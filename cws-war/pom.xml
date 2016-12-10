@@ -11,6 +11,9 @@
     <artifactId>cws-war</artifactId>
     <packaging>jar</packaging>
     <name>CWS WAR</name>
-    <description></description>
+    <description>
+        This is the Beans and WebServices Module, which will provide all the
+        binding logic as well as creating the REST / SOAP based API's.
+    </description>
 
 </project>

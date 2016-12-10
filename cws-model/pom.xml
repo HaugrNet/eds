@@ -11,6 +11,9 @@
     <artifactId>cws-model</artifactId>
     <packaging>jar</packaging>
     <name>CWS Model</name>
-    <description></description>
+    <description>
+        This is the CWS Database Module, which contain the Files to create a
+        Database, Migrate same database and also the Entities needed.
+    </description>
 
 </project>

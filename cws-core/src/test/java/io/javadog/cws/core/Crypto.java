@@ -6,7 +6,10 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.KeyGenerator;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
+import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.PBEKeySpec;
+import javax.crypto.spec.SecretKeySpec;
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
@@ -14,6 +17,9 @@ import java.security.Key;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.KeySpec;
+import java.util.Base64;
 import java.util.UUID;
 
 /**
@@ -22,29 +28,30 @@ import java.util.UUID;
  */
 public final class Crypto {
 
+    private static final String SYMMETRIC_ALGORITHM = "AES/CBC/PKCS5Padding";
+    private static final String ASYMMETRIC_ALGORITHM = "RSA";
+    private static final int ASYMMETRIC_KEYLENGTH = 2048;
+    private static final int SYMMETRIC_KEYLENGTH = 256;
     private static final String CHARSETNAME = "UTF-8";
 
     private final IvParameterSpec iv;
     private final KeyPair keyPair;
     private final Key key;
-    private final String algorithm;
 
     // =========================================================================
     // Constructors
     // =========================================================================
 
-    public Crypto(final KeyPair keyPair, final String algorithm) {
+    public Crypto(final KeyPair keyPair) {
         this.iv = null;
         this.keyPair = keyPair;
         this.key = null;
-        this.algorithm = algorithm;
     }
 
-    public Crypto(final IvParameterSpec iv, final Key key, final String algorithm) {
+    public Crypto(final IvParameterSpec iv, final Key key) {
         this.iv = iv;
         this.key = key;
         this.keyPair = null;
-        this.algorithm = algorithm;
     }
 
     // =========================================================================
@@ -65,14 +72,17 @@ public final class Crypto {
 
     private Cipher prepareCipher(final int mode) {
         try {
-            final Cipher cipher = Cipher.getInstance(algorithm);
+            final Cipher cipher;
 
             if (key != null) {
+                cipher = Cipher.getInstance(SYMMETRIC_ALGORITHM);
                 cipher.init(mode, key, iv);
             } else {
                 if (mode == Cipher.ENCRYPT_MODE) {
+                    cipher = Cipher.getInstance(keyPair.getPublic().getAlgorithm());
                     cipher.init(Cipher.ENCRYPT_MODE, keyPair.getPublic());
                 } else {
+                    cipher = Cipher.getInstance(keyPair.getPrivate().getAlgorithm());
                     cipher.init(Cipher.DECRYPT_MODE, keyPair.getPrivate());
                 }
             }
@@ -104,28 +114,61 @@ public final class Crypto {
         return new IvParameterSpec(bytes);
     }
 
-    public static SecretKey generateSymmetricKey(final String algorithm, final int keysize) {
+    public static SecretKey generateSymmetricKey() {
         try {
-            final String toUse;
-            if (algorithm.contains("/")) {
-                toUse = algorithm.substring(0, algorithm.indexOf('/'));
+            final String algorithm;
+            if (SYMMETRIC_ALGORITHM.contains("/")) {
+                algorithm = SYMMETRIC_ALGORITHM.substring(0, SYMMETRIC_ALGORITHM.indexOf('/'));
             } else {
-                toUse = algorithm;
+                algorithm = SYMMETRIC_ALGORITHM;
             }
-            final KeyGenerator keyGenerator = KeyGenerator.getInstance(toUse);
-            keyGenerator.init(keysize);
+
+            final KeyGenerator keyGenerator = KeyGenerator.getInstance(algorithm);
+            keyGenerator.init(SYMMETRIC_KEYLENGTH);
             return keyGenerator.generateKey();
         } catch (NoSuchAlgorithmException e) {
             throw new CWSException(e);
         }
     }
 
-    public static KeyPair generateAsymmetricKey(final String algorithm, final int keysize) {
+    public static KeyPair generateAsymmetricKey() {
         try {
-            final KeyPairGenerator keyGenerator = KeyPairGenerator.getInstance(algorithm);
-            keyGenerator.initialize(keysize);
+            final KeyPairGenerator keyGenerator = KeyPairGenerator.getInstance(ASYMMETRIC_ALGORITHM);
+            keyGenerator.initialize(ASYMMETRIC_KEYLENGTH);
             return keyGenerator.generateKeyPair();
         } catch (NoSuchAlgorithmException e) {
+            throw new CWSException(e);
+        }
+    }
+
+    /**
+     * <p>Converts the given Salted Password to a Key, which can be used for the
+     * initial Cryptographic Operations. With the help of the PBKDF2 algorithm,
+     * it creates a 256 byte Key over 10 iterations. However, for the Key to be
+     * of a good enough Quality, it should be having a length of at least 16
+     * characters and the same applies to the Salt.</p>
+     *
+     * <p>Note, that it takes the Password as a char array, rather than a
+     * String. The reason for this, is that a Char array can be overridden with
+     * garbage once we don't need it anymore, whereas a String which is
+     * immutable can't. This way we don't have to wait for the Garbage Collector
+     * to clean up things.</p>
+     *
+     * @param password Provided Password or Secret
+     * @param salt     System specific Salt
+     * @return Symmetric Key
+     */
+    public static SecretKey convertPasswordToKey(final char[] password, final String salt) {
+        try {
+            final String algorithm = "PBKDF2WithHmacSHA256";
+            final byte[] secret = stringToBytes(salt);
+
+            final SecretKeyFactory factory = SecretKeyFactory.getInstance(algorithm);
+            final KeySpec spec = new PBEKeySpec(password, secret, 1024, SYMMETRIC_KEYLENGTH);
+            final SecretKey tmpKey = factory.generateSecret(spec);
+
+            return new SecretKeySpec(tmpKey.getEncoded(), "AES");
+        } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
             throw new CWSException(e);
         }
     }
@@ -144,5 +187,13 @@ public final class Crypto {
         } catch (UnsupportedEncodingException e) {
             throw new CWSException(e);
         }
+    }
+
+    public static String base64Encode(final byte[] data) {
+        return Base64.getEncoder().encodeToString(data);
+    }
+
+    public static byte[] base64Decode(final String str) {
+        return Base64.getDecoder().decode(str);
     }
 }

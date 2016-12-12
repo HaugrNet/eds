@@ -23,6 +23,27 @@ import java.util.Base64;
 import java.util.UUID;
 
 /**
+ * <p>This library contain all the Cryptographic Operations, needed for CWS, to
+ * support the features needed. JCA, Java Cryptography Architecture, contains
+ * all the features needed, and is flexible enough, that it can be extended by
+ * providing different vendors - which will then allow using stronger encryption
+ * if needed.</p>
+ *
+ * <p>CWS uses two (three) types of Encryption. Symmetric Encryption of all the
+ * actual Data to be shared and Asymmetric Encryption to storing the Symmetric
+ * keys. Additionally, a Members Private Key can be stored encrypted within the
+ * system, and a Key is derived from the Credentials to unlock it, that is, if
+ * the Member is not storing the Private Key.</p>
+ *
+ * <p>The default Algorithms and Key sizes have been chosen, so they will work
+ * with a standard Java 8+ installation, if larger keys are requested, then the
+ * Java installation must be configured accordingly.</p>
+ *
+ * <p>Although Cryptography is the cornerstone of the CWS, there is no attempts
+ * made towards creating or inventing various Algorithms. The risk of making
+ * mistakes is too high. Instead, the CWS relies on the wisdom and maturity of
+ * existing Algorithms.</p>
+ *
  * @author Kim Jensen
  * @since  CWS 1.0
  */
@@ -144,8 +165,8 @@ public final class Crypto {
     /**
      * <p>Converts the given Salted Password to a Key, which can be used for the
      * initial Cryptographic Operations. With the help of the PBKDF2 algorithm,
-     * it creates a 256 byte Key over 10 iterations. However, for the Key to be
-     * of a good enough Quality, it should be having a length of at least 16
+     * it creates a 256 byte Key over 1024 iterations. However, for the Key to
+     * be of a good enough Quality, it should be having a length of at least 16
      * characters and the same applies to the Salt.</p>
      *
      * <p>Note, that it takes the Password as a char array, rather than a

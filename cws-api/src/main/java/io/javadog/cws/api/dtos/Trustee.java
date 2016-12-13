@@ -1,6 +1,6 @@
 package io.javadog.cws.api.dtos;
 
-import io.javadog.cws.api.common.TrustWorthiness;
+import io.javadog.cws.api.common.TrustLevel;
 
 import java.util.Date;
 
@@ -15,7 +15,7 @@ public final class Trustee {
 
     private Circle circle = null;
     private Member member = null;
-    private TrustWorthiness trustWorthiness = TrustWorthiness.NONE;
+    private TrustLevel trustWorthiness = TrustLevel.NONE;
     private Date modified = null;
     private Date added = null;
 }

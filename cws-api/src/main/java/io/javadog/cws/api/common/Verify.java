@@ -18,11 +18,8 @@ public class Verify implements Serializable {
     }
 
     protected static void ensureLength(final String field, final String value, final int min, final int max) {
-        if (value != null) {
-            if ((value.length() < min) || (value.length() > max)) {
-                throw new IllegalArgumentException("The field '" + field+ "' is outside of the allowed boundaries.");
-            }
+        if ((value != null) && ((value.length() < min) || (value.length() > max))) {
+            throw new IllegalArgumentException("The field '" + field+ "' is outside of the allowed boundaries.");
         }
     }
-
 }

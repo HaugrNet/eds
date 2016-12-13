@@ -2,7 +2,7 @@ package io.javadog.cws.api.dtos;
 
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.CredentialType;
-import io.javadog.cws.api.common.TrustWorthiness;
+import io.javadog.cws.api.common.TrustLevel;
 import io.javadog.cws.api.common.Verify;
 
 import javax.validation.constraints.NotNull;
@@ -33,7 +33,7 @@ public final class Member extends Verify {
     @XmlElement(required = true) private String name = null;
     @XmlElement(required = true) private CredentialType credentialType = null;
     @XmlElement(required = true) private char[] credentials = null;
-    @XmlElement(required = true) private TrustWorthiness trustWorthiness = TrustWorthiness.READ;
+    @XmlElement(required = true) private TrustLevel trustWorthiness = TrustLevel.READ;
     private Date modified = null;
     private Date added = null;
 
@@ -57,7 +57,7 @@ public final class Member extends Verify {
      * @param credentials     Credentials used
      * @param trustWorthiness Member Trust level
      */
-    public Member(final String name, final CredentialType credentialType, final char[] credentials, final TrustWorthiness trustWorthiness) {
+    public Member(final String name, final CredentialType credentialType, final char[] credentials, final TrustLevel trustWorthiness) {
         setName(name);
         setCredentialType(credentialType);
         setCredentials(credentials);
@@ -100,12 +100,12 @@ public final class Member extends Verify {
         return credentials;
     }
 
-    public void setTrustWorthiness(final TrustWorthiness trustWorthiness) {
+    public void setTrustWorthiness(final TrustLevel trustWorthiness) {
         ensureNotNull(FIELD_TRUST, trustWorthiness);
         this.trustWorthiness = trustWorthiness;
     }
 
-    public TrustWorthiness getTrustWorthiness() {
+    public TrustLevel getTrustWorthiness() {
         return trustWorthiness;
     }
 }

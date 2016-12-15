@@ -18,7 +18,7 @@ public class CWSResponse implements Serializable {
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
-    private int returnCode = 0;
+    private int returnCode = Constants.SUCCESS;
     private String returnMessage = "Ok";
 
     // =========================================================================

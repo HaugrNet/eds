@@ -7,7 +7,7 @@ import io.javadog.cws.api.dtos.Authenticate;
  * @author Kim Jensen
  * @since  CWS 1.0
  */
-public final class FetchMemberRequest extends Authenticate {
+public final class FetchObjectTypeRequest extends Authenticate {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;

@@ -1,5 +1,7 @@
 package io.javadog.cws.core;
 
+import io.javadog.cws.core.exceptions.CWSException;
+
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;

@@ -15,6 +15,14 @@
 
     <dependencies>
         <dependency>
+            <groupId>javadog.io</groupId>
+            <artifactId>cws-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>javadog.io</groupId>
+            <artifactId>cws-model</artifactId>
+        </dependency>
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.12</version>

@@ -16,4 +16,19 @@
         binding logic as well as creating the REST / SOAP based API's.
     </description>
 
+    <dependencies>
+        <dependency>
+            <groupId>javadog.io</groupId>
+            <artifactId>cws-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>javadog.io</groupId>
+            <artifactId>cws-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.7.14</version>
+        </dependency>
+    </dependencies>
 </project>

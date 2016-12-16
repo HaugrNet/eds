@@ -1,6 +1,5 @@
 package io.javadog.cws.api;
 
-import io.javadog.cws.api.dtos.Member;
 import io.javadog.cws.api.requests.FetchCircleRequest;
 import io.javadog.cws.api.requests.FetchMemberRequest;
 import io.javadog.cws.api.requests.ProcessCircleRequest;
@@ -18,7 +17,8 @@ import io.javadog.cws.api.responses.VersionResponse;
 public interface System {
 
     /**
-     * <p>Returns the current Version of the running CWS instance.</p>
+     * <p>Returns the current Version of the running CWS instance. This method
+     * serves mainly as a simply way to check if the system is operational.</p>
      *
      * @return The CWS Version
      */
@@ -29,13 +29,12 @@ public interface System {
      * share data between trusted Members. A Member can be anything from a
      * Person, Organization, Company, etc.</p>
      *
-     * @param member
      * @param request
      * @return
      */
-    FetchCircleResponse fetchCircles(Member member, FetchCircleRequest request);
-    ProcessCircleResponse processCircle(Member member, ProcessCircleRequest request);
+    FetchCircleResponse fetchCircles(FetchCircleRequest request);
+    ProcessCircleResponse processCircle(ProcessCircleRequest request);
 
-    FetchMemberResponse fetchMembers(Member member, FetchMemberRequest request);
-    ProcessMemberResponse processMember(Member member, ProcessMemberRequest request);
+    FetchMemberResponse fetchMembers(FetchMemberRequest request);
+    ProcessMemberResponse processMember(ProcessMemberRequest request);
 }

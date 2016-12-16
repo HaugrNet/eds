@@ -19,7 +19,7 @@ import io.javadog.cws.core.services.ProcessObjectTypeService;
 
 /**
  * @author Kim Jensen
- * @since CWS 1.0
+ * @since  CWS 1.0
  */
 public final class ShareServiceFactory {
 

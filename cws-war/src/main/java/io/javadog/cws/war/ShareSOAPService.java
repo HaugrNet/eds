@@ -28,9 +28,9 @@ import javax.jws.WebService;
  * @since  CWS 1.0
  */
 @WebService
-public final class ShareWebService implements Share {
+public final class ShareSOAPService implements Share {
 
-    private static final Logger log = LoggerFactory.getLogger(ShareWebService.class);
+    private static final Logger log = LoggerFactory.getLogger(ShareSOAPService.class);
 
     private static final String GENERAL_RETURN_MESSAGE = "An unknown error occurred. Please consult the CWS System Log.";
 

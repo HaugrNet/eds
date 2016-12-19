@@ -9,7 +9,7 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>cws-war</artifactId>
-    <packaging>jar</packaging>
+    <packaging>war</packaging>
     <name>CWS WAR</name>
     <description>
         This is the Beans and WebServices Module, which will provide all the
@@ -24,6 +24,10 @@
         <dependency>
             <groupId>javadog.io</groupId>
             <artifactId>cws-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>javax</groupId>
+            <artifactId>javaee-api</artifactId>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>

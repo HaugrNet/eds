@@ -1,4 +1,4 @@
-package io.javadog.cws.core;
+package io.javadog.cws.core.common;
 
 import io.javadog.cws.core.exceptions.CWSException;
 
@@ -54,7 +54,7 @@ public final class Crypto {
     private static final String SYMMETRIC_ALGORITHM = "AES/CBC/PKCS5Padding";
     private static final String ASYMMETRIC_ALGORITHM = "RSA";
     private static final int ASYMMETRIC_KEYLENGTH = 2048;
-    private static final int SYMMETRIC_KEYLENGTH = 256;
+    private static final int SYMMETRIC_KEYLENGTH = 128;
     private static final String CHARSETNAME = "UTF-8";
 
     private final IvParameterSpec iv;

@@ -12,7 +12,7 @@ import javax.xml.bind.annotation.XmlType;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "authenticationToken", propOrder = "version")
+@XmlType(name = "versionResponse", propOrder = "version")
 public final class VersionResponse extends CWSResponse {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
@@ -20,6 +20,14 @@ public final class VersionResponse extends CWSResponse {
 
     @XmlElement
     private String version = Constants.CWS_VERSION;
+
+    public VersionResponse() {
+        // Empty Constructor, required for WebServices
+    }
+
+    public VersionResponse(final int returnCode, final String returnMessage) {
+        super(returnCode, returnMessage);
+    }
 
     // =========================================================================
     // Standard Setters & Getters

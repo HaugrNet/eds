@@ -1,4 +1,4 @@
-package io.javadog.cws.core.exceptions;
+package io.javadog.cws.common.exceptions;
 
 import io.javadog.cws.api.common.Constants;
 
@@ -23,6 +23,11 @@ public class CWSException extends RuntimeException {
     public CWSException(final Throwable cause) {
         super(cause);
         this.returnCode = Constants.ERROR;
+    }
+
+    public CWSException(final int returnCode, final String message, final Throwable cause) {
+        super(message, cause);
+        this.returnCode = returnCode;
     }
 
     public int getReturnCode() {

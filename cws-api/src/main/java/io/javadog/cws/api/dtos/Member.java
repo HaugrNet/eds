@@ -20,7 +20,7 @@ import java.util.Map;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "member", propOrder = { "name", "credentialType", "credentials", "trustWorthiness" })
+@XmlType(name = "member", propOrder = { "name", "credentialType", "credentials", "trustLevel", "modified", "since" })
 public final class Member extends Verifiable {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
@@ -28,43 +28,16 @@ public final class Member extends Verifiable {
     private static final String FIELD_NAME = "name";
     private static final String FIELD_TYPE = "credentialType";
     private static final String FIELD_CREDENTIAL = "credentials";
-    private static final String FIELD_TRUST = "trustWorthiness";
+    private static final String FIELD_TRUST = "trustLevel";
     private static final int NAME_MIN_LENGTH = 1;
     private static final int NAME_MAX_LENGTH = 75;
 
     @XmlElement(required = true) private String name = null;
     @XmlElement(required = true) private CredentialType credentialType = null;
     @XmlElement(required = true) private char[] credentials = null;
-    @XmlElement(required = true) private TrustLevel trustWorthiness = TrustLevel.READ;
-    private Date modified = null;
-    private Date added = null;
-
-    // =========================================================================
-    // Object Constructors
-    // =========================================================================
-
-    /**
-     * Empty Constructor, to use if the setters are invoked. This is required
-     * for WebServices to work properly.
-     */
-    public Member() {
-        // Required for WebServices to work. Comment added to please Sonar.
-    }
-
-    /**
-     * Default Constructor, for setting all the fields in this Class.
-     *
-     * @param name            Name of the Member
-     * @param credentialType  Type of Credentials being used
-     * @param credentials     Credentials used
-     * @param trustWorthiness Member Trust level
-     */
-    public Member(final String name, final CredentialType credentialType, final char[] credentials, final TrustLevel trustWorthiness) {
-        setName(name);
-        setCredentialType(credentialType);
-        setCredentials(credentials);
-        setTrustWorthiness(trustWorthiness);
-    }
+    @XmlElement(required = true) private TrustLevel trustLevel = TrustLevel.READ;
+    @XmlElement                  private Date modified = null;
+    @XmlElement                  private Date since = null;
 
     // =========================================================================
     // Standard Setters & Getters
@@ -102,15 +75,38 @@ public final class Member extends Verifiable {
         return credentials;
     }
 
-    public void setTrustWorthiness(final TrustLevel trustWorthiness) {
-        ensureNotNull(FIELD_TRUST, trustWorthiness);
-        this.trustWorthiness = trustWorthiness;
+    public void setTrustLevel(final TrustLevel trustLevel) {
+        ensureNotNull(FIELD_TRUST, trustLevel);
+        this.trustLevel = trustLevel;
     }
 
-    public TrustLevel getTrustWorthiness() {
-        return trustWorthiness;
+    public TrustLevel getTrustLevel() {
+        return trustLevel;
     }
 
+    public void setModified(final Date modified) {
+        this.modified = modified;
+    }
+
+    public Date getModified() {
+        return modified;
+    }
+
+    public void setSince(final Date since) {
+        this.since = since;
+    }
+
+    public Date getSince() {
+        return since;
+    }
+
+    // =========================================================================
+    // Standard Methods
+    // =========================================================================
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Map<String, String> validate() {
         return new HashMap<>();

@@ -15,7 +15,7 @@ import io.javadog.cws.api.responses.ProcessFolderResponse;
 import io.javadog.cws.api.responses.ProcessObjectResponse;
 import io.javadog.cws.api.responses.ProcessObjectTypeResponse;
 import io.javadog.cws.core.ShareServiceFactory;
-import io.javadog.cws.core.exceptions.CWSException;
+import io.javadog.cws.common.exceptions.exceptions.CWSException;
 import io.javadog.cws.core.Servicable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

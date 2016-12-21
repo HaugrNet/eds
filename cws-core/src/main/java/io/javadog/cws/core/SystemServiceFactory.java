@@ -12,6 +12,10 @@ import io.javadog.cws.core.services.FetchCirclesService;
 import io.javadog.cws.core.services.FetchMemberService;
 import io.javadog.cws.core.services.ProcessCircleService;
 import io.javadog.cws.core.services.ProcessMemberService;
+import io.javadog.cws.model.ProcessMemberDao;
+import io.javadog.cws.model.jpa.ProcessMemberJpaDao;
+
+import javax.persistence.EntityManager;
 
 /**
  * @author Kim Jensen
@@ -19,12 +23,10 @@ import io.javadog.cws.core.services.ProcessMemberService;
  */
 public final class SystemServiceFactory {
 
-    public Servicable<FetchCircleResponse, FetchCircleRequest> prepareFetchCirclesService() {
-        return new FetchCirclesService();
-    }
+    private final EntityManager entityManager;
 
-    public Servicable<ProcessCircleResponse, ProcessCircleRequest> prepareProcessCircleService() {
-        return new ProcessCircleService();
+    public SystemServiceFactory(final EntityManager entityManager) {
+        this.entityManager = entityManager;
     }
 
     public Servicable<FetchMemberResponse, FetchMemberRequest> prepareFetchMemberService() {
@@ -32,6 +34,15 @@ public final class SystemServiceFactory {
     }
 
     public Servicable<ProcessMemberResponse, ProcessMemberRequest> prepareProcessMemberService() {
-        return new ProcessMemberService();
+        final ProcessMemberDao dao = new ProcessMemberJpaDao(entityManager);
+        return new ProcessMemberService(dao);
+    }
+
+    public Servicable<FetchCircleResponse, FetchCircleRequest> prepareFetchCirclesService() {
+        return new FetchCirclesService();
+    }
+
+    public Servicable<ProcessCircleResponse, ProcessCircleRequest> prepareProcessCircleService() {
+        return new ProcessCircleService();
     }
 }

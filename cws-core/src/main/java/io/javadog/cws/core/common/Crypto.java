@@ -1,6 +1,6 @@
 package io.javadog.cws.core.common;
 
-import io.javadog.cws.core.exceptions.CWSException;
+import io.javadog.cws.common.exceptions.exceptions.CWSException;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;

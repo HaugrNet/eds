@@ -1,4 +1,4 @@
-package io.javadog.cws.core.exceptions;
+package io.javadog.cws.common.exceptions;
 
 import io.javadog.cws.api.common.Constants;
 

@@ -16,4 +16,15 @@
         Database, Migrate same database and also the Entities needed.
     </description>
 
+    <dependencies>
+        <dependency>
+            <groupId>javadog.io</groupId>
+            <artifactId>cws-common</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>javax</groupId>
+            <artifactId>javaee-api</artifactId>
+        </dependency>
+    </dependencies>
+
 </project>

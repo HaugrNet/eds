@@ -20,7 +20,15 @@
         </dependency>
         <dependency>
             <groupId>javadog.io</groupId>
+            <artifactId>cws-common</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>javadog.io</groupId>
             <artifactId>cws-model</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>javax</groupId>
+            <artifactId>javaee-api</artifactId>
         </dependency>
         <dependency>
             <groupId>junit</groupId>

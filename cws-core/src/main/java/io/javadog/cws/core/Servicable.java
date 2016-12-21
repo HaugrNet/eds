@@ -3,7 +3,7 @@ package io.javadog.cws.core;
 import io.javadog.cws.api.common.Verifiable;
 import io.javadog.cws.api.dtos.Authenticate;
 import io.javadog.cws.api.responses.CWSResponse;
-import io.javadog.cws.core.exceptions.VerificationException;
+import io.javadog.cws.common.exceptions.VerificationException;
 
 import java.util.Map;
 

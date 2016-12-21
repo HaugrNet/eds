@@ -29,6 +29,17 @@ public class Constants {
     public static final long SERIAL_VERSION_UID = 201701010010000L; // YYYYMMDDvvvnnnn
 
     /**
+     * <p>The System Administrator Account - this account is used as the default
+     * standard administrative Member Account, and cannot be altered. Upon first
+     * attempt to process a Member, the System Administrator Account will be
+     * stored in the underlying database with the credentials provided. This
+     * way, the Account Name of the System Administrator will remain well-known,
+     * however - as there are not default credentials, there's also nothing to
+     * exploit.</p>
+     */
+    public static final String ADMIN_ACCOUNT = "admin";
+
+    /**
      * <p>General number for all Errors, an Error is defined as an event that
      * happened during processing, which meant that the processing cannot
      * complete properly, most likely due to a configuration error, programming
@@ -37,6 +48,8 @@ public class Constants {
      * CWS Developers.</p>
      */
     public static final int ERROR = 100;
+    public static final int DATABASE_ERROR = ERROR + 1;
+    public static final int CONSTRAINT_ERROR = ERROR + 2;
 
     /**
      * <p>General number for all Warnings, a Warning is defined as an even that
@@ -55,5 +68,6 @@ public class Constants {
     public static final int SUCCESS = 0;
 
     public static final int VERIFICATION_WARNING = WARNING + 1;
+    public static final int IDENTIFICATION_WARNING = WARNING + 2;
     public static final int NOTIMPLEMENTED_ERROR = ERROR + 99;
 }

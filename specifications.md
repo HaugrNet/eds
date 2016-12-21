@@ -78,8 +78,8 @@ Testing is traditionally made on different levels, with the most basic being
 Unit testing.
 
 Certain forms of Testing is initially discarded. Regression Testing will be
-added once a later version of the CWS is under development. If problems exist
-with performance, Performance Testing can also be added, but initially it is not
+since once a later version of the CWS is under development. If problems exist
+with performance, Performance Testing can also be since, but initially it is not
 considered.
 
 #### 3.1 Unit Testing

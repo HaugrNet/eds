@@ -13,12 +13,15 @@ import io.javadog.cws.api.responses.ProcessMemberResponse;
 import io.javadog.cws.api.responses.VersionResponse;
 import io.javadog.cws.core.Servicable;
 import io.javadog.cws.core.SystemServiceFactory;
-import io.javadog.cws.core.exceptions.CWSException;
+import io.javadog.cws.common.exceptions.exceptions.CWSException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.PostConstruct;
 import javax.ejb.Stateless;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.transaction.Transactional;
 
 /**
  * @author Kim Jensen
@@ -29,17 +32,21 @@ public class SystemBean implements System {
 
     private static final Logger log = LoggerFactory.getLogger(SystemBean.class);
 
+    @PersistenceContext(unitName = "cwsDatabase")
+    private EntityManager entityManager;
+
     private SystemServiceFactory factory = null;
 
     @PostConstruct
     public void init() {
-        factory = new SystemServiceFactory();
+        factory = new SystemServiceFactory(entityManager);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
+    @Transactional(Transactional.TxType.NEVER)
     public VersionResponse version() {
         final VersionResponse response = new VersionResponse();
         response.setVersion(Constants.CWS_VERSION);
@@ -51,6 +58,7 @@ public class SystemBean implements System {
      * {@inheritDoc}
      */
     @Override
+    @Transactional(Transactional.TxType.NEVER)
     public FetchMemberResponse fetchMembers(final FetchMemberRequest request) {
         FetchMemberResponse response;
 
@@ -73,6 +81,7 @@ public class SystemBean implements System {
      * {@inheritDoc}
      */
     @Override
+    @Transactional(Transactional.TxType.REQUIRED)
     public ProcessMemberResponse processMember(final ProcessMemberRequest request) {
         ProcessMemberResponse response;
 
@@ -95,6 +104,7 @@ public class SystemBean implements System {
      * {@inheritDoc}
      */
     @Override
+    @Transactional(Transactional.TxType.NEVER)
     public FetchCircleResponse fetchCircles(final FetchCircleRequest request) {
         FetchCircleResponse response;
 
@@ -117,6 +127,7 @@ public class SystemBean implements System {
      * {@inheritDoc}
      */
     @Override
+    @Transactional(Transactional.TxType.REQUIRED)
     public ProcessCircleResponse processCircle(final ProcessCircleRequest request) {
         ProcessCircleResponse response;
 

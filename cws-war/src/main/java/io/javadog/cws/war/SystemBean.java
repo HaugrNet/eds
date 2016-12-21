@@ -13,7 +13,7 @@ import io.javadog.cws.api.responses.ProcessMemberResponse;
 import io.javadog.cws.api.responses.VersionResponse;
 import io.javadog.cws.core.Servicable;
 import io.javadog.cws.core.SystemServiceFactory;
-import io.javadog.cws.common.exceptions.exceptions.CWSException;
+import io.javadog.cws.common.exceptions.CWSException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -4,7 +4,7 @@ import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.requests.ProcessCircleRequest;
 import io.javadog.cws.api.responses.ProcessCircleResponse;
 import io.javadog.cws.core.Servicable;
-import io.javadog.cws.common.exceptions.exceptions.CWSException;
+import io.javadog.cws.common.exceptions.CWSException;
 
 /**
  * @author Kim Jensen

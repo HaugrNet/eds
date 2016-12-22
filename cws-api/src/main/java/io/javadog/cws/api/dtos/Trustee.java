@@ -2,20 +2,21 @@ package io.javadog.cws.api.dtos;
 
 import io.javadog.cws.api.common.TrustLevel;
 
+import javax.xml.bind.annotation.XmlElement;
 import java.util.Date;
 
 /**
- * <p>A Trustee, is a member of a Circle, with a level of Trustworthiness, and
- * information about </p>
+ * <p>A Trustee, is a Member of a Circle, with a granted Trust Level.</p>
  *
  * @author Kim Jensen
  * @since  CWS 1.0
  */
 public final class Trustee {
 
-    private Circle circle = null;
-    private Member member = null;
-    private TrustLevel trustWorthiness = TrustLevel.NONE;
-    private Date modified = null;
-    private Date added = null;
+    @XmlElement                  private String id = null;
+    @XmlElement(required = true) private Circle circle = null;
+    @XmlElement(required = true) private Member member = null;
+    @XmlElement(required = true) private TrustLevel trustLevel = null;
+    @XmlElement                  private Date modified = null;
+    @XmlElement                  private Date since = null;
 }

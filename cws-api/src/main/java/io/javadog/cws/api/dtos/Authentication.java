@@ -22,8 +22,8 @@ import java.util.Map;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "authenticate", propOrder = { "name", "credentialType", "credentials" })
-public class Authenticate extends Verifiable {
+@XmlType(name = "authentication", propOrder = { "name", "credentialType", "credentials" })
+public class Authentication extends Verifiable {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
@@ -53,6 +53,12 @@ public class Authenticate extends Verifiable {
         return name;
     }
 
+    /**
+     * Sets the type of Credentials to be used, either a Passphrase (default) or
+     * an Asymmetric Key (RSA based Private Key or Public/Private Key Pair).
+     *
+     * @param credentialType Member Credential Type, i.e. Key or Passphrase
+     */
     @NotNull
     public void setCredentialType(final CredentialType credentialType) {
         ensureNotNull(FIELD_TYPE, credentialType);
@@ -63,13 +69,35 @@ public class Authenticate extends Verifiable {
         return credentialType;
     }
 
+    /**
+     * <p>Sets the Member's Credentials. This can be either a Passphrase
+     * (default) or an Asymmetric Key (RSA based Private Key or Public/Private
+     * Key Pair).</p>
+     *
+     * <p>If the Credentials is a Key, then the information given must be
+     * armored, i.e. Base64 encoded.</p>
+     *
+     * @param credentials Member Credentials, i.e. Key or Passphrase
+     */
     @NotNull
     public void setCredentials(final char[] credentials) {
         ensureNotNull(FIELD_CREDENTIALS, credentials);
+        // Arrays should not be referenced directly, as it can lead to problems
+        // with encapsulation. However, in our case it is important for 2
+        // reasons:
+        //   1. All requests is coming in via a WebService (REST/SOAP), and it
+        //      is therefore not likely that any changes can be made
+        //      uncontrolled.
+        //   2. The information stored here is highly sensitive, it is therefore
+        //      important that we can overwrite it ASAP, when we no longer need
+        //      to reference it. The Garbage Collector will clean up the mess,
+        //      but as we don't know when the Garbage Collector will run, it is
+        //      better to control this ourselves.
         this.credentials = credentials;
     }
 
     public char[] getCredentials() {
+        // See comment above.
         return credentials;
     }
 

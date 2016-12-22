@@ -4,7 +4,7 @@ package io.javadog.cws.api.common;
  * @author Kim Jensen
  * @since  CWS 1.0
  */
-public class Constants {
+public final class Constants {
 
     /**
      * <p>The Version of the current CWS Instance.</p>
@@ -27,6 +27,12 @@ public class Constants {
      * {@code private static final long serialVersionUID = IWSConstants.SERIAL_VERSION_UID;}
      */
     public static final long SERIAL_VERSION_UID = 201701010010000L; // YYYYMMDDvvvnnnn
+
+    /**
+     * <p>All Id's must be compliant with a standard UUID Pattern, which this
+     * regular expression matches.</p>
+     */
+    public static final String PATTERN_REGEX = "[\\da-z]{8}-[\\da-z]{4}-[\\da-z]{4}-[\\da-z]{4}-[\\da-z]{12}";
 
     /**
      * <p>The System Administrator Account - this account is used as the default
@@ -70,4 +76,8 @@ public class Constants {
     public static final int VERIFICATION_WARNING = WARNING + 1;
     public static final int IDENTIFICATION_WARNING = WARNING + 2;
     public static final int NOTIMPLEMENTED_ERROR = ERROR + 99;
+
+    private Constants() {
+        // Private Constructor, this is a Constants Class.
+    }
 }

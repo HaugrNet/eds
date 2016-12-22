@@ -1,7 +1,7 @@
 package io.javadog.cws.core;
 
 import io.javadog.cws.api.common.Verifiable;
-import io.javadog.cws.api.dtos.Authenticate;
+import io.javadog.cws.api.dtos.Authentication;
 import io.javadog.cws.api.responses.CWSResponse;
 import io.javadog.cws.common.exceptions.VerificationException;
 
@@ -11,7 +11,7 @@ import java.util.Map;
  * @author Kim Jensen
  * @since  CWS 1.0
  */
-public abstract class Servicable<R extends CWSResponse, V extends Authenticate> {
+public abstract class Servicable<R extends CWSResponse, V extends Authentication> {
 
     /**
      * <p>The main processing method for the given Service. Takes care of the

@@ -24,8 +24,9 @@ public final class ProcessMemberJpaDao implements ProcessMemberDao {
 
     @Override
     public MemberEntity findMemberByName(final String name) {
-        final String jql = "select m from MemberEntity where name = :name";
-        final Query query = entityManager.createNamedQuery(jql);
+        //final Query query = entityManager.createNamedQuery("findByName");
+        final Query query = entityManager.createQuery("select m from MemberEntity m where name = :name");
+        query.setParameter("name", name);
 
         return findUniqueRecord(query, "member", name);
     }

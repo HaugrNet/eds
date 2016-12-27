@@ -30,6 +30,13 @@
             <groupId>javax</groupId>
             <artifactId>javaee-api</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>javadog.io</groupId>
+            <artifactId>cws-model</artifactId>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>

@@ -9,9 +9,6 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-import java.util.Date;
 
 /**
  * @author Kim Jensen
@@ -25,7 +22,7 @@ import java.util.Date;
                 " where name = :name"
 ))
 @Table(name = "members")
-public class MemberEntity {
+public class MemberEntity extends CWSEntity {
 
     @Id
     @SequenceGenerator(name = "memberSequence", sequenceName = "member_sequence")
@@ -33,14 +30,11 @@ public class MemberEntity {
     @Column(name = "id", unique = true, nullable = false, updatable = false)
     private Long id;
 
-    @Column(name = "external_id", unique = true, nullable = false, updatable = false)
-    private String externalId;
+    @Column(name = "credential", unique = true, nullable = false)
+    private String credential;
 
-    @Column(name = "name", nullable = false, unique = true)
+    @Column(name = "name")
     private String name;
-
-    @Column(name = "description")
-    private String description;
 
     @Column(name = "armored_public_key", nullable = false)
     private String armoredPublicKey;
@@ -48,13 +42,9 @@ public class MemberEntity {
     @Column(name = "armored_encrypted_private_key", nullable = false)
     private String armoredEncryptedPrivateKey;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "modified", nullable = false)
-    private Date modified;
-
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "created", nullable = false, updatable = false)
-    private Date created;
+    // =========================================================================
+    // Entity Setters & Getters
+    // =========================================================================
 
     public void setId(final Long id) {
         this.id = id;
@@ -64,28 +54,20 @@ public class MemberEntity {
         return id;
     }
 
-    public void setExternalId(final String externalId) {
-        this.externalId = externalId;
+    public void setCredential(final String identifier) {
+        this.credential = identifier;
     }
 
-    public String getExternalId() {
-        return externalId;
+    public String getCredential() {
+        return credential;
     }
 
-    public void setName(final String name) {
-        this.name = name;
+    public void setName(final String commonName) {
+        this.name = commonName;
     }
 
     public String getName() {
         return name;
-    }
-
-    public void setDescription(final String description) {
-        this.description = description;
-    }
-
-    public String getDescription() {
-        return description;
     }
 
     public void setArmoredPublicKey(final String armoredPublicKey) {
@@ -102,21 +84,5 @@ public class MemberEntity {
 
     public String getArmoredEncryptedPrivateKey() {
         return armoredEncryptedPrivateKey;
-    }
-
-    public void setModified(final Date modified) {
-        this.modified = modified;
-    }
-
-    public Date getModified() {
-        return modified;
-    }
-
-    public void setCreated(final Date created) {
-        this.created = created;
-    }
-
-    public Date getCreated() {
-        return created;
     }
 }

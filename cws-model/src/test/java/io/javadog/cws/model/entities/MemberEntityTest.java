@@ -5,12 +5,9 @@ import io.javadog.cws.common.exceptions.ModelException;
 import io.javadog.cws.model.EntityManagerSetup;
 import io.javadog.cws.model.ProcessMemberDao;
 import io.javadog.cws.model.jpa.ProcessMemberJpaDao;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.Test;
 
-import javax.persistence.EntityManager;
+import javax.persistence.PersistenceException;
 import javax.persistence.Query;
 import java.util.Date;
 import java.util.List;
@@ -25,42 +22,75 @@ import static org.junit.Assert.assertThat;
  * @author Kim Jensen
  * @since  CWS 1.0
  */
-public final class MemberEntityTest {
+public final class MemberEntityTest extends EntityManagerSetup {
 
-    // =========================================================================
-    // Test Setup
-    // =========================================================================
-    private static final EntityManager entityManager = EntityManagerSetup.createEntityManagerInstance();
+    @Test
+    public void testEntity() {
+        final String externalId = UUID.randomUUID().toString();
+        final String credential = Constants.ADMIN_ACCOUNT;
+        final String name = "Account Name";
+        final String publicKey = UUID.randomUUID().toString();
+        final String privateKey = UUID.randomUUID().toString();
+        final Date modified = new Date();
+        final Date created = new Date();
 
-    @Before
-    public void begin() {
-        entityManager.getTransaction().begin();
+        final MemberEntity entity = new MemberEntity();
+        entity.setExternalId(externalId);
+        entity.setCredential(credential);
+        entity.setName(name);
+        entity.setArmoredPublicKey(publicKey);
+        entity.setArmoredEncryptedPrivateKey(privateKey);
+        entity.setModified(modified);
+        entity.setCreated(created);
+
+        // Now, save Entity and clear Cache
+        entityManager.persist(entity);
+        entityManager.flush();
+        entityManager.clear();
+        final long id = entity.getId();
+
+        final MemberEntity found = entityManager.find(MemberEntity.class, id);
+        assertThat(found.getId(), is(entity.getId()));
+        assertThat(found.getExternalId(), is(externalId));
+        assertThat(found.getCredential(), is(credential));
+        assertThat(found.getName(), is(name));
+        assertThat(found.getArmoredPublicKey(), is(publicKey));
+        assertThat(found.getArmoredEncryptedPrivateKey(), is(privateKey));
+        assertThat(found.getModified().getTime(), is(modified.getTime()));
+        assertThat(found.getCreated().getTime(), is(created.getTime()));
     }
 
-    @After
-    public void rollback() {
-        entityManager.getTransaction().rollback();
+    @Test(expected = PersistenceException.class)
+    public void testPersistDetachedEntity() {
+        final MemberEntity entity = new MemberEntity();
+        entity.setId(12341234L);
+        entityManager.persist(entity);
     }
 
-    @AfterClass
-    public static void close() {
-        entityManager.close();
-    }
+    @Test
+    public void testUpdateEntity() {
+        final String credential = Constants.ADMIN_ACCOUNT;
+        final String publicKey = UUID.randomUUID().toString();
+        final String privateKey = UUID.randomUUID().toString();
+        final MemberEntity entity = prepareMember(credential, publicKey, privateKey);
 
-    // =========================================================================
-    // JUnit Tests
-    // =========================================================================
+        final long lastModified = entity.getModified().getTime();
+        assertThat(entity.getName(), is(credential));
+
+        final String newName = "New Name";
+        entity.setName(newName);
+        persist(entity);
+        assertThat(entity.getName(), is(newName));
+        assertThat(entity.getModified().getTime() >= lastModified, is(true));
+    }
 
     @Test
     public void testAddContent() {
-        final MemberEntity entity = new MemberEntity();
-        entity.setExternalId(UUID.randomUUID().toString());
-        entity.setName(Constants.ADMIN_ACCOUNT);
-        entity.setArmoredPublicKey(UUID.randomUUID().toString());
-        entity.setArmoredEncryptedPrivateKey(UUID.randomUUID().toString());
-        entity.setModified(new Date());
-        entity.setCreated(new Date());
-        assertThat(entity.getId(), is(nullValue()));
+        final String credential = Constants.ADMIN_ACCOUNT;
+        final String publicKey = UUID.randomUUID().toString();
+        final String privateKey = UUID.randomUUID().toString();
+        final MemberEntity entity = prepareMember(credential, publicKey, privateKey);
+        assertThat(entity.getId(), is(not(nullValue())));
 
         entityManager.persist(entity);
         assertThat(entity.getId(), is(not(nullValue())));

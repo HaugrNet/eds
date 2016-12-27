@@ -5,7 +5,9 @@
     <persistence-unit name="io.javadog.cws.jpa">
         <description>JPA Test Database Setup</description>
         <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+        <class>io.javadog.cws.model.entities.CircleEntity</class>
         <class>io.javadog.cws.model.entities.MemberEntity</class>
+        <class>io.javadog.cws.model.entities.TrusteeEntity</class>
         <properties>
             <property name="hibernate.connection.driver_class" value="org.hsqldb.jdbcDriver"/>
             <property name="hibernate.connection.url" value ="jdbc:hsqldb:mem:testdb;shutdown=false"/>

@@ -133,12 +133,24 @@
                 </configuration>
             </plugin>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <!-- Parallel supports 'classes', 'methods' or 'both' -->
+                    <parallel>classes</parallel>
+                    <threadCount>5</threadCount>
+                </configuration>
+                <goals>
+                    <goal>test</goal>
+                </goals>
+            </plugin>
+            <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <version>0.7.5.201505241946</version>
                 <configuration>
                     <includes>
-                        <include>io.javadog.*</include>
+                        <include>io.javadog.cws.*</include>
                     </includes>
                 </configuration>
                 <executions>

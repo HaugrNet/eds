@@ -1,5 +1,6 @@
 package io.javadog.cws.model;
 
+import io.javadog.cws.model.entities.CWSEntity;
 import io.javadog.cws.model.entities.MemberEntity;
 
 /**
@@ -8,5 +9,6 @@ import io.javadog.cws.model.entities.MemberEntity;
  */
 public interface ProcessMemberDao {
 
+    <E extends CWSEntity> E persist(E entity);
     MemberEntity findMemberByName(String name);
 }

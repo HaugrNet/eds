@@ -12,6 +12,7 @@ public final class ProcessCircleResponse extends CWSResponse {
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
     public ProcessCircleResponse() {
+        // Empty Constructor, required for WebServices
     }
 
     public ProcessCircleResponse(final int returnCode, final String returnMessage) {

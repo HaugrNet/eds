@@ -12,6 +12,7 @@ public final class FetchFolderResponse extends CWSResponse {
     private static final long serialVersionUID = 8868831828030258226L;
 
     public FetchFolderResponse() {
+        // Empty Constructor, required for WebServices
     }
 
     public FetchFolderResponse(final int returnCode, final String returnMessage) {

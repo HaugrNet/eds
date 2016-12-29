@@ -12,6 +12,7 @@ public class FetchCircleResponse extends CWSResponse {
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
     public FetchCircleResponse() {
+        // Empty Constructor, required for WebServices
     }
 
     public FetchCircleResponse(final int returnCode, final String returnMessage) {

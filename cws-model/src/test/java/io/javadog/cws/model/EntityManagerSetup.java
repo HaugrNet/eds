@@ -49,7 +49,6 @@ public class EntityManagerSetup {
     protected CircleEntity prepareCircle(final String name) {
         final CircleEntity entity = new CircleEntity();
         entity.setName(name);
-
         return persist(entity);
     }
 

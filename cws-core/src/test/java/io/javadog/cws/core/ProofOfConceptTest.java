@@ -34,6 +34,7 @@ public final class ProofOfConceptTest {
         // Now, we're going to encrypt some data
         final String cleartext = "This is just an example";
         final byte[] encrypted = crypto.encrypt(Crypto.stringToBytes(cleartext));
+        final String armoredEncrypted = Crypto.base64Encode(encrypted);
 
         // And decrypt it so we can verify it
         final byte[] decrypted = crypto.decrypt(encrypted);
@@ -87,7 +88,6 @@ public final class ProofOfConceptTest {
         final SecretKey key = Crypto.convertPasswordToKey(password, salt);
 
         assertThat(key.getAlgorithm(), is("AES"));
-        //assertThat(key.getEncoded().length, is(32));
 
         final IvParameterSpec iv = Crypto.generateNewInitialVector();
         final Crypto crypto = new Crypto(iv, key);
@@ -95,9 +95,11 @@ public final class ProofOfConceptTest {
         // Now, we're going to encrypt some data
         final String cleartext = "This is just an example";
         final byte[] encrypted = crypto.encrypt(Crypto.stringToBytes(cleartext));
+        final String armoredEncrypted = Crypto.base64Encode(encrypted);
 
         // And decrypt it so we can verify it
-        final byte[] decrypted = crypto.decrypt(encrypted);
+        final byte[] dearmoredEncrypted = Crypto.base64Decode(armoredEncrypted);
+        final byte[] decrypted = crypto.decrypt(dearmoredEncrypted);
         final String result = Crypto.bytesToString(decrypted);
 
         assertThat(result, is(cleartext));

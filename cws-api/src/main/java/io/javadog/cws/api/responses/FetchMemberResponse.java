@@ -12,6 +12,7 @@ public final class FetchMemberResponse extends CWSResponse {
     private static final long serialVersionUID = 8868831828030258226L;
 
     public FetchMemberResponse() {
+        // Empty Constructor, required for WebServices
     }
 
     public FetchMemberResponse(final int returnCode, final String returnMessage) {

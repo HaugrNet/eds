@@ -54,8 +54,7 @@
             <artifactId>javaee-api</artifactId>
         </dependency>
 
-        <!-- Test Dependencies, we're building the Testing Framework here using
-             Spring & Hibernate. -->
+        <!-- Test Dependencies, primarily JUnit & Hibernate (for JPA). -->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -69,12 +68,6 @@
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-core</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-validator</artifactId>
-            <version>5.3.4.Final</version>
             <scope>test</scope>
         </dependency>
         <dependency>

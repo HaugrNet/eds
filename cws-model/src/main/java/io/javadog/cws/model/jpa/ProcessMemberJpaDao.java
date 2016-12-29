@@ -1,14 +1,17 @@
 package io.javadog.cws.model.jpa;
 
 import io.javadog.cws.api.common.Constants;
-import io.javadog.cws.model.ProcessMemberDao;
-import io.javadog.cws.model.entities.MemberEntity;
 import io.javadog.cws.common.exceptions.ModelException;
+import io.javadog.cws.model.ProcessMemberDao;
+import io.javadog.cws.model.entities.CWSEntity;
+import io.javadog.cws.model.entities.MemberEntity;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceException;
 import javax.persistence.Query;
+import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * @author Kim Jensen
@@ -22,6 +25,27 @@ public final class ProcessMemberJpaDao implements ProcessMemberDao {
         this.entityManager = entityManager;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <E extends CWSEntity> E persist(final E entity) {
+        if (entity.getExternalId() == null) {
+            entity.setExternalId(UUID.randomUUID().toString());
+        }
+        if (entity.getCreated() == null) {
+            entity.setCreated(new Date());
+        }
+
+        entity.setModified(new Date());
+        entityManager.persist(entity);
+
+        return entity;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public MemberEntity findMemberByName(final String name) {
         final Query query = entityManager.createNamedQuery("findByName");

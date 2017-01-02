@@ -5,7 +5,7 @@ import io.javadog.cws.api.requests.ProcessMemberRequest;
 import io.javadog.cws.api.responses.ProcessMemberResponse;
 import io.javadog.cws.common.exceptions.ModelException;
 import io.javadog.cws.core.Servicable;
-import io.javadog.cws.model.ProcessMemberDao;
+import io.javadog.cws.model.CommonDao;
 import io.javadog.cws.model.entities.MemberEntity;
 
 import java.util.Objects;
@@ -16,9 +16,9 @@ import java.util.Objects;
  */
 public final class ProcessMemberService extends Servicable<ProcessMemberResponse, ProcessMemberRequest> {
 
-    private final ProcessMemberDao dao;
+    private final CommonDao dao;
 
-    public ProcessMemberService(final ProcessMemberDao dao) {
+    public ProcessMemberService(final CommonDao dao) {
         this.dao = dao;
     }
 
@@ -48,7 +48,7 @@ public final class ProcessMemberService extends Servicable<ProcessMemberResponse
         MemberEntity entity;
 
         try {
-            entity = dao.findMemberByName(request.getName());
+            entity = dao.findMemberByNameCredential(request.getName());
         } catch (ModelException e) {
             if (Objects.equals(Constants.ADMIN_ACCOUNT, request.getName()) && (e.getReturnCode() == Constants.IDENTIFICATION_WARNING)) {
                 // First login

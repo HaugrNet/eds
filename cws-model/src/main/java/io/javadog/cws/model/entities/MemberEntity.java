@@ -2,12 +2,8 @@ package io.javadog.cws.model.entities;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
-import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 /**
@@ -16,43 +12,26 @@ import javax.persistence.Table;
  */
 @Entity
 @NamedQueries(@NamedQuery(
-        name = "findByName",
+        name = "findByCredential",
         query = "select m " +
                 "from MemberEntity m" +
-                " where name = :name"
+                " where credential = :credential"
 ))
 @Table(name = "members")
 public class MemberEntity extends CWSEntity {
 
-    @Id
-    @SequenceGenerator(name = "memberSequence", sequenceName = "member_sequence")
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "memberSequence")
-    @Column(name = "id", unique = true, nullable = false, updatable = false)
-    private Long id;
+    @Column(name = "credential", length = 256, unique = true, nullable = false)
+    private String credential = null;
 
-    @Column(name = "credential", unique = true, nullable = false)
-    private String credential;
+    @Column(name = "public_key", length = 256, nullable = false)
+    private String publicKey = null;
 
-    @Column(name = "name")
-    private String name;
-
-    @Column(name = "armored_public_key", nullable = false)
-    private String armoredPublicKey;
-
-    @Column(name = "armored_encrypted_private_key", nullable = false)
-    private String armoredEncryptedPrivateKey;
+    @Column(name = "private_key", length = 256, nullable = false)
+    private String privateKey = null;
 
     // =========================================================================
     // Entity Setters & Getters
     // =========================================================================
-
-    public void setId(final Long id) {
-        this.id = id;
-    }
-
-    public Long getId() {
-        return id;
-    }
 
     public void setCredential(final String identifier) {
         this.credential = identifier;
@@ -62,27 +41,19 @@ public class MemberEntity extends CWSEntity {
         return credential;
     }
 
-    public void setName(final String commonName) {
-        this.name = commonName;
+    public void setPublicKey(final String armoredPublicKey) {
+        this.publicKey = armoredPublicKey;
     }
 
-    public String getName() {
-        return name;
+    public String getPublicKey() {
+        return publicKey;
     }
 
-    public void setArmoredPublicKey(final String armoredPublicKey) {
-        this.armoredPublicKey = armoredPublicKey;
+    public void setPrivateKey(final String armoredEncryptedPrivateKey) {
+        this.privateKey = armoredEncryptedPrivateKey;
     }
 
-    public String getArmoredPublicKey() {
-        return armoredPublicKey;
-    }
-
-    public void setArmoredEncryptedPrivateKey(final String armoredEncryptedPrivateKey) {
-        this.armoredEncryptedPrivateKey = armoredEncryptedPrivateKey;
-    }
-
-    public String getArmoredEncryptedPrivateKey() {
-        return armoredEncryptedPrivateKey;
+    public String getPrivateKey() {
+        return privateKey;
     }
 }

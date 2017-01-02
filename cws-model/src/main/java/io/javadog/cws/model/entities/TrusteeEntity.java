@@ -7,11 +7,8 @@ import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 /**
@@ -22,36 +19,28 @@ import javax.persistence.Table;
 @Table(name = "trustees")
 public class TrusteeEntity extends CWSEntity {
 
-    @Id
-    @SequenceGenerator(name = "trusteeSequence", sequenceName = "trustee_sequence")
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "trusteeSequence")
-    @Column(name = "id", unique = true, nullable = false, updatable = false)
-    private Long id = null;
-
     @ManyToOne(targetEntity = MemberEntity.class, fetch = FetchType.EAGER, optional = false)
+    @JoinColumn(name = "member_id", referencedColumnName = "id", nullable = false, updatable = false)
     private MemberEntity member = null;
 
     @ManyToOne(targetEntity = CircleEntity.class, fetch = FetchType.EAGER, optional = false)
+    @JoinColumn(name = "circle_id", referencedColumnName = "id", nullable = false, updatable = false)
     private CircleEntity circle = null;
+
+    @ManyToOne(targetEntity = KeyEntity.class, fetch = FetchType.EAGER, optional = false)
+    @JoinColumn(name = "key_id", referencedColumnName = "id", nullable = false, updatable = false)
+    private KeyEntity key = null;
 
     @Column(name = "trust_level", nullable = false)
     @Enumerated(EnumType.STRING)
     private TrustLevel trustLevel = null;
 
-    @Column(name = "armored_key", nullable = false)
-    private String armoredKey = null;
+    @Column(name = "circle_key", nullable = false)
+    private String circleKey = null;
 
     // =========================================================================
     // Entity Setters & Getters
     // =========================================================================
-
-    public void setId(final Long id) {
-        this.id = id;
-    }
-
-    public Long getId() {
-        return id;
-    }
 
     public void setMember(final MemberEntity member) {
         this.member = member;
@@ -77,11 +66,19 @@ public class TrusteeEntity extends CWSEntity {
         return trustLevel;
     }
 
-    public void setArmoredKey(final String armoredKey) {
-        this.armoredKey = armoredKey;
+    public void setKey(final KeyEntity key) {
+        this.key = key;
     }
 
-    public String getArmoredKey() {
-        return armoredKey;
+    public KeyEntity getKey() {
+        return key;
+    }
+
+    public void setCircleKey(final String armoredKey) {
+        this.circleKey = armoredKey;
+    }
+
+    public String getCircleKey() {
+        return circleKey;
     }
 }

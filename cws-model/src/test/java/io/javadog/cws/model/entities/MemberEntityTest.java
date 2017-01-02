@@ -3,8 +3,9 @@ package io.javadog.cws.model.entities;
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.common.exceptions.ModelException;
 import io.javadog.cws.model.EntityManagerSetup;
-import io.javadog.cws.model.ProcessMemberDao;
-import io.javadog.cws.model.jpa.ProcessMemberJpaDao;
+import io.javadog.cws.model.CommonDao;
+import io.javadog.cws.model.jpa.CommonJpaDao;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import javax.persistence.PersistenceException;
@@ -22,13 +23,13 @@ import static org.junit.Assert.assertThat;
  * @author Kim Jensen
  * @since  CWS 1.0
  */
+@Ignore
 public final class MemberEntityTest extends EntityManagerSetup {
 
     @Test
     public void testEntity() {
         final String externalId = UUID.randomUUID().toString();
         final String credential = Constants.ADMIN_ACCOUNT;
-        final String name = "Account Name";
         final String publicKey = UUID.randomUUID().toString();
         final String privateKey = UUID.randomUUID().toString();
         final Date modified = new Date();
@@ -37,9 +38,8 @@ public final class MemberEntityTest extends EntityManagerSetup {
         final MemberEntity entity = new MemberEntity();
         entity.setExternalId(externalId);
         entity.setCredential(credential);
-        entity.setName(name);
-        entity.setArmoredPublicKey(publicKey);
-        entity.setArmoredEncryptedPrivateKey(privateKey);
+        entity.setPublicKey(publicKey);
+        entity.setPrivateKey(privateKey);
         entity.setModified(modified);
         entity.setCreated(created);
 
@@ -53,9 +53,8 @@ public final class MemberEntityTest extends EntityManagerSetup {
         assertThat(found.getId(), is(entity.getId()));
         assertThat(found.getExternalId(), is(externalId));
         assertThat(found.getCredential(), is(credential));
-        assertThat(found.getName(), is(name));
-        assertThat(found.getArmoredPublicKey(), is(publicKey));
-        assertThat(found.getArmoredEncryptedPrivateKey(), is(privateKey));
+        assertThat(found.getPublicKey(), is(publicKey));
+        assertThat(found.getPrivateKey(), is(privateKey));
         assertThat(found.getModified().getTime(), is(modified.getTime()));
         assertThat(found.getCreated().getTime(), is(created.getTime()));
     }
@@ -75,12 +74,8 @@ public final class MemberEntityTest extends EntityManagerSetup {
         final MemberEntity entity = prepareMember(credential, publicKey, privateKey);
 
         final long lastModified = entity.getModified().getTime();
-        assertThat(entity.getName(), is(credential));
 
-        final String newName = "New Name";
-        entity.setName(newName);
         persist(entity);
-        assertThat(entity.getName(), is(newName));
         assertThat(entity.getModified().getTime() >= lastModified, is(true));
     }
 
@@ -115,8 +110,8 @@ public final class MemberEntityTest extends EntityManagerSetup {
 
     @Test(expected = ModelException.class)
     public void testDaoFindMemberByName() {
-        final ProcessMemberDao dao = new ProcessMemberJpaDao(entityManager);
-        dao.findMemberByName(Constants.ADMIN_ACCOUNT);
+        final CommonDao dao = new CommonJpaDao(entityManager);
+        dao.findMemberByNameCredential(Constants.ADMIN_ACCOUNT);
     }
 
     @Test

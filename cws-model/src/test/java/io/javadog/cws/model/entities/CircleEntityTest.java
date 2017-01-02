@@ -31,9 +31,7 @@ public final class CircleEntityTest extends EntityManagerSetup {
     public void testUpdateCircle() {
         final CircleEntity entity = prepareCircle("Circle 2");
         final Date lastModified = entity.getModified();
-        assertThat(entity.getDescription(), is(nullValue()));
 
-        entity.setDescription("New Description");
         persist(entity);
         assertThat(entity.getModified().after(lastModified), is(true));
     }

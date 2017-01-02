@@ -1,6 +1,9 @@
 package io.javadog.cws.model.entities;
 
 import javax.persistence.Column;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -13,7 +16,12 @@ import java.util.Date;
 @MappedSuperclass
 public class CWSEntity {
 
-    @Column(name = "external_id", unique = true, nullable = false, updatable = false)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", unique = true, nullable = false, updatable = false)
+    private Long id;
+
+    @Column(name = "external_id", length = 36, unique = true, nullable = false, updatable = false)
     private String externalId = null;
 
     @Temporal(TemporalType.TIMESTAMP)
@@ -27,6 +35,14 @@ public class CWSEntity {
     // =========================================================================
     // Entity Setters & Getters
     // =========================================================================
+
+    public void setId(final Long id) {
+        this.id = id;
+    }
+
+    public Long getId() {
+        return id;
+    }
 
     public void setExternalId(final String externalId) {
         this.externalId = externalId;

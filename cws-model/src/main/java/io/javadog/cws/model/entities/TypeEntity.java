@@ -9,11 +9,14 @@ import javax.persistence.Table;
  * @since  CWS 1.0
  */
 @Entity
-@Table(name = "circles")
-public class CircleEntity extends CWSEntity {
+@Table(name = "types")
+public final class TypeEntity extends CWSEntity {
 
-    @Column(name = "name", nullable = false, unique = true)
+    @Column(name = "type_name", nullable = false)
     private String name = null;
+
+    @Column(name = "type_value", nullable = false)
+    private String type = null;
 
     // =========================================================================
     // Entity Setters & Getters
@@ -25,5 +28,13 @@ public class CircleEntity extends CWSEntity {
 
     public String getName() {
         return name;
+    }
+
+    public void setType(final String type) {
+        this.type = type;
+    }
+
+    public String getType() {
+        return type;
     }
 }

@@ -2,7 +2,7 @@ package io.javadog.cws.model.jpa;
 
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.common.exceptions.ModelException;
-import io.javadog.cws.model.ProcessMemberDao;
+import io.javadog.cws.model.CommonDao;
 import io.javadog.cws.model.entities.CWSEntity;
 import io.javadog.cws.model.entities.MemberEntity;
 
@@ -17,11 +17,11 @@ import java.util.UUID;
  * @author Kim Jensen
  * @since  CWS 1.0
  */
-public final class ProcessMemberJpaDao implements ProcessMemberDao {
+public final class CommonJpaDao implements CommonDao {
 
     private final EntityManager entityManager;
 
-    public ProcessMemberJpaDao(final EntityManager entityManager) {
+    public CommonJpaDao(final EntityManager entityManager) {
         this.entityManager = entityManager;
     }
 
@@ -47,11 +47,11 @@ public final class ProcessMemberJpaDao implements ProcessMemberDao {
      * {@inheritDoc}
      */
     @Override
-    public MemberEntity findMemberByName(final String name) {
-        final Query query = entityManager.createNamedQuery("findByName");
-        query.setParameter("name", name);
+    public MemberEntity findMemberByNameCredential(final String credential) {
+        final Query query = entityManager.createNamedQuery("findByCredential");
+        query.setParameter("credential", credential);
 
-        return findUniqueRecord(query, "member", name);
+        return findUniqueRecord(query, "member", credential);
     }
 
     private static <E> E findUniqueRecord(final Query query, final String entityName, final String keyName) {

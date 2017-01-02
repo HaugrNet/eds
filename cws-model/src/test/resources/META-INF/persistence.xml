@@ -16,82 +16,54 @@
         <class>io.javadog.cws.model.entities.DataEntity</class>
 
         <properties>
+            <!-- Hibernate Settings for our test -->
             <property name="hibernate.connection.driver_class" value="org.hsqldb.jdbcDriver"/>
             <property name="hibernate.connection.url" value ="jdbc:hsqldb:mem:testdb;shutdown=false"/>
             <property name="hibernate.connection.username" value="sa"/>
             <property name="hibernate.connection.password" value=""/>
             <property name="hibernate.connection.pool_size" value="10"/>
             <property name="hibernate.connection.autocommit" value="false"/>
-            <property name="hibernate.cache.provider_class" value="org.hibernate.cache.HashtableCacheProvider"/>
-            <property name="javax.persistence.schema-generation.database.action" value="create"/>
-            <property name="hibernate.hbm2ddl.auto" value="create-drop"/>
-            <property name="show_sql" value="false"/>
             <property name="hibernate.dialect" value="org.hibernate.dialect.HSQLDialect"/>
+            <property name="hibernate.cache.provider_class" value="org.hibernate.cache.HashtableCacheProvider"/>
+            <!-- The following is needed, as Hibernate otherwise require that each table creation is on a single line. -->
+            <property name="hibernate.hbm2ddl.import_files_sql_extractor" value="org.hibernate.tool.hbm2ddl.MultipleLinesSqlCommandExtractor" />
+            <property name="show_sql" value="false"/>
 
-            <!--&lt;!&ndash; Property:    javax.persistence.schema-generation.database.action-->
-                 <!--Values:      none, create, drop-and-create, drop-->
-                 <!--Description: Defines whether the persistence provider shall-->
-                              <!--create the database, first drop and then recreate-->
-                              <!--it, only drop it or do nothing at all.-->
-                                <!--If this property is not provided, no schema-->
-                              <!--will be created. &ndash;&gt;-->
-            <!--<property name="javax.persistence.schema-generation.database.action" value="create" />-->
+            <!-- Property:    javax.persistence.schema-generation.database.action
+                 Values:      none, create, drop-and-create, drop
+                 Description: Defines whether the persistence provider shall
+                              create the database, first drop and then recreate
+                              it, only drop it or do nothing at all.
+                                If this property is not provided, no schema
+                              will be created. -->
+            <property name="javax.persistence.schema-generation.database.action" value="create" />
 
-            <!--&lt;!&ndash; Property:    javax.persistence.schema-generation.scripts.action-->
-                 <!--Values:      none, create, drop-and-create, drop-->
-                 <!--Description: Defines which scripts the persistence provider-->
-                              <!--shall create.-->
-                                <!--A script target needs to be defined for each-->
-                              <!--script to be created. &ndash;&gt;-->
-            <!--<property name="javax.persistence.schema-generation.scripts.action" value="create" />-->
+            <!-- Property:    javax.persistence.schema-generation.create-source
+                 Values:      metadata, script, metadata-then-script, script-then-metadata
+                 Description: Defines how the schema shall be created. It can be
+                              done based on the mapping metadata, a script or a
+                              combination of both.
+                                If this parameter is not provided, the
+                              persistence provider will use only the mapping
+                              metadata or a script, if the
+                              javax.persistence.schema-generation.create-script-source
+                              property is defined. -->
+            <property name="javax.persistence.schema-generation.create-source" value="script"/>
 
-            <!--&lt;!&ndash; Property:    javax.persistence.schema-generation.create-source-->
-                 <!--Values:      metadata, script, metadata-then-script, script-then-metadata-->
-                 <!--Description: Defines how the schema shall be created. It can be-->
-                              <!--done based on the mapping metadata, a script or a-->
-                              <!--combination of both.-->
-                                <!--If this parameter is not provided, the-->
-                              <!--persistence provider will use only the mapping-->
-                              <!--metadata or a script, if the-->
-                              <!--javax.persistence.schema-generation.create-script-source-->
-                              <!--property is defined. &ndash;&gt;-->
-            <!--<property name="javax.persistence.schema-generation.create-source" value="script"/>-->
+            <!-- Property:    javax.persistence.schema-generation.create-script-source
+                 Values:      file URL, java.IO.Writer
+                 Description: Defines the location of the create script. This
+                              parameter has to be defined, if the
+                              javax.persistence.schema-generation.create-source
+                              property was set to script, metadata-then-script
+                              or script-then-metadata. -->
+            <property name="javax.persistence.schema-generation.create-script-source" value="META-INF/hsqldb/create.sql"/>
 
-            <!--&lt;!&ndash; Property:    javax.persistence.schema-generation.create-database-schemas-->
-                 <!--Values:      true, false-->
-                 <!--Description: Defines if the persistence provider shall also-->
-                              <!--create the required database schemas or only the-->
-                              <!--other database objects like tables, sequences,-->
-                              <!--etc..-->
-                                <!--This property defaults to false. &ndash;&gt;-->
-            <!--<property name="javax.persistence.schema-generation.create-database-schemas" value="true"/>-->
-
-            <!--&lt;!&ndash; Property:    javax.persistence.schema-generation.scripts.create-target-->
-                 <!--Values:      file URL, java.IO.Writer-->
-                 <!--Description: Defines the target location of the create script-->
-                              <!--generated by the persistence provider. &ndash;&gt;-->
-            <!--<property name="javax.persistence.schema-generation.scripts.create-target" value="META-INF/hsqldb/generated.sql"/>-->
-
-            <!--&lt;!&ndash; Property:    javax.persistence.schema-generation.create-script-source-->
-                 <!--Values:      file URL, java.IO.Writer-->
-                 <!--Description: Defines the location of the create script. This-->
-                              <!--parameter has to be defined, if the-->
-                              <!--javax.persistence.schema-generation.create-source-->
-                              <!--property was set to script, metadata-then-script-->
-                              <!--or script-then-metadata. &ndash;&gt;-->
-            <!--<property name="javax.persistence.schema-generation.create-script-source" value="META-INF/hsqldb/setup.sql"/>-->
-
-            <!--&lt;!&ndash; Property:    javax.persistence.schema-generation.connection-->
-                 <!--Values:      String-->
-                 <!--Description: Specifies the JDBC connection that shall be used-->
-                              <!--to create the database. &ndash;&gt;-->
-            <!--&lt;!&ndash;<property name="javax.persistence.schema-generation.connection" value="jdbc:hsqldb:mem:testdb;shutdown=false"/>&ndash;&gt;-->
-
-            <!--&lt;!&ndash; Property:    javax.persistence.sql-load-script-source-->
-                 <!--Values:      file URL, java.IO.Writer-->
-                 <!--Description: Defines the location of the SQL script that shall-->
-                              <!--be used load data into the database. &ndash;&gt;-->
-            <!--<property name="javax.persistence.sql-load-script-source" value="META-INF/hsqldbl/data.sql"/>-->
+            <!-- Property:    javax.persistence.sql-load-script-source
+                 Values:      file URL, java.IO.Writer
+                 Description: Defines the location of the SQL script that shall
+                              be used load data into the database. -->
+            <property name="javax.persistence.sql-load-script-source" value="META-INF/hsqldb/data.sql"/>
         </properties>
 
     </persistence-unit>

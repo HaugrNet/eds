@@ -13,7 +13,7 @@
     <name>CWS Model</name>
     <description>
         This is the CWS Database Module, which contain the Files to create a
-        Database, Migrate same database and also the Entities needed.
+        Database, Migrate same database and also the Entities and DAOs needed.
     </description>
 
     <build>

@@ -4,6 +4,7 @@ import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.common.exceptions.ModelException;
 import io.javadog.cws.model.CommonDao;
 import io.javadog.cws.model.entities.CWSEntity;
+import io.javadog.cws.model.entities.Externable;
 import io.javadog.cws.model.entities.MemberEntity;
 
 import javax.persistence.EntityManager;
@@ -30,9 +31,10 @@ public final class CommonJpaDao implements CommonDao {
      */
     @Override
     public <E extends CWSEntity> E persist(final E entity) {
-        if (entity.getExternalId() == null) {
-            entity.setExternalId(UUID.randomUUID().toString());
+        if ((entity instanceof Externable) && (((Externable) entity).getExternalId() == null)) {
+            ((Externable) entity).setExternalId(UUID.randomUUID().toString());
         }
+
         if (entity.getCreated() == null) {
             entity.setCreated(new Date());
         }

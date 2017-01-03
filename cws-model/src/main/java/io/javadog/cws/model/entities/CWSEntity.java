@@ -21,9 +21,6 @@ public class CWSEntity {
     @Column(name = "id", unique = true, nullable = false, updatable = false)
     private Long id;
 
-    @Column(name = "external_id", length = 36, unique = true, nullable = false, updatable = false)
-    private String externalId = null;
-
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "modified", nullable = false)
     private Date modified = null;
@@ -42,14 +39,6 @@ public class CWSEntity {
 
     public Long getId() {
         return id;
-    }
-
-    public void setExternalId(final String externalId) {
-        this.externalId = externalId;
-    }
-
-    public String getExternalId() {
-        return externalId;
     }
 
     public void setModified(final Date modified) {

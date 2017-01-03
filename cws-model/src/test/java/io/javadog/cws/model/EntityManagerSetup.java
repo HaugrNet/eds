@@ -2,6 +2,7 @@ package io.javadog.cws.model;
 
 import io.javadog.cws.model.entities.CWSEntity;
 import io.javadog.cws.model.entities.CircleEntity;
+import io.javadog.cws.model.entities.Externable;
 import io.javadog.cws.model.entities.MemberEntity;
 import org.junit.After;
 import org.junit.Before;
@@ -53,9 +54,10 @@ public class EntityManagerSetup {
     }
 
     protected <E extends CWSEntity> E persist(final E entity) {
-        if (entity.getExternalId() == null) {
-            entity.setExternalId(UUID.randomUUID().toString());
+        if ((entity instanceof Externable) && (((Externable) entity).getExternalId() == null)) {
+            ((Externable) entity).setExternalId(UUID.randomUUID().toString());
         }
+
         if (entity.getCreated() == null) {
             entity.setCreated(new Date());
         }

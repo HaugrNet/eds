@@ -28,9 +28,6 @@ public class KeyEntity extends CWSEntity {
     @Column(name = "padding", length = 32, nullable = false, updatable = false)
     private String padding = null;
 
-    @Column(name = "initial_vector", length = 256, nullable = false, updatable = false)
-    private String initialVector = null;
-
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     private Status status = null;
@@ -68,14 +65,6 @@ public class KeyEntity extends CWSEntity {
 
     public String getPadding() {
         return padding;
-    }
-
-    public void setInitialVector(final String initialVector) {
-        this.initialVector = initialVector;
-    }
-
-    public String getInitialVector() {
-        return initialVector;
     }
 
     public void setStatus(final Status status) {

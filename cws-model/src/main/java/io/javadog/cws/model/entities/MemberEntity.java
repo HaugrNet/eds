@@ -18,7 +18,7 @@ import javax.persistence.Table;
                 " where credential = :credential"
 ))
 @Table(name = "members")
-public class MemberEntity extends CWSEntity {
+public class MemberEntity extends Externable {
 
     @Column(name = "credential", length = 256, unique = true, nullable = false)
     private String credential = null;

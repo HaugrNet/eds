@@ -1,4 +1,4 @@
-package io.javadog.cws.core.common;
+package io.javadog.cws.common;
 
 import io.javadog.cws.common.exceptions.CWSException;
 
@@ -51,11 +51,7 @@ import java.util.UUID;
  */
 public final class Crypto {
 
-    private static final String SYMMETRIC_ALGORITHM = "AES/CBC/PKCS5Padding";
-    private static final String ASYMMETRIC_ALGORITHM = "RSA";
-    private static final int ASYMMETRIC_KEYLENGTH = 2048;
-    private static final int SYMMETRIC_KEYLENGTH = 128;
-    private static final String CHARSETNAME = "UTF-8";
+    private static final Settings settings = Settings.getInstance();
 
     private final IvParameterSpec iv;
     private final KeyPair keyPair;
@@ -98,7 +94,7 @@ public final class Crypto {
             final Cipher cipher;
 
             if (key != null) {
-                cipher = Cipher.getInstance(SYMMETRIC_ALGORITHM);
+                cipher = Cipher.getInstance(settings.getSymmetricAlgorithm());
                 cipher.init(mode, key, iv);
             } else {
                 if (mode == Cipher.ENCRYPT_MODE) {
@@ -139,15 +135,10 @@ public final class Crypto {
 
     public static SecretKey generateSymmetricKey() {
         try {
-            final String algorithm;
-            if (SYMMETRIC_ALGORITHM.contains("/")) {
-                algorithm = SYMMETRIC_ALGORITHM.substring(0, SYMMETRIC_ALGORITHM.indexOf('/'));
-            } else {
-                algorithm = SYMMETRIC_ALGORITHM;
-            }
+            final String algorithm = settings.getSymmetricAlgorithmName();
 
             final KeyGenerator keyGenerator = KeyGenerator.getInstance(algorithm);
-            keyGenerator.init(SYMMETRIC_KEYLENGTH);
+            keyGenerator.init(settings.getSymmetricKeylength());
             return keyGenerator.generateKey();
         } catch (NoSuchAlgorithmException e) {
             throw new CWSException(e);
@@ -156,8 +147,8 @@ public final class Crypto {
 
     public static KeyPair generateAsymmetricKey() {
         try {
-            final KeyPairGenerator keyGenerator = KeyPairGenerator.getInstance(ASYMMETRIC_ALGORITHM);
-            keyGenerator.initialize(ASYMMETRIC_KEYLENGTH);
+            final KeyPairGenerator keyGenerator = KeyPairGenerator.getInstance(settings.getAsymmetricAlgorithmName());
+            keyGenerator.initialize(settings.getAsymmetricKeylength());
             return keyGenerator.generateKeyPair();
         } catch (NoSuchAlgorithmException e) {
             throw new CWSException(e);
@@ -183,14 +174,14 @@ public final class Crypto {
      */
     public static SecretKey convertPasswordToKey(final char[] password, final String salt) {
         try {
-            final String algorithm = "PBKDF2WithHmacSHA256";
+            final String algorithm = settings.getPBEAlgorithm();
             final byte[] secret = stringToBytes(salt);
 
             final SecretKeyFactory factory = SecretKeyFactory.getInstance(algorithm);
-            final KeySpec spec = new PBEKeySpec(password, secret, 1024, SYMMETRIC_KEYLENGTH);
+            final KeySpec spec = new PBEKeySpec(password, secret, 1024, settings.getSymmetricKeylength());
             final SecretKey tmpKey = factory.generateSecret(spec);
 
-            return new SecretKeySpec(tmpKey.getEncoded(), "AES");
+            return new SecretKeySpec(tmpKey.getEncoded(), settings.getSymmetricAlgorithmName());
         } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
             throw new CWSException(e);
         }
@@ -198,7 +189,7 @@ public final class Crypto {
 
     public static byte[] stringToBytes(final String string) {
         try {
-            return string.getBytes(CHARSETNAME);
+            return string.getBytes(settings.getCharset());
         } catch (UnsupportedEncodingException e) {
             throw new CWSException(e);
         }
@@ -206,7 +197,7 @@ public final class Crypto {
 
     public static String bytesToString(final byte[] bytes) {
         try {
-            return new String(bytes, CHARSETNAME);
+            return new String(bytes, settings.getCharset());
         } catch (UnsupportedEncodingException e) {
             throw new CWSException(e);
         }

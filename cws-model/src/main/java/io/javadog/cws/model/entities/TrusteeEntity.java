@@ -17,7 +17,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "trustees")
-public class TrusteeEntity extends CWSEntity {
+public class TrusteeEntity extends Externable {
 
     @ManyToOne(targetEntity = MemberEntity.class, fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "member_id", referencedColumnName = "id", nullable = false, updatable = false)

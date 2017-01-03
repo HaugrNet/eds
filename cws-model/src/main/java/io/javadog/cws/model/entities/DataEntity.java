@@ -35,6 +35,9 @@ public class DataEntity {
     @Column(name = "encrypted_data", nullable = false)
     private byte[] data = null;
 
+    @Column(name = "initial_vector", length = 256, nullable = false, updatable = false)
+    private String initialVector = null;
+
     // =========================================================================
     // Entity Setters & Getters
     // =========================================================================
@@ -69,5 +72,13 @@ public class DataEntity {
 
     public byte[] getData() {
         return data;
+    }
+
+    public void setInitialVector(final String initialVector) {
+        this.initialVector = initialVector;
+    }
+
+    public String getInitialVector() {
+        return initialVector;
     }
 }

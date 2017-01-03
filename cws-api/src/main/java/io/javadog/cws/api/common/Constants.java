@@ -56,6 +56,7 @@ public final class Constants {
     public static final int ERROR = 100;
     public static final int DATABASE_ERROR = ERROR + 1;
     public static final int CONSTRAINT_ERROR = ERROR + 2;
+    public static final int PROPERTY_ERROR = ERROR + 3;
 
     /**
      * <p>General number for all Warnings, a Warning is defined as an even that

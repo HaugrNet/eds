@@ -10,7 +10,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "circles")
-public class CircleEntity extends CWSEntity {
+public class CircleEntity extends Externable {
 
     @Column(name = "name", nullable = false, unique = true)
     private String name = null;

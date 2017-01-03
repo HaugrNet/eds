@@ -25,6 +25,11 @@ public class CWSException extends RuntimeException {
         this.returnCode = Constants.ERROR;
     }
 
+    public CWSException(final int returnCode, final Throwable cause) {
+        super(cause);
+        this.returnCode = returnCode;
+    }
+
     public CWSException(final int returnCode, final String message, final Throwable cause) {
         super(message, cause);
         this.returnCode = returnCode;

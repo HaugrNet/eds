@@ -29,40 +29,10 @@
             <property name="hibernate.hbm2ddl.import_files_sql_extractor" value="org.hibernate.tool.hbm2ddl.MultipleLinesSqlCommandExtractor" />
             <property name="show_sql" value="false"/>
 
-            <!-- Property:    javax.persistence.schema-generation.database.action
-                 Values:      none, create, drop-and-create, drop
-                 Description: Defines whether the persistence provider shall
-                              create the database, first drop and then recreate
-                              it, only drop it or do nothing at all.
-                                If this property is not provided, no schema
-                              will be created. -->
+            <!-- JPA Settings to create test DB via scripts -->
             <property name="javax.persistence.schema-generation.database.action" value="create" />
-
-            <!-- Property:    javax.persistence.schema-generation.create-source
-                 Values:      metadata, script, metadata-then-script, script-then-metadata
-                 Description: Defines how the schema shall be created. It can be
-                              done based on the mapping metadata, a script or a
-                              combination of both.
-                                If this parameter is not provided, the
-                              persistence provider will use only the mapping
-                              metadata or a script, if the
-                              javax.persistence.schema-generation.create-script-source
-                              property is defined. -->
             <property name="javax.persistence.schema-generation.create-source" value="script"/>
-
-            <!-- Property:    javax.persistence.schema-generation.create-script-source
-                 Values:      file URL, java.IO.Writer
-                 Description: Defines the location of the create script. This
-                              parameter has to be defined, if the
-                              javax.persistence.schema-generation.create-source
-                              property was set to script, metadata-then-script
-                              or script-then-metadata. -->
             <property name="javax.persistence.schema-generation.create-script-source" value="META-INF/hsqldb/create.sql"/>
-
-            <!-- Property:    javax.persistence.sql-load-script-source
-                 Values:      file URL, java.IO.Writer
-                 Description: Defines the location of the SQL script that shall
-                              be used load data into the database. -->
             <property name="javax.persistence.sql-load-script-source" value="META-INF/hsqldb/data.sql"/>
         </properties>
 

@@ -12,7 +12,7 @@ import javax.persistence.Table;
 @Table(name = "types")
 public final class TypeEntity extends CWSEntity {
 
-    @Column(name = "type_name", nullable = false)
+    @Column(name = "type_name", unique = true, nullable = false)
     private String name = null;
 
     @Column(name = "type_value", nullable = false)

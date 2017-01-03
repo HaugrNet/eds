@@ -13,7 +13,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "objects")
-public class ObjectEntity extends CWSEntity {
+public class ObjectEntity extends Externable {
 
     @Column(name = "parent_id", nullable = false)
     private Long parentId = null;

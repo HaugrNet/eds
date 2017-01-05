@@ -73,6 +73,10 @@ public final class Settings {
         return properties.getProperty(SYMMETRIC_ALGORITHM_NAME);
     }
 
+    public String getSymmetricCipherMode() {
+        return properties.getProperty(SYMMETRIC_ALGORITHM_MODE);
+    }
+
     public int getSymmetricKeylength() {
         return toInt(properties.getProperty(SYMMETRIC_ALGORITHM_KEYLENGTH));
     }

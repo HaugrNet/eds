@@ -26,7 +26,7 @@ public final class ProcessMemberRequestTest {
         final Authentication authentication = new Authentication();
         authentication.setName(admin);
         authentication.setCredentialType(CredentialType.PASSPHRASE);
-        authentication.setCredentials(credentials);
+        authentication.setCredential(credentials);
 
         final Member member = new Member();
         member.setAuthentication(authentication);
@@ -34,13 +34,13 @@ public final class ProcessMemberRequestTest {
         final ProcessMemberRequest request = new ProcessMemberRequest();
         request.setName(admin);
         request.setCredentialType(CredentialType.PASSPHRASE);
-        request.setCredentials(credentials);
+        request.setCredential(credentials);
         request.setAction(Action.PROCESS);
         request.setMember(member);
 
         assertThat(request.getName(), is(admin));
         assertThat(request.getCredentialType(), is(CredentialType.PASSPHRASE));
-        assertThat(request.getCredentials(), is(credentials));
+        assertThat(request.getCredential(), is(credentials));
         assertThat(request.getAction(), is(Action.PROCESS));
         assertThat(request.getMember(), is(member));
 

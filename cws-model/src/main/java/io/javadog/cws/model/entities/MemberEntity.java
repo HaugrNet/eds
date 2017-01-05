@@ -15,13 +15,16 @@ import javax.persistence.Table;
         name = "findByCredential",
         query = "select m " +
                 "from MemberEntity m" +
-                " where credential = :credential"
+                " where name = :credential"
 ))
 @Table(name = "members")
 public class MemberEntity extends Externable {
 
-    @Column(name = "credential", length = 256, unique = true, nullable = false)
-    private String credential = null;
+    @Column(name = "name", length = 256, unique = true, nullable = false)
+    private String name = null;
+
+    @Column(name = "salt", length = 36, unique = true, nullable = false)
+    private String salt = null;
 
     @Column(name = "public_key", length = 256, nullable = false)
     private String publicKey = null;
@@ -33,12 +36,20 @@ public class MemberEntity extends Externable {
     // Entity Setters & Getters
     // =========================================================================
 
-    public void setCredential(final String identifier) {
-        this.credential = identifier;
+    public void setName(final String identifier) {
+        this.name = identifier;
     }
 
-    public String getCredential() {
-        return credential;
+    public String getName() {
+        return name;
+    }
+
+    public void setSalt(final String salt) {
+        this.salt = salt;
+    }
+
+    public String getSalt() {
+        return salt;
     }
 
     public void setPublicKey(final String armoredPublicKey) {

@@ -1,5 +1,6 @@
 package io.javadog.cws.common;
 
+import io.javadog.cws.common.exceptions.CWSCryptoException;
 import io.javadog.cws.common.exceptions.CWSException;
 
 import javax.crypto.BadPaddingException;
@@ -13,6 +14,9 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.UnsupportedEncodingException;
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.nio.charset.Charset;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.Key;
@@ -21,8 +25,8 @@ import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
+import java.util.Arrays;
 import java.util.Base64;
-import java.util.UUID;
 
 /**
  * <p>This library contain all the Cryptographic Operations, needed for CWS, to
@@ -51,89 +55,77 @@ import java.util.UUID;
  */
 public final class Crypto {
 
-    private static final Settings settings = Settings.getInstance();
+    private final Settings settings;
 
-    private final IvParameterSpec iv;
-    private final KeyPair keyPair;
-    private final Key key;
-
-    // =========================================================================
-    // Constructors
-    // =========================================================================
-
-    public Crypto(final KeyPair keyPair) {
-        this.iv = null;
-        this.keyPair = keyPair;
-        this.key = null;
-    }
-
-    public Crypto(final IvParameterSpec iv, final Key key) {
-        this.iv = iv;
-        this.key = key;
-        this.keyPair = null;
+    public Crypto(final Settings settings) {
+        this.settings = settings;
     }
 
     // =========================================================================
     // Public Methods
     // =========================================================================
 
-    public byte[] encrypt(final byte[] toEncrypt) {
-        return cryptoOperation(Cipher.ENCRYPT_MODE, toEncrypt);
-    }
-
-    public byte[] decrypt(final byte[] toEncrypt) {
-        return cryptoOperation(Cipher.DECRYPT_MODE, toEncrypt);
-    }
-
-    // =========================================================================
-    // Internal Methods
-    // =========================================================================
-
-    private Cipher prepareCipher(final int mode) {
+    public byte[] encrypt(final Key key, final byte[] toEncrypt) {
         try {
-            final Cipher cipher;
+            final Cipher cipher = prepareCipher(key, Cipher.ENCRYPT_MODE, null);
+            return cipher.doFinal(toEncrypt);
+        } catch (BadPaddingException | IllegalBlockSizeException e) {
+            throw new CWSCryptoException(e);
+        }
+    }
 
-            if (key != null) {
-                cipher = Cipher.getInstance(settings.getSymmetricAlgorithm());
+    public byte[] encrypt(final Key key, final IvParameterSpec iv, final byte[] toEncrypt) {
+        try {
+            final Cipher cipher = prepareCipher(key, Cipher.ENCRYPT_MODE, iv);
+            return cipher.doFinal(toEncrypt);
+        } catch (BadPaddingException | IllegalBlockSizeException e) {
+            throw new CWSCryptoException(e);
+        }
+    }
+
+    public byte[] decrypt(final Key key, final byte[] toDecrypt) {
+        try {
+            final Cipher cipher = prepareCipher(key, Cipher.DECRYPT_MODE, null);
+            return cipher.doFinal(toDecrypt);
+        } catch (BadPaddingException | IllegalBlockSizeException e) {
+            throw new CWSCryptoException(e);
+        }
+    }
+
+    public byte[] decrypt(final Key key, final IvParameterSpec iv, final byte[] toDecrypt) {
+        try {
+            final Cipher cipher = prepareCipher(key, Cipher.DECRYPT_MODE, iv);
+            return cipher.doFinal(toDecrypt);
+        } catch (BadPaddingException | IllegalBlockSizeException e) {
+            throw new CWSCryptoException(e);
+        }
+    }
+
+    private static Cipher prepareCipher(final Key key, final int mode, final IvParameterSpec iv) {
+        try {
+            final String algorithm = key.getAlgorithm();
+            final Cipher cipher = Cipher.getInstance(algorithm);
+
+            if (algorithm.contains("CBC") && (iv != null)) {
                 cipher.init(mode, key, iv);
             } else {
-                if (mode == Cipher.ENCRYPT_MODE) {
-                    cipher = Cipher.getInstance(keyPair.getPublic().getAlgorithm());
-                    cipher.init(Cipher.ENCRYPT_MODE, keyPair.getPublic());
-                } else {
-                    cipher = Cipher.getInstance(keyPair.getPrivate().getAlgorithm());
-                    cipher.init(Cipher.DECRYPT_MODE, keyPair.getPrivate());
-                }
+                cipher.init(mode, key);
             }
 
             return cipher;
-        } catch (NoSuchPaddingException | NoSuchAlgorithmException | InvalidKeyException | InvalidAlgorithmParameterException e) {
-            throw new CWSException(e);
+        } catch (NoSuchPaddingException | InvalidAlgorithmParameterException | InvalidKeyException | NoSuchAlgorithmException e) {
+            throw new CWSCryptoException(e);
         }
     }
 
-    private byte[] cryptoOperation(final int cipherMode, final byte[] bytes) {
-        try {
-            final Cipher cipher = prepareCipher(cipherMode);
-            return cipher.doFinal(bytes);
-        } catch (BadPaddingException | IllegalBlockSizeException e) {
-            throw new CWSException(e);
-        }
-    }
-
-    // =========================================================================
-    // Static Helper Methods
-    // =========================================================================
-
-    public static IvParameterSpec generateNewInitialVector() {
-        final String random = UUID.randomUUID().toString();
+    public IvParameterSpec generateInitialVector(final String salt) {
         final byte[] bytes = new byte[16];
-        System.arraycopy(random.getBytes(), 0, bytes, 0, bytes.length);
+        System.arraycopy(salt.getBytes(), 0, bytes, 0, bytes.length);
 
         return new IvParameterSpec(bytes);
     }
 
-    public static SecretKey generateSymmetricKey() {
+    public SecretKey generateSymmetricKey() {
         try {
             final String algorithm = settings.getSymmetricAlgorithmName();
 
@@ -145,7 +137,7 @@ public final class Crypto {
         }
     }
 
-    public static KeyPair generateAsymmetricKey() {
+    public KeyPair generateAsymmetricKey() {
         try {
             final KeyPairGenerator keyGenerator = KeyPairGenerator.getInstance(settings.getAsymmetricAlgorithmName());
             keyGenerator.initialize(settings.getAsymmetricKeylength());
@@ -153,6 +145,10 @@ public final class Crypto {
         } catch (NoSuchAlgorithmException e) {
             throw new CWSException(e);
         }
+    }
+
+    public SecretKey convertCredentialToKey(final char[] secret) {
+        return new SecretKeySpec(base64Decode(secret), settings.getSymmetricAlgorithm());
     }
 
     /**
@@ -172,7 +168,7 @@ public final class Crypto {
      * @param salt     System specific Salt
      * @return Symmetric Key
      */
-    public static SecretKey convertPasswordToKey(final char[] password, final String salt) {
+    public SecretKey convertPasswordToKey(final char[] password, final String salt) {
         try {
             final String algorithm = settings.getPBEAlgorithm();
             final byte[] secret = stringToBytes(salt);
@@ -187,7 +183,7 @@ public final class Crypto {
         }
     }
 
-    public static byte[] stringToBytes(final String string) {
+    public byte[] stringToBytes(final String string) {
         try {
             return string.getBytes(settings.getCharset());
         } catch (UnsupportedEncodingException e) {
@@ -195,7 +191,7 @@ public final class Crypto {
         }
     }
 
-    public static String bytesToString(final byte[] bytes) {
+    public String bytesToString(final byte[] bytes) {
         try {
             return new String(bytes, settings.getCharset());
         } catch (UnsupportedEncodingException e) {
@@ -207,7 +203,23 @@ public final class Crypto {
         return Base64.getEncoder().encodeToString(data);
     }
 
+    private byte[] base64Decode(final char[] chars) {
+        final CharBuffer charBuffer = CharBuffer.wrap(chars);
+        final ByteBuffer byteBuffer = Charset.forName(settings.getCharset()).encode(charBuffer);
+        final byte[] bytes = Arrays.copyOfRange(byteBuffer.array(), 0, byteBuffer.limit());
+
+        // To ensure that no traces of the sensitive data still exists, we're
+        // filling the array with null's.
+        Arrays.fill(charBuffer.array(), '\u0000');
+
+        return Base64.getDecoder().decode(bytes);
+    }
+
     public static byte[] base64Decode(final String str) {
         return Base64.getDecoder().decode(str);
+    }
+
+    public static void clearSensitiveData(final char[] chars) {
+        Arrays.fill(chars, '\u0000');
     }
 }

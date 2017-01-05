@@ -24,14 +24,14 @@ public final class AuthenticationTest {
         final Authentication authentication = new Authentication();
         assertThat(authentication.getName(), is(not(name)));
         assertThat(authentication.getCredentialType(), is(not(type)));
-        assertThat(authentication.getCredentials(), is(not(credentials)));
+        assertThat(authentication.getCredential(), is(not(credentials)));
 
         authentication.setName(name);
         authentication.setCredentialType(type);
-        authentication.setCredentials(credentials);
+        authentication.setCredential(credentials);
         assertThat(authentication.getName(), is(name));
         assertThat(authentication.getCredentialType(), is(type));
-        assertThat(authentication.getCredentials(), is(credentials));
+        assertThat(authentication.getCredential(), is(credentials));
 
         final Map<String, String> errors = authentication.validate();
         assertThat(errors.isEmpty(), is(true));
@@ -71,6 +71,6 @@ public final class AuthenticationTest {
     @Test(expected = IllegalArgumentException.class)
     public void testNullCredentials() {
         final Authentication authentication = new Authentication();
-        authentication.setCredentials(null);
+        authentication.setCredential(null);
     }
 }

@@ -39,8 +39,8 @@ public class EntityManagerSetup {
 
     protected MemberEntity prepareMember(final String credential, final String publicKey, final String privateKey) {
         final MemberEntity entity = new MemberEntity();
-        entity.setCredential(credential);
-        entity.setCredential(credential);
+        entity.setName(credential);
+        entity.setName(credential);
         entity.setPublicKey(publicKey);
         entity.setPrivateKey(privateKey);
 

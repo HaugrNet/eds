@@ -7,6 +7,7 @@ import org.junit.Test;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 import java.security.KeyPair;
+import java.util.UUID;
 
 /**
  * Proof Of Concept, showing that the simple Cryptographic Operations will work,
@@ -24,19 +25,21 @@ public final class CryptoTest {
      */
     @Test
     public void testObjectEncryption() {
-        // First, filling out Crypto Objects
-        final IvParameterSpec iv = Crypto.generateNewInitialVector();
-        final SecretKey key = Crypto.generateSymmetricKey();
-        final Crypto crypto = new Crypto(iv, key);
+        final Crypto crypto = new Crypto(Settings.getInstance());
+        final String salt = UUID.randomUUID().toString();
+        final IvParameterSpec iv = crypto.generateInitialVector(salt);
+        final SecretKey key = crypto.generateSymmetricKey();
 
         // Now, we're going to encrypt some data
         final String cleartext = "This is just an example";
-        final byte[] encrypted = crypto.encrypt(Crypto.stringToBytes(cleartext));
+        final byte[] toEncrypt = crypto.stringToBytes(cleartext);
+        final byte[] encrypted = crypto.encrypt(key, iv, toEncrypt);
         final String armoredEncrypted = Crypto.base64Encode(encrypted);
 
         // And decrypt it so we can verify it
-        final byte[] decrypted = crypto.decrypt(Crypto.base64Decode(armoredEncrypted));
-        final String result = Crypto.bytesToString(decrypted);
+        final byte[] toDecrypt = Crypto.base64Decode(armoredEncrypted);
+        final byte[] decrypted = crypto.decrypt(key, iv, toDecrypt);
+        final String result = crypto.bytesToString(decrypted);
 
         Assert.assertThat(result, CoreMatchers.is(cleartext));
     }
@@ -51,14 +54,15 @@ public final class CryptoTest {
      */
     @Test
     public void testMemberEncryption() {
-        final KeyPair keyPair = Crypto.generateAsymmetricKey();
-        final Crypto crypto = new Crypto(keyPair);
+        final Crypto crypto = new Crypto(Settings.getInstance());
+        final KeyPair key = crypto.generateAsymmetricKey();
 
         final String cleartext = "This is just an example";
-        final byte[] encrypted = crypto.encrypt(Crypto.stringToBytes(cleartext));
+        final byte[] toEncrypt = crypto.stringToBytes(cleartext);
+        final byte[] encrypted = crypto.encrypt(key.getPublic(), toEncrypt);
 
-        final byte[] decrypted = crypto.decrypt(encrypted);
-        final String result = Crypto.bytesToString(decrypted);
+        final byte[] decrypted = crypto.decrypt(key.getPrivate(), encrypted);
+        final String result = crypto.bytesToString(decrypted);
 
         Assert.assertThat(result, CoreMatchers.is(cleartext));
     }
@@ -81,24 +85,24 @@ public final class CryptoTest {
      */
     @Test
     public void testPasswordToKey() {
+        final Crypto crypto = new Crypto(Settings.getInstance());
         final char[] password = "MySuperSecretPassword".toCharArray();
         final String salt = "SystemSpecificSalt";
-        final SecretKey key = Crypto.convertPasswordToKey(password, salt);
+        final SecretKey key = crypto.convertPasswordToKey(password, salt);
 
         Assert.assertThat(key.getAlgorithm(), CoreMatchers.is("AES"));
 
-        final IvParameterSpec iv = Crypto.generateNewInitialVector();
-        final Crypto crypto = new Crypto(iv, key);
+        final IvParameterSpec iv = crypto.generateInitialVector(salt);
 
         // Now, we're going to encrypt some data
         final String cleartext = "This is just an example";
-        final byte[] encrypted = crypto.encrypt(Crypto.stringToBytes(cleartext));
+        final byte[] encrypted = crypto.encrypt(key, iv, crypto.stringToBytes(cleartext));
         final String armoredEncrypted = Crypto.base64Encode(encrypted);
 
         // And decrypt it so we can verify it
         final byte[] dearmoredEncrypted = Crypto.base64Decode(armoredEncrypted);
-        final byte[] decrypted = crypto.decrypt(dearmoredEncrypted);
-        final String result = Crypto.bytesToString(decrypted);
+        final byte[] decrypted = crypto.decrypt(key, iv, dearmoredEncrypted);
+        final String result = crypto.bytesToString(decrypted);
 
         Assert.assertThat(result, CoreMatchers.is(cleartext));
     }

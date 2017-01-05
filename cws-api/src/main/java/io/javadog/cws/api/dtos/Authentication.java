@@ -22,20 +22,20 @@ import java.util.Map;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "authentication", propOrder = { "name", "credentialType", "credentials" })
+@XmlType(name = "authentication", propOrder = { "name", "credentialType", "credential" })
 public class Authentication extends Verifiable {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
     private static final String FIELD_NAME = "name";
     private static final String FIELD_TYPE = "credentialType";
-    private static final String FIELD_CREDENTIALS = "credentials";
+    private static final String FIELD_CREDENTIALS = "credential";
     private static final int NAME_MIN_LENGTH = 1;
     private static final int NAME_MAX_LENGTH = 75;
 
     @XmlElement(required = true) private String name = null;
     @XmlElement(required = true) private CredentialType credentialType = null;
-    @XmlElement(required = true) private char[] credentials = null;
+    @XmlElement(required = true) private char[] credential = null;
 
     // =========================================================================
     // Standard Setters & Getters
@@ -77,11 +77,11 @@ public class Authentication extends Verifiable {
      * <p>If the Credentials is a Key, then the information given must be
      * armored, i.e. Base64 encoded.</p>
      *
-     * @param credentials Member Credentials, i.e. Key or Passphrase
+     * @param credential Member Credentials, i.e. Key or Passphrase
      */
     @NotNull
-    public void setCredentials(final char[] credentials) {
-        ensureNotNull(FIELD_CREDENTIALS, credentials);
+    public void setCredential(final char[] credential) {
+        ensureNotNull(FIELD_CREDENTIALS, credential);
         // Arrays should not be referenced directly, as it can lead to problems
         // with encapsulation. However, in our case it is important for 2
         // reasons:
@@ -93,12 +93,12 @@ public class Authentication extends Verifiable {
         //      to reference it. The Garbage Collector will clean up the mess,
         //      but as we don't know when the Garbage Collector will run, it is
         //      better to control this ourselves.
-        this.credentials = credentials;
+        this.credential = credential;
     }
 
-    public char[] getCredentials() {
+    public char[] getCredential() {
         // See comment above.
-        return credentials;
+        return credential;
     }
 
     @Override
@@ -109,7 +109,7 @@ public class Authentication extends Verifiable {
         if (name == null) {
             errors.put(FIELD_NAME, error);
         }
-        if (credentials == null) {
+        if (credential == null) {
             errors.put(FIELD_CREDENTIALS, error);
         }
         if (credentialType == null) {

@@ -37,7 +37,7 @@ public final class MemberEntityTest extends EntityManagerSetup {
 
         final MemberEntity entity = new MemberEntity();
         entity.setExternalId(externalId);
-        entity.setCredential(credential);
+        entity.setName(credential);
         entity.setPublicKey(publicKey);
         entity.setPrivateKey(privateKey);
         entity.setModified(modified);
@@ -52,7 +52,7 @@ public final class MemberEntityTest extends EntityManagerSetup {
         final MemberEntity found = entityManager.find(MemberEntity.class, id);
         assertThat(found.getId(), is(entity.getId()));
         assertThat(found.getExternalId(), is(externalId));
-        assertThat(found.getCredential(), is(credential));
+        assertThat(found.getName(), is(credential));
         assertThat(found.getPublicKey(), is(publicKey));
         assertThat(found.getPrivateKey(), is(privateKey));
         assertThat(found.getModified().getTime(), is(modified.getTime()));

@@ -11,9 +11,10 @@ import io.javadog.cws.api.responses.FetchMemberResponse;
 import io.javadog.cws.api.responses.ProcessCircleResponse;
 import io.javadog.cws.api.responses.ProcessMemberResponse;
 import io.javadog.cws.api.responses.VersionResponse;
+import io.javadog.cws.common.Settings;
+import io.javadog.cws.common.exceptions.CWSException;
 import io.javadog.cws.core.Servicable;
 import io.javadog.cws.core.SystemServiceFactory;
-import io.javadog.cws.common.exceptions.CWSException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,11 +36,12 @@ public class SystemBean implements System {
     @PersistenceContext(unitName = "cwsDatabase")
     private EntityManager entityManager;
 
+    private final Settings settings = Settings.getInstance();
     private SystemServiceFactory factory = null;
 
     @PostConstruct
     public void init() {
-        factory = new SystemServiceFactory(entityManager);
+        factory = new SystemServiceFactory(settings, entityManager);
     }
 
     /**

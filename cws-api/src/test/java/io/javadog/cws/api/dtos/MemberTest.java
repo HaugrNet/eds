@@ -25,7 +25,7 @@ public final class MemberTest {
         final Authentication authentication = new Authentication();
         authentication.setName(admin);
         authentication.setCredentialType(CredentialType.PASSPHRASE);
-        authentication.setCredentials(credentials);
+        authentication.setCredential(credentials);
 
         final String id = UUID.randomUUID().toString();
         final String description = "Member Description";

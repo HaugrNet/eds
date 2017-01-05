@@ -8,6 +8,7 @@ import io.javadog.cws.api.responses.FetchCircleResponse;
 import io.javadog.cws.api.responses.FetchMemberResponse;
 import io.javadog.cws.api.responses.ProcessCircleResponse;
 import io.javadog.cws.api.responses.ProcessMemberResponse;
+import io.javadog.cws.common.Settings;
 import io.javadog.cws.core.services.FetchCirclesService;
 import io.javadog.cws.core.services.FetchMemberService;
 import io.javadog.cws.core.services.ProcessCircleService;
@@ -24,9 +25,11 @@ import javax.persistence.EntityManager;
 public final class SystemServiceFactory {
 
     private final EntityManager entityManager;
+    private final Settings settings;
 
-    public SystemServiceFactory(final EntityManager entityManager) {
+    public SystemServiceFactory(final Settings settings, final EntityManager entityManager) {
         this.entityManager = entityManager;
+        this.settings = settings;
     }
 
     public Servicable<FetchMemberResponse, FetchMemberRequest> prepareFetchMemberService() {
@@ -35,7 +38,7 @@ public final class SystemServiceFactory {
 
     public Servicable<ProcessMemberResponse, ProcessMemberRequest> prepareProcessMemberService() {
         final CommonDao dao = new CommonJpaDao(entityManager);
-        return new ProcessMemberService(dao);
+        return new ProcessMemberService(settings, dao);
     }
 
     public Servicable<FetchCircleResponse, FetchCircleRequest> prepareFetchCirclesService() {

@@ -36,7 +36,7 @@ public class SystemBean implements System {
     @PersistenceContext(unitName = "cwsDatabase")
     private EntityManager entityManager;
 
-    private final Settings settings = Settings.getInstance();
+    private final Settings settings = new Settings();
     private SystemServiceFactory factory = null;
 
     @PostConstruct

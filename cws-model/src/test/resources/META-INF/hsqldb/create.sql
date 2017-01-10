@@ -113,6 +113,7 @@ CREATE TABLE members (
   salt             VARCHAR(36),
   public_key       VARCHAR(256), -- Public Key, stored armored
   private_key      VARCHAR(256), -- Private Key, stored encrypted & armored
+  algorithm        VARCHAR(10),  -- The Algorithm used for the Key Pair
   modified         TIMESTAMP DEFAULT now(),
   created          TIMESTAMP DEFAULT now(),
 
@@ -122,7 +123,7 @@ CREATE TABLE members (
   /* Unique Constraints */
   CONSTRAINT member_unique_external_id      UNIQUE (external_id),
   CONSTRAINT member_unique_name             UNIQUE (name),
-  CONSTRAINT member_unique_salr             UNIQUE (salt),
+  CONSTRAINT member_unique_salt             UNIQUE (salt),
 
   /* Not Null Constraints */
   CONSTRAINT member_notnull_id              CHECK (id IS NOT NULL),
@@ -131,6 +132,7 @@ CREATE TABLE members (
   CONSTRAINT member_notnull_salt            CHECK (salt IS NOT NULL),
   CONSTRAINT member_notnull_public_key      CHECK (public_key IS NOT NULL),
   CONSTRAINT member_notnull_private_key     CHECK (private_key IS NOT NULL),
+  CONSTRAINT member_notnull_algorithm       CHECK (algorithm IS NOT NULL),
   CONSTRAINT member_notnull_created         CHECK (created IS NOT NULL)
 );
 

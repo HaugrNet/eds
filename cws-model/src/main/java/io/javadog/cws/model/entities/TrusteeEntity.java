@@ -9,6 +9,8 @@ import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
 /**
@@ -16,6 +18,12 @@ import javax.persistence.Table;
  * @since  CWS 1.0
  */
 @Entity
+@NamedQueries({
+        @NamedQuery(name = "trust.findByMemberId",
+                query = "select t " +
+                        "from TrusteeEntity t " +
+                        "where t.member.id = :id")
+})
 @Table(name = "trustees")
 public class TrusteeEntity extends Externable {
 

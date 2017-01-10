@@ -11,8 +11,8 @@ import javax.persistence.Table;
  * @since  CWS 1.0
  */
 @Entity
-@NamedQueries(@NamedQuery(
-        name = "findByCredential",
+@NamedQueries(
+        @NamedQuery(name = "member.findByCredential",
         query = "select m " +
                 "from MemberEntity m" +
                 " where name = :credential"
@@ -31,6 +31,9 @@ public class MemberEntity extends Externable {
 
     @Column(name = "private_key", length = 256, nullable = false)
     private String privateKey = null;
+
+    @Column(name = "algorithm", length = 10, nullable = false)
+    private String algorithm = null;
 
     // =========================================================================
     // Entity Setters & Getters
@@ -66,5 +69,13 @@ public class MemberEntity extends Externable {
 
     public String getPrivateKey() {
         return privateKey;
+    }
+
+    public void setAlgorithm(final String algorithm) {
+        this.algorithm = algorithm;
+    }
+
+    public String getAlgorithm() {
+        return algorithm;
     }
 }

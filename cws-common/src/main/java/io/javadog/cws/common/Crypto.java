@@ -1,6 +1,7 @@
 package io.javadog.cws.common;
 
-import io.javadog.cws.common.exceptions.CWSCryptoException;
+import io.javadog.cws.api.common.Constants;
+import io.javadog.cws.common.exceptions.CryptoException;
 import io.javadog.cws.common.exceptions.CWSException;
 
 import javax.crypto.BadPaddingException;
@@ -20,11 +21,15 @@ import java.nio.charset.Charset;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.Key;
+import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
+import java.security.spec.X509EncodedKeySpec;
 import java.util.Arrays;
 import java.util.Base64;
 
@@ -70,7 +75,7 @@ public final class Crypto {
             final Cipher cipher = prepareCipher(key, Cipher.ENCRYPT_MODE, null);
             return cipher.doFinal(toEncrypt);
         } catch (BadPaddingException | IllegalBlockSizeException e) {
-            throw new CWSCryptoException(e);
+            throw new CryptoException(e);
         }
     }
 
@@ -79,7 +84,7 @@ public final class Crypto {
             final Cipher cipher = prepareCipher(key, Cipher.ENCRYPT_MODE, iv);
             return cipher.doFinal(toEncrypt);
         } catch (BadPaddingException | IllegalBlockSizeException e) {
-            throw new CWSCryptoException(e);
+            throw new CryptoException(e);
         }
     }
 
@@ -88,7 +93,7 @@ public final class Crypto {
             final Cipher cipher = prepareCipher(key, Cipher.DECRYPT_MODE, null);
             return cipher.doFinal(toDecrypt);
         } catch (BadPaddingException | IllegalBlockSizeException e) {
-            throw new CWSCryptoException(e);
+            throw new CryptoException(e);
         }
     }
 
@@ -97,7 +102,7 @@ public final class Crypto {
             final Cipher cipher = prepareCipher(key, Cipher.DECRYPT_MODE, iv);
             return cipher.doFinal(toDecrypt);
         } catch (BadPaddingException | IllegalBlockSizeException e) {
-            throw new CWSCryptoException(e);
+            throw new CryptoException(e);
         }
     }
 
@@ -114,7 +119,7 @@ public final class Crypto {
 
             return cipher;
         } catch (NoSuchPaddingException | InvalidAlgorithmParameterException | InvalidKeyException | NoSuchAlgorithmException e) {
-            throw new CWSCryptoException(e);
+            throw new CryptoException(e);
         }
     }
 
@@ -183,6 +188,37 @@ public final class Crypto {
         }
     }
 
+    public static String armorKey(final Key key) {
+        final X509EncodedKeySpec keySpec = new X509EncodedKeySpec(key.getEncoded());
+        final byte[] rawKey = keySpec.getEncoded();
+
+        return base64Encode(rawKey);
+    }
+
+    public static PublicKey dearmorPublicKey(final String algorithm, final String publicKey) {
+        try {
+            final byte[] rawKey = base64Decode(publicKey);
+            final X509EncodedKeySpec keySpec = new X509EncodedKeySpec(rawKey);
+            final KeyFactory keyFactory = KeyFactory.getInstance(algorithm);
+
+            return keyFactory.generatePublic(keySpec);
+        } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+            throw new CryptoException(e);
+        }
+    }
+
+    public static PrivateKey dearmorPrivateKey(final String algorithm, final String privateKey) {
+        try {
+            final byte[] rawKey = base64Decode(privateKey);
+            final X509EncodedKeySpec keySpec = new X509EncodedKeySpec(rawKey);
+            final KeyFactory keyFactory = KeyFactory.getInstance(algorithm);
+
+            return keyFactory.generatePrivate(keySpec);
+        } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+            throw new CryptoException(e);
+        }
+    }
+
     public byte[] stringToBytes(final String string) {
         try {
             return string.getBytes(settings.getCharset());
@@ -205,7 +241,7 @@ public final class Crypto {
 
     private byte[] base64Decode(final char[] chars) {
         final CharBuffer charBuffer = CharBuffer.wrap(chars);
-        final ByteBuffer byteBuffer = Charset.forName(settings.getCharset()).encode(charBuffer);
+        final ByteBuffer byteBuffer = getCharSet().encode(charBuffer);
         final byte[] bytes = Arrays.copyOfRange(byteBuffer.array(), 0, byteBuffer.limit());
 
         // To ensure that no traces of the sensitive data still exists, we're
@@ -213,6 +249,14 @@ public final class Crypto {
         Arrays.fill(charBuffer.array(), '\u0000');
 
         return Base64.getDecoder().decode(bytes);
+    }
+
+    public Charset getCharSet() {
+        try {
+            return Charset.forName(settings.getCharset());
+        } catch (IllegalArgumentException e) {
+            throw new CWSException(Constants.PROPERTY_ERROR, e);
+        }
     }
 
     public static byte[] base64Decode(final String str) {

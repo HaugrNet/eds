@@ -77,6 +77,7 @@ public final class Constants {
 
     public static final int VERIFICATION_WARNING = WARNING + 1;
     public static final int IDENTIFICATION_WARNING = WARNING + 2;
+    public static final int AUTHORIZATION_WARNING = WARNING + 3;
     public static final int NOTIMPLEMENTED_ERROR = ERROR + 99;
 
     private Constants() {

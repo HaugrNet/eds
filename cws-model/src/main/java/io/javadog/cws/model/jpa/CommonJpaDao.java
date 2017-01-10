@@ -6,6 +6,7 @@ import io.javadog.cws.model.CommonDao;
 import io.javadog.cws.model.entities.CWSEntity;
 import io.javadog.cws.model.entities.Externable;
 import io.javadog.cws.model.entities.MemberEntity;
+import io.javadog.cws.model.entities.TrusteeEntity;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceException;
@@ -50,10 +51,21 @@ public final class CommonJpaDao implements CommonDao {
      */
     @Override
     public MemberEntity findMemberByNameCredential(final String credential) {
-        final Query query = entityManager.createNamedQuery("findByCredential");
+        final Query query = entityManager.createNamedQuery("member.findByCredential");
         query.setParameter("credential", credential);
 
         return findUniqueRecord(query, "member", credential);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<TrusteeEntity> findTrustByMember(final MemberEntity member) {
+        final Query query = entityManager.createNamedQuery("trust.findByMemberId");
+        query.setParameter("id", member.getId());
+
+        return query.getResultList();
     }
 
     private static <E> E findUniqueRecord(final Query query, final String entityName, final String keyName) {

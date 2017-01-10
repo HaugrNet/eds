@@ -25,7 +25,7 @@ public final class CryptoTest {
      */
     @Test
     public void testObjectEncryption() {
-        final Crypto crypto = new Crypto(Settings.getInstance());
+        final Crypto crypto = new Crypto(new Settings());
         final String salt = UUID.randomUUID().toString();
         final IvParameterSpec iv = crypto.generateInitialVector(salt);
         final SecretKey key = crypto.generateSymmetricKey();
@@ -54,7 +54,7 @@ public final class CryptoTest {
      */
     @Test
     public void testMemberEncryption() {
-        final Crypto crypto = new Crypto(Settings.getInstance());
+        final Crypto crypto = new Crypto(new Settings());
         final KeyPair key = crypto.generateAsymmetricKey();
 
         final String cleartext = "This is just an example";
@@ -85,7 +85,7 @@ public final class CryptoTest {
      */
     @Test
     public void testPasswordToKey() {
-        final Crypto crypto = new Crypto(Settings.getInstance());
+        final Crypto crypto = new Crypto(new Settings());
         final char[] password = "MySuperSecretPassword".toCharArray();
         final String salt = "SystemSpecificSalt";
         final SecretKey key = crypto.convertPasswordToKey(password, salt);

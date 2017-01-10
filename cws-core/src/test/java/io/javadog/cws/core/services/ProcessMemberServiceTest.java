@@ -19,7 +19,7 @@ public final class ProcessMemberServiceTest extends EntityManagerSetup {
 
     @Test(expected = CWSException.class)
     public void testService() {
-        final Settings settings = Settings.getInstance();
+        final Settings settings = new Settings();
         final CommonDao dao = new CommonJpaDao(entityManager);
         final ProcessMemberService service = new ProcessMemberService(settings, dao);
         final ProcessMemberRequest request = new ProcessMemberRequest();

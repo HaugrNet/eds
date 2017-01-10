@@ -1,25 +1,41 @@
 package io.javadog.cws.common;
 
-import io.javadog.cws.api.common.Constants;
-import io.javadog.cws.common.exceptions.CWSException;
+import io.javadog.cws.common.exceptions.SettingException;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 /**
+ * <p>This Class holds the general settings for the CWS. All settings used by
+ * the CWS is set with default values, which may or may nor be overwritten,
+ * depending on the underlying database. It is possible to extend the settings
+ * with more values, if Client Systems needs certain information shared.</p>
+ *
+ * <p>By starting the CWS, the Settings are loaded from the Database, and
+ * invoking the Settings Request will allow the System Administrator to change
+ * the Settings. It is not possible for Circle Administrators to make any
+ * Updates, since this may have impacts on the System.</p>
+ *
+ * <p>Once a CWS system is being actively used, i.e. there exist Member Accounts
+ * other than the System Administrator, then the rules regarding the
+ * non-updateable values will be enforced. Updateable fields may be changed, by
+ * the CWS will only use them after a restart.</p>
+ *
  * @author Kim Jensen
  * @since  CWS 1.0
  */
 public final class Settings {
 
-    private static final String SYMMETRIC_ALGORITHM_NAME = "cws.crypto.symmetric.algorithm";
-    private static final String SYMMETRIC_ALGORITHM_MODE = "cws.crypto.symmetric.cipher.mode";
-    private static final String SYMMETRIC_ALGORITHM_PADDING = "cws.crypto.symmetric.padding";
-    private static final String SYMMETRIC_ALGORITHM_KEYLENGTH = "cws.crypto.symmetric.keylength";
-    private static final String ASYMMETRIC_ALGORITHM = "cws.crypto.asymmetric.algorithm";
-    private static final String ASYMMETRIC_ALGORITHM_KEYLENGTH = "cws.crypto.asymmetric.keylength";
-    private static final String PBE_ALGORITHM = "cws.crypto.pbe.algorithm";
-    private static final String CWS_SALT = "cws.system.salt";
-    private static final String CWS_CHARSET = "cws.system.charset";
+    public static final String SYMMETRIC_ALGORITHM_NAME = "cws.crypto.symmetric.algorithm";
+    public static final String SYMMETRIC_ALGORITHM_MODE = "cws.crypto.symmetric.cipher.mode";
+    public static final String SYMMETRIC_ALGORITHM_PADDING = "cws.crypto.symmetric.padding";
+    public static final String SYMMETRIC_ALGORITHM_KEYLENGTH = "cws.crypto.symmetric.keylength";
+    public static final String ASYMMETRIC_ALGORITHM = "cws.crypto.asymmetric.algorithm";
+    public static final String ASYMMETRIC_ALGORITHM_KEYLENGTH = "cws.crypto.asymmetric.keylength";
+    public static final String PBE_ALGORITHM = "cws.crypto.pbe.algorithm";
+    public static final String CWS_SALT = "cws.system.salt";
+    public static final String CWS_CHARSET = "cws.system.charset";
 
     private static final String DEFAULT_SYMMETRIC_ALGORITHM_NAME = "AES";
     private static final String DEFAULT_SYMMETRIC_CIPHER_MODE = "CBC";
@@ -31,11 +47,9 @@ public final class Settings {
     private static final String DEFAULT_SALT = "Default Salt, please make sure it is set in the DB instead.";
     private static final String DEFAULT_CHARSETNAME = "UTF-8";
 
-    private static final Object LOCK = new Object();
-    private static Settings instance = null;
     private final Properties properties = new Properties();
 
-    private Settings() {
+    public Settings() {
         properties.setProperty(SYMMETRIC_ALGORITHM_NAME, DEFAULT_SYMMETRIC_ALGORITHM_NAME);
         properties.setProperty(SYMMETRIC_ALGORITHM_MODE, DEFAULT_SYMMETRIC_CIPHER_MODE);
         properties.setProperty(SYMMETRIC_ALGORITHM_PADDING, DEFAULT_SYMMETRIC_PADDING);
@@ -47,18 +61,18 @@ public final class Settings {
         properties.setProperty(CWS_CHARSET, DEFAULT_CHARSETNAME);
     }
 
-    public static Settings getInstance() {
-        synchronized (LOCK) {
-            if (instance == null) {
-                instance = new Settings();
-            }
-
-            return instance;
-        }
-    }
-
     public void set(final String key, final String value) {
         properties.setProperty(key, value);
+    }
+
+    public Map<String, String> get() {
+        final Map<String, String> copy = new HashMap<>(16);
+
+        for (final String key : properties.stringPropertyNames()) {
+            copy.put(key, properties.getProperty(key));
+        }
+
+        return copy;
     }
 
     public String getSymmetricAlgorithm() {
@@ -105,7 +119,7 @@ public final class Settings {
         try {
             return Integer.valueOf(value);
         } catch (NumberFormatException e) {
-            throw new CWSException(Constants.PROPERTY_ERROR, e);
+            throw new SettingException(e);
         }
     }
 }

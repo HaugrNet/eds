@@ -6,10 +6,12 @@ import io.javadog.cws.api.requests.FetchCircleRequest;
 import io.javadog.cws.api.requests.FetchMemberRequest;
 import io.javadog.cws.api.requests.ProcessCircleRequest;
 import io.javadog.cws.api.requests.ProcessMemberRequest;
+import io.javadog.cws.api.requests.SettingRequest;
 import io.javadog.cws.api.responses.FetchCircleResponse;
 import io.javadog.cws.api.responses.FetchMemberResponse;
 import io.javadog.cws.api.responses.ProcessCircleResponse;
 import io.javadog.cws.api.responses.ProcessMemberResponse;
+import io.javadog.cws.api.responses.SettingResponse;
 import io.javadog.cws.api.responses.VersionResponse;
 import io.javadog.cws.common.Settings;
 import io.javadog.cws.common.exceptions.CWSException;
@@ -18,6 +20,7 @@ import io.javadog.cws.core.services.FetchCirclesService;
 import io.javadog.cws.core.services.FetchMemberService;
 import io.javadog.cws.core.services.ProcessCircleService;
 import io.javadog.cws.core.services.ProcessMemberService;
+import io.javadog.cws.core.services.SettingService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,6 +51,29 @@ public class SystemBean implements System {
     public VersionResponse version() {
         final VersionResponse response = new VersionResponse();
         response.setVersion(Constants.CWS_VERSION);
+
+        return response;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional(Transactional.TxType.REQUIRED)
+    public SettingResponse settings(final SettingRequest request) {
+        SettingResponse response;
+
+        try {
+            final Servicable<SettingResponse, SettingRequest> service = new SettingService(settings, entityManager);
+            response = service.process(request);
+        } catch (CWSException e) {
+            // Any Warning or Error thrown by the CWS contain enough information
+            // so it can be dealt with by the requesting System. Logging the
+            // error is thus not needed, as all information is provided in the
+            // response.
+            log.trace(e.getMessage(), e);
+            response = new SettingResponse(e.getReturnCode(), e.getMessage());
+        }
 
         return response;
     }

@@ -4,10 +4,12 @@ import io.javadog.cws.api.requests.FetchCircleRequest;
 import io.javadog.cws.api.requests.FetchMemberRequest;
 import io.javadog.cws.api.requests.ProcessCircleRequest;
 import io.javadog.cws.api.requests.ProcessMemberRequest;
+import io.javadog.cws.api.requests.SettingRequest;
 import io.javadog.cws.api.responses.FetchCircleResponse;
 import io.javadog.cws.api.responses.FetchMemberResponse;
 import io.javadog.cws.api.responses.ProcessCircleResponse;
 import io.javadog.cws.api.responses.ProcessMemberResponse;
+import io.javadog.cws.api.responses.SettingResponse;
 import io.javadog.cws.api.responses.VersionResponse;
 
 import javax.jws.WebService;
@@ -26,6 +28,8 @@ public interface System {
      * @return The CWS Version
      */
     VersionResponse version();
+
+    SettingResponse settings(SettingRequest request);
 
     FetchMemberResponse fetchMembers(FetchMemberRequest request);
 

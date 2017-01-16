@@ -8,17 +8,17 @@ import io.javadog.cws.api.common.TrustLevel;
  */
 public enum Action {
 
-    FETCH_CIRCLE(TrustLevel.GUEST, ""),
-    FETCH_FOLDER(TrustLevel.GUEST, ""),
-    FETCH_MEMBER(TrustLevel.GUEST, ""),
-    FETCH_OBJECT(TrustLevel.GUEST, ""),
-    FETCH_OBJECT_TYPE(TrustLevel.GUEST, ""),
-    PROCESS_CIRCLE(TrustLevel.WRITE, ""),
-    PROCESS_FOLDER(TrustLevel.WRITE, ""),
-    PROCESS_MEMBER(TrustLevel.WRITE, ""),
-    PROCESS_OBJECT(TrustLevel.WRITE, ""),
-    PROCESS_OBJECT_TYPE(TrustLevel.WRITE, ""),
-    SETTING(TrustLevel.ADMIN, "");
+    FETCH_CIRCLE(TrustLevel.GUEST, "Fetch Circles."),
+    FETCH_FOLDER(TrustLevel.GUEST, "Fetch Folders."),
+    FETCH_MEMBER(TrustLevel.GUEST, "Fetch Members."),
+    FETCH_OBJECT(TrustLevel.READ, "Fetch Object."),
+    FETCH_OBJECT_TYPE(TrustLevel.GUEST, "Fetch Object Types."),
+    PROCESS_CIRCLE(TrustLevel.WRITE, "Process Circle."),
+    PROCESS_FOLDER(TrustLevel.WRITE, "Process Folder."),
+    PROCESS_MEMBER(TrustLevel.WRITE, "Process Member."),
+    PROCESS_OBJECT(TrustLevel.WRITE, "Process Object."),
+    PROCESS_OBJECT_TYPE(TrustLevel.WRITE, "Process Object Type."),
+    SETTING(TrustLevel.ADMIN, "Settings.");
 
     // =========================================================================
     // Internal Functionality

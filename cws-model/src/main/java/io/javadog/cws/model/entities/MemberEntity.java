@@ -5,6 +5,8 @@ import javax.persistence.Entity;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
+import javax.persistence.Transient;
+import java.security.KeyPair;
 
 /**
  * @author Kim Jensen
@@ -34,6 +36,9 @@ public class MemberEntity extends Externable {
 
     @Column(name = "algorithm", length = 10, nullable = false)
     private String algorithm = null;
+
+    @Transient
+    private KeyPair keyPair = null;
 
     // =========================================================================
     // Entity Setters & Getters
@@ -77,5 +82,13 @@ public class MemberEntity extends Externable {
 
     public String getAlgorithm() {
         return algorithm;
+    }
+
+    public void setKeyPair(final KeyPair keyPair) {
+        this.keyPair = keyPair;
+    }
+
+    public KeyPair getKeyPair() {
+        return keyPair;
     }
 }

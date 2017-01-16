@@ -7,8 +7,6 @@ import io.javadog.cws.api.requests.ProcessMemberRequest;
 import io.javadog.cws.common.Settings;
 import io.javadog.cws.common.exceptions.CWSException;
 import io.javadog.cws.model.EntityManagerSetup;
-import io.javadog.cws.model.CommonDao;
-import io.javadog.cws.model.jpa.CommonJpaDao;
 import org.junit.Test;
 
 /**
@@ -20,8 +18,7 @@ public final class ProcessMemberServiceTest extends EntityManagerSetup {
     @Test(expected = CWSException.class)
     public void testService() {
         final Settings settings = new Settings();
-        final CommonDao dao = new CommonJpaDao(entityManager);
-        final ProcessMemberService service = new ProcessMemberService(settings, dao);
+        final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
         final ProcessMemberRequest request = new ProcessMemberRequest();
         request.setName(Constants.ADMIN_ACCOUNT);
         request.setCredentialType(CredentialType.PASSPHRASE);

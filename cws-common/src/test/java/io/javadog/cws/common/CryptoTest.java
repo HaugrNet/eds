@@ -1,13 +1,14 @@
 package io.javadog.cws.common;
 
-import org.hamcrest.CoreMatchers;
-import org.junit.Assert;
 import org.junit.Test;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 import java.security.KeyPair;
 import java.util.UUID;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 
 /**
  * Proof Of Concept, showing that the simple Cryptographic Operations will work,
@@ -17,6 +18,28 @@ import java.util.UUID;
  * @since  CWS 1.0
  */
 public final class CryptoTest {
+
+    /**
+     * Testing how to properly Armor and Dearmor a Key, meaning converting a
+     * Binary Key into a String and converted back. For the process, CWS uses
+     * the X.509 standard together with a simple Base64 encoding/decoding. The
+     * first is the standard for Public/Private Keys and the latter allows the
+     * result to be stored in an easily printable format that can be written
+     * in files.
+     */
+    @Test
+    public void testArmorAndDearmorAsymmetricKey() {
+        final Crypto crypto = new Crypto(new Settings());
+        final KeyPair keyPair = crypto.generateAsymmetricKey();
+        final String armoredPublicKey = Crypto.armorPublicKey(keyPair.getPublic());
+        final String armoredPrivateKey = Crypto.armorPrivateKey(keyPair.getPrivate());
+        final KeyPair newPair = crypto.dearmorAsymmetricKey(armoredPublicKey, armoredPrivateKey);
+
+        assertThat(newPair.getPublic().getAlgorithm(), is(keyPair.getPublic().getAlgorithm()));
+        assertThat(newPair.getPublic().getEncoded(), is(keyPair.getPublic().getEncoded()));
+        assertThat(newPair.getPrivate().getAlgorithm(), is(keyPair.getPrivate().getAlgorithm()));
+        assertThat(newPair.getPrivate().getEncoded(), is(keyPair.getPrivate().getEncoded()));
+    }
 
     /**
      * There's two types of Cryptography applied in CWS. This test will
@@ -34,14 +57,12 @@ public final class CryptoTest {
         final String cleartext = "This is just an example";
         final byte[] toEncrypt = crypto.stringToBytes(cleartext);
         final byte[] encrypted = crypto.encrypt(key, iv, toEncrypt);
-        final String armoredEncrypted = Crypto.base64Encode(encrypted);
 
         // And decrypt it so we can verify it
-        final byte[] toDecrypt = Crypto.base64Decode(armoredEncrypted);
-        final byte[] decrypted = crypto.decrypt(key, iv, toDecrypt);
+        final byte[] decrypted = crypto.decrypt(key, iv, encrypted);
         final String result = crypto.bytesToString(decrypted);
 
-        Assert.assertThat(result, CoreMatchers.is(cleartext));
+        assertThat(result, is(cleartext));
     }
 
     /**
@@ -64,7 +85,7 @@ public final class CryptoTest {
         final byte[] decrypted = crypto.decrypt(key.getPrivate(), encrypted);
         final String result = crypto.bytesToString(decrypted);
 
-        Assert.assertThat(result, CoreMatchers.is(cleartext));
+        assertThat(result, is(cleartext));
     }
 
     /**
@@ -90,20 +111,18 @@ public final class CryptoTest {
         final String salt = "SystemSpecificSalt";
         final SecretKey key = crypto.convertPasswordToKey(password, salt);
 
-        Assert.assertThat(key.getAlgorithm(), CoreMatchers.is("AES"));
+        assertThat(key.getAlgorithm(), is("AES"));
 
         final IvParameterSpec iv = crypto.generateInitialVector(salt);
 
         // Now, we're going to encrypt some data
         final String cleartext = "This is just an example";
         final byte[] encrypted = crypto.encrypt(key, iv, crypto.stringToBytes(cleartext));
-        final String armoredEncrypted = Crypto.base64Encode(encrypted);
 
         // And decrypt it so we can verify it
-        final byte[] dearmoredEncrypted = Crypto.base64Decode(armoredEncrypted);
-        final byte[] decrypted = crypto.decrypt(key, iv, dearmoredEncrypted);
+        final byte[] decrypted = crypto.decrypt(key, iv, encrypted);
         final String result = crypto.bytesToString(decrypted);
 
-        Assert.assertThat(result, CoreMatchers.is(cleartext));
+        assertThat(result, is(cleartext));
     }
 }

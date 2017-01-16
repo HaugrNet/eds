@@ -1,8 +1,8 @@
 package io.javadog.cws.common;
 
 import io.javadog.cws.api.common.Constants;
-import io.javadog.cws.common.exceptions.CryptoException;
 import io.javadog.cws.common.exceptions.CWSException;
+import io.javadog.cws.common.exceptions.CryptoException;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -29,6 +29,7 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
+import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Arrays;
 import java.util.Base64;
@@ -188,32 +189,34 @@ public final class Crypto {
         }
     }
 
-    public static String armorKey(final Key key) {
+    public static String armorPublicKey(final PublicKey key) {
         final X509EncodedKeySpec keySpec = new X509EncodedKeySpec(key.getEncoded());
         final byte[] rawKey = keySpec.getEncoded();
 
-        return base64Encode(rawKey);
+        return Base64.getEncoder().encodeToString(rawKey);
     }
 
-    public static PublicKey dearmorPublicKey(final String algorithm, final String publicKey) {
-        try {
-            final byte[] rawKey = base64Decode(publicKey);
-            final X509EncodedKeySpec keySpec = new X509EncodedKeySpec(rawKey);
-            final KeyFactory keyFactory = KeyFactory.getInstance(algorithm);
+    public static String armorPrivateKey(final PrivateKey key) {
+        final PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(key.getEncoded());
+        final byte[] rawKey = keySpec.getEncoded();
 
-            return keyFactory.generatePublic(keySpec);
-        } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
-            throw new CryptoException(e);
-        }
+        return Base64.getEncoder().encodeToString(rawKey);
     }
 
-    public static PrivateKey dearmorPrivateKey(final String algorithm, final String privateKey) {
+    public KeyPair dearmorAsymmetricKey(final String publicKey, final String privateKey) {
         try {
-            final byte[] rawKey = base64Decode(privateKey);
-            final X509EncodedKeySpec keySpec = new X509EncodedKeySpec(rawKey);
-            final KeyFactory keyFactory = KeyFactory.getInstance(algorithm);
+            final Base64.Decoder decoder = Base64.getDecoder();
+            final byte[] rawPublicKey = decoder.decode(publicKey);
+            final byte[] rawPrivateKey = decoder.decode(privateKey);
 
-            return keyFactory.generatePrivate(keySpec);
+            final KeyFactory keyFactory = KeyFactory.getInstance(settings.getAsymmetricAlgorithmName());
+            final X509EncodedKeySpec x509KeySpec = new X509EncodedKeySpec(rawPublicKey);
+            final PKCS8EncodedKeySpec pkcs8KeySpec = new PKCS8EncodedKeySpec(rawPrivateKey);
+
+            final PublicKey thePublicKey = keyFactory.generatePublic(x509KeySpec);
+            final PrivateKey thePrivateKEy = keyFactory.generatePrivate(pkcs8KeySpec);
+
+            return new KeyPair(thePublicKey, thePrivateKEy);
         } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
             throw new CryptoException(e);
         }
@@ -235,10 +238,6 @@ public final class Crypto {
         }
     }
 
-    public static String base64Encode(final byte[] data) {
-        return Base64.getEncoder().encodeToString(data);
-    }
-
     private byte[] base64Decode(final char[] chars) {
         final CharBuffer charBuffer = CharBuffer.wrap(chars);
         final ByteBuffer byteBuffer = getCharSet().encode(charBuffer);
@@ -246,7 +245,7 @@ public final class Crypto {
 
         // To ensure that no traces of the sensitive data still exists, we're
         // filling the array with null's.
-        Arrays.fill(charBuffer.array(), '\u0000');
+        clearSensitiveData(charBuffer.array());
 
         return Base64.getDecoder().decode(bytes);
     }
@@ -257,10 +256,6 @@ public final class Crypto {
         } catch (IllegalArgumentException e) {
             throw new CWSException(Constants.PROPERTY_ERROR, e);
         }
-    }
-
-    public static byte[] base64Decode(final String str) {
-        return Base64.getDecoder().decode(str);
     }
 
     public static void clearSensitiveData(final char[] chars) {

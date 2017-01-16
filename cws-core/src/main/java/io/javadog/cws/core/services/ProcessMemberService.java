@@ -9,7 +9,6 @@ import io.javadog.cws.api.responses.ProcessMemberResponse;
 import io.javadog.cws.common.Crypto;
 import io.javadog.cws.common.Settings;
 import io.javadog.cws.common.exceptions.AuthorizationException;
-import io.javadog.cws.common.exceptions.CryptoException;
 import io.javadog.cws.common.exceptions.ModelException;
 import io.javadog.cws.core.Servicable;
 import io.javadog.cws.model.CommonDao;
@@ -18,13 +17,8 @@ import io.javadog.cws.model.entities.TrusteeEntity;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
-import java.security.KeyFactory;
 import java.security.KeyPair;
-import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.security.spec.InvalidKeySpecException;
-import java.security.spec.X509EncodedKeySpec;
+import java.util.Base64;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -59,31 +53,17 @@ public final class ProcessMemberService extends Servicable<ProcessMemberResponse
         return new ProcessMemberResponse();
     }
 
-    private static KeyPair convertKey(final MemberEntity member) {
-        try {
-            final byte[] rawPublicKey = Crypto.base64Decode(member.getPublicKey());
-            final byte[] rawPrivateKey = Crypto.base64Decode(member.getPrivateKey());
-            final String algorithm = member.getAlgorithm();
-
-            final X509EncodedKeySpec publicKeySpec = new X509EncodedKeySpec(rawPublicKey);
-            final X509EncodedKeySpec privateKeySpec = new X509EncodedKeySpec(rawPrivateKey);
-
-            final KeyFactory factory = KeyFactory.getInstance(algorithm);
-            final PublicKey publicKey = factory.generatePublic(publicKeySpec);
-            final PrivateKey privateKey = factory.generatePrivate(privateKeySpec);
-
-            return new KeyPair(publicKey, privateKey);
-        } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
-            throw new CryptoException(e);
-        }
-    }
-
     private void checkAccountCredentials(final MemberEntity member) {
         final String toCheck = UUID.randomUUID().toString();
-        final KeyPair keyPair = convertKey(member);
+        final KeyPair keyPair = crypto.dearmorAsymmetricKey(member.getPublicKey(), member.getPrivateKey());
         final byte[] toEncrypt = toCheck.getBytes(crypto.getCharSet());
         final byte[] encrypted = crypto.encrypt(keyPair.getPublic(), toEncrypt);
 
+        final byte[] decrypted = crypto.decrypt(keyPair.getPrivate(), encrypted);
+        final String result = new String(decrypted, crypto.getCharSet());
+        if (!Objects.equals(result, toCheck)) {
+            throw new AuthorizationException("Cannot authenticate the Member from the given Credentials.");
+        }
     }
 
     /**
@@ -120,8 +100,8 @@ public final class ProcessMemberService extends Servicable<ProcessMemberResponse
      * to process Member Accounts. If not allowed, then an
      * {@code AuthorizationException} is thrown.
      *
-     * @param member
-     * @param level
+     * @param member Memver Account to check
+     * @param level  Minimal TrustLevel required for the given Request
      * @throws AuthorizationException if not allowed to process Member Accounts
      */
     private void checkAccount(final MemberEntity member, final TrustLevel level) {
@@ -152,13 +132,13 @@ public final class ProcessMemberService extends Servicable<ProcessMemberResponse
         final KeyPair pair = crypto.generateAsymmetricKey();
         final IvParameterSpec iv = crypto.generateInitialVector(salt);
         final byte[] encryptedPrivateKey = crypto.encrypt(key, iv, pair.getPrivate().getEncoded());
-        final String armoredPrivateKey = Crypto.base64Encode(pair.getPublic().getEncoded());
-        final String armoredPublicKey = Crypto.base64Encode(encryptedPrivateKey);
+        final String base64EncryptedPrivateKey = Base64.getEncoder().encodeToString(encryptedPrivateKey);
+        final String armoredPublicKey = Crypto.armorPublicKey(pair.getPublic());
 
         final MemberEntity account = new MemberEntity();
         account.setName(authentication.getName());
         account.setSalt(salt);
-        account.setPrivateKey(armoredPrivateKey);
+        account.setPrivateKey(base64EncryptedPrivateKey);
         account.setPublicKey(armoredPublicKey);
         dao.persist(account);
 

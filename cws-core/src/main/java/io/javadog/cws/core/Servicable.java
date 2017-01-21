@@ -142,7 +142,7 @@ public abstract class Servicable<R extends CWSResponse, V extends Authentication
         }
     }
 
-    private Key extractKeyFromCredentials(final V verifiable) {
+    protected Key extractKeyFromCredentials(final V verifiable) {
         final SecretKey key;
 
         if (verifiable.getCredentialType() == CredentialType.KEY) {

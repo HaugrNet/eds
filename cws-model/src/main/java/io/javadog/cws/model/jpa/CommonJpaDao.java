@@ -6,11 +6,13 @@ import io.javadog.cws.model.CommonDao;
 import io.javadog.cws.model.entities.CWSEntity;
 import io.javadog.cws.model.entities.Externable;
 import io.javadog.cws.model.entities.MemberEntity;
+import io.javadog.cws.model.entities.SettingEntity;
 import io.javadog.cws.model.entities.TrusteeEntity;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceException;
 import javax.persistence.Query;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -66,6 +68,25 @@ public final class CommonJpaDao implements CommonDao {
         query.setParameter("id", member.getId());
 
         return query.getResultList();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<SettingEntity> readSettings() {
+        final Query query = entityManager.createQuery("settings.readAll");
+        return findList(query);
+    }
+
+    private <E> List<E> findList(final Query query) {
+        List<E> list = query.getResultList();
+
+        if (list == null) {
+            list = new ArrayList<>(0);
+        }
+
+        return list;
     }
 
     private static <E> E findUniqueRecord(final Query query, final String entityName, final String keyName) {

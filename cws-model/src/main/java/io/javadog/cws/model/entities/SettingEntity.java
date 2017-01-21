@@ -2,6 +2,8 @@ package io.javadog.cws.model.entities;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
 /**
@@ -9,6 +11,10 @@ import javax.persistence.Table;
  * @since  CWS 1.0
  */
 @Entity
+@NamedQueries(
+        @NamedQuery(name = "settings.readAll",
+                    query = "select s from SettingEntity s")
+)
 @Table(name = "settings")
 public class SettingEntity extends CWSEntity {
 

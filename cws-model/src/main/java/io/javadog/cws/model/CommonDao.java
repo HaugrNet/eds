@@ -2,6 +2,7 @@ package io.javadog.cws.model;
 
 import io.javadog.cws.model.entities.CWSEntity;
 import io.javadog.cws.model.entities.MemberEntity;
+import io.javadog.cws.model.entities.SettingEntity;
 import io.javadog.cws.model.entities.TrusteeEntity;
 
 import java.util.List;
@@ -19,4 +20,6 @@ public interface CommonDao {
     MemberEntity findMemberByNameCredential(String credential);
 
     List<TrusteeEntity> findTrustByMember(MemberEntity member);
+
+    List<SettingEntity> readSettings();
 }

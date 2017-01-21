@@ -1,6 +1,7 @@
 package io.javadog.cws.core;
 
 import io.javadog.cws.api.common.Constants;
+import io.javadog.cws.api.common.CredentialType;
 import io.javadog.cws.api.common.TrustLevel;
 import io.javadog.cws.api.common.Verifiable;
 import io.javadog.cws.api.dtos.Authentication;
@@ -14,7 +15,9 @@ import io.javadog.cws.model.entities.MemberEntity;
 import io.javadog.cws.model.entities.TrusteeEntity;
 import io.javadog.cws.model.jpa.CommonJpaDao;
 
+import javax.crypto.SecretKey;
 import javax.persistence.EntityManager;
+import java.security.Key;
 import java.security.KeyPair;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +33,7 @@ public abstract class Servicable<R extends CWSResponse, V extends Authentication
     protected final Settings settings;
     protected final CommonDao dao;
     protected final Crypto crypto;
+    protected List<TrusteeEntity> trustees;
     protected MemberEntity member;
     protected KeyPair keyPair;
 
@@ -54,18 +58,45 @@ public abstract class Servicable<R extends CWSResponse, V extends Authentication
      */
     public abstract R process(V request);
 
-    protected void verifyAndCheckRequest(final V verifiable, final Action action) {
+    /**
+     * <p>All incoming requests must be verified, so it is clear if the given
+     * information (data) is sufficient to complete the request, and also to
+     * ensure that the requesting party is authenticated and authorized for the
+     * given action.</p>
+     *
+     * <p>If the data is insufficient or if the requesting party cannot be
+     * properly authenticated or authorized for the request, an Exception is
+     * thrown.</p>
+     *
+     * @param verifiable Request Object to use for the checks
+     * @param action     The Action for the permission check
+     */
+    protected void verifyRequest(final V verifiable, final Action action) {
+        // Step 1; Verify if the given data is sufficient to complete the
+        //         request. If not sufficient, no need to continue and involve
+        //         the DB, so an Exception will be thrown.
         verify(verifiable);
+
+        // Step 2; Find the Member by the given credentials, if nothing is
+        //         found, then no need to continue.
         member = dao.findMemberByNameCredential(verifiable.getName());
-        keyPair = checkAccountCredentials();
+
+        // Step 3; Check if the Member is valid, i.e. if the given Credentials
+        //         can correctly decrypt the Private Key for the Account. If
+        //         not, then an Exception is thrown.
+        checkAccountCredentials(verifiable);
+
+        // Step 4; Final check, ensure that the Member is having the correct
+        //         level of Access to any Circle - which doesn't necessarily
+        //         mean to the requesting Circle, as it requires deeper
+        //         checking.
         checkAccount(action);
     }
 
     /**
      * <p>General Verification Method, takes the given Request Object and
      * invokes the validate method on it, to ensure that it is correct.</p>
-     *        final KeyPair keyPair = checkAccountCredentials(entity);
-
+     *
      * <p>If the given Object is null, or if it contains one or more problems,
      * then an Exception is thrown, as it is not possible for the CWS to
      * complete the request with this Request Object, the thrown Exception will
@@ -96,9 +127,10 @@ public abstract class Servicable<R extends CWSResponse, V extends Authentication
         }
     }
 
-    private KeyPair checkAccountCredentials() {
+    private void checkAccountCredentials(final V verifiable) {
+        final Key key = extractKeyFromCredentials(verifiable);
         final String toCheck = UUID.randomUUID().toString();
-        keyPair = crypto.dearmorAsymmetricKey(member.getPublicKey(), member.getPrivateKey());
+        keyPair = crypto.extractAsymmetricKey(key, member.getSalt(), member.getPublicKey(), member.getPrivateKey());
 
         final byte[] toEncrypt = toCheck.getBytes(crypto.getCharSet());
         final byte[] encrypted = crypto.encrypt(keyPair.getPublic(), toEncrypt);
@@ -108,15 +140,28 @@ public abstract class Servicable<R extends CWSResponse, V extends Authentication
         if (!Objects.equals(result, toCheck)) {
             throw new AuthorizationException("Cannot authenticate the Member from the given Credentials.");
         }
+    }
 
-        return keyPair;
+    private Key extractKeyFromCredentials(final V verifiable) {
+        final SecretKey key;
+
+        if (verifiable.getCredentialType() == CredentialType.KEY) {
+            key = crypto.convertCredentialToKey(verifiable.getCredential());
+        } else {
+            key = crypto.convertPasswordToKey(verifiable.getCredential(), member.getSalt());
+        }
+
+        return key;
     }
 
     private void checkAccount(final Action action) {
+        // The System Admin is automatically permitted to perform a number of
+        // Actions, without being part of a Circle. So these checks must be
+        // made separately based on the actual Request.
         if (!Objects.equals(Constants.ADMIN_ACCOUNT, member.getName())) {
-            final List<TrusteeEntity> trusts = dao.findTrustByMember(member);
+            trustees = dao.findTrustByMember(member);
             boolean trusted = false;
-            for (final TrusteeEntity trust : trusts) {
+            for (final TrusteeEntity trust : trustees) {
                 if (TrustLevel.isAllowed(trust.getTrustLevel(), action.getTrustLevel())) {
                     trusted = true;
                 }

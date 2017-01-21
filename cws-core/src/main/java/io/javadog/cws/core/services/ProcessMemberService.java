@@ -32,7 +32,7 @@ public final class ProcessMemberService extends Servicable<ProcessMemberResponse
      */
     @Override
     public ProcessMemberResponse process(final ProcessMemberRequest request) {
-        verifyAndCheckRequest(request, Action.PROCESS_MEMBER);
+        verifyRequest(request, Action.PROCESS_MEMBER);
 
         return new ProcessMemberResponse();
     }

@@ -25,7 +25,7 @@ public final class FetchCirclesService extends Servicable<FetchCircleResponse, F
      */
     @Override
     public FetchCircleResponse process(final FetchCircleRequest request) {
-        verifyAndCheckRequest(request, Action.FETCH_CIRCLE);
+        verifyRequest(request, Action.FETCH_CIRCLE);
 
         throw new CWSException(Constants.NOTIMPLEMENTED_ERROR, "Not Yet Implemented.");
     }

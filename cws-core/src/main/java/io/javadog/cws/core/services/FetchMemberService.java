@@ -25,7 +25,7 @@ public final class FetchMemberService extends Servicable<FetchMemberResponse, Fe
      */
     @Override
     public FetchMemberResponse process(final FetchMemberRequest request) {
-        verifyAndCheckRequest(request, Action.FETCH_MEMBER);
+        verifyRequest(request, Action.FETCH_MEMBER);
 
         throw new CWSException(Constants.NOTIMPLEMENTED_ERROR, "Not Yet Implemented.");
     }

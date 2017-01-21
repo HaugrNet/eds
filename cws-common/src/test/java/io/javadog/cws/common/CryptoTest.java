@@ -4,6 +4,7 @@ import org.junit.Test;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
+import java.security.Key;
 import java.security.KeyPair;
 import java.util.UUID;
 
@@ -30,10 +31,12 @@ public final class CryptoTest {
     @Test
     public void testArmorAndDearmorAsymmetricKey() {
         final Crypto crypto = new Crypto(new Settings());
+        final String salt = UUID.randomUUID().toString();
+        final Key key = crypto.generateSymmetricKey();
         final KeyPair keyPair = crypto.generateAsymmetricKey();
         final String armoredPublicKey = Crypto.armorPublicKey(keyPair.getPublic());
-        final String armoredPrivateKey = Crypto.armorPrivateKey(keyPair.getPrivate());
-        final KeyPair newPair = crypto.dearmorAsymmetricKey(armoredPublicKey, armoredPrivateKey);
+        final String armoredPrivateKey = crypto.armorPrivateKey(key, salt, keyPair.getPrivate());
+        final KeyPair newPair = crypto.extractAsymmetricKey(key, salt, armoredPublicKey, armoredPrivateKey);
 
         assertThat(newPair.getPublic().getAlgorithm(), is(keyPair.getPublic().getAlgorithm()));
         assertThat(newPair.getPublic().getEncoded(), is(keyPair.getPublic().getEncoded()));

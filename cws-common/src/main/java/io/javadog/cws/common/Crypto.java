@@ -189,6 +189,13 @@ public final class Crypto {
         }
     }
 
+    /**
+     * The Public RSA Key stored in CWS, is simply saved in x.509 format, stored
+     * Base64 encoded.
+     *
+     * @param key Public RSA key to armor (Base64 encoded x.509 Key)
+     * @return String represenatation of the Key
+     */
     public static String armorPublicKey(final PublicKey key) {
         final X509EncodedKeySpec keySpec = new X509EncodedKeySpec(key.getEncoded());
         final byte[] rawKey = keySpec.getEncoded();
@@ -196,20 +203,52 @@ public final class Crypto {
         return Base64.getEncoder().encodeToString(rawKey);
     }
 
-    public static String armorPrivateKey(final PrivateKey key) {
-        final PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(key.getEncoded());
+    /**
+     * The Private RSA Key stored in CWS, is stored encrypted, so it cannot be
+     * extracted without some effort. To do this, a Key is needed, together with
+     * a Salt which the Initial Vector is based on. The encrypted Key, is then
+     * converted into PKCS8 and converted using Base64 encoding. The result of
+     * this will make the key save for storage in the database.
+     *
+     * @param key        Symmetric Key to encrypt the Private RSA Key with
+     * @param salt       Salt to generate the Initial Vector from
+     * @param privateKey The Private RSA Key to encrypt and armor
+     * @return Armored (Base64 encoded encrypted key in PCKS8 format)
+     */
+    public String armorPrivateKey(final Key key, final String salt, final PrivateKey privateKey) {
+        final IvParameterSpec iv = generateInitialVector(salt);
+        final byte[] encryptedPrivateKey = encrypt(key, iv, privateKey.getEncoded());
+        final PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(encryptedPrivateKey);
         final byte[] rawKey = keySpec.getEncoded();
 
         return Base64.getEncoder().encodeToString(rawKey);
     }
 
-    public KeyPair dearmorAsymmetricKey(final String publicKey, final String privateKey) {
+    /**
+     * <p>The RSA KeyPair for each Member Account, is stored with an encrypted
+     * Private Key and armored and the Public Key armored. This way, it is easy
+     * to verify that the Key's are correctly stored as they are stored purely
+     * as text and nothing else.</p>
+     *
+     * <p>To recreate the Key Pair the Private Key has to be decrypted and then
+     * both the Public and Private Keys must be converted.</p>
+     *
+     * @param key               Symmetric Key to decrypt the Private Key with
+     * @param salt              Base for the Initial Vector, used for decrypting
+     * @param armoredPublicKey  Armored unencrypted Public Key
+     * @param armoredPrivateKey Armored and encrypted Private Key
+     * @return RSA KeyPair with the Public and Private Keys
+     */
+    public KeyPair extractAsymmetricKey(final Key key, final String salt, final String armoredPublicKey, final String armoredPrivateKey) {
         try {
-            final Base64.Decoder decoder = Base64.getDecoder();
-            final byte[] rawPublicKey = decoder.decode(publicKey);
-            final byte[] rawPrivateKey = decoder.decode(privateKey);
-
             final KeyFactory keyFactory = KeyFactory.getInstance(settings.getAsymmetricAlgorithmName());
+            final Base64.Decoder decoder = Base64.getDecoder();
+            final IvParameterSpec iv = generateInitialVector(salt);
+
+            final byte[] rawPublicKey = decoder.decode(armoredPublicKey);
+            final byte[] encryptedPrivateKey = decoder.decode(armoredPrivateKey);
+            final byte[] rawPrivateKey = decrypt(key, iv, encryptedPrivateKey);
+
             final X509EncodedKeySpec x509KeySpec = new X509EncodedKeySpec(rawPublicKey);
             final PKCS8EncodedKeySpec pkcs8KeySpec = new PKCS8EncodedKeySpec(rawPrivateKey);
 

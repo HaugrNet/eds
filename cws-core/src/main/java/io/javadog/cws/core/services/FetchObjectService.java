@@ -25,7 +25,7 @@ public final class FetchObjectService extends Servicable<FetchObjectResponse, Fe
      */
     @Override
     public FetchObjectResponse process(final FetchObjectRequest request) {
-        verifyAndCheckRequest(request, Action.FETCH_OBJECT);
+        verifyRequest(request, Action.FETCH_OBJECT);
 
         throw new CWSException(Constants.NOTIMPLEMENTED_ERROR, "Not Yet Implemented.");
     }

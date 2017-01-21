@@ -25,7 +25,7 @@ public final class SettingService extends Servicable<SettingResponse, SettingReq
      */
     @Override
     public SettingResponse process(final SettingRequest request) {
-        verifyAndCheckRequest(request, Action.SETTING);
+        verifyRequest(request, Action.SETTING);
 
         throw new CWSException(Constants.NOTIMPLEMENTED_ERROR, "Not Yet Implemented.");
     }

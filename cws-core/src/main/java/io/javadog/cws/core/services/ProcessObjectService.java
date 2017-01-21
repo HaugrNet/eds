@@ -25,7 +25,7 @@ public final class ProcessObjectService extends Servicable<ProcessObjectResponse
      */
     @Override
     public ProcessObjectResponse process(final ProcessObjectRequest request) {
-        verifyAndCheckRequest(request, Action.PROCESS_OBJECT);
+        verifyRequest(request, Action.PROCESS_OBJECT);
 
         throw new CWSException(Constants.NOTIMPLEMENTED_ERROR, "Not Yet Implemented.");
     }

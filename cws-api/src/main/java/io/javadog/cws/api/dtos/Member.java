@@ -24,7 +24,7 @@ import java.util.Map;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "member", propOrder = { "id", "authentication", "modified", "since" })
+@XmlType(name = "member", propOrder = { "id", "authentication",  "created" })
 public final class Member extends Verifiable {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
@@ -34,8 +34,7 @@ public final class Member extends Verifiable {
 
     @XmlElement                  private String id = null;
     @XmlElement(required = true) private Authentication authentication = null;
-    @XmlElement                  private Date modified = null;
-    @XmlElement                  private Date since = null;
+    @XmlElement                  private Date created = null;
 
     // =========================================================================
     // Standard Setters & Getters
@@ -61,20 +60,12 @@ public final class Member extends Verifiable {
         return authentication;
     }
 
-    public void setModified(final Date modified) {
-        this.modified = modified;
+    public void setCreated(final Date created) {
+        this.created = created;
     }
 
-    public Date getModified() {
-        return modified;
-    }
-
-    public void setSince(final Date since) {
-        this.since = since;
-    }
-
-    public Date getSince() {
-        return since;
+    public Date getCreated() {
+        return created;
     }
 
     // =========================================================================

@@ -8,6 +8,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -29,6 +30,6 @@ public final class SettingRequest extends Authentication {
     }
 
     public Map<String, String> getSettings() {
-        return Collections.unmodifiableMap(settings);
+        return (settings != null) ? Collections.unmodifiableMap(settings) : new HashMap<>();
     }
 }

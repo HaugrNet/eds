@@ -128,7 +128,7 @@ public abstract class Servicable<R extends CWSResponse, V extends Authentication
     }
 
     private void checkAccountCredentials(final V verifiable) {
-        final Key key = extractKeyFromCredentials(verifiable);
+        final Key key = extractKeyFromCredentials(verifiable, member.getSalt());
         final String toCheck = UUID.randomUUID().toString();
         keyPair = crypto.extractAsymmetricKey(key, member.getSalt(), member.getPublicKey(), member.getPrivateKey());
 
@@ -142,13 +142,13 @@ public abstract class Servicable<R extends CWSResponse, V extends Authentication
         }
     }
 
-    protected Key extractKeyFromCredentials(final V verifiable) {
+    protected Key extractKeyFromCredentials(final V verifiable, final String salt) {
         final SecretKey key;
 
         if (verifiable.getCredentialType() == CredentialType.KEY) {
             key = crypto.convertCredentialToKey(verifiable.getCredential());
         } else {
-            key = crypto.convertPasswordToKey(verifiable.getCredential(), member.getSalt());
+            key = crypto.convertPasswordToKey(verifiable.getCredential(), salt);
         }
 
         return key;

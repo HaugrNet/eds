@@ -75,7 +75,7 @@ public final class Crypto {
         try {
             final Cipher cipher = prepareCipher(key, Cipher.ENCRYPT_MODE, null);
             return cipher.doFinal(toEncrypt);
-        } catch (BadPaddingException | IllegalBlockSizeException e) {
+        } catch (BadPaddingException | IllegalBlockSizeException | NoSuchPaddingException | NoSuchAlgorithmException | InvalidAlgorithmParameterException | InvalidKeyException e) {
             throw new CryptoException(e);
         }
     }
@@ -84,7 +84,7 @@ public final class Crypto {
         try {
             final Cipher cipher = prepareCipher(key, Cipher.ENCRYPT_MODE, iv);
             return cipher.doFinal(toEncrypt);
-        } catch (BadPaddingException | IllegalBlockSizeException e) {
+        } catch (BadPaddingException | IllegalBlockSizeException | NoSuchPaddingException | NoSuchAlgorithmException | InvalidAlgorithmParameterException | InvalidKeyException e) {
             throw new CryptoException(e);
         }
     }
@@ -93,7 +93,7 @@ public final class Crypto {
         try {
             final Cipher cipher = prepareCipher(key, Cipher.DECRYPT_MODE, null);
             return cipher.doFinal(toDecrypt);
-        } catch (BadPaddingException | IllegalBlockSizeException e) {
+        } catch (BadPaddingException | IllegalBlockSizeException | NoSuchPaddingException | NoSuchAlgorithmException | InvalidAlgorithmParameterException | InvalidKeyException e) {
             throw new CryptoException(e);
         }
     }
@@ -102,26 +102,22 @@ public final class Crypto {
         try {
             final Cipher cipher = prepareCipher(key, Cipher.DECRYPT_MODE, iv);
             return cipher.doFinal(toDecrypt);
-        } catch (BadPaddingException | IllegalBlockSizeException e) {
+        } catch (BadPaddingException | IllegalBlockSizeException | NoSuchPaddingException | NoSuchAlgorithmException | InvalidAlgorithmParameterException | InvalidKeyException e) {
             throw new CryptoException(e);
         }
     }
 
-    private static Cipher prepareCipher(final Key key, final int mode, final IvParameterSpec iv) {
-        try {
-            final String algorithm = key.getAlgorithm();
-            final Cipher cipher = Cipher.getInstance(algorithm);
+    private static Cipher prepareCipher(final Key key, final int mode, final IvParameterSpec iv) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException {
+        final String algorithm = key.getAlgorithm();
+        final Cipher cipher = Cipher.getInstance(algorithm);
 
-            if (algorithm.contains("CBC") && (iv != null)) {
-                cipher.init(mode, key, iv);
-            } else {
-                cipher.init(mode, key);
-            }
-
-            return cipher;
-        } catch (NoSuchPaddingException | InvalidAlgorithmParameterException | InvalidKeyException | NoSuchAlgorithmException e) {
-            throw new CryptoException(e);
+        if (algorithm.contains("CBC") && (iv != null)) {
+            cipher.init(mode, key, iv);
+        } else {
+            cipher.init(mode, key);
         }
+
+        return cipher;
     }
 
     public IvParameterSpec generateInitialVector(final String salt) {

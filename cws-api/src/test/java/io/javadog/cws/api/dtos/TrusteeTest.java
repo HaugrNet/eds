@@ -30,14 +30,12 @@ public final class TrusteeTest {
         authentication.setCredential(credentials);
 
         final String id = UUID.randomUUID().toString();
-        final Date lastModified = new Date(456L);
         final Date created = new Date(123L);
 
         final Member member = new Member();
         member.setId(id);
         member.setAuthentication(authentication);
-        member.setModified(lastModified);
-        member.setSince(created);
+        member.setCreated(created);
 
         return member;
     }

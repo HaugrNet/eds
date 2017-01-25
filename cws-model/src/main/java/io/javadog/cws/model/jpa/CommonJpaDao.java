@@ -75,7 +75,7 @@ public final class CommonJpaDao implements CommonDao {
      */
     @Override
     public List<SettingEntity> readSettings() {
-        final Query query = entityManager.createQuery("settings.readAll");
+        final Query query = entityManager.createNamedQuery("setting.readAll");
         return findList(query);
     }
 

@@ -28,14 +28,11 @@ public class MemberEntity extends Externable {
     @Column(name = "salt", length = 36, unique = true, nullable = false)
     private String salt = null;
 
-    @Column(name = "public_key", length = 256, nullable = false)
+    @Column(name = "public_key", length = 1024, nullable = false)
     private String publicKey = null;
 
-    @Column(name = "private_key", length = 256, nullable = false)
+    @Column(name = "private_key", length = 8192, nullable = false)
     private String privateKey = null;
-
-    @Column(name = "algorithm", length = 10, nullable = false)
-    private String algorithm = null;
 
     @Transient
     private KeyPair keyPair = null;
@@ -74,14 +71,6 @@ public class MemberEntity extends Externable {
 
     public String getPrivateKey() {
         return privateKey;
-    }
-
-    public void setAlgorithm(final String algorithm) {
-        this.algorithm = algorithm;
-    }
-
-    public String getAlgorithm() {
-        return algorithm;
     }
 
     public void setKeyPair(final KeyPair keyPair) {

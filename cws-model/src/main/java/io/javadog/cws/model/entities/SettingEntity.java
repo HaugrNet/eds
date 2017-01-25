@@ -12,7 +12,7 @@ import javax.persistence.Table;
  */
 @Entity
 @NamedQueries(
-        @NamedQuery(name = "settings.readAll",
+        @NamedQuery(name = "setting.readAll",
                     query = "select s from SettingEntity s")
 )
 @Table(name = "settings")

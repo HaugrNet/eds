@@ -42,31 +42,41 @@ public final class SettingService extends Servicable<SettingResponse, SettingReq
 
             final Map<String, SettingEntity> currentSettings = convertSettings(dao.readSettings());
             for (final Map.Entry<String, String> entry : request.getSettings().entrySet()) {
-                if (currentSettings.containsKey(entry.getKey())) {
-                    final SettingEntity entity = currentSettings.get(entry.getKey());
-                    if (entity.getModifiable() && !Objects.equals(entity.getSetting(), entry.getValue())) {
-                        entity.setSetting(entry.getValue());
-                        dao.persist(entity);
-                    }
-                } else {
-                    final SettingEntity setting = new SettingEntity();
-                    setting.setName(entry.getKey());
-                    setting.setSetting(entry.getValue());
-                    setting.setModifiable(true);
-                    dao.persist(setting);
-                    currentSettings.put(setting.getName(), setting);
-                }
+                processSetting(currentSettings, entry);
             }
 
-            final Map<String, String> map = new HashMap<>();
-            for (final Map.Entry<String, SettingEntity> entry : currentSettings.entrySet()) {
-                map.put(entry.getKey(), entry.getValue().getSetting());
-            }
             final SettingResponse response = new SettingResponse();
-            response.setSettings(map);
+            response.setSettings(transformSettings(currentSettings));
+
             return response;
         } else {
             throw new CWSException(Constants.IDENTIFICATION_WARNING, "Cannot complete this request, as it is only allowed for the System Administrator.");
+        }
+    }
+
+    /**
+     * Processes an existing or new Setting, and both saves the result in the
+     * database and ensures that the given map is updated.
+     *
+     * @param currentSettings Current Settings to check and update
+     * @param entry Entry from the given set of Settings to process
+     */
+    private void processSetting(final Map<String, SettingEntity> currentSettings, final Map.Entry<String, String> entry) {
+        if (currentSettings.containsKey(entry.getKey())) {
+            final SettingEntity entity = currentSettings.get(entry.getKey());
+
+            if (entity.getModifiable() && !Objects.equals(entity.getSetting(), entry.getValue())) {
+                entity.setSetting(entry.getValue());
+                dao.persist(entity);
+            }
+        } else {
+            final SettingEntity setting = new SettingEntity();
+            setting.setName(entry.getKey());
+            setting.setSetting(entry.getValue());
+            setting.setModifiable(true);
+            dao.persist(setting);
+
+            currentSettings.put(setting.getName(), setting);
         }
     }
 
@@ -75,6 +85,16 @@ public final class SettingService extends Servicable<SettingResponse, SettingReq
 
         for (final SettingEntity setting : list) {
             map.put(setting.getName(), setting);
+        }
+
+        return map;
+    }
+
+    private static Map<String, String> transformSettings(final Map<String, SettingEntity> settings) {
+        final Map<String, String> map = new HashMap<>();
+
+        for (final Map.Entry<String, SettingEntity> entry : settings.entrySet()) {
+            map.put(entry.getKey(), entry.getValue().getSetting());
         }
 
         return map;
@@ -99,7 +119,7 @@ public final class SettingService extends Servicable<SettingResponse, SettingReq
 
     private MemberEntity createNewAdminAccount(final SettingRequest request) {
         final String salt = UUID.randomUUID().toString();
-        final Key key = extractKeyFromCredentials(request);
+        final Key key = extractKeyFromCredentials(request, salt);
 
         final KeyPair pair = crypto.generateAsymmetricKey();
         final IvParameterSpec iv = crypto.generateInitialVector(salt);

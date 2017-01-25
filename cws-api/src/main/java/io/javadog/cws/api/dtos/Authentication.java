@@ -29,7 +29,7 @@ public class Authentication extends Verifiable {
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
     private static final String FIELD_NAME = "name";
     private static final String FIELD_TYPE = "credentialType";
-    private static final String FIELD_CREDENTIALS = "credential";
+    private static final String FIELD_CREDENTIAL = "credential";
     private static final int NAME_MIN_LENGTH = 1;
     private static final int NAME_MAX_LENGTH = 75;
 
@@ -81,7 +81,7 @@ public class Authentication extends Verifiable {
      */
     @NotNull
     public void setCredential(final char[] credential) {
-        ensureNotNull(FIELD_CREDENTIALS, credential);
+        ensureNotNull(FIELD_CREDENTIAL, credential);
         // Arrays should not be referenced directly, as it can lead to problems
         // with encapsulation. However, in our case it is important for 2
         // reasons:
@@ -101,20 +101,18 @@ public class Authentication extends Verifiable {
         return credential;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Map<String, String> validate() {
         final Map<String, String> errors = new HashMap<>();
-        final String error = "Value is missing, null or invalid.";
 
-        if (name == null) {
-            errors.put(FIELD_NAME, error);
-        }
-        if (credential == null) {
-            errors.put(FIELD_CREDENTIALS, error);
-        }
-        if (credentialType == null) {
-            errors.put(FIELD_TYPE, error);
-        }
+        checkNotNull(errors, FIELD_NAME, name, "Name is missing, null or invalid.");
+        checkNotEmpty(errors, FIELD_NAME, name, "Name may not be empty.");
+        checkNotTooLong(errors, FIELD_NAME, name, NAME_MAX_LENGTH, "Name is exceeding the maximum allowed length " + NAME_MAX_LENGTH + '.');
+        checkNotNull(errors, FIELD_CREDENTIAL, credential, "Credential is missing, null or invalid.");
+        checkNotNull(errors, FIELD_TYPE, credentialType, "CredentialType is missing, null or invalid.");
 
         return errors;
     }

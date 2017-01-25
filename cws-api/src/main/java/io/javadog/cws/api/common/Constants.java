@@ -32,7 +32,7 @@ public final class Constants {
      * <p>All Id's must be compliant with a standard UUID Pattern, which this
      * regular expression matches.</p>
      */
-    public static final String PATTERN_REGEX = "[\\da-z]{8}-[\\da-z]{4}-[\\da-z]{4}-[\\da-z]{4}-[\\da-z]{12}";
+    public static final String ID_PATTERN_REGEX = "[\\da-z]{8}-[\\da-z]{4}-[\\da-z]{4}-[\\da-z]{4}-[\\da-z]{12}";
 
     /**
      * <p>The System Administrator Account - this account is used as the default

@@ -65,9 +65,13 @@ public final class SettingService extends Servicable<SettingResponse, SettingReq
         if (currentSettings.containsKey(entry.getKey())) {
             final SettingEntity entity = currentSettings.get(entry.getKey());
 
-            if (entity.getModifiable() && !Objects.equals(entity.getSetting(), entry.getValue())) {
-                entity.setSetting(entry.getValue());
-                dao.persist(entity);
+            if (!Objects.equals(entity.getSetting(), entry.getValue())) {
+                if (entity.getModifiable()) {
+                    entity.setSetting(entry.getValue());
+                    dao.persist(entity);
+                } else {
+                    throw new CWSException(Constants.PROPERTY_ERROR, "The setting " + entry.getKey() + " may not be overwritten.");
+                }
             }
         } else {
             final SettingEntity setting = new SettingEntity();

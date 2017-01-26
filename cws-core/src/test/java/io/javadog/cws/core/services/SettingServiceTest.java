@@ -10,6 +10,8 @@ import io.javadog.cws.model.EntityManagerSetup;
 import org.junit.Test;
 
 import javax.persistence.Query;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -37,6 +39,7 @@ public final class SettingServiceTest extends EntityManagerSetup {
         final SettingResponse response = service.process(request);
         assertThat(response.getReturnCode(), is(0));
         assertThat(response.getReturnMessage(), is("Ok"));
+        assertThat(response.getSettings().size(), is(9));
     }
 
     @Test(expected = CWSException.class)
@@ -49,13 +52,79 @@ public final class SettingServiceTest extends EntityManagerSetup {
     }
 
     @Test
-    public void testInvokingRequest() {
+    public void testInvokingRequestWithNullSettingsList() {
         final SettingService service = new SettingService(new Settings(), entityManager);
         final SettingRequest request = prepareRequest();
 
         final SettingResponse response = service.process(request);
         assertThat(response.getReturnCode(), is(0));
         assertThat(response.getReturnMessage(), is("Ok"));
+        assertThat(response.getSettings().size(), is(9));
+    }
+
+    @Test
+    public void testInvokingRequestWithEmptySettings() {
+        final SettingService service = new SettingService(new Settings(), entityManager);
+        final SettingRequest request = prepareRequest();
+        final Map<String, String> settings = new HashMap<>();
+        request.setSettings(settings);
+
+        final SettingResponse response = service.process(request);
+        assertThat(response.getReturnCode(), is(0));
+        assertThat(response.getReturnMessage(), is("Ok"));
+        assertThat(response.getSettings().size(), is(9));
+    }
+
+    @Test
+    public void testInvokingRequestUpdateExistingSetting() {
+        final SettingService service = new SettingService(new Settings(), entityManager);
+        final SettingRequest request = prepareRequest();
+
+        // First invocation, retrieving the list of current values so we can
+        // check that it is being updated
+        final SettingResponse response = service.process(request);
+        assertThat(response.getReturnCode(), is(0));
+        assertThat(response.getReturnMessage(), is("Ok"));
+        assertThat(response.getSettings().size(), is(9));
+        assertThat(response.getSettings().get("cws.crypto.symmetric.keylength"), is("128"));
+
+        // The internal collection used is unmodifiable. So we simply copy the
+        // list from the response and update one of the existing values
+        final Map<String, String> settings = new HashMap<>(response.getSettings());
+        settings.put("cws.crypto.symmetric.keylength", "256");
+        request.setSettings(settings);
+
+        final SettingResponse update = service.process(request);
+        assertThat(update.getReturnCode(), is(0));
+        assertThat(update.getReturnMessage(), is("Ok"));
+        assertThat(update.getSettings().size(), is(9));
+        assertThat(update.getSettings().get("cws.crypto.symmetric.keylength"), is("256"));
+    }
+
+    @Test(expected = CWSException.class)
+    public void testInvokingRequestUpdateNotAllowedExistingSetting() {
+        final SettingService service = new SettingService(new Settings(), entityManager);
+        final SettingRequest request = prepareRequest();
+        final Map<String, String> settings = new HashMap<>();
+        settings.put("cws.crypto.symmetric.algorithm", "DES");
+        request.setSettings(settings);
+
+        service.process(request);
+    }
+
+    @Test
+    public void testInvokingRequestAddNewSetting() {
+        final SettingService service = new SettingService(new Settings(), entityManager);
+        final SettingRequest request = prepareRequest();
+        final Map<String, String> settings = new HashMap<>();
+        settings.put("cws.test.setting", "Setting Value");
+        request.setSettings(settings);
+
+        final SettingResponse response = service.process(request);
+        assertThat(response.getReturnCode(), is(0));
+        assertThat(response.getReturnMessage(), is("Ok"));
+        assertThat(response.getSettings().size(), is(10));
+        assertThat(response.getSettings().get("cws.test.setting"), is("Setting Value"));
     }
 
     private static SettingRequest prepareRequest() {

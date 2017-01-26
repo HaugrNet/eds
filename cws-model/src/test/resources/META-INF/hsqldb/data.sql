@@ -43,9 +43,9 @@ INSERT INTO types (type_name, type_value) VALUES ('folder', 'Folder');
 --   * RSA/ECB/OAEPWithSHA-256AndMGF1Padding (1024, 2048)
 -- The default should be sufficient for most, if increased security is wanted,
 -- please consider installing and using the unlimited strength patch.
-INSERT INTO settings (name, setting, modifiable) VALUES ('cws.crypto.symmetric.algorithm', 'AES', true);
+INSERT INTO settings (name, setting, modifiable) VALUES ('cws.crypto.symmetric.algorithm', 'AES', false);
 INSERT INTO settings (name, setting, modifiable) VALUES ('cws.crypto.symmetric.cipher.mode', 'CBC', false);
-INSERT INTO settings (name, setting, modifiable) VALUES ('cws.crypto.symmetric.padding', 'PKCS5Padding', true);
+INSERT INTO settings (name, setting, modifiable) VALUES ('cws.crypto.symmetric.padding', 'PKCS5Padding', false);
 
 -- The Key length is set to 128 bits by default, as this is the maximum allowed
 -- by Java, unless the unlimited strength patch have been applied. If it has
@@ -55,7 +55,7 @@ INSERT INTO settings (name, setting, modifiable) VALUES ('cws.crypto.symmetric.k
 -- Asymmetric Encryption (Public & Private Key), is used for sharing the
 -- Symmetric Keys, not for encrypting any data. For more information about
 -- these, please see the references given above.
-INSERT INTO settings (name, setting, modifiable) VALUES ('cws.crypto.asymmetric.algorithm', 'RSA', true);
+INSERT INTO settings (name, setting, modifiable) VALUES ('cws.crypto.asymmetric.algorithm', 'RSA', false);
 INSERT INTO settings (name, setting, modifiable) VALUES ('cws.crypto.asymmetric.keylength', '2048', true);
 
 -- If a Member is using something else than a Key to unlock their Account, the

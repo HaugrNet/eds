@@ -23,6 +23,16 @@ import java.util.Objects;
 import java.util.UUID;
 
 /**
+ * <p>The Setting Service, allows for checking and updating existing Settings
+ * and add new Settings, needed for Clients. Certain of the existing Settings
+ * have a flag that will not allow them to be updated. This was done to ensure
+ * that it is clear what existing settings is being used such as Cryptographic
+ * Algorithms, padding, etc. However, as the internal Cryptographic Operations
+ * is strongly linked to the Algorithms, they may be seen but not updated.</p>
+ *
+ * <p>For the same reason, the request can <b>only</b> be invoked by the System
+ * Administrator. Since changing things must be strictly limited.</p>
+ *
  * @author Kim Jensen
  * @since  CWS 1.0
  */

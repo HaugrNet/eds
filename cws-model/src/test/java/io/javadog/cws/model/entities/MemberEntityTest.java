@@ -2,7 +2,7 @@ package io.javadog.cws.model.entities;
 
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.common.exceptions.ModelException;
-import io.javadog.cws.model.EntityManagerSetup;
+import io.javadog.cws.model.DatabaseSetup;
 import io.javadog.cws.model.CommonDao;
 import io.javadog.cws.model.jpa.CommonJpaDao;
 import org.junit.Ignore;
@@ -24,7 +24,7 @@ import static org.junit.Assert.assertThat;
  * @since  CWS 1.0
  */
 @Ignore
-public final class MemberEntityTest extends EntityManagerSetup {
+public final class MemberEntityTest extends DatabaseSetup {
 
     @Test
     public void testEntity() {

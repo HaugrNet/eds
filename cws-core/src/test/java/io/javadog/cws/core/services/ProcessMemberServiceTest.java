@@ -6,14 +6,14 @@ import io.javadog.cws.api.common.CredentialType;
 import io.javadog.cws.api.requests.ProcessMemberRequest;
 import io.javadog.cws.common.Settings;
 import io.javadog.cws.common.exceptions.CWSException;
-import io.javadog.cws.model.EntityManagerSetup;
+import io.javadog.cws.model.DatabaseSetup;
 import org.junit.Test;
 
 /**
  * @author Kim Jensen
  * @since  CWS 1.0
  */
-public final class ProcessMemberServiceTest extends EntityManagerSetup {
+public final class ProcessMemberServiceTest extends DatabaseSetup {
 
     @Test(expected = CWSException.class)
     public void testService() {

@@ -220,6 +220,19 @@ public final class Crypto {
         return Base64.getEncoder().encodeToString(rawKey);
     }
 
+    public String encryptAndArmorCircleKey(final PublicKey publicKey, final SecretKey circleKey) {
+        final byte[] encryptedCircleKey = encrypt(publicKey, circleKey.getEncoded());
+
+        return Base64.getEncoder().encodeToString(encryptedCircleKey);
+    }
+
+    public SecretKey extractCircleKey(final PrivateKey privateKey, final String armoredCircleKey, final String algorithm) {
+        final byte[] dearmoredCircleKey = Base64.getDecoder().decode(armoredCircleKey);
+        final byte[] decryptedCircleKey = decrypt(privateKey, dearmoredCircleKey);
+
+        return new SecretKeySpec(decryptedCircleKey, algorithm);
+    }
+
     /**
      * <p>The RSA KeyPair for each Member Account, is stored with an encrypted
      * Private Key and armored and the Public Key armored. This way, it is easy

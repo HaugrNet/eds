@@ -1,7 +1,7 @@
 package io.javadog.cws.model.entities;
 
 import io.javadog.cws.api.common.TrustLevel;
-import io.javadog.cws.model.EntityManagerSetup;
+import io.javadog.cws.model.DatabaseSetup;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -15,7 +15,7 @@ import static org.junit.Assert.assertThat;
  * @since  CWS 1.0
  */
 @Ignore
-public final class TrusteeEntityTest extends EntityManagerSetup {
+public final class TrusteeEntityTest extends DatabaseSetup {
 
     @Test
     public void testEntity() {

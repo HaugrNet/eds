@@ -94,7 +94,7 @@ INSERT INTO settings (name, setting, modifiable) VALUES ('cws.system.charset', '
 
 -- Default Administrator User, it is set at the first request to the System, and
 -- is thus needed for loads of tests.
-insert into members (external_id, name, salt, public_key, private_key) values (
+INSERT INTO members (external_id, name, salt, public_key, private_key) VALUES (
     '483833a4-2af7-4d9d-953d-b1e86cac8035',
     'admin',
     '16dc08da-84f3-4ebb-af1d-c51d2c7c377d',

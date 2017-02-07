@@ -1,6 +1,6 @@
 package io.javadog.cws.model.entities;
 
-import io.javadog.cws.model.EntityManagerSetup;
+import io.javadog.cws.model.DatabaseSetup;
 import org.junit.Test;
 
 import java.util.Date;
@@ -14,7 +14,7 @@ import static org.junit.Assert.assertThat;
  * @author Kim Jensen
  * @since  CWS 1.0
  */
-public final class CircleEntityTest extends EntityManagerSetup {
+public final class CircleEntityTest extends DatabaseSetup {
 
     @Test
     public void testEntity() {

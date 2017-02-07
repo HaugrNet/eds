@@ -6,7 +6,7 @@ import io.javadog.cws.api.requests.SettingRequest;
 import io.javadog.cws.api.responses.SettingResponse;
 import io.javadog.cws.common.Settings;
 import io.javadog.cws.common.exceptions.CWSException;
-import io.javadog.cws.model.EntityManagerSetup;
+import io.javadog.cws.model.DatabaseSetup;
 import org.junit.Test;
 
 import javax.persistence.Query;
@@ -20,7 +20,7 @@ import static org.junit.Assert.assertThat;
  * @author Kim Jensen
  * @since  CWS 1.0
  */
-public final class SettingServiceTest extends EntityManagerSetup {
+public final class SettingServiceTest extends DatabaseSetup {
 
     @Test
     public void testCreatingAdmin() {

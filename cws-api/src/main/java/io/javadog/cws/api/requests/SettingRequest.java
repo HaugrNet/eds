@@ -7,7 +7,6 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,13 +22,13 @@ public final class SettingRequest extends Authentication {
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
     @XmlElement(name = "settings", required = true)
-    private Map<String, String> settings = null;
+    private final HashMap<String, String> settings = new HashMap<>();
 
     public void setSettings(final Map<String, String> settings) {
-        this.settings = Collections.unmodifiableMap(settings);
+        this.settings.putAll(settings);
     }
 
     public Map<String, String> getSettings() {
-        return (settings != null) ? Collections.unmodifiableMap(settings) : new HashMap<>();
+        return new HashMap<>(settings);
     }
 }

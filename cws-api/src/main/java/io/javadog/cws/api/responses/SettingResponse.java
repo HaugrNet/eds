@@ -6,7 +6,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -21,7 +21,7 @@ public final class SettingResponse extends CWSResponse {
     private static final long serialVersionUID = 8868831828030258226L;
 
     @XmlElement(name = "settings", required = true)
-    private Map<String, String> settings = null;
+    private final HashMap<String, String> settings = new HashMap<>();
 
     public SettingResponse() {
         // Empty Constructor, required for WebServices
@@ -32,10 +32,10 @@ public final class SettingResponse extends CWSResponse {
     }
 
     public void setSettings(final Map<String, String> settings) {
-        this.settings = Collections.unmodifiableMap(settings);
+        this.settings.putAll(settings);
     }
 
     public Map<String, String> getSettings() {
-        return Collections.unmodifiableMap(settings);
+        return new HashMap<>(settings);
     }
 }

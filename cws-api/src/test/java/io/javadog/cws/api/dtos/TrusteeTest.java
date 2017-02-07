@@ -35,7 +35,7 @@ public final class TrusteeTest {
         final Member member = new Member();
         member.setId(id);
         member.setAuthentication(authentication);
-        member.setCreated(created);
+        member.setAdded(created);
 
         return member;
     }

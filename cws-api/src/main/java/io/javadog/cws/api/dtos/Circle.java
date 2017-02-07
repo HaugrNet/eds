@@ -10,6 +10,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -18,7 +19,7 @@ import java.util.Map;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "circle", propOrder = { "id", "name" })
+@XmlType(name = "circle", propOrder = { "id", "name", "created" })
 public final class Circle extends Verifiable {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
@@ -30,6 +31,7 @@ public final class Circle extends Verifiable {
 
     @XmlElement(required = true) private String id = null;
     @XmlElement(required = true) private String name = null;
+    @XmlElement                  private Date created = null;
 
     // =========================================================================
     // Standard Setters & Getters
@@ -55,6 +57,14 @@ public final class Circle extends Verifiable {
 
     public String getName() {
         return name;
+    }
+
+    public void setCreated(final Date created) {
+        this.created = created;
+    }
+
+    public Date getCreated() {
+        return created;
     }
 
     /**

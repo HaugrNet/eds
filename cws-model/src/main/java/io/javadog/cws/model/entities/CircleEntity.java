@@ -2,6 +2,8 @@ package io.javadog.cws.model.entities;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
 /**
@@ -10,6 +12,12 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "circles")
+@NamedQueries({
+        @NamedQuery(name = "circle.findAll",
+                query = "select c " +
+                        "from CircleEntity c " +
+                        "order by name asc")
+})
 public class CircleEntity extends Externable {
 
     @Column(name = "name", nullable = false, unique = true)

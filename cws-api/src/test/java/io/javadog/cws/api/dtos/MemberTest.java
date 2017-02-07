@@ -34,11 +34,11 @@ public final class MemberTest {
         final Member member = new Member();
         member.setId(id);
         member.setAuthentication(authentication);
-        member.setCreated(created);
+        member.setAdded(created);
 
         assertThat(member.getId(), is(id));
         assertThat(member.getAuthentication(), is(authentication));
-        assertThat(member.getCreated(), is(created));
+        assertThat(member.getAdded(), is(created));
 
         final Map<String, String> errors = member.validate();
         assertThat(errors.isEmpty(), is(true));

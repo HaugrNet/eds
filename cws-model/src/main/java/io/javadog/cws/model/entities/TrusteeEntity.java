@@ -22,7 +22,15 @@ import javax.persistence.Table;
         @NamedQuery(name = "trust.findByMemberId",
                 query = "select t " +
                         "from TrusteeEntity t " +
-                        "where t.member.id = :id")
+                        "where t.member.id = :id"),
+        @NamedQuery(name = "trustee.findByExternalCircleId",
+                query = "select t " +
+                        "from TrusteeEntity t " +
+                        "where t.circle.externalId = :externalCircleId"),
+        @NamedQuery(name = "trustee.findByCircleId",
+                query = "select t " +
+                        "from TrusteeEntity t " +
+                        "where t.circle.id = :circleId")
 })
 @Table(name = "trustees")
 public class TrusteeEntity extends Externable {

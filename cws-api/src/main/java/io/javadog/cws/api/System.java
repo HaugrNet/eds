@@ -72,12 +72,18 @@ public interface System {
     ProcessMemberResponse processMember(ProcessMemberRequest request);
 
     /**
-     * <p>Retrieves a collection of Circles from the CWS. A Circle, is used to
-     * share data between trusted Members. A Member can be anything from a
-     * Person, Organization, Company, etc.</p>
+     * <p>Retrieval of a Circle can be made with or without a Circle Id. If no Id
+     * is given in the request, then CWS will simply return a list of all existing
+     * Circles. If the Id was given, then the CWS will return the found Circle and
+     * the list of Trustees for the Circle, i.e. the Members who have access and
+     * their current Trust Level.</p>
      *
-     * @param request
-     * @return
+     * <p>If No Circle was found for a given Id, or if a different error occurred
+     * during the handling of the Request, then an error is set and both the Circle
+     * and Trustee Lists returned will be empty</p>
+     *
+     * @param request Fetch Circle Request Object
+     * @return Fetch Circle Response Object with error information
      */
     FetchCircleResponse fetchCircles(FetchCircleRequest request);
 

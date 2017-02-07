@@ -4,6 +4,7 @@ import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.common.exceptions.ModelException;
 import io.javadog.cws.model.CommonDao;
 import io.javadog.cws.model.entities.CWSEntity;
+import io.javadog.cws.model.entities.CircleEntity;
 import io.javadog.cws.model.entities.Externable;
 import io.javadog.cws.model.entities.MemberEntity;
 import io.javadog.cws.model.entities.SettingEntity;
@@ -79,11 +80,53 @@ public final class CommonJpaDao implements CommonDao {
         return findList(query);
     }
 
-    private <E> List<E> findList(final Query query) {
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<TrusteeEntity> findTrusteesByCircle(final String externalCircleId) {
+        final Query query = entityManager.createNamedQuery("trustee.findByExternalCircleId");
+        query.setParameter("externalCircleId", externalCircleId);
+
+        return findExistingList(query, "trustees");
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<TrusteeEntity> findTrusteesByCircle(final Long circleId) {
+        final Query query = entityManager.createNamedQuery("trustee.findByCircleId");
+        query.setParameter("circleId", circleId);
+
+        return findExistingList(query, "trustees");
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<CircleEntity> findAllCircles() {
+        final Query query = entityManager.createNamedQuery("circle.findAll");
+
+        return findList(query);
+    }
+
+    private static <E> List<E> findList(final Query query) {
         List<E> list = query.getResultList();
 
         if (list == null) {
             list = new ArrayList<>(0);
+        }
+
+        return list;
+    }
+
+    private static <E> List<E> findExistingList(final Query query, final String listName) {
+        List<E> list = query.getResultList();
+
+        if ((list == null) || list.isEmpty()) {
+            throw new ModelException(Constants.IDENTIFICATION_WARNING, "No " + listName + " found.");
         }
 
         return list;

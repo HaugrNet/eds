@@ -274,7 +274,7 @@ public final class Crypto {
         try {
             return string.getBytes(settings.getCharset());
         } catch (UnsupportedEncodingException e) {
-            throw new CWSException(e);
+            throw new CWSException(Constants.PROPERTY_ERROR, e);
         }
     }
 
@@ -282,7 +282,7 @@ public final class Crypto {
         try {
             return new String(bytes, settings.getCharset());
         } catch (UnsupportedEncodingException e) {
-            throw new CWSException(e);
+            throw new CWSException(Constants.PROPERTY_ERROR, e);
         }
     }
 
@@ -308,5 +308,9 @@ public final class Crypto {
 
     public static void clearSensitiveData(final char[] chars) {
         Arrays.fill(chars, '\u0000');
+    }
+
+    public static void clearSensitiveData(final byte[] bytes) {
+        Arrays.fill(bytes, (byte) 0x00);
     }
 }

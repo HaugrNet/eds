@@ -1,14 +1,20 @@
 package io.javadog.cws.common;
 
+import io.javadog.cws.api.common.Constants;
+import io.javadog.cws.common.exceptions.CWSException;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
+import java.nio.charset.Charset;
 import java.security.Key;
 import java.security.KeyPair;
 import java.util.UUID;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.hasProperty;
 import static org.junit.Assert.assertThat;
 
 /**
@@ -20,8 +26,11 @@ import static org.junit.Assert.assertThat;
  */
 public final class CryptoTest {
 
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
+
     /**
-     * Testing how to properly Armor and Dearmor a Key, meaning converting a
+     * Testing how to properly Armor and De-armor a Key, meaning converting a
      * Binary Key into a String and converted back. For the process, CWS uses
      * the X.509 standard together with a simple Base64 encoding/decoding. The
      * first is the standard for Public/Private Keys and the latter allows the
@@ -127,5 +136,123 @@ public final class CryptoTest {
         final String result = crypto.bytesToString(decrypted);
 
         assertThat(result, is(cleartext));
+    }
+
+    /**
+     * <p>Circles have a Key generated, which is stored encrypted per Trustee,
+     * i.e. Member with access to the Circle. The Circle Key is encrypted using
+     * the Member's Public Key, and can be decrypted using the Member's Private
+     * Key which again is unlocked during the Authentication Process.</p>
+     */
+    @Test
+    public void testMemberAccessCircleKey() {
+        final Crypto crypto = new Crypto(new Settings());
+        final Charset charset = crypto.getCharSet();
+        final String dataSalt = UUID.randomUUID().toString();
+        final IvParameterSpec iv = crypto.generateInitialVector(dataSalt);
+        final SecretKey key = crypto.generateSymmetricKey();
+        final byte[] rawdata = UUID.randomUUID().toString().getBytes(charset);
+        final byte[] encryptedData = crypto.encrypt(key, iv, rawdata);
+
+        final KeyPair keyPair = crypto.generateAsymmetricKey();
+        final String armoredCircleKey = crypto.encryptAndArmorCircleKey(keyPair.getPublic(), key);
+        final SecretKey circleKey = crypto.extractCircleKey(keyPair.getPrivate(), armoredCircleKey, key.getAlgorithm());
+        final byte[] decryptedData = crypto.decrypt(circleKey, iv, encryptedData);
+
+        Crypto.clearSensitiveData(encryptedData);
+        assertThat(decryptedData, is(rawdata));
+    }
+
+    @Test
+    public void testStringToBytesConversion() {
+        final Settings settings = new Settings();
+        final Crypto crypto = new Crypto(settings);
+        final String str = "Alpha Beta æøåßöäÿ";
+
+        final String garbage = "INVALID_ENCODING";
+        settings.set(Settings.CWS_CHARSET, garbage);
+
+        // Final part of the test, set the Charset to an invalid entry, this
+        // should result in an Exception, with the following details.
+        thrown.expect(CWSException.class);
+        thrown.expectMessage("UnsupportedEncodingException: " + garbage);
+        thrown.expect(hasProperty("returnCode"));
+        thrown.expect(hasProperty("returnCode", is(Constants.PROPERTY_ERROR)));
+
+        crypto.stringToBytes(str);
+    }
+
+    @Test
+    public void testBytesToStringConversion() {
+        final Settings settings = new Settings();
+        final Crypto crypto = new Crypto(settings);
+        final byte[] bytes = "Alpha Beta æøåßöäÿ".getBytes();
+        final String garbage = "INVALID_ENCODING";
+        settings.set(Settings.CWS_CHARSET, garbage);
+
+        // Final part of the test, set the Charset to an invalid entry, this
+        // should result in an Exception, with the following details.
+        thrown.expect(CWSException.class);
+        thrown.expectMessage("UnsupportedEncodingException: " + garbage);
+        thrown.expect(hasProperty("returnCode"));
+        thrown.expect(hasProperty("returnCode", is(Constants.PROPERTY_ERROR)));
+
+        crypto.bytesToString(bytes);
+    }
+
+    /**
+     * Sensitive Data should only be handled via primitive arrays, and not
+     * immutable Objects such as String, which will be kept in memory longer.
+     * To ensure that the content of the Arrays is scrapped, a small method
+     * exist for doing this. This test will simply ensure that the result
+     * from the invocation is a destroyed array.
+     */
+    @Test
+    public void testDeletingArrays() {
+        final byte[] emptyBytes = {(byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0 };
+        final char[] emptyChars = {(char) 0, (char) 0, (char) 0, (char) 0, (char) 0, (char) 0 };
+        final String string = "String";
+
+        final byte[] bytes = string.getBytes();
+        Crypto.clearSensitiveData(bytes);
+        assertThat(bytes, is(emptyBytes));
+
+        final char[] chars = string.toCharArray();
+        Crypto.clearSensitiveData(chars);
+        assertThat(chars, is(emptyChars));
+    }
+
+    /**
+     * <p>Although the Charset is set via the Settings, it is used primarily
+     * together with the Crypto Library. It can be argued where it belongs, but
+     * for now it resides in the Crypto Library so the testing of it is also
+     * via the Crypto Library.</p>
+     */
+    @Test
+    public void testCharset() {
+        final Settings settings = new Settings();
+        final Crypto crypto = new Crypto(settings);
+
+        // First part of the test, expecting that that the default Settings
+        // Charset is the same as the one we get from the Crypto Library.
+        final String charset = settings.getCharset();
+        assertThat(crypto.getCharSet().name(), is(charset));
+
+        // Now, update the Charset, and ensure that it is also updated in the
+        // Crypto Library.
+        final String latin9 = "ISO-8859-15";
+        settings.set(Settings.CWS_CHARSET, latin9);
+        assertThat(crypto.getCharSet().name(), is(latin9));
+
+        // Final part of the test, set the Charset to an invalid entry, this
+        // should result in an Exception, with the following details.
+        final String garbage = "INVALID_ENCODING";
+        thrown.expect(CWSException.class);
+        thrown.expectMessage("UnsupportedCharsetException: " + garbage);
+        thrown.expect(hasProperty("returnCode"));
+        thrown.expect(hasProperty("returnCode", is(Constants.PROPERTY_ERROR)));
+
+        settings.set(Settings.CWS_CHARSET, garbage);
+        crypto.getCharSet();
     }
 }

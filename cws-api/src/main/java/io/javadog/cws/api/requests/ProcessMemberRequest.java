@@ -19,7 +19,7 @@ import java.util.Set;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "member", propOrder = "member")
+@XmlType(name = "processMemberRequest", propOrder = { "action", "member" })
 public final class ProcessMemberRequest extends Authentication {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
@@ -42,6 +42,7 @@ public final class ProcessMemberRequest extends Authentication {
      * <ul>
      *   <li>PROCESS</li>
      *   <li>DELETE</li>
+     *   <li>REKEY</li>
      * </ul>
      *
      * @param action Current Action

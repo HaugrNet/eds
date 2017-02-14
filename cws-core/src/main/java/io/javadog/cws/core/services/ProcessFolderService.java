@@ -5,7 +5,7 @@ import io.javadog.cws.api.requests.ProcessFolderRequest;
 import io.javadog.cws.api.responses.ProcessFolderResponse;
 import io.javadog.cws.common.Settings;
 import io.javadog.cws.common.exceptions.CWSException;
-import io.javadog.cws.core.Action;
+import io.javadog.cws.core.Permission;
 import io.javadog.cws.core.Servicable;
 
 import javax.persistence.EntityManager;
@@ -25,7 +25,7 @@ public final class ProcessFolderService extends Servicable<ProcessFolderResponse
      */
     @Override
     public ProcessFolderResponse process(final ProcessFolderRequest request) {
-        verifyRequest(request, Action.PROCESS_FOLDER);
+        verifyRequest(request, Permission.PROCESS_FOLDER);
 
         throw new CWSException(Constants.NOTIMPLEMENTED_ERROR, "Not Yet Implemented.");
     }

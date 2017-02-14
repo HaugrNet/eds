@@ -5,7 +5,7 @@ import io.javadog.cws.api.requests.FetchMemberRequest;
 import io.javadog.cws.api.responses.FetchMemberResponse;
 import io.javadog.cws.common.Settings;
 import io.javadog.cws.common.exceptions.CWSException;
-import io.javadog.cws.core.Action;
+import io.javadog.cws.core.Permission;
 import io.javadog.cws.core.Servicable;
 
 import javax.persistence.EntityManager;
@@ -25,7 +25,7 @@ public final class FetchMemberService extends Servicable<FetchMemberResponse, Fe
      */
     @Override
     public FetchMemberResponse process(final FetchMemberRequest request) {
-        verifyRequest(request, Action.FETCH_MEMBER);
+        verifyRequest(request, Permission.FETCH_MEMBER);
 
         throw new CWSException(Constants.NOTIMPLEMENTED_ERROR, "Not Yet Implemented.");
     }

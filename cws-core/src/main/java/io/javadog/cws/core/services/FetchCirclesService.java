@@ -8,7 +8,7 @@ import io.javadog.cws.api.dtos.Trustee;
 import io.javadog.cws.api.requests.FetchCircleRequest;
 import io.javadog.cws.api.responses.FetchCircleResponse;
 import io.javadog.cws.common.Settings;
-import io.javadog.cws.core.Action;
+import io.javadog.cws.core.Permission;
 import io.javadog.cws.core.Servicable;
 import io.javadog.cws.model.entities.CircleEntity;
 import io.javadog.cws.model.entities.MemberEntity;
@@ -34,7 +34,7 @@ public final class FetchCirclesService extends Servicable<FetchCircleResponse, F
      */
     @Override
     public FetchCircleResponse process(final FetchCircleRequest request) {
-        verifyRequest(request, Action.FETCH_CIRCLE);
+        verifyRequest(request, Permission.FETCH_CIRCLE);
         final FetchCircleResponse response = new FetchCircleResponse();
 
         if (request.getCircleId() != null) {

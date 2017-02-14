@@ -5,7 +5,7 @@ import io.javadog.cws.api.requests.FetchFolderRequest;
 import io.javadog.cws.api.responses.FetchFolderResponse;
 import io.javadog.cws.common.Settings;
 import io.javadog.cws.common.exceptions.CWSException;
-import io.javadog.cws.core.Action;
+import io.javadog.cws.core.Permission;
 import io.javadog.cws.core.Servicable;
 
 import javax.persistence.EntityManager;
@@ -25,7 +25,7 @@ public final class FetchFolderService extends Servicable<FetchFolderResponse, Fe
      */
     @Override
     public FetchFolderResponse process(final FetchFolderRequest request) {
-        verifyRequest(request, Action.FETCH_FOLDER);
+        verifyRequest(request, Permission.FETCH_FOLDER);
 
         throw new CWSException(Constants.NOTIMPLEMENTED_ERROR, "Not Yet Implemented.");
     }

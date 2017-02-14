@@ -6,7 +6,7 @@ import io.javadog.cws.api.common.TrustLevel;
  * @author Kim Jensen
  * @since  CWS 1.0
  */
-public enum Action {
+public enum Permission {
 
     FETCH_CIRCLE(TrustLevel.GUEST, "Fetch Circles."),
     FETCH_FOLDER(TrustLevel.GUEST, "Fetch Folders."),
@@ -27,7 +27,7 @@ public enum Action {
     private final TrustLevel trustLevel;
     private final String description;
 
-    Action(final TrustLevel trustLevel, final String description) {
+    Permission(final TrustLevel trustLevel, final String description) {
         this.trustLevel = trustLevel;
         this.description = description;
     }

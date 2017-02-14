@@ -5,7 +5,7 @@ import io.javadog.cws.api.requests.ProcessCircleRequest;
 import io.javadog.cws.api.responses.ProcessCircleResponse;
 import io.javadog.cws.common.Settings;
 import io.javadog.cws.common.exceptions.CWSException;
-import io.javadog.cws.core.Action;
+import io.javadog.cws.core.Permission;
 import io.javadog.cws.core.Servicable;
 
 import javax.persistence.EntityManager;
@@ -25,7 +25,7 @@ public final class ProcessCircleService extends Servicable<ProcessCircleResponse
      */
     @Override
     public ProcessCircleResponse process(final ProcessCircleRequest request) {
-        verifyRequest(request, Action.PROCESS_CIRCLE);
+        verifyRequest(request, Permission.PROCESS_CIRCLE);
 
         throw new CWSException(Constants.NOTIMPLEMENTED_ERROR, "Not Yet Implemented.");
     }

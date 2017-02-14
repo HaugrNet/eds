@@ -6,7 +6,7 @@ import io.javadog.cws.api.requests.ProcessMemberRequest;
 import io.javadog.cws.api.responses.ProcessMemberResponse;
 import io.javadog.cws.common.Crypto;
 import io.javadog.cws.common.Settings;
-import io.javadog.cws.core.Action;
+import io.javadog.cws.core.Permission;
 import io.javadog.cws.core.Servicable;
 import io.javadog.cws.model.entities.MemberEntity;
 
@@ -32,7 +32,7 @@ public final class ProcessMemberService extends Servicable<ProcessMemberResponse
      */
     @Override
     public ProcessMemberResponse process(final ProcessMemberRequest request) {
-        verifyRequest(request, Action.PROCESS_MEMBER);
+        verifyRequest(request, Permission.PROCESS_MEMBER);
 
         return new ProcessMemberResponse();
     }

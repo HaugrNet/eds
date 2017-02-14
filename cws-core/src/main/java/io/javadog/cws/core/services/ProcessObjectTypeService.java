@@ -5,7 +5,7 @@ import io.javadog.cws.api.requests.ProcessObjectTypeRequest;
 import io.javadog.cws.api.responses.ProcessObjectTypeResponse;
 import io.javadog.cws.common.Settings;
 import io.javadog.cws.common.exceptions.CWSException;
-import io.javadog.cws.core.Action;
+import io.javadog.cws.core.Permission;
 import io.javadog.cws.core.Servicable;
 
 import javax.persistence.EntityManager;
@@ -25,7 +25,7 @@ public final class ProcessObjectTypeService extends Servicable<ProcessObjectType
      */
     @Override
     public ProcessObjectTypeResponse process(final ProcessObjectTypeRequest request) {
-        verifyRequest(request, Action.PROCESS_OBJECT_TYPE);
+        verifyRequest(request, Permission.PROCESS_OBJECT_TYPE);
 
         throw new CWSException(Constants.NOTIMPLEMENTED_ERROR, "Not Yet Implemented.");
     }

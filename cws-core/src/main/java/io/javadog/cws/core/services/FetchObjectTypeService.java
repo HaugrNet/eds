@@ -5,7 +5,7 @@ import io.javadog.cws.api.requests.FetchObjectTypeRequest;
 import io.javadog.cws.api.responses.FetchObjectTypeResponse;
 import io.javadog.cws.common.Settings;
 import io.javadog.cws.common.exceptions.CWSException;
-import io.javadog.cws.core.Action;
+import io.javadog.cws.core.Permission;
 import io.javadog.cws.core.Servicable;
 
 import javax.persistence.EntityManager;
@@ -25,7 +25,7 @@ public final class FetchObjectTypeService extends Servicable<FetchObjectTypeResp
      */
     @Override
     public FetchObjectTypeResponse process(final FetchObjectTypeRequest request) {
-        verifyRequest(request, Action.FETCH_OBJECT_TYPE);
+        verifyRequest(request, Permission.FETCH_OBJECT_TYPE);
 
         throw new CWSException(Constants.NOTIMPLEMENTED_ERROR, "Not Yet Implemented.");
     }

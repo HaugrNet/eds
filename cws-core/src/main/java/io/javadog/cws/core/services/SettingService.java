@@ -6,7 +6,7 @@ import io.javadog.cws.api.responses.SettingResponse;
 import io.javadog.cws.common.Crypto;
 import io.javadog.cws.common.Settings;
 import io.javadog.cws.common.exceptions.CWSException;
-import io.javadog.cws.core.Action;
+import io.javadog.cws.core.Permission;
 import io.javadog.cws.core.Servicable;
 import io.javadog.cws.model.entities.MemberEntity;
 import io.javadog.cws.model.entities.SettingEntity;
@@ -116,7 +116,7 @@ public final class SettingService extends Servicable<SettingResponse, SettingReq
 
     private void checkAccount(final SettingRequest request) {
         try {
-            verifyRequest(request, Action.SETTING);
+            verifyRequest(request, Permission.SETTING);
         } catch (CWSException e) {
             if (e.getReturnCode() == Constants.IDENTIFICATION_WARNING) {
                 // Account doesn't exist, so we're creating a new one based on

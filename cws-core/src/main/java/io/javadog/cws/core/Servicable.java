@@ -71,7 +71,7 @@ public abstract class Servicable<R extends CWSResponse, V extends Authentication
      * @param verifiable Request Object to use for the checks
      * @param action     The Action for the permission check
      */
-    protected void verifyRequest(final V verifiable, final Action action) {
+    protected void verifyRequest(final V verifiable, final Permission action) {
         // Step 1; Verify if the given data is sufficient to complete the
         //         request. If not sufficient, no need to continue and involve
         //         the DB, so an Exception will be thrown.
@@ -154,7 +154,7 @@ public abstract class Servicable<R extends CWSResponse, V extends Authentication
         return key;
     }
 
-    private void checkAccount(final Action action) {
+    private void checkAccount(final Permission action) {
         // The System Admin is automatically permitted to perform a number of
         // Actions, without being part of a Circle. So these checks must be
         // made separately based on the actual Request.

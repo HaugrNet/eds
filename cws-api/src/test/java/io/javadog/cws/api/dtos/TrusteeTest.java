@@ -25,7 +25,7 @@ public final class TrusteeTest {
         final char[] credentials = UUID.randomUUID().toString().toCharArray();
 
         final Authentication authentication = new Authentication();
-        authentication.setName(admin);
+        authentication.setAccount(admin);
         authentication.setCredentialType(CredentialType.PASSPHRASE);
         authentication.setCredential(credentials);
 

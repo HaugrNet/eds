@@ -20,7 +20,7 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
         final Settings settings = new Settings();
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
         final ProcessMemberRequest request = new ProcessMemberRequest();
-        request.setName(Constants.ADMIN_ACCOUNT);
+        request.setAccount(Constants.ADMIN_ACCOUNT);
         request.setCredentialType(CredentialType.PASSPHRASE);
         request.setCredential(Constants.ADMIN_ACCOUNT.toCharArray());
         request.setAction(Action.PROCESS);

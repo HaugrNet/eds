@@ -46,7 +46,7 @@ public final class SettingServiceTest extends DatabaseSetup {
     public void testNonAdminRequest() {
         final SettingService service = new SettingService(new Settings(), entityManager);
         final SettingRequest request = prepareRequest();
-        request.setName("not admin");
+        request.setAccount("not admin");
 
         service.process(request);
     }
@@ -129,7 +129,7 @@ public final class SettingServiceTest extends DatabaseSetup {
 
     private static SettingRequest prepareRequest() {
         final SettingRequest request = new SettingRequest();
-        request.setName(Constants.ADMIN_ACCOUNT);
+        request.setAccount(Constants.ADMIN_ACCOUNT);
         request.setCredentialType(CredentialType.PASSPHRASE);
         request.setCredential(Constants.ADMIN_ACCOUNT.toCharArray());
 

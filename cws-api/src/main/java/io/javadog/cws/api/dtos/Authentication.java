@@ -22,18 +22,18 @@ import java.util.Map;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "authentication", propOrder = { "name", "credentialType", "credential" })
+@XmlType(name = "authentication", propOrder = { "account", "credentialType", "credential" })
 public class Authentication extends Verifiable {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
-    private static final String FIELD_NAME = "name";
+    private static final String FIELD_ACCOUNT = "account";
     private static final String FIELD_TYPE = "credentialType";
     private static final String FIELD_CREDENTIAL = "credential";
     private static final int NAME_MIN_LENGTH = 1;
     private static final int NAME_MAX_LENGTH = 75;
 
-    @XmlElement(required = true) private String name = null;
+    @XmlElement(required = true) private String account = null;
     @XmlElement(required = true) private CredentialType credentialType = null;
     @XmlElement(required = true) private char[] credential = null;
 
@@ -43,14 +43,14 @@ public class Authentication extends Verifiable {
 
     @NotNull
     @Size(min = NAME_MIN_LENGTH, max = NAME_MAX_LENGTH)
-    public void setName(final String name) {
-        ensureNotNull(FIELD_NAME, name);
-        ensureLength(FIELD_NAME, name, NAME_MIN_LENGTH, NAME_MAX_LENGTH);
-        this.name = name;
+    public void setAccount(final String account) {
+        ensureNotNull(FIELD_ACCOUNT, account);
+        ensureLength(FIELD_ACCOUNT, account, NAME_MIN_LENGTH, NAME_MAX_LENGTH);
+        this.account = account;
     }
 
-    public String getName() {
-        return name;
+    public String getAccount() {
+        return account;
     }
 
     /**
@@ -108,9 +108,9 @@ public class Authentication extends Verifiable {
     public Map<String, String> validate() {
         final Map<String, String> errors = new HashMap<>();
 
-        checkNotNull(errors, FIELD_NAME, name, "Name is missing, null or invalid.");
-        checkNotEmpty(errors, FIELD_NAME, name, "Name may not be empty.");
-        checkNotTooLong(errors, FIELD_NAME, name, NAME_MAX_LENGTH, "Name is exceeding the maximum allowed length " + NAME_MAX_LENGTH + '.');
+        checkNotNull(errors, FIELD_ACCOUNT, account, "Account is missing, null or invalid.");
+        checkNotEmpty(errors, FIELD_ACCOUNT, account, "Account may not be empty.");
+        checkNotTooLong(errors, FIELD_ACCOUNT, account, NAME_MAX_LENGTH, "Name is exceeding the maximum allowed length " + NAME_MAX_LENGTH + '.');
         checkNotNull(errors, FIELD_CREDENTIAL, credential, "Credential is missing, null or invalid.");
         checkNotNull(errors, FIELD_TYPE, credentialType, "CredentialType is missing, null or invalid.");
 

@@ -47,7 +47,7 @@ public final class SettingService extends Servicable<SettingResponse, SettingReq
      */
     @Override
     public SettingResponse process(final SettingRequest request) {
-        if (Objects.equals(request.getName(), Constants.ADMIN_ACCOUNT)) {
+        if (Objects.equals(request.getAccount(), Constants.ADMIN_ACCOUNT)) {
             checkAccount(request);
 
             final Map<String, SettingEntity> currentSettings = convertSettings(dao.readSettings());

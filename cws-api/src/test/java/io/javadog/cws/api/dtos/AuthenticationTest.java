@@ -22,14 +22,14 @@ public final class AuthenticationTest {
         final CredentialType type = CredentialType.KEY;
 
         final Authentication authentication = new Authentication();
-        assertThat(authentication.getName(), is(not(name)));
+        assertThat(authentication.getAccount(), is(not(name)));
         assertThat(authentication.getCredentialType(), is(not(type)));
         assertThat(authentication.getCredential(), is(not(credentials)));
 
-        authentication.setName(name);
+        authentication.setAccount(name);
         authentication.setCredentialType(type);
         authentication.setCredential(credentials);
-        assertThat(authentication.getName(), is(name));
+        assertThat(authentication.getAccount(), is(name));
         assertThat(authentication.getCredentialType(), is(type));
         assertThat(authentication.getCredential(), is(credentials));
 
@@ -47,19 +47,19 @@ public final class AuthenticationTest {
     @Test(expected = IllegalArgumentException.class)
     public void testNullName() {
         final Authentication authentication = new Authentication();
-        authentication.setName(null);
+        authentication.setAccount(null);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testEmptyName() {
         final Authentication authentication = new Authentication();
-        authentication.setName("");
+        authentication.setAccount("");
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testLongName() {
         final Authentication authentication = new Authentication();
-        authentication.setName("1234567890123456789012345678901234567891234567890123456789012345678901234567890");
+        authentication.setAccount("1234567890123456789012345678901234567891234567890123456789012345678901234567890");
     }
 
     @Test(expected = IllegalArgumentException.class)

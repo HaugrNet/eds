@@ -110,7 +110,7 @@ public final class FetchCirclesService extends Servicable<FetchCircleResponse, F
 
     private static Member convert(final MemberEntity entity) {
         final Authentication authentication = new Authentication();
-        authentication.setName(entity.getName());
+        authentication.setAccount(entity.getName());
         final Member member = new Member();
 
         member.setId(entity.getExternalId());

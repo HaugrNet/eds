@@ -91,6 +91,10 @@ public final class Settings {
         return properties.getProperty(SYMMETRIC_ALGORITHM_MODE);
     }
 
+    public String getSymmetricPadding() {
+        return properties.getProperty(SYMMETRIC_ALGORITHM_PADDING);
+    }
+
     public int getSymmetricKeylength() {
         return toInt(properties.getProperty(SYMMETRIC_ALGORITHM_KEYLENGTH));
     }

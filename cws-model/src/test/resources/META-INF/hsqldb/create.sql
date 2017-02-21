@@ -271,9 +271,9 @@ CREATE TABLE trustees (
   circle_id        INTEGER,
   key_id           INTEGER,
   trust_level      VARCHAR(10),
-  circle_key       VARCHAR(256) DEFAULT 'Not Applicable',
-  modified         TIMESTAMP    DEFAULT now(),
-  created          TIMESTAMP    DEFAULT now(),
+  circle_key       VARCHAR(8192) DEFAULT 'Not Applicable',
+  modified         TIMESTAMP     DEFAULT now(),
+  created          TIMESTAMP     DEFAULT now(),
 
   /* Primary & Foreign Keys */
   CONSTRAINT trustee_pk                     PRIMARY KEY (id),

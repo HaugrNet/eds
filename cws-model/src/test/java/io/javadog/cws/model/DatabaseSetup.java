@@ -33,7 +33,8 @@ public class DatabaseSetup {
     private static final String persistenceName = "io.javadog.cws.jpa";
     private static final EntityManagerFactory FACTORY = Persistence.createEntityManagerFactory(persistenceName);
     protected EntityManager entityManager = FACTORY.createEntityManager();
-    private final Crypto crypto = new Crypto(new Settings());
+    private final Settings settings = new Settings();
+    private final Crypto crypto = new Crypto(settings);
 
     @Before
     public void setup() {
@@ -49,12 +50,12 @@ public class DatabaseSetup {
      * Creates a new Member Entity, with a Password which is the same as the
      * name.
      *
-     * @param name Account name, also used as password
-     * @return Newly created Account
+     * @param account Account name, also used as password
+     * @return Newly created Entity
      */
-    public MemberEntity createMember(final String name) {
+    protected MemberEntity createMember(final String account) {
         final String salt = UUID.randomUUID().toString();
-        final Key key = crypto.convertPasswordToKey(name.toCharArray(), salt);
+        final Key key = crypto.convertPasswordToKey(account.toCharArray(), salt);
 
         final KeyPair pair = crypto.generateAsymmetricKey();
         final IvParameterSpec iv = crypto.generateInitialVector(salt);
@@ -62,32 +63,43 @@ public class DatabaseSetup {
         final String base64EncryptedPrivateKey = Base64.getEncoder().encodeToString(encryptedPrivateKey);
         final String armoredPublicKey = Crypto.armorPublicKey(pair.getPublic());
 
-        final MemberEntity account = new MemberEntity();
-        account.setName(name);
-        account.setSalt(salt);
-        account.setPrivateKey(base64EncryptedPrivateKey);
-        account.setPublicKey(armoredPublicKey);
-        entityManager.persist(account);
+        final MemberEntity entity = new MemberEntity();
+        entity.setName(account);
+        entity.setSalt(salt);
+        entity.setPrivateKey(base64EncryptedPrivateKey);
+        entity.setPublicKey(armoredPublicKey);
+        entity.setKeyPair(pair);
+        persist(entity);
 
-        return account;
+        return entity;
     }
 
-    public void addKeyAndTrusteesToCircle(final CircleEntity circle, final MemberEntity... accounts) {
+    protected CircleEntity createCircle(final String name) {
+        final CircleEntity entity = prepareCircle(name);
+        persist(entity);
+
+        return entity;
+    }
+
+    protected void addKeyAndTrusteesToCircle(final CircleEntity circle, final MemberEntity... accounts) {
         if (accounts != null) {
             final SecretKey key = crypto.generateSymmetricKey();
             final KeyEntity keyEntity = new KeyEntity();
             keyEntity.setAlgorithm(key.getAlgorithm());
+            keyEntity.setCipherMode(settings.getSymmetricCipherMode());
+            keyEntity.setPadding(settings.getSymmetricPadding());
             keyEntity.setStatus(Status.ACTIVE);
-            entityManager.persist(keyEntity);
+            persist(keyEntity);
 
             for (final MemberEntity account : accounts) {
                 final TrusteeEntity entity = new TrusteeEntity();
                 entity.setCircleKey(crypto.encryptAndArmorCircleKey(account.getKeyPair().getPublic(), key));
+                entity.setMember(account);
                 entity.setCircle(circle);
                 entity.setKey(keyEntity);
                 entity.setTrustLevel(TrustLevel.ADMIN);
 
-                entityManager.persist(entity);
+                persist(entity);
             }
         }
     }

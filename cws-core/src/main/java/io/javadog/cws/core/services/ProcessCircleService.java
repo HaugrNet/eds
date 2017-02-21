@@ -24,7 +24,7 @@ public final class ProcessCircleService extends Servicable<ProcessCircleResponse
      * {@inheritDoc}
      */
     @Override
-    public ProcessCircleResponse process(final ProcessCircleRequest request) {
+    public ProcessCircleResponse perform(final ProcessCircleRequest request) {
         verifyRequest(request, Permission.PROCESS_CIRCLE);
 
         throw new CWSException(Constants.NOTIMPLEMENTED_ERROR, "Not Yet Implemented.");

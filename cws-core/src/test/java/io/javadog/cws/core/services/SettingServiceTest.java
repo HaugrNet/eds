@@ -36,7 +36,7 @@ public final class SettingServiceTest extends DatabaseSetup {
         final SettingService service = new SettingService(new Settings(), entityManager);
         final SettingRequest request = prepareRequest();
 
-        final SettingResponse response = service.process(request);
+        final SettingResponse response = service.perform(request);
         assertThat(response.getReturnCode(), is(0));
         assertThat(response.getReturnMessage(), is("Ok"));
         assertThat(response.getSettings().size(), is(9));
@@ -48,7 +48,7 @@ public final class SettingServiceTest extends DatabaseSetup {
         final SettingRequest request = prepareRequest();
         request.setAccount("not admin");
 
-        service.process(request);
+        service.perform(request);
     }
 
     @Test
@@ -56,7 +56,7 @@ public final class SettingServiceTest extends DatabaseSetup {
         final SettingService service = new SettingService(new Settings(), entityManager);
         final SettingRequest request = prepareRequest();
 
-        final SettingResponse response = service.process(request);
+        final SettingResponse response = service.perform(request);
         assertThat(response.getReturnCode(), is(0));
         assertThat(response.getReturnMessage(), is("Ok"));
         assertThat(response.getSettings().size(), is(9));
@@ -69,7 +69,7 @@ public final class SettingServiceTest extends DatabaseSetup {
         final Map<String, String> settings = new HashMap<>();
         request.setSettings(settings);
 
-        final SettingResponse response = service.process(request);
+        final SettingResponse response = service.perform(request);
         assertThat(response.getReturnCode(), is(0));
         assertThat(response.getReturnMessage(), is("Ok"));
         assertThat(response.getSettings().size(), is(9));
@@ -82,7 +82,7 @@ public final class SettingServiceTest extends DatabaseSetup {
 
         // First invocation, retrieving the list of current values so we can
         // check that it is being updated
-        final SettingResponse response = service.process(request);
+        final SettingResponse response = service.perform(request);
         assertThat(response.getReturnCode(), is(0));
         assertThat(response.getReturnMessage(), is("Ok"));
         assertThat(response.getSettings().size(), is(9));
@@ -94,7 +94,7 @@ public final class SettingServiceTest extends DatabaseSetup {
         settings.put("cws.crypto.symmetric.keylength", "256");
         request.setSettings(settings);
 
-        final SettingResponse update = service.process(request);
+        final SettingResponse update = service.perform(request);
         assertThat(update.getReturnCode(), is(0));
         assertThat(update.getReturnMessage(), is("Ok"));
         assertThat(update.getSettings().size(), is(9));
@@ -109,7 +109,7 @@ public final class SettingServiceTest extends DatabaseSetup {
         settings.put("cws.crypto.symmetric.algorithm", "DES");
         request.setSettings(settings);
 
-        service.process(request);
+        service.perform(request);
     }
 
     @Test
@@ -120,7 +120,7 @@ public final class SettingServiceTest extends DatabaseSetup {
         settings.put("cws.test.setting", "Setting Value");
         request.setSettings(settings);
 
-        final SettingResponse response = service.process(request);
+        final SettingResponse response = service.perform(request);
         assertThat(response.getReturnCode(), is(0));
         assertThat(response.getReturnMessage(), is("Ok"));
         assertThat(response.getSettings().size(), is(10));

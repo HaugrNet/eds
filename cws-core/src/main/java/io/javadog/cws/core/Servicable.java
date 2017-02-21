@@ -47,16 +47,15 @@ public abstract class Servicable<R extends CWSResponse, V extends Authentication
      * <p>The main processing method for the given Service. Takes care of the
      * Business Logic for the request, and returns the response.</p>
      *
-     * <p>The method will all an unverified Request Object, and will as the
-     * first step verify it before starting the actual processing. The
-     * verification of the request Object is made regardless, to avoid that any
-     * strange errors can or will occur.</p>
+     * <p>The first step in the method, will be to verity the Request Object,
+     * to ensure that it has the required information to perform the request,
+     * and successfully complete it without any strange errors.</p>
      *
-     * @param request Request Object to process
+     * @param request Request Object to perform
      * @return Response Object with the result of the processing
      * @throws RuntimeException if an unknown error occurred
      */
-    public abstract R process(V request);
+    public abstract R perform(V request);
 
     /**
      * <p>All incoming requests must be verified, so it is clear if the given

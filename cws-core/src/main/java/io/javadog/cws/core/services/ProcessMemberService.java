@@ -31,7 +31,7 @@ public final class ProcessMemberService extends Servicable<ProcessMemberResponse
      * {@inheritDoc}
      */
     @Override
-    public ProcessMemberResponse process(final ProcessMemberRequest request) {
+    public ProcessMemberResponse perform(final ProcessMemberRequest request) {
         verifyRequest(request, Permission.PROCESS_MEMBER);
 
         return new ProcessMemberResponse();

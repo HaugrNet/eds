@@ -33,7 +33,7 @@ public final class FetchCirclesService extends Servicable<FetchCircleResponse, F
      * {@inheritDoc}
      */
     @Override
-    public FetchCircleResponse process(final FetchCircleRequest request) {
+    public FetchCircleResponse perform(final FetchCircleRequest request) {
         verifyRequest(request, Permission.FETCH_CIRCLE);
         final FetchCircleResponse response = new FetchCircleResponse();
 

@@ -24,7 +24,7 @@ public final class FetchFolderService extends Servicable<FetchFolderResponse, Fe
      * {@inheritDoc}
      */
     @Override
-    public FetchFolderResponse process(final FetchFolderRequest request) {
+    public FetchFolderResponse perform(final FetchFolderRequest request) {
         verifyRequest(request, Permission.FETCH_FOLDER);
 
         throw new CWSException(Constants.NOTIMPLEMENTED_ERROR, "Not Yet Implemented.");

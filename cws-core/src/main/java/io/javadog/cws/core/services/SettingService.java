@@ -46,7 +46,7 @@ public final class SettingService extends Servicable<SettingResponse, SettingReq
      * {@inheritDoc}
      */
     @Override
-    public SettingResponse process(final SettingRequest request) {
+    public SettingResponse perform(final SettingRequest request) {
         if (Objects.equals(request.getAccount(), Constants.ADMIN_ACCOUNT)) {
             checkAccount(request);
 
@@ -69,7 +69,7 @@ public final class SettingService extends Servicable<SettingResponse, SettingReq
      * database and ensures that the given map is updated.
      *
      * @param currentSettings Current Settings to check and update
-     * @param entry Entry from the given set of Settings to process
+     * @param entry Entry from the given set of Settings to perform
      */
     private void processSetting(final Map<String, SettingEntity> currentSettings, final Map.Entry<String, String> entry) {
         if (currentSettings.containsKey(entry.getKey())) {

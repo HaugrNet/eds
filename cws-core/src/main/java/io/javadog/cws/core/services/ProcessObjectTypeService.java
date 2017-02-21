@@ -24,7 +24,7 @@ public final class ProcessObjectTypeService extends Servicable<ProcessObjectType
      * {@inheritDoc}
      */
     @Override
-    public ProcessObjectTypeResponse process(final ProcessObjectTypeRequest request) {
+    public ProcessObjectTypeResponse perform(final ProcessObjectTypeRequest request) {
         verifyRequest(request, Permission.PROCESS_OBJECT_TYPE);
 
         throw new CWSException(Constants.NOTIMPLEMENTED_ERROR, "Not Yet Implemented.");

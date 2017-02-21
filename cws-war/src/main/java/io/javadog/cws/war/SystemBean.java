@@ -65,7 +65,7 @@ public class SystemBean implements System {
 
         try {
             final Servicable<SettingResponse, SettingRequest> service = new SettingService(settings, entityManager);
-            response = service.process(request);
+            response = service.perform(request);
         } catch (CWSException e) {
             // Any Warning or Error thrown by the CWS contain enough information
             // so it can be dealt with by the requesting System. Logging the
@@ -88,7 +88,7 @@ public class SystemBean implements System {
 
         try {
             final Servicable<FetchMemberResponse, FetchMemberRequest> service = new FetchMemberService(settings, entityManager);
-            response = service.process(request);
+            response = service.perform(request);
         } catch (CWSException e) {
             // Any Warning or Error thrown by the CWS contain enough information
             // so it can be dealt with by the requesting System. Logging the
@@ -111,7 +111,7 @@ public class SystemBean implements System {
 
         try {
             final Servicable<ProcessMemberResponse, ProcessMemberRequest> service = new ProcessMemberService(settings, entityManager);
-            response = service.process(request);
+            response = service.perform(request);
         } catch (CWSException e) {
             // Any Warning or Error thrown by the CWS contain enough information
             // so it can be dealt with by the requesting System. Logging the
@@ -134,7 +134,7 @@ public class SystemBean implements System {
 
         try {
             final Servicable<FetchCircleResponse, FetchCircleRequest> service = new FetchCirclesService(settings, entityManager);
-            response = service.process(request);
+            response = service.perform(request);
         } catch (CWSException e) {
             // Any Warning or Error thrown by the CWS contain enough information
             // so it can be dealt with by the requesting System. Logging the
@@ -157,7 +157,7 @@ public class SystemBean implements System {
 
         try {
             final Servicable<ProcessCircleResponse, ProcessCircleRequest> service = new ProcessCircleService(settings, entityManager);
-            response = service.process(request);
+            response = service.perform(request);
         } catch (CWSException e) {
             // Any Warning or Error thrown by the CWS contain enough information
             // so it can be dealt with by the requesting System. Logging the

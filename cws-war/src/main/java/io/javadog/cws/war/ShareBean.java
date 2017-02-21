@@ -52,7 +52,7 @@ public final class ShareBean implements Share {
 
         try {
             final Servicable<ProcessFolderResponse, ProcessFolderRequest> service = new ProcessFolderService(settings, entityManager);
-            response = service.process(request);
+            response = service.perform(request);
         } catch (CWSException e) {
             // Any Warning or Error thrown by the CWS contain enough information
             // so it can be dealt with by the requesting System. Logging the
@@ -75,7 +75,7 @@ public final class ShareBean implements Share {
 
         try {
             final Servicable<FetchFolderResponse, FetchFolderRequest> service = new FetchFolderService(settings, entityManager);
-            response = service.process(request);
+            response = service.perform(request);
         } catch (CWSException e) {
             // Any Warning or Error thrown by the CWS contain enough information
             // so it can be dealt with by the requesting System. Logging the
@@ -98,7 +98,7 @@ public final class ShareBean implements Share {
 
         try {
             final Servicable<ProcessObjectTypeResponse, ProcessObjectTypeRequest> service = new ProcessObjectTypeService(settings, entityManager);
-            response = service.process(request);
+            response = service.perform(request);
         } catch (CWSException e) {
             // Any Warning or Error thrown by the CWS contain enough information
             // so it can be dealt with by the requesting System. Logging the
@@ -121,7 +121,7 @@ public final class ShareBean implements Share {
 
         try {
             final Servicable<FetchObjectTypeResponse, FetchObjectTypeRequest> service = new FetchObjectTypeService(settings, entityManager);
-            response = service.process(request);
+            response = service.perform(request);
         } catch (CWSException e) {
             // Any Warning or Error thrown by the CWS contain enough information
             // so it can be dealt with by the requesting System. Logging the
@@ -144,7 +144,7 @@ public final class ShareBean implements Share {
 
         try {
             final Servicable<ProcessObjectResponse, ProcessObjectRequest> service = new ProcessObjectService(settings, entityManager);
-            response = service.process(request);
+            response = service.perform(request);
         } catch (CWSException e) {
             // Any Warning or Error thrown by the CWS contain enough information
             // so it can be dealt with by the requesting System. Logging the
@@ -167,7 +167,7 @@ public final class ShareBean implements Share {
 
         try {
             final Servicable<FetchObjectResponse, FetchObjectRequest> service = new FetchObjectService(settings, entityManager);
-            response = service.process(request);
+            response = service.perform(request);
         } catch (CWSException e) {
             // Any Warning or Error thrown by the CWS contain enough information
             // so it can be dealt with by the requesting System. Logging the

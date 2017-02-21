@@ -24,7 +24,7 @@ public final class ProcessFolderService extends Servicable<ProcessFolderResponse
      * {@inheritDoc}
      */
     @Override
-    public ProcessFolderResponse process(final ProcessFolderRequest request) {
+    public ProcessFolderResponse perform(final ProcessFolderRequest request) {
         verifyRequest(request, Permission.PROCESS_FOLDER);
 
         throw new CWSException(Constants.NOTIMPLEMENTED_ERROR, "Not Yet Implemented.");

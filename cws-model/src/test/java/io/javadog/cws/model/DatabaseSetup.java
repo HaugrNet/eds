@@ -74,13 +74,6 @@ public class DatabaseSetup {
         return entity;
     }
 
-    protected CircleEntity createCircle(final String name) {
-        final CircleEntity entity = prepareCircle(name);
-        persist(entity);
-
-        return entity;
-    }
-
     protected void addKeyAndTrusteesToCircle(final CircleEntity circle, final MemberEntity... accounts) {
         if (accounts != null) {
             final SecretKey key = crypto.generateSymmetricKey();
@@ -107,6 +100,16 @@ public class DatabaseSetup {
     // =========================================================================
     // Helper Methods
     // =========================================================================
+
+    protected KeyEntity prepareKey() {
+        final KeyEntity entity = new KeyEntity();
+        entity.setAlgorithm(settings.getSymmetricAlgorithm());
+        entity.setCipherMode(settings.getSymmetricCipherMode());
+        entity.setPadding(settings.getSymmetricPadding());
+        entity.setStatus(Status.ACTIVE);
+
+        return persist(entity);
+    }
 
     protected MemberEntity prepareMember(final String credential, final String publicKey, final String privateKey) {
         final MemberEntity entity = new MemberEntity();

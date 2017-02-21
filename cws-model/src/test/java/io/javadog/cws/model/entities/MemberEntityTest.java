@@ -2,10 +2,9 @@ package io.javadog.cws.model.entities;
 
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.common.exceptions.ModelException;
-import io.javadog.cws.model.DatabaseSetup;
 import io.javadog.cws.model.CommonDao;
+import io.javadog.cws.model.DatabaseSetup;
 import io.javadog.cws.model.jpa.CommonJpaDao;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import javax.persistence.PersistenceException;
@@ -23,13 +22,12 @@ import static org.junit.Assert.assertThat;
  * @author Kim Jensen
  * @since  CWS 1.0
  */
-@Ignore
 public final class MemberEntityTest extends DatabaseSetup {
 
     @Test
     public void testEntity() {
         final String externalId = UUID.randomUUID().toString();
-        final String credential = Constants.ADMIN_ACCOUNT;
+        final String credential = "New Account Name";
         final String publicKey = UUID.randomUUID().toString();
         final String privateKey = UUID.randomUUID().toString();
         final Date modified = new Date();
@@ -38,6 +36,7 @@ public final class MemberEntityTest extends DatabaseSetup {
         final MemberEntity entity = new MemberEntity();
         entity.setExternalId(externalId);
         entity.setName(credential);
+        entity.setSalt(UUID.randomUUID().toString());
         entity.setPublicKey(publicKey);
         entity.setPrivateKey(privateKey);
         entity.setModified(modified);
@@ -68,7 +67,7 @@ public final class MemberEntityTest extends DatabaseSetup {
 
     @Test
     public void testUpdateEntity() {
-        final String credential = Constants.ADMIN_ACCOUNT;
+        final String credential = "Updateable Account";
         final String publicKey = UUID.randomUUID().toString();
         final String privateKey = UUID.randomUUID().toString();
         final MemberEntity entity = prepareMember(credential, publicKey, privateKey);
@@ -81,7 +80,7 @@ public final class MemberEntityTest extends DatabaseSetup {
 
     @Test
     public void testAddContent() {
-        final String credential = Constants.ADMIN_ACCOUNT;
+        final String credential = "Account Name";
         final String publicKey = UUID.randomUUID().toString();
         final String privateKey = UUID.randomUUID().toString();
         final MemberEntity entity = prepareMember(credential, publicKey, privateKey);
@@ -94,16 +93,17 @@ public final class MemberEntityTest extends DatabaseSetup {
         entityManager.flush();
         entityManager.clear();
 
-        final Query query = entityManager.createQuery("select m from MemberEntity m");
+        final Query query = entityManager.createQuery("select m from MemberEntity m order by id desc");
         final List<MemberEntity> list = query.getResultList();
-        // Now, a couple of checks. First, that we have 1 and only 1 record
-        assertThat(list.size(), is(1));
+        // Now, a couple of checks. First, that we have 2 records, the default
+        // Administration Account and the newly created Account
+        assertThat(list.size(), is(2));
 
         final MemberEntity found = list.get(0);
         // Next, check that the newly found entity is not the same Object as the
         // first, this is done via the Reference Pointers, since an
         // Objects.equals() will yield the same result
-        assertThat(entity.toString(), is(not(found.toString())));
+        assertThat(entity.hashCode(), is(not(found.hashCode())));
         // Now, we'll ensure that it is the same Entity by comparing the Id's
         assertThat(entity.getId(), is(found.getId()));
     }
@@ -111,7 +111,7 @@ public final class MemberEntityTest extends DatabaseSetup {
     @Test(expected = ModelException.class)
     public void testDaoFindMemberByName() {
         final CommonDao dao = new CommonJpaDao(entityManager);
-        dao.findMemberByNameCredential(Constants.ADMIN_ACCOUNT);
+        dao.findMemberByNameCredential("A not existing Account");
     }
 
     @Test
@@ -119,6 +119,8 @@ public final class MemberEntityTest extends DatabaseSetup {
         final String jql = "select m from MemberEntity m";
         final Query query = entityManager.createQuery(jql);
         final List<MemberEntity> found = query.getResultList();
-        assertThat(found.isEmpty(), is(true));
+
+        assertThat(found.size(), is(1));
+        assertThat(found.get(0).getName(), is(Constants.ADMIN_ACCOUNT));
     }
 }

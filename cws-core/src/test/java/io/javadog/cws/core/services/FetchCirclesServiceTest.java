@@ -32,6 +32,39 @@ public final class FetchCirclesServiceTest extends DatabaseSetup {
         final FetchCircleResponse response = service.perform(request);
 
         assertThat(response, is(not(nullValue())));
+        assertThat(response.getReturnCode(), is(Constants.SUCCESS));
+        assertThat(response.getReturnMessage(), is("Ok"));
+        assertThat(response.getCircles().size(), is(2));
+        assertThat(response.getTrustees().size(), is(0));
+        assertThat(response.getCircles().get(0).getName(), is("circle1"));
+        assertThat(response.getCircles().get(1).getName(), is("circle2"));
+    }
+
+    @Test
+    public void testFetchAsMember() {
+        createTwoCircleWith5Members();
+        final Servicable<FetchCircleResponse, FetchCircleRequest> service = prepareService();
+
+        final FetchCircleRequest request = new FetchCircleRequest();
+        request.setAccount("member1");
+        request.setCredential("member1".toCharArray());
+        final FetchCircleResponse response = service.perform(request);
+
+        assertThat(response, is(not(nullValue())));
+        assertThat(response.getReturnCode(), is(Constants.SUCCESS));
+        assertThat(response.getReturnMessage(), is("Ok"));
+        assertThat(response.getCircles().size(), is(2));
+        assertThat(response.getTrustees().size(), is(0));
+        assertThat(response.getCircles().get(0).getName(), is("circle1"));
+        assertThat(response.getCircles().get(1).getName(), is("circle2"));
+
+        request.setCircleId(response.getCircles().get(0).getId());
+        final FetchCircleResponse response1 = service.perform(request);
+        assertThat(response1, is(not(nullValue())));
+        assertThat(response1.getReturnCode(), is(Constants.SUCCESS));
+        assertThat(response1.getReturnMessage(), is("Ok"));
+        assertThat(response1.getCircles().size(), is(1));
+        assertThat(response1.getTrustees().size(), is(4));
     }
 
     private Servicable<FetchCircleResponse, FetchCircleRequest> prepareService() {
@@ -48,8 +81,8 @@ public final class FetchCirclesServiceTest extends DatabaseSetup {
         final MemberEntity member4 = createMember("member4");
         final MemberEntity member5 = createMember("member5");
 
-        final CircleEntity circle1 = createCircle("circle1");
-        final CircleEntity circle2 = createCircle("circle2");
+        final CircleEntity circle1 = prepareCircle("circle1");
+        final CircleEntity circle2 = prepareCircle("circle2");
 
         addKeyAndTrusteesToCircle(circle1, member1, member2, member3, member4);
         addKeyAndTrusteesToCircle(circle2, member3, member4, member5);

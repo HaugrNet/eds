@@ -14,6 +14,8 @@ import java.security.KeyPair;
 import java.util.UUID;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.junit.Assert.assertThat;
 
@@ -172,13 +174,8 @@ public final class CryptoTest {
         final String garbage = "INVALID_ENCODING";
         settings.set(Settings.CWS_CHARSET, garbage);
 
-        // Final part of the test, set the Charset to an invalid entry, this
-        // should result in an Exception, with the following details.
-        thrown.expect(CWSException.class);
-        thrown.expectMessage("UnsupportedEncodingException: " + garbage);
-        thrown.expect(hasProperty("returnCode"));
-        thrown.expect(hasProperty("returnCode", is(Constants.PROPERTY_ERROR)));
-
+        prepareCause(CWSException.class, Constants.PROPERTY_ERROR, "UnsupportedEncodingException: " + garbage);
+        assertThat(str, is(not(nullValue())));
         crypto.stringToBytes(str);
     }
 
@@ -190,13 +187,8 @@ public final class CryptoTest {
         final String garbage = "INVALID_ENCODING";
         settings.set(Settings.CWS_CHARSET, garbage);
 
-        // Final part of the test, set the Charset to an invalid entry, this
-        // should result in an Exception, with the following details.
-        thrown.expect(CWSException.class);
-        thrown.expectMessage("UnsupportedEncodingException: " + garbage);
-        thrown.expect(hasProperty("returnCode"));
-        thrown.expect(hasProperty("returnCode", is(Constants.PROPERTY_ERROR)));
-
+        prepareCause(CWSException.class, Constants.PROPERTY_ERROR, "UnsupportedEncodingException: " + garbage);
+        assertThat(bytes, is(not(nullValue())));
         crypto.bytesToString(bytes);
     }
 
@@ -254,5 +246,13 @@ public final class CryptoTest {
 
         settings.set(Settings.CWS_CHARSET, garbage);
         crypto.getCharSet();
+    }
+
+    private <E extends CWSException> void prepareCause(final Class<E> cause, final int returnCode, final String returnMessage) {
+        final String propertyName = "returnCode";
+        thrown.expect(cause);
+        thrown.expectMessage(returnMessage);
+        thrown.expect(hasProperty(propertyName));
+        thrown.expect(hasProperty(propertyName, is(returnCode)));
     }
 }

@@ -4,6 +4,7 @@ import io.javadog.cws.api.common.TrustLevel;
 import io.javadog.cws.common.Crypto;
 import io.javadog.cws.common.Settings;
 import io.javadog.cws.common.enums.Status;
+import io.javadog.cws.common.exceptions.CWSException;
 import io.javadog.cws.model.entities.CWSEntity;
 import io.javadog.cws.model.entities.CircleEntity;
 import io.javadog.cws.model.entities.Externable;
@@ -12,6 +13,8 @@ import io.javadog.cws.model.entities.MemberEntity;
 import io.javadog.cws.model.entities.TrusteeEntity;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
+import org.junit.rules.ExpectedException;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
@@ -24,6 +27,9 @@ import java.util.Base64;
 import java.util.Date;
 import java.util.UUID;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.hasProperty;
+
 /**
  * @author Kim Jensen
  * @since  CWS 1.0
@@ -35,6 +41,13 @@ public class DatabaseSetup {
     protected EntityManager entityManager = FACTORY.createEntityManager();
     private final Settings settings = new Settings();
     private final Crypto crypto = new Crypto(settings);
+
+    /**
+     * If the test is expecting an Exception, then we'll use this as the rule.
+     * The method {@link #prepareCause(Class, int, String)} will provide the
+     * simplest way to setup the cause to be expected.
+     */
+    @Rule public ExpectedException thrown = ExpectedException.none();
 
     @Before
     public void setup() {
@@ -95,6 +108,23 @@ public class DatabaseSetup {
                 persist(entity);
             }
         }
+    }
+
+    /**
+     * Setting the cause of an error to expect. This consists of the CWS
+     * Exception, Return Code &amp; Message.
+     *
+     * @param cause         CWS Exception to except
+     * @param returnCode    The Return Code
+     * @param returnMessage The Return Message
+     * @param <E>           The Exception, must extend a CWS Exception
+     */
+    protected <E extends CWSException> void prepareCause(final Class<E> cause, final int returnCode, final String returnMessage) {
+        final String propertyName = "returnCode";
+        thrown.expect(cause);
+        thrown.expectMessage(returnMessage);
+        thrown.expect(hasProperty(propertyName));
+        thrown.expect(hasProperty(propertyName, is(returnCode)));
     }
 
     // =========================================================================

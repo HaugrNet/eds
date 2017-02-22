@@ -53,7 +53,7 @@ public final class FetchCirclesService extends Servicable<FetchCircleResponse, F
             }
             response.setTrustees(convertTrustees(members));
             final List<Circle> circles = new ArrayList<>(1);
-            circles.add(convert(trustees.get(0).getCircle()));
+            circles.add(convert(members.get(0).getCircle()));
             response.setCircles(circles);
         } else {
             final List<CircleEntity> circles = dao.findAllCircles();

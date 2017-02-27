@@ -134,8 +134,8 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <!-- Parallel supports 'classes', 'methods' or 'both' -->
-                    <parallel>classes</parallel>
-                    <threadCount>5</threadCount>
+                    <parallel>both</parallel>
+                    <threadCount>10</threadCount>
                 </configuration>
                 <goals>
                     <goal>test</goal>

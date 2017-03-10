@@ -67,6 +67,15 @@ public abstract class Verifiable implements Serializable {
         }
     }
 
+    protected static void ensureValidId(final String field, final String value) {
+        if (value != null) {
+            final Pattern pattern = Pattern.compile(Constants.ID_PATTERN_REGEX);
+            if (!pattern.matcher(value).matches()) {
+                throw new IllegalArgumentException(PRE_VALUE + field + "' is not matching the required pattern '" + Constants.ID_PATTERN_REGEX + "'.");
+            }
+        }
+    }
+
     protected static void ensureVerifiable(final String field, final Verifiable value) {
         if (value != null) {
             final Map<String, String> errors = value.validate();

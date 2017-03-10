@@ -1,6 +1,7 @@
 package io.javadog.cws.core.services;
 
 import io.javadog.cws.api.common.Constants;
+import io.javadog.cws.api.common.CredentialType;
 import io.javadog.cws.api.requests.FetchCircleRequest;
 import io.javadog.cws.api.responses.FetchCircleResponse;
 import io.javadog.cws.common.Settings;
@@ -29,6 +30,7 @@ public final class FetchCirclesServiceTest extends DatabaseSetup {
 
         final FetchCircleRequest request = new FetchCircleRequest();
         request.setAccount(Constants.ADMIN_ACCOUNT);
+        request.setCredentialType(CredentialType.PASSPHRASE);
         request.setCredential(Constants.ADMIN_ACCOUNT.toCharArray());
         final FetchCircleResponse response = service.perform(request);
 
@@ -48,6 +50,7 @@ public final class FetchCirclesServiceTest extends DatabaseSetup {
 
         final FetchCircleRequest request = new FetchCircleRequest();
         request.setAccount(Constants.ADMIN_ACCOUNT);
+        request.setCredentialType(CredentialType.PASSPHRASE);
         request.setCredential(Constants.ADMIN_ACCOUNT.toCharArray());
         final FetchCircleResponse response = service.perform(request);
 
@@ -75,6 +78,7 @@ public final class FetchCirclesServiceTest extends DatabaseSetup {
 
         final FetchCircleRequest request = new FetchCircleRequest();
         request.setAccount("member1");
+        request.setCredentialType(CredentialType.PASSPHRASE);
         request.setCredential("member1".toCharArray());
         final FetchCircleResponse response = service.perform(request);
 
@@ -103,6 +107,7 @@ public final class FetchCirclesServiceTest extends DatabaseSetup {
 
         final FetchCircleRequest request = new FetchCircleRequest();
         request.setAccount("member1");
+        request.setCredentialType(CredentialType.PASSPHRASE);
         request.setCredential("member1".toCharArray());
         final FetchCircleResponse response = service.perform(request);
 

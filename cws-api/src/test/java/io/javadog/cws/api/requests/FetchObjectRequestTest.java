@@ -11,68 +11,68 @@ import java.util.UUID;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.*;
 
 /**
  * @author Kim Jensen
  * @since  CWS 1.0
  */
-public class FetchCircleRequestTest {
+public class FetchObjectRequestTest {
 
     @Test
     public void testClass() {
-        final String circleId = UUID.randomUUID().toString();
+        final String objectId = UUID.randomUUID().toString();
 
-        final FetchCircleRequest request = new FetchCircleRequest();
+        final FetchObjectRequest request = new FetchObjectRequest();
         request.setAccount(Constants.ADMIN_ACCOUNT);
         request.setCredentialType(CredentialType.PASSPHRASE);
         request.setCredential(Constants.ADMIN_ACCOUNT.toCharArray());
-        request.setCircleId(circleId);
+        request.setObjectId(objectId);
 
-        assertThat(request.getCircleId(), is(circleId));
+        assertThat(request.getObjectId(), is(objectId));
         assertThat(request.validate(), is(not(nullValue())));
         assertThat(request.validate().size(), is(0));
     }
 
     @Test
-    public void testClassWithoutCircleId() {
-        final FetchCircleRequest request = new FetchCircleRequest();
+    public void testClassWithoutObjectId() {
+        final FetchObjectRequest request = new FetchObjectRequest();
         request.setAccount(Constants.ADMIN_ACCOUNT);
         request.setCredentialType(CredentialType.PASSPHRASE);
         request.setCredential(Constants.ADMIN_ACCOUNT.toCharArray());
 
-        assertThat(request.getCircleId(), is(nullValue()));
+        assertThat(request.getObjectId(), is(nullValue()));
         assertThat(request.validate(), is(not(nullValue())));
         assertThat(request.validate().size(), is(0));
     }
 
     @Test
-    public void testClassWithForcedCircleId() throws NoSuchFieldException, IllegalAccessException {
-        final String circleId = Constants.ADMIN_ACCOUNT;
+    public void testClassWithForcedObjectId() throws NoSuchFieldException, IllegalAccessException {
+        final String objectId = Constants.ADMIN_ACCOUNT;
 
-        final FetchCircleRequest request = new FetchCircleRequest();
+        final FetchObjectRequest request = new FetchObjectRequest();
         request.setAccount(Constants.ADMIN_ACCOUNT);
         request.setCredentialType(CredentialType.PASSPHRASE);
         request.setCredential(Constants.ADMIN_ACCOUNT.toCharArray());
 
-        final Field field = request.getClass().getDeclaredField("circleId");
+        final Field field = request.getClass().getDeclaredField("objectId");
         field.setAccessible(true);
-        field.set(request, circleId);
+        field.set(request, objectId);
 
         final Map<String, String> errors = request.validate();
 
-        assertThat(request.getCircleId(), is(circleId));
+        assertThat(request.getObjectId(), is(objectId));
         assertThat(errors, is(not(nullValue())));
         assertThat(errors.size(), is(1));
-        assertThat(errors.get("circleId"), is("The Circle Id is invalid."));
+        assertThat(errors.get("objectId"), is("The Object Id is invalid."));
     }
 
     @Test
     public void testEmptyClass() {
-        final FetchCircleRequest request = new FetchCircleRequest();
+        final FetchObjectRequest request = new FetchObjectRequest();
         final Map<String, String> errors = request.validate();
 
-        assertThat(request.getCircleId(), is(nullValue()));
+        assertThat(request.getObjectId(), is(nullValue()));
         assertThat(errors, is(not(nullValue())));
         assertThat(errors.size(), is(3));
         assertThat(errors.get("credentialType"), is("CredentialType is missing, null or invalid."));

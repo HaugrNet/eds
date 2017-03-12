@@ -31,7 +31,7 @@ public final class FetchMemberResponseTest {
     }
 
     @Test
-    public void testFetchingSpecificCircle() {
+    public void testFetchingSpecificMember() {
         final FetchMemberResponse response = new FetchMemberResponse();
         response.setMembers(prepareMembers(1));
         response.setCircles(prepareCircles());

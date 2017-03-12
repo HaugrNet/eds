@@ -1,12 +1,12 @@
 package io.javadog.cws.common;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+
 import io.javadog.cws.common.exceptions.SettingException;
 import org.junit.Test;
 
 import java.util.Map;
-
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
 
 /**
  * @author Kim Jensen

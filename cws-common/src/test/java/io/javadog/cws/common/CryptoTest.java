@@ -1,5 +1,11 @@
 package io.javadog.cws.common;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.Matchers.hasProperty;
+import static org.junit.Assert.assertThat;
+
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.common.exceptions.CWSException;
 import org.junit.Rule;
@@ -12,12 +18,6 @@ import java.nio.charset.Charset;
 import java.security.Key;
 import java.security.KeyPair;
 import java.util.UUID;
-
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.hamcrest.Matchers.hasProperty;
-import static org.junit.Assert.assertThat;
 
 /**
  * Proof Of Concept, showing that the simple Cryptographic Operations will work,

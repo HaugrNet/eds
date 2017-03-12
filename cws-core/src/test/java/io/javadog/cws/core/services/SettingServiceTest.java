@@ -1,5 +1,8 @@
 package io.javadog.cws.core.services;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.CredentialType;
 import io.javadog.cws.api.requests.SettingRequest;
@@ -12,9 +15,6 @@ import org.junit.Test;
 import javax.persistence.Query;
 import java.util.HashMap;
 import java.util.Map;
-
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
 
 /**
  * @author Kim Jensen

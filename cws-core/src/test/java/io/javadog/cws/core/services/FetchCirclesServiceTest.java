@@ -35,6 +35,7 @@ public final class FetchCirclesServiceTest extends DatabaseSetup {
         final FetchCircleResponse response = service.perform(request);
 
         assertThat(response, is(not(nullValue())));
+        assertThat(response.isOk(), is(true));
         assertThat(response.getReturnCode(), is(Constants.SUCCESS));
         assertThat(response.getReturnMessage(), is("Ok"));
         assertThat(response.getCircles().size(), is(2));
@@ -65,6 +66,7 @@ public final class FetchCirclesServiceTest extends DatabaseSetup {
         request.setCircleId(response.getCircles().get(0).getId());
         final FetchCircleResponse response1 = service.perform(request);
         assertThat(response1, is(not(nullValue())));
+        assertThat(response.isOk(), is(true));
         assertThat(response1.getReturnCode(), is(Constants.SUCCESS));
         assertThat(response1.getReturnMessage(), is("Ok"));
         assertThat(response1.getCircles().size(), is(1));
@@ -83,6 +85,7 @@ public final class FetchCirclesServiceTest extends DatabaseSetup {
         final FetchCircleResponse response = service.perform(request);
 
         assertThat(response, is(not(nullValue())));
+        assertThat(response.isOk(), is(true));
         assertThat(response.getReturnCode(), is(Constants.SUCCESS));
         assertThat(response.getReturnMessage(), is("Ok"));
         assertThat(response.getCircles().size(), is(2));
@@ -112,6 +115,7 @@ public final class FetchCirclesServiceTest extends DatabaseSetup {
         final FetchCircleResponse response = service.perform(request);
 
         assertThat(response, is(not(nullValue())));
+        assertThat(response.isOk(), is(true));
         assertThat(response.getReturnCode(), is(Constants.SUCCESS));
         assertThat(response.getReturnMessage(), is("Ok"));
         assertThat(response.getCircles().size(), is(2));
@@ -126,9 +130,7 @@ public final class FetchCirclesServiceTest extends DatabaseSetup {
 
     private Servicable<FetchCircleResponse, FetchCircleRequest> prepareService() {
         final Settings settings = new Settings();
-        final Servicable<FetchCircleResponse, FetchCircleRequest> service = new FetchCirclesService(settings, entityManager);
-
-        return service;
+        return new FetchCirclesService(settings, entityManager);
     }
 
     private void createTwoCircleWith5Members() {

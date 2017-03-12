@@ -1,5 +1,10 @@
 package io.javadog.cws.api.requests;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.junit.Assert.assertThat;
+
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.CredentialType;
 import org.junit.Test;
@@ -8,16 +13,11 @@ import java.lang.reflect.Field;
 import java.util.Map;
 import java.util.UUID;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.junit.Assert.assertThat;
-
 /**
  * @author Kim Jensen
  * @since  CWS 1.0
  */
-public class FetchCircleRequestTest {
+public final class FetchCircleRequestTest {
 
     @Test
     public void testClass() {

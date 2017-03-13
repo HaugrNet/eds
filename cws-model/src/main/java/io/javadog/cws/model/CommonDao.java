@@ -29,4 +29,10 @@ public interface CommonDao {
     List<TrusteeEntity> findTrusteesByCircle(Long circleId);
 
     List<CircleEntity> findAllCircles();
+
+    List<MemberEntity> findAllMembers();
+
+    MemberEntity findMemberByExternalId(String externalId);
+
+    List<CircleEntity> findCirclesForMember(MemberEntity member);
 }

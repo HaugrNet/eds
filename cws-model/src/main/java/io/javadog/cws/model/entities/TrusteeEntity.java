@@ -27,6 +27,11 @@ import javax.persistence.Table;
                 query = "select t " +
                         "from TrusteeEntity t " +
                         "where t.circle.externalId = :externalCircleId"),
+        @NamedQuery(name = "trustee.findCirclesByMember",
+                query = "select t.circle " +
+                        "from TrusteeEntity t " +
+                        "where t.member.id = :memberId " +
+                        "order by t.circle.name asc"),
         @NamedQuery(name = "trustee.findByCircleId",
                 query = "select t " +
                         "from TrusteeEntity t " +

@@ -12,12 +12,11 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "circles")
-@NamedQueries({
+@NamedQueries(
         @NamedQuery(name = "circle.findAll",
                 query = "select c " +
                         "from CircleEntity c " +
-                        "order by name asc")
-})
+                        "order by name asc"))
 public class CircleEntity extends Externable {
 
     @Column(name = "name", nullable = false, unique = true)

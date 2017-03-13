@@ -13,12 +13,21 @@ import java.security.KeyPair;
  * @since  CWS 1.0
  */
 @Entity
-@NamedQueries(
+@NamedQueries({
+        @NamedQuery(name = "member.findAll",
+                query = "select m " +
+                        "from MemberEntity m " +
+                        "order by name asc"),
+        @NamedQuery(name = "member.findByExternalId",
+                query = "select m " +
+                        "from MemberEntity m " +
+                        "where m.externalId = :externalId " +
+                        "order by name asc"),
         @NamedQuery(name = "member.findByCredential",
-        query = "select m " +
-                "from MemberEntity m" +
-                " where name = :credential"
-))
+                query = "select m " +
+                        "from MemberEntity m" +
+                        " where name = :credential")
+})
 @Table(name = "members")
 public class MemberEntity extends Externable {
 

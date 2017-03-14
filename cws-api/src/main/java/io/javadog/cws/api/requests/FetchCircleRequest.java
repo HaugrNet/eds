@@ -3,6 +3,7 @@ package io.javadog.cws.api.requests;
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.dtos.Authentication;
 
+import javax.validation.constraints.Pattern;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -29,7 +30,9 @@ public final class FetchCircleRequest extends Authentication {
     // Setters & Getters
     // =========================================================================
 
+    @Pattern(regexp = Constants.ID_PATTERN_REGEX)
     public void setCircleId(final String circleId) {
+        ensureValidId(FIELD_CIRCLE_ID, circleId);
         this.circleId = circleId;
     }
 

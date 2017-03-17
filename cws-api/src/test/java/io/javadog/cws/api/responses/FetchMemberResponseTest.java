@@ -1,3 +1,10 @@
+/*
+ * =============================================================================
+ * Copyright (c) 2010-2017, JavaDog.IO
+ * -----------------------------------------------------------------------------
+ * Project: ZObEL (cws-api)
+ * =============================================================================
+ */
 package io.javadog.cws.api.responses;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -6,7 +13,6 @@ import static org.junit.Assert.assertThat;
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.dtos.Circle;
 import io.javadog.cws.api.dtos.Member;
-import io.javadog.cws.api.dtos.Trustee;
 import org.junit.Test;
 
 import java.util.ArrayList;

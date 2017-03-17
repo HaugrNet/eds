@@ -1,14 +1,21 @@
+/*
+ * =============================================================================
+ * Copyright (c) 2010-2017, JavaDog.IO
+ * -----------------------------------------------------------------------------
+ * Project: ZObEL (cws-model)
+ * =============================================================================
+ */
 package io.javadog.cws.model.entities;
-
-import io.javadog.cws.model.DatabaseSetup;
-import org.junit.Test;
-
-import java.util.Date;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
+
+import io.javadog.cws.model.DatabaseSetup;
+import org.junit.Test;
+
+import java.util.Date;
 
 /**
  * @author Kim Jensen

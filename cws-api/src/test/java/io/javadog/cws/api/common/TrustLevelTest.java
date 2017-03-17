@@ -1,6 +1,11 @@
+/*
+ * =============================================================================
+ * Copyright (c) 2010-2017, JavaDog.IO
+ * -----------------------------------------------------------------------------
+ * Project: ZObEL (cws-api)
+ * =============================================================================
+ */
 package io.javadog.cws.api.common;
-
-import org.junit.Test;
 
 import static io.javadog.cws.api.common.TrustLevel.ADMIN;
 import static io.javadog.cws.api.common.TrustLevel.GUEST;
@@ -9,6 +14,8 @@ import static io.javadog.cws.api.common.TrustLevel.WRITE;
 import static io.javadog.cws.api.common.TrustLevel.isAllowed;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+
+import org.junit.Test;
 
 /**
  * @author Kim Jensen

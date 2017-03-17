@@ -1,4 +1,14 @@
+/*
+ * =============================================================================
+ * Copyright (c) 2010-2017, JavaDog.IO
+ * -----------------------------------------------------------------------------
+ * Project: ZObEL (cws-model)
+ * =============================================================================
+ */
 package io.javadog.cws.model;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.hasProperty;
 
 import io.javadog.cws.api.common.TrustLevel;
 import io.javadog.cws.common.Crypto;
@@ -26,9 +36,6 @@ import java.security.KeyPair;
 import java.util.Base64;
 import java.util.Date;
 import java.util.UUID;
-
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.Matchers.hasProperty;
 
 /**
  * @author Kim Jensen

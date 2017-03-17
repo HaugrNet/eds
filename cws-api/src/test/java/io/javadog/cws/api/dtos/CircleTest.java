@@ -1,14 +1,21 @@
+/*
+ * =============================================================================
+ * Copyright (c) 2010-2017, JavaDog.IO
+ * -----------------------------------------------------------------------------
+ * Project: ZObEL (cws-api)
+ * =============================================================================
+ */
 package io.javadog.cws.api.dtos;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
 
 import java.lang.reflect.Field;
 import java.util.Map;
 import java.util.UUID;
-
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.junit.Assert.assertThat;
 
 /**
  * @author Kim Jensen

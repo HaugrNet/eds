@@ -1,4 +1,16 @@
+/*
+ * =============================================================================
+ * Copyright (c) 2010-2017, JavaDog.IO
+ * -----------------------------------------------------------------------------
+ * Project: ZObEL (cws-core)
+ * =============================================================================
+ */
 package io.javadog.cws.core.services;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.junit.Assert.assertThat;
 
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.CredentialType;
@@ -11,11 +23,6 @@ import io.javadog.cws.model.DatabaseSetup;
 import io.javadog.cws.model.entities.CircleEntity;
 import io.javadog.cws.model.entities.MemberEntity;
 import org.junit.Test;
-
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.junit.Assert.assertThat;
 
 /**
  * @author Kim Jensen

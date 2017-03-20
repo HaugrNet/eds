@@ -7,7 +7,6 @@
  */
 package io.javadog.cws.core.services;
 
-import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -15,9 +14,7 @@ import static org.junit.Assert.assertThat;
 
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.CredentialType;
-import io.javadog.cws.api.requests.FetchCircleRequest;
 import io.javadog.cws.api.requests.FetchMemberRequest;
-import io.javadog.cws.api.responses.FetchCircleResponse;
 import io.javadog.cws.api.responses.FetchMemberResponse;
 import io.javadog.cws.common.Settings;
 import io.javadog.cws.common.exceptions.VerificationException;

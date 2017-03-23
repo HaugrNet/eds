@@ -46,7 +46,7 @@ public final class SettingServiceTest extends DatabaseSetup {
         final SettingResponse response = service.perform(request);
         assertThat(response.getReturnCode(), is(0));
         assertThat(response.getReturnMessage(), is("Ok"));
-        assertThat(response.getSettings().size(), is(9));
+        assertThat(response.getSettings().size(), is(11));
     }
 
     @Test(expected = CWSException.class)
@@ -66,7 +66,7 @@ public final class SettingServiceTest extends DatabaseSetup {
         final SettingResponse response = service.perform(request);
         assertThat(response.getReturnCode(), is(0));
         assertThat(response.getReturnMessage(), is("Ok"));
-        assertThat(response.getSettings().size(), is(9));
+        assertThat(response.getSettings().size(), is(11));
     }
 
     @Test
@@ -79,7 +79,7 @@ public final class SettingServiceTest extends DatabaseSetup {
         final SettingResponse response = service.perform(request);
         assertThat(response.getReturnCode(), is(0));
         assertThat(response.getReturnMessage(), is("Ok"));
-        assertThat(response.getSettings().size(), is(9));
+        assertThat(response.getSettings().size(), is(11));
     }
 
     @Test
@@ -92,7 +92,7 @@ public final class SettingServiceTest extends DatabaseSetup {
         final SettingResponse response = service.perform(request);
         assertThat(response.getReturnCode(), is(0));
         assertThat(response.getReturnMessage(), is("Ok"));
-        assertThat(response.getSettings().size(), is(9));
+        assertThat(response.getSettings().size(), is(11));
         assertThat(response.getSettings().get("cws.crypto.symmetric.keylength"), is("128"));
 
         // The internal collection used is unmodifiable. So we simply copy the
@@ -104,16 +104,18 @@ public final class SettingServiceTest extends DatabaseSetup {
         final SettingResponse update = service.perform(request);
         assertThat(update.getReturnCode(), is(0));
         assertThat(update.getReturnMessage(), is("Ok"));
-        assertThat(update.getSettings().size(), is(9));
+        assertThat(update.getSettings().size(), is(11));
         assertThat(update.getSettings().get("cws.crypto.symmetric.keylength"), is("256"));
     }
 
-    @Test(expected = CWSException.class)
+    @Test
     public void testInvokingRequestUpdateNotAllowedExistingSetting() {
+        prepareCause(CWSException.class, Constants.PROPERTY_ERROR, "The setting cws.crypto.symmetric.algorithm may not be overwritten.");
         final SettingService service = new SettingService(new Settings(), entityManager);
         final SettingRequest request = prepareRequest();
         final Map<String, String> settings = new HashMap<>();
         settings.put("cws.crypto.symmetric.algorithm", "DES");
+        assertThat(settings.get("cws.crypto.symmetric.algorithm"), is("DES"));
         request.setSettings(settings);
 
         service.perform(request);
@@ -130,7 +132,7 @@ public final class SettingServiceTest extends DatabaseSetup {
         final SettingResponse response = service.perform(request);
         assertThat(response.getReturnCode(), is(0));
         assertThat(response.getReturnMessage(), is("Ok"));
-        assertThat(response.getSettings().size(), is(10));
+        assertThat(response.getSettings().size(), is(12));
         assertThat(response.getSettings().get("cws.test.setting"), is("Setting Value"));
     }
 

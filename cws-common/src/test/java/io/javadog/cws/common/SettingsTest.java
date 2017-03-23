@@ -26,7 +26,7 @@ public final class SettingsTest {
         final Settings settings = new Settings();
 
         final Map<String, String> existing = settings.get();
-        assertThat(existing.size(), is(9));
+        assertThat(existing.size(), is(11));
         settings.set("my.new.key", "the awesome value");
 
         final Map<String, String> updated = settings.get();
@@ -81,5 +81,37 @@ public final class SettingsTest {
         final Settings settings = new Settings();
         settings.set(Settings.ASYMMETRIC_ALGORITHM_KEYLENGTH, "Long");
         settings.getAsymmetricKeylength();
+    }
+
+    @Test
+    public void testExposeAdmin() {
+        final Settings settings = new Settings();
+        assertThat(settings.getExposeAdmin(), is(false));
+        settings.set(Settings.EXPOSE_ADMIN, "true");
+        assertThat(settings.getExposeAdmin(), is(true));
+        settings.set(Settings.EXPOSE_ADMIN, "false");
+        assertThat(settings.getExposeAdmin(), is(false));
+        settings.set(Settings.EXPOSE_ADMIN, " true ");
+        assertThat(settings.getExposeAdmin(), is(true));
+        settings.set(Settings.EXPOSE_ADMIN, "");
+        assertThat(settings.getExposeAdmin(), is(false));
+        settings.set(Settings.EXPOSE_ADMIN, " what ");
+        assertThat(settings.getExposeAdmin(), is(false));
+    }
+
+    @Test
+    public void testShowOtherMemberInformation() {
+        final Settings settings = new Settings();
+        assertThat(settings.getShowOtherMemberInformation(), is(true));
+        settings.set(Settings.SHOW_OTHER_MEMBER_INFORMATION, "false");
+        assertThat(settings.getShowOtherMemberInformation(), is(false));
+        settings.set(Settings.SHOW_OTHER_MEMBER_INFORMATION, "true");
+        assertThat(settings.getShowOtherMemberInformation(), is(true));
+        settings.set(Settings.SHOW_OTHER_MEMBER_INFORMATION, " true ");
+        assertThat(settings.getShowOtherMemberInformation(), is(true));
+        settings.set(Settings.SHOW_OTHER_MEMBER_INFORMATION, "");
+        assertThat(settings.getShowOtherMemberInformation(), is(false));
+        settings.set(Settings.SHOW_OTHER_MEMBER_INFORMATION, " what ");
+        assertThat(settings.getShowOtherMemberInformation(), is(false));
     }
 }

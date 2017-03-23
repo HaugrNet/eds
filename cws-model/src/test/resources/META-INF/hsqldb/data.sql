@@ -79,6 +79,24 @@ INSERT INTO settings (name, setting, modifiable) VALUES ('cws.system.salt', 'Sys
 -- change this if you are really sure.
 INSERT INTO settings (name, setting, modifiable) VALUES ('cws.system.charset', 'UTF-8', true);
 
+-- The Administrator Account is a special Account in the CWS, it is not
+-- permitted to be a member of any Circles, nor can it be used for anything else
+-- than some system administrative tasks. Which is also why it should not appear
+-- in the list of Members to be fetched or assigned to Circles. However, rather
+-- than completely opting out on this, it may be a good idea to expose it. Hence
+-- this new setting value. Default false, meaning that the Administrator Account
+-- is not visible unless explicitly changed to true.
+INSERT INTO settings (name, setting, modifiable) VALUES ('cws.expose.admin', 'false', true);
+
+-- Privacy is important, however - there may be reasons to reduce the privacy
+-- level, and allow that a Member can view information about other Members even
+-- if there is no direct relation between the two. If two members share a
+-- Circle, then they will automatically be able to view the other settings, but
+-- if not, then this setting apply. By default, it is set to True - as CWS
+-- should be used by organizations or companies where all members already share
+-- information.
+INSERT INTO settings (name, setting, modifiable) VALUES ('cws.show.other.member.information', 'true', true);
+
 
 -- =============================================================================
 --  Following is TEST data, and should not be added in a PRODUCTION environment

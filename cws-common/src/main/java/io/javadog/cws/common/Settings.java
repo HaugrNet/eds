@@ -10,7 +10,6 @@ package io.javadog.cws.common;
 import io.javadog.cws.common.exceptions.SettingException;
 
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 
@@ -150,15 +149,6 @@ public final class Settings {
     }
 
     private static boolean toBoolean(final String value, final String defaultValue) {
-        final Boolean result;
-
-        if (value != null) {
-            final String str = value.trim().toLowerCase(Locale.ENGLISH);
-            result = Boolean.valueOf(str);
-        } else {
-            result = Boolean.valueOf(defaultValue);
-        }
-
-        return result;
+        return Boolean.valueOf((value != null) ? value.trim() : defaultValue);
     }
 }

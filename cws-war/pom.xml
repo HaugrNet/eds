@@ -16,6 +16,15 @@
         binding logic as well as creating the REST / SOAP based API's.
     </description>
 
+    <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+    </build>
+
     <dependencies>
         <dependency>
             <groupId>javadog.io</groupId>

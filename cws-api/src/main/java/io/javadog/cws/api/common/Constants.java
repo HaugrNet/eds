@@ -14,11 +14,6 @@ package io.javadog.cws.api.common;
 public final class Constants {
 
     /**
-     * <p>The Version of the current CWS Instance.</p>
-     */
-    public static final String CWS_VERSION = "CWS 1.0.0";
-
-    /**
      * <p>All serialized classes should use this value. The value reflects the
      * current version of the system. If updates are made in one or more of the
      * serialized classes, it should be updated.</p>

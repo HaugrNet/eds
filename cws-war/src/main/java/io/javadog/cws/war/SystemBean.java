@@ -28,6 +28,9 @@ import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
 
 /**
  * @author Kim Jensen
@@ -49,8 +52,20 @@ public class SystemBean implements System {
     @Override
     @Transactional(Transactional.TxType.NEVER)
     public VersionResponse version() {
-        final VersionResponse response = new VersionResponse();
-        response.setVersion(Constants.CWS_VERSION);
+        final ClassLoader loader = Thread.currentThread().getContextClassLoader();
+        final String cwsConfig = "cws.config";
+        VersionResponse response;
+
+        try (InputStream stream = loader.getResourceAsStream(cwsConfig)) {
+            final Properties properties = new Properties();
+            properties.load(stream);
+
+            response = new VersionResponse();
+            response.setVersion(properties.getProperty("cws.version"));
+        } catch (IOException e) {
+            log.error(e.getMessage(), e);
+            response = new VersionResponse(Constants.ERROR, e.getMessage());
+        }
 
         return response;
     }

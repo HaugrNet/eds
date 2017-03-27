@@ -26,7 +26,7 @@ public final class VersionResponse extends CWSResponse {
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
     @XmlElement
-    private String version = Constants.CWS_VERSION;
+    private String version = null;
 
     public VersionResponse() {
         // Empty Constructor, required for WebServices

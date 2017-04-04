@@ -179,4 +179,12 @@ public class DatabaseSetup {
 
         return entity;
     }
+
+    protected static void wait(final int millis) {
+        try {
+            Thread.sleep(millis);
+        } catch (InterruptedException e) {
+            System.out.println(e.getMessage());
+        }
+    }
 }

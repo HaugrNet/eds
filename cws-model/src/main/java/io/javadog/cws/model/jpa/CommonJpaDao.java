@@ -60,11 +60,19 @@ public final class CommonJpaDao implements CommonDao {
      * {@inheritDoc}
      */
     @Override
-    public MemberEntity findMemberByNameCredential(final String credential) {
-        final Query query = entityManager.createNamedQuery("member.findByCredential");
-        query.setParameter("credential", credential);
+    public <E extends CWSEntity> E find(final Class<E> cwsEntity, final Long id) {
+        return entityManager.find(cwsEntity, id);
+    }
 
-        return findUniqueRecord(query, "member", credential);
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public MemberEntity findMemberByName(final String name) {
+        final Query query = entityManager.createNamedQuery("member.findByName");
+        query.setParameter("name", name);
+
+        return findUniqueRecord(query, "member", name);
     }
 
     /**
@@ -125,7 +133,6 @@ public final class CommonJpaDao implements CommonDao {
     @Override
     public List<MemberEntity> findAllMembers() {
         final Query query = entityManager.createNamedQuery("member.findAll");
-
         return findList(query);
     }
 
@@ -141,28 +148,24 @@ public final class CommonJpaDao implements CommonDao {
         return found.isEmpty() ? null : found.get(0);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<CircleEntity> findCirclesForMember(final MemberEntity member) {
         final Query query = entityManager.createNamedQuery("trustee.findCirclesByMember");
         query.setParameter("memberId", member.getId());
-
         return findList(query);
     }
 
-    private static <E> List<E> findList(final Query query) {
-        List<E> list = query.getResultList();
-
-        if (list == null) {
-            list = new ArrayList<>(0);
-        }
-
-        return list;
-    }
+    // =========================================================================
+    // Internal Methods, handling the actual lookup's to simplify error handling
+    // =========================================================================
 
     private static <E> List<E> findExistingList(final Query query, final String listName) {
-        List<E> list = query.getResultList();
+        List<E> list = findList(query);
 
-        if ((list == null) || list.isEmpty()) {
+        if (list.isEmpty()) {
             throw new ModelException(Constants.IDENTIFICATION_WARNING, "No " + listName + " found.");
         }
 
@@ -170,14 +173,9 @@ public final class CommonJpaDao implements CommonDao {
     }
 
     private static <E> E findUniqueRecord(final Query query, final String entityName, final String keyName) {
-        final List<E> found;
-        try {
-            found = query.getResultList();
-        } catch (IllegalStateException | PersistenceException e) {
-            throw new ModelException(Constants.DATABASE_ERROR, e.getMessage(), e);
-        }
+        final List<E> found = query.getResultList();
 
-        if ((found == null) || found.isEmpty()) {
+        if (found.isEmpty()) {
             throw new ModelException(Constants.IDENTIFICATION_WARNING, "No " + entityName + " found with '" + keyName + "'.");
         }
 
@@ -186,5 +184,19 @@ public final class CommonJpaDao implements CommonDao {
         }
 
         return found.get(0);
+    }
+
+    private static <E> List<E> findList(final Query query) {
+        try {
+            List<E> list = query.getResultList();
+
+            if (list == null) {
+                list = new ArrayList<>(0);
+            }
+
+            return list;
+        } catch (IllegalStateException | PersistenceException e) {
+            throw new ModelException(Constants.DATABASE_ERROR, e.getMessage(), e);
+        }
     }
 }

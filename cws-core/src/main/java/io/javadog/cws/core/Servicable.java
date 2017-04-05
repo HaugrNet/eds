@@ -85,7 +85,7 @@ public abstract class Servicable<R extends CWSResponse, V extends Authentication
 
         // Step 2; Find the Member by the given credentials, if nothing is
         //         found, then no need to continue.
-        member = dao.findMemberByNameCredential(verifiable.getAccount());
+        member = dao.findMemberByName(verifiable.getAccount());
 
         // Step 3; Check if the Member is valid, i.e. if the given Credentials
         //         can correctly decrypt the Private Key for the Account. If

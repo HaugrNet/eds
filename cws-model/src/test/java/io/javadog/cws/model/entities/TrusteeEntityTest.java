@@ -38,7 +38,7 @@ public final class TrusteeEntityTest extends DatabaseSetup {
         entity.setCircleKey(circleKey);
         persist(entity);
 
-        final TrusteeEntity found = entityManager.find(TrusteeEntity.class, entity.getId());
+        final TrusteeEntity found = find(TrusteeEntity.class, entity.getId());
         assertThat(found.getMember().getId(), is(member.getId()));
         assertThat(found.getCircle().getId(), is(circle.getId()));
         assertThat(found.getKey().getId(), is(key.getId()));
@@ -47,7 +47,7 @@ public final class TrusteeEntityTest extends DatabaseSetup {
         found.setTrustLevel(TrustLevel.WRITE);
         persist(found);
 
-        final TrusteeEntity updated = entityManager.find(TrusteeEntity.class, entity.getId());
+        final TrusteeEntity updated = find(TrusteeEntity.class, entity.getId());
         assertThat(updated, is(not(nullValue())));
         assertThat(updated.getTrustLevel(), is(not(TrustLevel.ADMIN)));
         assertThat(updated.getCircleKey(), is(not(circleKey)));

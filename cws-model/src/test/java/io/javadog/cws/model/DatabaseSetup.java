@@ -17,10 +17,10 @@ import io.javadog.cws.common.enums.Status;
 import io.javadog.cws.common.exceptions.CWSException;
 import io.javadog.cws.model.entities.CWSEntity;
 import io.javadog.cws.model.entities.CircleEntity;
-import io.javadog.cws.model.entities.Externable;
 import io.javadog.cws.model.entities.KeyEntity;
 import io.javadog.cws.model.entities.MemberEntity;
 import io.javadog.cws.model.entities.TrusteeEntity;
+import io.javadog.cws.model.jpa.CommonJpaDao;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -33,8 +33,10 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import java.security.Key;
 import java.security.KeyPair;
+import java.text.SimpleDateFormat;
 import java.util.Base64;
 import java.util.Date;
+import java.util.Locale;
 import java.util.UUID;
 
 /**
@@ -43,9 +45,11 @@ import java.util.UUID;
  */
 public class DatabaseSetup {
 
+    private static final String TIMESTAMP = "yyyyMMddHHmmssSSS";
     private static final String persistenceName = "io.javadog.cws.jpa";
     private static final EntityManagerFactory FACTORY = Persistence.createEntityManagerFactory(persistenceName);
     protected EntityManager entityManager = FACTORY.createEntityManager();
+    protected CommonDao dao = new CommonJpaDao(entityManager);
     private final Settings settings = new Settings();
     private final Crypto crypto = new Crypto(settings);
 
@@ -166,25 +170,27 @@ public class DatabaseSetup {
     }
 
     protected <E extends CWSEntity> E persist(final E entity) {
-        if ((entity instanceof Externable) && (((Externable) entity).getExternalId() == null)) {
-            ((Externable) entity).setExternalId(UUID.randomUUID().toString());
-        }
-
-        if (entity.getCreated() == null) {
-            entity.setCreated(new Date());
-        }
-
-        entity.setModified(new Date());
-        entityManager.persist(entity);
-
-        return entity;
+        return dao.persist(entity);
     }
 
-    protected static void wait(final int millis) {
-        try {
-            Thread.sleep(millis);
-        } catch (InterruptedException e) {
-            System.out.println(e.getMessage());
+    protected <E extends CWSEntity> void persistAndDetach(final E entity) {
+        persist(entity);
+        entityManager.flush();
+        entityManager.clear();
+    }
+
+    protected <E extends CWSEntity> E find(final Class<E> cwsEntity, final Long id) {
+        return dao.find(cwsEntity, id);
+    }
+
+    protected String toString(final Date date) {
+        String str = null;
+
+        if (date != null) {
+            final SimpleDateFormat sdf = new SimpleDateFormat(TIMESTAMP, Locale.ENGLISH);
+            str = sdf.format(date);
         }
+
+        return str;
     }
 }

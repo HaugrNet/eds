@@ -25,7 +25,9 @@ public interface CommonDao {
 
     <E extends CWSEntity> E persist(E entity);
 
-    MemberEntity findMemberByNameCredential(String credential);
+    <E extends CWSEntity> E find(Class<E> cwsEntity, Long id);
+
+    MemberEntity findMemberByName(String name);
 
     List<TrusteeEntity> findTrustByMember(MemberEntity member);
 

@@ -30,10 +30,10 @@ import java.security.KeyPair;
                         "from MemberEntity m " +
                         "where m.externalId = :externalId " +
                         "order by name asc"),
-        @NamedQuery(name = "member.findByCredential",
+        @NamedQuery(name = "member.findByName",
                 query = "select m " +
                         "from MemberEntity m" +
-                        " where name = :credential")
+                        " where name = :name")
 })
 @Table(name = "members")
 public class MemberEntity extends Externable {

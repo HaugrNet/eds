@@ -31,7 +31,7 @@ public final class TypeEntityTest extends DatabaseSetup {
         entityManager.flush();
         entityManager.clear();
 
-        final TypeEntity found = entityManager.find(TypeEntity.class, entity.getId());
+        final TypeEntity found = find(TypeEntity.class, entity.getId());
         assertThat(found, is(not(nullValue())));
     }
 
@@ -42,7 +42,7 @@ public final class TypeEntityTest extends DatabaseSetup {
         entity.setType("Type 1");
         persist(entity);
 
-        final TypeEntity found = entityManager.find(TypeEntity.class, entity.getId());
+        final TypeEntity found = find(TypeEntity.class, entity.getId());
         assertThat(found, is(not(nullValue())));
         found.setName("Name 2");
         found.setType("Type 2");

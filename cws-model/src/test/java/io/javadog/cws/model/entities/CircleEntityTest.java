@@ -27,19 +27,17 @@ public final class CircleEntityTest extends DatabaseSetup {
         entityManager.flush();
         entityManager.clear();
 
-        final CircleEntity found = entityManager.find(CircleEntity.class, entity.getId());
+        final CircleEntity found = find(CircleEntity.class, entity.getId());
         assertThat(found, is(not(nullValue())));
         assertThat(found.getName(), is(entity.getName()));
 
-        wait(2500);
         found.setName("Circle 2");
         persist(found);
         entityManager.flush();
         entityManager.clear();
 
-        final CircleEntity updated = entityManager.find(CircleEntity.class, entity.getId());
+        final CircleEntity updated = find(CircleEntity.class, entity.getId());
         assertThat(updated, is(not(nullValue())));
         assertThat(updated.getName(), is(not(entity.getName())));
-        assertThat(updated.getModified().after(entity.getModified()), is(true));
     }
 }

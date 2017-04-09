@@ -50,7 +50,7 @@ public class DatabaseSetup {
     private static final EntityManagerFactory FACTORY = Persistence.createEntityManagerFactory(persistenceName);
     protected EntityManager entityManager = FACTORY.createEntityManager();
     protected CommonDao dao = new CommonJpaDao(entityManager);
-    private final Settings settings = new Settings();
+    protected final Settings settings = new Settings();
     private final Crypto crypto = new Crypto(settings);
 
     /**

@@ -101,7 +101,7 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
     @Test
     public void testAdminRequestWithMemberId() {
         final Settings settings = new Settings();
-        final Servicable<FetchMemberResponse, FetchMemberRequest> service = prepareService(settings);
+        final Servicable<FetchMemberResponse, FetchMemberRequest> service = prepareService();
         final FetchMemberRequest request = new FetchMemberRequest();
         request.setAccount(Constants.ADMIN_ACCOUNT);
         request.setCredentialType(CredentialType.PASSPHRASE);
@@ -145,27 +145,32 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
 
     @Test
     public void testFindAllMembersNoAdminIsolateTrustees() {
-        createTwoCircleWith5Members();
-        final Settings settings = new Settings();
+        final Servicable<FetchMemberResponse, FetchMemberRequest> service = prepareService();
+        final MemberEntity member = createTwoCircleWith5Members();
+
+        // Ensure that we have the correct settings for the Service
         settings.set(Settings.EXPOSE_ADMIN, "false");
         settings.set(Settings.SHOW_OTHER_MEMBER_INFORMATION, "false");
 
-        final Servicable<FetchMemberResponse, FetchMemberRequest> service = prepareService(settings);
-        final FetchMemberRequest request = buildRequest("member1");
+        // Build and send thr Request
+        final FetchMemberRequest request = buildRequestWithCredentials("member1");
         final FetchMemberResponse response = service.perform(request);
 
+        // Verify that we have found the correct data
         assertThat(response, is(not(nullValue())));
+        assertThat(response.getMembers().size(), is(1));
+        assertThat(response.getMembers().get(0).getId(), is(member.getId()));
     }
 
     @Test
     public void testFindAllMembersNoAdminAllTrustees() {
+        final Servicable<FetchMemberResponse, FetchMemberRequest> service = prepareService();
         createTwoCircleWith5Members();
-        final Settings settings = new Settings();
+
         settings.set(Settings.EXPOSE_ADMIN, "false");
         settings.set(Settings.SHOW_OTHER_MEMBER_INFORMATION, "true");
 
-        final Servicable<FetchMemberResponse, FetchMemberRequest> service = prepareService(settings);
-        final FetchMemberRequest request = buildRequest("member1");
+        final FetchMemberRequest request = buildRequestWithCredentials("member1");
         final FetchMemberResponse response = service.perform(request);
 
         assertThat(response, is(not(nullValue())));
@@ -173,16 +178,24 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
 
     @Test
     public void testFindAllMembersAndAdminIsolateTrustees() {
+        // Prepare the Service Class and add data to the Database
+        final Servicable<FetchMemberResponse, FetchMemberRequest> service = prepareService();
         createTwoCircleWith5Members();
-        final Settings settings = new Settings();
+
+        // Explicitly set the Settings, which will affect the Response
         settings.set(Settings.EXPOSE_ADMIN, "true");
         settings.set(Settings.SHOW_OTHER_MEMBER_INFORMATION, "false");
 
-        final Servicable<FetchMemberResponse, FetchMemberRequest> service = prepareService(settings);
-        final FetchMemberRequest request = buildRequest("member1");
+        // Now, prepare the Request and invoke the Service
+        final FetchMemberRequest request = buildRequestWithCredentials("member1");
         final FetchMemberResponse response = service.perform(request);
 
+        // Finally, check the response for the expected behaviour
         assertThat(response, is(not(nullValue())));
+        assertThat(response.getReturnCode(), is(Constants.SUCCESS));
+        assertThat(response.getReturnMessage(), is("Ok"));
+        assertThat(response.getMembers().size(), is(6));
+        assertThat(response.getCircles(), is(1));
     }
 
     @Test
@@ -193,31 +206,33 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
         settings.set(Settings.SHOW_OTHER_MEMBER_INFORMATION, "true");
 
         final Servicable<FetchMemberResponse, FetchMemberRequest> service = prepareService(settings);
-        final FetchMemberRequest request = buildRequest("member1");
+        final FetchMemberRequest request = buildRequestWithCredentials("member1");
         final FetchMemberResponse response = service.perform(request);
 
         assertThat(response, is(not(nullValue())));
     }
 
     private Servicable<FetchMemberResponse, FetchMemberRequest> prepareService() {
-        final Settings settings = new Settings();
         return new FetchMemberService(settings, entityManager);
     }
 
-    private Servicable<FetchMemberResponse, FetchMemberRequest> prepareService(final Settings settings) {
-        return new FetchMemberService(settings, entityManager);
-    }
-
-    private static FetchMemberRequest buildRequest(final String member) {
+    private static FetchMemberRequest buildRequestWithCredentials(final String accountName) {
         final FetchMemberRequest request = new FetchMemberRequest();
-        request.setAccount(member);
+        request.setAccount(accountName);
         request.setCredentialType(CredentialType.PASSPHRASE);
-        request.setCredential(member.toCharArray());
+        request.setCredential(accountName.toCharArray());
 
         return request;
     }
 
-    private void createTwoCircleWith5Members() {
+    /**
+     * Creates two Circles with a total of 5 Members, Member 2 - 5 is part of
+     * both Circles, whereas Member1 is only member of the first Circle. The
+     * returned Member is Member1.
+     *
+     * @return Member1, which is only a member of the first Circle
+     */
+    private MemberEntity createTwoCircleWith5Members() {
         final MemberEntity member1 = createMember("member1");
         final MemberEntity member2 = createMember("member2");
         final MemberEntity member3 = createMember("member3");
@@ -229,5 +244,7 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
 
         addKeyAndTrusteesToCircle(circle1, member1, member2, member3, member4);
         addKeyAndTrusteesToCircle(circle2, member3, member4, member5);
+
+        return member1;
     }
 }

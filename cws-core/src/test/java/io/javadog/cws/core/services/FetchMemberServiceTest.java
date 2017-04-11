@@ -22,6 +22,7 @@ import io.javadog.cws.core.Servicable;
 import io.javadog.cws.model.DatabaseSetup;
 import io.javadog.cws.model.entities.CircleEntity;
 import io.javadog.cws.model.entities.MemberEntity;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -71,80 +72,9 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
         service.perform(request);
     }
 
-    /**
-     * Testing retrieval of all Members as Administrator, with the Expose Admin
-     * Property set to True, which should result in a List of all Accounts.
-     */
     @Test
-    public void testAdminRequest() {
-        final Servicable<FetchMemberResponse, FetchMemberRequest> service = prepareService();
-        final FetchMemberRequest request = new FetchMemberRequest();
-        request.setAccount(Constants.ADMIN_ACCOUNT);
-        request.setCredentialType(CredentialType.PASSPHRASE);
-        request.setCredential(Constants.ADMIN_ACCOUNT.toCharArray());
-        final FetchMemberResponse response = service.perform(request);
-
-        assertThat(response, is(not(nullValue())));
-        assertThat(response.isOk(), is(true));
-        assertThat(response.getReturnCode(), is(Constants.SUCCESS));
-        assertThat(response.getReturnMessage(), is("Ok"));
-        assertThat(response.getMembers().size(), is(1));
-        assertThat(response.getCircles().isEmpty(), is(true));
-        assertThat(response.getMembers().get(0).getAuthentication().getAccount(), is(Constants.ADMIN_ACCOUNT));
-        assertThat(response.getMembers().get(0).getId(), is("483833a4-2af7-4d9d-953d-b1e86cac8035"));
-    }
-
-    /**
-     * Testing retrieval of a specific account as Administrator, this should
-     * always work, regardless of the Property settings.
-     */
-    @Test
-    public void testAdminRequestWithMemberId() {
-        final Settings settings = new Settings();
-        final Servicable<FetchMemberResponse, FetchMemberRequest> service = prepareService();
-        final FetchMemberRequest request = new FetchMemberRequest();
-        request.setAccount(Constants.ADMIN_ACCOUNT);
-        request.setCredentialType(CredentialType.PASSPHRASE);
-        request.setCredential(Constants.ADMIN_ACCOUNT.toCharArray());
-        request.setMemberId("483833a4-2af7-4d9d-953d-b1e86cac8035");
-
-        // First test, with the Both ExposeAdmin & ShowMembers set to true
-        // Second test, with ExposeAdmin true & ShowMembers false
-        // Third test, with ExposeAdmin false and ShowMembers true
-        // Fourth test, with Both ExposeAdmin & ShowMembers set to false
-
-        final FetchMemberResponse response = service.perform(request);
-
-        assertThat(response, is(not(nullValue())));
-        assertThat(response.isOk(), is(true));
-        assertThat(response.getReturnCode(), is(Constants.SUCCESS));
-        assertThat(response.getReturnMessage(), is("Ok"));
-        assertThat(response.getMembers().size(), is(1));
-        assertThat(response.getCircles().isEmpty(), is(true));
-        assertThat(response.getMembers().get(0).getAuthentication().getAccount(), is(Constants.ADMIN_ACCOUNT));
-        assertThat(response.getMembers().get(0).getId(), is("483833a4-2af7-4d9d-953d-b1e86cac8035"));
-    }
-
-    @Test
-    public void testAdminRequestWithInvalidMemberId() {
-        final Servicable<FetchMemberResponse, FetchMemberRequest> service = prepareService();
-        final FetchMemberRequest request = new FetchMemberRequest();
-        request.setAccount(Constants.ADMIN_ACCOUNT);
-        request.setCredentialType(CredentialType.PASSPHRASE);
-        request.setCredential(Constants.ADMIN_ACCOUNT.toCharArray());
-        request.setMemberId("483833a4-2af7-4d9d-953d-b1e86cac8021");
-        final FetchMemberResponse response = service.perform(request);
-
-        assertThat(response, is(not(nullValue())));
-        assertThat(response.isOk(), is(false));
-        assertThat(response.getReturnCode(), is(Constants.IDENTIFICATION_WARNING));
-        assertThat(response.getReturnMessage(), is("The requested Member cannot be found."));
-        assertThat(response.getMembers().isEmpty(), is(true));
-        assertThat(response.getCircles().isEmpty(), is(true));
-    }
-
-    @Test
-    public void testFindAllMembersNoAdminIsolateTrustees() {
+    @Ignore("To be completed.")
+    public void testFindAllMembersAsAdminNoAdminIsolateTrustees() {
         final Servicable<FetchMemberResponse, FetchMemberRequest> service = prepareService();
         final MemberEntity member = createTwoCircleWith5Members();
 
@@ -152,7 +82,27 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
         settings.set(Settings.EXPOSE_ADMIN, "false");
         settings.set(Settings.SHOW_OTHER_MEMBER_INFORMATION, "false");
 
-        // Build and send thr Request
+        // Build and send the Request
+        final FetchMemberRequest request = buildRequestWithCredentials(Constants.ADMIN_ACCOUNT);
+        final FetchMemberResponse response = service.perform(request);
+
+        // Verify that we have found the correct data
+        assertThat(response, is(not(nullValue())));
+        assertThat(response.getMembers().size(), is(1));
+        assertThat(response.getMembers().get(0).getId(), is(member.getId()));
+    }
+
+    @Test
+    @Ignore("To be completed.")
+    public void testFindAllMembersAsMember1NoAdminIsolateTrustees() {
+        final Servicable<FetchMemberResponse, FetchMemberRequest> service = prepareService();
+        final MemberEntity member = createTwoCircleWith5Members();
+
+        // Ensure that we have the correct settings for the Service
+        settings.set(Settings.EXPOSE_ADMIN, "false");
+        settings.set(Settings.SHOW_OTHER_MEMBER_INFORMATION, "false");
+
+        // Build and send the Request
         final FetchMemberRequest request = buildRequestWithCredentials("member1");
         final FetchMemberResponse response = service.perform(request);
 
@@ -163,64 +113,242 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testFindAllMembersNoAdminAllTrustees() {
+    @Ignore("To be completed.")
+    public void testFindAllMembersAsAdminWithAdminIsolateTrustees() {
         final Servicable<FetchMemberResponse, FetchMemberRequest> service = prepareService();
-        createTwoCircleWith5Members();
+        final MemberEntity member = createTwoCircleWith5Members();
 
-        settings.set(Settings.EXPOSE_ADMIN, "false");
-        settings.set(Settings.SHOW_OTHER_MEMBER_INFORMATION, "true");
-
-        final FetchMemberRequest request = buildRequestWithCredentials("member1");
-        final FetchMemberResponse response = service.perform(request);
-
-        assertThat(response, is(not(nullValue())));
-    }
-
-    @Test
-    public void testFindAllMembersAndAdminIsolateTrustees() {
-        // Prepare the Service Class and add data to the Database
-        final Servicable<FetchMemberResponse, FetchMemberRequest> service = prepareService();
-        createTwoCircleWith5Members();
-
-        // Explicitly set the Settings, which will affect the Response
+        // Ensure that we have the correct settings for the Service
         settings.set(Settings.EXPOSE_ADMIN, "true");
         settings.set(Settings.SHOW_OTHER_MEMBER_INFORMATION, "false");
 
-        // Now, prepare the Request and invoke the Service
-        final FetchMemberRequest request = buildRequestWithCredentials("member1");
+        // Build and send the Request
+        final FetchMemberRequest request = buildRequestWithCredentials(Constants.ADMIN_ACCOUNT);
         final FetchMemberResponse response = service.perform(request);
 
-        // Finally, check the response for the expected behaviour
+        // Verify that we have found the correct data
         assertThat(response, is(not(nullValue())));
-        assertThat(response.getReturnCode(), is(Constants.SUCCESS));
-        assertThat(response.getReturnMessage(), is("Ok"));
-        assertThat(response.getMembers().size(), is(6));
-        assertThat(response.getCircles(), is(1));
+        assertThat(response.getMembers().size(), is(1));
+        assertThat(response.getMembers().get(0).getId(), is(member.getId()));
     }
 
     @Test
-    public void testFindAllMembersAndAdminAllTrustees() {
-        createTwoCircleWith5Members();
-        final Settings settings = new Settings();
-        settings.set(Settings.EXPOSE_ADMIN, "true");
-        settings.set(Settings.SHOW_OTHER_MEMBER_INFORMATION, "true");
+    @Ignore("To be completed.")
+    public void testFindAllMembersAsMember1WithAdminIsolateTrustees() {
+        final Servicable<FetchMemberResponse, FetchMemberRequest> service = prepareService();
+        final MemberEntity member = createTwoCircleWith5Members();
 
-        final Servicable<FetchMemberResponse, FetchMemberRequest> service = prepareService(settings);
+        // Ensure that we have the correct settings for the Service
+        settings.set(Settings.EXPOSE_ADMIN, "true");
+        settings.set(Settings.SHOW_OTHER_MEMBER_INFORMATION, "false");
+
+        // Build and send the Request
         final FetchMemberRequest request = buildRequestWithCredentials("member1");
         final FetchMemberResponse response = service.perform(request);
 
+        // Verify that we have found the correct data
         assertThat(response, is(not(nullValue())));
+        assertThat(response.getMembers().size(), is(1));
+        assertThat(response.getMembers().get(0).getId(), is(member.getId()));
     }
+
+    @Test
+    @Ignore("To be completed.")
+    public void testFindAllMembersAsAdminNoAdminShowTrustees() {
+        final Servicable<FetchMemberResponse, FetchMemberRequest> service = prepareService();
+        final MemberEntity member = createTwoCircleWith5Members();
+
+        // Ensure that we have the correct settings for the Service
+        settings.set(Settings.EXPOSE_ADMIN, "false");
+        settings.set(Settings.SHOW_OTHER_MEMBER_INFORMATION, "true");
+
+        // Build and send the Request
+        final FetchMemberRequest request = buildRequestWithCredentials(Constants.ADMIN_ACCOUNT);
+        final FetchMemberResponse response = service.perform(request);
+
+        // Verify that we have found the correct data
+        assertThat(response, is(not(nullValue())));
+        assertThat(response.getMembers().size(), is(5));
+        assertThat(response.getMembers().get(0).getId(), is(member.getId()));
+    }
+
+    @Test
+    @Ignore("To be completed.")
+    public void testFindAllMembersAsMember1NoAdminShowTrustees() {
+        final Servicable<FetchMemberResponse, FetchMemberRequest> service = prepareService();
+        final MemberEntity member = createTwoCircleWith5Members();
+
+        // Ensure that we have the correct settings for the Service
+        settings.set(Settings.EXPOSE_ADMIN, "false");
+        settings.set(Settings.SHOW_OTHER_MEMBER_INFORMATION, "true");
+
+        // Build and send the Request
+        final FetchMemberRequest request = buildRequestWithCredentials("member1");
+        final FetchMemberResponse response = service.perform(request);
+
+        // Verify that we have found the correct data
+        assertThat(response, is(not(nullValue())));
+        assertThat(response.getMembers().size(), is(1));
+        assertThat(response.getMembers().get(0).getId(), is(member.getId()));
+    }
+
+    @Test
+    @Ignore("To be completed.")
+    public void testFindAllMembersAsAdminWithAdminShowTrustees() {
+        final Servicable<FetchMemberResponse, FetchMemberRequest> service = prepareService();
+        final MemberEntity member = createTwoCircleWith5Members();
+
+        // Ensure that we have the correct settings for the Service
+        settings.set(Settings.EXPOSE_ADMIN, "true");
+        settings.set(Settings.SHOW_OTHER_MEMBER_INFORMATION, "true");
+
+        // Build and send the Request
+        final FetchMemberRequest request = buildRequestWithCredentials(Constants.ADMIN_ACCOUNT);
+        final FetchMemberResponse response = service.perform(request);
+
+        // Verify that we have found the correct data
+        assertThat(response, is(not(nullValue())));
+        assertThat(response.getMembers().size(), is(1));
+        assertThat(response.getMembers().get(0).getId(), is(member.getId()));
+    }
+
+    @Test
+    @Ignore("To be completed.")
+    public void testFindAllMembersAsMember1WithAdminShowTrustees() {
+        final Servicable<FetchMemberResponse, FetchMemberRequest> service = prepareService();
+        final MemberEntity member = createTwoCircleWith5Members();
+
+        // Ensure that we have the correct settings for the Service
+        settings.set(Settings.EXPOSE_ADMIN, "true");
+        settings.set(Settings.SHOW_OTHER_MEMBER_INFORMATION, "true");
+
+        // Build and send the Request
+        final FetchMemberRequest request = buildRequestWithCredentials("member1");
+        final FetchMemberResponse response = service.perform(request);
+
+        // Verify that we have found the correct data
+        assertThat(response, is(not(nullValue())));
+        assertThat(response.getMembers().size(), is(1));
+        assertThat(response.getMembers().get(0).getId(), is(member.getId()));
+    }
+
+    @Test
+    @Ignore("To be completed.")
+    public void testFindSpecificMemberAsAdmin() {
+        final Servicable<FetchMemberResponse, FetchMemberRequest> service = prepareService();
+        final MemberEntity member = createTwoCircleWith5Members();
+
+        // Ensure that we have the correct settings for the Service
+        settings.set(Settings.EXPOSE_ADMIN, "false");
+        settings.set(Settings.SHOW_OTHER_MEMBER_INFORMATION, "true");
+
+        // Build and send the Request
+        final FetchMemberRequest request = buildRequestWithCredentials(Constants.ADMIN_ACCOUNT);
+        final FetchMemberResponse response = service.perform(request);
+
+        // Verify that we have found the correct data
+        assertThat(response, is(not(nullValue())));
+        assertThat(response.getMembers().size(), is(1));
+        assertThat(response.getMembers().get(0).getId(), is(member.getId()));
+    }
+
+    @Test
+    @Ignore("To be completed.")
+    public void testFindSpecificMemberAsMemberShared() {
+        final Servicable<FetchMemberResponse, FetchMemberRequest> service = prepareService();
+        final MemberEntity member = createTwoCircleWith5Members();
+
+        // Ensure that we have the correct settings for the Service
+        settings.set(Settings.EXPOSE_ADMIN, "false");
+        settings.set(Settings.SHOW_OTHER_MEMBER_INFORMATION, "true");
+
+        // Build and send the Request
+        final FetchMemberRequest request = buildRequestWithCredentials("member1");
+        final FetchMemberResponse response = service.perform(request);
+
+        // Verify that we have found the correct data
+        assertThat(response, is(not(nullValue())));
+        assertThat(response.getMembers().size(), is(1));
+        assertThat(response.getMembers().get(0).getId(), is(member.getId()));
+    }
+
+    @Test
+    @Ignore("To be completed.")
+    public void testFindSpecificMemberAsMemberNotShared() {
+        final Servicable<FetchMemberResponse, FetchMemberRequest> service = prepareService();
+        final MemberEntity member = createTwoCircleWith5Members();
+
+        // Ensure that we have the correct settings for the Service
+        settings.set(Settings.EXPOSE_ADMIN, "false");
+        settings.set(Settings.SHOW_OTHER_MEMBER_INFORMATION, "true");
+
+        // Build and send the Request. Member1 & Member5 are not in the same
+        // Circles, so it should not be allowed for Member5 to retrieve detailed
+        // information about Member1.
+        final FetchMemberRequest request = buildRequestWithCredentials("member5");
+        request.setMemberId(member.getExternalId());
+        final FetchMemberResponse response = service.perform(request);
+
+        // Verify that we have found the correct data
+        assertThat(response, is(not(nullValue())));
+        assertThat(response.getMembers().size(), is(1));
+        assertThat(response.getMembers().get(0).getId(), is(member.getId()));
+    }
+
+    @Test
+    @Ignore("To be completed.")
+    public void testFindYourselfAsAdmin() {
+        final Servicable<FetchMemberResponse, FetchMemberRequest> service = prepareService();
+        final MemberEntity member = createTwoCircleWith5Members();
+
+        // Ensure that we have the correct settings for the Service
+        settings.set(Settings.EXPOSE_ADMIN, "false");
+        settings.set(Settings.SHOW_OTHER_MEMBER_INFORMATION, "true");
+
+        // Build and send the Request
+        final FetchMemberRequest request = buildRequestWithCredentials(Constants.ADMIN_ACCOUNT);
+        final FetchMemberResponse response = service.perform(request);
+
+        // Verify that we have found the correct data
+        assertThat(response, is(not(nullValue())));
+        assertThat(response.getMembers().size(), is(1));
+        assertThat(response.getMembers().get(0).getId(), is(member.getId()));
+    }
+
+    @Test
+    @Ignore("To be completed.")
+    public void testFindYourselfAsMember() {
+        final Servicable<FetchMemberResponse, FetchMemberRequest> service = prepareService();
+        final MemberEntity member = createTwoCircleWith5Members();
+
+        // Ensure that we have the correct settings for the Service
+        settings.set(Settings.EXPOSE_ADMIN, "false");
+        settings.set(Settings.SHOW_OTHER_MEMBER_INFORMATION, "true");
+
+        // Build and send the Request
+        final FetchMemberRequest request = buildRequestWithCredentials("member1");
+        request.setMemberId(member.getExternalId());
+        final FetchMemberResponse response = service.perform(request);
+
+        // Verify that we have found the correct data
+        assertThat(response, is(not(nullValue())));
+        assertThat(response.getMembers().size(), is(1));
+        assertThat(response.getMembers().get(0).getId(), is(member.getId()));
+    }
+
+    // =========================================================================
+    // Internal Helper Methods
+    // =========================================================================
 
     private Servicable<FetchMemberResponse, FetchMemberRequest> prepareService() {
         return new FetchMemberService(settings, entityManager);
     }
 
-    private static FetchMemberRequest buildRequestWithCredentials(final String accountName) {
+    private static FetchMemberRequest buildRequestWithCredentials(final String account) {
         final FetchMemberRequest request = new FetchMemberRequest();
-        request.setAccount(accountName);
+        request.setAccount(account);
         request.setCredentialType(CredentialType.PASSPHRASE);
-        request.setCredential(accountName.toCharArray());
+        request.setCredential(account.toCharArray());
 
         return request;
     }

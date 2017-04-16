@@ -19,6 +19,6 @@ public final class AuthorizationException extends CWSException {
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
     public AuthorizationException(final String message) {
-        super(Constants.IDENTIFICATION_WARNING, message);
+        super(Constants.AUTHORIZATION_WARNING, message);
     }
 }

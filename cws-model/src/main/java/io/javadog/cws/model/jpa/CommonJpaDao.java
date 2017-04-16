@@ -152,9 +152,22 @@ public final class CommonJpaDao implements CommonDao {
      * {@inheritDoc}
      */
     @Override
-    public List<CircleEntity> findCirclesForMember(final MemberEntity member) {
+    public List<CircleEntity> findCirclesForMember(final MemberEntity requested) {
         final Query query = entityManager.createNamedQuery("trustee.findCirclesByMember");
-        query.setParameter("memberId", member.getId());
+        query.setParameter("memberId", requested.getId());
+
+        return findList(query);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<CircleEntity> findCirclesBothBelongTo(final MemberEntity member, final MemberEntity requested) {
+        final Query query = entityManager.createNamedQuery("trustee.findSharedCircles");
+        query.setParameter("member", member.getId());
+        query.setParameter("requested", requested.getId());
+
         return findList(query);
     }
 

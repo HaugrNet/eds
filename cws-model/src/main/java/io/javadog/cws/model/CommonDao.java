@@ -43,5 +43,7 @@ public interface CommonDao {
 
     MemberEntity findMemberByExternalId(String externalId);
 
-    List<CircleEntity> findCirclesForMember(MemberEntity member);
+    List<CircleEntity> findCirclesForMember(MemberEntity requested);
+
+    List<CircleEntity> findCirclesBothBelongTo(MemberEntity member, MemberEntity requested);
 }

@@ -18,8 +18,11 @@ import io.javadog.cws.core.Serviceable;
 import javax.persistence.EntityManager;
 
 /**
+ * Object Types is the basis for all shared information, as it either provides
+ * the MIMEType of files or Object Information for Objects shared.
+ *
  * @author Kim Jensen
- * @since CWS 1.0
+ * @since  CWS 1.0
  */
 public final class FetchObjectTypeService extends Serviceable<FetchObjectTypeResponse, FetchObjectTypeRequest> {
 

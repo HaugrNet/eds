@@ -22,7 +22,7 @@ import io.javadog.cws.api.responses.ProcessObjectResponse;
 import io.javadog.cws.api.responses.ProcessObjectTypeResponse;
 import io.javadog.cws.common.Settings;
 import io.javadog.cws.common.exceptions.CWSException;
-import io.javadog.cws.core.Servicable;
+import io.javadog.cws.core.Serviceable;
 import io.javadog.cws.core.services.FetchFolderService;
 import io.javadog.cws.core.services.FetchObjectService;
 import io.javadog.cws.core.services.FetchObjectTypeService;
@@ -58,7 +58,7 @@ public final class ShareBean implements Share {
         ProcessFolderResponse response;
 
         try {
-            final Servicable<ProcessFolderResponse, ProcessFolderRequest> service = new ProcessFolderService(settings, entityManager);
+            final Serviceable<ProcessFolderResponse, ProcessFolderRequest> service = new ProcessFolderService(settings, entityManager);
             response = service.perform(request);
         } catch (CWSException e) {
             // Any Warning or Error thrown by the CWS contain enough information
@@ -81,7 +81,7 @@ public final class ShareBean implements Share {
         FetchFolderResponse response;
 
         try {
-            final Servicable<FetchFolderResponse, FetchFolderRequest> service = new FetchFolderService(settings, entityManager);
+            final Serviceable<FetchFolderResponse, FetchFolderRequest> service = new FetchFolderService(settings, entityManager);
             response = service.perform(request);
         } catch (CWSException e) {
             // Any Warning or Error thrown by the CWS contain enough information
@@ -104,7 +104,7 @@ public final class ShareBean implements Share {
         ProcessObjectTypeResponse response;
 
         try {
-            final Servicable<ProcessObjectTypeResponse, ProcessObjectTypeRequest> service = new ProcessObjectTypeService(settings, entityManager);
+            final Serviceable<ProcessObjectTypeResponse, ProcessObjectTypeRequest> service = new ProcessObjectTypeService(settings, entityManager);
             response = service.perform(request);
         } catch (CWSException e) {
             // Any Warning or Error thrown by the CWS contain enough information
@@ -127,7 +127,7 @@ public final class ShareBean implements Share {
         FetchObjectTypeResponse response;
 
         try {
-            final Servicable<FetchObjectTypeResponse, FetchObjectTypeRequest> service = new FetchObjectTypeService(settings, entityManager);
+            final Serviceable<FetchObjectTypeResponse, FetchObjectTypeRequest> service = new FetchObjectTypeService(settings, entityManager);
             response = service.perform(request);
         } catch (CWSException e) {
             // Any Warning or Error thrown by the CWS contain enough information
@@ -150,7 +150,7 @@ public final class ShareBean implements Share {
         ProcessObjectResponse response;
 
         try {
-            final Servicable<ProcessObjectResponse, ProcessObjectRequest> service = new ProcessObjectService(settings, entityManager);
+            final Serviceable<ProcessObjectResponse, ProcessObjectRequest> service = new ProcessObjectService(settings, entityManager);
             response = service.perform(request);
         } catch (CWSException e) {
             // Any Warning or Error thrown by the CWS contain enough information
@@ -173,7 +173,7 @@ public final class ShareBean implements Share {
         FetchObjectResponse response;
 
         try {
-            final Servicable<FetchObjectResponse, FetchObjectRequest> service = new FetchObjectService(settings, entityManager);
+            final Serviceable<FetchObjectResponse, FetchObjectRequest> service = new FetchObjectService(settings, entityManager);
             response = service.perform(request);
         } catch (CWSException e) {
             // Any Warning or Error thrown by the CWS contain enough information

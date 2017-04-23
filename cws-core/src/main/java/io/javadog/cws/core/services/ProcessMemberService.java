@@ -11,7 +11,7 @@ import io.javadog.cws.api.requests.ProcessMemberRequest;
 import io.javadog.cws.api.responses.ProcessMemberResponse;
 import io.javadog.cws.common.Settings;
 import io.javadog.cws.core.Permission;
-import io.javadog.cws.core.Servicable;
+import io.javadog.cws.core.Serviceable;
 
 import javax.persistence.EntityManager;
 
@@ -19,7 +19,7 @@ import javax.persistence.EntityManager;
  * @author Kim Jensen
  * @since  CWS 1.0
  */
-public final class ProcessMemberService extends Servicable<ProcessMemberResponse, ProcessMemberRequest> {
+public final class ProcessMemberService extends Serviceable<ProcessMemberResponse, ProcessMemberRequest> {
 
     public ProcessMemberService(final Settings settings, final EntityManager entityManager) {
         super(settings, entityManager);

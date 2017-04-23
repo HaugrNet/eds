@@ -19,7 +19,7 @@ import io.javadog.cws.api.responses.FetchMemberResponse;
 import io.javadog.cws.common.Settings;
 import io.javadog.cws.common.exceptions.AuthorizationException;
 import io.javadog.cws.common.exceptions.VerificationException;
-import io.javadog.cws.core.Servicable;
+import io.javadog.cws.core.Serviceable;
 import io.javadog.cws.model.DatabaseSetup;
 import io.javadog.cws.model.entities.MemberEntity;
 import org.junit.Test;
@@ -65,7 +65,7 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
                 "Request Object contained errors: Key: credentialTypeError: CredentialType is missing, null or invalid.\n" +
                 "Key: credentialError: Credential is missing, null or invalid.\n" +
                 "Key: accountError: Account is missing, null or invalid.\n");
-        final Servicable<FetchMemberResponse, FetchMemberRequest> service = prepareService();
+        final Serviceable<FetchMemberResponse, FetchMemberRequest> service = prepareService();
         final FetchMemberRequest request = new FetchMemberRequest();
         // Just making sure that the account is missing
         assertThat(request.getAccount(), is(nullValue()));
@@ -76,7 +76,7 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
 
     @Test
     public void testFindNotExistingAccount() {
-        final Servicable<FetchMemberResponse, FetchMemberRequest> service = prepareService();
+        final Serviceable<FetchMemberResponse, FetchMemberRequest> service = prepareService();
 
         // Build and send the Request
         final FetchMemberRequest request = buildRequestWithCredentials(Constants.ADMIN_ACCOUNT);
@@ -105,7 +105,7 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
         // Ensure that we have the correct settings for the Service
         settings.set(Settings.EXPOSE_ADMIN, "false");
 
-        final Servicable<FetchMemberResponse, FetchMemberRequest> service = prepareService();
+        final Serviceable<FetchMemberResponse, FetchMemberRequest> service = prepareService();
         final FetchMemberRequest request = buildRequestWithCredentials(Constants.ADMIN_ACCOUNT);
         assertThat(request.validate().isEmpty(), is(true));
         final FetchMemberResponse response = service.perform(request);
@@ -129,7 +129,7 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
         // Ensure that we have the correct settings for the Service
         settings.set(Settings.EXPOSE_ADMIN, "true");
 
-        final Servicable<FetchMemberResponse, FetchMemberRequest> service = prepareService();
+        final Serviceable<FetchMemberResponse, FetchMemberRequest> service = prepareService();
         final FetchMemberRequest request = buildRequestWithCredentials(Constants.ADMIN_ACCOUNT);
         assertThat(request.validate().isEmpty(), is(true));
         final FetchMemberResponse response = service.perform(request);
@@ -153,7 +153,7 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
         // Ensure that we have the correct settings for the Service
         settings.set(Settings.EXPOSE_ADMIN, "false");
 
-        final Servicable<FetchMemberResponse, FetchMemberRequest> service = prepareService();
+        final Serviceable<FetchMemberResponse, FetchMemberRequest> service = prepareService();
         final FetchMemberRequest request = buildRequestWithCredentials("member1");
         assertThat(request.validate().isEmpty(), is(true));
         final FetchMemberResponse response = service.perform(request);
@@ -177,7 +177,7 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
         // Ensure that we have the correct settings for the Service
         settings.set(Settings.EXPOSE_ADMIN, "true");
 
-        final Servicable<FetchMemberResponse, FetchMemberRequest> service = prepareService();
+        final Serviceable<FetchMemberResponse, FetchMemberRequest> service = prepareService();
         final FetchMemberRequest request = buildRequestWithCredentials("member1");
         assertThat(request.validate().isEmpty(), is(true));
         final FetchMemberResponse response = service.perform(request);
@@ -205,7 +205,7 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
         // Ensure that we have the correct settings for the Service
         settings.set(Settings.EXPOSE_ADMIN, "true");
 
-        final Servicable<FetchMemberResponse, FetchMemberRequest> service = prepareService();
+        final Serviceable<FetchMemberResponse, FetchMemberRequest> service = prepareService();
         final FetchMemberRequest request = buildRequestWithCredentials(Constants.ADMIN_ACCOUNT);
         request.setMemberId(ADMIN_ID);
         assertThat(request.validate().isEmpty(), is(true));
@@ -231,7 +231,7 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
         // Ensure that we have the correct settings for the Service
         settings.set(Settings.EXPOSE_ADMIN, "false");
 
-        final Servicable<FetchMemberResponse, FetchMemberRequest> service = prepareService();
+        final Serviceable<FetchMemberResponse, FetchMemberRequest> service = prepareService();
         final FetchMemberRequest request = buildRequestWithCredentials(Constants.ADMIN_ACCOUNT);
         request.setMemberId(ADMIN_ID);
         assertThat(request.validate().isEmpty(), is(true));
@@ -256,7 +256,7 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
         // Ensure that we have the correct settings for the Service
         settings.set(Settings.SHARE_TRUSTEES, "false");
 
-        final Servicable<FetchMemberResponse, FetchMemberRequest> service = prepareService();
+        final Serviceable<FetchMemberResponse, FetchMemberRequest> service = prepareService();
         final MemberEntity member = findFirstMember();
         final FetchMemberRequest request = buildRequestWithCredentials(Constants.ADMIN_ACCOUNT);
         request.setMemberId(member.getExternalId());
@@ -281,7 +281,7 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
         // Ensure that we have the correct settings for the Service
         settings.set(Settings.SHARE_TRUSTEES, "true");
 
-        final Servicable<FetchMemberResponse, FetchMemberRequest> service = prepareService();
+        final Serviceable<FetchMemberResponse, FetchMemberRequest> service = prepareService();
         final MemberEntity member = findFirstMember();
         final FetchMemberRequest request = buildRequestWithCredentials(Constants.ADMIN_ACCOUNT);
         request.setMemberId(member.getExternalId());
@@ -307,7 +307,7 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
         // Ensure that we have the correct settings for the Service
         settings.set(Settings.EXPOSE_ADMIN, "true");
 
-        final Servicable<FetchMemberResponse, FetchMemberRequest> service = prepareService();
+        final Serviceable<FetchMemberResponse, FetchMemberRequest> service = prepareService();
         final MemberEntity member = findFirstMember();
         final FetchMemberRequest request = buildRequestWithCredentials(member.getName());
         request.setMemberId(ADMIN_ID);
@@ -335,7 +335,7 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
         settings.set(Settings.EXPOSE_ADMIN, "false");
 
         prepareCause(AuthorizationException.class, Constants.AUTHORIZATION_WARNING, "Not Authorized to access this information.");
-        final Servicable<FetchMemberResponse, FetchMemberRequest> service = prepareService();
+        final Serviceable<FetchMemberResponse, FetchMemberRequest> service = prepareService();
         final MemberEntity member = findFirstMember();
         final FetchMemberRequest request = buildRequestWithCredentials(member.getName());
         request.setMemberId(ADMIN_ID);
@@ -348,7 +348,7 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
         // Ensure that we have the correct settings for the Service
         settings.set(Settings.SHARE_TRUSTEES, "true");
 
-        final Servicable<FetchMemberResponse, FetchMemberRequest> service = prepareService();
+        final Serviceable<FetchMemberResponse, FetchMemberRequest> service = prepareService();
         final MemberEntity member = findFirstMember();
         final FetchMemberRequest request = buildRequestWithCredentials("member1");
         request.setMemberId(member.getExternalId());
@@ -366,7 +366,7 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
         // Ensure that we have the correct settings for the Service
         settings.set(Settings.SHARE_TRUSTEES, "false");
 
-        final Servicable<FetchMemberResponse, FetchMemberRequest> service = prepareService();
+        final Serviceable<FetchMemberResponse, FetchMemberRequest> service = prepareService();
         final MemberEntity member = findFirstMember();
         final FetchMemberRequest request = buildRequestWithCredentials("member1");
         request.setMemberId(member.getExternalId());
@@ -384,7 +384,7 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
         // Ensure that we have the correct settings for the Service
         settings.set(Settings.SHARE_TRUSTEES, "true");
 
-        final Servicable<FetchMemberResponse, FetchMemberRequest> service = prepareService();
+        final Serviceable<FetchMemberResponse, FetchMemberRequest> service = prepareService();
         final MemberEntity member = findFirstMember();
         final FetchMemberRequest request = buildRequestWithCredentials("member4");
         request.setMemberId(member.getExternalId());
@@ -401,7 +401,7 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
         // Ensure that we have the correct settings for the Service
         settings.set(Settings.SHARE_TRUSTEES, "false");
 
-        final Servicable<FetchMemberResponse, FetchMemberRequest> service = prepareService();
+        final Serviceable<FetchMemberResponse, FetchMemberRequest> service = prepareService();
         final MemberEntity member = findFirstMember();
         final FetchMemberRequest request = buildRequestWithCredentials("member4");
         request.setMemberId(member.getExternalId());
@@ -418,7 +418,7 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
         // Ensure that we have the correct settings for the Service
         settings.set(Settings.SHARE_TRUSTEES, "true");
 
-        final Servicable<FetchMemberResponse, FetchMemberRequest> service = prepareService();
+        final Serviceable<FetchMemberResponse, FetchMemberRequest> service = prepareService();
         final MemberEntity member = findFirstMember();
         final FetchMemberRequest request = buildRequestWithCredentials("member5");
         request.setMemberId(member.getExternalId());
@@ -435,7 +435,7 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
         // Ensure that we have the correct settings for the Service
         settings.set(Settings.SHARE_TRUSTEES, "false");
 
-        final Servicable<FetchMemberResponse, FetchMemberRequest> service = prepareService();
+        final Serviceable<FetchMemberResponse, FetchMemberRequest> service = prepareService();
         final MemberEntity member = findFirstMember();
         final FetchMemberRequest request = buildRequestWithCredentials("member5");
         request.setMemberId(member.getExternalId());
@@ -451,7 +451,7 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
     // Internal Helper Methods
     // =========================================================================
 
-    private Servicable<FetchMemberResponse, FetchMemberRequest> prepareService() {
+    private Serviceable<FetchMemberResponse, FetchMemberRequest> prepareService() {
         return new FetchMemberService(settings, entityManager);
     }
 

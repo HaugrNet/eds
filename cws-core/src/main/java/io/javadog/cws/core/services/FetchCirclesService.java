@@ -16,7 +16,7 @@ import io.javadog.cws.api.requests.FetchCircleRequest;
 import io.javadog.cws.api.responses.FetchCircleResponse;
 import io.javadog.cws.common.Settings;
 import io.javadog.cws.core.Permission;
-import io.javadog.cws.core.Servicable;
+import io.javadog.cws.core.Serviceable;
 import io.javadog.cws.model.entities.CircleEntity;
 import io.javadog.cws.model.entities.MemberEntity;
 import io.javadog.cws.model.entities.TrusteeEntity;
@@ -30,7 +30,7 @@ import java.util.Objects;
  * @author Kim Jensen
  * @since  CWS 1.0
  */
-public final class FetchCirclesService extends Servicable<FetchCircleResponse, FetchCircleRequest> {
+public final class FetchCirclesService extends Serviceable<FetchCircleResponse, FetchCircleRequest> {
 
     public FetchCirclesService(final Settings settings, final EntityManager entityManager) {
         super(settings, entityManager);

@@ -35,7 +35,7 @@ import java.util.UUID;
  * @author Kim Jensen
  * @since  CWS 1.0
  */
-public abstract class Servicable<R extends CWSResponse, V extends Authentication> {
+public abstract class Serviceable<R extends CWSResponse, V extends Authentication> {
 
     protected final Settings settings;
     protected final CommonDao dao;
@@ -44,7 +44,7 @@ public abstract class Servicable<R extends CWSResponse, V extends Authentication
     protected MemberEntity member;
     protected KeyPair keyPair;
 
-    protected Servicable(final Settings settings, final EntityManager entityManager) {
+    protected Serviceable(final Settings settings, final EntityManager entityManager) {
         this.dao = new CommonJpaDao(entityManager);
         this.crypto = new Crypto(settings);
         this.settings = settings;

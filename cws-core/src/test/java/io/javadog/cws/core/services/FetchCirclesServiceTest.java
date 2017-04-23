@@ -18,7 +18,7 @@ import io.javadog.cws.api.requests.FetchCircleRequest;
 import io.javadog.cws.api.responses.FetchCircleResponse;
 import io.javadog.cws.common.Settings;
 import io.javadog.cws.common.exceptions.VerificationException;
-import io.javadog.cws.core.Servicable;
+import io.javadog.cws.core.Serviceable;
 import io.javadog.cws.model.DatabaseSetup;
 import io.javadog.cws.model.entities.CircleEntity;
 import org.junit.Test;
@@ -37,7 +37,7 @@ public final class FetchCirclesServiceTest extends DatabaseSetup {
                 "Request Object contained errors: Key: credentialTypeError: CredentialType is missing, null or invalid.\n" +
                         "Key: credentialError: Credential is missing, null or invalid.\n" +
                         "Key: accountError: Account is missing, null or invalid.\n");
-        final Servicable<FetchCircleResponse, FetchCircleRequest> service = prepareService();
+        final Serviceable<FetchCircleResponse, FetchCircleRequest> service = prepareService();
         final FetchCircleRequest request = new FetchCircleRequest();
         // Just making sure that the account is missing
         assertThat(request.getAccount(), is(nullValue()));
@@ -48,7 +48,7 @@ public final class FetchCirclesServiceTest extends DatabaseSetup {
 
     @Test
     public void testFetchNotExistingCircle() {
-        final Servicable<FetchCircleResponse, FetchCircleRequest> service = prepareService();
+        final Serviceable<FetchCircleResponse, FetchCircleRequest> service = prepareService();
         final FetchCircleRequest request = buildRequestWithCredentials(Constants.ADMIN_ACCOUNT);
         request.setCircleId(UUID.randomUUID().toString());
         final FetchCircleResponse response = service.perform(request);
@@ -62,7 +62,7 @@ public final class FetchCirclesServiceTest extends DatabaseSetup {
 
     @Test
     public void testFetchAllCirclesAsAdmin() {
-        final Servicable<FetchCircleResponse, FetchCircleRequest> service = prepareService();
+        final Serviceable<FetchCircleResponse, FetchCircleRequest> service = prepareService();
         final FetchCircleRequest request = buildRequestWithCredentials(Constants.ADMIN_ACCOUNT);
         final FetchCircleResponse response = service.perform(request);
 
@@ -79,7 +79,7 @@ public final class FetchCirclesServiceTest extends DatabaseSetup {
 
     @Test
     public void testFetchAllCirclesAsMember1() {
-        final Servicable<FetchCircleResponse, FetchCircleRequest> service = prepareService();
+        final Serviceable<FetchCircleResponse, FetchCircleRequest> service = prepareService();
         final FetchCircleRequest request = buildRequestWithCredentials("member1");
         final FetchCircleResponse response = service.perform(request);
 
@@ -99,7 +99,7 @@ public final class FetchCirclesServiceTest extends DatabaseSetup {
         // Ensure that we have the correct settings for the Service
         settings.set(Settings.SHARE_TRUSTEES, "true");
 
-        final Servicable<FetchCircleResponse, FetchCircleRequest> service = prepareService();
+        final Serviceable<FetchCircleResponse, FetchCircleRequest> service = prepareService();
         final CircleEntity circle = findFirstCircle();
         final FetchCircleRequest request = buildRequestWithCredentials(Constants.ADMIN_ACCOUNT);
         request.setCircleId(circle.getExternalId());
@@ -121,7 +121,7 @@ public final class FetchCirclesServiceTest extends DatabaseSetup {
         // Ensure that we have the correct settings for the Service
         settings.set(Settings.SHARE_TRUSTEES, "false");
 
-        final Servicable<FetchCircleResponse, FetchCircleRequest> service = prepareService();
+        final Serviceable<FetchCircleResponse, FetchCircleRequest> service = prepareService();
         final CircleEntity circle = findFirstCircle();
         final FetchCircleRequest request = buildRequestWithCredentials(Constants.ADMIN_ACCOUNT);
         request.setCircleId(circle.getExternalId());
@@ -143,7 +143,7 @@ public final class FetchCirclesServiceTest extends DatabaseSetup {
         // Ensure that we have the correct settings for the Service
         settings.set(Settings.SHARE_TRUSTEES, "true");
 
-        final Servicable<FetchCircleResponse, FetchCircleRequest> service = prepareService();
+        final Serviceable<FetchCircleResponse, FetchCircleRequest> service = prepareService();
         final CircleEntity circle = findFirstCircle();
         final FetchCircleRequest request = buildRequestWithCredentials("member1");
         request.setCircleId(circle.getExternalId());
@@ -165,7 +165,7 @@ public final class FetchCirclesServiceTest extends DatabaseSetup {
         // Ensure that we have the correct settings for the Service
         settings.set(Settings.SHARE_TRUSTEES, "false");
 
-        final Servicable<FetchCircleResponse, FetchCircleRequest> service = prepareService();
+        final Serviceable<FetchCircleResponse, FetchCircleRequest> service = prepareService();
         final CircleEntity circle = findFirstCircle();
         final FetchCircleRequest request = buildRequestWithCredentials("member1");
         request.setCircleId(circle.getExternalId());
@@ -187,7 +187,7 @@ public final class FetchCirclesServiceTest extends DatabaseSetup {
         // Ensure that we have the correct settings for the Service
         settings.set(Settings.SHARE_TRUSTEES, "true");
 
-        final Servicable<FetchCircleResponse, FetchCircleRequest> service = prepareService();
+        final Serviceable<FetchCircleResponse, FetchCircleRequest> service = prepareService();
         final CircleEntity circle = findFirstCircle();
         final FetchCircleRequest request = buildRequestWithCredentials("member5");
         request.setCircleId(circle.getExternalId());
@@ -209,7 +209,7 @@ public final class FetchCirclesServiceTest extends DatabaseSetup {
         // Ensure that we have the correct settings for the Service
         settings.set(Settings.SHARE_TRUSTEES, "false");
 
-        final Servicable<FetchCircleResponse, FetchCircleRequest> service = prepareService();
+        final Serviceable<FetchCircleResponse, FetchCircleRequest> service = prepareService();
         final CircleEntity circle = findFirstCircle();
         final FetchCircleRequest request = buildRequestWithCredentials("member5");
         request.setCircleId(circle.getExternalId());
@@ -227,7 +227,7 @@ public final class FetchCirclesServiceTest extends DatabaseSetup {
     // Internal Helper Methods
     // =========================================================================
 
-    private Servicable<FetchCircleResponse, FetchCircleRequest> prepareService() {
+    private Serviceable<FetchCircleResponse, FetchCircleRequest> prepareService() {
         return new FetchCirclesService(settings, entityManager);
     }
 

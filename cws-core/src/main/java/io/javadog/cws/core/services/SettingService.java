@@ -14,7 +14,7 @@ import io.javadog.cws.common.Crypto;
 import io.javadog.cws.common.Settings;
 import io.javadog.cws.common.exceptions.CWSException;
 import io.javadog.cws.core.Permission;
-import io.javadog.cws.core.Servicable;
+import io.javadog.cws.core.Serviceable;
 import io.javadog.cws.model.entities.MemberEntity;
 import io.javadog.cws.model.entities.SettingEntity;
 
@@ -43,7 +43,7 @@ import java.util.UUID;
  * @author Kim Jensen
  * @since  CWS 1.0
  */
-public final class SettingService extends Servicable<SettingResponse, SettingRequest> {
+public final class SettingService extends Serviceable<SettingResponse, SettingRequest> {
 
     public SettingService(final Settings settings, final EntityManager entityManager) {
         super(settings, entityManager);

@@ -13,7 +13,7 @@ import io.javadog.cws.api.responses.FetchObjectTypeResponse;
 import io.javadog.cws.common.Settings;
 import io.javadog.cws.common.exceptions.CWSException;
 import io.javadog.cws.core.Permission;
-import io.javadog.cws.core.Servicable;
+import io.javadog.cws.core.Serviceable;
 
 import javax.persistence.EntityManager;
 
@@ -21,7 +21,7 @@ import javax.persistence.EntityManager;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-public final class FetchObjectTypeService extends Servicable<FetchObjectTypeResponse, FetchObjectTypeRequest> {
+public final class FetchObjectTypeService extends Serviceable<FetchObjectTypeResponse, FetchObjectTypeRequest> {
 
     public FetchObjectTypeService(final Settings settings, final EntityManager entityManager) {
         super(settings, entityManager);

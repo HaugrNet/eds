@@ -22,7 +22,7 @@ import io.javadog.cws.api.responses.SettingResponse;
 import io.javadog.cws.api.responses.VersionResponse;
 import io.javadog.cws.common.Settings;
 import io.javadog.cws.common.exceptions.CWSException;
-import io.javadog.cws.core.Servicable;
+import io.javadog.cws.core.Serviceable;
 import io.javadog.cws.core.services.FetchCirclesService;
 import io.javadog.cws.core.services.FetchMemberService;
 import io.javadog.cws.core.services.ProcessCircleService;
@@ -86,7 +86,7 @@ public class SystemBean implements System {
         SettingResponse response;
 
         try {
-            final Servicable<SettingResponse, SettingRequest> service = new SettingService(settings, entityManager);
+            final Serviceable<SettingResponse, SettingRequest> service = new SettingService(settings, entityManager);
             response = service.perform(request);
         } catch (CWSException e) {
             // Any Warning or Error thrown by the CWS contain enough information
@@ -109,7 +109,7 @@ public class SystemBean implements System {
         FetchMemberResponse response;
 
         try {
-            final Servicable<FetchMemberResponse, FetchMemberRequest> service = new FetchMemberService(settings, entityManager);
+            final Serviceable<FetchMemberResponse, FetchMemberRequest> service = new FetchMemberService(settings, entityManager);
             response = service.perform(request);
         } catch (CWSException e) {
             // Any Warning or Error thrown by the CWS contain enough information
@@ -132,7 +132,7 @@ public class SystemBean implements System {
         ProcessMemberResponse response;
 
         try {
-            final Servicable<ProcessMemberResponse, ProcessMemberRequest> service = new ProcessMemberService(settings, entityManager);
+            final Serviceable<ProcessMemberResponse, ProcessMemberRequest> service = new ProcessMemberService(settings, entityManager);
             response = service.perform(request);
         } catch (CWSException e) {
             // Any Warning or Error thrown by the CWS contain enough information
@@ -155,7 +155,7 @@ public class SystemBean implements System {
         FetchCircleResponse response;
 
         try {
-            final Servicable<FetchCircleResponse, FetchCircleRequest> service = new FetchCirclesService(settings, entityManager);
+            final Serviceable<FetchCircleResponse, FetchCircleRequest> service = new FetchCirclesService(settings, entityManager);
             response = service.perform(request);
         } catch (CWSException e) {
             // Any Warning or Error thrown by the CWS contain enough information
@@ -178,7 +178,7 @@ public class SystemBean implements System {
         ProcessCircleResponse response;
 
         try {
-            final Servicable<ProcessCircleResponse, ProcessCircleRequest> service = new ProcessCircleService(settings, entityManager);
+            final Serviceable<ProcessCircleResponse, ProcessCircleRequest> service = new ProcessCircleService(settings, entityManager);
             response = service.perform(request);
         } catch (CWSException e) {
             // Any Warning or Error thrown by the CWS contain enough information

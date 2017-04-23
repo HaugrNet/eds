@@ -17,7 +17,7 @@ import io.javadog.cws.api.common.CredentialType;
 import io.javadog.cws.api.requests.FetchCircleRequest;
 import io.javadog.cws.api.responses.FetchCircleResponse;
 import io.javadog.cws.common.Settings;
-import io.javadog.cws.common.exceptions.ModelException;
+import io.javadog.cws.common.exceptions.CWSException;
 import io.javadog.cws.common.exceptions.VerificationException;
 import io.javadog.cws.core.Servicable;
 import io.javadog.cws.model.DatabaseSetup;
@@ -51,10 +51,7 @@ public final class FetchCirclesServiceTest extends DatabaseSetup {
         final Servicable<FetchCircleResponse, FetchCircleRequest> service = prepareService();
         createTwoCircleWith5Members();
 
-        final FetchCircleRequest request = new FetchCircleRequest();
-        request.setAccount(Constants.ADMIN_ACCOUNT);
-        request.setCredentialType(CredentialType.PASSPHRASE);
-        request.setCredential(Constants.ADMIN_ACCOUNT.toCharArray());
+        final FetchCircleRequest request = buildRequestWithCredentials(Constants.ADMIN_ACCOUNT);
         final FetchCircleResponse response = service.perform(request);
 
         assertThat(response, is(not(nullValue())));
@@ -62,9 +59,9 @@ public final class FetchCirclesServiceTest extends DatabaseSetup {
         assertThat(response.getReturnCode(), is(Constants.SUCCESS));
         assertThat(response.getReturnMessage(), is("Ok"));
         assertThat(response.getCircles().size(), is(2));
-        assertThat(response.getTrustees().size(), is(0));
         assertThat(response.getCircles().get(0).getName(), is("circle1"));
         assertThat(response.getCircles().get(1).getName(), is("circle2"));
+        assertThat(response.getTrustees().isEmpty(), is(true));
     }
 
     @Test
@@ -72,10 +69,7 @@ public final class FetchCirclesServiceTest extends DatabaseSetup {
         final Servicable<FetchCircleResponse, FetchCircleRequest> service = prepareService();
         createTwoCircleWith5Members();
 
-        final FetchCircleRequest request = new FetchCircleRequest();
-        request.setAccount("member1");
-        request.setCredentialType(CredentialType.PASSPHRASE);
-        request.setCredential("member1".toCharArray());
+        final FetchCircleRequest request = buildRequestWithCredentials("member1");
         final FetchCircleResponse response = service.perform(request);
 
         assertThat(response, is(not(nullValue())));
@@ -83,9 +77,9 @@ public final class FetchCirclesServiceTest extends DatabaseSetup {
         assertThat(response.getReturnCode(), is(Constants.SUCCESS));
         assertThat(response.getReturnMessage(), is("Ok"));
         assertThat(response.getCircles().size(), is(2));
-        assertThat(response.getTrustees().size(), is(0));
         assertThat(response.getCircles().get(0).getName(), is("circle1"));
         assertThat(response.getCircles().get(1).getName(), is("circle2"));
+        assertThat(response.getTrustees().isEmpty(), is(true));
     }
 
     @Test
@@ -96,10 +90,7 @@ public final class FetchCirclesServiceTest extends DatabaseSetup {
         // Ensure that we have the correct settings for the Service
         settings.set(Settings.SHOW_OTHER_MEMBER_INFORMATION, "true");
 
-        final FetchCircleRequest request = new FetchCircleRequest();
-        request.setAccount(Constants.ADMIN_ACCOUNT);
-        request.setCredentialType(CredentialType.PASSPHRASE);
-        request.setCredential(Constants.ADMIN_ACCOUNT.toCharArray());
+        final FetchCircleRequest request = buildRequestWithCredentials(Constants.ADMIN_ACCOUNT);
         request.setCircleId(circle.getExternalId());
         final FetchCircleResponse response = service.perform(request);
 
@@ -123,10 +114,7 @@ public final class FetchCirclesServiceTest extends DatabaseSetup {
         // Ensure that we have the correct settings for the Service
         settings.set(Settings.SHOW_OTHER_MEMBER_INFORMATION, "false");
 
-        final FetchCircleRequest request = new FetchCircleRequest();
-        request.setAccount(Constants.ADMIN_ACCOUNT);
-        request.setCredentialType(CredentialType.PASSPHRASE);
-        request.setCredential(Constants.ADMIN_ACCOUNT.toCharArray());
+        final FetchCircleRequest request = buildRequestWithCredentials(Constants.ADMIN_ACCOUNT);
         request.setCircleId(circle.getExternalId());
         final FetchCircleResponse response = service.perform(request);
 
@@ -150,10 +138,7 @@ public final class FetchCirclesServiceTest extends DatabaseSetup {
         // Ensure that we have the correct settings for the Service
         settings.set(Settings.SHOW_OTHER_MEMBER_INFORMATION, "true");
 
-        final FetchCircleRequest request = new FetchCircleRequest();
-        request.setAccount("member1");
-        request.setCredentialType(CredentialType.PASSPHRASE);
-        request.setCredential("member1".toCharArray());
+        final FetchCircleRequest request = buildRequestWithCredentials("member1");
         request.setCircleId(circle.getExternalId());
         final FetchCircleResponse response = service.perform(request);
 
@@ -177,10 +162,7 @@ public final class FetchCirclesServiceTest extends DatabaseSetup {
         // Ensure that we have the correct settings for the Service
         settings.set(Settings.SHOW_OTHER_MEMBER_INFORMATION, "false");
 
-        final FetchCircleRequest request = new FetchCircleRequest();
-        request.setAccount("member1");
-        request.setCredentialType(CredentialType.PASSPHRASE);
-        request.setCredential("member1".toCharArray());
+        final FetchCircleRequest request = buildRequestWithCredentials("member1");
         request.setCircleId(circle.getExternalId());
         final FetchCircleResponse response = service.perform(request);
 
@@ -204,10 +186,7 @@ public final class FetchCirclesServiceTest extends DatabaseSetup {
         // Ensure that we have the correct settings for the Service
         settings.set(Settings.SHOW_OTHER_MEMBER_INFORMATION, "true");
 
-        final FetchCircleRequest request = new FetchCircleRequest();
-        request.setAccount("member5");
-        request.setCredentialType(CredentialType.PASSPHRASE);
-        request.setCredential("member5".toCharArray());
+        final FetchCircleRequest request = buildRequestWithCredentials("member5");
         request.setCircleId(circle.getExternalId());
         final FetchCircleResponse response = service.perform(request);
 
@@ -225,30 +204,34 @@ public final class FetchCirclesServiceTest extends DatabaseSetup {
 
     @Test
     public void testFetchCircle1WithShowFalseAsMember5() {
+        prepareCause(CWSException.class, Constants.AUTHORIZATION_WARNING, "Circle either does not exist or Member is not Authorized to access it.");
         final Servicable<FetchCircleResponse, FetchCircleRequest> service = prepareService();
         final CircleEntity circle = createTwoCircleWith5Members();
 
         // Ensure that we have the correct settings for the Service
         settings.set(Settings.SHOW_OTHER_MEMBER_INFORMATION, "false");
 
-        final FetchCircleRequest request = new FetchCircleRequest();
-        request.setAccount("member1");
-        request.setCredentialType(CredentialType.PASSPHRASE);
-        request.setCredential("member1".toCharArray());
+        final FetchCircleRequest request = buildRequestWithCredentials("member5");
         request.setCircleId(circle.getExternalId());
-        final FetchCircleResponse response = service.perform(request);
-
-        assertThat(response, is(not(nullValue())));
-        assertThat(response.getReturnCode(), is(Constants.SUCCESS));
-        assertThat(response.getReturnMessage(), is("Ok"));
-        assertThat(response.getCircles().size(), is(1));
-        assertThat(response.getCircles().get(0).getName(), is("circle1"));
-        assertThat(response.getTrustees().size(), is(0));
+        assertThat(request.getAccount(), is(not(nullValue())));
+        service.perform(request);
     }
-o
+
+    // =========================================================================
+    // Internal Helper Methods
+    // =========================================================================
+
     private Servicable<FetchCircleResponse, FetchCircleRequest> prepareService() {
-        final Settings settings = new Settings();
         return new FetchCirclesService(settings, entityManager);
+    }
+
+    private static FetchCircleRequest buildRequestWithCredentials(final String account) {
+        final FetchCircleRequest request = new FetchCircleRequest();
+        request.setAccount(account);
+        request.setCredentialType(CredentialType.PASSPHRASE);
+        request.setCredential(account.toCharArray());
+
+        return request;
     }
 
     private CircleEntity createTwoCircleWith5Members() {

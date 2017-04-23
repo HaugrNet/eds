@@ -88,16 +88,16 @@ public final class FetchCirclesService extends Servicable<FetchCircleResponse, F
      * @return List of Trustees for the given Circle, or empty List
      */
     private List<TrusteeEntity> findTrusteeByCircle(final CircleEntity circle) {
-        final List<TrusteeEntity> trustees = new ArrayList<>(0);
+        final List<TrusteeEntity> found = new ArrayList<>(0);
 
         for (final TrusteeEntity trusteeEntity : trustees) {
             if (Objects.equals(trusteeEntity.getCircle().getId(), circle.getId())) {
-                trustees.addAll(dao.findTrusteesByCircle(circle));
+                found.addAll(dao.findTrusteesByCircle(circle));
                 break;
             }
         }
 
-        return trustees;
+        return found;
     }
 
     private static List<Trustee> convertTrustees(final List<TrusteeEntity> entities) {

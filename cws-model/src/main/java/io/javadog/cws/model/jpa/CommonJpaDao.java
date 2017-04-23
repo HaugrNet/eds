@@ -114,7 +114,7 @@ public final class CommonJpaDao implements CommonDao {
         final Query query = entityManager.createNamedQuery("circle.findByExternalId");
         query.setParameter("eid", externalId);
 
-        return findUniqueRecord(query, "Circle", externalId);
+        return findSingleRecord(query);
     }
 
     /**
@@ -183,6 +183,12 @@ public final class CommonJpaDao implements CommonDao {
         }
 
         return list;
+    }
+
+    private static <E> E findSingleRecord(final Query query) {
+        final List<E> found = query.getResultList();
+
+        return found.size() >= 1 ? found.get(0) : null;
     }
 
     private static <E> E findUniqueRecord(final Query query, final String entityName, final String keyName) {

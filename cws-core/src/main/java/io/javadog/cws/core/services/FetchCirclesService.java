@@ -74,7 +74,7 @@ public final class FetchCirclesService extends Servicable<FetchCircleResponse, F
                 response.setCircles(circles);
             } else {
                 response.setReturnCode(Constants.IDENTIFICATION_WARNING);
-                response.setReturnMessage("No Circle exist with the Id '" + request.getCircleId() + '\'');
+                response.setReturnMessage("The requested Circle cannot be found.");
             }
         } else {
             final List<CircleEntity> circles = dao.findAllCircles();

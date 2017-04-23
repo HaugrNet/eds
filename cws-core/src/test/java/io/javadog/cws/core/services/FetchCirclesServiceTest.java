@@ -23,6 +23,8 @@ import io.javadog.cws.model.DatabaseSetup;
 import io.javadog.cws.model.entities.CircleEntity;
 import org.junit.Test;
 
+import java.util.UUID;
+
 /**
  * @author Kim Jensen
  * @since  CWS 1.0
@@ -42,6 +44,20 @@ public final class FetchCirclesServiceTest extends DatabaseSetup {
 
         // Should throw a VerificationException, as the request is invalid.
         service.perform(request);
+    }
+
+    @Test
+    public void testFetchNotExistingCircle() {
+        final Servicable<FetchCircleResponse, FetchCircleRequest> service = prepareService();
+        final FetchCircleRequest request = buildRequestWithCredentials(Constants.ADMIN_ACCOUNT);
+        request.setCircleId(UUID.randomUUID().toString());
+        final FetchCircleResponse response = service.perform(request);
+
+        // Verify that we have found the correct data
+        assertThat(response, is(not(nullValue())));
+        assertThat(response.isOk(), is(false));
+        assertThat(response.getReturnCode(), is(Constants.IDENTIFICATION_WARNING));
+        assertThat(response.getReturnMessage(), is("The requested Circle cannot be found."));
     }
 
     @Test

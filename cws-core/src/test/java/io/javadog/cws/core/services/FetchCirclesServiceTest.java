@@ -17,7 +17,6 @@ import io.javadog.cws.api.common.CredentialType;
 import io.javadog.cws.api.requests.FetchCircleRequest;
 import io.javadog.cws.api.responses.FetchCircleResponse;
 import io.javadog.cws.common.Settings;
-import io.javadog.cws.common.exceptions.CWSException;
 import io.javadog.cws.common.exceptions.VerificationException;
 import io.javadog.cws.core.Servicable;
 import io.javadog.cws.model.DatabaseSetup;
@@ -82,7 +81,7 @@ public final class FetchCirclesServiceTest extends DatabaseSetup {
     @Test
     public void testFetchCircle1WithShowTrueAsAdmin() {
         // Ensure that we have the correct settings for the Service
-        settings.set(Settings.SHOW_OTHER_MEMBER_INFORMATION, "true");
+        settings.set(Settings.SHARE_TRUSTEES, "true");
 
         final Servicable<FetchCircleResponse, FetchCircleRequest> service = prepareService();
         final CircleEntity circle = findFirstCircle();
@@ -104,7 +103,7 @@ public final class FetchCirclesServiceTest extends DatabaseSetup {
     @Test
     public void testFetchCircle1WithShowFalseAsAdmin() {
         // Ensure that we have the correct settings for the Service
-        settings.set(Settings.SHOW_OTHER_MEMBER_INFORMATION, "false");
+        settings.set(Settings.SHARE_TRUSTEES, "false");
 
         final Servicable<FetchCircleResponse, FetchCircleRequest> service = prepareService();
         final CircleEntity circle = findFirstCircle();
@@ -126,7 +125,7 @@ public final class FetchCirclesServiceTest extends DatabaseSetup {
     @Test
     public void testFetchCircle1WithShowTrueAsMember1() {
         // Ensure that we have the correct settings for the Service
-        settings.set(Settings.SHOW_OTHER_MEMBER_INFORMATION, "true");
+        settings.set(Settings.SHARE_TRUSTEES, "true");
 
         final Servicable<FetchCircleResponse, FetchCircleRequest> service = prepareService();
         final CircleEntity circle = findFirstCircle();
@@ -148,7 +147,7 @@ public final class FetchCirclesServiceTest extends DatabaseSetup {
     @Test
     public void testFetchCircle1WithShowFalseAsMember1() {
         // Ensure that we have the correct settings for the Service
-        settings.set(Settings.SHOW_OTHER_MEMBER_INFORMATION, "false");
+        settings.set(Settings.SHARE_TRUSTEES, "false");
 
         final Servicable<FetchCircleResponse, FetchCircleRequest> service = prepareService();
         final CircleEntity circle = findFirstCircle();
@@ -170,7 +169,7 @@ public final class FetchCirclesServiceTest extends DatabaseSetup {
     @Test
     public void testFetchCircle1WithShowTrueAsMember5() {
         // Ensure that we have the correct settings for the Service
-        settings.set(Settings.SHOW_OTHER_MEMBER_INFORMATION, "true");
+        settings.set(Settings.SHARE_TRUSTEES, "true");
 
         final Servicable<FetchCircleResponse, FetchCircleRequest> service = prepareService();
         final CircleEntity circle = findFirstCircle();
@@ -192,15 +191,20 @@ public final class FetchCirclesServiceTest extends DatabaseSetup {
     @Test
     public void testFetchCircle1WithShowFalseAsMember5() {
         // Ensure that we have the correct settings for the Service
-        settings.set(Settings.SHOW_OTHER_MEMBER_INFORMATION, "false");
+        settings.set(Settings.SHARE_TRUSTEES, "false");
 
-        prepareCause(CWSException.class, Constants.AUTHORIZATION_WARNING, "Circle either does not exist or Member is not Authorized to access it.");
         final Servicable<FetchCircleResponse, FetchCircleRequest> service = prepareService();
         final CircleEntity circle = findFirstCircle();
         final FetchCircleRequest request = buildRequestWithCredentials("member5");
         request.setCircleId(circle.getExternalId());
-        assertThat(request.getAccount(), is(not(nullValue())));
-        service.perform(request);
+        final FetchCircleResponse response = service.perform(request);
+
+        assertThat(response, is(not(nullValue())));
+        assertThat(response.getReturnCode(), is(Constants.SUCCESS));
+        assertThat(response.getReturnMessage(), is("Ok"));
+        assertThat(response.getCircles().size(), is(1));
+        assertThat(response.getCircles().get(0).getName(), is("circle1"));
+        assertThat(response.getTrustees().isEmpty(), is(true));
     }
 
     // =========================================================================

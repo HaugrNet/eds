@@ -95,7 +95,7 @@ INSERT INTO settings (name, setting, modifiable) VALUES ('cws.expose.admin', 'fa
 -- if not, then this setting apply. By default, it is set to True - as CWS
 -- should be used by organizations or companies where all members already share
 -- information.
-INSERT INTO settings (name, setting, modifiable) VALUES ('cws.show.other.member.information', 'true', true);
+INSERT INTO settings (name, setting, modifiable) VALUES ('cws.share.trustees', 'true', true);
 
 
 -- =============================================================================

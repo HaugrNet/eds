@@ -102,16 +102,16 @@ public final class SettingsTest {
     @Test
     public void testShowOtherMemberInformation() {
         final Settings settings = new Settings();
-        assertThat(settings.getShowOtherMemberInformation(), is(true));
-        settings.set(Settings.SHOW_OTHER_MEMBER_INFORMATION, "false");
-        assertThat(settings.getShowOtherMemberInformation(), is(false));
-        settings.set(Settings.SHOW_OTHER_MEMBER_INFORMATION, "true");
-        assertThat(settings.getShowOtherMemberInformation(), is(true));
-        settings.set(Settings.SHOW_OTHER_MEMBER_INFORMATION, " true ");
-        assertThat(settings.getShowOtherMemberInformation(), is(true));
-        settings.set(Settings.SHOW_OTHER_MEMBER_INFORMATION, "");
-        assertThat(settings.getShowOtherMemberInformation(), is(false));
-        settings.set(Settings.SHOW_OTHER_MEMBER_INFORMATION, " what ");
-        assertThat(settings.getShowOtherMemberInformation(), is(false));
+        assertThat(settings.getShareTrustees(), is(true));
+        settings.set(Settings.SHARE_TRUSTEES, "false");
+        assertThat(settings.getShareTrustees(), is(false));
+        settings.set(Settings.SHARE_TRUSTEES, "true");
+        assertThat(settings.getShareTrustees(), is(true));
+        settings.set(Settings.SHARE_TRUSTEES, " true ");
+        assertThat(settings.getShareTrustees(), is(true));
+        settings.set(Settings.SHARE_TRUSTEES, "");
+        assertThat(settings.getShareTrustees(), is(false));
+        settings.set(Settings.SHARE_TRUSTEES, " what ");
+        assertThat(settings.getShareTrustees(), is(false));
     }
 }

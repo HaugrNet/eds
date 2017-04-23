@@ -254,7 +254,7 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
     @Test
     public void testFindMember1WithShowOtherFalseAsAdmin() {
         // Ensure that we have the correct settings for the Service
-        settings.set(Settings.SHOW_OTHER_MEMBER_INFORMATION, "false");
+        settings.set(Settings.SHARE_TRUSTEES, "false");
 
         final Servicable<FetchMemberResponse, FetchMemberRequest> service = prepareService();
         final MemberEntity member = findFirstMember();
@@ -279,7 +279,7 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
     @Test
     public void testFindMember1WithShowOtherTrueAsAdmin() {
         // Ensure that we have the correct settings for the Service
-        settings.set(Settings.SHOW_OTHER_MEMBER_INFORMATION, "true");
+        settings.set(Settings.SHARE_TRUSTEES, "true");
 
         final Servicable<FetchMemberResponse, FetchMemberRequest> service = prepareService();
         final MemberEntity member = findFirstMember();
@@ -346,7 +346,7 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
     @Test
     public void testFindMember1WithShowOtherTrueAsMember1() {
         // Ensure that we have the correct settings for the Service
-        settings.set(Settings.SHOW_OTHER_MEMBER_INFORMATION, "true");
+        settings.set(Settings.SHARE_TRUSTEES, "true");
 
         final Servicable<FetchMemberResponse, FetchMemberRequest> service = prepareService();
         final MemberEntity member = findFirstMember();
@@ -364,7 +364,7 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
     @Test
     public void testFindMember1WithShowOtherFalseAsMember1() {
         // Ensure that we have the correct settings for the Service
-        settings.set(Settings.SHOW_OTHER_MEMBER_INFORMATION, "false");
+        settings.set(Settings.SHARE_TRUSTEES, "false");
 
         final Servicable<FetchMemberResponse, FetchMemberRequest> service = prepareService();
         final MemberEntity member = findFirstMember();
@@ -382,7 +382,7 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
     @Test
     public void testFindMember1WithShowOtherTrueAsMember4() {
         // Ensure that we have the correct settings for the Service
-        settings.set(Settings.SHOW_OTHER_MEMBER_INFORMATION, "true");
+        settings.set(Settings.SHARE_TRUSTEES, "true");
 
         final Servicable<FetchMemberResponse, FetchMemberRequest> service = prepareService();
         final MemberEntity member = findFirstMember();
@@ -399,7 +399,7 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
     @Test
     public void testFindMember1WithShowOtherFalseAsMember4() {
         // Ensure that we have the correct settings for the Service
-        settings.set(Settings.SHOW_OTHER_MEMBER_INFORMATION, "false");
+        settings.set(Settings.SHARE_TRUSTEES, "false");
 
         final Servicable<FetchMemberResponse, FetchMemberRequest> service = prepareService();
         final MemberEntity member = findFirstMember();
@@ -416,7 +416,7 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
     @Test
     public void testFindMember1WithShowOtherTrueAsMember5() {
         // Ensure that we have the correct settings for the Service
-        settings.set(Settings.SHOW_OTHER_MEMBER_INFORMATION, "true");
+        settings.set(Settings.SHARE_TRUSTEES, "true");
 
         final Servicable<FetchMemberResponse, FetchMemberRequest> service = prepareService();
         final MemberEntity member = findFirstMember();
@@ -433,7 +433,7 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
     @Test
     public void testFindMember1WithShowOtherFalseAsMember5() {
         // Ensure that we have the correct settings for the Service
-        settings.set(Settings.SHOW_OTHER_MEMBER_INFORMATION, "false");
+        settings.set(Settings.SHARE_TRUSTEES, "false");
 
         final Servicable<FetchMemberResponse, FetchMemberRequest> service = prepareService();
         final MemberEntity member = findFirstMember();

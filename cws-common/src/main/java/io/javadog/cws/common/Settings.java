@@ -44,7 +44,7 @@ public final class Settings {
     public static final String CWS_SALT = "cws.system.salt";
     public static final String CWS_CHARSET = "cws.system.charset";
     public static final String EXPOSE_ADMIN = "cws.expose.admin";
-    public static final String SHOW_OTHER_MEMBER_INFORMATION = "cws.show.other.member.information";
+    public static final String SHARE_TRUSTEES = "cws.share.trustees";
 
     private static final String DEFAULT_SYMMETRIC_ALGORITHM_NAME = "AES";
     private static final String DEFAULT_SYMMETRIC_CIPHER_MODE = "CBC";
@@ -56,7 +56,7 @@ public final class Settings {
     private static final String DEFAULT_SALT = "Default Salt, please make sure it is set in the DB instead.";
     private static final String DEFAULT_CHARSETNAME = "UTF-8";
     private static final String DEFAULT_EXPOSE_ADMIN = "false";
-    private static final String DEFAULT_SHOW_OTHER_MEMBER_INFORMATION = "true";
+    private static final String DEFAULT_SHARE_TRUSTEES = "true";
 
     private final Properties properties = new Properties();
 
@@ -71,7 +71,7 @@ public final class Settings {
         properties.setProperty(CWS_SALT, DEFAULT_SALT);
         properties.setProperty(CWS_CHARSET, DEFAULT_CHARSETNAME);
         properties.setProperty(EXPOSE_ADMIN, DEFAULT_EXPOSE_ADMIN);
-        properties.setProperty(SHOW_OTHER_MEMBER_INFORMATION, DEFAULT_SHOW_OTHER_MEMBER_INFORMATION);
+        properties.setProperty(SHARE_TRUSTEES, DEFAULT_SHARE_TRUSTEES);
     }
 
     public void set(final String key, final String value) {
@@ -136,8 +136,8 @@ public final class Settings {
         return toBoolean(properties.getProperty(EXPOSE_ADMIN), DEFAULT_EXPOSE_ADMIN);
     }
 
-    public Boolean getShowOtherMemberInformation() {
-        return toBoolean(properties.getProperty(SHOW_OTHER_MEMBER_INFORMATION), DEFAULT_SHOW_OTHER_MEMBER_INFORMATION);
+    public Boolean getShareTrustees() {
+        return toBoolean(properties.getProperty(SHARE_TRUSTEES), DEFAULT_SHARE_TRUSTEES);
     }
 
     private static int toInt(final String value) {

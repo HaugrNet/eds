@@ -15,7 +15,6 @@ import io.javadog.cws.api.dtos.Trustee;
 import io.javadog.cws.api.requests.FetchCircleRequest;
 import io.javadog.cws.api.responses.FetchCircleResponse;
 import io.javadog.cws.common.Settings;
-import io.javadog.cws.common.exceptions.CWSException;
 import io.javadog.cws.core.Permission;
 import io.javadog.cws.core.Servicable;
 import io.javadog.cws.model.entities.CircleEntity;
@@ -50,28 +49,33 @@ public final class FetchCirclesService extends Servicable<FetchCircleResponse, F
             // is found, the DAO will throw an Exception.
             final CircleEntity circle = dao.findCircleByExternalId(request.getCircleId());
 
-            // The Settings and the Requesting Member are both important when
-            // trying to ascertain if the Circle Trustees may be retrieved. If
-            // the requesting Member is the System Administrator, then all
-            // information may be retrieved. If the Settings allow it, then all
-            // information may be retrieved. However, if the request is made by
-            // anyone else than the System Administrator and the Settings
-            // doesn't allow exposing information, then we will only show
-            // information about Circles, which the requesting Member is allowed
-            // to access.
-            final List<TrusteeEntity> members;
-            if (Objects.equals(Constants.ADMIN_ACCOUNT, member.getName()) || settings.getShowOtherMemberInformation()) {
-                members = dao.findTrusteesByCircle(circle);
-            } else {
-                members = findTrusteeByCircle(circle);
-                if (members.isEmpty()) {
-                    throw new CWSException(Constants.AUTHORIZATION_WARNING, "Circle either does not exist or Member is not Authorized to access it.");
+            if (circle != null) {
+                // The Settings and the Requesting Member are both important when
+                // trying to ascertain if the Circle Trustees may be retrieved. If
+                // the requesting Member is the System Administrator, then all
+                // information may be retrieved. If the Settings allow it, then all
+                // information may be retrieved. However, if the request is made by
+                // anyone else than the System Administrator and the Settings
+                // doesn't allow exposing information, then we will only show
+                // information about Circles, which the requesting Member is allowed
+                // to access.
+                final List<TrusteeEntity> members;
+                if (Objects.equals(Constants.ADMIN_ACCOUNT, member.getName()) || settings.getShareTrustees()) {
+                    members = dao.findTrusteesByCircle(circle);
+                } else {
+                    // Regardless of the settings and requesting Member, we should
+                    // be as tolerant as possible, and if the Member is not allowed
+                    // to see the Circle details, then it is simply omitted.
+                    members = findTrusteeByCircle(circle);
                 }
+                response.setTrustees(convertTrustees(members));
+                final List<Circle> circles = new ArrayList<>(1);
+                circles.add(convert(circle));
+                response.setCircles(circles);
+            } else {
+                response.setReturnCode(Constants.IDENTIFICATION_WARNING);
+                response.setReturnMessage("No Circle exist with the Id '" + request.getCircleId() + '\'');
             }
-            response.setTrustees(convertTrustees(members));
-            final List<Circle> circles = new ArrayList<>(1);
-            circles.add(convert(members.get(0).getCircle()));
-            response.setCircles(circles);
         } else {
             final List<CircleEntity> circles = dao.findAllCircles();
             response.setCircles(convertCircles(circles));

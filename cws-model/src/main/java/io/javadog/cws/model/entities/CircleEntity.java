@@ -19,11 +19,16 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "circles")
-@NamedQueries(
+@NamedQueries({
         @NamedQuery(name = "circle.findAll",
                 query = "select c " +
                         "from CircleEntity c " +
-                        "order by name asc"))
+                        "order by name asc"),
+        @NamedQuery(name = "circle.findByExternalId",
+                query = "select c " +
+                        "from CircleEntity c " +
+                        "where c.externalId = :eid ")
+})
 public class CircleEntity extends Externable {
 
     @Column(name = "name", nullable = false, unique = true)

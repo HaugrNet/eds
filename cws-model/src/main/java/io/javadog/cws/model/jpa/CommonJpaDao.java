@@ -99,9 +99,9 @@ public final class CommonJpaDao implements CommonDao {
      * {@inheritDoc}
      */
     @Override
-    public List<TrusteeEntity> findTrusteesByCircle(final String externalCircleId) {
-        final Query query = entityManager.createNamedQuery("trustee.findByExternalCircleId");
-        query.setParameter("externalCircleId", externalCircleId);
+    public List<TrusteeEntity> findTrusteesByCircle(final CircleEntity circle) {
+        final Query query = entityManager.createNamedQuery("trustee.findByCircleId");
+        query.setParameter("circleId", circle.getId());
 
         return findExistingList(query, "trustees");
     }
@@ -110,11 +110,11 @@ public final class CommonJpaDao implements CommonDao {
      * {@inheritDoc}
      */
     @Override
-    public List<TrusteeEntity> findTrusteesByCircle(final Long circleId) {
-        final Query query = entityManager.createNamedQuery("trustee.findByCircleId");
-        query.setParameter("circleId", circleId);
+    public CircleEntity findCircleByExternalId(String externalId) {
+        final Query query = entityManager.createNamedQuery("circle.findByExternalId");
+        query.setParameter("eid", externalId);
 
-        return findExistingList(query, "trustees");
+        return findUniqueRecord(query, "Circle", externalId);
     }
 
     /**

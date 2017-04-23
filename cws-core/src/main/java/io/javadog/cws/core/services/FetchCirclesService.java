@@ -15,6 +15,7 @@ import io.javadog.cws.api.dtos.Trustee;
 import io.javadog.cws.api.requests.FetchCircleRequest;
 import io.javadog.cws.api.responses.FetchCircleResponse;
 import io.javadog.cws.common.Settings;
+import io.javadog.cws.common.exceptions.CWSException;
 import io.javadog.cws.core.Permission;
 import io.javadog.cws.core.Servicable;
 import io.javadog.cws.model.entities.CircleEntity;
@@ -45,18 +46,27 @@ public final class FetchCirclesService extends Servicable<FetchCircleResponse, F
         final FetchCircleResponse response = new FetchCircleResponse();
 
         if (request.getCircleId() != null) {
-            // Our check here should be made with both the Requesting Member and
-            // the Id of the Circle. If the requesting Member is the System
-            // Administrator, then we'll make a lookup and fetch all information
-            // about current Trustees - otherwise, an additional check is made,
-            // to ensure that only an existing Trustee may see who else have
-            // access to the Circle.
+            // First retrieve the Circle via the ExternalId given. If no Circle
+            // is found, the DAO will throw an Exception.
+            final CircleEntity circle = dao.findCircleByExternalId(request.getCircleId());
+
+            // The Settings and the Requesting Member are both important when
+            // trying to ascertain if the Circle Trustees may be retrieved. If
+            // the requesting Member is the System Administrator, then all
+            // information may be retrieved. If the Settings allow it, then all
+            // information may be retrieved. However, if the request is made by
+            // anyone else than the System Administrator and the Settings
+            // doesn't allow exposing information, then we will only show
+            // information about Circles, which the requesting Member is allowed
+            // to access.
             final List<TrusteeEntity> members;
-            if (Objects.equals(Constants.ADMIN_ACCOUNT, member.getName())) {
-                members = dao.findTrusteesByCircle(request.getCircleId());
+            if (Objects.equals(Constants.ADMIN_ACCOUNT, member.getName()) || settings.getShowOtherMemberInformation()) {
+                members = dao.findTrusteesByCircle(circle);
             } else {
-                final Long circleId = findCircleId(request.getCircleId());
-                members = dao.findTrusteesByCircle(circleId);
+                members = findTrusteeByCircle(circle);
+                if (members.isEmpty()) {
+                    throw new CWSException(Constants.AUTHORIZATION_WARNING, "Circle either does not exist or Member is not Authorized to access it.");
+                }
             }
             response.setTrustees(convertTrustees(members));
             final List<Circle> circles = new ArrayList<>(1);
@@ -70,16 +80,24 @@ public final class FetchCirclesService extends Servicable<FetchCircleResponse, F
         return response;
     }
 
-    private Long findCircleId(final String externalCircleId) {
-        Long circleId = null;
+    /**
+     * <p>If the Circle being sought is one, which the Member belongs to, then
+     * the details will be returned, otherwise an empty list is returned.</p>
+     *
+     * @param circle Circle Entity
+     * @return List of Trustees for the given Circle, or empty List
+     */
+    private List<TrusteeEntity> findTrusteeByCircle(final CircleEntity circle) {
+        final List<TrusteeEntity> trustees = new ArrayList<>(0);
 
-        for (final TrusteeEntity entity : trustees) {
-            if (Objects.equals(entity.getCircle().getExternalId(), externalCircleId)) {
-                circleId = entity.getCircle().getId();
+        for (final TrusteeEntity trusteeEntity : trustees) {
+            if (Objects.equals(trusteeEntity.getCircle().getId(), circle.getId())) {
+                trustees.addAll(dao.findTrusteesByCircle(circle));
+                break;
             }
         }
 
-        return circleId;
+        return trustees;
     }
 
     private static List<Trustee> convertTrustees(final List<TrusteeEntity> entities) {

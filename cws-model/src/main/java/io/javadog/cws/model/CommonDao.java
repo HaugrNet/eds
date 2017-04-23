@@ -33,9 +33,9 @@ public interface CommonDao {
 
     List<SettingEntity> readSettings();
 
-    List<TrusteeEntity> findTrusteesByCircle(String externalCircleId);
+    List<TrusteeEntity> findTrusteesByCircle(CircleEntity circle);
 
-    List<TrusteeEntity> findTrusteesByCircle(Long circleId);
+    CircleEntity findCircleByExternalId(String externalId);
 
     List<CircleEntity> findAllCircles();
 

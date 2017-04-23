@@ -28,14 +28,17 @@ public final class ObjectTypeTest {
 
     @Test
     public void testClass() {
-        final ObjectType type = new ObjectType();
-        type.setName("name1");
-        type.setType("type1");
+        final String name = "name1";
+        final String type = "type1";
 
-        assertThat(type.getName(), is("name1"));
-        assertThat(type.getType(), is("type1"));
+        final ObjectType objectType = new ObjectType();
+        objectType.setName(name);
+        objectType.setType(type);
 
-        final Map<String, String> errors = type.validate();
+        assertThat(objectType.getName(), is(name));
+        assertThat(objectType.getType(), is(type));
+
+        final Map<String, String> errors = objectType.validate();
         assertThat(errors.isEmpty(), is(true));
     }
 

@@ -14,6 +14,7 @@ import static org.junit.Assert.assertThat;
 import org.junit.Test;
 
 import java.lang.reflect.Field;
+import java.util.Date;
 import java.util.Map;
 import java.util.UUID;
 
@@ -27,13 +28,16 @@ public class CircleTest {
     public void testClass() {
         final String id = UUID.randomUUID().toString();
         final String name = "Circle Name";
+        final Date date = new Date();
 
         final Circle circle = new Circle();
         circle.setId(id);
         circle.setName(name);
+        circle.setCreated(date);
 
         assertThat(circle.getId(), is(id));
         assertThat(circle.getName(), is(name));
+        assertThat(circle.getCreated(), is(date));
 
         final Map<String, String> errors = circle.validate();
         assertThat(errors.size(), is(0));

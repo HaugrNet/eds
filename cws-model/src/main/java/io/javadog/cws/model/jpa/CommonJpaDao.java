@@ -72,7 +72,17 @@ public final class CommonJpaDao implements CommonDao {
         final Query query = entityManager.createNamedQuery("member.findByName");
         query.setParameter("name", name);
 
-        return findUniqueRecord(query, "member", name);
+        final List<MemberEntity> found = query.getResultList();
+
+        if (found.isEmpty()) {
+            throw new ModelException(Constants.IDENTIFICATION_WARNING, "No member found with '" + name + "'.");
+        }
+
+        if (found.size() > 1) {
+            throw new ModelException(Constants.CONSTRAINT_ERROR, "Could not uniquely identify a member with '" + name + "'.");
+        }
+
+        return found.get(0);
     }
 
     /**
@@ -103,14 +113,14 @@ public final class CommonJpaDao implements CommonDao {
         final Query query = entityManager.createNamedQuery("trustee.findByCircleId");
         query.setParameter("circleId", circle.getId());
 
-        return findExistingList(query, "trustees");
+        return findList(query);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public CircleEntity findCircleByExternalId(String externalId) {
+    public CircleEntity findCircleByExternalId(final String externalId) {
         final Query query = entityManager.createNamedQuery("circle.findByExternalId");
         query.setParameter("eid", externalId);
 
@@ -175,34 +185,9 @@ public final class CommonJpaDao implements CommonDao {
     // Internal Methods, handling the actual lookup's to simplify error handling
     // =========================================================================
 
-    private static <E> List<E> findExistingList(final Query query, final String listName) {
-        List<E> list = findList(query);
-
-        if (list.isEmpty()) {
-            throw new ModelException(Constants.IDENTIFICATION_WARNING, "No " + listName + " found.");
-        }
-
-        return list;
-    }
-
     private static <E> E findSingleRecord(final Query query) {
         final List<E> found = query.getResultList();
-
-        return found.size() >= 1 ? found.get(0) : null;
-    }
-
-    private static <E> E findUniqueRecord(final Query query, final String entityName, final String keyName) {
-        final List<E> found = query.getResultList();
-
-        if (found.isEmpty()) {
-            throw new ModelException(Constants.IDENTIFICATION_WARNING, "No " + entityName + " found with '" + keyName + "'.");
-        }
-
-        if (found.size() > 1) {
-            throw new ModelException(Constants.CONSTRAINT_ERROR, "Could not uniquely identify a " + entityName + " with '" + keyName + "'.");
-        }
-
-        return found.get(0);
+        return found.isEmpty() ? null : found.get(0);
     }
 
     private static <E> List<E> findList(final Query query) {

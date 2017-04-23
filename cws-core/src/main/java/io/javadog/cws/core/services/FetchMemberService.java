@@ -95,7 +95,7 @@ public final class FetchMemberService extends Serviceable<FetchMemberResponse, F
      * view the System Administrator Account, however this setting is disabled
      * per default.</p>
      *
-     * <p>If the {@link Settings#SHARE_TRUSTEES} flag is set,
+     * <p>If the {@link Settings#SHOW_TRUSTEES} flag is set,
      * then the Member may view all Circles, which the Other Member belongs to,
      * and not just the ones both Members share. By default, this Settings is
      * set to True.</p>
@@ -103,7 +103,7 @@ public final class FetchMemberService extends Serviceable<FetchMemberResponse, F
      * @param response  Response Object to fill
      * @param requested Requested Member to see if may be viewed
      * @see Settings#EXPOSE_ADMIN
-     * @see Settings#SHARE_TRUSTEES
+     * @see Settings#SHOW_TRUSTEES
      */
     private void fetchSomeoneElse(final FetchMemberResponse response, final MemberEntity requested) {
         if (Objects.equals(member.getName(), Constants.ADMIN_ACCOUNT)) {

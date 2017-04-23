@@ -97,7 +97,7 @@ public final class FetchCirclesServiceTest extends DatabaseSetup {
     @Test
     public void testFetchCircle1WithShowTrueAsAdmin() {
         // Ensure that we have the correct settings for the Service
-        settings.set(Settings.SHARE_TRUSTEES, "true");
+        settings.set(Settings.SHOW_TRUSTEES, "true");
 
         final Serviceable<FetchCircleResponse, FetchCircleRequest> service = prepareService();
         final CircleEntity circle = findFirstCircle();
@@ -119,7 +119,7 @@ public final class FetchCirclesServiceTest extends DatabaseSetup {
     @Test
     public void testFetchCircle1WithShowFalseAsAdmin() {
         // Ensure that we have the correct settings for the Service
-        settings.set(Settings.SHARE_TRUSTEES, "false");
+        settings.set(Settings.SHOW_TRUSTEES, "false");
 
         final Serviceable<FetchCircleResponse, FetchCircleRequest> service = prepareService();
         final CircleEntity circle = findFirstCircle();
@@ -141,7 +141,7 @@ public final class FetchCirclesServiceTest extends DatabaseSetup {
     @Test
     public void testFetchCircle1WithShowTrueAsMember1() {
         // Ensure that we have the correct settings for the Service
-        settings.set(Settings.SHARE_TRUSTEES, "true");
+        settings.set(Settings.SHOW_TRUSTEES, "true");
 
         final Serviceable<FetchCircleResponse, FetchCircleRequest> service = prepareService();
         final CircleEntity circle = findFirstCircle();
@@ -163,7 +163,7 @@ public final class FetchCirclesServiceTest extends DatabaseSetup {
     @Test
     public void testFetchCircle1WithShowFalseAsMember1() {
         // Ensure that we have the correct settings for the Service
-        settings.set(Settings.SHARE_TRUSTEES, "false");
+        settings.set(Settings.SHOW_TRUSTEES, "false");
 
         final Serviceable<FetchCircleResponse, FetchCircleRequest> service = prepareService();
         final CircleEntity circle = findFirstCircle();
@@ -185,7 +185,7 @@ public final class FetchCirclesServiceTest extends DatabaseSetup {
     @Test
     public void testFetchCircle1WithShowTrueAsMember5() {
         // Ensure that we have the correct settings for the Service
-        settings.set(Settings.SHARE_TRUSTEES, "true");
+        settings.set(Settings.SHOW_TRUSTEES, "true");
 
         final Serviceable<FetchCircleResponse, FetchCircleRequest> service = prepareService();
         final CircleEntity circle = findFirstCircle();
@@ -207,7 +207,7 @@ public final class FetchCirclesServiceTest extends DatabaseSetup {
     @Test
     public void testFetchCircle1WithShowFalseAsMember5() {
         // Ensure that we have the correct settings for the Service
-        settings.set(Settings.SHARE_TRUSTEES, "false");
+        settings.set(Settings.SHOW_TRUSTEES, "false");
 
         final Serviceable<FetchCircleResponse, FetchCircleRequest> service = prepareService();
         final CircleEntity circle = findFirstCircle();

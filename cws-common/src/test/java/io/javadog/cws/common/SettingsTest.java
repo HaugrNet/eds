@@ -103,15 +103,15 @@ public final class SettingsTest {
     public void testShowOtherMemberInformation() {
         final Settings settings = new Settings();
         assertThat(settings.getShareTrustees(), is(true));
-        settings.set(Settings.SHARE_TRUSTEES, "false");
+        settings.set(Settings.SHOW_TRUSTEES, "false");
         assertThat(settings.getShareTrustees(), is(false));
-        settings.set(Settings.SHARE_TRUSTEES, "true");
+        settings.set(Settings.SHOW_TRUSTEES, "true");
         assertThat(settings.getShareTrustees(), is(true));
-        settings.set(Settings.SHARE_TRUSTEES, " true ");
+        settings.set(Settings.SHOW_TRUSTEES, " true ");
         assertThat(settings.getShareTrustees(), is(true));
-        settings.set(Settings.SHARE_TRUSTEES, "");
+        settings.set(Settings.SHOW_TRUSTEES, "");
         assertThat(settings.getShareTrustees(), is(false));
-        settings.set(Settings.SHARE_TRUSTEES, " what ");
+        settings.set(Settings.SHOW_TRUSTEES, " what ");
         assertThat(settings.getShareTrustees(), is(false));
     }
 }

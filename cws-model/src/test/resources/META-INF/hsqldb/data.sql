@@ -91,11 +91,11 @@ INSERT INTO settings (name, setting, modifiable) VALUES ('cws.expose.admin', 'fa
 -- Privacy is important, however - there may be reasons to reduce the privacy
 -- level, and allow that a Member can view information about other Members even
 -- if there is no direct relation between the two. If two members share a
--- Circle, then they will automatically be able to view the other settings, but
--- if not, then this setting apply. By default, it is set to True - as CWS
--- should be used by organizations or companies where all members already share
+-- Circle, then they will automatically be able to view each other, but  if not,
+-- then this setting apply. By default, it is set to True - as CWS should be
+-- used by organizations or companies where all members already share
 -- information.
-INSERT INTO settings (name, setting, modifiable) VALUES ('cws.share.trustees', 'true', true);
+INSERT INTO settings (name, setting, modifiable) VALUES ('cws.show.trustees', 'true', true);
 
 
 -- =============================================================================

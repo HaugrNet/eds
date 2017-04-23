@@ -37,7 +37,8 @@ public final class SettingServiceTest extends DatabaseSetup {
         // we're doing here. Since each test is running within a transaction,
         // and they are rolled back after completion, this should not disturb
         // other tests.
-        final Query query = entityManager.createQuery("delete from MemberEntity");
+        final Query query = entityManager.createQuery("delete from MemberEntity where id = :id");
+        query.setParameter("id", 1L);
         query.executeUpdate();
 
         final SettingService service = new SettingService(new Settings(), entityManager);

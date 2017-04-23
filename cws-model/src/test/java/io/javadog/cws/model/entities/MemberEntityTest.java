@@ -65,6 +65,7 @@ public final class MemberEntityTest extends DatabaseSetup {
         assertThat(found.getPublicKey(), is(publicKey));
         assertThat(found.getPrivateKey(), is(privateKey));
         assertThat(found.getKeyPair(), is(nullValue()));
+        // ToDo fix the Time checks, as they are tricky when it comes to the millis.
         assertThat(found.getModified().getTime(), is(modified.getTime()));
         assertThat(found.getCreated().getTime(), is(created.getTime()));
     }
@@ -108,7 +109,7 @@ public final class MemberEntityTest extends DatabaseSetup {
         final List<MemberEntity> list = query.getResultList();
         // Now, a couple of checks. First, that we have 2 records, the default
         // Administration Account and the newly created Account
-        assertThat(list.size(), is(2));
+        assertThat(list.size(), is(7));
 
         final MemberEntity found = list.get(0);
         // Next, check that the newly found entity is not the same Object as the
@@ -145,7 +146,12 @@ public final class MemberEntityTest extends DatabaseSetup {
         final Query query = entityManager.createQuery(jql);
         final List<MemberEntity> found = query.getResultList();
 
-        assertThat(found.size(), is(1));
+        assertThat(found.size(), is(6));
         assertThat(found.get(0).getName(), is(Constants.ADMIN_ACCOUNT));
+        assertThat(found.get(1).getName(), is("member1"));
+        assertThat(found.get(2).getName(), is("member2"));
+        assertThat(found.get(3).getName(), is("member3"));
+        assertThat(found.get(4).getName(), is("member4"));
+        assertThat(found.get(5).getName(), is("member5"));
     }
 }

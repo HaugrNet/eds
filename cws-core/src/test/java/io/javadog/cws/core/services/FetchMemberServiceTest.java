@@ -21,7 +21,6 @@ import io.javadog.cws.common.exceptions.AuthorizationException;
 import io.javadog.cws.common.exceptions.VerificationException;
 import io.javadog.cws.core.Servicable;
 import io.javadog.cws.model.DatabaseSetup;
-import io.javadog.cws.model.entities.CircleEntity;
 import io.javadog.cws.model.entities.MemberEntity;
 import org.junit.Test;
 
@@ -103,13 +102,10 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
      */
     @Test
     public void testFindAllMembersWithExposeAdminFalseAsAdmin() {
-        final Servicable<FetchMemberResponse, FetchMemberRequest> service = prepareService();
-        createThreeCircleWith5Members();
-
         // Ensure that we have the correct settings for the Service
         settings.set(Settings.EXPOSE_ADMIN, "false");
 
-        // Build and send the Request
+        final Servicable<FetchMemberResponse, FetchMemberRequest> service = prepareService();
         final FetchMemberRequest request = buildRequestWithCredentials(Constants.ADMIN_ACCOUNT);
         assertThat(request.validate().isEmpty(), is(true));
         final FetchMemberResponse response = service.perform(request);
@@ -130,13 +126,10 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
      */
     @Test
     public void testFindAllMembersWithExposeAdminTrueAsAdmin() {
-        final Servicable<FetchMemberResponse, FetchMemberRequest> service = prepareService();
-        createThreeCircleWith5Members();
-
         // Ensure that we have the correct settings for the Service
         settings.set(Settings.EXPOSE_ADMIN, "true");
 
-        // Build and send the Request
+        final Servicable<FetchMemberResponse, FetchMemberRequest> service = prepareService();
         final FetchMemberRequest request = buildRequestWithCredentials(Constants.ADMIN_ACCOUNT);
         assertThat(request.validate().isEmpty(), is(true));
         final FetchMemberResponse response = service.perform(request);
@@ -157,13 +150,10 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
      */
     @Test
     public void testFindAllMembersWithExposeAdminFalseAsMember1() {
-        final Servicable<FetchMemberResponse, FetchMemberRequest> service = prepareService();
-        createThreeCircleWith5Members();
-
         // Ensure that we have the correct settings for the Service
         settings.set(Settings.EXPOSE_ADMIN, "false");
 
-        // Build and send the Request
+        final Servicable<FetchMemberResponse, FetchMemberRequest> service = prepareService();
         final FetchMemberRequest request = buildRequestWithCredentials("member1");
         assertThat(request.validate().isEmpty(), is(true));
         final FetchMemberResponse response = service.perform(request);
@@ -184,13 +174,10 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
      */
     @Test
     public void testFindAllMembersWithExposeAdminTrueAsMember1() {
-        final Servicable<FetchMemberResponse, FetchMemberRequest> service = prepareService();
-        createThreeCircleWith5Members();
-
         // Ensure that we have the correct settings for the Service
         settings.set(Settings.EXPOSE_ADMIN, "true");
 
-        // Build and send the Request
+        final Servicable<FetchMemberResponse, FetchMemberRequest> service = prepareService();
         final FetchMemberRequest request = buildRequestWithCredentials("member1");
         assertThat(request.validate().isEmpty(), is(true));
         final FetchMemberResponse response = service.perform(request);
@@ -215,13 +202,10 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
      */
     @Test
     public void testFindAdminWithExposeAdminTrueAsAdmin() {
-        final Servicable<FetchMemberResponse, FetchMemberRequest> service = prepareService();
-        createThreeCircleWith5Members();
-
         // Ensure that we have the correct settings for the Service
         settings.set(Settings.EXPOSE_ADMIN, "true");
 
-        // Build and send the Request
+        final Servicable<FetchMemberResponse, FetchMemberRequest> service = prepareService();
         final FetchMemberRequest request = buildRequestWithCredentials(Constants.ADMIN_ACCOUNT);
         request.setMemberId(ADMIN_ID);
         assertThat(request.validate().isEmpty(), is(true));
@@ -244,13 +228,10 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
      */
     @Test
     public void testFindAdminWithExposeAdminFalseAsAdmin() {
-        final Servicable<FetchMemberResponse, FetchMemberRequest> service = prepareService();
-        createThreeCircleWith5Members();
-
         // Ensure that we have the correct settings for the Service
         settings.set(Settings.EXPOSE_ADMIN, "false");
 
-        // Build and send the Request
+        final Servicable<FetchMemberResponse, FetchMemberRequest> service = prepareService();
         final FetchMemberRequest request = buildRequestWithCredentials(Constants.ADMIN_ACCOUNT);
         request.setMemberId(ADMIN_ID);
         assertThat(request.validate().isEmpty(), is(true));
@@ -272,13 +253,11 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
      */
     @Test
     public void testFindMember1WithShowOtherFalseAsAdmin() {
-        final Servicable<FetchMemberResponse, FetchMemberRequest> service = prepareService();
-        final MemberEntity member = createThreeCircleWith5Members();
-
         // Ensure that we have the correct settings for the Service
         settings.set(Settings.SHOW_OTHER_MEMBER_INFORMATION, "false");
 
-        // Build and send the Request
+        final Servicable<FetchMemberResponse, FetchMemberRequest> service = prepareService();
+        final MemberEntity member = findFirstMember();
         final FetchMemberRequest request = buildRequestWithCredentials(Constants.ADMIN_ACCOUNT);
         request.setMemberId(member.getExternalId());
         final FetchMemberResponse response = service.perform(request);
@@ -299,13 +278,11 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
      */
     @Test
     public void testFindMember1WithShowOtherTrueAsAdmin() {
-        final Servicable<FetchMemberResponse, FetchMemberRequest> service = prepareService();
-        final MemberEntity member = createThreeCircleWith5Members();
-
         // Ensure that we have the correct settings for the Service
         settings.set(Settings.SHOW_OTHER_MEMBER_INFORMATION, "true");
 
-        // Build and send the Request
+        final Servicable<FetchMemberResponse, FetchMemberRequest> service = prepareService();
+        final MemberEntity member = findFirstMember();
         final FetchMemberRequest request = buildRequestWithCredentials(Constants.ADMIN_ACCOUNT);
         request.setMemberId(member.getExternalId());
         final FetchMemberResponse response = service.perform(request);
@@ -327,13 +304,11 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
      */
     @Test
     public void testFindAdminWithExposeAdminTrueAsMember1() {
-        final Servicable<FetchMemberResponse, FetchMemberRequest> service = prepareService();
-        final MemberEntity member = createThreeCircleWith5Members();
-
         // Ensure that we have the correct settings for the Service
         settings.set(Settings.EXPOSE_ADMIN, "true");
 
-        // Build and send the Request
+        final Servicable<FetchMemberResponse, FetchMemberRequest> service = prepareService();
+        final MemberEntity member = findFirstMember();
         final FetchMemberRequest request = buildRequestWithCredentials(member.getName());
         request.setMemberId(ADMIN_ID);
         assertThat(request.validate().isEmpty(), is(true));
@@ -356,14 +331,12 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
      */
     @Test
     public void testFindAdminWithExposeAdminFalseAsMember1() {
-        prepareCause(AuthorizationException.class, Constants.AUTHORIZATION_WARNING, "Not Authorized to access this information.");
-        final Servicable<FetchMemberResponse, FetchMemberRequest> service = prepareService();
-        final MemberEntity member = createThreeCircleWith5Members();
-
         // Ensure that we have the correct settings for the Service
         settings.set(Settings.EXPOSE_ADMIN, "false");
 
-        // Build and send the Request
+        prepareCause(AuthorizationException.class, Constants.AUTHORIZATION_WARNING, "Not Authorized to access this information.");
+        final Servicable<FetchMemberResponse, FetchMemberRequest> service = prepareService();
+        final MemberEntity member = findFirstMember();
         final FetchMemberRequest request = buildRequestWithCredentials(member.getName());
         request.setMemberId(ADMIN_ID);
         assertThat(request.validate().isEmpty(), is(true));
@@ -372,13 +345,11 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
 
     @Test
     public void testFindMember1WithShowOtherTrueAsMember1() {
-        final Servicable<FetchMemberResponse, FetchMemberRequest> service = prepareService();
-        final MemberEntity member = createThreeCircleWith5Members();
-
         // Ensure that we have the correct settings for the Service
         settings.set(Settings.SHOW_OTHER_MEMBER_INFORMATION, "true");
 
-        // Build and send the Request
+        final Servicable<FetchMemberResponse, FetchMemberRequest> service = prepareService();
+        final MemberEntity member = findFirstMember();
         final FetchMemberRequest request = buildRequestWithCredentials("member1");
         request.setMemberId(member.getExternalId());
         final FetchMemberResponse response = service.perform(request);
@@ -392,13 +363,11 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
 
     @Test
     public void testFindMember1WithShowOtherFalseAsMember1() {
-        final Servicable<FetchMemberResponse, FetchMemberRequest> service = prepareService();
-        final MemberEntity member = createThreeCircleWith5Members();
-
         // Ensure that we have the correct settings for the Service
         settings.set(Settings.SHOW_OTHER_MEMBER_INFORMATION, "false");
 
-        // Build and send the Request
+        final Servicable<FetchMemberResponse, FetchMemberRequest> service = prepareService();
+        final MemberEntity member = findFirstMember();
         final FetchMemberRequest request = buildRequestWithCredentials("member1");
         request.setMemberId(member.getExternalId());
         final FetchMemberResponse response = service.perform(request);
@@ -412,13 +381,11 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
 
     @Test
     public void testFindMember1WithShowOtherTrueAsMember4() {
-        final Servicable<FetchMemberResponse, FetchMemberRequest> service = prepareService();
-        final MemberEntity member = createThreeCircleWith5Members();
-
         // Ensure that we have the correct settings for the Service
         settings.set(Settings.SHOW_OTHER_MEMBER_INFORMATION, "true");
 
-        // Build and send the Request
+        final Servicable<FetchMemberResponse, FetchMemberRequest> service = prepareService();
+        final MemberEntity member = findFirstMember();
         final FetchMemberRequest request = buildRequestWithCredentials("member4");
         request.setMemberId(member.getExternalId());
         final FetchMemberResponse response = service.perform(request);
@@ -431,13 +398,11 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
 
     @Test
     public void testFindMember1WithShowOtherFalseAsMember4() {
-        final Servicable<FetchMemberResponse, FetchMemberRequest> service = prepareService();
-        final MemberEntity member = createThreeCircleWith5Members();
-
         // Ensure that we have the correct settings for the Service
         settings.set(Settings.SHOW_OTHER_MEMBER_INFORMATION, "false");
 
-        // Build and send the Request
+        final Servicable<FetchMemberResponse, FetchMemberRequest> service = prepareService();
+        final MemberEntity member = findFirstMember();
         final FetchMemberRequest request = buildRequestWithCredentials("member4");
         request.setMemberId(member.getExternalId());
         final FetchMemberResponse response = service.perform(request);
@@ -450,13 +415,11 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
 
     @Test
     public void testFindMember1WithShowOtherTrueAsMember5() {
-        final Servicable<FetchMemberResponse, FetchMemberRequest> service = prepareService();
-        final MemberEntity member = createThreeCircleWith5Members();
-
         // Ensure that we have the correct settings for the Service
         settings.set(Settings.SHOW_OTHER_MEMBER_INFORMATION, "true");
 
-        // Build and send the Request
+        final Servicable<FetchMemberResponse, FetchMemberRequest> service = prepareService();
+        final MemberEntity member = findFirstMember();
         final FetchMemberRequest request = buildRequestWithCredentials("member5");
         request.setMemberId(member.getExternalId());
         final FetchMemberResponse response = service.perform(request);
@@ -469,13 +432,11 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
 
     @Test
     public void testFindMember1WithShowOtherFalseAsMember5() {
-        final Servicable<FetchMemberResponse, FetchMemberRequest> service = prepareService();
-        final MemberEntity member = createThreeCircleWith5Members();
-
         // Ensure that we have the correct settings for the Service
         settings.set(Settings.SHOW_OTHER_MEMBER_INFORMATION, "false");
 
-        // Build and send the Request
+        final Servicable<FetchMemberResponse, FetchMemberRequest> service = prepareService();
+        final MemberEntity member = findFirstMember();
         final FetchMemberRequest request = buildRequestWithCredentials("member5");
         request.setMemberId(member.getExternalId());
         final FetchMemberResponse response = service.perform(request);
@@ -504,27 +465,11 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
     }
 
     /**
-     * Creates two Circles with a total of 5 Members, Member 2 - 5 is part of
-     * both Circles, whereas Member1 is only member of the first Circle. The
-     * returned Member is Member1.
+     * Finds and returns the first Member, i.e. 'member1'.
      *
      * @return Member1, which is only a member of the first Circle
      */
-    private MemberEntity createThreeCircleWith5Members() {
-        final MemberEntity member1 = createMember("member1");
-        final MemberEntity member2 = createMember("member2");
-        final MemberEntity member3 = createMember("member3");
-        final MemberEntity member4 = createMember("member4");
-        final MemberEntity member5 = createMember("member5");
-
-        final CircleEntity circle1 = prepareCircle("circle1");
-        final CircleEntity circle2 = prepareCircle("circle2");
-        final CircleEntity circle3 = prepareCircle("circle3");
-
-        addKeyAndTrusteesToCircle(circle1, member1, member2, member3);
-        addKeyAndTrusteesToCircle(circle2, member1, member2, member3, member4);
-        addKeyAndTrusteesToCircle(circle3, member2, member3, member4, member5);
-
-        return member1;
+    private MemberEntity findFirstMember() {
+        return entityManager.find(MemberEntity.class, 2L);
     }
 }

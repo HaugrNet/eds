@@ -50,13 +50,13 @@ public final class SettingEntityTest extends DatabaseSetup {
 
         final List<SettingEntity> settings = dao.readSettings();
         assertThat(settings, is(not(nullValue())));
-        assertThat(settings.size(), is(12));
+        assertThat(settings.size(), is(13));
     }
 
     @Test
     public void testDaoFindSettings() {
         final List<SettingEntity> settings = dao.readSettings();
         assertThat(settings, is(not(nullValue())));
-        assertThat(settings.size(), is(11));
+        assertThat(settings.size(), is(12));
     }
 }

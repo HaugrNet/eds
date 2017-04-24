@@ -58,6 +58,11 @@ INSERT INTO settings (name, setting, modifiable) VALUES ('cws.crypto.symmetric.k
 INSERT INTO settings (name, setting, modifiable) VALUES ('cws.crypto.asymmetric.algorithm', 'RSA', false);
 INSERT INTO settings (name, setting, modifiable) VALUES ('cws.crypto.asymmetric.keylength', '2048', true);
 
+-- When new Members are added, the System Administrator can issue a signature,
+-- which can be used by the Member when creating their new Account. The
+-- signature is made with this Algorithm.
+INSERT INTO settings (name, setting, modifiable) VALUES ('ccws.crypto.signature.algorithm', 'SHA512WithRSA', false);
+
 -- If a Member is using something else than a Key to unlock their Account, the
 -- CWS will use the following Password Based Encryption, PBE, algorithm to do
 -- the trick. The provided information is extended with an instance specific

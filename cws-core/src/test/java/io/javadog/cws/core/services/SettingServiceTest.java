@@ -47,7 +47,7 @@ public final class SettingServiceTest extends DatabaseSetup {
         final SettingResponse response = service.perform(request);
         assertThat(response.getReturnCode(), is(0));
         assertThat(response.getReturnMessage(), is("Ok"));
-        assertThat(response.getSettings().size(), is(11));
+        assertThat(response.getSettings().size(), is(12));
     }
 
     @Test(expected = CWSException.class)
@@ -67,7 +67,7 @@ public final class SettingServiceTest extends DatabaseSetup {
         final SettingResponse response = service.perform(request);
         assertThat(response.getReturnCode(), is(0));
         assertThat(response.getReturnMessage(), is("Ok"));
-        assertThat(response.getSettings().size(), is(11));
+        assertThat(response.getSettings().size(), is(12));
     }
 
     @Test
@@ -80,7 +80,7 @@ public final class SettingServiceTest extends DatabaseSetup {
         final SettingResponse response = service.perform(request);
         assertThat(response.getReturnCode(), is(0));
         assertThat(response.getReturnMessage(), is("Ok"));
-        assertThat(response.getSettings().size(), is(11));
+        assertThat(response.getSettings().size(), is(12));
     }
 
     @Test
@@ -93,7 +93,7 @@ public final class SettingServiceTest extends DatabaseSetup {
         final SettingResponse response = service.perform(request);
         assertThat(response.getReturnCode(), is(0));
         assertThat(response.getReturnMessage(), is("Ok"));
-        assertThat(response.getSettings().size(), is(11));
+        assertThat(response.getSettings().size(), is(12));
         assertThat(response.getSettings().get("cws.crypto.symmetric.keylength"), is("128"));
 
         // The internal collection used is unmodifiable. So we simply copy the
@@ -105,7 +105,7 @@ public final class SettingServiceTest extends DatabaseSetup {
         final SettingResponse update = service.perform(request);
         assertThat(update.getReturnCode(), is(0));
         assertThat(update.getReturnMessage(), is("Ok"));
-        assertThat(update.getSettings().size(), is(11));
+        assertThat(update.getSettings().size(), is(12));
         assertThat(update.getSettings().get("cws.crypto.symmetric.keylength"), is("256"));
     }
 
@@ -133,7 +133,7 @@ public final class SettingServiceTest extends DatabaseSetup {
         final SettingResponse response = service.perform(request);
         assertThat(response.getReturnCode(), is(0));
         assertThat(response.getReturnMessage(), is("Ok"));
-        assertThat(response.getSettings().size(), is(12));
+        assertThat(response.getSettings().size(), is(13));
         assertThat(response.getSettings().get("cws.test.setting"), is("Setting Value"));
     }
 

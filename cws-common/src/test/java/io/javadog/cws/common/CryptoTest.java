@@ -221,6 +221,18 @@ public final class CryptoTest {
         assertThat(chars, is(emptyChars));
     }
 
+    @Test
+    public void testSignature() {
+        final Crypto crypto = new Crypto(new Settings());
+        final KeyPair keyPair = crypto.generateAsymmetricKey();
+        final String message = "Message to Sign";
+        final String signed = crypto.sign(keyPair, message);
+        final boolean verified = crypto.verify(keyPair, message, signed);
+
+        System.out.println(signed);
+        assertThat(verified, is(true));
+    }
+
     /**
      * <p>Although the Charset is set via the Settings, it is used primarily
      * together with the Crypto Library. It can be argued where it belongs, but

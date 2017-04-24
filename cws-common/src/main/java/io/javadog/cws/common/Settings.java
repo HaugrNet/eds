@@ -40,6 +40,7 @@ public final class Settings {
     public static final String SYMMETRIC_ALGORITHM_KEYLENGTH = "cws.crypto.symmetric.keylength";
     public static final String ASYMMETRIC_ALGORITHM = "cws.crypto.asymmetric.algorithm";
     public static final String ASYMMETRIC_ALGORITHM_KEYLENGTH = "cws.crypto.asymmetric.keylength";
+    public static final String SIGNATURE_ALGORITHM = "cws.crypto.signature.algorithm";
     public static final String PBE_ALGORITHM = "cws.crypto.pbe.algorithm";
     public static final String CWS_SALT = "cws.system.salt";
     public static final String CWS_CHARSET = "cws.system.charset";
@@ -52,6 +53,7 @@ public final class Settings {
     private static final String DEFAULT_ASYMMETRIC_ALGORITHM = "RSA";
     private static final String DEFAULT_ASYMMETRIC_KEYLENGTH = "2048";
     private static final String DEFAULT_SYMMETRIC_KEYLENGTH = "128";
+    private static final String DEFAULT_SIGNATURE_ALGORITHM = "SHA512WithRSA";
     private static final String DEFAULT_PBE_ALGORITHM = "PBKDF2WithHmacSHA256";
     private static final String DEFAULT_SALT = "Default Salt, please make sure it is set in the DB instead.";
     private static final String DEFAULT_CHARSETNAME = "UTF-8";
@@ -67,6 +69,7 @@ public final class Settings {
         properties.setProperty(SYMMETRIC_ALGORITHM_KEYLENGTH, DEFAULT_SYMMETRIC_KEYLENGTH);
         properties.setProperty(ASYMMETRIC_ALGORITHM, DEFAULT_ASYMMETRIC_ALGORITHM);
         properties.setProperty(ASYMMETRIC_ALGORITHM_KEYLENGTH, DEFAULT_ASYMMETRIC_KEYLENGTH);
+        properties.setProperty(SIGNATURE_ALGORITHM, DEFAULT_SIGNATURE_ALGORITHM);
         properties.setProperty(PBE_ALGORITHM, DEFAULT_PBE_ALGORITHM);
         properties.setProperty(CWS_SALT, DEFAULT_SALT);
         properties.setProperty(CWS_CHARSET, DEFAULT_CHARSETNAME);
@@ -118,6 +121,10 @@ public final class Settings {
 
     public int getAsymmetricKeylength() {
         return toInt(properties.getProperty(ASYMMETRIC_ALGORITHM_KEYLENGTH));
+    }
+
+    public String getSignatureAlgorithm() {
+        return properties.getProperty(SIGNATURE_ALGORITHM);
     }
 
     public String getPBEAlgorithm() {

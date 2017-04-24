@@ -65,9 +65,8 @@ public final class MemberEntityTest extends DatabaseSetup {
         assertThat(found.getPublicKey(), is(publicKey));
         assertThat(found.getPrivateKey(), is(privateKey));
         assertThat(found.getKeyPair(), is(nullValue()));
-        // ToDo fix the Time checks, as they are tricky when it comes to the millis.
-        assertThat(found.getModified().getTime(), is(modified.getTime()));
-        assertThat(found.getCreated().getTime(), is(created.getTime()));
+        assertThat(toString(found.getModified()), is(toString(modified)));
+        assertThat(toString(found.getCreated()), is(toString(created)));
     }
 
     @Test(expected = PersistenceException.class)

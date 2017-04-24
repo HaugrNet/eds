@@ -34,6 +34,8 @@ import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.Signature;
+import java.security.SignatureException;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
 import java.security.spec.PKCS8EncodedKeySpec;
@@ -110,6 +112,33 @@ public final class Crypto {
             final Cipher cipher = prepareCipher(key, Cipher.DECRYPT_MODE, iv);
             return cipher.doFinal(toDecrypt);
         } catch (BadPaddingException | IllegalBlockSizeException | NoSuchPaddingException | NoSuchAlgorithmException | InvalidAlgorithmParameterException | InvalidKeyException e) {
+            throw new CryptoException(e);
+        }
+    }
+
+
+    public String sign(final KeyPair keyPair, final String message) {
+        try {
+            final Signature signer = Signature.getInstance(settings.getSignatureAlgorithm());
+            signer.initSign(keyPair.getPrivate());
+            signer.update(message.getBytes());
+            final byte[] signed = signer.sign();
+
+            return Base64.getEncoder().encodeToString(signed);
+        } catch (NoSuchAlgorithmException | SignatureException | InvalidKeyException e) {
+            throw new CryptoException(e);
+        }
+    }
+
+    public boolean verify(final KeyPair keyPair, final String message, final String signature) {
+        try {
+            final byte[] bytes = Base64.getDecoder().decode(signature);
+            final Signature verifier = Signature.getInstance(settings.getSignatureAlgorithm());
+            verifier.initVerify(keyPair.getPublic());
+            verifier.update(message.getBytes());
+
+            return verifier.verify(bytes);
+        } catch (NoSuchAlgorithmException | SignatureException | InvalidKeyException e) {
             throw new CryptoException(e);
         }
     }
@@ -197,7 +226,7 @@ public final class Crypto {
      * Base64 encoded.
      *
      * @param key Public RSA key to armor (Base64 encoded x.509 Key)
-     * @return String represenatation of the Key
+     * @return String representation of the Key
      */
     public static String armorPublicKey(final PublicKey key) {
         final X509EncodedKeySpec keySpec = new X509EncodedKeySpec(key.getEncoded());

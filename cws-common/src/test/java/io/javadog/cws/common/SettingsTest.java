@@ -26,7 +26,7 @@ public final class SettingsTest {
         final Settings settings = new Settings();
 
         final Map<String, String> existing = settings.get();
-        assertThat(existing.size(), is(11));
+        assertThat(existing.size(), is(12));
         settings.set("my.new.key", "the awesome value");
 
         final Map<String, String> updated = settings.get();
@@ -43,6 +43,7 @@ public final class SettingsTest {
         assertThat(settings.getSymmetricKeylength(), is(128));
         assertThat(settings.getAsymmetricAlgorithmName(), is("RSA"));
         assertThat(settings.getAsymmetricKeylength(), is(2048));
+        assertThat(settings.getSignatureAlgorithm(), is("SHA512WithRSA"));
         assertThat(settings.getPBEAlgorithm(), is("PBKDF2WithHmacSHA256"));
         assertThat(settings.getSalt(), is("Default Salt, please make sure it is set in the DB instead."));
         assertThat(settings.getCharset(), is("UTF-8"));

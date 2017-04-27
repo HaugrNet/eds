@@ -40,5 +40,13 @@ public enum CredentialType {
      * to generate a Symmetric key which can be used to unlock the Asymmetric
      * Key for the Account.
      */
-    PASSPHRASE
+    PASSPHRASE,
+
+    /**
+     * If the Signature is chosen, it is because a Member has been invited to
+     * create their own Account. The Signature is provided by the System
+     * Administrator to the potential Member, who can then create the Account
+     * with a higher degree of control over the Credentials.
+     */
+    SIGNATURE
 }

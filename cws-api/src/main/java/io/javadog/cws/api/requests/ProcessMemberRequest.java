@@ -31,7 +31,7 @@ public final class ProcessMemberRequest extends Authentication {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
-    private static final Set<Action> ALLOWED = EnumSet.of(Action.PROCESS, Action.DELETE, Action.REKEY);
+    private static final Set<Action> ALLOWED = EnumSet.of(Action.PROCESS, Action.INVITE, Action.DELETE, Action.REKEY);
 
     private static final String FIELD_ACTION = "action";
     private static final String FIELD_MEMBER = "member";

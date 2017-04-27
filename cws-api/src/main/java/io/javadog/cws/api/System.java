@@ -62,6 +62,11 @@ public interface System {
      * adding the Member to one or more Circles being administrated by the
      * Circle Administrator.</i></p>
      *
+     * <p>A special variant for creating new Accounts is via Invitations, where
+     * the System Administrator can issue a signed invitation to a potential
+     * Member. If this is made, then the armoredKey, will contain a Signature,
+     * rather than a Private Key in the Response.</p>
+     *
      * <p><b>Update existing Member</b> <i>Updating an existing Member can only
      * be done by Members themselves. The information to update, is the
      * Credentials and Member name. As long as the Member name doesn't conflict

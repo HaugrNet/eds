@@ -33,6 +33,12 @@ public enum Action {
     PROCESS,
 
     /**
+     * <p>For Invitations, which will allow the System Administrator to create
+     * new Accounts by issuing a signed invitation.</p>
+     */
+    INVITE,
+
+    /**
      * <p>The Action Delete covers removal of records, which is a permanent
      * irreversible Action.</p>
      */

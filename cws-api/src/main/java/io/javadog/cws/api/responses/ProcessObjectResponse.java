@@ -16,7 +16,7 @@ import io.javadog.cws.api.common.Constants;
 public final class ProcessObjectResponse extends CWSResponse {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
-    private static final long serialVersionUID = 8868831828030258226L;
+    private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
     public ProcessObjectResponse() {
         // Empty Constructor, required for WebServices

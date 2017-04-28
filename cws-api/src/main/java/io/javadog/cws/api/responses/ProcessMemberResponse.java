@@ -24,7 +24,7 @@ import javax.xml.bind.annotation.XmlType;
 public final class ProcessMemberResponse extends CWSResponse {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
-    private static final long serialVersionUID = 8868831828030258226L;
+    private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
     @XmlElement private String id = null;
     @XmlElement private Member member = null;

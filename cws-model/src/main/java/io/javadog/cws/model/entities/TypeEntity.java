@@ -9,6 +9,8 @@ package io.javadog.cws.model.entities;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
 /**
@@ -16,6 +18,12 @@ import javax.persistence.Table;
  * @since  CWS 1.0
  */
 @Entity
+@NamedQueries(
+        @NamedQuery(name = "type.findAll",
+                    query = "select t " +
+                            "from TypeEntity t " +
+                            "order by t.name asc")
+)
 @Table(name = "types")
 public final class TypeEntity extends CWSEntity {
 

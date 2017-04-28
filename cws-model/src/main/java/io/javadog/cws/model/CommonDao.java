@@ -12,6 +12,7 @@ import io.javadog.cws.model.entities.CircleEntity;
 import io.javadog.cws.model.entities.MemberEntity;
 import io.javadog.cws.model.entities.SettingEntity;
 import io.javadog.cws.model.entities.TrusteeEntity;
+import io.javadog.cws.model.entities.TypeEntity;
 
 import java.util.List;
 
@@ -46,4 +47,6 @@ public interface CommonDao {
     List<CircleEntity> findCirclesForMember(MemberEntity requested);
 
     List<CircleEntity> findCirclesBothBelongTo(MemberEntity member, MemberEntity requested);
+
+    List<TypeEntity> findAllTypes();
 }

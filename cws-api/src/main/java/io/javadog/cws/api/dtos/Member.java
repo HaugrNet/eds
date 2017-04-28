@@ -38,10 +38,16 @@ public final class Member extends Verifiable {
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
     private static final String FIELD_ID = "id";
     private static final String FIELD_AUTHENTICATION = "authentication";
+    private static final String FIELD_ADDED = "added";
 
-    @XmlElement                  private String id = null;
-    @XmlElement(required = true) private Authentication authentication = null;
-    @XmlElement                  private Date added = null;
+    @XmlElement(name = FIELD_ID)
+    private String id = null;
+
+    @XmlElement(name = FIELD_AUTHENTICATION, required = true)
+    private Authentication authentication = null;
+
+    @XmlElement(name = FIELD_ADDED)
+    private Date added = null;
 
     // =========================================================================
     // Standard Setters & Getters

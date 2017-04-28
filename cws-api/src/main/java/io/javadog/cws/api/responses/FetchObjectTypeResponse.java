@@ -10,6 +10,7 @@ package io.javadog.cws.api.responses;
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.dtos.ObjectType;
 
+import javax.xml.bind.annotation.XmlElement;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -21,8 +22,9 @@ import java.util.List;
 public final class FetchObjectTypeResponse extends CWSResponse {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
-    private static final long serialVersionUID = 8868831828030258226L;
+    private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
+    @XmlElement(name = "types")
     private final List<ObjectType> types = new ArrayList<>(0);
 
     public FetchObjectTypeResponse() {

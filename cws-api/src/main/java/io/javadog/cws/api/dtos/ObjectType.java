@@ -29,22 +29,25 @@ public final class ObjectType extends Verifiable {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
-    private static final int maxLength = 256;
+    private static final int MAX_LENGTH = 256;
     private static final String FIELD_NAME = "name";
     private static final String FIELD_TYPE = "type";
 
-    @XmlElement(required = true) private String name = null;
-    @XmlElement(required = true) private String type = null;
+    @XmlElement(name = FIELD_NAME, required = true)
+    private String name = null;
+
+    @XmlElement(name = FIELD_TYPE, required = true)
+    private String type = null;
 
     // =========================================================================
     // Standard Setters & Getters
     // =========================================================================
 
     @NotNull
-    @Size(min = 1, max = maxLength)
+    @Size(min = 1, max = MAX_LENGTH)
     public void setName(final String name) {
         ensureNotNull(FIELD_NAME, name);
-        ensureLength(FIELD_NAME, name, 1, maxLength);
+        ensureLength(FIELD_NAME, name, 1, MAX_LENGTH);
         this.name = name;
     }
 
@@ -53,10 +56,10 @@ public final class ObjectType extends Verifiable {
     }
 
     @NotNull
-    @Size(min = 1, max = maxLength)
+    @Size(min = 1, max = MAX_LENGTH)
     public void setType(final String type) {
         ensureNotNull(FIELD_TYPE, type);
-        ensureLength(FIELD_TYPE, type, 1, maxLength);
+        ensureLength(FIELD_TYPE, type, 1, MAX_LENGTH);
         this.type = type;
     }
 
@@ -77,10 +80,10 @@ public final class ObjectType extends Verifiable {
 
         checkNotNull(errors, FIELD_NAME, name, "The Name is not defined.");
         checkNotEmpty(errors, FIELD_NAME, name, "The Name may not be empty.");
-        checkNotTooLong(errors, FIELD_NAME, name, maxLength, "The Name is longer than the allowed " + maxLength + " characters.");
+        checkNotTooLong(errors, FIELD_NAME, name, MAX_LENGTH, "The Name is longer than the allowed " + MAX_LENGTH + " characters.");
         checkNotNull(errors, FIELD_TYPE, type, "The Type is not defined.");
         checkNotEmpty(errors, FIELD_TYPE, type, "The Type may not be empty.");
-        checkNotTooLong(errors, FIELD_TYPE, type, maxLength, "The Type is longer than the allowed " + maxLength + " characters.");
+        checkNotTooLong(errors, FIELD_TYPE, type, MAX_LENGTH, "The Type is longer than the allowed " + MAX_LENGTH + " characters.");
 
         return errors;
     }

@@ -16,6 +16,7 @@ import io.javadog.cws.model.entities.Externable;
 import io.javadog.cws.model.entities.MemberEntity;
 import io.javadog.cws.model.entities.SettingEntity;
 import io.javadog.cws.model.entities.TrusteeEntity;
+import io.javadog.cws.model.entities.TypeEntity;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceException;
@@ -177,6 +178,13 @@ public final class CommonJpaDao implements CommonDao {
         final Query query = entityManager.createNamedQuery("trustee.findSharedCircles");
         query.setParameter("member", member.getId());
         query.setParameter("requested", requested.getId());
+
+        return findList(query);
+    }
+
+    @Override
+    public List<TypeEntity> findAllTypes() {
+        final Query query = entityManager.createNamedQuery("type.findAll");
 
         return findList(query);
     }

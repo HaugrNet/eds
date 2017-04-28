@@ -40,9 +40,14 @@ public class Authentication extends Verifiable {
     private static final int NAME_MIN_LENGTH = 1;
     private static final int NAME_MAX_LENGTH = 75;
 
-    @XmlElement(required = true) private String account = null;
-    @XmlElement(required = true) private CredentialType credentialType = null;
-    @XmlElement(required = true) private char[] credential = null;
+    @XmlElement(name = FIELD_ACCOUNT, required = true)
+    private String account = null;
+
+    @XmlElement(name = FIELD_TYPE, required = true)
+    private CredentialType credentialType = null;
+
+    @XmlElement(name = FIELD_CREDENTIAL, required = true)
+    private char[] credential = null;
 
     // =========================================================================
     // Standard Setters & Getters

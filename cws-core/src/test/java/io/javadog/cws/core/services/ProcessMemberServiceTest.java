@@ -12,7 +12,6 @@ import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.CredentialType;
 import io.javadog.cws.api.requests.ProcessMemberRequest;
 import io.javadog.cws.api.responses.ProcessMemberResponse;
-import io.javadog.cws.common.Settings;
 import io.javadog.cws.common.exceptions.CWSException;
 import io.javadog.cws.core.Serviceable;
 import io.javadog.cws.model.DatabaseSetup;
@@ -26,7 +25,6 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
 
     @Test(expected = CWSException.class)
     public void testService() {
-        final Settings settings = new Settings();
         final Serviceable<ProcessMemberResponse, ProcessMemberRequest> service = new ProcessMemberService(settings, entityManager);
         final ProcessMemberRequest request = new ProcessMemberRequest();
         request.setAccount(Constants.ADMIN_ACCOUNT);

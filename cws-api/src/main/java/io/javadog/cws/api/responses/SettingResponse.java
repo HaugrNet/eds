@@ -25,7 +25,7 @@ import java.util.Map;
 public final class SettingResponse extends CWSResponse {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
-    private static final long serialVersionUID = 8868831828030258226L;
+    private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
     @XmlElement(name = "settings", required = true)
     private final HashMap<String, String> settings = new HashMap<>();

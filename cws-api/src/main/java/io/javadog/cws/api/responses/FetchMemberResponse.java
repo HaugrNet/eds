@@ -13,6 +13,7 @@ import io.javadog.cws.api.dtos.Member;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -29,8 +30,8 @@ public final class FetchMemberResponse extends CWSResponse {
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
-    private final List<Member> members = new ArrayList<>(0);
-    private final List<Circle> circles = new ArrayList<>(0);
+    @XmlElement private final List<Member> members = new ArrayList<>(0);
+    @XmlElement private final List<Circle> circles = new ArrayList<>(0);
 
     public FetchMemberResponse() {
         // Empty Constructor, required for WebServices

@@ -14,12 +14,16 @@ import io.javadog.cws.api.requests.FetchObjectTypeRequest;
 import io.javadog.cws.api.requests.ProcessFolderRequest;
 import io.javadog.cws.api.requests.ProcessObjectRequest;
 import io.javadog.cws.api.requests.ProcessObjectTypeRequest;
+import io.javadog.cws.api.requests.SignRequest;
+import io.javadog.cws.api.requests.VerifyRequest;
 import io.javadog.cws.api.responses.FetchFolderResponse;
 import io.javadog.cws.api.responses.FetchObjectResponse;
 import io.javadog.cws.api.responses.FetchObjectTypeResponse;
 import io.javadog.cws.api.responses.ProcessFolderResponse;
 import io.javadog.cws.api.responses.ProcessObjectResponse;
 import io.javadog.cws.api.responses.ProcessObjectTypeResponse;
+import io.javadog.cws.api.responses.SignResponse;
+import io.javadog.cws.api.responses.VerifyResponse;
 import io.javadog.cws.common.Settings;
 import io.javadog.cws.common.exceptions.CWSException;
 import io.javadog.cws.core.Serviceable;
@@ -29,6 +33,8 @@ import io.javadog.cws.core.services.FetchObjectTypeService;
 import io.javadog.cws.core.services.ProcessFolderService;
 import io.javadog.cws.core.services.ProcessObjectService;
 import io.javadog.cws.core.services.ProcessObjectTypeService;
+import io.javadog.cws.core.services.SignService;
+import io.javadog.cws.core.services.VerifyService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -168,7 +174,7 @@ public final class ShareBean implements Share {
      * {@inheritDoc}
      */
     @Override
-    @Transactional(Transactional.TxType.NEVER)
+    @Transactional(Transactional.TxType.SUPPORTS)
     public FetchObjectResponse fetchObject(final FetchObjectRequest request) {
         FetchObjectResponse response;
 
@@ -182,6 +188,52 @@ public final class ShareBean implements Share {
             // response.
             log.trace(e.getMessage(), e);
             response = new FetchObjectResponse(e.getReturnCode(), e.getMessage());
+        }
+
+        return response;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional(Transactional.TxType.REQUIRED)
+    public SignResponse sign(final SignRequest request) {
+        SignResponse response;
+
+        try {
+            final Serviceable<SignResponse, SignRequest> service = new SignService(settings, entityManager);
+            response = service.perform(request);
+        } catch (CWSException e) {
+            // Any Warning or Error thrown by the CWS contain enough information
+            // so it can be dealt with by the requesting System. Logging the
+            // error is thus not needed, as all information is provided in the
+            // response.
+            log.trace(e.getMessage(), e);
+            response = new SignResponse(e.getReturnCode(), e.getMessage());
+        }
+
+        return response;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional(Transactional.TxType.SUPPORTS)
+    public VerifyResponse verify(final VerifyRequest request) {
+        VerifyResponse response;
+
+        try {
+            final Serviceable<VerifyResponse, VerifyRequest> service = new VerifyService(settings, entityManager);
+            response = service.perform(request);
+        } catch (CWSException e) {
+            // Any Warning or Error thrown by the CWS contain enough information
+            // so it can be dealt with by the requesting System. Logging the
+            // error is thus not needed, as all information is provided in the
+            // response.
+            log.trace(e.getMessage(), e);
+            response = new VerifyResponse(e.getReturnCode(), e.getMessage());
         }
 
         return response;

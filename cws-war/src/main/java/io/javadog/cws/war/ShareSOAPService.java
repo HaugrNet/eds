@@ -15,12 +15,16 @@ import io.javadog.cws.api.requests.FetchObjectTypeRequest;
 import io.javadog.cws.api.requests.ProcessFolderRequest;
 import io.javadog.cws.api.requests.ProcessObjectRequest;
 import io.javadog.cws.api.requests.ProcessObjectTypeRequest;
+import io.javadog.cws.api.requests.SignRequest;
+import io.javadog.cws.api.requests.VerifyRequest;
 import io.javadog.cws.api.responses.FetchFolderResponse;
 import io.javadog.cws.api.responses.FetchObjectResponse;
 import io.javadog.cws.api.responses.FetchObjectTypeResponse;
 import io.javadog.cws.api.responses.ProcessFolderResponse;
 import io.javadog.cws.api.responses.ProcessObjectResponse;
 import io.javadog.cws.api.responses.ProcessObjectTypeResponse;
+import io.javadog.cws.api.responses.SignResponse;
+import io.javadog.cws.api.responses.VerifyResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,7 +38,7 @@ import javax.xml.ws.BindingType;
  * @author Kim Jensen
  * @since  CWS 1.0
  */
-@SOAPBinding(style = SOAPBinding.Style.DOCUMENT)
+@SOAPBinding
 @BindingType(javax.xml.ws.soap.SOAPBinding.SOAP11HTTP_BINDING)
 @WebService(name = "shareWS", serviceName = "shareWSService", portName = "shareWS", targetNamespace = "http://ws.cws.javadog.io/")
 public final class ShareSOAPService implements Share {
@@ -172,6 +176,50 @@ public final class ShareSOAPService implements Share {
             // performance of the system.
             log.error(e.getMessage(), e);
             response = new FetchObjectResponse(Constants.ERROR, GENERAL_RETURN_MESSAGE);
+        }
+
+        return response;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @WebMethod
+    public SignResponse sign(final SignRequest request) {
+        SignResponse response;
+
+        try {
+            response = bean.sign(request);
+        } catch (RuntimeException e) {
+            // If an error occurs that has so far not been resolved, this is the
+            // final level where it can be handled. Errors can be Persistence
+            // problems or other things that will affect the reliability and/or
+            // performance of the system.
+            log.error(e.getMessage(), e);
+            response = new SignResponse(Constants.ERROR, GENERAL_RETURN_MESSAGE);
+        }
+
+        return response;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @WebMethod
+    public VerifyResponse verify(final VerifyRequest request) {
+        VerifyResponse response;
+
+        try {
+            response = bean.verify(request);
+        } catch (RuntimeException e) {
+            // If an error occurs that has so far not been resolved, this is the
+            // final level where it can be handled. Errors can be Persistence
+            // problems or other things that will affect the reliability and/or
+            // performance of the system.
+            log.error(e.getMessage(), e);
+            response = new VerifyResponse(Constants.ERROR, GENERAL_RETURN_MESSAGE);
         }
 
         return response;

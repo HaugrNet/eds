@@ -13,12 +13,16 @@ import io.javadog.cws.api.requests.FetchObjectTypeRequest;
 import io.javadog.cws.api.requests.ProcessFolderRequest;
 import io.javadog.cws.api.requests.ProcessObjectRequest;
 import io.javadog.cws.api.requests.ProcessObjectTypeRequest;
+import io.javadog.cws.api.requests.SignRequest;
+import io.javadog.cws.api.requests.VerifyRequest;
 import io.javadog.cws.api.responses.FetchFolderResponse;
 import io.javadog.cws.api.responses.FetchObjectResponse;
 import io.javadog.cws.api.responses.FetchObjectTypeResponse;
 import io.javadog.cws.api.responses.ProcessFolderResponse;
 import io.javadog.cws.api.responses.ProcessObjectResponse;
 import io.javadog.cws.api.responses.ProcessObjectTypeResponse;
+import io.javadog.cws.api.responses.SignResponse;
+import io.javadog.cws.api.responses.VerifyResponse;
 
 /**
  * @author Kim Jensen
@@ -34,4 +38,7 @@ public interface Share {
 
     ProcessObjectResponse processObject(ProcessObjectRequest request);
     FetchObjectResponse fetchObject(FetchObjectRequest request);
+
+    SignResponse sign(SignRequest request);
+    VerifyResponse verify(VerifyRequest request);
 }

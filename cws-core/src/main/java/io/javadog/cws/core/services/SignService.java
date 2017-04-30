@@ -8,9 +8,7 @@
 package io.javadog.cws.core.services;
 
 import io.javadog.cws.api.common.Constants;
-import io.javadog.cws.api.requests.ProcessObjectTypeRequest;
 import io.javadog.cws.api.requests.SignRequest;
-import io.javadog.cws.api.responses.ProcessObjectTypeResponse;
 import io.javadog.cws.api.responses.SignResponse;
 import io.javadog.cws.common.Settings;
 import io.javadog.cws.common.exceptions.CWSException;
@@ -34,7 +32,7 @@ public final class SignService extends Serviceable<SignResponse, SignRequest> {
      */
     @Override
     public SignResponse perform(final SignRequest request) {
-        verifyRequest(request, Permission.PROCESS_OBJECT_TYPE);
+        verifyRequest(request, Permission.CREATE_SIGNATURE);
 
         throw new CWSException(Constants.NOTIMPLEMENTED_ERROR, "Not Yet Implemented.");
     }

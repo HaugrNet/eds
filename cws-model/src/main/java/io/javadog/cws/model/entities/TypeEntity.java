@@ -18,12 +18,19 @@ import javax.persistence.Table;
  * @since  CWS 1.0
  */
 @Entity
-@NamedQueries(
+@NamedQueries({
         @NamedQuery(name = "type.findAll",
-                    query = "select t " +
-                            "from TypeEntity t " +
-                            "order by t.name asc")
-)
+                query = "select t " +
+                        "from TypeEntity t " +
+                        "order by t.name asc"),
+        @NamedQuery(name = "type.findMatching",
+                query = "select t from TypeEntity t " +
+                        "where lower(t.name) = lower(:name)"),
+        @NamedQuery(name = "type.countUsage",
+                query = "select count(o.id) " +
+                        "from ObjectEntity o " +
+                        "where o.type.id = :id")
+})
 @Table(name = "types")
 public final class TypeEntity extends CWSEntity {
 

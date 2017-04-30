@@ -25,7 +25,7 @@ public enum Permission {
     PROCESS_MEMBER(TrustLevel.WRITE, "Process Member."),
     PROCESS_OBJECT(TrustLevel.WRITE, "Process Object."),
     PROCESS_OBJECT_TYPE(TrustLevel.WRITE, "Process Object Type."),
-    SIGN(TrustLevel.WRITE, "Create Digital Signature."),
+    CREATE_SIGNATURE(TrustLevel.WRITE, "Create Digital Signature."),
     VERIFY_SIGNATURE(TrustLevel.WRITE, "Verify Digital Signature."),
     SETTING(TrustLevel.ADMIN, "Settings.");
 

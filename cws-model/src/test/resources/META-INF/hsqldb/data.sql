@@ -142,15 +142,16 @@ INSERT INTO keys (algorithm, cipher_mode, padding, status) VALUES
 -- With the Members created, and the Circles and Keys added, it is possible to
 -- also create a number of Trustees, in this case we add Member 1-3 to Circle 1,
 -- Member 1-4 to Circle 2 and Member 2-5 to Circle 3.
+-- The Trust Level is different for each Member.
 INSERT INTO trustees (external_id, member_id, circle_id, key_id, trust_level) VALUES
     ('c01e9a37-9ba0-4572-94ff-3d5bf357fc4a', 2, 1, 1, 'ADMIN'),
-    ('d8158a61-a06a-40b6-bcda-39a8710e2339', 3, 1, 1, 'ADMIN'),
-    ('b3437863-9143-4a15-aeac-8372e9c44775', 4, 1, 1, 'ADMIN'),
+    ('d8158a61-a06a-40b6-bcda-39a8710e2339', 3, 1, 1, 'WRITE'),
+    ('b3437863-9143-4a15-aeac-8372e9c44775', 4, 1, 1, 'READ'),
     ('41eb49f2-b1e5-43dc-8e4c-4bdcd19dd059', 2, 2, 2, 'ADMIN'),
-    ('3ce6c2b8-c16e-46cd-987a-46e69edeab16', 3, 2, 2, 'ADMIN'),
-    ('9737762b-2f87-4caa-9013-d59851839a6a', 4, 2, 2, 'ADMIN'),
+    ('3ce6c2b8-c16e-46cd-987a-46e69edeab16', 3, 2, 2, 'WRITE'),
+    ('9737762b-2f87-4caa-9013-d59851839a6a', 4, 2, 2, 'READ'),
     ('70e96aa5-2731-4f2a-bebe-7f5fecd5c688', 5, 2, 2, 'ADMIN'),
-    ('9968d55a-4eee-414a-bbb6-4f273456f08b', 3, 3, 3, 'ADMIN'),
-    ('d1cae751-a160-430c-aba7-431407342dfa', 4, 3, 3, 'ADMIN'),
+    ('9968d55a-4eee-414a-bbb6-4f273456f08b', 3, 3, 3, 'WRITE'),
+    ('d1cae751-a160-430c-aba7-431407342dfa', 4, 3, 3, 'READ'),
     ('1f92b9ad-f68f-45fe-85d5-9756bbd2c600', 5, 3, 3, 'ADMIN'),
-    ('b35a0d99-397c-4e77-8f84-843758700d60', 6, 3, 3, 'ADMIN');
+    ('b35a0d99-397c-4e77-8f84-843758700d60', 6, 3, 3, 'GUEST');

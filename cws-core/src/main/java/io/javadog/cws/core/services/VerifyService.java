@@ -19,11 +19,11 @@ import javax.persistence.EntityManager;
 
 /**
  * @author Kim Jensen
- * @since CWS 1.0
+ * @since  CWS 1.0
  */
 public final class VerifyService extends Serviceable<VerifyResponse, VerifyRequest> {
 
-    public VerifyService(Settings settings, EntityManager entityManager) {
+    public VerifyService(final Settings settings, final EntityManager entityManager) {
         super(settings, entityManager);
     }
 
@@ -32,7 +32,7 @@ public final class VerifyService extends Serviceable<VerifyResponse, VerifyReque
      */
     @Override
     public VerifyResponse perform(final VerifyRequest request) {
-        verifyRequest(request, Permission.PROCESS_OBJECT_TYPE);
+        verifyRequest(request, Permission.VERIFY_SIGNATURE);
 
         throw new CWSException(Constants.NOTIMPLEMENTED_ERROR, "Not Yet Implemented.");
     }

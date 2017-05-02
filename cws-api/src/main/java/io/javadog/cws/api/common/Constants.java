@@ -60,6 +60,8 @@ public final class Constants {
     public static final int CONSTRAINT_ERROR = ERROR + 2;
     public static final int PROPERTY_ERROR = ERROR + 3;
     public static final int CRYPTO_ERROR = ERROR + 4;
+    public static final int IDENTIFICATION_ERROR = ERROR + 5;
+    public static final int NOTIMPLEMENTED_ERROR = ERROR + 99;
 
     /**
      * <p>General number for all Warnings, a Warning is defined as an even that
@@ -80,7 +82,7 @@ public final class Constants {
     public static final int VERIFICATION_WARNING = WARNING + 1;
     public static final int IDENTIFICATION_WARNING = WARNING + 2;
     public static final int AUTHORIZATION_WARNING = WARNING + 3;
-    public static final int NOTIMPLEMENTED_ERROR = ERROR + 99;
+    public static final int ILLEGAL_ACTION = WARNING + 99;
 
     private Constants() {
         // Private Constructor, this is a Constants Class.

@@ -9,6 +9,7 @@ package io.javadog.cws.api.requests;
 
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.dtos.Authentication;
+import io.javadog.cws.api.dtos.ObjectType;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -21,28 +22,41 @@ import java.util.Map;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "fetchObjectRequest", propOrder = "objectId")
+@XmlType(name = "fetchObjectRequest", propOrder = { "dataType", "dataId" })
 public final class FetchObjectRequest extends Authentication {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
-    private static final String FIELD_OBJECT_ID = "objectId";
+    private static final String FIELD_DATA_TYPE = "dataType";
+    private static final String FIELD_DATA_ID = "dataId";
 
-    @XmlElement(name = FIELD_OBJECT_ID, required = true, nillable = true)
-    private String objectId = null;
+    @XmlElement(name = FIELD_DATA_TYPE, required = true, nillable = true)
+    private ObjectType dataType = null;
+
+    @XmlElement(name = FIELD_DATA_ID, required = true, nillable = true)
+    private String dataId = null;
 
     // =========================================================================
     // Setters & Getters
     // =========================================================================
 
-    public void setObjectId(final String objectId) {
-        ensureValidId(FIELD_OBJECT_ID, objectId);
-        this.objectId = objectId;
+    public void setDataType(ObjectType dataType) {
+        ensureVerifiable(FIELD_DATA_TYPE, dataType);
+        this.dataType = dataType;
     }
 
-    public String getObjectId() {
-        return objectId;
+    public ObjectType getDataType() {
+        return dataType;
+    }
+
+    public void setDataId(final String dataId) {
+        ensureValidId(FIELD_DATA_ID, dataId);
+        this.dataId = dataId;
+    }
+
+    public String getDataId() {
+        return dataId;
     }
 
     // =========================================================================
@@ -56,8 +70,11 @@ public final class FetchObjectRequest extends Authentication {
     public Map<String, String> validate() {
         final Map<String, String> errors = super.validate();
 
-        if (objectId != null) {
-            checkPattern(errors, FIELD_OBJECT_ID, objectId, Constants.ID_PATTERN_REGEX, "The Object Id is invalid.");
+        if (dataType != null) {
+            errors.putAll(dataType.validate());
+        }
+        if (dataId != null) {
+            checkPattern(errors, FIELD_DATA_ID, dataId, Constants.ID_PATTERN_REGEX, "The Object Data Id is invalid.");
         }
 
         return errors;

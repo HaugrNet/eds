@@ -48,6 +48,7 @@ public final class ProcessMemberRequest extends Authentication {
      * Actions enumerated Object includes:</p>
      * <ul>
      *   <li>PROCESS</li>
+     *   <li>INVITE</li>
      *   <li>DELETE</li>
      *   <li>REKEY</li>
      * </ul>

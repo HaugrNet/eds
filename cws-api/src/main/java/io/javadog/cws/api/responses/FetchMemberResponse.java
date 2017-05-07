@@ -30,8 +30,11 @@ public final class FetchMemberResponse extends CWSResponse {
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
-    @XmlElement private final List<Member> members = new ArrayList<>(0);
-    @XmlElement private final List<Circle> circles = new ArrayList<>(0);
+    @XmlElement(name = "members", required = true)
+    private final List<Member> members = new ArrayList<>(0);
+
+    @XmlElement(name = "circles", required = true)
+    private final List<Circle> circles = new ArrayList<>(0);
 
     public FetchMemberResponse() {
         // Empty Constructor, required for WebServices

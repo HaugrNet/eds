@@ -66,10 +66,10 @@ public class Authentication extends Verifiable {
     }
 
     /**
-     * Sets the type of Credentials to be used, either a Passphrase (default) or
+     * Sets the type of Credentials to be used, either a PassPhrase (default) or
      * an Asymmetric Key (RSA based Private Key or Public/Private Key Pair).
      *
-     * @param credentialType Member Credential Type, i.e. Key or Passphrase
+     * @param credentialType Member Credential Type, i.e. Key or PassPhrase
      */
     @NotNull
     public void setCredentialType(final CredentialType credentialType) {
@@ -82,14 +82,14 @@ public class Authentication extends Verifiable {
     }
 
     /**
-     * <p>Sets the Member's Credentials. This can be either a Passphrase
+     * <p>Sets the Member's Credentials. This can be either a PassPhrase
      * (default) or an Asymmetric Key (RSA based Private Key or Public/Private
      * Key Pair).</p>
      *
      * <p>If the Credentials is a Key, then the information given must be
      * armored, i.e. Base64 encoded.</p>
      *
-     * @param credential Member Credentials, i.e. Key or Passphrase
+     * @param credential Member Credentials, i.e. Key or PassPhrase
      */
     @NotNull
     public void setCredential(final char[] credential) {

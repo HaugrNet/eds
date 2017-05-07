@@ -67,14 +67,14 @@ public final class TrusteeTest {
         trustee.setMember(member);
         trustee.setCircle(circle);
         trustee.setTrustLevel(trustLevel);
-        trustee.setModified(lastModified);
+        trustee.setChanged(lastModified);
         trustee.setSince(created);
 
         assertThat(trustee.getId(), is(id));
         assertThat(trustee.getMember(), is(member));
         assertThat(trustee.getCircle(), is(circle));
         assertThat(trustee.getTrustLevel(), is(trustLevel));
-        assertThat(trustee.getModified(), is(lastModified));
+        assertThat(trustee.getChanged(), is(lastModified));
         assertThat(trustee.getSince(), is(created));
 
         final Map<String, String> errors = trustee.validate();

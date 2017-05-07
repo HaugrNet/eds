@@ -7,16 +7,115 @@
  */
 package io.javadog.cws.api.requests;
 
+import io.javadog.cws.api.common.Action;
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.dtos.Authentication;
+import io.javadog.cws.api.dtos.ObjectData;
+
+import javax.validation.constraints.NotNull;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlType;
+import java.util.EnumSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Kim Jensen
  * @since  CWS 1.0
  */
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(name = "ProcessObjectRequest", propOrder = { "action", "dataId", "data" })
 public final class ProcessObjectRequest extends Authentication {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
+    private static final Set<Action> ALLOWED = EnumSet.of(Action.PROCESS, Action.DELETE);
 
+    private static final String FIELD_ACTION = "action";
+    private static final String FIELD_DATA_ID = "dataId";
+    private static final String FIELD_DATA = "data";
+
+    @XmlElement(name = FIELD_ACTION, required = true)
+    private Action action = null;
+
+    @XmlElement(name = FIELD_DATA_ID, required = true, nillable = true)
+    private String dataId = null;
+
+    @XmlElement(name = FIELD_DATA, required = true)
+    private ObjectData data = null;
+
+    // =========================================================================
+    // Standard Setters & Getters
+    // =========================================================================
+
+    /**
+     * <p>Sets the Action for the processing Request. Allowed values from the
+     * Actions enumerated Object includes:</p>
+     * <ul>
+     *   <li>PROCESS</li>
+     *   <li>DELETE</li>
+     * </ul>
+     *
+     * @param action Current Action
+     * @throws IllegalArgumentException if the value is null or not allowed
+     */
+    @NotNull
+    public void setAction(final Action action) {
+        ensureNotNull(FIELD_ACTION, action);
+        ensureValidEntry(FIELD_ACTION, action, ALLOWED);
+        this.action = action;
+    }
+
+    public Action getAction() {
+        return action;
+    }
+
+    public void setDataId(final String dataId) {
+        ensureValidId(FIELD_DATA_ID, dataId);
+        this.dataId = dataId;
+    }
+
+    public String getDataId() {
+        return dataId;
+    }
+
+    @NotNull
+    public void setData(final ObjectData data) {
+        ensureNotNull(FIELD_DATA, data);
+        this.data = data;
+    }
+
+    public ObjectData getData() {
+        return data;
+    }
+
+    // =========================================================================
+    // Standard Methods
+    // =========================================================================
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Map<String, String> validate() {
+        final Map<String, String> errors = super.validate();
+
+        if (action == null) {
+            errors.put(FIELD_ACTION, "No action has been provided.");
+        }
+
+        if (dataId != null) {
+            checkPattern(errors, FIELD_DATA_ID, dataId, Constants.ID_PATTERN_REGEX, "The Object Data Id is invalid.");
+        }
+
+        if (data == null) {
+            errors.put(FIELD_DATA, "Value is missing, null or invalid.");
+        } else {
+            errors.putAll(data.validate());
+        }
+
+        return errors;
+    }
 }

@@ -28,7 +28,7 @@ import java.util.Map;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "trustee", propOrder = { "id", "circle", "member", "trustLevel", "modified", "since" })
+@XmlType(name = "trustee", propOrder = { "id", "circle", "member", "trustLevel", "changed", "since" })
 public final class Trustee extends Verifiable {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
@@ -37,13 +37,26 @@ public final class Trustee extends Verifiable {
     private static final String FIELD_CIRCLE = "circle";
     private static final String FIELD_MEMBER = "member";
     private static final String FIELD_TRUSTLEVEL = "trustLevel";
+    private static final String FIELD_CHANGED = "changed";
+    private static final String FIELD_SINCE = "since";
 
-    @XmlElement                  private String id = null;
-    @XmlElement(required = true) private Circle circle = null;
-    @XmlElement(required = true) private Member member = null;
-    @XmlElement(required = true) private TrustLevel trustLevel = null;
-    @XmlElement                  private Date modified = null;
-    @XmlElement                  private Date since = null;
+    @XmlElement(name = FIELD_ID)
+    private String id = null;
+
+    @XmlElement(name = FIELD_CIRCLE, required = true)
+    private Circle circle = null;
+
+    @XmlElement(name = FIELD_MEMBER, required = true)
+    private Member member = null;
+
+    @XmlElement(name = FIELD_TRUSTLEVEL, required = true)
+    private TrustLevel trustLevel = null;
+
+    @XmlElement(name = FIELD_CHANGED)
+    private Date changed = null;
+
+    @XmlElement(name = FIELD_SINCE)
+    private Date since = null;
 
     // =========================================================================
     // Standard Setters & Getters
@@ -91,12 +104,12 @@ public final class Trustee extends Verifiable {
         return trustLevel;
     }
 
-    public void setModified(final Date modified) {
-        this.modified = modified;
+    public void setChanged(final Date changed) {
+        this.changed = changed;
     }
 
-    public Date getModified() {
-        return modified;
+    public Date getChanged() {
+        return changed;
     }
 
     public void setSince(final Date since) {

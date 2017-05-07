@@ -131,7 +131,7 @@ public final class FetchCirclesService extends Serviceable<FetchCircleResponse, 
         trustee.setMember(convert(entity.getMember()));
         trustee.setCircle(convert(entity.getCircle()));
         trustee.setTrustLevel(entity.getTrustLevel());
-        trustee.setModified(entity.getModified());
+        trustee.setChanged(entity.getModified());
         trustee.setSince(entity.getCreated());
 
         return trustee;

@@ -34,9 +34,9 @@ public final class FetchObjectRequestTest {
         request.setAccount(Constants.ADMIN_ACCOUNT);
         request.setCredentialType(CredentialType.PASSPHRASE);
         request.setCredential(Constants.ADMIN_ACCOUNT.toCharArray());
-        request.setObjectId(objectId);
+        request.setDataId(objectId);
 
-        assertThat(request.getObjectId(), is(objectId));
+        assertThat(request.getDataId(), is(objectId));
         assertThat(request.validate(), is(not(nullValue())));
         assertThat(request.validate().size(), is(0));
     }
@@ -48,30 +48,30 @@ public final class FetchObjectRequestTest {
         request.setCredentialType(CredentialType.PASSPHRASE);
         request.setCredential(Constants.ADMIN_ACCOUNT.toCharArray());
 
-        assertThat(request.getObjectId(), is(nullValue()));
+        assertThat(request.getDataId(), is(nullValue()));
         assertThat(request.validate(), is(not(nullValue())));
         assertThat(request.validate().size(), is(0));
     }
 
     @Test
     public void testClassWithForcedObjectId() throws NoSuchFieldException, IllegalAccessException {
-        final String objectId = Constants.ADMIN_ACCOUNT;
+        final String dataId = Constants.ADMIN_ACCOUNT;
 
         final FetchObjectRequest request = new FetchObjectRequest();
         request.setAccount(Constants.ADMIN_ACCOUNT);
         request.setCredentialType(CredentialType.PASSPHRASE);
         request.setCredential(Constants.ADMIN_ACCOUNT.toCharArray());
 
-        final Field field = request.getClass().getDeclaredField("objectId");
+        final Field field = request.getClass().getDeclaredField("dataId");
         field.setAccessible(true);
-        field.set(request, objectId);
+        field.set(request, dataId);
 
         final Map<String, String> errors = request.validate();
 
-        assertThat(request.getObjectId(), is(objectId));
+        assertThat(request.getDataId(), is(dataId));
         assertThat(errors, is(not(nullValue())));
         assertThat(errors.size(), is(1));
-        assertThat(errors.get("objectId"), is("The Object Id is invalid."));
+        assertThat(errors.get("dataId"), is("The Object Data Id is invalid."));
     }
 
     @Test
@@ -79,7 +79,7 @@ public final class FetchObjectRequestTest {
         final FetchObjectRequest request = new FetchObjectRequest();
         final Map<String, String> errors = request.validate();
 
-        assertThat(request.getObjectId(), is(nullValue()));
+        assertThat(request.getDataId(), is(nullValue()));
         assertThat(errors, is(not(nullValue())));
         assertThat(errors.size(), is(3));
         assertThat(errors.get("credentialType"), is("CredentialType is missing, null or invalid."));

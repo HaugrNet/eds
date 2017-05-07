@@ -12,7 +12,6 @@ import io.javadog.cws.api.common.Verifiable;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -26,25 +25,28 @@ import java.util.Map;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "circle", propOrder = { "id", "name", "created" })
-public final class Circle extends Verifiable {
+@XmlType(name = "objectData", propOrder = { "id", "data", "objectType", "added" })
+public final class ObjectData extends Verifiable {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
-    private static final String FIELD_ID = "id";
-    private static final String FIELD_NAME = "name";
-    private static final String FIELD_CREATED = "created";
-    private static final int NAME_MIN_LENGTH = 1;
-    private static final int NAME_MAX_LENGTH = 75;
 
-    @XmlElement(name = FIELD_ID, required = true)
+    private static final String FIELD_ID = "id";
+    private static final String FIELD_DATA = "data";
+    private static final String FIELD_OBJECT_TYPE = "objectType";
+    private static final String FIELD_ADDED = "added";
+
+    @XmlElement(name = FIELD_ID, required = true, nillable = true)
     private String id = null;
 
-    @XmlElement(name = FIELD_NAME, required = true)
-    private String name = null;
+    @XmlElement(name = FIELD_DATA, required = true, nillable = true)
+    private byte[] data = null;
 
-    @XmlElement(name = FIELD_CREATED)
-    private Date created = null;
+    @XmlElement(name = FIELD_OBJECT_TYPE, required = true)
+    private ObjectType objectType = null;
+
+    @XmlElement(name = FIELD_ADDED)
+    private Date added = null;
 
     // =========================================================================
     // Standard Setters & Getters
@@ -60,24 +62,31 @@ public final class Circle extends Verifiable {
         return id;
     }
 
+    public void setData(byte[] data) {
+        this.data = data;
+    }
+
+    public byte[] getData() {
+        return data;
+    }
+
     @NotNull
-    @Size(min = NAME_MIN_LENGTH, max = NAME_MAX_LENGTH)
-    public void setName(final String name) {
-        ensureNotNull(FIELD_NAME, name);
-        ensureLength(FIELD_NAME, name, NAME_MIN_LENGTH, NAME_MAX_LENGTH);
-        this.name = name;
+    public void setObjectType(ObjectType objectType) {
+        ensureNotNull(FIELD_OBJECT_TYPE, objectType);
+        ensureVerifiable(FIELD_OBJECT_TYPE, objectType);
+        this.objectType = objectType;
     }
 
-    public String getName() {
-        return name;
+    public ObjectType getObjectType() {
+        return objectType;
     }
 
-    public void setCreated(final Date created) {
-        this.created = created;
+    public void setAdded(Date added) {
+        this.added = added;
     }
 
-    public Date getCreated() {
-        return created;
+    public Date getAdded() {
+        return added;
     }
 
     /**
@@ -88,9 +97,10 @@ public final class Circle extends Verifiable {
         final Map<String, String> errors = new HashMap<>();
 
         checkPattern(errors, FIELD_ID, id, Constants.ID_PATTERN_REGEX, "The Circle Id is invalid.");
-        checkNotNull(errors, FIELD_NAME, name, "The Name is missing, null or invalid.");
-        checkNotEmpty(errors, FIELD_NAME, name, "The Name may not be empty.");
-        checkNotTooLong(errors, FIELD_NAME, name, NAME_MAX_LENGTH, "The Name is exceeding the maximum allowed length " + NAME_MAX_LENGTH + '.');
+        checkNotNull(errors, FIELD_OBJECT_TYPE, objectType, "The ObjectType is undefined.");
+        if (objectType != null) {
+            errors.putAll(objectType.validate());
+        }
 
         return errors;
     }

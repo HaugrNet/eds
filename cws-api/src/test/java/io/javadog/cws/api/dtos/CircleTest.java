@@ -106,7 +106,7 @@ public class CircleTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void setTooLongName() {
+    public void testSetTooLongName() {
         final Circle circle = new Circle();
         circle.setName("1234567890123456789012345678901234567891234567890123456789012345678901234567890");
     }

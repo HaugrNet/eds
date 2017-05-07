@@ -42,7 +42,7 @@ public final class CommonJpaDao implements CommonDao {
      * {@inheritDoc}
      */
     @Override
-    public <E extends CWSEntity> E persist(final E entity) {
+    public <E extends CWSEntity> void persist(final E entity) {
         if ((entity instanceof Externable) && (((Externable) entity).getExternalId() == null)) {
             ((Externable) entity).setExternalId(UUID.randomUUID().toString());
         }
@@ -53,8 +53,6 @@ public final class CommonJpaDao implements CommonDao {
 
         entity.setModified(new Date());
         entityManager.persist(entity);
-
-        return entity;
     }
 
     /**
@@ -63,6 +61,11 @@ public final class CommonJpaDao implements CommonDao {
     @Override
     public <E extends CWSEntity> E find(final Class<E> cwsEntity, final Long id) {
         return entityManager.find(cwsEntity, id);
+    }
+
+    @Override
+    public <E extends CWSEntity> void delete(final E entity) {
+        entityManager.remove(entity);
     }
 
     /**
@@ -182,11 +185,36 @@ public final class CommonJpaDao implements CommonDao {
         return findList(query);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<TypeEntity> findAllTypes() {
         final Query query = entityManager.createNamedQuery("type.findAll");
 
         return findList(query);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<TypeEntity> findMatchingObjectTypes(final String name) {
+        final Query query = entityManager.createNamedQuery("type.findMatching");
+        query.setParameter("name", name);
+
+        return findList(query);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int countObjectTypeUsage(final Long id) {
+        final Query query = entityManager.createNamedQuery("type.countUsage");
+        query.setParameter("id", id);
+
+        return (int) query.getSingleResult();
     }
 
     // =========================================================================

@@ -78,7 +78,7 @@ public final class SettingsTest {
     }
 
     @Test(expected = SettingException.class)
-    public void setInvalidKeylength() {
+    public void testSetInvalidKeylength() {
         final Settings settings = new Settings();
         settings.set(Settings.ASYMMETRIC_ALGORITHM_KEYLENGTH, "Long");
         settings.getAsymmetricKeylength();

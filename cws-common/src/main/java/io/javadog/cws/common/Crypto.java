@@ -70,6 +70,7 @@ import java.util.Base64;
  */
 public final class Crypto {
 
+    private static final int INITIAL_VECTOR_SIZE = 16;
     private final Settings settings;
 
     public Crypto(final Settings settings) {
@@ -116,7 +117,6 @@ public final class Crypto {
         }
     }
 
-
     public String sign(final KeyPair keyPair, final String message) {
         try {
             final Signature signer = Signature.getInstance(settings.getSignatureAlgorithm());
@@ -147,7 +147,7 @@ public final class Crypto {
         final String algorithm = key.getAlgorithm();
         final Cipher cipher = Cipher.getInstance(algorithm);
 
-        if (algorithm.contains("CBC") && (iv != null)) {
+        if ((iv != null) && algorithm.contains("CBC")) {
             cipher.init(mode, key, iv);
         } else {
             cipher.init(mode, key);
@@ -157,7 +157,7 @@ public final class Crypto {
     }
 
     public IvParameterSpec generateInitialVector(final String salt) {
-        final byte[] bytes = new byte[16];
+        final byte[] bytes = new byte[INITIAL_VECTOR_SIZE];
         System.arraycopy(salt.getBytes(), 0, bytes, 0, bytes.length);
 
         return new IvParameterSpec(bytes);

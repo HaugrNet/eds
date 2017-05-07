@@ -11,7 +11,6 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
 
 import org.junit.Test;
 
@@ -35,15 +34,11 @@ public final class ConstantsTest {
      * kept, and that the Constructor is not made public.</p>
      */
     @Test
-    public void testPrivateConstructor() {
-        try {
-            final Constructor<Constants> constructor = Constants.class.getDeclaredConstructor();
-            assertThat(constructor.isAccessible(), is(false));
-            constructor.setAccessible(true);
-            final Constants mapper = constructor.newInstance();
-            assertThat(mapper, is(not(nullValue())));
-        } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException | InstantiationException e) {
-            fail("Could not invoke Private Constructor: " + e.getMessage());
-        }
+    public void testPrivateConstructor() throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
+        final Constructor<Constants> constructor = Constants.class.getDeclaredConstructor();
+        assertThat(constructor.isAccessible(), is(false));
+        constructor.setAccessible(true);
+        final Constants mapper = constructor.newInstance();
+        assertThat(mapper, is(not(nullValue())));
     }
 }

@@ -24,9 +24,11 @@ import java.util.List;
  */
 public interface CommonDao {
 
-    <E extends CWSEntity> E persist(E entity);
+    <E extends CWSEntity> void persist(E entity);
 
     <E extends CWSEntity> E find(Class<E> cwsEntity, Long id);
+
+    <E extends CWSEntity> void delete(E entity);
 
     MemberEntity findMemberByName(String name);
 
@@ -49,4 +51,8 @@ public interface CommonDao {
     List<CircleEntity> findCirclesBothBelongTo(MemberEntity member, MemberEntity requested);
 
     List<TypeEntity> findAllTypes();
+
+    List<TypeEntity> findMatchingObjectTypes(String name);
+
+    int countObjectTypeUsage(Long id);
 }

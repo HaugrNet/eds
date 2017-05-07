@@ -94,7 +94,7 @@ public final class SettingService extends Serviceable<SettingResponse, SettingRe
             final SettingEntity setting = new SettingEntity();
             setting.setName(entry.getKey());
             setting.setSetting(entry.getValue());
-            setting.setModifiable(true);
+            setting.setModifiable(Boolean.TRUE);
             dao.persist(setting);
 
             currentSettings.put(setting.getName(), setting);

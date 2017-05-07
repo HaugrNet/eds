@@ -24,6 +24,7 @@ import io.javadog.cws.model.jpa.CommonJpaDao;
 
 import javax.crypto.SecretKey;
 import javax.persistence.EntityManager;
+import java.nio.charset.Charset;
 import java.security.Key;
 import java.security.KeyPair;
 import java.util.List;
@@ -136,12 +137,13 @@ public abstract class Serviceable<R extends CWSResponse, V extends Authenticatio
     private void checkAccountCredentials(final V verifiable) {
         final Key key = extractKeyFromCredentials(verifiable, member.getSalt());
         final String toCheck = UUID.randomUUID().toString();
+        final Charset charset = crypto.getCharSet();
         keyPair = crypto.extractAsymmetricKey(key, member.getSalt(), member.getPublicKey(), member.getPrivateKey());
 
-        final byte[] toEncrypt = toCheck.getBytes(crypto.getCharSet());
+        final byte[] toEncrypt = toCheck.getBytes(charset);
         final byte[] encrypted = crypto.encrypt(keyPair.getPublic(), toEncrypt);
         final byte[] decrypted = crypto.decrypt(keyPair.getPrivate(), encrypted);
-        final String result = new String(decrypted, crypto.getCharSet());
+        final String result = new String(decrypted, charset);
 
         if (!Objects.equals(result, toCheck)) {
             throw new AuthorizationException("Cannot authenticate the Member from the given Credentials.");

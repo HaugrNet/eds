@@ -149,13 +149,13 @@ public final class Settings {
 
     private static int toInt(final String value) {
         try {
-            return Integer.valueOf(value);
+            return Integer.parseInt(value);
         } catch (NumberFormatException e) {
             throw new SettingException(e);
         }
     }
 
     private static boolean toBoolean(final String value, final String defaultValue) {
-        return Boolean.valueOf((value != null) ? value.trim() : defaultValue);
+        return Boolean.parseBoolean((value != null) ? value.trim() : defaultValue);
     }
 }

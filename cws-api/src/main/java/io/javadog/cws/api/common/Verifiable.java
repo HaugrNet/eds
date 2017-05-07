@@ -108,8 +108,11 @@ public abstract class Verifiable implements Serializable {
     }
 
     protected static void ensureLength(final String field, final String value, final int min, final int max) {
-        if ((value != null) && ((value.trim().length() < min) || (value.trim().length() > max))) {
-            throw new IllegalArgumentException(PRE_VALUE + field + "' is outside of the allowed boundaries.");
+        if (value != null) {
+            final int length = value.trim().length();
+            if ((length < min) || (length > max)) {
+                throw new IllegalArgumentException(PRE_VALUE + field + "' is outside of the allowed boundaries.");
+            }
         }
     }
 

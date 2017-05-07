@@ -7,6 +7,7 @@
  */
 package io.javadog.cws.api.requests;
 
+import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.dtos.Authentication;
 
 /**
@@ -15,4 +16,5 @@ import io.javadog.cws.api.dtos.Authentication;
  */
 public final class SignRequest extends Authentication {
 
+    private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 }

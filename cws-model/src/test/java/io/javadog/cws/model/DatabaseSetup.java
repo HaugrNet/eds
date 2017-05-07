@@ -148,8 +148,9 @@ public class DatabaseSetup {
         entity.setCipherMode(settings.getSymmetricCipherMode());
         entity.setPadding(settings.getSymmetricPadding());
         entity.setStatus(Status.ACTIVE);
+        persist(entity);
 
-        return persist(entity);
+        return entity;
     }
 
     protected MemberEntity prepareMember(final String credential, final String publicKey, final String privateKey) {
@@ -158,19 +159,21 @@ public class DatabaseSetup {
         entity.setSalt(UUID.randomUUID().toString());
         entity.setPublicKey(publicKey);
         entity.setPrivateKey(privateKey);
+        persist(entity);
 
-        return persist(entity);
+        return entity;
     }
 
     protected CircleEntity prepareCircle(final String name) {
         final CircleEntity entity = new CircleEntity();
         entity.setName(name);
+        persist(entity);
 
-        return persist(entity);
+        return entity;
     }
 
-    protected <E extends CWSEntity> E persist(final E entity) {
-        return dao.persist(entity);
+    protected <E extends CWSEntity> void persist(final E entity) {
+        dao.persist(entity);
     }
 
     protected <E extends CWSEntity> void persistAndDetach(final E entity) {

@@ -31,7 +31,7 @@ public final class ObjectTypeTest {
         final String name = "name1";
         final String type = "type1";
 
-        final ObjectType objectType = new ObjectType();
+        final DataType objectType = new DataType();
         objectType.setName(name);
         objectType.setType(type);
 
@@ -47,7 +47,7 @@ public final class ObjectTypeTest {
         expected.expect(IllegalArgumentException.class);
         expected.expectMessage("The value for 'name' may not be null.");
 
-        final ObjectType type = new ObjectType();
+        final DataType type = new DataType();
         type.setName(null);
     }
 
@@ -56,7 +56,7 @@ public final class ObjectTypeTest {
         expected.expect(IllegalArgumentException.class);
         expected.expectMessage("The value for 'name' is outside of the allowed boundaries.");
 
-        final ObjectType type = new ObjectType();
+        final DataType type = new DataType();
         type.setName("");
     }
 
@@ -68,7 +68,7 @@ public final class ObjectTypeTest {
         final String data = "12345678901234567890123456789012345678901234567890";
         final String value = data + data + data + data + data + data;
 
-        final ObjectType type = new ObjectType();
+        final DataType type = new DataType();
         type.setName(value);
     }
 
@@ -77,7 +77,7 @@ public final class ObjectTypeTest {
         expected.expect(IllegalArgumentException.class);
         expected.expectMessage("The value for 'type' may not be null.");
 
-        final ObjectType type = new ObjectType();
+        final DataType type = new DataType();
         type.setType(null);
     }
 
@@ -86,7 +86,7 @@ public final class ObjectTypeTest {
         expected.expect(IllegalArgumentException.class);
         expected.expectMessage("The value for 'type' is outside of the allowed boundaries.");
 
-        final ObjectType type = new ObjectType();
+        final DataType type = new DataType();
         type.setType("");
     }
 
@@ -98,13 +98,13 @@ public final class ObjectTypeTest {
         final String data = "12345678901234567890123456789012345678901234567890";
         final String value = data + data + data + data + data + data;
 
-        final ObjectType type = new ObjectType();
+        final DataType type = new DataType();
         type.setType(value);
     }
 
     @Test
     public void testEmptyObject() {
-        final ObjectType type = new ObjectType();
+        final DataType type = new DataType();
 
         final Map<String, String> errors = type.validate();
         assertThat(errors.size(), is(2));
@@ -114,7 +114,7 @@ public final class ObjectTypeTest {
 
     @Test
     public void testForcingEmptyData() throws NoSuchFieldException, IllegalAccessException {
-        final ObjectType type = new ObjectType();
+        final DataType type = new DataType();
         final Field fieldName = type.getClass().getDeclaredField("name");
         fieldName.setAccessible(true);
         fieldName.set(type, "");
@@ -132,7 +132,7 @@ public final class ObjectTypeTest {
     public void testForcingLongData() throws NoSuchFieldException, IllegalAccessException {
         final String data = "12345678901234567890123456789012345678901234567890";
         final String value = data + data + data + data + data + data;
-        final ObjectType type = new ObjectType();
+        final DataType type = new DataType();
         final Field fieldName = type.getClass().getDeclaredField("name");
         fieldName.setAccessible(true);
         fieldName.set(type, value);

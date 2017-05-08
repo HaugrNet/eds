@@ -7,13 +7,13 @@
  */
 package io.javadog.cws.core.services;
 
-import io.javadog.cws.api.dtos.ObjectType;
-import io.javadog.cws.api.requests.FetchObjectTypeRequest;
-import io.javadog.cws.api.responses.FetchObjectTypeResponse;
+import io.javadog.cws.api.dtos.DataType;
+import io.javadog.cws.api.requests.FetchDataTypeRequest;
+import io.javadog.cws.api.responses.FetchDataTypeResponse;
 import io.javadog.cws.common.Settings;
 import io.javadog.cws.core.Permission;
 import io.javadog.cws.core.Serviceable;
-import io.javadog.cws.model.entities.TypeEntity;
+import io.javadog.cws.model.entities.DataTypeEntity;
 
 import javax.persistence.EntityManager;
 import java.util.ArrayList;
@@ -26,7 +26,7 @@ import java.util.List;
  * @author Kim Jensen
  * @since  CWS 1.0
  */
-public final class FetchObjectTypeService extends Serviceable<FetchObjectTypeResponse, FetchObjectTypeRequest> {
+public final class FetchObjectTypeService extends Serviceable<FetchDataTypeResponse, FetchDataTypeRequest> {
 
     public FetchObjectTypeService(final Settings settings, final EntityManager entityManager) {
         super(settings, entityManager);
@@ -36,19 +36,19 @@ public final class FetchObjectTypeService extends Serviceable<FetchObjectTypeRes
      * {@inheritDoc}
      */
     @Override
-    public FetchObjectTypeResponse perform(final FetchObjectTypeRequest request) {
+    public FetchDataTypeResponse perform(final FetchDataTypeRequest request) {
         verifyRequest(request, Permission.FETCH_OBJECT_TYPE);
 
-        final List<TypeEntity> types = dao.findAllTypes();
-        final List<ObjectType> objectTypes = new ArrayList<>(types.size());
-        for (final TypeEntity type : types) {
-            final ObjectType objectType = new ObjectType();
+        final List<DataTypeEntity> types = dao.findAllTypes();
+        final List<DataType> objectTypes = new ArrayList<>(types.size());
+        for (final DataTypeEntity type : types) {
+            final DataType objectType = new DataType();
             objectType.setName(type.getName());
             objectType.setType(type.getType());
             objectTypes.add(objectType);
         }
 
-        final FetchObjectTypeResponse response = new FetchObjectTypeResponse();
+        final FetchDataTypeResponse response = new FetchDataTypeResponse();
         response.setTypes(objectTypes);
 
         return response;

@@ -8,16 +8,16 @@
 package io.javadog.cws.war;
 
 import io.javadog.cws.api.Share;
-import io.javadog.cws.api.requests.FetchObjectRequest;
-import io.javadog.cws.api.requests.FetchObjectTypeRequest;
-import io.javadog.cws.api.requests.ProcessObjectRequest;
-import io.javadog.cws.api.requests.ProcessObjectTypeRequest;
+import io.javadog.cws.api.requests.FetchDataRequest;
+import io.javadog.cws.api.requests.FetchDataTypeRequest;
+import io.javadog.cws.api.requests.ProcessDataRequest;
+import io.javadog.cws.api.requests.ProcessDataTypeRequest;
 import io.javadog.cws.api.requests.SignRequest;
 import io.javadog.cws.api.requests.VerifyRequest;
-import io.javadog.cws.api.responses.FetchObjectResponse;
-import io.javadog.cws.api.responses.FetchObjectTypeResponse;
-import io.javadog.cws.api.responses.ProcessObjectResponse;
-import io.javadog.cws.api.responses.ProcessObjectTypeResponse;
+import io.javadog.cws.api.responses.FetchDataResponse;
+import io.javadog.cws.api.responses.FetchDataTypeResponse;
+import io.javadog.cws.api.responses.ProcessDataResponse;
+import io.javadog.cws.api.responses.ProcessDataTypeResponse;
 import io.javadog.cws.api.responses.SignResponse;
 import io.javadog.cws.api.responses.VerifyResponse;
 import io.javadog.cws.common.Settings;
@@ -54,11 +54,11 @@ public final class ShareBean implements Share {
      */
     @Override
     @Transactional(Transactional.TxType.REQUIRED)
-    public ProcessObjectTypeResponse processObjectType(final ProcessObjectTypeRequest request) {
-        ProcessObjectTypeResponse response;
+    public ProcessDataTypeResponse processDataType(final ProcessDataTypeRequest request) {
+        ProcessDataTypeResponse response;
 
         try {
-            final Serviceable<ProcessObjectTypeResponse, ProcessObjectTypeRequest> service = new ProcessObjectTypeService(settings, entityManager);
+            final Serviceable<ProcessDataTypeResponse, ProcessDataTypeRequest> service = new ProcessObjectTypeService(settings, entityManager);
             response = service.perform(request);
         } catch (CWSException e) {
             // Any Warning or Error thrown by the CWS contain enough information
@@ -66,7 +66,7 @@ public final class ShareBean implements Share {
             // error is thus not needed, as all information is provided in the
             // response.
             log.trace(e.getMessage(), e);
-            response = new ProcessObjectTypeResponse(e.getReturnCode(), e.getMessage());
+            response = new ProcessDataTypeResponse(e.getReturnCode(), e.getMessage());
         }
 
         return response;
@@ -77,11 +77,11 @@ public final class ShareBean implements Share {
      */
     @Override
     @Transactional(Transactional.TxType.NEVER)
-    public FetchObjectTypeResponse fetchObjectTypes(final FetchObjectTypeRequest request) {
-        FetchObjectTypeResponse response;
+    public FetchDataTypeResponse fetchDataTypes(final FetchDataTypeRequest request) {
+        FetchDataTypeResponse response;
 
         try {
-            final Serviceable<FetchObjectTypeResponse, FetchObjectTypeRequest> service = new FetchObjectTypeService(settings, entityManager);
+            final Serviceable<FetchDataTypeResponse, FetchDataTypeRequest> service = new FetchObjectTypeService(settings, entityManager);
             response = service.perform(request);
         } catch (CWSException e) {
             // Any Warning or Error thrown by the CWS contain enough information
@@ -89,7 +89,7 @@ public final class ShareBean implements Share {
             // error is thus not needed, as all information is provided in the
             // response.
             log.trace(e.getMessage(), e);
-            response = new FetchObjectTypeResponse(e.getReturnCode(), e.getMessage());
+            response = new FetchDataTypeResponse(e.getReturnCode(), e.getMessage());
         }
 
         return response;
@@ -100,11 +100,11 @@ public final class ShareBean implements Share {
      */
     @Override
     @Transactional(Transactional.TxType.REQUIRED)
-    public ProcessObjectResponse processObject(final ProcessObjectRequest request) {
-        ProcessObjectResponse response;
+    public ProcessDataResponse processData(final ProcessDataRequest request) {
+        ProcessDataResponse response;
 
         try {
-            final Serviceable<ProcessObjectResponse, ProcessObjectRequest> service = new ProcessObjectService(settings, entityManager);
+            final Serviceable<ProcessDataResponse, ProcessDataRequest> service = new ProcessObjectService(settings, entityManager);
             response = service.perform(request);
         } catch (CWSException e) {
             // Any Warning or Error thrown by the CWS contain enough information
@@ -112,7 +112,7 @@ public final class ShareBean implements Share {
             // error is thus not needed, as all information is provided in the
             // response.
             log.trace(e.getMessage(), e);
-            response = new ProcessObjectResponse(e.getReturnCode(), e.getMessage());
+            response = new ProcessDataResponse(e.getReturnCode(), e.getMessage());
         }
 
         return response;
@@ -123,11 +123,11 @@ public final class ShareBean implements Share {
      */
     @Override
     @Transactional(Transactional.TxType.SUPPORTS)
-    public FetchObjectResponse fetchObject(final FetchObjectRequest request) {
-        FetchObjectResponse response;
+    public FetchDataResponse fetchData(final FetchDataRequest request) {
+        FetchDataResponse response;
 
         try {
-            final Serviceable<FetchObjectResponse, FetchObjectRequest> service = new FetchObjectService(settings, entityManager);
+            final Serviceable<FetchDataResponse, FetchDataRequest> service = new FetchObjectService(settings, entityManager);
             response = service.perform(request);
         } catch (CWSException e) {
             // Any Warning or Error thrown by the CWS contain enough information
@@ -135,7 +135,7 @@ public final class ShareBean implements Share {
             // error is thus not needed, as all information is provided in the
             // response.
             log.trace(e.getMessage(), e);
-            response = new FetchObjectResponse(e.getReturnCode(), e.getMessage());
+            response = new FetchDataResponse(e.getReturnCode(), e.getMessage());
         }
 
         return response;

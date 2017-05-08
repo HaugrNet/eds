@@ -29,9 +29,9 @@ public class ObjectEntity extends Externable {
     @JoinColumn(name = "circle_id",  referencedColumnName = "id", nullable = false, updatable = false)
     private CircleEntity circle = null;
 
-    @ManyToOne(targetEntity = TypeEntity.class, fetch = FetchType.EAGER, optional = false)
+    @ManyToOne(targetEntity = DataTypeEntity.class, fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "type_id",  referencedColumnName = "id", nullable = false, updatable = false)
-    private TypeEntity type = null;
+    private DataTypeEntity type = null;
 
     @Column(name = "name", nullable = false)
     private String name = null;
@@ -56,11 +56,11 @@ public class ObjectEntity extends Externable {
         return circle;
     }
 
-    public void setType(final TypeEntity type) {
+    public void setType(final DataTypeEntity type) {
         this.type = type;
     }
 
-    public TypeEntity getType() {
+    public DataTypeEntity getType() {
         return type;
     }
 

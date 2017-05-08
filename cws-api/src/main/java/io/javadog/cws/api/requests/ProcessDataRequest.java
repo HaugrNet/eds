@@ -10,7 +10,7 @@ package io.javadog.cws.api.requests;
 import io.javadog.cws.api.common.Action;
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.dtos.Authentication;
-import io.javadog.cws.api.dtos.ObjectData;
+import io.javadog.cws.api.dtos.Data;
 
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -26,8 +26,8 @@ import java.util.Set;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "ProcessObjectRequest", propOrder = { "action", "dataId", "data" })
-public final class ProcessObjectRequest extends Authentication {
+@XmlType(name = "ProcessDataRequest", propOrder = { "action", "dataId", "data" })
+public final class ProcessDataRequest extends Authentication {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
@@ -44,7 +44,7 @@ public final class ProcessObjectRequest extends Authentication {
     private String dataId = null;
 
     @XmlElement(name = FIELD_DATA, required = true)
-    private ObjectData data = null;
+    private Data data = null;
 
     // =========================================================================
     // Standard Setters & Getters
@@ -82,12 +82,12 @@ public final class ProcessObjectRequest extends Authentication {
     }
 
     @NotNull
-    public void setData(final ObjectData data) {
+    public void setData(final Data data) {
         ensureNotNull(FIELD_DATA, data);
         this.data = data;
     }
 
-    public ObjectData getData() {
+    public Data getData() {
         return data;
     }
 

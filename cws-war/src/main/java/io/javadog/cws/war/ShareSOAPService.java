@@ -9,16 +9,16 @@ package io.javadog.cws.war;
 
 import io.javadog.cws.api.Share;
 import io.javadog.cws.api.common.Constants;
-import io.javadog.cws.api.requests.FetchObjectRequest;
-import io.javadog.cws.api.requests.FetchObjectTypeRequest;
-import io.javadog.cws.api.requests.ProcessObjectRequest;
-import io.javadog.cws.api.requests.ProcessObjectTypeRequest;
+import io.javadog.cws.api.requests.FetchDataRequest;
+import io.javadog.cws.api.requests.FetchDataTypeRequest;
+import io.javadog.cws.api.requests.ProcessDataRequest;
+import io.javadog.cws.api.requests.ProcessDataTypeRequest;
 import io.javadog.cws.api.requests.SignRequest;
 import io.javadog.cws.api.requests.VerifyRequest;
-import io.javadog.cws.api.responses.FetchObjectResponse;
-import io.javadog.cws.api.responses.FetchObjectTypeResponse;
-import io.javadog.cws.api.responses.ProcessObjectResponse;
-import io.javadog.cws.api.responses.ProcessObjectTypeResponse;
+import io.javadog.cws.api.responses.FetchDataResponse;
+import io.javadog.cws.api.responses.FetchDataTypeResponse;
+import io.javadog.cws.api.responses.ProcessDataResponse;
+import io.javadog.cws.api.responses.ProcessDataTypeResponse;
 import io.javadog.cws.api.responses.SignResponse;
 import io.javadog.cws.api.responses.VerifyResponse;
 import org.slf4j.Logger;
@@ -50,18 +50,18 @@ public final class ShareSOAPService implements Share {
      */
     @Override
     @WebMethod
-    public ProcessObjectTypeResponse processObjectType(final ProcessObjectTypeRequest request) {
-        ProcessObjectTypeResponse response;
+    public ProcessDataTypeResponse processDataType(final ProcessDataTypeRequest request) {
+        ProcessDataTypeResponse response;
 
         try {
-            response = bean.processObjectType(request);
+            response = bean.processDataType(request);
         } catch (RuntimeException e) {
             // If an error occurs that has so far not been resolved, this is the
             // final level where it can be handled. Errors can be Persistence
             // problems or other things that will affect the reliability and/or
             // performance of the system.
             log.error(e.getMessage(), e);
-            response = new ProcessObjectTypeResponse(Constants.ERROR, GENERAL_RETURN_MESSAGE);
+            response = new ProcessDataTypeResponse(Constants.ERROR, GENERAL_RETURN_MESSAGE);
         }
 
         return response;
@@ -72,18 +72,18 @@ public final class ShareSOAPService implements Share {
      */
     @Override
     @WebMethod
-    public FetchObjectTypeResponse fetchObjectTypes(final FetchObjectTypeRequest request) {
-        FetchObjectTypeResponse response;
+    public FetchDataTypeResponse fetchDataTypes(final FetchDataTypeRequest request) {
+        FetchDataTypeResponse response;
 
         try {
-            response = bean.fetchObjectTypes(request);
+            response = bean.fetchDataTypes(request);
         } catch (RuntimeException e) {
             // If an error occurs that has so far not been resolved, this is the
             // final level where it can be handled. Errors can be Persistence
             // problems or other things that will affect the reliability and/or
             // performance of the system.
             log.error(e.getMessage(), e);
-            response = new FetchObjectTypeResponse(Constants.ERROR, GENERAL_RETURN_MESSAGE);
+            response = new FetchDataTypeResponse(Constants.ERROR, GENERAL_RETURN_MESSAGE);
         }
 
         return response;
@@ -94,18 +94,18 @@ public final class ShareSOAPService implements Share {
      */
     @Override
     @WebMethod
-    public ProcessObjectResponse processObject(final ProcessObjectRequest request) {
-        ProcessObjectResponse response;
+    public ProcessDataResponse processData(final ProcessDataRequest request) {
+        ProcessDataResponse response;
 
         try {
-            response = bean.processObject(request);
+            response = bean.processData(request);
         } catch (RuntimeException e) {
             // If an error occurs that has so far not been resolved, this is the
             // final level where it can be handled. Errors can be Persistence
             // problems or other things that will affect the reliability and/or
             // performance of the system.
             log.error(e.getMessage(), e);
-            response = new ProcessObjectResponse(Constants.ERROR, GENERAL_RETURN_MESSAGE);
+            response = new ProcessDataResponse(Constants.ERROR, GENERAL_RETURN_MESSAGE);
         }
 
         return response;
@@ -116,18 +116,18 @@ public final class ShareSOAPService implements Share {
      */
     @Override
     @WebMethod
-    public FetchObjectResponse fetchObject(final FetchObjectRequest request) {
-        FetchObjectResponse response;
+    public FetchDataResponse fetchData(final FetchDataRequest request) {
+        FetchDataResponse response;
 
         try {
-            response = bean.fetchObject(request);
+            response = bean.fetchData(request);
         } catch (RuntimeException e) {
             // If an error occurs that has so far not been resolved, this is the
             // final level where it can be handled. Errors can be Persistence
             // problems or other things that will affect the reliability and/or
             // performance of the system.
             log.error(e.getMessage(), e);
-            response = new FetchObjectResponse(Constants.ERROR, GENERAL_RETURN_MESSAGE);
+            response = new FetchDataResponse(Constants.ERROR, GENERAL_RETURN_MESSAGE);
         }
 
         return response;

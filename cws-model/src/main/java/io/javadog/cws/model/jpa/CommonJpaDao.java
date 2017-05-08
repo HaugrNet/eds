@@ -16,7 +16,7 @@ import io.javadog.cws.model.entities.Externable;
 import io.javadog.cws.model.entities.MemberEntity;
 import io.javadog.cws.model.entities.SettingEntity;
 import io.javadog.cws.model.entities.TrusteeEntity;
-import io.javadog.cws.model.entities.TypeEntity;
+import io.javadog.cws.model.entities.DataTypeEntity;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceException;
@@ -189,7 +189,7 @@ public final class CommonJpaDao implements CommonDao {
      * {@inheritDoc}
      */
     @Override
-    public List<TypeEntity> findAllTypes() {
+    public List<DataTypeEntity> findAllTypes() {
         final Query query = entityManager.createNamedQuery("type.findAll");
 
         return findList(query);
@@ -199,7 +199,7 @@ public final class CommonJpaDao implements CommonDao {
      * {@inheritDoc}
      */
     @Override
-    public List<TypeEntity> findMatchingObjectTypes(final String name) {
+    public List<DataTypeEntity> findMatchingObjectTypes(final String name) {
         final Query query = entityManager.createNamedQuery("type.findMatching");
         query.setParameter("name", name);
 

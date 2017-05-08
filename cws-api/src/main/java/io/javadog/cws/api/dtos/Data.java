@@ -25,8 +25,8 @@ import java.util.Map;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "objectData", propOrder = { "id", "data", "name", "objectType", "added" })
-public final class ObjectData extends Verifiable {
+@XmlType(name = "objectData", propOrder = { "id", "data", "name", "type", "added" })
+public final class Data extends Verifiable {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
@@ -35,7 +35,7 @@ public final class ObjectData extends Verifiable {
     private static final String FIELD_FOLDER_ID = "folderId";
     private static final String FIELD_NAME = "name";
     private static final String FIELD_DATA = "data";
-    private static final String FIELD_OBJECT_TYPE = "objectType";
+    private static final String FIELD_TYPE = "type";
     private static final String FIELD_ADDED = "added";
 
     @XmlElement(name = FIELD_ID, required = true, nillable = true)
@@ -50,8 +50,8 @@ public final class ObjectData extends Verifiable {
     @XmlElement(name = FIELD_DATA, required = true, nillable = true)
     private byte[] data = null;
 
-    @XmlElement(name = FIELD_OBJECT_TYPE, required = true)
-    private ObjectType objectType = null;
+    @XmlElement(name = FIELD_TYPE, required = true)
+    private DataType type = null;
 
     @XmlElement(name = FIELD_ADDED)
     private Date added = null;
@@ -97,14 +97,14 @@ public final class ObjectData extends Verifiable {
     }
 
     @NotNull
-    public void setObjectType(final ObjectType objectType) {
-        ensureNotNull(FIELD_OBJECT_TYPE, objectType);
-        ensureVerifiable(FIELD_OBJECT_TYPE, objectType);
-        this.objectType = objectType;
+    public void setType(final DataType objectType) {
+        ensureNotNull(FIELD_TYPE, objectType);
+        ensureVerifiable(FIELD_TYPE, objectType);
+        this.type = objectType;
     }
 
-    public ObjectType getObjectType() {
-        return objectType;
+    public DataType getType() {
+        return type;
     }
 
     public void setAdded(final Date added) {
@@ -124,9 +124,9 @@ public final class ObjectData extends Verifiable {
 
         checkPattern(errors, FIELD_ID, id, Constants.ID_PATTERN_REGEX, "The Object Data Id is invalid.");
         checkPattern(errors, FIELD_FOLDER_ID, folderId, Constants.ID_PATTERN_REGEX, "The Object Folder Id is invalid.");
-        checkNotNull(errors, FIELD_OBJECT_TYPE, objectType, "The ObjectType is undefined.");
-        if (objectType != null) {
-            errors.putAll(objectType.validate());
+        checkNotNull(errors, FIELD_TYPE, type, "The ObjectType is undefined.");
+        if (type != null) {
+            errors.putAll(type.validate());
         }
 
         return errors;

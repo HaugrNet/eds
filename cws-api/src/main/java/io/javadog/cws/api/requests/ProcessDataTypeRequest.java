@@ -10,7 +10,7 @@ package io.javadog.cws.api.requests;
 import io.javadog.cws.api.common.Action;
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.dtos.Authentication;
-import io.javadog.cws.api.dtos.ObjectType;
+import io.javadog.cws.api.dtos.DataType;
 
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlElement;
@@ -22,7 +22,7 @@ import java.util.Set;
  * @author Kim Jensen
  * @since  CWS 1.0
  */
-public final class ProcessObjectTypeRequest extends Authentication {
+public final class ProcessDataTypeRequest extends Authentication {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
@@ -32,7 +32,7 @@ public final class ProcessObjectTypeRequest extends Authentication {
     private static final String FIELD_TYPE = "objectType";
 
     @XmlElement(required = true) private Action action = null;
-    @XmlElement(required = true) private ObjectType objectType = null;
+    @XmlElement(required = true) private DataType objectType = null;
 
     // =========================================================================
     // Standard Setters & Getters
@@ -61,12 +61,12 @@ public final class ProcessObjectTypeRequest extends Authentication {
     }
 
     @NotNull
-    public void setObjectType(final ObjectType objectType) {
+    public void setObjectType(final DataType objectType) {
         ensureNotNull(FIELD_TYPE, objectType);
         this.objectType = objectType;
     }
 
-    public ObjectType getObjectType() {
+    public DataType getObjectType() {
         return objectType;
     }
 

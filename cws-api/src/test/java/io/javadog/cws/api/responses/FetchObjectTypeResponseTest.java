@@ -11,7 +11,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
 import io.javadog.cws.api.common.Constants;
-import io.javadog.cws.api.dtos.ObjectType;
+import io.javadog.cws.api.dtos.DataType;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -25,12 +25,12 @@ public final class FetchObjectTypeResponseTest {
 
     @Test
     public void testFetchingAllCircles() {
-        final List<ObjectType> types = new ArrayList<>(3);
+        final List<DataType> types = new ArrayList<>(3);
         for (int i = 0; i < 3; i++) {
-            types.add(new ObjectType());
+            types.add(new DataType());
         }
 
-        final FetchObjectTypeResponse response = new FetchObjectTypeResponse();
+        final FetchDataTypeResponse response = new FetchDataTypeResponse();
         response.setTypes(types);
 
         assertThat(response.isOk(), is(true));
@@ -41,7 +41,7 @@ public final class FetchObjectTypeResponseTest {
 
     @Test
     public void testFetchingWithError() {
-        final FetchObjectTypeResponse response = new FetchObjectTypeResponse(Constants.CONSTRAINT_ERROR, "Bollocks.");
+        final FetchDataTypeResponse response = new FetchDataTypeResponse(Constants.CONSTRAINT_ERROR, "Bollocks.");
 
         assertThat(response.isOk(), is(false));
         assertThat(response.getReturnCode(), is(Constants.CONSTRAINT_ERROR));

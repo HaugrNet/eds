@@ -23,7 +23,7 @@ public final class TypeEntityTest extends DatabaseSetup {
 
     @Test
     public void testEntity() {
-        final TypeEntity entity = new TypeEntity();
+        final DataTypeEntity entity = new DataTypeEntity();
         entity.setName("Name");
         entity.setType("Type");
         persist(entity);
@@ -31,18 +31,18 @@ public final class TypeEntityTest extends DatabaseSetup {
         entityManager.flush();
         entityManager.clear();
 
-        final TypeEntity found = find(TypeEntity.class, entity.getId());
+        final DataTypeEntity found = find(DataTypeEntity.class, entity.getId());
         assertThat(found, is(not(nullValue())));
     }
 
     @Test
     public void testUpdateCircle() {
-        final TypeEntity entity = new TypeEntity();
+        final DataTypeEntity entity = new DataTypeEntity();
         entity.setName("Name 1");
         entity.setType("Type 1");
         persist(entity);
 
-        final TypeEntity found = find(TypeEntity.class, entity.getId());
+        final DataTypeEntity found = find(DataTypeEntity.class, entity.getId());
         assertThat(found, is(not(nullValue())));
         found.setName("Name 2");
         found.setType("Type 2");

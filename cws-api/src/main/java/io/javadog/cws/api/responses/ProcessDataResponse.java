@@ -20,7 +20,7 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "processObjectResponse", propOrder = "id")
-public final class ProcessObjectResponse extends CWSResponse {
+public final class ProcessDataResponse extends CWSResponse {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
@@ -28,11 +28,11 @@ public final class ProcessObjectResponse extends CWSResponse {
     @XmlElement(name = "id", required = true)
     private String id = null;
 
-    public ProcessObjectResponse() {
+    public ProcessDataResponse() {
         // Empty Constructor, required for WebServices
     }
 
-    public ProcessObjectResponse(final int returnCode, final String returnMessage) {
+    public ProcessDataResponse(final int returnCode, final String returnMessage) {
         super(returnCode, returnMessage);
     }
 

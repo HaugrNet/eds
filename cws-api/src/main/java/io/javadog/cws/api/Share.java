@@ -7,16 +7,16 @@
  */
 package io.javadog.cws.api;
 
-import io.javadog.cws.api.requests.FetchObjectRequest;
-import io.javadog.cws.api.requests.FetchObjectTypeRequest;
-import io.javadog.cws.api.requests.ProcessObjectRequest;
-import io.javadog.cws.api.requests.ProcessObjectTypeRequest;
+import io.javadog.cws.api.requests.FetchDataRequest;
+import io.javadog.cws.api.requests.FetchDataTypeRequest;
+import io.javadog.cws.api.requests.ProcessDataRequest;
+import io.javadog.cws.api.requests.ProcessDataTypeRequest;
 import io.javadog.cws.api.requests.SignRequest;
 import io.javadog.cws.api.requests.VerifyRequest;
-import io.javadog.cws.api.responses.FetchObjectResponse;
-import io.javadog.cws.api.responses.FetchObjectTypeResponse;
-import io.javadog.cws.api.responses.ProcessObjectResponse;
-import io.javadog.cws.api.responses.ProcessObjectTypeResponse;
+import io.javadog.cws.api.responses.FetchDataResponse;
+import io.javadog.cws.api.responses.FetchDataTypeResponse;
+import io.javadog.cws.api.responses.ProcessDataResponse;
+import io.javadog.cws.api.responses.ProcessDataTypeResponse;
 import io.javadog.cws.api.responses.SignResponse;
 import io.javadog.cws.api.responses.VerifyResponse;
 
@@ -26,11 +26,11 @@ import io.javadog.cws.api.responses.VerifyResponse;
  */
 public interface Share {
 
-    ProcessObjectTypeResponse processObjectType(ProcessObjectTypeRequest request);
-    FetchObjectTypeResponse fetchObjectTypes(FetchObjectTypeRequest request);
+    ProcessDataTypeResponse processDataType(ProcessDataTypeRequest request);
+    FetchDataTypeResponse fetchDataTypes(FetchDataTypeRequest request);
 
-    ProcessObjectResponse processObject(ProcessObjectRequest request);
-    FetchObjectResponse fetchObject(FetchObjectRequest request);
+    ProcessDataResponse processData(ProcessDataRequest request);
+    FetchDataResponse fetchData(FetchDataRequest request);
 
     SignResponse sign(SignRequest request);
     VerifyResponse verify(VerifyRequest request);

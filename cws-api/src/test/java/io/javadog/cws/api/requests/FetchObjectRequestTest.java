@@ -30,7 +30,7 @@ public final class FetchObjectRequestTest {
     public void testClass() {
         final String objectId = UUID.randomUUID().toString();
 
-        final FetchObjectRequest request = new FetchObjectRequest();
+        final FetchDataRequest request = new FetchDataRequest();
         request.setAccount(Constants.ADMIN_ACCOUNT);
         request.setCredentialType(CredentialType.PASSPHRASE);
         request.setCredential(Constants.ADMIN_ACCOUNT.toCharArray());
@@ -43,7 +43,7 @@ public final class FetchObjectRequestTest {
 
     @Test
     public void testClassWithoutObjectId() {
-        final FetchObjectRequest request = new FetchObjectRequest();
+        final FetchDataRequest request = new FetchDataRequest();
         request.setAccount(Constants.ADMIN_ACCOUNT);
         request.setCredentialType(CredentialType.PASSPHRASE);
         request.setCredential(Constants.ADMIN_ACCOUNT.toCharArray());
@@ -57,7 +57,7 @@ public final class FetchObjectRequestTest {
     public void testClassWithForcedObjectId() throws NoSuchFieldException, IllegalAccessException {
         final String dataId = Constants.ADMIN_ACCOUNT;
 
-        final FetchObjectRequest request = new FetchObjectRequest();
+        final FetchDataRequest request = new FetchDataRequest();
         request.setAccount(Constants.ADMIN_ACCOUNT);
         request.setCredentialType(CredentialType.PASSPHRASE);
         request.setCredential(Constants.ADMIN_ACCOUNT.toCharArray());
@@ -76,7 +76,7 @@ public final class FetchObjectRequestTest {
 
     @Test
     public void testEmptyClass() {
-        final FetchObjectRequest request = new FetchObjectRequest();
+        final FetchDataRequest request = new FetchDataRequest();
         final Map<String, String> errors = request.validate();
 
         assertThat(request.getDataId(), is(nullValue()));

@@ -12,7 +12,7 @@ import io.javadog.cws.model.entities.CircleEntity;
 import io.javadog.cws.model.entities.MemberEntity;
 import io.javadog.cws.model.entities.SettingEntity;
 import io.javadog.cws.model.entities.TrusteeEntity;
-import io.javadog.cws.model.entities.TypeEntity;
+import io.javadog.cws.model.entities.DataTypeEntity;
 
 import java.util.List;
 
@@ -50,9 +50,9 @@ public interface CommonDao {
 
     List<CircleEntity> findCirclesBothBelongTo(MemberEntity member, MemberEntity requested);
 
-    List<TypeEntity> findAllTypes();
+    List<DataTypeEntity> findAllTypes();
 
-    List<TypeEntity> findMatchingObjectTypes(String name);
+    List<DataTypeEntity> findMatchingObjectTypes(String name);
 
     int countObjectTypeUsage(Long id);
 }

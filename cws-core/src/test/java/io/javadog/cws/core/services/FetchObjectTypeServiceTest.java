@@ -14,8 +14,8 @@ import static org.junit.Assert.assertThat;
 
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.CredentialType;
-import io.javadog.cws.api.requests.FetchObjectTypeRequest;
-import io.javadog.cws.api.responses.FetchObjectTypeResponse;
+import io.javadog.cws.api.requests.FetchDataTypeRequest;
+import io.javadog.cws.api.responses.FetchDataTypeResponse;
 import io.javadog.cws.common.exceptions.VerificationException;
 import io.javadog.cws.core.Serviceable;
 import io.javadog.cws.model.DatabaseSetup;
@@ -34,8 +34,8 @@ public final class FetchObjectTypeServiceTest extends DatabaseSetup {
                 "Key: credentialError: Credential is missing, null or invalid.\n" +
                 "Key: accountError: Account is missing, null or invalid.\n");
 
-        final Serviceable<FetchObjectTypeResponse, FetchObjectTypeRequest> service = prepareService();
-        final FetchObjectTypeRequest request = new FetchObjectTypeRequest();
+        final Serviceable<FetchDataTypeResponse, FetchDataTypeRequest> service = prepareService();
+        final FetchDataTypeRequest request = new FetchDataTypeRequest();
         assertThat(request.getAccount(), is(nullValue()));
 
         service.perform(request);
@@ -43,9 +43,9 @@ public final class FetchObjectTypeServiceTest extends DatabaseSetup {
 
     @Test
     public void testAdminRequest() {
-        final Serviceable<FetchObjectTypeResponse, FetchObjectTypeRequest> service = prepareService();
-        final FetchObjectTypeRequest request = buildRequestWithCredentials(Constants.ADMIN_ACCOUNT);
-        final FetchObjectTypeResponse response = service.perform(request);
+        final Serviceable<FetchDataTypeResponse, FetchDataTypeRequest> service = prepareService();
+        final FetchDataTypeRequest request = buildRequestWithCredentials(Constants.ADMIN_ACCOUNT);
+        final FetchDataTypeResponse response = service.perform(request);
 
         assertThat(response, is(not(nullValue())));
         assertThat(response.isOk(), is(true));
@@ -60,12 +60,12 @@ public final class FetchObjectTypeServiceTest extends DatabaseSetup {
     // Internal Helper Methods
     // =========================================================================
 
-    private Serviceable<FetchObjectTypeResponse, FetchObjectTypeRequest> prepareService() {
+    private Serviceable<FetchDataTypeResponse, FetchDataTypeRequest> prepareService() {
         return new FetchObjectTypeService(settings, entityManager);
     }
 
-    private static FetchObjectTypeRequest buildRequestWithCredentials(final String account) {
-        final FetchObjectTypeRequest request = new FetchObjectTypeRequest();
+    private static FetchDataTypeRequest buildRequestWithCredentials(final String account) {
+        final FetchDataTypeRequest request = new FetchDataTypeRequest();
         request.setAccount(account);
         request.setCredentialType(CredentialType.PASSPHRASE);
         request.setCredential(account.toCharArray());

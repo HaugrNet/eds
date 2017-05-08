@@ -21,23 +21,23 @@ import javax.persistence.Table;
 @NamedQueries({
         @NamedQuery(name = "type.findAll",
                 query = "select t " +
-                        "from TypeEntity t " +
+                        "from DataTypeEntity t " +
                         "order by t.name asc"),
         @NamedQuery(name = "type.findMatching",
-                query = "select t from TypeEntity t " +
+                query = "select t from DataTypeEntity t " +
                         "where lower(t.name) = lower(:name)"),
         @NamedQuery(name = "type.countUsage",
                 query = "select count(o.id) " +
                         "from ObjectEntity o " +
                         "where o.type.id = :id")
 })
-@Table(name = "types")
-public final class TypeEntity extends CWSEntity {
+@Table(name = "datatypes")
+public final class DataTypeEntity extends CWSEntity {
 
-    @Column(name = "type_name", unique = true, nullable = false)
+    @Column(name = "datatype_name", unique = true, nullable = false)
     private String name = null;
 
-    @Column(name = "type_value", nullable = false)
+    @Column(name = "datatype_value", nullable = false)
     private String type = null;
 
     // =========================================================================

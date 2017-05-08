@@ -9,7 +9,7 @@ package io.javadog.cws.api.requests;
 
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.dtos.Authentication;
-import io.javadog.cws.api.dtos.ObjectType;
+import io.javadog.cws.api.dtos.DataType;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -23,7 +23,7 @@ import java.util.Map;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "fetchObjectRequest", propOrder = { "dataType", "dataId" })
-public final class FetchObjectRequest extends Authentication {
+public final class FetchDataRequest extends Authentication {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
@@ -32,7 +32,7 @@ public final class FetchObjectRequest extends Authentication {
     private static final String FIELD_DATA_ID = "dataId";
 
     @XmlElement(name = FIELD_DATA_TYPE, required = true, nillable = true)
-    private ObjectType dataType = null;
+    private DataType dataType = null;
 
     @XmlElement(name = FIELD_DATA_ID, required = true, nillable = true)
     private String dataId = null;
@@ -41,12 +41,12 @@ public final class FetchObjectRequest extends Authentication {
     // Setters & Getters
     // =========================================================================
 
-    public void setDataType(ObjectType dataType) {
+    public void setDataType(DataType dataType) {
         ensureVerifiable(FIELD_DATA_TYPE, dataType);
         this.dataType = dataType;
     }
 
-    public ObjectType getDataType() {
+    public DataType getDataType() {
         return dataType;
     }
 

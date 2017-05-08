@@ -8,9 +8,12 @@
 package io.javadog.cws.api.responses;
 
 import io.javadog.cws.api.common.Constants;
-import io.javadog.cws.api.dtos.ObjectType;
+import io.javadog.cws.api.dtos.Data;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlType;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -19,19 +22,21 @@ import java.util.List;
  * @author Kim Jensen
  * @since  CWS 1.0
  */
-public final class FetchObjectTypeResponse extends CWSResponse {
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(name = "fetchObjectResponse", propOrder = "objects")
+public final class FetchDataResponse extends CWSResponse{
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
-    @XmlElement(name = "types")
-    private final List<ObjectType> types = new ArrayList<>(0);
+    @XmlElement(name = "objects")
+    private final List<Data> objects = new ArrayList<>(0);
 
-    public FetchObjectTypeResponse() {
+    public FetchDataResponse() {
         // Empty Constructor, required for WebServices
     }
 
-    public FetchObjectTypeResponse(final int returnCode, final String returnMessage) {
+    public FetchDataResponse(final int returnCode, final String returnMessage) {
         super(returnCode, returnMessage);
     }
 
@@ -39,11 +44,11 @@ public final class FetchObjectTypeResponse extends CWSResponse {
     // Setters & Getters
     // =========================================================================
 
-    public void setTypes(final List<ObjectType> types) {
-        this.types.addAll(types);
+    public void setObjects(final List<Data> objects) {
+        this.objects.addAll(objects);
     }
 
-    public List<ObjectType> getTypes() {
-        return Collections.unmodifiableList(types);
+    public List<Data> getObjects() {
+        return Collections.unmodifiableList(objects);
     }
 }

@@ -8,14 +8,14 @@
 package io.javadog.cws.core.services;
 
 import io.javadog.cws.api.common.Constants;
-import io.javadog.cws.api.dtos.ObjectType;
-import io.javadog.cws.api.requests.ProcessObjectTypeRequest;
-import io.javadog.cws.api.responses.ProcessObjectTypeResponse;
+import io.javadog.cws.api.dtos.DataType;
+import io.javadog.cws.api.requests.ProcessDataTypeRequest;
+import io.javadog.cws.api.responses.ProcessDataTypeResponse;
 import io.javadog.cws.common.Settings;
 import io.javadog.cws.common.exceptions.CWSException;
 import io.javadog.cws.core.Permission;
 import io.javadog.cws.core.Serviceable;
-import io.javadog.cws.model.entities.TypeEntity;
+import io.javadog.cws.model.entities.DataTypeEntity;
 
 import javax.persistence.EntityManager;
 import java.util.List;
@@ -25,7 +25,7 @@ import java.util.Objects;
  * @author Kim Jensen
  * @since  CWS 1.0
  */
-public final class ProcessObjectTypeService extends Serviceable<ProcessObjectTypeResponse, ProcessObjectTypeRequest> {
+public final class ProcessObjectTypeService extends Serviceable<ProcessDataTypeResponse, ProcessDataTypeRequest> {
 
     public ProcessObjectTypeService(final Settings settings, final EntityManager entityManager) {
         super(settings, entityManager);
@@ -35,9 +35,9 @@ public final class ProcessObjectTypeService extends Serviceable<ProcessObjectTyp
      * {@inheritDoc}
      */
     @Override
-    public ProcessObjectTypeResponse perform(final ProcessObjectTypeRequest request) {
+    public ProcessDataTypeResponse perform(final ProcessDataTypeRequest request) {
         verifyRequest(request, Permission.PROCESS_OBJECT_TYPE);
-        final ProcessObjectTypeResponse response;
+        final ProcessDataTypeResponse response;
 
         switch (request.getAction()) {
             case PROCESS:
@@ -61,14 +61,14 @@ public final class ProcessObjectTypeService extends Serviceable<ProcessObjectTyp
      * @param request Process ObjectType Request Object
      * @return Response with the newly processed ObjectType
      */
-    private ProcessObjectTypeResponse doProcess(final ProcessObjectTypeRequest request) {
+    private ProcessDataTypeResponse doProcess(final ProcessDataTypeRequest request) {
         final String name = request.getObjectType().getName().trim();
         final String type = request.getObjectType().getType().trim();
-        final TypeEntity entity;
+        final DataTypeEntity entity;
 
-        final List<TypeEntity> entities = dao.findMatchingObjectTypes(name);
+        final List<DataTypeEntity> entities = dao.findMatchingObjectTypes(name);
         if (entities.isEmpty()) {
-            entity = new TypeEntity();
+            entity = new DataTypeEntity();
             entity.setName(name);
             entity.setType(type);
             dao.persist(entity);
@@ -82,20 +82,20 @@ public final class ProcessObjectTypeService extends Serviceable<ProcessObjectTyp
             throw new CWSException(Constants.IDENTIFICATION_ERROR, "Could not uniquely identify the Object Type '" + name + "' as " + entities.size() + " were found with conflicting names.");
         }
 
-        final ObjectType objectType = new ObjectType();
+        final DataType objectType = new DataType();
         objectType.setName(name);
         objectType.setType(type);
 
-        final ProcessObjectTypeResponse response = new ProcessObjectTypeResponse();
+        final ProcessDataTypeResponse response = new ProcessDataTypeResponse();
         response.setObjectType(objectType);
 
         return response;
     }
 
-    private ProcessObjectTypeResponse doDelete(final ProcessObjectTypeRequest request) {
+    private ProcessDataTypeResponse doDelete(final ProcessDataTypeRequest request) {
         final String name = request.getObjectType().getName().trim();
 
-        final List<TypeEntity> entities = dao.findMatchingObjectTypes(name);
+        final List<DataTypeEntity> entities = dao.findMatchingObjectTypes(name);
         if (entities.size() == 1) {
             // We need to check that the Object Type is not being used. If so,
             // then it is not allowed to remove it.
@@ -109,6 +109,6 @@ public final class ProcessObjectTypeService extends Serviceable<ProcessObjectTyp
             throw new CWSException(Constants.IDENTIFICATION_ERROR, "Could not uniquely identify the Object Type '" + name + "'.");
         }
 
-        return new ProcessObjectTypeResponse();
+        return new ProcessDataTypeResponse();
     }
 }

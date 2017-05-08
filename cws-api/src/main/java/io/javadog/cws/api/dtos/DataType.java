@@ -25,7 +25,7 @@ import java.util.Map;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "member", propOrder = { "name", "FIELD_TYPE" })
-public final class ObjectType extends Verifiable {
+public final class DataType extends Verifiable {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;

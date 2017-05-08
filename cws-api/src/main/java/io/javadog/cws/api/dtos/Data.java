@@ -25,7 +25,7 @@ import java.util.Map;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "objectData", propOrder = { "id", "data", "name", "type", "added" })
+@XmlType(name = "objectData", propOrder = { "id", "name", "type", "bytes", "added" })
 public final class Data extends Verifiable {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
@@ -34,8 +34,8 @@ public final class Data extends Verifiable {
     private static final String FIELD_ID = "id";
     private static final String FIELD_FOLDER_ID = "folderId";
     private static final String FIELD_NAME = "name";
-    private static final String FIELD_DATA = "data";
     private static final String FIELD_TYPE = "type";
+    private static final String FIELD_BYTES = "bytes";
     private static final String FIELD_ADDED = "added";
 
     @XmlElement(name = FIELD_ID, required = true, nillable = true)
@@ -47,11 +47,11 @@ public final class Data extends Verifiable {
     @XmlElement(name = FIELD_NAME, required = true, nillable = true)
     private String name = null;
 
-    @XmlElement(name = FIELD_DATA, required = true, nillable = true)
-    private byte[] data = null;
-
     @XmlElement(name = FIELD_TYPE, required = true)
     private DataType type = null;
+
+    @XmlElement(name = FIELD_BYTES, required = true, nillable = true)
+    private byte[] bytes = null;
 
     @XmlElement(name = FIELD_ADDED)
     private Date added = null;
@@ -88,14 +88,6 @@ public final class Data extends Verifiable {
         return name;
     }
 
-    public void setData(final byte[] data) {
-        this.data = data;
-    }
-
-    public byte[] getData() {
-        return data;
-    }
-
     @NotNull
     public void setType(final DataType objectType) {
         ensureNotNull(FIELD_TYPE, objectType);
@@ -109,6 +101,14 @@ public final class Data extends Verifiable {
 
     public void setAdded(final Date added) {
         this.added = new Date(added.getTime());
+    }
+
+    public void setBytes(final byte[] bytes) {
+        this.bytes = bytes;
+    }
+
+    public byte[] getBytes() {
+        return bytes;
     }
 
     public Date getAdded() {

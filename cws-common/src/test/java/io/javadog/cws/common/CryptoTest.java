@@ -156,7 +156,7 @@ public final class CryptoTest {
     @Test
     public void testMemberAccessCircleKey() {
         final Crypto crypto = new Crypto(new Settings());
-        final Charset charset = crypto.getCharSet();
+        final Charset charset = new Settings().getCharset();
         final String dataSalt = UUID.randomUUID().toString();
         final IvParameterSpec iv = crypto.generateInitialVector(dataSalt);
         final SecretKey key = crypto.generateSymmetricKey();
@@ -181,7 +181,7 @@ public final class CryptoTest {
         final String garbage = "INVALID_ENCODING";
         settings.set(Settings.CWS_CHARSET, garbage);
 
-        prepareCause(CWSException.class, Constants.PROPERTY_ERROR, "UnsupportedEncodingException: " + garbage);
+        prepareCause(CWSException.class, Constants.PROPERTY_ERROR, "java.nio.charset.UnsupportedCharsetException: " + garbage);
         assertThat(str, is(not(nullValue())));
         crypto.stringToBytes(str);
     }
@@ -190,11 +190,11 @@ public final class CryptoTest {
     public void testBytesToStringConversion() {
         final Settings settings = new Settings();
         final Crypto crypto = new Crypto(settings);
-        final byte[] bytes = "Alpha Beta æøåßöäÿ".getBytes();
+        final byte[] bytes = "Alpha Beta æøåßöäÿ".getBytes(settings.getCharset());
         final String garbage = "INVALID_ENCODING";
         settings.set(Settings.CWS_CHARSET, garbage);
 
-        prepareCause(CWSException.class, Constants.PROPERTY_ERROR, "UnsupportedEncodingException: " + garbage);
+        prepareCause(CWSException.class, Constants.PROPERTY_ERROR, "UnsupportedCharsetException: " + garbage);
         assertThat(bytes, is(not(nullValue())));
         crypto.bytesToString(bytes);
     }
@@ -212,7 +212,7 @@ public final class CryptoTest {
         final char[] emptyChars = {(char) 0, (char) 0, (char) 0, (char) 0, (char) 0, (char) 0 };
         final String string = "String";
 
-        final byte[] bytes = string.getBytes();
+        final byte[] bytes = string.getBytes(new Settings().getCharset());
         Crypto.clearSensitiveData(bytes);
         assertThat(bytes, is(emptyBytes));
 
@@ -229,42 +229,7 @@ public final class CryptoTest {
         final String signed = crypto.sign(keyPair, message);
         final boolean verified = crypto.verify(keyPair, message, signed);
 
-        System.out.println(signed);
         assertThat(verified, is(true));
-    }
-
-    /**
-     * <p>Although the Charset is set via the Settings, it is used primarily
-     * together with the Crypto Library. It can be argued where it belongs, but
-     * for now it resides in the Crypto Library so the testing of it is also
-     * via the Crypto Library.</p>
-     */
-    @Test
-    public void testCharset() {
-        final Settings settings = new Settings();
-        final Crypto crypto = new Crypto(settings);
-
-        // First part of the test, expecting that that the default Settings
-        // Charset is the same as the one we get from the Crypto Library.
-        final String charset = settings.getCharset();
-        assertThat(crypto.getCharSet().name(), is(charset));
-
-        // Now, update the Charset, and ensure that it is also updated in the
-        // Crypto Library.
-        final String latin9 = "ISO-8859-15";
-        settings.set(Settings.CWS_CHARSET, latin9);
-        assertThat(crypto.getCharSet().name(), is(latin9));
-
-        // Final part of the test, set the Charset to an invalid entry, this
-        // should result in an Exception, with the following details.
-        final String garbage = "INVALID_ENCODING";
-        thrown.expect(CWSException.class);
-        thrown.expectMessage("UnsupportedCharsetException: " + garbage);
-        thrown.expect(hasProperty("returnCode"));
-        thrown.expect(hasProperty("returnCode", is(Constants.PROPERTY_ERROR)));
-
-        settings.set(Settings.CWS_CHARSET, garbage);
-        crypto.getCharSet();
     }
 
     private <E extends CWSException> void prepareCause(final Class<E> cause, final int returnCode, final String returnMessage) {

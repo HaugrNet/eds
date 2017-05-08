@@ -7,8 +7,11 @@
  */
 package io.javadog.cws.common;
 
+import io.javadog.cws.api.common.Constants;
+import io.javadog.cws.common.exceptions.CWSException;
 import io.javadog.cws.common.exceptions.SettingException;
 
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -135,8 +138,12 @@ public final class Settings {
         return properties.getProperty(CWS_SALT);
     }
 
-    public String getCharset() {
-        return properties.getProperty(CWS_CHARSET);
+    public Charset getCharset() {
+        try {
+            return Charset.forName(properties.getProperty(CWS_CHARSET));
+        } catch (IllegalArgumentException e) {
+            throw new CWSException(Constants.PROPERTY_ERROR, e);
+        }
     }
 
     public Boolean getExposeAdmin() {

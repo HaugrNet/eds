@@ -74,11 +74,11 @@ public final class Member extends Verifiable {
     }
 
     public void setAdded(final Date added) {
-        this.added = added;
+        this.added = new Date(added.getTime());
     }
 
     public Date getAdded() {
-        return added;
+        return new Date(added.getTime());
     }
 
     // =========================================================================

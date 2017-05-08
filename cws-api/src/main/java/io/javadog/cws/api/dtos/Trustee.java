@@ -105,19 +105,19 @@ public final class Trustee extends Verifiable {
     }
 
     public void setChanged(final Date changed) {
-        this.changed = changed;
+        this.changed = new Date(changed.getTime());
     }
 
     public Date getChanged() {
-        return changed;
+        return new Date(changed.getTime());
     }
 
     public void setSince(final Date since) {
-        this.since = since;
+        this.since = new Date(since.getTime());
     }
 
     public Date getSince() {
-        return since;
+        return new Date(since.getTime());
     }
 
     /**

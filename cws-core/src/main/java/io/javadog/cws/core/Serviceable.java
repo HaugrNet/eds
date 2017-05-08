@@ -137,7 +137,7 @@ public abstract class Serviceable<R extends CWSResponse, V extends Authenticatio
     private void checkAccountCredentials(final V verifiable) {
         final Key key = extractKeyFromCredentials(verifiable, member.getSalt());
         final String toCheck = UUID.randomUUID().toString();
-        final Charset charset = crypto.getCharSet();
+        final Charset charset = settings.getCharset();
         keyPair = crypto.extractAsymmetricKey(key, member.getSalt(), member.getPublicKey(), member.getPrivateKey());
 
         final byte[] toEncrypt = toCheck.getBytes(charset);

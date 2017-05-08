@@ -73,11 +73,11 @@ public final class Circle extends Verifiable {
     }
 
     public void setCreated(final Date created) {
-        this.created = created;
+        this.created = new Date(created.getTime());
     }
 
     public Date getCreated() {
-        return created;
+        return new Date(created.getTime());
     }
 
     /**

@@ -46,7 +46,7 @@ public final class SettingsTest {
         assertThat(settings.getSignatureAlgorithm(), is("SHA512WithRSA"));
         assertThat(settings.getPBEAlgorithm(), is("PBKDF2WithHmacSHA256"));
         assertThat(settings.getSalt(), is("Default Salt, please make sure it is set in the DB instead."));
-        assertThat(settings.getCharset(), is("UTF-8"));
+        assertThat(settings.getCharset().name(), is("UTF-8"));
     }
 
     @Test
@@ -74,7 +74,7 @@ public final class SettingsTest {
         assertThat(settings.getSalt(), is("UUID value"));
 
         settings.set(Settings.CWS_CHARSET, "ISO-8859-15");
-        assertThat(settings.getCharset(), is("ISO-8859-15"));
+        assertThat(settings.getCharset().name(), is("ISO-8859-15"));
     }
 
     @Test(expected = SettingException.class)

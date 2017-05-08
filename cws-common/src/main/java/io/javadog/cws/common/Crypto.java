@@ -7,7 +7,6 @@
  */
 package io.javadog.cws.common;
 
-import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.common.exceptions.CWSException;
 import io.javadog.cws.common.exceptions.CryptoException;
 
@@ -21,10 +20,8 @@ import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
-import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
-import java.nio.charset.Charset;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.Key;
@@ -121,7 +118,7 @@ public final class Crypto {
         try {
             final Signature signer = Signature.getInstance(settings.getSignatureAlgorithm());
             signer.initSign(keyPair.getPrivate());
-            signer.update(message.getBytes());
+            signer.update(message.getBytes(settings.getCharset()));
             final byte[] signed = signer.sign();
 
             return Base64.getEncoder().encodeToString(signed);
@@ -135,7 +132,7 @@ public final class Crypto {
             final byte[] bytes = Base64.getDecoder().decode(signature);
             final Signature verifier = Signature.getInstance(settings.getSignatureAlgorithm());
             verifier.initVerify(keyPair.getPublic());
-            verifier.update(message.getBytes());
+            verifier.update(message.getBytes(settings.getCharset()));
 
             return verifier.verify(bytes);
         } catch (NoSuchAlgorithmException | SignatureException | InvalidKeyException e) {
@@ -158,7 +155,7 @@ public final class Crypto {
 
     public IvParameterSpec generateInitialVector(final String salt) {
         final byte[] bytes = new byte[INITIAL_VECTOR_SIZE];
-        System.arraycopy(salt.getBytes(), 0, bytes, 0, bytes.length);
+        System.arraycopy(salt.getBytes(settings.getCharset()), 0, bytes, 0, bytes.length);
 
         return new IvParameterSpec(bytes);
     }
@@ -307,24 +304,16 @@ public final class Crypto {
     }
 
     public byte[] stringToBytes(final String string) {
-        try {
-            return string.getBytes(settings.getCharset());
-        } catch (UnsupportedEncodingException e) {
-            throw new CWSException(Constants.PROPERTY_ERROR, e);
-        }
+        return string.getBytes(settings.getCharset());
     }
 
     public String bytesToString(final byte[] bytes) {
-        try {
-            return new String(bytes, settings.getCharset());
-        } catch (UnsupportedEncodingException e) {
-            throw new CWSException(Constants.PROPERTY_ERROR, e);
-        }
+        return new String(bytes, settings.getCharset());
     }
 
     private byte[] base64Decode(final char[] chars) {
         final CharBuffer charBuffer = CharBuffer.wrap(chars);
-        final ByteBuffer byteBuffer = getCharSet().encode(charBuffer);
+        final ByteBuffer byteBuffer = settings.getCharset().encode(charBuffer);
         final byte[] bytes = Arrays.copyOfRange(byteBuffer.array(), 0, byteBuffer.limit());
 
         // To ensure that no traces of the sensitive data still exists, we're
@@ -332,14 +321,6 @@ public final class Crypto {
         clearSensitiveData(charBuffer.array());
 
         return Base64.getDecoder().decode(bytes);
-    }
-
-    public Charset getCharSet() {
-        try {
-            return Charset.forName(settings.getCharset());
-        } catch (IllegalArgumentException e) {
-            throw new CWSException(Constants.PROPERTY_ERROR, e);
-        }
     }
 
     public static void clearSensitiveData(final char[] chars) {

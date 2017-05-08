@@ -62,7 +62,7 @@ public final class ObjectData extends Verifiable {
         return id;
     }
 
-    public void setData(byte[] data) {
+    public void setData(final byte[] data) {
         this.data = data;
     }
 
@@ -71,7 +71,7 @@ public final class ObjectData extends Verifiable {
     }
 
     @NotNull
-    public void setObjectType(ObjectType objectType) {
+    public void setObjectType(final ObjectType objectType) {
         ensureNotNull(FIELD_OBJECT_TYPE, objectType);
         ensureVerifiable(FIELD_OBJECT_TYPE, objectType);
         this.objectType = objectType;
@@ -81,12 +81,12 @@ public final class ObjectData extends Verifiable {
         return objectType;
     }
 
-    public void setAdded(Date added) {
-        this.added = added;
+    public void setAdded(final Date added) {
+        this.added = new Date(added.getTime());
     }
 
     public Date getAdded() {
-        return added;
+        return new Date(added.getTime());
     }
 
     /**

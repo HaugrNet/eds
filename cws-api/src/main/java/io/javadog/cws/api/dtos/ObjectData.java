@@ -25,19 +25,27 @@ import java.util.Map;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "objectData", propOrder = { "id", "data", "objectType", "added" })
+@XmlType(name = "objectData", propOrder = { "id", "data", "name", "objectType", "added" })
 public final class ObjectData extends Verifiable {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
     private static final String FIELD_ID = "id";
+    private static final String FIELD_FOLDER_ID = "folderId";
+    private static final String FIELD_NAME = "name";
     private static final String FIELD_DATA = "data";
     private static final String FIELD_OBJECT_TYPE = "objectType";
     private static final String FIELD_ADDED = "added";
 
     @XmlElement(name = FIELD_ID, required = true, nillable = true)
     private String id = null;
+
+    @XmlElement(name = FIELD_FOLDER_ID, required = true, nillable = true)
+    private String folderId = null;
+
+    @XmlElement(name = FIELD_NAME, required = true, nillable = true)
+    private String name = null;
 
     @XmlElement(name = FIELD_DATA, required = true, nillable = true)
     private byte[] data = null;
@@ -60,6 +68,24 @@ public final class ObjectData extends Verifiable {
 
     public String getId() {
         return id;
+    }
+
+    @Pattern(regexp = Constants.ID_PATTERN_REGEX)
+    public void setFolderId(final String folderId) {
+        ensurePattern(FIELD_FOLDER_ID, folderId, Constants.ID_PATTERN_REGEX);
+        this.folderId = folderId;
+    }
+
+    public String getFolderId() {
+        return folderId;
+    }
+
+    public void setName(final String name) {
+        this.name = name;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public void setData(final byte[] data) {
@@ -96,7 +122,8 @@ public final class ObjectData extends Verifiable {
     public Map<String, String> validate() {
         final Map<String, String> errors = new HashMap<>();
 
-        checkPattern(errors, FIELD_ID, id, Constants.ID_PATTERN_REGEX, "The Circle Id is invalid.");
+        checkPattern(errors, FIELD_ID, id, Constants.ID_PATTERN_REGEX, "The Object Data Id is invalid.");
+        checkPattern(errors, FIELD_FOLDER_ID, folderId, Constants.ID_PATTERN_REGEX, "The Object Folder Id is invalid.");
         checkNotNull(errors, FIELD_OBJECT_TYPE, objectType, "The ObjectType is undefined.");
         if (objectType != null) {
             errors.putAll(objectType.validate());

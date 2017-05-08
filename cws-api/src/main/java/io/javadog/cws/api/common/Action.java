@@ -45,6 +45,27 @@ public enum Action {
     DELETE,
 
     /**
+     * <p>This Action adds a Trustee to a Circle.</p>
+     */
+    ADD,
+
+    /**
+     * <p>This Action Alters a Trustee's relation to a Circle, which means
+     * change the Trust Level. If invoked by the System Administrator, then it
+     * can only be used to alter the TrustLevel, not to grant access to the
+     * Data by giving the Member access to the Circle Key, as the System
+     * Administrator itself is not having access to this.</p>
+     */
+    ALTER,
+
+    /**
+     * <p>This Action allows a Circle or System Administrator to remove a Member
+     * from a Circle. A Circle Administrator cannot remove themselves from a
+     * Circle.</p>
+     */
+    REMOVE,
+
+    /**
      * <p>This is a special Action, which will enforce a complete re-encryption
      * of all data belonging the Object in question.</p>
      *

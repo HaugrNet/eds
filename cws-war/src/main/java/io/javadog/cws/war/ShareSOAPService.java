@@ -9,18 +9,14 @@ package io.javadog.cws.war;
 
 import io.javadog.cws.api.Share;
 import io.javadog.cws.api.common.Constants;
-import io.javadog.cws.api.requests.FetchFolderRequest;
 import io.javadog.cws.api.requests.FetchObjectRequest;
 import io.javadog.cws.api.requests.FetchObjectTypeRequest;
-import io.javadog.cws.api.requests.ProcessFolderRequest;
 import io.javadog.cws.api.requests.ProcessObjectRequest;
 import io.javadog.cws.api.requests.ProcessObjectTypeRequest;
 import io.javadog.cws.api.requests.SignRequest;
 import io.javadog.cws.api.requests.VerifyRequest;
-import io.javadog.cws.api.responses.FetchFolderResponse;
 import io.javadog.cws.api.responses.FetchObjectResponse;
 import io.javadog.cws.api.responses.FetchObjectTypeResponse;
-import io.javadog.cws.api.responses.ProcessFolderResponse;
 import io.javadog.cws.api.responses.ProcessObjectResponse;
 import io.javadog.cws.api.responses.ProcessObjectTypeResponse;
 import io.javadog.cws.api.responses.SignResponse;
@@ -48,50 +44,6 @@ public final class ShareSOAPService implements Share {
     private static final String GENERAL_RETURN_MESSAGE = "An unknown error occurred. Please consult the CWS System Log.";
 
     @Inject private ShareBean bean;
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @WebMethod
-    public ProcessFolderResponse processFolder(final ProcessFolderRequest request) {
-        ProcessFolderResponse response;
-
-        try {
-            response = bean.processFolder(request);
-        } catch (RuntimeException e) {
-            // If an error occurs that has so far not been resolved, this is the
-            // final level where it can be handled. Errors can be Persistence
-            // problems or other things that will affect the reliability and/or
-            // performance of the system.
-            log.error(e.getMessage(), e);
-            response = new ProcessFolderResponse(Constants.ERROR, GENERAL_RETURN_MESSAGE);
-        }
-
-        return response;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @WebMethod
-    public FetchFolderResponse fetchFolder(final FetchFolderRequest request) {
-        FetchFolderResponse response;
-
-        try {
-            response = bean.fetchFolder(request);
-        } catch (RuntimeException e) {
-            // If an error occurs that has so far not been resolved, this is the
-            // final level where it can be handled. Errors can be Persistence
-            // problems or other things that will affect the reliability and/or
-            // performance of the system.
-            log.error(e.getMessage(), e);
-            response = new FetchFolderResponse(Constants.ERROR, GENERAL_RETURN_MESSAGE);
-        }
-
-        return response;
-    }
 
     /**
      * {@inheritDoc}

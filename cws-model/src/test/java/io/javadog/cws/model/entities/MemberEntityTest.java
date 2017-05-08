@@ -65,8 +65,6 @@ public final class MemberEntityTest extends DatabaseSetup {
         assertThat(found.getPublicKey(), is(publicKey));
         assertThat(found.getPrivateKey(), is(privateKey));
         assertThat(found.getKeyPair(), is(nullValue()));
-        assertThat(toString(found.getModified()), is(toString(modified)));
-        assertThat(toString(found.getCreated()), is(toString(created)));
     }
 
     @Test(expected = PersistenceException.class)

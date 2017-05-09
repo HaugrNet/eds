@@ -77,6 +77,12 @@ INSERT INTO settings (name, setting, modifiable) VALUES ('cws.crypto.pbe.algorit
 -- useless.
 INSERT INTO settings (name, setting, modifiable) VALUES ('cws.system.salt', 'System Specific Salt, should be generated to a unique value per Setup.', false);
 
+-- For correctly dealing with Strings, it is important that the Locale is set to
+-- ensure that it is done properly. By default the Locale is English (EN), but
+-- if preferred, any other can be chosen. As long as they follow the IETF BCP 47
+-- allowed values. See: https://en.wikipedia.org/wiki/IETF_language_tag
+INSERT INTO settings (name, setting, modifiable) VALUES ('cws.system.locale', 'EN', true);
+
 -- When applying armoring to the raw keys, it means using a Base64 encoding and
 -- decoding. However, they have to be saved using a character set. Any character
 -- set can be used, but if keys have been stored using one, changing it will

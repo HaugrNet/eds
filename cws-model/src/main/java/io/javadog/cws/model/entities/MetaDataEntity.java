@@ -12,6 +12,8 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
 /**
@@ -19,10 +21,18 @@ import javax.persistence.Table;
  * @since  CWS 1.0
  */
 @Entity
-@Table(name = "objects")
-public class ObjectEntity extends Externable {
+@NamedQueries({
+        @NamedQuery(name = "metadata.findByMemberAndExternalId",
+                    query = "select m " +
+                            "from MetaDataEntity m " +
+                            "inner join TrusteeEntity t on m.circle.id = t.circle.id " +
+                            "where m.externalId = :eid" +
+                            "  and t.member.id = :mid")
+})
+@Table(name = "metadata")
+public class MetaDataEntity extends Externable {
 
-    @Column(name = "parent_id", nullable = false)
+    @Column(name = "parent_id")
     private Long parentId = null;
 
     @ManyToOne(targetEntity = CircleEntity.class, fetch = FetchType.EAGER, optional = false)
@@ -30,7 +40,7 @@ public class ObjectEntity extends Externable {
     private CircleEntity circle = null;
 
     @ManyToOne(targetEntity = DataTypeEntity.class, fetch = FetchType.EAGER, optional = false)
-    @JoinColumn(name = "type_id",  referencedColumnName = "id", nullable = false, updatable = false)
+    @JoinColumn(name = "datatype_id",  referencedColumnName = "id", nullable = false, updatable = false)
     private DataTypeEntity type = null;
 
     @Column(name = "name", nullable = false)

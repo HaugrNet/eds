@@ -13,6 +13,7 @@ import io.javadog.cws.common.exceptions.SettingException;
 
 import java.nio.charset.Charset;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 
@@ -46,6 +47,7 @@ public final class Settings {
     public static final String SIGNATURE_ALGORITHM = "cws.crypto.signature.algorithm";
     public static final String PBE_ALGORITHM = "cws.crypto.pbe.algorithm";
     public static final String CWS_SALT = "cws.system.salt";
+    public static final String CWS_LOCALE = "cws.system.locale";
     public static final String CWS_CHARSET = "cws.system.charset";
     public static final String EXPOSE_ADMIN = "cws.expose.admin";
     public static final String SHOW_TRUSTEES = "cws.show.trustees";
@@ -59,6 +61,7 @@ public final class Settings {
     private static final String DEFAULT_SIGNATURE_ALGORITHM = "SHA512WithRSA";
     private static final String DEFAULT_PBE_ALGORITHM = "PBKDF2WithHmacSHA256";
     private static final String DEFAULT_SALT = "Default Salt, please make sure it is set in the DB instead.";
+    private static final String DEFAULT_LOCALE = "EN";
     private static final String DEFAULT_CHARSETNAME = "UTF-8";
     private static final String DEFAULT_EXPOSE_ADMIN = "false";
     private static final String DEFAULT_SHOW_TRUSTEES = "true";
@@ -75,6 +78,7 @@ public final class Settings {
         properties.setProperty(SIGNATURE_ALGORITHM, DEFAULT_SIGNATURE_ALGORITHM);
         properties.setProperty(PBE_ALGORITHM, DEFAULT_PBE_ALGORITHM);
         properties.setProperty(CWS_SALT, DEFAULT_SALT);
+        properties.setProperty(CWS_LOCALE, DEFAULT_LOCALE);
         properties.setProperty(CWS_CHARSET, DEFAULT_CHARSETNAME);
         properties.setProperty(EXPOSE_ADMIN, DEFAULT_EXPOSE_ADMIN);
         properties.setProperty(SHOW_TRUSTEES, DEFAULT_SHOW_TRUSTEES);
@@ -136,6 +140,10 @@ public final class Settings {
 
     public String getSalt() {
         return properties.getProperty(CWS_SALT);
+    }
+
+    public Locale getLocale() {
+        return Locale.forLanguageTag(properties.getProperty(CWS_LOCALE));
     }
 
     public Charset getCharset() {

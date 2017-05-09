@@ -16,15 +16,13 @@ import io.javadog.cws.api.common.TrustLevel;
 public enum Permission {
 
     FETCH_CIRCLE(TrustLevel.GUEST, "Fetch Circles."),
-    FETCH_FOLDER(TrustLevel.GUEST, "Fetch Folders."),
     FETCH_MEMBER(TrustLevel.GUEST, "Fetch Members."),
-    FETCH_OBJECT(TrustLevel.READ, "Fetch Object."),
-    FETCH_OBJECT_TYPE(TrustLevel.GUEST, "Fetch Object Types."),
+    FETCH_DATA(TrustLevel.READ, "Fetch Data."),
+    FETCH_DATA_TYPE(TrustLevel.GUEST, "Fetch Data Types."),
     PROCESS_CIRCLE(TrustLevel.WRITE, "Process Circle."),
-    PROCESS_FOLDER(TrustLevel.WRITE, "Process Folder."),
     PROCESS_MEMBER(TrustLevel.WRITE, "Process Member."),
-    PROCESS_OBJECT(TrustLevel.WRITE, "Process Object."),
-    PROCESS_OBJECT_TYPE(TrustLevel.WRITE, "Process Object Type."),
+    PROCESS_DATA(TrustLevel.WRITE, "Process Data."),
+    PROCESS_DATA_TYPE(TrustLevel.WRITE, "Process Data Type."),
     CREATE_SIGNATURE(TrustLevel.WRITE, "Create Digital Signature."),
     VERIFY_SIGNATURE(TrustLevel.WRITE, "Verify Digital Signature."),
     SETTING(TrustLevel.ADMIN, "Settings.");

@@ -26,7 +26,7 @@ import java.util.Set;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "ProcessDataRequest", propOrder = { "action", "data" })
+@XmlType(name = "ProcessDataRequest", propOrder = { "action", "dataId", "data" })
 public final class ProcessDataRequest extends Authentication {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
@@ -40,7 +40,10 @@ public final class ProcessDataRequest extends Authentication {
     @XmlElement(name = FIELD_ACTION, required = true)
     private Action action = null;
 
-    @XmlElement(name = FIELD_DATA, required = true)
+    @XmlElement(name = "FIELD_DATA_ID", required = true, nillable = true)
+    private String dataId = null;
+
+    @XmlElement(name = FIELD_DATA, required = true, nillable = true)
     private Data data = null;
 
     // =========================================================================
@@ -69,9 +72,17 @@ public final class ProcessDataRequest extends Authentication {
         return action;
     }
 
-    @NotNull
+    public void setDataId(final String dataId) {
+        ensureValidId(FIELD_DATA_ID, dataId);
+        this.dataId = dataId;
+    }
+
+    public String getDataId() {
+        return dataId;
+    }
+
     public void setData(final Data data) {
-        ensureNotNull(FIELD_DATA, data);
+        ensureVerifiable(FIELD_DATA, data);
         this.data = data;
     }
 
@@ -92,12 +103,20 @@ public final class ProcessDataRequest extends Authentication {
 
         if (action == null) {
             errors.put(FIELD_ACTION, "No action has been provided.");
-        }
-
-        if (data == null) {
-            errors.put(FIELD_DATA, "Data is missing, null or invalid.");
         } else {
-            errors.putAll(data.validate());
+            if (action == Action.PROCESS) {
+                if (data == null) {
+                    errors.put(FIELD_DATA, "Data is missing, null or invalid.");
+                } else {
+                    errors.putAll(data.validate());
+                }
+            } else if (action == Action.DELETE) {
+                if (dataId == null) {
+                    errors.put(FIELD_DATA_ID, "Missing or invalid Data Id.");
+                }
+            } else {
+                errors.put(FIELD_ACTION, "Invalid Action provided.");
+            }
         }
 
         return errors;

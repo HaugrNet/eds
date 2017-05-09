@@ -20,16 +20,16 @@ import javax.persistence.Table;
 @Entity
 @NamedQueries({
         @NamedQuery(name = "type.findAll",
-                query = "select t " +
-                        "from DataTypeEntity t " +
-                        "order by t.name asc"),
+                query = "select d " +
+                        "from DataTypeEntity d " +
+                        "order by d.name asc"),
         @NamedQuery(name = "type.findMatching",
-                query = "select t from DataTypeEntity t " +
-                        "where lower(t.name) = lower(:name)"),
+                query = "select d from DataTypeEntity d " +
+                        "where lower(d.name) = lower(:name)"),
         @NamedQuery(name = "type.countUsage",
-                query = "select count(o.id) " +
-                        "from ObjectEntity o " +
-                        "where o.type.id = :id")
+                query = "select count(m.id) " +
+                        "from MetaDataEntity m " +
+                        "where m.type.id = :id")
 })
 @Table(name = "datatypes")
 public final class DataTypeEntity extends CWSEntity {

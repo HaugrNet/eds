@@ -36,7 +36,7 @@ public final class ProcessDataTypeService extends Serviceable<ProcessDataTypeRes
      */
     @Override
     public ProcessDataTypeResponse perform(final ProcessDataTypeRequest request) {
-        verifyRequest(request, Permission.PROCESS_OBJECT_TYPE);
+        verifyRequest(request, Permission.PROCESS_DATA_TYPE);
         final ProcessDataTypeResponse response;
 
         switch (request.getAction()) {
@@ -66,7 +66,7 @@ public final class ProcessDataTypeService extends Serviceable<ProcessDataTypeRes
         final String type = request.getObjectType().getType().trim();
         final DataTypeEntity entity;
 
-        final List<DataTypeEntity> entities = dao.findMatchingObjectTypes(name);
+        final List<DataTypeEntity> entities = dao.findMatchingDataTypes(name);
         if (entities.isEmpty()) {
             entity = new DataTypeEntity();
             entity.setName(name);
@@ -95,7 +95,7 @@ public final class ProcessDataTypeService extends Serviceable<ProcessDataTypeRes
     private ProcessDataTypeResponse doDelete(final ProcessDataTypeRequest request) {
         final String name = request.getObjectType().getName().trim();
 
-        final List<DataTypeEntity> entities = dao.findMatchingObjectTypes(name);
+        final List<DataTypeEntity> entities = dao.findMatchingDataTypes(name);
         if (entities.size() == 1) {
             // We need to check that the Object Type is not being used. If so,
             // then it is not allowed to remove it.

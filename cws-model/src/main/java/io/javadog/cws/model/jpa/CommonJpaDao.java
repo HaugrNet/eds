@@ -12,9 +12,11 @@ import io.javadog.cws.common.exceptions.ModelException;
 import io.javadog.cws.model.CommonDao;
 import io.javadog.cws.model.entities.CWSEntity;
 import io.javadog.cws.model.entities.CircleEntity;
+import io.javadog.cws.model.entities.DataEntity;
 import io.javadog.cws.model.entities.DataTypeEntity;
 import io.javadog.cws.model.entities.Externable;
 import io.javadog.cws.model.entities.MemberEntity;
+import io.javadog.cws.model.entities.MetaDataEntity;
 import io.javadog.cws.model.entities.SettingEntity;
 import io.javadog.cws.model.entities.TrusteeEntity;
 
@@ -42,16 +44,19 @@ public final class CommonJpaDao implements CommonDao {
      * {@inheritDoc}
      */
     @Override
-    public <E extends CWSEntity> void persist(final E entity) {
+    public void persist(final Object entity) {
         if ((entity instanceof Externable) && (((Externable) entity).getExternalId() == null)) {
             ((Externable) entity).setExternalId(UUID.randomUUID().toString());
         }
 
-        if (entity.getCreated() == null) {
-            entity.setCreated(new Date());
+        if (entity instanceof CWSEntity) {
+            if (((CWSEntity) entity).getCreated() == null) {
+                ((CWSEntity) entity).setCreated(new Date());
+            }
+
+            ((CWSEntity) entity).setModified(new Date());
         }
 
-        entity.setModified(new Date());
         entityManager.persist(entity);
     }
 
@@ -199,7 +204,7 @@ public final class CommonJpaDao implements CommonDao {
      * {@inheritDoc}
      */
     @Override
-    public List<DataTypeEntity> findMatchingObjectTypes(final String name) {
+    public List<DataTypeEntity> findMatchingDataTypes(final String name) {
         final Query query = entityManager.createNamedQuery("type.findMatching");
         query.setParameter("name", name);
 
@@ -215,6 +220,27 @@ public final class CommonJpaDao implements CommonDao {
         query.setParameter("id", id);
 
         return (int) query.getSingleResult();
+    }
+
+    @Override
+    public DataEntity findDataByMemberAndExternalId(final MemberEntity member, final String externalId) {
+        final Query query = entityManager.createNamedQuery("data.findByMemberAndExternalId");
+        query.setParameter("mid", member.getId());
+        query.setParameter("eid", externalId);
+
+        return findSingleRecord(query);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public MetaDataEntity findMetaDataByMemberAndExternalId(final MemberEntity member, final String externalId) {
+        final Query query = entityManager.createNamedQuery("metadata.findByMemberAndExternalId");
+        query.setParameter("mid", member.getId());
+        query.setParameter("eid", externalId);
+
+        return findSingleRecord(query);
     }
 
     // =========================================================================

@@ -32,7 +32,7 @@ public final class FetchObjectService extends Serviceable<FetchDataResponse, Fet
      */
     @Override
     public FetchDataResponse perform(final FetchDataRequest request) {
-        verifyRequest(request, Permission.FETCH_OBJECT);
+        verifyRequest(request, Permission.FETCH_DATA);
 
         throw new CWSException(ReturnCode.NOTIMPLEMENTED_ERROR, "Not Yet Implemented.");
     }

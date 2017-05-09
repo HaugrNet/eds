@@ -15,6 +15,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
@@ -23,7 +25,15 @@ import javax.persistence.Table;
  * @since  CWS 1.0
  */
 @Entity
-@Table(name = "objectdata")
+@NamedQueries({
+        @NamedQuery(name = "data.findByMemberAndExternalId",
+                query = "select d " +
+                        "from DataEntity d " +
+                        "inner join TrusteeEntity t on d.metadata.circle.id = t.circle.id " +
+                        "where d.metadata.externalId = :eid" +
+                        "  and t.member.id = :mid")
+})
+@Table(name = "data")
 public class DataEntity {
 
     @Id
@@ -31,9 +41,9 @@ public class DataEntity {
     @Column(name = "id", unique = true, nullable = false, updatable = false)
     private Long id;
 
-    @OneToOne(targetEntity = ObjectEntity.class, fetch = FetchType.EAGER, optional = false)
-    @JoinColumn(name = "object_id", referencedColumnName = "id", nullable = false, updatable = false)
-    private ObjectEntity object = null;
+    @OneToOne(targetEntity = MetaDataEntity.class, fetch = FetchType.EAGER, optional = false)
+    @JoinColumn(name = "metadata_id", referencedColumnName = "id", nullable = false, updatable = false)
+    private MetaDataEntity metadata = null;
 
     @ManyToOne(targetEntity = KeyEntity.class, fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "key_id", referencedColumnName = "id", nullable = false, updatable = false)
@@ -57,12 +67,12 @@ public class DataEntity {
         return id;
     }
 
-    public void setObject(final ObjectEntity object) {
-        this.object = object;
+    public void setMetadata(final MetaDataEntity object) {
+        this.metadata = object;
     }
 
-    public ObjectEntity getObject() {
-        return object;
+    public MetaDataEntity getMetadata() {
+        return metadata;
     }
 
     public void setKey(final KeyEntity key) {

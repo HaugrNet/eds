@@ -29,10 +29,9 @@ public final class ProcessDataServiceTest extends DatabaseSetup {
     public void testInvalidRequest() {
         prepareCause(VerificationException.class, ReturnCode.VERIFICATION_WARNING,
                 "Request Object contained errors: Key: credentialTypeError: CredentialType is missing, null or invalid.\n" +
-                "Key: credentialError: Credential is missing, null or invalid.\n" +
-                "Key: dataError: Data is missing, null or invalid.\n" +
-                "Key: actionError: No action has been provided.\n" +
-                "Key: accountError: Account is missing, null or invalid.\n");
+                        "Key: credentialError: Credential is missing, null or invalid.\n" +
+                        "Key: actionError: No action has been provided.\n" +
+                        "Key: accountError: Account is missing, null or invalid.\n");
 
         final Serviceable<ProcessDataResponse, ProcessDataRequest> service = prepareService();
         final ProcessDataRequest request = new ProcessDataRequest();

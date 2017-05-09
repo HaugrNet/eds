@@ -37,7 +37,7 @@ public final class FetchObjectTypeService extends Serviceable<FetchDataTypeRespo
      */
     @Override
     public FetchDataTypeResponse perform(final FetchDataTypeRequest request) {
-        verifyRequest(request, Permission.FETCH_OBJECT_TYPE);
+        verifyRequest(request, Permission.FETCH_DATA_TYPE);
 
         final List<DataTypeEntity> types = dao.findAllTypes();
         final List<DataType> objectTypes = new ArrayList<>(types.size());

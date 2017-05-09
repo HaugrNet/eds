@@ -12,7 +12,7 @@
         <class>io.javadog.cws.model.entities.KeyEntity</class>
         <class>io.javadog.cws.model.entities.TrusteeEntity</class>
         <class>io.javadog.cws.model.entities.DataTypeEntity</class>
-        <class>io.javadog.cws.model.entities.ObjectEntity</class>
+        <class>io.javadog.cws.model.entities.MetaDataEntity</class>
         <class>io.javadog.cws.model.entities.DataEntity</class>
 
         <properties>

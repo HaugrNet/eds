@@ -9,10 +9,12 @@ package io.javadog.cws.model;
 
 import io.javadog.cws.model.entities.CWSEntity;
 import io.javadog.cws.model.entities.CircleEntity;
+import io.javadog.cws.model.entities.DataEntity;
+import io.javadog.cws.model.entities.DataTypeEntity;
 import io.javadog.cws.model.entities.MemberEntity;
+import io.javadog.cws.model.entities.MetaDataEntity;
 import io.javadog.cws.model.entities.SettingEntity;
 import io.javadog.cws.model.entities.TrusteeEntity;
-import io.javadog.cws.model.entities.DataTypeEntity;
 
 import java.util.List;
 
@@ -24,7 +26,7 @@ import java.util.List;
  */
 public interface CommonDao {
 
-    <E extends CWSEntity> void persist(E entity);
+    void persist(Object entity);
 
     <E extends CWSEntity> E find(Class<E> cwsEntity, Long id);
 
@@ -52,7 +54,11 @@ public interface CommonDao {
 
     List<DataTypeEntity> findAllTypes();
 
-    List<DataTypeEntity> findMatchingObjectTypes(String name);
+    List<DataTypeEntity> findMatchingDataTypes(String name);
 
     int countObjectTypeUsage(Long id);
+
+    DataEntity findDataByMemberAndExternalId(MemberEntity member, String externalId);
+
+    MetaDataEntity findMetaDataByMemberAndExternalId(MemberEntity member, String externalId);
 }

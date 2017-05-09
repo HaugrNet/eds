@@ -25,8 +25,8 @@ import io.javadog.cws.common.exceptions.CWSException;
 import io.javadog.cws.core.Serviceable;
 import io.javadog.cws.core.services.FetchObjectService;
 import io.javadog.cws.core.services.FetchObjectTypeService;
-import io.javadog.cws.core.services.ProcessObjectService;
-import io.javadog.cws.core.services.ProcessObjectTypeService;
+import io.javadog.cws.core.services.ProcessDataService;
+import io.javadog.cws.core.services.ProcessDataTypeService;
 import io.javadog.cws.core.services.SignService;
 import io.javadog.cws.core.services.VerifyService;
 import org.slf4j.Logger;
@@ -58,7 +58,7 @@ public final class ShareBean implements Share {
         ProcessDataTypeResponse response;
 
         try {
-            final Serviceable<ProcessDataTypeResponse, ProcessDataTypeRequest> service = new ProcessObjectTypeService(settings, entityManager);
+            final Serviceable<ProcessDataTypeResponse, ProcessDataTypeRequest> service = new ProcessDataTypeService(settings, entityManager);
             response = service.perform(request);
         } catch (CWSException e) {
             // Any Warning or Error thrown by the CWS contain enough information
@@ -104,7 +104,7 @@ public final class ShareBean implements Share {
         ProcessDataResponse response;
 
         try {
-            final Serviceable<ProcessDataResponse, ProcessDataRequest> service = new ProcessObjectService(settings, entityManager);
+            final Serviceable<ProcessDataResponse, ProcessDataRequest> service = new ProcessDataService(settings, entityManager);
             response = service.perform(request);
         } catch (CWSException e) {
             // Any Warning or Error thrown by the CWS contain enough information

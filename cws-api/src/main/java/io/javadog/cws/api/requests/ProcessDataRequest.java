@@ -26,7 +26,7 @@ import java.util.Set;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "ProcessDataRequest", propOrder = { "action", "dataId", "data" })
+@XmlType(name = "ProcessDataRequest", propOrder = { "action", "data" })
 public final class ProcessDataRequest extends Authentication {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
@@ -39,9 +39,6 @@ public final class ProcessDataRequest extends Authentication {
 
     @XmlElement(name = FIELD_ACTION, required = true)
     private Action action = null;
-
-    @XmlElement(name = FIELD_DATA_ID, required = true, nillable = true)
-    private String dataId = null;
 
     @XmlElement(name = FIELD_DATA, required = true)
     private Data data = null;
@@ -72,15 +69,6 @@ public final class ProcessDataRequest extends Authentication {
         return action;
     }
 
-    public void setDataId(final String dataId) {
-        ensureValidId(FIELD_DATA_ID, dataId);
-        this.dataId = dataId;
-    }
-
-    public String getDataId() {
-        return dataId;
-    }
-
     @NotNull
     public void setData(final Data data) {
         ensureNotNull(FIELD_DATA, data);
@@ -106,12 +94,8 @@ public final class ProcessDataRequest extends Authentication {
             errors.put(FIELD_ACTION, "No action has been provided.");
         }
 
-        if (dataId != null) {
-            checkPattern(errors, FIELD_DATA_ID, dataId, Constants.ID_PATTERN_REGEX, "The Object Data Id is invalid.");
-        }
-
         if (data == null) {
-            errors.put(FIELD_DATA, "Value is missing, null or invalid.");
+            errors.put(FIELD_DATA, "Data is missing, null or invalid.");
         } else {
             errors.putAll(data.validate());
         }

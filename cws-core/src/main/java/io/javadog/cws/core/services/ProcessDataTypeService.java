@@ -25,9 +25,9 @@ import java.util.Objects;
  * @author Kim Jensen
  * @since  CWS 1.0
  */
-public final class ProcessObjectTypeService extends Serviceable<ProcessDataTypeResponse, ProcessDataTypeRequest> {
+public final class ProcessDataTypeService extends Serviceable<ProcessDataTypeResponse, ProcessDataTypeRequest> {
 
-    public ProcessObjectTypeService(final Settings settings, final EntityManager entityManager) {
+    public ProcessDataTypeService(final Settings settings, final EntityManager entityManager) {
         super(settings, entityManager);
     }
 

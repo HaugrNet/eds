@@ -25,13 +25,14 @@ import java.util.Map;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "objectData", propOrder = { "id", "name", "type", "bytes", "added" })
+@XmlType(name = "objectData", propOrder = { "id", "circleId", "folderId", "name", "type", "bytes", "added" })
 public final class Data extends Verifiable {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
     private static final String FIELD_ID = "id";
+    private static final String FIELD_CIRCLE_ID = "circleId";
     private static final String FIELD_FOLDER_ID = "folderId";
     private static final String FIELD_NAME = "name";
     private static final String FIELD_TYPE = "type";
@@ -40,6 +41,9 @@ public final class Data extends Verifiable {
 
     @XmlElement(name = FIELD_ID, required = true, nillable = true)
     private String id = null;
+
+    @XmlElement(name = FIELD_CIRCLE_ID, required = true, nillable = true)
+    private String circleId = null;
 
     @XmlElement(name = FIELD_FOLDER_ID, required = true, nillable = true)
     private String folderId = null;
@@ -68,6 +72,16 @@ public final class Data extends Verifiable {
 
     public String getId() {
         return id;
+    }
+
+    @Pattern(regexp = Constants.ID_PATTERN_REGEX)
+    public void setCircleId(final String circleId) {
+        ensurePattern(FIELD_CIRCLE_ID, circleId, Constants.ID_PATTERN_REGEX);
+        this.circleId = circleId;
+    }
+
+    public String getCircleId() {
+        return circleId;
     }
 
     @Pattern(regexp = Constants.ID_PATTERN_REGEX)
@@ -122,9 +136,16 @@ public final class Data extends Verifiable {
     public Map<String, String> validate() {
         final Map<String, String> errors = new HashMap<>();
 
-        checkPattern(errors, FIELD_ID, id, Constants.ID_PATTERN_REGEX, "The Object Data Id is invalid.");
-        checkPattern(errors, FIELD_FOLDER_ID, folderId, Constants.ID_PATTERN_REGEX, "The Object Folder Id is invalid.");
-        checkNotNull(errors, FIELD_TYPE, type, "The ObjectType is undefined.");
+        checkPattern(errors, FIELD_ID, id, Constants.ID_PATTERN_REGEX, "The Data Id is invalid.");
+
+        if (id == null) {
+            checkNotNull(errors, FIELD_CIRCLE_ID, circleId, "The Circle Id must be present if no Data Id is present.");
+            checkPattern(errors, FIELD_CIRCLE_ID, circleId, Constants.ID_PATTERN_REGEX, "The Circle Id is invalid.");
+        }
+
+        checkPattern(errors, FIELD_FOLDER_ID, folderId, Constants.ID_PATTERN_REGEX, "The Folder Id is invalid.");
+        checkNotNull(errors, FIELD_TYPE, type, "The DataType is undefined.");
+
         if (type != null) {
             errors.putAll(type.validate());
         }

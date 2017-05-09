@@ -21,9 +21,9 @@ import javax.persistence.EntityManager;
  * @author Kim Jensen
  * @since  CWS 1.0
  */
-public final class ProcessObjectService extends Serviceable<ProcessDataResponse, ProcessDataRequest> {
+public final class ProcessDataService extends Serviceable<ProcessDataResponse, ProcessDataRequest> {
 
-    public ProcessObjectService(final Settings settings, final EntityManager entityManager) {
+    public ProcessDataService(final Settings settings, final EntityManager entityManager) {
         super(settings, entityManager);
     }
 

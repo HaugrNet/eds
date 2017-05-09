@@ -35,39 +35,27 @@ public enum ReturnCode {
     private enum Classification {
 
         /**
-         * <p>The Info Classification is used for the Successful responses from
-         * the CWS.</p>
-         *
-         * <p>All requests should complete successfully, and when they do, then they
-         * will return with this return code.</p>
+         * <p>The Classification Info, is used for for all Successful Responses
+         * from the CWS.</p>
          */
         CLASS_INFO(0),
 
         /**
-         * <p>The Warning Classification is used for the types of errors, which
-         * is caused by Member input being incorrect or invalid. Meaning that
-         * the problem is correctable by the Member.</p>
-         *
-         * <p>General number for all Warnings, a Warning is defined as an event that
-         * happened during processing, which meant that the processing cannot
-         * complete properly, most likely due to invalid or missing data in the
-         * request, lack of privileges or similar types of events. The rule of thumb
-         * is that this type of error is linked directly to the member, and can be
-         * correctly by the member.</p>
+         * <p>The Classification Warning, is used for problems which prevents
+         * the successful completion of a Request - but where the cause of the
+         * problem is something that can be corrected by the Requesting Member.
+         * This is most likely due to invalid input or insufficient input data
+         * or Authentication/Authorization problems.</p>
          */
         CLASS_WARNING(1),
 
         /**
-         * <p>The Error Classification is used for the types of errors, which is
-         * caused internally, meaning that it is not possible for a Member to
-         * do anything to correct it.</p>
-         *
-         * <p>General number for all Errors, an Error is defined as an event that
-         * happened during processing, which meant that the processing cannot
-         * complete properly, most likely due to a configuration error, programming
-         * error, memory problem or similar types of events. The rule of thumb is
-         * that this level of error can only be handled by an administrator or the
-         * CWS Developers.</p>
+         * <p>The Classification Error, is used for internal problems, which
+         * prevents the CWS from successfully completing the request. These
+         * errors will be caused by errors in either the implementation of the
+         * logic or the quality of the existing data. Generally, this kind of
+         * problem cannot be correct by the Members, but require Administrative
+         * intervention or corrections by the CWS Developers.</p>
          */
         CLASS_ERROR(2);
 

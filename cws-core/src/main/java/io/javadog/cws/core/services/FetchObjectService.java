@@ -7,7 +7,7 @@
  */
 package io.javadog.cws.core.services;
 
-import io.javadog.cws.api.common.Constants;
+import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.requests.FetchDataRequest;
 import io.javadog.cws.api.responses.FetchDataResponse;
 import io.javadog.cws.common.Settings;
@@ -34,6 +34,6 @@ public final class FetchObjectService extends Serviceable<FetchDataResponse, Fet
     public FetchDataResponse perform(final FetchDataRequest request) {
         verifyRequest(request, Permission.FETCH_OBJECT);
 
-        throw new CWSException(Constants.NOTIMPLEMENTED_ERROR, "Not Yet Implemented.");
+        throw new CWSException(ReturnCode.NOTIMPLEMENTED_ERROR, "Not Yet Implemented.");
     }
 }

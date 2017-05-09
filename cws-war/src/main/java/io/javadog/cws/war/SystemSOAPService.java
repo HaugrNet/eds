@@ -8,7 +8,7 @@
 package io.javadog.cws.war;
 
 import io.javadog.cws.api.System;
-import io.javadog.cws.api.common.Constants;
+import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.requests.FetchCircleRequest;
 import io.javadog.cws.api.requests.FetchMemberRequest;
 import io.javadog.cws.api.requests.ProcessCircleRequest;
@@ -60,7 +60,7 @@ public class SystemSOAPService implements System {
             // problems or other things that will affect the reliability and/or
             // performance of the system.
             log.error(e.getMessage(), e);
-            response = new VersionResponse(Constants.ERROR, GENERAL_RETURN_MESSAGE);
+            response = new VersionResponse(ReturnCode.ERROR, GENERAL_RETURN_MESSAGE);
         }
 
         return response;
@@ -82,7 +82,7 @@ public class SystemSOAPService implements System {
             // problems or other things that will affect the reliability and/or
             // performance of the system.
             log.error(e.getMessage(), e);
-            response = new SettingResponse(Constants.ERROR, GENERAL_RETURN_MESSAGE);
+            response = new SettingResponse(ReturnCode.ERROR, GENERAL_RETURN_MESSAGE);
         }
 
         return response;
@@ -104,7 +104,7 @@ public class SystemSOAPService implements System {
             // problems or other things that will affect the reliability and/or
             // performance of the system.
             log.error(e.getMessage(), e);
-            response = new FetchMemberResponse(Constants.ERROR, GENERAL_RETURN_MESSAGE);
+            response = new FetchMemberResponse(ReturnCode.ERROR, GENERAL_RETURN_MESSAGE);
         }
 
         return response;
@@ -126,7 +126,7 @@ public class SystemSOAPService implements System {
             // problems or other things that will affect the reliability and/or
             // performance of the system.
             log.error(e.getMessage(), e);
-            response = new ProcessMemberResponse(Constants.ERROR, GENERAL_RETURN_MESSAGE);
+            response = new ProcessMemberResponse(ReturnCode.ERROR, GENERAL_RETURN_MESSAGE);
         }
 
         return response;
@@ -148,7 +148,7 @@ public class SystemSOAPService implements System {
             // problems or other things that will affect the reliability and/or
             // performance of the system.
             log.error(e.getMessage(), e);
-            response = new FetchCircleResponse(Constants.ERROR, GENERAL_RETURN_MESSAGE);
+            response = new FetchCircleResponse(ReturnCode.ERROR, GENERAL_RETURN_MESSAGE);
         }
 
         return response;
@@ -170,7 +170,7 @@ public class SystemSOAPService implements System {
             // problems or other things that will affect the reliability and/or
             // performance of the system.
             log.error(e.getMessage(), e);
-            response = new ProcessCircleResponse(Constants.ERROR, GENERAL_RETURN_MESSAGE);
+            response = new ProcessCircleResponse(ReturnCode.ERROR, GENERAL_RETURN_MESSAGE);
         }
 
         return response;

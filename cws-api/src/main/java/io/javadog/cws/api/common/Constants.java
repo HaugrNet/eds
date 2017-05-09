@@ -47,43 +47,6 @@ public final class Constants {
      */
     public static final String ADMIN_ACCOUNT = "admin";
 
-    /**
-     * <p>General number for all Errors, an Error is defined as an event that
-     * happened during processing, which meant that the processing cannot
-     * complete properly, most likely due to a configuration error, programming
-     * error, memory problem or similar types of events. The rule of thumb is
-     * that this level of error can only be handled by an administrator or the
-     * CWS Developers.</p>
-     */
-    public static final int ERROR = 100;
-    public static final int DATABASE_ERROR = ERROR + 1;
-    public static final int CONSTRAINT_ERROR = ERROR + 2;
-    public static final int PROPERTY_ERROR = ERROR + 3;
-    public static final int CRYPTO_ERROR = ERROR + 4;
-    public static final int IDENTIFICATION_ERROR = ERROR + 5;
-    public static final int NOTIMPLEMENTED_ERROR = ERROR + 99;
-
-    /**
-     * <p>General number for all Warnings, a Warning is defined as an even that
-     * happened during processing, which meant that the processing cannot
-     * complete properly, most likely due to invalid or missing data in the
-     * request, lack of privileges or similar types of events. The rule of thumb
-     * is that this type of error is linked directly to the member, and can be
-     * correctly by the member.</p>
-     */
-    private static final int WARNING = 100;
-
-    /**
-     * <p>All requests should complete successfully, and when they do, then they
-     * will return with this return code.</p>
-     */
-    public static final int SUCCESS = 0;
-
-    public static final int VERIFICATION_WARNING = WARNING + 1;
-    public static final int IDENTIFICATION_WARNING = WARNING + 2;
-    public static final int AUTHORIZATION_WARNING = WARNING + 3;
-    public static final int ILLEGAL_ACTION = WARNING + 99;
-
     private Constants() {
         // Private Constructor, this is a Constants Class.
     }

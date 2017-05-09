@@ -8,7 +8,7 @@
 package io.javadog.cws.war;
 
 import io.javadog.cws.api.System;
-import io.javadog.cws.api.common.Constants;
+import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.requests.FetchCircleRequest;
 import io.javadog.cws.api.requests.FetchMemberRequest;
 import io.javadog.cws.api.requests.ProcessCircleRequest;
@@ -71,7 +71,7 @@ public class SystemBean implements System {
             response.setVersion(properties.getProperty("cws.version"));
         } catch (IOException e) {
             log.error(e.getMessage(), e);
-            response = new VersionResponse(Constants.ERROR, e.getMessage());
+            response = new VersionResponse(ReturnCode.ERROR, e.getMessage());
         }
 
         return response;

@@ -8,6 +8,7 @@
 package io.javadog.cws.common.exceptions;
 
 import io.javadog.cws.api.common.Constants;
+import io.javadog.cws.api.common.ReturnCode;
 
 /**
  * Verification Exception, thrown if the Request Object provided was either null
@@ -22,6 +23,6 @@ public final class VerificationException extends CWSException {
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
     public VerificationException(final String message) {
-        super(Constants.VERIFICATION_WARNING, message);
+        super(ReturnCode.VERIFICATION_WARNING, message);
     }
 }

@@ -10,7 +10,7 @@ package io.javadog.cws.api.responses;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
-import io.javadog.cws.api.common.Constants;
+import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.dtos.Circle;
 import io.javadog.cws.api.dtos.Member;
 import org.junit.Test;
@@ -30,7 +30,7 @@ public final class FetchMemberResponseTest {
         response.setMembers(prepareMembers(3));
 
         assertThat(response.isOk(), is(true));
-        assertThat(response.getReturnCode(), is(Constants.SUCCESS));
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(response.getReturnMessage(), is("Ok"));
         assertThat(response.getMembers().size(), is(3));
         assertThat(response.getCircles().isEmpty(), is(true));
@@ -43,7 +43,7 @@ public final class FetchMemberResponseTest {
         response.setCircles(prepareCircles());
 
         assertThat(response.isOk(), is(true));
-        assertThat(response.getReturnCode(), is(Constants.SUCCESS));
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(response.getReturnMessage(), is("Ok"));
         assertThat(response.getMembers().size(), is(1));
         assertThat(response.getCircles().size(), is(3));
@@ -51,10 +51,10 @@ public final class FetchMemberResponseTest {
 
     @Test
     public void testFetchingWithError() {
-        final FetchMemberResponse response = new FetchMemberResponse(Constants.CRYPTO_ERROR, "Blimey.");
+        final FetchMemberResponse response = new FetchMemberResponse(ReturnCode.CRYPTO_ERROR, "Blimey.");
 
         assertThat(response.isOk(), is(false));
-        assertThat(response.getReturnCode(), is(Constants.CRYPTO_ERROR));
+        assertThat(response.getReturnCode(), is(ReturnCode.CRYPTO_ERROR));
         assertThat(response.getReturnMessage(), is("Blimey."));
         assertThat(response.getMembers().isEmpty(), is(true));
         assertThat(response.getCircles().isEmpty(), is(true));

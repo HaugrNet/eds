@@ -8,6 +8,7 @@
 package io.javadog.cws.api.responses;
 
 import io.javadog.cws.api.common.Constants;
+import io.javadog.cws.api.common.ReturnCode;
 
 /**
  * @author Kim Jensen
@@ -22,7 +23,7 @@ public final class ProcessFolderResponse extends CWSResponse {
         // Empty Constructor, required for WebServices
     }
 
-    public ProcessFolderResponse(final int returnCode, final String returnMessage) {
+    public ProcessFolderResponse(final ReturnCode returnCode, final String returnMessage) {
         super(returnCode, returnMessage);
     }
 }

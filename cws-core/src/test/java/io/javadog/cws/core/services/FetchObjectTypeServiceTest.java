@@ -14,6 +14,7 @@ import static org.junit.Assert.assertThat;
 
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.CredentialType;
+import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.requests.FetchDataTypeRequest;
 import io.javadog.cws.api.responses.FetchDataTypeResponse;
 import io.javadog.cws.common.exceptions.VerificationException;
@@ -29,7 +30,7 @@ public final class FetchObjectTypeServiceTest extends DatabaseSetup {
 
     @Test
     public void testEmptyRequest() {
-        prepareCause(VerificationException.class, Constants.VERIFICATION_WARNING,
+        prepareCause(VerificationException.class, ReturnCode.VERIFICATION_WARNING,
                 "Request Object contained errors: Key: credentialTypeError: CredentialType is missing, null or invalid.\n" +
                 "Key: credentialError: Credential is missing, null or invalid.\n" +
                 "Key: accountError: Account is missing, null or invalid.\n");
@@ -49,7 +50,7 @@ public final class FetchObjectTypeServiceTest extends DatabaseSetup {
 
         assertThat(response, is(not(nullValue())));
         assertThat(response.isOk(), is(true));
-        assertThat(response.getReturnCode(), is(Constants.SUCCESS));
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(response.getReturnMessage(), is("Ok"));
         assertThat(response.getTypes().size(), is(1));
         assertThat(response.getTypes().get(0).getName(), is("folder"));

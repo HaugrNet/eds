@@ -8,7 +8,7 @@
 package io.javadog.cws.war;
 
 import io.javadog.cws.api.Share;
-import io.javadog.cws.api.common.Constants;
+import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.requests.FetchDataRequest;
 import io.javadog.cws.api.requests.FetchDataTypeRequest;
 import io.javadog.cws.api.requests.ProcessDataRequest;
@@ -61,7 +61,7 @@ public final class ShareSOAPService implements Share {
             // problems or other things that will affect the reliability and/or
             // performance of the system.
             log.error(e.getMessage(), e);
-            response = new ProcessDataTypeResponse(Constants.ERROR, GENERAL_RETURN_MESSAGE);
+            response = new ProcessDataTypeResponse(ReturnCode.ERROR, GENERAL_RETURN_MESSAGE);
         }
 
         return response;
@@ -83,7 +83,7 @@ public final class ShareSOAPService implements Share {
             // problems or other things that will affect the reliability and/or
             // performance of the system.
             log.error(e.getMessage(), e);
-            response = new FetchDataTypeResponse(Constants.ERROR, GENERAL_RETURN_MESSAGE);
+            response = new FetchDataTypeResponse(ReturnCode.ERROR, GENERAL_RETURN_MESSAGE);
         }
 
         return response;
@@ -105,7 +105,7 @@ public final class ShareSOAPService implements Share {
             // problems or other things that will affect the reliability and/or
             // performance of the system.
             log.error(e.getMessage(), e);
-            response = new ProcessDataResponse(Constants.ERROR, GENERAL_RETURN_MESSAGE);
+            response = new ProcessDataResponse(ReturnCode.ERROR, GENERAL_RETURN_MESSAGE);
         }
 
         return response;
@@ -127,7 +127,7 @@ public final class ShareSOAPService implements Share {
             // problems or other things that will affect the reliability and/or
             // performance of the system.
             log.error(e.getMessage(), e);
-            response = new FetchDataResponse(Constants.ERROR, GENERAL_RETURN_MESSAGE);
+            response = new FetchDataResponse(ReturnCode.ERROR, GENERAL_RETURN_MESSAGE);
         }
 
         return response;
@@ -149,7 +149,7 @@ public final class ShareSOAPService implements Share {
             // problems or other things that will affect the reliability and/or
             // performance of the system.
             log.error(e.getMessage(), e);
-            response = new SignResponse(Constants.ERROR, GENERAL_RETURN_MESSAGE);
+            response = new SignResponse(ReturnCode.ERROR, GENERAL_RETURN_MESSAGE);
         }
 
         return response;
@@ -171,7 +171,7 @@ public final class ShareSOAPService implements Share {
             // problems or other things that will affect the reliability and/or
             // performance of the system.
             log.error(e.getMessage(), e);
-            response = new VerifyResponse(Constants.ERROR, GENERAL_RETURN_MESSAGE);
+            response = new VerifyResponse(ReturnCode.ERROR, GENERAL_RETURN_MESSAGE);
         }
 
         return response;

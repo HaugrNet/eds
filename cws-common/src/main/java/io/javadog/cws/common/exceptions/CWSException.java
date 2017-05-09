@@ -8,6 +8,7 @@
 package io.javadog.cws.common.exceptions;
 
 import io.javadog.cws.api.common.Constants;
+import io.javadog.cws.api.common.ReturnCode;
 
 /**
  * Top Exception Class for CWS.
@@ -20,29 +21,29 @@ public class CWSException extends RuntimeException {
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
-    private final int returnCode;
+    private final ReturnCode returnCode;
 
-    public CWSException(final int returnCode, final String message) {
+    public CWSException(final ReturnCode returnCode, final String message) {
         super(message);
         this.returnCode = returnCode;
     }
 
     public CWSException(final Throwable cause) {
         super(cause);
-        this.returnCode = Constants.ERROR;
+        this.returnCode = ReturnCode.ERROR;
     }
 
-    public CWSException(final int returnCode, final Throwable cause) {
+    public CWSException(final ReturnCode returnCode, final Throwable cause) {
         super(cause);
         this.returnCode = returnCode;
     }
 
-    public CWSException(final int returnCode, final String message, final Throwable cause) {
+    public CWSException(final ReturnCode returnCode, final String message, final Throwable cause) {
         super(message, cause);
         this.returnCode = returnCode;
     }
 
-    public int getReturnCode() {
+    public ReturnCode getReturnCode() {
         return returnCode;
     }
 }

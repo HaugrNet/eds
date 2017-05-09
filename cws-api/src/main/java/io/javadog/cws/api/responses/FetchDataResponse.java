@@ -8,6 +8,7 @@
 package io.javadog.cws.api.responses;
 
 import io.javadog.cws.api.common.Constants;
+import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.dtos.Data;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -36,7 +37,7 @@ public final class FetchDataResponse extends CWSResponse{
         // Empty Constructor, required for WebServices
     }
 
-    public FetchDataResponse(final int returnCode, final String returnMessage) {
+    public FetchDataResponse(final ReturnCode returnCode, final String returnMessage) {
         super(returnCode, returnMessage);
     }
 

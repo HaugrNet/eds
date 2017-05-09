@@ -7,7 +7,7 @@
  */
 package io.javadog.cws.core.services;
 
-import io.javadog.cws.api.common.Constants;
+import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.requests.SignRequest;
 import io.javadog.cws.api.responses.SignResponse;
 import io.javadog.cws.common.Settings;
@@ -34,6 +34,6 @@ public final class SignService extends Serviceable<SignResponse, SignRequest> {
     public SignResponse perform(final SignRequest request) {
         verifyRequest(request, Permission.CREATE_SIGNATURE);
 
-        throw new CWSException(Constants.NOTIMPLEMENTED_ERROR, "Not Yet Implemented.");
+        throw new CWSException(ReturnCode.NOTIMPLEMENTED_ERROR, "Not Yet Implemented.");
     }
 }

@@ -7,7 +7,7 @@
  */
 package io.javadog.cws.core.services;
 
-import io.javadog.cws.api.common.Constants;
+import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.requests.VerifyRequest;
 import io.javadog.cws.api.responses.VerifyResponse;
 import io.javadog.cws.common.Settings;
@@ -34,6 +34,6 @@ public final class VerifyService extends Serviceable<VerifyResponse, VerifyReque
     public VerifyResponse perform(final VerifyRequest request) {
         verifyRequest(request, Permission.VERIFY_SIGNATURE);
 
-        throw new CWSException(Constants.NOTIMPLEMENTED_ERROR, "Not Yet Implemented.");
+        throw new CWSException(ReturnCode.NOTIMPLEMENTED_ERROR, "Not Yet Implemented.");
     }
 }

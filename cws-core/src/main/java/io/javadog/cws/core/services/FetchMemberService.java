@@ -8,6 +8,7 @@
 package io.javadog.cws.core.services;
 
 import io.javadog.cws.api.common.Constants;
+import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.dtos.Authentication;
 import io.javadog.cws.api.dtos.Circle;
 import io.javadog.cws.api.dtos.Member;
@@ -59,7 +60,7 @@ public final class FetchMemberService extends Serviceable<FetchMemberResponse, F
                     fetchSomeoneElse(response, requestedMember);
                 } else {
                     // No such Account exist, will simply return with an error.
-                    response.setReturnCode(Constants.IDENTIFICATION_WARNING);
+                    response.setReturnCode(ReturnCode.IDENTIFICATION_WARNING);
                     response.setReturnMessage("The requested Member cannot be found.");
                 }
             }

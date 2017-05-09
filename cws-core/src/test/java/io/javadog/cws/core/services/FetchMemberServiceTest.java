@@ -14,6 +14,7 @@ import static org.junit.Assert.assertThat;
 
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.CredentialType;
+import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.requests.FetchMemberRequest;
 import io.javadog.cws.api.responses.FetchMemberResponse;
 import io.javadog.cws.common.Settings;
@@ -61,7 +62,7 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
      */
     @Test
     public void testEmptyRequest() {
-        prepareCause(VerificationException.class, Constants.VERIFICATION_WARNING,
+        prepareCause(VerificationException.class, ReturnCode.VERIFICATION_WARNING,
                 "Request Object contained errors: Key: credentialTypeError: CredentialType is missing, null or invalid.\n" +
                 "Key: credentialError: Credential is missing, null or invalid.\n" +
                 "Key: accountError: Account is missing, null or invalid.\n");
@@ -87,7 +88,7 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
         // Verify that we have found the correct data
         assertThat(response, is(not(nullValue())));
         assertThat(response.isOk(), is(false));
-        assertThat(response.getReturnCode(), is(Constants.IDENTIFICATION_WARNING));
+        assertThat(response.getReturnCode(), is(ReturnCode.IDENTIFICATION_WARNING));
         assertThat(response.getReturnMessage(), is("The requested Member cannot be found."));
     }
 
@@ -113,7 +114,7 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
         // Verify that we have found the correct data
         assertThat(response, is(not(nullValue())));
         assertThat(response.isOk(), is(true));
-        assertThat(response.getReturnCode(), is(Constants.SUCCESS));
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(response.getReturnMessage(), is("Ok"));
         assertThat(response.getMembers().size(), is(5));
         assertThat(response.getCircles().isEmpty(), is(true));
@@ -137,7 +138,7 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
         // Verify that we have found the correct data
         assertThat(response, is(not(nullValue())));
         assertThat(response.isOk(), is(true));
-        assertThat(response.getReturnCode(), is(Constants.SUCCESS));
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(response.getReturnMessage(), is("Ok"));
         assertThat(response.getMembers().size(), is(6));
         assertThat(response.getCircles().isEmpty(), is(true));
@@ -161,7 +162,7 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
         // Verify that we have found the correct data
         assertThat(response, is(not(nullValue())));
         assertThat(response.isOk(), is(true));
-        assertThat(response.getReturnCode(), is(Constants.SUCCESS));
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(response.getReturnMessage(), is("Ok"));
         assertThat(response.getMembers().size(), is(5));
         assertThat(response.getCircles().isEmpty(), is(true));
@@ -185,7 +186,7 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
         // Verify that we have found the correct data
         assertThat(response, is(not(nullValue())));
         assertThat(response.isOk(), is(true));
-        assertThat(response.getReturnCode(), is(Constants.SUCCESS));
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(response.getReturnMessage(), is("Ok"));
         assertThat(response.getMembers().size(), is(6));
         assertThat(response.getCircles().isEmpty(), is(true));
@@ -214,7 +215,7 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
         // Verify that we have found the correct data
         assertThat(response, is(not(nullValue())));
         assertThat(response.isOk(), is(true));
-        assertThat(response.getReturnCode(), is(Constants.SUCCESS));
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(response.getReturnMessage(), is("Ok"));
         assertThat(response.getMembers().size(), is(1));
         assertThat(response.getCircles().isEmpty(), is(true));
@@ -240,7 +241,7 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
         // Verify that we have found the correct data
         assertThat(response, is(not(nullValue())));
         assertThat(response.isOk(), is(true));
-        assertThat(response.getReturnCode(), is(Constants.SUCCESS));
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(response.getReturnMessage(), is("Ok"));
         assertThat(response.getMembers().size(), is(1));
         assertThat(response.getCircles().isEmpty(), is(true));
@@ -265,7 +266,7 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
         // Verify that we have found the correct data
         assertThat(response, is(not(nullValue())));
         assertThat(response.isOk(), is(true));
-        assertThat(response.getReturnCode(), is(Constants.SUCCESS));
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(response.getReturnMessage(), is("Ok"));
         assertThat(response.getMembers().size(), is(1));
         assertThat(response.getCircles().size(), is(2));
@@ -290,7 +291,7 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
         // Verify that we have found the correct data
         assertThat(response, is(not(nullValue())));
         assertThat(response.isOk(), is(true));
-        assertThat(response.getReturnCode(), is(Constants.SUCCESS));
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(response.getReturnMessage(), is("Ok"));
         assertThat(response.getMembers().size(), is(1));
         assertThat(response.getCircles().size(), is(2));
@@ -317,7 +318,7 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
         // Verify that we have found the correct data
         assertThat(response, is(not(nullValue())));
         assertThat(response.isOk(), is(true));
-        assertThat(response.getReturnCode(), is(Constants.SUCCESS));
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(response.getReturnMessage(), is("Ok"));
         assertThat(response.getMembers().size(), is(1));
         assertThat(response.getCircles().isEmpty(), is(true));
@@ -334,7 +335,7 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
         // Ensure that we have the correct settings for the Service
         settings.set(Settings.EXPOSE_ADMIN, "false");
 
-        prepareCause(AuthorizationException.class, Constants.AUTHORIZATION_WARNING, "Not Authorized to access this information.");
+        prepareCause(AuthorizationException.class, ReturnCode.AUTHORIZATION_WARNING, "Not Authorized to access this information.");
         final Serviceable<FetchMemberResponse, FetchMemberRequest> service = prepareService();
         final MemberEntity member = findFirstMember();
         final FetchMemberRequest request = buildRequestWithCredentials(member.getName());

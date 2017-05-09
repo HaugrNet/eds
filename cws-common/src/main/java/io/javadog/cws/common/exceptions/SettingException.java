@@ -8,6 +8,7 @@
 package io.javadog.cws.common.exceptions;
 
 import io.javadog.cws.api.common.Constants;
+import io.javadog.cws.api.common.ReturnCode;
 
 /**
  * @author Kim Jensen
@@ -19,6 +20,6 @@ public final class SettingException extends CWSException {
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
     public SettingException(final Throwable cause) {
-        super(Constants.PROPERTY_ERROR, cause);
+        super(ReturnCode.PROPERTY_ERROR, cause);
     }
 }

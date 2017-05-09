@@ -8,6 +8,7 @@
 package io.javadog.cws.api.responses;
 
 import io.javadog.cws.api.common.Constants;
+import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.dtos.DataType;
 
 import javax.xml.bind.annotation.XmlElement;
@@ -28,7 +29,7 @@ public final class ProcessDataTypeResponse extends CWSResponse {
         // Empty Constructor, required for WebServices
     }
 
-    public ProcessDataTypeResponse(final int returnCode, final String returnMessage) {
+    public ProcessDataTypeResponse(final ReturnCode returnCode, final String returnMessage) {
         super(returnCode, returnMessage);
     }
 

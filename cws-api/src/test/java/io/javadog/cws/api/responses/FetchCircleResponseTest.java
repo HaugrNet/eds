@@ -10,7 +10,7 @@ package io.javadog.cws.api.responses;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
-import io.javadog.cws.api.common.Constants;
+import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.dtos.Circle;
 import io.javadog.cws.api.dtos.Trustee;
 import org.junit.Test;
@@ -30,7 +30,7 @@ public final class FetchCircleResponseTest {
         response.setCircles(prepareCircles(3));
 
         assertThat(response.isOk(), is(true));
-        assertThat(response.getReturnCode(), is(Constants.SUCCESS));
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(response.getReturnMessage(), is("Ok"));
         assertThat(response.getCircles().size(), is(3));
         assertThat(response.getTrustees().isEmpty(), is(true));
@@ -43,7 +43,7 @@ public final class FetchCircleResponseTest {
         response.setTrustees(prepareTrustees());
 
         assertThat(response.isOk(), is(true));
-        assertThat(response.getReturnCode(), is(Constants.SUCCESS));
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(response.getReturnMessage(), is("Ok"));
         assertThat(response.getCircles().size(), is(1));
         assertThat(response.getTrustees().size(), is(3));
@@ -51,10 +51,10 @@ public final class FetchCircleResponseTest {
 
     @Test
     public void testFetchingWithError() {
-        final FetchCircleResponse response = new FetchCircleResponse(Constants.CONSTRAINT_ERROR, "Bollocks.");
+        final FetchCircleResponse response = new FetchCircleResponse(ReturnCode.CONSTRAINT_ERROR, "Bollocks.");
 
         assertThat(response.isOk(), is(false));
-        assertThat(response.getReturnCode(), is(Constants.CONSTRAINT_ERROR));
+        assertThat(response.getReturnCode(), is(ReturnCode.CONSTRAINT_ERROR));
         assertThat(response.getReturnMessage(), is("Bollocks."));
         assertThat(response.getCircles().isEmpty(), is(true));
         assertThat(response.getTrustees().isEmpty(), is(true));

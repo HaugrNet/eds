@@ -8,6 +8,7 @@
 package io.javadog.cws.api.responses;
 
 import io.javadog.cws.api.common.Constants;
+import io.javadog.cws.api.common.ReturnCode;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -25,7 +26,7 @@ public class CWSResponse implements Serializable {
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
-    private int returnCode = Constants.SUCCESS;
+    private ReturnCode returnCode = ReturnCode.SUCCESS;
     private String returnMessage = "Ok";
 
     // =========================================================================
@@ -40,7 +41,7 @@ public class CWSResponse implements Serializable {
         // Required for WebServices to work. Comment added to please Sonar.
     }
 
-    public CWSResponse(final int returnCode, final String returnMessage) {
+    public CWSResponse(final ReturnCode returnCode, final String returnMessage) {
         this.returnCode = returnCode;
         this.returnMessage = returnMessage;
     }
@@ -49,11 +50,11 @@ public class CWSResponse implements Serializable {
     // Standard Setters & Getters
     // =========================================================================
 
-    public void setReturnCode(final int returnCode) {
+    public void setReturnCode(final ReturnCode returnCode) {
         this.returnCode = returnCode;
     }
 
-    public int getReturnCode() {
+    public ReturnCode getReturnCode() {
         return returnCode;
     }
 
@@ -66,6 +67,6 @@ public class CWSResponse implements Serializable {
     }
 
     public boolean isOk() {
-        return returnCode == 0;
+        return returnCode == ReturnCode.SUCCESS;
     }
 }

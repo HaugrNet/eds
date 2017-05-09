@@ -8,6 +8,7 @@
 package io.javadog.cws.api.responses;
 
 import io.javadog.cws.api.common.Constants;
+import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.dtos.Circle;
 import io.javadog.cws.api.dtos.Member;
 
@@ -40,7 +41,7 @@ public final class FetchMemberResponse extends CWSResponse {
         // Empty Constructor, required for WebServices
     }
 
-    public FetchMemberResponse(final int returnCode, final String returnMessage) {
+    public FetchMemberResponse(final ReturnCode returnCode, final String returnMessage) {
         super(returnCode, returnMessage);
     }
 

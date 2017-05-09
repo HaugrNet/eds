@@ -8,6 +8,7 @@
 package io.javadog.cws.core.services;
 
 import io.javadog.cws.api.common.Constants;
+import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.requests.SettingRequest;
 import io.javadog.cws.api.responses.SettingResponse;
 import io.javadog.cws.common.Crypto;
@@ -67,7 +68,7 @@ public final class SettingService extends Serviceable<SettingResponse, SettingRe
 
             return response;
         } else {
-            throw new CWSException(Constants.IDENTIFICATION_WARNING, "Cannot complete this request, as it is only allowed for the System Administrator.");
+            throw new CWSException(ReturnCode.IDENTIFICATION_WARNING, "Cannot complete this request, as it is only allowed for the System Administrator.");
         }
     }
 
@@ -87,7 +88,7 @@ public final class SettingService extends Serviceable<SettingResponse, SettingRe
                     entity.setSetting(entry.getValue());
                     dao.persist(entity);
                 } else {
-                    throw new CWSException(Constants.PROPERTY_ERROR, "The setting " + entry.getKey() + " may not be overwritten.");
+                    throw new CWSException(ReturnCode.PROPERTY_ERROR, "The setting " + entry.getKey() + " may not be overwritten.");
                 }
             }
         } else {
@@ -125,7 +126,7 @@ public final class SettingService extends Serviceable<SettingResponse, SettingRe
         try {
             verifyRequest(request, Permission.SETTING);
         } catch (CWSException e) {
-            if (e.getReturnCode() == Constants.IDENTIFICATION_WARNING) {
+            if (e.getReturnCode() == ReturnCode.IDENTIFICATION_WARNING) {
                 // Account doesn't exist, so we're creating a new one based on
                 // the credentials. This also means that we won't throw the
                 // exception.

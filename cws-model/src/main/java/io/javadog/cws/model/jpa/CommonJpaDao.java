@@ -7,16 +7,16 @@
  */
 package io.javadog.cws.model.jpa;
 
-import io.javadog.cws.api.common.Constants;
+import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.common.exceptions.ModelException;
 import io.javadog.cws.model.CommonDao;
 import io.javadog.cws.model.entities.CWSEntity;
 import io.javadog.cws.model.entities.CircleEntity;
+import io.javadog.cws.model.entities.DataTypeEntity;
 import io.javadog.cws.model.entities.Externable;
 import io.javadog.cws.model.entities.MemberEntity;
 import io.javadog.cws.model.entities.SettingEntity;
 import io.javadog.cws.model.entities.TrusteeEntity;
-import io.javadog.cws.model.entities.DataTypeEntity;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceException;
@@ -79,11 +79,11 @@ public final class CommonJpaDao implements CommonDao {
         final List<MemberEntity> found = query.getResultList();
 
         if (found.isEmpty()) {
-            throw new ModelException(Constants.IDENTIFICATION_WARNING, "No member found with '" + name + "'.");
+            throw new ModelException(ReturnCode.IDENTIFICATION_WARNING, "No member found with '" + name + "'.");
         }
 
         if (found.size() > 1) {
-            throw new ModelException(Constants.CONSTRAINT_ERROR, "Could not uniquely identify a member with '" + name + "'.");
+            throw new ModelException(ReturnCode.CONSTRAINT_ERROR, "Could not uniquely identify a member with '" + name + "'.");
         }
 
         return found.get(0);
@@ -236,7 +236,7 @@ public final class CommonJpaDao implements CommonDao {
 
             return list;
         } catch (IllegalStateException | PersistenceException e) {
-            throw new ModelException(Constants.DATABASE_ERROR, e.getMessage(), e);
+            throw new ModelException(ReturnCode.DATABASE_ERROR, e.getMessage(), e);
         }
     }
 }

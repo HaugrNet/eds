@@ -7,7 +7,7 @@
  */
 package io.javadog.cws.core.services;
 
-import io.javadog.cws.api.common.Constants;
+import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.requests.ProcessDataRequest;
 import io.javadog.cws.api.responses.ProcessDataResponse;
 import io.javadog.cws.common.Settings;
@@ -34,6 +34,6 @@ public final class ProcessObjectService extends Serviceable<ProcessDataResponse,
     public ProcessDataResponse perform(final ProcessDataRequest request) {
         verifyRequest(request, Permission.PROCESS_OBJECT);
 
-        throw new CWSException(Constants.NOTIMPLEMENTED_ERROR, "Not Yet Implemented.");
+        throw new CWSException(ReturnCode.NOTIMPLEMENTED_ERROR, "Not Yet Implemented.");
     }
 }

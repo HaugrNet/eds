@@ -8,6 +8,7 @@
 package io.javadog.cws.core.services;
 
 import io.javadog.cws.api.common.Constants;
+import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.dtos.Authentication;
 import io.javadog.cws.api.dtos.Circle;
 import io.javadog.cws.api.dtos.Member;
@@ -73,7 +74,7 @@ public final class FetchCirclesService extends Serviceable<FetchCircleResponse, 
                 circles.add(convert(circle));
                 response.setCircles(circles);
             } else {
-                response.setReturnCode(Constants.IDENTIFICATION_WARNING);
+                response.setReturnCode(ReturnCode.IDENTIFICATION_WARNING);
                 response.setReturnMessage("The requested Circle cannot be found.");
             }
         } else {

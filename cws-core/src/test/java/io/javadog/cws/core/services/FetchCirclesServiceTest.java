@@ -14,6 +14,7 @@ import static org.junit.Assert.assertThat;
 
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.CredentialType;
+import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.requests.FetchCircleRequest;
 import io.javadog.cws.api.responses.FetchCircleResponse;
 import io.javadog.cws.common.Settings;
@@ -33,7 +34,7 @@ public final class FetchCirclesServiceTest extends DatabaseSetup {
 
     @Test
     public void testInvalidRequest() {
-        prepareCause(VerificationException.class, Constants.VERIFICATION_WARNING,
+        prepareCause(VerificationException.class, ReturnCode.VERIFICATION_WARNING,
                 "Request Object contained errors: Key: credentialTypeError: CredentialType is missing, null or invalid.\n" +
                         "Key: credentialError: Credential is missing, null or invalid.\n" +
                         "Key: accountError: Account is missing, null or invalid.\n");
@@ -56,7 +57,7 @@ public final class FetchCirclesServiceTest extends DatabaseSetup {
         // Verify that we have found the correct data
         assertThat(response, is(not(nullValue())));
         assertThat(response.isOk(), is(false));
-        assertThat(response.getReturnCode(), is(Constants.IDENTIFICATION_WARNING));
+        assertThat(response.getReturnCode(), is(ReturnCode.IDENTIFICATION_WARNING));
         assertThat(response.getReturnMessage(), is("The requested Circle cannot be found."));
     }
 
@@ -68,7 +69,7 @@ public final class FetchCirclesServiceTest extends DatabaseSetup {
 
         assertThat(response, is(not(nullValue())));
         assertThat(response.isOk(), is(true));
-        assertThat(response.getReturnCode(), is(Constants.SUCCESS));
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(response.getReturnMessage(), is("Ok"));
         assertThat(response.getCircles().size(), is(3));
         assertThat(response.getCircles().get(0).getName(), is("circle1"));
@@ -85,7 +86,7 @@ public final class FetchCirclesServiceTest extends DatabaseSetup {
 
         assertThat(response, is(not(nullValue())));
         assertThat(response.isOk(), is(true));
-        assertThat(response.getReturnCode(), is(Constants.SUCCESS));
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(response.getReturnMessage(), is("Ok"));
         assertThat(response.getCircles().size(), is(3));
         assertThat(response.getCircles().get(0).getName(), is("circle1"));
@@ -106,7 +107,7 @@ public final class FetchCirclesServiceTest extends DatabaseSetup {
         final FetchCircleResponse response = service.perform(request);
 
         assertThat(response, is(not(nullValue())));
-        assertThat(response.getReturnCode(), is(Constants.SUCCESS));
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(response.getReturnMessage(), is("Ok"));
         assertThat(response.getCircles().size(), is(1));
         assertThat(response.getCircles().get(0).getName(), is("circle1"));
@@ -128,7 +129,7 @@ public final class FetchCirclesServiceTest extends DatabaseSetup {
         final FetchCircleResponse response = service.perform(request);
 
         assertThat(response, is(not(nullValue())));
-        assertThat(response.getReturnCode(), is(Constants.SUCCESS));
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(response.getReturnMessage(), is("Ok"));
         assertThat(response.getCircles().size(), is(1));
         assertThat(response.getCircles().get(0).getName(), is("circle1"));
@@ -150,7 +151,7 @@ public final class FetchCirclesServiceTest extends DatabaseSetup {
         final FetchCircleResponse response = service.perform(request);
 
         assertThat(response, is(not(nullValue())));
-        assertThat(response.getReturnCode(), is(Constants.SUCCESS));
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(response.getReturnMessage(), is("Ok"));
         assertThat(response.getCircles().size(), is(1));
         assertThat(response.getCircles().get(0).getName(), is("circle1"));
@@ -172,7 +173,7 @@ public final class FetchCirclesServiceTest extends DatabaseSetup {
         final FetchCircleResponse response = service.perform(request);
 
         assertThat(response, is(not(nullValue())));
-        assertThat(response.getReturnCode(), is(Constants.SUCCESS));
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(response.getReturnMessage(), is("Ok"));
         assertThat(response.getCircles().size(), is(1));
         assertThat(response.getCircles().get(0).getName(), is("circle1"));
@@ -194,7 +195,7 @@ public final class FetchCirclesServiceTest extends DatabaseSetup {
         final FetchCircleResponse response = service.perform(request);
 
         assertThat(response, is(not(nullValue())));
-        assertThat(response.getReturnCode(), is(Constants.SUCCESS));
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(response.getReturnMessage(), is("Ok"));
         assertThat(response.getCircles().size(), is(1));
         assertThat(response.getCircles().get(0).getName(), is("circle1"));
@@ -216,7 +217,7 @@ public final class FetchCirclesServiceTest extends DatabaseSetup {
         final FetchCircleResponse response = service.perform(request);
 
         assertThat(response, is(not(nullValue())));
-        assertThat(response.getReturnCode(), is(Constants.SUCCESS));
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(response.getReturnMessage(), is("Ok"));
         assertThat(response.getCircles().size(), is(1));
         assertThat(response.getCircles().get(0).getName(), is("circle1"));

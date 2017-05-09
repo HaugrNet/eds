@@ -7,7 +7,7 @@
  */
 package io.javadog.cws.core.services;
 
-import io.javadog.cws.api.common.Constants;
+import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.dtos.DataType;
 import io.javadog.cws.api.requests.ProcessDataTypeRequest;
 import io.javadog.cws.api.responses.ProcessDataTypeResponse;
@@ -47,7 +47,7 @@ public final class ProcessObjectTypeService extends Serviceable<ProcessDataTypeR
                 response = doDelete(request);
                 break;
             default:
-                throw new CWSException(Constants.ILLEGAL_ACTION, "The Action " + request.getAction() + " is not supported for this request.");
+                throw new CWSException(ReturnCode.ILLEGAL_ACTION, "The Action " + request.getAction() + " is not supported for this request.");
         }
 
         return response;
@@ -79,7 +79,7 @@ public final class ProcessObjectTypeService extends Serviceable<ProcessDataTypeR
                 dao.persist(entity);
             }
         } else {
-            throw new CWSException(Constants.IDENTIFICATION_ERROR, "Could not uniquely identify the Object Type '" + name + "' as " + entities.size() + " were found with conflicting names.");
+            throw new CWSException(ReturnCode.IDENTIFICATION_ERROR, "Could not uniquely identify the Object Type '" + name + "' as " + entities.size() + " were found with conflicting names.");
         }
 
         final DataType objectType = new DataType();
@@ -101,12 +101,12 @@ public final class ProcessObjectTypeService extends Serviceable<ProcessDataTypeR
             // then it is not allowed to remove it.
             final int records = dao.countObjectTypeUsage(entities.get(0).getId());
             if (records > 0) {
-                throw new CWSException(Constants.ILLEGAL_ACTION, "The Object Type '" + name + "' cannot be deleted, as it is being actively used.");
+                throw new CWSException(ReturnCode.ILLEGAL_ACTION, "The Object Type '" + name + "' cannot be deleted, as it is being actively used.");
             } else {
                 dao.delete(entities.get(0));
             }
         } else {
-            throw new CWSException(Constants.IDENTIFICATION_ERROR, "Could not uniquely identify the Object Type '" + name + "'.");
+            throw new CWSException(ReturnCode.IDENTIFICATION_ERROR, "Could not uniquely identify the Object Type '" + name + "'.");
         }
 
         return new ProcessDataTypeResponse();

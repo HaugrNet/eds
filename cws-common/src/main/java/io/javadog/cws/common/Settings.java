@@ -7,7 +7,7 @@
  */
 package io.javadog.cws.common;
 
-import io.javadog.cws.api.common.Constants;
+import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.common.exceptions.CWSException;
 import io.javadog.cws.common.exceptions.SettingException;
 
@@ -142,7 +142,7 @@ public final class Settings {
         try {
             return Charset.forName(properties.getProperty(CWS_CHARSET));
         } catch (IllegalArgumentException e) {
-            throw new CWSException(Constants.PROPERTY_ERROR, e);
+            throw new CWSException(ReturnCode.PROPERTY_ERROR, e);
         }
     }
 

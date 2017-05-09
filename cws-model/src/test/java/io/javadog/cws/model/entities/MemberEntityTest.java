@@ -13,6 +13,7 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 
 import io.javadog.cws.api.common.Constants;
+import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.common.Crypto;
 import io.javadog.cws.common.Settings;
 import io.javadog.cws.common.exceptions.ModelException;
@@ -133,7 +134,7 @@ public final class MemberEntityTest extends DatabaseSetup {
         final MemberEntity nullEntity = dao.findMemberByExternalId(UUID.randomUUID().toString());
         assertThat(nullEntity, is(nullValue()));
 
-        prepareCause(ModelException.class, Constants.IDENTIFICATION_WARNING, "No member found with 'Unknown'.");
+        prepareCause(ModelException.class, ReturnCode.IDENTIFICATION_WARNING, "No member found with 'Unknown'.");
         dao.findMemberByName("Unknown");
     }
 

@@ -8,6 +8,7 @@
 package io.javadog.cws.common.exceptions;
 
 import io.javadog.cws.api.common.Constants;
+import io.javadog.cws.api.common.ReturnCode;
 
 /**
  * @author Kim Jensen
@@ -18,11 +19,11 @@ public final class ModelException extends CWSException {
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
-    public ModelException(final int returnCode, final String message) {
+    public ModelException(final ReturnCode returnCode, final String message) {
         super(returnCode, message);
     }
 
-    public ModelException(final int returnCode, final String message, final Throwable cause) {
+    public ModelException(final ReturnCode returnCode, final String message, final Throwable cause) {
         super(returnCode, message, cause);
     }
 }

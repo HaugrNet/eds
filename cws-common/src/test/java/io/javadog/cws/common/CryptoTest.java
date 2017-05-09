@@ -13,7 +13,7 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.junit.Assert.assertThat;
 
-import io.javadog.cws.api.common.Constants;
+import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.common.exceptions.CWSException;
 import org.junit.Rule;
 import org.junit.Test;
@@ -181,7 +181,7 @@ public final class CryptoTest {
         final String garbage = "INVALID_ENCODING";
         settings.set(Settings.CWS_CHARSET, garbage);
 
-        prepareCause(CWSException.class, Constants.PROPERTY_ERROR, "java.nio.charset.UnsupportedCharsetException: " + garbage);
+        prepareCause(CWSException.class, ReturnCode.PROPERTY_ERROR, "java.nio.charset.UnsupportedCharsetException: " + garbage);
         assertThat(str, is(not(nullValue())));
         crypto.stringToBytes(str);
     }
@@ -194,7 +194,7 @@ public final class CryptoTest {
         final String garbage = "INVALID_ENCODING";
         settings.set(Settings.CWS_CHARSET, garbage);
 
-        prepareCause(CWSException.class, Constants.PROPERTY_ERROR, "UnsupportedCharsetException: " + garbage);
+        prepareCause(CWSException.class, ReturnCode.PROPERTY_ERROR, "UnsupportedCharsetException: " + garbage);
         assertThat(bytes, is(not(nullValue())));
         crypto.bytesToString(bytes);
     }
@@ -232,7 +232,7 @@ public final class CryptoTest {
         assertThat(verified, is(true));
     }
 
-    private <E extends CWSException> void prepareCause(final Class<E> cause, final int returnCode, final String returnMessage) {
+    private <E extends CWSException> void prepareCause(final Class<E> cause, final ReturnCode returnCode, final String returnMessage) {
         final String propertyName = "returnCode";
         thrown.expect(cause);
         thrown.expectMessage(returnMessage);

@@ -10,7 +10,7 @@ package io.javadog.cws.api.responses;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
-import io.javadog.cws.api.common.Constants;
+import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.dtos.DataType;
 import org.junit.Test;
 
@@ -34,17 +34,17 @@ public final class FetchObjectTypeResponseTest {
         response.setTypes(types);
 
         assertThat(response.isOk(), is(true));
-        assertThat(response.getReturnCode(), is(Constants.SUCCESS));
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(response.getReturnMessage(), is("Ok"));
         assertThat(response.getTypes().size(), is(3));
     }
 
     @Test
     public void testFetchingWithError() {
-        final FetchDataTypeResponse response = new FetchDataTypeResponse(Constants.CONSTRAINT_ERROR, "Bollocks.");
+        final FetchDataTypeResponse response = new FetchDataTypeResponse(ReturnCode.CONSTRAINT_ERROR, "Bollocks.");
 
         assertThat(response.isOk(), is(false));
-        assertThat(response.getReturnCode(), is(Constants.CONSTRAINT_ERROR));
+        assertThat(response.getReturnCode(), is(ReturnCode.CONSTRAINT_ERROR));
         assertThat(response.getReturnMessage(), is("Bollocks."));
         assertThat(response.getTypes().isEmpty(), is(true));
     }

@@ -10,6 +10,7 @@ package io.javadog.cws.model;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.hasProperty;
 
+import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.common.TrustLevel;
 import io.javadog.cws.common.Crypto;
 import io.javadog.cws.common.Settings;
@@ -55,8 +56,8 @@ public class DatabaseSetup {
 
     /**
      * If the test is expecting an Exception, then we'll use this as the rule.
-     * The method {@link #prepareCause(Class, int, String)} will provide the
-     * simplest way to setup the cause to be expected.
+     * The method {@link #prepareCause(Class, ReturnCode, String)} will provide
+     * the simplest way to setup the cause to be expected.
      */
     @Rule public ExpectedException thrown = ExpectedException.none();
 
@@ -130,7 +131,7 @@ public class DatabaseSetup {
      * @param returnMessage The Return Message
      * @param <E>           The Exception, must extend a CWS Exception
      */
-    protected <E extends CWSException> void prepareCause(final Class<E> cause, final int returnCode, final String returnMessage) {
+    protected <E extends CWSException> void prepareCause(final Class<E> cause, final ReturnCode returnCode, final String returnMessage) {
         final String propertyName = "returnCode";
         thrown.expect(cause);
         thrown.expectMessage(returnMessage);

@@ -10,7 +10,7 @@ package io.javadog.cws.api.responses;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
-import io.javadog.cws.api.common.Constants;
+import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.dtos.Member;
 import org.junit.Test;
 
@@ -36,17 +36,17 @@ public final class ProcessMemberResponseTest {
         assertThat(response.getId(), is(id));
         assertThat(response.getMember(), is(member));
         assertThat(response.getArmoredKey(), is(armoredKey));
-        assertThat(response.getReturnCode(), is(Constants.SUCCESS));
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(response.getReturnMessage(), is("Ok"));
     }
 
     @Test
     public void testError() {
         final String returnMessage = "Cannot complete processing.";
-        final ProcessMemberResponse response = new ProcessMemberResponse(Constants.VERIFICATION_WARNING, returnMessage);
+        final ProcessMemberResponse response = new ProcessMemberResponse(ReturnCode.VERIFICATION_WARNING, returnMessage);
 
         assertThat(response.isOk(), is(false));
-        assertThat(response.getReturnCode(), is(Constants.VERIFICATION_WARNING));
+        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING));
         assertThat(response.getReturnMessage(), is(returnMessage));
     }
 }

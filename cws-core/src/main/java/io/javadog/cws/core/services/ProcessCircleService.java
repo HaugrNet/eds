@@ -7,7 +7,7 @@
  */
 package io.javadog.cws.core.services;
 
-import io.javadog.cws.api.common.Constants;
+import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.requests.ProcessCircleRequest;
 import io.javadog.cws.api.responses.ProcessCircleResponse;
 import io.javadog.cws.common.Settings;
@@ -34,6 +34,6 @@ public final class ProcessCircleService extends Serviceable<ProcessCircleRespons
     public ProcessCircleResponse perform(final ProcessCircleRequest request) {
         verifyRequest(request, Permission.PROCESS_CIRCLE);
 
-        throw new CWSException(Constants.NOTIMPLEMENTED_ERROR, "Not Yet Implemented.");
+        throw new CWSException(ReturnCode.NOTIMPLEMENTED_ERROR, "Not Yet Implemented.");
     }
 }

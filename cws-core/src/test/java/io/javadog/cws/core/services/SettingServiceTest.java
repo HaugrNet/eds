@@ -12,6 +12,7 @@ import static org.junit.Assert.assertThat;
 
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.CredentialType;
+import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.requests.SettingRequest;
 import io.javadog.cws.api.responses.SettingResponse;
 import io.javadog.cws.common.Settings;
@@ -45,7 +46,7 @@ public final class SettingServiceTest extends DatabaseSetup {
         final SettingRequest request = prepareRequest();
 
         final SettingResponse response = service.perform(request);
-        assertThat(response.getReturnCode(), is(0));
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(response.getReturnMessage(), is("Ok"));
         assertThat(response.getSettings().size(), is(12));
     }
@@ -65,7 +66,7 @@ public final class SettingServiceTest extends DatabaseSetup {
         final SettingRequest request = prepareRequest();
 
         final SettingResponse response = service.perform(request);
-        assertThat(response.getReturnCode(), is(0));
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(response.getReturnMessage(), is("Ok"));
         assertThat(response.getSettings().size(), is(12));
     }
@@ -78,7 +79,7 @@ public final class SettingServiceTest extends DatabaseSetup {
         request.setSettings(settings);
 
         final SettingResponse response = service.perform(request);
-        assertThat(response.getReturnCode(), is(0));
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(response.getReturnMessage(), is("Ok"));
         assertThat(response.getSettings().size(), is(12));
     }
@@ -91,7 +92,7 @@ public final class SettingServiceTest extends DatabaseSetup {
         // First invocation, retrieving the list of current values so we can
         // check that it is being updated
         final SettingResponse response = service.perform(request);
-        assertThat(response.getReturnCode(), is(0));
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(response.getReturnMessage(), is("Ok"));
         assertThat(response.getSettings().size(), is(12));
         assertThat(response.getSettings().get("cws.crypto.symmetric.keylength"), is("128"));
@@ -103,7 +104,7 @@ public final class SettingServiceTest extends DatabaseSetup {
         request.setSettings(settings);
 
         final SettingResponse update = service.perform(request);
-        assertThat(update.getReturnCode(), is(0));
+        assertThat(update.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(update.getReturnMessage(), is("Ok"));
         assertThat(update.getSettings().size(), is(12));
         assertThat(update.getSettings().get("cws.crypto.symmetric.keylength"), is("256"));
@@ -111,7 +112,7 @@ public final class SettingServiceTest extends DatabaseSetup {
 
     @Test
     public void testInvokingRequestUpdateNotAllowedExistingSetting() {
-        prepareCause(CWSException.class, Constants.PROPERTY_ERROR, "The setting cws.crypto.symmetric.algorithm may not be overwritten.");
+        prepareCause(CWSException.class, ReturnCode.PROPERTY_ERROR, "The setting cws.crypto.symmetric.algorithm may not be overwritten.");
         final SettingService service = new SettingService(new Settings(), entityManager);
         final SettingRequest request = prepareRequest();
         final Map<String, String> settings = new HashMap<>();
@@ -131,7 +132,7 @@ public final class SettingServiceTest extends DatabaseSetup {
         request.setSettings(settings);
 
         final SettingResponse response = service.perform(request);
-        assertThat(response.getReturnCode(), is(0));
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(response.getReturnMessage(), is("Ok"));
         assertThat(response.getSettings().size(), is(13));
         assertThat(response.getSettings().get("cws.test.setting"), is("Setting Value"));

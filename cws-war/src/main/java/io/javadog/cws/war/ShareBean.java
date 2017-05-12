@@ -23,8 +23,8 @@ import io.javadog.cws.api.responses.VerifyResponse;
 import io.javadog.cws.common.Settings;
 import io.javadog.cws.common.exceptions.CWSException;
 import io.javadog.cws.core.Serviceable;
-import io.javadog.cws.core.services.FetchObjectService;
-import io.javadog.cws.core.services.FetchObjectTypeService;
+import io.javadog.cws.core.services.FetchDataService;
+import io.javadog.cws.core.services.FetchDataTypeService;
 import io.javadog.cws.core.services.ProcessDataService;
 import io.javadog.cws.core.services.ProcessDataTypeService;
 import io.javadog.cws.core.services.SignService;
@@ -81,7 +81,7 @@ public final class ShareBean implements Share {
         FetchDataTypeResponse response;
 
         try {
-            final Serviceable<FetchDataTypeResponse, FetchDataTypeRequest> service = new FetchObjectTypeService(settings, entityManager);
+            final Serviceable<FetchDataTypeResponse, FetchDataTypeRequest> service = new FetchDataTypeService(settings, entityManager);
             response = service.perform(request);
         } catch (CWSException e) {
             // Any Warning or Error thrown by the CWS contain enough information
@@ -127,7 +127,7 @@ public final class ShareBean implements Share {
         FetchDataResponse response;
 
         try {
-            final Serviceable<FetchDataResponse, FetchDataRequest> service = new FetchObjectService(settings, entityManager);
+            final Serviceable<FetchDataResponse, FetchDataRequest> service = new FetchDataService(settings, entityManager);
             response = service.perform(request);
         } catch (CWSException e) {
             // Any Warning or Error thrown by the CWS contain enough information

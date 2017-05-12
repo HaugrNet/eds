@@ -21,9 +21,9 @@ import javax.persistence.EntityManager;
  * @author Kim Jensen
  * @since  CWS 1.0
  */
-public final class FetchObjectService extends Serviceable<FetchDataResponse, FetchDataRequest> {
+public final class FetchDataService extends Serviceable<FetchDataResponse, FetchDataRequest> {
 
-    public FetchObjectService(final Settings settings, final EntityManager entityManager) {
+    public FetchDataService(final Settings settings, final EntityManager entityManager) {
         super(settings, entityManager);
     }
 

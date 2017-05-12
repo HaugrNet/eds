@@ -26,9 +26,9 @@ import java.util.List;
  * @author Kim Jensen
  * @since  CWS 1.0
  */
-public final class FetchObjectTypeService extends Serviceable<FetchDataTypeResponse, FetchDataTypeRequest> {
+public final class FetchDataTypeService extends Serviceable<FetchDataTypeResponse, FetchDataTypeRequest> {
 
-    public FetchObjectTypeService(final Settings settings, final EntityManager entityManager) {
+    public FetchDataTypeService(final Settings settings, final EntityManager entityManager) {
         super(settings, entityManager);
     }
 

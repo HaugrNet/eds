@@ -62,7 +62,7 @@ public final class FetchDataTypeServiceTest extends DatabaseSetup {
     // =========================================================================
 
     private Serviceable<FetchDataTypeResponse, FetchDataTypeRequest> prepareService() {
-        return new FetchObjectTypeService(settings, entityManager);
+        return new FetchDataTypeService(settings, entityManager);
     }
 
     private static FetchDataTypeRequest buildRequestWithCredentials(final String account) {

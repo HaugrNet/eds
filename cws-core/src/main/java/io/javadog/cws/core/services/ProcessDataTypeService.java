@@ -58,8 +58,8 @@ public final class ProcessDataTypeService extends Serviceable<ProcessDataTypeRes
      * searching for the value using a trimmed lowercase version of the name.
      * If a match is found, then it is updated, otherwise it is created.
      *
-     * @param request Process ObjectType Request Object
-     * @return Response with the newly processed ObjectType
+     * @param request Process DataType Request Object
+     * @return Response with the newly processed DataType
      */
     private ProcessDataTypeResponse doProcess(final ProcessDataTypeRequest request) {
         final String name = request.getObjectType().getName().trim();
@@ -79,7 +79,7 @@ public final class ProcessDataTypeService extends Serviceable<ProcessDataTypeRes
                 dao.persist(entity);
             }
         } else {
-            throw new CWSException(ReturnCode.IDENTIFICATION_ERROR, "Could not uniquely identify the Object Type '" + name + "' as " + entities.size() + " were found with conflicting names.");
+            throw new CWSException(ReturnCode.IDENTIFICATION_ERROR, "Could not uniquely identify the Data Type '" + name + "' as " + entities.size() + " DataTypes were found with conflicting names.");
         }
 
         final DataType objectType = new DataType();
@@ -101,12 +101,12 @@ public final class ProcessDataTypeService extends Serviceable<ProcessDataTypeRes
             // then it is not allowed to remove it.
             final int records = dao.countObjectTypeUsage(entities.get(0).getId());
             if (records > 0) {
-                throw new CWSException(ReturnCode.ILLEGAL_ACTION, "The Object Type '" + name + "' cannot be deleted, as it is being actively used.");
+                throw new CWSException(ReturnCode.ILLEGAL_ACTION, "The Data Type '" + name + "' cannot be deleted, as it is being actively used.");
             } else {
                 dao.delete(entities.get(0));
             }
         } else {
-            throw new CWSException(ReturnCode.IDENTIFICATION_ERROR, "Could not uniquely identify the Object Type '" + name + "'.");
+            throw new CWSException(ReturnCode.IDENTIFICATION_ERROR, "Could not uniquely identify the Data Type '" + name + "'.");
         }
 
         return new ProcessDataTypeResponse();

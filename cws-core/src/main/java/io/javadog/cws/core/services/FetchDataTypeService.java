@@ -20,8 +20,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Object Types is the basis for all shared information, as it either provides
- * the MIMEType of files or Object Information for Objects shared.
+ * Data Types is the basis for all shared information, as it either provides
+ * the MIMEType of Files or Data Information for Objects shared.
  *
  * @author Kim Jensen
  * @since  CWS 1.0

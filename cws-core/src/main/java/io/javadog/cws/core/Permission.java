@@ -22,10 +22,10 @@ public enum Permission {
     PROCESS_CIRCLE(TrustLevel.WRITE, "Process Circle."),
     PROCESS_MEMBER(TrustLevel.WRITE, "Process Member."),
     PROCESS_DATA(TrustLevel.WRITE, "Process Data."),
-    PROCESS_DATA_TYPE(TrustLevel.WRITE, "Process Data Type."),
+    PROCESS_DATA_TYPE(TrustLevel.SYSOP, "Process Data Type."),
     CREATE_SIGNATURE(TrustLevel.WRITE, "Create Digital Signature."),
     VERIFY_SIGNATURE(TrustLevel.WRITE, "Verify Digital Signature."),
-    SETTING(TrustLevel.ADMIN, "Settings.");
+    SETTING(TrustLevel.SYSOP, "Settings.");
 
     // =========================================================================
     // Internal Functionality

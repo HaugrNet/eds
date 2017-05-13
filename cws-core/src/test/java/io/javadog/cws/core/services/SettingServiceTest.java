@@ -8,6 +8,7 @@
 package io.javadog.cws.core.services;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertThat;
 
 import io.javadog.cws.api.common.Constants;
@@ -16,6 +17,7 @@ import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.requests.SettingRequest;
 import io.javadog.cws.api.responses.SettingResponse;
 import io.javadog.cws.common.Settings;
+import io.javadog.cws.common.exceptions.AuthorizationException;
 import io.javadog.cws.common.exceptions.CWSException;
 import io.javadog.cws.model.DatabaseSetup;
 import org.junit.Test;
@@ -43,7 +45,7 @@ public final class SettingServiceTest extends DatabaseSetup {
         query.executeUpdate();
 
         final SettingService service = new SettingService(new Settings(), entityManager);
-        final SettingRequest request = prepareRequest();
+        final SettingRequest request = prepareRequest(Constants.ADMIN_ACCOUNT);
 
         final SettingResponse response = service.perform(request);
         assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
@@ -51,11 +53,14 @@ public final class SettingServiceTest extends DatabaseSetup {
         assertThat(response.getSettings().size(), is(13));
     }
 
-    @Test(expected = CWSException.class)
+    @Test
     public void testNonAdminRequest() {
+        prepareCause(AuthorizationException.class, ReturnCode.AUTHORIZATION_WARNING,
+                "Cannot complete this request, as it is only allowed for the System Administrator.");
+
         final SettingService service = new SettingService(new Settings(), entityManager);
-        final SettingRequest request = prepareRequest();
-        request.setAccount("not admin");
+        final SettingRequest request = prepareRequest("member1");
+        assertThat(request.getAccount(), is(not(Constants.ADMIN_ACCOUNT)));
 
         service.perform(request);
     }
@@ -63,7 +68,7 @@ public final class SettingServiceTest extends DatabaseSetup {
     @Test
     public void testInvokingRequestWithNullSettingsList() {
         final SettingService service = new SettingService(new Settings(), entityManager);
-        final SettingRequest request = prepareRequest();
+        final SettingRequest request = prepareRequest(Constants.ADMIN_ACCOUNT);
 
         final SettingResponse response = service.perform(request);
         assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
@@ -74,9 +79,9 @@ public final class SettingServiceTest extends DatabaseSetup {
     @Test
     public void testInvokingRequestWithEmptySettings() {
         final SettingService service = new SettingService(new Settings(), entityManager);
-        final SettingRequest request = prepareRequest();
-        final Map<String, String> settings = new HashMap<>();
-        request.setSettings(settings);
+        final SettingRequest request = prepareRequest(Constants.ADMIN_ACCOUNT);
+        final Map<String, String> mySettings = new HashMap<>();
+        request.setSettings(mySettings);
 
         final SettingResponse response = service.perform(request);
         assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
@@ -87,7 +92,7 @@ public final class SettingServiceTest extends DatabaseSetup {
     @Test
     public void testInvokingRequestUpdateExistingSetting() {
         final SettingService service = new SettingService(new Settings(), entityManager);
-        final SettingRequest request = prepareRequest();
+        final SettingRequest request = prepareRequest(Constants.ADMIN_ACCOUNT);
 
         // First invocation, retrieving the list of current values so we can
         // check that it is being updated
@@ -99,9 +104,9 @@ public final class SettingServiceTest extends DatabaseSetup {
 
         // The internal collection used is unmodifiable. So we simply copy the
         // list from the response and update one of the existing values
-        final Map<String, String> settings = new HashMap<>(response.getSettings());
-        settings.put("cws.crypto.symmetric.keylength", "256");
-        request.setSettings(settings);
+        final Map<String, String> mySettings = new HashMap<>(response.getSettings());
+        mySettings.put("cws.crypto.symmetric.keylength", "256");
+        request.setSettings(mySettings);
 
         final SettingResponse update = service.perform(request);
         assertThat(update.getReturnCode(), is(ReturnCode.SUCCESS));
@@ -114,11 +119,11 @@ public final class SettingServiceTest extends DatabaseSetup {
     public void testInvokingRequestUpdateNotAllowedExistingSetting() {
         prepareCause(CWSException.class, ReturnCode.PROPERTY_ERROR, "The setting cws.crypto.symmetric.algorithm may not be overwritten.");
         final SettingService service = new SettingService(new Settings(), entityManager);
-        final SettingRequest request = prepareRequest();
-        final Map<String, String> settings = new HashMap<>();
-        settings.put("cws.crypto.symmetric.algorithm", "DES");
-        assertThat(settings.get("cws.crypto.symmetric.algorithm"), is("DES"));
-        request.setSettings(settings);
+        final SettingRequest request = prepareRequest(Constants.ADMIN_ACCOUNT);
+        final Map<String, String> mySettings = new HashMap<>();
+        mySettings.put("cws.crypto.symmetric.algorithm", "DES");
+        assertThat(mySettings.get("cws.crypto.symmetric.algorithm"), is("DES"));
+        request.setSettings(mySettings);
 
         service.perform(request);
     }
@@ -126,10 +131,10 @@ public final class SettingServiceTest extends DatabaseSetup {
     @Test
     public void testInvokingRequestAddNewSetting() {
         final SettingService service = new SettingService(new Settings(), entityManager);
-        final SettingRequest request = prepareRequest();
-        final Map<String, String> settings = new HashMap<>();
-        settings.put("cws.test.setting", "Setting Value");
-        request.setSettings(settings);
+        final SettingRequest request = prepareRequest(Constants.ADMIN_ACCOUNT);
+        final Map<String, String> mySettings = new HashMap<>();
+        mySettings.put("cws.test.setting", "Setting Value");
+        request.setSettings(mySettings);
 
         final SettingResponse response = service.perform(request);
         assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
@@ -138,11 +143,11 @@ public final class SettingServiceTest extends DatabaseSetup {
         assertThat(response.getSettings().get("cws.test.setting"), is("Setting Value"));
     }
 
-    private static SettingRequest prepareRequest() {
+    private static SettingRequest prepareRequest(final String account) {
         final SettingRequest request = new SettingRequest();
-        request.setAccount(Constants.ADMIN_ACCOUNT);
+        request.setAccount(account);
         request.setCredentialType(CredentialType.PASSPHRASE);
-        request.setCredential(Constants.ADMIN_ACCOUNT.toCharArray());
+        request.setCredential(account.toCharArray());
 
         return request;
     }

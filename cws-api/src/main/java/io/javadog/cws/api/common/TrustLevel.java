@@ -19,7 +19,8 @@ public enum TrustLevel {
     GUEST,
     READ,
     WRITE,
-    ADMIN;
+    ADMIN,
+    SYSOP;
 
     /**
      * Checks the given Trust Level against an expected, to verify if the given

@@ -11,19 +11,24 @@ import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.dtos.DataType;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlType;
 
 /**
  * @author Kim Jensen
  * @since  CWS 1.0
  */
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(name = "processDataTypeResponse", propOrder = "dataType")
 public final class ProcessDataTypeResponse extends CWSResponse {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
     @XmlElement
-    private DataType objectType = null;
+    private DataType dataType = null;
 
     public ProcessDataTypeResponse() {
         // Empty Constructor, required for WebServices
@@ -33,11 +38,11 @@ public final class ProcessDataTypeResponse extends CWSResponse {
         super(returnCode, returnMessage);
     }
 
-    public void setObjectType(final DataType objectType) {
-        this.objectType = objectType;
+    public void setDataType(final DataType dataType) {
+        this.dataType = dataType;
     }
 
-    public DataType getObjectType() {
-        return objectType;
+    public DataType getDataType() {
+        return dataType;
     }
 }

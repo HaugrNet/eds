@@ -7,7 +7,9 @@
  */
 package io.javadog.cws.core;
 
-import io.javadog.cws.api.common.Constants;
+import static io.javadog.cws.api.common.Constants.ADMIN_ACCOUNT;
+import static io.javadog.cws.api.common.ReturnCode.IDENTIFICATION_WARNING;
+
 import io.javadog.cws.api.common.CredentialType;
 import io.javadog.cws.api.common.TrustLevel;
 import io.javadog.cws.api.common.Verifiable;
@@ -15,7 +17,9 @@ import io.javadog.cws.api.dtos.Authentication;
 import io.javadog.cws.api.responses.CWSResponse;
 import io.javadog.cws.common.Crypto;
 import io.javadog.cws.common.Settings;
+import io.javadog.cws.common.exceptions.AuthenticationException;
 import io.javadog.cws.common.exceptions.AuthorizationException;
+import io.javadog.cws.common.exceptions.ModelException;
 import io.javadog.cws.common.exceptions.VerificationException;
 import io.javadog.cws.model.CommonDao;
 import io.javadog.cws.model.entities.MemberEntity;
@@ -23,10 +27,12 @@ import io.javadog.cws.model.entities.TrusteeEntity;
 import io.javadog.cws.model.jpa.CommonJpaDao;
 
 import javax.crypto.SecretKey;
+import javax.crypto.spec.IvParameterSpec;
 import javax.persistence.EntityManager;
 import java.nio.charset.Charset;
 import java.security.Key;
 import java.security.KeyPair;
+import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -85,19 +91,21 @@ public abstract class Serviceable<R extends CWSResponse, V extends Authenticatio
         verify(verifiable);
 
         // Step 2; Find the Member by the given credentials, if nothing is
-        //         found, then no need to continue.
-        member = dao.findMemberByName(verifiable.getAccount());
+        //         found, then no need to continue. Unless, the account not
+        //         found is the Administrator Account, in which case we will
+        //         add a new Account with the given Credentials.
+        checkAccount(verifiable);
 
         // Step 3; Check if the Member is valid, i.e. if the given Credentials
         //         can correctly decrypt the Private Key for the Account. If
         //         not, then an Exception is thrown.
-        checkAccountCredentials(verifiable);
+        checkCredentials(verifiable);
 
         // Step 4; Final check, ensure that the Member is having the correct
         //         level of Access to any Circle - which doesn't necessarily
         //         mean to the requesting Circle, as it requires deeper
         //         checking.
-        checkAccount(action);
+        checkAuthorization(action);
     }
 
     /**
@@ -134,7 +142,39 @@ public abstract class Serviceable<R extends CWSResponse, V extends Authenticatio
         }
     }
 
-    private void checkAccountCredentials(final V verifiable) {
+    private void checkAccount(final V verifiable) {
+        try {
+            member = dao.findMemberByName(verifiable.getAccount());
+        } catch (ModelException e) {
+            if ((e.getReturnCode() == IDENTIFICATION_WARNING) && Objects.equals(ADMIN_ACCOUNT, verifiable.getAccount())) {
+                member = createNewAdminAccount(verifiable);
+            } else {
+                throw e;
+            }
+        }
+    }
+
+    private MemberEntity createNewAdminAccount(final V verifiable) {
+        final String salt = UUID.randomUUID().toString();
+        final Key key = extractKeyFromCredentials(verifiable, salt);
+
+        final KeyPair pair = crypto.generateAsymmetricKey();
+        final IvParameterSpec iv = crypto.generateInitialVector(salt);
+        final byte[] encryptedPrivateKey = crypto.encrypt(key, iv, pair.getPrivate().getEncoded());
+        final String base64EncryptedPrivateKey = Base64.getEncoder().encodeToString(encryptedPrivateKey);
+        final String armoredPublicKey = Crypto.armorPublicKey(pair.getPublic());
+
+        final MemberEntity account = new MemberEntity();
+        account.setName(ADMIN_ACCOUNT);
+        account.setSalt(salt);
+        account.setPrivateKey(base64EncryptedPrivateKey);
+        account.setPublicKey(armoredPublicKey);
+        dao.persist(account);
+
+        return account;
+    }
+
+    private void checkCredentials(final V verifiable) {
         final Key key = extractKeyFromCredentials(verifiable, member.getSalt());
         final String toCheck = UUID.randomUUID().toString();
         final Charset charset = settings.getCharset();
@@ -146,11 +186,11 @@ public abstract class Serviceable<R extends CWSResponse, V extends Authenticatio
         final String result = new String(decrypted, charset);
 
         if (!Objects.equals(result, toCheck)) {
-            throw new AuthorizationException("Cannot authenticate the Member from the given Credentials.");
+            throw new AuthenticationException("Cannot authenticate the Account '" + verifiable.getAccount() + "' from the given Credentials.");
         }
     }
 
-    protected Key extractKeyFromCredentials(final V verifiable, final String salt) {
+    private Key extractKeyFromCredentials(final V verifiable, final String salt) {
         final SecretKey key;
 
         if (verifiable.getCredentialType() == CredentialType.KEY) {
@@ -162,11 +202,17 @@ public abstract class Serviceable<R extends CWSResponse, V extends Authenticatio
         return key;
     }
 
-    private void checkAccount(final Permission action) {
+    private void checkAuthorization(final Permission action) {
+        // There is a couple of requests, which is only allowed to be made by
+        // the System Administrator.
+        if ((action.getTrustLevel() == TrustLevel.SYSOP) && !Objects.equals(ADMIN_ACCOUNT, member.getName())) {
+            throw new AuthorizationException("Cannot complete this request, as it is only allowed for the System Administrator.");
+        }
+
         // The System Admin is automatically permitted to perform a number of
         // Actions, without being part of a Circle. So these checks must be
         // made separately based on the actual Request.
-        if (!Objects.equals(Constants.ADMIN_ACCOUNT, member.getName())) {
+        if (!Objects.equals(ADMIN_ACCOUNT, member.getName())) {
             trustees = dao.findTrustByMember(member);
             boolean trusted = false;
             for (final TrusteeEntity trust : trustees) {

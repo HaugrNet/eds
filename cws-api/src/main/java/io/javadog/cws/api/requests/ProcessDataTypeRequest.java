@@ -13,7 +13,10 @@ import io.javadog.cws.api.dtos.Authentication;
 import io.javadog.cws.api.dtos.DataType;
 
 import javax.validation.constraints.NotNull;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlType;
 import java.util.EnumSet;
 import java.util.Map;
 import java.util.Set;
@@ -22,6 +25,8 @@ import java.util.Set;
  * @author Kim Jensen
  * @since  CWS 1.0
  */
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(name = "processDataTypeRequest", propOrder = { "action", "dataType" })
 public final class ProcessDataTypeRequest extends Authentication {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
@@ -29,10 +34,10 @@ public final class ProcessDataTypeRequest extends Authentication {
     private static final Set<Action> ALLOWED = EnumSet.of(Action.PROCESS, Action.DELETE);
 
     private static final String FIELD_ACTION = "action";
-    private static final String FIELD_TYPE = "objectType";
+    private static final String FIELD_TYPE = "dataType";
 
-    @XmlElement(required = true) private Action action = null;
-    @XmlElement(required = true) private DataType objectType = null;
+    @XmlElement(required = true) private Action action = Action.PROCESS;
+    @XmlElement(required = true) private DataType dataType = null;
 
     // =========================================================================
     // Standard Setters & Getters
@@ -61,13 +66,13 @@ public final class ProcessDataTypeRequest extends Authentication {
     }
 
     @NotNull
-    public void setObjectType(final DataType objectType) {
-        ensureNotNull(FIELD_TYPE, objectType);
-        this.objectType = objectType;
+    public void setDataType(final DataType dataType) {
+        ensureNotNull(FIELD_TYPE, dataType);
+        this.dataType = dataType;
     }
 
-    public DataType getObjectType() {
-        return objectType;
+    public DataType getDataType() {
+        return dataType;
     }
 
     // =========================================================================
@@ -85,10 +90,10 @@ public final class ProcessDataTypeRequest extends Authentication {
             errors.put(FIELD_ACTION, "No action has been provided.");
         }
 
-        if (objectType == null) {
+        if (dataType == null) {
             errors.put(FIELD_TYPE, "Value is missing, null or invalid.");
         } else {
-            errors.putAll(objectType.validate());
+            errors.putAll(dataType.validate());
         }
 
         return errors;

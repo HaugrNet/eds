@@ -12,6 +12,7 @@ import io.javadog.cws.api.dtos.DataType;
 import io.javadog.cws.api.requests.ProcessDataTypeRequest;
 import io.javadog.cws.api.responses.ProcessDataTypeResponse;
 import io.javadog.cws.common.Settings;
+import io.javadog.cws.common.exceptions.AuthorizationException;
 import io.javadog.cws.common.exceptions.CWSException;
 import io.javadog.cws.core.Permission;
 import io.javadog.cws.core.Serviceable;
@@ -62,24 +63,24 @@ public final class ProcessDataTypeService extends Serviceable<ProcessDataTypeRes
      * @return Response with the newly processed DataType
      */
     private ProcessDataTypeResponse doProcess(final ProcessDataTypeRequest request) {
-        final String name = request.getObjectType().getName().trim();
-        final String type = request.getObjectType().getType().trim();
+        final String name = request.getDataType().getName().trim();
+        final String type = request.getDataType().getType().trim();
+        final DataTypeEntity found = findEntity(name);
         final DataTypeEntity entity;
 
-        final List<DataTypeEntity> entities = dao.findMatchingDataTypes(name);
-        if (entities.isEmpty()) {
+        if (found == null) {
             entity = new DataTypeEntity();
             entity.setName(name);
             entity.setType(type);
             dao.persist(entity);
-        } else if (entities.size() == 1) {
-            entity = entities.get(0);
-            if (!Objects.equals(type, entity.getType())) {
+        } else {
+            entity = found;
+            if (entity.getId() == 1) {
+                throw new AuthorizationException("It is not permitted to update the DataType '" + entity.getName() + "'.");
+            } else if (!Objects.equals(type, entity.getType())) {
                 entity.setType(type);
                 dao.persist(entity);
             }
-        } else {
-            throw new CWSException(ReturnCode.IDENTIFICATION_ERROR, "Could not uniquely identify the Data Type '" + name + "' as " + entities.size() + " DataTypes were found with conflicting names.");
         }
 
         final DataType objectType = new DataType();
@@ -87,28 +88,43 @@ public final class ProcessDataTypeService extends Serviceable<ProcessDataTypeRes
         objectType.setType(type);
 
         final ProcessDataTypeResponse response = new ProcessDataTypeResponse();
-        response.setObjectType(objectType);
+        response.setDataType(objectType);
 
         return response;
     }
 
     private ProcessDataTypeResponse doDelete(final ProcessDataTypeRequest request) {
-        final String name = request.getObjectType().getName().trim();
+        final ProcessDataTypeResponse response;
+        final String name = request.getDataType().getName().trim();
+        final DataTypeEntity entity = findEntity(name);
 
-        final List<DataTypeEntity> entities = dao.findMatchingDataTypes(name);
-        if (entities.size() == 1) {
-            // We need to check that the Object Type is not being used. If so,
+        if (entity != null) {
+            // We need to check that the Data Type is not being used. If so,
             // then it is not allowed to remove it.
-            final int records = dao.countObjectTypeUsage(entities.get(0).getId());
+            final int records = dao.countObjectTypeUsage(entity.getId());
             if (records > 0) {
                 throw new CWSException(ReturnCode.ILLEGAL_ACTION, "The Data Type '" + name + "' cannot be deleted, as it is being actively used.");
             } else {
-                dao.delete(entities.get(0));
+                dao.delete(entity);
+                response = new ProcessDataTypeResponse();
             }
         } else {
+            response = new ProcessDataTypeResponse(ReturnCode.IDENTIFICATION_WARNING, "No records were found with the name '" + name + "'.");
+        }
+
+        return response;
+    }
+
+    private DataTypeEntity findEntity(final String name) {
+        final List<DataTypeEntity> entities = dao.findMatchingDataTypes(name);
+        DataTypeEntity entity = null;
+
+        if (entities.size() == 1) {
+            entity = entities.get(0);
+        } else if (entities.size() > 1) {
             throw new CWSException(ReturnCode.IDENTIFICATION_ERROR, "Could not uniquely identify the Data Type '" + name + "'.");
         }
 
-        return new ProcessDataTypeResponse();
+        return entity;
     }
 }

@@ -27,9 +27,10 @@ public enum ReturnCode {
     NOTIMPLEMENTED_ERROR(Classification.CLASS_ERROR, 99, "Logic Pending Implemented..."),
 
     WARNING(Classification.CLASS_WARNING, 0, "General Warning occurred while handling the request."),
-    VERIFICATION_WARNING(Classification.CLASS_WARNING, 1, "The provided Request information is insufficient or invalid."),
-    IDENTIFICATION_WARNING(Classification.CLASS_WARNING, 2, "Not possible to positively identify the requested Data."),
-    AUTHORIZATION_WARNING(Classification.CLASS_WARNING, 3, "The Account is not permitted to perform requested Action."),
+    AUTHENTICATION_WARNING(Classification.CLASS_WARNING, 1, "Authentication of the Account failed."),
+    AUTHORIZATION_WARNING(Classification.CLASS_WARNING, 2, "The Account is not permitted to perform requested Action."),
+    VERIFICATION_WARNING(Classification.CLASS_WARNING, 3, "The provided Request information is insufficient or invalid."),
+    IDENTIFICATION_WARNING(Classification.CLASS_WARNING, 4, "Not possible to positively identify the requested Data."),
     ILLEGAL_ACTION(Classification.CLASS_WARNING, 99, "The Account tried to invoke an Action not allowed.");
 
     private enum Classification {

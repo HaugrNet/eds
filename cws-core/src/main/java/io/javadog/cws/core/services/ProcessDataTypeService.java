@@ -101,7 +101,7 @@ public final class ProcessDataTypeService extends Serviceable<ProcessDataTypeRes
         if (entity != null) {
             // We need to check that the Data Type is not being used. If so,
             // then it is not allowed to remove it.
-            final int records = dao.countObjectTypeUsage(entity.getId());
+            final long records = dao.countObjectTypeUsage(entity.getId());
             if (records > 0) {
                 throw new CWSException(ReturnCode.ILLEGAL_ACTION, "The Data Type '" + name + "' cannot be deleted, as it is being actively used.");
             } else {

@@ -10,9 +10,6 @@ package io.javadog.cws.model.entities;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
@@ -34,12 +31,7 @@ import javax.persistence.Table;
                         "  and t.member.id = :mid")
 })
 @Table(name = "data")
-public class DataEntity {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", unique = true, nullable = false, updatable = false)
-    private Long id;
+public class DataEntity extends CWSEntity {
 
     @OneToOne(targetEntity = MetaDataEntity.class, fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "metadata_id", referencedColumnName = "id", nullable = false, updatable = false)
@@ -58,14 +50,6 @@ public class DataEntity {
     // =========================================================================
     // Entity Setters & Getters
     // =========================================================================
-
-    public void setId(final Long id) {
-        this.id = id;
-    }
-
-    public Long getId() {
-        return id;
-    }
 
     public void setMetadata(final MetaDataEntity object) {
         this.metadata = object;

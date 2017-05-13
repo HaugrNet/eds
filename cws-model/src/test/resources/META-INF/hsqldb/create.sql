@@ -392,6 +392,8 @@ CREATE TABLE data (
   key_id           INTEGER,
   encrypted_data   LONGVARBINARY,
   initial_vector   VARCHAR(256), -- Storing it armored
+  modified         TIMESTAMP DEFAULT now(),
+  created          TIMESTAMP DEFAULT now(),
 
   /* Primary & Foreign Keys */
   CONSTRAINT data_pk                        PRIMARY KEY (id),
@@ -403,5 +405,7 @@ CREATE TABLE data (
   CONSTRAINT data_notnull_metadata_id       CHECK (metadata_id IS NOT NULL),
   CONSTRAINT data_notnull_key_id            CHECK (key_id IS NOT NULL),
   CONSTRAINT data_notnull_data              CHECK (encrypted_data IS NOT NULL),
-  CONSTRAINT data_notnull_initial_vector    CHECK (initial_vector IS NOT NULL)
+  CONSTRAINT data_notnull_initial_vector    CHECK (initial_vector IS NOT NULL),
+  CONSTRAINT data_notnull_modified          CHECK (modified IS NOT NULL),
+  CONSTRAINT data_notnull_created           CHECK (created IS NOT NULL)
 );

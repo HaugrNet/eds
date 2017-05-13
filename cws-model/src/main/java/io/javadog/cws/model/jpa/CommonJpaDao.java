@@ -44,19 +44,16 @@ public final class CommonJpaDao implements CommonDao {
      * {@inheritDoc}
      */
     @Override
-    public void persist(final Object entity) {
+    public void persist(final CWSEntity entity) {
         if ((entity instanceof Externable) && (((Externable) entity).getExternalId() == null)) {
             ((Externable) entity).setExternalId(UUID.randomUUID().toString());
         }
 
-        if (entity instanceof CWSEntity) {
-            if (((CWSEntity) entity).getCreated() == null) {
-                ((CWSEntity) entity).setCreated(new Date());
-            }
-
-            ((CWSEntity) entity).setModified(new Date());
+        if (entity.getCreated() == null) {
+            entity.setCreated(new Date());
         }
 
+        entity.setModified(new Date());
         entityManager.persist(entity);
     }
 
@@ -215,11 +212,11 @@ public final class CommonJpaDao implements CommonDao {
      * {@inheritDoc}
      */
     @Override
-    public int countObjectTypeUsage(final Long id) {
+    public long countObjectTypeUsage(final Long id) {
         final Query query = entityManager.createNamedQuery("type.countUsage");
         query.setParameter("id", id);
 
-        return (int) query.getSingleResult();
+        return (long) query.getSingleResult();
     }
 
     @Override

@@ -26,7 +26,7 @@ import java.util.List;
  */
 public interface CommonDao {
 
-    void persist(Object entity);
+    void persist(CWSEntity entity);
 
     <E extends CWSEntity> E find(Class<E> cwsEntity, Long id);
 
@@ -56,7 +56,7 @@ public interface CommonDao {
 
     List<DataTypeEntity> findMatchingDataTypes(String name);
 
-    int countObjectTypeUsage(Long id);
+    long countObjectTypeUsage(Long id);
 
     DataEntity findDataByMemberAndExternalId(MemberEntity member, String externalId);
 

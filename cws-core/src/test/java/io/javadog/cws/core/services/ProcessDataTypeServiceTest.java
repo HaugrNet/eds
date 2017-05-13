@@ -87,7 +87,48 @@ public final class ProcessDataTypeServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testCreateAndUpdateFolderDataType() {
+    public void testCreateAndDeleteDataType() {
+        final Serviceable<ProcessDataTypeResponse, ProcessDataTypeRequest> service = prepareService();
+        final ProcessDataTypeRequest request = buildRequestWithCredentials(Constants.ADMIN_ACCOUNT);
+        request.setAction(Action.PROCESS);
+        final String theDataTypeName = "dataTypeToDelete";
+        final String newDataTypeType = "The Type information";
+        final DataType dataType = buildDataType(theDataTypeName, newDataTypeType);
+        request.setDataType(dataType);
+        final ProcessDataTypeResponse response = service.perform(request);
+
+        assertThat(response, is(not(nullValue())));
+        assertThat(response.isOk(), is(true));
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(response.getReturnMessage(), is("Ok"));
+
+        request.setAction(Action.DELETE);
+        final ProcessDataTypeResponse deletedResponse = service.perform(request);
+        assertThat(deletedResponse, is(not(nullValue())));
+        assertThat(deletedResponse.isOk(), is(true));
+        assertThat(deletedResponse.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(deletedResponse.getReturnMessage(), is("Ok"));
+    }
+
+    @Test
+    public void testDeleteUnknownDataType() {
+        final Serviceable<ProcessDataTypeResponse, ProcessDataTypeRequest> service = prepareService();
+        final ProcessDataTypeRequest request = buildRequestWithCredentials(Constants.ADMIN_ACCOUNT);
+        request.setAction(Action.DELETE);
+        final String theDataTypeName = "unknownDataType";
+        final String newDataTypeType = "The Type information";
+        final DataType dataType = buildDataType(theDataTypeName, newDataTypeType);
+        request.setDataType(dataType);
+        final ProcessDataTypeResponse response = service.perform(request);
+
+        assertThat(response, is(not(nullValue())));
+        assertThat(response.isOk(), is(false));
+        assertThat(response.getReturnCode(), is(ReturnCode.IDENTIFICATION_WARNING));
+        assertThat(response.getReturnMessage(), is("No records were found with the name '" + theDataTypeName + "'."));
+    }
+
+    @Test
+    public void testCreateAndUpdateDataType() {
         final Serviceable<ProcessDataTypeResponse, ProcessDataTypeRequest> service = prepareService();
         final ProcessDataTypeRequest request = buildRequestWithCredentials(Constants.ADMIN_ACCOUNT);
         request.setAction(Action.PROCESS);

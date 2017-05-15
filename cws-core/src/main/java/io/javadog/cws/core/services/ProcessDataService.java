@@ -171,7 +171,7 @@ public final class ProcessDataService extends Serviceable<ProcessDataResponse, P
         data.setId(metaDataEntity.getExternalId());
         data.setCircleId(metaDataEntity.getCircle().getExternalId());
         data.setName(metaDataEntity.getName());
-        data.setType(type);
+        data.setTypeName(type.getName());
         data.setAdded(metaDataEntity.getCreated());
 
         if (folder != null) {

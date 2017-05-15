@@ -10,8 +10,8 @@ package io.javadog.cws.api.dtos;
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.Verifiable;
 
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -25,17 +25,18 @@ import java.util.Map;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "data", propOrder = { "id", "circleId", "folderId", "name", "type", "bytes", "added" })
+@XmlType(name = "data", propOrder = { "id", "circleId", "folderId", "name", "typeName", "bytes", "added" })
 public final class Data extends Verifiable {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
+    private static final int MAX_LENGTH = 256;
     private static final String FIELD_ID = "id";
     private static final String FIELD_CIRCLE_ID = "circleId";
     private static final String FIELD_FOLDER_ID = "folderId";
     private static final String FIELD_NAME = "name";
-    private static final String FIELD_TYPE = "type";
+    private static final String FIELD_TYPENAME = "typeName";
     private static final String FIELD_BYTES = "bytes";
     private static final String FIELD_ADDED = "added";
 
@@ -51,8 +52,8 @@ public final class Data extends Verifiable {
     @XmlElement(name = FIELD_NAME, required = true, nillable = true)
     private String name = null;
 
-    @XmlElement(name = FIELD_TYPE, required = true)
-    private DataType type = null;
+    @XmlElement(name = FIELD_TYPENAME, required = true)
+    private String typeName = null;
 
     @XmlElement(name = FIELD_BYTES, required = true, nillable = true)
     private byte[] bytes = null;
@@ -94,7 +95,9 @@ public final class Data extends Verifiable {
         return folderId;
     }
 
+    @Size(max = MAX_LENGTH)
     public void setName(final String name) {
+        ensureSizeLimits(FIELD_NAME, name, 1, MAX_LENGTH);
         this.name = name;
     }
 
@@ -102,19 +105,14 @@ public final class Data extends Verifiable {
         return name;
     }
 
-    @NotNull
-    public void setType(final DataType objectType) {
-        ensureNotNull(FIELD_TYPE, objectType);
-        ensureVerifiable(FIELD_TYPE, objectType);
-        this.type = objectType;
+    @Size(min = 1, max = MAX_LENGTH)
+    public void setTypeName(final String typeName) {
+        ensureSizeLimits(FIELD_TYPENAME, typeName, 1, MAX_LENGTH);
+        this.typeName = typeName;
     }
 
-    public DataType getType() {
-        return type;
-    }
-
-    public void setAdded(final Date added) {
-        this.added = new Date(added.getTime());
+    public String getTypeName() {
+        return typeName;
     }
 
     public void setBytes(final byte[] bytes) {
@@ -123,6 +121,10 @@ public final class Data extends Verifiable {
 
     public byte[] getBytes() {
         return bytes;
+    }
+
+    public void setAdded(final Date added) {
+        this.added = new Date(added.getTime());
     }
 
     public Date getAdded() {
@@ -139,16 +141,14 @@ public final class Data extends Verifiable {
         checkPattern(errors, FIELD_ID, id, Constants.ID_PATTERN_REGEX, "The Data Id is invalid.");
 
         if (id == null) {
-            checkNotNull(errors, FIELD_CIRCLE_ID, circleId, "The Circle Id must be present if no Data Id is present.");
+            checkNotNull(errors, FIELD_CIRCLE_ID, circleId, "The Circle Id is required for new Data Objects.");
             checkPattern(errors, FIELD_CIRCLE_ID, circleId, Constants.ID_PATTERN_REGEX, "The Circle Id is invalid.");
+            checkNotNull(errors, FIELD_TYPENAME, typeName, "The DataType Name is required for new Data Objects.");
+            checkNotTooLong(errors, FIELD_TYPENAME, typeName, MAX_LENGTH, "The name of the DataType may not exceed " + MAX_LENGTH + " characters.");
         }
 
+        checkNotTooLong(errors, FIELD_NAME, name, MAX_LENGTH, "The name of the Data Object may not exceed " + MAX_LENGTH + " characters.");
         checkPattern(errors, FIELD_FOLDER_ID, folderId, Constants.ID_PATTERN_REGEX, "The Folder Id is invalid.");
-        checkNotNull(errors, FIELD_TYPE, type, "The DataType is undefined.");
-
-        if (type != null) {
-            errors.putAll(type.validate());
-        }
 
         return errors;
     }

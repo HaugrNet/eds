@@ -74,6 +74,16 @@ public abstract class Verifiable implements Serializable {
         }
     }
 
+    protected void ensureSizeLimits(final String field, final String value, final int min, final int max) {
+        if (value != null) {
+            if (value.length() < min) {
+                throw new IllegalArgumentException(PRE_VALUE + field + "' is shorter than the minimum length of " + min + '.');
+            } else if (value.length() > max) {
+                throw new IllegalArgumentException(PRE_VALUE + field + "' is longer than the maximum length of " + max + '.');
+            }
+        }
+    }
+
     protected static void ensureValidId(final String field, final String value) {
         if (value != null) {
             final Pattern pattern = Pattern.compile(Constants.ID_PATTERN_REGEX);

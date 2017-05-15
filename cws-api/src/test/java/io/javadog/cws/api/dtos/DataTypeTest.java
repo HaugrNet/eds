@@ -21,7 +21,7 @@ import java.util.Map;
  * @author Kim Jensen
  * @since  CWS 1.0
  */
-public final class ObjectTypeTest {
+public final class DataTypeTest {
 
     @Rule
     public ExpectedException expected = ExpectedException.none();
@@ -31,14 +31,14 @@ public final class ObjectTypeTest {
         final String name = "name1";
         final String type = "type1";
 
-        final DataType objectType = new DataType();
-        objectType.setName(name);
-        objectType.setType(type);
+        final DataType dataType = new DataType();
+        dataType.setName(name);
+        dataType.setType(type);
 
-        assertThat(objectType.getName(), is(name));
-        assertThat(objectType.getType(), is(type));
+        assertThat(dataType.getName(), is(name));
+        assertThat(dataType.getType(), is(type));
 
-        final Map<String, String> errors = objectType.validate();
+        final Map<String, String> errors = dataType.validate();
         assertThat(errors.isEmpty(), is(true));
     }
 

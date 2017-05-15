@@ -24,7 +24,7 @@ import java.util.UUID;
  * @author Kim Jensen
  * @since  CWS 1.0
  */
-public final class FetchObjectRequestTest {
+public final class FetchDataRequestTest {
 
     @Test
     public void testClass() {

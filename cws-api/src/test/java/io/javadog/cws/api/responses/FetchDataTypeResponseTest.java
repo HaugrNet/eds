@@ -21,7 +21,7 @@ import java.util.List;
  * @author Kim Jensen
  * @since  CWS 1.0
  */
-public final class FetchObjectTypeResponseTest {
+public final class FetchDataTypeResponseTest {
 
     @Test
     public void testFetchingAllCircles() {

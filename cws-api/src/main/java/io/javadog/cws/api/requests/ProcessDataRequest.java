@@ -26,7 +26,7 @@ import java.util.Set;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "ProcessDataRequest", propOrder = { "action", "dataId", "data" })
+@XmlType(name = "processDataRequest", propOrder = { "action", "dataId", "data" })
 public final class ProcessDataRequest extends Authentication {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
@@ -40,7 +40,7 @@ public final class ProcessDataRequest extends Authentication {
     @XmlElement(name = FIELD_ACTION, required = true)
     private Action action = null;
 
-    @XmlElement(name = "FIELD_DATA_ID", required = true, nillable = true)
+    @XmlElement(name = FIELD_DATA_ID, required = true, nillable = true)
     private String dataId = null;
 
     @XmlElement(name = FIELD_DATA, required = true, nillable = true)

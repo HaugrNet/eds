@@ -33,7 +33,7 @@ import javax.xml.ws.BindingType;
  * @author Kim Jensen
  * @since  CWS 1.0
  */
-@SOAPBinding(style = SOAPBinding.Style.DOCUMENT)
+@SOAPBinding
 @BindingType(javax.xml.ws.soap.SOAPBinding.SOAP11HTTP_BINDING)
 @WebService(name = "systemWS", serviceName = "systemWSService", portName = "systemWS", targetNamespace = "http://ws.cws.javadog.io/")
 public class SystemSOAPService implements System {

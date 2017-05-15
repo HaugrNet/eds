@@ -17,6 +17,7 @@
     </description>
 
     <build>
+        <finalName>cws</finalName>
         <resources>
             <resource>
                 <directory>src/main/resources</directory>

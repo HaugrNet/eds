@@ -36,8 +36,11 @@ public final class ProcessDataTypeRequest extends Authentication {
     private static final String FIELD_ACTION = "action";
     private static final String FIELD_TYPE = "dataType";
 
-    @XmlElement(required = true) private Action action = Action.PROCESS;
-    @XmlElement(required = true) private DataType dataType = null;
+    @XmlElement(name = FIELD_ACTION, required = true)
+    private Action action = Action.PROCESS;
+
+    @XmlElement(name = FIELD_TYPE, required = true)
+    private DataType dataType = null;
 
     // =========================================================================
     // Standard Setters & Getters

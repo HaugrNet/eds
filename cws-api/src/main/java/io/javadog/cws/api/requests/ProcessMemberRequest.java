@@ -36,8 +36,11 @@ public final class ProcessMemberRequest extends Authentication {
     private static final String FIELD_ACTION = "action";
     private static final String FIELD_MEMBER = "member";
 
-    @XmlElement(required = true) private Action action = null;
-    @XmlElement(required = true) private Member member = null;
+    @XmlElement(name = FIELD_ACTION, required = true)
+    private Action action = null;
+
+    @XmlElement(name = FIELD_MEMBER, required = true)
+    private Member member = null;
 
     // =========================================================================
     // Standard Setters & Getters

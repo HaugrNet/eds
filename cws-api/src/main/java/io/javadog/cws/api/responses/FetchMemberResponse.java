@@ -37,6 +37,10 @@ public final class FetchMemberResponse extends CWSResponse {
     @XmlElement(name = "circles", required = true)
     private final List<Circle> circles = new ArrayList<>(0);
 
+    // =========================================================================
+    // Object Constructors
+    // =========================================================================
+
     public FetchMemberResponse() {
         // Empty Constructor, required for WebServices
     }

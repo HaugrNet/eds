@@ -11,7 +11,10 @@ import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.dtos.DataType;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlType;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -20,6 +23,8 @@ import java.util.List;
  * @author Kim Jensen
  * @since  CWS 1.0
  */
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(name = "fetchDataTypeResponse")
 public final class FetchDataTypeResponse extends CWSResponse {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
@@ -27,6 +32,10 @@ public final class FetchDataTypeResponse extends CWSResponse {
 
     @XmlElement(name = "types")
     private final List<DataType> types = new ArrayList<>(0);
+
+    // =========================================================================
+    // Object Constructors
+    // =========================================================================
 
     public FetchDataTypeResponse() {
         // Empty Constructor, required for WebServices

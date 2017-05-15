@@ -31,6 +31,10 @@ public final class SettingResponse extends CWSResponse {
     @XmlElement(name = "settings", required = true)
     private final HashMap<String, String> settings = new HashMap<>();
 
+    // =========================================================================
+    // Object Constructors
+    // =========================================================================
+
     public SettingResponse() {
         // Empty Constructor, required for WebServices
     }

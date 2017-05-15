@@ -12,6 +12,7 @@ import io.javadog.cws.api.common.ReturnCode;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 import java.io.Serializable;
 
@@ -20,13 +21,16 @@ import java.io.Serializable;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "authenticationToken", propOrder = { "returnCode", "returnMessage" })
+@XmlType(name = "CWSResponse", propOrder = { "returnCode", "returnMessage" })
 public class CWSResponse implements Serializable {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
+    @XmlElement(name = "returnCode", required = true)
     private ReturnCode returnCode = ReturnCode.SUCCESS;
+
+    @XmlElement(name = "returnMessage", required = true)
     private String returnMessage = "Ok";
 
     // =========================================================================

@@ -29,6 +29,10 @@ public final class VersionResponse extends CWSResponse {
     @XmlElement
     private String version = null;
 
+    // =========================================================================
+    // Object Constructors
+    // =========================================================================
+
     public VersionResponse() {
         // Empty Constructor, required for WebServices
     }

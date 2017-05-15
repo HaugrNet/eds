@@ -38,13 +38,13 @@ public final class ProcessCircleRequest extends Authentication {
     private static final String FIELD_CIRCLE = "circle";
     private static final String FIELD_TRUSTEE = "trustee";
 
-    @XmlElement(required = true)
+    @XmlElement(name = FIELD_ACTION, required = true)
     private Action action = null;
 
-    @XmlElement(required = true)
+    @XmlElement(name = FIELD_CIRCLE, required = true)
     private Circle circle = null;
 
-    @XmlElement(name = "FIELD_TRUSTEE", required = true, nillable = true)
+    @XmlElement(name = FIELD_TRUSTEE, required = true, nillable = true)
     private Trustee trustee = null;
 
     // =========================================================================

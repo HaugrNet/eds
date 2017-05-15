@@ -25,7 +25,7 @@ import java.util.Map;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "objectData", propOrder = { "id", "circleId", "folderId", "name", "type", "bytes", "added" })
+@XmlType(name = "data", propOrder = { "id", "circleId", "folderId", "name", "type", "bytes", "added" })
 public final class Data extends Verifiable {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */

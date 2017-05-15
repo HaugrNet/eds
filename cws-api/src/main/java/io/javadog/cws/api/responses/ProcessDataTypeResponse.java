@@ -30,6 +30,10 @@ public final class ProcessDataTypeResponse extends CWSResponse {
     @XmlElement
     private DataType dataType = null;
 
+    // =========================================================================
+    // Object Constructors
+    // =========================================================================
+
     public ProcessDataTypeResponse() {
         // Empty Constructor, required for WebServices
     }
@@ -37,6 +41,10 @@ public final class ProcessDataTypeResponse extends CWSResponse {
     public ProcessDataTypeResponse(final ReturnCode returnCode, final String returnMessage) {
         super(returnCode, returnMessage);
     }
+
+    // =========================================================================
+    // Standard Setters & Getters
+    // =========================================================================
 
     public void setDataType(final DataType dataType) {
         this.dataType = dataType;

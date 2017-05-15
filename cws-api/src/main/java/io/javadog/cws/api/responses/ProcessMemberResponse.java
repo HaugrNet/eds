@@ -31,6 +31,10 @@ public final class ProcessMemberResponse extends CWSResponse {
     @XmlElement private Member member = null;
     @XmlElement private String armoredKey = null;
 
+    // =========================================================================
+    // Object Constructors
+    // =========================================================================
+
     public ProcessMemberResponse() {
         // Empty Constructor, required for WebServices
     }

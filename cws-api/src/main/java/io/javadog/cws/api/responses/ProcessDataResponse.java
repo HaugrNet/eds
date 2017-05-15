@@ -30,6 +30,10 @@ public final class ProcessDataResponse extends CWSResponse {
     @XmlElement(name = "id", required = true)
     private Data data = null;
 
+    // =========================================================================
+    // Object Constructors
+    // =========================================================================
+
     public ProcessDataResponse() {
         // Empty Constructor, required for WebServices
     }

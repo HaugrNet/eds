@@ -14,6 +14,7 @@ import io.javadog.cws.api.dtos.Trustee;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -30,8 +31,15 @@ public final class FetchCircleResponse extends CWSResponse {
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
+    @XmlElement(name = "circles", required = true)
     private final List<Circle> circles = new ArrayList<>(0);
+
+    @XmlElement(name = "trustees", required = true)
     private final List<Trustee> trustees = new ArrayList<>(0);
+
+    // =========================================================================
+    // Object Constructors
+    // =========================================================================
 
     public FetchCircleResponse() {
         // Empty Constructor, required for WebServices

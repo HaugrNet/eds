@@ -24,7 +24,7 @@ import java.util.List;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "fetchObjectResponse", propOrder = "objects")
+@XmlType(name = "fetchDataResponse", propOrder = "objects")
 public final class FetchDataResponse extends CWSResponse{
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
@@ -32,6 +32,10 @@ public final class FetchDataResponse extends CWSResponse{
 
     @XmlElement(name = "objects")
     private final List<Data> objects = new ArrayList<>(0);
+
+    // =========================================================================
+    // Object Constructors
+    // =========================================================================
 
     public FetchDataResponse() {
         // Empty Constructor, required for WebServices

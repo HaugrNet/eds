@@ -22,7 +22,7 @@ import java.util.Map;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "fetchObjectRequest", propOrder = { "dataType", "dataId" })
+@XmlType(name = "fetchDataRequest", propOrder = { "dataType", "dataId" })
 public final class FetchDataRequest extends Authentication {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
@@ -41,7 +41,7 @@ public final class FetchDataRequest extends Authentication {
     // Setters & Getters
     // =========================================================================
 
-    public void setDataType(DataType dataType) {
+    public void setDataType(final DataType dataType) {
         ensureVerifiable(FIELD_DATA_TYPE, dataType);
         this.dataType = dataType;
     }

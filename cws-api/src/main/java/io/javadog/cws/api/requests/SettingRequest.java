@@ -31,6 +31,10 @@ public final class SettingRequest extends Authentication {
     @XmlElement(name = "settings", required = true)
     private final HashMap<String, String> settings = new HashMap<>();
 
+    // =========================================================================
+    // Standard Setters & Getters
+    // =========================================================================
+
     public void setSettings(final Map<String, String> settings) {
         this.settings.putAll(settings);
     }

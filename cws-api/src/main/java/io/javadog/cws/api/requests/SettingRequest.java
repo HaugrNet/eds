@@ -10,6 +10,7 @@ package io.javadog.cws.api.requests;
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.dtos.Authentication;
 
+import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -35,11 +36,32 @@ public final class SettingRequest extends Authentication {
     // Standard Setters & Getters
     // =========================================================================
 
+    @NotNull
     public void setSettings(final Map<String, String> settings) {
+        ensureNotNull("settings", settings);
         this.settings.putAll(settings);
     }
 
     public Map<String, String> getSettings() {
         return new HashMap<>(settings);
+    }
+
+
+    // =========================================================================
+    // Standard Methods
+    // =========================================================================
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Map<String, String> validate() {
+        final Map<String, String> errors = super.validate();
+
+        if (settings == null) {
+            errors.put("settings", "The Settings may not be null.");
+        }
+
+        return errors;
     }
 }

@@ -7,6 +7,7 @@
  */
 package io.javadog.cws.api.dtos;
 
+import static io.javadog.cws.api.ReflectiveTesting.reflectiveCorrection;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -16,7 +17,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import java.lang.reflect.Field;
 import java.util.Date;
 import java.util.Map;
 import java.util.UUID;
@@ -221,17 +221,5 @@ public final class DataTest {
         assertThat(errors.get("folderId"), is("The Folder Id is invalid."));
         assertThat(errors.get("name"), is("The name of the Data Object may not exceed 256 characters."));
         assertThat(errors.get("typeName"), is("The name of the DataType may not exceed 256 characters."));
-    }
-
-    private static void reflectiveCorrection(final Object instance, final String fieldName, final Object newValue) {
-        try {
-            final Field field = instance.getClass().getDeclaredField(fieldName);
-            final boolean isAccessible = field.isAccessible();
-            field.setAccessible(true);
-            field.set(instance, newValue);
-            field.setAccessible(isAccessible);
-        } catch (NoSuchFieldException | IllegalAccessException | SecurityException e) {
-            throw new IllegalArgumentException(e);
-        }
     }
 }

@@ -30,7 +30,7 @@ public final class SettingRequest extends Authentication {
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
     @XmlElement(name = "settings", required = true)
-    private final HashMap<String, String> settings = new HashMap<>();
+    private HashMap<String, String> settings = null;
 
     // =========================================================================
     // Standard Setters & Getters
@@ -39,29 +39,10 @@ public final class SettingRequest extends Authentication {
     @NotNull
     public void setSettings(final Map<String, String> settings) {
         ensureNotNull("settings", settings);
-        this.settings.putAll(settings);
+        this.settings = new HashMap<>(settings);
     }
 
     public Map<String, String> getSettings() {
-        return new HashMap<>(settings);
-    }
-
-
-    // =========================================================================
-    // Standard Methods
-    // =========================================================================
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Map<String, String> validate() {
-        final Map<String, String> errors = super.validate();
-
-        if (settings == null) {
-            errors.put("settings", "The Settings may not be null.");
-        }
-
-        return errors;
+        return (settings == null) ? new HashMap<>(0) : new HashMap<>(settings);
     }
 }

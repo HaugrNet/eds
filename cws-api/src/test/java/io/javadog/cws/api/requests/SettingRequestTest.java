@@ -73,10 +73,9 @@ public final class SettingRequestTest {
         reflectiveCorrection(request, "settings", null);
 
         final Map<String, String> errors = request.validate();
-        assertThat(errors.size(), is(4));
+        assertThat(errors.size(), is(3));
         assertThat(errors.get("account"), is("Account is missing, null or invalid."));
         assertThat(errors.get("credentialType"), is("CredentialType is missing, null or invalid."));
         assertThat(errors.get("credential"), is("Credential is missing, null or invalid."));
-        assertThat(errors.get("settings"), is("The Settings may not be null."));
     }
 }

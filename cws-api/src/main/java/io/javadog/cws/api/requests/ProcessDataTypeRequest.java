@@ -91,6 +91,8 @@ public final class ProcessDataTypeRequest extends Authentication {
 
         if (action == null) {
             errors.put(FIELD_ACTION, "No action has been provided.");
+        } else {
+            checkContains(errors, FIELD_ACTION, action, ALLOWED, "Invalid Action has been provided.");
         }
 
         if (dataType == null) {

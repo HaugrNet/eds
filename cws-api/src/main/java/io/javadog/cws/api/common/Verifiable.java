@@ -10,6 +10,7 @@ package io.javadog.cws.api.common;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 /**
@@ -63,6 +64,14 @@ public abstract class Verifiable implements Serializable {
         if (value != null) {
             final Pattern pattern = Pattern.compile(regex);
             if (!pattern.matcher(value).matches()) {
+                errors.put(field, message);
+            }
+        }
+    }
+
+    protected static <E extends Enum<?>> void checkContains(final Map<String, String> errors, final String field, final E value, final Collection<E> acceptable, final String message) {
+        if (value != null) {
+            if (!acceptable.contains(value)) {
                 errors.put(field, message);
             }
         }

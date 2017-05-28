@@ -136,7 +136,7 @@ public final class DataTest {
     @Test
     public void testEmptyName() {
         expected.expect(IllegalArgumentException.class);
-        expected.expectMessage("The value for 'name' is shorter than the minimum length of 1.");
+        expected.expectMessage("The value for 'name' is empty.");
 
         final Data data = new Data();
         data.setName("");
@@ -154,7 +154,7 @@ public final class DataTest {
     @Test
     public void testEmptyTypeName() {
         expected.expect(IllegalArgumentException.class);
-        expected.expectMessage("The value for 'typeName' is shorter than the minimum length of 1.");
+        expected.expectMessage("The value for 'typeName' is empty.");
 
         final Data data = new Data();
         data.setTypeName("");

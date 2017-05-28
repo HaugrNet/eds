@@ -10,7 +10,6 @@ package io.javadog.cws.api.common;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Map;
-import java.util.Set;
 import java.util.regex.Pattern;
 
 /**
@@ -70,10 +69,8 @@ public abstract class Verifiable implements Serializable {
     }
 
     protected static <E extends Enum<?>> void checkContains(final Map<String, String> errors, final String field, final E value, final Collection<E> acceptable, final String message) {
-        if (value != null) {
-            if (!acceptable.contains(value)) {
-                errors.put(field, message);
-            }
+        if ((value != null) && !acceptable.contains(value)) {
+            errors.put(field, message);
         }
     }
 
@@ -83,10 +80,10 @@ public abstract class Verifiable implements Serializable {
         }
     }
 
-    protected void ensureSizeLimits(final String field, final String value, final int min, final int max) {
+    protected void ensureNotNullOrTooLong(final String field, final String value, final int max) {
         if (value != null) {
-            if (value.length() < min) {
-                throw new IllegalArgumentException(PRE_VALUE + field + "' is shorter than the minimum length of " + min + '.');
+            if (value.isEmpty()) {
+                throw new IllegalArgumentException(PRE_VALUE + field + "' is empty.");
             } else if (value.length() > max) {
                 throw new IllegalArgumentException(PRE_VALUE + field + "' is longer than the maximum length of " + max + '.');
             }

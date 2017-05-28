@@ -182,7 +182,6 @@ public final class ProcessDataService extends Serviceable<ProcessDataResponse, P
     }
 
     private ProcessDataResponse processNewData(final Data data) {
-
         return null;
     }
 

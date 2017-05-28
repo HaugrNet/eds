@@ -34,10 +34,21 @@ public final class ProcessDataTypeResponse extends CWSResponse {
     // Object Constructors
     // =========================================================================
 
+    /**
+     * Empty Constructor, to use if the setters are invoked. This is required
+     * for WebServices to work properly.
+     */
     public ProcessDataTypeResponse() {
         // Empty Constructor, required for WebServices
     }
 
+    /**
+     * Error Constructor, used if an error occurred, and the request could not
+     * complete successfully.
+     *
+     * @param returnCode    The CWS Return Code
+     * @param returnMessage The CWS Return Message
+     */
     public ProcessDataTypeResponse(final ReturnCode returnCode, final String returnMessage) {
         super(returnCode, returnMessage);
     }

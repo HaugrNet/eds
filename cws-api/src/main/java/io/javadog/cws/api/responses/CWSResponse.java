@@ -45,6 +45,13 @@ public class CWSResponse implements Serializable {
         // Required for WebServices to work. Comment added to please Sonar.
     }
 
+    /**
+     * Error Constructor, used if an error occurred, and the request could not
+     * complete successfully.
+     *
+     * @param returnCode    The CWS Return Code
+     * @param returnMessage The CWS Return Message
+     */
     public CWSResponse(final ReturnCode returnCode, final String returnMessage) {
         this.returnCode = returnCode;
         this.returnMessage = returnMessage;

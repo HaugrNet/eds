@@ -97,7 +97,7 @@ public final class Data extends Verifiable {
 
     @Size(max = MAX_LENGTH)
     public void setName(final String name) {
-        ensureSizeLimits(FIELD_NAME, name, 1, MAX_LENGTH);
+        ensureNotNullOrTooLong(FIELD_NAME, name, MAX_LENGTH);
         this.name = name;
     }
 
@@ -107,7 +107,7 @@ public final class Data extends Verifiable {
 
     @Size(min = 1, max = MAX_LENGTH)
     public void setTypeName(final String typeName) {
-        ensureSizeLimits(FIELD_TYPENAME, typeName, 1, MAX_LENGTH);
+        ensureNotNullOrTooLong(FIELD_TYPENAME, typeName, MAX_LENGTH);
         this.typeName = typeName;
     }
 

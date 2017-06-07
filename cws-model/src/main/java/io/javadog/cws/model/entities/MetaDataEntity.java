@@ -23,11 +23,35 @@ import javax.persistence.Table;
 @Entity
 @NamedQueries({
         @NamedQuery(name = "metadata.findByMemberAndExternalId",
-                    query = "select m " +
-                            "from MetaDataEntity m " +
-                            "inner join TrusteeEntity t on m.circle.id = t.circle.id " +
-                            "where m.externalId = :eid" +
-                            "  and t.member.id = :mid")
+                query = "select m " +
+                        "from MetaDataEntity m " +
+                        "inner join TrusteeEntity t on m.circle.id = t.circle.id " +
+                        "where t.member.id = :mid" +
+                        "  and m.externalId = :eid " +
+                        "order by m.name asc, m.id asc"),
+        @NamedQuery(name = "metadata.findByMemberAndFolder",
+                query = "select m " +
+                        "from MetaDataEntity m " +
+                        "inner join TrusteeEntity t on m.circle.id = t.circle.id " +
+                        "where t.member.id = :mid" +
+                        "  and m.parentId = :parentId " +
+                        "order by m.name asc, m.id asc"),
+        @NamedQuery(name = "metadata.findByMemberAndFolderAndType",
+                query = "select m " +
+                        "from MetaDataEntity m " +
+                        "inner join TrusteeEntity t on m.circle.id = t.circle.id " +
+                        "where t.member.id = :mid" +
+                        "  and m.parentId = :parentId" +
+                        "  and m.type.name =:typename " +
+                        "order by m.name asc, m.id asc"),
+        @NamedQuery(name = "metadata.findRootByMemberAndCircle",
+                query = "select m " +
+                        "from MetaDataEntity m " +
+                        "inner join TrusteeEntity t on m.circle.id = t.circle.id " +
+                        "where t.member.id = :mid" +
+                        "  and m.type.name = 'folder' " +
+                        "  and m.name = '/' " +
+                        "order by m.id asc")
 })
 @Table(name = "metadata")
 public class MetaDataEntity extends Externable {

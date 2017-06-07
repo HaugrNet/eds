@@ -7,6 +7,7 @@
  */
 package io.javadog.cws.model;
 
+import io.javadog.cws.api.dtos.DataType;
 import io.javadog.cws.model.entities.CWSEntity;
 import io.javadog.cws.model.entities.CircleEntity;
 import io.javadog.cws.model.entities.DataEntity;
@@ -61,4 +62,10 @@ public interface CommonDao {
     DataEntity findDataByMemberAndExternalId(MemberEntity member, String externalId);
 
     MetaDataEntity findMetaDataByMemberAndExternalId(MemberEntity member, String externalId);
+
+    List<MetaDataEntity> findMetadataByMemberFolderAndType(MemberEntity member, MetaDataEntity entity, DataType dataType);
+
+    MetaDataEntity findRootByMemberCircle(MemberEntity member, String circleId);
+
+    List<MetaDataEntity> findMetadataByMemberAndFolder(MemberEntity member, MetaDataEntity folder);
 }

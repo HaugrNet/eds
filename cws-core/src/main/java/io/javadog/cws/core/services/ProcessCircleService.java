@@ -23,6 +23,8 @@ import javax.persistence.EntityManager;
  */
 public final class ProcessCircleService extends Serviceable<ProcessCircleResponse, ProcessCircleRequest> {
 
+    // TODO when creating a new Circle, there should also be added a Folder with name "/" for the data as root
+
     public ProcessCircleService(final Settings settings, final EntityManager entityManager) {
         super(settings, entityManager);
     }

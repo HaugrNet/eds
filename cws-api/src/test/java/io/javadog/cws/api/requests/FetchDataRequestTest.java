@@ -47,10 +47,12 @@ public final class FetchDataRequestTest {
         request.setAccount(Constants.ADMIN_ACCOUNT);
         request.setCredentialType(CredentialType.PASSPHRASE);
         request.setCredential(Constants.ADMIN_ACCOUNT.toCharArray());
+        final Map<String, String> errors = request.validate();
 
         assertThat(request.getDataId(), is(nullValue()));
-        assertThat(request.validate(), is(not(nullValue())));
-        assertThat(request.validate().size(), is(0));
+        assertThat(errors, is(not(nullValue())));
+        assertThat(errors.size(), is(1));
+        assertThat(errors.get("circleId"), is("Either the CircleId or an Object Data Id must be provided."));
     }
 
     @Test
@@ -81,9 +83,10 @@ public final class FetchDataRequestTest {
 
         assertThat(request.getDataId(), is(nullValue()));
         assertThat(errors, is(not(nullValue())));
-        assertThat(errors.size(), is(3));
+        assertThat(errors.size(), is(4));
         assertThat(errors.get("credentialType"), is("CredentialType is missing, null or invalid."));
         assertThat(errors.get("credential"), is("Credential is missing, null or invalid."));
+        assertThat(errors.get("circleId"), is("Either the CircleId or an Object Data Id must be provided."));
         assertThat(errors.get("account"), is("Account is missing, null or invalid."));
     }
 }

@@ -28,7 +28,8 @@ import javax.persistence.Table;
                         "from DataEntity d " +
                         "inner join TrusteeEntity t on d.metadata.circle.id = t.circle.id " +
                         "where d.metadata.externalId = :eid" +
-                        "  and t.member.id = :mid")
+                        "  and t.member.id = :mid" +
+                        "  and t.trustLevel in :trustLevels")
 })
 @Table(name = "data")
 public class DataEntity extends CWSEntity {

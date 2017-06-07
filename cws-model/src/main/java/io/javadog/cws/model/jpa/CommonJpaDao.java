@@ -8,6 +8,8 @@
 package io.javadog.cws.model.jpa;
 
 import io.javadog.cws.api.common.ReturnCode;
+import io.javadog.cws.api.common.TrustLevel;
+import io.javadog.cws.api.dtos.DataType;
 import io.javadog.cws.common.exceptions.ModelException;
 import io.javadog.cws.model.CommonDao;
 import io.javadog.cws.model.entities.CWSEntity;
@@ -25,6 +27,7 @@ import javax.persistence.PersistenceException;
 import javax.persistence.Query;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.UUID;
 
@@ -224,6 +227,7 @@ public final class CommonJpaDao implements CommonDao {
         final Query query = entityManager.createNamedQuery("data.findByMemberAndExternalId");
         query.setParameter("mid", member.getId());
         query.setParameter("eid", externalId);
+        query.setParameter("trustLevels", EnumSet.of(TrustLevel.ADMIN, TrustLevel.WRITE, TrustLevel.READ));
 
         return findSingleRecord(query);
     }
@@ -238,6 +242,41 @@ public final class CommonJpaDao implements CommonDao {
         query.setParameter("eid", externalId);
 
         return findSingleRecord(query);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<MetaDataEntity> findMetadataByMemberFolderAndType(final MemberEntity member, final MetaDataEntity entity, final DataType dataType) {
+        final Query query = entityManager.createNamedQuery("metadata.findByMemberAndFolderAndType");
+        query.setParameter("parentId", entity.getParentId());
+        query.setParameter("mid", member.getId());
+        query.setParameter("typename", dataType.getName());
+
+        return findList(query);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public MetaDataEntity findRootByMemberCircle(final MemberEntity member, final String circleId) {
+        final Query query = entityManager.createNamedQuery("metadata.findRootByMemberAndCircle");
+
+        return findSingleRecord(query);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<MetaDataEntity> findMetadataByMemberAndFolder(final MemberEntity member, final MetaDataEntity folder) {
+        final Query query = entityManager.createNamedQuery("metadata.findByMemberAndFolder");
+        query.setParameter("mid", member.getId());
+        query.setParameter("parentId", folder.getId());
+
+        return findList(query);
     }
 
     // =========================================================================

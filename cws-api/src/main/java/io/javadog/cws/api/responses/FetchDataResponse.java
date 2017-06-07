@@ -24,14 +24,14 @@ import java.util.List;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "fetchDataResponse", propOrder = "objects")
+@XmlType(name = "fetchDataResponse", propOrder = "data")
 public final class FetchDataResponse extends CWSResponse{
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
-    @XmlElement(name = "objects")
-    private final List<Data> objects = new ArrayList<>(0);
+    @XmlElement(name = "data")
+    private final List<Data> data = new ArrayList<>(0);
 
     // =========================================================================
     // Object Constructors
@@ -60,11 +60,11 @@ public final class FetchDataResponse extends CWSResponse{
     // Setters & Getters
     // =========================================================================
 
-    public void setObjects(final List<Data> objects) {
-        this.objects.addAll(objects);
+    public void setData(final List<Data> data) {
+        this.data.addAll(data);
     }
 
-    public List<Data> getObjects() {
-        return Collections.unmodifiableList(objects);
+    public List<Data> getData() {
+        return Collections.unmodifiableList(data);
     }
 }

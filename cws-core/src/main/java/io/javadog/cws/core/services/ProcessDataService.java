@@ -46,6 +46,9 @@ public final class ProcessDataService extends Serviceable<ProcessDataResponse, P
     public ProcessDataResponse perform(final ProcessDataRequest request) {
         // TODO Check if the Member is allowed to perform writing Operations against the specific Circle, as the verify only makes a general check.
         verifyRequest(request, Permission.PROCESS_DATA);
+        // Since the verification above is of a more general nature, it is
+        // important that the processing is being double checked against the
+        // actual Circle.
         final ProcessDataResponse response;
 
         switch (request.getAction()) {

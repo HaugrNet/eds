@@ -26,7 +26,7 @@ public enum TrustLevel {
     SYSOP;
 
     /**
-     * Checks the given Trust Level against an expected, to verifySignature if the given
+     * Checks the given Trust Level against an expected, to verify if the given
      * level may perform an action. If the given Trust Level is the same or
      * higher than the expected, then a trust is returned, otherwise a false is
      * returned.

@@ -79,7 +79,7 @@ public final class CryptoTest {
         final byte[] toEncrypt = crypto.stringToBytes(cleartext);
         final byte[] encrypted = crypto.encrypt(key, iv, toEncrypt);
 
-        // And decrypt it so we can verifySignature it
+        // And decrypt it so we can verifyS it
         final byte[] decrypted = crypto.decrypt(key, iv, encrypted);
         final String result = crypto.bytesToString(decrypted);
 
@@ -140,7 +140,7 @@ public final class CryptoTest {
         final String cleartext = "This is just an example";
         final byte[] encrypted = crypto.encrypt(key, iv, crypto.stringToBytes(cleartext));
 
-        // And decrypt it so we can verifySignature it
+        // And decrypt it so we can verify it
         final byte[] decrypted = crypto.decrypt(key, iv, encrypted);
         final String result = crypto.bytesToString(decrypted);
 

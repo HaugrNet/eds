@@ -269,7 +269,7 @@ public final class Crypto {
     /**
      * <p>The RSA KeyPair for each Member Account, is stored with an encrypted
      * Private Key and armored and the Public Key armored. This way, it is easy
-     * to verifySignature that the Key's are correctly stored as they are stored purely
+     * to verify that the Key's are correctly stored as they are stored purely
      * as text and nothing else.</p>
      *
      * <p>To recreate the Key Pair the Private Key has to be decrypted and then

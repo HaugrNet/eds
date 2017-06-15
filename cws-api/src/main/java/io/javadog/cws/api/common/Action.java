@@ -22,7 +22,7 @@ import javax.xml.bind.annotation.XmlType;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "action", namespace = "api.cws.javadog.io")
+@XmlType(name = "action")
 public enum Action {
 
     /**

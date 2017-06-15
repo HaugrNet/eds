@@ -21,7 +21,8 @@ import javax.xml.bind.annotation.XmlType;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "processMemberResponse", namespace = "api.cws.javadog.io", propOrder = { "id", "member", "armoredKey" })
+// TODO find the cause of the problem why this cannot be deplyed with a camelCase name
+@XmlType(name = "ProcessMemberResponse", propOrder = { "id", "member", "armoredKey" })
 public final class ProcessMemberResponse extends CwsResponse {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */

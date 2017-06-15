@@ -22,7 +22,7 @@ import java.util.Map;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "fetchDataRequest", namespace = "api.cws.javadog.io", propOrder = { "dataType", "circleId", "dataId" })
+@XmlType(name = "fetchDataRequest", propOrder = { "dataType", "circleId", "dataId" })
 public final class FetchDataRequest extends Authentication {
 
     /**

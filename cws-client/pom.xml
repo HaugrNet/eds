@@ -15,14 +15,20 @@
 
     <build>
         <finalName>cws-client</finalName>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>false</filtering>
+            </resource>
+        </resources>
         <plugins>
-            <!-- Generate Java classes from WSDL during build -->
             <plugin>
                 <groupId>org.apache.cxf</groupId>
                 <artifactId>cxf-codegen-plugin</artifactId>
+                <version>2.7.18</version>
                 <executions>
                     <execution>
-                        <id>generate-sources</id>
+                        <id>share-sources</id>
                         <phase>generate-sources</phase>
                         <configuration>
                             <sourceRoot>${basedir}/target/generated/src/main/java</sourceRoot>
@@ -30,16 +36,29 @@
                             <wsdlOptions>
                                 <wsdlOption>
                                     <wsdl>${basedir}/src/main/resources/share.wsdl</wsdl>
-                                    <extraargs>
-                                        <extraarg>-client</extraarg>
-                                    </extraargs>
+                                    <!--<extraargs>-->
+                                        <!--<extraarg>-client</extraarg>-->
+                                    <!--</extraargs>-->
                                 </wsdlOption>
+                            </wsdlOptions>
+                        </configuration>
+                        <goals>
+                            <goal>wsdl2java</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>system-sources</id>
+                        <phase>generate-sources</phase>
+                        <configuration>
+                            <sourceRoot>${basedir}/target/generated/src/main/java</sourceRoot>
+                            <encoding>UTF-8</encoding>
+                            <wsdlOptions>
                                 <wsdlOption>
                                     <wsdl>${basedir}/src/main/resources/system.wsdl</wsdl>
-                                    <extraargs>
-                                        <extraarg>-client</extraarg>
-                                    </extraargs>
-                                </wsdlOption>
+                                    <!--<extraargs>-->
+                                        <!--<extraarg>-client</extraarg>-->
+                                    <!--</extraargs>-->
+                                 </wsdlOption>
                             </wsdlOptions>
                         </configuration>
                         <goals>
@@ -82,6 +101,10 @@
     </build>
 
     <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>cws-api</artifactId>
+        </dependency>
         <!-- Following is required to build the Client. -->
         <dependency>
             <groupId>org.apache.cxf</groupId>

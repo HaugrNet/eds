@@ -16,7 +16,7 @@ import javax.xml.bind.annotation.XmlType;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "trustLevel", namespace = "api.cws.javadog.io")
+@XmlType(name = "trustLevel")
 public enum TrustLevel {
 
     GUEST,

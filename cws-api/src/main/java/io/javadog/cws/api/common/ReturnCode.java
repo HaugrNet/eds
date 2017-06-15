@@ -16,7 +16,7 @@ import javax.xml.bind.annotation.XmlType;
  * @since CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "returnCode", namespace = "api.cws.javadog.io")
+@XmlType(name = "returnCode")
 public enum ReturnCode {
 
     SUCCESS(Classification.CLASS_INFO, 0, "Request completed normally."),

@@ -19,7 +19,7 @@ import javax.xml.bind.annotation.XmlType;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "verifyRequest", namespace = "api.cws.javadog.io")
+@XmlType(name = "verifyRequest")
 public final class VerifyRequest extends Authentication {
 
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;

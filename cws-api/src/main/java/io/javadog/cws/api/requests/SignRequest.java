@@ -19,7 +19,7 @@ import javax.xml.bind.annotation.XmlType;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "signRequest", namespace = "api.cws.javadog.io")
+@XmlType(name = "signRequest")
 public final class SignRequest extends Authentication {
 
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;

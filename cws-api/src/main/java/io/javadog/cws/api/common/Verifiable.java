@@ -31,7 +31,7 @@ import java.util.regex.Pattern;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "verifiable", namespace = "api.cws.javadog.io")
+@XmlType(name = "verifiable")
 public abstract class Verifiable implements Serializable {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */

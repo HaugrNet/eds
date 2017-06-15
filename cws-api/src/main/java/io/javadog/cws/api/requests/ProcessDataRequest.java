@@ -26,7 +26,7 @@ import java.util.Set;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "processDataRequest", namespace = "api.cws.javadog.io", propOrder = { "action", "dataId", "data" })
+@XmlType(name = "processDataRequest", propOrder = { "action", "dataId", "data" })
 public final class ProcessDataRequest extends Authentication {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */

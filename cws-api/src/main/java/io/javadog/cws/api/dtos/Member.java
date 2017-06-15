@@ -31,7 +31,7 @@ import java.util.Map;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "member", namespace = "api.cws.javadog.io", propOrder = { "id", "authentication",  "added" })
+@XmlType(name = "member", propOrder = { "id", "authentication",  "added" })
 public final class Member extends Verifiable {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */

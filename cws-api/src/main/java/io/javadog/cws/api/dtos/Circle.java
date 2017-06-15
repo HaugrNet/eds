@@ -26,7 +26,7 @@ import java.util.Map;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "circle", namespace = "api.cws.javadog.io", propOrder = { "id", "name", "created" })
+@XmlType(name = "circle", propOrder = { "id", "name", "created" })
 public final class Circle extends Verifiable {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */

@@ -19,7 +19,8 @@ import javax.xml.bind.annotation.XmlType;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "signResponse", namespace = "api.cws.javadog.io")
+// TODO find the cause of the problem why this cannot be deplyed with a camelCase name
+@XmlType(name = "SignResponse")
 public final class SignResponse extends CwsResponse {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */

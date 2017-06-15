@@ -24,8 +24,7 @@ import java.util.List;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-// TODO find the cause of the problem why this cannot be deplyed with a camelCase name
-@XmlType(name = "FetchDataResponse", propOrder = "data")
+@XmlType(name = "fetchDataResult", propOrder = "data")
 public final class FetchDataResponse extends CwsResponse {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */

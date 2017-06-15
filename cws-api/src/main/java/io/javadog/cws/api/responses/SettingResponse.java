@@ -22,7 +22,7 @@ import java.util.Map;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "settingResponse", propOrder = "settings")
+@XmlType(name = "settingResult", propOrder = "settings")
 public final class SettingResponse extends CwsResponse {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */

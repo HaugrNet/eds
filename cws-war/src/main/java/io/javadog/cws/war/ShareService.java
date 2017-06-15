@@ -38,7 +38,7 @@ import javax.xml.ws.BindingType;
  */
 @SOAPBinding
 @BindingType(javax.xml.ws.soap.SOAPBinding.SOAP11HTTP_BINDING)
-@WebService(name = "share", serviceName = "shareService", portName = "share", targetNamespace = "http://ws1.cws.javadog.io/")
+@WebService(name = "share", serviceName = "share", portName = "share", targetNamespace = "http://ws.cws.javadog.io/")
 public class ShareService implements Share {
 
     private static final Logger log = LoggerFactory.getLogger(ShareService.class);
@@ -52,7 +52,8 @@ public class ShareService implements Share {
      */
     @Override
     @WebMethod
-    public ProcessDataTypeResponse processDataType(final ProcessDataTypeRequest request) {
+    @WebResult(name = "response")
+    public ProcessDataTypeResponse processDataType(@WebParam(name = "request") final ProcessDataTypeRequest request) {
         ProcessDataTypeResponse response;
 
         try {
@@ -74,7 +75,8 @@ public class ShareService implements Share {
      */
     @Override
     @WebMethod
-    public FetchDataTypeResponse fetchDataTypes(final FetchDataTypeRequest request) {
+    @WebResult(name = "response")
+    public FetchDataTypeResponse fetchDataTypes(@WebParam(name = "request") final FetchDataTypeRequest request) {
         FetchDataTypeResponse response;
 
         try {
@@ -96,7 +98,8 @@ public class ShareService implements Share {
      */
     @Override
     @WebMethod
-    public ProcessDataResponse processData(final ProcessDataRequest request) {
+    @WebResult(name = "response")
+    public ProcessDataResponse processData(@WebParam(name = "request") final ProcessDataRequest request) {
         ProcessDataResponse response;
 
         try {
@@ -118,7 +121,8 @@ public class ShareService implements Share {
      */
     @Override
     @WebMethod
-    public FetchDataResponse fetchData(final FetchDataRequest request) {
+    @WebResult(name = "response")
+    public FetchDataResponse fetchData(@WebParam(name = "request") final FetchDataRequest request) {
         FetchDataResponse response;
 
         try {
@@ -162,8 +166,9 @@ public class ShareService implements Share {
      * {@inheritDoc}
      */
     @Override
-    @WebMethod
-    public VerifyResponse verify(final VerifyRequest request) {
+    @WebMethod(operationName = "verification")
+    @WebResult(name = "response")
+    public VerifyResponse verify(@WebParam(name = "request") final VerifyRequest request) {
         VerifyResponse response;
 
         try {

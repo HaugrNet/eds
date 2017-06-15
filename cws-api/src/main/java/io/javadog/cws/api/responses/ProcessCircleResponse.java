@@ -19,8 +19,7 @@ import javax.xml.bind.annotation.XmlType;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-// TODO find the cause of the problem why this cannot be deplyed with a camelCase name
-@XmlType(name = "ProcessCircleResponse")
+@XmlType(name = "processCircleResult")
 public final class ProcessCircleResponse extends CwsResponse {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */

@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.jws.WebMethod;
+import javax.jws.WebParam;
 import javax.jws.WebResult;
 import javax.jws.WebService;
 import javax.jws.soap.SOAPBinding;
@@ -36,7 +37,7 @@ import javax.xml.ws.BindingType;
  */
 @SOAPBinding
 @BindingType(javax.xml.ws.soap.SOAPBinding.SOAP11HTTP_BINDING)
-@WebService(name = "system", serviceName = "systemService", portName = "system", targetNamespace = "http://ws1.cws.javadog.io/")
+@WebService(name = "system", serviceName = "system", portName = "system", targetNamespace = "http://ws.cws.javadog.io/")
 public class SystemService implements System {
 
     private static final Logger log = LoggerFactory.getLogger(SystemService.class);
@@ -50,7 +51,7 @@ public class SystemService implements System {
      */
     @Override
     @WebMethod
-    @WebResult(name = "versionResponse")
+    @WebResult(name = "response")
     public VersionResponse version() {
         VersionResponse response;
 
@@ -73,7 +74,8 @@ public class SystemService implements System {
      */
     @Override
     @WebMethod
-    public SettingResponse settings(final SettingRequest request) {
+    @WebResult(name = "response")
+    public SettingResponse settings(@WebParam(name = "request") final SettingRequest request) {
         SettingResponse response;
 
         try {
@@ -95,7 +97,8 @@ public class SystemService implements System {
      */
     @Override
     @WebMethod
-    public FetchMemberResponse fetchMembers(final FetchMemberRequest request) {
+    @WebResult(name = "response")
+    public FetchMemberResponse fetchMembers(@WebParam(name = "request") final FetchMemberRequest request) {
         FetchMemberResponse response;
 
         try {
@@ -117,7 +120,8 @@ public class SystemService implements System {
      */
     @Override
     @WebMethod
-    public ProcessMemberResponse processMember(final ProcessMemberRequest request) {
+    @WebResult(name = "response")
+    public ProcessMemberResponse processMember(@WebParam(name = "request") final ProcessMemberRequest request) {
         ProcessMemberResponse response;
 
         try {
@@ -139,7 +143,8 @@ public class SystemService implements System {
      */
     @Override
     @WebMethod
-    public FetchCircleResponse fetchCircles(final FetchCircleRequest request) {
+    @WebResult(name = "response")
+    public FetchCircleResponse fetchCircles(@WebParam(name = "request") final FetchCircleRequest request) {
         FetchCircleResponse response;
 
         try {
@@ -161,7 +166,8 @@ public class SystemService implements System {
      */
     @Override
     @WebMethod
-    public ProcessCircleResponse processCircle(final ProcessCircleRequest request) {
+    @WebResult(name = "response")
+    public ProcessCircleResponse processCircle(@WebParam(name = "request") final ProcessCircleRequest request) {
         ProcessCircleResponse response;
 
         try {

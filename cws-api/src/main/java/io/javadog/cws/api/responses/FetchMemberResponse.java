@@ -25,7 +25,7 @@ import java.util.List;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "fetchMemberResponse", propOrder = { "members", "circles" })
+@XmlType(name = "fetchMemberResult", propOrder = { "members", "circles" })
 public final class FetchMemberResponse extends CwsResponse {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */

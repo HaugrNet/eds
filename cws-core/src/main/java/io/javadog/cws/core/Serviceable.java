@@ -117,7 +117,7 @@ public abstract class Serviceable<R extends CwsResponse, V extends Authenticatio
      * complete the request with this Request Object, the thrown Exception will
      * contain all the information needed to correct the problem.</p>
      *
-     * @param verifiable Given Request Object to verify
+     * @param verifiable Given Request Object to verifySignature
      * @throws VerificationException if the given Object is null or invalid
      */
     private static void verify(final Verifiable verifiable) {

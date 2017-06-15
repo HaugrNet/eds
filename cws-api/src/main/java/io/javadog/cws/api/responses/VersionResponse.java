@@ -20,14 +20,13 @@ import javax.xml.bind.annotation.XmlType;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-// TODO find the cause of the problem why this cannot be deplyed with a camelCase name
-@XmlType(name = "VersionResponse", propOrder = "version")
+@XmlType(name = "versionResult", propOrder = "version")
 public final class VersionResponse extends CwsResponse {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
-    @XmlElement
+    @XmlElement(name = "version")
     private String version = null;
 
     // =========================================================================

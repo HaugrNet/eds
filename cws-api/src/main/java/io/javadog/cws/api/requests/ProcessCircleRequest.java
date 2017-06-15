@@ -27,7 +27,7 @@ import java.util.Set;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "processCircleRequest", propOrder = { "action", "circle", "trustee" })
+@XmlType(name = "processCircleRequest", namespace = "api.cws.javadog.io", propOrder = { "action", "circle", "trustee" })
 public final class ProcessCircleRequest extends Authentication {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */

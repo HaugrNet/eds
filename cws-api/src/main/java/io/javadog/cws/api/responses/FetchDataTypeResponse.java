@@ -24,7 +24,7 @@ import java.util.List;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "fetchDataTypeResponse", propOrder = "types")
+@XmlType(name = "fetchDataTypeResponse", namespace = "api.cws.javadog.io", propOrder = "types")
 public final class FetchDataTypeResponse extends CwsResponse {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */

@@ -21,7 +21,7 @@ import java.io.Serializable;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "cwsResponse", propOrder = { "returnCode", "returnMessage" })
+@XmlType(name = "cwsResponse", namespace = "api.cws.javadog.io", propOrder = { "returnCode", "returnMessage" })
 public class CwsResponse implements Serializable {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */

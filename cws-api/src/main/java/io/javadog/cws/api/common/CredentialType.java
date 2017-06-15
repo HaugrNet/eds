@@ -7,6 +7,8 @@
  */
 package io.javadog.cws.api.common;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlType;
 
 /**
@@ -23,7 +25,8 @@ import javax.xml.bind.annotation.XmlType;
  * @author Kim Jensen
  * @since  CWS 1.0
  */
-@XmlType(name = "credentialType")
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(name = "credentialType", namespace = "api.cws.javadog.io")
 public enum CredentialType {
 
     /**

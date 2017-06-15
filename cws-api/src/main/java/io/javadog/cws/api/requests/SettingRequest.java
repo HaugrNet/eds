@@ -23,7 +23,7 @@ import java.util.Map;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "settingRequest", propOrder = "settings")
+@XmlType(name = "settingRequest", namespace = "api.cws.javadog.io", propOrder = "settings")
 public final class SettingRequest extends Authentication {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */

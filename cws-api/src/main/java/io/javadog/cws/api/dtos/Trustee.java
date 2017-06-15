@@ -28,7 +28,7 @@ import java.util.Map;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "trustee", propOrder = { "id", "circle", "member", "trustLevel", "changed", "since" })
+@XmlType(name = "trustee", namespace = "api.cws.javadog.io", propOrder = { "id", "circle", "member", "trustLevel", "changed", "since" })
 public final class Trustee extends Verifiable {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */

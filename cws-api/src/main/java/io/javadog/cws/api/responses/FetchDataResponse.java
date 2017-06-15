@@ -24,8 +24,7 @@ import java.util.List;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-// TODO Find out why we get a deployment error if this has a lowerCamelCase name
-@XmlType(name = "FetchDataResponse", propOrder = "data")
+@XmlType(name = "fetchDataResponse", namespace = "api.cws.javadog.io", propOrder = "data")
 public final class FetchDataResponse extends CwsResponse {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */

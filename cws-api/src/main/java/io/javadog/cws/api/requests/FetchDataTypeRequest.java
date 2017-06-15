@@ -19,7 +19,7 @@ import javax.xml.bind.annotation.XmlType;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "fetchDataTypeRequest")
+@XmlType(name = "fetchDataTypeRequest", namespace = "api.cws.javadog.io")
 public final class FetchDataTypeRequest extends Authentication {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */

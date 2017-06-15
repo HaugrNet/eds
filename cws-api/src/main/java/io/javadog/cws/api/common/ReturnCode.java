@@ -7,13 +7,16 @@
  */
 package io.javadog.cws.api.common;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlType;
 
 /**
  * @author Kim Jensen
  * @since CWS 1.0
  */
-@XmlType(name = "returnCode")
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(name = "returnCode", namespace = "api.cws.javadog.io")
 public enum ReturnCode {
 
     SUCCESS(Classification.CLASS_INFO, 0, "Request completed normally."),

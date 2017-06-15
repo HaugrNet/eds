@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.jws.WebMethod;
+import javax.jws.WebResult;
 import javax.jws.WebService;
 import javax.jws.soap.SOAPBinding;
 import javax.xml.ws.BindingType;
@@ -49,6 +50,7 @@ public class SystemService implements System {
      */
     @Override
     @WebMethod
+    @WebResult(name = "versionResponse")
     public VersionResponse version() {
         VersionResponse response;
 

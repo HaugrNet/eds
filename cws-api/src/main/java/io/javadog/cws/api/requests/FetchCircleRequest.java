@@ -22,7 +22,7 @@ import java.util.Map;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "fetchCircleRequest", propOrder = "circleId")
+@XmlType(name = "fetchCircleRequest", namespace = "api.cws.javadog.io", propOrder = "circleId")
 public final class FetchCircleRequest extends Authentication {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */

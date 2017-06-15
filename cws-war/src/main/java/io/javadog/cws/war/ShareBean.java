@@ -33,7 +33,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
 
 /**
@@ -44,8 +43,8 @@ public final class ShareBean implements Share {
 
     private static final Logger log = LoggerFactory.getLogger(ShareBean.class);
 
-    @PersistenceContext(unitName = "cwsDatabase")
-    private EntityManager entityManager;
+    //@PersistenceContext(unitName = "cwsDatabase")
+    private EntityManager entityManager = null;
 
     private final Settings settings = new Settings();
 

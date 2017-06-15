@@ -26,7 +26,7 @@ import java.util.List;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "fetchCircleResponse", propOrder = { "circles", "trustees" })
-public final class FetchCircleResponse extends CWSResponse {
+public final class FetchCircleResponse extends CwsResponse {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;

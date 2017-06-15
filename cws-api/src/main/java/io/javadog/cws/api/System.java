@@ -19,13 +19,10 @@ import io.javadog.cws.api.responses.ProcessMemberResponse;
 import io.javadog.cws.api.responses.SettingResponse;
 import io.javadog.cws.api.responses.VersionResponse;
 
-import javax.jws.WebService;
-
 /**
  * @author Kim Jensen
  * @since  CWS 1.0
  */
-@WebService
 public interface System {
 
     /**

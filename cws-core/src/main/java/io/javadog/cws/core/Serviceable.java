@@ -14,7 +14,7 @@ import io.javadog.cws.api.common.CredentialType;
 import io.javadog.cws.api.common.TrustLevel;
 import io.javadog.cws.api.common.Verifiable;
 import io.javadog.cws.api.dtos.Authentication;
-import io.javadog.cws.api.responses.CWSResponse;
+import io.javadog.cws.api.responses.CwsResponse;
 import io.javadog.cws.common.Crypto;
 import io.javadog.cws.common.Settings;
 import io.javadog.cws.common.exceptions.AuthenticationException;
@@ -42,7 +42,7 @@ import java.util.UUID;
  * @author Kim Jensen
  * @since  CWS 1.0
  */
-public abstract class Serviceable<R extends CWSResponse, V extends Authentication> {
+public abstract class Serviceable<R extends CwsResponse, V extends Authentication> {
 
     protected final Settings settings;
     protected final CommonDao dao;

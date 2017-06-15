@@ -21,8 +21,8 @@ import java.io.Serializable;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "CWSResponse", propOrder = { "returnCode", "returnMessage" })
-public class CWSResponse implements Serializable {
+@XmlType(name = "cwsResponse", propOrder = { "returnCode", "returnMessage" })
+public class CwsResponse implements Serializable {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
@@ -41,7 +41,7 @@ public class CWSResponse implements Serializable {
      * Empty Constructor, to use if the setters are invoked. This is required
      * for WebServices to work properly.
      */
-    public CWSResponse() {
+    public CwsResponse() {
         // Required for WebServices to work. Comment added to please Sonar.
     }
 
@@ -52,7 +52,7 @@ public class CWSResponse implements Serializable {
      * @param returnCode    The CWS Return Code
      * @param returnMessage The CWS Return Message
      */
-    public CWSResponse(final ReturnCode returnCode, final String returnMessage) {
+    public CwsResponse(final ReturnCode returnCode, final String returnMessage) {
         this.returnCode = returnCode;
         this.returnMessage = returnMessage;
     }

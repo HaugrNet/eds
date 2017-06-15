@@ -19,8 +19,9 @@ import javax.xml.bind.annotation.XmlType;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "signResponse")
-public final class SignResponse extends CWSResponse {
+// TODO Find out why we get a deployment error if this has a lowerCamelCase name
+@XmlType(name = "SignResponse")
+public final class SignResponse extends CwsResponse {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;

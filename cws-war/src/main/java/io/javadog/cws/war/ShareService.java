@@ -26,6 +26,8 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.jws.WebMethod;
+import javax.jws.WebParam;
+import javax.jws.WebResult;
 import javax.jws.WebService;
 import javax.jws.soap.SOAPBinding;
 import javax.xml.ws.BindingType;
@@ -36,10 +38,10 @@ import javax.xml.ws.BindingType;
  */
 @SOAPBinding
 @BindingType(javax.xml.ws.soap.SOAPBinding.SOAP11HTTP_BINDING)
-@WebService(name = "shareWS", serviceName = "shareWSService", portName = "shareWS", targetNamespace = "http://ws.cws.javadog.io/")
-public final class ShareSOAPService implements Share {
+@WebService(name = "share", serviceName = "shareService", portName = "share", targetNamespace = "http://ws1.cws.javadog.io/")
+public class ShareService implements Share {
 
-    private static final Logger log = LoggerFactory.getLogger(ShareSOAPService.class);
+    private static final Logger log = LoggerFactory.getLogger(ShareService.class);
 
     private static final String GENERAL_RETURN_MESSAGE = "An unknown error occurred. Please consult the CWS System Log.";
 
@@ -138,7 +140,8 @@ public final class ShareSOAPService implements Share {
      */
     @Override
     @WebMethod
-    public SignResponse sign(final SignRequest request) {
+    @WebResult(name = "response")
+    public SignResponse sign(@WebParam(name = "request") final SignRequest request) {
         SignResponse response;
 
         try {

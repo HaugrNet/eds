@@ -24,8 +24,8 @@ import java.util.List;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "fetchDataTypeResponse")
-public final class FetchDataTypeResponse extends CWSResponse {
+@XmlType(name = "fetchDataTypeResponse", propOrder = "types")
+public final class FetchDataTypeResponse extends CwsResponse {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;

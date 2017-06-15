@@ -33,7 +33,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
 import java.io.IOException;
 import java.io.InputStream;
@@ -48,8 +47,8 @@ public class SystemBean implements System {
 
     private static final Logger log = LoggerFactory.getLogger(SystemBean.class);
 
-    @PersistenceContext(unitName = "cwsDatabase")
-    private EntityManager entityManager;
+    //@PersistenceContext(unitName = "cwsDatabase")
+    private EntityManager entityManager = null;
 
     private final Settings settings = new Settings();
 

@@ -35,10 +35,10 @@ import javax.xml.ws.BindingType;
  */
 @SOAPBinding
 @BindingType(javax.xml.ws.soap.SOAPBinding.SOAP11HTTP_BINDING)
-@WebService(name = "systemWS", serviceName = "systemWSService", portName = "systemWS", targetNamespace = "http://ws.cws.javadog.io/")
-public class SystemSOAPService implements System {
+@WebService(name = "system", serviceName = "systemService", portName = "system", targetNamespace = "http://ws1.cws.javadog.io/")
+public class SystemService implements System {
 
-    private static final Logger log = LoggerFactory.getLogger(SystemSOAPService.class);
+    private static final Logger log = LoggerFactory.getLogger(SystemService.class);
 
     private static final String GENERAL_RETURN_MESSAGE = "An unknown error occurred. Please consult the CWS System Log.";
 

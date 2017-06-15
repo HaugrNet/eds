@@ -7,6 +7,7 @@
  */
 package io.javadog.cws.api.common;
 
+import javax.xml.bind.annotation.XmlType;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Map;
@@ -27,6 +28,7 @@ import java.util.regex.Pattern;
  * @author Kim Jensen
  * @since  CWS 1.0
  */
+@XmlType(name = "verifiable")
 public abstract class Verifiable implements Serializable {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */

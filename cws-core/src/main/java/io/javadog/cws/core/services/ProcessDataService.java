@@ -9,8 +9,8 @@ package io.javadog.cws.core.services;
 
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.common.TrustLevel;
-import io.javadog.cws.api.dtos.Data;
 import io.javadog.cws.api.dtos.DataType;
+import io.javadog.cws.api.dtos.MetaData;
 import io.javadog.cws.api.requests.ProcessDataRequest;
 import io.javadog.cws.api.responses.ProcessDataResponse;
 import io.javadog.cws.common.Settings;
@@ -66,26 +66,26 @@ public final class ProcessDataService extends Serviceable<ProcessDataResponse, P
     }
 
     private ProcessDataResponse process(final ProcessDataRequest request) {
-        final Data data = request.getData();
         final ProcessDataResponse response;
 
-        if (data.getId() != null) {
-            response = processExistingData(data);
+        if (request.getData().getId() != null) {
+            response = processExistingData(request);
         } else {
-            response = processNewData(data);
+            response = processNewData(request);
         }
 
         return response;
     }
 
-    private ProcessDataResponse processExistingData(final Data data) {
+    private ProcessDataResponse processExistingData(final ProcessDataRequest request) {
+        final MetaData data = request.getData();
         final DataEntity entity = dao.findDataByMemberAndExternalId(member, data.getId());
         final ProcessDataResponse response;
 
         if (entity != null) {
             final MetaDataEntity folder = checkFolder(entity, data.getFolderId());
             checkName(entity, data.getName());
-            checkData(entity, data.getBytes());
+            checkData(entity, request.getBytes());
             dao.persist(entity.getMetadata());
 
             response = new ProcessDataResponse();
@@ -163,14 +163,14 @@ public final class ProcessDataService extends Serviceable<ProcessDataResponse, P
         }
     }
 
-    private static Data buildDataObject(final DataEntity entity, final MetaDataEntity folder) {
+    private static MetaData buildDataObject(final DataEntity entity, final MetaDataEntity folder) {
         final MetaDataEntity metaDataEntity = entity.getMetadata();
 
         final DataType type = new DataType();
         type.setName(metaDataEntity.getType().getName());
         type.setType(metaDataEntity.getType().getType());
 
-        final Data data = new Data();
+        final MetaData data = new MetaData();
         data.setId(metaDataEntity.getExternalId());
         data.setCircleId(metaDataEntity.getCircle().getExternalId());
         data.setName(metaDataEntity.getName());
@@ -184,7 +184,7 @@ public final class ProcessDataService extends Serviceable<ProcessDataResponse, P
         return data;
     }
 
-    private ProcessDataResponse processNewData(final Data data) {
+    private ProcessDataResponse processNewData(final ProcessDataRequest request) {
         return null;
     }
 

@@ -9,7 +9,7 @@ package io.javadog.cws.api.responses;
 
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
-import io.javadog.cws.api.dtos.Data;
+import io.javadog.cws.api.dtos.MetaData;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -24,14 +24,17 @@ import java.util.List;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "fetchDataResult", propOrder = "data")
+@XmlType(name = "fetchDataResult", propOrder = { "data", "bytes" })
 public final class FetchDataResponse extends CwsResponse {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
     @XmlElement(name = "data")
-    private final List<Data> data = new ArrayList<>(0);
+    private final List<MetaData> data = new ArrayList<>(0);
+
+    @XmlElement(name = "bytes")
+    private byte[] bytes = null;
 
     // =========================================================================
     // Object Constructors
@@ -60,11 +63,19 @@ public final class FetchDataResponse extends CwsResponse {
     // Setters & Getters
     // =========================================================================
 
-    public void setData(final List<Data> data) {
+    public void setData(final List<MetaData> data) {
         this.data.addAll(data);
     }
 
-    public List<Data> getData() {
+    public List<MetaData> getData() {
         return Collections.unmodifiableList(data);
+    }
+
+    public void setBytes(final byte[] bytes) {
+        this.bytes = bytes;
+    }
+
+    public byte[] getBytes() {
+        return bytes;
     }
 }

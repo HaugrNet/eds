@@ -8,8 +8,8 @@
 package io.javadog.cws.core.services;
 
 import io.javadog.cws.api.common.ReturnCode;
-import io.javadog.cws.api.dtos.Data;
 import io.javadog.cws.api.dtos.DataType;
+import io.javadog.cws.api.dtos.MetaData;
 import io.javadog.cws.api.requests.FetchDataRequest;
 import io.javadog.cws.api.responses.FetchDataResponse;
 import io.javadog.cws.common.Settings;
@@ -98,10 +98,10 @@ public final class FetchDataService extends Serviceable<FetchDataResponse, Fetch
     }
 
     private static FetchDataResponse prepareResponse(final String folderId, final List<MetaDataEntity> records) {
-        final List<Data> list = new ArrayList<>(records.size());
+        final List<MetaData> list = new ArrayList<>(records.size());
 
         for (final MetaDataEntity metadata : records) {
-            final Data data = new Data();
+            final MetaData data = new MetaData();
             data.setId(metadata.getExternalId());
             data.setCircleId(metadata.getCircle().getExternalId());
             data.setFolderId(folderId);
@@ -129,18 +129,19 @@ public final class FetchDataService extends Serviceable<FetchDataResponse, Fetch
             final Key key = extractCircleKey(entity);
             final IvParameterSpec iv = crypto.generateInitialVector(entity.getInitialVector());
             final byte[] bytes = crypto.decrypt(key, iv, entity.getData());
-            final FetchDataResponse response = new FetchDataResponse();
-            final Data data = new Data();
+            final MetaData data = new MetaData();
             data.setTypeName(entity.getMetadata().getType().getName());
             data.setName(entity.getMetadata().getName());
             data.setId(entity.getMetadata().getExternalId());
             data.setCircleId(entity.getMetadata().getCircle().getExternalId());
             data.setAdded(entity.getMetadata().getCreated());
             data.setFolderId(readFolder(entity.getMetadata().getParentId()));
-            data.setBytes(bytes);
-            final List<Data> objects = new ArrayList<>(1);
+            final List<MetaData> objects = new ArrayList<>(1);
             objects.add(data);
+
+            final FetchDataResponse response = new FetchDataResponse();
             response.setData(objects);
+            response.setBytes(bytes);
 
             return response;
         } else {

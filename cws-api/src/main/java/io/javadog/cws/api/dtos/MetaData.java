@@ -25,8 +25,8 @@ import java.util.Map;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "data", propOrder = { "id", "circleId", "folderId", "name", "typeName", "bytes", "added" })
-public final class Data extends Verifiable {
+@XmlType(name = "metaData", propOrder = { "id", "circleId", "folderId", "name", "typeName", "added" })
+public final class MetaData extends Verifiable {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
@@ -37,7 +37,6 @@ public final class Data extends Verifiable {
     private static final String FIELD_FOLDER_ID = "folderId";
     private static final String FIELD_NAME = "name";
     private static final String FIELD_TYPENAME = "typeName";
-    private static final String FIELD_BYTES = "bytes";
     private static final String FIELD_ADDED = "added";
 
     @XmlElement(name = FIELD_ID, required = true, nillable = true)
@@ -54,9 +53,6 @@ public final class Data extends Verifiable {
 
     @XmlElement(name = FIELD_TYPENAME, required = true)
     private String typeName = null;
-
-    @XmlElement(name = FIELD_BYTES, required = true, nillable = true)
-    private byte[] bytes = null;
 
     @XmlElement(name = FIELD_ADDED)
     private Date added = null;
@@ -113,14 +109,6 @@ public final class Data extends Verifiable {
 
     public String getTypeName() {
         return typeName;
-    }
-
-    public void setBytes(final byte[] bytes) {
-        this.bytes = bytes;
-    }
-
-    public byte[] getBytes() {
-        return bytes;
     }
 
     public void setAdded(final Date added) {

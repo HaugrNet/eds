@@ -9,7 +9,7 @@ package io.javadog.cws.api.responses;
 
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
-import io.javadog.cws.api.dtos.Data;
+import io.javadog.cws.api.dtos.MetaData;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -28,7 +28,7 @@ public final class ProcessDataResponse extends CwsResponse {
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
     @XmlElement(name = "id", required = true)
-    private Data data = null;
+    private MetaData data = null;
 
     // =========================================================================
     // Object Constructors
@@ -57,11 +57,11 @@ public final class ProcessDataResponse extends CwsResponse {
     // Standard Setters & Getters
     // =========================================================================
 
-    public void setData(final Data data) {
+    public void setData(final MetaData data) {
         this.data = data;
     }
 
-    public Data getData() {
+    public MetaData getData() {
         return data;
     }
 }

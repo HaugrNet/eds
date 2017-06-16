@@ -10,7 +10,7 @@ package io.javadog.cws.api.requests;
 import io.javadog.cws.api.common.Action;
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.dtos.Authentication;
-import io.javadog.cws.api.dtos.Data;
+import io.javadog.cws.api.dtos.MetaData;
 
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -26,7 +26,7 @@ import java.util.Set;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "processDataRequest", propOrder = { "action", "dataId", "data" })
+@XmlType(name = "processDataRequest", propOrder = { "action", "dataId", "data", "bytes" })
 public final class ProcessDataRequest extends Authentication {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
@@ -36,6 +36,7 @@ public final class ProcessDataRequest extends Authentication {
     private static final String FIELD_ACTION = "action";
     private static final String FIELD_DATA_ID = "dataId";
     private static final String FIELD_DATA = "data";
+    private static final String FIELD_BYTES = "bytes";
 
     @XmlElement(name = FIELD_ACTION, required = true)
     private Action action = Action.PROCESS;
@@ -44,7 +45,10 @@ public final class ProcessDataRequest extends Authentication {
     private String dataId = null;
 
     @XmlElement(name = FIELD_DATA, required = true, nillable = true)
-    private Data data = null;
+    private MetaData data = null;
+
+    @XmlElement(name = FIELD_BYTES, nillable = true)
+    private byte[] bytes = null;
 
     // =========================================================================
     // Standard Setters & Getters
@@ -81,13 +85,21 @@ public final class ProcessDataRequest extends Authentication {
         return dataId;
     }
 
-    public void setData(final Data data) {
+    public void setData(final MetaData data) {
         ensureVerifiable(FIELD_DATA, data);
         this.data = data;
     }
 
-    public Data getData() {
+    public MetaData getData() {
         return data;
+    }
+
+    public void setBytes(final byte[] bytes) {
+        this.bytes = bytes;
+    }
+
+    public byte[] getBytes() {
+        return bytes;
     }
 
     // =========================================================================

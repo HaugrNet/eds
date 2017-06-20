@@ -21,7 +21,7 @@ it useful.
 
 # Release Plan
 The CWS has left the initial design, and is currently being implemented. The
-first working alpha release is scheduled for Spring 2017 with the final version
+first working alpha release is scheduled for Summer 2017 with the final version
 1.0 release later in 2017.
 
 # Software License

@@ -37,7 +37,6 @@ public class Authentication extends Verifiable {
     private static final String FIELD_ACCOUNT = "account";
     private static final String FIELD_TYPE = "credentialType";
     private static final String FIELD_CREDENTIAL = "credential";
-    private static final int NAME_MIN_LENGTH = 1;
     private static final int NAME_MAX_LENGTH = 75;
 
     @XmlElement(name = FIELD_ACCOUNT, required = true)
@@ -54,10 +53,10 @@ public class Authentication extends Verifiable {
     // =========================================================================
 
     @NotNull
-    @Size(min = NAME_MIN_LENGTH, max = NAME_MAX_LENGTH)
+    @Size(min = 1, max = NAME_MAX_LENGTH)
     public void setAccount(final String account) {
         ensureNotNull(FIELD_ACCOUNT, account);
-        ensureLength(FIELD_ACCOUNT, account, NAME_MIN_LENGTH, NAME_MAX_LENGTH);
+        ensureNotEmptyOrTooLong(FIELD_ACCOUNT, account, NAME_MAX_LENGTH);
         this.account = account;
     }
 

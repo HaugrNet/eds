@@ -98,6 +98,28 @@ public final class CommonJpaDao implements CommonDao {
      * {@inheritDoc}
      */
     @Override
+    public MemberEntity findMemberByNameAndGroupId(final String name, final String externalGroupId) {
+        final Query query = entityManager.createNamedQuery("member.findByNameAndGroup");
+        query.setParameter("name", name);
+        query.setParameter("ecid", externalGroupId);
+
+        final List<MemberEntity> found = query.getResultList();
+
+        if (found.isEmpty()) {
+            throw new ModelException(ReturnCode.IDENTIFICATION_WARNING, "No member found with '" + name + "'.");
+        }
+
+        if (found.size() > 1) {
+            throw new ModelException(ReturnCode.CONSTRAINT_ERROR, "Could not uniquely identify a member with '" + name + "'.");
+        }
+
+        return found.get(0);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public List<TrusteeEntity> findTrustByMember(final MemberEntity member) {
         final Query query = entityManager.createNamedQuery("trust.findByMemberId");
         query.setParameter("id", member.getId());

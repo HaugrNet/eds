@@ -32,8 +32,13 @@ import java.security.KeyPair;
                         "order by name asc"),
         @NamedQuery(name = "member.findByName",
                 query = "select m " +
-                        "from MemberEntity m" +
-                        " where name = :name")
+                        "from MemberEntity m " +
+                        "where name = :name"),
+        @NamedQuery(name = "member.findByNameAndGroup",
+                query = "select e.member " +
+                        "from TrusteeEntity e " +
+                        "where e.member.name = :name" +
+                        "  and e.circle.externalId = :ecid")
 })
 @Table(name = "members")
 public class MemberEntity extends Externable {

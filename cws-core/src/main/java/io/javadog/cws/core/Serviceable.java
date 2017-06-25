@@ -84,7 +84,7 @@ public abstract class Serviceable<R extends CwsResponse, V extends Authenticatio
      * @param verifiable Request Object to use for the checks
      * @param action     The Action for the permission check
      */
-    protected void verifyRequest(final V verifiable, final Permission action) {
+    protected void verifyRequest(final V verifiable, final Permission action, final String... circleId) {
         // Step 1; Verify if the given data is sufficient to complete the
         //         request. If not sufficient, no need to continue and involve
         //         the DB, so an Exception will be thrown.
@@ -94,7 +94,12 @@ public abstract class Serviceable<R extends CwsResponse, V extends Authenticatio
         //         found, then no need to continue. Unless, the account not
         //         found is the Administrator Account, in which case we will
         //         add a new Account with the given Credentials.
-        checkAccount(verifiable);
+        //           Note; if the CircleId is already given, it will be used as
+        //         part of the lookup, thus limiting what is being searched and
+        //         also allow the checks to end earlier. However, equally
+        //         important, this check is a premature check and will *not*
+        //         count in the final business logic!
+        checkAccount(verifiable, circleId);
 
         // Step 3; Check if the Member is valid, i.e. if the given Credentials
         //         can correctly decrypt the Private Key for the Account. If
@@ -142,9 +147,13 @@ public abstract class Serviceable<R extends CwsResponse, V extends Authenticatio
         }
     }
 
-    private void checkAccount(final V verifiable) {
+    private void checkAccount(final V verifiable, final String... circleId) {
         try {
-            member = dao.findMemberByName(verifiable.getAccount());
+            if ((circleId != null) && (circleId.length == 1)) {
+                member = dao.findMemberByNameAndGroupId(verifiable.getAccount(), circleId[0]);
+            } else {
+                member = dao.findMemberByName(verifiable.getAccount());
+            }
         } catch (ModelException e) {
             if ((e.getReturnCode() == IDENTIFICATION_WARNING) && Objects.equals(ADMIN_ACCOUNT, verifiable.getAccount())) {
                 member = createNewAdminAccount(verifiable);

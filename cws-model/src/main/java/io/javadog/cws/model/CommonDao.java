@@ -35,6 +35,8 @@ public interface CommonDao {
 
     MemberEntity findMemberByName(String name);
 
+    MemberEntity findMemberByNameAndGroupId(String name, String externalGroupId);
+
     List<TrusteeEntity> findTrustByMember(MemberEntity member);
 
     List<SettingEntity> readSettings();

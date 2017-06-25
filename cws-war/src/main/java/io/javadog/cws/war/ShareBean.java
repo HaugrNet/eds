@@ -32,6 +32,7 @@ import io.javadog.cws.core.services.VerifyService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
 
@@ -39,6 +40,7 @@ import javax.transaction.Transactional;
  * @author Kim Jensen
  * @since  CWS 1.0
  */
+@Stateless
 public final class ShareBean implements Share {
 
     private static final Logger log = LoggerFactory.getLogger(ShareBean.class);

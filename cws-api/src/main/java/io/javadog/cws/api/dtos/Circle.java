@@ -34,7 +34,6 @@ public final class Circle extends Verifiable {
     private static final String FIELD_ID = "id";
     private static final String FIELD_NAME = "name";
     private static final String FIELD_CREATED = "created";
-    private static final int NAME_MIN_LENGTH = 1;
     private static final int NAME_MAX_LENGTH = 75;
 
     @XmlElement(name = FIELD_ID, required = true)
@@ -61,10 +60,10 @@ public final class Circle extends Verifiable {
     }
 
     @NotNull
-    @Size(min = NAME_MIN_LENGTH, max = NAME_MAX_LENGTH)
+    @Size(min = 1, max = NAME_MAX_LENGTH)
     public void setName(final String name) {
         ensureNotNull(FIELD_NAME, name);
-        ensureLength(FIELD_NAME, name, NAME_MIN_LENGTH, NAME_MAX_LENGTH);
+        ensureNotEmptyOrTooLong(FIELD_NAME, name, NAME_MAX_LENGTH);
         this.name = name;
     }
 

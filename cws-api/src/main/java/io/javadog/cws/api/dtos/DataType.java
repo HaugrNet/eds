@@ -47,7 +47,7 @@ public final class DataType extends Verifiable {
     @Size(min = 1, max = MAX_LENGTH)
     public void setName(final String name) {
         ensureNotNull(FIELD_NAME, name);
-        ensureLength(FIELD_NAME, name, 1, MAX_LENGTH);
+        ensureNotEmptyOrTooLong(FIELD_NAME, name, MAX_LENGTH);
         this.name = name;
     }
 
@@ -59,7 +59,7 @@ public final class DataType extends Verifiable {
     @Size(min = 1, max = MAX_LENGTH)
     public void setType(final String type) {
         ensureNotNull(FIELD_TYPE, type);
-        ensureLength(FIELD_TYPE, type, 1, MAX_LENGTH);
+        ensureNotEmptyOrTooLong(FIELD_TYPE, type, MAX_LENGTH);
         this.type = type;
     }
 

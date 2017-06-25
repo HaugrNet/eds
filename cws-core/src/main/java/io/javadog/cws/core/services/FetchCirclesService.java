@@ -42,7 +42,7 @@ public final class FetchCirclesService extends Serviceable<FetchCircleResponse, 
      */
     @Override
     public FetchCircleResponse perform(final FetchCircleRequest request) {
-        verifyRequest(request, Permission.FETCH_CIRCLE);
+        verifyRequest(request, Permission.FETCH_CIRCLE, readExternalCircleId(request));
         final FetchCircleResponse response = new FetchCircleResponse();
 
         if (request.getCircleId() != null) {
@@ -83,6 +83,10 @@ public final class FetchCirclesService extends Serviceable<FetchCircleResponse, 
         }
 
         return response;
+    }
+
+    private static String readExternalCircleId(final FetchCircleRequest request) {
+        return (request != null) ? request.getCircleId() : null;
     }
 
     /**

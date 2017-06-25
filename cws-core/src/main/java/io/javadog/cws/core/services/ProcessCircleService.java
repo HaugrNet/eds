@@ -34,8 +34,18 @@ public final class ProcessCircleService extends Serviceable<ProcessCircleRespons
      */
     @Override
     public ProcessCircleResponse perform(final ProcessCircleRequest request) {
-        verifyRequest(request, Permission.PROCESS_CIRCLE);
+        verifyRequest(request, Permission.PROCESS_CIRCLE, readExternalCircleId(request));
 
         throw new CWSException(ReturnCode.NOTIMPLEMENTED_ERROR, "Not Yet Implemented.");
+    }
+
+    private static String readExternalCircleId(final ProcessCircleRequest request) {
+        String circleId = null;
+
+        if ((request != null) && (request.getCircle() != null)) {
+            circleId = request.getCircle().getId();
+        }
+
+        return circleId;
     }
 }

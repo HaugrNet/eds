@@ -124,6 +124,20 @@ public class DatabaseSetup {
 
     /**
      * Setting the cause of an error to expect. This consists of the CWS
+     * Exception &amp; Message.
+     *
+     * @param cause         CWS Exception to except
+     * @param returnMessage The Return Message
+     * @param <E>           The Exception, must extend a CWS Exception
+     */
+    protected <E extends CWSException> void prepareCause(final Class<E> cause, final String returnMessage) {
+        final String propertyName = "returnCode";
+        thrown.expect(cause);
+        thrown.expectMessage(returnMessage);
+    }
+
+    /**
+     * Setting the cause of an error to expect. This consists of the CWS
      * Exception, Return Code &amp; Message.
      *
      * @param cause         CWS Exception to except

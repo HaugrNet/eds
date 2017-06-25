@@ -18,6 +18,7 @@ import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.requests.FetchCircleRequest;
 import io.javadog.cws.api.responses.FetchCircleResponse;
 import io.javadog.cws.common.Settings;
+import io.javadog.cws.common.exceptions.ModelException;
 import io.javadog.cws.common.exceptions.VerificationException;
 import io.javadog.cws.core.Serviceable;
 import io.javadog.cws.model.DatabaseSetup;
@@ -80,19 +81,12 @@ public final class FetchCirclesServiceTest extends DatabaseSetup {
 
     @Test
     public void testFetchAllCirclesAsMember1() {
+        prepareCause(ModelException.class, "No member found with 'member1'.");
+
         final Serviceable<FetchCircleResponse, FetchCircleRequest> service = prepareService();
         final FetchCircleRequest request = buildRequestWithCredentials("member1");
-        final FetchCircleResponse response = service.perform(request);
-
-        assertThat(response, is(not(nullValue())));
-        assertThat(response.isOk(), is(true));
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
-        assertThat(response.getReturnMessage(), is("Ok"));
-        assertThat(response.getCircles().size(), is(3));
-        assertThat(response.getCircles().get(0).getName(), is("circle1"));
-        assertThat(response.getCircles().get(1).getName(), is("circle2"));
-        assertThat(response.getCircles().get(2).getName(), is("circle3"));
-        assertThat(response.getTrustees().isEmpty(), is(true));
+        assertThat(request, is(not(nullValue())));
+        service.perform(request);
     }
 
     @Test
@@ -185,43 +179,32 @@ public final class FetchCirclesServiceTest extends DatabaseSetup {
 
     @Test
     public void testFetchCircle1WithShowTrueAsMember5() {
+        prepareCause(ModelException.class, "No member found with 'member5'.");
+
         // Ensure that we have the correct settings for the Service
         settings.set(Settings.SHOW_TRUSTEES, "true");
 
         final Serviceable<FetchCircleResponse, FetchCircleRequest> service = prepareService();
         final CircleEntity circle = findFirstCircle();
         final FetchCircleRequest request = buildRequestWithCredentials("member5");
+        assertThat(request, is(not(nullValue())));
         request.setCircleId(circle.getExternalId());
-        final FetchCircleResponse response = service.perform(request);
-
-        assertThat(response, is(not(nullValue())));
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
-        assertThat(response.getReturnMessage(), is("Ok"));
-        assertThat(response.getCircles().size(), is(1));
-        assertThat(response.getCircles().get(0).getName(), is("circle1"));
-        assertThat(response.getTrustees().size(), is(3));
-        assertThat(response.getTrustees().get(0).getMember().getAuthentication().getAccount(), is("member1"));
-        assertThat(response.getTrustees().get(1).getMember().getAuthentication().getAccount(), is("member2"));
-        assertThat(response.getTrustees().get(2).getMember().getAuthentication().getAccount(), is("member3"));
+        service.perform(request);
     }
 
     @Test
     public void testFetchCircle1WithShowFalseAsMember5() {
+        prepareCause(ModelException.class, "No member found with 'member5'.");
+
         // Ensure that we have the correct settings for the Service
         settings.set(Settings.SHOW_TRUSTEES, "false");
 
         final Serviceable<FetchCircleResponse, FetchCircleRequest> service = prepareService();
         final CircleEntity circle = findFirstCircle();
         final FetchCircleRequest request = buildRequestWithCredentials("member5");
+        assertThat(request, is(not(nullValue())));
         request.setCircleId(circle.getExternalId());
-        final FetchCircleResponse response = service.perform(request);
-
-        assertThat(response, is(not(nullValue())));
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
-        assertThat(response.getReturnMessage(), is("Ok"));
-        assertThat(response.getCircles().size(), is(1));
-        assertThat(response.getCircles().get(0).getName(), is("circle1"));
-        assertThat(response.getTrustees().isEmpty(), is(true));
+        service.perform(request);
     }
 
     // =========================================================================

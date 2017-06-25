@@ -47,9 +47,10 @@ public abstract class Serviceable<R extends CwsResponse, V extends Authenticatio
     protected final Settings settings;
     protected final CommonDao dao;
     protected final Crypto crypto;
-    protected List<TrusteeEntity> trustees;
-    protected MemberEntity member;
-    protected KeyPair keyPair;
+
+    protected List<TrusteeEntity> trustees = null;
+    protected MemberEntity member = null;
+    protected KeyPair keyPair = null;
 
     protected Serviceable(final Settings settings, final EntityManager entityManager) {
         this.dao = new CommonJpaDao(entityManager);
@@ -84,7 +85,7 @@ public abstract class Serviceable<R extends CwsResponse, V extends Authenticatio
      * @param verifiable Request Object to use for the checks
      * @param action     The Action for the permission check
      */
-    protected void verifyRequest(final V verifiable, final Permission action, final String... circleId) {
+    protected void verifyRequest(final V verifiable, final Permission action, final String... externalCircleId) {
         // Step 1; Verify if the given data is sufficient to complete the
         //         request. If not sufficient, no need to continue and involve
         //         the DB, so an Exception will be thrown.
@@ -98,8 +99,8 @@ public abstract class Serviceable<R extends CwsResponse, V extends Authenticatio
         //         part of the lookup, thus limiting what is being searched and
         //         also allow the checks to end earlier. However, equally
         //         important, this check is a premature check and will *not*
-        //         count in the final business logic!
-        checkAccount(verifiable, circleId);
+        //         count in the final Business Logic!
+        checkAccount(verifiable, externalCircleId);
 
         // Step 3; Check if the Member is valid, i.e. if the given Credentials
         //         can correctly decrypt the Private Key for the Account. If
@@ -110,7 +111,11 @@ public abstract class Serviceable<R extends CwsResponse, V extends Authenticatio
         //         level of Access to any Circle - which doesn't necessarily
         //         mean to the requesting Circle, as it requires deeper
         //         checking.
-        checkAuthorization(action);
+        //           Note; if the CircleId is already given, then it will be
+        //         used to also check of the Member is Authorized. Again, this
+        //         check is only a premature check and will not count against
+        //         the final checks in the Business Logic.
+        checkAuthorization(action, externalCircleId);
     }
 
     /**
@@ -149,7 +154,10 @@ public abstract class Serviceable<R extends CwsResponse, V extends Authenticatio
 
     private void checkAccount(final V verifiable, final String... circleId) {
         try {
-            if ((circleId != null) && (circleId.length == 1)) {
+            // If the External Circle Id is given and the member is not the
+            // Administrator (who cannot be part of a Circle), we will use
+            // the CircleId in the checks.
+            if ((circleId != null) && (circleId.length == 1) && !Objects.equals(verifiable.getAccount(), ADMIN_ACCOUNT)) {
                 member = dao.findMemberByNameAndCircleId(verifiable.getAccount(), circleId[0]);
             } else {
                 member = dao.findMemberByName(verifiable.getAccount());
@@ -239,6 +247,7 @@ public abstract class Serviceable<R extends CwsResponse, V extends Authenticatio
                     trusted = true;
                 }
             }
+
             if (!trusted) {
                 throw new AuthorizationException("The requesting Account is not permitted to " + action.getDescription());
             }

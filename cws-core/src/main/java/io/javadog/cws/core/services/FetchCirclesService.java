@@ -42,10 +42,11 @@ public final class FetchCirclesService extends Serviceable<FetchCircleResponse, 
      */
     @Override
     public FetchCircleResponse perform(final FetchCircleRequest request) {
-        verifyRequest(request, Permission.FETCH_CIRCLE, readExternalCircleId(request));
+        final String circleId = readExternalCircleId(request);
+        verifyRequest(request, Permission.FETCH_CIRCLE, circleId);
         final FetchCircleResponse response = new FetchCircleResponse();
 
-        if (request.getCircleId() != null) {
+        if (circleId != null) {
             // First retrieve the Circle via the ExternalId given. If no Circle
             // is found, the DAO will throw an Exception.
             final CircleEntity circle = dao.findCircleByExternalId(request.getCircleId());

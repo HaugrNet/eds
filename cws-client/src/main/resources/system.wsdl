@@ -1,0 +1,521 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+                  xmlns:tns="http://ws1.cws.javadog.io/"
+                  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+                  xmlns:ns1="http://schemas.xmlsoap.org/soap/http"
+                  name="systemService"
+                  targetNamespace="http://ws1.cws.javadog.io/">
+  <wsdl:types>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://ws1.cws.javadog.io/" xmlns:ns1="api.cws.javadog.io" elementFormDefault="unqualified" targetNamespace="http://ws1.cws.javadog.io/" version="1.0">
+
+  <xs:import namespace="api.cws.javadog.io"/>
+
+  <xs:element name="fetchCircles" type="tns:fetchCircles"/>
+
+  <xs:element name="fetchCirclesResponse" type="tns:fetchCirclesResponse"/>
+
+  <xs:element name="fetchMembers" type="tns:fetchMembers"/>
+
+  <xs:element name="fetchMembersResponse" type="tns:fetchMembersResponse"/>
+
+  <xs:element name="processCircle" type="tns:processCircle"/>
+
+  <xs:element name="processCircleResponse" type="tns:processCircleResponse"/>
+
+  <xs:element name="processMember" type="tns:processMember"/>
+
+  <xs:element name="processMemberResponse" type="tns:processMemberResponse"/>
+
+  <xs:element name="settings" type="tns:settings"/>
+
+  <xs:element name="settingsResponse" type="tns:settingsResponse"/>
+
+  <xs:element name="version" type="tns:version"/>
+
+  <xs:element name="versionResponse" type="tns:versionResponse"/>
+
+  <xs:complexType name="settings">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="arg0" type="ns1:settingRequest"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="settingsResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="ns1:settingResponse"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="processMember">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="arg0" type="ns1:processMemberRequest"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="processMemberResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="ns1:processMemberResponse"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="fetchCircles">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="arg0" type="ns1:fetchCircleRequest"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="fetchCirclesResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="ns1:fetchCircleResponse"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="fetchMembers">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="arg0" type="ns1:fetchMemberRequest"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="fetchMembersResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="ns1:fetchMemberResponse"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="version">
+    <xs:sequence/>
+  </xs:complexType>
+
+  <xs:complexType name="versionResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="versionResponse" type="ns1:versionResponse"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="processCircle">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="arg0" type="ns1:processCircleRequest"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="processCircleResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="ns1:processCircleResponse"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:simpleType name="classification">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="CLASS_INFO"/>
+      <xs:enumeration value="CLASS_WARNING"/>
+      <xs:enumeration value="CLASS_ERROR"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+</xs:schema>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="api.cws.javadog.io" targetNamespace="api.cws.javadog.io" version="1.0">
+
+  <xs:complexType final="extension restriction" name="settingRequest">
+    <xs:complexContent>
+      <xs:extension base="tns:authentication">
+        <xs:sequence>
+          <xs:element name="settings">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element maxOccurs="unbounded" minOccurs="0" name="entry">
+                  <xs:complexType>
+                    <xs:sequence>
+                      <xs:element minOccurs="0" name="key" type="xs:string"/>
+                      <xs:element minOccurs="0" name="value" type="xs:string"/>
+                    </xs:sequence>
+                  </xs:complexType>
+                </xs:element>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="authentication">
+    <xs:complexContent>
+      <xs:extension base="tns:verifiable">
+        <xs:sequence>
+          <xs:element name="account" type="xs:string"/>
+          <xs:element name="credentialType" type="tns:credentialType"/>
+          <xs:element maxOccurs="unbounded" name="credential" type="xs:unsignedShort"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType abstract="true" name="verifiable">
+    <xs:sequence/>
+  </xs:complexType>
+
+  <xs:complexType final="extension restriction" name="settingResponse">
+    <xs:complexContent>
+      <xs:extension base="tns:cwsResponse">
+        <xs:sequence>
+          <xs:element name="settings">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element maxOccurs="unbounded" minOccurs="0" name="entry">
+                  <xs:complexType>
+                    <xs:sequence>
+                      <xs:element minOccurs="0" name="key" type="xs:string"/>
+                      <xs:element minOccurs="0" name="value" type="xs:string"/>
+                    </xs:sequence>
+                  </xs:complexType>
+                </xs:element>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="cwsResponse">
+    <xs:sequence>
+      <xs:element name="returnCode" type="tns:returnCode"/>
+      <xs:element name="returnMessage" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType final="extension restriction" name="processMemberRequest">
+    <xs:complexContent>
+      <xs:extension base="tns:authentication">
+        <xs:sequence>
+          <xs:element name="action" type="tns:action"/>
+          <xs:element name="member" type="tns:member"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType final="extension restriction" name="member">
+    <xs:complexContent>
+      <xs:extension base="tns:verifiable">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="id" type="xs:string"/>
+          <xs:element name="authentication" type="tns:authentication"/>
+          <xs:element minOccurs="0" name="added" type="xs:dateTime"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType final="extension restriction" name="processMemberResponse">
+    <xs:complexContent>
+      <xs:extension base="tns:cwsResponse">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="id" type="xs:string"/>
+          <xs:element minOccurs="0" name="member" type="tns:member"/>
+          <xs:element minOccurs="0" name="armoredKey" type="xs:string"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType final="extension restriction" name="fetchCircleRequest">
+    <xs:complexContent>
+      <xs:extension base="tns:authentication">
+        <xs:sequence>
+          <xs:element name="circleId" nillable="true" type="xs:string"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType final="extension restriction" name="fetchCircleResponse">
+    <xs:complexContent>
+      <xs:extension base="tns:cwsResponse">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" name="circles" type="tns:circle"/>
+          <xs:element maxOccurs="unbounded" name="trustees" type="tns:trustee"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType final="extension restriction" name="circle">
+    <xs:complexContent>
+      <xs:extension base="tns:verifiable">
+        <xs:sequence>
+          <xs:element name="id" type="xs:string"/>
+          <xs:element name="name" type="xs:string"/>
+          <xs:element minOccurs="0" name="created" type="xs:dateTime"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType final="extension restriction" name="trustee">
+    <xs:complexContent>
+      <xs:extension base="tns:verifiable">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="id" type="xs:string"/>
+          <xs:element name="circle" type="tns:circle"/>
+          <xs:element name="member" type="tns:member"/>
+          <xs:element name="trustLevel" type="tns:trustLevel"/>
+          <xs:element minOccurs="0" name="changed" type="xs:dateTime"/>
+          <xs:element minOccurs="0" name="since" type="xs:dateTime"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType final="extension restriction" name="fetchMemberRequest">
+    <xs:complexContent>
+      <xs:extension base="tns:authentication">
+        <xs:sequence>
+          <xs:element name="memberId" nillable="true" type="xs:string"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType final="extension restriction" name="fetchMemberResponse">
+    <xs:complexContent>
+      <xs:extension base="tns:cwsResponse">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" name="members" type="tns:member"/>
+          <xs:element maxOccurs="unbounded" name="circles" type="tns:circle"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType final="extension restriction" name="versionResponse">
+    <xs:complexContent>
+      <xs:extension base="tns:cwsResponse">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="version" type="xs:string"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType final="extension restriction" name="processCircleRequest">
+    <xs:complexContent>
+      <xs:extension base="tns:authentication">
+        <xs:sequence>
+          <xs:element name="action" type="tns:action"/>
+          <xs:element name="circle" type="tns:circle"/>
+          <xs:element name="trustee" nillable="true" type="tns:trustee"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType final="extension restriction" name="processCircleResponse">
+    <xs:complexContent>
+      <xs:extension base="tns:cwsResponse">
+        <xs:sequence/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:simpleType name="credentialType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="KEY"/>
+      <xs:enumeration value="PASSPHRASE"/>
+      <xs:enumeration value="SIGNATURE"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="returnCode">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="SUCCESS"/>
+      <xs:enumeration value="ERROR"/>
+      <xs:enumeration value="DATABASE_ERROR"/>
+      <xs:enumeration value="CONSTRAINT_ERROR"/>
+      <xs:enumeration value="PROPERTY_ERROR"/>
+      <xs:enumeration value="CRYPTO_ERROR"/>
+      <xs:enumeration value="IDENTIFICATION_ERROR"/>
+      <xs:enumeration value="NOTIMPLEMENTED_ERROR"/>
+      <xs:enumeration value="WARNING"/>
+      <xs:enumeration value="AUTHENTICATION_WARNING"/>
+      <xs:enumeration value="AUTHORIZATION_WARNING"/>
+      <xs:enumeration value="VERIFICATION_WARNING"/>
+      <xs:enumeration value="IDENTIFICATION_WARNING"/>
+      <xs:enumeration value="ILLEGAL_ACTION"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="action">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="NONE"/>
+      <xs:enumeration value="PROCESS"/>
+      <xs:enumeration value="INVITE"/>
+      <xs:enumeration value="DELETE"/>
+      <xs:enumeration value="ADD"/>
+      <xs:enumeration value="ALTER"/>
+      <xs:enumeration value="REMOVE"/>
+      <xs:enumeration value="REKEY"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="trustLevel">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="GUEST"/>
+      <xs:enumeration value="READ"/>
+      <xs:enumeration value="WRITE"/>
+      <xs:enumeration value="ADMIN"/>
+      <xs:enumeration value="SYSOP"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+</xs:schema>
+  </wsdl:types>
+  <wsdl:message name="settings">
+    <wsdl:part element="tns:settings" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="versionResponse">
+    <wsdl:part element="tns:versionResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="processMember">
+    <wsdl:part element="tns:processMember" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="processMemberResponse">
+    <wsdl:part element="tns:processMemberResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="settingsResponse">
+    <wsdl:part element="tns:settingsResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="fetchCircles">
+    <wsdl:part element="tns:fetchCircles" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="processCircleResponse">
+    <wsdl:part element="tns:processCircleResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="fetchMembersResponse">
+    <wsdl:part element="tns:fetchMembersResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="fetchMembers">
+    <wsdl:part element="tns:fetchMembers" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="version">
+    <wsdl:part element="tns:version" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="fetchCirclesResponse">
+    <wsdl:part element="tns:fetchCirclesResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="processCircle">
+    <wsdl:part element="tns:processCircle" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="system">
+    <wsdl:operation name="settings">
+      <wsdl:input message="tns:settings" name="settings">
+    </wsdl:input>
+      <wsdl:output message="tns:settingsResponse" name="settingsResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="processMember">
+      <wsdl:input message="tns:processMember" name="processMember">
+    </wsdl:input>
+      <wsdl:output message="tns:processMemberResponse" name="processMemberResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="fetchCircles">
+      <wsdl:input message="tns:fetchCircles" name="fetchCircles">
+    </wsdl:input>
+      <wsdl:output message="tns:fetchCirclesResponse" name="fetchCirclesResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="fetchMembers">
+      <wsdl:input message="tns:fetchMembers" name="fetchMembers">
+    </wsdl:input>
+      <wsdl:output message="tns:fetchMembersResponse" name="fetchMembersResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="version">
+      <wsdl:input message="tns:version" name="version">
+    </wsdl:input>
+      <wsdl:output message="tns:versionResponse" name="versionResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="processCircle">
+      <wsdl:input message="tns:processCircle" name="processCircle">
+    </wsdl:input>
+      <wsdl:output message="tns:processCircleResponse" name="processCircleResponse">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="systemServiceSoapBinding" type="tns:system">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="settings">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="settings">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="settingsResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="processMember">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="processMember">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="processMemberResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="fetchCircles">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="fetchCircles">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="fetchCirclesResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="fetchMembers">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="fetchMembers">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="fetchMembersResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="version">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="version">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="versionResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="processCircle">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="processCircle">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="processCircleResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="systemService">
+    <wsdl:port binding="tns:systemServiceSoapBinding" name="system">
+      <soap:address location="http://sn-0000655:57211/cws/systemService"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

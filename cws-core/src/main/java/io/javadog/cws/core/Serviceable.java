@@ -150,7 +150,7 @@ public abstract class Serviceable<R extends CwsResponse, V extends Authenticatio
     private void checkAccount(final V verifiable, final String... circleId) {
         try {
             if ((circleId != null) && (circleId.length == 1)) {
-                member = dao.findMemberByNameAndGroupId(verifiable.getAccount(), circleId[0]);
+                member = dao.findMemberByNameAndCircleId(verifiable.getAccount(), circleId[0]);
             } else {
                 member = dao.findMemberByName(verifiable.getAccount());
             }
@@ -211,7 +211,17 @@ public abstract class Serviceable<R extends CwsResponse, V extends Authenticatio
         return key;
     }
 
-    private void checkAuthorization(final Permission action) {
+    /**
+     * The checks here will verify if a Member is allowed to perform a given
+     * action. The optional CircleId has already been part of the Authentication
+     * of the Member, and if it is present, it means that the Member has been
+     * linked together with a specific Circle, so we will use it as part of the
+     * database lookup.
+     *
+     * @param action   Action that is to be performed
+     * @param circleId Optional External CircleId
+     */
+    private void checkAuthorization(final Permission action, final String... circleId) {
         // There is a couple of requests, which is only allowed to be made by
         // the System Administrator.
         if ((action.getTrustLevel() == TrustLevel.SYSOP) && !Objects.equals(ADMIN_ACCOUNT, member.getName())) {
@@ -222,7 +232,7 @@ public abstract class Serviceable<R extends CwsResponse, V extends Authenticatio
         // Actions, without being part of a Circle. So these checks must be
         // made separately based on the actual Request.
         if (!Objects.equals(ADMIN_ACCOUNT, member.getName())) {
-            trustees = dao.findTrustByMember(member);
+            findTrustees(member, circleId);
             boolean trusted = false;
             for (final TrusteeEntity trust : trustees) {
                 if (TrustLevel.isAllowed(trust.getTrustLevel(), action.getTrustLevel())) {
@@ -232,6 +242,14 @@ public abstract class Serviceable<R extends CwsResponse, V extends Authenticatio
             if (!trusted) {
                 throw new AuthorizationException("The requesting Account is not permitted to " + action.getDescription());
             }
+        }
+    }
+
+    private void findTrustees(final MemberEntity member, final String... circleId) {
+        if ((circleId != null) && (circleId.length == 1)) {
+            trustees = dao.findTrustByMemberAndCircle(member, circleId[0]);
+        } else {
+            trustees = dao.findTrustByMember(member);
         }
     }
 }

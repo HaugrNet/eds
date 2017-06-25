@@ -98,10 +98,10 @@ public final class CommonJpaDao implements CommonDao {
      * {@inheritDoc}
      */
     @Override
-    public MemberEntity findMemberByNameAndGroupId(final String name, final String externalGroupId) {
-        final Query query = entityManager.createNamedQuery("member.findByNameAndGroup");
+    public MemberEntity findMemberByNameAndCircleId(final String name, final String externalCircleId) {
+        final Query query = entityManager.createNamedQuery("member.findByNameAndCircle");
         query.setParameter("name", name);
-        query.setParameter("ecid", externalGroupId);
+        query.setParameter("externalCircleId", externalCircleId);
 
         final List<MemberEntity> found = query.getResultList();
 
@@ -123,6 +123,18 @@ public final class CommonJpaDao implements CommonDao {
     public List<TrusteeEntity> findTrustByMember(final MemberEntity member) {
         final Query query = entityManager.createNamedQuery("trust.findByMemberId");
         query.setParameter("id", member.getId());
+
+        return query.getResultList();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<TrusteeEntity> findTrustByMemberAndCircle(final MemberEntity member, final String externalCircleId) {
+        final Query query = entityManager.createNamedQuery("trust.findByMemberIdAndExternalCircleId");
+        query.setParameter("id", member.getId());
+        query.setParameter("externalCircleId", externalCircleId);
 
         return query.getResultList();
     }

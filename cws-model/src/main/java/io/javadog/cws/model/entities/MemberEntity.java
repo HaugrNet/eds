@@ -34,11 +34,11 @@ import java.security.KeyPair;
                 query = "select m " +
                         "from MemberEntity m " +
                         "where name = :name"),
-        @NamedQuery(name = "member.findByNameAndGroup",
+        @NamedQuery(name = "member.findByNameAndCircle",
                 query = "select e.member " +
                         "from TrusteeEntity e " +
                         "where e.member.name = :name" +
-                        "  and e.circle.externalId = :ecid")
+                        "  and e.circle.externalId = :externalCircleId")
 })
 @Table(name = "members")
 public class MemberEntity extends Externable {

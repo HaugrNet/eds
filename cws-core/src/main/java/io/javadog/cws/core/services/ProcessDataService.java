@@ -18,14 +18,16 @@ import io.javadog.cws.common.exceptions.CWSException;
 import io.javadog.cws.common.exceptions.ModelException;
 import io.javadog.cws.core.Permission;
 import io.javadog.cws.core.Serviceable;
-import io.javadog.cws.model.entities.CircleEntity;
 import io.javadog.cws.model.entities.DataEntity;
+import io.javadog.cws.model.entities.DataTypeEntity;
+import io.javadog.cws.model.entities.KeyEntity;
 import io.javadog.cws.model.entities.MetaDataEntity;
 import io.javadog.cws.model.entities.TrusteeEntity;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 import javax.persistence.EntityManager;
+import java.security.Key;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -95,7 +97,7 @@ public final class ProcessDataService extends Serviceable<ProcessDataResponse, P
             final MetaDataEntity folder = checkFolder(entity, data.getFolderId());
             checkName(entity, data.getName());
             checkData(entity, request.getBytes());
-            dao.persist(entity.getMetadata());
+            dao.persist(entity.getMetaData());
 
             response = new ProcessDataResponse();
             response.setData(buildDataObject(entity, folder));
@@ -104,6 +106,53 @@ public final class ProcessDataService extends Serviceable<ProcessDataResponse, P
         }
 
         return response;
+    }
+
+    private ProcessDataResponse processNewData(final ProcessDataRequest request) {
+        final TrusteeEntity trustee = findTrustee(request.getData().getCircleId());
+        final byte[] bytes = request.getBytes();
+
+        if (bytes != null) {
+            // 1. Find DataType Object, if none exist - fail. If DataType Object is "Folder", fail!
+            // 2. Extract Circle Key, and create new Key & Data Entities
+            final String algorithm = settings.getSymmetricAlgorithm();
+            final DataTypeEntity type = null;
+            final Long parentId = null;
+
+            final KeyEntity keyEntity = new KeyEntity();
+            keyEntity.setAlgorithm(algorithm);
+            keyEntity.setCipherMode(settings.getSymmetricCipherMode());
+            keyEntity.setPadding(settings.getSymmetricPadding());
+            keyEntity.setExpires(null);
+            keyEntity.setGracePeriod(0);
+
+            final MetaDataEntity metaData = new MetaDataEntity();
+            metaData.setCircle(trustee.getCircle());
+            metaData.setName(request.getData().getName());
+            metaData.setParentId(parentId);
+            metaData.setType(type);
+
+            final Key circleKey = crypto.extractCircleKey(member.getKeyPair().getPrivate(), trustee.getCircleKey(), algorithm);
+            final String uuid = UUID.randomUUID().toString();
+            final IvParameterSpec iv = crypto.generateInitialVector(uuid);
+            final byte[] encrypted = crypto.encrypt(circleKey, iv, bytes);
+            final DataEntity dataEntity = new DataEntity();
+            dataEntity.setInitialVector(uuid);
+            dataEntity.setMetaData(metaData);
+            dataEntity.setData(encrypted);
+            dataEntity.setKey(keyEntity);
+
+            dao.persist(keyEntity);
+            dao.persist(dataEntity);
+        } else {
+            if (Objects.equals("Folder", request.getData().getTypeName())) {
+                // Assuming a new Folder has to be created.
+            } else {
+                throw new CWSException(ReturnCode.WARNING, "");
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -124,7 +173,7 @@ public final class ProcessDataService extends Serviceable<ProcessDataResponse, P
         MetaDataEntity folder = null;
 
         if (folderId != null) {
-            final MetaDataEntity metadata = entity.getMetadata();
+            final MetaDataEntity metadata = entity.getMetaData();
 
             folder = dao.findMetaDataByMemberAndExternalId(member, folderId);
             if (folder == null) {
@@ -150,17 +199,17 @@ public final class ProcessDataService extends Serviceable<ProcessDataResponse, P
 
     private static void checkName(final DataEntity entity, final String name) {
         if (name != null) {
-            final String currentName = entity.getMetadata().getName();
+            final String currentName = entity.getMetaData().getName();
             final String givenName = name.trim();
             if (!Objects.equals(currentName, givenName)) {
-                entity.getMetadata().setName(givenName);
+                entity.getMetaData().setName(givenName);
             }
         }
     }
 
     private void checkData(final DataEntity entity, final byte[] bytes) {
         if (bytes != null) {
-            final TrusteeEntity trustee = findTrustee(entity.getMetadata().getCircle());
+            final TrusteeEntity trustee = findTrustee(entity.getMetaData().getCircle().getExternalId());
             final SecretKey circleKey = crypto.extractCircleKey(keyPair.getPrivate(), trustee.getCircleKey(), entity.getKey().getAlgorithm());
             final String salt = UUID.randomUUID().toString();
             final IvParameterSpec iv = crypto.generateInitialVector(salt);
@@ -173,7 +222,7 @@ public final class ProcessDataService extends Serviceable<ProcessDataResponse, P
     }
 
     private static MetaData buildDataObject(final DataEntity entity, final MetaDataEntity folder) {
-        final MetaDataEntity metaDataEntity = entity.getMetadata();
+        final MetaDataEntity metaDataEntity = entity.getMetaData();
 
         final DataType type = new DataType();
         type.setName(metaDataEntity.getType().getName());
@@ -193,10 +242,6 @@ public final class ProcessDataService extends Serviceable<ProcessDataResponse, P
         return data;
     }
 
-    private ProcessDataResponse processNewData(final ProcessDataRequest request) {
-        return null;
-    }
-
     private ProcessDataResponse delete(final ProcessDataRequest request) {
         final MetaDataEntity entity = dao.findMetaDataByMemberAndExternalId(member, request.getDataId());
         final ProcessDataResponse response;
@@ -211,11 +256,11 @@ public final class ProcessDataService extends Serviceable<ProcessDataResponse, P
         return response;
     }
 
-    private TrusteeEntity findTrustee(final CircleEntity circle) {
+    private TrusteeEntity findTrustee(final String externalCircleId) {
         TrusteeEntity found = null;
 
         for (final TrusteeEntity trustee : trustees) {
-            if (Objects.equals(trustee.getCircle().getId(), circle.getId())) {
+            if (Objects.equals(trustee.getCircle().getExternalId(), externalCircleId)) {
                 found = trustee;
                 break;
             }

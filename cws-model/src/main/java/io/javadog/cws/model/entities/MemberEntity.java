@@ -33,7 +33,7 @@ import java.security.KeyPair;
         @NamedQuery(name = "member.findByName",
                 query = "select m " +
                         "from MemberEntity m " +
-                        "where name = :name"),
+                        "where lower(name) = lower(:name)"),
         @NamedQuery(name = "member.findByNameAndCircle",
                 query = "select e.member " +
                         "from TrusteeEntity e " +

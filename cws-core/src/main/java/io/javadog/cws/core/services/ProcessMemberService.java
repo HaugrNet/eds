@@ -14,6 +14,8 @@ import io.javadog.cws.api.requests.ProcessMemberRequest;
 import io.javadog.cws.api.responses.ProcessMemberResponse;
 import io.javadog.cws.common.Crypto;
 import io.javadog.cws.common.Settings;
+import io.javadog.cws.common.exceptions.CWSException;
+import io.javadog.cws.common.exceptions.VerificationException;
 import io.javadog.cws.core.Permission;
 import io.javadog.cws.core.Serviceable;
 import io.javadog.cws.model.entities.MemberEntity;
@@ -42,34 +44,64 @@ public final class ProcessMemberService extends Serviceable<ProcessMemberRespons
      */
     @Override
     public ProcessMemberResponse perform(final ProcessMemberRequest request) {
+        if (request != null) {
+            final ProcessMemberResponse response;
+
+            if (request.getCredentialType() == CredentialType.SIGNATURE) {
+                response = processInvitation(request);
+            } else {
+                verifyRequest(request, Permission.PROCESS_MEMBER);
+
+                switch (request.getAction()) {
+                    case PROCESS:
+                        response = processMember(request);
+                        break;
+                    case INVITE:
+                        response = inviteMember(request);
+                        break;
+                    case DELETE:
+                        response = deleteMember(request);
+                        break;
+                    default:
+                        response = new ProcessMemberResponse(ReturnCode.ILLEGAL_ACTION, "Unsupported request.");
+                }
+            }
+
+            return response;
+        } else {
+            throw new VerificationException("Cannot Process a NULL Object.");
+        }
+    }
+
+    private ProcessMemberResponse processMember(final ProcessMemberRequest request) {
+        final String externalId = request.getMemberId();
         final ProcessMemberResponse response;
 
-        if ((request != null) && (request.getCredentialType() == CredentialType.SIGNATURE)) {
-            response = processInvitation(request);
+        if (externalId != null) {
+            final MemberEntity current = dao.findMemberByExternalId(externalId);
+            if (Objects.equals(current.getId(), member.getId())) {
+                // Members are allowed to process themselves
+                response = processSelf(request);
+            } else {
+                // It is only allowed for a Member to process their own Account,
+                // i.e. change AccountName or set new Credentials
+                throw new CWSException(ReturnCode.AUTHORIZATION_WARNING, "Requesting member is not allowed to process this Account.");
+            }
         } else {
-            verifyRequest(request, Permission.PROCESS_MEMBER);
+            final String accountName = request.getAccountName().trim();
 
-            switch (request.getAction()) {
-                case PROCESS:
-                    response = processMember(request);
-                    break;
-                case INVITE:
-                    response = inviteMember(request);
-                    break;
-                case DELETE:
-                    response = deleteMember(request);
-                    break;
-                default:
-                    response = new ProcessMemberResponse(ReturnCode.ILLEGAL_ACTION, "Unsupported request.");
+            final MemberEntity found = dao.findMemberByName(accountName);
+            if (found == null) {
+                final MemberEntity created = createNewAccount(accountName, request.getNewCredentialType(), request.getCredential());
+                response = new ProcessMemberResponse();
+                response.setId(created.getExternalId());
+                response.setArmoredKey(created.getPrivateKey());
+            } else {
+                throw new CWSException(ReturnCode.CONSTRAINT_ERROR, "An Account with the same AccountName already exist.");
             }
         }
 
         return response;
-    }
-
-    private ProcessMemberResponse processMember(final ProcessMemberRequest request) {
-
-        return null;
     }
 
     private ProcessMemberResponse inviteMember(final ProcessMemberRequest request) {
@@ -112,7 +144,7 @@ public final class ProcessMemberService extends Serviceable<ProcessMemberRespons
             dao.delete(found);
             response = new ProcessMemberResponse();
         } else {
-            response = new ProcessMemberResponse(ReturnCode.IDENTIFICATION_ERROR, "");
+            response = new ProcessMemberResponse(ReturnCode.IDENTIFICATION_ERROR, "No such Account exist.");
         }
 
         return response;
@@ -148,6 +180,47 @@ public final class ProcessMemberService extends Serviceable<ProcessMemberRespons
         } else {
             response = new ProcessMemberResponse(ReturnCode.AUTHENTICATION_WARNING, "The given signature is invalid.");
         }
+
+        return response;
+    }
+
+    private ProcessMemberResponse processSelf(final ProcessMemberRequest request) {
+        final ProcessMemberResponse response = new ProcessMemberResponse();
+        response.setId(member.getExternalId());
+
+        if (request.getAccountName() != null) {
+            final String accountName = request.getAccountName();
+            final MemberEntity existing = dao.findMemberByName(accountName.trim());
+
+            if (existing == null) {
+                member.setName(accountName.trim());
+            } else {
+                throw new CWSException(ReturnCode.CONSTRAINT_ERROR, "The new Account Name already exists.");
+            }
+        }
+
+        if ((request.getCredentialType() != null) && (request.getCredential() != null)) {
+            final char[] credential = request.getCredential();
+            final String salt = UUID.randomUUID().toString();
+            final SecretKey key;
+
+            if (request.getCredentialType() == CredentialType.KEY) {
+                key = crypto.convertCredentialToKey(credential);
+            } else {
+                key = crypto.convertPasswordToKey(credential, salt + settings.getSalt());
+            }
+            final KeyPair pair = crypto.generateAsymmetricKey();
+            final IvParameterSpec iv = crypto.generateInitialVector(salt);
+            final byte[] encryptedPrivateKey = crypto.encrypt(key, iv, pair.getPrivate().getEncoded());
+            final String base64EncryptedPrivateKey = Base64.getEncoder().encodeToString(encryptedPrivateKey);
+            final String armoredPublicKey = Crypto.armorKey(pair.getPublic());
+            member.setSalt(salt);
+            member.setPrivateKey(base64EncryptedPrivateKey);
+            member.setPublicKey(armoredPublicKey);
+            response.setArmoredKey(Crypto.armorKey(pair.getPrivate()));
+        }
+
+        dao.persist(member);
 
         return response;
     }

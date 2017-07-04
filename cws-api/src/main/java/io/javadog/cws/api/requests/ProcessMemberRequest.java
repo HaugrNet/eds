@@ -138,7 +138,9 @@ public final class ProcessMemberRequest extends Authentication {
                 checkNotNullAndValidId(errors, FIELD_MEMBER_ID, memberId, "A valid " + FIELD_MEMBER_ID + " is required to delete an account.");
             } else if (action == Action.PROCESS) {
                 checkValidId(errors, FIELD_MEMBER_ID, memberId, "The " + FIELD_MEMBER_ID + " must be valid.");
-                checkNotNullOrEmpty(errors, FIELD_ACCOUNT_NAME, accountName, "The " + FIELD_ACCOUNT_NAME + " is required for processing an account.");
+                if (memberId == null) {
+                    checkNotNullOrEmpty(errors, FIELD_ACCOUNT_NAME, accountName, "The " + FIELD_ACCOUNT_NAME + " is required for a new Account.");
+                }
                 checkNotTooLong(errors, FIELD_ACCOUNT_NAME, accountName, MAX_NAME_LENGTH, "The " + FIELD_ACCOUNT_NAME + " may not exceed " + MAX_NAME_LENGTH + " characters.");
             }
         }

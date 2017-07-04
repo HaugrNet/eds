@@ -33,8 +33,18 @@ public interface System {
      */
     VersionResponse version();
 
+    /**
+     *
+     * @param request Request Object
+     * @return Response Object with ReturnCode and Message
+     */
     SettingResponse settings(SettingRequest request);
 
+    /**
+     *
+     * @param request Request Object
+     * @return Response Object with ReturnCode and Message
+     */
     FetchMemberResponse fetchMembers(FetchMemberRequest request);
 
     /**
@@ -96,5 +106,10 @@ public interface System {
      */
     FetchCircleResponse fetchCircles(FetchCircleRequest request);
 
+    /**
+     *
+     * @param request Request Object
+     * @return Response Object with ReturnCode and Message
+     */
     ProcessCircleResponse processCircle(ProcessCircleRequest request);
 }

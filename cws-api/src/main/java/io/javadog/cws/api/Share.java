@@ -26,12 +26,45 @@ import io.javadog.cws.api.responses.VerifyResponse;
  */
 public interface Share {
 
+    /**
+     *
+     * @param request Request Object
+     * @return Response Object with ReturnCode and Message
+     */
     ProcessDataTypeResponse processDataType(ProcessDataTypeRequest request);
+
+    /**
+     *
+     * @param request Request Object
+     * @return Response Object with ReturnCode and Message
+     */
     FetchDataTypeResponse fetchDataTypes(FetchDataTypeRequest request);
 
+    /**
+     *
+     * @param request Request Object
+     * @return Response Object with ReturnCode and Message
+     */
     ProcessDataResponse processData(ProcessDataRequest request);
+
+    /**
+     *
+     * @param request Request Object
+     * @return Response Object with ReturnCode and Message
+     */
     FetchDataResponse fetchData(FetchDataRequest request);
 
+    /**
+     *
+     * @param request Request Object
+     * @return Response Object with ReturnCode and Message
+     */
     SignResponse sign(SignRequest request);
+
+    /**
+     *
+     * @param request Request Object
+     * @return Response Object with ReturnCode and Message
+     */
     VerifyResponse verify(VerifyRequest request);
 }

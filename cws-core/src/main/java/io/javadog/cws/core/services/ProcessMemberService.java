@@ -189,11 +189,11 @@ public final class ProcessMemberService extends Serviceable<ProcessMemberRespons
         response.setId(member.getExternalId());
 
         if (request.getAccountName() != null) {
-            final String accountName = request.getAccountName();
-            final MemberEntity existing = dao.findMemberByName(accountName.trim());
+            final String accountName = request.getAccountName().trim();
+            final MemberEntity existing = dao.findMemberByName(accountName);
 
             if (existing == null) {
-                member.setName(accountName.trim());
+                member.setName(accountName);
             } else {
                 throw new CWSException(ReturnCode.CONSTRAINT_ERROR, "The new Account Name already exists.");
             }

@@ -20,7 +20,6 @@ import io.javadog.cws.core.Permission;
 import io.javadog.cws.core.Serviceable;
 import io.javadog.cws.model.entities.DataEntity;
 import io.javadog.cws.model.entities.DataTypeEntity;
-import io.javadog.cws.model.entities.KeyEntity;
 import io.javadog.cws.model.entities.MetaDataEntity;
 import io.javadog.cws.model.entities.TrusteeEntity;
 
@@ -119,13 +118,6 @@ public final class ProcessDataService extends Serviceable<ProcessDataResponse, P
             final DataTypeEntity type = null;
             final Long parentId = null;
 
-            final KeyEntity keyEntity = new KeyEntity();
-            keyEntity.setAlgorithm(algorithm);
-            keyEntity.setCipherMode(settings.getSymmetricCipherMode());
-            keyEntity.setPadding(settings.getSymmetricPadding());
-            keyEntity.setExpires(null);
-            keyEntity.setGracePeriod(0);
-
             final MetaDataEntity metaData = new MetaDataEntity();
             metaData.setCircle(trustee.getCircle());
             metaData.setName(request.getData().getName());
@@ -140,13 +132,12 @@ public final class ProcessDataService extends Serviceable<ProcessDataResponse, P
             dataEntity.setInitialVector(uuid);
             dataEntity.setMetaData(metaData);
             dataEntity.setData(encrypted);
-            dataEntity.setKey(keyEntity);
+            dataEntity.setKey(trustee.getKey());
 
-            dao.persist(keyEntity);
             dao.persist(dataEntity);
         } else {
             if (Objects.equals("Folder", request.getData().getTypeName())) {
-                // Assuming a new Folder has to be created.
+                // TODO Assuming a new Folder has to be created.
             } else {
                 throw new CWSException(ReturnCode.WARNING, "");
             }

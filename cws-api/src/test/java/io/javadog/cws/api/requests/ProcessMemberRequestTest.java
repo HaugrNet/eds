@@ -14,7 +14,6 @@ import io.javadog.cws.api.common.Action;
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.CredentialType;
 import io.javadog.cws.api.dtos.Authentication;
-import io.javadog.cws.api.dtos.Member;
 import org.junit.Test;
 
 import java.util.Map;
@@ -36,21 +35,18 @@ public final class ProcessMemberRequestTest {
         authentication.setCredentialType(CredentialType.PASSPHRASE);
         authentication.setCredential(credentials);
 
-        final Member member = new Member();
-        member.setAuthentication(authentication);
-
         final ProcessMemberRequest request = new ProcessMemberRequest();
         request.setAccount(account);
         request.setCredentialType(CredentialType.PASSPHRASE);
         request.setCredential(credentials);
         request.setAction(Action.PROCESS);
-        request.setMember(member);
+        request.setAccountName("new Account");
 
         assertThat(request.getAccount(), is(account));
         assertThat(request.getCredentialType(), is(CredentialType.PASSPHRASE));
         assertThat(request.getCredential(), is(credentials));
         assertThat(request.getAction(), is(Action.PROCESS));
-        assertThat(request.getMember(), is(member));
+        assertThat(request.getAccountName(), is("new Account"));
 
         final Map<String, String> errors = request.validate();
         assertThat(errors.isEmpty(), is(true));
@@ -60,7 +56,11 @@ public final class ProcessMemberRequestTest {
     public void testEmptyObject() {
         final ProcessMemberRequest request = new ProcessMemberRequest();
         final Map<String, String> errors = request.validate();
-        assertThat(errors.size(), is(5));
+        assertThat(errors.size(), is(4));
+        assertThat(errors.get("credentialType"), is("CredentialType is missing, null or invalid."));
+        assertThat(errors.get("credential"), is("Credential is missing, null or invalid."));
+        assertThat(errors.get("action"), is("No action has been provided."));
+        assertThat(errors.get("account"), is("Account is missing, null or invalid."));
     }
 
     @Test(expected = IllegalArgumentException.class)

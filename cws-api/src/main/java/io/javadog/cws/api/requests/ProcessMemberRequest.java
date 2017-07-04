@@ -9,8 +9,8 @@ package io.javadog.cws.api.requests;
 
 import io.javadog.cws.api.common.Action;
 import io.javadog.cws.api.common.Constants;
+import io.javadog.cws.api.common.CredentialType;
 import io.javadog.cws.api.dtos.Authentication;
-import io.javadog.cws.api.dtos.Member;
 
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -26,21 +26,34 @@ import java.util.Set;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "processMemberRequest", propOrder = { "action", "member" })
+@XmlType(name = "processMemberRequest", propOrder = { "action", "memberId", "accountName", "newCredentialType", "newCredential" })
 public final class ProcessMemberRequest extends Authentication {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
-    private static final Set<Action> ALLOWED = EnumSet.of(Action.PROCESS, Action.INVITE, Action.DELETE, Action.REKEY);
+    private static final Set<Action> ALLOWED = EnumSet.of(Action.PROCESS, Action.INVITE, Action.DELETE);
 
+    private static final int MAX_NAME_LENGTH = 256;
     private static final String FIELD_ACTION = "action";
-    private static final String FIELD_MEMBER = "member";
+    private static final String FIELD_MEMBER_ID = "memberId";
+    private static final String FIELD_ACCOUNT_NAME = "accountName";
+    private static final String FIELD_NEW_CREDENTIAL_TYPE = "newCredentialType";
+    private static final String FIELD_NEW_CREDENTIAL = "newCredential";
 
     @XmlElement(name = FIELD_ACTION, required = true)
     private Action action = null;
 
-    @XmlElement(name = FIELD_MEMBER, required = true)
-    private Member member = null;
+    @XmlElement(name = FIELD_MEMBER_ID)
+    private String memberId = null;
+
+    @XmlElement(name = FIELD_ACCOUNT_NAME)
+    private String accountName = null;
+
+    @XmlElement(name = FIELD_NEW_CREDENTIAL_TYPE)
+    private CredentialType newCredentialType = null;
+
+    @XmlElement(name = FIELD_NEW_CREDENTIAL)
+    private String newCredential = null;
 
     // =========================================================================
     // Standard Setters & Getters
@@ -53,7 +66,6 @@ public final class ProcessMemberRequest extends Authentication {
      *   <li>PROCESS</li>
      *   <li>INVITE</li>
      *   <li>DELETE</li>
-     *   <li>REKEY</li>
      * </ul>
      *
      * @param action Current Action
@@ -70,14 +82,38 @@ public final class ProcessMemberRequest extends Authentication {
         return action;
     }
 
-    @NotNull
-    public void setMember(final Member member) {
-        ensureNotNull(FIELD_MEMBER, member);
-        this.member = member;
+    public void setMemberId(final String memberId) {
+        ensureValidId(FIELD_MEMBER_ID, memberId);
+        this.memberId = memberId;
     }
 
-    public Member getMember() {
-        return member;
+    public String getMemberId() {
+        return memberId;
+    }
+
+    public void setAccountName(final String accountName) {
+        ensureNotEmptyOrTooLong(FIELD_ACCOUNT_NAME, accountName, MAX_NAME_LENGTH);
+        this.accountName = accountName;
+    }
+
+    public String getAccountName() {
+        return accountName;
+    }
+
+    public void setNewCredentialType(final CredentialType newCredentialType) {
+        this.newCredentialType = newCredentialType;
+    }
+
+    public CredentialType getNewCredentialType() {
+        return newCredentialType;
+    }
+
+    public void setNewCredential(final String newCredential) {
+        this.newCredential = newCredential;
+    }
+
+    public String getNewCredential() {
+        return newCredential;
     }
 
     // =========================================================================
@@ -93,12 +129,18 @@ public final class ProcessMemberRequest extends Authentication {
 
         if (action == null) {
             errors.put(FIELD_ACTION, "No action has been provided.");
-        }
-
-        if (member == null) {
-            errors.put(FIELD_MEMBER, "Value is missing, null or invalid.");
+        } else if (!ALLOWED.contains(action)) {
+            errors.put(FIELD_ACCOUNT_NAME, "Not supported Action has been provided.");
         } else {
-            errors.putAll(member.validate());
+            if (action == Action.INVITE) {
+                checkNotNullOrEmpty(errors, FIELD_ACCOUNT_NAME, accountName, "");
+            } else if (action == Action.DELETE) {
+                checkNotNullAndValidId(errors, FIELD_MEMBER_ID, memberId, "A valid " + FIELD_MEMBER_ID + " is required to delete an account.");
+            } else if (action == Action.PROCESS) {
+                checkValidId(errors, FIELD_MEMBER_ID, memberId, "The " + FIELD_MEMBER_ID + " must be valid.");
+                checkNotNullOrEmpty(errors, FIELD_ACCOUNT_NAME, accountName, "The " + FIELD_ACCOUNT_NAME + " is required for processing an account.");
+                checkNotTooLong(errors, FIELD_ACCOUNT_NAME, accountName, MAX_NAME_LENGTH, "The " + FIELD_ACCOUNT_NAME + " may not exceed " + MAX_NAME_LENGTH + " characters.");
+            }
         }
 
         return errors;

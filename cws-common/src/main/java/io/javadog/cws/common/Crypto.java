@@ -114,10 +114,10 @@ public final class Crypto {
         }
     }
 
-    public String sign(final KeyPair keyPair, final String message) {
+    public String sign(final PrivateKey privateKey, final String message) {
         try {
             final Signature signer = Signature.getInstance(settings.getSignatureAlgorithm());
-            signer.initSign(keyPair.getPrivate());
+            signer.initSign(privateKey);
             signer.update(message.getBytes(settings.getCharset()));
             final byte[] signed = signer.sign();
 
@@ -127,11 +127,11 @@ public final class Crypto {
         }
     }
 
-    public boolean verify(final KeyPair keyPair, final String message, final String signature) {
+    public boolean verify(final PublicKey publicKey, final String message, final String signature) {
         try {
             final byte[] bytes = Base64.getDecoder().decode(signature);
             final Signature verifier = Signature.getInstance(settings.getSignatureAlgorithm());
-            verifier.initVerify(keyPair.getPublic());
+            verifier.initVerify(publicKey);
             verifier.update(message.getBytes(settings.getCharset()));
 
             return verifier.verify(bytes);
@@ -225,7 +225,7 @@ public final class Crypto {
      * @param key Public RSA key to armor (Base64 encoded x.509 Key)
      * @return String representation of the Key
      */
-    public static String armorPublicKey(final PublicKey key) {
+    public static String armorKey(final Key key) {
         final X509EncodedKeySpec keySpec = new X509EncodedKeySpec(key.getEncoded());
         final byte[] rawKey = keySpec.getEncoded();
 
@@ -298,6 +298,19 @@ public final class Crypto {
             final PrivateKey thePrivateKEy = keyFactory.generatePrivate(pkcs8KeySpec);
 
             return new KeyPair(thePublicKey, thePrivateKEy);
+        } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+            throw new CryptoException(e);
+        }
+    }
+
+    public PublicKey extractPublicKey(final String armoredPublicKey) {
+        try {
+            final KeyFactory keyFactory = KeyFactory.getInstance(settings.getAsymmetricAlgorithmName());
+            final Base64.Decoder decoder = Base64.getDecoder();
+            final byte[] rawPublicKey = decoder.decode(armoredPublicKey);
+            final X509EncodedKeySpec x509KeySpec = new X509EncodedKeySpec(rawPublicKey);
+
+            return keyFactory.generatePublic(x509KeySpec);
         } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
             throw new CryptoException(e);
         }

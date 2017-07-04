@@ -37,6 +37,7 @@ public abstract class Verifiable implements Serializable {
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
     private static final String PRE_VALUE = "The value for '";
+    private static final String PATTERN_PART = "' is not matching the required pattern '";
 
     /**
      * Simple Validation method, which checks if the required values are usable
@@ -58,10 +59,30 @@ public abstract class Verifiable implements Serializable {
         }
     }
 
+    protected static void checkNotNullOrEmpty(final Map<String, String> errors, final String field, final String value, final String message) {
+        if ((value == null) || value.trim().isEmpty()) {
+            errors.put(field, message);
+        }
+    }
+
     protected static void checkNotTooLong(final Map<String, String> errors, final String field, final String value, final int maxLength, final String message) {
         if ((value != null) && (value.trim().length() > maxLength)) {
             errors.put(field, message);
         }
+    }
+
+    protected static void checkValidId(final Map<String, String> errors, final String field, final String value, final String message) {
+        if (value != null) {
+            final Pattern pattern = Pattern.compile(Constants.ID_PATTERN_REGEX);
+            if (!pattern.matcher(value).matches()) {
+                errors.put(field, message);
+            }
+        }
+    }
+
+    protected static void checkNotNullAndValidId(final Map<String, String> errors, final String field, final String value, final String message) {
+        checkNotNull(errors, field, value, message);
+        checkValidId(errors, field, value, message);
     }
 
     protected static void checkPattern(final Map<String, String> errors, final String field, final String value, final String regex, final String message) {
@@ -99,7 +120,7 @@ public abstract class Verifiable implements Serializable {
         if (value != null) {
             final Pattern pattern = Pattern.compile(Constants.ID_PATTERN_REGEX);
             if (!pattern.matcher(value).matches()) {
-                throw new IllegalArgumentException(PRE_VALUE + field + "' is not matching the required pattern '" + Constants.ID_PATTERN_REGEX + "'.");
+                throw new IllegalArgumentException(PRE_VALUE + field + PATTERN_PART + Constants.ID_PATTERN_REGEX + "'.");
             }
         }
     }
@@ -117,7 +138,7 @@ public abstract class Verifiable implements Serializable {
         if (value != null) {
             final Pattern pattern = Pattern.compile(regex);
             if (!pattern.matcher(value).matches()) {
-                throw new IllegalArgumentException(PRE_VALUE + field + "' is not matching the required pattern '" + regex + "'.");
+                throw new IllegalArgumentException(PRE_VALUE + field + PATTERN_PART + regex + "'.");
             }
         }
     }

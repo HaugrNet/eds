@@ -86,7 +86,7 @@ public class DatabaseSetup {
         final IvParameterSpec iv = crypto.generateInitialVector(salt);
         final byte[] encryptedPrivateKey = crypto.encrypt(key, iv, pair.getPrivate().getEncoded());
         final String base64EncryptedPrivateKey = Base64.getEncoder().encodeToString(encryptedPrivateKey);
-        final String armoredPublicKey = Crypto.armorPublicKey(pair.getPublic());
+        final String armoredPublicKey = Crypto.armorKey(pair.getPublic());
 
         final MemberEntity entity = new MemberEntity();
         entity.setName(account);

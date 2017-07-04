@@ -52,7 +52,7 @@ public final class CryptoTest {
         final String salt = UUID.randomUUID().toString();
         final Key key = crypto.generateSymmetricKey();
         final KeyPair keyPair = crypto.generateAsymmetricKey();
-        final String armoredPublicKey = Crypto.armorPublicKey(keyPair.getPublic());
+        final String armoredPublicKey = Crypto.armorKey(keyPair.getPublic());
         final String armoredPrivateKey = crypto.armorPrivateKey(key, salt, keyPair.getPrivate());
         final KeyPair newPair = crypto.extractAsymmetricKey(key, salt, armoredPublicKey, armoredPrivateKey);
 
@@ -226,8 +226,8 @@ public final class CryptoTest {
         final Crypto crypto = new Crypto(new Settings());
         final KeyPair keyPair = crypto.generateAsymmetricKey();
         final String message = "Message to Sign";
-        final String signed = crypto.sign(keyPair, message);
-        final boolean verified = crypto.verify(keyPair, message, signed);
+        final String signed = crypto.sign(keyPair.getPrivate(), message);
+        final boolean verified = crypto.verify(keyPair.getPublic(), message, signed);
 
         assertThat(verified, is(true));
     }

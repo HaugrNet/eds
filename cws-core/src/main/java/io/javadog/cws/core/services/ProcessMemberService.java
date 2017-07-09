@@ -107,6 +107,7 @@ public final class ProcessMemberService extends Serviceable<ProcessMemberRespons
     private ProcessMemberResponse inviteMember(final ProcessMemberRequest request) {
         final ProcessMemberResponse response;
 
+        // TODO Before this will work, the Admin must have a proper KeyPair assigned, meaning that the test setup needs an update...
         // Invitations can only be issued by the System Administrator, not by
         // Circle Administrators.
         if (Objects.equals(Constants.ADMIN_ACCOUNT, request.getAccount())) {
@@ -205,6 +206,11 @@ public final class ProcessMemberService extends Serviceable<ProcessMemberRespons
             final SecretKey key;
 
             if (request.getCredentialType() == CredentialType.KEY) {
+                // If we have a request for a new Key, then a new key is
+                // generated, and used to re-encrypt the existing KeyPair
+                // before being returned. If the Account KeyPair which is
+                // used internally also needs replacement, then the request
+                // must be a REKEY.
                 key = crypto.convertCredentialToKey(credential);
             } else {
                 key = crypto.convertPasswordToKey(credential, salt + settings.getSalt());
@@ -241,6 +247,7 @@ public final class ProcessMemberService extends Serviceable<ProcessMemberRespons
         final String armoredPublicKey = Crypto.armorKey(pair.getPublic());
 
         final MemberEntity account = new MemberEntity();
+        account.setKeyPair(pair);
         account.setName(accountName);
         account.setSalt(salt);
         account.setPrivateKey(base64EncryptedPrivateKey);

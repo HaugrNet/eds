@@ -83,15 +83,11 @@ public final class CommonJpaDao implements CommonDao {
 
         final List<MemberEntity> found = query.getResultList();
 
-        if (found.isEmpty()) {
-            throw new ModelException(ReturnCode.IDENTIFICATION_WARNING, "No member found with '" + name + "'.");
-        }
-
         if (found.size() > 1) {
             throw new ModelException(ReturnCode.CONSTRAINT_ERROR, "Could not uniquely identify a member with '" + name + "'.");
         }
 
-        return found.get(0);
+        return found.isEmpty() ? null : found.get(0);
     }
 
     /**

@@ -8,9 +8,9 @@
 package io.javadog.cws.core;
 
 import static io.javadog.cws.api.common.Constants.ADMIN_ACCOUNT;
-import static io.javadog.cws.api.common.ReturnCode.IDENTIFICATION_WARNING;
 
 import io.javadog.cws.api.common.CredentialType;
+import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.common.TrustLevel;
 import io.javadog.cws.api.common.Verifiable;
 import io.javadog.cws.api.dtos.Authentication;
@@ -153,20 +153,21 @@ public abstract class Serviceable<R extends CwsResponse, V extends Authenticatio
     }
 
     private void checkAccount(final V verifiable, final String... circleId) {
-        try {
-            // If the External Circle Id is given and the member is not the
-            // Administrator (who cannot be part of a Circle), we will use
-            // the CircleId in the checks.
-            if ((circleId != null) && (circleId.length == 1) && !Objects.equals(verifiable.getAccount(), ADMIN_ACCOUNT)) {
-                member = dao.findMemberByNameAndCircleId(verifiable.getAccount(), circleId[0]);
-            } else {
-                member = dao.findMemberByName(verifiable.getAccount());
-            }
-        } catch (ModelException e) {
-            if ((e.getReturnCode() == IDENTIFICATION_WARNING) && Objects.equals(ADMIN_ACCOUNT, verifiable.getAccount())) {
-                member = createNewAdminAccount(verifiable);
-            } else {
-                throw e;
+        // If the External Circle Id is given and the member is not the
+        // Administrator (who cannot be part of a Circle), we will use
+        // the CircleId in the checks.
+        final String account = verifiable.getAccount();
+        if ((circleId != null) && (circleId.length == 1) && !Objects.equals(account, ADMIN_ACCOUNT)) {
+            member = dao.findMemberByNameAndCircleId(account, circleId[0]);
+        } else {
+            member = dao.findMemberByName(account);
+
+            if (member == null) {
+                if (Objects.equals(ADMIN_ACCOUNT, account)) {
+                    member = createNewAdminAccount(verifiable);
+                } else {
+                    throw new ModelException(ReturnCode.CONSTRAINT_ERROR, "Could not uniquely identify a member with '" + account + "'.");
+                }
             }
         }
     }

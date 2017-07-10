@@ -30,7 +30,7 @@ public final class FetchMemberRequest extends Authentication {
 
     private static final String FIELD_MEMBER_ID = "memberId";
 
-    @XmlElement(name = FIELD_MEMBER_ID, required = true, nillable = true)
+    @XmlElement(name = FIELD_MEMBER_ID, nillable = true, required = true)
     private String memberId = null;
 
     // =========================================================================

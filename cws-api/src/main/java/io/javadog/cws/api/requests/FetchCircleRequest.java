@@ -30,7 +30,7 @@ public final class FetchCircleRequest extends Authentication {
 
     private static final String FIELD_CIRCLE_ID = "circleId";
 
-    @XmlElement(name = FIELD_CIRCLE_ID, required = true, nillable = true)
+    @XmlElement(name = FIELD_CIRCLE_ID, nillable = true, required = true)
     private String circleId = null;
 
     // =========================================================================

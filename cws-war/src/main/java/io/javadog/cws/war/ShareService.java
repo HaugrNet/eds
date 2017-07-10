@@ -38,7 +38,7 @@ import javax.xml.ws.BindingType;
  */
 @SOAPBinding
 @BindingType(javax.xml.ws.soap.SOAPBinding.SOAP11HTTP_BINDING)
-@WebService(name = "share", serviceName = "share", portName = "share", targetNamespace = "http://ws.cws.javadog.io/")
+@WebService(name = "share", targetNamespace = "http://ws.cws.javadog.io/", serviceName = "share", portName = "share")
 public class ShareService implements Share {
 
     private static final Logger log = LoggerFactory.getLogger(ShareService.class);

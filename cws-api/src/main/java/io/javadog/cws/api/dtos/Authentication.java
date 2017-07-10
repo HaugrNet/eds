@@ -17,8 +17,8 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Common Object for All requests to the CWS, which contain enough information
@@ -117,7 +117,7 @@ public class Authentication extends Verifiable {
      */
     @Override
     public Map<String, String> validate() {
-        final Map<String, String> errors = new HashMap<>();
+        final Map<String, String> errors = new ConcurrentHashMap<>();
 
         checkNotNull(errors, FIELD_ACCOUNT, account, "Account is missing, null or invalid.");
         checkNotEmpty(errors, FIELD_ACCOUNT, account, "Account may not be empty.");

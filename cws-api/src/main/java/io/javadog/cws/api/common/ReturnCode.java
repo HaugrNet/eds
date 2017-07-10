@@ -51,7 +51,7 @@ public enum ReturnCode {
          * This is most likely due to invalid input or insufficient input data
          * or Authentication/Authorization problems.</p>
          */
-        CLASS_WARNING(1),
+        CLASS_WARNING(100),
 
         /**
          * <p>The Classification Error, is used for internal problems, which
@@ -61,7 +61,7 @@ public enum ReturnCode {
          * problem cannot be correct by the Members, but require Administrative
          * intervention or corrections by the CWS Developers.</p>
          */
-        CLASS_ERROR(2);
+        CLASS_ERROR(200);
 
         private final int classificationCode;
         Classification(final int classificationCode) {
@@ -69,7 +69,7 @@ public enum ReturnCode {
         }
 
         private int getClassificationCode() {
-            return classificationCode * 100;
+            return classificationCode;
         }
     }
 

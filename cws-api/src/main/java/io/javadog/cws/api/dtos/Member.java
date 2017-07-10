@@ -17,8 +17,8 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * <p>The Member Object, is used as Accounts in CWS. The Object consists of an
@@ -90,7 +90,7 @@ public final class Member extends Verifiable {
      */
     @Override
     public Map<String, String> validate() {
-        final Map<String, String> errors = new HashMap<>();
+        final Map<String, String> errors = new ConcurrentHashMap<>();
 
         checkPattern(errors, FIELD_ID, id, Constants.ID_PATTERN_REGEX, "The Member Id is invalid.");
         checkNotNull(errors, FIELD_AUTHENTICATION, authentication, "The Authentication is missing, null or invalid.");

@@ -12,10 +12,10 @@ import io.javadog.cws.common.exceptions.CWSException;
 import io.javadog.cws.common.exceptions.SettingException;
 
 import java.nio.charset.Charset;
-import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * <p>This Class holds the general settings for the CWS. All settings used by
@@ -89,7 +89,7 @@ public final class Settings {
     }
 
     public Map<String, String> get() {
-        final Map<String, String> copy = new HashMap<>(16);
+        final Map<String, String> copy = new ConcurrentHashMap<>(16);
 
         for (final String key : properties.stringPropertyNames()) {
             copy.put(key, properties.getProperty(key));

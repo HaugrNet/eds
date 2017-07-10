@@ -31,7 +31,7 @@ import javax.persistence.Table;
 })
 public class CircleEntity extends Externable {
 
-    @Column(name = "name", nullable = false, unique = true)
+    @Column(name = "name", unique = true, nullable = false)
     private String name = null;
 
     // =========================================================================

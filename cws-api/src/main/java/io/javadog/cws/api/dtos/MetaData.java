@@ -17,8 +17,8 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author Kim Jensen
@@ -39,16 +39,16 @@ public final class MetaData extends Verifiable {
     private static final String FIELD_TYPENAME = "typeName";
     private static final String FIELD_ADDED = "added";
 
-    @XmlElement(name = FIELD_ID, required = true, nillable = true)
+    @XmlElement(name = FIELD_ID, nillable = true, required = true)
     private String id = null;
 
-    @XmlElement(name = FIELD_CIRCLE_ID, required = true, nillable = true)
+    @XmlElement(name = FIELD_CIRCLE_ID, nillable = true, required = true)
     private String circleId = null;
 
-    @XmlElement(name = FIELD_FOLDER_ID, required = true, nillable = true)
+    @XmlElement(name = FIELD_FOLDER_ID, nillable = true, required = true)
     private String folderId = null;
 
-    @XmlElement(name = FIELD_NAME, required = true, nillable = true)
+    @XmlElement(name = FIELD_NAME, nillable = true, required = true)
     private String name = null;
 
     @XmlElement(name = FIELD_TYPENAME, required = true)
@@ -124,7 +124,7 @@ public final class MetaData extends Verifiable {
      */
     @Override
     public Map<String, String> validate() {
-        final Map<String, String> errors = new HashMap<>();
+        final Map<String, String> errors = new ConcurrentHashMap<>();
 
         checkPattern(errors, FIELD_ID, id, Constants.ID_PATTERN_REGEX, "The Data Id is invalid.");
 

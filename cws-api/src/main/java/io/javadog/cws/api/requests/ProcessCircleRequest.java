@@ -44,7 +44,7 @@ public final class ProcessCircleRequest extends Authentication {
     @XmlElement(name = FIELD_CIRCLE, required = true)
     private Circle circle = null;
 
-    @XmlElement(name = FIELD_TRUSTEE, required = true, nillable = true)
+    @XmlElement(name = FIELD_TRUSTEE, nillable = true, required = true)
     private Trustee trustee = null;
 
     // =========================================================================

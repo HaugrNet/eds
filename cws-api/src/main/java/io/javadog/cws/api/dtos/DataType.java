@@ -16,8 +16,8 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author Kim Jensen
@@ -76,7 +76,7 @@ public final class DataType extends Verifiable {
      */
     @Override
     public Map<String, String> validate() {
-        final Map<String, String> errors = new HashMap<>();
+        final Map<String, String> errors = new ConcurrentHashMap<>();
 
         checkNotNull(errors, FIELD_NAME, name, "The Name is not defined.");
         checkNotEmpty(errors, FIELD_NAME, name, "The Name may not be empty.");

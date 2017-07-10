@@ -26,13 +26,13 @@ import java.util.Date;
 @Table(name = "keys")
 public class KeyEntity extends CWSEntity {
 
-    @Column(name = "algorithm", length = 10, nullable = false, updatable = false)
+    @Column(name = "algorithm", nullable = false, updatable = false, length = 10)
     private String algorithm = null;
 
-    @Column(name = "cipher_mode", length = 10, nullable = false, updatable = false)
+    @Column(name = "cipher_mode", nullable = false, updatable = false, length = 10)
     private String cipherMode = null;
 
-    @Column(name = "padding", length = 32, nullable = false, updatable = false)
+    @Column(name = "padding", nullable = false, updatable = false, length = 32)
     private String padding = null;
 
     @Enumerated(EnumType.STRING)

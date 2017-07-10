@@ -44,7 +44,7 @@ public class DataEntity extends CWSEntity {
     @Column(name = "encrypted_data", nullable = false)
     private byte[] data = null;
 
-    @Column(name = "initial_vector", length = 256, nullable = false, updatable = false)
+    @Column(name = "initial_vector", nullable = false, updatable = false, length = 256)
     private String initialVector = null;
 
     // =========================================================================

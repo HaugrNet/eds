@@ -43,16 +43,16 @@ import java.security.KeyPair;
 @Table(name = "members")
 public class MemberEntity extends Externable {
 
-    @Column(name = "name", length = 256, unique = true, nullable = false)
+    @Column(name = "name", unique = true, nullable = false, length = 256)
     private String name = null;
 
-    @Column(name = "salt", length = 36, unique = true, nullable = false)
+    @Column(name = "salt", unique = true, nullable = false, length = 36)
     private String salt = null;
 
-    @Column(name = "public_key", length = 1024, nullable = false)
+    @Column(name = "public_key", nullable = false, length = 1024)
     private String publicKey = null;
 
-    @Column(name = "private_key", length = 8192, nullable = false)
+    @Column(name = "private_key", nullable = false, length = 8192)
     private String privateKey = null;
 
     @Transient

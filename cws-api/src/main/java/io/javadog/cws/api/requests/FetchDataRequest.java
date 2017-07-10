@@ -34,13 +34,13 @@ public final class FetchDataRequest extends Authentication {
     private static final String FIELD_CIRCLE_ID = "circleId";
     private static final String FIELD_DATA_ID = "dataId";
 
-    @XmlElement(name = FIELD_DATA_TYPE, required = true, nillable = true)
+    @XmlElement(name = FIELD_DATA_TYPE, nillable = true, required = true)
     private DataType dataType = null;
 
-    @XmlElement(name = FIELD_CIRCLE_ID, required = true, nillable = true)
+    @XmlElement(name = FIELD_CIRCLE_ID, nillable = true, required = true)
     private String circleId = null;
 
-    @XmlElement(name = FIELD_DATA_ID, required = true, nillable = true)
+    @XmlElement(name = FIELD_DATA_ID, nillable = true, required = true)
     private String dataId = null;
 
     // =========================================================================

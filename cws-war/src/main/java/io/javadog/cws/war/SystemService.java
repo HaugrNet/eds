@@ -37,7 +37,7 @@ import javax.xml.ws.BindingType;
  */
 @SOAPBinding
 @BindingType(javax.xml.ws.soap.SOAPBinding.SOAP11HTTP_BINDING)
-@WebService(name = "system", serviceName = "system", portName = "system", targetNamespace = "http://ws.cws.javadog.io/")
+@WebService(name = "system", targetNamespace = "http://ws.cws.javadog.io/", serviceName = "system", portName = "system")
 public class SystemService implements System {
 
     private static final Logger log = LoggerFactory.getLogger(SystemService.class);

@@ -17,7 +17,7 @@ import javax.persistence.MappedSuperclass;
 @MappedSuperclass
 public class Externable extends CWSEntity {
 
-    @Column(name = "external_id", length = 36, unique = true, nullable = false, updatable = false)
+    @Column(name = "external_id", unique = true, nullable = false, updatable = false, length = 36)
     private String externalId = null;
 
     // =========================================================================

@@ -18,8 +18,8 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author Kim Jensen
@@ -84,7 +84,7 @@ public final class Circle extends Verifiable {
      */
     @Override
     public Map<String, String> validate() {
-        final Map<String, String> errors = new HashMap<>();
+        final Map<String, String> errors = new ConcurrentHashMap<>();
 
         checkPattern(errors, FIELD_ID, id, Constants.ID_PATTERN_REGEX, "The Circle Id is invalid.");
         checkNotNull(errors, FIELD_NAME, name, "The Name is missing, null or invalid.");

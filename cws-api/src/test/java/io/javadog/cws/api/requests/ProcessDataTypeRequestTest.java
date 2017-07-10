@@ -12,7 +12,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import java.lang.reflect.Field;
 import java.util.Map;
 
 /**
@@ -43,7 +42,7 @@ public final class ProcessDataTypeRequestTest {
     }
 
     @Test
-    public void setNullAction() {
+    public void testSetNullAction() {
         exception.expect(IllegalArgumentException.class);
         exception.expectMessage("The value for 'action' may not be null.");
 
@@ -52,7 +51,7 @@ public final class ProcessDataTypeRequestTest {
     }
 
     @Test
-    public void setInvalidAction() {
+    public void testSetInvalidAction() {
         exception.expect(IllegalArgumentException.class);
         exception.expectMessage("The value for 'action' is not allowed.");
 
@@ -61,7 +60,7 @@ public final class ProcessDataTypeRequestTest {
     }
 
     @Test
-    public void setNullDataType() {
+    public void testSetNullDataType() {
         exception.expect(IllegalArgumentException.class);
         exception.expectMessage("The value for 'dataType' may not be null.");
 

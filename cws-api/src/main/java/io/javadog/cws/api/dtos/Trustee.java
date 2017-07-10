@@ -18,8 +18,8 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * <p>A Trustee, is a Member of a Circle, with a granted Trust Level.</p>
@@ -125,7 +125,7 @@ public final class Trustee extends Verifiable {
      */
     @Override
     public Map<String, String> validate() {
-        final Map<String, String> errors = new HashMap<>();
+        final Map<String, String> errors = new ConcurrentHashMap<>();
 
         checkPattern(errors, FIELD_ID, id, Constants.ID_PATTERN_REGEX, "The Trustee Id is invalid.");
         if (circle != null) {

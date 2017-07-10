@@ -17,10 +17,10 @@ import io.javadog.cws.core.Serviceable;
 import io.javadog.cws.model.entities.SettingEntity;
 
 import javax.persistence.EntityManager;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * <p>The Setting Service, allows for checking and updating existing Settings
@@ -91,7 +91,7 @@ public final class SettingService extends Serviceable<SettingResponse, SettingRe
     }
 
     private static Map<String, SettingEntity> convertSettings(final List<SettingEntity> list) {
-        final Map<String, SettingEntity> map = new HashMap<>(16);
+        final Map<String, SettingEntity> map = new ConcurrentHashMap<>(16);
 
         for (final SettingEntity setting : list) {
             map.put(setting.getName(), setting);
@@ -101,7 +101,7 @@ public final class SettingService extends Serviceable<SettingResponse, SettingRe
     }
 
     private static Map<String, String> transformSettings(final Map<String, SettingEntity> settings) {
-        final Map<String, String> map = new HashMap<>();
+        final Map<String, String> map = new ConcurrentHashMap<>();
 
         for (final Map.Entry<String, SettingEntity> entry : settings.entrySet()) {
             map.put(entry.getKey(), entry.getValue().getSetting());

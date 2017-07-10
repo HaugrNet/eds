@@ -41,10 +41,10 @@ public final class ProcessDataRequest extends Authentication {
     @XmlElement(name = FIELD_ACTION, required = true)
     private Action action = Action.PROCESS;
 
-    @XmlElement(name = FIELD_DATA_ID, required = true, nillable = true)
+    @XmlElement(name = FIELD_DATA_ID, nillable = true, required = true)
     private String dataId = null;
 
-    @XmlElement(name = FIELD_DATA, required = true, nillable = true)
+    @XmlElement(name = FIELD_DATA, nillable = true, required = true)
     private MetaData data = null;
 
     @XmlElement(name = FIELD_BYTES, nillable = true)

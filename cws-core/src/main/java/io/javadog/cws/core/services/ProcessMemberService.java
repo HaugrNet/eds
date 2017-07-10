@@ -107,7 +107,6 @@ public final class ProcessMemberService extends Serviceable<ProcessMemberRespons
     private ProcessMemberResponse inviteMember(final ProcessMemberRequest request) {
         final ProcessMemberResponse response;
 
-        // TODO Before this will work, the Admin must have a proper KeyPair assigned, meaning that the test setup needs an update...
         // Invitations can only be issued by the System Administrator, not by
         // Circle Administrators.
         if (Objects.equals(Constants.ADMIN_ACCOUNT, request.getAccount())) {
@@ -116,11 +115,12 @@ public final class ProcessMemberService extends Serviceable<ProcessMemberRespons
 
             if (existing == null) {
                 final String uuid = UUID.randomUUID().toString();
-                final String signature = crypto.sign(member.getKeyPair().getPrivate(), uuid);
+                final String signature = crypto.sign(keyPair.getPrivate(), uuid);
 
                 final MemberEntity entity = new MemberEntity();
                 entity.setName(memberName);
-                entity.setPrivateKey(CredentialType.SIGNATURE.name() + " :: " + uuid);
+                entity.setSalt(uuid);
+                entity.setPrivateKey(CredentialType.SIGNATURE.name());
                 entity.setPublicKey(signature);
                 dao.persist(entity);
 
@@ -142,8 +142,12 @@ public final class ProcessMemberService extends Serviceable<ProcessMemberRespons
         final ProcessMemberResponse response;
 
         if (found != null) {
-            dao.delete(found);
-            response = new ProcessMemberResponse();
+            if (Objects.equals(found.getName(), Constants.ADMIN_ACCOUNT)) {
+                response = new ProcessMemberResponse(ReturnCode.IDENTIFICATION_ERROR, "It is not permitted to delete the Admin Account.");
+            } else {
+                dao.delete(found);
+                response = new ProcessMemberResponse();
+            }
         } else {
             response = new ProcessMemberResponse(ReturnCode.IDENTIFICATION_ERROR, "No such Account exist.");
         }
@@ -153,33 +157,42 @@ public final class ProcessMemberService extends Serviceable<ProcessMemberRespons
 
     private ProcessMemberResponse processInvitation(final ProcessMemberRequest request) {
         final MemberEntity account = dao.findMemberByName(request.getAccount());
-        final String secret = account.getPrivateKey().substring(13);
-        final String signature = new String(request.getCredential());
-        final MemberEntity admin = dao.findMemberByName(Constants.ADMIN_ACCOUNT);
-        final PublicKey publicKey = crypto.extractPublicKey(admin.getPublicKey());
         final ProcessMemberResponse response;
 
-        if (crypto.verify(publicKey, secret, signature)) {
-            final String salt = UUID.randomUUID().toString();
-            final SecretKey key = crypto.convertCredentialToKey(UUID.randomUUID().toString().toCharArray());
+        if (account != null) {
+            if (Objects.equals(account.getPrivateKey(), CredentialType.SIGNATURE.name())) {
+                final String secret = account.getSalt();
+                final String signature = new String(request.getCredential());
+                final MemberEntity admin = dao.findMemberByName(Constants.ADMIN_ACCOUNT);
+                final PublicKey publicKey = crypto.extractPublicKey(admin.getPublicKey());
 
-            final KeyPair pair = crypto.generateAsymmetricKey();
-            final IvParameterSpec iv = crypto.generateInitialVector(salt);
-            final byte[] encryptedPrivateKey = crypto.encrypt(key, iv, pair.getPrivate().getEncoded());
-            final String base64EncryptedPrivateKey = Base64.getEncoder().encodeToString(encryptedPrivateKey);
-            final String armoredPublicKey = Crypto.armorKey(pair.getPublic());
+                if (crypto.verify(publicKey, secret, signature)) {
+                    final String salt = UUID.randomUUID().toString();
+                    final SecretKey key = crypto.convertCredentialToKey(UUID.randomUUID().toString().toCharArray());
 
-            account.setSalt(salt);
-            account.setPrivateKey(base64EncryptedPrivateKey);
-            account.setPublicKey(armoredPublicKey);
-            dao.persist(account);
+                    final KeyPair pair = crypto.generateAsymmetricKey();
+                    final IvParameterSpec iv = crypto.generateInitialVector(salt);
+                    final byte[] encryptedPrivateKey = crypto.encrypt(key, iv, pair.getPrivate().getEncoded());
+                    final String base64EncryptedPrivateKey = Base64.getEncoder().encodeToString(encryptedPrivateKey);
+                    final String armoredPublicKey = Crypto.armorKey(pair.getPublic());
 
-            final String armoredKey = Crypto.armorKey(key);
-            response = new ProcessMemberResponse();
-            response.setId(account.getExternalId());
-            response.setArmoredKey(armoredKey);
+                    account.setSalt(salt);
+                    account.setPrivateKey(base64EncryptedPrivateKey);
+                    account.setPublicKey(armoredPublicKey);
+                    dao.persist(account);
+
+                    final String armoredKey = Crypto.armorKey(key);
+                    response = new ProcessMemberResponse();
+                    response.setId(account.getExternalId());
+                    response.setArmoredKey(armoredKey);
+                } else {
+                    response = new ProcessMemberResponse(ReturnCode.AUTHENTICATION_WARNING, "The given signature is invalid.");
+                }
+            } else {
+                response = new ProcessMemberResponse(ReturnCode.VERIFICATION_WARNING, "Account does not have an invitation pending.");
+            }
         } else {
-            response = new ProcessMemberResponse(ReturnCode.AUTHENTICATION_WARNING, "The given signature is invalid.");
+            response = new ProcessMemberResponse(ReturnCode.IDENTIFICATION_WARNING, "Account does not exist.");
         }
 
         return response;

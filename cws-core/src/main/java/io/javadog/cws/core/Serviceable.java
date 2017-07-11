@@ -217,10 +217,6 @@ public abstract class Serviceable<R extends CwsResponse, V extends Authenticatio
             key = crypto.convertPasswordToKey(verifiable.getCredential(), salt);
         }
 
-        // Now, as we have used the secret from the request, we will immediately
-        // discard it, so it cannot be extracted
-        Crypto.clearSensitiveData(verifiable.getCredential());
-
         return key;
     }
 

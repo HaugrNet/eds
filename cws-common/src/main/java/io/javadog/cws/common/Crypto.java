@@ -183,7 +183,7 @@ public final class Crypto {
     }
 
     public SecretKey convertCredentialToKey(final char[] secret) {
-        return new SecretKeySpec(base64Decode(secret), settings.getSymmetricAlgorithm());
+        return new SecretKeySpec(base64Decode(secret), settings.getSymmetricAlgorithmName());
     }
 
     /**

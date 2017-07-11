@@ -167,8 +167,10 @@ public final class ProcessMemberService extends Serviceable<ProcessMemberRespons
                 final PublicKey publicKey = crypto.extractPublicKey(admin.getPublicKey());
 
                 if (crypto.verify(publicKey, secret, signature)) {
+                    // TODO Correct this, so a proper Private Key is generated and returned Armored. The Public Key Counterpart will be used to encrypt the stored Key and then discarded
                     final String salt = UUID.randomUUID().toString();
-                    final SecretKey key = crypto.convertCredentialToKey(UUID.randomUUID().toString().toCharArray());
+                    final char[] newSecret = UUID.randomUUID().toString().toCharArray();
+                    final SecretKey key = crypto.convertPasswordToKey(newSecret, salt);
 
                     final KeyPair pair = crypto.generateAsymmetricKey();
                     final IvParameterSpec iv = crypto.generateInitialVector(salt);

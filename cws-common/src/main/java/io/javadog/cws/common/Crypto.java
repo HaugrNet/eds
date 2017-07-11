@@ -75,83 +75,8 @@ public final class Crypto {
     }
 
     // =========================================================================
-    // Public Methods
+    // Public Methods to generate Keys & IVs.
     // =========================================================================
-
-    public byte[] encrypt(final Key key, final byte[] toEncrypt) {
-        try {
-            final Cipher cipher = prepareCipher(key, Cipher.ENCRYPT_MODE, null);
-            return cipher.doFinal(toEncrypt);
-        } catch (BadPaddingException | IllegalBlockSizeException | NoSuchPaddingException | NoSuchAlgorithmException | InvalidAlgorithmParameterException | InvalidKeyException e) {
-            throw new CryptoException(e);
-        }
-    }
-
-    public byte[] encrypt(final Key key, final IvParameterSpec iv, final byte[] toEncrypt) {
-        try {
-            final Cipher cipher = prepareCipher(key, Cipher.ENCRYPT_MODE, iv);
-            return cipher.doFinal(toEncrypt);
-        } catch (BadPaddingException | IllegalBlockSizeException | NoSuchPaddingException | NoSuchAlgorithmException | InvalidAlgorithmParameterException | InvalidKeyException e) {
-            throw new CryptoException(e);
-        }
-    }
-
-    public byte[] decrypt(final Key key, final byte[] toDecrypt) {
-        try {
-            final Cipher cipher = prepareCipher(key, Cipher.DECRYPT_MODE, null);
-            return cipher.doFinal(toDecrypt);
-        } catch (BadPaddingException | IllegalBlockSizeException | NoSuchPaddingException | NoSuchAlgorithmException | InvalidAlgorithmParameterException | InvalidKeyException e) {
-            throw new CryptoException(e);
-        }
-    }
-
-    public byte[] decrypt(final Key key, final IvParameterSpec iv, final byte[] toDecrypt) {
-        try {
-            final Cipher cipher = prepareCipher(key, Cipher.DECRYPT_MODE, iv);
-            return cipher.doFinal(toDecrypt);
-        } catch (BadPaddingException | IllegalBlockSizeException | NoSuchPaddingException | NoSuchAlgorithmException | InvalidAlgorithmParameterException | InvalidKeyException e) {
-            throw new CryptoException(e);
-        }
-    }
-
-    public String sign(final PrivateKey privateKey, final String message) {
-        try {
-            final Signature signer = Signature.getInstance(settings.getSignatureAlgorithm());
-            signer.initSign(privateKey);
-            signer.update(message.getBytes(settings.getCharset()));
-            final byte[] signed = signer.sign();
-
-            return Base64.getEncoder().encodeToString(signed);
-        } catch (NoSuchAlgorithmException | SignatureException | InvalidKeyException e) {
-            throw new CryptoException(e);
-        }
-    }
-
-    public boolean verify(final PublicKey publicKey, final String message, final String signature) {
-        try {
-            final byte[] bytes = Base64.getDecoder().decode(signature);
-            final Signature verifier = Signature.getInstance(settings.getSignatureAlgorithm());
-            verifier.initVerify(publicKey);
-            verifier.update(message.getBytes(settings.getCharset()));
-
-            return verifier.verify(bytes);
-        } catch (NoSuchAlgorithmException | SignatureException | InvalidKeyException e) {
-            throw new CryptoException(e);
-        }
-    }
-
-    private static Cipher prepareCipher(final Key key, final int mode, final IvParameterSpec iv) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException {
-        final String algorithm = key.getAlgorithm();
-        final Cipher cipher = Cipher.getInstance(algorithm);
-
-        if ((iv != null) && algorithm.contains("CBC")) {
-            cipher.init(mode, key, iv);
-        } else {
-            cipher.init(mode, key);
-        }
-
-        return cipher;
-    }
 
     public IvParameterSpec generateInitialVector(final String salt) {
         final byte[] bytes = new byte[INITIAL_VECTOR_SIZE];
@@ -217,6 +142,89 @@ public final class Crypto {
             throw new CWSException(e);
         }
     }
+
+    // =========================================================================
+    // Standard Cryptographic Operations; Sign,  Verify, Encrypt & Decrypt
+    // =========================================================================
+
+    public String sign(final PrivateKey privateKey, final String message) {
+        try {
+            final Signature signer = Signature.getInstance(settings.getSignatureAlgorithm());
+            signer.initSign(privateKey);
+            signer.update(message.getBytes(settings.getCharset()));
+            final byte[] signed = signer.sign();
+
+            return Base64.getEncoder().encodeToString(signed);
+        } catch (NoSuchAlgorithmException | SignatureException | InvalidKeyException e) {
+            throw new CryptoException(e);
+        }
+    }
+
+    public boolean verify(final PublicKey publicKey, final String message, final String signature) {
+        try {
+            final byte[] bytes = Base64.getDecoder().decode(signature);
+            final Signature verifier = Signature.getInstance(settings.getSignatureAlgorithm());
+            verifier.initVerify(publicKey);
+            verifier.update(message.getBytes(settings.getCharset()));
+
+            return verifier.verify(bytes);
+        } catch (NoSuchAlgorithmException | SignatureException | InvalidKeyException e) {
+            throw new CryptoException(e);
+        }
+    }
+
+    public byte[] encrypt(final PublicKey key, final byte[] toEncrypt) {
+        try {
+            final Cipher cipher = prepareCipher(key, Cipher.ENCRYPT_MODE, null);
+            return cipher.doFinal(toEncrypt);
+        } catch (BadPaddingException | IllegalBlockSizeException | NoSuchPaddingException | NoSuchAlgorithmException | InvalidAlgorithmParameterException | InvalidKeyException e) {
+            throw new CryptoException(e);
+        }
+    }
+
+    public byte[] decrypt(final PrivateKey key, final byte[] toDecrypt) {
+        try {
+            final Cipher cipher = prepareCipher(key, Cipher.DECRYPT_MODE, null);
+            return cipher.doFinal(toDecrypt);
+        } catch (BadPaddingException | IllegalBlockSizeException | NoSuchPaddingException | NoSuchAlgorithmException | InvalidAlgorithmParameterException | InvalidKeyException e) {
+            throw new CryptoException(e);
+        }
+    }
+
+    public byte[] encrypt(final Key key, final IvParameterSpec iv, final byte[] toEncrypt) {
+        try {
+            final Cipher cipher = prepareCipher(key, Cipher.ENCRYPT_MODE, iv);
+            return cipher.doFinal(toEncrypt);
+        } catch (BadPaddingException | IllegalBlockSizeException | NoSuchPaddingException | NoSuchAlgorithmException | InvalidAlgorithmParameterException | InvalidKeyException e) {
+            throw new CryptoException(e);
+        }
+    }
+
+    public byte[] decrypt(final Key key, final IvParameterSpec iv, final byte[] toDecrypt) {
+        try {
+            final Cipher cipher = prepareCipher(key, Cipher.DECRYPT_MODE, iv);
+            return cipher.doFinal(toDecrypt);
+        } catch (BadPaddingException | IllegalBlockSizeException | NoSuchPaddingException | NoSuchAlgorithmException | InvalidAlgorithmParameterException | InvalidKeyException e) {
+            throw new CryptoException(e);
+        }
+    }
+
+    private static Cipher prepareCipher(final Key key, final int mode, final IvParameterSpec iv) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException {
+        final String algorithm = key.getAlgorithm();
+        final Cipher cipher = Cipher.getInstance(algorithm);
+
+        if ((iv != null) && algorithm.contains("CBC")) {
+            cipher.init(mode, key, iv);
+        } else {
+            cipher.init(mode, key);
+        }
+
+        return cipher;
+    }
+
+    // =========================================================================
+    // Key Protection, Armor/Extract / Encrypt/Decrypt Keys
+    // =========================================================================
 
     /**
      * The Public RSA Key stored in CWS, is simply saved in x.509 format, stored

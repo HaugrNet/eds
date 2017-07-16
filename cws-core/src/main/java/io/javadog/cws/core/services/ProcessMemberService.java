@@ -115,7 +115,7 @@ public final class ProcessMemberService extends Serviceable<ProcessMemberRespons
 
             if (existing == null) {
                 final String uuid = UUID.randomUUID().toString();
-                final String signature = crypto.sign(keyPair.getPrivate(), uuid);
+                final String signature = crypto.sign(keyPair.getPrivate(), crypto.stringToBytes(uuid));
 
                 final MemberEntity entity = new MemberEntity();
                 entity.setName(memberName);
@@ -166,7 +166,7 @@ public final class ProcessMemberService extends Serviceable<ProcessMemberRespons
                 final MemberEntity admin = dao.findMemberByName(Constants.ADMIN_ACCOUNT);
                 final PublicKey publicKey = crypto.extractPublicKey(admin.getPublicKey());
 
-                if (crypto.verify(publicKey, secret, signature)) {
+                if (crypto.verify(publicKey, crypto.stringToBytes(secret), signature)) {
                     // TODO Correct this, so a proper Private Key is generated and returned Armored. The Public Key Counterpart will be used to encrypt the stored Key and then discarded
                     final String salt = UUID.randomUUID().toString();
                     final char[] newSecret = UUID.randomUUID().toString().toCharArray();

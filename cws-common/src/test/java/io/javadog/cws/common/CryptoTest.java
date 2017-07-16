@@ -15,6 +15,8 @@ import static org.junit.Assert.assertThat;
 
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.common.exceptions.CWSException;
+import io.javadog.cws.common.exceptions.CryptoException;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -24,6 +26,8 @@ import javax.crypto.spec.IvParameterSpec;
 import java.nio.charset.Charset;
 import java.security.Key;
 import java.security.KeyPair;
+import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.util.UUID;
 
 /**
@@ -37,6 +41,104 @@ public final class CryptoTest {
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();
+
+    @Test
+    public void testSignature() {
+        final Settings settings = new Settings();
+        final Crypto crypto = new Crypto(new Settings());
+        final KeyPair keyPair = crypto.generateAsymmetricKey();
+        final byte[] message = "Message to Sign".getBytes(settings.getCharset());
+        final String signed = crypto.sign(keyPair.getPrivate(), message);
+        final boolean verified = crypto.verify(keyPair.getPublic(), message, signed);
+
+        assertThat(verified, is(true));
+    }
+
+    @Test
+    public void testArmoringPublicKey() {
+        final Settings settings = new Settings();
+        final Crypto crypto = new Crypto(settings);
+
+        final KeyPair keyPair = crypto.generateAsymmetricKey();
+        final PublicKey key = keyPair.getPublic();
+
+        final String armoredKey = crypto.armoringPublicKey(key);
+        final PublicKey dearmoredKey = crypto.dearmoringPublicKey(armoredKey);
+
+        assertThat(dearmoredKey.getAlgorithm(), is(key.getAlgorithm()));
+        assertThat(dearmoredKey.getFormat(), is(key.getFormat()));
+        assertThat(dearmoredKey.getEncoded(), is(key.getEncoded()));
+    }
+
+    @Test
+    public void testArmoringPublicKeyInvalidAlgorithm() {
+        final Settings settings = new Settings();
+        final Crypto crypto = new Crypto(settings);
+
+        final KeyPair keyPair = crypto.generateAsymmetricKey();
+        final PublicKey key = keyPair.getPublic();
+
+        // Now, simulating incorrect settings
+        settings.set(Settings.ASYMMETRIC_ALGORITHM, "AES");
+        prepareCause(CryptoException.class, ReturnCode.CRYPTO_ERROR, "java.security.NoSuchAlgorithmException: AES KeyFactory not available");
+
+        final String armoredKey = crypto.armoringPublicKey(key);
+        assertThat(armoredKey.length(), is(392));
+        crypto.dearmoringPublicKey(armoredKey);
+    }
+
+    @Test
+    @Ignore("Error in the Asynchronous Encryption setup")
+    public void testArmoringPrivateKey() {
+        final Settings settings = new Settings();
+        final Crypto crypto = new Crypto(settings);
+
+        final KeyPair cryptoKeys = crypto.generateAsymmetricKey();
+        final KeyPair keyPair = crypto.generateAsymmetricKey();
+        final PrivateKey key = keyPair.getPrivate();
+
+        final String armoredKey = crypto.armoringPrivateKey(cryptoKeys.getPublic(), key);
+        final PrivateKey dearmoredKey = crypto.dearmoringPrivateKey(cryptoKeys.getPrivate(), armoredKey);
+
+        assertThat(dearmoredKey.getAlgorithm(), is(key.getAlgorithm()));
+        assertThat(dearmoredKey.getFormat(), is(key.getFormat()));
+        assertThat(dearmoredKey.getEncoded(), is(key.getEncoded()));
+    }
+
+    @Test
+    @Ignore("Error in the Asynchronous Encryption setup")
+    public void testArmoringPrivateKeyInvalidAlgorithm() {
+        final Settings settings = new Settings();
+        final Crypto crypto = new Crypto(settings);
+
+        final KeyPair cryptoKeys = crypto.generateAsymmetricKey();
+        final KeyPair keyPair = crypto.generateAsymmetricKey();
+        final PrivateKey key = keyPair.getPrivate();
+
+        // Now, simulating incorrect settings
+        settings.set(Settings.ASYMMETRIC_ALGORITHM, "AES");
+        prepareCause(CryptoException.class, ReturnCode.CRYPTO_ERROR, "java.security.NoSuchAlgorithmException: AES KeyFactory not available");
+
+        final String armoredKey = crypto.armoringPrivateKey(cryptoKeys.getPublic(), key);
+        assertThat(armoredKey.length(), is(392));
+        crypto.dearmoringPrivateKey(cryptoKeys.getPrivate(), armoredKey);
+    }
+
+    @Test
+    public void testArmoringSecretKey() {
+        final Settings settings = new Settings();
+        final Crypto crypto = new Crypto(settings);
+
+        final KeyPair keyPair = crypto.generateAsymmetricKey();
+        final SecretKey key = crypto.generateSymmetricKey();
+
+        final String armoredKey = crypto.armoringSecretKey(keyPair.getPublic(), key);
+        final SecretKey dearmoredKey = crypto.dearmoringSecretKey(keyPair.getPrivate(), armoredKey, key.getAlgorithm());
+
+        assertThat(dearmoredKey.getAlgorithm(), is(key.getAlgorithm()));
+        assertThat(dearmoredKey.getFormat(), is(key.getFormat()));
+        assertThat(dearmoredKey.getEncoded(), is(key.getEncoded()));
+    }
 
     /**
      * Testing how to properly Armor and De-armor a Key, meaning converting a
@@ -219,17 +321,6 @@ public final class CryptoTest {
         final char[] chars = string.toCharArray();
         Crypto.clearSensitiveData(chars);
         assertThat(chars, is(emptyChars));
-    }
-
-    @Test
-    public void testSignature() {
-        final Crypto crypto = new Crypto(new Settings());
-        final KeyPair keyPair = crypto.generateAsymmetricKey();
-        final String message = "Message to Sign";
-        final String signed = crypto.sign(keyPair.getPrivate(), message);
-        final boolean verified = crypto.verify(keyPair.getPublic(), message, signed);
-
-        assertThat(verified, is(true));
     }
 
     private <E extends CWSException> void prepareCause(final Class<E> cause, final ReturnCode returnCode, final String returnMessage) {

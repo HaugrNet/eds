@@ -61,7 +61,7 @@ INSERT INTO settings (name, setting, modifiable) VALUES ('cws.crypto.asymmetric.
 -- When new Members are added, the System Administrator can issue a signature,
 -- which can be used by the Member when creating their new Account. The
 -- signature is made with this Algorithm.
-INSERT INTO settings (name, setting, modifiable) VALUES ('ccws.crypto.signature.algorithm', 'SHA512WithRSA', false);
+INSERT INTO settings (name, setting, modifiable) VALUES ('cws.crypto.signature.algorithm', 'SHA512WithRSA', false);
 
 -- If a Member is using something else than a Key to unlock their Account, the
 -- CWS will use the following Password Based Encryption, PBE, algorithm to do
@@ -73,7 +73,7 @@ INSERT INTO settings (name, setting, modifiable) VALUES ('cws.crypto.pbe.algorit
 
 -- This is the System specific Salt, which will be applied whenever PBE is used
 -- to unlock the Private Key of a Member Account. This Salt should be set during
--- installation, and never changed, as it will render PBE based *all* accounts
+-- installation, and never changed, as it will render *all* PBE based accounts
 -- useless.
 INSERT INTO settings (name, setting, modifiable) VALUES ('cws.system.salt', 'System Specific Salt, should be generated to a unique value per Setup.', false);
 

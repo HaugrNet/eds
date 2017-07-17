@@ -7,6 +7,7 @@
  */
 package io.javadog.cws.common;
 
+import io.javadog.cws.common.enums.KeyAlgorithm;
 import io.javadog.cws.common.exceptions.CWSException;
 import io.javadog.cws.common.exceptions.CryptoException;
 
@@ -67,7 +68,6 @@ import java.util.Base64;
  */
 public final class Crypto {
 
-    private static final int INITIAL_VECTOR_SIZE = 16;
     private final Settings settings;
 
     public Crypto(final Settings settings) {
@@ -75,11 +75,47 @@ public final class Crypto {
     }
 
     // =========================================================================
-    // Public Methods to generate Keys & IVs.
+    // Public Methods to generate Keys
     // =========================================================================
 
-    public IvParameterSpec generateInitialVector(final String salt) {
-        final byte[] bytes = new byte[INITIAL_VECTOR_SIZE];
+    public CWSKey generateKey(final KeyAlgorithm algorithm, final String salt) {
+        try {
+            if (!algorithm.synchronous()) {
+                throw new CryptoException("Expected a Synchronous Algorithm & Salt.");
+            }
+
+            final byte[] bytes = new byte[algorithm.getLength() / 8];
+            System.arraycopy(salt.getBytes(settings.getCharset()), 0, bytes, 0, bytes.length);
+            final IvParameterSpec iv = new IvParameterSpec(bytes);
+
+            final KeyGenerator generator = KeyGenerator.getInstance(algorithm.getAlgorithm());
+            generator.init(settings.getSymmetricKeylength());
+            final SecretKey key = generator.generateKey();
+
+            return new CWSKey(algorithm, key, iv);
+        } catch (NoSuchAlgorithmException e) {
+            throw new CryptoException(e);
+        }
+    }
+
+    public CWSKey generateKey(final KeyAlgorithm algorithm) {
+        try {
+            if (algorithm.synchronous()) {
+                throw new CryptoException("Expected an Asynchronous Algorithm.");
+            }
+
+            final KeyPairGenerator generator = KeyPairGenerator.getInstance(algorithm);
+            generator.initialize(settings.getAsymmetricKeylength());
+            final KeyPair keyPair = generator.generateKeyPair();
+
+            return new CWSKey(algorithm, keyPair);
+        } catch (NoSuchAlgorithmException e) {
+            throw new CryptoException(e);
+        }
+    }
+
+    public IvParameterSpec generateInitialVector(final KeyAlgorithm algorithm, final String salt) {
+        final byte[] bytes = new byte[algorithm.getLength() / 8];
         System.arraycopy(salt.getBytes(settings.getCharset()), 0, bytes, 0, bytes.length);
 
         return new IvParameterSpec(bytes);
@@ -148,6 +184,24 @@ public final class Crypto {
     // =========================================================================
     // Standard Cryptographic Operations; Sign,  Verify, Encrypt & Decrypt
     // =========================================================================
+
+    public String sign(final CWSKey key, final byte[] message) {
+        try {
+            if (key.synchronous()) {
+                throw new CryptoException("Expected a KeyPair for signing.");
+            }
+
+            final String algorithm = key.getAlgorithm().getAlgorithm();
+            final Signature signer = Signature.getInstance(algorithm);
+            signer.initSign(key.getPrivateKey());
+            signer.update(message);
+            final byte[] signed = signer.sign();
+
+            return Base64.getEncoder().encodeToString(signed);
+        } catch (NoSuchAlgorithmException | SignatureException | InvalidKeyException e) {
+            throw new CryptoException(e);
+        }
+    }
 
     public String sign(final PrivateKey privateKey, final byte[] message) {
         try {
@@ -319,13 +373,12 @@ public final class Crypto {
      * this will make the key save for storage in the database.
      *
      * @param key        Symmetric Key to encrypt the Private RSA Key with
-     * @param salt       Salt to generate the Initial Vector from
+---     * @param salt       Salt to generate the Initial Vector from
      * @param privateKey The Private RSA Key to encrypt and armor
      * @return Armored (Base64 encoded encrypted key in PCKS8 format)
      */
-    public String armorPrivateKey(final Key key, final String salt, final PrivateKey privateKey) {
-        final IvParameterSpec iv = generateInitialVector(salt);
-        final byte[] encryptedPrivateKey = encrypt(key, iv, privateKey.getEncoded());
+    public String armorPrivateKey(final CWSKey key, final PrivateKey privateKey) {
+        final byte[] encryptedPrivateKey = encrypt(key.getKey(), key.getIv(), privateKey.getEncoded());
         final PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(encryptedPrivateKey);
         final byte[] rawKey = keySpec.getEncoded();
 

@@ -7,6 +7,8 @@
  */
 package io.javadog.cws.common.enums;
 
+import java.util.Objects;
+
 /**
  * <p>The core part for all cryptographic operations is the Algorithms used for
  * the various cryptographic operations. CWS uses a mixture of Synchronous (AES)
@@ -70,6 +72,10 @@ public enum KeyAlgorithm {
         this.algorithm = algorithm;
         this.transformation = transformation;
         this.length = length;
+    }
+
+    public boolean synchronous() {
+        return Objects.equals("AES", algorithm);
     }
 
     public String getAlgorithm() {

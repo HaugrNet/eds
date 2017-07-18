@@ -43,20 +43,12 @@ INSERT INTO datatypes (datatype_name, datatype_value) VALUES ('folder', 'Folder'
 --   * RSA/ECB/OAEPWithSHA-256AndMGF1Padding (1024, 2048)
 -- The default should be sufficient for most, if increased security is wanted,
 -- please consider installing and using the unlimited strength patch.
-INSERT INTO settings (name, setting, modifiable) VALUES ('cws.crypto.symmetric.algorithm', 'AES', false);
-INSERT INTO settings (name, setting, modifiable) VALUES ('cws.crypto.symmetric.cipher.mode', 'CBC', false);
-INSERT INTO settings (name, setting, modifiable) VALUES ('cws.crypto.symmetric.padding', 'PKCS5Padding', false);
-
--- The Key length is set to 128 bits by default, as this is the maximum allowed
--- by Java, unless the unlimited strength patch have been applied. If it has
--- been applied, it is also possible to use 192 and 256 bit keys.
-INSERT INTO settings (name, setting, modifiable) VALUES ('cws.crypto.symmetric.keylength', '128', true);
+INSERT INTO settings (name, setting, modifiable) VALUES ('cws.crypto.symmetric.algorithm', 'AES128', false);
 
 -- Asymmetric Encryption (Public & Private Key), is used for sharing the
 -- Symmetric Keys, not for encrypting any data. For more information about
 -- these, please see the references given above.
-INSERT INTO settings (name, setting, modifiable) VALUES ('cws.crypto.asymmetric.algorithm', 'RSA', false);
-INSERT INTO settings (name, setting, modifiable) VALUES ('cws.crypto.asymmetric.keylength', '2048', true);
+INSERT INTO settings (name, setting, modifiable) VALUES ('cws.crypto.asymmetric.algorithm', 'RSA2018', false);
 
 -- When new Members are added, the System Administrator can issue a signature,
 -- which can be used by the Member when creating their new Account. The
@@ -69,7 +61,7 @@ INSERT INTO settings (name, setting, modifiable) VALUES ('cws.crypto.signature.a
 -- Salt, and a Member Account specific Salt to ensure that enough entropy is
 -- available to create a strong enough Key to unlock the Private Key for the
 -- Account.
-INSERT INTO settings (name, setting, modifiable) VALUES ('cws.crypto.pbe.algorithm', 'PBKDF2WithHmacSHA256', false);
+INSERT INTO settings (name, setting, modifiable) VALUES ('cws.crypto.password.algorithm', 'PBE128', false);
 
 -- This is the System specific Salt, which will be applied whenever PBE is used
 -- to unlock the Private Key of a Member Account. This Salt should be set during
@@ -140,10 +132,10 @@ INSERT INTO circles (external_id, name) VALUES
     ('310c694a-71c2-4a04-838a-741442a18fbb', 'circle3');
 
 -- For each Circle, we need to have a unique Key, but with the same settings.
-INSERT INTO keys (algorithm, cipher_mode, padding, status) VALUES
-    ('AES', 'CBC', 'PKCS5Padding', 'ACTIVE'),
-    ('AES', 'CBC', 'PKCS5Padding', 'ACTIVE'),
-    ('AES', 'CBC', 'PKCS5Padding', 'ACTIVE');
+INSERT INTO keys (algorithm, salt, status) VALUES
+    ('AES128', '1ddaf6f5-1060-420b-90a3-cb6c95c7937d', 'ACTIVE'),
+    ('AES128', 'a1d5a9e0-2e08-4cde-9f03-aa8e138107e4', 'ACTIVE'),
+    ('AES128', '2d5ae533-0b62-42d2-8b90-9bf4139efa3e', 'ACTIVE');
 
 -- With the Members created, and the Circles and Keys added, it is possible to
 -- also create a number of Trustees, in this case we add Member 1-3 to Circle 1,

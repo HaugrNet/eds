@@ -7,8 +7,6 @@
  */
 package io.javadog.cws.common.enums;
 
-import java.util.Objects;
-
 /**
  * <p>The core part for all cryptographic operations is the Algorithms used for
  * the various cryptographic operations. CWS uses a mixture of Synchronous (AES)
@@ -16,7 +14,7 @@ import java.util.Objects;
  *
  * <p>The Java Cryptographic Extension (JCE) defines a number of Algorithms,
  * which any provider must support. Rather than allowing all of them, the CWS
- * is limiting them too two Algorithms, AES (Synchronous) and RSA (Asynchronous)
+ * is limiting them too two Algorithms, AES (Symmetric) and RSA (Asymmetric)
  * Cryptography. From the official list (see below), the Algorithms also require
  * a Block Cipher Mode, either ECB (Electronic CodeBook) or Cipher Block
  * Chaining (CBC). Padding is also a requirement, where the choices is between
@@ -48,7 +46,7 @@ import java.util.Objects;
  * Jurisdiction Policy Files are added.</p>
  *
  * <p>VWS not only uses symmetric and asymmetric encryption, also password based
- * encryption or PBE is used, to convert member provided passphrases into a
+ * encryption or PBE is used, to convert member provided passphrase's into a
  * SecretKey, which can be used to unlock the Account.</p>
  *
  * @author Kim Jensen
@@ -56,38 +54,51 @@ import java.util.Objects;
  */
 public enum KeyAlgorithm {
 
+    // Signature Algorithms
+    SHA256(Type.SIGNATURE, "RSA", "SHA256WithRSA", 256),
+    SHA512(Type.SIGNATURE, "RSA", "SHA512WithRSA", 512),
+
     // Password Based Encryption (PBE) Algorithms
-    PBE128("AES", "PBKDF2WithHmacSHA256", 128),
-    PBE192("AES", "PBKDF2WithHmacSHA256", 192),
-    PBE256("AES", "PBKDF2WithHmacSHA256", 256),
+    PBE128(Type.PASSWORD, "AES", "PBKDF2WithHmacSHA256", 128),
+    PBE192(Type.PASSWORD, "AES", "PBKDF2WithHmacSHA256", 192),
+    PBE256(Type.PASSWORD, "AES", "PBKDF2WithHmacSHA256", 256),
 
     // Symmetric Algorithms
-    AES128("AES", "AES/CBC/PKCS5Padding", 128),
-    AES192("AES", "AES/CBC/PKCS5Padding", 192), // Require JCE Unlimited Strength Files
-    AES256("AES", "AES/CBC/PKCS5Padding", 256), // Require JCE Unlimited Strength Files
+    AES128(Type.SYMMETRIC, "AES", "AES/CBC/PKCS5Padding", 128),
+    AES192(Type.SYMMETRIC, "AES", "AES/CBC/PKCS5Padding", 192), // Require JCE Unlimited Strength Files
+    AES256(Type.SYMMETRIC, "AES", "AES/CBC/PKCS5Padding", 256), // Require JCE Unlimited Strength Files
 
     // Asymmetric Algorithms
-    RSA1024("RSA", "RSA/ECB/PKCS1Padding", 1024),
-    RSA2048("RSA", "RSA/ECB/PKCS1Padding", 2048),
-    RSA4096("RSA", "RSA/ECB/PKCS1Padding", 4096),
-    RSA8192("RSA", "RSA/ECB/PKCS1Padding", 8192);
+    RSA1024(Type.ASYMMETRIC, "RSA", "RSA/ECB/PKCS1Padding", 1024),
+    RSA2048(Type.ASYMMETRIC, "RSA", "RSA/ECB/PKCS1Padding", 2048),
+    RSA4096(Type.ASYMMETRIC, "RSA", "RSA/ECB/PKCS1Padding", 4096),
+    RSA8192(Type.ASYMMETRIC, "RSA", "RSA/ECB/PKCS1Padding", 8192);
+
+    public enum Type {
+        SYMMETRIC,
+        ASYMMETRIC,
+        SIGNATURE,
+        PASSWORD
+    }
 
     // =========================================================================
     // Internal Functionality
     // =========================================================================
 
+    private final Type type;
     private final String algorithm;
     private final String transformation;
     private final int length;
 
-    KeyAlgorithm(final String algorithm, final String transformation, final int length) {
+    KeyAlgorithm(final Type type, final String algorithm, final String transformation, final int length) {
+        this.type = type;
         this.algorithm = algorithm;
         this.transformation = transformation;
         this.length = length;
     }
 
-    public boolean synchronous() {
-        return Objects.equals("AES", algorithm);
+    public Type getType() {
+        return type;
     }
 
     public String getName() {

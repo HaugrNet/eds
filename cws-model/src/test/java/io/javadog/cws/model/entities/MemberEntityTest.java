@@ -13,14 +13,15 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 
 import io.javadog.cws.api.common.Constants;
+import io.javadog.cws.common.CWSKey;
 import io.javadog.cws.common.Crypto;
 import io.javadog.cws.common.Settings;
+import io.javadog.cws.common.enums.KeyAlgorithm;
 import io.javadog.cws.model.DatabaseSetup;
 import org.junit.Test;
 
 import javax.persistence.PersistenceException;
 import javax.persistence.Query;
-import java.security.KeyPair;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -39,7 +40,7 @@ public final class MemberEntityTest extends DatabaseSetup {
         final String publicKey = UUID.randomUUID().toString();
         final String privateKey = UUID.randomUUID().toString();
         final String salt = UUID.randomUUID().toString();
-        final KeyPair keyPair = crypto.generateAsymmetricKey();
+        final CWSKey keyPair = crypto.generateKey(KeyAlgorithm.RSA2048);
         final Date modified = new Date();
         final Date created = new Date();
 
@@ -49,7 +50,7 @@ public final class MemberEntityTest extends DatabaseSetup {
         entity.setSalt(salt);
         entity.setPublicKey(publicKey);
         entity.setPrivateKey(privateKey);
-        entity.setKeyPair(keyPair);
+        entity.setKey(keyPair);
         entity.setModified(modified);
         entity.setCreated(created);
         persistAndDetach(entity);
@@ -63,7 +64,7 @@ public final class MemberEntityTest extends DatabaseSetup {
         assertThat(found.getSalt(), is(salt));
         assertThat(found.getPublicKey(), is(publicKey));
         assertThat(found.getPrivateKey(), is(privateKey));
-        assertThat(found.getKeyPair(), is(nullValue()));
+        assertThat(found.getKey(), is(nullValue()));
     }
 
     @Test(expected = PersistenceException.class)

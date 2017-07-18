@@ -7,6 +7,7 @@
  */
 package io.javadog.cws.model.entities;
 
+import io.javadog.cws.common.enums.KeyAlgorithm;
 import io.javadog.cws.common.enums.Status;
 
 import javax.persistence.Column;
@@ -26,14 +27,12 @@ import java.util.Date;
 @Table(name = "keys")
 public class KeyEntity extends CWSEntity {
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "algorithm", nullable = false, updatable = false, length = 10)
-    private String algorithm = null;
+    private KeyAlgorithm algorithm = null;
 
-    @Column(name = "cipher_mode", nullable = false, updatable = false, length = 10)
-    private String cipherMode = null;
-
-    @Column(name = "padding", nullable = false, updatable = false, length = 32)
-    private String padding = null;
+    @Column(name = "salt", updatable = false)
+    private String salt = null;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
@@ -50,28 +49,20 @@ public class KeyEntity extends CWSEntity {
     // Entity Setters & Getters
     // =========================================================================
 
-    public void setAlgorithm(final String algorithm) {
+    public void setAlgorithm(final KeyAlgorithm algorithm) {
         this.algorithm = algorithm;
     }
 
-    public String getAlgorithm() {
+    public KeyAlgorithm getAlgorithm() {
         return algorithm;
     }
 
-    public void setCipherMode(final String cipherMode) {
-        this.cipherMode = cipherMode;
+    public void setSalt(final String salt) {
+        this.salt = salt;
     }
 
-    public String getCipherMode() {
-        return cipherMode;
-    }
-
-    public void setPadding(final String padding) {
-        this.padding = padding;
-    }
-
-    public String getPadding() {
-        return padding;
+    public String getSalt() {
+        return salt;
     }
 
     public void setStatus(final Status status) {

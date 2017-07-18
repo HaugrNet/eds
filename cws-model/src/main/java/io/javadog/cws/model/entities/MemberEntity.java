@@ -7,13 +7,14 @@
  */
 package io.javadog.cws.model.entities;
 
+import io.javadog.cws.common.CWSKey;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.persistence.Transient;
-import java.security.KeyPair;
 
 /**
  * @author Kim Jensen
@@ -56,7 +57,7 @@ public class MemberEntity extends Externable {
     private String privateKey = null;
 
     @Transient
-    private KeyPair keyPair = null;
+    private CWSKey key = null;
 
     // =========================================================================
     // Entity Setters & Getters
@@ -94,11 +95,11 @@ public class MemberEntity extends Externable {
         return privateKey;
     }
 
-    public void setKeyPair(final KeyPair keyPair) {
-        this.keyPair = keyPair;
+    public void setKey(final CWSKey key) {
+        this.key = key;
     }
 
-    public KeyPair getKeyPair() {
-        return keyPair;
+    public CWSKey getKey() {
+        return key;
     }
 }

@@ -8,8 +8,8 @@
 package io.javadog.cws.common;
 
 import io.javadog.cws.api.common.ReturnCode;
+import io.javadog.cws.common.enums.KeyAlgorithm;
 import io.javadog.cws.common.exceptions.CWSException;
-import io.javadog.cws.common.exceptions.SettingException;
 
 import java.nio.charset.Charset;
 import java.util.Locale;
@@ -38,28 +38,20 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public final class Settings {
 
-    public static final String SYMMETRIC_ALGORITHM_NAME = "cws.crypto.symmetric.algorithm";
-    public static final String SYMMETRIC_ALGORITHM_MODE = "cws.crypto.symmetric.cipher.mode";
-    public static final String SYMMETRIC_ALGORITHM_PADDING = "cws.crypto.symmetric.padding";
-    public static final String SYMMETRIC_ALGORITHM_KEYLENGTH = "cws.crypto.symmetric.keylength";
+    public static final String SYMMETRIC_ALGORITHM = "cws.crypto.symmetric.algorithm";
     public static final String ASYMMETRIC_ALGORITHM = "cws.crypto.asymmetric.algorithm";
-    public static final String ASYMMETRIC_ALGORITHM_KEYLENGTH = "cws.crypto.asymmetric.keylength";
     public static final String SIGNATURE_ALGORITHM = "cws.crypto.signature.algorithm";
-    public static final String PBE_ALGORITHM = "cws.crypto.pbe.algorithm";
+    public static final String PASSWORD_ALGORITHM = "cws.crypto.password.algorithm";
     public static final String CWS_SALT = "cws.system.salt";
     public static final String CWS_LOCALE = "cws.system.locale";
     public static final String CWS_CHARSET = "cws.system.charset";
     public static final String EXPOSE_ADMIN = "cws.expose.admin";
     public static final String SHOW_TRUSTEES = "cws.show.trustees";
 
-    private static final String DEFAULT_SYMMETRIC_ALGORITHM_NAME = "AES";
-    private static final String DEFAULT_SYMMETRIC_CIPHER_MODE = "CBC";
-    private static final String DEFAULT_SYMMETRIC_PADDING = "PKCS5Padding";
-    private static final String DEFAULT_ASYMMETRIC_ALGORITHM = "RSA";
-    private static final String DEFAULT_ASYMMETRIC_KEYLENGTH = "2048";
-    private static final String DEFAULT_SYMMETRIC_KEYLENGTH = "128";
-    private static final String DEFAULT_SIGNATURE_ALGORITHM = "SHA512WithRSA";
-    private static final String DEFAULT_PBE_ALGORITHM = "PBKDF2WithHmacSHA256";
+    private static final String DEFAULT_SYMMETRIC_ALGORITHM = "AES128";
+    private static final String DEFAULT_ASYMMETRIC_ALGORITHM = "RSA2048";
+    private static final String DEFAULT_SIGNATURE_ALGORITHM = "SHA512";
+    private static final String DEFAULT_PASSWORD_ALGORITHM = "PBE128";
     private static final String DEFAULT_SALT = "Default Salt, please make sure it is set in the DB instead.";
     private static final String DEFAULT_LOCALE = "EN";
     private static final String DEFAULT_CHARSETNAME = "UTF-8";
@@ -69,14 +61,10 @@ public final class Settings {
     private final Properties properties = new Properties();
 
     public Settings() {
-        properties.setProperty(SYMMETRIC_ALGORITHM_NAME, DEFAULT_SYMMETRIC_ALGORITHM_NAME);
-        properties.setProperty(SYMMETRIC_ALGORITHM_MODE, DEFAULT_SYMMETRIC_CIPHER_MODE);
-        properties.setProperty(SYMMETRIC_ALGORITHM_PADDING, DEFAULT_SYMMETRIC_PADDING);
-        properties.setProperty(SYMMETRIC_ALGORITHM_KEYLENGTH, DEFAULT_SYMMETRIC_KEYLENGTH);
+        properties.setProperty(SYMMETRIC_ALGORITHM, DEFAULT_SYMMETRIC_ALGORITHM);
         properties.setProperty(ASYMMETRIC_ALGORITHM, DEFAULT_ASYMMETRIC_ALGORITHM);
-        properties.setProperty(ASYMMETRIC_ALGORITHM_KEYLENGTH, DEFAULT_ASYMMETRIC_KEYLENGTH);
         properties.setProperty(SIGNATURE_ALGORITHM, DEFAULT_SIGNATURE_ALGORITHM);
-        properties.setProperty(PBE_ALGORITHM, DEFAULT_PBE_ALGORITHM);
+        properties.setProperty(PASSWORD_ALGORITHM, DEFAULT_PASSWORD_ALGORITHM);
         properties.setProperty(CWS_SALT, DEFAULT_SALT);
         properties.setProperty(CWS_LOCALE, DEFAULT_LOCALE);
         properties.setProperty(CWS_CHARSET, DEFAULT_CHARSETNAME);
@@ -98,44 +86,20 @@ public final class Settings {
         return copy;
     }
 
-    public String getSymmetricAlgorithm() {
-        final String algorithm = properties.getProperty(SYMMETRIC_ALGORITHM_NAME);
-        final String mode = properties.getProperty(SYMMETRIC_ALGORITHM_MODE);
-        final String padding = properties.getProperty(SYMMETRIC_ALGORITHM_PADDING);
-
-        return algorithm + '/' + mode + '/' + padding;
+    public KeyAlgorithm getSymmetricAlgorithm() {
+        return KeyAlgorithm.valueOf(properties.getProperty(SYMMETRIC_ALGORITHM));
     }
 
-    public String getSymmetricAlgorithmName() {
-        return properties.getProperty(SYMMETRIC_ALGORITHM_NAME);
+    public KeyAlgorithm getAsymmetricAlgorithm() {
+        return KeyAlgorithm.valueOf(properties.getProperty(ASYMMETRIC_ALGORITHM));
     }
 
-    public String getSymmetricCipherMode() {
-        return properties.getProperty(SYMMETRIC_ALGORITHM_MODE);
+    public KeyAlgorithm getSignatureAlgorithm() {
+        return KeyAlgorithm.valueOf(properties.getProperty(SIGNATURE_ALGORITHM));
     }
 
-    public String getSymmetricPadding() {
-        return properties.getProperty(SYMMETRIC_ALGORITHM_PADDING);
-    }
-
-    public int getSymmetricKeylength() {
-        return toInt(properties.getProperty(SYMMETRIC_ALGORITHM_KEYLENGTH));
-    }
-
-    public String getAsymmetricAlgorithmName() {
-        return properties.getProperty(ASYMMETRIC_ALGORITHM);
-    }
-
-    public int getAsymmetricKeylength() {
-        return toInt(properties.getProperty(ASYMMETRIC_ALGORITHM_KEYLENGTH));
-    }
-
-    public String getSignatureAlgorithm() {
-        return properties.getProperty(SIGNATURE_ALGORITHM);
-    }
-
-    public String getPBEAlgorithm() {
-        return properties.getProperty(PBE_ALGORITHM);
+    public KeyAlgorithm getPasswordAlgorithm() {
+        return KeyAlgorithm.valueOf(properties.getProperty(PASSWORD_ALGORITHM));
     }
 
     public String getSalt() {
@@ -160,14 +124,6 @@ public final class Settings {
 
     public Boolean getShareTrustees() {
         return toBoolean(properties.getProperty(SHOW_TRUSTEES), DEFAULT_SHOW_TRUSTEES);
-    }
-
-    private static int toInt(final String value) {
-        try {
-            return Integer.parseInt(value);
-        } catch (NumberFormatException e) {
-            throw new SettingException(e);
-        }
     }
 
     private static boolean toBoolean(final String value, final String defaultValue) {

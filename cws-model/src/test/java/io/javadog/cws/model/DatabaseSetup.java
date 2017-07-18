@@ -12,8 +12,10 @@ import static org.hamcrest.Matchers.hasProperty;
 
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.common.TrustLevel;
+import io.javadog.cws.common.CWSKey;
 import io.javadog.cws.common.Crypto;
 import io.javadog.cws.common.Settings;
+import io.javadog.cws.common.enums.KeyAlgorithm;
 import io.javadog.cws.common.enums.Status;
 import io.javadog.cws.common.exceptions.CWSException;
 import io.javadog.cws.model.entities.CWSEntity;
@@ -27,13 +29,9 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.ExpectedException;
 
-import javax.crypto.SecretKey;
-import javax.crypto.spec.IvParameterSpec;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
-import java.security.Key;
-import java.security.KeyPair;
 import java.text.SimpleDateFormat;
 import java.util.Base64;
 import java.util.Date;
@@ -80,20 +78,19 @@ public class DatabaseSetup {
      */
     protected MemberEntity createMember(final String account) {
         final String salt = UUID.randomUUID().toString();
-        final Key key = crypto.convertPasswordToKey(account.toCharArray(), salt);
+        final CWSKey key = crypto.generateKey(KeyAlgorithm.PBE128, account.toCharArray(), salt);
 
-        final KeyPair pair = crypto.generateAsymmetricKey();
-        final IvParameterSpec iv = crypto.generateInitialVector(salt);
-        final byte[] encryptedPrivateKey = crypto.encrypt(key, iv, pair.getPrivate().getEncoded());
+        final CWSKey pair = crypto.generateKey(KeyAlgorithm.RSA2048);
+        final byte[] encryptedPrivateKey = crypto.encrypt(key, pair.getPrivate().getEncoded());
         final String base64EncryptedPrivateKey = Base64.getEncoder().encodeToString(encryptedPrivateKey);
-        final String armoredPublicKey = Crypto.armorKey(pair.getPublic());
+        final String armoredPublicKey = crypto.armoringPublicKey(pair);
 
         final MemberEntity entity = new MemberEntity();
         entity.setName(account);
         entity.setSalt(salt);
         entity.setPrivateKey(base64EncryptedPrivateKey);
         entity.setPublicKey(armoredPublicKey);
-        entity.setKeyPair(pair);
+        entity.setKey(pair);
         persist(entity);
 
         return entity;
@@ -101,17 +98,18 @@ public class DatabaseSetup {
 
     protected void addKeyAndTrusteesToCircle(final CircleEntity circle, final MemberEntity... accounts) {
         if (accounts != null) {
-            final SecretKey key = crypto.generateSymmetricKey();
+            final String salt = UUID.randomUUID().toString();
+            final KeyAlgorithm keyGenerator = KeyAlgorithm.AES128;
+            final CWSKey key = crypto.generateKey(keyGenerator, salt);
             final KeyEntity keyEntity = new KeyEntity();
             keyEntity.setAlgorithm(key.getAlgorithm());
-            keyEntity.setCipherMode(settings.getSymmetricCipherMode());
-            keyEntity.setPadding(settings.getSymmetricPadding());
+            keyEntity.setSalt(salt);
             keyEntity.setStatus(Status.ACTIVE);
             persist(keyEntity);
 
             for (final MemberEntity account : accounts) {
                 final TrusteeEntity entity = new TrusteeEntity();
-                entity.setCircleKey(crypto.encryptAndArmorCircleKey(account.getKeyPair().getPublic(), key));
+                entity.setCircleKey(crypto.encryptAndArmorCircleKey(account.getKey(), key.getKey()));
                 entity.setMember(account);
                 entity.setCircle(circle);
                 entity.setKey(keyEntity);
@@ -131,7 +129,6 @@ public class DatabaseSetup {
      * @param <E>           The Exception, must extend a CWS Exception
      */
     protected <E extends CWSException> void prepareCause(final Class<E> cause, final String returnMessage) {
-        final String propertyName = "returnCode";
         thrown.expect(cause);
         thrown.expectMessage(returnMessage);
     }
@@ -160,8 +157,7 @@ public class DatabaseSetup {
     protected KeyEntity prepareKey() {
         final KeyEntity entity = new KeyEntity();
         entity.setAlgorithm(settings.getSymmetricAlgorithm());
-        entity.setCipherMode(settings.getSymmetricCipherMode());
-        entity.setPadding(settings.getSymmetricPadding());
+        entity.setSalt(UUID.randomUUID().toString());
         entity.setStatus(Status.ACTIVE);
         persist(entity);
 

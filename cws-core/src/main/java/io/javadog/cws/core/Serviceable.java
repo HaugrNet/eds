@@ -15,6 +15,7 @@ import io.javadog.cws.api.common.TrustLevel;
 import io.javadog.cws.api.common.Verifiable;
 import io.javadog.cws.api.dtos.Authentication;
 import io.javadog.cws.api.responses.CwsResponse;
+import io.javadog.cws.common.CWSKey;
 import io.javadog.cws.common.Crypto;
 import io.javadog.cws.common.Settings;
 import io.javadog.cws.common.exceptions.AuthenticationException;
@@ -26,7 +27,6 @@ import io.javadog.cws.model.entities.MemberEntity;
 import io.javadog.cws.model.entities.TrusteeEntity;
 import io.javadog.cws.model.jpa.CommonJpaDao;
 
-import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 import javax.persistence.EntityManager;
 import java.nio.charset.Charset;
@@ -174,11 +174,11 @@ public abstract class Serviceable<R extends CwsResponse, V extends Authenticatio
 
     private MemberEntity createNewAdminAccount(final V verifiable) {
         final String salt = UUID.randomUUID().toString();
-        final Key key = extractKeyFromCredentials(verifiable, salt);
+        final CWSKey key = extractKeyFromCredentials(verifiable, salt);
 
-        final KeyPair pair = crypto.generateAsymmetricKey();
+        final CWSKey pair = crypto.generateKey(settings.getAsymmetricAlgorithm());
         final IvParameterSpec iv = crypto.generateInitialVector(salt);
-        final byte[] encryptedPrivateKey = crypto.encrypt(key, iv, pair.getPrivate().getEncoded());
+        final byte[] encryptedPrivateKey = crypto.encrypt(key, pair.getPrivate().getEncoded());
         final String base64EncryptedPrivateKey = Base64.getEncoder().encodeToString(encryptedPrivateKey);
         final String armoredPublicKey = Crypto.armorKey(pair.getPublic());
 
@@ -208,13 +208,13 @@ public abstract class Serviceable<R extends CwsResponse, V extends Authenticatio
         }
     }
 
-    private Key extractKeyFromCredentials(final V verifiable, final String salt) {
-        final SecretKey key;
+    private CWSKey extractKeyFromCredentials(final V verifiable, final String salt) {
+        final CWSKey key;
 
         if (verifiable.getCredentialType() == CredentialType.KEY) {
             key = crypto.convertCredentialToKey(verifiable.getCredential());
         } else {
-            key = crypto.convertPasswordToKey(verifiable.getCredential(), salt);
+            key = crypto.generateKey(settings.getPasswordAlgorithm(), verifiable.getCredential(), salt);
         }
 
         return key;

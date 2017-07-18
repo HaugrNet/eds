@@ -47,14 +47,26 @@ import java.util.Objects;
  * all the Algorithms are available unless the JCE Unlimited Strength
  * Jurisdiction Policy Files are added.</p>
  *
+ * <p>VWS not only uses symmetric and asymmetric encryption, also password based
+ * encryption or PBE is used, to convert member provided passphrases into a
+ * SecretKey, which can be used to unlock the Account.</p>
+ *
  * @author Kim Jensen
  * @since  CWS 1.0
  */
 public enum KeyAlgorithm {
 
+    // Password Based Encryption (PBE) Algorithms
+    PBE128("AES", "PBKDF2WithHmacSHA256", 128),
+    PBE192("AES", "PBKDF2WithHmacSHA256", 192),
+    PBE256("AES", "PBKDF2WithHmacSHA256", 256),
+
+    // Symmetric Algorithms
     AES128("AES", "AES/CBC/PKCS5Padding", 128),
     AES192("AES", "AES/CBC/PKCS5Padding", 192), // Require JCE Unlimited Strength Files
     AES256("AES", "AES/CBC/PKCS5Padding", 256), // Require JCE Unlimited Strength Files
+
+    // Asymmetric Algorithms
     RSA1024("RSA", "RSA/ECB/PKCS1Padding", 1024),
     RSA2048("RSA", "RSA/ECB/PKCS1Padding", 2048),
     RSA4096("RSA", "RSA/ECB/PKCS1Padding", 4096),
@@ -78,7 +90,7 @@ public enum KeyAlgorithm {
         return Objects.equals("AES", algorithm);
     }
 
-    public String getAlgorithm() {
+    public String getName() {
         return algorithm;
     }
 

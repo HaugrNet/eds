@@ -88,7 +88,7 @@ public final class Crypto {
             System.arraycopy(salt.getBytes(settings.getCharset()), 0, bytes, 0, bytes.length);
             final IvParameterSpec iv = new IvParameterSpec(bytes);
 
-            final KeyGenerator generator = KeyGenerator.getInstance(algorithm.getAlgorithm());
+            final KeyGenerator generator = KeyGenerator.getInstance(algorithm.getName());
             generator.init(settings.getSymmetricKeylength());
             final SecretKey key = generator.generateKey();
 
@@ -166,6 +166,40 @@ public final class Crypto {
      * @param salt     System specific Salt
      * @return Symmetric Key
      */
+    public CWSKey generateKey(final KeyAlgorithm algorithm, final char[] password, final String salt) {
+        try {
+            final byte[] secret = stringToBytes(salt);
+
+            final SecretKeyFactory factory = SecretKeyFactory.getInstance(algorithm.getTransformation());
+            final KeySpec spec = new PBEKeySpec(password, secret, 1024, algorithm.getLength());
+            final SecretKey tmpKey = factory.generateSecret(spec);
+
+            final IvParameterSpec iv = generateInitialVector(algorithm, salt);
+            final SecretKey key = new SecretKeySpec(tmpKey.getEncoded(), algorithm.getName());
+
+            return new CWSKey(algorithm, key, iv);
+        } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+            throw new CWSException(e);
+        }
+    }
+
+    /**
+     * <p>Converts the given Salted Password to a Key, which can be used for the
+     * initial Cryptographic Operations. With the help of the PBKDF2 algorithm,
+     * it creates a 256 byte Key over 1024 iterations. However, for the Key to
+     * be of a good enough Quality, it should be having a length of at least 16
+     * characters and the same applies to the Salt.</p>
+     *
+     * <p>Note, that it takes the Password as a char array, rather than a
+     * String. The reason for this, is that a Char array can be overridden with
+     * garbage once we don't need it anymore, whereas a String which is
+     * immutable can't. This way we don't have to wait for the Garbage Collector
+     * to clean up things.</p>
+     *
+     * @param password Provided Password or Secret
+     * @param salt     System specific Salt
+     * @return Symmetric Key
+     */
     public SecretKey convertPasswordToKey(final char[] password, final String salt) {
         try {
             final String algorithm = settings.getPBEAlgorithm();
@@ -191,7 +225,7 @@ public final class Crypto {
                 throw new CryptoException("Expected a KeyPair for signing.");
             }
 
-            final String algorithm = key.getAlgorithm().getAlgorithm();
+            final String algorithm = key.getAlgorithm().getName();
             final Signature signer = Signature.getInstance(algorithm);
             signer.initSign(key.getPrivateKey());
             signer.update(message);

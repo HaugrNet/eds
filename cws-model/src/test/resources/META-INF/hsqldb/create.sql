@@ -111,6 +111,7 @@ CREATE TABLE members (
   external_id      VARCHAR(36),
   name             VARCHAR(256), -- Member Authentication information
   salt             VARCHAR(36),
+  algorithm        VARCHAR(19) DEFAULT 'RSA2048',
   public_key       VARCHAR(1024), -- Public Key, stored armored
   private_key      VARCHAR(8192), -- Private Key, stored encrypted & armored
   modified         TIMESTAMP DEFAULT now(),
@@ -129,6 +130,7 @@ CREATE TABLE members (
   CONSTRAINT member_notnull_external_id     CHECK (external_id IS NOT NULL),
   CONSTRAINT member_notnull_name            CHECK (name IS NOT NULL),
   CONSTRAINT member_notnull_salt            CHECK (salt IS NOT NULL),
+  CONSTRAINT member_notnull_algorithm       CHECK (algorithm IS NOT NULL),
   CONSTRAINT member_notnull_public_key      CHECK (public_key IS NOT NULL),
   CONSTRAINT member_notnull_private_key     CHECK (private_key IS NOT NULL),
   CONSTRAINT member_notnull_created         CHECK (created IS NOT NULL)

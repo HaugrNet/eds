@@ -8,9 +8,12 @@
 package io.javadog.cws.model.entities;
 
 import io.javadog.cws.common.CWSKey;
+import io.javadog.cws.common.enums.KeyAlgorithm;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
@@ -50,6 +53,10 @@ public class MemberEntity extends Externable {
     @Column(name = "salt", unique = true, nullable = false, length = 36)
     private String salt = null;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "asymmetric_algorithm", nullable = false, length = 10)
+    private KeyAlgorithm algorithm;
+
     @Column(name = "public_key", nullable = false, length = 1024)
     private String publicKey = null;
 
@@ -77,6 +84,14 @@ public class MemberEntity extends Externable {
 
     public String getSalt() {
         return salt;
+    }
+
+    public void setAlgorithm(final KeyAlgorithm algorithm) {
+        this.algorithm = algorithm;
+    }
+
+    public KeyAlgorithm getAlgorithm() {
+        return algorithm;
     }
 
     public void setPublicKey(final String armoredPublicKey) {

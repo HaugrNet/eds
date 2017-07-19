@@ -12,6 +12,7 @@ import io.javadog.cws.api.common.CredentialType;
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.requests.ProcessMemberRequest;
 import io.javadog.cws.api.responses.ProcessMemberResponse;
+import io.javadog.cws.common.CWSKey;
 import io.javadog.cws.common.Crypto;
 import io.javadog.cws.common.Settings;
 import io.javadog.cws.common.exceptions.CWSException;
@@ -20,10 +21,7 @@ import io.javadog.cws.core.Permission;
 import io.javadog.cws.core.Serviceable;
 import io.javadog.cws.model.entities.MemberEntity;
 
-import javax.crypto.SecretKey;
-import javax.crypto.spec.IvParameterSpec;
 import javax.persistence.EntityManager;
-import java.security.KeyPair;
 import java.security.PublicKey;
 import java.util.Base64;
 import java.util.Objects;
@@ -115,7 +113,7 @@ public final class ProcessMemberService extends Serviceable<ProcessMemberRespons
 
             if (existing == null) {
                 final String uuid = UUID.randomUUID().toString();
-                final String signature = crypto.sign(keyPair.getPrivate(), crypto.stringToBytes(uuid));
+                final String signature = crypto.sign(keyPair, crypto.stringToBytes(uuid));
 
                 final MemberEntity entity = new MemberEntity();
                 entity.setName(memberName);
@@ -164,21 +162,20 @@ public final class ProcessMemberService extends Serviceable<ProcessMemberRespons
                 final String secret = account.getSalt();
                 final String signature = new String(request.getCredential());
                 final MemberEntity admin = dao.findMemberByName(Constants.ADMIN_ACCOUNT);
-                final PublicKey publicKey = crypto.extractPublicKey(admin.getPublicKey());
+                final PublicKey publicKey = crypto.extractPublicKey(admin.getAlgorithm(), admin.getPublicKey());
 
                 if (crypto.verify(publicKey, crypto.stringToBytes(secret), signature)) {
-                    // TODO Correct this, so a proper Private Key is generated and returned Armored. The Public Key Counterpart will be used to encrypt the stored Key and then discarded
                     final String salt = UUID.randomUUID().toString();
                     final char[] newSecret = UUID.randomUUID().toString().toCharArray();
-                    final SecretKey key = crypto.convertPasswordToKey(newSecret, salt);
+                    final CWSKey key = crypto.generateKey(settings.getPasswordAlgorithm(), newSecret, salt);
 
-                    final KeyPair pair = crypto.generateAsymmetricKey();
-                    final IvParameterSpec iv = crypto.generateInitialVector(salt);
-                    final byte[] encryptedPrivateKey = crypto.encrypt(key, iv, pair.getPrivate().getEncoded());
+                    final CWSKey pair = crypto.generateKey(settings.getAsymmetricAlgorithm());
+                    final byte[] encryptedPrivateKey = crypto.encrypt(key, pair.getPrivate().getEncoded());
                     final String base64EncryptedPrivateKey = Base64.getEncoder().encodeToString(encryptedPrivateKey);
                     final String armoredPublicKey = Crypto.armorKey(pair.getPublic());
 
                     account.setSalt(salt);
+                    account.setAlgorithm(pair.getAlgorithm());
                     account.setPrivateKey(base64EncryptedPrivateKey);
                     account.setPublicKey(armoredPublicKey);
                     dao.persist(account);
@@ -218,7 +215,7 @@ public final class ProcessMemberService extends Serviceable<ProcessMemberRespons
         if ((request.getCredentialType() != null) && (request.getCredential() != null)) {
             final char[] credential = request.getCredential();
             final String salt = UUID.randomUUID().toString();
-            final SecretKey key;
+            final CWSKey key;
 
             if (request.getCredentialType() == CredentialType.KEY) {
                 // If we have a request for a new Key, then a new key is
@@ -226,13 +223,12 @@ public final class ProcessMemberService extends Serviceable<ProcessMemberRespons
                 // before being returned. If the Account KeyPair which is
                 // used internally also needs replacement, then the request
                 // must be a REKEY.
-                key = crypto.convertCredentialToKey(credential);
+                key = null;//crypto.convertCredentialToKey(credential);
             } else {
-                key = crypto.convertPasswordToKey(credential, salt + settings.getSalt());
+                key = crypto.generateKey(settings.getPasswordAlgorithm(), credential, salt);
             }
-            final KeyPair pair = crypto.generateAsymmetricKey();
-            final IvParameterSpec iv = crypto.generateInitialVector(salt);
-            final byte[] encryptedPrivateKey = crypto.encrypt(key, iv, pair.getPrivate().getEncoded());
+            final CWSPair pair = crypto.generateKey(settings.getAsymmetricAlgorithm());
+            final byte[] encryptedPrivateKey = crypto.encrypt(key, pair.getPrivate().getEncoded());
             final String base64EncryptedPrivateKey = Base64.getEncoder().encodeToString(encryptedPrivateKey);
             final String armoredPublicKey = Crypto.armorKey(pair.getPublic());
             member.setSalt(salt);
@@ -248,21 +244,20 @@ public final class ProcessMemberService extends Serviceable<ProcessMemberRespons
 
     private MemberEntity createNewAccount(final String accountName, final CredentialType type, final char[] credential) {
         final String salt = UUID.randomUUID().toString();
-        final SecretKey key;
+        final CWSKey key;
 
         if (type == CredentialType.KEY) {
-            key = crypto.convertCredentialToKey(credential);
+            key = null;//crypto.convertCredentialToKey(credential);
         } else {
-            key = crypto.convertPasswordToKey(credential, salt + settings.getSalt());
+            key = crypto.generateKey(settings.getPasswordAlgorithm(), credential, settings.getSalt());
         }
-        final KeyPair pair = crypto.generateAsymmetricKey();
-        final IvParameterSpec iv = crypto.generateInitialVector(salt);
-        final byte[] encryptedPrivateKey = crypto.encrypt(key, iv, pair.getPrivate().getEncoded());
+        final CWSKey pair = crypto.generateKey(settings.getAsymmetricAlgorithm());
+        final byte[] encryptedPrivateKey = crypto.encrypt(key, pair.getPrivate().getEncoded());
         final String base64EncryptedPrivateKey = Base64.getEncoder().encodeToString(encryptedPrivateKey);
-        final String armoredPublicKey = Crypto.armorKey(pair.getPublic());
+        final String armoredPublicKey = crypto.armoringPublicKey(pair);
 
         final MemberEntity account = new MemberEntity();
-        account.setKeyPair(pair);
+        account.setKey(pair);
         account.setName(accountName);
         account.setSalt(salt);
         account.setPrivateKey(base64EncryptedPrivateKey);

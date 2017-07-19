@@ -14,6 +14,7 @@ import io.javadog.cws.api.dtos.MetaData;
 import io.javadog.cws.api.requests.ProcessDataRequest;
 import io.javadog.cws.api.responses.ProcessDataResponse;
 import io.javadog.cws.common.Settings;
+import io.javadog.cws.common.enums.KeyAlgorithm;
 import io.javadog.cws.common.exceptions.CWSException;
 import io.javadog.cws.common.exceptions.ModelException;
 import io.javadog.cws.core.Permission;
@@ -114,7 +115,7 @@ public final class ProcessDataService extends Serviceable<ProcessDataResponse, P
         if (bytes != null) {
             // 1. Find DataType Object, if none exist - fail. If DataType Object is "Folder", fail!
             // 2. Extract Circle Key, and create new Key & Data Entities
-            final String algorithm = settings.getSymmetricAlgorithm();
+            final KeyAlgorithm algorithm = settings.getSymmetricAlgorithm();
             final DataTypeEntity type = null;
             final Long parentId = null;
 

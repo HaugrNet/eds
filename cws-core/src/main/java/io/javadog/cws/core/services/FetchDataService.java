@@ -12,6 +12,7 @@ import io.javadog.cws.api.dtos.DataType;
 import io.javadog.cws.api.dtos.MetaData;
 import io.javadog.cws.api.requests.FetchDataRequest;
 import io.javadog.cws.api.responses.FetchDataResponse;
+import io.javadog.cws.common.CWSKey;
 import io.javadog.cws.common.Settings;
 import io.javadog.cws.common.exceptions.CWSException;
 import io.javadog.cws.core.Permission;
@@ -21,9 +22,7 @@ import io.javadog.cws.model.entities.DataEntity;
 import io.javadog.cws.model.entities.MetaDataEntity;
 import io.javadog.cws.model.entities.TrusteeEntity;
 
-import javax.crypto.spec.IvParameterSpec;
 import javax.persistence.EntityManager;
-import java.security.Key;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -130,9 +129,9 @@ public final class FetchDataService extends Serviceable<FetchDataResponse, Fetch
         final DataEntity entity = dao.findDataByMemberAndExternalId(member, metadata.getExternalId());
 
         if (entity != null) {
-            final Key key = extractCircleKey(entity);
-            final IvParameterSpec iv = crypto.generateInitialVector(entity.getInitialVector());
-            final byte[] bytes = crypto.decrypt(key, iv, entity.getData());
+            final CWSKey key = extractCircleKey(entity);
+            key.setIv(crypto.generateInitialVector(key.getAlgorithm(), entity.getInitialVector()));
+            final byte[] bytes = crypto.decrypt(key, entity.getData());
 
             final MetaData metaData = new MetaData();
             metaData.setTypeName(entity.getMetaData().getType().getName());
@@ -155,12 +154,12 @@ public final class FetchDataService extends Serviceable<FetchDataResponse, Fetch
         }
     }
 
-    private Key extractCircleKey(final DataEntity entity) {
+    private CWSKey extractCircleKey(final DataEntity entity) {
         final CircleEntity circle = entity.getMetaData().getCircle();
 
         for (final TrusteeEntity trustee : trustees) {
             if (Objects.equals(circle.getId(), trustee.getCircle().getId())) {
-                return crypto.extractCircleKey(member.getKeyPair().getPrivate(), trustee.getCircleKey(), entity.getKey().getAlgorithm());
+                return crypto.extractCircleKey(entity.getKey().getAlgorithm(), member.getKey(), trustee.getCircleKey());
             }
         }
 

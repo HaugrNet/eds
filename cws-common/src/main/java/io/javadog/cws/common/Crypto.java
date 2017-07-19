@@ -135,7 +135,7 @@ public final class Crypto {
         }
     }
 
-    private IvParameterSpec generateInitialVector(final KeyAlgorithm algorithm, final String salt) {
+    public IvParameterSpec generateInitialVector(final KeyAlgorithm algorithm, final String salt) {
         final byte[] bytes = new byte[algorithm.getLength() / 8];
         System.arraycopy(salt.getBytes(settings.getCharset()), 0, bytes, 0, bytes.length);
 

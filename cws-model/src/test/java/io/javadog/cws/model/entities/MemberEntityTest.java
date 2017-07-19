@@ -18,6 +18,7 @@ import io.javadog.cws.common.Crypto;
 import io.javadog.cws.common.Settings;
 import io.javadog.cws.common.enums.KeyAlgorithm;
 import io.javadog.cws.model.DatabaseSetup;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import javax.persistence.PersistenceException;
@@ -30,6 +31,7 @@ import java.util.UUID;
  * @author Kim Jensen
  * @since  CWS 1.0
  */
+@Ignore
 public final class MemberEntityTest extends DatabaseSetup {
 
     @Test

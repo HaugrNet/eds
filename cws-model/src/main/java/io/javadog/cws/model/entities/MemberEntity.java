@@ -54,7 +54,7 @@ public class MemberEntity extends Externable {
     private String salt = null;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "asymmetric_algorithm", nullable = false, length = 10)
+    @Column(name = "algorithm", nullable = false, length = 10)
     private KeyAlgorithm algorithm;
 
     @Column(name = "public_key", nullable = false, length = 1024)

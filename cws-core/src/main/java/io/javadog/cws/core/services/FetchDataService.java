@@ -130,7 +130,7 @@ public final class FetchDataService extends Serviceable<FetchDataResponse, Fetch
 
         if (entity != null) {
             final CWSKey key = extractCircleKey(entity);
-            key.setIv(crypto.generateInitialVector(key.getAlgorithm(), entity.getInitialVector()));
+            key.setSalt(entity.getInitialVector());
             final byte[] bytes = crypto.decrypt(key, entity.getData());
 
             final MetaData metaData = new MetaData();

@@ -48,7 +48,7 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
         final ProcessMemberResponse response = service.perform(request);
         assertThat(response, is(not(nullValue())));
         assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
-        final String signature = response.getArmoredKey();
+        final String signature = response.getSignature();
 
         final ProcessMemberRequest invationRequest = new ProcessMemberRequest();
         invationRequest.setAccount("invitee");

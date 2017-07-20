@@ -26,16 +26,13 @@ public final class ProcessMemberResponseTest {
     public void testClass() {
         final String id = UUID.randomUUID().toString();
         final Member member = new Member();
-        final String armoredKey = UUID.randomUUID().toString();
 
         final ProcessMemberResponse response = new ProcessMemberResponse();
         response.setId(id);
         response.setMember(member);
-        response.setArmoredKey(armoredKey);
 
         assertThat(response.getId(), is(id));
         assertThat(response.getMember(), is(member));
-        assertThat(response.getArmoredKey(), is(armoredKey));
         assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(response.getReturnMessage(), is("Ok"));
     }

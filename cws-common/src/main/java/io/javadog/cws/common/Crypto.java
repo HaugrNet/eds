@@ -97,9 +97,10 @@ public final class Crypto {
         }
 
         final SecretKey key = new SecretKeySpec(base64Decode(secret), algorithm.getName());
-        final IvParameterSpec iv = generateInitialVector(algorithm, salt);
 
-        return new CWSKey(algorithm, key, iv);
+        final CWSKey cwsKey = new CWSKey(algorithm, key);
+        cwsKey.setSalt(salt);
+        return cwsKey;
     }
 
     public CWSKey generateKey(final KeyAlgorithm algorithm, final String salt) {
@@ -111,9 +112,10 @@ public final class Crypto {
             final KeyGenerator generator = KeyGenerator.getInstance(algorithm.getName());
             generator.init(algorithm.getLength());
             final SecretKey key = generator.generateKey();
-            final IvParameterSpec iv = generateInitialVector(algorithm, salt);
 
-            return new CWSKey(algorithm, key, iv);
+            final CWSKey cwsKey = new CWSKey(algorithm, key);
+            cwsKey.setSalt(salt);
+            return cwsKey;
         } catch (NoSuchAlgorithmException e) {
             throw new CryptoException(e);
         }
@@ -200,12 +202,18 @@ public final class Crypto {
         }
     }
 
-    private static Cipher prepareCipher(final CWSKey key, final int type) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException {
+    private Cipher prepareCipher(final CWSKey key, final int type) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException {
         final KeyAlgorithm algorithm = key.getAlgorithm();
         final Cipher cipher = Cipher.getInstance(algorithm.getTransformation());
 
         if (algorithm.getType() == KeyAlgorithm.Type.SYMMETRIC) {
-            cipher.init(type, key.getKey(), key.getIv());
+            final String salt = key.getSalt();
+            if (salt != null) {
+                final IvParameterSpec iv = generateInitialVector(key.getAlgorithm(), salt);
+                cipher.init(type, key.getKey(), iv);
+            } else {
+                throw new CryptoException("The Salt is missing for the Symmetric Key");
+            }
         } else {
             cipher.init(type, key.getKey());
         }
@@ -224,13 +232,14 @@ public final class Crypto {
         return Base64.getEncoder().encodeToString(rawKey);
     }
 
-    public PublicKey dearmoringPublicKey(final KeyAlgorithm algorithm, final String armoredKey) {
+    public CWSKey dearmoringPublicKey(final KeyAlgorithm algorithm, final String armoredKey) {
         try {
             final KeyFactory keyFactory = KeyFactory.getInstance(algorithm.getName());
             final byte[] rawKey = Base64.getDecoder().decode(armoredKey);
             final X509EncodedKeySpec x509KeySpec = new X509EncodedKeySpec(rawKey);
+            final PublicKey publicKey = keyFactory.generatePublic(x509KeySpec);
 
-            return keyFactory.generatePublic(x509KeySpec);
+            return new CWSKey(algorithm, publicKey);
         } catch (InvalidKeySpecException | NoSuchAlgorithmException e) {
             throw new CryptoException(e);
         }
@@ -269,7 +278,7 @@ public final class Crypto {
         final byte[] decryptedCircleKey = decrypt(decryptionKey, dearmoredCircleKey);
 
         final SecretKey key = new SecretKeySpec(decryptedCircleKey, algorithm.getName());
-        return new CWSKey(algorithm, key, null);
+        return new CWSKey(algorithm, key);
     }
 
     /**
@@ -318,7 +327,7 @@ public final class Crypto {
         final byte[] decryptedCircleKey = decrypt(privateKey, dearmoredCircleKey);
         final SecretKey key = new SecretKeySpec(decryptedCircleKey, algorithm.getName());
 
-        return new CWSKey(algorithm, key, null);
+        return new CWSKey(algorithm, key);
     }
 
     /**
@@ -340,8 +349,7 @@ public final class Crypto {
         try {
             final KeyFactory keyFactory = KeyFactory.getInstance(algorithm.getName());
             final Base64.Decoder decoder = Base64.getDecoder();
-            final IvParameterSpec iv = generateInitialVector(key.getAlgorithm(), salt);
-            key.setIv(iv);
+            key.setSalt(salt);
 
             final byte[] rawPublicKey = decoder.decode(armoredPublicKey);
             final byte[] encryptedPrivateKey = decoder.decode(armoredPrivateKey);
@@ -360,14 +368,15 @@ public final class Crypto {
         }
     }
 
-    public PublicKey extractPublicKey(final KeyAlgorithm algorithm, final String armoredPublicKey) {
+    public CWSKey extractPublicKey(final KeyAlgorithm algorithm, final String armoredPublicKey) {
         try {
             final KeyFactory keyFactory = KeyFactory.getInstance(algorithm.getName());
             final Base64.Decoder decoder = Base64.getDecoder();
             final byte[] rawPublicKey = decoder.decode(armoredPublicKey);
             final X509EncodedKeySpec x509KeySpec = new X509EncodedKeySpec(rawPublicKey);
+            final PublicKey publicKey = keyFactory.generatePublic(x509KeySpec);
 
-            return keyFactory.generatePublic(x509KeySpec);
+            return new CWSKey(algorithm, publicKey);
         } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
             throw new CryptoException(e);
         }

@@ -21,7 +21,7 @@ import javax.xml.bind.annotation.XmlType;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "processMemberResult", propOrder = { "id", "member", "armoredKey" })
+@XmlType(name = "processMemberResult", propOrder = { "id", "member", "signature" })
 public final class ProcessMemberResponse extends CwsResponse {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
@@ -34,7 +34,7 @@ public final class ProcessMemberResponse extends CwsResponse {
     private Member member = null;
 
     @XmlElement
-    private String armoredKey = null;
+    private String signature = null;
 
     // =========================================================================
     // Object Constructors
@@ -79,11 +79,11 @@ public final class ProcessMemberResponse extends CwsResponse {
         return member;
     }
 
-    public void setArmoredKey(final String armoredKey) {
-        this.armoredKey = armoredKey;
+    public void setSignature(final String signature) {
+        this.signature = signature;
     }
 
-    public String getArmoredKey() {
-        return armoredKey;
+    public String getSignature() {
+        return signature;
     }
 }

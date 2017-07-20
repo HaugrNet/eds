@@ -9,7 +9,6 @@ package io.javadog.cws.common;
 
 import io.javadog.cws.common.enums.KeyAlgorithm;
 
-import javax.crypto.spec.IvParameterSpec;
 import java.security.Key;
 import java.security.KeyPair;
 import java.security.PrivateKey;
@@ -24,23 +23,26 @@ public final class CWSKey {
     private final KeyAlgorithm algorithm;
     private final KeyPair keyPair;
     private final Key key;
-    private IvParameterSpec iv = null;
+    private String salt = null;
 
     public CWSKey(final KeyAlgorithm algorithm, final KeyPair keyPair) {
+        if ((algorithm == null) || (keyPair == null)) {
+            throw new IllegalArgumentException("Missing information");
+        }
+
         this.algorithm = algorithm;
         this.keyPair = keyPair;
-
-        // rest is set to null, as this is an Asymmetric Key
-        this.key = null;
+        this.key = keyPair.getPrivate();
     }
 
-    public CWSKey(final KeyAlgorithm algorithm, final Key key, final IvParameterSpec iv) {
-        this.algorithm = algorithm;
-        this.key = key;
-        this.iv = iv;
+    public CWSKey(final KeyAlgorithm algorithm, final Key key) {
+        if ((algorithm == null) || (key == null)) {
+            throw new IllegalArgumentException("Missing information");
+        }
 
-        // rest is set to null, as this is a Symmetric Key
+        this.algorithm = algorithm;
         this.keyPair = null;
+        this.key = key;
     }
 
     public KeyAlgorithm.Type getType() {
@@ -52,11 +54,31 @@ public final class CWSKey {
     }
 
     public PublicKey getPublic() {
-        return (keyPair != null) ? keyPair.getPublic() : null;
+        final PublicKey theKey;
+
+        if (algorithm.getType() == KeyAlgorithm.Type.ASYMMETRIC) {
+            if (keyPair != null) {
+                theKey = keyPair.getPublic();
+            } else {
+                theKey = (PublicKey) key;
+            }
+        } else {
+            theKey = null;
+        }
+
+        return theKey;
     }
 
     public PrivateKey getPrivate() {
-        return (keyPair != null) ? keyPair.getPrivate() : null;
+        final PrivateKey theKey;
+
+        if (algorithm.getType() == KeyAlgorithm.Type.ASYMMETRIC) {
+            theKey = (PrivateKey) key;
+        } else {
+            theKey = null;
+        }
+
+        return theKey;
     }
 
     public Key getKey() {
@@ -64,14 +86,14 @@ public final class CWSKey {
     }
 
     public byte[] getEncoded() {
-        return (key != null) ? key.getEncoded() : keyPair.getPrivate().getEncoded();
+        return key.getEncoded();
     }
 
-    public void setIv(final IvParameterSpec iv) {
-        this.iv = iv;
+    public void setSalt(final String salt) {
+        this.salt = salt;
     }
 
-    public IvParameterSpec getIv() {
-        return iv;
+    public String getSalt() {
+        return salt;
     }
 }

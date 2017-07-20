@@ -13,6 +13,7 @@ import io.javadog.cws.api.dtos.DataType;
 import io.javadog.cws.api.dtos.MetaData;
 import io.javadog.cws.api.requests.ProcessDataRequest;
 import io.javadog.cws.api.responses.ProcessDataResponse;
+import io.javadog.cws.common.CWSKey;
 import io.javadog.cws.common.Settings;
 import io.javadog.cws.common.enums.KeyAlgorithm;
 import io.javadog.cws.common.exceptions.CWSException;
@@ -24,10 +25,7 @@ import io.javadog.cws.model.entities.DataTypeEntity;
 import io.javadog.cws.model.entities.MetaDataEntity;
 import io.javadog.cws.model.entities.TrusteeEntity;
 
-import javax.crypto.SecretKey;
-import javax.crypto.spec.IvParameterSpec;
 import javax.persistence.EntityManager;
-import java.security.Key;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -125,12 +123,12 @@ public final class ProcessDataService extends Serviceable<ProcessDataResponse, P
             metaData.setParentId(parentId);
             metaData.setType(type);
 
-            final Key circleKey = crypto.extractCircleKey(member.getKeyPair().getPrivate(), trustee.getCircleKey(), algorithm);
-            final String uuid = UUID.randomUUID().toString();
-            final IvParameterSpec iv = crypto.generateInitialVector(uuid);
-            final byte[] encrypted = crypto.encrypt(circleKey, iv, bytes);
+            final CWSKey circleKey = crypto.extractCircleKey(algorithm, member.getKey(), trustee.getCircleKey());
+            final String salt = UUID.randomUUID().toString();
+            circleKey.setSalt(salt);
+            final byte[] encrypted = crypto.encrypt(circleKey, bytes);
             final DataEntity dataEntity = new DataEntity();
-            dataEntity.setInitialVector(uuid);
+            dataEntity.setInitialVector(salt);
             dataEntity.setMetaData(metaData);
             dataEntity.setData(encrypted);
             dataEntity.setKey(trustee.getKey());
@@ -202,10 +200,10 @@ public final class ProcessDataService extends Serviceable<ProcessDataResponse, P
     private void checkData(final DataEntity entity, final byte[] bytes) {
         if (bytes != null) {
             final TrusteeEntity trustee = findTrustee(entity.getMetaData().getCircle().getExternalId());
-            final SecretKey circleKey = crypto.extractCircleKey(keyPair.getPrivate(), trustee.getCircleKey(), entity.getKey().getAlgorithm());
+            final CWSKey circleKey = crypto.extractCircleKey(entity.getKey().getAlgorithm(), keyPair, trustee.getCircleKey());
             final String salt = UUID.randomUUID().toString();
-            final IvParameterSpec iv = crypto.generateInitialVector(salt);
-            final byte[] encrypted = crypto.encrypt(circleKey, iv, bytes);
+            circleKey.setSalt(salt);
+            final byte[] encrypted = crypto.encrypt(circleKey, bytes);
 
             entity.setInitialVector(salt);
             entity.setData(encrypted);

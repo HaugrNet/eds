@@ -245,13 +245,15 @@ public final class CryptoTest {
     public void testBytesToStringConversion() {
         final Settings settings = new Settings();
         final Crypto crypto = new Crypto(settings);
-        final byte[] bytes = "Alpha Beta æøåßöäÿ".getBytes(settings.getCharset());
+        final String str = "Alpha Beta æøåßöäÿ";
+        final byte[] bytes = str.getBytes(settings.getCharset());
         final String garbage = "INVALID_ENCODING";
         settings.set(Settings.CWS_CHARSET, garbage);
 
         prepareCause(CWSException.class, ReturnCode.PROPERTY_ERROR, "UnsupportedCharsetException: " + garbage);
         assertThat(bytes, is(not(nullValue())));
-        crypto.bytesToString(bytes);
+        final String reversed = crypto.bytesToString(bytes);
+        assertThat(reversed, is(str));
     }
 
     /**

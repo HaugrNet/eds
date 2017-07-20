@@ -13,7 +13,6 @@ import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.requests.ProcessMemberRequest;
 import io.javadog.cws.api.responses.ProcessMemberResponse;
 import io.javadog.cws.common.CWSKey;
-import io.javadog.cws.common.Crypto;
 import io.javadog.cws.common.Settings;
 import io.javadog.cws.common.exceptions.CWSException;
 import io.javadog.cws.common.exceptions.VerificationException;
@@ -22,7 +21,6 @@ import io.javadog.cws.core.Serviceable;
 import io.javadog.cws.model.entities.MemberEntity;
 
 import javax.persistence.EntityManager;
-import java.security.PublicKey;
 import java.util.Base64;
 import java.util.Objects;
 import java.util.UUID;
@@ -93,7 +91,6 @@ public final class ProcessMemberService extends Serviceable<ProcessMemberRespons
                 final MemberEntity created = createNewAccount(accountName, request.getNewCredentialType(), request.getCredential());
                 response = new ProcessMemberResponse();
                 response.setId(created.getExternalId());
-                response.setArmoredKey(created.getPrivateKey());
             } else {
                 throw new CWSException(ReturnCode.CONSTRAINT_ERROR, "An Account with the same AccountName already exist.");
             }
@@ -123,8 +120,7 @@ public final class ProcessMemberService extends Serviceable<ProcessMemberRespons
                 dao.persist(entity);
 
                 response = new ProcessMemberResponse();
-                request.setMemberId(entity.getExternalId());
-                response.setArmoredKey(signature);
+                response.setSignature(signature);
             } else {
                 response = new ProcessMemberResponse(ReturnCode.CONSTRAINT_ERROR, "Cannot create an invitation, as as the account already exists.");
             }
@@ -162,7 +158,7 @@ public final class ProcessMemberService extends Serviceable<ProcessMemberRespons
                 final String secret = account.getSalt();
                 final String signature = new String(request.getCredential());
                 final MemberEntity admin = dao.findMemberByName(Constants.ADMIN_ACCOUNT);
-                final PublicKey publicKey = crypto.extractPublicKey(admin.getAlgorithm(), admin.getPublicKey());
+                final CWSKey publicKey = crypto.extractPublicKey(admin.getAlgorithm(), admin.getPublicKey());
 
                 if (crypto.verify(publicKey, crypto.stringToBytes(secret), signature)) {
                     final String salt = UUID.randomUUID().toString();
@@ -172,7 +168,7 @@ public final class ProcessMemberService extends Serviceable<ProcessMemberRespons
                     final CWSKey pair = crypto.generateKey(settings.getAsymmetricAlgorithm());
                     final byte[] encryptedPrivateKey = crypto.encrypt(key, pair.getPrivate().getEncoded());
                     final String base64EncryptedPrivateKey = Base64.getEncoder().encodeToString(encryptedPrivateKey);
-                    final String armoredPublicKey = Crypto.armorKey(pair.getPublic());
+                    final String armoredPublicKey = crypto.armoringPublicKey(pair);
 
                     account.setSalt(salt);
                     account.setAlgorithm(pair.getAlgorithm());
@@ -180,10 +176,8 @@ public final class ProcessMemberService extends Serviceable<ProcessMemberRespons
                     account.setPublicKey(armoredPublicKey);
                     dao.persist(account);
 
-                    final String armoredKey = Crypto.armorKey(key);
                     response = new ProcessMemberResponse();
                     response.setId(account.getExternalId());
-                    response.setArmoredKey(armoredKey);
                 } else {
                     response = new ProcessMemberResponse(ReturnCode.AUTHENTICATION_WARNING, "The given signature is invalid.");
                 }
@@ -215,26 +209,14 @@ public final class ProcessMemberService extends Serviceable<ProcessMemberRespons
         if ((request.getCredentialType() != null) && (request.getCredential() != null)) {
             final char[] credential = request.getCredential();
             final String salt = UUID.randomUUID().toString();
-            final CWSKey key;
-
-            if (request.getCredentialType() == CredentialType.KEY) {
-                // If we have a request for a new Key, then a new key is
-                // generated, and used to re-encrypt the existing KeyPair
-                // before being returned. If the Account KeyPair which is
-                // used internally also needs replacement, then the request
-                // must be a REKEY.
-                key = null;//crypto.convertCredentialToKey(credential);
-            } else {
-                key = crypto.generateKey(settings.getPasswordAlgorithm(), credential, salt);
-            }
-            final CWSPair pair = crypto.generateKey(settings.getAsymmetricAlgorithm());
+            final CWSKey key = crypto.generateKey(settings.getPasswordAlgorithm(), credential, salt);
+            final CWSKey pair = crypto.generateKey(settings.getAsymmetricAlgorithm());
             final byte[] encryptedPrivateKey = crypto.encrypt(key, pair.getPrivate().getEncoded());
             final String base64EncryptedPrivateKey = Base64.getEncoder().encodeToString(encryptedPrivateKey);
-            final String armoredPublicKey = Crypto.armorKey(pair.getPublic());
+            final String armoredPublicKey = crypto.armoringPublicKey(pair);
             member.setSalt(salt);
             member.setPrivateKey(base64EncryptedPrivateKey);
             member.setPublicKey(armoredPublicKey);
-            response.setArmoredKey(Crypto.armorKey(pair.getPrivate()));
         }
 
         dao.persist(member);
@@ -244,13 +226,7 @@ public final class ProcessMemberService extends Serviceable<ProcessMemberRespons
 
     private MemberEntity createNewAccount(final String accountName, final CredentialType type, final char[] credential) {
         final String salt = UUID.randomUUID().toString();
-        final CWSKey key;
-
-        if (type == CredentialType.KEY) {
-            key = null;//crypto.convertCredentialToKey(credential);
-        } else {
-            key = crypto.generateKey(settings.getPasswordAlgorithm(), credential, settings.getSalt());
-        }
+        final CWSKey key = crypto.generateKey(settings.getPasswordAlgorithm(), credential, settings.getSalt());
         final CWSKey pair = crypto.generateKey(settings.getAsymmetricAlgorithm());
         final byte[] encryptedPrivateKey = crypto.encrypt(key, pair.getPrivate().getEncoded());
         final String base64EncryptedPrivateKey = Base64.getEncoder().encodeToString(encryptedPrivateKey);

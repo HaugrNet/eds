@@ -10,12 +10,14 @@ package io.javadog.cws.war;
 import io.javadog.cws.api.Share;
 import io.javadog.cws.api.requests.FetchDataRequest;
 import io.javadog.cws.api.requests.FetchDataTypeRequest;
+import io.javadog.cws.api.requests.FetchSignatureRequest;
 import io.javadog.cws.api.requests.ProcessDataRequest;
 import io.javadog.cws.api.requests.ProcessDataTypeRequest;
 import io.javadog.cws.api.requests.SignRequest;
 import io.javadog.cws.api.requests.VerifyRequest;
 import io.javadog.cws.api.responses.FetchDataResponse;
 import io.javadog.cws.api.responses.FetchDataTypeResponse;
+import io.javadog.cws.api.responses.FetchSignatureResponse;
 import io.javadog.cws.api.responses.ProcessDataResponse;
 import io.javadog.cws.api.responses.ProcessDataTypeResponse;
 import io.javadog.cws.api.responses.SignResponse;
@@ -25,6 +27,7 @@ import io.javadog.cws.common.exceptions.CWSException;
 import io.javadog.cws.core.Serviceable;
 import io.javadog.cws.core.services.FetchDataService;
 import io.javadog.cws.core.services.FetchDataTypeService;
+import io.javadog.cws.core.services.FetchSignatureService;
 import io.javadog.cws.core.services.ProcessDataService;
 import io.javadog.cws.core.services.ProcessDataTypeService;
 import io.javadog.cws.core.services.SignService;
@@ -183,6 +186,29 @@ public final class ShareBean implements Share {
             // response.
             log.trace(e.getMessage(), e);
             response = new VerifyResponse(e.getReturnCode(), e.getMessage());
+        }
+
+        return response;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional(Transactional.TxType.SUPPORTS)
+    public FetchSignatureResponse fetchSignatures(final FetchSignatureRequest request) {
+        FetchSignatureResponse response;
+
+        try {
+            final Serviceable<FetchSignatureResponse, FetchSignatureRequest> service = new FetchSignatureService(settings, entityManager);
+            response = service.perform(request);
+        } catch (CWSException e) {
+            // Any Warning or Error thrown by the CWS contain enough information
+            // so it can be dealt with by the requesting System. Logging the
+            // error is thus not needed, as all information is provided in the
+            // response.
+            log.trace(e.getMessage(), e);
+            response = new FetchSignatureResponse(e.getReturnCode(), e.getMessage());
         }
 
         return response;

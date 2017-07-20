@@ -10,12 +10,14 @@ package io.javadog.cws.client;
 import io.javadog.cws.api.Share;
 import io.javadog.cws.api.requests.FetchDataRequest;
 import io.javadog.cws.api.requests.FetchDataTypeRequest;
+import io.javadog.cws.api.requests.FetchSignatureRequest;
 import io.javadog.cws.api.requests.ProcessDataRequest;
 import io.javadog.cws.api.requests.ProcessDataTypeRequest;
 import io.javadog.cws.api.requests.SignRequest;
 import io.javadog.cws.api.requests.VerifyRequest;
 import io.javadog.cws.api.responses.FetchDataResponse;
 import io.javadog.cws.api.responses.FetchDataTypeResponse;
+import io.javadog.cws.api.responses.FetchSignatureResponse;
 import io.javadog.cws.api.responses.ProcessDataResponse;
 import io.javadog.cws.api.responses.ProcessDataTypeResponse;
 import io.javadog.cws.api.responses.SignResponse;
@@ -72,6 +74,14 @@ public final class ShareSoapClient implements Share {
      */
     @Override
     public VerifyResponse verify(final VerifyRequest request) {
+        return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public FetchSignatureResponse fetchSignatures(final FetchSignatureRequest request) {
         return null;
     }
 }

@@ -9,12 +9,14 @@ package io.javadog.cws.api;
 
 import io.javadog.cws.api.requests.FetchDataRequest;
 import io.javadog.cws.api.requests.FetchDataTypeRequest;
+import io.javadog.cws.api.requests.FetchSignatureRequest;
 import io.javadog.cws.api.requests.ProcessDataRequest;
 import io.javadog.cws.api.requests.ProcessDataTypeRequest;
 import io.javadog.cws.api.requests.SignRequest;
 import io.javadog.cws.api.requests.VerifyRequest;
 import io.javadog.cws.api.responses.FetchDataResponse;
 import io.javadog.cws.api.responses.FetchDataTypeResponse;
+import io.javadog.cws.api.responses.FetchSignatureResponse;
 import io.javadog.cws.api.responses.ProcessDataResponse;
 import io.javadog.cws.api.responses.ProcessDataTypeResponse;
 import io.javadog.cws.api.responses.SignResponse;
@@ -67,4 +69,6 @@ public interface Share {
      * @return Response Object with ReturnCode and Message
      */
     VerifyResponse verify(VerifyRequest request);
+
+    FetchSignatureResponse fetchSignatures(FetchSignatureRequest request);
 }

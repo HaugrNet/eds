@@ -11,12 +11,14 @@ import io.javadog.cws.api.Share;
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.requests.FetchDataRequest;
 import io.javadog.cws.api.requests.FetchDataTypeRequest;
+import io.javadog.cws.api.requests.FetchSignatureRequest;
 import io.javadog.cws.api.requests.ProcessDataRequest;
 import io.javadog.cws.api.requests.ProcessDataTypeRequest;
 import io.javadog.cws.api.requests.SignRequest;
 import io.javadog.cws.api.requests.VerifyRequest;
 import io.javadog.cws.api.responses.FetchDataResponse;
 import io.javadog.cws.api.responses.FetchDataTypeResponse;
+import io.javadog.cws.api.responses.FetchSignatureResponse;
 import io.javadog.cws.api.responses.ProcessDataResponse;
 import io.javadog.cws.api.responses.ProcessDataTypeResponse;
 import io.javadog.cws.api.responses.SignResponse;
@@ -180,6 +182,29 @@ public class ShareService implements Share {
             // performance of the system.
             log.error(e.getMessage(), e);
             response = new VerifyResponse(ReturnCode.ERROR, GENERAL_RETURN_MESSAGE);
+        }
+
+        return response;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @WebMethod
+    @WebResult(name = "response")
+    public FetchSignatureResponse fetchSignatures(@WebParam(name = "request") final FetchSignatureRequest request) {
+        FetchSignatureResponse response;
+
+        try {
+            response = bean.fetchSignatures(request);
+        } catch (RuntimeException e) {
+            // If an error occurs that has so far not been resolved, this is the
+            // final level where it can be handled. Errors can be Persistence
+            // problems or other things that will affect the reliability and/or
+            // performance of the system.
+            log.error(e.getMessage(), e);
+            response = new FetchSignatureResponse(ReturnCode.ERROR, GENERAL_RETURN_MESSAGE);
         }
 
         return response;

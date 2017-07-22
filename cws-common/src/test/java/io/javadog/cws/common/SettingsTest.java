@@ -59,7 +59,7 @@ public final class SettingsTest {
         settings.set(Settings.SIGNATURE_ALGORITHM, KeyAlgorithm.SHA256.name());
         assertThat(settings.getSignatureAlgorithm(), is(KeyAlgorithm.SHA256));
 
-        settings.set(Settings.PASSWORD_ALGORITHM, KeyAlgorithm.PBE192.name());
+        settings.set(Settings.PBE_ALGORITHM, KeyAlgorithm.PBE192.name());
         assertThat(settings.getPasswordAlgorithm(), is(KeyAlgorithm.PBE192));
 
         settings.set(Settings.CWS_SALT, "UUID value");

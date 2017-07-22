@@ -16,13 +16,12 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.KeyGenerator;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
+import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
-import java.security.Key;
 import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -32,9 +31,9 @@ import java.security.PublicKey;
 import java.security.Signature;
 import java.security.SignatureException;
 import java.security.spec.InvalidKeySpecException;
+import java.security.spec.KeySpec;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
-import java.util.Arrays;
 import java.util.Base64;
 
 /**
@@ -91,24 +90,34 @@ public final class Crypto {
      * @param salt   System specific Salt
      * @return Symmetric Key
      */
-    public CWSKey generateKey(final KeyAlgorithm algorithm, final char[] secret, final String salt) {
+    public CWSKey generateKey(final KeyAlgorithm algorithm, final String secret, final String salt) {
         if (algorithm.getType() != KeyAlgorithm.Type.PASSWORD) {
             throw new CryptoException("Expected a Password Algorithm.");
         }
 
-        final SecretKey key = new SecretKeySpec(base64Decode(secret), algorithm.getName());
+        try {
+            final char[] rawSecret = secret.toCharArray();
+            final byte[] rawSalt = (salt + settings.getSalt()).getBytes(settings.getCharset());
+            final int iterations = 4192;
+            final int length = algorithm.getLength() * 8;
+            final KeySpec spec = new PBEKeySpec(rawSecret, rawSalt, iterations, length);
+            final SecretKeyFactory factory = SecretKeyFactory.getInstance(algorithm.getName());
+            final SecretKey secretKey = factory.generateSecret(spec);
+            final CWSKey key = new CWSKey(algorithm, secretKey);
+            key.setSalt(salt);
 
-        final CWSKey cwsKey = new CWSKey(algorithm, key);
-        cwsKey.setSalt(salt);
-        return cwsKey;
+            return key;
+        } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+            throw new CryptoException(e);
+        }
     }
 
     public CWSKey generateKey(final KeyAlgorithm algorithm, final String salt) {
-        try {
-            if (algorithm.getType() != KeyAlgorithm.Type.SYMMETRIC) {
-                throw new CryptoException("Expected a Symmetric Algorithm.");
-            }
+        if (algorithm.getType() != KeyAlgorithm.Type.SYMMETRIC) {
+            throw new CryptoException("Expected a Symmetric Algorithm.");
+        }
 
+        try {
             final KeyGenerator generator = KeyGenerator.getInstance(algorithm.getName());
             generator.init(algorithm.getLength());
             final SecretKey key = generator.generateKey();
@@ -122,11 +131,11 @@ public final class Crypto {
     }
 
     public CWSKey generateKey(final KeyAlgorithm algorithm) {
-        try {
-            if (algorithm.getType() != KeyAlgorithm.Type.ASYMMETRIC) {
-                throw new CryptoException("Expected an Asymmetric Algorithm.");
-            }
+        if (algorithm.getType() != KeyAlgorithm.Type.ASYMMETRIC) {
+            throw new CryptoException("Expected an Asymmetric Algorithm.");
+        }
 
+        try {
             final KeyPairGenerator generator = KeyPairGenerator.getInstance(algorithm.getName());
             generator.initialize(algorithm.getLength());
             final KeyPair keyPair = generator.generateKeyPair();
@@ -137,7 +146,7 @@ public final class Crypto {
         }
     }
 
-    public IvParameterSpec generateInitialVector(final KeyAlgorithm algorithm, final String salt) {
+    private IvParameterSpec generateInitialVector(final KeyAlgorithm algorithm, final String salt) {
         final byte[] bytes = new byte[algorithm.getLength() / 8];
         System.arraycopy(salt.getBytes(settings.getCharset()), 0, bytes, 0, bytes.length);
 
@@ -150,12 +159,11 @@ public final class Crypto {
 
     public String sign(final CWSKey key, final byte[] message) {
         try {
-            if (key.getType() != KeyAlgorithm.Type.SIGNATURE) {
-                throw new CryptoException("Expected a Signature Algorithm for signing.");
+            if (key.getType() != KeyAlgorithm.Type.ASYMMETRIC) {
+                throw new CryptoException("Expected an Asymmetric Key for signing.");
             }
 
-            final String algorithm = key.getAlgorithm().getName();
-            final Signature signer = Signature.getInstance(algorithm);
+            final Signature signer = Signature.getInstance(settings.getSignatureAlgorithm().getName());
             signer.initSign(key.getPrivate());
             signer.update(message);
             final byte[] signed = signer.sign();
@@ -168,13 +176,12 @@ public final class Crypto {
 
     public boolean verify(final CWSKey key, final byte[] message, final String signature) {
         try {
-            if (key.getType() != KeyAlgorithm.Type.SIGNATURE) {
-                throw new CryptoException("Expected a Signature Algorithm for verifying.");
+            if (key.getType() != KeyAlgorithm.Type.ASYMMETRIC) {
+                throw new CryptoException("Expected an Asymmetric Key for verifying.");
             }
 
-            final String algorithm = key.getAlgorithm().getName();
             final byte[] bytes = Base64.getDecoder().decode(signature);
-            final Signature verifier = Signature.getInstance(algorithm);
+            final Signature verifier = Signature.getInstance(settings.getSignatureAlgorithm().getName());
             verifier.initVerify(key.getPublic());
             verifier.update(message);
 
@@ -225,6 +232,13 @@ public final class Crypto {
     // Key Protection, Encrypting & Armoring - De-armoring & Decrypting Keys
     // =========================================================================
 
+    /**
+     * The Public RSA Key stored in CWS, is simply saved in x.509 format, stored
+     * Base64 encoded.
+     *
+     * @param key Public RSA key to armor (Base64 encoded x.509 Key)
+     * @return String representation of the Key
+     */
     public String armoringPublicKey(final CWSKey key) {
         final X509EncodedKeySpec keySpec = new X509EncodedKeySpec(key.getPublic().getEncoded());
         final byte[] rawKey = keySpec.getEncoded();
@@ -282,31 +296,15 @@ public final class Crypto {
     }
 
     /**
-     * The Public RSA Key stored in CWS, is simply saved in x.509 format, stored
-     * Base64 encoded.
-     *
-     * @param key Public RSA key to armor (Base64 encoded x.509 Key)
-     * @return String representation of the Key
-     * @deprecated please use {@link #armoringPublicKey(CWSKey)}
-     */
-    @Deprecated
-    public static String armorKey(final Key key) {
-        final X509EncodedKeySpec keySpec = new X509EncodedKeySpec(key.getEncoded());
-        final byte[] rawKey = keySpec.getEncoded();
-
-        return Base64.getEncoder().encodeToString(rawKey);
-    }
-
-    /**
      * The Private RSA Key stored in CWS, is stored encrypted, so it cannot be
      * extracted without some effort. To do this, a Key is needed, together with
      * a Salt which the Initial Vector is based on. The encrypted Key, is then
-     * converted into PKCS8 and converted using Base64 encoding. The result of
+     * converted into PKCS 8 and converted using Base64 encoding. The result of
      * this will make the key save for storage in the database.
      *
      * @param key        Symmetric Key to encrypt the Private RSA Key with
      * @param privateKey The Private RSA Key to encrypt and armor
-     * @return Armored (Base64 encoded encrypted key in PCKS8 format)
+     * @return Armored (Base64 encoded encrypted key in PCKS 8 format)
      */
     public String armorPrivateKey(final CWSKey key, final PrivateKey privateKey) {
         final byte[] encryptedPrivateKey = encrypt(key, privateKey.getEncoded());
@@ -316,7 +314,7 @@ public final class Crypto {
         return Base64.getEncoder().encodeToString(rawKey);
     }
 
-    public String encryptAndArmorCircleKey(final CWSKey publicKey, final Key circleKey) {
+    public String encryptAndArmorCircleKey(final CWSKey publicKey, final CWSKey circleKey) {
         final byte[] encryptedCircleKey = encrypt(publicKey, circleKey.getEncoded());
 
         return Base64.getEncoder().encodeToString(encryptedCircleKey);
@@ -388,25 +386,5 @@ public final class Crypto {
 
     public String bytesToString(final byte[] bytes) {
         return new String(bytes, settings.getCharset());
-    }
-
-    private byte[] base64Decode(final char[] chars) {
-        final CharBuffer charBuffer = CharBuffer.wrap(chars);
-        final ByteBuffer byteBuffer = settings.getCharset().encode(charBuffer);
-        final byte[] bytes = Arrays.copyOfRange(byteBuffer.array(), 0, byteBuffer.limit());
-
-        // To ensure that no traces of the sensitive data still exists, we're
-        // filling the array with null's.
-        clearSensitiveData(charBuffer.array());
-
-        return Base64.getDecoder().decode(bytes);
-    }
-
-    public static void clearSensitiveData(final char[] chars) {
-        Arrays.fill(chars, '\u0000');
-    }
-
-    public static void clearSensitiveData(final byte[] bytes) {
-        Arrays.fill(bytes, (byte) 0x00);
     }
 }

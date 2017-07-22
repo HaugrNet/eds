@@ -147,7 +147,7 @@ public final class SettingServiceTest extends DatabaseSetup {
         final SettingRequest request = new SettingRequest();
         request.setAccount(account);
         request.setCredentialType(CredentialType.PASSPHRASE);
-        request.setCredential(account.toCharArray());
+        request.setCredential(account);
 
         return request;
     }

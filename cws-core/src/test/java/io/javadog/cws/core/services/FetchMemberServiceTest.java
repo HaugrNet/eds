@@ -460,7 +460,7 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
         final FetchMemberRequest request = new FetchMemberRequest();
         request.setAccount(account);
         request.setCredentialType(CredentialType.PASSPHRASE);
-        request.setCredential(account.toCharArray());
+        request.setCredential(account);
 
         return request;
     }

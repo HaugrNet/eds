@@ -78,7 +78,7 @@ public class DatabaseSetup {
      */
     protected MemberEntity createMember(final String account) {
         final String salt = UUID.randomUUID().toString();
-        final CWSKey key = crypto.generateKey(KeyAlgorithm.PBE128, account.toCharArray(), salt);
+        final CWSKey key = crypto.generateKey(KeyAlgorithm.PBE128, account, salt);
 
         final CWSKey pair = crypto.generateKey(KeyAlgorithm.RSA2048);
         final byte[] encryptedPrivateKey = crypto.encrypt(key, pair.getPrivate().getEncoded());
@@ -109,7 +109,7 @@ public class DatabaseSetup {
 
             for (final MemberEntity account : accounts) {
                 final TrusteeEntity entity = new TrusteeEntity();
-                entity.setCircleKey(crypto.encryptAndArmorCircleKey(account.getKey(), key.getKey()));
+                entity.setCircleKey(crypto.encryptAndArmorCircleKey(account.getKey(), key));
                 entity.setMember(account);
                 entity.setCircle(circle);
                 entity.setKey(keyEntity);

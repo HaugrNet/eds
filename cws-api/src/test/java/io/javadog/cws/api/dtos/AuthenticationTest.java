@@ -25,7 +25,7 @@ public final class AuthenticationTest {
     @Test
     public void testClass() {
         final String name = "Authentication Name";
-        final char[] credentials = "Member Passphrase".toCharArray();
+        final String credentials = "Member Passphrase";
         final CredentialType type = CredentialType.KEY;
 
         final Authentication authentication = new Authentication();

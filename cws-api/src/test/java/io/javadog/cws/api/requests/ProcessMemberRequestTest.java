@@ -28,7 +28,7 @@ public final class ProcessMemberRequestTest {
     @Test
     public void testClass() {
         final String account = Constants.ADMIN_ACCOUNT;
-        final char[] credentials = UUID.randomUUID().toString().toCharArray();
+        final String credentials = UUID.randomUUID().toString();
 
         final Authentication authentication = new Authentication();
         authentication.setAccount(account);

@@ -38,7 +38,7 @@ public final class FetchMemberRequestTest {
         final FetchMemberRequest request = new FetchMemberRequest();
         request.setAccount(Constants.ADMIN_ACCOUNT);
         request.setCredentialType(CredentialType.PASSPHRASE);
-        request.setCredential(Constants.ADMIN_ACCOUNT.toCharArray());
+        request.setCredential(Constants.ADMIN_ACCOUNT);
         request.setMemberId(memberId);
 
         assertThat(request.getMemberId(), is(memberId));
@@ -51,7 +51,7 @@ public final class FetchMemberRequestTest {
         final FetchMemberRequest request = new FetchMemberRequest();
         request.setAccount(Constants.ADMIN_ACCOUNT);
         request.setCredentialType(CredentialType.PASSPHRASE);
-        request.setCredential(Constants.ADMIN_ACCOUNT.toCharArray());
+        request.setCredential(Constants.ADMIN_ACCOUNT);
 
         assertThat(request.getMemberId(), is(nullValue()));
         assertThat(request.validate(), is(not(nullValue())));
@@ -74,7 +74,7 @@ public final class FetchMemberRequestTest {
         final FetchMemberRequest request = new FetchMemberRequest();
         request.setAccount(Constants.ADMIN_ACCOUNT);
         request.setCredentialType(CredentialType.PASSPHRASE);
-        request.setCredential(Constants.ADMIN_ACCOUNT.toCharArray());
+        request.setCredential(Constants.ADMIN_ACCOUNT);
 
         final Field field = request.getClass().getDeclaredField("memberId");
         field.setAccessible(true);

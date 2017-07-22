@@ -33,7 +33,7 @@ public final class FetchDataRequestTest {
         final FetchDataRequest request = new FetchDataRequest();
         request.setAccount(Constants.ADMIN_ACCOUNT);
         request.setCredentialType(CredentialType.PASSPHRASE);
-        request.setCredential(Constants.ADMIN_ACCOUNT.toCharArray());
+        request.setCredential(Constants.ADMIN_ACCOUNT);
         request.setDataId(objectId);
 
         assertThat(request.getDataId(), is(objectId));
@@ -46,7 +46,7 @@ public final class FetchDataRequestTest {
         final FetchDataRequest request = new FetchDataRequest();
         request.setAccount(Constants.ADMIN_ACCOUNT);
         request.setCredentialType(CredentialType.PASSPHRASE);
-        request.setCredential(Constants.ADMIN_ACCOUNT.toCharArray());
+        request.setCredential(Constants.ADMIN_ACCOUNT);
         final Map<String, String> errors = request.validate();
 
         assertThat(request.getDataId(), is(nullValue()));
@@ -62,7 +62,7 @@ public final class FetchDataRequestTest {
         final FetchDataRequest request = new FetchDataRequest();
         request.setAccount(Constants.ADMIN_ACCOUNT);
         request.setCredentialType(CredentialType.PASSPHRASE);
-        request.setCredential(Constants.ADMIN_ACCOUNT.toCharArray());
+        request.setCredential(Constants.ADMIN_ACCOUNT);
 
         final Field field = request.getClass().getDeclaredField("dataId");
         field.setAccessible(true);

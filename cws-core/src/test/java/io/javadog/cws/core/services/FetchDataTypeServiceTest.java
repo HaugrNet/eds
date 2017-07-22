@@ -69,7 +69,7 @@ public final class FetchDataTypeServiceTest extends DatabaseSetup {
         final FetchDataTypeRequest request = new FetchDataTypeRequest();
         request.setAccount(account);
         request.setCredentialType(CredentialType.PASSPHRASE);
-        request.setCredential(account.toCharArray());
+        request.setCredential(account);
 
         return request;
     }

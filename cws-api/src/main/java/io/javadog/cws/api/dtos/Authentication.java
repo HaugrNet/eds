@@ -46,7 +46,7 @@ public class Authentication extends Verifiable {
     private CredentialType credentialType = null;
 
     @XmlElement(name = FIELD_CREDENTIAL, required = true)
-    private char[] credential = null;
+    private String credential = null;
 
     // =========================================================================
     // Standard Setters & Getters
@@ -91,23 +91,12 @@ public class Authentication extends Verifiable {
      * @param credential Member Credentials, i.e. Key or PassPhrase
      */
     @NotNull
-    public void setCredential(final char[] credential) {
+    public void setCredential(final String credential) {
         ensureNotNull(FIELD_CREDENTIAL, credential);
-        // Arrays should not be referenced directly, as it can lead to problems
-        // with encapsulation. However, in our case it is important for 2
-        // reasons:
-        //   1. All requests is coming in via a WebService (REST/SOAP), and it
-        //      is therefore not likely that any changes can be made
-        //      uncontrolled.
-        //   2. The information stored here is highly sensitive, it is therefore
-        //      important that we can overwrite it ASAP, when we no longer need
-        //      to reference it. The Garbage Collector will clean up the mess,
-        //      but as we don't know when the Garbage Collector will run, it is
-        //      better to control this ourselves.
         this.credential = credential;
     }
 
-    public char[] getCredential() {
+    public String getCredential() {
         // See comment above.
         return credential;
     }

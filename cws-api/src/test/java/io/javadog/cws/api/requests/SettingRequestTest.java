@@ -32,7 +32,7 @@ public final class SettingRequestTest {
         final SettingRequest request = new SettingRequest();
         request.setAccount(Constants.ADMIN_ACCOUNT);
         request.setCredentialType(CredentialType.PASSPHRASE);
-        request.setCredential(Constants.ADMIN_ACCOUNT.toCharArray());
+        request.setCredential(Constants.ADMIN_ACCOUNT);
         assertThat(request.getSettings().isEmpty(), is(true));
 
         request.setSettings(settings);

@@ -38,7 +38,7 @@ public final class FetchCircleRequestTest {
         final FetchCircleRequest request = new FetchCircleRequest();
         request.setAccount(Constants.ADMIN_ACCOUNT);
         request.setCredentialType(CredentialType.PASSPHRASE);
-        request.setCredential(Constants.ADMIN_ACCOUNT.toCharArray());
+        request.setCredential(Constants.ADMIN_ACCOUNT);
         request.setCircleId(circleId);
 
         assertThat(request.getCircleId(), is(circleId));
@@ -51,7 +51,7 @@ public final class FetchCircleRequestTest {
         final FetchCircleRequest request = new FetchCircleRequest();
         request.setAccount(Constants.ADMIN_ACCOUNT);
         request.setCredentialType(CredentialType.PASSPHRASE);
-        request.setCredential(Constants.ADMIN_ACCOUNT.toCharArray());
+        request.setCredential(Constants.ADMIN_ACCOUNT);
 
         assertThat(request.getCircleId(), is(nullValue()));
         assertThat(request.validate(), is(not(nullValue())));
@@ -74,7 +74,7 @@ public final class FetchCircleRequestTest {
         final FetchCircleRequest request = new FetchCircleRequest();
         request.setAccount(Constants.ADMIN_ACCOUNT);
         request.setCredentialType(CredentialType.PASSPHRASE);
-        request.setCredential(Constants.ADMIN_ACCOUNT.toCharArray());
+        request.setCredential(Constants.ADMIN_ACCOUNT);
 
         final Field field = request.getClass().getDeclaredField("circleId");
         field.setAccessible(true);

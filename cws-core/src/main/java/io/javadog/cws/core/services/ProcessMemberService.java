@@ -156,13 +156,12 @@ public final class ProcessMemberService extends Serviceable<ProcessMemberRespons
         if (account != null) {
             if (Objects.equals(account.getPrivateKey(), CredentialType.SIGNATURE.name())) {
                 final String secret = account.getSalt();
-                final String signature = new String(request.getCredential());
                 final MemberEntity admin = dao.findMemberByName(Constants.ADMIN_ACCOUNT);
                 final CWSKey publicKey = crypto.extractPublicKey(admin.getAlgorithm(), admin.getPublicKey());
 
-                if (crypto.verify(publicKey, crypto.stringToBytes(secret), signature)) {
+                if (crypto.verify(publicKey, crypto.stringToBytes(secret), request.getCredential())) {
                     final String salt = UUID.randomUUID().toString();
-                    final char[] newSecret = UUID.randomUUID().toString().toCharArray();
+                    final String newSecret = UUID.randomUUID().toString();
                     final CWSKey key = crypto.generateKey(settings.getPasswordAlgorithm(), newSecret, salt);
 
                     final CWSKey pair = crypto.generateKey(settings.getAsymmetricAlgorithm());
@@ -207,9 +206,8 @@ public final class ProcessMemberService extends Serviceable<ProcessMemberRespons
         }
 
         if ((request.getCredentialType() != null) && (request.getCredential() != null)) {
-            final char[] credential = request.getCredential();
             final String salt = UUID.randomUUID().toString();
-            final CWSKey key = crypto.generateKey(settings.getPasswordAlgorithm(), credential, salt);
+            final CWSKey key = crypto.generateKey(settings.getPasswordAlgorithm(), request.getCredential(), salt);
             final CWSKey pair = crypto.generateKey(settings.getAsymmetricAlgorithm());
             final byte[] encryptedPrivateKey = crypto.encrypt(key, pair.getPrivate().getEncoded());
             final String base64EncryptedPrivateKey = Base64.getEncoder().encodeToString(encryptedPrivateKey);
@@ -224,7 +222,7 @@ public final class ProcessMemberService extends Serviceable<ProcessMemberRespons
         return response;
     }
 
-    private MemberEntity createNewAccount(final String accountName, final CredentialType type, final char[] credential) {
+    private MemberEntity createNewAccount(final String accountName, final CredentialType type, final String credential) {
         final String salt = UUID.randomUUID().toString();
         final CWSKey key = crypto.generateKey(settings.getPasswordAlgorithm(), credential, settings.getSalt());
         final CWSKey pair = crypto.generateKey(settings.getAsymmetricAlgorithm());

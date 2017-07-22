@@ -169,7 +169,7 @@ public final class ProcessDataTypeServiceTest extends DatabaseSetup {
         final ProcessDataTypeRequest request = new ProcessDataTypeRequest();
         request.setAccount(account);
         request.setCredentialType(CredentialType.PASSPHRASE);
-        request.setCredential(account.toCharArray());
+        request.setCredential(account);
 
         return request;
     }

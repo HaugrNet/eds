@@ -53,7 +53,7 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
         final ProcessMemberRequest invationRequest = new ProcessMemberRequest();
         invationRequest.setAccount("invitee");
         invationRequest.setCredentialType(CredentialType.SIGNATURE);
-        invationRequest.setCredential(signature.toCharArray());
+        invationRequest.setCredential(signature);
         final ProcessMemberResponse invitationResponse = service.perform(invationRequest);
         assertThat(invitationResponse, is(not(nullValue())));
         assertThat(invitationResponse.getReturnCode(), is(ReturnCode.SUCCESS));
@@ -63,7 +63,7 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
         final ProcessMemberRequest request = new ProcessMemberRequest();
         request.setAccount(Constants.ADMIN_ACCOUNT);
         request.setCredentialType(CredentialType.PASSPHRASE);
-        request.setCredential(Constants.ADMIN_ACCOUNT.toCharArray());
+        request.setCredential(Constants.ADMIN_ACCOUNT);
 
         return request;
     }

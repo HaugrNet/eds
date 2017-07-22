@@ -27,7 +27,7 @@ public final class ProcessDataRequestTest {
         final ProcessDataRequest request = new ProcessDataRequest();
         request.setAccount(Constants.ADMIN_ACCOUNT);
         request.setCredentialType(CredentialType.PASSPHRASE);
-        request.setCredential(Constants.ADMIN_ACCOUNT.toCharArray());
+        request.setCredential(Constants.ADMIN_ACCOUNT);
 
         assertThat(request.validate(), is(not(nullValue())));
         assertThat(request.validate().size(), is(1));

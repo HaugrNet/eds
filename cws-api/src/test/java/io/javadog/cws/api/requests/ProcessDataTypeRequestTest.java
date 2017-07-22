@@ -32,7 +32,7 @@ public final class ProcessDataTypeRequestTest {
         final ProcessDataTypeRequest request = new ProcessDataTypeRequest();
         request.setAccount(Constants.ADMIN_ACCOUNT);
         request.setCredentialType(CredentialType.PASSPHRASE);
-        request.setCredential(Constants.ADMIN_ACCOUNT.toCharArray());
+        request.setCredential(Constants.ADMIN_ACCOUNT);
         request.setDataType(dataType);
 
         assertThat(request.getDataType(), is(dataType));

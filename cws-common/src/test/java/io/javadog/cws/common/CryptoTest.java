@@ -78,7 +78,7 @@ public final class CryptoTest {
 
         final String password = "MySuperSecretPassword";
         final String salt = UUID.randomUUID().toString();
-        final CWSKey cryptoKeys = crypto.generateKey(settings.getPasswordAlgorithm(), password, salt);
+        final CWSKey cryptoKeys = crypto.generateKey(settings.getSymmetricAlgorithm(), password, salt);
         cryptoKeys.setSalt(UUID.randomUUID().toString());
         final CWSKey keyPair = crypto.generateKey(settings.getAsymmetricAlgorithm());
 
@@ -93,14 +93,15 @@ public final class CryptoTest {
         final Settings settings = new Settings();
         final Crypto crypto = new Crypto(settings);
 
-        final CWSKey secretKey = crypto.generateKey(KeyAlgorithm.AES128);
+        final String salt = UUID.randomUUID().toString();
+        final CWSKey secretKey = crypto.generateKey(KeyAlgorithm.AES128, salt);
         final CWSKey keyPair = crypto.generateKey(KeyAlgorithm.RSA2048);
 
         final String armoredKey = crypto.armoringSecretKey(keyPair, secretKey);
         final CWSKey dearmoredKey = crypto.dearmoringSecretKey(secretKey.getAlgorithm(), keyPair, armoredKey);
 
         assertThat(dearmoredKey.getType(), is(secretKey.getType()));
-        assertThat(dearmoredKey.getAlgorithm(), is(keyPair.getAlgorithm()));
+        assertThat(dearmoredKey.getAlgorithm(), is(secretKey.getAlgorithm()));
         assertThat(dearmoredKey.getKey(), is(secretKey.getKey()));
     }
 
@@ -175,9 +176,10 @@ public final class CryptoTest {
         final Crypto crypto = new Crypto(new Settings());
         final String password = "MySuperSecretPassword";
         final String salt = "SystemSpecificSalt";
-        final CWSKey key = crypto.generateKey(settings.getPasswordAlgorithm(), password, salt);
+        final CWSKey key = crypto.generateKey(settings.getSymmetricAlgorithm(), password, salt);
 
         // Now, we're going to encrypt some data
+        key.setSalt(UUID.randomUUID().toString());
         final String cleartext = "This is just an example";
         final byte[] encrypted = crypto.encrypt(key, crypto.stringToBytes(cleartext));
 
@@ -207,6 +209,7 @@ public final class CryptoTest {
         final CWSKey keyPair = crypto.generateKey(settings.getAsymmetricAlgorithm());
         final String armoredCircleKey = crypto.encryptAndArmorCircleKey(keyPair, key);
         final CWSKey circleKey = crypto.extractCircleKey(key.getAlgorithm(), keyPair, armoredCircleKey);
+        circleKey.setSalt(dataSalt);
         final byte[] decryptedData = crypto.decrypt(circleKey, encryptedData);
 
         assertThat(decryptedData, is(rawdata));

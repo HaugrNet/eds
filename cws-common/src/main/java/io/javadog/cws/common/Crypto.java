@@ -8,6 +8,7 @@
 package io.javadog.cws.common;
 
 import io.javadog.cws.common.enums.KeyAlgorithm;
+import io.javadog.cws.common.exceptions.CWSException;
 import io.javadog.cws.common.exceptions.CryptoException;
 
 import javax.crypto.BadPaddingException;
@@ -91,24 +92,22 @@ public final class Crypto {
      * @return Symmetric Key
      */
     public CWSKey generateKey(final KeyAlgorithm algorithm, final String secret, final String salt) {
-        if (algorithm.getType() != KeyAlgorithm.Type.PASSWORD) {
-            throw new CryptoException("Expected a Password Algorithm.");
+        if (algorithm.getType() != KeyAlgorithm.Type.SYMMETRIC) {
+            throw new CryptoException("Expected a Symmetric Algorithm.");
         }
 
         try {
-            final char[] rawSecret = secret.toCharArray();
-            final byte[] rawSalt = (salt + settings.getSalt()).getBytes(settings.getCharset());
-            final int iterations = 4192;
-            final int length = algorithm.getLength() * 8;
-            final KeySpec spec = new PBEKeySpec(rawSecret, rawSalt, iterations, length);
-            final SecretKeyFactory factory = SecretKeyFactory.getInstance(algorithm.getName());
-            final SecretKey secretKey = factory.generateSecret(spec);
-            final CWSKey key = new CWSKey(algorithm, secretKey);
-            key.setSalt(salt);
+            final byte[] secretSalt = stringToBytes(salt);
 
-            return key;
+            final KeyAlgorithm pbeAlgorithm = settings.getPasswordAlgorithm();
+            final SecretKeyFactory factory = SecretKeyFactory.getInstance(pbeAlgorithm.getTransformation());
+            final KeySpec spec = new PBEKeySpec(secret.toCharArray(), secretSalt, 1024, algorithm.getLength());
+            final SecretKey tmpKey = factory.generateSecret(spec);
+            final SecretKey key = new SecretKeySpec(tmpKey.getEncoded(), algorithm.getName());
+
+            return new CWSKey(algorithm, key);
         } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
-            throw new CryptoException(e);
+            throw new CWSException(e);
         }
     }
 
@@ -163,7 +162,7 @@ public final class Crypto {
                 throw new CryptoException("Expected an Asymmetric Key for signing.");
             }
 
-            final Signature signer = Signature.getInstance(settings.getSignatureAlgorithm().getName());
+            final Signature signer = Signature.getInstance(settings.getSignatureAlgorithm().getTransformation());
             signer.initSign(key.getPrivate());
             signer.update(message);
             final byte[] signed = signer.sign();
@@ -181,7 +180,7 @@ public final class Crypto {
             }
 
             final byte[] bytes = Base64.getDecoder().decode(signature);
-            final Signature verifier = Signature.getInstance(settings.getSignatureAlgorithm().getName());
+            final Signature verifier = Signature.getInstance(settings.getSignatureAlgorithm().getTransformation());
             verifier.initVerify(key.getPublic());
             verifier.update(message);
 
@@ -211,9 +210,14 @@ public final class Crypto {
 
     private Cipher prepareCipher(final CWSKey key, final int type) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException {
         final KeyAlgorithm algorithm = key.getAlgorithm();
-        final Cipher cipher = Cipher.getInstance(algorithm.getTransformation());
+        final Cipher cipher;
 
-        if (algorithm.getType() == KeyAlgorithm.Type.SYMMETRIC) {
+        if (algorithm.getType() == KeyAlgorithm.Type.ASYMMETRIC) {
+            final String rsa = algorithm.getName();
+            cipher = Cipher.getInstance(rsa);
+            cipher.init(type, (type == Cipher.ENCRYPT_MODE) ? key.getPublic() : key.getPrivate());
+        } else {
+            cipher = Cipher.getInstance(algorithm.getTransformation());
             final String salt = key.getSalt();
             if (salt != null) {
                 final IvParameterSpec iv = generateInitialVector(key.getAlgorithm(), salt);
@@ -221,8 +225,6 @@ public final class Crypto {
             } else {
                 throw new CryptoException("The Salt is missing for the Symmetric Key");
             }
-        } else {
-            cipher.init(type, key.getKey());
         }
 
         return cipher;
@@ -272,7 +274,6 @@ public final class Crypto {
             final KeyFactory keyFactory = KeyFactory.getInstance(algorithm.getName());
             final byte[] dearmored = Base64.getDecoder().decode(armoredKey);
             final byte[] rawKey = decrypt(decryptionKey, dearmored);
-
             final X509EncodedKeySpec keySpec = new X509EncodedKeySpec(rawKey);
 
             return keyFactory.generatePrivate(keySpec);
@@ -315,6 +316,7 @@ public final class Crypto {
     }
 
     public String encryptAndArmorCircleKey(final CWSKey publicKey, final CWSKey circleKey) {
+        System.out.println(Base64.getEncoder().encode(circleKey.getEncoded()));
         final byte[] encryptedCircleKey = encrypt(publicKey, circleKey.getEncoded());
 
         return Base64.getEncoder().encodeToString(encryptedCircleKey);
@@ -323,6 +325,7 @@ public final class Crypto {
     public CWSKey extractCircleKey(final KeyAlgorithm algorithm, final CWSKey privateKey, final String armoredCircleKey) {
         final byte[] dearmoredCircleKey = Base64.getDecoder().decode(armoredCircleKey);
         final byte[] decryptedCircleKey = decrypt(privateKey, dearmoredCircleKey);
+        System.out.println(Base64.getEncoder().encode(decryptedCircleKey));
         final SecretKey key = new SecretKeySpec(decryptedCircleKey, algorithm.getName());
 
         return new CWSKey(algorithm, key);

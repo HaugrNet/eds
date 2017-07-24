@@ -83,7 +83,7 @@ public class DatabaseSetup {
         final CWSKey pair = crypto.generateKey(KeyAlgorithm.RSA2048);
         final byte[] encryptedPrivateKey = crypto.encrypt(key, pair.getPrivate().getEncoded());
         final String base64EncryptedPrivateKey = Base64.getEncoder().encodeToString(encryptedPrivateKey);
-        final String armoredPublicKey = crypto.armoringPublicKey(pair);
+        final String armoredPublicKey = crypto.armoringPublicKey(pair.getPublic());
 
         final MemberEntity entity = new MemberEntity();
         entity.setName(account);

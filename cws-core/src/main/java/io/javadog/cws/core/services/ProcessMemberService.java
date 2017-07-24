@@ -167,7 +167,7 @@ public final class ProcessMemberService extends Serviceable<ProcessMemberRespons
                     final CWSKey pair = crypto.generateKey(settings.getAsymmetricAlgorithm());
                     final byte[] encryptedPrivateKey = crypto.encrypt(key, pair.getPrivate().getEncoded());
                     final String base64EncryptedPrivateKey = Base64.getEncoder().encodeToString(encryptedPrivateKey);
-                    final String armoredPublicKey = crypto.armoringPublicKey(pair);
+                    final String armoredPublicKey = crypto.armoringPublicKey(pair.getPublic());
 
                     account.setSalt(salt);
                     account.setAlgorithm(pair.getAlgorithm());
@@ -211,7 +211,7 @@ public final class ProcessMemberService extends Serviceable<ProcessMemberRespons
             final CWSKey pair = crypto.generateKey(settings.getAsymmetricAlgorithm());
             final byte[] encryptedPrivateKey = crypto.encrypt(key, pair.getPrivate().getEncoded());
             final String base64EncryptedPrivateKey = Base64.getEncoder().encodeToString(encryptedPrivateKey);
-            final String armoredPublicKey = crypto.armoringPublicKey(pair);
+            final String armoredPublicKey = crypto.armoringPublicKey(pair.getPublic());
             member.setSalt(salt);
             member.setPrivateKey(base64EncryptedPrivateKey);
             member.setPublicKey(armoredPublicKey);
@@ -228,7 +228,7 @@ public final class ProcessMemberService extends Serviceable<ProcessMemberRespons
         final CWSKey pair = crypto.generateKey(settings.getAsymmetricAlgorithm());
         final byte[] encryptedPrivateKey = crypto.encrypt(key, pair.getPrivate().getEncoded());
         final String base64EncryptedPrivateKey = Base64.getEncoder().encodeToString(encryptedPrivateKey);
-        final String armoredPublicKey = crypto.armoringPublicKey(pair);
+        final String armoredPublicKey = crypto.armoringPublicKey(pair.getPublic());
 
         final MemberEntity account = new MemberEntity();
         account.setKey(pair);

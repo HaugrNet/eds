@@ -64,6 +64,8 @@ import java.util.Base64;
  */
 public final class Crypto {
 
+    private static final String ASYMMETRIC_ALGORITHM = "RSA";
+
     private final Settings settings;
 
     public Crypto(final Settings settings) {
@@ -241,37 +243,36 @@ public final class Crypto {
      * @param key Public RSA key to armor (Base64 encoded x.509 Key)
      * @return String representation of the Key
      */
-    public String armoringPublicKey(final CWSKey key) {
-        final X509EncodedKeySpec keySpec = new X509EncodedKeySpec(key.getPublic().getEncoded());
+    public String armoringPublicKey(final PublicKey key) {
+        final X509EncodedKeySpec keySpec = new X509EncodedKeySpec(key.getEncoded());
         final byte[] rawKey = keySpec.getEncoded();
 
         return Base64.getEncoder().encodeToString(rawKey);
     }
 
-    public CWSKey dearmoringPublicKey(final KeyAlgorithm algorithm, final String armoredKey) {
+    public PublicKey dearmoringPublicKey(final String armoredKey) {
         try {
-            final KeyFactory keyFactory = KeyFactory.getInstance(algorithm.getName());
+            final KeyFactory keyFactory = KeyFactory.getInstance(ASYMMETRIC_ALGORITHM);
             final byte[] rawKey = Base64.getDecoder().decode(armoredKey);
             final X509EncodedKeySpec x509KeySpec = new X509EncodedKeySpec(rawKey);
-            final PublicKey publicKey = keyFactory.generatePublic(x509KeySpec);
 
-            return new CWSKey(algorithm, publicKey);
+            return keyFactory.generatePublic(x509KeySpec);
         } catch (InvalidKeySpecException | NoSuchAlgorithmException e) {
             throw new CryptoException(e);
         }
     }
 
-    public String armoringPrivateKey(final CWSKey encryptionKey, final CWSKey key) {
-        final PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(key.getPrivate().getEncoded());
+    public String armoringPrivateKey(final CWSKey encryptionKey, final PrivateKey key) {
+        final PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(key.getEncoded());
         final byte[] rawKey = keySpec.getEncoded();
         final byte[] encryptedKey = encrypt(encryptionKey, rawKey);
 
         return Base64.getEncoder().encodeToString(encryptedKey);
     }
 
-    public PrivateKey dearmoringPrivateKey(final KeyAlgorithm algorithm, final CWSKey decryptionKey, final String armoredKey) {
+    public PrivateKey dearmoringPrivateKey(final CWSKey decryptionKey, final String armoredKey) {
         try {
-            final KeyFactory keyFactory = KeyFactory.getInstance(algorithm.getName());
+            final KeyFactory keyFactory = KeyFactory.getInstance(ASYMMETRIC_ALGORITHM);
             final byte[] dearmored = Base64.getDecoder().decode(armoredKey);
             final byte[] rawKey = decrypt(decryptionKey, dearmored);
             final PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(rawKey);
@@ -316,7 +317,6 @@ public final class Crypto {
     }
 
     public String encryptAndArmorCircleKey(final CWSKey publicKey, final CWSKey circleKey) {
-        System.out.println(Base64.getEncoder().encode(circleKey.getEncoded()));
         final byte[] encryptedCircleKey = encrypt(publicKey, circleKey.getEncoded());
 
         return Base64.getEncoder().encodeToString(encryptedCircleKey);
@@ -325,7 +325,6 @@ public final class Crypto {
     public CWSKey extractCircleKey(final KeyAlgorithm algorithm, final CWSKey privateKey, final String armoredCircleKey) {
         final byte[] dearmoredCircleKey = Base64.getDecoder().decode(armoredCircleKey);
         final byte[] decryptedCircleKey = decrypt(privateKey, dearmoredCircleKey);
-        System.out.println(Base64.getEncoder().encode(decryptedCircleKey));
         final SecretKey key = new SecretKeySpec(decryptedCircleKey, algorithm.getName());
 
         return new CWSKey(algorithm, key);
@@ -348,21 +347,19 @@ public final class Crypto {
      */
     public CWSKey extractAsymmetricKey(final KeyAlgorithm algorithm, final CWSKey key, final String salt, final String armoredPublicKey, final String armoredPrivateKey) {
         try {
-            final KeyFactory keyFactory = KeyFactory.getInstance(algorithm.getName());
-            final Base64.Decoder decoder = Base64.getDecoder();
+            final KeyFactory keyFactory = KeyFactory.getInstance(ASYMMETRIC_ALGORITHM);
             key.setSalt(salt);
 
-            final byte[] rawPublicKey = decoder.decode(armoredPublicKey);
-            final byte[] encryptedPrivateKey = decoder.decode(armoredPrivateKey);
-            final byte[] rawPrivateKey = decrypt(key, encryptedPrivateKey);
-
+            // Extracting the Public Key
+            final byte[] rawPublicKey = Base64.getDecoder().decode(armoredPublicKey);
             final X509EncodedKeySpec x509KeySpec = new X509EncodedKeySpec(rawPublicKey);
-            final PKCS8EncodedKeySpec pkcs8KeySpec = new PKCS8EncodedKeySpec(rawPrivateKey);
+            final PublicKey publicKey = keyFactory.generatePublic(x509KeySpec);
 
-            final PublicKey thePublicKey = keyFactory.generatePublic(x509KeySpec);
-            final PrivateKey thePrivateKEy = keyFactory.generatePrivate(pkcs8KeySpec);
-            final KeyPair keyPair = new KeyPair(thePublicKey, thePrivateKEy);
+            // Extracting the Private Key
+            final PrivateKey privateKey = dearmoringPrivateKey(key, armoredPrivateKey);
 
+            // Build the CWSKey
+            final KeyPair keyPair = new KeyPair(publicKey, privateKey);
             return new CWSKey(algorithm, keyPair);
         } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
             throw new CryptoException(e);

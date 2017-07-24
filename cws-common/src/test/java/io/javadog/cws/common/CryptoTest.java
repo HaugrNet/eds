@@ -22,6 +22,7 @@ import org.junit.rules.ExpectedException;
 
 import java.nio.charset.Charset;
 import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.util.UUID;
 
 /**
@@ -59,11 +60,10 @@ public final class CryptoTest {
 
         final CWSKey key = crypto.generateKey(settings.getAsymmetricAlgorithm());
 
-        final String armoredKey = crypto.armoringPublicKey(key);
-        final CWSKey dearmoredKey = crypto.dearmoringPublicKey(key.getAlgorithm(), armoredKey);
+        final String armoredKey = crypto.armoringPublicKey(key.getPublic());
+        final PublicKey dearmoredKey = crypto.dearmoringPublicKey(armoredKey);
 
-        assertThat(dearmoredKey.getAlgorithm(), is(key.getAlgorithm()));
-        assertThat(dearmoredKey.getPublic(), is(key.getPublic()));
+        assertThat(dearmoredKey, is(key.getPublic()));
     }
 
     /**
@@ -82,8 +82,8 @@ public final class CryptoTest {
         cryptoKeys.setSalt(UUID.randomUUID().toString());
         final CWSKey keyPair = crypto.generateKey(settings.getAsymmetricAlgorithm());
 
-        final String armoredKey = crypto.armoringPrivateKey(cryptoKeys, keyPair);
-        final PrivateKey dearmoredKey = crypto.dearmoringPrivateKey(keyPair.getAlgorithm(), cryptoKeys, armoredKey);
+        final String armoredKey = crypto.armoringPrivateKey(cryptoKeys, keyPair.getPrivate());
+        final PrivateKey dearmoredKey = crypto.dearmoringPrivateKey(cryptoKeys, armoredKey);
 
         assertThat(keyPair.getPrivate(), is(dearmoredKey));
     }
@@ -103,6 +103,26 @@ public final class CryptoTest {
         assertThat(dearmoredKey.getType(), is(secretKey.getType()));
         assertThat(dearmoredKey.getAlgorithm(), is(secretKey.getAlgorithm()));
         assertThat(dearmoredKey.getKey(), is(secretKey.getKey()));
+    }
+
+    @Test
+    public void testArmoringAsymmetricKey() {
+        final Settings settings = new Settings();
+        final Crypto crypto = new Crypto(settings);
+
+        final String secret = "MySuperSecretPassword";
+        final String salt = UUID.randomUUID().toString();
+        final CWSKey secretKey = crypto.generateKey(settings.getSymmetricAlgorithm(), secret, salt);
+        secretKey.setSalt(salt);
+        final CWSKey pair = crypto.generateKey(settings.getAsymmetricAlgorithm());
+
+        final String armoredPublicKey = crypto.armoringPublicKey(pair.getPublic());
+        final String armoredPrivateKey = crypto.armorPrivateKey(secretKey, pair.getPrivate());
+
+        final CWSKey dearmoredPair = crypto.extractAsymmetricKey(pair.getAlgorithm(), secretKey, salt, armoredPublicKey, armoredPrivateKey);
+        assertThat(dearmoredPair.getAlgorithm(), is(pair.getAlgorithm()));
+        assertThat(dearmoredPair.getPublic(), is(pair.getPublic()));
+        assertThat(dearmoredPair.getPrivate(), is(pair.getPrivate()));
     }
 
     /**

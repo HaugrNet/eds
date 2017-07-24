@@ -9,7 +9,6 @@ package io.javadog.cws.core;
 
 import static io.javadog.cws.api.common.Constants.ADMIN_ACCOUNT;
 
-import io.javadog.cws.api.common.CredentialType;
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.common.TrustLevel;
 import io.javadog.cws.api.common.Verifiable;
@@ -171,12 +170,12 @@ public abstract class Serviceable<R extends CwsResponse, V extends Authenticatio
 
     private MemberEntity createNewAdminAccount(final V verifiable) {
         final String salt = UUID.randomUUID().toString();
-        final CWSKey key = extractKeyFromCredentials(verifiable, salt);
+        final CWSKey key = crypto.generateKey(settings.getSymmetricAlgorithm(), verifiable.getCredential(), salt);
 
         final CWSKey pair = crypto.generateKey(settings.getAsymmetricAlgorithm());
         final byte[] encryptedPrivateKey = crypto.encrypt(key, pair.getPrivate().getEncoded());
         final String base64EncryptedPrivateKey = Base64.getEncoder().encodeToString(encryptedPrivateKey);
-        final String armoredPublicKey = crypto.armoringPublicKey(pair);
+        final String armoredPublicKey = crypto.armoringPublicKey(pair.getPublic());
 
         final MemberEntity account = new MemberEntity();
         account.setName(ADMIN_ACCOUNT);
@@ -189,10 +188,10 @@ public abstract class Serviceable<R extends CwsResponse, V extends Authenticatio
     }
 
     private void checkCredentials(final V verifiable) {
-        final CWSKey key = extractKeyFromCredentials(verifiable, member.getSalt());
+        final CWSKey key = crypto.generateKey(settings.getSymmetricAlgorithm(), verifiable.getCredential(), member.getSalt());
         final String toCheck = UUID.randomUUID().toString();
         final Charset charset = settings.getCharset();
-        keyPair = null;//crypto.extractAsymmetricKey(key, member.getSalt(), member.getPublicKey(), member.getPrivateKey());
+        keyPair = crypto.extractAsymmetricKey(settings.getAsymmetricAlgorithm(), key, member.getSalt(), member.getPublicKey(), member.getPrivateKey());
 
         final byte[] toEncrypt = toCheck.getBytes(charset);
         final byte[] encrypted = crypto.encrypt(keyPair, toEncrypt);
@@ -202,18 +201,6 @@ public abstract class Serviceable<R extends CwsResponse, V extends Authenticatio
         if (!Objects.equals(result, toCheck)) {
             throw new AuthenticationException("Cannot authenticate the Account '" + verifiable.getAccount() + "' from the given Credentials.");
         }
-    }
-
-    private CWSKey extractKeyFromCredentials(final V verifiable, final String salt) {
-        final CWSKey key;
-
-        if (verifiable.getCredentialType() == CredentialType.KEY) {
-            key = null;//crypto.generateKey(settings.get)convertCredentialToKey(verifiable.getCredential());
-        } else {
-            key = crypto.generateKey(settings.getPasswordAlgorithm(), verifiable.getCredential(), salt);
-        }
-
-        return key;
     }
 
     /**

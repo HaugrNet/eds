@@ -262,7 +262,7 @@ public final class Crypto {
     }
 
     public String armoringPrivateKey(final CWSKey encryptionKey, final CWSKey key) {
-        final X509EncodedKeySpec keySpec = new X509EncodedKeySpec(key.getPrivate().getEncoded());
+        final PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(key.getPrivate().getEncoded());
         final byte[] rawKey = keySpec.getEncoded();
         final byte[] encryptedKey = encrypt(encryptionKey, rawKey);
 
@@ -274,7 +274,7 @@ public final class Crypto {
             final KeyFactory keyFactory = KeyFactory.getInstance(algorithm.getName());
             final byte[] dearmored = Base64.getDecoder().decode(armoredKey);
             final byte[] rawKey = decrypt(decryptionKey, dearmored);
-            final X509EncodedKeySpec keySpec = new X509EncodedKeySpec(rawKey);
+            final PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(rawKey);
 
             return keyFactory.generatePrivate(keySpec);
         } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {

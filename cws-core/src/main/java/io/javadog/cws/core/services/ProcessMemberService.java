@@ -115,6 +115,7 @@ public final class ProcessMemberService extends Serviceable<ProcessMemberRespons
                 final MemberEntity entity = new MemberEntity();
                 entity.setName(memberName);
                 entity.setSalt(uuid);
+                entity.setAlgorithm(settings.getSignatureAlgorithm());
                 entity.setPrivateKey(CredentialType.SIGNATURE.name());
                 entity.setPublicKey(signature);
                 dao.persist(entity);
@@ -162,17 +163,14 @@ public final class ProcessMemberService extends Serviceable<ProcessMemberRespons
                 if (crypto.verify(publicKey, crypto.stringToBytes(secret), request.getCredential())) {
                     final String salt = UUID.randomUUID().toString();
                     final String newSecret = UUID.randomUUID().toString();
-                    final CWSKey key = crypto.generateKey(settings.getPasswordAlgorithm(), newSecret, salt);
-
                     final CWSKey pair = crypto.generateKey(settings.getAsymmetricAlgorithm());
-                    final byte[] encryptedPrivateKey = crypto.encrypt(key, pair.getPrivate().getEncoded());
-                    final String base64EncryptedPrivateKey = Base64.getEncoder().encodeToString(encryptedPrivateKey);
-                    final String armoredPublicKey = crypto.armoringPublicKey(pair.getPublic());
+                    final CWSKey key = crypto.generateKey(settings.getSymmetricAlgorithm(), newSecret, salt);
+                    key.setSalt(salt);
 
                     account.setSalt(salt);
                     account.setAlgorithm(pair.getAlgorithm());
-                    account.setPrivateKey(base64EncryptedPrivateKey);
-                    account.setPublicKey(armoredPublicKey);
+                    account.setPublicKey(crypto.armoringPublicKey(pair.getPublic()));
+                    account.setPrivateKey(crypto.armoringPrivateKey(key, pair.getPrivate()));
                     dao.persist(account);
 
                     response = new ProcessMemberResponse();

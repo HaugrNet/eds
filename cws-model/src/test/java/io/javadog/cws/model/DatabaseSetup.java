@@ -33,7 +33,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import java.text.SimpleDateFormat;
-import java.util.Base64;
 import java.util.Date;
 import java.util.Locale;
 import java.util.UUID;
@@ -69,29 +68,22 @@ public class DatabaseSetup {
         entityManager.getTransaction().rollback();
     }
 
-    /**
-     * Creates a new Member Entity, with a Password which is the same as the
-     * name.
-     *
-     * @param account Account name, also used as password
-     * @return Newly created Entity
-     */
-    protected MemberEntity createMember(final String account) {
+    protected MemberEntity prepareMember(final String accountName, final String secret) {
         final String salt = UUID.randomUUID().toString();
-        final CWSKey key = crypto.generateKey(KeyAlgorithm.PBE128, account, salt);
-
-        final CWSKey pair = crypto.generateKey(KeyAlgorithm.RSA2048);
-        final byte[] encryptedPrivateKey = crypto.encrypt(key, pair.getPrivate().getEncoded());
-        final String base64EncryptedPrivateKey = Base64.getEncoder().encodeToString(encryptedPrivateKey);
-        final String armoredPublicKey = crypto.armoringPublicKey(pair.getPublic());
+        final CWSKey pair = crypto.generateKey(settings.getAsymmetricAlgorithm());
+        final CWSKey secretKey = crypto.generateKey(settings.getSymmetricAlgorithm(), secret, salt);
+        secretKey.setSalt(salt);
 
         final MemberEntity entity = new MemberEntity();
-        entity.setName(account);
+        entity.setExternalId(UUID.randomUUID().toString());
+        entity.setName(accountName);
         entity.setSalt(salt);
-        entity.setPrivateKey(base64EncryptedPrivateKey);
-        entity.setPublicKey(armoredPublicKey);
+        entity.setAlgorithm(settings.getAsymmetricAlgorithm());
+        entity.setPublicKey(crypto.armoringPublicKey(pair.getPublic()));
+        entity.setPrivateKey(crypto.armoringPrivateKey(secretKey, pair.getPrivate()));
         entity.setKey(pair);
-        persist(entity);
+        entity.setModified(new Date());
+        entity.setCreated(new Date());
 
         return entity;
     }

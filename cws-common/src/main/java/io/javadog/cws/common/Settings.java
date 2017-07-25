@@ -52,7 +52,7 @@ public final class Settings {
     private static final String DEFAULT_ASYMMETRIC_ALGORITHM = "RSA2048";
     private static final String DEFAULT_SIGNATURE_ALGORITHM = "SHA512";
     private static final String DEFAULT_PBE_ALGORITHM = "PBE128";
-    private static final String DEFAULT_SALT = "Default Salt, please make sure it is set in the DB instead.";
+    private static final String DEFAULT_SALT = "Default salt, also used as kill switch. Must be set in DB.";
     private static final String DEFAULT_LOCALE = "EN";
     private static final String DEFAULT_CHARSETNAME = "UTF-8";
     private static final String DEFAULT_EXPOSE_ADMIN = "false";

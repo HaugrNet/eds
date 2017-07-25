@@ -164,9 +164,10 @@ public class DatabaseSetup {
         return entity;
     }
 
-    protected MemberEntity prepareMember(final String credential, final String publicKey, final String privateKey) {
+    protected MemberEntity prepareMember(final String credential, final KeyAlgorithm algorithm, final String publicKey, final String privateKey) {
         final MemberEntity entity = new MemberEntity();
         entity.setName(credential);
+        entity.setAlgorithm(algorithm);
         entity.setSalt(UUID.randomUUID().toString());
         entity.setPublicKey(publicKey);
         entity.setPrivateKey(privateKey);

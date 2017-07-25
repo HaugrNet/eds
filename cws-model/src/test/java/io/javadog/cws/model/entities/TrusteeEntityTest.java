@@ -13,8 +13,8 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 
 import io.javadog.cws.api.common.TrustLevel;
+import io.javadog.cws.common.enums.KeyAlgorithm;
 import io.javadog.cws.model.DatabaseSetup;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.UUID;
@@ -23,12 +23,12 @@ import java.util.UUID;
  * @author Kim Jensen
  * @since  CWS 1.0
  */
-@Ignore
 public final class TrusteeEntityTest extends DatabaseSetup {
 
     @Test
     public void testEntity() {
-        final MemberEntity member = prepareMember("Trustee Member", "public Key", "private Key");
+        final KeyAlgorithm algorithm = settings.getAsymmetricAlgorithm();
+        final MemberEntity member = prepareMember("Trustee Member", algorithm, "public Key", "private Key");
         final CircleEntity circle = prepareCircle("Trustee Circle");
         final String circleKey = UUID.randomUUID().toString();
         final KeyEntity key = prepareKey();

@@ -55,7 +55,7 @@ public class MemberEntity extends Externable {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "algorithm", nullable = false, length = 10)
-    private KeyAlgorithm algorithm;
+    private KeyAlgorithm algorithm = null;
 
     @Column(name = "public_key", nullable = false, length = 1024)
     private String publicKey = null;

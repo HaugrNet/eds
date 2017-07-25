@@ -18,7 +18,6 @@ import io.javadog.cws.common.Crypto;
 import io.javadog.cws.common.Settings;
 import io.javadog.cws.common.enums.KeyAlgorithm;
 import io.javadog.cws.model.DatabaseSetup;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import javax.persistence.PersistenceException;
@@ -31,7 +30,6 @@ import java.util.UUID;
  * @author Kim Jensen
  * @since  CWS 1.0
  */
-@Ignore
 public final class MemberEntityTest extends DatabaseSetup {
 
     @Test
@@ -79,9 +77,10 @@ public final class MemberEntityTest extends DatabaseSetup {
     @Test
     public void testUpdateEntity() {
         final String credential = "Updateable Account";
+        final KeyAlgorithm algorithm = settings.getAsymmetricAlgorithm();
         final String publicKey = UUID.randomUUID().toString();
         final String privateKey = UUID.randomUUID().toString();
-        final MemberEntity entity = prepareMember(credential, publicKey, privateKey);
+        final MemberEntity entity = prepareMember(credential, algorithm, publicKey, privateKey);
 
         final long lastModified = entity.getModified().getTime();
 
@@ -92,9 +91,10 @@ public final class MemberEntityTest extends DatabaseSetup {
     @Test
     public void testAddContent() {
         final String credential = "Account Name";
+        final KeyAlgorithm algorithm = settings.getAsymmetricAlgorithm();
         final String publicKey = UUID.randomUUID().toString();
         final String privateKey = UUID.randomUUID().toString();
-        final MemberEntity entity = prepareMember(credential, publicKey, privateKey);
+        final MemberEntity entity = prepareMember(credential, algorithm, publicKey, privateKey);
         assertThat(entity.getId(), is(not(nullValue())));
 
         entityManager.persist(entity);
@@ -137,6 +137,47 @@ public final class MemberEntityTest extends DatabaseSetup {
 
         final MemberEntity found = dao.findMemberByName("Unknown");
         assertThat(found, is(nullValue()));
+    }
+
+    @Test
+    public void testPrepareData() {
+        System.out.println("-- Default Administrator User, it is set at the first request to the System, and");
+        System.out.println("-- is thus needed for loads of tests. Remaining Accounts is for \"member1\" to");
+        System.out.println("-- \"member5\", which is all used as part of the tests.");
+        System.out.println("INSERT INTO members (external_id, name, salt, algorithm, public_key, private_key) VALUES");
+
+        final MemberEntity admin = createAndPrintMember(Constants.ADMIN_ACCOUNT);
+        createAndPrintMember("member1");
+        createAndPrintMember("member2");
+        createAndPrintMember("member3");
+        createAndPrintMember("member4");
+        createAndPrintMember("member5");
+
+        assertThat(admin.getAlgorithm(), is(KeyAlgorithm.RSA2048));
+    }
+
+    private MemberEntity createAndPrintMember(final String name) {
+        final Crypto crypto = new Crypto(settings);
+        final KeyAlgorithm algorithm = settings.getAsymmetricAlgorithm();
+        final String salt = UUID.randomUUID().toString();
+        final CWSKey secretKey = crypto.generateKey(settings.getSymmetricAlgorithm(), name, salt);
+        secretKey.setSalt(salt);
+        final CWSKey pair = crypto.generateKey(algorithm);
+        final String publicKey = crypto.armoringPublicKey(pair.getPublic());
+        final String privateKey = crypto.armoringPrivateKey(secretKey, pair.getPrivate());
+
+        final MemberEntity member = new MemberEntity();
+        member.setName(name);
+        member.setSalt(salt);
+        member.setAlgorithm(algorithm);
+        member.setPublicKey(publicKey);
+        member.setPrivateKey(privateKey);
+        dao.persist(member);
+
+        // Expecting a "INSERT INTO members (external_id, name, salt, algorithm, public_key, private_key) VALUES" line before
+        System.out.println("    ('" + member.getExternalId() + "', '" + name + "', '" + salt + "', '" + algorithm + "', '" + publicKey + "', '" + privateKey + "),");
+
+        return member;
     }
 
     @Test

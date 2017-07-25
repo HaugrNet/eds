@@ -17,6 +17,7 @@ import io.javadog.cws.api.responses.CwsResponse;
 import io.javadog.cws.common.CWSKey;
 import io.javadog.cws.common.Crypto;
 import io.javadog.cws.common.Settings;
+import io.javadog.cws.common.enums.KeyAlgorithm;
 import io.javadog.cws.common.exceptions.AuthenticationException;
 import io.javadog.cws.common.exceptions.AuthorizationException;
 import io.javadog.cws.common.exceptions.ModelException;
@@ -169,10 +170,11 @@ public abstract class Serviceable<R extends CwsResponse, V extends Authenticatio
     }
 
     private MemberEntity createNewAdminAccount(final V verifiable) {
+        final KeyAlgorithm algorithm = settings.getAsymmetricAlgorithm();
         final String salt = UUID.randomUUID().toString();
         final CWSKey key = crypto.generateKey(settings.getSymmetricAlgorithm(), verifiable.getCredential(), salt);
 
-        final CWSKey pair = crypto.generateKey(settings.getAsymmetricAlgorithm());
+        final CWSKey pair = crypto.generateKey(algorithm);
         final byte[] encryptedPrivateKey = crypto.encrypt(key, pair.getPrivate().getEncoded());
         final String base64EncryptedPrivateKey = Base64.getEncoder().encodeToString(encryptedPrivateKey);
         final String armoredPublicKey = crypto.armoringPublicKey(pair.getPublic());
@@ -182,6 +184,7 @@ public abstract class Serviceable<R extends CwsResponse, V extends Authenticatio
         account.setSalt(salt);
         account.setPrivateKey(base64EncryptedPrivateKey);
         account.setPublicKey(armoredPublicKey);
+        account.setAlgorithm(algorithm);
         dao.persist(account);
 
         return account;
@@ -191,7 +194,7 @@ public abstract class Serviceable<R extends CwsResponse, V extends Authenticatio
         final CWSKey key = crypto.generateKey(settings.getSymmetricAlgorithm(), verifiable.getCredential(), member.getSalt());
         final String toCheck = UUID.randomUUID().toString();
         final Charset charset = settings.getCharset();
-        keyPair = crypto.extractAsymmetricKey(settings.getAsymmetricAlgorithm(), key, member.getSalt(), member.getPublicKey(), member.getPrivateKey());
+        keyPair = crypto.extractAsymmetricKey(member.getAlgorithm(), key, member.getSalt(), member.getPublicKey(), member.getPrivateKey());
 
         final byte[] toEncrypt = toCheck.getBytes(charset);
         final byte[] encrypted = crypto.encrypt(keyPair, toEncrypt);

@@ -42,7 +42,7 @@ public final class SettingsTest {
         assertThat(settings.getAsymmetricAlgorithm(), is(KeyAlgorithm.RSA2048));
         assertThat(settings.getSignatureAlgorithm(), is(KeyAlgorithm.SHA512));
         assertThat(settings.getPasswordAlgorithm(), is(KeyAlgorithm.PBE128));
-        assertThat(settings.getSalt(), is("Default Salt, please make sure it is set in the DB instead."));
+        assertThat(settings.getSalt(), is("Default salt, also used as kill switch. Must be set in DB."));
         assertThat(settings.getCharset().name(), is("UTF-8"));
     }
 

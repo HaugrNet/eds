@@ -99,11 +99,12 @@ public final class Crypto {
         }
 
         try {
+            final char[] extendedSecret = (secret + settings.getSalt()).toCharArray();
             final byte[] secretSalt = stringToBytes(salt);
 
             final KeyAlgorithm pbeAlgorithm = settings.getPasswordAlgorithm();
             final SecretKeyFactory factory = SecretKeyFactory.getInstance(pbeAlgorithm.getTransformation());
-            final KeySpec spec = new PBEKeySpec(secret.toCharArray(), secretSalt, 1024, algorithm.getLength());
+            final KeySpec spec = new PBEKeySpec(extendedSecret, secretSalt, 1024, algorithm.getLength());
             final SecretKey tmpKey = factory.generateSecret(spec);
             final SecretKey key = new SecretKeySpec(tmpKey.getEncoded(), algorithm.getName());
 

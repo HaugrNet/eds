@@ -50,7 +50,7 @@ public final class SettingServiceTest extends DatabaseSetup {
         final SettingResponse response = service.perform(request);
         assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(response.getReturnMessage(), is("Ok"));
-        assertThat(response.getSettings().size(), is(13));
+        assertThat(response.getSettings().size(), is(9));
     }
 
     @Test
@@ -73,7 +73,7 @@ public final class SettingServiceTest extends DatabaseSetup {
         final SettingResponse response = service.perform(request);
         assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(response.getReturnMessage(), is("Ok"));
-        assertThat(response.getSettings().size(), is(13));
+        assertThat(response.getSettings().size(), is(9));
     }
 
     @Test
@@ -86,7 +86,7 @@ public final class SettingServiceTest extends DatabaseSetup {
         final SettingResponse response = service.perform(request);
         assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(response.getReturnMessage(), is("Ok"));
-        assertThat(response.getSettings().size(), is(13));
+        assertThat(response.getSettings().size(), is(9));
     }
 
     @Test
@@ -99,20 +99,20 @@ public final class SettingServiceTest extends DatabaseSetup {
         final SettingResponse response = service.perform(request);
         assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(response.getReturnMessage(), is("Ok"));
-        assertThat(response.getSettings().size(), is(13));
-        assertThat(response.getSettings().get("cws.crypto.symmetric.keylength"), is("128"));
+        assertThat(response.getSettings().size(), is(9));
+        assertThat(response.getSettings().get(Settings.CWS_CHARSET), is("UTF-8"));
 
         // The internal collection used is unmodifiable. So we simply copy the
         // list from the response and update one of the existing values
         final Map<String, String> mySettings = new HashMap<>(response.getSettings());
-        mySettings.put("cws.crypto.symmetric.keylength", "256");
+        mySettings.put(Settings.CWS_CHARSET, "ISO-8859-15");
         request.setSettings(mySettings);
 
         final SettingResponse update = service.perform(request);
         assertThat(update.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(update.getReturnMessage(), is("Ok"));
-        assertThat(update.getSettings().size(), is(13));
-        assertThat(update.getSettings().get("cws.crypto.symmetric.keylength"), is("256"));
+        assertThat(update.getSettings().size(), is(9));
+        assertThat(update.getSettings().get(Settings.CWS_CHARSET), is("ISO-8859-15"));
     }
 
     @Test
@@ -139,7 +139,7 @@ public final class SettingServiceTest extends DatabaseSetup {
         final SettingResponse response = service.perform(request);
         assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(response.getReturnMessage(), is("Ok"));
-        assertThat(response.getSettings().size(), is(14));
+        assertThat(response.getSettings().size(), is(10));
         assertThat(response.getSettings().get("cws.test.setting"), is("Setting Value"));
     }
 

@@ -29,7 +29,6 @@ import io.javadog.cws.model.jpa.CommonJpaDao;
 
 import javax.persistence.EntityManager;
 import java.nio.charset.Charset;
-import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -173,18 +172,18 @@ public abstract class Serviceable<R extends CwsResponse, V extends Authenticatio
         final KeyAlgorithm algorithm = settings.getAsymmetricAlgorithm();
         final String salt = UUID.randomUUID().toString();
         final CWSKey key = crypto.generateKey(settings.getSymmetricAlgorithm(), verifiable.getCredential(), salt);
+        key.setSalt(salt);
 
         final CWSKey pair = crypto.generateKey(algorithm);
-        final byte[] encryptedPrivateKey = crypto.encrypt(key, pair.getPrivate().getEncoded());
-        final String base64EncryptedPrivateKey = Base64.getEncoder().encodeToString(encryptedPrivateKey);
-        final String armoredPublicKey = crypto.armoringPublicKey(pair.getPublic());
+        final String publicKey = crypto.armoringPublicKey(pair.getPublic());
+        final String privateKey = crypto.armoringPrivateKey(key, pair.getPrivate());
 
         final MemberEntity account = new MemberEntity();
         account.setName(ADMIN_ACCOUNT);
         account.setSalt(salt);
-        account.setPrivateKey(base64EncryptedPrivateKey);
-        account.setPublicKey(armoredPublicKey);
         account.setAlgorithm(algorithm);
+        account.setPublicKey(publicKey);
+        account.setPrivateKey(privateKey);
         dao.persist(account);
 
         return account;

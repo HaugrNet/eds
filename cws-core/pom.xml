@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <artifactId>cws</artifactId>
-        <groupId>javadog.io</groupId>
+        <groupId>io.javadog</groupId>
         <version>1.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
@@ -24,15 +24,15 @@
 
     <dependencies>
         <dependency>
-            <groupId>javadog.io</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>cws-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>javadog.io</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>cws-common</artifactId>
         </dependency>
         <dependency>
-            <groupId>javadog.io</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>cws-model</artifactId>
         </dependency>
         <dependency>
@@ -42,7 +42,7 @@
 
         <!-- Test Dependencies, primarily JUnit & Hibernate (for JPA). -->
         <dependency>
-            <groupId>javadog.io</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>cws-model</artifactId>
             <type>test-jar</type>
             <scope>test</scope>

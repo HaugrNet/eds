@@ -44,7 +44,7 @@ public class SystemService implements System {
 
     private static final String GENERAL_RETURN_MESSAGE = "An unknown error occurred. Please consult the CWS System Log.";
 
-    @Inject private SystemBean bean;
+    @Inject @CWSBean private SystemBean bean;
 
     /**
      * {@inheritDoc}

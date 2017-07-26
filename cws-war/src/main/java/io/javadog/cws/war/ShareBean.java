@@ -43,8 +43,9 @@ import javax.transaction.Transactional;
  * @author Kim Jensen
  * @since  CWS 1.0
  */
+@CWSBean
 @Stateless
-public final class ShareBean implements Share {
+public class ShareBean implements Share {
 
     private static final Logger log = LoggerFactory.getLogger(ShareBean.class);
 

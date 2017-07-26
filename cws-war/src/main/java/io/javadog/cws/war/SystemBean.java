@@ -42,6 +42,7 @@ import java.util.Properties;
  * @author Kim Jensen
  * @since  CWS 1.0
  */
+@CWSBean
 @Stateless
 public class SystemBean implements System {
 

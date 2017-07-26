@@ -55,7 +55,7 @@ import java.util.UUID;
  */
 public final class FetchMemberServiceTest extends DatabaseSetup {
 
-    private static final String ADMIN_ID = "483833a4-2af7-4d9d-953d-b1e86cac8035";
+    private static final String ADMIN_ID = "07b59d91-023f-4ecf-9166-b3db4c930c7b";
     /**
      * Testing a Request without any credentials. This should always result in
      * an error from CWS.

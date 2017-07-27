@@ -65,6 +65,7 @@ import java.util.Base64;
 public final class Crypto {
 
     private static final String ASYMMETRIC_ALGORITHM = "RSA";
+    private static final int BYTE_LENGTH = 8;
 
     private final Settings settings;
 
@@ -93,11 +94,7 @@ public final class Crypto {
      * @param salt   System specific Salt
      * @return Symmetric Key
      */
-    public CWSKey generateKey(final KeyAlgorithm algorithm, final String secret, final String salt) {
-        if (algorithm.getType() != KeyAlgorithm.Type.SYMMETRIC) {
-            throw new CryptoException("Expected a Symmetric Algorithm.");
-        }
-
+    public CWSKey generatePasswordKey(final KeyAlgorithm algorithm, final String secret, final String salt) {
         try {
             final char[] extendedSecret = (secret + settings.getSalt()).toCharArray();
             final byte[] secretSalt = stringToBytes(salt);
@@ -106,19 +103,17 @@ public final class Crypto {
             final SecretKeyFactory factory = SecretKeyFactory.getInstance(pbeAlgorithm.getTransformation());
             final KeySpec spec = new PBEKeySpec(extendedSecret, secretSalt, 1024, algorithm.getLength());
             final SecretKey tmpKey = factory.generateSecret(spec);
-            final SecretKey key = new SecretKeySpec(tmpKey.getEncoded(), algorithm.getName());
+            final SecretKey secretKey = new SecretKeySpec(tmpKey.getEncoded(), algorithm.getName());
+            final CWSKey key = new CWSKey(algorithm, secretKey);
+            key.setSalt(salt);
 
-            return new CWSKey(algorithm, key);
+            return key;
         } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
             throw new CWSException(e);
         }
     }
 
-    public CWSKey generateKey(final KeyAlgorithm algorithm, final String salt) {
-        if (algorithm.getType() != KeyAlgorithm.Type.SYMMETRIC) {
-            throw new CryptoException("Expected a Symmetric Algorithm.");
-        }
-
+    public CWSKey generateSymmetricKey(final KeyAlgorithm algorithm, final String salt) {
         try {
             final KeyGenerator generator = KeyGenerator.getInstance(algorithm.getName());
             generator.init(algorithm.getLength());
@@ -132,11 +127,7 @@ public final class Crypto {
         }
     }
 
-    public CWSKey generateKey(final KeyAlgorithm algorithm) {
-        if (algorithm.getType() != KeyAlgorithm.Type.ASYMMETRIC) {
-            throw new CryptoException("Expected an Asymmetric Algorithm.");
-        }
-
+    public CWSKey generateAsymmetricKey(final KeyAlgorithm algorithm) {
         try {
             final KeyPairGenerator generator = KeyPairGenerator.getInstance(algorithm.getName());
             generator.initialize(algorithm.getLength());
@@ -148,25 +139,14 @@ public final class Crypto {
         }
     }
 
-    private IvParameterSpec generateInitialVector(final KeyAlgorithm algorithm, final String salt) {
-        final byte[] bytes = new byte[algorithm.getLength() / 8];
-        System.arraycopy(salt.getBytes(settings.getCharset()), 0, bytes, 0, bytes.length);
-
-        return new IvParameterSpec(bytes);
-    }
-
     // =========================================================================
     // Standard Cryptographic Operations; Sign,  Verify, Encrypt & Decrypt
     // =========================================================================
 
-    public String sign(final CWSKey key, final byte[] message) {
+    public String sign(final PrivateKey key, final byte[] message) {
         try {
-            if (key.getType() != KeyAlgorithm.Type.ASYMMETRIC) {
-                throw new CryptoException("Expected an Asymmetric Key for signing.");
-            }
-
             final Signature signer = Signature.getInstance(settings.getSignatureAlgorithm().getTransformation());
-            signer.initSign(key.getPrivate());
+            signer.initSign(key);
             signer.update(message);
             final byte[] signed = signer.sign();
 
@@ -176,15 +156,11 @@ public final class Crypto {
         }
     }
 
-    public boolean verify(final CWSKey key, final byte[] message, final String signature) {
+    public boolean verify(final PublicKey key, final byte[] message, final String signature) {
         try {
-            if (key.getType() != KeyAlgorithm.Type.ASYMMETRIC) {
-                throw new CryptoException("Expected an Asymmetric Key for verifying.");
-            }
-
             final byte[] bytes = Base64.getDecoder().decode(signature);
             final Signature verifier = Signature.getInstance(settings.getSignatureAlgorithm().getTransformation());
-            verifier.initVerify(key.getPublic());
+            verifier.initVerify(key);
             verifier.update(message);
 
             return verifier.verify(bytes);
@@ -223,7 +199,9 @@ public final class Crypto {
             cipher = Cipher.getInstance(algorithm.getTransformation());
             final String salt = key.getSalt();
             if (salt != null) {
-                final IvParameterSpec iv = generateInitialVector(key.getAlgorithm(), salt);
+                final byte[] bytes = new byte[algorithm.getLength() / BYTE_LENGTH];
+                System.arraycopy(salt.getBytes(settings.getCharset()), 0, bytes, 0, bytes.length);
+                final IvParameterSpec iv = new IvParameterSpec(bytes);
                 cipher.init(type, key.getKey(), iv);
             } else {
                 throw new CryptoException("The Salt is missing for the Symmetric Key");
@@ -347,38 +325,17 @@ public final class Crypto {
      * @return RSA KeyPair with the Public and Private Keys
      */
     public CWSKey extractAsymmetricKey(final KeyAlgorithm algorithm, final CWSKey key, final String salt, final String armoredPublicKey, final String armoredPrivateKey) {
-        try {
-            final KeyFactory keyFactory = KeyFactory.getInstance(ASYMMETRIC_ALGORITHM);
-            key.setSalt(salt);
+        key.setSalt(salt);
 
-            // Extracting the Public Key
-            final byte[] rawPublicKey = Base64.getDecoder().decode(armoredPublicKey);
-            final X509EncodedKeySpec x509KeySpec = new X509EncodedKeySpec(rawPublicKey);
-            final PublicKey publicKey = keyFactory.generatePublic(x509KeySpec);
+        // Extracting the Public Key
+        final PublicKey publicKey = dearmoringPublicKey(armoredPublicKey);
 
-            // Extracting the Private Key
-            final PrivateKey privateKey = dearmoringPrivateKey(key, armoredPrivateKey);
+        // Extracting the Private Key
+        final PrivateKey privateKey = dearmoringPrivateKey(key, armoredPrivateKey);
 
-            // Build the CWSKey
-            final KeyPair keyPair = new KeyPair(publicKey, privateKey);
-            return new CWSKey(algorithm, keyPair);
-        } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
-            throw new CryptoException(e);
-        }
-    }
-
-    public CWSKey extractPublicKey(final KeyAlgorithm algorithm, final String armoredPublicKey) {
-        try {
-            final KeyFactory keyFactory = KeyFactory.getInstance(algorithm.getName());
-            final Base64.Decoder decoder = Base64.getDecoder();
-            final byte[] rawPublicKey = decoder.decode(armoredPublicKey);
-            final X509EncodedKeySpec x509KeySpec = new X509EncodedKeySpec(rawPublicKey);
-            final PublicKey publicKey = keyFactory.generatePublic(x509KeySpec);
-
-            return new CWSKey(algorithm, publicKey);
-        } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
-            throw new CryptoException(e);
-        }
+        // Build the CWSKey
+        final KeyPair keyPair = new KeyPair(publicKey, privateKey);
+        return new CWSKey(algorithm, keyPair);
     }
 
     public byte[] stringToBytes(final String string) {

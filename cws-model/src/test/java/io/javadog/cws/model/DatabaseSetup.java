@@ -70,8 +70,8 @@ public class DatabaseSetup {
 
     protected MemberEntity prepareMember(final String accountName, final String secret) {
         final String salt = UUID.randomUUID().toString();
-        final CWSKey pair = crypto.generateKey(settings.getAsymmetricAlgorithm());
-        final CWSKey secretKey = crypto.generateKey(settings.getSymmetricAlgorithm(), secret, salt);
+        final CWSKey pair = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
+        final CWSKey secretKey = crypto.generatePasswordKey(settings.getSymmetricAlgorithm(), secret, salt);
         secretKey.setSalt(salt);
 
         final MemberEntity entity = new MemberEntity();
@@ -92,7 +92,7 @@ public class DatabaseSetup {
         if (accounts != null) {
             final String salt = UUID.randomUUID().toString();
             final KeyAlgorithm keyGenerator = KeyAlgorithm.AES128;
-            final CWSKey key = crypto.generateKey(keyGenerator, salt);
+            final CWSKey key = crypto.generateSymmetricKey(keyGenerator, salt);
             final KeyEntity keyEntity = new KeyEntity();
             keyEntity.setAlgorithm(key.getAlgorithm());
             keyEntity.setSalt(salt);

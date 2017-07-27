@@ -171,10 +171,10 @@ public abstract class Serviceable<R extends CwsResponse, V extends Authenticatio
     private MemberEntity createNewAdminAccount(final V verifiable) {
         final KeyAlgorithm algorithm = settings.getAsymmetricAlgorithm();
         final String salt = UUID.randomUUID().toString();
-        final CWSKey key = crypto.generateKey(settings.getSymmetricAlgorithm(), verifiable.getCredential(), salt);
+        final CWSKey key = crypto.generatePasswordKey(settings.getSymmetricAlgorithm(), verifiable.getCredential(), salt);
         key.setSalt(salt);
 
-        final CWSKey pair = crypto.generateKey(algorithm);
+        final CWSKey pair = crypto.generateAsymmetricKey(algorithm);
         final String publicKey = crypto.armoringPublicKey(pair.getPublic());
         final String privateKey = crypto.armoringPrivateKey(key, pair.getPrivate());
 
@@ -190,7 +190,7 @@ public abstract class Serviceable<R extends CwsResponse, V extends Authenticatio
     }
 
     private void checkCredentials(final V verifiable) {
-        final CWSKey key = crypto.generateKey(settings.getSymmetricAlgorithm(), verifiable.getCredential(), member.getSalt());
+        final CWSKey key = crypto.generatePasswordKey(settings.getSymmetricAlgorithm(), verifiable.getCredential(), member.getSalt());
         final String toCheck = UUID.randomUUID().toString();
         final Charset charset = settings.getCharset();
         keyPair = crypto.extractAsymmetricKey(member.getAlgorithm(), key, member.getSalt(), member.getPublicKey(), member.getPrivateKey());

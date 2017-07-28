@@ -50,15 +50,19 @@ public final class ProcessDataService extends Serviceable<ProcessDataResponse, P
         // actual Circle.
         final ProcessDataResponse response;
 
-        switch (request.getAction()) {
-            case PROCESS:
-                response = process(request);
-                break;
-            case DELETE:
-                response = delete(request);
-                break;
-            default:
-                throw new CWSException(ReturnCode.ILLEGAL_ACTION, "The Action " + request.getAction() + " is not supported for this request.");
+        if (request != null) {
+            switch (request.getAction()) {
+                case PROCESS:
+                    response = process(request);
+                    break;
+                case DELETE:
+                    response = delete(request);
+                    break;
+                default:
+                    throw new CWSException(ReturnCode.ILLEGAL_ACTION, "The Action " + request.getAction() + " is not supported for this request.");
+            }
+        } else {
+            throw new CWSException(ReturnCode.VERIFICATION_WARNING, "It is not possible to complete the request.");
         }
 
         return response;

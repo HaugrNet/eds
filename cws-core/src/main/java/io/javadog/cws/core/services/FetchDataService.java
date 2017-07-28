@@ -43,28 +43,49 @@ public final class FetchDataService extends Serviceable<FetchDataResponse, Fetch
     @Override
     public FetchDataResponse perform(final FetchDataRequest request) {
         verifyRequest(request, Permission.FETCH_DATA, readExternalCircleId(request));
-        final String externalDataId = request.getDataId();
         final FetchDataResponse response;
 
-        if (externalDataId == null) {
-            final DataType type = request.getDataType();
-            if (type != null) {
-                response = readAllMetaDataForCircleAndType(request.getCircleId(), type);
+        if (request != null) {
+            final String externalDataId = request.getDataId();
 
+            if (externalDataId == null) {
+                response = processExistingData(request);
             } else {
-                response = readAllMetaDataForCircle(request.getCircleId());
+                response = processNewData(request);
             }
         } else {
-            final MetaDataEntity entity = dao.findMetaDataByMemberAndExternalId(member, externalDataId);
-            if (entity != null) {
-                if (Objects.equals("Folder", entity.getType().getType())) {
-                    response = readFolderContent(entity, request.getDataType());
-                } else {
-                    response = readCompleteDataObject(entity);
-                }
+            throw new CWSException(ReturnCode.VERIFICATION_WARNING, "It is not possible to complete the request.");
+        }
+
+        return response;
+    }
+
+    private FetchDataResponse processExistingData(final FetchDataRequest request) {
+        final DataType type = request.getDataType();
+        final FetchDataResponse response;
+
+        if (type != null) {
+            response = readAllMetaDataForCircleAndType(request.getCircleId(), type);
+
+        } else {
+            response = readAllMetaDataForCircle(request.getCircleId());
+        }
+
+        return response;
+    }
+
+    private FetchDataResponse processNewData(final FetchDataRequest request) {
+        final MetaDataEntity entity = dao.findMetaDataByMemberAndExternalId(member, request.getDataId());
+        final FetchDataResponse response;
+
+        if (entity != null) {
+            if (Objects.equals("Folder", entity.getType().getType())) {
+                response = readFolderContent(entity, request.getDataType());
             } else {
-                response = new FetchDataResponse(ReturnCode.IDENTIFICATION_WARNING, "No information could be found for the given Id.");
+                response = readCompleteDataObject(entity);
             }
+        } else {
+            response = new FetchDataResponse(ReturnCode.IDENTIFICATION_WARNING, "No information could be found for the given Id.");
         }
 
         return response;

@@ -55,24 +55,24 @@ package io.javadog.cws.common.enums;
 public enum KeyAlgorithm {
 
     // Signature Algorithms
-    SHA256(Type.SIGNATURE, "RSA", "SHA256WithRSA", 256),
-    SHA512(Type.SIGNATURE, "RSA", "SHA512WithRSA", 512),
+    SHA256(Type.SIGNATURE, "RSA", Transformation.SIG256, 256),
+    SHA512(Type.SIGNATURE, "RSA", Transformation.SIG512, 512),
 
     // Password Based Encryption (PBE) Algorithms
-    PBE128(Type.PASSWORD, "AES", "PBKDF2WithHmacSHA256", 128),
-    PBE192(Type.PASSWORD, "AES", "PBKDF2WithHmacSHA256", 192),
-    PBE256(Type.PASSWORD, "AES", "PBKDF2WithHmacSHA256", 256),
+    PBE128(Type.PASSWORD, "AES", Transformation.PBE, 128),
+    PBE192(Type.PASSWORD, "AES", Transformation.PBE, 192),
+    PBE256(Type.PASSWORD, "AES", Transformation.PBE, 256),
 
     // Symmetric Algorithms
-    AES128(Type.SYMMETRIC, "AES", "AES/CBC/PKCS5Padding", 128),
-    AES192(Type.SYMMETRIC, "AES", "AES/CBC/PKCS5Padding", 192), // Require JCE Unlimited Strength Files
-    AES256(Type.SYMMETRIC, "AES", "AES/CBC/PKCS5Padding", 256), // Require JCE Unlimited Strength Files
+    AES128(Type.SYMMETRIC, "AES", Transformation.AES, 128),
+    AES192(Type.SYMMETRIC, "AES", Transformation.AES, 192), // Require JCE Unlimited Strength Files
+    AES256(Type.SYMMETRIC, "AES", Transformation.AES, 256), // Require JCE Unlimited Strength Files
 
     // Asymmetric Algorithms
-    RSA1024(Type.ASYMMETRIC, "RSA", "RSA/ECB/PKCS1Padding", 1024),
-    RSA2048(Type.ASYMMETRIC, "RSA", "RSA/ECB/PKCS1Padding", 2048),
-    RSA4096(Type.ASYMMETRIC, "RSA", "RSA/ECB/PKCS1Padding", 4096),
-    RSA8192(Type.ASYMMETRIC, "RSA", "RSA/ECB/PKCS1Padding", 8192);
+    RSA1024(Type.ASYMMETRIC, "RSA", Transformation.RSA, 1024),
+    RSA2048(Type.ASYMMETRIC, "RSA", Transformation.RSA, 2048),
+    RSA4096(Type.ASYMMETRIC, "RSA", Transformation.RSA, 4096),
+    RSA8192(Type.ASYMMETRIC, "RSA", Transformation.RSA, 8192);
 
     public enum Type {
         SYMMETRIC,
@@ -81,16 +81,34 @@ public enum KeyAlgorithm {
         PASSWORD
     }
 
+    public enum Transformation {
+        SIG256("SHA256WithRSA"),
+        SIG512("SHA512WithRSA"),
+        PBE("PBKDF2WithHmacSHA256"),
+        AES("AES/CBC/PKCS5Padding"),
+        RSA("RSA/ECB/PKCS1Padding");
+
+        private final String value;
+
+        Transformation(final String value) {
+            this.value = value;
+        }
+
+        public String getValue() {
+            return value;
+        }
+    }
+
     // =========================================================================
     // Internal Functionality
     // =========================================================================
 
     private final Type type;
     private final String algorithm;
-    private final String transformation;
+    private final Transformation transformation;
     private final int length;
 
-    KeyAlgorithm(final Type type, final String algorithm, final String transformation, final int length) {
+    KeyAlgorithm(final Type type, final String algorithm, final Transformation transformation, final int length) {
         this.type = type;
         this.algorithm = algorithm;
         this.transformation = transformation;
@@ -106,7 +124,7 @@ public enum KeyAlgorithm {
     }
 
     public String getTransformation() {
-        return transformation;
+        return transformation.getValue();
     }
 
     public int getLength() {

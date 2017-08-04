@@ -49,18 +49,18 @@ public class CWSEntity {
     }
 
     public void setModified(final Date modified) {
-        this.modified = modified;
+        this.modified = (modified != null) ? new Date(modified.getTime()) : null;
     }
 
     public Date getModified() {
-        return modified;
+        return (modified != null) ? new Date(modified.getTime()) : null;
     }
 
     public void setCreated(final Date created) {
-        this.created = created;
+        this.created = (created != null) ? new Date(created.getTime()) : null;
     }
 
     public Date getCreated() {
-        return created;
+        return (created != null) ? new Date(created.getTime()) : null;
     }
 }

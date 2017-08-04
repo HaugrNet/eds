@@ -65,8 +65,9 @@ public enum KeyAlgorithm {
 
     // Symmetric Algorithms
     AES128(Type.SYMMETRIC, "AES", Transformation.AES, 128),
-    AES192(Type.SYMMETRIC, "AES", Transformation.AES, 192), // Require JCE Unlimited Strength Files
-    AES256(Type.SYMMETRIC, "AES", Transformation.AES, 256), // Require JCE Unlimited Strength Files
+    // Require JCE Unlimited Strength Files
+    AES192(Type.SYMMETRIC, "AES", Transformation.AES, 192),
+    AES256(Type.SYMMETRIC, "AES", Transformation.AES, 256),
 
     // Asymmetric Algorithms
     RSA1024(Type.ASYMMETRIC, "RSA", Transformation.RSA, 1024),

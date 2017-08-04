@@ -63,11 +63,11 @@ public class KeyEntity extends CWSEntity {
     }
 
     public void setExpires(final Date expires) {
-        this.expires = expires;
+        this.expires = (expires != null) ? new Date(expires.getTime()) : null;
     }
 
     public Date getExpires() {
-        return expires;
+        return (expires != null) ? new Date(expires.getTime()) : null;
     }
 
     public void setGracePeriod(final Integer gracePeriod) {

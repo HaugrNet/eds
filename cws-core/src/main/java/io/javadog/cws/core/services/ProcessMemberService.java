@@ -75,7 +75,7 @@ public final class ProcessMemberService extends Serviceable<ProcessMemberRespons
         final ProcessMemberResponse response;
 
         if (externalId != null) {
-            final MemberEntity current = dao.findMemberByExternalId(externalId);
+            final MemberEntity current = dao.find(MemberEntity.class, externalId);
             if (Objects.equals(current.getId(), member.getId())) {
                 // Members are allowed to process themselves
                 response = processSelf(request);
@@ -134,7 +134,7 @@ public final class ProcessMemberService extends Serviceable<ProcessMemberRespons
     }
 
     private ProcessMemberResponse deleteMember(final ProcessMemberRequest request) {
-        final MemberEntity found = dao.findMemberByExternalId(request.getMemberId());
+        final MemberEntity found = dao.find(MemberEntity.class, request.getMemberId());
         final ProcessMemberResponse response;
 
         if (found != null) {

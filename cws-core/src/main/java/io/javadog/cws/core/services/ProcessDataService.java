@@ -111,14 +111,16 @@ public final class ProcessDataService extends Serviceable<ProcessDataResponse, P
     }
 
     private ProcessDataResponse processNewData(final ProcessDataRequest request) {
+        final DataTypeEntity type = dao.findDataTypeByName(request.getData().getTypeName());
         final TrusteeEntity trustee = findTrustee(request.getData().getCircleId());
         final byte[] bytes = request.getBytes();
+        final ProcessDataResponse response;
 
-        if (bytes != null) {
-            // 1. Find DataType Object, if none exist - fail. If DataType Object is "Folder", fail!
+        if (Objects.equals(type.getName(), "Folder")) {
+            response = createFolder(trustee, request);
+        } else if (bytes != null) {
             // 2. Extract Circle Key, and create new Key & Data Entities
             final KeyAlgorithm algorithm = settings.getSymmetricAlgorithm();
-            final DataTypeEntity type = null;
             final Long parentId = null;
 
             final MetaDataEntity metaData = new MetaDataEntity();
@@ -138,14 +140,22 @@ public final class ProcessDataService extends Serviceable<ProcessDataResponse, P
             dataEntity.setKey(trustee.getKey());
 
             dao.persist(dataEntity);
+            response = new ProcessDataResponse();
         } else {
-            if (Objects.equals("Folder", request.getData().getTypeName())) {
-                // TODO Assuming a new Folder has to be created.
-            } else {
-                throw new CWSException(ReturnCode.WARNING, "");
-            }
+            // Okay, weird case - storing a Data Object without Data. So,
+            // basically we're just storing the MetaData.
+//            final MetaDataEntity metaData = new MetaDataEntity();
+//            metaData.setCircle(trustee.getCircle());
+//            metaData.setName(request.getData().getName());
+//            metaData.setParentId(parentId);
+//            metaData.setType(type);
+            response = new ProcessDataResponse();
         }
 
+        return response;
+    }
+
+    private ProcessDataResponse createFolder(final TrusteeEntity trustee, final ProcessDataRequest request) {
         return null;
     }
 

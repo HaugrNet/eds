@@ -8,10 +8,12 @@
 package io.javadog.cws.model;
 
 import io.javadog.cws.api.dtos.DataType;
+import io.javadog.cws.common.exceptions.ModelException;
 import io.javadog.cws.model.entities.CWSEntity;
 import io.javadog.cws.model.entities.CircleEntity;
 import io.javadog.cws.model.entities.DataEntity;
 import io.javadog.cws.model.entities.DataTypeEntity;
+import io.javadog.cws.model.entities.Externable;
 import io.javadog.cws.model.entities.MemberEntity;
 import io.javadog.cws.model.entities.MetaDataEntity;
 import io.javadog.cws.model.entities.SettingEntity;
@@ -31,6 +33,8 @@ public interface CommonDao {
 
     <E extends CWSEntity> E find(Class<E> cwsEntity, Long id);
 
+    <E extends Externable> E find(Class<E> cwsEntity, String externalId);
+
     <E extends CWSEntity> void delete(E entity);
 
     MemberEntity findMemberByName(String name);
@@ -45,13 +49,9 @@ public interface CommonDao {
 
     List<TrusteeEntity> findTrusteesByCircle(CircleEntity circle);
 
-    CircleEntity findCircleByExternalId(String externalId);
-
     List<CircleEntity> findAllCircles();
 
     List<MemberEntity> findAllMembers();
-
-    MemberEntity findMemberByExternalId(String externalId);
 
     List<CircleEntity> findCirclesForMember(MemberEntity requested);
 
@@ -60,6 +60,16 @@ public interface CommonDao {
     List<DataTypeEntity> findAllTypes();
 
     List<DataTypeEntity> findMatchingDataTypes(String name);
+
+    /**
+     * Finds a unique DataType in the system. If none exist or it is not
+     * possible to find a unique record, then an Exception is thrown.
+     *
+     * @param name Name of the DataType to find
+     * @return Found DataType Entity
+     * @throws ModelException if no unique value could be found
+     */
+    DataTypeEntity findDataTypeByName(String name);
 
     long countObjectTypeUsage(Long id);
 

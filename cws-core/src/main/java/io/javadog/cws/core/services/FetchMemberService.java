@@ -54,7 +54,7 @@ public final class FetchMemberService extends Serviceable<FetchMemberResponse, F
                 // Authentication/Authorization logic.
                 fetchYourself(response);
             } else {
-                final MemberEntity requestedMember = dao.findMemberByExternalId(request.getMemberId());
+                final MemberEntity requestedMember = dao.find(MemberEntity.class, request.getMemberId());
                 if (requestedMember != null) {
                     // Request is for a different Member...
                     fetchSomeoneElse(response, requestedMember);

@@ -103,14 +103,14 @@ public final class MemberEntityTest extends DatabaseSetup {
         assertThat(admin, is(not(nullValue())));
         assertThat(admin.getName(), is(Constants.ADMIN_ACCOUNT));
 
-        final MemberEntity adminByExternalId = dao.findMemberByExternalId(admin.getExternalId());
+        final MemberEntity adminByExternalId = dao.find(MemberEntity.class, admin.getExternalId());
         assertThat(adminByExternalId, is(not(nullValue())));
         assertThat(adminByExternalId.getId(), is(admin.getId()));
     }
 
     @Test
     public void testDaoFindMemberUnknown() {
-        final MemberEntity nullEntity = dao.findMemberByExternalId(UUID.randomUUID().toString());
+        final MemberEntity nullEntity = dao.find(MemberEntity.class, UUID.randomUUID().toString());
         assertThat(nullEntity, is(nullValue()));
 
         final MemberEntity found = dao.findMemberByName("Unknown");

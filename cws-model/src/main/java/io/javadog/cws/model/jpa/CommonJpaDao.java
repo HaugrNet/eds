@@ -25,6 +25,9 @@ import io.javadog.cws.model.entities.TrusteeEntity;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceException;
 import javax.persistence.Query;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.EnumSet;
@@ -68,6 +71,22 @@ public final class CommonJpaDao implements CommonDao {
         return entityManager.find(cwsEntity, id);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <E extends Externable> E find(final Class<E> cwsEntity, final String externalId) {
+        final CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+        final CriteriaQuery<E> query = builder.createQuery(cwsEntity);
+        final Root<E> entity = query.from(cwsEntity);
+        query.select(entity).where(builder.equal(entity.get("externalId"), externalId));
+
+        return findSingleRecord(entityManager.createQuery(query));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public <E extends CWSEntity> void delete(final E entity) {
         entityManager.remove(entity);
@@ -159,17 +178,6 @@ public final class CommonJpaDao implements CommonDao {
      * {@inheritDoc}
      */
     @Override
-    public CircleEntity findCircleByExternalId(final String externalId) {
-        final Query query = entityManager.createNamedQuery("circle.findByExternalId");
-        query.setParameter("eid", externalId);
-
-        return findSingleRecord(query);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public List<CircleEntity> findAllCircles() {
         final Query query = entityManager.createNamedQuery("circle.findAll");
 
@@ -183,18 +191,6 @@ public final class CommonJpaDao implements CommonDao {
     public List<MemberEntity> findAllMembers() {
         final Query query = entityManager.createNamedQuery("member.findAll");
         return findList(query);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public MemberEntity findMemberByExternalId(final String externalId) {
-        final Query query = entityManager.createNamedQuery("member.findByExternalId");
-        query.setParameter("externalId", externalId);
-
-        final List<MemberEntity> found = findList(query);
-        return found.isEmpty() ? null : found.get(0);
     }
 
     /**
@@ -239,6 +235,17 @@ public final class CommonJpaDao implements CommonDao {
         query.setParameter("name", name);
 
         return findList(query);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public DataTypeEntity findDataTypeByName(final String name) {
+        final Query query = entityManager.createNamedQuery("type.findMatching");
+        query.setParameter("name", name);
+
+        return findUniqueRecord(query);
     }
 
     /**
@@ -313,8 +320,19 @@ public final class CommonJpaDao implements CommonDao {
     // Internal Methods, handling the actual lookup's to simplify error handling
     // =========================================================================
 
+    private static <E> E findUniqueRecord(final Query query) {
+        final List<E> found = query.getResultList();
+
+        if (found.size() != 1) {
+            throw new ModelException(ReturnCode.DATABASE_ERROR, "Could not uniquely identify a record with the given criteria's.");
+        }
+
+        return found.get(0);
+    }
+
     private static <E> E findSingleRecord(final Query query) {
         final List<E> found = query.getResultList();
+
         return found.isEmpty() ? null : found.get(0);
     }
 

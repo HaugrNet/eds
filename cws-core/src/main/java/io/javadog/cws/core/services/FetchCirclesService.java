@@ -49,7 +49,7 @@ public final class FetchCirclesService extends Serviceable<FetchCircleResponse, 
         if (circleId != null) {
             // First retrieve the Circle via the ExternalId given. If no Circle
             // is found, the DAO will throw an Exception.
-            final CircleEntity circle = dao.findCircleByExternalId(request.getCircleId());
+            final CircleEntity circle = dao.find(CircleEntity.class, request.getCircleId());
 
             if (circle != null) {
                 // The Settings and the Requesting Member are both important when

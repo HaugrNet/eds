@@ -29,11 +29,6 @@ import javax.persistence.Transient;
                 query = "select m " +
                         "from MemberEntity m " +
                         "order by name asc"),
-        @NamedQuery(name = "member.findByExternalId",
-                query = "select m " +
-                        "from MemberEntity m " +
-                        "where m.externalId = :externalId " +
-                        "order by name asc"),
         @NamedQuery(name = "member.findByName",
                 query = "select m " +
                         "from MemberEntity m " +

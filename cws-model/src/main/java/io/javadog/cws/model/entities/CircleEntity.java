@@ -15,20 +15,15 @@ import javax.persistence.Table;
 
 /**
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since  CWS 1.0                                                           | {}
+ postgres  |
  */
 @Entity
 @Table(name = "circles")
-@NamedQueries({
-        @NamedQuery(name = "circle.findAll",
-                query = "select c " +
-                        "from CircleEntity c " +
-                        "order by name asc"),
-        @NamedQuery(name = "circle.findByExternalId",
-                query = "select c " +
-                        "from CircleEntity c " +
-                        "where c.externalId = :eid ")
-})
+@NamedQueries(@NamedQuery(name = "circle.findAll",
+        query = "select c " +
+                "from CircleEntity c " +
+                "order by name asc"))
 public class CircleEntity extends Externable {
 
     @Column(name = "name", unique = true, nullable = false)

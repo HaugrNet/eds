@@ -71,8 +71,8 @@ public final class ProcessDataService extends Serviceable<ProcessDataResponse, P
     private static String readExternalCircleId(final ProcessDataRequest request) {
         String circleId = null;
 
-        if ((request != null) && (request.getData() != null)) {
-            circleId = request.getData().getCircleId();
+        if ((request != null) && (request.getMetaData() != null)) {
+            circleId = request.getMetaData().getCircleId();
         }
 
         return circleId;
@@ -81,7 +81,7 @@ public final class ProcessDataService extends Serviceable<ProcessDataResponse, P
     private ProcessDataResponse process(final ProcessDataRequest request) {
         final ProcessDataResponse response;
 
-        if (request.getData().getId() != null) {
+        if (request.getMetaData().getId() != null) {
             response = processExistingData(request);
         } else {
             response = processNewData(request);
@@ -91,7 +91,7 @@ public final class ProcessDataService extends Serviceable<ProcessDataResponse, P
     }
 
     private ProcessDataResponse processExistingData(final ProcessDataRequest request) {
-        final MetaData data = request.getData();
+        final MetaData data = request.getMetaData();
         final DataEntity entity = dao.findDataByMemberAndExternalId(member, data.getId());
         final ProcessDataResponse response;
 
@@ -102,7 +102,7 @@ public final class ProcessDataService extends Serviceable<ProcessDataResponse, P
             dao.persist(entity.getMetaData());
 
             response = new ProcessDataResponse();
-            response.setData(buildDataObject(entity, folder));
+            response.setMetaData(buildDataObject(entity, folder));
         } else {
             response = new ProcessDataResponse(ReturnCode.IDENTIFICATION_WARNING, "The requested Data Object could not be located.");
         }
@@ -111,8 +111,8 @@ public final class ProcessDataService extends Serviceable<ProcessDataResponse, P
     }
 
     private ProcessDataResponse processNewData(final ProcessDataRequest request) {
-        final DataTypeEntity type = dao.findDataTypeByName(request.getData().getTypeName());
-        final TrusteeEntity trustee = findTrustee(request.getData().getCircleId());
+        final DataTypeEntity type = dao.findDataTypeByName(request.getMetaData().getTypeName());
+        final TrusteeEntity trustee = findTrustee(request.getMetaData().getCircleId());
         final byte[] bytes = request.getBytes();
         final ProcessDataResponse response;
 
@@ -125,7 +125,7 @@ public final class ProcessDataService extends Serviceable<ProcessDataResponse, P
 
             final MetaDataEntity metaData = new MetaDataEntity();
             metaData.setCircle(trustee.getCircle());
-            metaData.setName(request.getData().getName());
+            metaData.setName(request.getMetaData().getName());
             metaData.setParentId(parentId);
             metaData.setType(type);
 
@@ -142,21 +142,72 @@ public final class ProcessDataService extends Serviceable<ProcessDataResponse, P
             dao.persist(dataEntity);
             response = new ProcessDataResponse();
         } else {
+            // TODO Add a general "Data" type, which can be used for systems where they control Object information.
             // Okay, weird case - storing a Data Object without Data. So,
             // basically we're just storing the MetaData.
-//            final MetaDataEntity metaData = new MetaDataEntity();
-//            metaData.setCircle(trustee.getCircle());
-//            metaData.setName(request.getData().getName());
-//            metaData.setParentId(parentId);
-//            metaData.setType(type);
+            final MetaDataEntity parent = findParent(request.getMetaData());
+            final Long parentId = parent.getId();
+
+            final MetaDataEntity metaData = new MetaDataEntity();
+            metaData.setCircle(trustee.getCircle());
+            metaData.setName(request.getMetaData().getName());
+            metaData.setParentId(parentId);
+            metaData.setType(type);
+
             response = new ProcessDataResponse();
+            response.setMetaData(convert(metaData, parent));
         }
 
         return response;
     }
 
+    private MetaDataEntity findParent(final MetaData metadata) {
+        final MetaDataEntity entity;
+
+        if (metadata.getFolderId() != null) {
+            entity = dao.findMetaDataByMemberAndExternalId(member, metadata.getFolderId());
+            if (!Objects.equals(entity.getType().getName(), "folder")) {
+                throw new ModelException(ReturnCode.IDENTIFICATION_WARNING, "Provided FolderId is not a folder.");
+            }
+        } else {
+            entity = dao.findRootByMemberCircle(member, metadata.getCircleId());
+        }
+
+        return entity;
+    }
+
     private ProcessDataResponse createFolder(final TrusteeEntity trustee, final ProcessDataRequest request) {
-        return null;
+        final MetaDataEntity parent = findParent(request.getMetaData());
+        final DataTypeEntity folderType = dao.findDataTypeByName("folder");
+        final MetaDataEntity folder = createMetaData(trustee, request.getMetaData().getName(), parent.getId(), folderType);
+
+        final ProcessDataResponse response = new ProcessDataResponse();
+        response.setMetaData(convert(folder, parent));
+
+        return response;
+    }
+
+    private MetaDataEntity createMetaData(final TrusteeEntity trustee, final String name, final Long parentId, final DataTypeEntity dataType) {
+        final MetaDataEntity entity = new MetaDataEntity();
+        entity.setCircle(trustee.getCircle());
+        entity.setName(name);
+        entity.setParentId(parentId);
+        entity.setType(dataType);
+        dao.persist(entity);
+
+        return entity;
+    }
+
+    private static MetaData convert(final MetaDataEntity entity, final MetaDataEntity parent) {
+        final MetaData metaData = new MetaData();
+        metaData.setId(entity.getExternalId());
+        metaData.setCircleId(entity.getCircle().getExternalId());
+        metaData.setFolderId(parent.getExternalId());
+        metaData.setName(entity.getName());
+        metaData.setTypeName(entity.getType().getName());
+        metaData.setAdded(entity.getCreated());
+
+        return metaData;
     }
 
     /**

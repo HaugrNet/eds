@@ -85,12 +85,12 @@ public final class ProcessDataRequest extends Authentication {
         return dataId;
     }
 
-    public void setData(final MetaData data) {
+    public void setMetaData(final MetaData data) {
         ensureVerifiable(FIELD_DATA, data);
         this.data = data;
     }
 
-    public MetaData getData() {
+    public MetaData getMetaData() {
         return data;
     }
 

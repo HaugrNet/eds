@@ -21,14 +21,14 @@ import javax.xml.bind.annotation.XmlType;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "processDataResult", propOrder = "data")
+@XmlType(name = "processDataResult", propOrder = "metaData")
 public final class ProcessDataResponse extends CwsResponse {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
-    @XmlElement(name = "id", required = true)
-    private MetaData data = null;
+    @XmlElement(name = "metaData", required = true)
+    private MetaData metaData = null;
 
     // =========================================================================
     // Object Constructors
@@ -57,11 +57,11 @@ public final class ProcessDataResponse extends CwsResponse {
     // Standard Setters & Getters
     // =========================================================================
 
-    public void setData(final MetaData data) {
-        this.data = data;
+    public void setMetaData(final MetaData metaData) {
+        this.metaData = metaData;
     }
 
-    public MetaData getData() {
-        return data;
+    public MetaData getMetaData() {
+        return metaData;
     }
 }

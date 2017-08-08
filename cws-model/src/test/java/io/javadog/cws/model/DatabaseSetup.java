@@ -11,7 +11,6 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.hasProperty;
 
 import io.javadog.cws.api.common.ReturnCode;
-import io.javadog.cws.api.common.TrustLevel;
 import io.javadog.cws.common.CWSKey;
 import io.javadog.cws.common.Crypto;
 import io.javadog.cws.common.Settings;
@@ -22,7 +21,6 @@ import io.javadog.cws.model.entities.CWSEntity;
 import io.javadog.cws.model.entities.CircleEntity;
 import io.javadog.cws.model.entities.KeyEntity;
 import io.javadog.cws.model.entities.MemberEntity;
-import io.javadog.cws.model.entities.TrusteeEntity;
 import io.javadog.cws.model.jpa.CommonJpaDao;
 import org.junit.After;
 import org.junit.Before;
@@ -49,7 +47,7 @@ public class DatabaseSetup {
     protected EntityManager entityManager = FACTORY.createEntityManager();
     protected CommonDao dao = new CommonJpaDao(entityManager);
     protected final Settings settings = new Settings();
-    private final Crypto crypto = new Crypto(settings);
+    protected final Crypto crypto = new Crypto(settings);
 
     /**
      * If the test is expecting an Exception, then we'll use this as the rule.
@@ -86,30 +84,6 @@ public class DatabaseSetup {
         entity.setCreated(new Date());
 
         return entity;
-    }
-
-    protected void addKeyAndTrusteesToCircle(final CircleEntity circle, final MemberEntity... accounts) {
-        if (accounts != null) {
-            final String salt = UUID.randomUUID().toString();
-            final KeyAlgorithm keyGenerator = KeyAlgorithm.AES128;
-            final CWSKey key = crypto.generateSymmetricKey(keyGenerator, salt);
-            final KeyEntity keyEntity = new KeyEntity();
-            keyEntity.setAlgorithm(key.getAlgorithm());
-            keyEntity.setSalt(salt);
-            keyEntity.setStatus(Status.ACTIVE);
-            persist(keyEntity);
-
-            for (final MemberEntity account : accounts) {
-                final TrusteeEntity entity = new TrusteeEntity();
-                entity.setCircleKey(crypto.encryptAndArmorCircleKey(account.getKey(), key));
-                entity.setMember(account);
-                entity.setCircle(circle);
-                entity.setKey(keyEntity);
-                entity.setTrustLevel(TrustLevel.ADMIN);
-
-                persist(entity);
-            }
-        }
     }
 
     /**

@@ -81,6 +81,7 @@ public final class ProcessCircleRequest extends Authentication {
     }
 
     public void setCircleId(final String circleId) {
+        ensureValidId(FIELD_CIRCLE_ID, circleId);
         this.circleId = circleId;
     }
 
@@ -89,6 +90,7 @@ public final class ProcessCircleRequest extends Authentication {
     }
 
     public void setCircleName(final String circleName) {
+        ensureNotEmptyOrTooLong(FIELD_CIRCLE_NAME, circleName, 256);
         this.circleName = circleName;
     }
 
@@ -97,6 +99,7 @@ public final class ProcessCircleRequest extends Authentication {
     }
 
     public void setMemberId(final String memberId) {
+        ensureValidId(FIELD_MEMBER_ID, memberId);
         this.memberId = memberId;
     }
 
@@ -112,7 +115,7 @@ public final class ProcessCircleRequest extends Authentication {
         return trustLevel;
     }
 
-// =========================================================================
+    // =========================================================================
     // Standard Methods
     // =========================================================================
 
@@ -128,25 +131,29 @@ public final class ProcessCircleRequest extends Authentication {
         } else {
             switch (action) {
                 case CREATE:
-                    checkNotNullOrEmpty(errors, FIELD_CIRCLE_NAME, circleName, "The " + FIELD_CIRCLE_NAME + " is invalid.");
-                    checkNotNullAndValidId(errors, FIELD_MEMBER_ID, memberId, "The " + FIELD_MEMBER_ID + " is missing.");
+                    checkNotNullOrEmpty(errors, FIELD_CIRCLE_NAME, circleName, "Cannot create a new Circle, without the Circle Name.");
+                    checkNotNullAndValidId(errors, FIELD_MEMBER_ID, memberId, "Cannot create a new Circle, without an initial Circle Administrator, please provide a Member Id.");
                     break;
                 case UPDATE:
-                    checkNotNullAndValidId(errors, FIELD_CIRCLE_ID, circleId, "Invalid " + FIELD_CIRCLE_ID + " provided.");
-                    checkNotNullOrEmpty(errors, FIELD_CIRCLE_NAME, circleName, "The " + FIELD_CIRCLE_NAME + " is not valid.");
+                    checkNotNullAndValidId(errors, FIELD_CIRCLE_ID, circleId, "Cannot update the Circle Name, without knowing the Circle Id.");
+                    checkNotNullOrEmpty(errors, FIELD_CIRCLE_NAME, circleName, "Cannot update the Circle Name, without a new Circle Name.");
                     break;
                 case DELETE:
-                    checkNotNullAndValidId(errors, FIELD_CIRCLE_ID, circleId, "Invalid " + FIELD_CIRCLE_ID + " provided.");
+                    checkNotNullAndValidId(errors, FIELD_CIRCLE_ID, circleId, "Cannot delete a Circle, without knowing the Circle Id.");
                     break;
                 case ADD:
+                    checkNotNullAndValidId(errors, FIELD_CIRCLE_ID, circleId, "Cannot add a Trustee to a Circle, without a Circle Id.");
+                    checkValidId(errors, FIELD_MEMBER_ID, memberId, "Cannot add a Trustee to a Circle, without a Member Id.");
+                    checkNotNull(errors, FIELD_TRUSTLEVEL, trustLevel, "Cannot add a Trustee to a Circle, without an initial TrustLevel.");
+                    break;
                 case ALTER:
-                    checkNotNullAndValidId(errors, FIELD_CIRCLE_ID, circleId, "Invalid " + FIELD_CIRCLE_ID + " provided.");
-                    checkValidId(errors, FIELD_MEMBER_ID, memberId, "The " + FIELD_MEMBER_ID + " is missing.");
-                    checkNotNull(errors, FIELD_TRUSTLEVEL, trustLevel, "The " + FIELD_TRUSTLEVEL + " is missing.");
+                    checkNotNullAndValidId(errors, FIELD_CIRCLE_ID, circleId, "Cannot alter a Trustees TrustLevel, without knowing the Circle Id.");
+                    checkValidId(errors, FIELD_MEMBER_ID, memberId, "Cannot alter a Trustees TrustLevel, without knowing the Member Id.");
+                    checkNotNull(errors, FIELD_TRUSTLEVEL, trustLevel, "Cannot alter a Trustees TrustLevel, without knowing the new TrustLevel.");
                     break;
                 case REMOVE:
-                    checkNotNullAndValidId(errors, FIELD_CIRCLE_ID, circleId, "Invalid " + FIELD_CIRCLE_ID + " provided.");
-                    checkValidId(errors, FIELD_MEMBER_ID, memberId, "The " + FIELD_MEMBER_ID + " is missing.");
+                    checkNotNullAndValidId(errors, FIELD_CIRCLE_ID, circleId, "Cannot remove a Trustee from a Circle, without knowing the Circle Id.");
+                    checkValidId(errors, FIELD_MEMBER_ID, memberId, "Cannot remove a Trustee from a Circle, without knowing the Member Id.");
                     break;
                 default:
                     errors.put(FIELD_ACTION, "Invalid Action provided.");

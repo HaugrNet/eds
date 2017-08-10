@@ -277,8 +277,8 @@ CREATE TABLE trustees (
 
   /* Primary & Foreign Keys */
   CONSTRAINT trustee_pk                     PRIMARY KEY (id),
-  CONSTRAINT trustee_member_fk              FOREIGN KEY (member_id) REFERENCES members (id),
-  CONSTRAINT trustee_circle_fk              FOREIGN KEY (circle_id) REFERENCES circles (id),
+  CONSTRAINT trustee_member_fk              FOREIGN KEY (member_id) REFERENCES members (id) ON DELETE CASCADE,
+  CONSTRAINT trustee_circle_fk              FOREIGN KEY (circle_id) REFERENCES circles (id) ON DELETE CASCADE,
   CONSTRAINT trustee_key_fk                 FOREIGN KEY (key_id) REFERENCES keys (id),
 
   /* Unique Constraints */
@@ -361,7 +361,7 @@ CREATE TABLE metadata (
 
   /* Primary & Foreign Keys */
   CONSTRAINT metadata_pk                    PRIMARY KEY (id),
-  CONSTRAINT metadata_circle_fk             FOREIGN KEY (circle_id) REFERENCES circles (id),
+  CONSTRAINT metadata_circle_fk             FOREIGN KEY (circle_id) REFERENCES circles (id) ON DELETE CASCADE,
   CONSTRAINT metadata_datatype_fk           FOREIGN KEY (datatype_id) REFERENCES datatypes (id),
 
   /* Unique Constraints */
@@ -397,8 +397,8 @@ CREATE TABLE data (
 
   /* Primary & Foreign Keys */
   CONSTRAINT data_pk                        PRIMARY KEY (id),
-  CONSTRAINT data_metadata_fk               FOREIGN KEY (metadata_id) REFERENCES metadata (id),
-  CONSTRAINT data_key_fk                    FOREIGN KEY (key_id) REFERENCES keys (id),
+  CONSTRAINT data_metadata_fk               FOREIGN KEY (metadata_id) REFERENCES metadata (id) ON DELETE CASCADE,
+  CONSTRAINT data_key_fk                    FOREIGN KEY (key_id) REFERENCES keys (id) ON DELETE CASCADE,
 
   /* Not Null Constraints */
   CONSTRAINT data_notnull_id                CHECK (id IS NOT NULL),

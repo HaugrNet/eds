@@ -143,7 +143,7 @@ public final class MemberEntityTest extends DatabaseSetup {
         println("-- \"member5\", which is all used as part of the tests.");
         println("INSERT INTO members (external_id, name, salt, algorithm, public_key, private_key) VALUES");
 
-        final MemberEntity admin = createAndPrintMember(Constants.ADMIN_ACCOUNT, ',');
+        createAndPrintMember(Constants.ADMIN_ACCOUNT, ',');
         final MemberEntity member1 = createAndPrintMember("member1", ',');
         final MemberEntity member2 = createAndPrintMember("member2", ',');
         final MemberEntity member3 = createAndPrintMember("member3", ',');
@@ -161,7 +161,7 @@ public final class MemberEntityTest extends DatabaseSetup {
 
         println("");
         println("-- For each Circle, we need to have a unique Key, but with the same settings.");
-        println("INSERT INTO keys (algorithm, salt, status) VALUES");
+        println("INSERT INTO keys (algorithm, status) VALUES");
         final KeyEntity key1 = createAndPrintKey(',');
         final KeyEntity key2 = createAndPrintKey(',');
         final KeyEntity key3 = createAndPrintKey(';');
@@ -172,9 +172,9 @@ public final class MemberEntityTest extends DatabaseSetup {
         println("-- Member 1-4 to Circle 2 and Member 2-5 to Circle 3.");
         println("-- The Trust Level is different for each Member.");
         println("INSERT INTO trustees (external_id, member_id, circle_id, key_id, trust_level, circle_key) VALUES");
-        final CWSKey cwsKey1 = crypto.generateSymmetricKey(key1.getAlgorithm(), key1.getSalt());
-        final CWSKey cwsKey2 = crypto.generateSymmetricKey(key1.getAlgorithm(), key1.getSalt());
-        final CWSKey cwsKey3 = crypto.generateSymmetricKey(key1.getAlgorithm(), key1.getSalt());
+        final CWSKey cwsKey1 = crypto.generateSymmetricKey(key1.getAlgorithm());
+        final CWSKey cwsKey2 = crypto.generateSymmetricKey(key1.getAlgorithm());
+        final CWSKey cwsKey3 = crypto.generateSymmetricKey(key1.getAlgorithm());
         createAndPrintTrustee(member1, circle1, key1, cwsKey1, TrustLevel.ADMIN, ',');
         createAndPrintTrustee(member2, circle1, key1, cwsKey1, TrustLevel.WRITE, ',');
         createAndPrintTrustee(member3, circle1, key1, cwsKey1, TrustLevel.READ,  ',');
@@ -186,8 +186,6 @@ public final class MemberEntityTest extends DatabaseSetup {
         createAndPrintTrustee(member3, circle3, key3, cwsKey3, TrustLevel.READ,  ',');
         createAndPrintTrustee(member4, circle3, key3, cwsKey3, TrustLevel.ADMIN, ',');
         createAndPrintTrustee(member5, circle3, key3, cwsKey3, TrustLevel.GUEST, ';');
-
-        assertThat(admin.getAlgorithm(), is(KeyAlgorithm.RSA2048));
     }
 
     private MemberEntity createAndPrintMember(final String name, final char delimiter) {
@@ -210,7 +208,7 @@ public final class MemberEntityTest extends DatabaseSetup {
     private KeyEntity createAndPrintKey(final char delimiter) {
         final KeyEntity entity = prepareKey();
 
-        println("    ('" + entity.getAlgorithm() + "', '" + entity.getSalt() + "', '" + entity.getStatus() + "')" + delimiter);
+        println("    ('" + entity.getAlgorithm() + "', '" + entity.getStatus() + "')" + delimiter);
 
         return entity;
     }

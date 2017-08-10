@@ -18,7 +18,6 @@ import io.javadog.cws.model.DatabaseSetup;
 import org.junit.Test;
 
 import java.util.Date;
-import java.util.UUID;
 
 /**
  * @author Kim Jensen
@@ -29,10 +28,8 @@ public final class KeyEntityTest extends DatabaseSetup {
     @Test
     public void testEntity() {
         final Settings mySettings = new Settings();
-        final String salt = UUID.randomUUID().toString();
         final KeyEntity key = new KeyEntity();
         key.setAlgorithm(mySettings.getSymmetricAlgorithm());
-        key.setSalt(salt);
         key.setStatus(Status.ACTIVE);
         key.setExpires(new Date());
         key.setGracePeriod(3);
@@ -42,7 +39,6 @@ public final class KeyEntityTest extends DatabaseSetup {
         final KeyEntity found = find(KeyEntity.class, key.getId());
         assertThat(found, is(not(nullValue())));
         assertThat(found.getAlgorithm(), is(key.getAlgorithm()));
-        assertThat(found.getSalt(), is(salt));
         assertThat(found.getStatus(), is(key.getStatus()));
         assertThat(toString(found.getExpires()), is(toString(key.getExpires())));
         assertThat(found.getGracePeriod(), is(key.getGracePeriod()));

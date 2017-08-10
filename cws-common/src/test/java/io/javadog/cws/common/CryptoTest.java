@@ -93,8 +93,7 @@ public final class CryptoTest {
         final Settings settings = new Settings();
         final Crypto crypto = new Crypto(settings);
 
-        final String salt = UUID.randomUUID().toString();
-        final CWSKey secretKey = crypto.generateSymmetricKey(KeyAlgorithm.AES128, salt);
+        final CWSKey secretKey = crypto.generateSymmetricKey(KeyAlgorithm.AES128);
         final CWSKey keyPair = crypto.generateAsymmetricKey(KeyAlgorithm.RSA2048);
 
         final String armoredKey = crypto.armoringSecretKey(keyPair, secretKey);
@@ -134,8 +133,7 @@ public final class CryptoTest {
     public void testObjectEncryption() {
         final Settings settings = new Settings();
         final Crypto crypto = new Crypto(settings);
-        final String salt = UUID.randomUUID().toString();
-        final CWSKey key = crypto.generateSymmetricKey(settings.getSymmetricAlgorithm(), salt);
+        final CWSKey key = crypto.generateSymmetricKey(settings.getSymmetricAlgorithm());
         key.setSalt(UUID.randomUUID().toString());
 
         // Now, we're going to encrypt some data
@@ -222,7 +220,8 @@ public final class CryptoTest {
         final Crypto crypto = new Crypto(new Settings());
         final Charset charset = new Settings().getCharset();
         final String dataSalt = UUID.randomUUID().toString();
-        final CWSKey key = crypto.generateSymmetricKey(settings.getSymmetricAlgorithm(), dataSalt);
+        final CWSKey key = crypto.generateSymmetricKey(settings.getSymmetricAlgorithm());
+        key.setSalt(dataSalt);
         final byte[] rawdata = UUID.randomUUID().toString().getBytes(charset);
         final byte[] encryptedData = crypto.encrypt(key, rawdata);
 

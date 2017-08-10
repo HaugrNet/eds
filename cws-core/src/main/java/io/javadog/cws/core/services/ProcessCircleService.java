@@ -27,7 +27,6 @@ import io.javadog.cws.model.entities.TrusteeEntity;
 import javax.persistence.EntityManager;
 import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
 
 /**
  * @author Kim Jensen
@@ -113,15 +112,13 @@ public final class ProcessCircleService extends Serviceable<ProcessCircleRespons
                     circle.setName(name);
                     dao.persist(circle);
 
-                    final String salt = UUID.randomUUID().toString();
                     final KeyAlgorithm algorithm = settings.getSymmetricAlgorithm();
                     final KeyEntity keyEntity = new KeyEntity();
                     keyEntity.setAlgorithm(algorithm);
-                    keyEntity.setSalt(salt);
                     keyEntity.setStatus(Status.ACTIVE);
                     dao.persist(keyEntity);
 
-                    final CWSKey key = crypto.generateSymmetricKey(keyEntity.getAlgorithm(), keyEntity.getSalt());
+                    final CWSKey key = crypto.generateSymmetricKey(keyEntity.getAlgorithm());
                     final String circleKey = crypto.encryptAndArmorCircleKey(circleAdmin.getKey(), key);
                     final TrusteeEntity trustee = new TrusteeEntity();
                     trustee.setMember(circleAdmin);

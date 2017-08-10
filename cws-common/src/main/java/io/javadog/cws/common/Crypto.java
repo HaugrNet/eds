@@ -113,15 +113,13 @@ public final class Crypto {
         }
     }
 
-    public CWSKey generateSymmetricKey(final KeyAlgorithm algorithm, final String salt) {
+    public CWSKey generateSymmetricKey(final KeyAlgorithm algorithm) {
         try {
             final KeyGenerator generator = KeyGenerator.getInstance(algorithm.getName());
             generator.init(algorithm.getLength());
             final SecretKey key = generator.generateKey();
 
-            final CWSKey cwsKey = new CWSKey(algorithm, key);
-            cwsKey.setSalt(salt);
-            return cwsKey;
+            return new CWSKey(algorithm, key);
         } catch (NoSuchAlgorithmException e) {
             throw new CryptoException(e);
         }

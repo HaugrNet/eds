@@ -31,9 +31,6 @@ public class KeyEntity extends CWSEntity {
     @Column(name = "algorithm", nullable = false, updatable = false, length = 10)
     private KeyAlgorithm algorithm = null;
 
-    @Column(name = "salt", updatable = false)
-    private String salt = null;
-
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     private Status status = null;
@@ -55,14 +52,6 @@ public class KeyEntity extends CWSEntity {
 
     public KeyAlgorithm getAlgorithm() {
         return algorithm;
-    }
-
-    public void setSalt(final String salt) {
-        this.salt = salt;
-    }
-
-    public String getSalt() {
-        return salt;
     }
 
     public void setStatus(final Status status) {

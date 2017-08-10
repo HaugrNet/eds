@@ -133,10 +133,10 @@ INSERT INTO circles (external_id, name) VALUES
     ('0a866d7e-5f87-4a2b-a1aa-55c77586aee3', 'circle3');
 
 -- For each Circle, we need to have a unique Key, but with the same settings.
-INSERT INTO keys (algorithm, salt, status) VALUES
-    ('AES128', '35f586f0-c128-401d-97ac-586a7103bea9', 'ACTIVE'),
-    ('AES128', 'ff1fb541-f4dd-47c2-ac8c-1348ee32b1cd', 'ACTIVE'),
-    ('AES128', '85dc1f61-1404-4c27-8fea-56272d6b9088', 'ACTIVE');
+INSERT INTO keys (algorithm, status) VALUES
+    ('AES128', 'ACTIVE'),
+    ('AES128', 'ACTIVE'),
+    ('AES128', 'ACTIVE');
 
 -- With the Members created, and the Circles and Keys added, it is possible to
 -- also create a number of Trustees, in this case we add Member 1-3 to Circle 1,

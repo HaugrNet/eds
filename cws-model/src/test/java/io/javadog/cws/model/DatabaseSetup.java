@@ -123,7 +123,6 @@ public class DatabaseSetup {
     protected KeyEntity prepareKey() {
         final KeyEntity entity = new KeyEntity();
         entity.setAlgorithm(settings.getSymmetricAlgorithm());
-        entity.setSalt(UUID.randomUUID().toString());
         entity.setStatus(Status.ACTIVE);
         persist(entity);
 

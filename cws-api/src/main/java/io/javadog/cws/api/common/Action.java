@@ -34,6 +34,15 @@ public enum Action {
      * <p>The Action Process covers creating and updating records.</p>
      */
     PROCESS,
+    /**
+     * <p>The Action Create is for creating new records.</p>
+     */
+    CREATE,
+
+    /**
+     * <p>The Action Update, is for updating existing records.</p>
+     */
+    UPDATE,
 
     /**
      * <p>For Invitations, which will allow the System Administrator to create

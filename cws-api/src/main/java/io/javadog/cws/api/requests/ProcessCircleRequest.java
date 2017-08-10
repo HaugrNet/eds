@@ -9,9 +9,8 @@ package io.javadog.cws.api.requests;
 
 import io.javadog.cws.api.common.Action;
 import io.javadog.cws.api.common.Constants;
+import io.javadog.cws.api.common.TrustLevel;
 import io.javadog.cws.api.dtos.Authentication;
-import io.javadog.cws.api.dtos.Circle;
-import io.javadog.cws.api.dtos.Trustee;
 
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -27,25 +26,33 @@ import java.util.Set;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "processCircleRequest", propOrder = { "action", "circle", "trustee" })
+@XmlType(name = "processCircleRequest", propOrder = { "action", "circleId", "circleName", "memberId", "trustLevel" })
 public final class ProcessCircleRequest extends Authentication {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
-    private static final Set<Action> ALLOWED = EnumSet.of(Action.PROCESS, Action.ADD, Action.ALTER, Action.REMOVE, Action.DELETE);
+    private static final Set<Action> ALLOWED = EnumSet.of(Action.CREATE, Action.UPDATE, Action.DELETE, Action.ADD, Action.ALTER, Action.REMOVE);
 
     private static final String FIELD_ACTION = "action";
-    private static final String FIELD_CIRCLE = "circle";
-    private static final String FIELD_TRUSTEE = "trustee";
+    private static final String FIELD_CIRCLE_ID = "circleId";
+    private static final String FIELD_CIRCLE_NAME = "circleName";
+    private static final String FIELD_MEMBER_ID = "memberId";
+    private static final String FIELD_TRUSTLEVEL = "trustlevel";
 
     @XmlElement(name = FIELD_ACTION, required = true)
     private Action action = null;
 
-    @XmlElement(name = FIELD_CIRCLE, required = true)
-    private Circle circle = null;
+    @XmlElement(name = FIELD_CIRCLE_ID)
+    private String circleId = null;
 
-    @XmlElement(name = FIELD_TRUSTEE, nillable = true, required = true)
-    private Trustee trustee = null;
+    @XmlElement(name = FIELD_CIRCLE_NAME)
+    private String circleName = null;
+
+    @XmlElement(name = FIELD_MEMBER_ID)
+    private String memberId = null;
+
+    @XmlElement(name = FIELD_TRUSTLEVEL)
+    private TrustLevel trustLevel = null;
 
     // =========================================================================
     // Standard Setters & Getters
@@ -73,33 +80,39 @@ public final class ProcessCircleRequest extends Authentication {
         return action;
     }
 
-    /**
-     * <p>Sets the Circle to Process, i.e. either Create if it doesn't exist or
-     * update if possible, depending on the Action.</p>
-     *
-     * @param circle Circle to Process
-     */
-    @NotNull
-    public void setCircle(final Circle circle) {
-        ensureNotNull(FIELD_CIRCLE, circle);
-        ensureVerifiable(FIELD_CIRCLE, circle);
-        this.circle = circle;
+    public void setCircleId(final String circleId) {
+        this.circleId = circleId;
     }
 
-    public Circle getCircle() {
-        return circle;
+    public String getCircleId() {
+        return circleId;
     }
 
-    public void setTrustee(final Trustee trustee) {
-        ensureVerifiable(FIELD_TRUSTEE, trustee);
-        this.trustee = trustee;
+    public void setCircleName(final String circleName) {
+        this.circleName = circleName;
     }
 
-    public Trustee getTrustee() {
-        return trustee;
+    public String getCircleName() {
+        return circleName;
     }
 
-    // =========================================================================
+    public void setMemberId(final String memberId) {
+        this.memberId = memberId;
+    }
+
+    public String getMemberId() {
+        return memberId;
+    }
+
+    public void setTrustLevel(final TrustLevel trustLevel) {
+        this.trustLevel = trustLevel;
+    }
+
+    public TrustLevel getTrustLevel() {
+        return trustLevel;
+    }
+
+// =========================================================================
     // Standard Methods
     // =========================================================================
 
@@ -112,19 +125,31 @@ public final class ProcessCircleRequest extends Authentication {
 
         if (action == null) {
             errors.put(FIELD_ACTION, "No action has been provided.");
-        }
-
-        if (circle == null) {
-            errors.put(FIELD_CIRCLE, "Value is missing, null or invalid.");
         } else {
-            errors.putAll(circle.validate());
-        }
-
-        if ((action != null) && ((action == Action.ADD) || (action == Action.ALTER) || (action == Action.REMOVE))) {
-            if (trustee == null) {
-                errors.put(FIELD_TRUSTEE, "Value is missing, null or invalid.");
-            } else {
-                errors.putAll(trustee.validate());
+            switch (action) {
+                case CREATE:
+                    checkNotNullOrEmpty(errors, FIELD_CIRCLE_NAME, circleName, "The " + FIELD_CIRCLE_NAME + " is invalid.");
+                    checkNotNullAndValidId(errors, FIELD_MEMBER_ID, memberId, "The " + FIELD_MEMBER_ID + " is missing.");
+                    break;
+                case UPDATE:
+                    checkNotNullAndValidId(errors, FIELD_CIRCLE_ID, circleId, "Invalid " + FIELD_CIRCLE_ID + " provided.");
+                    checkNotNullOrEmpty(errors, FIELD_CIRCLE_NAME, circleName, "The " + FIELD_CIRCLE_NAME + " is not valid.");
+                    break;
+                case DELETE:
+                    checkNotNullAndValidId(errors, FIELD_CIRCLE_ID, circleId, "Invalid " + FIELD_CIRCLE_ID + " provided.");
+                    break;
+                case ADD:
+                case ALTER:
+                    checkNotNullAndValidId(errors, FIELD_CIRCLE_ID, circleId, "Invalid " + FIELD_CIRCLE_ID + " provided.");
+                    checkValidId(errors, FIELD_MEMBER_ID, memberId, "The " + FIELD_MEMBER_ID + " is missing.");
+                    checkNotNull(errors, FIELD_TRUSTLEVEL, trustLevel, "The " + FIELD_TRUSTLEVEL + " is missing.");
+                    break;
+                case REMOVE:
+                    checkNotNullAndValidId(errors, FIELD_CIRCLE_ID, circleId, "Invalid " + FIELD_CIRCLE_ID + " provided.");
+                    checkValidId(errors, FIELD_MEMBER_ID, memberId, "The " + FIELD_MEMBER_ID + " is missing.");
+                    break;
+                default:
+                    errors.put(FIELD_ACTION, "Invalid Action provided.");
             }
         }
 

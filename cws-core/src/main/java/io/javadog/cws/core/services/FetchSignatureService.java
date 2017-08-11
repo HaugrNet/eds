@@ -7,15 +7,17 @@
  */
 package io.javadog.cws.core.services;
 
-import io.javadog.cws.api.common.ReturnCode;
+import io.javadog.cws.api.dtos.Signature;
 import io.javadog.cws.api.requests.FetchSignatureRequest;
 import io.javadog.cws.api.responses.FetchSignatureResponse;
 import io.javadog.cws.common.Settings;
-import io.javadog.cws.common.exceptions.CWSException;
 import io.javadog.cws.core.Permission;
 import io.javadog.cws.core.Serviceable;
+import io.javadog.cws.model.entities.SignatureEntity;
 
 import javax.persistence.EntityManager;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Kim Jensen
@@ -34,6 +36,22 @@ public final class FetchSignatureService extends Serviceable<FetchSignatureRespo
     public FetchSignatureResponse perform(final FetchSignatureRequest request) {
         verifyRequest(request, Permission.FETCH_SIGNATURES);
 
-        throw new CWSException(ReturnCode.NOTIMPLEMENTED_ERROR, "Not Yet Implemented.");
+        final List<SignatureEntity> found = dao.findAllSignatures(member.getId());
+        final List<Signature> signatures = new ArrayList<>(found.size());
+
+        for (final SignatureEntity entity : found) {
+            final Signature signature = new Signature();
+            signature.setId(entity.getExternalId());
+            signature.setExpires(entity.getExpires());
+            signature.setVerifications(entity.getVerifications());
+            signature.setCreated(entity.getCreated());
+            signature.setLastVerification(entity.getModified());
+
+            signatures.add(signature);
+        }
+
+        final FetchSignatureResponse response = new FetchSignatureResponse();
+        response.setSignatures(signatures);
+        return response;
     }
 }

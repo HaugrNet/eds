@@ -12,6 +12,7 @@ import io.javadog.cws.api.common.ReturnCode;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 
 /**
@@ -19,11 +20,14 @@ import javax.xml.bind.annotation.XmlType;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "verifyResult")
+@XmlType(name = "verifyResult", propOrder = "verified")
 public final class VerifyResponse extends CwsResponse {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
+
+    @XmlElement(name = "verified")
+    private Boolean verified = null;
 
     // =========================================================================
     // Object Constructors
@@ -46,5 +50,13 @@ public final class VerifyResponse extends CwsResponse {
      */
     public VerifyResponse(final ReturnCode returnCode, final String returnMessage) {
         super(returnCode, returnMessage);
+    }
+
+    public void setVerified(final Boolean verified) {
+        this.verified = verified;
+    }
+
+    public Boolean getVerified() {
+        return verified;
     }
 }

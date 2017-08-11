@@ -20,6 +20,7 @@ import io.javadog.cws.model.entities.Externable;
 import io.javadog.cws.model.entities.MemberEntity;
 import io.javadog.cws.model.entities.MetaDataEntity;
 import io.javadog.cws.model.entities.SettingEntity;
+import io.javadog.cws.model.entities.SignatureEntity;
 import io.javadog.cws.model.entities.TrusteeEntity;
 
 import javax.persistence.EntityManager;
@@ -327,12 +328,23 @@ public final class CommonJpaDao implements CommonDao {
         return findList(query);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<SignatureEntity> findAllSignatures(final Long id) {
+        final Query query = entityManager.createNamedQuery("signature.findByMember");
+        query.setParameter("mid", id);
+
+        return findList(query);
+    }
+
     // =========================================================================
     // Internal Methods, handling the actual lookup's to simplify error handling
     // =========================================================================
 
     private static <E> E findUniqueRecord(final Query query) {
-        final List<E> found = query.getResultList();
+        final List<E> found = findList(query);
 
         if (found.size() != 1) {
             throw new ModelException(ReturnCode.DATABASE_ERROR, "Could not uniquely identify a record with the given criteria's.");
@@ -342,7 +354,7 @@ public final class CommonJpaDao implements CommonDao {
     }
 
     private static <E> E findSingleRecord(final Query query) {
-        final List<E> found = query.getResultList();
+        final List<E> found = findList(query);
 
         return found.isEmpty() ? null : found.get(0);
     }

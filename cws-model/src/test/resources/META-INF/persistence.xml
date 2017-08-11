@@ -14,6 +14,7 @@
         <class>io.javadog.cws.model.entities.DataTypeEntity</class>
         <class>io.javadog.cws.model.entities.MetaDataEntity</class>
         <class>io.javadog.cws.model.entities.DataEntity</class>
+        <class>io.javadog.cws.model.entities.SignatureEntity</class>
 
         <properties>
             <!-- JPA Settings to create test DB via scripts -->

@@ -7,13 +7,13 @@
  */
 package io.javadog.cws.core.services;
 
-import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.requests.SignRequest;
 import io.javadog.cws.api.responses.SignResponse;
+import io.javadog.cws.common.CWSKey;
 import io.javadog.cws.common.Settings;
-import io.javadog.cws.common.exceptions.CWSException;
 import io.javadog.cws.core.Permission;
 import io.javadog.cws.core.Serviceable;
+import io.javadog.cws.model.entities.SignatureEntity;
 
 import javax.persistence.EntityManager;
 
@@ -34,6 +34,17 @@ public final class SignService extends Serviceable<SignResponse, SignRequest> {
     public SignResponse perform(final SignRequest request) {
         verifyRequest(request, Permission.CREATE_SIGNATURE);
 
-        throw new CWSException(ReturnCode.NOTIMPLEMENTED_ERROR, "Not Yet Implemented.");
+        final CWSKey key = member.getKey();
+        final String signature = crypto.sign(key.getPrivate(), request.getData());
+
+        final SignatureEntity entity = new SignatureEntity();
+        entity.setMember(member);
+        entity.setExpires(request.getExpires());
+        dao.persist(entity);
+
+        final SignResponse response = new SignResponse();
+        response.setSignature(signature);
+        response.setSignatureId(entity.getExternalId());
+        return response;
     }
 }

@@ -230,7 +230,6 @@ public final class ProcessMemberService extends Serviceable<ProcessMemberRespons
         final String armoredPublicKey = crypto.armoringPublicKey(pair.getPublic());
 
         final MemberEntity account = new MemberEntity();
-        account.setKey(pair);
         account.setName(accountName);
         account.setSalt(salt);
         account.setPrivateKey(base64EncryptedPrivateKey);

@@ -7,7 +7,9 @@ INSERT INTO versions(schema_version, cws_version) VALUES (1, '1.0.0');
 
 -- Default, we have 1 Object Type, which is the folder. The rest is left to
 -- the initial setup to create
-INSERT INTO datatypes (datatype_name, datatype_value) VALUES ('folder', 'Folder');
+INSERT INTO datatypes (datatype_name, datatype_value) VALUES
+    ('folder', 'Folder'),
+    ('data', 'Data Object');
 
 
 -- =============================================================================

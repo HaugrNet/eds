@@ -9,7 +9,6 @@ package io.javadog.cws.core.services;
 
 import io.javadog.cws.api.requests.SignRequest;
 import io.javadog.cws.api.responses.SignResponse;
-import io.javadog.cws.common.CWSKey;
 import io.javadog.cws.common.Settings;
 import io.javadog.cws.core.Permission;
 import io.javadog.cws.core.Serviceable;
@@ -34,9 +33,7 @@ public final class SignService extends Serviceable<SignResponse, SignRequest> {
     public SignResponse perform(final SignRequest request) {
         verifyRequest(request, Permission.CREATE_SIGNATURE);
 
-        final CWSKey key = member.getKey();
-        final String signature = crypto.sign(key.getPrivate(), request.getData());
-
+        final String signature = crypto.sign(keyPair.getPrivate(), request.getData());
         final SignatureEntity entity = new SignatureEntity();
         entity.setMember(member);
         entity.setExpires(request.getExpires());

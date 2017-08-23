@@ -7,6 +7,7 @@
  */
 package io.javadog.cws.core.services;
 
+import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.common.TrustLevel;
 import io.javadog.cws.api.dtos.DataType;
@@ -116,7 +117,7 @@ public final class ProcessDataService extends Serviceable<ProcessDataResponse, P
         final byte[] bytes = request.getBytes();
         final ProcessDataResponse response;
 
-        if (Objects.equals(type.getName(), "Folder")) {
+        if (Objects.equals(Constants.FOLDER_TYPENAME, type.getName())) {
             response = createFolder(trustee, request);
         } else if (bytes != null) {
             // 2. Extract Circle Key, and create new Key & Data Entities
@@ -129,7 +130,7 @@ public final class ProcessDataService extends Serviceable<ProcessDataResponse, P
             metaData.setParentId(parentId);
             metaData.setType(type);
 
-            final CWSKey circleKey = crypto.extractCircleKey(algorithm, member.getKey(), trustee.getCircleKey());
+            final CWSKey circleKey = crypto.extractCircleKey(algorithm, keyPair, trustee.getCircleKey());
             final String salt = UUID.randomUUID().toString();
             circleKey.setSalt(salt);
             final byte[] encrypted = crypto.encrypt(circleKey, bytes);
@@ -166,7 +167,7 @@ public final class ProcessDataService extends Serviceable<ProcessDataResponse, P
 
         if (metadata.getFolderId() != null) {
             entity = dao.findMetaDataByMemberAndExternalId(member, metadata.getFolderId());
-            if (!Objects.equals(entity.getType().getName(), "folder")) {
+            if (!Objects.equals(Constants.FOLDER_TYPENAME, entity.getType().getName())) {
                 throw new ModelException(ReturnCode.IDENTIFICATION_WARNING, "Provided FolderId is not a folder.");
             }
         } else {
@@ -178,7 +179,7 @@ public final class ProcessDataService extends Serviceable<ProcessDataResponse, P
 
     private ProcessDataResponse createFolder(final TrusteeEntity trustee, final ProcessDataRequest request) {
         final MetaDataEntity parent = findParent(request.getMetaData());
-        final DataTypeEntity folderType = dao.findDataTypeByName("folder");
+        final DataTypeEntity folderType = dao.findDataTypeByName(Constants.FOLDER_TYPENAME);
         final MetaDataEntity folder = createMetaData(trustee, request.getMetaData().getName(), parent.getId(), folderType);
 
         final ProcessDataResponse response = new ProcessDataResponse();
@@ -238,7 +239,7 @@ public final class ProcessDataService extends Serviceable<ProcessDataResponse, P
                 final Long foundCircleId = folder.getCircle().getId();
 
                 if (Objects.equals(currentCircleId, foundCircleId)) {
-                    if (Objects.equals(metadata.getType().getName(), "folder")) {
+                    if (Objects.equals(Constants.FOLDER_TYPENAME, metadata.getType().getName())) {
                         throw new ModelException(ReturnCode.ILLEGAL_ACTION, "It is not permitted to move Folders.");
                     } else {
                         metadata.setParentId(folder.getId());

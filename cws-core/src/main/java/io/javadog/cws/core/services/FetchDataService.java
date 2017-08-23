@@ -7,6 +7,7 @@
  */
 package io.javadog.cws.core.services;
 
+import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.dtos.DataType;
 import io.javadog.cws.api.dtos.MetaData;
@@ -79,7 +80,7 @@ public final class FetchDataService extends Serviceable<FetchDataResponse, Fetch
         final FetchDataResponse response;
 
         if (entity != null) {
-            if (Objects.equals("Folder", entity.getType().getType())) {
+            if (Objects.equals(Constants.FOLDER_TYPENAME, entity.getType().getName())) {
                 response = readFolderContent(entity, request.getDataType());
             } else {
                 response = readCompleteDataObject(entity);
@@ -180,7 +181,7 @@ public final class FetchDataService extends Serviceable<FetchDataResponse, Fetch
 
         for (final TrusteeEntity trustee : trustees) {
             if (Objects.equals(circle.getId(), trustee.getCircle().getId())) {
-                return crypto.extractCircleKey(entity.getKey().getAlgorithm(), member.getKey(), trustee.getCircleKey());
+                return crypto.extractCircleKey(entity.getKey().getAlgorithm(), keyPair, trustee.getCircleKey());
             }
         }
 

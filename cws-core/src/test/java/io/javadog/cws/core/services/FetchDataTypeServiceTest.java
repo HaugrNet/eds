@@ -52,9 +52,11 @@ public final class FetchDataTypeServiceTest extends DatabaseSetup {
         assertThat(response.isOk(), is(true));
         assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(response.getReturnMessage(), is("Ok"));
-        assertThat(response.getTypes().size(), is(1));
-        assertThat(response.getTypes().get(0).getName(), is("folder"));
-        assertThat(response.getTypes().get(0).getType(), is("Folder"));
+        assertThat(response.getTypes().size(), is(2));
+        assertThat(response.getTypes().get(0).getName(), is(Constants.DATA_TYPENAME));
+        assertThat(response.getTypes().get(0).getType(), is("Data Object"));
+        assertThat(response.getTypes().get(1).getName(), is(Constants.FOLDER_TYPENAME));
+        assertThat(response.getTypes().get(1).getType(), is("Folder"));
     }
 
     // =========================================================================

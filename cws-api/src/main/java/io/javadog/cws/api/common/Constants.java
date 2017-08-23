@@ -47,6 +47,10 @@ public final class Constants {
      */
     public static final String ADMIN_ACCOUNT = "admin";
 
+    public static final String FOLDER_TYPENAME = "folder";
+
+    public static final String DATA_TYPENAME = "data";
+
     private Constants() {
         // Private Constructor, this is a Constants Class.
     }

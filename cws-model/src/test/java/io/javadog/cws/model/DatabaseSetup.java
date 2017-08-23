@@ -66,9 +66,8 @@ public class DatabaseSetup {
         entityManager.getTransaction().rollback();
     }
 
-    protected MemberEntity prepareMember(final String accountName, final String secret) {
+    protected MemberEntity prepareMember(final String accountName, final String secret, final CWSKey keyPair) {
         final String salt = UUID.randomUUID().toString();
-        final CWSKey pair = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
         final CWSKey secretKey = crypto.generatePasswordKey(settings.getSymmetricAlgorithm(), secret, salt);
         secretKey.setSalt(salt);
 
@@ -77,9 +76,8 @@ public class DatabaseSetup {
         entity.setName(accountName);
         entity.setSalt(salt);
         entity.setAlgorithm(settings.getAsymmetricAlgorithm());
-        entity.setPublicKey(crypto.armoringPublicKey(pair.getPublic()));
-        entity.setPrivateKey(crypto.armoringPrivateKey(secretKey, pair.getPrivate()));
-        entity.setKey(pair);
+        entity.setPublicKey(crypto.armoringPublicKey(keyPair.getPublic()));
+        entity.setPrivateKey(crypto.armoringPrivateKey(secretKey, keyPair.getPrivate()));
         entity.setModified(new Date());
         entity.setCreated(new Date());
 

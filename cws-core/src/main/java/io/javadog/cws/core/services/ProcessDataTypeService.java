@@ -75,7 +75,7 @@ public final class ProcessDataTypeService extends Serviceable<ProcessDataTypeRes
             dao.persist(entity);
         } else {
             entity = found;
-            if (entity.getId() == 1) {
+            if (entity.getId() <= 2) {
                 throw new AuthorizationException("It is not permitted to update the DataType '" + entity.getName() + "'.");
             } else if (!Objects.equals(type, entity.getType())) {
                 entity.setType(type);

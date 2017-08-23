@@ -25,6 +25,13 @@ public final class CWSKey {
     private final Key key;
     private String salt = null;
 
+    public CWSKey(final PublicKey publicKey) {
+        // For the Public Key, we just need the Type
+        algorithm = KeyAlgorithm.RSA2048;
+        keyPair = new KeyPair(publicKey, null);
+        key = null;
+    }
+
     public CWSKey(final KeyAlgorithm algorithm, final KeyPair keyPair) {
         if ((algorithm == null) || (keyPair == null)) {
             throw new IllegalArgumentException("Missing information");

@@ -33,7 +33,8 @@ public final class MemberEntityTest extends DatabaseSetup {
 
     @Test
     public void testEntity() {
-        final MemberEntity entity = prepareMember("New Account Name", "My Super Secret");
+        final CWSKey keyPair = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
+        final MemberEntity entity = prepareMember("New Account Name", "My Super Secret", keyPair);
         persistAndDetach(entity);
 
         final long id = entity.getId();
@@ -45,7 +46,6 @@ public final class MemberEntityTest extends DatabaseSetup {
         assertThat(found.getSalt(), is(entity.getSalt()));
         assertThat(found.getPublicKey(), is(entity.getPublicKey()));
         assertThat(found.getPrivateKey(), is(entity.getPrivateKey()));
-        assertThat(found.getKey(), is(nullValue()));
     }
 
     @Test(expected = PersistenceException.class)
@@ -143,12 +143,18 @@ public final class MemberEntityTest extends DatabaseSetup {
         println("-- \"member5\", which is all used as part of the tests.");
         println("INSERT INTO members (external_id, name, salt, algorithm, public_key, private_key) VALUES");
 
-        createAndPrintMember(Constants.ADMIN_ACCOUNT, ',');
-        final MemberEntity member1 = createAndPrintMember("member1", ',');
-        final MemberEntity member2 = createAndPrintMember("member2", ',');
-        final MemberEntity member3 = createAndPrintMember("member3", ',');
-        final MemberEntity member4 = createAndPrintMember("member4", ',');
-        final MemberEntity member5 = createAndPrintMember("member5", ';');
+        final CWSKey keyPair = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
+        createAndPrintMember(Constants.ADMIN_ACCOUNT, keyPair, ',');
+        final CWSKey keyPair1 = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
+        final MemberEntity member1 = createAndPrintMember("member1", keyPair1, ',');
+        final CWSKey keyPair2 = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
+        final MemberEntity member2 = createAndPrintMember("member2", keyPair2, ',');
+        final CWSKey keyPair3 = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
+        final MemberEntity member3 = createAndPrintMember("member3", keyPair3, ',');
+        final CWSKey keyPair4 = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
+        final MemberEntity member4 = createAndPrintMember("member4", keyPair4, ',');
+        final CWSKey keyPair5 = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
+        final MemberEntity member5 = createAndPrintMember("member5", keyPair5, ';');
 
         println("");
         println("-- Default, we have 3 Circles as part of the test setup, using the very");
@@ -175,21 +181,21 @@ public final class MemberEntityTest extends DatabaseSetup {
         final CWSKey cwsKey1 = crypto.generateSymmetricKey(key1.getAlgorithm());
         final CWSKey cwsKey2 = crypto.generateSymmetricKey(key1.getAlgorithm());
         final CWSKey cwsKey3 = crypto.generateSymmetricKey(key1.getAlgorithm());
-        createAndPrintTrustee(member1, circle1, key1, cwsKey1, TrustLevel.ADMIN, ',');
-        createAndPrintTrustee(member2, circle1, key1, cwsKey1, TrustLevel.WRITE, ',');
-        createAndPrintTrustee(member3, circle1, key1, cwsKey1, TrustLevel.READ,  ',');
-        createAndPrintTrustee(member1, circle2, key2, cwsKey2, TrustLevel.ADMIN, ',');
-        createAndPrintTrustee(member2, circle2, key2, cwsKey2, TrustLevel.WRITE, ',');
-        createAndPrintTrustee(member3, circle2, key2, cwsKey2, TrustLevel.READ,  ',');
-        createAndPrintTrustee(member4, circle2, key2, cwsKey2, TrustLevel.ADMIN, ',');
-        createAndPrintTrustee(member2, circle3, key3, cwsKey3, TrustLevel.WRITE, ',');
-        createAndPrintTrustee(member3, circle3, key3, cwsKey3, TrustLevel.READ,  ',');
-        createAndPrintTrustee(member4, circle3, key3, cwsKey3, TrustLevel.ADMIN, ',');
-        createAndPrintTrustee(member5, circle3, key3, cwsKey3, TrustLevel.GUEST, ';');
+        createAndPrintTrustee(member1, keyPair1, circle1, key1, cwsKey1, TrustLevel.ADMIN, ',');
+        createAndPrintTrustee(member2, keyPair2, circle1, key1, cwsKey1, TrustLevel.WRITE, ',');
+        createAndPrintTrustee(member3, keyPair3, circle1, key1, cwsKey1, TrustLevel.READ,  ',');
+        createAndPrintTrustee(member1, keyPair1, circle2, key2, cwsKey2, TrustLevel.ADMIN, ',');
+        createAndPrintTrustee(member2, keyPair2, circle2, key2, cwsKey2, TrustLevel.WRITE, ',');
+        createAndPrintTrustee(member3, keyPair3, circle2, key2, cwsKey2, TrustLevel.READ,  ',');
+        createAndPrintTrustee(member4, keyPair4, circle2, key2, cwsKey2, TrustLevel.ADMIN, ',');
+        createAndPrintTrustee(member2, keyPair2, circle3, key3, cwsKey3, TrustLevel.WRITE, ',');
+        createAndPrintTrustee(member3, keyPair3, circle3, key3, cwsKey3, TrustLevel.READ,  ',');
+        createAndPrintTrustee(member4, keyPair4, circle3, key3, cwsKey3, TrustLevel.ADMIN, ',');
+        createAndPrintTrustee(member5, keyPair5, circle3, key3, cwsKey3, TrustLevel.GUEST, ';');
     }
 
-    private MemberEntity createAndPrintMember(final String name, final char delimiter) {
-        final MemberEntity entity = prepareMember(name, name);
+    private MemberEntity createAndPrintMember(final String name, final CWSKey keyPair, final char delimiter) {
+        final MemberEntity entity = prepareMember(name, name, keyPair);
         dao.persist(entity);
 
         println("    ('" + entity.getExternalId() + "', '" + name + "', '" + entity.getSalt() + "', '" + entity.getAlgorithm() + "', '" + entity.getPublicKey() + "', '" + entity.getPrivateKey() + "')" + delimiter);
@@ -213,8 +219,8 @@ public final class MemberEntityTest extends DatabaseSetup {
         return entity;
     }
 
-    private void createAndPrintTrustee(final MemberEntity member, final CircleEntity circle, final KeyEntity key, final CWSKey circleKey, final TrustLevel trustLevel, final char delimiter) {
-        final String armoredKey = crypto.encryptAndArmorCircleKey(member.getKey(), circleKey);
+    private void createAndPrintTrustee(final MemberEntity member, final CWSKey keyPair, final CircleEntity circle, final KeyEntity key, final CWSKey circleKey, final TrustLevel trustLevel, final char delimiter) {
+        final String armoredKey = crypto.encryptAndArmorCircleKey(keyPair, circleKey);
         final TrusteeEntity entity = new TrusteeEntity();
         entity.setMember(member);
         entity.setCircle(circle);

@@ -73,13 +73,27 @@ public final class ProcessDataTypeServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testUpdateRestrictedDataType() {
+    public void testUpdateRestrictedDataTypeFolder() {
         prepareCause(AuthorizationException.class, ReturnCode.AUTHORIZATION_WARNING,
-                "It is not permitted to update the DataType 'folder'.");
+                "It is not permitted to update the DataType '" + Constants.FOLDER_TYPENAME + "'.");
 
         final Serviceable<ProcessDataTypeResponse, ProcessDataTypeRequest> service = prepareService();
         final ProcessDataTypeRequest request = buildRequestWithCredentials(Constants.ADMIN_ACCOUNT);
-        final DataType dataType = buildDataType("folder", "alternative folder");
+        final DataType dataType = buildDataType(Constants.FOLDER_TYPENAME, "alternative folder");
+        request.setDataType(dataType);
+        assertThat(request.getDataType(), is(not(nullValue())));
+
+        service.perform(request);
+    }
+
+    @Test
+    public void testUpdateRestrictedDataTypeData() {
+        prepareCause(AuthorizationException.class, ReturnCode.AUTHORIZATION_WARNING,
+                "It is not permitted to update the DataType '" + Constants.DATA_TYPENAME + "'.");
+
+        final Serviceable<ProcessDataTypeResponse, ProcessDataTypeRequest> service = prepareService();
+        final ProcessDataTypeRequest request = buildRequestWithCredentials(Constants.ADMIN_ACCOUNT);
+        final DataType dataType = buildDataType(Constants.DATA_TYPENAME, "alternative data");
         request.setDataType(dataType);
         assertThat(request.getDataType(), is(not(nullValue())));
 

@@ -423,7 +423,7 @@ CREATE TABLE signatures (
   created          TIMESTAMP DEFAULT now(),
 
   /* Primary & Foreign Keys */
-g  CONSTRAINT signature_pk                   PRIMARY KEY (id),
+  CONSTRAINT signature_pk                   PRIMARY KEY (id),
   CONSTRAINT signature_member_fk            FOREIGN KEY (member_id) REFERENCES members (id) ON DELETE CASCADE,
 
   /* Not Null Constraints */

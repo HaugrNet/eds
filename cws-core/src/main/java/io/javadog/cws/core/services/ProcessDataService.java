@@ -14,11 +14,11 @@ import io.javadog.cws.api.dtos.DataType;
 import io.javadog.cws.api.dtos.MetaData;
 import io.javadog.cws.api.requests.ProcessDataRequest;
 import io.javadog.cws.api.responses.ProcessDataResponse;
-import io.javadog.cws.common.CWSKey;
 import io.javadog.cws.common.Settings;
 import io.javadog.cws.common.enums.KeyAlgorithm;
 import io.javadog.cws.common.exceptions.CWSException;
 import io.javadog.cws.common.exceptions.ModelException;
+import io.javadog.cws.common.keys.CWSKey;
 import io.javadog.cws.core.Permission;
 import io.javadog.cws.core.Serviceable;
 import io.javadog.cws.model.entities.DataEntity;
@@ -143,7 +143,6 @@ public final class ProcessDataService extends Serviceable<ProcessDataResponse, P
             dao.persist(dataEntity);
             response = new ProcessDataResponse();
         } else {
-            // TODO Add a general "Data" type, which can be used for systems where they control Object information.
             // Okay, weird case - storing a Data Object without Data. So,
             // basically we're just storing the MetaData.
             final MetaDataEntity parent = findParent(request.getMetaData());

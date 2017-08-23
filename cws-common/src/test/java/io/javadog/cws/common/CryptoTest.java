@@ -16,6 +16,7 @@ import static org.junit.Assert.assertThat;
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.common.enums.KeyAlgorithm;
 import io.javadog.cws.common.exceptions.CWSException;
+import io.javadog.cws.common.keys.CWSKey;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;

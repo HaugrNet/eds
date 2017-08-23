@@ -11,12 +11,12 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.hasProperty;
 
 import io.javadog.cws.api.common.ReturnCode;
-import io.javadog.cws.common.CWSKey;
 import io.javadog.cws.common.Crypto;
 import io.javadog.cws.common.Settings;
 import io.javadog.cws.common.enums.KeyAlgorithm;
 import io.javadog.cws.common.enums.Status;
 import io.javadog.cws.common.exceptions.CWSException;
+import io.javadog.cws.common.keys.CWSKey;
 import io.javadog.cws.model.entities.CWSEntity;
 import io.javadog.cws.model.entities.CircleEntity;
 import io.javadog.cws.model.entities.KeyEntity;

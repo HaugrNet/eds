@@ -14,8 +14,8 @@ import static org.junit.Assert.assertThat;
 
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.TrustLevel;
-import io.javadog.cws.common.CWSKey;
 import io.javadog.cws.common.enums.KeyAlgorithm;
+import io.javadog.cws.common.keys.CWSKey;
 import io.javadog.cws.model.DatabaseSetup;
 import org.junit.Ignore;
 import org.junit.Test;

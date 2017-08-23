@@ -10,6 +10,7 @@ package io.javadog.cws.common;
 import io.javadog.cws.common.enums.KeyAlgorithm;
 import io.javadog.cws.common.exceptions.CWSException;
 import io.javadog.cws.common.exceptions.CryptoException;
+import io.javadog.cws.common.keys.CWSKey;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;

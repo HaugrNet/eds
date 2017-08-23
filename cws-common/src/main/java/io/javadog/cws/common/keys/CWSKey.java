@@ -5,7 +5,7 @@
  * Project: CWS (cws-common)
  * =============================================================================
  */
-package io.javadog.cws.common;
+package io.javadog.cws.common.keys;
 
 import io.javadog.cws.common.enums.KeyAlgorithm;
 

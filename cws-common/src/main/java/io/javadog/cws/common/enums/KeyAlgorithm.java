@@ -45,8 +45,8 @@ package io.javadog.cws.common.enums;
  * all the Algorithms are available unless the JCE Unlimited Strength
  * Jurisdiction Policy Files are added.</p>
  *
- * <p>VWS not only uses symmetric and asymmetric encryption, also password based
- * encryption or PBE is used, to convert member provided passphrase's into a
+ * <p>CWS not only uses symmetric and asymmetric encryption, also password based
+ * encryption, or PBE, is used, to convert member provided passphrase's into a
  * SecretKey, which can be used to unlock the Account.</p>
  *
  * @author Kim Jensen

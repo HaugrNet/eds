@@ -124,11 +124,12 @@ public final class ProcessDataService extends Serviceable<ProcessDataResponse, P
             final KeyAlgorithm algorithm = settings.getSymmetricAlgorithm();
             final Long parentId = null;
 
-            final MetaDataEntity metaData = new MetaDataEntity();
-            metaData.setCircle(trustee.getCircle());
-            metaData.setName(request.getMetaData().getName());
-            metaData.setParentId(parentId);
-            metaData.setType(type);
+            final MetaDataEntity metaDataEntity = new MetaDataEntity();
+            metaDataEntity.setCircle(trustee.getCircle());
+            metaDataEntity.setName(request.getMetaData().getName());
+            metaDataEntity.setParentId(parentId);
+            metaDataEntity.setType(type);
+            dao.persist(metaDataEntity);
 
             final CWSKey circleKey = crypto.extractCircleKey(algorithm, keyPair, trustee.getCircleKey());
             final String salt = UUID.randomUUID().toString();
@@ -136,12 +137,15 @@ public final class ProcessDataService extends Serviceable<ProcessDataResponse, P
             final byte[] encrypted = crypto.encrypt(circleKey, bytes);
             final DataEntity dataEntity = new DataEntity();
             dataEntity.setInitialVector(salt);
-            dataEntity.setMetaData(metaData);
+            dataEntity.setMetaData(metaDataEntity);
             dataEntity.setData(encrypted);
             dataEntity.setKey(trustee.getKey());
 
             dao.persist(dataEntity);
             response = new ProcessDataResponse();
+            final MetaData metaData = request.getMetaData();
+            metaData.setId(metaDataEntity.getExternalId());
+            response.setMetaData(metaData);
         } else {
             // Okay, weird case - storing a Data Object without Data. So,
             // basically we're just storing the MetaData.

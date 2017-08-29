@@ -81,7 +81,24 @@ public abstract class Serviceable<R extends CwsResponse, V extends Authenticatio
      * @param verifiable Request Object to use for the checks
      * @param action     The Action for the permission check
      */
-    protected void verifyRequest(final V verifiable, final Permission action, final String... externalCircleId) {
+    protected void verifyRequest(final V verifiable, final Permission action) {
+        verifyRequest(verifiable, action, null);
+    }
+    /**
+     * <p>All incoming requests must be verified, so it is clear if the given
+     * information (data) is sufficient to complete the request, and also to
+     * ensure that the requesting party is authenticated and authorized for the
+     * given action.</p>
+     *
+     * <p>If the data is insufficient or if the requesting party cannot be
+     * properly authenticated or authorized for the request, an Exception is
+     * thrown.</p>
+     *
+     * @param verifiable       Request Object to use for the checks
+     * @param action           The Action for the permission check
+     * @param externalCircleId Given CircleId, to limit lookup's
+     */
+    protected void verifyRequest(final V verifiable, final Permission action, final String externalCircleId) {
         // Step 1; Verify if the given data is sufficient to complete the
         //         request. If not sufficient, no need to continue and involve
         //         the DB, so an Exception will be thrown.
@@ -148,13 +165,13 @@ public abstract class Serviceable<R extends CwsResponse, V extends Authenticatio
         }
     }
 
-    private void checkAccount(final V verifiable, final String... circleId) {
+    private void checkAccount(final V verifiable, final String circleId) {
         // If the External Circle Id is given and the member is not the
         // Administrator (who cannot be part of a Circle), we will use
         // the CircleId in the checks.
         final String account = verifiable.getAccount();
-        if ((circleId != null) && (circleId.length == 1) && !Objects.equals(account, ADMIN_ACCOUNT)) {
-            member = dao.findMemberByNameAndCircleId(account, circleId[0]);
+        if ((circleId != null) && !Objects.equals(account, ADMIN_ACCOUNT)) {
+            member = dao.findMemberByNameAndCircleId(account, circleId);
         } else {
             member = dao.findMemberByName(account);
 
@@ -215,7 +232,7 @@ public abstract class Serviceable<R extends CwsResponse, V extends Authenticatio
      * @param action   Action that is to be performed
      * @param circleId Optional External CircleId
      */
-    private void checkAuthorization(final Permission action, final String... circleId) {
+    private void checkAuthorization(final Permission action, final String circleId) {
         // There is a couple of requests, which is only allowed to be made by
         // the System Administrator.
         if ((action.getTrustLevel() == TrustLevel.SYSOP) && !Objects.equals(ADMIN_ACCOUNT, member.getName())) {
@@ -240,9 +257,9 @@ public abstract class Serviceable<R extends CwsResponse, V extends Authenticatio
         }
     }
 
-    private void findTrustees(final MemberEntity member, final String... circleId) {
-        if ((circleId != null) && (circleId.length == 1)) {
-            trustees = dao.findTrustByMemberAndCircle(member, circleId[0]);
+    private void findTrustees(final MemberEntity member, final String circleId) {
+        if (circleId != null) {
+            trustees = dao.findTrustByMemberAndCircle(member, circleId);
         } else {
             trustees = dao.findTrustByMember(member);
         }

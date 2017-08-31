@@ -138,6 +138,19 @@ public final class MemberEntityTest extends DatabaseSetup {
     @Test
     @Ignore("This test is only present to help generate test data.")
     public void testPrepareData() {
+        println("-- =============================================================================");
+        println("-- Following is TEST data, and should not be added in a PRODUCTION environment");
+        println("-- -----------------------------------------------------------------------------");
+        println("-- Unfortunately, JPA only allow setting 3 scripts when creating the database,");
+        println("-- the first is the actual model, which contain what is needed to setup the");
+        println("-- database, including all tables, views, procedures, constraints, etc. The");
+        println("-- second script is for the data (this one), but as we both need to have data");
+        println("-- for production and for testing, we're adding it all here. The final script");
+        println("-- is for destroying the database, which is needed of you have a real database");
+        println("-- and not just an in-memory database.");
+        println("-- =============================================================================");
+
+        println("");
         println("-- Default Administrator User, it is set at the first request to the System, and");
         println("-- is thus needed for loads of tests. Remaining Accounts is for \"member1\" to");
         println("-- \"member5\", which is all used as part of the tests.");
@@ -171,6 +184,13 @@ public final class MemberEntityTest extends DatabaseSetup {
         final KeyEntity key1 = createAndPrintKey(',');
         final KeyEntity key2 = createAndPrintKey(',');
         final KeyEntity key3 = createAndPrintKey(';');
+
+        println("");
+        println("-- For each Circle, we need to have root folder for all data.");
+        println("INSERT INTO metadata (external_id, parent_id, circle_id, datatype_id, name) VALUES");
+        createandPrintFolder(circle1, ',');
+        createandPrintFolder(circle2, ',');
+        createandPrintFolder(circle3, ';');
 
         println("");
         println("-- With the Members created, and the Circles and Keys added, it is possible to");
@@ -217,6 +237,18 @@ public final class MemberEntityTest extends DatabaseSetup {
         println("    ('" + entity.getAlgorithm() + "', '" + entity.getStatus() + "')" + delimiter);
 
         return entity;
+    }
+
+    private void createandPrintFolder(final CircleEntity circleEntity, final char delimiter) {
+        final DataTypeEntity dataTypeEntity = dao.find(DataTypeEntity.class, 1L);
+        final MetaDataEntity entity = new MetaDataEntity();
+        entity.setCircle(circleEntity);
+        entity.setName("/");
+        entity.setParentId(0L);
+        entity.setType(dataTypeEntity);
+        dao.persist(entity);
+
+        println("    ('" + entity.getExternalId() + "', 0, " + entity.getCircle().getId() + ", 1, '/')" + delimiter);
     }
 
     private void createAndPrintTrustee(final MemberEntity member, final CWSKey keyPair, final CircleEntity circle, final KeyEntity key, final CWSKey circleKey, final TrustLevel trustLevel, final char delimiter) {

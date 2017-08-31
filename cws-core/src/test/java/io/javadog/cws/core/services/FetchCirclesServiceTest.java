@@ -81,13 +81,17 @@ public final class FetchCirclesServiceTest extends DatabaseSetup {
 
     @Test
     public void testFetchAllCirclesAsMember1() {
-        // TODO Correct test so it follows latest development...
-        //prepareCause(ModelException.class, "No member found with 'member1'.");
-
         final Serviceable<FetchCircleResponse, FetchCircleRequest> service = prepareService();
         final FetchCircleRequest request = buildRequestWithCredentials("member1");
-        assertThat(request, is(not(nullValue())));
-        service.perform(request);
+
+        final FetchCircleResponse response = service.perform(request);
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(response.getReturnMessage(), is("Ok"));
+        assertThat(response.getCircles().size(), is(3));
+        assertThat(response.getCircles().get(0).getName(), is("circle1"));
+        assertThat(response.getCircles().get(1).getName(), is("circle2"));
+        assertThat(response.getCircles().get(2).getName(), is("circle3"));
+        assertThat(response.getTrustees().size(), is(0));
     }
 
     @Test

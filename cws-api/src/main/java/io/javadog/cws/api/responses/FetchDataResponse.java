@@ -7,9 +7,11 @@
  */
 package io.javadog.cws.api.responses;
 
+import static io.javadog.cws.api.common.Utilities.copy;
+
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
-import io.javadog.cws.api.dtos.MetaData;
+import io.javadog.cws.api.dtos.Metadata;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -31,7 +33,7 @@ public final class FetchDataResponse extends CwsResponse {
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
     @XmlElement(name = "data")
-    private final List<MetaData> data = new ArrayList<>(0);
+    private final List<Metadata> data = new ArrayList<>(0);
 
     @XmlElement(name = "bytes")
     private byte[] bytes = null;
@@ -63,19 +65,19 @@ public final class FetchDataResponse extends CwsResponse {
     // Setters & Getters
     // =========================================================================
 
-    public void setData(final List<MetaData> data) {
+    public void setData(final List<Metadata> data) {
         this.data.addAll(data);
     }
 
-    public List<MetaData> getData() {
+    public List<Metadata> getData() {
         return Collections.unmodifiableList(data);
     }
 
     public void setBytes(final byte[] bytes) {
-        this.bytes = bytes;
+        this.bytes = copy(bytes);
     }
 
     public byte[] getBytes() {
-        return bytes;
+        return copy(bytes);
     }
 }

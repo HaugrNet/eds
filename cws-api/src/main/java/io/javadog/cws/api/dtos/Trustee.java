@@ -7,6 +7,8 @@
  */
 package io.javadog.cws.api.dtos;
 
+import static io.javadog.cws.api.common.Utilities.copy;
+
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.TrustLevel;
 import io.javadog.cws.api.common.Verifiable;
@@ -105,19 +107,19 @@ public final class Trustee extends Verifiable {
     }
 
     public void setChanged(final Date changed) {
-        this.changed = new Date(changed.getTime());
+        this.changed = copy(changed);
     }
 
     public Date getChanged() {
-        return new Date(changed.getTime());
+        return copy(changed);
     }
 
     public void setSince(final Date since) {
-        this.since = new Date(since.getTime());
+        this.since = copy(since);
     }
 
     public Date getSince() {
-        return new Date(since.getTime());
+        return copy(since);
     }
 
     /**

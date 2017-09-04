@@ -26,16 +26,16 @@ import javax.persistence.Table;
         @NamedQuery(name = "data.findByMemberAndExternalId",
                 query = "select d " +
                         "from DataEntity d " +
-                        "inner join TrusteeEntity t on d.metaData.circle.id = t.circle.id " +
-                        "where d.metaData.externalId = :eid" +
+                        "inner join TrusteeEntity t on d.metadata.circle.id = t.circle.id " +
+                        "where d.metadata.externalId = :eid" +
                         "  and t.member.id = :mid" +
                         "  and t.trustLevel in :trustLevels"))
 @Table(name = "data")
 public class DataEntity extends CWSEntity {
 
-    @OneToOne(targetEntity = MetaDataEntity.class, fetch = FetchType.EAGER, optional = false)
+    @OneToOne(targetEntity = MetadataEntity.class, fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "metadata_id", referencedColumnName = "id", nullable = false, updatable = false)
-    private MetaDataEntity metaData = null;
+    private MetadataEntity metadata = null;
 
     @ManyToOne(targetEntity = KeyEntity.class, fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "key_id", referencedColumnName = "id", nullable = false, updatable = false)
@@ -51,12 +51,12 @@ public class DataEntity extends CWSEntity {
     // Entity Setters & Getters
     // =========================================================================
 
-    public void setMetaData(final MetaDataEntity object) {
-        this.metaData = object;
+    public void setMetadata(final MetadataEntity object) {
+        this.metadata = object;
     }
 
-    public MetaDataEntity getMetaData() {
-        return metaData;
+    public MetadataEntity getMetadata() {
+        return metadata;
     }
 
     public void setKey(final KeyEntity key) {

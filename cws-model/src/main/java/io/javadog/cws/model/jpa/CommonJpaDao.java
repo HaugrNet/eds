@@ -18,7 +18,7 @@ import io.javadog.cws.model.entities.DataEntity;
 import io.javadog.cws.model.entities.DataTypeEntity;
 import io.javadog.cws.model.entities.Externable;
 import io.javadog.cws.model.entities.MemberEntity;
-import io.javadog.cws.model.entities.MetaDataEntity;
+import io.javadog.cws.model.entities.MetadataEntity;
 import io.javadog.cws.model.entities.SettingEntity;
 import io.javadog.cws.model.entities.SignatureEntity;
 import io.javadog.cws.model.entities.TrusteeEntity;
@@ -285,7 +285,7 @@ public final class CommonJpaDao implements CommonDao {
      * {@inheritDoc}
      */
     @Override
-    public MetaDataEntity findMetaDataByMemberAndExternalId(final MemberEntity member, final String externalId) {
+    public MetadataEntity findMetaDataByMemberAndExternalId(final MemberEntity member, final String externalId) {
         final Query query = entityManager.createNamedQuery("metadata.findByMemberAndExternalId");
         query.setParameter("mid", member.getId());
         query.setParameter("eid", externalId);
@@ -297,7 +297,7 @@ public final class CommonJpaDao implements CommonDao {
      * {@inheritDoc}
      */
     @Override
-    public List<MetaDataEntity> findMetadataByMemberFolderAndType(final MemberEntity member, final MetaDataEntity entity, final DataType dataType) {
+    public List<MetadataEntity> findMetadataByMemberFolderAndType(final MemberEntity member, final MetadataEntity entity, final DataType dataType) {
         final Query query = entityManager.createNamedQuery("metadata.findByMemberAndFolderAndType");
         query.setParameter("parentId", entity.getParentId());
         query.setParameter("mid", member.getId());
@@ -310,7 +310,7 @@ public final class CommonJpaDao implements CommonDao {
      * {@inheritDoc}
      */
     @Override
-    public MetaDataEntity findRootByMemberCircle(final MemberEntity member, final String circleId) {
+    public MetadataEntity findRootByMemberCircle(final MemberEntity member, final String circleId) {
         final Query query = entityManager.createNamedQuery("metadata.findRootByMemberAndCircle");
 
         return findSingleRecord(query);
@@ -320,7 +320,7 @@ public final class CommonJpaDao implements CommonDao {
      * {@inheritDoc}
      */
     @Override
-    public List<MetaDataEntity> findMetadataByMemberAndFolder(final MemberEntity member, final MetaDataEntity folder) {
+    public List<MetadataEntity> findMetadataByMemberAndFolder(final MemberEntity member, final MetadataEntity folder) {
         final Query query = entityManager.createNamedQuery("metadata.findByMemberAndFolder");
         query.setParameter("mid", member.getId());
         query.setParameter("parentId", folder.getId());

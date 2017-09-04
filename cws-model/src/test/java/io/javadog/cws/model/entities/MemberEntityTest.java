@@ -241,7 +241,7 @@ public final class MemberEntityTest extends DatabaseSetup {
 
     private void createandPrintFolder(final CircleEntity circleEntity, final char delimiter) {
         final DataTypeEntity dataTypeEntity = dao.find(DataTypeEntity.class, 1L);
-        final MetaDataEntity entity = new MetaDataEntity();
+        final MetadataEntity entity = new MetadataEntity();
         entity.setCircle(circleEntity);
         entity.setName("/");
         entity.setParentId(0L);

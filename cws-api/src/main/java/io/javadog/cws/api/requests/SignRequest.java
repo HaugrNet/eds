@@ -7,6 +7,8 @@
  */
 package io.javadog.cws.api.requests;
 
+import static io.javadog.cws.api.common.Utilities.copy;
+
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.dtos.Authentication;
 
@@ -41,19 +43,19 @@ public final class SignRequest extends Authentication {
 
     public void setData(final byte[] data) {
         ensureNotNull(FIELD_DATA, data);
-        this.data = data;
+        this.data = copy(data);
     }
 
     public byte[] getData() {
-        return data;
+        return copy(data);
     }
 
     public void setExpires(final Date expires) {
-        this.expires = expires;
+        this.expires = copy(expires);
     }
 
     public Date getExpires() {
-        return expires;
+        return copy(expires);
     }
 
     // =========================================================================

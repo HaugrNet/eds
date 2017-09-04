@@ -7,6 +7,8 @@
  */
 package io.javadog.cws.api.dtos;
 
+import static io.javadog.cws.api.common.Utilities.copy;
+
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.Verifiable;
 
@@ -74,11 +76,11 @@ public final class Member extends Verifiable {
     }
 
     public void setAdded(final Date added) {
-        this.added = new Date(added.getTime());
+        this.added = copy(added);
     }
 
     public Date getAdded() {
-        return new Date(added.getTime());
+        return copy(added);
     }
 
     // =========================================================================

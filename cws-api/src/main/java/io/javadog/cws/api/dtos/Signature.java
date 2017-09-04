@@ -7,6 +7,8 @@
  */
 package io.javadog.cws.api.dtos;
 
+import static io.javadog.cws.api.common.Utilities.copy;
+
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.Verifiable;
 
@@ -63,11 +65,11 @@ public final class Signature extends Verifiable {
     }
 
     public void setExpires(final Date expires) {
-        this.expires = (expires != null) ? new Date(expires.getTime()) : null;
+        this.expires = copy(expires);
     }
 
     public Date getExpires() {
-        return (expires != null) ? new Date(expires.getTime()) : null;
+        return copy(expires);
     }
 
     public void setVerifications(final Long verifications) {
@@ -79,19 +81,19 @@ public final class Signature extends Verifiable {
     }
 
     public void setCreated(final Date created) {
-        this.created = (created != null) ? new Date(created.getTime()) : null;
+        this.created = copy(created);
     }
 
     public Date getCreated() {
-        return (created != null) ? new Date(created.getTime()) : null;
+        return copy(created);
     }
 
     public void setLastVerification(final Date lastVerification) {
-        this.lastVerification = (lastVerification != null) ? new Date(lastVerification.getTime()) : null;
+        this.lastVerification = copy(lastVerification);
     }
 
     public Date getLastVerification() {
-        return (lastVerification != null) ? new Date(lastVerification.getTime()) : null;
+        return copy(lastVerification);
     }
 
     // =========================================================================

@@ -7,10 +7,12 @@
  */
 package io.javadog.cws.api.requests;
 
+import static io.javadog.cws.api.common.Utilities.copy;
+
 import io.javadog.cws.api.common.Action;
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.dtos.Authentication;
-import io.javadog.cws.api.dtos.MetaData;
+import io.javadog.cws.api.dtos.Metadata;
 
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -26,7 +28,7 @@ import java.util.Set;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "processDataRequest", propOrder = { "action", "dataId", "data", "bytes" })
+@XmlType(name = "processDataRequest", propOrder = { "action", "dataId", "metadata", "bytes" })
 public final class ProcessDataRequest extends Authentication {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
@@ -35,7 +37,7 @@ public final class ProcessDataRequest extends Authentication {
 
     private static final String FIELD_ACTION = "action";
     private static final String FIELD_DATA_ID = "dataId";
-    private static final String FIELD_DATA = "data";
+    private static final String FIELD_DATA = "metadata";
     private static final String FIELD_BYTES = "bytes";
 
     @XmlElement(name = FIELD_ACTION, required = true)
@@ -45,7 +47,7 @@ public final class ProcessDataRequest extends Authentication {
     private String dataId = null;
 
     @XmlElement(name = FIELD_DATA, nillable = true, required = true)
-    private MetaData data = null;
+    private Metadata metadata = null;
 
     @XmlElement(name = FIELD_BYTES, nillable = true)
     private byte[] bytes = null;
@@ -85,21 +87,21 @@ public final class ProcessDataRequest extends Authentication {
         return dataId;
     }
 
-    public void setMetaData(final MetaData data) {
-        ensureVerifiable(FIELD_DATA, data);
-        this.data = data;
+    public void setMetadata(final Metadata metadata) {
+        ensureVerifiable(FIELD_DATA, metadata);
+        this.metadata = metadata;
     }
 
-    public MetaData getMetaData() {
-        return data;
+    public Metadata getMetadata() {
+        return metadata;
     }
 
     public void setBytes(final byte[] bytes) {
-        this.bytes = bytes;
+        this.bytes = copy(bytes);
     }
 
     public byte[] getBytes() {
-        return bytes;
+        return copy(bytes);
     }
 
     // =========================================================================
@@ -117,10 +119,10 @@ public final class ProcessDataRequest extends Authentication {
             errors.put(FIELD_ACTION, "No action has been provided.");
         } else {
             if (action == Action.PROCESS) {
-                if (data == null) {
+                if (metadata == null) {
                     errors.put(FIELD_DATA, "Data is missing, null or invalid.");
                 } else {
-                    errors.putAll(data.validate());
+                    errors.putAll(metadata.validate());
                 }
             } else if (action == Action.DELETE) {
                 if (dataId == null) {

@@ -15,7 +15,7 @@ import io.javadog.cws.model.entities.DataEntity;
 import io.javadog.cws.model.entities.DataTypeEntity;
 import io.javadog.cws.model.entities.Externable;
 import io.javadog.cws.model.entities.MemberEntity;
-import io.javadog.cws.model.entities.MetaDataEntity;
+import io.javadog.cws.model.entities.MetadataEntity;
 import io.javadog.cws.model.entities.SettingEntity;
 import io.javadog.cws.model.entities.SignatureEntity;
 import io.javadog.cws.model.entities.TrusteeEntity;
@@ -78,13 +78,13 @@ public interface CommonDao {
 
     DataEntity findDataByMemberAndExternalId(MemberEntity member, String externalId);
 
-    MetaDataEntity findMetaDataByMemberAndExternalId(MemberEntity member, String externalId);
+    MetadataEntity findMetaDataByMemberAndExternalId(MemberEntity member, String externalId);
 
-    List<MetaDataEntity> findMetadataByMemberFolderAndType(MemberEntity member, MetaDataEntity entity, DataType dataType);
+    List<MetadataEntity> findMetadataByMemberFolderAndType(MemberEntity member, MetadataEntity entity, DataType dataType);
 
-    MetaDataEntity findRootByMemberCircle(MemberEntity member, String circleId);
+    MetadataEntity findRootByMemberCircle(MemberEntity member, String circleId);
 
-    List<MetaDataEntity> findMetadataByMemberAndFolder(MemberEntity member, MetaDataEntity folder);
+    List<MetadataEntity> findMetadataByMemberAndFolder(MemberEntity member, MetadataEntity folder);
 
     List<SignatureEntity> findAllSignatures(Long id);
 }

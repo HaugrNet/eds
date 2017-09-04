@@ -28,7 +28,7 @@ import javax.persistence.Table;
                         "where lower(d.name) = lower(:name)"),
         @NamedQuery(name = "type.countUsage",
                 query = "select count(m.id) " +
-                        "from MetaDataEntity m " +
+                        "from MetadataEntity m " +
                         "where m.type.id = :id")
 })
 @Table(name = "datatypes")

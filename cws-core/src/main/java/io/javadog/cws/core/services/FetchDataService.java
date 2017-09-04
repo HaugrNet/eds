@@ -10,7 +10,7 @@ package io.javadog.cws.core.services;
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.dtos.DataType;
-import io.javadog.cws.api.dtos.MetaData;
+import io.javadog.cws.api.dtos.Metadata;
 import io.javadog.cws.api.requests.FetchDataRequest;
 import io.javadog.cws.api.responses.FetchDataResponse;
 import io.javadog.cws.common.Settings;
@@ -20,7 +20,7 @@ import io.javadog.cws.core.Permission;
 import io.javadog.cws.core.Serviceable;
 import io.javadog.cws.model.entities.CircleEntity;
 import io.javadog.cws.model.entities.DataEntity;
-import io.javadog.cws.model.entities.MetaDataEntity;
+import io.javadog.cws.model.entities.MetadataEntity;
 import io.javadog.cws.model.entities.TrusteeEntity;
 
 import javax.persistence.EntityManager;
@@ -76,7 +76,7 @@ public final class FetchDataService extends Serviceable<FetchDataResponse, Fetch
     }
 
     private FetchDataResponse processNewData(final FetchDataRequest request) {
-        final MetaDataEntity entity = dao.findMetaDataByMemberAndExternalId(member, request.getDataId());
+        final MetadataEntity entity = dao.findMetaDataByMemberAndExternalId(member, request.getDataId());
         final FetchDataResponse response;
 
         if (entity != null) {
@@ -97,21 +97,21 @@ public final class FetchDataService extends Serviceable<FetchDataResponse, Fetch
     }
 
     private FetchDataResponse readAllMetaDataForCircleAndType(final String circleId, final DataType type) {
-        final MetaDataEntity root = dao.findRootByMemberCircle(member, circleId);
-        final List<MetaDataEntity> data = dao.findMetadataByMemberFolderAndType(member, root, type);
+        final MetadataEntity root = dao.findRootByMemberCircle(member, circleId);
+        final List<MetadataEntity> data = dao.findMetadataByMemberFolderAndType(member, root, type);
 
         return prepareResponse(root.getExternalId(), data);
     }
 
     private FetchDataResponse readAllMetaDataForCircle(final String circleId) {
-        final MetaDataEntity root = dao.findRootByMemberCircle(member, circleId);
-        final List<MetaDataEntity> data = dao.findMetadataByMemberAndFolder(member, root);
+        final MetadataEntity root = dao.findRootByMemberCircle(member, circleId);
+        final List<MetadataEntity> data = dao.findMetadataByMemberAndFolder(member, root);
 
         return prepareResponse(root.getExternalId(), data);
     }
 
-    private FetchDataResponse readFolderContent(final MetaDataEntity entity, final DataType dataType) {
-        final List<MetaDataEntity> entities;
+    private FetchDataResponse readFolderContent(final MetadataEntity entity, final DataType dataType) {
+        final List<MetadataEntity> entities;
 
         if (dataType != null) {
             entities = dao.findMetadataByMemberFolderAndType(member, entity, dataType);
@@ -122,11 +122,11 @@ public final class FetchDataService extends Serviceable<FetchDataResponse, Fetch
         return prepareResponse(entity.getExternalId(), entities);
     }
 
-    private static FetchDataResponse prepareResponse(final String folderId, final List<MetaDataEntity> records) {
-        final List<MetaData> list = new ArrayList<>(records.size());
+    private static FetchDataResponse prepareResponse(final String folderId, final List<MetadataEntity> records) {
+        final List<Metadata> list = new ArrayList<>(records.size());
 
-        for (final MetaDataEntity metadata : records) {
-            final MetaData data = new MetaData();
+        for (final MetadataEntity metadata : records) {
+            final Metadata data = new Metadata();
             data.setId(metadata.getExternalId());
             data.setCircleId(metadata.getCircle().getExternalId());
             data.setFolderId(folderId);
@@ -143,7 +143,7 @@ public final class FetchDataService extends Serviceable<FetchDataResponse, Fetch
         return response;
     }
 
-    private FetchDataResponse readCompleteDataObject(final MetaDataEntity metadata) {
+    private FetchDataResponse readCompleteDataObject(final MetadataEntity metadata) {
         // Following Query will read out a specific Data Records with meta data
         // information, if the person is allowed, which includes checks for
         // Circle Membership and right TrustLevel of the Member. If no Entity
@@ -155,15 +155,15 @@ public final class FetchDataService extends Serviceable<FetchDataResponse, Fetch
             key.setSalt(entity.getInitialVector());
             final byte[] bytes = crypto.decrypt(key, entity.getData());
 
-            final MetaData metaData = new MetaData();
-            metaData.setTypeName(entity.getMetaData().getType().getName());
-            metaData.setName(entity.getMetaData().getName());
-            metaData.setId(entity.getMetaData().getExternalId());
-            metaData.setCircleId(entity.getMetaData().getCircle().getExternalId());
-            metaData.setAdded(entity.getMetaData().getCreated());
-            metaData.setFolderId(readFolder(entity.getMetaData().getParentId()));
+            final Metadata metaData = new Metadata();
+            metaData.setTypeName(entity.getMetadata().getType().getName());
+            metaData.setName(entity.getMetadata().getName());
+            metaData.setId(entity.getMetadata().getExternalId());
+            metaData.setCircleId(entity.getMetadata().getCircle().getExternalId());
+            metaData.setAdded(entity.getMetadata().getCreated());
+            metaData.setFolderId(readFolder(entity.getMetadata().getParentId()));
 
-            final List<MetaData> objects = new ArrayList<>(1);
+            final List<Metadata> objects = new ArrayList<>(1);
             objects.add(metaData);
 
             final FetchDataResponse response = new FetchDataResponse();
@@ -177,7 +177,7 @@ public final class FetchDataService extends Serviceable<FetchDataResponse, Fetch
     }
 
     private CWSKey extractCircleKey(final DataEntity entity) {
-        final CircleEntity circle = entity.getMetaData().getCircle();
+        final CircleEntity circle = entity.getMetadata().getCircle();
 
         for (final TrusteeEntity trustee : trustees) {
             if (Objects.equals(circle.getId(), trustee.getCircle().getId())) {
@@ -189,7 +189,7 @@ public final class FetchDataService extends Serviceable<FetchDataResponse, Fetch
     }
 
     private String readFolder(final Long folderId) {
-        final MetaDataEntity entity = dao.find(MetaDataEntity.class, folderId);
+        final MetadataEntity entity = dao.find(MetadataEntity.class, folderId);
 
         return entity.getExternalId();
     }

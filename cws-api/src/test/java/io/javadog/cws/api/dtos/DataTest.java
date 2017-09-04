@@ -41,7 +41,7 @@ public final class DataTest {
         final String typeName = "DataType Name";
         final Date added = new Date();
 
-        final MetaData data = new MetaData();
+        final Metadata data = new Metadata();
         data.setId(id);
         data.setCircleId(circleId);
         data.setFolderId(folderId);
@@ -61,7 +61,7 @@ public final class DataTest {
 
     @Test
     public void testEmptyClass() {
-        final MetaData data = new MetaData();
+        final Metadata data = new Metadata();
         final Map<String, String> errors = data.validate();
 
         assertThat(errors.isEmpty(), is(false));
@@ -72,7 +72,7 @@ public final class DataTest {
 
     @Test
     public void testNullId() {
-        final MetaData data = new MetaData();
+        final Metadata data = new Metadata();
         data.setId(UUID.randomUUID().toString());
         assertThat(data.getId(), is(not(nullValue())));
 
@@ -85,14 +85,14 @@ public final class DataTest {
         expected.expect(IllegalArgumentException.class);
         expected.expectMessage("The value for 'id' is not matching the required pattern '[\\da-z]{8}-[\\da-z]{4}-[\\da-z]{4}-[\\da-z]{4}-[\\da-z]{12}'.");
 
-        final MetaData data = new MetaData();
+        final Metadata data = new Metadata();
 
         data.setId("123");
     }
 
     @Test
     public void testNullCircleId() {
-        final MetaData data = new MetaData();
+        final Metadata data = new Metadata();
         data.setCircleId(UUID.randomUUID().toString());
         assertThat(data.getCircleId(), is(not(nullValue())));
 
@@ -105,14 +105,14 @@ public final class DataTest {
         expected.expect(IllegalArgumentException.class);
         expected.expectMessage("The value for 'circleId' is not matching the required pattern '[\\da-z]{8}-[\\da-z]{4}-[\\da-z]{4}-[\\da-z]{4}-[\\da-z]{12}'.");
 
-        final MetaData data = new MetaData();
+        final Metadata data = new Metadata();
 
         data.setCircleId("123");
     }
 
     @Test
     public void testNullFolderId() {
-        final MetaData data = new MetaData();
+        final Metadata data = new Metadata();
         data.setFolderId(UUID.randomUUID().toString());
         assertThat(data.getFolderId(), is(not(nullValue())));
 
@@ -125,7 +125,7 @@ public final class DataTest {
         expected.expect(IllegalArgumentException.class);
         expected.expectMessage("The value for 'folderId' is not matching the required pattern '[\\da-z]{8}-[\\da-z]{4}-[\\da-z]{4}-[\\da-z]{4}-[\\da-z]{12}'.");
 
-        final MetaData data = new MetaData();
+        final Metadata data = new Metadata();
         data.setFolderId("123");
     }
 
@@ -134,7 +134,7 @@ public final class DataTest {
         expected.expect(IllegalArgumentException.class);
         expected.expectMessage("The value for 'name' is empty.");
 
-        final MetaData data = new MetaData();
+        final Metadata data = new Metadata();
         data.setName("");
     }
 
@@ -143,7 +143,7 @@ public final class DataTest {
         expected.expect(IllegalArgumentException.class);
         expected.expectMessage("The value for 'name' is longer than the maximum length of 256.");
 
-        final MetaData data = new MetaData();
+        final Metadata data = new Metadata();
         data.setName(LONG_NAME);
     }
 
@@ -152,7 +152,7 @@ public final class DataTest {
         expected.expect(IllegalArgumentException.class);
         expected.expectMessage("The value for 'typeName' is empty.");
 
-        final MetaData data = new MetaData();
+        final Metadata data = new Metadata();
         data.setTypeName("");
     }
 
@@ -161,13 +161,13 @@ public final class DataTest {
         expected.expect(IllegalArgumentException.class);
         expected.expectMessage("The value for 'typeName' is longer than the maximum length of 256.");
 
-        final MetaData data = new MetaData();
+        final Metadata data = new Metadata();
         data.setTypeName(LONG_NAME);
     }
 
     @Test
     public void testValidationWithInvalidId() {
-        final MetaData data = new MetaData();
+        final Metadata data = new Metadata();
         data.setId(UUID.randomUUID().toString());
         reflectiveCorrection(data, "id", "invalid Id");
         reflectiveCorrection(data, "name", LONG_NAME);
@@ -183,7 +183,7 @@ public final class DataTest {
 
     @Test
     public void testValidationWithNullId1() {
-        final MetaData data = new MetaData();
+        final Metadata data = new Metadata();
         data.setId(UUID.randomUUID().toString());
         reflectiveCorrection(data, "id", null);
         reflectiveCorrection(data, "circleId", null);
@@ -202,7 +202,7 @@ public final class DataTest {
 
     @Test
     public void testValidationWithNullId2() {
-        final MetaData data = new MetaData();
+        final Metadata data = new Metadata();
         data.setId(UUID.randomUUID().toString());
         reflectiveCorrection(data, "id", null);
         reflectiveCorrection(data, "circleId", "invalid Circle Id");

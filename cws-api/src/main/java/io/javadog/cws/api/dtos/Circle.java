@@ -7,6 +7,8 @@
  */
 package io.javadog.cws.api.dtos;
 
+import static io.javadog.cws.api.common.Utilities.copy;
+
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.Verifiable;
 
@@ -72,11 +74,11 @@ public final class Circle extends Verifiable {
     }
 
     public void setCreated(final Date created) {
-        this.created = new Date(created.getTime());
+        this.created = copy(created);
     }
 
     public Date getCreated() {
-        return new Date(created.getTime());
+        return copy(created);
     }
 
     /**

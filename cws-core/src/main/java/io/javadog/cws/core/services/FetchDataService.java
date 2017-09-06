@@ -161,7 +161,7 @@ public final class FetchDataService extends Serviceable<FetchDataResponse, Fetch
             metaData.setId(entity.getMetadata().getExternalId());
             metaData.setCircleId(entity.getMetadata().getCircle().getExternalId());
             metaData.setAdded(entity.getMetadata().getCreated());
-            metaData.setFolderId(readFolder(entity.getMetadata().getParentId()));
+            metaData.setFolderId(readFolder(entity.getMetadata()));
 
             final List<Metadata> objects = new ArrayList<>(1);
             objects.add(metaData);
@@ -188,8 +188,15 @@ public final class FetchDataService extends Serviceable<FetchDataResponse, Fetch
         throw new CWSException(ReturnCode.IDENTIFICATION_WARNING, "Could not extract the Key for the requested Data Object");
     }
 
-    private String readFolder(final Long folderId) {
-        final MetadataEntity entity = dao.find(MetadataEntity.class, folderId);
+    private String readFolder(final MetadataEntity folderEntity) {
+        final Long parentId = folderEntity.getParentId();
+        final MetadataEntity entity;
+
+        if (parentId != null) {
+            entity = dao.find(MetadataEntity.class, parentId);
+        } else {
+            entity = dao.findRootByMemberCircle(member, folderEntity.getCircle().getExternalId());
+        }
 
         return entity.getExternalId();
     }

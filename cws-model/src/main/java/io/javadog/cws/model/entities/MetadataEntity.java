@@ -42,15 +42,17 @@ import javax.persistence.Table;
                         "inner join TrusteeEntity t on m.circle.id = t.circle.id " +
                         "where t.member.id = :mid" +
                         "  and m.parentId = :parentId" +
-                        "  and m.type.name =:typename " +
+                        "  and m.type.name = :typename " +
                         "order by m.name asc, m.id asc"),
         @NamedQuery(name = "metadata.findRootByMemberAndCircle",
                 query = "select m " +
                         "from MetadataEntity m " +
                         "inner join TrusteeEntity t on m.circle.id = t.circle.id " +
                         "where t.member.id = :mid" +
-                        "  and m.type.name = 'folder' " +
-                        "  and m.name = '/' " +
+                        "  and m.circle.externalId = :cid" +
+                        "  and m.type.name = 'folder'" +
+                        "  and m.name = '/'" +
+                        "  and m.parentId = 0 " +
                         "order by m.id asc")
 })
 @Table(name = "metadata")

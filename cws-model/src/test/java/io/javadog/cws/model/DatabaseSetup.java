@@ -10,7 +10,9 @@ package io.javadog.cws.model;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.hasProperty;
 
+import io.javadog.cws.api.common.CredentialType;
 import io.javadog.cws.api.common.ReturnCode;
+import io.javadog.cws.api.dtos.Authentication;
 import io.javadog.cws.common.Crypto;
 import io.javadog.cws.common.Settings;
 import io.javadog.cws.common.enums.KeyAlgorithm;
@@ -30,6 +32,7 @@ import org.junit.rules.ExpectedException;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
+import java.lang.reflect.InvocationTargetException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -64,6 +67,20 @@ public class DatabaseSetup {
     @After
     public void tearDown() {
         entityManager.getTransaction().rollback();
+    }
+
+    protected static <T extends Authentication> T prepareRequest(final Class<T> clazz, final String account) {
+        try {
+            final T request = clazz.getConstructor().newInstance();
+
+            request.setAccount(account);
+            request.setCredential(account);
+            request.setCredentialType(CredentialType.PASSPHRASE);
+
+            return request;
+        } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
+            throw new CWSException(ReturnCode.ERROR, "Cannot instantiate Request Object", e);
+        }
     }
 
     protected MemberEntity prepareMember(final String accountName, final String secret, final CWSKey keyPair) {

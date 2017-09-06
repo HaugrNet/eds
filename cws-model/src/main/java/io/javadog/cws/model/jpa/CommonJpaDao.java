@@ -312,6 +312,8 @@ public final class CommonJpaDao implements CommonDao {
     @Override
     public MetadataEntity findRootByMemberCircle(final MemberEntity member, final String circleId) {
         final Query query = entityManager.createNamedQuery("metadata.findRootByMemberAndCircle");
+        query.setParameter("mid", member.getId());
+        query.setParameter("cid", circleId);
 
         return findSingleRecord(query);
     }

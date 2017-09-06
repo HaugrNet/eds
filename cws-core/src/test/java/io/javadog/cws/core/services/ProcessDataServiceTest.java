@@ -12,20 +12,18 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 
 import io.javadog.cws.api.common.Action;
-import io.javadog.cws.api.common.CredentialType;
 import io.javadog.cws.api.common.ReturnCode;
-import io.javadog.cws.api.dtos.Authentication;
 import io.javadog.cws.api.dtos.Metadata;
+import io.javadog.cws.api.requests.FetchDataRequest;
 import io.javadog.cws.api.requests.ProcessDataRequest;
+import io.javadog.cws.api.responses.FetchDataResponse;
 import io.javadog.cws.api.responses.ProcessDataResponse;
-import io.javadog.cws.common.exceptions.CWSException;
 import io.javadog.cws.common.exceptions.VerificationException;
 import io.javadog.cws.core.Serviceable;
 import io.javadog.cws.model.DatabaseSetup;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import java.lang.reflect.InvocationTargetException;
 import java.security.SecureRandom;
 
 /**
@@ -66,26 +64,11 @@ public final class ProcessDataServiceTest extends DatabaseSetup {
         final ProcessDataResponse saveResponse = service.perform(saveRequest);
         assertThat(saveResponse.getReturnCode(), is(ReturnCode.SUCCESS));
 
-        //final FetchDataRequest fetchRequest = prepareRequest(FetchDataRequest.class, "member1");
-        //fetchRequest.setDataId(saveResponse.getMetadata().getId());
-        //final FetchDataService dataService = new FetchDataService(settings, entityManager);
-        //// TODO Extend test data, so each Circle has a Root Folder
-        //final FetchDataResponse fetchResponse = dataService.perform(fetchRequest);
-        //assertThat(fetchResponse.getReturnCode(), is(ReturnCode.SUCCESS));
-    }
-
-    private static <T extends Authentication> T prepareRequest(final Class<T> clazz, final String account) {
-        try {
-            final T request = clazz.getConstructor().newInstance();
-
-            request.setAccount(account);
-            request.setCredential(account);
-            request.setCredentialType(CredentialType.PASSPHRASE);
-
-            return request;
-        } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
-            throw new CWSException(ReturnCode.ERROR, "Cannot instantiate Request Object", e);
-        }
+        final FetchDataRequest fetchRequest = prepareRequest(FetchDataRequest.class, "member1");
+        fetchRequest.setDataId(saveResponse.getMetadata().getId());
+        final FetchDataService dataService = new FetchDataService(settings, entityManager);
+        final FetchDataResponse fetchResponse = dataService.perform(fetchRequest);
+        assertThat(fetchResponse.getReturnCode(), is(ReturnCode.SUCCESS));
     }
 
     private static byte[] generateData(final int bytes) {

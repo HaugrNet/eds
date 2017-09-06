@@ -31,7 +31,7 @@ import java.util.UUID;
  * @author Kim Jensen
  * @since  CWS 1.0
  */
-public final class FetchCirclesServiceTest extends DatabaseSetup {
+public final class FetchCircleServiceTest extends DatabaseSetup {
 
     @Test
     public void testInvalidRequest() {
@@ -217,7 +217,7 @@ public final class FetchCirclesServiceTest extends DatabaseSetup {
     // =========================================================================
 
     private Serviceable<FetchCircleResponse, FetchCircleRequest> prepareService() {
-        return new FetchCirclesService(settings, entityManager);
+        return new FetchCircleService(settings, entityManager);
     }
 
     private static FetchCircleRequest buildRequestWithCredentials(final String account) {

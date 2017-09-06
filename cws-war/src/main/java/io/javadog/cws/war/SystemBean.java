@@ -23,7 +23,7 @@ import io.javadog.cws.api.responses.VersionResponse;
 import io.javadog.cws.common.Settings;
 import io.javadog.cws.common.exceptions.CWSException;
 import io.javadog.cws.core.Serviceable;
-import io.javadog.cws.core.services.FetchCirclesService;
+import io.javadog.cws.core.services.FetchCircleService;
 import io.javadog.cws.core.services.FetchMemberService;
 import io.javadog.cws.core.services.ProcessCircleService;
 import io.javadog.cws.core.services.ProcessMemberService;
@@ -155,7 +155,7 @@ public class SystemBean implements System {
         FetchCircleResponse response;
 
         try {
-            final Serviceable<FetchCircleResponse, FetchCircleRequest> service = new FetchCirclesService(settings, entityManager);
+            final Serviceable<FetchCircleResponse, FetchCircleRequest> service = new FetchCircleService(settings, entityManager);
             response = service.perform(request);
         } catch (CWSException e) {
             // Any Warning or Error thrown by the CWS contain enough information

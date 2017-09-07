@@ -49,7 +49,7 @@ public class ShareBean implements Share {
 
     private static final Logger log = LoggerFactory.getLogger(ShareBean.class);
 
-    //@PersistenceContext(unitName = "cwsDatabase")
+    //@PersistenceContext(unitName = "cwsDS")
     private EntityManager entityManager = null;
 
     private final Settings settings = new Settings();

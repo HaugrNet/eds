@@ -48,7 +48,9 @@ public class SystemBean implements System {
 
     private static final Logger log = LoggerFactory.getLogger(SystemBean.class);
 
-    //@PersistenceContext(unitName = "cwsDatabase")
+    private static final String CWS_CONFIG = "cws.config";
+
+    //@PersistenceContext(unitName = "cwsDS")
     private EntityManager entityManager = null;
 
     private final Settings settings = new Settings();
@@ -60,10 +62,9 @@ public class SystemBean implements System {
     @Transactional(Transactional.TxType.NEVER)
     public VersionResponse version() {
         final ClassLoader loader = Thread.currentThread().getContextClassLoader();
-        final String cwsConfig = "cws.config";
         VersionResponse response;
 
-        try (InputStream stream = loader.getResourceAsStream(cwsConfig)) {
+        try (InputStream stream = loader.getResourceAsStream(CWS_CONFIG)) {
             final Properties properties = new Properties();
             properties.load(stream);
 

@@ -15,29 +15,15 @@ import java.security.PrivateKey;
  * @author Kim Jensen
  * @since  CWS 1.0
  */
-public final class PrivateCWSKey implements CommonKey<PrivateKey> {
+public final class PrivateCWSKey extends CommonKey<PrivateKey> {
 
-    private final KeyAlgorithm algorithm;
-    private final PrivateKey key;
-
+    /**
+     * Default Constructor.
+     *
+     * @param algorithm Key Algorithm
+     * @param key       Key
+     */
     public PrivateCWSKey(final KeyAlgorithm algorithm, final PrivateKey key) {
-        this.algorithm = algorithm;
-        this.key = key;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public KeyAlgorithm getAlgorithm() {
-        return algorithm;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public PrivateKey getKey() {
-        return key;
+        super(algorithm, key);
     }
 }

@@ -15,29 +15,15 @@ import java.security.KeyPair;
  * @author Kim Jensen
  * @since  CWS 1.0
  */
-public final class CWSKeyPair implements CommonKey<KeyPair> {
+public final class CWSKeyPair extends CommonKey<KeyPair> {
 
-    private final KeyAlgorithm algorithm;
-    private final KeyPair key;
-
+    /**
+     * Default Constructor.
+     *
+     * @param algorithm Key Algorithm
+     * @param key       Key
+     */
     public CWSKeyPair(final KeyAlgorithm algorithm, final KeyPair key) {
-        this.algorithm = algorithm;
-        this.key = key;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public KeyAlgorithm getAlgorithm() {
-        return algorithm;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public KeyPair getKey() {
-        return key;
+        super(algorithm, key);
     }
 }

@@ -15,29 +15,15 @@ import java.security.PublicKey;
  * @author Kim Jensen
  * @since  CWS 1.0
  */
-public final class PublicCWSKey implements CommonKey<PublicKey> {
+public final class PublicCWSKey extends CommonKey<PublicKey> {
 
-    private final KeyAlgorithm algorithm;
-    private final PublicKey key;
-
+    /**
+     * Default Constructor.
+     *
+     * @param algorithm Key Algorithm
+     * @param key       Key
+     */
     public PublicCWSKey(final KeyAlgorithm algorithm, final PublicKey key) {
-        this.algorithm = algorithm;
-        this.key = key;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public KeyAlgorithm getAlgorithm() {
-        return algorithm;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public PublicKey getKey() {
-        return key;
+        super(algorithm, key);
     }
 }

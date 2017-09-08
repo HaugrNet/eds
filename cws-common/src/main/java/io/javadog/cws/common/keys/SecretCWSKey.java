@@ -15,31 +15,18 @@ import javax.crypto.SecretKey;
  * @author Kim Jensen
  * @since  CWS 1.0
  */
-public final class SecretCWSKey implements CommonKey<SecretKey> {
+public final class SecretCWSKey extends CommonKey<SecretKey> {
 
-    private final KeyAlgorithm algorithm;
-    private final SecretKey key;
     private String salt = null;
 
+    /**
+     * Default Constructor.
+     *
+     * @param algorithm Key Algorithm
+     * @param key       Key
+     */
     public SecretCWSKey(final KeyAlgorithm algorithm, final SecretKey key) {
-        this.algorithm = algorithm;
-        this.key = key;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public KeyAlgorithm getAlgorithm() {
-        return algorithm;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public SecretKey getKey() {
-        return key;
+        super(algorithm, key);
     }
 
     public void setSalt(final String salt) {

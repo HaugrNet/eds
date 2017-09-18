@@ -23,6 +23,7 @@ import io.javadog.cws.api.responses.ProcessMemberResponse;
 import io.javadog.cws.api.responses.SettingResponse;
 import io.javadog.cws.api.responses.VersionResponse;
 import io.javadog.cws.common.exceptions.CWSException;
+import io.javadog.cws.model.DatabaseSetup;
 import org.junit.Test;
 
 import java.lang.reflect.Field;
@@ -32,7 +33,7 @@ import java.lang.reflect.InvocationTargetException;
  * @author Kim Jensen
  * @since  CWS 1.0
  */
-public final class SystemServiceTest {
+public final class SystemServiceTest extends DatabaseSetup {
 
     @Test
     public void testVersion() {
@@ -200,10 +201,10 @@ public final class SystemServiceTest {
         }
     }
 
-    private static SystemService prepareSystemService() {
+    private SystemService prepareSystemService() {
         try {
             final SystemBean bean = SystemBean.class.getConstructor().newInstance();
-            setField(bean, "entityManager", null);
+            setField(bean, "entityManager", entityManager);
 
             final SystemService service = SystemService.class.getConstructor().newInstance();
             setField(service, "bean", bean);

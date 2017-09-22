@@ -10,6 +10,8 @@ package io.javadog.cws.war;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
+import io.javadog.cws.api.common.Action;
+import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.requests.FetchCircleRequest;
 import io.javadog.cws.api.requests.FetchMemberRequest;
@@ -52,6 +54,15 @@ public final class SystemServiceTest extends DatabaseSetup {
     }
 
     @Test
+    public void testSettings() {
+        final SystemService system = prepareSystemService();
+        final SettingRequest request = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
+
+        final SettingResponse response = system.settings(request);
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
+    }
+
+    @Test
     public void testSettingsWithNullRequest() {
         final SystemService system = prepareSystemService();
         final SettingRequest request = null;
@@ -76,6 +87,15 @@ public final class SystemServiceTest extends DatabaseSetup {
 
         final SettingResponse response = system.settings(request);
         assertThat(response.getReturnCode(), is(ReturnCode.ERROR));
+    }
+
+    @Test
+    public void testFetchMembers() {
+        final SystemService system = prepareSystemService();
+        final FetchMemberRequest request = prepareRequest(FetchMemberRequest.class, "member1");
+
+        final FetchMemberResponse response = system.fetchMembers(request);
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
     }
 
     @Test
@@ -106,6 +126,17 @@ public final class SystemServiceTest extends DatabaseSetup {
     }
 
     @Test
+    public void testProcessMember() {
+        final SystemService system = prepareSystemService();
+        final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
+        request.setAction(Action.INVITE);
+        request.setAccountName("new Account");
+
+        final ProcessMemberResponse response = system.processMember(request);
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
+    }
+
+    @Test
     public void testProcessMemberWithNullRequest() {
         final SystemService system = prepareSystemService();
         final ProcessMemberRequest request = null;
@@ -133,6 +164,15 @@ public final class SystemServiceTest extends DatabaseSetup {
     }
 
     @Test
+    public void testFetchCircle() {
+        final SystemService system = prepareSystemService();
+        final FetchCircleRequest request = prepareRequest(FetchCircleRequest.class, "member1");
+
+        final FetchCircleResponse response = system.fetchCircles(request);
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
+    }
+
+    @Test
     public void testFetchCircleWithNullRequest() {
         final SystemService system = prepareSystemService();
         final FetchCircleRequest request = null;
@@ -157,6 +197,18 @@ public final class SystemServiceTest extends DatabaseSetup {
 
         final FetchCircleResponse response = system.fetchCircles(request);
         assertThat(response.getReturnCode(), is(ReturnCode.ERROR));
+    }
+
+    @Test
+    public void testProcessCircle() {
+        final SystemService system = prepareSystemService();
+        final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, Constants.ADMIN_ACCOUNT);
+        request.setAction(Action.CREATE);
+        request.setCircleName("Test Circle");
+        request.setMemberId("073dcc8f-ffa6-4cda-8d61-09ba9441e78e");
+
+        final ProcessCircleResponse response = system.processCircle(request);
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
     }
 
     @Test

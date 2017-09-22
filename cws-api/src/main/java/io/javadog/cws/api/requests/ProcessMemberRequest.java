@@ -41,7 +41,7 @@ public final class ProcessMemberRequest extends Authentication {
     private static final String FIELD_NEW_CREDENTIAL = "newCredential";
 
     @XmlElement(name = FIELD_ACTION, required = true)
-    private Action action = null;
+    private Action action = Action.PROCESS;
 
     @XmlElement(name = FIELD_MEMBER_ID)
     private String memberId = null;

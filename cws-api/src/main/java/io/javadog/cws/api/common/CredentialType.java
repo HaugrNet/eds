@@ -13,9 +13,8 @@ import javax.xml.bind.annotation.XmlType;
 
 /**
  * <p>This is the types of credentials allowed for the Authentication Process.
- * It can be either an Asymmetric Key (Private Key only or Public/Private Key
- * pair), which is armored using a simply Base64 encoding. Or it can be a
- * Passphrase, which together a System & Account Salt.</p>
+ * It can be either an Invitation (Signature, with a shared secret). Or it can
+ * be a Passphrase, which together a System & Account Salt.</p>
  *
  * <p>Regardless of the type, the information given will be used to decrypt the
  * Asymmetric Key, which was generated and stored with the Account. The Private
@@ -28,14 +27,6 @@ import javax.xml.bind.annotation.XmlType;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "credentialType")
 public enum CredentialType {
-
-    /**
-     * If the Key is chosen, the CWS is expecting an Armored (Base64 encoded)
-     * Asymmetric Key, either the Private Key or a Key Pair (Private/Public)
-     * Key. The Private Key part will be used to unlock the Asymmetric Key for
-     * the Account.
-     */
-    KEY,
 
     /**
      * If the Passphrase is chosen, then the information will be used together

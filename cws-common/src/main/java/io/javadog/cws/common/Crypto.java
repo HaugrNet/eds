@@ -8,7 +8,6 @@
 package io.javadog.cws.common;
 
 import io.javadog.cws.common.enums.KeyAlgorithm;
-import io.javadog.cws.common.exceptions.CWSException;
 import io.javadog.cws.common.exceptions.CryptoException;
 import io.javadog.cws.common.keys.CWSKey;
 
@@ -110,7 +109,7 @@ public final class Crypto {
 
             return key;
         } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
-            throw new CWSException(e);
+            throw new CryptoException(e.getMessage(), e);
         }
     }
 
@@ -122,7 +121,7 @@ public final class Crypto {
 
             return new CWSKey(algorithm, key);
         } catch (NoSuchAlgorithmException e) {
-            throw new CryptoException(e);
+            throw new CryptoException(e.getMessage(), e);
         }
     }
 
@@ -134,7 +133,7 @@ public final class Crypto {
 
             return new CWSKey(algorithm, keyPair);
         } catch (NoSuchAlgorithmException e) {
-            throw new CryptoException(e);
+            throw new CryptoException(e.getMessage(), e);
         }
     }
 
@@ -151,7 +150,7 @@ public final class Crypto {
 
             return Base64.getEncoder().encodeToString(signed);
         } catch (NoSuchAlgorithmException | SignatureException | InvalidKeyException e) {
-            throw new CryptoException(e);
+            throw new CryptoException(e.getMessage(), e);
         }
     }
 
@@ -163,8 +162,8 @@ public final class Crypto {
             verifier.update(message);
 
             return verifier.verify(bytes);
-        } catch (NoSuchAlgorithmException | SignatureException | InvalidKeyException e) {
-            throw new CryptoException(e);
+        } catch (NoSuchAlgorithmException | SignatureException | InvalidKeyException | IllegalArgumentException e) {
+            throw new CryptoException(e.getMessage(), e);
         }
     }
 
@@ -173,7 +172,7 @@ public final class Crypto {
             final Cipher cipher = prepareCipher(key, Cipher.ENCRYPT_MODE);
             return cipher.doFinal(toEncrypt);
         } catch (BadPaddingException | IllegalBlockSizeException | NoSuchPaddingException | NoSuchAlgorithmException | InvalidAlgorithmParameterException | InvalidKeyException e) {
-            throw new CryptoException(e);
+            throw new CryptoException(e.getMessage(), e);
         }
     }
 
@@ -182,7 +181,7 @@ public final class Crypto {
             final Cipher cipher = prepareCipher(key, Cipher.DECRYPT_MODE);
             return cipher.doFinal(toDecrypt);
         } catch (BadPaddingException | IllegalBlockSizeException | NoSuchPaddingException | NoSuchAlgorithmException | InvalidAlgorithmParameterException | InvalidKeyException e) {
-            throw new CryptoException(e);
+            throw new CryptoException(e.getMessage(), e);
         }
     }
 
@@ -236,7 +235,7 @@ public final class Crypto {
 
             return keyFactory.generatePublic(x509KeySpec);
         } catch (InvalidKeySpecException | NoSuchAlgorithmException e) {
-            throw new CryptoException(e);
+            throw new CryptoException(e.getMessage(), e);
         }
     }
 
@@ -257,7 +256,7 @@ public final class Crypto {
 
             return keyFactory.generatePrivate(keySpec);
         } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
-            throw new CryptoException(e);
+            throw new CryptoException(e.getMessage(), e);
         }
     }
 

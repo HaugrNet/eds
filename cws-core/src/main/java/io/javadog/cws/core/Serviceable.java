@@ -177,7 +177,7 @@ public abstract class Serviceable<R extends CwsResponse, V extends Authenticatio
 
             if (member == null) {
                 if (Objects.equals(ADMIN_ACCOUNT, account)) {
-                    member = createNewAdminAccount(verifiable);
+                    member = createNewAccount(ADMIN_ACCOUNT, verifiable.getCredential());
                 } else {
                     throw new ModelException(ReturnCode.CONSTRAINT_ERROR, "Could not uniquely identify a member with '" + account + "'.");
                 }
@@ -185,25 +185,29 @@ public abstract class Serviceable<R extends CwsResponse, V extends Authenticatio
         }
     }
 
-    private MemberEntity createNewAdminAccount(final V verifiable) {
+    protected MemberEntity createNewAccount(final String accountName, final String credential) {
+        final MemberEntity account = new MemberEntity();
+        updateMemberPassword(account, credential);
+        account.setName(accountName);
+        dao.persist(account);
+
+        return account;
+    }
+
+    protected void updateMemberPassword(final MemberEntity member, final String password) {
         final KeyAlgorithm algorithm = settings.getAsymmetricAlgorithm();
         final String salt = UUID.randomUUID().toString();
-        final CWSKey key = crypto.generatePasswordKey(settings.getSymmetricAlgorithm(), verifiable.getCredential(), salt);
+        final CWSKey key = crypto.generatePasswordKey(settings.getSymmetricAlgorithm(), password, salt);
         key.setSalt(salt);
 
         final CWSKey pair = crypto.generateAsymmetricKey(algorithm);
         final String publicKey = crypto.armoringPublicKey(pair.getPublic());
         final String privateKey = crypto.armoringPrivateKey(key, pair.getPrivate());
 
-        final MemberEntity account = new MemberEntity();
-        account.setName(ADMIN_ACCOUNT);
-        account.setSalt(salt);
-        account.setAlgorithm(algorithm);
-        account.setPublicKey(publicKey);
-        account.setPrivateKey(privateKey);
-        dao.persist(account);
-
-        return account;
+        member.setSalt(salt);
+        member.setAlgorithm(algorithm);
+        member.setPrivateKey(privateKey);
+        member.setPublicKey(publicKey);
     }
 
     private void checkCredentials(final V verifiable) {

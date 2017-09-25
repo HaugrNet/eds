@@ -11,7 +11,6 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
 import io.javadog.cws.api.common.ReturnCode;
-import io.javadog.cws.api.dtos.Member;
 import org.junit.Test;
 
 import java.util.UUID;
@@ -25,14 +24,11 @@ public final class ProcessMemberResponseTest {
     @Test
     public void testClass() {
         final String id = UUID.randomUUID().toString();
-        final Member member = new Member();
 
         final ProcessMemberResponse response = new ProcessMemberResponse();
         response.setId(id);
-        response.setMember(member);
 
         assertThat(response.getId(), is(id));
-        assertThat(response.getMember(), is(member));
         assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(response.getReturnMessage(), is("Ok"));
     }

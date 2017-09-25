@@ -23,7 +23,16 @@ public final class CryptoException extends CWSException {
         super(ReturnCode.CRYPTO_ERROR, message);
     }
 
-    public CryptoException(final Throwable cause) {
-        super(ReturnCode.CRYPTO_ERROR, cause);
+    /**
+     * To prevent that too much information about the underlying system is
+     * exposed via the error text, the Cause must be separate from the message.
+     * Hence, even for trivial problems we're not allowing the Cause to stand
+     * alone.
+     *
+     * @param message Error description
+     * @param cause   Cause of the error
+     */
+    public CryptoException(final String message, final Throwable cause) {
+        super(ReturnCode.CRYPTO_ERROR, message, cause);
     }
 }

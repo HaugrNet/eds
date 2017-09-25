@@ -26,7 +26,7 @@ public final class AuthenticationTest {
     public void testClass() {
         final String name = "Authentication Name";
         final String credentials = "Member Passphrase";
-        final CredentialType type = CredentialType.KEY;
+        final CredentialType type = CredentialType.PASSPHRASE;
 
         final Authentication authentication = new Authentication();
         assertThat(authentication.getAccount(), is(not(name)));

@@ -9,7 +9,6 @@ package io.javadog.cws.api.responses;
 
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
-import io.javadog.cws.api.dtos.Member;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -21,7 +20,7 @@ import javax.xml.bind.annotation.XmlType;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "processMemberResult", propOrder = { "id", "member", "signature" })
+@XmlType(name = "processMemberResult", propOrder = { "id", "signature" })
 public final class ProcessMemberResponse extends CwsResponse {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
@@ -29,9 +28,6 @@ public final class ProcessMemberResponse extends CwsResponse {
 
     @XmlElement
     private String id = null;
-
-    @XmlElement
-    private Member member = null;
 
     @XmlElement
     private String signature = null;
@@ -69,14 +65,6 @@ public final class ProcessMemberResponse extends CwsResponse {
 
     public String getId() {
         return id;
-    }
-
-    public void setMember(final Member member) {
-        this.member = member;
-    }
-
-    public Member getMember() {
-        return member;
     }
 
     public void setSignature(final String signature) {

@@ -22,7 +22,6 @@ import io.javadog.cws.model.entities.MemberEntity;
 
 import javax.persistence.EntityManager;
 import java.security.PublicKey;
-import java.util.Base64;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -50,16 +49,20 @@ public final class ProcessMemberService extends Serviceable<ProcessMemberRespons
                 verifyRequest(request, Permission.PROCESS_MEMBER);
 
                 switch (request.getAction()) {
-                    case PROCESS:
-                        response = processMember(request);
+                    case CREATE:
+                        response = createMember(request);
                         break;
                     case INVITE:
                         response = inviteMember(request);
+                        break;
+                    case PROCESS:
+                        response = processSelf(request);
                         break;
                     case DELETE:
                         response = deleteMember(request);
                         break;
                     default:
+                        // This line should be unreachable, if not. Programming error!
                         response = new ProcessMemberResponse(ReturnCode.ILLEGAL_ACTION, "Unsupported request.");
                 }
             }
@@ -70,34 +73,20 @@ public final class ProcessMemberService extends Serviceable<ProcessMemberRespons
         }
     }
 
-    private ProcessMemberResponse processMember(final ProcessMemberRequest request) {
-        final String externalId = request.getMemberId();
-        final ProcessMemberResponse response;
+    private ProcessMemberResponse createMember(final ProcessMemberRequest request) {
+        final String accountName = request.getAccountName().trim();
 
-        if (externalId != null) {
-            final MemberEntity current = dao.find(MemberEntity.class, externalId);
-            if (Objects.equals(current.getId(), member.getId())) {
-                // Members are allowed to process themselves
-                response = processSelf(request);
-            } else {
-                // It is only allowed for a Member to process their own Account,
-                // i.e. change AccountName or set new Credentials
-                throw new CWSException(ReturnCode.AUTHORIZATION_WARNING, "Requesting member is not allowed to process this Account.");
-            }
+        final MemberEntity found = dao.findMemberByName(accountName);
+        if (found == null) {
+            final MemberEntity created = createNewAccount(accountName, request.getNewCredential());
+            final ProcessMemberResponse response;
+            response = new ProcessMemberResponse();
+            response.setId(created.getExternalId());
+
+            return response;
         } else {
-            final String accountName = request.getAccountName().trim();
-
-            final MemberEntity found = dao.findMemberByName(accountName);
-            if (found == null) {
-                final MemberEntity created = createNewAccount(accountName, request.getNewCredential());
-                response = new ProcessMemberResponse();
-                response.setId(created.getExternalId());
-            } else {
-                throw new CWSException(ReturnCode.CONSTRAINT_ERROR, "An Account with the same AccountName already exist.");
-            }
+            throw new CWSException(ReturnCode.CONSTRAINT_ERROR, "An Account with the same AccountName already exist.");
         }
-
-        return response;
     }
 
     private ProcessMemberResponse inviteMember(final ProcessMemberRequest request) {
@@ -129,6 +118,30 @@ public final class ProcessMemberService extends Serviceable<ProcessMemberRespons
         } else {
             response = new ProcessMemberResponse(ReturnCode.ILLEGAL_ACTION, "Not permitted to perform this Action.");
         }
+
+        return response;
+    }
+
+    private ProcessMemberResponse processSelf(final ProcessMemberRequest request) {
+        final ProcessMemberResponse response = new ProcessMemberResponse();
+        response.setId(member.getExternalId());
+
+        if (request.getAccountName() != null) {
+            final String accountName = request.getAccountName().trim();
+            final MemberEntity existing = dao.findMemberByName(accountName);
+
+            if (existing == null) {
+                member.setName(accountName);
+            } else {
+                throw new CWSException(ReturnCode.CONSTRAINT_ERROR, "The new Account Name already exists.");
+            }
+        }
+
+        if (request.getNewCredential() != null) {
+            updateMemberPassword(member, request.getNewCredential());
+        }
+
+        dao.persist(member);
 
         return response;
     }
@@ -187,55 +200,5 @@ public final class ProcessMemberService extends Serviceable<ProcessMemberRespons
         }
 
         return response;
-    }
-
-    private ProcessMemberResponse processSelf(final ProcessMemberRequest request) {
-        final ProcessMemberResponse response = new ProcessMemberResponse();
-        response.setId(member.getExternalId());
-
-        if (request.getAccountName() != null) {
-            final String accountName = request.getAccountName().trim();
-            final MemberEntity existing = dao.findMemberByName(accountName);
-
-            if (existing == null) {
-                member.setName(accountName);
-            } else {
-                throw new CWSException(ReturnCode.CONSTRAINT_ERROR, "The new Account Name already exists.");
-            }
-        }
-
-        if ((request.getCredentialType() != null) && (request.getCredential() != null)) {
-            final String salt = UUID.randomUUID().toString();
-            final CWSKey key = crypto.generatePasswordKey(settings.getPasswordAlgorithm(), request.getCredential(), salt);
-            final CWSKey pair = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
-            final byte[] encryptedPrivateKey = crypto.encrypt(key, pair.getPrivate().getEncoded());
-            final String base64EncryptedPrivateKey = Base64.getEncoder().encodeToString(encryptedPrivateKey);
-            final String armoredPublicKey = crypto.armoringPublicKey(pair.getPublic());
-            member.setSalt(salt);
-            member.setPrivateKey(base64EncryptedPrivateKey);
-            member.setPublicKey(armoredPublicKey);
-        }
-
-        dao.persist(member);
-
-        return response;
-    }
-
-    private MemberEntity createNewAccount(final String accountName, final String credential) {
-        final String salt = UUID.randomUUID().toString();
-        final CWSKey key = crypto.generatePasswordKey(settings.getPasswordAlgorithm(), credential, settings.getSalt());
-        final CWSKey pair = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
-        final byte[] encryptedPrivateKey = crypto.encrypt(key, pair.getPrivate().getEncoded());
-        final String base64EncryptedPrivateKey = Base64.getEncoder().encodeToString(encryptedPrivateKey);
-        final String armoredPublicKey = crypto.armoringPublicKey(pair.getPublic());
-
-        final MemberEntity account = new MemberEntity();
-        account.setName(accountName);
-        account.setSalt(salt);
-        account.setPrivateKey(base64EncryptedPrivateKey);
-        account.setPublicKey(armoredPublicKey);
-        dao.persist(account);
-
-        return account;
     }
 }

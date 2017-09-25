@@ -40,7 +40,8 @@ public final class VerifyService extends Serviceable<VerifyResponse, VerifyReque
         final VerifyResponse response;
 
         if (entity != null) {
-            if ((entity.getExpires() != null) && entity.getExpires().after(new Date())) {
+            final Date expires = entity.getExpires();
+            if ((expires != null) && expires.after(new Date())) {
                 response = new VerifyResponse(ReturnCode.VERIFICATION_WARNING, "The Signature has expired.");
             } else {
                 final PublicKey publicKey = crypto.dearmoringPublicKey(entity.getMember().getPublicKey());

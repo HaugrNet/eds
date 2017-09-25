@@ -44,7 +44,6 @@ public final class SignatureServiceTest extends DatabaseSetup {
         final VerifyRequest verifyRequest = prepareRequest(VerifyRequest.class, "member2");
         verifyRequest.setData(data);
         verifyRequest.setSignature(signResponse.getSignature());
-        verifyRequest.setSignatureId(signResponse.getSignatureId());
         final VerifyResponse verifyResponse = verifyService.perform(verifyRequest);
         assertThat(verifyResponse.getReturnCode(), is(ReturnCode.SUCCESS));
 

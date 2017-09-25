@@ -35,7 +35,8 @@ public final class VerifyService extends Serviceable<VerifyResponse, VerifyReque
     @Override
     public VerifyResponse perform(final VerifyRequest request) {
         verifyRequest(request, Permission.VERIFY_SIGNATURE);
-        final SignatureEntity entity = dao.find(SignatureEntity.class, request.getSignatureId());
+        final String checksum = crypto.generateChecksum(request.getSignature());
+        final SignatureEntity entity = dao.findByChecksum(checksum);
         final VerifyResponse response;
 
         if (entity != null) {

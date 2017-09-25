@@ -23,17 +23,13 @@ import java.util.Map;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "verifyRequest", propOrder = { "signatureId", "signature", "data" })
+@XmlType(name = "verifyRequest", propOrder = { "signature", "data" })
 public final class VerifyRequest extends Authentication {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
-    private static final String FIELD_SIGNATURE_ID = "signatureId";
     private static final String FIELD_SIGNATURE = "signature";
     private static final String FIELD_DATA = "data";
-
-    @XmlElement(name = FIELD_SIGNATURE_ID, required = true)
-    private String signatureId = null;
 
     @XmlElement(name = FIELD_SIGNATURE, required = true)
     private String signature = null;
@@ -44,17 +40,6 @@ public final class VerifyRequest extends Authentication {
     // =========================================================================
     // Standard Setters & Getters
     // =========================================================================
-
-    public void setSignatureId(final String signatureId) {
-        ensureNotNull(FIELD_SIGNATURE_ID, signatureId);
-        ensureValidId(FIELD_SIGNATURE_ID, signatureId);
-
-        this.signatureId = signatureId;
-    }
-
-    public String getSignatureId() {
-        return signatureId;
-    }
 
     public void setSignature(final String signature) {
         ensureNotNull(FIELD_SIGNATURE, signature);
@@ -86,7 +71,6 @@ public final class VerifyRequest extends Authentication {
     public Map<String, String> validate() {
         final Map<String, String> errors = super.validate();
 
-        checkNotNullAndValidId(errors, FIELD_SIGNATURE_ID, signatureId, "The Signature Id is missing.");
         checkNotNullOrEmpty(errors, FIELD_SIGNATURE, signature, "The Signature is missing.");
         checkNotNull(errors, FIELD_DATA, data, "The Data Object to check the Signature against is missing.");
 

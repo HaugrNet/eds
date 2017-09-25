@@ -27,17 +27,23 @@ import java.util.Date;
 @NamedQueries({
         @NamedQuery(name = "signature.readAll",
                     query = "select s from SignatureEntity s"),
+        @NamedQuery(name = "signature.findByChecksum",
+                    query = "select s from SignatureEntity s " +
+                            "where s.checksum = :checksum"),
         @NamedQuery(name = "signature.findByMember",
                     query = "select s from SignatureEntity s " +
                             "where s.member.id = :mid " +
                             "order by s.id desc")
 })
 @Table(name = "signatures")
-public final class SignatureEntity extends Externable {
+public final class SignatureEntity extends CWSEntity {
 
     @ManyToOne(targetEntity = MemberEntity.class, fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "member_id", referencedColumnName = "id", nullable = false, updatable = false)
     private MemberEntity member = null;
+
+    @Column(name = "checksum", updatable = false, length = 256)
+    private String checksum = null;
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "expires", updatable = false)
@@ -58,12 +64,20 @@ public final class SignatureEntity extends Externable {
         return member;
     }
 
+    public void setChecksum(final String checksum) {
+        this.checksum = checksum;
+    }
+
+    public String getChecksum() {
+        return checksum;
+    }
+
     public void setExpires(final Date expires) {
-        this.expires = expires;
+        this.expires = (expires != null) ? new Date(expires.getTime()) : null;
     }
 
     public Date getExpires() {
-        return expires;
+        return (expires != null) ? new Date(expires.getTime()) : null;
     }
 
     public void setVerifications(final Long verifications) {

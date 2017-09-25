@@ -20,14 +20,11 @@ import javax.xml.bind.annotation.XmlType;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "signResult", propOrder = { "signatureId", "signature" })
+@XmlType(name = "signResult", propOrder = "signature")
 public final class SignResponse extends CwsResponse {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
-
-    @XmlElement(name = "signatureId")
-    private String signatureId = null;
 
     @XmlElement(name = "signature")
     private String signature = null;
@@ -53,14 +50,6 @@ public final class SignResponse extends CwsResponse {
      */
     public SignResponse(final ReturnCode returnCode, final String returnMessage) {
         super(returnCode, returnMessage);
-    }
-
-    public void setSignatureId(final String signatureId) {
-        this.signatureId = signatureId;
-    }
-
-    public String getSignatureId() {
-        return signatureId;
     }
 
     public void setSignature(final String signature) {

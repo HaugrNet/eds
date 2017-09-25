@@ -26,6 +26,7 @@ import java.security.InvalidKeyException;
 import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
@@ -64,6 +65,7 @@ import java.util.Base64;
  */
 public final class Crypto {
 
+    private static final String HASHCODE_ALGORITHM_SHA512 = "SHA-512";
     private static final String ASYMMETRIC_ALGORITHM = "RSA";
     private static final int BYTE_LENGTH = 8;
 
@@ -133,6 +135,22 @@ public final class Crypto {
 
             return new CWSKey(algorithm, keyPair);
         } catch (NoSuchAlgorithmException e) {
+            throw new CryptoException(e.getMessage(), e);
+        }
+    }
+
+    public String generateChecksum(final String value) {
+        try {
+            final MessageDigest digest = MessageDigest.getInstance(HASHCODE_ALGORITHM_SHA512);
+            final byte[] bytes = value.getBytes(settings.getCharset());
+            final byte[] hashed = digest.digest(bytes);
+
+            return new String(hashed, settings.getCharset());
+        } catch (final NoSuchAlgorithmException e) {
+            // The MessageDigest method getInstance, if throwing a checked
+            // NoSuchAlgorithm Exception. However, as we only use internal
+            // values for the Algorithms, then we'll never face this problem.
+            // Hence, the exception is ignored
             throw new CryptoException(e.getMessage(), e);
         }
     }

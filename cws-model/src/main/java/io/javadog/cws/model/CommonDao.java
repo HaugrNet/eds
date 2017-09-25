@@ -86,5 +86,7 @@ public interface CommonDao {
 
     List<MetadataEntity> findMetadataByMemberAndFolder(MemberEntity member, MetadataEntity folder);
 
+    SignatureEntity findByChecksum(String checksum);
+
     List<SignatureEntity> findAllSignatures(Long id);
 }

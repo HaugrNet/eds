@@ -30,6 +30,6 @@ public final class VerifyRequestTest {
         request.setCredential(Constants.ADMIN_ACCOUNT);
 
         assertThat(request.validate(), is(not(nullValue())));
-        assertThat(request.validate().size(), is(3));
+        assertThat(request.validate().size(), is(2));
     }
 }

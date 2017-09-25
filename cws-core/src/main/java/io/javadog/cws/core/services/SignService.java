@@ -36,12 +36,12 @@ public final class SignService extends Serviceable<SignResponse, SignRequest> {
         final String signature = crypto.sign(keyPair.getPrivate(), request.getData());
         final SignatureEntity entity = new SignatureEntity();
         entity.setMember(member);
+        entity.setChecksum(crypto.generateChecksum(signature));
         entity.setExpires(request.getExpires());
         dao.persist(entity);
 
         final SignResponse response = new SignResponse();
         response.setSignature(signature);
-        response.setSignatureId(entity.getExternalId());
         return response;
     }
 }

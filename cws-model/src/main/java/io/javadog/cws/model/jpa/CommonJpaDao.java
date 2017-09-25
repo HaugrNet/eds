@@ -334,6 +334,17 @@ public final class CommonJpaDao implements CommonDao {
      * {@inheritDoc}
      */
     @Override
+    public SignatureEntity findByChecksum(final String checksum) {
+        final Query query = entityManager.createNamedQuery("signature.findByChecksum");
+        query.setParameter("checksum", checksum);
+
+        return findSingleRecord(query);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public List<SignatureEntity> findAllSignatures(final Long id) {
         final Query query = entityManager.createNamedQuery("signature.findByMember");
         query.setParameter("mid", id);

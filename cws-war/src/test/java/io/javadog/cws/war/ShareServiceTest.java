@@ -226,7 +226,6 @@ public class ShareServiceTest extends DatabaseSetup {
 
         final VerifyRequest verifyRequest = prepareRequest(VerifyRequest.class, "member2");
         verifyRequest.setData(data);
-        verifyRequest.setSignatureId(signResponse.getSignatureId());
         verifyRequest.setSignature(signResponse.getSignature());
         final VerifyResponse verifyResponse = service.verify(verifyRequest);
         assertThat(verifyResponse.getReturnCode(), is(ReturnCode.SUCCESS));

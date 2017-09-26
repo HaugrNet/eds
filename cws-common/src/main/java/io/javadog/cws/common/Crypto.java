@@ -48,9 +48,8 @@ import java.util.Base64;
  *
  * <p>CWS uses two (three) types of Encryption. Symmetric Encryption of all the
  * actual Data to be shared and Asymmetric Encryption to storing the Symmetric
- * keys. Additionally, a Members Private Key can be stored encrypted within the
- * system, and a Key is derived from the Credentials to unlock it, that is, if
- * the Member is not storing the Private Key.</p>
+ * keys. Additionally, all Private Key are be stored encrypted, and a Key is
+ * derived from the Credentials to unlock it.</p>
  *
  * <p>The default Algorithms and Key sizes have been chosen, so they will work
  * with a standard Java 8+ installation, if larger keys are requested, then the
@@ -59,16 +58,12 @@ import java.util.Base64;
  * <p>Although Cryptography is the cornerstone of the CWS, there is no attempts
  * made towards creating or inventing various Algorithms. The risk of making
  * mistakes is too high. Instead, the CWS relies on the wisdom and maturity of
- * existing Algorithms.</p>
+ * existing implementations.</p>
  *
  * @author Kim Jensen
  * @since  CWS 1.0
  */
 public final class Crypto {
-
-    private static final String HASHCODE_ALGORITHM_SHA512 = "SHA-512";
-    private static final String ASYMMETRIC_ALGORITHM = "RSA";
-    private static final int BYTE_LENGTH = 8;
 
     private final Settings settings;
 
@@ -86,12 +81,6 @@ public final class Crypto {
      * it creates a 256 byte Key over 1024 iterations. However, for the Key to
      * be of a good enough Quality, it should be having a length of at least 16
      * characters and the same applies to the Salt.</p>
-     *
-     * <p>Note, that it takes the Password as a char array, rather than a
-     * String. The reason for this, is that a Char array can be overridden with
-     * garbage once we don't need it anymore, whereas a String which is
-     * immutable can't. This way we don't have to wait for the Garbage Collector
-     * to clean up things.</p>
      *
      * @param secret Provided Passphrase or Secret
      * @param salt   System specific Salt
@@ -142,7 +131,7 @@ public final class Crypto {
 
     public String generateChecksum(final String value) {
         try {
-            final MessageDigest digest = MessageDigest.getInstance(HASHCODE_ALGORITHM_SHA512);
+            final MessageDigest digest = MessageDigest.getInstance(settings.getHashAlgorithm().getAlgorithm());
             final Charset charset = settings.getCharset();
             final byte[] bytes = value.getBytes(charset);
             final byte[] hashed = digest.digest(bytes);
@@ -158,7 +147,7 @@ public final class Crypto {
     }
 
     // =========================================================================
-    // Standard Cryptographic Operations; Sign,  Verify, Encrypt & Decrypt
+    // Standard Cryptographic Operations; Sign, Verify, Encrypt & Decrypt
     // =========================================================================
 
     public String sign(final PrivateKey key, final byte[] message) {
@@ -217,7 +206,7 @@ public final class Crypto {
             cipher = Cipher.getInstance(algorithm.getTransformation());
             final String salt = key.getSalt();
             if (salt != null) {
-                final byte[] bytes = new byte[algorithm.getLength() / BYTE_LENGTH];
+                final byte[] bytes = new byte[algorithm.getLength() / 8];
                 System.arraycopy(salt.getBytes(settings.getCharset()), 0, bytes, 0, bytes.length);
                 final IvParameterSpec iv = new IvParameterSpec(bytes);
                 cipher.init(type, key.getKey(), iv);
@@ -249,7 +238,7 @@ public final class Crypto {
 
     public PublicKey dearmoringPublicKey(final String armoredKey) {
         try {
-            final KeyFactory keyFactory = KeyFactory.getInstance(ASYMMETRIC_ALGORITHM);
+            final KeyFactory keyFactory = KeyFactory.getInstance(settings.getAsymmetricAlgorithm().getName());
             final byte[] rawKey = Base64.getDecoder().decode(armoredKey);
             final X509EncodedKeySpec x509KeySpec = new X509EncodedKeySpec(rawKey);
 
@@ -269,7 +258,7 @@ public final class Crypto {
 
     public PrivateKey dearmoringPrivateKey(final CWSKey decryptionKey, final String armoredKey) {
         try {
-            final KeyFactory keyFactory = KeyFactory.getInstance(ASYMMETRIC_ALGORITHM);
+            final KeyFactory keyFactory = KeyFactory.getInstance(settings.getAsymmetricAlgorithm().getName());
             final byte[] dearmored = Base64.getDecoder().decode(armoredKey);
             final byte[] rawKey = decrypt(decryptionKey, dearmored);
             final PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(rawKey);

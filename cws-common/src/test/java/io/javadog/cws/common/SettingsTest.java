@@ -10,6 +10,7 @@ package io.javadog.cws.common;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
+import io.javadog.cws.common.enums.HashAlgorithm;
 import io.javadog.cws.common.enums.KeyAlgorithm;
 import org.junit.Test;
 
@@ -27,7 +28,7 @@ public final class SettingsTest {
         final Settings settings = new Settings();
 
         final Map<String, String> existing = settings.get();
-        assertThat(existing.size(), is(9));
+        assertThat(existing.size(), is(10));
         settings.set("my.new.key", "the awesome value");
 
         final Map<String, String> updated = settings.get();
@@ -58,6 +59,9 @@ public final class SettingsTest {
 
         settings.set(Settings.SIGNATURE_ALGORITHM, KeyAlgorithm.SHA256.name());
         assertThat(settings.getSignatureAlgorithm(), is(KeyAlgorithm.SHA256));
+
+        settings.set(Settings.HASH_ALGORITHM, HashAlgorithm.SHA256.name());
+        assertThat(settings.getHashAlgorithm(), is(HashAlgorithm.SHA256));
 
         settings.set(Settings.PBE_ALGORITHM, KeyAlgorithm.PBE192.name());
         assertThat(settings.getPasswordAlgorithm(), is(KeyAlgorithm.PBE192));

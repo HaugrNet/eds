@@ -65,6 +65,13 @@ INSERT INTO settings (name, setting, modifiable) VALUES ('cws.crypto.signature.a
 -- Account.
 INSERT INTO settings (name, setting, modifiable) VALUES ('cws.crypto.password.algorithm', 'PBE128', false);
 
+-- For the CheckSums or Fingerprints we're generating - we just need a way
+-- to ensure that the value is both identifiable. For Signatures, it is used
+-- as part of the lookup to find a Signature in the Database and for stored
+-- Data Objects, it is a simple mechanism to ensure the integrity of the
+-- stored data.
+INSERT INTO settings (name, setting, modifiable) VALUES ('cws.crypto.hash.algorithm', 'SHA512', false);
+
 -- This is the System specific Salt, which will be applied whenever PBE is used
 -- to unlock the Private Key of a Member Account. This Salt should be set during
 -- installation, and never changed, as it will render *all* PBE based accounts

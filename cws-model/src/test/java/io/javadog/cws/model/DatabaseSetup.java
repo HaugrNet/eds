@@ -33,6 +33,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import java.lang.reflect.InvocationTargetException;
+import java.security.SecureRandom;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -99,6 +100,14 @@ public class DatabaseSetup {
         entity.setCreated(new Date());
 
         return entity;
+    }
+
+    protected static byte[] generateData(final int bytes) {
+        final byte[] data = new byte[bytes];
+        final SecureRandom random = new SecureRandom();
+        random.nextBytes(data);
+
+        return data;
     }
 
     /**

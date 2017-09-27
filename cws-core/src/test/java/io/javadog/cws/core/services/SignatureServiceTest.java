@@ -20,6 +20,8 @@ import io.javadog.cws.api.responses.VerifyResponse;
 import io.javadog.cws.model.DatabaseSetup;
 import org.junit.Test;
 
+import java.util.Date;
+
 /**
  * This Test Class, is testing the following Service Classes in one, as they are
  * all fairly small but also connected.
@@ -31,7 +33,7 @@ public final class SignatureServiceTest extends DatabaseSetup {
 
     @Test
     public void testSignVerifyFetch() {
-        final byte[] data = "12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890".getBytes(settings.getCharset());
+        final byte[] data = generateData(1048576);
         final FetchSignatureService fetchService = new FetchSignatureService(settings, entityManager);
         final VerifyService verifyService = new VerifyService(settings, entityManager);
         final SignService signService = new SignService(settings, entityManager);
@@ -46,11 +48,68 @@ public final class SignatureServiceTest extends DatabaseSetup {
         verifyRequest.setSignature(signResponse.getSignature());
         final VerifyResponse verifyResponse = verifyService.perform(verifyRequest);
         assertThat(verifyResponse.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(verifyResponse.getVerified(), is(true));
 
         final FetchSignatureRequest fetchRequest = prepareRequest(FetchSignatureRequest.class, "member1");
         final FetchSignatureResponse fetchResponse = fetchService.perform(fetchRequest);
         assertThat(fetchResponse.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(fetchResponse.getSignatures().size(), is(1));
         assertThat(fetchResponse.getSignatures().get(0).getVerifications(), is(1L));
+    }
+
+    @Test
+    public void testExpiredSignature() {
+        final byte[] data = generateData(1048576);
+        final VerifyService verifyService = new VerifyService(settings, entityManager);
+        final SignService signService = new SignService(settings, entityManager);
+
+        final SignRequest signRequest = prepareRequest(SignRequest.class, "member1");
+        signRequest.setData(data);
+        signRequest.setExpires(new Date(new Date().getTime() - 5));
+        final SignResponse signResponse = signService.perform(signRequest);
+        assertThat(signResponse.getReturnCode(), is(ReturnCode.SUCCESS));
+
+        final VerifyRequest verifyRequest = prepareRequest(VerifyRequest.class, "member2");
+        verifyRequest.setData(data);
+        verifyRequest.setSignature(signResponse.getSignature());
+        final VerifyResponse verifyResponse = verifyService.perform(verifyRequest);
+        assertThat(verifyResponse.getReturnCode(), is(ReturnCode.SIGNATURE_WARNING));
+        assertThat(verifyResponse.getReturnMessage(), is("The Signature has expired."));
+        assertThat(verifyResponse.getVerified(), is(false));
+    }
+
+    @Test
+    public void testCorrectSignatureWrongData() {
+        final byte[] data = generateData(1048576);
+        final VerifyService verifyService = new VerifyService(settings, entityManager);
+        final SignService signService = new SignService(settings, entityManager);
+
+        final SignRequest signRequest = prepareRequest(SignRequest.class, "member1");
+        signRequest.setData(data);
+        final SignResponse signResponse = signService.perform(signRequest);
+        assertThat(signResponse.getReturnCode(), is(ReturnCode.SUCCESS));
+
+        final VerifyRequest verifyRequest = prepareRequest(VerifyRequest.class, "member2");
+        final byte[] wrongData = generateData(524288);
+        verifyRequest.setData(wrongData);
+        verifyRequest.setSignature(signResponse.getSignature());
+        final VerifyResponse verifyResponse = verifyService.perform(verifyRequest);
+        assertThat(verifyResponse.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(verifyResponse.getVerified(), is(false));
+    }
+
+    @Test
+    public void testInvalidSignature() {
+        final byte[] data = generateData(524288);
+        final String signature = "VYU8uIyr54AZGeM4aUilgEItfI39/b4YpFcry8ByJYVuJoI0gxNLiw9CMCaocOfXyGkmQJuI4KvL1lhNN6jnsY51OYxsxcJKUBgMnGMRdp9mr+ryiduotTYeD9Z+IyWXdUlQ9W3N/TX1uqLwVCh9qrngXtnOXx5rnZrWybQPsoLEnVOXvkL94Et0EcIUe6spRbaR+8I4oCtGToLcMCZdD32z6suhIfqz9UFiU10W01T2ebNV4SuTf56RSZ1vyWix6C8GJhwLqWE697femoqBWh1UYgKsi5x6d1SYC7ZWSxVj61PpPJ3MfzAxVc5rqJDk1og3zfciDWPMJmF4aJ60Sg==";
+        final VerifyService verifyService = new VerifyService(settings, entityManager);
+        final VerifyRequest request = prepareRequest(VerifyRequest.class, "member1");
+        request.setData(data);
+        request.setSignature(signature);
+
+        final VerifyResponse response = verifyService.perform(request);
+        assertThat(response.getReturnCode(), is(ReturnCode.IDENTIFICATION_WARNING));
+        assertThat(response.getReturnMessage(), is("It was not possible to find the Signature."));
+        assertThat(response.getVerified(), is(false));
     }
 }

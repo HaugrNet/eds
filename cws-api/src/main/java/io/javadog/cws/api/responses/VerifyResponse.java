@@ -27,7 +27,7 @@ public final class VerifyResponse extends CwsResponse {
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
     @XmlElement(name = "verified")
-    private Boolean verified = null;
+    private Boolean verified = false;
 
     // =========================================================================
     // Object Constructors

@@ -23,8 +23,6 @@ import io.javadog.cws.core.Serviceable;
 import io.javadog.cws.model.DatabaseSetup;
 import org.junit.Test;
 
-import java.security.SecureRandom;
-
 /**
  * @author Kim Jensen
  * @since  CWS 1.0
@@ -68,14 +66,6 @@ public final class ProcessDataServiceTest extends DatabaseSetup {
         final FetchDataService dataService = new FetchDataService(settings, entityManager);
         final FetchDataResponse fetchResponse = dataService.perform(fetchRequest);
         assertThat(fetchResponse.getReturnCode(), is(ReturnCode.SUCCESS));
-    }
-
-    private static byte[] generateData(final int bytes) {
-        final byte[] data = new byte[bytes];
-        final SecureRandom random = new SecureRandom();
-        random.nextBytes(data);
-
-        return data;
     }
 
     private Serviceable<ProcessDataResponse, ProcessDataRequest> prepareService() {

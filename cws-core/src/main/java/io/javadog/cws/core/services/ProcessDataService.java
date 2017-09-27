@@ -135,10 +135,12 @@ public final class ProcessDataService extends Serviceable<ProcessDataResponse, P
             final String salt = UUID.randomUUID().toString();
             circleKey.setSalt(salt);
             final byte[] encrypted = crypto.encrypt(circleKey, bytes);
+            final String checksum = crypto.generateChecksum(encrypted);
             final DataEntity dataEntity = new DataEntity();
-            dataEntity.setInitialVector(salt);
             dataEntity.setMetadata(metadataEntity);
             dataEntity.setData(encrypted);
+            dataEntity.setInitialVector(salt);
+            dataEntity.setChecksum(checksum);
             dataEntity.setKey(trustee.getKey());
 
             dao.persist(dataEntity);
@@ -273,9 +275,11 @@ public final class ProcessDataService extends Serviceable<ProcessDataResponse, P
             final String salt = UUID.randomUUID().toString();
             circleKey.setSalt(salt);
             final byte[] encrypted = crypto.encrypt(circleKey, bytes);
+            final String checksum = crypto.generateChecksum(encrypted);
 
             entity.setInitialVector(salt);
             entity.setData(encrypted);
+            entity.setChecksum(checksum);
             dao.persist(entity);
         }
     }

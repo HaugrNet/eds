@@ -47,6 +47,9 @@ public class DataEntity extends CWSEntity {
     @Column(name = "initial_vector", nullable = false, updatable = false, length = 256)
     private String initialVector = null;
 
+    @Column(name = "checksum", nullable = false, length = 256)
+    private String checksum = null;
+
     // =========================================================================
     // Entity Setters & Getters
     // =========================================================================
@@ -81,5 +84,13 @@ public class DataEntity extends CWSEntity {
 
     public String getInitialVector() {
         return initialVector;
+    }
+
+    public void setChecksum(final String checksum) {
+        this.checksum = checksum;
+    }
+
+    public String getChecksum() {
+        return checksum;
     }
 }

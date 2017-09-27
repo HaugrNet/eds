@@ -21,7 +21,6 @@ import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
-import java.nio.charset.Charset;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.KeyFactory;
@@ -130,13 +129,15 @@ public final class Crypto {
     }
 
     public String generateChecksum(final String value) {
+        return generateChecksum(value.getBytes(settings.getCharset()));
+    }
+
+    public String generateChecksum(final byte[] bytes) {
         try {
             final MessageDigest digest = MessageDigest.getInstance(settings.getHashAlgorithm().getAlgorithm());
-            final Charset charset = settings.getCharset();
-            final byte[] bytes = value.getBytes(charset);
             final byte[] hashed = digest.digest(bytes);
 
-            return new String(hashed, charset);
+            return new String(hashed, settings.getCharset());
         } catch (final NoSuchAlgorithmException e) {
             // The MessageDigest method getInstance, if throwing a checked
             // NoSuchAlgorithm Exception. However, as we only use internal

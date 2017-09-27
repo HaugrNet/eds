@@ -21,7 +21,6 @@ import io.javadog.cws.api.responses.ProcessDataResponse;
 import io.javadog.cws.common.exceptions.VerificationException;
 import io.javadog.cws.core.Serviceable;
 import io.javadog.cws.model.DatabaseSetup;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.security.SecureRandom;
@@ -33,13 +32,13 @@ import java.security.SecureRandom;
 public final class ProcessDataServiceTest extends DatabaseSetup {
 
     @Test
-    @Ignore("Temporarily ignoring test as there was a refactoring change that caused it to fail.")
-    public void testInvalidRequest() {
+    public void testEmptyRequest() {
         prepareCause(VerificationException.class, ReturnCode.VERIFICATION_WARNING,
-                "Request Object contained errors: Key: credentialTypeError: CredentialType is missing, null or invalid.\n" +
-                        "Key: credentialError: Credential is missing, null or invalid.\n" +
-                        "Key: dataError: Data is missing, null or invalid.\n" +
-                        "Key: accountError: Account is missing, null or invalid.\n");
+                "Request Object contained errors:" +
+                        "\nKey: credentialType, Error: CredentialType is missing, null or invalid." +
+                        "\nKey: metadata, Error: Data is missing, null or invalid." +
+                        "\nKey: credential, Error: Credential is missing, null or invalid." +
+                        "\nKey: account, Error: Account is missing, null or invalid.");
 
         final Serviceable<ProcessDataResponse, ProcessDataRequest> service = prepareService();
         final ProcessDataRequest request = new ProcessDataRequest();

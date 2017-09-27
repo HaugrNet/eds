@@ -34,10 +34,11 @@ public final class ProcessDataTypeServiceTest extends DatabaseSetup {
     @Test
     public void testEmptyRequest() {
         prepareCause(VerificationException.class, ReturnCode.VERIFICATION_WARNING,
-                "Request Object contained errors: Key: credentialTypeError: CredentialType is missing, null or invalid.\n" +
-                        "Key: credentialError: Credential is missing, null or invalid.\n" +
-                        "Key: dataTypeError: Value is missing, null or invalid.\n" +
-                        "Key: accountError: Account is missing, null or invalid.");
+                "Request Object contained errors:" +
+                        "\nKey: credentialType, Error: CredentialType is missing, null or invalid." +
+                        "\nKey: credential, Error: Credential is missing, null or invalid." +
+                        "\nKey: dataType, Error: Value is missing, null or invalid." +
+                        "\nKey: account, Error: Account is missing, null or invalid.");
 
         final Serviceable<ProcessDataTypeResponse, ProcessDataTypeRequest> service = prepareService();
         final ProcessDataTypeRequest request = new ProcessDataTypeRequest();
@@ -49,7 +50,7 @@ public final class ProcessDataTypeServiceTest extends DatabaseSetup {
     @Test
     public void testInvokeWithoutAnything() {
         prepareCause(VerificationException.class, ReturnCode.VERIFICATION_WARNING,
-                "Request Object contained errors: Key: dataTypeError: Value is missing, null or invalid.");
+                "Request Object contained errors:\nKey: dataType, Error: Value is missing, null or invalid.");
 
         final Serviceable<ProcessDataTypeResponse, ProcessDataTypeRequest> service = prepareService();
         final ProcessDataTypeRequest request = buildRequestWithCredentials(Constants.ADMIN_ACCOUNT);

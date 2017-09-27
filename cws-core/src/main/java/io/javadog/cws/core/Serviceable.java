@@ -151,14 +151,13 @@ public abstract class Serviceable<R extends CwsResponse, V extends Authenticatio
                 final StringBuilder builder = new StringBuilder(capacity);
 
                 for (final Map.Entry<String, String> error : errors.entrySet()) {
-                    builder.append("Key: ");
+                    builder.append("\nKey: ");
                     builder.append(error.getKey());
-                    builder.append("Error: ");
+                    builder.append(", Error: ");
                     builder.append(error.getValue());
-                    builder.append('\n');
                 }
 
-                throw new VerificationException("Request Object contained errors: " + builder);
+                throw new VerificationException("Request Object contained errors:" + builder);
             }
         } else {
             throw new VerificationException("Cannot Process a NULL Object.");

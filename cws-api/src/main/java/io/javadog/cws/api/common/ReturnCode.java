@@ -27,6 +27,7 @@ public enum ReturnCode {
     PROPERTY_ERROR(Classification.CLASS_ERROR, 3, "Error extracting settings information."),
     CRYPTO_ERROR(Classification.CLASS_ERROR, 4, "Cryptographic Error occurred during the handling of the request."),
     IDENTIFICATION_ERROR(Classification.CLASS_ERROR, 5, "Not possible to positively identify the Requested Data."),
+    INTEGRITY_ERROR(Classification.CLASS_ERROR, 6, "The Encrypted Data is having integrity problems."),
     NOTIMPLEMENTED_ERROR(Classification.CLASS_ERROR, 99, "Logic Pending Implemented..."),
 
     WARNING(Classification.CLASS_WARNING, 0, "General Warning occurred while handling the request."),

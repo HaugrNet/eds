@@ -50,7 +50,7 @@ public final class FetchDataService extends Serviceable<FetchDataResponse, Fetch
             final String externalDataId = request.getDataId();
 
             if (externalDataId == null) {
-                response = processExistingData(request);
+                response = retrieveExistingData(request);
             } else {
                 response = processNewData(request);
             }
@@ -61,7 +61,7 @@ public final class FetchDataService extends Serviceable<FetchDataResponse, Fetch
         return response;
     }
 
-    private FetchDataResponse processExistingData(final FetchDataRequest request) {
+    private FetchDataResponse retrieveExistingData(final FetchDataRequest request) {
         final DataType type = request.getDataType();
         final FetchDataResponse response;
 
@@ -144,33 +144,38 @@ public final class FetchDataService extends Serviceable<FetchDataResponse, Fetch
     }
 
     private FetchDataResponse readCompleteDataObject(final MetadataEntity metadata) {
-        // Following Query will read out a specific Data Records with meta data
+        // Following Query will read out a specific Data Record with meta data
         // information, if the person is allowed, which includes checks for
         // Circle Membership and right TrustLevel of the Member. If no Entity
         // is found, then there can be multiple reasons.
         final DataEntity entity = dao.findDataByMemberAndExternalId(member, metadata.getExternalId());
 
         if (entity != null) {
-            final CWSKey key = extractCircleKey(entity);
-            key.setSalt(entity.getInitialVector());
-            final byte[] bytes = crypto.decrypt(key, entity.getData());
+            final String checksum = crypto.generateChecksum(entity.getData());
+            if (Objects.equals(checksum, entity.getChecksum())) {
+                final CWSKey key = extractCircleKey(entity);
+                key.setSalt(entity.getInitialVector());
+                final byte[] bytes = crypto.decrypt(key, entity.getData());
 
-            final Metadata metaData = new Metadata();
-            metaData.setTypeName(entity.getMetadata().getType().getName());
-            metaData.setName(entity.getMetadata().getName());
-            metaData.setId(entity.getMetadata().getExternalId());
-            metaData.setCircleId(entity.getMetadata().getCircle().getExternalId());
-            metaData.setAdded(entity.getMetadata().getCreated());
-            metaData.setFolderId(readFolder(entity.getMetadata()));
+                final Metadata metaData = new Metadata();
+                metaData.setTypeName(entity.getMetadata().getType().getName());
+                metaData.setName(entity.getMetadata().getName());
+                metaData.setId(entity.getMetadata().getExternalId());
+                metaData.setCircleId(entity.getMetadata().getCircle().getExternalId());
+                metaData.setAdded(entity.getMetadata().getCreated());
+                metaData.setFolderId(readFolder(entity.getMetadata()));
 
-            final List<Metadata> objects = new ArrayList<>(1);
-            objects.add(metaData);
+                final List<Metadata> objects = new ArrayList<>(1);
+                objects.add(metaData);
 
-            final FetchDataResponse response = new FetchDataResponse();
-            response.setData(objects);
-            response.setBytes(bytes);
+                final FetchDataResponse response = new FetchDataResponse();
+                response.setData(objects);
+                response.setBytes(bytes);
 
-            return response;
+                return response;
+            } else {
+                throw new CWSException(ReturnCode.INTEGRITY_ERROR, "The Encrypted Data Checksum is invalid, the data appears to have been corrupted.");
+            }
         } else {
             throw new CWSException(ReturnCode.IDENTIFICATION_WARNING, "No Data Object found, matching the provided information or member is lacking privileges to read the actual data.");
         }

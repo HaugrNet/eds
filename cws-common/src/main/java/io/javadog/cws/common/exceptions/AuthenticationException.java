@@ -22,4 +22,8 @@ public final class AuthenticationException extends CWSException {
     public AuthenticationException(final String message) {
         super(ReturnCode.AUTHENTICATION_WARNING, message);
     }
+
+    public AuthenticationException(final String message, final Throwable cause) {
+        super(ReturnCode.AUTHENTICATION_WARNING, message, cause);
+    }
 }

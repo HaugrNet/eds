@@ -9,7 +9,6 @@ package io.javadog.cws.core;
 
 import static io.javadog.cws.api.common.Constants.ADMIN_ACCOUNT;
 
-import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.common.TrustLevel;
 import io.javadog.cws.api.common.Verifiable;
 import io.javadog.cws.api.dtos.Authentication;
@@ -19,7 +18,7 @@ import io.javadog.cws.common.Settings;
 import io.javadog.cws.common.enums.KeyAlgorithm;
 import io.javadog.cws.common.exceptions.AuthenticationException;
 import io.javadog.cws.common.exceptions.AuthorizationException;
-import io.javadog.cws.common.exceptions.ModelException;
+import io.javadog.cws.common.exceptions.CryptoException;
 import io.javadog.cws.common.exceptions.VerificationException;
 import io.javadog.cws.common.keys.CWSKey;
 import io.javadog.cws.model.CommonDao;
@@ -84,6 +83,7 @@ public abstract class Serviceable<R extends CwsResponse, V extends Authenticatio
     protected void verifyRequest(final V verifiable, final Permission action) {
         verifyRequest(verifiable, action, null);
     }
+
     /**
      * <p>All incoming requests must be verified, so it is clear if the given
      * information (data) is sufficient to complete the request, and also to
@@ -178,7 +178,7 @@ public abstract class Serviceable<R extends CwsResponse, V extends Authenticatio
                 if (Objects.equals(ADMIN_ACCOUNT, account)) {
                     member = createNewAccount(ADMIN_ACCOUNT, verifiable.getCredential());
                 } else {
-                    throw new ModelException(ReturnCode.CONSTRAINT_ERROR, "Could not uniquely identify a member with '" + account + "'.");
+                    throw new AuthenticationException("Could not uniquely identify an account for '" + account + "'.");
                 }
             }
         }
@@ -210,18 +210,26 @@ public abstract class Serviceable<R extends CwsResponse, V extends Authenticatio
     }
 
     private void checkCredentials(final V verifiable) {
-        final CWSKey key = crypto.generatePasswordKey(settings.getSymmetricAlgorithm(), verifiable.getCredential(), member.getSalt());
-        final String toCheck = UUID.randomUUID().toString();
-        final Charset charset = settings.getCharset();
-        keyPair = crypto.extractAsymmetricKey(member.getAlgorithm(), key, member.getSalt(), member.getPublicKey(), member.getPrivateKey());
+        try {
+            final CWSKey key = crypto.generatePasswordKey(settings.getSymmetricAlgorithm(), verifiable.getCredential(), member.getSalt());
+            final Charset charset = settings.getCharset();
+            keyPair = crypto.extractAsymmetricKey(member.getAlgorithm(), key, member.getSalt(), member.getPublicKey(), member.getPrivateKey());
 
-        final byte[] toEncrypt = toCheck.getBytes(charset);
-        final byte[] encrypted = crypto.encrypt(keyPair, toEncrypt);
-        final byte[] decrypted = crypto.decrypt(keyPair, encrypted);
-        final String result = new String(decrypted, charset);
+            final String toCheck = UUID.randomUUID().toString();
+            final byte[] toEncrypt = toCheck.getBytes(charset);
+            final byte[] encrypted = crypto.encrypt(keyPair, toEncrypt);
+            final byte[] decrypted = crypto.decrypt(keyPair, encrypted);
+            final String result = new String(decrypted, charset);
 
-        if (!Objects.equals(result, toCheck)) {
-            throw new AuthenticationException("Cannot authenticate the Account '" + verifiable.getAccount() + "' from the given Credentials.");
+            if (!Objects.equals(result, toCheck)) {
+                throw new AuthenticationException("Cannot authenticate the Account '" + verifiable.getAccount() + "' from the given Credentials.");
+            }
+        } catch (CryptoException e) {
+            // Converting Credentials to a Key, which is used to decrypt the
+            // saved encrypted private Key - may lead to problem as the Password
+            // Key may cause padding problems. Hence, we have both the check in
+            // the logic above, but also here.
+            throw new AuthenticationException("Cannot authenticate the Account '" + verifiable.getAccount() + "' from the given Credentials.", e);
         }
     }
 

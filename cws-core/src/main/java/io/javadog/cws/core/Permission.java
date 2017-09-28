@@ -26,7 +26,7 @@ public enum Permission {
     PROCESS_DATA_TYPE(TrustLevel.SYSOP, "Process Data Type."),
     CREATE_SIGNATURE(TrustLevel.WRITE, "Create Digital Signature."),
     VERIFY_SIGNATURE(TrustLevel.WRITE, "Verify Digital Signature."),
-    SETTING(TrustLevel.SYSOP, "Settings.");
+    SETTING(TrustLevel.SYSOP, "Process Settings.");
 
     // =========================================================================
     // Internal Functionality

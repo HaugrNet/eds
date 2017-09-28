@@ -23,8 +23,14 @@ import org.junit.Test;
 import java.util.Date;
 
 /**
- * This Test Class, is testing the following Service Classes in one, as they are
- * all fairly small but also connected.
+ * <p>This Test Class, is testing the following Service Classes in one, as they
+ * are all fairly small but also connected.</p>
+ *
+ * <ul>
+ *   <li>SignService</li>
+ *   <li>VerifyService</li>
+ *   <li>FetchSignatureService</li>
+ * </ul>
  *
  * @author Kim Jensen
  * @since  CWS 1.0
@@ -58,6 +64,28 @@ public final class SignatureServiceTest extends DatabaseSetup {
     }
 
     @Test
+    public void testSignatureExpiringIn5Minutes() {
+        final byte[] data = generateData(1048576);
+        final VerifyService verifyService = new VerifyService(settings, entityManager);
+        final SignService signService = new SignService(settings, entityManager);
+
+        final SignRequest signRequest = prepareRequest(SignRequest.class, "member1");
+        signRequest.setData(data);
+        // Let our new Signature expire in 5 minutes
+        signRequest.setExpires(new Date(new Date().getTime() + 300000L));
+        final SignResponse signResponse = signService.perform(signRequest);
+        assertThat(signResponse.getReturnCode(), is(ReturnCode.SUCCESS));
+
+        final VerifyRequest verifyRequest = prepareRequest(VerifyRequest.class, "member2");
+        verifyRequest.setData(data);
+        verifyRequest.setSignature(signResponse.getSignature());
+        final VerifyResponse verifyResponse = verifyService.perform(verifyRequest);
+        assertThat(verifyResponse.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(verifyResponse.getReturnMessage(), is("Ok"));
+        assertThat(verifyResponse.getVerified(), is(true));
+    }
+
+    @Test
     public void testExpiredSignature() {
         final byte[] data = generateData(1048576);
         final VerifyService verifyService = new VerifyService(settings, entityManager);
@@ -65,7 +93,7 @@ public final class SignatureServiceTest extends DatabaseSetup {
 
         final SignRequest signRequest = prepareRequest(SignRequest.class, "member1");
         signRequest.setData(data);
-        signRequest.setExpires(new Date(new Date().getTime() - 5));
+        signRequest.setExpires(new Date());
         final SignResponse signResponse = signService.perform(signRequest);
         assertThat(signResponse.getReturnCode(), is(ReturnCode.SUCCESS));
 

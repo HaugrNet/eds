@@ -174,9 +174,9 @@ public final class MemberEntityTest extends DatabaseSetup {
         println("-- imaginative names, 'circle1' to 'circle3'.");
         println("");
         println("INSERT INTO circles (external_id, name) VALUES");
-        final CircleEntity circle1 = createAndPrintCircle("circle1", ',');
-        final CircleEntity circle2 = createAndPrintCircle("circle2", ',');
-        final CircleEntity circle3 = createAndPrintCircle("circle3", ';');
+        final CircleEntity circle1 = createAndPrintCircle(CIRCLE_1_ID, "circle1", ',');
+        final CircleEntity circle2 = createAndPrintCircle(CIRCLE_2_ID, "circle2", ',');
+        final CircleEntity circle3 = createAndPrintCircle(CIRCLE_3_ID, "circle3", ';');
 
         println("");
         println("-- For each Circle, we need to have a unique Key, but with the same settings.");
@@ -223,8 +223,8 @@ public final class MemberEntityTest extends DatabaseSetup {
         return entity;
     }
 
-    private CircleEntity createAndPrintCircle(final String name, final char delimiter) {
-        final CircleEntity entity = prepareCircle(name);
+    private CircleEntity createAndPrintCircle(final String externalId, final String name, final char delimiter) {
+        final CircleEntity entity = prepareCircle(externalId, name);
 
         println("    ('" + entity.getExternalId() + "', '" + entity.getName() + "')" + delimiter);
 

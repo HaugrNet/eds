@@ -45,6 +45,10 @@ import java.util.UUID;
  */
 public class DatabaseSetup {
 
+    protected static final String CIRCLE_1_ID = "d8838d7d-71e7-433d-8790-af7c080e9de9";
+    protected static final String CIRCLE_2_ID = "8ba34e12-8830-4a1f-9681-b689cad52009";
+    protected static final String CIRCLE_3_ID = "a2797176-a5b9-4dc9-867b-8c5c1bb3a9f9";
+
     private static final String TIMESTAMP = "yyyyMMddHHmmssSSS";
     private static final String persistenceName = "io.javadog.cws.jpa";
     private static final EntityManagerFactory FACTORY = Persistence.createEntityManagerFactory(persistenceName);
@@ -165,8 +169,9 @@ public class DatabaseSetup {
         return entity;
     }
 
-    protected CircleEntity prepareCircle(final String name) {
+    protected CircleEntity prepareCircle(final String externalId, final String name) {
         final CircleEntity entity = new CircleEntity();
+        entity.setExternalId(externalId);
         entity.setName(name);
         persist(entity);
 

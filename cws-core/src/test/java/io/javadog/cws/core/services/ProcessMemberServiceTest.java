@@ -235,8 +235,7 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
         final ProcessMemberRequest request = prepareAdminRequest();
         request.setAction(Action.DELETE);
-        // Admin
-        request.setMemberId("d95a14e6-e1d1-424b-8834-16a79498f4d1");
+        request.setMemberId(ADMIN_ID);
 
         final ProcessMemberResponse response = service.perform(request);
         assertThat(response.getReturnCode(), is(ReturnCode.IDENTIFICATION_ERROR));

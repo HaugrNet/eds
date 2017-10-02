@@ -48,6 +48,12 @@ public class DatabaseSetup {
     protected static final String CIRCLE_1_ID = "d8838d7d-71e7-433d-8790-af7c080e9de9";
     protected static final String CIRCLE_2_ID = "8ba34e12-8830-4a1f-9681-b689cad52009";
     protected static final String CIRCLE_3_ID = "a2797176-a5b9-4dc9-867b-8c5c1bb3a9f9";
+    protected static final String ADMIN_ID = "d95a14e6-e1d1-424b-8834-16a79498f4d1";
+    protected static final String MEMBER_1_ID = "073dcc8f-ffa6-4cda-8d61-09ba9441e78e";
+    protected static final String MEMBER_2_ID = "d842fa67-5387-44e6-96e3-4e8a7ead4c8d";
+    protected static final String MEMBER_3_ID = "f32c9422-b3e4-4b52-8d39-82c45f6e80a9";
+    protected static final String MEMBER_4_ID = "b629f009-4da2-46ed-91b8-aa9dec54814d";
+    protected static final String MEMBER_5_ID = "63cb90cc-c1fb-4c6a-b881-bec278b4e232";
 
     private static final String TIMESTAMP = "yyyyMMddHHmmssSSS";
     private static final String persistenceName = "io.javadog.cws.jpa";
@@ -88,13 +94,13 @@ public class DatabaseSetup {
         }
     }
 
-    protected MemberEntity prepareMember(final String accountName, final String secret, final CWSKey keyPair) {
+    protected MemberEntity prepareMember(final String externalId, final String accountName, final String secret, final CWSKey keyPair) {
         final String salt = UUID.randomUUID().toString();
         final CWSKey secretKey = crypto.generatePasswordKey(settings.getSymmetricAlgorithm(), secret, salt);
         secretKey.setSalt(salt);
 
         final MemberEntity entity = new MemberEntity();
-        entity.setExternalId(UUID.randomUUID().toString());
+        entity.setExternalId(externalId);
         entity.setName(accountName);
         entity.setSalt(salt);
         entity.setAlgorithm(settings.getAsymmetricAlgorithm());
@@ -157,11 +163,11 @@ public class DatabaseSetup {
         return entity;
     }
 
-    protected MemberEntity prepareMember(final String credential, final KeyAlgorithm algorithm, final String publicKey, final String privateKey) {
+    protected MemberEntity prepareMember(final String externalId, final String credential, final KeyAlgorithm algorithm, final String publicKey, final String privateKey) {
         final MemberEntity entity = new MemberEntity();
         entity.setName(credential);
         entity.setAlgorithm(algorithm);
-        entity.setSalt(UUID.randomUUID().toString());
+        entity.setSalt(externalId);
         entity.setPublicKey(publicKey);
         entity.setPrivateKey(privateKey);
         persist(entity);

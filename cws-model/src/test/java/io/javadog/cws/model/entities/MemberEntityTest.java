@@ -34,7 +34,8 @@ public final class MemberEntityTest extends DatabaseSetup {
     @Test
     public void testEntity() {
         final CWSKey keyPair = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
-        final MemberEntity entity = prepareMember("New Account Name", "My Super Secret", keyPair);
+        final String externalId = UUID.randomUUID().toString();
+        final MemberEntity entity = prepareMember(externalId, "New Account Name", "My Super Secret", keyPair);
         persistAndDetach(entity);
 
         final long id = entity.getId();
@@ -61,7 +62,8 @@ public final class MemberEntityTest extends DatabaseSetup {
         final KeyAlgorithm algorithm = settings.getAsymmetricAlgorithm();
         final String publicKey = UUID.randomUUID().toString();
         final String privateKey = UUID.randomUUID().toString();
-        final MemberEntity entity = prepareMember(credential, algorithm, publicKey, privateKey);
+        final String externalId = UUID.randomUUID().toString();
+        final MemberEntity entity = prepareMember(externalId, credential, algorithm, publicKey, privateKey);
 
         final long lastModified = entity.getModified().getTime();
 
@@ -75,7 +77,8 @@ public final class MemberEntityTest extends DatabaseSetup {
         final KeyAlgorithm algorithm = settings.getAsymmetricAlgorithm();
         final String publicKey = UUID.randomUUID().toString();
         final String privateKey = UUID.randomUUID().toString();
-        final MemberEntity entity = prepareMember(credential, algorithm, publicKey, privateKey);
+        final String externalId = UUID.randomUUID().toString();
+        final MemberEntity entity = prepareMember(externalId, credential, algorithm, publicKey, privateKey);
         assertThat(entity.getId(), is(not(nullValue())));
 
         entityManager.persist(entity);
@@ -157,17 +160,17 @@ public final class MemberEntityTest extends DatabaseSetup {
         println("INSERT INTO members (external_id, name, salt, algorithm, public_key, private_key) VALUES");
 
         final CWSKey keyPair = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
-        createAndPrintMember(Constants.ADMIN_ACCOUNT, keyPair, ',');
+        createAndPrintMember(ADMIN_ID, Constants.ADMIN_ACCOUNT, keyPair, ',');
         final CWSKey keyPair1 = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
-        final MemberEntity member1 = createAndPrintMember("member1", keyPair1, ',');
+        final MemberEntity member1 = createAndPrintMember(MEMBER_1_ID, "member1", keyPair1, ',');
         final CWSKey keyPair2 = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
-        final MemberEntity member2 = createAndPrintMember("member2", keyPair2, ',');
+        final MemberEntity member2 = createAndPrintMember(MEMBER_2_ID, "member2", keyPair2, ',');
         final CWSKey keyPair3 = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
-        final MemberEntity member3 = createAndPrintMember("member3", keyPair3, ',');
+        final MemberEntity member3 = createAndPrintMember(MEMBER_3_ID, "member3", keyPair3, ',');
         final CWSKey keyPair4 = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
-        final MemberEntity member4 = createAndPrintMember("member4", keyPair4, ',');
+        final MemberEntity member4 = createAndPrintMember(MEMBER_4_ID, "member4", keyPair4, ',');
         final CWSKey keyPair5 = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
-        final MemberEntity member5 = createAndPrintMember("member5", keyPair5, ';');
+        final MemberEntity member5 = createAndPrintMember(MEMBER_5_ID, "member5", keyPair5, ';');
 
         println("");
         println("-- Default, we have 3 Circles as part of the test setup, using the very");
@@ -214,8 +217,8 @@ public final class MemberEntityTest extends DatabaseSetup {
         createAndPrintTrustee(member5, keyPair5, circle3, key3, cwsKey3, TrustLevel.GUEST, ';');
     }
 
-    private MemberEntity createAndPrintMember(final String name, final CWSKey keyPair, final char delimiter) {
-        final MemberEntity entity = prepareMember(name, name, keyPair);
+    private MemberEntity createAndPrintMember(final String externalId, final String name, final CWSKey keyPair, final char delimiter) {
+        final MemberEntity entity = prepareMember(externalId, name, name, keyPair);
         dao.persist(entity);
 
         println("    ('" + entity.getExternalId() + "', '" + name + "', '" + entity.getSalt() + "', '" + entity.getAlgorithm() + "', '" + entity.getPublicKey() + "', '" + entity.getPrivateKey() + "')" + delimiter);

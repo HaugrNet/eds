@@ -16,6 +16,7 @@ import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.CredentialType;
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.requests.FetchCircleRequest;
+import io.javadog.cws.api.requests.ProcessCircleRequest;
 import io.javadog.cws.api.responses.FetchCircleResponse;
 import io.javadog.cws.common.Settings;
 import io.javadog.cws.common.exceptions.ModelException;
@@ -28,20 +29,41 @@ import org.junit.Test;
 import java.util.UUID;
 
 /**
+ * <p>Common test class for the Process & Fetch Circle Services.</p>
+ *
  * @author Kim Jensen
  * @since  CWS 1.0
  */
-public final class FetchCircleServiceTest extends DatabaseSetup {
+public final class CircleServiceTest extends DatabaseSetup {
 
     @Test
-    public void testInvalidRequest() {
+    public void testEmptyFetchRequest() {
         prepareCause(VerificationException.class, ReturnCode.VERIFICATION_WARNING,
                 "Request Object contained errors:" +
                         "\nKey: credentialType, Error: CredentialType is missing, null or invalid." +
                         "\nKey: credential, Error: Credential is missing, null or invalid." +
                         "\nKey: account, Error: Account is missing, null or invalid.");
-        final Serviceable<FetchCircleResponse, FetchCircleRequest> service = prepareService();
+
+        final FetchCircleService service = new FetchCircleService(settings, entityManager);
         final FetchCircleRequest request = new FetchCircleRequest();
+        // Just making sure that the account is missing
+        assertThat(request.getAccount(), is(nullValue()));
+
+        // Should throw a VerificationException, as the request is invalid.
+        service.perform(request);
+    }
+
+    @Test
+    public void testEmptyProcessRequest() {
+        prepareCause(VerificationException.class, ReturnCode.VERIFICATION_WARNING,
+                "Request Object contained errors:" +
+                        "\nKey: credentialType, Error: CredentialType is missing, null or invalid." +
+                        "\nKey: credential, Error: Credential is missing, null or invalid." +
+                        "\nKey: action, Error: No action has been provided." +
+                        "\nKey: account, Error: Account is missing, null or invalid.");
+
+        final ProcessCircleService service = new ProcessCircleService(settings, entityManager);
+        final ProcessCircleRequest request = new ProcessCircleRequest();
         // Just making sure that the account is missing
         assertThat(request.getAccount(), is(nullValue()));
 

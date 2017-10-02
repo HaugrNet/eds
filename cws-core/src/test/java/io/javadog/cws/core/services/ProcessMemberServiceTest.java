@@ -93,7 +93,6 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
 
     @Test
     public void testInvitationWithInvalidSignature() {
-        // TODO Write this test in the WAR module with a invalid Base64 Signature (f.x. UUID)
         final String bogusSignature = "T+OoZiBpm36P868XUZYWFsW1jUFlD31x+FeQuDjcm4DmmIk+qWd8KuUzLdnETRPIxo/OuYLcpvFiPxMf0v78feiw/yVVV5+1xjO+FR/KYgB4JTaJ6p0RIEpS3rjs27bY+1OYclsk4MPRKbxZN06ZFHlSY4btk1G4ML7x0/iUCLBbOO2y3S4JZpKwAR7kAyhVeqyi8qKi13o+7z/J0KP2EhHrF8+2y3z63TKLyClZRrAhvy3/g/k0q7MccFOKDGsxxIpe2jfOHtxLEYfbgrdly/fZHEQL5vbbf/LbQ7MISfcwXSLtJMD0COXsm/V1nkmI/ficjskvNuUj+h739KEmuQ==";
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
         final ProcessMemberRequest request = prepareAdminRequest();

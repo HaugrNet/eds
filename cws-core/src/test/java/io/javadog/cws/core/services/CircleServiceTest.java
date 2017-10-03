@@ -12,12 +12,15 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 
+import io.javadog.cws.api.common.Action;
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.requests.FetchCircleRequest;
 import io.javadog.cws.api.requests.ProcessCircleRequest;
 import io.javadog.cws.api.responses.FetchCircleResponse;
+import io.javadog.cws.api.responses.ProcessCircleResponse;
 import io.javadog.cws.common.Settings;
+import io.javadog.cws.common.exceptions.AuthorizationException;
 import io.javadog.cws.common.exceptions.ModelException;
 import io.javadog.cws.common.exceptions.VerificationException;
 import io.javadog.cws.model.DatabaseSetup;
@@ -231,6 +234,189 @@ public final class CircleServiceTest extends DatabaseSetup {
         assertThat(request, is(not(nullValue())));
         request.setCircleId(circle.getExternalId());
         service.perform(request);
+    }
+
+    @Test
+    public void testCreateCircle() {
+        final ProcessCircleService service = new ProcessCircleService(settings, entityManager);
+        final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, Constants.ADMIN_ACCOUNT);
+        request.setAction(Action.CREATE);
+        request.setMemberId(MEMBER_1_ID);
+        request.setCircleName("My Circle");
+
+        final ProcessCircleResponse response = service.perform(request);
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(response.getReturnMessage(), is("Ok"));
+        assertThat(response.getCircleId(), is(not(nullValue())));
+
+        final FetchCircleService fetchService = new FetchCircleService(settings, entityManager);
+        final FetchCircleRequest fetchRequest = prepareRequest(FetchCircleRequest.class, "member1");
+        fetchRequest.setCircleId(response.getCircleId());
+        final FetchCircleResponse fetchResponse = fetchService.perform(fetchRequest);
+        assertThat(fetchResponse.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(fetchResponse.getCircles().size(), is(1));
+        assertThat(fetchResponse.getCircles().get(0).getName(), is("My Circle"));
+    }
+
+    @Test
+    public void testCreateCircleAsMember() {
+        final ProcessCircleService service = new ProcessCircleService(settings, entityManager);
+        final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, "member1");
+        request.setAction(Action.CREATE);
+        request.setCircleName("My Circle");
+        request.setMemberId(MEMBER_1_ID);
+
+        final ProcessCircleResponse response = service.perform(request);
+        assertThat(response.getReturnCode(), is(ReturnCode.AUTHORIZATION_WARNING));
+        assertThat(response.getReturnMessage(), is("Only the System Administrator may create a new Circle."));
+    }
+
+    @Test
+    public void testCreateCircleWithExistingName() {
+        final ProcessCircleService service = new ProcessCircleService(settings, entityManager);
+        final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, Constants.ADMIN_ACCOUNT);
+        request.setAction(Action.CREATE);
+        request.setCircleName("Circle1");
+        request.setMemberId(MEMBER_1_ID);
+
+        final ProcessCircleResponse response = service.perform(request);
+        assertThat(response.getReturnCode(), is(ReturnCode.IDENTIFICATION_WARNING));
+        assertThat(response.getReturnMessage(), is("A Circle with the requested name already exists."));
+    }
+
+    @Test
+    public void testUpdateExistingCircleAsAdmin() {
+        final ProcessCircleService service = new ProcessCircleService(settings, entityManager);
+        final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, Constants.ADMIN_ACCOUNT);
+        request.setAction(Action.UPDATE);
+        request.setCircleName("Circle One");
+        request.setCircleId(CIRCLE_1_ID);
+
+        final ProcessCircleResponse response = service.perform(request);
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(response.getReturnMessage(), is("Ok"));
+
+        final FetchCircleService fetchService = new FetchCircleService(settings, entityManager);
+        final FetchCircleRequest fetchRequest = prepareRequest(FetchCircleRequest.class, Constants.ADMIN_ACCOUNT);
+        fetchRequest.setCircleId(CIRCLE_1_ID);
+        final FetchCircleResponse fetchResponse = fetchService.perform(fetchRequest);
+        assertThat(fetchResponse.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(fetchResponse.getCircles().size(), is(1));
+        assertThat(fetchResponse.getCircles().get(0).getName(), is("Circle One"));
+    }
+
+    @Test
+    public void testUpdateExistingCircleAsCircleAdmin() {
+        final ProcessCircleService service = new ProcessCircleService(settings, entityManager);
+        final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, "member1");
+        request.setAction(Action.UPDATE);
+        request.setCircleName("Circle One");
+        request.setCircleId(CIRCLE_1_ID);
+
+        final ProcessCircleResponse response = service.perform(request);
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(response.getReturnMessage(), is("Ok"));
+    }
+
+    @Test
+    public void testUpdateExistingCircleAsCircleMember() {
+        prepareCause(AuthorizationException.class, ReturnCode.AUTHORIZATION_WARNING, "The requesting Account is not permitted to Process Circle.");
+        final ProcessCircleService service = new ProcessCircleService(settings, entityManager);
+        final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, "member2");
+        request.setAction(Action.UPDATE);
+        request.setCircleName("Circle One");
+        request.setCircleId(CIRCLE_1_ID);
+        assertThat(request.validate().isEmpty(), is(true));
+
+        service.perform(request);
+    }
+
+    @Test
+    public void testUpdateCircleAsNonMember() {
+        prepareCause(ModelException.class, ReturnCode.IDENTIFICATION_WARNING, "No member found with 'member5'.");
+        final ProcessCircleService service = new ProcessCircleService(settings, entityManager);
+        final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, "member5");
+        request.setAction(Action.UPDATE);
+        request.setCircleName("Circle One");
+        request.setCircleId(CIRCLE_1_ID);
+        assertThat(request.validate().isEmpty(), is(true));
+
+        service.perform(request);
+    }
+
+    @Test
+    public void testUpdateNonExistingCircle() {
+        final ProcessCircleService service = new ProcessCircleService(settings, entityManager);
+        final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, Constants.ADMIN_ACCOUNT);
+        request.setAction(Action.UPDATE);
+        request.setCircleName("Circle One");
+        request.setCircleId(UUID.randomUUID().toString());
+
+        final ProcessCircleResponse response = service.perform(request);
+        assertThat(response.getReturnCode(), is(ReturnCode.IDENTIFICATION_WARNING));
+        assertThat(response.getReturnMessage(), is("No Circle could be found with the given Id."));
+    }
+
+    @Test
+    public void testUpdateExistingCircleWithExistingName() {
+        final ProcessCircleService service = new ProcessCircleService(settings, entityManager);
+        final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, "member1");
+        request.setAction(Action.UPDATE);
+        request.setCircleName("Circle2");
+        request.setCircleId(CIRCLE_1_ID);
+
+        final ProcessCircleResponse response = service.perform(request);
+        assertThat(response.getReturnCode(), is(ReturnCode.IDENTIFICATION_WARNING));
+        assertThat(response.getReturnMessage(), is("A Circle with the requested name already exists."));
+    }
+
+    @Test
+    public void testUpdateExistingCircleWithOwnName() {
+        final ProcessCircleService service = new ProcessCircleService(settings, entityManager);
+        final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, "member1");
+        request.setAction(Action.UPDATE);
+        request.setCircleName("Circle1");
+        request.setCircleId(CIRCLE_1_ID);
+
+        final ProcessCircleResponse response = service.perform(request);
+        assertThat(response.getReturnCode(), is(ReturnCode.IDENTIFICATION_WARNING));
+        assertThat(response.getReturnMessage(), is("A Circle with the requested name already exists."));
+    }
+
+    @Test
+    public void testDeleteCircleAsAdmin() {
+        final ProcessCircleService service = new ProcessCircleService(settings, entityManager);
+        final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, Constants.ADMIN_ACCOUNT);
+        request.setAction(Action.DELETE);
+        request.setCircleId(CIRCLE_1_ID);
+
+        final ProcessCircleResponse response = service.perform(request);
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(response.getReturnMessage(), is("Ok"));
+    }
+
+    @Test
+    public void testDeleteCircleAsMember() {
+        final ProcessCircleService service = new ProcessCircleService(settings, entityManager);
+        final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, "member1");
+        request.setAction(Action.DELETE);
+        request.setCircleId(CIRCLE_1_ID);
+
+        final ProcessCircleResponse response = service.perform(request);
+        assertThat(response.getReturnCode(), is(ReturnCode.AUTHORIZATION_WARNING));
+        assertThat(response.getReturnMessage(), is("Only the System Administrator may delete a Circle."));
+    }
+
+    @Test
+    public void testDeleteNotExistingCircle() {
+        final ProcessCircleService service = new ProcessCircleService(settings, entityManager);
+        final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, Constants.ADMIN_ACCOUNT);
+        request.setAction(Action.DELETE);
+        request.setCircleId(UUID.randomUUID().toString());
+
+        final ProcessCircleResponse response = service.perform(request);
+        assertThat(response.getReturnCode(), is(ReturnCode.IDENTIFICATION_WARNING));
+        assertThat(response.getReturnMessage(), is("No Circle could be found with the given Id."));
     }
 
     // =========================================================================

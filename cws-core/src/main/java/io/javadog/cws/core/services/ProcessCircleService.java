@@ -132,6 +132,7 @@ public final class ProcessCircleService extends Serviceable<ProcessCircleRespons
                     dao.persist(trustee);
 
                     response = new ProcessCircleResponse();
+                    response.setCircleId(circle.getExternalId());
                 }
             } else {
                 response = new ProcessCircleResponse(ReturnCode.IDENTIFICATION_WARNING, "A Circle with the requested name already exists.");
@@ -165,10 +166,14 @@ public final class ProcessCircleService extends Serviceable<ProcessCircleRespons
 
         if (existing == null) {
             final CircleEntity entity = dao.find(CircleEntity.class, externalId);
-            entity.setName(name);
-            dao.persist(entity);
+            if (entity != null) {
+                entity.setName(name);
+                dao.persist(entity);
 
-            response = new ProcessCircleResponse();
+                response = new ProcessCircleResponse();
+            } else {
+                response = new ProcessCircleResponse(ReturnCode.IDENTIFICATION_WARNING, "No Circle could be found with the given Id.");
+            }
         } else {
             response = new ProcessCircleResponse(ReturnCode.IDENTIFICATION_WARNING, "A Circle with the requested name already exists.");
         }
@@ -192,9 +197,13 @@ public final class ProcessCircleService extends Serviceable<ProcessCircleRespons
         if (Objects.equals(Constants.ADMIN_ACCOUNT, member.getName())) {
             final String externalId = request.getCircleId();
             final CircleEntity entity = dao.find(CircleEntity.class, externalId);
-            dao.delete(entity);
+            if (entity != null) {
+                dao.delete(entity);
 
-            response = new ProcessCircleResponse();
+                response = new ProcessCircleResponse();
+            } else {
+                response = new ProcessCircleResponse(ReturnCode.IDENTIFICATION_WARNING, "No Circle could be found with the given Id.");
+            }
         } else {
             response = new ProcessCircleResponse(ReturnCode.AUTHORIZATION_WARNING, "Only the System Administrator may delete a Circle.");
         }

@@ -122,7 +122,7 @@ public final class CommonJpaDao implements CommonDao {
         final List<MemberEntity> found = query.getResultList();
 
         if (found.isEmpty()) {
-            throw new ModelException(ReturnCode.IDENTIFICATION_WARNING, "No member found with '" + name + "'.");
+            throw new ModelException(ReturnCode.IDENTIFICATION_WARNING, "No Trustee information found for member '" + name + "' and circle '" + externalCircleId + "'.");
         }
 
         if (found.size() > 1) {
@@ -350,6 +350,15 @@ public final class CommonJpaDao implements CommonDao {
         query.setParameter("mid", id);
 
         return findList(query);
+    }
+
+    @Override
+    public TrusteeEntity findTrusteeByCircleAndMember(final String externalCircleId, final String externalMemberId) {
+        final Query query = entityManager.createNamedQuery("trustee.findByCircleAndMember");
+        query.setParameter("externalCircleId", externalCircleId);
+        query.setParameter("externalMemberId", externalMemberId);
+
+        return findSingleRecord(query);
     }
 
     // =========================================================================

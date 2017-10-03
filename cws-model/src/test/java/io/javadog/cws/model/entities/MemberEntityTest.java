@@ -214,7 +214,7 @@ public final class MemberEntityTest extends DatabaseSetup {
         createAndPrintTrustee(member2, keyPair2, circle3, key3, cwsKey3, TrustLevel.WRITE, ',');
         createAndPrintTrustee(member3, keyPair3, circle3, key3, cwsKey3, TrustLevel.READ,  ',');
         createAndPrintTrustee(member4, keyPair4, circle3, key3, cwsKey3, TrustLevel.ADMIN, ',');
-        createAndPrintTrustee(member5, keyPair5, circle3, key3, cwsKey3, TrustLevel.GUEST, ';');
+        createAndPrintTrustee(member5, keyPair5, circle3, key3, cwsKey3, TrustLevel.READ, ';');
     }
 
     private MemberEntity createAndPrintMember(final String externalId, final String name, final CWSKey keyPair, final char delimiter) {

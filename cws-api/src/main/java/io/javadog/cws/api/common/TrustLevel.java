@@ -19,7 +19,6 @@ import javax.xml.bind.annotation.XmlType;
 @XmlType(name = "trustLevel")
 public enum TrustLevel {
 
-    GUEST,
     READ,
     WRITE,
     ADMIN,

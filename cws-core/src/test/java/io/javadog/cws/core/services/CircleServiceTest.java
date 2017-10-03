@@ -15,6 +15,7 @@ import static org.junit.Assert.assertThat;
 import io.javadog.cws.api.common.Action;
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
+import io.javadog.cws.api.common.TrustLevel;
 import io.javadog.cws.api.requests.FetchCircleRequest;
 import io.javadog.cws.api.requests.ProcessCircleRequest;
 import io.javadog.cws.api.responses.FetchCircleResponse;
@@ -208,13 +209,14 @@ public final class CircleServiceTest extends DatabaseSetup {
 
     @Test
     public void testFetchCircle1WithShowTrueAsMember5() {
-        prepareCause(ModelException.class, "No member found with 'member5'.");
+        final CircleEntity circle = findFirstCircle();
+
+        prepareCause(ModelException.class, "No Trustee information found for member 'member5' and circle '" + circle.getExternalId() + "'.");
 
         // Ensure that we have the correct settings for the Service
         settings.set(Settings.SHOW_TRUSTEES, "true");
 
         final FetchCircleService service = new FetchCircleService(settings, entityManager);
-        final CircleEntity circle = findFirstCircle();
         final FetchCircleRequest request = prepareRequest(FetchCircleRequest.class, "member5");
         assertThat(request, is(not(nullValue())));
         request.setCircleId(circle.getExternalId());
@@ -223,13 +225,13 @@ public final class CircleServiceTest extends DatabaseSetup {
 
     @Test
     public void testFetchCircle1WithShowFalseAsMember5() {
-        prepareCause(ModelException.class, "No member found with 'member5'.");
+        final CircleEntity circle = findFirstCircle();
+        prepareCause(ModelException.class, "No Trustee information found for member 'member5' and circle '" + circle.getExternalId() + "'.");
 
         // Ensure that we have the correct settings for the Service
         settings.set(Settings.SHOW_TRUSTEES, "false");
 
         final FetchCircleService service = new FetchCircleService(settings, entityManager);
-        final CircleEntity circle = findFirstCircle();
         final FetchCircleRequest request = prepareRequest(FetchCircleRequest.class, "member5");
         assertThat(request, is(not(nullValue())));
         request.setCircleId(circle.getExternalId());
@@ -269,6 +271,32 @@ public final class CircleServiceTest extends DatabaseSetup {
         final ProcessCircleResponse response = service.perform(request);
         assertThat(response.getReturnCode(), is(ReturnCode.AUTHORIZATION_WARNING));
         assertThat(response.getReturnMessage(), is("Only the System Administrator may create a new Circle."));
+    }
+
+    @Test
+    public void testCreateCircleWithInvalidCircleAdmin() {
+        final ProcessCircleService service = new ProcessCircleService(settings, entityManager);
+        final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, Constants.ADMIN_ACCOUNT);
+        request.setAction(Action.CREATE);
+        request.setMemberId(UUID.randomUUID().toString());
+        request.setCircleName("My Circle");
+
+        final ProcessCircleResponse response = service.perform(request);
+        assertThat(response.getReturnCode(), is(ReturnCode.IDENTIFICATION_WARNING));
+        assertThat(response.getReturnMessage(), is("Cannot create a new Circle with a non-existing Circle Administrator."));
+    }
+
+    @Test
+    public void testCreateCircleWithSystemAdminAsCircleAdmin() {
+        final ProcessCircleService service = new ProcessCircleService(settings, entityManager);
+        final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, Constants.ADMIN_ACCOUNT);
+        request.setAction(Action.CREATE);
+        request.setMemberId(ADMIN_ID);
+        request.setCircleName("My Circle");
+
+        final ProcessCircleResponse response = service.perform(request);
+        assertThat(response.getReturnCode(), is(ReturnCode.IDENTIFICATION_WARNING));
+        assertThat(response.getReturnMessage(), is("It is not allowed for the System Administrator to be part of a Circle."));
     }
 
     @Test
@@ -320,7 +348,7 @@ public final class CircleServiceTest extends DatabaseSetup {
 
     @Test
     public void testUpdateExistingCircleAsCircleMember() {
-        prepareCause(AuthorizationException.class, ReturnCode.AUTHORIZATION_WARNING, "The requesting Account is not permitted to Process Circle.");
+        prepareCause(AuthorizationException.class, ReturnCode.AUTHORIZATION_WARNING, "The requesting Account is not permitted to Process a Circle.");
         final ProcessCircleService service = new ProcessCircleService(settings, entityManager);
         final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, "member2");
         request.setAction(Action.UPDATE);
@@ -333,7 +361,7 @@ public final class CircleServiceTest extends DatabaseSetup {
 
     @Test
     public void testUpdateCircleAsNonMember() {
-        prepareCause(ModelException.class, ReturnCode.IDENTIFICATION_WARNING, "No member found with 'member5'.");
+        prepareCause(ModelException.class, ReturnCode.IDENTIFICATION_WARNING, "No Trustee information found for member 'member5' and circle '" + CIRCLE_1_ID + "'.");
         final ProcessCircleService service = new ProcessCircleService(settings, entityManager);
         final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, "member5");
         request.setAction(Action.UPDATE);
@@ -417,6 +445,250 @@ public final class CircleServiceTest extends DatabaseSetup {
         final ProcessCircleResponse response = service.perform(request);
         assertThat(response.getReturnCode(), is(ReturnCode.IDENTIFICATION_WARNING));
         assertThat(response.getReturnMessage(), is("No Circle could be found with the given Id."));
+    }
+
+    @Test
+    public void testAddingTrusteeAsAdmin() {
+        final ProcessCircleService service = new ProcessCircleService(settings, entityManager);
+        final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, Constants.ADMIN_ACCOUNT);
+        request.setAction(Action.ADD);
+        request.setCircleId(CIRCLE_1_ID);
+        request.setMemberId(MEMBER_5_ID);
+        request.setTrustLevel(TrustLevel.WRITE);
+
+        final ProcessCircleResponse response = service.perform(request);
+        assertThat(response.getReturnCode(), is(ReturnCode.AUTHORIZATION_WARNING));
+        assertThat(response.getReturnMessage(), is("The System Administrator cannot add a Member to a Circle."));
+    }
+
+    @Test
+    public void testAddingTrusteeAsWritingTrustee() {
+        prepareCause(AuthorizationException.class, ReturnCode.AUTHORIZATION_WARNING, "The requesting Account is not permitted to Process a Circle.");
+
+        final ProcessCircleService service = new ProcessCircleService(settings, entityManager);
+        final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, "member2");
+        request.setAction(Action.ADD);
+        request.setCircleId(CIRCLE_1_ID);
+        request.setMemberId(MEMBER_5_ID);
+        request.setTrustLevel(TrustLevel.WRITE);
+        assertThat(request.validate().isEmpty(), is(true));
+
+        service.perform(request);
+    }
+
+    @Test
+    public void testAddingTrusteeAsCircleAdmin() {
+        final ProcessCircleService service = new ProcessCircleService(settings, entityManager);
+        final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, "member1");
+        request.setAction(Action.ADD);
+        request.setCircleId(CIRCLE_1_ID);
+        request.setMemberId(MEMBER_5_ID);
+        request.setTrustLevel(TrustLevel.WRITE);
+
+        final ProcessCircleResponse response = service.perform(request);
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(response.getReturnMessage(), is("Ok"));
+    }
+
+    @Test
+    public void testAddingTrusteeToInvalidCircleAsCircleAdmin() {
+        final String circleId = UUID.randomUUID().toString();
+        prepareCause(ModelException.class, ReturnCode.IDENTIFICATION_WARNING, "No Trustee information found for member 'member1' and circle '" + circleId + "'.");
+
+        final ProcessCircleService service = new ProcessCircleService(settings, entityManager);
+        final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, "member1");
+        request.setAction(Action.ADD);
+        request.setCircleId(circleId);
+        request.setMemberId(MEMBER_5_ID);
+        request.setTrustLevel(TrustLevel.WRITE);
+        assertThat(request.validate().isEmpty(), is(true));
+
+        service.perform(request);
+    }
+
+    @Test
+    public void testAddingInvalidMemberAsTrusteeAsCircleAdmin() {
+        final ProcessCircleService service = new ProcessCircleService(settings, entityManager);
+        final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, "member1");
+        request.setAction(Action.ADD);
+        request.setCircleId(CIRCLE_1_ID);
+        request.setMemberId(UUID.randomUUID().toString());
+        request.setTrustLevel(TrustLevel.WRITE);
+
+        final ProcessCircleResponse response = service.perform(request);
+        assertThat(response.getReturnCode(), is(ReturnCode.IDENTIFICATION_WARNING));
+        assertThat(response.getReturnMessage(), is("No Member could be found with the given Id."));
+    }
+
+    @Test
+    public void testAddingExistingTrusteeAsTrustee() {
+        final ProcessCircleService service = new ProcessCircleService(settings, entityManager);
+        final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, "member1");
+        request.setAction(Action.ADD);
+        request.setCircleId(CIRCLE_1_ID);
+        request.setMemberId(MEMBER_2_ID);
+        request.setTrustLevel(TrustLevel.WRITE);
+
+        final ProcessCircleResponse response = service.perform(request);
+        assertThat(response.getReturnCode(), is(ReturnCode.IDENTIFICATION_WARNING));
+        assertThat(response.getReturnMessage(), is("The Member is already a trustee of the requested Circle."));
+    }
+
+    @Test
+    public void testAlterTrusteeAsAdmin() {
+        final ProcessCircleService service = new ProcessCircleService(settings, entityManager);
+        final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, Constants.ADMIN_ACCOUNT);
+        request.setAction(Action.ALTER);
+        request.setCircleId(CIRCLE_1_ID);
+        request.setMemberId(MEMBER_2_ID);
+        request.setTrustLevel(TrustLevel.ADMIN);
+
+        final ProcessCircleResponse response = service.perform(request);
+        assertThat(response.getReturnCode(), is(ReturnCode.AUTHORIZATION_WARNING));
+        assertThat(response.getReturnMessage(), is("Only a Circle Administrator may alter a Trustee."));
+    }
+
+    @Test
+    public void testAlterTrusteeAsWritingTrustee() {
+        prepareCause(AuthorizationException.class, ReturnCode.AUTHORIZATION_WARNING, "The requesting Account is not permitted to Process a Circle.");
+
+        final ProcessCircleService service = new ProcessCircleService(settings, entityManager);
+        final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, "member2");
+        request.setAction(Action.ALTER);
+        request.setCircleId(CIRCLE_1_ID);
+        request.setMemberId(MEMBER_2_ID);
+        request.setTrustLevel(TrustLevel.ADMIN);
+        assertThat(request.validate().isEmpty(), is(true));
+
+        service.perform(request);
+    }
+
+    @Test
+    public void testAlterTrusteeSetAdminAsCircleAdmin() {
+        final ProcessCircleService service = new ProcessCircleService(settings, entityManager);
+        final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, "member1");
+        request.setAction(Action.ALTER);
+        request.setCircleId(CIRCLE_1_ID);
+        request.setMemberId(MEMBER_2_ID);
+        request.setTrustLevel(TrustLevel.ADMIN);
+
+        final ProcessCircleResponse response = service.perform(request);
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(response.getReturnMessage(), is("Ok"));
+
+        final FetchCircleService fetchService = new FetchCircleService(settings, entityManager);
+        final FetchCircleRequest fetchRequest = prepareRequest(FetchCircleRequest.class, "member1");
+        fetchRequest.setCircleId(CIRCLE_1_ID);
+        final FetchCircleResponse fetchResponse = fetchService.perform(fetchRequest);
+        assertThat(fetchResponse.getReturnCode(), is(ReturnCode.SUCCESS));
+        // TODO Alter the Fetching, to make sure that the Sorting is properly defined or can be controlled externally
+        assertThat(fetchResponse.getTrustees().get(2).getMember().getId(), is(MEMBER_2_ID));
+        assertThat(fetchResponse.getTrustees().get(2).getTrustLevel(), is(TrustLevel.ADMIN));
+    }
+
+    @Test
+    public void testAlterTrusteeToInvalidCircleAsCircleAdmin() {
+        final String circleId = UUID.randomUUID().toString();
+        prepareCause(ModelException.class, ReturnCode.IDENTIFICATION_WARNING, "No Trustee information found for member 'member1' and circle '" + circleId + "'.");
+
+        final ProcessCircleService service = new ProcessCircleService(settings, entityManager);
+        final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, "member1");
+        request.setAction(Action.ALTER);
+        request.setCircleId(circleId);
+        request.setMemberId(MEMBER_5_ID);
+        request.setTrustLevel(TrustLevel.WRITE);
+        assertThat(request.validate().isEmpty(), is(true));
+
+        service.perform(request);
+    }
+
+    @Test
+    public void testAlterInvalidMemberAsTrusteeAsCircleAdmin() {
+        final ProcessCircleService service = new ProcessCircleService(settings, entityManager);
+        final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, "member1");
+        request.setAction(Action.ALTER);
+        request.setCircleId(CIRCLE_1_ID);
+        request.setMemberId(UUID.randomUUID().toString());
+        request.setTrustLevel(TrustLevel.WRITE);
+
+        final ProcessCircleResponse response = service.perform(request);
+        assertThat(response.getReturnCode(), is(ReturnCode.IDENTIFICATION_WARNING));
+        assertThat(response.getReturnMessage(), is("The requested Trustee could not be found."));
+    }
+
+    @Test
+    public void testRemoveTrusteeAsAdmin() {
+        final ProcessCircleService service = new ProcessCircleService(settings, entityManager);
+        final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, Constants.ADMIN_ACCOUNT);
+        request.setAction(Action.REMOVE);
+        request.setCircleId(CIRCLE_1_ID);
+        request.setMemberId(MEMBER_2_ID);
+
+        final ProcessCircleResponse response = service.perform(request);
+        assertThat(response.getReturnCode(), is(ReturnCode.AUTHORIZATION_WARNING));
+        assertThat(response.getReturnMessage(), is("Only a Circle Administrator may remove a Trustee."));
+    }
+
+    @Test
+    public void testRemoveTrusteeAsWritingTrustee() {
+        prepareCause(AuthorizationException.class, ReturnCode.AUTHORIZATION_WARNING, "The requesting Account is not permitted to Process a Circle.");
+
+        final ProcessCircleService service = new ProcessCircleService(settings, entityManager);
+        final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, "member2");
+        request.setAction(Action.REMOVE);
+        request.setCircleId(CIRCLE_1_ID);
+        request.setMemberId(MEMBER_2_ID);
+        assertThat(request.validate().isEmpty(), is(true));
+
+        service.perform(request);
+    }
+
+    @Test
+    public void testRemoveTrusteeAsCircleAdmin() {
+        final ProcessCircleService service = new ProcessCircleService(settings, entityManager);
+        final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, "member1");
+        request.setAction(Action.REMOVE);
+        request.setCircleId(CIRCLE_1_ID);
+        request.setMemberId(MEMBER_2_ID);
+
+        final ProcessCircleResponse response = service.perform(request);
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(response.getReturnMessage(), is("Ok"));
+
+        final FetchCircleService fetchService = new FetchCircleService(settings, entityManager);
+        final FetchCircleRequest fetchRequest = prepareRequest(FetchCircleRequest.class, "member1");
+        fetchRequest.setCircleId(CIRCLE_1_ID);
+        final FetchCircleResponse fetchResponse = fetchService.perform(fetchRequest);
+        assertThat(fetchResponse.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(fetchResponse.getTrustees().size(), is(2));
+    }
+
+    @Test
+    public void testRemoveTrusteeToInvalidCircleAsCircleAdmin() {
+        final String circleId = UUID.randomUUID().toString();
+        prepareCause(ModelException.class, ReturnCode.IDENTIFICATION_WARNING, "No Trustee information found for member 'member1' and circle '" + circleId + "'.");
+
+        final ProcessCircleService service = new ProcessCircleService(settings, entityManager);
+        final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, "member1");
+        request.setAction(Action.REMOVE);
+        request.setCircleId(circleId);
+        request.setMemberId(MEMBER_5_ID);
+        assertThat(request.validate().isEmpty(), is(true));
+
+        service.perform(request);
+    }
+
+    @Test
+    public void testRemoveInvalidMemberAsTrusteeAsCircleAdmin() {
+        final ProcessCircleService service = new ProcessCircleService(settings, entityManager);
+        final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, "member1");
+        request.setAction(Action.REMOVE);
+        request.setCircleId(CIRCLE_1_ID);
+        request.setMemberId(UUID.randomUUID().toString());
+
+        final ProcessCircleResponse response = service.perform(request);
+        assertThat(response.getReturnCode(), is(ReturnCode.IDENTIFICATION_WARNING));
+        assertThat(response.getReturnMessage(), is("The requested Trustee could not be found."));
     }
 
     // =========================================================================

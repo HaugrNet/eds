@@ -89,4 +89,6 @@ public interface CommonDao {
     SignatureEntity findByChecksum(String checksum);
 
     List<SignatureEntity> findAllSignatures(Long id);
+
+    TrusteeEntity findTrusteeByCircleAndMember(String externalCircleId, String externalMemberId);
 }

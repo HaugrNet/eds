@@ -67,6 +67,7 @@ public final class ProcessCircleService extends Serviceable<ProcessCircleRespons
                 response = removeTrustee(request);
                 break;
             default:
+                // Unreachable Code by design.
                 throw new CWSException(ReturnCode.ILLEGAL_ACTION, "Unsupported Action.");
         }
 
@@ -106,7 +107,7 @@ public final class ProcessCircleService extends Serviceable<ProcessCircleRespons
 
                 if (circleAdmin == null) {
                     response = new ProcessCircleResponse(ReturnCode.IDENTIFICATION_WARNING, "Cannot create a new Circle with a non-existing Circle Administrator.");
-                } else if (!Objects.equals(Constants.ADMIN_ACCOUNT, member.getName())) {
+                } else if (Objects.equals(Constants.ADMIN_ACCOUNT, circleAdmin.getName())) {
                     response = new ProcessCircleResponse(ReturnCode.IDENTIFICATION_WARNING, "It is not allowed for the System Administrator to be part of a Circle.");
                 } else {
                     final CircleEntity circle = new CircleEntity();
@@ -227,35 +228,40 @@ public final class ProcessCircleService extends Serviceable<ProcessCircleRespons
         } else {
             final String memberId = request.getMemberId();
             final MemberEntity newTrusteeMember = dao.find(MemberEntity.class, memberId);
-            final List<TrusteeEntity> existing = dao.findTrustByMemberAndCircle(newTrusteeMember, request.getCircleId());
 
-            if (existing.isEmpty()) {
-                // Please be aware, that during re-key requests - there will
-                // exist 2 Trustee entities, one with the old Key and one with
-                // the new. In the unlikely event that someone is being added
-                // during this - the logic should also reflect it. However, as
-                // re-key is not supported in version 1.0, support for multiple
-                // Keys can wait until this is also supported.
-                final TrusteeEntity admin = trustees.get(0);
-                final TrustLevel trustLevel = request.getTrustLevel();
-                final TrusteeEntity trustee = new TrusteeEntity();
-                trustee.setMember(newTrusteeMember);
-                trustee.setCircle(admin.getCircle());
-                trustee.setKey(admin.getKey());
-                trustee.setTrustLevel(trustLevel);
+            if (newTrusteeMember != null) {
+                final List<TrusteeEntity> existing = dao.findTrustByMemberAndCircle(newTrusteeMember, request.getCircleId());
 
-                if ((trustLevel == TrustLevel.ADMIN) || (trustLevel == TrustLevel.WRITE) || (trustLevel == TrustLevel.READ)) {
-                    final CWSKey circleKey = crypto.extractCircleKey(admin.getKey().getAlgorithm(), keyPair, admin.getCircleKey());
-                    final PublicKey publicKey = crypto.dearmoringPublicKey(newTrusteeMember.getPublicKey());
-                    final CWSKey cwsKey = new CWSKey(publicKey);
-                    trustee.setCircleKey(crypto.encryptAndArmorCircleKey(cwsKey, circleKey));
+                if (existing.isEmpty()) {
+                    // Please be aware, that during re-key requests - there will
+                    // exist 2 Trustee entities, one with the old Key and one with
+                    // the new. In the unlikely event that someone is being added
+                    // during this - the logic should also reflect it. However, as
+                    // re-key is not supported in version 1.0, support for multiple
+                    // Keys can wait until this is also supported.
+                    final TrusteeEntity admin = trustees.get(0);
+                    final TrustLevel trustLevel = request.getTrustLevel();
+                    final TrusteeEntity trustee = new TrusteeEntity();
+                    trustee.setMember(newTrusteeMember);
+                    trustee.setCircle(admin.getCircle());
+                    trustee.setKey(admin.getKey());
+                    trustee.setTrustLevel(trustLevel);
+
+                    if ((trustLevel == TrustLevel.ADMIN) || (trustLevel == TrustLevel.WRITE) || (trustLevel == TrustLevel.READ)) {
+                        final CWSKey circleKey = crypto.extractCircleKey(admin.getKey().getAlgorithm(), keyPair, admin.getCircleKey());
+                        final PublicKey publicKey = crypto.dearmoringPublicKey(newTrusteeMember.getPublicKey());
+                        final CWSKey cwsKey = new CWSKey(publicKey);
+                        trustee.setCircleKey(crypto.encryptAndArmorCircleKey(cwsKey, circleKey));
+                    }
+
+                    dao.persist(trustee);
+
+                    response = new ProcessCircleResponse();
+                } else {
+                    response = new ProcessCircleResponse(ReturnCode.IDENTIFICATION_WARNING, "The Member is already a trustee of the requested Circle.");
                 }
-
-                dao.persist(trustee);
-
-                response = new ProcessCircleResponse();
             } else {
-                response = new ProcessCircleResponse(ReturnCode.IDENTIFICATION_WARNING, "The Member is already a trustee of the requested Circle.");
+                response = new ProcessCircleResponse(ReturnCode.IDENTIFICATION_WARNING, "No Member could be found with the given Id.");
             }
         }
 
@@ -266,22 +272,10 @@ public final class ProcessCircleService extends Serviceable<ProcessCircleRespons
         final ProcessCircleResponse response;
 
         if (!Objects.equals(Constants.ADMIN_ACCOUNT, member.getName())) {
-            final TrusteeEntity trustee = dao.find(TrusteeEntity.class, request.getMemberId());
+            final TrusteeEntity trustee = dao.findTrusteeByCircleAndMember(request.getCircleId(), request.getMemberId());
             if (trustee != null) {
                 final TrustLevel newTrustLevel = request.getTrustLevel();
                 trustee.setTrustLevel(newTrustLevel);
-
-                if (newTrustLevel == TrustLevel.GUEST) {
-                    trustee.setCircleKey(null);
-                } else if (trustee.getTrustLevel() == TrustLevel.GUEST) {
-                    final TrusteeEntity admin = trustees.get(0);
-                    final CWSKey circleKey = crypto.extractCircleKey(admin.getKey().getAlgorithm(), keyPair, admin.getCircleKey());
-                    final PublicKey publicKey = crypto.dearmoringPublicKey(trustee.getMember().getPublicKey());
-                    final CWSKey cwsKey = new CWSKey(publicKey);
-                    final String armoredKey = crypto.encryptAndArmorCircleKey(cwsKey, circleKey);
-                    trustee.setCircleKey(armoredKey);
-                }
-
                 dao.persist(trustee);
 
                 response = new ProcessCircleResponse();
@@ -299,7 +293,7 @@ public final class ProcessCircleService extends Serviceable<ProcessCircleRespons
         final ProcessCircleResponse response;
 
         if (!Objects.equals(Constants.ADMIN_ACCOUNT, member.getName())) {
-            final TrusteeEntity trustee = dao.find(TrusteeEntity.class, request.getMemberId());
+            final TrusteeEntity trustee = dao.findTrusteeByCircleAndMember(request.getCircleId(), request.getMemberId());
             if (trustee != null) {
                 dao.delete(trustee);
 
@@ -308,7 +302,7 @@ public final class ProcessCircleService extends Serviceable<ProcessCircleRespons
                 response = new ProcessCircleResponse(ReturnCode.IDENTIFICATION_WARNING, "The requested Trustee could not be found.");
             }
         } else {
-            response = new ProcessCircleResponse(ReturnCode.AUTHORIZATION_WARNING, "Only a Circle Administrator may delete a Trustee.");
+            response = new ProcessCircleResponse(ReturnCode.AUTHORIZATION_WARNING, "Only a Circle Administrator may remove a Trustee.");
         }
 
         return response;

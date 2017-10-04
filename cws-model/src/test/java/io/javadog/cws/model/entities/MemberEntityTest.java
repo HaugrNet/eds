@@ -200,7 +200,7 @@ public final class MemberEntityTest extends DatabaseSetup {
         println("-- also create a number of Trustees, in this case we add Member 1-3 to Circle 1,");
         println("-- Member 1-4 to Circle 2 and Member 2-5 to Circle 3.");
         println("-- The Trust Level is different for each Member.");
-        println("INSERT INTO trustees (external_id, member_id, circle_id, key_id, trust_level, circle_key) VALUES");
+        println("INSERT INTO trustees (member_id, circle_id, key_id, trust_level, circle_key) VALUES");
         final CWSKey cwsKey1 = crypto.generateSymmetricKey(key1.getAlgorithm());
         final CWSKey cwsKey2 = crypto.generateSymmetricKey(key1.getAlgorithm());
         final CWSKey cwsKey3 = crypto.generateSymmetricKey(key1.getAlgorithm());
@@ -264,7 +264,7 @@ public final class MemberEntityTest extends DatabaseSetup {
         entity.setCircleKey(armoredKey);
         dao.persist(entity);
 
-        println("    ('" + entity.getExternalId() + "', " + member.getId() + ", " + circle.getId() + ", " + key.getId() + ", '" + trustLevel + "', '" + armoredKey + "')" + delimiter);
+        println("    (" + member.getId() + ", " + circle.getId() + ", " + key.getId() + ", '" + trustLevel + "', '" + armoredKey + "')" + delimiter);
     }
 
     private static void println(final String str) {

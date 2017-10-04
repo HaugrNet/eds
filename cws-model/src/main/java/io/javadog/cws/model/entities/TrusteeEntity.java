@@ -63,7 +63,7 @@ import javax.persistence.Table;
                         "where t.circle.id = :circleId")
 })
 @Table(name = "trustees")
-public class TrusteeEntity extends Externable {
+public class TrusteeEntity extends CWSEntity {
 
     @ManyToOne(targetEntity = MemberEntity.class, fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "member_id", referencedColumnName = "id", nullable = false, updatable = false)

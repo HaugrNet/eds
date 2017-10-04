@@ -14,7 +14,6 @@ import io.javadog.cws.api.common.TrustLevel;
 import io.javadog.cws.api.common.Verifiable;
 
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -30,20 +29,16 @@ import java.util.concurrent.ConcurrentHashMap;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "trustee", propOrder = { "id", "circle", "member", "trustLevel", "changed", "since" })
+@XmlType(name = "trustee", propOrder = { "circle", "member", "trustLevel", "changed", "since" })
 public final class Trustee extends Verifiable {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
-    private static final String FIELD_ID = "id";
     private static final String FIELD_CIRCLE = "circle";
     private static final String FIELD_MEMBER = "member";
     private static final String FIELD_TRUSTLEVEL = "trustLevel";
     private static final String FIELD_CHANGED = "changed";
     private static final String FIELD_SINCE = "since";
-
-    @XmlElement(name = FIELD_ID)
-    private String id = null;
 
     @XmlElement(name = FIELD_CIRCLE, required = true)
     private Circle circle = null;
@@ -63,16 +58,6 @@ public final class Trustee extends Verifiable {
     // =========================================================================
     // Standard Setters & Getters
     // =========================================================================
-
-    @Pattern(regexp = Constants.ID_PATTERN_REGEX)
-    public void setId(final String id) {
-        ensurePattern(FIELD_ID, id, Constants.ID_PATTERN_REGEX);
-        this.id = id;
-    }
-
-    public String getId() {
-        return id;
-    }
 
     @NotNull
     public void setCircle(final Circle circle) {
@@ -129,7 +114,6 @@ public final class Trustee extends Verifiable {
     public Map<String, String> validate() {
         final Map<String, String> errors = new ConcurrentHashMap<>();
 
-        checkPattern(errors, FIELD_ID, id, Constants.ID_PATTERN_REGEX, "The Trustee Id is invalid.");
         if (circle != null) {
             extendErrors(errors, circle.validate(), "Circle :: ");
         } else {

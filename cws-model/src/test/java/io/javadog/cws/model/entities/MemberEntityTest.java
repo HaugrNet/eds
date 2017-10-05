@@ -131,11 +131,11 @@ public final class MemberEntityTest extends DatabaseSetup {
 
         assertThat(found.size(), is(6));
         assertThat(found.get(0).getName(), is(Constants.ADMIN_ACCOUNT));
-        assertThat(found.get(1).getName(), is("member1"));
-        assertThat(found.get(2).getName(), is("member2"));
-        assertThat(found.get(3).getName(), is("member3"));
-        assertThat(found.get(4).getName(), is("member4"));
-        assertThat(found.get(5).getName(), is("member5"));
+        assertThat(found.get(1).getName(), is(MEMBER_1));
+        assertThat(found.get(2).getName(), is(MEMBER_2));
+        assertThat(found.get(3).getName(), is(MEMBER_3));
+        assertThat(found.get(4).getName(), is(MEMBER_4));
+        assertThat(found.get(5).getName(), is(MEMBER_5));
     }
 
     @Test
@@ -162,24 +162,24 @@ public final class MemberEntityTest extends DatabaseSetup {
         final CWSKey keyPair = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
         createAndPrintMember(ADMIN_ID, Constants.ADMIN_ACCOUNT, keyPair, ',');
         final CWSKey keyPair1 = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
-        final MemberEntity member1 = createAndPrintMember(MEMBER_1_ID, "member1", keyPair1, ',');
+        final MemberEntity member1 = createAndPrintMember(MEMBER_1_ID, MEMBER_1, keyPair1, ',');
         final CWSKey keyPair2 = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
-        final MemberEntity member2 = createAndPrintMember(MEMBER_2_ID, "member2", keyPair2, ',');
+        final MemberEntity member2 = createAndPrintMember(MEMBER_2_ID, MEMBER_2, keyPair2, ',');
         final CWSKey keyPair3 = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
-        final MemberEntity member3 = createAndPrintMember(MEMBER_3_ID, "member3", keyPair3, ',');
+        final MemberEntity member3 = createAndPrintMember(MEMBER_3_ID, MEMBER_3, keyPair3, ',');
         final CWSKey keyPair4 = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
-        final MemberEntity member4 = createAndPrintMember(MEMBER_4_ID, "member4", keyPair4, ',');
+        final MemberEntity member4 = createAndPrintMember(MEMBER_4_ID, MEMBER_4, keyPair4, ',');
         final CWSKey keyPair5 = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
-        final MemberEntity member5 = createAndPrintMember(MEMBER_5_ID, "member5", keyPair5, ';');
+        final MemberEntity member5 = createAndPrintMember(MEMBER_5_ID, MEMBER_5, keyPair5, ';');
 
         println("");
         println("-- Default, we have 3 Circles as part of the test setup, using the very");
         println("-- imaginative names, 'circle1' to 'circle3'.");
         println("");
         println("INSERT INTO circles (external_id, name) VALUES");
-        final CircleEntity circle1 = createAndPrintCircle(CIRCLE_1_ID, "circle1", ',');
-        final CircleEntity circle2 = createAndPrintCircle(CIRCLE_2_ID, "circle2", ',');
-        final CircleEntity circle3 = createAndPrintCircle(CIRCLE_3_ID, "circle3", ';');
+        final CircleEntity circle1 = createAndPrintCircle(CIRCLE_1_ID, CIRCLE_1, ',');
+        final CircleEntity circle2 = createAndPrintCircle(CIRCLE_2_ID, CIRCLE_2, ',');
+        final CircleEntity circle3 = createAndPrintCircle(CIRCLE_3_ID, CIRCLE_3, ';');
 
         println("");
         println("-- For each Circle, we need to have a unique Key, but with the same settings.");

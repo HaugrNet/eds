@@ -46,7 +46,7 @@ public final class ServicableTest extends DatabaseSetup {
         prepareCause(AuthorizationException.class, ReturnCode.AUTHORIZATION_WARNING, "Cannot complete this request, as it is only allowed for the System Administrator.");
 
         final SettingService service = new SettingService(settings, entityManager);
-        final SettingRequest request = prepareRequest(SettingRequest.class, "member1");
+        final SettingRequest request = prepareRequest(SettingRequest.class, MEMBER_1);
         assertThat(request.validate().isEmpty(), is(true));
 
         service.perform(request);
@@ -57,7 +57,7 @@ public final class ServicableTest extends DatabaseSetup {
         prepareCause(AuthorizationException.class, ReturnCode.AUTHORIZATION_WARNING, "he requesting Account is not permitted to Create Digital Signature.");
 
         final SignService service = new SignService(settings, entityManager);
-        final SignRequest request = prepareRequest(SignRequest.class, "member5");
+        final SignRequest request = prepareRequest(SignRequest.class, MEMBER_5);
         request.setData(generateData(262144));
         assertThat(request.validate().isEmpty(), is(true));
 
@@ -69,7 +69,7 @@ public final class ServicableTest extends DatabaseSetup {
         prepareCause(AuthenticationException.class, ReturnCode.AUTHENTICATION_WARNING, "Cannot authenticate the Account 'member5' from the given Credentials.");
 
         final FetchCircleService service = new FetchCircleService(settings, entityManager);
-        final FetchCircleRequest request = prepareRequest(FetchCircleRequest.class, "member5");
+        final FetchCircleRequest request = prepareRequest(FetchCircleRequest.class, MEMBER_5);
         request.setCredential("something wrong");
         assertThat(request.validate().isEmpty(), is(true));
 
@@ -81,8 +81,8 @@ public final class ServicableTest extends DatabaseSetup {
         prepareCause(AuthenticationException.class, ReturnCode.AUTHENTICATION_WARNING, "Cannot authenticate the Account 'member5' from the given Credentials.");
 
         final FetchCircleService service = new FetchCircleService(settings, entityManager);
-        final FetchCircleRequest request = prepareRequest(FetchCircleRequest.class, "member5");
-        request.setCredential("member4");
+        final FetchCircleRequest request = prepareRequest(FetchCircleRequest.class, MEMBER_5);
+        request.setCredential(MEMBER_4);
         assertThat(request.validate().isEmpty(), is(true));
 
         service.perform(request);

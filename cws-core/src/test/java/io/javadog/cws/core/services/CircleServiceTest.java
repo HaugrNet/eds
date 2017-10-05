@@ -98,24 +98,24 @@ public final class CircleServiceTest extends DatabaseSetup {
         assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(response.getReturnMessage(), is("Ok"));
         assertThat(response.getCircles().size(), is(3));
-        assertThat(response.getCircles().get(0).getName(), is("circle1"));
-        assertThat(response.getCircles().get(1).getName(), is("circle2"));
-        assertThat(response.getCircles().get(2).getName(), is("circle3"));
+        assertThat(response.getCircles().get(0).getName(), is(CIRCLE_1));
+        assertThat(response.getCircles().get(1).getName(), is(CIRCLE_2));
+        assertThat(response.getCircles().get(2).getName(), is(CIRCLE_3));
         assertThat(response.getTrustees().isEmpty(), is(true));
     }
 
     @Test
     public void testFetchAllCirclesAsMember1() {
         final FetchCircleService service = new FetchCircleService(settings, entityManager);
-        final FetchCircleRequest request = prepareRequest(FetchCircleRequest.class, "member1");
+        final FetchCircleRequest request = prepareRequest(FetchCircleRequest.class, MEMBER_1);
 
         final FetchCircleResponse response = service.perform(request);
         assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(response.getReturnMessage(), is("Ok"));
         assertThat(response.getCircles().size(), is(3));
-        assertThat(response.getCircles().get(0).getName(), is("circle1"));
-        assertThat(response.getCircles().get(1).getName(), is("circle2"));
-        assertThat(response.getCircles().get(2).getName(), is("circle3"));
+        assertThat(response.getCircles().get(0).getName(), is(CIRCLE_1));
+        assertThat(response.getCircles().get(1).getName(), is(CIRCLE_2));
+        assertThat(response.getCircles().get(2).getName(), is(CIRCLE_3));
         assertThat(response.getTrustees().size(), is(0));
     }
 
@@ -134,11 +134,11 @@ public final class CircleServiceTest extends DatabaseSetup {
         assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(response.getReturnMessage(), is("Ok"));
         assertThat(response.getCircles().size(), is(1));
-        assertThat(response.getCircles().get(0).getName(), is("circle1"));
+        assertThat(response.getCircles().get(0).getName(), is(CIRCLE_1));
         assertThat(response.getTrustees().size(), is(3));
-        assertThat(response.getTrustees().get(0).getMember().getAuthentication().getAccount(), is("member1"));
-        assertThat(response.getTrustees().get(1).getMember().getAuthentication().getAccount(), is("member2"));
-        assertThat(response.getTrustees().get(2).getMember().getAuthentication().getAccount(), is("member3"));
+        assertThat(response.getTrustees().get(0).getMember().getAuthentication().getAccount(), is(MEMBER_1));
+        assertThat(response.getTrustees().get(1).getMember().getAuthentication().getAccount(), is(MEMBER_2));
+        assertThat(response.getTrustees().get(2).getMember().getAuthentication().getAccount(), is(MEMBER_3));
     }
 
     @Test
@@ -156,11 +156,11 @@ public final class CircleServiceTest extends DatabaseSetup {
         assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(response.getReturnMessage(), is("Ok"));
         assertThat(response.getCircles().size(), is(1));
-        assertThat(response.getCircles().get(0).getName(), is("circle1"));
+        assertThat(response.getCircles().get(0).getName(), is(CIRCLE_1));
         assertThat(response.getTrustees().size(), is(3));
-        assertThat(response.getTrustees().get(0).getMember().getAuthentication().getAccount(), is("member1"));
-        assertThat(response.getTrustees().get(1).getMember().getAuthentication().getAccount(), is("member2"));
-        assertThat(response.getTrustees().get(2).getMember().getAuthentication().getAccount(), is("member3"));
+        assertThat(response.getTrustees().get(0).getMember().getAuthentication().getAccount(), is(MEMBER_1));
+        assertThat(response.getTrustees().get(1).getMember().getAuthentication().getAccount(), is(MEMBER_2));
+        assertThat(response.getTrustees().get(2).getMember().getAuthentication().getAccount(), is(MEMBER_3));
     }
 
     @Test
@@ -170,7 +170,7 @@ public final class CircleServiceTest extends DatabaseSetup {
 
         final FetchCircleService service = new FetchCircleService(settings, entityManager);
         final CircleEntity circle = findFirstCircle();
-        final FetchCircleRequest request = prepareRequest(FetchCircleRequest.class, "member1");
+        final FetchCircleRequest request = prepareRequest(FetchCircleRequest.class, MEMBER_1);
         request.setCircleId(circle.getExternalId());
         final FetchCircleResponse response = service.perform(request);
 
@@ -178,11 +178,11 @@ public final class CircleServiceTest extends DatabaseSetup {
         assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(response.getReturnMessage(), is("Ok"));
         assertThat(response.getCircles().size(), is(1));
-        assertThat(response.getCircles().get(0).getName(), is("circle1"));
+        assertThat(response.getCircles().get(0).getName(), is(CIRCLE_1));
         assertThat(response.getTrustees().size(), is(3));
-        assertThat(response.getTrustees().get(0).getMember().getAuthentication().getAccount(), is("member1"));
-        assertThat(response.getTrustees().get(1).getMember().getAuthentication().getAccount(), is("member2"));
-        assertThat(response.getTrustees().get(2).getMember().getAuthentication().getAccount(), is("member3"));
+        assertThat(response.getTrustees().get(0).getMember().getAuthentication().getAccount(), is(MEMBER_1));
+        assertThat(response.getTrustees().get(1).getMember().getAuthentication().getAccount(), is(MEMBER_2));
+        assertThat(response.getTrustees().get(2).getMember().getAuthentication().getAccount(), is(MEMBER_3));
     }
 
     @Test
@@ -192,7 +192,7 @@ public final class CircleServiceTest extends DatabaseSetup {
 
         final FetchCircleService service = new FetchCircleService(settings, entityManager);
         final CircleEntity circle = findFirstCircle();
-        final FetchCircleRequest request = prepareRequest(FetchCircleRequest.class, "member1");
+        final FetchCircleRequest request = prepareRequest(FetchCircleRequest.class, MEMBER_1);
         request.setCircleId(circle.getExternalId());
         final FetchCircleResponse response = service.perform(request);
 
@@ -200,11 +200,11 @@ public final class CircleServiceTest extends DatabaseSetup {
         assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(response.getReturnMessage(), is("Ok"));
         assertThat(response.getCircles().size(), is(1));
-        assertThat(response.getCircles().get(0).getName(), is("circle1"));
+        assertThat(response.getCircles().get(0).getName(), is(CIRCLE_1));
         assertThat(response.getTrustees().size(), is(3));
-        assertThat(response.getTrustees().get(0).getMember().getAuthentication().getAccount(), is("member1"));
-        assertThat(response.getTrustees().get(1).getMember().getAuthentication().getAccount(), is("member2"));
-        assertThat(response.getTrustees().get(2).getMember().getAuthentication().getAccount(), is("member3"));
+        assertThat(response.getTrustees().get(0).getMember().getAuthentication().getAccount(), is(MEMBER_1));
+        assertThat(response.getTrustees().get(1).getMember().getAuthentication().getAccount(), is(MEMBER_2));
+        assertThat(response.getTrustees().get(2).getMember().getAuthentication().getAccount(), is(MEMBER_3));
     }
 
     @Test
@@ -217,7 +217,7 @@ public final class CircleServiceTest extends DatabaseSetup {
         settings.set(Settings.SHOW_TRUSTEES, "true");
 
         final FetchCircleService service = new FetchCircleService(settings, entityManager);
-        final FetchCircleRequest request = prepareRequest(FetchCircleRequest.class, "member5");
+        final FetchCircleRequest request = prepareRequest(FetchCircleRequest.class, MEMBER_5);
         assertThat(request, is(not(nullValue())));
         request.setCircleId(circle.getExternalId());
         service.perform(request);
@@ -232,7 +232,7 @@ public final class CircleServiceTest extends DatabaseSetup {
         settings.set(Settings.SHOW_TRUSTEES, "false");
 
         final FetchCircleService service = new FetchCircleService(settings, entityManager);
-        final FetchCircleRequest request = prepareRequest(FetchCircleRequest.class, "member5");
+        final FetchCircleRequest request = prepareRequest(FetchCircleRequest.class, MEMBER_5);
         assertThat(request, is(not(nullValue())));
         request.setCircleId(circle.getExternalId());
         service.perform(request);
@@ -252,7 +252,7 @@ public final class CircleServiceTest extends DatabaseSetup {
         assertThat(response.getCircleId(), is(not(nullValue())));
 
         final FetchCircleService fetchService = new FetchCircleService(settings, entityManager);
-        final FetchCircleRequest fetchRequest = prepareRequest(FetchCircleRequest.class, "member1");
+        final FetchCircleRequest fetchRequest = prepareRequest(FetchCircleRequest.class, MEMBER_1);
         fetchRequest.setCircleId(response.getCircleId());
         final FetchCircleResponse fetchResponse = fetchService.perform(fetchRequest);
         assertThat(fetchResponse.getReturnCode(), is(ReturnCode.SUCCESS));
@@ -263,7 +263,7 @@ public final class CircleServiceTest extends DatabaseSetup {
     @Test
     public void testCreateCircleAsMember() {
         final ProcessCircleService service = new ProcessCircleService(settings, entityManager);
-        final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, "member1");
+        final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, MEMBER_1);
         request.setAction(Action.CREATE);
         request.setCircleName("My Circle");
         request.setMemberId(MEMBER_1_ID);
@@ -304,7 +304,7 @@ public final class CircleServiceTest extends DatabaseSetup {
         final ProcessCircleService service = new ProcessCircleService(settings, entityManager);
         final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, Constants.ADMIN_ACCOUNT);
         request.setAction(Action.CREATE);
-        request.setCircleName("Circle1");
+        request.setCircleName(CIRCLE_1);
         request.setMemberId(MEMBER_1_ID);
 
         final ProcessCircleResponse response = service.perform(request);
@@ -336,7 +336,7 @@ public final class CircleServiceTest extends DatabaseSetup {
     @Test
     public void testUpdateExistingCircleAsCircleAdmin() {
         final ProcessCircleService service = new ProcessCircleService(settings, entityManager);
-        final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, "member1");
+        final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, MEMBER_1);
         request.setAction(Action.UPDATE);
         request.setCircleName("Circle One");
         request.setCircleId(CIRCLE_1_ID);
@@ -350,7 +350,7 @@ public final class CircleServiceTest extends DatabaseSetup {
     public void testUpdateExistingCircleAsCircleMember() {
         prepareCause(AuthorizationException.class, ReturnCode.AUTHORIZATION_WARNING, "The requesting Account is not permitted to Process a Circle.");
         final ProcessCircleService service = new ProcessCircleService(settings, entityManager);
-        final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, "member2");
+        final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, MEMBER_2);
         request.setAction(Action.UPDATE);
         request.setCircleName("Circle One");
         request.setCircleId(CIRCLE_1_ID);
@@ -363,7 +363,7 @@ public final class CircleServiceTest extends DatabaseSetup {
     public void testUpdateCircleAsNonMember() {
         prepareCause(ModelException.class, ReturnCode.IDENTIFICATION_WARNING, "No Trustee information found for member 'member5' and circle '" + CIRCLE_1_ID + "'.");
         final ProcessCircleService service = new ProcessCircleService(settings, entityManager);
-        final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, "member5");
+        final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, MEMBER_5);
         request.setAction(Action.UPDATE);
         request.setCircleName("Circle One");
         request.setCircleId(CIRCLE_1_ID);
@@ -388,9 +388,9 @@ public final class CircleServiceTest extends DatabaseSetup {
     @Test
     public void testUpdateExistingCircleWithExistingName() {
         final ProcessCircleService service = new ProcessCircleService(settings, entityManager);
-        final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, "member1");
+        final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, MEMBER_1);
         request.setAction(Action.UPDATE);
-        request.setCircleName("Circle2");
+        request.setCircleName(CIRCLE_2);
         request.setCircleId(CIRCLE_1_ID);
 
         final ProcessCircleResponse response = service.perform(request);
@@ -401,9 +401,9 @@ public final class CircleServiceTest extends DatabaseSetup {
     @Test
     public void testUpdateExistingCircleWithOwnName() {
         final ProcessCircleService service = new ProcessCircleService(settings, entityManager);
-        final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, "member1");
+        final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, MEMBER_1);
         request.setAction(Action.UPDATE);
-        request.setCircleName("Circle1");
+        request.setCircleName(CIRCLE_1);
         request.setCircleId(CIRCLE_1_ID);
 
         final ProcessCircleResponse response = service.perform(request);
@@ -426,7 +426,7 @@ public final class CircleServiceTest extends DatabaseSetup {
     @Test
     public void testDeleteCircleAsMember() {
         final ProcessCircleService service = new ProcessCircleService(settings, entityManager);
-        final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, "member1");
+        final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, MEMBER_1);
         request.setAction(Action.DELETE);
         request.setCircleId(CIRCLE_1_ID);
 
@@ -466,7 +466,7 @@ public final class CircleServiceTest extends DatabaseSetup {
         prepareCause(AuthorizationException.class, ReturnCode.AUTHORIZATION_WARNING, "The requesting Account is not permitted to Process a Circle.");
 
         final ProcessCircleService service = new ProcessCircleService(settings, entityManager);
-        final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, "member2");
+        final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, MEMBER_2);
         request.setAction(Action.ADD);
         request.setCircleId(CIRCLE_1_ID);
         request.setMemberId(MEMBER_5_ID);
@@ -479,7 +479,7 @@ public final class CircleServiceTest extends DatabaseSetup {
     @Test
     public void testAddingTrusteeAsCircleAdmin() {
         final ProcessCircleService service = new ProcessCircleService(settings, entityManager);
-        final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, "member1");
+        final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, MEMBER_1);
         request.setAction(Action.ADD);
         request.setCircleId(CIRCLE_1_ID);
         request.setMemberId(MEMBER_5_ID);
@@ -496,7 +496,7 @@ public final class CircleServiceTest extends DatabaseSetup {
         prepareCause(ModelException.class, ReturnCode.IDENTIFICATION_WARNING, "No Trustee information found for member 'member1' and circle '" + circleId + "'.");
 
         final ProcessCircleService service = new ProcessCircleService(settings, entityManager);
-        final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, "member1");
+        final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, MEMBER_1);
         request.setAction(Action.ADD);
         request.setCircleId(circleId);
         request.setMemberId(MEMBER_5_ID);
@@ -509,7 +509,7 @@ public final class CircleServiceTest extends DatabaseSetup {
     @Test
     public void testAddingInvalidMemberAsTrusteeAsCircleAdmin() {
         final ProcessCircleService service = new ProcessCircleService(settings, entityManager);
-        final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, "member1");
+        final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, MEMBER_1);
         request.setAction(Action.ADD);
         request.setCircleId(CIRCLE_1_ID);
         request.setMemberId(UUID.randomUUID().toString());
@@ -523,7 +523,7 @@ public final class CircleServiceTest extends DatabaseSetup {
     @Test
     public void testAddingExistingTrusteeAsTrustee() {
         final ProcessCircleService service = new ProcessCircleService(settings, entityManager);
-        final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, "member1");
+        final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, MEMBER_1);
         request.setAction(Action.ADD);
         request.setCircleId(CIRCLE_1_ID);
         request.setMemberId(MEMBER_2_ID);
@@ -553,7 +553,7 @@ public final class CircleServiceTest extends DatabaseSetup {
         prepareCause(AuthorizationException.class, ReturnCode.AUTHORIZATION_WARNING, "The requesting Account is not permitted to Process a Circle.");
 
         final ProcessCircleService service = new ProcessCircleService(settings, entityManager);
-        final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, "member2");
+        final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, MEMBER_2);
         request.setAction(Action.ALTER);
         request.setCircleId(CIRCLE_1_ID);
         request.setMemberId(MEMBER_2_ID);
@@ -566,7 +566,7 @@ public final class CircleServiceTest extends DatabaseSetup {
     @Test
     public void testAlterTrusteeSetAdminAsCircleAdmin() {
         final ProcessCircleService service = new ProcessCircleService(settings, entityManager);
-        final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, "member1");
+        final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, MEMBER_1);
         request.setAction(Action.ALTER);
         request.setCircleId(CIRCLE_1_ID);
         request.setMemberId(MEMBER_2_ID);
@@ -577,7 +577,7 @@ public final class CircleServiceTest extends DatabaseSetup {
         assertThat(response.getReturnMessage(), is("Ok"));
 
         final FetchCircleService fetchService = new FetchCircleService(settings, entityManager);
-        final FetchCircleRequest fetchRequest = prepareRequest(FetchCircleRequest.class, "member1");
+        final FetchCircleRequest fetchRequest = prepareRequest(FetchCircleRequest.class, MEMBER_1);
         fetchRequest.setCircleId(CIRCLE_1_ID);
         final FetchCircleResponse fetchResponse = fetchService.perform(fetchRequest);
         assertThat(fetchResponse.getReturnCode(), is(ReturnCode.SUCCESS));
@@ -592,7 +592,7 @@ public final class CircleServiceTest extends DatabaseSetup {
         prepareCause(ModelException.class, ReturnCode.IDENTIFICATION_WARNING, "No Trustee information found for member 'member1' and circle '" + circleId + "'.");
 
         final ProcessCircleService service = new ProcessCircleService(settings, entityManager);
-        final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, "member1");
+        final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, MEMBER_1);
         request.setAction(Action.ALTER);
         request.setCircleId(circleId);
         request.setMemberId(MEMBER_5_ID);
@@ -605,7 +605,7 @@ public final class CircleServiceTest extends DatabaseSetup {
     @Test
     public void testAlterInvalidMemberAsTrusteeAsCircleAdmin() {
         final ProcessCircleService service = new ProcessCircleService(settings, entityManager);
-        final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, "member1");
+        final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, MEMBER_1);
         request.setAction(Action.ALTER);
         request.setCircleId(CIRCLE_1_ID);
         request.setMemberId(UUID.randomUUID().toString());
@@ -634,7 +634,7 @@ public final class CircleServiceTest extends DatabaseSetup {
         prepareCause(AuthorizationException.class, ReturnCode.AUTHORIZATION_WARNING, "The requesting Account is not permitted to Process a Circle.");
 
         final ProcessCircleService service = new ProcessCircleService(settings, entityManager);
-        final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, "member2");
+        final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, MEMBER_2);
         request.setAction(Action.REMOVE);
         request.setCircleId(CIRCLE_1_ID);
         request.setMemberId(MEMBER_2_ID);
@@ -646,7 +646,7 @@ public final class CircleServiceTest extends DatabaseSetup {
     @Test
     public void testRemoveTrusteeAsCircleAdmin() {
         final ProcessCircleService service = new ProcessCircleService(settings, entityManager);
-        final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, "member1");
+        final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, MEMBER_1);
         request.setAction(Action.REMOVE);
         request.setCircleId(CIRCLE_1_ID);
         request.setMemberId(MEMBER_2_ID);
@@ -656,7 +656,7 @@ public final class CircleServiceTest extends DatabaseSetup {
         assertThat(response.getReturnMessage(), is("Ok"));
 
         final FetchCircleService fetchService = new FetchCircleService(settings, entityManager);
-        final FetchCircleRequest fetchRequest = prepareRequest(FetchCircleRequest.class, "member1");
+        final FetchCircleRequest fetchRequest = prepareRequest(FetchCircleRequest.class, MEMBER_1);
         fetchRequest.setCircleId(CIRCLE_1_ID);
         final FetchCircleResponse fetchResponse = fetchService.perform(fetchRequest);
         assertThat(fetchResponse.getReturnCode(), is(ReturnCode.SUCCESS));
@@ -669,7 +669,7 @@ public final class CircleServiceTest extends DatabaseSetup {
         prepareCause(ModelException.class, ReturnCode.IDENTIFICATION_WARNING, "No Trustee information found for member 'member1' and circle '" + circleId + "'.");
 
         final ProcessCircleService service = new ProcessCircleService(settings, entityManager);
-        final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, "member1");
+        final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, MEMBER_1);
         request.setAction(Action.REMOVE);
         request.setCircleId(circleId);
         request.setMemberId(MEMBER_5_ID);
@@ -681,7 +681,7 @@ public final class CircleServiceTest extends DatabaseSetup {
     @Test
     public void testRemoveInvalidMemberAsTrusteeAsCircleAdmin() {
         final ProcessCircleService service = new ProcessCircleService(settings, entityManager);
-        final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, "member1");
+        final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, MEMBER_1);
         request.setAction(Action.REMOVE);
         request.setCircleId(CIRCLE_1_ID);
         request.setMemberId(UUID.randomUUID().toString());

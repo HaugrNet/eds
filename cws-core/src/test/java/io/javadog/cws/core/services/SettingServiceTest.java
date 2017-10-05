@@ -58,7 +58,7 @@ public final class SettingServiceTest extends DatabaseSetup {
                 "Cannot complete this request, as it is only allowed for the System Administrator.");
 
         final SettingService service = new SettingService(new Settings(), entityManager);
-        final SettingRequest request = prepareRequest(SettingRequest.class, "member1");
+        final SettingRequest request = prepareRequest(SettingRequest.class, MEMBER_1);
         assertThat(request.getAccount(), is(not(Constants.ADMIN_ACCOUNT)));
 
         service.perform(request);

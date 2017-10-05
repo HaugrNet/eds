@@ -45,6 +45,14 @@ import java.util.UUID;
  */
 public class DatabaseSetup {
 
+    protected static final String MEMBER_1 = "member1";
+    protected static final String MEMBER_2 = "member2";
+    protected static final String MEMBER_3 = "member3";
+    protected static final String MEMBER_4 = "member4";
+    protected static final String MEMBER_5 = "member5";
+    protected static final String CIRCLE_1 = "circle1";
+    protected static final String CIRCLE_2 = "circle2";
+    protected static final String CIRCLE_3 = "circle3";
     protected static final String CIRCLE_1_ID = "d8838d7d-71e7-433d-8790-af7c080e9de9";
     protected static final String CIRCLE_2_ID = "8ba34e12-8830-4a1f-9681-b689cad52009";
     protected static final String CIRCLE_3_ID = "a2797176-a5b9-4dc9-867b-8c5c1bb3a9f9";

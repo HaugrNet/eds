@@ -92,7 +92,7 @@ public final class SystemServiceTest extends DatabaseSetup {
     @Test
     public void testFetchMembers() {
         final SystemService system = prepareSystemService();
-        final FetchMemberRequest request = prepareRequest(FetchMemberRequest.class, "member1");
+        final FetchMemberRequest request = prepareRequest(FetchMemberRequest.class, MEMBER_1);
 
         final FetchMemberResponse response = system.fetchMembers(request);
         assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
@@ -166,7 +166,7 @@ public final class SystemServiceTest extends DatabaseSetup {
     @Test
     public void testFetchCircle() {
         final SystemService system = prepareSystemService();
-        final FetchCircleRequest request = prepareRequest(FetchCircleRequest.class, "member1");
+        final FetchCircleRequest request = prepareRequest(FetchCircleRequest.class, MEMBER_1);
 
         final FetchCircleResponse response = system.fetchCircles(request);
         assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));

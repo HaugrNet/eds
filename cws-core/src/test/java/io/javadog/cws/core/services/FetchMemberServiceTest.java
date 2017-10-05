@@ -154,7 +154,7 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
         settings.set(Settings.EXPOSE_ADMIN, "false");
 
         final FetchMemberService service = new FetchMemberService(settings, entityManager);
-        final FetchMemberRequest request = prepareRequest(FetchMemberRequest.class, "member1");
+        final FetchMemberRequest request = prepareRequest(FetchMemberRequest.class, MEMBER_1);
         assertThat(request.validate().isEmpty(), is(true));
         final FetchMemberResponse response = service.perform(request);
 
@@ -178,7 +178,7 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
         settings.set(Settings.EXPOSE_ADMIN, "true");
 
         final FetchMemberService service = new FetchMemberService(settings, entityManager);
-        final FetchMemberRequest request = prepareRequest(FetchMemberRequest.class, "member1");
+        final FetchMemberRequest request = prepareRequest(FetchMemberRequest.class, MEMBER_1);
         assertThat(request.validate().isEmpty(), is(true));
         final FetchMemberResponse response = service.perform(request);
 
@@ -350,7 +350,7 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
 
         final FetchMemberService service = new FetchMemberService(settings, entityManager);
         final MemberEntity member = findFirstMember();
-        final FetchMemberRequest request = prepareRequest(FetchMemberRequest.class, "member1");
+        final FetchMemberRequest request = prepareRequest(FetchMemberRequest.class, MEMBER_1);
         request.setMemberId(member.getExternalId());
         final FetchMemberResponse response = service.perform(request);
 
@@ -368,7 +368,7 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
 
         final FetchMemberService service = new FetchMemberService(settings, entityManager);
         final MemberEntity member = findFirstMember();
-        final FetchMemberRequest request = prepareRequest(FetchMemberRequest.class, "member1");
+        final FetchMemberRequest request = prepareRequest(FetchMemberRequest.class, MEMBER_1);
         request.setMemberId(member.getExternalId());
         final FetchMemberResponse response = service.perform(request);
 
@@ -403,7 +403,7 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
 
         final FetchMemberService service = new FetchMemberService(settings, entityManager);
         final MemberEntity member = findFirstMember();
-        final FetchMemberRequest request = prepareRequest(FetchMemberRequest.class, "member4");
+        final FetchMemberRequest request = prepareRequest(FetchMemberRequest.class, MEMBER_4);
         request.setMemberId(member.getExternalId());
         final FetchMemberResponse response = service.perform(request);
 
@@ -420,7 +420,7 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
 
         final FetchMemberService service = new FetchMemberService(settings, entityManager);
         final MemberEntity member = findFirstMember();
-        final FetchMemberRequest request = prepareRequest(FetchMemberRequest.class, "member5");
+        final FetchMemberRequest request = prepareRequest(FetchMemberRequest.class, MEMBER_5);
         request.setMemberId(member.getExternalId());
         final FetchMemberResponse response = service.perform(request);
 
@@ -437,7 +437,7 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
 
         final FetchMemberService service = new FetchMemberService(settings, entityManager);
         final MemberEntity member = findFirstMember();
-        final FetchMemberRequest request = prepareRequest(FetchMemberRequest.class, "member5");
+        final FetchMemberRequest request = prepareRequest(FetchMemberRequest.class, MEMBER_5);
         request.setMemberId(member.getExternalId());
         final FetchMemberResponse response = service.perform(request);
 

@@ -99,7 +99,7 @@ public final class DataTypeServiceTest extends DatabaseSetup {
                 "Cannot complete this request, as it is only allowed for the System Administrator.");
 
         final ProcessDataTypeService service = new ProcessDataTypeService(settings, entityManager);
-        final ProcessDataTypeRequest request = prepareRequest(ProcessDataTypeRequest.class, "member1");
+        final ProcessDataTypeRequest request = prepareRequest(ProcessDataTypeRequest.class, MEMBER_1);
         final DataType dataType = buildDataType("MyDataType", "The Data Type");
         request.setDataType(dataType);
         assertThat(request.getDataType(), is(not(nullValue())));

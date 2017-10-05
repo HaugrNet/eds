@@ -92,7 +92,7 @@ public class ShareServiceTest extends DatabaseSetup {
     @Test
     public void testFetchDataTypes() {
         final ShareService service = prepareShareService();
-        final FetchDataTypeRequest request = prepareRequest(FetchDataTypeRequest.class, "member1");
+        final FetchDataTypeRequest request = prepareRequest(FetchDataTypeRequest.class, MEMBER_1);
 
         final FetchDataTypeResponse response = service.fetchDataTypes(request);
         assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
@@ -134,7 +134,7 @@ public class ShareServiceTest extends DatabaseSetup {
     @Test
     public void testProcessData() {
         final ShareService service = prepareShareService();
-        final ProcessDataRequest request = prepareRequest(ProcessDataRequest.class, "member1");
+        final ProcessDataRequest request = prepareRequest(ProcessDataRequest.class, MEMBER_1);
         request.setAction(Action.PROCESS);
         request.setBytes("alfa beta gamma".getBytes(settings.getCharset()));
         final Metadata metadata = new Metadata();
@@ -179,7 +179,7 @@ public class ShareServiceTest extends DatabaseSetup {
     @Test
     public void testFetchData() {
         final ShareService service = prepareShareService();
-        final FetchDataRequest request = prepareRequest(FetchDataRequest.class, "member1");
+        final FetchDataRequest request = prepareRequest(FetchDataRequest.class, MEMBER_1);
         request.setCircleId("d8838d7d-71e7-433d-8790-af7c080e9de9");
 
         final FetchDataResponse response = service.fetchData(request);
@@ -218,13 +218,13 @@ public class ShareServiceTest extends DatabaseSetup {
     @Test
     public void testSignatures() {
         final ShareService service = prepareShareService();
-        final SignRequest signRequest = prepareRequest(SignRequest.class, "member1");
+        final SignRequest signRequest = prepareRequest(SignRequest.class, MEMBER_1);
         final byte[] data = "alfa".getBytes(settings.getCharset());
         signRequest.setData(data);
         final SignResponse signResponse = service.sign(signRequest);
         assertThat(signResponse.getReturnCode(), is(ReturnCode.SUCCESS));
 
-        final VerifyRequest verifyRequest = prepareRequest(VerifyRequest.class, "member2");
+        final VerifyRequest verifyRequest = prepareRequest(VerifyRequest.class, MEMBER_2);
         verifyRequest.setData(data);
         verifyRequest.setSignature(signResponse.getSignature());
         final VerifyResponse verifyResponse = service.verify(verifyRequest);
@@ -288,7 +288,7 @@ public class ShareServiceTest extends DatabaseSetup {
     @Test
     public void testFetchSignatures() {
         final ShareService service = prepareShareService();
-        final FetchSignatureRequest request = prepareRequest(FetchSignatureRequest.class, "member1");
+        final FetchSignatureRequest request = prepareRequest(FetchSignatureRequest.class, MEMBER_1);
 
         final FetchSignatureResponse response = service.fetchSignatures(request);
         assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));

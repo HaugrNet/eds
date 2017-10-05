@@ -23,13 +23,15 @@ import io.javadog.cws.model.DatabaseSetup;
 import org.junit.Test;
 
 /**
+ * <p>Common test class for the Process & Fetch Data Services.</p>
+ *
  * @author Kim Jensen
  * @since  CWS 1.0
  */
-public final class ProcessDataServiceTest extends DatabaseSetup {
+public final class DataServiceTest extends DatabaseSetup {
 
     @Test
-    public void testEmptyRequest() {
+    public void testEmptyProcessRequest() {
         prepareCause(VerificationException.class, ReturnCode.VERIFICATION_WARNING,
                 "Request Object contained errors:" +
                         "\nKey: credentialType, Error: CredentialType is missing, null or invalid." +
@@ -45,13 +47,29 @@ public final class ProcessDataServiceTest extends DatabaseSetup {
     }
 
     @Test
+    public void testEmptyFetchRequest() {
+        prepareCause(VerificationException.class, ReturnCode.VERIFICATION_WARNING,
+                "Request Object contained errors:" +
+                        "\nKey: credentialType, Error: CredentialType is missing, null or invalid." +
+                        "\nKey: credential, Error: Credential is missing, null or invalid." +
+                        "\nKey: circleId, Error: Either the CircleId or an Object Data Id must be provided." +
+                        "\nKey: account, Error: Account is missing, null or invalid.");
+
+        final FetchDataService service = new FetchDataService(settings, entityManager);
+        final FetchDataRequest request = new FetchDataRequest();
+        assertThat(request.getAccount(), is(nullValue()));
+
+        service.perform(request);
+    }
+
+    @Test
     public void testSavingAndReadingData() {
         final ProcessDataService service = new ProcessDataService(settings, entityManager);
         final FetchDataService dataService = new FetchDataService(settings, entityManager);
 
         // 1 MB large Data
         final byte[] data = generateData(1048576);
-        final ProcessDataRequest saveRequest = prepareRequest(ProcessDataRequest.class, "member1");
+        final ProcessDataRequest saveRequest = prepareRequest(ProcessDataRequest.class, MEMBER_1);
         final Metadata metaData = new Metadata();
         metaData.setCircleId(CIRCLE_1_ID);
         metaData.setName("MyData");
@@ -62,7 +80,7 @@ public final class ProcessDataServiceTest extends DatabaseSetup {
         final ProcessDataResponse saveResponse = service.perform(saveRequest);
         assertThat(saveResponse.getReturnCode(), is(ReturnCode.SUCCESS));
 
-        final FetchDataRequest fetchRequest = prepareRequest(FetchDataRequest.class, "member1");
+        final FetchDataRequest fetchRequest = prepareRequest(FetchDataRequest.class, MEMBER_1);
         fetchRequest.setDataId(saveResponse.getMetadata().getId());
         final FetchDataResponse fetchResponse = dataService.perform(fetchRequest);
         assertThat(fetchResponse.getReturnCode(), is(ReturnCode.SUCCESS));

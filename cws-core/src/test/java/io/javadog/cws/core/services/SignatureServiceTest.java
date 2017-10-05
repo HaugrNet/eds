@@ -44,19 +44,19 @@ public final class SignatureServiceTest extends DatabaseSetup {
         final VerifyService verifyService = new VerifyService(settings, entityManager);
         final SignService signService = new SignService(settings, entityManager);
 
-        final SignRequest signRequest = prepareRequest(SignRequest.class, "member1");
+        final SignRequest signRequest = prepareRequest(SignRequest.class, MEMBER_1);
         signRequest.setData(data);
         final SignResponse signResponse = signService.perform(signRequest);
         assertThat(signResponse.getReturnCode(), is(ReturnCode.SUCCESS));
 
-        final VerifyRequest verifyRequest = prepareRequest(VerifyRequest.class, "member2");
+        final VerifyRequest verifyRequest = prepareRequest(VerifyRequest.class, MEMBER_2);
         verifyRequest.setData(data);
         verifyRequest.setSignature(signResponse.getSignature());
         final VerifyResponse verifyResponse = verifyService.perform(verifyRequest);
         assertThat(verifyResponse.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(verifyResponse.getVerified(), is(true));
 
-        final FetchSignatureRequest fetchRequest = prepareRequest(FetchSignatureRequest.class, "member1");
+        final FetchSignatureRequest fetchRequest = prepareRequest(FetchSignatureRequest.class, MEMBER_1);
         final FetchSignatureResponse fetchResponse = fetchService.perform(fetchRequest);
         assertThat(fetchResponse.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(fetchResponse.getSignatures().size(), is(1));
@@ -69,14 +69,14 @@ public final class SignatureServiceTest extends DatabaseSetup {
         final VerifyService verifyService = new VerifyService(settings, entityManager);
         final SignService signService = new SignService(settings, entityManager);
 
-        final SignRequest signRequest = prepareRequest(SignRequest.class, "member1");
+        final SignRequest signRequest = prepareRequest(SignRequest.class, MEMBER_1);
         signRequest.setData(data);
         // Let our new Signature expire in 5 minutes
         signRequest.setExpires(new Date(new Date().getTime() + 300000L));
         final SignResponse signResponse = signService.perform(signRequest);
         assertThat(signResponse.getReturnCode(), is(ReturnCode.SUCCESS));
 
-        final VerifyRequest verifyRequest = prepareRequest(VerifyRequest.class, "member2");
+        final VerifyRequest verifyRequest = prepareRequest(VerifyRequest.class, MEMBER_2);
         verifyRequest.setData(data);
         verifyRequest.setSignature(signResponse.getSignature());
         final VerifyResponse verifyResponse = verifyService.perform(verifyRequest);
@@ -91,13 +91,13 @@ public final class SignatureServiceTest extends DatabaseSetup {
         final VerifyService verifyService = new VerifyService(settings, entityManager);
         final SignService signService = new SignService(settings, entityManager);
 
-        final SignRequest signRequest = prepareRequest(SignRequest.class, "member1");
+        final SignRequest signRequest = prepareRequest(SignRequest.class, MEMBER_1);
         signRequest.setData(data);
         signRequest.setExpires(new Date());
         final SignResponse signResponse = signService.perform(signRequest);
         assertThat(signResponse.getReturnCode(), is(ReturnCode.SUCCESS));
 
-        final VerifyRequest verifyRequest = prepareRequest(VerifyRequest.class, "member2");
+        final VerifyRequest verifyRequest = prepareRequest(VerifyRequest.class, MEMBER_2);
         verifyRequest.setData(data);
         verifyRequest.setSignature(signResponse.getSignature());
         final VerifyResponse verifyResponse = verifyService.perform(verifyRequest);
@@ -112,12 +112,12 @@ public final class SignatureServiceTest extends DatabaseSetup {
         final VerifyService verifyService = new VerifyService(settings, entityManager);
         final SignService signService = new SignService(settings, entityManager);
 
-        final SignRequest signRequest = prepareRequest(SignRequest.class, "member1");
+        final SignRequest signRequest = prepareRequest(SignRequest.class, MEMBER_1);
         signRequest.setData(data);
         final SignResponse signResponse = signService.perform(signRequest);
         assertThat(signResponse.getReturnCode(), is(ReturnCode.SUCCESS));
 
-        final VerifyRequest verifyRequest = prepareRequest(VerifyRequest.class, "member2");
+        final VerifyRequest verifyRequest = prepareRequest(VerifyRequest.class, MEMBER_2);
         final byte[] wrongData = generateData(524288);
         verifyRequest.setData(wrongData);
         verifyRequest.setSignature(signResponse.getSignature());
@@ -131,7 +131,7 @@ public final class SignatureServiceTest extends DatabaseSetup {
         final byte[] data = generateData(524288);
         final String signature = "VYU8uIyr54AZGeM4aUilgEItfI39/b4YpFcry8ByJYVuJoI0gxNLiw9CMCaocOfXyGkmQJuI4KvL1lhNN6jnsY51OYxsxcJKUBgMnGMRdp9mr+ryiduotTYeD9Z+IyWXdUlQ9W3N/TX1uqLwVCh9qrngXtnOXx5rnZrWybQPsoLEnVOXvkL94Et0EcIUe6spRbaR+8I4oCtGToLcMCZdD32z6suhIfqz9UFiU10W01T2ebNV4SuTf56RSZ1vyWix6C8GJhwLqWE697femoqBWh1UYgKsi5x6d1SYC7ZWSxVj61PpPJ3MfzAxVc5rqJDk1og3zfciDWPMJmF4aJ60Sg==";
         final VerifyService verifyService = new VerifyService(settings, entityManager);
-        final VerifyRequest request = prepareRequest(VerifyRequest.class, "member1");
+        final VerifyRequest request = prepareRequest(VerifyRequest.class, MEMBER_1);
         request.setData(data);
         request.setSignature(signature);
 

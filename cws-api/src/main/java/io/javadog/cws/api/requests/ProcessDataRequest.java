@@ -12,7 +12,6 @@ import static io.javadog.cws.api.common.Utilities.copy;
 import io.javadog.cws.api.common.Action;
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.dtos.Authentication;
-import io.javadog.cws.api.dtos.Metadata;
 
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -28,26 +27,38 @@ import java.util.Set;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "processDataRequest", propOrder = { "action", "dataId", "metadata", "bytes" })
+@XmlType(name = "processDataRequest", propOrder = { "action", "id", "circleId", "folderId", "name", "typeName", "bytes" })
 public final class ProcessDataRequest extends Authentication {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
-    private static final Set<Action> ALLOWED = EnumSet.of(Action.PROCESS, Action.DELETE);
+    private static final Set<Action> ALLOWED = EnumSet.of(Action.ADD, Action.UPDATE, Action.DELETE);
 
     private static final String FIELD_ACTION = "action";
-    private static final String FIELD_DATA_ID = "dataId";
-    private static final String FIELD_DATA = "metadata";
+    private static final String FIELD_ID = "id";
+    private static final String FIELD_CIRCLE_ID = "circleId";
+    private static final String FIELD_FOLDER_ID = "folderId";
+    private static final String FIELD_NAME = "name";
+    private static final String FIELD_TYPENAME = "typeName";
     private static final String FIELD_BYTES = "bytes";
 
     @XmlElement(name = FIELD_ACTION, required = true)
     private Action action = Action.PROCESS;
 
-    @XmlElement(name = FIELD_DATA_ID, nillable = true, required = true)
-    private String dataId = null;
+    @XmlElement(name = FIELD_ID, nillable = true, required = true)
+    private String id = null;
 
-    @XmlElement(name = FIELD_DATA, nillable = true, required = true)
-    private Metadata metadata = null;
+    @XmlElement(name = FIELD_CIRCLE_ID, nillable = true)
+    private String circleId = null;
+
+    @XmlElement(name = FIELD_FOLDER_ID, nillable = true)
+    private String folderId = null;
+
+    @XmlElement(name = FIELD_NAME, nillable = true)
+    private String name = null;
+
+    @XmlElement(name = FIELD_TYPENAME)
+    private String typeName = null;
 
     @XmlElement(name = FIELD_BYTES, nillable = true)
     private byte[] bytes = null;
@@ -78,22 +89,45 @@ public final class ProcessDataRequest extends Authentication {
         return action;
     }
 
-    public void setDataId(final String dataId) {
-        ensureValidId(FIELD_DATA_ID, dataId);
-        this.dataId = dataId;
+    public void setId(final String id) {
+        ensureValidId(FIELD_ID, id);
+        this.id = id;
     }
 
-    public String getDataId() {
-        return dataId;
+    public String getId() {
+        return id;
     }
 
-    public void setMetadata(final Metadata metadata) {
-        ensureVerifiable(FIELD_DATA, metadata);
-        this.metadata = metadata;
+    public void setCircleId(final String circleId) {
+        this.circleId = circleId;
     }
 
-    public Metadata getMetadata() {
-        return metadata;
+    public String getCircleId() {
+        return circleId;
+    }
+
+    public void setFolderId(final String folderId) {
+        this.folderId = folderId;
+    }
+
+    public String getFolderId() {
+        return folderId;
+    }
+
+    public void setName(final String name) {
+        this.name = name;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setTypeName(final String typeName) {
+        this.typeName = typeName;
+    }
+
+    public String getTypeName() {
+        return typeName;
     }
 
     public void setBytes(final byte[] bytes) {
@@ -118,18 +152,21 @@ public final class ProcessDataRequest extends Authentication {
         if (action == null) {
             errors.put(FIELD_ACTION, "No action has been provided.");
         } else {
-            if (action == Action.PROCESS) {
-                if (metadata == null) {
-                    errors.put(FIELD_DATA, "Data is missing, null or invalid.");
-                } else {
-                    errors.putAll(metadata.validate());
-                }
-            } else if (action == Action.DELETE) {
-                if (dataId == null) {
-                    errors.put(FIELD_DATA_ID, "Missing or invalid Data Id.");
-                }
-            } else {
-                errors.put(FIELD_ACTION, "Invalid Action provided.");
+            switch (action) {
+                case ADD:
+                    checkNotNullAndValidId(errors, FIELD_CIRCLE_ID, circleId, "The Circle Id is missing or invalid.");
+                    checkValidId(errors, FIELD_FOLDER_ID, folderId, "The Folder Id is invalid.");
+                    checkNotNullEmptyOrTooLong(errors, FIELD_NAME, name, 256, "The name of the new Data Object is missing or invalid.");
+                    checkNotNullOrEmpty(errors, FIELD_TYPENAME, typeName, "The Data Type is missing or invalid.");
+                    break;
+                case UPDATE:
+                    checkNotNullAndValidId(errors, FIELD_ID, id, "The Id is missing or invalid.");
+                    break;
+                case DELETE:
+                    checkNotNullAndValidId(errors, FIELD_ID, id, "The Id is missing or invalid.");
+                    break;
+                default:
+                    errors.put(FIELD_ACTION, "Invalid Action provided.");
             }
         }
 

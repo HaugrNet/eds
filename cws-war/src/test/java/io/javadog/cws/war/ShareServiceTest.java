@@ -16,7 +16,6 @@ import io.javadog.cws.api.common.Action;
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.dtos.DataType;
-import io.javadog.cws.api.dtos.Metadata;
 import io.javadog.cws.api.requests.FetchDataRequest;
 import io.javadog.cws.api.requests.FetchDataTypeRequest;
 import io.javadog.cws.api.requests.FetchSignatureRequest;
@@ -135,18 +134,16 @@ public class ShareServiceTest extends DatabaseSetup {
     public void testProcessData() {
         final ShareService service = prepareShareService();
         final ProcessDataRequest request = prepareRequest(ProcessDataRequest.class, MEMBER_1);
-        request.setAction(Action.PROCESS);
+        request.setAction(Action.ADD);
         request.setBytes("alfa beta gamma".getBytes(settings.getCharset()));
-        final Metadata metadata = new Metadata();
-        metadata.setCircleId("d8838d7d-71e7-433d-8790-af7c080e9de9");
-        metadata.setName("Data Name");
-        metadata.setTypeName("data");
-        request.setMetadata(metadata);
+        request.setCircleId("d8838d7d-71e7-433d-8790-af7c080e9de9");
+        request.setName("Data Name");
+        request.setTypeName("data");
 
         final ProcessDataResponse response = service.processData(request);
         assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(response.getReturnMessage(), is("Ok"));
-        assertThat(response.getMetadata().getId(), is(not(nullValue())));
+        assertThat(response.getId(), is(not(nullValue())));
     }
 
     @Test

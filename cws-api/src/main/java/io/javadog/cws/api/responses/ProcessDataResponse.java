@@ -9,7 +9,6 @@ package io.javadog.cws.api.responses;
 
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
-import io.javadog.cws.api.dtos.Metadata;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -21,14 +20,14 @@ import javax.xml.bind.annotation.XmlType;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "processDataResult", propOrder = "metadata")
+@XmlType(name = "processDataResult", propOrder = "id")
 public final class ProcessDataResponse extends CwsResponse {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
-    @XmlElement(name = "metadata", required = true)
-    private Metadata metadata = null;
+    @XmlElement(name = "id", required = true)
+    private String id = null;
 
     // =========================================================================
     // Object Constructors
@@ -57,11 +56,11 @@ public final class ProcessDataResponse extends CwsResponse {
     // Standard Setters & Getters
     // =========================================================================
 
-    public void setMetadata(final Metadata metadata) {
-        this.metadata = metadata;
+    public void setId(final String id) {
+        this.id = id;
     }
 
-    public Metadata getMetadata() {
-        return metadata;
+    public String getId() {
+        return id;
     }
 }

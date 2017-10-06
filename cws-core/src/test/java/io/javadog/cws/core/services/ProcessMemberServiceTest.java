@@ -46,7 +46,7 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
     public void testAdding() {
         final String account = "Created Member";
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
-        final ProcessMemberRequest request = prepareAdminRequest();
+        final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
         request.setAction(Action.CREATE);
         request.setAccountName(account);
         request.setNewCredential(account);
@@ -61,7 +61,7 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
 
         final String account = MEMBER_4;
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
-        final ProcessMemberRequest request = prepareAdminRequest();
+        final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
         request.setAction(Action.CREATE);
         request.setAccountName(account);
         request.setNewCredential(account);
@@ -73,7 +73,7 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
     @Test
     public void testInvitation() {
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
-        final ProcessMemberRequest request = prepareAdminRequest();
+        final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
         request.setAction(Action.INVITE);
         request.setAccountName("invitee");
 
@@ -95,7 +95,7 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
     public void testInvitationWithInvalidSignature() {
         final String bogusSignature = "T+OoZiBpm36P868XUZYWFsW1jUFlD31x+FeQuDjcm4DmmIk+qWd8KuUzLdnETRPIxo/OuYLcpvFiPxMf0v78feiw/yVVV5+1xjO+FR/KYgB4JTaJ6p0RIEpS3rjs27bY+1OYclsk4MPRKbxZN06ZFHlSY4btk1G4ML7x0/iUCLBbOO2y3S4JZpKwAR7kAyhVeqyi8qKi13o+7z/J0KP2EhHrF8+2y3z63TKLyClZRrAhvy3/g/k0q7MccFOKDGsxxIpe2jfOHtxLEYfbgrdly/fZHEQL5vbbf/LbQ7MISfcwXSLtJMD0COXsm/V1nkmI/ficjskvNuUj+h739KEmuQ==";
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
-        final ProcessMemberRequest request = prepareAdminRequest();
+        final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
         request.setAction(Action.INVITE);
         request.setAccountName("invitee");
 
@@ -115,7 +115,7 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
     public void testInvitationWithInvalidSignature2() {
         prepareCause(CryptoException.class, ReturnCode.CRYPTO_ERROR, "Illegal base64 character 2d");
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
-        final ProcessMemberRequest request = prepareAdminRequest();
+        final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
         request.setAction(Action.INVITE);
         request.setAccountName("invitee");
 
@@ -159,7 +159,7 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
     @Test
     public void testInviteExistingAccount() {
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
-        final ProcessMemberRequest request = prepareAdminRequest();
+        final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
         request.setAction(Action.INVITE);
         request.setAccountName(MEMBER_4);
 
@@ -208,7 +208,7 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
     @Test
     public void testDeleteMember() {
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
-        final ProcessMemberRequest request = prepareAdminRequest();
+        final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
         request.setAction(Action.DELETE);
         // Member 2
         request.setMemberId("d842fa67-5387-44e6-96e3-4e8a7ead4c8d");
@@ -220,7 +220,7 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
     @Test
     public void testDeleteUnknownAccount() {
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
-        final ProcessMemberRequest request = prepareAdminRequest();
+        final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
         request.setAction(Action.DELETE);
         // Random MemberId, should not exist!
         request.setMemberId(UUID.randomUUID().toString());
@@ -233,16 +233,12 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
     @Test
     public void testDeleteAdmin() {
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
-        final ProcessMemberRequest request = prepareAdminRequest();
+        final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
         request.setAction(Action.DELETE);
         request.setMemberId(ADMIN_ID);
 
         final ProcessMemberResponse response = service.perform(request);
         assertThat(response.getReturnCode(), is(ReturnCode.IDENTIFICATION_ERROR));
         assertThat(response.getReturnMessage(), is("It is not permitted to delete the Admin Account."));
-    }
-
-    private static ProcessMemberRequest prepareAdminRequest() {
-        return prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
     }
 }

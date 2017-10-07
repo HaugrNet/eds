@@ -71,11 +71,6 @@ public abstract class Verifiable implements Serializable {
         }
     }
 
-    protected static void checkNotNullEmptyOrTooLong(final Map<String, String> errors, final String field, final String value, final int maxLength, final String message) {
-        checkNotNullOrEmpty(errors, field, value, message);
-        checkNotTooLong(errors, field, value, maxLength, message);
-    }
-
     protected static void checkValidId(final Map<String, String> errors, final String field, final String value, final String message) {
         if (value != null) {
             final Pattern pattern = Pattern.compile(Constants.ID_PATTERN_REGEX);

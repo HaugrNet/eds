@@ -81,6 +81,36 @@ public final class DataServiceTest extends DatabaseSetup {
     }
 
     @Test
+    public void testSaveAndUpdateData() {
+        final ProcessDataService service = new ProcessDataService(settings, entityManager);
+        final FetchDataService dataService = new FetchDataService(settings, entityManager);
+
+        // 1 MB large Data
+        final ProcessDataRequest saveRequest = prepareAddRequest(MEMBER_1, CIRCLE_1_ID, "My Data", 1048576);
+        final ProcessDataResponse saveResponse = service.perform(saveRequest);
+        assertThat(saveResponse.getReturnCode(), is(ReturnCode.SUCCESS));
+
+        final FetchDataRequest fetchRequest1 = prepareRequest(FetchDataRequest.class, MEMBER_1);
+        fetchRequest1.setDataId(saveResponse.getId());
+        final FetchDataResponse fetchResponse1 = dataService.perform(fetchRequest1);
+        assertThat(fetchResponse1.getReturnCode(), is(ReturnCode.SUCCESS));
+
+        final ProcessDataRequest updateRequest = prepareUpdateRequest(MEMBER_1, saveResponse.getId());
+        updateRequest.setName("New Name");
+        final ProcessDataResponse updateResponse = service.perform(updateRequest);
+        assertThat(updateResponse.getReturnCode(), is(ReturnCode.SUCCESS));
+
+        assertThat(saveResponse.getReturnCode(), is(ReturnCode.SUCCESS));
+        final FetchDataRequest fetchRequest2 = prepareRequest(FetchDataRequest.class, MEMBER_1);
+        fetchRequest2.setDataId(saveResponse.getId());
+        final FetchDataResponse fetchResponse2 = dataService.perform(fetchRequest2);
+        assertThat(fetchResponse2.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(fetchResponse1.getData().get(0).getId(), is(fetchResponse2.getData().get(0).getId()));
+        assertThat(fetchResponse1.getData().get(0).getName(), is("My Data"));
+        assertThat(fetchResponse2.getData().get(0).getName(), is("New Name"));
+    }
+
+    @Test
     public void testSaveAndDeleteData() {
         final ProcessDataService service = new ProcessDataService(settings, entityManager);
         final ProcessDataRequest saveRequest = prepareAddRequest(MEMBER_1, CIRCLE_1_ID, "The Data", 524288);

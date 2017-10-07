@@ -374,7 +374,6 @@ CREATE TABLE metadata (
   CONSTRAINT metadata_notafter_parent_id    CHECK (parent_id < id),
   CONSTRAINT metadata_notnull_circle_id     CHECK (circle_id IS NOT NULL),
   CONSTRAINT metadata_notnull_type_id       CHECK (datatype_id IS NOT NULL),
-  CONSTRAINT metadata_notnull_name          CHECK (name IS NOT NULL),
   CONSTRAINT metadata_notnull_modified      CHECK (modified IS NOT NULL),
   CONSTRAINT metadata_notnull_created       CHECK (created IS NOT NULL)
 );

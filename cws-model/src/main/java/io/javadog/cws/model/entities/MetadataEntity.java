@@ -69,7 +69,7 @@ public class MetadataEntity extends Externable {
     @JoinColumn(name = "datatype_id",  referencedColumnName = "id", nullable = false, updatable = false)
     private DataTypeEntity type = null;
 
-    @Column(name = "name", nullable = false)
+    @Column(name = "name", length = 256)
     private String name = null;
 
     // =========================================================================

@@ -7,6 +7,8 @@
  */
 package io.javadog.cws.api.requests;
 
+import static io.javadog.cws.api.common.Constants.MAX_STRING_LENGTH;
+
 import io.javadog.cws.api.common.Action;
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.TrustLevel;
@@ -90,7 +92,7 @@ public final class ProcessCircleRequest extends Authentication {
     }
 
     public void setCircleName(final String circleName) {
-        ensureNotEmptyOrTooLong(FIELD_CIRCLE_NAME, circleName, 256);
+        ensureNotEmptyOrTooLong(FIELD_CIRCLE_NAME, circleName, MAX_STRING_LENGTH);
         this.circleName = circleName;
     }
 

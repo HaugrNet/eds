@@ -7,6 +7,8 @@
  */
 package io.javadog.cws.model.entities;
 
+import static io.javadog.cws.api.common.Constants.MAX_STRING_LENGTH;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -44,10 +46,10 @@ public class DataEntity extends CWSEntity {
     @Column(name = "encrypted_data", nullable = false)
     private byte[] data = null;
 
-    @Column(name = "initial_vector", nullable = false, updatable = false, length = 256)
+    @Column(name = "initial_vector", nullable = false, updatable = false, length = MAX_STRING_LENGTH)
     private String initialVector = null;
 
-    @Column(name = "checksum", nullable = false, length = 256)
+    @Column(name = "checksum", nullable = false, length = MAX_STRING_LENGTH)
     private String checksum = null;
 
     // =========================================================================

@@ -106,7 +106,7 @@ public abstract class Verifiable implements Serializable {
         }
     }
 
-    protected void ensureNotNullOrTooLong(final String field, final String value, final int max) {
+    protected void ensureNotNullEmptyOrTooLong(final String field, final String value, final int max) {
         if (value != null) {
             if (value.isEmpty()) {
                 throw new IllegalArgumentException(PRE_VALUE + field + "' is empty.");

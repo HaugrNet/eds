@@ -7,6 +7,8 @@
  */
 package io.javadog.cws.model.entities;
 
+import static io.javadog.cws.api.common.Constants.MAX_STRING_LENGTH;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -69,7 +71,7 @@ public class MetadataEntity extends Externable {
     @JoinColumn(name = "datatype_id",  referencedColumnName = "id", nullable = false, updatable = false)
     private DataTypeEntity type = null;
 
-    @Column(name = "name", length = 256)
+    @Column(name = "name", length = MAX_STRING_LENGTH)
     private String name = null;
 
     // =========================================================================

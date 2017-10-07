@@ -7,6 +7,8 @@
  */
 package io.javadog.cws.model.entities;
 
+import static io.javadog.cws.api.common.Utilities.copy;
+
 import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -49,18 +51,18 @@ public class CWSEntity {
     }
 
     public void setModified(final Date modified) {
-        this.modified = (modified != null) ? new Date(modified.getTime()) : null;
+        this.modified = copy(modified);
     }
 
     public Date getModified() {
-        return (modified != null) ? new Date(modified.getTime()) : null;
+        return copy(modified);
     }
 
     public void setCreated(final Date created) {
-        this.created = (created != null) ? new Date(created.getTime()) : null;
+        this.created = copy(created);
     }
 
     public Date getCreated() {
-        return (created != null) ? new Date(created.getTime()) : null;
+        return copy(created);
     }
 }

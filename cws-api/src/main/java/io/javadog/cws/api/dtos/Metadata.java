@@ -7,6 +7,7 @@
  */
 package io.javadog.cws.api.dtos;
 
+import static io.javadog.cws.api.common.Constants.MAX_STRING_LENGTH;
 import static io.javadog.cws.api.common.Utilities.copy;
 
 import io.javadog.cws.api.common.Constants;
@@ -33,7 +34,6 @@ public final class Metadata extends Verifiable {
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
-    private static final int MAX_LENGTH = 256;
     private static final String FIELD_ID = "id";
     private static final String FIELD_CIRCLE_ID = "circleId";
     private static final String FIELD_FOLDER_ID = "folderId";
@@ -93,9 +93,9 @@ public final class Metadata extends Verifiable {
         return folderId;
     }
 
-    @Size(max = MAX_LENGTH)
+    @Size(max = MAX_STRING_LENGTH)
     public void setName(final String name) {
-        ensureNotNullOrTooLong(FIELD_NAME, name, MAX_LENGTH);
+        ensureNotNullEmptyOrTooLong(FIELD_NAME, name, MAX_STRING_LENGTH);
         this.name = name;
     }
 
@@ -103,9 +103,9 @@ public final class Metadata extends Verifiable {
         return name;
     }
 
-    @Size(min = 1, max = MAX_LENGTH)
+    @Size(min = 1, max = MAX_STRING_LENGTH)
     public void setTypeName(final String typeName) {
-        ensureNotNullOrTooLong(FIELD_TYPENAME, typeName, MAX_LENGTH);
+        ensureNotNullEmptyOrTooLong(FIELD_TYPENAME, typeName, MAX_STRING_LENGTH);
         this.typeName = typeName;
     }
 
@@ -134,10 +134,10 @@ public final class Metadata extends Verifiable {
             checkNotNull(errors, FIELD_CIRCLE_ID, circleId, "The Circle Id is required for new Data Objects.");
             checkPattern(errors, FIELD_CIRCLE_ID, circleId, Constants.ID_PATTERN_REGEX, "The Circle Id is invalid.");
             checkNotNull(errors, FIELD_TYPENAME, typeName, "The DataType Name is required for new Data Objects.");
-            checkNotTooLong(errors, FIELD_TYPENAME, typeName, MAX_LENGTH, "The name of the DataType may not exceed " + MAX_LENGTH + " characters.");
+            checkNotTooLong(errors, FIELD_TYPENAME, typeName, MAX_STRING_LENGTH, "The name of the DataType may not exceed " + MAX_STRING_LENGTH + " characters.");
         }
 
-        checkNotTooLong(errors, FIELD_NAME, name, MAX_LENGTH, "The name of the Data Object may not exceed " + MAX_LENGTH + " characters.");
+        checkNotTooLong(errors, FIELD_NAME, name, MAX_STRING_LENGTH, "The name of the Data Object may not exceed " + MAX_STRING_LENGTH + " characters.");
         checkPattern(errors, FIELD_FOLDER_ID, folderId, Constants.ID_PATTERN_REGEX, "The Folder Id is invalid.");
 
         return errors;

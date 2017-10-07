@@ -7,6 +7,8 @@
  */
 package io.javadog.cws.api.requests;
 
+import static io.javadog.cws.api.common.Constants.MAX_STRING_LENGTH;
+
 import io.javadog.cws.api.common.Action;
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.dtos.Authentication;
@@ -32,7 +34,6 @@ public final class ProcessMemberRequest extends Authentication {
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
     private static final Set<Action> ALLOWED = EnumSet.of(Action.CREATE, Action.INVITE, Action.PROCESS, Action.DELETE);
 
-    private static final int MAX_NAME_LENGTH = 256;
     private static final String FIELD_ACTION = "action";
     private static final String FIELD_MEMBER_ID = "memberId";
     private static final String FIELD_ACCOUNT_NAME = "accountName";
@@ -87,7 +88,7 @@ public final class ProcessMemberRequest extends Authentication {
     }
 
     public void setAccountName(final String accountName) {
-        ensureNotEmptyOrTooLong(FIELD_ACCOUNT_NAME, accountName, MAX_NAME_LENGTH);
+        ensureNotEmptyOrTooLong(FIELD_ACCOUNT_NAME, accountName, MAX_STRING_LENGTH);
         this.accountName = accountName;
     }
 
@@ -126,7 +127,7 @@ public final class ProcessMemberRequest extends Authentication {
                     checkNotNullOrEmpty(errors, FIELD_ACCOUNT_NAME, accountName, "The Account Name os missing.");
                     break;
                 case PROCESS:
-                    checkNotTooLong(errors, FIELD_ACCOUNT_NAME, accountName, MAX_NAME_LENGTH, "The " + FIELD_ACCOUNT_NAME + " may not exceed " + MAX_NAME_LENGTH + " characters.");
+                    checkNotTooLong(errors, FIELD_ACCOUNT_NAME, accountName, MAX_STRING_LENGTH, "The " + FIELD_ACCOUNT_NAME + " may not exceed " + MAX_STRING_LENGTH + " characters.");
                     break;
                 case DELETE:
                     checkNotNullAndValidId(errors, FIELD_MEMBER_ID, memberId, "A valid " + FIELD_MEMBER_ID + " is required to delete an account.");

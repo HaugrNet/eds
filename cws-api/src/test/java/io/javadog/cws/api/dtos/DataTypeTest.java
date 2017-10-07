@@ -7,6 +7,7 @@
  */
 package io.javadog.cws.api.dtos;
 
+import static io.javadog.cws.api.common.Constants.MAX_STRING_LENGTH;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
@@ -142,7 +143,7 @@ public final class DataTypeTest {
 
         final Map<String, String> errors = type.validate();
         assertThat(errors.size(), is(2));
-        assertThat(errors.get("name"), is("The Name is longer than the allowed 256 characters."));
-        assertThat(errors.get("type"), is("The Type is longer than the allowed 256 characters."));
+        assertThat(errors.get("name"), is("The Name is longer than the allowed " + MAX_STRING_LENGTH + " characters."));
+        assertThat(errors.get("type"), is("The Type is longer than the allowed " + MAX_STRING_LENGTH + " characters."));
     }
 }

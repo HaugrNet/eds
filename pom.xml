@@ -15,7 +15,7 @@
         <!-- The destination file for the code coverage report has to be set to
              the same value for each module pom. This will allow JaCoCo to sum
              up information in the same report, providing cross-module coverage. -->
-        <sonar.jacoco.reportPath>${project.basedir}/target/jacoco.exec</sonar.jacoco.reportPath>
+        <sonar.jacoco.reportPath>${project.basedir}/../target/jacoco.exec</sonar.jacoco.reportPath>
         <!-- Sonar is by default analyzing everything. But Generated Code is
              beyond our control, so error reports from this is just annoying!
              Legend: *  - zero or more characters

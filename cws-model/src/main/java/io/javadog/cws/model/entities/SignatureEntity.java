@@ -7,6 +7,8 @@
  */
 package io.javadog.cws.model.entities;
 
+import static io.javadog.cws.api.common.Constants.MAX_STRING_LENGTH;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -42,7 +44,7 @@ public final class SignatureEntity extends CWSEntity {
     @JoinColumn(name = "member_id", referencedColumnName = "id", nullable = false, updatable = false)
     private MemberEntity member = null;
 
-    @Column(name = "checksum", updatable = false, length = 256)
+    @Column(name = "checksum", updatable = false, length = MAX_STRING_LENGTH)
     private String checksum = null;
 
     @Temporal(TemporalType.TIMESTAMP)

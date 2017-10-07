@@ -7,6 +7,8 @@
  */
 package io.javadog.cws.api.dtos;
 
+import static io.javadog.cws.api.common.Constants.MAX_STRING_LENGTH;
+
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.Verifiable;
 
@@ -29,7 +31,6 @@ public final class DataType extends Verifiable {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
-    private static final int MAX_LENGTH = 256;
     private static final String FIELD_NAME = "name";
     private static final String FIELD_TYPE = "type";
 
@@ -44,10 +45,10 @@ public final class DataType extends Verifiable {
     // =========================================================================
 
     @NotNull
-    @Size(min = 1, max = MAX_LENGTH)
+    @Size(min = 1, max = MAX_STRING_LENGTH)
     public void setName(final String name) {
         ensureNotNull(FIELD_NAME, name);
-        ensureNotEmptyOrTooLong(FIELD_NAME, name, MAX_LENGTH);
+        ensureNotEmptyOrTooLong(FIELD_NAME, name, MAX_STRING_LENGTH);
         this.name = name;
     }
 
@@ -56,10 +57,10 @@ public final class DataType extends Verifiable {
     }
 
     @NotNull
-    @Size(min = 1, max = MAX_LENGTH)
+    @Size(min = 1, max = MAX_STRING_LENGTH)
     public void setType(final String type) {
         ensureNotNull(FIELD_TYPE, type);
-        ensureNotEmptyOrTooLong(FIELD_TYPE, type, MAX_LENGTH);
+        ensureNotEmptyOrTooLong(FIELD_TYPE, type, MAX_STRING_LENGTH);
         this.type = type;
     }
 
@@ -80,10 +81,10 @@ public final class DataType extends Verifiable {
 
         checkNotNull(errors, FIELD_NAME, name, "The Name is not defined.");
         checkNotEmpty(errors, FIELD_NAME, name, "The Name may not be empty.");
-        checkNotTooLong(errors, FIELD_NAME, name, MAX_LENGTH, "The Name is longer than the allowed " + MAX_LENGTH + " characters.");
+        checkNotTooLong(errors, FIELD_NAME, name, MAX_STRING_LENGTH, "The Name is longer than the allowed " + MAX_STRING_LENGTH + " characters.");
         checkNotNull(errors, FIELD_TYPE, type, "The Type is not defined.");
         checkNotEmpty(errors, FIELD_TYPE, type, "The Type may not be empty.");
-        checkNotTooLong(errors, FIELD_TYPE, type, MAX_LENGTH, "The Type is longer than the allowed " + MAX_LENGTH + " characters.");
+        checkNotTooLong(errors, FIELD_TYPE, type, MAX_STRING_LENGTH, "The Type is longer than the allowed " + MAX_STRING_LENGTH + " characters.");
 
         return errors;
     }

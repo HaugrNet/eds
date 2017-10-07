@@ -8,6 +8,7 @@
 package io.javadog.cws.api.dtos;
 
 import static io.javadog.cws.api.ReflectiveTesting.reflectiveCorrection;
+import static io.javadog.cws.api.common.Constants.MAX_STRING_LENGTH;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -141,7 +142,7 @@ public final class DataTest {
     @Test
     public void testTooLongName() {
         expected.expect(IllegalArgumentException.class);
-        expected.expectMessage("The value for 'name' is longer than the maximum length of 256.");
+        expected.expectMessage("The value for 'name' is longer than the maximum length of " + MAX_STRING_LENGTH +'.');
 
         final Metadata data = new Metadata();
         data.setName(LONG_NAME);
@@ -159,7 +160,7 @@ public final class DataTest {
     @Test
     public void testTooLongTypeName() {
         expected.expect(IllegalArgumentException.class);
-        expected.expectMessage("The value for 'typeName' is longer than the maximum length of 256.");
+        expected.expectMessage("The value for 'typeName' is longer than the maximum length of " + MAX_STRING_LENGTH + '.');
 
         final Metadata data = new Metadata();
         data.setTypeName(LONG_NAME);
@@ -177,7 +178,7 @@ public final class DataTest {
         assertThat(errors.isEmpty(), is(false));
         assertThat(errors.size(), is(3));
         assertThat(errors.get("id"), is("The Data Id is invalid."));
-        assertThat(errors.get("name"), is("The name of the Data Object may not exceed 256 characters."));
+        assertThat(errors.get("name"), is("The name of the Data Object may not exceed " + MAX_STRING_LENGTH + " characters."));
         assertThat(errors.get("folderId"), is("The Folder Id is invalid."));
     }
 
@@ -196,7 +197,7 @@ public final class DataTest {
         assertThat(errors.size(), is(4));
         assertThat(errors.get("circleId"), is("The Circle Id is required for new Data Objects."));
         assertThat(errors.get("folderId"), is("The Folder Id is invalid."));
-        assertThat(errors.get("name"), is("The name of the Data Object may not exceed 256 characters."));
+        assertThat(errors.get("name"), is("The name of the Data Object may not exceed " + MAX_STRING_LENGTH + " characters."));
         assertThat(errors.get("typeName"), is("The DataType Name is required for new Data Objects."));
     }
 
@@ -215,7 +216,7 @@ public final class DataTest {
         assertThat(errors.size(), is(4));
         assertThat(errors.get("circleId"), is("The Circle Id is invalid."));
         assertThat(errors.get("folderId"), is("The Folder Id is invalid."));
-        assertThat(errors.get("name"), is("The name of the Data Object may not exceed 256 characters."));
-        assertThat(errors.get("typeName"), is("The name of the DataType may not exceed 256 characters."));
+        assertThat(errors.get("name"), is("The name of the Data Object may not exceed " + MAX_STRING_LENGTH + " characters."));
+        assertThat(errors.get("typeName"), is("The name of the DataType may not exceed " + MAX_STRING_LENGTH + " characters."));
     }
 }

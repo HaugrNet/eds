@@ -101,13 +101,7 @@ public final class CommonJpaDao implements CommonDao {
         final Query query = entityManager.createNamedQuery("member.findByName");
         query.setParameter("name", name);
 
-        final List<MemberEntity> found = query.getResultList();
-
-        if (found.size() > 1) {
-            throw new ModelException(ReturnCode.CONSTRAINT_ERROR, "Could not uniquely identify a member with '" + name + "'.");
-        }
-
-        return found.isEmpty() ? null : found.get(0);
+        return findSingleRecord(query);
     }
 
     /**
@@ -119,14 +113,10 @@ public final class CommonJpaDao implements CommonDao {
         query.setParameter("name", name);
         query.setParameter("externalCircleId", externalCircleId);
 
-        final List<MemberEntity> found = query.getResultList();
+        final List<MemberEntity> found = findList(query);
 
         if (found.isEmpty()) {
             throw new ModelException(ReturnCode.IDENTIFICATION_WARNING, "No Trustee information found for member '" + name + "' and circle '" + externalCircleId + "'.");
-        }
-
-        if (found.size() > 1) {
-            throw new ModelException(ReturnCode.CONSTRAINT_ERROR, "Could not uniquely identify a member with '" + name + "'.");
         }
 
         return found.get(0);
@@ -140,7 +130,7 @@ public final class CommonJpaDao implements CommonDao {
         final Query query = entityManager.createNamedQuery("trust.findByMemberId");
         query.setParameter("id", member.getId());
 
-        return query.getResultList();
+        return findList(query);
     }
 
     /**
@@ -152,7 +142,7 @@ public final class CommonJpaDao implements CommonDao {
         query.setParameter("id", member.getId());
         query.setParameter("externalCircleId", externalCircleId);
 
-        return query.getResultList();
+        return findList(query);
     }
 
     /**

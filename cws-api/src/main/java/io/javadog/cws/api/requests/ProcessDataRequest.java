@@ -7,6 +7,7 @@
  */
 package io.javadog.cws.api.requests;
 
+import static io.javadog.cws.api.common.Constants.MAX_STRING_LENGTH;
 import static io.javadog.cws.api.common.Utilities.copy;
 
 import io.javadog.cws.api.common.Action;
@@ -34,7 +35,6 @@ public final class ProcessDataRequest extends Authentication {
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
     private static final Set<Action> ALLOWED = EnumSet.of(Action.ADD, Action.UPDATE, Action.DELETE);
 
-    private static final int MAX_LENGTH = 256;
     private static final String FIELD_ACTION = "action";
     private static final String FIELD_ID = "id";
     private static final String FIELD_CIRCLE_ID = "circleId";
@@ -157,13 +157,13 @@ public final class ProcessDataRequest extends Authentication {
                 case ADD:
                     checkNotNullAndValidId(errors, FIELD_CIRCLE_ID, circleId, "The Circle Id is missing or invalid.");
                     checkValidId(errors, FIELD_FOLDER_ID, folderId, "The Folder Id is invalid.");
-                    checkNotTooLong(errors, FIELD_NAME, name, MAX_LENGTH, "The name of the new Data Object is invalid.");
+                    checkNotTooLong(errors, FIELD_NAME, name, MAX_STRING_LENGTH, "The name of the new Data Object is invalid.");
                     checkNotNullOrEmpty(errors, FIELD_TYPENAME, typeName, "The Data Type is missing or invalid.");
                     break;
                 case UPDATE:
                     checkNotNullAndValidId(errors, FIELD_ID, id, "The Id is missing or invalid.");
                     checkValidId(errors, FIELD_FOLDER_ID, folderId, "The Folder Id is invalid.");
-                    checkNotTooLong(errors, FIELD_NAME, name, MAX_LENGTH, "The name of the new Data Object is invalid.");
+                    checkNotTooLong(errors, FIELD_NAME, name, MAX_STRING_LENGTH, "The name of the new Data Object is invalid.");
                     break;
                 case DELETE:
                     checkNotNullAndValidId(errors, FIELD_ID, id, "The Id is missing or invalid.");

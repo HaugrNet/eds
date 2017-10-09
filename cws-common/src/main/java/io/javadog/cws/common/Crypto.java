@@ -99,7 +99,7 @@ public final class Crypto {
             key.setSalt(salt);
 
             return key;
-        } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+        } catch (IllegalArgumentException | NoSuchAlgorithmException | InvalidKeySpecException e) {
             throw new CryptoException(e.getMessage(), e);
         }
     }
@@ -111,7 +111,7 @@ public final class Crypto {
             final SecretKey key = generator.generateKey();
 
             return new CWSKey(algorithm, key);
-        } catch (NoSuchAlgorithmException e) {
+        } catch (IllegalArgumentException | NoSuchAlgorithmException e) {
             throw new CryptoException(e.getMessage(), e);
         }
     }
@@ -123,7 +123,7 @@ public final class Crypto {
             final KeyPair keyPair = generator.generateKeyPair();
 
             return new CWSKey(algorithm, keyPair);
-        } catch (NoSuchAlgorithmException e) {
+        } catch (IllegalArgumentException | NoSuchAlgorithmException e) {
             throw new CryptoException(e.getMessage(), e);
         }
     }
@@ -138,11 +138,7 @@ public final class Crypto {
             final byte[] hashed = digest.digest(bytes);
 
             return new String(hashed, settings.getCharset());
-        } catch (final NoSuchAlgorithmException e) {
-            // The MessageDigest method getInstance, if throwing a checked
-            // NoSuchAlgorithm Exception. However, as we only use internal
-            // values for the Algorithms, then we'll never face this problem.
-            // Hence, the exception is ignored
+        } catch (IllegalArgumentException | NoSuchAlgorithmException e) {
             throw new CryptoException(e.getMessage(), e);
         }
     }

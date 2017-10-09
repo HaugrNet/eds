@@ -16,6 +16,7 @@ import static org.junit.Assert.assertThat;
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.common.enums.KeyAlgorithm;
 import io.javadog.cws.common.exceptions.CWSException;
+import io.javadog.cws.common.exceptions.CryptoException;
 import io.javadog.cws.common.keys.CWSKey;
 import org.junit.Rule;
 import org.junit.Test;
@@ -39,9 +40,64 @@ public final class CryptoTest {
     public ExpectedException thrown = ExpectedException.none();
 
     @Test
+    public void testGeneratingPasswordKeyWithInvalidAlgorithm() {
+        thrown.expect(CryptoException.class);
+        thrown.expectMessage("RSA/ECB/PKCS1Padding SecretKeyFactory not available");
+
+        final Settings settings = new Settings();
+        settings.set(Settings.PBE_ALGORITHM, "RSA2048");
+        final Crypto crypto = new Crypto(settings);
+        final String salt = UUID.randomUUID().toString();
+        crypto.generatePasswordKey(KeyAlgorithm.AES128, "my secret", salt);
+    }
+
+    @Test
+    public void testGeneratingSymmetricKeyWithInvalidAlgorithm() {
+        thrown.expect(CryptoException.class);
+        thrown.expectMessage("RSA KeyGenerator not available");
+
+        final Settings settings = new Settings();
+        final Crypto crypto = new Crypto(settings);
+        crypto.generateSymmetricKey(KeyAlgorithm.RSA2048);
+    }
+
+    @Test
+    public void testGeneratingAsymmetricKeyWithInvalidAlgorithm() {
+        thrown.expect(CryptoException.class);
+        thrown.expectMessage("AES KeyPairGenerator not available");
+
+        final Settings settings = new Settings();
+        final Crypto crypto = new Crypto(settings);
+        crypto.generateAsymmetricKey(KeyAlgorithm.AES128);
+    }
+
+    @Test
+    public void testGeneratingChecksumWithInvalidAlgorithm() {
+        thrown.expect(CryptoException.class);
+        thrown.expectMessage("No enum constant io.javadog.cws.common.enums.HashAlgorithm.AES128");
+
+        final Settings settings = new Settings();
+        settings.set(Settings.HASH_ALGORITHM, "AES128");
+        final Crypto crypto = new Crypto(settings);
+        crypto.generateChecksum("Bla bla bla");
+    }
+
+    @Test
+    public void testSigningWithInvalidAlgorithm() {
+        thrown.expect(CryptoException.class);
+        thrown.expectMessage("AES/CBC/PKCS5Padding Signature not available");
+
+        final Settings settings = new Settings();
+        settings.set(Settings.SIGNATURE_ALGORITHM, "AES256");
+        final Crypto crypto = new Crypto(settings);
+        final CWSKey key = crypto.generateAsymmetricKey(KeyAlgorithm.RSA2048);
+        crypto.sign(key.getPrivate(), "bla bla bla".getBytes(settings.getCharset()));
+    }
+
+    @Test
     public void testSignature() {
         final Settings settings = new Settings();
-        final Crypto crypto = new Crypto(new Settings());
+        final Crypto crypto = new Crypto(settings);
         final CWSKey key = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
         final byte[] message = "Message to Sign".getBytes(settings.getCharset());
         final String signature = crypto.sign(key.getPrivate(), message);

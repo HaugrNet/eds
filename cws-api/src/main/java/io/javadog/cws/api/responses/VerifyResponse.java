@@ -56,7 +56,7 @@ public final class VerifyResponse extends CwsResponse {
         this.verified = verified;
     }
 
-    public boolean getVerified() {
+    public boolean isVerified() {
         return verified;
     }
 }

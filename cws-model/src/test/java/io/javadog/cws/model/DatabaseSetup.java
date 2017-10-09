@@ -10,8 +10,10 @@ package io.javadog.cws.model;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.hasProperty;
 
+import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.CredentialType;
 import io.javadog.cws.api.common.ReturnCode;
+import io.javadog.cws.api.common.TrustLevel;
 import io.javadog.cws.api.dtos.Authentication;
 import io.javadog.cws.common.Crypto;
 import io.javadog.cws.common.Settings;
@@ -21,8 +23,11 @@ import io.javadog.cws.common.exceptions.CWSException;
 import io.javadog.cws.common.keys.CWSKey;
 import io.javadog.cws.model.entities.CWSEntity;
 import io.javadog.cws.model.entities.CircleEntity;
+import io.javadog.cws.model.entities.DataTypeEntity;
 import io.javadog.cws.model.entities.KeyEntity;
 import io.javadog.cws.model.entities.MemberEntity;
+import io.javadog.cws.model.entities.MetadataEntity;
+import io.javadog.cws.model.entities.TrusteeEntity;
 import io.javadog.cws.model.jpa.CommonJpaDao;
 import org.junit.After;
 import org.junit.Before;
@@ -158,10 +163,6 @@ public class DatabaseSetup {
         thrown.expect(hasProperty(propertyName, is(returnCode)));
     }
 
-    // =========================================================================
-    // Helper Methods
-    // =========================================================================
-
     protected KeyEntity prepareKey() {
         final KeyEntity entity = new KeyEntity();
         entity.setAlgorithm(settings.getSymmetricAlgorithm());
@@ -215,5 +216,142 @@ public class DatabaseSetup {
         }
 
         return str;
+    }
+
+    /**
+     * This method will help build the
+     */
+    protected String prepareTestData() {
+        final StringBuilder builder = new StringBuilder(20000);
+        append(builder, "-- =============================================================================");
+        append(builder, "-- Following is TEST data, and should not be added in a PRODUCTION environment");
+        append(builder, "-- -----------------------------------------------------------------------------");
+        append(builder, "-- Unfortunately, JPA only allow setting 3 scripts when creating the database,");
+        append(builder, "-- the first is the actual model, which contain what is needed to setup the");
+        append(builder, "-- database, including all tables, views, procedures, constraints, etc. The");
+        append(builder, "-- second script is for the data (this one), but as we both need to have data");
+        append(builder, "-- for production and for testing, we're adding it all here. The final script");
+        append(builder, "-- is for destroying the database, which is needed of you have a real database");
+        append(builder, "-- and not just an in-memory database.");
+        append(builder, "-- =============================================================================");
+
+        append(builder, "");
+        append(builder, "-- Default Administrator User, it is set at the first request to the System, and");
+        append(builder, "-- is thus needed for loads of tests. Remaining Accounts is for \"member1\" to");
+        append(builder, "-- \"member5\", which is all used as part of the tests.");
+        append(builder, "INSERT INTO members (external_id, name, salt, algorithm, public_key, private_key) VALUES");
+
+        final CWSKey keyPair = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
+        createAndAppendMember(builder, ADMIN_ID, Constants.ADMIN_ACCOUNT, keyPair, ',');
+        final CWSKey keyPair1 = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
+        final MemberEntity member1 = createAndAppendMember(builder, MEMBER_1_ID, MEMBER_1, keyPair1, ',');
+        final CWSKey keyPair2 = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
+        final MemberEntity member2 = createAndAppendMember(builder, MEMBER_2_ID, MEMBER_2, keyPair2, ',');
+        final CWSKey keyPair3 = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
+        final MemberEntity member3 = createAndAppendMember(builder, MEMBER_3_ID, MEMBER_3, keyPair3, ',');
+        final CWSKey keyPair4 = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
+        final MemberEntity member4 = createAndAppendMember(builder, MEMBER_4_ID, MEMBER_4, keyPair4, ',');
+        final CWSKey keyPair5 = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
+        final MemberEntity member5 = createAndAppendMember(builder, MEMBER_5_ID, MEMBER_5, keyPair5, ';');
+
+        append(builder, "");
+        append(builder, "-- Default, we have 3 Circles as part of the test setup, using the very");
+        append(builder, "-- imaginative names, 'circle1' to 'circle3'.");
+        append(builder, "");
+        append(builder, "INSERT INTO circles (external_id, name) VALUES");
+        final CircleEntity circle1 = createAndAppendCircle(builder, CIRCLE_1_ID, CIRCLE_1, ',');
+        final CircleEntity circle2 = createAndAppendCircle(builder, CIRCLE_2_ID, CIRCLE_2, ',');
+        final CircleEntity circle3 = createAndAppendCircle(builder, CIRCLE_3_ID, CIRCLE_3, ';');
+
+        append(builder, "");
+        append(builder, "-- For each Circle, we need to have a unique Key, but with the same settings.");
+        append(builder, "INSERT INTO keys (algorithm, status) VALUES");
+        final KeyEntity key1 = createAndAppendKey(builder, ',');
+        final KeyEntity key2 = createAndAppendKey(builder, ',');
+        final KeyEntity key3 = createAndAppendKey(builder, ';');
+
+        append(builder, "");
+        append(builder, "-- For each Circle, we need to have root folder for all data.");
+        append(builder, "INSERT INTO metadata (external_id, parent_id, circle_id, datatype_id, name) VALUES");
+        createandAppendFolder(builder, circle1, ',');
+        createandAppendFolder(builder, circle2, ',');
+        createandAppendFolder(builder, circle3, ';');
+
+        append(builder, "");
+        append(builder, "-- With the Members created, and the Circles and Keys added, it is possible to");
+        append(builder, "-- also create a number of Trustees, in this case we add Member 1-3 to Circle 1,");
+        append(builder, "-- Member 1-4 to Circle 2 and Member 2-5 to Circle 3.");
+        append(builder, "-- The Trust Level is different for each Member.");
+        append(builder, "INSERT INTO trustees (member_id, circle_id, key_id, trust_level, circle_key) VALUES");
+        final CWSKey cwsKey1 = crypto.generateSymmetricKey(key1.getAlgorithm());
+        final CWSKey cwsKey2 = crypto.generateSymmetricKey(key1.getAlgorithm());
+        final CWSKey cwsKey3 = crypto.generateSymmetricKey(key1.getAlgorithm());
+        createAndAppendTrustee(builder, member1, keyPair1, circle1, key1, cwsKey1, TrustLevel.ADMIN, ',');
+        createAndAppendTrustee(builder, member2, keyPair2, circle1, key1, cwsKey1, TrustLevel.WRITE, ',');
+        createAndAppendTrustee(builder, member3, keyPair3, circle1, key1, cwsKey1, TrustLevel.READ,  ',');
+        createAndAppendTrustee(builder, member1, keyPair1, circle2, key2, cwsKey2, TrustLevel.ADMIN, ',');
+        createAndAppendTrustee(builder, member2, keyPair2, circle2, key2, cwsKey2, TrustLevel.WRITE, ',');
+        createAndAppendTrustee(builder, member3, keyPair3, circle2, key2, cwsKey2, TrustLevel.READ,  ',');
+        createAndAppendTrustee(builder, member4, keyPair4, circle2, key2, cwsKey2, TrustLevel.ADMIN, ',');
+        createAndAppendTrustee(builder, member2, keyPair2, circle3, key3, cwsKey3, TrustLevel.WRITE, ',');
+        createAndAppendTrustee(builder, member3, keyPair3, circle3, key3, cwsKey3, TrustLevel.READ,  ',');
+        createAndAppendTrustee(builder, member4, keyPair4, circle3, key3, cwsKey3, TrustLevel.ADMIN, ',');
+        createAndAppendTrustee(builder, member5, keyPair5, circle3, key3, cwsKey3, TrustLevel.READ, ';');
+
+        return builder.toString();
+    }
+
+    private MemberEntity createAndAppendMember(final StringBuilder builder, final String externalId, final String name, final CWSKey keyPair, final char delimiter) {
+        final MemberEntity entity = prepareMember(externalId, name, name, keyPair);
+        dao.persist(entity);
+
+        append(builder, "    ('" + entity.getExternalId() + "', '" + name + "', '" + entity.getSalt() + "', '" + entity.getAlgorithm() + "', '" + entity.getPublicKey() + "', '" + entity.getPrivateKey() + "')" + delimiter);
+
+        return entity;
+    }
+
+    private CircleEntity createAndAppendCircle(final StringBuilder builder, final String externalId, final String name, final char delimiter) {
+        final CircleEntity entity = prepareCircle(externalId, name);
+
+        append(builder, "    ('" + entity.getExternalId() + "', '" + entity.getName() + "')" + delimiter);
+
+        return entity;
+    }
+
+    private KeyEntity createAndAppendKey(final StringBuilder builder, final char delimiter) {
+        final KeyEntity entity = prepareKey();
+
+        append(builder, "    ('" + entity.getAlgorithm() + "', '" + entity.getStatus() + "')" + delimiter);
+
+        return entity;
+    }
+
+    private void createandAppendFolder(final StringBuilder builder, final CircleEntity circleEntity, final char delimiter) {
+        final DataTypeEntity dataTypeEntity = dao.find(DataTypeEntity.class, 1L);
+        final MetadataEntity entity = new MetadataEntity();
+        entity.setCircle(circleEntity);
+        entity.setName("/");
+        entity.setParentId(0L);
+        entity.setType(dataTypeEntity);
+        dao.persist(entity);
+
+        append(builder, "    ('" + entity.getExternalId() + "', 0, " + entity.getCircle().getId() + ", 1, '/')" + delimiter);
+    }
+
+    private void createAndAppendTrustee(final StringBuilder builder, final MemberEntity member, final CWSKey keyPair, final CircleEntity circle, final KeyEntity key, final CWSKey circleKey, final TrustLevel trustLevel, final char delimiter) {
+        final String armoredKey = crypto.encryptAndArmorCircleKey(keyPair, circleKey);
+        final TrusteeEntity entity = new TrusteeEntity();
+        entity.setMember(member);
+        entity.setCircle(circle);
+        entity.setKey(key);
+        entity.setTrustLevel(trustLevel);
+        entity.setCircleKey(armoredKey);
+        dao.persist(entity);
+
+        append(builder, "    (" + member.getId() + ", " + circle.getId() + ", " + key.getId() + ", '" + trustLevel + "', '" + armoredKey + "')" + delimiter);
+    }
+
+    private static void append(final StringBuilder builder, final String str) {
+        builder.append(str);
     }
 }

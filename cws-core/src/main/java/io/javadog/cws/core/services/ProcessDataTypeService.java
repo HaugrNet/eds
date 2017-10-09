@@ -7,6 +7,7 @@
  */
 package io.javadog.cws.core.services;
 
+import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.dtos.DataType;
 import io.javadog.cws.api.requests.ProcessDataTypeRequest;
@@ -75,7 +76,7 @@ public final class ProcessDataTypeService extends Serviceable<ProcessDataTypeRes
             dao.persist(entity);
         } else {
             entity = found;
-            if (entity.getId() <= 2) {
+            if (Objects.equals(Constants.FOLDER_TYPENAME, entity.getName()) || Objects.equals(Constants.DATA_TYPENAME, entity.getName())) {
                 throw new AuthorizationException("It is not permitted to update the DataType '" + entity.getName() + "'.");
             } else if (!Objects.equals(type, entity.getType())) {
                 entity.setType(type);

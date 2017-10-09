@@ -54,7 +54,7 @@ public final class SignatureServiceTest extends DatabaseSetup {
         verifyRequest.setSignature(signResponse.getSignature());
         final VerifyResponse verifyResponse = verifyService.perform(verifyRequest);
         assertThat(verifyResponse.getReturnCode(), is(ReturnCode.SUCCESS));
-        assertThat(verifyResponse.getVerified(), is(true));
+        assertThat(verifyResponse.isVerified(), is(true));
 
         final FetchSignatureRequest fetchRequest = prepareRequest(FetchSignatureRequest.class, MEMBER_1);
         final FetchSignatureResponse fetchResponse = fetchService.perform(fetchRequest);
@@ -82,7 +82,7 @@ public final class SignatureServiceTest extends DatabaseSetup {
         final VerifyResponse verifyResponse = verifyService.perform(verifyRequest);
         assertThat(verifyResponse.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(verifyResponse.getReturnMessage(), is("Ok"));
-        assertThat(verifyResponse.getVerified(), is(true));
+        assertThat(verifyResponse.isVerified(), is(true));
     }
 
     @Test
@@ -103,7 +103,7 @@ public final class SignatureServiceTest extends DatabaseSetup {
         final VerifyResponse verifyResponse = verifyService.perform(verifyRequest);
         assertThat(verifyResponse.getReturnCode(), is(ReturnCode.SIGNATURE_WARNING));
         assertThat(verifyResponse.getReturnMessage(), is("The Signature has expired."));
-        assertThat(verifyResponse.getVerified(), is(false));
+        assertThat(verifyResponse.isVerified(), is(false));
     }
 
     @Test
@@ -123,7 +123,7 @@ public final class SignatureServiceTest extends DatabaseSetup {
         verifyRequest.setSignature(signResponse.getSignature());
         final VerifyResponse verifyResponse = verifyService.perform(verifyRequest);
         assertThat(verifyResponse.getReturnCode(), is(ReturnCode.SUCCESS));
-        assertThat(verifyResponse.getVerified(), is(false));
+        assertThat(verifyResponse.isVerified(), is(false));
     }
 
     @Test
@@ -138,6 +138,6 @@ public final class SignatureServiceTest extends DatabaseSetup {
         final VerifyResponse response = verifyService.perform(request);
         assertThat(response.getReturnCode(), is(ReturnCode.IDENTIFICATION_WARNING));
         assertThat(response.getReturnMessage(), is("It was not possible to find the Signature."));
-        assertThat(response.getVerified(), is(false));
+        assertThat(response.isVerified(), is(false));
     }
 }

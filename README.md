@@ -21,12 +21,15 @@ API and scales depending on the deployment - it can be used by anyone who finds
 it useful. 
 
 # Release Plan
-The design and initial implementation of CWS has been completed. All features are
-in place. Both Data model & API looks have now reached Alpha Stage.
+The code has reached a feature freeze, with most of the code looking close to
+being production ready. Testing and bug fixing is well underway and should be
+completed by the end of October, 2017.
 
-Please note that the code itself has not been tested properly. The Coverage of
-the CWS has dropped significantly, and there are plenty of known issues in the
-code, which the testing will help fix.
+Support for third-party analysis tools is pending as is testing under various
+Application & Cloud Servers and Databases.
+
+The initial plan of having a final 1.0 release ready by the end of 2017 remains
+the goal and with the current level of progress, it is still feasible.
 
 # Software License
 The CWS is released under Apache License 2 or APL2.

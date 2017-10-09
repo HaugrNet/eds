@@ -22,7 +22,7 @@ import io.javadog.cws.api.responses.FetchCircleResponse;
 import io.javadog.cws.api.responses.ProcessCircleResponse;
 import io.javadog.cws.common.Settings;
 import io.javadog.cws.common.exceptions.AuthorizationException;
-import io.javadog.cws.common.exceptions.ModelException;
+import io.javadog.cws.common.exceptions.CWSException;
 import io.javadog.cws.common.exceptions.VerificationException;
 import io.javadog.cws.model.DatabaseSetup;
 import io.javadog.cws.model.entities.CircleEntity;
@@ -210,8 +210,7 @@ public final class CircleServiceTest extends DatabaseSetup {
     @Test
     public void testFetchCircle1WithShowTrueAsMember5() {
         final CircleEntity circle = findFirstCircle();
-
-        prepareCause(ModelException.class, "No Trustee information found for member 'member5' and circle '" + circle.getExternalId() + "'.");
+        prepareCause(CWSException.class, "No Trustee information found for member 'member5' and circle '" + circle.getExternalId() + "'.");
 
         // Ensure that we have the correct settings for the Service
         settings.set(Settings.SHOW_TRUSTEES, "true");
@@ -226,7 +225,7 @@ public final class CircleServiceTest extends DatabaseSetup {
     @Test
     public void testFetchCircle1WithShowFalseAsMember5() {
         final CircleEntity circle = findFirstCircle();
-        prepareCause(ModelException.class, "No Trustee information found for member 'member5' and circle '" + circle.getExternalId() + "'.");
+        prepareCause(CWSException.class, "No Trustee information found for member 'member5' and circle '" + circle.getExternalId() + "'.");
 
         // Ensure that we have the correct settings for the Service
         settings.set(Settings.SHOW_TRUSTEES, "false");
@@ -361,7 +360,7 @@ public final class CircleServiceTest extends DatabaseSetup {
 
     @Test
     public void testUpdateCircleAsNonMember() {
-        prepareCause(ModelException.class, ReturnCode.IDENTIFICATION_WARNING, "No Trustee information found for member 'member5' and circle '" + CIRCLE_1_ID + "'.");
+        prepareCause(CWSException.class, ReturnCode.IDENTIFICATION_WARNING, "No Trustee information found for member 'member5' and circle '" + CIRCLE_1_ID + "'.");
         final ProcessCircleService service = new ProcessCircleService(settings, entityManager);
         final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, MEMBER_5);
         request.setAction(Action.UPDATE);
@@ -493,7 +492,7 @@ public final class CircleServiceTest extends DatabaseSetup {
     @Test
     public void testAddingTrusteeToInvalidCircleAsCircleAdmin() {
         final String circleId = UUID.randomUUID().toString();
-        prepareCause(ModelException.class, ReturnCode.IDENTIFICATION_WARNING, "No Trustee information found for member 'member1' and circle '" + circleId + "'.");
+        prepareCause(CWSException.class, ReturnCode.IDENTIFICATION_WARNING, "No Trustee information found for member 'member1' and circle '" + circleId + "'.");
 
         final ProcessCircleService service = new ProcessCircleService(settings, entityManager);
         final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, MEMBER_1);
@@ -589,7 +588,7 @@ public final class CircleServiceTest extends DatabaseSetup {
     @Test
     public void testAlterTrusteeToInvalidCircleAsCircleAdmin() {
         final String circleId = UUID.randomUUID().toString();
-        prepareCause(ModelException.class, ReturnCode.IDENTIFICATION_WARNING, "No Trustee information found for member 'member1' and circle '" + circleId + "'.");
+        prepareCause(CWSException.class, ReturnCode.IDENTIFICATION_WARNING, "No Trustee information found for member 'member1' and circle '" + circleId + "'.");
 
         final ProcessCircleService service = new ProcessCircleService(settings, entityManager);
         final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, MEMBER_1);
@@ -666,7 +665,7 @@ public final class CircleServiceTest extends DatabaseSetup {
     @Test
     public void testRemoveTrusteeToInvalidCircleAsCircleAdmin() {
         final String circleId = UUID.randomUUID().toString();
-        prepareCause(ModelException.class, ReturnCode.IDENTIFICATION_WARNING, "No Trustee information found for member 'member1' and circle '" + circleId + "'.");
+        prepareCause(CWSException.class, ReturnCode.IDENTIFICATION_WARNING, "No Trustee information found for member 'member1' and circle '" + circleId + "'.");
 
         final ProcessCircleService service = new ProcessCircleService(settings, entityManager);
         final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, MEMBER_1);

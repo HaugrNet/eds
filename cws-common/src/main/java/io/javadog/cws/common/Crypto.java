@@ -206,14 +206,10 @@ public final class Crypto {
         } else {
             cipher = Cipher.getInstance(algorithm.getTransformation());
             final String salt = key.getSalt();
-            if (salt != null) {
-                final byte[] bytes = new byte[algorithm.getLength() / 8];
-                System.arraycopy(salt.getBytes(settings.getCharset()), 0, bytes, 0, bytes.length);
-                final IvParameterSpec iv = new IvParameterSpec(bytes);
-                cipher.init(type, key.getKey(), iv);
-            } else {
-                throw new CryptoException("The Salt is missing for the Symmetric Key");
-            }
+            final byte[] bytes = new byte[algorithm.getLength() / 8];
+            System.arraycopy(salt.getBytes(settings.getCharset()), 0, bytes, 0, bytes.length);
+            final IvParameterSpec iv = new IvParameterSpec(bytes);
+            cipher.init(type, key.getKey(), iv);
         }
 
         return cipher;

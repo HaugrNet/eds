@@ -8,7 +8,6 @@
 package io.javadog.cws.model;
 
 import io.javadog.cws.api.dtos.DataType;
-import io.javadog.cws.common.exceptions.ModelException;
 import io.javadog.cws.model.entities.CWSEntity;
 import io.javadog.cws.model.entities.CircleEntity;
 import io.javadog.cws.model.entities.DataEntity;
@@ -70,7 +69,7 @@ public interface CommonDao {
      *
      * @param name Name of the DataType to find
      * @return Found DataType Entity
-     * @throws ModelException if no unique value could be found
+     * @throws io.javadog.cws.common.exceptions.CWSException if no unique value could be found
      */
     DataTypeEntity findDataTypeByName(String name);
 

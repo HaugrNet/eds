@@ -127,14 +127,14 @@ public final class Settings {
     }
 
     public Boolean getExposeAdmin() {
-        return toBoolean(properties.getProperty(EXPOSE_ADMIN), DEFAULT_EXPOSE_ADMIN);
+        return toBoolean(properties.getProperty(EXPOSE_ADMIN));
     }
 
     public Boolean getShareTrustees() {
-        return toBoolean(properties.getProperty(SHOW_TRUSTEES), DEFAULT_SHOW_TRUSTEES);
+        return toBoolean(properties.getProperty(SHOW_TRUSTEES));
     }
 
-    private static boolean toBoolean(final String value, final String defaultValue) {
-        return Boolean.parseBoolean((value != null) ? value.trim() : defaultValue);
+    private static boolean toBoolean(final String value) {
+        return Boolean.parseBoolean(value.trim());
     }
 }

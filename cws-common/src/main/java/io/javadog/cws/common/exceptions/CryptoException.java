@@ -19,10 +19,6 @@ public final class CryptoException extends CWSException {
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
-    public CryptoException(final String message) {
-        super(ReturnCode.CRYPTO_ERROR, message);
-    }
-
     /**
      * To prevent that too much information about the underlying system is
      * exposed via the error text, the Cause must be separate from the message.

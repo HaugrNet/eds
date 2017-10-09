@@ -10,7 +10,7 @@ package io.javadog.cws.model.jpa;
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.common.TrustLevel;
 import io.javadog.cws.api.dtos.DataType;
-import io.javadog.cws.common.exceptions.ModelException;
+import io.javadog.cws.common.exceptions.CWSException;
 import io.javadog.cws.model.CommonDao;
 import io.javadog.cws.model.entities.CWSEntity;
 import io.javadog.cws.model.entities.CircleEntity;
@@ -116,7 +116,7 @@ public final class CommonJpaDao implements CommonDao {
         final List<MemberEntity> found = findList(query);
 
         if (found.isEmpty()) {
-            throw new ModelException(ReturnCode.IDENTIFICATION_WARNING, "No Trustee information found for member '" + name + "' and circle '" + externalCircleId + "'.");
+            throw new CWSException(ReturnCode.IDENTIFICATION_WARNING, "No Trustee information found for member '" + name + "' and circle '" + externalCircleId + "'.");
         }
 
         return found.get(0);
@@ -359,7 +359,7 @@ public final class CommonJpaDao implements CommonDao {
         final List<E> found = findList(query);
 
         if (found.size() != 1) {
-            throw new ModelException(ReturnCode.DATABASE_ERROR, "Could not uniquely identify a record with the given criteria's.");
+            throw new CWSException(ReturnCode.DATABASE_ERROR, "Could not uniquely identify a record with the given criteria's.");
         }
 
         return found.get(0);
@@ -381,7 +381,8 @@ public final class CommonJpaDao implements CommonDao {
 
             return list;
         } catch (IllegalStateException | PersistenceException e) {
-            throw new ModelException(ReturnCode.DATABASE_ERROR, e.getMessage(), e);
+            // This should be and will hopefully remain unreachable code.
+            throw new CWSException(ReturnCode.DATABASE_ERROR, e.getMessage(), e);
         }
     }
 }

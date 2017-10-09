@@ -15,7 +15,6 @@ import io.javadog.cws.api.responses.ProcessDataResponse;
 import io.javadog.cws.common.Settings;
 import io.javadog.cws.common.enums.KeyAlgorithm;
 import io.javadog.cws.common.exceptions.CWSException;
-import io.javadog.cws.common.exceptions.ModelException;
 import io.javadog.cws.common.keys.CWSKey;
 import io.javadog.cws.core.Permission;
 import io.javadog.cws.core.Serviceable;
@@ -147,7 +146,7 @@ public final class ProcessDataService extends Serviceable<ProcessDataResponse, P
         if (request.getFolderId() != null) {
             entity = dao.findMetaDataByMemberAndExternalId(member, request.getFolderId());
             if (!Objects.equals(Constants.FOLDER_TYPENAME, entity.getType().getName())) {
-                throw new ModelException(ReturnCode.IDENTIFICATION_WARNING, "Provided FolderId is not a folder.");
+                throw new CWSException(ReturnCode.IDENTIFICATION_WARNING, "Provided FolderId is not a folder.");
             }
         } else {
             entity = dao.findRootByMemberCircle(member, request.getCircleId());
@@ -207,12 +206,12 @@ public final class ProcessDataService extends Serviceable<ProcessDataResponse, P
 
                 if (Objects.equals(currentCircleId, foundCircleId)) {
                     if (Objects.equals(Constants.FOLDER_TYPENAME, metadata.getType().getName())) {
-                        throw new ModelException(ReturnCode.ILLEGAL_ACTION, "It is not permitted to move Folders.");
+                        throw new CWSException(ReturnCode.ILLEGAL_ACTION, "It is not permitted to move Folders.");
                     } else {
                         metadata.setParentId(folder.getId());
                     }
                 } else {
-                    throw new ModelException(ReturnCode.ILLEGAL_ACTION, "Moving Data from one Circle to another is not permitted.");
+                    throw new CWSException(ReturnCode.ILLEGAL_ACTION, "Moving Data from one Circle to another is not permitted.");
                 }
             }
         }

@@ -7,7 +7,6 @@
  */
 package io.javadog.cws.war;
 
-import io.javadog.cws.api.System;
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.requests.FetchCircleRequest;
 import io.javadog.cws.api.requests.FetchMemberRequest;
@@ -42,9 +41,8 @@ import java.util.Properties;
  * @author Kim Jensen
  * @since  CWS 1.0
  */
-@CWSBean
 @Stateless
-public class SystemBean implements System {
+public class SystemBean {
 
     private static final Logger log = LoggerFactory.getLogger(SystemBean.class);
 
@@ -55,10 +53,6 @@ public class SystemBean implements System {
 
     private final Settings settings = new Settings();
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     @Transactional(Transactional.TxType.NEVER)
     public VersionResponse version() {
         final ClassLoader loader = Thread.currentThread().getContextClassLoader();
@@ -78,10 +72,6 @@ public class SystemBean implements System {
         return response;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     @Transactional(Transactional.TxType.REQUIRED)
     public SettingResponse settings(final SettingRequest request) {
         SettingResponse response;
@@ -101,10 +91,6 @@ public class SystemBean implements System {
         return response;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     @Transactional(Transactional.TxType.NEVER)
     public FetchMemberResponse fetchMembers(final FetchMemberRequest request) {
         FetchMemberResponse response;
@@ -124,10 +110,6 @@ public class SystemBean implements System {
         return response;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     @Transactional(Transactional.TxType.REQUIRED)
     public ProcessMemberResponse processMember(final ProcessMemberRequest request) {
         ProcessMemberResponse response;
@@ -147,10 +129,6 @@ public class SystemBean implements System {
         return response;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     @Transactional(Transactional.TxType.NEVER)
     public FetchCircleResponse fetchCircles(final FetchCircleRequest request) {
         FetchCircleResponse response;
@@ -170,10 +148,6 @@ public class SystemBean implements System {
         return response;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     @Transactional(Transactional.TxType.REQUIRED)
     public ProcessCircleResponse processCircle(final ProcessCircleRequest request) {
         ProcessCircleResponse response;

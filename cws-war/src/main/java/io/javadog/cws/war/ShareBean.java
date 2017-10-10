@@ -7,7 +7,6 @@
  */
 package io.javadog.cws.war;
 
-import io.javadog.cws.api.Share;
 import io.javadog.cws.api.requests.FetchDataRequest;
 import io.javadog.cws.api.requests.FetchDataTypeRequest;
 import io.javadog.cws.api.requests.FetchSignatureRequest;
@@ -43,9 +42,8 @@ import javax.transaction.Transactional;
  * @author Kim Jensen
  * @since  CWS 1.0
  */
-@CWSBean
 @Stateless
-public class ShareBean implements Share {
+public class ShareBean {
 
     private static final Logger log = LoggerFactory.getLogger(ShareBean.class);
 
@@ -54,10 +52,6 @@ public class ShareBean implements Share {
 
     private final Settings settings = new Settings();
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     @Transactional(Transactional.TxType.REQUIRED)
     public ProcessDataTypeResponse processDataType(final ProcessDataTypeRequest request) {
         ProcessDataTypeResponse response;
@@ -77,10 +71,6 @@ public class ShareBean implements Share {
         return response;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     @Transactional(Transactional.TxType.NEVER)
     public FetchDataTypeResponse fetchDataTypes(final FetchDataTypeRequest request) {
         FetchDataTypeResponse response;
@@ -100,10 +90,6 @@ public class ShareBean implements Share {
         return response;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     @Transactional(Transactional.TxType.REQUIRED)
     public ProcessDataResponse processData(final ProcessDataRequest request) {
         ProcessDataResponse response;
@@ -123,10 +109,6 @@ public class ShareBean implements Share {
         return response;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     @Transactional(Transactional.TxType.SUPPORTS)
     public FetchDataResponse fetchData(final FetchDataRequest request) {
         FetchDataResponse response;
@@ -146,10 +128,6 @@ public class ShareBean implements Share {
         return response;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     @Transactional(Transactional.TxType.REQUIRED)
     public SignResponse sign(final SignRequest request) {
         SignResponse response;
@@ -169,10 +147,6 @@ public class ShareBean implements Share {
         return response;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     @Transactional(Transactional.TxType.SUPPORTS)
     public VerifyResponse verify(final VerifyRequest request) {
         VerifyResponse response;
@@ -192,10 +166,6 @@ public class ShareBean implements Share {
         return response;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     @Transactional(Transactional.TxType.SUPPORTS)
     public FetchSignatureResponse fetchSignatures(final FetchSignatureRequest request) {
         FetchSignatureResponse response;

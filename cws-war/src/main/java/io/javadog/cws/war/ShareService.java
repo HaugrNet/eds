@@ -47,7 +47,7 @@ public class ShareService implements Share {
 
     private static final String GENERAL_RETURN_MESSAGE = "An unknown error occurred. Please consult the CWS System Log.";
 
-    @Inject @CWSBean private Share bean;
+    @Inject private ShareBean bean;
 
     /**
      * {@inheritDoc}

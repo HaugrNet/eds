@@ -29,6 +29,32 @@ import io.javadog.cws.api.responses.VerifyResponse;
 public interface Share {
 
     /**
+     * <p>All stored data must have a data type, i.e. a way for an external
+     * client or system to identify and apply rules for how to work with the
+     * data. By default, two data types exist; &quot;data&quot; &amp;
+     * &quot;folder&quot;, which will allow any system to operate without
+     * adding additional types.</p>
+     *
+     * <p>However, if additional types is needed, which can be MIME Type
+     * information for file sharing between multiple Clients, or Object
+     * Identification information for Data Objects, then these must be added
+     * before they can be used.</p>
+     *
+     * <p>The request takes both the name of a Data Type and the type itself,
+     * but to properly identify what action should be taken (added/updated or
+     * deleted), the proper {@link io.javadog.cws.api.common.Action} must also
+     * be set.</p>
+     *
+     * <p>Allowed Actions include the following:</p>
+     * <ul>
+     *   <li><b>{@link io.javadog.cws.api.common.Action#PROCESS}</b> to either
+     *   add or update an existing Data type, note that the two default types
+     *   cannot be updated.</li>
+     *   <li><b>{@link io.javadog.cws.api.common.Action#DELETE}</b> to remove
+     *   an unused Data Type from the system. If a Type is still being used,
+     *   then it cannot be removed. The two default types also cannot be
+     *   removed.</li>
+     * </ul>
      *
      * @param request Request Object
      * @return Response Object with ReturnCode and Message
@@ -36,6 +62,9 @@ public interface Share {
     ProcessDataTypeResponse processDataType(ProcessDataTypeRequest request);
 
     /**
+     * <p>This request will retrieve a list of all currently available Data
+     * Types, which can be used to either add/update data to the system or
+     * identify how existing data should be processed.</p>
      *
      * @param request Request Object
      * @return Response Object with ReturnCode and Message

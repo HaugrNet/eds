@@ -9,6 +9,7 @@ package io.javadog.cws.api.requests;
 
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.dtos.Authentication;
+import io.javadog.cws.api.dtos.Page;
 
 import javax.validation.constraints.Pattern;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -22,16 +23,20 @@ import java.util.Map;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "fetchCircleRequest", propOrder = "circleId")
+@XmlType(name = "fetchCircleRequest", propOrder = { "circleId", "page" })
 public final class FetchCircleRequest extends Authentication {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
     private static final String FIELD_CIRCLE_ID = "circleId";
+    private static final String FIELD_PATH = "page";
 
     @XmlElement(name = FIELD_CIRCLE_ID, nillable = true, required = true)
     private String circleId = null;
+
+    @XmlElement(name = FIELD_PATH)
+    private Page page = null;
 
     // =========================================================================
     // Setters & Getters
@@ -45,6 +50,14 @@ public final class FetchCircleRequest extends Authentication {
 
     public String getCircleId() {
         return circleId;
+    }
+
+    public void setPage(final Page page) {
+        this.page = page;
+    }
+
+    public Page getPage() {
+        return page;
     }
 
     // =========================================================================

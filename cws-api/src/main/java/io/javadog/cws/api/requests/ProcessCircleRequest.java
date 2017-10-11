@@ -64,8 +64,12 @@ public final class ProcessCircleRequest extends Authentication {
      * <p>Sets the Action for the processing Request. Allowed values from the
      * Actions enumerated Object includes:</p>
      * <ul>
-     *   <li>PROCESS</li>
-     *   <li>DELETE</li>
+     *   <li><b>CREATE</b> - Create or Add new Circles</li>
+     *   <li><b>UPDATE</b> - Update an existing Circle</li>
+     *   <li><b>DELETE</b> - Delete an existing Circle</li>
+     *   <li><b>ADD</b> - Add a Trustee to a Circle</li>
+     *   <li><b>ALTER</b> - Alter an existing Circle Trustee</li>
+     *   <li><b>REMOVE</b> - Remove an existing Circle Trustee</li>
      * </ul>
      *
      * @param action Current Action

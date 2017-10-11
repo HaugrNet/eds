@@ -158,6 +158,18 @@ public abstract class Verifiable implements Serializable {
         }
     }
 
+    protected static void ensureValidRange(final String field, final int value, final int min, final int max) {
+        if ((value < min) || (value > max)) {
+            throw new IllegalArgumentException(PRE_VALUE + field + "' is outside of the allowed boundaries.");
+        }
+    }
+
+    protected static void ensurePositiveNumber(final String field, final int value) {
+        if (value < 1) {
+            throw new IllegalArgumentException(PRE_VALUE + field + "' must be at least 1.");
+        }
+    }
+
     protected static void extendErrors(final Map<String, String> toExtend, final Map<String, String> toAppend, final String keyPrefix) {
         for (final Map.Entry<String, String> entry : toAppend.entrySet()) {
             toExtend.put(keyPrefix + entry.getKey(), entry.getValue());

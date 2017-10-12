@@ -32,6 +32,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
 import java.io.IOException;
 import java.io.InputStream;
@@ -48,8 +49,8 @@ public class SystemBean {
 
     private static final String CWS_CONFIG = "cws.config";
 
-    //@PersistenceContext(unitName = "cwsDS")
-    private EntityManager entityManager = null;
+    @PersistenceContext(unitName = "cwsDS")
+    private EntityManager entityManager;
 
     private final Settings settings = new Settings();
 

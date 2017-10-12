@@ -36,6 +36,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
 
 /**
@@ -47,8 +48,8 @@ public class ShareBean {
 
     private static final Logger log = LoggerFactory.getLogger(ShareBean.class);
 
-    //@PersistenceContext(unitName = "cwsDS")
-    private EntityManager entityManager = null;
+    @PersistenceContext(unitName = "cwsDS")
+    private EntityManager entityManager;
 
     private final Settings settings = new Settings();
 

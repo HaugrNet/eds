@@ -1,0 +1,12 @@
+# $WILDFLY_HOME/bin/jboss-cli.sh --file=/path/to/this/file.
+connect
+batch
+
+## Add Postgresql driver
+/subsystem=datasources/jdbc-driver=postgresql:add(driver-name=postgresql,driver-module-name=org.postgresql,driver-xa-datasource-class-name=org.postgresql.xa.PGXADataSource)
+
+## Add CWS Datasource
+data-source add --name=cwsDS --driver-name=postgresql --jndi-name=java:jboss/datasources/cwsDS --connection-url=jdbc:postgresql://localhost:5432/cws --user-name=cws_user --password=cws --use-ccm=false --max-pool-size=25 --blocking-timeout-wait-millis=5000 --enabled=true
+
+run-batch
+#:reload

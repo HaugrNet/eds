@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="2.0"
+             xmlns="http://java.sun.com/xml/ns/persistence"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd">
+
+    <persistence-unit name="cwsDS" transaction-type="JTA">
+        <!--<provider>org.hibernate.ejb.HibernatePersistence</provider>-->
+        <jta-data-source>datasources/cwsDS</jta-data-source>
+
+        <class>io.javadog.cws.model.entities.SettingEntity</class>
+        <class>io.javadog.cws.model.entities.MemberEntity</class>
+        <class>io.javadog.cws.model.entities.CircleEntity</class>
+        <class>io.javadog.cws.model.entities.KeyEntity</class>
+        <class>io.javadog.cws.model.entities.TrusteeEntity</class>
+        <class>io.javadog.cws.model.entities.DataTypeEntity</class>
+        <class>io.javadog.cws.model.entities.MetadataEntity</class>
+        <class>io.javadog.cws.model.entities.DataEntity</class>
+        <class>io.javadog.cws.model.entities.SignatureEntity</class>
+
+        <properties>
+            <!-- We had a problem with our deployments, that the Sequences
+                 weren't used properly, instead we saw some strange negative
+                 numbers as generated Id values. After som googling, the link
+                 below was found, where someone describes the same problem. It
+                 turns out that JBoss have activated an experimental feature in
+                 Hibernate by default, the solution is then to simply deactivate
+                 this again, which we do with the following property setting.
+                 http://stackoverflow.com/questions/9861416/hibernate-generates-negative-id-values-when-using-a-sequence -->
+            <property name="hibernate.id.new_generator_mappings" value="false"/>
+            <property name="hibernate.show_sql" value="false"/>
+            <property name="hibernate.format_sql" value="false"/>
+        </properties>
+    </persistence-unit>
+</persistence>

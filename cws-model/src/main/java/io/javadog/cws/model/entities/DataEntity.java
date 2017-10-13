@@ -27,9 +27,10 @@ import javax.persistence.Table;
 @NamedQueries(
         @NamedQuery(name = "data.findByMemberAndExternalId",
                 query = "select d " +
-                        "from DataEntity d " +
-                        "inner join TrusteeEntity t on d.metadata.circle.id = t.circle.id " +
-                        "where d.metadata.externalId = :eid" +
+                        "from DataEntity d," +
+                        "     TrusteeEntity t " +
+                        "where d.metadata.circle.id = t.circle.id" +
+                        "  and d.metadata.externalId = :eid" +
                         "  and t.member.id = :mid" +
                         "  and t.trustLevel in :trustLevels"))
 @Table(name = "data")

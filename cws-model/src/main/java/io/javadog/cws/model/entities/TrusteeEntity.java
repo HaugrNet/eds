@@ -51,10 +51,12 @@ import javax.persistence.Table;
                         "order by t.circle.name asc"),
         @NamedQuery(name = "trustee.findSharedCircles",
                 query = "select c " +
-                        "from CircleEntity c" +
-                        "  join TrusteeEntity t1 on c.id = t1.circle.id" +
-                        "  join TrusteeEntity t2 on c.id = t2.circle.id " +
-                        "where t1.member.id = :member" +
+                        "from CircleEntity c, " +
+                        "     TrusteeEntity t1," +
+                        "     TrusteeEntity t2 " +
+                        "where c.id = t1.circle.id" +
+                        "  and c.id = t2.circle.id" +
+                        "  and t1.member.id = :member" +
                         "  and t2.member.id = :requested " +
                         "order by c.name asc"),
         @NamedQuery(name = "trustee.findByCircleId",

@@ -26,31 +26,35 @@ import javax.persistence.Table;
 @NamedQueries({
         @NamedQuery(name = "metadata.findByMemberAndExternalId",
                 query = "select m " +
-                        "from MetadataEntity m " +
-                        "inner join TrusteeEntity t on m.circle.id = t.circle.id " +
-                        "where t.member.id = :mid" +
+                        "from MetadataEntity m," +
+                        "     TrusteeEntity t " +
+                        "where m.circle.id = t.circle.id" +
+                        "  and t.member.id = :mid" +
                         "  and m.externalId = :eid " +
                         "order by m.name asc, m.id asc"),
         @NamedQuery(name = "metadata.findByMemberAndFolder",
                 query = "select m " +
-                        "from MetadataEntity m " +
-                        "inner join TrusteeEntity t on m.circle.id = t.circle.id " +
-                        "where t.member.id = :mid" +
+                        "from MetadataEntity m," +
+                        "     TrusteeEntity t " +
+                        "where m.circle.id = t.circle.id" +
+                        "  and t.member.id = :mid" +
                         "  and m.parentId = :parentId " +
                         "order by m.name asc, m.id asc"),
         @NamedQuery(name = "metadata.findByMemberAndFolderAndType",
                 query = "select m " +
-                        "from MetadataEntity m " +
-                        "inner join TrusteeEntity t on m.circle.id = t.circle.id " +
-                        "where t.member.id = :mid" +
+                        "from MetadataEntity m," +
+                        "     TrusteeEntity t " +
+                        "where m.circle.id = t.circle.id" +
+                        "  and t.member.id = :mid" +
                         "  and m.parentId = :parentId" +
                         "  and m.type.name = :typename " +
                         "order by m.name asc, m.id asc"),
         @NamedQuery(name = "metadata.findRootByMemberAndCircle",
                 query = "select m " +
-                        "from MetadataEntity m " +
-                        "inner join TrusteeEntity t on m.circle.id = t.circle.id " +
-                        "where t.member.id = :mid" +
+                        "from MetadataEntity m," +
+                        "     TrusteeEntity t " +
+                        "where m.circle.id = t.circle.id" +
+                        "  and t.member.id = :mid" +
                         "  and m.circle.externalId = :cid" +
                         "  and m.type.name = 'folder'" +
                         "  and m.name = '/'" +

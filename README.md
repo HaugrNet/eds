@@ -15,6 +15,37 @@ Communication is achieved via a public API, which allows both REST and SOAP
 based WebService requests. This will give a high degree of flexibility for
 anyone to integrate it into their system.
 
+# Build, Install & Run
+The current version of CWS has reached the point where it can build, deploy and
+run in WildFly using PostgreSQL as database. To test, please make sure that you
+have Java (8+), [Maven](https://maven.apache.org/) and [PostgreSQL](https://www.postgresql.org/)
+installed and running, as well as a local copy of the CWS sources.
+
+In the accessories folder, you can find the configuration for WildFly 10, the
+files are located in the same folder structure as you need to add them to your
+local WildFly installation.
+
+The database files can all be found in the cws-model module under
+`src/main/resources/postgresql` where the `01-install.sql` script will create
+the database, user (with password) and setup the database with tables & data for
+the initial run.
+
+Then do the following:
+
+```
+$ cd /path/to/cws/sources
+$ mvn clean install
+$ cp cws-war/target/cws.war ${WILDFLY_HOME}/standalone/deployments
+$ ${WILDFLY_HOME}/bin/standalone.sh -c standalone.xml
+```
+Now, you should have a running version of CWS which can be reached from the
+following SOAP based URL's:
+
+```
+http://localhost:9080/cws/system?wsdl
+http://localhost:9080/cws/share?wsdl
+```
+
 # Who is this for
 It is not designed for anyone particular, but as it provides a rather general
 API and scales depending on the deployment - it can be used by anyone who finds

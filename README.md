@@ -17,9 +17,10 @@ anyone to integrate it into their system.
 
 # Build, Install & Run
 The current version of CWS has reached the point where it can build, deploy and
-run in WildFly using PostgreSQL as database. To test, please make sure that you
-have Java (8+), [Maven](https://maven.apache.org/) and [PostgreSQL](https://www.postgresql.org/)
-installed and running, as well as a local copy of the CWS sources.
+run in [WildFly](http://www.wildfly.org/) using PostgreSQL as database. To test,
+please make sure that you have Java (8+), [Maven](https://maven.apache.org/) and
+[PostgreSQL](https://www.postgresql.org/) installed and running, as well as a
+local copy of the CWS sources.
 
 In the accessories folder, you can find the configuration for WildFly 10, the
 files are located in the same folder structure as you need to add them to your

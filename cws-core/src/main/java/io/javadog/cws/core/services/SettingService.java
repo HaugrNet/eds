@@ -72,7 +72,7 @@ public final class SettingService extends Serviceable<SettingResponse, SettingRe
             final SettingEntity entity = currentSettings.get(entry.getKey());
 
             if (!Objects.equals(entity.getSetting(), entry.getValue())) {
-                if (entity.getModifiable()) {
+                if (entity.isModifiable()) {
                     entity.setSetting(entry.getValue());
                     dao.persist(entity);
                 } else {

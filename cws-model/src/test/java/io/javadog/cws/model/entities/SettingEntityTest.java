@@ -35,7 +35,7 @@ public final class SettingEntityTest extends DatabaseSetup {
         assertThat(found, is(not(nullValue())));
         assertThat(found.getName(), is("My.New.Setting"));
         assertThat(found.getSetting(), is("The Setting Value"));
-        assertThat(found.getModifiable(), is(false));
+        assertThat(found.isModifiable(), is(false));
 
         found.setName("My.Altered.Setting");
         found.setSetting("The Altered Setting");
@@ -46,7 +46,7 @@ public final class SettingEntityTest extends DatabaseSetup {
         assertThat(updated, is(not(nullValue())));
         assertThat(updated.getName(), is("My.Altered.Setting"));
         assertThat(updated.getSetting(), is("The Altered Setting"));
-        assertThat(updated.getModifiable(), is(true));
+        assertThat(updated.isModifiable(), is(true));
 
         final List<SettingEntity> settings = dao.readSettings();
         assertThat(settings, is(not(nullValue())));

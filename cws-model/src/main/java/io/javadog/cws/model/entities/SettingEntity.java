@@ -58,7 +58,7 @@ public class SettingEntity extends CWSEntity {
         this.modifiable = modifiable;
     }
 
-    public Boolean getModifiable() {
+    public Boolean isModifiable() {
         return modifiable;
     }
 }

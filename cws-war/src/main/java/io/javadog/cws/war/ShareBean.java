@@ -21,7 +21,6 @@ import io.javadog.cws.api.responses.ProcessDataResponse;
 import io.javadog.cws.api.responses.ProcessDataTypeResponse;
 import io.javadog.cws.api.responses.SignResponse;
 import io.javadog.cws.api.responses.VerifyResponse;
-import io.javadog.cws.common.Settings;
 import io.javadog.cws.common.exceptions.CWSException;
 import io.javadog.cws.core.Serviceable;
 import io.javadog.cws.core.services.FetchDataService;
@@ -35,6 +34,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ejb.Stateless;
+import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
@@ -51,14 +51,15 @@ public class ShareBean {
     @PersistenceContext(unitName = "cwsDS")
     private EntityManager entityManager;
 
-    private final Settings settings = new Settings();
+    @Inject
+    private SettingBean settingBean;
 
     @Transactional(Transactional.TxType.REQUIRED)
     public ProcessDataTypeResponse processDataType(final ProcessDataTypeRequest request) {
         ProcessDataTypeResponse response;
 
         try {
-            final Serviceable<ProcessDataTypeResponse, ProcessDataTypeRequest> service = new ProcessDataTypeService(settings, entityManager);
+            final Serviceable<ProcessDataTypeResponse, ProcessDataTypeRequest> service = new ProcessDataTypeService(settingBean.getSettings(), entityManager);
             response = service.perform(request);
         } catch (CWSException e) {
             // Any Warning or Error thrown by the CWS contain enough information
@@ -77,7 +78,7 @@ public class ShareBean {
         FetchDataTypeResponse response;
 
         try {
-            final Serviceable<FetchDataTypeResponse, FetchDataTypeRequest> service = new FetchDataTypeService(settings, entityManager);
+            final Serviceable<FetchDataTypeResponse, FetchDataTypeRequest> service = new FetchDataTypeService(settingBean.getSettings(), entityManager);
             response = service.perform(request);
         } catch (CWSException e) {
             // Any Warning or Error thrown by the CWS contain enough information
@@ -96,7 +97,7 @@ public class ShareBean {
         ProcessDataResponse response;
 
         try {
-            final Serviceable<ProcessDataResponse, ProcessDataRequest> service = new ProcessDataService(settings, entityManager);
+            final Serviceable<ProcessDataResponse, ProcessDataRequest> service = new ProcessDataService(settingBean.getSettings(), entityManager);
             response = service.perform(request);
         } catch (CWSException e) {
             // Any Warning or Error thrown by the CWS contain enough information
@@ -115,7 +116,7 @@ public class ShareBean {
         FetchDataResponse response;
 
         try {
-            final Serviceable<FetchDataResponse, FetchDataRequest> service = new FetchDataService(settings, entityManager);
+            final Serviceable<FetchDataResponse, FetchDataRequest> service = new FetchDataService(settingBean.getSettings(), entityManager);
             response = service.perform(request);
         } catch (CWSException e) {
             // Any Warning or Error thrown by the CWS contain enough information
@@ -134,7 +135,7 @@ public class ShareBean {
         SignResponse response;
 
         try {
-            final Serviceable<SignResponse, SignRequest> service = new SignService(settings, entityManager);
+            final Serviceable<SignResponse, SignRequest> service = new SignService(settingBean.getSettings(), entityManager);
             response = service.perform(request);
         } catch (CWSException e) {
             // Any Warning or Error thrown by the CWS contain enough information
@@ -153,7 +154,7 @@ public class ShareBean {
         VerifyResponse response;
 
         try {
-            final Serviceable<VerifyResponse, VerifyRequest> service = new VerifyService(settings, entityManager);
+            final Serviceable<VerifyResponse, VerifyRequest> service = new VerifyService(settingBean.getSettings(), entityManager);
             response = service.perform(request);
         } catch (CWSException e) {
             // Any Warning or Error thrown by the CWS contain enough information
@@ -172,7 +173,7 @@ public class ShareBean {
         FetchSignatureResponse response;
 
         try {
-            final Serviceable<FetchSignatureResponse, FetchSignatureRequest> service = new FetchSignatureService(settings, entityManager);
+            final Serviceable<FetchSignatureResponse, FetchSignatureRequest> service = new FetchSignatureService(settingBean.getSettings(), entityManager);
             response = service.perform(request);
         } catch (CWSException e) {
             // Any Warning or Error thrown by the CWS contain enough information

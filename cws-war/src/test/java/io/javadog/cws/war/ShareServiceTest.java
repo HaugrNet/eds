@@ -30,18 +30,13 @@ import io.javadog.cws.api.responses.ProcessDataResponse;
 import io.javadog.cws.api.responses.ProcessDataTypeResponse;
 import io.javadog.cws.api.responses.SignResponse;
 import io.javadog.cws.api.responses.VerifyResponse;
-import io.javadog.cws.common.exceptions.CWSException;
-import io.javadog.cws.model.DatabaseSetup;
 import org.junit.Test;
-
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 
 /**
  * @author Kim Jensen
- * @since CWS 1.0
+ * @since  CWS 1.0
  */
-public class ShareServiceTest extends DatabaseSetup {
+public class ShareServiceTest extends BeanSetup {
 
     @Test
     public void testProcessDataType() {
@@ -318,50 +313,5 @@ public class ShareServiceTest extends DatabaseSetup {
 
         final FetchSignatureResponse response = service.fetchSignatures(request);
         assertThat(response.getReturnCode(), is(ReturnCode.ERROR));
-    }
-
-    // =========================================================================
-    // Internal Methods
-    // =========================================================================
-
-    private static ShareService prepareFlawedShareService() {
-        try {
-            final ShareService service = ShareService.class.getConstructor().newInstance();
-            setField(service, "bean", null);
-
-            return service;
-        } catch (InstantiationException | InvocationTargetException | IllegalAccessException | NoSuchMethodException e) {
-            throw new CWSException(ReturnCode.ERROR, "Cannot instantiate Service Object", e);
-        }
-    }
-
-    private ShareService prepareShareService() {
-        try {
-            final ShareBean bean = ShareBean.class.getConstructor().newInstance();
-            setField(bean, "entityManager", entityManager);
-
-            final ShareService service = ShareService.class.getConstructor().newInstance();
-            setField(service, "bean", bean);
-
-            return service;
-        } catch (InstantiationException | InvocationTargetException | IllegalAccessException | NoSuchMethodException e) {
-            throw new CWSException(ReturnCode.ERROR, "Cannot instantiate Service Object", e);
-        }
-    }
-
-    private static void setField(final Object instance, final String fieldName, final Object value) {
-        try {
-            final Class<?> clazz = instance.getClass();
-            final Field field;
-
-            field = clazz.getDeclaredField(fieldName);
-            final boolean accessible = field.isAccessible();
-
-            field.setAccessible(true);
-            field.set(instance, value);
-            field.setAccessible(accessible);
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            throw new CWSException(ReturnCode.ERROR, "Cannot set Field", e);
-        }
     }
 }

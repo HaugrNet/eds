@@ -24,18 +24,13 @@ import io.javadog.cws.api.responses.ProcessCircleResponse;
 import io.javadog.cws.api.responses.ProcessMemberResponse;
 import io.javadog.cws.api.responses.SettingResponse;
 import io.javadog.cws.api.responses.VersionResponse;
-import io.javadog.cws.common.exceptions.CWSException;
-import io.javadog.cws.model.DatabaseSetup;
 import org.junit.Test;
-
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 
 /**
  * @author Kim Jensen
  * @since  CWS 1.0
  */
-public final class SystemServiceTest extends DatabaseSetup {
+public final class SystemServiceTest extends BeanSetup {
 
     @Test
     public void testVersion() {
@@ -236,50 +231,5 @@ public final class SystemServiceTest extends DatabaseSetup {
 
         final ProcessCircleResponse response = system.processCircle(request);
         assertThat(response.getReturnCode(), is(ReturnCode.ERROR));
-    }
-
-    // =========================================================================
-    // Internal Methods
-    // =========================================================================
-
-    private static SystemService prepareFlawedSystemService() {
-        try {
-            final SystemService service = SystemService.class.getConstructor().newInstance();
-            setField(service, "bean", null);
-
-            return service;
-        } catch (InstantiationException | InvocationTargetException | IllegalAccessException | NoSuchMethodException e) {
-            throw new CWSException(ReturnCode.ERROR, "Cannot instantiate Service Object", e);
-        }
-    }
-
-    private SystemService prepareSystemService() {
-        try {
-            final SystemBean bean = SystemBean.class.getConstructor().newInstance();
-            setField(bean, "entityManager", entityManager);
-
-            final SystemService service = SystemService.class.getConstructor().newInstance();
-            setField(service, "bean", bean);
-
-            return service;
-        } catch (InstantiationException | InvocationTargetException | IllegalAccessException | NoSuchMethodException e) {
-            throw new CWSException(ReturnCode.ERROR, "Cannot instantiate Service Object", e);
-        }
-    }
-
-    private static void setField(final Object instance, final String fieldName, final Object value) {
-        try {
-            final Class<?> clazz = instance.getClass();
-            final Field field;
-
-            field = clazz.getDeclaredField(fieldName);
-            final boolean accessible = field.isAccessible();
-
-            field.setAccessible(true);
-            field.set(instance, value);
-            field.setAccessible(accessible);
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            throw new CWSException(ReturnCode.ERROR, "Cannot set Field", e);
-        }
     }
 }

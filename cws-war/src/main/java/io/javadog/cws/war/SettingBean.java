@@ -14,7 +14,6 @@ import io.javadog.cws.model.jpa.CommonJpaDao;
 
 import javax.annotation.PostConstruct;
 import javax.ejb.Stateless;
-import javax.inject.Singleton;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.util.List;
@@ -24,7 +23,6 @@ import java.util.List;
  * @since  CWS 1.0
  */
 @Stateless
-@Singleton
 public class SettingBean {
 
     @PersistenceContext(unitName = "cwsDS")

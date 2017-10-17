@@ -1,14 +1,15 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
-                  xmlns:tns="http://ws1.cws.javadog.io/"
+                  xmlns:tns="http://ws.cws.javadog.io/"
                   xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
-                  xmlns:ns1="http://schemas.xmlsoap.org/soap/http"
-                  name="shareService"
-                  targetNamespace="http://ws1.cws.javadog.io/">
+                  name="share" targetNamespace="http://ws.cws.javadog.io/">
+  <wsdl:documentation>
+    Service: Cryptographic WebStore Share Service
+    Version: 1.0
+    Owner: JavaDog.io
+  </wsdl:documentation>
   <wsdl:types>
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://ws1.cws.javadog.io/" xmlns:ns1="api.cws.javadog.io" elementFormDefault="unqualified" targetNamespace="http://ws1.cws.javadog.io/" version="1.0">
-
-  <xs:import namespace="api.cws.javadog.io"/>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://ws.cws.javadog.io/" elementFormDefault="unqualified" targetNamespace="http://ws.cws.javadog.io/" version="1.0">
 
   <xs:element name="fetchData" type="tns:fetchData"/>
 
@@ -17,6 +18,10 @@
   <xs:element name="fetchDataTypes" type="tns:fetchDataTypes"/>
 
   <xs:element name="fetchDataTypesResponse" type="tns:fetchDataTypesResponse"/>
+
+  <xs:element name="fetchSignatures" type="tns:fetchSignatures"/>
+
+  <xs:element name="fetchSignaturesResponse" type="tns:fetchSignaturesResponse"/>
 
   <xs:element name="processData" type="tns:processData"/>
 
@@ -30,100 +35,27 @@
 
   <xs:element name="signResponse" type="tns:signResponse"/>
 
-  <xs:element name="verify" type="tns:verify"/>
+  <xs:element name="verification" type="tns:verification"/>
 
-  <xs:element name="verifyResponse" type="tns:verifyResponse"/>
+  <xs:element name="verificationResponse" type="tns:verificationResponse"/>
 
   <xs:complexType name="processData">
     <xs:sequence>
-      <xs:element minOccurs="0" name="arg0" type="ns1:processDataRequest"/>
+      <xs:element minOccurs="0" name="request" type="tns:processDataRequest"/>
     </xs:sequence>
   </xs:complexType>
-
-  <xs:complexType name="processDataResponse">
-    <xs:sequence>
-      <xs:element minOccurs="0" name="return" type="ns1:processDataResponse"/>
-    </xs:sequence>
-  </xs:complexType>
-
-  <xs:complexType name="fetchDataTypes">
-    <xs:sequence>
-      <xs:element minOccurs="0" name="arg0" type="ns1:fetchDataTypeRequest"/>
-    </xs:sequence>
-  </xs:complexType>
-
-  <xs:complexType name="fetchDataTypesResponse">
-    <xs:sequence>
-      <xs:element minOccurs="0" name="return" type="ns1:fetchDataTypeResponse"/>
-    </xs:sequence>
-  </xs:complexType>
-
-  <xs:complexType name="fetchData">
-    <xs:sequence>
-      <xs:element minOccurs="0" name="arg0" type="ns1:fetchDataRequest"/>
-    </xs:sequence>
-  </xs:complexType>
-
-  <xs:complexType name="fetchDataResponse">
-    <xs:sequence>
-      <xs:element minOccurs="0" name="return" type="ns1:fetchDataResponse"/>
-    </xs:sequence>
-  </xs:complexType>
-
-  <xs:complexType name="verify">
-    <xs:sequence>
-      <xs:element minOccurs="0" name="arg0" type="ns1:verifyRequest"/>
-    </xs:sequence>
-  </xs:complexType>
-
-  <xs:complexType name="verifyResponse">
-    <xs:sequence>
-      <xs:element minOccurs="0" name="return" type="ns1:verifyResponse"/>
-    </xs:sequence>
-  </xs:complexType>
-
-  <xs:complexType name="sign">
-    <xs:sequence>
-      <xs:element minOccurs="0" name="request" type="ns1:signRequest"/>
-    </xs:sequence>
-  </xs:complexType>
-
-  <xs:complexType name="signResponse">
-    <xs:sequence>
-      <xs:element minOccurs="0" name="response" type="ns1:signResponse"/>
-    </xs:sequence>
-  </xs:complexType>
-
-  <xs:complexType name="processDataType">
-    <xs:sequence>
-      <xs:element minOccurs="0" name="arg0" type="ns1:processDataTypeRequest"/>
-    </xs:sequence>
-  </xs:complexType>
-
-  <xs:complexType name="processDataTypeResponse">
-    <xs:sequence>
-      <xs:element minOccurs="0" name="return" type="ns1:processDataTypeResponse"/>
-    </xs:sequence>
-  </xs:complexType>
-
-  <xs:simpleType name="classification">
-    <xs:restriction base="xs:string">
-      <xs:enumeration value="CLASS_INFO"/>
-      <xs:enumeration value="CLASS_WARNING"/>
-      <xs:enumeration value="CLASS_ERROR"/>
-    </xs:restriction>
-  </xs:simpleType>
-
-</xs:schema>
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="api.cws.javadog.io" targetNamespace="api.cws.javadog.io" version="1.0">
 
   <xs:complexType final="extension restriction" name="processDataRequest">
     <xs:complexContent>
       <xs:extension base="tns:authentication">
         <xs:sequence>
           <xs:element name="action" type="tns:action"/>
-          <xs:element name="dataId" nillable="true" type="xs:string"/>
-          <xs:element name="data" nillable="true" type="tns:data"/>
+          <xs:element name="id" nillable="true" type="xs:string"/>
+          <xs:element minOccurs="0" name="circleId" nillable="true" type="xs:string"/>
+          <xs:element minOccurs="0" name="folderId" nillable="true" type="xs:string"/>
+          <xs:element minOccurs="0" name="name" nillable="true" type="xs:string"/>
+          <xs:element minOccurs="0" name="typeName" type="xs:string"/>
+          <xs:element minOccurs="0" name="bytes" nillable="true" type="xs:base64Binary"/>
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>
@@ -135,7 +67,7 @@
         <xs:sequence>
           <xs:element name="account" type="xs:string"/>
           <xs:element name="credentialType" type="tns:credentialType"/>
-          <xs:element maxOccurs="unbounded" name="credential" type="xs:unsignedShort"/>
+          <xs:element name="credential" type="xs:string"/>
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>
@@ -145,36 +77,32 @@
     <xs:sequence/>
   </xs:complexType>
 
-  <xs:complexType final="extension restriction" name="data">
+  <xs:complexType name="processDataResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="response" type="tns:processDataResult"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType final="extension restriction" name="processDataResult">
     <xs:complexContent>
-      <xs:extension base="tns:verifiable">
+      <xs:extension base="tns:cwsResult">
         <xs:sequence>
-          <xs:element name="id" nillable="true" type="xs:string"/>
-          <xs:element name="circleId" nillable="true" type="xs:string"/>
-          <xs:element name="folderId" nillable="true" type="xs:string"/>
-          <xs:element name="name" nillable="true" type="xs:string"/>
-          <xs:element name="typeName" type="xs:string"/>
-          <xs:element name="bytes" nillable="true" type="xs:base64Binary"/>
-          <xs:element minOccurs="0" name="added" type="xs:dateTime"/>
+          <xs:element name="id" type="xs:string"/>
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
 
-  <xs:complexType final="extension restriction" name="processDataResponse">
-    <xs:complexContent>
-      <xs:extension base="tns:cwsResponse">
-        <xs:sequence>
-          <xs:element name="id" type="tns:data"/>
-        </xs:sequence>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-
-  <xs:complexType name="cwsResponse">
+  <xs:complexType name="cwsResult">
     <xs:sequence>
       <xs:element name="returnCode" type="tns:returnCode"/>
       <xs:element name="returnMessage" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="fetchDataTypes">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="request" type="tns:fetchDataTypeRequest"/>
     </xs:sequence>
   </xs:complexType>
 
@@ -186,9 +114,15 @@
     </xs:complexContent>
   </xs:complexType>
 
-  <xs:complexType final="extension restriction" name="fetchDataTypeResponse">
+  <xs:complexType name="fetchDataTypesResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="response" type="tns:fetchDataTypeResult"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType final="extension restriction" name="fetchDataTypeResult">
     <xs:complexContent>
-      <xs:extension base="tns:cwsResponse">
+      <xs:extension base="tns:cwsResult">
         <xs:sequence>
           <xs:element maxOccurs="unbounded" minOccurs="0" name="types" type="tns:dataType"/>
         </xs:sequence>
@@ -207,6 +141,12 @@
     </xs:complexContent>
   </xs:complexType>
 
+  <xs:complexType name="fetchData">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="request" type="tns:fetchDataRequest"/>
+    </xs:sequence>
+  </xs:complexType>
+
   <xs:complexType final="extension restriction" name="fetchDataRequest">
     <xs:complexContent>
       <xs:extension base="tns:authentication">
@@ -219,46 +159,152 @@
     </xs:complexContent>
   </xs:complexType>
 
-  <xs:complexType final="extension restriction" name="fetchDataResponse">
+  <xs:complexType name="fetchDataResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="response" type="tns:fetchDataResult"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType final="extension restriction" name="fetchDataResult">
     <xs:complexContent>
-      <xs:extension base="tns:cwsResponse">
+      <xs:extension base="tns:cwsResult">
         <xs:sequence>
-          <xs:element maxOccurs="unbounded" minOccurs="0" name="data" type="tns:data"/>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="data" type="tns:metadata"/>
+          <xs:element minOccurs="0" name="bytes" type="xs:base64Binary"/>
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
 
-  <xs:complexType final="extension restriction" name="verifyRequest">
+  <xs:complexType final="extension restriction" name="metadata">
     <xs:complexContent>
-      <xs:extension base="tns:authentication">
-        <xs:sequence/>
+      <xs:extension base="tns:verifiable">
+        <xs:sequence>
+          <xs:element name="id" nillable="true" type="xs:string"/>
+          <xs:element name="circleId" nillable="true" type="xs:string"/>
+          <xs:element name="folderId" nillable="true" type="xs:string"/>
+          <xs:element name="name" nillable="true" type="xs:string"/>
+          <xs:element name="typeName" type="xs:string"/>
+          <xs:element minOccurs="0" name="added" type="xs:dateTime"/>
+        </xs:sequence>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
 
-  <xs:complexType final="extension restriction" name="verifyResponse">
+  <xs:complexType name="verification">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="request" type="tns:verifyRequest"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType final="extension restriction" name="verifyRequest">
     <xs:complexContent>
-      <xs:extension base="tns:cwsResponse">
-        <xs:sequence/>
+      <xs:extension base="tns:authentication">
+        <xs:sequence>
+          <xs:element name="signature" type="xs:string"/>
+          <xs:element name="data" type="xs:base64Binary"/>
+        </xs:sequence>
       </xs:extension>
     </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="verificationResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="response" type="tns:verifyResult"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType final="extension restriction" name="verifyResult">
+    <xs:complexContent>
+      <xs:extension base="tns:cwsResult">
+        <xs:sequence>
+          <xs:element name="verified" type="xs:boolean"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="sign">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="request" type="tns:signRequest"/>
+    </xs:sequence>
   </xs:complexType>
 
   <xs:complexType final="extension restriction" name="signRequest">
     <xs:complexContent>
       <xs:extension base="tns:authentication">
+        <xs:sequence>
+          <xs:element name="data" type="xs:base64Binary"/>
+          <xs:element minOccurs="0" name="expires" type="xs:dateTime"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="signResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="response" type="tns:signResult"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType final="extension restriction" name="signResult">
+    <xs:complexContent>
+      <xs:extension base="tns:cwsResult">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="signature" type="xs:string"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="fetchSignatures">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="request" type="tns:fetchSignatureRequest"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType final="extension restriction" name="fetchSignatureRequest">
+    <xs:complexContent>
+      <xs:extension base="tns:authentication">
         <xs:sequence/>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
 
-  <xs:complexType final="extension restriction" name="signResponse">
+  <xs:complexType name="fetchSignaturesResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="response" type="tns:fetchSignatureResult"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType final="extension restriction" name="fetchSignatureResult">
     <xs:complexContent>
-      <xs:extension base="tns:cwsResponse">
-        <xs:sequence/>
+      <xs:extension base="tns:cwsResult">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" name="signatures" type="tns:signature"/>
+        </xs:sequence>
       </xs:extension>
     </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType final="extension restriction" name="signature">
+    <xs:complexContent>
+      <xs:extension base="tns:verifiable">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="id" type="xs:string"/>
+          <xs:element minOccurs="0" name="expires" type="xs:dateTime"/>
+          <xs:element minOccurs="0" name="verifications" type="xs:long"/>
+          <xs:element minOccurs="0" name="created" type="xs:dateTime"/>
+          <xs:element minOccurs="0" name="lastVerification" type="xs:dateTime"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="processDataType">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="request" type="tns:processDataTypeRequest"/>
+    </xs:sequence>
   </xs:complexType>
 
   <xs:complexType final="extension restriction" name="processDataTypeRequest">
@@ -272,9 +318,15 @@
     </xs:complexContent>
   </xs:complexType>
 
-  <xs:complexType final="extension restriction" name="processDataTypeResponse">
+  <xs:complexType name="processDataTypeResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="response" type="tns:processDataTypeResult"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType final="extension restriction" name="processDataTypeResult">
     <xs:complexContent>
-      <xs:extension base="tns:cwsResponse">
+      <xs:extension base="tns:cwsResult">
         <xs:sequence>
           <xs:element minOccurs="0" name="dataType" type="tns:dataType"/>
         </xs:sequence>
@@ -286,6 +338,8 @@
     <xs:restriction base="xs:string">
       <xs:enumeration value="NONE"/>
       <xs:enumeration value="PROCESS"/>
+      <xs:enumeration value="CREATE"/>
+      <xs:enumeration value="UPDATE"/>
       <xs:enumeration value="INVITE"/>
       <xs:enumeration value="DELETE"/>
       <xs:enumeration value="ADD"/>
@@ -297,7 +351,6 @@
 
   <xs:simpleType name="credentialType">
     <xs:restriction base="xs:string">
-      <xs:enumeration value="KEY"/>
       <xs:enumeration value="PASSPHRASE"/>
       <xs:enumeration value="SIGNATURE"/>
     </xs:restriction>
@@ -312,24 +365,54 @@
       <xs:enumeration value="PROPERTY_ERROR"/>
       <xs:enumeration value="CRYPTO_ERROR"/>
       <xs:enumeration value="IDENTIFICATION_ERROR"/>
+      <xs:enumeration value="INTEGRITY_ERROR"/>
       <xs:enumeration value="NOTIMPLEMENTED_ERROR"/>
       <xs:enumeration value="WARNING"/>
       <xs:enumeration value="AUTHENTICATION_WARNING"/>
       <xs:enumeration value="AUTHORIZATION_WARNING"/>
       <xs:enumeration value="VERIFICATION_WARNING"/>
+      <xs:enumeration value="SIGNATURE_WARNING"/>
       <xs:enumeration value="IDENTIFICATION_WARNING"/>
       <xs:enumeration value="ILLEGAL_ACTION"/>
     </xs:restriction>
   </xs:simpleType>
 
+  <xs:simpleType name="classification">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="CLASS_INFO"/>
+      <xs:enumeration value="CLASS_WARNING"/>
+      <xs:enumeration value="CLASS_ERROR"/>
+    </xs:restriction>
+  </xs:simpleType>
+
 </xs:schema>
   </wsdl:types>
+  <wsdl:message name="processDataResponse">
+    <wsdl:part element="tns:processDataResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="verificationResponse">
+    <wsdl:part element="tns:verificationResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
   <wsdl:message name="fetchDataResponse">
     <wsdl:part element="tns:fetchDataResponse" name="parameters">
     </wsdl:part>
   </wsdl:message>
   <wsdl:message name="processDataTypeResponse">
     <wsdl:part element="tns:processDataTypeResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="sign">
+    <wsdl:part element="tns:sign" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="processDataType">
+    <wsdl:part element="tns:processDataType" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="fetchDataTypesResponse">
+    <wsdl:part element="tns:fetchDataTypesResponse" name="parameters">
     </wsdl:part>
   </wsdl:message>
   <wsdl:message name="processData">
@@ -344,35 +427,26 @@
     <wsdl:part element="tns:fetchData" name="parameters">
     </wsdl:part>
   </wsdl:message>
-  <wsdl:message name="fetchDataTypesResponse">
-    <wsdl:part element="tns:fetchDataTypesResponse" name="parameters">
-    </wsdl:part>
-  </wsdl:message>
-  <wsdl:message name="processDataResponse">
-    <wsdl:part element="tns:processDataResponse" name="parameters">
-    </wsdl:part>
-  </wsdl:message>
-  <wsdl:message name="verify">
-    <wsdl:part element="tns:verify" name="parameters">
-    </wsdl:part>
-  </wsdl:message>
-  <wsdl:message name="verifyResponse">
-    <wsdl:part element="tns:verifyResponse" name="parameters">
-    </wsdl:part>
-  </wsdl:message>
-  <wsdl:message name="sign">
-    <wsdl:part element="tns:sign" name="parameters">
-    </wsdl:part>
-  </wsdl:message>
-  <wsdl:message name="processDataType">
-    <wsdl:part element="tns:processDataType" name="parameters">
+  <wsdl:message name="verification">
+    <wsdl:part element="tns:verification" name="parameters">
     </wsdl:part>
   </wsdl:message>
   <wsdl:message name="signResponse">
     <wsdl:part element="tns:signResponse" name="parameters">
     </wsdl:part>
   </wsdl:message>
+  <wsdl:message name="fetchSignaturesResponse">
+    <wsdl:part element="tns:fetchSignaturesResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="fetchSignatures">
+    <wsdl:part element="tns:fetchSignatures" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
   <wsdl:portType name="share">
+    <wsdl:documentation>The Share Service, is part of the CWS, offering the core
+    part of the Business Logic, i.e. the part which will most often be used by
+    various Clients and as part of other services.</wsdl:documentation>
     <wsdl:operation name="processData">
       <wsdl:input message="tns:processData" name="processData">
     </wsdl:input>
@@ -391,16 +465,22 @@
       <wsdl:output message="tns:fetchDataResponse" name="fetchDataResponse">
     </wsdl:output>
     </wsdl:operation>
-    <wsdl:operation name="verify">
-      <wsdl:input message="tns:verify" name="verify">
+    <wsdl:operation name="verification">
+      <wsdl:input message="tns:verification" name="verification">
     </wsdl:input>
-      <wsdl:output message="tns:verifyResponse" name="verifyResponse">
+      <wsdl:output message="tns:verificationResponse" name="verificationResponse">
     </wsdl:output>
     </wsdl:operation>
     <wsdl:operation name="sign">
       <wsdl:input message="tns:sign" name="sign">
     </wsdl:input>
       <wsdl:output message="tns:signResponse" name="signResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="fetchSignatures">
+      <wsdl:input message="tns:fetchSignatures" name="fetchSignatures">
+    </wsdl:input>
+      <wsdl:output message="tns:fetchSignaturesResponse" name="fetchSignaturesResponse">
     </wsdl:output>
     </wsdl:operation>
     <wsdl:operation name="processDataType">
@@ -410,7 +490,7 @@
     </wsdl:output>
     </wsdl:operation>
   </wsdl:portType>
-  <wsdl:binding name="shareServiceSoapBinding" type="tns:share">
+  <wsdl:binding name="shareSoapBinding" type="tns:share">
     <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
     <wsdl:operation name="fetchData">
       <soap:operation soapAction="" style="document"/>
@@ -439,12 +519,12 @@
         <soap:body use="literal"/>
       </wsdl:output>
     </wsdl:operation>
-    <wsdl:operation name="verify">
+    <wsdl:operation name="verification">
       <soap:operation soapAction="" style="document"/>
-      <wsdl:input name="verify">
+      <wsdl:input name="verification">
         <soap:body use="literal"/>
       </wsdl:input>
-      <wsdl:output name="verifyResponse">
+      <wsdl:output name="verificationResponse">
         <soap:body use="literal"/>
       </wsdl:output>
     </wsdl:operation>
@@ -454,6 +534,15 @@
         <soap:body use="literal"/>
       </wsdl:input>
       <wsdl:output name="signResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="fetchSignatures">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="fetchSignatures">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="fetchSignaturesResponse">
         <soap:body use="literal"/>
       </wsdl:output>
     </wsdl:operation>
@@ -467,9 +556,9 @@
       </wsdl:output>
     </wsdl:operation>
   </wsdl:binding>
-  <wsdl:service name="shareService">
-    <wsdl:port binding="tns:shareServiceSoapBinding" name="share">
-      <soap:address location="http://sn-0000655:57211/cws/shareService"/>
+  <wsdl:service name="share">
+    <wsdl:port binding="tns:shareSoapBinding" name="share">
+      <soap:address location="http://localhost:9080/cws/share"/>
     </wsdl:port>
   </wsdl:service>
 </wsdl:definitions>

@@ -200,7 +200,7 @@ public final class SystemServiceTest extends BeanSetup {
         final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, Constants.ADMIN_ACCOUNT);
         request.setAction(Action.CREATE);
         request.setCircleName("Test Circle");
-        request.setMemberId("073dcc8f-ffa6-4cda-8d61-09ba9441e78e");
+        request.setMemberId(MEMBER_1_ID);
 
         final ProcessCircleResponse response = system.processCircle(request);
         assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));

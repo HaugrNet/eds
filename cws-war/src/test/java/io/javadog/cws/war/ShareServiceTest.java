@@ -131,7 +131,7 @@ public class ShareServiceTest extends BeanSetup {
         final ProcessDataRequest request = prepareRequest(ProcessDataRequest.class, MEMBER_1);
         request.setAction(Action.ADD);
         request.setBytes("alfa beta gamma".getBytes(settings.getCharset()));
-        request.setCircleId("d8838d7d-71e7-433d-8790-af7c080e9de9");
+        request.setCircleId(CIRCLE_1_ID);
         request.setName("Data Name");
         request.setTypeName("data");
 
@@ -172,7 +172,7 @@ public class ShareServiceTest extends BeanSetup {
     public void testFetchData() {
         final ShareService service = prepareShareService();
         final FetchDataRequest request = prepareRequest(FetchDataRequest.class, MEMBER_1);
-        request.setCircleId("d8838d7d-71e7-433d-8790-af7c080e9de9");
+        request.setCircleId(CIRCLE_1_ID);
 
         final FetchDataResponse response = service.fetchData(request);
         assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));

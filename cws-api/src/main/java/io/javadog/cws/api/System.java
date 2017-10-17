@@ -34,6 +34,29 @@ public interface System {
     VersionResponse version();
 
     /**
+     * <p>This request allows the System Administrator to read and alter the
+     * Settings of this CWS system. Please be aware, that some fields cannot
+     * be altered once the system is started, as it may have fatal consequences
+     * for running system.</p>
+     *
+     * <p>The following Settings exists:</p>
+     * <ul>
+     *   <li><b>cws.crypto.symmetric.algorithm</b> - updateable</li>
+     *   <li><b>cws.crypto.asymmetric.algorithm</b> - updateable</li>
+     *   <li><b>cws.crypto.signature.algorithm</b> - updateable</li>
+     *   <li><b>cws.crypto.password.algorithm</b> - updateable</li>
+     *   <li><b>cws.crypto.hash.algorithm</b> - updateable</li>
+     *   <li><b>cws.system.salt</b> - not updateable</li>
+     *   <li><b>cws.system.locale</b> - updateable</li>
+     *   <li><b>cws.system.charset</b> - updateable</li>
+     *   <li><b>cws.expose.admin</b> - updateable</li>
+     *   <li><b>cws.show.trustees</b> - updateable</li>
+     * </ul>
+     *
+     * <p>The System Salt is not updateable via this request, as it is will then
+     * act as a &quot;kill-switch&quot;. This value must be updated via standard
+     * SQL updates. Although it is a fairly important feature, it should not be
+     * too easy to change it by mistake.</p>
      *
      * @param request Request Object
      * @return Response Object with ReturnCode and Message

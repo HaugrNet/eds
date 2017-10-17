@@ -45,17 +45,17 @@ INSERT INTO datatypes (datatype_name, datatype_value) VALUES
 --   * RSA/ECB/OAEPWithSHA-256AndMGF1Padding (1024, 2048)
 -- The default should be sufficient for most, if increased security is wanted,
 -- please consider installing and using the unlimited strength patch.
-INSERT INTO settings (name, setting, modifiable) VALUES ('cws.crypto.symmetric.algorithm', 'AES128', false);
+INSERT INTO settings (name, setting, modifiable) VALUES ('cws.crypto.symmetric.algorithm', 'AES128', true);
 
 -- Asymmetric Encryption (Public & Private Key), is used for sharing the
 -- Symmetric Keys, not for encrypting any data. For more information about
 -- these, please see the references given above.
-INSERT INTO settings (name, setting, modifiable) VALUES ('cws.crypto.asymmetric.algorithm', 'RSA2018', false);
+INSERT INTO settings (name, setting, modifiable) VALUES ('cws.crypto.asymmetric.algorithm', 'RSA2048', true);
 
 -- When new Members are added, the System Administrator can issue a signature,
 -- which can be used by the Member when creating their new Account. The
 -- signature is made with this Algorithm.
-INSERT INTO settings (name, setting, modifiable) VALUES ('cws.crypto.signature.algorithm', 'SHA512', false);
+INSERT INTO settings (name, setting, modifiable) VALUES ('cws.crypto.signature.algorithm', 'SHA512', true);
 
 -- If a Member is using something else than a Key to unlock their Account, the
 -- CWS will use the following Password Based Encryption, PBE, algorithm to do
@@ -63,14 +63,14 @@ INSERT INTO settings (name, setting, modifiable) VALUES ('cws.crypto.signature.a
 -- Salt, and a Member Account specific Salt to ensure that enough entropy is
 -- available to create a strong enough Key to unlock the Private Key for the
 -- Account.
-INSERT INTO settings (name, setting, modifiable) VALUES ('cws.crypto.password.algorithm', 'PBE128', false);
+INSERT INTO settings (name, setting, modifiable) VALUES ('cws.crypto.password.algorithm', 'PBE128', true);
 
 -- For the CheckSums or Fingerprints we're generating - we just need a way
 -- to ensure that the value is both identifiable. For Signatures, it is used
 -- as part of the lookup to find a Signature in the Database and for stored
 -- Data Objects, it is a simple mechanism to ensure the integrity of the
 -- stored data.
-INSERT INTO settings (name, setting, modifiable) VALUES ('cws.crypto.hash.algorithm', 'SHA512', false);
+INSERT INTO settings (name, setting, modifiable) VALUES ('cws.crypto.hash.algorithm', 'SHA512', true);
 
 -- This is the System specific Salt, which will be applied whenever PBE is used
 -- to unlock the Private Key of a Member Account. This Salt should be set during

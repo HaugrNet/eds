@@ -116,12 +116,12 @@ public final class SettingServiceTest extends DatabaseSetup {
 
     @Test
     public void testInvokingRequestUpdateNotAllowedExistingSetting() {
-        prepareCause(CWSException.class, ReturnCode.PROPERTY_ERROR, "The setting cws.crypto.symmetric.algorithm may not be overwritten.");
+        prepareCause(CWSException.class, ReturnCode.PROPERTY_ERROR, "The setting cws.system.salt may not be overwritten.");
         final SettingService service = new SettingService(new Settings(), entityManager);
         final SettingRequest request = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
         final Map<String, String> mySettings = new HashMap<>();
-        mySettings.put("cws.crypto.symmetric.algorithm", "DES");
-        assertThat(mySettings.get("cws.crypto.symmetric.algorithm"), is("DES"));
+        mySettings.put("cws.system.salt", "Enabling Kill Switch");
+        assertThat(mySettings.get("cws.system.salt"), is("Enabling Kill Switch"));
         request.setSettings(mySettings);
 
         service.perform(request);

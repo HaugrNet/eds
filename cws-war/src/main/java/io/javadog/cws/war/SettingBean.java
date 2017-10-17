@@ -36,9 +36,7 @@ public class SettingBean {
         final List<SettingEntity> found = dao.readSettings();
 
         for (final SettingEntity entity : found) {
-            if (entity.isModifiable()) {
-                settings.set(entity.getName(), entity.getSetting());
-            }
+            settings.set(entity.getName(), entity.getSetting());
         }
     }
 

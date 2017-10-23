@@ -8,6 +8,7 @@
 package io.javadog.cws.core.services;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 
@@ -20,6 +21,7 @@ import io.javadog.cws.api.responses.ProcessDataResponse;
 import io.javadog.cws.common.exceptions.AuthorizationException;
 import io.javadog.cws.common.exceptions.VerificationException;
 import io.javadog.cws.model.DatabaseSetup;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.UUID;
@@ -139,6 +141,7 @@ public final class DataServiceTest extends DatabaseSetup {
     }
 
     @Test
+    @Ignore("2017-10-23: Test added, code incomplete")
     public void testSaveAndDeleteDataWithoutAccess() {
         final ProcessDataService service = new ProcessDataService(settings, entityManager);
         final ProcessDataRequest saveRequest = prepareAddRequest(MEMBER_1, CIRCLE_1_ID, "More Data", 524288);
@@ -159,6 +162,149 @@ public final class DataServiceTest extends DatabaseSetup {
         final ProcessDataResponse response = service.perform(request);
         assertThat(response.getReturnCode(), is(ReturnCode.IDENTIFICATION_WARNING));
         assertThat(response.getReturnMessage(), is("The requested Data Object could not be located."));
+    }
+
+    @Test
+    @Ignore("2017-10-23: Test added, code incomplete")
+    public void testAddUpdateAndDeleteFolder() {
+        final ProcessDataService service = new ProcessDataService(settings, entityManager);
+        final ProcessDataRequest request = prepareAddRequest(MEMBER_1, CIRCLE_1_ID, "folder1", 0);
+        request.setTypeName("folder");
+        final ProcessDataResponse addResponse = service.perform(request);
+        assertThat(addResponse.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(addResponse.getReturnMessage(), is("Ok"));
+        assertThat(addResponse.getId(), is(not(nullValue())));
+
+        final ProcessDataRequest updateRequest = prepareUpdateRequest(MEMBER_1, addResponse.getId());
+        updateRequest.setName("updated Folder Name");
+        final ProcessDataResponse updateResponse = service.perform(updateRequest);
+        assertThat(updateResponse.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(updateResponse.getReturnMessage(), is("Ok"));
+        assertThat(updateResponse.getId(), is(nullValue()));
+
+        final ProcessDataRequest deleteRequest = prepareDeleteRequest(MEMBER_1, addResponse.getId());
+        final ProcessDataResponse deleteResponse = service.perform(deleteRequest);
+        assertThat(deleteResponse.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(deleteResponse.getReturnMessage(), is("Ok"));
+        assertThat(deleteResponse.getId(), is(nullValue()));
+    }
+
+    @Test
+    @Ignore("2017-10-23: Test added, code incomplete")
+    public void testAddSameFolder() {
+        final ProcessDataService service = new ProcessDataService(settings, entityManager);
+        final ProcessDataRequest request = prepareAddRequest(MEMBER_1, CIRCLE_1_ID, "folder1", 0);
+        request.setTypeName("folder");
+        final ProcessDataResponse response1 = service.perform(request);
+        assertThat(response1.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(response1.getReturnMessage(), is("Ok"));
+        assertThat(response1.getId(), is(not(nullValue())));
+
+        final ProcessDataResponse response2 = service.perform(request);
+        assertThat(response2.getReturnCode(), is(ReturnCode.CONSTRAINT_ERROR));
+        assertThat(response2.getReturnMessage(), is("..."));
+        assertThat(response2.getId(), is(nullValue()));
+    }
+
+    @Test
+    @Ignore("2017-10-23: Test added, code incomplete")
+    public void testDeleteFolderWithData() {
+        final ProcessDataService service = new ProcessDataService(settings, entityManager);
+        final ProcessDataRequest addFolderRequest = prepareAddRequest(MEMBER_1, CIRCLE_1_ID, "folder1", 0);
+        addFolderRequest.setTypeName("folder");
+        final ProcessDataResponse addFolderResponse = service.perform(addFolderRequest);
+        assertThat(addFolderResponse.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(addFolderResponse.getReturnMessage(), is("Ok"));
+        assertThat(addFolderResponse.getId(), is(not(nullValue())));
+
+        final ProcessDataRequest addDataRequest = prepareAddRequest(MEMBER_1, CIRCLE_1_ID, "More Data", 524288);
+        addDataRequest.setFolderId(addFolderResponse.getId());
+        final ProcessDataResponse addDataResponse = service.perform(addDataRequest);
+        assertThat(addDataResponse.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(addDataResponse.getReturnMessage(), is("Ok"));
+
+        final ProcessDataRequest deleteFolderRequest = prepareDeleteRequest(MEMBER_1, addFolderResponse.getId());
+        final ProcessDataResponse deleteFolderResponse = service.perform(deleteFolderRequest);
+        assertThat(deleteFolderResponse.getReturnCode(), is(ReturnCode.ERROR));
+        assertThat(deleteFolderResponse.getReturnMessage(), is("..."));
+        assertThat(deleteFolderResponse.getId(), is(nullValue()));
+    }
+
+    @Test
+    @Ignore("2017-10-23: Test added, code incomplete")
+    public void testMoveFolder() {
+        final ProcessDataService service = new ProcessDataService(settings, entityManager);
+        final ProcessDataRequest addFolderRequest = prepareAddRequest(MEMBER_1, CIRCLE_1_ID, "folder1", 0);
+        addFolderRequest.setTypeName("folder");
+        final ProcessDataResponse addFolderResponse1 = service.perform(addFolderRequest);
+        assertThat(addFolderResponse1.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(addFolderResponse1.getReturnMessage(), is("Ok"));
+        assertThat(addFolderResponse1.getId(), is(not(nullValue())));
+        final String folderId1 = addFolderResponse1.getId();
+
+        addFolderRequest.setName("folder2");
+        final ProcessDataResponse addFolderResponse2 = service.perform(addFolderRequest);
+        assertThat(addFolderResponse2.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(addFolderResponse2.getReturnMessage(), is("Ok"));
+        assertThat(addFolderResponse2.getId(), is(not(nullValue())));
+        final String folderId2 = addFolderResponse2.getId();
+
+        final ProcessDataRequest moveFolderRequest = prepareUpdateRequest(MEMBER_1, folderId2);
+        moveFolderRequest.setFolderId(folderId1);
+        final ProcessDataResponse moveFolderResponse = service.perform(moveFolderRequest);
+        assertThat(moveFolderResponse.getReturnCode(), is(ReturnCode.ERROR));
+        assertThat(moveFolderResponse.getReturnMessage(), is("..."));
+        assertThat(moveFolderResponse.getId(), is(nullValue()));
+    }
+
+    @Test
+    @Ignore("2017-10-23: Test added, code incomplete")
+    public void testMoveData() {
+        final ProcessDataService service = new ProcessDataService(settings, entityManager);
+        final ProcessDataRequest addFolderRequest = prepareAddRequest(MEMBER_1, CIRCLE_1_ID, "folder1", 0);
+        addFolderRequest.setTypeName("folder");
+        final ProcessDataResponse addFolderResponse = service.perform(addFolderRequest);
+        assertThat(addFolderResponse.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(addFolderResponse.getReturnMessage(), is("Ok"));
+        assertThat(addFolderResponse.getId(), is(not(nullValue())));
+
+        final ProcessDataRequest addDataRequest = prepareAddRequest(MEMBER_1, CIRCLE_1_ID, "my data", 512);
+        final ProcessDataResponse addDataResponse = service.perform(addDataRequest);
+        assertThat(addDataResponse.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(addDataResponse.getReturnMessage(), is("Ok"));
+        assertThat(addDataResponse.getId(), is(not(nullValue())));
+
+        final ProcessDataRequest moveDataRequest = prepareUpdateRequest(MEMBER_1, addDataResponse.getId());
+        moveDataRequest.setFolderId(addFolderResponse.getId());
+        final ProcessDataResponse moveFolderResponse = service.perform(moveDataRequest);
+        assertThat(moveFolderResponse.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(moveFolderResponse.getReturnMessage(), is("Ok"));
+        assertThat(moveFolderResponse.getId(), is(nullValue()));
+    }
+
+    @Test
+    @Ignore("2017-10-23: Test added, code incomplete")
+    public void testMoveDataToDifferentCircle() {
+        final ProcessDataService service = new ProcessDataService(settings, entityManager);
+        final ProcessDataRequest addFolderRequest = prepareAddRequest(MEMBER_1, CIRCLE_1_ID, "folder1", 0);
+        addFolderRequest.setTypeName("folder");
+        final ProcessDataResponse addFolderResponse = service.perform(addFolderRequest);
+        assertThat(addFolderResponse.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(addFolderResponse.getReturnMessage(), is("Ok"));
+        assertThat(addFolderResponse.getId(), is(not(nullValue())));
+
+        final ProcessDataRequest addDataRequest = prepareAddRequest(MEMBER_1, CIRCLE_2_ID, "my data", 512);
+        final ProcessDataResponse addDataResponse = service.perform(addDataRequest);
+        assertThat(addDataResponse.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(addDataResponse.getReturnMessage(), is("Ok"));
+        assertThat(addDataResponse.getId(), is(not(nullValue())));
+
+        final ProcessDataRequest moveDataRequest = prepareUpdateRequest(MEMBER_1, addDataResponse.getId());
+        moveDataRequest.setFolderId(addFolderResponse.getId());
+        final ProcessDataResponse moveFolderResponse = service.perform(moveDataRequest);
+        assertThat(moveFolderResponse.getReturnCode(), is(ReturnCode.ERROR));
+        assertThat(moveFolderResponse.getReturnMessage(), is("..."));
+        assertThat(moveFolderResponse.getId(), is(nullValue()));
     }
 
     // =========================================================================

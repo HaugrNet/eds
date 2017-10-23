@@ -126,9 +126,15 @@ public class DatabaseSetup {
     }
 
     protected static byte[] generateData(final int bytes) {
-        final byte[] data = new byte[bytes];
-        final SecureRandom random = new SecureRandom();
-        random.nextBytes(data);
+        final byte[] data;
+
+        if (bytes > 0) {
+            data = new byte[bytes];
+            final SecureRandom random = new SecureRandom();
+            random.nextBytes(data);
+        } else {
+            data = null;
+        }
 
         return data;
     }

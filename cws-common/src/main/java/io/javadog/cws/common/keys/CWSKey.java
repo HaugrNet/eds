@@ -10,97 +10,58 @@ package io.javadog.cws.common.keys;
 import io.javadog.cws.common.enums.KeyAlgorithm;
 
 import java.security.Key;
-import java.security.KeyPair;
-import java.security.PrivateKey;
-import java.security.PublicKey;
+import java.util.Objects;
 
 /**
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
-public final class CWSKey {
+public abstract class CWSKey<T extends Key> {
 
     private final KeyAlgorithm algorithm;
-    private final KeyPair keyPair;
-    private final Key key;
-    private String salt = null;
+    protected final T key;
 
-    public CWSKey(final PublicKey publicKey) {
-        // For the Public Key, we just need the Type
-        algorithm = KeyAlgorithm.RSA2048;
-        keyPair = new KeyPair(publicKey, null);
-        key = null;
-    }
-
-    public CWSKey(final KeyAlgorithm algorithm, final KeyPair keyPair) {
-        if ((algorithm == null) || (keyPair == null)) {
-            throw new IllegalArgumentException("Missing information");
-        }
-
+    /**
+     * Default Constructor.
+     *
+     * @param algorithm Key Algorithm
+     * @param key       Key
+     */
+    protected CWSKey(final KeyAlgorithm algorithm, final T key) {
         this.algorithm = algorithm;
-        this.keyPair = keyPair;
-        this.key = keyPair.getPrivate();
-    }
-
-    public CWSKey(final KeyAlgorithm algorithm, final Key key) {
-        if ((algorithm == null) || (key == null)) {
-            throw new IllegalArgumentException("Missing information");
-        }
-
-        this.algorithm = algorithm;
-        this.keyPair = null;
         this.key = key;
     }
 
-    public KeyAlgorithm.Type getType() {
-        return algorithm.getType();
+    public abstract T getKey();
+
+    public byte[] getEncoded() {
+        return key.getEncoded();
     }
 
     public KeyAlgorithm getAlgorithm() {
         return algorithm;
     }
 
-    public PublicKey getPublic() {
-        final PublicKey theKey;
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(final Object obj) {
+        boolean result = false;
 
-        if (algorithm.getType() == KeyAlgorithm.Type.ASYMMETRIC) {
-            if (keyPair != null) {
-                theKey = keyPair.getPublic();
-            } else {
-                theKey = (PublicKey) key;
-            }
-        } else {
-            theKey = null;
+        if ((obj != null) && (getClass() == obj.getClass())) {
+            final CWSKey<T> that = (CWSKey<T>) obj;
+            result = (algorithm == that.algorithm) && Objects.equals(key, that.key);
         }
 
-        return theKey;
+        return result;
     }
 
-    public PrivateKey getPrivate() {
-        final PrivateKey theKey;
-
-        if (algorithm.getType() == KeyAlgorithm.Type.ASYMMETRIC) {
-            theKey = (PrivateKey) key;
-        } else {
-            theKey = null;
-        }
-
-        return theKey;
-    }
-
-    public Key getKey() {
-        return key;
-    }
-
-    public byte[] getEncoded() {
-        return key.getEncoded();
-    }
-
-    public void setSalt(final String salt) {
-        this.salt = salt;
-    }
-
-    public String getSalt() {
-        return salt;
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        return Objects.hash(algorithm, key);
     }
 }

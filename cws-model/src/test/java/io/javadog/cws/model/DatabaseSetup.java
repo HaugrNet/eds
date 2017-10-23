@@ -20,7 +20,8 @@ import io.javadog.cws.common.Settings;
 import io.javadog.cws.common.enums.KeyAlgorithm;
 import io.javadog.cws.common.enums.Status;
 import io.javadog.cws.common.exceptions.CWSException;
-import io.javadog.cws.common.keys.CWSKey;
+import io.javadog.cws.common.keys.CWSKeyPair;
+import io.javadog.cws.common.keys.SecretCWSKey;
 import io.javadog.cws.model.entities.CWSEntity;
 import io.javadog.cws.model.entities.CircleEntity;
 import io.javadog.cws.model.entities.DataTypeEntity;
@@ -107,9 +108,9 @@ public class DatabaseSetup {
         }
     }
 
-    protected MemberEntity prepareMember(final String externalId, final String accountName, final String secret, final CWSKey keyPair) {
+    protected MemberEntity prepareMember(final String externalId, final String accountName, final String secret, final CWSKeyPair keyPair) {
         final String salt = UUID.randomUUID().toString();
-        final CWSKey secretKey = crypto.generatePasswordKey(settings.getSymmetricAlgorithm(), secret, salt);
+        final SecretCWSKey secretKey = crypto.generatePasswordKey(settings.getSymmetricAlgorithm(), secret, salt);
         secretKey.setSalt(salt);
 
         final MemberEntity entity = new MemberEntity();
@@ -117,8 +118,8 @@ public class DatabaseSetup {
         entity.setName(accountName);
         entity.setSalt(salt);
         entity.setAlgorithm(settings.getAsymmetricAlgorithm());
-        entity.setPublicKey(crypto.armoringPublicKey(keyPair.getPublic()));
-        entity.setPrivateKey(crypto.armoringPrivateKey(secretKey, keyPair.getPrivate()));
+        entity.setPublicKey(crypto.armoringPublicKey(keyPair.getPublic().getKey()));
+        entity.setPrivateKey(crypto.armoringPrivateKey(secretKey, keyPair.getPrivate().getKey()));
         entity.setModified(new Date());
         entity.setCreated(new Date());
 
@@ -247,17 +248,17 @@ public class DatabaseSetup {
         append(builder, "-- \"member5\", which is all used as part of the tests.");
         append(builder, "INSERT INTO members (external_id, name, salt, algorithm, public_key, private_key) VALUES");
 
-        final CWSKey keyPair = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
+        final CWSKeyPair keyPair = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
         createAndAppendMember(builder, ADMIN_ID, Constants.ADMIN_ACCOUNT, keyPair, ',');
-        final CWSKey keyPair1 = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
+        final CWSKeyPair keyPair1 = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
         final MemberEntity member1 = createAndAppendMember(builder, MEMBER_1_ID, MEMBER_1, keyPair1, ',');
-        final CWSKey keyPair2 = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
+        final CWSKeyPair keyPair2 = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
         final MemberEntity member2 = createAndAppendMember(builder, MEMBER_2_ID, MEMBER_2, keyPair2, ',');
-        final CWSKey keyPair3 = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
+        final CWSKeyPair keyPair3 = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
         final MemberEntity member3 = createAndAppendMember(builder, MEMBER_3_ID, MEMBER_3, keyPair3, ',');
-        final CWSKey keyPair4 = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
+        final CWSKeyPair keyPair4 = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
         final MemberEntity member4 = createAndAppendMember(builder, MEMBER_4_ID, MEMBER_4, keyPair4, ',');
-        final CWSKey keyPair5 = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
+        final CWSKeyPair keyPair5 = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
         final MemberEntity member5 = createAndAppendMember(builder, MEMBER_5_ID, MEMBER_5, keyPair5, ';');
 
         append(builder, "");
@@ -289,9 +290,9 @@ public class DatabaseSetup {
         append(builder, "-- Member 1-4 to Circle 2 and Member 2-5 to Circle 3.");
         append(builder, "-- The Trust Level is different for each Member.");
         append(builder, "INSERT INTO trustees (member_id, circle_id, key_id, trust_level, circle_key) VALUES");
-        final CWSKey cwsKey1 = crypto.generateSymmetricKey(key1.getAlgorithm());
-        final CWSKey cwsKey2 = crypto.generateSymmetricKey(key1.getAlgorithm());
-        final CWSKey cwsKey3 = crypto.generateSymmetricKey(key1.getAlgorithm());
+        final SecretCWSKey cwsKey1 = crypto.generateSymmetricKey(key1.getAlgorithm());
+        final SecretCWSKey cwsKey2 = crypto.generateSymmetricKey(key1.getAlgorithm());
+        final SecretCWSKey cwsKey3 = crypto.generateSymmetricKey(key1.getAlgorithm());
         createAndAppendTrustee(builder, member1, keyPair1, circle1, key1, cwsKey1, TrustLevel.ADMIN, ',');
         createAndAppendTrustee(builder, member2, keyPair2, circle1, key1, cwsKey1, TrustLevel.WRITE, ',');
         createAndAppendTrustee(builder, member3, keyPair3, circle1, key1, cwsKey1, TrustLevel.READ,  ',');
@@ -307,7 +308,7 @@ public class DatabaseSetup {
         return builder.toString();
     }
 
-    private MemberEntity createAndAppendMember(final StringBuilder builder, final String externalId, final String name, final CWSKey keyPair, final char delimiter) {
+    private MemberEntity createAndAppendMember(final StringBuilder builder, final String externalId, final String name, final CWSKeyPair keyPair, final char delimiter) {
         final MemberEntity entity = prepareMember(externalId, name, name, keyPair);
         dao.persist(entity);
 
@@ -344,8 +345,8 @@ public class DatabaseSetup {
         append(builder, "    ('" + entity.getExternalId() + "', 0, " + entity.getCircle().getId() + ", 1, '/')" + delimiter);
     }
 
-    private void createAndAppendTrustee(final StringBuilder builder, final MemberEntity member, final CWSKey keyPair, final CircleEntity circle, final KeyEntity key, final CWSKey circleKey, final TrustLevel trustLevel, final char delimiter) {
-        final String armoredKey = crypto.encryptAndArmorCircleKey(keyPair, circleKey);
+    private void createAndAppendTrustee(final StringBuilder builder, final MemberEntity member, final CWSKeyPair keyPair, final CircleEntity circle, final KeyEntity key, final SecretCWSKey circleKey, final TrustLevel trustLevel, final char delimiter) {
+        final String armoredKey = crypto.encryptAndArmorCircleKey(keyPair.getPublic(), circleKey);
         final TrusteeEntity entity = new TrusteeEntity();
         entity.setMember(member);
         entity.setCircle(circle);

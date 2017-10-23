@@ -15,7 +15,7 @@ import io.javadog.cws.api.responses.ProcessDataResponse;
 import io.javadog.cws.common.Settings;
 import io.javadog.cws.common.enums.KeyAlgorithm;
 import io.javadog.cws.common.exceptions.CWSException;
-import io.javadog.cws.common.keys.CWSKey;
+import io.javadog.cws.common.keys.SecretCWSKey;
 import io.javadog.cws.core.Permission;
 import io.javadog.cws.core.Serviceable;
 import io.javadog.cws.model.entities.DataEntity;
@@ -106,7 +106,7 @@ public final class ProcessDataService extends Serviceable<ProcessDataResponse, P
             metadataEntity.setType(type);
             dao.persist(metadataEntity);
 
-            final CWSKey circleKey = crypto.extractCircleKey(algorithm, keyPair, trustee.getCircleKey());
+            final SecretCWSKey circleKey = crypto.extractCircleKey(algorithm, keyPair.getPrivate(), trustee.getCircleKey());
             final String salt = UUID.randomUUID().toString();
             circleKey.setSalt(salt);
             final byte[] encrypted = crypto.encrypt(circleKey, bytes);
@@ -232,7 +232,7 @@ public final class ProcessDataService extends Serviceable<ProcessDataResponse, P
     private void checkData(final DataEntity entity, final byte[] bytes) {
         if (bytes != null) {
             final TrusteeEntity trustee = findTrustee(entity.getMetadata().getCircle().getExternalId());
-            final CWSKey circleKey = crypto.extractCircleKey(entity.getKey().getAlgorithm(), keyPair, trustee.getCircleKey());
+            final SecretCWSKey circleKey = crypto.extractCircleKey(entity.getKey().getAlgorithm(), keyPair.getPrivate(), trustee.getCircleKey());
             final String salt = UUID.randomUUID().toString();
             circleKey.setSalt(salt);
             final byte[] encrypted = crypto.encrypt(circleKey, bytes);

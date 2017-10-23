@@ -16,7 +16,8 @@ import io.javadog.cws.common.Settings;
 import io.javadog.cws.common.enums.KeyAlgorithm;
 import io.javadog.cws.common.enums.Status;
 import io.javadog.cws.common.exceptions.CWSException;
-import io.javadog.cws.common.keys.CWSKey;
+import io.javadog.cws.common.keys.PublicCWSKey;
+import io.javadog.cws.common.keys.SecretCWSKey;
 import io.javadog.cws.core.Permission;
 import io.javadog.cws.core.Serviceable;
 import io.javadog.cws.model.entities.CircleEntity;
@@ -120,10 +121,10 @@ public final class ProcessCircleService extends Serviceable<ProcessCircleRespons
                     keyEntity.setStatus(Status.ACTIVE);
                     dao.persist(keyEntity);
 
-                    final CWSKey key = crypto.generateSymmetricKey(keyEntity.getAlgorithm());
+                    final SecretCWSKey key = crypto.generateSymmetricKey(keyEntity.getAlgorithm());
                     final PublicKey publicKey = crypto.dearmoringPublicKey(circleAdmin.getPublicKey());
-                    final CWSKey cwsKey = new CWSKey(publicKey);
-                    final String circleKey = crypto.encryptAndArmorCircleKey(cwsKey, key);
+                    final PublicCWSKey cwsPublicKey = new PublicCWSKey(circleAdmin.getAlgorithm(), publicKey);
+                    final String circleKey = crypto.encryptAndArmorCircleKey(cwsPublicKey, key);
                     final TrusteeEntity trustee = new TrusteeEntity();
                     trustee.setMember(circleAdmin);
                     trustee.setCircle(circle);
@@ -248,10 +249,10 @@ public final class ProcessCircleService extends Serviceable<ProcessCircleRespons
                     trustee.setTrustLevel(trustLevel);
 
                     if ((trustLevel == TrustLevel.ADMIN) || (trustLevel == TrustLevel.WRITE) || (trustLevel == TrustLevel.READ)) {
-                        final CWSKey circleKey = crypto.extractCircleKey(admin.getKey().getAlgorithm(), keyPair, admin.getCircleKey());
+                        final SecretCWSKey circleKey = crypto.extractCircleKey(admin.getKey().getAlgorithm(), keyPair.getPrivate(), admin.getCircleKey());
                         final PublicKey publicKey = crypto.dearmoringPublicKey(newTrusteeMember.getPublicKey());
-                        final CWSKey cwsKey = new CWSKey(publicKey);
-                        trustee.setCircleKey(crypto.encryptAndArmorCircleKey(cwsKey, circleKey));
+                        final PublicCWSKey cwsPublicKey = new PublicCWSKey(newTrusteeMember.getAlgorithm(), publicKey);
+                        trustee.setCircleKey(crypto.encryptAndArmorCircleKey(cwsPublicKey, circleKey));
                     }
 
                     dao.persist(trustee);

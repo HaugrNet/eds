@@ -14,7 +14,7 @@ import static org.junit.Assert.assertThat;
 
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.common.enums.KeyAlgorithm;
-import io.javadog.cws.common.keys.CWSKey;
+import io.javadog.cws.common.keys.CWSKeyPair;
 import io.javadog.cws.model.DatabaseSetup;
 import org.junit.Test;
 
@@ -31,7 +31,7 @@ public final class MemberEntityTest extends DatabaseSetup {
 
     @Test
     public void testEntity() {
-        final CWSKey keyPair = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
+        final CWSKeyPair keyPair = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
         final String externalId = UUID.randomUUID().toString();
         final MemberEntity entity = prepareMember(externalId, "New Account Name", "My Super Secret", keyPair);
         persistAndDetach(entity);

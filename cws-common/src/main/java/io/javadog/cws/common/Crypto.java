@@ -9,7 +9,10 @@ package io.javadog.cws.common;
 
 import io.javadog.cws.common.enums.KeyAlgorithm;
 import io.javadog.cws.common.exceptions.CryptoException;
-import io.javadog.cws.common.keys.CWSKey;
+import io.javadog.cws.common.keys.CWSKeyPair;
+import io.javadog.cws.common.keys.PrivateCWSKey;
+import io.javadog.cws.common.keys.PublicCWSKey;
+import io.javadog.cws.common.keys.SecretCWSKey;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -85,7 +88,7 @@ public final class Crypto {
      * @param salt   System specific Salt
      * @return Symmetric Key
      */
-    public CWSKey generatePasswordKey(final KeyAlgorithm algorithm, final String secret, final String salt) {
+    public SecretCWSKey generatePasswordKey(final KeyAlgorithm algorithm, final String secret, final String salt) {
         try {
             final char[] extendedSecret = (secret + settings.getSalt()).toCharArray();
             final byte[] secretSalt = stringToBytes(salt);
@@ -95,7 +98,7 @@ public final class Crypto {
             final KeySpec spec = new PBEKeySpec(extendedSecret, secretSalt, 1024, algorithm.getLength());
             final SecretKey tmpKey = factory.generateSecret(spec);
             final SecretKey secretKey = new SecretKeySpec(tmpKey.getEncoded(), algorithm.getName());
-            final CWSKey key = new CWSKey(algorithm, secretKey);
+            final SecretCWSKey key = new SecretCWSKey(algorithm, secretKey);
             key.setSalt(salt);
 
             return key;
@@ -104,25 +107,25 @@ public final class Crypto {
         }
     }
 
-    public CWSKey generateSymmetricKey(final KeyAlgorithm algorithm) {
+    public SecretCWSKey generateSymmetricKey(final KeyAlgorithm algorithm) {
         try {
             final KeyGenerator generator = KeyGenerator.getInstance(algorithm.getName());
             generator.init(algorithm.getLength());
             final SecretKey key = generator.generateKey();
 
-            return new CWSKey(algorithm, key);
+            return new SecretCWSKey(algorithm, key);
         } catch (IllegalArgumentException | NoSuchAlgorithmException e) {
             throw new CryptoException(e.getMessage(), e);
         }
     }
 
-    public CWSKey generateAsymmetricKey(final KeyAlgorithm algorithm) {
+    public CWSKeyPair generateAsymmetricKey(final KeyAlgorithm algorithm) {
         try {
             final KeyPairGenerator generator = KeyPairGenerator.getInstance(algorithm.getName());
             generator.initialize(algorithm.getLength());
             final KeyPair keyPair = generator.generateKeyPair();
 
-            return new CWSKey(algorithm, keyPair);
+            return new CWSKeyPair(algorithm, keyPair);
         } catch (IllegalArgumentException | NoSuchAlgorithmException e) {
             throw new CryptoException(e.getMessage(), e);
         }
@@ -173,7 +176,7 @@ public final class Crypto {
         }
     }
 
-    public byte[] encrypt(final CWSKey key, final byte[] toEncrypt) {
+    public byte[] encrypt(final SecretCWSKey key, final byte[] toEncrypt) {
         try {
             final Cipher cipher = prepareCipher(key, Cipher.ENCRYPT_MODE);
             return cipher.doFinal(toEncrypt);
@@ -182,7 +185,7 @@ public final class Crypto {
         }
     }
 
-    public byte[] decrypt(final CWSKey key, final byte[] toDecrypt) {
+    public byte[] decrypt(final SecretCWSKey key, final byte[] toDecrypt) {
         try {
             final Cipher cipher = prepareCipher(key, Cipher.DECRYPT_MODE);
             return cipher.doFinal(toDecrypt);
@@ -191,22 +194,48 @@ public final class Crypto {
         }
     }
 
-    private Cipher prepareCipher(final CWSKey key, final int type) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException {
-        final KeyAlgorithm algorithm = key.getAlgorithm();
-        final Cipher cipher;
-
-        if (algorithm.getType() == KeyAlgorithm.Type.ASYMMETRIC) {
-            final String rsa = algorithm.getName();
-            cipher = Cipher.getInstance(rsa);
-            cipher.init(type, (type == Cipher.ENCRYPT_MODE) ? key.getPublic() : key.getPrivate());
-        } else {
-            cipher = Cipher.getInstance(algorithm.getTransformation());
-            final String salt = key.getSalt();
-            final byte[] bytes = new byte[algorithm.getLength() / 8];
-            System.arraycopy(salt.getBytes(settings.getCharset()), 0, bytes, 0, bytes.length);
-            final IvParameterSpec iv = new IvParameterSpec(bytes);
-            cipher.init(type, key.getKey(), iv);
+    public byte[] encrypt(final PublicCWSKey key, final byte[] toEncrypt) {
+        try {
+            final Cipher cipher = prepareCipher(key);
+            return cipher.doFinal(toEncrypt);
+        } catch (BadPaddingException | IllegalBlockSizeException | NoSuchPaddingException | NoSuchAlgorithmException | InvalidKeyException e) {
+            throw new CryptoException(e.getMessage(), e);
         }
+    }
+
+    public byte[] decrypt(final PrivateCWSKey key, final byte[] toDecrypt) {
+        try {
+            final Cipher cipher = prepareCipher(key);
+            return cipher.doFinal(toDecrypt);
+        } catch (BadPaddingException | IllegalBlockSizeException | NoSuchPaddingException | NoSuchAlgorithmException | InvalidKeyException e) {
+            throw new CryptoException(e.getMessage(), e);
+        }
+    }
+
+    private Cipher prepareCipher(final SecretCWSKey key, final int type) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException {
+        final KeyAlgorithm algorithm = key.getAlgorithm();
+        final Cipher cipher = Cipher.getInstance(algorithm.getTransformation());
+        final String salt = key.getSalt();
+        final byte[] bytes = new byte[algorithm.getLength() / 8];
+        System.arraycopy(salt.getBytes(settings.getCharset()), 0, bytes, 0, bytes.length);
+        final IvParameterSpec iv = new IvParameterSpec(bytes);
+        cipher.init(type, key.getKey(), iv);
+
+        return cipher;
+    }
+
+    private static Cipher prepareCipher(final PublicCWSKey key) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException {
+        final String rsa = key.getAlgorithm().getName();
+        final Cipher cipher = Cipher.getInstance(rsa);
+        cipher.init(Cipher.ENCRYPT_MODE, key.getKey());
+
+        return cipher;
+    }
+
+    private static Cipher prepareCipher(final PrivateCWSKey key) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException {
+        final String rsa = key.getAlgorithm().getName();
+        final Cipher cipher = Cipher.getInstance(rsa);
+        cipher.init(Cipher.DECRYPT_MODE, key.getKey());
 
         return cipher;
     }
@@ -231,7 +260,8 @@ public final class Crypto {
 
     public PublicKey dearmoringPublicKey(final String armoredKey) {
         try {
-            final KeyFactory keyFactory = KeyFactory.getInstance(settings.getAsymmetricAlgorithm().getName());
+            final KeyAlgorithm algorithm = settings.getAsymmetricAlgorithm();
+            final KeyFactory keyFactory = KeyFactory.getInstance(algorithm.getName());
             final byte[] rawKey = Base64.getDecoder().decode(armoredKey);
             final X509EncodedKeySpec x509KeySpec = new X509EncodedKeySpec(rawKey);
 
@@ -241,7 +271,7 @@ public final class Crypto {
         }
     }
 
-    public String armoringPrivateKey(final CWSKey encryptionKey, final PrivateKey key) {
+    public String armoringPrivateKey(final SecretCWSKey encryptionKey, final PrivateKey key) {
         final PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(key.getEncoded());
         final byte[] rawKey = keySpec.getEncoded();
         final byte[] encryptedKey = encrypt(encryptionKey, rawKey);
@@ -249,9 +279,10 @@ public final class Crypto {
         return Base64.getEncoder().encodeToString(encryptedKey);
     }
 
-    public PrivateKey dearmoringPrivateKey(final CWSKey decryptionKey, final String armoredKey) {
+    public PrivateKey dearmoringPrivateKey(final SecretCWSKey decryptionKey, final String armoredKey) {
         try {
-            final KeyFactory keyFactory = KeyFactory.getInstance(settings.getAsymmetricAlgorithm().getName());
+            final KeyAlgorithm algorithm = settings.getAsymmetricAlgorithm();
+            final KeyFactory keyFactory = KeyFactory.getInstance(algorithm.getName());
             final byte[] dearmored = Base64.getDecoder().decode(armoredKey);
             final byte[] rawKey = decrypt(decryptionKey, dearmored);
             final PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(rawKey);
@@ -260,20 +291,6 @@ public final class Crypto {
         } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
             throw new CryptoException(e.getMessage(), e);
         }
-    }
-
-    public String armoringSecretKey(final CWSKey encryptionKey, final CWSKey key) {
-        final byte[] encryptedCircleKey = encrypt(encryptionKey, key.getEncoded());
-
-        return Base64.getEncoder().encodeToString(encryptedCircleKey);
-    }
-
-    public CWSKey dearmoringSecretKey(final KeyAlgorithm algorithm, final CWSKey decryptionKey, final String armoredKey) {
-        final byte[] dearmoredCircleKey = Base64.getDecoder().decode(armoredKey);
-        final byte[] decryptedCircleKey = decrypt(decryptionKey, dearmoredCircleKey);
-
-        final SecretKey key = new SecretKeySpec(decryptedCircleKey, algorithm.getName());
-        return new CWSKey(algorithm, key);
     }
 
     /**
@@ -287,7 +304,7 @@ public final class Crypto {
      * @param privateKey The Private RSA Key to encrypt and armor
      * @return Armored (Base64 encoded encrypted key in PCKS 8 format)
      */
-    public String armorPrivateKey(final CWSKey key, final PrivateKey privateKey) {
+    public String armorPrivateKey(final SecretCWSKey key, final PrivateKey privateKey) {
         final byte[] encryptedPrivateKey = encrypt(key, privateKey.getEncoded());
         final PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(encryptedPrivateKey);
         final byte[] rawKey = keySpec.getEncoded();
@@ -295,18 +312,18 @@ public final class Crypto {
         return Base64.getEncoder().encodeToString(rawKey);
     }
 
-    public String encryptAndArmorCircleKey(final CWSKey publicKey, final CWSKey circleKey) {
+    public String encryptAndArmorCircleKey(final PublicCWSKey publicKey, final SecretCWSKey circleKey) {
         final byte[] encryptedCircleKey = encrypt(publicKey, circleKey.getEncoded());
 
         return Base64.getEncoder().encodeToString(encryptedCircleKey);
     }
 
-    public CWSKey extractCircleKey(final KeyAlgorithm algorithm, final CWSKey privateKey, final String armoredCircleKey) {
+    public SecretCWSKey extractCircleKey(final KeyAlgorithm algorithm, final PrivateCWSKey privateKey, final String armoredCircleKey) {
         final byte[] dearmoredCircleKey = Base64.getDecoder().decode(armoredCircleKey);
         final byte[] decryptedCircleKey = decrypt(privateKey, dearmoredCircleKey);
         final SecretKey key = new SecretKeySpec(decryptedCircleKey, algorithm.getName());
 
-        return new CWSKey(algorithm, key);
+        return new SecretCWSKey(algorithm, key);
     }
 
     /**
@@ -324,7 +341,7 @@ public final class Crypto {
      * @param armoredPrivateKey Armored and encrypted Private Key
      * @return RSA KeyPair with the Public and Private Keys
      */
-    public CWSKey extractAsymmetricKey(final KeyAlgorithm algorithm, final CWSKey key, final String salt, final String armoredPublicKey, final String armoredPrivateKey) {
+    public CWSKeyPair extractAsymmetricKey(final KeyAlgorithm algorithm, final SecretCWSKey key, final String salt, final String armoredPublicKey, final String armoredPrivateKey) {
         key.setSalt(salt);
 
         // Extracting the Public Key
@@ -333,9 +350,9 @@ public final class Crypto {
         // Extracting the Private Key
         final PrivateKey privateKey = dearmoringPrivateKey(key, armoredPrivateKey);
 
-        // Build the CWSKey
+        // Build the CWSKeyPair
         final KeyPair keyPair = new KeyPair(publicKey, privateKey);
-        return new CWSKey(algorithm, keyPair);
+        return new CWSKeyPair(algorithm, keyPair);
     }
 
     public byte[] stringToBytes(final String string) {

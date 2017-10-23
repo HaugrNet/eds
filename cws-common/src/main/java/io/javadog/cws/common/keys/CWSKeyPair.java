@@ -10,12 +10,16 @@ package io.javadog.cws.common.keys;
 import io.javadog.cws.common.enums.KeyAlgorithm;
 
 import java.security.KeyPair;
+import java.util.Objects;
 
 /**
  * @author Kim Jensen
  * @since  CWS 1.0
  */
-public final class CWSKeyPair extends CommonKey<KeyPair> {
+public final class CWSKeyPair {
+
+    private final PublicCWSKey publicKey;
+    private final PrivateCWSKey privateKey;
 
     /**
      * Default Constructor.
@@ -24,6 +28,36 @@ public final class CWSKeyPair extends CommonKey<KeyPair> {
      * @param key       Key
      */
     public CWSKeyPair(final KeyAlgorithm algorithm, final KeyPair key) {
-        super(algorithm, key);
+        publicKey = new PublicCWSKey(algorithm, key.getPublic());
+        privateKey = new PrivateCWSKey(algorithm, key.getPrivate());
+    }
+
+    public PublicCWSKey getPublic() {
+        return publicKey;
+    }
+
+    public PrivateCWSKey getPrivate() {
+        return privateKey;
+    }
+
+    public KeyAlgorithm getAlgorithm() {
+        return publicKey.getAlgorithm();
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        boolean result = false;
+
+        if ((obj != null) && (getClass() == obj.getClass())) {
+            final CWSKeyPair that = (CWSKeyPair) obj;
+            result = Objects.equals(publicKey, that.publicKey) && Objects.equals(privateKey, that.privateKey);
+        }
+
+        return result;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(publicKey, privateKey);
     }
 }

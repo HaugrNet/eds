@@ -10,12 +10,13 @@ package io.javadog.cws.common.keys;
 import io.javadog.cws.common.enums.KeyAlgorithm;
 
 import javax.crypto.SecretKey;
+import java.util.Objects;
 
 /**
  * @author Kim Jensen
  * @since  CWS 1.0
  */
-public final class SecretCWSKey extends CommonKey<SecretKey> {
+public final class SecretCWSKey extends CWSKey<SecretKey> {
 
     private String salt = null;
 
@@ -35,5 +36,36 @@ public final class SecretCWSKey extends CommonKey<SecretKey> {
 
     public String getSalt() {
         return salt;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public SecretKey getKey() {
+        return key;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(final Object obj) {
+        boolean result = false;
+
+        if ((obj != null) && (getClass() == obj.getClass())) {
+            final SecretCWSKey that = (SecretCWSKey) obj;
+            result = super.equals(that) && Objects.equals(salt, that.salt);
+        }
+
+        return result;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), salt);
     }
 }

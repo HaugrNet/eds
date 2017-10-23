@@ -20,7 +20,8 @@ import io.javadog.cws.common.exceptions.AuthenticationException;
 import io.javadog.cws.common.exceptions.AuthorizationException;
 import io.javadog.cws.common.exceptions.CryptoException;
 import io.javadog.cws.common.exceptions.VerificationException;
-import io.javadog.cws.common.keys.CWSKey;
+import io.javadog.cws.common.keys.CWSKeyPair;
+import io.javadog.cws.common.keys.SecretCWSKey;
 import io.javadog.cws.model.CommonDao;
 import io.javadog.cws.model.entities.MemberEntity;
 import io.javadog.cws.model.entities.TrusteeEntity;
@@ -45,7 +46,7 @@ public abstract class Serviceable<R extends CwsResponse, V extends Authenticatio
 
     protected List<TrusteeEntity> trustees = null;
     protected MemberEntity member = null;
-    protected CWSKey keyPair = null;
+    protected CWSKeyPair keyPair = null;
 
     protected Serviceable(final Settings settings, final EntityManager entityManager) {
         this.dao = new CommonJpaDao(entityManager);
@@ -196,12 +197,12 @@ public abstract class Serviceable<R extends CwsResponse, V extends Authenticatio
     protected void updateMemberPassword(final MemberEntity member, final String password) {
         final KeyAlgorithm algorithm = settings.getAsymmetricAlgorithm();
         final String salt = UUID.randomUUID().toString();
-        final CWSKey key = crypto.generatePasswordKey(settings.getSymmetricAlgorithm(), password, salt);
+        final SecretCWSKey key = crypto.generatePasswordKey(settings.getSymmetricAlgorithm(), password, salt);
         key.setSalt(salt);
 
-        final CWSKey pair = crypto.generateAsymmetricKey(algorithm);
-        final String publicKey = crypto.armoringPublicKey(pair.getPublic());
-        final String privateKey = crypto.armoringPrivateKey(key, pair.getPrivate());
+        final CWSKeyPair pair = crypto.generateAsymmetricKey(algorithm);
+        final String publicKey = crypto.armoringPublicKey(pair.getPublic().getKey());
+        final String privateKey = crypto.armoringPrivateKey(key, pair.getPrivate().getKey());
 
         member.setSalt(salt);
         member.setAlgorithm(algorithm);
@@ -211,14 +212,14 @@ public abstract class Serviceable<R extends CwsResponse, V extends Authenticatio
 
     private void checkCredentials(final V verifiable) {
         try {
-            final CWSKey key = crypto.generatePasswordKey(settings.getSymmetricAlgorithm(), verifiable.getCredential(), member.getSalt());
+            final SecretCWSKey key = crypto.generatePasswordKey(settings.getSymmetricAlgorithm(), verifiable.getCredential(), member.getSalt());
             final Charset charset = settings.getCharset();
             keyPair = crypto.extractAsymmetricKey(member.getAlgorithm(), key, member.getSalt(), member.getPublicKey(), member.getPrivateKey());
 
             final String toCheck = UUID.randomUUID().toString();
             final byte[] toEncrypt = toCheck.getBytes(charset);
-            final byte[] encrypted = crypto.encrypt(keyPair, toEncrypt);
-            final byte[] decrypted = crypto.decrypt(keyPair, encrypted);
+            final byte[] encrypted = crypto.encrypt(keyPair.getPublic(), toEncrypt);
+            final byte[] decrypted = crypto.decrypt(keyPair.getPrivate(), encrypted);
             final String result = new String(decrypted, charset);
 
             if (!Objects.equals(result, toCheck)) {

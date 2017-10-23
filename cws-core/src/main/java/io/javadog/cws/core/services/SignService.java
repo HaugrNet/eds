@@ -33,7 +33,7 @@ public final class SignService extends Serviceable<SignResponse, SignRequest> {
     public SignResponse perform(final SignRequest request) {
         verifyRequest(request, Permission.CREATE_SIGNATURE);
 
-        final String signature = crypto.sign(keyPair.getPrivate(), request.getData());
+        final String signature = crypto.sign(keyPair.getPrivate().getKey(), request.getData());
         final SignatureEntity entity = new SignatureEntity();
         entity.setMember(member);
         entity.setChecksum(crypto.generateChecksum(signature));

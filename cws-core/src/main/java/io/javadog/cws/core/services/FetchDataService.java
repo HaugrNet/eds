@@ -15,7 +15,7 @@ import io.javadog.cws.api.requests.FetchDataRequest;
 import io.javadog.cws.api.responses.FetchDataResponse;
 import io.javadog.cws.common.Settings;
 import io.javadog.cws.common.exceptions.CWSException;
-import io.javadog.cws.common.keys.CWSKey;
+import io.javadog.cws.common.keys.SecretCWSKey;
 import io.javadog.cws.core.Permission;
 import io.javadog.cws.core.Serviceable;
 import io.javadog.cws.model.entities.CircleEntity;
@@ -153,7 +153,7 @@ public final class FetchDataService extends Serviceable<FetchDataResponse, Fetch
         if (entity != null) {
             final String checksum = crypto.generateChecksum(entity.getData());
             if (Objects.equals(checksum, entity.getChecksum())) {
-                final CWSKey key = extractCircleKey(entity);
+                final SecretCWSKey key = extractCircleKey(entity);
                 key.setSalt(entity.getInitialVector());
                 final byte[] bytes = crypto.decrypt(key, entity.getData());
 
@@ -181,12 +181,12 @@ public final class FetchDataService extends Serviceable<FetchDataResponse, Fetch
         }
     }
 
-    private CWSKey extractCircleKey(final DataEntity entity) {
+    private SecretCWSKey extractCircleKey(final DataEntity entity) {
         final CircleEntity circle = entity.getMetadata().getCircle();
 
         for (final TrusteeEntity trustee : trustees) {
             if (Objects.equals(circle.getId(), trustee.getCircle().getId())) {
-                return crypto.extractCircleKey(entity.getKey().getAlgorithm(), keyPair, trustee.getCircleKey());
+                return crypto.extractCircleKey(entity.getKey().getAlgorithm(), keyPair.getPrivate(), trustee.getCircleKey());
             }
         }
 

@@ -18,11 +18,14 @@ import io.javadog.cws.common.enums.KeyAlgorithm;
 import io.javadog.cws.common.exceptions.CWSException;
 import io.javadog.cws.common.exceptions.CryptoException;
 import io.javadog.cws.common.keys.CWSKey;
+import io.javadog.cws.common.keys.CWSKeyPair;
+import io.javadog.cws.common.keys.SecretCWSKey;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import java.nio.charset.Charset;
+import java.security.KeyPair;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.util.UUID;
@@ -90,18 +93,18 @@ public final class CryptoTest {
         final Settings settings = new Settings();
         settings.set(Settings.SIGNATURE_ALGORITHM, "AES256");
         final Crypto crypto = new Crypto(settings);
-        final CWSKey key = crypto.generateAsymmetricKey(KeyAlgorithm.RSA2048);
-        crypto.sign(key.getPrivate(), "bla bla bla".getBytes(settings.getCharset()));
+        final CWSKeyPair key = crypto.generateAsymmetricKey(KeyAlgorithm.RSA2048);
+        crypto.sign(key.getPrivate().getKey(), "bla bla bla".getBytes(settings.getCharset()));
     }
 
     @Test
     public void testSignature() {
         final Settings settings = new Settings();
         final Crypto crypto = new Crypto(settings);
-        final CWSKey key = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
+        final CWSKeyPair keyPair = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
         final byte[] message = "Message to Sign".getBytes(settings.getCharset());
-        final String signature = crypto.sign(key.getPrivate(), message);
-        final boolean verified = crypto.verify(key.getPublic(), message, signature);
+        final String signature = crypto.sign(keyPair.getPrivate().getKey(), message);
+        final boolean verified = crypto.verify(keyPair.getPublic().getKey(), message, signature);
 
         assertThat(verified, is(true));
     }
@@ -115,12 +118,12 @@ public final class CryptoTest {
         final Settings settings = new Settings();
         final Crypto crypto = new Crypto(settings);
 
-        final CWSKey key = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
+        final CWSKeyPair key = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
 
-        final String armoredKey = crypto.armoringPublicKey(key.getPublic());
+        final String armoredKey = crypto.armoringPublicKey(key.getPublic().getKey());
         final PublicKey dearmoredKey = crypto.dearmoringPublicKey(armoredKey);
 
-        assertThat(dearmoredKey, is(key.getPublic()));
+        assertThat(dearmoredKey, is(key.getPublic().getKey()));
     }
 
     /**
@@ -135,30 +138,14 @@ public final class CryptoTest {
 
         final String password = "MySuperSecretPassword";
         final String salt = UUID.randomUUID().toString();
-        final CWSKey cryptoKeys = crypto.generatePasswordKey(settings.getSymmetricAlgorithm(), password, salt);
+        final SecretCWSKey cryptoKeys = crypto.generatePasswordKey(settings.getSymmetricAlgorithm(), password, salt);
         cryptoKeys.setSalt(UUID.randomUUID().toString());
-        final CWSKey keyPair = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
+        final CWSKeyPair keyPair = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
 
-        final String armoredKey = crypto.armoringPrivateKey(cryptoKeys, keyPair.getPrivate());
+        final String armoredKey = crypto.armoringPrivateKey(cryptoKeys, keyPair.getPrivate().getKey());
         final PrivateKey dearmoredKey = crypto.dearmoringPrivateKey(cryptoKeys, armoredKey);
 
-        assertThat(keyPair.getPrivate(), is(dearmoredKey));
-    }
-
-    @Test
-    public void testArmoringSecretKey() {
-        final Settings settings = new Settings();
-        final Crypto crypto = new Crypto(settings);
-
-        final CWSKey secretKey = crypto.generateSymmetricKey(KeyAlgorithm.AES128);
-        final CWSKey keyPair = crypto.generateAsymmetricKey(KeyAlgorithm.RSA2048);
-
-        final String armoredKey = crypto.armoringSecretKey(keyPair, secretKey);
-        final CWSKey dearmoredKey = crypto.dearmoringSecretKey(secretKey.getAlgorithm(), keyPair, armoredKey);
-
-        assertThat(dearmoredKey.getType(), is(secretKey.getType()));
-        assertThat(dearmoredKey.getAlgorithm(), is(secretKey.getAlgorithm()));
-        assertThat(dearmoredKey.getKey(), is(secretKey.getKey()));
+        assertThat(keyPair.getPrivate().getKey(), is(dearmoredKey));
     }
 
     @Test
@@ -168,17 +155,18 @@ public final class CryptoTest {
 
         final String secret = "MySuperSecretPassword";
         final String salt = UUID.randomUUID().toString();
-        final CWSKey secretKey = crypto.generatePasswordKey(settings.getSymmetricAlgorithm(), secret, salt);
+        final SecretCWSKey secretKey = crypto.generatePasswordKey(settings.getSymmetricAlgorithm(), secret, salt);
         secretKey.setSalt(salt);
-        final CWSKey pair = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
+        final CWSKeyPair pair = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
 
-        final String armoredPublicKey = crypto.armoringPublicKey(pair.getPublic());
-        final String armoredPrivateKey = crypto.armorPrivateKey(secretKey, pair.getPrivate());
+        final String armoredPublicKey = crypto.armoringPublicKey(pair.getPublic().getKey());
+        final String armoredPrivateKey = crypto.armorPrivateKey(secretKey, pair.getPrivate().getKey());
 
-        final CWSKey dearmoredPair = crypto.extractAsymmetricKey(pair.getAlgorithm(), secretKey, salt, armoredPublicKey, armoredPrivateKey);
+        final CWSKeyPair dearmoredPair = crypto.extractAsymmetricKey(pair.getAlgorithm(), secretKey, salt, armoredPublicKey, armoredPrivateKey);
         assertThat(dearmoredPair.getAlgorithm(), is(pair.getAlgorithm()));
         assertThat(dearmoredPair.getPublic(), is(pair.getPublic()));
         assertThat(dearmoredPair.getPrivate(), is(pair.getPrivate()));
+        assertThat(dearmoredPair.getPublic().hashCode(), is(pair.getPublic().hashCode()));
     }
 
     /**
@@ -190,7 +178,7 @@ public final class CryptoTest {
     public void testObjectEncryption() {
         final Settings settings = new Settings();
         final Crypto crypto = new Crypto(settings);
-        final CWSKey key = crypto.generateSymmetricKey(settings.getSymmetricAlgorithm());
+        final SecretCWSKey key = crypto.generateSymmetricKey(settings.getSymmetricAlgorithm());
         key.setSalt(UUID.randomUUID().toString());
 
         // Now, we're going to encrypt some data
@@ -217,13 +205,13 @@ public final class CryptoTest {
     public void testMemberEncryption() {
         final Settings settings = new Settings();
         final Crypto crypto = new Crypto(settings);
-        final CWSKey key = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
+        final CWSKeyPair key = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
 
         final String cleartext = "This is just an example";
         final byte[] toEncrypt = crypto.stringToBytes(cleartext);
-        final byte[] encrypted = crypto.encrypt(key, toEncrypt);
+        final byte[] encrypted = crypto.encrypt(key.getPublic(), toEncrypt);
 
-        final byte[] decrypted = crypto.decrypt(key, encrypted);
+        final byte[] decrypted = crypto.decrypt(key.getPrivate(), encrypted);
         final String result = crypto.bytesToString(decrypted);
 
         assertThat(result, is(cleartext));
@@ -251,7 +239,7 @@ public final class CryptoTest {
         final Crypto crypto = new Crypto(new Settings());
         final String password = "MySuperSecretPassword";
         final String salt = "SystemSpecificSalt";
-        final CWSKey key = crypto.generatePasswordKey(settings.getSymmetricAlgorithm(), password, salt);
+        final SecretCWSKey key = crypto.generatePasswordKey(settings.getSymmetricAlgorithm(), password, salt);
 
         // Now, we're going to encrypt some data
         key.setSalt(UUID.randomUUID().toString());
@@ -277,14 +265,14 @@ public final class CryptoTest {
         final Crypto crypto = new Crypto(new Settings());
         final Charset charset = new Settings().getCharset();
         final String dataSalt = UUID.randomUUID().toString();
-        final CWSKey key = crypto.generateSymmetricKey(settings.getSymmetricAlgorithm());
+        final SecretCWSKey key = crypto.generateSymmetricKey(settings.getSymmetricAlgorithm());
         key.setSalt(dataSalt);
         final byte[] rawdata = UUID.randomUUID().toString().getBytes(charset);
         final byte[] encryptedData = crypto.encrypt(key, rawdata);
 
-        final CWSKey keyPair = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
-        final String armoredCircleKey = crypto.encryptAndArmorCircleKey(keyPair, key);
-        final CWSKey circleKey = crypto.extractCircleKey(key.getAlgorithm(), keyPair, armoredCircleKey);
+        final CWSKeyPair keyPair = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
+        final String armoredCircleKey = crypto.encryptAndArmorCircleKey(keyPair.getPublic(), key);
+        final SecretCWSKey circleKey = crypto.extractCircleKey(key.getAlgorithm(), keyPair.getPrivate(), armoredCircleKey);
         circleKey.setSalt(dataSalt);
         final byte[] decryptedData = crypto.decrypt(circleKey, encryptedData);
 
@@ -318,6 +306,55 @@ public final class CryptoTest {
         assertThat(bytes, is(not(nullValue())));
         final String reversed = crypto.bytesToString(bytes);
         assertThat(reversed, is(str));
+    }
+
+    @Test
+    public void testCWSKeyPairEquality() {
+        final Settings settings = new Settings();
+        final Crypto crypto = new Crypto(settings);
+        final CWSKeyPair key1 = crypto.generateAsymmetricKey(KeyAlgorithm.RSA1024);
+        final CWSKeyPair key2 = crypto.generateAsymmetricKey(KeyAlgorithm.RSA2048);
+        final CWSKeyPair key3 = crypto.generateAsymmetricKey(KeyAlgorithm.RSA1024);
+        final KeyPair pair1 = new KeyPair(key1.getPublic().getKey(), key1.getPrivate().getKey());
+        final KeyPair pair2 = new KeyPair(key1.getPublic().getKey(), key2.getPrivate().getKey());
+        final KeyPair pair3 = new KeyPair(key2.getPublic().getKey(), key2.getPrivate().getKey());
+        final CWSKeyPair cwsPair1 = new CWSKeyPair(key1.getAlgorithm(), pair1);
+        final CWSKeyPair cwsPair2 = new CWSKeyPair(key2.getAlgorithm(), pair2);
+        final CWSKeyPair cwsPair3 = new CWSKeyPair(key3.getAlgorithm(), pair3);
+        final CWSKey<PublicKey> key4 = key1.getPublic();
+        final CWSKey<PrivateKey> key5 = key1.getPrivate();
+
+        assertThat(key1.equals(key1), is(true));
+        assertThat(key1.equals(key2), is(false));
+        assertThat(key1.equals(key3), is(false));
+        assertThat(key4.equals(key5), is(false));
+        assertThat(key1.equals(null), is(false));
+        assertThat(key1.equals("nope"), is(false));
+        assertThat(cwsPair1.equals(cwsPair2), is(false));
+        assertThat(cwsPair1.equals(cwsPair3), is(false));
+
+        assertThat(key1.hashCode(), is(key1.hashCode()));
+        assertThat(key1.hashCode(), is(not(key2.hashCode())));
+    }
+
+    @Test
+    public void testCWSKeyEquality() {
+        final Settings settings = new Settings();
+        final Crypto crypto = new Crypto(settings);
+        final SecretCWSKey key1 = crypto.generateSymmetricKey(KeyAlgorithm.AES128);
+        final SecretCWSKey key2 = new SecretCWSKey(key1.getAlgorithm(), key1.getKey());
+        final SecretCWSKey key3 = crypto.generateSymmetricKey(KeyAlgorithm.AES128);
+        key2.setSalt(UUID.randomUUID().toString());
+        key3.setSalt(UUID.randomUUID().toString());
+
+        assertThat(key1.equals(key1), is(true));
+        assertThat(key1.equals(key2), is(false));
+        assertThat(key1.equals(key3), is(false));
+        assertThat(key1.equals(null), is(false));
+        assertThat(key1.equals("nope"), is(false));
+
+        assertThat(key1.hashCode(), is(key1.hashCode()));
+        assertThat(key1.hashCode(), is(not(key2.hashCode())));
     }
 
     private <E extends CWSException> void prepareCause(final Class<E> cause, final ReturnCode returnCode, final String returnMessage) {

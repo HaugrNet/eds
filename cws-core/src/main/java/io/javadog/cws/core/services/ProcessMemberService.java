@@ -15,7 +15,8 @@ import io.javadog.cws.api.responses.ProcessMemberResponse;
 import io.javadog.cws.common.Settings;
 import io.javadog.cws.common.exceptions.CWSException;
 import io.javadog.cws.common.exceptions.VerificationException;
-import io.javadog.cws.common.keys.CWSKey;
+import io.javadog.cws.common.keys.CWSKeyPair;
+import io.javadog.cws.common.keys.SecretCWSKey;
 import io.javadog.cws.core.Permission;
 import io.javadog.cws.core.Serviceable;
 import io.javadog.cws.model.entities.MemberEntity;
@@ -100,7 +101,7 @@ public final class ProcessMemberService extends Serviceable<ProcessMemberRespons
 
             if (existing == null) {
                 final String uuid = UUID.randomUUID().toString();
-                final String signature = crypto.sign(keyPair.getPrivate(), crypto.stringToBytes(uuid));
+                final String signature = crypto.sign(keyPair.getPrivate().getKey(), crypto.stringToBytes(uuid));
 
                 final MemberEntity entity = new MemberEntity();
                 entity.setName(memberName);
@@ -177,14 +178,14 @@ public final class ProcessMemberService extends Serviceable<ProcessMemberRespons
                 if (crypto.verify(publicKey, crypto.stringToBytes(secret), request.getCredential())) {
                     final String salt = UUID.randomUUID().toString();
                     final String newSecret = UUID.randomUUID().toString();
-                    final CWSKey pair = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
-                    final CWSKey key = crypto.generatePasswordKey(settings.getSymmetricAlgorithm(), newSecret, salt);
+                    final CWSKeyPair pair = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
+                    final SecretCWSKey key = crypto.generatePasswordKey(settings.getSymmetricAlgorithm(), newSecret, salt);
                     key.setSalt(salt);
 
                     account.setSalt(salt);
                     account.setAlgorithm(pair.getAlgorithm());
-                    account.setPublicKey(crypto.armoringPublicKey(pair.getPublic()));
-                    account.setPrivateKey(crypto.armoringPrivateKey(key, pair.getPrivate()));
+                    account.setPublicKey(crypto.armoringPublicKey(pair.getPublic().getKey()));
+                    account.setPrivateKey(crypto.armoringPrivateKey(key, pair.getPrivate().getKey()));
                     dao.persist(account);
 
                     response = new ProcessMemberResponse();

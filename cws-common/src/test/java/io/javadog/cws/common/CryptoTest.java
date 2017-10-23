@@ -160,7 +160,7 @@ public final class CryptoTest {
         final CWSKeyPair pair = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
 
         final String armoredPublicKey = crypto.armoringPublicKey(pair.getPublic().getKey());
-        final String armoredPrivateKey = crypto.armorPrivateKey(secretKey, pair.getPrivate().getKey());
+        final String armoredPrivateKey = crypto.armoringPrivateKey(secretKey, pair.getPrivate().getKey());
 
         final CWSKeyPair dearmoredPair = crypto.extractAsymmetricKey(pair.getAlgorithm(), secretKey, salt, armoredPublicKey, armoredPrivateKey);
         assertThat(dearmoredPair.getAlgorithm(), is(pair.getAlgorithm()));
@@ -261,6 +261,10 @@ public final class CryptoTest {
      */
     @Test
     public void testMemberAccessCircleKey() {
+        // Added this stupid assertion, as SonarQube failed to detect the
+        // assertion at the end of the test.
+        assertThat(Boolean.parseBoolean("Is SonarQube rule squid:S2699 working correctly ?"), is(false));
+
         final Settings settings = new Settings();
         final Crypto crypto = new Crypto(new Settings());
         final Charset charset = new Settings().getCharset();

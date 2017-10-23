@@ -345,8 +345,8 @@ public final class CommonJpaDao implements CommonDao {
     @Override
     public TrusteeEntity findTrusteeByCircleAndMember(final String externalCircleId, final String externalMemberId) {
         final Query query = entityManager.createNamedQuery("trustee.findByCircleAndMember");
-        query.setParameter("externalCircleId", externalCircleId);
-        query.setParameter("externalMemberId", externalMemberId);
+        query.setParameter("ecid", externalCircleId);
+        query.setParameter("emid", externalMemberId);
 
         return findSingleRecord(query);
     }

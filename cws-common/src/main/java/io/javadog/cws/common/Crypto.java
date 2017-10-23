@@ -9,6 +9,7 @@ package io.javadog.cws.common;
 
 import io.javadog.cws.common.enums.KeyAlgorithm;
 import io.javadog.cws.common.exceptions.CryptoException;
+import io.javadog.cws.common.keys.CWSKey;
 import io.javadog.cws.common.keys.CWSKeyPair;
 import io.javadog.cws.common.keys.PrivateCWSKey;
 import io.javadog.cws.common.keys.PublicCWSKey;
@@ -26,6 +27,7 @@ import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
+import java.security.Key;
 import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -66,6 +68,9 @@ import java.util.Base64;
  * @since  CWS 1.0
  */
 public final class Crypto {
+
+    // Silly constant to please SonarQube
+    private static final int BYTE_SIZE = 8;
 
     private final Settings settings;
 
@@ -196,46 +201,41 @@ public final class Crypto {
 
     public byte[] encrypt(final PublicCWSKey key, final byte[] toEncrypt) {
         try {
-            final Cipher cipher = prepareCipher(key);
+            final Cipher cipher = prepareCipher(key, Cipher.ENCRYPT_MODE);
             return cipher.doFinal(toEncrypt);
-        } catch (BadPaddingException | IllegalBlockSizeException | NoSuchPaddingException | NoSuchAlgorithmException | InvalidKeyException e) {
+        } catch (BadPaddingException | IllegalBlockSizeException | NoSuchPaddingException | NoSuchAlgorithmException | InvalidAlgorithmParameterException | InvalidKeyException e) {
             throw new CryptoException(e.getMessage(), e);
         }
     }
 
     public byte[] decrypt(final PrivateCWSKey key, final byte[] toDecrypt) {
         try {
-            final Cipher cipher = prepareCipher(key);
+            final Cipher cipher = prepareCipher(key, Cipher.DECRYPT_MODE);
             return cipher.doFinal(toDecrypt);
-        } catch (BadPaddingException | IllegalBlockSizeException | NoSuchPaddingException | NoSuchAlgorithmException | InvalidKeyException e) {
+        } catch (BadPaddingException | IllegalBlockSizeException | NoSuchPaddingException | NoSuchAlgorithmException | InvalidAlgorithmParameterException | InvalidKeyException e) {
             throw new CryptoException(e.getMessage(), e);
         }
     }
 
-    private Cipher prepareCipher(final SecretCWSKey key, final int type) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException {
-        final KeyAlgorithm algorithm = key.getAlgorithm();
-        final Cipher cipher = Cipher.getInstance(algorithm.getTransformation());
-        final String salt = key.getSalt();
-        final byte[] bytes = new byte[algorithm.getLength() / 8];
-        System.arraycopy(salt.getBytes(settings.getCharset()), 0, bytes, 0, bytes.length);
-        final IvParameterSpec iv = new IvParameterSpec(bytes);
+    private Cipher prepareCipher(final CWSKey<?> key, final int type) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException {
+        IvParameterSpec iv = null;
+        final String instanceName;
+        final Cipher cipher;
+
+        if (key.getAlgorithm().getType() == KeyAlgorithm.Type.ASYMMETRIC) {
+            instanceName = key.getAlgorithm().getName();
+        } else {
+            final KeyAlgorithm algorithm = key.getAlgorithm();
+            instanceName = algorithm.getTransformation();
+            final String salt = ((SecretCWSKey) key).getSalt();
+            final byte[] bytes = new byte[algorithm.getLength() / BYTE_SIZE];
+            System.arraycopy(salt.getBytes(settings.getCharset()), 0, bytes, 0, bytes.length);
+
+            iv = new IvParameterSpec(bytes);
+        }
+
+        cipher = Cipher.getInstance(instanceName);
         cipher.init(type, key.getKey(), iv);
-
-        return cipher;
-    }
-
-    private static Cipher prepareCipher(final PublicCWSKey key) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException {
-        final String rsa = key.getAlgorithm().getName();
-        final Cipher cipher = Cipher.getInstance(rsa);
-        cipher.init(Cipher.ENCRYPT_MODE, key.getKey());
-
-        return cipher;
-    }
-
-    private static Cipher prepareCipher(final PrivateCWSKey key) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException {
-        final String rsa = key.getAlgorithm().getName();
-        final Cipher cipher = Cipher.getInstance(rsa);
-        cipher.init(Cipher.DECRYPT_MODE, key.getKey());
 
         return cipher;
     }
@@ -251,7 +251,7 @@ public final class Crypto {
      * @param key Public RSA key to armor (Base64 encoded x.509 Key)
      * @return String representation of the Key
      */
-    public String armoringPublicKey(final PublicKey key) {
+    public String armoringPublicKey(final Key key) {
         final X509EncodedKeySpec keySpec = new X509EncodedKeySpec(key.getEncoded());
         final byte[] rawKey = keySpec.getEncoded();
 
@@ -271,8 +271,19 @@ public final class Crypto {
         }
     }
 
-    public String armoringPrivateKey(final SecretCWSKey encryptionKey, final PrivateKey key) {
-        final PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(key.getEncoded());
+    /**
+     * The Private RSA Key stored in CWS, is stored encrypted, so it cannot be
+     * extracted without some effort. To do this, a Key is needed, together with
+     * a Salt which the Initial Vector is based on. The encrypted Key, is then
+     * converted into PKCS8 and converted using Base64 encoding. The result of
+     * this will make the key save for storage in the database.
+     *
+     * @param encryptionKey Symmetric Key to encrypt the Private RSA Key with
+     * @param privateKey    The Private RSA Key to encrypt and armor
+     * @return Armored (PCKS8 and Base64 encoded encrypted key)
+     */
+    public String armoringPrivateKey(final SecretCWSKey encryptionKey, final Key privateKey) {
+        final PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(privateKey.getEncoded());
         final byte[] rawKey = keySpec.getEncoded();
         final byte[] encryptedKey = encrypt(encryptionKey, rawKey);
 
@@ -291,25 +302,6 @@ public final class Crypto {
         } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
             throw new CryptoException(e.getMessage(), e);
         }
-    }
-
-    /**
-     * The Private RSA Key stored in CWS, is stored encrypted, so it cannot be
-     * extracted without some effort. To do this, a Key is needed, together with
-     * a Salt which the Initial Vector is based on. The encrypted Key, is then
-     * converted into PKCS 8 and converted using Base64 encoding. The result of
-     * this will make the key save for storage in the database.
-     *
-     * @param key        Symmetric Key to encrypt the Private RSA Key with
-     * @param privateKey The Private RSA Key to encrypt and armor
-     * @return Armored (Base64 encoded encrypted key in PCKS 8 format)
-     */
-    public String armorPrivateKey(final SecretCWSKey key, final PrivateKey privateKey) {
-        final byte[] encryptedPrivateKey = encrypt(key, privateKey.getEncoded());
-        final PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(encryptedPrivateKey);
-        final byte[] rawKey = keySpec.getEncoded();
-
-        return Base64.getEncoder().encodeToString(rawKey);
     }
 
     public String encryptAndArmorCircleKey(final PublicCWSKey publicKey, final SecretCWSKey circleKey) {

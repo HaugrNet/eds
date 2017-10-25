@@ -40,15 +40,6 @@ import javax.persistence.Table;
                         "  and t.member.id = :mid" +
                         "  and m.parentId = :parentId " +
                         "order by m.name asc, m.id asc"),
-        @NamedQuery(name = "metadata.findByMemberAndFolderAndType",
-                query = "select m " +
-                        "from MetadataEntity m," +
-                        "     TrusteeEntity t " +
-                        "where m.circle.id = t.circle.id" +
-                        "  and t.member.id = :mid" +
-                        "  and m.parentId = :parentId" +
-                        "  and m.type.name = :typename " +
-                        "order by m.name asc, m.id asc"),
         @NamedQuery(name = "metadata.findRootByMemberAndCircle",
                 query = "select m " +
                         "from MetadataEntity m," +

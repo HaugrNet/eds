@@ -9,7 +9,6 @@ package io.javadog.cws.model.jpa;
 
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.common.TrustLevel;
-import io.javadog.cws.api.dtos.DataType;
 import io.javadog.cws.common.exceptions.CWSException;
 import io.javadog.cws.model.CommonDao;
 import io.javadog.cws.model.entities.CWSEntity;
@@ -287,19 +286,6 @@ public final class CommonJpaDao implements CommonDao {
      * {@inheritDoc}
      */
     @Override
-    public List<MetadataEntity> findMetadataByMemberFolderAndType(final MemberEntity member, final MetadataEntity entity, final DataType dataType) {
-        final Query query = entityManager.createNamedQuery("metadata.findByMemberAndFolderAndType");
-        query.setParameter("parentId", entity.getParentId());
-        query.setParameter("mid", member.getId());
-        query.setParameter("typename", dataType.getName());
-
-        return findList(query);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public MetadataEntity findRootByMemberCircle(final MemberEntity member, final String circleId) {
         final Query query = entityManager.createNamedQuery("metadata.findRootByMemberAndCircle");
         query.setParameter("mid", member.getId());
@@ -312,10 +298,12 @@ public final class CommonJpaDao implements CommonDao {
      * {@inheritDoc}
      */
     @Override
-    public List<MetadataEntity> findMetadataByMemberAndFolder(final MemberEntity member, final MetadataEntity folder) {
+    public List<MetadataEntity> findMetadataByMemberAndFolder(final MemberEntity member, final MetadataEntity folder, final int pageNumber, final int pageSize) {
         final Query query = entityManager.createNamedQuery("metadata.findByMemberAndFolder");
         query.setParameter("mid", member.getId());
         query.setParameter("parentId", folder.getId());
+        query.setMaxResults(pageSize);
+        query.setFirstResult((pageNumber - 1) * pageSize);
 
         return findList(query);
     }

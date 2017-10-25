@@ -42,7 +42,7 @@ public final class FetchDataRequestTest {
     }
 
     @Test
-    public void testClassWithoutObjectId() {
+    public void testClassWithoutDataId() {
         final FetchDataRequest request = new FetchDataRequest();
         request.setAccount(Constants.ADMIN_ACCOUNT);
         request.setCredentialType(CredentialType.PASSPHRASE);
@@ -56,7 +56,7 @@ public final class FetchDataRequestTest {
     }
 
     @Test
-    public void testClassWithForcedObjectId() throws NoSuchFieldException, IllegalAccessException {
+    public void testClassWithForcedDataId() throws NoSuchFieldException, IllegalAccessException {
         final String dataId = Constants.ADMIN_ACCOUNT;
 
         final FetchDataRequest request = new FetchDataRequest();
@@ -73,7 +73,7 @@ public final class FetchDataRequestTest {
         assertThat(request.getDataId(), is(dataId));
         assertThat(errors, is(not(nullValue())));
         assertThat(errors.size(), is(1));
-        assertThat(errors.get("dataId"), is("The Object Data Id is invalid."));
+        assertThat(errors.get("dataId"), is("The Data Id is invalid."));
     }
 
     @Test

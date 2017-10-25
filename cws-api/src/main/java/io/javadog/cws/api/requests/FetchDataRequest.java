@@ -22,7 +22,7 @@ import java.util.Map;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "fetchDataRequest", propOrder = { "circleId", "dataId" })
-public final class FetchDataRequest extends Authentication {
+public final class FetchDataRequest extends Authentication implements CircleIdRequest {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
@@ -49,11 +49,19 @@ public final class FetchDataRequest extends Authentication {
     // Setters & Getters
     // =========================================================================
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void setCircleId(final String circleId) {
         ensureValidId(FIELD_CIRCLE_ID, circleId);
         this.circleId = circleId;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public String getCircleId() {
         return circleId;
     }

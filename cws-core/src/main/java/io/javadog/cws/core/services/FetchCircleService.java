@@ -42,14 +42,14 @@ public final class FetchCircleService extends Serviceable<FetchCircleResponse, F
      */
     @Override
     public FetchCircleResponse perform(final FetchCircleRequest request) {
-        final String circleId = readExternalCircleId(request);
-        verifyRequest(request, Permission.FETCH_CIRCLE, circleId);
+        verifyRequest(request, Permission.FETCH_CIRCLE);
         final FetchCircleResponse response = new FetchCircleResponse();
+        final String circleId = request.getCircleId();
 
         if (circleId != null) {
             // First retrieve the Circle via the ExternalId given. If no Circle
             // is found, the DAO will throw an Exception.
-            final CircleEntity circle = dao.find(CircleEntity.class, request.getCircleId());
+            final CircleEntity circle = dao.find(CircleEntity.class, circleId);
 
             if (circle != null) {
                 // The Settings and the Requesting Member are both important when
@@ -84,10 +84,6 @@ public final class FetchCircleService extends Serviceable<FetchCircleResponse, F
         }
 
         return response;
-    }
-
-    private static String readExternalCircleId(final FetchCircleRequest request) {
-        return (request != null) ? request.getCircleId() : null;
     }
 
     /**

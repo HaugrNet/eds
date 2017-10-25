@@ -42,8 +42,8 @@ public final class ProcessDataService extends Serviceable<ProcessDataResponse, P
      */
     @Override
     public ProcessDataResponse perform(final ProcessDataRequest request) {
-        final String circleId = (request != null) ? request.getCircleId() : null;
-        verifyRequest(request, Permission.PROCESS_DATA, circleId);
+        verifyRequest(request, Permission.PROCESS_DATA);
+
         // Since the verification above is of a more general nature, it is
         // important that the processing is being double checked against the
         // actual Circle.

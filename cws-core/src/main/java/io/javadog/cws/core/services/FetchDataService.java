@@ -42,7 +42,7 @@ public final class FetchDataService extends Serviceable<FetchDataResponse, Fetch
      */
     @Override
     public FetchDataResponse perform(final FetchDataRequest request) {
-        verifyRequest(request, Permission.FETCH_DATA, readExternalCircleId(request));
+        verifyRequest(request, Permission.FETCH_DATA);
         final MetadataEntity root = findRootMetadata(request);
         final FetchDataResponse response;
 
@@ -60,10 +60,6 @@ public final class FetchDataService extends Serviceable<FetchDataResponse, Fetch
         }
 
         return response;
-    }
-
-    private static String readExternalCircleId(final FetchDataRequest request) {
-        return (request != null) ? request.getCircleId() : null;
     }
 
     /**

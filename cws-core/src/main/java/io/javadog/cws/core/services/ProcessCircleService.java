@@ -45,7 +45,7 @@ public final class ProcessCircleService extends Serviceable<ProcessCircleRespons
      */
     @Override
     public ProcessCircleResponse perform(final ProcessCircleRequest request) {
-        verifyRequest(request, Permission.PROCESS_CIRCLE, readExternalCircleId(request));
+        verifyRequest(request, Permission.PROCESS_CIRCLE);
         final ProcessCircleResponse response;
 
         switch (request.getAction()) {
@@ -73,16 +73,6 @@ public final class ProcessCircleService extends Serviceable<ProcessCircleRespons
         }
 
         return response;
-    }
-
-    private static String readExternalCircleId(final ProcessCircleRequest request) {
-        String circleId = null;
-
-        if (request != null) {
-            circleId = request.getCircleId();
-        }
-
-        return circleId;
     }
 
     /**

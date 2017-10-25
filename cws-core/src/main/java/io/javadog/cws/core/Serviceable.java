@@ -12,6 +12,7 @@ import static io.javadog.cws.api.common.Constants.ADMIN_ACCOUNT;
 import io.javadog.cws.api.common.TrustLevel;
 import io.javadog.cws.api.common.Verifiable;
 import io.javadog.cws.api.dtos.Authentication;
+import io.javadog.cws.api.requests.CircleIdRequest;
 import io.javadog.cws.api.responses.CwsResponse;
 import io.javadog.cws.common.Crypto;
 import io.javadog.cws.common.Settings;
@@ -78,28 +79,18 @@ public abstract class Serviceable<R extends CwsResponse, V extends Authenticatio
      * properly authenticated or authorized for the request, an Exception is
      * thrown.</p>
      *
-     * @param verifiable Request Object to use for the checks
-     * @param action     The Action for the permission check
-     */
-    protected void verifyRequest(final V verifiable, final Permission action) {
-        verifyRequest(verifiable, action, null);
-    }
-
-    /**
-     * <p>All incoming requests must be verified, so it is clear if the given
-     * information (data) is sufficient to complete the request, and also to
-     * ensure that the requesting party is authenticated and authorized for the
-     * given action.</p>
-     *
-     * <p>If the data is insufficient or if the requesting party cannot be
-     * properly authenticated or authorized for the request, an Exception is
-     * thrown.</p>
-     *
      * @param verifiable       Request Object to use for the checks
      * @param action           The Action for the permission check
-     * @param externalCircleId Given CircleId, to limit lookup's
      */
-    protected void verifyRequest(final V verifiable, final Permission action, final String externalCircleId) {
+    protected void verifyRequest(final V verifiable, final Permission action) {
+        // If available, let's extract the CircleId so it can be used to improve
+        // accuracy of the checks and reduce the amount of data fetched from the
+        // database in preparation to perform these checks.
+        String circleId = null;
+        if (verifiable instanceof CircleIdRequest) {
+            circleId = ((CircleIdRequest) verifiable).getCircleId();
+        }
+
         // Step 1; Verify if the given data is sufficient to complete the
         //         request. If not sufficient, no need to continue and involve
         //         the DB, so an Exception will be thrown.
@@ -114,7 +105,7 @@ public abstract class Serviceable<R extends CwsResponse, V extends Authenticatio
         //         also allow the checks to end earlier. However, equally
         //         important, this check is a premature check and will *not*
         //         count in the final Business Logic!
-        checkAccount(verifiable, externalCircleId);
+        checkAccount(verifiable, circleId);
 
         // Step 3; Check if the Member is valid, i.e. if the given Credentials
         //         can correctly decrypt the Private Key for the Account. If
@@ -129,7 +120,7 @@ public abstract class Serviceable<R extends CwsResponse, V extends Authenticatio
         //         used to also check of the Member is Authorized. Again, this
         //         check is only a premature check and will not count against
         //         the final checks in the Business Logic.
-        checkAuthorization(action, externalCircleId);
+        checkAuthorization(action, circleId);
     }
 
     /**

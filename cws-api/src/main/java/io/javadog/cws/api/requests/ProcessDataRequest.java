@@ -29,7 +29,7 @@ import java.util.Set;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "processDataRequest", propOrder = { "action", "id", "circleId", "folderId", "name", "typeName", "bytes" })
-public final class ProcessDataRequest extends Authentication {
+public final class ProcessDataRequest extends Authentication implements CircleIdRequest {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
@@ -99,10 +99,18 @@ public final class ProcessDataRequest extends Authentication {
         return id;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void setCircleId(final String circleId) {
         this.circleId = circleId;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public String getCircleId() {
         return circleId;
     }

@@ -22,8 +22,8 @@ import java.util.Map;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "fetchCircleRequest", propOrder = { "circleId" })
-public final class FetchCircleRequest extends Authentication {
+@XmlType(name = "fetchCircleRequest", propOrder = "circleId")
+public final class FetchCircleRequest extends Authentication implements CircleIdRequest {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
@@ -37,12 +37,20 @@ public final class FetchCircleRequest extends Authentication {
     // Setters & Getters
     // =========================================================================
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     @Pattern(regexp = Constants.ID_PATTERN_REGEX)
     public void setCircleId(final String circleId) {
         ensureValidId(FIELD_CIRCLE_ID, circleId);
         this.circleId = circleId;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public String getCircleId() {
         return circleId;
     }

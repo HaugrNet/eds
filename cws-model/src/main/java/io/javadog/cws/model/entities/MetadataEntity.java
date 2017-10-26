@@ -31,7 +31,7 @@ import javax.persistence.Table;
                         "where m.circle.id = t.circle.id" +
                         "  and t.member.id = :mid" +
                         "  and m.externalId = :eid " +
-                        "order by m.name asc, m.id asc"),
+                        "order by m.id desc"),
         @NamedQuery(name = "metadata.findByMemberAndFolder",
                 query = "select m " +
                         "from MetadataEntity m," +
@@ -39,7 +39,7 @@ import javax.persistence.Table;
                         "where m.circle.id = t.circle.id" +
                         "  and t.member.id = :mid" +
                         "  and m.parentId = :parentId " +
-                        "order by m.name asc, m.id asc"),
+                        "order by m.id desc"),
         @NamedQuery(name = "metadata.findRootByMemberAndCircle",
                 query = "select m " +
                         "from MetadataEntity m," +
@@ -50,7 +50,7 @@ import javax.persistence.Table;
                         "  and m.type.name = 'folder'" +
                         "  and m.name = '/'" +
                         "  and m.parentId = 0 " +
-                        "order by m.id asc")
+                        "order by m.id desc"),
 })
 @Table(name = "metadata")
 public class MetadataEntity extends Externable {

@@ -36,6 +36,7 @@ public enum ReturnCode {
     VERIFICATION_WARNING(Classification.CLASS_WARNING, 3, "The provided Request information is insufficient or invalid."),
     SIGNATURE_WARNING(Classification.CLASS_WARNING, 4, "There Signature is not usable."),
     IDENTIFICATION_WARNING(Classification.CLASS_WARNING, 5, "Not possible to positively identify the requested Data."),
+    INTEGRITY_WARNING(Classification.CLASS_WARNING, 6, "Not possible to perform the given action, as it will lead to data integrity problems."),
     ILLEGAL_ACTION(Classification.CLASS_WARNING, 99, "The Account tried to invoke an Action not allowed.");
 
     private enum Classification {

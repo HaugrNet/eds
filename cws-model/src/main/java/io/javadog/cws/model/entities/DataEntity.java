@@ -24,7 +24,11 @@ import javax.persistence.Table;
  * @since  CWS 1.0
  */
 @Entity
-@NamedQueries(
+@NamedQueries({
+        @NamedQuery(name = "data.findByMetadata",
+                query = "select d " +
+                        "from DataEntity d " +
+                        "where d.metadata.id = :metadataId"),
         @NamedQuery(name = "data.findByMemberAndExternalId",
                 query = "select d " +
                         "from DataEntity d," +
@@ -32,7 +36,8 @@ import javax.persistence.Table;
                         "where d.metadata.circle.id = t.circle.id" +
                         "  and d.metadata.externalId = :eid" +
                         "  and t.member.id = :mid" +
-                        "  and t.trustLevel in :trustLevels"))
+                        "  and t.trustLevel in :trustLevels")
+})
 @Table(name = "data")
 public class DataEntity extends CWSEntity {
 

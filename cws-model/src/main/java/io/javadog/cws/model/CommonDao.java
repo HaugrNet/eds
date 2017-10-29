@@ -74,6 +74,8 @@ public interface CommonDao {
 
     long countObjectTypeUsage(Long id);
 
+    DataEntity findDataByMetadata(MetadataEntity metadata);
+
     DataEntity findDataByMemberAndExternalId(MemberEntity member, String externalId);
 
     MetadataEntity findMetaDataByMemberAndExternalId(MemberEntity member, String externalId);
@@ -87,4 +89,8 @@ public interface CommonDao {
     List<SignatureEntity> findAllSignatures(Long id);
 
     TrusteeEntity findTrusteeByCircleAndMember(String externalCircleId, String externalMemberId);
+
+    long countFolderContent(MetadataEntity entity);
+
+    MetadataEntity findInFolder(MemberEntity member, MetadataEntity folder, String name);
 }

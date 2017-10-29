@@ -165,7 +165,7 @@ public final class ProcessDataRequest extends Authentication implements CircleId
                 case ADD:
                     checkNotNullAndValidId(errors, FIELD_CIRCLE_ID, circleId, "The Circle Id is missing or invalid.");
                     checkValidId(errors, FIELD_FOLDER_ID, folderId, "The Folder Id is invalid.");
-                    checkNotTooLong(errors, FIELD_NAME, name, MAX_STRING_LENGTH, "The name of the new Data Object is invalid.");
+                    checkNotNullEmptyOrTooLong(errors, FIELD_NAME, name, MAX_STRING_LENGTH, "The name of the new Data Object is invalid.");
                     checkNotNullOrEmpty(errors, FIELD_TYPENAME, typeName, "The Data Type is missing or invalid.");
                     break;
                 case UPDATE:

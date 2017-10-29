@@ -261,6 +261,14 @@ public final class CommonJpaDao implements CommonDao {
     }
 
     @Override
+    public DataEntity findDataByMetadata(final MetadataEntity metadata) {
+        final Query query = entityManager.createNamedQuery("data.findByMetadata");
+        query.setParameter("metadataId", metadata.getId());
+
+        return findSingleRecord(query);
+    }
+
+    @Override
     public DataEntity findDataByMemberAndExternalId(final MemberEntity member, final String externalId) {
         final Query query = entityManager.createNamedQuery("data.findByMemberAndExternalId");
         query.setParameter("mid", member.getId());
@@ -330,11 +338,38 @@ public final class CommonJpaDao implements CommonDao {
         return findList(query);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public TrusteeEntity findTrusteeByCircleAndMember(final String externalCircleId, final String externalMemberId) {
         final Query query = entityManager.createNamedQuery("trustee.findByCircleAndMember");
         query.setParameter("ecid", externalCircleId);
         query.setParameter("emid", externalMemberId);
+
+        return findSingleRecord(query);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public long countFolderContent(final MetadataEntity entity) {
+        final Query query = entityManager.createNamedQuery("metadata.countFolderContent");
+        query.setParameter("pid", entity.getId());
+
+        return (long) query.getSingleResult();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public MetadataEntity findInFolder(final MemberEntity member, final MetadataEntity folder, final String name) {
+        final Query query = entityManager.createNamedQuery("metadata.findInFolder");
+        query.setParameter("mid", member.getId());
+        query.setParameter("pid", folder.getId());
+        query.setParameter("name", name);
 
         return findSingleRecord(query);
     }

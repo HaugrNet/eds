@@ -51,6 +51,18 @@ import javax.persistence.Table;
                         "  and m.name = '/'" +
                         "  and m.parentId = 0 " +
                         "order by m.id desc"),
+        @NamedQuery(name = "metadata.findInFolder",
+                query = "select m " +
+                        "from MetadataEntity m," +
+                        "     TrusteeEntity t " +
+                        "where m.circle.id = t.circle.id" +
+                        "  and t.member.id = :mid" +
+                        "  and m.parentId = :pid" +
+                        "  and lower(m.name) = lower(:name)"),
+        @NamedQuery(name = "metadata.countFolderContent",
+                query = "select count(m.id) " +
+                        "from MetadataEntity m " +
+                        "where m.parentId = :pid")
 })
 @Table(name = "metadata")
 public class MetadataEntity extends Externable {

@@ -70,7 +70,6 @@ public enum KeyAlgorithm {
     AES256(Type.SYMMETRIC, "AES", Transformation.AES, 256),
 
     // Asymmetric Algorithms
-    RSA1024(Type.ASYMMETRIC, "RSA", Transformation.RSA, 1024),
     RSA2048(Type.ASYMMETRIC, "RSA", Transformation.RSA, 2048),
     RSA4096(Type.ASYMMETRIC, "RSA", Transformation.RSA, 4096),
     RSA8192(Type.ASYMMETRIC, "RSA", Transformation.RSA, 8192);

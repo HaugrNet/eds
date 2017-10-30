@@ -72,6 +72,28 @@ public interface Share {
     FetchDataTypeResponse fetchDataTypes(FetchDataTypeRequest request);
 
     /**
+     * <p>Allow adding new Folders or Data records as well as update or remove
+     * existing records. The data provided will be encrypted for the specified
+     * Circle and stored encrypted in the underlying database.</p>
+     *
+     * <p>The Request supports the following Actions:</p>
+     * <ul>
+     *   <li><b>{@link io.javadog.cws.api.common.Action#ADD}</b> a new, not
+     *   existing record to the system with a given name. The name must be
+     *   unique in the Folder where the data is stored. If no type is specified,
+     *   then by default the &quot;data&quot; type is used, which is a general
+     *   purpose type, indicating that the requesting system must have details
+     *   about the actual data type.</li>
+     *   <li><b>{@link io.javadog.cws.api.common.Action#UPDATE}</b> an existing
+     *   record. It is possible to replace the encrypted data, rename the Data
+     *   Object and move Data Objects between different Folders belonging to the
+     *   same Circle. It is not possible to move Folders, as this will break the
+     *   underlying data model since it can lead to recursive data structures,
+     *   folders can thus only be renamed.</li>
+     *   <li><b>{@link io.javadog.cws.api.common.Action#DELETE}</b> an existing
+     *   Data Object or an existing, empty, folder. It is not possible to delete
+     *   folders with Data.</li>
+     * </ul>
      *
      * @param request Request Object
      * @return Response Object with ReturnCode and Message
@@ -79,6 +101,18 @@ public interface Share {
     ProcessDataResponse processData(ProcessDataRequest request);
 
     /**
+     * <p>Allow retrieving data for a specific Circle from the System. Unless a
+     * specific Data Object is requested, the list of returned information will
+     * only be the Metadata for the Data Object. If a specific Data Object is
+     * requested, then the listing will contain a single entry with the Metadata
+     * for the Object, and the data is set in the Response Object as well.</p>
+     *
+     * <p>By default, the content retrieved is a list of data for the root
+     * folder for the given Circle. If a specific Folder is given, then the list
+     * will be the content of the provided folder. The sorting of the content
+     * is always with the most recent data first. It is possible to specify how
+     * many Metadata Objects should be returned, and also which page number to
+     * read from.</p>
      *
      * @param request Request Object
      * @return Response Object with ReturnCode and Message

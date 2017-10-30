@@ -64,6 +64,9 @@ public interface System {
     SettingResponse settings(SettingRequest request);
 
     /**
+     * <p>Allows the retrieval of existing Member Accounts from the System, if
+     * a specific Account is requested, then a list of Circles where the Account
+     * is also a Trustee is returned.</p>
      *
      * @param request Request Object
      * @return Response Object with ReturnCode and Message
@@ -130,6 +133,35 @@ public interface System {
     FetchCircleResponse fetchCircles(FetchCircleRequest request);
 
     /**
+     * <p>With this request it is possible to process Circles and Trustees. A
+     * Trustee, is an Account which has been granted access to a Circle, and
+     * thus also has access to the the Circle Key to both encrypt and decrypt
+     * the data belonging to a Circle.</p>
+     *
+     * <p>The Request supports the following Actions:</p>
+     * <ul>
+     *   <li><b>{@link io.javadog.cws.api.common.Action#CREATE}</b> a new
+     *   Circle. This can only be performed by the System Administrator. It
+     *   allows the creation of a new Circle with a default new Circle
+     *   Administrator, which cannot be the System Administrator.</li>
+     *   <li><b>{@link io.javadog.cws.api.common.Action#UPDATE}</b> an existing
+     *   Circle, i.e. rename it.</li>
+     *   <li><b>{@link io.javadog.cws.api.common.Action#DELETE}</b> an existing
+     *   Circle from the System. This action cannot be reverted - once Deleted,
+     *   the Keys and Data will also be deleted.</li>
+     *   <li><b>{@link io.javadog.cws.api.common.Action#ADD}</b> a new Trustee
+     *   to the Circle, i.e. an Account other than the System Administrator with
+     *   a specific Trust level.</li>
+     *   <li><b>{@link io.javadog.cws.api.common.Action#ALTER}</b> the level of
+     *   trust for a given Trustee towards the Circle.</li>
+     *   <li><b>{@link io.javadog.cws.api.common.Action#REMOVE}</b> a Trustee
+     *   from the Circle, meaning that the Account will no longer be able to
+     *   access any data belonging to the Circle.</li>
+     * </ul>
+     *
+     * <p>The System Administrator is not allowed to be a Trustee of a Circle,
+     * as this may pose as a conflict of interest or potentially as a Security
+     * issue.</p>
      *
      * @param request Request Object
      * @return Response Object with ReturnCode and Message

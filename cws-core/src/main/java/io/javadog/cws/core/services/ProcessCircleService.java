@@ -238,12 +238,10 @@ public final class ProcessCircleService extends Serviceable<ProcessCircleRespons
                     trustee.setKey(admin.getKey());
                     trustee.setTrustLevel(trustLevel);
 
-                    if ((trustLevel == TrustLevel.ADMIN) || (trustLevel == TrustLevel.WRITE) || (trustLevel == TrustLevel.READ)) {
-                        final SecretCWSKey circleKey = crypto.extractCircleKey(admin.getKey().getAlgorithm(), keyPair.getPrivate(), admin.getCircleKey());
-                        final PublicKey publicKey = crypto.dearmoringPublicKey(newTrusteeMember.getPublicKey());
-                        final PublicCWSKey cwsPublicKey = new PublicCWSKey(newTrusteeMember.getAlgorithm(), publicKey);
-                        trustee.setCircleKey(crypto.encryptAndArmorCircleKey(cwsPublicKey, circleKey));
-                    }
+                    final SecretCWSKey circleKey = crypto.extractCircleKey(admin.getKey().getAlgorithm(), keyPair.getPrivate(), admin.getCircleKey());
+                    final PublicKey publicKey = crypto.dearmoringPublicKey(newTrusteeMember.getPublicKey());
+                    final PublicCWSKey cwsPublicKey = new PublicCWSKey(newTrusteeMember.getAlgorithm(), publicKey);
+                    trustee.setCircleKey(crypto.encryptAndArmorCircleKey(cwsPublicKey, circleKey));
 
                     dao.persist(trustee);
 

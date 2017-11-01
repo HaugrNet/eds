@@ -54,13 +54,14 @@ public final class ProcessDataRequest extends Authentication implements CircleId
     @XmlElement(name = FIELD_CIRCLE_ID, nillable = true)
     private String circleId = null;
 
+    @Size(min = 1, max = MAX_STRING_LENGTH)
+    @XmlElement(name = FIELD_NAME, nillable = true)
+    private String name = null;
+
     @Pattern(regexp = Constants.ID_PATTERN_REGEX)
     @XmlElement(name = FIELD_FOLDER_ID, nillable = true)
     private String folderId = null;
 
-    @Size(min = 1, max = MAX_STRING_LENGTH)
-    @XmlElement(name = FIELD_NAME, nillable = true)
-    private String name = null;
 
     @Size(min = 1, max = MAX_NAME_LENGTH)
     @XmlElement(name = FIELD_TYPENAME)
@@ -105,20 +106,20 @@ public final class ProcessDataRequest extends Authentication implements CircleId
         return circleId;
     }
 
-    public void setFolderId(final String folderId) {
-        this.folderId = folderId;
-    }
-
-    public String getFolderId() {
-        return folderId;
-    }
-
     public void setName(final String name) {
         this.name = name;
     }
 
     public String getName() {
         return name;
+    }
+
+    public void setFolderId(final String folderId) {
+        this.folderId = folderId;
+    }
+
+    public String getFolderId() {
+        return folderId;
     }
 
     public void setTypeName(final String typeName) {

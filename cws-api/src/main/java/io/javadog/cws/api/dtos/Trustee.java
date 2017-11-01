@@ -115,9 +115,9 @@ public final class Trustee implements Serializable {
         }
 
         final Trustee that = (Trustee) obj;
-        return Objects.equals(circle, that.circle) &&
+        return (trustLevel == that.trustLevel) &&
+                Objects.equals(circle, that.circle) &&
                 Objects.equals(member, that.member) &&
-                (trustLevel == that.trustLevel) &&
                 Objects.equals(changed, that.changed) &&
                 Objects.equals(since, that.since);
     }

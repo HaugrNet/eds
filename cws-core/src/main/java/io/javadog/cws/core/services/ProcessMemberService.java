@@ -82,7 +82,7 @@ public final class ProcessMemberService extends Serviceable<ProcessMemberRespons
             final MemberEntity created = createNewAccount(accountName, request.getNewCredential());
             final ProcessMemberResponse response;
             response = new ProcessMemberResponse();
-            response.setId(created.getExternalId());
+            response.setMemberId(created.getExternalId());
 
             return response;
         } else {
@@ -125,7 +125,7 @@ public final class ProcessMemberService extends Serviceable<ProcessMemberRespons
 
     private ProcessMemberResponse processSelf(final ProcessMemberRequest request) {
         final ProcessMemberResponse response = new ProcessMemberResponse();
-        response.setId(member.getExternalId());
+        response.setMemberId(member.getExternalId());
 
         if (request.getAccountName() != null) {
             final String accountName = request.getAccountName().trim();
@@ -189,7 +189,7 @@ public final class ProcessMemberService extends Serviceable<ProcessMemberRespons
                     dao.persist(account);
 
                     response = new ProcessMemberResponse();
-                    response.setId(account.getExternalId());
+                    response.setMemberId(account.getExternalId());
                 } else {
                     response = new ProcessMemberResponse(ReturnCode.AUTHENTICATION_WARNING, "The given signature is invalid.");
                 }

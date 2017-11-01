@@ -27,7 +27,7 @@ public final class ProcessDataTypeResponse extends CwsResponse {
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
-    @XmlElement
+    @XmlElement(name = "dataType")
     private DataType dataType = null;
 
     // =========================================================================

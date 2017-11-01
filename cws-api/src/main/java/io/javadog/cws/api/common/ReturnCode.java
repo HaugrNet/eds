@@ -21,15 +21,6 @@ public enum ReturnCode {
 
     SUCCESS(Classification.CLASS_INFO, 0, "Request completed normally."),
 
-    ERROR(Classification.CLASS_ERROR, 0, "General Error occurred while handling the request."),
-    DATABASE_ERROR(Classification.CLASS_ERROR, 1, "Database Error occurred during the handling of the request."),
-    CONSTRAINT_ERROR(Classification.CLASS_ERROR, 2, "Unique Constraint Violation in the Database."),
-    PROPERTY_ERROR(Classification.CLASS_ERROR, 3, "Error extracting settings information."),
-    CRYPTO_ERROR(Classification.CLASS_ERROR, 4, "Cryptographic Error occurred during the handling of the request."),
-    IDENTIFICATION_ERROR(Classification.CLASS_ERROR, 5, "Not possible to positively identify the Requested Data."),
-    INTEGRITY_ERROR(Classification.CLASS_ERROR, 6, "The Encrypted Data is having integrity problems."),
-    NOTIMPLEMENTED_ERROR(Classification.CLASS_ERROR, 99, "Logic Pending Implemented..."),
-
     WARNING(Classification.CLASS_WARNING, 0, "General Warning occurred while handling the request."),
     AUTHENTICATION_WARNING(Classification.CLASS_WARNING, 1, "Authentication of the Account failed."),
     AUTHORIZATION_WARNING(Classification.CLASS_WARNING, 2, "The Account is not permitted to perform requested Action."),
@@ -37,9 +28,18 @@ public enum ReturnCode {
     SIGNATURE_WARNING(Classification.CLASS_WARNING, 4, "There Signature is not usable."),
     IDENTIFICATION_WARNING(Classification.CLASS_WARNING, 5, "Not possible to positively identify the requested Data."),
     INTEGRITY_WARNING(Classification.CLASS_WARNING, 6, "Not possible to perform the given action, as it will lead to data integrity problems."),
-    ILLEGAL_ACTION(Classification.CLASS_WARNING, 99, "The Account tried to invoke an Action not allowed.");
+    ILLEGAL_ACTION(Classification.CLASS_WARNING, 99, "The Account tried to invoke an Action not allowed."),
 
-    private enum Classification {
+    ERROR(Classification.CLASS_ERROR, 0, "General Error occurred while handling the request."),
+    DATABASE_ERROR(Classification.CLASS_ERROR, 1, "Database Error occurred during the handling of the request."),
+    CONSTRAINT_ERROR(Classification.CLASS_ERROR, 2, "Unique Constraint Violation in the Database."),
+    PROPERTY_ERROR(Classification.CLASS_ERROR, 3, "Error extracting settings information."),
+    CRYPTO_ERROR(Classification.CLASS_ERROR, 4, "Cryptographic Error occurred during the handling of the request."),
+    IDENTIFICATION_ERROR(Classification.CLASS_ERROR, 5, "Not possible to positively identify the Requested Data."),
+    INTEGRITY_ERROR(Classification.CLASS_ERROR, 6, "The Encrypted Data is having integrity problems."),
+    NOTIMPLEMENTED_ERROR(Classification.CLASS_ERROR, 99, "Logic Pending Implemented...");
+
+    public enum Classification {
 
         /**
          * <p>The Classification Info, is used for for all Successful Responses
@@ -88,6 +88,10 @@ public enum ReturnCode {
         this.classification = classification;
         this.code = code;
         this.description = description;
+    }
+
+    public Classification getClassification() {
+        return classification;
     }
 
     public int getCode() {

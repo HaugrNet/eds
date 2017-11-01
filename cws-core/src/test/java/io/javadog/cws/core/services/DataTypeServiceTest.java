@@ -15,7 +15,6 @@ import static org.junit.Assert.assertThat;
 import io.javadog.cws.api.common.Action;
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
-import io.javadog.cws.api.dtos.DataType;
 import io.javadog.cws.api.requests.FetchDataTypeRequest;
 import io.javadog.cws.api.requests.ProcessDataTypeRequest;
 import io.javadog.cws.api.responses.FetchDataTypeResponse;
@@ -88,7 +87,8 @@ public final class DataTypeServiceTest extends DatabaseSetup {
 
         final ProcessDataTypeService service = new ProcessDataTypeService(settings, entityManager);
         final ProcessDataTypeRequest request = prepareRequest(ProcessDataTypeRequest.class, Constants.ADMIN_ACCOUNT);
-        assertThat(request.getDataType(), is(nullValue()));
+        assertThat(request.getName(), is(nullValue()));
+        assertThat(request.getType(), is(nullValue()));
 
         service.perform(request);
     }
@@ -100,9 +100,10 @@ public final class DataTypeServiceTest extends DatabaseSetup {
 
         final ProcessDataTypeService service = new ProcessDataTypeService(settings, entityManager);
         final ProcessDataTypeRequest request = prepareRequest(ProcessDataTypeRequest.class, MEMBER_1);
-        final DataType dataType = buildDataType("MyDataType", "The Data Type");
-        request.setDataType(dataType);
-        assertThat(request.getDataType(), is(not(nullValue())));
+        request.setType("MyDataType");
+        request.setName("The Data Type");
+        assertThat(request.getName(), is(not(nullValue())));
+        assertThat(request.getType(), is(not(nullValue())));
 
         service.perform(request);
     }
@@ -114,9 +115,10 @@ public final class DataTypeServiceTest extends DatabaseSetup {
 
         final ProcessDataTypeService service = new ProcessDataTypeService(settings, entityManager);
         final ProcessDataTypeRequest request = prepareRequest(ProcessDataTypeRequest.class, Constants.ADMIN_ACCOUNT);
-        final DataType dataType = buildDataType(Constants.FOLDER_TYPENAME, "alternative folder");
-        request.setDataType(dataType);
-        assertThat(request.getDataType(), is(not(nullValue())));
+        request.setType(Constants.FOLDER_TYPENAME);
+        request.setName("alternative folder");
+        assertThat(request.getName(), is(not(nullValue())));
+        assertThat(request.getType(), is(not(nullValue())));
 
         service.perform(request);
     }
@@ -128,9 +130,10 @@ public final class DataTypeServiceTest extends DatabaseSetup {
 
         final ProcessDataTypeService service = new ProcessDataTypeService(settings, entityManager);
         final ProcessDataTypeRequest request = prepareRequest(ProcessDataTypeRequest.class, Constants.ADMIN_ACCOUNT);
-        final DataType dataType = buildDataType(Constants.DATA_TYPENAME, "alternative data");
-        request.setDataType(dataType);
-        assertThat(request.getDataType(), is(not(nullValue())));
+        request.setType(Constants.DATA_TYPENAME);
+        request.setName("alternative data");
+        assertThat(request.getName(), is(not(nullValue())));
+        assertThat(request.getType(), is(not(nullValue())));
 
         service.perform(request);
     }
@@ -142,8 +145,8 @@ public final class DataTypeServiceTest extends DatabaseSetup {
         request.setAction(Action.PROCESS);
         final String theDataTypeName = "dataTypeToDelete";
         final String newDataTypeType = "The Type information";
-        final DataType dataType = buildDataType(theDataTypeName, newDataTypeType);
-        request.setDataType(dataType);
+        request.setName(theDataTypeName);
+        request.setType(newDataTypeType);
         final ProcessDataTypeResponse response = service.perform(request);
 
         assertThat(response, is(not(nullValue())));
@@ -166,8 +169,8 @@ public final class DataTypeServiceTest extends DatabaseSetup {
         request.setAction(Action.DELETE);
         final String theDataTypeName = "unknownDataType";
         final String newDataTypeType = "The Type information";
-        final DataType dataType = buildDataType(theDataTypeName, newDataTypeType);
-        request.setDataType(dataType);
+        request.setName(theDataTypeName);
+        request.setType(newDataTypeType);
         final ProcessDataTypeResponse response = service.perform(request);
 
         assertThat(response, is(not(nullValue())));
@@ -183,8 +186,8 @@ public final class DataTypeServiceTest extends DatabaseSetup {
         request.setAction(Action.PROCESS);
         final String theDataTypeName = "newName";
         final String newDataTypeType = "newType";
-        final DataType dataType = buildDataType(theDataTypeName, newDataTypeType);
-        request.setDataType(dataType);
+        request.setName(theDataTypeName);
+        request.setType(newDataTypeType);
 
         final ProcessDataTypeResponse response = service.perform(request);
         assertThat(response, is(not(nullValue())));
@@ -195,8 +198,8 @@ public final class DataTypeServiceTest extends DatabaseSetup {
         assertThat(response.getDataType().getType(), is(newDataTypeType));
 
         final String updatedDataTypeType = "updatedType";
-        final DataType updatedDataType = buildDataType(theDataTypeName, updatedDataTypeType);
-        request.setDataType(updatedDataType);
+        request.setName(theDataTypeName);
+        request.setType(updatedDataTypeType);
         final ProcessDataTypeResponse updateResponse = service.perform(request);
         assertThat(updateResponse, is(not(nullValue())));
         assertThat(updateResponse.isOk(), is(true));
@@ -204,17 +207,5 @@ public final class DataTypeServiceTest extends DatabaseSetup {
         assertThat(updateResponse.getReturnMessage(), is("Ok"));
         assertThat(updateResponse.getDataType().getName(), is(theDataTypeName));
         assertThat(updateResponse.getDataType().getType(), is(updatedDataTypeType));
-    }
-
-    // =========================================================================
-    // Internal Helper Methods
-    // =========================================================================
-
-    private static DataType buildDataType(final String name, final String type) {
-        final DataType dataType = new DataType();
-        dataType.setName(name);
-        dataType.setType(type);
-
-        return dataType;
     }
 }

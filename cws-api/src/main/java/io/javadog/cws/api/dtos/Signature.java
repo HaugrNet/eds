@@ -10,35 +10,34 @@ package io.javadog.cws.api.dtos;
 import static io.javadog.cws.api.common.Utilities.copy;
 
 import io.javadog.cws.api.common.Constants;
-import io.javadog.cws.api.common.Verifiable;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
+import java.io.Serializable;
 import java.util.Date;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Objects;
 
 /**
  * @author Kim Jensen
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "signature", propOrder = { "id", "expires", "verifications", "created", "lastVerification" })
-public final class Signature extends Verifiable {
+@XmlType(name = "signature", propOrder = { "signature", "expires", "verifications", "created", "lastVerification" })
+public final class Signature implements Serializable {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
-    private static final String FIELD_ID = "id";
+    private static final String FIELD_SIGNATURE = "signature";
     private static final String FIELD_EXPIRES = "expires";
     private static final String FIELD_VERIFICATIONS = "verifications";
     private static final String FIELD_CREATED = "created";
     private static final String FIELD_LAST_VERIFICATION = "lastVerification";
 
-    @XmlElement(name = FIELD_ID)
-    private String id = null;
+    @XmlElement(name = FIELD_SIGNATURE)
+    private String theSignature = null;
 
     @XmlElement(name = FIELD_EXPIRES)
     private Date expires = null;
@@ -56,12 +55,13 @@ public final class Signature extends Verifiable {
     // Standard Setters & Getters
     // =========================================================================
 
-    public void setId(final String id) {
-        this.id = id;
+
+    public void setSignature(final String signature) {
+        this.theSignature = signature;
     }
 
-    public String getId() {
-        return id;
+    public String getSignature() {
+        return theSignature;
     }
 
     public void setExpires(final Date expires) {
@@ -104,7 +104,36 @@ public final class Signature extends Verifiable {
      * {@inheritDoc}
      */
     @Override
-    public Map<String, String> validate() {
-        return new ConcurrentHashMap<>();
+    public boolean equals(final Object obj) {
+        if (this == obj) {
+            return true;
+        }
+
+        if (!(obj instanceof Signature)) {
+            return false;
+        }
+
+        final Signature that = (Signature) obj;
+        return Objects.equals(theSignature, that.theSignature) &&
+                Objects.equals(expires, that.expires) &&
+                Objects.equals(verifications, that.verifications) &&
+                Objects.equals(created, that.created) &&
+                Objects.equals(lastVerification, that.lastVerification);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(theSignature, expires, verifications, created, lastVerification);
+    }
+
+    @Override
+    public String toString() {
+        return "Signature{" +
+                "signature='" + theSignature + '\'' +
+                ", expires=" + expires +
+                ", verifications=" + verifications +
+                ", created=" + created +
+                ", lastVerification=" + lastVerification +
+                '}';
     }
 }

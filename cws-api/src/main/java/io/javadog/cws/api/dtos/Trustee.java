@@ -11,16 +11,14 @@ import static io.javadog.cws.api.common.Utilities.copy;
 
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.TrustLevel;
-import io.javadog.cws.api.common.Verifiable;
 
-import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
+import java.io.Serializable;
 import java.util.Date;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Objects;
 
 /**
  * <p>A Trustee, is a Member of a Circle, with a granted Trust Level.</p>
@@ -30,7 +28,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "trustee", propOrder = { "circle", "member", "trustLevel", "changed", "since" })
-public final class Trustee extends Verifiable {
+public final class Trustee implements Serializable {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
@@ -59,10 +57,7 @@ public final class Trustee extends Verifiable {
     // Standard Setters & Getters
     // =========================================================================
 
-    @NotNull
     public void setCircle(final Circle circle) {
-        ensureNotNull(FIELD_CIRCLE, circle);
-        ensureVerifiable(FIELD_CIRCLE, circle);
         this.circle = circle;
     }
 
@@ -70,10 +65,7 @@ public final class Trustee extends Verifiable {
         return circle;
     }
 
-    @NotNull
     public void setMember(final Member member) {
-        ensureNotNull(FIELD_MEMBER, member);
-        ensureVerifiable(FIELD_MEMBER, member);
         this.member = member;
     }
 
@@ -81,9 +73,7 @@ public final class Trustee extends Verifiable {
         return member;
     }
 
-    @NotNull
     public void setTrustLevel(final TrustLevel trustLevel) {
-        ensureNotNull(FIELD_TRUSTLEVEL, trustLevel);
         this.trustLevel = trustLevel;
     }
 
@@ -107,25 +97,50 @@ public final class Trustee extends Verifiable {
         return copy(since);
     }
 
+    // =========================================================================
+    // Standard Methods
+    // =========================================================================
+
     /**
      * {@inheritDoc}
      */
     @Override
-    public Map<String, String> validate() {
-        final Map<String, String> errors = new ConcurrentHashMap<>();
-
-        if (circle != null) {
-            extendErrors(errors, circle.validate(), "Circle :: ");
-        } else {
-            checkNotNull(errors, FIELD_CIRCLE, circle, "The Circle is missing, null or invalid.");
+    public boolean equals(final Object obj) {
+        if (this == obj) {
+            return true;
         }
-        if (member != null) {
-            extendErrors(errors, member.validate(), "Member :: ");
-        } else {
-            checkNotNull(errors, FIELD_MEMBER, member, "The Member is missing, null or invalid.");
-        }
-        checkNotNull(errors, FIELD_TRUSTLEVEL, trustLevel, "The TrustLevel is missing, null or invalid.");
 
-        return errors;
+        if (!(obj instanceof Trustee)) {
+            return false;
+        }
+
+        final Trustee that = (Trustee) obj;
+        return Objects.equals(circle, that.circle) &&
+                Objects.equals(member, that.member) &&
+                (trustLevel == that.trustLevel) &&
+                Objects.equals(changed, that.changed) &&
+                Objects.equals(since, that.since);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        return Objects.hash(circle, member, trustLevel, changed, since);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        return "Trustee{" +
+                "circle=" + circle +
+                ", member=" + member +
+                ", trustLevel=" + trustLevel +
+                ", changed=" + changed +
+                ", since=" + since +
+                '}';
     }
 }

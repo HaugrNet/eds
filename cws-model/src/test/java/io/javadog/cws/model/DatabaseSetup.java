@@ -14,7 +14,7 @@ import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.CredentialType;
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.common.TrustLevel;
-import io.javadog.cws.api.dtos.Authentication;
+import io.javadog.cws.api.requests.Authentication;
 import io.javadog.cws.common.Crypto;
 import io.javadog.cws.common.Settings;
 import io.javadog.cws.common.enums.KeyAlgorithm;

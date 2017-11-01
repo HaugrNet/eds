@@ -77,7 +77,7 @@ public final class DataServiceTest extends DatabaseSetup {
         assertThat(saveResponse.getReturnCode(), is(ReturnCode.SUCCESS));
 
         final FetchDataRequest fetchRequest = prepareRequest(FetchDataRequest.class, MEMBER_1);
-        fetchRequest.setDataId(saveResponse.getId());
+        fetchRequest.setDataId(saveResponse.getDataId());
         final FetchDataResponse fetchResponse = dataService.perform(fetchRequest);
         assertThat(fetchResponse.getReturnCode(), is(ReturnCode.SUCCESS));
     }
@@ -93,23 +93,23 @@ public final class DataServiceTest extends DatabaseSetup {
         assertThat(saveResponse.getReturnCode(), is(ReturnCode.SUCCESS));
 
         final FetchDataRequest fetchRequest1 = prepareRequest(FetchDataRequest.class, MEMBER_1);
-        fetchRequest1.setDataId(saveResponse.getId());
+        fetchRequest1.setDataId(saveResponse.getDataId());
         final FetchDataResponse fetchResponse1 = dataService.perform(fetchRequest1);
         assertThat(fetchResponse1.getReturnCode(), is(ReturnCode.SUCCESS));
 
-        final ProcessDataRequest updateRequest = prepareUpdateRequest(MEMBER_1, saveResponse.getId());
+        final ProcessDataRequest updateRequest = prepareUpdateRequest(MEMBER_1, saveResponse.getDataId());
         updateRequest.setName("New Name");
         final ProcessDataResponse updateResponse = service.perform(updateRequest);
         assertThat(updateResponse.getReturnCode(), is(ReturnCode.SUCCESS));
 
         assertThat(saveResponse.getReturnCode(), is(ReturnCode.SUCCESS));
         final FetchDataRequest fetchRequest2 = prepareRequest(FetchDataRequest.class, MEMBER_1);
-        fetchRequest2.setDataId(saveResponse.getId());
+        fetchRequest2.setDataId(saveResponse.getDataId());
         final FetchDataResponse fetchResponse2 = dataService.perform(fetchRequest2);
         assertThat(fetchResponse2.getReturnCode(), is(ReturnCode.SUCCESS));
-        assertThat(fetchResponse1.getData().get(0).getId(), is(fetchResponse2.getData().get(0).getId()));
-        assertThat(fetchResponse1.getData().get(0).getName(), is("My Data"));
-        assertThat(fetchResponse2.getData().get(0).getName(), is("New Name"));
+        assertThat(fetchResponse1.getMetadata().get(0).getDataId(), is(fetchResponse2.getMetadata().get(0).getDataId()));
+        assertThat(fetchResponse1.getMetadata().get(0).getName(), is("My Data"));
+        assertThat(fetchResponse2.getMetadata().get(0).getName(), is("New Name"));
     }
 
     @Test
@@ -128,9 +128,9 @@ public final class DataServiceTest extends DatabaseSetup {
         final ProcessDataRequest request = prepareRequest(ProcessDataRequest.class, MEMBER_4);
         request.setAction(Action.UPDATE);
         request.setCircleId(CIRCLE_2_ID);
-        request.setId(UUID.randomUUID().toString());
+        request.setDataId(UUID.randomUUID().toString());
         request.setName("New Name for our not existing Data");
-        request.setBytes(generateData(512));
+        request.setData(generateData(512));
 
         final ProcessDataResponse response = service.perform(request);
         assertThat(response.getReturnCode(), is(ReturnCode.IDENTIFICATION_WARNING));
@@ -145,7 +145,7 @@ public final class DataServiceTest extends DatabaseSetup {
         assertThat(saveResponse.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(saveResponse.getReturnMessage(), is("Ok"));
 
-        final ProcessDataRequest deleteRequest = prepareDeleteRequest(MEMBER_1, saveResponse.getId());
+        final ProcessDataRequest deleteRequest = prepareDeleteRequest(MEMBER_1, saveResponse.getDataId());
         final ProcessDataResponse deleteResponse = service.perform(deleteRequest);
         assertThat(deleteResponse.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(deleteResponse.getReturnMessage(), is("Ok"));
@@ -161,7 +161,7 @@ public final class DataServiceTest extends DatabaseSetup {
         assertThat(saveResponse.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(saveResponse.getReturnMessage(), is("Ok"));
 
-        final ProcessDataRequest deleteRequest = prepareDeleteRequest(MEMBER_3, saveResponse.getId());
+        final ProcessDataRequest deleteRequest = prepareDeleteRequest(MEMBER_3, saveResponse.getDataId());
         service.perform(deleteRequest);
     }
 
@@ -173,7 +173,7 @@ public final class DataServiceTest extends DatabaseSetup {
         assertThat(saveResponse.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(saveResponse.getReturnMessage(), is("Ok"));
 
-        final ProcessDataRequest deleteRequest = prepareDeleteRequest(MEMBER_4, saveResponse.getId());
+        final ProcessDataRequest deleteRequest = prepareDeleteRequest(MEMBER_4, saveResponse.getDataId());
         final ProcessDataResponse deleteResponse = service.perform(deleteRequest);
         assertThat(deleteResponse.getReturnCode(), is(ReturnCode.IDENTIFICATION_WARNING));
         assertThat(deleteResponse.getReturnMessage(), is("The requested Data Object could not be found."));
@@ -196,20 +196,20 @@ public final class DataServiceTest extends DatabaseSetup {
         final ProcessDataResponse addResponse = service.perform(request);
         assertThat(addResponse.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(addResponse.getReturnMessage(), is("Ok"));
-        assertThat(addResponse.getId(), is(not(nullValue())));
+        assertThat(addResponse.getDataId(), is(not(nullValue())));
 
-        final ProcessDataRequest updateRequest = prepareUpdateRequest(MEMBER_1, addResponse.getId());
+        final ProcessDataRequest updateRequest = prepareUpdateRequest(MEMBER_1, addResponse.getDataId());
         updateRequest.setName("updated Folder Name");
         final ProcessDataResponse updateResponse = service.perform(updateRequest);
         assertThat(updateResponse.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(updateResponse.getReturnMessage(), is("Ok"));
-        assertThat(updateResponse.getId(), is(addResponse.getId()));
+        assertThat(updateResponse.getDataId(), is(addResponse.getDataId()));
 
-        final ProcessDataRequest deleteRequest = prepareDeleteRequest(MEMBER_1, addResponse.getId());
+        final ProcessDataRequest deleteRequest = prepareDeleteRequest(MEMBER_1, addResponse.getDataId());
         final ProcessDataResponse deleteResponse = service.perform(deleteRequest);
         assertThat(deleteResponse.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(deleteResponse.getReturnMessage(), is("Ok"));
-        assertThat(deleteResponse.getId(), is(nullValue()));
+        assertThat(deleteResponse.getDataId(), is(nullValue()));
     }
 
     @Test
@@ -220,12 +220,12 @@ public final class DataServiceTest extends DatabaseSetup {
         final ProcessDataResponse response1 = service.perform(request);
         assertThat(response1.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(response1.getReturnMessage(), is("Ok"));
-        assertThat(response1.getId(), is(not(nullValue())));
+        assertThat(response1.getDataId(), is(not(nullValue())));
 
         final ProcessDataResponse response2 = service.perform(request);
         assertThat(response2.getReturnCode(), is(ReturnCode.INTEGRITY_WARNING));
         assertThat(response2.getReturnMessage(), is("Another record with the same name already exists."));
-        assertThat(response2.getId(), is(nullValue()));
+        assertThat(response2.getDataId(), is(nullValue()));
     }
 
     @Test
@@ -236,19 +236,19 @@ public final class DataServiceTest extends DatabaseSetup {
         final ProcessDataResponse addFolderResponse = service.perform(addFolderRequest);
         assertThat(addFolderResponse.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(addFolderResponse.getReturnMessage(), is("Ok"));
-        assertThat(addFolderResponse.getId(), is(not(nullValue())));
+        assertThat(addFolderResponse.getDataId(), is(not(nullValue())));
 
         final ProcessDataRequest addDataRequest = prepareAddRequest(MEMBER_1, CIRCLE_1_ID, "More Data", 524288);
-        addDataRequest.setFolderId(addFolderResponse.getId());
+        addDataRequest.setFolderId(addFolderResponse.getDataId());
         final ProcessDataResponse addDataResponse = service.perform(addDataRequest);
         assertThat(addDataResponse.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(addDataResponse.getReturnMessage(), is("Ok"));
 
-        final ProcessDataRequest deleteFolderRequest = prepareDeleteRequest(MEMBER_1, addFolderResponse.getId());
+        final ProcessDataRequest deleteFolderRequest = prepareDeleteRequest(MEMBER_1, addFolderResponse.getDataId());
         final ProcessDataResponse deleteFolderResponse = service.perform(deleteFolderRequest);
         assertThat(deleteFolderResponse.getReturnCode(), is(ReturnCode.INTEGRITY_WARNING));
         assertThat(deleteFolderResponse.getReturnMessage(), is("The requested Folder cannot be removed as it is not empty."));
-        assertThat(deleteFolderResponse.getId(), is(nullValue()));
+        assertThat(deleteFolderResponse.getDataId(), is(nullValue()));
     }
 
     @Test
@@ -261,15 +261,15 @@ public final class DataServiceTest extends DatabaseSetup {
         final ProcessDataResponse addFolderResponse1 = service.perform(addFolderRequest);
         assertThat(addFolderResponse1.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(addFolderResponse1.getReturnMessage(), is("Ok"));
-        assertThat(addFolderResponse1.getId(), is(not(nullValue())));
-        final String folderId1 = addFolderResponse1.getId();
+        assertThat(addFolderResponse1.getDataId(), is(not(nullValue())));
+        final String folderId1 = addFolderResponse1.getDataId();
 
         addFolderRequest.setName("folder2");
         final ProcessDataResponse addFolderResponse2 = service.perform(addFolderRequest);
         assertThat(addFolderResponse2.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(addFolderResponse2.getReturnMessage(), is("Ok"));
-        assertThat(addFolderResponse2.getId(), is(not(nullValue())));
-        final String folderId2 = addFolderResponse2.getId();
+        assertThat(addFolderResponse2.getDataId(), is(not(nullValue())));
+        final String folderId2 = addFolderResponse2.getDataId();
 
         final ProcessDataRequest moveFolderRequest = prepareUpdateRequest(MEMBER_1, folderId2);
         moveFolderRequest.setFolderId(folderId1);
@@ -284,20 +284,20 @@ public final class DataServiceTest extends DatabaseSetup {
         final ProcessDataResponse addFolderResponse = service.perform(addFolderRequest);
         assertThat(addFolderResponse.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(addFolderResponse.getReturnMessage(), is("Ok"));
-        assertThat(addFolderResponse.getId(), is(not(nullValue())));
+        assertThat(addFolderResponse.getDataId(), is(not(nullValue())));
 
         final ProcessDataRequest addDataRequest = prepareAddRequest(MEMBER_1, CIRCLE_1_ID, "my data", 512);
         final ProcessDataResponse addDataResponse = service.perform(addDataRequest);
         assertThat(addDataResponse.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(addDataResponse.getReturnMessage(), is("Ok"));
-        assertThat(addDataResponse.getId(), is(not(nullValue())));
+        assertThat(addDataResponse.getDataId(), is(not(nullValue())));
 
-        final ProcessDataRequest moveDataRequest = prepareUpdateRequest(MEMBER_1, addDataResponse.getId());
-        moveDataRequest.setFolderId(addFolderResponse.getId());
+        final ProcessDataRequest moveDataRequest = prepareUpdateRequest(MEMBER_1, addDataResponse.getDataId());
+        moveDataRequest.setFolderId(addFolderResponse.getDataId());
         final ProcessDataResponse moveFolderResponse = service.perform(moveDataRequest);
         assertThat(moveFolderResponse.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(moveFolderResponse.getReturnMessage(), is("Ok"));
-        assertThat(moveFolderResponse.getId(), is(addDataResponse.getId()));
+        assertThat(moveFolderResponse.getDataId(), is(addDataResponse.getDataId()));
     }
 
     @Test
@@ -310,16 +310,16 @@ public final class DataServiceTest extends DatabaseSetup {
         final ProcessDataResponse addFolderResponse = service.perform(addFolderRequest);
         assertThat(addFolderResponse.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(addFolderResponse.getReturnMessage(), is("Ok"));
-        assertThat(addFolderResponse.getId(), is(not(nullValue())));
+        assertThat(addFolderResponse.getDataId(), is(not(nullValue())));
 
         final ProcessDataRequest addDataRequest = prepareAddRequest(MEMBER_1, CIRCLE_2_ID, "my data", 512);
         final ProcessDataResponse addDataResponse = service.perform(addDataRequest);
         assertThat(addDataResponse.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(addDataResponse.getReturnMessage(), is("Ok"));
-        assertThat(addDataResponse.getId(), is(not(nullValue())));
+        assertThat(addDataResponse.getDataId(), is(not(nullValue())));
 
-        final ProcessDataRequest moveDataRequest = prepareUpdateRequest(MEMBER_1, addDataResponse.getId());
-        moveDataRequest.setFolderId(addFolderResponse.getId());
+        final ProcessDataRequest moveDataRequest = prepareUpdateRequest(MEMBER_1, addDataResponse.getDataId());
+        moveDataRequest.setFolderId(addFolderResponse.getDataId());
         service.perform(moveDataRequest);
     }
 
@@ -333,7 +333,7 @@ public final class DataServiceTest extends DatabaseSetup {
         request.setCircleId(circleId);
         request.setName(dataName);
         request.setTypeName("data");
-        request.setBytes(generateData(bytes));
+        request.setData(generateData(bytes));
 
         return request;
     }
@@ -341,7 +341,7 @@ public final class DataServiceTest extends DatabaseSetup {
     private static ProcessDataRequest prepareUpdateRequest(final String account, final String dataId) {
         final ProcessDataRequest request = prepareRequest(ProcessDataRequest.class, account);
         request.setAction(Action.UPDATE);
-        request.setId(dataId);
+        request.setDataId(dataId);
 
         return request;
     }
@@ -349,7 +349,7 @@ public final class DataServiceTest extends DatabaseSetup {
     private static ProcessDataRequest prepareDeleteRequest(final String account, final String dataId) {
         final ProcessDataRequest request = prepareRequest(ProcessDataRequest.class, account);
         request.setAction(Action.DELETE);
-        request.setId(dataId);
+        request.setDataId(dataId);
 
         return request;
     }

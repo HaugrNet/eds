@@ -51,7 +51,11 @@ public final class Constants {
 
     public static final String DATA_TYPENAME = "data";
 
+    public static final int MAX_NAME_LENGTH = 75;
+
     public static final int MAX_STRING_LENGTH = 256;
+
+    public static final int MAX_PAGE_SIZE = 100;
 
     private Constants() {
         // Private Constructor, this is a Constants Class.

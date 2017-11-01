@@ -8,7 +8,6 @@
 package io.javadog.cws.api.requests;
 
 import io.javadog.cws.api.common.Constants;
-import io.javadog.cws.api.dtos.Authentication;
 
 import javax.validation.constraints.Pattern;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -30,6 +29,7 @@ public final class FetchMemberRequest extends Authentication {
 
     private static final String FIELD_MEMBER_ID = "memberId";
 
+    @Pattern(regexp = Constants.ID_PATTERN_REGEX)
     @XmlElement(name = FIELD_MEMBER_ID, nillable = true, required = true)
     private String memberId = null;
 
@@ -37,9 +37,7 @@ public final class FetchMemberRequest extends Authentication {
     // Setters & Getters
     // =========================================================================
 
-    @Pattern(regexp = Constants.ID_PATTERN_REGEX)
     public void setMemberId(final String memberId) {
-        ensureValidId(FIELD_MEMBER_ID, memberId);
         this.memberId = memberId;
     }
 
@@ -58,9 +56,7 @@ public final class FetchMemberRequest extends Authentication {
     public Map<String, String> validate() {
         final Map<String, String> errors = super.validate();
 
-        if (memberId != null) {
-            checkPattern(errors, FIELD_MEMBER_ID, memberId, Constants.ID_PATTERN_REGEX, "The Member Id is invalid.");
-        }
+        checkValidId(errors, FIELD_MEMBER_ID, memberId, "The Member Id is invalid.");
 
         return errors;
     }

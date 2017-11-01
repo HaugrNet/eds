@@ -9,6 +9,7 @@ package io.javadog.cws.core.services;
 
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
+import io.javadog.cws.api.dtos.DataType;
 import io.javadog.cws.api.dtos.Metadata;
 import io.javadog.cws.api.requests.FetchDataRequest;
 import io.javadog.cws.api.responses.FetchDataResponse;
@@ -19,6 +20,7 @@ import io.javadog.cws.core.Permission;
 import io.javadog.cws.core.Serviceable;
 import io.javadog.cws.model.entities.CircleEntity;
 import io.javadog.cws.model.entities.DataEntity;
+import io.javadog.cws.model.entities.DataTypeEntity;
 import io.javadog.cws.model.entities.MetadataEntity;
 import io.javadog.cws.model.entities.TrusteeEntity;
 
@@ -108,8 +110,8 @@ public final class FetchDataService extends Serviceable<FetchDataResponse, Fetch
                 objects.add(metaData);
 
                 final FetchDataResponse response = new FetchDataResponse();
-                response.setData(objects);
-                response.setBytes(bytes);
+                response.setMetadata(objects);
+                response.setData(bytes);
 
                 return response;
             } else {
@@ -129,7 +131,7 @@ public final class FetchDataService extends Serviceable<FetchDataResponse, Fetch
         }
 
         final FetchDataResponse response = new FetchDataResponse();
-        response.setData(list);
+        response.setMetadata(list);
 
         return response;
     }
@@ -137,14 +139,23 @@ public final class FetchDataService extends Serviceable<FetchDataResponse, Fetch
     private static Metadata convert(final MetadataEntity entity, final String folderId) {
         final Metadata metaData = new Metadata();
 
-        metaData.setTypeName(entity.getType().getName());
+        metaData.setDataType(convert(entity.getType()));
         metaData.setName(entity.getName());
-        metaData.setId(entity.getExternalId());
+        metaData.setDataId(entity.getExternalId());
         metaData.setCircleId(entity.getCircle().getExternalId());
         metaData.setAdded(entity.getCreated());
         metaData.setFolderId(folderId);
 
         return metaData;
+    }
+
+    private static DataType convert(final DataTypeEntity entity) {
+        final DataType dataType = new DataType();
+
+        dataType.setName(entity.getName());
+        dataType.setType(entity.getType());
+
+        return dataType;
     }
 
     private SecretCWSKey extractCircleKey(final DataEntity entity) {

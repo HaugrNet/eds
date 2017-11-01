@@ -5,7 +5,7 @@
  * Project: CWS (cws-api)
  * =============================================================================
  */
-package io.javadog.cws.api.dtos;
+package io.javadog.cws.api.requests;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;

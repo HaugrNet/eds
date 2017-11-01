@@ -20,14 +20,14 @@ import javax.xml.bind.annotation.XmlType;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "processMemberResult", propOrder = { "id", "signature" })
+@XmlType(name = "processMemberResult", propOrder = { "memberId", "signature" })
 public final class ProcessMemberResponse extends CwsResponse {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
-    @XmlElement
-    private String id = null;
+    @XmlElement(name = "memberId")
+    private String memberId = null;
 
     @XmlElement
     private String signature = null;
@@ -59,12 +59,12 @@ public final class ProcessMemberResponse extends CwsResponse {
     // Standard Setters & Getters
     // =========================================================================
 
-    public void setId(final String id) {
-        this.id = id;
+    public void setMemberId(final String memberId) {
+        this.memberId = memberId;
     }
 
-    public String getId() {
-        return id;
+    public String getMemberId() {
+        return memberId;
     }
 
     public void setSignature(final String signature) {

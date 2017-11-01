@@ -67,5 +67,4 @@ public final class FetchSignatureResponse extends CwsResponse {
     public List<Signature> getSignatures() {
         return Collections.unmodifiableList(signatures);
     }
-
 }

@@ -10,8 +10,8 @@ package io.javadog.cws.api.requests;
 import static io.javadog.cws.api.common.Utilities.copy;
 
 import io.javadog.cws.api.common.Constants;
-import io.javadog.cws.api.dtos.Authentication;
 
+import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -31,6 +31,7 @@ public final class SignRequest extends Authentication {
     private static final String FIELD_DATA = "data";
     private static final String FIELD_EXPIRES = "expires";
 
+    @NotNull
     @XmlElement(name = FIELD_DATA, required = true)
     private byte[] data = null;
 
@@ -42,7 +43,6 @@ public final class SignRequest extends Authentication {
     // =========================================================================
 
     public void setData(final byte[] data) {
-        ensureNotNull(FIELD_DATA, data);
         this.data = copy(data);
     }
 

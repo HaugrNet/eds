@@ -52,6 +52,10 @@ public final class VerifyResponse extends CwsResponse {
         super(returnCode, returnMessage);
     }
 
+    // =========================================================================
+    // Standard Setters & Getters
+    // =========================================================================
+
     public void setVerified(final boolean verified) {
         this.verified = verified;
     }

@@ -7,21 +7,20 @@
  */
 package io.javadog.cws.api.requests;
 
-import static io.javadog.cws.api.common.Constants.MAX_STRING_LENGTH;
+import static io.javadog.cws.api.common.Constants.MAX_NAME_LENGTH;
 
 import io.javadog.cws.api.common.Action;
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.TrustLevel;
-import io.javadog.cws.api.dtos.Authentication;
 
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
-import java.util.EnumSet;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * @author Kim Jensen
@@ -33,7 +32,6 @@ public final class ProcessCircleRequest extends Authentication implements Circle
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
-    private static final Set<Action> ALLOWED = EnumSet.of(Action.CREATE, Action.UPDATE, Action.DELETE, Action.ADD, Action.ALTER, Action.REMOVE);
 
     private static final String FIELD_ACTION = "action";
     private static final String FIELD_CIRCLE_ID = "circleId";
@@ -41,15 +39,19 @@ public final class ProcessCircleRequest extends Authentication implements Circle
     private static final String FIELD_MEMBER_ID = "memberId";
     private static final String FIELD_TRUSTLEVEL = "trustlevel";
 
+    @NotNull
     @XmlElement(name = FIELD_ACTION, required = true)
     private Action action = null;
 
+    @Pattern(regexp = Constants.ID_PATTERN_REGEX)
     @XmlElement(name = FIELD_CIRCLE_ID)
     private String circleId = null;
 
+    @Size(min = 1, max = MAX_NAME_LENGTH)
     @XmlElement(name = FIELD_CIRCLE_NAME)
     private String circleName = null;
 
+    @Pattern(regexp = Constants.ID_PATTERN_REGEX)
     @XmlElement(name = FIELD_MEMBER_ID)
     private String memberId = null;
 
@@ -60,25 +62,7 @@ public final class ProcessCircleRequest extends Authentication implements Circle
     // Standard Setters & Getters
     // =========================================================================
 
-    /**
-     * <p>Sets the Action for the processing Request. Allowed values from the
-     * Actions enumerated Object includes:</p>
-     * <ul>
-     *   <li><b>CREATE</b> - Create or Add new Circles</li>
-     *   <li><b>UPDATE</b> - Update an existing Circle</li>
-     *   <li><b>DELETE</b> - Delete an existing Circle</li>
-     *   <li><b>ADD</b> - Add a Trustee to a Circle</li>
-     *   <li><b>ALTER</b> - Alter an existing Circle Trustee</li>
-     *   <li><b>REMOVE</b> - Remove an existing Circle Trustee</li>
-     * </ul>
-     *
-     * @param action Current Action
-     * @throws IllegalArgumentException if the value is null or not allowed
-     */
-    @NotNull
     public void setAction(final Action action) {
-        ensureNotNull(FIELD_ACTION, action);
-        ensureValidEntry(FIELD_ACTION, action, ALLOWED);
         this.action = action;
     }
 
@@ -91,7 +75,6 @@ public final class ProcessCircleRequest extends Authentication implements Circle
      */
     @Override
     public void setCircleId(final String circleId) {
-        ensureValidId(FIELD_CIRCLE_ID, circleId);
         this.circleId = circleId;
     }
 
@@ -104,7 +87,6 @@ public final class ProcessCircleRequest extends Authentication implements Circle
     }
 
     public void setCircleName(final String circleName) {
-        ensureNotEmptyOrTooLong(FIELD_CIRCLE_NAME, circleName, MAX_STRING_LENGTH);
         this.circleName = circleName;
     }
 
@@ -113,7 +95,6 @@ public final class ProcessCircleRequest extends Authentication implements Circle
     }
 
     public void setMemberId(final String memberId) {
-        ensureValidId(FIELD_MEMBER_ID, memberId);
         this.memberId = memberId;
     }
 

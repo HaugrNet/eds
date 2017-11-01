@@ -218,7 +218,7 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
         assertThat(response.getReturnMessage(), is("Ok"));
         assertThat(response.getMembers().size(), is(1));
         assertThat(response.getCircles().isEmpty(), is(true));
-        assertThat(response.getMembers().get(0).getAuthentication().getAccount(), is(Constants.ADMIN_ACCOUNT));
+        assertThat(response.getMembers().get(0).getAccountName(), is(Constants.ADMIN_ACCOUNT));
     }
 
     /**
@@ -244,7 +244,7 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
         assertThat(response.getReturnMessage(), is("Ok"));
         assertThat(response.getMembers().size(), is(1));
         assertThat(response.getCircles().isEmpty(), is(true));
-        assertThat(response.getMembers().get(0).getAuthentication().getAccount(), is(Constants.ADMIN_ACCOUNT));
+        assertThat(response.getMembers().get(0).getAccountName(), is(Constants.ADMIN_ACCOUNT));
     }
 
     /**
@@ -269,7 +269,7 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
         assertThat(response.getReturnMessage(), is("Ok"));
         assertThat(response.getMembers().size(), is(1));
         assertThat(response.getCircles().size(), is(2));
-        assertThat(response.getMembers().get(0).getAuthentication().getAccount(), is(member.getName()));
+        assertThat(response.getMembers().get(0).getAccountName(), is(member.getName()));
     }
 
     /**
@@ -294,7 +294,7 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
         assertThat(response.getReturnMessage(), is("Ok"));
         assertThat(response.getMembers().size(), is(1));
         assertThat(response.getCircles().size(), is(2));
-        assertThat(response.getMembers().get(0).getAuthentication().getAccount(), is(member.getName()));
+        assertThat(response.getMembers().get(0).getAccountName(), is(member.getName()));
     }
 
     /**
@@ -321,7 +321,7 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
         assertThat(response.getReturnMessage(), is("Ok"));
         assertThat(response.getMembers().size(), is(1));
         assertThat(response.getCircles().isEmpty(), is(true));
-        assertThat(response.getMembers().get(0).getAuthentication().getAccount(), is(Constants.ADMIN_ACCOUNT));
+        assertThat(response.getMembers().get(0).getAccountName(), is(Constants.ADMIN_ACCOUNT));
     }
 
     /**
@@ -358,7 +358,7 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
         assertThat(response, is(not(nullValue())));
         assertThat(response.getMembers().size(), is(1));
         assertThat(response.getCircles().size(), is(2));
-        assertThat(response.getMembers().get(0).getAuthentication().getAccount(), is(member.getName()));
+        assertThat(response.getMembers().get(0).getAccountName(), is(member.getName()));
     }
 
     @Test
@@ -376,7 +376,7 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
         assertThat(response, is(not(nullValue())));
         assertThat(response.getMembers().size(), is(1));
         assertThat(response.getCircles().size(), is(2));
-        assertThat(response.getMembers().get(0).getAuthentication().getAccount(), is(member.getName()));
+        assertThat(response.getMembers().get(0).getAccountName(), is(member.getName()));
     }
 
     @Test

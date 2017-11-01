@@ -8,7 +8,6 @@
 package io.javadog.cws.api.requests;
 
 import io.javadog.cws.api.common.Constants;
-import io.javadog.cws.api.dtos.Authentication;
 
 import javax.validation.constraints.Pattern;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -30,6 +29,7 @@ public final class FetchCircleRequest extends Authentication implements CircleId
 
     private static final String FIELD_CIRCLE_ID = "circleId";
 
+    @Pattern(regexp = Constants.ID_PATTERN_REGEX)
     @XmlElement(name = FIELD_CIRCLE_ID, nillable = true, required = true)
     private String circleId = null;
 
@@ -41,9 +41,7 @@ public final class FetchCircleRequest extends Authentication implements CircleId
      * {@inheritDoc}
      */
     @Override
-    @Pattern(regexp = Constants.ID_PATTERN_REGEX)
     public void setCircleId(final String circleId) {
-        ensureValidId(FIELD_CIRCLE_ID, circleId);
         this.circleId = circleId;
     }
 
@@ -66,9 +64,7 @@ public final class FetchCircleRequest extends Authentication implements CircleId
     public Map<String, String> validate() {
         final Map<String, String> errors = super.validate();
 
-        if (circleId != null) {
-            checkPattern(errors, FIELD_CIRCLE_ID, circleId, Constants.ID_PATTERN_REGEX, "The Circle Id is invalid.");
-        }
+        checkValidId(errors, FIELD_CIRCLE_ID, circleId, "The Circle Id is invalid.");
 
         return errors;
     }

@@ -52,6 +52,10 @@ public final class SignResponse extends CwsResponse {
         super(returnCode, returnMessage);
     }
 
+    // =========================================================================
+    // Standard Setters & Getters
+    // =========================================================================
+
     public void setSignature(final String signature) {
         this.signature = signature;
     }

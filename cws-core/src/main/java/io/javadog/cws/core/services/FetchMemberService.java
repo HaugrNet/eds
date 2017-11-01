@@ -9,7 +9,6 @@ package io.javadog.cws.core.services;
 
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
-import io.javadog.cws.api.dtos.Authentication;
 import io.javadog.cws.api.dtos.Circle;
 import io.javadog.cws.api.dtos.Member;
 import io.javadog.cws.api.requests.FetchMemberRequest;
@@ -136,12 +135,10 @@ public final class FetchMemberService extends Serviceable<FetchMemberResponse, F
     }
 
     private static Member convert(final MemberEntity entity) {
-        final Authentication authentication = new Authentication();
-        authentication.setAccount(entity.getName());
         final Member member = new Member();
 
-        member.setId(entity.getExternalId());
-        member.setAuthentication(authentication);
+        member.setMemberId(entity.getExternalId());
+        member.setAccountName(entity.getName());
         member.setAdded(entity.getCreated());
 
         return member;
@@ -191,7 +188,7 @@ public final class FetchMemberService extends Serviceable<FetchMemberResponse, F
     private static Circle convert(final CircleEntity entity) {
         final Circle circle = new Circle();
 
-        circle.setId(entity.getExternalId());
+        circle.setCircleId(entity.getExternalId());
         circle.setName(entity.getName());
         circle.setCreated(entity.getCreated());
 

@@ -13,7 +13,6 @@ import static org.junit.Assert.assertThat;
 import io.javadog.cws.api.common.Action;
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.CredentialType;
-import io.javadog.cws.api.dtos.Authentication;
 import org.junit.Test;
 
 import java.util.Map;

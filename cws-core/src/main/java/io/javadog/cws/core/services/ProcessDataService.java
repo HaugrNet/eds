@@ -76,7 +76,7 @@ public final class ProcessDataService extends Serviceable<ProcessDataResponse, P
 
         if (existingName == null) {
             final TrusteeEntity trustee = findTrustee(request.getCircleId());
-            final byte[] bytes = request.getBytes();
+            final byte[] bytes = request.getData();
 
             if (Objects.equals(Constants.FOLDER_TYPENAME, type.getName())) {
                 response = createFolder(trustee, request);
@@ -98,11 +98,11 @@ public final class ProcessDataService extends Serviceable<ProcessDataResponse, P
 
                 dao.persist(dataEntity);
                 response = new ProcessDataResponse();
-                response.setId(metadataEntity.getExternalId());
+                response.setDataId(metadataEntity.getExternalId());
             } else {
                 final MetadataEntity metadataEntity = createMetadataEntity(trustee, type, parent.getId(), request.getName());
                 response = new ProcessDataResponse();
-                response.setId(metadataEntity.getExternalId());
+                response.setDataId(metadataEntity.getExternalId());
             }
         } else {
             response = new ProcessDataResponse(ReturnCode.INTEGRITY_WARNING, "Another record with the same name already exists.");
@@ -112,7 +112,7 @@ public final class ProcessDataService extends Serviceable<ProcessDataResponse, P
     }
 
     private ProcessDataResponse processUpdateData(final ProcessDataRequest request) {
-        final MetadataEntity entity = dao.findMetaDataByMemberAndExternalId(member, request.getId());
+        final MetadataEntity entity = dao.findMetaDataByMemberAndExternalId(member, request.getDataId());
         final ProcessDataResponse response;
 
         if (entity != null) {
@@ -121,11 +121,11 @@ public final class ProcessDataService extends Serviceable<ProcessDataResponse, P
                 entity.setParentId(folder.getParentId());
             }
             checkName(entity, request.getName());
-            checkData(entity, request.getBytes());
+            checkData(entity, request.getData());
             dao.persist(entity);
 
             response = new ProcessDataResponse();
-            response.setId(entity.getExternalId());
+            response.setDataId(entity.getExternalId());
         } else {
             response = new ProcessDataResponse(ReturnCode.IDENTIFICATION_WARNING, "The requested Data Object could not be found.");
         }
@@ -134,7 +134,7 @@ public final class ProcessDataService extends Serviceable<ProcessDataResponse, P
     }
 
     private ProcessDataResponse processDeleteData(final ProcessDataRequest request) {
-        final MetadataEntity entity = dao.findMetaDataByMemberAndExternalId(member, request.getId());
+        final MetadataEntity entity = dao.findMetaDataByMemberAndExternalId(member, request.getDataId());
         final ProcessDataResponse response;
 
         if (entity != null) {
@@ -191,7 +191,7 @@ public final class ProcessDataService extends Serviceable<ProcessDataResponse, P
         final MetadataEntity folder = createMetadata(trustee, request.getName(), parent.getId(), folderType);
 
         final ProcessDataResponse response = new ProcessDataResponse();
-        response.setId(folder.getExternalId());
+        response.setDataId(folder.getExternalId());
 
         return response;
     }

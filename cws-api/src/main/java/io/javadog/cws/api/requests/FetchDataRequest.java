@@ -7,9 +7,12 @@
  */
 package io.javadog.cws.api.requests;
 
-import io.javadog.cws.api.common.Constants;
-import io.javadog.cws.api.dtos.Authentication;
+import static io.javadog.cws.api.common.Constants.MAX_PAGE_SIZE;
 
+import io.javadog.cws.api.common.Constants;
+
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -31,17 +34,20 @@ public final class FetchDataRequest extends Authentication implements CircleIdRe
     private static final String FIELD_DATA_ID = "dataId";
     private static final String FIELD_PAGE_NUMBER = "pageNumber";
     private static final String FIELD_PAGE_SIZE = "pageSize";
-    private static final int MAX_PAGE_SIZE = 100;
 
+    @Pattern(regexp = Constants.ID_PATTERN_REGEX)
     @XmlElement(name = FIELD_CIRCLE_ID, nillable = true, required = true)
     private String circleId = null;
 
+    @Pattern(regexp = Constants.ID_PATTERN_REGEX)
     @XmlElement(name = FIELD_DATA_ID, nillable = true, required = true)
     private String dataId = null;
 
+    @Size(min = 1)
     @XmlElement(name = FIELD_PAGE_NUMBER, nillable = true)
     private int pageNumber = 1;
 
+    @Size(min = 1, max = MAX_PAGE_SIZE)
     @XmlElement(name = FIELD_PAGE_SIZE, nillable = true)
     private int pageSize = MAX_PAGE_SIZE;
 
@@ -54,7 +60,6 @@ public final class FetchDataRequest extends Authentication implements CircleIdRe
      */
     @Override
     public void setCircleId(final String circleId) {
-        ensureValidId(FIELD_CIRCLE_ID, circleId);
         this.circleId = circleId;
     }
 
@@ -67,7 +72,6 @@ public final class FetchDataRequest extends Authentication implements CircleIdRe
     }
 
     public void setDataId(final String dataId) {
-        ensureValidId(FIELD_DATA_ID, dataId);
         this.dataId = dataId;
     }
 
@@ -76,7 +80,6 @@ public final class FetchDataRequest extends Authentication implements CircleIdRe
     }
 
     public void setPageNumber(final int pageNumber) {
-        ensurePositiveNumber(FIELD_PAGE_NUMBER, pageNumber);
         this.pageNumber = pageNumber;
     }
 
@@ -85,7 +88,6 @@ public final class FetchDataRequest extends Authentication implements CircleIdRe
     }
 
     public void setPageSize(final int pageSize) {
-        ensureValidRange(FIELD_PAGE_SIZE, pageSize, 1, MAX_PAGE_SIZE);
         this.pageSize = pageSize;
     }
 
@@ -105,20 +107,12 @@ public final class FetchDataRequest extends Authentication implements CircleIdRe
         final Map<String, String> errors = super.validate();
 
         if ((circleId == null) && (dataId == null)) {
-            errors.put(FIELD_CIRCLE_ID, "Either the CircleId or an Object Data Id must be provided.");
-        } else {
-            if (circleId != null) {
-                checkPattern(errors, FIELD_CIRCLE_ID, circleId, Constants.ID_PATTERN_REGEX, "The Circle Id is invalid.");
-            } else {
-                checkPattern(errors, FIELD_DATA_ID, dataId, Constants.ID_PATTERN_REGEX, "The Data Id is invalid.");
-            }
-            if (pageNumber <= 0) {
-                errors.put(FIELD_PAGE_NUMBER, "Cannot fetch a negative page number");
-            }
-            if ((pageSize <= 0) || (pageSize > MAX_PAGE_SIZE)) {
-                errors.put(FIELD_PAGE_SIZE, "The size of the page must be between 1 and " + MAX_PAGE_SIZE + '.');
-            }
+            errors.put(FIELD_CIRCLE_ID, "Either a Circle or Data Id must be provided.");
         }
+        checkValidId(errors, FIELD_CIRCLE_ID, circleId, "The Circle Id is invalid.");
+        checkValidId(errors, FIELD_DATA_ID, dataId, "The Data Id is invalid.");
+        checkIntegerWithMax(errors, FIELD_PAGE_NUMBER, pageNumber, Integer.MAX_VALUE, "The Page Number must be a positive number, starting with 1.");
+        checkIntegerWithMax(errors, FIELD_PAGE_SIZE, pageSize, MAX_PAGE_SIZE, "The Page Size must be a positive number, starting with 1.");
 
         return errors;
     }

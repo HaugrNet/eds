@@ -7,42 +7,38 @@
  */
 package io.javadog.cws.api.dtos;
 
-import static io.javadog.cws.api.common.Constants.MAX_STRING_LENGTH;
 import static io.javadog.cws.api.common.Utilities.copy;
 
 import io.javadog.cws.api.common.Constants;
-import io.javadog.cws.api.common.Verifiable;
 
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
+import java.io.Serializable;
 import java.util.Date;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Objects;
 
 /**
  * @author Kim Jensen
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "metadata", propOrder = { "id", "circleId", "folderId", "name", "typeName", "added" })
-public final class Metadata extends Verifiable {
+@XmlType(name = "metadata", propOrder = { "dataId", "circleId", "folderId", "name", "dataType", "added" })
+public final class Metadata implements Serializable {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
-    private static final String FIELD_ID = "id";
+    private static final String FIELD_DATA_ID = "dataId";
     private static final String FIELD_CIRCLE_ID = "circleId";
     private static final String FIELD_FOLDER_ID = "folderId";
     private static final String FIELD_NAME = "name";
-    private static final String FIELD_TYPENAME = "typeName";
+    private static final String FIELD_DATATYPE = "dataType";
     private static final String FIELD_ADDED = "added";
 
-    @XmlElement(name = FIELD_ID, nillable = true, required = true)
-    private String id = null;
+    @XmlElement(name = FIELD_DATA_ID, nillable = true, required = true)
+    private String dataId = null;
 
     @XmlElement(name = FIELD_CIRCLE_ID, nillable = true, required = true)
     private String circleId = null;
@@ -53,8 +49,8 @@ public final class Metadata extends Verifiable {
     @XmlElement(name = FIELD_NAME, nillable = true, required = true)
     private String name = null;
 
-    @XmlElement(name = FIELD_TYPENAME, required = true)
-    private String typeName = null;
+    @XmlElement(name = FIELD_DATATYPE, required = true)
+    private DataType dataType = null;
 
     @XmlElement(name = FIELD_ADDED)
     private Date added = null;
@@ -63,19 +59,15 @@ public final class Metadata extends Verifiable {
     // Standard Setters & Getters
     // =========================================================================
 
-    @Pattern(regexp = Constants.ID_PATTERN_REGEX)
-    public void setId(final String id) {
-        ensurePattern(FIELD_ID, id, Constants.ID_PATTERN_REGEX);
-        this.id = id;
+    public void setDataId(final String dataId) {
+        this.dataId = dataId;
     }
 
-    public String getId() {
-        return id;
+    public String getDataId() {
+        return dataId;
     }
 
-    @Pattern(regexp = Constants.ID_PATTERN_REGEX)
     public void setCircleId(final String circleId) {
-        ensurePattern(FIELD_CIRCLE_ID, circleId, Constants.ID_PATTERN_REGEX);
         this.circleId = circleId;
     }
 
@@ -83,9 +75,7 @@ public final class Metadata extends Verifiable {
         return circleId;
     }
 
-    @Pattern(regexp = Constants.ID_PATTERN_REGEX)
     public void setFolderId(final String folderId) {
-        ensurePattern(FIELD_FOLDER_ID, folderId, Constants.ID_PATTERN_REGEX);
         this.folderId = folderId;
     }
 
@@ -93,9 +83,7 @@ public final class Metadata extends Verifiable {
         return folderId;
     }
 
-    @Size(max = MAX_STRING_LENGTH)
     public void setName(final String name) {
-        ensureNotNullEmptyOrTooLong(FIELD_NAME, name, MAX_STRING_LENGTH);
         this.name = name;
     }
 
@@ -103,14 +91,12 @@ public final class Metadata extends Verifiable {
         return name;
     }
 
-    @Size(min = 1, max = MAX_STRING_LENGTH)
-    public void setTypeName(final String typeName) {
-        ensureNotNullEmptyOrTooLong(FIELD_TYPENAME, typeName, MAX_STRING_LENGTH);
-        this.typeName = typeName;
+    public void setDataType(final DataType dataType) {
+        this.dataType = dataType;
     }
 
-    public String getTypeName() {
-        return typeName;
+    public DataType getDataType() {
+        return dataType;
     }
 
     public void setAdded(final Date added) {
@@ -121,25 +107,52 @@ public final class Metadata extends Verifiable {
         return copy(added);
     }
 
+    // =========================================================================
+    // Standard Methods
+    // =========================================================================
+
     /**
      * {@inheritDoc}
      */
     @Override
-    public Map<String, String> validate() {
-        final Map<String, String> errors = new ConcurrentHashMap<>();
-
-        checkPattern(errors, FIELD_ID, id, Constants.ID_PATTERN_REGEX, "The Data Id is invalid.");
-
-        if (id == null) {
-            checkNotNull(errors, FIELD_CIRCLE_ID, circleId, "The Circle Id is required for new Data Objects.");
-            checkPattern(errors, FIELD_CIRCLE_ID, circleId, Constants.ID_PATTERN_REGEX, "The Circle Id is invalid.");
-            checkNotNull(errors, FIELD_TYPENAME, typeName, "The DataType Name is required for new Data Objects.");
-            checkNotTooLong(errors, FIELD_TYPENAME, typeName, MAX_STRING_LENGTH, "The name of the DataType may not exceed " + MAX_STRING_LENGTH + " characters.");
+    public boolean equals(final Object obj) {
+        if (this == obj) {
+            return true;
         }
 
-        checkNotTooLong(errors, FIELD_NAME, name, MAX_STRING_LENGTH, "The name of the Data Object may not exceed " + MAX_STRING_LENGTH + " characters.");
-        checkPattern(errors, FIELD_FOLDER_ID, folderId, Constants.ID_PATTERN_REGEX, "The Folder Id is invalid.");
+        if (!(obj instanceof Metadata)) {
+            return false;
+        }
 
-        return errors;
+        final Metadata that = (Metadata) obj;
+        return Objects.equals(dataId, that.dataId) &&
+                Objects.equals(circleId, that.circleId) &&
+                Objects.equals(folderId, that.folderId) &&
+                Objects.equals(name, that.name) &&
+                Objects.equals(dataType, that.dataType) &&
+                Objects.equals(added, that.added);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        return Objects.hash(dataId, circleId, folderId, name, dataType, added);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        return "Metadata{" +
+                "dataId='" + dataId + '\'' +
+                ", circleId='" + circleId + '\'' +
+                ", folderId='" + folderId + '\'' +
+                ", name='" + name + '\'' +
+                ", dataType=" + dataType +
+                ", added=" + added +
+                '}';
     }
 }

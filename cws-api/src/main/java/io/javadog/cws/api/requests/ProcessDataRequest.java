@@ -7,82 +7,73 @@
  */
 package io.javadog.cws.api.requests;
 
+import static io.javadog.cws.api.common.Constants.MAX_NAME_LENGTH;
 import static io.javadog.cws.api.common.Constants.MAX_STRING_LENGTH;
 import static io.javadog.cws.api.common.Utilities.copy;
 
 import io.javadog.cws.api.common.Action;
 import io.javadog.cws.api.common.Constants;
-import io.javadog.cws.api.dtos.Authentication;
 
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
-import java.util.EnumSet;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * @author Kim Jensen
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "processDataRequest", propOrder = { "action", "id", "circleId", "folderId", "name", "typeName", "bytes" })
+@XmlType(name = "processDataRequest", propOrder = { "action", "dataId", "circleId", "folderId", "name", "typeName", "data" })
 public final class ProcessDataRequest extends Authentication implements CircleIdRequest {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
-    private static final Set<Action> ALLOWED = EnumSet.of(Action.ADD, Action.UPDATE, Action.DELETE);
 
     private static final String FIELD_ACTION = "action";
-    private static final String FIELD_ID = "id";
+    private static final String FIELD_DATA_ID = "dataId";
     private static final String FIELD_CIRCLE_ID = "circleId";
     private static final String FIELD_FOLDER_ID = "folderId";
     private static final String FIELD_NAME = "name";
     private static final String FIELD_TYPENAME = "typeName";
-    private static final String FIELD_BYTES = "bytes";
+    private static final String FIELD_DATA = "data";
 
+    @NotNull
     @XmlElement(name = FIELD_ACTION, required = true)
     private Action action = Action.PROCESS;
 
-    @XmlElement(name = FIELD_ID, nillable = true, required = true)
-    private String id = null;
+    @Pattern(regexp = Constants.ID_PATTERN_REGEX)
+    @XmlElement(name = FIELD_DATA_ID, nillable = true, required = true)
+    private String dataId = null;
 
+    @Pattern(regexp = Constants.ID_PATTERN_REGEX)
     @XmlElement(name = FIELD_CIRCLE_ID, nillable = true)
     private String circleId = null;
 
+    @Pattern(regexp = Constants.ID_PATTERN_REGEX)
     @XmlElement(name = FIELD_FOLDER_ID, nillable = true)
     private String folderId = null;
 
+    @Size(min = 1, max = MAX_STRING_LENGTH)
     @XmlElement(name = FIELD_NAME, nillable = true)
     private String name = null;
 
+    @Size(min = 1, max = MAX_NAME_LENGTH)
     @XmlElement(name = FIELD_TYPENAME)
     private String typeName = null;
 
-    @XmlElement(name = FIELD_BYTES, nillable = true)
-    private byte[] bytes = null;
+    @XmlElement(name = FIELD_DATA, nillable = true)
+    private byte[] data = null;
 
     // =========================================================================
     // Standard Setters & Getters
     // =========================================================================
 
-    /**
-     * <p>Sets the Action for the processing Request. Allowed values from the
-     * Actions enumerated Object includes:</p>
-     * <ul>
-     *   <li>PROCESS</li>
-     *   <li>DELETE</li>
-     * </ul>
-     *
-     * @param action Current Action
-     * @throws IllegalArgumentException if the value is null or not allowed
-     */
-    @NotNull
     public void setAction(final Action action) {
-        ensureNotNull(FIELD_ACTION, action);
-        ensureValidEntry(FIELD_ACTION, action, ALLOWED);
         this.action = action;
     }
 
@@ -90,13 +81,12 @@ public final class ProcessDataRequest extends Authentication implements CircleId
         return action;
     }
 
-    public void setId(final String id) {
-        ensureValidId(FIELD_ID, id);
-        this.id = id;
+    public void setDataId(final String dataId) {
+        this.dataId = dataId;
     }
 
-    public String getId() {
-        return id;
+    public String getDataId() {
+        return dataId;
     }
 
     /**
@@ -139,12 +129,12 @@ public final class ProcessDataRequest extends Authentication implements CircleId
         return typeName;
     }
 
-    public void setBytes(final byte[] bytes) {
-        this.bytes = copy(bytes);
+    public void setData(final byte[] data) {
+        this.data = copy(data);
     }
 
-    public byte[] getBytes() {
-        return copy(bytes);
+    public byte[] getData() {
+        return copy(data);
     }
 
     // =========================================================================
@@ -169,12 +159,12 @@ public final class ProcessDataRequest extends Authentication implements CircleId
                     checkNotNullOrEmpty(errors, FIELD_TYPENAME, typeName, "The Data Type is missing or invalid.");
                     break;
                 case UPDATE:
-                    checkNotNullAndValidId(errors, FIELD_ID, id, "The Id is missing or invalid.");
+                    checkNotNullAndValidId(errors, FIELD_DATA_ID, dataId, "The Id is missing or invalid.");
                     checkValidId(errors, FIELD_FOLDER_ID, folderId, "The Folder Id is invalid.");
                     checkNotTooLong(errors, FIELD_NAME, name, MAX_STRING_LENGTH, "The name of the new Data Object is invalid.");
                     break;
                 case DELETE:
-                    checkNotNullAndValidId(errors, FIELD_ID, id, "The Id is missing or invalid.");
+                    checkNotNullAndValidId(errors, FIELD_DATA_ID, dataId, "The Id is missing or invalid.");
                     break;
                 default:
                     errors.put(FIELD_ACTION, "Invalid Action provided.");

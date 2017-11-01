@@ -15,7 +15,6 @@ import static org.junit.Assert.assertThat;
 import io.javadog.cws.api.common.Action;
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
-import io.javadog.cws.api.dtos.DataType;
 import io.javadog.cws.api.requests.FetchDataRequest;
 import io.javadog.cws.api.requests.FetchDataTypeRequest;
 import io.javadog.cws.api.requests.FetchSignatureRequest;
@@ -43,10 +42,8 @@ public class ShareServiceTest extends BeanSetup {
         final ShareService service = prepareShareService();
         final ProcessDataTypeRequest request = prepareRequest(ProcessDataTypeRequest.class, Constants.ADMIN_ACCOUNT);
         request.setAction(Action.PROCESS);
-        final DataType type = new DataType();
-        type.setName("TestType");
-        type.setType("Test Type Value");
-        request.setDataType(type);
+        request.setName("TestType");
+        request.setType("Test Type Value");
 
         final ProcessDataTypeResponse response = service.processDataType(request);
         assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
@@ -130,7 +127,7 @@ public class ShareServiceTest extends BeanSetup {
         final ShareService service = prepareShareService();
         final ProcessDataRequest request = prepareRequest(ProcessDataRequest.class, MEMBER_1);
         request.setAction(Action.ADD);
-        request.setBytes("alfa beta gamma".getBytes(settings.getCharset()));
+        request.setData("alfa beta gamma".getBytes(settings.getCharset()));
         request.setCircleId(CIRCLE_1_ID);
         request.setName("Data Name");
         request.setTypeName("data");
@@ -138,7 +135,7 @@ public class ShareServiceTest extends BeanSetup {
         final ProcessDataResponse response = service.processData(request);
         assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(response.getReturnMessage(), is("Ok"));
-        assertThat(response.getId(), is(not(nullValue())));
+        assertThat(response.getDataId(), is(not(nullValue())));
     }
 
     @Test
@@ -177,7 +174,7 @@ public class ShareServiceTest extends BeanSetup {
         final FetchDataResponse response = service.fetchData(request);
         assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(response.getReturnMessage(), is("Ok"));
-        assertThat(response.getData().isEmpty(), is(true));
+        assertThat(response.getMetadata().isEmpty(), is(true));
     }
 
     @Test

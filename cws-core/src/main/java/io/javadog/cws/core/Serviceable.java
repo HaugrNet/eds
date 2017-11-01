@@ -10,9 +10,9 @@ package io.javadog.cws.core;
 import static io.javadog.cws.api.common.Constants.ADMIN_ACCOUNT;
 
 import io.javadog.cws.api.common.TrustLevel;
-import io.javadog.cws.api.common.Verifiable;
-import io.javadog.cws.api.dtos.Authentication;
+import io.javadog.cws.api.requests.Authentication;
 import io.javadog.cws.api.requests.CircleIdRequest;
+import io.javadog.cws.api.requests.Verifiable;
 import io.javadog.cws.api.responses.CwsResponse;
 import io.javadog.cws.common.Crypto;
 import io.javadog.cws.common.Settings;

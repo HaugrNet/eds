@@ -8,14 +8,12 @@
 package io.javadog.cws.api.dtos;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
 
-import java.lang.reflect.Field;
 import java.util.Date;
-import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -31,83 +29,37 @@ public class CircleTest {
         final Date date = new Date();
 
         final Circle circle = new Circle();
-        circle.setId(id);
+        circle.setCircleId(id);
         circle.setName(name);
         circle.setCreated(date);
 
-        assertThat(circle.getId(), is(id));
+        assertThat(circle.getCircleId(), is(id));
         assertThat(circle.getName(), is(name));
         assertThat(circle.getCreated(), is(date));
-
-        final Map<String, String> errors = circle.validate();
-        assertThat(errors.size(), is(0));
     }
 
     @Test
-    public void testEmptyObjectValidation() {
+    public void testStandardMethods() {
         final Circle circle = new Circle();
+        final Circle sameCircle = new Circle();
+        final Circle emptyCircle = new Circle();
 
-        final Map<String, String> errors = circle.validate();
-        assertThat(errors.size(), is(1));
-    }
+        circle.setCircleId(UUID.randomUUID().toString());
+        circle.setName("The Circle Name");
+        circle.setCreated(new Date());
+        sameCircle.setCircleId(circle.getCircleId());
+        sameCircle.setName(circle.getName());
+        sameCircle.setCreated(circle.getCreated());
 
-    @Test
-    public void testForcingInvalidData1() throws NoSuchFieldException, IllegalAccessException {
-        final Circle circle = new Circle();
-        final Field name = circle.getClass().getDeclaredField("name");
-        name.setAccessible(true);
-        name.set(circle, "");
-        final Field id = circle.getClass().getDeclaredField("id");
-        id.setAccessible(true);
-        id.set(circle, "123");
+        assertThat(circle.equals(null), is(false));
+        assertThat(circle.equals(circle), is(true));
+        assertThat(circle.equals(sameCircle), is(true));
+        assertThat(circle.equals(emptyCircle), is(false));
 
-        final Map<String, String> errors = circle.validate();
-        assertThat(errors.size(), is(2));
-    }
+        assertThat(circle.hashCode(), is(sameCircle.hashCode()));
+        assertThat(circle.hashCode(), is(not(emptyCircle.hashCode())));
 
-    @Test
-    public void testForcingInvalidData2() throws NoSuchFieldException, IllegalAccessException {
-        final Circle circle = new Circle();
-        final Field name = circle.getClass().getDeclaredField("name");
-        name.setAccessible(true);
-        name.set(circle, "12345678901234567890123456789012345678901234567890123456789012345678901234567890");
-        final Field id = circle.getClass().getDeclaredField("id");
-        id.setAccessible(true);
-        id.set(circle, "");
-
-        final Map<String, String> errors = circle.validate();
-        assertThat(errors.size(), is(2));
-    }
-
-    @Test
-    public void testNullId() {
-        final Circle circle = new Circle();
-        circle.setId(null);
-
-        assertThat(circle.getId(), is(nullValue()));
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testShortId() {
-        final Circle circle = new Circle();
-        circle.setId("short");
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testLongId() {
-        final Circle circle = new Circle();
-        circle.setId("1234567890123456789012345789012345678901234567890");
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testNullName() {
-        final Circle circle = new Circle();
-        circle.setName(null);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testSetTooLongName() {
-        final Circle circle = new Circle();
-        circle.setName("1234567890123456789012345678901234567891234567890123456789012345678901234567890");
+        assertThat(circle.toString(), is(sameCircle.toString()));
+        assertThat(circle.toString(), is(not(emptyCircle.toString())));
     }
 }

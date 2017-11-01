@@ -7,7 +7,6 @@ import static org.junit.Assert.assertThat;
 import io.javadog.cws.api.common.Action;
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.CredentialType;
-import io.javadog.cws.api.dtos.DataType;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -25,47 +24,22 @@ public final class ProcessDataTypeRequestTest {
 
     @Test
     public void testClass() {
-        final DataType dataType = new DataType();
-        dataType.setName("Data Type Name");
-        dataType.setType("Data Type Type");
+        final String name = "DataType Name";
+        final String type = "DataType Type";
 
         final ProcessDataTypeRequest request = new ProcessDataTypeRequest();
         request.setAccount(Constants.ADMIN_ACCOUNT);
         request.setCredentialType(CredentialType.PASSPHRASE);
         request.setCredential(Constants.ADMIN_ACCOUNT);
-        request.setDataType(dataType);
+        request.setAction(Action.PROCESS);
+        request.setName(name);
+        request.setType(type);
 
-        assertThat(request.getDataType(), is(dataType));
+        assertThat(request.getName(), is(name));
+        assertThat(request.getType(), is(type));
 
         final Map<String, String> errors = request.validate();
         assertThat(errors.isEmpty(), is(true));
-    }
-
-    @Test
-    public void testSetNullAction() {
-        exception.expect(IllegalArgumentException.class);
-        exception.expectMessage("The value for 'action' may not be null.");
-
-        final ProcessDataTypeRequest request = new ProcessDataTypeRequest();
-        request.setAction(null);
-    }
-
-    @Test
-    public void testSetInvalidAction() {
-        exception.expect(IllegalArgumentException.class);
-        exception.expectMessage("The value for 'action' is not allowed.");
-
-        final ProcessDataTypeRequest request = new ProcessDataTypeRequest();
-        request.setAction(Action.REKEY);
-    }
-
-    @Test
-    public void testSetNullDataType() {
-        exception.expect(IllegalArgumentException.class);
-        exception.expectMessage("The value for 'dataType' may not be null.");
-
-        final ProcessDataTypeRequest request = new ProcessDataTypeRequest();
-        request.setDataType(null);
     }
 
     @Test
@@ -81,7 +55,7 @@ public final class ProcessDataTypeRequestTest {
     }
 
     @Test
-    public void testValidateInvalidAction() throws NoSuchFieldException, IllegalAccessException {
+    public void testValidateInvalidAction() {
         final ProcessDataTypeRequest request = new ProcessDataTypeRequest();
         reflectiveCorrection(request, "action", Action.REKEY);
         final Map<String, String> errors = request.validate();

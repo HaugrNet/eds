@@ -26,17 +26,17 @@ import java.util.List;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "fetchDataResult", propOrder = { "data", "bytes" })
+@XmlType(name = "fetchDataResult", propOrder = { "metadata", "data" })
 public final class FetchDataResponse extends CwsResponse {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
-    @XmlElement(name = "data")
-    private final List<Metadata> data = new ArrayList<>(0);
+    @XmlElement(name = "metadata", required = true)
+    private final List<Metadata> metadata = new ArrayList<>(0);
 
-    @XmlElement(name = "bytes")
-    private byte[] bytes = null;
+    @XmlElement(name = "data", required = true)
+    private byte[] data = null;
 
     // =========================================================================
     // Object Constructors
@@ -65,19 +65,19 @@ public final class FetchDataResponse extends CwsResponse {
     // Setters & Getters
     // =========================================================================
 
-    public void setData(final List<Metadata> data) {
-        this.data.addAll(data);
+    public void setMetadata(final List<Metadata> metadata) {
+        this.metadata.addAll(metadata);
     }
 
-    public List<Metadata> getData() {
-        return Collections.unmodifiableList(data);
+    public List<Metadata> getMetadata() {
+        return Collections.unmodifiableList(metadata);
     }
 
-    public void setBytes(final byte[] bytes) {
-        this.bytes = copy(bytes);
+    public void setData(final byte[] data) {
+        this.data = copy(data);
     }
 
-    public byte[] getBytes() {
-        return copy(bytes);
+    public byte[] getData() {
+        return copy(data);
     }
 }

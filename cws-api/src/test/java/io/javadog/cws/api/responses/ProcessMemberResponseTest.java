@@ -26,9 +26,9 @@ public final class ProcessMemberResponseTest {
         final String id = UUID.randomUUID().toString();
 
         final ProcessMemberResponse response = new ProcessMemberResponse();
-        response.setId(id);
+        response.setMemberId(id);
 
-        assertThat(response.getId(), is(id));
+        assertThat(response.getMemberId(), is(id));
         assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(response.getReturnMessage(), is("Ok"));
     }

@@ -64,8 +64,8 @@ public final class ProcessDataTypeService extends Serviceable<ProcessDataTypeRes
      * @return Response with the newly processed DataType
      */
     private ProcessDataTypeResponse doProcess(final ProcessDataTypeRequest request) {
-        final String name = request.getDataType().getName().trim();
-        final String type = request.getDataType().getType().trim();
+        final String name = request.getName().trim();
+        final String type = request.getType().trim();
         final DataTypeEntity found = findEntity(name);
         final DataTypeEntity entity;
 
@@ -96,7 +96,7 @@ public final class ProcessDataTypeService extends Serviceable<ProcessDataTypeRes
 
     private ProcessDataTypeResponse doDelete(final ProcessDataTypeRequest request) {
         final ProcessDataTypeResponse response;
-        final String name = request.getDataType().getName().trim();
+        final String name = request.getName().trim();
         final DataTypeEntity entity = findEntity(name);
 
         if (entity != null) {

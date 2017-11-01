@@ -136,9 +136,9 @@ public final class CircleServiceTest extends DatabaseSetup {
         assertThat(response.getCircles().size(), is(1));
         assertThat(response.getCircles().get(0).getName(), is(CIRCLE_1));
         assertThat(response.getTrustees().size(), is(3));
-        assertThat(response.getTrustees().get(0).getMember().getAuthentication().getAccount(), is(MEMBER_1));
-        assertThat(response.getTrustees().get(1).getMember().getAuthentication().getAccount(), is(MEMBER_2));
-        assertThat(response.getTrustees().get(2).getMember().getAuthentication().getAccount(), is(MEMBER_3));
+        assertThat(response.getTrustees().get(0).getMember().getAccountName(), is(MEMBER_1));
+        assertThat(response.getTrustees().get(1).getMember().getAccountName(), is(MEMBER_2));
+        assertThat(response.getTrustees().get(2).getMember().getAccountName(), is(MEMBER_3));
     }
 
     @Test
@@ -158,9 +158,9 @@ public final class CircleServiceTest extends DatabaseSetup {
         assertThat(response.getCircles().size(), is(1));
         assertThat(response.getCircles().get(0).getName(), is(CIRCLE_1));
         assertThat(response.getTrustees().size(), is(3));
-        assertThat(response.getTrustees().get(0).getMember().getAuthentication().getAccount(), is(MEMBER_1));
-        assertThat(response.getTrustees().get(1).getMember().getAuthentication().getAccount(), is(MEMBER_2));
-        assertThat(response.getTrustees().get(2).getMember().getAuthentication().getAccount(), is(MEMBER_3));
+        assertThat(response.getTrustees().get(0).getMember().getAccountName(), is(MEMBER_1));
+        assertThat(response.getTrustees().get(1).getMember().getAccountName(), is(MEMBER_2));
+        assertThat(response.getTrustees().get(2).getMember().getAccountName(), is(MEMBER_3));
     }
 
     @Test
@@ -180,9 +180,9 @@ public final class CircleServiceTest extends DatabaseSetup {
         assertThat(response.getCircles().size(), is(1));
         assertThat(response.getCircles().get(0).getName(), is(CIRCLE_1));
         assertThat(response.getTrustees().size(), is(3));
-        assertThat(response.getTrustees().get(0).getMember().getAuthentication().getAccount(), is(MEMBER_1));
-        assertThat(response.getTrustees().get(1).getMember().getAuthentication().getAccount(), is(MEMBER_2));
-        assertThat(response.getTrustees().get(2).getMember().getAuthentication().getAccount(), is(MEMBER_3));
+        assertThat(response.getTrustees().get(0).getMember().getAccountName(), is(MEMBER_1));
+        assertThat(response.getTrustees().get(1).getMember().getAccountName(), is(MEMBER_2));
+        assertThat(response.getTrustees().get(2).getMember().getAccountName(), is(MEMBER_3));
     }
 
     @Test
@@ -202,9 +202,9 @@ public final class CircleServiceTest extends DatabaseSetup {
         assertThat(response.getCircles().size(), is(1));
         assertThat(response.getCircles().get(0).getName(), is(CIRCLE_1));
         assertThat(response.getTrustees().size(), is(3));
-        assertThat(response.getTrustees().get(0).getMember().getAuthentication().getAccount(), is(MEMBER_1));
-        assertThat(response.getTrustees().get(1).getMember().getAuthentication().getAccount(), is(MEMBER_2));
-        assertThat(response.getTrustees().get(2).getMember().getAuthentication().getAccount(), is(MEMBER_3));
+        assertThat(response.getTrustees().get(0).getMember().getAccountName(), is(MEMBER_1));
+        assertThat(response.getTrustees().get(1).getMember().getAccountName(), is(MEMBER_2));
+        assertThat(response.getTrustees().get(2).getMember().getAccountName(), is(MEMBER_3));
     }
 
     @Test
@@ -580,8 +580,7 @@ public final class CircleServiceTest extends DatabaseSetup {
         fetchRequest.setCircleId(CIRCLE_1_ID);
         final FetchCircleResponse fetchResponse = fetchService.perform(fetchRequest);
         assertThat(fetchResponse.getReturnCode(), is(ReturnCode.SUCCESS));
-        // TODO Alter the Fetching, to make sure that the Sorting is properly defined or can be controlled externally
-        assertThat(fetchResponse.getTrustees().get(2).getMember().getId(), is(MEMBER_2_ID));
+        assertThat(fetchResponse.getTrustees().get(2).getMember().getMemberId(), is(MEMBER_2_ID));
         assertThat(fetchResponse.getTrustees().get(2).getTrustLevel(), is(TrustLevel.ADMIN));
     }
 

@@ -7,20 +7,20 @@
  */
 package io.javadog.cws.api.requests;
 
+import static io.javadog.cws.api.common.Constants.MAX_NAME_LENGTH;
 import static io.javadog.cws.api.common.Constants.MAX_STRING_LENGTH;
 
 import io.javadog.cws.api.common.Action;
 import io.javadog.cws.api.common.Constants;
-import io.javadog.cws.api.dtos.Authentication;
 
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
-import java.util.EnumSet;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * @author Kim Jensen
@@ -32,19 +32,21 @@ public final class ProcessMemberRequest extends Authentication {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
-    private static final Set<Action> ALLOWED = EnumSet.of(Action.CREATE, Action.INVITE, Action.PROCESS, Action.DELETE);
 
     private static final String FIELD_ACTION = "action";
     private static final String FIELD_MEMBER_ID = "memberId";
     private static final String FIELD_ACCOUNT_NAME = "accountName";
     private static final String FIELD_NEW_CREDENTIAL = "newCredential";
 
+    @NotNull
     @XmlElement(name = FIELD_ACTION, required = true)
     private Action action = null;
 
+    @Pattern(regexp = Constants.ID_PATTERN_REGEX)
     @XmlElement(name = FIELD_MEMBER_ID)
     private String memberId = null;
 
+    @Size(min = 1, max = MAX_NAME_LENGTH)
     @XmlElement(name = FIELD_ACCOUNT_NAME)
     private String accountName = null;
 
@@ -55,22 +57,7 @@ public final class ProcessMemberRequest extends Authentication {
     // Standard Setters & Getters
     // =========================================================================
 
-    /**
-     * <p>Sets the Action for the processing Request. Allowed values from the
-     * Actions enumerated Object includes:</p>
-     * <ul>
-     *   <li>PROCESS</li>
-     *   <li>INVITE</li>
-     *   <li>DELETE</li>
-     * </ul>
-     *
-     * @param action Current Action
-     * @throws IllegalArgumentException if the value is null or not allowed
-     */
-    @NotNull
     public void setAction(final Action action) {
-        ensureNotNull(FIELD_ACTION, action);
-        ensureValidEntry(FIELD_ACTION, action, ALLOWED);
         this.action = action;
     }
 
@@ -79,7 +66,6 @@ public final class ProcessMemberRequest extends Authentication {
     }
 
     public void setMemberId(final String memberId) {
-        ensureValidId(FIELD_MEMBER_ID, memberId);
         this.memberId = memberId;
     }
 
@@ -88,7 +74,6 @@ public final class ProcessMemberRequest extends Authentication {
     }
 
     public void setAccountName(final String accountName) {
-        ensureNotEmptyOrTooLong(FIELD_ACCOUNT_NAME, accountName, MAX_STRING_LENGTH);
         this.accountName = accountName;
     }
 

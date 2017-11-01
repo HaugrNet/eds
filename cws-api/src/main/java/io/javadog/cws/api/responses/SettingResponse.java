@@ -54,6 +54,10 @@ public final class SettingResponse extends CwsResponse {
         super(returnCode, returnMessage);
     }
 
+    // =========================================================================
+    // Standard Setters & Getters
+    // =========================================================================
+
     public void setSettings(final Map<String, String> settings) {
         this.settings.putAll(settings);
     }

@@ -10,17 +10,14 @@ package io.javadog.cws.api.dtos;
 import static io.javadog.cws.api.common.Utilities.copy;
 
 import io.javadog.cws.api.common.Constants;
-import io.javadog.cws.api.common.Verifiable;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
+import java.io.Serializable;
 import java.util.Date;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Objects;
 
 /**
  * <p>The Member Object, is used as Accounts in CWS. The Object consists of an
@@ -33,20 +30,20 @@ import java.util.concurrent.ConcurrentHashMap;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "member", propOrder = { "id", "authentication",  "added" })
-public final class Member extends Verifiable {
+@XmlType(name = "member", propOrder = { "memberId", "accountName",  "added" })
+public final class Member implements Serializable {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
-    private static final String FIELD_ID = "id";
-    private static final String FIELD_AUTHENTICATION = "authentication";
+    private static final String FIELD_MEMBER_ID = "memberId";
+    private static final String FIELD_AUTHENTICATION = "accountName";
     private static final String FIELD_ADDED = "added";
 
-    @XmlElement(name = FIELD_ID)
-    private String id = null;
+    @XmlElement(name = FIELD_MEMBER_ID)
+    private String memberId = null;
 
     @XmlElement(name = FIELD_AUTHENTICATION, required = true)
-    private Authentication authentication = null;
+    private String accountName = null;
 
     @XmlElement(name = FIELD_ADDED)
     private Date added = null;
@@ -55,24 +52,20 @@ public final class Member extends Verifiable {
     // Standard Setters & Getters
     // =========================================================================
 
-    @Pattern(regexp = Constants.ID_PATTERN_REGEX)
-    public void setId(final String id) {
-        ensurePattern(FIELD_ID, id, Constants.ID_PATTERN_REGEX);
-        this.id = id;
+    public void setMemberId(final String memberId) {
+        this.memberId = memberId;
     }
 
-    public String getId() {
-        return id;
+    public String getMemberId() {
+        return memberId;
     }
 
-    @NotNull
-    public void setAuthentication(final Authentication authentication) {
-        ensureNotNull(FIELD_AUTHENTICATION, authentication);
-        this.authentication = authentication;
+    public void setAccountName(final String accountName) {
+        this.accountName = accountName;
     }
 
-    public Authentication getAuthentication() {
-        return authentication;
+    public String getAccountName() {
+        return accountName;
     }
 
     public void setAdded(final Date added) {
@@ -91,12 +84,38 @@ public final class Member extends Verifiable {
      * {@inheritDoc}
      */
     @Override
-    public Map<String, String> validate() {
-        final Map<String, String> errors = new ConcurrentHashMap<>();
+    public boolean equals(final Object obj) {
+        if (this == obj) {
+            return true;
+        }
 
-        checkPattern(errors, FIELD_ID, id, Constants.ID_PATTERN_REGEX, "The Member Id is invalid.");
-        checkNotNull(errors, FIELD_AUTHENTICATION, authentication, "The Authentication is missing, null or invalid.");
+        if (!(obj instanceof Member)) {
+            return false;
+        }
 
-        return errors;
+        final Member that = (Member) obj;
+        return Objects.equals(memberId, that.memberId) &&
+                Objects.equals(accountName, that.accountName) &&
+                Objects.equals(added, that.added);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        return Objects.hash(memberId, accountName, added);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        return "Member{" +
+                "memberId='" + memberId + '\'' +
+                ", accountName='" + accountName + '\'' +
+                ", added=" + added +
+                '}';
     }
 }

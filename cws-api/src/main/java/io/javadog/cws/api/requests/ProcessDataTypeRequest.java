@@ -7,60 +7,53 @@
  */
 package io.javadog.cws.api.requests;
 
+import static io.javadog.cws.api.common.Constants.MAX_NAME_LENGTH;
+import static io.javadog.cws.api.common.Constants.MAX_STRING_LENGTH;
+
 import io.javadog.cws.api.common.Action;
 import io.javadog.cws.api.common.Constants;
-import io.javadog.cws.api.dtos.Authentication;
-import io.javadog.cws.api.dtos.DataType;
 
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
-import java.util.EnumSet;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * @author Kim Jensen
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "processDataTypeRequest", propOrder = { "action", "dataType" })
+@XmlType(name = "processDataTypeRequest", propOrder = { "action", "name", "type" })
 public final class ProcessDataTypeRequest extends Authentication {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
-    private static final Set<Action> ALLOWED = EnumSet.of(Action.PROCESS, Action.DELETE);
 
     private static final String FIELD_ACTION = "action";
-    private static final String FIELD_TYPE = "dataType";
+    private static final String FIELD_NAME = "name";
+    private static final String FIELD_TYPE = "type";
 
     @XmlElement(name = FIELD_ACTION, required = true)
     private Action action = Action.PROCESS;
 
+    @NotNull
+    @Size(min = 1, max = MAX_NAME_LENGTH)
+    @XmlElement(name = FIELD_NAME, required = true)
+    private String name = null;
+
+    @NotNull
+    @Size(min = 1, max = MAX_STRING_LENGTH)
     @XmlElement(name = FIELD_TYPE, required = true)
-    private DataType dataType = null;
+    private String type = null;
 
     // =========================================================================
     // Standard Setters & Getters
     // =========================================================================
 
-    /**
-     * <p>Sets the Action for the processing Request. Allowed values from the
-     * Actions enumerated Object includes:</p>
-     * <ul>
-     *   <li>PROCESS</li>
-     *   <li>DELETE</li>
-     * </ul>
-     *
-     * @param action Current Action
-     * @throws IllegalArgumentException if the value is null or not allowed
-     */
-    @NotNull
     public void setAction(final Action action) {
-        ensureNotNull(FIELD_ACTION, action);
-        ensureValidEntry(FIELD_ACTION, action, ALLOWED);
         this.action = action;
     }
 
@@ -68,14 +61,20 @@ public final class ProcessDataTypeRequest extends Authentication {
         return action;
     }
 
-    @NotNull
-    public void setDataType(final DataType dataType) {
-        ensureNotNull(FIELD_TYPE, dataType);
-        this.dataType = dataType;
+    public void setName(final String name) {
+        this.name = name;
     }
 
-    public DataType getDataType() {
-        return dataType;
+    public String getName() {
+        return name;
+    }
+
+    public void setType(final String type) {
+        this.type = type;
+    }
+
+    public String getType() {
+        return type;
     }
 
     // =========================================================================
@@ -92,13 +91,17 @@ public final class ProcessDataTypeRequest extends Authentication {
         if (action == null) {
             errors.put(FIELD_ACTION, "No action has been provided.");
         } else {
-            checkContains(errors, FIELD_ACTION, action, ALLOWED, "Invalid Action has been provided.");
-        }
-
-        if (dataType == null) {
-            errors.put(FIELD_TYPE, "Value is missing, null or invalid.");
-        } else {
-            errors.putAll(dataType.validate());
+            switch (action) {
+                case PROCESS:
+                    checkNotNullEmptyOrTooLong(errors, FIELD_NAME, name, MAX_NAME_LENGTH, "The name of the DataType is missing or invalid.");
+                    checkNotNullEmptyOrTooLong(errors, FIELD_TYPE, name, MAX_STRING_LENGTH, "The type of the DataType is missing or invalid.");
+                    break;
+                case DELETE:
+                    checkNotNullEmptyOrTooLong(errors, FIELD_NAME, name, MAX_NAME_LENGTH, "The name of the DataType is missing or invalid.");
+                    break;
+                default:
+                    errors.put(FIELD_ACTION, "Invalid Action provided.");
+            }
         }
 
         return errors;

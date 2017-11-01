@@ -7,19 +7,14 @@
  */
 package io.javadog.cws.api.dtos;
 
-import static io.javadog.cws.api.common.Constants.MAX_STRING_LENGTH;
-
 import io.javadog.cws.api.common.Constants;
-import io.javadog.cws.api.common.Verifiable;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.io.Serializable;
+import java.util.Objects;
 
 /**
  * @author Kim Jensen
@@ -27,10 +22,11 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "dataType", propOrder = { "name", "type" })
-public final class DataType extends Verifiable {
+public final class DataType implements Serializable {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
+
     private static final String FIELD_NAME = "name";
     private static final String FIELD_TYPE = "type";
 
@@ -44,11 +40,7 @@ public final class DataType extends Verifiable {
     // Standard Setters & Getters
     // =========================================================================
 
-    @NotNull
-    @Size(min = 1, max = MAX_STRING_LENGTH)
     public void setName(final String name) {
-        ensureNotNull(FIELD_NAME, name);
-        ensureNotEmptyOrTooLong(FIELD_NAME, name, MAX_STRING_LENGTH);
         this.name = name;
     }
 
@@ -56,11 +48,7 @@ public final class DataType extends Verifiable {
         return name;
     }
 
-    @NotNull
-    @Size(min = 1, max = MAX_STRING_LENGTH)
     public void setType(final String type) {
-        ensureNotNull(FIELD_TYPE, type);
-        ensureNotEmptyOrTooLong(FIELD_TYPE, type, MAX_STRING_LENGTH);
         this.type = type;
     }
 
@@ -76,16 +64,30 @@ public final class DataType extends Verifiable {
      * {@inheritDoc}
      */
     @Override
-    public Map<String, String> validate() {
-        final Map<String, String> errors = new ConcurrentHashMap<>();
+    public boolean equals(final Object obj) {
+        if (this == obj) {
+            return true;
+        }
 
-        checkNotNull(errors, FIELD_NAME, name, "The Name is not defined.");
-        checkNotEmpty(errors, FIELD_NAME, name, "The Name may not be empty.");
-        checkNotTooLong(errors, FIELD_NAME, name, MAX_STRING_LENGTH, "The Name is longer than the allowed " + MAX_STRING_LENGTH + " characters.");
-        checkNotNull(errors, FIELD_TYPE, type, "The Type is not defined.");
-        checkNotEmpty(errors, FIELD_TYPE, type, "The Type may not be empty.");
-        checkNotTooLong(errors, FIELD_TYPE, type, MAX_STRING_LENGTH, "The Type is longer than the allowed " + MAX_STRING_LENGTH + " characters.");
+        if (!(obj instanceof DataType)) {
+            return false;
+        }
 
-        return errors;
+        final DataType that = (DataType) obj;
+        return Objects.equals(name, that.name) &&
+                Objects.equals(type, that.type);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, type);
+    }
+
+    @Override
+    public String toString() {
+        return "DataType{" +
+                "name='" + name + '\'' +
+                ", type='" + type + '\'' +
+                '}';
     }
 }

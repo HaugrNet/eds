@@ -26,7 +26,7 @@ public final class AuthenticationTest {
     public void testClass() {
         final String name = "Authentication Name";
         final String credentials = "Member Passphrase";
-        final CredentialType type = CredentialType.PASSPHRASE;
+        final CredentialType type = CredentialType.SIGNATURE;
 
         final Authentication authentication = new Authentication();
         assertThat(authentication.getAccount(), is(not(name)));
@@ -47,37 +47,8 @@ public final class AuthenticationTest {
     @Test
     public void testValidationOfEmptyObject() {
         final Authentication authentication = new Authentication();
-        final Map<String, String> errors = authentication.validate();
-        assertThat(errors.size(), is(3));
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testNullName() {
-        final Authentication authentication = new Authentication();
-        authentication.setAccount(null);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testEmptyName() {
-        final Authentication authentication = new Authentication();
-        authentication.setAccount("");
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testLongName() {
-        final Authentication authentication = new Authentication();
-        authentication.setAccount("1234567890123456789012345678901234567891234567890123456789012345678901234567890");
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testNullType() {
-        final Authentication authentication = new Authentication();
         authentication.setCredentialType(null);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testNullCredentials() {
-        final Authentication authentication = new Authentication();
-        authentication.setCredential(null);
+        final Map<String, String> errors = authentication.validate();
+        assertThat(errors.size(), is(2));
     }
 }

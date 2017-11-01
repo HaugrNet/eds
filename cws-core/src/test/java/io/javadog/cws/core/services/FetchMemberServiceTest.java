@@ -61,8 +61,7 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
     public void testEmptyRequest() {
         prepareCause(VerificationException.class, ReturnCode.VERIFICATION_WARNING,
                 "Request Object contained errors:" +
-                        "\nKey: credentialType, Error: CredentialType is missing, null or invalid." +
-                        "\nKey: credential, Error: Credential is missing, null or invalid." +
+                        "\nKey: credential, Error: The Credential is missing." +
                         "\nKey: account, Error: Account is missing, null or invalid.");
 
         final FetchMemberService service = new FetchMemberService(settings, entityManager);

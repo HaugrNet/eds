@@ -38,8 +38,7 @@ public final class DataServiceTest extends DatabaseSetup {
     public void testEmptyProcessRequest() {
         prepareCause(VerificationException.class, ReturnCode.VERIFICATION_WARNING,
                 "Request Object contained errors:" +
-                        "\nKey: credentialType, Error: CredentialType is missing, null or invalid." +
-                        "\nKey: credential, Error: Credential is missing, null or invalid." +
+                        "\nKey: credential, Error: The Credential is missing." +
                         "\nKey: action, Error: Invalid Action provided." +
                         "\nKey: account, Error: Account is missing, null or invalid.");
 
@@ -54,9 +53,8 @@ public final class DataServiceTest extends DatabaseSetup {
     public void testEmptyFetchRequest() {
         prepareCause(VerificationException.class, ReturnCode.VERIFICATION_WARNING,
                 "Request Object contained errors:" +
-                        "\nKey: credentialType, Error: CredentialType is missing, null or invalid." +
-                        "\nKey: credential, Error: Credential is missing, null or invalid." +
-                        "\nKey: circleId, Error: Either the CircleId or an Object Data Id must be provided." +
+                        "\nKey: credential, Error: The Credential is missing." +
+                        "\nKey: circleId, Error: Either a Circle or Data Id must be provided." +
                         "\nKey: account, Error: Account is missing, null or invalid.");
 
         final FetchDataService service = new FetchDataService(settings, entityManager);

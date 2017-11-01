@@ -59,15 +59,6 @@ public final class FetchCircleRequestTest {
     }
 
     @Test
-    public void testInvalidCircleId() {
-        excepctedException.expect(IllegalArgumentException.class);
-        excepctedException.expectMessage("The value for 'circleId' is not matching the required pattern '[\\da-z]{8}-[\\da-z]{4}-[\\da-z]{4}-[\\da-z]{4}-[\\da-z]{12}'.");
-
-        final FetchCircleRequest request = new FetchCircleRequest();
-        request.setCircleId("invalidCircleId");
-    }
-
-    @Test
     public void testClassWithForcedCircleId() throws NoSuchFieldException, IllegalAccessException {
         final String circleId = Constants.ADMIN_ACCOUNT;
 
@@ -95,9 +86,8 @@ public final class FetchCircleRequestTest {
 
         assertThat(request.getCircleId(), is(nullValue()));
         assertThat(errors, is(not(nullValue())));
-        assertThat(errors.size(), is(3));
-        assertThat(errors.get("credentialType"), is("CredentialType is missing, null or invalid."));
-        assertThat(errors.get("credential"), is("Credential is missing, null or invalid."));
+        assertThat(errors.size(), is(2));
+        assertThat(errors.get("credential"), is("The Credential is missing."));
         assertThat(errors.get("account"), is("Account is missing, null or invalid."));
     }
 }

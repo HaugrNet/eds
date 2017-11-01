@@ -24,6 +24,6 @@ public final class ProcessCircleRequestTest {
     public void testEmptyObject() {
         final ProcessCircleRequest request = new ProcessCircleRequest();
         final Map<String, String> errors = request.validate();
-        assertThat(errors.size(), is(4));
+        assertThat(errors.size(), is(3));
     }
 }

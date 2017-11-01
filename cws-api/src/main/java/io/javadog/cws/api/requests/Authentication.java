@@ -19,7 +19,6 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -100,44 +99,5 @@ public class Authentication extends Verifiable {
         }
 
         return errors;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-
-        if (!(obj instanceof Authentication)) {
-            return false;
-        }
-
-        final Authentication that = (Authentication) obj;
-        return Objects.equals(account, that.account) &&
-                Objects.equals(credential, that.credential) &&
-                (credentialType == that.credentialType);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int hashCode() {
-        return Objects.hash(account, credential, credentialType);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String toString() {
-        return "Authentication{" +
-                "account='" + account + '\'' +
-                ", credential=xxxxxxxx" +
-                ", credentialType=" + credentialType +
-                '}';
     }
 }

@@ -26,14 +26,10 @@ import javax.xml.bind.annotation.XmlType;
 public enum Action {
 
     /**
-     * <p>If no Actions are allowed, this is a dummy value.</p>
-     */
-    NONE,
-
-    /**
      * <p>The Action Process covers creating and updating records.</p>
      */
     PROCESS,
+
     /**
      * <p>The Action Create is for creating new records.</p>
      */

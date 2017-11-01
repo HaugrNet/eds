@@ -52,7 +52,7 @@ public final class FetchDataRequestTest {
         assertThat(request.getDataId(), is(nullValue()));
         assertThat(errors, is(not(nullValue())));
         assertThat(errors.size(), is(1));
-        assertThat(errors.get("circleId"), is("Either the CircleId or an Object Data Id must be provided."));
+        assertThat(errors.get("circleId"), is("Either a Circle or Data Id must be provided."));
     }
 
     @Test
@@ -83,10 +83,9 @@ public final class FetchDataRequestTest {
 
         assertThat(request.getDataId(), is(nullValue()));
         assertThat(errors, is(not(nullValue())));
-        assertThat(errors.size(), is(4));
-        assertThat(errors.get("credentialType"), is("CredentialType is missing, null or invalid."));
-        assertThat(errors.get("credential"), is("Credential is missing, null or invalid."));
-        assertThat(errors.get("circleId"), is("Either the CircleId or an Object Data Id must be provided."));
+        assertThat(errors.size(), is(3));
+        assertThat(errors.get("credential"), is("The Credential is missing."));
+        assertThat(errors.get("circleId"), is("Either a Circle or Data Id must be provided."));
         assertThat(errors.get("account"), is("Account is missing, null or invalid."));
     }
 }

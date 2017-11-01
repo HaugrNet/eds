@@ -42,8 +42,7 @@ public final class CircleServiceTest extends DatabaseSetup {
     public void testEmptyFetchRequest() {
         prepareCause(VerificationException.class, ReturnCode.VERIFICATION_WARNING,
                 "Request Object contained errors:" +
-                        "\nKey: credentialType, Error: CredentialType is missing, null or invalid." +
-                        "\nKey: credential, Error: Credential is missing, null or invalid." +
+                        "\nKey: credential, Error: The Credential is missing." +
                         "\nKey: account, Error: Account is missing, null or invalid.");
 
         final FetchCircleService service = new FetchCircleService(settings, entityManager);
@@ -59,8 +58,7 @@ public final class CircleServiceTest extends DatabaseSetup {
     public void testEmptyProcessRequest() {
         prepareCause(VerificationException.class, ReturnCode.VERIFICATION_WARNING,
                 "Request Object contained errors:" +
-                        "\nKey: credentialType, Error: CredentialType is missing, null or invalid." +
-                        "\nKey: credential, Error: Credential is missing, null or invalid." +
+                        "\nKey: credential, Error: The Credential is missing." +
                         "\nKey: action, Error: No action has been provided." +
                         "\nKey: account, Error: Account is missing, null or invalid.");
 

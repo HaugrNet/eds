@@ -34,4 +34,14 @@ public final class PrivateCWSKey extends CWSKey<PrivateKey> {
     public PrivateKey getKey() {
         return key;
     }
+
+    /**
+     * <p>Destroys the Private Key.</p>
+     */
+    public void destroy() {
+        if (!destroyed) {
+            // TODO find a way to ensure that the Key is being destroyed.
+            destroyed = true;
+        }
+    }
 }

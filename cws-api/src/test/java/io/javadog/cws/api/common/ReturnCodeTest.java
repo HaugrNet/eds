@@ -39,33 +39,33 @@ public class ReturnCodeTest {
         assertThat(ReturnCode.WARNING.getDescription(), is("General Warning occurred while handling the request."));
         assertThat(ReturnCode.WARNING.getClassification(), is(ReturnCode.Classification.CLASS_WARNING));
 
-        assertThat(ReturnCode.AUTHENTICATION_WARNING.getCode(), is(101));
-        assertThat(ReturnCode.AUTHENTICATION_WARNING.getDescription(), is("Authentication of the Account failed."));
-        assertThat(ReturnCode.AUTHENTICATION_WARNING.getClassification(), is(ReturnCode.Classification.CLASS_WARNING));
-
-        assertThat(ReturnCode.AUTHORIZATION_WARNING.getCode(), is(102));
-        assertThat(ReturnCode.AUTHORIZATION_WARNING.getDescription(), is("The Account is not permitted to perform requested Action."));
-        assertThat(ReturnCode.AUTHORIZATION_WARNING.getClassification(), is(ReturnCode.Classification.CLASS_WARNING));
-
-        assertThat(ReturnCode.VERIFICATION_WARNING.getCode(), is(103));
+        assertThat(ReturnCode.VERIFICATION_WARNING.getCode(), is(101));
         assertThat(ReturnCode.VERIFICATION_WARNING.getDescription(), is("The provided Request information is insufficient or invalid."));
         assertThat(ReturnCode.VERIFICATION_WARNING.getClassification(), is(ReturnCode.Classification.CLASS_WARNING));
 
-        assertThat(ReturnCode.SIGNATURE_WARNING.getCode(), is(104));
+        assertThat(ReturnCode.AUTHENTICATION_WARNING.getCode(), is(102));
+        assertThat(ReturnCode.AUTHENTICATION_WARNING.getDescription(), is("Authentication of the Account failed."));
+        assertThat(ReturnCode.AUTHENTICATION_WARNING.getClassification(), is(ReturnCode.Classification.CLASS_WARNING));
+
+        assertThat(ReturnCode.AUTHORIZATION_WARNING.getCode(), is(103));
+        assertThat(ReturnCode.AUTHORIZATION_WARNING.getDescription(), is("The Account is not permitted to perform requested Action."));
+        assertThat(ReturnCode.AUTHORIZATION_WARNING.getClassification(), is(ReturnCode.Classification.CLASS_WARNING));
+
+        assertThat(ReturnCode.ILLEGAL_ACTION.getCode(), is(104));
+        assertThat(ReturnCode.ILLEGAL_ACTION.getDescription(), is("The Account tried to invoke an Action not allowed."));
+        assertThat(ReturnCode.ILLEGAL_ACTION.getClassification(), is(ReturnCode.Classification.CLASS_WARNING));
+
+        assertThat(ReturnCode.SIGNATURE_WARNING.getCode(), is(105));
         assertThat(ReturnCode.SIGNATURE_WARNING.getDescription(), is("There Signature is not usable."));
         assertThat(ReturnCode.SIGNATURE_WARNING.getClassification(), is(ReturnCode.Classification.CLASS_WARNING));
 
-        assertThat(ReturnCode.IDENTIFICATION_WARNING.getCode(), is(105));
+        assertThat(ReturnCode.IDENTIFICATION_WARNING.getCode(), is(106));
         assertThat(ReturnCode.IDENTIFICATION_WARNING.getDescription(), is("Not possible to positively identify the requested Data."));
         assertThat(ReturnCode.IDENTIFICATION_WARNING.getClassification(), is(ReturnCode.Classification.CLASS_WARNING));
 
-        assertThat(ReturnCode.INTEGRITY_WARNING.getCode(), is(106));
+        assertThat(ReturnCode.INTEGRITY_WARNING.getCode(), is(107));
         assertThat(ReturnCode.INTEGRITY_WARNING.getDescription(), is("Not possible to perform the given action, as it will lead to data integrity problems."));
         assertThat(ReturnCode.INTEGRITY_WARNING.getClassification(), is(ReturnCode.Classification.CLASS_WARNING));
-
-        assertThat(ReturnCode.ILLEGAL_ACTION.getCode(), is(199));
-        assertThat(ReturnCode.ILLEGAL_ACTION.getDescription(), is("The Account tried to invoke an Action not allowed."));
-        assertThat(ReturnCode.ILLEGAL_ACTION.getClassification(), is(ReturnCode.Classification.CLASS_WARNING));
     }
 
     @Test
@@ -97,9 +97,5 @@ public class ReturnCodeTest {
         assertThat(ReturnCode.INTEGRITY_ERROR.getCode(), is(206));
         assertThat(ReturnCode.INTEGRITY_ERROR.getDescription(), is("The Encrypted Data is having integrity problems."));
         assertThat(ReturnCode.INTEGRITY_ERROR.getClassification(), is(ReturnCode.Classification.CLASS_ERROR));
-
-        assertThat(ReturnCode.NOTIMPLEMENTED_ERROR.getCode(), is(299));
-        assertThat(ReturnCode.NOTIMPLEMENTED_ERROR.getDescription(), is("Logic Pending Implemented..."));
-        assertThat(ReturnCode.NOTIMPLEMENTED_ERROR.getClassification(), is(ReturnCode.Classification.CLASS_ERROR));
     }
 }

@@ -150,6 +150,16 @@ public final class DataServiceTest extends DatabaseSetup {
     }
 
     @Test
+    public void testMovingDataToFolderWhereSameNameDataExist() {
+        final ProcessDataService service = new ProcessDataService(settings, entityManager);
+        final ProcessDataRequest saveRequest = prepareAddRequest(MEMBER_1, CIRCLE_1_ID, "The Data", 524288);
+        final ProcessDataResponse saveResponse = service.perform(saveRequest);
+        assertThat(saveResponse.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(saveResponse.getReturnMessage(), is("Ok"));
+
+    }
+
+    @Test
     public void testSaveAndDeleteDataWithoutPermission() {
         prepareCause(AuthorizationException.class, ReturnCode.AUTHORIZATION_WARNING, "The requesting Account is not permitted to Process Data.");
 

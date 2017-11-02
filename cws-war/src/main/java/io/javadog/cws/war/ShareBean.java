@@ -7,6 +7,8 @@
  */
 package io.javadog.cws.war;
 
+import static io.javadog.cws.war.CommonBean.destroy;
+
 import io.javadog.cws.api.requests.FetchDataRequest;
 import io.javadog.cws.api.requests.FetchDataTypeRequest;
 import io.javadog.cws.api.requests.FetchSignatureRequest;
@@ -56,10 +58,11 @@ public class ShareBean {
 
     @Transactional(Transactional.TxType.REQUIRED)
     public ProcessDataTypeResponse processDataType(final ProcessDataTypeRequest request) {
+        Serviceable<ProcessDataTypeResponse, ProcessDataTypeRequest> service = null;
         ProcessDataTypeResponse response;
 
         try {
-            final Serviceable<ProcessDataTypeResponse, ProcessDataTypeRequest> service = new ProcessDataTypeService(settingBean.getSettings(), entityManager);
+            service = new ProcessDataTypeService(settingBean.getSettings(), entityManager);
             response = service.perform(request);
         } catch (CWSException e) {
             // Any Warning or Error thrown by the CWS contain enough information
@@ -68,6 +71,8 @@ public class ShareBean {
             // response.
             log.trace(e.getMessage(), e);
             response = new ProcessDataTypeResponse(e.getReturnCode(), e.getMessage());
+        } finally {
+            destroy(service);
         }
 
         return response;
@@ -75,10 +80,11 @@ public class ShareBean {
 
     @Transactional(Transactional.TxType.NEVER)
     public FetchDataTypeResponse fetchDataTypes(final FetchDataTypeRequest request) {
+        Serviceable<FetchDataTypeResponse, FetchDataTypeRequest> service = null;
         FetchDataTypeResponse response;
 
         try {
-            final Serviceable<FetchDataTypeResponse, FetchDataTypeRequest> service = new FetchDataTypeService(settingBean.getSettings(), entityManager);
+            service = new FetchDataTypeService(settingBean.getSettings(), entityManager);
             response = service.perform(request);
         } catch (CWSException e) {
             // Any Warning or Error thrown by the CWS contain enough information
@@ -87,6 +93,8 @@ public class ShareBean {
             // response.
             log.trace(e.getMessage(), e);
             response = new FetchDataTypeResponse(e.getReturnCode(), e.getMessage());
+        } finally {
+            destroy(service);
         }
 
         return response;
@@ -94,10 +102,11 @@ public class ShareBean {
 
     @Transactional(Transactional.TxType.REQUIRED)
     public ProcessDataResponse processData(final ProcessDataRequest request) {
+        Serviceable<ProcessDataResponse, ProcessDataRequest> service = null;
         ProcessDataResponse response;
 
         try {
-            final Serviceable<ProcessDataResponse, ProcessDataRequest> service = new ProcessDataService(settingBean.getSettings(), entityManager);
+            service = new ProcessDataService(settingBean.getSettings(), entityManager);
             response = service.perform(request);
         } catch (CWSException e) {
             // Any Warning or Error thrown by the CWS contain enough information
@@ -106,6 +115,8 @@ public class ShareBean {
             // response.
             log.trace(e.getMessage(), e);
             response = new ProcessDataResponse(e.getReturnCode(), e.getMessage());
+        } finally {
+            destroy(service);
         }
 
         return response;
@@ -113,10 +124,11 @@ public class ShareBean {
 
     @Transactional(Transactional.TxType.SUPPORTS)
     public FetchDataResponse fetchData(final FetchDataRequest request) {
+        Serviceable<FetchDataResponse, FetchDataRequest> service = null;
         FetchDataResponse response;
 
         try {
-            final Serviceable<FetchDataResponse, FetchDataRequest> service = new FetchDataService(settingBean.getSettings(), entityManager);
+            service = new FetchDataService(settingBean.getSettings(), entityManager);
             response = service.perform(request);
         } catch (CWSException e) {
             // Any Warning or Error thrown by the CWS contain enough information
@@ -125,6 +137,8 @@ public class ShareBean {
             // response.
             log.trace(e.getMessage(), e);
             response = new FetchDataResponse(e.getReturnCode(), e.getMessage());
+        } finally {
+            destroy(service);
         }
 
         return response;
@@ -132,10 +146,11 @@ public class ShareBean {
 
     @Transactional(Transactional.TxType.REQUIRED)
     public SignResponse sign(final SignRequest request) {
+        Serviceable<SignResponse, SignRequest> service = null;
         SignResponse response;
 
         try {
-            final Serviceable<SignResponse, SignRequest> service = new SignService(settingBean.getSettings(), entityManager);
+            service = new SignService(settingBean.getSettings(), entityManager);
             response = service.perform(request);
         } catch (CWSException e) {
             // Any Warning or Error thrown by the CWS contain enough information
@@ -144,6 +159,8 @@ public class ShareBean {
             // response.
             log.trace(e.getMessage(), e);
             response = new SignResponse(e.getReturnCode(), e.getMessage());
+        } finally {
+            destroy(service);
         }
 
         return response;
@@ -151,10 +168,11 @@ public class ShareBean {
 
     @Transactional(Transactional.TxType.SUPPORTS)
     public VerifyResponse verify(final VerifyRequest request) {
+        Serviceable<VerifyResponse, VerifyRequest> service = null;
         VerifyResponse response;
 
         try {
-            final Serviceable<VerifyResponse, VerifyRequest> service = new VerifyService(settingBean.getSettings(), entityManager);
+            service = new VerifyService(settingBean.getSettings(), entityManager);
             response = service.perform(request);
         } catch (CWSException e) {
             // Any Warning or Error thrown by the CWS contain enough information
@@ -163,6 +181,8 @@ public class ShareBean {
             // response.
             log.trace(e.getMessage(), e);
             response = new VerifyResponse(e.getReturnCode(), e.getMessage());
+        } finally {
+            destroy(service);
         }
 
         return response;
@@ -170,10 +190,11 @@ public class ShareBean {
 
     @Transactional(Transactional.TxType.SUPPORTS)
     public FetchSignatureResponse fetchSignatures(final FetchSignatureRequest request) {
+        Serviceable<FetchSignatureResponse, FetchSignatureRequest> service = null;
         FetchSignatureResponse response;
 
         try {
-            final Serviceable<FetchSignatureResponse, FetchSignatureRequest> service = new FetchSignatureService(settingBean.getSettings(), entityManager);
+            service = new FetchSignatureService(settingBean.getSettings(), entityManager);
             response = service.perform(request);
         } catch (CWSException e) {
             // Any Warning or Error thrown by the CWS contain enough information
@@ -182,6 +203,8 @@ public class ShareBean {
             // response.
             log.trace(e.getMessage(), e);
             response = new FetchSignatureResponse(e.getReturnCode(), e.getMessage());
+        } finally {
+            destroy(service);
         }
 
         return response;

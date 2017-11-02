@@ -46,6 +46,13 @@ public final class SecretCWSKey extends CWSKey<SecretKey> {
         return key;
     }
 
+    public void destroy() {
+        if (!destroyed) {
+            // TODO find a way to ensure that the Key is being destroyed.
+            destroyed = true;
+        }
+    }
+
     /**
      * {@inheritDoc}
      */

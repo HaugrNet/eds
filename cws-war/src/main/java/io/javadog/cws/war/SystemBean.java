@@ -7,6 +7,8 @@
  */
 package io.javadog.cws.war;
 
+import static io.javadog.cws.war.CommonBean.destroy;
+
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.requests.FetchCircleRequest;
 import io.javadog.cws.api.requests.FetchMemberRequest;
@@ -75,10 +77,11 @@ public class SystemBean {
 
     @Transactional(Transactional.TxType.REQUIRED)
     public SettingResponse settings(final SettingRequest request) {
+        Serviceable<SettingResponse, SettingRequest> service = null;
         SettingResponse response;
 
         try {
-            final Serviceable<SettingResponse, SettingRequest> service = new SettingService(settingBean.getSettings(), entityManager);
+            service = new SettingService(settingBean.getSettings(), entityManager);
             response = service.perform(request);
         } catch (CWSException e) {
             // Any Warning or Error thrown by the CWS contain enough information
@@ -87,6 +90,8 @@ public class SystemBean {
             // response.
             log.trace(e.getMessage(), e);
             response = new SettingResponse(e.getReturnCode(), e.getMessage());
+        } finally {
+            destroy(service);
         }
 
         return response;
@@ -94,10 +99,11 @@ public class SystemBean {
 
     @Transactional(Transactional.TxType.NEVER)
     public FetchMemberResponse fetchMembers(final FetchMemberRequest request) {
+        Serviceable<FetchMemberResponse, FetchMemberRequest> service = null;
         FetchMemberResponse response;
 
         try {
-            final Serviceable<FetchMemberResponse, FetchMemberRequest> service = new FetchMemberService(settingBean.getSettings(), entityManager);
+            service = new FetchMemberService(settingBean.getSettings(), entityManager);
             response = service.perform(request);
         } catch (CWSException e) {
             // Any Warning or Error thrown by the CWS contain enough information
@@ -106,6 +112,8 @@ public class SystemBean {
             // response.
             log.trace(e.getMessage(), e);
             response = new FetchMemberResponse(e.getReturnCode(), e.getMessage());
+        } finally {
+            destroy(service);
         }
 
         return response;
@@ -113,10 +121,11 @@ public class SystemBean {
 
     @Transactional(Transactional.TxType.REQUIRED)
     public ProcessMemberResponse processMember(final ProcessMemberRequest request) {
+        Serviceable<ProcessMemberResponse, ProcessMemberRequest> service = null;
         ProcessMemberResponse response;
 
         try {
-            final Serviceable<ProcessMemberResponse, ProcessMemberRequest> service = new ProcessMemberService(settingBean.getSettings(), entityManager);
+            service = new ProcessMemberService(settingBean.getSettings(), entityManager);
             response = service.perform(request);
         } catch (CWSException e) {
             // Any Warning or Error thrown by the CWS contain enough information
@@ -125,6 +134,8 @@ public class SystemBean {
             // response.
             log.trace(e.getMessage(), e);
             response = new ProcessMemberResponse(e.getReturnCode(), e.getMessage());
+        } finally {
+            destroy(service);
         }
 
         return response;
@@ -132,10 +143,11 @@ public class SystemBean {
 
     @Transactional(Transactional.TxType.NEVER)
     public FetchCircleResponse fetchCircles(final FetchCircleRequest request) {
+        Serviceable<FetchCircleResponse, FetchCircleRequest> service = null;
         FetchCircleResponse response;
 
         try {
-            final Serviceable<FetchCircleResponse, FetchCircleRequest> service = new FetchCircleService(settingBean.getSettings(), entityManager);
+            service = new FetchCircleService(settingBean.getSettings(), entityManager);
             response = service.perform(request);
         } catch (CWSException e) {
             // Any Warning or Error thrown by the CWS contain enough information
@@ -144,6 +156,8 @@ public class SystemBean {
             // response.
             log.trace(e.getMessage(), e);
             response = new FetchCircleResponse(e.getReturnCode(), e.getMessage());
+        } finally {
+            destroy(service);
         }
 
         return response;
@@ -151,10 +165,11 @@ public class SystemBean {
 
     @Transactional(Transactional.TxType.REQUIRED)
     public ProcessCircleResponse processCircle(final ProcessCircleRequest request) {
+        Serviceable<ProcessCircleResponse, ProcessCircleRequest> service = null;
         ProcessCircleResponse response;
 
         try {
-            final Serviceable<ProcessCircleResponse, ProcessCircleRequest> service = new ProcessCircleService(settingBean.getSettings(), entityManager);
+            service = new ProcessCircleService(settingBean.getSettings(), entityManager);
             response = service.perform(request);
         } catch (CWSException e) {
             // Any Warning or Error thrown by the CWS contain enough information
@@ -163,6 +178,8 @@ public class SystemBean {
             // response.
             log.trace(e.getMessage(), e);
             response = new ProcessCircleResponse(e.getReturnCode(), e.getMessage());
+        } finally {
+            destroy(service);
         }
 
         return response;

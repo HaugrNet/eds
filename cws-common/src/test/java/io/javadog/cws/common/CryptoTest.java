@@ -316,9 +316,9 @@ public final class CryptoTest {
     public void testCWSKeyPairEquality() {
         final Settings settings = new Settings();
         final Crypto crypto = new Crypto(settings);
-        final CWSKeyPair key1 = crypto.generateAsymmetricKey(KeyAlgorithm.RSA4096);
-        final CWSKeyPair key2 = crypto.generateAsymmetricKey(KeyAlgorithm.RSA8192);
-        final CWSKeyPair key3 = crypto.generateAsymmetricKey(KeyAlgorithm.RSA4096);
+        final CWSKeyPair key1 = crypto.generateAsymmetricKey(KeyAlgorithm.RSA2048);
+        final CWSKeyPair key2 = crypto.generateAsymmetricKey(KeyAlgorithm.RSA4096);
+        final CWSKeyPair key3 = crypto.generateAsymmetricKey(KeyAlgorithm.RSA2048);
         final KeyPair pair1 = new KeyPair(key1.getPublic().getKey(), key1.getPrivate().getKey());
         final KeyPair pair2 = new KeyPair(key1.getPublic().getKey(), key2.getPrivate().getKey());
         final KeyPair pair3 = new KeyPair(key2.getPublic().getKey(), key2.getPrivate().getKey());

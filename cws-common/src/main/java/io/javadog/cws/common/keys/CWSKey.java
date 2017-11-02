@@ -18,6 +18,7 @@ import java.util.Objects;
  */
 public abstract class CWSKey<T extends Key> {
 
+    protected volatile boolean destroyed = false;
     private final KeyAlgorithm algorithm;
     protected final T key;
 
@@ -47,14 +48,18 @@ public abstract class CWSKey<T extends Key> {
      */
     @Override
     public boolean equals(final Object obj) {
-        boolean result = false;
-
-        if ((obj != null) && (getClass() == obj.getClass())) {
-            final CWSKey<T> that = (CWSKey<T>) obj;
-            result = (algorithm == that.algorithm) && Objects.equals(key, that.key);
+        if (this == obj) {
+            return true;
         }
 
-        return result;
+        if (!(obj instanceof CWSKey)) {
+            return false;
+        }
+
+        final CWSKey<?> that = (CWSKey<?>) obj;
+        return (destroyed == that.destroyed) &&
+                (algorithm == that.algorithm) &&
+                Objects.equals(key, that.key);
     }
 
     /**
@@ -62,6 +67,6 @@ public abstract class CWSKey<T extends Key> {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(algorithm, key);
+        return Objects.hash(destroyed, algorithm, key);
     }
 }

@@ -70,6 +70,19 @@ public abstract class Serviceable<R extends CwsResponse, V extends Authenticatio
     public abstract R perform(V request);
 
     /**
+     * <p>To ensure that sensitive data (keys) have as short a lifespan in the
+     * memory as possible, they must be destroyed, which this method will
+     * handle.</p>
+     *
+     * @throws CryptoException if a problem occurred with destroying keys
+     */
+    public void destroy() {
+        if ((keyPair != null) && (keyPair.getPrivate() != null)) {
+            keyPair.getPrivate().destroy();
+        }
+    }
+
+    /**
      * <p>All incoming requests must be verified, so it is clear if the given
      * information (data) is sufficient to complete the request, and also to
      * ensure that the requesting party is authenticated and authorized for the
@@ -79,8 +92,8 @@ public abstract class Serviceable<R extends CwsResponse, V extends Authenticatio
      * properly authenticated or authorized for the request, an Exception is
      * thrown.</p>
      *
-     * @param verifiable       Request Object to use for the checks
-     * @param action           The Action for the permission check
+     * @param verifiable Request Object to use for the checks
+     * @param action     The Action for the permission check
      */
     protected void verifyRequest(final V verifiable, final Permission action) {
         // If available, let's extract the CircleId so it can be used to improve
@@ -206,6 +219,10 @@ public abstract class Serviceable<R extends CwsResponse, V extends Authenticatio
             final SecretCWSKey key = crypto.generatePasswordKey(settings.getSymmetricAlgorithm(), verifiable.getCredential(), member.getSalt());
             final Charset charset = settings.getCharset();
             keyPair = crypto.extractAsymmetricKey(member.getAlgorithm(), key, member.getSalt(), member.getPublicKey(), member.getPrivateKey());
+
+            // To ensure that the PBE key is no longer usable, we're destroying
+            // it now.
+            key.destroy();
 
             final String toCheck = UUID.randomUUID().toString();
             final byte[] toEncrypt = toCheck.getBytes(charset);

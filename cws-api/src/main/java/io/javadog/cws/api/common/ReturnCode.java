@@ -39,6 +39,9 @@ public enum ReturnCode {
     INTEGRITY_ERROR(Classification.CLASS_ERROR, 6, "The Encrypted Data is having integrity problems."),
     NOTIMPLEMENTED_ERROR(Classification.CLASS_ERROR, 99, "Logic Pending Implemented...");
 
+    /**
+     * ReturnCode Classification, i.e. Basic Severity.
+     */
     public enum Classification {
 
         /**

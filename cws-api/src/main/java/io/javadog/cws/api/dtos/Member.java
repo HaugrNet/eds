@@ -7,6 +7,9 @@
  */
 package io.javadog.cws.api.dtos;
 
+import static io.javadog.cws.api.common.Constants.FIELD_ACCOUNT_NAME;
+import static io.javadog.cws.api.common.Constants.FIELD_ADDED;
+import static io.javadog.cws.api.common.Constants.FIELD_MEMBER_ID;
 import static io.javadog.cws.api.common.Utilities.copy;
 
 import io.javadog.cws.api.common.Constants;
@@ -30,19 +33,16 @@ import java.util.Objects;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "member", propOrder = { "memberId", "accountName",  "added" })
+@XmlType(name = "member", propOrder = { FIELD_MEMBER_ID, FIELD_ACCOUNT_NAME, FIELD_ADDED })
 public final class Member implements Serializable {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
-    private static final String FIELD_MEMBER_ID = "memberId";
-    private static final String FIELD_AUTHENTICATION = "accountName";
-    private static final String FIELD_ADDED = "added";
 
     @XmlElement(name = FIELD_MEMBER_ID)
     private String memberId = null;
 
-    @XmlElement(name = FIELD_AUTHENTICATION, required = true)
+    @XmlElement(name = FIELD_ACCOUNT_NAME, required = true)
     private String accountName = null;
 
     @XmlElement(name = FIELD_ADDED)

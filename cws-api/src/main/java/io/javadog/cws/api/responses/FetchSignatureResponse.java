@@ -7,6 +7,8 @@
  */
 package io.javadog.cws.api.responses;
 
+import static io.javadog.cws.api.common.Constants.FIELD_SIGNATURES;
+
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.dtos.Signature;
@@ -24,13 +26,13 @@ import java.util.List;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "fetchSignatureResult", propOrder = "signatures")
+@XmlType(name = "fetchSignatureResult", propOrder = FIELD_SIGNATURES)
 public final class FetchSignatureResponse extends CwsResponse {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
-    @XmlElement(name = "signatures", required = true)
+    @XmlElement(name = FIELD_SIGNATURES, required = true)
     private final List<Signature> signatures = new ArrayList<>(0);
 
     // =========================================================================

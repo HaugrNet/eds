@@ -31,21 +31,21 @@ public final class MetadataTest {
         final Date added = new Date();
 
         final DataType dataType = new DataType();
-        dataType.setName("DataType Name");
+        dataType.setTypeName("DataType Name");
         dataType.setType("DataType Type");
 
         final Metadata metadata = new Metadata();
         metadata.setDataId(id);
         metadata.setCircleId(circleId);
         metadata.setFolderId(folderId);
-        metadata.setName(dataName);
+        metadata.setDataName(dataName);
         metadata.setDataType(dataType);
         metadata.setAdded(added);
 
         assertThat(metadata.getDataId(), is(id));
         assertThat(metadata.getCircleId(), is(circleId));
         assertThat(metadata.getFolderId(), is(folderId));
-        assertThat(metadata.getName(), is(dataName));
+        assertThat(metadata.getDataName(), is(dataName));
         assertThat(metadata.getDataType(), is(dataType));
         assertThat(metadata.getAdded(), is(added));
     }
@@ -53,7 +53,7 @@ public final class MetadataTest {
     @Test
     public void testStandardMethods() {
         final DataType dataType = new DataType();
-        dataType.setName("DataType Name");
+        dataType.setTypeName("DataType Name");
         dataType.setType("DataType Type");
 
         final Metadata metadata = new Metadata();
@@ -63,13 +63,13 @@ public final class MetadataTest {
         metadata.setDataId(UUID.randomUUID().toString());
         metadata.setCircleId(UUID.randomUUID().toString());
         metadata.setFolderId(UUID.randomUUID().toString());
-        metadata.setName("Data Record");
+        metadata.setDataName("Data Record");
         metadata.setDataType(dataType);
         metadata.setAdded(new Date());
         sameMetadata.setDataId(metadata.getDataId());
         sameMetadata.setCircleId(metadata.getCircleId());
         sameMetadata.setFolderId(metadata.getFolderId());
-        sameMetadata.setName(metadata.getName());
+        sameMetadata.setDataName(metadata.getDataName());
         sameMetadata.setDataType(metadata.getDataType());
         sameMetadata.setAdded(metadata.getAdded());
 

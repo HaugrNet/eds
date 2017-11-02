@@ -29,14 +29,14 @@ public final class AuthenticationTest {
         final CredentialType type = CredentialType.SIGNATURE;
 
         final Authentication authentication = new Authentication();
-        assertThat(authentication.getAccount(), is(not(name)));
+        assertThat(authentication.getAccountName(), is(not(name)));
         assertThat(authentication.getCredentialType(), is(not(type)));
         assertThat(authentication.getCredential(), is(not(credentials)));
 
-        authentication.setAccount(name);
+        authentication.setAccountName(name);
         authentication.setCredentialType(type);
         authentication.setCredential(credentials);
-        assertThat(authentication.getAccount(), is(name));
+        assertThat(authentication.getAccountName(), is(name));
         assertThat(authentication.getCredentialType(), is(type));
         assertThat(authentication.getCredential(), is(credentials));
 

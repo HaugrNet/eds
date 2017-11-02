@@ -98,7 +98,7 @@ public class DatabaseSetup {
         try {
             final T request = clazz.getConstructor().newInstance();
 
-            request.setAccount(account);
+            request.setAccountName(account);
             request.setCredential(account);
             request.setCredentialType(CredentialType.PASSPHRASE);
 

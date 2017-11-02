@@ -30,11 +30,11 @@ public class CircleTest {
 
         final Circle circle = new Circle();
         circle.setCircleId(id);
-        circle.setName(name);
+        circle.setCircleName(name);
         circle.setCreated(date);
 
         assertThat(circle.getCircleId(), is(id));
-        assertThat(circle.getName(), is(name));
+        assertThat(circle.getCircleName(), is(name));
         assertThat(circle.getCreated(), is(date));
     }
 
@@ -45,10 +45,10 @@ public class CircleTest {
         final Circle emptyCircle = new Circle();
 
         circle.setCircleId(UUID.randomUUID().toString());
-        circle.setName("The Circle Name");
+        circle.setCircleName("The Circle Name");
         circle.setCreated(new Date());
         sameCircle.setCircleId(circle.getCircleId());
-        sameCircle.setName(circle.getName());
+        sameCircle.setCircleName(circle.getCircleName());
         sameCircle.setCreated(circle.getCreated());
 
         assertThat(circle.equals(null), is(false));

@@ -38,11 +38,11 @@ public final class DataTypeServiceTest extends DatabaseSetup {
         prepareCause(VerificationException.class, ReturnCode.VERIFICATION_WARNING,
                 "Request Object contained errors:" +
                         "\nKey: credential, Error: The Credential is missing." +
-                        "\nKey: account, Error: Account is missing, null or invalid.");
+                        "\nKey: accountName, Error: AccountName is missing, null or invalid.");
 
         final FetchDataTypeService service = new FetchDataTypeService(settings, entityManager);
         final FetchDataTypeRequest request = new FetchDataTypeRequest();
-        assertThat(request.getAccount(), is(nullValue()));
+        assertThat(request.getAccountName(), is(nullValue()));
 
         service.perform(request);
     }
@@ -52,13 +52,13 @@ public final class DataTypeServiceTest extends DatabaseSetup {
         prepareCause(VerificationException.class, ReturnCode.VERIFICATION_WARNING,
                 "Request Object contained errors:" +
                         "\nKey: credential, Error: The Credential is missing." +
-                        "\nKey: name, Error: The name of the DataType is missing or invalid." +
-                        "\nKey: type, Error: The type of the DataType is missing or invalid." +
-                        "\nKey: account, Error: Account is missing, null or invalid.");
+                        "\nKey: accountName, Error: AccountName is missing, null or invalid." +
+                        "\nKey: typeName, Error: The name of the DataType is missing or invalid." +
+                        "\nKey: type, Error: The type of the DataType is missing or invalid.");
 
         final ProcessDataTypeService service = new ProcessDataTypeService(settings, entityManager);
         final ProcessDataTypeRequest request = new ProcessDataTypeRequest();
-        assertThat(request.getAccount(), is(nullValue()));
+        assertThat(request.getAccountName(), is(nullValue()));
 
         service.perform(request);
     }
@@ -73,23 +73,23 @@ public final class DataTypeServiceTest extends DatabaseSetup {
         assertThat(response.isOk(), is(true));
         assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(response.getReturnMessage(), is("Ok"));
-        assertThat(response.getTypes().size(), is(2));
-        assertThat(response.getTypes().get(0).getName(), is(Constants.DATA_TYPENAME));
-        assertThat(response.getTypes().get(0).getType(), is("Data Object"));
-        assertThat(response.getTypes().get(1).getName(), is(Constants.FOLDER_TYPENAME));
-        assertThat(response.getTypes().get(1).getType(), is("Folder"));
+        assertThat(response.getDataTypes().size(), is(2));
+        assertThat(response.getDataTypes().get(0).getTypeName(), is(Constants.DATA_TYPENAME));
+        assertThat(response.getDataTypes().get(0).getType(), is("Data Object"));
+        assertThat(response.getDataTypes().get(1).getTypeName(), is(Constants.FOLDER_TYPENAME));
+        assertThat(response.getDataTypes().get(1).getType(), is("Folder"));
     }
 
     @Test
     public void testInvokeWithoutAnything() {
         prepareCause(VerificationException.class, ReturnCode.VERIFICATION_WARNING,
                 "Request Object contained errors:" +
-                        "\nKey: name, Error: The name of the DataType is missing or invalid." +
+                        "\nKey: typeName, Error: The name of the DataType is missing or invalid." +
                         "\nKey: type, Error: The type of the DataType is missing or invalid.");
 
         final ProcessDataTypeService service = new ProcessDataTypeService(settings, entityManager);
         final ProcessDataTypeRequest request = prepareRequest(ProcessDataTypeRequest.class, Constants.ADMIN_ACCOUNT);
-        assertThat(request.getName(), is(nullValue()));
+        assertThat(request.getTypeName(), is(nullValue()));
         assertThat(request.getType(), is(nullValue()));
 
         service.perform(request);
@@ -103,15 +103,15 @@ public final class DataTypeServiceTest extends DatabaseSetup {
         final ProcessDataTypeService service = new ProcessDataTypeService(settings, entityManager);
         final ProcessDataTypeRequest request = prepareRequest(ProcessDataTypeRequest.class, MEMBER_1);
         request.setType("MyDataType");
-        request.setName("The Data Type");
-        assertThat(request.getName(), is(not(nullValue())));
+        request.setTypeName("The Data Type");
+        assertThat(request.getTypeName(), is(not(nullValue())));
         assertThat(request.getType(), is(not(nullValue())));
 
         service.perform(request);
     }
 
     @Test
-    @Ignore("TODO: 2017-11-01 - Ignores as the test is failing, although it should work. Must be investigated!")
+    @Ignore("TODO: 2017-11-01 - Ignored as the test is failing, although it should work. Must be investigated!")
     public void testUpdateRestrictedDataTypeFolder() {
         prepareCause(AuthorizationException.class, ReturnCode.AUTHORIZATION_WARNING,
                 "It is not permitted to update the DataType '" + Constants.FOLDER_TYPENAME + "'.");
@@ -119,15 +119,15 @@ public final class DataTypeServiceTest extends DatabaseSetup {
         final ProcessDataTypeService service = new ProcessDataTypeService(settings, entityManager);
         final ProcessDataTypeRequest request = prepareRequest(ProcessDataTypeRequest.class, Constants.ADMIN_ACCOUNT);
         request.setType(Constants.FOLDER_TYPENAME);
-        request.setName("alternative folder");
-        assertThat(request.getName(), is(not(nullValue())));
+        request.setTypeName("alternative folder");
+        assertThat(request.getTypeName(), is(not(nullValue())));
         assertThat(request.getType(), is(not(nullValue())));
 
         service.perform(request);
     }
 
     @Test
-    @Ignore("TODO: 2017-11-01 - Ignores as the test is failing, although it should work. Must be investigated!")
+    @Ignore("TODO: 2017-11-01 - Ignored as the test is failing, although it should work. Must be investigated!")
     public void testUpdateRestrictedDataTypeData() {
         prepareCause(AuthorizationException.class, ReturnCode.AUTHORIZATION_WARNING,
                 "It is not permitted to update the DataType '" + Constants.DATA_TYPENAME + "'.");
@@ -135,8 +135,8 @@ public final class DataTypeServiceTest extends DatabaseSetup {
         final ProcessDataTypeService service = new ProcessDataTypeService(settings, entityManager);
         final ProcessDataTypeRequest request = prepareRequest(ProcessDataTypeRequest.class, Constants.ADMIN_ACCOUNT);
         request.setType(Constants.DATA_TYPENAME);
-        request.setName("alternative data");
-        assertThat(request.getName(), is(not(nullValue())));
+        request.setTypeName("alternative data");
+        assertThat(request.getTypeName(), is(not(nullValue())));
         assertThat(request.getType(), is(not(nullValue())));
 
         final ProcessDataTypeResponse response = service.perform(request);
@@ -150,7 +150,7 @@ public final class DataTypeServiceTest extends DatabaseSetup {
         request.setAction(Action.PROCESS);
         final String theDataTypeName = "dataTypeToDelete";
         final String newDataTypeType = "The Type information";
-        request.setName(theDataTypeName);
+        request.setTypeName(theDataTypeName);
         request.setType(newDataTypeType);
         final ProcessDataTypeResponse response = service.perform(request);
 
@@ -174,7 +174,7 @@ public final class DataTypeServiceTest extends DatabaseSetup {
         request.setAction(Action.DELETE);
         final String theDataTypeName = "unknownDataType";
         final String newDataTypeType = "The Type information";
-        request.setName(theDataTypeName);
+        request.setTypeName(theDataTypeName);
         request.setType(newDataTypeType);
         final ProcessDataTypeResponse response = service.perform(request);
 
@@ -191,7 +191,7 @@ public final class DataTypeServiceTest extends DatabaseSetup {
         request.setAction(Action.PROCESS);
         final String theDataTypeName = "newName";
         final String newDataTypeType = "newType";
-        request.setName(theDataTypeName);
+        request.setTypeName(theDataTypeName);
         request.setType(newDataTypeType);
 
         final ProcessDataTypeResponse response = service.perform(request);
@@ -199,18 +199,18 @@ public final class DataTypeServiceTest extends DatabaseSetup {
         assertThat(response.isOk(), is(true));
         assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(response.getReturnMessage(), is("Ok"));
-        assertThat(response.getDataType().getName(), is(theDataTypeName));
+        assertThat(response.getDataType().getTypeName(), is(theDataTypeName));
         assertThat(response.getDataType().getType(), is(newDataTypeType));
 
         final String updatedDataTypeType = "updatedType";
-        request.setName(theDataTypeName);
+        request.setTypeName(theDataTypeName);
         request.setType(updatedDataTypeType);
         final ProcessDataTypeResponse updateResponse = service.perform(request);
         assertThat(updateResponse, is(not(nullValue())));
         assertThat(updateResponse.isOk(), is(true));
         assertThat(updateResponse.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(updateResponse.getReturnMessage(), is("Ok"));
-        assertThat(updateResponse.getDataType().getName(), is(theDataTypeName));
+        assertThat(updateResponse.getDataType().getTypeName(), is(theDataTypeName));
         assertThat(updateResponse.getDataType().getType(), is(updatedDataTypeType));
     }
 }

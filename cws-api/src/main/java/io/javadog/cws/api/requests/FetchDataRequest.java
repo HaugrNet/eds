@@ -7,6 +7,10 @@
  */
 package io.javadog.cws.api.requests;
 
+import static io.javadog.cws.api.common.Constants.FIELD_CIRCLE_ID;
+import static io.javadog.cws.api.common.Constants.FIELD_DATA_ID;
+import static io.javadog.cws.api.common.Constants.FIELD_PAGE_NUMBER;
+import static io.javadog.cws.api.common.Constants.FIELD_PAGE_SIZE;
 import static io.javadog.cws.api.common.Constants.MAX_PAGE_SIZE;
 
 import io.javadog.cws.api.common.Constants;
@@ -24,16 +28,11 @@ import java.util.Map;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "fetchDataRequest", propOrder = { "circleId", "dataId" })
+@XmlType(name = "fetchDataRequest", propOrder = { FIELD_CIRCLE_ID, FIELD_DATA_ID, FIELD_PAGE_NUMBER, FIELD_PAGE_SIZE })
 public final class FetchDataRequest extends Authentication implements CircleIdRequest {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
-
-    private static final String FIELD_CIRCLE_ID = "circleId";
-    private static final String FIELD_DATA_ID = "dataId";
-    private static final String FIELD_PAGE_NUMBER = "pageNumber";
-    private static final String FIELD_PAGE_SIZE = "pageSize";
 
     @Pattern(regexp = Constants.ID_PATTERN_REGEX)
     @XmlElement(name = FIELD_CIRCLE_ID, nillable = true, required = true)

@@ -96,7 +96,7 @@ public final class TrusteeTest {
     private static Circle createCircle() {
         final Circle circle = new Circle();
         circle.setCircleId(UUID.randomUUID().toString());
-        circle.setName("Circle Name");
+        circle.setCircleName("Circle Name");
         circle.setCreated(new Date());
 
         return circle;

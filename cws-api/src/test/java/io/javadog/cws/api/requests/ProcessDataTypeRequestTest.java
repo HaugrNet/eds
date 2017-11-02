@@ -1,6 +1,9 @@
 package io.javadog.cws.api.requests;
 
 import static io.javadog.cws.api.ReflectiveTesting.reflectiveCorrection;
+import static io.javadog.cws.api.common.Constants.FIELD_ACCOUNT_NAME;
+import static io.javadog.cws.api.common.Constants.FIELD_ACTION;
+import static io.javadog.cws.api.common.Constants.FIELD_CREDENTIAL;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
@@ -23,14 +26,14 @@ public final class ProcessDataTypeRequestTest {
         final String type = "DataType Type";
 
         final ProcessDataTypeRequest request = new ProcessDataTypeRequest();
-        request.setAccount(Constants.ADMIN_ACCOUNT);
+        request.setAccountName(Constants.ADMIN_ACCOUNT);
         request.setCredentialType(CredentialType.PASSPHRASE);
         request.setCredential(Constants.ADMIN_ACCOUNT);
         request.setAction(Action.PROCESS);
-        request.setName(name);
+        request.setTypeName(name);
         request.setType(type);
 
-        assertThat(request.getName(), is(name));
+        assertThat(request.getTypeName(), is(name));
         assertThat(request.getType(), is(type));
 
         final Map<String, String> errors = request.validate();
@@ -43,8 +46,8 @@ public final class ProcessDataTypeRequestTest {
 
         final Map<String, String> errors = request.validate();
         assertThat(errors.size(), is(4));
-        assertThat(errors.get("account"), is("Account is missing, null or invalid."));
-        assertThat(errors.get("credential"), is("The Credential is missing."));
+        assertThat(errors.get(FIELD_ACCOUNT_NAME), is("AccountName is missing, null or invalid."));
+        assertThat(errors.get(FIELD_CREDENTIAL), is("The Credential is missing."));
     }
 
     @Test
@@ -53,8 +56,8 @@ public final class ProcessDataTypeRequestTest {
         reflectiveCorrection(request, "action", Action.REKEY);
         final Map<String, String> errors = request.validate();
         assertThat(errors.size(), is(3));
-        assertThat(errors.get("account"), is("Account is missing, null or invalid."));
-        assertThat(errors.get("credential"), is("The Credential is missing."));
-        assertThat(errors.get("action"), is("Invalid Action provided."));
+        assertThat(errors.get(FIELD_ACCOUNT_NAME), is("AccountName is missing, null or invalid."));
+        assertThat(errors.get(FIELD_CREDENTIAL), is("The Credential is missing."));
+        assertThat(errors.get(FIELD_ACTION), is("Invalid Action provided."));
     }
 }

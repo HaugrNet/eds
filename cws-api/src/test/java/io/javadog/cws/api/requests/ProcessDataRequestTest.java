@@ -25,7 +25,7 @@ public final class ProcessDataRequestTest {
     @Test
     public void testClass() {
         final ProcessDataRequest request = new ProcessDataRequest();
-        request.setAccount(Constants.ADMIN_ACCOUNT);
+        request.setAccountName(Constants.ADMIN_ACCOUNT);
         request.setCredentialType(CredentialType.PASSPHRASE);
         request.setCredential(Constants.ADMIN_ACCOUNT);
 

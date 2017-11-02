@@ -25,10 +25,10 @@ public final class DataTypeTest {
         final String type = "type";
 
         final DataType dataType = new DataType();
-        dataType.setName(name);
+        dataType.setTypeName(name);
         dataType.setType(type);
 
-        assertThat(dataType.getName(), is(name));
+        assertThat(dataType.getTypeName(), is(name));
         assertThat(dataType.getType(), is(type));
     }
 
@@ -38,9 +38,9 @@ public final class DataTypeTest {
         final DataType sameDataType = new DataType();
         final DataType emptyDataType = new DataType();
 
-        dataType.setName("DataType Name");
+        dataType.setTypeName("DataType Name");
         dataType.setType("DataType Type");
-        sameDataType.setName(dataType.getName());
+        sameDataType.setTypeName(dataType.getTypeName());
         sameDataType.setType(dataType.getType());
 
         assertThat(dataType.equals(null), is(false));

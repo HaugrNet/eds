@@ -7,6 +7,13 @@
  */
 package io.javadog.cws.api.requests;
 
+import static io.javadog.cws.api.common.Constants.FIELD_ACTION;
+import static io.javadog.cws.api.common.Constants.FIELD_CIRCLE_ID;
+import static io.javadog.cws.api.common.Constants.FIELD_DATA;
+import static io.javadog.cws.api.common.Constants.FIELD_DATA_ID;
+import static io.javadog.cws.api.common.Constants.FIELD_DATA_NAME;
+import static io.javadog.cws.api.common.Constants.FIELD_FOLDER_ID;
+import static io.javadog.cws.api.common.Constants.FIELD_TYPENAME;
 import static io.javadog.cws.api.common.Constants.MAX_NAME_LENGTH;
 import static io.javadog.cws.api.common.Constants.MAX_STRING_LENGTH;
 import static io.javadog.cws.api.common.Utilities.copy;
@@ -28,19 +35,11 @@ import java.util.Map;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "processDataRequest", propOrder = { "action", "dataId", "circleId", "folderId", "name", "typeName", "data" })
+@XmlType(name = "processDataRequest", propOrder = { FIELD_ACTION, FIELD_DATA_ID, FIELD_CIRCLE_ID, FIELD_DATA_NAME, FIELD_FOLDER_ID, FIELD_TYPENAME, FIELD_DATA })
 public final class ProcessDataRequest extends Authentication implements CircleIdRequest {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
-
-    private static final String FIELD_ACTION = "action";
-    private static final String FIELD_DATA_ID = "dataId";
-    private static final String FIELD_CIRCLE_ID = "circleId";
-    private static final String FIELD_FOLDER_ID = "folderId";
-    private static final String FIELD_NAME = "name";
-    private static final String FIELD_TYPENAME = "typeName";
-    private static final String FIELD_DATA = "data";
 
     @NotNull
     @XmlElement(name = FIELD_ACTION, required = true)
@@ -55,8 +54,8 @@ public final class ProcessDataRequest extends Authentication implements CircleId
     private String circleId = null;
 
     @Size(min = 1, max = MAX_STRING_LENGTH)
-    @XmlElement(name = FIELD_NAME, nillable = true)
-    private String name = null;
+    @XmlElement(name = FIELD_DATA_NAME, nillable = true)
+    private String dataName = null;
 
     @Pattern(regexp = Constants.ID_PATTERN_REGEX)
     @XmlElement(name = FIELD_FOLDER_ID, nillable = true)
@@ -64,7 +63,7 @@ public final class ProcessDataRequest extends Authentication implements CircleId
 
 
     @Size(min = 1, max = MAX_NAME_LENGTH)
-    @XmlElement(name = FIELD_TYPENAME)
+    @XmlElement(name = FIELD_TYPENAME, required = true)
     private String typeName = null;
 
     @XmlElement(name = FIELD_DATA, nillable = true)
@@ -106,12 +105,12 @@ public final class ProcessDataRequest extends Authentication implements CircleId
         return circleId;
     }
 
-    public void setName(final String name) {
-        this.name = name;
+    public void setDataName(final String dataName) {
+        this.dataName = dataName;
     }
 
-    public String getName() {
-        return name;
+    public String getDataName() {
+        return dataName;
     }
 
     public void setFolderId(final String folderId) {
@@ -156,13 +155,13 @@ public final class ProcessDataRequest extends Authentication implements CircleId
                 case ADD:
                     checkNotNullAndValidId(errors, FIELD_CIRCLE_ID, circleId, "The Circle Id is missing or invalid.");
                     checkValidId(errors, FIELD_FOLDER_ID, folderId, "The Folder Id is invalid.");
-                    checkNotNullEmptyOrTooLong(errors, FIELD_NAME, name, MAX_STRING_LENGTH, "The name of the new Data Object is invalid.");
+                    checkNotNullEmptyOrTooLong(errors, FIELD_DATA_NAME, dataName, MAX_STRING_LENGTH, "The name of the new Data Object is invalid.");
                     checkNotNullOrEmpty(errors, FIELD_TYPENAME, typeName, "The Data Type is missing or invalid.");
                     break;
                 case UPDATE:
                     checkNotNullAndValidId(errors, FIELD_DATA_ID, dataId, "The Id is missing or invalid.");
                     checkValidId(errors, FIELD_FOLDER_ID, folderId, "The Folder Id is invalid.");
-                    checkNotTooLong(errors, FIELD_NAME, name, MAX_STRING_LENGTH, "The name of the new Data Object is invalid.");
+                    checkNotTooLong(errors, FIELD_DATA_NAME, dataName, MAX_STRING_LENGTH, "The name of the new Data Object is invalid.");
                     break;
                 case DELETE:
                     checkNotNullAndValidId(errors, FIELD_DATA_ID, dataId, "The Id is missing or invalid.");

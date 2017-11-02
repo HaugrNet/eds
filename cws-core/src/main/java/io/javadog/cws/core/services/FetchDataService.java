@@ -140,7 +140,7 @@ public final class FetchDataService extends Serviceable<FetchDataResponse, Fetch
         final Metadata metaData = new Metadata();
 
         metaData.setDataType(convert(entity.getType()));
-        metaData.setName(entity.getName());
+        metaData.setDataName(entity.getName());
         metaData.setDataId(entity.getExternalId());
         metaData.setCircleId(entity.getCircle().getExternalId());
         metaData.setAdded(entity.getCreated());
@@ -152,7 +152,7 @@ public final class FetchDataService extends Serviceable<FetchDataResponse, Fetch
     private static DataType convert(final DataTypeEntity entity) {
         final DataType dataType = new DataType();
 
-        dataType.setName(entity.getName());
+        dataType.setTypeName(entity.getName());
         dataType.setType(entity.getType());
 
         return dataType;

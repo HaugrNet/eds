@@ -7,6 +7,9 @@
  */
 package io.javadog.cws.api.dtos;
 
+import static io.javadog.cws.api.common.Constants.FIELD_TYPE;
+import static io.javadog.cws.api.common.Constants.FIELD_TYPENAME;
+
 import io.javadog.cws.api.common.Constants;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -21,17 +24,14 @@ import java.util.Objects;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "dataType", propOrder = { "name", "type" })
+@XmlType(name = "dataType", propOrder = { FIELD_TYPENAME, FIELD_TYPE })
 public final class DataType implements Serializable {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
-    private static final String FIELD_NAME = "name";
-    private static final String FIELD_TYPE = "type";
-
-    @XmlElement(name = FIELD_NAME, required = true)
-    private String name = null;
+    @XmlElement(name = FIELD_TYPENAME, required = true)
+    private String typeName = null;
 
     @XmlElement(name = FIELD_TYPE, required = true)
     private String type = null;
@@ -40,12 +40,12 @@ public final class DataType implements Serializable {
     // Standard Setters & Getters
     // =========================================================================
 
-    public void setName(final String name) {
-        this.name = name;
+    public void setTypeName(final String typeName) {
+        this.typeName = typeName;
     }
 
-    public String getName() {
-        return name;
+    public String getTypeName() {
+        return typeName;
     }
 
     public void setType(final String type) {
@@ -74,19 +74,19 @@ public final class DataType implements Serializable {
         }
 
         final DataType that = (DataType) obj;
-        return Objects.equals(name, that.name) &&
+        return Objects.equals(typeName, that.typeName) &&
                 Objects.equals(type, that.type);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, type);
+        return Objects.hash(typeName, type);
     }
 
     @Override
     public String toString() {
         return "DataType{" +
-                "name='" + name + '\'' +
+                "typeName='" + typeName + '\'' +
                 ", type='" + type + '\'' +
                 '}';
     }

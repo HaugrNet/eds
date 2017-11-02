@@ -7,6 +7,10 @@
  */
 package io.javadog.cws.api.requests;
 
+import static io.javadog.cws.api.common.Constants.FIELD_ACCOUNT_NAME;
+import static io.javadog.cws.api.common.Constants.FIELD_CIRCLE_ID;
+import static io.javadog.cws.api.common.Constants.FIELD_CREDENTIAL;
+import static io.javadog.cws.api.common.Constants.FIELD_DATA_ID;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -31,7 +35,7 @@ public final class FetchDataRequestTest {
         final String objectId = UUID.randomUUID().toString();
 
         final FetchDataRequest request = new FetchDataRequest();
-        request.setAccount(Constants.ADMIN_ACCOUNT);
+        request.setAccountName(Constants.ADMIN_ACCOUNT);
         request.setCredentialType(CredentialType.PASSPHRASE);
         request.setCredential(Constants.ADMIN_ACCOUNT);
         request.setDataId(objectId);
@@ -44,7 +48,7 @@ public final class FetchDataRequestTest {
     @Test
     public void testClassWithoutDataId() {
         final FetchDataRequest request = new FetchDataRequest();
-        request.setAccount(Constants.ADMIN_ACCOUNT);
+        request.setAccountName(Constants.ADMIN_ACCOUNT);
         request.setCredentialType(CredentialType.PASSPHRASE);
         request.setCredential(Constants.ADMIN_ACCOUNT);
         final Map<String, String> errors = request.validate();
@@ -60,7 +64,7 @@ public final class FetchDataRequestTest {
         final String dataId = Constants.ADMIN_ACCOUNT;
 
         final FetchDataRequest request = new FetchDataRequest();
-        request.setAccount(Constants.ADMIN_ACCOUNT);
+        request.setAccountName(Constants.ADMIN_ACCOUNT);
         request.setCredentialType(CredentialType.PASSPHRASE);
         request.setCredential(Constants.ADMIN_ACCOUNT);
 
@@ -73,7 +77,7 @@ public final class FetchDataRequestTest {
         assertThat(request.getDataId(), is(dataId));
         assertThat(errors, is(not(nullValue())));
         assertThat(errors.size(), is(1));
-        assertThat(errors.get("dataId"), is("The Data Id is invalid."));
+        assertThat(errors.get(FIELD_DATA_ID), is("The Data Id is invalid."));
     }
 
     @Test
@@ -84,8 +88,8 @@ public final class FetchDataRequestTest {
         assertThat(request.getDataId(), is(nullValue()));
         assertThat(errors, is(not(nullValue())));
         assertThat(errors.size(), is(3));
-        assertThat(errors.get("credential"), is("The Credential is missing."));
-        assertThat(errors.get("circleId"), is("Either a Circle or Data Id must be provided."));
-        assertThat(errors.get("account"), is("Account is missing, null or invalid."));
+        assertThat(errors.get(FIELD_ACCOUNT_NAME), is("AccountName is missing, null or invalid."));
+        assertThat(errors.get(FIELD_CREDENTIAL), is("The Credential is missing."));
+        assertThat(errors.get(FIELD_CIRCLE_ID), is("Either a Circle or Data Id must be provided."));
     }
 }

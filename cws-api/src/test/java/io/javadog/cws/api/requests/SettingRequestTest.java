@@ -8,6 +8,8 @@
 package io.javadog.cws.api.requests;
 
 import static io.javadog.cws.api.ReflectiveTesting.reflectiveCorrection;
+import static io.javadog.cws.api.common.Constants.FIELD_ACCOUNT_NAME;
+import static io.javadog.cws.api.common.Constants.FIELD_CREDENTIAL;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
@@ -30,7 +32,7 @@ public final class SettingRequestTest {
         settings.put("Setting1", "Value1");
 
         final SettingRequest request = new SettingRequest();
-        request.setAccount(Constants.ADMIN_ACCOUNT);
+        request.setAccountName(Constants.ADMIN_ACCOUNT);
         request.setCredentialType(CredentialType.PASSPHRASE);
         request.setCredential(Constants.ADMIN_ACCOUNT);
         assertThat(request.getSettings().isEmpty(), is(true));
@@ -74,7 +76,7 @@ public final class SettingRequestTest {
 
         final Map<String, String> errors = request.validate();
         assertThat(errors.size(), is(2));
-        assertThat(errors.get("account"), is("Account is missing, null or invalid."));
-        assertThat(errors.get("credential"), is("The Credential is missing."));
+        assertThat(errors.get(FIELD_ACCOUNT_NAME), is("AccountName is missing, null or invalid."));
+        assertThat(errors.get(FIELD_CREDENTIAL), is("The Credential is missing."));
     }
 }

@@ -7,6 +7,8 @@
  */
 package io.javadog.cws.api.requests;
 
+import static io.javadog.cws.api.common.Constants.FIELD_DATA;
+import static io.javadog.cws.api.common.Constants.FIELD_SIGNATURE;
 import static io.javadog.cws.api.common.Utilities.copy;
 
 import io.javadog.cws.api.common.Constants;
@@ -23,13 +25,11 @@ import java.util.Map;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "verifyRequest", propOrder = { "signature", "data" })
+@XmlType(name = "verifyRequest", propOrder = { FIELD_SIGNATURE, FIELD_DATA })
 public final class VerifyRequest extends Authentication {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
-    private static final String FIELD_SIGNATURE = "signature";
-    private static final String FIELD_DATA = "data";
 
     @NotNull
     @XmlElement(name = FIELD_SIGNATURE, required = true)

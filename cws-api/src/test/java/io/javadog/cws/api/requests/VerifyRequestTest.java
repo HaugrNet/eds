@@ -25,7 +25,7 @@ public final class VerifyRequestTest {
     @Test
     public void testClass() {
         final VerifyRequest request = new VerifyRequest();
-        request.setAccount(Constants.ADMIN_ACCOUNT);
+        request.setAccountName(Constants.ADMIN_ACCOUNT);
         request.setCredentialType(CredentialType.PASSPHRASE);
         request.setCredential(Constants.ADMIN_ACCOUNT);
 

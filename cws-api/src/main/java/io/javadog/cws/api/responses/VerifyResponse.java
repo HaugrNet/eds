@@ -7,6 +7,8 @@
  */
 package io.javadog.cws.api.responses;
 
+import static io.javadog.cws.api.common.Constants.FIELD_VERIFIED;
+
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
 
@@ -20,13 +22,13 @@ import javax.xml.bind.annotation.XmlType;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "verifyResult", propOrder = "verified")
+@XmlType(name = "verifyResult", propOrder = FIELD_VERIFIED)
 public final class VerifyResponse extends CwsResponse {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
-    @XmlElement(name = "verified")
+    @XmlElement(name = FIELD_VERIFIED, required = true)
     private boolean verified = false;
 
     // =========================================================================

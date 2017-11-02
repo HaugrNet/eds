@@ -125,7 +125,7 @@ public final class SystemServiceTest extends BeanSetup {
         final SystemService system = prepareSystemService();
         final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
         request.setAction(Action.INVITE);
-        request.setAccountName("new Account");
+        request.setNewAccountName("new Account");
 
         final ProcessMemberResponse response = system.processMember(request);
         assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));

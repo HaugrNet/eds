@@ -39,12 +39,12 @@ public final class DataServiceTest extends DatabaseSetup {
         prepareCause(VerificationException.class, ReturnCode.VERIFICATION_WARNING,
                 "Request Object contained errors:" +
                         "\nKey: credential, Error: The Credential is missing." +
-                        "\nKey: action, Error: Invalid Action provided." +
-                        "\nKey: account, Error: Account is missing, null or invalid.");
+                        "\nKey: accountName, Error: AccountName is missing, null or invalid." +
+                        "\nKey: action, Error: Invalid Action provided.");
 
         final ProcessDataService service = new ProcessDataService(settings, entityManager);
         final ProcessDataRequest request = new ProcessDataRequest();
-        assertThat(request.getAccount(), is(nullValue()));
+        assertThat(request.getAccountName(), is(nullValue()));
 
         service.perform(request);
     }
@@ -54,12 +54,12 @@ public final class DataServiceTest extends DatabaseSetup {
         prepareCause(VerificationException.class, ReturnCode.VERIFICATION_WARNING,
                 "Request Object contained errors:" +
                         "\nKey: credential, Error: The Credential is missing." +
-                        "\nKey: circleId, Error: Either a Circle or Data Id must be provided." +
-                        "\nKey: account, Error: Account is missing, null or invalid.");
+                        "\nKey: accountName, Error: AccountName is missing, null or invalid." +
+                        "\nKey: circleId, Error: Either a Circle or Data Id must be provided.");
 
         final FetchDataService service = new FetchDataService(settings, entityManager);
         final FetchDataRequest request = new FetchDataRequest();
-        assertThat(request.getAccount(), is(nullValue()));
+        assertThat(request.getAccountName(), is(nullValue()));
 
         service.perform(request);
     }
@@ -96,7 +96,7 @@ public final class DataServiceTest extends DatabaseSetup {
         assertThat(fetchResponse1.getReturnCode(), is(ReturnCode.SUCCESS));
 
         final ProcessDataRequest updateRequest = prepareUpdateRequest(MEMBER_1, saveResponse.getDataId());
-        updateRequest.setName("New Name");
+        updateRequest.setDataName("New Name");
         final ProcessDataResponse updateResponse = service.perform(updateRequest);
         assertThat(updateResponse.getReturnCode(), is(ReturnCode.SUCCESS));
 
@@ -106,8 +106,8 @@ public final class DataServiceTest extends DatabaseSetup {
         final FetchDataResponse fetchResponse2 = dataService.perform(fetchRequest2);
         assertThat(fetchResponse2.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(fetchResponse1.getMetadata().get(0).getDataId(), is(fetchResponse2.getMetadata().get(0).getDataId()));
-        assertThat(fetchResponse1.getMetadata().get(0).getName(), is("My Data"));
-        assertThat(fetchResponse2.getMetadata().get(0).getName(), is("New Name"));
+        assertThat(fetchResponse1.getMetadata().get(0).getDataName(), is("My Data"));
+        assertThat(fetchResponse2.getMetadata().get(0).getDataName(), is("New Name"));
     }
 
     @Test
@@ -127,7 +127,7 @@ public final class DataServiceTest extends DatabaseSetup {
         request.setAction(Action.UPDATE);
         request.setCircleId(CIRCLE_2_ID);
         request.setDataId(UUID.randomUUID().toString());
-        request.setName("New Name for our not existing Data");
+        request.setDataName("New Name for our not existing Data");
         request.setData(generateData(512));
 
         final ProcessDataResponse response = service.perform(request);
@@ -197,7 +197,7 @@ public final class DataServiceTest extends DatabaseSetup {
         assertThat(addResponse.getDataId(), is(not(nullValue())));
 
         final ProcessDataRequest updateRequest = prepareUpdateRequest(MEMBER_1, addResponse.getDataId());
-        updateRequest.setName("updated Folder Name");
+        updateRequest.setDataName("updated Folder Name");
         final ProcessDataResponse updateResponse = service.perform(updateRequest);
         assertThat(updateResponse.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(updateResponse.getReturnMessage(), is("Ok"));
@@ -262,7 +262,7 @@ public final class DataServiceTest extends DatabaseSetup {
         assertThat(addFolderResponse1.getDataId(), is(not(nullValue())));
         final String folderId1 = addFolderResponse1.getDataId();
 
-        addFolderRequest.setName("folder2");
+        addFolderRequest.setDataName("folder2");
         final ProcessDataResponse addFolderResponse2 = service.perform(addFolderRequest);
         assertThat(addFolderResponse2.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(addFolderResponse2.getReturnMessage(), is("Ok"));
@@ -329,7 +329,7 @@ public final class DataServiceTest extends DatabaseSetup {
         final ProcessDataRequest request = prepareRequest(ProcessDataRequest.class, account);
         request.setAction(Action.ADD);
         request.setCircleId(circleId);
-        request.setName(dataName);
+        request.setDataName(dataName);
         request.setTypeName("data");
         request.setData(generateData(bytes));
 

@@ -71,7 +71,7 @@ public final class ProcessDataService extends Serviceable<ProcessDataResponse, P
     private ProcessDataResponse processAddData(final ProcessDataRequest request) {
         final DataTypeEntity type = dao.findDataTypeByName(request.getTypeName());
         final MetadataEntity parent = findParent(request);
-        final MetadataEntity existingName = dao.findInFolder(member, parent, request.getName());
+        final MetadataEntity existingName = dao.findInFolder(member, parent, request.getDataName());
         final ProcessDataResponse response;
 
         if (existingName == null) {
@@ -81,7 +81,7 @@ public final class ProcessDataService extends Serviceable<ProcessDataResponse, P
             if (Objects.equals(Constants.FOLDER_TYPENAME, type.getName())) {
                 response = createFolder(trustee, request);
             } else if (bytes != null) {
-                final MetadataEntity metadataEntity = createMetadataEntity(trustee, type, parent.getId(), request.getName());
+                final MetadataEntity metadataEntity = createMetadataEntity(trustee, type, parent.getId(), request.getDataName());
                 final KeyEntity keyEntity = trustee.getKey();
                 final KeyAlgorithm algorithm = keyEntity.getAlgorithm();
 
@@ -100,7 +100,7 @@ public final class ProcessDataService extends Serviceable<ProcessDataResponse, P
                 response = new ProcessDataResponse();
                 response.setDataId(metadataEntity.getExternalId());
             } else {
-                final MetadataEntity metadataEntity = createMetadataEntity(trustee, type, parent.getId(), request.getName());
+                final MetadataEntity metadataEntity = createMetadataEntity(trustee, type, parent.getId(), request.getDataName());
                 response = new ProcessDataResponse();
                 response.setDataId(metadataEntity.getExternalId());
             }
@@ -120,7 +120,7 @@ public final class ProcessDataService extends Serviceable<ProcessDataResponse, P
                 final MetadataEntity folder = checkFolder(entity, request.getFolderId());
                 entity.setParentId(folder.getParentId());
             }
-            checkName(entity, request.getName());
+            checkName(entity, request.getDataName());
             checkData(entity, request.getData());
             dao.persist(entity);
 
@@ -188,7 +188,7 @@ public final class ProcessDataService extends Serviceable<ProcessDataResponse, P
     private ProcessDataResponse createFolder(final TrusteeEntity trustee, final ProcessDataRequest request) {
         final MetadataEntity parent = findParent(request);
         final DataTypeEntity folderType = dao.findDataTypeByName(Constants.FOLDER_TYPENAME);
-        final MetadataEntity folder = createMetadata(trustee, request.getName(), parent.getId(), folderType);
+        final MetadataEntity folder = createMetadata(trustee, request.getDataName(), parent.getId(), folderType);
 
         final ProcessDataResponse response = new ProcessDataResponse();
         response.setDataId(folder.getExternalId());

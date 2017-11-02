@@ -7,6 +7,11 @@
  */
 package io.javadog.cws.api.requests;
 
+import static io.javadog.cws.api.common.Constants.FIELD_ACTION;
+import static io.javadog.cws.api.common.Constants.FIELD_CIRCLE_ID;
+import static io.javadog.cws.api.common.Constants.FIELD_CIRCLE_NAME;
+import static io.javadog.cws.api.common.Constants.FIELD_MEMBER_ID;
+import static io.javadog.cws.api.common.Constants.FIELD_TRUSTLEVEL;
 import static io.javadog.cws.api.common.Constants.MAX_NAME_LENGTH;
 
 import io.javadog.cws.api.common.Action;
@@ -27,35 +32,29 @@ import java.util.Map;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "processCircleRequest", propOrder = { "action", "circleId", "circleName", "memberId", "trustLevel" })
+@XmlType(name = "processCircleRequest", propOrder = { FIELD_ACTION, FIELD_CIRCLE_ID, FIELD_CIRCLE_NAME, FIELD_MEMBER_ID, FIELD_TRUSTLEVEL })
 public final class ProcessCircleRequest extends Authentication implements CircleIdRequest {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
-
-    private static final String FIELD_ACTION = "action";
-    private static final String FIELD_CIRCLE_ID = "circleId";
-    private static final String FIELD_CIRCLE_NAME = "circleName";
-    private static final String FIELD_MEMBER_ID = "memberId";
-    private static final String FIELD_TRUSTLEVEL = "trustlevel";
 
     @NotNull
     @XmlElement(name = FIELD_ACTION, required = true)
     private Action action = null;
 
     @Pattern(regexp = Constants.ID_PATTERN_REGEX)
-    @XmlElement(name = FIELD_CIRCLE_ID)
+    @XmlElement(name = FIELD_CIRCLE_ID, required = true)
     private String circleId = null;
 
     @Size(min = 1, max = MAX_NAME_LENGTH)
-    @XmlElement(name = FIELD_CIRCLE_NAME)
+    @XmlElement(name = FIELD_CIRCLE_NAME, required = true)
     private String circleName = null;
 
     @Pattern(regexp = Constants.ID_PATTERN_REGEX)
-    @XmlElement(name = FIELD_MEMBER_ID)
+    @XmlElement(name = FIELD_MEMBER_ID, required = true)
     private String memberId = null;
 
-    @XmlElement(name = FIELD_TRUSTLEVEL)
+    @XmlElement(name = FIELD_TRUSTLEVEL, required = true)
     private TrustLevel trustLevel = null;
 
     // =========================================================================

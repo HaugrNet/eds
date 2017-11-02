@@ -7,6 +7,8 @@
  */
 package io.javadog.cws.api.requests;
 
+import static io.javadog.cws.api.common.Constants.FIELD_CIRCLE_ID;
+
 import io.javadog.cws.api.common.Constants;
 
 import javax.validation.constraints.Pattern;
@@ -21,13 +23,11 @@ import java.util.Map;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "fetchCircleRequest", propOrder = "circleId")
+@XmlType(name = "fetchCircleRequest", propOrder = FIELD_CIRCLE_ID)
 public final class FetchCircleRequest extends Authentication implements CircleIdRequest {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
-
-    private static final String FIELD_CIRCLE_ID = "circleId";
 
     @Pattern(regexp = Constants.ID_PATTERN_REGEX)
     @XmlElement(name = FIELD_CIRCLE_ID, nillable = true, required = true)

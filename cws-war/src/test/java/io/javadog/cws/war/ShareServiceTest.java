@@ -42,14 +42,14 @@ public class ShareServiceTest extends BeanSetup {
         final ShareService service = prepareShareService();
         final ProcessDataTypeRequest request = prepareRequest(ProcessDataTypeRequest.class, Constants.ADMIN_ACCOUNT);
         request.setAction(Action.PROCESS);
-        request.setName("TestType");
+        request.setTypeName("TestType");
         request.setType("Test Type Value");
 
         final ProcessDataTypeResponse response = service.processDataType(request);
         assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(response.getReturnMessage(), is("Ok"));
         assertThat(response.getDataType(), is(not(nullValue())));
-        assertThat(response.getDataType().getName(), is("TestType"));
+        assertThat(response.getDataType().getTypeName(), is("TestType"));
         assertThat(response.getDataType().getType(), is("Test Type Value"));
     }
 
@@ -88,11 +88,11 @@ public class ShareServiceTest extends BeanSetup {
         final FetchDataTypeResponse response = service.fetchDataTypes(request);
         assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(response.getReturnMessage(), is("Ok"));
-        assertThat(response.getTypes().size(), is(2));
-        assertThat(response.getTypes().get(0).getName(), is("data"));
-        assertThat(response.getTypes().get(0).getType(), is("Data Object"));
-        assertThat(response.getTypes().get(1).getName(), is("folder"));
-        assertThat(response.getTypes().get(1).getType(), is("Folder"));
+        assertThat(response.getDataTypes().size(), is(2));
+        assertThat(response.getDataTypes().get(0).getTypeName(), is("data"));
+        assertThat(response.getDataTypes().get(0).getType(), is("Data Object"));
+        assertThat(response.getDataTypes().get(1).getTypeName(), is("folder"));
+        assertThat(response.getDataTypes().get(1).getType(), is("Folder"));
     }
 
     @Test
@@ -129,7 +129,7 @@ public class ShareServiceTest extends BeanSetup {
         request.setAction(Action.ADD);
         request.setData("alfa beta gamma".getBytes(settings.getCharset()));
         request.setCircleId(CIRCLE_1_ID);
-        request.setName("Data Name");
+        request.setDataName("Data Name");
         request.setTypeName("data");
 
         final ProcessDataResponse response = service.processData(request);

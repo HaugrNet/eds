@@ -7,6 +7,9 @@
  */
 package io.javadog.cws.api.requests;
 
+import static io.javadog.cws.api.common.Constants.FIELD_ACCOUNT_NAME;
+import static io.javadog.cws.api.common.Constants.FIELD_CREDENTIAL;
+import static io.javadog.cws.api.common.Constants.FIELD_CREDENTIALTYPE;
 import static io.javadog.cws.api.common.Constants.MAX_NAME_LENGTH;
 
 import io.javadog.cws.api.common.Constants;
@@ -31,38 +34,35 @@ import java.util.concurrent.ConcurrentHashMap;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "authentication", propOrder = { "account", "credential", "credentialType" })
+@XmlType(name = "authentication", propOrder = { FIELD_ACCOUNT_NAME, FIELD_CREDENTIAL, FIELD_CREDENTIALTYPE })
 public class Authentication extends Verifiable {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
-    private static final String FIELD_ACCOUNT = "account";
-    private static final String FIELD_CREDENTIAL = "credential";
-    private static final String FIELD_TYPE = "credentialType";
 
     @NotNull
     @Size(min = 1, max = MAX_NAME_LENGTH)
-    @XmlElement(name = FIELD_ACCOUNT, required = true)
-    private String account = null;
+    @XmlElement(name = FIELD_ACCOUNT_NAME, required = true)
+    private String accountName = null;
 
     @NotNull
     @XmlElement(name = FIELD_CREDENTIAL, required = true)
     private String credential = null;
 
     @NotNull
-    @XmlElement(name = FIELD_TYPE, required = true)
+    @XmlElement(name = FIELD_CREDENTIALTYPE, required = true)
     private CredentialType credentialType = CredentialType.PASSPHRASE;
 
     // =========================================================================
     // Standard Setters & Getters
     // =========================================================================
 
-    public void setAccount(final String account) {
-        this.account = account;
+    public void setAccountName(final String accountName) {
+        this.accountName = accountName;
     }
 
-    public String getAccount() {
-        return account;
+    public String getAccountName() {
+        return accountName;
     }
 
     public void setCredential(final String credential) {
@@ -92,7 +92,7 @@ public class Authentication extends Verifiable {
     public Map<String, String> validate() {
         final Map<String, String> errors = new ConcurrentHashMap<>();
 
-        checkNotNullEmptyOrTooLong(errors, FIELD_ACCOUNT, account, MAX_NAME_LENGTH, "Account is missing, null or invalid.");
+        checkNotNullEmptyOrTooLong(errors, FIELD_ACCOUNT_NAME, accountName, MAX_NAME_LENGTH, "AccountName is missing, null or invalid.");
         checkNotNull(errors, FIELD_CREDENTIAL, credential, "The Credential is missing.");
         if (credentialType == null) {
             credentialType = CredentialType.PASSPHRASE;

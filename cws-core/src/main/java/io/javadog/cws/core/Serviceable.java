@@ -160,7 +160,7 @@ public abstract class Serviceable<R extends CwsResponse, V extends Authenticatio
         // If the External Circle Id is given and the member is not the
         // Administrator (who cannot be part of a Circle), we will use
         // the CircleId in the checks.
-        final String account = verifiable.getAccount();
+        final String account = verifiable.getAccountName();
         if ((circleId != null) && !Objects.equals(account, ADMIN_ACCOUNT)) {
             member = dao.findMemberByNameAndCircleId(account, circleId);
         } else {
@@ -214,14 +214,14 @@ public abstract class Serviceable<R extends CwsResponse, V extends Authenticatio
             final String result = new String(decrypted, charset);
 
             if (!Objects.equals(result, toCheck)) {
-                throw new AuthenticationException("Cannot authenticate the Account '" + verifiable.getAccount() + "' from the given Credentials.");
+                throw new AuthenticationException("Cannot authenticate the Account '" + verifiable.getAccountName() + "' from the given Credentials.");
             }
         } catch (CryptoException e) {
             // Converting Credentials to a Key, which is used to decrypt the
             // saved encrypted private Key - may lead to problem as the Password
             // Key may cause padding problems. Hence, we have both the check in
             // the logic above, but also here.
-            throw new AuthenticationException("Cannot authenticate the Account '" + verifiable.getAccount() + "' from the given Credentials.", e);
+            throw new AuthenticationException("Cannot authenticate the Account '" + verifiable.getAccountName() + "' from the given Credentials.", e);
         }
     }
 

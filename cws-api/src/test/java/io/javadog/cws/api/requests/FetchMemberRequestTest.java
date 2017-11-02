@@ -7,6 +7,9 @@
  */
 package io.javadog.cws.api.requests;
 
+import static io.javadog.cws.api.common.Constants.FIELD_ACCOUNT_NAME;
+import static io.javadog.cws.api.common.Constants.FIELD_CREDENTIAL;
+import static io.javadog.cws.api.common.Constants.FIELD_MEMBER_ID;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -31,7 +34,7 @@ public final class FetchMemberRequestTest {
         final String memberId = UUID.randomUUID().toString();
 
         final FetchMemberRequest request = new FetchMemberRequest();
-        request.setAccount(Constants.ADMIN_ACCOUNT);
+        request.setAccountName(Constants.ADMIN_ACCOUNT);
         request.setCredentialType(CredentialType.PASSPHRASE);
         request.setCredential(Constants.ADMIN_ACCOUNT);
         request.setMemberId(memberId);
@@ -44,7 +47,7 @@ public final class FetchMemberRequestTest {
     @Test
     public void testClassWithoutMemberId() {
         final FetchMemberRequest request = new FetchMemberRequest();
-        request.setAccount(Constants.ADMIN_ACCOUNT);
+        request.setAccountName(Constants.ADMIN_ACCOUNT);
         request.setCredentialType(CredentialType.PASSPHRASE);
         request.setCredential(Constants.ADMIN_ACCOUNT);
 
@@ -58,7 +61,7 @@ public final class FetchMemberRequestTest {
         final String memberId = Constants.ADMIN_ACCOUNT;
 
         final FetchMemberRequest request = new FetchMemberRequest();
-        request.setAccount(Constants.ADMIN_ACCOUNT);
+        request.setAccountName(Constants.ADMIN_ACCOUNT);
         request.setCredentialType(CredentialType.PASSPHRASE);
         request.setCredential(Constants.ADMIN_ACCOUNT);
 
@@ -71,7 +74,7 @@ public final class FetchMemberRequestTest {
         assertThat(request.getMemberId(), is(memberId));
         assertThat(errors, is(not(nullValue())));
         assertThat(errors.size(), is(1));
-        assertThat(errors.get("memberId"), is("The Member Id is invalid."));
+        assertThat(errors.get(FIELD_MEMBER_ID), is("The Member Id is invalid."));
     }
 
     @Test
@@ -82,7 +85,7 @@ public final class FetchMemberRequestTest {
         assertThat(request.getMemberId(), is(nullValue()));
         assertThat(errors, is(not(nullValue())));
         assertThat(errors.size(), is(2));
-        assertThat(errors.get("credential"), is("The Credential is missing."));
-        assertThat(errors.get("account"), is("Account is missing, null or invalid."));
+        assertThat(errors.get(FIELD_ACCOUNT_NAME), is("AccountName is missing, null or invalid."));
+        assertThat(errors.get(FIELD_CREDENTIAL), is("The Credential is missing."));
     }
 }

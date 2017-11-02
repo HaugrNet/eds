@@ -75,7 +75,7 @@ public final class ProcessMemberService extends Serviceable<ProcessMemberRespons
     }
 
     private ProcessMemberResponse createMember(final ProcessMemberRequest request) {
-        final String accountName = request.getAccountName().trim();
+        final String accountName = request.getNewAccountName().trim();
 
         final MemberEntity found = dao.findMemberByName(accountName);
         if (found == null) {
@@ -95,8 +95,8 @@ public final class ProcessMemberService extends Serviceable<ProcessMemberRespons
 
         // Invitations can only be issued by the System Administrator, not by
         // Circle Administrators.
-        if (Objects.equals(Constants.ADMIN_ACCOUNT, request.getAccount())) {
-            final String memberName = request.getAccountName().trim();
+        if (Objects.equals(Constants.ADMIN_ACCOUNT, request.getAccountName())) {
+            final String memberName = request.getNewAccountName().trim();
             final MemberEntity existing = dao.findMemberByName(memberName);
 
             if (existing == null) {
@@ -127,8 +127,8 @@ public final class ProcessMemberService extends Serviceable<ProcessMemberRespons
         final ProcessMemberResponse response = new ProcessMemberResponse();
         response.setMemberId(member.getExternalId());
 
-        if (request.getAccountName() != null) {
-            final String accountName = request.getAccountName().trim();
+        if (request.getNewAccountName() != null) {
+            final String accountName = request.getNewAccountName().trim();
             final MemberEntity existing = dao.findMemberByName(accountName);
 
             if (existing == null) {
@@ -166,7 +166,7 @@ public final class ProcessMemberService extends Serviceable<ProcessMemberRespons
     }
 
     private ProcessMemberResponse processInvitation(final ProcessMemberRequest request) {
-        final MemberEntity account = dao.findMemberByName(request.getAccount());
+        final MemberEntity account = dao.findMemberByName(request.getAccountName());
         final ProcessMemberResponse response;
 
         if (account != null) {

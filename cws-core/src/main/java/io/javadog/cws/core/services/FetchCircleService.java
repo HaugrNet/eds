@@ -152,7 +152,7 @@ public final class FetchCircleService extends Serviceable<FetchCircleResponse, F
         final Circle circle = new Circle();
 
         circle.setCircleId(entity.getExternalId());
-        circle.setName(entity.getName());
+        circle.setCircleName(entity.getName());
         circle.setCreated(entity.getCreated());
 
         return circle;

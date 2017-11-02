@@ -7,6 +7,9 @@
  */
 package io.javadog.cws.api.responses;
 
+import static io.javadog.cws.api.common.Constants.FIELD_RETURN_CODE;
+import static io.javadog.cws.api.common.Constants.FIELD_RETURN_MESSAGE;
+
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
 
@@ -21,16 +24,16 @@ import java.io.Serializable;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "cwsResult", propOrder = { "returnCode", "returnMessage" })
+@XmlType(name = "cwsResult", propOrder = { FIELD_RETURN_CODE, FIELD_RETURN_MESSAGE })
 public class CwsResponse implements Serializable {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
-    @XmlElement(name = "returnCode", required = true)
+    @XmlElement(name = FIELD_RETURN_CODE, required = true)
     private ReturnCode returnCode = ReturnCode.SUCCESS;
 
-    @XmlElement(name = "returnMessage", required = true)
+    @XmlElement(name = FIELD_RETURN_MESSAGE, required = true)
     private String returnMessage = "Ok";
 
     // =========================================================================

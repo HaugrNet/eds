@@ -7,6 +7,9 @@
  */
 package io.javadog.cws.api.responses;
 
+import static io.javadog.cws.api.common.Constants.FIELD_MEMBER_ID;
+import static io.javadog.cws.api.common.Constants.FIELD_SIGNATURE;
+
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
 
@@ -20,16 +23,16 @@ import javax.xml.bind.annotation.XmlType;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "processMemberResult", propOrder = { "memberId", "signature" })
+@XmlType(name = "processMemberResult", propOrder = { FIELD_MEMBER_ID, FIELD_SIGNATURE })
 public final class ProcessMemberResponse extends CwsResponse {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
-    @XmlElement(name = "memberId")
+    @XmlElement(name = FIELD_MEMBER_ID, required = true)
     private String memberId = null;
 
-    @XmlElement
+    @XmlElement(name = FIELD_SIGNATURE, required = true)
     private String signature = null;
 
     // =========================================================================

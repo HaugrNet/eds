@@ -7,6 +7,9 @@
  */
 package io.javadog.cws.api.requests;
 
+import static io.javadog.cws.api.common.Constants.FIELD_ACCOUNT_NAME;
+import static io.javadog.cws.api.common.Constants.FIELD_CIRCLE_ID;
+import static io.javadog.cws.api.common.Constants.FIELD_CREDENTIAL;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -36,7 +39,7 @@ public final class FetchCircleRequestTest {
         final String circleId = UUID.randomUUID().toString();
 
         final FetchCircleRequest request = new FetchCircleRequest();
-        request.setAccount(Constants.ADMIN_ACCOUNT);
+        request.setAccountName(Constants.ADMIN_ACCOUNT);
         request.setCredentialType(CredentialType.PASSPHRASE);
         request.setCredential(Constants.ADMIN_ACCOUNT);
         request.setCircleId(circleId);
@@ -49,7 +52,7 @@ public final class FetchCircleRequestTest {
     @Test
     public void testClassWithoutCircleId() {
         final FetchCircleRequest request = new FetchCircleRequest();
-        request.setAccount(Constants.ADMIN_ACCOUNT);
+        request.setAccountName(Constants.ADMIN_ACCOUNT);
         request.setCredentialType(CredentialType.PASSPHRASE);
         request.setCredential(Constants.ADMIN_ACCOUNT);
 
@@ -63,7 +66,7 @@ public final class FetchCircleRequestTest {
         final String circleId = Constants.ADMIN_ACCOUNT;
 
         final FetchCircleRequest request = new FetchCircleRequest();
-        request.setAccount(Constants.ADMIN_ACCOUNT);
+        request.setAccountName(Constants.ADMIN_ACCOUNT);
         request.setCredentialType(CredentialType.PASSPHRASE);
         request.setCredential(Constants.ADMIN_ACCOUNT);
 
@@ -76,7 +79,7 @@ public final class FetchCircleRequestTest {
         assertThat(request.getCircleId(), is(circleId));
         assertThat(errors, is(not(nullValue())));
         assertThat(errors.size(), is(1));
-        assertThat(errors.get("circleId"), is("The Circle Id is invalid."));
+        assertThat(errors.get(FIELD_CIRCLE_ID), is("The Circle Id is invalid."));
     }
 
     @Test
@@ -87,7 +90,7 @@ public final class FetchCircleRequestTest {
         assertThat(request.getCircleId(), is(nullValue()));
         assertThat(errors, is(not(nullValue())));
         assertThat(errors.size(), is(2));
-        assertThat(errors.get("credential"), is("The Credential is missing."));
-        assertThat(errors.get("account"), is("Account is missing, null or invalid."));
+        assertThat(errors.get(FIELD_ACCOUNT_NAME), is("AccountName is missing, null or invalid."));
+        assertThat(errors.get(FIELD_CREDENTIAL), is("The Credential is missing."));
     }
 }

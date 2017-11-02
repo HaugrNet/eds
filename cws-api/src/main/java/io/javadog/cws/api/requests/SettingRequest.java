@@ -7,6 +7,8 @@
  */
 package io.javadog.cws.api.requests;
 
+import static io.javadog.cws.api.common.Constants.FIELD_SETTINGS;
+
 import io.javadog.cws.api.common.Constants;
 
 import javax.validation.constraints.NotNull;
@@ -22,14 +24,14 @@ import java.util.Map;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "settingRequest", propOrder = "settings")
+@XmlType(name = "settingRequest", propOrder = FIELD_SETTINGS)
 public final class SettingRequest extends Authentication {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
     @NotNull
-    @XmlElement(name = "settings", required = true)
+    @XmlElement(name = FIELD_SETTINGS, required = true)
     private HashMap<String, String> settings = null;
 
     // =========================================================================

@@ -43,12 +43,12 @@ public final class CircleServiceTest extends DatabaseSetup {
         prepareCause(VerificationException.class, ReturnCode.VERIFICATION_WARNING,
                 "Request Object contained errors:" +
                         "\nKey: credential, Error: The Credential is missing." +
-                        "\nKey: account, Error: Account is missing, null or invalid.");
+                        "\nKey: accountName, Error: AccountName is missing, null or invalid.");
 
         final FetchCircleService service = new FetchCircleService(settings, entityManager);
         final FetchCircleRequest request = new FetchCircleRequest();
         // Just making sure that the account is missing
-        assertThat(request.getAccount(), is(nullValue()));
+        assertThat(request.getAccountName(), is(nullValue()));
 
         // Should throw a VerificationException, as the request is invalid.
         service.perform(request);
@@ -59,13 +59,13 @@ public final class CircleServiceTest extends DatabaseSetup {
         prepareCause(VerificationException.class, ReturnCode.VERIFICATION_WARNING,
                 "Request Object contained errors:" +
                         "\nKey: credential, Error: The Credential is missing." +
-                        "\nKey: action, Error: No action has been provided." +
-                        "\nKey: account, Error: Account is missing, null or invalid.");
+                        "\nKey: accountName, Error: AccountName is missing, null or invalid." +
+                        "\nKey: action, Error: No action has been provided.");
 
         final ProcessCircleService service = new ProcessCircleService(settings, entityManager);
         final ProcessCircleRequest request = new ProcessCircleRequest();
         // Just making sure that the account is missing
-        assertThat(request.getAccount(), is(nullValue()));
+        assertThat(request.getAccountName(), is(nullValue()));
 
         // Should throw a VerificationException, as the request is invalid.
         service.perform(request);
@@ -96,9 +96,9 @@ public final class CircleServiceTest extends DatabaseSetup {
         assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(response.getReturnMessage(), is("Ok"));
         assertThat(response.getCircles().size(), is(3));
-        assertThat(response.getCircles().get(0).getName(), is(CIRCLE_1));
-        assertThat(response.getCircles().get(1).getName(), is(CIRCLE_2));
-        assertThat(response.getCircles().get(2).getName(), is(CIRCLE_3));
+        assertThat(response.getCircles().get(0).getCircleName(), is(CIRCLE_1));
+        assertThat(response.getCircles().get(1).getCircleName(), is(CIRCLE_2));
+        assertThat(response.getCircles().get(2).getCircleName(), is(CIRCLE_3));
         assertThat(response.getTrustees().isEmpty(), is(true));
     }
 
@@ -111,9 +111,9 @@ public final class CircleServiceTest extends DatabaseSetup {
         assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(response.getReturnMessage(), is("Ok"));
         assertThat(response.getCircles().size(), is(3));
-        assertThat(response.getCircles().get(0).getName(), is(CIRCLE_1));
-        assertThat(response.getCircles().get(1).getName(), is(CIRCLE_2));
-        assertThat(response.getCircles().get(2).getName(), is(CIRCLE_3));
+        assertThat(response.getCircles().get(0).getCircleName(), is(CIRCLE_1));
+        assertThat(response.getCircles().get(1).getCircleName(), is(CIRCLE_2));
+        assertThat(response.getCircles().get(2).getCircleName(), is(CIRCLE_3));
         assertThat(response.getTrustees().size(), is(0));
     }
 
@@ -132,7 +132,7 @@ public final class CircleServiceTest extends DatabaseSetup {
         assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(response.getReturnMessage(), is("Ok"));
         assertThat(response.getCircles().size(), is(1));
-        assertThat(response.getCircles().get(0).getName(), is(CIRCLE_1));
+        assertThat(response.getCircles().get(0).getCircleName(), is(CIRCLE_1));
         assertThat(response.getTrustees().size(), is(3));
         assertThat(response.getTrustees().get(0).getMember().getAccountName(), is(MEMBER_1));
         assertThat(response.getTrustees().get(1).getMember().getAccountName(), is(MEMBER_2));
@@ -154,7 +154,7 @@ public final class CircleServiceTest extends DatabaseSetup {
         assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(response.getReturnMessage(), is("Ok"));
         assertThat(response.getCircles().size(), is(1));
-        assertThat(response.getCircles().get(0).getName(), is(CIRCLE_1));
+        assertThat(response.getCircles().get(0).getCircleName(), is(CIRCLE_1));
         assertThat(response.getTrustees().size(), is(3));
         assertThat(response.getTrustees().get(0).getMember().getAccountName(), is(MEMBER_1));
         assertThat(response.getTrustees().get(1).getMember().getAccountName(), is(MEMBER_2));
@@ -176,7 +176,7 @@ public final class CircleServiceTest extends DatabaseSetup {
         assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(response.getReturnMessage(), is("Ok"));
         assertThat(response.getCircles().size(), is(1));
-        assertThat(response.getCircles().get(0).getName(), is(CIRCLE_1));
+        assertThat(response.getCircles().get(0).getCircleName(), is(CIRCLE_1));
         assertThat(response.getTrustees().size(), is(3));
         assertThat(response.getTrustees().get(0).getMember().getAccountName(), is(MEMBER_1));
         assertThat(response.getTrustees().get(1).getMember().getAccountName(), is(MEMBER_2));
@@ -198,7 +198,7 @@ public final class CircleServiceTest extends DatabaseSetup {
         assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(response.getReturnMessage(), is("Ok"));
         assertThat(response.getCircles().size(), is(1));
-        assertThat(response.getCircles().get(0).getName(), is(CIRCLE_1));
+        assertThat(response.getCircles().get(0).getCircleName(), is(CIRCLE_1));
         assertThat(response.getTrustees().size(), is(3));
         assertThat(response.getTrustees().get(0).getMember().getAccountName(), is(MEMBER_1));
         assertThat(response.getTrustees().get(1).getMember().getAccountName(), is(MEMBER_2));
@@ -254,7 +254,7 @@ public final class CircleServiceTest extends DatabaseSetup {
         final FetchCircleResponse fetchResponse = fetchService.perform(fetchRequest);
         assertThat(fetchResponse.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(fetchResponse.getCircles().size(), is(1));
-        assertThat(fetchResponse.getCircles().get(0).getName(), is("My Circle"));
+        assertThat(fetchResponse.getCircles().get(0).getCircleName(), is("My Circle"));
     }
 
     @Test
@@ -327,7 +327,7 @@ public final class CircleServiceTest extends DatabaseSetup {
         final FetchCircleResponse fetchResponse = fetchService.perform(fetchRequest);
         assertThat(fetchResponse.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(fetchResponse.getCircles().size(), is(1));
-        assertThat(fetchResponse.getCircles().get(0).getName(), is("Circle One"));
+        assertThat(fetchResponse.getCircles().get(0).getCircleName(), is("Circle One"));
     }
 
     @Test

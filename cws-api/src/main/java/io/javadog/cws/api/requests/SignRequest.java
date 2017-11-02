@@ -7,6 +7,8 @@
  */
 package io.javadog.cws.api.requests;
 
+import static io.javadog.cws.api.common.Constants.FIELD_DATA;
+import static io.javadog.cws.api.common.Constants.FIELD_EXPIRES;
 import static io.javadog.cws.api.common.Utilities.copy;
 
 import io.javadog.cws.api.common.Constants;
@@ -24,18 +26,16 @@ import java.util.Map;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "signRequest", propOrder = { "data", "expires" })
+@XmlType(name = "signRequest", propOrder = { FIELD_DATA, FIELD_EXPIRES })
 public final class SignRequest extends Authentication {
 
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
-    private static final String FIELD_DATA = "data";
-    private static final String FIELD_EXPIRES = "expires";
 
     @NotNull
     @XmlElement(name = FIELD_DATA, required = true)
     private byte[] data = null;
 
-    @XmlElement(name = FIELD_EXPIRES)
+    @XmlElement(name = FIELD_EXPIRES, required = true)
     private Date expires = null;
 
     // =========================================================================

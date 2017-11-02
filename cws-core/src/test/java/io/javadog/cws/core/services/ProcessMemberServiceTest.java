@@ -48,7 +48,7 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
         final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
         request.setAction(Action.CREATE);
-        request.setAccountName(account);
+        request.setNewAccountName(account);
         request.setNewCredential(account);
         final ProcessMemberResponse response = service.perform(request);
 
@@ -63,7 +63,7 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
         final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
         request.setAction(Action.CREATE);
-        request.setAccountName(account);
+        request.setNewAccountName(account);
         request.setNewCredential(account);
         assertThat(request.validate().isEmpty(), is(true));
 
@@ -75,7 +75,7 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
         final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
         request.setAction(Action.INVITE);
-        request.setAccountName("invitee");
+        request.setNewAccountName("invitee");
 
         final ProcessMemberResponse response = service.perform(request);
         assertThat(response, is(not(nullValue())));
@@ -83,7 +83,7 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
         final String signature = response.getSignature();
 
         final ProcessMemberRequest invationRequest = new ProcessMemberRequest();
-        invationRequest.setAccount("invitee");
+        invationRequest.setAccountName("invitee");
         invationRequest.setCredentialType(CredentialType.SIGNATURE);
         invationRequest.setCredential(signature);
         final ProcessMemberResponse invitationResponse = service.perform(invationRequest);
@@ -97,13 +97,13 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
         final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
         request.setAction(Action.INVITE);
-        request.setAccountName("invitee");
+        request.setNewAccountName("invitee");
 
         final ProcessMemberResponse response = service.perform(request);
         assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
 
         final ProcessMemberRequest invationRequest = new ProcessMemberRequest();
-        invationRequest.setAccount("invitee");
+        invationRequest.setAccountName("invitee");
         invationRequest.setCredentialType(CredentialType.SIGNATURE);
         invationRequest.setCredential(bogusSignature);
         final ProcessMemberResponse invitationResponse = service.perform(invationRequest);
@@ -117,13 +117,13 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
         final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
         request.setAction(Action.INVITE);
-        request.setAccountName("invitee");
+        request.setNewAccountName("invitee");
 
         final ProcessMemberResponse response = service.perform(request);
         assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
 
         final ProcessMemberRequest invationRequest = new ProcessMemberRequest();
-        invationRequest.setAccount("invitee");
+        invationRequest.setAccountName("invitee");
         invationRequest.setCredentialType(CredentialType.SIGNATURE);
         invationRequest.setCredential(UUID.randomUUID().toString());
 
@@ -134,7 +134,7 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
     public void testInvitationWithoutPendingInvitation() {
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
         final ProcessMemberRequest request = new ProcessMemberRequest();
-        request.setAccount(MEMBER_1);
+        request.setAccountName(MEMBER_1);
         request.setCredentialType(CredentialType.SIGNATURE);
         request.setCredential(UUID.randomUUID().toString());
 
@@ -147,7 +147,7 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
     public void testInvitationWithoutAccount() {
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
         final ProcessMemberRequest request = new ProcessMemberRequest();
-        request.setAccount("wannabe");
+        request.setNewAccountName("wannabe");
         request.setCredentialType(CredentialType.SIGNATURE);
         request.setCredential(UUID.randomUUID().toString());
 
@@ -161,7 +161,7 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
         final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
         request.setAction(Action.INVITE);
-        request.setAccountName(MEMBER_4);
+        request.setNewAccountName(MEMBER_4);
 
         final ProcessMemberResponse response = service.perform(request);
         assertThat(response.getReturnCode(), is(ReturnCode.CONSTRAINT_ERROR));
@@ -173,7 +173,7 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
         final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, MEMBER_1);
         request.setAction(Action.INVITE);
-        request.setAccountName("invitee");
+        request.setNewAccountName("invitee");
 
         final ProcessMemberResponse response = service.perform(request);
         assertThat(response.getReturnCode(), is(ReturnCode.ILLEGAL_ACTION));
@@ -185,7 +185,7 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
         final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, MEMBER_1);
         request.setAction(Action.PROCESS);
-        request.setAccountName("Supreme Member");
+        request.setNewAccountName("Supreme Member");
         request.setNewCredential("Bla bla bla");
 
         final ProcessMemberResponse response = service.perform(request);
@@ -198,7 +198,7 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
         final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, MEMBER_1);
         request.setAction(Action.PROCESS);
-        request.setAccountName(MEMBER_2);
+        request.setNewAccountName(MEMBER_2);
         request.setNewCredential("Bla bla bla");
         assertThat(request.validate().size(), is(0));
 

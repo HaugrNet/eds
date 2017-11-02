@@ -62,12 +62,12 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
         prepareCause(VerificationException.class, ReturnCode.VERIFICATION_WARNING,
                 "Request Object contained errors:" +
                         "\nKey: credential, Error: The Credential is missing." +
-                        "\nKey: account, Error: Account is missing, null or invalid.");
+                        "\nKey: accountName, Error: AccountName is missing, null or invalid.");
 
         final FetchMemberService service = new FetchMemberService(settings, entityManager);
         final FetchMemberRequest request = new FetchMemberRequest();
         // Just making sure that the account is missing
-        assertThat(request.getAccount(), is(nullValue()));
+        assertThat(request.getAccountName(), is(nullValue()));
 
         // Should throw a VerificationException, as the request is invalid.
         service.perform(request);

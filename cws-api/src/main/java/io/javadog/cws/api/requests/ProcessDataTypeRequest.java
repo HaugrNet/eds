@@ -7,6 +7,9 @@
  */
 package io.javadog.cws.api.requests;
 
+import static io.javadog.cws.api.common.Constants.FIELD_ACTION;
+import static io.javadog.cws.api.common.Constants.FIELD_TYPE;
+import static io.javadog.cws.api.common.Constants.FIELD_TYPENAME;
 import static io.javadog.cws.api.common.Constants.MAX_NAME_LENGTH;
 import static io.javadog.cws.api.common.Constants.MAX_STRING_LENGTH;
 
@@ -26,23 +29,19 @@ import java.util.Map;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "processDataTypeRequest", propOrder = { "action", "name", "type" })
+@XmlType(name = "processDataTypeRequest", propOrder = { FIELD_ACTION, FIELD_TYPENAME, FIELD_TYPE })
 public final class ProcessDataTypeRequest extends Authentication {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
-
-    private static final String FIELD_ACTION = "action";
-    private static final String FIELD_NAME = "name";
-    private static final String FIELD_TYPE = "type";
 
     @XmlElement(name = FIELD_ACTION, required = true)
     private Action action = Action.PROCESS;
 
     @NotNull
     @Size(min = 1, max = MAX_NAME_LENGTH)
-    @XmlElement(name = FIELD_NAME, required = true)
-    private String name = null;
+    @XmlElement(name = FIELD_TYPENAME, required = true)
+    private String typeName = null;
 
     @NotNull
     @Size(min = 1, max = MAX_STRING_LENGTH)
@@ -61,12 +60,12 @@ public final class ProcessDataTypeRequest extends Authentication {
         return action;
     }
 
-    public void setName(final String name) {
-        this.name = name;
+    public void setTypeName(final String typeName) {
+        this.typeName = typeName;
     }
 
-    public String getName() {
-        return name;
+    public String getTypeName() {
+        return typeName;
     }
 
     public void setType(final String type) {
@@ -93,11 +92,11 @@ public final class ProcessDataTypeRequest extends Authentication {
         } else {
             switch (action) {
                 case PROCESS:
-                    checkNotNullEmptyOrTooLong(errors, FIELD_NAME, name, MAX_NAME_LENGTH, "The name of the DataType is missing or invalid.");
-                    checkNotNullEmptyOrTooLong(errors, FIELD_TYPE, name, MAX_STRING_LENGTH, "The type of the DataType is missing or invalid.");
+                    checkNotNullEmptyOrTooLong(errors, FIELD_TYPENAME, typeName, MAX_NAME_LENGTH, "The name of the DataType is missing or invalid.");
+                    checkNotNullEmptyOrTooLong(errors, FIELD_TYPE, type, MAX_STRING_LENGTH, "The type of the DataType is missing or invalid.");
                     break;
                 case DELETE:
-                    checkNotNullEmptyOrTooLong(errors, FIELD_NAME, name, MAX_NAME_LENGTH, "The name of the DataType is missing or invalid.");
+                    checkNotNullEmptyOrTooLong(errors, FIELD_TYPENAME, typeName, MAX_NAME_LENGTH, "The name of the DataType is missing or invalid.");
                     break;
                 default:
                     errors.put(FIELD_ACTION, "Invalid Action provided.");

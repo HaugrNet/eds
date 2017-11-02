@@ -7,6 +7,8 @@
  */
 package io.javadog.cws.api.responses;
 
+import static io.javadog.cws.api.common.Constants.FIELD_DATATYPES;
+
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.dtos.DataType;
@@ -24,14 +26,14 @@ import java.util.List;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "fetchDataTypeResult", propOrder = "types")
+@XmlType(name = "fetchDataTypeResult", propOrder = FIELD_DATATYPES)
 public final class FetchDataTypeResponse extends CwsResponse {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
-    @XmlElement(name = "types")
-    private final List<DataType> types = new ArrayList<>(0);
+    @XmlElement(name = FIELD_DATATYPES, required = true)
+    private final List<DataType> dataTypes = new ArrayList<>(0);
 
     // =========================================================================
     // Object Constructors
@@ -60,11 +62,11 @@ public final class FetchDataTypeResponse extends CwsResponse {
     // Setters & Getters
     // =========================================================================
 
-    public void setTypes(final List<DataType> types) {
-        this.types.addAll(types);
+    public void setDataTypes(final List<DataType> types) {
+        this.dataTypes.addAll(types);
     }
 
-    public List<DataType> getTypes() {
-        return Collections.unmodifiableList(types);
+    public List<DataType> getDataTypes() {
+        return Collections.unmodifiableList(dataTypes);
     }
 }

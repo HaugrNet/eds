@@ -7,6 +7,9 @@
  */
 package io.javadog.cws.api.dtos;
 
+import static io.javadog.cws.api.common.Constants.FIELD_CIRCLE_ID;
+import static io.javadog.cws.api.common.Constants.FIELD_CIRCLE_NAME;
+import static io.javadog.cws.api.common.Constants.FIELD_CREATED;
 import static io.javadog.cws.api.common.Utilities.copy;
 
 import io.javadog.cws.api.common.Constants;
@@ -24,20 +27,17 @@ import java.util.Objects;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "circle", propOrder = { "circleId", "name", "created" })
+@XmlType(name = "circle", propOrder = { FIELD_CIRCLE_ID, FIELD_CIRCLE_NAME, FIELD_CREATED })
 public final class Circle implements Serializable {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
-    private static final String FIELD_CIRCLE_ID = "circleId";
-    private static final String FIELD_NAME = "name";
-    private static final String FIELD_CREATED = "created";
 
     @XmlElement(name = FIELD_CIRCLE_ID, required = true)
     private String circleId = null;
 
-    @XmlElement(name = FIELD_NAME, required = true)
-    private String name = null;
+    @XmlElement(name = FIELD_CIRCLE_NAME, required = true)
+    private String circleName = null;
 
     @XmlElement(name = FIELD_CREATED)
     private Date created = null;
@@ -54,12 +54,12 @@ public final class Circle implements Serializable {
         return circleId;
     }
 
-    public void setName(final String name) {
-        this.name = name;
+    public void setCircleName(final String circleName) {
+        this.circleName = circleName;
     }
 
-    public String getName() {
-        return name;
+    public String getCircleName() {
+        return circleName;
     }
 
     public void setCreated(final Date created) {
@@ -89,7 +89,7 @@ public final class Circle implements Serializable {
 
         final Circle that = (Circle) obj;
         return Objects.equals(circleId, that.circleId) &&
-                Objects.equals(name, that.name) &&
+                Objects.equals(circleName, that.circleName) &&
                 Objects.equals(created, that.created);
     }
 
@@ -98,7 +98,7 @@ public final class Circle implements Serializable {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(circleId, name, created);
+        return Objects.hash(circleId, circleName, created);
     }
 
     /**
@@ -107,7 +107,7 @@ public final class Circle implements Serializable {
     public String toString() {
         return "Circle{" +
                 "circleId='" + circleId + '\'' +
-                ", name='" + name + '\'' +
+                ", circleName='" + circleName + '\'' +
                 ", created=" + created +
                 '}';
     }

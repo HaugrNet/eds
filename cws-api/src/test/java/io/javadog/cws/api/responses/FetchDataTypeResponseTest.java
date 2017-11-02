@@ -31,12 +31,12 @@ public final class FetchDataTypeResponseTest {
         }
 
         final FetchDataTypeResponse response = new FetchDataTypeResponse();
-        response.setTypes(types);
+        response.setDataTypes(types);
 
         assertThat(response.isOk(), is(true));
         assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(response.getReturnMessage(), is("Ok"));
-        assertThat(response.getTypes().size(), is(3));
+        assertThat(response.getDataTypes().size(), is(3));
     }
 
     @Test
@@ -46,6 +46,6 @@ public final class FetchDataTypeResponseTest {
         assertThat(response.isOk(), is(false));
         assertThat(response.getReturnCode(), is(ReturnCode.CONSTRAINT_ERROR));
         assertThat(response.getReturnMessage(), is("Bollocks."));
-        assertThat(response.getTypes().isEmpty(), is(true));
+        assertThat(response.getDataTypes().isEmpty(), is(true));
     }
 }

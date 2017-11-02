@@ -7,6 +7,9 @@
  */
 package io.javadog.cws.api.responses;
 
+import static io.javadog.cws.api.common.Constants.FIELD_CIRCLES;
+import static io.javadog.cws.api.common.Constants.FIELD_TRUSTEES;
+
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.dtos.Circle;
@@ -25,16 +28,16 @@ import java.util.List;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "fetchCircleResult", propOrder = { "circles", "trustees" })
+@XmlType(name = "fetchCircleResult", propOrder = { FIELD_CIRCLES, FIELD_TRUSTEES })
 public final class FetchCircleResponse extends CwsResponse {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
-    @XmlElement(name = "circles", required = true)
+    @XmlElement(name = FIELD_CIRCLES, required = true)
     private final List<Circle> circles = new ArrayList<>(0);
 
-    @XmlElement(name = "trustees", required = true)
+    @XmlElement(name = FIELD_TRUSTEES, required = true)
     private final List<Trustee> trustees = new ArrayList<>(0);
 
     // =========================================================================

@@ -25,7 +25,7 @@ public final class SignRequestTest {
     @Test
     public void testClass() {
         final SignRequest request = new SignRequest();
-        request.setAccount(Constants.ADMIN_ACCOUNT);
+        request.setAccountName(Constants.ADMIN_ACCOUNT);
         request.setCredentialType(CredentialType.PASSPHRASE);
         request.setCredential(Constants.ADMIN_ACCOUNT);
 

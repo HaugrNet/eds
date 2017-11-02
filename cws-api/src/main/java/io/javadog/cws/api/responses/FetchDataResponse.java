@@ -7,6 +7,8 @@
  */
 package io.javadog.cws.api.responses;
 
+import static io.javadog.cws.api.common.Constants.FIELD_DATA;
+import static io.javadog.cws.api.common.Constants.FIELD_METADATA;
 import static io.javadog.cws.api.common.Utilities.copy;
 
 import io.javadog.cws.api.common.Constants;
@@ -26,16 +28,16 @@ import java.util.List;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "fetchDataResult", propOrder = { "metadata", "data" })
+@XmlType(name = "fetchDataResult", propOrder = { FIELD_METADATA, FIELD_DATA })
 public final class FetchDataResponse extends CwsResponse {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
-    @XmlElement(name = "metadata", required = true)
+    @XmlElement(name = FIELD_METADATA, required = true)
     private final List<Metadata> metadata = new ArrayList<>(0);
 
-    @XmlElement(name = "data", required = true)
+    @XmlElement(name = FIELD_DATA, required = true)
     private byte[] data = null;
 
     // =========================================================================

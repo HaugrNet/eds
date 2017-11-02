@@ -7,6 +7,11 @@
  */
 package io.javadog.cws.api.requests;
 
+import static io.javadog.cws.api.common.Constants.FIELD_ACCOUNT_NAME;
+import static io.javadog.cws.api.common.Constants.FIELD_ACTION;
+import static io.javadog.cws.api.common.Constants.FIELD_MEMBER_ID;
+import static io.javadog.cws.api.common.Constants.FIELD_NEW_ACCOUNT_NAME;
+import static io.javadog.cws.api.common.Constants.FIELD_NEW_CREDENTIAL;
 import static io.javadog.cws.api.common.Constants.MAX_NAME_LENGTH;
 import static io.javadog.cws.api.common.Constants.MAX_STRING_LENGTH;
 
@@ -27,30 +32,25 @@ import java.util.Map;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "processMemberRequest", propOrder = { "action", "memberId", "accountName", "newCredential" })
+@XmlType(name = "processMemberRequest", propOrder = { FIELD_ACTION, FIELD_MEMBER_ID, FIELD_NEW_ACCOUNT_NAME, FIELD_NEW_CREDENTIAL })
 public final class ProcessMemberRequest extends Authentication {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
-
-    private static final String FIELD_ACTION = "action";
-    private static final String FIELD_MEMBER_ID = "memberId";
-    private static final String FIELD_ACCOUNT_NAME = "accountName";
-    private static final String FIELD_NEW_CREDENTIAL = "newCredential";
 
     @NotNull
     @XmlElement(name = FIELD_ACTION, required = true)
     private Action action = null;
 
     @Pattern(regexp = Constants.ID_PATTERN_REGEX)
-    @XmlElement(name = FIELD_MEMBER_ID)
+    @XmlElement(name = FIELD_MEMBER_ID, required = true)
     private String memberId = null;
 
     @Size(min = 1, max = MAX_NAME_LENGTH)
-    @XmlElement(name = FIELD_ACCOUNT_NAME)
-    private String accountName = null;
+    @XmlElement(name = FIELD_NEW_ACCOUNT_NAME, required = true)
+    private String newAccountName = null;
 
-    @XmlElement(name = FIELD_NEW_CREDENTIAL)
+    @XmlElement(name = FIELD_NEW_CREDENTIAL, required = true)
     private String newCredential = null;
 
     // =========================================================================
@@ -73,12 +73,12 @@ public final class ProcessMemberRequest extends Authentication {
         return memberId;
     }
 
-    public void setAccountName(final String accountName) {
-        this.accountName = accountName;
+    public void setNewAccountName(final String newAccountName) {
+        this.newAccountName = newAccountName;
     }
 
-    public String getAccountName() {
-        return accountName;
+    public String getNewAccountName() {
+        return newAccountName;
     }
 
     public void setNewCredential(final String newCredential) {
@@ -105,14 +105,14 @@ public final class ProcessMemberRequest extends Authentication {
         } else {
             switch (action) {
                 case CREATE:
-                    checkNotNullOrEmpty(errors, FIELD_ACCOUNT_NAME, accountName, "The Account Name os missing.");
+                    checkNotNullOrEmpty(errors, FIELD_NEW_ACCOUNT_NAME, newAccountName, "The Account Name os missing.");
                     checkNotNullOrEmpty(errors, FIELD_NEW_CREDENTIAL, newCredential, "The Credentials are required to create new Account.");
                     break;
                 case INVITE:
-                    checkNotNullOrEmpty(errors, FIELD_ACCOUNT_NAME, accountName, "The Account Name os missing.");
+                    checkNotNullOrEmpty(errors, FIELD_NEW_ACCOUNT_NAME, newAccountName, "The Account Name os missing.");
                     break;
                 case PROCESS:
-                    checkNotTooLong(errors, FIELD_ACCOUNT_NAME, accountName, MAX_STRING_LENGTH, "The " + FIELD_ACCOUNT_NAME + " may not exceed " + MAX_STRING_LENGTH + " characters.");
+                    checkNotTooLong(errors, FIELD_NEW_ACCOUNT_NAME, newAccountName, MAX_STRING_LENGTH, "The " + FIELD_NEW_ACCOUNT_NAME + " may not exceed " + MAX_STRING_LENGTH + " characters.");
                     break;
                 case DELETE:
                     checkNotNullAndValidId(errors, FIELD_MEMBER_ID, memberId, "A valid " + FIELD_MEMBER_ID + " is required to delete an account.");

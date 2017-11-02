@@ -7,6 +7,12 @@
  */
 package io.javadog.cws.api.dtos;
 
+import static io.javadog.cws.api.common.Constants.FIELD_ADDED;
+import static io.javadog.cws.api.common.Constants.FIELD_CIRCLE_ID;
+import static io.javadog.cws.api.common.Constants.FIELD_DATATYPE;
+import static io.javadog.cws.api.common.Constants.FIELD_DATA_ID;
+import static io.javadog.cws.api.common.Constants.FIELD_DATA_NAME;
+import static io.javadog.cws.api.common.Constants.FIELD_FOLDER_ID;
 import static io.javadog.cws.api.common.Utilities.copy;
 
 import io.javadog.cws.api.common.Constants;
@@ -24,18 +30,11 @@ import java.util.Objects;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "metadata", propOrder = { "dataId", "circleId", "folderId", "name", "dataType", "added" })
+@XmlType(name = "metadata", propOrder = { FIELD_DATA_ID, FIELD_CIRCLE_ID, FIELD_FOLDER_ID, FIELD_DATA_NAME, FIELD_DATATYPE, FIELD_ADDED })
 public final class Metadata implements Serializable {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
-
-    private static final String FIELD_DATA_ID = "dataId";
-    private static final String FIELD_CIRCLE_ID = "circleId";
-    private static final String FIELD_FOLDER_ID = "folderId";
-    private static final String FIELD_NAME = "name";
-    private static final String FIELD_DATATYPE = "dataType";
-    private static final String FIELD_ADDED = "added";
 
     @XmlElement(name = FIELD_DATA_ID, nillable = true, required = true)
     private String dataId = null;
@@ -46,8 +45,8 @@ public final class Metadata implements Serializable {
     @XmlElement(name = FIELD_FOLDER_ID, nillable = true, required = true)
     private String folderId = null;
 
-    @XmlElement(name = FIELD_NAME, nillable = true, required = true)
-    private String name = null;
+    @XmlElement(name = FIELD_DATA_NAME, nillable = true, required = true)
+    private String dataName = null;
 
     @XmlElement(name = FIELD_DATATYPE, required = true)
     private DataType dataType = null;
@@ -83,12 +82,12 @@ public final class Metadata implements Serializable {
         return folderId;
     }
 
-    public void setName(final String name) {
-        this.name = name;
+    public void setDataName(final String dataName) {
+        this.dataName = dataName;
     }
 
-    public String getName() {
-        return name;
+    public String getDataName() {
+        return dataName;
     }
 
     public void setDataType(final DataType dataType) {
@@ -128,7 +127,7 @@ public final class Metadata implements Serializable {
         return Objects.equals(dataId, that.dataId) &&
                 Objects.equals(circleId, that.circleId) &&
                 Objects.equals(folderId, that.folderId) &&
-                Objects.equals(name, that.name) &&
+                Objects.equals(dataName, that.dataName) &&
                 Objects.equals(dataType, that.dataType) &&
                 Objects.equals(added, that.added);
     }
@@ -138,7 +137,7 @@ public final class Metadata implements Serializable {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(dataId, circleId, folderId, name, dataType, added);
+        return Objects.hash(dataId, circleId, folderId, dataName, dataType, added);
     }
 
     /**
@@ -150,7 +149,7 @@ public final class Metadata implements Serializable {
                 "dataId='" + dataId + '\'' +
                 ", circleId='" + circleId + '\'' +
                 ", folderId='" + folderId + '\'' +
-                ", name='" + name + '\'' +
+                ", dataName='" + dataName + '\'' +
                 ", dataType=" + dataType +
                 ", added=" + added +
                 '}';

@@ -25,7 +25,7 @@ public final class FetchDataTypeRequestTest {
     @Test
     public void testClass() {
         final FetchDataTypeRequest request = new FetchDataTypeRequest();
-        request.setAccount(Constants.ADMIN_ACCOUNT);
+        request.setAccountName(Constants.ADMIN_ACCOUNT);
         request.setCredentialType(CredentialType.PASSPHRASE);
         request.setCredential(Constants.ADMIN_ACCOUNT);
 

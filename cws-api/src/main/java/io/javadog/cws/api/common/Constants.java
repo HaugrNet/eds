@@ -57,6 +57,50 @@ public final class Constants {
 
     public static final int MAX_PAGE_SIZE = 100;
 
+    // Following is a list of the Field names being used as part of the SOAP
+    // WSDL file - they are listed here, so the names can be used as part of
+    // the XML Class Annotations.
+    public static final String FIELD_CIRCLE_ID = "circleId";
+    public static final String FIELD_MEMBER_ID = "memberId";
+    public static final String FIELD_FOLDER_ID = "folderId";
+    public static final String FIELD_DATA_ID = "dataId";
+    public static final String FIELD_ACCOUNT_NAME = "accountName";
+    public static final String FIELD_NEW_ACCOUNT_NAME = "newAccountName";
+    public static final String FIELD_CREDENTIAL = "credential";
+    public static final String FIELD_NEW_CREDENTIAL = "newCredential";
+    public static final String FIELD_CREDENTIALTYPE = "credentialType";
+    public static final String FIELD_CIRCLE = "circle";
+    public static final String FIELD_CIRCLES = "circles";
+    public static final String FIELD_CIRCLE_NAME = "circleName";
+    public static final String FIELD_TRUSTEES = "trustees";
+    public static final String FIELD_MEMBER = "member";
+    public static final String FIELD_MEMBERS = "members";
+    public static final String FIELD_TRUSTLEVEL = "trustLevel";
+    public static final String FIELD_METADATA = "metadata";
+    public static final String FIELD_DATA_NAME = "dataName";
+    public static final String FIELD_DATA = "data";
+    public static final String FIELD_DATATYPE = "dataType";
+    public static final String FIELD_DATATYPES = "dataTypes";
+    public static final String FIELD_TYPENAME = "typeName";
+    public static final String FIELD_TYPE = "type";
+    public static final String FIELD_SIGNATURE = "signature";
+    public static final String FIELD_SIGNATURES = "signatures";
+    public static final String FIELD_SETTINGS = "settings";
+    public static final String FIELD_EXPIRES = "expires";
+    public static final String FIELD_VERIFICATIONS = "verifications";
+    public static final String FIELD_LAST_VERIFICATION = "lastVerification";
+    public static final String FIELD_ADDED = "added";
+    public static final String FIELD_SINCE = "since";
+    public static final String FIELD_CHANGED = "changed";
+    public static final String FIELD_CREATED = "created";
+    public static final String FIELD_VERSION = "version";
+    public static final String FIELD_VERIFIED = "verified";
+    public static final String FIELD_ACTION = "action";
+    public static final String FIELD_RETURN_CODE = "returnCode";
+    public static final String FIELD_RETURN_MESSAGE = "returnMessage";
+    public static final String FIELD_PAGE_NUMBER = "pageNumber";
+    public static final String FIELD_PAGE_SIZE = "pageSize";
+
     private Constants() {
         // Private Constructor, this is a Constants Class.
     }

@@ -43,13 +43,13 @@ public final class FetchDataTypeService extends Serviceable<FetchDataTypeRespons
         final List<DataType> objectTypes = new ArrayList<>(types.size());
         for (final DataTypeEntity type : types) {
             final DataType objectType = new DataType();
-            objectType.setName(type.getName());
+            objectType.setTypeName(type.getName());
             objectType.setType(type.getType());
             objectTypes.add(objectType);
         }
 
         final FetchDataTypeResponse response = new FetchDataTypeResponse();
-        response.setTypes(objectTypes);
+        response.setDataTypes(objectTypes);
 
         return response;
     }

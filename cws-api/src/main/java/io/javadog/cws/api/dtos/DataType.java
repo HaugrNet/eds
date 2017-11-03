@@ -7,9 +7,6 @@
  */
 package io.javadog.cws.api.dtos;
 
-import static io.javadog.cws.api.common.Constants.FIELD_TYPE;
-import static io.javadog.cws.api.common.Constants.FIELD_TYPENAME;
-
 import io.javadog.cws.api.common.Constants;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -24,16 +21,16 @@ import java.util.Objects;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "dataType", propOrder = { FIELD_TYPENAME, FIELD_TYPE })
+@XmlType(name = "dataType", propOrder = { Constants.FIELD_TYPENAME, Constants.FIELD_TYPE })
 public final class DataType implements Serializable {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
-    @XmlElement(name = FIELD_TYPENAME, required = true)
+    @XmlElement(name = Constants.FIELD_TYPENAME, required = true)
     private String typeName = null;
 
-    @XmlElement(name = FIELD_TYPE, required = true)
+    @XmlElement(name = Constants.FIELD_TYPE, required = true)
     private String type = null;
 
     // =========================================================================

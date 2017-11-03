@@ -7,11 +7,6 @@
  */
 package io.javadog.cws.api.dtos;
 
-import static io.javadog.cws.api.common.Constants.FIELD_CHANGED;
-import static io.javadog.cws.api.common.Constants.FIELD_CIRCLE;
-import static io.javadog.cws.api.common.Constants.FIELD_MEMBER;
-import static io.javadog.cws.api.common.Constants.FIELD_SINCE;
-import static io.javadog.cws.api.common.Constants.FIELD_TRUSTLEVEL;
 import static io.javadog.cws.api.common.Utilities.copy;
 
 import io.javadog.cws.api.common.Constants;
@@ -32,25 +27,25 @@ import java.util.Objects;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "trustee", propOrder = { FIELD_CIRCLE, FIELD_MEMBER, FIELD_TRUSTLEVEL, FIELD_CHANGED, FIELD_SINCE })
+@XmlType(name = "trustee", propOrder = { Constants.FIELD_CIRCLE, Constants.FIELD_MEMBER, Constants.FIELD_TRUSTLEVEL, Constants.FIELD_CHANGED, Constants.FIELD_SINCE })
 public final class Trustee implements Serializable {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
-    @XmlElement(name = FIELD_CIRCLE, required = true)
+    @XmlElement(name = Constants.FIELD_CIRCLE, required = true)
     private Circle circle = null;
 
-    @XmlElement(name = FIELD_MEMBER, required = true)
+    @XmlElement(name = Constants.FIELD_MEMBER, required = true)
     private Member member = null;
 
-    @XmlElement(name = FIELD_TRUSTLEVEL, required = true)
+    @XmlElement(name = Constants.FIELD_TRUSTLEVEL, required = true)
     private TrustLevel trustLevel = null;
 
-    @XmlElement(name = FIELD_CHANGED)
+    @XmlElement(name = Constants.FIELD_CHANGED)
     private Date changed = null;
 
-    @XmlElement(name = FIELD_SINCE)
+    @XmlElement(name = Constants.FIELD_SINCE)
     private Date since = null;
 
     // =========================================================================

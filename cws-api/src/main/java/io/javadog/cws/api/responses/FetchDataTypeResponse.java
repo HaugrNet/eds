@@ -7,8 +7,6 @@
  */
 package io.javadog.cws.api.responses;
 
-import static io.javadog.cws.api.common.Constants.FIELD_DATATYPES;
-
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.dtos.DataType;
@@ -26,13 +24,13 @@ import java.util.List;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "fetchDataTypeResult", propOrder = FIELD_DATATYPES)
+@XmlType(name = "fetchDataTypeResult", propOrder = Constants.FIELD_DATATYPES)
 public final class FetchDataTypeResponse extends CwsResponse {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
-    @XmlElement(name = FIELD_DATATYPES, required = true)
+    @XmlElement(name = Constants.FIELD_DATATYPES, required = true)
     private final List<DataType> dataTypes = new ArrayList<>(0);
 
     // =========================================================================

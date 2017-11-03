@@ -7,11 +7,6 @@
  */
 package io.javadog.cws.api.dtos;
 
-import static io.javadog.cws.api.common.Constants.FIELD_CREATED;
-import static io.javadog.cws.api.common.Constants.FIELD_EXPIRES;
-import static io.javadog.cws.api.common.Constants.FIELD_LAST_VERIFICATION;
-import static io.javadog.cws.api.common.Constants.FIELD_SIGNATURE;
-import static io.javadog.cws.api.common.Constants.FIELD_VERIFICATIONS;
 import static io.javadog.cws.api.common.Utilities.copy;
 
 import io.javadog.cws.api.common.Constants;
@@ -29,25 +24,25 @@ import java.util.Objects;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "signature", propOrder = { FIELD_SIGNATURE, FIELD_EXPIRES, FIELD_VERIFICATIONS, FIELD_LAST_VERIFICATION, FIELD_CREATED })
+@XmlType(name = "signature", propOrder = { Constants.FIELD_SIGNATURE, Constants.FIELD_EXPIRES, Constants.FIELD_VERIFICATIONS, Constants.FIELD_LAST_VERIFICATION, Constants.FIELD_CREATED })
 public final class Signature implements Serializable {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
-    @XmlElement(name = FIELD_SIGNATURE)
+    @XmlElement(name = Constants.FIELD_SIGNATURE)
     private String theSignature = null;
 
-    @XmlElement(name = FIELD_EXPIRES)
+    @XmlElement(name = Constants.FIELD_EXPIRES)
     private Date expires = null;
 
-    @XmlElement(name = FIELD_VERIFICATIONS)
+    @XmlElement(name = Constants.FIELD_VERIFICATIONS)
     private Long verifications = null;
 
-    @XmlElement(name = FIELD_LAST_VERIFICATION)
+    @XmlElement(name = Constants.FIELD_LAST_VERIFICATION)
     private Date lastVerification = null;
 
-    @XmlElement(name = FIELD_CREATED)
+    @XmlElement(name = Constants.FIELD_CREATED)
     private Date created = null;
 
     // =========================================================================

@@ -11,42 +11,41 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
 import io.javadog.cws.api.common.ReturnCode;
-import io.javadog.cws.api.dtos.DataType;
 import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Kim Jensen
  * @since  CWS 1.0
  */
-public final class FetchDataTypeResponseTest {
+public final class SettingResponseTest {
 
     @Test
     public void testClassflow() {
-        final List<DataType> dataTypes = new ArrayList<>(3);
-        dataTypes.add(new DataType());
-        dataTypes.add(new DataType());
-        dataTypes.add(new DataType());
+        final Map<String, String> settings = new HashMap();
+        settings.put("key1", "value1");
+        settings.put("key2", "value2");
+        settings.put("key3", "value3");
 
-        final FetchDataTypeResponse response = new FetchDataTypeResponse();
-        response.setDataTypes(dataTypes);
+        final SettingResponse response = new SettingResponse();
+        response.setSettings(settings);
 
         assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(response.getReturnMessage(), is("Ok"));
         assertThat(response.isOk(), is(true));
-        assertThat(response.getDataTypes(), is(dataTypes));
+        assertThat(response.getSettings(), is(settings));
     }
 
     @Test
     public void testError() {
-        final String msg = "FetchDataType Request failed due to Verification Problems.";
-        final FetchDataTypeResponse response = new FetchDataTypeResponse(ReturnCode.VERIFICATION_WARNING, msg);
+        final String msg = "Setting Request failed due to Verification Problems.";
+        final SettingResponse response = new SettingResponse(ReturnCode.VERIFICATION_WARNING, msg);
 
         assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING));
         assertThat(response.getReturnMessage(), is(msg));
         assertThat(response.isOk(), is(false));
-        assertThat(response.getDataTypes(), is(new ArrayList<>(0)));
+        assertThat(response.getSettings(), is(new HashMap<>(0)));
     }
 }

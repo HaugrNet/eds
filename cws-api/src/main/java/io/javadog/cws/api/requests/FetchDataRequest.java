@@ -7,12 +7,6 @@
  */
 package io.javadog.cws.api.requests;
 
-import static io.javadog.cws.api.common.Constants.FIELD_CIRCLE_ID;
-import static io.javadog.cws.api.common.Constants.FIELD_DATA_ID;
-import static io.javadog.cws.api.common.Constants.FIELD_PAGE_NUMBER;
-import static io.javadog.cws.api.common.Constants.FIELD_PAGE_SIZE;
-import static io.javadog.cws.api.common.Constants.MAX_PAGE_SIZE;
-
 import io.javadog.cws.api.common.Constants;
 
 import javax.validation.constraints.Pattern;
@@ -28,27 +22,27 @@ import java.util.Map;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "fetchDataRequest", propOrder = { FIELD_CIRCLE_ID, FIELD_DATA_ID, FIELD_PAGE_NUMBER, FIELD_PAGE_SIZE })
+@XmlType(name = "fetchDataRequest", propOrder = { Constants.FIELD_CIRCLE_ID, Constants.FIELD_DATA_ID, Constants.FIELD_PAGE_NUMBER, Constants.FIELD_PAGE_SIZE })
 public final class FetchDataRequest extends Authentication implements CircleIdRequest {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
     @Pattern(regexp = Constants.ID_PATTERN_REGEX)
-    @XmlElement(name = FIELD_CIRCLE_ID, nillable = true, required = true)
+    @XmlElement(name = Constants.FIELD_CIRCLE_ID, nillable = true, required = true)
     private String circleId = null;
 
     @Pattern(regexp = Constants.ID_PATTERN_REGEX)
-    @XmlElement(name = FIELD_DATA_ID, nillable = true, required = true)
+    @XmlElement(name = Constants.FIELD_DATA_ID, nillable = true, required = true)
     private String dataId = null;
 
     @Size(min = 1)
-    @XmlElement(name = FIELD_PAGE_NUMBER, nillable = true)
+    @XmlElement(name = Constants.FIELD_PAGE_NUMBER, nillable = true)
     private int pageNumber = 1;
 
-    @Size(min = 1, max = MAX_PAGE_SIZE)
-    @XmlElement(name = FIELD_PAGE_SIZE, nillable = true)
-    private int pageSize = MAX_PAGE_SIZE;
+    @Size(min = 1, max = Constants.MAX_PAGE_SIZE)
+    @XmlElement(name = Constants.FIELD_PAGE_SIZE, nillable = true)
+    private int pageSize = Constants.MAX_PAGE_SIZE;
 
     // =========================================================================
     // Setters & Getters
@@ -106,12 +100,12 @@ public final class FetchDataRequest extends Authentication implements CircleIdRe
         final Map<String, String> errors = super.validate();
 
         if ((circleId == null) && (dataId == null)) {
-            errors.put(FIELD_CIRCLE_ID, "Either a Circle or Data Id must be provided.");
+            errors.put(Constants.FIELD_CIRCLE_ID, "Either a Circle or Data Id must be provided.");
         }
-        checkValidId(errors, FIELD_CIRCLE_ID, circleId, "The Circle Id is invalid.");
-        checkValidId(errors, FIELD_DATA_ID, dataId, "The Data Id is invalid.");
-        checkIntegerWithMax(errors, FIELD_PAGE_NUMBER, pageNumber, Integer.MAX_VALUE, "The Page Number must be a positive number, starting with 1.");
-        checkIntegerWithMax(errors, FIELD_PAGE_SIZE, pageSize, MAX_PAGE_SIZE, "The Page Size must be a positive number, starting with 1.");
+        checkValidId(errors, Constants.FIELD_CIRCLE_ID, circleId, "The Circle Id is invalid.");
+        checkValidId(errors, Constants.FIELD_DATA_ID, dataId, "The Data Id is invalid.");
+        checkIntegerWithMax(errors, Constants.FIELD_PAGE_NUMBER, pageNumber, Integer.MAX_VALUE, "The Page Number must be a positive number, starting with 1.");
+        checkIntegerWithMax(errors, Constants.FIELD_PAGE_SIZE, pageSize, Constants.MAX_PAGE_SIZE, "The Page Size must be a positive number, starting with 1.");
 
         return errors;
     }

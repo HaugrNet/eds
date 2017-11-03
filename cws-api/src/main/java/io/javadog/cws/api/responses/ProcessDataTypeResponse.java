@@ -7,8 +7,6 @@
  */
 package io.javadog.cws.api.responses;
 
-import static io.javadog.cws.api.common.Constants.FIELD_DATATYPE;
-
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.dtos.DataType;
@@ -23,13 +21,13 @@ import javax.xml.bind.annotation.XmlType;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "processDataTypeResult", propOrder = FIELD_DATATYPE)
+@XmlType(name = "processDataTypeResult", propOrder = Constants.FIELD_DATATYPE)
 public final class ProcessDataTypeResponse extends CwsResponse {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
-    @XmlElement(name = FIELD_DATATYPE, required = true)
+    @XmlElement(name = Constants.FIELD_DATATYPE, required = true)
     private DataType dataType = null;
 
     // =========================================================================

@@ -52,7 +52,7 @@ public abstract class CWSKey<T extends Key> {
             return true;
         }
 
-        if (!(obj instanceof CWSKey)) {
+        if ((obj == null) || (getClass() != obj.getClass())) {
             return false;
         }
 

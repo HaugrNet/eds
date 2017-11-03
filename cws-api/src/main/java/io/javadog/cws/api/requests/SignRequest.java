@@ -7,8 +7,6 @@
  */
 package io.javadog.cws.api.requests;
 
-import static io.javadog.cws.api.common.Constants.FIELD_DATA;
-import static io.javadog.cws.api.common.Constants.FIELD_EXPIRES;
 import static io.javadog.cws.api.common.Utilities.copy;
 
 import io.javadog.cws.api.common.Constants;
@@ -26,16 +24,16 @@ import java.util.Map;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "signRequest", propOrder = { FIELD_DATA, FIELD_EXPIRES })
+@XmlType(name = "signRequest", propOrder = { Constants.FIELD_DATA, Constants.FIELD_EXPIRES })
 public final class SignRequest extends Authentication {
 
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
     @NotNull
-    @XmlElement(name = FIELD_DATA, required = true)
+    @XmlElement(name = Constants.FIELD_DATA, required = true)
     private byte[] data = null;
 
-    @XmlElement(name = FIELD_EXPIRES, required = true)
+    @XmlElement(name = Constants.FIELD_EXPIRES, required = true)
     private Date expires = null;
 
     // =========================================================================
@@ -69,7 +67,7 @@ public final class SignRequest extends Authentication {
     public Map<String, String> validate() {
         final Map<String, String> errors = super.validate();
 
-        checkNotNull(errors, FIELD_DATA, data, "The Data Object to create a Signature is missing.");
+        checkNotNull(errors, Constants.FIELD_DATA, data, "The Data Object to create a Signature is missing.");
 
         return errors;
     }

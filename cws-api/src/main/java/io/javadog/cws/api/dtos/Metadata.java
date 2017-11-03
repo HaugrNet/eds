@@ -7,12 +7,6 @@
  */
 package io.javadog.cws.api.dtos;
 
-import static io.javadog.cws.api.common.Constants.FIELD_ADDED;
-import static io.javadog.cws.api.common.Constants.FIELD_CIRCLE_ID;
-import static io.javadog.cws.api.common.Constants.FIELD_DATATYPE;
-import static io.javadog.cws.api.common.Constants.FIELD_DATA_ID;
-import static io.javadog.cws.api.common.Constants.FIELD_DATA_NAME;
-import static io.javadog.cws.api.common.Constants.FIELD_FOLDER_ID;
 import static io.javadog.cws.api.common.Utilities.copy;
 
 import io.javadog.cws.api.common.Constants;
@@ -30,28 +24,28 @@ import java.util.Objects;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "metadata", propOrder = { FIELD_DATA_ID, FIELD_CIRCLE_ID, FIELD_FOLDER_ID, FIELD_DATA_NAME, FIELD_DATATYPE, FIELD_ADDED })
+@XmlType(name = "metadata", propOrder = { Constants.FIELD_DATA_ID, Constants.FIELD_CIRCLE_ID, Constants.FIELD_FOLDER_ID, Constants.FIELD_DATA_NAME, Constants.FIELD_DATATYPE, Constants.FIELD_ADDED })
 public final class Metadata implements Serializable {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
-    @XmlElement(name = FIELD_DATA_ID, nillable = true, required = true)
+    @XmlElement(name = Constants.FIELD_DATA_ID, nillable = true, required = true)
     private String dataId = null;
 
-    @XmlElement(name = FIELD_CIRCLE_ID, nillable = true, required = true)
+    @XmlElement(name = Constants.FIELD_CIRCLE_ID, nillable = true, required = true)
     private String circleId = null;
 
-    @XmlElement(name = FIELD_FOLDER_ID, nillable = true, required = true)
+    @XmlElement(name = Constants.FIELD_FOLDER_ID, nillable = true, required = true)
     private String folderId = null;
 
-    @XmlElement(name = FIELD_DATA_NAME, nillable = true, required = true)
+    @XmlElement(name = Constants.FIELD_DATA_NAME, nillable = true, required = true)
     private String dataName = null;
 
-    @XmlElement(name = FIELD_DATATYPE, required = true)
+    @XmlElement(name = Constants.FIELD_DATATYPE, required = true)
     private DataType dataType = null;
 
-    @XmlElement(name = FIELD_ADDED)
+    @XmlElement(name = Constants.FIELD_ADDED)
     private Date added = null;
 
     // =========================================================================

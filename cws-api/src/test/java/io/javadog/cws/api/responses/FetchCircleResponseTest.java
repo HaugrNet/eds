@@ -25,62 +25,30 @@ import java.util.List;
 public final class FetchCircleResponseTest {
 
     @Test
-    public void testFetchingAllCircles() {
-        final FetchCircleResponse response = new FetchCircleResponse();
-        response.setCircles(prepareCircles(3));
+    public void testClassflow() {
+        final List<Circle> circles = new ArrayList();
+        final List<Trustee> trustees = new ArrayList();
 
-        assertThat(response.isOk(), is(true));
+        final FetchCircleResponse response = new FetchCircleResponse();
+        response.setCircles(circles);
+        response.setTrustees(trustees);
+
         assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(response.getReturnMessage(), is("Ok"));
-        assertThat(response.getCircles().size(), is(3));
-        assertThat(response.getTrustees().isEmpty(), is(true));
+        assertThat(response.isOk(), is(true));
+        assertThat(response.getCircles(), is(circles));
+        assertThat(response.getTrustees(), is(trustees));
     }
 
     @Test
-    public void testFetchingSpecificCircle() {
-        final FetchCircleResponse response = new FetchCircleResponse();
-        response.setCircles(prepareCircles(1));
-        response.setTrustees(prepareTrustees());
+    public void testError() {
+        final String msg = "FetchCircle Request failed due to Verification Problems.";
+        final FetchCircleResponse response = new FetchCircleResponse(ReturnCode.VERIFICATION_WARNING, msg);
 
-        assertThat(response.isOk(), is(true));
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
-        assertThat(response.getReturnMessage(), is("Ok"));
-        assertThat(response.getCircles().size(), is(1));
-        assertThat(response.getTrustees().size(), is(3));
-    }
-
-    @Test
-    public void testFetchingWithError() {
-        final FetchCircleResponse response = new FetchCircleResponse(ReturnCode.CONSTRAINT_ERROR, "Bollocks.");
-
+        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING));
+        assertThat(response.getReturnMessage(), is(msg));
         assertThat(response.isOk(), is(false));
-        assertThat(response.getReturnCode(), is(ReturnCode.CONSTRAINT_ERROR));
-        assertThat(response.getReturnMessage(), is("Bollocks."));
-        assertThat(response.getCircles().isEmpty(), is(true));
-        assertThat(response.getTrustees().isEmpty(), is(true));
-    }
-
-    // =========================================================================
-    // Internal Helper Methods
-    // =========================================================================
-
-    private static List<Circle> prepareCircles(final int amount) {
-        final List<Circle> circles = new ArrayList<>(amount);
-
-        for (int i = 0; i < amount; i++) {
-            circles.add(new Circle());
-        }
-
-        return circles;
-    }
-
-    private static List<Trustee> prepareTrustees() {
-        final List<Trustee> trustees = new ArrayList<>(3);
-
-        for (int i = 0; i < 3; i++) {
-            trustees.add(new Trustee());
-        }
-
-        return trustees;
+        assertThat(response.getCircles(), is(new ArrayList<>(0)));
+        assertThat(response.getTrustees(), is(new ArrayList<>(0)));
     }
 }

@@ -7,8 +7,6 @@
  */
 package io.javadog.cws.api.requests;
 
-import static io.javadog.cws.api.common.Constants.FIELD_MEMBER_ID;
-
 import io.javadog.cws.api.common.Constants;
 
 import javax.validation.constraints.Pattern;
@@ -23,14 +21,14 @@ import java.util.Map;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "fetchMemberRequest", propOrder = FIELD_MEMBER_ID)
+@XmlType(name = "fetchMemberRequest", propOrder = Constants.FIELD_MEMBER_ID)
 public final class FetchMemberRequest extends Authentication {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
     @Pattern(regexp = Constants.ID_PATTERN_REGEX)
-    @XmlElement(name = FIELD_MEMBER_ID, nillable = true, required = true)
+    @XmlElement(name = Constants.FIELD_MEMBER_ID, nillable = true, required = true)
     private String memberId = null;
 
     // =========================================================================
@@ -56,7 +54,7 @@ public final class FetchMemberRequest extends Authentication {
     public Map<String, String> validate() {
         final Map<String, String> errors = super.validate();
 
-        checkValidId(errors, FIELD_MEMBER_ID, memberId, "The Member Id is invalid.");
+        checkValidId(errors, Constants.FIELD_MEMBER_ID, memberId, "The Member Id is invalid.");
 
         return errors;
     }

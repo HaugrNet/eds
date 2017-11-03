@@ -7,15 +7,6 @@
  */
 package io.javadog.cws.api.requests;
 
-import static io.javadog.cws.api.common.Constants.FIELD_ACTION;
-import static io.javadog.cws.api.common.Constants.FIELD_CIRCLE_ID;
-import static io.javadog.cws.api.common.Constants.FIELD_DATA;
-import static io.javadog.cws.api.common.Constants.FIELD_DATA_ID;
-import static io.javadog.cws.api.common.Constants.FIELD_DATA_NAME;
-import static io.javadog.cws.api.common.Constants.FIELD_FOLDER_ID;
-import static io.javadog.cws.api.common.Constants.FIELD_TYPENAME;
-import static io.javadog.cws.api.common.Constants.MAX_NAME_LENGTH;
-import static io.javadog.cws.api.common.Constants.MAX_STRING_LENGTH;
 import static io.javadog.cws.api.common.Utilities.copy;
 
 import io.javadog.cws.api.common.Action;
@@ -35,38 +26,38 @@ import java.util.Map;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "processDataRequest", propOrder = { FIELD_ACTION, FIELD_DATA_ID, FIELD_CIRCLE_ID, FIELD_DATA_NAME, FIELD_FOLDER_ID, FIELD_TYPENAME, FIELD_DATA })
+@XmlType(name = "processDataRequest", propOrder = { Constants.FIELD_ACTION, Constants.FIELD_DATA_ID, Constants.FIELD_CIRCLE_ID, Constants.FIELD_DATA_NAME, Constants.FIELD_FOLDER_ID, Constants.FIELD_TYPENAME, Constants.FIELD_DATA })
 public final class ProcessDataRequest extends Authentication implements CircleIdRequest {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
     @NotNull
-    @XmlElement(name = FIELD_ACTION, required = true)
+    @XmlElement(name = Constants.FIELD_ACTION, required = true)
     private Action action = Action.PROCESS;
 
     @Pattern(regexp = Constants.ID_PATTERN_REGEX)
-    @XmlElement(name = FIELD_DATA_ID, nillable = true, required = true)
+    @XmlElement(name = Constants.FIELD_DATA_ID, nillable = true, required = true)
     private String dataId = null;
 
     @Pattern(regexp = Constants.ID_PATTERN_REGEX)
-    @XmlElement(name = FIELD_CIRCLE_ID, nillable = true)
+    @XmlElement(name = Constants.FIELD_CIRCLE_ID, nillable = true)
     private String circleId = null;
 
-    @Size(min = 1, max = MAX_STRING_LENGTH)
-    @XmlElement(name = FIELD_DATA_NAME, nillable = true)
+    @Size(min = 1, max = Constants.MAX_STRING_LENGTH)
+    @XmlElement(name = Constants.FIELD_DATA_NAME, nillable = true)
     private String dataName = null;
 
     @Pattern(regexp = Constants.ID_PATTERN_REGEX)
-    @XmlElement(name = FIELD_FOLDER_ID, nillable = true)
+    @XmlElement(name = Constants.FIELD_FOLDER_ID, nillable = true)
     private String folderId = null;
 
 
-    @Size(min = 1, max = MAX_NAME_LENGTH)
-    @XmlElement(name = FIELD_TYPENAME, required = true)
+    @Size(min = 1, max = Constants.MAX_NAME_LENGTH)
+    @XmlElement(name = Constants.FIELD_TYPENAME, required = true)
     private String typeName = null;
 
-    @XmlElement(name = FIELD_DATA, nillable = true)
+    @XmlElement(name = Constants.FIELD_DATA, nillable = true)
     private byte[] data = null;
 
     // =========================================================================
@@ -149,25 +140,25 @@ public final class ProcessDataRequest extends Authentication implements CircleId
         final Map<String, String> errors = super.validate();
 
         if (action == null) {
-            errors.put(FIELD_ACTION, "No action has been provided.");
+            errors.put(Constants.FIELD_ACTION, "No action has been provided.");
         } else {
             switch (action) {
                 case ADD:
-                    checkNotNullAndValidId(errors, FIELD_CIRCLE_ID, circleId, "The Circle Id is missing or invalid.");
-                    checkValidId(errors, FIELD_FOLDER_ID, folderId, "The Folder Id is invalid.");
-                    checkNotNullEmptyOrTooLong(errors, FIELD_DATA_NAME, dataName, MAX_STRING_LENGTH, "The name of the new Data Object is invalid.");
-                    checkNotNullOrEmpty(errors, FIELD_TYPENAME, typeName, "The Data Type is missing or invalid.");
+                    checkNotNullAndValidId(errors, Constants.FIELD_CIRCLE_ID, circleId, "The Circle Id is missing or invalid.");
+                    checkValidId(errors, Constants.FIELD_FOLDER_ID, folderId, "The Folder Id is invalid.");
+                    checkNotNullEmptyOrTooLong(errors, Constants.FIELD_DATA_NAME, dataName, Constants.MAX_STRING_LENGTH, "The name of the new Data Object is invalid.");
+                    checkNotNullOrEmpty(errors, Constants.FIELD_TYPENAME, typeName, "The Data Type is missing or invalid.");
                     break;
                 case UPDATE:
-                    checkNotNullAndValidId(errors, FIELD_DATA_ID, dataId, "The Id is missing or invalid.");
-                    checkValidId(errors, FIELD_FOLDER_ID, folderId, "The Folder Id is invalid.");
-                    checkNotTooLong(errors, FIELD_DATA_NAME, dataName, MAX_STRING_LENGTH, "The name of the new Data Object is invalid.");
+                    checkNotNullAndValidId(errors, Constants.FIELD_DATA_ID, dataId, "The Id is missing or invalid.");
+                    checkValidId(errors, Constants.FIELD_FOLDER_ID, folderId, "The Folder Id is invalid.");
+                    checkNotTooLong(errors, Constants.FIELD_DATA_NAME, dataName, Constants.MAX_STRING_LENGTH, "The name of the new Data Object is invalid.");
                     break;
                 case DELETE:
-                    checkNotNullAndValidId(errors, FIELD_DATA_ID, dataId, "The Id is missing or invalid.");
+                    checkNotNullAndValidId(errors, Constants.FIELD_DATA_ID, dataId, "The Id is missing or invalid.");
                     break;
                 default:
-                    errors.put(FIELD_ACTION, "Invalid Action provided.");
+                    errors.put(Constants.FIELD_ACTION, "Invalid Action provided.");
             }
         }
 

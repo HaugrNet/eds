@@ -7,9 +7,6 @@
  */
 package io.javadog.cws.api.dtos;
 
-import static io.javadog.cws.api.common.Constants.FIELD_CIRCLE_ID;
-import static io.javadog.cws.api.common.Constants.FIELD_CIRCLE_NAME;
-import static io.javadog.cws.api.common.Constants.FIELD_CREATED;
 import static io.javadog.cws.api.common.Utilities.copy;
 
 import io.javadog.cws.api.common.Constants;
@@ -27,19 +24,19 @@ import java.util.Objects;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "circle", propOrder = { FIELD_CIRCLE_ID, FIELD_CIRCLE_NAME, FIELD_CREATED })
+@XmlType(name = "circle", propOrder = { Constants.FIELD_CIRCLE_ID, Constants.FIELD_CIRCLE_NAME, Constants.FIELD_CREATED })
 public final class Circle implements Serializable {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
-    @XmlElement(name = FIELD_CIRCLE_ID, required = true)
+    @XmlElement(name = Constants.FIELD_CIRCLE_ID, required = true)
     private String circleId = null;
 
-    @XmlElement(name = FIELD_CIRCLE_NAME, required = true)
+    @XmlElement(name = Constants.FIELD_CIRCLE_NAME, required = true)
     private String circleName = null;
 
-    @XmlElement(name = FIELD_CREATED)
+    @XmlElement(name = Constants.FIELD_CREATED)
     private Date created = null;
 
     // =========================================================================

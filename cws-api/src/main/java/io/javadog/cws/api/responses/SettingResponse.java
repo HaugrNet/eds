@@ -7,8 +7,6 @@
  */
 package io.javadog.cws.api.responses;
 
-import static io.javadog.cws.api.common.Constants.FIELD_SETTINGS;
-
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
 
@@ -24,13 +22,13 @@ import java.util.Map;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "settingResult", propOrder = FIELD_SETTINGS)
+@XmlType(name = "settingResult", propOrder = Constants.FIELD_SETTINGS)
 public final class SettingResponse extends CwsResponse {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
-    @XmlElement(name = FIELD_SETTINGS, required = true)
+    @XmlElement(name = Constants.FIELD_SETTINGS, required = true)
     private final HashMap<String, String> settings = new HashMap<>();
 
     // =========================================================================

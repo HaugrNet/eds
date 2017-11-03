@@ -7,11 +7,6 @@
  */
 package io.javadog.cws.api.requests;
 
-import static io.javadog.cws.api.common.Constants.FIELD_ACCOUNT_NAME;
-import static io.javadog.cws.api.common.Constants.FIELD_CREDENTIAL;
-import static io.javadog.cws.api.common.Constants.FIELD_CREDENTIALTYPE;
-import static io.javadog.cws.api.common.Constants.MAX_NAME_LENGTH;
-
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.CredentialType;
 
@@ -34,23 +29,23 @@ import java.util.concurrent.ConcurrentHashMap;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "authentication", propOrder = { FIELD_ACCOUNT_NAME, FIELD_CREDENTIAL, FIELD_CREDENTIALTYPE })
+@XmlType(name = "authentication", propOrder = { Constants.FIELD_ACCOUNT_NAME, Constants.FIELD_CREDENTIAL, Constants.FIELD_CREDENTIALTYPE })
 public class Authentication extends Verifiable {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
     @NotNull
-    @Size(min = 1, max = MAX_NAME_LENGTH)
-    @XmlElement(name = FIELD_ACCOUNT_NAME, required = true)
+    @Size(min = 1, max = Constants.MAX_NAME_LENGTH)
+    @XmlElement(name = Constants.FIELD_ACCOUNT_NAME, required = true)
     private String accountName = null;
 
     @NotNull
-    @XmlElement(name = FIELD_CREDENTIAL, required = true)
+    @XmlElement(name = Constants.FIELD_CREDENTIAL, required = true)
     private String credential = null;
 
     @NotNull
-    @XmlElement(name = FIELD_CREDENTIALTYPE, required = true)
+    @XmlElement(name = Constants.FIELD_CREDENTIALTYPE, required = true)
     private CredentialType credentialType = CredentialType.PASSPHRASE;
 
     // =========================================================================
@@ -92,8 +87,8 @@ public class Authentication extends Verifiable {
     public Map<String, String> validate() {
         final Map<String, String> errors = new ConcurrentHashMap<>();
 
-        checkNotNullEmptyOrTooLong(errors, FIELD_ACCOUNT_NAME, accountName, MAX_NAME_LENGTH, "AccountName is missing, null or invalid.");
-        checkNotNull(errors, FIELD_CREDENTIAL, credential, "The Credential is missing.");
+        checkNotNullEmptyOrTooLong(errors, Constants.FIELD_ACCOUNT_NAME, accountName, Constants.MAX_NAME_LENGTH, "AccountName is missing, null or invalid.");
+        checkNotNull(errors, Constants.FIELD_CREDENTIAL, credential, "The Credential is missing.");
         if (credentialType == null) {
             credentialType = CredentialType.PASSPHRASE;
         }

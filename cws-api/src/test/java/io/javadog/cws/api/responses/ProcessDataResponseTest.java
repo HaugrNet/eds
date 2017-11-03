@@ -8,45 +8,41 @@
 package io.javadog.cws.api.responses;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 
 import io.javadog.cws.api.common.ReturnCode;
-import io.javadog.cws.api.dtos.DataType;
 import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.UUID;
 
 /**
  * @author Kim Jensen
  * @since  CWS 1.0
  */
-public final class FetchDataTypeResponseTest {
+public final class ProcessDataResponseTest {
 
     @Test
     public void testClassflow() {
-        final List<DataType> dataTypes = new ArrayList<>(3);
-        dataTypes.add(new DataType());
-        dataTypes.add(new DataType());
-        dataTypes.add(new DataType());
+        final String dataId = UUID.randomUUID().toString();
 
-        final FetchDataTypeResponse response = new FetchDataTypeResponse();
-        response.setDataTypes(dataTypes);
+        final ProcessDataResponse response = new ProcessDataResponse();
+        response.setDataId(dataId);
 
         assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(response.getReturnMessage(), is("Ok"));
         assertThat(response.isOk(), is(true));
-        assertThat(response.getDataTypes(), is(dataTypes));
+        assertThat(response.getDataId(), is(dataId));
     }
 
     @Test
     public void testError() {
-        final String msg = "FetchDataType Request failed due to Verification Problems.";
-        final FetchDataTypeResponse response = new FetchDataTypeResponse(ReturnCode.VERIFICATION_WARNING, msg);
+        final String msg = "ProcessData Request failed due to Verification Problems.";
+        final ProcessDataResponse response = new ProcessDataResponse(ReturnCode.VERIFICATION_WARNING, msg);
 
         assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING));
         assertThat(response.getReturnMessage(), is(msg));
         assertThat(response.isOk(), is(false));
-        assertThat(response.getDataTypes(), is(new ArrayList<>(0)));
+        assertThat(response.getDataId(), is(nullValue()));
     }
 }

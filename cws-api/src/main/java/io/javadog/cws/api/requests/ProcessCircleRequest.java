@@ -7,13 +7,6 @@
  */
 package io.javadog.cws.api.requests;
 
-import static io.javadog.cws.api.common.Constants.FIELD_ACTION;
-import static io.javadog.cws.api.common.Constants.FIELD_CIRCLE_ID;
-import static io.javadog.cws.api.common.Constants.FIELD_CIRCLE_NAME;
-import static io.javadog.cws.api.common.Constants.FIELD_MEMBER_ID;
-import static io.javadog.cws.api.common.Constants.FIELD_TRUSTLEVEL;
-import static io.javadog.cws.api.common.Constants.MAX_NAME_LENGTH;
-
 import io.javadog.cws.api.common.Action;
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.TrustLevel;
@@ -32,29 +25,29 @@ import java.util.Map;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "processCircleRequest", propOrder = { FIELD_ACTION, FIELD_CIRCLE_ID, FIELD_CIRCLE_NAME, FIELD_MEMBER_ID, FIELD_TRUSTLEVEL })
+@XmlType(name = "processCircleRequest", propOrder = { Constants.FIELD_ACTION, Constants.FIELD_CIRCLE_ID, Constants.FIELD_CIRCLE_NAME, Constants.FIELD_MEMBER_ID, Constants.FIELD_TRUSTLEVEL })
 public final class ProcessCircleRequest extends Authentication implements CircleIdRequest {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
     @NotNull
-    @XmlElement(name = FIELD_ACTION, required = true)
+    @XmlElement(name = Constants.FIELD_ACTION, required = true)
     private Action action = null;
 
     @Pattern(regexp = Constants.ID_PATTERN_REGEX)
-    @XmlElement(name = FIELD_CIRCLE_ID, required = true)
+    @XmlElement(name = Constants.FIELD_CIRCLE_ID, required = true)
     private String circleId = null;
 
-    @Size(min = 1, max = MAX_NAME_LENGTH)
-    @XmlElement(name = FIELD_CIRCLE_NAME, required = true)
+    @Size(min = 1, max = Constants.MAX_NAME_LENGTH)
+    @XmlElement(name = Constants.FIELD_CIRCLE_NAME, required = true)
     private String circleName = null;
 
     @Pattern(regexp = Constants.ID_PATTERN_REGEX)
-    @XmlElement(name = FIELD_MEMBER_ID, required = true)
+    @XmlElement(name = Constants.FIELD_MEMBER_ID, required = true)
     private String memberId = null;
 
-    @XmlElement(name = FIELD_TRUSTLEVEL, required = true)
+    @XmlElement(name = Constants.FIELD_TRUSTLEVEL, required = true)
     private TrustLevel trustLevel = null;
 
     // =========================================================================
@@ -121,36 +114,36 @@ public final class ProcessCircleRequest extends Authentication implements Circle
         final Map<String, String> errors = super.validate();
 
         if (action == null) {
-            errors.put(FIELD_ACTION, "No action has been provided.");
+            errors.put(Constants.FIELD_ACTION, "No action has been provided.");
         } else {
             switch (action) {
                 case CREATE:
-                    checkNotNullOrEmpty(errors, FIELD_CIRCLE_NAME, circleName, "Cannot create a new Circle, without the Circle Name.");
-                    checkNotNullAndValidId(errors, FIELD_MEMBER_ID, memberId, "Cannot create a new Circle, without an initial Circle Administrator, please provide a Member Id.");
+                    checkNotNullOrEmpty(errors, Constants.FIELD_CIRCLE_NAME, circleName, "Cannot create a new Circle, without the Circle Name.");
+                    checkNotNullAndValidId(errors, Constants.FIELD_MEMBER_ID, memberId, "Cannot create a new Circle, without an initial Circle Administrator, please provide a Member Id.");
                     break;
                 case UPDATE:
-                    checkNotNullAndValidId(errors, FIELD_CIRCLE_ID, circleId, "Cannot update the Circle Name, without knowing the Circle Id.");
-                    checkNotNullOrEmpty(errors, FIELD_CIRCLE_NAME, circleName, "Cannot update the Circle Name, without a new Circle Name.");
+                    checkNotNullAndValidId(errors, Constants.FIELD_CIRCLE_ID, circleId, "Cannot update the Circle Name, without knowing the Circle Id.");
+                    checkNotNullOrEmpty(errors, Constants.FIELD_CIRCLE_NAME, circleName, "Cannot update the Circle Name, without a new Circle Name.");
                     break;
                 case DELETE:
-                    checkNotNullAndValidId(errors, FIELD_CIRCLE_ID, circleId, "Cannot delete a Circle, without knowing the Circle Id.");
+                    checkNotNullAndValidId(errors, Constants.FIELD_CIRCLE_ID, circleId, "Cannot delete a Circle, without knowing the Circle Id.");
                     break;
                 case ADD:
-                    checkNotNullAndValidId(errors, FIELD_CIRCLE_ID, circleId, "Cannot add a Trustee to a Circle, without a Circle Id.");
-                    checkValidId(errors, FIELD_MEMBER_ID, memberId, "Cannot add a Trustee to a Circle, without a Member Id.");
-                    checkNotNull(errors, FIELD_TRUSTLEVEL, trustLevel, "Cannot add a Trustee to a Circle, without an initial TrustLevel.");
+                    checkNotNullAndValidId(errors, Constants.FIELD_CIRCLE_ID, circleId, "Cannot add a Trustee to a Circle, without a Circle Id.");
+                    checkValidId(errors, Constants.FIELD_MEMBER_ID, memberId, "Cannot add a Trustee to a Circle, without a Member Id.");
+                    checkNotNull(errors, Constants.FIELD_TRUSTLEVEL, trustLevel, "Cannot add a Trustee to a Circle, without an initial TrustLevel.");
                     break;
                 case ALTER:
-                    checkNotNullAndValidId(errors, FIELD_CIRCLE_ID, circleId, "Cannot alter a Trustees TrustLevel, without knowing the Circle Id.");
-                    checkValidId(errors, FIELD_MEMBER_ID, memberId, "Cannot alter a Trustees TrustLevel, without knowing the Member Id.");
-                    checkNotNull(errors, FIELD_TRUSTLEVEL, trustLevel, "Cannot alter a Trustees TrustLevel, without knowing the new TrustLevel.");
+                    checkNotNullAndValidId(errors, Constants.FIELD_CIRCLE_ID, circleId, "Cannot alter a Trustees TrustLevel, without knowing the Circle Id.");
+                    checkValidId(errors, Constants.FIELD_MEMBER_ID, memberId, "Cannot alter a Trustees TrustLevel, without knowing the Member Id.");
+                    checkNotNull(errors, Constants.FIELD_TRUSTLEVEL, trustLevel, "Cannot alter a Trustees TrustLevel, without knowing the new TrustLevel.");
                     break;
                 case REMOVE:
-                    checkNotNullAndValidId(errors, FIELD_CIRCLE_ID, circleId, "Cannot remove a Trustee from a Circle, without knowing the Circle Id.");
-                    checkValidId(errors, FIELD_MEMBER_ID, memberId, "Cannot remove a Trustee from a Circle, without knowing the Member Id.");
+                    checkNotNullAndValidId(errors, Constants.FIELD_CIRCLE_ID, circleId, "Cannot remove a Trustee from a Circle, without knowing the Circle Id.");
+                    checkValidId(errors, Constants.FIELD_MEMBER_ID, memberId, "Cannot remove a Trustee from a Circle, without knowing the Member Id.");
                     break;
                 default:
-                    errors.put(FIELD_ACTION, "Invalid Action provided.");
+                    errors.put(Constants.FIELD_ACTION, "Invalid Action provided.");
             }
         }
 

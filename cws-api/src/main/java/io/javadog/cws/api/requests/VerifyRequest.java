@@ -7,8 +7,6 @@
  */
 package io.javadog.cws.api.requests;
 
-import static io.javadog.cws.api.common.Constants.FIELD_DATA;
-import static io.javadog.cws.api.common.Constants.FIELD_SIGNATURE;
 import static io.javadog.cws.api.common.Utilities.copy;
 
 import io.javadog.cws.api.common.Constants;
@@ -25,18 +23,18 @@ import java.util.Map;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "verifyRequest", propOrder = { FIELD_SIGNATURE, FIELD_DATA })
+@XmlType(name = "verifyRequest", propOrder = { Constants.FIELD_SIGNATURE, Constants.FIELD_DATA })
 public final class VerifyRequest extends Authentication {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
     @NotNull
-    @XmlElement(name = FIELD_SIGNATURE, required = true)
+    @XmlElement(name = Constants.FIELD_SIGNATURE, required = true)
     private String signature = null;
 
     @NotNull
-    @XmlElement(name = FIELD_DATA, required = true)
+    @XmlElement(name = Constants.FIELD_DATA, required = true)
     private byte[] data = null;
 
     // =========================================================================
@@ -70,8 +68,8 @@ public final class VerifyRequest extends Authentication {
     public Map<String, String> validate() {
         final Map<String, String> errors = super.validate();
 
-        checkNotNullOrEmpty(errors, FIELD_SIGNATURE, signature, "The Signature is missing.");
-        checkNotNull(errors, FIELD_DATA, data, "The Data Object to check the Signature against is missing.");
+        checkNotNullOrEmpty(errors, Constants.FIELD_SIGNATURE, signature, "The Signature is missing.");
+        checkNotNull(errors, Constants.FIELD_DATA, data, "The Data Object to check the Signature against is missing.");
 
         return errors;
     }

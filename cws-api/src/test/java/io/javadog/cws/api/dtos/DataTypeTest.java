@@ -20,7 +20,7 @@ import org.junit.Test;
 public final class DataTypeTest {
 
     @Test
-    public void testClass() {
+    public void testClassflow() {
         final String name = "name";
         final String type = "type";
 
@@ -34,12 +34,10 @@ public final class DataTypeTest {
 
     @Test
     public void testStandardMethods() {
-        final DataType dataType = new DataType();
+        final DataType dataType = prepareDataType("DataType Name", "DataType Type");
         final DataType sameDataType = new DataType();
         final DataType emptyDataType = new DataType();
 
-        dataType.setTypeName("DataType Name");
-        dataType.setType("DataType Type");
         sameDataType.setTypeName(dataType.getTypeName());
         sameDataType.setType(dataType.getType());
 
@@ -53,5 +51,33 @@ public final class DataTypeTest {
 
         assertThat(dataType.toString(), is(sameDataType.toString()));
         assertThat(dataType.toString(), is(not(emptyDataType.toString())));
+    }
+
+    @Test
+    public void testEquality() {
+        final String typeName1 = "First Type Name";
+        final String typeName2 = "Second Type Name";
+        final String type1 = "The First Type";
+        final String type2 = "The Second Type";
+        final DataType dataType1 = prepareDataType(typeName1, type1);
+        final DataType dataType2 = prepareDataType(typeName2, type1);
+        final DataType dataType3 = prepareDataType(typeName1, type2);
+
+        assertThat(dataType1.equals(dataType2), is(false));
+        assertThat(dataType2.equals(dataType1), is(false));
+        assertThat(dataType1.equals(dataType3), is(false));
+        assertThat(dataType3.equals(dataType1), is(false));
+    }
+
+    // =========================================================================
+    // Internal Helper Method
+    // =========================================================================
+
+    private static DataType prepareDataType(final String typeName, final String type) {
+        final DataType dataType = new DataType();
+        dataType.setTypeName(typeName);
+        dataType.setType(type);
+
+        return dataType;
     }
 }

@@ -23,7 +23,7 @@ import java.util.UUID;
 public class CircleTest {
 
     @Test
-    public void testClass() {
+    public void testClassflow() {
         final String id = UUID.randomUUID().toString();
         final String name = "Circle Name";
         final Date date = new Date();
@@ -40,13 +40,10 @@ public class CircleTest {
 
     @Test
     public void testStandardMethods() {
-        final Circle circle = new Circle();
+        final Circle circle = prepareCircle(UUID.randomUUID().toString(), "The Circle Nane", new Date());
         final Circle sameCircle = new Circle();
         final Circle emptyCircle = new Circle();
 
-        circle.setCircleId(UUID.randomUUID().toString());
-        circle.setCircleName("The Circle Name");
-        circle.setCreated(new Date());
         sameCircle.setCircleId(circle.getCircleId());
         sameCircle.setCircleName(circle.getCircleName());
         sameCircle.setCreated(circle.getCreated());
@@ -61,5 +58,39 @@ public class CircleTest {
 
         assertThat(circle.toString(), is(sameCircle.toString()));
         assertThat(circle.toString(), is(not(emptyCircle.toString())));
+    }
+
+    @Test
+    public void testEquality() {
+        final String circleId1 = UUID.randomUUID().toString();
+        final String circleId2 = UUID.randomUUID().toString();
+        final String circleName1 = "First Circle Name";
+        final String circleName2 = "Second Circle Name";
+        final Date created1 = new Date(1212121212L);
+        final Date created2 = new Date(2121212121L);
+        final Circle circle1 = prepareCircle(circleId1, circleName1, created1);
+        final Circle circle2 = prepareCircle(circleId2, circleName1, created1);
+        final Circle circle3 = prepareCircle(circleId1, circleName2, created1);
+        final Circle circle4 = prepareCircle(circleId1, circleName1, created2);
+
+        assertThat(circle1.equals(circle2), is(false));
+        assertThat(circle2.equals(circle1), is(false));
+        assertThat(circle1.equals(circle3), is(false));
+        assertThat(circle3.equals(circle1), is(false));
+        assertThat(circle1.equals(circle4), is(false));
+        assertThat(circle4.equals(circle1), is(false));
+    }
+
+    // =========================================================================
+    // Internal Helper Method
+    // =========================================================================
+
+    private static Circle prepareCircle(final String circleId, final String circleName, final Date created) {
+        final Circle circle = new Circle();
+        circle.setCircleId(circleId);
+        circle.setCircleName(circleName);
+        circle.setCreated(created);
+
+        return circle;
     }
 }

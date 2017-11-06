@@ -43,6 +43,10 @@ public abstract class CWSKey<T extends Key> {
         return algorithm;
     }
 
+    public boolean isDestroyed() {
+        return destroyed;
+    }
+
     /**
      * {@inheritDoc}
      */

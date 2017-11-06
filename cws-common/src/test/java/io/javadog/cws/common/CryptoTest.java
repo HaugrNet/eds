@@ -19,6 +19,7 @@ import io.javadog.cws.common.exceptions.CWSException;
 import io.javadog.cws.common.exceptions.CryptoException;
 import io.javadog.cws.common.keys.CWSKey;
 import io.javadog.cws.common.keys.CWSKeyPair;
+import io.javadog.cws.common.keys.PrivateCWSKey;
 import io.javadog.cws.common.keys.SecretCWSKey;
 import org.junit.Rule;
 import org.junit.Test;
@@ -359,6 +360,30 @@ public final class CryptoTest {
 
         assertThat(key1.hashCode(), is(key1.hashCode()));
         assertThat(key1.hashCode(), is(not(key2.hashCode())));
+    }
+
+    @Test
+    public void testDestroyingKeys() {
+        final Settings settings = new Settings();
+        final Crypto crypto = new Crypto(settings);
+        final CWSKeyPair keyPair = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
+        final PrivateCWSKey privateKey = keyPair.getPrivate();
+        final SecretCWSKey secretKey = crypto.generateSymmetricKey(settings.getSymmetricAlgorithm());
+
+        assertThat(privateKey.isDestroyed(), is(false));
+        assertThat(secretKey.isDestroyed(), is(false));
+
+        // First attempt at destroying should also update the flag
+        privateKey.destroy();
+        secretKey.destroy();
+        assertThat(privateKey.isDestroyed(), is(true));
+        assertThat(secretKey.isDestroyed(), is(true));
+
+        // Second attempt at destroying should be ignored
+        privateKey.destroy();
+        secretKey.destroy();
+        assertThat(privateKey.isDestroyed(), is(true));
+        assertThat(secretKey.isDestroyed(), is(true));
     }
 
     private <E extends CWSException> void prepareCause(final Class<E> cause, final ReturnCode returnCode, final String returnMessage) {

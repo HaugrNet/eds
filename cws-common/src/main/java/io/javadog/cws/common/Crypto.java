@@ -276,11 +276,11 @@ public final class Crypto {
      * extracted without some effort. To do this, a Key is needed, together with
      * a Salt which the Initial Vector is based on. The encrypted Key, is then
      * converted into PKCS8 and converted using Base64 encoding. The result of
-     * this will make the key save for storage in the database.
+     * this will make the key safe for storage in the database.
      *
      * @param encryptionKey Symmetric Key to encrypt the Private RSA Key with
      * @param privateKey    The Private RSA Key to encrypt and armor
-     * @return Armored (PCKS8 and Base64 encoded encrypted key)
+     * @return Armored (PKCS8 and Base64 encoded encrypted key)
      */
     public String armoringPrivateKey(final SecretCWSKey encryptionKey, final Key privateKey) {
         final PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(privateKey.getEncoded());

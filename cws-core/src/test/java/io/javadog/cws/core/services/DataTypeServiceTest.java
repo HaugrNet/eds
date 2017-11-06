@@ -22,7 +22,6 @@ import io.javadog.cws.api.responses.ProcessDataTypeResponse;
 import io.javadog.cws.common.exceptions.AuthorizationException;
 import io.javadog.cws.common.exceptions.VerificationException;
 import io.javadog.cws.model.DatabaseSetup;
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -111,15 +110,14 @@ public final class DataTypeServiceTest extends DatabaseSetup {
     }
 
     @Test
-    @Ignore("TODO: 2017-11-01 - Ignored as the test is failing, although it should work. Must be investigated!")
     public void testUpdateRestrictedDataTypeFolder() {
         prepareCause(AuthorizationException.class, ReturnCode.AUTHORIZATION_WARNING,
                 "It is not permitted to update the DataType '" + Constants.FOLDER_TYPENAME + "'.");
 
         final ProcessDataTypeService service = new ProcessDataTypeService(settings, entityManager);
         final ProcessDataTypeRequest request = prepareRequest(ProcessDataTypeRequest.class, Constants.ADMIN_ACCOUNT);
-        request.setType(Constants.FOLDER_TYPENAME);
-        request.setTypeName("alternative folder");
+        request.setTypeName(Constants.FOLDER_TYPENAME);
+        request.setType("alternative folder");
         assertThat(request.getTypeName(), is(not(nullValue())));
         assertThat(request.getType(), is(not(nullValue())));
 
@@ -127,15 +125,14 @@ public final class DataTypeServiceTest extends DatabaseSetup {
     }
 
     @Test
-    @Ignore("TODO: 2017-11-01 - Ignored as the test is failing, although it should work. Must be investigated!")
     public void testUpdateRestrictedDataTypeData() {
         prepareCause(AuthorizationException.class, ReturnCode.AUTHORIZATION_WARNING,
                 "It is not permitted to update the DataType '" + Constants.DATA_TYPENAME + "'.");
 
         final ProcessDataTypeService service = new ProcessDataTypeService(settings, entityManager);
         final ProcessDataTypeRequest request = prepareRequest(ProcessDataTypeRequest.class, Constants.ADMIN_ACCOUNT);
-        request.setType(Constants.DATA_TYPENAME);
-        request.setTypeName("alternative data");
+        request.setTypeName(Constants.DATA_TYPENAME);
+        request.setType("alternative data");
         assertThat(request.getTypeName(), is(not(nullValue())));
         assertThat(request.getType(), is(not(nullValue())));
 

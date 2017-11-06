@@ -67,7 +67,6 @@ public final class CommonBeanTest extends BeanSetup {
          */
         private FailService(final Settings settings, final EntityManager entityManager) {
             super(settings, entityManager);
-
         }
 
         /**
@@ -86,5 +85,4 @@ public final class CommonBeanTest extends BeanSetup {
             throw new CWSException(ReturnCode.CRYPTO_ERROR, "Cannot destroy failed service.");
         }
     }
-
 }

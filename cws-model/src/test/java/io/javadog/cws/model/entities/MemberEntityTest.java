@@ -142,8 +142,8 @@ public final class MemberEntityTest extends DatabaseSetup {
      */
     @Test
     public void testPreparingTestData() {
-        entityManager.createNativeQuery("DELETE FROM circles").executeUpdate();
-        entityManager.createNativeQuery("DELETE FROM members").executeUpdate();
+        entityManager.createNativeQuery("DELETE FROM cws_circles").executeUpdate();
+        entityManager.createNativeQuery("DELETE FROM cws_members").executeUpdate();
         final String sql = prepareTestData();
         assertThat(sql.length() > 19000, is(true));
     }

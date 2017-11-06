@@ -22,7 +22,7 @@ import javax.persistence.Table;
         @NamedQuery(name = "setting.readAll",
                     query = "select s from SettingEntity s")
 )
-@Table(name = "settings")
+@Table(name = "cws_settings")
 public class SettingEntity extends CWSEntity {
 
     @Column(name = "name", nullable = false)

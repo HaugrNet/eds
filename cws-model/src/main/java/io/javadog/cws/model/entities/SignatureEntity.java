@@ -37,7 +37,7 @@ import java.util.Date;
                             "where s.member.id = :mid " +
                             "order by s.id desc")
 })
-@Table(name = "signatures")
+@Table(name = "cws_signatures")
 public final class SignatureEntity extends CWSEntity {
 
     @ManyToOne(targetEntity = MemberEntity.class, fetch = FetchType.EAGER, optional = false)

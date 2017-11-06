@@ -32,7 +32,7 @@
 --   The API request for "version", will also return the latest information from
 -- this table.
 -- =============================================================================
-CREATE TABLE versions (
+CREATE TABLE cws_versions (
   id               SERIAL,
   schema_version   INTEGER,
   cws_version      VARCHAR(10),
@@ -64,7 +64,7 @@ CREATE TABLE versions (
 -- initial setup, however which values and why is described in the installation
 -- documentation.
 -- =============================================================================
-CREATE TABLE settings (
+CREATE TABLE cws_settings (
   id               SERIAL,
   name             VARCHAR(256),
   setting          VARCHAR(256),
@@ -107,7 +107,7 @@ CREATE TABLE settings (
 -- CWS is only suppose to be a Data Storage Facility, and this be further down
 -- the entire Application Layer.
 -- =============================================================================
-CREATE TABLE members (
+CREATE TABLE cws_members (
   id               SERIAL,
   external_id      VARCHAR(36),
   name             VARCHAR(256), -- Member Authentication information
@@ -144,7 +144,7 @@ CREATE TABLE members (
 -- Circle Administrative privileges. When creating a new Circle the initial new
 -- Circle Administrator must be added, which cannot be the System Administrator.
 -- =============================================================================
-CREATE TABLE circles (
+CREATE TABLE cws_circles (
   id               SERIAL,
   external_id      VARCHAR(36),
   name             VARCHAR(256),
@@ -212,7 +212,7 @@ CREATE TABLE circles (
 -- process. If nobody have logged in within the Grace Period, then the CWS will
 -- simply refuse to process the data.
 -- =============================================================================
-CREATE TABLE keys (
+CREATE TABLE cws_keys (
   id               SERIAL,
   algorithm        VARCHAR(256) DEFAULT 'AES128',
   status           VARCHAR(256) DEFAULT 'ACTIVE',
@@ -263,7 +263,7 @@ CREATE TABLE keys (
 -- is stored with the relation and not within the Key table. For Guests, the Key
 -- stored is simply "Not Applicable".
 -- =============================================================================
-CREATE TABLE trustees (
+CREATE TABLE cws_trustees (
   id               SERIAL,
   member_id        INTEGER,
   circle_id        INTEGER,
@@ -275,9 +275,9 @@ CREATE TABLE trustees (
 
   /* Primary & Foreign Keys */
   CONSTRAINT trustee_pk                     PRIMARY KEY (id),
-  CONSTRAINT trustee_member_fk              FOREIGN KEY (member_id) REFERENCES members (id) ON DELETE CASCADE,
-  CONSTRAINT trustee_circle_fk              FOREIGN KEY (circle_id) REFERENCES circles (id) ON DELETE CASCADE,
-  CONSTRAINT trustee_key_fk                 FOREIGN KEY (key_id) REFERENCES keys (id),
+  CONSTRAINT trustee_member_fk              FOREIGN KEY (member_id) REFERENCES cws_members (id) ON DELETE CASCADE,
+  CONSTRAINT trustee_circle_fk              FOREIGN KEY (circle_id) REFERENCES cws_circles (id) ON DELETE CASCADE,
+  CONSTRAINT trustee_key_fk                 FOREIGN KEY (key_id) REFERENCES cws_keys (id),
 
   /* Unique Constraints */
   CONSTRAINT trustee_unique_fks             UNIQUE (member_id, circle_id, key_id),
@@ -304,7 +304,7 @@ CREATE TABLE trustees (
 -- the folder type is used primarily internally to help structurize the Objects
 -- better.
 -- =============================================================================
-CREATE TABLE datatypes (
+CREATE TABLE cws_datatypes (
   id               SERIAL,
   datatype_name    VARCHAR(256),
   datatype_value   VARCHAR(256),
@@ -351,7 +351,7 @@ CREATE TABLE datatypes (
 -- not possible to create looping structures, since the Id must always be
 -- smaller than the current Id.
 -- =============================================================================
-CREATE TABLE metadata (
+CREATE TABLE cws_metadata (
   id               SERIAL,
   external_id      VARCHAR(36),
   parent_id        INTEGER,
@@ -363,8 +363,8 @@ CREATE TABLE metadata (
 
   /* Primary & Foreign Keys */
   CONSTRAINT metadata_pk                    PRIMARY KEY (id),
-  CONSTRAINT metadata_circle_fk             FOREIGN KEY (circle_id) REFERENCES circles (id) ON DELETE CASCADE,
-  CONSTRAINT metadata_datatype_fk           FOREIGN KEY (datatype_id) REFERENCES datatypes (id),
+  CONSTRAINT metadata_circle_fk             FOREIGN KEY (circle_id) REFERENCES cws_circles (id) ON DELETE CASCADE,
+  CONSTRAINT metadata_datatype_fk           FOREIGN KEY (datatype_id) REFERENCES cws_datatypes (id),
 
   /* Unique Constraints */
   CONSTRAINT metadata_unique_external_id    UNIQUE (external_id),
@@ -387,7 +387,7 @@ CREATE TABLE metadata (
 -- Data is considered deprecated and it is pending deletion and can no longer be
 -- used.
 -- =============================================================================
-CREATE TABLE data (
+CREATE TABLE cws_data (
   id               SERIAL,
   metadata_id      INTEGER,
   key_id           INTEGER,
@@ -399,8 +399,8 @@ CREATE TABLE data (
 
   /* Primary & Foreign Keys */
   CONSTRAINT data_pk                        PRIMARY KEY (id),
-  CONSTRAINT data_metadata_fk               FOREIGN KEY (metadata_id) REFERENCES metadata (id) ON DELETE CASCADE,
-  CONSTRAINT data_key_fk                    FOREIGN KEY (key_id) REFERENCES keys (id) ON DELETE CASCADE,
+  CONSTRAINT data_metadata_fk               FOREIGN KEY (metadata_id) REFERENCES cws_metadata (id) ON DELETE CASCADE,
+  CONSTRAINT data_key_fk                    FOREIGN KEY (key_id) REFERENCES cws_keys (id) ON DELETE CASCADE,
 
   /* Not Null Constraints */
   CONSTRAINT data_notnull_id                CHECK (id IS NOT NULL),
@@ -418,7 +418,7 @@ CREATE TABLE data (
 -- stored in this table. Complete with number of verifications and expiration of
 -- the signature.
 -- =============================================================================
-CREATE TABLE signatures (
+CREATE TABLE cws_signatures (
   id               SERIAL,
   checksum         VARCHAR(256),
   member_id        INTEGER,
@@ -429,7 +429,7 @@ CREATE TABLE signatures (
 
   /* Primary & Foreign Keys */
   CONSTRAINT signature_pk                   PRIMARY KEY (id),
-  CONSTRAINT signature_member_fk            FOREIGN KEY (member_id) REFERENCES members (id) ON DELETE CASCADE,
+  CONSTRAINT signature_member_fk            FOREIGN KEY (member_id) REFERENCES cws_members (id) ON DELETE CASCADE,
 
   /* Unique Constraints */
   CONSTRAINT signarure_unique_checksum      UNIQUE (checksum),

@@ -31,7 +31,7 @@ import javax.persistence.Table;
                         "from MetadataEntity m " +
                         "where m.type.id = :id")
 })
-@Table(name = "datatypes")
+@Table(name = "cws_datatypes")
 public final class DataTypeEntity extends CWSEntity {
 
     @Column(name = "datatype_name", unique = true, nullable = false)

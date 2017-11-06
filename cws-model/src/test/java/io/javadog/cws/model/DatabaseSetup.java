@@ -246,7 +246,7 @@ public class DatabaseSetup {
         append(builder, "-- Default Administrator User, it is set at the first request to the System, and");
         append(builder, "-- is thus needed for loads of tests. Remaining Accounts is for \"member1\" to");
         append(builder, "-- \"member5\", which is all used as part of the tests.");
-        append(builder, "INSERT INTO members (external_id, name, salt, algorithm, public_key, private_key) VALUES");
+        append(builder, "INSERT INTO cws_members (external_id, name, salt, algorithm, public_key, private_key) VALUES");
 
         final CWSKeyPair keyPair = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
         createAndAppendMember(builder, ADMIN_ID, Constants.ADMIN_ACCOUNT, keyPair, ',');
@@ -265,14 +265,14 @@ public class DatabaseSetup {
         append(builder, "-- Default, we have 3 Circles as part of the test setup, using the very");
         append(builder, "-- imaginative names, 'circle1' to 'circle3'.");
         append(builder, "");
-        append(builder, "INSERT INTO circles (external_id, name) VALUES");
+        append(builder, "INSERT INTO cws_circles (external_id, name) VALUES");
         final CircleEntity circle1 = createAndAppendCircle(builder, CIRCLE_1_ID, CIRCLE_1, ',');
         final CircleEntity circle2 = createAndAppendCircle(builder, CIRCLE_2_ID, CIRCLE_2, ',');
         final CircleEntity circle3 = createAndAppendCircle(builder, CIRCLE_3_ID, CIRCLE_3, ';');
 
         append(builder, "");
         append(builder, "-- For each Circle, we need to have a unique Key, but with the same settings.");
-        append(builder, "INSERT INTO keys (algorithm, status) VALUES");
+        append(builder, "INSERT INTO cws_keys (algorithm, status) VALUES");
         final KeyEntity key1 = createAndAppendKey(builder, ',');
         final KeyEntity key2 = createAndAppendKey(builder, ',');
         final KeyEntity key3 = createAndAppendKey(builder, ';');
@@ -289,7 +289,7 @@ public class DatabaseSetup {
         append(builder, "-- also create a number of Trustees, in this case we add Member 1-3 to Circle 1,");
         append(builder, "-- Member 1-4 to Circle 2 and Member 2-5 to Circle 3.");
         append(builder, "-- The Trust Level is different for each Member.");
-        append(builder, "INSERT INTO trustees (member_id, circle_id, key_id, trust_level, circle_key) VALUES");
+        append(builder, "INSERT INTO cws_trustees (member_id, circle_id, key_id, trust_level, circle_key) VALUES");
         final SecretCWSKey cwsKey1 = crypto.generateSymmetricKey(key1.getAlgorithm());
         final SecretCWSKey cwsKey2 = crypto.generateSymmetricKey(key1.getAlgorithm());
         final SecretCWSKey cwsKey3 = crypto.generateSymmetricKey(key1.getAlgorithm());

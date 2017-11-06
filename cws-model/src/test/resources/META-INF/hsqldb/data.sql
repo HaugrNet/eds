@@ -3,11 +3,11 @@
 -- =============================================================================
 
 -- Initial Database Version is 1, initial Production CWS release is 1.0.0
-INSERT INTO versions(schema_version, cws_version) VALUES (1, '1.0.0');
+INSERT INTO cws_versions(schema_version, cws_version) VALUES (1, '1.0.0');
 
 -- Default, we have 1 Object Type, which is the folder. The rest is left to
 -- the initial setup to create
-INSERT INTO datatypes (datatype_name, datatype_value) VALUES
+INSERT INTO cws_datatypes (datatype_name, datatype_value) VALUES
     ('folder', 'Folder'),
     ('data', 'Data Object');
 
@@ -45,17 +45,17 @@ INSERT INTO datatypes (datatype_name, datatype_value) VALUES
 --   * RSA/ECB/OAEPWithSHA-256AndMGF1Padding (1024, 2048)
 -- The default should be sufficient for most, if increased security is wanted,
 -- please consider installing and using the unlimited strength patch.
-INSERT INTO settings (name, setting, modifiable) VALUES ('cws.crypto.symmetric.algorithm', 'AES128', true);
+INSERT INTO cws_settings (name, setting, modifiable) VALUES ('cws.crypto.symmetric.algorithm', 'AES128', true);
 
 -- Asymmetric Encryption (Public & Private Key), is used for sharing the
 -- Symmetric Keys, not for encrypting any data. For more information about
 -- these, please see the references given above.
-INSERT INTO settings (name, setting, modifiable) VALUES ('cws.crypto.asymmetric.algorithm', 'RSA2048', true);
+INSERT INTO cws_settings (name, setting, modifiable) VALUES ('cws.crypto.asymmetric.algorithm', 'RSA2048', true);
 
 -- When new Members are added, the System Administrator can issue a signature,
 -- which can be used by the Member when creating their new Account. The
 -- signature is made with this Algorithm.
-INSERT INTO settings (name, setting, modifiable) VALUES ('cws.crypto.signature.algorithm', 'SHA512', true);
+INSERT INTO cws_settings (name, setting, modifiable) VALUES ('cws.crypto.signature.algorithm', 'SHA512', true);
 
 -- If a Member is using something else than a Key to unlock their Account, the
 -- CWS will use the following Password Based Encryption, PBE, algorithm to do
@@ -63,33 +63,33 @@ INSERT INTO settings (name, setting, modifiable) VALUES ('cws.crypto.signature.a
 -- Salt, and a Member Account specific Salt to ensure that enough entropy is
 -- available to create a strong enough Key to unlock the Private Key for the
 -- Account.
-INSERT INTO settings (name, setting, modifiable) VALUES ('cws.crypto.password.algorithm', 'PBE128', true);
+INSERT INTO cws_settings (name, setting, modifiable) VALUES ('cws.crypto.password.algorithm', 'PBE128', true);
 
 -- For the CheckSums or Fingerprints we're generating - we just need a way
 -- to ensure that the value is both identifiable. For Signatures, it is used
 -- as part of the lookup to find a Signature in the Database and for stored
 -- Data Objects, it is a simple mechanism to ensure the integrity of the
 -- stored data.
-INSERT INTO settings (name, setting, modifiable) VALUES ('cws.crypto.hash.algorithm', 'SHA512', true);
+INSERT INTO cws_settings (name, setting, modifiable) VALUES ('cws.crypto.hash.algorithm', 'SHA512', true);
 
 -- This is the System specific Salt, which will be applied whenever PBE is used
 -- to unlock the Private Key of a Member Account. This Salt should be set during
 -- installation, and never changed, as it will render *all* PBE based accounts
 -- useless (kill-switch).
-INSERT INTO settings (name, setting, modifiable) VALUES ('cws.system.salt', 'Default salt, also used as kill switch. Must be set in DB.', false);
+INSERT INTO cws_settings (name, setting, modifiable) VALUES ('cws.system.salt', 'Default salt, also used as kill switch. Must be set in DB.', false);
 
 -- For correctly dealing with Strings, it is important that the Locale is set to
 -- ensure that it is done properly. By default the Locale is English (EN), but
 -- if preferred, any other can be chosen. As long as they follow the IETF BCP 47
 -- allowed values. See: https://en.wikipedia.org/wiki/IETF_language_tag
-INSERT INTO settings (name, setting, modifiable) VALUES ('cws.system.locale', 'EN', true);
+INSERT INTO cws_settings (name, setting, modifiable) VALUES ('cws.system.locale', 'EN', true);
 
 -- When applying armoring to the raw keys, it means using a Base64 encoding and
 -- decoding. However, they have to be saved using a character set. Any character
 -- set can be used, but if keys have been stored using one, changing it will
 -- cause problems as they may not be read out safely again. So, please only
 -- change this if you are really sure.
-INSERT INTO settings (name, setting, modifiable) VALUES ('cws.system.charset', 'UTF-8', true);
+INSERT INTO cws_settings (name, setting, modifiable) VALUES ('cws.system.charset', 'UTF-8', true);
 
 -- The Administrator Account is a special Account in the CWS, it is not
 -- permitted to be a member of any Circles, nor can it be used for anything else
@@ -98,7 +98,7 @@ INSERT INTO settings (name, setting, modifiable) VALUES ('cws.system.charset', '
 -- than completely opting out on this, it may be a good idea to expose it. Hence
 -- this new setting value. Default false, meaning that the Administrator Account
 -- is not visible unless explicitly changed to true.
-INSERT INTO settings (name, setting, modifiable) VALUES ('cws.expose.admin', 'false', true);
+INSERT INTO cws_settings (name, setting, modifiable) VALUES ('cws.expose.admin', 'false', true);
 
 -- Privacy is important, however - there may be reasons to reduce the privacy
 -- level, and allow that a Member can view information about other Members even
@@ -107,7 +107,7 @@ INSERT INTO settings (name, setting, modifiable) VALUES ('cws.expose.admin', 'fa
 -- then this setting apply. By default, it is set to True - as CWS should be
 -- used by organizations or companies where all members already share
 -- information.
-INSERT INTO settings (name, setting, modifiable) VALUES ('cws.show.trustees', 'true', true);
+INSERT INTO cws_settings (name, setting, modifiable) VALUES ('cws.show.trustees', 'true', true);
 
 
 -- =============================================================================
@@ -125,7 +125,7 @@ INSERT INTO settings (name, setting, modifiable) VALUES ('cws.show.trustees', 't
 -- Default Administrator User, it is set at the first request to the System, and
 -- is thus needed for loads of tests. Remaining Accounts is for "member1" to
 -- "member5", which is all used as part of the tests.
-INSERT INTO members (external_id, name, salt, algorithm, public_key, private_key) VALUES
+INSERT INTO cws_members (external_id, name, salt, algorithm, public_key, private_key) VALUES
     ('d95a14e6-e1d1-424b-8834-16a79498f4d1', 'admin',   'd3cecd21-b1a1-48bf-8936-780157158a19', 'RSA2048', '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'),
     ('073dcc8f-ffa6-4cda-8d61-09ba9441e78e', 'member1', '9cbed0bc-22c9-417f-8c6c-44fbaa0c0844', 'RSA2048', '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'),
     ('d842fa67-5387-44e6-96e3-4e8a7ead4c8d', 'member2', '3157bb59-abe6-46a0-9d80-146afea7fd60', 'RSA2048', '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'),
@@ -136,19 +136,19 @@ INSERT INTO members (external_id, name, salt, algorithm, public_key, private_key
 -- Default, we have 3 Circles as part of the test setup, using the very
 -- imaginative names, 'circle1' to 'circle3'.
 
-INSERT INTO circles (external_id, name) VALUES
+INSERT INTO cws_circles (external_id, name) VALUES
     ('d8838d7d-71e7-433d-8790-af7c080e9de9', 'circle1'),
     ('8ba34e12-8830-4a1f-9681-b689cad52009', 'circle2'),
     ('a2797176-a5b9-4dc9-867b-8c5c1bb3a9f9', 'circle3');
 
 -- For each Circle, we need to have a unique Key, but with the same settings.
-INSERT INTO keys (algorithm, status) VALUES
+INSERT INTO cws_keys (algorithm, status) VALUES
     ('AES128', 'ACTIVE'),
     ('AES128', 'ACTIVE'),
     ('AES128', 'ACTIVE');
 
 -- For each Circle, we need to have root folder for all data.
-INSERT INTO metadata (external_id, parent_id, circle_id, datatype_id, name) VALUES
+INSERT INTO cws_metadata (external_id, parent_id, circle_id, datatype_id, name) VALUES
     ('3568d3cf-d7ae-4aba-bf21-ef50fe6020e8', 0, 1, 1, '/'),
     ('e72ee11d-6268-44d8-a6cf-3165f4531dbf', 0, 2, 1, '/'),
     ('32cda78d-0016-47ea-a0a6-da05f87c26f3', 0, 3, 1, '/');
@@ -157,7 +157,7 @@ INSERT INTO metadata (external_id, parent_id, circle_id, datatype_id, name) VALU
 -- also create a number of Trustees, in this case we add Member 1-3 to Circle 1,
 -- Member 1-4 to Circle 2 and Member 2-5 to Circle 3.
 -- The Trust Level is different for each Member.
-INSERT INTO trustees (member_id, circle_id, key_id, trust_level, circle_key) VALUES
+INSERT INTO cws_trustees (member_id, circle_id, key_id, trust_level, circle_key) VALUES
     (2, 1, 1, 'ADMIN', 'Ov9nn3NWCQDYrFzvuD8wOtG7LH90sr8D24PRafKEY/jPRNQwYSE7m+vEq4NvIjmjAdq0bTG48fir+eaxD+Dxm8cQSxkv+nmsNWks6N0g42sv94v+/blNB9V6ocau1FrZn42C65Pe+AR0REFa6OKxAYpovz7cKpIsqNF4+5OAFybDC/HitVdIWtdYnl3Xb5UiUKR2TtgxkpNn/bw72ogDVxnscO49YAFq6GtGACYMzWG4+0pU/A/TQ0MQNGPk4ueTK5as5WT1uURhQ8UIt1IXwzHhUgpTAEM0kcTxCFCnivhdQcoEPHoDXv0MmmmrN94I7A/L+WEGhjF+ltA2bPLmbA=='),
     (3, 1, 1, 'WRITE', 'cQmT0OUntmlLNHzcInyV2uLKIUf72HtF7s+ts5bJ9UgoIM7gyC1gTaQ+Gw/cfOH1fLpMAiezlNuK1+fwuonIBZtF8njEdITA6WpesR8NQTFSM2ys85Dmue2faD8nUyp55y4D2PZQAAnzWhmwvo43OXwIUrbZbJglSJUqryt+mxdacVO42pn6rdolTbJg+9gTBc9yRoZFdxlWRjMdka5VA28mhopyVFCc3X5tD7bTx+5IhQJibIyjnu2MvA88Vv2csLkJUpVa0jNQQg0l5BUd/ug71r2vvo9IJw3Z3+jZGYB4vAxbtngsBKtaO9EbSHhUE1ZXZSqUmR4GiMac5te7IQ=='),
     (4, 1, 1, 'READ',  'wegsUSXTt7YMrbL6Oj6AEt75ftAICK4bKqVYZDNap5SMkgVm4fARVYDTLg2ucuOeyqk+WFY4KP860xk0QXSrDvcmkwkH889h2Ye8+VI5uqBnt4ihqFCfHAYmzAJ0r45EDCtNl2PivoKGx+XlK1cVtPLSwrefIWoF+rwhZtPjEfeit753iRnDQrcbZtIpOW8I7uNyw600e5sbZmSgFB10sdxxRM6RqhM3rxmLe3KwgSn/HpBuoVChgbSLXRlwIvd3nW3R8GExI7nv7arEevAmLuVJfp+KIK4/RH/V3DKBvxrjPGx1Fgmvf41LqMbpqsObAAc0H6QXGfXf20MII2CojQ=='),

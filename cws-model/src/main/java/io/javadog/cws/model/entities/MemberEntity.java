@@ -39,7 +39,7 @@ import javax.persistence.Table;
                         "where e.member.name = :name" +
                         "  and e.circle.externalId = :externalCircleId")
 })
-@Table(name = "members")
+@Table(name = "cws_members")
 public class MemberEntity extends Externable {
 
     @Column(name = "name", unique = true, nullable = false, length = MAX_STRING_LENGTH)

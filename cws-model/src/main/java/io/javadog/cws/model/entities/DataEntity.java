@@ -38,7 +38,7 @@ import javax.persistence.Table;
                         "  and t.member.id = :mid" +
                         "  and t.trustLevel in :trustLevels")
 })
-@Table(name = "data")
+@Table(name = "cws_data")
 public class DataEntity extends CWSEntity {
 
     @OneToOne(targetEntity = MetadataEntity.class, fetch = FetchType.EAGER, optional = false)

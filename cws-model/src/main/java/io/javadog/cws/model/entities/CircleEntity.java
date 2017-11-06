@@ -18,7 +18,7 @@ import javax.persistence.Table;
  * @since  CWS 1.0
  */
 @Entity
-@Table(name = "circles")
+@Table(name = "cws_circles")
 @NamedQueries({
         @NamedQuery(name = "circle.findAll",
                     query = "select c " +

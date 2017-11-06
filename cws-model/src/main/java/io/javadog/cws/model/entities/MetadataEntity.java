@@ -64,7 +64,7 @@ import javax.persistence.Table;
                         "from MetadataEntity m " +
                         "where m.parentId = :pid")
 })
-@Table(name = "metadata")
+@Table(name = "cws_metadata")
 public class MetadataEntity extends Externable {
 
     @Column(name = "parent_id")

@@ -64,7 +64,7 @@ import javax.persistence.Table;
                         "from TrusteeEntity t " +
                         "where t.circle.id = :circleId")
 })
-@Table(name = "trustees")
+@Table(name = "cws_trustees")
 public class TrusteeEntity extends CWSEntity {
 
     @ManyToOne(targetEntity = MemberEntity.class, fetch = FetchType.EAGER, optional = false)

@@ -26,7 +26,7 @@ import java.util.Date;
  * @since  CWS 1.0
  */
 @Entity
-@Table(name = "keys")
+@Table(name = "cws_keys")
 public class KeyEntity extends CWSEntity {
 
     @Enumerated(EnumType.STRING)

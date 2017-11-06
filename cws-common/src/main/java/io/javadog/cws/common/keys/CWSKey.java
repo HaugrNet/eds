@@ -14,11 +14,11 @@ import java.util.Objects;
 
 /**
  * @author Kim Jensen
- * @since CWS 1.0
+ * @since  CWS 1.0
  */
 public abstract class CWSKey<T extends Key> {
 
-    protected volatile boolean destroyed = false;
+    protected boolean destroyed = false;
     private final KeyAlgorithm algorithm;
     protected final T key;
 

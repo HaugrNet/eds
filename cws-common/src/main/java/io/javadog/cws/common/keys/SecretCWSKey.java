@@ -48,7 +48,10 @@ public final class SecretCWSKey extends CWSKey<SecretKey> {
 
     public void destroy() {
         if (!destroyed) {
-            // TODO find a way to ensure that the Key is being destroyed.
+            // Although the Secret Key is extending the Destroyable interface,
+            // meaning that it should be possible to destroy it simply by
+            // invoking the .destroy() method - it results in a
+            // DestroyFailedException! A better solution must be found.
             destroyed = true;
         }
     }

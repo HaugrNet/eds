@@ -8,7 +8,9 @@
 package io.javadog.cws.common.keys;
 
 import io.javadog.cws.common.enums.KeyAlgorithm;
+import io.javadog.cws.common.exceptions.CryptoException;
 
+import javax.security.auth.DestroyFailedException;
 import java.security.PrivateKey;
 
 /**
@@ -40,8 +42,14 @@ public final class PrivateCWSKey extends CWSKey<PrivateKey> {
      */
     public void destroy() {
         if (!destroyed) {
-            // TODO find a way to ensure that the Key is being destroyed.
-            destroyed = true;
+            try {
+                // Updating the flag first, so any further attempts at
+                // destroying the Key will be ignored.
+                destroyed = true;
+                key.destroy();
+            } catch (DestroyFailedException e) {
+                throw new CryptoException(e.getMessage(), e);
+            }
         }
     }
 }

@@ -14,11 +14,17 @@ import org.slf4j.LoggerFactory;
 
 /**
  * @author Kim Jensen
- * @since CWS 1.0
+ * @since  CWS 1.0
  */
 public final class CommonBean {
 
     private static final Logger log = LoggerFactory.getLogger(CommonBean.class);
+
+    /**
+     * Private Constructor, this is a utility Class.
+     */
+    private CommonBean() {
+    }
 
     public static void destroy(final Serviceable<?, ?> serviceable) {
         if (serviceable != null) {

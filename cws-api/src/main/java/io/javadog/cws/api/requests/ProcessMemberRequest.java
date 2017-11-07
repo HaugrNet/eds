@@ -95,22 +95,25 @@ public final class ProcessMemberRequest extends Authentication {
         if (action == null) {
             errors.put(Constants.FIELD_ACTION, "No action has been provided.");
         } else {
+            final String newAccountErrorMessage = "The " + Constants.FIELD_NEW_ACCOUNT_NAME + " may not exceed " + Constants.MAX_STRING_LENGTH + " characters.";
             switch (action) {
                 case CREATE:
-                    checkNotNullOrEmpty(errors, Constants.FIELD_NEW_ACCOUNT_NAME, newAccountName, "The Account Name os missing.");
+                    checkNotNullOrEmpty(errors, Constants.FIELD_NEW_ACCOUNT_NAME, newAccountName, "The New Account Name is missing.");
+                    checkNotTooLong(errors, Constants.FIELD_NEW_ACCOUNT_NAME, newAccountName, Constants.MAX_NAME_LENGTH, newAccountErrorMessage);
                     checkNotNullOrEmpty(errors, Constants.FIELD_NEW_CREDENTIAL, newCredential, "The Credentials are required to create new Account.");
                     break;
                 case INVITE:
-                    checkNotNullOrEmpty(errors, Constants.FIELD_NEW_ACCOUNT_NAME, newAccountName, "The Account Name os missing.");
+                    checkNotNullOrEmpty(errors, Constants.FIELD_NEW_ACCOUNT_NAME, newAccountName, "The New Account Name is missing.");
+                    checkNotTooLong(errors, Constants.FIELD_NEW_ACCOUNT_NAME, newAccountName, Constants.MAX_NAME_LENGTH, newAccountErrorMessage);
                     break;
                 case PROCESS:
-                    checkNotTooLong(errors, Constants.FIELD_NEW_ACCOUNT_NAME, newAccountName, Constants.MAX_STRING_LENGTH, "The " + Constants.FIELD_NEW_ACCOUNT_NAME + " may not exceed " + Constants.MAX_STRING_LENGTH + " characters.");
+                    checkNotTooLong(errors, Constants.FIELD_NEW_ACCOUNT_NAME, newAccountName, Constants.MAX_NAME_LENGTH, newAccountErrorMessage);
                     break;
                 case DELETE:
-                    checkNotNullAndValidId(errors, Constants.FIELD_MEMBER_ID, memberId, "A valid " + Constants.FIELD_MEMBER_ID + " is required to delete an account.");
+                    checkNotNullAndValidId(errors, Constants.FIELD_MEMBER_ID, memberId, "A valid memberId is required to delete an account.");
                     break;
                 default:
-                    errors.put(Constants.FIELD_ACCOUNT_NAME, "Not supported Action has been provided.");
+                    errors.put(Constants.FIELD_ACTION, "Not supported Action has been provided.");
             }
         }
 

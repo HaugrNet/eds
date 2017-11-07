@@ -90,10 +90,10 @@ public final class ProcessDataTypeRequest extends Authentication {
                     checkNotNullEmptyOrTooLong(errors, Constants.FIELD_TYPE, type, Constants.MAX_STRING_LENGTH, "The type of the DataType is missing or invalid.");
                     break;
                 case DELETE:
-                    checkNotNullEmptyOrTooLong(errors, Constants.FIELD_TYPENAME, typeName, Constants.MAX_NAME_LENGTH, "The name of the DataType is missing or invalid.");
+                    checkNotNullOrEmpty(errors, Constants.FIELD_TYPENAME, typeName, "The name of the DataType is missing or invalid.");
                     break;
                 default:
-                    errors.put(Constants.FIELD_ACTION, "Invalid Action provided.");
+                    errors.put(Constants.FIELD_ACTION, "Not supported Action has been provided.");
             }
         }
 

@@ -59,9 +59,8 @@ public abstract class Verifiable implements Serializable {
     }
 
     protected static void checkNotNullEmptyOrTooLong(final Map<String, String> errors, final String field, final String value, final int maxLength, final String message) {
-        if ((value == null) || value.isEmpty() || (value.trim().length() > maxLength)) {
-            errors.put(field, message);
-        }
+        checkNotNullOrEmpty(errors, field, value, message);
+        checkNotTooLong(errors, field, value, maxLength, message);
     }
 
     protected static void checkNotTooLong(final Map<String, String> errors, final String field, final String value, final int maxLength, final String message) {

@@ -10,7 +10,6 @@ package io.javadog.cws.common.keys;
 import io.javadog.cws.common.enums.KeyAlgorithm;
 
 import javax.crypto.SecretKey;
-import java.util.Objects;
 
 /**
  * @author Kim Jensen
@@ -55,28 +54,5 @@ public final class SecretCWSKey extends CWSKey<SecretKey> {
             // Theoretically, we should just invoke the key.destroy() here,
             // but each invocation of fails with a DestroyFailedException!
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean equals(final Object obj) {
-        boolean result = false;
-
-        if ((obj != null) && (getClass() == obj.getClass())) {
-            final SecretCWSKey that = (SecretCWSKey) obj;
-            result = super.equals(that) && Objects.equals(salt, that.salt);
-        }
-
-        return result;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int hashCode() {
-        return Objects.hash(super.hashCode(), salt);
     }
 }

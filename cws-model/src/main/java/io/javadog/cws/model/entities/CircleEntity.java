@@ -7,6 +7,8 @@
  */
 package io.javadog.cws.model.entities;
 
+import static io.javadog.cws.api.common.Constants.MAX_NAME_LENGTH;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.NamedQueries;
@@ -30,7 +32,7 @@ import javax.persistence.Table;
 })
 public class CircleEntity extends Externable {
 
-    @Column(name = "name", unique = true, nullable = false)
+    @Column(name = "name", unique = true, nullable = false, length = MAX_NAME_LENGTH)
     private String name = null;
 
     // =========================================================================

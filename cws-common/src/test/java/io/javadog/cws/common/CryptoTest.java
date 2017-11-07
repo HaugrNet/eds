@@ -17,7 +17,6 @@ import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.common.enums.KeyAlgorithm;
 import io.javadog.cws.common.exceptions.CWSException;
 import io.javadog.cws.common.exceptions.CryptoException;
-import io.javadog.cws.common.keys.CWSKey;
 import io.javadog.cws.common.keys.CWSKeyPair;
 import io.javadog.cws.common.keys.PrivateCWSKey;
 import io.javadog.cws.common.keys.SecretCWSKey;
@@ -26,7 +25,6 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import java.nio.charset.Charset;
-import java.security.KeyPair;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.util.UUID;
@@ -165,9 +163,9 @@ public final class CryptoTest {
 
         final CWSKeyPair dearmoredPair = crypto.extractAsymmetricKey(pair.getAlgorithm(), secretKey, salt, armoredPublicKey, armoredPrivateKey);
         assertThat(dearmoredPair.getAlgorithm(), is(pair.getAlgorithm()));
-        assertThat(dearmoredPair.getPublic(), is(pair.getPublic()));
-        assertThat(dearmoredPair.getPrivate(), is(pair.getPrivate()));
-        assertThat(dearmoredPair.getPublic().hashCode(), is(pair.getPublic().hashCode()));
+        assertThat(dearmoredPair.getPublic().getKey(), is(pair.getPublic().getKey()));
+        assertThat(dearmoredPair.getPrivate().getKey(), is(pair.getPrivate().getKey()));
+        assertThat(dearmoredPair.getPublic().getKey().hashCode(), is(pair.getPublic().getKey().hashCode()));
     }
 
     /**
@@ -311,55 +309,6 @@ public final class CryptoTest {
         assertThat(bytes, is(not(nullValue())));
         final String reversed = crypto.bytesToString(bytes);
         assertThat(reversed, is(str));
-    }
-
-    @Test
-    public void testCWSKeyPairEquality() {
-        final Settings settings = new Settings();
-        final Crypto crypto = new Crypto(settings);
-        final CWSKeyPair key1 = crypto.generateAsymmetricKey(KeyAlgorithm.RSA2048);
-        final CWSKeyPair key2 = crypto.generateAsymmetricKey(KeyAlgorithm.RSA4096);
-        final CWSKeyPair key3 = crypto.generateAsymmetricKey(KeyAlgorithm.RSA2048);
-        final KeyPair pair1 = new KeyPair(key1.getPublic().getKey(), key1.getPrivate().getKey());
-        final KeyPair pair2 = new KeyPair(key1.getPublic().getKey(), key2.getPrivate().getKey());
-        final KeyPair pair3 = new KeyPair(key2.getPublic().getKey(), key2.getPrivate().getKey());
-        final CWSKeyPair cwsPair1 = new CWSKeyPair(key1.getAlgorithm(), pair1);
-        final CWSKeyPair cwsPair2 = new CWSKeyPair(key2.getAlgorithm(), pair2);
-        final CWSKeyPair cwsPair3 = new CWSKeyPair(key3.getAlgorithm(), pair3);
-        final CWSKey<PublicKey> key4 = key1.getPublic();
-        final CWSKey<PrivateKey> key5 = key1.getPrivate();
-
-        assertThat(key1.equals(key1), is(true));
-        assertThat(key1.equals(key2), is(false));
-        assertThat(key1.equals(key3), is(false));
-        assertThat(key4.equals(key5), is(false));
-        assertThat(key1.equals(null), is(false));
-        assertThat(key1.equals("nope"), is(false));
-        assertThat(cwsPair1.equals(cwsPair2), is(false));
-        assertThat(cwsPair1.equals(cwsPair3), is(false));
-
-        assertThat(key1.hashCode(), is(key1.hashCode()));
-        assertThat(key1.hashCode(), is(not(key2.hashCode())));
-    }
-
-    @Test
-    public void testCWSKeyEquality() {
-        final Settings settings = new Settings();
-        final Crypto crypto = new Crypto(settings);
-        final SecretCWSKey key1 = crypto.generateSymmetricKey(KeyAlgorithm.AES128);
-        final SecretCWSKey key2 = new SecretCWSKey(key1.getAlgorithm(), key1.getKey());
-        final SecretCWSKey key3 = crypto.generateSymmetricKey(KeyAlgorithm.AES128);
-        key2.setSalt(UUID.randomUUID().toString());
-        key3.setSalt(UUID.randomUUID().toString());
-
-        assertThat(key1.equals(key1), is(true));
-        assertThat(key1.equals(key2), is(false));
-        assertThat(key1.equals(key3), is(false));
-        assertThat(key1.equals(null), is(false));
-        assertThat(key1.equals("nope"), is(false));
-
-        assertThat(key1.hashCode(), is(key1.hashCode()));
-        assertThat(key1.hashCode(), is(not(key2.hashCode())));
     }
 
     @Test

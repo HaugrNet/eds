@@ -34,7 +34,7 @@ public final class ProcessDataRequest extends Authentication implements CircleId
 
     @NotNull
     @XmlElement(name = Constants.FIELD_ACTION, required = true)
-    private Action action = Action.PROCESS;
+    private Action action = null;
 
     @Pattern(regexp = Constants.ID_PATTERN_REGEX)
     @XmlElement(name = Constants.FIELD_DATA_ID, nillable = true, required = true)
@@ -44,14 +44,13 @@ public final class ProcessDataRequest extends Authentication implements CircleId
     @XmlElement(name = Constants.FIELD_CIRCLE_ID, nillable = true)
     private String circleId = null;
 
-    @Size(min = 1, max = Constants.MAX_STRING_LENGTH)
+    @Size(min = 1, max = Constants.MAX_NAME_LENGTH)
     @XmlElement(name = Constants.FIELD_DATA_NAME, nillable = true)
     private String dataName = null;
 
     @Pattern(regexp = Constants.ID_PATTERN_REGEX)
     @XmlElement(name = Constants.FIELD_FOLDER_ID, nillable = true)
     private String folderId = null;
-
 
     @Size(min = 1, max = Constants.MAX_NAME_LENGTH)
     @XmlElement(name = Constants.FIELD_TYPENAME, required = true)
@@ -146,19 +145,18 @@ public final class ProcessDataRequest extends Authentication implements CircleId
                 case ADD:
                     checkNotNullAndValidId(errors, Constants.FIELD_CIRCLE_ID, circleId, "The Circle Id is missing or invalid.");
                     checkValidId(errors, Constants.FIELD_FOLDER_ID, folderId, "The Folder Id is invalid.");
-                    checkNotNullEmptyOrTooLong(errors, Constants.FIELD_DATA_NAME, dataName, Constants.MAX_STRING_LENGTH, "The name of the new Data Object is invalid.");
-                    checkNotNullOrEmpty(errors, Constants.FIELD_TYPENAME, typeName, "The Data Type is missing or invalid.");
+                    checkNotNullEmptyOrTooLong(errors, Constants.FIELD_DATA_NAME, dataName, Constants.MAX_NAME_LENGTH, "The name of the new Data Object is invalid.");
                     break;
                 case UPDATE:
-                    checkNotNullAndValidId(errors, Constants.FIELD_DATA_ID, dataId, "The Id is missing or invalid.");
+                    checkNotNullAndValidId(errors, Constants.FIELD_DATA_ID, dataId, "The Data Id is missing or invalid.");
                     checkValidId(errors, Constants.FIELD_FOLDER_ID, folderId, "The Folder Id is invalid.");
-                    checkNotTooLong(errors, Constants.FIELD_DATA_NAME, dataName, Constants.MAX_STRING_LENGTH, "The name of the new Data Object is invalid.");
+                    checkNotTooLong(errors, Constants.FIELD_DATA_NAME, dataName, Constants.MAX_NAME_LENGTH, "The new name of the Data Object is invalid.");
                     break;
                 case DELETE:
                     checkNotNullAndValidId(errors, Constants.FIELD_DATA_ID, dataId, "The Id is missing or invalid.");
                     break;
                 default:
-                    errors.put(Constants.FIELD_ACTION, "Invalid Action provided.");
+                    errors.put(Constants.FIELD_ACTION, "Not supported Action has been provided.");
             }
         }
 

@@ -7,7 +7,7 @@
  */
 package io.javadog.cws.model.entities;
 
-import static io.javadog.cws.api.common.Constants.MAX_STRING_LENGTH;
+import static io.javadog.cws.api.common.Constants.MAX_NAME_LENGTH;
 
 import io.javadog.cws.common.enums.KeyAlgorithm;
 
@@ -42,7 +42,7 @@ import javax.persistence.Table;
 @Table(name = "cws_members")
 public class MemberEntity extends Externable {
 
-    @Column(name = "name", unique = true, nullable = false, length = MAX_STRING_LENGTH)
+    @Column(name = "name", unique = true, nullable = false, length = MAX_NAME_LENGTH)
     private String name = null;
 
     @Column(name = "salt", unique = true, nullable = false, length = 36)

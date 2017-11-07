@@ -40,7 +40,7 @@ public final class DataServiceTest extends DatabaseSetup {
                 "Request Object contained errors:" +
                         "\nKey: credential, Error: The Credential is missing." +
                         "\nKey: accountName, Error: AccountName is missing, null or invalid." +
-                        "\nKey: action, Error: Invalid Action provided.");
+                        "\nKey: action, Error: No action has been provided.");
 
         final ProcessDataService service = new ProcessDataService(settings, entityManager);
         final ProcessDataRequest request = new ProcessDataRequest();
@@ -54,8 +54,8 @@ public final class DataServiceTest extends DatabaseSetup {
         prepareCause(VerificationException.class, ReturnCode.VERIFICATION_WARNING,
                 "Request Object contained errors:" +
                         "\nKey: credential, Error: The Credential is missing." +
-                        "\nKey: accountName, Error: AccountName is missing, null or invalid." +
-                        "\nKey: circleId, Error: Either a Circle or Data Id must be provided.");
+                        "\nKey: circle & data Id, Error: Either a Circle or Data Id must be provided." +
+                        "\nKey: accountName, Error: AccountName is missing, null or invalid.");
 
         final FetchDataService service = new FetchDataService(settings, entityManager);
         final FetchDataRequest request = new FetchDataRequest();
@@ -121,6 +121,18 @@ public final class DataServiceTest extends DatabaseSetup {
     }
 
     @Test
+    public void testFetchingInvalidDataId() {
+        final FetchDataService service = new FetchDataService(settings, entityManager);
+        final FetchDataRequest request = prepareRequest(FetchDataRequest.class, MEMBER_4);
+        request.setCircleId(CIRCLE_3_ID);
+        request.setDataId(UUID.randomUUID().toString());
+
+        final FetchDataResponse response = service.perform(request);
+        assertThat(response.getReturnCode(), is(ReturnCode.IDENTIFICATION_WARNING));
+        assertThat(response.getReturnMessage(), is("No information could be found for the given Id."));
+    }
+
+    @Test
     public void testUpdateNotExistingData() {
         final ProcessDataService service = new ProcessDataService(settings, entityManager);
         final ProcessDataRequest request = prepareRequest(ProcessDataRequest.class, MEMBER_4);
@@ -151,12 +163,12 @@ public final class DataServiceTest extends DatabaseSetup {
 
     @Test
     public void testMovingDataToFolderWhereSameNameDataExist() {
+        // TODO Complete this test
         final ProcessDataService service = new ProcessDataService(settings, entityManager);
-        final ProcessDataRequest saveRequest = prepareAddRequest(MEMBER_1, CIRCLE_1_ID, "The Data", 524288);
+        final ProcessDataRequest saveRequest = prepareAddRequest(MEMBER_4, CIRCLE_3_ID, "The Data", 524288);
         final ProcessDataResponse saveResponse = service.perform(saveRequest);
         assertThat(saveResponse.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(saveResponse.getReturnMessage(), is("Ok"));
-
     }
 
     @Test

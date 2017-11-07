@@ -11,6 +11,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertThat;
 
+import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.CredentialType;
 import org.junit.Test;
 
@@ -23,7 +24,7 @@ import java.util.Map;
 public final class AuthenticationTest {
 
     @Test
-    public void testClass() {
+    public void testClassflow() {
         final String name = "Authentication Name";
         final String credentials = "Member Passphrase";
         final CredentialType type = CredentialType.SIGNATURE;
@@ -45,10 +46,14 @@ public final class AuthenticationTest {
     }
 
     @Test
-    public void testValidationOfEmptyObject() {
+    public void testEmptyClass() {
         final Authentication authentication = new Authentication();
+        authentication.setAccountName("");
         authentication.setCredentialType(null);
+
         final Map<String, String> errors = authentication.validate();
         assertThat(errors.size(), is(2));
+        assertThat(errors.get(Constants.FIELD_ACCOUNT_NAME), is("AccountName is missing, null or invalid."));
+        assertThat(errors.get(Constants.FIELD_CREDENTIAL), is("The Credential is missing."));
     }
 }

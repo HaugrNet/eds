@@ -10,7 +10,6 @@ package io.javadog.cws.common.keys;
 import io.javadog.cws.common.enums.KeyAlgorithm;
 
 import java.security.KeyPair;
-import java.util.Objects;
 
 /**
  * @author Kim Jensen
@@ -42,22 +41,5 @@ public final class CWSKeyPair {
 
     public KeyAlgorithm getAlgorithm() {
         return publicKey.getAlgorithm();
-    }
-
-    @Override
-    public boolean equals(final Object obj) {
-        boolean result = false;
-
-        if ((obj != null) && (getClass() == obj.getClass())) {
-            final CWSKeyPair that = (CWSKeyPair) obj;
-            result = Objects.equals(publicKey, that.publicKey) && Objects.equals(privateKey, that.privateKey);
-        }
-
-        return result;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(publicKey, privateKey);
     }
 }

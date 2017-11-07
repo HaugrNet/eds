@@ -100,7 +100,7 @@ public final class FetchDataRequest extends Authentication implements CircleIdRe
         final Map<String, String> errors = super.validate();
 
         if ((circleId == null) && (dataId == null)) {
-            errors.put(Constants.FIELD_CIRCLE_ID, "Either a Circle or Data Id must be provided.");
+            errors.put(Constants.FIELD_IDS, "Either a Circle or Data Id must be provided.");
         }
         checkValidId(errors, Constants.FIELD_CIRCLE_ID, circleId, "The Circle Id is invalid.");
         checkValidId(errors, Constants.FIELD_DATA_ID, dataId, "The Data Id is invalid.");

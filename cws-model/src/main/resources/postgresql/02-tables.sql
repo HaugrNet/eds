@@ -110,7 +110,7 @@ CREATE TABLE cws_settings (
 CREATE TABLE cws_members (
   id               SERIAL,
   external_id      VARCHAR(36),
-  name             VARCHAR(256), -- Member Authentication information
+  name             VARCHAR(75), -- Member Authentication information
   salt             VARCHAR(36),
   algorithm        VARCHAR(19) DEFAULT 'RSA2048',
   public_key       VARCHAR(1024), -- Public Key, stored armored
@@ -147,7 +147,7 @@ CREATE TABLE cws_members (
 CREATE TABLE cws_circles (
   id               SERIAL,
   external_id      VARCHAR(36),
-  name             VARCHAR(256),
+  name             VARCHAR(75),
   modified         TIMESTAMP DEFAULT now(),
   created          TIMESTAMP DEFAULT now(),
 
@@ -306,7 +306,7 @@ CREATE TABLE cws_trustees (
 -- =============================================================================
 CREATE TABLE cws_datatypes (
   id               SERIAL,
-  datatype_name    VARCHAR(256),
+  datatype_name    VARCHAR(75),
   datatype_value   VARCHAR(256),
   modified         TIMESTAMP DEFAULT now(),
   created          TIMESTAMP DEFAULT now(),
@@ -357,7 +357,7 @@ CREATE TABLE cws_metadata (
   parent_id        INTEGER,
   circle_id        INTEGER,
   datatype_id      INTEGER,
-  name             VARCHAR(256),
+  name             VARCHAR(75),
   modified         TIMESTAMP DEFAULT now(),
   created          TIMESTAMP DEFAULT now(),
 

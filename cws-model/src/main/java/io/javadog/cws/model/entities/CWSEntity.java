@@ -31,12 +31,12 @@ public class CWSEntity {
     private Long id;
 
     @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "modified", nullable = false)
-    private Date modified = null;
+    @Column(name = "altered", nullable = false)
+    private Date altered = null;
 
     @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "created", nullable = false, updatable = false)
-    private Date created = null;
+    @Column(name = "added", nullable = false, updatable = false)
+    private Date added = null;
 
     // =========================================================================
     // Entity Setters & Getters
@@ -50,19 +50,19 @@ public class CWSEntity {
         return id;
     }
 
-    public void setModified(final Date modified) {
-        this.modified = copy(modified);
+    public void setAltered(final Date modified) {
+        this.altered = copy(modified);
     }
 
-    public Date getModified() {
-        return copy(modified);
+    public Date getAltered() {
+        return copy(altered);
     }
 
-    public void setCreated(final Date created) {
-        this.created = copy(created);
+    public void setAdded(final Date created) {
+        this.added = copy(created);
     }
 
-    public Date getCreated() {
-        return copy(created);
+    public Date getAdded() {
+        return copy(added);
     }
 }

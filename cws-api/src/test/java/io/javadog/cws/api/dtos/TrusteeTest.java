@@ -29,20 +29,20 @@ public final class TrusteeTest {
         final Circle circle = prepareCircle(UUID.randomUUID().toString(), "Circle Name", new Date());
         final TrustLevel trustLevel = TrustLevel.WRITE;
         final Date lastModified = new Date(456L);
-        final Date created = new Date(123L);
+        final Date added = new Date(123L);
 
         final Trustee trustee = new Trustee();
         trustee.setMember(member);
         trustee.setCircle(circle);
         trustee.setTrustLevel(trustLevel);
         trustee.setChanged(lastModified);
-        trustee.setSince(created);
+        trustee.setAdded(added);
 
         assertThat(trustee.getMember(), is(member));
         assertThat(trustee.getCircle(), is(circle));
         assertThat(trustee.getTrustLevel(), is(trustLevel));
         assertThat(trustee.getChanged(), is(lastModified));
-        assertThat(trustee.getSince(), is(created));
+        assertThat(trustee.getAdded(), is(added));
     }
 
     @Test
@@ -61,7 +61,7 @@ public final class TrusteeTest {
         sameTrustee.setCircle(trustee.getCircle());
         sameTrustee.setTrustLevel(trustee.getTrustLevel());
         sameTrustee.setChanged(trustee.getChanged());
-        sameTrustee.setSince(trustee.getSince());
+        sameTrustee.setAdded(trustee.getAdded());
 
         assertThat(trustee.equals(null), is(false));
         assertThat(trustee.equals(trustee), is(true));
@@ -118,22 +118,22 @@ public final class TrusteeTest {
         return member;
     }
 
-    private static Circle prepareCircle(final String circleID, final String circleName, final Date created) {
+    private static Circle prepareCircle(final String circleID, final String circleName, final Date added) {
         final Circle circle = new Circle();
         circle.setCircleId(circleID);
         circle.setCircleName(circleName);
-        circle.setCreated(created);
+        circle.setAdded(added);
 
         return circle;
     }
 
-    private static Trustee prepareTrustee(final Member member, final Circle circle, final TrustLevel trustLevel, final Date lastModified, final Date since) {
+    private static Trustee prepareTrustee(final Member member, final Circle circle, final TrustLevel trustLevel, final Date lastModified, final Date added) {
         final Trustee trustee = new Trustee();
         trustee.setMember(member);
         trustee.setCircle(circle);
         trustee.setTrustLevel(trustLevel);
         trustee.setChanged(lastModified);
-        trustee.setSince(since);
+        trustee.setAdded(added);
 
         return trustee;
     }

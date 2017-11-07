@@ -139,7 +139,7 @@ public final class FetchMemberService extends Serviceable<FetchMemberResponse, F
 
         member.setMemberId(entity.getExternalId());
         member.setAccountName(entity.getName());
-        member.setAdded(entity.getCreated());
+        member.setAdded(entity.getAdded());
 
         return member;
     }
@@ -190,7 +190,7 @@ public final class FetchMemberService extends Serviceable<FetchMemberResponse, F
 
         circle.setCircleId(entity.getExternalId());
         circle.setCircleName(entity.getName());
-        circle.setCreated(entity.getCreated());
+        circle.setAdded(entity.getAdded());
 
         return circle;
     }

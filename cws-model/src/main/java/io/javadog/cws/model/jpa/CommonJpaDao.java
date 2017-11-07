@@ -55,11 +55,11 @@ public final class CommonJpaDao implements CommonDao {
             ((Externable) entity).setExternalId(UUID.randomUUID().toString());
         }
 
-        if (entity.getCreated() == null) {
-            entity.setCreated(new Date());
+        if (entity.getAdded() == null) {
+            entity.setAdded(new Date());
         }
 
-        entity.setModified(new Date());
+        entity.setAltered(new Date());
         entityManager.persist(entity);
     }
 

@@ -69,8 +69,8 @@ CREATE TABLE cws_settings (
   name             VARCHAR(256),
   setting          VARCHAR(256),
   modifiable       BOOLEAN   DEFAULT TRUE,
-  modified         TIMESTAMP DEFAULT now(),
-  created          TIMESTAMP DEFAULT now(),
+  altered          TIMESTAMP DEFAULT now(),
+  added            TIMESTAMP DEFAULT now(),
 
   /* Primary & Foreign Keys */
   CONSTRAINT setting_pk                     PRIMARY KEY (id),
@@ -82,8 +82,8 @@ CREATE TABLE cws_settings (
   CONSTRAINT setting_notnull_id             CHECK (id IS NOT NULL),
   CONSTRAINT setting_notnull_name           CHECK (name IS NOT NULL),
   CONSTRAINT setting_notnull_modifiable     CHECK (modifiable IS NOT NULL),
-  CONSTRAINT setting_notnull_modified       CHECK (modified IS NOT NULL),
-  CONSTRAINT setting_notnull_created        CHECK (created IS NOT NULL)
+  CONSTRAINT setting_notnull_altered        CHECK (altered IS NOT NULL),
+  CONSTRAINT setting_notnull_added          CHECK (added IS NOT NULL)
 );
 
 -- =============================================================================
@@ -115,8 +115,8 @@ CREATE TABLE cws_members (
   algorithm        VARCHAR(19) DEFAULT 'RSA2048',
   public_key       VARCHAR(1024), -- Public Key, stored armored
   private_key      VARCHAR(8192), -- Private Key, stored encrypted & armored
-  modified         TIMESTAMP DEFAULT now(),
-  created          TIMESTAMP DEFAULT now(),
+  altered          TIMESTAMP DEFAULT now(),
+  added            TIMESTAMP DEFAULT now(),
 
   /* Primary & Foreign Keys */
   CONSTRAINT member_pk                      PRIMARY KEY (id),
@@ -134,7 +134,8 @@ CREATE TABLE cws_members (
   CONSTRAINT member_notnull_algorithm       CHECK (algorithm IS NOT NULL),
   CONSTRAINT member_notnull_public_key      CHECK (public_key IS NOT NULL),
   CONSTRAINT member_notnull_private_key     CHECK (private_key IS NOT NULL),
-  CONSTRAINT member_notnull_created         CHECK (created IS NOT NULL)
+  CONSTRAINT member_notnull_altered         CHECK (altered IS NOT NULL),
+  CONSTRAINT member_notnull_added           CHECK (added IS NOT NULL)
 );
 
 -- =============================================================================
@@ -148,8 +149,8 @@ CREATE TABLE cws_circles (
   id               SERIAL,
   external_id      VARCHAR(36),
   name             VARCHAR(75),
-  modified         TIMESTAMP DEFAULT now(),
-  created          TIMESTAMP DEFAULT now(),
+  altered          TIMESTAMP DEFAULT now(),
+  added            TIMESTAMP DEFAULT now(),
 
   /* Primary & Foreign Keys */
   CONSTRAINT circle_pk                      PRIMARY KEY (id),
@@ -162,8 +163,8 @@ CREATE TABLE cws_circles (
   CONSTRAINT circle_notnull_id              CHECK (id IS NOT NULL),
   CONSTRAINT circle_notnull_external_id     CHECK (external_id IS NOT NULL),
   CONSTRAINT circle_notnull_name            CHECK (name IS NOT NULL),
-  CONSTRAINT circle_notnull_modified        CHECK (modified IS NOT NULL),
-  CONSTRAINT circle_notnull_created         CHECK (created IS NOT NULL)
+  CONSTRAINT circle_notnull_altered         CHECK (altered IS NOT NULL),
+  CONSTRAINT circle_notnull_added           CHECK (added IS NOT NULL)
 );
 
 -- =============================================================================
@@ -218,8 +219,8 @@ CREATE TABLE cws_keys (
   status           VARCHAR(256) DEFAULT 'ACTIVE',
   expires          TIMESTAMP,
   grace_period     INTEGER,
-  modified         TIMESTAMP   DEFAULT now(),
-  created          TIMESTAMP   DEFAULT now(),
+  altered          TIMESTAMP   DEFAULT now(),
+  added            TIMESTAMP   DEFAULT now(),
 
   /* Primary & Foreign Keys */
   CONSTRAINT key_pk                         PRIMARY KEY (id),
@@ -228,8 +229,8 @@ CREATE TABLE cws_keys (
   CONSTRAINT key_notnull_id                 CHECK (id IS NOT NULL),
   CONSTRAINT key_notnull_algorithm          CHECK (algorithm IS NOT NULL),
   CONSTRAINT key_notnull_status             CHECK (status IS NOT NULL),
-  CONSTRAINT key_notnull_modified           CHECK (modified IS NOT NULL),
-  CONSTRAINT key_notnull_created            CHECK (created IS NOT NULL)
+  CONSTRAINT key_notnull_altered            CHECK (altered IS NOT NULL),
+  CONSTRAINT key_notnull_added              CHECK (added IS NOT NULL)
 );
 
 -- =============================================================================
@@ -270,8 +271,8 @@ CREATE TABLE cws_trustees (
   key_id           INTEGER,
   trust_level      VARCHAR(10),
   circle_key       VARCHAR(8192) DEFAULT 'Not Applicable',
-  modified         TIMESTAMP     DEFAULT now(),
-  created          TIMESTAMP     DEFAULT now(),
+  altered          TIMESTAMP     DEFAULT now(),
+  added            TIMESTAMP     DEFAULT now(),
 
   /* Primary & Foreign Keys */
   CONSTRAINT trustee_pk                     PRIMARY KEY (id),
@@ -289,8 +290,8 @@ CREATE TABLE cws_trustees (
   CONSTRAINT trustee_notnull_key_id         CHECK (key_id IS NOT NULL),
   CONSTRAINT trustee_notnull_trust_level    CHECK (trust_level IS NOT NULL),
   CONSTRAINT trustee_notnull_circle_key     CHECK (circle_key IS NOT NULL),
-  CONSTRAINT trustee_notnull_modified       CHECK (modified IS NOT NULL),
-  CONSTRAINT trustee_notnull_created        CHECK (created IS NOT NULL)
+  CONSTRAINT trustee_notnull_altered        CHECK (altered IS NOT NULL),
+  CONSTRAINT trustee_notnull_added          CHECK (added IS NOT NULL)
 );
 
 -- =============================================================================
@@ -308,8 +309,8 @@ CREATE TABLE cws_datatypes (
   id               SERIAL,
   datatype_name    VARCHAR(75),
   datatype_value   VARCHAR(256),
-  modified         TIMESTAMP DEFAULT now(),
-  created          TIMESTAMP DEFAULT now(),
+  altered          TIMESTAMP DEFAULT now(),
+  added            TIMESTAMP DEFAULT now(),
 
   /* Primary & Foreign Keys */
   CONSTRAINT datatype_pk                    PRIMARY KEY (id),
@@ -321,8 +322,8 @@ CREATE TABLE cws_datatypes (
   CONSTRAINT datatype_notnull_id            CHECK (id IS NOT NULL),
   CONSTRAINT datatype_notnull_type_name     CHECK (datatype_name IS NOT NULL),
   CONSTRAINT datatype_notnull_type_value    CHECK (datatype_value IS NOT NULL),
-  CONSTRAINT datatype_notnull_modified      CHECK (modified IS NOT NULL),
-  CONSTRAINT datatype_notnull_created       CHECK (created IS NOT NULL)
+  CONSTRAINT datatype_notnull_altered       CHECK (altered IS NOT NULL),
+  CONSTRAINT datatype_notnull_added         CHECK (added IS NOT NULL)
 );
 
 -- =============================================================================
@@ -358,8 +359,8 @@ CREATE TABLE cws_metadata (
   circle_id        INTEGER,
   datatype_id      INTEGER,
   name             VARCHAR(75),
-  modified         TIMESTAMP DEFAULT now(),
-  created          TIMESTAMP DEFAULT now(),
+  altered          TIMESTAMP DEFAULT now(),
+  added            TIMESTAMP DEFAULT now(),
 
   /* Primary & Foreign Keys */
   CONSTRAINT metadata_pk                    PRIMARY KEY (id),
@@ -375,8 +376,8 @@ CREATE TABLE cws_metadata (
   CONSTRAINT metadata_notafter_parent_id    CHECK (parent_id < id),
   CONSTRAINT metadata_notnull_circle_id     CHECK (circle_id IS NOT NULL),
   CONSTRAINT metadata_notnull_type_id       CHECK (datatype_id IS NOT NULL),
-  CONSTRAINT metadata_notnull_modified      CHECK (modified IS NOT NULL),
-  CONSTRAINT metadata_notnull_created       CHECK (created IS NOT NULL)
+  CONSTRAINT metadata_notnull_altered       CHECK (altered IS NOT NULL),
+  CONSTRAINT metadata_notnull_added         CHECK (added IS NOT NULL)
 );
 
 -- =============================================================================
@@ -394,8 +395,8 @@ CREATE TABLE cws_data (
   encrypted_data   BYTEA,
   initial_vector   VARCHAR(256), -- Storing it armored
   checksum         VARCHAR(256),
-  modified         TIMESTAMP DEFAULT now(),
-  created          TIMESTAMP DEFAULT now(),
+  altered          TIMESTAMP DEFAULT now(),
+  added            TIMESTAMP DEFAULT now(),
 
   /* Primary & Foreign Keys */
   CONSTRAINT data_pk                        PRIMARY KEY (id),
@@ -409,8 +410,8 @@ CREATE TABLE cws_data (
   CONSTRAINT data_notnull_data              CHECK (encrypted_data IS NOT NULL),
   CONSTRAINT data_notnull_initial_vector    CHECK (initial_vector IS NOT NULL),
   CONSTRAINT data_notnull_checksum          CHECK (checksum IS NOT NULL),
-  CONSTRAINT data_notnull_modified          CHECK (modified IS NOT NULL),
-  CONSTRAINT data_notnull_created           CHECK (created IS NOT NULL)
+  CONSTRAINT data_notnull_altered           CHECK (altered IS NOT NULL),
+  CONSTRAINT data_notnull_added             CHECK (added IS NOT NULL)
 );
 
 -- =============================================================================
@@ -424,8 +425,8 @@ CREATE TABLE cws_signatures (
   member_id        INTEGER,
   expires          TIMESTAMP,
   verifications    INTEGER DEFAULT 0,
-  modified         TIMESTAMP DEFAULT now(),
-  created          TIMESTAMP DEFAULT now(),
+  altered          TIMESTAMP DEFAULT now(),
+  added            TIMESTAMP DEFAULT now(),
 
   /* Primary & Foreign Keys */
   CONSTRAINT signature_pk                   PRIMARY KEY (id),
@@ -438,6 +439,6 @@ CREATE TABLE cws_signatures (
   CONSTRAINT signarure_notnull_id           CHECK (id IS NOT NULL),
   CONSTRAINT signature_notnull_checksum     CHECK (checksum IS NOT NULL),
   CONSTRAINT signarure_notnull_member_id    CHECK (member_id IS NOT NULL),
-  CONSTRAINT signarure_notnull_modified     CHECK (modified IS NOT NULL),
-  CONSTRAINT signarure_notnull_created      CHECK (created IS NOT NULL)
+  CONSTRAINT signarure_notnull_altered      CHECK (altered IS NOT NULL),
+  CONSTRAINT signarure_notnull_added        CHECK (added IS NOT NULL)
 );

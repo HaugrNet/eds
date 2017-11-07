@@ -27,7 +27,7 @@ import java.util.Objects;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "trustee", propOrder = { Constants.FIELD_CIRCLE, Constants.FIELD_MEMBER, Constants.FIELD_TRUSTLEVEL, Constants.FIELD_CHANGED, Constants.FIELD_SINCE })
+@XmlType(name = "trustee", propOrder = { Constants.FIELD_CIRCLE, Constants.FIELD_MEMBER, Constants.FIELD_TRUSTLEVEL, Constants.FIELD_CHANGED, Constants.FIELD_ADDED })
 public final class Trustee implements Serializable {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
@@ -45,8 +45,8 @@ public final class Trustee implements Serializable {
     @XmlElement(name = Constants.FIELD_CHANGED)
     private Date changed = null;
 
-    @XmlElement(name = Constants.FIELD_SINCE)
-    private Date since = null;
+    @XmlElement(name = Constants.FIELD_ADDED)
+    private Date added = null;
 
     // =========================================================================
     // Standard Setters & Getters
@@ -84,12 +84,12 @@ public final class Trustee implements Serializable {
         return copy(changed);
     }
 
-    public void setSince(final Date since) {
-        this.since = copy(since);
+    public void setAdded(final Date added) {
+        this.added = copy(added);
     }
 
-    public Date getSince() {
-        return copy(since);
+    public Date getAdded() {
+        return copy(added);
     }
 
     // =========================================================================
@@ -114,7 +114,7 @@ public final class Trustee implements Serializable {
                 Objects.equals(circle, that.circle) &&
                 Objects.equals(member, that.member) &&
                 Objects.equals(changed, that.changed) &&
-                Objects.equals(since, that.since);
+                Objects.equals(added, that.added);
     }
 
     /**
@@ -122,7 +122,7 @@ public final class Trustee implements Serializable {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(circle, member, trustLevel, changed, since);
+        return Objects.hash(circle, member, trustLevel, changed, added);
     }
 
     /**
@@ -135,7 +135,7 @@ public final class Trustee implements Serializable {
                 ", member=" + member +
                 ", trustLevel=" + trustLevel +
                 ", changed=" + changed +
-                ", since=" + since +
+                ", added=" + added +
                 '}';
     }
 }

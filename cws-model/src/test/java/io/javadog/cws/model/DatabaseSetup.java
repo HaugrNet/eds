@@ -120,8 +120,8 @@ public class DatabaseSetup {
         entity.setAlgorithm(settings.getAsymmetricAlgorithm());
         entity.setPublicKey(crypto.armoringPublicKey(keyPair.getPublic().getKey()));
         entity.setPrivateKey(crypto.armoringPrivateKey(secretKey, keyPair.getPrivate().getKey()));
-        entity.setModified(new Date());
-        entity.setCreated(new Date());
+        entity.setAltered(new Date());
+        entity.setAdded(new Date());
 
         return entity;
     }

@@ -63,10 +63,10 @@ public final class MemberEntityTest extends DatabaseSetup {
         final String externalId = UUID.randomUUID().toString();
         final MemberEntity entity = prepareMember(externalId, credential, algorithm, publicKey, privateKey);
 
-        final long lastModified = entity.getModified().getTime();
+        final long lastModified = entity.getAltered().getTime();
 
         persist(entity);
-        assertThat(entity.getModified().getTime() >= lastModified, is(true));
+        assertThat(entity.getAltered().getTime() >= lastModified, is(true));
     }
 
     @Test

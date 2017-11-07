@@ -31,11 +31,11 @@ public class CircleTest {
         final Circle circle = new Circle();
         circle.setCircleId(id);
         circle.setCircleName(name);
-        circle.setCreated(date);
+        circle.setAdded(date);
 
         assertThat(circle.getCircleId(), is(id));
         assertThat(circle.getCircleName(), is(name));
-        assertThat(circle.getCreated(), is(date));
+        assertThat(circle.getAdded(), is(date));
     }
 
     @Test
@@ -46,7 +46,7 @@ public class CircleTest {
 
         sameCircle.setCircleId(circle.getCircleId());
         sameCircle.setCircleName(circle.getCircleName());
-        sameCircle.setCreated(circle.getCreated());
+        sameCircle.setAdded(circle.getAdded());
 
         assertThat(circle.equals(null), is(false));
         assertThat(circle.equals(circle), is(true));
@@ -66,12 +66,12 @@ public class CircleTest {
         final String circleId2 = UUID.randomUUID().toString();
         final String circleName1 = "First Circle Name";
         final String circleName2 = "Second Circle Name";
-        final Date created1 = new Date(1212121212L);
-        final Date created2 = new Date(2121212121L);
-        final Circle circle1 = prepareCircle(circleId1, circleName1, created1);
-        final Circle circle2 = prepareCircle(circleId2, circleName1, created1);
-        final Circle circle3 = prepareCircle(circleId1, circleName2, created1);
-        final Circle circle4 = prepareCircle(circleId1, circleName1, created2);
+        final Date added1 = new Date(1212121212L);
+        final Date added2 = new Date(2121212121L);
+        final Circle circle1 = prepareCircle(circleId1, circleName1, added1);
+        final Circle circle2 = prepareCircle(circleId2, circleName1, added1);
+        final Circle circle3 = prepareCircle(circleId1, circleName2, added1);
+        final Circle circle4 = prepareCircle(circleId1, circleName1, added2);
 
         assertThat(circle1.equals(circle2), is(false));
         assertThat(circle2.equals(circle1), is(false));
@@ -85,11 +85,11 @@ public class CircleTest {
     // Internal Helper Method
     // =========================================================================
 
-    private static Circle prepareCircle(final String circleId, final String circleName, final Date created) {
+    private static Circle prepareCircle(final String circleId, final String circleName, final Date added) {
         final Circle circle = new Circle();
         circle.setCircleId(circleId);
         circle.setCircleName(circleName);
-        circle.setCreated(created);
+        circle.setAdded(added);
 
         return circle;
     }

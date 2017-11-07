@@ -132,8 +132,8 @@ public final class FetchCircleService extends Serviceable<FetchCircleResponse, F
         trustee.setMember(convert(entity.getMember()));
         trustee.setCircle(convert(entity.getCircle()));
         trustee.setTrustLevel(entity.getTrustLevel());
-        trustee.setChanged(entity.getModified());
-        trustee.setSince(entity.getCreated());
+        trustee.setChanged(entity.getAltered());
+        trustee.setAdded(entity.getAdded());
 
         return trustee;
     }
@@ -143,7 +143,7 @@ public final class FetchCircleService extends Serviceable<FetchCircleResponse, F
 
         member.setMemberId(entity.getExternalId());
         member.setAccountName(entity.getName());
-        member.setAdded(entity.getCreated());
+        member.setAdded(entity.getAdded());
 
         return member;
     }
@@ -153,7 +153,7 @@ public final class FetchCircleService extends Serviceable<FetchCircleResponse, F
 
         circle.setCircleId(entity.getExternalId());
         circle.setCircleName(entity.getName());
-        circle.setCreated(entity.getCreated());
+        circle.setAdded(entity.getAdded());
 
         return circle;
     }

@@ -24,7 +24,7 @@ import java.util.Objects;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "circle", propOrder = { Constants.FIELD_CIRCLE_ID, Constants.FIELD_CIRCLE_NAME, Constants.FIELD_CREATED })
+@XmlType(name = "circle", propOrder = { Constants.FIELD_CIRCLE_ID, Constants.FIELD_CIRCLE_NAME, Constants.FIELD_ADDED })
 public final class Circle implements Serializable {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
@@ -36,8 +36,8 @@ public final class Circle implements Serializable {
     @XmlElement(name = Constants.FIELD_CIRCLE_NAME, required = true)
     private String circleName = null;
 
-    @XmlElement(name = Constants.FIELD_CREATED)
-    private Date created = null;
+    @XmlElement(name = Constants.FIELD_ADDED)
+    private Date added = null;
 
     // =========================================================================
     // Standard Setters & Getters
@@ -59,12 +59,12 @@ public final class Circle implements Serializable {
         return circleName;
     }
 
-    public void setCreated(final Date created) {
-        this.created = copy(created);
+    public void setAdded(final Date added) {
+        this.added = copy(added);
     }
 
-    public Date getCreated() {
-        return copy(created);
+    public Date getAdded() {
+        return copy(added);
     }
 
     // =========================================================================
@@ -87,7 +87,7 @@ public final class Circle implements Serializable {
         final Circle that = (Circle) obj;
         return Objects.equals(circleId, that.circleId) &&
                 Objects.equals(circleName, that.circleName) &&
-                Objects.equals(created, that.created);
+                Objects.equals(added, that.added);
     }
 
     /**
@@ -95,7 +95,7 @@ public final class Circle implements Serializable {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(circleId, circleName, created);
+        return Objects.hash(circleId, circleName, added);
     }
 
     /**
@@ -105,7 +105,7 @@ public final class Circle implements Serializable {
         return "Circle{" +
                 "circleId='" + circleId + '\'' +
                 ", circleName='" + circleName + '\'' +
-                ", created=" + created +
+                ", added=" + added +
                 '}';
     }
 }

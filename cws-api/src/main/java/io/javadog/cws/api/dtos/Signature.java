@@ -24,7 +24,7 @@ import java.util.Objects;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "signature", propOrder = { Constants.FIELD_SIGNATURE, Constants.FIELD_EXPIRES, Constants.FIELD_VERIFICATIONS, Constants.FIELD_LAST_VERIFICATION, Constants.FIELD_CREATED })
+@XmlType(name = "signature", propOrder = { Constants.FIELD_SIGNATURE, Constants.FIELD_EXPIRES, Constants.FIELD_VERIFICATIONS, Constants.FIELD_LAST_VERIFICATION, Constants.FIELD_ADDED })
 public final class Signature implements Serializable {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
@@ -42,8 +42,8 @@ public final class Signature implements Serializable {
     @XmlElement(name = Constants.FIELD_LAST_VERIFICATION)
     private Date lastVerification = null;
 
-    @XmlElement(name = Constants.FIELD_CREATED)
-    private Date created = null;
+    @XmlElement(name = Constants.FIELD_ADDED)
+    private Date added = null;
 
     // =========================================================================
     // Standard Setters & Getters
@@ -82,12 +82,12 @@ public final class Signature implements Serializable {
         return copy(lastVerification);
     }
 
-    public void setCreated(final Date created) {
-        this.created = copy(created);
+    public void setAdded(final Date added) {
+        this.added = copy(added);
     }
 
-    public Date getCreated() {
-        return copy(created);
+    public Date getAdded() {
+        return copy(added);
     }
 
     // =========================================================================
@@ -112,12 +112,12 @@ public final class Signature implements Serializable {
                 Objects.equals(expires, that.expires) &&
                 Objects.equals(verifications, that.verifications) &&
                 Objects.equals(lastVerification, that.lastVerification) &&
-                Objects.equals(created, that.created);
+                Objects.equals(added, that.added);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(theSignature, expires, verifications, lastVerification, created);
+        return Objects.hash(theSignature, expires, verifications, lastVerification, added);
     }
 
     @Override
@@ -127,7 +127,7 @@ public final class Signature implements Serializable {
                 ", expires=" + expires +
                 ", verifications=" + verifications +
                 ", lastVerification=" + lastVerification +
-                ", created=" + created +
+                ", added=" + added +
                 '}';
     }
 }

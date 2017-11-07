@@ -143,7 +143,7 @@ public final class FetchDataService extends Serviceable<FetchDataResponse, Fetch
         metaData.setDataName(entity.getName());
         metaData.setDataId(entity.getExternalId());
         metaData.setCircleId(entity.getCircle().getExternalId());
-        metaData.setAdded(entity.getCreated());
+        metaData.setAdded(entity.getAdded());
         metaData.setFolderId(folderId);
 
         return metaData;

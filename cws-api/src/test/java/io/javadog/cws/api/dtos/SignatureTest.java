@@ -27,20 +27,20 @@ public final class SignatureTest {
         final String signatureValue = UUID.randomUUID().toString();
         final Date expires = new Date(123L);
         final Long verifications = 1L;
-        final Date created = new Date(321L);
+        final Date added = new Date(321L);
         final Date lastVerification = new Date();
 
         final Signature signature = new Signature();
         signature.setSignature(signatureValue);
         signature.setExpires(expires);
         signature.setVerifications(verifications);
-        signature.setCreated(created);
+        signature.setAdded(added);
         signature.setLastVerification(lastVerification);
 
         assertThat(signature.getSignature(), is(signatureValue));
         assertThat(signature.getExpires(), is(expires));
         assertThat(signature.getVerifications(), is(verifications));
-        assertThat(signature.getCreated(), is(created));
+        assertThat(signature.getAdded(), is(added));
         assertThat(signature.getLastVerification(), is(lastVerification));
     }
 
@@ -53,7 +53,7 @@ public final class SignatureTest {
         sameSignature.setSignature(signature.getSignature());
         sameSignature.setExpires(signature.getExpires());
         sameSignature.setVerifications(signature.getVerifications());
-        sameSignature.setCreated(signature.getCreated());
+        sameSignature.setAdded(signature.getAdded());
         sameSignature.setLastVerification(signature.getLastVerification());
 
         assertThat(signature.equals(null), is(false));
@@ -100,12 +100,12 @@ public final class SignatureTest {
     // Internal Helper Method
     // =========================================================================
 
-    private static Signature prepareSignature(final String signatureId, final Date expires, final Long verifications, final Date created, final Date lastVerification) {
+    private static Signature prepareSignature(final String signatureId, final Date expires, final Long verifications, final Date added, final Date lastVerification) {
         final Signature signature = new Signature();
         signature.setSignature(signatureId);
         signature.setExpires(expires);
         signature.setVerifications(verifications);
-        signature.setCreated(created);
+        signature.setAdded(added);
         signature.setLastVerification(lastVerification);
 
         return signature;

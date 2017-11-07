@@ -89,8 +89,4 @@ public final class SignatureEntity extends CWSEntity {
     public Long getVerifications() {
         return verifications;
     }
-
-    public void incrementVerifications() {
-        verifications++;
-    }
 }

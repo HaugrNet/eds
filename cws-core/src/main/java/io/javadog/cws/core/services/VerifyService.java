@@ -48,7 +48,7 @@ public final class VerifyService extends Serviceable<VerifyResponse, VerifyReque
                 final boolean verified = crypto.verify(publicKey, request.getData(), request.getSignature());
 
                 if (verified) {
-                    entity.incrementVerifications();
+                    entity.setVerifications(entity.getVerifications() + 1);
                     dao.persist(entity);
                 }
 

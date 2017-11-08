@@ -63,8 +63,8 @@ public final class ProcessMemberService extends Serviceable<ProcessMemberRespons
                         response = deleteMember(request);
                         break;
                     default:
-                        // This line should be unreachable, if not. Programming error!
-                        response = new ProcessMemberResponse(ReturnCode.ILLEGAL_ACTION, "Unsupported request.");
+                        // Unreachable Code by design.
+                        throw new CWSException(ReturnCode.ILLEGAL_ACTION, "Unsupported Action.");
                 }
             }
 

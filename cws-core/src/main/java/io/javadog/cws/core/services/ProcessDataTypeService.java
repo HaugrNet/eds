@@ -49,7 +49,8 @@ public final class ProcessDataTypeService extends Serviceable<ProcessDataTypeRes
                 response = doDelete(request);
                 break;
             default:
-                throw new CWSException(ReturnCode.ILLEGAL_ACTION, "The Action " + request.getAction() + " is not supported for this request.");
+                // Unreachable Code by design.
+                throw new CWSException(ReturnCode.ILLEGAL_ACTION, "Unsupported Action.");
         }
 
         return response;

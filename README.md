@@ -1,3 +1,5 @@
+# [![Coverity Status](https://scan.coverity.com/projects/13955/badge.svg)](https://scan.coverity.com/projects/javadogs-cws) [![SonarQube Badge](https://sonarcloud.io/api/badges/gate?key=io.javadog:cws)](https://sonarcloud.io/dashboard?id=io.javadog:cws) [![GitHub license](https://img.shields.io/badge/license-Apache+License+2.0-blue.svg?style=flat)](http://www.apache.org/licenses/LICENSE-2.0)
+
 # CWS - Cryptographic Web Store
 CWS, Cryptographic Web Store or CryptoStore, is designed to be used as a backend
 component in other systems. Facilitating protected storing, sharing or

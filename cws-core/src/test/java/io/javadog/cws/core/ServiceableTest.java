@@ -8,16 +8,17 @@
 package io.javadog.cws.core;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 
+import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.requests.FetchCircleRequest;
 import io.javadog.cws.api.requests.SettingRequest;
 import io.javadog.cws.api.requests.SignRequest;
 import io.javadog.cws.common.exceptions.AuthenticationException;
 import io.javadog.cws.common.exceptions.AuthorizationException;
-import io.javadog.cws.common.exceptions.VerificationException;
 import io.javadog.cws.core.services.FetchCircleService;
 import io.javadog.cws.core.services.SettingService;
 import io.javadog.cws.core.services.SignService;
@@ -28,15 +29,17 @@ import org.junit.Test;
  * @author Kim Jensen
  * @since  CWS 1.0
  */
-public final class ServicableTest extends DatabaseSetup {
+public final class ServiceableTest extends DatabaseSetup {
 
     @Test
-    public void testAccessSettingsWithNullRequest() {
-        prepareCause(VerificationException.class, ReturnCode.VERIFICATION_WARNING, "Cannot Process a NULL Object.");
+    public void testAccesWithInvalidPassword() {
+        prepareCause(AuthenticationException.class, ReturnCode.AUTHENTICATION_WARNING, "Cannot authenticate the Account 'admin' from the given Credentials.");
 
         final SettingService service = new SettingService(settings, entityManager);
-        final SettingRequest request = null;
-        assertThat(request, is(nullValue()));
+        final SettingRequest request = new SettingRequest();
+        request.setAccountName(Constants.ADMIN_ACCOUNT);
+        request.setCredential("Invalid Credentials");
+        assertThat(request, is(not(nullValue())));
 
         service.perform(request);
     }

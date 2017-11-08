@@ -34,6 +34,8 @@ public interface CommonDao {
 
     <E extends Externable> E find(Class<E> cwsEntity, String externalId);
 
+    <E extends CWSEntity> E getReference(Class<E> cwsEntity, Long id);
+
     <E extends CWSEntity> void delete(E entity);
 
     MemberEntity findMemberByName(String name);

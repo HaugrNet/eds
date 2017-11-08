@@ -84,6 +84,11 @@ public final class CommonJpaDao implements CommonDao {
         return findSingleRecord(entityManager.createQuery(query));
     }
 
+    @Override
+    public <E extends CWSEntity> E getReference(final Class<E> cwsEntity, final Long id) {
+        return entityManager.getReference(cwsEntity, id);
+    }
+
     /**
      * {@inheritDoc}
      */

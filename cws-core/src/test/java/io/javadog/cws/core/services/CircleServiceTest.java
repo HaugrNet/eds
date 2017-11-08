@@ -450,7 +450,7 @@ public final class CircleServiceTest extends DatabaseSetup {
         final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, Constants.ADMIN_ACCOUNT);
         request.setAction(Action.ADD);
         request.setCircleId(CIRCLE_1_ID);
-        request.setMemberId(MEMBER_5_ID);
+        request.setMemberId(MEMBER_4_ID);
         request.setTrustLevel(TrustLevel.WRITE);
 
         final ProcessCircleResponse response = service.perform(request);
@@ -466,7 +466,7 @@ public final class CircleServiceTest extends DatabaseSetup {
         final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, MEMBER_2);
         request.setAction(Action.ADD);
         request.setCircleId(CIRCLE_1_ID);
-        request.setMemberId(MEMBER_5_ID);
+        request.setMemberId(MEMBER_3_ID);
         request.setTrustLevel(TrustLevel.WRITE);
         assertThat(request.validate().isEmpty(), is(true));
 

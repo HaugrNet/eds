@@ -43,13 +43,17 @@ public final class CommonBeanTest extends BeanSetup {
 
     @Test
     public void testDestroy() {
+        thrown.expect(CWSException.class);
+        thrown.expectMessage("Method is not implemented.");
+
         final SettingService service = new SettingService(settings, entityManager);
         final FailService failService = new FailService(settings, entityManager);
-        assertThat(failService.perform(null), is(nullValue()));
 
         CommonBean.destroy(null);
         CommonBean.destroy(service);
         CommonBean.destroy(failService);
+
+        assertThat(failService.perform(null), is(nullValue()));
     }
 
     /**
@@ -74,7 +78,7 @@ public final class CommonBeanTest extends BeanSetup {
          */
         @Override
         public SettingResponse perform(final SettingRequest request) {
-            return null;
+            throw new CWSException(ReturnCode.ERROR, "Method is not implemented.");
         }
 
         /**

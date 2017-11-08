@@ -334,7 +334,7 @@ public class DatabaseSetup {
     }
 
     private void createandAppendFolder(final StringBuilder builder, final CircleEntity circleEntity, final char delimiter) {
-        final DataTypeEntity dataTypeEntity = dao.find(DataTypeEntity.class, 1L);
+        final DataTypeEntity dataTypeEntity = dao.getReference(DataTypeEntity.class, 1L);
         final MetadataEntity entity = new MetadataEntity();
         entity.setCircle(circleEntity);
         entity.setName("/");

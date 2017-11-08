@@ -157,6 +157,7 @@ public final class ProcessDataRequest extends Authentication implements CircleId
                     break;
                 default:
                     errors.put(Constants.FIELD_ACTION, "Not supported Action has been provided.");
+                    break;
             }
         }
 

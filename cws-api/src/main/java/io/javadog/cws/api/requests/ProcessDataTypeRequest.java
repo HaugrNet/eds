@@ -94,6 +94,7 @@ public final class ProcessDataTypeRequest extends Authentication {
                     break;
                 default:
                     errors.put(Constants.FIELD_ACTION, "Not supported Action has been provided.");
+                    break;
             }
         }
 

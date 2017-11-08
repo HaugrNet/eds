@@ -146,6 +146,7 @@ public final class ProcessCircleRequest extends Authentication implements Circle
                     break;
                 default:
                     errors.put(Constants.FIELD_ACTION, "Not supported Action has been provided.");
+                    break;
             }
         }
 

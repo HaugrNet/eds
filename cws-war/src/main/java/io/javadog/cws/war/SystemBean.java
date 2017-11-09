@@ -9,7 +9,6 @@ package io.javadog.cws.war;
 
 import static io.javadog.cws.war.CommonBean.destroy;
 
-import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.requests.FetchCircleRequest;
 import io.javadog.cws.api.requests.FetchMemberRequest;
 import io.javadog.cws.api.requests.ProcessCircleRequest;
@@ -36,9 +35,6 @@ import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Properties;
 
 /**
  * @author Kim Jensen
@@ -49,8 +45,6 @@ public class SystemBean {
 
     private static final Logger log = LoggerFactory.getLogger(SystemBean.class);
 
-    private static final String CWS_CONFIG = "cws.config";
-
     @PersistenceContext(unitName = "cwsDS")
     private EntityManager entityManager;
 
@@ -58,19 +52,8 @@ public class SystemBean {
 
     @Transactional(Transactional.TxType.NEVER)
     public VersionResponse version() {
-        final ClassLoader loader = Thread.currentThread().getContextClassLoader();
-        VersionResponse response;
-
-        try (InputStream stream = loader.getResourceAsStream(CWS_CONFIG)) {
-            final Properties properties = new Properties();
-            properties.load(stream);
-
-            response = new VersionResponse();
-            response.setVersion(properties.getProperty("cws.version"));
-        } catch (IOException e) {
-            log.error(e.getMessage(), e);
-            response = new VersionResponse(ReturnCode.ERROR, e.getMessage());
-        }
+        final VersionResponse response = new VersionResponse();
+        response.setVersion("1.0");
 
         return response;
     }

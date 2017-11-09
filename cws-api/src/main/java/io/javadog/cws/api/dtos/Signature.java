@@ -31,7 +31,7 @@ public final class Signature implements Serializable {
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
     @XmlElement(name = Constants.FIELD_SIGNATURE)
-    private String theSignature = null;
+    private String signature = null;
 
     @XmlElement(name = Constants.FIELD_EXPIRES)
     private Date expires = null;
@@ -49,13 +49,12 @@ public final class Signature implements Serializable {
     // Standard Setters & Getters
     // =========================================================================
 
-
     public void setSignature(final String signature) {
-        this.theSignature = signature;
+        this.signature = signature;
     }
 
     public String getSignature() {
-        return theSignature;
+        return signature;
     }
 
     public void setExpires(final Date expires) {
@@ -108,7 +107,7 @@ public final class Signature implements Serializable {
         }
 
         final Signature that = (Signature) obj;
-        return Objects.equals(theSignature, that.theSignature) &&
+        return Objects.equals(signature, that.signature) &&
                 Objects.equals(expires, that.expires) &&
                 Objects.equals(verifications, that.verifications) &&
                 Objects.equals(lastVerification, that.lastVerification) &&
@@ -117,13 +116,13 @@ public final class Signature implements Serializable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(theSignature, expires, verifications, lastVerification, added);
+        return Objects.hash(signature, expires, verifications, lastVerification, added);
     }
 
     @Override
     public String toString() {
         return "Signature{" +
-                "signature='" + theSignature + '\'' +
+                "signature='" + signature + '\'' +
                 ", expires=" + expires +
                 ", verifications=" + verifications +
                 ", lastVerification=" + lastVerification +

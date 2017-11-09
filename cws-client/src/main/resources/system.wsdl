@@ -46,7 +46,6 @@
       <xs:extension base="tns:authentication">
         <xs:sequence>
           <xs:element name="circleId" nillable="true" type="xs:string"/>
-          <xs:element minOccurs="0" name="page" type="tns:page"/>
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>
@@ -56,9 +55,9 @@
     <xs:complexContent>
       <xs:extension base="tns:verifiable">
         <xs:sequence>
-          <xs:element name="account" type="xs:string"/>
-          <xs:element name="credentialType" type="tns:credentialType"/>
+          <xs:element name="accountName" type="xs:string"/>
           <xs:element name="credential" type="xs:string"/>
+          <xs:element name="credentialType" type="tns:credentialType"/>
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>
@@ -66,19 +65,6 @@
 
   <xs:complexType abstract="true" name="verifiable">
     <xs:sequence/>
-  </xs:complexType>
-
-  <xs:complexType final="extension restriction" name="page">
-    <xs:complexContent>
-      <xs:extension base="tns:verifiable">
-        <xs:sequence>
-          <xs:element name="pageNumber" type="xs:int"/>
-          <xs:element name="pageSize" type="xs:int"/>
-          <xs:element name="sortOrder" type="tns:sortingOrder"/>
-          <xs:element name="sortBy" type="tns:sortingField"/>
-        </xs:sequence>
-      </xs:extension>
-    </xs:complexContent>
   </xs:complexType>
 
   <xs:complexType name="fetchCirclesResponse">
@@ -106,41 +92,29 @@
   </xs:complexType>
 
   <xs:complexType final="extension restriction" name="circle">
-    <xs:complexContent>
-      <xs:extension base="tns:verifiable">
-        <xs:sequence>
-          <xs:element name="id" type="xs:string"/>
-          <xs:element name="name" type="xs:string"/>
-          <xs:element minOccurs="0" name="created" type="xs:dateTime"/>
-        </xs:sequence>
-      </xs:extension>
-    </xs:complexContent>
+    <xs:sequence>
+      <xs:element name="circleId" type="xs:string"/>
+      <xs:element name="circleName" type="xs:string"/>
+      <xs:element minOccurs="0" name="added" type="xs:dateTime"/>
+    </xs:sequence>
   </xs:complexType>
 
   <xs:complexType final="extension restriction" name="trustee">
-    <xs:complexContent>
-      <xs:extension base="tns:verifiable">
-        <xs:sequence>
-          <xs:element name="circle" type="tns:circle"/>
-          <xs:element name="member" type="tns:member"/>
-          <xs:element name="trustLevel" type="tns:trustLevel"/>
-          <xs:element minOccurs="0" name="changed" type="xs:dateTime"/>
-          <xs:element minOccurs="0" name="since" type="xs:dateTime"/>
-        </xs:sequence>
-      </xs:extension>
-    </xs:complexContent>
+    <xs:sequence>
+      <xs:element name="circle" type="tns:circle"/>
+      <xs:element name="member" type="tns:member"/>
+      <xs:element name="trustLevel" type="tns:trustLevel"/>
+      <xs:element minOccurs="0" name="changed" type="xs:dateTime"/>
+      <xs:element minOccurs="0" name="added" type="xs:dateTime"/>
+    </xs:sequence>
   </xs:complexType>
 
   <xs:complexType final="extension restriction" name="member">
-    <xs:complexContent>
-      <xs:extension base="tns:verifiable">
-        <xs:sequence>
-          <xs:element minOccurs="0" name="id" type="xs:string"/>
-          <xs:element name="authentication" type="tns:authentication"/>
-          <xs:element minOccurs="0" name="added" type="xs:dateTime"/>
-        </xs:sequence>
-      </xs:extension>
-    </xs:complexContent>
+    <xs:sequence>
+      <xs:element minOccurs="0" name="memberId" type="xs:string"/>
+      <xs:element name="accountName" type="xs:string"/>
+      <xs:element minOccurs="0" name="added" type="xs:dateTime"/>
+    </xs:sequence>
   </xs:complexType>
 
   <xs:complexType name="processMember">
@@ -154,9 +128,9 @@
       <xs:extension base="tns:authentication">
         <xs:sequence>
           <xs:element name="action" type="tns:action"/>
-          <xs:element minOccurs="0" name="memberId" type="xs:string"/>
-          <xs:element minOccurs="0" name="accountName" type="xs:string"/>
-          <xs:element minOccurs="0" name="newCredential" type="xs:string"/>
+          <xs:element name="memberId" type="xs:string"/>
+          <xs:element name="newAccountName" type="xs:string"/>
+          <xs:element name="newCredential" type="xs:string"/>
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>
@@ -172,8 +146,8 @@
     <xs:complexContent>
       <xs:extension base="tns:cwsResult">
         <xs:sequence>
-          <xs:element minOccurs="0" name="id" type="xs:string"/>
-          <xs:element minOccurs="0" name="signature" type="xs:string"/>
+          <xs:element name="memberId" type="xs:string"/>
+          <xs:element name="signature" type="xs:string"/>
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>
@@ -248,10 +222,10 @@
       <xs:extension base="tns:authentication">
         <xs:sequence>
           <xs:element name="action" type="tns:action"/>
-          <xs:element minOccurs="0" name="circleId" type="xs:string"/>
-          <xs:element minOccurs="0" name="circleName" type="xs:string"/>
-          <xs:element minOccurs="0" name="memberId" type="xs:string"/>
-          <xs:element minOccurs="0" name="trustlevel" type="tns:trustLevel"/>
+          <xs:element name="circleId" type="xs:string"/>
+          <xs:element name="circleName" type="xs:string"/>
+          <xs:element name="memberId" type="xs:string"/>
+          <xs:element name="trustLevel" type="tns:trustLevel"/>
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>
@@ -320,26 +294,11 @@
     <xs:complexContent>
       <xs:extension base="tns:cwsResult">
         <xs:sequence>
-          <xs:element minOccurs="0" name="version" type="xs:string"/>
+          <xs:element name="version" type="xs:string"/>
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
-
-  <xs:simpleType name="sortingOrder">
-    <xs:restriction base="xs:string">
-      <xs:enumeration value="ASC"/>
-      <xs:enumeration value="DESC"/>
-    </xs:restriction>
-  </xs:simpleType>
-
-  <xs:simpleType name="sortingField">
-    <xs:restriction base="xs:string">
-      <xs:enumeration value="CREATED"/>
-      <xs:enumeration value="MODIFIED"/>
-      <xs:enumeration value="NAME"/>
-    </xs:restriction>
-  </xs:simpleType>
 
   <xs:simpleType name="credentialType">
     <xs:restriction base="xs:string">
@@ -360,6 +319,14 @@
   <xs:simpleType name="returnCode">
     <xs:restriction base="xs:string">
       <xs:enumeration value="SUCCESS"/>
+      <xs:enumeration value="WARNING"/>
+      <xs:enumeration value="VERIFICATION_WARNING"/>
+      <xs:enumeration value="AUTHENTICATION_WARNING"/>
+      <xs:enumeration value="AUTHORIZATION_WARNING"/>
+      <xs:enumeration value="ILLEGAL_ACTION"/>
+      <xs:enumeration value="SIGNATURE_WARNING"/>
+      <xs:enumeration value="IDENTIFICATION_WARNING"/>
+      <xs:enumeration value="INTEGRITY_WARNING"/>
       <xs:enumeration value="ERROR"/>
       <xs:enumeration value="DATABASE_ERROR"/>
       <xs:enumeration value="CONSTRAINT_ERROR"/>
@@ -367,14 +334,6 @@
       <xs:enumeration value="CRYPTO_ERROR"/>
       <xs:enumeration value="IDENTIFICATION_ERROR"/>
       <xs:enumeration value="INTEGRITY_ERROR"/>
-      <xs:enumeration value="NOTIMPLEMENTED_ERROR"/>
-      <xs:enumeration value="WARNING"/>
-      <xs:enumeration value="AUTHENTICATION_WARNING"/>
-      <xs:enumeration value="AUTHORIZATION_WARNING"/>
-      <xs:enumeration value="VERIFICATION_WARNING"/>
-      <xs:enumeration value="SIGNATURE_WARNING"/>
-      <xs:enumeration value="IDENTIFICATION_WARNING"/>
-      <xs:enumeration value="ILLEGAL_ACTION"/>
     </xs:restriction>
   </xs:simpleType>
 
@@ -388,7 +347,6 @@
 
   <xs:simpleType name="action">
     <xs:restriction base="xs:string">
-      <xs:enumeration value="NONE"/>
       <xs:enumeration value="PROCESS"/>
       <xs:enumeration value="CREATE"/>
       <xs:enumeration value="UPDATE"/>

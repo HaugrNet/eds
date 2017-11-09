@@ -3,11 +3,11 @@
                   xmlns:tns="http://ws.cws.javadog.io/"
                   xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
                   name="share" targetNamespace="http://ws.cws.javadog.io/">
-  <wsdl:documentation>
-    Service: Cryptographic WebStore Share Service
-    Version: 1.0
-    Owner: JavaDog.io
-  </wsdl:documentation>
+    <wsdl:documentation>
+      Service: Cryptographic WebStore Share Service
+      Version: 1.0
+      Owner: JavaDog.io
+    </wsdl:documentation>
   <wsdl:types>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://ws.cws.javadog.io/" elementFormDefault="unqualified" targetNamespace="http://ws.cws.javadog.io/" version="1.0">
 
@@ -50,12 +50,12 @@
       <xs:extension base="tns:authentication">
         <xs:sequence>
           <xs:element name="action" type="tns:action"/>
-          <xs:element name="id" nillable="true" type="xs:string"/>
+          <xs:element name="dataId" nillable="true" type="xs:string"/>
           <xs:element minOccurs="0" name="circleId" nillable="true" type="xs:string"/>
+          <xs:element minOccurs="0" name="dataName" nillable="true" type="xs:string"/>
           <xs:element minOccurs="0" name="folderId" nillable="true" type="xs:string"/>
-          <xs:element minOccurs="0" name="name" nillable="true" type="xs:string"/>
-          <xs:element minOccurs="0" name="typeName" type="xs:string"/>
-          <xs:element minOccurs="0" name="bytes" nillable="true" type="xs:base64Binary"/>
+          <xs:element name="typeName" type="xs:string"/>
+          <xs:element minOccurs="0" name="data" nillable="true" type="xs:base64Binary"/>
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>
@@ -65,9 +65,9 @@
     <xs:complexContent>
       <xs:extension base="tns:verifiable">
         <xs:sequence>
-          <xs:element name="account" type="xs:string"/>
-          <xs:element name="credentialType" type="tns:credentialType"/>
+          <xs:element name="accountName" type="xs:string"/>
           <xs:element name="credential" type="xs:string"/>
+          <xs:element name="credentialType" type="tns:credentialType"/>
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>
@@ -87,7 +87,7 @@
     <xs:complexContent>
       <xs:extension base="tns:cwsResult">
         <xs:sequence>
-          <xs:element name="id" type="xs:string"/>
+          <xs:element name="dataId" type="xs:string"/>
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>
@@ -124,21 +124,17 @@
     <xs:complexContent>
       <xs:extension base="tns:cwsResult">
         <xs:sequence>
-          <xs:element maxOccurs="unbounded" minOccurs="0" name="types" type="tns:dataType"/>
+          <xs:element maxOccurs="unbounded" name="dataTypes" type="tns:dataType"/>
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
 
   <xs:complexType final="extension restriction" name="dataType">
-    <xs:complexContent>
-      <xs:extension base="tns:verifiable">
-        <xs:sequence>
-          <xs:element name="name" type="xs:string"/>
-          <xs:element name="type" type="xs:string"/>
-        </xs:sequence>
-      </xs:extension>
-    </xs:complexContent>
+    <xs:sequence>
+      <xs:element name="typeName" type="xs:string"/>
+      <xs:element name="type" type="xs:string"/>
+    </xs:sequence>
   </xs:complexType>
 
   <xs:complexType name="fetchData">
@@ -151,9 +147,10 @@
     <xs:complexContent>
       <xs:extension base="tns:authentication">
         <xs:sequence>
-          <xs:element name="dataType" nillable="true" type="tns:dataType"/>
           <xs:element name="circleId" nillable="true" type="xs:string"/>
           <xs:element name="dataId" nillable="true" type="xs:string"/>
+          <xs:element name="pageNumber" nillable="true" type="xs:int"/>
+          <xs:element name="pageSize" nillable="true" type="xs:int"/>
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>
@@ -169,26 +166,22 @@
     <xs:complexContent>
       <xs:extension base="tns:cwsResult">
         <xs:sequence>
-          <xs:element maxOccurs="unbounded" minOccurs="0" name="data" type="tns:metadata"/>
-          <xs:element minOccurs="0" name="bytes" type="xs:base64Binary"/>
+          <xs:element maxOccurs="unbounded" name="metadata" type="tns:metadata"/>
+          <xs:element name="data" type="xs:base64Binary"/>
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
 
   <xs:complexType final="extension restriction" name="metadata">
-    <xs:complexContent>
-      <xs:extension base="tns:verifiable">
-        <xs:sequence>
-          <xs:element name="id" nillable="true" type="xs:string"/>
-          <xs:element name="circleId" nillable="true" type="xs:string"/>
-          <xs:element name="folderId" nillable="true" type="xs:string"/>
-          <xs:element name="name" nillable="true" type="xs:string"/>
-          <xs:element name="typeName" type="xs:string"/>
-          <xs:element minOccurs="0" name="added" type="xs:dateTime"/>
-        </xs:sequence>
-      </xs:extension>
-    </xs:complexContent>
+    <xs:sequence>
+      <xs:element name="dataId" nillable="true" type="xs:string"/>
+      <xs:element name="circleId" nillable="true" type="xs:string"/>
+      <xs:element name="folderId" nillable="true" type="xs:string"/>
+      <xs:element name="dataName" nillable="true" type="xs:string"/>
+      <xs:element name="dataType" type="tns:dataType"/>
+      <xs:element minOccurs="0" name="added" type="xs:dateTime"/>
+    </xs:sequence>
   </xs:complexType>
 
   <xs:complexType name="verification">
@@ -235,7 +228,7 @@
       <xs:extension base="tns:authentication">
         <xs:sequence>
           <xs:element name="data" type="xs:base64Binary"/>
-          <xs:element minOccurs="0" name="expires" type="xs:dateTime"/>
+          <xs:element name="expires" type="xs:dateTime"/>
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>
@@ -251,7 +244,7 @@
     <xs:complexContent>
       <xs:extension base="tns:cwsResult">
         <xs:sequence>
-          <xs:element minOccurs="0" name="signature" type="xs:string"/>
+          <xs:element name="signature" type="xs:string"/>
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>
@@ -288,17 +281,13 @@
   </xs:complexType>
 
   <xs:complexType final="extension restriction" name="signature">
-    <xs:complexContent>
-      <xs:extension base="tns:verifiable">
-        <xs:sequence>
-          <xs:element minOccurs="0" name="id" type="xs:string"/>
-          <xs:element minOccurs="0" name="expires" type="xs:dateTime"/>
-          <xs:element minOccurs="0" name="verifications" type="xs:long"/>
-          <xs:element minOccurs="0" name="created" type="xs:dateTime"/>
-          <xs:element minOccurs="0" name="lastVerification" type="xs:dateTime"/>
-        </xs:sequence>
-      </xs:extension>
-    </xs:complexContent>
+    <xs:sequence>
+      <xs:element minOccurs="0" name="signature" type="xs:string"/>
+      <xs:element minOccurs="0" name="expires" type="xs:dateTime"/>
+      <xs:element minOccurs="0" name="verifications" type="xs:long"/>
+      <xs:element minOccurs="0" name="lastVerification" type="xs:dateTime"/>
+      <xs:element minOccurs="0" name="added" type="xs:dateTime"/>
+    </xs:sequence>
   </xs:complexType>
 
   <xs:complexType name="processDataType">
@@ -312,7 +301,8 @@
       <xs:extension base="tns:authentication">
         <xs:sequence>
           <xs:element name="action" type="tns:action"/>
-          <xs:element name="dataType" type="tns:dataType"/>
+          <xs:element name="typeName" type="xs:string"/>
+          <xs:element name="type" type="xs:string"/>
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>
@@ -328,7 +318,7 @@
     <xs:complexContent>
       <xs:extension base="tns:cwsResult">
         <xs:sequence>
-          <xs:element minOccurs="0" name="dataType" type="tns:dataType"/>
+          <xs:element name="dataType" type="tns:dataType"/>
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>
@@ -336,7 +326,6 @@
 
   <xs:simpleType name="action">
     <xs:restriction base="xs:string">
-      <xs:enumeration value="NONE"/>
       <xs:enumeration value="PROCESS"/>
       <xs:enumeration value="CREATE"/>
       <xs:enumeration value="UPDATE"/>
@@ -359,6 +348,14 @@
   <xs:simpleType name="returnCode">
     <xs:restriction base="xs:string">
       <xs:enumeration value="SUCCESS"/>
+      <xs:enumeration value="WARNING"/>
+      <xs:enumeration value="VERIFICATION_WARNING"/>
+      <xs:enumeration value="AUTHENTICATION_WARNING"/>
+      <xs:enumeration value="AUTHORIZATION_WARNING"/>
+      <xs:enumeration value="ILLEGAL_ACTION"/>
+      <xs:enumeration value="SIGNATURE_WARNING"/>
+      <xs:enumeration value="IDENTIFICATION_WARNING"/>
+      <xs:enumeration value="INTEGRITY_WARNING"/>
       <xs:enumeration value="ERROR"/>
       <xs:enumeration value="DATABASE_ERROR"/>
       <xs:enumeration value="CONSTRAINT_ERROR"/>
@@ -366,14 +363,6 @@
       <xs:enumeration value="CRYPTO_ERROR"/>
       <xs:enumeration value="IDENTIFICATION_ERROR"/>
       <xs:enumeration value="INTEGRITY_ERROR"/>
-      <xs:enumeration value="NOTIMPLEMENTED_ERROR"/>
-      <xs:enumeration value="WARNING"/>
-      <xs:enumeration value="AUTHENTICATION_WARNING"/>
-      <xs:enumeration value="AUTHORIZATION_WARNING"/>
-      <xs:enumeration value="VERIFICATION_WARNING"/>
-      <xs:enumeration value="SIGNATURE_WARNING"/>
-      <xs:enumeration value="IDENTIFICATION_WARNING"/>
-      <xs:enumeration value="ILLEGAL_ACTION"/>
     </xs:restriction>
   </xs:simpleType>
 

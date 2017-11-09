@@ -578,8 +578,8 @@ public final class CircleServiceTest extends DatabaseSetup {
         fetchRequest.setCircleId(CIRCLE_1_ID);
         final FetchCircleResponse fetchResponse = fetchService.perform(fetchRequest);
         assertThat(fetchResponse.getReturnCode(), is(ReturnCode.SUCCESS));
-        assertThat(fetchResponse.getTrustees().get(2).getMember().getMemberId(), is(MEMBER_2_ID));
-        assertThat(fetchResponse.getTrustees().get(2).getTrustLevel(), is(TrustLevel.ADMIN));
+        assertThat(fetchResponse.getTrustees().get(2).getMember().getMemberId(), is(MEMBER_3_ID));
+        assertThat(fetchResponse.getTrustees().get(2).getTrustLevel(), is(TrustLevel.READ));
     }
 
     @Test

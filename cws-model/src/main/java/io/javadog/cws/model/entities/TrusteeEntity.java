@@ -29,12 +29,14 @@ import javax.persistence.Table;
         @NamedQuery(name = "trust.findByMemberId",
                 query = "select t " +
                         "from TrusteeEntity t " +
-                        "where t.member.id = :id"),
+                        "where t.member.id = :id " +
+                        "order by t.id asc"),
         @NamedQuery(name = "trust.findByMemberIdAndExternalCircleId",
                 query = "select t " +
                         "from TrusteeEntity t " +
                         "where t.member.id = :id" +
-                        "  and t.circle.externalId = :externalCircleId"),
+                        "  and t.circle.externalId = :externalCircleId " +
+                        "order by t.member.name asc"),
         @NamedQuery(name = "trustee.findByCircleAndMember",
                 query = "select t " +
                         "from TrusteeEntity t " +
@@ -62,7 +64,8 @@ import javax.persistence.Table;
         @NamedQuery(name = "trustee.findByCircleId",
                 query = "select t " +
                         "from TrusteeEntity t " +
-                        "where t.circle.id = :circleId")
+                        "where t.circle.id = :circleId " +
+                        "order by t.member.name asc")
 })
 @Table(name = "cws_trustees")
 public class TrusteeEntity extends CWSEntity {

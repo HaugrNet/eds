@@ -20,7 +20,8 @@ import javax.persistence.Table;
 @Entity
 @NamedQueries(
         @NamedQuery(name = "setting.readAll",
-                    query = "select s from SettingEntity s")
+                    query = "select s from SettingEntity s " +
+                            "order by name asc")
 )
 @Table(name = "cws_settings")
 public class SettingEntity extends CWSEntity {

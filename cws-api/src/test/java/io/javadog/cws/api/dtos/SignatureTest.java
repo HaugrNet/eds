@@ -24,20 +24,20 @@ public final class SignatureTest {
 
     @Test
     public void testClassflow() {
-        final String signatureValue = UUID.randomUUID().toString();
+        final String checksum = UUID.randomUUID().toString();
         final Date expires = new Date(123L);
         final Long verifications = 1L;
         final Date added = new Date(321L);
         final Date lastVerification = new Date();
 
         final Signature signature = new Signature();
-        signature.setSignature(signatureValue);
+        signature.setChecksum(checksum);
         signature.setExpires(expires);
         signature.setVerifications(verifications);
         signature.setAdded(added);
         signature.setLastVerification(lastVerification);
 
-        assertThat(signature.getSignature(), is(signatureValue));
+        assertThat(signature.getChecksum(), is(checksum));
         assertThat(signature.getExpires(), is(expires));
         assertThat(signature.getVerifications(), is(verifications));
         assertThat(signature.getAdded(), is(added));
@@ -50,7 +50,7 @@ public final class SignatureTest {
         final Signature sameSignature = new Signature();
         final Signature emptySignature = new Signature();
 
-        sameSignature.setSignature(signature.getSignature());
+        sameSignature.setChecksum(signature.getChecksum());
         sameSignature.setExpires(signature.getExpires());
         sameSignature.setVerifications(signature.getVerifications());
         sameSignature.setAdded(signature.getAdded());
@@ -70,19 +70,19 @@ public final class SignatureTest {
 
     @Test
     public void testEquality() {
-        final String signatureId1 = UUID.randomUUID().toString();
-        final String signatureId2 = UUID.randomUUID().toString();
+        final String checksum1 = UUID.randomUUID().toString();
+        final String checksum2 = UUID.randomUUID().toString();
         final Date date1 = new Date(1212121212L);
         final Date date2 = new Date(2121212121L);
         final Long verifications1 = 1L;
         final Long verifications2 = 2L;
 
-        final Signature signature1 = prepareSignature(signatureId1, date1, verifications1, date1, date1);
-        final Signature signature2 = prepareSignature(signatureId2, date1, verifications1, date1, date1);
-        final Signature signature3 = prepareSignature(signatureId1, date2, verifications1, date1, date1);
-        final Signature signature4 = prepareSignature(signatureId1, date1, verifications2, date1, date1);
-        final Signature signature5 = prepareSignature(signatureId1, date1, verifications1, date2, date1);
-        final Signature signature6 = prepareSignature(signatureId1, date1, verifications1, date1, date2);
+        final Signature signature1 = prepareSignature(checksum1, date1, verifications1, date1, date1);
+        final Signature signature2 = prepareSignature(checksum2, date1, verifications1, date1, date1);
+        final Signature signature3 = prepareSignature(checksum1, date2, verifications1, date1, date1);
+        final Signature signature4 = prepareSignature(checksum1, date1, verifications2, date1, date1);
+        final Signature signature5 = prepareSignature(checksum1, date1, verifications1, date2, date1);
+        final Signature signature6 = prepareSignature(checksum1, date1, verifications1, date1, date2);
 
         assertThat(signature1.equals(signature2), is(false));
         assertThat(signature2.equals(signature1), is(false));
@@ -100,9 +100,9 @@ public final class SignatureTest {
     // Internal Helper Method
     // =========================================================================
 
-    private static Signature prepareSignature(final String signatureId, final Date expires, final Long verifications, final Date added, final Date lastVerification) {
+    private static Signature prepareSignature(final String checksum, final Date expires, final Long verifications, final Date added, final Date lastVerification) {
         final Signature signature = new Signature();
-        signature.setSignature(signatureId);
+        signature.setChecksum(checksum);
         signature.setExpires(expires);
         signature.setVerifications(verifications);
         signature.setAdded(added);

@@ -24,14 +24,14 @@ import java.util.Objects;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "signature", propOrder = { Constants.FIELD_SIGNATURE, Constants.FIELD_EXPIRES, Constants.FIELD_VERIFICATIONS, Constants.FIELD_LAST_VERIFICATION, Constants.FIELD_ADDED })
+@XmlType(name = "signature", propOrder = { Constants.FIELD_CHECKSUM, Constants.FIELD_EXPIRES, Constants.FIELD_VERIFICATIONS, Constants.FIELD_LAST_VERIFICATION, Constants.FIELD_ADDED })
 public final class Signature implements Serializable {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
-    @XmlElement(name = Constants.FIELD_SIGNATURE)
-    private String signature = null;
+    @XmlElement(name = Constants.FIELD_CHECKSUM)
+    private String checksum = null;
 
     @XmlElement(name = Constants.FIELD_EXPIRES)
     private Date expires = null;
@@ -49,12 +49,12 @@ public final class Signature implements Serializable {
     // Standard Setters & Getters
     // =========================================================================
 
-    public void setSignature(final String signature) {
-        this.signature = signature;
+    public void setChecksum(final String checksum) {
+        this.checksum = checksum;
     }
 
-    public String getSignature() {
-        return signature;
+    public String getChecksum() {
+        return checksum;
     }
 
     public void setExpires(final Date expires) {
@@ -107,7 +107,7 @@ public final class Signature implements Serializable {
         }
 
         final Signature that = (Signature) obj;
-        return Objects.equals(signature, that.signature) &&
+        return Objects.equals(checksum, that.checksum) &&
                 Objects.equals(expires, that.expires) &&
                 Objects.equals(verifications, that.verifications) &&
                 Objects.equals(lastVerification, that.lastVerification) &&
@@ -116,13 +116,13 @@ public final class Signature implements Serializable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(signature, expires, verifications, lastVerification, added);
+        return Objects.hash(checksum, expires, verifications, lastVerification, added);
     }
 
     @Override
     public String toString() {
         return "Signature{" +
-                "signature='" + signature + '\'' +
+                "checksum='" + checksum + '\'' +
                 ", expires=" + expires +
                 ", verifications=" + verifications +
                 ", lastVerification=" + lastVerification +

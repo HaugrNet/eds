@@ -41,6 +41,7 @@ public final class FetchSignatureService extends Serviceable<FetchSignatureRespo
 
         for (final SignatureEntity entity : found) {
             final Signature signature = new Signature();
+            signature.setChecksum(entity.getChecksum());
             signature.setExpires(entity.getExpires());
             signature.setVerifications(entity.getVerifications());
             signature.setAdded(entity.getAdded());

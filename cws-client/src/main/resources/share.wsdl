@@ -282,7 +282,7 @@
 
   <xs:complexType final="extension restriction" name="signature">
     <xs:sequence>
-      <xs:element minOccurs="0" name="signature" type="xs:string"/>
+      <xs:element minOccurs="0" name="checksum" type="xs:string"/>
       <xs:element minOccurs="0" name="expires" type="xs:dateTime"/>
       <xs:element minOccurs="0" name="verifications" type="xs:long"/>
       <xs:element minOccurs="0" name="lastVerification" type="xs:dateTime"/>

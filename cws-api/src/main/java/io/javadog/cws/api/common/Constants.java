@@ -84,6 +84,7 @@ public final class Constants {
     public static final String FIELD_DATATYPES = "dataTypes";
     public static final String FIELD_TYPENAME = "typeName";
     public static final String FIELD_TYPE = "type";
+    public static final String FIELD_CHECKSUM = "checksum";
     public static final String FIELD_SIGNATURE = "signature";
     public static final String FIELD_SIGNATURES = "signatures";
     public static final String FIELD_SETTINGS = "settings";

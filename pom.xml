@@ -166,9 +166,7 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <parallel>methods</parallel>
-                    <!-- Getting Hibernate LockAcquisition Exceptions if higher:
-                         SQL Error: -4861, SQLState: 40001 -->
-                    <threadCount>1</threadCount>
+                    <threadCount>10</threadCount>
                 </configuration>
                 <goals>
                     <goal>test</goal>

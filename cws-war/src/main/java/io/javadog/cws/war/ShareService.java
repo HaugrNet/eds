@@ -168,7 +168,7 @@ public class ShareService implements Share {
      * {@inheritDoc}
      */
     @Override
-    @WebMethod(operationName = "verification")
+    @WebMethod
     @WebResult(name = "response")
     public VerifyResponse verify(@WebParam(name = "request") final VerifyRequest request) {
         VerifyResponse response;

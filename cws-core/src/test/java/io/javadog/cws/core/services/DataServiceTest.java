@@ -135,6 +135,21 @@ public final class DataServiceTest extends DatabaseSetup {
     }
 
     @Test
+    public void testAddAndMoveToInvalidFolder() {
+        prepareCause(CWSException.class, ReturnCode.INTEGRITY_WARNING, "No existing Folder could be found.");
+
+        final ProcessDataService service = new ProcessDataService(settings, entityManager);
+        final ProcessDataRequest saveRequest = prepareAddRequest(MEMBER_1, CIRCLE_1_ID, "The Data", 1048576);
+
+        final ProcessDataResponse saveResponse = service.perform(saveRequest);
+        assertThat(saveResponse.getReturnCode(), is(ReturnCode.SUCCESS));
+
+        final ProcessDataRequest updateRequest = prepareUpdateRequest(MEMBER_1, saveResponse.getDataId());
+        updateRequest.setFolderId(UUID.randomUUID().toString());
+        service.perform(updateRequest);
+    }
+
+    @Test
     public void testAddDataWithoutPermission() {
         prepareCause(CWSException.class, ReturnCode.AUTHORIZATION_WARNING, "The requesting Account is not permitted to Process Data.");
 

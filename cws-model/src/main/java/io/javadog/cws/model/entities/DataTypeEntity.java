@@ -25,7 +25,7 @@ import javax.persistence.Table;
                 query = "select d " +
                         "from DataTypeEntity d " +
                         "order by d.name asc"),
-        @NamedQuery(name = "type.findMatching",
+        @NamedQuery(name = "type.findByName",
                 query = "select d from DataTypeEntity d " +
                         "where lower(d.name) = lower(:name)"),
         @NamedQuery(name = "type.countUsage",

@@ -20,7 +20,6 @@ import io.javadog.cws.core.Serviceable;
 import io.javadog.cws.model.entities.DataTypeEntity;
 
 import javax.persistence.EntityManager;
-import java.util.List;
 import java.util.Objects;
 
 /**
@@ -67,7 +66,7 @@ public final class ProcessDataTypeService extends Serviceable<ProcessDataTypeRes
     private ProcessDataTypeResponse doProcess(final ProcessDataTypeRequest request) {
         final String name = request.getTypeName().trim();
         final String type = request.getType().trim();
-        final DataTypeEntity found = findEntity(name);
+        final DataTypeEntity found = dao.findDataTypeByName(name);
         final DataTypeEntity entity;
 
         if (found == null) {
@@ -79,7 +78,9 @@ public final class ProcessDataTypeService extends Serviceable<ProcessDataTypeRes
             entity = found;
             if (Objects.equals(Constants.FOLDER_TYPENAME, entity.getName()) || Objects.equals(Constants.DATA_TYPENAME, entity.getName())) {
                 throw new AuthorizationException("It is not permitted to update the DataType '" + entity.getName() + "'.");
-            } else if (!Objects.equals(type, entity.getType())) {
+            }
+
+            if (!Objects.equals(type, entity.getType())) {
                 entity.setType(type);
                 dao.persist(entity);
             }
@@ -98,7 +99,7 @@ public final class ProcessDataTypeService extends Serviceable<ProcessDataTypeRes
     private ProcessDataTypeResponse doDelete(final ProcessDataTypeRequest request) {
         final ProcessDataTypeResponse response;
         final String name = request.getTypeName().trim();
-        final DataTypeEntity entity = findEntity(name);
+        final DataTypeEntity entity = dao.findDataTypeByName(name);
 
         if (entity != null) {
             // We need to check that the Data Type is not being used. If so,
@@ -115,18 +116,5 @@ public final class ProcessDataTypeService extends Serviceable<ProcessDataTypeRes
         }
 
         return response;
-    }
-
-    private DataTypeEntity findEntity(final String name) {
-        final List<DataTypeEntity> entities = dao.findMatchingDataTypes(name);
-        DataTypeEntity entity = null;
-
-        if (entities.size() == 1) {
-            entity = entities.get(0);
-        } else if (entities.size() > 1) {
-            throw new CWSException(ReturnCode.IDENTIFICATION_ERROR, "Could not uniquely identify the Data Type '" + name + "'.");
-        }
-
-        return entity;
     }
 }

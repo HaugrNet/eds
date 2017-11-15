@@ -16,10 +16,13 @@ import io.javadog.cws.api.common.Action;
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.requests.FetchDataTypeRequest;
+import io.javadog.cws.api.requests.ProcessDataRequest;
 import io.javadog.cws.api.requests.ProcessDataTypeRequest;
 import io.javadog.cws.api.responses.FetchDataTypeResponse;
+import io.javadog.cws.api.responses.ProcessDataResponse;
 import io.javadog.cws.api.responses.ProcessDataTypeResponse;
 import io.javadog.cws.common.exceptions.AuthorizationException;
+import io.javadog.cws.common.exceptions.CWSException;
 import io.javadog.cws.common.exceptions.VerificationException;
 import io.javadog.cws.model.DatabaseSetup;
 import org.junit.Test;
@@ -162,6 +165,34 @@ public final class DataTypeServiceTest extends DatabaseSetup {
         assertThat(deletedResponse.isOk(), is(true));
         assertThat(deletedResponse.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(deletedResponse.getReturnMessage(), is("Ok"));
+    }
+
+    @Test
+    public void testCreateAndDeleteUsedDataType() {
+        prepareCause(CWSException.class, ReturnCode.ILLEGAL_ACTION, "The Data Type 'text' cannot be deleted, as it is being actively used.");
+
+        final ProcessDataTypeService service = new ProcessDataTypeService(settings, entityManager);
+        final ProcessDataService dataService = new ProcessDataService(settings, entityManager);
+
+        final ProcessDataTypeRequest addRequest = prepareRequest(ProcessDataTypeRequest.class, Constants.ADMIN_ACCOUNT);
+        addRequest.setAction(Action.PROCESS);
+        addRequest.setTypeName("text");
+        addRequest.setType("text/plain");
+        final ProcessDataTypeResponse addResponse = service.perform(addRequest);
+        assertThat(addResponse.isOk(), is(true));
+
+        final ProcessDataRequest dataRequest = prepareRequest(ProcessDataRequest.class, MEMBER_1);
+        dataRequest.setAction(Action.ADD);
+        dataRequest.setCircleId(CIRCLE_1_ID);
+        dataRequest.setTypeName("text");
+        dataRequest.setDataName("file.txt");
+        final ProcessDataResponse dataResponse = dataService.perform(dataRequest);
+        assertThat(dataResponse.isOk(), is(true));
+
+        final ProcessDataTypeRequest deleteRequest = prepareRequest(ProcessDataTypeRequest.class, Constants.ADMIN_ACCOUNT);
+        deleteRequest.setAction(Action.DELETE);
+        deleteRequest.setTypeName("text");
+        service.perform(deleteRequest);
     }
 
     @Test

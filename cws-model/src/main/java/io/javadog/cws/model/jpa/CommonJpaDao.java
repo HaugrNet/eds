@@ -236,22 +236,11 @@ public final class CommonJpaDao implements CommonDao {
      * {@inheritDoc}
      */
     @Override
-    public List<DataTypeEntity> findMatchingDataTypes(final String name) {
-        final Query query = entityManager.createNamedQuery("type.findMatching");
-        query.setParameter("name", name);
-
-        return findList(query);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public DataTypeEntity findDataTypeByName(final String name) {
-        final Query query = entityManager.createNamedQuery("type.findMatching");
+        final Query query = entityManager.createNamedQuery("type.findByName");
         query.setParameter("name", name);
 
-        return findUniqueRecord(query);
+        return findSingleRecord(query);
     }
 
     /**
@@ -395,16 +384,6 @@ public final class CommonJpaDao implements CommonDao {
     // =========================================================================
     // Internal Methods, handling the actual lookup's to simplify error handling
     // =========================================================================
-
-    private static <E> E findUniqueRecord(final Query query) {
-        final List<E> found = findList(query);
-
-        if (found.size() != 1) {
-            throw new CWSException(ReturnCode.DATABASE_ERROR, "Could not uniquely identify a record with the given criteria's.");
-        }
-
-        return found.get(0);
-    }
 
     private static <E> E findSingleRecord(final Query query) {
         final List<E> found = findList(query);

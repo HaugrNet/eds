@@ -62,8 +62,6 @@ public interface CommonDao {
 
     List<DataTypeEntity> findAllTypes();
 
-    List<DataTypeEntity> findMatchingDataTypes(String name);
-
     /**
      * Finds a unique DataType in the system. If none exist or it is not
      * possible to find a unique record, then an Exception is thrown.

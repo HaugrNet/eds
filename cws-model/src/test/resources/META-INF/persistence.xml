@@ -33,8 +33,8 @@
             <!-- Hibernate Settings for our test -->
             <property name="hibernate.connection.pool_size" value="50"/>
             <property name="hibernate.connection.autocommit" value="false"/>
-            <property name="hibernate.dialect" value="org.hibernate.dialect.HSQLDialect"/>
-            <!--<property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect"/>-->
+            <!--<property name="hibernate.dialect" value="org.hibernate.dialect.HSQLDialect"/>-->
+            <property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect"/>
             <property name="hibernate.cache.provider_class" value="org.hibernate.cache.HashtableCacheProvider"/>
             <!-- The following is needed, as Hibernate otherwise require that each table creation is on a single line. -->
             <property name="hibernate.hbm2ddl.import_files_sql_extractor" value="org.hibernate.tool.hbm2ddl.MultipleLinesSqlCommandExtractor" />

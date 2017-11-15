@@ -95,4 +95,6 @@ public interface CommonDao {
     long countFolderContent(MetadataEntity entity);
 
     MetadataEntity findInFolder(MemberEntity member, MetadataEntity folder, String name);
+
+    boolean checkIfNameIsUsed(MetadataEntity entity, String name, Long folderId);
 }

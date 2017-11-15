@@ -301,9 +301,9 @@ public class DatabaseSetup {
         createAndAppendTrustee(builder, member3, keyPair3, circle2, key2, cwsKey2, TrustLevel.READ,  ',');
         createAndAppendTrustee(builder, member4, keyPair4, circle2, key2, cwsKey2, TrustLevel.ADMIN, ',');
         createAndAppendTrustee(builder, member2, keyPair2, circle3, key3, cwsKey3, TrustLevel.WRITE, ',');
-        createAndAppendTrustee(builder, member3, keyPair3, circle3, key3, cwsKey3, TrustLevel.READ,  ',');
+        createAndAppendTrustee(builder, member3, keyPair3, circle3, key3, cwsKey3, TrustLevel.WRITE, ',');
         createAndAppendTrustee(builder, member4, keyPair4, circle3, key3, cwsKey3, TrustLevel.ADMIN, ',');
-        createAndAppendTrustee(builder, member5, keyPair5, circle3, key3, cwsKey3, TrustLevel.READ, ';');
+        createAndAppendTrustee(builder, member5, keyPair5, circle3, key3, cwsKey3, TrustLevel.READ,  ';');
 
         return builder.toString();
     }

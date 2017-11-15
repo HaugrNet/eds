@@ -59,6 +59,12 @@ import javax.persistence.Table;
                         "  and t.member.id = :mid" +
                         "  and m.parentId = :pid" +
                         "  and lower(m.name) = lower(:name)"),
+        @NamedQuery(name = "metadata.findByNameAndFolder",
+                query = "select m " +
+                        "from MetadataEntity m " +
+                        "where m.id <> :id" +
+                        "  and m.name = :name" +
+                        "  and m.parentId = :parentId"),
         @NamedQuery(name = "metadata.countFolderContent",
                 query = "select count(m.id) " +
                         "from MetadataEntity m " +

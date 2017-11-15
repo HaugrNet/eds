@@ -379,6 +379,19 @@ public final class CommonJpaDao implements CommonDao {
         return findSingleRecord(query);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean checkIfNameIsUsed(final MetadataEntity entity, final String name, final Long folderId) {
+        final Query query = entityManager.createNamedQuery("metadata.findByNameAndFolder");
+        query.setParameter("id", entity.getId());
+        query.setParameter("name", name);
+        query.setParameter("parentId", folderId);
+
+        return findSingleRecord(query) != null;
+    }
+
     // =========================================================================
     // Internal Methods, handling the actual lookup's to simplify error handling
     // =========================================================================

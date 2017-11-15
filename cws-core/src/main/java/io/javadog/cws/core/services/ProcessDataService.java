@@ -9,7 +9,6 @@ package io.javadog.cws.core.services;
 
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
-import io.javadog.cws.api.common.TrustLevel;
 import io.javadog.cws.api.requests.ProcessDataRequest;
 import io.javadog.cws.api.responses.ProcessDataResponse;
 import io.javadog.cws.common.Settings;
@@ -116,12 +115,21 @@ public final class ProcessDataService extends Serviceable<ProcessDataResponse, P
         final ProcessDataResponse response;
 
         if (entity != null) {
+            // Now, check if the member account is allowed to perform the requested
+            // action. If not allowed, then an Exception is thrown.
+            findTrustee(entity.getCircle().getExternalId());
+
+            // First, let's identify the folder, we're not updating it yet, only
+            // after the name has also been checked.
+            Long folderId = entity.getParentId();
             if (request.getFolderId() != null) {
                 final MetadataEntity folder = checkFolder(entity, request.getFolderId());
-                entity.setParentId(folder.getParentId());
+                folderId = folder.getId();
             }
-            checkName(entity, request.getDataName());
+
+            entity.setName(checkName(entity, request.getDataName(), folderId));
             checkData(entity, request.getData());
+            entity.setParentId(folderId);
             dao.persist(entity);
 
             response = new ProcessDataResponse();
@@ -138,6 +146,10 @@ public final class ProcessDataService extends Serviceable<ProcessDataResponse, P
         final ProcessDataResponse response;
 
         if (entity != null) {
+            // Now, check if the member account is allowed to perform the requested
+            // action. If not allowed, then an Exception is thrown.
+            findTrustee(entity.getCircle().getExternalId());
+
             if (Objects.equals(Constants.FOLDER_TYPENAME, entity.getType().getName())) {
                 // If the Entity is a Folder, then we must check if it
                 // currently has content, if so - then we cannot delete it.
@@ -175,7 +187,7 @@ public final class ProcessDataService extends Serviceable<ProcessDataResponse, P
 
         if (request.getFolderId() != null) {
             entity = dao.findMetaDataByMemberAndExternalId(member, request.getFolderId());
-            if (!Objects.equals(Constants.FOLDER_TYPENAME, entity.getType().getName())) {
+            if ((entity == null) || !Objects.equals(Constants.FOLDER_TYPENAME, entity.getType().getName())) {
                 throw new CWSException(ReturnCode.IDENTIFICATION_WARNING, "Provided FolderId is not a folder.");
             }
         } else {
@@ -232,8 +244,6 @@ public final class ProcessDataService extends Serviceable<ProcessDataResponse, P
             if (Objects.equals(currentCircleId, foundCircleId)) {
                 if (Objects.equals(Constants.FOLDER_TYPENAME, entity.getType().getName())) {
                     throw new CWSException(ReturnCode.ILLEGAL_ACTION, "It is not permitted to move Folders.");
-                } else {
-                    entity.setParentId(folder.getId());
                 }
             } else {
                 throw new CWSException(ReturnCode.ILLEGAL_ACTION, "Moving Data from one Circle to another is not permitted.");
@@ -245,20 +255,27 @@ public final class ProcessDataService extends Serviceable<ProcessDataResponse, P
         return folder;
     }
 
-    private static void checkName(final MetadataEntity entity, final String name) {
-        if (name != null) {
-            final String currentName = entity.getName();
-            final String givenName = name.trim();
-            if (!Objects.equals(currentName, givenName)) {
-                entity.setName(givenName);
-            }
+    private String checkName(final MetadataEntity entity, final String name, final Long folderId) {
+        final String theName = (name != null) ? name.trim() : entity.getName();
+
+        if (dao.checkIfNameIsUsed(entity, theName, folderId)) {
+            throw new CWSException(ReturnCode.IDENTIFICATION_WARNING, "The name provided is already being used in the given folder.");
         }
+
+        return theName;
     }
 
     private void checkData(final MetadataEntity metadata, final byte[] bytes) {
         if (bytes != null) {
-            final DataEntity entity = dao.findDataByMetadata(metadata);
             final TrusteeEntity trustee = findTrustee(metadata.getCircle().getExternalId());
+
+            DataEntity entity = dao.findDataByMetadata(metadata);
+            if (entity == null) {
+                entity = new DataEntity();
+                entity.setMetadata(metadata);
+                entity.setKey(trustee.getKey());
+            }
+
             final SecretCWSKey circleKey = crypto.extractCircleKey(entity.getKey().getAlgorithm(), keyPair.getPrivate(), trustee.getCircleKey());
             final String salt = UUID.randomUUID().toString();
             circleKey.setSalt(salt);
@@ -278,18 +295,13 @@ public final class ProcessDataService extends Serviceable<ProcessDataResponse, P
         for (final TrusteeEntity trustee : trustees) {
             if (Objects.equals(trustee.getCircle().getExternalId(), externalCircleId)) {
                 found = trustee;
-                break;
             }
         }
 
-        if (found != null) {
-            if (TrustLevel.isAllowed(found.getTrustLevel(), TrustLevel.WRITE)) {
-                return found;
-            } else {
-                throw new CWSException(ReturnCode.ILLEGAL_ACTION, "The current Account is not allowed to perform the given action.");
-            }
-        } else {
-            throw new CWSException(ReturnCode.ILLEGAL_ACTION, "The current Account does not have any relation with the requested Circle.");
+        if (found == null) {
+            throw new CWSException(ReturnCode.AUTHORIZATION_WARNING, "The current Account is not allowed to perform the given action.");
         }
+
+        return found;
     }
 }

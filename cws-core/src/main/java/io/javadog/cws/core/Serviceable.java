@@ -30,6 +30,7 @@ import io.javadog.cws.model.jpa.CommonJpaDao;
 
 import javax.persistence.EntityManager;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -263,25 +264,30 @@ public abstract class Serviceable<R extends CwsResponse, V extends Authenticatio
         // Actions, without being part of a Circle. So these checks must be
         // made separately based on the actual Request.
         if (!Objects.equals(ADMIN_ACCOUNT, member.getName())) {
-            findTrustees(member, circleId);
-            boolean trusted = false;
-            for (final TrusteeEntity trust : trustees) {
+            final List<TrusteeEntity> allTrustees = findTrustees(member, circleId);
+            trustees = new ArrayList<>();
+
+            for (final TrusteeEntity trust : allTrustees) {
                 if (TrustLevel.isAllowed(trust.getTrustLevel(), action.getTrustLevel())) {
-                    trusted = true;
+                    trustees.add(trust);
                 }
             }
 
-            if (!trusted) {
+            if (trustees.isEmpty()) {
                 throw new AuthorizationException("The requesting Account is not permitted to " + action.getDescription());
             }
         }
     }
 
-    private void findTrustees(final MemberEntity member, final String circleId) {
+    private List<TrusteeEntity> findTrustees(final MemberEntity member, final String circleId) {
+        final List<TrusteeEntity> found;
+
         if (circleId != null) {
-            trustees = dao.findTrustByMemberAndCircle(member, circleId);
+            found = dao.findTrustByMemberAndCircle(member, circleId);
         } else {
-            trustees = dao.findTrustByMember(member);
+            found = dao.findTrustByMember(member);
         }
+
+        return found;
     }
 }

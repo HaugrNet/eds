@@ -29,7 +29,7 @@ import java.util.UUID;
 
 /**
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 public final class ProcessDataService extends Serviceable<ProcessDataResponse, ProcessDataRequest> {
 
@@ -224,7 +224,7 @@ public final class ProcessDataService extends Serviceable<ProcessDataResponse, P
      * permitted to move a Folder, as this is fairly problematic due to the
      * restraints in the Data Model, which has been added to prevent looping
      * models.</p>
-     *
+     * <p>
      * <p>For the same reason, the FolderId must internally remain a number, so
      * it can be checked for consistency - although the externally exposed Id
      * is the UUID or ExternalId value.</p>

@@ -43,9 +43,7 @@ public final class PrivateCWSKey extends CWSKey<PrivateKey> {
             // Updating the flag first, so any further attempts at
             // destroying the Key will be ignored.
             destroyed = true;
-
-            // Theoretically, we should just invoke the key.destroy() here,
-            // but each invocation of fails with a DestroyFailedException!
+            destroyKey();
         }
     }
 }

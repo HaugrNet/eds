@@ -8,7 +8,11 @@
 package io.javadog.cws.common.keys;
 
 import io.javadog.cws.common.enums.KeyAlgorithm;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import javax.security.auth.DestroyFailedException;
+import javax.security.auth.Destroyable;
 import java.security.Key;
 
 /**
@@ -16,6 +20,8 @@ import java.security.Key;
  * @since  CWS 1.0
  */
 public abstract class CWSKey<T extends Key> {
+
+    private static final Logger log = LoggerFactory.getLogger(CWSKey.class);
 
     protected boolean destroyed = false;
     private final KeyAlgorithm algorithm;
@@ -44,5 +50,22 @@ public abstract class CWSKey<T extends Key> {
 
     public boolean isDestroyed() {
         return destroyed;
+    }
+
+    /**
+     * <p>The Secret &amp; Private Keys both extend the {@link Destroyable }
+     * interface, which means that they in theory can be destroyed. However,
+     * many of the implementations only have the default behaviour, which is to
+     * simply throw a {@link DestroyFailedException}. Hence this method will
+     * simply ignore this exception by logging it as a debug message. Hopefully
+     * the debug logs will be reduced in the future, once the implementation has
+     * been added.</p>
+     */
+    protected void destroyKey() {
+        try {
+            ((Destroyable) key).destroy();
+        } catch (DestroyFailedException e) {
+            log.debug("The Key could not be destroyed, as the implementation was not added: {}", e.getMessage(), e);
+        }
     }
 }

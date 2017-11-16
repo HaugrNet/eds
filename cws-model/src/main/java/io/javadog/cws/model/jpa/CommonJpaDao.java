@@ -254,6 +254,9 @@ public final class CommonJpaDao implements CommonDao {
         return (long) query.getSingleResult();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public DataEntity findDataByMetadata(final MetadataEntity metadata) {
         final Query query = entityManager.createNamedQuery("data.findByMetadata");
@@ -262,6 +265,9 @@ public final class CommonJpaDao implements CommonDao {
         return findSingleRecord(query);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public DataEntity findDataByMemberAndExternalId(final MemberEntity member, final String externalId) {
         final Query query = entityManager.createNamedQuery("data.findByMemberAndExternalId");
@@ -393,13 +399,12 @@ public final class CommonJpaDao implements CommonDao {
 
     private static <E> List<E> findList(final Query query) {
         try {
-            List<E> list = query.getResultList();
+            final List<E> list = query.getResultList();
 
-            if (list == null) {
-                list = new ArrayList<>(0);
-            }
-
-            return list;
+            // JPA does not specify the exact behaviour of the getResultList()
+            // call, hence if a null is returned, we're converting it into an
+            // empty list. Which is always easier to deal with.
+            return (list != null) ? list : new ArrayList<>(0);
         } catch (IllegalStateException | PersistenceException e) {
             // This should be and will hopefully remain unreachable code.
             throw new CWSException(ReturnCode.DATABASE_ERROR, e.getMessage(), e);

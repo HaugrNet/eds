@@ -56,6 +56,11 @@
 
         <!-- Test Dependencies, primarily JUnit & Hibernate (for JPA). -->
         <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-core</artifactId>
             <scope>test</scope>

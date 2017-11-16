@@ -9,6 +9,7 @@ package io.javadog.cws.core;
 
 import static io.javadog.cws.api.common.Constants.ADMIN_ACCOUNT;
 
+import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.common.TrustLevel;
 import io.javadog.cws.api.requests.Authentication;
 import io.javadog.cws.api.requests.CircleIdRequest;
@@ -19,11 +20,13 @@ import io.javadog.cws.common.Settings;
 import io.javadog.cws.common.enums.KeyAlgorithm;
 import io.javadog.cws.common.exceptions.AuthenticationException;
 import io.javadog.cws.common.exceptions.AuthorizationException;
+import io.javadog.cws.common.exceptions.CWSException;
 import io.javadog.cws.common.exceptions.CryptoException;
 import io.javadog.cws.common.exceptions.VerificationException;
 import io.javadog.cws.common.keys.CWSKeyPair;
 import io.javadog.cws.common.keys.SecretCWSKey;
 import io.javadog.cws.model.CommonDao;
+import io.javadog.cws.model.entities.DataEntity;
 import io.javadog.cws.model.entities.MemberEntity;
 import io.javadog.cws.model.entities.TrusteeEntity;
 import io.javadog.cws.model.jpa.CommonJpaDao;
@@ -277,6 +280,28 @@ public abstract class Serviceable<R extends CwsResponse, V extends Authenticatio
                 throw new AuthorizationException("The requesting Account is not permitted to " + action.getDescription());
             }
         }
+    }
+
+    protected SecretCWSKey extractCircleKey(final DataEntity entity) {
+        final TrusteeEntity trustee = findTrustee(entity.getMetadata().getCircle().getExternalId());
+
+        return crypto.extractCircleKey(entity.getKey().getAlgorithm(), keyPair.getPrivate(), trustee.getCircleKey());
+    }
+
+    protected TrusteeEntity findTrustee(final String externalCircleId) {
+        TrusteeEntity found = null;
+
+        for (final TrusteeEntity trustee : trustees) {
+            if (Objects.equals(trustee.getCircle().getExternalId(), externalCircleId)) {
+                found = trustee;
+            }
+        }
+
+        if (found == null) {
+            throw new CWSException(ReturnCode.AUTHORIZATION_WARNING, "The current Account is not allowed to perform the given action.");
+        }
+
+        return found;
     }
 
     private List<TrusteeEntity> findTrustees(final MemberEntity member, final String circleId) {

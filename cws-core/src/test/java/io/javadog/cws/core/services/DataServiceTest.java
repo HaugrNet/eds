@@ -22,8 +22,10 @@ import io.javadog.cws.api.responses.ProcessDataResponse;
 import io.javadog.cws.common.exceptions.CWSException;
 import io.javadog.cws.common.exceptions.VerificationException;
 import io.javadog.cws.model.DatabaseSetup;
+import io.javadog.cws.model.entities.DataEntity;
 import org.junit.Test;
 
+import javax.persistence.Query;
 import java.util.UUID;
 
 /**
@@ -119,6 +121,37 @@ public final class DataServiceTest extends DatabaseSetup {
         final ProcessDataResponse response = service.perform(request);
         assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(response.getReturnMessage(), is("Ok"));
+
+        final FetchDataService readService = new FetchDataService(settings, entityManager);
+        final FetchDataRequest readRequest = prepareReadRequest(MEMBER_1, CIRCLE_1_ID, response.getDataId());
+        final FetchDataResponse readResponse = readService.perform(readRequest);
+        assertThat(readResponse.isOk(), is(true));
+    }
+
+    @Test
+    public void testAddDataWithInvalidChecksum() {
+        prepareCause(CWSException.class, ReturnCode.INTEGRITY_ERROR, "The Encrypted Data Checksum is invalid, the data appears to have been corrupted.");
+
+        final ProcessDataService service = new ProcessDataService(settings, entityManager);
+        final ProcessDataRequest request = prepareAddRequest(MEMBER_1, CIRCLE_1_ID, "The Data", 524288);
+
+        final ProcessDataResponse response = service.perform(request);
+        assertThat(response.isOk(), is(true));
+
+        // Now to the tricky part. We wish to test that the checksum is invalid,
+        // and thus resulting in a correct error message. As the checksum is
+        // controlled internally by CWS, it cannot be altered (rightfully) via
+        // the API, hence we have to modify it directly in the database!
+        final Query query = entityManager.createQuery("select d from DataEntity d where d.metadata.externalId = :eid");
+        query.setParameter("eid", response.getDataId());
+        final DataEntity entity = (DataEntity) query.getSingleResult();
+        entity.setChecksum("��f\u0012�)��a����f��0�\b\n\u05C8ТU��?v�\u0000\u000E�\f���ӺЂC��ئ\u0003��g�c�\u001F)��Ɩ���");
+        entityManager.persist(entity);
+
+        // Now to the actual test - reading the data with invalid checksum
+        final FetchDataService readService = new FetchDataService(settings, entityManager);
+        final FetchDataRequest readRequest = prepareReadRequest(MEMBER_1, CIRCLE_1_ID, response.getDataId());
+        readService.perform(readRequest);
     }
 
     @Test

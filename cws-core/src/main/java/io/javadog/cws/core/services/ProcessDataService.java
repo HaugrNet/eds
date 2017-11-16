@@ -276,7 +276,7 @@ public final class ProcessDataService extends Serviceable<ProcessDataResponse, P
                 entity.setKey(trustee.getKey());
             }
 
-            final SecretCWSKey circleKey = crypto.extractCircleKey(entity.getKey().getAlgorithm(), keyPair.getPrivate(), trustee.getCircleKey());
+            final SecretCWSKey circleKey = extractCircleKey(entity);
             final String salt = UUID.randomUUID().toString();
             circleKey.setSalt(salt);
             final byte[] encrypted = crypto.encrypt(circleKey, bytes);
@@ -287,21 +287,5 @@ public final class ProcessDataService extends Serviceable<ProcessDataResponse, P
             entity.setChecksum(checksum);
             dao.persist(entity);
         }
-    }
-
-    private TrusteeEntity findTrustee(final String externalCircleId) {
-        TrusteeEntity found = null;
-
-        for (final TrusteeEntity trustee : trustees) {
-            if (Objects.equals(trustee.getCircle().getExternalId(), externalCircleId)) {
-                found = trustee;
-            }
-        }
-
-        if (found == null) {
-            throw new CWSException(ReturnCode.AUTHORIZATION_WARNING, "The current Account is not allowed to perform the given action.");
-        }
-
-        return found;
     }
 }

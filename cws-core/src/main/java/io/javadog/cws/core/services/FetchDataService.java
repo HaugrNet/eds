@@ -18,11 +18,9 @@ import io.javadog.cws.common.exceptions.CWSException;
 import io.javadog.cws.common.keys.SecretCWSKey;
 import io.javadog.cws.core.Permission;
 import io.javadog.cws.core.Serviceable;
-import io.javadog.cws.model.entities.CircleEntity;
 import io.javadog.cws.model.entities.DataEntity;
 import io.javadog.cws.model.entities.DataTypeEntity;
 import io.javadog.cws.model.entities.MetadataEntity;
-import io.javadog.cws.model.entities.TrusteeEntity;
 
 import javax.persistence.EntityManager;
 import java.util.ArrayList;
@@ -97,6 +95,12 @@ public final class FetchDataService extends Serviceable<FetchDataResponse, Fetch
         // Circle Membership and right TrustLevel of the Member. If no Entity
         // is found, then there can be multiple reasons.
         final DataEntity entity = dao.findDataByMemberAndExternalId(member, metadata.getExternalId());
+        final FetchDataResponse response = new FetchDataResponse();
+        final List<Metadata> objects = new ArrayList<>(1);
+        final MetadataEntity parent = dao.find(MetadataEntity.class, metadata.getParentId());
+        final Metadata metaData = convert(metadata, parent.getExternalId());
+        objects.add(metaData);
+        response.setMetadata(objects);
 
         if (entity != null) {
             final String checksum = crypto.generateChecksum(entity.getData());
@@ -104,22 +108,13 @@ public final class FetchDataService extends Serviceable<FetchDataResponse, Fetch
                 final SecretCWSKey key = extractCircleKey(entity);
                 key.setSalt(entity.getInitialVector());
                 final byte[] bytes = crypto.decrypt(key, entity.getData());
-
-                final Metadata metaData = convert(entity.getMetadata(), readFolder(entity.getMetadata()));
-                final List<Metadata> objects = new ArrayList<>(1);
-                objects.add(metaData);
-
-                final FetchDataResponse response = new FetchDataResponse();
-                response.setMetadata(objects);
                 response.setData(bytes);
-
-                return response;
             } else {
                 throw new CWSException(ReturnCode.INTEGRITY_ERROR, "The Encrypted Data Checksum is invalid, the data appears to have been corrupted.");
             }
-        } else {
-            throw new CWSException(ReturnCode.IDENTIFICATION_WARNING, "No Data Object found, matching the provided information or member is lacking privileges to read the actual data.");
         }
+
+        return response;
     }
 
     private static FetchDataResponse prepareResponse(final String folderId, final List<MetadataEntity> records) {
@@ -156,30 +151,5 @@ public final class FetchDataService extends Serviceable<FetchDataResponse, Fetch
         dataType.setType(entity.getType());
 
         return dataType;
-    }
-
-    private SecretCWSKey extractCircleKey(final DataEntity entity) {
-        final CircleEntity circle = entity.getMetadata().getCircle();
-
-        for (final TrusteeEntity trustee : trustees) {
-            if (Objects.equals(circle.getId(), trustee.getCircle().getId())) {
-                return crypto.extractCircleKey(entity.getKey().getAlgorithm(), keyPair.getPrivate(), trustee.getCircleKey());
-            }
-        }
-
-        throw new CWSException(ReturnCode.IDENTIFICATION_WARNING, "Could not extract the Key for the requested Data Object");
-    }
-
-    private String readFolder(final MetadataEntity folderEntity) {
-        final Long parentId = folderEntity.getParentId();
-        final MetadataEntity entity;
-
-        if (parentId != null) {
-            entity = dao.find(MetadataEntity.class, parentId);
-        } else {
-            entity = dao.findRootByMemberCircle(member, folderEntity.getCircle().getExternalId());
-        }
-
-        return entity.getExternalId();
     }
 }

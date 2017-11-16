@@ -24,7 +24,11 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
 import java.nio.charset.Charset;
+import java.security.KeyPair;
+import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.util.UUID;
@@ -333,6 +337,106 @@ public final class CryptoTest {
         secretKey.destroy();
         assertThat(privateKey.isDestroyed(), is(true));
         assertThat(secretKey.isDestroyed(), is(true));
+    }
+
+    @Test
+    public void testInvalidSymmetricKeyEncryption() throws NoSuchAlgorithmException {
+        prepareCause(CryptoException.class, ReturnCode.CRYPTO_ERROR, "No installed provider supports this key: javax.crypto.spec.SecretKeySpec");
+
+        final Settings settings = new Settings();
+        final Crypto crypto = new Crypto(settings);
+        final SecretKey secretKey = generateKey(settings.getSymmetricAlgorithm());
+        final SecretCWSKey key = new SecretCWSKey(settings.getAsymmetricAlgorithm(), secretKey);
+        key.setSalt(UUID.randomUUID().toString());
+        final byte[] data = UUID.randomUUID().toString().getBytes(settings.getCharset());
+
+        final byte[] encrypted = crypto.encrypt(key, data);
+        assertThat(encrypted.length > 0, is(true));
+    }
+
+    @Test
+    public void testInvalidSymmetricKeyDecryption() throws NoSuchAlgorithmException {
+        prepareCause(CryptoException.class, ReturnCode.CRYPTO_ERROR, "No installed provider supports this key: javax.crypto.spec.SecretKeySpec");
+
+        final Settings settings = new Settings();
+        final Crypto crypto = new Crypto(settings);
+        final SecretKey secretKey = generateKey(settings.getSymmetricAlgorithm());
+        final SecretCWSKey key = new SecretCWSKey(settings.getAsymmetricAlgorithm(), secretKey);
+        key.setSalt(UUID.randomUUID().toString());
+        final byte[] data = UUID.randomUUID().toString().getBytes(settings.getCharset());
+
+        final byte[] decrypted = crypto.decrypt(key, data);
+        assertThat(decrypted.length > 0, is(true));
+    }
+
+    @Test
+    public void testInvalidAsymmetricKeyEncryption() {
+        prepareCause(CryptoException.class, ReturnCode.CRYPTO_ERROR, "io.javadog.cws.common.keys.PublicCWSKey cannot be cast to io.javadog.cws.common.keys.SecretCWSKey");
+
+        final Settings settings = new Settings();
+        final Crypto crypto = new Crypto(settings);
+        final CWSKeyPair generated = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
+        final KeyPair keys = new KeyPair(generated.getPublic().getKey(), generated.getPrivate().getKey());
+        final CWSKeyPair keyPair = new CWSKeyPair(settings.getSymmetricAlgorithm(), keys);
+        final byte[] data = UUID.randomUUID().toString().getBytes(settings.getCharset());
+
+        final byte[] encrypted = crypto.encrypt(keyPair.getPublic(), data);
+        assertThat(encrypted.length > 0, is(true));
+    }
+
+    @Test
+    public void testInvalidAsymmetricKeyDecryption() {
+        prepareCause(CryptoException.class, ReturnCode.CRYPTO_ERROR, "io.javadog.cws.common.keys.PrivateCWSKey cannot be cast to io.javadog.cws.common.keys.SecretCWSKey");
+
+        final Settings settings = new Settings();
+        final Crypto crypto = new Crypto(settings);
+        final CWSKeyPair generated = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
+        final KeyPair keys = new KeyPair(generated.getPublic().getKey(), generated.getPrivate().getKey());
+        final CWSKeyPair keyPair = new CWSKeyPair(settings.getSymmetricAlgorithm(), keys);
+        final byte[] data = UUID.randomUUID().toString().getBytes(settings.getCharset());
+
+        final byte[] decrypted = crypto.decrypt(keyPair.getPrivate(), data);
+        assertThat(decrypted.length > 0, is(true));
+    }
+
+    @Test
+    public void testInvalidDearmoringPublicKey() {
+        prepareCause(CryptoException.class, ReturnCode.CRYPTO_ERROR, "AES KeyFactory not available");
+
+        final Settings settings = new Settings();
+        final Crypto crypto = new Crypto(settings);
+        final CWSKeyPair keyPair = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
+        final String armoredPublicKey = crypto.armoringPublicKey(keyPair.getPublic().getKey());
+
+        settings.set(Settings.ASYMMETRIC_ALGORITHM, KeyAlgorithm.AES128.name());
+        final PublicKey publicKey = crypto.dearmoringPublicKey(armoredPublicKey);
+        assertThat(publicKey, is(not(nullValue())));
+    }
+
+    @Test
+    public void testInvalidDearmoringPrivateKey() {
+        prepareCause(CryptoException.class, ReturnCode.CRYPTO_ERROR, "AES KeyFactory not available");
+
+        final Settings settings = new Settings();
+        final Crypto crypto = new Crypto(settings);
+        final CWSKeyPair keyPair = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
+        final SecretCWSKey secretKey = crypto.generateSymmetricKey(settings.getSymmetricAlgorithm());
+        secretKey.setSalt(UUID.randomUUID().toString());
+
+        final String armoredPrivateKey = crypto.armoringPrivateKey(secretKey, keyPair.getPrivate().getKey());
+        settings.set(Settings.ASYMMETRIC_ALGORITHM, KeyAlgorithm.AES128.name());
+        final PrivateKey privateKey = crypto.dearmoringPrivateKey(secretKey, armoredPrivateKey);
+        assertThat(privateKey, is(not(nullValue())));
+    }
+
+    // =========================================================================
+    // Internal helper methods
+    // =========================================================================
+
+    private static SecretKey generateKey(final KeyAlgorithm algorithm) throws NoSuchAlgorithmException {
+        final KeyGenerator generator = KeyGenerator.getInstance(algorithm.getName());
+        generator.init(algorithm.getLength());
+        return generator.generateKey();
     }
 
     private <E extends CWSException> void prepareCause(final Class<E> cause, final ReturnCode returnCode, final String returnMessage) {

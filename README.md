@@ -56,15 +56,14 @@ API and scales depending on the deployment - it can be used by anyone who finds
 it useful. 
 
 # Release Plan
-The code has reached a feature freeze, with most of the code looking close to
-being production ready. Testing and bug fixing is well underway and should be
-completed by the end of October, 2017.
+CWS Development has reached the final phase for version 1.0. With the following
+milestones still pending, for details, see milestones in GitHub.
 
-Support for third-party analysis tools is pending as is testing under various
-Application & Cloud Servers and Databases.
-
-The initial plan of having a final 1.0 release ready by the end of 2017 remains
-the goal and with the current level of progress, it is still feasible.
+- 0.6 - Released November 17th, 2017; Code Completion Release
+- 0.7 - Scheduled for December, 2017; Documentation Release
+- 0.8 - Scheduled for December, 2017; REST Release
+- 0.9 - Scheduled for December, 2017; Auditing & Review Release
+- 1.0 - Scheduled for December 31st, 2017; Final 1.0 Release
 
 # Software License
 The CWS is released under Apache License 2 or APL2.

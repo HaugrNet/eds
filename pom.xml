@@ -32,7 +32,7 @@
         <module>cws-model</module>
         <module>cws-core</module>
         <module>cws-war</module>
-        <module>cws-client</module>
+        <!--<module>cws-client</module>-->
     </modules>
 
     <organization>

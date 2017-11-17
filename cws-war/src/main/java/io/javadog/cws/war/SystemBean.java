@@ -20,6 +20,7 @@ import io.javadog.cws.api.responses.ProcessCircleResponse;
 import io.javadog.cws.api.responses.ProcessMemberResponse;
 import io.javadog.cws.api.responses.SettingResponse;
 import io.javadog.cws.api.responses.VersionResponse;
+import io.javadog.cws.common.Settings;
 import io.javadog.cws.common.exceptions.CWSException;
 import io.javadog.cws.core.Serviceable;
 import io.javadog.cws.core.services.FetchCircleService;
@@ -27,14 +28,13 @@ import io.javadog.cws.core.services.FetchMemberService;
 import io.javadog.cws.core.services.ProcessCircleService;
 import io.javadog.cws.core.services.ProcessMemberService;
 import io.javadog.cws.core.services.SettingService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
+import java.util.logging.Logger;
 
 /**
  * @author Kim Jensen
@@ -43,7 +43,7 @@ import javax.transaction.Transactional;
 @Stateless
 public class SystemBean {
 
-    private static final Logger log = LoggerFactory.getLogger(SystemBean.class);
+    private static final Logger log = Logger.getLogger(SystemBean.class.getName());
 
     @PersistenceContext(unitName = "cwsDS")
     private EntityManager entityManager;
@@ -71,7 +71,7 @@ public class SystemBean {
             // so it can be dealt with by the requesting System. Logging the
             // error is thus not needed, as all information is provided in the
             // response.
-            log.trace(e.getMessage(), e);
+            log.log(Settings.DEBUG, e.getMessage(), e);
             response = new SettingResponse(e.getReturnCode(), e.getMessage());
         } finally {
             destroy(service);
@@ -93,7 +93,7 @@ public class SystemBean {
             // so it can be dealt with by the requesting System. Logging the
             // error is thus not needed, as all information is provided in the
             // response.
-            log.trace(e.getMessage(), e);
+            log.log(Settings.DEBUG, e.getMessage(), e);
             response = new FetchMemberResponse(e.getReturnCode(), e.getMessage());
         } finally {
             destroy(service);
@@ -115,7 +115,7 @@ public class SystemBean {
             // so it can be dealt with by the requesting System. Logging the
             // error is thus not needed, as all information is provided in the
             // response.
-            log.trace(e.getMessage(), e);
+            log.log(Settings.DEBUG, e.getMessage(), e);
             response = new ProcessMemberResponse(e.getReturnCode(), e.getMessage());
         } finally {
             destroy(service);
@@ -137,7 +137,7 @@ public class SystemBean {
             // so it can be dealt with by the requesting System. Logging the
             // error is thus not needed, as all information is provided in the
             // response.
-            log.trace(e.getMessage(), e);
+            log.log(Settings.DEBUG, e.getMessage(), e);
             response = new FetchCircleResponse(e.getReturnCode(), e.getMessage());
         } finally {
             destroy(service);
@@ -159,7 +159,7 @@ public class SystemBean {
             // so it can be dealt with by the requesting System. Logging the
             // error is thus not needed, as all information is provided in the
             // response.
-            log.trace(e.getMessage(), e);
+            log.log(Settings.DEBUG, e.getMessage(), e);
             response = new ProcessCircleResponse(e.getReturnCode(), e.getMessage());
         } finally {
             destroy(service);

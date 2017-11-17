@@ -7,13 +7,13 @@
  */
 package io.javadog.cws.common.keys;
 
+import io.javadog.cws.common.Settings;
 import io.javadog.cws.common.enums.KeyAlgorithm;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.security.auth.DestroyFailedException;
 import javax.security.auth.Destroyable;
 import java.security.Key;
+import java.util.logging.Logger;
 
 /**
  * @author Kim Jensen
@@ -21,7 +21,7 @@ import java.security.Key;
  */
 public abstract class CWSKey<T extends Key> {
 
-    private static final Logger log = LoggerFactory.getLogger(CWSKey.class);
+    private static final Logger log = Logger.getLogger(CWSKey.class.getName());
 
     protected boolean destroyed = false;
     private final KeyAlgorithm algorithm;
@@ -65,7 +65,7 @@ public abstract class CWSKey<T extends Key> {
         try {
             ((Destroyable) key).destroy();
         } catch (DestroyFailedException e) {
-            log.debug("The Key could not be destroyed, as the implementation was not added: {}", e.getMessage(), e);
+            log.log(Settings.INFO, "The Key could not be destroyed, as the implementation was not added: " + e.getMessage(), e);
         }
     }
 }

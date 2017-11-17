@@ -3,7 +3,7 @@
 # WildFly Control Script
 # -----------------------------------------------------------------------------
 # History:
-#   Version 1.00 - 2017-10-16, Kim Jensen <Kim@dawn.dk>
+#   Version 1.00 - 2017-10-16, Kim Jensen <kim@dawn.dk>
 #     o Initial version
 # -----------------------------------------------------------------------------
 # Methods:
@@ -68,7 +68,7 @@ show_help () {
     echo
     echo "  The Command must be one of the following:"
     echo "    start     Attempts to start a CWS WildFly instance"
-    echo "    stop      Attempts to stop the running ZObEL WildFly instance"
+    echo "    stop      Attempts to stop the running CWS WildFly instance"
     echo "    deploy    Deploy the latest CWS snapshot to WildFly"
     echo "    undeploy  Undeploy the currently deployed CWS snapshot"
     echo "    status    Retrieves the status of the CWS WildFly instance"
@@ -222,10 +222,7 @@ doClean () {
         echo "Cleaning WildFly Log files"
         rm -fr ${standalone}/log 2>/dev/null
         mkdir  ${standalone}/log 2>/dev/null
-        mkdir  ${standalone}/log/etem 2>/dev/null
-        mkdir  ${standalone}/log/zobel 2>/dev/null
         touch  ${standalone}/log/server.log 2>/dev/null
-        touch  /elster/protokolle/jbossinstanzen/zbl/zobel.log 2>/dev/null
 
         echo "Cleaning WildFly Deployments"
         rm -fr ${standalone}/data/* 2>/dev/null

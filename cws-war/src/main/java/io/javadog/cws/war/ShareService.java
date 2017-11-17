@@ -23,8 +23,7 @@ import io.javadog.cws.api.responses.ProcessDataResponse;
 import io.javadog.cws.api.responses.ProcessDataTypeResponse;
 import io.javadog.cws.api.responses.SignResponse;
 import io.javadog.cws.api.responses.VerifyResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import io.javadog.cws.common.Settings;
 
 import javax.inject.Inject;
 import javax.jws.WebMethod;
@@ -33,6 +32,7 @@ import javax.jws.WebResult;
 import javax.jws.WebService;
 import javax.jws.soap.SOAPBinding;
 import javax.xml.ws.BindingType;
+import java.util.logging.Logger;
 
 /**
  * @author Kim Jensen
@@ -43,7 +43,7 @@ import javax.xml.ws.BindingType;
 @WebService(name = "share", targetNamespace = "http://ws.cws.javadog.io/", serviceName = "share", portName = "share")
 public class ShareService implements Share {
 
-    private static final Logger log = LoggerFactory.getLogger(ShareService.class);
+    private static final Logger log = Logger.getLogger(ShareService.class.getName());
 
     private static final String GENERAL_RETURN_MESSAGE = "An unknown error occurred. Please consult the CWS System Log.";
 
@@ -65,7 +65,7 @@ public class ShareService implements Share {
             // final level where it can be handled. Errors can be Persistence
             // problems or other things that will affect the reliability and/or
             // performance of the system.
-            log.error(e.getMessage(), e);
+            log.log(Settings.ERROR, e.getMessage(), e);
             response = new ProcessDataTypeResponse(ReturnCode.ERROR, GENERAL_RETURN_MESSAGE);
         }
 
@@ -88,7 +88,7 @@ public class ShareService implements Share {
             // final level where it can be handled. Errors can be Persistence
             // problems or other things that will affect the reliability and/or
             // performance of the system.
-            log.error(e.getMessage(), e);
+            log.log(Settings.ERROR, e.getMessage(), e);
             response = new FetchDataTypeResponse(ReturnCode.ERROR, GENERAL_RETURN_MESSAGE);
         }
 
@@ -111,7 +111,7 @@ public class ShareService implements Share {
             // final level where it can be handled. Errors can be Persistence
             // problems or other things that will affect the reliability and/or
             // performance of the system.
-            log.error(e.getMessage(), e);
+            log.log(Settings.ERROR, e.getMessage(), e);
             response = new ProcessDataResponse(ReturnCode.ERROR, GENERAL_RETURN_MESSAGE);
         }
 
@@ -134,7 +134,7 @@ public class ShareService implements Share {
             // final level where it can be handled. Errors can be Persistence
             // problems or other things that will affect the reliability and/or
             // performance of the system.
-            log.error(e.getMessage(), e);
+            log.log(Settings.ERROR, e.getMessage(), e);
             response = new FetchDataResponse(ReturnCode.ERROR, GENERAL_RETURN_MESSAGE);
         }
 
@@ -157,7 +157,7 @@ public class ShareService implements Share {
             // final level where it can be handled. Errors can be Persistence
             // problems or other things that will affect the reliability and/or
             // performance of the system.
-            log.error(e.getMessage(), e);
+            log.log(Settings.ERROR, e.getMessage(), e);
             response = new SignResponse(ReturnCode.ERROR, GENERAL_RETURN_MESSAGE);
         }
 
@@ -180,7 +180,7 @@ public class ShareService implements Share {
             // final level where it can be handled. Errors can be Persistence
             // problems or other things that will affect the reliability and/or
             // performance of the system.
-            log.error(e.getMessage(), e);
+            log.log(Settings.ERROR, e.getMessage(), e);
             response = new VerifyResponse(ReturnCode.ERROR, GENERAL_RETURN_MESSAGE);
         }
 
@@ -203,7 +203,7 @@ public class ShareService implements Share {
             // final level where it can be handled. Errors can be Persistence
             // problems or other things that will affect the reliability and/or
             // performance of the system.
-            log.error(e.getMessage(), e);
+            log.log(Settings.ERROR, e.getMessage(), e);
             response = new FetchSignatureResponse(ReturnCode.ERROR, GENERAL_RETURN_MESSAGE);
         }
 

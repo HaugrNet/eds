@@ -7,10 +7,11 @@
  */
 package io.javadog.cws.war;
 
+import io.javadog.cws.common.Settings;
 import io.javadog.cws.common.exceptions.CWSException;
 import io.javadog.cws.core.Serviceable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import java.util.logging.Logger;
 
 /**
  * @author Kim Jensen
@@ -18,7 +19,7 @@ import org.slf4j.LoggerFactory;
  */
 public final class CommonBean {
 
-    private static final Logger log = LoggerFactory.getLogger(CommonBean.class);
+    private static final Logger log = Logger.getLogger(CommonBean.class.getName());
 
     /**
      * Private Constructor, this is a utility Class.
@@ -31,7 +32,7 @@ public final class CommonBean {
             try {
                 serviceable.destroy();
             } catch (CWSException e) {
-                log.error("Failed destroying the Service: {}", e.getMessage(), e);
+                log.log(Settings.WARN, "Failed destroying the Service: " + e.getMessage(), e);
             }
         }
     }

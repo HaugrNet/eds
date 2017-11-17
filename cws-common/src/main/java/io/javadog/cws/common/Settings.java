@@ -17,6 +17,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Level;
 
 /**
  * <p>This Class holds the general settings for the CWS. All settings used by
@@ -39,6 +40,16 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public final class Settings {
 
+    /** Debug log level, by default it should be off. */
+    public static final Level DEBUG = Level.OFF;
+    /** Info log level, by default it should be off. */
+    public static final Level INFO = Level.OFF;
+    /** Warn log level, used for problems with user provided data. */
+    public static final Level WARN = Level.WARNING;
+    /** Error log level, used if an internal error occurred. */
+    public static final Level ERROR = Level.SEVERE;
+
+    // Settings, which is changeable via the settings table in the database
     public static final String SYMMETRIC_ALGORITHM = "cws.crypto.symmetric.algorithm";
     public static final String ASYMMETRIC_ALGORITHM = "cws.crypto.asymmetric.algorithm";
     public static final String SIGNATURE_ALGORITHM = "cws.crypto.signature.algorithm";
@@ -133,6 +144,10 @@ public final class Settings {
     public Boolean getShareTrustees() {
         return toBoolean(properties.getProperty(SHOW_TRUSTEES));
     }
+
+    // =========================================================================
+    // Internal methods
+    // =========================================================================
 
     private static boolean toBoolean(final String value) {
         return Boolean.parseBoolean(value.trim());

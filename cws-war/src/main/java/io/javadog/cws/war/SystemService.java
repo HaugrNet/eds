@@ -20,8 +20,7 @@ import io.javadog.cws.api.responses.ProcessCircleResponse;
 import io.javadog.cws.api.responses.ProcessMemberResponse;
 import io.javadog.cws.api.responses.SettingResponse;
 import io.javadog.cws.api.responses.VersionResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import io.javadog.cws.common.Settings;
 
 import javax.inject.Inject;
 import javax.jws.WebMethod;
@@ -30,6 +29,7 @@ import javax.jws.WebResult;
 import javax.jws.WebService;
 import javax.jws.soap.SOAPBinding;
 import javax.xml.ws.BindingType;
+import java.util.logging.Logger;
 
 /**
  * @author Kim Jensen
@@ -40,7 +40,7 @@ import javax.xml.ws.BindingType;
 @WebService(name = "system", targetNamespace = "http://ws.cws.javadog.io/", serviceName = "system", portName = "system")
 public class SystemService implements System {
 
-    private static final Logger log = LoggerFactory.getLogger(SystemService.class);
+    private static final Logger log = Logger.getLogger(SystemService.class.getName());
 
     private static final String GENERAL_RETURN_MESSAGE = "An unknown error occurred. Please consult the CWS System Log.";
 
@@ -62,7 +62,7 @@ public class SystemService implements System {
             // final level where it can be handled. Errors can be Persistence
             // problems or other things that will affect the reliability and/or
             // performance of the system.
-            log.error(e.getMessage(), e);
+            log.log(Settings.ERROR, e.getMessage(), e);
             response = new VersionResponse(ReturnCode.ERROR, GENERAL_RETURN_MESSAGE);
         }
 
@@ -85,7 +85,7 @@ public class SystemService implements System {
             // final level where it can be handled. Errors can be Persistence
             // problems or other things that will affect the reliability and/or
             // performance of the system.
-            log.error(e.getMessage(), e);
+            log.log(Settings.ERROR, e.getMessage(), e);
             response = new SettingResponse(ReturnCode.ERROR, GENERAL_RETURN_MESSAGE);
         }
 
@@ -108,7 +108,7 @@ public class SystemService implements System {
             // final level where it can be handled. Errors can be Persistence
             // problems or other things that will affect the reliability and/or
             // performance of the system.
-            log.error(e.getMessage(), e);
+            log.log(Settings.ERROR, e.getMessage(), e);
             response = new FetchMemberResponse(ReturnCode.ERROR, GENERAL_RETURN_MESSAGE);
         }
 
@@ -131,7 +131,7 @@ public class SystemService implements System {
             // final level where it can be handled. Errors can be Persistence
             // problems or other things that will affect the reliability and/or
             // performance of the system.
-            log.error(e.getMessage(), e);
+            log.log(Settings.ERROR, e.getMessage(), e);
             response = new ProcessMemberResponse(ReturnCode.ERROR, GENERAL_RETURN_MESSAGE);
         }
 
@@ -154,7 +154,7 @@ public class SystemService implements System {
             // final level where it can be handled. Errors can be Persistence
             // problems or other things that will affect the reliability and/or
             // performance of the system.
-            log.error(e.getMessage(), e);
+            log.log(Settings.ERROR, e.getMessage(), e);
             response = new FetchCircleResponse(ReturnCode.ERROR, GENERAL_RETURN_MESSAGE);
         }
 
@@ -177,7 +177,7 @@ public class SystemService implements System {
             // final level where it can be handled. Errors can be Persistence
             // problems or other things that will affect the reliability and/or
             // performance of the system.
-            log.error(e.getMessage(), e);
+            log.log(Settings.ERROR, e.getMessage(), e);
             response = new ProcessCircleResponse(ReturnCode.ERROR, GENERAL_RETURN_MESSAGE);
         }
 

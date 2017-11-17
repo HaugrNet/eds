@@ -122,33 +122,9 @@
                     <version>3.3.0.603</version>
                 </plugin>
                 <plugin>
-                    <groupId>org.apache.cxf</groupId>
-                    <artifactId>cxf-codegen-plugin</artifactId>
-                    <version>3.2.1</version>
-                </plugin>
-                <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>build-helper-maven-plugin</artifactId>
                     <version>3.0.0</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>findbugs-maven-plugin</artifactId>
-                    <version>3.0.5</version>
-                    <configuration>
-                        <effort>Max</effort>
-                        <threshold>Low</threshold>
-                        <failOnError>true</failOnError>
-                        <includeFilterFile>accessories/findbugs/findbugs-security-include.xml</includeFilterFile>
-                        <excludeFilterFile>accessories/findbugs/findbugs-security-exclude.xml</excludeFilterFile>
-                        <plugins>
-                            <plugin>
-                                <groupId>com.h3xstream.findsecbugs</groupId>
-                                <artifactId>findsecbugs-plugin</artifactId>
-                                <version>LATEST</version> <!-- Auto-update to the latest stable -->
-                            </plugin>
-                        </plugins>
-                    </configuration>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -195,11 +171,14 @@
                     </execution>
                     <execution>
                         <id>post-test</id>
-                        <phase>test</phase>
+                        <phase>prepare-package</phase>
                         <goals>
                             <goal>report</goal>
-                            <goal>report-integration</goal>
                         </goals>
+                        <configuration>
+                            <dataFile>${sonar.jacoco.reportPath}</dataFile>
+                            <outputDirectory>${project.basedir}/../target/jacoco</outputDirectory>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>

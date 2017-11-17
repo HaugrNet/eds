@@ -38,7 +38,7 @@ Then do the following:
 
 ```
 $ cd /path/to/cws/sources
-$ mvn clean install
+$ mvn clean verify
 $ cp cws-war/target/cws.war ${WILDFLY_HOME}/standalone/deployments
 $ ${WILDFLY_HOME}/bin/standalone.sh -c standalone.xml
 ```

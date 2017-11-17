@@ -25,7 +25,7 @@ please make sure that you have Java (8+), [Maven](https://maven.apache.org/) and
 [PostgreSQL](https://www.postgresql.org/) installed and running, as well as a
 local copy of the CWS sources.
 
-In the accessories folder, you can find the configuration for WildFly 10, the
+In the accessories folder, you can find the configuration for WildFly 10 and 11, the
 files are located in the same folder structure as you need to add them to your
 local WildFly installation.
 
@@ -40,14 +40,14 @@ Then do the following:
 $ cd /path/to/cws/sources
 $ mvn clean verify
 $ cp cws-war/target/cws.war ${WILDFLY_HOME}/standalone/deployments
-$ ${WILDFLY_HOME}/bin/standalone.sh -c standalone.xml
+$ ${WILDFLY_HOME}/bin/standalone.sh -c standalone-cws.xml
 ```
 Now, you should have a running version of CWS which can be reached from the
 following SOAP based URL's:
 
 ```
-http://localhost:9080/cws/system?wsdl
-http://localhost:9080/cws/share?wsdl
+http://localhost:8080/cws/system?wsdl
+http://localhost:8080/cws/share?wsdl
 ```
 
 # Who is this for

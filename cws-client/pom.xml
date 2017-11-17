@@ -13,6 +13,10 @@
     <name>CWS Client</name>
     <description>Sample CWS Client Module, primarily for testing.</description>
 
+    <properties>
+        <cxf.version>3.2.1</cxf.version>
+    </properties>
+
     <build>
         <finalName>cws-client</finalName>
         <resources>
@@ -25,7 +29,7 @@
             <plugin>
                 <groupId>org.apache.cxf</groupId>
                 <artifactId>cxf-codegen-plugin</artifactId>
-                <version>2.7.18</version>
+                <version>${cxf.version}</version>
                 <executions>
                     <execution>
                         <id>share-sources</id>
@@ -36,9 +40,6 @@
                             <wsdlOptions>
                                 <wsdlOption>
                                     <wsdl>${basedir}/src/main/resources/share.wsdl</wsdl>
-                                    <!--<extraargs>-->
-                                        <!--<extraarg>-client</extraarg>-->
-                                    <!--</extraargs>-->
                                 </wsdlOption>
                             </wsdlOptions>
                         </configuration>
@@ -55,9 +56,6 @@
                             <wsdlOptions>
                                 <wsdlOption>
                                     <wsdl>${basedir}/src/main/resources/system.wsdl</wsdl>
-                                    <!--<extraargs>-->
-                                        <!--<extraarg>-client</extraarg>-->
-                                    <!--</extraargs>-->
                                  </wsdlOption>
                             </wsdlOptions>
                         </configuration>
@@ -109,20 +107,24 @@
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-frontend-jaxws</artifactId>
+            <version>${cxf.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-transports-http</artifactId>
+            <version>${cxf.version}</version>
         </dependency>
 
         <!-- Following is required to run the Client. -->
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-databinding-jaxb</artifactId>
+            <version>${cxf.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.ws.xmlschema</groupId>
             <artifactId>xmlschema-core</artifactId>
+            <version>2.2.2</version>
         </dependency>
 
         <dependency>

@@ -35,9 +35,9 @@
 
   <xs:element name="signResponse" type="tns:signResponse"/>
 
-  <xs:element name="verification" type="tns:verification"/>
+  <xs:element name="verify" type="tns:verify"/>
 
-  <xs:element name="verificationResponse" type="tns:verificationResponse"/>
+  <xs:element name="verifyResponse" type="tns:verifyResponse"/>
 
   <xs:complexType name="processData">
     <xs:sequence>
@@ -184,39 +184,6 @@
     </xs:sequence>
   </xs:complexType>
 
-  <xs:complexType name="verification">
-    <xs:sequence>
-      <xs:element minOccurs="0" name="request" type="tns:verifyRequest"/>
-    </xs:sequence>
-  </xs:complexType>
-
-  <xs:complexType final="extension restriction" name="verifyRequest">
-    <xs:complexContent>
-      <xs:extension base="tns:authentication">
-        <xs:sequence>
-          <xs:element name="signature" type="xs:string"/>
-          <xs:element name="data" type="xs:base64Binary"/>
-        </xs:sequence>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-
-  <xs:complexType name="verificationResponse">
-    <xs:sequence>
-      <xs:element minOccurs="0" name="response" type="tns:verifyResult"/>
-    </xs:sequence>
-  </xs:complexType>
-
-  <xs:complexType final="extension restriction" name="verifyResult">
-    <xs:complexContent>
-      <xs:extension base="tns:cwsResult">
-        <xs:sequence>
-          <xs:element name="verified" type="xs:boolean"/>
-        </xs:sequence>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-
   <xs:complexType name="sign">
     <xs:sequence>
       <xs:element minOccurs="0" name="request" type="tns:signRequest"/>
@@ -245,6 +212,39 @@
       <xs:extension base="tns:cwsResult">
         <xs:sequence>
           <xs:element name="signature" type="xs:string"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="verify">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="request" type="tns:verifyRequest"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType final="extension restriction" name="verifyRequest">
+    <xs:complexContent>
+      <xs:extension base="tns:authentication">
+        <xs:sequence>
+          <xs:element name="signature" type="xs:string"/>
+          <xs:element name="data" type="xs:base64Binary"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="verifyResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="response" type="tns:verifyResult"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType final="extension restriction" name="verifyResult">
+    <xs:complexContent>
+      <xs:extension base="tns:cwsResult">
+        <xs:sequence>
+          <xs:element name="verified" type="xs:boolean"/>
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>
@@ -380,10 +380,6 @@
     <wsdl:part element="tns:processDataResponse" name="parameters">
     </wsdl:part>
   </wsdl:message>
-  <wsdl:message name="verificationResponse">
-    <wsdl:part element="tns:verificationResponse" name="parameters">
-    </wsdl:part>
-  </wsdl:message>
   <wsdl:message name="fetchDataResponse">
     <wsdl:part element="tns:fetchDataResponse" name="parameters">
     </wsdl:part>
@@ -416,12 +412,16 @@
     <wsdl:part element="tns:fetchData" name="parameters">
     </wsdl:part>
   </wsdl:message>
-  <wsdl:message name="verification">
-    <wsdl:part element="tns:verification" name="parameters">
-    </wsdl:part>
-  </wsdl:message>
   <wsdl:message name="signResponse">
     <wsdl:part element="tns:signResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="verifyResponse">
+    <wsdl:part element="tns:verifyResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="verify">
+    <wsdl:part element="tns:verify" name="parameters">
     </wsdl:part>
   </wsdl:message>
   <wsdl:message name="fetchSignaturesResponse">
@@ -454,16 +454,16 @@
       <wsdl:output message="tns:fetchDataResponse" name="fetchDataResponse">
     </wsdl:output>
     </wsdl:operation>
-    <wsdl:operation name="verification">
-      <wsdl:input message="tns:verification" name="verification">
-    </wsdl:input>
-      <wsdl:output message="tns:verificationResponse" name="verificationResponse">
-    </wsdl:output>
-    </wsdl:operation>
     <wsdl:operation name="sign">
       <wsdl:input message="tns:sign" name="sign">
     </wsdl:input>
       <wsdl:output message="tns:signResponse" name="signResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="verify">
+      <wsdl:input message="tns:verify" name="verify">
+    </wsdl:input>
+      <wsdl:output message="tns:verifyResponse" name="verifyResponse">
     </wsdl:output>
     </wsdl:operation>
     <wsdl:operation name="fetchSignatures">
@@ -508,21 +508,21 @@
         <soap:body use="literal"/>
       </wsdl:output>
     </wsdl:operation>
-    <wsdl:operation name="verification">
-      <soap:operation soapAction="" style="document"/>
-      <wsdl:input name="verification">
-        <soap:body use="literal"/>
-      </wsdl:input>
-      <wsdl:output name="verificationResponse">
-        <soap:body use="literal"/>
-      </wsdl:output>
-    </wsdl:operation>
     <wsdl:operation name="sign">
       <soap:operation soapAction="" style="document"/>
       <wsdl:input name="sign">
         <soap:body use="literal"/>
       </wsdl:input>
       <wsdl:output name="signResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="verify">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="verify">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="verifyResponse">
         <soap:body use="literal"/>
       </wsdl:output>
     </wsdl:operation>

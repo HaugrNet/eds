@@ -39,7 +39,7 @@ import java.net.URL;
  * @author Kim Jensen
  * @since  CWS 1.0
  */
-public final class ShareSoapClient extends Mapper implements Share {
+public final class ShareSoapClient implements Share {
 
     private static final QName SERVICE_NAME = new QName("http://ws.cws.javadog.io/", "share");
     private final io.javadog.cws.ws.Share client;
@@ -117,7 +117,7 @@ public final class ShareSoapClient extends Mapper implements Share {
     }
 
     // =========================================================================
-    // Internal mapping of the API <-> WS Objects
+    // Internal mapping of the API <-> WS Request & Response Objects
     // =========================================================================
 
     private static io.javadog.cws.ws.ProcessDataTypeRequest map(final ProcessDataTypeRequest api) {
@@ -125,7 +125,10 @@ public final class ShareSoapClient extends Mapper implements Share {
 
         if (api != null) {
             ws = new io.javadog.cws.ws.ProcessDataTypeRequest();
-            fillAuthentication(ws, api);
+            Mapper.fillAuthentication(ws, api);
+            ws.setAction(Mapper.map(api.getAction()));
+            ws.setTypeName(api.getTypeName());
+            ws.setType(api.getType());
         }
 
         return ws;
@@ -136,7 +139,8 @@ public final class ShareSoapClient extends Mapper implements Share {
 
         if (ws != null) {
             api = new ProcessDataTypeResponse();
-            fillResponse(api, ws);
+            Mapper.fillResponse(api, ws);
+            api.setDataType(Mapper.map(ws.getDataType()));
         }
 
         return api;
@@ -147,7 +151,7 @@ public final class ShareSoapClient extends Mapper implements Share {
 
         if (api != null) {
             ws = new io.javadog.cws.ws.FetchDataTypeRequest();
-            fillAuthentication(ws, api);
+            Mapper.fillAuthentication(ws, api);
         }
 
         return ws;
@@ -158,7 +162,8 @@ public final class ShareSoapClient extends Mapper implements Share {
 
         if (ws != null) {
             api = new FetchDataTypeResponse();
-            fillResponse(api, ws);
+            Mapper.fillResponse(api, ws);
+            api.setDataTypes(Mapper.mapDataTypes(ws.getDataTypes()));
         }
 
         return api;
@@ -169,7 +174,14 @@ public final class ShareSoapClient extends Mapper implements Share {
 
         if (api != null) {
             ws = new io.javadog.cws.ws.ProcessDataRequest();
-            fillAuthentication(ws, api);
+            Mapper.fillAuthentication(ws, api);
+            ws.setAction(Mapper.map(api.getAction()));
+            ws.setDataId(api.getDataId());
+            ws.setCircleId(api.getCircleId());
+            ws.setDataName(api.getDataName());
+            ws.setFolderId(api.getFolderId());
+            ws.setTypeName(api.getTypeName());
+            ws.setData(api.getData());
         }
 
         return ws;
@@ -180,7 +192,8 @@ public final class ShareSoapClient extends Mapper implements Share {
 
         if (ws != null) {
             api = new ProcessDataResponse();
-            fillResponse(api, ws);
+            Mapper.fillResponse(api, ws);
+            api.setDataId(ws.getDataId());
         }
 
         return api;
@@ -191,7 +204,11 @@ public final class ShareSoapClient extends Mapper implements Share {
 
         if (api != null) {
             ws = new io.javadog.cws.ws.FetchDataRequest();
-            fillAuthentication(ws, api);
+            Mapper.fillAuthentication(ws, api);
+            ws.setCircleId(api.getCircleId());
+            ws.setDataId(api.getDataId());
+            ws.setPageNumber(api.getPageNumber());
+            ws.setPageSize(api.getPageSize());
         }
 
         return ws;
@@ -202,7 +219,8 @@ public final class ShareSoapClient extends Mapper implements Share {
 
         if (ws != null) {
             api = new FetchDataResponse();
-            fillResponse(api, ws);
+            Mapper.fillResponse(api, ws);
+            api.setMetadata(Mapper.mapMetadata(ws.getMetadata()));
             api.setData(ws.getData());
         }
 
@@ -214,9 +232,9 @@ public final class ShareSoapClient extends Mapper implements Share {
 
         if (api != null) {
             ws = new io.javadog.cws.ws.SignRequest();
-            fillAuthentication(ws, api);
+            Mapper.fillAuthentication(ws, api);
             ws.setData(api.getData());
-            ws.setExpires(map(api.getExpires()));
+            ws.setExpires(Mapper.map(api.getExpires()));
         }
 
         return ws;
@@ -227,7 +245,7 @@ public final class ShareSoapClient extends Mapper implements Share {
 
         if (ws != null) {
             api = new SignResponse();
-            fillResponse(api, ws);
+            Mapper.fillResponse(api, ws);
             api.setSignature(ws.getSignature());
         }
 
@@ -239,7 +257,7 @@ public final class ShareSoapClient extends Mapper implements Share {
 
         if (api != null) {
             ws = new io.javadog.cws.ws.VerifyRequest();
-            fillAuthentication(ws, api);
+            Mapper.fillAuthentication(ws, api);
             ws.setSignature(api.getSignature());
             ws.setData(api.getData());
         }
@@ -252,7 +270,7 @@ public final class ShareSoapClient extends Mapper implements Share {
 
         if (ws != null) {
             api = new VerifyResponse();
-            fillResponse(api, ws);
+            Mapper.fillResponse(api, ws);
             api.setVerified(ws.isVerified());
         }
 
@@ -264,7 +282,7 @@ public final class ShareSoapClient extends Mapper implements Share {
 
         if (api != null) {
             ws = new io.javadog.cws.ws.FetchSignatureRequest();
-            fillAuthentication(ws, api);
+            Mapper.fillAuthentication(ws, api);
         }
 
         return ws;
@@ -275,7 +293,8 @@ public final class ShareSoapClient extends Mapper implements Share {
 
         if (ws != null) {
             api = new FetchSignatureResponse();
-            fillResponse(api, ws);
+            Mapper.fillResponse(api, ws);
+            api.setSignatures(Mapper.mapSignatures(ws.getSignatures()));
         }
 
         return api;

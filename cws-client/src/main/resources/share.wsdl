@@ -50,12 +50,12 @@
       <xs:extension base="tns:authentication">
         <xs:sequence>
           <xs:element name="action" type="tns:action"/>
-          <xs:element name="dataId" nillable="true" type="xs:string"/>
-          <xs:element minOccurs="0" name="circleId" nillable="true" type="xs:string"/>
-          <xs:element minOccurs="0" name="dataName" nillable="true" type="xs:string"/>
-          <xs:element minOccurs="0" name="folderId" nillable="true" type="xs:string"/>
+          <xs:element name="dataId" type="xs:string"/>
+          <xs:element minOccurs="0" name="circleId" type="xs:string"/>
+          <xs:element minOccurs="0" name="dataName" type="xs:string"/>
+          <xs:element minOccurs="0" name="folderId" type="xs:string"/>
           <xs:element name="typeName" type="xs:string"/>
-          <xs:element minOccurs="0" name="data" nillable="true" type="xs:base64Binary"/>
+          <xs:element minOccurs="0" name="data" type="xs:base64Binary"/>
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>
@@ -547,7 +547,7 @@
   </wsdl:binding>
   <wsdl:service name="share">
     <wsdl:port binding="tns:shareSoapBinding" name="share">
-      <soap:address location="http://localhost:9080/cws/share"/>
+      <soap:address location="http://localhost:8080/cws/share"/>
     </wsdl:port>
   </wsdl:service>
 </wsdl:definitions>

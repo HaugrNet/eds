@@ -37,26 +37,26 @@ public final class ProcessDataRequest extends Authentication implements CircleId
     private Action action = null;
 
     @Pattern(regexp = Constants.ID_PATTERN_REGEX)
-    @XmlElement(name = Constants.FIELD_DATA_ID, nillable = true, required = true)
+    @XmlElement(name = Constants.FIELD_DATA_ID, required = true)
     private String dataId = null;
 
     @Pattern(regexp = Constants.ID_PATTERN_REGEX)
-    @XmlElement(name = Constants.FIELD_CIRCLE_ID, nillable = true)
+    @XmlElement(name = Constants.FIELD_CIRCLE_ID)
     private String circleId = null;
 
     @Size(min = 1, max = Constants.MAX_NAME_LENGTH)
-    @XmlElement(name = Constants.FIELD_DATA_NAME, nillable = true)
+    @XmlElement(name = Constants.FIELD_DATA_NAME)
     private String dataName = null;
 
     @Pattern(regexp = Constants.ID_PATTERN_REGEX)
-    @XmlElement(name = Constants.FIELD_FOLDER_ID, nillable = true)
+    @XmlElement(name = Constants.FIELD_FOLDER_ID)
     private String folderId = null;
 
     @Size(min = 1, max = Constants.MAX_NAME_LENGTH)
     @XmlElement(name = Constants.FIELD_TYPENAME, required = true)
     private String typeName = null;
 
-    @XmlElement(name = Constants.FIELD_DATA, nillable = true)
+    @XmlElement(name = Constants.FIELD_DATA)
     private byte[] data = null;
 
     // =========================================================================

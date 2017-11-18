@@ -30,13 +30,15 @@ import io.javadog.cws.ws.VersionResult;
 import javax.xml.namespace.QName;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
  * @author Kim Jensen
  * @since  CWS 1.0
  */
-public final class SystemSoapClient extends Mapper implements System {
+public final class SystemSoapClient implements System {
 
     private static final QName SERVICE_NAME = new QName("http://ws.cws.javadog.io/", "system");
     private final io.javadog.cws.ws.System client;
@@ -106,7 +108,7 @@ public final class SystemSoapClient extends Mapper implements System {
     }
 
     // =========================================================================
-    // Internal mapping of the API <-> WS Objects
+    // Internal mapping of the API <-> WS Request & Response Objects
     // =========================================================================
 
     private static VersionResponse map(final VersionResult ws) {
@@ -114,7 +116,8 @@ public final class SystemSoapClient extends Mapper implements System {
 
         if (ws != null) {
             api = new VersionResponse();
-            fillResponse(api, ws);
+            Mapper.fillResponse(api, ws);
+            api.setVersion(ws.getVersion());
         }
 
         return api;
@@ -125,15 +128,11 @@ public final class SystemSoapClient extends Mapper implements System {
 
         if (api != null) {
             ws = new io.javadog.cws.ws.SettingRequest();
-            fillAuthentication(ws, api);
+            Mapper.fillAuthentication(ws, api);
             ws.setSettings(mapSettings(api.getSettings()));
         }
 
         return ws;
-    }
-
-    private static io.javadog.cws.ws.SettingRequest.Settings mapSettings(final Map<String, String> api) {
-        return null;
     }
 
     private static SettingResponse map(final SettingResult ws) {
@@ -141,7 +140,8 @@ public final class SystemSoapClient extends Mapper implements System {
 
         if (ws != null) {
             api = new SettingResponse();
-            fillResponse(api, ws);
+            Mapper.fillResponse(api, ws);
+            api.setSettings(mapSettings(ws.getSettings()));
         }
 
         return api;
@@ -152,7 +152,7 @@ public final class SystemSoapClient extends Mapper implements System {
 
         if (api != null) {
             ws = new io.javadog.cws.ws.FetchMemberRequest();
-            fillAuthentication(ws, api);
+            Mapper.fillAuthentication(ws, api);
             ws.setMemberId(api.getMemberId());
         }
 
@@ -164,7 +164,9 @@ public final class SystemSoapClient extends Mapper implements System {
 
         if (ws != null) {
             api = new FetchMemberResponse();
-            fillResponse(api, ws);
+            Mapper.fillResponse(api, ws);
+            api.setMembers(Mapper.mapMembers(ws.getMembers()));
+            api.setCircles(Mapper.mapCircles(ws.getCircles()));
         }
 
         return api;
@@ -175,8 +177,8 @@ public final class SystemSoapClient extends Mapper implements System {
 
         if (api != null) {
             ws = new io.javadog.cws.ws.ProcessMemberRequest();
-            fillAuthentication(ws, api);
-            ws.setAction(map(api.getAction()));
+            Mapper.fillAuthentication(ws, api);
+            ws.setAction(Mapper.map(api.getAction()));
             ws.setMemberId(api.getMemberId());
             ws.setNewAccountName(api.getNewAccountName());
             ws.setNewCredential(api.getNewCredential());
@@ -190,7 +192,7 @@ public final class SystemSoapClient extends Mapper implements System {
 
         if (ws != null) {
             api = new ProcessMemberResponse();
-            fillResponse(api, ws);
+            Mapper.fillResponse(api, ws);
             api.setMemberId(ws.getMemberId());
             api.setSignature(ws.getSignature());
         }
@@ -203,7 +205,7 @@ public final class SystemSoapClient extends Mapper implements System {
 
         if (api != null) {
             ws = new io.javadog.cws.ws.FetchCircleRequest();
-            fillAuthentication(ws, api);
+            Mapper.fillAuthentication(ws, api);
         }
 
         return ws;
@@ -214,7 +216,9 @@ public final class SystemSoapClient extends Mapper implements System {
 
         if (ws != null) {
             api = new FetchCircleResponse();
-            fillResponse(api, ws);
+            Mapper.fillResponse(api, ws);
+            api.setCircles(Mapper.mapCircles(ws.getCircles()));
+            api.setTrustees(Mapper.mapTrustees(ws.getTrustees()));
         }
 
         return api;
@@ -225,12 +229,12 @@ public final class SystemSoapClient extends Mapper implements System {
 
         if (api != null) {
             ws = new io.javadog.cws.ws.ProcessCircleRequest();
-            fillAuthentication(ws, api);
-            ws.setAction(map(api.getAction()));
+            Mapper.fillAuthentication(ws, api);
+            ws.setAction(Mapper.map(api.getAction()));
             ws.setCircleId(api.getCircleId());
             ws.setCircleName(api.getCircleName());
             ws.setMemberId(api.getMemberId());
-            ws.setTrustLevel(map(api.getTrustLevel()));
+            ws.setTrustLevel(Mapper.map(api.getTrustLevel()));
         }
 
         return ws;
@@ -241,8 +245,41 @@ public final class SystemSoapClient extends Mapper implements System {
 
         if (ws != null) {
             api = new ProcessCircleResponse();
-            fillResponse(api, ws);
+            Mapper.fillResponse(api, ws);
             api.setCircleId(ws.getCircleId());
+        }
+
+        return api;
+    }
+
+    // =========================================================================
+    // Mapping of sub components
+    // =========================================================================
+
+    private static io.javadog.cws.ws.SettingRequest.Settings mapSettings(final Map<String, String> api) {
+        io.javadog.cws.ws.SettingRequest.Settings ws = null;
+
+        if (api != null) {
+            ws = new io.javadog.cws.ws.SettingRequest.Settings();
+            final List<io.javadog.cws.ws.SettingRequest.Settings.Entry> list = ws.getEntry();
+            for (final Map.Entry<String, String> map : api.entrySet()) {
+                final io.javadog.cws.ws.SettingRequest.Settings.Entry entry = new io.javadog.cws.ws.SettingRequest.Settings.Entry();
+                entry.setKey(map.getKey());
+                entry.setValue(map.getValue());
+                list.add(entry);
+            }
+        }
+
+        return ws;
+    }
+
+    private static Map<String, String> mapSettings(final SettingResult.Settings ws) {
+        final Map<String, String> api = new HashMap<>();
+
+        if (ws != null) {
+            for (final SettingResult.Settings.Entry entry : ws.getEntry()) {
+                api.put(entry.getKey(), entry.getValue());
+            }
         }
 
         return api;

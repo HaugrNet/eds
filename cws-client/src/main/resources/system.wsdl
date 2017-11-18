@@ -509,7 +509,7 @@
   </wsdl:binding>
   <wsdl:service name="system">
     <wsdl:port binding="tns:systemSoapBinding" name="system">
-      <soap:address location="http://localhost:9080/cws/system"/>
+      <soap:address location="http://localhost:8080/cws/system"/>
     </wsdl:port>
   </wsdl:service>
 </wsdl:definitions>

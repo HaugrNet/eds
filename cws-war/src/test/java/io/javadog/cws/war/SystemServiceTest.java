@@ -26,6 +26,10 @@ import io.javadog.cws.api.responses.SettingResponse;
 import io.javadog.cws.api.responses.VersionResponse;
 import org.junit.Test;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
+
 /**
  * @author Kim Jensen
  * @since  CWS 1.0
@@ -33,11 +37,20 @@ import org.junit.Test;
 public final class SystemServiceTest extends BeanSetup {
 
     @Test
-    public void testVersion() {
+    public void testVersion() throws IOException {
+        final ClassLoader loader = Thread.currentThread().getContextClassLoader();
         final SystemService system = prepareSystemService();
+        final String version;
+
+        try (InputStream stream = loader.getResourceAsStream("cws.config")) {
+            final Properties properties = new Properties();
+            properties.load(stream);
+            version = properties.getProperty("cws.version");
+        }
 
         final VersionResponse response = system.version();
         assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(response.getVersion(), is(version));
     }
 
     @Test

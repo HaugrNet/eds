@@ -9,6 +9,7 @@ package io.javadog.cws.war;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
 import io.javadog.cws.api.common.Action;
 import io.javadog.cws.api.common.Constants;
@@ -39,18 +40,24 @@ public final class SystemServiceTest extends BeanSetup {
     @Test
     public void testVersion() throws IOException {
         final ClassLoader loader = Thread.currentThread().getContextClassLoader();
-        final SystemService system = prepareSystemService();
-        final String version;
+        final String propertiesFile = "cws.config";
 
-        try (InputStream stream = loader.getResourceAsStream("cws.config")) {
-            final Properties properties = new Properties();
-            properties.load(stream);
-            version = properties.getProperty("cws.version");
+        if (loader != null) {
+            final SystemService system = prepareSystemService();
+            final String version;
+
+            try (InputStream stream = loader.getResourceAsStream(propertiesFile)) {
+                final Properties properties = new Properties();
+                properties.load(stream);
+                version = properties.getProperty("cws.version");
+            }
+
+            final VersionResponse response = system.version();
+            assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
+            assertThat(response.getVersion(), is(version));
+        } else {
+            fail("Could not open the Class Loader, to read the '" + propertiesFile + "' file from the test resource path.");
         }
-
-        final VersionResponse response = system.version();
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
-        assertThat(response.getVersion(), is(version));
     }
 
     @Test

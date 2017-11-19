@@ -80,7 +80,7 @@ public class SystemBean {
         return response;
     }
 
-    @Transactional(Transactional.TxType.NEVER)
+    @Transactional(Transactional.TxType.SUPPORTS)
     public FetchMemberResponse fetchMembers(final FetchMemberRequest request) {
         Serviceable<FetchMemberResponse, FetchMemberRequest> service = null;
         FetchMemberResponse response;
@@ -124,7 +124,7 @@ public class SystemBean {
         return response;
     }
 
-    @Transactional(Transactional.TxType.NEVER)
+    @Transactional(Transactional.TxType.SUPPORTS)
     public FetchCircleResponse fetchCircles(final FetchCircleRequest request) {
         Serviceable<FetchCircleResponse, FetchCircleRequest> service = null;
         FetchCircleResponse response;

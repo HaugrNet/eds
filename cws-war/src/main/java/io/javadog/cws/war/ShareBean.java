@@ -78,7 +78,7 @@ public class ShareBean {
         return response;
     }
 
-    @Transactional(Transactional.TxType.NEVER)
+    @Transactional(Transactional.TxType.SUPPORTS)
     public FetchDataTypeResponse fetchDataTypes(final FetchDataTypeRequest request) {
         Serviceable<FetchDataTypeResponse, FetchDataTypeRequest> service = null;
         FetchDataTypeResponse response;

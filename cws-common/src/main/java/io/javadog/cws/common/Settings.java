@@ -41,9 +41,9 @@ import java.util.logging.Level;
 public final class Settings {
 
     /** Debug log level, by default it should be off. */
-    public static final Level DEBUG = Level.OFF;
+    public static final Level DEBUG = Level.FINEST;
     /** Info log level, by default it should be off. */
-    public static final Level INFO = Level.OFF;
+    public static final Level INFO = Level.INFO;
     /** Warn log level, used for problems with user provided data. */
     public static final Level WARN = Level.WARNING;
     /** Error log level, used if an internal error occurred. */

@@ -50,7 +50,7 @@ public class SystemBean {
 
     @Inject private SettingBean settingBean;
 
-    @Transactional(Transactional.TxType.NEVER)
+    @Transactional(Transactional.TxType.SUPPORTS)
     public VersionResponse version() {
         final VersionResponse response = new VersionResponse();
         response.setVersion("0.7-SNAPSHOT");

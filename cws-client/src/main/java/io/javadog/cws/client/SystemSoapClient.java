@@ -47,12 +47,16 @@ public final class SystemSoapClient implements System {
      * Simple CXF based SOAP Client for the CWS Share logic.
      *
      * @param wsdl WSDL Location for a running CWS 1.0 instance
-     * @throws MalformedURLException if the URL is incorrect
+     * @throws CWSClientException if the URL is incorrect
      */
-    public SystemSoapClient(final String wsdl) throws MalformedURLException {
-        final URL wsdlURL = new URL(wsdl);
-        final System_Service service = new System_Service(wsdlURL, SERVICE_NAME);
-        client = service.getSystem();
+    public SystemSoapClient(final String wsdl) {
+        try {
+            final URL wsdlURL = new URL(wsdl);
+            final System_Service service = new System_Service(wsdlURL, SERVICE_NAME);
+            client = service.getSystem();
+        } catch (MalformedURLException e) {
+            throw new CWSClientException(e);
+        }
     }
 
     // =========================================================================

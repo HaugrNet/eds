@@ -60,12 +60,12 @@ public abstract class CWSKey<T extends Key> {
      * simply ignore this exception by logging it as a debug message. Hopefully
      * the debug logs will be reduced in the future, once the implementation has
      * been added.</p>
+     *
+     * <p>Unfortunately, it seems that the functionality is not implemented in
+     * Java 8, so to avoid large stacktrace in the logs, the code to destroy
+     * the keys is revoked and listed as pending..</p>
      */
     protected void destroyKey() {
-        try {
-            ((Destroyable) key).destroy();
-        } catch (DestroyFailedException e) {
-            log.log(Settings.INFO, "The Key could not be destroyed, as the implementation was not added: " + e.getMessage(), e);
-        }
+        log.log(Settings.INFO, "Java 8 support for destroying keys is not implemented.");
     }
 }

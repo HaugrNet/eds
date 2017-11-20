@@ -59,7 +59,7 @@ it useful.
 CWS Development has reached the final phase for version 1.0. With the following
 milestones still pending, for details, see milestones in GitHub.
 
-- 0.6 - Released November 17th, 2017; Code Completion Release
+- [0.6](https://javadog.io/downloads/cws-0.6.1.tgz) - Released November 17th, 2017; Code Completion Release
 - 0.7 - Scheduled for December, 2017; Documentation Release
 - 0.8 - Scheduled for December, 2017; REST Release
 - 0.9 - Scheduled for December, 2017; Auditing & Review Release

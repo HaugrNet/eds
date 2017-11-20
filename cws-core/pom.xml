@@ -13,15 +13,6 @@
     <name>CWS Core</name>
     <description>This is the Core Logic module for the CWS.</description>
 
-    <build>
-        <testResources>
-            <testResource>
-                <directory>src/test/resources</directory>
-                <filtering>false</filtering>
-            </testResource>
-        </testResources>
-    </build>
-
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -73,4 +64,14 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
+    <build>
+        <testResources>
+            <testResource>
+                <directory>src/test/resources</directory>
+                <filtering>false</filtering>
+            </testResource>
+        </testResources>
+    </build>
+
 </project>

@@ -63,7 +63,7 @@ INSERT INTO cws_settings (name, setting, modifiable) VALUES ('cws.crypto.signatu
 -- Salt, and a Member Account specific Salt to ensure that enough entropy is
 -- available to create a strong enough Key to unlock the Private Key for the
 -- Account.
-INSERT INTO cws_settings (name, setting, modifiable) VALUES ('cws.crypto.password.algorithm', 'PBE128', true);
+INSERT INTO cws_settings (name, setting, modifiable) VALUES ('cws.crypto.pbe.algorithm', 'PBE128', true);
 
 -- For the CheckSums or Fingerprints we're generating - we just need a way
 -- to ensure that the value is both identifiable. For Signatures, it is used

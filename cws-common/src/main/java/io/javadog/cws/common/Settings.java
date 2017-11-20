@@ -53,7 +53,7 @@ public final class Settings {
     public static final String SYMMETRIC_ALGORITHM = "cws.crypto.symmetric.algorithm";
     public static final String ASYMMETRIC_ALGORITHM = "cws.crypto.asymmetric.algorithm";
     public static final String SIGNATURE_ALGORITHM = "cws.crypto.signature.algorithm";
-    public static final String PBE_ALGORITHM = "cws.crypto.password.algorithm";
+    public static final String PBE_ALGORITHM = "cws.crypto.pbe.algorithm";
     public static final String HASH_ALGORITHM = "cws.crypto.hash.algorithm";
     public static final String CWS_SALT = "cws.system.salt";
     public static final String CWS_LOCALE = "cws.system.locale";

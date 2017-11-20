@@ -43,7 +43,9 @@ package io.javadog.cws.common.enums;
  * <p>To limit the choices, CWS is simply focusing on 2 Algorithms only and only
  * allow the KeySize to be optional. This enum is listing those - however, not
  * all the Algorithms are available unless the JCE Unlimited Strength
- * Jurisdiction Policy Files are added.</p>
+ * Jurisdiction Policy Files are added. However, as of Java 8u162 and Java 9,
+ * it is <a href="https://bugs.openjdk.java.net/browse/JDK-8170157">enabled by
+ * default</a>.</p>
  *
  * <p>CWS not only uses symmetric and asymmetric encryption, also password based
  * encryption, or PBE, is used, to convert member provided passphrase's into a
@@ -65,7 +67,9 @@ public enum KeyAlgorithm {
 
     // Symmetric Algorithms
     AES128(Type.SYMMETRIC, "AES", Transformation.AES, 128),
-    // Require JCE Unlimited Strength Files
+    // Note, prior to Java 8u162 (January 2018) & Java 9, JCE the Unlimited
+    // Strength was disabled by default, after this - it is enabled by default:
+    //  o https://bugs.openjdk.java.net/browse/JDK-8170157
     AES192(Type.SYMMETRIC, "AES", Transformation.AES, 192),
     AES256(Type.SYMMETRIC, "AES", Transformation.AES, 256),
 

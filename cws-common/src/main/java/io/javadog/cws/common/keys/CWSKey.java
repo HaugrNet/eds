@@ -56,7 +56,7 @@ public abstract class CWSKey<T extends Key> {
      * <p>The Secret &amp; Private Keys both extend the {@link Destroyable }
      * interface, which means that they in theory can be destroyed. However,
      * many of the implementations only have the default behaviour, which is to
-     * simply throw a {@link DestroyFailedException}. Hence this method will
+     * simply throw a {@link DestroyFailedException }. Hence this method will
      * simply ignore this exception by logging it as a debug message. Hopefully
      * the debug logs will be reduced in the future, once the implementation has
      * been added.</p>
@@ -66,6 +66,15 @@ public abstract class CWSKey<T extends Key> {
      * the keys is revoked and listed as pending..</p>
      */
     protected void destroyKey() {
-        log.log(Settings.INFO, "Java 8 support for destroying keys is not implemented.");
+        // From the OpenJDK bugs:
+        //  o https://bugs.openjdk.java.net/browse/JDK-6263419
+        //     - No way to clean the memory for a java.security.Key
+        //  o https://bugs.openjdk.java.net/browse/JDK-8008795
+        //     - Clean memory in JCE implementations of private key and secret key
+        //  o https://bugs.openjdk.java.net/browse/JDK-8158689
+        //     - java.security.KeyPair should implement Destroyable
+        //  o https://bugs.openjdk.java.net/browse/JDK-8160206
+        //     - SecretKeySpec should implement destroy()
+        log.log(Settings.INFO, "Java support for destroying keys is not yet implemented.");
     }
 }

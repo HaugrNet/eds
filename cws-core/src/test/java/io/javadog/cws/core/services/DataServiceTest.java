@@ -145,7 +145,7 @@ public final class DataServiceTest extends DatabaseSetup {
         final Query query = entityManager.createQuery("select d from DataEntity d where d.metadata.externalId = :eid");
         query.setParameter("eid", response.getDataId());
         final DataEntity entity = (DataEntity) query.getSingleResult();
-        entity.setChecksum("��f\u0012�)��a����f��0�\b\n\u05C8ТU��?v�\u0000\u000E�\f���ӺЂC��ئ\u0003��g�c�\u001F)��Ɩ���");
+        entity.setChecksum(UUID.randomUUID().toString());
         entityManager.persist(entity);
 
         // Now to the actual test - reading the data with invalid checksum

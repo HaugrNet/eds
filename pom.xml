@@ -43,17 +43,16 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <!-- SonarQube Settings -->
-        <sonar.language>java</sonar.language>
         <sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
         <!-- The destination file for the code coverage report has to be set to
              the same value for each module pom. This will allow JaCoCo to sum
              up information in the same report, providing cross-module coverage. -->
-        <sonar.jacoco.reportPath>${project.basedir}/../target/jacoco.exec</sonar.jacoco.reportPath>
+        <sonar.jacoco.reportPaths>${project.basedir}/../target/jacoco.exec</sonar.jacoco.reportPaths>
         <!-- Sonar is by default analyzing everything. But Generated Code is
              beyond our control, so error reports from this is just annoying!
              Legend: *  - zero or more characters
                      ** - zero or more directories -->
-        <sonar.exclusions>file:**/generated*/**</sonar.exclusions>
+        <sonar.exclusions>**/generated*/**</sonar.exclusions>
     </properties>
 
     <dependencyManagement>
@@ -182,9 +181,9 @@
                     <version>0.7.9</version>
                 </plugin>
                 <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
+                    <groupId>org.sonarsource.scanner.maven</groupId>
                     <artifactId>sonar-maven-plugin</artifactId>
-                    <version>3.3.0.603</version>
+                    <version>3.4.0.905</version>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
@@ -221,7 +220,7 @@
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <configuration>
-                    <destFile>${sonar.jacoco.reportPath}</destFile>
+                    <destFile>${sonar.jacoco.reportPaths}</destFile>
                     <append>true</append>
                     <includes>
                         <include>io.javadog.cws.*</include>

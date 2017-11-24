@@ -37,9 +37,19 @@ the initial run.
 Then do the following:
 
 ```
+Setup your database: The following will create a database named cws and a user 
+named cws_user as well as set up all needed tables.
+
+$ psql postgres
+$ \i 01-install.sql
+
+Then build the package and deploy it:
+
 $ cd /path/to/cws/sources
 $ mvn clean verify
 $ cp cws-war/target/cws.war ${WILDFLY_HOME}/standalone/deployments
+$ cd accessories/configuration/wildfly-XX
+$ cp -R * ${WILDFLY_HOME}
 $ ${WILDFLY_HOME}/bin/standalone.sh -c standalone-cws.xml
 ```
 Now, you should have a running version of CWS which can be reached from the

@@ -68,7 +68,7 @@ public final class ProcessDataService extends Serviceable<ProcessDataResponse, P
     }
 
     private ProcessDataResponse processAddData(final ProcessDataRequest request) {
-        final DataTypeEntity type = dao.findDataTypeByName(request.getTypeName());
+        final DataTypeEntity type = findDataType(request.getTypeName());
         final MetadataEntity parent = findParent(request);
         final MetadataEntity existingName = dao.findInFolder(member, parent, request.getDataName());
         final ProcessDataResponse response;
@@ -169,6 +169,23 @@ public final class ProcessDataService extends Serviceable<ProcessDataResponse, P
         }
 
         return response;
+    }
+
+    private DataTypeEntity findDataType(final String typeName) {
+        DataTypeEntity entity = null;
+
+        if (typeName != null) {
+            entity = dao.findDataTypeByName(typeName);
+            if (entity == null) {
+                throw new CWSException(ReturnCode.INTEGRITY_WARNING, "Cannot find a matching DataType for the Object.");
+            }
+        }
+
+        if (entity == null) {
+            entity = dao.findDataTypeByName(Constants.DATA_TYPENAME);
+        }
+
+        return entity;
     }
 
     private MetadataEntity createMetadataEntity(final TrusteeEntity trustee, final DataTypeEntity type, final Long parentId, final String name) {

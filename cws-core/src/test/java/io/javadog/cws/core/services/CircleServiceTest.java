@@ -17,9 +17,13 @@ import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.common.TrustLevel;
 import io.javadog.cws.api.requests.FetchCircleRequest;
+import io.javadog.cws.api.requests.FetchDataRequest;
 import io.javadog.cws.api.requests.ProcessCircleRequest;
+import io.javadog.cws.api.requests.ProcessDataRequest;
 import io.javadog.cws.api.responses.FetchCircleResponse;
+import io.javadog.cws.api.responses.FetchDataResponse;
 import io.javadog.cws.api.responses.ProcessCircleResponse;
+import io.javadog.cws.api.responses.ProcessDataResponse;
 import io.javadog.cws.common.Settings;
 import io.javadog.cws.common.exceptions.AuthorizationException;
 import io.javadog.cws.common.exceptions.CWSException;
@@ -69,6 +73,35 @@ public final class CircleServiceTest extends DatabaseSetup {
 
         // Should throw a VerificationException, as the request is invalid.
         service.perform(request);
+    }
+
+    @Test
+    public void testCreateAndReadCircle() {
+        final ProcessCircleService processService = new ProcessCircleService(settings, entityManager);
+        final ProcessCircleRequest createRequest = prepareRequest(ProcessCircleRequest.class, Constants.ADMIN_ACCOUNT);
+        createRequest.setAction(Action.CREATE);
+        createRequest.setMemberId(MEMBER_5_ID);
+        createRequest.setCircleName("One");
+
+        final ProcessCircleResponse createResponse = processService.perform(createRequest);
+        assertThat(createResponse.isOk(), is(true));
+
+        final ProcessDataService processDataService = new ProcessDataService(settings, entityManager);
+        final ProcessDataRequest addRequest = prepareRequest(ProcessDataRequest.class, MEMBER_5);
+        addRequest.setAction(Action.ADD);
+        addRequest.setCircleId(createResponse.getCircleId());
+        addRequest.setDataName("My Data Object");
+        addRequest.setData(generateData(512));
+        final ProcessDataResponse processDataResponse = processDataService.perform(addRequest);
+        assertThat(processDataResponse.isOk(), is(true));
+
+        final FetchDataService dataService = new FetchDataService(settings, entityManager);
+        final FetchDataRequest dataRequest = prepareRequest(FetchDataRequest.class, MEMBER_5);
+        dataRequest.setCircleId(createResponse.getCircleId());
+        final FetchDataResponse dataResponse = dataService.perform(dataRequest);
+        assertThat(dataResponse.isOk(), is(true));
+        assertThat(dataResponse.getMetadata().size(), is(1));
+        assertThat(dataResponse.getMetadata().get(0).getDataName(), is("My Data Object"));
     }
 
     @Test

@@ -208,6 +208,18 @@ public final class DataServiceTest extends DatabaseSetup {
     }
 
     @Test
+    public void testAddDataWithInvalidDataType() {
+        prepareCause(CWSException.class, ReturnCode.INTEGRITY_WARNING, "Cannot find a matching DataType for the Object.");
+
+        final ProcessDataService service = new ProcessDataService(settings, entityManager);
+        final ProcessDataRequest request = prepareAddRequest(MEMBER_1, CIRCLE_1_ID, "The Data", 512);
+        request.setTypeName("Weird");
+        assertThat(request.validate().isEmpty(), is(true));
+
+        service.perform(request);
+    }
+
+    @Test
     public void testDeletingDataWithoutPermission() {
         prepareCause(CWSException.class, ReturnCode.AUTHORIZATION_WARNING, "The current Account is not allowed to perform the given action.");
 

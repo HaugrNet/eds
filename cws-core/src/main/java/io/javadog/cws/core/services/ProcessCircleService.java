@@ -21,8 +21,10 @@ import io.javadog.cws.common.keys.SecretCWSKey;
 import io.javadog.cws.core.Permission;
 import io.javadog.cws.core.Serviceable;
 import io.javadog.cws.model.entities.CircleEntity;
+import io.javadog.cws.model.entities.DataTypeEntity;
 import io.javadog.cws.model.entities.KeyEntity;
 import io.javadog.cws.model.entities.MemberEntity;
+import io.javadog.cws.model.entities.MetadataEntity;
 import io.javadog.cws.model.entities.TrusteeEntity;
 
 import javax.persistence.EntityManager;
@@ -105,6 +107,7 @@ public final class ProcessCircleService extends Serviceable<ProcessCircleRespons
                     circle.setName(name);
                     dao.persist(circle);
 
+                    createRootFolder(circle);
                     final KeyAlgorithm algorithm = settings.getSymmetricAlgorithm();
                     final KeyEntity keyEntity = new KeyEntity();
                     keyEntity.setAlgorithm(algorithm);
@@ -134,6 +137,16 @@ public final class ProcessCircleService extends Serviceable<ProcessCircleRespons
         }
 
         return response;
+    }
+
+    private void createRootFolder(final CircleEntity circle) {
+        final DataTypeEntity dataTypeEntity = dao.getReference(DataTypeEntity.class, 1L);
+        final MetadataEntity entity = new MetadataEntity();
+        entity.setCircle(circle);
+        entity.setName("/");
+        entity.setParentId(0L);
+        entity.setType(dataTypeEntity);
+        dao.persist(entity);
     }
 
     /**

@@ -8,6 +8,7 @@
 package io.javadog.cws.client;
 
 import io.javadog.cws.api.common.Action;
+import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.CredentialType;
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.common.TrustLevel;
@@ -21,9 +22,11 @@ import io.javadog.cws.api.requests.Authentication;
 import io.javadog.cws.api.responses.CwsResponse;
 import io.javadog.cws.ws.CwsResult;
 
+import javax.xml.bind.JAXBElement;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
+import javax.xml.namespace.QName;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -39,6 +42,20 @@ public final class Mapper {
      * Private Constructor, this is a utility Class.
      */
     private Mapper() {
+    }
+
+    // =========================================================================
+    // Mapping of JAXBElement (nullable) Objects
+    // =========================================================================
+
+    public static JAXBElement<String> convert(final String field, final String value) {
+        final QName qName = new QName("", field);
+        return new JAXBElement<>(qName, String.class, value);
+    }
+
+    public static JAXBElement<Integer> convert(final String field, final Integer value) {
+        final QName qName = new QName("", field);
+        return new JAXBElement<>(qName, Integer.class, value);
     }
 
     // =========================================================================
@@ -76,8 +93,16 @@ public final class Mapper {
         return (ws != null) ? TrustLevel.valueOf(ws.name()) : null;
     }
 
-    public static io.javadog.cws.ws.TrustLevel map(final TrustLevel api) {
-        return (api != null) ? io.javadog.cws.ws.TrustLevel.valueOf(api.name()) : null;
+    public static JAXBElement<io.javadog.cws.ws.TrustLevel> map(final TrustLevel api) {
+        JAXBElement<io.javadog.cws.ws.TrustLevel> ws = null;
+
+        if (api != null) {
+            final io.javadog.cws.ws.TrustLevel value = io.javadog.cws.ws.TrustLevel.valueOf(api.name());
+            final QName qName = new QName("", Constants.FIELD_TRUSTLEVEL);
+            ws = new JAXBElement(qName, String.class, value);
+        }
+
+        return ws;
     }
 
     // =========================================================================
@@ -100,7 +125,7 @@ public final class Mapper {
         return api;
     }
 
-    public static List<DataType> mapDataTypes(final List<io.javadog.cws.ws.DataType> ws) {
+    public static List<DataType> mapDataTypes(final Iterable<io.javadog.cws.ws.DataType> ws) {
         final List<DataType> api = new ArrayList<>();
 
         for (final io.javadog.cws.ws.DataType wsDataType : ws) {
@@ -110,17 +135,21 @@ public final class Mapper {
         return api;
     }
 
-    public static List<Member> mapMembers(final List<io.javadog.cws.ws.Member> ws) {
+    public static List<Member> mapMembers(final Iterable<io.javadog.cws.ws.Member> ws) {
         final List<Member> api = new ArrayList<>();
 
         for (final io.javadog.cws.ws.Member wsMember : ws) {
-            api.add(map(wsMember));
+            final Member member = new Member();
+            member.setMemberId(wsMember.getMemberId());
+            member.setAccountName(wsMember.getAccountName());
+            member.setAdded(map(wsMember.getAdded()));
+            api.add(member);
         }
 
         return api;
     }
 
-    public static List<Metadata> mapMetadata(final List<io.javadog.cws.ws.Metadata> ws) {
+    public static List<Metadata> mapMetadata(final Iterable<io.javadog.cws.ws.Metadata> ws) {
         final List<Metadata> api = new ArrayList<>();
 
         for (final io.javadog.cws.ws.Metadata wsMetadata : ws) {
@@ -129,7 +158,7 @@ public final class Mapper {
             metadata.setCircleId(wsMetadata.getCircleId());
             metadata.setFolderId(wsMetadata.getFolderId());
             metadata.setDataName(wsMetadata.getDataName());
-            metadata.setDataType(map(wsMetadata.getDataType()));
+            metadata.setTypeName(wsMetadata.getTypeName());
             metadata.setAdded(map(wsMetadata.getAdded()));
 
             api.add(metadata);
@@ -138,7 +167,7 @@ public final class Mapper {
         return api;
     }
 
-    public static List<Signature> mapSignatures(final List<io.javadog.cws.ws.Signature> ws) {
+    public static List<Signature> mapSignatures(final Iterable<io.javadog.cws.ws.Signature> ws) {
         final List<Signature> api = new ArrayList<>();
 
         for (final io.javadog.cws.ws.Signature wsSignature : ws) {
@@ -155,13 +184,13 @@ public final class Mapper {
         return api;
     }
 
-    public static List<Trustee> mapTrustees(final List<io.javadog.cws.ws.Trustee> ws) {
+    public static List<Trustee> mapTrustees(final Iterable<io.javadog.cws.ws.Trustee> ws) {
         final List<Trustee> api = new ArrayList<>();
 
         for (final io.javadog.cws.ws.Trustee wsTrustee : ws) {
             final Trustee trustee = new Trustee();
-            trustee.setCircle(map(wsTrustee.getCircle()));
-            trustee.setMember(map(wsTrustee.getMember()));
+            trustee.setCircleId(wsTrustee.getCircleId());
+            trustee.setMemberId(wsTrustee.getMemberId());
             trustee.setTrustLevel(map(wsTrustee.getTrustLevel()));
             trustee.setChanged(map(wsTrustee.getChanged()));
             trustee.setAdded(map(wsTrustee.getAdded()));
@@ -175,19 +204,6 @@ public final class Mapper {
     // Mapping of Internal Object Types
     // =========================================================================
 
-    private static Circle map(final io.javadog.cws.ws.Circle ws) {
-        Circle api = null;
-
-        if (ws != null) {
-            api = new Circle();
-            api.setCircleId(ws.getCircleId());
-            api.setCircleName(ws.getCircleName());
-            api.setAdded(map(ws.getAdded()));
-        }
-
-        return api;
-    }
-
     public static DataType map(final io.javadog.cws.ws.DataType ws) {
         DataType api = null;
 
@@ -195,19 +211,6 @@ public final class Mapper {
             api = new DataType();
             api.setTypeName(ws.getTypeName());
             api.setType(ws.getType());
-        }
-
-        return api;
-    }
-
-    private static Member map(final io.javadog.cws.ws.Member ws) {
-        Member api = null;
-
-        if (ws != null) {
-            api = new Member();
-            api.setMemberId(ws.getMemberId());
-            api.setAccountName(ws.getAccountName());
-            api.setAdded(map(ws.getAdded()));
         }
 
         return api;

@@ -167,9 +167,9 @@ public final class CircleServiceTest extends DatabaseSetup {
         assertThat(response.getCircles().size(), is(1));
         assertThat(response.getCircles().get(0).getCircleName(), is(CIRCLE_1));
         assertThat(response.getTrustees().size(), is(3));
-        assertThat(response.getTrustees().get(0).getMember().getAccountName(), is(MEMBER_1));
-        assertThat(response.getTrustees().get(1).getMember().getAccountName(), is(MEMBER_2));
-        assertThat(response.getTrustees().get(2).getMember().getAccountName(), is(MEMBER_3));
+        assertThat(response.getTrustees().get(0).getMemberId(), is(MEMBER_1_ID));
+        assertThat(response.getTrustees().get(1).getMemberId(), is(MEMBER_2_ID));
+        assertThat(response.getTrustees().get(2).getMemberId(), is(MEMBER_3_ID));
     }
 
     @Test
@@ -189,9 +189,9 @@ public final class CircleServiceTest extends DatabaseSetup {
         assertThat(response.getCircles().size(), is(1));
         assertThat(response.getCircles().get(0).getCircleName(), is(CIRCLE_1));
         assertThat(response.getTrustees().size(), is(3));
-        assertThat(response.getTrustees().get(0).getMember().getAccountName(), is(MEMBER_1));
-        assertThat(response.getTrustees().get(1).getMember().getAccountName(), is(MEMBER_2));
-        assertThat(response.getTrustees().get(2).getMember().getAccountName(), is(MEMBER_3));
+        assertThat(response.getTrustees().get(0).getMemberId(), is(MEMBER_1_ID));
+        assertThat(response.getTrustees().get(1).getMemberId(), is(MEMBER_2_ID));
+        assertThat(response.getTrustees().get(2).getMemberId(), is(MEMBER_3_ID));
     }
 
     @Test
@@ -211,9 +211,9 @@ public final class CircleServiceTest extends DatabaseSetup {
         assertThat(response.getCircles().size(), is(1));
         assertThat(response.getCircles().get(0).getCircleName(), is(CIRCLE_1));
         assertThat(response.getTrustees().size(), is(3));
-        assertThat(response.getTrustees().get(0).getMember().getAccountName(), is(MEMBER_1));
-        assertThat(response.getTrustees().get(1).getMember().getAccountName(), is(MEMBER_2));
-        assertThat(response.getTrustees().get(2).getMember().getAccountName(), is(MEMBER_3));
+        assertThat(response.getTrustees().get(0).getMemberId(), is(MEMBER_1_ID));
+        assertThat(response.getTrustees().get(1).getMemberId(), is(MEMBER_2_ID));
+        assertThat(response.getTrustees().get(2).getMemberId(), is(MEMBER_3_ID));
     }
 
     @Test
@@ -233,9 +233,9 @@ public final class CircleServiceTest extends DatabaseSetup {
         assertThat(response.getCircles().size(), is(1));
         assertThat(response.getCircles().get(0).getCircleName(), is(CIRCLE_1));
         assertThat(response.getTrustees().size(), is(3));
-        assertThat(response.getTrustees().get(0).getMember().getAccountName(), is(MEMBER_1));
-        assertThat(response.getTrustees().get(1).getMember().getAccountName(), is(MEMBER_2));
-        assertThat(response.getTrustees().get(2).getMember().getAccountName(), is(MEMBER_3));
+        assertThat(response.getTrustees().get(0).getMemberId(), is(MEMBER_1_ID));
+        assertThat(response.getTrustees().get(1).getMemberId(), is(MEMBER_2_ID));
+        assertThat(response.getTrustees().get(2).getMemberId(), is(MEMBER_3_ID));
     }
 
     @Test
@@ -611,7 +611,7 @@ public final class CircleServiceTest extends DatabaseSetup {
         fetchRequest.setCircleId(CIRCLE_1_ID);
         final FetchCircleResponse fetchResponse = fetchService.perform(fetchRequest);
         assertThat(fetchResponse.getReturnCode(), is(ReturnCode.SUCCESS));
-        assertThat(fetchResponse.getTrustees().get(2).getMember().getMemberId(), is(MEMBER_3_ID));
+        assertThat(fetchResponse.getTrustees().get(2).getMemberId(), is(MEMBER_3_ID));
         assertThat(fetchResponse.getTrustees().get(2).getTrustLevel(), is(TrustLevel.READ));
     }
 

@@ -50,11 +50,11 @@
       <xs:extension base="tns:authentication">
         <xs:sequence>
           <xs:element name="action" type="tns:action"/>
-          <xs:element name="dataId" type="xs:string"/>
+          <xs:element minOccurs="0" name="dataId" type="xs:string"/>
           <xs:element minOccurs="0" name="circleId" type="xs:string"/>
           <xs:element minOccurs="0" name="dataName" type="xs:string"/>
           <xs:element minOccurs="0" name="folderId" type="xs:string"/>
-          <xs:element name="typeName" type="xs:string"/>
+          <xs:element minOccurs="0" name="typeName" type="xs:string"/>
           <xs:element minOccurs="0" name="data" type="xs:base64Binary"/>
         </xs:sequence>
       </xs:extension>
@@ -147,10 +147,10 @@
     <xs:complexContent>
       <xs:extension base="tns:authentication">
         <xs:sequence>
-          <xs:element name="circleId" nillable="true" type="xs:string"/>
-          <xs:element name="dataId" nillable="true" type="xs:string"/>
-          <xs:element name="pageNumber" nillable="true" type="xs:int"/>
-          <xs:element name="pageSize" nillable="true" type="xs:int"/>
+          <xs:element minOccurs="0" name="circleId" nillable="true" type="xs:string"/>
+          <xs:element minOccurs="0" name="dataId" nillable="true" type="xs:string"/>
+          <xs:element minOccurs="0" name="pageNumber" nillable="true" type="xs:int"/>
+          <xs:element minOccurs="0" name="pageSize" nillable="true" type="xs:int"/>
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>
@@ -175,12 +175,12 @@
 
   <xs:complexType final="extension restriction" name="metadata">
     <xs:sequence>
-      <xs:element name="dataId" nillable="true" type="xs:string"/>
-      <xs:element name="circleId" nillable="true" type="xs:string"/>
-      <xs:element name="folderId" nillable="true" type="xs:string"/>
-      <xs:element name="dataName" nillable="true" type="xs:string"/>
-      <xs:element name="dataType" type="tns:dataType"/>
-      <xs:element minOccurs="0" name="added" type="xs:dateTime"/>
+      <xs:element name="dataId" type="xs:string"/>
+      <xs:element name="circleId" type="xs:string"/>
+      <xs:element name="folderId" type="xs:string"/>
+      <xs:element name="dataName" type="xs:string"/>
+      <xs:element name="typeName" type="xs:string"/>
+      <xs:element name="added" type="xs:dateTime"/>
     </xs:sequence>
   </xs:complexType>
 
@@ -195,7 +195,7 @@
       <xs:extension base="tns:authentication">
         <xs:sequence>
           <xs:element name="data" type="xs:base64Binary"/>
-          <xs:element name="expires" type="xs:dateTime"/>
+          <xs:element minOccurs="0" name="expires" type="xs:dateTime"/>
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>
@@ -302,7 +302,7 @@
         <xs:sequence>
           <xs:element name="action" type="tns:action"/>
           <xs:element name="typeName" type="xs:string"/>
-          <xs:element name="type" type="xs:string"/>
+          <xs:element minOccurs="0" name="type" type="xs:string"/>
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>

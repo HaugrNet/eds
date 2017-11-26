@@ -9,6 +9,7 @@ package io.javadog.cws.api.requests;
 
 import io.javadog.cws.api.common.Constants;
 
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -29,20 +30,20 @@ public final class FetchDataRequest extends Authentication implements CircleIdRe
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
     @Pattern(regexp = Constants.ID_PATTERN_REGEX)
-    @XmlElement(name = Constants.FIELD_CIRCLE_ID, nillable = true, required = true)
+    @XmlElement(name = Constants.FIELD_CIRCLE_ID, nillable = true)
     private String circleId = null;
 
     @Pattern(regexp = Constants.ID_PATTERN_REGEX)
-    @XmlElement(name = Constants.FIELD_DATA_ID, nillable = true, required = true)
+    @XmlElement(name = Constants.FIELD_DATA_ID, nillable = true)
     private String dataId = null;
 
-    @Size(min = 1)
+    @NotNull @Size(min = 1)
     @XmlElement(name = Constants.FIELD_PAGE_NUMBER, nillable = true)
-    private int pageNumber = 1;
+    private Integer pageNumber = 1;
 
-    @Size(min = 1, max = Constants.MAX_PAGE_SIZE)
+    @NotNull @Size(min = 1, max = Constants.MAX_PAGE_SIZE)
     @XmlElement(name = Constants.FIELD_PAGE_SIZE, nillable = true)
-    private int pageSize = Constants.MAX_PAGE_SIZE;
+    private Integer pageSize = Constants.MAX_PAGE_SIZE;
 
     // =========================================================================
     // Setters & Getters
@@ -80,11 +81,11 @@ public final class FetchDataRequest extends Authentication implements CircleIdRe
         return pageNumber;
     }
 
-    public void setPageSize(final int pageSize) {
+    public void setPageSize(final Integer pageSize) {
         this.pageSize = pageSize;
     }
 
-    public int getPageSize() {
+    public Integer getPageSize() {
         return pageSize;
     }
 
@@ -102,6 +103,7 @@ public final class FetchDataRequest extends Authentication implements CircleIdRe
         if ((circleId == null) && (dataId == null)) {
             errors.put(Constants.FIELD_IDS, "Either a Circle or Data Id must be provided.");
         }
+
         checkValidId(errors, Constants.FIELD_CIRCLE_ID, circleId, "The Circle Id is invalid.");
         checkValidId(errors, Constants.FIELD_DATA_ID, dataId, "The Data Id is invalid.");
         checkIntegerWithMax(errors, Constants.FIELD_PAGE_NUMBER, pageNumber, Integer.MAX_VALUE, "The Page Number must be a positive number, starting with 1.");

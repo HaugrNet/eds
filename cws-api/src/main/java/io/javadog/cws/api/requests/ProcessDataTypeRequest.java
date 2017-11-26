@@ -39,7 +39,7 @@ public final class ProcessDataTypeRequest extends Authentication {
 
     @NotNull
     @Size(min = 1, max = Constants.MAX_STRING_LENGTH)
-    @XmlElement(name = Constants.FIELD_TYPE, required = true)
+    @XmlElement(name = Constants.FIELD_TYPE)
     private String type = null;
 
     // =========================================================================

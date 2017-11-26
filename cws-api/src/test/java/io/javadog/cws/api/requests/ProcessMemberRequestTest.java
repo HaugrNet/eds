@@ -126,7 +126,7 @@ public final class ProcessMemberRequestTest {
         request.setAccountName(Constants.ADMIN_ACCOUNT);
         request.setCredential(Constants.ADMIN_ACCOUNT);
         request.setNewAccountName("Updated AccountName");
-        request.setAction(Action.PROCESS);
+        request.setAction(Action.UPDATE);
 
         final Map<String, String> errors = request.validate();
         assertThat(errors.isEmpty(), is(true));

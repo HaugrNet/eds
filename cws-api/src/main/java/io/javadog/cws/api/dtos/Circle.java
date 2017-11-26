@@ -36,7 +36,7 @@ public final class Circle implements Serializable {
     @XmlElement(name = Constants.FIELD_CIRCLE_NAME, required = true)
     private String circleName = null;
 
-    @XmlElement(name = Constants.FIELD_ADDED)
+    @XmlElement(name = Constants.FIELD_ADDED, required = true)
     private Date added = null;
 
     // =========================================================================

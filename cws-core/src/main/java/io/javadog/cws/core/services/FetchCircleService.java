@@ -10,7 +10,6 @@ package io.javadog.cws.core.services;
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.dtos.Circle;
-import io.javadog.cws.api.dtos.Member;
 import io.javadog.cws.api.dtos.Trustee;
 import io.javadog.cws.api.requests.FetchCircleRequest;
 import io.javadog.cws.api.responses.FetchCircleResponse;
@@ -18,7 +17,6 @@ import io.javadog.cws.common.Settings;
 import io.javadog.cws.core.Permission;
 import io.javadog.cws.core.Serviceable;
 import io.javadog.cws.model.entities.CircleEntity;
-import io.javadog.cws.model.entities.MemberEntity;
 import io.javadog.cws.model.entities.TrusteeEntity;
 
 import javax.persistence.EntityManager;
@@ -129,23 +127,13 @@ public final class FetchCircleService extends Serviceable<FetchCircleResponse, F
     private static Trustee convert(final TrusteeEntity entity) {
         final Trustee trustee = new Trustee();
 
-        trustee.setMember(convert(entity.getMember()));
-        trustee.setCircle(convert(entity.getCircle()));
+        trustee.setMemberId(entity.getMember().getExternalId());
+        trustee.setCircleId(entity.getCircle().getExternalId());
         trustee.setTrustLevel(entity.getTrustLevel());
         trustee.setChanged(entity.getAltered());
         trustee.setAdded(entity.getAdded());
 
         return trustee;
-    }
-
-    private static Member convert(final MemberEntity entity) {
-        final Member member = new Member();
-
-        member.setMemberId(entity.getExternalId());
-        member.setAccountName(entity.getName());
-        member.setAdded(entity.getAdded());
-
-        return member;
     }
 
     private static Circle convert(final CircleEntity entity) {

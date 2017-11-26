@@ -25,21 +25,21 @@ public final class TrusteeTest {
 
     @Test
     public void testClassflow() {
-        final Member member = prepareMember(UUID.randomUUID().toString(), "Member AccountName", new Date());
-        final Circle circle = prepareCircle(UUID.randomUUID().toString(), "Circle Name", new Date());
+        final String memberId = UUID.randomUUID().toString();
+        final String circleId = UUID.randomUUID().toString();
         final TrustLevel trustLevel = TrustLevel.WRITE;
         final Date lastModified = new Date(456L);
         final Date added = new Date(123L);
 
         final Trustee trustee = new Trustee();
-        trustee.setMember(member);
-        trustee.setCircle(circle);
+        trustee.setMemberId(memberId);
+        trustee.setCircleId(circleId);
         trustee.setTrustLevel(trustLevel);
         trustee.setChanged(lastModified);
         trustee.setAdded(added);
 
-        assertThat(trustee.getMember(), is(member));
-        assertThat(trustee.getCircle(), is(circle));
+        assertThat(trustee.getMemberId(), is(memberId));
+        assertThat(trustee.getCircleId(), is(circleId));
         assertThat(trustee.getTrustLevel(), is(trustLevel));
         assertThat(trustee.getChanged(), is(lastModified));
         assertThat(trustee.getAdded(), is(added));
@@ -47,18 +47,18 @@ public final class TrusteeTest {
 
     @Test
     public void testStandardMethods() {
-        final Member member = prepareMember(UUID.randomUUID().toString(), "Member AccountName", new Date());
-        final Circle circle = prepareCircle(UUID.randomUUID().toString(), "Circle Name", new Date());
+        final String memberId = UUID.randomUUID().toString();
+        final String circleId = UUID.randomUUID().toString();
         final TrustLevel trustLevel = TrustLevel.WRITE;
         final Date lastModified = new Date(456L);
         final Date created = new Date(123L);
 
-        final Trustee trustee = prepareTrustee(member, circle, trustLevel, lastModified, created);
+        final Trustee trustee = prepareTrustee(circleId, memberId, trustLevel, lastModified, created);
         final Trustee sameTrustee = new Trustee();
         final Trustee emptyTrustee = new Trustee();
 
-        sameTrustee.setMember(trustee.getMember());
-        sameTrustee.setCircle(trustee.getCircle());
+        sameTrustee.setMemberId(trustee.getMemberId());
+        sameTrustee.setCircleId(trustee.getCircleId());
         sameTrustee.setTrustLevel(trustee.getTrustLevel());
         sameTrustee.setChanged(trustee.getChanged());
         sameTrustee.setAdded(trustee.getAdded());
@@ -77,21 +77,21 @@ public final class TrusteeTest {
 
     @Test
     public void testEquality() {
-        final Member member1 = prepareMember(UUID.randomUUID().toString(), "Member1", new Date());
-        final Member member2 = prepareMember(UUID.randomUUID().toString(), "Member2", new Date());
-        final Circle circle1 = prepareCircle(UUID.randomUUID().toString(), "Circle1", new Date());
-        final Circle circle2 = prepareCircle(UUID.randomUUID().toString(), "Circle2", new Date());
+        final String circleId1 = UUID.randomUUID().toString();
+        final String circleId2 = UUID.randomUUID().toString();
+        final String memberId1 = UUID.randomUUID().toString();
+        final String memberId2 = UUID.randomUUID().toString();
         final TrustLevel trustLevel1 = TrustLevel.WRITE;
         final TrustLevel trustLevel2 = TrustLevel.READ;
         final Date date1 = new Date(1212121212L);
         final Date date2 = new Date(2121212121L);
 
-        final Trustee trustee1 = prepareTrustee(member1, circle1, trustLevel1, date1, date1);
-        final Trustee trustee2 = prepareTrustee(member2, circle1, trustLevel1, date1, date1);
-        final Trustee trustee3 = prepareTrustee(member1, circle2, trustLevel1, date1, date1);
-        final Trustee trustee4 = prepareTrustee(member1, circle1, trustLevel2, date1, date1);
-        final Trustee trustee5 = prepareTrustee(member1, circle1, trustLevel1, date2, date1);
-        final Trustee trustee6 = prepareTrustee(member1, circle1, trustLevel1, date1, date2);
+        final Trustee trustee1 = prepareTrustee(circleId1, memberId1, trustLevel1, date1, date1);
+        final Trustee trustee2 = prepareTrustee(circleId2, memberId1, trustLevel1, date1, date1);
+        final Trustee trustee3 = prepareTrustee(circleId1, memberId2, trustLevel1, date1, date1);
+        final Trustee trustee4 = prepareTrustee(circleId1, memberId1, trustLevel2, date1, date1);
+        final Trustee trustee5 = prepareTrustee(circleId1, memberId1, trustLevel1, date2, date1);
+        final Trustee trustee6 = prepareTrustee(circleId1, memberId1, trustLevel1, date1, date2);
 
         assertThat(trustee1.equals(trustee2), is(false));
         assertThat(trustee2.equals(trustee1), is(false));
@@ -109,28 +109,10 @@ public final class TrusteeTest {
     // Internal Helper Methods
     // =========================================================================
 
-    private static Member prepareMember(final String memberID, final String accountName, final Date added) {
-        final Member member = new Member();
-        member.setMemberId(memberID);
-        member.setAccountName(accountName);
-        member.setAdded(added);
-
-        return member;
-    }
-
-    private static Circle prepareCircle(final String circleID, final String circleName, final Date added) {
-        final Circle circle = new Circle();
-        circle.setCircleId(circleID);
-        circle.setCircleName(circleName);
-        circle.setAdded(added);
-
-        return circle;
-    }
-
-    private static Trustee prepareTrustee(final Member member, final Circle circle, final TrustLevel trustLevel, final Date lastModified, final Date added) {
+    private static Trustee prepareTrustee(final String memberId, final String circleId, final TrustLevel trustLevel, final Date lastModified, final Date added) {
         final Trustee trustee = new Trustee();
-        trustee.setMember(member);
-        trustee.setCircle(circle);
+        trustee.setMemberId(memberId);
+        trustee.setCircleId(circleId);
         trustee.setTrustLevel(trustLevel);
         trustee.setChanged(lastModified);
         trustee.setAdded(added);

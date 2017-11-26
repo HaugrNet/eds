@@ -33,7 +33,7 @@ public final class SignRequest extends Authentication {
     @XmlElement(name = Constants.FIELD_DATA, required = true)
     private byte[] data = null;
 
-    @XmlElement(name = Constants.FIELD_EXPIRES, required = true)
+    @XmlElement(name = Constants.FIELD_EXPIRES)
     private Date expires = null;
 
     // =========================================================================

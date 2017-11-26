@@ -24,28 +24,28 @@ import java.util.Objects;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "metadata", propOrder = { Constants.FIELD_DATA_ID, Constants.FIELD_CIRCLE_ID, Constants.FIELD_FOLDER_ID, Constants.FIELD_DATA_NAME, Constants.FIELD_DATATYPE, Constants.FIELD_ADDED })
+@XmlType(name = "metadata", propOrder = { Constants.FIELD_DATA_ID, Constants.FIELD_CIRCLE_ID, Constants.FIELD_FOLDER_ID, Constants.FIELD_DATA_NAME, Constants.FIELD_TYPENAME, Constants.FIELD_ADDED })
 public final class Metadata implements Serializable {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
-    @XmlElement(name = Constants.FIELD_DATA_ID, nillable = true, required = true)
+    @XmlElement(name = Constants.FIELD_DATA_ID, required = true)
     private String dataId = null;
 
-    @XmlElement(name = Constants.FIELD_CIRCLE_ID, nillable = true, required = true)
+    @XmlElement(name = Constants.FIELD_CIRCLE_ID, required = true)
     private String circleId = null;
 
-    @XmlElement(name = Constants.FIELD_FOLDER_ID, nillable = true, required = true)
+    @XmlElement(name = Constants.FIELD_FOLDER_ID, required = true)
     private String folderId = null;
 
-    @XmlElement(name = Constants.FIELD_DATA_NAME, nillable = true, required = true)
+    @XmlElement(name = Constants.FIELD_DATA_NAME, required = true)
     private String dataName = null;
 
-    @XmlElement(name = Constants.FIELD_DATATYPE, required = true)
-    private DataType dataType = null;
+    @XmlElement(name = Constants.FIELD_TYPENAME, required = true)
+    private String typeName = null;
 
-    @XmlElement(name = Constants.FIELD_ADDED)
+    @XmlElement(name = Constants.FIELD_ADDED, required = true)
     private Date added = null;
 
     // =========================================================================
@@ -84,12 +84,12 @@ public final class Metadata implements Serializable {
         return dataName;
     }
 
-    public void setDataType(final DataType dataType) {
-        this.dataType = dataType;
+    public void setTypeName(final String typeName) {
+        this.typeName = typeName;
     }
 
-    public DataType getDataType() {
-        return dataType;
+    public String getTypeName() {
+        return typeName;
     }
 
     public void setAdded(final Date added) {
@@ -122,7 +122,7 @@ public final class Metadata implements Serializable {
                 Objects.equals(circleId, that.circleId) &&
                 Objects.equals(folderId, that.folderId) &&
                 Objects.equals(dataName, that.dataName) &&
-                Objects.equals(dataType, that.dataType) &&
+                Objects.equals(typeName, that.typeName) &&
                 Objects.equals(added, that.added);
     }
 
@@ -131,7 +131,7 @@ public final class Metadata implements Serializable {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(dataId, circleId, folderId, dataName, dataType, added);
+        return Objects.hash(dataId, circleId, folderId, dataName, typeName, added);
     }
 
     /**
@@ -144,7 +144,7 @@ public final class Metadata implements Serializable {
                 ", circleId='" + circleId + '\'' +
                 ", folderId='" + folderId + '\'' +
                 ", dataName='" + dataName + '\'' +
-                ", dataType=" + dataType +
+                ", typeName=" + typeName +
                 ", added=" + added +
                 '}';
     }

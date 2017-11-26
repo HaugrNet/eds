@@ -27,19 +27,19 @@ import java.util.Objects;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "trustee", propOrder = { Constants.FIELD_CIRCLE, Constants.FIELD_MEMBER, Constants.FIELD_TRUSTLEVEL, Constants.FIELD_CHANGED, Constants.FIELD_ADDED })
+@XmlType(name = "trustee", propOrder = { Constants.FIELD_CIRCLE_ID, Constants.FIELD_MEMBER_ID, Constants.FIELD_TRUSTLEVEL, Constants.FIELD_CHANGED, Constants.FIELD_ADDED })
 public final class Trustee implements Serializable {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
-    @XmlElement(name = Constants.FIELD_CIRCLE, required = true)
-    private Circle circle = null;
+    @XmlElement(name = Constants.FIELD_CIRCLE_ID)
+    private String circleId = null;
 
-    @XmlElement(name = Constants.FIELD_MEMBER, required = true)
-    private Member member = null;
+    @XmlElement(name = Constants.FIELD_MEMBER_ID)
+    private String memberId = null;
 
-    @XmlElement(name = Constants.FIELD_TRUSTLEVEL, required = true)
+    @XmlElement(name = Constants.FIELD_TRUSTLEVEL)
     private TrustLevel trustLevel = null;
 
     @XmlElement(name = Constants.FIELD_CHANGED)
@@ -52,20 +52,20 @@ public final class Trustee implements Serializable {
     // Standard Setters & Getters
     // =========================================================================
 
-    public void setCircle(final Circle circle) {
-        this.circle = circle;
+    public void setCircleId(final String circleId) {
+        this.circleId = circleId;
     }
 
-    public Circle getCircle() {
-        return circle;
+    public String getCircleId() {
+        return circleId;
     }
 
-    public void setMember(final Member member) {
-        this.member = member;
+    public void setMemberId(final String memberId) {
+        this.memberId = memberId;
     }
 
-    public Member getMember() {
-        return member;
+    public String getMemberId() {
+        return memberId;
     }
 
     public void setTrustLevel(final TrustLevel trustLevel) {
@@ -111,8 +111,8 @@ public final class Trustee implements Serializable {
 
         final Trustee that = (Trustee) obj;
         return (trustLevel == that.trustLevel) &&
-                Objects.equals(circle, that.circle) &&
-                Objects.equals(member, that.member) &&
+                Objects.equals(circleId, that.circleId) &&
+                Objects.equals(memberId, that.memberId) &&
                 Objects.equals(changed, that.changed) &&
                 Objects.equals(added, that.added);
     }
@@ -122,7 +122,7 @@ public final class Trustee implements Serializable {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(circle, member, trustLevel, changed, added);
+        return Objects.hash(circleId, memberId, trustLevel, changed, added);
     }
 
     /**
@@ -131,8 +131,8 @@ public final class Trustee implements Serializable {
     @Override
     public String toString() {
         return "Trustee{" +
-                "circle=" + circle +
-                ", member=" + member +
+                "circleId=" + circleId +
+                ", memberId=" + memberId +
                 ", trustLevel=" + trustLevel +
                 ", changed=" + changed +
                 ", added=" + added +

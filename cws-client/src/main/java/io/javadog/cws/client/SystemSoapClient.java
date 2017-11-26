@@ -8,6 +8,7 @@
 package io.javadog.cws.client;
 
 import io.javadog.cws.api.System;
+import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.requests.FetchCircleRequest;
 import io.javadog.cws.api.requests.FetchMemberRequest;
 import io.javadog.cws.api.requests.ProcessCircleRequest;
@@ -157,7 +158,7 @@ public final class SystemSoapClient implements System {
         if (api != null) {
             ws = new io.javadog.cws.ws.FetchMemberRequest();
             Mapper.fillAuthentication(ws, api);
-            ws.setMemberId(api.getMemberId());
+            ws.setMemberId(Mapper.convert(Constants.FIELD_MEMBER_ID, api.getMemberId()));
         }
 
         return ws;
@@ -183,9 +184,9 @@ public final class SystemSoapClient implements System {
             ws = new io.javadog.cws.ws.ProcessMemberRequest();
             Mapper.fillAuthentication(ws, api);
             ws.setAction(Mapper.map(api.getAction()));
-            ws.setMemberId(api.getMemberId());
-            ws.setNewAccountName(api.getNewAccountName());
-            ws.setNewCredential(api.getNewCredential());
+            ws.setMemberId(Mapper.convert(Constants.FIELD_MEMBER_ID, api.getMemberId()));
+            ws.setNewAccountName(Mapper.convert(Constants.FIELD_NEW_ACCOUNT_NAME, api.getNewAccountName()));
+            ws.setNewCredential(Mapper.convert(Constants.FIELD_NEW_CREDENTIAL, api.getNewCredential()));
         }
 
         return ws;
@@ -235,9 +236,9 @@ public final class SystemSoapClient implements System {
             ws = new io.javadog.cws.ws.ProcessCircleRequest();
             Mapper.fillAuthentication(ws, api);
             ws.setAction(Mapper.map(api.getAction()));
-            ws.setCircleId(api.getCircleId());
-            ws.setCircleName(api.getCircleName());
-            ws.setMemberId(api.getMemberId());
+            ws.setCircleId(Mapper.convert(Constants.FIELD_CIRCLE_ID, api.getCircleId()));
+            ws.setCircleName(Mapper.convert(Constants.FIELD_CIRCLE_NAME, api.getCircleName()));
+            ws.setMemberId(Mapper.convert(Constants.FIELD_MEMBER_ID, api.getMemberId()));
             ws.setTrustLevel(Mapper.map(api.getTrustLevel()));
         }
 

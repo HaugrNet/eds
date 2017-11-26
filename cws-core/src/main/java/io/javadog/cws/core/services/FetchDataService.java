@@ -9,7 +9,6 @@ package io.javadog.cws.core.services;
 
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
-import io.javadog.cws.api.dtos.DataType;
 import io.javadog.cws.api.dtos.Metadata;
 import io.javadog.cws.api.requests.FetchDataRequest;
 import io.javadog.cws.api.responses.FetchDataResponse;
@@ -19,7 +18,6 @@ import io.javadog.cws.common.keys.SecretCWSKey;
 import io.javadog.cws.core.Permission;
 import io.javadog.cws.core.Serviceable;
 import io.javadog.cws.model.entities.DataEntity;
-import io.javadog.cws.model.entities.DataTypeEntity;
 import io.javadog.cws.model.entities.MetadataEntity;
 
 import javax.persistence.EntityManager;
@@ -134,22 +132,13 @@ public final class FetchDataService extends Serviceable<FetchDataResponse, Fetch
     private static Metadata convert(final MetadataEntity entity, final String folderId) {
         final Metadata metaData = new Metadata();
 
-        metaData.setDataType(convert(entity.getType()));
-        metaData.setDataName(entity.getName());
         metaData.setDataId(entity.getExternalId());
         metaData.setCircleId(entity.getCircle().getExternalId());
-        metaData.setAdded(entity.getAdded());
         metaData.setFolderId(folderId);
+        metaData.setDataName(entity.getName());
+        metaData.setTypeName(entity.getType().getName());
+        metaData.setAdded(entity.getAdded());
 
         return metaData;
-    }
-
-    private static DataType convert(final DataTypeEntity entity) {
-        final DataType dataType = new DataType();
-
-        dataType.setTypeName(entity.getName());
-        dataType.setType(entity.getType());
-
-        return dataType;
     }
 }

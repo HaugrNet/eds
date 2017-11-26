@@ -184,7 +184,7 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
     public void testProcessSelf() {
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
         final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, MEMBER_1);
-        request.setAction(Action.PROCESS);
+        request.setAction(Action.UPDATE);
         request.setNewAccountName("Supreme Member");
         request.setNewCredential("Bla bla bla");
 
@@ -197,7 +197,7 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
         prepareCause(CWSException.class, ReturnCode.CONSTRAINT_ERROR, "The new Account Name already exists.");
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
         final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, MEMBER_1);
-        request.setAction(Action.PROCESS);
+        request.setAction(Action.UPDATE);
         request.setNewAccountName(MEMBER_2);
         request.setNewCredential("Bla bla bla");
         assertThat(request.validate().size(), is(0));

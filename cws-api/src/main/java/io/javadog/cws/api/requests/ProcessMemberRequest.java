@@ -35,14 +35,14 @@ public final class ProcessMemberRequest extends Authentication {
     private Action action = null;
 
     @Pattern(regexp = Constants.ID_PATTERN_REGEX)
-    @XmlElement(name = Constants.FIELD_MEMBER_ID, required = true)
+    @XmlElement(name = Constants.FIELD_MEMBER_ID, nillable = true)
     private String memberId = null;
 
     @Size(min = 1, max = Constants.MAX_NAME_LENGTH)
-    @XmlElement(name = Constants.FIELD_NEW_ACCOUNT_NAME, required = true)
+    @XmlElement(name = Constants.FIELD_NEW_ACCOUNT_NAME, nillable = true)
     private String newAccountName = null;
 
-    @XmlElement(name = Constants.FIELD_NEW_CREDENTIAL, required = true)
+    @XmlElement(name = Constants.FIELD_NEW_CREDENTIAL, nillable = true)
     private String newCredential = null;
 
     // =========================================================================
@@ -106,7 +106,7 @@ public final class ProcessMemberRequest extends Authentication {
                     checkNotNullOrEmpty(errors, Constants.FIELD_NEW_ACCOUNT_NAME, newAccountName, "The New Account Name is missing.");
                     checkNotTooLong(errors, Constants.FIELD_NEW_ACCOUNT_NAME, newAccountName, Constants.MAX_NAME_LENGTH, newAccountErrorMessage);
                     break;
-                case PROCESS:
+                case UPDATE:
                     checkNotTooLong(errors, Constants.FIELD_NEW_ACCOUNT_NAME, newAccountName, Constants.MAX_NAME_LENGTH, newAccountErrorMessage);
                     break;
                 case DELETE:

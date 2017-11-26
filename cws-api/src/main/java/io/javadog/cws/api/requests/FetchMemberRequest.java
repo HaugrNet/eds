@@ -28,7 +28,7 @@ public final class FetchMemberRequest extends Authentication {
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
     @Pattern(regexp = Constants.ID_PATTERN_REGEX)
-    @XmlElement(name = Constants.FIELD_MEMBER_ID, nillable = true, required = true)
+    @XmlElement(name = Constants.FIELD_MEMBER_ID, nillable = true)
     private String memberId = null;
 
     // =========================================================================

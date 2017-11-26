@@ -37,7 +37,7 @@ public final class ProcessDataRequest extends Authentication implements CircleId
     private Action action = null;
 
     @Pattern(regexp = Constants.ID_PATTERN_REGEX)
-    @XmlElement(name = Constants.FIELD_DATA_ID, required = true)
+    @XmlElement(name = Constants.FIELD_DATA_ID)
     private String dataId = null;
 
     @Pattern(regexp = Constants.ID_PATTERN_REGEX)
@@ -53,7 +53,7 @@ public final class ProcessDataRequest extends Authentication implements CircleId
     private String folderId = null;
 
     @Size(min = 1, max = Constants.MAX_NAME_LENGTH)
-    @XmlElement(name = Constants.FIELD_TYPENAME, required = true)
+    @XmlElement(name = Constants.FIELD_TYPENAME)
     private String typeName = null;
 
     @XmlElement(name = Constants.FIELD_DATA)

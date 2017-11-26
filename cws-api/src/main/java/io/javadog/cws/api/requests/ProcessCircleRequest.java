@@ -36,18 +36,18 @@ public final class ProcessCircleRequest extends Authentication implements Circle
     private Action action = null;
 
     @Pattern(regexp = Constants.ID_PATTERN_REGEX)
-    @XmlElement(name = Constants.FIELD_CIRCLE_ID, required = true)
+    @XmlElement(name = Constants.FIELD_CIRCLE_ID, nillable = true)
     private String circleId = null;
 
     @Size(min = 1, max = Constants.MAX_NAME_LENGTH)
-    @XmlElement(name = Constants.FIELD_CIRCLE_NAME, required = true)
+    @XmlElement(name = Constants.FIELD_CIRCLE_NAME, nillable = true)
     private String circleName = null;
 
     @Pattern(regexp = Constants.ID_PATTERN_REGEX)
-    @XmlElement(name = Constants.FIELD_MEMBER_ID, required = true)
+    @XmlElement(name = Constants.FIELD_MEMBER_ID, nillable = true)
     private String memberId = null;
 
-    @XmlElement(name = Constants.FIELD_TRUSTLEVEL, required = true)
+    @XmlElement(name = Constants.FIELD_TRUSTLEVEL, nillable = true)
     private TrustLevel trustLevel = null;
 
     // =========================================================================

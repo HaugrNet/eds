@@ -30,6 +30,7 @@ import io.javadog.cws.api.responses.VersionResponse;
 import org.junit.Test;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.UUID;
 
 /**
  * @author Kim Jensen
@@ -70,11 +71,13 @@ public class SystemSoapClientTest {
 
     @Test
     public void testProcessMembers() {
+        final String accountName = UUID.randomUUID().toString();
+
         final System system = new SystemSoapClient(SYSTEM_URL);
         final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
         request.setAction(Action.CREATE);
-        request.setNewAccountName("newMember");
-        request.setNewCredential("Password");
+        request.setNewAccountName(accountName);
+        request.setNewCredential(accountName);
 
         final ProcessMemberResponse response = system.processMember(request);
         assertThat(response.getReturnMessage(), is("Ok"));
@@ -93,10 +96,21 @@ public class SystemSoapClientTest {
 
     @Test
     public void testProcessCircles() {
+        final String accountName = UUID.randomUUID().toString();
+
         final System system = new SystemSoapClient(SYSTEM_URL);
+        final ProcessMemberRequest memberRequest = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
+        memberRequest.setAction(Action.CREATE);
+        memberRequest.setNewAccountName(accountName);
+        memberRequest.setNewCredential(accountName);
+        final ProcessMemberResponse memberResponse = system.processMember(memberRequest);
+        assertThat(memberResponse.isOk(), is(true));
+
         final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, Constants.ADMIN_ACCOUNT);
         request.setAction(Action.CREATE);
-        request.setCircleName("Circle Name");
+        request.setCircleName(accountName);
+        request.setMemberId(memberResponse.getMemberId());
+        request.setCircleName(UUID.randomUUID().toString());
 
         final ProcessCircleResponse response = system.processCircle(request);
         assertThat(response.getReturnMessage(), is("Ok"));

@@ -56,7 +56,7 @@ public final class ProcessMemberService extends Serviceable<ProcessMemberRespons
                     case INVITE:
                         response = inviteMember(request);
                         break;
-                    case PROCESS:
+                    case UPDATE:
                         response = processSelf(request);
                         break;
                     case DELETE:

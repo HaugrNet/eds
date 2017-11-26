@@ -28,7 +28,7 @@ public final class FetchCircleRequest extends Authentication implements CircleId
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
     @Pattern(regexp = Constants.ID_PATTERN_REGEX)
-    @XmlElement(name = Constants.FIELD_CIRCLE_ID, nillable = true, required = true)
+    @XmlElement(name = Constants.FIELD_CIRCLE_ID, nillable = true)
     private String circleId = null;
 
     // =========================================================================

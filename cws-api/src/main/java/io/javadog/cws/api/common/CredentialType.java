@@ -14,7 +14,7 @@ import javax.xml.bind.annotation.XmlType;
 /**
  * <p>This is the types of credentials allowed for the Authentication Process.
  * It can be either an Invitation (Signature, with a shared secret). Or it can
- * be a Passphrase, which together a System & Account Salt.</p>
+ * be a Passphrase, which together a System &amp; Account Salt.</p>
  *
  * <p>Regardless of the type, the information given will be used to decrypt the
  * Asymmetric Key, which was generated and stored with the Account. The Private

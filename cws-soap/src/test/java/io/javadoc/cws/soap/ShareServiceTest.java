@@ -2,10 +2,10 @@
  * =============================================================================
  * Copyright (c) 2016-2017, JavaDog.io
  * -----------------------------------------------------------------------------
- * Project: CWS (cws-war)
+ * Project: CWS (cws-soap)
  * =============================================================================
  */
-package io.javadog.cws.war;
+package io.javadoc.cws.soap;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;

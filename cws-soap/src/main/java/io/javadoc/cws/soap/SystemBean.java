@@ -2,12 +2,12 @@
  * =============================================================================
  * Copyright (c) 2016-2017, JavaDog.io
  * -----------------------------------------------------------------------------
- * Project: CWS (cws-war)
+ * Project: CWS (cws-soap)
  * =============================================================================
  */
-package io.javadog.cws.war;
+package io.javadoc.cws.soap;
 
-import static io.javadog.cws.war.CommonBean.destroy;
+import static io.javadoc.cws.soap.CommonBean.destroy;
 
 import io.javadog.cws.api.requests.FetchCircleRequest;
 import io.javadog.cws.api.requests.FetchMemberRequest;

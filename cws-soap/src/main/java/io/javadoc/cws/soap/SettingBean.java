@@ -2,10 +2,10 @@
  * =============================================================================
  * Copyright (c) 2016-2017, JavaDog.io
  * -----------------------------------------------------------------------------
- * Project: CWS (cws-war)
+ * Project: CWS (cws-soap)
  * =============================================================================
  */
-package io.javadog.cws.war;
+package io.javadoc.cws.soap;
 
 import io.javadog.cws.common.Settings;
 import io.javadog.cws.model.CommonDao;

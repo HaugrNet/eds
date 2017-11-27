@@ -14,6 +14,7 @@ import static org.junit.Assert.assertThat;
 import io.javadog.cws.api.common.TrustLevel;
 import org.junit.Test;
 
+import java.security.SecureRandom;
 import java.util.Date;
 import java.util.UUID;
 
@@ -47,8 +48,8 @@ public final class TrusteeTest {
 
     @Test
     public void testStandardMethods() {
+        final long circleId = new SecureRandom().nextLong();
         final String memberId = UUID.randomUUID().toString();
-        final String circleId = UUID.randomUUID().toString();
         final TrustLevel trustLevel = TrustLevel.WRITE;
         final Date lastModified = new Date(456L);
         final Date created = new Date(123L);
@@ -77,8 +78,8 @@ public final class TrusteeTest {
 
     @Test
     public void testEquality() {
-        final String circleId1 = UUID.randomUUID().toString();
-        final String circleId2 = UUID.randomUUID().toString();
+        final long circleId1 = new SecureRandom().nextLong();
+        final long circleId2 = new SecureRandom().nextLong();
         final String memberId1 = UUID.randomUUID().toString();
         final String memberId2 = UUID.randomUUID().toString();
         final TrustLevel trustLevel1 = TrustLevel.WRITE;
@@ -109,10 +110,10 @@ public final class TrusteeTest {
     // Internal Helper Methods
     // =========================================================================
 
-    private static Trustee prepareTrustee(final String memberId, final String circleId, final TrustLevel trustLevel, final Date lastModified, final Date added) {
+    private static Trustee prepareTrustee(final long circleId, final String memberId, final TrustLevel trustLevel, final Date lastModified, final Date added) {
         final Trustee trustee = new Trustee();
         trustee.setMemberId(memberId);
-        trustee.setCircleId(circleId);
+        trustee.setCircleId(String.valueOf(circleId));
         trustee.setTrustLevel(trustLevel);
         trustee.setChanged(lastModified);
         trustee.setAdded(added);

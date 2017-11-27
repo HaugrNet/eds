@@ -5,9 +5,7 @@
  * Project: CWS (cws-soap)
  * =============================================================================
  */
-package io.javadoc.cws.soap;
-
-import static io.javadoc.cws.soap.CommonBean.destroy;
+package io.javadog.cws.soap;
 
 import io.javadog.cws.api.requests.FetchCircleRequest;
 import io.javadog.cws.api.requests.FetchMemberRequest;
@@ -74,7 +72,7 @@ public class SystemBean {
             log.log(Settings.DEBUG, e.getMessage(), e);
             response = new SettingResponse(e.getReturnCode(), e.getMessage());
         } finally {
-            destroy(service);
+            CommonBean.destroy(service);
         }
 
         return response;
@@ -96,7 +94,7 @@ public class SystemBean {
             log.log(Settings.DEBUG, e.getMessage(), e);
             response = new FetchMemberResponse(e.getReturnCode(), e.getMessage());
         } finally {
-            destroy(service);
+            CommonBean.destroy(service);
         }
 
         return response;
@@ -118,7 +116,7 @@ public class SystemBean {
             log.log(Settings.DEBUG, e.getMessage(), e);
             response = new ProcessMemberResponse(e.getReturnCode(), e.getMessage());
         } finally {
-            destroy(service);
+            CommonBean.destroy(service);
         }
 
         return response;
@@ -140,7 +138,7 @@ public class SystemBean {
             log.log(Settings.DEBUG, e.getMessage(), e);
             response = new FetchCircleResponse(e.getReturnCode(), e.getMessage());
         } finally {
-            destroy(service);
+            CommonBean.destroy(service);
         }
 
         return response;
@@ -162,7 +160,7 @@ public class SystemBean {
             log.log(Settings.DEBUG, e.getMessage(), e);
             response = new ProcessCircleResponse(e.getReturnCode(), e.getMessage());
         } finally {
-            destroy(service);
+            CommonBean.destroy(service);
         }
 
         return response;

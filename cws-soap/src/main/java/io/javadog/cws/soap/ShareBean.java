@@ -5,9 +5,7 @@
  * Project: CWS (cws-soap)
  * =============================================================================
  */
-package io.javadoc.cws.soap;
-
-import static io.javadoc.cws.soap.CommonBean.destroy;
+package io.javadog.cws.soap;
 
 import io.javadog.cws.api.requests.FetchDataRequest;
 import io.javadog.cws.api.requests.FetchDataTypeRequest;
@@ -72,7 +70,7 @@ public class ShareBean {
             log.log(Settings.DEBUG, e.getMessage(), e);
             response = new ProcessDataTypeResponse(e.getReturnCode(), e.getMessage());
         } finally {
-            destroy(service);
+            CommonBean.destroy(service);
         }
 
         return response;
@@ -94,7 +92,7 @@ public class ShareBean {
             log.log(Settings.DEBUG, e.getMessage(), e);
             response = new FetchDataTypeResponse(e.getReturnCode(), e.getMessage());
         } finally {
-            destroy(service);
+            CommonBean.destroy(service);
         }
 
         return response;
@@ -116,7 +114,7 @@ public class ShareBean {
             log.log(Settings.DEBUG, e.getMessage(), e);
             response = new ProcessDataResponse(e.getReturnCode(), e.getMessage());
         } finally {
-            destroy(service);
+            CommonBean.destroy(service);
         }
 
         return response;
@@ -138,7 +136,7 @@ public class ShareBean {
             log.log(Settings.DEBUG, e.getMessage(), e);
             response = new FetchDataResponse(e.getReturnCode(), e.getMessage());
         } finally {
-            destroy(service);
+            CommonBean.destroy(service);
         }
 
         return response;
@@ -160,7 +158,7 @@ public class ShareBean {
             log.log(Settings.DEBUG, e.getMessage(), e);
             response = new SignResponse(e.getReturnCode(), e.getMessage());
         } finally {
-            destroy(service);
+            CommonBean.destroy(service);
         }
 
         return response;
@@ -182,7 +180,7 @@ public class ShareBean {
             log.log(Settings.DEBUG, e.getMessage(), e);
             response = new VerifyResponse(e.getReturnCode(), e.getMessage());
         } finally {
-            destroy(service);
+            CommonBean.destroy(service);
         }
 
         return response;
@@ -204,7 +202,7 @@ public class ShareBean {
             log.log(Settings.DEBUG, e.getMessage(), e);
             response = new FetchSignatureResponse(e.getReturnCode(), e.getMessage());
         } finally {
-            destroy(service);
+            CommonBean.destroy(service);
         }
 
         return response;

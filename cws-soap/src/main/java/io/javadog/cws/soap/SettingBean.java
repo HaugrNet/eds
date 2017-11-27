@@ -5,7 +5,7 @@
  * Project: CWS (cws-soap)
  * =============================================================================
  */
-package io.javadoc.cws.soap;
+package io.javadog.cws.soap;
 
 import io.javadog.cws.common.Settings;
 import io.javadog.cws.model.CommonDao;

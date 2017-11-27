@@ -5,7 +5,7 @@
  * Project: CWS (cws-soap)
  * =============================================================================
  */
-package io.javadoc.cws.soap;
+package io.javadog.cws.soap;
 
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;

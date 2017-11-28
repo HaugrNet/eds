@@ -96,9 +96,8 @@ public final class ProcessCircleRequestTest {
         request.setAction(Action.CREATE);
 
         final Map<String, String> errors = request.validate();
-        assertThat(errors.size(), is(2));
+        assertThat(errors.size(), is(1));
         assertThat(errors.get(Constants.FIELD_CIRCLE_NAME), is("Cannot create a new Circle, without the Circle Name."));
-        assertThat(errors.get(Constants.FIELD_MEMBER_ID), is("Cannot create a new Circle, without an initial Circle Administrator, please provide a Member Id."));
     }
 
     @Test

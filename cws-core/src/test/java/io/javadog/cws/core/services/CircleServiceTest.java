@@ -25,7 +25,6 @@ import io.javadog.cws.api.responses.FetchDataResponse;
 import io.javadog.cws.api.responses.ProcessCircleResponse;
 import io.javadog.cws.api.responses.ProcessDataResponse;
 import io.javadog.cws.common.Settings;
-import io.javadog.cws.common.exceptions.AuthorizationException;
 import io.javadog.cws.common.exceptions.CWSException;
 import io.javadog.cws.common.exceptions.VerificationException;
 import io.javadog.cws.model.DatabaseSetup;
@@ -299,8 +298,8 @@ public final class CircleServiceTest extends DatabaseSetup {
         request.setMemberId(MEMBER_1_ID);
 
         final ProcessCircleResponse response = service.perform(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.AUTHORIZATION_WARNING));
-        assertThat(response.getReturnMessage(), is("Only the System Administrator may create a new Circle."));
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(response.getReturnMessage(), is("Ok"));
     }
 
     @Test
@@ -378,7 +377,6 @@ public final class CircleServiceTest extends DatabaseSetup {
 
     @Test
     public void testUpdateExistingCircleAsCircleMember() {
-        prepareCause(AuthorizationException.class, ReturnCode.AUTHORIZATION_WARNING, "The requesting Account is not permitted to Process a Circle.");
         final ProcessCircleService service = new ProcessCircleService(settings, entityManager);
         final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, MEMBER_2);
         request.setAction(Action.UPDATE);
@@ -386,7 +384,9 @@ public final class CircleServiceTest extends DatabaseSetup {
         request.setCircleId(CIRCLE_1_ID);
         assertThat(request.validate().isEmpty(), is(true));
 
-        service.perform(request);
+        final ProcessCircleResponse response = service.perform(request);
+        assertThat(response.getReturnCode(), is(ReturnCode.AUTHORIZATION_WARNING));
+        assertThat(response.getReturnMessage(), is("Only a Circle Administrator may perform this action."));
     }
 
     @Test
@@ -493,8 +493,6 @@ public final class CircleServiceTest extends DatabaseSetup {
 
     @Test
     public void testAddingTrusteeAsWritingTrustee() {
-        prepareCause(AuthorizationException.class, ReturnCode.AUTHORIZATION_WARNING, "The requesting Account is not permitted to Process a Circle.");
-
         final ProcessCircleService service = new ProcessCircleService(settings, entityManager);
         final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, MEMBER_2);
         request.setAction(Action.ADD);
@@ -503,7 +501,9 @@ public final class CircleServiceTest extends DatabaseSetup {
         request.setTrustLevel(TrustLevel.WRITE);
         assertThat(request.validate().isEmpty(), is(true));
 
-        service.perform(request);
+        final ProcessCircleResponse response = service.perform(request);
+        assertThat(response.getReturnCode(), is(ReturnCode.AUTHORIZATION_WARNING));
+        assertThat(response.getReturnMessage(), is("Only a Circle Administrator may perform this action."));
     }
 
     @Test
@@ -580,8 +580,6 @@ public final class CircleServiceTest extends DatabaseSetup {
 
     @Test
     public void testAlterTrusteeAsWritingTrustee() {
-        prepareCause(AuthorizationException.class, ReturnCode.AUTHORIZATION_WARNING, "The requesting Account is not permitted to Process a Circle.");
-
         final ProcessCircleService service = new ProcessCircleService(settings, entityManager);
         final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, MEMBER_2);
         request.setAction(Action.ALTER);
@@ -590,7 +588,9 @@ public final class CircleServiceTest extends DatabaseSetup {
         request.setTrustLevel(TrustLevel.ADMIN);
         assertThat(request.validate().isEmpty(), is(true));
 
-        service.perform(request);
+        final ProcessCircleResponse response = service.perform(request);
+        assertThat(response.getReturnCode(), is(ReturnCode.AUTHORIZATION_WARNING));
+        assertThat(response.getReturnMessage(), is("Only a Circle Administrator may perform this action."));
     }
 
     @Test
@@ -660,8 +660,6 @@ public final class CircleServiceTest extends DatabaseSetup {
 
     @Test
     public void testRemoveTrusteeAsWritingTrustee() {
-        prepareCause(AuthorizationException.class, ReturnCode.AUTHORIZATION_WARNING, "The requesting Account is not permitted to Process a Circle.");
-
         final ProcessCircleService service = new ProcessCircleService(settings, entityManager);
         final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, MEMBER_2);
         request.setAction(Action.REMOVE);
@@ -669,7 +667,9 @@ public final class CircleServiceTest extends DatabaseSetup {
         request.setMemberId(MEMBER_2_ID);
         assertThat(request.validate().isEmpty(), is(true));
 
-        service.perform(request);
+        final ProcessCircleResponse response = service.perform(request);
+        assertThat(response.getReturnCode(), is(ReturnCode.AUTHORIZATION_WARNING));
+        assertThat(response.getReturnMessage(), is("Only a Circle Administrator may perform this action."));
     }
 
     @Test

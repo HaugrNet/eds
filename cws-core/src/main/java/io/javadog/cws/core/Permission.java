@@ -20,7 +20,7 @@ public enum Permission {
     FETCH_DATA(TrustLevel.READ, "Fetch Data."),
     FETCH_DATA_TYPE(TrustLevel.READ, "Fetch Data Types."),
     FETCH_SIGNATURES(TrustLevel.WRITE, "Fetch Signatures."),
-    PROCESS_CIRCLE(TrustLevel.ADMIN, "Process a Circle."),
+    PROCESS_CIRCLE(TrustLevel.READ, "Process a Circle."),
     PROCESS_MEMBER(TrustLevel.WRITE, "Process a Member."),
     PROCESS_DATA(TrustLevel.WRITE, "Process Data."),
     PROCESS_DATA_TYPE(TrustLevel.SYSOP, "Process Data Type."),

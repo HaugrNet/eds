@@ -32,15 +32,22 @@ public final class SignService extends Serviceable<SignResponse, SignRequest> {
     @Override
     public SignResponse perform(final SignRequest request) {
         verifyRequest(request, Permission.CREATE_SIGNATURE);
+        final SignResponse response = new SignResponse();
 
         final String signature = crypto.sign(keyPair.getPrivate().getKey(), request.getData());
-        final SignatureEntity entity = new SignatureEntity();
-        entity.setMember(member);
-        entity.setChecksum(crypto.generateChecksum(signature));
-        entity.setExpires(request.getExpires());
-        dao.persist(entity);
+        final String checksum = crypto.generateChecksum(signature);
+        final SignatureEntity existing = dao.findByChecksum(checksum);
 
-        final SignResponse response = new SignResponse();
+        if (existing == null) {
+            final SignatureEntity entity = new SignatureEntity();
+            entity.setMember(member);
+            entity.setChecksum(checksum);
+            entity.setExpires(request.getExpires());
+            dao.persist(entity);
+        } else {
+            response.setReturnMessage("This document has already been signed.");
+        }
+
         response.setSignature(signature);
         return response;
     }

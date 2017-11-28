@@ -86,6 +86,23 @@ public final class SignatureServiceTest extends DatabaseSetup {
     }
 
     @Test
+    public void testDuplicateSigning() {
+        final byte[] data = generateData(1048576);
+        final SignService signService = new SignService(settings, entityManager);
+
+        final SignRequest signRequest = prepareRequest(SignRequest.class, MEMBER_1);
+        signRequest.setData(data);
+        // Let our new Signature expire in 5 minutes
+        signRequest.setExpires(new Date(new Date().getTime() + 300000L));
+        final SignResponse signResponse = signService.perform(signRequest);
+        assertThat(signResponse.getReturnCode(), is(ReturnCode.SUCCESS));
+
+        final SignResponse duplicateResponse = signService.perform(signRequest);
+        assertThat(duplicateResponse.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(duplicateResponse.getReturnMessage(), is("This document has already been signed."));
+    }
+
+    @Test
     public void testExpiredSignature() {
         final byte[] data = generateData(1048576);
         final VerifyService verifyService = new VerifyService(settings, entityManager);

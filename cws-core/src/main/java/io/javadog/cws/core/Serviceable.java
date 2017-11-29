@@ -37,6 +37,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -267,7 +268,8 @@ public abstract class Serviceable<R extends CwsResponse, V extends Authenticatio
         // Actions, without being part of a Circle. So these checks must be
         // made separately based on the actual Request.
         if (!Objects.equals(ADMIN_ACCOUNT, member.getName())) {
-            final List<TrusteeEntity> allTrustees = findTrustees(member, circleId);
+            final Set<TrustLevel> permissions = TrustLevel.getLevels(action.getTrustLevel());
+            final List<TrusteeEntity> allTrustees = findTrustees(member, circleId, permissions);
             trustees = new ArrayList<>();
 
             for (final TrusteeEntity trust : allTrustees) {
@@ -276,7 +278,7 @@ public abstract class Serviceable<R extends CwsResponse, V extends Authenticatio
                 }
             }
 
-            if (trustees.isEmpty()) {
+            if ((action.getTrustLevel() != TrustLevel.ALL) && trustees.isEmpty()) {
                 throw new AuthorizationException("The requesting Account is not permitted to " + action.getDescription());
             }
         }
@@ -304,13 +306,13 @@ public abstract class Serviceable<R extends CwsResponse, V extends Authenticatio
         return found;
     }
 
-    private List<TrusteeEntity> findTrustees(final MemberEntity member, final String circleId) {
+    private List<TrusteeEntity> findTrustees(final MemberEntity member, final String circleId, final Set<TrustLevel> permissions) {
         final List<TrusteeEntity> found;
 
         if (circleId != null) {
-            found = dao.findTrustByMemberAndCircle(member, circleId);
+            found = dao.findTrustByMemberAndCircle(member, circleId, permissions);
         } else {
-            found = dao.findTrustByMember(member);
+            found = dao.findTrustByMember(member, permissions);
         }
 
         return found;

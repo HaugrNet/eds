@@ -98,12 +98,26 @@ public final class DataTypeServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testNotAuthorizedRequest() {
-        prepareCause(AuthorizationException.class, ReturnCode.AUTHORIZATION_WARNING,
-                "Cannot complete this request, as it is only allowed for the System Administrator.");
-
+    public void testCircleAdminsAreAuthorized() {
         final ProcessDataTypeService service = new ProcessDataTypeService(settings, entityManager);
         final ProcessDataTypeRequest request = prepareRequest(ProcessDataTypeRequest.class, MEMBER_1);
+        request.setType("MyDataType");
+        request.setTypeName("The Data Type");
+        assertThat(request.getTypeName(), is(not(nullValue())));
+        assertThat(request.getType(), is(not(nullValue())));
+
+        final ProcessDataTypeResponse response = service.perform(request);
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(response.getReturnMessage(), is("Ok"));
+    }
+
+    @Test
+    public void testNotAuthorizedRequest() {
+        prepareCause(AuthorizationException.class, ReturnCode.AUTHORIZATION_WARNING,
+                "The requesting Account is not permitted to Process Data Type.");
+
+        final ProcessDataTypeService service = new ProcessDataTypeService(settings, entityManager);
+        final ProcessDataTypeRequest request = prepareRequest(ProcessDataTypeRequest.class, MEMBER_2);
         request.setType("MyDataType");
         request.setTypeName("The Data Type");
         assertThat(request.getTypeName(), is(not(nullValue())));

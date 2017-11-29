@@ -7,6 +7,7 @@
  */
 package io.javadog.cws.model;
 
+import io.javadog.cws.api.common.TrustLevel;
 import io.javadog.cws.model.entities.CWSEntity;
 import io.javadog.cws.model.entities.CircleEntity;
 import io.javadog.cws.model.entities.DataEntity;
@@ -19,6 +20,7 @@ import io.javadog.cws.model.entities.SignatureEntity;
 import io.javadog.cws.model.entities.TrusteeEntity;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Common DAO Class for CWS.
@@ -42,9 +44,9 @@ public interface CommonDao {
 
     MemberEntity findMemberByNameAndCircleId(String name, String externalCircleId);
 
-    List<TrusteeEntity> findTrustByMember(MemberEntity member);
+    List<TrusteeEntity> findTrustByMember(MemberEntity member, Set<TrustLevel> permissions);
 
-    List<TrusteeEntity> findTrustByMemberAndCircle(MemberEntity member, String externalCircleId);
+    List<TrusteeEntity> findTrustByMemberAndCircle(MemberEntity member, String externalCircleId, Set<TrustLevel> permissions);
 
     List<SettingEntity> readSettings();
 

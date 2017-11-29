@@ -31,19 +31,18 @@ public interface Share {
     /**
      * <p>All stored data must have a data type, i.e. a way for an external
      * client or system to identify and apply rules for how to work with the
-     * data. By default, two data types exist; &quot;data&quot; &amp;
-     * &quot;folder&quot;, which will allow any system to operate without
-     * adding additional types.</p>
+     * data. By default, two data types exist; &quot;<b>data</b>&quot; &amp;
+     * &quot;<b>folder</b>&quot;, which will allow any system to operate
+     * without adding additional types.</p>
      *
-     * <p>However, if additional types is needed, which can be MIME Type
-     * information for file sharing between multiple Clients, or Object
-     * Identification information for Data Objects, then these must be added
-     * before they can be used.</p>
+     * <p>If more data types are needed, i.e. MIME Type data or Object Creation
+     * information - then these must be added before they can be used, which is
+     * done using this request.</p>
      *
-     * <p>The request takes both the name of a Data Type and the type itself,
-     * but to properly identify what action should be taken (added/updated or
-     * deleted), the proper {@link io.javadog.cws.api.common.Action} must also
-     * be set.</p>
+     * <p>The request takes both the name of a Data Type (typeName) and the
+     * type (type) itself, but to properly identify what action should be taken
+     * (added/updated or deleted), the proper
+     * {@link io.javadog.cws.api.common.Action} must also be set.</p>
      *
      * <p>Allowed Actions include the following:</p>
      * <ul>
@@ -55,6 +54,10 @@ public interface Share {
      *   then it cannot be removed. The two default types also cannot be
      *   removed.</li>
      * </ul>
+     *
+     * <p>As the data types are generally available, it is only allowed for
+     * Circle Administrators or the System Administrator to create new, update
+     * or delete existing.</p>
      *
      * @param request Request Object
      * @return Response Object with ReturnCode and Message

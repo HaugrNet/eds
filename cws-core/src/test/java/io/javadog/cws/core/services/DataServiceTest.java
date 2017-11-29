@@ -16,9 +16,13 @@ import io.javadog.cws.api.common.Action;
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.requests.FetchDataRequest;
+import io.javadog.cws.api.requests.ProcessCircleRequest;
 import io.javadog.cws.api.requests.ProcessDataRequest;
+import io.javadog.cws.api.requests.ProcessMemberRequest;
 import io.javadog.cws.api.responses.FetchDataResponse;
+import io.javadog.cws.api.responses.ProcessCircleResponse;
 import io.javadog.cws.api.responses.ProcessDataResponse;
+import io.javadog.cws.api.responses.ProcessMemberResponse;
 import io.javadog.cws.common.exceptions.CWSException;
 import io.javadog.cws.common.exceptions.VerificationException;
 import io.javadog.cws.model.DatabaseSetup;
@@ -126,6 +130,25 @@ public final class DataServiceTest extends DatabaseSetup {
         final FetchDataRequest readRequest = prepareReadRequest(MEMBER_1, CIRCLE_1_ID, response.getDataId());
         final FetchDataResponse readResponse = readService.perform(readRequest);
         assertThat(readResponse.isOk(), is(true));
+    }
+
+    @Test
+    public void testCreateCircleAsNewMember() {
+        final String accountName = "accountName";
+        final ProcessMemberRequest memberRequest = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
+        memberRequest.setNewAccountName(accountName);
+        memberRequest.setNewCredential(accountName);
+        memberRequest.setAction(Action.CREATE);
+        final ProcessMemberService memberService = new ProcessMemberService(settings, entityManager);
+        final ProcessMemberResponse memberResponse = memberService.perform(memberRequest);
+        assertThat(memberResponse.isOk(), is(true));
+
+        final ProcessCircleRequest circleRequest = prepareRequest(ProcessCircleRequest.class, accountName);
+        circleRequest.setCircleName("circleName");
+        circleRequest.setAction(Action.CREATE);
+        final ProcessCircleService circleService = new ProcessCircleService(settings, entityManager);
+        final ProcessCircleResponse circleResponse = circleService.perform(circleRequest);
+        assertThat(circleResponse.isOk(), is(true));
     }
 
     @Test

@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -130,9 +131,10 @@ public final class CommonJpaDao implements CommonDao {
      * {@inheritDoc}
      */
     @Override
-    public List<TrusteeEntity> findTrustByMember(final MemberEntity member) {
+    public List<TrusteeEntity> findTrustByMember(final MemberEntity member, final Set<TrustLevel> permissions) {
         final Query query = entityManager.createNamedQuery("trust.findByMemberId");
         query.setParameter("id", member.getId());
+        query.setParameter("permissions", permissions);
 
         return findList(query);
     }
@@ -141,10 +143,11 @@ public final class CommonJpaDao implements CommonDao {
      * {@inheritDoc}
      */
     @Override
-    public List<TrusteeEntity> findTrustByMemberAndCircle(final MemberEntity member, final String externalCircleId) {
+    public List<TrusteeEntity> findTrustByMemberAndCircle(final MemberEntity member, final String externalCircleId, final Set<TrustLevel> permissions) {
         final Query query = entityManager.createNamedQuery("trust.findByMemberIdAndExternalCircleId");
         query.setParameter("id", member.getId());
         query.setParameter("externalCircleId", externalCircleId);
+        query.setParameter("permissions", permissions);
 
         return findList(query);
     }

@@ -16,12 +16,10 @@ import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.requests.FetchCircleRequest;
 import io.javadog.cws.api.requests.SettingRequest;
-import io.javadog.cws.api.requests.SignRequest;
 import io.javadog.cws.common.exceptions.AuthenticationException;
 import io.javadog.cws.common.exceptions.AuthorizationException;
 import io.javadog.cws.core.services.FetchCircleService;
 import io.javadog.cws.core.services.SettingService;
-import io.javadog.cws.core.services.SignService;
 import io.javadog.cws.model.DatabaseSetup;
 import org.junit.Test;
 
@@ -50,18 +48,6 @@ public final class ServiceableTest extends DatabaseSetup {
 
         final SettingService service = new SettingService(settings, entityManager);
         final SettingRequest request = prepareRequest(SettingRequest.class, MEMBER_1);
-        assertThat(request.validate().isEmpty(), is(true));
-
-        service.perform(request);
-    }
-
-    @Test
-    public void testCreateSignatureWithoutPermission() {
-        prepareCause(AuthorizationException.class, ReturnCode.AUTHORIZATION_WARNING, "he requesting Account is not permitted to Create Digital Signature.");
-
-        final SignService service = new SignService(settings, entityManager);
-        final SignRequest request = prepareRequest(SignRequest.class, MEMBER_5);
-        request.setData(generateData(262144));
         assertThat(request.validate().isEmpty(), is(true));
 
         service.perform(request);

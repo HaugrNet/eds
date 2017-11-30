@@ -214,7 +214,8 @@ public abstract class Serviceable<R extends CwsResponse, V extends Authenticatio
         final String privateKey = crypto.armoringPrivateKey(key, pair.getPrivate().getKey());
 
         member.setSalt(salt);
-        member.setAlgorithm(algorithm);
+        member.setPbeAlgorithm(settings.getPasswordAlgorithm());
+        member.setRsaAlgorithm(algorithm);
         member.setPrivateKey(privateKey);
         member.setPublicKey(publicKey);
     }
@@ -223,7 +224,7 @@ public abstract class Serviceable<R extends CwsResponse, V extends Authenticatio
         try {
             final SecretCWSKey key = crypto.generatePasswordKey(settings.getSymmetricAlgorithm(), verifiable.getCredential(), member.getSalt());
             final Charset charset = settings.getCharset();
-            keyPair = crypto.extractAsymmetricKey(member.getAlgorithm(), key, member.getSalt(), member.getPublicKey(), member.getPrivateKey());
+            keyPair = crypto.extractAsymmetricKey(member.getRsaAlgorithm(), key, member.getSalt(), member.getPublicKey(), member.getPrivateKey());
 
             // To ensure that the PBE key is no longer usable, we're destroying
             // it now.

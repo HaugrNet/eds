@@ -117,7 +117,8 @@ public class DatabaseSetup {
         entity.setExternalId(externalId);
         entity.setName(accountName);
         entity.setSalt(salt);
-        entity.setAlgorithm(settings.getAsymmetricAlgorithm());
+        entity.setPbeAlgorithm(settings.getPasswordAlgorithm());
+        entity.setRsaAlgorithm(settings.getAsymmetricAlgorithm());
         entity.setPublicKey(crypto.armoringPublicKey(keyPair.getPublic().getKey()));
         entity.setPrivateKey(crypto.armoringPrivateKey(secretKey, keyPair.getPrivate().getKey()));
         entity.setAltered(new Date());
@@ -182,7 +183,8 @@ public class DatabaseSetup {
     protected MemberEntity prepareMember(final String externalId, final String credential, final KeyAlgorithm algorithm, final String publicKey, final String privateKey) {
         final MemberEntity entity = new MemberEntity();
         entity.setName(credential);
-        entity.setAlgorithm(algorithm);
+        entity.setPbeAlgorithm(settings.getPasswordAlgorithm());
+        entity.setRsaAlgorithm(algorithm);
         entity.setSalt(externalId);
         entity.setPublicKey(publicKey);
         entity.setPrivateKey(privateKey);
@@ -246,7 +248,7 @@ public class DatabaseSetup {
         append(builder, "-- Default Administrator User, it is set at the first request to the System, and");
         append(builder, "-- is thus needed for loads of tests. Remaining Accounts is for \"member1\" to");
         append(builder, "-- \"member5\", which is all used as part of the tests.");
-        append(builder, "INSERT INTO cws_members (external_id, name, salt, algorithm, public_key, private_key) VALUES");
+        append(builder, "INSERT INTO cws_members (external_id, name, salt, pbe_algorithm, rsa_algorithm, public_key, private_key) VALUES");
 
         final CWSKeyPair keyPair = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
         createAndAppendMember(builder, ADMIN_ID, Constants.ADMIN_ACCOUNT, keyPair, ',');
@@ -312,7 +314,7 @@ public class DatabaseSetup {
         final MemberEntity entity = prepareMember(externalId, name, name, keyPair);
         dao.persist(entity);
 
-        append(builder, "    ('" + entity.getExternalId() + "', '" + name + "', '" + entity.getSalt() + "', '" + entity.getAlgorithm() + "', '" + entity.getPublicKey() + "', '" + entity.getPrivateKey() + "')" + delimiter);
+        append(builder, "    ('" + entity.getExternalId() + "', '" + name + "', '" + entity.getSalt() + "', '" + entity.getPbeAlgorithm() + "', '" + entity.getRsaAlgorithm() + "', '" + entity.getPublicKey() + "', '" + entity.getPrivateKey() + "')" + delimiter);
 
         return entity;
     }

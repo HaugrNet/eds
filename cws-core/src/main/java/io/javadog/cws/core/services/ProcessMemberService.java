@@ -106,7 +106,8 @@ public final class ProcessMemberService extends Serviceable<ProcessMemberRespons
                 final MemberEntity entity = new MemberEntity();
                 entity.setName(memberName);
                 entity.setSalt(uuid);
-                entity.setAlgorithm(settings.getSignatureAlgorithm());
+                entity.setPbeAlgorithm(settings.getPasswordAlgorithm());
+                entity.setRsaAlgorithm(settings.getSignatureAlgorithm());
                 entity.setPrivateKey(CredentialType.SIGNATURE.name());
                 entity.setPublicKey(signature);
                 dao.persist(entity);
@@ -183,7 +184,8 @@ public final class ProcessMemberService extends Serviceable<ProcessMemberRespons
                     key.setSalt(salt);
 
                     account.setSalt(salt);
-                    account.setAlgorithm(pair.getAlgorithm());
+                    account.setPbeAlgorithm(settings.getPasswordAlgorithm());
+                    account.setRsaAlgorithm(pair.getAlgorithm());
                     account.setPublicKey(crypto.armoringPublicKey(pair.getPublic().getKey()));
                     account.setPrivateKey(crypto.armoringPrivateKey(key, pair.getPrivate().getKey()));
                     dao.persist(account);

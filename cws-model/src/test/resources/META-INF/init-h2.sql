@@ -112,7 +112,8 @@ CREATE TABLE cws_members (
   external_id      VARCHAR(36),
   name             VARCHAR(75), -- Member Authentication information
   salt             VARCHAR(36),
-  algorithm        VARCHAR(19) DEFAULT 'RSA2048',
+  pbe_algorithm    VARCHAR(19) DEFAULT 'PBE128',
+  rsa_algorithm    VARCHAR(19) DEFAULT 'RSA2048',
   public_key       VARCHAR(1024), -- Public Key, stored armored
   private_key      VARCHAR(8192), -- Private Key, stored encrypted & armored
   altered          TIMESTAMP DEFAULT now(),
@@ -131,7 +132,8 @@ CREATE TABLE cws_members (
   CONSTRAINT member_notnull_external_id     CHECK (external_id IS NOT NULL),
   CONSTRAINT member_notnull_name            CHECK (name IS NOT NULL),
   CONSTRAINT member_notnull_salt            CHECK (salt IS NOT NULL),
-  CONSTRAINT member_notnull_algorithm       CHECK (algorithm IS NOT NULL),
+  CONSTRAINT member_notnull_pbe_algorithm   CHECK (pbe_algorithm IS NOT NULL),
+  CONSTRAINT member_notnull_rsa_algorithm   CHECK (rsa_algorithm IS NOT NULL),
   CONSTRAINT member_notnull_public_key      CHECK (public_key IS NOT NULL),
   CONSTRAINT member_notnull_private_key     CHECK (private_key IS NOT NULL),
   CONSTRAINT member_notnull_altered         CHECK (altered IS NOT NULL),

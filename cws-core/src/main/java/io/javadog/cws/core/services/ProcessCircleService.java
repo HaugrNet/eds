@@ -147,7 +147,7 @@ public final class ProcessCircleService extends Serviceable<ProcessCircleRespons
 
         final SecretCWSKey key = crypto.generateSymmetricKey(keyEntity.getAlgorithm());
         final PublicKey publicKey = crypto.dearmoringPublicKey(circleAdmin.getPublicKey());
-        final PublicCWSKey cwsPublicKey = new PublicCWSKey(circleAdmin.getAlgorithm(), publicKey);
+        final PublicCWSKey cwsPublicKey = new PublicCWSKey(circleAdmin.getRsaAlgorithm(), publicKey);
         final String circleKey = crypto.encryptAndArmorCircleKey(cwsPublicKey, key);
         final TrusteeEntity trustee = new TrusteeEntity();
         trustee.setMember(circleAdmin);
@@ -277,7 +277,7 @@ public final class ProcessCircleService extends Serviceable<ProcessCircleRespons
 
                     final SecretCWSKey circleKey = crypto.extractCircleKey(admin.getKey().getAlgorithm(), keyPair.getPrivate(), admin.getCircleKey());
                     final PublicKey publicKey = crypto.dearmoringPublicKey(newTrusteeMember.getPublicKey());
-                    final PublicCWSKey cwsPublicKey = new PublicCWSKey(newTrusteeMember.getAlgorithm(), publicKey);
+                    final PublicCWSKey cwsPublicKey = new PublicCWSKey(newTrusteeMember.getRsaAlgorithm(), publicKey);
                     trustee.setCircleKey(crypto.encryptAndArmorCircleKey(cwsPublicKey, circleKey));
 
                     dao.persist(trustee);

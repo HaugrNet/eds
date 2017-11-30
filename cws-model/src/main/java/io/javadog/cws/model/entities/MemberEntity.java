@@ -49,8 +49,12 @@ public class MemberEntity extends Externable {
     private String salt = null;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "algorithm", nullable = false, length = 10)
-    private KeyAlgorithm algorithm = null;
+    @Column(name = "pbe_algorithm", nullable = false, length = 10)
+    private KeyAlgorithm pbeAlgorithm = null;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "rsa_algorithm", nullable = false, length = 10)
+    private KeyAlgorithm rsaAlgorithm = null;
 
     @Column(name = "public_key", nullable = false, length = 1024)
     private String publicKey = null;
@@ -78,12 +82,20 @@ public class MemberEntity extends Externable {
         return salt;
     }
 
-    public void setAlgorithm(final KeyAlgorithm algorithm) {
-        this.algorithm = algorithm;
+    public void setPbeAlgorithm(final KeyAlgorithm pbeAlgorithm) {
+        this.pbeAlgorithm = pbeAlgorithm;
     }
 
-    public KeyAlgorithm getAlgorithm() {
-        return algorithm;
+    public KeyAlgorithm getPbeAlgorithm() {
+        return pbeAlgorithm;
+    }
+
+    public void setRsaAlgorithm(final KeyAlgorithm algorithm) {
+        this.rsaAlgorithm = algorithm;
+    }
+
+    public KeyAlgorithm getRsaAlgorithm() {
+        return rsaAlgorithm;
     }
 
     public void setPublicKey(final String armoredPublicKey) {

@@ -57,26 +57,26 @@ package io.javadog.cws.common.enums;
 public enum KeyAlgorithm {
 
     // Signature Algorithms
-    SHA256(Type.SIGNATURE, "RSA", Transformation.SIG256, 256),
-    SHA512(Type.SIGNATURE, "RSA", Transformation.SIG512, 512),
-
-    // Password Based Encryption (PBE) Algorithms
-    PBE128(Type.PASSWORD, "AES", Transformation.PBE, 128),
-    PBE192(Type.PASSWORD, "AES", Transformation.PBE, 192),
-    PBE256(Type.PASSWORD, "AES", Transformation.PBE, 256),
+    SHA256(Type.SIGNATURE, "RSA", Transformation.SIG256, 256, null),
+    SHA512(Type.SIGNATURE, "RSA", Transformation.SIG512, 512, null),
 
     // Symmetric Algorithms
-    AES128(Type.SYMMETRIC, "AES", Transformation.AES, 128),
+    AES128(Type.SYMMETRIC, "AES", Transformation.AES, 128, null),
     // Note, prior to Java 8u162 (January 2018) & Java 9, JCE the Unlimited
     // Strength was disabled by default, after this - it is enabled by default:
     //  o https://bugs.openjdk.java.net/browse/JDK-8170157
-    AES192(Type.SYMMETRIC, "AES", Transformation.AES, 192),
-    AES256(Type.SYMMETRIC, "AES", Transformation.AES, 256),
+    AES192(Type.SYMMETRIC, "AES", Transformation.AES, 192, null),
+    AES256(Type.SYMMETRIC, "AES", Transformation.AES, 256, null),
+
+    // Password Based Encryption (PBE) Algorithms
+    PBE128(Type.PASSWORD, "AES", Transformation.PBE, 128, AES128),
+    PBE192(Type.PASSWORD, "AES", Transformation.PBE, 192, AES192),
+    PBE256(Type.PASSWORD, "AES", Transformation.PBE, 256, AES256),
 
     // Asymmetric Algorithms
-    RSA2048(Type.ASYMMETRIC, "RSA", Transformation.RSA, 2048),
-    RSA4096(Type.ASYMMETRIC, "RSA", Transformation.RSA, 4096),
-    RSA8192(Type.ASYMMETRIC, "RSA", Transformation.RSA, 8192);
+    RSA2048(Type.ASYMMETRIC, "RSA", Transformation.RSA, 2048, null),
+    RSA4096(Type.ASYMMETRIC, "RSA", Transformation.RSA, 4096, null),
+    RSA8192(Type.ASYMMETRIC, "RSA", Transformation.RSA, 8192, null);
 
     public enum Type {
         SYMMETRIC,
@@ -111,12 +111,14 @@ public enum KeyAlgorithm {
     private final String algorithm;
     private final Transformation transformation;
     private final int length;
+    private final KeyAlgorithm derived;
 
-    KeyAlgorithm(final Type type, final String algorithm, final Transformation transformation, final int length) {
+    KeyAlgorithm(final Type type, final String algorithm, final Transformation transformation, final int length, final KeyAlgorithm derived) {
         this.type = type;
         this.algorithm = algorithm;
         this.transformation = transformation;
         this.length = length;
+        this.derived = derived;
     }
 
     public Type getType() {
@@ -133,5 +135,9 @@ public enum KeyAlgorithm {
 
     public int getLength() {
         return length;
+    }
+
+    public KeyAlgorithm getDerived() {
+        return derived;
     }
 }

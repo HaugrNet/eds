@@ -206,7 +206,7 @@ public abstract class Serviceable<R extends CwsResponse, V extends Authenticatio
     protected void updateMemberPassword(final MemberEntity member, final String password) {
         final KeyAlgorithm algorithm = settings.getAsymmetricAlgorithm();
         final String salt = UUID.randomUUID().toString();
-        final SecretCWSKey key = crypto.generatePasswordKey(settings.getSymmetricAlgorithm(), password, salt);
+        final SecretCWSKey key = crypto.generatePasswordKey(settings.getPasswordAlgorithm(), password, salt);
         key.setSalt(salt);
 
         final CWSKeyPair pair = crypto.generateAsymmetricKey(algorithm);
@@ -222,7 +222,7 @@ public abstract class Serviceable<R extends CwsResponse, V extends Authenticatio
 
     private void checkCredentials(final V verifiable) {
         try {
-            final SecretCWSKey key = crypto.generatePasswordKey(settings.getSymmetricAlgorithm(), verifiable.getCredential(), member.getSalt());
+            final SecretCWSKey key = crypto.generatePasswordKey(settings.getPasswordAlgorithm(), verifiable.getCredential(), member.getSalt());
             final Charset charset = settings.getCharset();
             keyPair = crypto.extractAsymmetricKey(member.getRsaAlgorithm(), key, member.getSalt(), member.getPublicKey(), member.getPrivateKey());
 
@@ -269,8 +269,7 @@ public abstract class Serviceable<R extends CwsResponse, V extends Authenticatio
         // Actions, without being part of a Circle. So these checks must be
         // made separately based on the actual Request.
         if (!Objects.equals(ADMIN_ACCOUNT, member.getName())) {
-            final Set<TrustLevel> permissions = TrustLevel.getLevels(action.getTrustLevel());
-            final List<TrusteeEntity> allTrustees = findTrustees(member, circleId, permissions);
+            final List<TrusteeEntity> allTrustees = findTrustees(member, circleId, TrustLevel.getLevels(action.getTrustLevel()));
             trustees = new ArrayList<>();
 
             for (final TrusteeEntity trust : allTrustees) {

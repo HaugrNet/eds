@@ -48,7 +48,7 @@ public final class CryptoTest {
     @Test
     public void testGeneratingPasswordKeyWithInvalidAlgorithm() {
         thrown.expect(CryptoException.class);
-        thrown.expectMessage("RSA/ECB/PKCS1Padding SecretKeyFactory not available");
+        thrown.expectMessage("AES/CBC/PKCS5Padding SecretKeyFactory not available");
 
         final Settings settings = new Settings();
         settings.set(Settings.PBE_ALGORITHM, "RSA2048");
@@ -141,7 +141,7 @@ public final class CryptoTest {
 
         final String password = "MySuperSecretPassword";
         final String salt = UUID.randomUUID().toString();
-        final SecretCWSKey cryptoKeys = crypto.generatePasswordKey(settings.getSymmetricAlgorithm(), password, salt);
+        final SecretCWSKey cryptoKeys = crypto.generatePasswordKey(settings.getPasswordAlgorithm(), password, salt);
         cryptoKeys.setSalt(UUID.randomUUID().toString());
         final CWSKeyPair keyPair = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
 
@@ -158,7 +158,7 @@ public final class CryptoTest {
 
         final String secret = "MySuperSecretPassword";
         final String salt = UUID.randomUUID().toString();
-        final SecretCWSKey secretKey = crypto.generatePasswordKey(settings.getSymmetricAlgorithm(), secret, salt);
+        final SecretCWSKey secretKey = crypto.generatePasswordKey(settings.getPasswordAlgorithm(), secret, salt);
         secretKey.setSalt(salt);
         final CWSKeyPair pair = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
 
@@ -242,7 +242,7 @@ public final class CryptoTest {
         final Crypto crypto = new Crypto(new Settings());
         final String password = "MySuperSecretPassword";
         final String salt = "SystemSpecificSalt";
-        final SecretCWSKey key = crypto.generatePasswordKey(settings.getSymmetricAlgorithm(), password, salt);
+        final SecretCWSKey key = crypto.generatePasswordKey(settings.getPasswordAlgorithm(), password, salt);
 
         // Now, we're going to encrypt some data
         key.setSalt(UUID.randomUUID().toString());

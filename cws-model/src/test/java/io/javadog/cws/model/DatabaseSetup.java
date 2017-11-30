@@ -110,7 +110,7 @@ public class DatabaseSetup {
 
     protected MemberEntity prepareMember(final String externalId, final String accountName, final String secret, final CWSKeyPair keyPair) {
         final String salt = UUID.randomUUID().toString();
-        final SecretCWSKey secretKey = crypto.generatePasswordKey(settings.getSymmetricAlgorithm(), secret, salt);
+        final SecretCWSKey secretKey = crypto.generatePasswordKey(settings.getPasswordAlgorithm(), secret, salt);
         secretKey.setSalt(salt);
 
         final MemberEntity entity = new MemberEntity();

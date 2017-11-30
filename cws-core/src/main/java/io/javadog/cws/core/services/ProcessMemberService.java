@@ -180,7 +180,7 @@ public final class ProcessMemberService extends Serviceable<ProcessMemberRespons
                     final String salt = UUID.randomUUID().toString();
                     final String newSecret = UUID.randomUUID().toString();
                     final CWSKeyPair pair = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
-                    final SecretCWSKey key = crypto.generatePasswordKey(settings.getSymmetricAlgorithm(), newSecret, salt);
+                    final SecretCWSKey key = crypto.generatePasswordKey(settings.getPasswordAlgorithm(), newSecret, salt);
                     key.setSalt(salt);
 
                     account.setSalt(salt);

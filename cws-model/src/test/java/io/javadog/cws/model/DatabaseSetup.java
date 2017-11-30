@@ -109,15 +109,16 @@ public class DatabaseSetup {
     }
 
     protected MemberEntity prepareMember(final String externalId, final String accountName, final String secret, final CWSKeyPair keyPair) {
+        final KeyAlgorithm pbeAlgorithm = settings.getPasswordAlgorithm();
         final String salt = UUID.randomUUID().toString();
-        final SecretCWSKey secretKey = crypto.generatePasswordKey(settings.getPasswordAlgorithm(), secret, salt);
+        final SecretCWSKey secretKey = crypto.generatePasswordKey(pbeAlgorithm, secret, salt);
         secretKey.setSalt(salt);
 
         final MemberEntity entity = new MemberEntity();
         entity.setExternalId(externalId);
         entity.setName(accountName);
         entity.setSalt(salt);
-        entity.setPbeAlgorithm(settings.getPasswordAlgorithm());
+        entity.setPbeAlgorithm(pbeAlgorithm);
         entity.setRsaAlgorithm(settings.getAsymmetricAlgorithm());
         entity.setPublicKey(crypto.armoringPublicKey(keyPair.getPublic().getKey()));
         entity.setPrivateKey(crypto.armoringPrivateKey(secretKey, keyPair.getPrivate().getKey()));

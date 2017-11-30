@@ -13,6 +13,7 @@ import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.requests.ProcessMemberRequest;
 import io.javadog.cws.api.responses.ProcessMemberResponse;
 import io.javadog.cws.common.Settings;
+import io.javadog.cws.common.enums.KeyAlgorithm;
 import io.javadog.cws.common.exceptions.CWSException;
 import io.javadog.cws.common.exceptions.VerificationException;
 import io.javadog.cws.common.keys.CWSKeyPair;
@@ -177,14 +178,15 @@ public final class ProcessMemberService extends Serviceable<ProcessMemberRespons
                 final PublicKey publicKey = crypto.dearmoringPublicKey(admin.getPublicKey());
 
                 if (crypto.verify(publicKey, crypto.stringToBytes(secret), request.getCredential())) {
+                    final KeyAlgorithm pbeAlgorithm = settings.getPasswordAlgorithm();
                     final String salt = UUID.randomUUID().toString();
                     final String newSecret = UUID.randomUUID().toString();
                     final CWSKeyPair pair = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
-                    final SecretCWSKey key = crypto.generatePasswordKey(settings.getPasswordAlgorithm(), newSecret, salt);
+                    final SecretCWSKey key = crypto.generatePasswordKey(pbeAlgorithm, newSecret, salt);
                     key.setSalt(salt);
 
                     account.setSalt(salt);
-                    account.setPbeAlgorithm(settings.getPasswordAlgorithm());
+                    account.setPbeAlgorithm(pbeAlgorithm);
                     account.setRsaAlgorithm(pair.getAlgorithm());
                     account.setPublicKey(crypto.armoringPublicKey(pair.getPublic().getKey()));
                     account.setPrivateKey(crypto.armoringPrivateKey(key, pair.getPrivate().getKey()));

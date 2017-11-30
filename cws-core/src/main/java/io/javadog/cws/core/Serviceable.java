@@ -204,25 +204,26 @@ public abstract class Serviceable<R extends CwsResponse, V extends Authenticatio
     }
 
     protected void updateMemberPassword(final MemberEntity member, final String password) {
-        final KeyAlgorithm algorithm = settings.getAsymmetricAlgorithm();
+        final KeyAlgorithm pbeAlgorithm = settings.getPasswordAlgorithm();
+        final KeyAlgorithm rsaAlgorithm = settings.getAsymmetricAlgorithm();
         final String salt = UUID.randomUUID().toString();
-        final SecretCWSKey key = crypto.generatePasswordKey(settings.getPasswordAlgorithm(), password, salt);
+        final SecretCWSKey key = crypto.generatePasswordKey(pbeAlgorithm, password, salt);
         key.setSalt(salt);
 
-        final CWSKeyPair pair = crypto.generateAsymmetricKey(algorithm);
+        final CWSKeyPair pair = crypto.generateAsymmetricKey(rsaAlgorithm);
         final String publicKey = crypto.armoringPublicKey(pair.getPublic().getKey());
         final String privateKey = crypto.armoringPrivateKey(key, pair.getPrivate().getKey());
 
         member.setSalt(salt);
-        member.setPbeAlgorithm(settings.getPasswordAlgorithm());
-        member.setRsaAlgorithm(algorithm);
+        member.setPbeAlgorithm(pbeAlgorithm);
+        member.setRsaAlgorithm(rsaAlgorithm);
         member.setPrivateKey(privateKey);
         member.setPublicKey(publicKey);
     }
 
     private void checkCredentials(final V verifiable) {
         try {
-            final SecretCWSKey key = crypto.generatePasswordKey(settings.getPasswordAlgorithm(), verifiable.getCredential(), member.getSalt());
+            final SecretCWSKey key = crypto.generatePasswordKey(member.getPbeAlgorithm(), verifiable.getCredential(), member.getSalt());
             final Charset charset = settings.getCharset();
             keyPair = crypto.extractAsymmetricKey(member.getRsaAlgorithm(), key, member.getSalt(), member.getPublicKey(), member.getPrivateKey());
 

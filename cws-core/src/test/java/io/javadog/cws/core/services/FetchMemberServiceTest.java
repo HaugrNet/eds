@@ -14,6 +14,7 @@ import static org.junit.Assert.assertThat;
 
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
+import io.javadog.cws.api.dtos.Member;
 import io.javadog.cws.api.requests.FetchMemberRequest;
 import io.javadog.cws.api.responses.FetchMemberResponse;
 import io.javadog.cws.common.Settings;
@@ -164,6 +165,17 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
         assertThat(response.getReturnMessage(), is("Ok"));
         assertThat(response.getMembers().size(), is(5));
         assertThat(response.getCircles().isEmpty(), is(true));
+
+        // Check that the member information is present
+        final Member member1 = response.getMembers().get(0);
+        assertThat(member1.getAccountName(), is(MEMBER_1));
+        assertThat(member1.getMemberId(), is(MEMBER_1_ID));
+        assertThat(member1.getAdded(), is(not(nullValue())));
+
+        final Member member5 = response.getMembers().get(4);
+        assertThat(member5.getAccountName(), is(MEMBER_5));
+        assertThat(member5.getMemberId(), is(MEMBER_5_ID));
+        assertThat(member5.getAdded(), is(not(nullValue())));
     }
 
     /**

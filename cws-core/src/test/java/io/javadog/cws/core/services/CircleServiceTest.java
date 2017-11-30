@@ -16,6 +16,7 @@ import io.javadog.cws.api.common.Action;
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.common.TrustLevel;
+import io.javadog.cws.api.dtos.Trustee;
 import io.javadog.cws.api.requests.FetchCircleRequest;
 import io.javadog.cws.api.requests.FetchDataRequest;
 import io.javadog.cws.api.requests.ProcessCircleRequest;
@@ -232,9 +233,25 @@ public final class CircleServiceTest extends DatabaseSetup {
         assertThat(response.getCircles().size(), is(1));
         assertThat(response.getCircles().get(0).getCircleName(), is(CIRCLE_1));
         assertThat(response.getTrustees().size(), is(3));
-        assertThat(response.getTrustees().get(0).getMemberId(), is(MEMBER_1_ID));
-        assertThat(response.getTrustees().get(1).getMemberId(), is(MEMBER_2_ID));
-        assertThat(response.getTrustees().get(2).getMemberId(), is(MEMBER_3_ID));
+
+        // Check the member records
+        final Trustee trustee1 = response.getTrustees().get(0);
+        assertThat(trustee1.getCircleId(), is(CIRCLE_1_ID));
+        assertThat(trustee1.getMemberId(), is(MEMBER_1_ID));
+        assertThat(trustee1.getTrustLevel(), is(TrustLevel.ADMIN));
+        assertThat(trustee1.getChanged().before(trustee1.getAdded()), is(false));
+
+        final Trustee trustee2 = response.getTrustees().get(1);
+        assertThat(trustee2.getCircleId(), is(CIRCLE_1_ID));
+        assertThat(trustee2.getMemberId(), is(MEMBER_2_ID));
+        assertThat(trustee2.getTrustLevel(), is(TrustLevel.WRITE));
+        assertThat(trustee2.getChanged().before(trustee2.getAdded()), is(false));
+
+        final Trustee trustee3 = response.getTrustees().get(2);
+        assertThat(trustee3.getCircleId(), is(CIRCLE_1_ID));
+        assertThat(trustee3.getMemberId(), is(MEMBER_3_ID));
+        assertThat(trustee3.getTrustLevel(), is(TrustLevel.READ));
+        assertThat(trustee3.getChanged().before(trustee3.getAdded()), is(false));
     }
 
     @Test

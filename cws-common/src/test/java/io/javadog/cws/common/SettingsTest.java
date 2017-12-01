@@ -14,8 +14,10 @@ import io.javadog.cws.common.enums.HashAlgorithm;
 import io.javadog.cws.common.enums.KeyAlgorithm;
 import org.junit.Test;
 
+import java.util.EnumSet;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Kim Jensen
@@ -39,10 +41,15 @@ public final class SettingsTest {
     public void testReadingDefaultSettings() {
         final Settings settings = new Settings();
 
-        assertThat(settings.getSymmetricAlgorithm(), is(KeyAlgorithm.AES128));
-        assertThat(settings.getAsymmetricAlgorithm(), is(KeyAlgorithm.RSA2048));
-        assertThat(settings.getSignatureAlgorithm(), is(KeyAlgorithm.SHA512));
-        assertThat(settings.getPasswordAlgorithm(), is(KeyAlgorithm.PBE128));
+        final Set<KeyAlgorithm> aes = prepareSetOf(KeyAlgorithm.Type.SYMMETRIC);
+        final Set<KeyAlgorithm> rsa = prepareSetOf(KeyAlgorithm.Type.ASYMMETRIC);
+        final Set<KeyAlgorithm> sha = prepareSetOf(KeyAlgorithm.Type.SIGNATURE);
+        final Set<KeyAlgorithm> pbe = prepareSetOf(KeyAlgorithm.Type.PASSWORD);
+
+        assertThat(aes.contains(settings.getSymmetricAlgorithm()), is(true));
+        assertThat(rsa.contains(settings.getAsymmetricAlgorithm()), is(true));
+        assertThat(sha.contains(settings.getSignatureAlgorithm()), is(true));
+        assertThat(pbe.contains(settings.getPasswordAlgorithm()), is(true));
         assertThat(settings.getSalt(), is("Default salt, also used as kill switch. Must be set in DB."));
         assertThat(settings.getCharset().name(), is("UTF-8"));
     }
@@ -57,6 +64,9 @@ public final class SettingsTest {
         settings.set(Settings.ASYMMETRIC_ALGORITHM, KeyAlgorithm.RSA4096.name());
         assertThat(settings.getAsymmetricAlgorithm(), is(KeyAlgorithm.RSA4096));
 
+        settings.set(Settings.ASYMMETRIC_ALGORITHM, KeyAlgorithm.RSA8192.name());
+        assertThat(settings.getAsymmetricAlgorithm(), is(KeyAlgorithm.RSA8192));
+
         settings.set(Settings.SIGNATURE_ALGORITHM, KeyAlgorithm.SHA256.name());
         assertThat(settings.getSignatureAlgorithm(), is(KeyAlgorithm.SHA256));
 
@@ -65,6 +75,9 @@ public final class SettingsTest {
 
         settings.set(Settings.PBE_ALGORITHM, KeyAlgorithm.PBE192.name());
         assertThat(settings.getPasswordAlgorithm(), is(KeyAlgorithm.PBE192));
+
+        settings.set(Settings.PBE_ALGORITHM, KeyAlgorithm.PBE256.name());
+        assertThat(settings.getPasswordAlgorithm(), is(KeyAlgorithm.PBE256));
 
         settings.set(Settings.CWS_SALT, "UUID value");
         assertThat(settings.getSalt(), is("UUID value"));
@@ -106,5 +119,21 @@ public final class SettingsTest {
         assertThat(settings.getShareTrustees(), is(false));
         settings.set(Settings.SHOW_TRUSTEES, " what ");
         assertThat(settings.getShareTrustees(), is(false));
+    }
+
+    // =========================================================================
+    // Internal methods
+    // =========================================================================
+
+    private static Set<KeyAlgorithm> prepareSetOf(final KeyAlgorithm.Type type) {
+        final Set<KeyAlgorithm> set = EnumSet.noneOf(KeyAlgorithm.class);
+
+        for (final KeyAlgorithm algorithm : KeyAlgorithm.values()) {
+            if (algorithm.getType() == type) {
+                set.add(algorithm);
+            }
+        }
+
+        return set;
     }
 }

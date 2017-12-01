@@ -69,8 +69,9 @@ import java.util.Base64;
  */
 public final class Crypto {
 
-    // Silly constant to please SonarQube
-    private static final int BYTE_SIZE = 8;
+    // For AES, the blocksize is always 128 bit and thus the IV must also be of
+    // the same size. See: https://en.wikipedia.org/wiki/Initialization_vector
+    private static final int IV_SIZE = 16;
 
     private final Settings settings;
 
@@ -227,7 +228,7 @@ public final class Crypto {
             final KeyAlgorithm algorithm = key.getAlgorithm();
             instanceName = algorithm.getTransformation();
             final String salt = ((SecretCWSKey) key).getSalt();
-            final byte[] bytes = new byte[algorithm.getLength() / BYTE_SIZE];
+            final byte[] bytes = new byte[IV_SIZE];
             System.arraycopy(salt.getBytes(settings.getCharset()), 0, bytes, 0, bytes.length);
 
             iv = new IvParameterSpec(bytes);

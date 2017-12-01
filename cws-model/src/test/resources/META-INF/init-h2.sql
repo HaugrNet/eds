@@ -114,7 +114,7 @@ CREATE TABLE cws_members (
   salt             VARCHAR(36),
   pbe_algorithm    VARCHAR(19) DEFAULT 'PBE128',
   rsa_algorithm    VARCHAR(19) DEFAULT 'RSA2048',
-  public_key       VARCHAR(1024), -- Public Key, stored armored
+  public_key       VARCHAR(1536), -- Public Key, stored armored
   private_key      VARCHAR(8192), -- Private Key, stored encrypted & armored
   altered          TIMESTAMP DEFAULT now(),
   added            TIMESTAMP DEFAULT now(),

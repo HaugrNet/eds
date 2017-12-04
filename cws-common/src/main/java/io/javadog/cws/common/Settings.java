@@ -156,14 +156,14 @@ public final class Settings {
     }
 
     public Integer getSanityInterval() {
-        return Integer.parseInt(properties.getProperty(SANITY_INTERVAL));
+        return Integer.valueOf(properties.getProperty(SANITY_INTERVAL));
     }
 
     // =========================================================================
     // Internal methods
     // =========================================================================
 
-    private static boolean toBoolean(final String value) {
-        return Boolean.parseBoolean(value.trim());
+    private static Boolean toBoolean(final String value) {
+        return Boolean.valueOf(value.trim());
     }
 }

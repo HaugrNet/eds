@@ -87,6 +87,7 @@ public final class Constants {
     public static final String FIELD_CHECKSUM = "checksum";
     public static final String FIELD_SIGNATURE = "signature";
     public static final String FIELD_SIGNATURES = "signatures";
+    public static final String FIELD_SANITIES = "sanities";
     public static final String FIELD_SETTINGS = "settings";
     public static final String FIELD_EXPIRES = "expires";
     public static final String FIELD_VERIFICATIONS = "verifications";

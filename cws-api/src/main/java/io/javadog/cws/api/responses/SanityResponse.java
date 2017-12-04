@@ -9,25 +9,29 @@ package io.javadog.cws.api.responses;
 
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
+import io.javadog.cws.api.dtos.Sanity;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
-import java.util.Date;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * @author Kim Jensen
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "sanityResult", propOrder = Constants.FIELD_SETTINGS)
+@XmlType(name = "sanityResult", propOrder = Constants.FIELD_SANITIES )
 public final class SanityResponse extends CwsResponse {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
-    private ConcurrentHashMap<String, Date> failures = new ConcurrentHashMap();
+    @XmlElement(name = Constants.FIELD_SANITIES, required = true)
+    private final List<Sanity> sanities = new ArrayList<>(0);
 
     // =========================================================================
     // Object Constructors
@@ -56,11 +60,11 @@ public final class SanityResponse extends CwsResponse {
     // Standard Setters & Getters
     // =========================================================================
 
-    public void setFailures(final ConcurrentHashMap<String, Date> failures) {
-        this.failures = failures;
+    public void setSanities(final List<Sanity> sanities) {
+        this.sanities.addAll(sanities);
     }
 
-    public ConcurrentHashMap<String, Date> getFailures() {
-        return failures;
+    public List<Sanity> getSanities() {
+        return Collections.unmodifiableList(sanities);
     }
 }

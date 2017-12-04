@@ -51,6 +51,11 @@ package io.javadog.cws.common.enums;
  * encryption, or PBE, is used, to convert member provided passphrase's into a
  * SecretKey, which can be used to unlock the Account.</p>
  *
+ * <p>The listing below also refer to a derived algorithm. This is used for the
+ * Password Based Encryption algorithms, as they need one algorithm to create
+ * the Key, but once created, they have to be used with a different algorithm.
+ * Otherwise there will be problems with them.</p>
+ *
  * @author Kim Jensen
  * @since  CWS 1.0
  */

@@ -9,8 +9,12 @@ package io.javadog.cws.model.entities;
 
 import static io.javadog.cws.api.common.Constants.MAX_STRING_LENGTH;
 
+import io.javadog.cws.common.enums.SanityStatus;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -58,6 +62,10 @@ public class DataEntity extends CWSEntity {
     @Column(name = "checksum", nullable = false, length = MAX_STRING_LENGTH)
     private String checksum = null;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "sanity_status", nullable = false, length = MAX_STRING_LENGTH)
+    private SanityStatus sanityStatus = null;
+
     // =========================================================================
     // Entity Setters & Getters
     // =========================================================================
@@ -100,5 +108,13 @@ public class DataEntity extends CWSEntity {
 
     public String getChecksum() {
         return checksum;
+    }
+
+    public void setSanityStatus(final SanityStatus sanityStatus) {
+        this.sanityStatus = sanityStatus;
+    }
+
+    public SanityStatus getSanityStatus() {
+        return sanityStatus;
     }
 }

@@ -153,8 +153,6 @@ public final class DataServiceTest extends DatabaseSetup {
 
     @Test
     public void testAddDataWithInvalidChecksum() {
-        prepareCause(CWSException.class, ReturnCode.INTEGRITY_ERROR, "The Encrypted Data Checksum is invalid, the data appears to have been corrupted.");
-
         final ProcessDataService service = new ProcessDataService(settings, entityManager);
         final ProcessDataRequest request = prepareAddRequest(MEMBER_1, CIRCLE_1_ID, "The Data", 524288);
 
@@ -174,7 +172,9 @@ public final class DataServiceTest extends DatabaseSetup {
         // Now to the actual test - reading the data with invalid checksum
         final FetchDataService readService = new FetchDataService(settings, entityManager);
         final FetchDataRequest readRequest = prepareReadRequest(MEMBER_1, CIRCLE_1_ID, response.getDataId());
-        readService.perform(readRequest);
+        final FetchDataResponse readResponse = readService.perform(readRequest);
+        assertThat(readResponse.getReturnCode(), is(ReturnCode.INTEGRITY_ERROR));
+        assertThat(readResponse.getReturnMessage(), is("The Encrypted Data Checksum is invalid, the data appears to have been corrupted."));
     }
 
     @Test

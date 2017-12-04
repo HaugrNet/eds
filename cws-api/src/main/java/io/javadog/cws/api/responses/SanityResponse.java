@@ -13,6 +13,8 @@ import io.javadog.cws.api.common.ReturnCode;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlType;
+import java.util.Date;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author Kim Jensen
@@ -24,6 +26,8 @@ public final class SanityResponse extends CwsResponse {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
+
+    private ConcurrentHashMap<String, Date> failures = new ConcurrentHashMap();
 
     // =========================================================================
     // Object Constructors
@@ -52,4 +56,11 @@ public final class SanityResponse extends CwsResponse {
     // Standard Setters & Getters
     // =========================================================================
 
+    public void setFailures(final ConcurrentHashMap<String, Date> failures) {
+        this.failures = failures;
+    }
+
+    public ConcurrentHashMap<String, Date> getFailures() {
+        return failures;
+    }
 }

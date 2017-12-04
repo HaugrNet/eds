@@ -397,6 +397,7 @@ CREATE TABLE cws_data (
   encrypted_data   BYTEA,
   initial_vector   VARCHAR(256), -- Storing it armored
   checksum         VARCHAR(256),
+  sanity_status    VARCHAR(256) DEFAULT 'Ok',
   altered          TIMESTAMP DEFAULT now(),
   added            TIMESTAMP DEFAULT now(),
 
@@ -412,6 +413,7 @@ CREATE TABLE cws_data (
   CONSTRAINT data_notnull_data              CHECK (encrypted_data IS NOT NULL),
   CONSTRAINT data_notnull_initial_vector    CHECK (initial_vector IS NOT NULL),
   CONSTRAINT data_notnull_checksum          CHECK (checksum IS NOT NULL),
+  CONSTRAINT data_notnull_sanity_status     CHECK (sanity_status IS NOT NULL),
   CONSTRAINT data_notnull_altered           CHECK (altered IS NOT NULL),
   CONSTRAINT data_notnull_added             CHECK (added IS NOT NULL)
 );

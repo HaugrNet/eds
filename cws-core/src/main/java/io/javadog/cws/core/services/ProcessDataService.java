@@ -13,6 +13,7 @@ import io.javadog.cws.api.requests.ProcessDataRequest;
 import io.javadog.cws.api.responses.ProcessDataResponse;
 import io.javadog.cws.common.Settings;
 import io.javadog.cws.common.enums.KeyAlgorithm;
+import io.javadog.cws.common.enums.SanityStatus;
 import io.javadog.cws.common.exceptions.CWSException;
 import io.javadog.cws.common.keys.SecretCWSKey;
 import io.javadog.cws.core.Permission;
@@ -29,7 +30,7 @@ import java.util.UUID;
 
 /**
  * @author Kim Jensen
- * @since CWS 1.0
+ * @since  CWS 1.0
  */
 public final class ProcessDataService extends Serviceable<ProcessDataResponse, ProcessDataRequest> {
 
@@ -90,10 +91,11 @@ public final class ProcessDataService extends Serviceable<ProcessDataResponse, P
 
                 final DataEntity dataEntity = new DataEntity();
                 dataEntity.setMetadata(metadataEntity);
+                dataEntity.setKey(keyEntity);
                 dataEntity.setData(crypto.encrypt(circleKey, bytes));
                 dataEntity.setInitialVector(salt);
                 dataEntity.setChecksum(crypto.generateChecksum(dataEntity.getData()));
-                dataEntity.setKey(keyEntity);
+                dataEntity.setSanityStatus(SanityStatus.OK);
 
                 dao.persist(dataEntity);
                 response = new ProcessDataResponse();
@@ -299,9 +301,10 @@ public final class ProcessDataService extends Serviceable<ProcessDataResponse, P
             final byte[] encrypted = crypto.encrypt(circleKey, bytes);
             final String checksum = crypto.generateChecksum(encrypted);
 
-            entity.setInitialVector(salt);
             entity.setData(encrypted);
+            entity.setInitialVector(salt);
             entity.setChecksum(checksum);
+            entity.setSanityStatus(SanityStatus.OK);
             dao.persist(entity);
         }
     }

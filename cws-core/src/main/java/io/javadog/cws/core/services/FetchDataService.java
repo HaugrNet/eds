@@ -13,7 +13,7 @@ import io.javadog.cws.api.dtos.Metadata;
 import io.javadog.cws.api.requests.FetchDataRequest;
 import io.javadog.cws.api.responses.FetchDataResponse;
 import io.javadog.cws.common.Settings;
-import io.javadog.cws.common.exceptions.CWSException;
+import io.javadog.cws.common.enums.SanityStatus;
 import io.javadog.cws.common.keys.SecretCWSKey;
 import io.javadog.cws.core.Permission;
 import io.javadog.cws.core.Serviceable;
@@ -94,11 +94,8 @@ public final class FetchDataService extends Serviceable<FetchDataResponse, Fetch
         // is found, then there can be multiple reasons.
         final DataEntity entity = dao.findDataByMemberAndExternalId(member, metadata.getExternalId());
         final FetchDataResponse response = new FetchDataResponse();
-        final List<Metadata> objects = new ArrayList<>(1);
         final MetadataEntity parent = dao.find(MetadataEntity.class, metadata.getParentId());
         final Metadata metaData = convert(metadata, parent.getExternalId());
-        objects.add(metaData);
-        response.setMetadata(objects);
 
         if (entity != null) {
             final String checksum = crypto.generateChecksum(entity.getData());
@@ -106,9 +103,19 @@ public final class FetchDataService extends Serviceable<FetchDataResponse, Fetch
                 final SecretCWSKey key = extractCircleKey(entity);
                 key.setSalt(entity.getInitialVector());
                 final byte[] bytes = crypto.decrypt(key, entity.getData());
+                final List<Metadata> metadataList = new ArrayList<>(1);
+                metadataList.add(metaData);
+
+                response.setMetadata(metadataList);
                 response.setData(bytes);
             } else {
-                throw new CWSException(ReturnCode.INTEGRITY_ERROR, "The Encrypted Data Checksum is invalid, the data appears to have been corrupted.");
+                // Let's update the DB with the information that the data is
+                // invalid, and return the error.
+                entity.setSanityStatus(SanityStatus.FAILED);
+                dao.persist(entity);
+
+                response.setReturnCode(ReturnCode.INTEGRITY_ERROR);
+                response.setReturnMessage("The Encrypted Data Checksum is invalid, the data appears to have been corrupted.");
             }
         }
 

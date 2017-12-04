@@ -66,6 +66,23 @@ public interface System {
     SettingResponse settings(SettingRequest request);
 
     /**
+     * <p>Data stored encrypted is nothing but a long array of bytes. If, over
+     * time, an error occurs the da storage so a few bits have been flipped,
+     * then it is not possible to decrypt the data to the original.</p>
+     *
+     * <p>The stored data is having a checksum, which is written when the data
+     * is stored and checked when the data is read out. The checksum is made
+     * from the encrypted data.</p>
+     *
+     * <p>The build-in sanity checks will run over all persisted data either at
+     * predefined intervals or during startup. If a record is no longer valid,
+     * i.e. the checksum becomes invalid, then the record is marked as failed,
+     * and thus unusable. It should be possible for administrators to recover
+     * these from backups, but it requires that it is known when the failure
+     * occurred - which this request can help with ascertaining.</p>
+     *
+     * <p>The response Object contain a Map of ObjectIds which has failed, with
+     * the value being the timestamp of the first check where it failed.</p>
      *
      * @param request Request Object
      * @return Response Object with ReturnCode and Message

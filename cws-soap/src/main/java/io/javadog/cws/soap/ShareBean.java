@@ -120,7 +120,7 @@ public class ShareBean {
         return response;
     }
 
-    @Transactional(Transactional.TxType.SUPPORTS)
+    @Transactional(Transactional.TxType.REQUIRED)
     public FetchDataResponse fetchData(final FetchDataRequest request) {
         Serviceable<FetchDataResponse, FetchDataRequest> service = null;
         FetchDataResponse response;

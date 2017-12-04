@@ -109,6 +109,27 @@ INSERT INTO cws_settings (name, setting, modifiable) VALUES ('cws.expose.admin',
 -- information.
 INSERT INTO cws_settings (name, setting, modifiable) VALUES ('cws.show.trustees', 'true', true);
 
+-- Overtime, it can happen that the data is deteriorating. Meaning that some of
+-- the bits can change and thus result in data which cannot be recovered as the
+-- decryption will give a completely false Object back. When data is stored, it
+-- is having a checksum of the encrypted bytes, which is also read out when the
+-- data is requested. If the checksum fails, then it is not possible to recover
+-- the original data anymore.
+--   However, as most systems also use backups, it is possible to recover the
+-- encrypted data from a backup, but the question is how far back the backup
+-- has to go. To ensure that a backup is correct and that there is no problems
+-- in the database, the sanity checks can be enabled at startup, meaning that
+-- when CWS is started up, all encrypted data is checked and verified. If a
+-- check fails - then the field is marked with a failed Sanity check, and the
+-- date of the check.
+INSERT INTO cws_settings (name, setting, modifiable) VALUES ('cws.sanity.check.startup', 'true', true);
+
+-- Please see the comment for the 'cws.sanity.check.startup', for the motivation
+-- and reason for the sanity check. This setting sets the interval, at which the
+-- sanity checks should be made. By default, it is set to 180 days but it can be
+-- altered if needed.
+INSERT INTO cws_settings (name, setting, modifiable) VALUES ('cws.sanity.check.interval', '180', true);
+
 
 -- =============================================================================
 -- Following is TEST data, and should not be added in a PRODUCTION environment

@@ -49,7 +49,7 @@ public final class SettingServiceTest extends DatabaseSetup {
         final SettingResponse response = service.perform(request);
         assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(response.getReturnMessage(), is("Ok"));
-        assertThat(response.getSettings().size(), is(10));
+        assertThat(response.getSettings().size(), is(12));
     }
 
     @Test
@@ -72,7 +72,7 @@ public final class SettingServiceTest extends DatabaseSetup {
         final SettingResponse response = service.perform(request);
         assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(response.getReturnMessage(), is("Ok"));
-        assertThat(response.getSettings().size(), is(10));
+        assertThat(response.getSettings().size(), is(12));
     }
 
     @Test
@@ -85,7 +85,7 @@ public final class SettingServiceTest extends DatabaseSetup {
         final SettingResponse response = service.perform(request);
         assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(response.getReturnMessage(), is("Ok"));
-        assertThat(response.getSettings().size(), is(10));
+        assertThat(response.getSettings().size(), is(12));
     }
 
     @Test
@@ -98,7 +98,7 @@ public final class SettingServiceTest extends DatabaseSetup {
         final SettingResponse response = service.perform(request);
         assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(response.getReturnMessage(), is("Ok"));
-        assertThat(response.getSettings().size(), is(10));
+        assertThat(response.getSettings().size(), is(12));
         assertThat(response.getSettings().get(Settings.CWS_CHARSET), is("UTF-8"));
 
         // The internal collection used is unmodifiable. So we simply copy the
@@ -110,7 +110,7 @@ public final class SettingServiceTest extends DatabaseSetup {
         final SettingResponse update = service.perform(request);
         assertThat(update.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(update.getReturnMessage(), is("Ok"));
-        assertThat(update.getSettings().size(), is(10));
+        assertThat(update.getSettings().size(), is(12));
         assertThat(update.getSettings().get(Settings.CWS_CHARSET), is("ISO-8859-15"));
     }
 
@@ -138,7 +138,7 @@ public final class SettingServiceTest extends DatabaseSetup {
         final SettingResponse response = service.perform(request);
         assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(response.getReturnMessage(), is("Ok"));
-        assertThat(response.getSettings().size(), is(11));
+        assertThat(response.getSettings().size(), is(13));
         assertThat(response.getSettings().get("cws.test.setting"), is("Setting Value"));
     }
 }

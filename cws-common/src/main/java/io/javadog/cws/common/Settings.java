@@ -60,6 +60,8 @@ public final class Settings {
     public static final String CWS_CHARSET = "cws.system.charset";
     public static final String EXPOSE_ADMIN = "cws.expose.admin";
     public static final String SHOW_TRUSTEES = "cws.show.trustees";
+    public static final String SANITY_STARTUP = "cws.sanity.check.startup";
+    public static final String SANITY_INTERVAL = "cws.sanity.check.interval";
 
     private static final String DEFAULT_SYMMETRIC_ALGORITHM = "AES128";
     private static final String DEFAULT_ASYMMETRIC_ALGORITHM = "RSA2048";
@@ -71,6 +73,8 @@ public final class Settings {
     private static final String DEFAULT_CHARSETNAME = "UTF-8";
     private static final String DEFAULT_EXPOSE_ADMIN = "false";
     private static final String DEFAULT_SHOW_TRUSTEES = "true";
+    private static final String DEFAULT_SANITY_STARTUP = "true";
+    private static final String DEFAULT_SANITY_INTERVAL = "180";
 
     private final Properties properties = new Properties();
 
@@ -85,6 +89,8 @@ public final class Settings {
         properties.setProperty(CWS_CHARSET, DEFAULT_CHARSETNAME);
         properties.setProperty(EXPOSE_ADMIN, DEFAULT_EXPOSE_ADMIN);
         properties.setProperty(SHOW_TRUSTEES, DEFAULT_SHOW_TRUSTEES);
+        properties.setProperty(SANITY_STARTUP, DEFAULT_SANITY_STARTUP);
+        properties.setProperty(SANITY_INTERVAL, DEFAULT_SANITY_INTERVAL);
     }
 
     public void set(final String key, final String value) {
@@ -143,6 +149,14 @@ public final class Settings {
 
     public Boolean getShareTrustees() {
         return toBoolean(properties.getProperty(SHOW_TRUSTEES));
+    }
+
+    public Boolean getSanityStartup() {
+        return toBoolean(properties.getProperty(SANITY_STARTUP));
+    }
+
+    public Integer getSanityInterval() {
+        return Integer.parseInt(properties.getProperty(SANITY_INTERVAL));
     }
 
     // =========================================================================

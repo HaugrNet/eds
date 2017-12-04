@@ -30,7 +30,7 @@ public final class SettingsTest {
         final Settings settings = new Settings();
 
         final Map<String, String> existing = settings.get();
-        assertThat(existing.size(), is(10));
+        assertThat(existing.size(), is(12));
         settings.set("my.new.key", "the awesome value");
 
         final Map<String, String> updated = settings.get();
@@ -87,6 +87,12 @@ public final class SettingsTest {
 
         settings.set(Settings.CWS_CHARSET, "ISO-8859-15");
         assertThat(settings.getCharset().name(), is("ISO-8859-15"));
+
+        settings.set(Settings.SANITY_STARTUP, "false");
+        assertThat(settings.getSanityStartup(), is(false));
+
+        settings.set(Settings.SANITY_INTERVAL, "120");
+        assertThat(settings.getSanityInterval(), is(120));
     }
 
     @Test

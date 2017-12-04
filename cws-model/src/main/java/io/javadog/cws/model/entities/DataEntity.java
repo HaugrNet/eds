@@ -33,6 +33,10 @@ import javax.persistence.Table;
                 query = "select d " +
                         "from DataEntity d " +
                         "where d.metadata.id = :metadataId"),
+        @NamedQuery(name = "data.findAllWithState",
+                query = "select d " +
+                        "from DataEntity d " +
+                        "where d.sanityStatus = :status"),
         @NamedQuery(name = "data.findByMemberAndExternalId",
                 query = "select d " +
                         "from DataEntity d," +

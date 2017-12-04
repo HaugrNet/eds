@@ -97,4 +97,6 @@ public interface CommonDao {
     MetadataEntity findInFolder(MemberEntity member, MetadataEntity folder, String name);
 
     boolean checkIfNameIsUsed(MetadataEntity entity, String name, Long folderId);
+
+    List<DataEntity> findFailedRecords();
 }

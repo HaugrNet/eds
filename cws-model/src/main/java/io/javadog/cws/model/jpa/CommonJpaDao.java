@@ -9,6 +9,7 @@ package io.javadog.cws.model.jpa;
 
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.common.TrustLevel;
+import io.javadog.cws.common.enums.SanityStatus;
 import io.javadog.cws.common.exceptions.CWSException;
 import io.javadog.cws.model.CommonDao;
 import io.javadog.cws.model.entities.CWSEntity;
@@ -388,6 +389,17 @@ public final class CommonJpaDao implements CommonDao {
         query.setParameter("parentId", folderId);
 
         return findSingleRecord(query) != null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<DataEntity> findFailedRecords() {
+        final Query query = entityManager.createNamedQuery("data.findAllWithState");
+        query.setParameter("status", SanityStatus.FAILED);
+
+        return findList(query);
     }
 
     // =========================================================================

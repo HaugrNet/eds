@@ -11,11 +11,13 @@ import io.javadog.cws.api.requests.FetchCircleRequest;
 import io.javadog.cws.api.requests.FetchMemberRequest;
 import io.javadog.cws.api.requests.ProcessCircleRequest;
 import io.javadog.cws.api.requests.ProcessMemberRequest;
+import io.javadog.cws.api.requests.SanityRequest;
 import io.javadog.cws.api.requests.SettingRequest;
 import io.javadog.cws.api.responses.FetchCircleResponse;
 import io.javadog.cws.api.responses.FetchMemberResponse;
 import io.javadog.cws.api.responses.ProcessCircleResponse;
 import io.javadog.cws.api.responses.ProcessMemberResponse;
+import io.javadog.cws.api.responses.SanityResponse;
 import io.javadog.cws.api.responses.SettingResponse;
 import io.javadog.cws.api.responses.VersionResponse;
 
@@ -62,6 +64,13 @@ public interface System {
      * @return Response Object with ReturnCode and Message
      */
     SettingResponse settings(SettingRequest request);
+
+    /**
+     *
+     * @param request Request Object
+     * @return Response Object with ReturnCode and Message
+     */
+    SanityResponse sanity(SanityRequest request);
 
     /**
      * <p>Allows the retrieval of existing Member Accounts from the System, if

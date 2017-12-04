@@ -13,11 +13,13 @@ import io.javadog.cws.api.requests.FetchCircleRequest;
 import io.javadog.cws.api.requests.FetchMemberRequest;
 import io.javadog.cws.api.requests.ProcessCircleRequest;
 import io.javadog.cws.api.requests.ProcessMemberRequest;
+import io.javadog.cws.api.requests.SanityRequest;
 import io.javadog.cws.api.requests.SettingRequest;
 import io.javadog.cws.api.responses.FetchCircleResponse;
 import io.javadog.cws.api.responses.FetchMemberResponse;
 import io.javadog.cws.api.responses.ProcessCircleResponse;
 import io.javadog.cws.api.responses.ProcessMemberResponse;
+import io.javadog.cws.api.responses.SanityResponse;
 import io.javadog.cws.api.responses.SettingResponse;
 import io.javadog.cws.api.responses.VersionResponse;
 import io.javadog.cws.common.Settings;
@@ -87,6 +89,29 @@ public class SystemService implements System {
             // performance of the system.
             log.log(Settings.ERROR, e.getMessage(), e);
             response = new SettingResponse(ReturnCode.ERROR, GENERAL_RETURN_MESSAGE);
+        }
+
+        return response;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @WebMethod
+    @WebResult(name = "response")
+    public SanityResponse sanity(@WebParam(name = "request") final SanityRequest request) {
+        SanityResponse response;
+
+        try {
+            response = bean.sanity(request);
+        } catch (RuntimeException e) {
+            // If an error occurs that has so far not been resolved, this is the
+            // final level where it can be handled. Errors can be Persistence
+            // problems or other things that will affect the reliability and/or
+            // performance of the system.
+            log.log(Settings.ERROR, e.getMessage(), e);
+            response = new SanityResponse(ReturnCode.ERROR, GENERAL_RETURN_MESSAGE);
         }
 
         return response;

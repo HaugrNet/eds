@@ -18,11 +18,13 @@ import io.javadog.cws.api.requests.FetchCircleRequest;
 import io.javadog.cws.api.requests.FetchMemberRequest;
 import io.javadog.cws.api.requests.ProcessCircleRequest;
 import io.javadog.cws.api.requests.ProcessMemberRequest;
+import io.javadog.cws.api.requests.SanityRequest;
 import io.javadog.cws.api.requests.SettingRequest;
 import io.javadog.cws.api.responses.FetchCircleResponse;
 import io.javadog.cws.api.responses.FetchMemberResponse;
 import io.javadog.cws.api.responses.ProcessCircleResponse;
 import io.javadog.cws.api.responses.ProcessMemberResponse;
+import io.javadog.cws.api.responses.SanityResponse;
 import io.javadog.cws.api.responses.SettingResponse;
 import io.javadog.cws.api.responses.VersionResponse;
 import org.junit.Test;
@@ -101,6 +103,42 @@ public final class SystemServiceTest extends BeanSetup {
         final SettingRequest request = null;
 
         final SettingResponse response = system.settings(request);
+        assertThat(response.getReturnCode(), is(ReturnCode.ERROR));
+    }
+
+    @Test
+    public void testSanity() {
+        final SystemService system = prepareSystemService();
+        final SanityRequest request = prepareRequest(SanityRequest.class, Constants.ADMIN_ACCOUNT);
+
+        final SanityResponse response = system.sanity(request);
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
+    }
+
+    @Test
+    public void testSanityWithNullRequest() {
+        final SystemService system = prepareSystemService();
+        final SanityRequest request = null;
+
+        final SanityResponse response = system.sanity(request);
+        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING));
+    }
+
+    @Test
+    public void testSanityWithEmptyRequest() {
+        final SystemService system = prepareSystemService();
+        final SanityRequest request = new SanityRequest();
+
+        final SanityResponse response = system.sanity(request);
+        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING));
+    }
+
+    @Test
+    public void testFlawedSanity() {
+        final SystemService system = prepareFlawedSystemService();
+        final SanityRequest request = null;
+
+        final SanityResponse response = system.sanity(request);
         assertThat(response.getReturnCode(), is(ReturnCode.ERROR));
     }
 

@@ -32,7 +32,7 @@ import java.util.logging.Level;
  *
  * <p>Once a CWS system is being actively used, i.e. there exist Member Accounts
  * other than the System Administrator, then the rules regarding the
- * non-updateable values will be enforced. Updateable fields may be changed, by
+ * non-updateable values will be enforced. Updateable fields may be changed, but
  * the CWS will only use them after a restart.</p>
  *
  * @author Kim Jensen

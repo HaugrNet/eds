@@ -103,7 +103,7 @@ public enum KeyAlgorithm {
             this.value = value;
         }
 
-        public String getValue() {
+        String getValue() {
             return value;
         }
     }

@@ -70,12 +70,13 @@ CWS Development has reached the final phase for version 1.0. With the following
 milestones still pending, for details, see milestones in GitHub. The original
 goal for releasing the final 1.0 was on December 31st, 2017. However, as the
 OpenJDK will [include unlimited strength cryptography](https://bugs.openjdk.java.net/browse/JDK-8170157)
-as of Java 8u162, to be released on [January 16th, 2018](http://www.oracle.com/technetwork/java/javase/8u152-relnotes-3850503.html).
+as of Java 8u162, to be released on [January 16th, 2018](http://www.oracle.com/technetwork/java/javase/8u152-relnotes-3850503.html)
+the release of CWS 1.0 has been postponed until January 31st, 2018.
 
 - [0.6](https://javadog.io/downloads/cws-0.6.1.tgz) - Released November 17th, 2017; Code Completion Release
 - 0.7 - Scheduled for December, 2017; Documentation Release
 - 0.8 - Scheduled for December, 2017; REST Release
-- 0.9 - Scheduled for December, 2017; Auditing & Review Release
+- 0.9 - Scheduled for January, 2018; Auditing & Review Release
 - 1.0 - Scheduled for January 31st, 2018; Final 1.0 Release
 
 # Software License

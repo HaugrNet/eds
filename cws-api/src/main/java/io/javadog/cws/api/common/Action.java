@@ -71,15 +71,5 @@ public enum Action {
      * from a Circle. A Circle Administrator cannot remove themselves from a
      * Circle.</p>
      */
-    REMOVE,
-
-    /**
-     * <p>This is a special Action, which will enforce a complete re-encryption
-     * of all data belonging the Object in question.</p>
-     *
-     * <p>Note, that only for those Objects where a Key is stored, is this
-     * Action allowed, which include processing Members and processing Circles.
-     * For other requests, this Action is not allowed.</p>
-     */
-    REKEY
+    REMOVE
 }

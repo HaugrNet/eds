@@ -34,7 +34,7 @@ import javax.persistence.Table;
                         "where m.type.id = :id")
 })
 @Table(name = "cws_datatypes")
-public final class DataTypeEntity extends CWSEntity {
+public class DataTypeEntity extends CWSEntity {
 
     @Column(name = "datatype_name", unique = true, nullable = false, length = MAX_NAME_LENGTH)
     private String name = null;

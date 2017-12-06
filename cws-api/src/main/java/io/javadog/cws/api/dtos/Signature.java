@@ -24,7 +24,7 @@ import java.util.Objects;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "signature", propOrder = { Constants.FIELD_CHECKSUM, Constants.FIELD_EXPIRES, Constants.FIELD_VERIFICATIONS, Constants.FIELD_LAST_VERIFICATION, Constants.FIELD_ADDED })
+@XmlType(name = Constants.FIELD_SIGNATURE, propOrder = { Constants.FIELD_CHECKSUM, Constants.FIELD_EXPIRES, Constants.FIELD_VERIFICATIONS, Constants.FIELD_LAST_VERIFICATION, Constants.FIELD_ADDED })
 public final class Signature implements Serializable {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */

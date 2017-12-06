@@ -30,7 +30,7 @@ import java.util.Objects;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "member", propOrder = { Constants.FIELD_MEMBER_ID, Constants.FIELD_ACCOUNT_NAME, Constants.FIELD_ADDED })
+@XmlType(name = Constants.FIELD_MEMBER, propOrder = { Constants.FIELD_MEMBER_ID, Constants.FIELD_ACCOUNT_NAME, Constants.FIELD_ADDED })
 public final class Member implements Serializable {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */

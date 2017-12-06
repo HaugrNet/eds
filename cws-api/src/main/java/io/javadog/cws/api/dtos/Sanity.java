@@ -24,17 +24,17 @@ import java.util.Objects;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "sanity", propOrder = { Constants.FIELD_DATA_ID, Constants.FIELD_CHANGED })
+@XmlType(name = Constants.FIELD_SANITY, propOrder = { Constants.FIELD_DATA_ID, Constants.FIELD_CHANGED })
 public final class Sanity implements Serializable {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
     @XmlElement(name = Constants.FIELD_DATA_ID)
-    private String dataId;
+    private String dataId = null;
 
     @XmlElement(name = Constants.FIELD_CHANGED)
-    private Date changed;
+    private Date changed = null;
 
     // =========================================================================
     // Standard Setters & Getters

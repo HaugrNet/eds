@@ -111,7 +111,7 @@ public final class SystemServiceTest extends BeanSetup {
         final SystemService system = prepareSystemService();
         final SanityRequest request = prepareRequest(SanityRequest.class, Constants.ADMIN_ACCOUNT);
 
-        final SanityResponse response = system.sanity(request);
+        final SanityResponse response = system.sanitized(request);
         assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
     }
 
@@ -120,7 +120,7 @@ public final class SystemServiceTest extends BeanSetup {
         final SystemService system = prepareSystemService();
         final SanityRequest request = null;
 
-        final SanityResponse response = system.sanity(request);
+        final SanityResponse response = system.sanitized(request);
         assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING));
     }
 
@@ -129,7 +129,7 @@ public final class SystemServiceTest extends BeanSetup {
         final SystemService system = prepareSystemService();
         final SanityRequest request = new SanityRequest();
 
-        final SanityResponse response = system.sanity(request);
+        final SanityResponse response = system.sanitized(request);
         assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING));
     }
 
@@ -138,7 +138,7 @@ public final class SystemServiceTest extends BeanSetup {
         final SystemService system = prepareFlawedSystemService();
         final SanityRequest request = null;
 
-        final SanityResponse response = system.sanity(request);
+        final SanityResponse response = system.sanitized(request);
         assertThat(response.getReturnCode(), is(ReturnCode.ERROR));
     }
 

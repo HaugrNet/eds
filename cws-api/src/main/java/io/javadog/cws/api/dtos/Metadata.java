@@ -24,7 +24,7 @@ import java.util.Objects;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "metadata", propOrder = { Constants.FIELD_DATA_ID, Constants.FIELD_CIRCLE_ID, Constants.FIELD_FOLDER_ID, Constants.FIELD_DATA_NAME, Constants.FIELD_TYPENAME, Constants.FIELD_ADDED })
+@XmlType(name = Constants.FIELD_METADATA, propOrder = { Constants.FIELD_DATA_ID, Constants.FIELD_CIRCLE_ID, Constants.FIELD_FOLDER_ID, Constants.FIELD_DATA_NAME, Constants.FIELD_TYPENAME, Constants.FIELD_ADDED })
 public final class Metadata implements Serializable {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */

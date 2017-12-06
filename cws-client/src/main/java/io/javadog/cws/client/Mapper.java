@@ -16,6 +16,7 @@ import io.javadog.cws.api.dtos.Circle;
 import io.javadog.cws.api.dtos.DataType;
 import io.javadog.cws.api.dtos.Member;
 import io.javadog.cws.api.dtos.Metadata;
+import io.javadog.cws.api.dtos.Sanity;
 import io.javadog.cws.api.dtos.Signature;
 import io.javadog.cws.api.dtos.Trustee;
 import io.javadog.cws.api.requests.Authentication;
@@ -108,6 +109,21 @@ public final class Mapper {
     // =========================================================================
     // Mapping of Collections
     // =========================================================================
+
+    public static List<Sanity> mapSanities(final List<io.javadog.cws.ws.Sanity> ws) {
+        final List<Sanity> api = new ArrayList<>();
+
+        if (ws != null) {
+            for (final io.javadog.cws.ws.Sanity wsSanity : ws) {
+                final Sanity sanity = new Sanity();
+                sanity.setDataId(wsSanity.getDataId());
+                sanity.setChanged(map(wsSanity.getChanged()));
+                api.add(sanity);
+            }
+        }
+
+        return api;
+    }
 
     public static List<Circle> mapCircles(final List<io.javadog.cws.ws.Circle> ws) {
         final List<Circle> api = new ArrayList<>();

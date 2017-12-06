@@ -73,6 +73,7 @@ public final class Constants {
     public static final String FIELD_CIRCLE = "circle";
     public static final String FIELD_CIRCLES = "circles";
     public static final String FIELD_CIRCLE_NAME = "circleName";
+    public static final String FIELD_TRUSTEE = "trustee";
     public static final String FIELD_TRUSTEES = "trustees";
     public static final String FIELD_MEMBER = "member";
     public static final String FIELD_MEMBERS = "members";
@@ -87,6 +88,7 @@ public final class Constants {
     public static final String FIELD_CHECKSUM = "checksum";
     public static final String FIELD_SIGNATURE = "signature";
     public static final String FIELD_SIGNATURES = "signatures";
+    public static final String FIELD_SANITY = "sanity";
     public static final String FIELD_SANITIES = "sanities";
     public static final String FIELD_SETTINGS = "settings";
     public static final String FIELD_EXPIRES = "expires";

@@ -334,7 +334,6 @@
       <xs:enumeration value="ADD"/>
       <xs:enumeration value="ALTER"/>
       <xs:enumeration value="REMOVE"/>
-      <xs:enumeration value="REKEY"/>
     </xs:restriction>
   </xs:simpleType>
 

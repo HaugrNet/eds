@@ -24,7 +24,7 @@ import java.util.Objects;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "circle", propOrder = { Constants.FIELD_CIRCLE_ID, Constants.FIELD_CIRCLE_NAME, Constants.FIELD_ADDED })
+@XmlType(name = Constants.FIELD_CIRCLE, propOrder = { Constants.FIELD_CIRCLE_ID, Constants.FIELD_CIRCLE_NAME, Constants.FIELD_ADDED })
 public final class Circle implements Serializable {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */

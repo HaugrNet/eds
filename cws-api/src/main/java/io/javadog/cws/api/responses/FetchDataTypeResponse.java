@@ -61,7 +61,7 @@ public final class FetchDataTypeResponse extends CwsResponse {
     // =========================================================================
 
     public void setDataTypes(final List<DataType> types) {
-        this.dataTypes.addAll(types);
+        dataTypes.addAll(types);
     }
 
     public List<DataType> getDataTypes() {

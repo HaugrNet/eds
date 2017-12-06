@@ -18,7 +18,7 @@ import java.util.Set;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "trustLevel")
+@XmlType(name = Constants.FIELD_TRUSTLEVEL)
 public enum TrustLevel {
 
     ALL,

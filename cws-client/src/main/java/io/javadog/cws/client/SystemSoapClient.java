@@ -13,17 +13,20 @@ import io.javadog.cws.api.requests.FetchCircleRequest;
 import io.javadog.cws.api.requests.FetchMemberRequest;
 import io.javadog.cws.api.requests.ProcessCircleRequest;
 import io.javadog.cws.api.requests.ProcessMemberRequest;
+import io.javadog.cws.api.requests.SanityRequest;
 import io.javadog.cws.api.requests.SettingRequest;
 import io.javadog.cws.api.responses.FetchCircleResponse;
 import io.javadog.cws.api.responses.FetchMemberResponse;
 import io.javadog.cws.api.responses.ProcessCircleResponse;
 import io.javadog.cws.api.responses.ProcessMemberResponse;
+import io.javadog.cws.api.responses.SanityResponse;
 import io.javadog.cws.api.responses.SettingResponse;
 import io.javadog.cws.api.responses.VersionResponse;
 import io.javadog.cws.ws.FetchCircleResult;
 import io.javadog.cws.ws.FetchMemberResult;
 import io.javadog.cws.ws.ProcessCircleResult;
 import io.javadog.cws.ws.ProcessMemberResult;
+import io.javadog.cws.ws.SanityResult;
 import io.javadog.cws.ws.SettingResult;
 import io.javadog.cws.ws.System_Service;
 import io.javadog.cws.ws.VersionResult;
@@ -78,6 +81,14 @@ public final class SystemSoapClient implements System {
     @Override
     public SettingResponse settings(final SettingRequest request) {
         return map(client.settings(map(request)));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public SanityResponse sanitized(final SanityRequest request) {
+        return map(client.sanitized(map(request)));
     }
 
     /**
@@ -147,6 +158,29 @@ public final class SystemSoapClient implements System {
             api = new SettingResponse();
             Mapper.fillResponse(api, ws);
             api.setSettings(mapSettings(ws.getSettings()));
+        }
+
+        return api;
+    }
+
+    private static io.javadog.cws.ws.SanityRequest map(final SanityRequest api) {
+        io.javadog.cws.ws.SanityRequest ws = null;
+
+        if (api != null) {
+            ws = new io.javadog.cws.ws.SanityRequest();
+            Mapper.fillAuthentication(ws, api);
+        }
+
+        return ws;
+    }
+
+    private static SanityResponse map(final SanityResult ws) {
+        SanityResponse api = null;
+
+        if (ws != null) {
+            api = new SanityResponse();
+            Mapper.fillResponse(api, ws);
+            api.setSanities(Mapper.mapSanities(ws.getSanities()));
         }
 
         return api;

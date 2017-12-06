@@ -27,6 +27,10 @@
 
   <xs:element name="processMemberResponse" type="tns:processMemberResponse"/>
 
+  <xs:element name="sanitized" type="tns:sanitized"/>
+
+  <xs:element name="sanitizedResponse" type="tns:sanitizedResponse"/>
+
   <xs:element name="settings" type="tns:settings"/>
 
   <xs:element name="settingsResponse" type="tns:settingsResponse"/>
@@ -35,18 +39,16 @@
 
   <xs:element name="versionResponse" type="tns:versionResponse"/>
 
-  <xs:complexType name="fetchCircles">
+  <xs:complexType name="sanitized">
     <xs:sequence>
-      <xs:element minOccurs="0" name="request" type="tns:fetchCircleRequest"/>
+      <xs:element minOccurs="0" name="request" type="tns:sanityRequest"/>
     </xs:sequence>
   </xs:complexType>
 
-  <xs:complexType final="extension restriction" name="fetchCircleRequest">
+  <xs:complexType final="extension restriction" name="sanityRequest">
     <xs:complexContent>
       <xs:extension base="tns:authentication">
-        <xs:sequence>
-          <xs:element minOccurs="0" name="circleId" nillable="true" type="xs:string"/>
-        </xs:sequence>
+        <xs:sequence/>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -67,6 +69,52 @@
     <xs:sequence/>
   </xs:complexType>
 
+  <xs:complexType name="sanitizedResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="response" type="tns:sanityResult"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType final="extension restriction" name="sanityResult">
+    <xs:complexContent>
+      <xs:extension base="tns:cwsResult">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" name="sanities" type="tns:sanity"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="cwsResult">
+    <xs:sequence>
+      <xs:element name="returnCode" type="tns:returnCode"/>
+      <xs:element name="returnMessage" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType final="extension restriction" name="sanity">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="dataId" type="xs:string"/>
+      <xs:element minOccurs="0" name="changed" type="xs:dateTime"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="fetchCircles">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="request" type="tns:fetchCircleRequest"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType final="extension restriction" name="fetchCircleRequest">
+    <xs:complexContent>
+      <xs:extension base="tns:authentication">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="circleId" nillable="true" type="xs:string"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
   <xs:complexType name="fetchCirclesResponse">
     <xs:sequence>
       <xs:element minOccurs="0" name="response" type="tns:fetchCircleResult"/>
@@ -82,13 +130,6 @@
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>
-  </xs:complexType>
-
-  <xs:complexType name="cwsResult">
-    <xs:sequence>
-      <xs:element name="returnCode" type="tns:returnCode"/>
-      <xs:element name="returnMessage" type="xs:string"/>
-    </xs:sequence>
   </xs:complexType>
 
   <xs:complexType final="extension restriction" name="circle">
@@ -307,15 +348,6 @@
     </xs:restriction>
   </xs:simpleType>
 
-  <xs:simpleType name="trustLevel">
-    <xs:restriction base="xs:string">
-      <xs:enumeration value="READ"/>
-      <xs:enumeration value="WRITE"/>
-      <xs:enumeration value="ADMIN"/>
-      <xs:enumeration value="SYSOP"/>
-    </xs:restriction>
-  </xs:simpleType>
-
   <xs:simpleType name="returnCode">
     <xs:restriction base="xs:string">
       <xs:enumeration value="SUCCESS"/>
@@ -345,6 +377,16 @@
     </xs:restriction>
   </xs:simpleType>
 
+  <xs:simpleType name="trustLevel">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="ALL"/>
+      <xs:enumeration value="READ"/>
+      <xs:enumeration value="WRITE"/>
+      <xs:enumeration value="ADMIN"/>
+      <xs:enumeration value="SYSOP"/>
+    </xs:restriction>
+  </xs:simpleType>
+
   <xs:simpleType name="action">
     <xs:restriction base="xs:string">
       <xs:enumeration value="PROCESS"/>
@@ -355,18 +397,37 @@
       <xs:enumeration value="ADD"/>
       <xs:enumeration value="ALTER"/>
       <xs:enumeration value="REMOVE"/>
-      <xs:enumeration value="REKEY"/>
     </xs:restriction>
   </xs:simpleType>
 
 </xs:schema>
   </wsdl:types>
-  <wsdl:message name="processMemberResponse">
-    <wsdl:part element="tns:processMemberResponse" name="parameters">
+  <wsdl:message name="sanitized">
+    <wsdl:part element="tns:sanitized" name="parameters">
     </wsdl:part>
   </wsdl:message>
   <wsdl:message name="processCircleResponse">
     <wsdl:part element="tns:processCircleResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="settings">
+    <wsdl:part element="tns:settings" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="version">
+    <wsdl:part element="tns:version" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="sanitizedResponse">
+    <wsdl:part element="tns:sanitizedResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="fetchMembersResponse">
+    <wsdl:part element="tns:fetchMembersResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="processMemberResponse">
+    <wsdl:part element="tns:processMemberResponse" name="parameters">
     </wsdl:part>
   </wsdl:message>
   <wsdl:message name="fetchCircles">
@@ -379,10 +440,6 @@
   </wsdl:message>
   <wsdl:message name="processMember">
     <wsdl:part element="tns:processMember" name="parameters">
-    </wsdl:part>
-  </wsdl:message>
-  <wsdl:message name="settings">
-    <wsdl:part element="tns:settings" name="parameters">
     </wsdl:part>
   </wsdl:message>
   <wsdl:message name="versionResponse">
@@ -401,18 +458,16 @@
     <wsdl:part element="tns:fetchMembers" name="parameters">
     </wsdl:part>
   </wsdl:message>
-  <wsdl:message name="version">
-    <wsdl:part element="tns:version" name="parameters">
-    </wsdl:part>
-  </wsdl:message>
-  <wsdl:message name="fetchMembersResponse">
-    <wsdl:part element="tns:fetchMembersResponse" name="parameters">
-    </wsdl:part>
-  </wsdl:message>
   <wsdl:portType name="system">
     <wsdl:documentation>The System Service is a part the CWS, is part of the
     CWS, offering the functionality to administrate a CWS system, such as the
     Circles, Accounts, Trustees and Settings.</wsdl:documentation>
+    <wsdl:operation name="sanitized">
+      <wsdl:input message="tns:sanitized" name="sanitized">
+    </wsdl:input>
+      <wsdl:output message="tns:sanitizedResponse" name="sanitizedResponse">
+    </wsdl:output>
+    </wsdl:operation>
     <wsdl:operation name="fetchCircles">
       <wsdl:input message="tns:fetchCircles" name="fetchCircles">
     </wsdl:input>
@@ -452,6 +507,15 @@
   </wsdl:portType>
   <wsdl:binding name="systemSoapBinding" type="tns:system">
     <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="sanitized">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="sanitized">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="sanitizedResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
     <wsdl:operation name="fetchCircles">
       <soap:operation soapAction="" style="document"/>
       <wsdl:input name="fetchCircles">

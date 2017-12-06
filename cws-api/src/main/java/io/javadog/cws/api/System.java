@@ -87,7 +87,7 @@ public interface System {
      * @param request Request Object
      * @return Response Object with ReturnCode and Message
      */
-    SanityResponse sanity(SanityRequest request);
+    SanityResponse sanitized(SanityRequest request);
 
     /**
      * <p>Allows the retrieval of existing Member Accounts from the System, if

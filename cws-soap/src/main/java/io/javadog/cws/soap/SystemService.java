@@ -100,7 +100,7 @@ public class SystemService implements System {
     @Override
     @WebMethod
     @WebResult(name = "response")
-    public SanityResponse sanity(@WebParam(name = "request") final SanityRequest request) {
+    public SanityResponse sanitized(@WebParam(name = "request") final SanityRequest request) {
         SanityResponse response;
 
         try {

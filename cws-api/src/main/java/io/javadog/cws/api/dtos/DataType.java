@@ -21,7 +21,7 @@ import java.util.Objects;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "dataType", propOrder = { Constants.FIELD_TYPENAME, Constants.FIELD_TYPE })
+@XmlType(name = Constants.FIELD_DATATYPE, propOrder = { Constants.FIELD_TYPENAME, Constants.FIELD_TYPE })
 public final class DataType implements Serializable {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */

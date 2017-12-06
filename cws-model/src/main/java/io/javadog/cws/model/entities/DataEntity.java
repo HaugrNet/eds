@@ -8,6 +8,7 @@
 package io.javadog.cws.model.entities;
 
 import static io.javadog.cws.api.common.Constants.MAX_STRING_LENGTH;
+import static io.javadog.cws.api.common.Utilities.copy;
 
 import io.javadog.cws.common.enums.SanityStatus;
 
@@ -22,6 +23,9 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import java.util.Date;
 
 /**
  * @author Kim Jensen
@@ -70,6 +74,10 @@ public class DataEntity extends CWSEntity {
     @Column(name = "sanity_status", nullable = false, length = MAX_STRING_LENGTH)
     private SanityStatus sanityStatus = null;
 
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "sanity_checked", nullable = false)
+    private Date sanityChecked = null;
+
     // =========================================================================
     // Entity Setters & Getters
     // =========================================================================
@@ -91,11 +99,11 @@ public class DataEntity extends CWSEntity {
     }
 
     public void setData(final byte[] data) {
-        this.data = data;
+        this.data = copy(data);
     }
 
     public byte[] getData() {
-        return data;
+        return copy(data);
     }
 
     public void setInitialVector(final String initialVector) {
@@ -120,5 +128,13 @@ public class DataEntity extends CWSEntity {
 
     public SanityStatus getSanityStatus() {
         return sanityStatus;
+    }
+
+    public void setSanityChecked(final Date sanityChecked) {
+        this.sanityChecked = copy(sanityChecked);
+    }
+
+    public Date getSanityChecked() {
+        return copy(sanityChecked);
     }
 }

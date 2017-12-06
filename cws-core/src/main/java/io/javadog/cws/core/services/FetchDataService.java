@@ -22,6 +22,7 @@ import io.javadog.cws.model.entities.MetadataEntity;
 
 import javax.persistence.EntityManager;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -112,6 +113,7 @@ public final class FetchDataService extends Serviceable<FetchDataResponse, Fetch
                 // Let's update the DB with the information that the data is
                 // invalid, and return the error.
                 entity.setSanityStatus(SanityStatus.FAILED);
+                entity.setSanityChecked(new Date());
                 dao.persist(entity);
 
                 response.setReturnCode(ReturnCode.INTEGRITY_ERROR);

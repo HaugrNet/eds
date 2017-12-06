@@ -41,7 +41,7 @@ public final class SanityService extends Serviceable<SanityResponse, SanityReque
         for (final DataEntity entity : found) {
             final Sanity sanity = new Sanity();
             sanity.setDataId(entity.getMetadata().getExternalId());
-            sanity.setChanged(entity.getAltered());
+            sanity.setChanged(entity.getSanityChecked());
             sanities.add(sanity);
         }
 

@@ -9,8 +9,8 @@ package io.javadog.cws.core.model.entities;
 
 import static io.javadog.cws.api.common.Utilities.copy;
 
-import io.javadog.cws.common.enums.KeyAlgorithm;
-import io.javadog.cws.common.enums.Status;
+import io.javadog.cws.core.enums.KeyAlgorithm;
+import io.javadog.cws.core.enums.Status;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

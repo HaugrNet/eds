@@ -7,8 +7,8 @@
  */
 package io.javadog.cws.core;
 
-import io.javadog.cws.common.Settings;
-import io.javadog.cws.common.exceptions.CWSException;
+import io.javadog.cws.core.exceptions.CWSException;
+import io.javadog.cws.core.model.Settings;
 import io.javadog.cws.core.services.Serviceable;
 
 import java.util.logging.Logger;

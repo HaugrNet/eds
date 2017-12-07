@@ -17,10 +17,10 @@ import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.dtos.Member;
 import io.javadog.cws.api.requests.FetchMemberRequest;
 import io.javadog.cws.api.responses.FetchMemberResponse;
-import io.javadog.cws.common.Settings;
-import io.javadog.cws.common.exceptions.AuthorizationException;
-import io.javadog.cws.common.exceptions.VerificationException;
 import io.javadog.cws.core.DatabaseSetup;
+import io.javadog.cws.core.exceptions.AuthorizationException;
+import io.javadog.cws.core.exceptions.VerificationException;
+import io.javadog.cws.core.model.Settings;
 import io.javadog.cws.core.model.entities.MemberEntity;
 import org.junit.Test;
 

@@ -9,7 +9,7 @@ package io.javadog.cws.core.model.entities;
 
 import static io.javadog.cws.api.common.Constants.MAX_NAME_LENGTH;
 
-import io.javadog.cws.common.enums.KeyAlgorithm;
+import io.javadog.cws.core.enums.KeyAlgorithm;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

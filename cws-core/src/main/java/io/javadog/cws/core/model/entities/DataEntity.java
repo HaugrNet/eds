@@ -10,7 +10,7 @@ package io.javadog.cws.core.model.entities;
 import static io.javadog.cws.api.common.Constants.MAX_STRING_LENGTH;
 import static io.javadog.cws.api.common.Utilities.copy;
 
-import io.javadog.cws.common.enums.SanityStatus;
+import io.javadog.cws.core.enums.SanityStatus;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

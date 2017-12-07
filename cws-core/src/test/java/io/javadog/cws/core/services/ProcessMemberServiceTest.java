@@ -18,9 +18,9 @@ import io.javadog.cws.api.common.CredentialType;
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.requests.ProcessMemberRequest;
 import io.javadog.cws.api.responses.ProcessMemberResponse;
-import io.javadog.cws.common.exceptions.CWSException;
-import io.javadog.cws.common.exceptions.CryptoException;
 import io.javadog.cws.core.DatabaseSetup;
+import io.javadog.cws.core.exceptions.CWSException;
+import io.javadog.cws.core.exceptions.CryptoException;
 import org.junit.Test;
 
 import java.util.UUID;

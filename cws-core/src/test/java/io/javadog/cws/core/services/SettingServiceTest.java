@@ -15,10 +15,10 @@ import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.requests.SettingRequest;
 import io.javadog.cws.api.responses.SettingResponse;
-import io.javadog.cws.common.Settings;
-import io.javadog.cws.common.exceptions.AuthorizationException;
-import io.javadog.cws.common.exceptions.CWSException;
 import io.javadog.cws.core.DatabaseSetup;
+import io.javadog.cws.core.exceptions.AuthorizationException;
+import io.javadog.cws.core.exceptions.CWSException;
+import io.javadog.cws.core.model.Settings;
 import org.junit.Test;
 
 import javax.persistence.Query;

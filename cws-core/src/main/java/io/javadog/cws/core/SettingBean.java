@@ -7,9 +7,8 @@
  */
 package io.javadog.cws.core;
 
-import io.javadog.cws.common.Settings;
 import io.javadog.cws.core.model.CommonDao;
-import io.javadog.cws.core.model.CommonJpaDao;
+import io.javadog.cws.core.model.Settings;
 import io.javadog.cws.core.model.entities.SettingEntity;
 
 import javax.annotation.PostConstruct;
@@ -32,7 +31,7 @@ public class SettingBean {
 
     @PostConstruct
     public void init() {
-        final CommonDao dao = new CommonJpaDao(entityManager);
+        final CommonDao dao = new CommonDao(entityManager);
         final List<SettingEntity> found = dao.readSettings();
 
         for (final SettingEntity entity : found) {

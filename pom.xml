@@ -27,8 +27,6 @@
 
     <modules>
         <module>cws-api</module>
-        <module>cws-common</module>
-        <module>cws-model</module>
         <module>cws-core</module>
         <module>cws-soap</module>
         <module>cws-war</module>
@@ -61,11 +59,6 @@
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>cws-api</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>cws-common</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

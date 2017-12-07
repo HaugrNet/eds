@@ -16,9 +16,9 @@ import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.requests.FetchCircleRequest;
 import io.javadog.cws.api.requests.SettingRequest;
-import io.javadog.cws.common.exceptions.AuthenticationException;
-import io.javadog.cws.common.exceptions.AuthorizationException;
 import io.javadog.cws.core.DatabaseSetup;
+import io.javadog.cws.core.exceptions.AuthenticationException;
+import io.javadog.cws.core.exceptions.AuthorizationException;
 import org.junit.Test;
 
 /**

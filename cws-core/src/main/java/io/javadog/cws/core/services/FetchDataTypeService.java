@@ -10,8 +10,8 @@ package io.javadog.cws.core.services;
 import io.javadog.cws.api.dtos.DataType;
 import io.javadog.cws.api.requests.FetchDataTypeRequest;
 import io.javadog.cws.api.responses.FetchDataTypeResponse;
-import io.javadog.cws.common.Settings;
 import io.javadog.cws.core.enums.Permission;
+import io.javadog.cws.core.model.Settings;
 import io.javadog.cws.core.model.entities.DataTypeEntity;
 
 import javax.persistence.EntityManager;

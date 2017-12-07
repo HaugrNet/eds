@@ -23,8 +23,8 @@ import io.javadog.cws.api.responses.ProcessDataResponse;
 import io.javadog.cws.api.responses.ProcessDataTypeResponse;
 import io.javadog.cws.api.responses.SignResponse;
 import io.javadog.cws.api.responses.VerifyResponse;
-import io.javadog.cws.common.Settings;
 import io.javadog.cws.core.ShareBean;
+import io.javadog.cws.core.model.Settings;
 
 import javax.inject.Inject;
 import javax.jws.WebMethod;

@@ -12,10 +12,10 @@ import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.dtos.DataType;
 import io.javadog.cws.api.requests.ProcessDataTypeRequest;
 import io.javadog.cws.api.responses.ProcessDataTypeResponse;
-import io.javadog.cws.common.Settings;
-import io.javadog.cws.common.exceptions.AuthorizationException;
-import io.javadog.cws.common.exceptions.CWSException;
 import io.javadog.cws.core.enums.Permission;
+import io.javadog.cws.core.exceptions.AuthorizationException;
+import io.javadog.cws.core.exceptions.CWSException;
+import io.javadog.cws.core.model.Settings;
 import io.javadog.cws.core.model.entities.DataTypeEntity;
 
 import javax.persistence.EntityManager;

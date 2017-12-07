@@ -22,8 +22,8 @@ import io.javadog.cws.api.responses.ProcessMemberResponse;
 import io.javadog.cws.api.responses.SanityResponse;
 import io.javadog.cws.api.responses.SettingResponse;
 import io.javadog.cws.api.responses.VersionResponse;
-import io.javadog.cws.common.Settings;
 import io.javadog.cws.core.SystemBean;
+import io.javadog.cws.core.model.Settings;
 
 import javax.inject.Inject;
 import javax.jws.WebMethod;

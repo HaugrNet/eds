@@ -21,10 +21,10 @@ import io.javadog.cws.api.requests.ProcessDataTypeRequest;
 import io.javadog.cws.api.responses.FetchDataTypeResponse;
 import io.javadog.cws.api.responses.ProcessDataResponse;
 import io.javadog.cws.api.responses.ProcessDataTypeResponse;
-import io.javadog.cws.common.exceptions.AuthorizationException;
-import io.javadog.cws.common.exceptions.CWSException;
-import io.javadog.cws.common.exceptions.VerificationException;
 import io.javadog.cws.core.DatabaseSetup;
+import io.javadog.cws.core.exceptions.AuthorizationException;
+import io.javadog.cws.core.exceptions.CWSException;
+import io.javadog.cws.core.exceptions.VerificationException;
 import org.junit.Test;
 
 /**

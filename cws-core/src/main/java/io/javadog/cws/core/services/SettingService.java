@@ -10,9 +10,9 @@ package io.javadog.cws.core.services;
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.requests.SettingRequest;
 import io.javadog.cws.api.responses.SettingResponse;
-import io.javadog.cws.common.Settings;
-import io.javadog.cws.common.exceptions.CWSException;
 import io.javadog.cws.core.enums.Permission;
+import io.javadog.cws.core.exceptions.CWSException;
+import io.javadog.cws.core.model.Settings;
 import io.javadog.cws.core.model.entities.SettingEntity;
 
 import javax.persistence.EntityManager;

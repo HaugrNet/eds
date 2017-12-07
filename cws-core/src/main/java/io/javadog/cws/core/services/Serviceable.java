@@ -15,19 +15,18 @@ import io.javadog.cws.api.requests.Authentication;
 import io.javadog.cws.api.requests.CircleIdRequest;
 import io.javadog.cws.api.requests.Verifiable;
 import io.javadog.cws.api.responses.CwsResponse;
-import io.javadog.cws.common.Crypto;
-import io.javadog.cws.common.Settings;
-import io.javadog.cws.common.enums.KeyAlgorithm;
-import io.javadog.cws.common.exceptions.AuthenticationException;
-import io.javadog.cws.common.exceptions.AuthorizationException;
-import io.javadog.cws.common.exceptions.CWSException;
-import io.javadog.cws.common.exceptions.CryptoException;
-import io.javadog.cws.common.exceptions.VerificationException;
-import io.javadog.cws.common.keys.CWSKeyPair;
-import io.javadog.cws.common.keys.SecretCWSKey;
+import io.javadog.cws.core.enums.KeyAlgorithm;
 import io.javadog.cws.core.enums.Permission;
+import io.javadog.cws.core.exceptions.AuthenticationException;
+import io.javadog.cws.core.exceptions.AuthorizationException;
+import io.javadog.cws.core.exceptions.CWSException;
+import io.javadog.cws.core.exceptions.CryptoException;
+import io.javadog.cws.core.exceptions.VerificationException;
+import io.javadog.cws.core.jce.CWSKeyPair;
+import io.javadog.cws.core.jce.Crypto;
+import io.javadog.cws.core.jce.SecretCWSKey;
 import io.javadog.cws.core.model.CommonDao;
-import io.javadog.cws.core.model.CommonJpaDao;
+import io.javadog.cws.core.model.Settings;
 import io.javadog.cws.core.model.entities.DataEntity;
 import io.javadog.cws.core.model.entities.MemberEntity;
 import io.javadog.cws.core.model.entities.TrusteeEntity;
@@ -56,7 +55,7 @@ public abstract class Serviceable<R extends CwsResponse, V extends Authenticatio
     protected CWSKeyPair keyPair = null;
 
     protected Serviceable(final Settings settings, final EntityManager entityManager) {
-        this.dao = new CommonJpaDao(entityManager);
+        this.dao = new CommonDao(entityManager);
         this.crypto = new Crypto(settings);
         this.settings = settings;
     }

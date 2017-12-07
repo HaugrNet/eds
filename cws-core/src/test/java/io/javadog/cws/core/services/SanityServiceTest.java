@@ -19,8 +19,8 @@ import io.javadog.cws.api.requests.SanityRequest;
 import io.javadog.cws.api.responses.FetchDataResponse;
 import io.javadog.cws.api.responses.ProcessDataResponse;
 import io.javadog.cws.api.responses.SanityResponse;
-import io.javadog.cws.common.exceptions.AuthorizationException;
 import io.javadog.cws.core.DatabaseSetup;
+import io.javadog.cws.core.exceptions.AuthorizationException;
 import io.javadog.cws.core.model.entities.DataEntity;
 import org.junit.Test;
 

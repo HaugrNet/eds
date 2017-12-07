@@ -18,8 +18,7 @@ import io.javadog.cws.common.exceptions.CWSException;
 import io.javadog.cws.common.exceptions.VerificationException;
 import io.javadog.cws.common.keys.CWSKeyPair;
 import io.javadog.cws.common.keys.SecretCWSKey;
-import io.javadog.cws.core.Permission;
-import io.javadog.cws.core.Serviceable;
+import io.javadog.cws.core.enums.Permission;
 import io.javadog.cws.model.entities.MemberEntity;
 
 import javax.persistence.EntityManager;

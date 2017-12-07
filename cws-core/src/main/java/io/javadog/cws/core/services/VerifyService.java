@@ -11,8 +11,7 @@ import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.requests.VerifyRequest;
 import io.javadog.cws.api.responses.VerifyResponse;
 import io.javadog.cws.common.Settings;
-import io.javadog.cws.core.Permission;
-import io.javadog.cws.core.Serviceable;
+import io.javadog.cws.core.enums.Permission;
 import io.javadog.cws.model.entities.SignatureEntity;
 
 import javax.persistence.EntityManager;

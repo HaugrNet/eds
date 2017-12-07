@@ -22,12 +22,12 @@ import io.javadog.cws.api.responses.SettingResponse;
 import io.javadog.cws.api.responses.VersionResponse;
 import io.javadog.cws.common.Settings;
 import io.javadog.cws.common.exceptions.CWSException;
-import io.javadog.cws.core.Serviceable;
 import io.javadog.cws.core.services.FetchCircleService;
 import io.javadog.cws.core.services.FetchMemberService;
 import io.javadog.cws.core.services.ProcessCircleService;
 import io.javadog.cws.core.services.ProcessMemberService;
 import io.javadog.cws.core.services.SanityService;
+import io.javadog.cws.core.services.Serviceable;
 import io.javadog.cws.core.services.SettingService;
 
 import javax.ejb.Stateless;

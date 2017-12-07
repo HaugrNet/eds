@@ -5,7 +5,7 @@
  * Project: CWS (cws-core)
  * =============================================================================
  */
-package io.javadog.cws.core;
+package io.javadog.cws.core.services;
 
 import static io.javadog.cws.api.common.Constants.ADMIN_ACCOUNT;
 
@@ -25,6 +25,7 @@ import io.javadog.cws.common.exceptions.CryptoException;
 import io.javadog.cws.common.exceptions.VerificationException;
 import io.javadog.cws.common.keys.CWSKeyPair;
 import io.javadog.cws.common.keys.SecretCWSKey;
+import io.javadog.cws.core.enums.Permission;
 import io.javadog.cws.model.CommonDao;
 import io.javadog.cws.model.entities.DataEntity;
 import io.javadog.cws.model.entities.MemberEntity;

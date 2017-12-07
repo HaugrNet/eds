@@ -9,7 +9,7 @@ package io.javadog.cws.soap;
 
 import io.javadog.cws.common.Settings;
 import io.javadog.cws.common.exceptions.CWSException;
-import io.javadog.cws.core.Serviceable;
+import io.javadog.cws.core.services.Serviceable;
 
 import java.util.logging.Logger;
 

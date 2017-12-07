@@ -5,7 +5,7 @@
  * Project: CWS (cws-core)
  * =============================================================================
  */
-package io.javadog.cws.core;
+package io.javadog.cws.core.enums;
 
 import io.javadog.cws.api.common.TrustLevel;
 

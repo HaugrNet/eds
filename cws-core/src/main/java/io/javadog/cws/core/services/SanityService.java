@@ -11,8 +11,7 @@ import io.javadog.cws.api.dtos.Sanity;
 import io.javadog.cws.api.requests.SanityRequest;
 import io.javadog.cws.api.responses.SanityResponse;
 import io.javadog.cws.common.Settings;
-import io.javadog.cws.core.Permission;
-import io.javadog.cws.core.Serviceable;
+import io.javadog.cws.core.enums.Permission;
 import io.javadog.cws.model.entities.DataEntity;
 
 import javax.persistence.EntityManager;

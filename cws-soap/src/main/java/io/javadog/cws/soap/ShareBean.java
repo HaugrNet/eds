@@ -23,12 +23,12 @@ import io.javadog.cws.api.responses.SignResponse;
 import io.javadog.cws.api.responses.VerifyResponse;
 import io.javadog.cws.common.Settings;
 import io.javadog.cws.common.exceptions.CWSException;
-import io.javadog.cws.core.Serviceable;
 import io.javadog.cws.core.services.FetchDataService;
 import io.javadog.cws.core.services.FetchDataTypeService;
 import io.javadog.cws.core.services.FetchSignatureService;
 import io.javadog.cws.core.services.ProcessDataService;
 import io.javadog.cws.core.services.ProcessDataTypeService;
+import io.javadog.cws.core.services.Serviceable;
 import io.javadog.cws.core.services.SignService;
 import io.javadog.cws.core.services.VerifyService;
 

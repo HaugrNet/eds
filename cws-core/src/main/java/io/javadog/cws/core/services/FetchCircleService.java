@@ -14,8 +14,7 @@ import io.javadog.cws.api.dtos.Trustee;
 import io.javadog.cws.api.requests.FetchCircleRequest;
 import io.javadog.cws.api.responses.FetchCircleResponse;
 import io.javadog.cws.common.Settings;
-import io.javadog.cws.core.Permission;
-import io.javadog.cws.core.Serviceable;
+import io.javadog.cws.core.enums.Permission;
 import io.javadog.cws.model.entities.CircleEntity;
 import io.javadog.cws.model.entities.TrusteeEntity;
 

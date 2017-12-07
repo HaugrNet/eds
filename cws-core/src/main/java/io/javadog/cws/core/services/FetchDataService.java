@@ -15,8 +15,7 @@ import io.javadog.cws.api.responses.FetchDataResponse;
 import io.javadog.cws.common.Settings;
 import io.javadog.cws.common.enums.SanityStatus;
 import io.javadog.cws.common.keys.SecretCWSKey;
-import io.javadog.cws.core.Permission;
-import io.javadog.cws.core.Serviceable;
+import io.javadog.cws.core.enums.Permission;
 import io.javadog.cws.model.entities.DataEntity;
 import io.javadog.cws.model.entities.MetadataEntity;
 

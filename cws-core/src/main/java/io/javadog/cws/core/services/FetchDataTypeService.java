@@ -11,8 +11,7 @@ import io.javadog.cws.api.dtos.DataType;
 import io.javadog.cws.api.requests.FetchDataTypeRequest;
 import io.javadog.cws.api.responses.FetchDataTypeResponse;
 import io.javadog.cws.common.Settings;
-import io.javadog.cws.core.Permission;
-import io.javadog.cws.core.Serviceable;
+import io.javadog.cws.core.enums.Permission;
 import io.javadog.cws.model.entities.DataTypeEntity;
 
 import javax.persistence.EntityManager;

@@ -257,7 +257,7 @@ public final class ProcessCircleService extends Serviceable<ProcessCircleRespons
             final MemberEntity newTrusteeMember = dao.find(MemberEntity.class, memberId);
 
             if (newTrusteeMember != null) {
-                final List<TrusteeEntity> existing = dao.findTrustByMemberAndCircle(newTrusteeMember, request.getCircleId(), TrustLevel.getLevels(TrustLevel.ALL));
+                final List<TrusteeEntity> existing = dao.findTrustByMemberAndCircle(newTrusteeMember.getId(), request.getCircleId(), TrustLevel.getLevels(TrustLevel.ALL));
 
                 if (existing.isEmpty()) {
                     // Please be aware, that during re-key requests - there will

@@ -311,9 +311,9 @@ public abstract class Serviceable<R extends CwsResponse, V extends Authenticatio
         final List<TrusteeEntity> found;
 
         if (circleId != null) {
-            found = dao.findTrustByMemberAndCircle(member, circleId, permissions);
+            found = dao.findTrustByMemberAndCircle(member.getId(), circleId, permissions);
         } else {
-            found = dao.findTrustByMember(member, permissions);
+            found = dao.findTrustByMember(member.getId(), permissions);
         }
 
         return found;

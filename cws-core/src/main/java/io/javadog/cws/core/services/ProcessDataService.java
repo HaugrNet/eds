@@ -71,7 +71,7 @@ public final class ProcessDataService extends Serviceable<ProcessDataResponse, P
     private ProcessDataResponse processAddData(final ProcessDataRequest request) {
         final DataTypeEntity type = findDataType(request.getTypeName());
         final MetadataEntity parent = findParent(request);
-        final MetadataEntity existingName = dao.findInFolder(member, parent, request.getDataName());
+        final MetadataEntity existingName = dao.findInFolder(member.getId(), parent, request.getDataName());
         final ProcessDataResponse response;
 
         if (existingName == null) {
@@ -114,7 +114,7 @@ public final class ProcessDataService extends Serviceable<ProcessDataResponse, P
     }
 
     private ProcessDataResponse processUpdateData(final ProcessDataRequest request) {
-        final MetadataEntity entity = dao.findMetaDataByMemberAndExternalId(member, request.getDataId());
+        final MetadataEntity entity = dao.findMetaDataByMemberAndExternalId(member.getId(), request.getDataId());
         final ProcessDataResponse response;
 
         if (entity != null) {
@@ -145,7 +145,7 @@ public final class ProcessDataService extends Serviceable<ProcessDataResponse, P
     }
 
     private ProcessDataResponse processDeleteData(final ProcessDataRequest request) {
-        final MetadataEntity entity = dao.findMetaDataByMemberAndExternalId(member, request.getDataId());
+        final MetadataEntity entity = dao.findMetaDataByMemberAndExternalId(member.getId(), request.getDataId());
         final ProcessDataResponse response;
 
         if (entity != null) {
@@ -156,7 +156,7 @@ public final class ProcessDataService extends Serviceable<ProcessDataResponse, P
             if (Objects.equals(Constants.FOLDER_TYPENAME, entity.getType().getName())) {
                 // If the Entity is a Folder, then we must check if it
                 // currently has content, if so - then we cannot delete it.
-                final long count = dao.countFolderContent(entity);
+                final long count = dao.countFolderContent(entity.getId());
                 if (count > 0) {
                     response = new ProcessDataResponse(ReturnCode.INTEGRITY_WARNING, "The requested Folder cannot be removed as it is not empty.");
                 } else {
@@ -206,12 +206,12 @@ public final class ProcessDataService extends Serviceable<ProcessDataResponse, P
         final MetadataEntity entity;
 
         if (request.getFolderId() != null) {
-            entity = dao.findMetaDataByMemberAndExternalId(member, request.getFolderId());
+            entity = dao.findMetaDataByMemberAndExternalId(member.getId(), request.getFolderId());
             if ((entity == null) || !Objects.equals(Constants.FOLDER_TYPENAME, entity.getType().getName())) {
                 throw new CWSException(ReturnCode.IDENTIFICATION_WARNING, "Provided FolderId is not a folder.");
             }
         } else {
-            entity = dao.findRootByMemberCircle(member, request.getCircleId());
+            entity = dao.findRootByMemberCircle(member.getId(), request.getCircleId());
         }
 
         return entity;
@@ -256,7 +256,7 @@ public final class ProcessDataService extends Serviceable<ProcessDataResponse, P
     private MetadataEntity checkFolder(final MetadataEntity entity, final String folderId) {
         final MetadataEntity folder;
 
-        folder = dao.findMetaDataByMemberAndExternalId(member, folderId);
+        folder = dao.findMetaDataByMemberAndExternalId(member.getId(), folderId);
         if (folder != null) {
             final Long currentCircleId = entity.getCircle().getId();
             final Long foundCircleId = folder.getCircle().getId();
@@ -278,7 +278,7 @@ public final class ProcessDataService extends Serviceable<ProcessDataResponse, P
     private String checkName(final MetadataEntity entity, final String name, final Long folderId) {
         final String theName = (name != null) ? name.trim() : entity.getName();
 
-        if (dao.checkIfNameIsUsed(entity, theName, folderId)) {
+        if (dao.checkIfNameIsUsed(entity.getId(), theName, folderId)) {
             throw new CWSException(ReturnCode.IDENTIFICATION_WARNING, "The name provided is already being used in the given folder.");
         }
 
@@ -289,7 +289,7 @@ public final class ProcessDataService extends Serviceable<ProcessDataResponse, P
         if (bytes != null) {
             final TrusteeEntity trustee = findTrustee(metadata.getCircle().getExternalId());
 
-            DataEntity entity = dao.findDataByMetadata(metadata);
+            DataEntity entity = dao.findDataByMetadata(metadata.getId());
             if (entity == null) {
                 entity = new DataEntity();
                 entity.setMetadata(metadata);

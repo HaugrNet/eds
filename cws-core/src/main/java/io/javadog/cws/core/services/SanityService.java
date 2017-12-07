@@ -12,7 +12,7 @@ import io.javadog.cws.api.requests.SanityRequest;
 import io.javadog.cws.api.responses.SanityResponse;
 import io.javadog.cws.common.Settings;
 import io.javadog.cws.core.enums.Permission;
-import io.javadog.cws.model.entities.DataEntity;
+import io.javadog.cws.core.model.entities.DataEntity;
 
 import javax.persistence.EntityManager;
 import java.util.ArrayList;

@@ -9,7 +9,10 @@ package io.javadog.cws.soap;
 
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.common.exceptions.CWSException;
-import io.javadog.cws.model.DatabaseSetup;
+import io.javadog.cws.core.DatabaseSetup;
+import io.javadog.cws.core.SettingBean;
+import io.javadog.cws.core.ShareBean;
+import io.javadog.cws.core.SystemBean;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;

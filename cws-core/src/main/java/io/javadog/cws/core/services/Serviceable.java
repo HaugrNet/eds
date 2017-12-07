@@ -26,11 +26,11 @@ import io.javadog.cws.common.exceptions.VerificationException;
 import io.javadog.cws.common.keys.CWSKeyPair;
 import io.javadog.cws.common.keys.SecretCWSKey;
 import io.javadog.cws.core.enums.Permission;
-import io.javadog.cws.model.CommonDao;
-import io.javadog.cws.model.entities.DataEntity;
-import io.javadog.cws.model.entities.MemberEntity;
-import io.javadog.cws.model.entities.TrusteeEntity;
-import io.javadog.cws.model.jpa.CommonJpaDao;
+import io.javadog.cws.core.model.CommonDao;
+import io.javadog.cws.core.model.CommonJpaDao;
+import io.javadog.cws.core.model.entities.DataEntity;
+import io.javadog.cws.core.model.entities.MemberEntity;
+import io.javadog.cws.core.model.entities.TrusteeEntity;
 
 import javax.persistence.EntityManager;
 import java.nio.charset.Charset;

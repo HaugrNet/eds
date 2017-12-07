@@ -6,15 +6,15 @@
     <persistence-unit name="cwsDS" transaction-type="JTA">
         <jta-data-source>java:/datasources/cwsDS</jta-data-source>
 
-        <class>io.javadog.cws.model.entities.SettingEntity</class>
-        <class>io.javadog.cws.model.entities.MemberEntity</class>
-        <class>io.javadog.cws.model.entities.CircleEntity</class>
-        <class>io.javadog.cws.model.entities.KeyEntity</class>
-        <class>io.javadog.cws.model.entities.TrusteeEntity</class>
-        <class>io.javadog.cws.model.entities.DataTypeEntity</class>
-        <class>io.javadog.cws.model.entities.MetadataEntity</class>
-        <class>io.javadog.cws.model.entities.DataEntity</class>
-        <class>io.javadog.cws.model.entities.SignatureEntity</class>
+        <class>io.javadog.cws.core.model.entities.SettingEntity</class>
+        <class>io.javadog.cws.core.model.entities.MemberEntity</class>
+        <class>io.javadog.cws.core.model.entities.CircleEntity</class>
+        <class>io.javadog.cws.core.model.entities.KeyEntity</class>
+        <class>io.javadog.cws.core.model.entities.TrusteeEntity</class>
+        <class>io.javadog.cws.core.model.entities.DataTypeEntity</class>
+        <class>io.javadog.cws.core.model.entities.MetadataEntity</class>
+        <class>io.javadog.cws.core.model.entities.DataEntity</class>
+        <class>io.javadog.cws.core.model.entities.SignatureEntity</class>
 
         <properties>
             <property name="hibernate.show_sql" value="false"/>

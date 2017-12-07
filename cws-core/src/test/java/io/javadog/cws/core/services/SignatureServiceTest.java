@@ -17,7 +17,7 @@ import io.javadog.cws.api.requests.VerifyRequest;
 import io.javadog.cws.api.responses.FetchSignatureResponse;
 import io.javadog.cws.api.responses.SignResponse;
 import io.javadog.cws.api.responses.VerifyResponse;
-import io.javadog.cws.model.DatabaseSetup;
+import io.javadog.cws.core.DatabaseSetup;
 import org.junit.Test;
 
 import java.util.Date;

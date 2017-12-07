@@ -18,7 +18,7 @@ import io.javadog.cws.api.responses.SettingResponse;
 import io.javadog.cws.common.Settings;
 import io.javadog.cws.common.exceptions.AuthorizationException;
 import io.javadog.cws.common.exceptions.CWSException;
-import io.javadog.cws.model.DatabaseSetup;
+import io.javadog.cws.core.DatabaseSetup;
 import org.junit.Test;
 
 import javax.persistence.Query;

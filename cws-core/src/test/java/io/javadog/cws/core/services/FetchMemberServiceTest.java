@@ -20,8 +20,8 @@ import io.javadog.cws.api.responses.FetchMemberResponse;
 import io.javadog.cws.common.Settings;
 import io.javadog.cws.common.exceptions.AuthorizationException;
 import io.javadog.cws.common.exceptions.VerificationException;
-import io.javadog.cws.model.DatabaseSetup;
-import io.javadog.cws.model.entities.MemberEntity;
+import io.javadog.cws.core.DatabaseSetup;
+import io.javadog.cws.core.model.entities.MemberEntity;
 import org.junit.Test;
 
 import java.util.UUID;

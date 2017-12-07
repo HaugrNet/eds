@@ -25,8 +25,8 @@ import io.javadog.cws.api.responses.ProcessDataResponse;
 import io.javadog.cws.api.responses.ProcessMemberResponse;
 import io.javadog.cws.common.exceptions.CWSException;
 import io.javadog.cws.common.exceptions.VerificationException;
-import io.javadog.cws.model.DatabaseSetup;
-import io.javadog.cws.model.entities.DataEntity;
+import io.javadog.cws.core.DatabaseSetup;
+import io.javadog.cws.core.model.entities.DataEntity;
 import org.junit.Test;
 
 import javax.persistence.Query;

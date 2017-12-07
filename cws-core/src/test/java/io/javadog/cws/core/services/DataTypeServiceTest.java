@@ -24,7 +24,7 @@ import io.javadog.cws.api.responses.ProcessDataTypeResponse;
 import io.javadog.cws.common.exceptions.AuthorizationException;
 import io.javadog.cws.common.exceptions.CWSException;
 import io.javadog.cws.common.exceptions.VerificationException;
-import io.javadog.cws.model.DatabaseSetup;
+import io.javadog.cws.core.DatabaseSetup;
 import org.junit.Test;
 
 /**

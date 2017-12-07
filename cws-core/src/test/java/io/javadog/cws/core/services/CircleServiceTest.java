@@ -28,8 +28,8 @@ import io.javadog.cws.api.responses.ProcessDataResponse;
 import io.javadog.cws.common.Settings;
 import io.javadog.cws.common.exceptions.CWSException;
 import io.javadog.cws.common.exceptions.VerificationException;
-import io.javadog.cws.model.DatabaseSetup;
-import io.javadog.cws.model.entities.CircleEntity;
+import io.javadog.cws.core.DatabaseSetup;
+import io.javadog.cws.core.model.entities.CircleEntity;
 import org.junit.Test;
 
 import java.util.UUID;

@@ -12,7 +12,7 @@ import io.javadog.cws.api.requests.VerifyRequest;
 import io.javadog.cws.api.responses.VerifyResponse;
 import io.javadog.cws.common.Settings;
 import io.javadog.cws.core.enums.Permission;
-import io.javadog.cws.model.entities.SignatureEntity;
+import io.javadog.cws.core.model.entities.SignatureEntity;
 
 import javax.persistence.EntityManager;
 import java.security.PublicKey;

@@ -17,6 +17,7 @@ import io.javadog.cws.api.requests.SettingRequest;
 import io.javadog.cws.api.responses.SettingResponse;
 import io.javadog.cws.common.Settings;
 import io.javadog.cws.common.exceptions.CWSException;
+import io.javadog.cws.core.CommonBean;
 import io.javadog.cws.core.services.Serviceable;
 import io.javadog.cws.core.services.SettingService;
 import org.junit.Test;

@@ -1,0 +1,41 @@
+<persistence xmlns="http://java.sun.com/xml/ns/persistence"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd"
+        version="2.0">
+    <persistence-unit name="io.javadog.cws.jpa">
+        <description>JPA Test Database Setup</description>
+        <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+
+        <class>io.javadog.cws.core.model.entities.SettingEntity</class>
+        <class>io.javadog.cws.core.model.entities.MemberEntity</class>
+        <class>io.javadog.cws.core.model.entities.CircleEntity</class>
+        <class>io.javadog.cws.core.model.entities.KeyEntity</class>
+        <class>io.javadog.cws.core.model.entities.TrusteeEntity</class>
+        <class>io.javadog.cws.core.model.entities.DataTypeEntity</class>
+        <class>io.javadog.cws.core.model.entities.MetadataEntity</class>
+        <class>io.javadog.cws.core.model.entities.DataEntity</class>
+        <class>io.javadog.cws.core.model.entities.SignatureEntity</class>
+
+        <properties>
+            <!-- JPA Settings to create test DB via scripts -->
+            <property name="javax.persistence.jdbc.url" value ="jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE"/>
+            <property name="javax.persistence.jdbc.driver" value="org.h2.Driver"/>
+            <property name="javax.persistence.jdbc.user" value="sa"/>
+            <property name="javax.persistence.jdbc.password" value="sa"/>
+            <property name="javax.persistence.schema-generation.database.action" value="create" />
+            <property name="javax.persistence.schema-generation.create-source" value="script"/>
+            <property name="javax.persistence.schema-generation.create-script-source" value="META-INF/init-h2.sql"/>
+            <property name="javax.persistence.sql-load-script-source" value="META-INF/data.sql"/>
+
+            <!-- Hibernate Settings for our test -->
+            <property name="hibernate.connection.pool_size" value="50"/>
+            <property name="hibernate.connection.autocommit" value="false"/>
+            <property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect"/>
+            <property name="hibernate.cache.provider_class" value="org.hibernate.cache.HashtableCacheProvider"/>
+            <!-- The following is needed, as Hibernate otherwise require that each table creation is on a single line. -->
+            <property name="hibernate.hbm2ddl.import_files_sql_extractor" value="org.hibernate.tool.hbm2ddl.MultipleLinesSqlCommandExtractor" />
+            <property name="show_sql" value="false"/>
+        </properties>
+
+    </persistence-unit>
+</persistence>

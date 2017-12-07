@@ -20,8 +20,8 @@ import io.javadog.cws.api.responses.FetchDataResponse;
 import io.javadog.cws.api.responses.ProcessDataResponse;
 import io.javadog.cws.api.responses.SanityResponse;
 import io.javadog.cws.common.exceptions.AuthorizationException;
-import io.javadog.cws.model.DatabaseSetup;
-import io.javadog.cws.model.entities.DataEntity;
+import io.javadog.cws.core.DatabaseSetup;
+import io.javadog.cws.core.model.entities.DataEntity;
 import org.junit.Test;
 
 import javax.persistence.Query;

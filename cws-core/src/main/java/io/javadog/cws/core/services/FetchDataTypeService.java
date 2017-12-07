@@ -12,7 +12,7 @@ import io.javadog.cws.api.requests.FetchDataTypeRequest;
 import io.javadog.cws.api.responses.FetchDataTypeResponse;
 import io.javadog.cws.common.Settings;
 import io.javadog.cws.core.enums.Permission;
-import io.javadog.cws.model.entities.DataTypeEntity;
+import io.javadog.cws.core.model.entities.DataTypeEntity;
 
 import javax.persistence.EntityManager;
 import java.util.ArrayList;

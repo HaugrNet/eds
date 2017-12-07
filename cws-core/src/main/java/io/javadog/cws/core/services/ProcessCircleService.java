@@ -20,12 +20,12 @@ import io.javadog.cws.common.exceptions.CWSException;
 import io.javadog.cws.common.keys.PublicCWSKey;
 import io.javadog.cws.common.keys.SecretCWSKey;
 import io.javadog.cws.core.enums.Permission;
-import io.javadog.cws.model.entities.CircleEntity;
-import io.javadog.cws.model.entities.DataTypeEntity;
-import io.javadog.cws.model.entities.KeyEntity;
-import io.javadog.cws.model.entities.MemberEntity;
-import io.javadog.cws.model.entities.MetadataEntity;
-import io.javadog.cws.model.entities.TrusteeEntity;
+import io.javadog.cws.core.model.entities.CircleEntity;
+import io.javadog.cws.core.model.entities.DataTypeEntity;
+import io.javadog.cws.core.model.entities.KeyEntity;
+import io.javadog.cws.core.model.entities.MemberEntity;
+import io.javadog.cws.core.model.entities.MetadataEntity;
+import io.javadog.cws.core.model.entities.TrusteeEntity;
 
 import javax.persistence.EntityManager;
 import java.security.PublicKey;

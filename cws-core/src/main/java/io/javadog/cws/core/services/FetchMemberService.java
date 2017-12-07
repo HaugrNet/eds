@@ -16,9 +16,9 @@ import io.javadog.cws.api.responses.FetchMemberResponse;
 import io.javadog.cws.common.Settings;
 import io.javadog.cws.common.exceptions.AuthorizationException;
 import io.javadog.cws.core.enums.Permission;
-import io.javadog.cws.model.entities.CircleEntity;
-import io.javadog.cws.model.entities.MemberEntity;
-import io.javadog.cws.model.entities.TrusteeEntity;
+import io.javadog.cws.core.model.entities.CircleEntity;
+import io.javadog.cws.core.model.entities.MemberEntity;
+import io.javadog.cws.core.model.entities.TrusteeEntity;
 
 import javax.persistence.EntityManager;
 import java.util.ArrayList;

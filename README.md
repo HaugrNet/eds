@@ -18,7 +18,7 @@ Communication is achieved via a public API, which allows both REST and SOAP
 based WebService requests. This will give a high degree of flexibility for
 anyone to integrate it into their system.
 
-# Build, Install & Run
+# Build, Install and Run
 The current version of CWS has reached the point where it can build, deploy and
 run in [WildFly](http://www.wildfly.org/) using PostgreSQL as database. To test,
 please make sure that you have Java (8+), [Maven](https://maven.apache.org/) and
@@ -74,7 +74,7 @@ as of Java 8u162, to be released on [January 16th, 2018](http://www.oracle.com/t
 the release of CWS 1.0 has been postponed until January 31st, 2018.
 
 - [0.6](https://javadog.io/downloads/cws-0.6.1.tgz) - Released November 17th, 2017; Code Completion Release
-- 0.7 - Scheduled for December, 2017; Documentation Release
+- [0.7](https://javadog.io/downloads/cws-0.7.0.tgz) - Released December 9th, 2017; Documentation Release
 - 0.8 - Scheduled for December, 2017; REST Release
 - 0.9 - Scheduled for January, 2018; Auditing & Review Release
 - 1.0 - Scheduled for January 31st, 2018; Final 1.0 Release

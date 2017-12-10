@@ -167,6 +167,7 @@
       <xs:extension base="tns:cwsResult">
         <xs:sequence>
           <xs:element maxOccurs="unbounded" name="metadata" type="tns:metadata"/>
+          <xs:element name="records" type="xs:long"/>
           <xs:element name="data" type="xs:base64Binary"/>
         </xs:sequence>
       </xs:extension>

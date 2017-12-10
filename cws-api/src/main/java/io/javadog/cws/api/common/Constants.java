@@ -80,6 +80,7 @@ public final class Constants {
     public static final String FIELD_TRUSTLEVEL = "trustLevel";
     public static final String FIELD_METADATA = "metadata";
     public static final String FIELD_DATA_NAME = "dataName";
+    public static final String FIELD_RECORDS = "records";
     public static final String FIELD_DATA = "data";
     public static final String FIELD_DATATYPE = "dataType";
     public static final String FIELD_DATATYPES = "dataTypes";

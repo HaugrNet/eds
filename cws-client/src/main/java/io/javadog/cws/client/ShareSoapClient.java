@@ -222,6 +222,7 @@ public final class ShareSoapClient implements Share {
             api = new FetchDataResponse();
             Mapper.fillResponse(api, ws);
             api.setMetadata(Mapper.mapMetadata(ws.getMetadata()));
+            api.setRecords(ws.getRecords());
             api.setData(ws.getData());
         }
 

@@ -26,7 +26,7 @@ import java.util.List;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "fetchDataResult", propOrder = { Constants.FIELD_METADATA, Constants.FIELD_DATA })
+@XmlType(name = "fetchDataResult", propOrder = { Constants.FIELD_METADATA, Constants.FIELD_RECORDS, Constants.FIELD_DATA })
 public final class FetchDataResponse extends CwsResponse {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
@@ -34,6 +34,9 @@ public final class FetchDataResponse extends CwsResponse {
 
     @XmlElement(name = Constants.FIELD_METADATA, required = true)
     private final List<Metadata> metadata = new ArrayList<>(0);
+
+    @XmlElement(name = Constants.FIELD_RECORDS, required = true)
+    private long records = 0;
 
     @XmlElement(name = Constants.FIELD_DATA, required = true)
     private byte[] data = null;
@@ -71,6 +74,14 @@ public final class FetchDataResponse extends CwsResponse {
 
     public List<Metadata> getMetadata() {
         return Collections.unmodifiableList(metadata);
+    }
+
+    public void setRecords(final long records) {
+        this.records = records;
+    }
+
+    public long getRecords() {
+        return records;
     }
 
     public void setData(final byte[] data) {

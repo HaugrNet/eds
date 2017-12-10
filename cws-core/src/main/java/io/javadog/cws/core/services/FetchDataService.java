@@ -49,7 +49,8 @@ public final class FetchDataService extends Serviceable<FetchDataResponse, Fetch
                 final int pageNumber = request.getPageNumber();
                 final int pageSize = request.getPageSize();
                 final List<MetadataEntity> found = dao.findMetadataByMemberAndFolder(member, root, pageNumber, pageSize);
-                response = prepareResponse(root.getExternalId(), found);
+                final long count = dao.countFolderContent(root.getId());
+                response = prepareResponse(root.getExternalId(), found, count);
             } else {
                 response = readCompleteDataObject(root);
             }
@@ -123,7 +124,7 @@ public final class FetchDataService extends Serviceable<FetchDataResponse, Fetch
         return response;
     }
 
-    private static FetchDataResponse prepareResponse(final String folderId, final List<MetadataEntity> records) {
+    private static FetchDataResponse prepareResponse(final String folderId, final List<MetadataEntity> records, final long count) {
         final List<Metadata> list = new ArrayList<>(records.size());
 
         for (final MetadataEntity metadata : records) {
@@ -133,6 +134,7 @@ public final class FetchDataService extends Serviceable<FetchDataResponse, Fetch
 
         final FetchDataResponse response = new FetchDataResponse();
         response.setMetadata(list);
+        response.setRecords(count);
 
         return response;
     }

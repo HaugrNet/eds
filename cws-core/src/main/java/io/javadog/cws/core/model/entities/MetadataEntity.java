@@ -37,7 +37,7 @@ import javax.persistence.Table;
                         "from MetadataEntity m," +
                         "     TrusteeEntity t " +
                         "where m.circle.id = t.circle.id" +
-                        "  and t.member.id = :mid" +
+                        "  and t.member = :member" +
                         "  and m.parentId = :parentId " +
                         "order by m.id desc"),
         @NamedQuery(name = "metadata.findRootByMemberAndCircle",
@@ -56,8 +56,8 @@ import javax.persistence.Table;
                         "from MetadataEntity m," +
                         "     TrusteeEntity t " +
                         "where m.circle.id = t.circle.id" +
-                        "  and t.member.id = :mid" +
-                        "  and m.parentId = :pid" +
+                        "  and t.member = :member" +
+                        "  and m.parentId = :parentId" +
                         "  and lower(m.name) = lower(:name)"),
         @NamedQuery(name = "metadata.findByNameAndFolder",
                 query = "select m " +

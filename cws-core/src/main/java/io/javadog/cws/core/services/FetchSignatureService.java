@@ -35,7 +35,7 @@ public final class FetchSignatureService extends Serviceable<FetchSignatureRespo
     public FetchSignatureResponse perform(final FetchSignatureRequest request) {
         verifyRequest(request, Permission.FETCH_SIGNATURES);
 
-        final List<SignatureEntity> found = dao.findAllSignatures(member.getId());
+        final List<SignatureEntity> found = dao.findAllSignatures(member);
         final List<Signature> signatures = new ArrayList<>(found.size());
 
         for (final SignatureEntity entity : found) {

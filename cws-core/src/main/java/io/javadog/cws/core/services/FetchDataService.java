@@ -48,7 +48,7 @@ public final class FetchDataService extends Serviceable<FetchDataResponse, Fetch
             if (Objects.equals(root.getType().getName(), Constants.FOLDER_TYPENAME)) {
                 final int pageNumber = request.getPageNumber();
                 final int pageSize = request.getPageSize();
-                final List<MetadataEntity> found = dao.findMetadataByMemberAndFolder(member, root, pageNumber, pageSize);
+                final List<MetadataEntity> found = dao.findMetadataByMemberAndFolder(member, root.getId(), pageNumber, pageSize);
                 response = prepareResponse(root.getExternalId(), found);
             } else {
                 response = readCompleteDataObject(root);
@@ -92,7 +92,7 @@ public final class FetchDataService extends Serviceable<FetchDataResponse, Fetch
         // information, if the person is allowed, which includes checks for
         // Circle Membership and right TrustLevel of the Member. If no Entity
         // is found, then there can be multiple reasons.
-        final DataEntity entity = dao.findDataByMemberAndExternalId(member.getId(), metadata.getExternalId());
+        final DataEntity entity = dao.findDataByMemberAndExternalId(member, metadata.getExternalId());
         final FetchDataResponse response = new FetchDataResponse();
         final MetadataEntity parent = dao.find(MetadataEntity.class, metadata.getParentId());
         final Metadata metaData = convert(metadata, parent.getExternalId());

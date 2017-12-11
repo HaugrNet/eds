@@ -16,6 +16,7 @@ import java.nio.charset.Charset;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 
@@ -79,91 +80,99 @@ public final class Settings {
     private final Properties properties = new Properties();
 
     public Settings() {
-        properties.setProperty(SYMMETRIC_ALGORITHM, DEFAULT_SYMMETRIC_ALGORITHM);
-        properties.setProperty(ASYMMETRIC_ALGORITHM, DEFAULT_ASYMMETRIC_ALGORITHM);
-        properties.setProperty(SIGNATURE_ALGORITHM, DEFAULT_SIGNATURE_ALGORITHM);
-        properties.setProperty(PBE_ALGORITHM, DEFAULT_PBE_ALGORITHM);
-        properties.setProperty(HASH_ALGORITHM, DEFAULT_HASH_ALGORITHM);
-        properties.setProperty(CWS_SALT, DEFAULT_SALT);
-        properties.setProperty(CWS_LOCALE, DEFAULT_LOCALE);
-        properties.setProperty(CWS_CHARSET, DEFAULT_CHARSETNAME);
-        properties.setProperty(EXPOSE_ADMIN, DEFAULT_EXPOSE_ADMIN);
-        properties.setProperty(SHOW_TRUSTEES, DEFAULT_SHOW_TRUSTEES);
-        properties.setProperty(SANITY_STARTUP, DEFAULT_SANITY_STARTUP);
-        properties.setProperty(SANITY_INTERVAL, DEFAULT_SANITY_INTERVAL);
+        set(SYMMETRIC_ALGORITHM, DEFAULT_SYMMETRIC_ALGORITHM);
+        set(ASYMMETRIC_ALGORITHM, DEFAULT_ASYMMETRIC_ALGORITHM);
+        set(SIGNATURE_ALGORITHM, DEFAULT_SIGNATURE_ALGORITHM);
+        set(PBE_ALGORITHM, DEFAULT_PBE_ALGORITHM);
+        set(HASH_ALGORITHM, DEFAULT_HASH_ALGORITHM);
+        set(CWS_SALT, DEFAULT_SALT);
+        set(CWS_LOCALE, DEFAULT_LOCALE);
+        set(CWS_CHARSET, DEFAULT_CHARSETNAME);
+        set(EXPOSE_ADMIN, DEFAULT_EXPOSE_ADMIN);
+        set(SHOW_TRUSTEES, DEFAULT_SHOW_TRUSTEES);
+        set(SANITY_STARTUP, DEFAULT_SANITY_STARTUP);
+        set(SANITY_INTERVAL, DEFAULT_SANITY_INTERVAL);
     }
+
+    // =========================================================================
+    // Generic Settings Methods
+    // =========================================================================
 
     public void set(final String key, final String value) {
         properties.setProperty(key, value);
     }
 
+    public String get(final String key) {
+        return properties.getProperty(key);
+    }
+
+    public Set<String> keys() {
+        return properties.stringPropertyNames();
+    }
+
     public Map<String, String> get() {
         final Map<String, String> copy = new ConcurrentHashMap<>(16);
 
-        for (final String key : properties.stringPropertyNames()) {
-            copy.put(key, properties.getProperty(key));
+        for (final String key : keys()) {
+            copy.put(key, get(key));
         }
 
         return copy;
     }
 
+    // =========================================================================
+    // Specific Setting Getter Methods
+    // =========================================================================
+
     public KeyAlgorithm getSymmetricAlgorithm() {
-        return KeyAlgorithm.valueOf(properties.getProperty(SYMMETRIC_ALGORITHM));
+        return KeyAlgorithm.valueOf(get(SYMMETRIC_ALGORITHM));
     }
 
     public KeyAlgorithm getAsymmetricAlgorithm() {
-        return KeyAlgorithm.valueOf(properties.getProperty(ASYMMETRIC_ALGORITHM));
+        return KeyAlgorithm.valueOf(get(ASYMMETRIC_ALGORITHM));
     }
 
     public KeyAlgorithm getSignatureAlgorithm() {
-        return KeyAlgorithm.valueOf(properties.getProperty(SIGNATURE_ALGORITHM));
+        return KeyAlgorithm.valueOf(get(SIGNATURE_ALGORITHM));
     }
 
     public KeyAlgorithm getPasswordAlgorithm() {
-        return KeyAlgorithm.valueOf(properties.getProperty(PBE_ALGORITHM));
+        return KeyAlgorithm.valueOf(get(PBE_ALGORITHM));
     }
 
     public HashAlgorithm getHashAlgorithm() {
-        return HashAlgorithm.valueOf(properties.getProperty(HASH_ALGORITHM));
+        return HashAlgorithm.valueOf(get(HASH_ALGORITHM));
     }
 
     public String getSalt() {
-        return properties.getProperty(CWS_SALT);
+        return get(CWS_SALT);
     }
 
     public Locale getLocale() {
-        return Locale.forLanguageTag(properties.getProperty(CWS_LOCALE));
+        return Locale.forLanguageTag(get(CWS_LOCALE));
     }
 
     public Charset getCharset() {
         try {
-            return Charset.forName(properties.getProperty(CWS_CHARSET));
+            return Charset.forName(get(CWS_CHARSET));
         } catch (IllegalArgumentException e) {
             throw new CWSException(ReturnCode.PROPERTY_ERROR, e);
         }
     }
 
     public Boolean getExposeAdmin() {
-        return toBoolean(properties.getProperty(EXPOSE_ADMIN));
+        return Boolean.valueOf(get(EXPOSE_ADMIN).trim());
     }
 
     public Boolean getShareTrustees() {
-        return toBoolean(properties.getProperty(SHOW_TRUSTEES));
+        return Boolean.valueOf(get(SHOW_TRUSTEES).trim());
     }
 
     public Boolean getSanityStartup() {
-        return toBoolean(properties.getProperty(SANITY_STARTUP));
+        return Boolean.valueOf(get(SANITY_STARTUP).trim());
     }
 
     public Integer getSanityInterval() {
-        return Integer.valueOf(properties.getProperty(SANITY_INTERVAL));
-    }
-
-    // =========================================================================
-    // Internal methods
-    // =========================================================================
-
-    private static Boolean toBoolean(final String value) {
-        return Boolean.valueOf(value.trim());
+        return Integer.valueOf(get(SANITY_INTERVAL).trim());
     }
 }

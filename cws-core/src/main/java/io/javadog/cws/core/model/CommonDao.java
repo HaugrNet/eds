@@ -41,6 +41,9 @@ import java.util.UUID;
  */
 public final class CommonDao {
 
+    private static final String MEMBER = "member";
+    private static final String PARENT_ID = "parentId";
+
     private final EntityManager entityManager;
 
     public CommonDao(final EntityManager entityManager) {
@@ -102,17 +105,17 @@ public final class CommonDao {
         return found.get(0);
     }
 
-    public List<TrusteeEntity> findTrustByMember(final Long memberId, final Set<TrustLevel> permissions) {
-        final Query query = entityManager.createNamedQuery("trust.findByMemberId");
-        query.setParameter("id", memberId);
+    public List<TrusteeEntity> findTrustByMember(final MemberEntity member, final Set<TrustLevel> permissions) {
+        final Query query = entityManager.createNamedQuery("trust.findByMember");
+        query.setParameter(MEMBER, member);
         query.setParameter("permissions", permissions);
 
         return findList(query);
     }
 
-    public List<TrusteeEntity> findTrustByMemberAndCircle(final Long memberId, final String externalCircleId, final Set<TrustLevel> permissions) {
-        final Query query = entityManager.createNamedQuery("trust.findByMemberIdAndExternalCircleId");
-        query.setParameter("id", memberId);
+    public List<TrusteeEntity> findTrustByMemberAndCircle(final MemberEntity member, final String externalCircleId, final Set<TrustLevel> permissions) {
+        final Query query = entityManager.createNamedQuery("trust.findByMemberAndExternalCircleId");
+        query.setParameter(MEMBER, member);
         query.setParameter("externalCircleId", externalCircleId);
         query.setParameter("permissions", permissions);
 
@@ -124,9 +127,9 @@ public final class CommonDao {
         return findList(query);
     }
 
-    public List<TrusteeEntity> findTrusteesByCircle(final Long circleId) {
-        final Query query = entityManager.createNamedQuery("trustee.findByCircleId");
-        query.setParameter("circleId", circleId);
+    public List<TrusteeEntity> findTrusteesByCircle(final CircleEntity circle) {
+        final Query query = entityManager.createNamedQuery("trustee.findByCircle");
+        query.setParameter("circle", circle);
 
         return findList(query);
     }
@@ -149,17 +152,17 @@ public final class CommonDao {
         return findSingleRecord(query);
     }
 
-    public List<CircleEntity> findCirclesForMember(final Long memberId) {
+    public List<CircleEntity> findCirclesForMember(final MemberEntity member) {
         final Query query = entityManager.createNamedQuery("trustee.findCirclesByMember");
-        query.setParameter("memberId", memberId);
+        query.setParameter(MEMBER, member);
 
         return findList(query);
     }
 
-    public List<CircleEntity> findCirclesBothBelongTo(final Long memberId, final MemberEntity requested) {
+    public List<CircleEntity> findCirclesBothBelongTo(final MemberEntity member, final MemberEntity requested) {
         final Query query = entityManager.createNamedQuery("trustee.findSharedCircles");
-        query.setParameter("member", memberId);
-        query.setParameter("requested", requested.getId());
+        query.setParameter(MEMBER, member);
+        query.setParameter("requested", requested);
 
         return findList(query);
     }
@@ -185,24 +188,24 @@ public final class CommonDao {
         return findSingleRecord(query);
     }
 
-    public long countObjectTypeUsage(final Long id) {
+    public long countObjectTypeUsage(final DataTypeEntity dataType) {
         final Query query = entityManager.createNamedQuery("type.countUsage");
-        query.setParameter("id", id);
+        query.setParameter("type", dataType);
 
         return (long) query.getSingleResult();
     }
 
-    public DataEntity findDataByMetadata(final Long metadataId) {
+    public DataEntity findDataByMetadata(final MetadataEntity metadata) {
         final Query query = entityManager.createNamedQuery("data.findByMetadata");
-        query.setParameter("metadataId", metadataId);
+        query.setParameter("metadata", metadata);
 
         return findSingleRecord(query);
     }
 
-    public DataEntity findDataByMemberAndExternalId(final Long memberId, final String externalId) {
+    public DataEntity findDataByMemberAndExternalId(final MemberEntity member, final String externalId) {
         final Query query = entityManager.createNamedQuery("data.findByMemberAndExternalId");
-        query.setParameter("mid", memberId);
-        query.setParameter("eid", externalId);
+        query.setParameter(MEMBER, member);
+        query.setParameter("externalId", externalId);
         query.setParameter("trustLevels", EnumSet.of(TrustLevel.ADMIN, TrustLevel.WRITE, TrustLevel.READ));
 
         return findSingleRecord(query);
@@ -224,10 +227,10 @@ public final class CommonDao {
         return findSingleRecord(query);
     }
 
-    public List<MetadataEntity> findMetadataByMemberAndFolder(final MemberEntity member, final MetadataEntity folder, final int pageNumber, final int pageSize) {
+    public List<MetadataEntity> findMetadataByMemberAndFolder(final MemberEntity member, final Long parentId, final int pageNumber, final int pageSize) {
         final Query query = entityManager.createNamedQuery("metadata.findByMemberAndFolder");
-        query.setParameter("mid", member.getId());
-        query.setParameter("parentId", folder.getId());
+        query.setParameter(MEMBER, member);
+        query.setParameter(PARENT_ID, parentId);
         query.setMaxResults(pageSize);
         query.setFirstResult((pageNumber - 1) * pageSize);
 
@@ -241,9 +244,9 @@ public final class CommonDao {
         return findSingleRecord(query);
     }
 
-    public List<SignatureEntity> findAllSignatures(final Long id) {
+    public List<SignatureEntity> findAllSignatures(final MemberEntity member) {
         final Query query = entityManager.createNamedQuery("signature.findByMember");
-        query.setParameter("mid", id);
+        query.setParameter(MEMBER, member);
 
         return findList(query);
     }
@@ -263,20 +266,20 @@ public final class CommonDao {
         return (long) query.getSingleResult();
     }
 
-    public MetadataEntity findInFolder(final long memberId, final MetadataEntity folder, final String name) {
+    public MetadataEntity findInFolder(final MemberEntity member, final Long parentId, final String name) {
         final Query query = entityManager.createNamedQuery("metadata.findInFolder");
-        query.setParameter("mid", memberId);
-        query.setParameter("pid", folder.getId());
+        query.setParameter(MEMBER, member);
+        query.setParameter(PARENT_ID, parentId);
         query.setParameter("name", name);
 
         return findSingleRecord(query);
     }
 
-    public boolean checkIfNameIsUsed(final Long metadataId, final String name, final Long folderId) {
+    public boolean checkIfNameIsUsed(final Long metadataId, final String name, final Long parentId) {
         final Query query = entityManager.createNamedQuery("metadata.findByNameAndFolder");
         query.setParameter("id", metadataId);
         query.setParameter("name", name);
-        query.setParameter("parentId", folderId);
+        query.setParameter(PARENT_ID, parentId);
 
         return findSingleRecord(query) != null;
     }

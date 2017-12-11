@@ -89,6 +89,21 @@ public final class SettingServiceTest extends DatabaseSetup {
     }
 
     @Test
+    public void testInvokingRequestWithNullEntries() {
+        final SettingService service = new SettingService(new Settings(), entityManager);
+        final SettingRequest request = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
+        final Map<String, String> mySettings = new HashMap<>();
+        mySettings.put(null, "NullKey");
+        mySettings.put("nullValue", null);
+        request.setSettings(mySettings);
+
+        final SettingResponse response = service.perform(request);
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(response.getReturnMessage(), is("Ok"));
+        assertThat(response.getSettings().size(), is(14));
+    }
+
+    @Test
     public void testInvokingRequestUpdateExistingSetting() {
         final SettingService service = new SettingService(new Settings(), entityManager);
         final SettingRequest request = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);

@@ -24,13 +24,21 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * <p>The Setting Service, allows for checking and updating existing Settings
  * and add new Settings, needed for Clients. Certain of the existing Settings
- * have a flag that will not allow them to be updated. This was done to ensure
- * that it is clear what existing settings is being used such as Cryptographic
- * Algorithms, padding, etc. However, as the internal Cryptographic Operations
- * is strongly linked to the Algorithms, they may be seen but not updated.</p>
+ * have a flag that will not allow them to be updated. Most settings may or can
+ * be updated, but if the Flag is present, it is for a good reason - as it
+ * prevents a change that can affect the system.</p>
+ *
+ * <p>Version 1.0 of CWS is only having one entry which may not be altered, the
+ * System Salt. Reason is that if this is being changed, it will prevent anyone
+ * from accessing the system, as the Member Keys cannot be unlocked.</p>
  *
  * <p>For the same reason, the request can <b>only</b> be invoked by the System
  * Administrator. Since changing things must be strictly limited.</p>
+ *
+ * <p>The Setting service is trying to be as error tolerant as possible, meaning
+ * that null Keys and null Values will be converted into empty Strings. If an
+ * attempt at making updates to a Key, which is not permitted to be updated, an
+ * error will occur.</p>
  *
  * @author Kim Jensen
  * @since  CWS 1.0
@@ -48,45 +56,40 @@ public final class SettingService extends Serviceable<SettingResponse, SettingRe
     public SettingResponse perform(final SettingRequest request) {
         verifyRequest(request, Permission.SETTING);
 
-        final Map<String, SettingEntity> currentSettings = convertSettings(dao.readSettings());
+        final Map<String, SettingEntity> existing = convertSettings(dao.readSettings());
         for (final Map.Entry<String, String> entry : request.getSettings().entrySet()) {
-            processSetting(currentSettings, entry);
+            final String key = trim(entry.getKey());
+            final String value = trim(entry.getValue());
+            final SettingEntity entity;
+
+            if (existing.containsKey(key)) {
+                entity = existing.get(key);
+                if (entity.isModifiable()) {
+                    persistAndUpdateSetting(entity, key, value);
+                } else if (!Objects.equals(entity.getSetting(), value)) {
+                    // If the request contain an update do a non-updateable
+                    // field, then the Exception will be thrown, which will
+                    // result in the Transaction being rolled back
+                    throw new CWSException(ReturnCode.PROPERTY_ERROR, "The setting " + key + " may not be overwritten.");
+                }
+            } else {
+                entity = new SettingEntity();
+                persistAndUpdateSetting(entity, key, value);
+            }
         }
 
         final SettingResponse response = new SettingResponse();
-        response.setSettings(transformSettings(currentSettings));
+        response.setSettings(convert(settings));
 
         return response;
     }
 
-    /**
-     * Processes an existing or new Setting, and both saves the result in the
-     * database and ensures that the given map is updated.
-     *
-     * @param currentSettings Current Settings to check and update
-     * @param entry Entry from the given set of Settings to perform
-     */
-    private void processSetting(final Map<String, SettingEntity> currentSettings, final Map.Entry<String, String> entry) {
-        if (currentSettings.containsKey(entry.getKey())) {
-            final SettingEntity entity = currentSettings.get(entry.getKey());
-
-            if (!Objects.equals(entity.getSetting(), entry.getValue())) {
-                if (entity.isModifiable()) {
-                    entity.setSetting(entry.getValue());
-                    dao.persist(entity);
-                } else {
-                    throw new CWSException(ReturnCode.PROPERTY_ERROR, "The setting " + entry.getKey() + " may not be overwritten.");
-                }
-            }
-        } else {
-            final SettingEntity setting = new SettingEntity();
-            setting.setName(entry.getKey());
-            setting.setSetting(entry.getValue());
-            setting.setModifiable(Boolean.TRUE);
-            dao.persist(setting);
-
-            currentSettings.put(setting.getName(), setting);
-        }
+    private void persistAndUpdateSetting(final SettingEntity entity, final String key, final String value) {
+        entity.setName(key);
+        entity.setSetting(value);
+        entity.setModifiable(Boolean.TRUE);
+        dao.persist(entity);
+        settings.set(key, value);
     }
 
     private static Map<String, SettingEntity> convertSettings(final List<SettingEntity> list) {
@@ -99,13 +102,15 @@ public final class SettingService extends Serviceable<SettingResponse, SettingRe
         return map;
     }
 
-    private static Map<String, String> transformSettings(final Map<String, SettingEntity> settings) {
-        final Map<String, String> map = new ConcurrentHashMap<>();
-
-        for (final Map.Entry<String, SettingEntity> entry : settings.entrySet()) {
-            map.put(entry.getKey(), entry.getValue().getSetting());
+    private static Map<String, String> convert(final Settings settings) {
+        final Map<String, String> map = new ConcurrentHashMap<>(16);
+        for (final String key : settings.keys()) {
+            map.put(key, settings.get(key));
         }
 
         return map;
+    }
+    private static String trim(final String value) {
+        return (value != null) ? value.trim() : "";
     }
 }

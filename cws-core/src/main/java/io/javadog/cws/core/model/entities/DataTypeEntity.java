@@ -31,7 +31,7 @@ import javax.persistence.Table;
         @NamedQuery(name = "type.countUsage",
                 query = "select count(m.id) " +
                         "from MetadataEntity m " +
-                        "where m.type.id = :id")
+                        "where m.type = :type")
 })
 @Table(name = "cws_datatypes")
 public class DataTypeEntity extends CWSEntity {

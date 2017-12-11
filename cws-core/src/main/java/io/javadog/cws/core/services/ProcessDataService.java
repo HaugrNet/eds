@@ -71,7 +71,7 @@ public final class ProcessDataService extends Serviceable<ProcessDataResponse, P
     private ProcessDataResponse processAddData(final ProcessDataRequest request) {
         final DataTypeEntity type = findDataType(request.getTypeName());
         final MetadataEntity parent = findParent(request);
-        final MetadataEntity existingName = dao.findInFolder(member.getId(), parent, request.getDataName());
+        final MetadataEntity existingName = dao.findInFolder(member, parent.getId(), request.getDataName());
         final ProcessDataResponse response;
 
         if (existingName == null) {
@@ -289,7 +289,7 @@ public final class ProcessDataService extends Serviceable<ProcessDataResponse, P
         if (bytes != null) {
             final TrusteeEntity trustee = findTrustee(metadata.getCircle().getExternalId());
 
-            DataEntity entity = dao.findDataByMetadata(metadata.getId());
+            DataEntity entity = dao.findDataByMetadata(metadata);
             if (entity == null) {
                 entity = new DataEntity();
                 entity.setMetadata(metadata);

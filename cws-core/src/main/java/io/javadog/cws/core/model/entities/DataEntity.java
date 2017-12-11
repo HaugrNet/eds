@@ -36,7 +36,7 @@ import java.util.Date;
         @NamedQuery(name = "data.findByMetadata",
                 query = "select d " +
                         "from DataEntity d " +
-                        "where d.metadata.id = :metadataId"),
+                        "where d.metadata = :metadata"),
         @NamedQuery(name = "data.findAllWithState",
                 query = "select d " +
                         "from DataEntity d " +
@@ -46,8 +46,8 @@ import java.util.Date;
                         "from DataEntity d," +
                         "     TrusteeEntity t " +
                         "where d.metadata.circle.id = t.circle.id" +
-                        "  and d.metadata.externalId = :eid" +
-                        "  and t.member.id = :mid" +
+                        "  and d.metadata.externalId = :externalId" +
+                        "  and t.member = :member" +
                         "  and t.trustLevel in :trustLevels")
 })
 @Table(name = "cws_data")

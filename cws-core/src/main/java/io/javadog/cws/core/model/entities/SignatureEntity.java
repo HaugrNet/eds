@@ -34,7 +34,7 @@ import java.util.Date;
                             "where s.checksum = :checksum"),
         @NamedQuery(name = "signature.findByMember",
                     query = "select s from SignatureEntity s " +
-                            "where s.member.id = :mid " +
+                            "where s.member = :member " +
                             "order by s.id desc")
 })
 @Table(name = "cws_signatures")

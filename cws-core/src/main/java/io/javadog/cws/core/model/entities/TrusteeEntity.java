@@ -26,16 +26,16 @@ import javax.persistence.Table;
  */
 @Entity
 @NamedQueries({
-        @NamedQuery(name = "trust.findByMemberId",
+        @NamedQuery(name = "trust.findByMember",
                 query = "select t " +
                         "from TrusteeEntity t " +
-                        "where t.member.id = :id " +
+                        "where t.member = :member" +
                         "  and t.trustLevel in (:permissions) " +
                         "order by t.id asc"),
-        @NamedQuery(name = "trust.findByMemberIdAndExternalCircleId",
+        @NamedQuery(name = "trust.findByMemberAndExternalCircleId",
                 query = "select t " +
                         "from TrusteeEntity t " +
-                        "where t.member.id = :id" +
+                        "where t.member = :member" +
                         "  and t.circle.externalId = :externalCircleId " +
                         "  and t.trustLevel in (:permissions) " +
                         "order by t.member.name asc"),
@@ -51,7 +51,7 @@ import javax.persistence.Table;
         @NamedQuery(name = "trustee.findCirclesByMember",
                 query = "select t.circle " +
                         "from TrusteeEntity t " +
-                        "where t.member.id = :memberId " +
+                        "where t.member = :member " +
                         "order by t.circle.name asc"),
         @NamedQuery(name = "trustee.findSharedCircles",
                 query = "select c " +
@@ -60,13 +60,13 @@ import javax.persistence.Table;
                         "     TrusteeEntity t2 " +
                         "where c.id = t1.circle.id" +
                         "  and c.id = t2.circle.id" +
-                        "  and t1.member.id = :member" +
-                        "  and t2.member.id = :requested " +
+                        "  and t1.member = :member" +
+                        "  and t2.member = :requested " +
                         "order by c.name asc"),
-        @NamedQuery(name = "trustee.findByCircleId",
+        @NamedQuery(name = "trustee.findByCircle",
                 query = "select t " +
                         "from TrusteeEntity t " +
-                        "where t.circle.id = :circleId " +
+                        "where t.circle = :circle " +
                         "order by t.member.name asc")
 })
 @Table(name = "cws_trustees")

@@ -59,7 +59,7 @@ public final class FetchCircleService extends Serviceable<FetchCircleResponse, F
                 // to access.
                 final List<TrusteeEntity> members;
                 if (Objects.equals(Constants.ADMIN_ACCOUNT, member.getName()) || settings.getShareTrustees()) {
-                    members = dao.findTrusteesByCircle(circle.getId());
+                    members = dao.findTrusteesByCircle(circle);
                 } else {
                     // Regardless of the settings and requesting Member, we should
                     // be as tolerant as possible, and if the Member is not allowed
@@ -94,7 +94,7 @@ public final class FetchCircleService extends Serviceable<FetchCircleResponse, F
 
         for (final TrusteeEntity trusteeEntity : trustees) {
             if (Objects.equals(trusteeEntity.getCircle().getId(), circle.getId())) {
-                found.addAll(dao.findTrusteesByCircle(circle.getId()));
+                found.addAll(dao.findTrusteesByCircle(circle));
                 break;
             }
         }

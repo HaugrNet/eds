@@ -163,13 +163,13 @@ public final class FetchMemberService extends Serviceable<FetchMemberResponse, F
     }
 
     private List<Circle> findCirclesMemberBelongsTo(final MemberEntity requested) {
-        final List<CircleEntity> circles = dao.findCirclesForMember(requested.getId());
+        final List<CircleEntity> circles = dao.findCirclesForMember(requested);
 
         return convertCircles(circles);
     }
 
     private List<Circle> findSharedCircles(final MemberEntity current, final MemberEntity requested) {
-        final List<CircleEntity> circles = dao.findCirclesBothBelongTo(current.getId(), requested);
+        final List<CircleEntity> circles = dao.findCirclesBothBelongTo(current, requested);
 
         return convertCircles(circles);
     }

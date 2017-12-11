@@ -34,12 +34,14 @@ public final class FetchDataResponseTest {
 
         final FetchDataResponse response = new FetchDataResponse();
         response.setMetadata(metadata);
+        response.setRecords(3L);
         response.setData(data);
 
         assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(response.getReturnMessage(), is("Ok"));
         assertThat(response.isOk(), is(true));
         assertThat(response.getMetadata(), is(metadata));
+        assertThat(response.getRecords(), is(3L));
         assertThat(response.getData(), is(data));
     }
 

@@ -54,7 +54,7 @@ public class SystemBean {
     @Transactional(Transactional.TxType.SUPPORTS)
     public VersionResponse version() {
         final VersionResponse response = new VersionResponse();
-        response.setVersion("0.7-SNAPSHOT");
+        response.setVersion("0.8-SNAPSHOT");
 
         return response;
     }

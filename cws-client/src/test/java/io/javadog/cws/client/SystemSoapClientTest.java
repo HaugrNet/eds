@@ -46,7 +46,7 @@ public class SystemSoapClientTest {
         final VersionResponse response = system.version();
         assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(response.getReturnMessage(), is("Ok"));
-        assertThat(response.getVersion(), is("0.7-SNAPSHOT"));
+        assertThat(response.getVersion(), is("0.8-SNAPSHOT"));
     }
 
     @Test

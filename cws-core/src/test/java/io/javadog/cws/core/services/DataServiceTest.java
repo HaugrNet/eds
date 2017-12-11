@@ -118,6 +118,27 @@ public final class DataServiceTest extends DatabaseSetup {
     }
 
     @Test
+    public void testAddingAndFetchingData() {
+        final ProcessDataService processService = new ProcessDataService(settings, entityManager);
+        final FetchDataService fetchService = new FetchDataService(settings, entityManager);
+
+        final FetchDataRequest fetchRequest = prepareRequest(FetchDataRequest.class, MEMBER_1);
+        fetchRequest.setCircleId(CIRCLE_1_ID);
+        final FetchDataResponse emptyResponse = fetchService.perform(fetchRequest);
+        assertThat(emptyResponse.isOk(), is(true));
+        assertThat(emptyResponse.getRecords(), is(0L));
+
+        // Add some data...
+        assertThat(processService.perform(prepareAddRequest(MEMBER_1, CIRCLE_1_ID, "My Data 1", 1048576)).isOk(), is(true));
+        assertThat(processService.perform(prepareAddRequest(MEMBER_1, CIRCLE_1_ID, "My Data 2", 1048576)).isOk(), is(true));
+        assertThat(processService.perform(prepareAddRequest(MEMBER_1, CIRCLE_1_ID, "My Data 3", 1048576)).isOk(), is(true));
+
+        final FetchDataResponse fullResponse = fetchService.perform(fetchRequest);
+        assertThat(fullResponse.isOk(), is(true));
+        assertThat(fullResponse.getRecords(), is(3L));
+    }
+
+    @Test
     public void testAddEmptyData() {
         final ProcessDataService service = new ProcessDataService(settings, entityManager);
         final ProcessDataRequest request = prepareAddRequest(MEMBER_1, CIRCLE_1_ID, "The Data", 0);

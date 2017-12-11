@@ -93,7 +93,7 @@ public final class FetchDataService extends Serviceable<FetchDataResponse, Fetch
         // information, if the person is allowed, which includes checks for
         // Circle Membership and right TrustLevel of the Member. If no Entity
         // is found, then there can be multiple reasons.
-        final DataEntity entity = dao.findDataByMemberAndExternalId(member.getId(), metadata.getExternalId());
+        final DataEntity entity = dao.findDataByMemberAndExternalId(member, metadata.getExternalId());
         final FetchDataResponse response = new FetchDataResponse();
         final MetadataEntity parent = dao.find(MetadataEntity.class, metadata.getParentId());
         final Metadata metaData = convert(metadata, parent.getExternalId());
@@ -134,6 +134,7 @@ public final class FetchDataService extends Serviceable<FetchDataResponse, Fetch
 
         final FetchDataResponse response = new FetchDataResponse();
         response.setMetadata(list);
+        response.setRecords(count);
 
         return response;
     }

@@ -50,7 +50,7 @@ public final class FetchMemberResponseTest {
         assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING));
         assertThat(response.getReturnMessage(), is(msg));
         assertThat(response.isOk(), is(false));
-        assertThat(response.getMembers(), is(new ArrayList(0)));
-        assertThat(response.getCircles(), is(new ArrayList(0)));
+        assertThat(response.getMembers().isEmpty(), is(true));
+        assertThat(response.getCircles().isEmpty(), is(true));
     }
 }

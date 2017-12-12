@@ -44,6 +44,6 @@ public final class SanityResponseTest {
         assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING));
         assertThat(response.getReturnMessage(), is(msg));
         assertThat(response.isOk(), is(false));
-        assertThat(response.getSanities(), is(new ArrayList<>(0)));
+        assertThat(response.getSanities().isEmpty(), is(true));
     }
 }

@@ -48,7 +48,7 @@ public final class FetchCircleResponseTest {
         assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING));
         assertThat(response.getReturnMessage(), is(msg));
         assertThat(response.isOk(), is(false));
-        assertThat(response.getCircles(), is(new ArrayList<>(0)));
-        assertThat(response.getTrustees(), is(new ArrayList<>(0)));
+        assertThat(response.getCircles().isEmpty(), is(true));
+        assertThat(response.getTrustees().isEmpty(), is(true));
     }
 }

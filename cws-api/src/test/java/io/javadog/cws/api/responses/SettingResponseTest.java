@@ -46,6 +46,6 @@ public final class SettingResponseTest {
         assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING));
         assertThat(response.getReturnMessage(), is(msg));
         assertThat(response.isOk(), is(false));
-        assertThat(response.getSettings(), is(new HashMap<>(0)));
+        assertThat(response.getSettings().isEmpty(), is(true));
     }
 }

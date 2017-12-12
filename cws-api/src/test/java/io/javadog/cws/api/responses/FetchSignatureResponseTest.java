@@ -45,6 +45,6 @@ public final class FetchSignatureResponseTest {
         assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING));
         assertThat(response.getReturnMessage(), is(msg));
         assertThat(response.isOk(), is(false));
-        assertThat(response.getSignatures(), is(new ArrayList(0)));
+        assertThat(response.getSignatures().isEmpty(), is(true));
     }
 }

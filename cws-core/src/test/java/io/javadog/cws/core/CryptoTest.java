@@ -15,6 +15,7 @@ import static org.junit.Assert.assertThat;
 
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.core.enums.KeyAlgorithm;
+import io.javadog.cws.core.enums.StandardSetting;
 import io.javadog.cws.core.exceptions.CWSException;
 import io.javadog.cws.core.exceptions.CryptoException;
 import io.javadog.cws.core.jce.CWSKeyPair;
@@ -53,7 +54,7 @@ public final class CryptoTest {
         thrown.expectMessage("AES/CBC/PKCS5Padding SecretKeyFactory not available");
 
         final Settings settings = new Settings();
-        settings.set(Settings.PBE_ALGORITHM, "RSA2048");
+        settings.set(StandardSetting.PBE_ALGORITHM.getKey(), "RSA2048");
         final Crypto crypto = new Crypto(settings);
         final String salt = UUID.randomUUID().toString();
         crypto.generatePasswordKey(KeyAlgorithm.AES128, "my secret", salt);
@@ -85,7 +86,7 @@ public final class CryptoTest {
         thrown.expectMessage("No enum constant io.javadog.cws.core.enums.HashAlgorithm.AES128");
 
         final Settings settings = new Settings();
-        settings.set(Settings.HASH_ALGORITHM, "AES128");
+        settings.set(StandardSetting.HASH_ALGORITHM.getKey(), "AES128");
         final Crypto crypto = new Crypto(settings);
         crypto.generateChecksum("Bla bla bla");
     }
@@ -96,7 +97,7 @@ public final class CryptoTest {
         thrown.expectMessage("AES/CBC/PKCS5Padding Signature not available");
 
         final Settings settings = new Settings();
-        settings.set(Settings.SIGNATURE_ALGORITHM, "AES256");
+        settings.set(StandardSetting.SIGNATURE_ALGORITHM.getKey(), "AES256");
         final Crypto crypto = new Crypto(settings);
         final CWSKeyPair key = crypto.generateAsymmetricKey(KeyAlgorithm.RSA2048);
         crypto.sign(key.getPrivate().getKey(), "bla bla bla".getBytes(settings.getCharset()));
@@ -295,7 +296,7 @@ public final class CryptoTest {
         final String str = "Alpha Beta æøåßöäÿ";
 
         final String garbage = "INVALID_ENCODING";
-        settings.set(Settings.CWS_CHARSET, garbage);
+        settings.set(StandardSetting.CWS_CHARSET.getKey(), garbage);
 
         prepareCause(CWSException.class, ReturnCode.PROPERTY_ERROR, "java.nio.charset.UnsupportedCharsetException: " + garbage);
         assertThat(str, is(not(nullValue())));
@@ -309,7 +310,7 @@ public final class CryptoTest {
         final String str = "Alpha Beta æøåßöäÿ";
         final byte[] bytes = str.getBytes(settings.getCharset());
         final String garbage = "INVALID_ENCODING";
-        settings.set(Settings.CWS_CHARSET, garbage);
+        settings.set(StandardSetting.CWS_CHARSET.getKey(), garbage);
 
         prepareCause(CWSException.class, ReturnCode.PROPERTY_ERROR, "UnsupportedCharsetException: " + garbage);
         assertThat(bytes, is(not(nullValue())));
@@ -410,7 +411,7 @@ public final class CryptoTest {
         final CWSKeyPair keyPair = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
         final String armoredPublicKey = crypto.armoringPublicKey(keyPair.getPublic().getKey());
 
-        settings.set(Settings.ASYMMETRIC_ALGORITHM, KeyAlgorithm.AES128.name());
+        settings.set(StandardSetting.ASYMMETRIC_ALGORITHM.getKey(), KeyAlgorithm.AES128.name());
         final PublicKey publicKey = crypto.dearmoringPublicKey(armoredPublicKey);
         assertThat(publicKey, is(not(nullValue())));
     }
@@ -426,7 +427,7 @@ public final class CryptoTest {
         secretKey.setSalt(UUID.randomUUID().toString());
 
         final String armoredPrivateKey = crypto.armoringPrivateKey(secretKey, keyPair.getPrivate().getKey());
-        settings.set(Settings.ASYMMETRIC_ALGORITHM, KeyAlgorithm.AES128.name());
+        settings.set(StandardSetting.ASYMMETRIC_ALGORITHM.getKey(), KeyAlgorithm.AES128.name());
         final PrivateKey privateKey = crypto.dearmoringPrivateKey(secretKey, armoredPrivateKey);
         assertThat(privateKey, is(not(nullValue())));
     }

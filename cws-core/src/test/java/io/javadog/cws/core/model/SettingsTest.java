@@ -12,6 +12,7 @@ import static org.junit.Assert.assertThat;
 
 import io.javadog.cws.core.enums.HashAlgorithm;
 import io.javadog.cws.core.enums.KeyAlgorithm;
+import io.javadog.cws.core.enums.StandardSetting;
 import org.junit.Test;
 
 import java.util.EnumSet;
@@ -58,40 +59,40 @@ public final class SettingsTest {
     public void testUpdateDefaultSettings() {
         final Settings settings = new Settings();
 
-        settings.set(Settings.SYMMETRIC_ALGORITHM, KeyAlgorithm.AES192.name());
+        settings.set(StandardSetting.SYMMETRIC_ALGORITHM, KeyAlgorithm.AES192.name());
         assertThat(settings.getSymmetricAlgorithm(), is(KeyAlgorithm.AES192));
 
-        settings.set(Settings.ASYMMETRIC_ALGORITHM, KeyAlgorithm.RSA4096.name());
+        settings.set(StandardSetting.ASYMMETRIC_ALGORITHM, KeyAlgorithm.RSA4096.name());
         assertThat(settings.getAsymmetricAlgorithm(), is(KeyAlgorithm.RSA4096));
 
-        settings.set(Settings.ASYMMETRIC_ALGORITHM, KeyAlgorithm.RSA8192.name());
+        settings.set(StandardSetting.ASYMMETRIC_ALGORITHM, KeyAlgorithm.RSA8192.name());
         assertThat(settings.getAsymmetricAlgorithm(), is(KeyAlgorithm.RSA8192));
 
-        settings.set(Settings.SIGNATURE_ALGORITHM, KeyAlgorithm.SHA256.name());
+        settings.set(StandardSetting.SIGNATURE_ALGORITHM, KeyAlgorithm.SHA256.name());
         assertThat(settings.getSignatureAlgorithm(), is(KeyAlgorithm.SHA256));
 
-        settings.set(Settings.HASH_ALGORITHM, HashAlgorithm.SHA256.name());
+        settings.set(StandardSetting.HASH_ALGORITHM, HashAlgorithm.SHA256.name());
         assertThat(settings.getHashAlgorithm(), is(HashAlgorithm.SHA256));
 
-        settings.set(Settings.PBE_ALGORITHM, KeyAlgorithm.PBE192.name());
+        settings.set(StandardSetting.PBE_ALGORITHM, KeyAlgorithm.PBE192.name());
         assertThat(settings.getPasswordAlgorithm(), is(KeyAlgorithm.PBE192));
 
-        settings.set(Settings.PBE_ALGORITHM, KeyAlgorithm.PBE256.name());
+        settings.set(StandardSetting.PBE_ALGORITHM, KeyAlgorithm.PBE256.name());
         assertThat(settings.getPasswordAlgorithm(), is(KeyAlgorithm.PBE256));
 
-        settings.set(Settings.CWS_SALT, "UUID value");
+        settings.set(StandardSetting.CWS_SALT, "UUID value");
         assertThat(settings.getSalt(), is("UUID value"));
 
-        settings.set(Settings.CWS_LOCALE, Locale.GERMAN.toString());
+        settings.set(StandardSetting.CWS_LOCALE, Locale.GERMAN.toString());
         assertThat(settings.getLocale(), is(Locale.GERMAN));
 
-        settings.set(Settings.CWS_CHARSET, "ISO-8859-15");
+        settings.set(StandardSetting.CWS_CHARSET, "ISO-8859-15");
         assertThat(settings.getCharset().name(), is("ISO-8859-15"));
 
-        settings.set(Settings.SANITY_STARTUP, "false");
+        settings.set(StandardSetting.SANITY_STARTUP, "false");
         assertThat(settings.getSanityStartup(), is(false));
 
-        settings.set(Settings.SANITY_INTERVAL, "120");
+        settings.set(StandardSetting.SANITY_INTERVAL, "120");
         assertThat(settings.getSanityInterval(), is(120));
     }
 
@@ -99,15 +100,15 @@ public final class SettingsTest {
     public void testExposeAdmin() {
         final Settings settings = new Settings();
         assertThat(settings.getExposeAdmin(), is(false));
-        settings.set(Settings.EXPOSE_ADMIN, "true");
+        settings.set(StandardSetting.EXPOSE_ADMIN, "true");
         assertThat(settings.getExposeAdmin(), is(true));
-        settings.set(Settings.EXPOSE_ADMIN, "false");
+        settings.set(StandardSetting.EXPOSE_ADMIN, "false");
         assertThat(settings.getExposeAdmin(), is(false));
-        settings.set(Settings.EXPOSE_ADMIN, " true ");
+        settings.set(StandardSetting.EXPOSE_ADMIN, " true ");
         assertThat(settings.getExposeAdmin(), is(true));
-        settings.set(Settings.EXPOSE_ADMIN, "");
+        settings.set(StandardSetting.EXPOSE_ADMIN, "");
         assertThat(settings.getExposeAdmin(), is(false));
-        settings.set(Settings.EXPOSE_ADMIN, " what ");
+        settings.set(StandardSetting.EXPOSE_ADMIN, " what ");
         assertThat(settings.getExposeAdmin(), is(false));
     }
 
@@ -115,15 +116,15 @@ public final class SettingsTest {
     public void testShowOtherMemberInformation() {
         final Settings settings = new Settings();
         assertThat(settings.getShareTrustees(), is(true));
-        settings.set(Settings.SHOW_TRUSTEES, "false");
+        settings.set(StandardSetting.SHOW_TRUSTEES, "false");
         assertThat(settings.getShareTrustees(), is(false));
-        settings.set(Settings.SHOW_TRUSTEES, "true");
+        settings.set(StandardSetting.SHOW_TRUSTEES, "true");
         assertThat(settings.getShareTrustees(), is(true));
-        settings.set(Settings.SHOW_TRUSTEES, " true ");
+        settings.set(StandardSetting.SHOW_TRUSTEES, " true ");
         assertThat(settings.getShareTrustees(), is(true));
-        settings.set(Settings.SHOW_TRUSTEES, "");
+        settings.set(StandardSetting.SHOW_TRUSTEES, "");
         assertThat(settings.getShareTrustees(), is(false));
-        settings.set(Settings.SHOW_TRUSTEES, " what ");
+        settings.set(StandardSetting.SHOW_TRUSTEES, " what ");
         assertThat(settings.getShareTrustees(), is(false));
     }
 

@@ -18,9 +18,9 @@ import io.javadog.cws.api.dtos.Member;
 import io.javadog.cws.api.requests.FetchMemberRequest;
 import io.javadog.cws.api.responses.FetchMemberResponse;
 import io.javadog.cws.core.DatabaseSetup;
+import io.javadog.cws.core.enums.StandardSetting;
 import io.javadog.cws.core.exceptions.AuthorizationException;
 import io.javadog.cws.core.exceptions.VerificationException;
-import io.javadog.cws.core.model.Settings;
 import io.javadog.cws.core.model.entities.MemberEntity;
 import org.junit.Test;
 
@@ -103,7 +103,7 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
     @Test
     public void testFindAllMembersWithExposeAdminFalseAsAdmin() {
         // Ensure that we have the correct settings for the Service
-        settings.set(Settings.EXPOSE_ADMIN, "false");
+        settings.set(StandardSetting.EXPOSE_ADMIN, "false");
 
         final FetchMemberService service = new FetchMemberService(settings, entityManager);
         final FetchMemberRequest request = prepareRequest(FetchMemberRequest.class, Constants.ADMIN_ACCOUNT);
@@ -127,7 +127,7 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
     @Test
     public void testFindAllMembersWithExposeAdminTrueAsAdmin() {
         // Ensure that we have the correct settings for the Service
-        settings.set(Settings.EXPOSE_ADMIN, "true");
+        settings.set(StandardSetting.EXPOSE_ADMIN, "true");
 
         final FetchMemberService service = new FetchMemberService(settings, entityManager);
         final FetchMemberRequest request = prepareRequest(FetchMemberRequest.class, Constants.ADMIN_ACCOUNT);
@@ -151,7 +151,7 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
     @Test
     public void testFindAllMembersWithExposeAdminFalseAsMember1() {
         // Ensure that we have the correct settings for the Service
-        settings.set(Settings.EXPOSE_ADMIN, "false");
+        settings.set(StandardSetting.EXPOSE_ADMIN, "false");
 
         final FetchMemberService service = new FetchMemberService(settings, entityManager);
         final FetchMemberRequest request = prepareRequest(FetchMemberRequest.class, MEMBER_1);
@@ -186,7 +186,7 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
     @Test
     public void testFindAllMembersWithExposeAdminTrueAsMember1() {
         // Ensure that we have the correct settings for the Service
-        settings.set(Settings.EXPOSE_ADMIN, "true");
+        settings.set(StandardSetting.EXPOSE_ADMIN, "true");
 
         final FetchMemberService service = new FetchMemberService(settings, entityManager);
         final FetchMemberRequest request = prepareRequest(FetchMemberRequest.class, MEMBER_1);
@@ -214,7 +214,7 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
     @Test
     public void testFindAdminWithExposeAdminTrueAsAdmin() {
         // Ensure that we have the correct settings for the Service
-        settings.set(Settings.EXPOSE_ADMIN, "true");
+        settings.set(StandardSetting.EXPOSE_ADMIN, "true");
 
         final FetchMemberService service = new FetchMemberService(settings, entityManager);
         final FetchMemberRequest request = prepareRequest(FetchMemberRequest.class, Constants.ADMIN_ACCOUNT);
@@ -240,7 +240,7 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
     @Test
     public void testFindAdminWithExposeAdminFalseAsAdmin() {
         // Ensure that we have the correct settings for the Service
-        settings.set(Settings.EXPOSE_ADMIN, "false");
+        settings.set(StandardSetting.EXPOSE_ADMIN, "false");
 
         final FetchMemberService service = new FetchMemberService(settings, entityManager);
         final FetchMemberRequest request = prepareRequest(FetchMemberRequest.class, Constants.ADMIN_ACCOUNT);
@@ -265,7 +265,7 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
     @Test
     public void testFindMember1WithShowOtherFalseAsAdmin() {
         // Ensure that we have the correct settings for the Service
-        settings.set(Settings.SHOW_TRUSTEES, "false");
+        settings.set(StandardSetting.SHOW_TRUSTEES, "false");
 
         final FetchMemberService service = new FetchMemberService(settings, entityManager);
         final MemberEntity member = findFirstMember();
@@ -290,7 +290,7 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
     @Test
     public void testFindMember1WithShowOtherTrueAsAdmin() {
         // Ensure that we have the correct settings for the Service
-        settings.set(Settings.SHOW_TRUSTEES, "true");
+        settings.set(StandardSetting.SHOW_TRUSTEES, "true");
 
         final FetchMemberService service = new FetchMemberService(settings, entityManager);
         final MemberEntity member = findFirstMember();
@@ -316,7 +316,7 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
     @Test
     public void testFindAdminWithExposeAdminTrueAsMember1() {
         // Ensure that we have the correct settings for the Service
-        settings.set(Settings.EXPOSE_ADMIN, "true");
+        settings.set(StandardSetting.EXPOSE_ADMIN, "true");
 
         final FetchMemberService service = new FetchMemberService(settings, entityManager);
         final MemberEntity member = findFirstMember();
@@ -343,7 +343,7 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
     @Test
     public void testFindAdminWithExposeAdminFalseAsMember1() {
         // Ensure that we have the correct settings for the Service
-        settings.set(Settings.EXPOSE_ADMIN, "false");
+        settings.set(StandardSetting.EXPOSE_ADMIN, "false");
 
         prepareCause(AuthorizationException.class, ReturnCode.AUTHORIZATION_WARNING, "Not Authorized to access this information.");
         final FetchMemberService service = new FetchMemberService(settings, entityManager);
@@ -357,7 +357,7 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
     @Test
     public void testFindMember1WithShowOtherTrueAsMember1() {
         // Ensure that we have the correct settings for the Service
-        settings.set(Settings.SHOW_TRUSTEES, "true");
+        settings.set(StandardSetting.SHOW_TRUSTEES, "true");
 
         final FetchMemberService service = new FetchMemberService(settings, entityManager);
         final MemberEntity member = findFirstMember();
@@ -375,7 +375,7 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
     @Test
     public void testFindMember1WithShowOtherFalseAsMember1() {
         // Ensure that we have the correct settings for the Service
-        settings.set(Settings.SHOW_TRUSTEES, "false");
+        settings.set(StandardSetting.SHOW_TRUSTEES, "false");
 
         final FetchMemberService service = new FetchMemberService(settings, entityManager);
         final MemberEntity member = findFirstMember();
@@ -393,7 +393,7 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
     @Test
     public void testFindMember1WithShowOtherTrueAsMember4() {
         // Ensure that we have the correct settings for the Service
-        settings.set(Settings.SHOW_TRUSTEES, "true");
+        settings.set(StandardSetting.SHOW_TRUSTEES, "true");
 
         final FetchMemberService service = new FetchMemberService(settings, entityManager);
         final MemberEntity member = findFirstMember();
@@ -410,7 +410,7 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
     @Test
     public void testFindMember1WithShowOtherFalseAsMember4() {
         // Ensure that we have the correct settings for the Service
-        settings.set(Settings.SHOW_TRUSTEES, "false");
+        settings.set(StandardSetting.SHOW_TRUSTEES, "false");
 
         final FetchMemberService service = new FetchMemberService(settings, entityManager);
         final MemberEntity member = findFirstMember();
@@ -427,7 +427,7 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
     @Test
     public void testFindMember1WithShowOtherTrueAsMember5() {
         // Ensure that we have the correct settings for the Service
-        settings.set(Settings.SHOW_TRUSTEES, "true");
+        settings.set(StandardSetting.SHOW_TRUSTEES, "true");
 
         final FetchMemberService service = new FetchMemberService(settings, entityManager);
         final MemberEntity member = findFirstMember();
@@ -444,7 +444,7 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
     @Test
     public void testFindMember1WithShowOtherFalseAsMember5() {
         // Ensure that we have the correct settings for the Service
-        settings.set(Settings.SHOW_TRUSTEES, "false");
+        settings.set(StandardSetting.SHOW_TRUSTEES, "false");
 
         final FetchMemberService service = new FetchMemberService(settings, entityManager);
         final MemberEntity member = findFirstMember();

@@ -10,6 +10,7 @@ package io.javadog.cws.core.model;
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.core.enums.HashAlgorithm;
 import io.javadog.cws.core.enums.KeyAlgorithm;
+import io.javadog.cws.core.enums.StandardSetting;
 import io.javadog.cws.core.exceptions.CWSException;
 
 import java.nio.charset.Charset;
@@ -50,53 +51,21 @@ public final class Settings {
     /** Error log level, used if an internal error occurred. */
     public static final Level ERROR = Level.SEVERE;
 
-    // Settings, which is changeable via the settings table in the database
-    public static final String SYMMETRIC_ALGORITHM = "cws.crypto.symmetric.algorithm";
-    public static final String ASYMMETRIC_ALGORITHM = "cws.crypto.asymmetric.algorithm";
-    public static final String SIGNATURE_ALGORITHM = "cws.crypto.signature.algorithm";
-    public static final String PBE_ALGORITHM = "cws.crypto.pbe.algorithm";
-    public static final String HASH_ALGORITHM = "cws.crypto.hash.algorithm";
-    public static final String CWS_SALT = "cws.system.salt";
-    public static final String CWS_LOCALE = "cws.system.locale";
-    public static final String CWS_CHARSET = "cws.system.charset";
-    public static final String EXPOSE_ADMIN = "cws.expose.admin";
-    public static final String SHOW_TRUSTEES = "cws.show.trustees";
-    public static final String SANITY_STARTUP = "cws.sanity.check.startup";
-    public static final String SANITY_INTERVAL = "cws.sanity.check.interval";
-
-    private static final String DEFAULT_SYMMETRIC_ALGORITHM = "AES128";
-    private static final String DEFAULT_ASYMMETRIC_ALGORITHM = "RSA2048";
-    private static final String DEFAULT_SIGNATURE_ALGORITHM = "SHA512";
-    private static final String DEFAULT_PBE_ALGORITHM = "PBE128";
-    private static final String DEFAULT_HASH_ALGORITHM = DEFAULT_SIGNATURE_ALGORITHM;
-    private static final String DEFAULT_SALT = "Default salt, also used as kill switch. Must be set in DB.";
-    private static final String DEFAULT_LOCALE = "EN";
-    private static final String DEFAULT_CHARSETNAME = "UTF-8";
-    private static final String DEFAULT_EXPOSE_ADMIN = "false";
-    private static final String DEFAULT_SHOW_TRUSTEES = "true";
-    private static final String DEFAULT_SANITY_STARTUP = "true";
-    private static final String DEFAULT_SANITY_INTERVAL = "180";
-
     private final Properties properties = new Properties();
 
     public Settings() {
-        set(SYMMETRIC_ALGORITHM, DEFAULT_SYMMETRIC_ALGORITHM);
-        set(ASYMMETRIC_ALGORITHM, DEFAULT_ASYMMETRIC_ALGORITHM);
-        set(SIGNATURE_ALGORITHM, DEFAULT_SIGNATURE_ALGORITHM);
-        set(PBE_ALGORITHM, DEFAULT_PBE_ALGORITHM);
-        set(HASH_ALGORITHM, DEFAULT_HASH_ALGORITHM);
-        set(CWS_SALT, DEFAULT_SALT);
-        set(CWS_LOCALE, DEFAULT_LOCALE);
-        set(CWS_CHARSET, DEFAULT_CHARSETNAME);
-        set(EXPOSE_ADMIN, DEFAULT_EXPOSE_ADMIN);
-        set(SHOW_TRUSTEES, DEFAULT_SHOW_TRUSTEES);
-        set(SANITY_STARTUP, DEFAULT_SANITY_STARTUP);
-        set(SANITY_INTERVAL, DEFAULT_SANITY_INTERVAL);
+        for (final StandardSetting setting : StandardSetting.values()) {
+            set(setting, setting.getValue());
+        }
     }
 
     // =========================================================================
     // Generic Settings Methods
     // =========================================================================
+
+    public void set(final StandardSetting key, final String value) {
+        set(key.getKey(), value);
+    }
 
     public void set(final String key, final String value) {
         properties.setProperty(key, value);
@@ -120,59 +89,63 @@ public final class Settings {
         return copy;
     }
 
+    public void remove(final String key) {
+        properties.remove(key);
+    }
+
     // =========================================================================
     // Specific Setting Getter Methods
     // =========================================================================
 
     public KeyAlgorithm getSymmetricAlgorithm() {
-        return KeyAlgorithm.valueOf(get(SYMMETRIC_ALGORITHM));
+        return KeyAlgorithm.valueOf(get(StandardSetting.SYMMETRIC_ALGORITHM.getKey()));
     }
 
     public KeyAlgorithm getAsymmetricAlgorithm() {
-        return KeyAlgorithm.valueOf(get(ASYMMETRIC_ALGORITHM));
+        return KeyAlgorithm.valueOf(get(StandardSetting.ASYMMETRIC_ALGORITHM.getKey()));
     }
 
     public KeyAlgorithm getSignatureAlgorithm() {
-        return KeyAlgorithm.valueOf(get(SIGNATURE_ALGORITHM));
+        return KeyAlgorithm.valueOf(get(StandardSetting.SIGNATURE_ALGORITHM.getKey()));
     }
 
     public KeyAlgorithm getPasswordAlgorithm() {
-        return KeyAlgorithm.valueOf(get(PBE_ALGORITHM));
+        return KeyAlgorithm.valueOf(get(StandardSetting.PBE_ALGORITHM.getKey()));
     }
 
     public HashAlgorithm getHashAlgorithm() {
-        return HashAlgorithm.valueOf(get(HASH_ALGORITHM));
+        return HashAlgorithm.valueOf(get(StandardSetting.HASH_ALGORITHM.getKey()));
     }
 
     public String getSalt() {
-        return get(CWS_SALT);
+        return get(StandardSetting.CWS_SALT.getKey());
     }
 
     public Locale getLocale() {
-        return Locale.forLanguageTag(get(CWS_LOCALE));
+        return Locale.forLanguageTag(get(StandardSetting.CWS_LOCALE.getKey()));
     }
 
     public Charset getCharset() {
         try {
-            return Charset.forName(get(CWS_CHARSET));
+            return Charset.forName(get(StandardSetting.CWS_CHARSET.getKey()));
         } catch (IllegalArgumentException e) {
             throw new CWSException(ReturnCode.PROPERTY_ERROR, e);
         }
     }
 
     public Boolean getExposeAdmin() {
-        return Boolean.valueOf(get(EXPOSE_ADMIN).trim());
+        return Boolean.valueOf(get(StandardSetting.EXPOSE_ADMIN.getKey()).trim());
     }
 
     public Boolean getShareTrustees() {
-        return Boolean.valueOf(get(SHOW_TRUSTEES).trim());
+        return Boolean.valueOf(get(StandardSetting.SHOW_TRUSTEES.getKey()).trim());
     }
 
     public Boolean getSanityStartup() {
-        return Boolean.valueOf(get(SANITY_STARTUP).trim());
+        return Boolean.valueOf(get(StandardSetting.SANITY_STARTUP.getKey()).trim());
     }
 
     public Integer getSanityInterval() {
-        return Integer.valueOf(get(SANITY_INTERVAL).trim());
+        return Integer.valueOf(get(StandardSetting.SANITY_INTERVAL.getKey()).trim());
     }
 }

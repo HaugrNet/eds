@@ -29,6 +29,7 @@ public enum ReturnCode {
     SIGNATURE_WARNING(Classification.CLASS_WARNING, 5, "There Signature is not usable."),
     IDENTIFICATION_WARNING(Classification.CLASS_WARNING, 6, "Not possible to positively identify the requested Data."),
     INTEGRITY_WARNING(Classification.CLASS_WARNING, 7, "Not possible to perform the given action, as it will lead to data integrity problems."),
+    SETTING_WARNING(Classification.CLASS_WARNING, 8, "Not permitted to add, alter or delete the given Setting."),
 
     ERROR(Classification.CLASS_ERROR, 0, "General Error occurred while handling the request."),
     DATABASE_ERROR(Classification.CLASS_ERROR, 1, "Database Error occurred during the handling of the request."),

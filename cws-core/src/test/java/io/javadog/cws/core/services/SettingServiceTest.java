@@ -16,6 +16,7 @@ import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.requests.SettingRequest;
 import io.javadog.cws.api.responses.SettingResponse;
 import io.javadog.cws.core.DatabaseSetup;
+import io.javadog.cws.core.enums.StandardSetting;
 import io.javadog.cws.core.exceptions.AuthorizationException;
 import io.javadog.cws.core.exceptions.CWSException;
 import io.javadog.cws.core.model.Settings;
@@ -89,18 +90,29 @@ public final class SettingServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testInvokingRequestWithNullEntries() {
+    public void testInvokingRequestWithNullKey() {
+        prepareCause(CWSException.class, ReturnCode.SETTING_WARNING, "Setting Keys may neither be null nor empty.");
         final SettingService service = new SettingService(new Settings(), entityManager);
         final SettingRequest request = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
         final Map<String, String> mySettings = new HashMap<>();
         mySettings.put(null, "NullKey");
-        mySettings.put("nullValue", null);
         request.setSettings(mySettings);
+        assertThat(request.validate().isEmpty(), is(true));
 
-        final SettingResponse response = service.perform(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
-        assertThat(response.getReturnMessage(), is("Ok"));
-        assertThat(response.getSettings().size(), is(14));
+        service.perform(request);
+    }
+
+    @Test
+    public void testInvokingRequestWithEmptyKey() {
+        prepareCause(CWSException.class, ReturnCode.SETTING_WARNING, "Setting Keys may neither be null nor empty.");
+        final SettingService service = new SettingService(new Settings(), entityManager);
+        final SettingRequest request = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
+        final Map<String, String> mySettings = new HashMap<>();
+        mySettings.put("", "EmptyKey");
+        request.setSettings(mySettings);
+        assertThat(request.validate().isEmpty(), is(true));
+
+        service.perform(request);
     }
 
     @Test
@@ -114,24 +126,38 @@ public final class SettingServiceTest extends DatabaseSetup {
         assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(response.getReturnMessage(), is("Ok"));
         assertThat(response.getSettings().size(), is(12));
-        assertThat(response.getSettings().get(Settings.CWS_CHARSET), is("UTF-8"));
+        assertThat(response.getSettings().get(StandardSetting.CWS_CHARSET.getKey()), is("UTF-8"));
 
         // The internal collection used is unmodifiable. So we simply copy the
         // list from the response and update one of the existing values
         final Map<String, String> mySettings = new HashMap<>(response.getSettings());
-        mySettings.put(Settings.CWS_CHARSET, "ISO-8859-15");
+        mySettings.put(StandardSetting.CWS_CHARSET.getKey(), "ISO-8859-15");
         request.setSettings(mySettings);
 
         final SettingResponse update = service.perform(request);
         assertThat(update.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(update.getReturnMessage(), is("Ok"));
         assertThat(update.getSettings().size(), is(12));
-        assertThat(update.getSettings().get(Settings.CWS_CHARSET), is("ISO-8859-15"));
+        assertThat(update.getSettings().get(StandardSetting.CWS_CHARSET.getKey()), is("ISO-8859-15"));
+    }
+
+    @Test
+    public void testAddingAndRemovingCustomSetting() {
+        final SettingService service = new SettingService(new Settings(), entityManager);
+        final SettingRequest request = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
+        final Map<String, String> mySettings = new HashMap<>();
+        mySettings.put("my.setting.key", "value");
+        request.setSettings(mySettings);
+
+        final SettingResponse update = service.perform(request);
+        assertThat(update.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(update.getReturnMessage(), is("Ok"));
+        assertThat(update.getSettings().size(), is(13));
     }
 
     @Test
     public void testInvokingRequestUpdateNotAllowedExistingSetting() {
-        prepareCause(CWSException.class, ReturnCode.PROPERTY_ERROR, "The setting cws.system.salt may not be overwritten.");
+        prepareCause(CWSException.class, ReturnCode.SETTING_WARNING, "The setting cws.system.salt may not be overwritten.");
         final SettingService service = new SettingService(new Settings(), entityManager);
         final SettingRequest request = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
         final Map<String, String> mySettings = new HashMap<>();
@@ -155,5 +181,51 @@ public final class SettingServiceTest extends DatabaseSetup {
         assertThat(response.getReturnMessage(), is("Ok"));
         assertThat(response.getSettings().size(), is(13));
         assertThat(response.getSettings().get("cws.test.setting"), is("Setting Value"));
+    }
+
+    @Test
+    public void testAddSettingWithNullValue() {
+        prepareCause(CWSException.class, ReturnCode.SETTING_WARNING, "Cannot add a setting without a value.");
+        final SettingService service = new SettingService(new Settings(), entityManager);
+        final SettingRequest request = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
+        final Map<String, String> mySettings = new HashMap<>();
+        mySettings.put("cws.test.setting", null);
+        request.setSettings(mySettings);
+        assertThat(request.validate().isEmpty(), is(true));
+
+        service.perform(request);
+    }
+
+    @Test
+    public void testDeletingCustomSetting() {
+        final SettingService service = new SettingService(new Settings(), entityManager);
+        final SettingRequest request = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
+        final Map<String, String> mySettings = new HashMap<>();
+        mySettings.put("cws.test.setting", "Test Value");
+        request.setSettings(mySettings);
+        assertThat(request.validate().isEmpty(), is(true));
+
+        final SettingResponse response = service.perform(request);
+        assertThat(response.isOk(), is(true));
+        assertThat(response.getSettings().size(), is(13));
+
+        mySettings.put("cws.test.setting", null);
+        request.setSettings(mySettings);
+        final SettingResponse deleteResponse = service.perform(request);
+        assertThat(deleteResponse.isOk(), is(true));
+        assertThat(deleteResponse.getSettings().size(), is(12));
+    }
+
+    @Test
+    public void testDeletingStandardSetting() {
+        prepareCause(CWSException.class, ReturnCode.SETTING_WARNING, "It is not allowed to delete standard settings.");
+        final SettingService service = new SettingService(new Settings(), entityManager);
+        final SettingRequest request = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
+        final Map<String, String> mySettings = new HashMap<>();
+        mySettings.put(StandardSetting.CWS_CHARSET.getKey(), null);
+        request.setSettings(mySettings);
+        assertThat(request.validate().isEmpty(), is(true));
+
+        service.perform(request);
     }
 }

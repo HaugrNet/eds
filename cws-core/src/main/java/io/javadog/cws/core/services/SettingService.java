@@ -11,6 +11,7 @@ import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.requests.SettingRequest;
 import io.javadog.cws.api.responses.SettingResponse;
 import io.javadog.cws.core.enums.Permission;
+import io.javadog.cws.core.enums.StandardSetting;
 import io.javadog.cws.core.exceptions.CWSException;
 import io.javadog.cws.core.model.Settings;
 import io.javadog.cws.core.model.entities.SettingEntity;
@@ -59,10 +60,16 @@ public final class SettingService extends Serviceable<SettingResponse, SettingRe
         final Map<String, SettingEntity> existing = convertSettings(dao.readSettings());
         for (final Map.Entry<String, String> entry : request.getSettings().entrySet()) {
             final String key = trim(entry.getKey());
+            if (key.isEmpty()) {
+                throw new CWSException(ReturnCode.SETTING_WARNING, "Setting Keys may neither be null nor empty.");
+            }
+
             final String value = trim(entry.getValue());
             final SettingEntity entity;
 
-            if (existing.containsKey(key)) {
+            if (existing.containsKey(key) && value.isEmpty()) {
+                deleteSetting(existing.get(key));
+            } else if (existing.containsKey(key)) {
                 entity = existing.get(key);
                 if (entity.isModifiable()) {
                     persistAndUpdateSetting(entity, key, value);
@@ -70,7 +77,7 @@ public final class SettingService extends Serviceable<SettingResponse, SettingRe
                     // If the request contain an update do a non-updateable
                     // field, then the Exception will be thrown, which will
                     // result in the Transaction being rolled back
-                    throw new CWSException(ReturnCode.PROPERTY_ERROR, "The setting " + key + " may not be overwritten.");
+                    throw new CWSException(ReturnCode.SETTING_WARNING, "The setting " + key + " may not be overwritten.");
                 }
             } else {
                 entity = new SettingEntity();
@@ -84,7 +91,20 @@ public final class SettingService extends Serviceable<SettingResponse, SettingRe
         return response;
     }
 
+    private void deleteSetting(final SettingEntity entity) {
+        if (StandardSetting.contains(entity.getName())) {
+            throw new CWSException(ReturnCode.SETTING_WARNING, "It is not allowed to delete standard settings.");
+        }
+
+        settings.remove(entity.getName());
+        dao.delete(entity);
+    }
+
     private void persistAndUpdateSetting(final SettingEntity entity, final String key, final String value) {
+        if (value.isEmpty()) {
+            throw new CWSException(ReturnCode.SETTING_WARNING, "Cannot add a setting without a value.");
+        }
+
         entity.setName(key);
         entity.setSetting(value);
         entity.setModifiable(Boolean.TRUE);
@@ -110,6 +130,7 @@ public final class SettingService extends Serviceable<SettingResponse, SettingRe
 
         return map;
     }
+
     private static String trim(final String value) {
         return (value != null) ? value.trim() : "";
     }

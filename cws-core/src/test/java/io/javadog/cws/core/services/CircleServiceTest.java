@@ -26,9 +26,9 @@ import io.javadog.cws.api.responses.FetchDataResponse;
 import io.javadog.cws.api.responses.ProcessCircleResponse;
 import io.javadog.cws.api.responses.ProcessDataResponse;
 import io.javadog.cws.core.DatabaseSetup;
+import io.javadog.cws.core.enums.StandardSetting;
 import io.javadog.cws.core.exceptions.CWSException;
 import io.javadog.cws.core.exceptions.VerificationException;
-import io.javadog.cws.core.model.Settings;
 import io.javadog.cws.core.model.entities.CircleEntity;
 import org.junit.Test;
 
@@ -153,7 +153,7 @@ public final class CircleServiceTest extends DatabaseSetup {
     @Test
     public void testFetchCircle1WithShowTrueAsAdmin() {
         // Ensure that we have the correct settings for the Service
-        settings.set(Settings.SHOW_TRUSTEES, "true");
+        settings.set(StandardSetting.SHOW_TRUSTEES, "true");
 
         final FetchCircleService service = new FetchCircleService(settings, entityManager);
         final CircleEntity circle = findFirstCircle();
@@ -175,7 +175,7 @@ public final class CircleServiceTest extends DatabaseSetup {
     @Test
     public void testFetchCircle1WithShowFalseAsAdmin() {
         // Ensure that we have the correct settings for the Service
-        settings.set(Settings.SHOW_TRUSTEES, "false");
+        settings.set(StandardSetting.SHOW_TRUSTEES, "false");
 
         final FetchCircleService service = new FetchCircleService(settings, entityManager);
         final CircleEntity circle = findFirstCircle();
@@ -197,7 +197,7 @@ public final class CircleServiceTest extends DatabaseSetup {
     @Test
     public void testFetchCircle1WithShowTrueAsMember1() {
         // Ensure that we have the correct settings for the Service
-        settings.set(Settings.SHOW_TRUSTEES, "true");
+        settings.set(StandardSetting.SHOW_TRUSTEES, "true");
 
         final FetchCircleService service = new FetchCircleService(settings, entityManager);
         final CircleEntity circle = findFirstCircle();
@@ -219,7 +219,7 @@ public final class CircleServiceTest extends DatabaseSetup {
     @Test
     public void testFetchCircle1WithShowFalseAsMember1() {
         // Ensure that we have the correct settings for the Service
-        settings.set(Settings.SHOW_TRUSTEES, "false");
+        settings.set(StandardSetting.SHOW_TRUSTEES, "false");
 
         final FetchCircleService service = new FetchCircleService(settings, entityManager);
         final CircleEntity circle = findFirstCircle();
@@ -260,7 +260,7 @@ public final class CircleServiceTest extends DatabaseSetup {
         prepareCause(CWSException.class, "No Trustee information found for member 'member5' and circle '" + circle.getExternalId() + "'.");
 
         // Ensure that we have the correct settings for the Service
-        settings.set(Settings.SHOW_TRUSTEES, "true");
+        settings.set(StandardSetting.SHOW_TRUSTEES, "true");
 
         final FetchCircleService service = new FetchCircleService(settings, entityManager);
         final FetchCircleRequest request = prepareRequest(FetchCircleRequest.class, MEMBER_5);
@@ -275,7 +275,7 @@ public final class CircleServiceTest extends DatabaseSetup {
         prepareCause(CWSException.class, "No Trustee information found for member 'member5' and circle '" + circle.getExternalId() + "'.");
 
         // Ensure that we have the correct settings for the Service
-        settings.set(Settings.SHOW_TRUSTEES, "false");
+        settings.set(StandardSetting.SHOW_TRUSTEES, "false");
 
         final FetchCircleService service = new FetchCircleService(settings, entityManager);
         final FetchCircleRequest request = prepareRequest(FetchCircleRequest.class, MEMBER_5);

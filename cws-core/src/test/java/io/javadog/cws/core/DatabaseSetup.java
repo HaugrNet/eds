@@ -38,18 +38,24 @@ import org.junit.rules.ExpectedException;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.security.SecureRandom;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 import java.util.UUID;
+import java.util.logging.LogManager;
+import java.util.logging.Logger;
 
 /**
  * @author Kim Jensen
  * @since  CWS 1.0
  */
 public class DatabaseSetup {
+
+    private static final Logger log = Logger.getLogger(DatabaseSetup.class.getName());
 
     protected static final String MEMBER_1 = "member1";
     protected static final String MEMBER_2 = "member2";
@@ -76,6 +82,20 @@ public class DatabaseSetup {
     protected CommonDao dao = new CommonDao(entityManager);
     protected final Settings settings = new Settings();
     protected final Crypto crypto = new Crypto(settings);
+
+    static {
+        final ClassLoader loader = Thread.currentThread().getContextClassLoader();
+
+        if (loader != null) {
+            final String propertiesFile = "logger.properties";
+            try (InputStream stream = loader.getResourceAsStream(propertiesFile)) {
+                final LogManager manager = LogManager.getLogManager();
+                manager.readConfiguration(stream);
+            } catch (IOException e) {
+                log.log(Settings.ERROR, e.getMessage());
+            }
+        }
+    }
 
     /**
      * If the test is expecting an Exception, then we'll use this as the rule.

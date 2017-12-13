@@ -117,7 +117,7 @@ public final class DataTypeServiceTest extends DatabaseSetup {
                 "The requesting Account is not permitted to Process Data Type.");
 
         final ProcessDataTypeService service = new ProcessDataTypeService(settings, entityManager);
-        final ProcessDataTypeRequest request = prepareRequest(ProcessDataTypeRequest.class, MEMBER_2);
+        final ProcessDataTypeRequest request = prepareRequest(ProcessDataTypeRequest.class, MEMBER_5);
         request.setType("MyDataType");
         request.setTypeName("The Data Type");
         assertThat(request.getTypeName(), is(not(nullValue())));

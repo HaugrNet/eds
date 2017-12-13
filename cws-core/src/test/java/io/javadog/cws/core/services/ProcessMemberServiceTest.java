@@ -71,6 +71,19 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
     }
 
     @Test
+    public void testProcessingSelf() {
+        final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
+        final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, MEMBER_5);
+        request.setAction(Action.UPDATE);
+        request.setMemberId(MEMBER_5_ID);
+        request.setNewAccountName(null);
+        request.setNewCredential(null);
+
+        final ProcessMemberResponse response = service.perform(request);
+        assertThat(response.isOk(), is(true));
+    }
+
+    @Test
     public void testInvitation() {
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
         final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);

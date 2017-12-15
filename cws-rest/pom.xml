@@ -8,10 +8,10 @@
         <version>0.8-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
-    <artifactId>cws-soap</artifactId>
+    <artifactId>cws-rest</artifactId>
     <packaging>jar</packaging>
-    <name>CWS SOAP</name>
-    <description>CWS SOAP Based WebServices.</description>
+    <name>CWS REST</name>
+    <description>CWS REST Based WebServices.</description>
 
     <dependencies>
         <dependency>

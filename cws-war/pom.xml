@@ -19,6 +19,10 @@
     <dependencies>
         <dependency>
             <groupId>io.javadog</groupId>
+            <artifactId>cws-rest</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.javadog</groupId>
             <artifactId>cws-soap</artifactId>
         </dependency>
         <dependency>

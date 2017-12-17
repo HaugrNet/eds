@@ -39,7 +39,7 @@ public class SanityService {
     @Path("/sanitized")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response sanitize(final SanityRequest sanitizedRequest) {
+    public Response sanitized(final SanityRequest sanitizedRequest) {
         SanityResponse sanitizedResponse = null;
         ReturnCode returnCode = ReturnCode.ERROR;
 

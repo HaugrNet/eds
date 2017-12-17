@@ -298,7 +298,7 @@ public final class CryptoTest {
         final String garbage = "INVALID_ENCODING";
         settings.set(StandardSetting.CWS_CHARSET.getKey(), garbage);
 
-        prepareCause(CWSException.class, ReturnCode.PROPERTY_ERROR, "java.nio.charset.UnsupportedCharsetException: " + garbage);
+        prepareCause(CWSException.class, ReturnCode.SETTING_ERROR, "java.nio.charset.UnsupportedCharsetException: " + garbage);
         assertThat(str, is(not(nullValue())));
         crypto.stringToBytes(str);
     }
@@ -312,7 +312,7 @@ public final class CryptoTest {
         final String garbage = "INVALID_ENCODING";
         settings.set(StandardSetting.CWS_CHARSET.getKey(), garbage);
 
-        prepareCause(CWSException.class, ReturnCode.PROPERTY_ERROR, "UnsupportedCharsetException: " + garbage);
+        prepareCause(CWSException.class, ReturnCode.SETTING_ERROR, "UnsupportedCharsetException: " + garbage);
         assertThat(bytes, is(not(nullValue())));
         final String reversed = crypto.bytesToString(bytes);
         assertThat(reversed, is(str));

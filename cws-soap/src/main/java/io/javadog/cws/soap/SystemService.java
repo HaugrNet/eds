@@ -23,6 +23,7 @@ import io.javadog.cws.api.responses.SanityResponse;
 import io.javadog.cws.api.responses.SettingResponse;
 import io.javadog.cws.api.responses.VersionResponse;
 import io.javadog.cws.core.SystemBean;
+import io.javadog.cws.core.misc.StringUtil;
 import io.javadog.cws.core.model.Settings;
 
 import javax.inject.Inject;
@@ -59,7 +60,9 @@ public class SystemService implements System {
         VersionResponse response;
 
         try {
+            final Long startTime = java.lang.System.nanoTime();
             response = bean.version();
+            log.log(Settings.INFO, () -> StringUtil.durationSince("version", startTime));
         } catch (RuntimeException e) {
             // If an error occurs that has so far not been resolved, this is the
             // final level where it can be handled. Errors can be Persistence
@@ -82,7 +85,9 @@ public class SystemService implements System {
         SettingResponse response;
 
         try {
+            final Long startTime = java.lang.System.nanoTime();
             response = bean.settings(request);
+            log.log(Settings.INFO, () -> StringUtil.durationSince("settings", startTime));
         } catch (RuntimeException e) {
             // If an error occurs that has so far not been resolved, this is the
             // final level where it can be handled. Errors can be Persistence
@@ -105,7 +110,9 @@ public class SystemService implements System {
         SanityResponse response;
 
         try {
+            final Long startTime = java.lang.System.nanoTime();
             response = bean.sanity(request);
+            log.log(Settings.INFO, () -> StringUtil.durationSince("sanitized", startTime));
         } catch (RuntimeException e) {
             // If an error occurs that has so far not been resolved, this is the
             // final level where it can be handled. Errors can be Persistence
@@ -128,7 +135,9 @@ public class SystemService implements System {
         FetchMemberResponse response;
 
         try {
+            final Long startTime = java.lang.System.nanoTime();
             response = bean.fetchMembers(request);
+            log.log(Settings.INFO, () -> StringUtil.durationSince("fetchMembers", startTime));
         } catch (RuntimeException e) {
             // If an error occurs that has so far not been resolved, this is the
             // final level where it can be handled. Errors can be Persistence
@@ -151,7 +160,9 @@ public class SystemService implements System {
         ProcessMemberResponse response;
 
         try {
+            final Long startTime = java.lang.System.nanoTime();
             response = bean.processMember(request);
+            log.log(Settings.INFO, () -> StringUtil.durationSince("processMember", startTime));
         } catch (RuntimeException e) {
             // If an error occurs that has so far not been resolved, this is the
             // final level where it can be handled. Errors can be Persistence
@@ -174,7 +185,9 @@ public class SystemService implements System {
         FetchCircleResponse response;
 
         try {
+            final Long startTime = java.lang.System.nanoTime();
             response = bean.fetchCircles(request);
+            log.log(Settings.INFO, () -> StringUtil.durationSince("fetchCircles", startTime));
         } catch (RuntimeException e) {
             // If an error occurs that has so far not been resolved, this is the
             // final level where it can be handled. Errors can be Persistence
@@ -197,7 +210,9 @@ public class SystemService implements System {
         ProcessCircleResponse response;
 
         try {
+            final Long startTime = java.lang.System.nanoTime();
             response = bean.processCircle(request);
+            log.log(Settings.INFO, () -> StringUtil.durationSince("processCircle", startTime));
         } catch (RuntimeException e) {
             // If an error occurs that has so far not been resolved, this is the
             // final level where it can be handled. Errors can be Persistence

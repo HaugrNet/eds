@@ -129,7 +129,7 @@ public final class Settings {
         try {
             return Charset.forName(get(StandardSetting.CWS_CHARSET.getKey()));
         } catch (IllegalArgumentException e) {
-            throw new CWSException(ReturnCode.PROPERTY_ERROR, e);
+            throw new CWSException(ReturnCode.SETTING_ERROR, e);
         }
     }
 

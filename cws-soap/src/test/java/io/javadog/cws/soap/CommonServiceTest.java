@@ -30,7 +30,7 @@ import java.lang.reflect.InvocationTargetException;
  * @author Kim Jensen
  * @since  CWS 1.0
  */
-public final class CommonBeanTest extends BeanSetup {
+public final class CommonServiceTest extends BeanSetup {
 
     @Test
     public void testConstantsConstructor() throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {

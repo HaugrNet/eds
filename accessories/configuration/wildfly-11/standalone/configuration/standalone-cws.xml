@@ -118,7 +118,7 @@
                 <level name="WARN"/>
             </logger>
             <logger category="io.javadog.cws">
-                <level name="WARN"/>
+                <level name="INFO"/>
             </logger>
             <root-logger>
                 <level name="INFO"/>

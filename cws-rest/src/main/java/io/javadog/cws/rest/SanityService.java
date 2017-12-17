@@ -1,21 +1,21 @@
 /*
- * =====================================================================================================================
- * Copyright (c) 2010-2017, secunet Security Networks AG, Germany
- * ---------------------------------------------------------------------------------------------------------------------
- * Project: DÜbEL (duebel-ws160)
- * =====================================================================================================================
+ * =============================================================================
+ * Copyright (c) 2016-2017, JavaDog.io
+ * -----------------------------------------------------------------------------
+ * Project: CWS (cws-rest)
+ * =============================================================================
  */
 package io.javadog.cws.rest;
 
 import io.javadog.cws.api.common.ReturnCode;
-import io.javadog.cws.api.responses.VersionResponse;
+import io.javadog.cws.api.requests.SanityRequest;
+import io.javadog.cws.api.responses.SanityResponse;
 import io.javadog.cws.core.SystemBean;
 import io.javadog.cws.core.misc.StringUtil;
 import io.javadog.cws.core.model.Settings;
 
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -27,26 +27,27 @@ import java.util.logging.Logger;
  * @author Kim Jensen
  * @since  CWS 1.0
  */
-@Path("/version")
-@Consumes({MediaType.TEXT_PLAIN, MediaType.APPLICATION_JSON})
-public class VersionService {
+@Path("/sanity")
+@Consumes(MediaType.APPLICATION_JSON)
+public class SanityService {
 
-    private static final Logger log = Logger.getLogger(VersionService.class.getName());
+    private static final Logger log = Logger.getLogger(SanityService.class.getName());
 
     @Inject private SystemBean bean;
 
-    @GET
     @POST
+    @Path("/sanitized")
+    @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response version() {
+    public Response sanitize(final SanityRequest request) {
         ReturnCode returnCode = ReturnCode.ERROR;
-        VersionResponse response = null;
+        SanityResponse response = null;
 
         try {
             final Long startTime = System.nanoTime();
-            response = bean.version();
+            response = bean.sanity(request);
             returnCode = response.getReturnCode();
-            log.log(Settings.INFO, () -> StringUtil.durationSince("version", startTime));
+            log.log(Settings.INFO, () -> StringUtil.durationSince("sanitized", startTime));
         } catch (RuntimeException e) {
             log.log(Settings.ERROR, e.getMessage(), e);
         }

@@ -44,21 +44,21 @@ public class DataTypeService {
     @Path("/processDataType")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response process(@NotNull final ProcessDataTypeRequest request) {
+    public Response process(@NotNull final ProcessDataTypeRequest processDataTypeRequest) {
+        ProcessDataTypeResponse processDataTypeResponse = null;
         ReturnCode returnCode = ReturnCode.ERROR;
-        ProcessDataTypeResponse response = null;
 
         try {
             final Long startTime = System.nanoTime();
-            request.setAction(Action.PROCESS);
-            response = bean.processDataType(request);
-            returnCode = response.getReturnCode();
+            processDataTypeRequest.setAction(Action.PROCESS);
+            processDataTypeResponse = bean.processDataType(processDataTypeRequest);
+            returnCode = processDataTypeResponse.getReturnCode();
             log.log(Settings.INFO, () -> StringUtil.durationSince("processDataType", startTime));
         } catch (RuntimeException e) {
             log.log(Settings.ERROR, e.getMessage(), e);
         }
 
-        return Response.status(returnCode.getHttpCode()).entity(response).build();
+        return Response.status(returnCode.getHttpCode()).entity(processDataTypeResponse).build();
     }
 
     @POST
@@ -66,40 +66,40 @@ public class DataTypeService {
     @Path("/deleteDataType")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response delete(@NotNull final ProcessDataTypeRequest request) {
+    public Response delete(@NotNull final ProcessDataTypeRequest deleteDataTypeRequest) {
+        ProcessDataTypeResponse deleteDataTypeResponse = null;
         ReturnCode returnCode = ReturnCode.ERROR;
-        ProcessDataTypeResponse response = null;
 
         try {
             final Long startTime = System.nanoTime();
-            request.setAction(Action.DELETE);
-            response = bean.processDataType(request);
-            returnCode = response.getReturnCode();
+            deleteDataTypeRequest.setAction(Action.DELETE);
+            deleteDataTypeResponse = bean.processDataType(deleteDataTypeRequest);
+            returnCode = deleteDataTypeResponse.getReturnCode();
             log.log(Settings.INFO, () -> StringUtil.durationSince("deleteDataType", startTime));
         } catch (RuntimeException e) {
             log.log(Settings.ERROR, e.getMessage(), e);
         }
 
-        return Response.status(returnCode.getHttpCode()).entity(response).build();
+        return Response.status(returnCode.getHttpCode()).entity(deleteDataTypeResponse).build();
     }
 
     @POST
     @Path("/fetchDataTypes")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response fetch(@NotNull final FetchDataTypeRequest request) {
+    public Response fetch(@NotNull final FetchDataTypeRequest fetchDataTypesRequest) {
+        FetchDataTypeResponse fetchDataTypesResponse = null;
         ReturnCode returnCode = ReturnCode.ERROR;
-        FetchDataTypeResponse response = null;
 
         try {
             final Long startTime = System.nanoTime();
-            response = bean.fetchDataTypes(request);
-            returnCode = response.getReturnCode();
+            fetchDataTypesResponse = bean.fetchDataTypes(fetchDataTypesRequest);
+            returnCode = fetchDataTypesResponse.getReturnCode();
             log.log(Settings.INFO, () -> StringUtil.durationSince("fetchDataTypes", startTime));
         } catch (RuntimeException e) {
             log.log(Settings.ERROR, e.getMessage(), e);
         }
 
-        return Response.status(returnCode.getHttpCode()).entity(response).build();
+        return Response.status(returnCode.getHttpCode()).entity(fetchDataTypesResponse).build();
     }
 }

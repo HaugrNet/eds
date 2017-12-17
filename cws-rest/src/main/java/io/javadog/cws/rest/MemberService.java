@@ -44,63 +44,63 @@ public class MemberService {
     @Path("/createMember")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response create(@NotNull final ProcessMemberRequest request) {
+    public Response create(@NotNull final ProcessMemberRequest createMemberRequest) {
+        ProcessMemberResponse createMemberResponse = null;
         ReturnCode returnCode = ReturnCode.ERROR;
-        ProcessMemberResponse response = null;
 
         try {
             final Long startTime = System.nanoTime();
-            request.setAction(Action.CREATE);
-            response = bean.processMember(request);
-            returnCode = response.getReturnCode();
+            createMemberRequest.setAction(Action.CREATE);
+            createMemberResponse = bean.processMember(createMemberRequest);
+            returnCode = createMemberResponse.getReturnCode();
             log.log(Settings.INFO, () -> StringUtil.durationSince("createMember", startTime));
         } catch (RuntimeException e) {
             log.log(Settings.ERROR, e.getMessage(), e);
         }
 
-        return Response.status(returnCode.getHttpCode()).entity(response).build();
+        return Response.status(returnCode.getHttpCode()).entity(createMemberResponse).build();
     }
 
     @POST
     @Path("/inviteMember")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response invite(@NotNull final ProcessMemberRequest request) {
+    public Response invite(@NotNull final ProcessMemberRequest inviteMemberRequest) {
+        ProcessMemberResponse inviteMemberResponse = null;
         ReturnCode returnCode = ReturnCode.ERROR;
-        ProcessMemberResponse response = null;
 
         try {
             final Long startTime = System.nanoTime();
-            request.setAction(Action.INVITE);
-            response = bean.processMember(request);
-            returnCode = response.getReturnCode();
+            inviteMemberRequest.setAction(Action.INVITE);
+            inviteMemberResponse = bean.processMember(inviteMemberRequest);
+            returnCode = inviteMemberResponse.getReturnCode();
             log.log(Settings.INFO, () -> StringUtil.durationSince("inviteMember", startTime));
         } catch (RuntimeException e) {
             log.log(Settings.ERROR, e.getMessage(), e);
         }
 
-        return Response.status(returnCode.getHttpCode()).entity(response).build();
+        return Response.status(returnCode.getHttpCode()).entity(inviteMemberResponse).build();
     }
 
     @POST
     @Path("/updateMember")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response update(@NotNull final ProcessMemberRequest request) {
+    public Response update(@NotNull final ProcessMemberRequest updateMemberRequest) {
+        ProcessMemberResponse updateMemberResponse = null;
         ReturnCode returnCode = ReturnCode.ERROR;
-        ProcessMemberResponse response = null;
 
         try {
             final Long startTime = System.nanoTime();
-            request.setAction(Action.UPDATE);
-            response = bean.processMember(request);
-            returnCode = response.getReturnCode();
+            updateMemberRequest.setAction(Action.UPDATE);
+            updateMemberResponse = bean.processMember(updateMemberRequest);
+            returnCode = updateMemberResponse.getReturnCode();
             log.log(Settings.INFO, () -> StringUtil.durationSince("updateMember", startTime));
         } catch (RuntimeException e) {
             log.log(Settings.ERROR, e.getMessage(), e);
         }
 
-        return Response.status(returnCode.getHttpCode()).entity(response).build();
+        return Response.status(returnCode.getHttpCode()).entity(updateMemberResponse).build();
     }
 
     @POST
@@ -108,40 +108,40 @@ public class MemberService {
     @Path("/deleteMember")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response delete(@NotNull final ProcessMemberRequest request) {
+    public Response delete(@NotNull final ProcessMemberRequest deleteMemberRequest) {
+        ProcessMemberResponse deleteMemberResponse = null;
         ReturnCode returnCode = ReturnCode.ERROR;
-        ProcessMemberResponse response = null;
 
         try {
             final Long startTime = System.nanoTime();
-            request.setAction(Action.DELETE);
-            response = bean.processMember(request);
-            returnCode = response.getReturnCode();
+            deleteMemberRequest.setAction(Action.DELETE);
+            deleteMemberResponse = bean.processMember(deleteMemberRequest);
+            returnCode = deleteMemberResponse.getReturnCode();
             log.log(Settings.INFO, () -> StringUtil.durationSince("deleteMember", startTime));
         } catch (RuntimeException e) {
             log.log(Settings.ERROR, e.getMessage(), e);
         }
 
-        return Response.status(returnCode.getHttpCode()).entity(response).build();
+        return Response.status(returnCode.getHttpCode()).entity(deleteMemberResponse).build();
     }
 
     @POST
     @Path("/fetchMembers")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response fetch(@NotNull final FetchMemberRequest request) {
+    public Response fetch(@NotNull final FetchMemberRequest fetchMembersRequest) {
+        FetchMemberResponse fetchMembersResponse = null;
         ReturnCode returnCode = ReturnCode.ERROR;
-        FetchMemberResponse response = null;
 
         try {
             final Long startTime = System.nanoTime();
-            response = bean.fetchMembers(request);
-            returnCode = response.getReturnCode();
+            fetchMembersResponse = bean.fetchMembers(fetchMembersRequest);
+            returnCode = fetchMembersResponse.getReturnCode();
             log.log(Settings.INFO, () -> StringUtil.durationSince("fetchMembers", startTime));
         } catch (RuntimeException e) {
             log.log(Settings.ERROR, e.getMessage(), e);
         }
 
-        return Response.status(returnCode.getHttpCode()).entity(response).build();
+        return Response.status(returnCode.getHttpCode()).entity(fetchMembersResponse).build();
     }
 }

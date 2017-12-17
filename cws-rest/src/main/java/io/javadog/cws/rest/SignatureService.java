@@ -44,59 +44,59 @@ public class SignatureService {
     @Path("/signDocument")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response sign(@NotNull final SignRequest request) {
+    public Response sign(@NotNull final SignRequest signDocumentRequest) {
+        SignResponse signDocumentResponse = null;
         ReturnCode returnCode = ReturnCode.ERROR;
-        SignResponse response = null;
 
         try {
             final Long startTime = System.nanoTime();
-            response = bean.sign(request);
-            returnCode = response.getReturnCode();
+            signDocumentResponse = bean.sign(signDocumentRequest);
+            returnCode = signDocumentResponse.getReturnCode();
             log.log(Settings.INFO, () -> StringUtil.durationSince("signDocument", startTime));
         } catch (RuntimeException e) {
             log.log(Settings.ERROR, e.getMessage(), e);
         }
 
-        return Response.status(returnCode.getHttpCode()).entity(response).build();
+        return Response.status(returnCode.getHttpCode()).entity(signDocumentResponse).build();
     }
 
     @POST
     @Path("/verifySignature")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response verify(@NotNull final VerifyRequest request) {
+    public Response verify(@NotNull final VerifyRequest verifySignatureRequest) {
+        VerifyResponse verifySignatureResponse = null;
         ReturnCode returnCode = ReturnCode.ERROR;
-        VerifyResponse response = null;
 
         try {
             final Long startTime = System.nanoTime();
-            response = bean.verify(request);
-            returnCode = response.getReturnCode();
+            verifySignatureResponse = bean.verify(verifySignatureRequest);
+            returnCode = verifySignatureResponse.getReturnCode();
             log.log(Settings.INFO, () -> StringUtil.durationSince("verifySignature", startTime));
         } catch (RuntimeException e) {
             log.log(Settings.ERROR, e.getMessage(), e);
         }
 
-        return Response.status(returnCode.getHttpCode()).entity(response).build();
+        return Response.status(returnCode.getHttpCode()).entity(verifySignatureResponse).build();
     }
 
     @POST
     @Path("/fetchSignatures")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response fetch(@NotNull final FetchSignatureRequest request) {
+    public Response fetch(@NotNull final FetchSignatureRequest fetchSignaturesRequest) {
+        FetchSignatureResponse fetchSignaturesResponse = null;
         ReturnCode returnCode = ReturnCode.ERROR;
-        FetchSignatureResponse response = null;
 
         try {
             final Long startTime = System.nanoTime();
-            response = bean.fetchSignatures(request);
-            returnCode = response.getReturnCode();
+            fetchSignaturesResponse = bean.fetchSignatures(fetchSignaturesRequest);
+            returnCode = fetchSignaturesResponse.getReturnCode();
             log.log(Settings.INFO, () -> StringUtil.durationSince("fetchSignatures", startTime));
         } catch (RuntimeException e) {
             log.log(Settings.ERROR, e.getMessage(), e);
         }
 
-        return Response.status(returnCode.getHttpCode()).entity(response).build();
+        return Response.status(returnCode.getHttpCode()).entity(fetchSignaturesResponse).build();
     }
 }

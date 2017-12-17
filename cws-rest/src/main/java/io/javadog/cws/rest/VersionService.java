@@ -39,18 +39,18 @@ public class VersionService {
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     public Response version() {
+        VersionResponse versionResponse = null;
         ReturnCode returnCode = ReturnCode.ERROR;
-        VersionResponse response = null;
 
         try {
             final Long startTime = System.nanoTime();
-            response = bean.version();
-            returnCode = response.getReturnCode();
+            versionResponse = bean.version();
+            returnCode = versionResponse.getReturnCode();
             log.log(Settings.INFO, () -> StringUtil.durationSince("version", startTime));
         } catch (RuntimeException e) {
             log.log(Settings.ERROR, e.getMessage(), e);
         }
 
-        return Response.status(returnCode.getHttpCode()).entity(response).build();
+        return Response.status(returnCode.getHttpCode()).entity(versionResponse).build();
     }
 }

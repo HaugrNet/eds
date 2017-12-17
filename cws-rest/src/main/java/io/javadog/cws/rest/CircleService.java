@@ -44,42 +44,42 @@ public class CircleService {
     @Path("/createCircle")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response create(@NotNull final ProcessCircleRequest request) {
+    public Response create(@NotNull final ProcessCircleRequest createCircleRequest) {
+        ProcessCircleResponse createCircleResponse = null;
         ReturnCode returnCode = ReturnCode.ERROR;
-        ProcessCircleResponse response = null;
 
         try {
             final Long startTime = System.nanoTime();
-            request.setAction(Action.CREATE);
-            response = bean.processCircle(request);
-            returnCode = response.getReturnCode();
+            createCircleRequest.setAction(Action.CREATE);
+            createCircleResponse = bean.processCircle(createCircleRequest);
+            returnCode = createCircleResponse.getReturnCode();
             log.log(Settings.INFO, () -> StringUtil.durationSince("createCircle", startTime));
         } catch (RuntimeException e) {
             log.log(Settings.ERROR, e.getMessage(), e);
         }
 
-        return Response.status(returnCode.getHttpCode()).entity(response).build();
+        return Response.status(returnCode.getHttpCode()).entity(createCircleResponse).build();
     }
 
     @POST
     @Path("/updateCircle")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response update(@NotNull final ProcessCircleRequest request) {
+    public Response update(@NotNull final ProcessCircleRequest updateCircleRequest) {
+        ProcessCircleResponse updateCircleResponse = null;
         ReturnCode returnCode = ReturnCode.ERROR;
-        ProcessCircleResponse response = null;
 
         try {
             final Long startTime = System.nanoTime();
-            request.setAction(Action.UPDATE);
-            response = bean.processCircle(request);
-            returnCode = response.getReturnCode();
+            updateCircleRequest.setAction(Action.UPDATE);
+            updateCircleResponse = bean.processCircle(updateCircleRequest);
+            returnCode = updateCircleResponse.getReturnCode();
             log.log(Settings.INFO, () -> StringUtil.durationSince("updateCircle", startTime));
         } catch (RuntimeException e) {
             log.log(Settings.ERROR, e.getMessage(), e);
         }
 
-        return Response.status(returnCode.getHttpCode()).entity(response).build();
+        return Response.status(returnCode.getHttpCode()).entity(updateCircleResponse).build();
     }
 
     @POST
@@ -87,63 +87,63 @@ public class CircleService {
     @Path("/deleteCircle")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response delete(@NotNull final ProcessCircleRequest request) {
+    public Response delete(@NotNull final ProcessCircleRequest deleteCircleRequest) {
+        ProcessCircleResponse deleteCircleResponse = null;
         ReturnCode returnCode = ReturnCode.ERROR;
-        ProcessCircleResponse response = null;
 
         try {
             final Long startTime = System.nanoTime();
-            request.setAction(Action.DELETE);
-            response = bean.processCircle(request);
-            returnCode = response.getReturnCode();
+            deleteCircleRequest.setAction(Action.DELETE);
+            deleteCircleResponse = bean.processCircle(deleteCircleRequest);
+            returnCode = deleteCircleResponse.getReturnCode();
             log.log(Settings.INFO, () -> StringUtil.durationSince("deleteCircle", startTime));
         } catch (RuntimeException e) {
             log.log(Settings.ERROR, e.getMessage(), e);
         }
 
-        return Response.status(returnCode.getHttpCode()).entity(response).build();
+        return Response.status(returnCode.getHttpCode()).entity(deleteCircleResponse).build();
     }
 
     @POST
     @Path("/addTrustee")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response add(@NotNull final ProcessCircleRequest request) {
+    public Response add(@NotNull final ProcessCircleRequest addTrusteeRequest) {
+        ProcessCircleResponse addTrusteeResponse = null;
         ReturnCode returnCode = ReturnCode.ERROR;
-        ProcessCircleResponse response = null;
 
         try {
             final Long startTime = System.nanoTime();
-            request.setAction(Action.ADD);
-            response = bean.processCircle(request);
-            returnCode = response.getReturnCode();
+            addTrusteeRequest.setAction(Action.ADD);
+            addTrusteeResponse = bean.processCircle(addTrusteeRequest);
+            returnCode = addTrusteeResponse.getReturnCode();
             log.log(Settings.INFO, () -> StringUtil.durationSince("addTrustee", startTime));
         } catch (RuntimeException e) {
             log.log(Settings.ERROR, e.getMessage(), e);
         }
 
-        return Response.status(returnCode.getHttpCode()).entity(response).build();
+        return Response.status(returnCode.getHttpCode()).entity(addTrusteeResponse).build();
     }
 
     @POST
     @Path("/alterTrustee")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response alter(@NotNull final ProcessCircleRequest request) {
+    public Response alter(@NotNull final ProcessCircleRequest alterTrusteeRequest) {
+        ProcessCircleResponse alterTrusteeResponse = null;
         ReturnCode returnCode = ReturnCode.ERROR;
-        ProcessCircleResponse response = null;
 
         try {
             final Long startTime = System.nanoTime();
-            request.setAction(Action.ALTER);
-            response = bean.processCircle(request);
-            returnCode = response.getReturnCode();
+            alterTrusteeRequest.setAction(Action.ALTER);
+            alterTrusteeResponse = bean.processCircle(alterTrusteeRequest);
+            returnCode = alterTrusteeResponse.getReturnCode();
             log.log(Settings.INFO, () -> StringUtil.durationSince("alterTrustee", startTime));
         } catch (RuntimeException e) {
             log.log(Settings.ERROR, e.getMessage(), e);
         }
 
-        return Response.status(returnCode.getHttpCode()).entity(response).build();
+        return Response.status(returnCode.getHttpCode()).entity(alterTrusteeResponse).build();
     }
 
     @POST
@@ -151,40 +151,40 @@ public class CircleService {
     @Path("/removeTrustee")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response remove(@NotNull final ProcessCircleRequest request) {
+    public Response remove(@NotNull final ProcessCircleRequest removeTrusteeRequest) {
+        ProcessCircleResponse removeTrusteeResponse = null;
         ReturnCode returnCode = ReturnCode.ERROR;
-        ProcessCircleResponse response = null;
 
         try {
             final Long startTime = System.nanoTime();
-            request.setAction(Action.REMOVE);
-            response = bean.processCircle(request);
-            returnCode = response.getReturnCode();
+            removeTrusteeRequest.setAction(Action.REMOVE);
+            removeTrusteeResponse = bean.processCircle(removeTrusteeRequest);
+            returnCode = removeTrusteeResponse.getReturnCode();
             log.log(Settings.INFO, () -> StringUtil.durationSince("removeTrustee", startTime));
         } catch (RuntimeException e) {
             log.log(Settings.ERROR, e.getMessage(), e);
         }
 
-        return Response.status(returnCode.getHttpCode()).entity(response).build();
+        return Response.status(returnCode.getHttpCode()).entity(removeTrusteeResponse).build();
     }
 
     @POST
     @Path("/fetchCircles")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response fetch(@NotNull final FetchCircleRequest request) {
+    public Response fetch(@NotNull final FetchCircleRequest fetchCirclesRequest) {
+        FetchCircleResponse fetchCirclesResponse = null;
         ReturnCode returnCode = ReturnCode.ERROR;
-        FetchCircleResponse response = null;
 
         try {
             final Long startTime = System.nanoTime();
-            response = bean.fetchCircles(request);
-            returnCode = response.getReturnCode();
+            fetchCirclesResponse = bean.fetchCircles(fetchCirclesRequest);
+            returnCode = fetchCirclesResponse.getReturnCode();
             log.log(Settings.INFO, () -> StringUtil.durationSince("fetchCircles", startTime));
         } catch (RuntimeException e) {
             log.log(Settings.ERROR, e.getMessage(), e);
         }
 
-        return Response.status(returnCode.getHttpCode()).entity(response).build();
+        return Response.status(returnCode.getHttpCode()).entity(fetchCirclesResponse).build();
     }
 }

@@ -39,19 +39,19 @@ public class SanityService {
     @Path("/sanitized")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response sanitize(final SanityRequest request) {
+    public Response sanitize(final SanityRequest sanitizedRequest) {
+        SanityResponse sanitizedResponse = null;
         ReturnCode returnCode = ReturnCode.ERROR;
-        SanityResponse response = null;
 
         try {
             final Long startTime = System.nanoTime();
-            response = bean.sanity(request);
-            returnCode = response.getReturnCode();
+            sanitizedResponse = bean.sanity(sanitizedRequest);
+            returnCode = sanitizedResponse.getReturnCode();
             log.log(Settings.INFO, () -> StringUtil.durationSince("sanitized", startTime));
         } catch (RuntimeException e) {
             log.log(Settings.ERROR, e.getMessage(), e);
         }
 
-        return Response.status(returnCode.getHttpCode()).entity(response).build();
+        return Response.status(returnCode.getHttpCode()).entity(sanitizedResponse).build();
     }
 }

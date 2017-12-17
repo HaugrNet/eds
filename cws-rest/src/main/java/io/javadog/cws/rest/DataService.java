@@ -44,42 +44,42 @@ public class DataService {
     @Path("/addData")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response add(@NotNull final ProcessDataRequest request) {
+    public Response add(@NotNull final ProcessDataRequest addDataRequest) {
+        ProcessDataResponse addDataResponse = null;
         ReturnCode returnCode = ReturnCode.ERROR;
-        ProcessDataResponse response = null;
 
         try {
             final Long startTime = System.nanoTime();
-            request.setAction(Action.ADD);
-            response = bean.processData(request);
-            returnCode = response.getReturnCode();
+            addDataRequest.setAction(Action.ADD);
+            addDataResponse = bean.processData(addDataRequest);
+            returnCode = addDataResponse.getReturnCode();
             log.log(Settings.INFO, () -> StringUtil.durationSince("addData", startTime));
         } catch (RuntimeException e) {
             log.log(Settings.ERROR, e.getMessage(), e);
         }
 
-        return Response.status(returnCode.getHttpCode()).entity(response).build();
+        return Response.status(returnCode.getHttpCode()).entity(addDataResponse).build();
     }
 
     @POST
     @Path("/updateData")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response update(@NotNull final ProcessDataRequest request) {
+    public Response update(@NotNull final ProcessDataRequest updateDataRequest) {
+        ProcessDataResponse updateDataResponse = null;
         ReturnCode returnCode = ReturnCode.ERROR;
-        ProcessDataResponse response = null;
 
         try {
             final Long startTime = System.nanoTime();
-            request.setAction(Action.UPDATE);
-            response = bean.processData(request);
-            returnCode = response.getReturnCode();
+            updateDataRequest.setAction(Action.UPDATE);
+            updateDataResponse = bean.processData(updateDataRequest);
+            returnCode = updateDataResponse.getReturnCode();
             log.log(Settings.INFO, () -> StringUtil.durationSince("updateData", startTime));
         } catch (RuntimeException e) {
             log.log(Settings.ERROR, e.getMessage(), e);
         }
 
-        return Response.status(returnCode.getHttpCode()).entity(response).build();
+        return Response.status(returnCode.getHttpCode()).entity(updateDataResponse).build();
     }
 
     @POST
@@ -87,40 +87,40 @@ public class DataService {
     @Path("/deleteData")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response delete(@NotNull final ProcessDataRequest request) {
+    public Response delete(@NotNull final ProcessDataRequest deleteDataRequest) {
+        ProcessDataResponse deleteDataResponse = null;
         ReturnCode returnCode = ReturnCode.ERROR;
-        ProcessDataResponse response = null;
 
         try {
             final Long startTime = System.nanoTime();
-            request.setAction(Action.DELETE);
-            response = bean.processData(request);
-            returnCode = response.getReturnCode();
+            deleteDataRequest.setAction(Action.DELETE);
+            deleteDataResponse = bean.processData(deleteDataRequest);
+            returnCode = deleteDataResponse.getReturnCode();
             log.log(Settings.INFO, () -> StringUtil.durationSince("deleteData", startTime));
         } catch (RuntimeException e) {
             log.log(Settings.ERROR, e.getMessage(), e);
         }
 
-        return Response.status(returnCode.getHttpCode()).entity(response).build();
+        return Response.status(returnCode.getHttpCode()).entity(deleteDataResponse).build();
     }
 
     @POST
     @Path("/fetchData")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response fetch(@NotNull final FetchDataRequest request) {
+    public Response fetch(@NotNull final FetchDataRequest fetchDataRequest) {
+        FetchDataResponse fetchDataResponse = null;
         ReturnCode returnCode = ReturnCode.ERROR;
-        FetchDataResponse response = null;
 
         try {
             final Long startTime = System.nanoTime();
-            response = bean.fetchData(request);
-            returnCode = response.getReturnCode();
+            fetchDataResponse = bean.fetchData(fetchDataRequest);
+            returnCode = fetchDataResponse.getReturnCode();
             log.log(Settings.INFO, () -> StringUtil.durationSince("fetchData", startTime));
         } catch (RuntimeException e) {
             log.log(Settings.ERROR, e.getMessage(), e);
         }
 
-        return Response.status(returnCode.getHttpCode()).entity(response).build();
+        return Response.status(returnCode.getHttpCode()).entity(fetchDataResponse).build();
     }
 }

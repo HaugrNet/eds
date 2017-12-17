@@ -15,7 +15,7 @@ import io.javadog.cws.api.responses.FetchDataTypeResponse;
 import io.javadog.cws.api.responses.ProcessDataTypeResponse;
 import io.javadog.cws.core.SettingBean;
 import io.javadog.cws.core.ShareBean;
-import io.javadog.cws.core.misc.StringUtil;
+import io.javadog.cws.core.misc.LoggingUtil;
 import io.javadog.cws.core.model.Settings;
 
 import javax.inject.Inject;
@@ -55,7 +55,7 @@ public class DataTypeService {
             processDataTypeRequest.setAction(Action.PROCESS);
             processDataTypeResponse = bean.processDataType(processDataTypeRequest);
             returnCode = processDataTypeResponse.getReturnCode();
-            log.log(Settings.INFO, () -> StringUtil.requestDuration(settings.getSettings().getLocale(), "processDataType", startTime));
+            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "processDataType", startTime));
         } catch (RuntimeException e) {
             log.log(Settings.ERROR, e.getMessage(), e);
         }
@@ -77,7 +77,7 @@ public class DataTypeService {
             deleteDataTypeRequest.setAction(Action.DELETE);
             deleteDataTypeResponse = bean.processDataType(deleteDataTypeRequest);
             returnCode = deleteDataTypeResponse.getReturnCode();
-            log.log(Settings.INFO, () -> StringUtil.requestDuration(settings.getSettings().getLocale(), "deleteDataType", startTime));
+            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "deleteDataType", startTime));
         } catch (RuntimeException e) {
             log.log(Settings.ERROR, e.getMessage(), e);
         }
@@ -97,7 +97,7 @@ public class DataTypeService {
             final Long startTime = System.nanoTime();
             fetchDataTypesResponse = bean.fetchDataTypes(fetchDataTypesRequest);
             returnCode = fetchDataTypesResponse.getReturnCode();
-            log.log(Settings.INFO, () -> StringUtil.requestDuration(settings.getSettings().getLocale(), "fetchDataTypes", startTime));
+            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "fetchDataTypes", startTime));
         } catch (RuntimeException e) {
             log.log(Settings.ERROR, e.getMessage(), e);
         }

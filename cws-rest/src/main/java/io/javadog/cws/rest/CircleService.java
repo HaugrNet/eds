@@ -15,7 +15,7 @@ import io.javadog.cws.api.responses.FetchCircleResponse;
 import io.javadog.cws.api.responses.ProcessCircleResponse;
 import io.javadog.cws.core.SettingBean;
 import io.javadog.cws.core.SystemBean;
-import io.javadog.cws.core.misc.StringUtil;
+import io.javadog.cws.core.misc.LoggingUtil;
 import io.javadog.cws.core.model.Settings;
 
 import javax.inject.Inject;
@@ -55,7 +55,7 @@ public class CircleService {
             createCircleRequest.setAction(Action.CREATE);
             createCircleResponse = bean.processCircle(createCircleRequest);
             returnCode = createCircleResponse.getReturnCode();
-            log.log(Settings.INFO, () -> StringUtil.requestDuration(settings.getSettings().getLocale(), "createCircle", startTime));
+            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "createCircle", startTime));
         } catch (RuntimeException e) {
             log.log(Settings.ERROR, e.getMessage(), e);
         }
@@ -76,7 +76,7 @@ public class CircleService {
             updateCircleRequest.setAction(Action.UPDATE);
             updateCircleResponse = bean.processCircle(updateCircleRequest);
             returnCode = updateCircleResponse.getReturnCode();
-            log.log(Settings.INFO, () -> StringUtil.requestDuration(settings.getSettings().getLocale(), "updateCircle", startTime));
+            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "updateCircle", startTime));
         } catch (RuntimeException e) {
             log.log(Settings.ERROR, e.getMessage(), e);
         }
@@ -98,7 +98,7 @@ public class CircleService {
             deleteCircleRequest.setAction(Action.DELETE);
             deleteCircleResponse = bean.processCircle(deleteCircleRequest);
             returnCode = deleteCircleResponse.getReturnCode();
-            log.log(Settings.INFO, () -> StringUtil.requestDuration(settings.getSettings().getLocale(), "deleteCircle", startTime));
+            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "deleteCircle", startTime));
         } catch (RuntimeException e) {
             log.log(Settings.ERROR, e.getMessage(), e);
         }
@@ -119,7 +119,7 @@ public class CircleService {
             addTrusteeRequest.setAction(Action.ADD);
             addTrusteeResponse = bean.processCircle(addTrusteeRequest);
             returnCode = addTrusteeResponse.getReturnCode();
-            log.log(Settings.INFO, () -> StringUtil.requestDuration(settings.getSettings().getLocale(), "addTrustee", startTime));
+            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "addTrustee", startTime));
         } catch (RuntimeException e) {
             log.log(Settings.ERROR, e.getMessage(), e);
         }
@@ -140,7 +140,7 @@ public class CircleService {
             alterTrusteeRequest.setAction(Action.ALTER);
             alterTrusteeResponse = bean.processCircle(alterTrusteeRequest);
             returnCode = alterTrusteeResponse.getReturnCode();
-            log.log(Settings.INFO, () -> StringUtil.requestDuration(settings.getSettings().getLocale(), "alterTrustee", startTime));
+            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "alterTrustee", startTime));
         } catch (RuntimeException e) {
             log.log(Settings.ERROR, e.getMessage(), e);
         }
@@ -162,7 +162,7 @@ public class CircleService {
             removeTrusteeRequest.setAction(Action.REMOVE);
             removeTrusteeResponse = bean.processCircle(removeTrusteeRequest);
             returnCode = removeTrusteeResponse.getReturnCode();
-            log.log(Settings.INFO, () -> StringUtil.requestDuration(settings.getSettings().getLocale(), "removeTrustee", startTime));
+            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "removeTrustee", startTime));
         } catch (RuntimeException e) {
             log.log(Settings.ERROR, e.getMessage(), e);
         }
@@ -182,7 +182,7 @@ public class CircleService {
             final Long startTime = System.nanoTime();
             fetchCirclesResponse = bean.fetchCircles(fetchCirclesRequest);
             returnCode = fetchCirclesResponse.getReturnCode();
-            log.log(Settings.INFO, () -> StringUtil.requestDuration(settings.getSettings().getLocale(), "fetchCircles", startTime));
+            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "fetchCircles", startTime));
         } catch (RuntimeException e) {
             log.log(Settings.ERROR, e.getMessage(), e);
         }

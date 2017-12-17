@@ -16,7 +16,7 @@ import io.javadog.cws.api.responses.SignResponse;
 import io.javadog.cws.api.responses.VerifyResponse;
 import io.javadog.cws.core.SettingBean;
 import io.javadog.cws.core.ShareBean;
-import io.javadog.cws.core.misc.StringUtil;
+import io.javadog.cws.core.misc.LoggingUtil;
 import io.javadog.cws.core.model.Settings;
 
 import javax.inject.Inject;
@@ -54,7 +54,7 @@ public class SignatureService {
             final Long startTime = System.nanoTime();
             signDocumentResponse = bean.sign(signDocumentRequest);
             returnCode = signDocumentResponse.getReturnCode();
-            log.log(Settings.INFO, () -> StringUtil.requestDuration(settings.getSettings().getLocale(), "signDocument", startTime));
+            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "signDocument", startTime));
         } catch (RuntimeException e) {
             log.log(Settings.ERROR, e.getMessage(), e);
         }
@@ -74,7 +74,7 @@ public class SignatureService {
             final Long startTime = System.nanoTime();
             verifySignatureResponse = bean.verify(verifySignatureRequest);
             returnCode = verifySignatureResponse.getReturnCode();
-            log.log(Settings.INFO, () -> StringUtil.requestDuration(settings.getSettings().getLocale(), "verifySignature", startTime));
+            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "verifySignature", startTime));
         } catch (RuntimeException e) {
             log.log(Settings.ERROR, e.getMessage(), e);
         }
@@ -94,7 +94,7 @@ public class SignatureService {
             final Long startTime = System.nanoTime();
             fetchSignaturesResponse = bean.fetchSignatures(fetchSignaturesRequest);
             returnCode = fetchSignaturesResponse.getReturnCode();
-            log.log(Settings.INFO, () -> StringUtil.requestDuration(settings.getSettings().getLocale(), "fetchSignatures", startTime));
+            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "fetchSignatures", startTime));
         } catch (RuntimeException e) {
             log.log(Settings.ERROR, e.getMessage(), e);
         }

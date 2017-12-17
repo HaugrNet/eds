@@ -13,9 +13,9 @@ import java.util.Locale;
  * @author Kim Jensen
  * @since  CWS 1.0
  */
-public final class StringUtil {
+public final class LoggingUtil {
 
-    private StringUtil() {
+    private LoggingUtil() {
         // Private Constructor, this is a utility Class.
     }
 

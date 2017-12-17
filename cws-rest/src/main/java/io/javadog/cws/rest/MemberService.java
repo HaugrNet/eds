@@ -15,7 +15,7 @@ import io.javadog.cws.api.responses.FetchMemberResponse;
 import io.javadog.cws.api.responses.ProcessMemberResponse;
 import io.javadog.cws.core.SettingBean;
 import io.javadog.cws.core.SystemBean;
-import io.javadog.cws.core.misc.StringUtil;
+import io.javadog.cws.core.misc.LoggingUtil;
 import io.javadog.cws.core.model.Settings;
 
 import javax.inject.Inject;
@@ -55,7 +55,7 @@ public class MemberService {
             createMemberRequest.setAction(Action.CREATE);
             createMemberResponse = bean.processMember(createMemberRequest);
             returnCode = createMemberResponse.getReturnCode();
-            log.log(Settings.INFO, () -> StringUtil.requestDuration(settings.getSettings().getLocale(), "createMember", startTime));
+            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "createMember", startTime));
         } catch (RuntimeException e) {
             log.log(Settings.ERROR, e.getMessage(), e);
         }
@@ -76,7 +76,7 @@ public class MemberService {
             inviteMemberRequest.setAction(Action.INVITE);
             inviteMemberResponse = bean.processMember(inviteMemberRequest);
             returnCode = inviteMemberResponse.getReturnCode();
-            log.log(Settings.INFO, () -> StringUtil.requestDuration(settings.getSettings().getLocale(), "inviteMember", startTime));
+            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "inviteMember", startTime));
         } catch (RuntimeException e) {
             log.log(Settings.ERROR, e.getMessage(), e);
         }
@@ -97,7 +97,7 @@ public class MemberService {
             updateMemberRequest.setAction(Action.UPDATE);
             updateMemberResponse = bean.processMember(updateMemberRequest);
             returnCode = updateMemberResponse.getReturnCode();
-            log.log(Settings.INFO, () -> StringUtil.requestDuration(settings.getSettings().getLocale(), "updateMember", startTime));
+            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "updateMember", startTime));
         } catch (RuntimeException e) {
             log.log(Settings.ERROR, e.getMessage(), e);
         }
@@ -119,7 +119,7 @@ public class MemberService {
             deleteMemberRequest.setAction(Action.DELETE);
             deleteMemberResponse = bean.processMember(deleteMemberRequest);
             returnCode = deleteMemberResponse.getReturnCode();
-            log.log(Settings.INFO, () -> StringUtil.requestDuration(settings.getSettings().getLocale(), "deleteMember", startTime));
+            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "deleteMember", startTime));
         } catch (RuntimeException e) {
             log.log(Settings.ERROR, e.getMessage(), e);
         }
@@ -139,7 +139,7 @@ public class MemberService {
             final Long startTime = System.nanoTime();
             fetchMembersResponse = bean.fetchMembers(fetchMembersRequest);
             returnCode = fetchMembersResponse.getReturnCode();
-            log.log(Settings.INFO, () -> StringUtil.requestDuration(settings.getSettings().getLocale(), "fetchMembers", startTime));
+            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "fetchMembers", startTime));
         } catch (RuntimeException e) {
             log.log(Settings.ERROR, e.getMessage(), e);
         }

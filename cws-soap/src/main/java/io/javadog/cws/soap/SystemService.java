@@ -24,7 +24,7 @@ import io.javadog.cws.api.responses.SettingResponse;
 import io.javadog.cws.api.responses.VersionResponse;
 import io.javadog.cws.core.SettingBean;
 import io.javadog.cws.core.SystemBean;
-import io.javadog.cws.core.misc.StringUtil;
+import io.javadog.cws.core.misc.LoggingUtil;
 import io.javadog.cws.core.model.Settings;
 
 import javax.inject.Inject;
@@ -64,7 +64,7 @@ public class SystemService implements System {
         try {
             final Long startTime = java.lang.System.nanoTime();
             response = bean.version();
-            log.log(Settings.INFO, () -> StringUtil.requestDuration(settings.getSettings().getLocale(), "version", startTime));
+            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "version", startTime));
         } catch (RuntimeException e) {
             // If an error occurs that has so far not been resolved, this is the
             // final level where it can be handled. Errors can be Persistence
@@ -89,7 +89,7 @@ public class SystemService implements System {
         try {
             final Long startTime = java.lang.System.nanoTime();
             response = bean.settings(request);
-            log.log(Settings.INFO, () -> StringUtil.requestDuration(settings.getSettings().getLocale(), "settings", startTime));
+            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "settings", startTime));
         } catch (RuntimeException e) {
             // If an error occurs that has so far not been resolved, this is the
             // final level where it can be handled. Errors can be Persistence
@@ -114,7 +114,7 @@ public class SystemService implements System {
         try {
             final Long startTime = java.lang.System.nanoTime();
             response = bean.sanity(request);
-            log.log(Settings.INFO, () -> StringUtil.requestDuration(settings.getSettings().getLocale(), "sanitized", startTime));
+            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "sanitized", startTime));
         } catch (RuntimeException e) {
             // If an error occurs that has so far not been resolved, this is the
             // final level where it can be handled. Errors can be Persistence
@@ -139,7 +139,7 @@ public class SystemService implements System {
         try {
             final Long startTime = java.lang.System.nanoTime();
             response = bean.fetchMembers(request);
-            log.log(Settings.INFO, () -> StringUtil.requestDuration(settings.getSettings().getLocale(), "fetchMembers", startTime));
+            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "fetchMembers", startTime));
         } catch (RuntimeException e) {
             // If an error occurs that has so far not been resolved, this is the
             // final level where it can be handled. Errors can be Persistence
@@ -164,7 +164,7 @@ public class SystemService implements System {
         try {
             final Long startTime = java.lang.System.nanoTime();
             response = bean.processMember(request);
-            log.log(Settings.INFO, () -> StringUtil.requestDuration(settings.getSettings().getLocale(), "processMember", startTime));
+            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "processMember", startTime));
         } catch (RuntimeException e) {
             // If an error occurs that has so far not been resolved, this is the
             // final level where it can be handled. Errors can be Persistence
@@ -189,7 +189,7 @@ public class SystemService implements System {
         try {
             final Long startTime = java.lang.System.nanoTime();
             response = bean.fetchCircles(request);
-            log.log(Settings.INFO, () -> StringUtil.requestDuration(settings.getSettings().getLocale(), "fetchCircles", startTime));
+            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "fetchCircles", startTime));
         } catch (RuntimeException e) {
             // If an error occurs that has so far not been resolved, this is the
             // final level where it can be handled. Errors can be Persistence
@@ -214,7 +214,7 @@ public class SystemService implements System {
         try {
             final Long startTime = java.lang.System.nanoTime();
             response = bean.processCircle(request);
-            log.log(Settings.INFO, () -> StringUtil.requestDuration(settings.getSettings().getLocale(), "processCircle", startTime));
+            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "processCircle", startTime));
         } catch (RuntimeException e) {
             // If an error occurs that has so far not been resolved, this is the
             // final level where it can be handled. Errors can be Persistence

@@ -11,7 +11,7 @@ import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.responses.VersionResponse;
 import io.javadog.cws.core.SettingBean;
 import io.javadog.cws.core.SystemBean;
-import io.javadog.cws.core.misc.StringUtil;
+import io.javadog.cws.core.misc.LoggingUtil;
 import io.javadog.cws.core.model.Settings;
 
 import javax.inject.Inject;
@@ -48,7 +48,7 @@ public class VersionService {
             final Long startTime = System.nanoTime();
             versionResponse = bean.version();
             returnCode = versionResponse.getReturnCode();
-            log.log(Settings.INFO, () -> StringUtil.requestDuration(settings.getSettings().getLocale(), "version", startTime));
+            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "version", startTime));
         } catch (RuntimeException e) {
             log.log(Settings.ERROR, e.getMessage(), e);
         }

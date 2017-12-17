@@ -25,7 +25,7 @@ import io.javadog.cws.api.responses.SignResponse;
 import io.javadog.cws.api.responses.VerifyResponse;
 import io.javadog.cws.core.SettingBean;
 import io.javadog.cws.core.ShareBean;
-import io.javadog.cws.core.misc.StringUtil;
+import io.javadog.cws.core.misc.LoggingUtil;
 import io.javadog.cws.core.model.Settings;
 
 import javax.inject.Inject;
@@ -65,7 +65,7 @@ public class ShareService implements Share {
         try {
             final Long startTime = System.nanoTime();
             response = bean.processDataType(request);
-            log.log(Settings.INFO, () -> StringUtil.requestDuration(settings.getSettings().getLocale(), "processDataType", startTime));
+            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "processDataType", startTime));
         } catch (RuntimeException e) {
             // If an error occurs that has so far not been resolved, this is the
             // final level where it can be handled. Errors can be Persistence
@@ -90,7 +90,7 @@ public class ShareService implements Share {
         try {
             final Long startTime = System.nanoTime();
             response = bean.fetchDataTypes(request);
-            log.log(Settings.INFO, () -> StringUtil.requestDuration(settings.getSettings().getLocale(), "fetchDataTypes", startTime));
+            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "fetchDataTypes", startTime));
         } catch (RuntimeException e) {
             // If an error occurs that has so far not been resolved, this is the
             // final level where it can be handled. Errors can be Persistence
@@ -115,7 +115,7 @@ public class ShareService implements Share {
         try {
             final Long startTime = System.nanoTime();
             response = bean.processData(request);
-            log.log(Settings.INFO, () -> StringUtil.requestDuration(settings.getSettings().getLocale(), "processData", startTime));
+            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "processData", startTime));
         } catch (RuntimeException e) {
             // If an error occurs that has so far not been resolved, this is the
             // final level where it can be handled. Errors can be Persistence
@@ -140,7 +140,7 @@ public class ShareService implements Share {
         try {
             final Long startTime = System.nanoTime();
             response = bean.fetchData(request);
-            log.log(Settings.INFO, () -> StringUtil.requestDuration(settings.getSettings().getLocale(), "fetchData", startTime));
+            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "fetchData", startTime));
         } catch (RuntimeException e) {
             // If an error occurs that has so far not been resolved, this is the
             // final level where it can be handled. Errors can be Persistence
@@ -165,7 +165,7 @@ public class ShareService implements Share {
         try {
             final Long startTime = System.nanoTime();
             response = bean.sign(request);
-            log.log(Settings.INFO, () -> StringUtil.requestDuration(settings.getSettings().getLocale(), "signDocument", startTime));
+            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "signDocument", startTime));
         } catch (RuntimeException e) {
             // If an error occurs that has so far not been resolved, this is the
             // final level where it can be handled. Errors can be Persistence
@@ -190,7 +190,7 @@ public class ShareService implements Share {
         try {
             final Long startTime = System.nanoTime();
             response = bean.verify(request);
-            log.log(Settings.INFO, () -> StringUtil.requestDuration(settings.getSettings().getLocale(), "verifySignatures", startTime));
+            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "verifySignatures", startTime));
         } catch (RuntimeException e) {
             // If an error occurs that has so far not been resolved, this is the
             // final level where it can be handled. Errors can be Persistence
@@ -215,7 +215,7 @@ public class ShareService implements Share {
         try {
             final Long startTime = System.nanoTime();
             response = bean.fetchSignatures(request);
-            log.log(Settings.INFO, () -> StringUtil.requestDuration(settings.getSettings().getLocale(), "fetchSignatures", startTime));
+            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "fetchSignatures", startTime));
         } catch (RuntimeException e) {
             // If an error occurs that has so far not been resolved, this is the
             // final level where it can be handled. Errors can be Persistence

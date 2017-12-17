@@ -15,7 +15,7 @@ import io.javadog.cws.api.responses.FetchDataResponse;
 import io.javadog.cws.api.responses.ProcessDataResponse;
 import io.javadog.cws.core.SettingBean;
 import io.javadog.cws.core.ShareBean;
-import io.javadog.cws.core.misc.StringUtil;
+import io.javadog.cws.core.misc.LoggingUtil;
 import io.javadog.cws.core.model.Settings;
 
 import javax.inject.Inject;
@@ -55,7 +55,7 @@ public class DataService {
             addDataRequest.setAction(Action.ADD);
             addDataResponse = bean.processData(addDataRequest);
             returnCode = addDataResponse.getReturnCode();
-            log.log(Settings.INFO, () -> StringUtil.requestDuration(settings.getSettings().getLocale(), "addData", startTime));
+            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "addData", startTime));
         } catch (RuntimeException e) {
             log.log(Settings.ERROR, e.getMessage(), e);
         }
@@ -76,7 +76,7 @@ public class DataService {
             updateDataRequest.setAction(Action.UPDATE);
             updateDataResponse = bean.processData(updateDataRequest);
             returnCode = updateDataResponse.getReturnCode();
-            log.log(Settings.INFO, () -> StringUtil.requestDuration(settings.getSettings().getLocale(), "updateData", startTime));
+            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "updateData", startTime));
         } catch (RuntimeException e) {
             log.log(Settings.ERROR, e.getMessage(), e);
         }
@@ -98,7 +98,7 @@ public class DataService {
             deleteDataRequest.setAction(Action.DELETE);
             deleteDataResponse = bean.processData(deleteDataRequest);
             returnCode = deleteDataResponse.getReturnCode();
-            log.log(Settings.INFO, () -> StringUtil.requestDuration(settings.getSettings().getLocale(), "deleteData", startTime));
+            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "deleteData", startTime));
         } catch (RuntimeException e) {
             log.log(Settings.ERROR, e.getMessage(), e);
         }
@@ -118,7 +118,7 @@ public class DataService {
             final Long startTime = System.nanoTime();
             fetchDataResponse = bean.fetchData(fetchDataRequest);
             returnCode = fetchDataResponse.getReturnCode();
-            log.log(Settings.INFO, () -> StringUtil.requestDuration(settings.getSettings().getLocale(), "fetchData", startTime));
+            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "fetchData", startTime));
         } catch (RuntimeException e) {
             log.log(Settings.ERROR, e.getMessage(), e);
         }

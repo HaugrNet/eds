@@ -64,11 +64,4 @@ public final class ProcessDataTypeResponse extends CwsResponse {
     public DataType getDataType() {
         return dataType;
     }
-
-    @Override
-    public String toString() {
-        return "ProcessDataTypeResponse{" +
-                "dataType=" + dataType +
-                '}';
-    }
 }

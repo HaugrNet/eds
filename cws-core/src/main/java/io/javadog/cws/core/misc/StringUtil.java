@@ -7,7 +7,6 @@
  */
 package io.javadog.cws.core.misc;
 
-import java.util.Formatter;
 import java.util.Locale;
 
 /**
@@ -20,12 +19,19 @@ public final class StringUtil {
         // Private Constructor, this is a utility Class.
     }
 
-    public static String durationSince(final String action, final long startNanoTime) {
-        final long elapsedNS = System.nanoTime() - startNanoTime;
+    /**
+     * Returns a simple String with the duration in milliseconds which the given
+     * action took to complete. The start time is given in NanoSeconds, using
+     * the {@link System#nanoTime()} method.
+     *
+     * @param locale        The Locale used for generating the formatted string
+     * @param action        The Requested action that was performed
+     * @param startNanoTime The start time in ns via {@link System#nanoTime()}
+     * @return Formatted String for the logging, contain action and duration
+     */
+    public static String requestDuration(final Locale locale, final String action, final long startNanoTime) {
+        final double elapsed = (System.nanoTime() - startNanoTime) / 1000000.0D;
 
-        try (Formatter formatter = new Formatter(Locale.US)) {
-            final double elaspedMS = elapsedNS / 1000000.0D;
-            return formatter.format("%s completed in %(,.2f ms", action, elaspedMS).toString();
-        }
+        return String.format(locale, "%s completed in %.2f ms", action, elapsed);
     }
 }

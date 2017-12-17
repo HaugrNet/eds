@@ -511,6 +511,8 @@ public enum ReturnCode {
     // Internal functionality for the ReturnCode Enum
     // =========================================================================
 
+    private static final int ERROR_CODE_NUMBER = 90;
+
     private final Classification classification;
     private final int code;
     private final String description;
@@ -532,7 +534,7 @@ public enum ReturnCode {
     public int getHttpCode() {
         int httpCode = getCode();
 
-        if (code > 90) {
+        if (code > ERROR_CODE_NUMBER) {
             httpCode = classification.getClassificationCode();
         }
 

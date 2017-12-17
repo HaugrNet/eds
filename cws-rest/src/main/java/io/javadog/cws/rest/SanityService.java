@@ -10,6 +10,7 @@ package io.javadog.cws.rest;
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.requests.SanityRequest;
 import io.javadog.cws.api.responses.SanityResponse;
+import io.javadog.cws.core.SettingBean;
 import io.javadog.cws.core.SystemBean;
 import io.javadog.cws.core.misc.StringUtil;
 import io.javadog.cws.core.model.Settings;
@@ -33,6 +34,7 @@ public class SanityService {
 
     private static final Logger log = Logger.getLogger(SanityService.class.getName());
 
+    @Inject private SettingBean settings;
     @Inject private SystemBean bean;
 
     @POST
@@ -47,7 +49,7 @@ public class SanityService {
             final Long startTime = System.nanoTime();
             sanitizedResponse = bean.sanity(sanitizedRequest);
             returnCode = sanitizedResponse.getReturnCode();
-            log.log(Settings.INFO, () -> StringUtil.durationSince("sanitized", startTime));
+            log.log(Settings.INFO, () -> StringUtil.requestDuration(settings.getSettings().getLocale(), "sanitized", startTime));
         } catch (RuntimeException e) {
             log.log(Settings.ERROR, e.getMessage(), e);
         }

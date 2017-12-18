@@ -124,30 +124,18 @@ public final class CircleServiceTest extends DatabaseSetup {
         final FetchCircleRequest request = prepareRequest(FetchCircleRequest.class, Constants.ADMIN_ACCOUNT);
         final FetchCircleResponse response = service.perform(request);
 
-        assertThat(response, is(not(nullValue())));
         assertThat(response.isOk(), is(true));
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
-        assertThat(response.getReturnMessage(), is("Ok"));
-        assertThat(response.getCircles().size(), is(3));
-        assertThat(response.getCircles().get(0).getCircleName(), is(CIRCLE_1));
-        assertThat(response.getCircles().get(1).getCircleName(), is(CIRCLE_2));
-        assertThat(response.getCircles().get(2).getCircleName(), is(CIRCLE_3));
-        assertThat(response.getTrustees().isEmpty(), is(true));
+        detailedCircleAssertion(response, CIRCLE_1, CIRCLE_2, CIRCLE_3);
     }
 
     @Test
     public void testFetchAllCirclesAsMember1() {
         final FetchCircleService service = new FetchCircleService(settings, entityManager);
         final FetchCircleRequest request = prepareRequest(FetchCircleRequest.class, MEMBER_1);
-
         final FetchCircleResponse response = service.perform(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
-        assertThat(response.getReturnMessage(), is("Ok"));
-        assertThat(response.getCircles().size(), is(3));
-        assertThat(response.getCircles().get(0).getCircleName(), is(CIRCLE_1));
-        assertThat(response.getCircles().get(1).getCircleName(), is(CIRCLE_2));
-        assertThat(response.getCircles().get(2).getCircleName(), is(CIRCLE_3));
-        assertThat(response.getTrustees().size(), is(0));
+
+        assertThat(response.isOk(), is(true));
+        detailedCircleAssertion(response, CIRCLE_1, CIRCLE_2, CIRCLE_3);
     }
 
     @Test
@@ -161,15 +149,8 @@ public final class CircleServiceTest extends DatabaseSetup {
         request.setCircleId(circle.getExternalId());
         final FetchCircleResponse response = service.perform(request);
 
-        assertThat(response, is(not(nullValue())));
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
-        assertThat(response.getReturnMessage(), is("Ok"));
-        assertThat(response.getCircles().size(), is(1));
-        assertThat(response.getCircles().get(0).getCircleName(), is(CIRCLE_1));
-        assertThat(response.getTrustees().size(), is(3));
-        assertThat(response.getTrustees().get(0).getMemberId(), is(MEMBER_1_ID));
-        assertThat(response.getTrustees().get(1).getMemberId(), is(MEMBER_2_ID));
-        assertThat(response.getTrustees().get(2).getMemberId(), is(MEMBER_3_ID));
+        assertThat(response.isOk(), is(true));
+        detailedTrusteeAssertion(response, CIRCLE_1, MEMBER_1_ID, MEMBER_2_ID, MEMBER_3_ID);
     }
 
     @Test
@@ -182,16 +163,8 @@ public final class CircleServiceTest extends DatabaseSetup {
         final FetchCircleRequest request = prepareRequest(FetchCircleRequest.class, Constants.ADMIN_ACCOUNT);
         request.setCircleId(circle.getExternalId());
         final FetchCircleResponse response = service.perform(request);
-
-        assertThat(response, is(not(nullValue())));
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
-        assertThat(response.getReturnMessage(), is("Ok"));
-        assertThat(response.getCircles().size(), is(1));
-        assertThat(response.getCircles().get(0).getCircleName(), is(CIRCLE_1));
-        assertThat(response.getTrustees().size(), is(3));
-        assertThat(response.getTrustees().get(0).getMemberId(), is(MEMBER_1_ID));
-        assertThat(response.getTrustees().get(1).getMemberId(), is(MEMBER_2_ID));
-        assertThat(response.getTrustees().get(2).getMemberId(), is(MEMBER_3_ID));
+        assertThat(response.isOk(), is(true));
+        detailedTrusteeAssertion(response, CIRCLE_1, MEMBER_1_ID, MEMBER_2_ID, MEMBER_3_ID);
     }
 
     @Test
@@ -205,15 +178,8 @@ public final class CircleServiceTest extends DatabaseSetup {
         request.setCircleId(circle.getExternalId());
         final FetchCircleResponse response = service.perform(request);
 
-        assertThat(response, is(not(nullValue())));
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
-        assertThat(response.getReturnMessage(), is("Ok"));
-        assertThat(response.getCircles().size(), is(1));
-        assertThat(response.getCircles().get(0).getCircleName(), is(CIRCLE_1));
-        assertThat(response.getTrustees().size(), is(3));
-        assertThat(response.getTrustees().get(0).getMemberId(), is(MEMBER_1_ID));
-        assertThat(response.getTrustees().get(1).getMemberId(), is(MEMBER_2_ID));
-        assertThat(response.getTrustees().get(2).getMemberId(), is(MEMBER_3_ID));
+        assertThat(response.isOk(), is(true));
+        detailedTrusteeAssertion(response, CIRCLE_1, MEMBER_1_ID, MEMBER_2_ID, MEMBER_3_ID);
     }
 
     @Test
@@ -743,5 +709,36 @@ public final class CircleServiceTest extends DatabaseSetup {
 
     private CircleEntity findFirstCircle() {
         return entityManager.find(CircleEntity.class, 1L);
+    }
+
+    private static void detailedCircleAssertion(final FetchCircleResponse response, final String... circleNames) {
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(response.getReturnMessage(), is("Ok"));
+        assertThat(response.getTrustees().isEmpty(), is(true));
+
+        if ((circleNames != null) && (circleNames.length > 0)) {
+            assertThat(response.getCircles().size(), is(circleNames.length));
+            for (int i = 0; i < circleNames.length; i++) {
+                assertThat(response.getCircles().get(i).getCircleName(), is(circleNames[i]));
+            }
+        } else {
+            assertThat(response.getCircles().isEmpty(), is(true));
+        }
+    }
+
+    private static void detailedTrusteeAssertion(final FetchCircleResponse response, final String circleName, final String... memberIds) {
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(response.getReturnMessage(), is("Ok"));
+        assertThat(response.getCircles().size(), is(1));
+        assertThat(response.getCircles().get(0).getCircleName(), is(circleName));
+
+        if ((memberIds != null) && (memberIds.length > 0)) {
+            assertThat(response.getTrustees().size(), is(memberIds.length));
+            for (int i = 0; i < memberIds.length; i++) {
+                assertThat(response.getTrustees().get(i).getMemberId(), is(memberIds[i]));
+            }
+        } else {
+            assertThat(response.getTrustees().isEmpty(), is(true));
+        }
     }
 }

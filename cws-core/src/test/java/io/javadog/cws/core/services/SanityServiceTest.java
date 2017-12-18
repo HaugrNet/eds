@@ -21,11 +21,7 @@ import io.javadog.cws.api.responses.ProcessDataResponse;
 import io.javadog.cws.api.responses.SanityResponse;
 import io.javadog.cws.core.DatabaseSetup;
 import io.javadog.cws.core.exceptions.AuthorizationException;
-import io.javadog.cws.core.model.entities.DataEntity;
 import org.junit.Test;
-
-import javax.persistence.Query;
-import java.util.UUID;
 
 /**
  * @author Kim Jensen
@@ -60,16 +56,7 @@ public final class SanityServiceTest extends DatabaseSetup {
 
         final ProcessDataResponse response = service.perform(request);
         assertThat(response.isOk(), is(true));
-
-        // Now to the tricky part. We wish to test that the checksum is invalid,
-        // and thus resulting in a correct error message. As the checksum is
-        // controlled internally by CWS, it cannot be altered (rightfully) via
-        // the API, hence we have to modify it directly in the database!
-        final Query query = entityManager.createQuery("select d from DataEntity d where d.metadata.externalId = :eid");
-        query.setParameter("eid", response.getDataId());
-        final DataEntity entity = (DataEntity) query.getSingleResult();
-        entity.setChecksum(UUID.randomUUID().toString());
-        entityManager.persist(entity);
+        falsifyChecksum(response);
 
         // Now to the actual test - reading the data with invalid checksum
         final FetchDataService readService = new FetchDataService(settings, entityManager);

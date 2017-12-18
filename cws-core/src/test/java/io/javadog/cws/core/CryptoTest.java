@@ -10,7 +10,6 @@ package io.javadog.cws.core;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
-import static org.hamcrest.Matchers.hasProperty;
 import static org.junit.Assert.assertThat;
 
 import io.javadog.cws.api.common.ReturnCode;
@@ -23,13 +22,10 @@ import io.javadog.cws.core.jce.Crypto;
 import io.javadog.cws.core.jce.PrivateCWSKey;
 import io.javadog.cws.core.jce.SecretCWSKey;
 import io.javadog.cws.core.model.Settings;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
-import java.nio.charset.Charset;
 import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
@@ -43,19 +39,14 @@ import java.util.UUID;
  * @author Kim Jensen
  * @since  CWS 1.0
  */
-public final class CryptoTest {
-
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
+public final class CryptoTest extends DatabaseSetup {
 
     @Test
     public void testGeneratingPasswordKeyWithInvalidAlgorithm() {
         thrown.expect(CryptoException.class);
         thrown.expectMessage("AES/CBC/PKCS5Padding SecretKeyFactory not available");
 
-        final Settings settings = new Settings();
         settings.set(StandardSetting.PBE_ALGORITHM.getKey(), "RSA2048");
-        final Crypto crypto = new Crypto(settings);
         final String salt = UUID.randomUUID().toString();
         crypto.generatePasswordKey(KeyAlgorithm.AES128, "my secret", salt);
     }
@@ -65,8 +56,6 @@ public final class CryptoTest {
         thrown.expect(CryptoException.class);
         thrown.expectMessage("RSA KeyGenerator not available");
 
-        final Settings settings = new Settings();
-        final Crypto crypto = new Crypto(settings);
         crypto.generateSymmetricKey(KeyAlgorithm.RSA2048);
     }
 
@@ -75,8 +64,6 @@ public final class CryptoTest {
         thrown.expect(CryptoException.class);
         thrown.expectMessage("AES KeyPairGenerator not available");
 
-        final Settings settings = new Settings();
-        final Crypto crypto = new Crypto(settings);
         crypto.generateAsymmetricKey(KeyAlgorithm.AES128);
     }
 
@@ -85,10 +72,10 @@ public final class CryptoTest {
         thrown.expect(CryptoException.class);
         thrown.expectMessage("No enum constant io.javadog.cws.core.enums.HashAlgorithm.AES128");
 
-        final Settings settings = new Settings();
-        settings.set(StandardSetting.HASH_ALGORITHM.getKey(), "AES128");
-        final Crypto crypto = new Crypto(settings);
-        crypto.generateChecksum("Bla bla bla");
+        final Settings mySettings = new Settings();
+        mySettings.set(StandardSetting.HASH_ALGORITHM.getKey(), "AES128");
+        final Crypto myCrypto = new Crypto(mySettings);
+        myCrypto.generateChecksum("Bla bla bla");
     }
 
     @Test
@@ -96,17 +83,15 @@ public final class CryptoTest {
         thrown.expect(CryptoException.class);
         thrown.expectMessage("AES/CBC/PKCS5Padding Signature not available");
 
-        final Settings settings = new Settings();
-        settings.set(StandardSetting.SIGNATURE_ALGORITHM.getKey(), "AES256");
-        final Crypto crypto = new Crypto(settings);
-        final CWSKeyPair key = crypto.generateAsymmetricKey(KeyAlgorithm.RSA2048);
-        crypto.sign(key.getPrivate().getKey(), "bla bla bla".getBytes(settings.getCharset()));
+        final Settings mySettings = new Settings();
+        mySettings.set(StandardSetting.SIGNATURE_ALGORITHM.getKey(), "AES256");
+        final Crypto myCrypto = new Crypto(mySettings);
+        final CWSKeyPair key = myCrypto.generateAsymmetricKey(KeyAlgorithm.RSA2048);
+        myCrypto.sign(key.getPrivate().getKey(), "bla bla bla".getBytes(mySettings.getCharset()));
     }
 
     @Test
     public void testSignature() {
-        final Settings settings = new Settings();
-        final Crypto crypto = new Crypto(settings);
         final CWSKeyPair keyPair = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
         final byte[] message = "Message to Sign".getBytes(settings.getCharset());
         final String signature = crypto.sign(keyPair.getPrivate().getKey(), message);
@@ -121,9 +106,6 @@ public final class CryptoTest {
      */
     @Test
     public void testArmoringPublicKey() {
-        final Settings settings = new Settings();
-        final Crypto crypto = new Crypto(settings);
-
         final CWSKeyPair key = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
 
         final String armoredKey = crypto.armoringPublicKey(key.getPublic().getKey());
@@ -139,9 +121,6 @@ public final class CryptoTest {
      */
     @Test
     public void testArmoringPrivateKey() {
-        final Settings settings = new Settings();
-        final Crypto crypto = new Crypto(settings);
-
         final String password = "MySuperSecretPassword";
         final String salt = UUID.randomUUID().toString();
         final SecretCWSKey cryptoKeys = crypto.generatePasswordKey(settings.getPasswordAlgorithm(), password, salt);
@@ -156,9 +135,6 @@ public final class CryptoTest {
 
     @Test
     public void testArmoringAsymmetricKey() {
-        final Settings settings = new Settings();
-        final Crypto crypto = new Crypto(settings);
-
         final String secret = "MySuperSecretPassword";
         final String salt = UUID.randomUUID().toString();
         final SecretCWSKey secretKey = crypto.generatePasswordKey(settings.getPasswordAlgorithm(), secret, salt);
@@ -182,8 +158,6 @@ public final class CryptoTest {
      */
     @Test
     public void testObjectEncryption() {
-        final Settings settings = new Settings();
-        final Crypto crypto = new Crypto(settings);
         final SecretCWSKey key = crypto.generateSymmetricKey(settings.getSymmetricAlgorithm());
         key.setSalt(UUID.randomUUID().toString());
 
@@ -209,8 +183,6 @@ public final class CryptoTest {
      */
     @Test
     public void testMemberEncryption() {
-        final Settings settings = new Settings();
-        final Crypto crypto = new Crypto(settings);
         final CWSKeyPair key = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
 
         final String cleartext = "This is just an example";
@@ -241,8 +213,6 @@ public final class CryptoTest {
      */
     @Test
     public void testPasswordToKey() {
-        final Settings settings = new Settings();
-        final Crypto crypto = new Crypto(new Settings());
         final String password = "MySuperSecretPassword";
         final String salt = "SystemSpecificSalt";
         final SecretCWSKey key = crypto.generatePasswordKey(settings.getPasswordAlgorithm(), password, salt);
@@ -271,13 +241,10 @@ public final class CryptoTest {
         // assertion at the end of the test.
         assertThat(Boolean.parseBoolean("Is SonarQube rule squid:S2699 working correctly ?"), is(false));
 
-        final Settings settings = new Settings();
-        final Crypto crypto = new Crypto(new Settings());
-        final Charset charset = new Settings().getCharset();
         final String dataSalt = UUID.randomUUID().toString();
         final SecretCWSKey key = crypto.generateSymmetricKey(settings.getSymmetricAlgorithm());
         key.setSalt(dataSalt);
-        final byte[] rawdata = UUID.randomUUID().toString().getBytes(charset);
+        final byte[] rawdata = generateData(1048576);
         final byte[] encryptedData = crypto.encrypt(key, rawdata);
 
         final CWSKeyPair keyPair = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
@@ -291,37 +258,35 @@ public final class CryptoTest {
 
     @Test
     public void testStringToBytesConversion() {
-        final Settings settings = new Settings();
-        final Crypto crypto = new Crypto(settings);
+        final Settings mySettings = new Settings();
+        final Crypto myCrypto = new Crypto(mySettings);
         final String str = "Alpha Beta æøåßöäÿ";
 
         final String garbage = "INVALID_ENCODING";
-        settings.set(StandardSetting.CWS_CHARSET.getKey(), garbage);
+        mySettings.set(StandardSetting.CWS_CHARSET.getKey(), garbage);
 
         prepareCause(CWSException.class, ReturnCode.SETTING_ERROR, "java.nio.charset.UnsupportedCharsetException: " + garbage);
         assertThat(str, is(not(nullValue())));
-        crypto.stringToBytes(str);
+        myCrypto.stringToBytes(str);
     }
 
     @Test
     public void testBytesToStringConversion() {
-        final Settings settings = new Settings();
-        final Crypto crypto = new Crypto(settings);
+        final Settings mySettings = new Settings();
+        final Crypto myCrypto = new Crypto(mySettings);
         final String str = "Alpha Beta æøåßöäÿ";
-        final byte[] bytes = str.getBytes(settings.getCharset());
+        final byte[] bytes = str.getBytes(mySettings.getCharset());
         final String garbage = "INVALID_ENCODING";
-        settings.set(StandardSetting.CWS_CHARSET.getKey(), garbage);
+        mySettings.set(StandardSetting.CWS_CHARSET.getKey(), garbage);
 
         prepareCause(CWSException.class, ReturnCode.SETTING_ERROR, "UnsupportedCharsetException: " + garbage);
         assertThat(bytes, is(not(nullValue())));
-        final String reversed = crypto.bytesToString(bytes);
+        final String reversed = myCrypto.bytesToString(bytes);
         assertThat(reversed, is(str));
     }
 
     @Test
     public void testDestroyingKeys() {
-        final Settings settings = new Settings();
-        final Crypto crypto = new Crypto(settings);
         final CWSKeyPair keyPair = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
         final PrivateCWSKey privateKey = keyPair.getPrivate();
         final SecretCWSKey secretKey = crypto.generateSymmetricKey(settings.getSymmetricAlgorithm());
@@ -346,12 +311,8 @@ public final class CryptoTest {
     public void testInvalidSymmetricKeyEncryption() throws NoSuchAlgorithmException {
         prepareCause(CryptoException.class, ReturnCode.CRYPTO_ERROR, "No installed provider supports this key: javax.crypto.spec.SecretKeySpec");
 
-        final Settings settings = new Settings();
-        final Crypto crypto = new Crypto(settings);
-        final SecretKey secretKey = generateKey(settings.getSymmetricAlgorithm());
-        final SecretCWSKey key = new SecretCWSKey(settings.getAsymmetricAlgorithm(), secretKey);
-        key.setSalt(UUID.randomUUID().toString());
-        final byte[] data = UUID.randomUUID().toString().getBytes(settings.getCharset());
+        final SecretCWSKey key = prepareSecretCwsKey();
+        final byte[] data = generateData(524288);
 
         final byte[] encrypted = crypto.encrypt(key, data);
         assertThat(encrypted.length > 0, is(true));
@@ -361,12 +322,8 @@ public final class CryptoTest {
     public void testInvalidSymmetricKeyDecryption() throws NoSuchAlgorithmException {
         prepareCause(CryptoException.class, ReturnCode.CRYPTO_ERROR, "No installed provider supports this key: javax.crypto.spec.SecretKeySpec");
 
-        final Settings settings = new Settings();
-        final Crypto crypto = new Crypto(settings);
-        final SecretKey secretKey = generateKey(settings.getSymmetricAlgorithm());
-        final SecretCWSKey key = new SecretCWSKey(settings.getAsymmetricAlgorithm(), secretKey);
-        key.setSalt(UUID.randomUUID().toString());
-        final byte[] data = UUID.randomUUID().toString().getBytes(settings.getCharset());
+        final SecretCWSKey key = prepareSecretCwsKey();
+        final byte[] data = generateData(524288);
 
         final byte[] decrypted = crypto.decrypt(key, data);
         assertThat(decrypted.length > 0, is(true));
@@ -376,12 +333,8 @@ public final class CryptoTest {
     public void testInvalidAsymmetricKeyEncryption() {
         prepareCause(CryptoException.class, ReturnCode.CRYPTO_ERROR, "io.javadog.cws.core.jce.PublicCWSKey cannot be cast to io.javadog.cws.core.jce.SecretCWSKey");
 
-        final Settings settings = new Settings();
-        final Crypto crypto = new Crypto(settings);
-        final CWSKeyPair generated = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
-        final KeyPair keys = new KeyPair(generated.getPublic().getKey(), generated.getPrivate().getKey());
-        final CWSKeyPair keyPair = new CWSKeyPair(settings.getSymmetricAlgorithm(), keys);
-        final byte[] data = UUID.randomUUID().toString().getBytes(settings.getCharset());
+        final CWSKeyPair keyPair = generateKeyPair();
+        final byte[] data = generateData(524288);
 
         final byte[] encrypted = crypto.encrypt(keyPair.getPublic(), data);
         assertThat(encrypted.length > 0, is(true));
@@ -391,12 +344,8 @@ public final class CryptoTest {
     public void testInvalidAsymmetricKeyDecryption() {
         prepareCause(CryptoException.class, ReturnCode.CRYPTO_ERROR, "io.javadog.cws.core.jce.PrivateCWSKey cannot be cast to io.javadog.cws.core.jce.SecretCWSKey");
 
-        final Settings settings = new Settings();
-        final Crypto crypto = new Crypto(settings);
-        final CWSKeyPair generated = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
-        final KeyPair keys = new KeyPair(generated.getPublic().getKey(), generated.getPrivate().getKey());
-        final CWSKeyPair keyPair = new CWSKeyPair(settings.getSymmetricAlgorithm(), keys);
-        final byte[] data = UUID.randomUUID().toString().getBytes(settings.getCharset());
+        final CWSKeyPair keyPair = generateKeyPair();
+        final byte[] data = generateData(524288);
 
         final byte[] decrypted = crypto.decrypt(keyPair.getPrivate(), data);
         assertThat(decrypted.length > 0, is(true));
@@ -406,13 +355,13 @@ public final class CryptoTest {
     public void testInvalidDearmoringPublicKey() {
         prepareCause(CryptoException.class, ReturnCode.CRYPTO_ERROR, "AES KeyFactory not available");
 
-        final Settings settings = new Settings();
-        final Crypto crypto = new Crypto(settings);
-        final CWSKeyPair keyPair = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
-        final String armoredPublicKey = crypto.armoringPublicKey(keyPair.getPublic().getKey());
+        final Settings mySettings = new Settings();
+        final Crypto myCrypto = new Crypto(mySettings);
+        final CWSKeyPair keyPair = myCrypto.generateAsymmetricKey(mySettings.getAsymmetricAlgorithm());
+        final String armoredPublicKey = myCrypto.armoringPublicKey(keyPair.getPublic().getKey());
 
-        settings.set(StandardSetting.ASYMMETRIC_ALGORITHM.getKey(), KeyAlgorithm.AES128.name());
-        final PublicKey publicKey = crypto.dearmoringPublicKey(armoredPublicKey);
+        mySettings.set(StandardSetting.ASYMMETRIC_ALGORITHM.getKey(), KeyAlgorithm.AES128.name());
+        final PublicKey publicKey = myCrypto.dearmoringPublicKey(armoredPublicKey);
         assertThat(publicKey, is(not(nullValue())));
     }
 
@@ -420,15 +369,15 @@ public final class CryptoTest {
     public void testInvalidDearmoringPrivateKey() {
         prepareCause(CryptoException.class, ReturnCode.CRYPTO_ERROR, "AES KeyFactory not available");
 
-        final Settings settings = new Settings();
-        final Crypto crypto = new Crypto(settings);
-        final CWSKeyPair keyPair = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
-        final SecretCWSKey secretKey = crypto.generateSymmetricKey(settings.getSymmetricAlgorithm());
+        final Settings mySettings = new Settings();
+        final Crypto myCrypto = new Crypto(mySettings);
+        final CWSKeyPair keyPair = myCrypto.generateAsymmetricKey(mySettings.getAsymmetricAlgorithm());
+        final SecretCWSKey secretKey = myCrypto.generateSymmetricKey(mySettings.getSymmetricAlgorithm());
         secretKey.setSalt(UUID.randomUUID().toString());
 
-        final String armoredPrivateKey = crypto.armoringPrivateKey(secretKey, keyPair.getPrivate().getKey());
-        settings.set(StandardSetting.ASYMMETRIC_ALGORITHM.getKey(), KeyAlgorithm.AES128.name());
-        final PrivateKey privateKey = crypto.dearmoringPrivateKey(secretKey, armoredPrivateKey);
+        final String armoredPrivateKey = myCrypto.armoringPrivateKey(secretKey, keyPair.getPrivate().getKey());
+        mySettings.set(StandardSetting.ASYMMETRIC_ALGORITHM.getKey(), KeyAlgorithm.AES128.name());
+        final PrivateKey privateKey = myCrypto.dearmoringPrivateKey(secretKey, armoredPrivateKey);
         assertThat(privateKey, is(not(nullValue())));
     }
 
@@ -436,17 +385,23 @@ public final class CryptoTest {
     // Internal helper methods
     // =========================================================================
 
-    private static SecretKey generateKey(final KeyAlgorithm algorithm) throws NoSuchAlgorithmException {
+    private SecretCWSKey prepareSecretCwsKey() throws NoSuchAlgorithmException {
+        final KeyAlgorithm algorithm = settings.getSymmetricAlgorithm();
         final KeyGenerator generator = KeyGenerator.getInstance(algorithm.getName());
         generator.init(algorithm.getLength());
-        return generator.generateKey();
+
+        final SecretKey secretKey = generator.generateKey();
+        final SecretCWSKey key = new SecretCWSKey(settings.getAsymmetricAlgorithm(), secretKey);
+        key.setSalt(UUID.randomUUID().toString());
+
+        return key;
     }
 
-    private <E extends CWSException> void prepareCause(final Class<E> cause, final ReturnCode returnCode, final String returnMessage) {
-        final String propertyName = "returnCode";
-        thrown.expect(cause);
-        thrown.expectMessage(returnMessage);
-        thrown.expect(hasProperty(propertyName));
-        thrown.expect(hasProperty(propertyName, is(returnCode)));
+    private CWSKeyPair generateKeyPair() {
+        final CWSKeyPair generated = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
+        final KeyPair keys = new KeyPair(generated.getPublic().getKey(), generated.getPrivate().getKey());
+        final CWSKeyPair keyPair = new CWSKeyPair(settings.getSymmetricAlgorithm(), keys);
+
+        return keyPair;
     }
 }

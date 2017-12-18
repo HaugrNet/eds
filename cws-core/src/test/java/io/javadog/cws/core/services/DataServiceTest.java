@@ -26,10 +26,8 @@ import io.javadog.cws.api.responses.ProcessMemberResponse;
 import io.javadog.cws.core.DatabaseSetup;
 import io.javadog.cws.core.exceptions.CWSException;
 import io.javadog.cws.core.exceptions.VerificationException;
-import io.javadog.cws.core.model.entities.DataEntity;
 import org.junit.Test;
 
-import javax.persistence.Query;
 import java.util.UUID;
 
 /**
@@ -179,16 +177,7 @@ public final class DataServiceTest extends DatabaseSetup {
 
         final ProcessDataResponse response = service.perform(request);
         assertThat(response.isOk(), is(true));
-
-        // Now to the tricky part. We wish to test that the checksum is invalid,
-        // and thus resulting in a correct error message. As the checksum is
-        // controlled internally by CWS, it cannot be altered (rightfully) via
-        // the API, hence we have to modify it directly in the database!
-        final Query query = entityManager.createQuery("select d from DataEntity d where d.metadata.externalId = :eid");
-        query.setParameter("eid", response.getDataId());
-        final DataEntity entity = (DataEntity) query.getSingleResult();
-        entity.setChecksum(UUID.randomUUID().toString());
-        entityManager.persist(entity);
+        falsifyChecksum(response);
 
         // Now to the actual test - reading the data with invalid checksum
         final FetchDataService readService = new FetchDataService(settings, entityManager);
@@ -574,22 +563,22 @@ public final class DataServiceTest extends DatabaseSetup {
     // =========================================================================
 
     private static ProcessDataRequest prepareAddRequest(final String account, final String circleId, final String dataName, final int bytes) {
-        final ProcessDataRequest request = prepareRequest(ProcessDataRequest.class, account);
-        request.setAction(Action.ADD);
-        request.setCircleId(circleId);
-        request.setDataName(dataName);
-        request.setTypeName(Constants.DATA_TYPENAME);
-        request.setData(generateData(bytes));
+        final ProcessDataRequest dataRequest = prepareRequest(ProcessDataRequest.class, account);
+        dataRequest.setAction(Action.ADD);
+        dataRequest.setCircleId(circleId);
+        dataRequest.setDataName(dataName);
+        dataRequest.setTypeName(Constants.DATA_TYPENAME);
+        dataRequest.setData(generateData(bytes));
 
-        return request;
+        return dataRequest;
     }
 
     private static FetchDataRequest prepareReadRequest(final String account, final String circleId, final String dataId) {
-        final FetchDataRequest request = prepareRequest(FetchDataRequest.class, account);
-        request.setCircleId(circleId);
-        request.setDataId(dataId);
+        final FetchDataRequest dataRequest = prepareRequest(FetchDataRequest.class, account);
+        dataRequest.setCircleId(circleId);
+        dataRequest.setDataId(dataId);
 
-        return request;
+        return dataRequest;
     }
 
     private static ProcessDataRequest prepareUpdateRequest(final String account, final String dataId) {

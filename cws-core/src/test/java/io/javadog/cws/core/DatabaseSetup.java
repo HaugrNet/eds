@@ -15,6 +15,7 @@ import io.javadog.cws.api.common.CredentialType;
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.common.TrustLevel;
 import io.javadog.cws.api.requests.Authentication;
+import io.javadog.cws.api.responses.ProcessDataResponse;
 import io.javadog.cws.core.enums.KeyAlgorithm;
 import io.javadog.cws.core.enums.Status;
 import io.javadog.cws.core.exceptions.CWSException;
@@ -25,6 +26,7 @@ import io.javadog.cws.core.model.CommonDao;
 import io.javadog.cws.core.model.Settings;
 import io.javadog.cws.core.model.entities.CWSEntity;
 import io.javadog.cws.core.model.entities.CircleEntity;
+import io.javadog.cws.core.model.entities.DataEntity;
 import io.javadog.cws.core.model.entities.DataTypeEntity;
 import io.javadog.cws.core.model.entities.KeyEntity;
 import io.javadog.cws.core.model.entities.MemberEntity;
@@ -38,6 +40,7 @@ import org.junit.rules.ExpectedException;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
+import javax.persistence.Query;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
@@ -246,6 +249,26 @@ public class DatabaseSetup {
         }
 
         return str;
+    }
+
+    /**
+     * To properly test the cases where the SanityCheck is suppose to fail, i.e.
+     * the Data Checksum is not matching the data anymore - a backdoor is needed
+     * into the database whereby it is achieved. This method will do just that.
+     *
+     * @param response Process Data Response Object
+     */
+    protected void falsifyChecksum(final ProcessDataResponse response) {
+        // Now to the tricky part. We wish to test that the checksum is invalid,
+        // and thus resulting in a correct error message. As the checksum is
+        // controlled internally by CWS, it cannot be altered (rightfully) via
+        // the API, hence we have to modify it directly in the database!
+        final String jql = "select d from DataEntity d where d.metadata.externalId = :eid";
+        final Query query = entityManager.createQuery(jql);
+        query.setParameter("eid", response.getDataId());
+        final DataEntity entity = (DataEntity) query.getSingleResult();
+        entity.setChecksum(UUID.randomUUID().toString());
+        entityManager.persist(entity);
     }
 
     /**

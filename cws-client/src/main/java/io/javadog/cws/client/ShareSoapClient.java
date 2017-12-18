@@ -46,15 +46,20 @@ public final class ShareSoapClient implements Share {
     private final io.javadog.cws.ws.Share client;
 
     /**
-     * Simple CXF based SOAP Client for the CWS Share logic.
+     * Constructor for the CWS Share SOAP Client. It takes the base URL for the
+     * CWS Instance to communicate with, which is the protocol, hostname, port
+     * and deployment name. For example; &quot;http://localhost:8080/cws&quot;.
      *
-     * @param wsdl WSDL Location for a running CWS 1.0 instance
-     * @throws MalformedURLException if the URL is incorrect
+     * @param baseURL Base URL for the CWS Instance
      */
-    public ShareSoapClient(final String wsdl) throws MalformedURLException {
-        final URL wsdlURL = new URL(wsdl);
-        final Share_Service service = new Share_Service(wsdlURL, SERVICE_NAME);
-        client = service.getShare();
+    public ShareSoapClient(final String baseURL) {
+        try {
+            final URL wsdlURL = new URL(baseURL + "/share?wsdl");
+            final Share_Service service = new Share_Service(wsdlURL, SERVICE_NAME);
+            client = service.getShare();
+        } catch (MalformedURLException e) {
+            throw new CWSClientException(e);
+        }
     }
 
     // =========================================================================

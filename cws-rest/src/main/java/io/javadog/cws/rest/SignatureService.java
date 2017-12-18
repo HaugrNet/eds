@@ -25,7 +25,6 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.logging.Logger;
 
@@ -43,61 +42,58 @@ public class SignatureService {
 
     @POST
     @Path("/signDocument")
-    @Consumes(MediaType.APPLICATION_XML)
-    @Produces(MediaType.APPLICATION_XML)
+    @Consumes(CwsApplication.CONSUMES)
+    @Produces(CwsApplication.PRODUCES)
     public Response sign(@NotNull final SignRequest signDocumentRequest) {
-        SignResponse signDocumentResponse = null;
-        ReturnCode returnCode = ReturnCode.ERROR;
+        final Long startTime = System.nanoTime();
+        SignResponse response;
 
         try {
-            final Long startTime = System.nanoTime();
-            signDocumentResponse = bean.sign(signDocumentRequest);
-            returnCode = signDocumentResponse.getReturnCode();
+            response = bean.sign(signDocumentRequest);
             log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "signDocument", startTime));
         } catch (RuntimeException e) {
-            log.log(Settings.ERROR, e.getMessage(), e);
+            log.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "signDocument", startTime, e));
+            response = new SignResponse(ReturnCode.ERROR, e.getMessage());
         }
 
-        return Response.status(returnCode.getHttpCode()).entity(signDocumentResponse).build();
+        return CwsApplication.buildResponse(response);
     }
 
     @POST
     @Path("/verifySignature")
-    @Consumes(MediaType.APPLICATION_XML)
-    @Produces(MediaType.APPLICATION_XML)
+    @Consumes(CwsApplication.CONSUMES)
+    @Produces(CwsApplication.PRODUCES)
     public Response verify(@NotNull final VerifyRequest verifySignatureRequest) {
-        VerifyResponse verifySignatureResponse = null;
-        ReturnCode returnCode = ReturnCode.ERROR;
+        final Long startTime = System.nanoTime();
+        VerifyResponse response;
 
         try {
-            final Long startTime = System.nanoTime();
-            verifySignatureResponse = bean.verify(verifySignatureRequest);
-            returnCode = verifySignatureResponse.getReturnCode();
+            response = bean.verify(verifySignatureRequest);
             log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "verifySignature", startTime));
         } catch (RuntimeException e) {
-            log.log(Settings.ERROR, e.getMessage(), e);
+            log.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "verifySignature", startTime, e));
+            response = new VerifyResponse(ReturnCode.ERROR, e.getMessage());
         }
 
-        return Response.status(returnCode.getHttpCode()).entity(verifySignatureResponse).build();
+        return CwsApplication.buildResponse(response);
     }
 
     @POST
     @Path("/fetchSignatures")
-    @Consumes(MediaType.APPLICATION_XML)
-    @Produces(MediaType.APPLICATION_XML)
+    @Consumes(CwsApplication.CONSUMES)
+    @Produces(CwsApplication.PRODUCES)
     public Response fetch(@NotNull final FetchSignatureRequest fetchSignaturesRequest) {
-        FetchSignatureResponse fetchSignaturesResponse = null;
-        ReturnCode returnCode = ReturnCode.ERROR;
+        final Long startTime = System.nanoTime();
+        FetchSignatureResponse response;
 
         try {
-            final Long startTime = System.nanoTime();
-            fetchSignaturesResponse = bean.fetchSignatures(fetchSignaturesRequest);
-            returnCode = fetchSignaturesResponse.getReturnCode();
+            response = bean.fetchSignatures(fetchSignaturesRequest);
             log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "fetchSignatures", startTime));
         } catch (RuntimeException e) {
-            log.log(Settings.ERROR, e.getMessage(), e);
+            log.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "fetchSignatures", startTime, e));
+            response = new FetchSignatureResponse(ReturnCode.ERROR, e.getMessage());
         }
 
-        return Response.status(returnCode.getHttpCode()).entity(fetchSignaturesResponse).build();
+        return CwsApplication.buildResponse(response);
     }
 }

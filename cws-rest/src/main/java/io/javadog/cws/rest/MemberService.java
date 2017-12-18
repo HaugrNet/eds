@@ -25,7 +25,6 @@ import javax.ws.rs.DELETE;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.logging.Logger;
 
@@ -43,106 +42,101 @@ public class MemberService {
 
     @POST
     @Path("/createMember")
-    @Consumes(MediaType.APPLICATION_XML)
-    @Produces(MediaType.APPLICATION_XML)
+    @Consumes(CwsApplication.CONSUMES)
+    @Produces(CwsApplication.PRODUCES)
     public Response create(@NotNull final ProcessMemberRequest createMemberRequest) {
-        ProcessMemberResponse createMemberResponse = null;
-        ReturnCode returnCode = ReturnCode.ERROR;
+        final Long startTime = System.nanoTime();
+        ProcessMemberResponse response;
 
         try {
-            final Long startTime = System.nanoTime();
             createMemberRequest.setAction(Action.CREATE);
-            createMemberResponse = bean.processMember(createMemberRequest);
-            returnCode = createMemberResponse.getReturnCode();
+            response = bean.processMember(createMemberRequest);
             log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "createMember", startTime));
         } catch (RuntimeException e) {
-            log.log(Settings.ERROR, e.getMessage(), e);
+            log.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "createMember", startTime, e));
+            response = new ProcessMemberResponse(ReturnCode.ERROR, e.getMessage());
         }
 
-        return Response.status(returnCode.getHttpCode()).entity(createMemberResponse).build();
+        return CwsApplication.buildResponse(response);
     }
 
     @POST
     @Path("/inviteMember")
-    @Consumes(MediaType.APPLICATION_XML)
-    @Produces(MediaType.APPLICATION_XML)
+    @Consumes(CwsApplication.CONSUMES)
+    @Produces(CwsApplication.PRODUCES)
     public Response invite(@NotNull final ProcessMemberRequest inviteMemberRequest) {
-        ProcessMemberResponse inviteMemberResponse = null;
-        ReturnCode returnCode = ReturnCode.ERROR;
+        final Long startTime = System.nanoTime();
+        ProcessMemberResponse response;
 
         try {
-            final Long startTime = System.nanoTime();
             inviteMemberRequest.setAction(Action.INVITE);
-            inviteMemberResponse = bean.processMember(inviteMemberRequest);
-            returnCode = inviteMemberResponse.getReturnCode();
+            response = bean.processMember(inviteMemberRequest);
             log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "inviteMember", startTime));
         } catch (RuntimeException e) {
-            log.log(Settings.ERROR, e.getMessage(), e);
+            log.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "inviteMember", startTime, e));
+            response = new ProcessMemberResponse(ReturnCode.ERROR, e.getMessage());
         }
 
-        return Response.status(returnCode.getHttpCode()).entity(inviteMemberResponse).build();
+        return CwsApplication.buildResponse(response);
     }
 
     @POST
     @Path("/updateMember")
-    @Consumes(MediaType.APPLICATION_XML)
-    @Produces(MediaType.APPLICATION_XML)
+    @Consumes(CwsApplication.CONSUMES)
+    @Produces(CwsApplication.PRODUCES)
     public Response update(@NotNull final ProcessMemberRequest updateMemberRequest) {
-        ProcessMemberResponse updateMemberResponse = null;
-        ReturnCode returnCode = ReturnCode.ERROR;
+        final Long startTime = System.nanoTime();
+        ProcessMemberResponse response;
 
         try {
-            final Long startTime = System.nanoTime();
             updateMemberRequest.setAction(Action.UPDATE);
-            updateMemberResponse = bean.processMember(updateMemberRequest);
-            returnCode = updateMemberResponse.getReturnCode();
+            response = bean.processMember(updateMemberRequest);
             log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "updateMember", startTime));
         } catch (RuntimeException e) {
-            log.log(Settings.ERROR, e.getMessage(), e);
+            log.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "updateMember", startTime, e));
+            response = new ProcessMemberResponse(ReturnCode.ERROR, e.getMessage());
         }
 
-        return Response.status(returnCode.getHttpCode()).entity(updateMemberResponse).build();
+        return CwsApplication.buildResponse(response);
     }
 
     @POST
     @DELETE
     @Path("/deleteMember")
-    @Consumes(MediaType.APPLICATION_XML)
-    @Produces(MediaType.APPLICATION_XML)
+    @Consumes(CwsApplication.CONSUMES)
+    @Produces(CwsApplication.PRODUCES)
     public Response delete(@NotNull final ProcessMemberRequest deleteMemberRequest) {
-        ProcessMemberResponse deleteMemberResponse = null;
-        ReturnCode returnCode = ReturnCode.ERROR;
+        final Long startTime = System.nanoTime();
+        ProcessMemberResponse response;
 
         try {
-            final Long startTime = System.nanoTime();
             deleteMemberRequest.setAction(Action.DELETE);
-            deleteMemberResponse = bean.processMember(deleteMemberRequest);
-            returnCode = deleteMemberResponse.getReturnCode();
+            response = bean.processMember(deleteMemberRequest);
             log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "deleteMember", startTime));
         } catch (RuntimeException e) {
-            log.log(Settings.ERROR, e.getMessage(), e);
+            log.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "deleteMember", startTime, e));
+            response = new ProcessMemberResponse(ReturnCode.ERROR, e.getMessage());
         }
 
-        return Response.status(returnCode.getHttpCode()).entity(deleteMemberResponse).build();
+        return CwsApplication.buildResponse(response);
     }
 
     @POST
     @Path("/fetchMembers")
-    @Consumes(MediaType.APPLICATION_XML)
-    @Produces(MediaType.APPLICATION_XML)
+    @Consumes(CwsApplication.CONSUMES)
+    @Produces(CwsApplication.PRODUCES)
     public Response fetch(@NotNull final FetchMemberRequest fetchMembersRequest) {
-        FetchMemberResponse fetchMembersResponse = null;
-        ReturnCode returnCode = ReturnCode.ERROR;
+        final Long startTime = System.nanoTime();
+        FetchMemberResponse response;
 
         try {
-            final Long startTime = System.nanoTime();
-            fetchMembersResponse = bean.fetchMembers(fetchMembersRequest);
-            returnCode = fetchMembersResponse.getReturnCode();
+            response = bean.fetchMembers(fetchMembersRequest);
             log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "fetchMembers", startTime));
         } catch (RuntimeException e) {
-            log.log(Settings.ERROR, e.getMessage(), e);
+            log.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "fetchMembers", startTime, e));
+            response = new FetchMemberResponse(ReturnCode.ERROR, e.getMessage());
         }
 
-        return Response.status(returnCode.getHttpCode()).entity(fetchMembersResponse).build();
+        return CwsApplication.buildResponse(response);
     }
 }

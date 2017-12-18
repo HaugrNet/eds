@@ -22,7 +22,6 @@ import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.logging.Logger;
 
@@ -40,21 +39,20 @@ public class SettingService {
 
     @GET
     @POST
-    @Consumes(MediaType.APPLICATION_XML)
-    @Produces(MediaType.APPLICATION_XML)
+    @Consumes(CwsApplication.CONSUMES)
+    @Produces(CwsApplication.PRODUCES)
     public Response settings(@NotNull final SettingRequest settingRequest) {
-        SettingResponse settingResponse = null;
-        ReturnCode returnCode = ReturnCode.ERROR;
+        final Long startTime = System.nanoTime();
+        SettingResponse response;
 
         try {
-            final Long startTime = System.nanoTime();
-            settingResponse = bean.settings(settingRequest);
-            returnCode = settingResponse.getReturnCode();
+            response = bean.settings(settingRequest);
             log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "settings", startTime));
         } catch (RuntimeException e) {
-            log.log(Settings.ERROR, e.getMessage(), e);
+            log.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "settings", startTime, e));
+            response = new SettingResponse(ReturnCode.ERROR, e.getMessage());
         }
 
-        return Response.status(returnCode.getHttpCode()).entity(settingResponse).build();
+        return CwsApplication.buildResponse(response);
     }
 }

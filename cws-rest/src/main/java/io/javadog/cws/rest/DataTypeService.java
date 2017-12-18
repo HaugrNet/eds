@@ -25,7 +25,6 @@ import javax.ws.rs.DELETE;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.logging.Logger;
 
@@ -43,64 +42,61 @@ public class DataTypeService {
 
     @POST
     @Path("/processDataType")
-    @Consumes(MediaType.APPLICATION_XML)
-    @Produces(MediaType.APPLICATION_XML)
+    @Consumes(CwsApplication.CONSUMES)
+    @Produces(CwsApplication.PRODUCES)
     public Response process(@NotNull final ProcessDataTypeRequest processDataTypeRequest) {
-        ProcessDataTypeResponse processDataTypeResponse = null;
-        ReturnCode returnCode = ReturnCode.ERROR;
+        final Long startTime = System.nanoTime();
+        ProcessDataTypeResponse response;
 
         try {
-            final Long startTime = System.nanoTime();
             processDataTypeRequest.setAction(Action.PROCESS);
-            processDataTypeResponse = bean.processDataType(processDataTypeRequest);
-            returnCode = processDataTypeResponse.getReturnCode();
+            response = bean.processDataType(processDataTypeRequest);
             log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "processDataType", startTime));
         } catch (RuntimeException e) {
-            log.log(Settings.ERROR, e.getMessage(), e);
+            log.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "processDataType", startTime, e));
+            response = new ProcessDataTypeResponse(ReturnCode.ERROR, e.getMessage());
         }
 
-        return Response.status(returnCode.getHttpCode()).entity(processDataTypeResponse).build();
+        return CwsApplication.buildResponse(response);
     }
 
     @POST
     @DELETE
     @Path("/deleteDataType")
-    @Consumes(MediaType.APPLICATION_XML)
-    @Produces(MediaType.APPLICATION_XML)
+    @Consumes(CwsApplication.CONSUMES)
+    @Produces(CwsApplication.PRODUCES)
     public Response delete(@NotNull final ProcessDataTypeRequest deleteDataTypeRequest) {
-        ProcessDataTypeResponse deleteDataTypeResponse = null;
-        ReturnCode returnCode = ReturnCode.ERROR;
+        final Long startTime = System.nanoTime();
+        ProcessDataTypeResponse response;
 
         try {
-            final Long startTime = System.nanoTime();
             deleteDataTypeRequest.setAction(Action.DELETE);
-            deleteDataTypeResponse = bean.processDataType(deleteDataTypeRequest);
-            returnCode = deleteDataTypeResponse.getReturnCode();
+            response = bean.processDataType(deleteDataTypeRequest);
             log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "deleteDataType", startTime));
         } catch (RuntimeException e) {
-            log.log(Settings.ERROR, e.getMessage(), e);
+            log.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "deleteDataType", startTime, e));
+            response = new ProcessDataTypeResponse(ReturnCode.ERROR, e.getMessage());
         }
 
-        return Response.status(returnCode.getHttpCode()).entity(deleteDataTypeResponse).build();
+        return CwsApplication.buildResponse(response);
     }
 
     @POST
     @Path("/fetchDataTypes")
-    @Consumes(MediaType.APPLICATION_XML)
-    @Produces(MediaType.APPLICATION_XML)
+    @Consumes(CwsApplication.CONSUMES)
+    @Produces(CwsApplication.PRODUCES)
     public Response fetch(@NotNull final FetchDataTypeRequest fetchDataTypesRequest) {
-        FetchDataTypeResponse fetchDataTypesResponse = null;
-        ReturnCode returnCode = ReturnCode.ERROR;
+        final Long startTime = System.nanoTime();
+        FetchDataTypeResponse response;
 
         try {
-            final Long startTime = System.nanoTime();
-            fetchDataTypesResponse = bean.fetchDataTypes(fetchDataTypesRequest);
-            returnCode = fetchDataTypesResponse.getReturnCode();
+            response = bean.fetchDataTypes(fetchDataTypesRequest);
             log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "fetchDataTypes", startTime));
         } catch (RuntimeException e) {
-            log.log(Settings.ERROR, e.getMessage(), e);
+            log.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "fetchDataTypes", startTime, e));
+            response = new FetchDataTypeResponse(ReturnCode.ERROR, e.getMessage());
         }
 
-        return Response.status(returnCode.getHttpCode()).entity(fetchDataTypesResponse).build();
+        return CwsApplication.buildResponse(response);
     }
 }

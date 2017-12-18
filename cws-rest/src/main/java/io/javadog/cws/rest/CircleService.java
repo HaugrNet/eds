@@ -25,7 +25,6 @@ import javax.ws.rs.DELETE;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.logging.Logger;
 
@@ -43,149 +42,142 @@ public class CircleService {
 
     @POST
     @Path("/createCircle")
-    @Consumes(MediaType.APPLICATION_XML)
-    @Produces(MediaType.APPLICATION_XML)
+    @Consumes(CwsApplication.CONSUMES)
+    @Produces(CwsApplication.PRODUCES)
     public Response create(@NotNull final ProcessCircleRequest createCircleRequest) {
-        ProcessCircleResponse createCircleResponse = null;
-        ReturnCode returnCode = ReturnCode.ERROR;
+        final Long startTime = System.nanoTime();
+        ProcessCircleResponse response;
 
         try {
-            final Long startTime = System.nanoTime();
             createCircleRequest.setAction(Action.CREATE);
-            createCircleResponse = bean.processCircle(createCircleRequest);
-            returnCode = createCircleResponse.getReturnCode();
+            response = bean.processCircle(createCircleRequest);
             log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "createCircle", startTime));
         } catch (RuntimeException e) {
-            log.log(Settings.ERROR, e.getMessage(), e);
+            log.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "createCircle", startTime, e));
+            response = new ProcessCircleResponse(ReturnCode.ERROR, e.getMessage());
         }
 
-        return Response.status(returnCode.getHttpCode()).entity(createCircleResponse).build();
+        return CwsApplication.buildResponse(response);
     }
 
     @POST
     @Path("/updateCircle")
-    @Consumes(MediaType.APPLICATION_XML)
-    @Produces(MediaType.APPLICATION_XML)
+    @Consumes(CwsApplication.CONSUMES)
+    @Produces(CwsApplication.PRODUCES)
     public Response update(@NotNull final ProcessCircleRequest updateCircleRequest) {
-        ProcessCircleResponse updateCircleResponse = null;
-        ReturnCode returnCode = ReturnCode.ERROR;
+        final Long startTime = System.nanoTime();
+        ProcessCircleResponse response;
 
         try {
-            final Long startTime = System.nanoTime();
             updateCircleRequest.setAction(Action.UPDATE);
-            updateCircleResponse = bean.processCircle(updateCircleRequest);
-            returnCode = updateCircleResponse.getReturnCode();
+            response = bean.processCircle(updateCircleRequest);
             log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "updateCircle", startTime));
         } catch (RuntimeException e) {
-            log.log(Settings.ERROR, e.getMessage(), e);
+            log.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "updateCircle", startTime, e));
+            response = new ProcessCircleResponse(ReturnCode.ERROR, e.getMessage());
         }
 
-        return Response.status(returnCode.getHttpCode()).entity(updateCircleResponse).build();
+        return CwsApplication.buildResponse(response);
     }
 
     @POST
     @DELETE
     @Path("/deleteCircle")
-    @Consumes(MediaType.APPLICATION_XML)
-    @Produces(MediaType.APPLICATION_XML)
+    @Consumes(CwsApplication.CONSUMES)
+    @Produces(CwsApplication.PRODUCES)
     public Response delete(@NotNull final ProcessCircleRequest deleteCircleRequest) {
-        ProcessCircleResponse deleteCircleResponse = null;
-        ReturnCode returnCode = ReturnCode.ERROR;
+        final Long startTime = System.nanoTime();
+        ProcessCircleResponse response;
 
         try {
-            final Long startTime = System.nanoTime();
             deleteCircleRequest.setAction(Action.DELETE);
-            deleteCircleResponse = bean.processCircle(deleteCircleRequest);
-            returnCode = deleteCircleResponse.getReturnCode();
+            response = bean.processCircle(deleteCircleRequest);
             log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "deleteCircle", startTime));
         } catch (RuntimeException e) {
-            log.log(Settings.ERROR, e.getMessage(), e);
+            log.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "deleteCircle", startTime, e));
+            response = new ProcessCircleResponse(ReturnCode.ERROR, e.getMessage());
         }
 
-        return Response.status(returnCode.getHttpCode()).entity(deleteCircleResponse).build();
+        return CwsApplication.buildResponse(response);
     }
 
     @POST
     @Path("/addTrustee")
-    @Consumes(MediaType.APPLICATION_XML)
-    @Produces(MediaType.APPLICATION_XML)
+    @Consumes(CwsApplication.CONSUMES)
+    @Produces(CwsApplication.PRODUCES)
     public Response add(@NotNull final ProcessCircleRequest addTrusteeRequest) {
-        ProcessCircleResponse addTrusteeResponse = null;
-        ReturnCode returnCode = ReturnCode.ERROR;
+        final Long startTime = System.nanoTime();
+        ProcessCircleResponse response;
 
         try {
-            final Long startTime = System.nanoTime();
             addTrusteeRequest.setAction(Action.ADD);
-            addTrusteeResponse = bean.processCircle(addTrusteeRequest);
-            returnCode = addTrusteeResponse.getReturnCode();
+            response = bean.processCircle(addTrusteeRequest);
             log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "addTrustee", startTime));
         } catch (RuntimeException e) {
-            log.log(Settings.ERROR, e.getMessage(), e);
+            log.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "addTrustee", startTime, e));
+            response = new ProcessCircleResponse(ReturnCode.ERROR, e.getMessage());
         }
 
-        return Response.status(returnCode.getHttpCode()).entity(addTrusteeResponse).build();
+        return CwsApplication.buildResponse(response);
     }
 
     @POST
     @Path("/alterTrustee")
-    @Consumes(MediaType.APPLICATION_XML)
-    @Produces(MediaType.APPLICATION_XML)
+    @Consumes(CwsApplication.CONSUMES)
+    @Produces(CwsApplication.PRODUCES)
     public Response alter(@NotNull final ProcessCircleRequest alterTrusteeRequest) {
-        ProcessCircleResponse alterTrusteeResponse = null;
-        ReturnCode returnCode = ReturnCode.ERROR;
+        final Long startTime = System.nanoTime();
+        ProcessCircleResponse response;
 
         try {
-            final Long startTime = System.nanoTime();
             alterTrusteeRequest.setAction(Action.ALTER);
-            alterTrusteeResponse = bean.processCircle(alterTrusteeRequest);
-            returnCode = alterTrusteeResponse.getReturnCode();
+            response = bean.processCircle(alterTrusteeRequest);
             log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "alterTrustee", startTime));
         } catch (RuntimeException e) {
-            log.log(Settings.ERROR, e.getMessage(), e);
+            log.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "alterTrustee", startTime, e));
+            response = new ProcessCircleResponse(ReturnCode.ERROR, e.getMessage());
         }
 
-        return Response.status(returnCode.getHttpCode()).entity(alterTrusteeResponse).build();
+        return CwsApplication.buildResponse(response);
     }
 
     @POST
     @DELETE
     @Path("/removeTrustee")
-    @Consumes(MediaType.APPLICATION_XML)
-    @Produces(MediaType.APPLICATION_XML)
+    @Consumes(CwsApplication.CONSUMES)
+    @Produces(CwsApplication.PRODUCES)
     public Response remove(@NotNull final ProcessCircleRequest removeTrusteeRequest) {
-        ProcessCircleResponse removeTrusteeResponse = null;
-        ReturnCode returnCode = ReturnCode.ERROR;
+        final Long startTime = System.nanoTime();
+        ProcessCircleResponse response;
 
         try {
-            final Long startTime = System.nanoTime();
             removeTrusteeRequest.setAction(Action.REMOVE);
-            removeTrusteeResponse = bean.processCircle(removeTrusteeRequest);
-            returnCode = removeTrusteeResponse.getReturnCode();
+            response = bean.processCircle(removeTrusteeRequest);
             log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "removeTrustee", startTime));
         } catch (RuntimeException e) {
-            log.log(Settings.ERROR, e.getMessage(), e);
+            log.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "removeTrustee", startTime, e));
+            response = new ProcessCircleResponse(ReturnCode.ERROR, e.getMessage());
         }
 
-        return Response.status(returnCode.getHttpCode()).entity(removeTrusteeResponse).build();
+        return CwsApplication.buildResponse(response);
     }
 
     @POST
     @Path("/fetchCircles")
-    @Consumes(MediaType.APPLICATION_XML)
-    @Produces(MediaType.APPLICATION_XML)
+    @Consumes(CwsApplication.CONSUMES)
+    @Produces(CwsApplication.PRODUCES)
     public Response fetch(@NotNull final FetchCircleRequest fetchCirclesRequest) {
-        FetchCircleResponse fetchCirclesResponse = null;
-        ReturnCode returnCode = ReturnCode.ERROR;
+        final Long startTime = System.nanoTime();
+        FetchCircleResponse response;
 
         try {
-            final Long startTime = System.nanoTime();
-            fetchCirclesResponse = bean.fetchCircles(fetchCirclesRequest);
-            returnCode = fetchCirclesResponse.getReturnCode();
+            response = bean.fetchCircles(fetchCirclesRequest);
             log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "fetchCircles", startTime));
         } catch (RuntimeException e) {
-            log.log(Settings.ERROR, e.getMessage(), e);
+            log.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "fetchCircles", startTime, e));
+            response = new FetchCircleResponse(ReturnCode.ERROR, e.getMessage());
         }
 
-        return Response.status(returnCode.getHttpCode()).entity(fetchCirclesResponse).build();
+        return CwsApplication.buildResponse(response);
     }
 }

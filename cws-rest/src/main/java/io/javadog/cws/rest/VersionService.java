@@ -19,7 +19,6 @@ import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.logging.Logger;
 
@@ -37,20 +36,19 @@ public class VersionService {
 
     @GET
     @POST
-    @Produces(MediaType.APPLICATION_XML)
+    @Produces(CwsApplication.PRODUCES)
     public Response version() {
-        VersionResponse versionResponse = null;
-        ReturnCode returnCode = ReturnCode.ERROR;
+        final Long startTime = System.nanoTime();
+        VersionResponse response;
 
         try {
-            final Long startTime = System.nanoTime();
-            versionResponse = bean.version();
-            returnCode = versionResponse.getReturnCode();
+            response = bean.version();
             log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "version", startTime));
         } catch (RuntimeException e) {
-            log.log(Settings.ERROR, e.getMessage(), e);
+            log.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "version", startTime, e));
+            response = new VersionResponse(ReturnCode.ERROR, e.getMessage());
         }
 
-        return Response.status(returnCode.getHttpCode()).entity(versionResponse).build();
+        return CwsApplication.buildResponse(response);
     }
 }

@@ -7,8 +7,12 @@
  */
 package io.javadog.cws.rest;
 
+import io.javadog.cws.api.responses.CwsResponse;
+
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -18,6 +22,9 @@ import java.util.Set;
  */
 @ApplicationPath("/")
 public class CwsApplication extends Application {
+
+    public static final String CONSUMES = MediaType.APPLICATION_XML;
+    public static final String PRODUCES = MediaType.APPLICATION_XML;
 
     /**
      * {@inheritDoc}
@@ -36,5 +43,13 @@ public class CwsApplication extends Application {
         set.add(VersionService.class);
 
         return set;
+    }
+
+    public static Response buildResponse(final CwsResponse cwsResponse) {
+        return Response
+                .status(cwsResponse.getReturnCode().getHttpCode())
+                .type(PRODUCES)
+                .entity(cwsResponse)
+                .build();
     }
 }

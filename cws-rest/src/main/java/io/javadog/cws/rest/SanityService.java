@@ -21,7 +21,6 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.logging.Logger;
 
@@ -39,21 +38,20 @@ public class SanityService {
 
     @POST
     @Path("/sanitized")
-    @Consumes(MediaType.APPLICATION_XML)
-    @Produces(MediaType.APPLICATION_XML)
+    @Consumes(CwsApplication.CONSUMES)
+    @Produces(CwsApplication.PRODUCES)
     public Response sanitized(@NotNull final SanityRequest sanitizedRequest) {
-        SanityResponse sanitizedResponse = null;
-        ReturnCode returnCode = ReturnCode.ERROR;
+        final Long startTime = System.nanoTime();
+        SanityResponse response;
 
         try {
-            final Long startTime = System.nanoTime();
-            sanitizedResponse = bean.sanity(sanitizedRequest);
-            returnCode = sanitizedResponse.getReturnCode();
+            response = bean.sanity(sanitizedRequest);
             log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "sanitized", startTime));
         } catch (RuntimeException e) {
-            log.log(Settings.ERROR, e.getMessage(), e);
+            log.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "sanitized", startTime, e));
+            response = new SanityResponse(ReturnCode.ERROR, e.getMessage());
         }
 
-        return Response.status(returnCode.getHttpCode()).entity(sanitizedResponse).build();
+        return CwsApplication.buildResponse(response);
     }
 }

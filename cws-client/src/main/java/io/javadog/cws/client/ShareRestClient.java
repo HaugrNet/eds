@@ -29,7 +29,7 @@ import javax.ws.rs.core.Response;
  * @author Kim Jensen
  * @since  CWS 1.0
  */
-public final class ShareRestClient extends BaseClient implements Share {
+public final class ShareRestClient extends BaseRestClient implements Share {
 
     /**
      * Constructor for the CWS Share REST Client. It takes the base URL for the
@@ -69,7 +69,7 @@ public final class ShareRestClient extends BaseClient implements Share {
         }
 
         final ProcessDataTypeResponse cwsResponse = response.readEntity(ProcessDataTypeResponse.class);
-        response.close();
+        close(response);
 
         return cwsResponse;
     }
@@ -81,7 +81,7 @@ public final class ShareRestClient extends BaseClient implements Share {
     public FetchDataTypeResponse fetchDataTypes(final FetchDataTypeRequest request) {
         final Response response = runRequest("/dataTypes/fetch", request);
         final FetchDataTypeResponse cwsResponse = response.readEntity(FetchDataTypeResponse.class);
-        response.close();
+        close(response);
 
         return cwsResponse;
     }
@@ -112,7 +112,7 @@ public final class ShareRestClient extends BaseClient implements Share {
         }
 
         final ProcessDataResponse cwsResponse = response.readEntity(ProcessDataResponse.class);
-        response.close();
+        close(response);
 
         return cwsResponse;
     }
@@ -124,7 +124,7 @@ public final class ShareRestClient extends BaseClient implements Share {
     public FetchDataResponse fetchData(final FetchDataRequest request) {
         final Response response = runRequest("/data/fetch", request);
         final FetchDataResponse cwsResponse = response.readEntity(FetchDataResponse.class);
-        response.close();
+        close(response);
 
         return cwsResponse;
     }
@@ -136,7 +136,7 @@ public final class ShareRestClient extends BaseClient implements Share {
     public SignResponse sign(final SignRequest request) {
         final Response response = runRequest("/signatures/signDocument", request);
         final SignResponse cwsResponse = response.readEntity(SignResponse.class);
-        response.close();
+        close(response);
 
         return cwsResponse;
     }
@@ -148,7 +148,7 @@ public final class ShareRestClient extends BaseClient implements Share {
     public VerifyResponse verify(final VerifyRequest request) {
         final Response response = runRequest("/signatures/verifySignature", request);
         final VerifyResponse cwsResponse = response.readEntity(VerifyResponse.class);
-        response.close();
+        close(response);
 
         return cwsResponse;
     }
@@ -160,7 +160,7 @@ public final class ShareRestClient extends BaseClient implements Share {
     public FetchSignatureResponse fetchSignatures(final FetchSignatureRequest request) {
         final Response response = runRequest("/signatures/fetch", request);
         final FetchSignatureResponse cwsResponse = response.readEntity(FetchSignatureResponse.class);
-        response.close();
+        close(response);
 
         return cwsResponse;
     }

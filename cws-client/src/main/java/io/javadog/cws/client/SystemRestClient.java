@@ -23,13 +23,14 @@ import io.javadog.cws.api.responses.SettingResponse;
 import io.javadog.cws.api.responses.VersionResponse;
 import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
 
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 /**
  * @author Kim Jensen
  * @since  CWS 1.0
  */
-public final class SystemRestClient extends BaseClient implements System {
+public final class SystemRestClient extends BaseRestClient implements System {
 
     /**
      * Constructor for the CWS System REST Client. It takes the base URL for the
@@ -53,9 +54,9 @@ public final class SystemRestClient extends BaseClient implements System {
     public VersionResponse version() {
         final String url = baseURL + "/version";
         final ResteasyWebTarget target = client.target(url);
-        final Response response =  target.request().get();
+        final Response response =  target.request().accept(MediaType.APPLICATION_XML_TYPE).get();
         final VersionResponse versionResponse = response.readEntity(VersionResponse.class);
-        response.close();
+        close(response);
 
         return versionResponse;
     }
@@ -67,7 +68,7 @@ public final class SystemRestClient extends BaseClient implements System {
     public SettingResponse settings(final SettingRequest request) {
         final Response response = runRequest("/settings", request);
         final SettingResponse cwsResponse = response.readEntity(SettingResponse.class);
-        response.close();
+        close(response);
 
         return cwsResponse;
     }
@@ -79,7 +80,7 @@ public final class SystemRestClient extends BaseClient implements System {
     public SanityResponse sanitized(final SanityRequest request) {
         final Response response = runRequest("/sanity/sanitized", request);
         final SanityResponse cwsResponse = response.readEntity(SanityResponse.class);
-        response.close();
+        close(response);
 
         return cwsResponse;
     }
@@ -91,7 +92,7 @@ public final class SystemRestClient extends BaseClient implements System {
     public FetchMemberResponse fetchMembers(final FetchMemberRequest request) {
         final Response response = runRequest("/members/fetch", request);
         final FetchMemberResponse cwsResponse = response.readEntity(FetchMemberResponse.class);
-        response.close();
+        close(response);
 
         return cwsResponse;
     }
@@ -125,7 +126,7 @@ public final class SystemRestClient extends BaseClient implements System {
         }
 
         final ProcessMemberResponse cwsResponse = response.readEntity(ProcessMemberResponse.class);
-        response.close();
+        close(response);
 
         return cwsResponse;
     }
@@ -137,7 +138,7 @@ public final class SystemRestClient extends BaseClient implements System {
     public FetchCircleResponse fetchCircles(final FetchCircleRequest request) {
         final Response response = runRequest("/circles/fetch", request);
         final FetchCircleResponse cwsResponse = response.readEntity(FetchCircleResponse.class);
-        response.close();
+        close(response);
 
         return cwsResponse;
     }
@@ -177,7 +178,7 @@ public final class SystemRestClient extends BaseClient implements System {
         }
 
         final ProcessCircleResponse cwsResponse = response.readEntity(ProcessCircleResponse.class);
-        response.close();
+        close(response);
 
         return cwsResponse;
     }

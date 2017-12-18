@@ -20,19 +20,24 @@ import javax.ws.rs.core.Response;
  * @author Kim Jensen
  * @since  CWS 1.0
  */
-public class BaseClient {
+public class BaseRestClient {
 
-    protected final ResteasyClient client = new ResteasyClientBuilder().build();
+    protected  ResteasyClient client = new ResteasyClientBuilder().build();
     protected final String baseURL;
 
-    protected BaseClient(final String baseURL) {
+    protected BaseRestClient(final String baseURL) {
         this.baseURL = baseURL;
     }
 
     protected <R extends Authentication> Response runRequest(final String requestURL, final R request) {
         final String url = baseURL + requestURL;
+        client = new ResteasyClientBuilder().build();
         final ResteasyWebTarget target = client.target(url);
-        final Entity<R> entity = Entity.entity(request, MediaType.APPLICATION_JSON);
-        return target.request().post(entity);
+        final Entity<R> entity = Entity.entity(request, MediaType.APPLICATION_XML);
+        return target.request().accept(MediaType.APPLICATION_XML).post(entity);
+    }
+
+    protected void close(final Response response) {
+        response.close();
     }
 }

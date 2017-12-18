@@ -15,9 +15,15 @@
 
   <xs:element name="fetchDataResponse" type="tns:fetchDataResponse"/>
 
+  <xs:element name="fetchDataResult" type="tns:fetchDataResult"/>
+
+  <xs:element name="fetchDataTypeResult" type="tns:fetchDataTypeResult"/>
+
   <xs:element name="fetchDataTypes" type="tns:fetchDataTypes"/>
 
   <xs:element name="fetchDataTypesResponse" type="tns:fetchDataTypesResponse"/>
+
+  <xs:element name="fetchSignatureResult" type="tns:fetchSignatureResult"/>
 
   <xs:element name="fetchSignatures" type="tns:fetchSignatures"/>
 
@@ -27,17 +33,25 @@
 
   <xs:element name="processDataResponse" type="tns:processDataResponse"/>
 
+  <xs:element name="processDataResult" type="tns:processDataResult"/>
+
   <xs:element name="processDataType" type="tns:processDataType"/>
 
   <xs:element name="processDataTypeResponse" type="tns:processDataTypeResponse"/>
+
+  <xs:element name="processDataTypeResult" type="tns:processDataTypeResult"/>
 
   <xs:element name="sign" type="tns:sign"/>
 
   <xs:element name="signResponse" type="tns:signResponse"/>
 
+  <xs:element name="signResult" type="tns:signResult"/>
+
   <xs:element name="verify" type="tns:verify"/>
 
   <xs:element name="verifyResponse" type="tns:verifyResponse"/>
+
+  <xs:element name="verifyResult" type="tns:verifyResult"/>
 
   <xs:complexType name="processData">
     <xs:sequence>
@@ -349,20 +363,21 @@
     <xs:restriction base="xs:string">
       <xs:enumeration value="SUCCESS"/>
       <xs:enumeration value="WARNING"/>
-      <xs:enumeration value="VERIFICATION_WARNING"/>
-      <xs:enumeration value="AUTHENTICATION_WARNING"/>
       <xs:enumeration value="AUTHORIZATION_WARNING"/>
-      <xs:enumeration value="ILLEGAL_ACTION"/>
-      <xs:enumeration value="SIGNATURE_WARNING"/>
+      <xs:enumeration value="AUTHENTICATION_WARNING"/>
       <xs:enumeration value="IDENTIFICATION_WARNING"/>
+      <xs:enumeration value="ILLEGAL_ACTION"/>
+      <xs:enumeration value="VERIFICATION_WARNING"/>
       <xs:enumeration value="INTEGRITY_WARNING"/>
+      <xs:enumeration value="SIGNATURE_WARNING"/>
+      <xs:enumeration value="SETTING_WARNING"/>
       <xs:enumeration value="ERROR"/>
+      <xs:enumeration value="CRYPTO_ERROR"/>
+      <xs:enumeration value="INTEGRITY_ERROR"/>
+      <xs:enumeration value="SETTING_ERROR"/>
+      <xs:enumeration value="IDENTIFICATION_ERROR"/>
       <xs:enumeration value="DATABASE_ERROR"/>
       <xs:enumeration value="CONSTRAINT_ERROR"/>
-      <xs:enumeration value="PROPERTY_ERROR"/>
-      <xs:enumeration value="CRYPTO_ERROR"/>
-      <xs:enumeration value="IDENTIFICATION_ERROR"/>
-      <xs:enumeration value="INTEGRITY_ERROR"/>
     </xs:restriction>
   </xs:simpleType>
 

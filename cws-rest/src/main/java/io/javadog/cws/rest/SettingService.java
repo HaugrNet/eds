@@ -18,7 +18,6 @@ import io.javadog.cws.core.model.Settings;
 import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -37,7 +36,6 @@ public class SettingService {
     @Inject private SettingBean settings;
     @Inject private SystemBean bean;
 
-    @GET
     @POST
     @Consumes(CwsApplication.CONSUMES)
     @Produces(CwsApplication.PRODUCES)

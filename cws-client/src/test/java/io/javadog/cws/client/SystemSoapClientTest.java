@@ -38,11 +38,10 @@ import java.util.UUID;
  */
 public class SystemSoapClientTest {
 
-    private static final String SYSTEM_URL = "http://localhost:8080/cws/system?wsdl";
+    private static final System system = new SystemSoapClient("http://localhost:8080/cws");
 
     @Test
     public void testVersion() {
-        final System system = new SystemSoapClient(SYSTEM_URL);
         final VersionResponse response = system.version();
         assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(response.getReturnMessage(), is("Ok"));
@@ -51,7 +50,6 @@ public class SystemSoapClientTest {
 
     @Test
     public void testSettings() {
-        final System system = new SystemSoapClient(SYSTEM_URL);
         final SettingRequest request = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
 
         final SettingResponse response = system.settings(request);
@@ -61,7 +59,6 @@ public class SystemSoapClientTest {
 
     @Test
     public void testFetchMembers() {
-        final System system = new SystemSoapClient(SYSTEM_URL);
         final FetchMemberRequest request = prepareRequest(FetchMemberRequest.class, Constants.ADMIN_ACCOUNT);
 
         final FetchMemberResponse response = system.fetchMembers(request);
@@ -73,7 +70,6 @@ public class SystemSoapClientTest {
     public void testProcessMembers() {
         final String accountName = UUID.randomUUID().toString();
 
-        final System system = new SystemSoapClient(SYSTEM_URL);
         final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
         request.setAction(Action.CREATE);
         request.setNewAccountName(accountName);
@@ -86,7 +82,6 @@ public class SystemSoapClientTest {
 
     @Test
     public void testFetchCircles() {
-        final System system = new SystemSoapClient(SYSTEM_URL);
         final FetchCircleRequest request = prepareRequest(FetchCircleRequest.class, Constants.ADMIN_ACCOUNT);
 
         final FetchCircleResponse response = system.fetchCircles(request);
@@ -98,7 +93,6 @@ public class SystemSoapClientTest {
     public void testProcessCircles() {
         final String accountName = UUID.randomUUID().toString();
 
-        final System system = new SystemSoapClient(SYSTEM_URL);
         final ProcessMemberRequest memberRequest = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
         memberRequest.setAction(Action.CREATE);
         memberRequest.setNewAccountName(accountName);

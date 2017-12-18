@@ -211,20 +211,20 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
         // Ensure that we have the correct settings for the Service
         settings.set(StandardSetting.EXPOSE_ADMIN, "true");
 
-        final FetchMemberService fetchMemberService = new FetchMemberService(settings, entityManager);
-        final FetchMemberRequest fetchMemberRequest = prepareRequest(FetchMemberRequest.class, Constants.ADMIN_ACCOUNT);
-        fetchMemberRequest.setMemberId(ADMIN_ID);
-        assertThat(fetchMemberRequest.validate().isEmpty(), is(true));
-        final FetchMemberResponse fetchMemberResponse = fetchMemberService.perform(fetchMemberRequest);
+        final FetchMemberService fetchService = new FetchMemberService(settings, entityManager);
+        final FetchMemberRequest fetchRequest = prepareRequest(FetchMemberRequest.class, Constants.ADMIN_ACCOUNT);
+        fetchRequest.setMemberId(ADMIN_ID);
+        assertThat(fetchRequest.validate().isEmpty(), is(true));
+        final FetchMemberResponse fetchResponse = fetchService.perform(fetchRequest);
 
         // Verify that we have found the correct data
-        assertThat(fetchMemberResponse, is(not(nullValue())));
-        assertThat(fetchMemberResponse.isOk(), is(true));
-        assertThat(fetchMemberResponse.getReturnCode(), is(ReturnCode.SUCCESS));
-        assertThat(fetchMemberResponse.getReturnMessage(), is("Ok"));
-        assertThat(fetchMemberResponse.getMembers().size(), is(1));
-        assertThat(fetchMemberResponse.getCircles().isEmpty(), is(true));
-        assertThat(fetchMemberResponse.getMembers().get(0).getAccountName(), is(Constants.ADMIN_ACCOUNT));
+        assertThat(fetchResponse, is(not(nullValue())));
+        assertThat(fetchResponse.isOk(), is(true));
+        assertThat(fetchResponse.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(fetchResponse.getReturnMessage(), is("Ok"));
+        assertThat(fetchResponse.getMembers().size(), is(1));
+        assertThat(fetchResponse.getCircles().isEmpty(), is(true));
+        assertThat(fetchResponse.getMembers().get(0).getAccountName(), is(Constants.ADMIN_ACCOUNT));
     }
 
     /**

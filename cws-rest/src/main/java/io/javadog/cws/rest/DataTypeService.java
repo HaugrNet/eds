@@ -34,7 +34,6 @@ import java.util.logging.Logger;
  * @since  CWS 1.0
  */
 @Path("/dataTypes")
-@Consumes(MediaType.APPLICATION_JSON)
 public class DataTypeService {
 
     private static final Logger log = Logger.getLogger(DataTypeService.class.getName());
@@ -44,8 +43,8 @@ public class DataTypeService {
 
     @POST
     @Path("/processDataType")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_XML)
+    @Produces(MediaType.APPLICATION_XML)
     public Response process(@NotNull final ProcessDataTypeRequest processDataTypeRequest) {
         ProcessDataTypeResponse processDataTypeResponse = null;
         ReturnCode returnCode = ReturnCode.ERROR;
@@ -66,8 +65,8 @@ public class DataTypeService {
     @POST
     @DELETE
     @Path("/deleteDataType")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_XML)
+    @Produces(MediaType.APPLICATION_XML)
     public Response delete(@NotNull final ProcessDataTypeRequest deleteDataTypeRequest) {
         ProcessDataTypeResponse deleteDataTypeResponse = null;
         ReturnCode returnCode = ReturnCode.ERROR;
@@ -87,8 +86,8 @@ public class DataTypeService {
 
     @POST
     @Path("/fetchDataTypes")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_XML)
+    @Produces(MediaType.APPLICATION_XML)
     public Response fetch(@NotNull final FetchDataTypeRequest fetchDataTypesRequest) {
         FetchDataTypeResponse fetchDataTypesResponse = null;
         ReturnCode returnCode = ReturnCode.ERROR;

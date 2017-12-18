@@ -30,7 +30,6 @@ import java.util.logging.Logger;
  * @since  CWS 1.0
  */
 @Path("/sanity")
-@Consumes(MediaType.APPLICATION_JSON)
 public class SanityService {
 
     private static final Logger log = Logger.getLogger(SanityService.class.getName());
@@ -40,8 +39,8 @@ public class SanityService {
 
     @POST
     @Path("/sanitized")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_XML)
+    @Produces(MediaType.APPLICATION_XML)
     public Response sanitized(@NotNull final SanityRequest sanitizedRequest) {
         SanityResponse sanitizedResponse = null;
         ReturnCode returnCode = ReturnCode.ERROR;

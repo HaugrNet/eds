@@ -34,7 +34,6 @@ import java.util.logging.Logger;
  * @since  CWS 1.0
  */
 @Path("/data")
-@Consumes(MediaType.APPLICATION_JSON)
 public class DataService {
 
     private static final Logger log = Logger.getLogger(DataService.class.getName());
@@ -44,8 +43,8 @@ public class DataService {
 
     @POST
     @Path("/addData")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_XML)
+    @Produces(MediaType.APPLICATION_XML)
     public Response add(@NotNull final ProcessDataRequest addDataRequest) {
         ProcessDataResponse addDataResponse = null;
         ReturnCode returnCode = ReturnCode.ERROR;
@@ -65,8 +64,8 @@ public class DataService {
 
     @POST
     @Path("/updateData")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_XML)
+    @Produces(MediaType.APPLICATION_XML)
     public Response update(@NotNull final ProcessDataRequest updateDataRequest) {
         ProcessDataResponse updateDataResponse = null;
         ReturnCode returnCode = ReturnCode.ERROR;
@@ -87,8 +86,8 @@ public class DataService {
     @POST
     @DELETE
     @Path("/deleteData")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_XML)
+    @Produces(MediaType.APPLICATION_XML)
     public Response delete(@NotNull final ProcessDataRequest deleteDataRequest) {
         ProcessDataResponse deleteDataResponse = null;
         ReturnCode returnCode = ReturnCode.ERROR;
@@ -108,8 +107,8 @@ public class DataService {
 
     @POST
     @Path("/fetchData")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_XML)
+    @Produces(MediaType.APPLICATION_XML)
     public Response fetch(@NotNull final FetchDataRequest fetchDataRequest) {
         FetchDataResponse fetchDataResponse = null;
         ReturnCode returnCode = ReturnCode.ERROR;

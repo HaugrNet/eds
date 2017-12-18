@@ -15,7 +15,6 @@ import io.javadog.cws.core.misc.LoggingUtil;
 import io.javadog.cws.core.model.Settings;
 
 import javax.inject.Inject;
-import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -29,7 +28,6 @@ import java.util.logging.Logger;
  * @since  CWS 1.0
  */
 @Path("/version")
-@Consumes({MediaType.TEXT_PLAIN, MediaType.APPLICATION_JSON})
 public class VersionService {
 
     private static final Logger log = Logger.getLogger(VersionService.class.getName());
@@ -39,7 +37,7 @@ public class VersionService {
 
     @GET
     @POST
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_XML)
     public Response version() {
         VersionResponse versionResponse = null;
         ReturnCode returnCode = ReturnCode.ERROR;

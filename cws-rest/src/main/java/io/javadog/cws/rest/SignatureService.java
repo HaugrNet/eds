@@ -34,7 +34,6 @@ import java.util.logging.Logger;
  * @since  CWS 1.0
  */
 @Path("/signatures")
-@Consumes(MediaType.APPLICATION_JSON)
 public class SignatureService {
 
     private static final Logger log = Logger.getLogger(SignatureService.class.getName());
@@ -44,8 +43,8 @@ public class SignatureService {
 
     @POST
     @Path("/signDocument")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_XML)
+    @Produces(MediaType.APPLICATION_XML)
     public Response sign(@NotNull final SignRequest signDocumentRequest) {
         SignResponse signDocumentResponse = null;
         ReturnCode returnCode = ReturnCode.ERROR;
@@ -64,8 +63,8 @@ public class SignatureService {
 
     @POST
     @Path("/verifySignature")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_XML)
+    @Produces(MediaType.APPLICATION_XML)
     public Response verify(@NotNull final VerifyRequest verifySignatureRequest) {
         VerifyResponse verifySignatureResponse = null;
         ReturnCode returnCode = ReturnCode.ERROR;
@@ -84,8 +83,8 @@ public class SignatureService {
 
     @POST
     @Path("/fetchSignatures")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_XML)
+    @Produces(MediaType.APPLICATION_XML)
     public Response fetch(@NotNull final FetchSignatureRequest fetchSignaturesRequest) {
         FetchSignatureResponse fetchSignaturesResponse = null;
         ReturnCode returnCode = ReturnCode.ERROR;

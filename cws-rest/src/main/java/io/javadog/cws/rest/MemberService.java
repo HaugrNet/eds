@@ -34,7 +34,6 @@ import java.util.logging.Logger;
  * @since  CWS 1.0
  */
 @Path("/members")
-@Consumes(MediaType.APPLICATION_JSON)
 public class MemberService {
 
     private static final Logger log = Logger.getLogger(MemberService.class.getName());
@@ -44,8 +43,8 @@ public class MemberService {
 
     @POST
     @Path("/createMember")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_XML)
+    @Produces(MediaType.APPLICATION_XML)
     public Response create(@NotNull final ProcessMemberRequest createMemberRequest) {
         ProcessMemberResponse createMemberResponse = null;
         ReturnCode returnCode = ReturnCode.ERROR;
@@ -65,8 +64,8 @@ public class MemberService {
 
     @POST
     @Path("/inviteMember")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_XML)
+    @Produces(MediaType.APPLICATION_XML)
     public Response invite(@NotNull final ProcessMemberRequest inviteMemberRequest) {
         ProcessMemberResponse inviteMemberResponse = null;
         ReturnCode returnCode = ReturnCode.ERROR;
@@ -86,8 +85,8 @@ public class MemberService {
 
     @POST
     @Path("/updateMember")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_XML)
+    @Produces(MediaType.APPLICATION_XML)
     public Response update(@NotNull final ProcessMemberRequest updateMemberRequest) {
         ProcessMemberResponse updateMemberResponse = null;
         ReturnCode returnCode = ReturnCode.ERROR;
@@ -108,8 +107,8 @@ public class MemberService {
     @POST
     @DELETE
     @Path("/deleteMember")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_XML)
+    @Produces(MediaType.APPLICATION_XML)
     public Response delete(@NotNull final ProcessMemberRequest deleteMemberRequest) {
         ProcessMemberResponse deleteMemberResponse = null;
         ReturnCode returnCode = ReturnCode.ERROR;
@@ -129,8 +128,8 @@ public class MemberService {
 
     @POST
     @Path("/fetchMembers")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_XML)
+    @Produces(MediaType.APPLICATION_XML)
     public Response fetch(@NotNull final FetchMemberRequest fetchMembersRequest) {
         FetchMemberResponse fetchMembersResponse = null;
         ReturnCode returnCode = ReturnCode.ERROR;

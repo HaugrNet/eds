@@ -34,7 +34,6 @@ import java.util.logging.Logger;
  * @since  CWS 1.0
  */
 @Path("/circles")
-@Consumes(MediaType.APPLICATION_JSON)
 public class CircleService {
 
     private static final Logger log = Logger.getLogger(CircleService.class.getName());
@@ -44,8 +43,8 @@ public class CircleService {
 
     @POST
     @Path("/createCircle")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_XML)
+    @Produces(MediaType.APPLICATION_XML)
     public Response create(@NotNull final ProcessCircleRequest createCircleRequest) {
         ProcessCircleResponse createCircleResponse = null;
         ReturnCode returnCode = ReturnCode.ERROR;
@@ -65,8 +64,8 @@ public class CircleService {
 
     @POST
     @Path("/updateCircle")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_XML)
+    @Produces(MediaType.APPLICATION_XML)
     public Response update(@NotNull final ProcessCircleRequest updateCircleRequest) {
         ProcessCircleResponse updateCircleResponse = null;
         ReturnCode returnCode = ReturnCode.ERROR;
@@ -87,8 +86,8 @@ public class CircleService {
     @POST
     @DELETE
     @Path("/deleteCircle")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_XML)
+    @Produces(MediaType.APPLICATION_XML)
     public Response delete(@NotNull final ProcessCircleRequest deleteCircleRequest) {
         ProcessCircleResponse deleteCircleResponse = null;
         ReturnCode returnCode = ReturnCode.ERROR;
@@ -108,8 +107,8 @@ public class CircleService {
 
     @POST
     @Path("/addTrustee")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_XML)
+    @Produces(MediaType.APPLICATION_XML)
     public Response add(@NotNull final ProcessCircleRequest addTrusteeRequest) {
         ProcessCircleResponse addTrusteeResponse = null;
         ReturnCode returnCode = ReturnCode.ERROR;
@@ -129,8 +128,8 @@ public class CircleService {
 
     @POST
     @Path("/alterTrustee")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_XML)
+    @Produces(MediaType.APPLICATION_XML)
     public Response alter(@NotNull final ProcessCircleRequest alterTrusteeRequest) {
         ProcessCircleResponse alterTrusteeResponse = null;
         ReturnCode returnCode = ReturnCode.ERROR;
@@ -151,8 +150,8 @@ public class CircleService {
     @POST
     @DELETE
     @Path("/removeTrustee")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_XML)
+    @Produces(MediaType.APPLICATION_XML)
     public Response remove(@NotNull final ProcessCircleRequest removeTrusteeRequest) {
         ProcessCircleResponse removeTrusteeResponse = null;
         ReturnCode returnCode = ReturnCode.ERROR;
@@ -172,8 +171,8 @@ public class CircleService {
 
     @POST
     @Path("/fetchCircles")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_XML)
+    @Produces(MediaType.APPLICATION_XML)
     public Response fetch(@NotNull final FetchCircleRequest fetchCirclesRequest) {
         FetchCircleResponse fetchCirclesResponse = null;
         ReturnCode returnCode = ReturnCode.ERROR;

@@ -31,7 +31,6 @@ import java.util.logging.Logger;
  * @since  CWS 1.0
  */
 @Path("/settings")
-@Consumes({MediaType.TEXT_PLAIN, MediaType.APPLICATION_JSON})
 public class SettingService {
 
     private static final Logger log = Logger.getLogger(SettingService.class.getName());
@@ -41,7 +40,8 @@ public class SettingService {
 
     @GET
     @POST
-    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_XML)
+    @Produces(MediaType.APPLICATION_XML)
     public Response settings(@NotNull final SettingRequest settingRequest) {
         SettingResponse settingResponse = null;
         ReturnCode returnCode = ReturnCode.ERROR;

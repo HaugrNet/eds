@@ -13,15 +13,21 @@
 
   <xs:element name="fetchData" type="tns:fetchData"/>
 
+  <xs:element name="fetchDataRequest" type="tns:fetchDataRequest"/>
+
   <xs:element name="fetchDataResponse" type="tns:fetchDataResponse"/>
 
   <xs:element name="fetchDataResult" type="tns:fetchDataResult"/>
+
+  <xs:element name="fetchDataTypeRequest" type="tns:fetchDataTypeRequest"/>
 
   <xs:element name="fetchDataTypeResult" type="tns:fetchDataTypeResult"/>
 
   <xs:element name="fetchDataTypes" type="tns:fetchDataTypes"/>
 
   <xs:element name="fetchDataTypesResponse" type="tns:fetchDataTypesResponse"/>
+
+  <xs:element name="fetchSignatureRequest" type="tns:fetchSignatureRequest"/>
 
   <xs:element name="fetchSignatureResult" type="tns:fetchSignatureResult"/>
 
@@ -31,11 +37,15 @@
 
   <xs:element name="processData" type="tns:processData"/>
 
+  <xs:element name="processDataRequest" type="tns:processDataRequest"/>
+
   <xs:element name="processDataResponse" type="tns:processDataResponse"/>
 
   <xs:element name="processDataResult" type="tns:processDataResult"/>
 
   <xs:element name="processDataType" type="tns:processDataType"/>
+
+  <xs:element name="processDataTypeRequest" type="tns:processDataTypeRequest"/>
 
   <xs:element name="processDataTypeResponse" type="tns:processDataTypeResponse"/>
 
@@ -43,11 +53,15 @@
 
   <xs:element name="sign" type="tns:sign"/>
 
+  <xs:element name="signRequest" type="tns:signRequest"/>
+
   <xs:element name="signResponse" type="tns:signResponse"/>
 
   <xs:element name="signResult" type="tns:signResult"/>
 
   <xs:element name="verify" type="tns:verify"/>
+
+  <xs:element name="verifyRequest" type="tns:verifyRequest"/>
 
   <xs:element name="verifyResponse" type="tns:verifyResponse"/>
 

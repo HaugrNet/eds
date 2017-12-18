@@ -75,6 +75,6 @@ public abstract class CWSKey<T extends Key> {
         //     - java.security.KeyPair should implement Destroyable
         //  o https://bugs.openjdk.java.net/browse/JDK-8160206
         //     - SecretKeySpec should implement destroy()
-        log.log(Settings.INFO, "Java support for destroying keys is not yet implemented.");
+        log.log(Settings.DEBUG, "Java support for destroying keys is not yet implemented.");
     }
 }

@@ -105,23 +105,14 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
         // Ensure that we have the correct settings for the Service
         settings.set(StandardSetting.EXPOSE_ADMIN, "false");
 
-        final FetchMemberService service = new FetchMemberService(settings, entityManager);
-        final FetchMemberRequest request = prepareRequest(FetchMemberRequest.class, Constants.ADMIN_ACCOUNT);
-        assertThat(request.validate().isEmpty(), is(true));
-        final FetchMemberResponse response = service.perform(request);
-
-        // Verify that we have found the correct data
-        assertThat(response, is(not(nullValue())));
-        assertThat(response.isOk(), is(true));
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
-        assertThat(response.getReturnMessage(), is("Ok"));
-        assertThat(response.getMembers().size(), is(5));
-        assertThat(response.getCircles().isEmpty(), is(true));
+        final FetchMemberRequest fetchRequest = prepareRequest(FetchMemberRequest.class, Constants.ADMIN_ACCOUNT);
+        assertThat(fetchRequest.validate().isEmpty(), is(true));
+        runRequestAndVerifyResponse(fetchRequest, 5);
     }
 
     /**
      * This test expects a list of All Members, including the System
-     * Administrator, which should be 6 in total. No Circles is fetches,
+     * Administrator, which should be 6 in total. No Circles are fetched,
      * as we're not looking at a specific Member Account.
      */
     @Test
@@ -129,23 +120,27 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
         // Ensure that we have the correct settings for the Service
         settings.set(StandardSetting.EXPOSE_ADMIN, "true");
 
-        final FetchMemberService service = new FetchMemberService(settings, entityManager);
         final FetchMemberRequest request = prepareRequest(FetchMemberRequest.class, Constants.ADMIN_ACCOUNT);
         assertThat(request.validate().isEmpty(), is(true));
-        final FetchMemberResponse response = service.perform(request);
+        runRequestAndVerifyResponse(request, 6);
+    }
+
+    private void runRequestAndVerifyResponse(final FetchMemberRequest request, final int expectedMembers) {
+        final FetchMemberService service = new FetchMemberService(settings, entityManager);
+        final FetchMemberResponse fetchResponse = service.perform(request);
 
         // Verify that we have found the correct data
-        assertThat(response, is(not(nullValue())));
-        assertThat(response.isOk(), is(true));
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
-        assertThat(response.getReturnMessage(), is("Ok"));
-        assertThat(response.getMembers().size(), is(6));
-        assertThat(response.getCircles().isEmpty(), is(true));
+        assertThat(fetchResponse, is(not(nullValue())));
+        assertThat(fetchResponse.isOk(), is(true));
+        assertThat(fetchResponse.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(fetchResponse.getReturnMessage(), is("Ok"));
+        assertThat(fetchResponse.getMembers().size(), is(expectedMembers));
+        assertThat(fetchResponse.getCircles().isEmpty(), is(true));
     }
 
     /**
      * This test expects a list of All Members, excluding the System
-     * Administrator, which should be 5 in total. No Circles is fetches,
+     * Administrator, which should be 5 in total. No Circles are fetched,
      * as we're not looking at a specific Member Account.
      */
     @Test
@@ -180,7 +175,7 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
 
     /**
      * This test expects a list of All Members, including the System
-     * Administrator, which should be 6 in total. No Circles is fetches,
+     * Administrator, which should be 6 in total. No Circles are fetched,
      * as we're not looking at a specific Member Account.
      */
     @Test

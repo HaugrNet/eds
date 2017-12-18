@@ -25,33 +25,38 @@ please make sure that you have Java (8+), [Maven](https://maven.apache.org/) and
 [PostgreSQL](https://www.postgresql.org/) installed and running, as well as a
 local copy of the CWS sources.
 
-In the accessories folder, you can find the configuration for WildFly 10 and 11, the
-files are located in the same folder structure as you need to add them to your
-local WildFly installation.
+In the accessories folder, you can find the configuration for WildFly 10 and 11,
+the files are located in the same folder structure as you need to add them to
+your local WildFly installation.
 
-The database files can all be found in the cws-model module under
-`src/main/resources/postgresql` where the `01-install.sql` script will create
-the database, user (with password) and setup the database with tables & data for
-the initial run.
+The database files can also be found in the accessories module under
+`configuration/postgresql` where the `01-install.sql` script will create
+the database, user (with password) and setup the database with tables &amp; data
+for the initial run.
 
 Then do the following:
 
-```
-Setup your database: The following will create a database named cws and a user 
-named cws_user as well as set up all needed tables.
+First, setup your database: The following will create a database named cws and a
+user named cws_user as well as set up all needed tables. Note, that re-running
+the script will destroy an existing CWS database. For the initial release, no
+update scripts will be made, unless requested.
 
-$ psql postgres
-$ \i 01-install.sql
+```
+$ cd [ /path/to/cws/sources/ ] accessories/postgresql
+$ psql postgres --file 01-install.sql
+```
 
 Then build the package and deploy it:
 
-$ cd /path/to/cws/sources
+```
+$ cd [ /path/to/cws/sources ]
 $ mvn clean verify
 $ cp cws-war/target/cws.war ${WILDFLY_HOME}/standalone/deployments
 $ cd accessories/configuration/wildfly-XX
 $ cp -R * ${WILDFLY_HOME}
 $ ${WILDFLY_HOME}/bin/standalone.sh -c standalone-cws.xml
 ```
+
 Now, you should have a running version of CWS which can be reached from the
 following SOAP based URL's:
 
@@ -67,14 +72,14 @@ it useful.
 
 # Release Plan
 CWS Development has reached the final phase for version 1.0. With the following
-milestones still pending, for details, see milestones in GitHub. The original
-goal for releasing the final 1.0 was on December 31st, 2017. However, as the
-OpenJDK will [include unlimited strength cryptography](https://bugs.openjdk.java.net/browse/JDK-8170157)
+milestones still pending, for details, see milestones and related open issues in
+GitHub. The original goal for releasing the final 1.0 was on December 31st,
+2017. However, as the OpenJDK will [include unlimited strength cryptography](https://bugs.openjdk.java.net/browse/JDK-8170157)
 as of Java 8u162, to be released on [January 16th, 2018](http://www.oracle.com/technetwork/java/javase/8u152-relnotes-3850503.html)
-the release of CWS 1.0 has been postponed until January 31st, 2018.
+the release of CWS 1.0 is scheduled January 31st, 2018.
 
-- 0.8 - Scheduled for December, 2017; REST Release
-- 0.9 - Scheduled for January, 2018; Auditing & Review Release
+- 0.8 - Scheduled for December, 2017; REST &amp; Feature Freeze Release
+- 0.9 - Scheduled for January, 2018; Auditing &amp; Review Release
 - 1.0 - Scheduled for January 31st, 2018; Final 1.0 Release
 
 # Software License

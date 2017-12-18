@@ -51,19 +51,19 @@ public final class SanityServiceTest extends DatabaseSetup {
 
     @Test
     public void testWithFailedChecksums() {
-        final ProcessDataService service = new ProcessDataService(settings, entityManager);
-        final ProcessDataRequest request = prepareAddRequest(MEMBER_1, CIRCLE_1_ID, "The Data", 524288);
+        final ProcessDataService dataService = new ProcessDataService(settings, entityManager);
+        final ProcessDataRequest dataRequest = prepareAddRequest(MEMBER_1, CIRCLE_1_ID, "The Data", 524288);
 
-        final ProcessDataResponse response = service.perform(request);
+        final ProcessDataResponse response = dataService.perform(dataRequest);
         assertThat(response.isOk(), is(true));
         falsifyChecksum(response);
 
         // Now to the actual test - reading the data with invalid checksum
-        final FetchDataService readService = new FetchDataService(settings, entityManager);
-        final FetchDataRequest readRequest = prepareReadRequest(MEMBER_1, CIRCLE_1_ID, response.getDataId());
-        final FetchDataResponse readResponse = readService.perform(readRequest);
-        assertThat(readResponse.getReturnCode(), is(ReturnCode.INTEGRITY_ERROR));
-        assertThat(readResponse.getReturnMessage(), is("The Encrypted Data Checksum is invalid, the data appears to have been corrupted."));
+        final FetchDataService readDataService = new FetchDataService(settings, entityManager);
+        final FetchDataRequest readDattaRequest = prepareReadRequest(MEMBER_1, CIRCLE_1_ID, response.getDataId());
+        final FetchDataResponse readDataResponse = readDataService.perform(readDattaRequest);
+        assertThat(readDataResponse.getReturnCode(), is(ReturnCode.INTEGRITY_ERROR));
+        assertThat(readDataResponse.getReturnMessage(), is("The Encrypted Data Checksum is invalid, the data appears to have been corrupted."));
 
         // Now for the actual testing...
         final SanityRequest sanityRequest = prepareRequest(SanityRequest.class, Constants.ADMIN_ACCOUNT);

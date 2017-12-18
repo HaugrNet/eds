@@ -578,16 +578,16 @@ public final class CircleServiceTest extends DatabaseSetup {
 
     @Test
     public void testAlterTrusteeSetAdminAsCircleAdmin() {
-        final ProcessCircleService service = new ProcessCircleService(settings, entityManager);
-        final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, MEMBER_1);
-        request.setAction(Action.ALTER);
-        request.setCircleId(CIRCLE_1_ID);
-        request.setMemberId(MEMBER_2_ID);
-        request.setTrustLevel(TrustLevel.ADMIN);
+        final ProcessCircleService circleService = new ProcessCircleService(settings, entityManager);
+        final ProcessCircleRequest circleRequest = prepareRequest(ProcessCircleRequest.class, MEMBER_1);
+        circleRequest.setAction(Action.ALTER);
+        circleRequest.setCircleId(CIRCLE_1_ID);
+        circleRequest.setMemberId(MEMBER_2_ID);
+        circleRequest.setTrustLevel(TrustLevel.ADMIN);
 
-        final ProcessCircleResponse response = service.perform(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
-        assertThat(response.getReturnMessage(), is("Ok"));
+        final ProcessCircleResponse circleResponse = circleService.perform(circleRequest);
+        assertThat(circleResponse.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(circleResponse.getReturnMessage(), is("Ok"));
 
         final FetchCircleService fetchService = new FetchCircleService(settings, entityManager);
         final FetchCircleRequest fetchRequest = prepareRequest(FetchCircleRequest.class, MEMBER_1);

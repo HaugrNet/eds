@@ -412,22 +412,22 @@ public final class DataServiceTest extends DatabaseSetup {
 
     @Test
     public void testDeleteFolderWithData() {
-        final ProcessDataService service = new ProcessDataService(settings, entityManager);
+        final ProcessDataService dataService = new ProcessDataService(settings, entityManager);
         final ProcessDataRequest addFolderRequest = prepareAddRequest(MEMBER_1, CIRCLE_1_ID, "folder1", 0);
         addFolderRequest.setTypeName("folder");
-        final ProcessDataResponse addFolderResponse = service.perform(addFolderRequest);
+        final ProcessDataResponse addFolderResponse = dataService.perform(addFolderRequest);
         assertThat(addFolderResponse.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(addFolderResponse.getReturnMessage(), is("Ok"));
         assertThat(addFolderResponse.getDataId(), is(not(nullValue())));
 
         final ProcessDataRequest addDataRequest = prepareAddRequest(MEMBER_1, CIRCLE_1_ID, "More Data", 524288);
         addDataRequest.setFolderId(addFolderResponse.getDataId());
-        final ProcessDataResponse addDataResponse = service.perform(addDataRequest);
+        final ProcessDataResponse addDataResponse = dataService.perform(addDataRequest);
         assertThat(addDataResponse.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(addDataResponse.getReturnMessage(), is("Ok"));
 
         final ProcessDataRequest deleteFolderRequest = prepareDeleteRequest(MEMBER_1, addFolderResponse.getDataId());
-        final ProcessDataResponse deleteFolderResponse = service.perform(deleteFolderRequest);
+        final ProcessDataResponse deleteFolderResponse = dataService.perform(deleteFolderRequest);
         assertThat(deleteFolderResponse.getReturnCode(), is(ReturnCode.INTEGRITY_WARNING));
         assertThat(deleteFolderResponse.getReturnMessage(), is("The requested Folder cannot be removed as it is not empty."));
         assertThat(deleteFolderResponse.getDataId(), is(nullValue()));
@@ -461,12 +461,12 @@ public final class DataServiceTest extends DatabaseSetup {
     @Test
     public void testMoveData() {
         final ProcessDataService service = new ProcessDataService(settings, entityManager);
-        final ProcessDataRequest addFolderRequest = prepareAddRequest(MEMBER_1, CIRCLE_1_ID, "folder1", 0);
-        addFolderRequest.setTypeName("folder");
-        final ProcessDataResponse addFolderResponse = service.perform(addFolderRequest);
-        assertThat(addFolderResponse.getReturnCode(), is(ReturnCode.SUCCESS));
-        assertThat(addFolderResponse.getReturnMessage(), is("Ok"));
-        assertThat(addFolderResponse.getDataId(), is(not(nullValue())));
+        final ProcessDataRequest createFolderRequest = prepareAddRequest(MEMBER_1, CIRCLE_1_ID, "folder1", 0);
+        createFolderRequest.setTypeName("folder");
+        final ProcessDataResponse createFolderResponse = service.perform(createFolderRequest);
+        assertThat(createFolderResponse.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(createFolderResponse.getReturnMessage(), is("Ok"));
+        assertThat(createFolderResponse.getDataId(), is(not(nullValue())));
 
         final ProcessDataRequest addDataRequest = prepareAddRequest(MEMBER_1, CIRCLE_1_ID, "my data", 512);
         final ProcessDataResponse addDataResponse = service.perform(addDataRequest);
@@ -475,7 +475,7 @@ public final class DataServiceTest extends DatabaseSetup {
         assertThat(addDataResponse.getDataId(), is(not(nullValue())));
 
         final ProcessDataRequest moveDataRequest = prepareUpdateRequest(MEMBER_1, addDataResponse.getDataId());
-        moveDataRequest.setFolderId(addFolderResponse.getDataId());
+        moveDataRequest.setFolderId(createFolderResponse.getDataId());
         final ProcessDataResponse moveFolderResponse = service.perform(moveDataRequest);
         assertThat(moveFolderResponse.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(moveFolderResponse.getReturnMessage(), is("Ok"));

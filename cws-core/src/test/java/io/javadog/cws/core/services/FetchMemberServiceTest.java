@@ -148,26 +148,26 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
         // Ensure that we have the correct settings for the Service
         settings.set(StandardSetting.EXPOSE_ADMIN, "false");
 
-        final FetchMemberService service = new FetchMemberService(settings, entityManager);
-        final FetchMemberRequest request = prepareRequest(FetchMemberRequest.class, MEMBER_1);
-        assertThat(request.validate().isEmpty(), is(true));
-        final FetchMemberResponse response = service.perform(request);
+        final FetchMemberService memberService = new FetchMemberService(settings, entityManager);
+        final FetchMemberRequest memberRequest = prepareRequest(FetchMemberRequest.class, MEMBER_1);
+        assertThat(memberRequest.validate().isEmpty(), is(true));
+        final FetchMemberResponse memberResponse = memberService.perform(memberRequest);
 
         // Verify that we have found the correct data
-        assertThat(response, is(not(nullValue())));
-        assertThat(response.isOk(), is(true));
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
-        assertThat(response.getReturnMessage(), is("Ok"));
-        assertThat(response.getMembers().size(), is(5));
-        assertThat(response.getCircles().isEmpty(), is(true));
+        assertThat(memberResponse, is(not(nullValue())));
+        assertThat(memberResponse.isOk(), is(true));
+        assertThat(memberResponse.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(memberResponse.getReturnMessage(), is("Ok"));
+        assertThat(memberResponse.getMembers().size(), is(5));
+        assertThat(memberResponse.getCircles().isEmpty(), is(true));
 
         // Check that the member information is present
-        final Member member1 = response.getMembers().get(0);
+        final Member member1 = memberResponse.getMembers().get(0);
         assertThat(member1.getAccountName(), is(MEMBER_1));
         assertThat(member1.getMemberId(), is(MEMBER_1_ID));
         assertThat(member1.getAdded(), is(not(nullValue())));
 
-        final Member member5 = response.getMembers().get(4);
+        final Member member5 = memberResponse.getMembers().get(4);
         assertThat(member5.getAccountName(), is(MEMBER_5));
         assertThat(member5.getMemberId(), is(MEMBER_5_ID));
         assertThat(member5.getAdded(), is(not(nullValue())));
@@ -211,20 +211,20 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
         // Ensure that we have the correct settings for the Service
         settings.set(StandardSetting.EXPOSE_ADMIN, "true");
 
-        final FetchMemberService service = new FetchMemberService(settings, entityManager);
-        final FetchMemberRequest request = prepareRequest(FetchMemberRequest.class, Constants.ADMIN_ACCOUNT);
-        request.setMemberId(ADMIN_ID);
-        assertThat(request.validate().isEmpty(), is(true));
-        final FetchMemberResponse response = service.perform(request);
+        final FetchMemberService fetchMemberService = new FetchMemberService(settings, entityManager);
+        final FetchMemberRequest fetchMemberRequest = prepareRequest(FetchMemberRequest.class, Constants.ADMIN_ACCOUNT);
+        fetchMemberRequest.setMemberId(ADMIN_ID);
+        assertThat(fetchMemberRequest.validate().isEmpty(), is(true));
+        final FetchMemberResponse fetchMemberResponse = fetchMemberService.perform(fetchMemberRequest);
 
         // Verify that we have found the correct data
-        assertThat(response, is(not(nullValue())));
-        assertThat(response.isOk(), is(true));
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
-        assertThat(response.getReturnMessage(), is("Ok"));
-        assertThat(response.getMembers().size(), is(1));
-        assertThat(response.getCircles().isEmpty(), is(true));
-        assertThat(response.getMembers().get(0).getAccountName(), is(Constants.ADMIN_ACCOUNT));
+        assertThat(fetchMemberResponse, is(not(nullValue())));
+        assertThat(fetchMemberResponse.isOk(), is(true));
+        assertThat(fetchMemberResponse.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(fetchMemberResponse.getReturnMessage(), is("Ok"));
+        assertThat(fetchMemberResponse.getMembers().size(), is(1));
+        assertThat(fetchMemberResponse.getCircles().isEmpty(), is(true));
+        assertThat(fetchMemberResponse.getMembers().get(0).getAccountName(), is(Constants.ADMIN_ACCOUNT));
     }
 
     /**
@@ -237,20 +237,20 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
         // Ensure that we have the correct settings for the Service
         settings.set(StandardSetting.EXPOSE_ADMIN, "false");
 
-        final FetchMemberService service = new FetchMemberService(settings, entityManager);
-        final FetchMemberRequest request = prepareRequest(FetchMemberRequest.class, Constants.ADMIN_ACCOUNT);
-        request.setMemberId(ADMIN_ID);
-        assertThat(request.validate().isEmpty(), is(true));
-        final FetchMemberResponse response = service.perform(request);
+        final FetchMemberService fetchMemberService = new FetchMemberService(settings, entityManager);
+        final FetchMemberRequest fetchMemberRequest = prepareRequest(FetchMemberRequest.class, Constants.ADMIN_ACCOUNT);
+        fetchMemberRequest.setMemberId(ADMIN_ID);
+        assertThat(fetchMemberRequest.validate().isEmpty(), is(true));
+        final FetchMemberResponse fetchMemberResponse = fetchMemberService.perform(fetchMemberRequest);
 
         // Verify that we have found the correct data
-        assertThat(response, is(not(nullValue())));
-        assertThat(response.isOk(), is(true));
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
-        assertThat(response.getReturnMessage(), is("Ok"));
-        assertThat(response.getMembers().size(), is(1));
-        assertThat(response.getCircles().isEmpty(), is(true));
-        assertThat(response.getMembers().get(0).getAccountName(), is(Constants.ADMIN_ACCOUNT));
+        assertThat(fetchMemberResponse, is(not(nullValue())));
+        assertThat(fetchMemberResponse.isOk(), is(true));
+        assertThat(fetchMemberResponse.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(fetchMemberResponse.getReturnMessage(), is("Ok"));
+        assertThat(fetchMemberResponse.getMembers().size(), is(1));
+        assertThat(fetchMemberResponse.getCircles().isEmpty(), is(true));
+        assertThat(fetchMemberResponse.getMembers().get(0).getAccountName(), is(Constants.ADMIN_ACCOUNT));
     }
 
     /**
@@ -262,20 +262,20 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
         // Ensure that we have the correct settings for the Service
         settings.set(StandardSetting.SHOW_TRUSTEES, "false");
 
-        final FetchMemberService service = new FetchMemberService(settings, entityManager);
-        final MemberEntity member = findFirstMember();
-        final FetchMemberRequest request = prepareRequest(FetchMemberRequest.class, Constants.ADMIN_ACCOUNT);
-        request.setMemberId(member.getExternalId());
-        final FetchMemberResponse response = service.perform(request);
+        final FetchMemberService memberService = new FetchMemberService(settings, entityManager);
+        final MemberEntity firstMember = findFirstMember();
+        final FetchMemberRequest memberRequest = prepareRequest(FetchMemberRequest.class, Constants.ADMIN_ACCOUNT);
+        memberRequest.setMemberId(firstMember.getExternalId());
+        final FetchMemberResponse memberResponse = memberService.perform(memberRequest);
 
         // Verify that we have found the correct data
-        assertThat(response, is(not(nullValue())));
-        assertThat(response.isOk(), is(true));
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
-        assertThat(response.getReturnMessage(), is("Ok"));
-        assertThat(response.getMembers().size(), is(1));
-        assertThat(response.getCircles().size(), is(2));
-        assertThat(response.getMembers().get(0).getAccountName(), is(member.getName()));
+        assertThat(memberResponse, is(not(nullValue())));
+        assertThat(memberResponse.isOk(), is(true));
+        assertThat(memberResponse.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(memberResponse.getReturnMessage(), is("Ok"));
+        assertThat(memberResponse.getMembers().size(), is(1));
+        assertThat(memberResponse.getCircles().size(), is(2));
+        assertThat(memberResponse.getMembers().get(0).getAccountName(), is(firstMember.getName()));
     }
 
     /**
@@ -313,21 +313,21 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
         // Ensure that we have the correct settings for the Service
         settings.set(StandardSetting.EXPOSE_ADMIN, "true");
 
-        final FetchMemberService service = new FetchMemberService(settings, entityManager);
+        final FetchMemberService memberService = new FetchMemberService(settings, entityManager);
         final MemberEntity member = findFirstMember();
-        final FetchMemberRequest request = prepareRequest(FetchMemberRequest.class, member.getName());
-        request.setMemberId(ADMIN_ID);
-        assertThat(request.validate().isEmpty(), is(true));
-        final FetchMemberResponse response = service.perform(request);
+        final FetchMemberRequest memberRequest = prepareRequest(FetchMemberRequest.class, member.getName());
+        memberRequest.setMemberId(ADMIN_ID);
+        assertThat(memberRequest.validate().isEmpty(), is(true));
+        final FetchMemberResponse memberResponse = memberService.perform(memberRequest);
 
         // Verify that we have found the correct data
-        assertThat(response, is(not(nullValue())));
-        assertThat(response.isOk(), is(true));
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
-        assertThat(response.getReturnMessage(), is("Ok"));
-        assertThat(response.getMembers().size(), is(1));
-        assertThat(response.getCircles().isEmpty(), is(true));
-        assertThat(response.getMembers().get(0).getAccountName(), is(Constants.ADMIN_ACCOUNT));
+        assertThat(memberResponse, is(not(nullValue())));
+        assertThat(memberResponse.isOk(), is(true));
+        assertThat(memberResponse.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(memberResponse.getReturnMessage(), is("Ok"));
+        assertThat(memberResponse.getMembers().size(), is(1));
+        assertThat(memberResponse.getCircles().isEmpty(), is(true));
+        assertThat(memberResponse.getMembers().get(0).getAccountName(), is(Constants.ADMIN_ACCOUNT));
     }
 
     /**
@@ -354,17 +354,17 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
         // Ensure that we have the correct settings for the Service
         settings.set(StandardSetting.SHOW_TRUSTEES, "true");
 
-        final FetchMemberService service = new FetchMemberService(settings, entityManager);
+        final FetchMemberService memberService = new FetchMemberService(settings, entityManager);
         final MemberEntity member = findFirstMember();
-        final FetchMemberRequest request = prepareRequest(FetchMemberRequest.class, MEMBER_1);
-        request.setMemberId(member.getExternalId());
-        final FetchMemberResponse response = service.perform(request);
+        final FetchMemberRequest memberRequest = prepareRequest(FetchMemberRequest.class, MEMBER_1);
+        memberRequest.setMemberId(member.getExternalId());
+        final FetchMemberResponse memberResponse = memberService.perform(memberRequest);
 
         // Verify that we have found the correct data
-        assertThat(response, is(not(nullValue())));
-        assertThat(response.getMembers().size(), is(1));
-        assertThat(response.getCircles().size(), is(2));
-        assertThat(response.getMembers().get(0).getAccountName(), is(member.getName()));
+        assertThat(memberResponse, is(not(nullValue())));
+        assertThat(memberResponse.getMembers().size(), is(1));
+        assertThat(memberResponse.getCircles().size(), is(2));
+        assertThat(memberResponse.getMembers().get(0).getAccountName(), is(member.getName()));
     }
 
     @Test

@@ -31,6 +31,7 @@ public class CwsApplication extends Application {
         set.add(DataTypeService.class);
         set.add(MemberService.class);
         set.add(SanityService.class);
+        set.add(SettingService.class);
         set.add(SignatureService.class);
         set.add(VersionService.class);
 

@@ -18,11 +18,15 @@ public final class CWSClientException extends RuntimeException {
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
-    public CWSClientException(final String message, final Throwable cause) {
-        super(message, cause);
+    public CWSClientException(final String message) {
+        super(message);
     }
 
     public CWSClientException(final Throwable cause) {
         super(cause);
+    }
+
+    public CWSClientException(final String message, final Throwable cause) {
+        super(message, cause);
     }
 }

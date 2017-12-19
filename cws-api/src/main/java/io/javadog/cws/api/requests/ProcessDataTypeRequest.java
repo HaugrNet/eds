@@ -15,6 +15,7 @@ import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import java.util.Map;
 
@@ -23,6 +24,7 @@ import java.util.Map;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
+@XmlRootElement(name = "processDataTypeRequest")
 @XmlType(name = "processDataTypeRequest", propOrder = { Constants.FIELD_ACTION, Constants.FIELD_TYPENAME, Constants.FIELD_TYPE })
 public final class ProcessDataTypeRequest extends Authentication {
 

@@ -14,6 +14,7 @@ import io.javadog.cws.api.dtos.DataType;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
 /**
@@ -21,6 +22,7 @@ import javax.xml.bind.annotation.XmlType;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
+@XmlRootElement(name = "processDataTypeResult")
 @XmlType(name = "processDataTypeResult", propOrder = Constants.FIELD_DATATYPE)
 public final class ProcessDataTypeResponse extends CwsResponse {
 

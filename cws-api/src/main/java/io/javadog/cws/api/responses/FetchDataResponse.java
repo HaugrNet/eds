@@ -16,6 +16,7 @@ import io.javadog.cws.api.dtos.Metadata;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -26,6 +27,7 @@ import java.util.List;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
+@XmlRootElement(name = "fetchDataResult")
 @XmlType(name = "fetchDataResult", propOrder = { Constants.FIELD_METADATA, Constants.FIELD_RECORDS, Constants.FIELD_DATA })
 public final class FetchDataResponse extends CwsResponse {
 

@@ -15,6 +15,7 @@ import io.javadog.cws.api.dtos.Trustee;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -25,6 +26,7 @@ import java.util.List;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
+@XmlRootElement(name = "fetchCircleResult")
 @XmlType(name = "fetchCircleResult", propOrder = { Constants.FIELD_CIRCLES, Constants.FIELD_TRUSTEES })
 public final class FetchCircleResponse extends CwsResponse {
 

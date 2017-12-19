@@ -45,19 +45,7 @@ public class DataService {
     @Consumes(CwsApplication.CONSUMES)
     @Produces(CwsApplication.PRODUCES)
     public Response add(@NotNull final ProcessDataRequest addDataRequest) {
-        final Long startTime = System.nanoTime();
-        ProcessDataResponse response;
-
-        try {
-            addDataRequest.setAction(Action.ADD);
-            response = bean.processData(addDataRequest);
-            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "addData", startTime));
-        } catch (RuntimeException e) {
-            log.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "addData", startTime, e));
-            response = new ProcessDataResponse(ReturnCode.ERROR, e.getMessage());
-        }
-
-        return CwsApplication.buildResponse(response);
+        return processData(addDataRequest, Action.ADD, "addData");
     }
 
     @POST
@@ -65,19 +53,7 @@ public class DataService {
     @Consumes(CwsApplication.CONSUMES)
     @Produces(CwsApplication.PRODUCES)
     public Response update(@NotNull final ProcessDataRequest updateDataRequest) {
-        final Long startTime = System.nanoTime();
-        ProcessDataResponse response;
-
-        try {
-            updateDataRequest.setAction(Action.UPDATE);
-            response = bean.processData(updateDataRequest);
-            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "updateData", startTime));
-        } catch (RuntimeException e) {
-            log.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "updateData", startTime, e));
-            response = new ProcessDataResponse(ReturnCode.ERROR, e.getMessage());
-        }
-
-        return CwsApplication.buildResponse(response);
+        return processData(updateDataRequest, Action.UPDATE, "updateData");
     }
 
     @POST
@@ -86,19 +62,7 @@ public class DataService {
     @Consumes(CwsApplication.CONSUMES)
     @Produces(CwsApplication.PRODUCES)
     public Response delete(@NotNull final ProcessDataRequest deleteDataRequest) {
-        final Long startTime = System.nanoTime();
-        ProcessDataResponse response;
-
-        try {
-            deleteDataRequest.setAction(Action.DELETE);
-            response = bean.processData(deleteDataRequest);
-            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "deleteData", startTime));
-        } catch (RuntimeException e) {
-            log.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "deleteData", startTime, e));
-            response = new ProcessDataResponse(ReturnCode.ERROR, e.getMessage());
-        }
-
-        return CwsApplication.buildResponse(response);
+        return processData(deleteDataRequest, Action.DELETE, "deleteData");
     }
 
     @POST
@@ -115,6 +79,22 @@ public class DataService {
         } catch (RuntimeException e) {
             log.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "fetchData", startTime, e));
             response = new FetchDataResponse(ReturnCode.ERROR, e.getMessage());
+        }
+
+        return CwsApplication.buildResponse(response);
+    }
+
+    private Response processData(final ProcessDataRequest request, final Action action, final String logAction) {
+        final Long startTime = System.nanoTime();
+        ProcessDataResponse response;
+
+        try {
+            request.setAction(action);
+            response = bean.processData(request);
+            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), logAction, startTime));
+        } catch (RuntimeException e) {
+            log.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), logAction, startTime, e));
+            response = new ProcessDataResponse(ReturnCode.ERROR, e.getMessage());
         }
 
         return CwsApplication.buildResponse(response);

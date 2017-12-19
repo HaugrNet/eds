@@ -45,19 +45,7 @@ public class DataTypeService {
     @Consumes(CwsApplication.CONSUMES)
     @Produces(CwsApplication.PRODUCES)
     public Response process(@NotNull final ProcessDataTypeRequest processDataTypeRequest) {
-        final Long startTime = System.nanoTime();
-        ProcessDataTypeResponse response;
-
-        try {
-            processDataTypeRequest.setAction(Action.PROCESS);
-            response = bean.processDataType(processDataTypeRequest);
-            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "processDataType", startTime));
-        } catch (RuntimeException e) {
-            log.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "processDataType", startTime, e));
-            response = new ProcessDataTypeResponse(ReturnCode.ERROR, e.getMessage());
-        }
-
-        return CwsApplication.buildResponse(response);
+        return processDataType(processDataTypeRequest, Action.PROCESS, "processDataType");
     }
 
     @POST
@@ -66,19 +54,7 @@ public class DataTypeService {
     @Consumes(CwsApplication.CONSUMES)
     @Produces(CwsApplication.PRODUCES)
     public Response delete(@NotNull final ProcessDataTypeRequest deleteDataTypeRequest) {
-        final Long startTime = System.nanoTime();
-        ProcessDataTypeResponse response;
-
-        try {
-            deleteDataTypeRequest.setAction(Action.DELETE);
-            response = bean.processDataType(deleteDataTypeRequest);
-            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "deleteDataType", startTime));
-        } catch (RuntimeException e) {
-            log.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "deleteDataType", startTime, e));
-            response = new ProcessDataTypeResponse(ReturnCode.ERROR, e.getMessage());
-        }
-
-        return CwsApplication.buildResponse(response);
+        return processDataType(deleteDataTypeRequest, Action.DELETE, "deleteDataType");
     }
 
     @POST
@@ -95,6 +71,22 @@ public class DataTypeService {
         } catch (RuntimeException e) {
             log.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "fetchDataTypes", startTime, e));
             response = new FetchDataTypeResponse(ReturnCode.ERROR, e.getMessage());
+        }
+
+        return CwsApplication.buildResponse(response);
+    }
+
+    private Response processDataType(final ProcessDataTypeRequest request, final Action action, final String logAction) {
+        final Long startTime = System.nanoTime();
+        ProcessDataTypeResponse response;
+
+        try {
+            request.setAction(action);
+            response = bean.processDataType(request);
+            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), logAction, startTime));
+        } catch (RuntimeException e) {
+            log.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), logAction, startTime, e));
+            response = new ProcessDataTypeResponse(ReturnCode.ERROR, e.getMessage());
         }
 
         return CwsApplication.buildResponse(response);

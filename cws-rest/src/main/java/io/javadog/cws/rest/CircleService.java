@@ -45,19 +45,7 @@ public class CircleService {
     @Consumes(CwsApplication.CONSUMES)
     @Produces(CwsApplication.PRODUCES)
     public Response create(@NotNull final ProcessCircleRequest createCircleRequest) {
-        final Long startTime = System.nanoTime();
-        ProcessCircleResponse response;
-
-        try {
-            createCircleRequest.setAction(Action.CREATE);
-            response = bean.processCircle(createCircleRequest);
-            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "createCircle", startTime));
-        } catch (RuntimeException e) {
-            log.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "createCircle", startTime, e));
-            response = new ProcessCircleResponse(ReturnCode.ERROR, e.getMessage());
-        }
-
-        return CwsApplication.buildResponse(response);
+        return processCircle(createCircleRequest, Action.CREATE, "createCircle");
     }
 
     @POST
@@ -65,19 +53,7 @@ public class CircleService {
     @Consumes(CwsApplication.CONSUMES)
     @Produces(CwsApplication.PRODUCES)
     public Response update(@NotNull final ProcessCircleRequest updateCircleRequest) {
-        final Long startTime = System.nanoTime();
-        ProcessCircleResponse response;
-
-        try {
-            updateCircleRequest.setAction(Action.UPDATE);
-            response = bean.processCircle(updateCircleRequest);
-            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "updateCircle", startTime));
-        } catch (RuntimeException e) {
-            log.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "updateCircle", startTime, e));
-            response = new ProcessCircleResponse(ReturnCode.ERROR, e.getMessage());
-        }
-
-        return CwsApplication.buildResponse(response);
+        return processCircle(updateCircleRequest, Action.UPDATE, "updateCircle");
     }
 
     @POST
@@ -86,19 +62,7 @@ public class CircleService {
     @Consumes(CwsApplication.CONSUMES)
     @Produces(CwsApplication.PRODUCES)
     public Response delete(@NotNull final ProcessCircleRequest deleteCircleRequest) {
-        final Long startTime = System.nanoTime();
-        ProcessCircleResponse response;
-
-        try {
-            deleteCircleRequest.setAction(Action.DELETE);
-            response = bean.processCircle(deleteCircleRequest);
-            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "deleteCircle", startTime));
-        } catch (RuntimeException e) {
-            log.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "deleteCircle", startTime, e));
-            response = new ProcessCircleResponse(ReturnCode.ERROR, e.getMessage());
-        }
-
-        return CwsApplication.buildResponse(response);
+        return processCircle(deleteCircleRequest, Action.DELETE, "deleteCircle");
     }
 
     @POST
@@ -106,19 +70,7 @@ public class CircleService {
     @Consumes(CwsApplication.CONSUMES)
     @Produces(CwsApplication.PRODUCES)
     public Response add(@NotNull final ProcessCircleRequest addTrusteeRequest) {
-        final Long startTime = System.nanoTime();
-        ProcessCircleResponse response;
-
-        try {
-            addTrusteeRequest.setAction(Action.ADD);
-            response = bean.processCircle(addTrusteeRequest);
-            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "addTrustee", startTime));
-        } catch (RuntimeException e) {
-            log.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "addTrustee", startTime, e));
-            response = new ProcessCircleResponse(ReturnCode.ERROR, e.getMessage());
-        }
-
-        return CwsApplication.buildResponse(response);
+        return processCircle(addTrusteeRequest, Action.ADD, "addTrustee");
     }
 
     @POST
@@ -126,19 +78,7 @@ public class CircleService {
     @Consumes(CwsApplication.CONSUMES)
     @Produces(CwsApplication.PRODUCES)
     public Response alter(@NotNull final ProcessCircleRequest alterTrusteeRequest) {
-        final Long startTime = System.nanoTime();
-        ProcessCircleResponse response;
-
-        try {
-            alterTrusteeRequest.setAction(Action.ALTER);
-            response = bean.processCircle(alterTrusteeRequest);
-            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "alterTrustee", startTime));
-        } catch (RuntimeException e) {
-            log.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "alterTrustee", startTime, e));
-            response = new ProcessCircleResponse(ReturnCode.ERROR, e.getMessage());
-        }
-
-        return CwsApplication.buildResponse(response);
+        return processCircle(alterTrusteeRequest, Action.ALTER, "alterTrustee");
     }
 
     @POST
@@ -147,19 +87,7 @@ public class CircleService {
     @Consumes(CwsApplication.CONSUMES)
     @Produces(CwsApplication.PRODUCES)
     public Response remove(@NotNull final ProcessCircleRequest removeTrusteeRequest) {
-        final Long startTime = System.nanoTime();
-        ProcessCircleResponse response;
-
-        try {
-            removeTrusteeRequest.setAction(Action.REMOVE);
-            response = bean.processCircle(removeTrusteeRequest);
-            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "removeTrustee", startTime));
-        } catch (RuntimeException e) {
-            log.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "removeTrustee", startTime, e));
-            response = new ProcessCircleResponse(ReturnCode.ERROR, e.getMessage());
-        }
-
-        return CwsApplication.buildResponse(response);
+        return processCircle(removeTrusteeRequest, Action.REMOVE, "removeTrustee");
     }
 
     @POST
@@ -176,6 +104,22 @@ public class CircleService {
         } catch (RuntimeException e) {
             log.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "fetchCircles", startTime, e));
             response = new FetchCircleResponse(ReturnCode.ERROR, e.getMessage());
+        }
+
+        return CwsApplication.buildResponse(response);
+    }
+
+    private Response processCircle(final ProcessCircleRequest request, final Action action, final String logAction) {
+        final Long startTime = System.nanoTime();
+        ProcessCircleResponse response;
+
+        try {
+            request.setAction(action);
+            response = bean.processCircle(request);
+            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), logAction, startTime));
+        } catch (RuntimeException e) {
+            log.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), logAction, startTime, e));
+            response = new ProcessCircleResponse(ReturnCode.ERROR, e.getMessage());
         }
 
         return CwsApplication.buildResponse(response);

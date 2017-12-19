@@ -45,19 +45,7 @@ public class MemberService {
     @Consumes(CwsApplication.CONSUMES)
     @Produces(CwsApplication.PRODUCES)
     public Response create(@NotNull final ProcessMemberRequest createMemberRequest) {
-        final Long startTime = System.nanoTime();
-        ProcessMemberResponse response;
-
-        try {
-            createMemberRequest.setAction(Action.CREATE);
-            response = bean.processMember(createMemberRequest);
-            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "createMember", startTime));
-        } catch (RuntimeException e) {
-            log.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "createMember", startTime, e));
-            response = new ProcessMemberResponse(ReturnCode.ERROR, e.getMessage());
-        }
-
-        return CwsApplication.buildResponse(response);
+        return processMember(createMemberRequest, Action.CREATE, "createMember");
     }
 
     @POST
@@ -65,19 +53,7 @@ public class MemberService {
     @Consumes(CwsApplication.CONSUMES)
     @Produces(CwsApplication.PRODUCES)
     public Response invite(@NotNull final ProcessMemberRequest inviteMemberRequest) {
-        final Long startTime = System.nanoTime();
-        ProcessMemberResponse response;
-
-        try {
-            inviteMemberRequest.setAction(Action.INVITE);
-            response = bean.processMember(inviteMemberRequest);
-            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "inviteMember", startTime));
-        } catch (RuntimeException e) {
-            log.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "inviteMember", startTime, e));
-            response = new ProcessMemberResponse(ReturnCode.ERROR, e.getMessage());
-        }
-
-        return CwsApplication.buildResponse(response);
+        return processMember(inviteMemberRequest, Action.INVITE, "inviteMember");
     }
 
     @POST
@@ -85,19 +61,7 @@ public class MemberService {
     @Consumes(CwsApplication.CONSUMES)
     @Produces(CwsApplication.PRODUCES)
     public Response update(@NotNull final ProcessMemberRequest updateMemberRequest) {
-        final Long startTime = System.nanoTime();
-        ProcessMemberResponse response;
-
-        try {
-            updateMemberRequest.setAction(Action.UPDATE);
-            response = bean.processMember(updateMemberRequest);
-            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "updateMember", startTime));
-        } catch (RuntimeException e) {
-            log.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "updateMember", startTime, e));
-            response = new ProcessMemberResponse(ReturnCode.ERROR, e.getMessage());
-        }
-
-        return CwsApplication.buildResponse(response);
+        return processMember(updateMemberRequest, Action.UPDATE, "updateMember");
     }
 
     @POST
@@ -106,19 +70,7 @@ public class MemberService {
     @Consumes(CwsApplication.CONSUMES)
     @Produces(CwsApplication.PRODUCES)
     public Response delete(@NotNull final ProcessMemberRequest deleteMemberRequest) {
-        final Long startTime = System.nanoTime();
-        ProcessMemberResponse response;
-
-        try {
-            deleteMemberRequest.setAction(Action.DELETE);
-            response = bean.processMember(deleteMemberRequest);
-            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "deleteMember", startTime));
-        } catch (RuntimeException e) {
-            log.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "deleteMember", startTime, e));
-            response = new ProcessMemberResponse(ReturnCode.ERROR, e.getMessage());
-        }
-
-        return CwsApplication.buildResponse(response);
+        return processMember(deleteMemberRequest, Action.DELETE, "deleteMember");
     }
 
     @POST
@@ -135,6 +87,22 @@ public class MemberService {
         } catch (RuntimeException e) {
             log.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "fetchMembers", startTime, e));
             response = new FetchMemberResponse(ReturnCode.ERROR, e.getMessage());
+        }
+
+        return CwsApplication.buildResponse(response);
+    }
+
+    private Response processMember(final ProcessMemberRequest request, final Action action, final String logAction) {
+        final Long startTime = System.nanoTime();
+        ProcessMemberResponse response;
+
+        try {
+            request.setAction(action);
+            response = bean.processMember(request);
+            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), logAction, startTime));
+        } catch (RuntimeException e) {
+            log.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), logAction, startTime, e));
+            response = new ProcessMemberResponse(ReturnCode.ERROR, e.getMessage());
         }
 
         return CwsApplication.buildResponse(response);

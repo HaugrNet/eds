@@ -15,7 +15,6 @@ import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import java.util.Map;
 
@@ -24,7 +23,6 @@ import java.util.Map;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlRootElement(name = "verifyRequest")
 @XmlType(name = "verifyRequest", propOrder = { Constants.FIELD_SIGNATURE, Constants.FIELD_DATA })
 public final class VerifyRequest extends Authentication {
 

@@ -15,7 +15,6 @@ import io.javadog.cws.api.dtos.Member;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -26,7 +25,6 @@ import java.util.List;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlRootElement(name = "fetchMemberResult")
 @XmlType(name = "fetchMemberResult", propOrder = { Constants.FIELD_MEMBERS, Constants.FIELD_CIRCLES })
 public final class FetchMemberResponse extends CwsResponse {
 

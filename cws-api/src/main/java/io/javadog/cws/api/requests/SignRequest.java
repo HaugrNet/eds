@@ -15,7 +15,6 @@ import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import java.util.Date;
 import java.util.Map;
@@ -25,7 +24,6 @@ import java.util.Map;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlRootElement(name = "signRequest")
 @XmlType(name = "signRequest", propOrder = { Constants.FIELD_DATA, Constants.FIELD_EXPIRES })
 public final class SignRequest extends Authentication {
 

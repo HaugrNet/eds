@@ -13,7 +13,6 @@ import io.javadog.cws.api.common.ReturnCode;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import java.util.HashMap;
 import java.util.Map;
@@ -23,7 +22,6 @@ import java.util.Map;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlRootElement(name = "settingResult")
 @XmlType(name = "settingResult", propOrder = Constants.FIELD_SETTINGS)
 public final class SettingResponse extends CwsResponse {
 

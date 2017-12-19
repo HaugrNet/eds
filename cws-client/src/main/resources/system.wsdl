@@ -11,9 +11,17 @@
   <wsdl:types>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://ws.cws.javadog.io/" elementFormDefault="unqualified" targetNamespace="http://ws.cws.javadog.io/" version="1.0">
 
+  <xs:element name="fetchCircleRequest" type="tns:fetchCircleRequest"/>
+
+  <xs:element name="fetchCircleResult" type="tns:fetchCircleResult"/>
+
   <xs:element name="fetchCircles" type="tns:fetchCircles"/>
 
   <xs:element name="fetchCirclesResponse" type="tns:fetchCirclesResponse"/>
+
+  <xs:element name="fetchMemberRequest" type="tns:fetchMemberRequest"/>
+
+  <xs:element name="fetchMemberResult" type="tns:fetchMemberResult"/>
 
   <xs:element name="fetchMembers" type="tns:fetchMembers"/>
 
@@ -21,15 +29,31 @@
 
   <xs:element name="processCircle" type="tns:processCircle"/>
 
+  <xs:element name="processCircleRequest" type="tns:processCircleRequest"/>
+
   <xs:element name="processCircleResponse" type="tns:processCircleResponse"/>
+
+  <xs:element name="processCircleResult" type="tns:processCircleResult"/>
 
   <xs:element name="processMember" type="tns:processMember"/>
 
+  <xs:element name="processMemberRequest" type="tns:processMemberRequest"/>
+
   <xs:element name="processMemberResponse" type="tns:processMemberResponse"/>
+
+  <xs:element name="processMemberResult" type="tns:processMemberResult"/>
 
   <xs:element name="sanitized" type="tns:sanitized"/>
 
   <xs:element name="sanitizedResponse" type="tns:sanitizedResponse"/>
+
+  <xs:element name="sanityRequest" type="tns:sanityRequest"/>
+
+  <xs:element name="sanityResult" type="tns:sanityResult"/>
+
+  <xs:element name="settingRequest" type="tns:settingRequest"/>
+
+  <xs:element name="settingResult" type="tns:settingResult"/>
 
   <xs:element name="settings" type="tns:settings"/>
 
@@ -38,6 +62,8 @@
   <xs:element name="version" type="tns:version"/>
 
   <xs:element name="versionResponse" type="tns:versionResponse"/>
+
+  <xs:element name="versionResult" type="tns:versionResult"/>
 
   <xs:complexType name="sanitized">
     <xs:sequence>

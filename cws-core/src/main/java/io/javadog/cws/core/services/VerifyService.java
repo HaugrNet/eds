@@ -17,8 +17,6 @@ import io.javadog.cws.core.model.entities.SignatureEntity;
 import javax.persistence.EntityManager;
 import java.security.PublicKey;
 import java.util.Date;
-import java.util.Map;
-import java.util.Objects;
 
 /**
  * @author Kim Jensen
@@ -28,13 +26,6 @@ public final class VerifyService extends Serviceable<VerifyResponse, VerifyReque
 
     public VerifyService(final Settings settings, final EntityManager entityManager) {
         super(settings, entityManager);
-        final Map<String, Object> map = entityManager.getEntityManagerFactory().getProperties();
-        for (final Map.Entry<String, Object> entry : map.entrySet()) {
-            final String key = entry.getKey();
-            if (Objects.equals(key, "javax.persistence.jdbc.driver")) {
-                System.out.println("Database Driver is: '" + entry.getValue() + "'.");
-            }
-        }
     }
 
     /**

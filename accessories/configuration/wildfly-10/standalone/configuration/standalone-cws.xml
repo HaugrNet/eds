@@ -109,6 +109,9 @@
             <logger category="com.arjuna">
                 <level name="WARN"/>
             </logger>
+            <logger category="org.hibernate">
+                <level name="WARN"/>
+            </logger>
             <logger category="org.jboss.as.config">
                 <level name="DEBUG"/>
             </logger>
@@ -116,12 +119,12 @@
                 <level name="WARN"/>
             </logger>
             <logger category="io.javadog.cws">
-                <level name="WARN"/>
+                <level name="INFO"/>
             </logger>
             <root-logger>
                 <level name="INFO"/>
                 <handlers>
-                    <handler name="CONSOLE"/>
+                    <!--<handler name="CONSOLE"/>-->
                     <handler name="FILE"/>
                 </handlers>
             </root-logger>

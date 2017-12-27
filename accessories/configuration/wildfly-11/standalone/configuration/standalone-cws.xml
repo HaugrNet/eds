@@ -111,6 +111,9 @@
             <logger category="org.hibernate.dialect.function.TemplateRenderer">
                 <level name="ERROR"/>
             </logger>
+            <logger category="org.hibernate">
+                <level name="WARN"/>
+            </logger>
             <logger category="org.jboss.as.config">
                 <level name="DEBUG"/>
             </logger>
@@ -123,7 +126,7 @@
             <root-logger>
                 <level name="INFO"/>
                 <handlers>
-                    <handler name="CONSOLE"/>
+                    <!--<handler name="CONSOLE"/>-->
                     <handler name="FILE"/>
                 </handlers>
             </root-logger>
@@ -549,7 +552,7 @@
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:webservices:2.0">
             <modify-wsdl-address>true</modify-wsdl-address>
-            <wsdl-host>${jboss.bind.address:127.0.0.1}</wsdl-host>
+            <wsdl-host>jbossws.undefined.host</wsdl-host>
             <endpoint-config name="Standard-Endpoint-Config"/>
             <endpoint-config name="Recording-Endpoint-Config">
                 <pre-handler-chain name="recording-handlers" protocol-bindings="##SOAP11_HTTP ##SOAP11_HTTP_MTOM ##SOAP12_HTTP ##SOAP12_HTTP_MTOM">

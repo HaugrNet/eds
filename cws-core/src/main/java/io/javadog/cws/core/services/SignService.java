@@ -39,6 +39,7 @@ public final class SignService extends Serviceable<SignResponse, SignRequest> {
 
         if (existing == null) {
             final SignatureEntity entity = new SignatureEntity();
+            entity.setPublicKey(member.getPublicKey());
             entity.setMember(member);
             entity.setChecksum(checksum);
             entity.setExpires(request.getExpires());

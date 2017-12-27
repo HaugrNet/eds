@@ -40,9 +40,12 @@ import java.util.Date;
 @Table(name = "cws_signatures")
 public class SignatureEntity extends CWSEntity {
 
-    @ManyToOne(targetEntity = MemberEntity.class, fetch = FetchType.EAGER, optional = false)
+    @ManyToOne(targetEntity = MemberEntity.class, fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "member_id", referencedColumnName = "id", nullable = false, updatable = false)
     private MemberEntity member = null;
+
+    @Column(name = "public_key", nullable = false, length = 3072)
+    private String publicKey = null;
 
     @Column(name = "checksum", updatable = false, length = MAX_STRING_LENGTH)
     private String checksum = null;
@@ -57,6 +60,14 @@ public class SignatureEntity extends CWSEntity {
     // =========================================================================
     // Entity Setters & Getters
     // =========================================================================
+
+    public void setPublicKey(final String publicKey) {
+        this.publicKey = publicKey;
+    }
+
+    public String getPublicKey() {
+        return publicKey;
+    }
 
     public void setMember(final MemberEntity member) {
         this.member = member;

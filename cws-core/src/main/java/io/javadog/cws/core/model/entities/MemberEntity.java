@@ -56,10 +56,10 @@ public class MemberEntity extends Externable {
     @Column(name = "rsa_algorithm", nullable = false, length = 10)
     private KeyAlgorithm rsaAlgorithm = null;
 
-    @Column(name = "public_key", nullable = false, length = 1024)
+    @Column(name = "public_key", nullable = false, length = 3072)
     private String publicKey = null;
 
-    @Column(name = "private_key", nullable = false, length = 8192)
+    @Column(name = "private_key", nullable = false, length = 16384)
     private String privateKey = null;
 
     // =========================================================================

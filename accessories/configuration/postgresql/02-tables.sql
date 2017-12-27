@@ -114,8 +114,8 @@ CREATE TABLE cws_members (
   salt             VARCHAR(36),
   pbe_algorithm    VARCHAR(19) DEFAULT 'PBE128',
   rsa_algorithm    VARCHAR(19) DEFAULT 'RSA2048',
-  public_key       VARCHAR(1536), -- Public Key, stored armored
-  private_key      VARCHAR(8192), -- Private Key, stored encrypted & armored
+  public_key       VARCHAR(3072),  -- Public Key, stored armored
+  private_key      VARCHAR(16384), -- Private Key, stored encrypted & armored
   altered          TIMESTAMP DEFAULT now(),
   added            TIMESTAMP DEFAULT now(),
 
@@ -427,6 +427,7 @@ CREATE TABLE cws_data (
 -- =============================================================================
 CREATE TABLE cws_signatures (
   id               SERIAL,
+  public_key       VARCHAR(3072), -- Public Key, stored armored
   checksum         VARCHAR(256),
   member_id        INTEGER,
   expires          TIMESTAMP,
@@ -443,6 +444,7 @@ CREATE TABLE cws_signatures (
 
   /* Not Null Constraints */
   CONSTRAINT signarure_notnull_id           CHECK (id IS NOT NULL),
+  CONSTRAINT signature_notnull_public_key   CHECK (public_key IS NOT NULL),
   CONSTRAINT signature_notnull_checksum     CHECK (checksum IS NOT NULL),
   CONSTRAINT signarure_notnull_member_id    CHECK (member_id IS NOT NULL),
   CONSTRAINT signarure_notnull_altered      CHECK (altered IS NOT NULL),

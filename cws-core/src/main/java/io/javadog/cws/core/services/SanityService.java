@@ -66,7 +66,7 @@ public final class SanityService extends Serviceable<SanityResponse, SanityReque
     }
 
     private static List<Sanity> convertRecords(final List<DataEntity> found) {
-        final List<Sanity> sanities = new ArrayList<>();
+        final List<Sanity> sanities = new ArrayList<>(found.size());
 
         for (final DataEntity entity : found) {
             final Sanity sanity = new Sanity();

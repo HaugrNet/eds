@@ -170,6 +170,8 @@ public final class SystemSoapClient implements System {
         if (api != null) {
             ws = new io.javadog.cws.ws.SanityRequest();
             Mapper.fillAuthentication(ws, api);
+            ws.setCircleId(Mapper.convert(Constants.FIELD_CIRCLE_ID, api.getCircleId()));
+            ws.setSince(Mapper.map(api.getSince()));
         }
 
         return ws;

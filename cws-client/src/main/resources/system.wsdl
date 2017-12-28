@@ -74,7 +74,10 @@
   <xs:complexType final="extension restriction" name="sanityRequest">
     <xs:complexContent>
       <xs:extension base="tns:authentication">
-        <xs:sequence/>
+        <xs:sequence>
+          <xs:element minOccurs="0" name="circleId" nillable="true" type="xs:string"/>
+          <xs:element minOccurs="0" name="since" type="xs:dateTime"/>
+        </xs:sequence>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>

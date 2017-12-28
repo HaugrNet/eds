@@ -34,31 +34,34 @@ public final class SanityServiceTest extends DatabaseSetup {
 
     @Test
     public void testRequestAsSystemAdministrator() {
+        prepareInvalidData();
         final SanityRequest request = prepareRequest(SanityRequest.class, Constants.ADMIN_ACCOUNT);
         final SanityService service = new SanityService(settings, entityManager);
         final SanityResponse response = service.perform(request);
         assertThat(response.isOk(), is(true));
-        assertThat(response.getSanities().isEmpty(), is(true));
+        assertThat(response.getSanities().size(), is(6));
     }
 
     @Test
     public void testRequestAsSystemAdministratorForCircle() {
+        prepareInvalidData();
         final SanityRequest request = prepareRequest(SanityRequest.class, Constants.ADMIN_ACCOUNT);
         request.setCircleId(CIRCLE_3_ID);
         request.setSince(new Date(0L));
         final SanityService service = new SanityService(settings, entityManager);
         final SanityResponse response = service.perform(request);
         assertThat(response.isOk(), is(true));
-        assertThat(response.getSanities().isEmpty(), is(true));
+        assertThat(response.getSanities().size(), is(2));
     }
 
     @Test
     public void testRequestAsCircleAdministratorForCircle() {
+        prepareInvalidData();
         final SanityRequest request = prepareRequest(SanityRequest.class, MEMBER_1);
         final SanityService service = new SanityService(settings, entityManager);
         final SanityResponse response = service.perform(request);
         assertThat(response.isOk(), is(true));
-        assertThat(response.getSanities().isEmpty(), is(true));
+        assertThat(response.getSanities().size(), is(4));
     }
 
     @Test
@@ -111,6 +114,16 @@ public final class SanityServiceTest extends DatabaseSetup {
     // =========================================================================
     // Internal Helper Methods
     // =========================================================================
+
+    private void prepareInvalidData() {
+        final ProcessDataService service = new ProcessDataService(settings, entityManager);
+        falsifyChecksum(service.perform(prepareAddRequest(MEMBER_1, CIRCLE_1_ID, "Data1", 524288)));
+        falsifyChecksum(service.perform(prepareAddRequest(MEMBER_1, CIRCLE_1_ID, "Data2", 1048576)));
+        falsifyChecksum(service.perform(prepareAddRequest(MEMBER_1, CIRCLE_2_ID, "Data3", 524288)));
+        falsifyChecksum(service.perform(prepareAddRequest(MEMBER_1, CIRCLE_2_ID, "Data4", 1048576)));
+        falsifyChecksum(service.perform(prepareAddRequest(MEMBER_4, CIRCLE_3_ID, "Data5", 524288)));
+        falsifyChecksum(service.perform(prepareAddRequest(MEMBER_4, CIRCLE_3_ID, "Data6", 1048576)));
+    }
 
     private static ProcessDataRequest prepareAddRequest(final String account, final String circleId, final String dataName, final int bytes) {
         final ProcessDataRequest request = prepareRequest(ProcessDataRequest.class, account);

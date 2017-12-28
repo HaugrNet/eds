@@ -17,6 +17,7 @@ import io.javadog.cws.api.common.TrustLevel;
 import io.javadog.cws.api.requests.Authentication;
 import io.javadog.cws.api.responses.ProcessDataResponse;
 import io.javadog.cws.core.enums.KeyAlgorithm;
+import io.javadog.cws.core.enums.SanityStatus;
 import io.javadog.cws.core.enums.Status;
 import io.javadog.cws.core.exceptions.CWSException;
 import io.javadog.cws.core.jce.CWSKeyPair;
@@ -268,6 +269,8 @@ public class DatabaseSetup {
         query.setParameter("eid", response.getDataId());
         final DataEntity entity = (DataEntity) query.getSingleResult();
         entity.setChecksum(UUID.randomUUID().toString());
+        entity.setSanityStatus(SanityStatus.FAILED);
+        entity.setSanityChecked(new Date());
         entityManager.persist(entity);
     }
 

@@ -67,6 +67,12 @@ public enum Action {
     ALTER,
 
     /**
+     * <p>Invalidating an Account, means that the Account is being made
+     * unreadable and it is not possible for Account to be used again.</p>
+     */
+    INVALIDATE,
+
+    /**
      * <p>This Action allows a Circle or System Administrator to remove a Member
      * from a Circle. A Circle Administrator cannot remove themselves from a
      * Circle.</p>

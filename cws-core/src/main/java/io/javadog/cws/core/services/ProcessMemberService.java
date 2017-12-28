@@ -10,6 +10,7 @@ package io.javadog.cws.core.services;
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.CredentialType;
 import io.javadog.cws.api.common.ReturnCode;
+import io.javadog.cws.api.common.TrustLevel;
 import io.javadog.cws.api.requests.ProcessMemberRequest;
 import io.javadog.cws.api.responses.ProcessMemberResponse;
 import io.javadog.cws.core.enums.KeyAlgorithm;
@@ -20,9 +21,12 @@ import io.javadog.cws.core.jce.CWSKeyPair;
 import io.javadog.cws.core.jce.SecretCWSKey;
 import io.javadog.cws.core.model.Settings;
 import io.javadog.cws.core.model.entities.MemberEntity;
+import io.javadog.cws.core.model.entities.TrusteeEntity;
 
 import javax.persistence.EntityManager;
 import java.security.PublicKey;
+import java.util.EnumSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -58,6 +62,9 @@ public final class ProcessMemberService extends Serviceable<ProcessMemberRespons
                         break;
                     case UPDATE:
                         response = processSelf(request);
+                        break;
+                    case INVALIDATE:
+                        response = invalidate();
                         break;
                     case DELETE:
                         response = deleteMember(request);
@@ -140,11 +147,36 @@ public final class ProcessMemberService extends Serviceable<ProcessMemberRespons
         }
 
         if (request.getNewCredential() != null) {
-            updateMemberPassword(member, request.getNewCredential());
+            final CWSKeyPair pair = updateMemberPassword(member, request.getNewCredential());
+
+            final List<TrusteeEntity> list = dao.findTrustByMember(member, EnumSet.allOf(TrustLevel.class));
+            for (final TrusteeEntity trustee : list) {
+                final KeyAlgorithm algorithm = trustee.getKey().getAlgorithm();
+                final SecretCWSKey circleKey = crypto.extractCircleKey(algorithm, keyPair.getPrivate(), trustee.getCircleKey());
+                trustee.setCircleKey(crypto.encryptAndArmorCircleKey(pair.getPublic(), circleKey));
+
+                dao.persist(trustee);
+            }
         }
 
         dao.persist(member);
 
+        return response;
+    }
+
+    /**
+     * <p>This method will invalidate the invoking Member Account, by updating
+     * the passphrase for the Account to a new random value and then use it
+     * internally, to also update the members KeyPair. Thus rendering the
+     * Account completely useless.</p>
+     *
+     * @return New Response Object
+     */
+    private ProcessMemberResponse invalidate() {
+        updateMemberPassword(member, UUID.randomUUID().toString());
+
+        final ProcessMemberResponse response = new ProcessMemberResponse();
+        response.setReturnMessage("Account has been Invalidated.");
         return response;
     }
 

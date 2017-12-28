@@ -16,9 +16,14 @@ import io.javadog.cws.api.common.Action;
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.CredentialType;
 import io.javadog.cws.api.common.ReturnCode;
+import io.javadog.cws.api.requests.FetchDataRequest;
+import io.javadog.cws.api.requests.ProcessDataRequest;
 import io.javadog.cws.api.requests.ProcessMemberRequest;
+import io.javadog.cws.api.responses.FetchDataResponse;
+import io.javadog.cws.api.responses.ProcessDataResponse;
 import io.javadog.cws.api.responses.ProcessMemberResponse;
 import io.javadog.cws.core.DatabaseSetup;
+import io.javadog.cws.core.exceptions.AuthenticationException;
 import io.javadog.cws.core.exceptions.CWSException;
 import io.javadog.cws.core.exceptions.CryptoException;
 import org.junit.Test;
@@ -218,6 +223,53 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
         service.perform(request);
     }
 
+    /**
+     * When a member is updating the passphrase, then it will result in a new
+     * KeyPair generated internally, this means that the internal Keys must also
+     * be updated for each Circle, which the Member belongs to. This test will
+     * add some data, change the Passphrase and verify that the data can be
+     * read out both before and after the change.
+     */
+    @Test
+    public void testUpdatePassphraseWithDataVerification() {
+        final String dataId = addData(MEMBER_1, CIRCLE_1_ID);
+        final byte[] data1 = fetchData(MEMBER_1, dataId);
+
+        final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
+        final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, MEMBER_1);
+        request.setAction(Action.UPDATE);
+        request.setNewCredential("My new Passphrase");
+        final ProcessMemberResponse response = service.perform(request);
+        assertThat(response.isOk(), is(true));
+
+        final FetchDataService fetchService = new FetchDataService(settings, entityManager);
+        final FetchDataRequest fetchRequest = prepareRequest(FetchDataRequest.class, MEMBER_1);
+        fetchRequest.setCredential("My new Passphrase");
+        fetchRequest.setDataId(dataId);
+
+        final FetchDataResponse dataResponse = fetchService.perform(fetchRequest);
+        assertThat(dataResponse.isOk(), is(true));
+        final byte[] data2 = dataResponse.getData();
+        assertThat(data1, is(data2));
+    }
+
+    @Test
+    public void testInvalidateSelf() {
+        prepareCause(AuthenticationException.class, ReturnCode.AUTHENTICATION_WARNING, "Cannot authenticate the Account '" + MEMBER_4 + "' from the given Credentials.");
+
+        final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
+        final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, MEMBER_4);
+        request.setAction(Action.INVALIDATE);
+
+        final ProcessMemberResponse response = service.perform(request);
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(response.getReturnMessage(), is("Account has been Invalidated."));
+
+        request.setAction(Action.UPDATE);
+        request.setNewCredential("New Passphrase");
+        service.perform(request);
+    }
+
     @Test
     public void testDeleteMember() {
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
@@ -253,5 +305,29 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
         final ProcessMemberResponse response = service.perform(request);
         assertThat(response.getReturnCode(), is(ReturnCode.IDENTIFICATION_ERROR));
         assertThat(response.getReturnMessage(), is("It is not permitted to delete the Admin Account."));
+    }
+
+    private String addData(final String member, final String circleId) {
+        final ProcessDataService service = new ProcessDataService(settings, entityManager);
+
+        final ProcessDataRequest dataRequest = prepareRequest(ProcessDataRequest.class, member);
+        dataRequest.setAction(Action.ADD);
+        dataRequest.setCircleId(circleId);
+        dataRequest.setDataName(UUID.randomUUID().toString());
+        dataRequest.setData(generateData(1048576));
+
+        final ProcessDataResponse response = service.perform(dataRequest);
+        assertThat(response.isOk(), is(true));
+        return response.getDataId();
+    }
+
+    private byte[] fetchData(final String member, final String dataId) {
+        final FetchDataService service = new FetchDataService(settings, entityManager);
+        final FetchDataRequest request = prepareRequest(FetchDataRequest.class, member);
+        request.setDataId(dataId);
+
+        final FetchDataResponse response = service.perform(request);
+        assertThat(response.isOk(), is(true));
+        return response.getData();
     }
 }

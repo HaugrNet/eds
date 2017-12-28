@@ -423,6 +423,7 @@
       <xs:enumeration value="DELETE"/>
       <xs:enumeration value="ADD"/>
       <xs:enumeration value="ALTER"/>
+      <xs:enumeration value="INVALIDATE"/>
       <xs:enumeration value="REMOVE"/>
     </xs:restriction>
   </xs:simpleType>

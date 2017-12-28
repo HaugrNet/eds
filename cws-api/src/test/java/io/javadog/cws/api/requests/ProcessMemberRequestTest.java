@@ -146,6 +146,16 @@ public final class ProcessMemberRequestTest {
     }
 
     @Test
+    public void testInvalidate() {
+        final ProcessMemberRequest request = new ProcessMemberRequest();
+        request.setAccountName(Constants.ADMIN_ACCOUNT);
+        request.setCredential(Constants.ADMIN_ACCOUNT);
+        request.setAction(Action.INVALIDATE);
+        final Map<String, String> errors = request.validate();
+        assertThat(errors.isEmpty(), is(true));
+    }
+
+    @Test
     public void testActionDelete() {
         final ProcessMemberRequest request = new ProcessMemberRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);

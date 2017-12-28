@@ -203,7 +203,7 @@ public abstract class Serviceable<R extends CwsResponse, V extends Authenticatio
         return account;
     }
 
-    protected void updateMemberPassword(final MemberEntity member, final String password) {
+    protected CWSKeyPair updateMemberPassword(final MemberEntity member, final String password) {
         final KeyAlgorithm pbeAlgorithm = settings.getPasswordAlgorithm();
         final KeyAlgorithm rsaAlgorithm = settings.getAsymmetricAlgorithm();
         final String salt = UUID.randomUUID().toString();
@@ -219,6 +219,8 @@ public abstract class Serviceable<R extends CwsResponse, V extends Authenticatio
         member.setRsaAlgorithm(rsaAlgorithm);
         member.setPrivateKey(privateKey);
         member.setPublicKey(publicKey);
+
+        return pair;
     }
 
     private void checkCredentials(final V verifiable) {

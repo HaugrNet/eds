@@ -111,6 +111,8 @@ public final class ProcessMemberRequest extends Authentication {
                 case UPDATE:
                     checkNotTooLong(errors, Constants.FIELD_NEW_ACCOUNT_NAME, newAccountName, Constants.MAX_NAME_LENGTH, newAccountErrorMessage);
                     break;
+                case INVALIDATE:
+                    break;
                 case DELETE:
                     checkNotNullAndValidId(errors, Constants.FIELD_MEMBER_ID, memberId, "A valid memberId is required to delete an account.");
                     break;

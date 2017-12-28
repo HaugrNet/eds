@@ -28,6 +28,7 @@ import io.javadog.cws.core.exceptions.CWSException;
 import io.javadog.cws.core.exceptions.VerificationException;
 import org.junit.Test;
 
+import java.util.Date;
 import java.util.UUID;
 
 /**
@@ -177,7 +178,7 @@ public final class DataServiceTest extends DatabaseSetup {
 
         final ProcessDataResponse response = service.perform(request);
         assertThat(response.isOk(), is(true));
-        falsifyChecksum(response);
+        falsifyChecksum(response, new Date());
 
         // Now to the actual test - reading the data with invalid checksum
         final FetchDataService readService = new FetchDataService(settings, entityManager);

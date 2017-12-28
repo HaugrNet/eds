@@ -257,9 +257,10 @@ public class DatabaseSetup {
      * the Data Checksum is not matching the data anymore - a backdoor is needed
      * into the database whereby it is achieved. This method will do just that.
      *
-     * @param response Process Data Response Object
+     * @param response    Process Data Response Object
+     * @param sanityCheck The timestamp for the last sanity check
      */
-    protected void falsifyChecksum(final ProcessDataResponse response) {
+    protected void falsifyChecksum(final ProcessDataResponse response, final Date sanityCheck) {
         // Now to the tricky part. We wish to test that the checksum is invalid,
         // and thus resulting in a correct error message. As the checksum is
         // controlled internally by CWS, it cannot be altered (rightfully) via
@@ -270,7 +271,7 @@ public class DatabaseSetup {
         final DataEntity entity = (DataEntity) query.getSingleResult();
         entity.setChecksum(UUID.randomUUID().toString());
         entity.setSanityStatus(SanityStatus.FAILED);
-        entity.setSanityChecked(new Date());
+        entity.setSanityChecked(sanityCheck);
         entityManager.persist(entity);
     }
 

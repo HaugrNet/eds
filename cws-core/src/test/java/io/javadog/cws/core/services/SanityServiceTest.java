@@ -47,11 +47,11 @@ public final class SanityServiceTest extends DatabaseSetup {
         prepareInvalidData();
         final SanityRequest request = prepareRequest(SanityRequest.class, Constants.ADMIN_ACCOUNT);
         request.setCircleId(CIRCLE_3_ID);
-        request.setSince(new Date(0L));
+        request.setSince(new Date(10000L));
         final SanityService service = new SanityService(settings, entityManager);
         final SanityResponse response = service.perform(request);
         assertThat(response.isOk(), is(true));
-        assertThat(response.getSanities().size(), is(2));
+        assertThat(response.getSanities().size(), is(1));
     }
 
     @Test
@@ -93,7 +93,7 @@ public final class SanityServiceTest extends DatabaseSetup {
 
         final ProcessDataResponse response = dataService.perform(dataRequest);
         assertThat(response.isOk(), is(true));
-        falsifyChecksum(response);
+        falsifyChecksum(response, new Date());
 
         // Now to the actual test - reading the data with invalid checksum
         final FetchDataService readDataService = new FetchDataService(settings, entityManager);
@@ -117,12 +117,12 @@ public final class SanityServiceTest extends DatabaseSetup {
 
     private void prepareInvalidData() {
         final ProcessDataService service = new ProcessDataService(settings, entityManager);
-        falsifyChecksum(service.perform(prepareAddRequest(MEMBER_1, CIRCLE_1_ID, "Data1", 524288)));
-        falsifyChecksum(service.perform(prepareAddRequest(MEMBER_1, CIRCLE_1_ID, "Data2", 1048576)));
-        falsifyChecksum(service.perform(prepareAddRequest(MEMBER_1, CIRCLE_2_ID, "Data3", 524288)));
-        falsifyChecksum(service.perform(prepareAddRequest(MEMBER_1, CIRCLE_2_ID, "Data4", 1048576)));
-        falsifyChecksum(service.perform(prepareAddRequest(MEMBER_4, CIRCLE_3_ID, "Data5", 524288)));
-        falsifyChecksum(service.perform(prepareAddRequest(MEMBER_4, CIRCLE_3_ID, "Data6", 1048576)));
+        falsifyChecksum(service.perform(prepareAddRequest(MEMBER_1, CIRCLE_1_ID, "Data1", 524288)), new Date(10L));
+        falsifyChecksum(service.perform(prepareAddRequest(MEMBER_1, CIRCLE_1_ID, "Data2", 1048576)), new Date());
+        falsifyChecksum(service.perform(prepareAddRequest(MEMBER_1, CIRCLE_2_ID, "Data3", 524288)), new Date(10L));
+        falsifyChecksum(service.perform(prepareAddRequest(MEMBER_1, CIRCLE_2_ID, "Data4", 1048576)), new Date());
+        falsifyChecksum(service.perform(prepareAddRequest(MEMBER_4, CIRCLE_3_ID, "Data5", 524288)), new Date(10L));
+        falsifyChecksum(service.perform(prepareAddRequest(MEMBER_4, CIRCLE_3_ID, "Data6", 1048576)), new Date());
     }
 
     private static ProcessDataRequest prepareAddRequest(final String account, final String circleId, final String dataName, final int bytes) {

@@ -40,7 +40,21 @@ import java.util.Date;
         @NamedQuery(name = "data.findAllWithState",
                 query = "select d " +
                         "from DataEntity d " +
-                        "where d.sanityStatus = :status"),
+                        "where d.sanityStatus = :status" +
+                        "  and d.sanityChecked >= :since"),
+        @NamedQuery(name = "data.findAllWithStateForCircle",
+                query = "select d " +
+                        "from DataEntity d " +
+                        "where d.sanityStatus = :status" +
+                        "  and d.sanityChecked >= :since" +
+                        "  and d.metadata.circle.externalId = :externalId"),
+        @NamedQuery(name = "data.findAllWithStateForMember",
+                query = "select d " +
+                        "from DataEntity d, TrusteeEntity t " +
+                        "where t.circle = d.metadata.circle" +
+                        "  and d.sanityStatus = :status" +
+                        "  and d.sanityChecked >= :since" +
+                        "  and t.member = :member"),
         @NamedQuery(name = "data.findByMemberAndExternalId",
                 query = "select d " +
                         "from DataEntity d," +

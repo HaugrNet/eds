@@ -13,7 +13,9 @@ import static org.junit.Assert.assertThat;
 import io.javadog.cws.api.common.Constants;
 import org.junit.Test;
 
+import java.util.Date;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * @author Kim Jensen
@@ -23,23 +25,46 @@ public final class SanityRequestTest {
 
     @Test
     public void testClassflow() {
-        final SanityRequest request = new SanityRequest();
-        request.setAccountName(Constants.ADMIN_ACCOUNT);
-        request.setCredential(Constants.ADMIN_ACCOUNT);
-        final Map<String, String> errors = request.validate();
+        final String circleId = UUID.randomUUID().toString();
+        final Date since = new Date();
 
+        final SanityRequest sanityRequest = new SanityRequest();
+        sanityRequest.setAccountName(Constants.ADMIN_ACCOUNT);
+        sanityRequest.setCredential(Constants.ADMIN_ACCOUNT);
+        sanityRequest.setCircleId(circleId);
+        sanityRequest.setSince(since);
+
+        final Map<String, String> errors = sanityRequest.validate();
         assertThat(errors.isEmpty(), is(true));
-        assertThat(request.getAccountName(), is(Constants.ADMIN_ACCOUNT));
-        assertThat(request.getCredential(), is(Constants.ADMIN_ACCOUNT));
+        assertThat(sanityRequest.getAccountName(), is(Constants.ADMIN_ACCOUNT));
+        assertThat(sanityRequest.getCredential(), is(Constants.ADMIN_ACCOUNT));
+        assertThat(sanityRequest.getCircleId(), is(circleId));
+        assertThat(sanityRequest.getSince(), is(since));
     }
 
     @Test
     public void testEmptyClass() {
-        final SanityRequest request = new SanityRequest();
-        final Map<String, String> errors = request.validate();
+        final SanityRequest sanityRequest = new SanityRequest();
+        final Map<String, String> errors = sanityRequest.validate();
 
+        assertThat(errors.isEmpty(), is(false));
         assertThat(errors.size(), is(2));
         assertThat(errors.get(Constants.FIELD_ACCOUNT_NAME), is("AccountName is missing, null or invalid."));
         assertThat(errors.get(Constants.FIELD_CREDENTIAL), is("The Credential is missing."));
+    }
+
+    @Test
+    public void testClassWithInvalidValues() {
+        final String circleId = "Invalid Circle Id";
+
+        final SanityRequest sanityRequest = new SanityRequest();
+        sanityRequest.setCircleId(circleId);
+
+        final Map<String, String> errors = sanityRequest.validate();
+        assertThat(errors.isEmpty(), is(false));
+        assertThat(errors.size(), is(3));
+        assertThat(errors.get(Constants.FIELD_ACCOUNT_NAME), is("AccountName is missing, null or invalid."));
+        assertThat(errors.get(Constants.FIELD_CREDENTIAL), is("The Credential is missing."));
+        assertThat(errors.get(Constants.FIELD_CIRCLE_ID), is("The Circle Id is invalid."));
     }
 }

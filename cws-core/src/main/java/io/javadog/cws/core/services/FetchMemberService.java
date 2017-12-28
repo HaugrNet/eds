@@ -63,7 +63,7 @@ public final class FetchMemberService extends Serviceable<FetchMemberResponse, F
                 }
             }
         } else {
-            final List<MemberEntity> members = dao.findAllMembers();
+            final List<MemberEntity> members = dao.findAllAscending(MemberEntity.class, "name");
             response.setMembers(convertMembers(members));
         }
 

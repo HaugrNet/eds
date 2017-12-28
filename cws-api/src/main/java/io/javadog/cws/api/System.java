@@ -41,24 +41,10 @@ public interface System {
      * be altered once the system is started, as it may have fatal consequences
      * for running system.</p>
      *
-     * <p>The following Settings exists:</p>
-     * <ul>
-     *   <li><b>cws.crypto.symmetric.algorithm</b> - updateable</li>
-     *   <li><b>cws.crypto.asymmetric.algorithm</b> - updateable</li>
-     *   <li><b>cws.crypto.signature.algorithm</b> - updateable</li>
-     *   <li><b>cws.crypto.password.algorithm</b> - updateable</li>
-     *   <li><b>cws.crypto.hash.algorithm</b> - updateable</li>
-     *   <li><b>cws.system.salt</b> - not updateable</li>
-     *   <li><b>cws.system.locale</b> - updateable</li>
-     *   <li><b>cws.system.charset</b> - updateable</li>
-     *   <li><b>cws.expose.admin</b> - updateable</li>
-     *   <li><b>cws.show.trustees</b> - updateable</li>
-     * </ul>
-     *
-     * <p>The System Salt is not updateable via this request, as it is will then
-     * act as a &quot;kill-switch&quot;. This value must be updated via standard
-     * SQL updates. Although it is a fairly important feature, it should not be
-     * too easy to change it by mistake.</p>
+     * <p>Note, that the System Salt is only updateable as long as no Accounts
+     * have been added, after which - it is no longer allowed to update it. This
+     * is because the System Salt is used as part of the Passphrase to Key
+     * process in the Authentication logic.</p>
      *
      * @param request Request Object
      * @return Response Object with ReturnCode and Message
@@ -68,7 +54,7 @@ public interface System {
     /**
      * <p>Data stored encrypted is nothing but a long array of bytes. If, over
      * time, an error occurs the da storage so a few bits have been flipped,
-     * then it is not possible to decrypt the data to the original.</p>
+     * then it is not possible to decrypt the data.</p>
      *
      * <p>The stored data is having a checksum, which is written when the data
      * is stored and checked when the data is read out. The checksum is made
@@ -80,6 +66,13 @@ public interface System {
      * and thus unusable. It should be possible for administrators to recover
      * these from backups, but it requires that it is known when the failure
      * occurred - which this request can help with ascertaining.</p>
+     *
+     * <p>The request can be invoked by the System Administrator, which can then
+     * return a complete list of all failures, or it can be invoked by a
+     * Circle Administrator, and result in a list of Objects failing for a given
+     * Circle or all Circles Administrated by the Circle Administrator. It is
+     * also possible to provide a timestamp, to only get failures reported since
+     * a certain time.</p>
      *
      * <p>The response Object contain a Map of ObjectIds which has failed, with
      * the value being the timestamp of the first check where it failed.</p>

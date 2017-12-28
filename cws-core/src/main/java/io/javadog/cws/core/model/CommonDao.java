@@ -18,7 +18,6 @@ import io.javadog.cws.core.model.entities.DataTypeEntity;
 import io.javadog.cws.core.model.entities.Externable;
 import io.javadog.cws.core.model.entities.MemberEntity;
 import io.javadog.cws.core.model.entities.MetadataEntity;
-import io.javadog.cws.core.model.entities.SettingEntity;
 import io.javadog.cws.core.model.entities.SignatureEntity;
 import io.javadog.cws.core.model.entities.TrusteeEntity;
 
@@ -41,8 +40,11 @@ import java.util.UUID;
  */
 public final class CommonDao {
 
+    private static final String EXTERNAL_ID = "externalId";
     private static final String MEMBER = "member";
     private static final String PARENT_ID = "parentId";
+    private static final String STATUS = "status";
+    private static final String SINCE = "since";
 
     private final EntityManager entityManager;
 
@@ -71,9 +73,18 @@ public final class CommonDao {
         final CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         final CriteriaQuery<E> query = builder.createQuery(cwsEntity);
         final Root<E> entity = query.from(cwsEntity);
-        query.select(entity).where(builder.equal(entity.get("externalId"), externalId));
+        query.select(entity).where(builder.equal(entity.get(EXTERNAL_ID), externalId));
 
         return findSingleRecord(entityManager.createQuery(query));
+    }
+
+    public <E extends CWSEntity> List<E> findAllAscending(final Class<E> cwsEntity, final String orderBy) {
+        final CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+        final CriteriaQuery<E> query = builder.createQuery(cwsEntity);
+        final Root<E> entity = query.from(cwsEntity);
+        query.orderBy(builder.asc(entity.get(orderBy)));
+
+        return findList(entityManager.createQuery(query));
     }
 
     public <E extends CWSEntity> E getReference(final Class<E> cwsEntity, final Long id) {
@@ -122,26 +133,10 @@ public final class CommonDao {
         return findList(query);
     }
 
-    public List<SettingEntity> readSettings() {
-        final Query query = entityManager.createNamedQuery("setting.readAll");
-        return findList(query);
-    }
-
     public List<TrusteeEntity> findTrusteesByCircle(final CircleEntity circle) {
         final Query query = entityManager.createNamedQuery("trustee.findByCircle");
         query.setParameter("circle", circle);
 
-        return findList(query);
-    }
-
-    public List<CircleEntity> findAllCircles() {
-        final Query query = entityManager.createNamedQuery("circle.findAll");
-
-        return findList(query);
-    }
-
-    public List<MemberEntity> findAllMembers() {
-        final Query query = entityManager.createNamedQuery("member.findAll");
         return findList(query);
     }
 
@@ -205,7 +200,7 @@ public final class CommonDao {
     public DataEntity findDataByMemberAndExternalId(final MemberEntity member, final String externalId) {
         final Query query = entityManager.createNamedQuery("data.findByMemberAndExternalId");
         query.setParameter(MEMBER, member);
-        query.setParameter("externalId", externalId);
+        query.setParameter(EXTERNAL_ID, externalId);
         query.setParameter("trustLevels", EnumSet.of(TrustLevel.ADMIN, TrustLevel.WRITE, TrustLevel.READ));
 
         return findSingleRecord(query);
@@ -284,9 +279,28 @@ public final class CommonDao {
         return findSingleRecord(query) != null;
     }
 
-    public List<DataEntity> findFailedRecords() {
+    public List<DataEntity> findFailedRecords(final Date since) {
         final Query query = entityManager.createNamedQuery("data.findAllWithState");
-        query.setParameter("status", SanityStatus.FAILED);
+        query.setParameter(STATUS, SanityStatus.FAILED);
+        query.setParameter(SINCE, since);
+
+        return findList(query);
+    }
+
+    public List<DataEntity> findFailedRecords(final String circleId, final Date since) {
+        final Query query = entityManager.createNamedQuery("data.findAllWithStateForCircle");
+        query.setParameter(STATUS, SanityStatus.FAILED);
+        query.setParameter(SINCE, since);
+        query.setParameter(EXTERNAL_ID, circleId);
+
+        return findList(query);
+    }
+
+    public List<DataEntity> findFailedRecords(final MemberEntity circleAdministrator, final Date since) {
+        final Query query = entityManager.createNamedQuery("data.findAllWithStateForMember");
+        query.setParameter(STATUS, SanityStatus.FAILED);
+        query.setParameter(SINCE, since);
+        query.setParameter(MEMBER, circleAdministrator);
 
         return findList(query);
     }

@@ -21,7 +21,10 @@ import io.javadog.cws.api.responses.ProcessDataResponse;
 import io.javadog.cws.api.responses.SanityResponse;
 import io.javadog.cws.core.DatabaseSetup;
 import io.javadog.cws.core.exceptions.AuthorizationException;
+import io.javadog.cws.core.exceptions.CWSException;
 import org.junit.Test;
+
+import java.util.Date;
 
 /**
  * @author Kim Jensen
@@ -30,7 +33,7 @@ import org.junit.Test;
 public final class SanityServiceTest extends DatabaseSetup {
 
     @Test
-    public void testNormalCase() {
+    public void testRequestAsSystemAdministrator() {
         final SanityRequest request = prepareRequest(SanityRequest.class, Constants.ADMIN_ACCOUNT);
         final SanityService service = new SanityService(settings, entityManager);
         final SanityResponse response = service.perform(request);
@@ -39,11 +42,42 @@ public final class SanityServiceTest extends DatabaseSetup {
     }
 
     @Test
+    public void testRequestAsSystemAdministratorForCircle() {
+        final SanityRequest request = prepareRequest(SanityRequest.class, Constants.ADMIN_ACCOUNT);
+        request.setCircleId(CIRCLE_3_ID);
+        request.setSince(new Date(0L));
+        final SanityService service = new SanityService(settings, entityManager);
+        final SanityResponse response = service.perform(request);
+        assertThat(response.isOk(), is(true));
+        assertThat(response.getSanities().isEmpty(), is(true));
+    }
+
+    @Test
+    public void testRequestAsCircleAdministratorForCircle() {
+        final SanityRequest request = prepareRequest(SanityRequest.class, MEMBER_1);
+        final SanityService service = new SanityService(settings, entityManager);
+        final SanityResponse response = service.perform(request);
+        assertThat(response.isOk(), is(true));
+        assertThat(response.getSanities().isEmpty(), is(true));
+    }
+
+    @Test
+    public void testRequestAsCircleAdministratorForOtherCircle() {
+        prepareCause(CWSException.class, ReturnCode.IDENTIFICATION_WARNING, "No Trustee information found for member '" + MEMBER_1 + "' and circle '" + CIRCLE_3_ID + "'.");
+        final SanityRequest request = prepareRequest(SanityRequest.class, MEMBER_1);
+        request.setCircleId(CIRCLE_3_ID);
+        final SanityService service = new SanityService(settings, entityManager);
+        final SanityResponse response = service.perform(request);
+        assertThat(response.isOk(), is(true));
+        assertThat(response.getSanities().isEmpty(), is(true));
+    }
+
+    @Test
     public void testRequestAsMember() {
-        prepareCause(AuthorizationException.class, ReturnCode.AUTHORIZATION_WARNING, "Cannot complete this request, as it is only allowed for the System Administrator.");
+        prepareCause(AuthorizationException.class, ReturnCode.AUTHORIZATION_WARNING, "The requesting Account is not permitted to Process last Sanity Check.");
 
         final SanityService service = new SanityService(settings, entityManager);
-        final SanityRequest request = prepareRequest(SanityRequest.class, MEMBER_1);
+        final SanityRequest request = prepareRequest(SanityRequest.class, MEMBER_5);
         assertThat(request.validate().isEmpty(), is(true));
 
         service.perform(request);

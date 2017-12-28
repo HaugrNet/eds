@@ -75,7 +75,7 @@ public final class FetchCircleService extends Serviceable<FetchCircleResponse, F
                 response.setReturnMessage("The requested Circle cannot be found.");
             }
         } else {
-            final List<CircleEntity> circles = dao.findAllCircles();
+            final List<CircleEntity> circles = dao.findAllAscending(CircleEntity.class, "name");
             response.setCircles(convertCircles(circles));
         }
 

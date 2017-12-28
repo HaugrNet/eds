@@ -97,6 +97,7 @@ public final class Constants {
     public static final String FIELD_LAST_VERIFICATION = "lastVerification";
     public static final String FIELD_ADDED = "added";
     public static final String FIELD_CHANGED = "changed";
+    public static final String FIELD_SINCE = "since";
     public static final String FIELD_VERSION = "version";
     public static final String FIELD_VERIFIED = "verified";
     public static final String FIELD_ACTION = "action";

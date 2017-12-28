@@ -32,7 +32,7 @@ public class SettingBean {
     @PostConstruct
     public void init() {
         final CommonDao dao = new CommonDao(entityManager);
-        final List<SettingEntity> found = dao.readSettings();
+        final List<SettingEntity> found = dao.findAllAscending(SettingEntity.class, "id");
 
         for (final SettingEntity entity : found) {
             settings.set(entity.getName(), entity.getSetting());

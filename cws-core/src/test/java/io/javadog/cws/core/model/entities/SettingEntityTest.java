@@ -48,14 +48,14 @@ public final class SettingEntityTest extends DatabaseSetup {
         assertThat(updated.getSetting(), is("The Altered Setting"));
         assertThat(updated.isModifiable(), is(true));
 
-        final List<SettingEntity> mySettings = dao.readSettings();
+        final List<SettingEntity> mySettings = dao.findAllAscending(SettingEntity.class, "id");
         assertThat(mySettings, is(not(nullValue())));
         assertThat(mySettings.size(), is(13));
     }
 
     @Test
     public void testDaoFindSettings() {
-        final List<SettingEntity> mySettings = dao.readSettings();
+        final List<SettingEntity> mySettings = dao.findAllAscending(SettingEntity.class, "id");
         assertThat(mySettings, is(not(nullValue())));
         assertThat(mySettings.size(), is(12));
     }

@@ -57,7 +57,7 @@ public final class SettingService extends Serviceable<SettingResponse, SettingRe
     public SettingResponse perform(final SettingRequest request) {
         verifyRequest(request, Permission.SETTING);
 
-        final Map<String, SettingEntity> existing = convertSettings(dao.readSettings());
+        final Map<String, SettingEntity> existing = convertSettings(dao.findAllAscending(SettingEntity.class, "id"));
         for (final Map.Entry<String, String> entry : request.getSettings().entrySet()) {
             final String key = trim(entry.getKey());
             if (key.isEmpty()) {

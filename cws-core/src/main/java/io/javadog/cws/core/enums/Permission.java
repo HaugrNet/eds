@@ -86,11 +86,12 @@ public enum Permission {
     SETTING(TrustLevel.SYSOP, "Process Settings."),
 
     /**
-     * The Sanity checks is something, which is limited to the System
-     * Administrator, as the information is system relevant, and is part of the
-     * information to see if there is problems with the stored data.
+     * The Sanity checks is something, which is limited to the System or Circle
+     * Administrators, the System Administrator may read the information for all
+     * Circles, but Circle Administrators are only allowed to read the data for
+     * their own Circle(s).
      */
-    SANITY(TrustLevel.SYSOP, "Process last Sanity Check.");
+    SANITY(TrustLevel.ADMIN, "Process last Sanity Check.");
 
     // =========================================================================
     // Internal Functionality

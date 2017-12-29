@@ -107,16 +107,19 @@ public final class SystemRestClient extends BaseRestClient implements System {
         if ((request != null) && (request.getAction() != null)) {
             switch (request.getAction()) {
                 case CREATE:
-                    response = runRequest("/members/create", request);
+                    response = runRequest("/members/createMember", request);
                     break;
                 case INVITE:
-                    response = runRequest("/members/invite", request);
+                    response = runRequest("/members/inviteMember", request);
                     break;
                 case UPDATE:
-                    response = runRequest("/members/update", request);
+                    response = runRequest("/members/updateMember", request);
+                    break;
+                case INVALIDATE:
+                    response = runRequest("/members/invalidate", request);
                     break;
                 case DELETE:
-                    response = runRequest("/members/delete", request);
+                    response = runRequest("/members/deleteMember", request);
                     break;
                 default:
                     throw new CWSClientException("Unsupported Operation: " + request.getAction());
@@ -153,22 +156,22 @@ public final class SystemRestClient extends BaseRestClient implements System {
         if ((request != null) && (request.getAction() != null)) {
             switch (request.getAction()) {
                 case CREATE:
-                    response = runRequest("/circles/create", request);
+                    response = runRequest("/circles/createCircle", request);
                     break;
                 case UPDATE:
-                    response = runRequest("/circles/update", request);
+                    response = runRequest("/circles/updateCircle", request);
                     break;
                 case DELETE:
-                    response = runRequest("/circles/delete", request);
+                    response = runRequest("/circles/deleteCircle", request);
                     break;
                 case ADD:
-                    response = runRequest("/circles/add", request);
+                    response = runRequest("/circles/addTrustee", request);
                     break;
                 case ALTER:
-                    response = runRequest("/circles/alter", request);
+                    response = runRequest("/circles/alterTrustee", request);
                     break;
                 case REMOVE:
-                    response = runRequest("/circles/remove", request);
+                    response = runRequest("/circles/removeTrustee", request);
                     break;
                 default:
                     throw new CWSClientException("Unsupported Operation: " + request.getAction());

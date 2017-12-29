@@ -65,6 +65,14 @@ public class MemberService {
     }
 
     @POST
+    @Path("/invalidate")
+    @Consumes(CwsApplication.CONSUMES)
+    @Produces(CwsApplication.PRODUCES)
+    public Response invalidate(@NotNull final ProcessMemberRequest invalidateRequest) {
+        return processMember(invalidateRequest, Action.INVALIDATE, "invalidate");
+    }
+
+    @POST
     @DELETE
     @Path("/deleteMember")
     @Consumes(CwsApplication.CONSUMES)

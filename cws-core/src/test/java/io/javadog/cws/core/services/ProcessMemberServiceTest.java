@@ -23,7 +23,6 @@ import io.javadog.cws.api.responses.FetchDataResponse;
 import io.javadog.cws.api.responses.ProcessDataResponse;
 import io.javadog.cws.api.responses.ProcessMemberResponse;
 import io.javadog.cws.core.DatabaseSetup;
-import io.javadog.cws.core.exceptions.AuthenticationException;
 import io.javadog.cws.core.exceptions.CWSException;
 import io.javadog.cws.core.exceptions.CryptoException;
 import org.junit.Test;
@@ -255,7 +254,7 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
 
     @Test
     public void testInvalidateSelf() {
-        prepareCause(AuthenticationException.class, ReturnCode.AUTHENTICATION_WARNING, "Cannot authenticate the Account '" + MEMBER_4 + "' from the given Credentials.");
+        prepareCause(CryptoException.class, ReturnCode.CRYPTO_ERROR, "Decryption error");
 
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
         final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, MEMBER_4);

@@ -64,7 +64,7 @@ public final class ProcessMemberService extends Serviceable<ProcessMemberRespons
                         response = processSelf(request);
                         break;
                     case INVALIDATE:
-                        response = invalidate();
+                        response = invalidate(request);
                         break;
                     case DELETE:
                         response = deleteMember(request);
@@ -165,15 +165,18 @@ public final class ProcessMemberService extends Serviceable<ProcessMemberRespons
     }
 
     /**
-     * <p>This method will invalidate the invoking Member Account, by updating
-     * the passphrase for the Account to a new random value and then use it
-     * internally, to also update the members KeyPair. Thus rendering the
-     * Account completely useless.</p>
+     * <p>Invalidating the account means making a change, so it is still
+     * usable, i.e. the Member can still access the Account, but it is not
+     * possible to access any encrypted data, as the keys used for the
+     * encryption has been altered.</p>
      *
+     * <p>This way, the account will appear fine, but will be useless.</p>
+     *
+     * @param request Request Object
      * @return New Response Object
      */
-    private ProcessMemberResponse invalidate() {
-        updateMemberPassword(member, UUID.randomUUID().toString());
+    private ProcessMemberResponse invalidate(final ProcessMemberRequest request) {
+        updateMemberPassword(member, request.getCredential());
 
         final ProcessMemberResponse response = new ProcessMemberResponse();
         response.setReturnMessage("Account has been Invalidated.");

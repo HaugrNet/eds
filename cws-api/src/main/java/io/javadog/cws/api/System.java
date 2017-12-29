@@ -130,6 +130,11 @@ public interface System {
      * system. Removal of a Member will automatically remove all Data belonging
      * to the Member, i.e. the Circle relations and the Member details.</i></p>
      *
+     * <p>It is also possible, via this request, to invalidate the account,
+     * meaning that the account will appear correct, but it is not possible to
+     * either read or write data in any Circles. The Account can be later
+     * corrected, by replacing all existing Trustee records.</p>
+     *
      * @param request Request Object with details for the Processing
      * @return Response Object with the result of the Processing
      */

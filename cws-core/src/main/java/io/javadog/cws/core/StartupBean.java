@@ -60,7 +60,9 @@ public class StartupBean {
         // at startup.
         timerConfig.setPersistent(true);
 
+        // Starting the Timer Service every hour.
         final ScheduleExpression expression = new ScheduleExpression();
+        expression.hour("*");
         timerService.createCalendarTimer(expression, timerConfig);
         log.log(Settings.INFO, "First scheduled sanitizing will begin at {}", expression);
     }
@@ -75,5 +77,6 @@ public class StartupBean {
     public void runSanitizing(final Timer timer) {
         log.log(Settings.INFO, "Starting Timed Sanitizing check.");
         sanitizerBean.sanitize();
+        log.log(Settings.INFO, "Next Sanitizing check will begin at: " + timer.getNextTimeout());
     }
 }

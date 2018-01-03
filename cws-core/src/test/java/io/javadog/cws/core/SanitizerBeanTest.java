@@ -26,6 +26,7 @@ import javax.ejb.EJBException;
 import javax.ejb.ScheduleExpression;
 import javax.ejb.Timer;
 import javax.ejb.TimerConfig;
+import javax.ejb.TimerHandle;
 import javax.ejb.TimerService;
 import javax.persistence.Query;
 import java.io.Serializable;
@@ -64,7 +65,7 @@ public final class SanitizerBeanTest extends DatabaseSetup {
         final List<Long> idsBefore = sanitizerBean.findNextBatch(100);
 
         final StartupBean bean = prepareStartupBean("false");
-        bean.runSanitizing(null);
+        bean.runSanitizing(new TestTimer());
 
         final List<Long> idsAfter = sanitizerBean.findNextBatch(100);
         assertThat(idsBefore.isEmpty(), is(false));
@@ -142,6 +143,49 @@ public final class SanitizerBeanTest extends DatabaseSetup {
             return bean;
         } catch (InstantiationException | InvocationTargetException | IllegalAccessException | NoSuchMethodException e) {
             throw new CWSException(ReturnCode.ERROR, "Cannot instantiate Service Object", e);
+        }
+    }
+
+    private static class TestTimer implements Timer {
+
+        @Override
+        public void cancel() throws IllegalStateException, EJBException {
+
+        }
+
+        @Override
+        public long getTimeRemaining() throws IllegalStateException, EJBException {
+            return 0;
+        }
+
+        @Override
+        public Date getNextTimeout() throws IllegalStateException, EJBException {
+            return null;
+        }
+
+        @Override
+        public ScheduleExpression getSchedule() throws IllegalStateException, EJBException {
+            return null;
+        }
+
+        @Override
+        public boolean isPersistent() throws IllegalStateException, EJBException {
+            return false;
+        }
+
+        @Override
+        public boolean isCalendarTimer() throws IllegalStateException, EJBException {
+            return false;
+        }
+
+        @Override
+        public Serializable getInfo() throws IllegalStateException, EJBException {
+            return null;
+        }
+
+        @Override
+        public TimerHandle getHandle() throws IllegalStateException, EJBException {
+            return null;
         }
     }
 

@@ -8,25 +8,21 @@
 package io.javadog.cws.core;
 
 import io.javadog.cws.core.enums.SanityStatus;
-import io.javadog.cws.core.exceptions.CWSException;
 import io.javadog.cws.core.jce.Crypto;
 import io.javadog.cws.core.model.CommonDao;
 import io.javadog.cws.core.model.Settings;
 import io.javadog.cws.core.model.entities.DataEntity;
 
 import javax.annotation.PostConstruct;
-import javax.ejb.Asynchronous;
+import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
-import javax.persistence.LockTimeoutException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceException;
-import javax.persistence.PessimisticLockException;
 import javax.persistence.Query;
 import javax.transaction.Transactional;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -36,9 +32,9 @@ import java.util.logging.Logger;
  * @author Kim Jensen
  * @since  CWS 1.0
  */
-@Asynchronous
+@Stateless
 @Transactional
-public final class SanitizerBean {
+public class SanitizerBean {
 
     private static final Logger log = Logger.getLogger(SanitizerBean.class.getName());
     private static final int BLOCK = 100;
@@ -56,7 +52,6 @@ public final class SanitizerBean {
         crypto = new Crypto(settingBean.getSettings());
     }
 
-    @Asynchronous
     public void sanitize() {
         List<Long> ids = findNextBatch(BLOCK);
         int count = 0;
@@ -65,13 +60,10 @@ public final class SanitizerBean {
         while (!ids.isEmpty()) {
             for (final Long id : ids) {
                 final SanityStatus status = processEntity(id);
-                if (status != SanityStatus.UNKNOWN) {
-                    count++;
-                }
-
                 if (status == SanityStatus.FAILED) {
                     flawed++;
                 }
+                count++;
             }
 
             ids = findNextBatch(BLOCK);
@@ -83,7 +75,7 @@ public final class SanitizerBean {
 
     @Transactional(Transactional.TxType.REQUIRES_NEW)
     public SanityStatus processEntity(final Long id) {
-        SanityStatus status = SanityStatus.UNKNOWN;
+        SanityStatus status = SanityStatus.OK;
 
         try {
             // We're reading out the Entity using a Pessimistic lock,
@@ -106,15 +98,14 @@ public final class SanitizerBean {
             entity.setSanityChecked(new Date());
             entityManager.persist(entity);
             status = entity.getSanityStatus();
-        } catch (PessimisticLockException | LockTimeoutException e) {
-            // If we receive this, it can only be because a different process
-            // is currently also attempting to sanitize this record - hence we
-            // will just log it and otherwise ignore it.
-            log.log(Settings.DEBUG, e.getMessage(), e);
         } catch (PersistenceException e) {
-            // If this exception is caught, then the lock is unsupported. If
-            // that is the case, a more thorough analysis of the underlying
-            // cause must be made and therefore it is logged with level ERROR.
+            // There is 2 potential problems which may be caught here:
+            //   1. A different process (CWS instance) may be processing the
+            //      record, hence it is perfectly legitimate and we can actually
+            //      ignore the error. However, it is still being logged.
+            //   2. The underlying database does not support locking, so it is
+            //      not possible to continue. If this is the case, it should be
+            //      reported to the CWS developers.
             log.log(Settings.ERROR, e.getMessage(), e);
         }
 
@@ -123,27 +114,16 @@ public final class SanitizerBean {
 
     @Transactional(Transactional.TxType.SUPPORTS)
     public List<Long> findNextBatch(final int maxResults) {
-        List<Long> ids;
+        // JPA support for Java 8 Date/Time API is not supported
+        // before JavaEE8, which is still very early in adoption.
+        final int days = settingBean.getSettings().getSanityInterval();
+        final Date date = java.sql.Date.valueOf(LocalDate.now().minusDays(days));
 
-        try {
-            // JPA support for Java 8 Date/Time API is not supported
-            // before JavaEE8, which is still very early in adoption.
-            final int days = settingBean.getSettings().getSanityInterval();
-            final Date date = java.sql.Date.valueOf(LocalDate.now().minusDays(days));
+        final Query query = entityManager.createNamedQuery("data.findIdsForSanityCheck");
+        query.setParameter("status", SanityStatus.OK);
+        query.setParameter("date", date);
+        query.setMaxResults(maxResults);
 
-            final Query query = entityManager.createNamedQuery("data.findIdsForSanityCheck");
-            query.setParameter("status", SanityStatus.OK);
-            query.setParameter("date", date);
-
-            query.setMaxResults(maxResults);
-            query.setLockMode(LockModeType.PESSIMISTIC_READ);
-
-            ids = CommonDao.findList(query);
-        } catch (CWSException e) {
-            log.log(Settings.ERROR, "It was not possible to extract the list of Ids for Objects to run a sanity check on: " + e.getMessage(), e);
-            ids = new ArrayList<>(0);
-        }
-
-        return ids;
+        return CommonDao.findList(query);
     }
 }

@@ -20,6 +20,7 @@ import io.javadog.cws.api.responses.FetchDataResponse;
 import io.javadog.cws.api.responses.ProcessDataResponse;
 import io.javadog.cws.api.responses.SanityResponse;
 import io.javadog.cws.core.DatabaseSetup;
+import io.javadog.cws.core.enums.SanityStatus;
 import io.javadog.cws.core.exceptions.AuthorizationException;
 import io.javadog.cws.core.exceptions.CWSException;
 import org.junit.Test;
@@ -93,7 +94,7 @@ public final class SanityServiceTest extends DatabaseSetup {
 
         final ProcessDataResponse response = dataService.perform(dataRequest);
         assertThat(response.isOk(), is(true));
-        falsifyChecksum(response, new Date());
+        falsifyChecksum(response, new Date(), SanityStatus.FAILED);
 
         // Now to the actual test - reading the data with invalid checksum
         final FetchDataService readDataService = new FetchDataService(settings, entityManager);
@@ -117,12 +118,12 @@ public final class SanityServiceTest extends DatabaseSetup {
 
     private void prepareInvalidData() {
         final ProcessDataService service = new ProcessDataService(settings, entityManager);
-        falsifyChecksum(service.perform(prepareAddRequest(MEMBER_1, CIRCLE_1_ID, "Invalidated Data1", 524288)), new Date(10L));
-        falsifyChecksum(service.perform(prepareAddRequest(MEMBER_1, CIRCLE_1_ID, "Invalidated Data2", 1048576)), new Date());
-        falsifyChecksum(service.perform(prepareAddRequest(MEMBER_1, CIRCLE_2_ID, "Invalidated Data3", 524288)), new Date(10L));
-        falsifyChecksum(service.perform(prepareAddRequest(MEMBER_1, CIRCLE_2_ID, "Invalidated Data4", 1048576)), new Date());
-        falsifyChecksum(service.perform(prepareAddRequest(MEMBER_4, CIRCLE_3_ID, "Invalidated Data5", 524288)), new Date(10L));
-        falsifyChecksum(service.perform(prepareAddRequest(MEMBER_4, CIRCLE_3_ID, "Invalidated Data6", 1048576)), new Date());
+        falsifyChecksum(service.perform(prepareAddRequest(MEMBER_1, CIRCLE_1_ID, "Invalidated Data1", 524288)), new Date(10L), SanityStatus.FAILED);
+        falsifyChecksum(service.perform(prepareAddRequest(MEMBER_1, CIRCLE_1_ID, "Invalidated Data2", 1048576)), new Date(), SanityStatus.FAILED);
+        falsifyChecksum(service.perform(prepareAddRequest(MEMBER_1, CIRCLE_2_ID, "Invalidated Data3", 524288)), new Date(10L), SanityStatus.FAILED);
+        falsifyChecksum(service.perform(prepareAddRequest(MEMBER_1, CIRCLE_2_ID, "Invalidated Data4", 1048576)), new Date(), SanityStatus.FAILED);
+        falsifyChecksum(service.perform(prepareAddRequest(MEMBER_4, CIRCLE_3_ID, "Invalidated Data5", 524288)), new Date(10L), SanityStatus.FAILED);
+        falsifyChecksum(service.perform(prepareAddRequest(MEMBER_4, CIRCLE_3_ID, "Invalidated Data6", 1048576)), new Date(), SanityStatus.FAILED);
     }
 
     private static ProcessDataRequest prepareAddRequest(final String account, final String circleId, final String dataName, final int bytes) {

@@ -259,8 +259,9 @@ public class DatabaseSetup {
      *
      * @param response    Process Data Response Object
      * @param sanityCheck The timestamp for the last sanity check
+     * @param status      The Sanity Status to use
      */
-    protected void falsifyChecksum(final ProcessDataResponse response, final Date sanityCheck) {
+    protected void falsifyChecksum(final ProcessDataResponse response, final Date sanityCheck, final SanityStatus status) {
         // Now to the tricky part. We wish to test that the checksum is invalid,
         // and thus resulting in a correct error message. As the checksum is
         // controlled internally by CWS, it cannot be altered (rightfully) via
@@ -270,7 +271,7 @@ public class DatabaseSetup {
         query.setParameter("eid", response.getDataId());
         final DataEntity entity = (DataEntity) query.getSingleResult();
         entity.setChecksum(UUID.randomUUID().toString());
-        entity.setSanityStatus(SanityStatus.FAILED);
+        entity.setSanityStatus(status);
         entity.setSanityChecked(sanityCheck);
         entityManager.persist(entity);
     }

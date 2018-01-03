@@ -24,6 +24,7 @@ import io.javadog.cws.api.responses.ProcessCircleResponse;
 import io.javadog.cws.api.responses.ProcessDataResponse;
 import io.javadog.cws.api.responses.ProcessMemberResponse;
 import io.javadog.cws.core.DatabaseSetup;
+import io.javadog.cws.core.enums.SanityStatus;
 import io.javadog.cws.core.exceptions.CWSException;
 import io.javadog.cws.core.exceptions.VerificationException;
 import org.junit.Test;
@@ -178,7 +179,7 @@ public final class DataServiceTest extends DatabaseSetup {
 
         final ProcessDataResponse response = service.perform(request);
         assertThat(response.isOk(), is(true));
-        falsifyChecksum(response, new Date());
+        falsifyChecksum(response, new Date(), SanityStatus.FAILED);
 
         // Now to the actual test - reading the data with invalid checksum
         final FetchDataService readService = new FetchDataService(settings, entityManager);

@@ -141,7 +141,7 @@ public final class Crypto {
             final MessageDigest digest = MessageDigest.getInstance(settings.getHashAlgorithm().getAlgorithm());
             final byte[] hashed = digest.digest(bytes);
 
-            return new String(hashed, settings.getCharset());
+            return Base64.getEncoder().encodeToString(hashed);
         } catch (IllegalArgumentException | NoSuchAlgorithmException e) {
             throw new CryptoException(e.getMessage(), e);
         }

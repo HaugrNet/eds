@@ -14,6 +14,5 @@ package io.javadog.cws.core.enums;
 public enum SanityStatus {
 
     OK,
-    FAILED,
-    UNKNOWN
+    FAILED
 }

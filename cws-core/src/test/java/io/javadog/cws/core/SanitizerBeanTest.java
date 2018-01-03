@@ -13,18 +13,17 @@ import static org.junit.Assert.assertThat;
 import io.javadog.cws.api.common.Action;
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
-import io.javadog.cws.api.requests.FetchDataRequest;
 import io.javadog.cws.api.requests.ProcessDataRequest;
-import io.javadog.cws.core.enums.StandardSetting;
+import io.javadog.cws.api.responses.ProcessDataResponse;
+import io.javadog.cws.core.enums.SanityStatus;
 import io.javadog.cws.core.exceptions.CWSException;
-import io.javadog.cws.core.model.Settings;
+import io.javadog.cws.core.model.entities.DataEntity;
 import io.javadog.cws.core.services.ProcessDataService;
 import org.junit.Test;
 
 import javax.persistence.Query;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
@@ -41,10 +40,7 @@ public final class SanitizerBeanTest extends DatabaseSetup {
 
         // Check that there is nothing to scan/check at first
         final List<Long> idsBefore = bean.findNextBatch(100);
-        assertThat(idsBefore.size(), is(0));
-
-        // Move all Objects back in time, so we will have something to check
-        assertThat(timeWarp(), is(6));
+        assertThat(idsBefore.size(), is(6));
 
         // Run the actual sanitizing
         bean.sanitize();
@@ -73,18 +69,6 @@ public final class SanitizerBeanTest extends DatabaseSetup {
         } catch (InstantiationException | InvocationTargetException | IllegalAccessException | NoSuchMethodException e) {
             throw new CWSException(ReturnCode.ERROR, "Cannot instantiate Service Object", e);
         }
-    }
-
-    private int timeWarp() {
-        final int days = new Settings().getSanityInterval() + 1;
-        final Date date = java.sql.Date.valueOf(LocalDate.now().minusDays(days));
-        final Query query = entityManager.createQuery("update DataEntity set sanityChecked = :date");
-        query.setParameter("date", date);
-        settings.set(StandardSetting.SANITY_INTERVAL, "0");
-
-        final int updated = query.executeUpdate();
-        entityManager.clear();
-        return updated;
     }
 
     private SettingBean prepareSettingBean() {
@@ -121,12 +105,29 @@ public final class SanitizerBeanTest extends DatabaseSetup {
 
     private void prepareInvalidData() {
         final ProcessDataService service = new ProcessDataService(settings, entityManager);
-        falsifyChecksum(service.perform(prepareAddRequest(MEMBER_1, CIRCLE_1_ID, "Invalidated Data1", 1048576)), new Date(10L));
-        falsifyChecksum(service.perform(prepareAddRequest(MEMBER_1, CIRCLE_1_ID, "Invalidated Data2", 524288)), new Date());
-        falsifyChecksum(service.perform(prepareAddRequest(MEMBER_1, CIRCLE_2_ID, "Invalidated Data3", 1048576)), new Date(10L));
-        falsifyChecksum(service.perform(prepareAddRequest(MEMBER_1, CIRCLE_2_ID, "Invalidated Data4", 524288)), new Date());
-        falsifyChecksum(service.perform(prepareAddRequest(MEMBER_4, CIRCLE_3_ID, "Invalidated Data5", 1048576)), new Date(10L));
-        falsifyChecksum(service.perform(prepareAddRequest(MEMBER_4, CIRCLE_3_ID, "Invalidated Data6", 524288)), new Date());
+        timeWarpChecksum(service.perform(prepareAddRequest(MEMBER_1, CIRCLE_1_ID, "Valid Data1", 1048576)), new Date(1L), SanityStatus.OK);
+        falsifyChecksum(service.perform(prepareAddRequest(MEMBER_1, CIRCLE_1_ID, "Invalidated Data1", 1048576)), new Date(2L), SanityStatus.OK);
+        falsifyChecksum(service.perform(prepareAddRequest(MEMBER_1, CIRCLE_1_ID, "Invalidated Data2", 524288)), new Date(), SanityStatus.OK);
+        timeWarpChecksum(service.perform(prepareAddRequest(MEMBER_1, CIRCLE_2_ID, "Valid Data2", 1048576)), new Date(3L), SanityStatus.OK);
+        falsifyChecksum(service.perform(prepareAddRequest(MEMBER_1, CIRCLE_2_ID, "Invalidated Data3", 1048576)), new Date(4L), SanityStatus.OK);
+        falsifyChecksum(service.perform(prepareAddRequest(MEMBER_1, CIRCLE_2_ID, "Invalidated Data4", 524288)), new Date(), SanityStatus.OK);
+        timeWarpChecksum(service.perform(prepareAddRequest(MEMBER_4, CIRCLE_3_ID, "Valid Data3", 1048576)), new Date(5L), SanityStatus.OK);
+        falsifyChecksum(service.perform(prepareAddRequest(MEMBER_4, CIRCLE_3_ID, "Invalidated Data5", 1048576)), new Date(6L), SanityStatus.OK);
+        falsifyChecksum(service.perform(prepareAddRequest(MEMBER_4, CIRCLE_3_ID, "Invalidated Data6", 524288)), new Date(), SanityStatus.OK);
+    }
+
+    private void timeWarpChecksum(final ProcessDataResponse response, final Date sanityCheck, final SanityStatus status) {
+        // Now to the tricky part. We wish to test that the checksum is invalid,
+        // and thus resulting in a correct error message. As the checksum is
+        // controlled internally by CWS, it cannot be altered (rightfully) via
+        // the API, hence we have to modify it directly in the database!
+        final String jql = "select d from DataEntity d where d.metadata.externalId = :eid";
+        final Query query = entityManager.createQuery(jql);
+        query.setParameter("eid", response.getDataId());
+        final DataEntity entity = (DataEntity) query.getSingleResult();
+        entity.setSanityStatus(status);
+        entity.setSanityChecked(sanityCheck);
+        entityManager.persist(entity);
     }
 
     private static ProcessDataRequest prepareAddRequest(final String account, final String circleId, final String dataName, final int bytes) {
@@ -136,14 +137,6 @@ public final class SanitizerBeanTest extends DatabaseSetup {
         request.setDataName(dataName);
         request.setTypeName(Constants.DATA_TYPENAME);
         request.setData(generateData(bytes));
-
-        return request;
-    }
-
-    private static FetchDataRequest prepareReadRequest(final String account, final String circleId, final String dataId) {
-        final FetchDataRequest request = prepareRequest(FetchDataRequest.class, account);
-        request.setCircleId(circleId);
-        request.setDataId(dataId);
 
         return request;
     }

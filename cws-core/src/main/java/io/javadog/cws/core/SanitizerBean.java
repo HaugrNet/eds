@@ -1,6 +1,6 @@
 /*
  * =============================================================================
- * Copyright (c) 2016-2017, JavaDog.io
+ * Copyright (c) 2016-2018, JavaDog.io
  * -----------------------------------------------------------------------------
  * Project: CWS (cws-core)
  * =============================================================================
@@ -69,8 +69,7 @@ public class SanitizerBean {
             ids = findNextBatch(BLOCK);
         }
 
-        final int[] args = { flawed, count };
-        log.log(Settings.INFO, "Completed Sanity check, found {0} out of {1} Data Objects.", args);
+        log.log(Settings.INFO, "Completed Sanity check, found " + flawed + " flaws out of " + count + " checked Data Objects.");
     }
 
     @Transactional(Transactional.TxType.REQUIRES_NEW)

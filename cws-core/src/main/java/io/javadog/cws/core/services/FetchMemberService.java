@@ -1,6 +1,6 @@
 /*
  * =============================================================================
- * Copyright (c) 2016-2017, JavaDog.io
+ * Copyright (c) 2016-2018, JavaDog.io
  * -----------------------------------------------------------------------------
  * Project: CWS (cws-core)
  * =============================================================================
@@ -90,19 +90,19 @@ public final class FetchMemberService extends Serviceable<FetchMemberResponse, F
      * all Accounts - however, for other Members, the rules to apply must follow
      * the rules defined via the Settings.</p>
      *
-     * <p>If the {@link Settings#EXPOSE_ADMIN} flag is set, then a Member may
-     * view the System Administrator Account, however this setting is disabled
-     * per default.</p>
+     * <p>If the {@link io.javadog.cws.core.enums.StandardSetting#EXPOSE_ADMIN}
+     * flag is set, then a Member may view the System Administrator Account,
+     * however this setting is disabled per default.</p>
      *
-     * <p>If the {@link Settings#SHOW_TRUSTEES} flag is set,
-     * then the Member may view all Circles, which the Other Member belongs to,
-     * and not just the ones both Members share. By default, this Settings is
-     * set to True.</p>
+     * <p>If the {@link io.javadog.cws.core.enums.StandardSetting##SHOW_TRUSTEES}
+     * flag is set, then the Member may view all Circles, which the Other Member
+     * belongs to, and not just the ones both Members share. By default, this
+     * Settings is set to True.</p>
      *
      * @param response  Response Object to fill
      * @param requested Requested Member to see if may be viewed
-     * @see Settings#EXPOSE_ADMIN
-     * @see Settings#SHOW_TRUSTEES
+     * @see io.javadog.cws.core.enums.StandardSetting##EXPOSE_ADMIN
+     * @see io.javadog.cws.core.enums.StandardSetting##SHOW_TRUSTEES
      */
     private void fetchSomeoneElse(final FetchMemberResponse response, final MemberEntity requested) {
         if (Objects.equals(member.getName(), Constants.ADMIN_ACCOUNT)) {

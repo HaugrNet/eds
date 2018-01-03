@@ -11,6 +11,7 @@ import io.javadog.cws.core.model.Settings;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
+import javax.ejb.Asynchronous;
 import javax.ejb.ScheduleExpression;
 import javax.ejb.Singleton;
 import javax.ejb.Startup;
@@ -29,6 +30,7 @@ import java.util.logging.Logger;
  */
 @Startup
 @Singleton
+@Asynchronous
 @TransactionAttribute(TransactionAttributeType.REQUIRED)
 public class StartupBean {
 
@@ -45,7 +47,7 @@ public class StartupBean {
         // If requested, then simply start the sanitize as a background job
         // now. The job will process small blocks of code and save these.
         if (settingBean.getSettings().getSanityStartup()) {
-            sanitizerBean.sanitize();
+            runSanitizing();
         }
 
         // Registering the Timer Service. This will ensure that the Scheduler
@@ -63,9 +65,15 @@ public class StartupBean {
         log.log(Settings.INFO, "First scheduled sanitizing will begin at {}", expression);
     }
 
+    @Asynchronous
+    public void runSanitizing() {
+        log.log(Settings.INFO, "Starting initial Sanitizing check.");
+        sanitizerBean.sanitize();
+    }
+
     @Timeout
     public void timerservice(final Timer timer) {
-        log.log(Settings.INFO, "Starting Timed Sanitizing Service.");
+        log.log(Settings.INFO, "Starting Timed Sanitizing check.");
         sanitizerBean.sanitize();
     }
 }

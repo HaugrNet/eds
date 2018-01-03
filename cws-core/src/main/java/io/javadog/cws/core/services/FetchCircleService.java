@@ -7,7 +7,6 @@
  */
 package io.javadog.cws.core.services;
 
-import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.dtos.Circle;
 import io.javadog.cws.api.dtos.Trustee;
@@ -21,7 +20,6 @@ import io.javadog.cws.core.model.entities.TrusteeEntity;
 import javax.persistence.EntityManager;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * @author Kim Jensen
@@ -57,15 +55,7 @@ public final class FetchCircleService extends Serviceable<FetchCircleResponse, F
                 // doesn't allow exposing information, then we will only show
                 // information about Circles, which the requesting Member is allowed
                 // to access.
-                final List<TrusteeEntity> members;
-                if (Objects.equals(Constants.ADMIN_ACCOUNT, member.getName()) || settings.getShareTrustees()) {
-                    members = dao.findTrusteesByCircle(circle);
-                } else {
-                    // Regardless of the settings and requesting Member, we should
-                    // be as tolerant as possible, and if the Member is not allowed
-                    // to see the Circle details, then it is simply omitted.
-                    members = findTrusteeByCircle(circle);
-                }
+                final List<TrusteeEntity> members = dao.findTrusteesByCircle(circle);
                 response.setTrustees(convertTrustees(members));
                 final List<Circle> circles = new ArrayList<>(1);
                 circles.add(convert(circle));
@@ -80,26 +70,6 @@ public final class FetchCircleService extends Serviceable<FetchCircleResponse, F
         }
 
         return response;
-    }
-
-    /**
-     * <p>If the Circle being sought is one, which the Member belongs to, then
-     * the details will be returned, otherwise an empty list is returned.</p>
-     *
-     * @param circle Circle Entity
-     * @return List of Trustees for the given Circle, or empty List
-     */
-    private List<TrusteeEntity> findTrusteeByCircle(final CircleEntity circle) {
-        final List<TrusteeEntity> found = new ArrayList<>(0);
-
-        for (final TrusteeEntity trusteeEntity : trustees) {
-            if (Objects.equals(trusteeEntity.getCircle().getId(), circle.getId())) {
-                found.addAll(dao.findTrusteesByCircle(circle));
-                break;
-            }
-        }
-
-        return found;
     }
 
     private static List<Trustee> convertTrustees(final List<TrusteeEntity> entities) {

@@ -237,7 +237,6 @@ public final class DataTypeServiceTest extends DatabaseSetup {
         request.setType(newDataTypeType);
 
         final ProcessDataTypeResponse response = service.perform(request);
-        assertThat(response, is(not(nullValue())));
         assertThat(response.isOk(), is(true));
         assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(response.getReturnMessage(), is("Ok"));
@@ -248,11 +247,35 @@ public final class DataTypeServiceTest extends DatabaseSetup {
         request.setTypeName(theDataTypeName);
         request.setType(updatedDataTypeType);
         final ProcessDataTypeResponse updateResponse = service.perform(request);
-        assertThat(updateResponse, is(not(nullValue())));
         assertThat(updateResponse.isOk(), is(true));
         assertThat(updateResponse.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(updateResponse.getReturnMessage(), is("Ok"));
         assertThat(updateResponse.getDataType().getTypeName(), is(theDataTypeName));
         assertThat(updateResponse.getDataType().getType(), is(updatedDataTypeType));
+    }
+
+    @Test
+    public void testCreateAndRepeatDataType() {
+        final ProcessDataTypeService service = new ProcessDataTypeService(settings, entityManager);
+        final ProcessDataTypeRequest request = prepareRequest(ProcessDataTypeRequest.class, Constants.ADMIN_ACCOUNT);
+        request.setAction(Action.PROCESS);
+        final String theDataTypeName = "newName";
+        final String newDataTypeType = "newType";
+        request.setTypeName(theDataTypeName);
+        request.setType(newDataTypeType);
+
+        final ProcessDataTypeResponse response = service.perform(request);
+        assertThat(response.isOk(), is(true));
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(response.getReturnMessage(), is("Ok"));
+        assertThat(response.getDataType().getTypeName(), is(theDataTypeName));
+        assertThat(response.getDataType().getType(), is(newDataTypeType));
+
+        final ProcessDataTypeResponse updateResponse = service.perform(request);
+        assertThat(updateResponse.isOk(), is(true));
+        assertThat(updateResponse.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(updateResponse.getReturnMessage(), is("Ok"));
+        assertThat(updateResponse.getDataType().getTypeName(), is(theDataTypeName));
+        assertThat(updateResponse.getDataType().getType(), is(newDataTypeType));
     }
 }

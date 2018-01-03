@@ -16,14 +16,22 @@ import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.requests.ProcessDataRequest;
 import io.javadog.cws.api.responses.ProcessDataResponse;
 import io.javadog.cws.core.enums.SanityStatus;
+import io.javadog.cws.core.enums.StandardSetting;
 import io.javadog.cws.core.exceptions.CWSException;
 import io.javadog.cws.core.model.entities.DataEntity;
 import io.javadog.cws.core.services.ProcessDataService;
 import org.junit.Test;
 
+import javax.ejb.EJBException;
+import javax.ejb.ScheduleExpression;
+import javax.ejb.Timer;
+import javax.ejb.TimerConfig;
+import javax.ejb.TimerService;
 import javax.persistence.Query;
+import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -34,7 +42,37 @@ import java.util.List;
 public final class SanitizerBeanTest extends DatabaseSetup {
 
     @Test
-    public void testBean() {
+    public void testStartupBeanWithSanitizeCheck() {
+        prepareInvalidData();
+        prepareStartupBean("true");
+
+        assertThat(prepareSanitizeBean().findNextBatch(100).isEmpty(), is(true));
+    }
+
+    @Test
+    public void testStartupBeanWithoutSanitizeCheck() {
+        prepareInvalidData();
+        prepareStartupBean("false");
+
+        assertThat(prepareSanitizeBean().findNextBatch(100).isEmpty(), is(false));
+    }
+
+    @Test
+    public void testStartupBeanTimerService() {
+        prepareInvalidData();
+        final SanitizerBean sanitizerBean = prepareSanitizeBean();
+        final List<Long> idsBefore = sanitizerBean.findNextBatch(100);
+
+        final StartupBean bean = prepareStartupBean("false");
+        bean.runSanitizing(null);
+
+        final List<Long> idsAfter = sanitizerBean.findNextBatch(100);
+        assertThat(idsBefore.isEmpty(), is(false));
+        assertThat(idsAfter.isEmpty(), is(true));
+    }
+
+    @Test
+    public void testSantizeBean() {
         final SanitizerBean bean = prepareSanitizeBean();
         prepareInvalidData();
 
@@ -54,13 +92,31 @@ public final class SanitizerBeanTest extends DatabaseSetup {
     // Internal Helper Methods
     // =========================================================================
 
+    private StartupBean prepareStartupBean(final String sanityAtStartup) {
+        try {
+            final StartupBean bean = StartupBean.class.getConstructor().newInstance();
+
+            // Inject Dependencies
+            setField(bean, "settingBean", prepareSettingBean(sanityAtStartup));
+            setField(bean, "sanitizerBean", prepareSanitizeBean());
+            setField(bean, "timerService", new TestTimerService());
+
+            // Invoke PostConstructor
+            bean.startup();
+
+            return bean;
+        } catch (InstantiationException | InvocationTargetException | IllegalAccessException | NoSuchMethodException e) {
+            throw new CWSException(ReturnCode.ERROR, "Cannot instantiate Service Object", e);
+        }
+    }
+
     private SanitizerBean prepareSanitizeBean() {
         try {
             final SanitizerBean bean = SanitizerBean.class.getConstructor().newInstance();
 
             // Inject Dependencies
             setField(bean, "entityManager", entityManager);
-            setField(bean, "settingBean", prepareSettingBean());
+            setField(bean, "settingBean", prepareSettingBean("true"));
 
             // Invoke PostConstructor
             bean.init();
@@ -71,19 +127,84 @@ public final class SanitizerBeanTest extends DatabaseSetup {
         }
     }
 
-    private SettingBean prepareSettingBean() {
+    private SettingBean prepareSettingBean(final String sanityAtStartup) {
         try {
             final SettingBean bean = SettingBean.class.getConstructor().newInstance();
             setField(bean, "entityManager", entityManager);
-            setField(bean, "settings", settings);
 
             // Just invoking the postConstruct method, has to be done manually,
             // as the Bean is not managed in our tests ;-)
             bean.init();
 
+            // Overriding the Startup settings
+            bean.getSettings().set(StandardSetting.SANITY_STARTUP.getKey(), sanityAtStartup);
+
             return bean;
         } catch (InstantiationException | InvocationTargetException | IllegalAccessException | NoSuchMethodException e) {
             throw new CWSException(ReturnCode.ERROR, "Cannot instantiate Service Object", e);
+        }
+    }
+
+    private static class TestTimerService implements TimerService {
+
+        @Override
+        public Timer createTimer(final long duration, final Serializable info) throws IllegalArgumentException, IllegalStateException, EJBException {
+            return null;
+        }
+
+        @Override
+        public Timer createSingleActionTimer(final long duration, final TimerConfig timerConfig) throws IllegalArgumentException, IllegalStateException, EJBException {
+            return null;
+        }
+
+        @Override
+        public Timer createTimer(final long initialDuration, final long intervalDuration, final Serializable info) throws IllegalArgumentException, IllegalStateException, EJBException {
+            return null;
+        }
+
+        @Override
+        public Timer createIntervalTimer(final long initialDuration, final long intervalDuration, final TimerConfig timerConfig) throws IllegalArgumentException, IllegalStateException, EJBException {
+            return null;
+        }
+
+        @Override
+        public Timer createTimer(final Date expiration, final Serializable info) throws IllegalArgumentException, IllegalStateException, EJBException {
+            return null;
+        }
+
+        @Override
+        public Timer createSingleActionTimer(final Date expiration, final TimerConfig timerConfig) throws IllegalArgumentException, IllegalStateException, EJBException {
+            return null;
+        }
+
+        @Override
+        public Timer createTimer(final Date initialExpiration, final long intervalDuration, final Serializable info) throws IllegalArgumentException, IllegalStateException, EJBException {
+            return null;
+        }
+
+        @Override
+        public Timer createIntervalTimer(final Date initialExpiration, final long intervalDuration, final TimerConfig timerConfig) throws IllegalArgumentException, IllegalStateException, EJBException {
+            return null;
+        }
+
+        @Override
+        public Timer createCalendarTimer(final ScheduleExpression schedule) throws IllegalArgumentException, IllegalStateException, EJBException {
+            return null;
+        }
+
+        @Override
+        public Timer createCalendarTimer(final ScheduleExpression schedule, final TimerConfig timerConfig) throws IllegalArgumentException, IllegalStateException, EJBException {
+            return null;
+        }
+
+        @Override
+        public Collection<Timer> getTimers() throws IllegalStateException, EJBException {
+            return null;
+        }
+
+        @Override
+        public Collection<Timer> getAllTimers() throws IllegalStateException, EJBException {
+            return null;
         }
     }
 

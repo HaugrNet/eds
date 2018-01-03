@@ -72,7 +72,7 @@ public class StartupBean {
     }
 
     @Timeout
-    public void timerservice(final Timer timer) {
+    public void runSanitizing(final Timer timer) {
         log.log(Settings.INFO, "Starting Timed Sanitizing check.");
         sanitizerBean.sanitize();
     }

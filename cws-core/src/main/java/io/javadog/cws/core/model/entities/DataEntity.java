@@ -62,7 +62,13 @@ import java.util.Date;
                         "where d.metadata.circle.id = t.circle.id" +
                         "  and d.metadata.externalId = :externalId" +
                         "  and t.member = :member" +
-                        "  and t.trustLevel in :trustLevels")
+                        "  and t.trustLevel in :trustLevels"),
+        @NamedQuery(name = "data.findIdsForSanityCheck",
+                query = "select d.id " +
+                        "from DataEntity d " +
+                        "where d.sanityStatus = :status" +
+                        "  and d.sanityChecked <= :date " +
+                        "order by d.id asc")
 })
 @Table(name = "cws_data")
 public class DataEntity extends CWSEntity {

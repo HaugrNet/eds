@@ -117,12 +117,12 @@ public final class SanityServiceTest extends DatabaseSetup {
 
     private void prepareInvalidData() {
         final ProcessDataService service = new ProcessDataService(settings, entityManager);
-        falsifyChecksum(service.perform(prepareAddRequest(MEMBER_1, CIRCLE_1_ID, "Data1", 524288)), new Date(10L));
-        falsifyChecksum(service.perform(prepareAddRequest(MEMBER_1, CIRCLE_1_ID, "Data2", 1048576)), new Date());
-        falsifyChecksum(service.perform(prepareAddRequest(MEMBER_1, CIRCLE_2_ID, "Data3", 524288)), new Date(10L));
-        falsifyChecksum(service.perform(prepareAddRequest(MEMBER_1, CIRCLE_2_ID, "Data4", 1048576)), new Date());
-        falsifyChecksum(service.perform(prepareAddRequest(MEMBER_4, CIRCLE_3_ID, "Data5", 524288)), new Date(10L));
-        falsifyChecksum(service.perform(prepareAddRequest(MEMBER_4, CIRCLE_3_ID, "Data6", 1048576)), new Date());
+        falsifyChecksum(service.perform(prepareAddRequest(MEMBER_1, CIRCLE_1_ID, "Invalidated Data1", 524288)), new Date(10L));
+        falsifyChecksum(service.perform(prepareAddRequest(MEMBER_1, CIRCLE_1_ID, "Invalidated Data2", 1048576)), new Date());
+        falsifyChecksum(service.perform(prepareAddRequest(MEMBER_1, CIRCLE_2_ID, "Invalidated Data3", 524288)), new Date(10L));
+        falsifyChecksum(service.perform(prepareAddRequest(MEMBER_1, CIRCLE_2_ID, "Invalidated Data4", 1048576)), new Date());
+        falsifyChecksum(service.perform(prepareAddRequest(MEMBER_4, CIRCLE_3_ID, "Invalidated Data5", 524288)), new Date(10L));
+        falsifyChecksum(service.perform(prepareAddRequest(MEMBER_4, CIRCLE_3_ID, "Invalidated Data6", 1048576)), new Date());
     }
 
     private static ProcessDataRequest prepareAddRequest(final String account, final String circleId, final String dataName, final int bytes) {

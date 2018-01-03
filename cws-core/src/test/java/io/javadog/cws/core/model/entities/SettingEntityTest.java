@@ -28,25 +28,21 @@ public final class SettingEntityTest extends DatabaseSetup {
         final SettingEntity entity = new SettingEntity();
         entity.setName("My.New.Setting");
         entity.setSetting("The Setting Value");
-        entity.setModifiable(false);
         persist(entity);
 
         final SettingEntity found = find(SettingEntity.class, entity.getId());
         assertThat(found, is(not(nullValue())));
         assertThat(found.getName(), is("My.New.Setting"));
         assertThat(found.getSetting(), is("The Setting Value"));
-        assertThat(found.isModifiable(), is(false));
 
         found.setName("My.Altered.Setting");
         found.setSetting("The Altered Setting");
-        found.setModifiable(true);
         persist(found);
 
         final SettingEntity updated = find(SettingEntity.class, entity.getId());
         assertThat(updated, is(not(nullValue())));
         assertThat(updated.getName(), is("My.Altered.Setting"));
         assertThat(updated.getSetting(), is("The Altered Setting"));
-        assertThat(updated.isModifiable(), is(true));
 
         final List<SettingEntity> mySettings = dao.findAllAscending(SettingEntity.class, "id");
         assertThat(mySettings, is(not(nullValue())));

@@ -32,9 +32,6 @@ public class SettingEntity extends CWSEntity {
     @Column(name = "setting")
     private String setting = null;
 
-    @Column(name = "modifiable", nullable = false)
-    private Boolean modifiable = null;
-
     // =========================================================================
     // Entity Setters & Getters
     // =========================================================================
@@ -53,13 +50,5 @@ public class SettingEntity extends CWSEntity {
 
     public String getSetting() {
         return setting;
-    }
-
-    public void setModifiable(final Boolean modifiable) {
-        this.modifiable = modifiable;
-    }
-
-    public Boolean isModifiable() {
-        return modifiable;
     }
 }

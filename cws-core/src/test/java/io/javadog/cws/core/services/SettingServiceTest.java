@@ -20,10 +20,12 @@ import io.javadog.cws.core.enums.StandardSetting;
 import io.javadog.cws.core.exceptions.AuthorizationException;
 import io.javadog.cws.core.exceptions.CWSException;
 import io.javadog.cws.core.model.Settings;
+import io.javadog.cws.core.model.entities.MemberEntity;
 import org.junit.Test;
 
 import javax.persistence.Query;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -113,6 +115,25 @@ public final class SettingServiceTest extends DatabaseSetup {
         assertThat(request.validate().isEmpty(), is(true));
 
         service.perform(request);
+    }
+
+    @Test
+    public void testUpdatingSalt() {
+        // Before starting, all member accounts must be removed
+        final List<MemberEntity> members = dao.findAllAscending(MemberEntity.class, "id");
+        for (final MemberEntity member : members) {
+            dao.delete(member);
+        }
+        final SettingService service = new SettingService(new Settings(), entityManager);
+        final SettingRequest request = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
+        final SettingResponse response = service.perform(request);
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
+
+        final Map<String, String> mySettings = new HashMap<>(response.getSettings());
+        mySettings.put(StandardSetting.CWS_SALT.getKey(), "new SALT");
+        request.setSettings(mySettings);
+        final SettingResponse update = service.perform(request);
+        assertThat(update.getReturnCode(), is(ReturnCode.SUCCESS));
     }
 
     @Test

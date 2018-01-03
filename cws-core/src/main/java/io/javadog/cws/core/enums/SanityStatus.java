@@ -9,10 +9,11 @@ package io.javadog.cws.core.enums;
 
 /**
  * @author Kim Jensen
- * @since CWS 1.0
+ * @since  CWS 1.0
  */
 public enum SanityStatus {
 
     OK,
-    FAILED
+    FAILED,
+    UNKNOWN
 }

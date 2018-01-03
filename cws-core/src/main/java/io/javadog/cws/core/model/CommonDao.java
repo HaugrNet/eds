@@ -305,6 +305,13 @@ public final class CommonDao {
         return findList(query);
     }
 
+    public Long countMembers() {
+        final Query query = entityManager.createNamedQuery("member.countMembers");
+        final Object obj = findSingleRecord(query);
+
+        return (Long) obj;
+    }
+
     // =========================================================================
     // Internal Methods, handling the actual lookup's to simplify error handling
     // =========================================================================
@@ -315,7 +322,7 @@ public final class CommonDao {
         return found.isEmpty() ? null : found.get(0);
     }
 
-    private static <E> List<E> findList(final Query query) {
+    public static <E> List<E> findList(final Query query) {
         try {
             final List<E> list = query.getResultList();
 

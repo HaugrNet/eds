@@ -71,13 +71,10 @@ public final class SettingService extends Serviceable<SettingResponse, SettingRe
                 deleteSetting(existing.get(key));
             } else if (existing.containsKey(key)) {
                 entity = existing.get(key);
-                if (entity.isModifiable()) {
-                    persistAndUpdateSetting(entity, key, value);
+                if (Objects.equals(entity.getName(), StandardSetting.CWS_SALT.getKey())) {
+                    updateSaltOrThrowException(request, entity, key, value);
                 } else if (!Objects.equals(entity.getSetting(), value)) {
-                    // If the request contain an update do a non-updateable
-                    // field, then the Exception will be thrown, which will
-                    // result in the Transaction being rolled back
-                    throw new CWSException(ReturnCode.SETTING_WARNING, "The setting " + key + " may not be overwritten.");
+                    persistAndUpdateSetting(entity, key, value);
                 }
             } else {
                 entity = new SettingEntity();
@@ -89,6 +86,27 @@ public final class SettingService extends Serviceable<SettingResponse, SettingRe
         response.setSettings(convert(settings));
 
         return response;
+    }
+
+    private void updateSaltOrThrowException(final SettingRequest request, final SettingEntity entity, final String key, final String value) {
+        // If there is no change between the existing Salt and the one from the
+        // request, then we will simply ignore it.
+        if (!Objects.equals(entity.getSetting(), value)) {
+            final Long members = dao.countMembers();
+
+            if (members > 1) {
+                // It is only allowed to update the System Salt provided that no
+                // other account exists than the System Administrator. If that is
+                // the case, then an exception is thrown.
+                throw new CWSException(ReturnCode.SETTING_WARNING, "The setting " + key + " may not be overwritten.");
+            }
+
+            // First, save the updated Salt value
+            persistAndUpdateSetting(entity, key, value);
+
+            // Now the tricky part - we have to update the Admin Account also.
+            updateMemberPassword(member, request.getCredential());
+        }
     }
 
     private void deleteSetting(final SettingEntity entity) {
@@ -107,7 +125,6 @@ public final class SettingService extends Serviceable<SettingResponse, SettingRe
 
         entity.setName(key);
         entity.setSetting(value);
-        entity.setModifiable(Boolean.TRUE);
         dao.persist(entity);
         settings.set(key, value);
     }

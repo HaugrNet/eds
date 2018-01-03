@@ -25,10 +25,9 @@ import javax.persistence.Table;
  */
 @Entity
 @NamedQueries({
-        @NamedQuery(name = "member.findAll",
-                query = "select m " +
-                        "from MemberEntity m " +
-                        "order by name asc"),
+        @NamedQuery(name = "member.countMembers",
+                query = "select count(m.id) " +
+                        "from MemberEntity m"),
         @NamedQuery(name = "member.findByName",
                 query = "select m " +
                         "from MemberEntity m " +

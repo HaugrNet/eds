@@ -69,7 +69,8 @@ public class SanitizerBean {
             ids = findNextBatch(BLOCK);
         }
 
-        log.log(Settings.INFO, "Completed Sanity check, found " + flawed + " flaws out of " + count + " checked Data Objects.");
+        final String[] args = { String.valueOf(flawed), String.valueOf(count) };
+        log.log(Settings.INFO, "Completed Sanity check, found {0} flaws out of {1} checked Data Objects.", args);
     }
 
     @Transactional(Transactional.TxType.REQUIRES_NEW)

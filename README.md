@@ -78,7 +78,6 @@ GitHub. The original goal for releasing the final 1.0 was on December 31st,
 as of Java 8u162, to be released on [January 16th, 2018](http://www.oracle.com/technetwork/java/javase/8u152-relnotes-3850503.html)
 the release of CWS 1.0 is scheduled January 31st, 2018.
 
-- 0.8 - Scheduled for December, 2017; REST &amp; Feature Freeze Release
 - 0.9 - Scheduled for January, 2018; Auditing &amp; Review Release
 - 1.0 - Scheduled for January 31st, 2018; Final 1.0 Release
 

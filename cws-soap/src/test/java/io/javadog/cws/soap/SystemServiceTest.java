@@ -14,16 +14,21 @@ import static org.junit.Assert.fail;
 import io.javadog.cws.api.common.Action;
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
+import io.javadog.cws.api.common.TrustLevel;
 import io.javadog.cws.api.requests.FetchCircleRequest;
 import io.javadog.cws.api.requests.FetchMemberRequest;
+import io.javadog.cws.api.requests.FetchTrusteeRequest;
 import io.javadog.cws.api.requests.ProcessCircleRequest;
 import io.javadog.cws.api.requests.ProcessMemberRequest;
+import io.javadog.cws.api.requests.ProcessTrusteeRequest;
 import io.javadog.cws.api.requests.SanityRequest;
 import io.javadog.cws.api.requests.SettingRequest;
 import io.javadog.cws.api.responses.FetchCircleResponse;
 import io.javadog.cws.api.responses.FetchMemberResponse;
+import io.javadog.cws.api.responses.FetchTrusteeResponse;
 import io.javadog.cws.api.responses.ProcessCircleResponse;
 import io.javadog.cws.api.responses.ProcessMemberResponse;
+import io.javadog.cws.api.responses.ProcessTrusteeResponse;
 import io.javadog.cws.api.responses.SanityResponse;
 import io.javadog.cws.api.responses.SettingResponse;
 import io.javadog.cws.api.responses.VersionResponse;
@@ -288,6 +293,83 @@ public final class SystemServiceTest extends BeanSetup {
         final ProcessCircleRequest request = null;
 
         final ProcessCircleResponse response = system.processCircle(request);
+        assertThat(response.getReturnCode(), is(ReturnCode.ERROR));
+    }
+
+    @Test
+    public void testFetchTrustee() {
+        final SystemService system = prepareSystemService();
+        final FetchTrusteeRequest request = prepareRequest(FetchTrusteeRequest.class, MEMBER_1);
+        request.setCircleId(CIRCLE_1_ID);
+
+        final FetchTrusteeResponse response = system.fetchTrustees(request);
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
+    }
+
+    @Test
+    public void testFetchTrusteeWithNullRequest() {
+        final SystemService system = prepareSystemService();
+        final FetchTrusteeRequest request = null;
+
+        final FetchTrusteeResponse response = system.fetchTrustees(request);
+        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING));
+    }
+
+    @Test
+    public void testFetchTrusteeWithEmptyRequest() {
+        final SystemService system = prepareSystemService();
+        final FetchTrusteeRequest request = new FetchTrusteeRequest();
+
+        final FetchTrusteeResponse response = system.fetchTrustees(request);
+        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING));
+    }
+
+    @Test
+    public void testFlawedFetchTrustee() {
+        final SystemService system = prepareFlawedSystemService();
+        final FetchTrusteeRequest request = null;
+
+        final FetchTrusteeResponse response = system.fetchTrustees(request);
+        assertThat(response.getReturnCode(), is(ReturnCode.ERROR));
+    }
+
+    @Test
+    public void testProcessTrustee() {
+        final SystemService system = prepareSystemService();
+        final ProcessTrusteeRequest request = prepareRequest(ProcessTrusteeRequest.class, MEMBER_1);
+        request.setAction(Action.ALTER);
+        request.setMemberId(MEMBER_2_ID);
+        request.setCircleId(CIRCLE_1_ID);
+        request.setTrustLevel(TrustLevel.WRITE);
+
+        final ProcessTrusteeResponse response = system.processTrustee(request);
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
+    }
+
+    @Test
+    public void testProcessTrusteeWithNullRequest() {
+        final SystemService system = prepareSystemService();
+        final ProcessTrusteeRequest request = null;
+
+        final ProcessTrusteeResponse response = system.processTrustee(request);
+        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING));
+    }
+
+    @Test
+    public void testProcessTrusteeWithEmptyRequest() {
+        final SystemService system = prepareSystemService();
+        final ProcessTrusteeRequest request = new ProcessTrusteeRequest();
+
+        final ProcessTrusteeResponse response = system.processTrustee(request);
+        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING));
+    }
+
+    @Test
+    public void testFlawedProcessTrustee() {
+        final SystemService system = prepareFlawedSystemService();
+        final ProcessTrusteeRequest request = null;
+
+        final ProcessTrusteeResponse response = system.processTrustee(request);
         assertThat(response.getReturnCode(), is(ReturnCode.ERROR));
     }
 }

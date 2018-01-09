@@ -9,14 +9,18 @@ package io.javadog.cws.core;
 
 import io.javadog.cws.api.requests.FetchCircleRequest;
 import io.javadog.cws.api.requests.FetchMemberRequest;
+import io.javadog.cws.api.requests.FetchTrusteeRequest;
 import io.javadog.cws.api.requests.ProcessCircleRequest;
 import io.javadog.cws.api.requests.ProcessMemberRequest;
+import io.javadog.cws.api.requests.ProcessTrusteeRequest;
 import io.javadog.cws.api.requests.SanityRequest;
 import io.javadog.cws.api.requests.SettingRequest;
 import io.javadog.cws.api.responses.FetchCircleResponse;
 import io.javadog.cws.api.responses.FetchMemberResponse;
+import io.javadog.cws.api.responses.FetchTrusteeResponse;
 import io.javadog.cws.api.responses.ProcessCircleResponse;
 import io.javadog.cws.api.responses.ProcessMemberResponse;
+import io.javadog.cws.api.responses.ProcessTrusteeResponse;
 import io.javadog.cws.api.responses.SanityResponse;
 import io.javadog.cws.api.responses.SettingResponse;
 import io.javadog.cws.api.responses.VersionResponse;
@@ -24,10 +28,11 @@ import io.javadog.cws.core.exceptions.CWSException;
 import io.javadog.cws.core.model.Settings;
 import io.javadog.cws.core.services.FetchCircleService;
 import io.javadog.cws.core.services.FetchMemberService;
+import io.javadog.cws.core.services.FetchTrusteeService;
 import io.javadog.cws.core.services.ProcessCircleService;
 import io.javadog.cws.core.services.ProcessMemberService;
+import io.javadog.cws.core.services.ProcessTrusteeService;
 import io.javadog.cws.core.services.SanityService;
-import io.javadog.cws.core.services.Serviceable;
 import io.javadog.cws.core.services.SettingService;
 
 import javax.ejb.Stateless;
@@ -61,7 +66,7 @@ public class SystemBean {
 
     @Transactional(Transactional.TxType.REQUIRED)
     public SettingResponse settings(final SettingRequest request) {
-        Serviceable<SettingResponse, SettingRequest> service = null;
+        SettingService service = null;
         SettingResponse response;
 
         try {
@@ -83,7 +88,7 @@ public class SystemBean {
 
     @Transactional(Transactional.TxType.SUPPORTS)
     public SanityResponse sanity(final SanityRequest request) {
-        Serviceable<SanityResponse, SanityRequest> service = null;
+        SanityService service = null;
         SanityResponse response;
 
         try {
@@ -105,7 +110,7 @@ public class SystemBean {
 
     @Transactional(Transactional.TxType.SUPPORTS)
     public FetchMemberResponse fetchMembers(final FetchMemberRequest request) {
-        Serviceable<FetchMemberResponse, FetchMemberRequest> service = null;
+        FetchMemberService service = null;
         FetchMemberResponse response;
 
         try {
@@ -127,7 +132,7 @@ public class SystemBean {
 
     @Transactional(Transactional.TxType.REQUIRED)
     public ProcessMemberResponse processMember(final ProcessMemberRequest request) {
-        Serviceable<ProcessMemberResponse, ProcessMemberRequest> service = null;
+        ProcessMemberService service = null;
         ProcessMemberResponse response;
 
         try {
@@ -149,7 +154,7 @@ public class SystemBean {
 
     @Transactional(Transactional.TxType.SUPPORTS)
     public FetchCircleResponse fetchCircles(final FetchCircleRequest request) {
-        Serviceable<FetchCircleResponse, FetchCircleRequest> service = null;
+        FetchCircleService service = null;
         FetchCircleResponse response;
 
         try {
@@ -171,7 +176,7 @@ public class SystemBean {
 
     @Transactional(Transactional.TxType.REQUIRED)
     public ProcessCircleResponse processCircle(final ProcessCircleRequest request) {
-        Serviceable<ProcessCircleResponse, ProcessCircleRequest> service = null;
+        ProcessCircleService service = null;
         ProcessCircleResponse response;
 
         try {
@@ -184,6 +189,50 @@ public class SystemBean {
             // response.
             log.log(Settings.DEBUG, e.getMessage(), e);
             response = new ProcessCircleResponse(e.getReturnCode(), e.getMessage());
+        } finally {
+            CommonBean.destroy(service);
+        }
+
+        return response;
+    }
+
+    @Transactional(Transactional.TxType.SUPPORTS)
+    public FetchTrusteeResponse fetchTrustees(final FetchTrusteeRequest request) {
+        FetchTrusteeService service = null;
+        FetchTrusteeResponse response;
+
+        try {
+            service = new FetchTrusteeService(settingBean.getSettings(), entityManager);
+            response = service.perform(request);
+        } catch (CWSException e) {
+            // Any Warning or Error thrown by the CWS contain enough information
+            // so it can be dealt with by the requesting System. Logging the
+            // error is thus not needed, as all information is provided in the
+            // response.
+            log.log(Settings.DEBUG, e.getMessage(), e);
+            response = new FetchTrusteeResponse(e.getReturnCode(), e.getMessage());
+        } finally {
+            CommonBean.destroy(service);
+        }
+
+        return response;
+    }
+
+    @Transactional(Transactional.TxType.REQUIRED)
+    public ProcessTrusteeResponse processTrustee(final ProcessTrusteeRequest request) {
+        ProcessTrusteeService service = null;
+        ProcessTrusteeResponse response;
+
+        try {
+            service = new ProcessTrusteeService(settingBean.getSettings(), entityManager);
+            response = service.perform(request);
+        } catch (CWSException e) {
+            // Any Warning or Error thrown by the CWS contain enough information
+            // so it can be dealt with by the requesting System. Logging the
+            // error is thus not needed, as all information is provided in the
+            // response.
+            log.log(Settings.DEBUG, e.getMessage(), e);
+            response = new ProcessTrusteeResponse(e.getReturnCode(), e.getMessage());
         } finally {
             CommonBean.destroy(service);
         }

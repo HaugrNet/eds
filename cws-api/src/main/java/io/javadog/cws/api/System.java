@@ -9,14 +9,18 @@ package io.javadog.cws.api;
 
 import io.javadog.cws.api.requests.FetchCircleRequest;
 import io.javadog.cws.api.requests.FetchMemberRequest;
+import io.javadog.cws.api.requests.FetchTrusteeRequest;
 import io.javadog.cws.api.requests.ProcessCircleRequest;
 import io.javadog.cws.api.requests.ProcessMemberRequest;
+import io.javadog.cws.api.requests.ProcessTrusteeRequest;
 import io.javadog.cws.api.requests.SanityRequest;
 import io.javadog.cws.api.requests.SettingRequest;
 import io.javadog.cws.api.responses.FetchCircleResponse;
 import io.javadog.cws.api.responses.FetchMemberResponse;
+import io.javadog.cws.api.responses.FetchTrusteeResponse;
 import io.javadog.cws.api.responses.ProcessCircleResponse;
 import io.javadog.cws.api.responses.ProcessMemberResponse;
+import io.javadog.cws.api.responses.ProcessTrusteeResponse;
 import io.javadog.cws.api.responses.SanityResponse;
 import io.javadog.cws.api.responses.SettingResponse;
 import io.javadog.cws.api.responses.VersionResponse;
@@ -141,15 +145,7 @@ public interface System {
     ProcessMemberResponse processMember(ProcessMemberRequest request);
 
     /**
-     * <p>Retrieval of a Circle can be made with or without a Circle Id. If no Id
-     * is given in the request, then CWS will simply return a list of all existing
-     * Circles. If the Id was given, then the CWS will return the found Circle and
-     * the list of Trustees for the Circle, i.e. the Members who have access and
-     * their current Trust Level.</p>
-     *
-     * <p>If No Circle was found for a given Id, or if a different error occurred
-     * during the handling of the Request, then an error is set and both the Circle
-     * and Trustee Lists returned will be empty</p>
+     * <p>This request will fetch a list of all Circles in the system.</p>
      *
      * @param request Fetch Circle Request Object
      * @return Fetch Circle Response Object with error information
@@ -157,10 +153,15 @@ public interface System {
     FetchCircleResponse fetchCircles(FetchCircleRequest request);
 
     /**
-     * <p>With this request it is possible to process Circles and Trustees. A
-     * Trustee, is an Account which has been granted access to a Circle, and
-     * thus also has access to the the Circle Key to both encrypt and decrypt
-     * the data belonging to a Circle.</p>
+     * <p>With this request it is possible to process Circles. The request may
+     * be invoked by all members, allowing members to create the different types
+     * of connections needed to sharing of data.</p>
+     *
+     * <p>If a request to create a new Circle is made by a member, then the
+     * initial Circle Administrator will automatically be set to the Member. If
+     * the request is made by the System administrator, then a Member Id is
+     * required, as it is not allowed for the System Administrator to be part of
+     * any Circles.</p>
      *
      * <p>The Request supports the following Actions:</p>
      * <ul>
@@ -173,6 +174,35 @@ public interface System {
      *   <li><b>{@link io.javadog.cws.api.common.Action#DELETE}</b> an existing
      *   Circle from the System. This action cannot be reverted - once Deleted,
      *   the Keys and Data will also be deleted.</li>
+     * </ul>
+     *
+     * @param request Request Object
+     * @return Response Object with ReturnCode and Message
+     */
+    ProcessCircleResponse processCircle(ProcessCircleRequest request);
+
+    /**
+     * <p>With this request, it is possible to retrieve the list of Trustees,
+     * belonging to a Circle. A Trustee, is a member who has been granted access
+     * to a Circle either as Circle Administrator, Write access or Read access
+     * only.</p>
+     *
+     * <p>If No Circle was found for a given Id, or if a different error occurred
+     * during the handling of the Request, then an error is set and the list of
+     * Trustee returned will be empty</p>
+     *
+     * @param request Fetch Circle Request Object
+     * @return Fetch Circle Response Object with error information
+     */
+    FetchTrusteeResponse fetchTrustees(FetchTrusteeRequest request);
+
+    /**
+     * <p>With this request it is possible to process Trustees. A Trustee, is a
+     * Member which has been granted access to a Circle, and thereby is able to
+     * access the Circle Key to both encrypt and decrypt Circle Data.</p>
+     *
+     * <p>The Request supports the following Actions:</p>
+     * <ul>
      *   <li><b>{@link io.javadog.cws.api.common.Action#ADD}</b> a new Trustee
      *   to the Circle, i.e. an Account other than the System Administrator with
      *   a specific Trust level.</li>
@@ -190,5 +220,5 @@ public interface System {
      * @param request Request Object
      * @return Response Object with ReturnCode and Message
      */
-    ProcessCircleResponse processCircle(ProcessCircleRequest request);
+    ProcessTrusteeResponse processTrustee(ProcessTrusteeRequest request);
 }

@@ -7,18 +7,13 @@
  */
 package io.javadog.cws.core.services;
 
-import io.javadog.cws.api.common.ReturnCode;
-import io.javadog.cws.api.dtos.Circle;
-import io.javadog.cws.api.dtos.Trustee;
 import io.javadog.cws.api.requests.FetchCircleRequest;
 import io.javadog.cws.api.responses.FetchCircleResponse;
 import io.javadog.cws.core.enums.Permission;
 import io.javadog.cws.core.model.Settings;
 import io.javadog.cws.core.model.entities.CircleEntity;
-import io.javadog.cws.core.model.entities.TrusteeEntity;
 
 import javax.persistence.EntityManager;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -38,80 +33,10 @@ public final class FetchCircleService extends Serviceable<FetchCircleResponse, F
     public FetchCircleResponse perform(final FetchCircleRequest request) {
         verifyRequest(request, Permission.FETCH_CIRCLE);
         final FetchCircleResponse response = new FetchCircleResponse();
-        final String circleId = request.getCircleId();
 
-        if (circleId != null) {
-            // First retrieve the Circle via the ExternalId given. If no Circle
-            // is found, the DAO will throw an Exception.
-            final CircleEntity circle = dao.find(CircleEntity.class, circleId);
-
-            if (circle != null) {
-                // The Settings and the Requesting Member are both important when
-                // trying to ascertain if the Circle Trustees may be retrieved. If
-                // the requesting Member is the System Administrator, then all
-                // information may be retrieved. If the Settings allow it, then all
-                // information may be retrieved. However, if the request is made by
-                // anyone else than the System Administrator and the Settings
-                // doesn't allow exposing information, then we will only show
-                // information about Circles, which the requesting Member is allowed
-                // to access.
-                final List<TrusteeEntity> members = dao.findTrusteesByCircle(circle);
-                response.setTrustees(convertTrustees(members));
-                final List<Circle> circles = new ArrayList<>(1);
-                circles.add(convert(circle));
-                response.setCircles(circles);
-            } else {
-                response.setReturnCode(ReturnCode.IDENTIFICATION_WARNING);
-                response.setReturnMessage("The requested Circle cannot be found.");
-            }
-        } else {
-            final List<CircleEntity> circles = dao.findAllAscending(CircleEntity.class, "name");
-            response.setCircles(convertCircles(circles));
-        }
+        final List<CircleEntity> circles = dao.findAllAscending(CircleEntity.class, "name");
+        response.setCircles(convertCircles(circles));
 
         return response;
-    }
-
-    private static List<Trustee> convertTrustees(final List<TrusteeEntity> entities) {
-        final List<Trustee> trustees = new ArrayList<>(entities.size());
-
-        for (final TrusteeEntity entity : entities) {
-            trustees.add(convert(entity));
-
-        }
-
-        return trustees;
-    }
-
-    private static List<Circle> convertCircles(final List<CircleEntity> entities) {
-        final List<Circle> circles = new ArrayList<>(entities.size());
-
-        for (final CircleEntity entity : entities) {
-            circles.add(convert(entity));
-        }
-
-        return circles;
-    }
-
-    private static Trustee convert(final TrusteeEntity entity) {
-        final Trustee trustee = new Trustee();
-
-        trustee.setMemberId(entity.getMember().getExternalId());
-        trustee.setCircleId(entity.getCircle().getExternalId());
-        trustee.setTrustLevel(entity.getTrustLevel());
-        trustee.setChanged(entity.getAltered());
-        trustee.setAdded(entity.getAdded());
-
-        return trustee;
-    }
-
-    private static Circle convert(final CircleEntity entity) {
-        final Circle circle = new Circle();
-
-        circle.setCircleId(entity.getExternalId());
-        circle.setCircleName(entity.getName());
-        circle.setAdded(entity.getAdded());
-
-        return circle;
     }
 }

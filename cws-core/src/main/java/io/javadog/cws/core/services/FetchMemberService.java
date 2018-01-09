@@ -94,15 +94,15 @@ public final class FetchMemberService extends Serviceable<FetchMemberResponse, F
      * flag is set, then a Member may view the System Administrator Account,
      * however this setting is disabled per default.</p>
      *
-     * <p>If the {@link io.javadog.cws.core.enums.StandardSetting##SHOW_TRUSTEES}
+     * <p>If the {@link io.javadog.cws.core.enums.StandardSetting#SHOW_TRUSTEES}
      * flag is set, then the Member may view all Circles, which the Other Member
      * belongs to, and not just the ones both Members share. By default, this
      * Settings is set to True.</p>
      *
      * @param response  Response Object to fill
      * @param requested Requested Member to see if may be viewed
-     * @see io.javadog.cws.core.enums.StandardSetting##EXPOSE_ADMIN
-     * @see io.javadog.cws.core.enums.StandardSetting##SHOW_TRUSTEES
+     * @see io.javadog.cws.core.enums.StandardSetting#EXPOSE_ADMIN
+     * @see io.javadog.cws.core.enums.StandardSetting#SHOW_TRUSTEES
      */
     private void fetchSomeoneElse(final FetchMemberResponse response, final MemberEntity requested) {
         if (Objects.equals(member.getName(), Constants.ADMIN_ACCOUNT)) {
@@ -172,25 +172,5 @@ public final class FetchMemberService extends Serviceable<FetchMemberResponse, F
         final List<CircleEntity> circles = dao.findCirclesBothBelongTo(current, requested);
 
         return convertCircles(circles);
-    }
-
-    private static List<Circle> convertCircles(final List<CircleEntity> entities) {
-        final List<Circle> circles = new ArrayList<>(entities.size());
-
-        for (final CircleEntity entity : entities) {
-            circles.add(convert(entity));
-        }
-
-        return circles;
-    }
-
-    private static Circle convert(final CircleEntity entity) {
-        final Circle circle = new Circle();
-
-        circle.setCircleId(entity.getExternalId());
-        circle.setCircleName(entity.getName());
-        circle.setAdded(entity.getAdded());
-
-        return circle;
     }
 }

@@ -9,7 +9,7 @@ package io.javadog.cws.api.responses;
 
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
-import io.javadog.cws.api.dtos.Circle;
+import io.javadog.cws.api.dtos.Trustee;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -25,15 +25,15 @@ import java.util.List;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlRootElement(name = "fetchCircleResult")
-@XmlType(name = "fetchCircleResult", propOrder = Constants.FIELD_CIRCLES)
-public final class FetchCircleResponse extends CwsResponse {
+@XmlRootElement(name = "fetchTrusteeResult")
+@XmlType(name = "fetchTrusteeResult", propOrder = Constants.FIELD_TRUSTEES)
+public final class FetchTrusteeResponse extends CwsResponse {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
-    @XmlElement(name = Constants.FIELD_CIRCLES, required = true)
-    private final List<Circle> circles = new ArrayList<>(0);
+    @XmlElement(name = Constants.FIELD_TRUSTEES, required = true)
+    private final List<Trustee> trustees = new ArrayList<>(0);
 
     // =========================================================================
     // Object Constructors
@@ -43,7 +43,7 @@ public final class FetchCircleResponse extends CwsResponse {
      * Empty Constructor, to use if the setters are invoked. This is required
      * for WebServices to work properly.
      */
-    public FetchCircleResponse() {
+    public FetchTrusteeResponse() {
         // Empty Constructor, required for WebServices
     }
 
@@ -54,7 +54,7 @@ public final class FetchCircleResponse extends CwsResponse {
      * @param returnCode    The CWS Return Code
      * @param returnMessage The CWS Return Message
      */
-    public FetchCircleResponse(final ReturnCode returnCode, final String returnMessage) {
+    public FetchTrusteeResponse(final ReturnCode returnCode, final String returnMessage) {
         super(returnCode, returnMessage);
     }
 
@@ -62,11 +62,11 @@ public final class FetchCircleResponse extends CwsResponse {
     // Setters & Getters
     // =========================================================================
 
-    public void setCircles(final List<Circle> circles) {
-        this.circles.addAll(circles);
+    public void setTrustees(final List<Trustee> trustees) {
+        this.trustees.addAll(trustees);
     }
 
-    public List<Circle> getCircles() {
-        return Collections.unmodifiableList(circles);
+    public List<Trustee> getTrustees() {
+        return Collections.unmodifiableList(trustees);
     }
 }

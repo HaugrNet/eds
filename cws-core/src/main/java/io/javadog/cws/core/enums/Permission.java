@@ -43,17 +43,23 @@ public enum Permission {
     FETCH_SIGNATURES(TrustLevel.ALL, "Fetch Signatures."),
 
     /**
+     * Processing of Members is limited to the System Administrator. However,
+     * any given Member may update their own settings, which include accountName
+     * and Passphrase.
+     */
+    PROCESS_MEMBER(TrustLevel.ALL, "Process a Member."),
+
+    /**
      * Everybody is allowed to create Circles, but only Circle Administrators
      * may be allowed to add Members, update or remove Members.
      */
     PROCESS_CIRCLE(TrustLevel.ALL, "Process a Circle."),
 
     /**
-     * Processing of Members is limited to the System Administrator. However,
-     * any given Member may update their own settings, which include accountName
-     * and Passphrase.
+     * Only Circle Administrators are allowed to add, alter or remove trustees,
+     * i.e. Member Circle relations.
      */
-    PROCESS_MEMBER(TrustLevel.ALL, "Process a Member."),
+    PROCESS_TRUSTEE(TrustLevel.ADMIN, "Process a Trustee"),
 
     /**
      * Only someone with writing permissions in a Circle, may add, update or

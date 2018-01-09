@@ -9,10 +9,10 @@ package io.javadog.cws.api.requests;
 
 import io.javadog.cws.api.common.Action;
 import io.javadog.cws.api.common.Constants;
+import io.javadog.cws.api.common.TrustLevel;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -25,40 +25,31 @@ import java.util.Map;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlRootElement(name = "processCircleRequest")
-@XmlType(name = "processCircleRequest", propOrder = { Constants.FIELD_ACTION, Constants.FIELD_CIRCLE_ID, Constants.FIELD_CIRCLE_NAME, Constants.FIELD_MEMBER_ID })
-public final class ProcessCircleRequest extends Authentication implements CircleIdRequest {
+@XmlRootElement(name = "processTrusteeRequest")
+@XmlType(name = "processTrusteeRequest", propOrder = { Constants.FIELD_ACTION, Constants.FIELD_CIRCLE_ID, Constants.FIELD_MEMBER_ID, Constants.FIELD_TRUSTLEVEL })
+public final class ProcessTrusteeRequest extends Authentication implements CircleIdRequest {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
+
+    @Pattern(regexp = Constants.ID_PATTERN_REGEX)
+    @XmlElement(name = Constants.FIELD_CIRCLE_ID, nillable = true)
+    private String circleId = null;
 
     @NotNull
     @XmlElement(name = Constants.FIELD_ACTION, required = true)
     private Action action = null;
 
     @Pattern(regexp = Constants.ID_PATTERN_REGEX)
-    @XmlElement(name = Constants.FIELD_CIRCLE_ID, nillable = true)
-    private String circleId = null;
-
-    @Size(min = 1, max = Constants.MAX_NAME_LENGTH)
-    @XmlElement(name = Constants.FIELD_CIRCLE_NAME, nillable = true)
-    private String circleName = null;
-
-    @Pattern(regexp = Constants.ID_PATTERN_REGEX)
     @XmlElement(name = Constants.FIELD_MEMBER_ID, nillable = true)
     private String memberId = null;
+
+    @XmlElement(name = Constants.FIELD_TRUSTLEVEL, nillable = true)
+    private TrustLevel trustLevel = null;
 
     // =========================================================================
     // Standard Setters & Getters
     // =========================================================================
-
-    public void setAction(final Action action) {
-        this.action = action;
-    }
-
-    public Action getAction() {
-        return action;
-    }
 
     /**
      * {@inheritDoc}
@@ -76,12 +67,12 @@ public final class ProcessCircleRequest extends Authentication implements Circle
         return circleId;
     }
 
-    public void setCircleName(final String circleName) {
-        this.circleName = circleName;
+    public void setAction(final Action action) {
+        this.action = action;
     }
 
-    public String getCircleName() {
-        return circleName;
+    public Action getAction() {
+        return action;
     }
 
     public void setMemberId(final String memberId) {
@@ -90,6 +81,14 @@ public final class ProcessCircleRequest extends Authentication implements Circle
 
     public String getMemberId() {
         return memberId;
+    }
+
+    public void setTrustLevel(final TrustLevel trustLevel) {
+        this.trustLevel = trustLevel;
+    }
+
+    public TrustLevel getTrustLevel() {
+        return trustLevel;
     }
 
     // =========================================================================
@@ -107,17 +106,19 @@ public final class ProcessCircleRequest extends Authentication implements Circle
             errors.put(Constants.FIELD_ACTION, "No action has been provided.");
         } else {
             switch (action) {
-                case CREATE:
-                    checkNotNullOrEmpty(errors, Constants.FIELD_CIRCLE_NAME, circleName, "Cannot create a new Circle, without the Circle Name.");
-                    checkNotTooLong(errors, Constants.FIELD_CIRCLE_NAME, circleName, Constants.MAX_NAME_LENGTH, "The " + Constants.FIELD_CIRCLE_NAME + " may not exceed " + Constants.MAX_NAME_LENGTH + " characters.");
+                case ADD:
+                    checkNotNullAndValidId(errors, Constants.FIELD_CIRCLE_ID, circleId, "Cannot add a Trustee to a Circle, without a Circle Id.");
+                    checkNotNullAndValidId(errors, Constants.FIELD_MEMBER_ID, memberId, "Cannot add a Trustee to a Circle, without a Member Id.");
+                    checkNotNull(errors, Constants.FIELD_TRUSTLEVEL, trustLevel, "Cannot add a Trustee to a Circle, without an initial TrustLevel.");
                     break;
-                case UPDATE:
-                    checkNotNullAndValidId(errors, Constants.FIELD_CIRCLE_ID, circleId, "Cannot update the Circle Name, without knowing the Circle Id.");
-                    checkNotNullOrEmpty(errors, Constants.FIELD_CIRCLE_NAME, circleName, "Cannot update the Circle Name, without a new Circle Name.");
-                    checkNotTooLong(errors, Constants.FIELD_CIRCLE_NAME, circleName, Constants.MAX_NAME_LENGTH, "The " + Constants.FIELD_CIRCLE_NAME + " may not exceed " + Constants.MAX_NAME_LENGTH + " characters.");
+                case ALTER:
+                    checkNotNullAndValidId(errors, Constants.FIELD_CIRCLE_ID, circleId, "Cannot alter a Trustees TrustLevel, without knowing the Circle Id.");
+                    checkNotNullAndValidId(errors, Constants.FIELD_MEMBER_ID, memberId, "Cannot alter a Trustees TrustLevel, without knowing the Member Id.");
+                    checkNotNull(errors, Constants.FIELD_TRUSTLEVEL, trustLevel, "Cannot alter a Trustees TrustLevel, without knowing the new TrustLevel.");
                     break;
-                case DELETE:
-                    checkNotNullAndValidId(errors, Constants.FIELD_CIRCLE_ID, circleId, "Cannot delete a Circle, without knowing the Circle Id.");
+                case REMOVE:
+                    checkNotNullAndValidId(errors, Constants.FIELD_CIRCLE_ID, circleId, "Cannot remove a Trustee from a Circle, without knowing the Circle Id.");
+                    checkNotNullAndValidId(errors, Constants.FIELD_MEMBER_ID, memberId, "Cannot remove a Trustee from a Circle, without knowing the Member Id.");
                     break;
                 default:
                     errors.put(Constants.FIELD_ACTION, "Not supported Action has been provided.");

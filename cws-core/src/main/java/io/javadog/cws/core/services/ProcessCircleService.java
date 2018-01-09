@@ -29,7 +29,6 @@ import io.javadog.cws.core.model.entities.TrusteeEntity;
 
 import javax.persistence.EntityManager;
 import java.security.PublicKey;
-import java.util.List;
 import java.util.Objects;
 
 /**
@@ -63,15 +62,6 @@ public final class ProcessCircleService extends Serviceable<ProcessCircleRespons
                         break;
                     case DELETE:
                         response = deleteCircle(request);
-                        break;
-                    case ADD:
-                        response = addTrustee(request);
-                        break;
-                    case ALTER:
-                        response = alterTrustee(request);
-                        break;
-                    case REMOVE:
-                        response = removeTrustee(request);
                         break;
                     default:
                         // Unreachable Code by design.
@@ -234,100 +224,6 @@ public final class ProcessCircleService extends Serviceable<ProcessCircleRespons
             }
         } else {
             response = new ProcessCircleResponse(ReturnCode.AUTHORIZATION_WARNING, "Only the System Administrator may delete a Circle.");
-        }
-
-        return response;
-    }
-
-    /**
-     * As the Circle Id is mandatory for this request, it also means that the
-     * Validation logic has extracted the Circle Administrator as the only
-     * Trustee record, so we can use this to create a new Trustee record from.
-     *
-     * @param request Request Object with new Trustee information
-     * @return Response with error information.
-     */
-    private ProcessCircleResponse addTrustee(final ProcessCircleRequest request) {
-        final ProcessCircleResponse response;
-
-        if (Objects.equals(Constants.ADMIN_ACCOUNT, member.getName())) {
-            response = new ProcessCircleResponse(ReturnCode.AUTHORIZATION_WARNING, "The System Administrator cannot add a Member to a Circle.");
-        } else {
-            final String memberId = request.getMemberId();
-            final MemberEntity newTrusteeMember = dao.find(MemberEntity.class, memberId);
-
-            if (newTrusteeMember != null) {
-                final List<TrusteeEntity> existing = dao.findTrustByMemberAndCircle(newTrusteeMember, request.getCircleId(), TrustLevel.getLevels(TrustLevel.ALL));
-
-                if (existing.isEmpty()) {
-                    // Please be aware, that during re-key requests - there will
-                    // exist 2 Trustee entities, one with the old Key and one with
-                    // the new. In the unlikely event that someone is being added
-                    // during this - the logic should also reflect it. However, as
-                    // re-key is not supported in version 1.0, support for multiple
-                    // Keys can wait until this is also supported.
-                    final TrusteeEntity admin = trustees.get(0);
-                    final TrustLevel trustLevel = request.getTrustLevel();
-                    final TrusteeEntity trustee = new TrusteeEntity();
-                    trustee.setMember(newTrusteeMember);
-                    trustee.setCircle(admin.getCircle());
-                    trustee.setKey(admin.getKey());
-                    trustee.setTrustLevel(trustLevel);
-
-                    final SecretCWSKey circleKey = crypto.extractCircleKey(admin.getKey().getAlgorithm(), keyPair.getPrivate(), admin.getCircleKey());
-                    final PublicKey publicKey = crypto.dearmoringPublicKey(newTrusteeMember.getPublicKey());
-                    final PublicCWSKey cwsPublicKey = new PublicCWSKey(newTrusteeMember.getRsaAlgorithm(), publicKey);
-                    trustee.setCircleKey(crypto.encryptAndArmorCircleKey(cwsPublicKey, circleKey));
-
-                    dao.persist(trustee);
-
-                    response = new ProcessCircleResponse();
-                } else {
-                    response = new ProcessCircleResponse(ReturnCode.IDENTIFICATION_WARNING, "The Member is already a trustee of the requested Circle.");
-                }
-            } else {
-                response = new ProcessCircleResponse(ReturnCode.IDENTIFICATION_WARNING, "No Member could be found with the given Id.");
-            }
-        }
-
-        return response;
-    }
-
-    private ProcessCircleResponse alterTrustee(final ProcessCircleRequest request) {
-        final ProcessCircleResponse response;
-
-        if (!Objects.equals(Constants.ADMIN_ACCOUNT, member.getName())) {
-            final TrusteeEntity trustee = dao.findTrusteeByCircleAndMember(request.getCircleId(), request.getMemberId());
-            if (trustee != null) {
-                final TrustLevel newTrustLevel = request.getTrustLevel();
-                trustee.setTrustLevel(newTrustLevel);
-                dao.persist(trustee);
-
-                response = new ProcessCircleResponse();
-            } else {
-                response = new ProcessCircleResponse(ReturnCode.IDENTIFICATION_WARNING, "The requested Trustee could not be found.");
-            }
-        } else {
-            response = new ProcessCircleResponse(ReturnCode.AUTHORIZATION_WARNING, "Only a Circle Administrator may alter a Trustee.");
-        }
-
-        return response;
-    }
-
-    private ProcessCircleResponse removeTrustee(final ProcessCircleRequest request) {
-        final ProcessCircleResponse response;
-
-        if (!Objects.equals(Constants.ADMIN_ACCOUNT, member.getName())) {
-            final TrusteeEntity trustee = dao.findTrusteeByCircleAndMember(request.getCircleId(), request.getMemberId());
-            if (trustee != null) {
-                dao.delete(trustee);
-
-                response = new ProcessCircleResponse();
-            } else {
-                response = new ProcessCircleResponse(ReturnCode.IDENTIFICATION_WARNING, "The requested Trustee could not be found.");
-            }
-        } else {
-            response = new ProcessCircleResponse(ReturnCode.AUTHORIZATION_WARNING, "Only a Circle Administrator may remove a Trustee.");
         }
 
         return response;

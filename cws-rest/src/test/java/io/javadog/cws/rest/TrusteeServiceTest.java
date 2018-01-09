@@ -1,6 +1,6 @@
 /*
  * =============================================================================
- * Copyright (c) 2016-2017, JavaDog.io
+ * Copyright (c) 2016-2018, JavaDog.io
  * -----------------------------------------------------------------------------
  * Project: CWS (cws-rest)
  * =============================================================================
@@ -11,8 +11,8 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
 import io.javadog.cws.api.common.ReturnCode;
-import io.javadog.cws.api.requests.FetchCircleRequest;
-import io.javadog.cws.api.requests.ProcessCircleRequest;
+import io.javadog.cws.api.requests.FetchTrusteeRequest;
+import io.javadog.cws.api.requests.ProcessTrusteeRequest;
 import io.javadog.cws.core.SystemBean;
 import io.javadog.cws.core.exceptions.CWSException;
 import org.junit.Test;
@@ -24,66 +24,66 @@ import java.lang.reflect.InvocationTargetException;
  * @author Kim Jensen
  * @since  CWS 1.0
  */
-public final class CircleServiceTest extends BeanSetup {
+public final class TrusteeServiceTest extends BeanSetup {
 
     @Test
-    public void testCreate() {
-        final CircleService service = prepareService();
-        final ProcessCircleRequest request = new ProcessCircleRequest();
+    public void testAdd() {
+        final TrusteeService service = prepareService();
+        final ProcessTrusteeRequest request = new ProcessTrusteeRequest();
 
-        final Response response = service.create(request);
+        final Response response = service.add(request);
         assertThat(response.getStatus(), is(ReturnCode.VERIFICATION_WARNING.getHttpCode()));
     }
 
     @Test
-    public void testFlawedCreate() {
-        final CircleService service = prepareFlawedService();
-        final ProcessCircleRequest request = new ProcessCircleRequest();
+    public void testFlawedAdd() {
+        final TrusteeService service = prepareFlawedService();
+        final ProcessTrusteeRequest request = new ProcessTrusteeRequest();
 
-        final Response response = service.create(request);
+        final Response response = service.add(request);
         assertThat(response.getStatus(), is(ReturnCode.ERROR.getHttpCode()));
     }
 
     @Test
-    public void testUpdatw() {
-        final CircleService service = prepareService();
-        final ProcessCircleRequest request = new ProcessCircleRequest();
+    public void testAlter() {
+        final TrusteeService service = prepareService();
+        final ProcessTrusteeRequest request = new ProcessTrusteeRequest();
 
-        final Response response = service.update(request);
+        final Response response = service.alter(request);
         assertThat(response.getStatus(), is(ReturnCode.VERIFICATION_WARNING.getHttpCode()));
     }
 
     @Test
-    public void testFlawedUpdate() {
-        final CircleService service = prepareFlawedService();
-        final ProcessCircleRequest request = new ProcessCircleRequest();
+    public void testFlawedAlter() {
+        final TrusteeService service = prepareFlawedService();
+        final ProcessTrusteeRequest request = new ProcessTrusteeRequest();
 
-        final Response response = service.update(request);
+        final Response response = service.alter(request);
         assertThat(response.getStatus(), is(ReturnCode.ERROR.getHttpCode()));
     }
 
     @Test
-    public void testDelete() {
-        final CircleService service = prepareService();
-        final ProcessCircleRequest request = new ProcessCircleRequest();
+    public void testRemove() {
+        final TrusteeService service = prepareService();
+        final ProcessTrusteeRequest request = new ProcessTrusteeRequest();
 
-        final Response response = service.delete(request);
+        final Response response = service.remove(request);
         assertThat(response.getStatus(), is(ReturnCode.VERIFICATION_WARNING.getHttpCode()));
     }
 
     @Test
-    public void testFlawedDelete() {
-        final CircleService service = prepareFlawedService();
-        final ProcessCircleRequest request = new ProcessCircleRequest();
+    public void testFlawedRemove() {
+        final TrusteeService service = prepareFlawedService();
+        final ProcessTrusteeRequest request = new ProcessTrusteeRequest();
 
-        final Response response = service.delete(request);
+        final Response response = service.remove(request);
         assertThat(response.getStatus(), is(ReturnCode.ERROR.getHttpCode()));
     }
 
     @Test
     public void testFetch() {
-        final CircleService service = prepareService();
-        final FetchCircleRequest request = new FetchCircleRequest();
+        final TrusteeService service = prepareService();
+        final FetchTrusteeRequest request = new FetchTrusteeRequest();
 
         final Response response = service.fetch(request);
         assertThat(response.getStatus(), is(ReturnCode.VERIFICATION_WARNING.getHttpCode()));
@@ -91,8 +91,8 @@ public final class CircleServiceTest extends BeanSetup {
 
     @Test
     public void testFlawedFetch() {
-        final CircleService service = prepareFlawedService();
-        final FetchCircleRequest request = new FetchCircleRequest();
+        final TrusteeService service = prepareFlawedService();
+        final FetchTrusteeRequest request = new FetchTrusteeRequest();
 
         final Response response = service.fetch(request);
         assertThat(response.getStatus(), is(ReturnCode.ERROR.getHttpCode()));
@@ -102,10 +102,10 @@ public final class CircleServiceTest extends BeanSetup {
     // Internal Test Setup Methods
     // =========================================================================
 
-    private static CircleService prepareFlawedService() {
+    private static TrusteeService prepareFlawedService() {
         try {
 
-            final CircleService service = CircleService.class.getConstructor().newInstance();
+            final TrusteeService service = TrusteeService.class.getConstructor().newInstance();
             setField(service, "bean", null);
 
             return service;
@@ -114,13 +114,13 @@ public final class CircleServiceTest extends BeanSetup {
         }
     }
 
-    private CircleService prepareService() {
+    private TrusteeService prepareService() {
         try {
             final SystemBean bean = SystemBean.class.getConstructor().newInstance();
             setField(bean, "entityManager", entityManager);
             setField(bean, "settingBean", prepareSettingBean());
 
-            final CircleService service = CircleService.class.getConstructor().newInstance();
+            final TrusteeService service = TrusteeService.class.getConstructor().newInstance();
             setField(service, "bean", bean);
 
             return service;

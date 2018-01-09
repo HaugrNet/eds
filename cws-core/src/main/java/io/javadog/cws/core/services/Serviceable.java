@@ -11,6 +11,7 @@ import static io.javadog.cws.api.common.Constants.ADMIN_ACCOUNT;
 
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.common.TrustLevel;
+import io.javadog.cws.api.dtos.Circle;
 import io.javadog.cws.api.requests.Authentication;
 import io.javadog.cws.api.requests.CircleIdRequest;
 import io.javadog.cws.api.requests.Verifiable;
@@ -27,6 +28,7 @@ import io.javadog.cws.core.jce.Crypto;
 import io.javadog.cws.core.jce.SecretCWSKey;
 import io.javadog.cws.core.model.CommonDao;
 import io.javadog.cws.core.model.Settings;
+import io.javadog.cws.core.model.entities.CircleEntity;
 import io.javadog.cws.core.model.entities.DataEntity;
 import io.javadog.cws.core.model.entities.MemberEntity;
 import io.javadog.cws.core.model.entities.TrusteeEntity;
@@ -291,6 +293,27 @@ public abstract class Serviceable<R extends CwsResponse, V extends Authenticatio
         final TrusteeEntity trustee = findTrustee(entity.getMetadata().getCircle().getExternalId());
 
         return crypto.extractCircleKey(entity.getKey().getAlgorithm(), keyPair.getPrivate(), trustee.getCircleKey());
+    }
+
+
+    protected static List<Circle> convertCircles(final List<CircleEntity> entities) {
+        final List<Circle> circles = new ArrayList<>(entities.size());
+
+        for (final CircleEntity entity : entities) {
+            circles.add(convert(entity));
+        }
+
+        return circles;
+    }
+
+    protected static Circle convert(final CircleEntity entity) {
+        final Circle circle = new Circle();
+
+        circle.setCircleId(entity.getExternalId());
+        circle.setCircleName(entity.getName());
+        circle.setAdded(entity.getAdded());
+
+        return circle;
     }
 
     protected TrusteeEntity findTrustee(final String externalCircleId) {

@@ -40,6 +40,7 @@ public class CwsApplication extends Application {
         set.add(SanityService.class);
         set.add(SettingService.class);
         set.add(SignatureService.class);
+        set.add(TrusteeService.class);
         set.add(VersionService.class);
 
         return set;

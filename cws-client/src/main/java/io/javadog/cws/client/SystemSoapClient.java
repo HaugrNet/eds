@@ -11,21 +11,27 @@ import io.javadog.cws.api.System;
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.requests.FetchCircleRequest;
 import io.javadog.cws.api.requests.FetchMemberRequest;
+import io.javadog.cws.api.requests.FetchTrusteeRequest;
 import io.javadog.cws.api.requests.ProcessCircleRequest;
 import io.javadog.cws.api.requests.ProcessMemberRequest;
+import io.javadog.cws.api.requests.ProcessTrusteeRequest;
 import io.javadog.cws.api.requests.SanityRequest;
 import io.javadog.cws.api.requests.SettingRequest;
 import io.javadog.cws.api.responses.FetchCircleResponse;
 import io.javadog.cws.api.responses.FetchMemberResponse;
+import io.javadog.cws.api.responses.FetchTrusteeResponse;
 import io.javadog.cws.api.responses.ProcessCircleResponse;
 import io.javadog.cws.api.responses.ProcessMemberResponse;
+import io.javadog.cws.api.responses.ProcessTrusteeResponse;
 import io.javadog.cws.api.responses.SanityResponse;
 import io.javadog.cws.api.responses.SettingResponse;
 import io.javadog.cws.api.responses.VersionResponse;
 import io.javadog.cws.ws.FetchCircleResult;
 import io.javadog.cws.ws.FetchMemberResult;
+import io.javadog.cws.ws.FetchTrusteeResult;
 import io.javadog.cws.ws.ProcessCircleResult;
 import io.javadog.cws.ws.ProcessMemberResult;
+import io.javadog.cws.ws.ProcessTrusteeResult;
 import io.javadog.cws.ws.SanityResult;
 import io.javadog.cws.ws.SettingResult;
 import io.javadog.cws.ws.System_Service;
@@ -122,6 +128,22 @@ public final class SystemSoapClient implements System {
     @Override
     public ProcessCircleResponse processCircle(final ProcessCircleRequest request) {
         return map(client.processCircle(map(request)));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public FetchTrusteeResponse fetchTrustees(final FetchTrusteeRequest request) {
+        return map(client.fetchTrustees(map(request)));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ProcessTrusteeResponse processTrustee(final ProcessTrusteeRequest request) {
+        return map(client.processTrustee(map(request)));
     }
 
     // =========================================================================
@@ -260,7 +282,6 @@ public final class SystemSoapClient implements System {
             api = new FetchCircleResponse();
             Mapper.fillResponse(api, ws);
             api.setCircles(Mapper.mapCircles(ws.getCircles()));
-            api.setTrustees(Mapper.mapTrustees(ws.getTrustees()));
         }
 
         return api;
@@ -276,7 +297,6 @@ public final class SystemSoapClient implements System {
             ws.setCircleId(Mapper.convert(Constants.FIELD_CIRCLE_ID, api.getCircleId()));
             ws.setCircleName(Mapper.convert(Constants.FIELD_CIRCLE_NAME, api.getCircleName()));
             ws.setMemberId(Mapper.convert(Constants.FIELD_MEMBER_ID, api.getMemberId()));
-            ws.setTrustLevel(Mapper.map(api.getTrustLevel()));
         }
 
         return ws;
@@ -289,6 +309,56 @@ public final class SystemSoapClient implements System {
             api = new ProcessCircleResponse();
             Mapper.fillResponse(api, ws);
             api.setCircleId(ws.getCircleId());
+        }
+
+        return api;
+    }
+
+    private static io.javadog.cws.ws.FetchTrusteeRequest map(final FetchTrusteeRequest api) {
+        io.javadog.cws.ws.FetchTrusteeRequest ws = null;
+
+        if (api != null) {
+            ws = new io.javadog.cws.ws.FetchTrusteeRequest();
+            Mapper.fillAuthentication(ws, api);
+            ws.setCircleId(Mapper.convert(Constants.FIELD_CIRCLE_ID, api.getCircleId()));
+        }
+
+        return ws;
+    }
+
+    private static FetchTrusteeResponse map(final FetchTrusteeResult ws) {
+        FetchTrusteeResponse api = null;
+
+        if (ws != null) {
+            api = new FetchTrusteeResponse();
+            Mapper.fillResponse(api, ws);
+            api.setTrustees(Mapper.mapTrustees(ws.getTrustees()));
+        }
+
+        return api;
+    }
+
+    private static io.javadog.cws.ws.ProcessTrusteeRequest map(final ProcessTrusteeRequest api) {
+        io.javadog.cws.ws.ProcessTrusteeRequest ws = null;
+
+        if (api != null) {
+            ws = new io.javadog.cws.ws.ProcessTrusteeRequest();
+            Mapper.fillAuthentication(ws, api);
+            ws.setAction(Mapper.map(api.getAction()));
+            ws.setCircleId(Mapper.convert(Constants.FIELD_CIRCLE_ID, api.getCircleId()));
+            ws.setMemberId(Mapper.convert(Constants.FIELD_MEMBER_ID, api.getMemberId()));
+            ws.setTrustLevel(Mapper.map(api.getTrustLevel()));
+        }
+
+        return ws;
+    }
+
+    private static ProcessTrusteeResponse map(final ProcessTrusteeResult ws) {
+        ProcessTrusteeResponse api = null;
+
+        if (ws != null) {
+            api = new ProcessTrusteeResponse();
+            Mapper.fillResponse(api, ws);
         }
 
         return api;

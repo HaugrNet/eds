@@ -10,14 +10,18 @@ package io.javadog.cws.client;
 import io.javadog.cws.api.System;
 import io.javadog.cws.api.requests.FetchCircleRequest;
 import io.javadog.cws.api.requests.FetchMemberRequest;
+import io.javadog.cws.api.requests.FetchTrusteeRequest;
 import io.javadog.cws.api.requests.ProcessCircleRequest;
 import io.javadog.cws.api.requests.ProcessMemberRequest;
+import io.javadog.cws.api.requests.ProcessTrusteeRequest;
 import io.javadog.cws.api.requests.SanityRequest;
 import io.javadog.cws.api.requests.SettingRequest;
 import io.javadog.cws.api.responses.FetchCircleResponse;
 import io.javadog.cws.api.responses.FetchMemberResponse;
+import io.javadog.cws.api.responses.FetchTrusteeResponse;
 import io.javadog.cws.api.responses.ProcessCircleResponse;
 import io.javadog.cws.api.responses.ProcessMemberResponse;
+import io.javadog.cws.api.responses.ProcessTrusteeResponse;
 import io.javadog.cws.api.responses.SanityResponse;
 import io.javadog.cws.api.responses.SettingResponse;
 import io.javadog.cws.api.responses.VersionResponse;
@@ -164,15 +168,6 @@ public final class SystemRestClient extends BaseRestClient implements System {
                 case DELETE:
                     response = runRequest("/circles/deleteCircle", request);
                     break;
-                case ADD:
-                    response = runRequest("/circles/addTrustee", request);
-                    break;
-                case ALTER:
-                    response = runRequest("/circles/alterTrustee", request);
-                    break;
-                case REMOVE:
-                    response = runRequest("/circles/removeTrustee", request);
-                    break;
                 default:
                     throw new CWSClientException("Unsupported Operation: " + request.getAction());
             }
@@ -181,6 +176,49 @@ public final class SystemRestClient extends BaseRestClient implements System {
         }
 
         final ProcessCircleResponse cwsResponse = response.readEntity(ProcessCircleResponse.class);
+        close(response);
+
+        return cwsResponse;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public FetchTrusteeResponse fetchTrustees(final FetchTrusteeRequest request) {
+        final Response response = runRequest("/trustees/fetch", request);
+        final FetchTrusteeResponse cwsResponse = response.readEntity(FetchTrusteeResponse.class);
+        close(response);
+
+        return cwsResponse;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ProcessTrusteeResponse processTrustee(final ProcessTrusteeRequest request) {
+        final Response response;
+
+        if ((request != null) && (request.getAction() != null)) {
+            switch (request.getAction()) {
+                case ADD:
+                    response = runRequest("/trustees/addTrustee", request);
+                    break;
+                case ALTER:
+                    response = runRequest("/trustees/alterTrustee", request);
+                    break;
+                case REMOVE:
+                    response = runRequest("/trustees/removeTrustee", request);
+                    break;
+                default:
+                    throw new CWSClientException("Unsupported Operation: " + request.getAction());
+            }
+        } else {
+            throw new CWSClientException("Cannot perform request, as the Request Object is missing or incomplete.");
+        }
+
+        final ProcessTrusteeResponse cwsResponse = response.readEntity(ProcessTrusteeResponse.class);
         close(response);
 
         return cwsResponse;

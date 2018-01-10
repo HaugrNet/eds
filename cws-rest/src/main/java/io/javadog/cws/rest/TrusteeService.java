@@ -33,7 +33,7 @@ import java.util.logging.Logger;
  * @since  CWS 1.0
  */
 @Path("/trustees")
-public final class TrusteeService {
+public class TrusteeService {
 
     private static final Logger log = Logger.getLogger(TrusteeService.class.getName());
 

@@ -11,6 +11,8 @@
   <wsdl:types>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://ws.cws.javadog.io/" elementFormDefault="unqualified" targetNamespace="http://ws.cws.javadog.io/" version="1.0">
 
+  <xs:element name="ProcessTrusteeResult" type="tns:processTrusteeResult"/>
+
   <xs:element name="fetchCircleRequest" type="tns:fetchCircleRequest"/>
 
   <xs:element name="fetchCircleResult" type="tns:fetchCircleResult"/>
@@ -27,6 +29,14 @@
 
   <xs:element name="fetchMembersResponse" type="tns:fetchMembersResponse"/>
 
+  <xs:element name="fetchTrusteeRequest" type="tns:fetchTrusteeRequest"/>
+
+  <xs:element name="fetchTrusteeResult" type="tns:fetchTrusteeResult"/>
+
+  <xs:element name="fetchTrustees" type="tns:fetchTrustees"/>
+
+  <xs:element name="fetchTrusteesResponse" type="tns:fetchTrusteesResponse"/>
+
   <xs:element name="processCircle" type="tns:processCircle"/>
 
   <xs:element name="processCircleRequest" type="tns:processCircleRequest"/>
@@ -42,6 +52,12 @@
   <xs:element name="processMemberResponse" type="tns:processMemberResponse"/>
 
   <xs:element name="processMemberResult" type="tns:processMemberResult"/>
+
+  <xs:element name="processTrustee" type="tns:processTrustee"/>
+
+  <xs:element name="processTrusteeRequest" type="tns:processTrusteeRequest"/>
+
+  <xs:element name="processTrusteeResponse" type="tns:processTrusteeResponse"/>
 
   <xs:element name="sanitized" type="tns:sanitized"/>
 
@@ -137,9 +153,7 @@
   <xs:complexType final="extension restriction" name="fetchCircleRequest">
     <xs:complexContent>
       <xs:extension base="tns:authentication">
-        <xs:sequence>
-          <xs:element minOccurs="0" name="circleId" nillable="true" type="xs:string"/>
-        </xs:sequence>
+        <xs:sequence/>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -155,7 +169,6 @@
       <xs:extension base="tns:cwsResult">
         <xs:sequence>
           <xs:element maxOccurs="unbounded" name="circles" type="tns:circle"/>
-          <xs:element maxOccurs="unbounded" name="trustees" type="tns:trustee"/>
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>
@@ -166,16 +179,6 @@
       <xs:element name="circleId" type="xs:string"/>
       <xs:element name="circleName" type="xs:string"/>
       <xs:element name="added" type="xs:dateTime"/>
-    </xs:sequence>
-  </xs:complexType>
-
-  <xs:complexType final="extension restriction" name="trustee">
-    <xs:sequence>
-      <xs:element minOccurs="0" name="circleId" type="xs:string"/>
-      <xs:element minOccurs="0" name="memberId" type="xs:string"/>
-      <xs:element minOccurs="0" name="trustLevel" type="tns:trustLevel"/>
-      <xs:element minOccurs="0" name="changed" type="xs:dateTime"/>
-      <xs:element minOccurs="0" name="added" type="xs:dateTime"/>
     </xs:sequence>
   </xs:complexType>
 
@@ -287,7 +290,6 @@
           <xs:element minOccurs="0" name="circleId" nillable="true" type="xs:string"/>
           <xs:element minOccurs="0" name="circleName" nillable="true" type="xs:string"/>
           <xs:element minOccurs="0" name="memberId" nillable="true" type="xs:string"/>
-          <xs:element minOccurs="0" name="trustLevel" nillable="true" type="tns:trustLevel"/>
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>
@@ -370,6 +372,81 @@
     </xs:complexContent>
   </xs:complexType>
 
+  <xs:complexType name="fetchTrustees">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="request" type="tns:fetchTrusteeRequest"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType final="extension restriction" name="fetchTrusteeRequest">
+    <xs:complexContent>
+      <xs:extension base="tns:authentication">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="circleId" nillable="true" type="xs:string"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="fetchTrusteesResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="response" type="tns:fetchTrusteeResult"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType final="extension restriction" name="fetchTrusteeResult">
+    <xs:complexContent>
+      <xs:extension base="tns:cwsResult">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" name="trustees" type="tns:trustee"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType final="extension restriction" name="trustee">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="memberId" type="xs:string"/>
+      <xs:element minOccurs="0" name="circleId" type="xs:string"/>
+      <xs:element minOccurs="0" name="trustLevel" type="tns:trustLevel"/>
+      <xs:element minOccurs="0" name="changed" type="xs:dateTime"/>
+      <xs:element minOccurs="0" name="added" type="xs:dateTime"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="processTrustee">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="request" type="tns:processTrusteeRequest"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType final="extension restriction" name="processTrusteeRequest">
+    <xs:complexContent>
+      <xs:extension base="tns:authentication">
+        <xs:sequence>
+          <xs:element name="action" type="tns:action"/>
+          <xs:element minOccurs="0" name="circleId" nillable="true" type="xs:string"/>
+          <xs:element minOccurs="0" name="memberId" nillable="true" type="xs:string"/>
+          <xs:element minOccurs="0" name="trustLevel" nillable="true" type="tns:trustLevel"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="processTrusteeResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="response" type="tns:processTrusteeResult"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType final="extension restriction" name="processTrusteeResult">
+    <xs:complexContent>
+      <xs:extension base="tns:cwsResult">
+        <xs:sequence/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
   <xs:simpleType name="credentialType">
     <xs:restriction base="xs:string">
       <xs:enumeration value="PASSPHRASE"/>
@@ -407,16 +484,6 @@
     </xs:restriction>
   </xs:simpleType>
 
-  <xs:simpleType name="trustLevel">
-    <xs:restriction base="xs:string">
-      <xs:enumeration value="ALL"/>
-      <xs:enumeration value="READ"/>
-      <xs:enumeration value="WRITE"/>
-      <xs:enumeration value="ADMIN"/>
-      <xs:enumeration value="SYSOP"/>
-    </xs:restriction>
-  </xs:simpleType>
-
   <xs:simpleType name="action">
     <xs:restriction base="xs:string">
       <xs:enumeration value="PROCESS"/>
@@ -428,6 +495,16 @@
       <xs:enumeration value="ALTER"/>
       <xs:enumeration value="INVALIDATE"/>
       <xs:enumeration value="REMOVE"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="trustLevel">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="ALL"/>
+      <xs:enumeration value="READ"/>
+      <xs:enumeration value="WRITE"/>
+      <xs:enumeration value="ADMIN"/>
+      <xs:enumeration value="SYSOP"/>
     </xs:restriction>
   </xs:simpleType>
 
@@ -451,6 +528,14 @@
   </wsdl:message>
   <wsdl:message name="sanitizedResponse">
     <wsdl:part element="tns:sanitizedResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="fetchTrustees">
+    <wsdl:part element="tns:fetchTrustees" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="fetchTrusteesResponse">
+    <wsdl:part element="tns:fetchTrusteesResponse" name="parameters">
     </wsdl:part>
   </wsdl:message>
   <wsdl:message name="fetchMembersResponse">
@@ -487,6 +572,14 @@
   </wsdl:message>
   <wsdl:message name="fetchMembers">
     <wsdl:part element="tns:fetchMembers" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="processTrusteeResponse">
+    <wsdl:part element="tns:processTrusteeResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="processTrustee">
+    <wsdl:part element="tns:processTrustee" name="parameters">
     </wsdl:part>
   </wsdl:message>
   <wsdl:portType name="system">
@@ -533,6 +626,18 @@
       <wsdl:input message="tns:version" name="version">
     </wsdl:input>
       <wsdl:output message="tns:versionResponse" name="versionResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="fetchTrustees">
+      <wsdl:input message="tns:fetchTrustees" name="fetchTrustees">
+    </wsdl:input>
+      <wsdl:output message="tns:fetchTrusteesResponse" name="fetchTrusteesResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="processTrustee">
+      <wsdl:input message="tns:processTrustee" name="processTrustee">
+    </wsdl:input>
+      <wsdl:output message="tns:processTrusteeResponse" name="processTrusteeResponse">
     </wsdl:output>
     </wsdl:operation>
   </wsdl:portType>
@@ -598,6 +703,24 @@
         <soap:body use="literal"/>
       </wsdl:input>
       <wsdl:output name="versionResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="fetchTrustees">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="fetchTrustees">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="fetchTrusteesResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="processTrustee">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="processTrustee">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="processTrusteeResponse">
         <soap:body use="literal"/>
       </wsdl:output>
     </wsdl:operation>

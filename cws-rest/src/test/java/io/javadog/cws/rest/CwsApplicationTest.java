@@ -21,6 +21,6 @@ public final class CwsApplicationTest {
     @Test
     public void testApplication() {
         final CwsApplication application = new CwsApplication();
-        assertThat(application.getClasses().size(), is(8));
+        assertThat(application.getClasses().size(), is(9));
     }
 }

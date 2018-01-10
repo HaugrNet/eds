@@ -21,7 +21,7 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "ProcessTrusteeResult")
-@XmlType(name = "pProcessTrusteeResult")
+@XmlType(name = "processTrusteeResult")
 public final class ProcessTrusteeResponse extends CwsResponse {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */

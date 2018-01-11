@@ -64,7 +64,7 @@ public class StartupBean {
         final ScheduleExpression expression = new ScheduleExpression();
         expression.hour("*");
         timerService.createCalendarTimer(expression, timerConfig);
-        log.log(Settings.INFO, "First scheduled sanitizing will begin at {}", expression);
+        log.log(Settings.INFO, "First scheduled sanitizing will begin at {}", expression.toString());
     }
 
     @Asynchronous

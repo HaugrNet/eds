@@ -84,7 +84,11 @@ public class StartupBean {
         try {
             final Query query = entityManager.createNamedQuery("version.findAll");
             final List<VersionEntity> result = CommonDao.findList(query);
-            if (!result.isEmpty() && (result.get(0).getSchemaVersion() == DB_VERSION)) {
+
+            // If the database is invalid, then no data could be found, meaning
+            // that the database was not properly initialized, this should
+            // result in an error while reading.
+            if (result.get(0).getSchemaVersion() == DB_VERSION) {
                 ready = true;
             }
         } catch (PersistenceException e) {

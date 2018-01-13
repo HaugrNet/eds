@@ -29,7 +29,7 @@ import io.javadog.cws.api.responses.VersionResponse;
  * @author Kim Jensen
  * @since  CWS 1.0
  */
-public interface System {
+public interface Management {
 
     /**
      * <p>Returns the current Version of the running CWS instance. This method

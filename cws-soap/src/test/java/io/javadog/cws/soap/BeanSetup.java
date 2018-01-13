@@ -49,9 +49,9 @@ public class BeanSetup extends DatabaseSetup {
         }
     }
 
-    protected static SystemService prepareFlawedSystemService() {
+    protected static ManagementService prepareFlawedSystemService() {
         try {
-            final SystemService service = SystemService.class.getConstructor().newInstance();
+            final ManagementService service = ManagementService.class.getConstructor().newInstance();
             setField(service, "bean", null);
 
             return service;
@@ -60,13 +60,13 @@ public class BeanSetup extends DatabaseSetup {
         }
     }
 
-    protected SystemService prepareSystemService() {
+    protected ManagementService prepareSystemService() {
         try {
             final SystemBean bean = SystemBean.class.getConstructor().newInstance();
             setField(bean, "entityManager", entityManager);
             setField(bean, "settingBean", prepareSettingBean());
 
-            final SystemService service = SystemService.class.getConstructor().newInstance();
+            final ManagementService service = ManagementService.class.getConstructor().newInstance();
             setField(service, "bean", bean);
 
             return service;

@@ -7,7 +7,7 @@
  */
 package io.javadog.cws.client;
 
-import io.javadog.cws.api.System;
+import io.javadog.cws.api.Management;
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.requests.FetchCircleRequest;
 import io.javadog.cws.api.requests.FetchMemberRequest;
@@ -29,12 +29,12 @@ import io.javadog.cws.api.responses.VersionResponse;
 import io.javadog.cws.ws.FetchCircleResult;
 import io.javadog.cws.ws.FetchMemberResult;
 import io.javadog.cws.ws.FetchTrusteeResult;
+import io.javadog.cws.ws.Management_Service;
 import io.javadog.cws.ws.ProcessCircleResult;
 import io.javadog.cws.ws.ProcessMemberResult;
 import io.javadog.cws.ws.ProcessTrusteeResult;
 import io.javadog.cws.ws.SanityResult;
 import io.javadog.cws.ws.SettingResult;
-import io.javadog.cws.ws.System_Service;
 import io.javadog.cws.ws.VersionResult;
 
 import javax.xml.namespace.QName;
@@ -48,23 +48,24 @@ import java.util.Map;
  * @author Kim Jensen
  * @since  CWS 1.0
  */
-public final class SystemSoapClient implements System {
+public final class ManagementSoapClient implements Management {
 
-    private static final QName SERVICE_NAME = new QName("http://ws.cws.javadog.io/", "system");
-    private final io.javadog.cws.ws.System client;
+    private static final QName SERVICE_NAME = new QName("http://ws.cws.javadog.io/", "management");
+    private final io.javadog.cws.ws.Management client;
 
     /**
-     * Constructor for the CWS Share SOAP Client. It takes the base URL for the
-     * CWS Instance to communicate with, which is the protocol, hostname, port
-     * and deployment name. For example; &quot;http://localhost:8080/cws&quot;.
+     * Constructor for the CWS Management SOAP Client. It takes the base URL for
+     * the CWS Instance to communicate with, which is the protocol, hostname,
+     * port and deployment name. For example;
+     * &quot;http://localhost:8080/cws&quot;.
      *
      * @param baseURL Base URL for the CWS Instance
      */
-    public SystemSoapClient(final String baseURL) {
+    public ManagementSoapClient(final String baseURL) {
         try {
-            final URL wsdlURL = new URL(baseURL + "/system?wsdl");
-            final System_Service service = new System_Service(wsdlURL, SERVICE_NAME);
-            client = service.getSystem();
+            final URL wsdlURL = new URL(baseURL + "/management?wsdl");
+            final Management_Service service = new Management_Service(wsdlURL, SERVICE_NAME);
+            client = service.getManagement();
         } catch (MalformedURLException e) {
             throw new CWSClientException(e);
         }

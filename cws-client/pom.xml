@@ -103,7 +103,7 @@
                             <encoding>UTF-8</encoding>
                             <wsdlOptions>
                                 <wsdlOption>
-                                    <wsdl>${basedir}/src/main/resources/system.wsdl</wsdl>
+                                    <wsdl>${basedir}/src/main/resources/management.wsdl</wsdl>
                                  </wsdlOption>
                             </wsdlOptions>
                         </configuration>

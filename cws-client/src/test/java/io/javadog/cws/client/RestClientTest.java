@@ -12,8 +12,8 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 
+import io.javadog.cws.api.Management;
 import io.javadog.cws.api.Share;
-import io.javadog.cws.api.System;
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.requests.SettingRequest;
@@ -34,7 +34,7 @@ import java.util.UUID;
  */
 public final class RestClientTest {
 
-    private final System system = new SystemRestClient(Base.URL);
+    private final Management system = new ManagementRestClient(Base.URL);
     private final Share share = new ShareRestClient(Base.URL);
 
     @Test

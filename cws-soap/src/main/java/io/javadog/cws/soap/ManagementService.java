@@ -7,7 +7,7 @@
  */
 package io.javadog.cws.soap;
 
-import io.javadog.cws.api.System;
+import io.javadog.cws.api.Management;
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.requests.FetchCircleRequest;
 import io.javadog.cws.api.requests.FetchMemberRequest;
@@ -46,10 +46,10 @@ import java.util.logging.Logger;
  */
 @SOAPBinding
 @BindingType(javax.xml.ws.soap.SOAPBinding.SOAP11HTTP_BINDING)
-@WebService(name = "system", targetNamespace = "http://ws.cws.javadog.io/", serviceName = "system", portName = "system")
-public class SystemService implements System {
+@WebService(name = "management", targetNamespace = "http://ws.cws.javadog.io/", serviceName = "management", portName = "management")
+public class ManagementService implements Management {
 
-    private static final Logger log = Logger.getLogger(SystemService.class.getName());
+    private static final Logger log = Logger.getLogger(ManagementService.class.getName());
 
     private static final String GENERAL_RETURN_MESSAGE = "An unknown error occurred. Please consult the CWS System Log.";
 

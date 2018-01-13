@@ -1,17 +1,16 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
-                  xmlns:tns="http://ws.cws.javadog.io/"
-                  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
-                  name="system" targetNamespace="http://ws.cws.javadog.io/">
-  <wsdl:documentation>
-    Service: Cryptographic WebStore System Service
-    Version: 1.0
-    Owner: JavaDog.io
-  </wsdl:documentation>
+<wsdl:definitions
+        xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+        xmlns:tns="http://ws.cws.javadog.io/"
+        xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+        name="management" targetNamespace="http://ws.cws.javadog.io/">
+    <wsdl:documentation>
+      Service: Cryptographic WebStore Management Service
+      Version: 1.0
+      Owner: JavaDog.io
+    </wsdl:documentation>
   <wsdl:types>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://ws.cws.javadog.io/" elementFormDefault="unqualified" targetNamespace="http://ws.cws.javadog.io/" version="1.0">
-
-  <xs:element name="ProcessTrusteeResult" type="tns:processTrusteeResult"/>
 
   <xs:element name="fetchCircleRequest" type="tns:fetchCircleRequest"/>
 
@@ -58,6 +57,8 @@
   <xs:element name="processTrusteeRequest" type="tns:processTrusteeRequest"/>
 
   <xs:element name="processTrusteeResponse" type="tns:processTrusteeResponse"/>
+
+  <xs:element name="processTrusteeResult" type="tns:processTrusteeResult"/>
 
   <xs:element name="sanitized" type="tns:sanitized"/>
 
@@ -582,8 +583,8 @@
     <wsdl:part element="tns:processTrustee" name="parameters">
     </wsdl:part>
   </wsdl:message>
-  <wsdl:portType name="system">
-    <wsdl:documentation>The System Service is a part the CWS, is part of the
+  <wsdl:portType name="management">
+    <wsdl:documentation>The Management Service is a part the CWS, is part of the
     CWS, offering the functionality to administrate a CWS system, such as the
     Circles, Accounts, Trustees and Settings.</wsdl:documentation>
     <wsdl:operation name="sanitized">
@@ -641,7 +642,7 @@
     </wsdl:output>
     </wsdl:operation>
   </wsdl:portType>
-  <wsdl:binding name="systemSoapBinding" type="tns:system">
+  <wsdl:binding name="managementSoapBinding" type="tns:management">
     <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
     <wsdl:operation name="sanitized">
       <soap:operation soapAction="" style="document"/>
@@ -725,9 +726,9 @@
       </wsdl:output>
     </wsdl:operation>
   </wsdl:binding>
-  <wsdl:service name="system">
-    <wsdl:port binding="tns:systemSoapBinding" name="system">
-      <soap:address location="http://localhost:8080/cws/system"/>
+  <wsdl:service name="management">
+    <wsdl:port binding="tns:managementSoapBinding" name="management">
+      <soap:address location="http://localhost:8080/cws/management"/>
     </wsdl:port>
   </wsdl:service>
 </wsdl:definitions>

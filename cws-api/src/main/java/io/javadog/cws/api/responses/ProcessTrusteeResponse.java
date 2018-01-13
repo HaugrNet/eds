@@ -20,7 +20,7 @@ import javax.xml.bind.annotation.XmlType;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlRootElement(name = "ProcessTrusteeResult")
+@XmlRootElement(name = "processTrusteeResult")
 @XmlType(name = "processTrusteeResult")
 public final class ProcessTrusteeResponse extends CwsResponse {
 

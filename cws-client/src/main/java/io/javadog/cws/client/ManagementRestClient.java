@@ -7,7 +7,7 @@
  */
 package io.javadog.cws.client;
 
-import io.javadog.cws.api.System;
+import io.javadog.cws.api.Management;
 import io.javadog.cws.api.requests.FetchCircleRequest;
 import io.javadog.cws.api.requests.FetchMemberRequest;
 import io.javadog.cws.api.requests.FetchTrusteeRequest;
@@ -34,7 +34,7 @@ import javax.ws.rs.core.Response;
  * @author Kim Jensen
  * @since  CWS 1.0
  */
-public final class SystemRestClient extends BaseRestClient implements System {
+public final class ManagementRestClient extends BaseRestClient implements Management {
 
     /**
      * Constructor for the CWS System REST Client. It takes the base URL for the
@@ -43,7 +43,7 @@ public final class SystemRestClient extends BaseRestClient implements System {
      *
      * @param baseURL Base URL for the CWS Instance
      */
-    public SystemRestClient(final String baseURL) {
+    public ManagementRestClient(final String baseURL) {
         super(baseURL);
     }
 

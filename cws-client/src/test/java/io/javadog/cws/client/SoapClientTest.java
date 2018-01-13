@@ -10,7 +10,7 @@ package io.javadog.cws.client;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
-import io.javadog.cws.api.System;
+import io.javadog.cws.api.Management;
 import io.javadog.cws.api.common.Action;
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
@@ -37,7 +37,7 @@ public final class SoapClientTest {
 
     @Test
     public void testVersion() {
-        final System system = new SystemSoapClient(Base.URL);
+        final Management system = new ManagementSoapClient(Base.URL);
         final VersionResponse response = system.version();
         assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(response.getReturnMessage(), is("Ok"));
@@ -46,7 +46,7 @@ public final class SoapClientTest {
 
     @Test
     public void testSettings() {
-        final System system = new SystemSoapClient(Base.URL);
+        final Management system = new ManagementSoapClient(Base.URL);
         final SettingRequest request = Base.prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
 
         final SettingResponse response = system.settings(request);
@@ -56,7 +56,7 @@ public final class SoapClientTest {
 
     @Test
     public void testFetchMembers() {
-        final System system = new SystemSoapClient(Base.URL);
+        final Management system = new ManagementSoapClient(Base.URL);
         final FetchMemberRequest request = Base.prepareRequest(FetchMemberRequest.class, Constants.ADMIN_ACCOUNT);
 
         final FetchMemberResponse response = system.fetchMembers(request);
@@ -68,7 +68,7 @@ public final class SoapClientTest {
     public void testProcessMembers() {
         final String accountName = UUID.randomUUID().toString();
 
-        final System system = new SystemSoapClient(Base.URL);
+        final Management system = new ManagementSoapClient(Base.URL);
         final ProcessMemberRequest request = Base.prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
         request.setAction(Action.CREATE);
         request.setNewAccountName(accountName);
@@ -81,7 +81,7 @@ public final class SoapClientTest {
 
     @Test
     public void testFetchCircles() {
-        final System system = new SystemSoapClient(Base.URL);
+        final Management system = new ManagementSoapClient(Base.URL);
         final FetchCircleRequest request = Base.prepareRequest(FetchCircleRequest.class, Constants.ADMIN_ACCOUNT);
 
         final FetchCircleResponse response = system.fetchCircles(request);
@@ -93,7 +93,7 @@ public final class SoapClientTest {
     public void testProcessCircles() {
         final String accountName = UUID.randomUUID().toString();
 
-        final System system = new SystemSoapClient(Base.URL);
+        final Management system = new ManagementSoapClient(Base.URL);
         final ProcessMemberRequest memberRequest = Base.prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
         memberRequest.setAction(Action.CREATE);
         memberRequest.setNewAccountName(accountName);

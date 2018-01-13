@@ -7,7 +7,9 @@
  */
 package io.javadog.cws.core;
 
+import io.javadog.cws.core.model.CommonDao;
 import io.javadog.cws.core.model.Settings;
+import io.javadog.cws.core.model.entities.VersionEntity;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
@@ -22,6 +24,11 @@ import javax.ejb.TimerService;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 import javax.inject.Inject;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.PersistenceException;
+import javax.persistence.Query;
+import java.util.List;
 import java.util.logging.Logger;
 
 /**
@@ -35,13 +42,18 @@ import java.util.logging.Logger;
 public class StartupBean {
 
     private static final Logger log = Logger.getLogger(StartupBean.class.getName());
+    private static final int DB_VERSION = 1;
 
+    @PersistenceContext private EntityManager entityManager;
     @Inject private SettingBean settingBean;
     @Inject private SanitizerBean sanitizerBean;
     @Resource private TimerService timerService;
 
     @PostConstruct
     public void startup() {
+        log.info("Check if Database is up-to-date.");
+        checkDatabase();
+
         log.info("Initializing the CWS Sanitizer Service.");
 
         // If requested, then simply start the sanitize as a background job
@@ -64,7 +76,22 @@ public class StartupBean {
         final ScheduleExpression expression = new ScheduleExpression();
         expression.hour("*");
         timerService.createCalendarTimer(expression, timerConfig);
-        log.log(Settings.INFO, "First scheduled sanitizing will begin at {}", expression.toString());
+    }
+
+    private void checkDatabase() {
+        boolean ready = false;
+
+        try {
+            final Query query = entityManager.createNamedQuery("version.findAll");
+            final List<VersionEntity> result = CommonDao.findList(query);
+            if (!result.isEmpty() && (result.get(0).getSchemaVersion() == DB_VERSION)) {
+                ready = true;
+            }
+        } catch (PersistenceException e) {
+            log.log(Settings.ERROR, "Problem with DB: " + e.getMessage(), e);
+        }
+
+        settingBean.getSettings().set("cws.isReady", String.valueOf(ready));
     }
 
     @Asynchronous

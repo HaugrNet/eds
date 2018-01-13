@@ -36,6 +36,7 @@ CREATE TABLE cws_versions (
   id               INTEGER AUTO_INCREMENT,
   schema_version   INTEGER,
   cws_version      VARCHAR(10),
+  db_vendor        VARCHAR(25),
   installed        TIMESTAMP DEFAULT now(),
 
   /* Primary & Foreign Keys */
@@ -48,8 +49,11 @@ CREATE TABLE cws_versions (
   CONSTRAINT version_notnull_id             CHECK (id IS NOT NULL),
   CONSTRAINT version_notnull_db_version     CHECK (schema_version IS NOT NULL),
   CONSTRAINT version_notnull_cws_version    CHECK (cws_version IS NOT NULL),
+  CONSTRAINT version_notnull_db_vendor      CHECK (db_vendor IS NOT NULL),
   CONSTRAINT version_notnull_installed      CHECK (installed IS NOT NULL)
 );
+-- Initial Database Version is 1, initial Production CWS release is 1.0.0
+INSERT INTO cws_versions(schema_version, cws_version, db_vendor) VALUES (1, '1.0.0', 'H2');
 
 -- =============================================================================
 -- The CWS is configured via a set of property values, which are all stored in

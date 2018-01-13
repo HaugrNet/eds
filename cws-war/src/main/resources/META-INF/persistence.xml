@@ -15,6 +15,7 @@
         <class>io.javadog.cws.core.model.entities.MetadataEntity</class>
         <class>io.javadog.cws.core.model.entities.DataEntity</class>
         <class>io.javadog.cws.core.model.entities.SignatureEntity</class>
+        <class>io.javadog.cws.core.model.entities.VersionEntity</class>
 
         <properties>
             <property name="hibernate.show_sql" value="false"/>

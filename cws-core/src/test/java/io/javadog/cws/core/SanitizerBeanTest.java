@@ -98,6 +98,7 @@ public final class SanitizerBeanTest extends DatabaseSetup {
             final StartupBean bean = StartupBean.class.getConstructor().newInstance();
 
             // Inject Dependencies
+            setField(bean, "entityManager", entityManager);
             setField(bean, "settingBean", prepareSettingBean(sanityAtStartup));
             setField(bean, "sanitizerBean", prepareSanitizeBean());
             setField(bean, "timerService", new TestTimerService());

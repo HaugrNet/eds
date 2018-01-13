@@ -42,18 +42,39 @@ the script will destroy an existing CWS database. For the initial release, no
 update scripts will be made, unless requested.
 
 ```
-$ cd [ /path/to/cws/sources/ ] accessories/postgresql
+$ cd [ /path/to/cws/files/ ] accessories/postgresql
 $ psql postgres --file 01-install.sql
 ```
 
-Then build the package and deploy it:
+
+
+**Developers only**: If you want to build from source, run these steps to create the cws.war package:
 
 ```
 $ cd [ /path/to/cws/sources ]
 $ mvn clean verify
-$ cp cws-war/target/cws.war ${WILDFLY_HOME}/standalone/deployments
-$ cd accessories/configuration/wildfly-XX
+```
+
+Now copy the cws.war file in place.
+
+```
+$ cp cws.war ${WILDFLY_HOME}/standalone/deployments
+```
+
+*Note: if you built it from scratch, you will probably find it at cws-war/target/cws.war*
+
+And finally we need to also copy the wildfly configuration into place:
+
+```
+$ cd wildfly-[WILDFLYVERSION]
 $ cp -R * ${WILDFLY_HOME}
+```
+
+*Note: If you built from scratch, the configuration is located under accessories/configuration/.*
+
+And now you can start the server with this command:
+
+```
 $ ${WILDFLY_HOME}/bin/standalone.sh -c standalone-cws.xml
 ```
 

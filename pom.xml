@@ -32,6 +32,7 @@
         <module>cws-soap</module>
         <module>cws-war</module>
         <!--<module>cws-client</module>-->
+        <!--<module>cws-test</module>-->
     </modules>
 
     <scm>
@@ -39,6 +40,10 @@
     </scm>
 
     <properties>
+        <cxf.version>3.2.1</cxf.version>
+        <swarm.version>2017.12.1</swarm.version>
+        <resteasy.version>3.1.4.Final</resteasy.version>
+
         <!-- To avoid that the builds are platform specific -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
@@ -78,10 +83,56 @@
                 <version>${project.version}</version>
             </dependency>
             <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>cws-client</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>javax</groupId>
                 <artifactId>javaee-api</artifactId>
                 <version>7.0</version>
                 <scope>provided</scope>
+            </dependency>
+
+            <!-- Following is required to build & run the REST Client -->
+            <dependency>
+                <groupId>org.jboss.resteasy</groupId>
+                <artifactId>resteasy-jaxrs</artifactId>
+                <version>${resteasy.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jboss.resteasy</groupId>
+                <artifactId>resteasy-client</artifactId>
+                <version>${resteasy.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jboss.resteasy</groupId>
+                <artifactId>resteasy-jaxb-provider</artifactId>
+                <version>${resteasy.version}</version>
+            </dependency>
+
+            <!-- Following is required to build the SOAP Client. -->
+            <dependency>
+                <groupId>org.apache.cxf</groupId>
+                <artifactId>cxf-rt-frontend-jaxws</artifactId>
+                <version>${cxf.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.cxf</groupId>
+                <artifactId>cxf-rt-transports-http</artifactId>
+                <version>${cxf.version}</version>
+            </dependency>
+
+            <!-- Following is required to run the SOAP Client. -->
+            <dependency>
+                <groupId>org.apache.cxf</groupId>
+                <artifactId>cxf-rt-databinding-jaxb</artifactId>
+                <version>${cxf.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.ws.xmlschema</groupId>
+                <artifactId>xmlschema-core</artifactId>
+                <version>2.2.2</version>
             </dependency>
 
             <!-- Dependencies used for testing -->
@@ -100,6 +151,14 @@
                 <groupId>com.h2database</groupId>
                 <artifactId>h2</artifactId>
                 <version>1.4.196</version>
+            </dependency>
+
+            <dependency>
+              <groupId>org.wildfly.swarm</groupId>
+              <artifactId>bom</artifactId>
+              <version>${swarm.version}</version>
+              <scope>import</scope>
+              <type>pom</type>
             </dependency>
 
             <dependency>
@@ -169,6 +228,11 @@
                             </goals>
                         </execution>
                     </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.wildfly.swarm</groupId>
+                    <artifactId>wildfly-swarm-plugin</artifactId>
+                    <version>${swarm.version}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.jacoco</groupId>

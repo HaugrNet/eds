@@ -82,7 +82,7 @@ Now, you should have a running version of CWS which can be reached from the
 following SOAP based URL's:
 
 ```
-http://localhost:8080/cws/system?wsdl
+http://localhost:8080/cws/management?wsdl
 http://localhost:8080/cws/share?wsdl
 ```
 

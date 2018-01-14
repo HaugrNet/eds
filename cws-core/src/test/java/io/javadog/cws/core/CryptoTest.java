@@ -72,7 +72,7 @@ public final class CryptoTest extends DatabaseSetup {
         thrown.expect(CryptoException.class);
         thrown.expectMessage("No enum constant io.javadog.cws.core.enums.HashAlgorithm.AES128");
 
-        final Settings mySettings = new Settings();
+        final Settings mySettings = newSettings();
         mySettings.set(StandardSetting.HASH_ALGORITHM.getKey(), "AES128");
         final Crypto myCrypto = new Crypto(mySettings);
         myCrypto.generateChecksum("Bla bla bla");
@@ -83,7 +83,7 @@ public final class CryptoTest extends DatabaseSetup {
         thrown.expect(CryptoException.class);
         thrown.expectMessage("AES/CBC/PKCS5Padding Signature not available");
 
-        final Settings mySettings = new Settings();
+        final Settings mySettings = newSettings();
         mySettings.set(StandardSetting.SIGNATURE_ALGORITHM.getKey(), "AES256");
         final Crypto myCrypto = new Crypto(mySettings);
         final CWSKeyPair key = myCrypto.generateAsymmetricKey(KeyAlgorithm.RSA2048);
@@ -258,7 +258,7 @@ public final class CryptoTest extends DatabaseSetup {
 
     @Test
     public void testStringToBytesConversion() {
-        final Settings mySettings = new Settings();
+        final Settings mySettings = newSettings();
         final Crypto myCrypto = new Crypto(mySettings);
         final String str = "Alpha Beta æøåßöäÿ";
 
@@ -272,7 +272,7 @@ public final class CryptoTest extends DatabaseSetup {
 
     @Test
     public void testBytesToStringConversion() {
-        final Settings mySettings = new Settings();
+        final Settings mySettings = newSettings();
         final Crypto myCrypto = new Crypto(mySettings);
         final String str = "Alpha Beta æøåßöäÿ";
         final byte[] bytes = str.getBytes(mySettings.getCharset());
@@ -355,7 +355,7 @@ public final class CryptoTest extends DatabaseSetup {
     public void testInvalidDearmoringPublicKey() {
         prepareCause(CryptoException.class, ReturnCode.CRYPTO_ERROR, "AES KeyFactory not available");
 
-        final Settings mySettings = new Settings();
+        final Settings mySettings = newSettings();
         final Crypto myCrypto = new Crypto(mySettings);
         final CWSKeyPair keyPair = myCrypto.generateAsymmetricKey(mySettings.getAsymmetricAlgorithm());
         final String armoredPublicKey = myCrypto.armoringPublicKey(keyPair.getPublic().getKey());
@@ -369,7 +369,7 @@ public final class CryptoTest extends DatabaseSetup {
     public void testInvalidDearmoringPrivateKey() {
         prepareCause(CryptoException.class, ReturnCode.CRYPTO_ERROR, "AES KeyFactory not available");
 
-        final Settings mySettings = new Settings();
+        final Settings mySettings = newSettings();
         final Crypto myCrypto = new Crypto(mySettings);
         final CWSKeyPair keyPair = myCrypto.generateAsymmetricKey(mySettings.getAsymmetricAlgorithm());
         final SecretCWSKey secretKey = myCrypto.generateSymmetricKey(mySettings.getSymmetricAlgorithm());

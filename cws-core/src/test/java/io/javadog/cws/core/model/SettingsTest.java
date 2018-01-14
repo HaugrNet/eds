@@ -10,6 +10,7 @@ package io.javadog.cws.core.model;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
+import io.javadog.cws.core.DatabaseSetup;
 import io.javadog.cws.core.enums.HashAlgorithm;
 import io.javadog.cws.core.enums.KeyAlgorithm;
 import io.javadog.cws.core.enums.StandardSetting;
@@ -24,108 +25,108 @@ import java.util.Set;
  * @author Kim Jensen
  * @since  CWS 1.0
  */
-public final class SettingsTest {
+public final class SettingsTest extends DatabaseSetup {
 
     @Test
     public void testSettings() {
-        final Settings settings = new Settings();
+        final Settings mySettings = newSettings();
 
-        final Map<String, String> existing = settings.get();
+        final Map<String, String> existing = mySettings.get();
         assertThat(existing.size(), is(12));
-        settings.set("my.new.key", "the awesome value");
+        mySettings.set("my.new.key", "the awesome value");
 
-        final Map<String, String> updated = settings.get();
+        final Map<String, String> updated = mySettings.get();
         assertThat(updated.size(), is(existing.size() + 1));
     }
 
     @Test
     public void testReadingDefaultSettings() {
-        final Settings settings = new Settings();
+        final Settings mySettings = newSettings();
 
         final Set<KeyAlgorithm> aes = prepareSetOf(KeyAlgorithm.Type.SYMMETRIC);
         final Set<KeyAlgorithm> rsa = prepareSetOf(KeyAlgorithm.Type.ASYMMETRIC);
         final Set<KeyAlgorithm> sha = prepareSetOf(KeyAlgorithm.Type.SIGNATURE);
         final Set<KeyAlgorithm> pbe = prepareSetOf(KeyAlgorithm.Type.PASSWORD);
 
-        assertThat(aes.contains(settings.getSymmetricAlgorithm()), is(true));
-        assertThat(rsa.contains(settings.getAsymmetricAlgorithm()), is(true));
-        assertThat(sha.contains(settings.getSignatureAlgorithm()), is(true));
-        assertThat(pbe.contains(settings.getPasswordAlgorithm()), is(true));
-        assertThat(settings.getSalt(), is("Default salt, also used as kill switch. Must be set in DB."));
-        assertThat(settings.getCharset().name(), is("UTF-8"));
+        assertThat(aes.contains(mySettings.getSymmetricAlgorithm()), is(true));
+        assertThat(rsa.contains(mySettings.getAsymmetricAlgorithm()), is(true));
+        assertThat(sha.contains(mySettings.getSignatureAlgorithm()), is(true));
+        assertThat(pbe.contains(mySettings.getPasswordAlgorithm()), is(true));
+        assertThat(mySettings.getSalt(), is("Default salt, also used as kill switch. Must be set in DB."));
+        assertThat(mySettings.getCharset().name(), is("UTF-8"));
     }
 
     @Test
     public void testUpdateDefaultSettings() {
-        final Settings settings = new Settings();
+        final Settings mySettings = newSettings();
 
-        settings.set(StandardSetting.SYMMETRIC_ALGORITHM, KeyAlgorithm.AES192.name());
-        assertThat(settings.getSymmetricAlgorithm(), is(KeyAlgorithm.AES192));
+        mySettings.set(StandardSetting.SYMMETRIC_ALGORITHM, KeyAlgorithm.AES192.name());
+        assertThat(mySettings.getSymmetricAlgorithm(), is(KeyAlgorithm.AES192));
 
-        settings.set(StandardSetting.ASYMMETRIC_ALGORITHM, KeyAlgorithm.RSA4096.name());
-        assertThat(settings.getAsymmetricAlgorithm(), is(KeyAlgorithm.RSA4096));
+        mySettings.set(StandardSetting.ASYMMETRIC_ALGORITHM, KeyAlgorithm.RSA4096.name());
+        assertThat(mySettings.getAsymmetricAlgorithm(), is(KeyAlgorithm.RSA4096));
 
-        settings.set(StandardSetting.ASYMMETRIC_ALGORITHM, KeyAlgorithm.RSA8192.name());
-        assertThat(settings.getAsymmetricAlgorithm(), is(KeyAlgorithm.RSA8192));
+        mySettings.set(StandardSetting.ASYMMETRIC_ALGORITHM, KeyAlgorithm.RSA8192.name());
+        assertThat(mySettings.getAsymmetricAlgorithm(), is(KeyAlgorithm.RSA8192));
 
-        settings.set(StandardSetting.SIGNATURE_ALGORITHM, KeyAlgorithm.SHA256.name());
-        assertThat(settings.getSignatureAlgorithm(), is(KeyAlgorithm.SHA256));
+        mySettings.set(StandardSetting.SIGNATURE_ALGORITHM, KeyAlgorithm.SHA256.name());
+        assertThat(mySettings.getSignatureAlgorithm(), is(KeyAlgorithm.SHA256));
 
-        settings.set(StandardSetting.HASH_ALGORITHM, HashAlgorithm.SHA256.name());
-        assertThat(settings.getHashAlgorithm(), is(HashAlgorithm.SHA256));
+        mySettings.set(StandardSetting.HASH_ALGORITHM, HashAlgorithm.SHA256.name());
+        assertThat(mySettings.getHashAlgorithm(), is(HashAlgorithm.SHA256));
 
-        settings.set(StandardSetting.PBE_ALGORITHM, KeyAlgorithm.PBE192.name());
-        assertThat(settings.getPasswordAlgorithm(), is(KeyAlgorithm.PBE192));
+        mySettings.set(StandardSetting.PBE_ALGORITHM, KeyAlgorithm.PBE192.name());
+        assertThat(mySettings.getPasswordAlgorithm(), is(KeyAlgorithm.PBE192));
 
-        settings.set(StandardSetting.PBE_ALGORITHM, KeyAlgorithm.PBE256.name());
-        assertThat(settings.getPasswordAlgorithm(), is(KeyAlgorithm.PBE256));
+        mySettings.set(StandardSetting.PBE_ALGORITHM, KeyAlgorithm.PBE256.name());
+        assertThat(mySettings.getPasswordAlgorithm(), is(KeyAlgorithm.PBE256));
 
-        settings.set(StandardSetting.CWS_SALT, "UUID value");
-        assertThat(settings.getSalt(), is("UUID value"));
+        mySettings.set(StandardSetting.CWS_SALT, "UUID value");
+        assertThat(mySettings.getSalt(), is("UUID value"));
 
-        settings.set(StandardSetting.CWS_LOCALE, Locale.GERMAN.toString());
-        assertThat(settings.getLocale(), is(Locale.GERMAN));
+        mySettings.set(StandardSetting.CWS_LOCALE, Locale.GERMAN.toString());
+        assertThat(mySettings.getLocale(), is(Locale.GERMAN));
 
-        settings.set(StandardSetting.CWS_CHARSET, "ISO-8859-15");
-        assertThat(settings.getCharset().name(), is("ISO-8859-15"));
+        mySettings.set(StandardSetting.CWS_CHARSET, "ISO-8859-15");
+        assertThat(mySettings.getCharset().name(), is("ISO-8859-15"));
 
-        settings.set(StandardSetting.SANITY_STARTUP, "false");
-        assertThat(settings.getSanityStartup(), is(false));
+        mySettings.set(StandardSetting.SANITY_STARTUP, "false");
+        assertThat(mySettings.getSanityStartup(), is(false));
 
-        settings.set(StandardSetting.SANITY_INTERVAL, "120");
-        assertThat(settings.getSanityInterval(), is(120));
+        mySettings.set(StandardSetting.SANITY_INTERVAL, "120");
+        assertThat(mySettings.getSanityInterval(), is(120));
     }
 
     @Test
     public void testExposeAdmin() {
-        final Settings settings = new Settings();
-        assertThat(settings.getExposeAdmin(), is(false));
-        settings.set(StandardSetting.EXPOSE_ADMIN, "true");
-        assertThat(settings.getExposeAdmin(), is(true));
-        settings.set(StandardSetting.EXPOSE_ADMIN, "false");
-        assertThat(settings.getExposeAdmin(), is(false));
-        settings.set(StandardSetting.EXPOSE_ADMIN, " true ");
-        assertThat(settings.getExposeAdmin(), is(true));
-        settings.set(StandardSetting.EXPOSE_ADMIN, "");
-        assertThat(settings.getExposeAdmin(), is(false));
-        settings.set(StandardSetting.EXPOSE_ADMIN, " what ");
-        assertThat(settings.getExposeAdmin(), is(false));
+        final Settings mySettings = newSettings();
+        assertThat(mySettings.getExposeAdmin(), is(false));
+        mySettings.set(StandardSetting.EXPOSE_ADMIN, "true");
+        assertThat(mySettings.getExposeAdmin(), is(true));
+        mySettings.set(StandardSetting.EXPOSE_ADMIN, "false");
+        assertThat(mySettings.getExposeAdmin(), is(false));
+        mySettings.set(StandardSetting.EXPOSE_ADMIN, " true ");
+        assertThat(mySettings.getExposeAdmin(), is(true));
+        mySettings.set(StandardSetting.EXPOSE_ADMIN, "");
+        assertThat(mySettings.getExposeAdmin(), is(false));
+        mySettings.set(StandardSetting.EXPOSE_ADMIN, " what ");
+        assertThat(mySettings.getExposeAdmin(), is(false));
     }
 
     @Test
     public void testShowOtherMemberInformation() {
-        final Settings settings = new Settings();
-        assertThat(settings.getShareTrustees(), is(true));
-        settings.set(StandardSetting.SHOW_TRUSTEES, "false");
-        assertThat(settings.getShareTrustees(), is(false));
-        settings.set(StandardSetting.SHOW_TRUSTEES, "true");
-        assertThat(settings.getShareTrustees(), is(true));
-        settings.set(StandardSetting.SHOW_TRUSTEES, " true ");
-        assertThat(settings.getShareTrustees(), is(true));
-        settings.set(StandardSetting.SHOW_TRUSTEES, "");
-        assertThat(settings.getShareTrustees(), is(false));
-        settings.set(StandardSetting.SHOW_TRUSTEES, " what ");
-        assertThat(settings.getShareTrustees(), is(false));
+        final Settings mySettings = newSettings();
+        assertThat(mySettings.getShareTrustees(), is(true));
+        mySettings.set(StandardSetting.SHOW_TRUSTEES, "false");
+        assertThat(mySettings.getShareTrustees(), is(false));
+        mySettings.set(StandardSetting.SHOW_TRUSTEES, "true");
+        assertThat(mySettings.getShareTrustees(), is(true));
+        mySettings.set(StandardSetting.SHOW_TRUSTEES, " true ");
+        assertThat(mySettings.getShareTrustees(), is(true));
+        mySettings.set(StandardSetting.SHOW_TRUSTEES, "");
+        assertThat(mySettings.getShareTrustees(), is(false));
+        mySettings.set(StandardSetting.SHOW_TRUSTEES, " what ");
+        assertThat(mySettings.getShareTrustees(), is(false));
     }
 
     // =========================================================================

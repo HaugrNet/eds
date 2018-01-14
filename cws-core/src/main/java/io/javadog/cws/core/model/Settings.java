@@ -51,11 +51,27 @@ public final class Settings {
     /** Error log level, used if an internal error occurred. */
     public static final Level ERROR = Level.SEVERE;
 
+    private static Settings instance = null;
+    private static final Object LOCK = new Object();
+
     private final Properties properties = new Properties();
 
-    public Settings() {
+    /**
+     * Private Constructor, this is a Singleton.
+     */
+    private Settings() {
         for (final StandardSetting setting : StandardSetting.values()) {
             set(setting, setting.getValue());
+        }
+    }
+
+    public static Settings getInstance() {
+        synchronized (LOCK) {
+            //if (instance == null) {
+                instance = new Settings();
+            //}
+
+            return instance;
         }
     }
 

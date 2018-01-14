@@ -44,6 +44,7 @@ import javax.persistence.Persistence;
 import javax.persistence.Query;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.security.SecureRandom;
 import java.text.SimpleDateFormat;
@@ -84,7 +85,7 @@ public class DatabaseSetup {
     private static final EntityManagerFactory FACTORY = Persistence.createEntityManagerFactory(persistenceName);
     protected EntityManager entityManager = FACTORY.createEntityManager();
     protected CommonDao dao = new CommonDao(entityManager);
-    protected final Settings settings = new Settings();
+    protected final Settings settings = Settings.getInstance();
     protected final Crypto crypto = new Crypto(settings);
 
     static {
@@ -194,6 +195,23 @@ public class DatabaseSetup {
         thrown.expectMessage(returnMessage);
         thrown.expect(hasProperty(propertyName));
         thrown.expect(hasProperty(propertyName, is(returnCode)));
+    }
+
+    /**
+     * Some of our tests require that we change the Settings, but as changing
+     * the settings may affect other tests, hence for those - a new Settings
+     * instance is enforced, which has to be done via Reflection.
+     *
+     * @return New Settings instance
+     */
+    protected Settings newSettings() {
+        try {
+            final Constructor<Settings> constructor = Settings.class.getDeclaredConstructor();
+            constructor.setAccessible(true);
+            return constructor.newInstance();
+        } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
+            throw new CWSException(ReturnCode.ERROR, e.getMessage(), e);
+        }
     }
 
     protected KeyEntity prepareKey() {

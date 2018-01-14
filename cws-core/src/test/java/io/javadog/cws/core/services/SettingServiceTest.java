@@ -19,7 +19,6 @@ import io.javadog.cws.core.DatabaseSetup;
 import io.javadog.cws.core.enums.StandardSetting;
 import io.javadog.cws.core.exceptions.AuthorizationException;
 import io.javadog.cws.core.exceptions.CWSException;
-import io.javadog.cws.core.model.Settings;
 import io.javadog.cws.core.model.entities.MemberEntity;
 import org.junit.Test;
 
@@ -46,7 +45,7 @@ public final class SettingServiceTest extends DatabaseSetup {
         query.setParameter("id", 1L);
         query.executeUpdate();
 
-        final SettingService service = new SettingService(new Settings(), entityManager);
+        final SettingService service = new SettingService(newSettings(), entityManager);
         final SettingRequest request = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
 
         final SettingResponse response = service.perform(request);
@@ -60,7 +59,7 @@ public final class SettingServiceTest extends DatabaseSetup {
         prepareCause(AuthorizationException.class, ReturnCode.AUTHORIZATION_WARNING,
                 "Cannot complete this request, as it is only allowed for the System Administrator.");
 
-        final SettingService service = new SettingService(new Settings(), entityManager);
+        final SettingService service = new SettingService(newSettings(), entityManager);
         final SettingRequest request = prepareRequest(SettingRequest.class, MEMBER_1);
         assertThat(request.getAccountName(), is(not(Constants.ADMIN_ACCOUNT)));
 
@@ -69,7 +68,7 @@ public final class SettingServiceTest extends DatabaseSetup {
 
     @Test
     public void testInvokingRequestWithNullSettingsList() {
-        final SettingService service = new SettingService(new Settings(), entityManager);
+        final SettingService service = new SettingService(newSettings(), entityManager);
         final SettingRequest request = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
 
         final SettingResponse response = service.perform(request);
@@ -80,7 +79,7 @@ public final class SettingServiceTest extends DatabaseSetup {
 
     @Test
     public void testInvokingRequestWithEmptySettings() {
-        final SettingService service = new SettingService(new Settings(), entityManager);
+        final SettingService service = new SettingService(newSettings(), entityManager);
         final SettingRequest request = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
         final Map<String, String> mySettings = new HashMap<>();
         request.setSettings(mySettings);
@@ -94,7 +93,7 @@ public final class SettingServiceTest extends DatabaseSetup {
     @Test
     public void testInvokingRequestWithNullKey() {
         prepareCause(CWSException.class, ReturnCode.SETTING_WARNING, "Setting Keys may neither be null nor empty.");
-        final SettingService service = new SettingService(new Settings(), entityManager);
+        final SettingService service = new SettingService(newSettings(), entityManager);
         final SettingRequest request = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
         final Map<String, String> mySettings = new HashMap<>();
         mySettings.put(null, "NullKey");
@@ -107,7 +106,7 @@ public final class SettingServiceTest extends DatabaseSetup {
     @Test
     public void testInvokingRequestWithEmptyKey() {
         prepareCause(CWSException.class, ReturnCode.SETTING_WARNING, "Setting Keys may neither be null nor empty.");
-        final SettingService service = new SettingService(new Settings(), entityManager);
+        final SettingService service = new SettingService(newSettings(), entityManager);
         final SettingRequest request = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
         final Map<String, String> mySettings = new HashMap<>();
         mySettings.put("", "EmptyKey");
@@ -124,7 +123,7 @@ public final class SettingServiceTest extends DatabaseSetup {
         for (final MemberEntity member : members) {
             dao.delete(member);
         }
-        final SettingService service = new SettingService(new Settings(), entityManager);
+        final SettingService service = new SettingService(newSettings(), entityManager);
         final SettingRequest request = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
         final SettingResponse response = service.perform(request);
         assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
@@ -138,7 +137,7 @@ public final class SettingServiceTest extends DatabaseSetup {
 
     @Test
     public void testInvokingRequestUpdateExistingSetting() {
-        final SettingService service = new SettingService(new Settings(), entityManager);
+        final SettingService service = new SettingService(newSettings(), entityManager);
         final SettingRequest request = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
 
         // First invocation, retrieving the list of current values so we can
@@ -164,7 +163,7 @@ public final class SettingServiceTest extends DatabaseSetup {
 
     @Test
     public void testAddingAndRemovingCustomSetting() {
-        final SettingService service = new SettingService(new Settings(), entityManager);
+        final SettingService service = new SettingService(newSettings(), entityManager);
         final SettingRequest request = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
         final Map<String, String> mySettings = new HashMap<>();
         mySettings.put("my.setting.key", "value");
@@ -179,7 +178,7 @@ public final class SettingServiceTest extends DatabaseSetup {
     @Test
     public void testInvokingRequestUpdateNotAllowedExistingSetting() {
         prepareCause(CWSException.class, ReturnCode.SETTING_WARNING, "The setting cws.system.salt may not be overwritten.");
-        final SettingService service = new SettingService(new Settings(), entityManager);
+        final SettingService service = new SettingService(newSettings(), entityManager);
         final SettingRequest request = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
         final Map<String, String> mySettings = new HashMap<>();
         mySettings.put("cws.system.salt", "Enabling Kill Switch");
@@ -191,7 +190,7 @@ public final class SettingServiceTest extends DatabaseSetup {
 
     @Test
     public void testInvokingRequestAddNewSetting() {
-        final SettingService service = new SettingService(new Settings(), entityManager);
+        final SettingService service = new SettingService(newSettings(), entityManager);
         final SettingRequest request = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
         final Map<String, String> mySettings = new HashMap<>();
         mySettings.put("cws.test.setting", "Setting Value");
@@ -207,7 +206,7 @@ public final class SettingServiceTest extends DatabaseSetup {
     @Test
     public void testAddSettingWithNullValue() {
         prepareCause(CWSException.class, ReturnCode.SETTING_WARNING, "Cannot add a setting without a value.");
-        final SettingService service = new SettingService(new Settings(), entityManager);
+        final SettingService service = new SettingService(newSettings(), entityManager);
         final SettingRequest request = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
         final Map<String, String> mySettings = new HashMap<>();
         mySettings.put("cws.test.setting", null);
@@ -219,7 +218,7 @@ public final class SettingServiceTest extends DatabaseSetup {
 
     @Test
     public void testDeletingCustomSetting() {
-        final SettingService service = new SettingService(new Settings(), entityManager);
+        final SettingService service = new SettingService(newSettings(), entityManager);
         final SettingRequest request = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
         final Map<String, String> mySettings = new HashMap<>();
         mySettings.put("cws.test.setting", "Test Value");
@@ -240,7 +239,7 @@ public final class SettingServiceTest extends DatabaseSetup {
     @Test
     public void testDeletingStandardSetting() {
         prepareCause(CWSException.class, ReturnCode.SETTING_WARNING, "It is not allowed to delete standard settings.");
-        final SettingService service = new SettingService(new Settings(), entityManager);
+        final SettingService service = new SettingService(newSettings(), entityManager);
         final SettingRequest request = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
         final Map<String, String> mySettings = new HashMap<>();
         mySettings.put(StandardSetting.CWS_CHARSET.getKey(), null);

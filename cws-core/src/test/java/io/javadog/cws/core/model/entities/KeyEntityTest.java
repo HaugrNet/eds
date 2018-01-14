@@ -27,7 +27,7 @@ public final class KeyEntityTest extends DatabaseSetup {
 
     @Test
     public void testEntity() {
-        final Settings mySettings = new Settings();
+        final Settings mySettings = newSettings();
         final KeyEntity key = new KeyEntity();
         key.setAlgorithm(mySettings.getSymmetricAlgorithm());
         key.setStatus(Status.ACTIVE);

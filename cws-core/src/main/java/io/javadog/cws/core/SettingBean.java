@@ -27,7 +27,7 @@ public class SettingBean {
     @PersistenceContext(unitName = "cwsDS")
     private EntityManager entityManager;
 
-    private final Settings settings = new Settings();
+    private final Settings settings = Settings.getInstance();
 
     @PostConstruct
     public void init() {

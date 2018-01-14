@@ -99,9 +99,17 @@ public final class SanitizerBeanTest extends DatabaseSetup {
 
             // Inject Dependencies
             setField(bean, "entityManager", entityManager);
-            setField(bean, "settingBean", prepareSettingBean(sanityAtStartup));
             setField(bean, "sanitizerBean", prepareSanitizeBean());
             setField(bean, "timerService", new TestTimerService());
+
+            // The Bean is updating the Settings via the DB, so we need to alter
+            // the content of the DB to reflect this. As the content has not yet
+            // been read out - it is also not cached, hence a simply update will
+            // suffice.
+            final Query query = entityManager.createQuery("update SettingEntity set setting = :setting where name = :name");
+            query.setParameter("name", StandardSetting.SANITY_STARTUP.getKey());
+            query.setParameter("setting", sanityAtStartup);
+            query.executeUpdate();
 
             // Invoke PostConstructor
             bean.startup();
@@ -118,28 +126,6 @@ public final class SanitizerBeanTest extends DatabaseSetup {
 
             // Inject Dependencies
             setField(bean, "entityManager", entityManager);
-            setField(bean, "settingBean", prepareSettingBean("true"));
-
-            // Invoke PostConstructor
-            bean.init();
-
-            return bean;
-        } catch (InstantiationException | InvocationTargetException | IllegalAccessException | NoSuchMethodException e) {
-            throw new CWSException(ReturnCode.ERROR, "Cannot instantiate Service Object", e);
-        }
-    }
-
-    private SettingBean prepareSettingBean(final String sanityAtStartup) {
-        try {
-            final SettingBean bean = SettingBean.class.getConstructor().newInstance();
-            setField(bean, "entityManager", entityManager);
-
-            // Just invoking the postConstruct method, has to be done manually,
-            // as the Bean is not managed in our tests ;-)
-            bean.init();
-
-            // Overriding the Startup settings
-            bean.getSettings().set(StandardSetting.SANITY_STARTUP.getKey(), sanityAtStartup);
 
             return bean;
         } catch (InstantiationException | InvocationTargetException | IllegalAccessException | NoSuchMethodException e) {

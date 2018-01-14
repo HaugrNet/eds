@@ -13,7 +13,6 @@ import io.javadog.cws.api.requests.FetchTrusteeRequest;
 import io.javadog.cws.api.requests.ProcessTrusteeRequest;
 import io.javadog.cws.api.responses.FetchTrusteeResponse;
 import io.javadog.cws.api.responses.ProcessTrusteeResponse;
-import io.javadog.cws.core.SettingBean;
 import io.javadog.cws.core.SystemBean;
 import io.javadog.cws.core.misc.LoggingUtil;
 import io.javadog.cws.core.model.Settings;
@@ -37,8 +36,7 @@ public class TrusteeService {
 
     private static final Logger log = Logger.getLogger(TrusteeService.class.getName());
 
-    @Inject
-    private SettingBean settings;
+    private final Settings settings = Settings.getInstance();
     @Inject private SystemBean bean;
 
     @POST
@@ -76,9 +74,9 @@ public class TrusteeService {
 
         try {
             response = bean.fetchTrustees(fetchTrusteeRequest);
-            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "fetchCircles", startTime));
+            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), "fetchCircles", startTime));
         } catch (RuntimeException e) {
-            log.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "fetchCircles", startTime, e));
+            log.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getLocale(), "fetchCircles", startTime, e));
             response = new FetchTrusteeResponse(ReturnCode.ERROR, e.getMessage());
         }
 
@@ -92,9 +90,9 @@ public class TrusteeService {
         try {
             request.setAction(action);
             response = bean.processTrustee(request);
-            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), logAction, startTime));
+            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), logAction, startTime));
         } catch (RuntimeException e) {
-            log.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), logAction, startTime, e));
+            log.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getLocale(), logAction, startTime, e));
             response = new ProcessTrusteeResponse(ReturnCode.ERROR, e.getMessage());
         }
 

@@ -60,7 +60,6 @@ public final class VersionServiceTest extends BeanSetup {
         try {
             final SystemBean bean = SystemBean.class.getConstructor().newInstance();
             setField(bean, "entityManager", entityManager);
-            setField(bean, "settingBean", prepareSettingBean());
 
             final VersionService service = VersionService.class.getConstructor().newInstance();
             setField(service, "bean", bean);

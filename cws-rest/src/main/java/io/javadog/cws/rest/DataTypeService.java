@@ -13,7 +13,6 @@ import io.javadog.cws.api.requests.FetchDataTypeRequest;
 import io.javadog.cws.api.requests.ProcessDataTypeRequest;
 import io.javadog.cws.api.responses.FetchDataTypeResponse;
 import io.javadog.cws.api.responses.ProcessDataTypeResponse;
-import io.javadog.cws.core.SettingBean;
 import io.javadog.cws.core.ShareBean;
 import io.javadog.cws.core.misc.LoggingUtil;
 import io.javadog.cws.core.model.Settings;
@@ -37,7 +36,7 @@ public class DataTypeService {
 
     private static final Logger log = Logger.getLogger(DataTypeService.class.getName());
 
-    @Inject private SettingBean settings;
+    private final Settings settings = Settings.getInstance();
     @Inject private ShareBean bean;
 
     @POST
@@ -67,9 +66,9 @@ public class DataTypeService {
 
         try {
             response = bean.fetchDataTypes(fetchDataTypesRequest);
-            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "fetchDataTypes", startTime));
+            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), "fetchDataTypes", startTime));
         } catch (RuntimeException e) {
-            log.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "fetchDataTypes", startTime, e));
+            log.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getLocale(), "fetchDataTypes", startTime, e));
             response = new FetchDataTypeResponse(ReturnCode.ERROR, e.getMessage());
         }
 
@@ -83,9 +82,9 @@ public class DataTypeService {
         try {
             request.setAction(action);
             response = bean.processDataType(request);
-            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), logAction, startTime));
+            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), logAction, startTime));
         } catch (RuntimeException e) {
-            log.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), logAction, startTime, e));
+            log.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getLocale(), logAction, startTime, e));
             response = new ProcessDataTypeResponse(ReturnCode.ERROR, e.getMessage());
         }
 

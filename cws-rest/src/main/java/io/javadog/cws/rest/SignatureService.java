@@ -14,7 +14,6 @@ import io.javadog.cws.api.requests.VerifyRequest;
 import io.javadog.cws.api.responses.FetchSignatureResponse;
 import io.javadog.cws.api.responses.SignResponse;
 import io.javadog.cws.api.responses.VerifyResponse;
-import io.javadog.cws.core.SettingBean;
 import io.javadog.cws.core.ShareBean;
 import io.javadog.cws.core.misc.LoggingUtil;
 import io.javadog.cws.core.model.Settings;
@@ -37,7 +36,7 @@ public class SignatureService {
 
     private static final Logger log = Logger.getLogger(SignatureService.class.getName());
 
-    @Inject private SettingBean settings;
+    private final Settings settings = Settings.getInstance();
     @Inject private ShareBean bean;
 
     @POST
@@ -50,9 +49,9 @@ public class SignatureService {
 
         try {
             response = bean.sign(signDocumentRequest);
-            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "signDocument", startTime));
+            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), "signDocument", startTime));
         } catch (RuntimeException e) {
-            log.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "signDocument", startTime, e));
+            log.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getLocale(), "signDocument", startTime, e));
             response = new SignResponse(ReturnCode.ERROR, e.getMessage());
         }
 
@@ -69,9 +68,9 @@ public class SignatureService {
 
         try {
             response = bean.verify(verifySignatureRequest);
-            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "verifySignature", startTime));
+            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), "verifySignature", startTime));
         } catch (RuntimeException e) {
-            log.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "verifySignature", startTime, e));
+            log.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getLocale(), "verifySignature", startTime, e));
             response = new VerifyResponse(ReturnCode.ERROR, e.getMessage());
         }
 
@@ -88,9 +87,9 @@ public class SignatureService {
 
         try {
             response = bean.fetchSignatures(fetchSignaturesRequest);
-            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "fetchSignatures", startTime));
+            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), "fetchSignatures", startTime));
         } catch (RuntimeException e) {
-            log.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "fetchSignatures", startTime, e));
+            log.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getLocale(), "fetchSignatures", startTime, e));
             response = new FetchSignatureResponse(ReturnCode.ERROR, e.getMessage());
         }
 

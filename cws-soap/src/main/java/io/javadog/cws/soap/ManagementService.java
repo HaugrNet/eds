@@ -26,7 +26,6 @@ import io.javadog.cws.api.responses.ProcessTrusteeResponse;
 import io.javadog.cws.api.responses.SanityResponse;
 import io.javadog.cws.api.responses.SettingResponse;
 import io.javadog.cws.api.responses.VersionResponse;
-import io.javadog.cws.core.SettingBean;
 import io.javadog.cws.core.SystemBean;
 import io.javadog.cws.core.misc.LoggingUtil;
 import io.javadog.cws.core.model.Settings;
@@ -53,7 +52,7 @@ public class ManagementService implements Management {
 
     private static final String GENERAL_RETURN_MESSAGE = "An unknown error occurred. Please consult the CWS System Log.";
 
-    @Inject private SettingBean settings;
+    private final Settings settings = Settings.getInstance();
     @Inject private SystemBean bean;
 
     /**
@@ -68,7 +67,7 @@ public class ManagementService implements Management {
         try {
             final Long startTime = java.lang.System.nanoTime();
             response = bean.version();
-            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "version", startTime));
+            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), "version", startTime));
         } catch (RuntimeException e) {
             // If an error occurs that has so far not been resolved, this is the
             // final level where it can be handled. Errors can be Persistence
@@ -93,7 +92,7 @@ public class ManagementService implements Management {
         try {
             final Long startTime = java.lang.System.nanoTime();
             response = bean.settings(request);
-            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "settings", startTime));
+            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), "settings", startTime));
         } catch (RuntimeException e) {
             // If an error occurs that has so far not been resolved, this is the
             // final level where it can be handled. Errors can be Persistence
@@ -118,7 +117,7 @@ public class ManagementService implements Management {
         try {
             final Long startTime = java.lang.System.nanoTime();
             response = bean.sanity(request);
-            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "sanitized", startTime));
+            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), "sanitized", startTime));
         } catch (RuntimeException e) {
             // If an error occurs that has so far not been resolved, this is the
             // final level where it can be handled. Errors can be Persistence
@@ -143,7 +142,7 @@ public class ManagementService implements Management {
         try {
             final Long startTime = java.lang.System.nanoTime();
             response = bean.fetchMembers(request);
-            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "fetchMembers", startTime));
+            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), "fetchMembers", startTime));
         } catch (RuntimeException e) {
             // If an error occurs that has so far not been resolved, this is the
             // final level where it can be handled. Errors can be Persistence
@@ -168,7 +167,7 @@ public class ManagementService implements Management {
         try {
             final Long startTime = java.lang.System.nanoTime();
             response = bean.processMember(request);
-            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "processMember", startTime));
+            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), "processMember", startTime));
         } catch (RuntimeException e) {
             // If an error occurs that has so far not been resolved, this is the
             // final level where it can be handled. Errors can be Persistence
@@ -193,7 +192,7 @@ public class ManagementService implements Management {
         try {
             final Long startTime = java.lang.System.nanoTime();
             response = bean.fetchCircles(request);
-            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "fetchCircles", startTime));
+            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), "fetchCircles", startTime));
         } catch (RuntimeException e) {
             // If an error occurs that has so far not been resolved, this is the
             // final level where it can be handled. Errors can be Persistence
@@ -218,7 +217,7 @@ public class ManagementService implements Management {
         try {
             final Long startTime = java.lang.System.nanoTime();
             response = bean.processCircle(request);
-            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "processCircle", startTime));
+            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), "processCircle", startTime));
         } catch (RuntimeException e) {
             // If an error occurs that has so far not been resolved, this is the
             // final level where it can be handled. Errors can be Persistence
@@ -243,7 +242,7 @@ public class ManagementService implements Management {
         try {
             final Long startTime = java.lang.System.nanoTime();
             response = bean.fetchTrustees(request);
-            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "fetchCircles", startTime));
+            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), "fetchCircles", startTime));
         } catch (RuntimeException e) {
             // If an error occurs that has so far not been resolved, this is the
             // final level where it can be handled. Errors can be Persistence
@@ -268,7 +267,7 @@ public class ManagementService implements Management {
         try {
             final Long startTime = java.lang.System.nanoTime();
             response = bean.processTrustee(request);
-            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "processCircle", startTime));
+            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), "processCircle", startTime));
         } catch (RuntimeException e) {
             // If an error occurs that has so far not been resolved, this is the
             // final level where it can be handled. Errors can be Persistence

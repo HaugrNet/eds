@@ -36,7 +36,6 @@ import io.javadog.cws.core.services.SanityService;
 import io.javadog.cws.core.services.SettingService;
 
 import javax.ejb.Stateless;
-import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
@@ -53,8 +52,7 @@ public class SystemBean {
 
     @PersistenceContext(unitName = "cwsDS")
     private EntityManager entityManager;
-
-    @Inject private SettingBean settingBean;
+    private final Settings settings = Settings.getInstance();
 
     @Transactional(Transactional.TxType.SUPPORTS)
     public VersionResponse version() {
@@ -70,7 +68,7 @@ public class SystemBean {
         SettingResponse response;
 
         try {
-            service = new SettingService(settingBean.getSettings(), entityManager);
+            service = new SettingService(settings, entityManager);
             response = service.perform(request);
         } catch (CWSException e) {
             // Any Warning or Error thrown by the CWS contain enough information
@@ -92,7 +90,7 @@ public class SystemBean {
         SanityResponse response;
 
         try {
-            service = new SanityService(settingBean.getSettings(), entityManager);
+            service = new SanityService(settings, entityManager);
             response = service.perform(request);
         } catch (CWSException e) {
             // Any Warning or Error thrown by the CWS contain enough information
@@ -114,7 +112,7 @@ public class SystemBean {
         FetchMemberResponse response;
 
         try {
-            service = new FetchMemberService(settingBean.getSettings(), entityManager);
+            service = new FetchMemberService(settings, entityManager);
             response = service.perform(request);
         } catch (CWSException e) {
             // Any Warning or Error thrown by the CWS contain enough information
@@ -136,7 +134,7 @@ public class SystemBean {
         ProcessMemberResponse response;
 
         try {
-            service = new ProcessMemberService(settingBean.getSettings(), entityManager);
+            service = new ProcessMemberService(settings, entityManager);
             response = service.perform(request);
         } catch (CWSException e) {
             // Any Warning or Error thrown by the CWS contain enough information
@@ -158,7 +156,7 @@ public class SystemBean {
         FetchCircleResponse response;
 
         try {
-            service = new FetchCircleService(settingBean.getSettings(), entityManager);
+            service = new FetchCircleService(settings, entityManager);
             response = service.perform(request);
         } catch (CWSException e) {
             // Any Warning or Error thrown by the CWS contain enough information
@@ -180,7 +178,7 @@ public class SystemBean {
         ProcessCircleResponse response;
 
         try {
-            service = new ProcessCircleService(settingBean.getSettings(), entityManager);
+            service = new ProcessCircleService(settings, entityManager);
             response = service.perform(request);
         } catch (CWSException e) {
             // Any Warning or Error thrown by the CWS contain enough information
@@ -202,7 +200,7 @@ public class SystemBean {
         FetchTrusteeResponse response;
 
         try {
-            service = new FetchTrusteeService(settingBean.getSettings(), entityManager);
+            service = new FetchTrusteeService(settings, entityManager);
             response = service.perform(request);
         } catch (CWSException e) {
             // Any Warning or Error thrown by the CWS contain enough information
@@ -224,7 +222,7 @@ public class SystemBean {
         ProcessTrusteeResponse response;
 
         try {
-            service = new ProcessTrusteeService(settingBean.getSettings(), entityManager);
+            service = new ProcessTrusteeService(settings, entityManager);
             response = service.perform(request);
         } catch (CWSException e) {
             // Any Warning or Error thrown by the CWS contain enough information

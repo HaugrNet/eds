@@ -100,7 +100,6 @@ public final class DataTypeServiceTest extends BeanSetup {
         try {
             final ShareBean bean = ShareBean.class.getConstructor().newInstance();
             setField(bean, "entityManager", entityManager);
-            setField(bean, "settingBean", prepareSettingBean());
 
             final DataTypeService service = DataTypeService.class.getConstructor().newInstance();
             setField(service, "bean", bean);

@@ -101,7 +101,6 @@ public final class SignatureServiceTest extends BeanSetup {
         try {
             final ShareBean bean = ShareBean.class.getConstructor().newInstance();
             setField(bean, "entityManager", entityManager);
-            setField(bean, "settingBean", prepareSettingBean());
 
             final SignatureService service = SignatureService.class.getConstructor().newInstance();
             setField(service, "bean", bean);

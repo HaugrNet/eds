@@ -13,7 +13,6 @@ import io.javadog.cws.api.requests.FetchDataRequest;
 import io.javadog.cws.api.requests.ProcessDataRequest;
 import io.javadog.cws.api.responses.FetchDataResponse;
 import io.javadog.cws.api.responses.ProcessDataResponse;
-import io.javadog.cws.core.SettingBean;
 import io.javadog.cws.core.ShareBean;
 import io.javadog.cws.core.misc.LoggingUtil;
 import io.javadog.cws.core.model.Settings;
@@ -37,7 +36,7 @@ public class DataService {
 
     private static final Logger log = Logger.getLogger(DataService.class.getName());
 
-    @Inject private SettingBean settings;
+    private final Settings settings = Settings.getInstance();
     @Inject private ShareBean bean;
 
     @POST
@@ -75,9 +74,9 @@ public class DataService {
 
         try {
             response = bean.fetchData(fetchDataRequest);
-            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "fetchData", startTime));
+            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), "fetchData", startTime));
         } catch (RuntimeException e) {
-            log.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "fetchData", startTime, e));
+            log.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getLocale(), "fetchData", startTime, e));
             response = new FetchDataResponse(ReturnCode.ERROR, e.getMessage());
         }
 
@@ -91,9 +90,9 @@ public class DataService {
         try {
             request.setAction(action);
             response = bean.processData(request);
-            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), logAction, startTime));
+            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), logAction, startTime));
         } catch (RuntimeException e) {
-            log.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), logAction, startTime, e));
+            log.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getLocale(), logAction, startTime, e));
             response = new ProcessDataResponse(ReturnCode.ERROR, e.getMessage());
         }
 

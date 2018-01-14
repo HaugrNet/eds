@@ -63,7 +63,6 @@ public final class SanityServiceTest extends BeanSetup {
         try {
             final SystemBean bean = SystemBean.class.getConstructor().newInstance();
             setField(bean, "entityManager", entityManager);
-            setField(bean, "settingBean", prepareSettingBean());
 
             final SanityService service = SanityService.class.getConstructor().newInstance();
             setField(service, "bean", bean);

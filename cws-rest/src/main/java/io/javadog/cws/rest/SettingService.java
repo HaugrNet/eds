@@ -10,7 +10,6 @@ package io.javadog.cws.rest;
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.requests.SettingRequest;
 import io.javadog.cws.api.responses.SettingResponse;
-import io.javadog.cws.core.SettingBean;
 import io.javadog.cws.core.SystemBean;
 import io.javadog.cws.core.misc.LoggingUtil;
 import io.javadog.cws.core.model.Settings;
@@ -33,7 +32,7 @@ public class SettingService {
 
     private static final Logger log = Logger.getLogger(SettingService.class.getName());
 
-    @Inject private SettingBean settings;
+    private final Settings settings = Settings.getInstance();
     @Inject private SystemBean bean;
 
     @POST
@@ -45,9 +44,9 @@ public class SettingService {
 
         try {
             response = bean.settings(settingRequest);
-            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "settings", startTime));
+            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), "settings", startTime));
         } catch (RuntimeException e) {
-            log.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "settings", startTime, e));
+            log.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getLocale(), "settings", startTime, e));
             response = new SettingResponse(ReturnCode.ERROR, e.getMessage());
         }
 

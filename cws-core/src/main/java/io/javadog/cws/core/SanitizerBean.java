@@ -13,9 +13,7 @@ import io.javadog.cws.core.model.CommonDao;
 import io.javadog.cws.core.model.Settings;
 import io.javadog.cws.core.model.entities.DataEntity;
 
-import javax.annotation.PostConstruct;
 import javax.ejb.Stateless;
-import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
 import javax.persistence.PersistenceContext;
@@ -41,16 +39,8 @@ public class SanitizerBean {
 
     @PersistenceContext(unitName = "cwsDS")
     private EntityManager entityManager;
-
-    @Inject
-    private SettingBean settingBean;
-
-    private Crypto crypto = null;
-
-    @PostConstruct
-    public void init() {
-        crypto = new Crypto(settingBean.getSettings());
-    }
+    private final Settings settings = Settings.getInstance();
+    private final Crypto crypto = new Crypto(settings);
 
     public void sanitize() {
         List<Long> ids = findNextBatch(BLOCK);
@@ -116,7 +106,7 @@ public class SanitizerBean {
     public List<Long> findNextBatch(final int maxResults) {
         // JPA support for Java 8 Date/Time API is not supported
         // before JavaEE8, which is still very early in adoption.
-        final int days = settingBean.getSettings().getSanityInterval();
+        final int days = settings.getSanityInterval();
         final Date date = java.sql.Date.valueOf(LocalDate.now().minusDays(days));
 
         final Query query = entityManager.createNamedQuery("data.findIdsForSanityCheck");

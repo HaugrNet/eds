@@ -118,7 +118,6 @@ public final class DataServiceTest extends BeanSetup {
         try {
             final ShareBean bean = ShareBean.class.getConstructor().newInstance();
             setField(bean, "entityManager", entityManager);
-            setField(bean, "settingBean", prepareSettingBean());
 
             final DataService service = DataService.class.getConstructor().newInstance();
             setField(service, "bean", bean);

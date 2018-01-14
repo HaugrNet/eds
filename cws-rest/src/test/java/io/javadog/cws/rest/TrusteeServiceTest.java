@@ -118,7 +118,6 @@ public final class TrusteeServiceTest extends BeanSetup {
         try {
             final SystemBean bean = SystemBean.class.getConstructor().newInstance();
             setField(bean, "entityManager", entityManager);
-            setField(bean, "settingBean", prepareSettingBean());
 
             final TrusteeService service = TrusteeService.class.getConstructor().newInstance();
             setField(service, "bean", bean);

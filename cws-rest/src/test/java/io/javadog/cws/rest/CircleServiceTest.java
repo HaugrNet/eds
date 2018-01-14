@@ -118,7 +118,6 @@ public final class CircleServiceTest extends BeanSetup {
         try {
             final SystemBean bean = SystemBean.class.getConstructor().newInstance();
             setField(bean, "entityManager", entityManager);
-            setField(bean, "settingBean", prepareSettingBean());
 
             final CircleService service = CircleService.class.getConstructor().newInstance();
             setField(service, "bean", bean);

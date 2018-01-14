@@ -136,7 +136,6 @@ public final class MemberServiceTest extends BeanSetup {
         try {
             final SystemBean bean = SystemBean.class.getConstructor().newInstance();
             setField(bean, "entityManager", entityManager);
-            setField(bean, "settingBean", prepareSettingBean());
 
             final MemberService service = MemberService.class.getConstructor().newInstance();
             setField(service, "bean", bean);

@@ -13,7 +13,6 @@ import io.javadog.cws.api.requests.FetchCircleRequest;
 import io.javadog.cws.api.requests.ProcessCircleRequest;
 import io.javadog.cws.api.responses.FetchCircleResponse;
 import io.javadog.cws.api.responses.ProcessCircleResponse;
-import io.javadog.cws.core.SettingBean;
 import io.javadog.cws.core.SystemBean;
 import io.javadog.cws.core.misc.LoggingUtil;
 import io.javadog.cws.core.model.Settings;
@@ -37,7 +36,7 @@ public class CircleService {
 
     private static final Logger log = Logger.getLogger(CircleService.class.getName());
 
-    @Inject private SettingBean settings;
+    private final Settings settings = Settings.getInstance();
     @Inject private SystemBean bean;
 
     @POST
@@ -75,9 +74,9 @@ public class CircleService {
 
         try {
             response = bean.fetchCircles(fetchCirclesRequest);
-            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "fetchCircles", startTime));
+            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), "fetchCircles", startTime));
         } catch (RuntimeException e) {
-            log.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), "fetchCircles", startTime, e));
+            log.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getLocale(), "fetchCircles", startTime, e));
             response = new FetchCircleResponse(ReturnCode.ERROR, e.getMessage());
         }
 
@@ -91,9 +90,9 @@ public class CircleService {
         try {
             request.setAction(action);
             response = bean.processCircle(request);
-            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), logAction, startTime));
+            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), logAction, startTime));
         } catch (RuntimeException e) {
-            log.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getSettings().getLocale(), logAction, startTime, e));
+            log.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getLocale(), logAction, startTime, e));
             response = new ProcessCircleResponse(ReturnCode.ERROR, e.getMessage());
         }
 

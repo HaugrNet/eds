@@ -9,6 +9,7 @@ package io.javadog.cws.core;
 
 import io.javadog.cws.core.model.CommonDao;
 import io.javadog.cws.core.model.Settings;
+import io.javadog.cws.core.model.entities.SettingEntity;
 import io.javadog.cws.core.model.entities.VersionEntity;
 
 import javax.annotation.PostConstruct;
@@ -45,40 +46,44 @@ public class StartupBean {
     private static final int DB_VERSION = 1;
 
     @PersistenceContext private EntityManager entityManager;
-    @Inject private SettingBean settingBean;
     @Inject private SanitizerBean sanitizerBean;
     @Resource private TimerService timerService;
+    private final Settings settings = Settings.getInstance();
 
     @PostConstruct
     public void startup() {
         log.info("Check if Database is up-to-date.");
-        checkDatabase();
+        if (checkDatabase()) {
 
-        log.info("Initializing the CWS Sanitizer Service.");
+            log.info("Initialize the Settings.");
+            initializeSettings();
 
-        // If requested, then simply start the sanitize as a background job
-        // now. The job will process small blocks of code and save these.
-        if (settingBean.getSettings().getSanityStartup()) {
-            runSanitizing();
+            log.info("Initializing the CWS Sanitizer Service.");
+
+            // If requested, then simply start the sanitize as a background job
+            // now. The job will process small blocks of code and save these.
+            if (settings.getSanityStartup()) {
+                runSanitizing();
+            }
+
+            // Registering the Timer Service. This will ensure that the Scheduler
+            // is invoked at frequent intervals.
+            final TimerConfig timerConfig = new TimerConfig();
+            timerConfig.setInfo("CWS Sanitizer");
+
+            // Once started, the next run should always occur as planned, regardless
+            // of restarts, as it is not guaranteed that the sanitizing is performed
+            // at startup.
+            timerConfig.setPersistent(true);
+
+            // Starting the Timer Service every hour.
+            final ScheduleExpression expression = new ScheduleExpression();
+            expression.hour("*");
+            timerService.createCalendarTimer(expression, timerConfig);
         }
-
-        // Registering the Timer Service. This will ensure that the Scheduler
-        // is invoked at frequent intervals.
-        final TimerConfig timerConfig = new TimerConfig();
-        timerConfig.setInfo("CWS Sanitizer");
-
-        // Once started, the next run should always occur as planned, regardless
-        // of restarts, as it is not guaranteed that the sanitizing is performed
-        // at startup.
-        timerConfig.setPersistent(true);
-
-        // Starting the Timer Service every hour.
-        final ScheduleExpression expression = new ScheduleExpression();
-        expression.hour("*");
-        timerService.createCalendarTimer(expression, timerConfig);
     }
 
-    private void checkDatabase() {
+    private boolean checkDatabase() {
         boolean ready = false;
 
         try {
@@ -95,7 +100,17 @@ public class StartupBean {
             log.log(Settings.ERROR, "Problem with DB: " + e.getMessage(), e);
         }
 
-        settingBean.getSettings().set("cws.isReady", String.valueOf(ready));
+        settings.set("cws.isReady", String.valueOf(ready));
+        return ready;
+    }
+
+    private void initializeSettings() {
+        final CommonDao dao = new CommonDao(entityManager);
+        final List<SettingEntity> found = dao.findAllAscending(SettingEntity.class, "id");
+
+        for (final SettingEntity entity : found) {
+            settings.set(entity.getName(), entity.getSetting());
+        }
     }
 
     @Asynchronous

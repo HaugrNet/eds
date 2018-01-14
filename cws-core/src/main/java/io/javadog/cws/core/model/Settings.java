@@ -67,9 +67,9 @@ public final class Settings {
 
     public static Settings getInstance() {
         synchronized (LOCK) {
-            //if (instance == null) {
+            if (instance == null) {
                 instance = new Settings();
-            //}
+            }
 
             return instance;
         }

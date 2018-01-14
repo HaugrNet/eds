@@ -45,10 +45,12 @@ public final class CryptoTest extends DatabaseSetup {
     public void testGeneratingPasswordKeyWithInvalidAlgorithm() {
         thrown.expect(CryptoException.class);
         thrown.expectMessage("AES/CBC/PKCS5Padding SecretKeyFactory not available");
+        final Settings mySettings = newSettings();
+        mySettings.set(StandardSetting.PBE_ALGORITHM.getKey(), "RSA2048");
+        final Crypto myCrypto = new Crypto(mySettings);
 
-        settings.set(StandardSetting.PBE_ALGORITHM.getKey(), "RSA2048");
         final String salt = UUID.randomUUID().toString();
-        crypto.generatePasswordKey(KeyAlgorithm.AES128, "my secret", salt);
+        myCrypto.generatePasswordKey(KeyAlgorithm.AES128, "my secret", salt);
     }
 
     @Test

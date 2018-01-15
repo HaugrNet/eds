@@ -13,7 +13,7 @@ import io.javadog.cws.api.requests.FetchTrusteeRequest;
 import io.javadog.cws.api.requests.ProcessTrusteeRequest;
 import io.javadog.cws.api.responses.FetchTrusteeResponse;
 import io.javadog.cws.api.responses.ProcessTrusteeResponse;
-import io.javadog.cws.core.SystemBean;
+import io.javadog.cws.core.ManagementBean;
 import io.javadog.cws.core.misc.LoggingUtil;
 import io.javadog.cws.core.model.Settings;
 
@@ -37,7 +37,7 @@ public class TrusteeService {
     private static final Logger log = Logger.getLogger(TrusteeService.class.getName());
 
     private final Settings settings = Settings.getInstance();
-    @Inject private SystemBean bean;
+    @Inject private ManagementBean bean;
 
     @POST
     @Path("/addTrustee")

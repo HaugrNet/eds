@@ -13,7 +13,7 @@ import io.javadog.cws.api.requests.FetchCircleRequest;
 import io.javadog.cws.api.requests.ProcessCircleRequest;
 import io.javadog.cws.api.responses.FetchCircleResponse;
 import io.javadog.cws.api.responses.ProcessCircleResponse;
-import io.javadog.cws.core.SystemBean;
+import io.javadog.cws.core.ManagementBean;
 import io.javadog.cws.core.misc.LoggingUtil;
 import io.javadog.cws.core.model.Settings;
 
@@ -37,7 +37,7 @@ public class CircleService {
     private static final Logger log = Logger.getLogger(CircleService.class.getName());
 
     private final Settings settings = Settings.getInstance();
-    @Inject private SystemBean bean;
+    @Inject private ManagementBean bean;
 
     @POST
     @Path("/createCircle")

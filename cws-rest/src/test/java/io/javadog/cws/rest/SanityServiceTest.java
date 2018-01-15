@@ -12,7 +12,7 @@ import static org.junit.Assert.assertThat;
 
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.requests.SanityRequest;
-import io.javadog.cws.core.SystemBean;
+import io.javadog.cws.core.ManagementBean;
 import io.javadog.cws.core.exceptions.CWSException;
 import org.junit.Test;
 
@@ -61,7 +61,7 @@ public final class SanityServiceTest extends BeanSetup {
 
     private SanityService prepareService() {
         try {
-            final SystemBean bean = SystemBean.class.getConstructor().newInstance();
+            final ManagementBean bean = ManagementBean.class.getConstructor().newInstance();
             setField(bean, "entityManager", entityManager);
 
             final SanityService service = SanityService.class.getConstructor().newInstance();

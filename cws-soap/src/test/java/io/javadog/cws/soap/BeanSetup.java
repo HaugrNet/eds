@@ -9,8 +9,8 @@ package io.javadog.cws.soap;
 
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.core.DatabaseSetup;
+import io.javadog.cws.core.ManagementBean;
 import io.javadog.cws.core.ShareBean;
-import io.javadog.cws.core.SystemBean;
 import io.javadog.cws.core.exceptions.CWSException;
 
 import java.lang.reflect.Field;
@@ -60,7 +60,7 @@ public class BeanSetup extends DatabaseSetup {
 
     protected ManagementService prepareSystemService() {
         try {
-            final SystemBean bean = SystemBean.class.getConstructor().newInstance();
+            final ManagementBean bean = ManagementBean.class.getConstructor().newInstance();
             setField(bean, "entityManager", entityManager);
 
             final ManagementService service = ManagementService.class.getConstructor().newInstance();

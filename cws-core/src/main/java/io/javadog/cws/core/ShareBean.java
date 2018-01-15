@@ -47,8 +47,7 @@ public class ShareBean {
 
     private static final Logger log = Logger.getLogger(ShareBean.class.getName());
 
-    @PersistenceContext(unitName = "cwsDS")
-    private EntityManager entityManager;
+    @PersistenceContext private EntityManager entityManager;
     private final Settings settings = Settings.getInstance();
 
     @Transactional(Transactional.TxType.REQUIRED)

@@ -11,7 +11,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
 import io.javadog.cws.api.common.ReturnCode;
-import io.javadog.cws.core.SystemBean;
+import io.javadog.cws.core.ManagementBean;
 import io.javadog.cws.core.exceptions.CWSException;
 import org.junit.Test;
 
@@ -58,7 +58,7 @@ public final class VersionServiceTest extends BeanSetup {
 
     private VersionService prepareService() {
         try {
-            final SystemBean bean = SystemBean.class.getConstructor().newInstance();
+            final ManagementBean bean = ManagementBean.class.getConstructor().newInstance();
             setField(bean, "entityManager", entityManager);
 
             final VersionService service = VersionService.class.getConstructor().newInstance();

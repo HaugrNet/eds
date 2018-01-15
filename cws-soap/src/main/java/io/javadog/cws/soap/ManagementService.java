@@ -26,7 +26,7 @@ import io.javadog.cws.api.responses.ProcessTrusteeResponse;
 import io.javadog.cws.api.responses.SanityResponse;
 import io.javadog.cws.api.responses.SettingResponse;
 import io.javadog.cws.api.responses.VersionResponse;
-import io.javadog.cws.core.SystemBean;
+import io.javadog.cws.core.ManagementBean;
 import io.javadog.cws.core.misc.LoggingUtil;
 import io.javadog.cws.core.model.Settings;
 
@@ -53,7 +53,7 @@ public class ManagementService implements Management {
     private static final String GENERAL_RETURN_MESSAGE = "An unknown error occurred. Please consult the CWS System Log.";
 
     private final Settings settings = Settings.getInstance();
-    @Inject private SystemBean bean;
+    @Inject private ManagementBean bean;
 
     /**
      * {@inheritDoc}

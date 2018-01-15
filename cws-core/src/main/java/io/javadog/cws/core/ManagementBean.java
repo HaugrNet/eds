@@ -46,12 +46,11 @@ import java.util.logging.Logger;
  * @since  CWS 1.0
  */
 @Stateless
-public class SystemBean {
+public class ManagementBean {
 
-    private static final Logger log = Logger.getLogger(SystemBean.class.getName());
+    private static final Logger log = Logger.getLogger(ManagementBean.class.getName());
 
-    @PersistenceContext(unitName = "cwsDS")
-    private EntityManager entityManager;
+    @PersistenceContext private EntityManager entityManager;
     private final Settings settings = Settings.getInstance();
 
     @Transactional(Transactional.TxType.SUPPORTS)

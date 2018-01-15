@@ -13,7 +13,7 @@ import io.javadog.cws.api.requests.FetchMemberRequest;
 import io.javadog.cws.api.requests.ProcessMemberRequest;
 import io.javadog.cws.api.responses.FetchMemberResponse;
 import io.javadog.cws.api.responses.ProcessMemberResponse;
-import io.javadog.cws.core.SystemBean;
+import io.javadog.cws.core.ManagementBean;
 import io.javadog.cws.core.misc.LoggingUtil;
 import io.javadog.cws.core.model.Settings;
 
@@ -37,7 +37,7 @@ public class MemberService {
     private static final Logger log = Logger.getLogger(MemberService.class.getName());
 
     private final Settings settings = Settings.getInstance();
-    @Inject private SystemBean bean;
+    @Inject private ManagementBean bean;
 
     @POST
     @Path("/createMember")

@@ -37,8 +37,7 @@ public class SanitizerBean {
     private static final Logger log = Logger.getLogger(SanitizerBean.class.getName());
     private static final int BLOCK = 100;
 
-    @PersistenceContext(unitName = "cwsDS")
-    private EntityManager entityManager;
+    @PersistenceContext private EntityManager entityManager;
     private final Settings settings = Settings.getInstance();
     private final Crypto crypto = new Crypto(settings);
 

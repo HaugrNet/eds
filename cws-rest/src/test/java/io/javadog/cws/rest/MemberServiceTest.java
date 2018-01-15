@@ -13,7 +13,7 @@ import static org.junit.Assert.assertThat;
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.requests.FetchMemberRequest;
 import io.javadog.cws.api.requests.ProcessMemberRequest;
-import io.javadog.cws.core.SystemBean;
+import io.javadog.cws.core.ManagementBean;
 import io.javadog.cws.core.exceptions.CWSException;
 import org.junit.Test;
 
@@ -134,7 +134,7 @@ public final class MemberServiceTest extends BeanSetup {
 
     private MemberService prepareService() {
         try {
-            final SystemBean bean = SystemBean.class.getConstructor().newInstance();
+            final ManagementBean bean = ManagementBean.class.getConstructor().newInstance();
             setField(bean, "entityManager", entityManager);
 
             final MemberService service = MemberService.class.getConstructor().newInstance();

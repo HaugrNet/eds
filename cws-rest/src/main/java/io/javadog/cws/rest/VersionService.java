@@ -9,7 +9,7 @@ package io.javadog.cws.rest;
 
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.responses.VersionResponse;
-import io.javadog.cws.core.SystemBean;
+import io.javadog.cws.core.ManagementBean;
 import io.javadog.cws.core.misc.LoggingUtil;
 import io.javadog.cws.core.model.Settings;
 
@@ -31,7 +31,7 @@ public class VersionService {
     private static final Logger log = Logger.getLogger(VersionService.class.getName());
 
     private final Settings settings = Settings.getInstance();
-    @Inject private SystemBean bean;
+    @Inject private ManagementBean bean;
 
     @GET
     @POST

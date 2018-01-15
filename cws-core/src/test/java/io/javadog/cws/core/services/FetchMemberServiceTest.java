@@ -185,9 +185,10 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
     @Test
     public void testFindAllMembersWithExposeAdminTrueAsMember1() {
         // Ensure that we have the correct settings for the Service
-        settings.set(StandardSetting.EXPOSE_ADMIN, "true");
+        final Settings mySettings = newSettings();
+        mySettings.set(StandardSetting.EXPOSE_ADMIN, "true");
 
-        final FetchMemberService service = new FetchMemberService(settings, entityManager);
+        final FetchMemberService service = new FetchMemberService(mySettings, entityManager);
         final FetchMemberRequest request = prepareRequest(FetchMemberRequest.class, MEMBER_1);
         assertThat(request.validate().isEmpty(), is(true));
         final FetchMemberResponse response = service.perform(request);
@@ -213,9 +214,10 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
     @Test
     public void testFindAdminWithExposeAdminTrueAsAdmin() {
         // Ensure that we have the correct settings for the Service
-        settings.set(StandardSetting.EXPOSE_ADMIN, "true");
+        final Settings mySettings = newSettings();
+        mySettings.set(StandardSetting.EXPOSE_ADMIN, "true");
 
-        final FetchMemberService fetchService = new FetchMemberService(settings, entityManager);
+        final FetchMemberService fetchService = new FetchMemberService(mySettings, entityManager);
         final FetchMemberRequest fetchRequest = prepareRequest(FetchMemberRequest.class, Constants.ADMIN_ACCOUNT);
         fetchRequest.setMemberId(ADMIN_ID);
         assertThat(fetchRequest.validate().isEmpty(), is(true));
@@ -239,9 +241,10 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
     @Test
     public void testFindAdminWithExposeAdminFalseAsAdmin() {
         // Ensure that we have the correct settings for the Service
-        settings.set(StandardSetting.EXPOSE_ADMIN, "false");
+        final Settings mySettings = newSettings();
+        mySettings.set(StandardSetting.EXPOSE_ADMIN, "false");
 
-        final FetchMemberService fetchMemberService = new FetchMemberService(settings, entityManager);
+        final FetchMemberService fetchMemberService = new FetchMemberService(mySettings, entityManager);
         final FetchMemberRequest fetchMemberRequest = prepareRequest(FetchMemberRequest.class, Constants.ADMIN_ACCOUNT);
         fetchMemberRequest.setMemberId(ADMIN_ID);
         assertThat(fetchMemberRequest.validate().isEmpty(), is(true));
@@ -264,9 +267,10 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
     @Test
     public void testFindMember1WithShowOtherFalseAsAdmin() {
         // Ensure that we have the correct settings for the Service
-        settings.set(StandardSetting.SHOW_TRUSTEES, "false");
+        final Settings mySettings = newSettings();
+        mySettings.set(StandardSetting.SHOW_TRUSTEES, "false");
 
-        final FetchMemberService memberService = new FetchMemberService(settings, entityManager);
+        final FetchMemberService memberService = new FetchMemberService(mySettings, entityManager);
         final MemberEntity firstMember = findFirstMember();
         final FetchMemberRequest memberRequest = prepareRequest(FetchMemberRequest.class, Constants.ADMIN_ACCOUNT);
         memberRequest.setMemberId(firstMember.getExternalId());
@@ -289,9 +293,10 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
     @Test
     public void testFindMember1WithShowOtherTrueAsAdmin() {
         // Ensure that we have the correct settings for the Service
-        settings.set(StandardSetting.SHOW_TRUSTEES, "true");
+        final Settings mySettings = newSettings();
+        mySettings.set(StandardSetting.SHOW_TRUSTEES, "true");
 
-        final FetchMemberService service = new FetchMemberService(settings, entityManager);
+        final FetchMemberService service = new FetchMemberService(mySettings, entityManager);
         final MemberEntity member = findFirstMember();
         final FetchMemberRequest request = prepareRequest(FetchMemberRequest.class, Constants.ADMIN_ACCOUNT);
         request.setMemberId(member.getExternalId());
@@ -315,9 +320,10 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
     @Test
     public void testFindAdminWithExposeAdminTrueAsMember1() {
         // Ensure that we have the correct settings for the Service
-        settings.set(StandardSetting.EXPOSE_ADMIN, "true");
+        final Settings mySettings = newSettings();
+        mySettings.set(StandardSetting.EXPOSE_ADMIN, "true");
 
-        final FetchMemberService memberService = new FetchMemberService(settings, entityManager);
+        final FetchMemberService memberService = new FetchMemberService(mySettings, entityManager);
         final MemberEntity member = findFirstMember();
         final FetchMemberRequest memberRequest = prepareRequest(FetchMemberRequest.class, member.getName());
         memberRequest.setMemberId(ADMIN_ID);
@@ -357,9 +363,10 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
     @Test
     public void testFindMember1WithShowOtherTrueAsMember1() {
         // Ensure that we have the correct settings for the Service
-        settings.set(StandardSetting.SHOW_TRUSTEES, "true");
+        final Settings mySettings = newSettings();
+        mySettings.set(StandardSetting.SHOW_TRUSTEES, "true");
 
-        final FetchMemberService memberService = new FetchMemberService(settings, entityManager);
+        final FetchMemberService memberService = new FetchMemberService(mySettings, entityManager);
         final MemberEntity member = findFirstMember();
         final FetchMemberRequest memberRequest = prepareRequest(FetchMemberRequest.class, MEMBER_1);
         memberRequest.setMemberId(member.getExternalId());
@@ -375,9 +382,10 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
     @Test
     public void testFindMember1WithShowOtherFalseAsMember1() {
         // Ensure that we have the correct settings for the Service
-        settings.set(StandardSetting.SHOW_TRUSTEES, "false");
+        final Settings mySettings = newSettings();
+        mySettings.set(StandardSetting.SHOW_TRUSTEES, "false");
 
-        final FetchMemberService service = new FetchMemberService(settings, entityManager);
+        final FetchMemberService service = new FetchMemberService(mySettings, entityManager);
         final MemberEntity member = findFirstMember();
         final FetchMemberRequest request = prepareRequest(FetchMemberRequest.class, MEMBER_1);
         request.setMemberId(member.getExternalId());
@@ -393,9 +401,10 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
     @Test
     public void testFindMember1WithShowOtherTrueAsMember4() {
         // Ensure that we have the correct settings for the Service
-        settings.set(StandardSetting.SHOW_TRUSTEES, "true");
+        final Settings mySettings = newSettings();
+        mySettings.set(StandardSetting.SHOW_TRUSTEES, "true");
 
-        final FetchMemberService service = new FetchMemberService(settings, entityManager);
+        final FetchMemberService service = new FetchMemberService(mySettings, entityManager);
         final MemberEntity member = findFirstMember();
         final FetchMemberRequest request = prepareRequest(FetchMemberRequest.class, "member4");
         request.setMemberId(member.getExternalId());
@@ -428,9 +437,10 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
     @Test
     public void testFindMember1WithShowOtherTrueAsMember5() {
         // Ensure that we have the correct settings for the Service
-        settings.set(StandardSetting.SHOW_TRUSTEES, "true");
+        final Settings mySettings = newSettings();
+        mySettings.set(StandardSetting.SHOW_TRUSTEES, "true");
 
-        final FetchMemberService service = new FetchMemberService(settings, entityManager);
+        final FetchMemberService service = new FetchMemberService(mySettings, entityManager);
         final MemberEntity member = findFirstMember();
         final FetchMemberRequest request = prepareRequest(FetchMemberRequest.class, MEMBER_5);
         request.setMemberId(member.getExternalId());

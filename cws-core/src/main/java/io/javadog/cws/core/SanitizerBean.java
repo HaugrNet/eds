@@ -27,6 +27,18 @@ import java.util.Objects;
 import java.util.logging.Logger;
 
 /**
+ * <p>Generally, the database is always trustworthy, it is a system which is
+ * designed to be entrusted with data - meaning that the bits and bytes going
+ * in should match those coming out. However, if certain parts of the data is
+ * not accessed or used in a long time, the disc used to persist the data on
+ * may develop problems which can corrupt data over time.</p>
+ *
+ * <p>Simplest solution is to make sure that data is used frequently and as
+ * long as the data extracted matches the one that was persisted - everything
+ * is fine. If a problem occurs over time, then a flag is set which will mark
+ * the data invalid. This way, the corrupted record can be either removed or
+ * replaced with a valid record from a backup.</p>
+ *
  * @author Kim Jensen
  * @since  CWS 1.0
  */

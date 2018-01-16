@@ -148,7 +148,9 @@ public final class FetchMemberService extends Serviceable<FetchMemberResponse, F
         final boolean exposeAdmin = settings.getExposeAdmin();
 
         for (final MemberEntity entity : entities) {
-            // If the Settings to expose the System Administrator is set to true, then we'll also add this, however by default we will otherwise skip the System Administrator.
+            // If the Settings to expose the System Administrator is set to
+            // true, then we'll also add this, however by default we will
+            // otherwise skip the System Administrator.
             final boolean isAdmin = Objects.equals(entity.getName(), Constants.ADMIN_ACCOUNT);
             if (isAdmin) {
                 if (exposeAdmin) {

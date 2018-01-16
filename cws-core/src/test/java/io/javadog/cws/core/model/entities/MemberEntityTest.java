@@ -14,6 +14,7 @@ import static org.junit.Assert.assertThat;
 
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.core.DatabaseSetup;
+import io.javadog.cws.core.GenerateTestData;
 import io.javadog.cws.core.enums.KeyAlgorithm;
 import io.javadog.cws.core.jce.CWSKeyPair;
 import org.junit.Test;
@@ -142,9 +143,8 @@ public final class MemberEntityTest extends DatabaseSetup {
      */
     @Test
     public void testPreparingTestData() {
-        entityManager.createNativeQuery("DELETE FROM cws_circles").executeUpdate();
-        entityManager.createNativeQuery("DELETE FROM cws_members").executeUpdate();
-        final String sql = prepareTestData();
+        final GenerateTestData generator = new GenerateTestData();
+        final String sql = generator.prepareTestData();
         assertThat(sql.length() > 19000, is(true));
     }
 }

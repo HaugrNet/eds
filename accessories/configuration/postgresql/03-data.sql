@@ -127,4 +127,4 @@ INSERT INTO cws_settings (name, setting) VALUES ('cws.sanity.check.startup', 'tr
 -- and reason for the sanity check. This setting sets the interval, at which the
 -- sanity checks should be made. By default, it is set to 180 days but it can be
 -- altered if needed.
-INSERT INTO cws_settings (name, setting) VALUES ('cws.sanity.check.interval', '180');
+INSERT INTO cws_settings (name, setting) VALUES ('cws.sanity.check.interval.days', '180');

@@ -86,8 +86,9 @@ public final class Crypto {
      * be of a good enough Quality, it should be having a length of at least 16
      * characters and the same applies to the Salt.</p>
      *
-     * @param secret Provided Passphrase or Secret
-     * @param salt   System specific Salt
+     * @param algorithm PBE Algorithm to generate Account Symmetric Key
+     * @param secret    Provided Passphrase or Secret
+     * @param salt      System specific Salt
      * @return Symmetric Key
      */
     public SecretCWSKey generatePasswordKey(final KeyAlgorithm algorithm, final String secret, final String salt) {

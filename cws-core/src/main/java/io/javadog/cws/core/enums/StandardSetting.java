@@ -26,7 +26,7 @@ public enum StandardSetting {
     EXPOSE_ADMIN("cws.expose.admin", "false"),
     SHOW_TRUSTEES("cws.show.trustees", "true"),
     SANITY_STARTUP("cws.sanity.check.startup", "true"),
-    SANITY_INTERVAL("cws.sanity.check.interval", "180");
+    SANITY_INTERVAL("cws.sanity.check.interval.days", "180");
 
     // =========================================================================
     // Internal Functionality

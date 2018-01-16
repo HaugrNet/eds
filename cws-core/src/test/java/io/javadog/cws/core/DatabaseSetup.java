@@ -348,7 +348,7 @@ public class DatabaseSetup {
 
         append(builder, "");
         append(builder, "-- For each Circle, we need to have root folder for all data.");
-        append(builder, "INSERT INTO metadata (external_id, parent_id, circle_id, datatype_id, name) VALUES");
+        append(builder, "INSERT INTO cws_metadata (external_id, parent_id, circle_id, datatype_id, name) VALUES");
         createandAppendFolder(builder, circle1, ',');
         createandAppendFolder(builder, circle2, ',');
         createandAppendFolder(builder, circle3, ';');
@@ -428,6 +428,6 @@ public class DatabaseSetup {
     }
 
     private static void append(final StringBuilder builder, final String str) {
-        builder.append(str);
+        builder.append(str).append('\n');
     }
 }

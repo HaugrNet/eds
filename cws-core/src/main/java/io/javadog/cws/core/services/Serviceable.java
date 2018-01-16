@@ -34,7 +34,6 @@ import io.javadog.cws.core.model.entities.MemberEntity;
 import io.javadog.cws.core.model.entities.TrusteeEntity;
 
 import javax.persistence.EntityManager;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -228,27 +227,17 @@ public abstract class Serviceable<R extends CwsResponse, V extends Authenticatio
     private void checkCredentials(final V verifiable) {
         try {
             final SecretCWSKey key = crypto.generatePasswordKey(member.getPbeAlgorithm(), verifiable.getCredential(), member.getSalt());
-            final Charset charset = settings.getCharset();
             keyPair = crypto.extractAsymmetricKey(member.getRsaAlgorithm(), key, member.getSalt(), member.getPublicKey(), member.getPrivateKey());
 
             // To ensure that the PBE key is no longer usable, we're destroying
             // it now.
             key.destroy();
-
-            final String toCheck = UUID.randomUUID().toString();
-            final byte[] toEncrypt = toCheck.getBytes(charset);
-            final byte[] encrypted = crypto.encrypt(keyPair.getPublic(), toEncrypt);
-            final byte[] decrypted = crypto.decrypt(keyPair.getPrivate(), encrypted);
-            final String result = new String(decrypted, charset);
-
-            if (!Objects.equals(result, toCheck)) {
-                throw new AuthenticationException("Cannot authenticate the Account '" + verifiable.getAccountName() + "' from the given Credentials.");
-            }
         } catch (CryptoException e) {
-            // Converting Credentials to a Key, which is used to decrypt the
-            // saved encrypted private Key - may lead to problem as the Password
-            // Key may cause padding problems. Hence, we have both the check in
-            // the logic above, but also here.
+            // If an incorrect Passphrase was used to generate the PBE key, then
+            // a Bad Padding Exception should've been thrown, which is converted
+            // into a CWS Crypto Exception. If that is the case, the Member has
+            // provided invalid credentials - with which it is not possible to
+            // extract the KeyPair for the Account.
             throw new AuthenticationException("Cannot authenticate the Account '" + verifiable.getAccountName() + "' from the given Credentials.", e);
         }
     }

@@ -83,7 +83,7 @@ public abstract class Serviceable<R extends CwsResponse, V extends Authenticatio
      * @throws CryptoException if a problem occurred with destroying keys
      */
     public void destroy() {
-        if ((keyPair != null) && (keyPair.getPrivate() != null)) {
+        if (keyPair != null) {
             keyPair.getPrivate().destroy();
         }
     }
@@ -267,14 +267,7 @@ public abstract class Serviceable<R extends CwsResponse, V extends Authenticatio
         // Actions, without being part of a Circle. So these checks must be
         // made separately based on the actual Request.
         if (!Objects.equals(ADMIN_ACCOUNT, member.getName())) {
-            final List<TrusteeEntity> allTrustees = findTrustees(member, circleId, TrustLevel.getLevels(action.getTrustLevel()));
-            trustees = new ArrayList<>();
-
-            for (final TrusteeEntity trust : allTrustees) {
-                if (TrustLevel.isAllowed(trust.getTrustLevel(), action.getTrustLevel())) {
-                    trustees.add(trust);
-                }
-            }
+            trustees = findTrustees(member, circleId, TrustLevel.getLevels(action.getTrustLevel()));
 
             if ((action.getTrustLevel() != TrustLevel.ALL) && trustees.isEmpty()) {
                 throw new AuthorizationException("The requesting Account is not permitted to " + action.getDescription());
@@ -287,7 +280,6 @@ public abstract class Serviceable<R extends CwsResponse, V extends Authenticatio
 
         return crypto.extractCircleKey(entity.getKey().getAlgorithm(), keyPair.getPrivate(), trustee.getCircleKey());
     }
-
 
     protected static List<Circle> convertCircles(final List<CircleEntity> entities) {
         final List<Circle> circles = new ArrayList<>(entities.size());

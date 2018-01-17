@@ -70,9 +70,9 @@ public final class Settings {
             if (instance == null) {
                 instance = new Settings();
             }
-
-            return instance;
         }
+
+        return instance;
     }
 
     // =========================================================================

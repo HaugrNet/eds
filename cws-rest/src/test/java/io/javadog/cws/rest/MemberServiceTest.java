@@ -81,6 +81,24 @@ public final class MemberServiceTest extends BeanSetup {
     }
 
     @Test
+    public void testInvalidate() {
+        final MemberService service = prepareService();
+        final ProcessMemberRequest request = new ProcessMemberRequest();
+
+        final Response response = service.invalidate(request);
+        assertThat(response.getStatus(), is(ReturnCode.VERIFICATION_WARNING.getHttpCode()));
+    }
+
+    @Test
+    public void testFlawedInvalidate() {
+        final MemberService service = prepareFlawedService();
+        final ProcessMemberRequest request = new ProcessMemberRequest();
+
+        final Response response = service.invalidate(request);
+        assertThat(response.getStatus(), is(ReturnCode.ERROR.getHttpCode()));
+    }
+
+    @Test
     public void testDelete() {
         final MemberService service = prepareService();
         final ProcessMemberRequest request = new ProcessMemberRequest();

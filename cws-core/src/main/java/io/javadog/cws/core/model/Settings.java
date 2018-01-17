@@ -164,4 +164,8 @@ public final class Settings {
     public Integer getSanityInterval() {
         return Integer.valueOf(get(StandardSetting.SANITY_INTERVAL.getKey()).trim());
     }
+
+    public Boolean isReady() {
+        return Boolean.valueOf(get(StandardSetting.IS_READY.getKey()).trim());
+    }
 }

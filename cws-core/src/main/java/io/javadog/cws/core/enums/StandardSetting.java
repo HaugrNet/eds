@@ -26,7 +26,9 @@ public enum StandardSetting {
     EXPOSE_ADMIN("cws.expose.admin", "false"),
     SHOW_TRUSTEES("cws.show.trustees", "true"),
     SANITY_STARTUP("cws.sanity.check.startup", "true"),
-    SANITY_INTERVAL("cws.sanity.check.interval.days", "180");
+    SANITY_INTERVAL("cws.sanity.check.interval.days", "180"),
+    // The isReady setting is set by the StartUp bean, and thus not persisted.
+    IS_READY("cws.is.ready", "true");
 
     // =========================================================================
     // Internal Functionality

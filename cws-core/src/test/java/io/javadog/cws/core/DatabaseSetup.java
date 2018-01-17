@@ -16,6 +16,7 @@ import io.javadog.cws.api.requests.Authentication;
 import io.javadog.cws.api.responses.ProcessDataResponse;
 import io.javadog.cws.core.enums.KeyAlgorithm;
 import io.javadog.cws.core.enums.SanityStatus;
+import io.javadog.cws.core.enums.StandardSetting;
 import io.javadog.cws.core.enums.Status;
 import io.javadog.cws.core.exceptions.CWSException;
 import io.javadog.cws.core.jce.CWSKeyPair;
@@ -107,6 +108,7 @@ public class DatabaseSetup {
     @Before
     public void setup() {
         entityManager.getTransaction().begin();
+        settings.set(StandardSetting.IS_READY.getKey(), "true");
     }
 
     @After

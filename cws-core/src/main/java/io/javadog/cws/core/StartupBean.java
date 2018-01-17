@@ -7,6 +7,8 @@
  */
 package io.javadog.cws.core;
 
+import io.javadog.cws.core.enums.StandardSetting;
+import io.javadog.cws.core.exceptions.CWSException;
 import io.javadog.cws.core.model.CommonDao;
 import io.javadog.cws.core.model.Settings;
 import io.javadog.cws.core.model.entities.SettingEntity;
@@ -27,7 +29,6 @@ import javax.ejb.TransactionAttributeType;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.persistence.PersistenceException;
 import javax.persistence.Query;
 import java.util.List;
 import java.util.logging.Logger;
@@ -93,14 +94,14 @@ public class StartupBean {
             // If the database is invalid, then no data could be found, meaning
             // that the database was not properly initialized, this should
             // result in an error while reading.
-            if (result.get(0).getSchemaVersion() == DB_VERSION) {
+            if (!result.isEmpty() && (result.get(0).getSchemaVersion() == DB_VERSION)) {
                 ready = true;
             }
-        } catch (PersistenceException e) {
+        } catch (CWSException e) {
             log.log(Settings.ERROR, "Problem with DB: " + e.getMessage(), e);
         }
 
-        settings.set("cws.isReady", String.valueOf(ready));
+        settings.set(StandardSetting.IS_READY.getKey(), String.valueOf(ready));
         return ready;
     }
 

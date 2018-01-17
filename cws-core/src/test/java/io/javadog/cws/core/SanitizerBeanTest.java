@@ -18,6 +18,7 @@ import io.javadog.cws.api.responses.ProcessDataResponse;
 import io.javadog.cws.core.enums.SanityStatus;
 import io.javadog.cws.core.enums.StandardSetting;
 import io.javadog.cws.core.exceptions.CWSException;
+import io.javadog.cws.core.model.Settings;
 import io.javadog.cws.core.model.entities.DataEntity;
 import io.javadog.cws.core.services.ProcessDataService;
 import org.junit.Test;
@@ -48,6 +49,24 @@ public final class SanitizerBeanTest extends DatabaseSetup {
         prepareStartupBean("true");
 
         assertThat(prepareSanitizeBean().findNextBatch(100).isEmpty(), is(true));
+    }
+
+    @Test
+    public void testStartupBeanWithEmptyVersionTable() {
+        final Query query = entityManager.createNativeQuery("delete from cws_versions");
+        query.executeUpdate();
+
+        final StartupBean bean = prepareStartupBean("true");
+        assertThat(getBeanSettings(bean).isReady(), is(false));
+    }
+
+    @Test
+    public void testStartupBeanWithDifferentVersion() {
+        final Query query = entityManager.createNativeQuery("insert into cws_versions (schema_version, cws_version, db_vendor) values (9999, '99.9.9', 'H2')");
+        query.executeUpdate();
+
+        final StartupBean bean = prepareStartupBean("true");
+        assertThat(getBeanSettings(bean).isReady(), is(false));
     }
 
     @Test
@@ -101,6 +120,7 @@ public final class SanitizerBeanTest extends DatabaseSetup {
             setField(bean, "entityManager", entityManager);
             setField(bean, "sanitizerBean", prepareSanitizeBean());
             setField(bean, "timerService", new TestTimerService());
+            setField(bean, "settings", newSettings());
 
             // The Bean is updating the Settings via the DB, so we need to alter
             // the content of the DB to reflect this. As the content has not yet
@@ -129,6 +149,22 @@ public final class SanitizerBeanTest extends DatabaseSetup {
 
             return bean;
         } catch (InstantiationException | InvocationTargetException | IllegalAccessException | NoSuchMethodException e) {
+            throw new CWSException(ReturnCode.ERROR, "Cannot instantiate Service Object", e);
+        }
+    }
+
+    private static Settings getBeanSettings(final StartupBean bean) {
+        try {
+            final Class<?> clazz = bean.getClass();
+            final Field field = clazz.getDeclaredField("settings");
+            final boolean isAccessible = field.isAccessible();
+
+            field.setAccessible(true);
+            final Settings beanSettings = (Settings) field.get(bean);
+            field.setAccessible(isAccessible);
+
+            return beanSettings;
+        } catch (IllegalAccessException | NoSuchFieldException e) {
             throw new CWSException(ReturnCode.ERROR, "Cannot instantiate Service Object", e);
         }
     }

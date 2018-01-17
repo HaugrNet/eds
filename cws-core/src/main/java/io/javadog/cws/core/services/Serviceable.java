@@ -102,44 +102,48 @@ public abstract class Serviceable<R extends CwsResponse, V extends Authenticatio
      * @param action     The Action for the permission check
      */
     protected void verifyRequest(final V verifiable, final Permission action) {
-        // If available, let's extract the CircleId so it can be used to improve
-        // accuracy of the checks and reduce the amount of data fetched from the
-        // database in preparation to perform these checks.
-        String circleId = null;
-        if (verifiable instanceof CircleIdRequest) {
-            circleId = ((CircleIdRequest) verifiable).getCircleId();
+        if (settings.isReady()) {
+            // If available, let's extract the CircleId so it can be used to improve
+            // accuracy of the checks and reduce the amount of data fetched from the
+            // database in preparation to perform these checks.
+            String circleId = null;
+            if (verifiable instanceof CircleIdRequest) {
+                circleId = ((CircleIdRequest) verifiable).getCircleId();
+            }
+
+            // Step 1; Verify if the given data is sufficient to complete the
+            //         request. If not sufficient, no need to continue and involve
+            //         the DB, so an Exception will be thrown.
+            verify(verifiable);
+
+            // Step 2; Find the Member by the given credentials, if nothing is
+            //         found, then no need to continue. Unless, the account not
+            //         found is the Administrator Account, in which case we will
+            //         add a new Account with the given Credentials.
+            //           Note; if the CircleId is already given, it will be used as
+            //         part of the lookup, thus limiting what is being searched and
+            //         also allow the checks to end earlier. However, equally
+            //         important, this check is a premature check and will *not*
+            //         count in the final Business Logic!
+            checkAccount(verifiable, circleId);
+
+            // Step 3; Check if the Member is valid, i.e. if the given Credentials
+            //         can correctly decrypt the Private Key for the Account. If
+            //         not, then an Exception is thrown.
+            checkCredentials(verifiable);
+
+            // Step 4; Final check, ensure that the Member is having the correct
+            //         level of Access to any Circle - which doesn't necessarily
+            //         mean to the requesting Circle, as it requires deeper
+            //         checking.
+            //           Note; if the CircleId is already given, then it will be
+            //         used to also check of the Member is Authorized. Again, this
+            //         check is only a premature check and will not count against
+            //         the final checks in the Business Logic.
+            checkAuthorization(action, circleId);
+        } else {
+            throw new CWSException(ReturnCode.DATABASE_ERROR, "The Database is invalid, CWS neither can nor will work correctly until resolved.");
         }
-
-        // Step 1; Verify if the given data is sufficient to complete the
-        //         request. If not sufficient, no need to continue and involve
-        //         the DB, so an Exception will be thrown.
-        verify(verifiable);
-
-        // Step 2; Find the Member by the given credentials, if nothing is
-        //         found, then no need to continue. Unless, the account not
-        //         found is the Administrator Account, in which case we will
-        //         add a new Account with the given Credentials.
-        //           Note; if the CircleId is already given, it will be used as
-        //         part of the lookup, thus limiting what is being searched and
-        //         also allow the checks to end earlier. However, equally
-        //         important, this check is a premature check and will *not*
-        //         count in the final Business Logic!
-        checkAccount(verifiable, circleId);
-
-        // Step 3; Check if the Member is valid, i.e. if the given Credentials
-        //         can correctly decrypt the Private Key for the Account. If
-        //         not, then an Exception is thrown.
-        checkCredentials(verifiable);
-
-        // Step 4; Final check, ensure that the Member is having the correct
-        //         level of Access to any Circle - which doesn't necessarily
-        //         mean to the requesting Circle, as it requires deeper
-        //         checking.
-        //           Note; if the CircleId is already given, then it will be
-        //         used to also check of the Member is Authorized. Again, this
-        //         check is only a premature check and will not count against
-        //         the final checks in the Business Logic.
-        checkAuthorization(action, circleId);
     }
 
     /**

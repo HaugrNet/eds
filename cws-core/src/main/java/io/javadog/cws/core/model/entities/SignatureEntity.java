@@ -8,6 +8,7 @@
 package io.javadog.cws.core.model.entities;
 
 import static io.javadog.cws.api.common.Constants.MAX_STRING_LENGTH;
+import static io.javadog.cws.api.common.Utilities.copy;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -50,12 +51,12 @@ public class SignatureEntity extends CWSEntity {
     @Column(name = "checksum", updatable = false, length = MAX_STRING_LENGTH)
     private String checksum = null;
 
+    @Column(name = "verifications")
+    private Long verifications = 0L;
+
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "expires", updatable = false)
     private Date expires = null;
-
-    @Column(name = "verifications")
-    private Long verifications = 0L;
 
     // =========================================================================
     // Entity Setters & Getters
@@ -85,19 +86,19 @@ public class SignatureEntity extends CWSEntity {
         return checksum;
     }
 
-    public void setExpires(final Date expires) {
-        this.expires = (expires != null) ? new Date(expires.getTime()) : null;
-    }
-
-    public Date getExpires() {
-        return (expires != null) ? new Date(expires.getTime()) : null;
-    }
-
     public void setVerifications(final Long verifications) {
         this.verifications = verifications;
     }
 
     public Long getVerifications() {
         return verifications;
+    }
+
+    public void setExpires(final Date expires) {
+        this.expires = copy(expires);
+    }
+
+    public Date getExpires() {
+        return copy(expires);
     }
 }

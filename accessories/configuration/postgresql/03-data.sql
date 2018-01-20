@@ -99,6 +99,13 @@ INSERT INTO cws_settings (name, setting) VALUES ('cws.system.charset', 'UTF-8');
 -- is not visible unless explicitly changed to true.
 INSERT INTO cws_settings (name, setting) VALUES ('cws.expose.admin', 'false');
 
+-- Exposing all Circles, means that it is possible for a member, other than the
+-- System Administrator, to be able to view Circles who they are not having a
+-- Trustee relationship with - If the value is set to true.
+--   If the value is set to false, then it is only possible to extract a list of
+-- Circles with whom the Member is having a Trustee relationship with.
+INSERT INTO cws_settings (name, setting) VALUES ('cws.show.all.circles', 'true');
+
 -- Privacy is important, however - there may be reasons to reduce the privacy
 -- level, and allow that a Member can view information about other Members even
 -- if there is no direct relation between the two. If two members share a

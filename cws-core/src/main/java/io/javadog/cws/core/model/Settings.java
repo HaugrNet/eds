@@ -153,6 +153,10 @@ public final class Settings {
         return Boolean.valueOf(get(StandardSetting.EXPOSE_ADMIN.getKey()).trim());
     }
 
+    public Boolean getShowAllCircles() {
+        return Boolean.valueOf(get(StandardSetting.SHOW_CIRCLES.getKey()).trim());
+    }
+
     public Boolean getShareTrustees() {
         return Boolean.valueOf(get(StandardSetting.SHOW_TRUSTEES.getKey()).trim());
     }

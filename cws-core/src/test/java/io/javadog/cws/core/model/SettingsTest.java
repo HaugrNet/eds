@@ -32,7 +32,7 @@ public final class SettingsTest extends DatabaseSetup {
         final Settings mySettings = newSettings();
 
         final Map<String, String> existing = mySettings.get();
-        assertThat(existing.size(), is(13));
+        assertThat(existing.size(), is(14));
         mySettings.set("my.new.key", "the awesome value");
 
         final Map<String, String> updated = mySettings.get();

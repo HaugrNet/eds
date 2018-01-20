@@ -24,8 +24,10 @@ import io.javadog.cws.api.responses.FetchDataResponse;
 import io.javadog.cws.api.responses.ProcessCircleResponse;
 import io.javadog.cws.api.responses.ProcessDataResponse;
 import io.javadog.cws.core.DatabaseSetup;
+import io.javadog.cws.core.enums.StandardSetting;
 import io.javadog.cws.core.exceptions.CWSException;
 import io.javadog.cws.core.exceptions.VerificationException;
+import io.javadog.cws.core.model.Settings;
 import org.junit.Test;
 
 import java.util.UUID;
@@ -101,8 +103,10 @@ public final class CircleServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testFetchAllCirclesAsAdmin() {
-        final FetchCircleService service = new FetchCircleService(settings, entityManager);
+    public void testFetchAllCirclesAsAdminWithShowCirclesTrue() {
+        final Settings mySettings = newSettings();
+        mySettings.set(StandardSetting.SHOW_CIRCLES.getKey(), "true");
+        final FetchCircleService service = new FetchCircleService(mySettings, entityManager);
         final FetchCircleRequest request = prepareRequest(FetchCircleRequest.class, Constants.ADMIN_ACCOUNT);
         final FetchCircleResponse response = service.perform(request);
 
@@ -111,13 +115,51 @@ public final class CircleServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testFetchAllCirclesAsMember1() {
-        final FetchCircleService service = new FetchCircleService(settings, entityManager);
+    public void testFetchAllCirclesAsAdminWithShowCirclesFalse() {
+        final Settings mySettings = newSettings();
+        mySettings.set(StandardSetting.SHOW_CIRCLES.getKey(), "false");
+        final FetchCircleService service = new FetchCircleService(mySettings, entityManager);
+        final FetchCircleRequest request = prepareRequest(FetchCircleRequest.class, Constants.ADMIN_ACCOUNT);
+        final FetchCircleResponse response = service.perform(request);
+
+        assertThat(response.isOk(), is(true));
+        detailedCircleAssertion(response, CIRCLE_1, CIRCLE_2, CIRCLE_3);
+    }
+
+    @Test
+    public void testFetchAllCirclesAsMember1WithShowCirclesTrue() {
+        final Settings mySettings = newSettings();
+        mySettings.set(StandardSetting.SHOW_CIRCLES.getKey(), "true");
+        final FetchCircleService service = new FetchCircleService(mySettings, entityManager);
         final FetchCircleRequest request = prepareRequest(FetchCircleRequest.class, MEMBER_1);
         final FetchCircleResponse response = service.perform(request);
 
         assertThat(response.isOk(), is(true));
         detailedCircleAssertion(response, CIRCLE_1, CIRCLE_2, CIRCLE_3);
+    }
+
+    @Test
+    public void testFetchAllCirclesAsMember1WithShowCirclesFalse() {
+        final Settings mySettings = newSettings();
+        mySettings.set(StandardSetting.SHOW_CIRCLES.getKey(), "false");
+        final FetchCircleService service = new FetchCircleService(mySettings, entityManager);
+        final FetchCircleRequest request = prepareRequest(FetchCircleRequest.class, MEMBER_1);
+        final FetchCircleResponse response = service.perform(request);
+
+        assertThat(response.isOk(), is(true));
+        detailedCircleAssertion(response, CIRCLE_1, CIRCLE_2);
+    }
+
+    @Test
+    public void testFetchAllCirclesAsMember5WithShowCirclesFalse() {
+        final Settings mySettings = newSettings();
+        mySettings.set(StandardSetting.SHOW_CIRCLES.getKey(), "false");
+        final FetchCircleService service = new FetchCircleService(mySettings, entityManager);
+        final FetchCircleRequest request = prepareRequest(FetchCircleRequest.class, MEMBER_5);
+        final FetchCircleResponse response = service.perform(request);
+
+        assertThat(response.isOk(), is(true));
+        detailedCircleAssertion(response, CIRCLE_3);
     }
 
     @Test

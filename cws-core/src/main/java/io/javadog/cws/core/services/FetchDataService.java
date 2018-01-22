@@ -107,18 +107,27 @@ public final class FetchDataService extends Serviceable<FetchDataResponse, Fetch
                 final List<Metadata> metadataList = new ArrayList<>(1);
                 metadataList.add(metaData);
 
+                // The Object may have the Status Failed, but was corrected. But
+                // as we're going to update the Object anyway, let's just update
+                // it with an Ok flag also.
+                entity.setSanityStatus(SanityStatus.OK);
+
                 response.setMetadata(metadataList);
                 response.setData(bytes);
             } else {
                 // Let's update the DB with the information that the data is
                 // invalid, and return the error.
                 entity.setSanityStatus(SanityStatus.FAILED);
-                entity.setSanityChecked(new Date());
-                dao.persist(entity);
 
                 response.setReturnCode(ReturnCode.INTEGRITY_ERROR);
                 response.setReturnMessage("The Encrypted Data Checksum is invalid, the data appears to have been corrupted.");
             }
+
+            // Regardless what the Status is, let's update the Object, so the
+            // information is persisted. This will also prevent that the Object
+            // is checked too soon.
+            entity.setSanityChecked(new Date());
+            dao.persist(entity);
         }
 
         return response;

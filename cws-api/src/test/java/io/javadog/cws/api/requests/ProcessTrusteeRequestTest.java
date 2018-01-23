@@ -13,6 +13,7 @@ import static org.junit.Assert.assertThat;
 import io.javadog.cws.api.common.Action;
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.TrustLevel;
+import io.javadog.cws.api.common.Utilities;
 import org.junit.Test;
 
 import java.util.Map;
@@ -31,7 +32,7 @@ public final class ProcessTrusteeRequestTest {
 
         final ProcessTrusteeRequest request = new ProcessTrusteeRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
-        request.setCredential(Constants.ADMIN_ACCOUNT);
+        request.setCredential(Utilities.convert(Constants.ADMIN_ACCOUNT));
         request.setAction(Action.ADD);
         request.setCircleId(circleId);
         request.setMemberId(memberId);
@@ -40,7 +41,7 @@ public final class ProcessTrusteeRequestTest {
 
         assertThat(errors.isEmpty(), is(true));
         assertThat(request.getAccountName(), is(Constants.ADMIN_ACCOUNT));
-        assertThat(request.getCredential(), is(Constants.ADMIN_ACCOUNT));
+        assertThat(Utilities.convert(request.getCredential()), is(Constants.ADMIN_ACCOUNT));
         assertThat(request.getAction(), is(Action.ADD));
         assertThat(request.getCircleId(), is(circleId));
         assertThat(request.getMemberId(), is(memberId));
@@ -62,7 +63,7 @@ public final class ProcessTrusteeRequestTest {
     public void testInvalidAction() {
         final ProcessTrusteeRequest request = new ProcessTrusteeRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
-        request.setCredential(Constants.ADMIN_ACCOUNT);
+        request.setCredential(Utilities.convert(Constants.ADMIN_ACCOUNT));
         request.setAction(Action.PROCESS);
 
         final Map<String, String> errors = request.validate();
@@ -74,7 +75,7 @@ public final class ProcessTrusteeRequestTest {
     public void testActionAdd() {
         final ProcessTrusteeRequest request = new ProcessTrusteeRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
-        request.setCredential(Constants.ADMIN_ACCOUNT);
+        request.setCredential(Utilities.convert(Constants.ADMIN_ACCOUNT));
         request.setCircleId(UUID.randomUUID().toString());
         request.setMemberId(UUID.randomUUID().toString());
         request.setTrustLevel(TrustLevel.WRITE);
@@ -88,7 +89,7 @@ public final class ProcessTrusteeRequestTest {
     public void testActionAddFail() {
         final ProcessTrusteeRequest request = new ProcessTrusteeRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
-        request.setCredential(Constants.ADMIN_ACCOUNT);
+        request.setCredential(Utilities.convert(Constants.ADMIN_ACCOUNT));
         request.setCircleId(null);
         request.setMemberId("Invalid MemberId");
         request.setTrustLevel(null);
@@ -105,7 +106,7 @@ public final class ProcessTrusteeRequestTest {
     public void testActionAlter() {
         final ProcessTrusteeRequest request = new ProcessTrusteeRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
-        request.setCredential(Constants.ADMIN_ACCOUNT);
+        request.setCredential(Utilities.convert(Constants.ADMIN_ACCOUNT));
         request.setCircleId(UUID.randomUUID().toString());
         request.setMemberId(UUID.randomUUID().toString());
         request.setTrustLevel(TrustLevel.WRITE);
@@ -119,7 +120,7 @@ public final class ProcessTrusteeRequestTest {
     public void testActionAlterFail() {
         final ProcessTrusteeRequest request = new ProcessTrusteeRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
-        request.setCredential(Constants.ADMIN_ACCOUNT);
+        request.setCredential(Utilities.convert(Constants.ADMIN_ACCOUNT));
         request.setCircleId("Invalid Circle Id");
         request.setMemberId(null);
         request.setTrustLevel(null);
@@ -136,7 +137,7 @@ public final class ProcessTrusteeRequestTest {
     public void testActionRemove() {
         final ProcessTrusteeRequest request = new ProcessTrusteeRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
-        request.setCredential(Constants.ADMIN_ACCOUNT);
+        request.setCredential(Utilities.convert(Constants.ADMIN_ACCOUNT));
         request.setCircleId(UUID.randomUUID().toString());
         request.setMemberId(UUID.randomUUID().toString());
         request.setAction(Action.REMOVE);
@@ -149,7 +150,7 @@ public final class ProcessTrusteeRequestTest {
     public void testActionRemoveFail() {
         final ProcessTrusteeRequest request = new ProcessTrusteeRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
-        request.setCredential(Constants.ADMIN_ACCOUNT);
+        request.setCredential(Utilities.convert(Constants.ADMIN_ACCOUNT));
         request.setCircleId(null);
         request.setMemberId("invalid Member Id");
         request.setAction(Action.REMOVE);

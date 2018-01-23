@@ -15,6 +15,7 @@ import static org.junit.Assert.assertThat;
 import io.javadog.cws.api.common.Action;
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
+import io.javadog.cws.api.common.Utilities;
 import io.javadog.cws.api.requests.FetchDataRequest;
 import io.javadog.cws.api.requests.ProcessCircleRequest;
 import io.javadog.cws.api.requests.ProcessDataRequest;
@@ -158,7 +159,7 @@ public final class DataServiceTest extends DatabaseSetup {
         final String accountName = "accountName";
         final ProcessMemberRequest memberRequest = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
         memberRequest.setNewAccountName(accountName);
-        memberRequest.setNewCredential(accountName);
+        memberRequest.setNewCredential(Utilities.convert(accountName));
         memberRequest.setAction(Action.CREATE);
         final ProcessMemberService memberService = new ProcessMemberService(settings, entityManager);
         final ProcessMemberResponse memberResponse = memberService.perform(memberRequest);

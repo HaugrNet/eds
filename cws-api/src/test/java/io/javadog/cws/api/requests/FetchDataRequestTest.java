@@ -12,6 +12,7 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 
 import io.javadog.cws.api.common.Constants;
+import io.javadog.cws.api.common.Utilities;
 import org.junit.Test;
 
 import java.util.Map;
@@ -30,7 +31,7 @@ public final class FetchDataRequestTest {
 
         final FetchDataRequest request = new FetchDataRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
-        request.setCredential(Constants.ADMIN_ACCOUNT);
+        request.setCredential(Utilities.convert(Constants.ADMIN_ACCOUNT));
         request.setCircleId(circleId);
         request.setDataId(dataId);
         request.setPageNumber(43);
@@ -38,7 +39,7 @@ public final class FetchDataRequestTest {
 
         assertThat(request.validate().isEmpty(), is(true));
         assertThat(request.getAccountName(), is(Constants.ADMIN_ACCOUNT));
-        assertThat(request.getCredential(), is(Constants.ADMIN_ACCOUNT));
+        assertThat(Utilities.convert(request.getCredential()), is(Constants.ADMIN_ACCOUNT));
         assertThat(request.getCircleId(), is(circleId));
         assertThat(request.getDataId(), is(dataId));
         assertThat(request.getPageNumber(), is(43));

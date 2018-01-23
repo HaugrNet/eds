@@ -52,6 +52,12 @@ public abstract class Verifiable implements Serializable {
         }
     }
 
+    protected static void checkNotNullOrEmpty(final Map<String, String> errors, final String field, final byte[] value, final String message) {
+        if ((value == null) || (value.length == 0)) {
+            errors.put(field, message);
+        }
+    }
+
     protected static void checkNotNullOrEmpty(final Map<String, String> errors, final String field, final String value, final String message) {
         if ((value == null) || value.trim().isEmpty()) {
             errors.put(field, message);

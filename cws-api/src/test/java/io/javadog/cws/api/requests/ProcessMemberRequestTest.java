@@ -12,6 +12,7 @@ import static org.junit.Assert.assertThat;
 
 import io.javadog.cws.api.common.Action;
 import io.javadog.cws.api.common.Constants;
+import io.javadog.cws.api.common.Utilities;
 import org.junit.Test;
 
 import java.util.Map;
@@ -31,19 +32,19 @@ public final class ProcessMemberRequestTest {
 
         final ProcessMemberRequest request = new ProcessMemberRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
-        request.setCredential(Constants.ADMIN_ACCOUNT);
+        request.setCredential(Utilities.convert(Constants.ADMIN_ACCOUNT));
         request.setAction(Action.CREATE);
         request.setNewAccountName(newAccountName);
-        request.setNewCredential(newCredential);
+        request.setNewCredential(Utilities.convert(newCredential));
         request.setMemberId(memberId);
         final Map<String, String> errors = request.validate();
 
         assertThat(errors.isEmpty(), is(true));
         assertThat(request.getAccountName(), is(Constants.ADMIN_ACCOUNT));
-        assertThat(request.getCredential(), is(Constants.ADMIN_ACCOUNT));
+        assertThat(Utilities.convert(request.getCredential()), is(Constants.ADMIN_ACCOUNT));
         assertThat(request.getAction(), is(Action.CREATE));
         assertThat(request.getNewAccountName(), is(newAccountName));
-        assertThat(request.getNewCredential(), is(newCredential));
+        assertThat(Utilities.convert(request.getNewCredential()), is(newCredential));
         assertThat(request.getMemberId(), is(memberId));
     }
 
@@ -62,7 +63,7 @@ public final class ProcessMemberRequestTest {
     public void testInvalidAction() {
         final ProcessMemberRequest request = new ProcessMemberRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
-        request.setCredential(Constants.ADMIN_ACCOUNT);
+        request.setCredential(Utilities.convert(Constants.ADMIN_ACCOUNT));
         request.setAction(Action.ADD);
 
         final Map<String, String> errors = request.validate();
@@ -74,9 +75,9 @@ public final class ProcessMemberRequestTest {
     public void testActionCreate() {
         final ProcessMemberRequest request = new ProcessMemberRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
-        request.setCredential(Constants.ADMIN_ACCOUNT);
+        request.setCredential(Utilities.convert(Constants.ADMIN_ACCOUNT));
         request.setNewAccountName("New AccountName");
-        request.setNewCredential("New Credential");
+        request.setNewCredential(Utilities.convert("New Credential"));
         request.setAction(Action.CREATE);
 
         final Map<String, String> errors = request.validate();
@@ -87,7 +88,7 @@ public final class ProcessMemberRequestTest {
     public void testActionCreateFail() {
         final ProcessMemberRequest request = new ProcessMemberRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
-        request.setCredential(Constants.ADMIN_ACCOUNT);
+        request.setCredential(Utilities.convert(Constants.ADMIN_ACCOUNT));
         request.setAction(Action.CREATE);
 
         final Map<String, String> errors = request.validate();
@@ -100,7 +101,7 @@ public final class ProcessMemberRequestTest {
     public void testActionInvite() {
         final ProcessMemberRequest request = new ProcessMemberRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
-        request.setCredential(Constants.ADMIN_ACCOUNT);
+        request.setCredential(Utilities.convert(Constants.ADMIN_ACCOUNT));
         request.setNewAccountName("New AccountName");
         request.setAction(Action.INVITE);
 
@@ -112,7 +113,7 @@ public final class ProcessMemberRequestTest {
     public void testActionInviteFail() {
         final ProcessMemberRequest request = new ProcessMemberRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
-        request.setCredential(Constants.ADMIN_ACCOUNT);
+        request.setCredential(Utilities.convert(Constants.ADMIN_ACCOUNT));
         request.setAction(Action.INVITE);
 
         final Map<String, String> errors = request.validate();
@@ -124,7 +125,7 @@ public final class ProcessMemberRequestTest {
     public void testActionProcess() {
         final ProcessMemberRequest request = new ProcessMemberRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
-        request.setCredential(Constants.ADMIN_ACCOUNT);
+        request.setCredential(Utilities.convert(Constants.ADMIN_ACCOUNT));
         request.setNewAccountName("Updated AccountName");
         request.setAction(Action.UPDATE);
 
@@ -136,7 +137,7 @@ public final class ProcessMemberRequestTest {
     public void testActionProcessFail() {
         final ProcessMemberRequest request = new ProcessMemberRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
-        request.setCredential(Constants.ADMIN_ACCOUNT);
+        request.setCredential(Utilities.convert(Constants.ADMIN_ACCOUNT));
         request.setNewAccountName("Ridiculously and invalid Name for an Account - it has to exceed our total maximum, hence this awfully name.");
         request.setAction(Action.INVITE);
 
@@ -149,7 +150,7 @@ public final class ProcessMemberRequestTest {
     public void testInvalidate() {
         final ProcessMemberRequest request = new ProcessMemberRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
-        request.setCredential(Constants.ADMIN_ACCOUNT);
+        request.setCredential(Utilities.convert(Constants.ADMIN_ACCOUNT));
         request.setAction(Action.INVALIDATE);
         final Map<String, String> errors = request.validate();
         assertThat(errors.isEmpty(), is(true));
@@ -159,7 +160,7 @@ public final class ProcessMemberRequestTest {
     public void testActionDelete() {
         final ProcessMemberRequest request = new ProcessMemberRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
-        request.setCredential(Constants.ADMIN_ACCOUNT);
+        request.setCredential(Utilities.convert(Constants.ADMIN_ACCOUNT));
         request.setMemberId(UUID.randomUUID().toString());
         request.setAction(Action.DELETE);
 
@@ -171,7 +172,7 @@ public final class ProcessMemberRequestTest {
     public void testActionDeleteFail() {
         final ProcessMemberRequest request = new ProcessMemberRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
-        request.setCredential(Constants.ADMIN_ACCOUNT);
+        request.setCredential(Utilities.convert(Constants.ADMIN_ACCOUNT));
         request.setMemberId("Invalid Member Id");
         request.setAction(Action.DELETE);
 

@@ -16,6 +16,7 @@ import io.javadog.cws.api.common.Action;
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.CredentialType;
 import io.javadog.cws.api.common.ReturnCode;
+import io.javadog.cws.api.common.Utilities;
 import io.javadog.cws.api.requests.FetchDataRequest;
 import io.javadog.cws.api.requests.ProcessDataRequest;
 import io.javadog.cws.api.requests.ProcessMemberRequest;
@@ -53,7 +54,7 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
         final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
         request.setAction(Action.CREATE);
         request.setNewAccountName(account);
-        request.setNewCredential(account);
+        request.setNewCredential(Utilities.convert(account));
         final ProcessMemberResponse response = service.perform(request);
 
         assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
@@ -68,7 +69,7 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
         final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
         request.setAction(Action.CREATE);
         request.setNewAccountName(account);
-        request.setNewCredential(account);
+        request.setNewCredential(Utilities.convert(account));
         assertThat(request.validate().isEmpty(), is(true));
 
         service.perform(request);
@@ -102,7 +103,7 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
         final ProcessMemberRequest invationRequest = new ProcessMemberRequest();
         invationRequest.setAccountName("invitee");
         invationRequest.setCredentialType(CredentialType.SIGNATURE);
-        invationRequest.setCredential(signature);
+        invationRequest.setCredential(Utilities.convert(signature));
         final ProcessMemberResponse invitationResponse = service.perform(invationRequest);
         assertThat(invitationResponse, is(not(nullValue())));
         assertThat(invitationResponse.getReturnCode(), is(ReturnCode.SUCCESS));
@@ -122,7 +123,7 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
         final ProcessMemberRequest invationRequest = new ProcessMemberRequest();
         invationRequest.setAccountName("invitee");
         invationRequest.setCredentialType(CredentialType.SIGNATURE);
-        invationRequest.setCredential(bogusSignature);
+        invationRequest.setCredential(Utilities.convert(bogusSignature));
         final ProcessMemberResponse invitationResponse = service.perform(invationRequest);
         assertThat(invitationResponse.getReturnCode(), is(ReturnCode.AUTHENTICATION_WARNING));
         assertThat(invitationResponse.getReturnMessage(), is("The given signature is invalid."));
@@ -142,7 +143,7 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
         final ProcessMemberRequest invationRequest = new ProcessMemberRequest();
         invationRequest.setAccountName("invitee");
         invationRequest.setCredentialType(CredentialType.SIGNATURE);
-        invationRequest.setCredential(UUID.randomUUID().toString());
+        invationRequest.setCredential(Utilities.convert(UUID.randomUUID().toString()));
 
         service.perform(invationRequest);
     }
@@ -153,7 +154,7 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
         final ProcessMemberRequest request = new ProcessMemberRequest();
         request.setAccountName(MEMBER_1);
         request.setCredentialType(CredentialType.SIGNATURE);
-        request.setCredential(UUID.randomUUID().toString());
+        request.setCredential(Utilities.convert(UUID.randomUUID().toString()));
 
         final ProcessMemberResponse response = service.perform(request);
         assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING));
@@ -166,7 +167,7 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
         final ProcessMemberRequest request = new ProcessMemberRequest();
         request.setNewAccountName("wannabe");
         request.setCredentialType(CredentialType.SIGNATURE);
-        request.setCredential(UUID.randomUUID().toString());
+        request.setCredential(Utilities.convert(UUID.randomUUID().toString()));
 
         final ProcessMemberResponse response = service.perform(request);
         assertThat(response.getReturnCode(), is(ReturnCode.IDENTIFICATION_WARNING));
@@ -203,7 +204,7 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
         final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, MEMBER_1);
         request.setAction(Action.UPDATE);
         request.setNewAccountName("Supreme Member");
-        request.setNewCredential("Bla bla bla");
+        request.setNewCredential(Utilities.convert("Bla bla bla"));
 
         final ProcessMemberResponse response = service.perform(request);
         assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
@@ -216,7 +217,7 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
         final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, MEMBER_1);
         request.setAction(Action.UPDATE);
         request.setNewAccountName(MEMBER_2);
-        request.setNewCredential("Bla bla bla");
+        request.setNewCredential(Utilities.convert("Bla bla bla"));
         assertThat(request.validate().size(), is(0));
 
         service.perform(request);
@@ -237,13 +238,13 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
         final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, MEMBER_1);
         request.setAction(Action.UPDATE);
-        request.setNewCredential("My new Passphrase");
+        request.setNewCredential(Utilities.convert("My new Passphrase"));
         final ProcessMemberResponse response = service.perform(request);
         assertThat(response.isOk(), is(true));
 
         final FetchDataService fetchService = new FetchDataService(settings, entityManager);
         final FetchDataRequest fetchRequest = prepareRequest(FetchDataRequest.class, MEMBER_1);
-        fetchRequest.setCredential("My new Passphrase");
+        fetchRequest.setCredential(Utilities.convert("My new Passphrase"));
         fetchRequest.setDataId(dataId);
 
         final FetchDataResponse dataResponse = fetchService.perform(fetchRequest);
@@ -265,7 +266,7 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
         assertThat(response.getReturnMessage(), is("Account has been Invalidated."));
 
         request.setAction(Action.UPDATE);
-        request.setNewCredential("New Passphrase");
+        request.setNewCredential(Utilities.convert("New Passphrase"));
         service.perform(request);
     }
 

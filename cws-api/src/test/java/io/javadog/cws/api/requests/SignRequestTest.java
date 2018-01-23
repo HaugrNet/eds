@@ -11,6 +11,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
 import io.javadog.cws.api.common.Constants;
+import io.javadog.cws.api.common.Utilities;
 import org.junit.Test;
 
 import java.util.Date;
@@ -29,14 +30,14 @@ public final class SignRequestTest {
 
         final SignRequest request = new SignRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
-        request.setCredential(Constants.ADMIN_ACCOUNT);
+        request.setCredential(Utilities.convert(Constants.ADMIN_ACCOUNT));
         request.setData(data);
         request.setExpires(expires);
 
         final Map<String, String> errors = request.validate();
         assertThat(errors.isEmpty(), is(true));
         assertThat(request.getAccountName(), is(Constants.ADMIN_ACCOUNT));
-        assertThat(request.getCredential(), is(Constants.ADMIN_ACCOUNT));
+        assertThat(request.getCredential(), is(Utilities.convert(Constants.ADMIN_ACCOUNT)));
         assertThat(request.getData(), is(data));
         assertThat(request.getExpires(), is(expires));
     }

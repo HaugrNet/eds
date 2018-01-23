@@ -9,6 +9,7 @@ package io.javadog.cws.core;
 
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.TrustLevel;
+import io.javadog.cws.api.common.Utilities;
 import io.javadog.cws.core.enums.Status;
 import io.javadog.cws.core.jce.CWSKeyPair;
 import io.javadog.cws.core.jce.Crypto;
@@ -105,7 +106,7 @@ public final class GenerateTestData {
 
     private void createAndAppendMember(final StringBuilder builder, final String externalId, final String name, final CWSKeyPair keyPair, final char delimiter) {
         final String salt = UUID.randomUUID().toString();
-        final SecretCWSKey secretKey = crypto.generatePasswordKey(settings.getPasswordAlgorithm(), name, salt);
+        final SecretCWSKey secretKey = crypto.generatePasswordKey(settings.getPasswordAlgorithm(), Utilities.convert(name), salt);
         final String publicKey = crypto.armoringPublicKey(keyPair.getPublic().getKey());
         final String privateKey = crypto.armoringPrivateKey(secretKey, keyPair.getPrivate().getKey());
 

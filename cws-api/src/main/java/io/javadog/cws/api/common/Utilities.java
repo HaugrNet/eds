@@ -7,6 +7,7 @@
  */
 package io.javadog.cws.api.common;
 
+import java.nio.charset.Charset;
 import java.util.Date;
 
 /**
@@ -14,6 +15,8 @@ import java.util.Date;
  * @since  CWS 1.0
  */
 public final class Utilities {
+
+    private static final Charset CHARSET = Charset.forName("UTF-8");
 
     private Utilities() {
         // Private Constructor, this is a Utility Class
@@ -43,4 +46,16 @@ public final class Utilities {
     public static byte[] copy(final byte[] bytes) {
         return bytes;
     }
+
+    public static String convert(final String str) {
+        return str;
+    }
+
+    //public static byte[] convert(final String str) {
+    //    return str.getBytes(CHARSET);
+    //}
+
+    //public static String convert(final byte[] bytes) {
+    //    return new String(bytes, CHARSET);
+    //}
 }

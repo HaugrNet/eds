@@ -12,6 +12,7 @@ import static org.hamcrest.Matchers.hasProperty;
 
 import io.javadog.cws.api.common.CredentialType;
 import io.javadog.cws.api.common.ReturnCode;
+import io.javadog.cws.api.common.Utilities;
 import io.javadog.cws.api.requests.Authentication;
 import io.javadog.cws.api.responses.ProcessDataResponse;
 import io.javadog.cws.core.enums.KeyAlgorithm;
@@ -121,7 +122,7 @@ public class DatabaseSetup {
             final T request = clazz.getConstructor().newInstance();
 
             request.setAccountName(account);
-            request.setCredential(account);
+            request.setCredential(Utilities.convert(account));
             request.setCredentialType(CredentialType.PASSPHRASE);
 
             return request;
@@ -133,7 +134,7 @@ public class DatabaseSetup {
     protected MemberEntity prepareMember(final String externalId, final String accountName, final String secret, final CWSKeyPair keyPair) {
         final KeyAlgorithm pbeAlgorithm = settings.getPasswordAlgorithm();
         final String salt = UUID.randomUUID().toString();
-        final SecretCWSKey secretKey = crypto.generatePasswordKey(pbeAlgorithm, secret, salt);
+        final SecretCWSKey secretKey = crypto.generatePasswordKey(pbeAlgorithm, Utilities.convert(secret), salt);
         secretKey.setSalt(salt);
 
         final MemberEntity entity = new MemberEntity();

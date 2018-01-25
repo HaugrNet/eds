@@ -7,6 +7,8 @@
  */
 package io.javadog.cws.api.requests;
 
+import static io.javadog.cws.api.common.Utilities.copy;
+
 import io.javadog.cws.api.common.Action;
 import io.javadog.cws.api.common.Constants;
 
@@ -45,7 +47,7 @@ public final class ProcessMemberRequest extends Authentication {
     private String newAccountName = null;
 
     @XmlElement(name = Constants.FIELD_NEW_CREDENTIAL, nillable = true)
-    private String newCredential = null;
+    private byte[] newCredential = null;
 
     // =========================================================================
     // Standard Setters & Getters
@@ -75,12 +77,12 @@ public final class ProcessMemberRequest extends Authentication {
         return newAccountName;
     }
 
-    public void setNewCredential(final String newCredential) {
-        this.newCredential = newCredential;
+    public void setNewCredential(final byte[] newCredential) {
+        this.newCredential = copy(newCredential);
     }
 
-    public String getNewCredential() {
-        return newCredential;
+    public byte[] getNewCredential() {
+        return copy(newCredential);
     }
 
     // =========================================================================

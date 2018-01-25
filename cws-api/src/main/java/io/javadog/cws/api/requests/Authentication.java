@@ -7,6 +7,8 @@
  */
 package io.javadog.cws.api.requests;
 
+import static io.javadog.cws.api.common.Utilities.copy;
+
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.CredentialType;
 
@@ -42,7 +44,7 @@ public class Authentication extends Verifiable {
 
     @NotNull
     @XmlElement(name = Constants.FIELD_CREDENTIAL, required = true)
-    private String credential = null;
+    private byte[] credential = null;
 
     @NotNull
     @XmlElement(name = Constants.FIELD_CREDENTIALTYPE, required = true)
@@ -60,12 +62,12 @@ public class Authentication extends Verifiable {
         return accountName;
     }
 
-    public void setCredential(final String credential) {
-        this.credential = credential;
+    public void setCredential(final byte[] credential) {
+        this.credential = copy(credential);
     }
 
-    public String getCredential() {
-        return credential;
+    public byte[] getCredential() {
+        return copy(credential);
     }
 
     public void setCredentialType(final CredentialType credentialType) {

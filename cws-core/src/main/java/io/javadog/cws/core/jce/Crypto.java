@@ -91,9 +91,9 @@ public final class Crypto {
      * @param salt      System specific Salt
      * @return Symmetric Key
      */
-    public SecretCWSKey generatePasswordKey(final KeyAlgorithm algorithm, final String secret, final String salt) {
+    public SecretCWSKey generatePasswordKey(final KeyAlgorithm algorithm, final byte[] secret, final String salt) {
         try {
-            final char[] extendedSecret = (secret + settings.getSalt()).toCharArray();
+            final char[] extendedSecret = (new String(secret, settings.getCharset()) + settings.getSalt()).toCharArray();
             final byte[] secretSalt = stringToBytes(salt);
 
             final SecretKeyFactory factory = SecretKeyFactory.getInstance(algorithm.getTransformation());
@@ -166,6 +166,10 @@ public final class Crypto {
     }
 
     public boolean verify(final PublicKey key, final byte[] message, final String signature) {
+        return verify(key, message, signature.getBytes(settings.getCharset()));
+    }
+
+    public boolean verify(final PublicKey key, final byte[] message, final byte[] signature) {
         try {
             final byte[] bytes = Base64.getDecoder().decode(signature);
             final Signature verifier = Signature.getInstance(settings.getSignatureAlgorithm().getTransformation());

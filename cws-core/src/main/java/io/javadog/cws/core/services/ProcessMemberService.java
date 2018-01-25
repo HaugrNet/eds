@@ -49,7 +49,12 @@ public final class ProcessMemberService extends Serviceable<ProcessMemberRespons
             final ProcessMemberResponse response;
 
             if (request.getCredentialType() == CredentialType.SIGNATURE) {
-                response = processInvitation(request);
+                final byte[] newCredential = request.getNewCredential();
+                if ((newCredential != null) && (newCredential.length > 0)) {
+                    response = processInvitation(request);
+                } else {
+                    response = new ProcessMemberResponse(ReturnCode.VERIFICATION_WARNING, "The " + Constants.FIELD_NEW_CREDENTIAL + " is missing in Request.");
+                }
             } else {
                 verifyRequest(request, Permission.PROCESS_MEMBER);
 
@@ -214,7 +219,7 @@ public final class ProcessMemberService extends Serviceable<ProcessMemberRespons
                 if (crypto.verify(publicKey, crypto.stringToBytes(secret), request.getCredential())) {
                     final KeyAlgorithm pbeAlgorithm = settings.getPasswordAlgorithm();
                     final String salt = UUID.randomUUID().toString();
-                    final String newSecret = UUID.randomUUID().toString();
+                    final byte[] newSecret = request.getNewCredential();
                     final CWSKeyPair pair = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
                     final SecretCWSKey key = crypto.generatePasswordKey(pbeAlgorithm, newSecret, salt);
                     key.setSalt(salt);

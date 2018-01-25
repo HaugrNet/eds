@@ -104,9 +104,39 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
         invationRequest.setAccountName("invitee");
         invationRequest.setCredentialType(CredentialType.SIGNATURE);
         invationRequest.setCredential(Utilities.convert(signature));
+        invationRequest.setNewCredential(Utilities.convert("New Passphase"));
         final ProcessMemberResponse invitationResponse = service.perform(invationRequest);
         assertThat(invitationResponse, is(not(nullValue())));
         assertThat(invitationResponse.getReturnCode(), is(ReturnCode.SUCCESS));
+    }
+
+    @Test
+    public void testNullNewCredentialForInvitation() {
+        final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
+
+        final ProcessMemberRequest request = new ProcessMemberRequest();
+        request.setAccountName("null Invitee");
+        request.setCredentialType(CredentialType.SIGNATURE);
+        request.setCredential(Utilities.convert("Signature"));
+
+        final ProcessMemberResponse response = service.perform(request);
+        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING));
+        assertThat(response.getReturnMessage(), is("The newCredential is missing in Request."));
+    }
+
+    @Test
+    public void testEmptyNewCredentialForInvitation() {
+        final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
+
+        final ProcessMemberRequest request = new ProcessMemberRequest();
+        request.setAccountName("empty Invitee");
+        request.setCredentialType(CredentialType.SIGNATURE);
+        request.setCredential(Utilities.convert("Signature"));
+        request.setNewCredential(Utilities.convert(""));
+
+        final ProcessMemberResponse response = service.perform(request);
+        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING));
+        assertThat(response.getReturnMessage(), is("The newCredential is missing in Request."));
     }
 
     @Test
@@ -124,6 +154,7 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
         invationRequest.setAccountName("invitee");
         invationRequest.setCredentialType(CredentialType.SIGNATURE);
         invationRequest.setCredential(Utilities.convert(bogusSignature));
+        invationRequest.setNewCredential(Utilities.convert(UUID.randomUUID().toString()));
         final ProcessMemberResponse invitationResponse = service.perform(invationRequest);
         assertThat(invitationResponse.getReturnCode(), is(ReturnCode.AUTHENTICATION_WARNING));
         assertThat(invitationResponse.getReturnMessage(), is("The given signature is invalid."));
@@ -144,6 +175,7 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
         invationRequest.setAccountName("invitee");
         invationRequest.setCredentialType(CredentialType.SIGNATURE);
         invationRequest.setCredential(Utilities.convert(UUID.randomUUID().toString()));
+        invationRequest.setNewCredential(Utilities.convert(UUID.randomUUID().toString()));
 
         service.perform(invationRequest);
     }
@@ -155,6 +187,7 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
         request.setAccountName(MEMBER_1);
         request.setCredentialType(CredentialType.SIGNATURE);
         request.setCredential(Utilities.convert(UUID.randomUUID().toString()));
+        request.setNewCredential(Utilities.convert(UUID.randomUUID().toString()));
 
         final ProcessMemberResponse response = service.perform(request);
         assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING));
@@ -168,6 +201,7 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
         request.setNewAccountName("wannabe");
         request.setCredentialType(CredentialType.SIGNATURE);
         request.setCredential(Utilities.convert(UUID.randomUUID().toString()));
+        request.setNewCredential(Utilities.convert(UUID.randomUUID().toString()));
 
         final ProcessMemberResponse response = service.perform(request);
         assertThat(response.getReturnCode(), is(ReturnCode.IDENTIFICATION_WARNING));

@@ -199,7 +199,7 @@ public abstract class Serviceable<R extends CwsResponse, V extends Authenticatio
         }
     }
 
-    protected MemberEntity createNewAccount(final String accountName, final String credential) {
+    protected MemberEntity createNewAccount(final String accountName, final byte[] credential) {
         final MemberEntity account = new MemberEntity();
         updateMemberPassword(account, credential);
         account.setName(accountName);
@@ -208,7 +208,7 @@ public abstract class Serviceable<R extends CwsResponse, V extends Authenticatio
         return account;
     }
 
-    protected CWSKeyPair updateMemberPassword(final MemberEntity member, final String password) {
+    protected CWSKeyPair updateMemberPassword(final MemberEntity member, final byte[] password) {
         final KeyAlgorithm pbeAlgorithm = settings.getPasswordAlgorithm();
         final KeyAlgorithm rsaAlgorithm = settings.getAsymmetricAlgorithm();
         final String salt = UUID.randomUUID().toString();

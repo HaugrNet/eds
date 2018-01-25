@@ -47,15 +47,23 @@ public final class Utilities {
         return bytes;
     }
 
-    public static String convert(final String str) {
-        return str;
+    /**
+     * Converts the given String to a UTF-8 encoded Byte Array.
+     *
+     * @param str String to convert to Byte Array
+     * @return UTF-8 encoded Byte array
+     */
+    public static byte[] convert(final String str) {
+        return str.getBytes(CHARSET);
     }
 
-    //public static byte[] convert(final String str) {
-    //    return str.getBytes(CHARSET);
-    //}
-
-    //public static String convert(final byte[] bytes) {
-    //    return new String(bytes, CHARSET);
-    //}
+    /**
+     * Converts the given Byte Array to a String, assuming it is UTF-8 encoded.
+     *
+     * @param bytes UTF-8 encoded Byte Array to convert to String
+     * @return New String from the UTF-8 encoded Byte Array
+     */
+    public static String convert(final byte[] bytes) {
+        return new String(bytes, CHARSET);
+    }
 }

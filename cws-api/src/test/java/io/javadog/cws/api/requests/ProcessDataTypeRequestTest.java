@@ -10,10 +10,10 @@ package io.javadog.cws.api.requests;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
+import io.javadog.cws.api.TestUtilities;
 import io.javadog.cws.api.common.Action;
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.CredentialType;
-import io.javadog.cws.api.common.Utilities;
 import org.junit.Test;
 
 import java.util.Map;
@@ -32,7 +32,7 @@ public final class ProcessDataTypeRequestTest {
         final ProcessDataTypeRequest request = new ProcessDataTypeRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
         request.setCredentialType(CredentialType.PASSPHRASE);
-        request.setCredential(Utilities.convert(Constants.ADMIN_ACCOUNT));
+        request.setCredential(TestUtilities.convert(Constants.ADMIN_ACCOUNT));
         request.setAction(Action.PROCESS);
         request.setTypeName(typeName);
         request.setType(type);
@@ -40,7 +40,7 @@ public final class ProcessDataTypeRequestTest {
 
         assertThat(errors.isEmpty(), is(true));
         assertThat(request.getAccountName(), is(Constants.ADMIN_ACCOUNT));
-        assertThat(Utilities.convert(request.getCredential()), is(Constants.ADMIN_ACCOUNT));
+        assertThat(TestUtilities.convert(request.getCredential()), is(Constants.ADMIN_ACCOUNT));
         assertThat(request.getAction(), is(Action.PROCESS));
         assertThat(request.getTypeName(), is(typeName));
         assertThat(request.getType(), is(type));
@@ -62,7 +62,7 @@ public final class ProcessDataTypeRequestTest {
     public void testInvalidAction() {
         final ProcessDataTypeRequest request = new ProcessDataTypeRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
-        request.setCredential(Utilities.convert(Constants.ADMIN_ACCOUNT));
+        request.setCredential(TestUtilities.convert(Constants.ADMIN_ACCOUNT));
         request.setAction(Action.ADD);
 
         final Map<String, String> errors = request.validate();
@@ -74,7 +74,7 @@ public final class ProcessDataTypeRequestTest {
     public void testActionProcess() {
         final ProcessDataTypeRequest request = new ProcessDataTypeRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
-        request.setCredential(Utilities.convert(Constants.ADMIN_ACCOUNT));
+        request.setCredential(TestUtilities.convert(Constants.ADMIN_ACCOUNT));
         request.setTypeName("The TypeName");
         request.setType("The Type");
         request.setAction(Action.PROCESS);
@@ -87,7 +87,7 @@ public final class ProcessDataTypeRequestTest {
     public void testActionProcessFail() {
         final ProcessDataTypeRequest request = new ProcessDataTypeRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
-        request.setCredential(Utilities.convert(Constants.ADMIN_ACCOUNT));
+        request.setCredential(TestUtilities.convert(Constants.ADMIN_ACCOUNT));
         request.setAction(Action.PROCESS);
 
         final Map<String, String> errors = request.validate();
@@ -100,7 +100,7 @@ public final class ProcessDataTypeRequestTest {
     public void testActionDelete() {
         final ProcessDataTypeRequest request = new ProcessDataTypeRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
-        request.setCredential(Utilities.convert(Constants.ADMIN_ACCOUNT));
+        request.setCredential(TestUtilities.convert(Constants.ADMIN_ACCOUNT));
         request.setTypeName("The TypeName to Delete");
         request.setAction(Action.DELETE);
 
@@ -112,7 +112,7 @@ public final class ProcessDataTypeRequestTest {
     public void testActionDeleteFail() {
         final ProcessDataTypeRequest request = new ProcessDataTypeRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
-        request.setCredential(Utilities.convert(Constants.ADMIN_ACCOUNT));
+        request.setCredential(TestUtilities.convert(Constants.ADMIN_ACCOUNT));
         request.setTypeName("");
         request.setAction(Action.DELETE);
 

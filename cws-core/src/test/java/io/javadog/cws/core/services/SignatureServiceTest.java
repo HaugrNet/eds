@@ -97,6 +97,7 @@ public final class SignatureServiceTest extends DatabaseSetup {
         final SignResponse signResponse = signService.perform(signRequest);
         assertThat(signResponse.getReturnCode(), is(ReturnCode.SUCCESS));
 
+        signRequest.setCredential(crypto.stringToBytes(MEMBER_1));
         final SignResponse duplicateResponse = signService.perform(signRequest);
         assertThat(duplicateResponse.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(duplicateResponse.getReturnMessage(), is("This document has already been signed."));

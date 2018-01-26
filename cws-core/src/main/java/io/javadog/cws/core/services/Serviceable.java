@@ -35,6 +35,7 @@ import io.javadog.cws.core.model.entities.TrusteeEntity;
 
 import javax.persistence.EntityManager;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -236,6 +237,11 @@ public abstract class Serviceable<R extends CwsResponse, V extends Authenticatio
             // To ensure that the PBE key is no longer usable, we're destroying
             // it now.
             key.destroy();
+
+            // As the Credential has been checked, it is no longer needed, so it
+            // can also be destroyed, to ensure that it is not living in memory
+            // any longer.
+            Arrays.fill(verifiable.getCredential(), (byte) 0);
         } catch (CryptoException e) {
             // If an incorrect Passphrase was used to generate the PBE key, then
             // a Bad Padding Exception should've been thrown, which is converted

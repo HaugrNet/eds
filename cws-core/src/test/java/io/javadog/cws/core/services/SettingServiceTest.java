@@ -130,6 +130,7 @@ public final class SettingServiceTest extends DatabaseSetup {
 
         final Map<String, String> mySettings = new HashMap<>(response.getSettings());
         mySettings.put(StandardSetting.CWS_SALT.getKey(), "new SALT");
+        request.setCredential(crypto.stringToBytes(Constants.ADMIN_ACCOUNT));
         request.setSettings(mySettings);
         final SettingResponse update = service.perform(request);
         assertThat(update.getReturnCode(), is(ReturnCode.SUCCESS));
@@ -153,6 +154,7 @@ public final class SettingServiceTest extends DatabaseSetup {
         final Map<String, String> mySettings = new HashMap<>(response.getSettings());
         mySettings.put(StandardSetting.CWS_CHARSET.getKey(), "ISO-8859-15");
         request.setSettings(mySettings);
+        request.setCredential(crypto.stringToBytes(Constants.ADMIN_ACCOUNT));
 
         final SettingResponse update = service.perform(request);
         assertThat(update.getReturnCode(), is(ReturnCode.SUCCESS));
@@ -230,6 +232,7 @@ public final class SettingServiceTest extends DatabaseSetup {
         assertThat(response.getSettings().size(), is(15));
 
         mySettings.put("cws.test.setting", null);
+        request.setCredential(crypto.stringToBytes(Constants.ADMIN_ACCOUNT));
         request.setSettings(mySettings);
         final SettingResponse deleteResponse = service.perform(request);
         assertThat(deleteResponse.isOk(), is(true));

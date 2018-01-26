@@ -14,7 +14,6 @@ import static org.junit.Assert.assertThat;
 
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
-import io.javadog.cws.api.common.Utilities;
 import io.javadog.cws.api.requests.FetchCircleRequest;
 import io.javadog.cws.api.requests.SettingRequest;
 import io.javadog.cws.core.DatabaseSetup;
@@ -45,7 +44,7 @@ public final class ServiceableTest extends DatabaseSetup {
         final SettingService service = new SettingService(mySettings, entityManager);
         final SettingRequest request = new SettingRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
-        request.setCredential(Utilities.convert("Invalid Credentials"));
+        request.setCredential(crypto.stringToBytes("Invalid Credentials"));
         assertThat(request, is(not(nullValue())));
 
         service.perform(request);
@@ -58,7 +57,7 @@ public final class ServiceableTest extends DatabaseSetup {
         final SettingService service = new SettingService(settings, entityManager);
         final SettingRequest request = new SettingRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
-        request.setCredential(Utilities.convert("Invalid Credentials"));
+        request.setCredential(crypto.stringToBytes("Invalid Credentials"));
         assertThat(request, is(not(nullValue())));
 
         service.perform(request);
@@ -81,7 +80,7 @@ public final class ServiceableTest extends DatabaseSetup {
 
         final FetchCircleService service = new FetchCircleService(settings, entityManager);
         final FetchCircleRequest request = prepareRequest(FetchCircleRequest.class, MEMBER_5);
-        request.setCredential(Utilities.convert("something wrong"));
+        request.setCredential(crypto.stringToBytes("something wrong"));
         assertThat(request.validate().isEmpty(), is(true));
 
         service.perform(request);
@@ -93,7 +92,7 @@ public final class ServiceableTest extends DatabaseSetup {
 
         final FetchCircleService service = new FetchCircleService(settings, entityManager);
         final FetchCircleRequest request = prepareRequest(FetchCircleRequest.class, MEMBER_5);
-        request.setCredential(Utilities.convert(MEMBER_4));
+        request.setCredential(crypto.stringToBytes(MEMBER_4));
         assertThat(request.validate().isEmpty(), is(true));
 
         service.perform(request);

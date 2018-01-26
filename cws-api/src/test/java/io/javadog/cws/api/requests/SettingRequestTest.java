@@ -10,8 +10,8 @@ package io.javadog.cws.api.requests;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
+import io.javadog.cws.api.TestUtilities;
 import io.javadog.cws.api.common.Constants;
-import io.javadog.cws.api.common.Utilities;
 import org.junit.Test;
 
 import java.util.HashMap;
@@ -30,7 +30,7 @@ public final class SettingRequestTest {
 
         final SettingRequest request = new SettingRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
-        request.setCredential(Utilities.convert(Constants.ADMIN_ACCOUNT));
+        request.setCredential(TestUtilities.convert(Constants.ADMIN_ACCOUNT));
         assertThat(request.getSettings().isEmpty(), is(true));
 
         request.setSettings(settings);

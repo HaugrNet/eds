@@ -11,9 +11,9 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertThat;
 
+import io.javadog.cws.api.TestUtilities;
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.CredentialType;
-import io.javadog.cws.api.common.Utilities;
 import org.junit.Test;
 
 import java.util.Map;
@@ -37,10 +37,10 @@ public final class AuthenticationTest {
 
         authentication.setAccountName(name);
         authentication.setCredentialType(type);
-        authentication.setCredential(Utilities.convert(credentials));
+        authentication.setCredential(TestUtilities.convert(credentials));
         assertThat(authentication.getAccountName(), is(name));
         assertThat(authentication.getCredentialType(), is(type));
-        assertThat(Utilities.convert(authentication.getCredential()), is(credentials));
+        assertThat(TestUtilities.convert(authentication.getCredential()), is(credentials));
 
         final Map<String, String> errors = authentication.validate();
         assertThat(errors.isEmpty(), is(true));

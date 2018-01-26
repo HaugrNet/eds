@@ -93,7 +93,7 @@ public final class Crypto {
      */
     public SecretCWSKey generatePasswordKey(final KeyAlgorithm algorithm, final byte[] secret, final String salt) {
         try {
-            final char[] extendedSecret = (new String(secret, settings.getCharset()) + settings.getSalt()).toCharArray();
+            final char[] extendedSecret = convertSecret(secret);
             final byte[] secretSalt = stringToBytes(salt);
 
             final SecretKeyFactory factory = SecretKeyFactory.getInstance(algorithm.getTransformation());
@@ -107,6 +107,33 @@ public final class Crypto {
         } catch (IllegalArgumentException | NoSuchAlgorithmException | InvalidKeySpecException e) {
             throw new CryptoException(e.getMessage(), e);
         }
+    }
+
+    /**
+     * <p>Converting the given secret (byte array) into a char array with the
+     * salt from the system appended without using the String Object is not
+     * trivial.</p>
+     *
+     * <p>From <a href="https://stackoverflow.com/a/9855338">Stackoverflow</a>,
+     * it is clear that the solution can be complex, but as all which is needed
+     * here is a way to convert the bytes to chars so a Key can be generated, a
+     * simpler conversion may be sufficient.</p>
+     *
+     * @param secret Provided Passphrase or Secret
+     * @return Extended secret as char array
+     */
+    private char[] convertSecret(final byte[] secret) {
+        final char[] secretChars = new char[secret.length];
+        for (int i = 0; i < secret.length; i++) {
+            secretChars[i] = (char) secret[i];
+        }
+
+        final char[] salt = settings.getSalt().toCharArray();
+        final char[] chars = new char[secretChars.length + salt.length];
+        System.arraycopy(secretChars, 0, chars, 0, secretChars.length);
+        System.arraycopy(salt, 0, chars, secretChars.length, salt.length);
+
+        return chars;
     }
 
     public SecretCWSKey generateSymmetricKey(final KeyAlgorithm algorithm) {

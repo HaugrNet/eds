@@ -10,8 +10,8 @@ package io.javadog.cws.api.requests;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
+import io.javadog.cws.api.TestUtilities;
 import io.javadog.cws.api.common.Constants;
-import io.javadog.cws.api.common.Utilities;
 import org.junit.Test;
 
 import java.util.Date;
@@ -31,14 +31,14 @@ public final class SanityRequestTest {
 
         final SanityRequest sanityRequest = new SanityRequest();
         sanityRequest.setAccountName(Constants.ADMIN_ACCOUNT);
-        sanityRequest.setCredential(Utilities.convert(Constants.ADMIN_ACCOUNT));
+        sanityRequest.setCredential(TestUtilities.convert(Constants.ADMIN_ACCOUNT));
         sanityRequest.setCircleId(circleId);
         sanityRequest.setSince(since);
 
         final Map<String, String> errors = sanityRequest.validate();
         assertThat(errors.isEmpty(), is(true));
         assertThat(sanityRequest.getAccountName(), is(Constants.ADMIN_ACCOUNT));
-        assertThat(Utilities.convert(sanityRequest.getCredential()), is(Constants.ADMIN_ACCOUNT));
+        assertThat(TestUtilities.convert(sanityRequest.getCredential()), is(Constants.ADMIN_ACCOUNT));
         assertThat(sanityRequest.getCircleId(), is(circleId));
         assertThat(sanityRequest.getSince(), is(since));
     }

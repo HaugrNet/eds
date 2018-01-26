@@ -10,9 +10,9 @@ package io.javadog.cws.api.requests;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
+import io.javadog.cws.api.TestUtilities;
 import io.javadog.cws.api.common.Action;
 import io.javadog.cws.api.common.Constants;
-import io.javadog.cws.api.common.Utilities;
 import org.junit.Test;
 
 import java.util.Map;
@@ -32,7 +32,7 @@ public final class ProcessCircleRequestTest {
 
         final ProcessCircleRequest request = new ProcessCircleRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
-        request.setCredential(Utilities.convert(Constants.ADMIN_ACCOUNT));
+        request.setCredential(TestUtilities.convert(Constants.ADMIN_ACCOUNT));
         request.setAction(Action.CREATE);
         request.setCircleId(circleId);
         request.setCircleName(circleName);
@@ -41,7 +41,7 @@ public final class ProcessCircleRequestTest {
 
         assertThat(errors.isEmpty(), is(true));
         assertThat(request.getAccountName(), is(Constants.ADMIN_ACCOUNT));
-        assertThat(Utilities.convert(request.getCredential()), is(Constants.ADMIN_ACCOUNT));
+        assertThat(TestUtilities.convert(request.getCredential()), is(Constants.ADMIN_ACCOUNT));
         assertThat(request.getAction(), is(Action.CREATE));
         assertThat(request.getCircleId(), is(circleId));
         assertThat(request.getCircleName(), is(circleName));
@@ -63,7 +63,7 @@ public final class ProcessCircleRequestTest {
     public void testInvalidAction() {
         final ProcessCircleRequest request = new ProcessCircleRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
-        request.setCredential(Utilities.convert(Constants.ADMIN_ACCOUNT));
+        request.setCredential(TestUtilities.convert(Constants.ADMIN_ACCOUNT));
         request.setAction(Action.PROCESS);
 
         final Map<String, String> errors = request.validate();
@@ -75,7 +75,7 @@ public final class ProcessCircleRequestTest {
     public void testActionCreate() {
         final ProcessCircleRequest request = new ProcessCircleRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
-        request.setCredential(Utilities.convert(Constants.ADMIN_ACCOUNT));
+        request.setCredential(TestUtilities.convert(Constants.ADMIN_ACCOUNT));
         request.setCircleName("New Circle");
         request.setMemberId(UUID.randomUUID().toString());
         request.setAction(Action.CREATE);
@@ -88,7 +88,7 @@ public final class ProcessCircleRequestTest {
     public void testActionCreateFail() {
         final ProcessCircleRequest request = new ProcessCircleRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
-        request.setCredential(Utilities.convert(Constants.ADMIN_ACCOUNT));
+        request.setCredential(TestUtilities.convert(Constants.ADMIN_ACCOUNT));
         request.setCircleName(null);
         request.setMemberId("Invalid Member Id");
         request.setAction(Action.CREATE);
@@ -102,7 +102,7 @@ public final class ProcessCircleRequestTest {
     public void testActionUpdate() {
         final ProcessCircleRequest request = new ProcessCircleRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
-        request.setCredential(Utilities.convert(Constants.ADMIN_ACCOUNT));
+        request.setCredential(TestUtilities.convert(Constants.ADMIN_ACCOUNT));
         request.setCircleId(UUID.randomUUID().toString());
         request.setCircleName("New Circle Name");
         request.setAction(Action.UPDATE);
@@ -115,7 +115,7 @@ public final class ProcessCircleRequestTest {
     public void testActionUpdateFail() {
         final ProcessCircleRequest request = new ProcessCircleRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
-        request.setCredential(Utilities.convert(Constants.ADMIN_ACCOUNT));
+        request.setCredential(TestUtilities.convert(Constants.ADMIN_ACCOUNT));
         request.setCircleId("Invalid Circle Id");
         request.setCircleName("Invalid Circle Name, as it is too long and thus not acceptable. The max length of a Circle Name is 75 characters.");
         request.setAction(Action.UPDATE);
@@ -130,7 +130,7 @@ public final class ProcessCircleRequestTest {
     public void testActionDelete() {
         final ProcessCircleRequest request = new ProcessCircleRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
-        request.setCredential(Utilities.convert(Constants.ADMIN_ACCOUNT));
+        request.setCredential(TestUtilities.convert(Constants.ADMIN_ACCOUNT));
         request.setCircleId(UUID.randomUUID().toString());
         request.setAction(Action.DELETE);
 
@@ -142,7 +142,7 @@ public final class ProcessCircleRequestTest {
     public void testActionDeleteFail() {
         final ProcessCircleRequest request = new ProcessCircleRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
-        request.setCredential(Utilities.convert(Constants.ADMIN_ACCOUNT));
+        request.setCredential(TestUtilities.convert(Constants.ADMIN_ACCOUNT));
         request.setCircleId(null);
         request.setAction(Action.DELETE);
 

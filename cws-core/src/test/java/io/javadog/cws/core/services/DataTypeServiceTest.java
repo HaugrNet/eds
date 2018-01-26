@@ -173,6 +173,7 @@ public final class DataTypeServiceTest extends DatabaseSetup {
         assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(response.getReturnMessage(), is("Ok"));
 
+        request.setCredential(crypto.stringToBytes(Constants.ADMIN_ACCOUNT));
         request.setAction(Action.DELETE);
         final ProcessDataTypeResponse deletedResponse = service.perform(request);
         assertThat(deletedResponse, is(not(nullValue())));
@@ -244,6 +245,7 @@ public final class DataTypeServiceTest extends DatabaseSetup {
         assertThat(response.getDataType().getType(), is(newDataTypeType));
 
         final String updatedDataTypeType = "updatedType";
+        request.setCredential(crypto.stringToBytes(Constants.ADMIN_ACCOUNT));
         request.setTypeName(theDataTypeName);
         request.setType(updatedDataTypeType);
         final ProcessDataTypeResponse updateResponse = service.perform(request);
@@ -271,6 +273,7 @@ public final class DataTypeServiceTest extends DatabaseSetup {
         assertThat(response.getDataType().getTypeName(), is(aDataTypeName));
         assertThat(response.getDataType().getType(), is(aDataTypeType));
 
+        createRequest.setCredential(crypto.stringToBytes(Constants.ADMIN_ACCOUNT));
         final ProcessDataTypeResponse updateResponse = dataTypeService.perform(createRequest);
         assertThat(updateResponse.isOk(), is(true));
         assertThat(updateResponse.getReturnCode(), is(ReturnCode.SUCCESS));

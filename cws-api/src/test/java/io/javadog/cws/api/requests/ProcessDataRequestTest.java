@@ -10,9 +10,9 @@ package io.javadog.cws.api.requests;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
+import io.javadog.cws.api.TestUtilities;
 import io.javadog.cws.api.common.Action;
 import io.javadog.cws.api.common.Constants;
-import io.javadog.cws.api.common.Utilities;
 import org.junit.Test;
 
 import java.util.Map;
@@ -35,7 +35,7 @@ public final class ProcessDataRequestTest {
 
         final ProcessDataRequest request = new ProcessDataRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
-        request.setCredential(Utilities.convert(Constants.ADMIN_ACCOUNT));
+        request.setCredential(TestUtilities.convert(Constants.ADMIN_ACCOUNT));
         request.setAction(Action.ADD);
         request.setDataId(dataId);
         request.setCircleId(circleId);
@@ -47,7 +47,7 @@ public final class ProcessDataRequestTest {
 
         assertThat(errors.isEmpty(), is(true));
         assertThat(request.getAccountName(), is(Constants.ADMIN_ACCOUNT));
-        assertThat(Utilities.convert(request.getCredential()), is(Constants.ADMIN_ACCOUNT));
+        assertThat(TestUtilities.convert(request.getCredential()), is(Constants.ADMIN_ACCOUNT));
         assertThat(request.getAction(), is(Action.ADD));
         assertThat(request.getDataId(), is(dataId));
         assertThat(request.getCircleId(), is(circleId));
@@ -73,7 +73,7 @@ public final class ProcessDataRequestTest {
     public void testInvalidAction() {
         final ProcessDataRequest request = new ProcessDataRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
-        request.setCredential(Utilities.convert(Constants.ADMIN_ACCOUNT));
+        request.setCredential(TestUtilities.convert(Constants.ADMIN_ACCOUNT));
         request.setAction(Action.PROCESS);
 
         final Map<String, String> errors = request.validate();
@@ -85,7 +85,7 @@ public final class ProcessDataRequestTest {
     public void testActionAdd() {
         final ProcessDataRequest request = new ProcessDataRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
-        request.setCredential(Utilities.convert(Constants.ADMIN_ACCOUNT));
+        request.setCredential(TestUtilities.convert(Constants.ADMIN_ACCOUNT));
         request.setCircleId(UUID.randomUUID().toString());
         request.setFolderId(UUID.randomUUID().toString());
         request.setDataName("New Data");
@@ -100,7 +100,7 @@ public final class ProcessDataRequestTest {
     public void testActionAddFail() {
         final ProcessDataRequest request = new ProcessDataRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
-        request.setCredential(Utilities.convert(Constants.ADMIN_ACCOUNT));
+        request.setCredential(TestUtilities.convert(Constants.ADMIN_ACCOUNT));
         request.setCircleId(null);
         request.setFolderId("Invalid folder Id");
         request.setAction(Action.ADD);
@@ -115,7 +115,7 @@ public final class ProcessDataRequestTest {
     public void testActionUpdate() {
         final ProcessDataRequest request = new ProcessDataRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
-        request.setCredential(Utilities.convert(Constants.ADMIN_ACCOUNT));
+        request.setCredential(TestUtilities.convert(Constants.ADMIN_ACCOUNT));
         request.setDataId(UUID.randomUUID().toString());
         request.setFolderId(UUID.randomUUID().toString());
         request.setDataName("Updated Data Name");
@@ -129,7 +129,7 @@ public final class ProcessDataRequestTest {
     public void testActionUpdateFail() {
         final ProcessDataRequest request = new ProcessDataRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
-        request.setCredential(Utilities.convert(Constants.ADMIN_ACCOUNT));
+        request.setCredential(TestUtilities.convert(Constants.ADMIN_ACCOUNT));
         request.setDataId(null);
         request.setFolderId("Invalid Folder Id");
         request.setDataName("Too long new name for the Data, it is only allowed to be under 75 characters long, and this should hopefully exceed that.");
@@ -146,7 +146,7 @@ public final class ProcessDataRequestTest {
     public void testActionDelete() {
         final ProcessDataRequest request = new ProcessDataRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
-        request.setCredential(Utilities.convert(Constants.ADMIN_ACCOUNT));
+        request.setCredential(TestUtilities.convert(Constants.ADMIN_ACCOUNT));
         request.setDataId(UUID.randomUUID().toString());
         request.setAction(Action.DELETE);
 
@@ -158,7 +158,7 @@ public final class ProcessDataRequestTest {
     public void testActionDeleteFail() {
         final ProcessDataRequest request = new ProcessDataRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
-        request.setCredential(Utilities.convert(Constants.ADMIN_ACCOUNT));
+        request.setCredential(TestUtilities.convert(Constants.ADMIN_ACCOUNT));
         request.setDataId(null);
         request.setAction(Action.DELETE);
 

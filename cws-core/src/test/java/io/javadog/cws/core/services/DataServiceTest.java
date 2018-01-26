@@ -15,7 +15,6 @@ import static org.junit.Assert.assertThat;
 import io.javadog.cws.api.common.Action;
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
-import io.javadog.cws.api.common.Utilities;
 import io.javadog.cws.api.requests.FetchDataRequest;
 import io.javadog.cws.api.requests.ProcessCircleRequest;
 import io.javadog.cws.api.requests.ProcessDataRequest;
@@ -134,6 +133,7 @@ public final class DataServiceTest extends DatabaseSetup {
         assertThat(processService.perform(prepareAddRequest(MEMBER_1, CIRCLE_1_ID, "My Data 2", 1048576)).isOk(), is(true));
         assertThat(processService.perform(prepareAddRequest(MEMBER_1, CIRCLE_1_ID, "My Data 3", 1048576)).isOk(), is(true));
 
+        fetchRequest.setCredential(crypto.stringToBytes(MEMBER_1));
         final FetchDataResponse fullResponse = fetchService.perform(fetchRequest);
         assertThat(fullResponse.isOk(), is(true));
         assertThat(fullResponse.getRecords(), is(3L));
@@ -159,7 +159,7 @@ public final class DataServiceTest extends DatabaseSetup {
         final String accountName = "accountName";
         final ProcessMemberRequest memberRequest = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
         memberRequest.setNewAccountName(accountName);
-        memberRequest.setNewCredential(Utilities.convert(accountName));
+        memberRequest.setNewCredential(crypto.stringToBytes(accountName));
         memberRequest.setAction(Action.CREATE);
         final ProcessMemberService memberService = new ProcessMemberService(settings, entityManager);
         final ProcessMemberResponse memberResponse = memberService.perform(memberRequest);
@@ -303,6 +303,7 @@ public final class DataServiceTest extends DatabaseSetup {
         assertThat(response.isOk(), is(true));
 
         // We're taking the previously generated Data Id and uses that as folder.
+        request.setCredential(crypto.stringToBytes(MEMBER_4));
         request.setFolderId(response.getDataId());
         service.perform(request);
     }
@@ -407,6 +408,7 @@ public final class DataServiceTest extends DatabaseSetup {
         assertThat(response1.getReturnMessage(), is("Ok"));
         assertThat(response1.getDataId(), is(not(nullValue())));
 
+        request.setCredential(crypto.stringToBytes(MEMBER_1));
         final ProcessDataResponse response2 = service.perform(request);
         assertThat(response2.getReturnCode(), is(ReturnCode.INTEGRITY_WARNING));
         assertThat(response2.getReturnMessage(), is("Another record with the same name already exists."));
@@ -449,6 +451,7 @@ public final class DataServiceTest extends DatabaseSetup {
         assertThat(addFolderResponse1.getDataId(), is(not(nullValue())));
         final String folderId1 = addFolderResponse1.getDataId();
 
+        addFolderRequest.setCredential(crypto.stringToBytes(MEMBER_1));
         addFolderRequest.setDataName("folder2");
         final ProcessDataResponse addFolderResponse2 = service.perform(addFolderRequest);
         assertThat(addFolderResponse2.getReturnCode(), is(ReturnCode.SUCCESS));

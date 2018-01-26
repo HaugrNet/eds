@@ -13,7 +13,6 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 
 import io.javadog.cws.api.common.ReturnCode;
-import io.javadog.cws.api.common.Utilities;
 import io.javadog.cws.core.enums.KeyAlgorithm;
 import io.javadog.cws.core.enums.StandardSetting;
 import io.javadog.cws.core.exceptions.CWSException;
@@ -51,7 +50,19 @@ public final class CryptoTest extends DatabaseSetup {
         final Crypto myCrypto = new Crypto(mySettings);
 
         final String salt = UUID.randomUUID().toString();
-        myCrypto.generatePasswordKey(KeyAlgorithm.AES128, Utilities.convert("my secret"), salt);
+        myCrypto.generatePasswordKey(KeyAlgorithm.AES128, crypto.stringToBytes("my secret"), salt);
+    }
+
+    @Test
+    public void testPasswordWithWeirdCharacters() {
+        final byte[] secret = new byte[256];
+        for (int i = 0; i<256; i++) {
+            secret[i] = (byte) i;
+        }
+        final KeyAlgorithm algorithm = KeyAlgorithm.PBE128;
+        final String salt = UUID.randomUUID().toString();
+        final SecretCWSKey key = crypto.generatePasswordKey(algorithm, secret, salt);
+        assertThat(key, is(not(nullValue())));
     }
 
     @Test
@@ -126,7 +137,7 @@ public final class CryptoTest extends DatabaseSetup {
     public void testArmoringPrivateKey() {
         final String password = "MySuperSecretPassword";
         final String salt = UUID.randomUUID().toString();
-        final SecretCWSKey cryptoKeys = crypto.generatePasswordKey(settings.getPasswordAlgorithm(), Utilities.convert(password), salt);
+        final SecretCWSKey cryptoKeys = crypto.generatePasswordKey(settings.getPasswordAlgorithm(), crypto.stringToBytes(password), salt);
         cryptoKeys.setSalt(UUID.randomUUID().toString());
         final CWSKeyPair keyPair = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
 
@@ -140,7 +151,7 @@ public final class CryptoTest extends DatabaseSetup {
     public void testArmoringAsymmetricKey() {
         final String secret = "MySuperSecretPassword";
         final String salt = UUID.randomUUID().toString();
-        final SecretCWSKey secretKey = crypto.generatePasswordKey(settings.getPasswordAlgorithm(), Utilities.convert(secret), salt);
+        final SecretCWSKey secretKey = crypto.generatePasswordKey(settings.getPasswordAlgorithm(), crypto.stringToBytes(secret), salt);
         secretKey.setSalt(salt);
         final CWSKeyPair pair = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
 
@@ -218,7 +229,7 @@ public final class CryptoTest extends DatabaseSetup {
     public void testPasswordToKey() {
         final String password = "MySuperSecretPassword";
         final String salt = "SystemSpecificSalt";
-        final SecretCWSKey key = crypto.generatePasswordKey(settings.getPasswordAlgorithm(), Utilities.convert(password), salt);
+        final SecretCWSKey key = crypto.generatePasswordKey(settings.getPasswordAlgorithm(), crypto.stringToBytes(password), salt);
 
         // Now, we're going to encrypt some data
         key.setSalt(UUID.randomUUID().toString());

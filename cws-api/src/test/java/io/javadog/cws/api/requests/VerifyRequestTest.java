@@ -10,8 +10,8 @@ package io.javadog.cws.api.requests;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
+import io.javadog.cws.api.TestUtilities;
 import io.javadog.cws.api.common.Constants;
-import io.javadog.cws.api.common.Utilities;
 import org.junit.Test;
 
 import java.util.Map;
@@ -29,14 +29,14 @@ public final class VerifyRequestTest {
 
         final VerifyRequest request = new VerifyRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
-        request.setCredential(Utilities.convert(Constants.ADMIN_ACCOUNT));
+        request.setCredential(TestUtilities.convert(Constants.ADMIN_ACCOUNT));
         request.setSignature(signature);
         request.setData(data);
 
         final Map<String, String> errors = request.validate();
         assertThat(errors.isEmpty(), is(true));
         assertThat(request.getAccountName(), is(Constants.ADMIN_ACCOUNT));
-        assertThat(Utilities.convert(request.getCredential()), is(Constants.ADMIN_ACCOUNT));
+        assertThat(TestUtilities.convert(request.getCredential()), is(Constants.ADMIN_ACCOUNT));
         assertThat(request.getSignature(), is(signature));
         assertThat(request.getData(), is(data));
     }

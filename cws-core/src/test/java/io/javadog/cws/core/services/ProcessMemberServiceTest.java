@@ -27,6 +27,7 @@ import io.javadog.cws.core.exceptions.CWSException;
 import io.javadog.cws.core.exceptions.CryptoException;
 import org.junit.Test;
 
+import java.util.Base64;
 import java.util.UUID;
 
 /**
@@ -97,12 +98,12 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
         final ProcessMemberResponse response = service.perform(request);
         assertThat(response, is(not(nullValue())));
         assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
-        final String signature = response.getSignature();
+        final byte[] signature = response.getSignature();
 
         final ProcessMemberRequest invationRequest = new ProcessMemberRequest();
         invationRequest.setAccountName("invitee");
         invationRequest.setCredentialType(CredentialType.SIGNATURE);
-        invationRequest.setCredential(crypto.stringToBytes(signature));
+        invationRequest.setCredential(signature);
         invationRequest.setNewCredential(crypto.stringToBytes("New Passphase"));
         final ProcessMemberResponse invitationResponse = service.perform(invationRequest);
         assertThat(invitationResponse, is(not(nullValue())));
@@ -152,7 +153,7 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
         final ProcessMemberRequest invationRequest = new ProcessMemberRequest();
         invationRequest.setAccountName("invitee");
         invationRequest.setCredentialType(CredentialType.SIGNATURE);
-        invationRequest.setCredential(crypto.stringToBytes(bogusSignature));
+        invationRequest.setCredential(Base64.getDecoder().decode(bogusSignature));
         invationRequest.setNewCredential(crypto.stringToBytes(UUID.randomUUID().toString()));
         final ProcessMemberResponse invitationResponse = service.perform(invationRequest);
         assertThat(invitationResponse.getReturnCode(), is(ReturnCode.AUTHENTICATION_WARNING));
@@ -161,7 +162,7 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
 
     @Test
     public void testInvitationWithInvalidSignature2() {
-        prepareCause(CryptoException.class, ReturnCode.CRYPTO_ERROR, "Illegal base64 character 2d");
+        prepareCause(CryptoException.class, ReturnCode.CRYPTO_ERROR, "Signature length not correct: got 36 but was expecting 256");
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
         final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
         request.setAction(Action.INVITE);

@@ -14,6 +14,7 @@ import io.javadog.cws.core.model.Settings;
 import io.javadog.cws.core.model.entities.SignatureEntity;
 
 import javax.persistence.EntityManager;
+import java.util.Base64;
 
 /**
  * @author Kim Jensen
@@ -33,8 +34,9 @@ public final class SignService extends Serviceable<SignResponse, SignRequest> {
         verifyRequest(request, Permission.CREATE_SIGNATURE);
         final SignResponse response = new SignResponse();
 
-        final String signature = crypto.sign(keyPair.getPrivate().getKey(), request.getData());
-        final String checksum = crypto.generateChecksum(signature);
+        final byte[] rawSignature = crypto.sign(keyPair.getPrivate().getKey(), request.getData());
+        final String signature = Base64.getEncoder().encodeToString(rawSignature);
+        final String checksum = crypto.generateChecksum(rawSignature);
         final SignatureEntity existing = dao.findByChecksum(checksum);
 
         if (existing == null) {

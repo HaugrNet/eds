@@ -11,6 +11,7 @@ import io.javadog.cws.api.common.CredentialType;
 import io.javadog.cws.api.requests.Authentication;
 
 import java.lang.reflect.InvocationTargetException;
+import java.nio.charset.Charset;
 
 /**
  * @author Kim Jensen
@@ -29,7 +30,7 @@ public final class Base {
             final A request = clazz.getConstructor().newInstance();
 
             request.setAccountName(account);
-            request.setCredential(account);
+            request.setCredential(account.getBytes(Charset.forName("UTF-8")));
             request.setCredentialType(CredentialType.PASSPHRASE);
 
             return request;

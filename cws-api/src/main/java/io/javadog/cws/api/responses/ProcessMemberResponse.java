@@ -7,6 +7,8 @@
  */
 package io.javadog.cws.api.responses;
 
+import static io.javadog.cws.api.common.Utilities.copy;
+
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
 
@@ -32,7 +34,7 @@ public final class ProcessMemberResponse extends CwsResponse {
     private String memberId = null;
 
     @XmlElement(name = Constants.FIELD_SIGNATURE, required = true)
-    private String signature = null;
+    private byte[] signature = null;
 
     // =========================================================================
     // Object Constructors
@@ -69,11 +71,11 @@ public final class ProcessMemberResponse extends CwsResponse {
         return memberId;
     }
 
-    public void setSignature(final String signature) {
-        this.signature = signature;
+    public void setSignature(final byte[] signature) {
+        this.signature = copy(signature);
     }
 
-    public String getSignature() {
-        return signature;
+    public byte[] getSignature() {
+        return copy(signature);
     }
 }

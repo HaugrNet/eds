@@ -16,6 +16,7 @@ import io.javadog.cws.core.model.entities.SignatureEntity;
 
 import javax.persistence.EntityManager;
 import java.security.PublicKey;
+import java.util.Base64;
 import java.util.Date;
 
 /**
@@ -34,7 +35,8 @@ public final class VerifyService extends Serviceable<VerifyResponse, VerifyReque
     @Override
     public VerifyResponse perform(final VerifyRequest request) {
         verifyRequest(request, Permission.VERIFY_SIGNATURE);
-        final String checksum = crypto.generateChecksum(request.getSignature());
+        final byte[] signature = Base64.getDecoder().decode(request.getSignature());
+        final String checksum = crypto.generateChecksum(signature);
         final SignatureEntity entity = dao.findByChecksum(checksum);
         final VerifyResponse response;
 
@@ -44,7 +46,7 @@ public final class VerifyService extends Serviceable<VerifyResponse, VerifyReque
                 response = new VerifyResponse(ReturnCode.SIGNATURE_WARNING, "The Signature has expired.");
             } else {
                 final PublicKey publicKey = crypto.dearmoringPublicKey(entity.getPublicKey());
-                final boolean verified = crypto.verify(publicKey, request.getData(), request.getSignature());
+                final boolean verified = crypto.verify(publicKey, request.getData(), signature);
 
                 if (verified) {
                     entity.setVerifications(entity.getVerifications() + 1);

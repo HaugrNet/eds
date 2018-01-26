@@ -94,7 +94,7 @@
       <xs:extension base="tns:verifiable">
         <xs:sequence>
           <xs:element name="accountName" type="xs:string"/>
-          <xs:element name="credential" type="xs:string"/>
+          <xs:element name="credential" type="xs:base64Binary"/>
           <xs:element name="credentialType" type="tns:credentialType"/>
         </xs:sequence>
       </xs:extension>

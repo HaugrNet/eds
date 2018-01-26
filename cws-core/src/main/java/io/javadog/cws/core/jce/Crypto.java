@@ -179,31 +179,25 @@ public final class Crypto {
     // Standard Cryptographic Operations; Sign, Verify, Encrypt & Decrypt
     // =========================================================================
 
-    public String sign(final PrivateKey key, final byte[] message) {
+    public byte[] sign(final PrivateKey key, final byte[] message) {
         try {
             final Signature signer = Signature.getInstance(settings.getSignatureAlgorithm().getTransformation());
             signer.initSign(key);
             signer.update(message);
-            final byte[] signed = signer.sign();
 
-            return Base64.getEncoder().encodeToString(signed);
+            return signer.sign();
         } catch (NoSuchAlgorithmException | SignatureException | InvalidKeyException e) {
             throw new CryptoException(e.getMessage(), e);
         }
     }
 
-    public boolean verify(final PublicKey key, final byte[] message, final String signature) {
-        return verify(key, message, signature.getBytes(settings.getCharset()));
-    }
-
     public boolean verify(final PublicKey key, final byte[] message, final byte[] signature) {
         try {
-            final byte[] bytes = Base64.getDecoder().decode(signature);
             final Signature verifier = Signature.getInstance(settings.getSignatureAlgorithm().getTransformation());
             verifier.initVerify(key);
             verifier.update(message);
 
-            return verifier.verify(bytes);
+            return verifier.verify(signature);
         } catch (NoSuchAlgorithmException | SignatureException | InvalidKeyException | IllegalArgumentException e) {
             throw new CryptoException(e.getMessage(), e);
         }

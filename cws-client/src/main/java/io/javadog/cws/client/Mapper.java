@@ -59,6 +59,11 @@ public final class Mapper {
         return new JAXBElement<>(qName, Integer.class, value);
     }
 
+    public static JAXBElement<byte[]> convert(final String field, final byte[] value) {
+        final QName qName = new QName("", field);
+        return new JAXBElement<>(qName, byte[].class, value);
+    }
+
     // =========================================================================
     // Mapping of Standard Request & Response information
     // =========================================================================

@@ -27,6 +27,7 @@ import io.javadog.cws.api.responses.SettingResponse;
 import io.javadog.cws.api.responses.VersionResponse;
 import org.junit.Test;
 
+import java.nio.charset.Charset;
 import java.util.UUID;
 
 /**
@@ -72,7 +73,7 @@ public final class SoapClientTest {
         final ProcessMemberRequest request = Base.prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
         request.setAction(Action.CREATE);
         request.setNewAccountName(accountName);
-        request.setNewCredential(accountName);
+        request.setNewCredential(accountName.getBytes(Charset.forName("UTF-8")));
 
         final ProcessMemberResponse response = system.processMember(request);
         assertThat(response.getReturnMessage(), is("Ok"));
@@ -97,7 +98,7 @@ public final class SoapClientTest {
         final ProcessMemberRequest memberRequest = Base.prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
         memberRequest.setAction(Action.CREATE);
         memberRequest.setNewAccountName(accountName);
-        memberRequest.setNewCredential(accountName);
+        memberRequest.setNewCredential(accountName.getBytes(Charset.forName("UTF-8")));
         final ProcessMemberResponse memberResponse = system.processMember(memberRequest);
         assertThat(memberResponse.isOk(), is(true));
 

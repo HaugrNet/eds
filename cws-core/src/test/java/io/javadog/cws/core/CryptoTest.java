@@ -108,7 +108,7 @@ public final class CryptoTest extends DatabaseSetup {
     public void testSignature() {
         final CWSKeyPair keyPair = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
         final byte[] message = "Message to Sign".getBytes(settings.getCharset());
-        final String signature = crypto.sign(keyPair.getPrivate().getKey(), message);
+        final byte[] signature = crypto.sign(keyPair.getPrivate().getKey(), message);
         final boolean verified = crypto.verify(keyPair.getPublic().getKey(), message, signature);
 
         assertThat(verified, is(true));

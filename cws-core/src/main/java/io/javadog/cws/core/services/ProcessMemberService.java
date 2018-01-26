@@ -25,6 +25,7 @@ import io.javadog.cws.core.model.entities.TrusteeEntity;
 
 import javax.persistence.EntityManager;
 import java.security.PublicKey;
+import java.util.Base64;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
@@ -113,7 +114,7 @@ public final class ProcessMemberService extends Serviceable<ProcessMemberRespons
 
             if (existing == null) {
                 final String uuid = UUID.randomUUID().toString();
-                final String signature = crypto.sign(keyPair.getPrivate().getKey(), crypto.stringToBytes(uuid));
+                final byte[] signature = crypto.sign(keyPair.getPrivate().getKey(), crypto.stringToBytes(uuid));
 
                 final MemberEntity entity = new MemberEntity();
                 entity.setName(memberName);
@@ -121,7 +122,7 @@ public final class ProcessMemberService extends Serviceable<ProcessMemberRespons
                 entity.setPbeAlgorithm(settings.getPasswordAlgorithm());
                 entity.setRsaAlgorithm(settings.getSignatureAlgorithm());
                 entity.setPrivateKey(CredentialType.SIGNATURE.name());
-                entity.setPublicKey(signature);
+                entity.setPublicKey(Base64.getEncoder().encodeToString(signature));
                 dao.persist(entity);
 
                 response = new ProcessMemberResponse();

@@ -104,7 +104,7 @@
       <xs:extension base="tns:verifiable">
         <xs:sequence>
           <xs:element name="accountName" type="xs:string"/>
-          <xs:element name="credential" type="xs:string"/>
+          <xs:element name="credential" type="xs:base64Binary"/>
           <xs:element name="credentialType" type="tns:credentialType"/>
         </xs:sequence>
       </xs:extension>
@@ -196,7 +196,7 @@
           <xs:element name="action" type="tns:action"/>
           <xs:element minOccurs="0" name="memberId" nillable="true" type="xs:string"/>
           <xs:element minOccurs="0" name="newAccountName" nillable="true" type="xs:string"/>
-          <xs:element minOccurs="0" name="newCredential" nillable="true" type="xs:string"/>
+          <xs:element minOccurs="0" name="newCredential" nillable="true" type="xs:base64Binary"/>
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>
@@ -213,7 +213,7 @@
       <xs:extension base="tns:cwsResult">
         <xs:sequence>
           <xs:element name="memberId" type="xs:string"/>
-          <xs:element name="signature" type="xs:string"/>
+          <xs:element name="signature" type="xs:base64Binary"/>
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>

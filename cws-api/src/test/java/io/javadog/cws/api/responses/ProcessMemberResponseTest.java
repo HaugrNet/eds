@@ -11,6 +11,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 
+import io.javadog.cws.api.TestUtilities;
 import io.javadog.cws.api.common.ReturnCode;
 import org.junit.Test;
 
@@ -29,13 +30,13 @@ public final class ProcessMemberResponseTest {
 
         final ProcessMemberResponse response = new ProcessMemberResponse();
         response.setMemberId(memberId);
-        response.setSignature(signature);
+        response.setSignature(TestUtilities.convert(signature));
 
         assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(response.getReturnMessage(), is("Ok"));
         assertThat(response.isOk(), is(true));
         assertThat(response.getMemberId(), is(memberId));
-        assertThat(response.getSignature(), is(signature));
+        assertThat(TestUtilities.convert(response.getSignature()), is(signature));
     }
 
     @Test

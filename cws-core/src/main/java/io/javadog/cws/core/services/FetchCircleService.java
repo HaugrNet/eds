@@ -37,18 +37,23 @@ public final class FetchCircleService extends Serviceable<FetchCircleResponse, F
     public FetchCircleResponse perform(final FetchCircleRequest request) {
         verifyRequest(request, Permission.FETCH_CIRCLE);
         final FetchCircleResponse response = new FetchCircleResponse();
+        final List<Circle> circles;
 
         if (Constants.ADMIN_ACCOUNT.equals(member.getName()) || settings.getShowAllCircles()) {
-            final List<CircleEntity> circles = dao.findAllAscending(CircleEntity.class, "name");
-            response.setCircles(convertCircles(circles));
-        } else {
-            final List<Circle> circles = new ArrayList<>(trustees.size());
-            for (final TrusteeEntity trustee : trustees) {
-                circles.add(convert(trustee.getCircle()));
+            final List<CircleEntity> entities = dao.findAllAscending(CircleEntity.class, "name");
+            circles = new ArrayList<>(entities.size());
+            for (final CircleEntity entity : entities) {
+                circles.add(convert(entity, null));
             }
-            response.setCircles(circles);
+        } else {
+            circles = new ArrayList<>(trustees.size());
+            for (final TrusteeEntity trustee : trustees) {
+                final String externalKey = decryptExternalKey(trustee);
+                circles.add(convert(trustee.getCircle(), externalKey));
+            }
         }
 
+        response.setCircles(circles);
         return response;
     }
 }

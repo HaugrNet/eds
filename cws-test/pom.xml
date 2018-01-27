@@ -11,21 +11,9 @@
     <artifactId>cws-test</artifactId>
     <packaging>war</packaging>
     <name>CWS Test</name>
-    <description>Sample CWS Test Module.</description>
+    <description>Sample CWS Test Module</description>
 
     <dependencies>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>cws-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.javadog</groupId>
-            <artifactId>cws-rest</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.javadog</groupId>
-            <artifactId>cws-soap</artifactId>
-        </dependency>
         <dependency>
             <groupId>javax</groupId>
             <artifactId>javaee-api</artifactId>
@@ -33,7 +21,24 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
+            <artifactId>cws-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>cws-rest</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>cws-soap</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
             <artifactId>cws-client</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>1.4.196</version>
         </dependency>
 
         <dependency>

@@ -30,7 +30,7 @@ import java.util.Objects;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = Constants.FIELD_MEMBER, propOrder = { Constants.FIELD_MEMBER_ID, Constants.FIELD_ACCOUNT_NAME, Constants.FIELD_ADDED })
+@XmlType(name = Constants.FIELD_MEMBER, propOrder = { Constants.FIELD_MEMBER_ID, Constants.FIELD_ACCOUNT_NAME, Constants.FIELD_PUBLIC_KEY, Constants.FIELD_ADDED })
 public final class Member implements Serializable {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
@@ -41,6 +41,13 @@ public final class Member implements Serializable {
 
     @XmlElement(name = Constants.FIELD_ACCOUNT_NAME, required = true)
     private String accountName = null;
+
+    // The Public Key is an optional value which may or may not be provided,
+    // hence it is only stored but not used for anything. For the same reason,
+    // it is not used as part of the Standard Object methods, #equals(),
+    // #hashCode() and #toString().
+    @XmlElement(name = Constants.FIELD_PUBLIC_KEY, required = true)
+    private String publicKey = null;
 
     @XmlElement(name = Constants.FIELD_ADDED, required = true)
     private Date added = null;
@@ -63,6 +70,14 @@ public final class Member implements Serializable {
 
     public String getAccountName() {
         return accountName;
+    }
+
+    public void setPublicKey(final String publicKey) {
+        this.publicKey = publicKey;
+    }
+
+    public String getPublicKey() {
+        return publicKey;
     }
 
     public void setAdded(final Date added) {

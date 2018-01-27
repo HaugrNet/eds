@@ -26,7 +26,7 @@ import java.util.Map;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "processCircleRequest")
-@XmlType(name = "processCircleRequest", propOrder = { Constants.FIELD_ACTION, Constants.FIELD_CIRCLE_ID, Constants.FIELD_CIRCLE_NAME, Constants.FIELD_MEMBER_ID })
+@XmlType(name = "processCircleRequest", propOrder = { Constants.FIELD_ACTION, Constants.FIELD_CIRCLE_ID, Constants.FIELD_CIRCLE_NAME, Constants.FIELD_MEMBER_ID, Constants.FIELD_CIRCKE_KEY })
 public final class ProcessCircleRequest extends Authentication implements CircleIdRequest {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
@@ -47,6 +47,11 @@ public final class ProcessCircleRequest extends Authentication implements Circle
     @Pattern(regexp = Constants.ID_PATTERN_REGEX)
     @XmlElement(name = Constants.FIELD_MEMBER_ID, nillable = true)
     private String memberId = null;
+
+    // The Circle Key is an optional value which may or may not be provided,
+    // hence it is only stored but not used for anything.
+    @XmlElement(name = Constants.FIELD_CIRCKE_KEY, nillable = true)
+    private String circleKey = null;
 
     // =========================================================================
     // Standard Setters & Getters
@@ -92,6 +97,14 @@ public final class ProcessCircleRequest extends Authentication implements Circle
         return memberId;
     }
 
+    public void setCircleKey(final String circleKey) {
+        this.circleKey = circleKey;
+    }
+
+    public String getCircleKey() {
+        return circleKey;
+    }
+
     // =========================================================================
     // Standard Methods
     // =========================================================================
@@ -113,7 +126,6 @@ public final class ProcessCircleRequest extends Authentication implements Circle
                     break;
                 case UPDATE:
                     checkNotNullAndValidId(errors, Constants.FIELD_CIRCLE_ID, circleId, "Cannot update the Circle Name, without knowing the Circle Id.");
-                    checkNotNullOrEmpty(errors, Constants.FIELD_CIRCLE_NAME, circleName, "Cannot update the Circle Name, without a new Circle Name.");
                     checkNotTooLong(errors, Constants.FIELD_CIRCLE_NAME, circleName, Constants.MAX_NAME_LENGTH, "The " + Constants.FIELD_CIRCLE_NAME + " may not exceed " + Constants.MAX_NAME_LENGTH + " characters.");
                     break;
                 case DELETE:

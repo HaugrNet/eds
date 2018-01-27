@@ -41,7 +41,7 @@
 
     <properties>
         <cxf.version>3.2.1</cxf.version>
-        <swarm.version>2017.12.1</swarm.version>
+        <swarm.version>2018.1.0</swarm.version>
         <resteasy.version>3.1.4.Final</resteasy.version>
 
         <!-- To avoid that the builds are platform specific -->

@@ -24,7 +24,7 @@ import java.util.Objects;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = Constants.FIELD_CIRCLE, propOrder = { Constants.FIELD_CIRCLE_ID, Constants.FIELD_CIRCLE_NAME, Constants.FIELD_ADDED })
+@XmlType(name = Constants.FIELD_CIRCLE, propOrder = { Constants.FIELD_CIRCLE_ID, Constants.FIELD_CIRCLE_NAME, Constants.FIELD_CIRCKE_KEY, Constants.FIELD_ADDED })
 public final class Circle implements Serializable {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
@@ -35,6 +35,13 @@ public final class Circle implements Serializable {
 
     @XmlElement(name = Constants.FIELD_CIRCLE_NAME, required = true)
     private String circleName = null;
+
+    // The Circle Key is an optional value which may or may not be provided,
+    // hence it is only stored but not used for anything. For the same reason,
+    // it is not used as part of the Standard Object methods, #equals(),
+    // #hashCode() and #toString().
+    @XmlElement(name = Constants.FIELD_CIRCKE_KEY, nillable = true)
+    private String circleKey = null;
 
     @XmlElement(name = Constants.FIELD_ADDED, required = true)
     private Date added = null;
@@ -57,6 +64,14 @@ public final class Circle implements Serializable {
 
     public String getCircleName() {
         return circleName;
+    }
+
+    public void setCircleKey(final String circleKey) {
+        this.circleKey = circleKey;
+    }
+
+    public String getCircleKey() {
+        return circleKey;
     }
 
     public void setAdded(final Date added) {

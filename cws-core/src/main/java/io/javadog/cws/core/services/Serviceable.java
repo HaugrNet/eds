@@ -34,7 +34,6 @@ import io.javadog.cws.core.model.entities.MemberEntity;
 import io.javadog.cws.core.model.entities.TrusteeEntity;
 
 import javax.persistence.EntityManager;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -287,21 +286,36 @@ public abstract class Serviceable<R extends CwsResponse, V extends Authenticatio
         return crypto.extractCircleKey(entity.getKey().getAlgorithm(), keyPair.getPrivate(), trustee.getCircleKey());
     }
 
-    protected static List<Circle> convertCircles(final List<CircleEntity> entities) {
-        final List<Circle> circles = new ArrayList<>(entities.size());
+    protected byte[] encryptExternalKey(final SecretCWSKey circleKey, final String externalKey) {
+        byte[] encryptedKey = null;
 
-        for (final CircleEntity entity : entities) {
-            circles.add(convert(entity));
+        if (externalKey != null) {
+            circleKey.setSalt(settings.getSalt());
+            encryptedKey = crypto.encrypt(circleKey, crypto.stringToBytes(externalKey));
         }
 
-        return circles;
+        return encryptedKey;
     }
 
-    protected static Circle convert(final CircleEntity entity) {
+    protected String decryptExternalKey(final TrusteeEntity trustee) {
+        final byte[] encryptedKey = trustee.getCircle().getCircleKey();
+        String externalKey = null;
+
+        if (encryptedKey != null) {
+            final SecretCWSKey circleKey = crypto.extractCircleKey(settings.getSymmetricAlgorithm(), keyPair.getPrivate(), trustee.getCircleKey());
+            circleKey.setSalt(settings.getSalt());
+            externalKey = crypto.bytesToString(crypto.decrypt(circleKey, encryptedKey));
+        }
+
+        return externalKey;
+    }
+
+    protected static Circle convert(final CircleEntity entity, final String circleKey) {
         final Circle circle = new Circle();
 
         circle.setCircleId(entity.getExternalId());
         circle.setCircleName(entity.getName());
+        circle.setCircleKey(circleKey);
         circle.setAdded(entity.getAdded());
 
         return circle;

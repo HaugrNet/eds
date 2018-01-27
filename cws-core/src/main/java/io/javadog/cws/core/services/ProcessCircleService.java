@@ -104,12 +104,13 @@ public final class ProcessCircleService extends Serviceable<ProcessCircleRespons
                 } else if (Objects.equals(owner.getName(), Constants.ADMIN_ACCOUNT)) {
                     response = new ProcessCircleResponse(ReturnCode.IDENTIFICATION_WARNING, "It is not allowed for the System Administrator to be part of a Circle.");
                 } else {
-                    response = createCircle(owner, name);
+                    response = createCircle(owner, name, request.getCircleKey());
                 }
             } else {
-                response = createCircle(member, name);
+                response = createCircle(member, name, request.getCircleKey());
             }
         }
+
         return response;
     }
 
@@ -118,26 +119,30 @@ public final class ProcessCircleService extends Serviceable<ProcessCircleRespons
      * will also be given a new encryption key and a default root folder for
      * storing of all Data Objects.</p>
      *
-     * @param circleAdmin The initial Circle Administrator
-     * @param name        The name of the new Circle
+     * @param circleAdmin       The initial Circle Administrator
+     * @param name              The name of the new Circle
+     * @param externalCircleKey External Circle Key
      * @return Response Object with the new Circle Id
      */
-    private ProcessCircleResponse createCircle(final MemberEntity circleAdmin, final String name) {
+    private ProcessCircleResponse createCircle(final MemberEntity circleAdmin, final String name, final String externalCircleKey) {
+        final KeyAlgorithm algorithm = settings.getSymmetricAlgorithm();
+        final SecretCWSKey key = crypto.generateSymmetricKey(algorithm);
+        final PublicKey publicKey = crypto.dearmoringPublicKey(circleAdmin.getPublicKey());
+        final PublicCWSKey cwsPublicKey = new PublicCWSKey(circleAdmin.getRsaAlgorithm(), publicKey);
+        final String circleKey = crypto.encryptAndArmorCircleKey(cwsPublicKey, key);
+        final byte[] externalKey = encryptExternalKey(key, externalCircleKey);
+
         final CircleEntity circle = new CircleEntity();
         circle.setName(name);
+        circle.setCircleKey(externalKey);
         dao.persist(circle);
 
         createRootFolder(circle);
-        final KeyAlgorithm algorithm = settings.getSymmetricAlgorithm();
         final KeyEntity keyEntity = new KeyEntity();
         keyEntity.setAlgorithm(algorithm);
         keyEntity.setStatus(Status.ACTIVE);
         dao.persist(keyEntity);
 
-        final SecretCWSKey key = crypto.generateSymmetricKey(keyEntity.getAlgorithm());
-        final PublicKey publicKey = crypto.dearmoringPublicKey(circleAdmin.getPublicKey());
-        final PublicCWSKey cwsPublicKey = new PublicCWSKey(circleAdmin.getRsaAlgorithm(), publicKey);
-        final String circleKey = crypto.encryptAndArmorCircleKey(cwsPublicKey, key);
         final TrusteeEntity trustee = new TrusteeEntity();
         trustee.setMember(circleAdmin);
         trustee.setCircle(circle);
@@ -177,23 +182,45 @@ public final class ProcessCircleService extends Serviceable<ProcessCircleRespons
      */
     private ProcessCircleResponse updateCircle(final ProcessCircleRequest request) {
         final String externalId = request.getCircleId();
-        final String name = request.getCircleName();
         final ProcessCircleResponse response;
 
-        final CircleEntity existing = dao.findCircleByName(name);
+        final CircleEntity entity = dao.find(CircleEntity.class, externalId);
 
-        if (existing == null) {
-            final CircleEntity entity = dao.find(CircleEntity.class, externalId);
-            if (entity != null) {
-                entity.setName(name);
-                dao.persist(entity);
+        if (entity != null) {
+            entity.setCircleKey(updateExternalCircleKey(request.getCircleKey()));
+            response = checkAndUpdateCircleName(entity, request.getCircleName());
 
-                response = new ProcessCircleResponse();
-            } else {
-                response = new ProcessCircleResponse(ReturnCode.IDENTIFICATION_WARNING, "No Circle could be found with the given Id.");
-            }
+            dao.persist(entity);
         } else {
-            response = new ProcessCircleResponse(ReturnCode.IDENTIFICATION_WARNING, "A Circle with the requested name already exists.");
+            response = new ProcessCircleResponse(ReturnCode.IDENTIFICATION_WARNING, "No Circle could be found with the given Id.");
+        }
+
+        return response;
+    }
+
+    private byte[] updateExternalCircleKey(final String externalKey) {
+        byte[] encryptedKey = null;
+
+        if (externalKey != null) {
+            final TrusteeEntity trustee = trustees.get(0);
+            final SecretCWSKey circleKey = crypto.extractCircleKey(settings.getSymmetricAlgorithm(), keyPair.getPrivate(), trustee.getCircleKey());
+            circleKey.setSalt(settings.getSalt());
+            encryptedKey = crypto.encrypt(circleKey, crypto.stringToBytes(externalKey));
+        }
+
+        return encryptedKey;
+    }
+
+    private ProcessCircleResponse checkAndUpdateCircleName(final CircleEntity entity, final String name) {
+        ProcessCircleResponse response = new ProcessCircleResponse();
+
+        if (!Objects.equals(entity.getName(), name)) {
+            final CircleEntity existing = dao.findCircleByName(name);
+            if (existing == null) {
+                entity.setName(name);
+            } else {
+                response = new ProcessCircleResponse(ReturnCode.IDENTIFICATION_WARNING, "A Circle with the requested name already exists.");
+            }
         }
 
         return response;

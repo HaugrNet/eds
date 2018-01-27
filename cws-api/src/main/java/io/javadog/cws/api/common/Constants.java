@@ -66,12 +66,14 @@ public final class Constants {
     public static final String FIELD_FOLDER_ID = "folderId";
     public static final String FIELD_DATA_ID = "dataId";
     public static final String FIELD_ACCOUNT_NAME = "accountName";
+    public static final String FIELD_PUBLIC_KEY = "publicKey";
     public static final String FIELD_NEW_ACCOUNT_NAME = "newAccountName";
     public static final String FIELD_CREDENTIAL = "credential";
     public static final String FIELD_NEW_CREDENTIAL = "newCredential";
     public static final String FIELD_CREDENTIALTYPE = "credentialType";
     public static final String FIELD_CIRCLE = "circle";
     public static final String FIELD_CIRCLES = "circles";
+    public static final String FIELD_CIRCKE_KEY = "circleKey";
     public static final String FIELD_CIRCLE_NAME = "circleName";
     public static final String FIELD_TRUSTEE = "trustee";
     public static final String FIELD_TRUSTEES = "trustees";

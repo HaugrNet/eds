@@ -154,7 +154,7 @@ public final class CommonDao {
         return findList(query);
     }
 
-    public List<CircleEntity> findCirclesBothBelongTo(final MemberEntity member, final MemberEntity requested) {
+    public List<TrusteeEntity> findCirclesBothBelongTo(final MemberEntity member, final MemberEntity requested) {
         final Query query = entityManager.createNamedQuery("trustee.findSharedCircles");
         query.setParameter(MEMBER, member);
         query.setParameter("requested", requested);

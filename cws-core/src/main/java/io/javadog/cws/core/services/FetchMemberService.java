@@ -78,7 +78,8 @@ public final class FetchMemberService extends Serviceable<FetchMemberResponse, F
         if (!Objects.equals(member.getName(), Constants.ADMIN_ACCOUNT)) {
             final List<Circle> circles = new ArrayList<>(trustees.size());
             for (final TrusteeEntity trustee : trustees) {
-                circles.add(convert(trustee.getCircle()));
+                final String externalKey = decryptExternalKey(trustee);
+                circles.add(convert(trustee.getCircle(), externalKey));
             }
             response.setCircles(circles);
         }
@@ -138,6 +139,7 @@ public final class FetchMemberService extends Serviceable<FetchMemberResponse, F
 
         member.setMemberId(entity.getExternalId());
         member.setAccountName(entity.getName());
+        member.setPublicKey(entity.getPublicKey());
         member.setAdded(entity.getAdded());
 
         return member;
@@ -165,14 +167,29 @@ public final class FetchMemberService extends Serviceable<FetchMemberResponse, F
     }
 
     private List<Circle> findCirclesMemberBelongsTo(final MemberEntity requested) {
-        final List<CircleEntity> circles = dao.findCirclesForMember(requested);
+        final List<CircleEntity> entities = dao.findCirclesForMember(requested);
+        final List<Circle> circles = new ArrayList<>(entities.size());
+        for (final CircleEntity entity : entities) {
+            final Circle circle = convert(entity, null);
+            circles.add(circle);
+        }
+
+        return circles;
+    }
+
+    private List<Circle> findSharedCircles(final MemberEntity current, final MemberEntity requested) {
+        final List<TrusteeEntity> circles = dao.findCirclesBothBelongTo(current, requested);
 
         return convertCircles(circles);
     }
 
-    private List<Circle> findSharedCircles(final MemberEntity current, final MemberEntity requested) {
-        final List<CircleEntity> circles = dao.findCirclesBothBelongTo(current, requested);
+    private List<Circle> convertCircles(final List<TrusteeEntity> trustees) {
+        final List<Circle> circles = new ArrayList<>(trustees.size());
+        for (final TrusteeEntity trustee : trustees) {
+            final String externalKey = decryptExternalKey(trustee);
+            circles.add(convert(trustee.getCircle(), externalKey));
+        }
 
-        return convertCircles(circles);
+        return circles;
     }
 }

@@ -28,7 +28,7 @@ import java.util.Map;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "processMemberRequest")
-@XmlType(name = "processMemberRequest", propOrder = { Constants.FIELD_ACTION, Constants.FIELD_MEMBER_ID, Constants.FIELD_NEW_ACCOUNT_NAME, Constants.FIELD_NEW_CREDENTIAL })
+@XmlType(name = "processMemberRequest", propOrder = { Constants.FIELD_ACTION, Constants.FIELD_MEMBER_ID,  Constants.FIELD_PUBLIC_KEY, Constants.FIELD_NEW_ACCOUNT_NAME, Constants.FIELD_NEW_CREDENTIAL })
 public final class ProcessMemberRequest extends Authentication {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
@@ -41,6 +41,11 @@ public final class ProcessMemberRequest extends Authentication {
     @Pattern(regexp = Constants.ID_PATTERN_REGEX)
     @XmlElement(name = Constants.FIELD_MEMBER_ID, nillable = true)
     private String memberId = null;
+
+    // The Public Key is an optional value which may or may not be provided,
+    // hence it is only stored but not used for anything.
+    @XmlElement(name = Constants.FIELD_PUBLIC_KEY, required = true)
+    private String publicKey = null;
 
     @Size(min = 1, max = Constants.MAX_NAME_LENGTH)
     @XmlElement(name = Constants.FIELD_NEW_ACCOUNT_NAME, nillable = true)
@@ -67,6 +72,14 @@ public final class ProcessMemberRequest extends Authentication {
 
     public String getMemberId() {
         return memberId;
+    }
+
+    public void setPublicKey(final String publicKey) {
+        this.publicKey = publicKey;
+    }
+
+    public String getPublicKey() {
+        return publicKey;
     }
 
     public void setNewAccountName(final String newAccountName) {

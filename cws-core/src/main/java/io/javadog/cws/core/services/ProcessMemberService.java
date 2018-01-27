@@ -165,6 +165,10 @@ public final class ProcessMemberService extends Serviceable<ProcessMemberRespons
             }
         }
 
+        if (request.getPublicKey() != null) {
+            member.setMemberKey(request.getPublicKey());
+        }
+
         dao.persist(member);
 
         return response;
@@ -228,6 +232,7 @@ public final class ProcessMemberService extends Serviceable<ProcessMemberRespons
                     account.setSalt(salt);
                     account.setPbeAlgorithm(pbeAlgorithm);
                     account.setRsaAlgorithm(pair.getAlgorithm());
+                    account.setMemberKey(request.getPublicKey());
                     account.setPublicKey(crypto.armoringPublicKey(pair.getPublic().getKey()));
                     account.setPrivateKey(crypto.armoringPrivateKey(key, pair.getPrivate().getKey()));
                     dao.persist(account);

@@ -55,6 +55,9 @@ public class MemberEntity extends Externable {
     @Column(name = "rsa_algorithm", nullable = false, length = 10)
     private KeyAlgorithm rsaAlgorithm = null;
 
+    @Column(name = "external_key")
+    private String memberKey = null;
+
     @Column(name = "public_key", nullable = false, length = 3072)
     private String publicKey = null;
 
@@ -95,6 +98,14 @@ public class MemberEntity extends Externable {
 
     public KeyAlgorithm getRsaAlgorithm() {
         return rsaAlgorithm;
+    }
+
+    public void setMemberKey(final String memberKey) {
+        this.memberKey = memberKey;
+    }
+
+    public String getMemberKey() {
+        return memberKey;
     }
 
     public void setPublicKey(final String armoredPublicKey) {

@@ -333,8 +333,8 @@ public final class CircleServiceTest extends DatabaseSetup {
         request.setCircleId(CIRCLE_1_ID);
 
         final ProcessCircleResponse response = service.perform(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.IDENTIFICATION_WARNING));
-        assertThat(response.getReturnMessage(), is("A Circle with the requested name already exists."));
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(response.getReturnMessage(), is("Ok"));
     }
 
     @Test

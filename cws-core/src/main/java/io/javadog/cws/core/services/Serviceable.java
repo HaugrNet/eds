@@ -34,6 +34,7 @@ import io.javadog.cws.core.model.entities.MemberEntity;
 import io.javadog.cws.core.model.entities.TrusteeEntity;
 
 import javax.persistence.EntityManager;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -51,7 +52,7 @@ public abstract class Serviceable<R extends CwsResponse, V extends Authenticatio
     protected final CommonDao dao;
     protected final Crypto crypto;
 
-    protected List<TrusteeEntity> trustees = null;
+    protected List<TrusteeEntity> trustees = new ArrayList<>(0);
     protected MemberEntity member = null;
     protected CWSKeyPair keyPair = null;
 

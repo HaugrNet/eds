@@ -24,6 +24,8 @@ import java.util.Map;
  */
 public final class AuthenticationTest {
 
+    private static final byte[] CREDENTIAL = {};
+
     @Test
     public void testClassflow() {
         final String name = "Authentication Name";
@@ -50,6 +52,20 @@ public final class AuthenticationTest {
     public void testEmptyClass() {
         final Authentication authentication = new Authentication();
         authentication.setAccountName("");
+        authentication.setCredentialType(null);
+
+        final Map<String, String> errors = authentication.validate();
+        assertThat(errors.size(), is(2));
+        assertThat(errors.get(Constants.FIELD_ACCOUNT_NAME), is("AccountName is missing, null or invalid."));
+        assertThat(errors.get(Constants.FIELD_CREDENTIAL), is("The Credential is missing."));
+    }
+
+    @Test
+    public void testEmptyClassEmptyCredential() {
+        final byte[] credential = CREDENTIAL;
+        final Authentication authentication = new Authentication();
+        authentication.setAccountName("");
+        authentication.setCredential(credential);
         authentication.setCredentialType(null);
 
         final Map<String, String> errors = authentication.validate();

@@ -213,7 +213,7 @@ public final class ProcessCircleService extends Serviceable<ProcessCircleRespons
     private ProcessCircleResponse checkAndUpdateCircleName(final CircleEntity entity, final String name) {
         ProcessCircleResponse response = new ProcessCircleResponse();
 
-        if (!Objects.equals(entity.getName(), name)) {
+        if ((name != null) && !Objects.equals(entity.getName(), name)) {
             final CircleEntity existing = dao.findCircleByName(name);
             if (existing == null) {
                 entity.setName(name);

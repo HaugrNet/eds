@@ -199,6 +199,35 @@ public final class CircleServiceTest extends DatabaseSetup {
     }
 
     @Test
+    public void testCreateCircleWithExternalCircleKey() {
+        final ProcessCircleService service = new ProcessCircleService(settings, entityManager);
+        final ProcessCircleRequest createRequest = prepareRequest(ProcessCircleRequest.class, MEMBER_5);
+        createRequest.setAction(Action.CREATE);
+        createRequest.setCircleName("Extra Encrypted");
+        createRequest.setCircleKey(UUID.randomUUID().toString());
+
+        final ProcessCircleResponse createResponse = service.perform(createRequest);
+        assertThat(createResponse.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(createResponse.getCircleId(), is(not(nullValue())));
+
+        final ProcessCircleRequest updateRequest = prepareRequest(ProcessCircleRequest.class, MEMBER_5);
+        updateRequest.setCredential(crypto.stringToBytes(MEMBER_5));
+        updateRequest.setAction(Action.UPDATE);
+        updateRequest.setCircleId(createResponse.getCircleId());
+        updateRequest.setCircleKey(UUID.randomUUID().toString());
+        final ProcessCircleResponse updateResponse = service.perform(updateRequest);
+        assertThat(updateResponse.getReturnCode(), is(ReturnCode.SUCCESS));
+
+        final FetchCircleService fetchService = new FetchCircleService(settings, entityManager);
+        final FetchCircleRequest fetchRequest = prepareRequest(FetchCircleRequest.class, MEMBER_5);
+        final FetchCircleResponse fetchResponse = fetchService.perform(fetchRequest);
+        assertThat(fetchResponse.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(fetchResponse.getCircles().size(), is(4));
+        assertThat(fetchResponse.getCircles().get(0).getCircleId(), is(createResponse.getCircleId()));
+        assertThat(fetchResponse.getCircles().get(0).getCircleKey(), is(updateRequest.getCircleKey()));
+    }
+
+    @Test
     public void testCreateCircleWithInvalidCircleAdmin() {
         final ProcessCircleService service = new ProcessCircleService(settings, entityManager);
         final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, Constants.ADMIN_ACCOUNT);

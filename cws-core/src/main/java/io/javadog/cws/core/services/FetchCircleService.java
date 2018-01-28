@@ -19,6 +19,7 @@ import io.javadog.cws.core.model.entities.TrusteeEntity;
 import javax.persistence.EntityManager;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author Kim Jensen
@@ -43,17 +44,28 @@ public final class FetchCircleService extends Serviceable<FetchCircleResponse, F
             final List<CircleEntity> entities = dao.findAllAscending(CircleEntity.class, "name");
             circles = new ArrayList<>(entities.size());
             for (final CircleEntity entity : entities) {
-                circles.add(convert(entity, null));
+                circles.add(convert(entity, extractExternalCircleKey(entity)));
             }
         } else {
             circles = new ArrayList<>(trustees.size());
             for (final TrusteeEntity trustee : trustees) {
-                final String externalKey = decryptExternalKey(trustee);
-                circles.add(convert(trustee.getCircle(), externalKey));
+                circles.add(convert(trustee.getCircle(), decryptExternalKey(trustee)));
             }
         }
 
         response.setCircles(circles);
         return response;
+    }
+
+    private String extractExternalCircleKey(final CircleEntity entity) {
+        String externalKey = null;
+
+        for (final TrusteeEntity trustee : trustees) {
+            if (Objects.equals(trustee.getCircle().getId(), entity.getId())) {
+                externalKey = decryptExternalKey(trustee);
+            }
+        }
+
+        return externalKey;
     }
 }

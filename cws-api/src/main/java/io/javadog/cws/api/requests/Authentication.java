@@ -90,7 +90,7 @@ public class Authentication extends Verifiable {
         final Map<String, String> errors = new ConcurrentHashMap<>();
 
         checkNotNullEmptyOrTooLong(errors, Constants.FIELD_ACCOUNT_NAME, accountName, Constants.MAX_NAME_LENGTH, "AccountName is missing, null or invalid.");
-        checkNotNull(errors, Constants.FIELD_CREDENTIAL, credential, "The Credential is missing.");
+        checkNotNullOrEmpty(errors, Constants.FIELD_CREDENTIAL, credential, "The Credential is missing.");
         if (credentialType == null) {
             credentialType = CredentialType.PASSPHRASE;
         }

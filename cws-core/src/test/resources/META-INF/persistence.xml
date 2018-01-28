@@ -29,7 +29,7 @@
             <property name="javax.persistence.sql-load-script-source" value="META-INF/data.sql"/>
 
             <!-- Hibernate Settings for our test -->
-            <property name="hibernate.connection.pool_size" value="50"/>
+            <property name="hibernate.connection.pool_size" value="75"/>
             <property name="hibernate.connection.autocommit" value="false"/>
             <property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect"/>
             <property name="hibernate.cache.provider_class" value="org.hibernate.cache.HashtableCacheProvider"/>

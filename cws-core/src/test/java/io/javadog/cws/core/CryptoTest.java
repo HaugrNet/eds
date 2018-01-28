@@ -89,7 +89,7 @@ public final class CryptoTest extends DatabaseSetup {
         final Settings mySettings = newSettings();
         mySettings.set(StandardSetting.HASH_ALGORITHM.getKey(), "AES128");
         final Crypto myCrypto = new Crypto(mySettings);
-        myCrypto.generateChecksum("Bla bla bla");
+        myCrypto.generateChecksum("Bla bla bla".getBytes(settings.getCharset()));
     }
 
     @Test

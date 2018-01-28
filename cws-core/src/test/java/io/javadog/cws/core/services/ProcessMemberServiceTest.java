@@ -17,9 +17,11 @@ import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.CredentialType;
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.requests.FetchDataRequest;
+import io.javadog.cws.api.requests.FetchMemberRequest;
 import io.javadog.cws.api.requests.ProcessDataRequest;
 import io.javadog.cws.api.requests.ProcessMemberRequest;
 import io.javadog.cws.api.responses.FetchDataResponse;
+import io.javadog.cws.api.responses.FetchMemberResponse;
 import io.javadog.cws.api.responses.ProcessDataResponse;
 import io.javadog.cws.api.responses.ProcessMemberResponse;
 import io.javadog.cws.core.DatabaseSetup;
@@ -58,6 +60,32 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
         final ProcessMemberResponse response = service.perform(request);
 
         assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
+    }
+
+    @Test
+    public void testAddingWithPublicKey() {
+        final String account = "Member with PublicKey";
+        final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
+        final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
+        request.setAction(Action.CREATE);
+        request.setNewAccountName(account);
+        request.setNewCredential(crypto.stringToBytes(account));
+        final ProcessMemberResponse response = service.perform(request);
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
+
+        final ProcessMemberRequest updateRequest = prepareRequest(ProcessMemberRequest.class, account);
+        updateRequest.setAction(Action.UPDATE);
+        updateRequest.setPublicKey(UUID.randomUUID().toString());
+        final ProcessMemberResponse updateResponse = service.perform(updateRequest);
+        assertThat(updateResponse.getReturnCode(), is(ReturnCode.SUCCESS));
+
+        final FetchMemberService fetchService = new FetchMemberService(settings, entityManager);
+        final FetchMemberRequest fetchRequest = prepareRequest(FetchMemberRequest.class, MEMBER_4);
+        fetchRequest.setMemberId(response.getMemberId());
+        final FetchMemberResponse fetchResponse = fetchService.perform(fetchRequest);
+        assertThat(fetchResponse.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(fetchResponse.getMembers().size(), is(1));
+        assertThat(fetchResponse.getMembers().get(0).getPublicKey(), is(updateRequest.getPublicKey()));
     }
 
     @Test

@@ -160,10 +160,6 @@ public final class Crypto {
         }
     }
 
-    public String generateChecksum(final String value) {
-        return generateChecksum(value.getBytes(settings.getCharset()));
-    }
-
     public String generateChecksum(final byte[] bytes) {
         try {
             final MessageDigest digest = MessageDigest.getInstance(settings.getHashAlgorithm().getAlgorithm());

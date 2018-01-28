@@ -139,7 +139,7 @@ public final class FetchMemberService extends Serviceable<FetchMemberResponse, F
 
         member.setMemberId(entity.getExternalId());
         member.setAccountName(entity.getName());
-        member.setPublicKey(entity.getPublicKey());
+        member.setPublicKey(entity.getMemberKey());
         member.setAdded(entity.getAdded());
 
         return member;

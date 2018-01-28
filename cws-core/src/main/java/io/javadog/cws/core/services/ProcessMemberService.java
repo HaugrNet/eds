@@ -93,8 +93,7 @@ public final class ProcessMemberService extends Serviceable<ProcessMemberRespons
         final MemberEntity found = dao.findMemberByName(accountName);
         if (found == null) {
             final MemberEntity created = createNewAccount(accountName, request.getNewCredential());
-            final ProcessMemberResponse response;
-            response = new ProcessMemberResponse();
+            final ProcessMemberResponse response = new ProcessMemberResponse();
             response.setMemberId(created.getExternalId());
 
             return response;

@@ -138,6 +138,7 @@ public final class Mapper {
                 final Circle circle = new Circle();
                 circle.setCircleId(wsCircle.getCircleId());
                 circle.setCircleName(wsCircle.getCircleName());
+                circle.setCircleKey(wsCircle.getCircleKey().getValue());
                 circle.setAdded(map(wsCircle.getAdded()));
                 api.add(circle);
             }
@@ -163,6 +164,7 @@ public final class Mapper {
             final Member member = new Member();
             member.setMemberId(wsMember.getMemberId());
             member.setAccountName(wsMember.getAccountName());
+            member.setPublicKey(wsMember.getPublicKey());
             member.setAdded(map(wsMember.getAdded()));
             api.add(member);
         }

@@ -179,6 +179,7 @@
     <xs:sequence>
       <xs:element name="circleId" type="xs:string"/>
       <xs:element name="circleName" type="xs:string"/>
+      <xs:element minOccurs="0" name="circleKey" nillable="true" type="xs:string"/>
       <xs:element name="added" type="xs:dateTime"/>
     </xs:sequence>
   </xs:complexType>
@@ -195,6 +196,7 @@
         <xs:sequence>
           <xs:element name="action" type="tns:action"/>
           <xs:element minOccurs="0" name="memberId" nillable="true" type="xs:string"/>
+          <xs:element name="publicKey" type="xs:string"/>
           <xs:element minOccurs="0" name="newAccountName" nillable="true" type="xs:string"/>
           <xs:element minOccurs="0" name="newCredential" nillable="true" type="xs:base64Binary"/>
         </xs:sequence>
@@ -291,6 +293,7 @@
           <xs:element minOccurs="0" name="circleId" nillable="true" type="xs:string"/>
           <xs:element minOccurs="0" name="circleName" nillable="true" type="xs:string"/>
           <xs:element minOccurs="0" name="memberId" nillable="true" type="xs:string"/>
+          <xs:element minOccurs="0" name="circleKey" nillable="true" type="xs:string"/>
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>
@@ -349,6 +352,7 @@
     <xs:sequence>
       <xs:element name="memberId" type="xs:string"/>
       <xs:element name="accountName" type="xs:string"/>
+      <xs:element name="publicKey" type="xs:string"/>
       <xs:element name="added" type="xs:dateTime"/>
     </xs:sequence>
   </xs:complexType>

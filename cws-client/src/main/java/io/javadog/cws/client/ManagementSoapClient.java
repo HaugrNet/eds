@@ -245,6 +245,7 @@ public final class ManagementSoapClient implements Management {
             Mapper.fillAuthentication(ws, api);
             ws.setAction(Mapper.map(api.getAction()));
             ws.setMemberId(Mapper.convert(Constants.FIELD_MEMBER_ID, api.getMemberId()));
+            ws.setPublicKey(api.getPublicKey());
             ws.setNewAccountName(Mapper.convert(Constants.FIELD_NEW_ACCOUNT_NAME, api.getNewAccountName()));
             ws.setNewCredential(Mapper.convert(Constants.FIELD_NEW_CREDENTIAL, api.getNewCredential()));
         }
@@ -298,6 +299,7 @@ public final class ManagementSoapClient implements Management {
             ws.setCircleId(Mapper.convert(Constants.FIELD_CIRCLE_ID, api.getCircleId()));
             ws.setCircleName(Mapper.convert(Constants.FIELD_CIRCLE_NAME, api.getCircleName()));
             ws.setMemberId(Mapper.convert(Constants.FIELD_MEMBER_ID, api.getMemberId()));
+            ws.setCircleKey(Mapper.convert(Constants.FIELD_CIRCKE_KEY, api.getCircleKey()));
         }
 
         return ws;

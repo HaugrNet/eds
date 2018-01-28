@@ -302,7 +302,7 @@ public abstract class Serviceable<R extends CwsResponse, V extends Authenticatio
         String externalKey = null;
 
         if (encryptedKey != null) {
-            final SecretCWSKey circleKey = crypto.extractCircleKey(settings.getSymmetricAlgorithm(), keyPair.getPrivate(), trustee.getCircleKey());
+            final SecretCWSKey circleKey = crypto.extractCircleKey(trustee.getKey().getAlgorithm(), keyPair.getPrivate(), trustee.getCircleKey());
             circleKey.setSalt(settings.getSalt());
             externalKey = crypto.bytesToString(crypto.decrypt(circleKey, encryptedKey));
         }

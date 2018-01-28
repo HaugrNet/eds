@@ -203,9 +203,8 @@ public final class ProcessCircleService extends Serviceable<ProcessCircleRespons
 
         if (externalKey != null) {
             final TrusteeEntity trustee = trustees.get(0);
-            final SecretCWSKey circleKey = crypto.extractCircleKey(settings.getSymmetricAlgorithm(), keyPair.getPrivate(), trustee.getCircleKey());
-            circleKey.setSalt(settings.getSalt());
-            encryptedKey = crypto.encrypt(circleKey, crypto.stringToBytes(externalKey));
+            final SecretCWSKey circleKey = crypto.extractCircleKey(trustee.getKey().getAlgorithm(), keyPair.getPrivate(), trustee.getCircleKey());
+            encryptedKey = encryptExternalKey(circleKey, externalKey);
         }
 
         return encryptedKey;

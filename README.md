@@ -46,8 +46,6 @@ $ cd [ /path/to/cws/files/ ] accessories/postgresql
 $ psql postgres --file 01-install.sql
 ```
 
-
-
 **Developers only**: If you want to build from source, run these steps to create the cws.war package:
 
 ```
@@ -96,14 +94,17 @@ CWS Development has reached the final phase for version 1.0. With the following
 milestones still pending, for details, see milestones and related open issues in
 GitHub. The original goal for releasing the final 1.0 was on December 31st,
 2017. However, as the OpenJDK will [include unlimited strength cryptography](https://bugs.openjdk.java.net/browse/JDK-8170157)
-as of Java 8u162, to be released on [January 16th, 2018](http://www.oracle.com/technetwork/java/javase/8u152-relnotes-3850503.html)
-the release of CWS 1.0 is scheduled January 31st, 2018.
+as of Java 8u161, released on [January 16th, 2018](http://www.oracle.com/technetwork/java/javase/8u152-relnotes-3850503.html)
+the release of CWS 0.9.9 is scheduled February 2nd, 2018.
 
-- 0.9 - Scheduled for January, 2018; Auditing &amp; Review Release
-- 1.0 - Scheduled for January 31st, 2018; Final 1.0 Release
+- 0.9.9 - Scheduled for February 2nd, 2018; Final 1.0 Release Candidate
+
+The final 1.0.0 release will be made as soon as Travis-CI and Circle-CI have
+upgraded their images to use the latest Java 8, so the default settings can be
+updated to the highest AES encryption key size.
 
 # Software License
 The CWS is released under Apache License 2 or APL2.
 
 # Contact
-Kim Jensen <kim at javadog.io>
+Kim.Jensen at javadog.io

@@ -42,7 +42,7 @@ public final class RestClientTest {
         final VersionResponse response = system.version();
         assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
         assertThat(response.getReturnMessage(), is("Ok"));
-        assertThat(response.getVersion(), is("0.9-SNAPSHOT"));
+        assertThat(response.getVersion(), is("1.0-SNAPSHOT"));
     }
 
     @Test

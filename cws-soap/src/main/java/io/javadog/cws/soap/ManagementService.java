@@ -65,7 +65,7 @@ public class ManagementService implements Management {
         VersionResponse response;
 
         try {
-            final Long startTime = java.lang.System.nanoTime();
+            final Long startTime = System.nanoTime();
             response = bean.version();
             log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), "version", startTime));
         } catch (RuntimeException e) {
@@ -90,7 +90,7 @@ public class ManagementService implements Management {
         SettingResponse response;
 
         try {
-            final Long startTime = java.lang.System.nanoTime();
+            final Long startTime = System.nanoTime();
             response = bean.settings(request);
             log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), "settings", startTime));
         } catch (RuntimeException e) {
@@ -115,7 +115,7 @@ public class ManagementService implements Management {
         SanityResponse response;
 
         try {
-            final Long startTime = java.lang.System.nanoTime();
+            final Long startTime = System.nanoTime();
             response = bean.sanity(request);
             log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), "sanitized", startTime));
         } catch (RuntimeException e) {
@@ -140,7 +140,7 @@ public class ManagementService implements Management {
         FetchMemberResponse response;
 
         try {
-            final Long startTime = java.lang.System.nanoTime();
+            final Long startTime = System.nanoTime();
             response = bean.fetchMembers(request);
             log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), "fetchMembers", startTime));
         } catch (RuntimeException e) {
@@ -165,7 +165,7 @@ public class ManagementService implements Management {
         ProcessMemberResponse response;
 
         try {
-            final Long startTime = java.lang.System.nanoTime();
+            final Long startTime = System.nanoTime();
             response = bean.processMember(request);
             log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), "processMember", startTime));
         } catch (RuntimeException e) {
@@ -190,7 +190,7 @@ public class ManagementService implements Management {
         FetchCircleResponse response;
 
         try {
-            final Long startTime = java.lang.System.nanoTime();
+            final Long startTime = System.nanoTime();
             response = bean.fetchCircles(request);
             log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), "fetchCircles", startTime));
         } catch (RuntimeException e) {
@@ -215,7 +215,7 @@ public class ManagementService implements Management {
         ProcessCircleResponse response;
 
         try {
-            final Long startTime = java.lang.System.nanoTime();
+            final Long startTime = System.nanoTime();
             response = bean.processCircle(request);
             log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), "processCircle", startTime));
         } catch (RuntimeException e) {
@@ -240,7 +240,7 @@ public class ManagementService implements Management {
         FetchTrusteeResponse response;
 
         try {
-            final Long startTime = java.lang.System.nanoTime();
+            final Long startTime = System.nanoTime();
             response = bean.fetchTrustees(request);
             log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), "fetchCircles", startTime));
         } catch (RuntimeException e) {
@@ -265,7 +265,7 @@ public class ManagementService implements Management {
         ProcessTrusteeResponse response;
 
         try {
-            final Long startTime = java.lang.System.nanoTime();
+            final Long startTime = System.nanoTime();
             response = bean.processTrustee(request);
             log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), "processCircle", startTime));
         } catch (RuntimeException e) {

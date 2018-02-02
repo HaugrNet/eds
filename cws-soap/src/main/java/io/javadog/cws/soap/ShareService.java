@@ -34,6 +34,7 @@ import javax.jws.WebResult;
 import javax.jws.WebService;
 import javax.jws.soap.SOAPBinding;
 import javax.xml.ws.BindingType;
+import javax.xml.ws.soap.MTOM;
 import java.util.logging.Logger;
 
 /**
@@ -41,7 +42,8 @@ import java.util.logging.Logger;
  * @since  CWS 1.0
  */
 @SOAPBinding
-@BindingType(javax.xml.ws.soap.SOAPBinding.SOAP11HTTP_BINDING)
+@MTOM(threshold = 4096)
+@BindingType(javax.xml.ws.soap.SOAPBinding.SOAP11HTTP_MTOM_BINDING)
 @WebService(name = "share", targetNamespace = "http://ws.cws.javadog.io/", serviceName = "share", portName = "share")
 public class ShareService implements Share {
 

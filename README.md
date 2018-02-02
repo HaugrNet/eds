@@ -97,8 +97,6 @@ GitHub. The original goal for releasing the final 1.0 was on December 31st,
 as of Java 8u161, released on [January 16th, 2018](http://www.oracle.com/technetwork/java/javase/8u152-relnotes-3850503.html)
 the release of CWS 0.9.9 is scheduled February 2nd, 2018.
 
-- 0.9.9 - Scheduled for February 2nd, 2018; Final 1.0 Release Candidate
-
 The final 1.0.0 release will be made as soon as Travis-CI and Circle-CI have
 upgraded their images to use the latest Java 8, so the default settings can be
 updated to the highest AES encryption key size.

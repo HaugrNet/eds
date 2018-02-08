@@ -79,12 +79,16 @@ public class SanitizerBean {
         SanityStatus status = SanityStatus.OK;
 
         try {
-            // We're reading out the Entity using a Pessimistic lock,
-            // as it can be that a separate process is also trying to
-            // perform this operation, so to prevent that two processes
-            // are working on the same Entity, we're using a lock which
-            // is added on the database level.
-            final DataEntity entity = entityManager.find(DataEntity.class, id, LockModeType.PESSIMISTIC_WRITE);
+            // When trying to run the updates, it would be good if it could be
+            // done using a Pessimistic locking, to prevent that other processes
+            // accidentally also perform the update, as the Pessimistic locking
+            // is made at te DB level, whereas the Optimistic locking is handled
+            // by the ORM Vendor. However, due to problems with the stability of
+            // the Travis-CI builds, the locking has been removed.
+            //   Even if two different CWS instances perform the same update on
+            // an Object, it should not have any other consequences than wasted
+            // CPU and DB updates.
+            final DataEntity entity = entityManager.find(DataEntity.class, id, LockModeType.NONE);
             final String checksum = crypto.generateChecksum(entity.getData());
 
             if (!Objects.equals(checksum, entity.getChecksum())) {

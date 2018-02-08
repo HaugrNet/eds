@@ -90,16 +90,17 @@ API and scales depending on the deployment - it can be used by anyone who finds
 it useful. 
 
 # Release Plan
-CWS Development has reached the final phase for version 1.0. With the following
-milestones still pending, for details, see milestones and related open issues in
-GitHub. The original goal for releasing the final 1.0 was on December 31st,
-2017. However, as the OpenJDK will [include unlimited strength cryptography](https://bugs.openjdk.java.net/browse/JDK-8170157)
-as of Java 8u161, released on [January 16th, 2018](http://www.oracle.com/technetwork/java/javase/8u152-relnotes-3850503.html)
-the release of CWS 0.9.9 is scheduled February 2nd, 2018.
+CWS is feature complete, version 0.9.9 has been released, and now it is just a
+question of time before [Circle-CI](https://circleci.com) &amp;
+[Travis-CI](https://travis-ci.org) upgrade their Build Images to use the latest
+Java 8. Once they have upgraded, the default settings will be changed to
+ensure that the default key size for the symmetric keys is set to the highest
+value possible.
 
-The final 1.0.0 release will be made as soon as Travis-CI and Circle-CI have
-upgraded their images to use the latest Java 8, so the default settings can be
-updated to the highest AES encryption key size.
+In the meantime, testing will continue to be improved, by adding a new external
+test suit using [FitNesse](http://fitnesse.org/), and also trying to perform
+Penetration Testing. Bugs and flaws will still be corrected, but no new features
+or changes will be made.
 
 # Software License
 The CWS is released under Apache License 2 or APL2.

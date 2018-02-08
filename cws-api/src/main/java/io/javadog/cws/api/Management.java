@@ -26,6 +26,9 @@ import io.javadog.cws.api.responses.SettingResponse;
 import io.javadog.cws.api.responses.VersionResponse;
 
 /**
+ * This interface contain the functionality needed to setup, configure and
+ * control a CWS instance.
+ *
  * @author Kim Jensen
  * @since  CWS 1.0
  */

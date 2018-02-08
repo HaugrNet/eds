@@ -23,6 +23,9 @@ import io.javadog.cws.api.responses.SignResponse;
 import io.javadog.cws.api.responses.VerifyResponse;
 
 /**
+ * This interface contain the functionality to deal with data, dataTypes as
+ * well as signing and verifying data.
+ *
  * @author Kim Jensen
  * @since  CWS 1.0
  */

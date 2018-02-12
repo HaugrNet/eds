@@ -48,10 +48,153 @@ public interface Management {
      * be altered once the system is started, as it may have fatal consequences
      * for running system.</p>
      *
-     * <p>Note, that the System Salt is only updateable as long as no Accounts
-     * have been added, after which - it is no longer allowed to update it. This
-     * is because the System Salt is used as part of the Passphrase to Key
-     * process in the Authentication logic.</p>
+     * <p>The following is the standard settings, and the values which they will
+     * expect. If the value is invalid or cannot be transferred into something
+     * which the CWS can understand, then no entries is being updated and the
+     * request will respond with a warning</p>
+     *
+     * <ul>
+     *   <li>
+     *     <b>cws.crypto.symmetric.algorithm</b> - default value: 'AES128'<br>
+     *     Allowed Values: 'AES128', 'AES192', 'AES256'<br>
+     *     <i> The Algorithm used for the Symmetric Keys in CWS. All data is
+     *     stored using this Algorithm. Although it can be changed, please test
+     *     the CWS carefully before doing so. And please be aware, that the
+     *     information here is only used for generating new Keys, so changing
+     *     things will not affect existing records.<br>
+     *       The default should be sufficient for most, if increased security is
+     *     wanted, please consider installing and using the unlimited strength
+     *     patch. It is worth noting, that as of January 2018 - all official
+     *     Java versions comes with the unlimited strength enabled per
+     *     default.<br>
+     *       Please see <a href="http://docs.oracle.com/javase/8/docs/technotes/guides/security/StandardNames.html">Standard Names</a>
+     *     &amp; <a href="http://docs.oracle.com/javase/8/docs/api/javax/crypto/Cipher.html">Cipher</a>
+     *     for more information.</i>
+     *   </li>
+     *   <li>
+     *     <b>cws.crypto.asymmetric.algorithm</b> - default value: 'RSA2048'<br>
+     *     Allowed Values: 'RSA2048', 'RSA4096', or 'RSA8192'<br>
+     *     <i> Asymmetric Encryption (Public &amp; Private Key), is used for
+     *     sharing the Symmetric Keys, not for encrypting any data.</i>
+     *   </li>
+     *   <li>
+     *     <b>cws.crypto.signature.algorithm</b> - default value: 'SHA512'<br>
+     *     Allowed Values: 'SHA256' or 'SHA512'<br>
+     *     <i>When new Members are added, the System Administrator can issue a
+     *     signature, which can be used by the Member when creating their new
+     *     Account. The signature is made with this Algorithm.</i>
+     *   </li>
+     *   <li>
+     *     <b>cws.crypto.pbe.algorithm</b> - default value: 'PBE128'<br>
+     *     Allowed Values: 'PBE128', 'PBE192', or 'PBE256'<br>
+     *     <i>If a Member is using something else than a Key to unlock their
+     *     Account, the CWS will use the following Password Based Encryption,
+     *     PBE, algorithm to do the trick. The provided information is extended
+     *     with an instance specific Salt, and a Member Account specific Salt to
+     *     ensure that enough entropy is available to create a strong enough Key
+     *     to unlock the Private Key for the Account.</i>
+     *   </li>
+     *   <li>
+     *     <b>cws.crypto.hash.algorithm</b> - default value: 'SHA512'<br>
+     *     Allowed Values: 'SHA256' or 'SHA512'<br>
+     *     <i>For the CheckSums or Fingerprints we're generating - we just need
+     *     a way to ensure that the value is both identifiable. For Signatures,
+     *     it is used as part of the lookup to find a Signature in the Database
+     *     and for stored Data Objects, it is a simple mechanism to ensure the
+     *     integrity of the stored data.</i>
+     *   </li>
+     *   <li>
+     *     <b>cws.system.salt</b> - default value: -<br>
+     *     Allowed Values: Anything, but it should be hard to guess.<br>
+     *     <i>This is the System specific Salt, which will be applied whenever
+     *     PBE is used to unlock the Private Key of a Member Account. This Salt
+     *     can only be altered as long as no account exist other than the System
+     *     Administrator account - this safety precaution has been added to
+     *     prevent that it is accidentally altered later. If so desired, an
+     *     Administrator with access to the DB can change it later - however,
+     *     this will render *all* accounts useless.</i>
+     *   </li>
+     *   <li>
+     *     <b>cws.system.locale</b> - default value: 'EN'<br>
+     *     Allowed Values: Any language abbreviation<br>
+     *     <i>For correctly dealing with Strings, it is important that the
+     *     Locale is set to ensure that it is done properly. By default the
+     *     Locale is English (EN), but if preferred, any other can be chosen. As
+     *     long as they follow the <a href="https://en.wikipedia.org/wiki/IETF_language_tag">IETF BCP 47</a>
+     *     allowed values.</i>
+     *   </li>
+     *   <li>
+     *     <b>cws.system.charset</b> - default value: 'UTF-8'<br>
+     *     Allowed Values: Any Character Set supported by Java<br>
+     *     <i>When applying armoring to the raw keys, it means using a Base64
+     *     encoding and decoding. However, they have to be saved using a
+     *     character set. Any character set can be used, but if keys have been
+     *     stored using one, changing it will cause problems as they may not be
+     *     read out safely again. So, please only change this if you are really
+     *     sure.</i>
+     *   </li>
+     *   <li>
+     *     <b>cws.expose.admin</b> - default value: 'false'<br>
+     *     Allowed Values: Boolean - 'true' or 'false'<br>
+     *     <i>The Administrator Account is a special Account in the CWS, it is
+     *     not permitted to be a member of any Circles, nor can it be used for
+     *     anything else than some system administrative tasks. Which is also
+     *     why it should not appear in the list of Members to be fetched or
+     *     assigned to Circles. However, rather than completely opting out on
+     *     this, it may be a good idea to expose it.<br>
+     *       Default value is 'false', meaning that the Administrator Account is
+     *       not visible unless explicitly changed to true.</i>
+     *   </li>
+     *   <li>
+     *     <b>cws.show.all.circles</b> - default value: 'true'<br>
+     *     Allowed Values: Boolean - 'true' or 'false'<br>
+     *     <i>Exposing all Circles, means that it is possible for a member,
+     *     other than the System Administrator, to be able to view Circles who
+     *     they are not having a Trustee relationship with - If the value is set
+     *     to true.<br>
+     *       If the value is set to false, then it is only possible to extract a
+     *     list of Circles with whom the Member is having a Trustee relationship
+     *     with.</i>
+     *   </li>
+     *   <li>
+     *     <b>cws.show.trustees</b> - default value: true<br>
+     *     Allowed Values: Boolean - 'true' or 'false'<br>
+     *     <i>Privacy is important, however - there may be reasons to reduce the
+     *     privacy level, and allow that a Member can view information about
+     *     other Members even if there is no direct relation between the two. If
+     *     two members share a Circle, then they will automatically be able to
+     *     view each other, but if not, then this setting apply. By default, it
+     *     is set to True - as CWS should be used by organizations or companies
+     *     where all members already share information.</i>
+     *   </li>
+     *   <li>
+     *     <b>cws.sanity.check.startup</b> - default value: 'true'<br>
+     *     Allowed Values: Boolean - 'true' or 'false'<br>
+     *     <i> Overtime, it can happen that the data is deteriorating. Meaning
+     *     that some of the bits can change and thus result in data which cannot
+     *     be recovered as the decryption will give a completely false Object
+     *     back. When data is stored, it is having a checksum of the encrypted
+     *     bytes, which is also read out when the data is requested. If the
+     *     checksum fails, then it is not possible to recover the original data
+     *     anymore.<br>
+     *       However, as most systems also use backups, it is possible to
+     *     recover the encrypted data from a backup, but the question is how far
+     *     back the backup has to go. To ensure that a backup is correct and
+     *     that there is no problems in the database, the sanity checks can be
+     *     enabled at startup, meaning that when CWS is started up, all
+     *     encrypted data is checked and verified. If a check fails - then the
+     *     field is marked with a failed Sanity check, and the date of the
+     *     check.</i>
+     *   </li>
+     *   <li>
+     *     <b>cws.sanity.check.interval.days</b> - default value: '180'<br>
+     *     Allowed Values: Any integer<br>
+     *     <i>Please see the comment for the 'cws.sanity.check.startup', for the
+     *     motivation and reason for the sanity check. This setting sets the
+     *     interval, at which the sanity checks should be made. By default, it
+     *     is set to 180 days but it can be altered if needed.</i>
+     *   </li>
+     * </ul>
      *
      * @param request Request Object
      * @return Response Object with ReturnCode and Message

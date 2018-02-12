@@ -34,7 +34,6 @@ create database cws with owner = cws_user;
 
 -- Now, we can fill the database with tables, views & data
 \ir 02-tables.sql
-\ir 03-data.sql
 -- -----------------------------------------------------------------------------
 
 

@@ -332,6 +332,12 @@ CREATE TABLE cws_datatypes (
   CONSTRAINT datatype_notnull_added         CHECK (added IS NOT NULL)
 );
 
+-- Default, we have 1 Object Type, which is the folder. The rest is left to
+-- the initial setup to create
+INSERT INTO cws_datatypes (datatype_name, datatype_value) VALUES
+    ('folder', 'Folder'),
+    ('data', 'Data Object');
+
 -- =============================================================================
 -- The main objective of CWS, is to store data securely. This table, contain the
 -- primary metadata for each Object stored, but not the data for the Object.

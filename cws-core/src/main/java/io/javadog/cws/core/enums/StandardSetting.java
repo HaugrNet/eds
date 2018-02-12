@@ -51,7 +51,7 @@ public enum StandardSetting {
         return value;
     }
 
-    public static boolean contains(final String key) {
+    public static StandardSetting find(final String key) {
         StandardSetting found = null;
 
         for (final StandardSetting setting : StandardSetting.values()) {
@@ -60,6 +60,6 @@ public enum StandardSetting {
             }
         }
 
-        return found != null;
+        return found;
     }
 }

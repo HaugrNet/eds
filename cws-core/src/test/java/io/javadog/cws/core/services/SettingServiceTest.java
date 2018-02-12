@@ -16,6 +16,7 @@ import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.requests.SettingRequest;
 import io.javadog.cws.api.responses.SettingResponse;
 import io.javadog.cws.core.DatabaseSetup;
+import io.javadog.cws.core.enums.KeyAlgorithm;
 import io.javadog.cws.core.enums.StandardSetting;
 import io.javadog.cws.core.exceptions.AuthorizationException;
 import io.javadog.cws.core.exceptions.CWSException;
@@ -206,19 +207,6 @@ public final class SettingServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testAddSettingWithNullValue() {
-        prepareCause(CWSException.class, ReturnCode.SETTING_WARNING, "Cannot add a setting without a value.");
-        final SettingService service = new SettingService(newSettings(), entityManager);
-        final SettingRequest request = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
-        final Map<String, String> mySettings = new HashMap<>();
-        mySettings.put("cws.test.setting", null);
-        request.setSettings(mySettings);
-        assertThat(request.validate().isEmpty(), is(true));
-
-        service.perform(request);
-    }
-
-    @Test
     public void testDeletingCustomSetting() {
         final SettingService service = new SettingService(newSettings(), entityManager);
         final SettingRequest request = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
@@ -241,7 +229,7 @@ public final class SettingServiceTest extends DatabaseSetup {
 
     @Test
     public void testDeletingStandardSetting() {
-        prepareCause(CWSException.class, ReturnCode.SETTING_WARNING, "It is not allowed to delete standard settings.");
+        prepareCause(CWSException.class, ReturnCode.SETTING_WARNING, "The value for the key 'cws.system.charset' is undefined.");
         final SettingService service = new SettingService(newSettings(), entityManager);
         final SettingRequest request = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
         final Map<String, String> mySettings = new HashMap<>();
@@ -250,5 +238,78 @@ public final class SettingServiceTest extends DatabaseSetup {
         assertThat(request.validate().isEmpty(), is(true));
 
         service.perform(request);
+    }
+
+    @Test
+    public void testSetCryptoAlgorithms() {
+        final SettingService service = new SettingService(newSettings(), entityManager);
+        final SettingRequest request1 = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
+        final SettingResponse response1 = service.perform(request1);
+        assertThat(response1.isOk(), is(true));
+
+        final Map<String, String> mySettings = response1.getSettings();
+        mySettings.put(StandardSetting.SYMMETRIC_ALGORITHM.getKey(), KeyAlgorithm.AES256.name());
+        mySettings.put(StandardSetting.ASYMMETRIC_ALGORITHM.getKey(), KeyAlgorithm.RSA8192.name());
+        mySettings.put(StandardSetting.SIGNATURE_ALGORITHM.getKey(), KeyAlgorithm.SHA256.name());
+        mySettings.put(StandardSetting.PBE_ALGORITHM.getKey(), KeyAlgorithm.PBE256.name());
+        mySettings.put(StandardSetting.HASH_ALGORITHM.getKey(), KeyAlgorithm.SHA256.name());
+
+        final SettingRequest request2 = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
+        request2.setSettings(mySettings);
+        final SettingResponse response2 = service.perform(request2);
+        assertThat(response2.isOk(), is(true));
+    }
+
+    @Test
+    public void testSetInvalidSymmetricAlgorithm() {
+        prepareCause(CWSException.class, ReturnCode.SETTING_WARNING, "Unsupported Crypto Algorithm for 'cws.crypto.symmetric.algorithm'.");
+        final SettingService service = new SettingService(newSettings(), entityManager);
+        final SettingRequest request1 = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
+        final SettingResponse response1 = service.perform(request1);
+        assertThat(response1.isOk(), is(true));
+
+        final Map<String, String> mySettings = response1.getSettings();
+        mySettings.put(StandardSetting.SYMMETRIC_ALGORITHM.getKey(), KeyAlgorithm.RSA8192.name());
+
+        final SettingRequest request2 = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
+        request2.setSettings(mySettings);
+        service.perform(request2);
+    }
+
+    @Test
+    public void testInvalidCharset() {
+        prepareCause(CWSException.class, ReturnCode.SETTING_WARNING, "Invalid Character set value for 'cws.system.charset'.");
+        final SettingService service = new SettingService(newSettings(), entityManager);
+        final SettingRequest request = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
+        final Map<String, String> newSettings = new HashMap<>();
+        newSettings.put(StandardSetting.CWS_CHARSET.getKey(), "UTF-9");
+        request.setSettings(newSettings);
+        assertThat(request.validate().isEmpty(), is(true));
+
+        service.perform(request);
+    }
+
+    @Test
+    public void testSanityInterval() {
+        prepareCause(CWSException.class, ReturnCode.SETTING_WARNING, "Invalid Integer value for 'SANITY_INTERVAL'.");
+        final SettingService service = new SettingService(newSettings(), entityManager);
+        final SettingRequest request1 = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
+        final SettingResponse response1 = service.perform(request1);
+        assertThat(response1.isOk(), is(true));
+
+        final Map<String, String> mySettings = response1.getSettings();
+        mySettings.put(StandardSetting.SANITY_INTERVAL.getKey(), "7");
+        mySettings.put(StandardSetting.SANITY_STARTUP.getKey(), "nope");
+
+        final SettingRequest request2 = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
+        request2.setSettings(mySettings);
+        final SettingResponse response2 = service.perform(request2);
+        assertThat(response2.isOk(), is(true));
+
+        mySettings.put(StandardSetting.SANITY_INTERVAL.getKey(), "weekly");
+        final SettingRequest request3 = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
+        request3.setSettings(mySettings);
+        service.perform(request3);
+        assertThat(response1.isOk(), is(true));
     }
 }

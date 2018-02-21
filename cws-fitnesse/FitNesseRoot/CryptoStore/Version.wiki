@@ -2,7 +2,7 @@
 Test
 ---
 !*> Setup
-!path cws-fitnesse.jar
+!path target/cws-fitnesse.jar
 !define TEST_SYSTEM {slim}
 
 |Import                 |

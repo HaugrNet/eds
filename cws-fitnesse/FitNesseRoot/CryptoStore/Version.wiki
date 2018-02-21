@@ -1,0 +1,17 @@
+---
+Test
+---
+!*> Setup
+!path cws-fitnesse.jar
+!define TEST_SYSTEM {slim}
+
+|Import                 |
+|io.javadog.cws.fitnesse|
+*!
+
+!2 '''!-CryptoStore-! Version Request'''
+The !-CryptoStore-! Version request is not requiring any credentials, or - well anything. It is a simple static ''is alive'' request.
+
+!|Version                                 |
+|return code?|return message?|cws version?|
+|SUCCESS     |Ok             |1.0-SNAPSHOT|

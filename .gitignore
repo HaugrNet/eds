@@ -12,3 +12,4 @@ cws.pid
 .idea
 *.iml
 target
+dependency-reduced-pom.xml

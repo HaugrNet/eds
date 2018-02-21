@@ -5,16 +5,15 @@
  * Project: CWS (cws-test)
  * =============================================================================
  */
-package io.javadog.cws.test.fixtures;
+package io.javadog.cws.test;
 
-import io.javadog.cws.api.responses.ProcessDataTypeResponse;
-import io.javadog.cws.test.utils.ReturnObject;
+import io.javadog.cws.api.responses.ProcessDataResponse;
 
 /**
  * @author Kim Jensen
  * @since  CWS 1.0
  */
-public final class ProcessDataType extends ReturnObject<ProcessDataTypeResponse> {
+public final class ProcessData extends CwsRequest<ProcessDataResponse> {
 
     // =========================================================================
     // Request & Response Setters and Getters

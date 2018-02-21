@@ -5,30 +5,25 @@
  * Project: CWS (cws-test)
  * =============================================================================
  */
-package io.javadog.cws.test.fixtures;
+package io.javadog.cws.test.callers;
 
-import io.javadog.cws.api.responses.SanityResponse;
-import io.javadog.cws.test.utils.ReturnObject;
+import io.javadog.cws.api.Management;
+import io.javadog.cws.api.responses.VersionResponse;
+import io.javadog.cws.client.ManagementSoapClient;
 
 /**
  * @author Kim Jensen
  * @since  CWS 1.0
  */
-public final class Sanitized extends ReturnObject<SanityResponse> {
+public final class CallManagement {
+
+    private static final Management MANAGEMENT = new ManagementSoapClient("http://localhost:8080/cws");
 
     // =========================================================================
-    // Request & Response Setters and Getters
+    // Management Interface Functionality
     // =========================================================================
 
-    // =========================================================================
-    // Standard FitNesse Fixture method(s)
-    // =========================================================================
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void execute() {
-
+    public static VersionResponse version() {
+        return MANAGEMENT.version();
     }
 }

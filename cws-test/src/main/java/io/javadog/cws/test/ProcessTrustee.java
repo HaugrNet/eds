@@ -7,23 +7,27 @@
  */
 package io.javadog.cws.test;
 
-import io.javadog.cws.api.Management;
-import io.javadog.cws.api.responses.VersionResponse;
-import io.javadog.cws.client.ManagementSoapClient;
+import io.javadog.cws.api.responses.ProcessTrusteeResponse;
 
 /**
  * @author Kim Jensen
  * @since  CWS 1.0
  */
-public final class CallManagement {
-
-    private static final Management MANAGEMENT = new ManagementSoapClient("http://localhost:8080/cws");
+public final class ProcessTrustee extends CwsRequest<ProcessTrusteeResponse> {
 
     // =========================================================================
-    // Management Interface Functionality
+    // Request & Response Setters and Getters
     // =========================================================================
 
-    public static VersionResponse version() {
-        return MANAGEMENT.version();
+    // =========================================================================
+    // Standard FitNesse Fixture method(s)
+    // =========================================================================
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void execute() {
+
     }
 }

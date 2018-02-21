@@ -5,15 +5,16 @@
  * Project: CWS (cws-test)
  * =============================================================================
  */
-package io.javadog.cws.test.utils;
+package io.javadog.cws.test;
 
 import io.javadog.cws.api.responses.CwsResponse;
+import io.javadog.cws.test.utils.Converter;
 
 /**
  * @author Kim Jensen
  * @since  CWS 1.0
  */
-public abstract class ReturnObject<R extends CwsResponse> {
+public abstract class CwsRequest<R extends CwsResponse> {
 
     protected String accountName = null;
     protected byte[] credential = null;
@@ -27,11 +28,11 @@ public abstract class ReturnObject<R extends CwsResponse> {
         this.credential = Converter.convertBytes(credential);
     }
 
-    public String getReturnCode() {
+    public String returnCode() {
         return response.getReturnCode().name();
     }
 
-    public String getReturnMessage() {
+    public String returnMessage() {
         return response.getReturnMessage();
     }
 

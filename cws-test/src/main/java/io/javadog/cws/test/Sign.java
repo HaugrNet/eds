@@ -5,22 +5,23 @@
  * Project: CWS (cws-test)
  * =============================================================================
  */
-package io.javadog.cws.test.fixtures;
+package io.javadog.cws.test;
 
-import io.javadog.cws.api.requests.VerifyRequest;
-import io.javadog.cws.api.responses.VerifyResponse;
-import io.javadog.cws.test.CallShare;
+import io.javadog.cws.api.requests.SignRequest;
+import io.javadog.cws.api.responses.SignResponse;
+import io.javadog.cws.test.callers.CallShare;
 import io.javadog.cws.test.utils.Converter;
-import io.javadog.cws.test.utils.ReturnObject;
+
+import java.util.Date;
 
 /**
  * @author Kim Jensen
  * @since  CWS 1.0
  */
-public final class Verify extends ReturnObject<VerifyResponse> {
+public final class Sign extends CwsRequest<SignResponse> {
 
     private byte[] data = null;
-    private String signature = null;
+    private Date expires = null;
 
     // =========================================================================
     // Request & Response Setters and Getters
@@ -30,12 +31,12 @@ public final class Verify extends ReturnObject<VerifyResponse> {
         this.data = Converter.convertBytes(data);
     }
 
-    public void setSignature(final String signature) {
-        this.signature = signature;
+    public void setExpires(final String expires) {
+        this.expires = Converter.convertDate(expires);
     }
 
-    public String verified() {
-        return response.isVerified() ? "true" : "false";
+    public String signature() {
+        return response.getSignature();
     }
 
     // =========================================================================
@@ -47,12 +48,12 @@ public final class Verify extends ReturnObject<VerifyResponse> {
      */
     @Override
     public void execute() {
-        final VerifyRequest request = new VerifyRequest();
+        final SignRequest request = new SignRequest();
         request.setAccountName(accountName);
         request.setCredential(credential);
         request.setData(data);
-        request.setSignature(signature);
+        request.setExpires(expires);
 
-        response = CallShare.verify(request);
+        response = CallShare.sign(request);
     }
 }

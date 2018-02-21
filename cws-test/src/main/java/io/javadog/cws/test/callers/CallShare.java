@@ -5,7 +5,7 @@
  * Project: CWS (cws-test)
  * =============================================================================
  */
-package io.javadog.cws.test;
+package io.javadog.cws.test.callers;
 
 import io.javadog.cws.api.Share;
 import io.javadog.cws.api.requests.SignRequest;

@@ -5,16 +5,15 @@
  * Project: CWS (cws-test)
  * =============================================================================
  */
-package io.javadog.cws.test.fixtures;
+package io.javadog.cws.test;
 
 import io.javadog.cws.api.responses.ProcessMemberResponse;
-import io.javadog.cws.test.utils.ReturnObject;
 
 /**
  * @author Kim Jensen
  * @since  CWS 1.0
  */
-public final class ProcessMember extends ReturnObject<ProcessMemberResponse> {
+public final class ProcessMember extends CwsRequest<ProcessMemberResponse> {
 
     // =========================================================================
     // Request & Response Setters and Getters

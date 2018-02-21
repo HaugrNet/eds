@@ -5,25 +5,19 @@
  * Project: CWS (cws-test)
  * =============================================================================
  */
-package io.javadog.cws.test.fixtures;
+package io.javadog.cws.test;
 
-import io.javadog.cws.api.responses.VersionResponse;
-import io.javadog.cws.test.CallManagement;
-import io.javadog.cws.test.utils.ReturnObject;
+import io.javadog.cws.api.responses.SettingResponse;
 
 /**
  * @author Kim Jensen
  * @since  CWS 1.0
  */
-public final class Version extends ReturnObject<VersionResponse> {
+public final class Settings extends CwsRequest<SettingResponse> {
 
     // =========================================================================
     // Request & Response Setters and Getters
     // =========================================================================
-
-    public String version() {
-        return response.getVersion();
-    }
 
     // =========================================================================
     // Standard FitNesse Fixture method(s)
@@ -34,6 +28,6 @@ public final class Version extends ReturnObject<VersionResponse> {
      */
     @Override
     public void execute() {
-        response = CallManagement.version();
+
     }
 }

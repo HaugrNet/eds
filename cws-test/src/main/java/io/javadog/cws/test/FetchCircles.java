@@ -5,16 +5,15 @@
  * Project: CWS (cws-test)
  * =============================================================================
  */
-package io.javadog.cws.test.fixtures;
+package io.javadog.cws.test;
 
-import io.javadog.cws.api.responses.FetchDataResponse;
-import io.javadog.cws.test.utils.ReturnObject;
+import io.javadog.cws.api.responses.FetchCircleResponse;
 
 /**
  * @author Kim Jensen
  * @since  CWS 1.0
  */
-public final class FetchData extends ReturnObject<FetchDataResponse> {
+public final class FetchCircles extends CwsRequest<FetchCircleResponse> {
 
     // =========================================================================
     // Request & Response Setters and Getters

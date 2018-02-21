@@ -5,16 +5,15 @@
  * Project: CWS (cws-test)
  * =============================================================================
  */
-package io.javadog.cws.test.fixtures;
+package io.javadog.cws.test;
 
-import io.javadog.cws.api.responses.FetchMemberResponse;
-import io.javadog.cws.test.utils.ReturnObject;
+import io.javadog.cws.api.responses.SanityResponse;
 
 /**
  * @author Kim Jensen
  * @since  CWS 1.0
  */
-public final class FetchMembers extends ReturnObject<FetchMemberResponse> {
+public final class Sanitized extends CwsRequest<SanityResponse> {
 
     // =========================================================================
     // Request & Response Setters and Getters

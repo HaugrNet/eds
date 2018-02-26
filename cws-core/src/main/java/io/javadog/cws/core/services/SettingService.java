@@ -75,29 +75,9 @@ public final class SettingService extends Serviceable<SettingResponse, SettingRe
         // return a new Map of keys & values for those that needs updating.
         final Map<String, String> changedEntries = findChangedEntries(request);
 
-        // Step three; All issues should've been covered, meaning that we can now
-        // safely update the settings in the DB & the Settings Object.
-        final Map<String, SettingEntity> existing = convertSettings(dao.findAllAscending(SettingEntity.class, "id"));
-        for (final Map.Entry<String, String> entry : changedEntries.entrySet()) {
-            final String key = trim(entry.getKey());
-
-            final String value = trim(entry.getValue());
-            final SettingEntity entity;
-
-            if (existing.containsKey(key) && isEmpty(value)) {
-                deleteSetting(existing.get(key));
-            } else if (existing.containsKey(key)) {
-                entity = existing.get(key);
-                if (Objects.equals(entity.getName(), StandardSetting.CWS_SALT.getKey())) {
-                    updateSaltOrThrowException(request, entity, key, value);
-                } else {
-                    persistAndUpdateSetting(entity, key, value);
-                }
-            } else {
-                entity = new SettingEntity();
-                persistAndUpdateSetting(entity, key, value);
-            }
-        }
+        // All issues should've been covered, meaning that we can now safely
+        // update the settings in the DB & the Settings Object.
+        processCheckedSettings(request, changedEntries);
 
         final SettingResponse response = new SettingResponse();
         response.setSettings(convert(settings));
@@ -122,6 +102,30 @@ public final class SettingService extends Serviceable<SettingResponse, SettingRe
         }
 
         return map;
+    }
+
+    private void processCheckedSettings(final SettingRequest request, final Map<String, String> changedEntries) {
+        final Map<String, SettingEntity> existing = convertSettings(dao.findAllAscending(SettingEntity.class, "id"));
+        for (final Map.Entry<String, String> entry : changedEntries.entrySet()) {
+            final String key = trim(entry.getKey());
+
+            final String value = trim(entry.getValue());
+            final SettingEntity entity;
+
+            if (existing.containsKey(key) && isEmpty(value)) {
+                deleteSetting(existing.get(key));
+            } else if (existing.containsKey(key)) {
+                entity = existing.get(key);
+                if (Objects.equals(entity.getName(), StandardSetting.CWS_SALT.getKey())) {
+                    updateSaltOrThrowException(request, entity, key, value);
+                } else {
+                    persistAndUpdateSetting(entity, key, value);
+                }
+            } else {
+                entity = new SettingEntity();
+                persistAndUpdateSetting(entity, key, value);
+            }
+        }
     }
 
     private void checkStandardSetting(final Map.Entry<String, String> entry) {
@@ -252,7 +256,7 @@ public final class SettingService extends Serviceable<SettingResponse, SettingRe
         return map;
     }
 
-    private static Map<String, String> convert(final Settings settings) {
+    public static Map<String, String> convert(final Settings settings) {
         final Map<String, String> map = new ConcurrentHashMap<>(16);
         for (final String key : settings.keys()) {
             map.put(key, settings.get(key));

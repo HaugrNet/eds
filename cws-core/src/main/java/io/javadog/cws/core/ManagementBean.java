@@ -7,6 +7,7 @@
  */
 package io.javadog.cws.core;
 
+import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.requests.FetchCircleRequest;
 import io.javadog.cws.api.requests.FetchMemberRequest;
 import io.javadog.cws.api.requests.FetchTrusteeRequest;
@@ -76,6 +77,14 @@ public class ManagementBean {
             // response.
             log.log(Settings.DEBUG, e.getMessage(), e);
             response = new SettingResponse(e.getReturnCode(), e.getMessage());
+
+            // For the case that we have a settings warning, the current
+            // settings should be returned, so it can be shown what they
+            // currently are - this way, an administrator will have to worry a
+            // little less about the putting the system into an unusable state.
+            if (e.getReturnCode() == ReturnCode.SETTING_WARNING) {
+                response.setSettings(SettingService.convert(settings));
+            }
         } finally {
             CommonBean.destroy(service);
         }

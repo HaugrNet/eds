@@ -26,7 +26,7 @@ import java.lang.reflect.InvocationTargetException;
 public final class SettingServiceTest extends BeanSetup {
 
     @Test
-    public void testVersion() {
+    public void testSettings() {
         final SettingService service = prepareService();
         final SettingRequest request = new SettingRequest();
 
@@ -35,7 +35,7 @@ public final class SettingServiceTest extends BeanSetup {
     }
 
     @Test
-    public void testFlawedVersion() {
+    public void testFlawedSettings() {
         final SettingService service = prepareFlawedService();
         final SettingRequest request = new SettingRequest();
 

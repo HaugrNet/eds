@@ -32,10 +32,12 @@ import io.javadog.cws.api.responses.ProcessTrusteeResponse;
 import io.javadog.cws.api.responses.SanityResponse;
 import io.javadog.cws.api.responses.SettingResponse;
 import io.javadog.cws.api.responses.VersionResponse;
+import io.javadog.cws.core.enums.StandardSetting;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -76,12 +78,35 @@ public final class ManagementServiceTest extends BeanSetup {
     }
 
     @Test
+    public void testSettingsAsMember() {
+        final ManagementService system = prepareSystemService();
+        final SettingRequest request = prepareRequest(SettingRequest.class, MEMBER_1);
+
+        final SettingResponse response = system.settings(request);
+        assertThat(response.getReturnCode(), is(ReturnCode.AUTHORIZATION_WARNING));
+        assertThat(response.getSettings().size(), is(0));
+    }
+
+    @Test
     public void testSettings() {
         final ManagementService system = prepareSystemService();
         final SettingRequest request = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
 
         final SettingResponse response = system.settings(request);
         assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
+    }
+
+    @Test
+    public void testUpdateSettingsWithInvalidData() {
+        final ManagementService system = prepareSystemService();
+        final SettingRequest request = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
+        final Map<String, String> map = request.getSettings();
+        map.put(StandardSetting.PBE_ALGORITHM.getKey(), "Hash Them");
+        request.setSettings(map);
+
+        final SettingResponse response = system.settings(request);
+        assertThat(response.getReturnCode(), is(ReturnCode.SETTING_WARNING));
+        assertThat(response.getSettings().size(), is(14));
     }
 
     @Test

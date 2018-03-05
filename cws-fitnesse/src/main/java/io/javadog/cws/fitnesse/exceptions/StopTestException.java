@@ -13,6 +13,10 @@ package io.javadog.cws.fitnesse.exceptions;
  */
 public final class StopTestException extends RuntimeException {
 
+    public StopTestException(final String message, final Throwable cause) {
+        super(message, cause);
+    }
+
     public StopTestException(final Throwable cause) {
         super(cause);
     }

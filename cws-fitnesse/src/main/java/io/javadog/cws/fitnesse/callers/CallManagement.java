@@ -8,6 +8,8 @@
 package io.javadog.cws.fitnesse.callers;
 
 import io.javadog.cws.api.Management;
+import io.javadog.cws.api.requests.SettingRequest;
+import io.javadog.cws.api.responses.SettingResponse;
 import io.javadog.cws.api.responses.VersionResponse;
 import io.javadog.cws.client.ManagementSoapClient;
 
@@ -25,5 +27,9 @@ public final class CallManagement {
 
     public static VersionResponse version() {
         return MANAGEMENT.version();
+    }
+
+    public static SettingResponse settings(final SettingRequest request) {
+        return MANAGEMENT.settings(request);
     }
 }

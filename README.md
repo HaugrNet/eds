@@ -102,6 +102,40 @@ test suit using [FitNesse](http://fitnesse.org/), and also trying to perform
 Penetration Testing. Bugs and flaws will still be corrected, but no new features
 or changes will be made.
 
+# Wish to join
+The overall quality of the software can only improve if more eyes look at it and
+help with implementing features and adding more tests. If you wish to join,
+please contact Kim Jensen (see below).
+
+### Code Quality
+Code quality if very important, which means that we aim at 200% test coverage,
+which may sound ridiulous. However, it is meant in the way that we aim at having
+both standard tests (JUnit) and external testing (FitNesse), where both suites
+are covering as much as possible. Of course, external testing cannot and should
+not cover the same bases as the standard tests.
+
+The tests written, have been written using JUnit only, i.e. no mocking. Mocking
+is unreliable in testing, as you simply test your mocks rather than your logic.
+For that reason, CWS is using faking for tests, meaning that the buildup of the
+expected result will demand a bit more work, but as the code is properly tested,
+it also has the added advantage of giving more reliable tests.
+
+The code is also checked against as mane analysis tools as possible. The final
+code must have 0 issues of any kind - before it is considered ready for
+submitting into the main repository.
+
+### Documentation
+Docummentation of code is also important, having silly comments is meaningless,
+but often it helps to add inline comments to explain intentions and reasoning
+for choices made. But, commenting out code is banned, if it is commented out, it
+is meaningless and should be removed.
+
+### Style Guide
+The style guide is simple, it is more or less the default from IntelliJ. Only
+important guideline is don't use tabs. mixing tabs and spaces means that the
+code looks unreadable, and the default indentation is made with spaces. All
+Classes have a default header, which must also be applied.
+
 # Software License
 The CWS is released under Apache License 2 or APL2.
 

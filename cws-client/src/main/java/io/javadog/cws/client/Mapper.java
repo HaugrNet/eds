@@ -75,7 +75,7 @@ public final class Mapper {
     }
 
     public static void fillResponse(final CwsResponse api, final CwsResult ws) {
-        api.setReturnCode(map(ws.getReturnCode()));
+        api.setReturnCode(ReturnCode.findReturnCode(ws.getReturnCode()));
         api.setReturnMessage(ws.getReturnMessage());
     }
 
@@ -89,10 +89,6 @@ public final class Mapper {
 
     public static io.javadog.cws.ws.Action map(final Action api) {
         return (api != null) ? io.javadog.cws.ws.Action.valueOf(api.name()) : null;
-    }
-
-    private static ReturnCode map(final io.javadog.cws.ws.ReturnCode ws) {
-        return (ws != null) ? ReturnCode.valueOf(ws.name()) : null;
     }
 
     private static TrustLevel map(final io.javadog.cws.ws.TrustLevel ws) {

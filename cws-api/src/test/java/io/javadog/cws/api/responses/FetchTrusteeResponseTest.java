@@ -30,7 +30,7 @@ public final class FetchTrusteeResponseTest {
         final FetchTrusteeResponse response = new FetchTrusteeResponse();
         response.setTrustees(trustees);
 
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
         assertThat(response.getReturnMessage(), is("Ok"));
         assertThat(response.isOk(), is(true));
         assertThat(response.getTrustees(), is(trustees));
@@ -41,7 +41,7 @@ public final class FetchTrusteeResponseTest {
         final String msg = "FetchCircle Request failed due to Verification Problems.";
         final FetchTrusteeResponse response = new FetchTrusteeResponse(ReturnCode.VERIFICATION_WARNING, msg);
 
-        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING));
+        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING.getCode()));
         assertThat(response.getReturnMessage(), is(msg));
         assertThat(response.isOk(), is(false));
         assertThat(response.getTrustees().isEmpty(), is(true));

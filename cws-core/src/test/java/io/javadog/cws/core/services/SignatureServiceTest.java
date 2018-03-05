@@ -47,18 +47,18 @@ public final class SignatureServiceTest extends DatabaseSetup {
         final SignRequest signRequest = prepareRequest(SignRequest.class, MEMBER_1);
         signRequest.setData(data);
         final SignResponse signResponse = signService.perform(signRequest);
-        assertThat(signResponse.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(signResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
 
         final VerifyRequest verifyRequest = prepareRequest(VerifyRequest.class, MEMBER_2);
         verifyRequest.setData(data);
         verifyRequest.setSignature(signResponse.getSignature());
         final VerifyResponse verifyResponse = verifyService.perform(verifyRequest);
-        assertThat(verifyResponse.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(verifyResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
         assertThat(verifyResponse.isVerified(), is(true));
 
         final FetchSignatureRequest fetchRequest = prepareRequest(FetchSignatureRequest.class, MEMBER_1);
         final FetchSignatureResponse fetchResponse = fetchService.perform(fetchRequest);
-        assertThat(fetchResponse.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(fetchResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
         assertThat(fetchResponse.getSignatures().size(), is(1));
         assertThat(fetchResponse.getSignatures().get(0).getVerifications(), is(1L));
     }
@@ -74,13 +74,13 @@ public final class SignatureServiceTest extends DatabaseSetup {
         // Let our new Signature expire in 5 minutes
         signRequest.setExpires(new Date(new Date().getTime() + 300000L));
         final SignResponse signResponse = signService.perform(signRequest);
-        assertThat(signResponse.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(signResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
 
         final VerifyRequest verifyRequest = prepareRequest(VerifyRequest.class, MEMBER_2);
         verifyRequest.setData(data);
         verifyRequest.setSignature(signResponse.getSignature());
         final VerifyResponse verifyResponse = verifyService.perform(verifyRequest);
-        assertThat(verifyResponse.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(verifyResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
         assertThat(verifyResponse.getReturnMessage(), is("Ok"));
         assertThat(verifyResponse.isVerified(), is(true));
     }
@@ -95,11 +95,11 @@ public final class SignatureServiceTest extends DatabaseSetup {
         // Let our new Signature expire in 5 minutes
         signRequest.setExpires(new Date(new Date().getTime() + 300000L));
         final SignResponse signResponse = signService.perform(signRequest);
-        assertThat(signResponse.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(signResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
 
         signRequest.setCredential(crypto.stringToBytes(MEMBER_1));
         final SignResponse duplicateResponse = signService.perform(signRequest);
-        assertThat(duplicateResponse.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(duplicateResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
         assertThat(duplicateResponse.getReturnMessage(), is("This document has already been signed."));
     }
 
@@ -113,13 +113,13 @@ public final class SignatureServiceTest extends DatabaseSetup {
         signRequest.setData(data);
         signRequest.setExpires(new Date());
         final SignResponse signResponse = signService.perform(signRequest);
-        assertThat(signResponse.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(signResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
 
         final VerifyRequest verifyRequest = prepareRequest(VerifyRequest.class, MEMBER_2);
         verifyRequest.setData(data);
         verifyRequest.setSignature(signResponse.getSignature());
         final VerifyResponse verifyResponse = verifyService.perform(verifyRequest);
-        assertThat(verifyResponse.getReturnCode(), is(ReturnCode.SIGNATURE_WARNING));
+        assertThat(verifyResponse.getReturnCode(), is(ReturnCode.SIGNATURE_WARNING.getCode()));
         assertThat(verifyResponse.getReturnMessage(), is("The Signature has expired."));
         assertThat(verifyResponse.isVerified(), is(false));
     }
@@ -133,14 +133,14 @@ public final class SignatureServiceTest extends DatabaseSetup {
         final SignRequest signRequest = prepareRequest(SignRequest.class, MEMBER_1);
         signRequest.setData(data);
         final SignResponse signResponse = signService.perform(signRequest);
-        assertThat(signResponse.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(signResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
 
         final VerifyRequest verifyRequest = prepareRequest(VerifyRequest.class, MEMBER_2);
         final byte[] wrongData = generateData(524288);
         verifyRequest.setData(wrongData);
         verifyRequest.setSignature(signResponse.getSignature());
         final VerifyResponse verifyResponse = verifyService.perform(verifyRequest);
-        assertThat(verifyResponse.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(verifyResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
         assertThat(verifyResponse.isVerified(), is(false));
     }
 
@@ -154,7 +154,7 @@ public final class SignatureServiceTest extends DatabaseSetup {
         request.setSignature(signature);
 
         final VerifyResponse response = verifyService.perform(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.IDENTIFICATION_WARNING));
+        assertThat(response.getReturnCode(), is(ReturnCode.IDENTIFICATION_WARNING.getCode()));
         assertThat(response.getReturnMessage(), is("It was not possible to find the Signature."));
         assertThat(response.isVerified(), is(false));
     }

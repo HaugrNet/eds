@@ -31,7 +31,7 @@ public final class FetchSignatureResponseTest {
         final FetchSignatureResponse response = new FetchSignatureResponse();
         response.setSignatures(signatures);
 
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
         assertThat(response.getReturnMessage(), is("Ok"));
         assertThat(response.isOk(), is(true));
         assertThat(response.getSignatures(), is(signatures));
@@ -42,7 +42,7 @@ public final class FetchSignatureResponseTest {
         final String msg = "FetchSignature Request failed due to Verification Problems.";
         final FetchSignatureResponse response = new FetchSignatureResponse(ReturnCode.VERIFICATION_WARNING, msg);
 
-        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING));
+        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING.getCode()));
         assertThat(response.getReturnMessage(), is(msg));
         assertThat(response.isOk(), is(false));
         assertThat(response.getSignatures().isEmpty(), is(true));

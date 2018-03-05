@@ -46,7 +46,7 @@ public class ShareServiceTest extends BeanSetup {
         request.setType("Test Type Value");
 
         final ProcessDataTypeResponse response = service.processDataType(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
         assertThat(response.getReturnMessage(), is("Ok"));
         assertThat(response.getDataType(), is(not(nullValue())));
         assertThat(response.getDataType().getTypeName(), is("TestType"));
@@ -59,7 +59,7 @@ public class ShareServiceTest extends BeanSetup {
         final ProcessDataTypeRequest request = null;
 
         final ProcessDataTypeResponse response = service.processDataType(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING));
+        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING.getCode()));
     }
 
     @Test
@@ -68,7 +68,7 @@ public class ShareServiceTest extends BeanSetup {
         final ProcessDataTypeRequest request = new ProcessDataTypeRequest();
 
         final ProcessDataTypeResponse response = service.processDataType(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING));
+        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING.getCode()));
     }
 
     @Test
@@ -77,7 +77,7 @@ public class ShareServiceTest extends BeanSetup {
         final ProcessDataTypeRequest request = new ProcessDataTypeRequest();
 
         final ProcessDataTypeResponse response = service.processDataType(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.ERROR));
+        assertThat(response.getReturnCode(), is(ReturnCode.ERROR.getCode()));
     }
 
     @Test
@@ -86,7 +86,7 @@ public class ShareServiceTest extends BeanSetup {
         final FetchDataTypeRequest request = prepareRequest(FetchDataTypeRequest.class, MEMBER_1);
 
         final FetchDataTypeResponse response = service.fetchDataTypes(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
         assertThat(response.getReturnMessage(), is("Ok"));
         assertThat(response.getDataTypes().size(), is(2));
         assertThat(response.getDataTypes().get(0).getTypeName(), is("data"));
@@ -101,7 +101,7 @@ public class ShareServiceTest extends BeanSetup {
         final FetchDataTypeRequest request = null;
 
         final FetchDataTypeResponse response = service.fetchDataTypes(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING));
+        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING.getCode()));
     }
 
     @Test
@@ -110,7 +110,7 @@ public class ShareServiceTest extends BeanSetup {
         final FetchDataTypeRequest request = new FetchDataTypeRequest();
 
         final FetchDataTypeResponse response = service.fetchDataTypes(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING));
+        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING.getCode()));
     }
 
     @Test
@@ -119,7 +119,7 @@ public class ShareServiceTest extends BeanSetup {
         final FetchDataTypeRequest request = new FetchDataTypeRequest();
 
         final FetchDataTypeResponse response = service.fetchDataTypes(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.ERROR));
+        assertThat(response.getReturnCode(), is(ReturnCode.ERROR.getCode()));
     }
 
     @Test
@@ -133,7 +133,7 @@ public class ShareServiceTest extends BeanSetup {
         request.setTypeName("data");
 
         final ProcessDataResponse response = service.processData(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
         assertThat(response.getReturnMessage(), is("Ok"));
         assertThat(response.getDataId(), is(not(nullValue())));
     }
@@ -144,7 +144,7 @@ public class ShareServiceTest extends BeanSetup {
         final ProcessDataRequest request = null;
 
         final ProcessDataResponse response = service.processData(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING));
+        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING.getCode()));
     }
 
     @Test
@@ -153,7 +153,7 @@ public class ShareServiceTest extends BeanSetup {
         final ProcessDataRequest request = new ProcessDataRequest();
 
         final ProcessDataResponse response = service.processData(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING));
+        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING.getCode()));
     }
 
     @Test
@@ -162,7 +162,7 @@ public class ShareServiceTest extends BeanSetup {
         final ProcessDataRequest request = new ProcessDataRequest();
 
         final ProcessDataResponse response = service.processData(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.ERROR));
+        assertThat(response.getReturnCode(), is(ReturnCode.ERROR.getCode()));
     }
 
     @Test
@@ -172,7 +172,7 @@ public class ShareServiceTest extends BeanSetup {
         request.setCircleId(CIRCLE_1_ID);
 
         final FetchDataResponse response = service.fetchData(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
         assertThat(response.getReturnMessage(), is("Ok"));
         assertThat(response.getMetadata().isEmpty(), is(true));
     }
@@ -183,7 +183,7 @@ public class ShareServiceTest extends BeanSetup {
         final FetchDataRequest request = null;
 
         final FetchDataResponse response = service.fetchData(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING));
+        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING.getCode()));
     }
 
     @Test
@@ -192,7 +192,7 @@ public class ShareServiceTest extends BeanSetup {
         final FetchDataRequest request = new FetchDataRequest();
 
         final FetchDataResponse response = service.fetchData(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING));
+        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING.getCode()));
     }
 
     @Test
@@ -201,7 +201,7 @@ public class ShareServiceTest extends BeanSetup {
         final FetchDataRequest request = new FetchDataRequest();
 
         final FetchDataResponse response = service.fetchData(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.ERROR));
+        assertThat(response.getReturnCode(), is(ReturnCode.ERROR.getCode()));
     }
 
     @Test
@@ -211,13 +211,13 @@ public class ShareServiceTest extends BeanSetup {
         final byte[] data = "alfa".getBytes(settings.getCharset());
         signRequest.setData(data);
         final SignResponse signResponse = service.sign(signRequest);
-        assertThat(signResponse.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(signResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
 
         final VerifyRequest verifyRequest = prepareRequest(VerifyRequest.class, MEMBER_2);
         verifyRequest.setData(data);
         verifyRequest.setSignature(signResponse.getSignature());
         final VerifyResponse verifyResponse = service.verify(verifyRequest);
-        assertThat(verifyResponse.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(verifyResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
     }
 
     @Test
@@ -226,7 +226,7 @@ public class ShareServiceTest extends BeanSetup {
         final SignRequest request = null;
 
         final SignResponse response = service.sign(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING));
+        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING.getCode()));
     }
 
     @Test
@@ -235,7 +235,7 @@ public class ShareServiceTest extends BeanSetup {
         final SignRequest request = new SignRequest();
 
         final SignResponse response = service.sign(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING));
+        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING.getCode()));
     }
 
     @Test
@@ -244,7 +244,7 @@ public class ShareServiceTest extends BeanSetup {
         final SignRequest request = new SignRequest();
 
         final SignResponse response = service.sign(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.ERROR));
+        assertThat(response.getReturnCode(), is(ReturnCode.ERROR.getCode()));
     }
 
     @Test
@@ -253,7 +253,7 @@ public class ShareServiceTest extends BeanSetup {
         final VerifyRequest request = null;
 
         final VerifyResponse response = service.verify(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING));
+        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING.getCode()));
     }
 
     @Test
@@ -262,7 +262,7 @@ public class ShareServiceTest extends BeanSetup {
         final VerifyRequest request = new VerifyRequest();
 
         final VerifyResponse response = service.verify(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING));
+        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING.getCode()));
     }
 
     @Test
@@ -271,7 +271,7 @@ public class ShareServiceTest extends BeanSetup {
         final VerifyRequest request = new VerifyRequest();
 
         final VerifyResponse response = service.verify(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.ERROR));
+        assertThat(response.getReturnCode(), is(ReturnCode.ERROR.getCode()));
     }
 
     @Test
@@ -280,7 +280,7 @@ public class ShareServiceTest extends BeanSetup {
         final FetchSignatureRequest request = prepareRequest(FetchSignatureRequest.class, MEMBER_1);
 
         final FetchSignatureResponse response = service.fetchSignatures(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
         assertThat(response.getReturnMessage(), is("Ok"));
         assertThat(response.getSignatures().isEmpty(), is(true));
     }
@@ -291,7 +291,7 @@ public class ShareServiceTest extends BeanSetup {
         final FetchSignatureRequest request = null;
 
         final FetchSignatureResponse response = service.fetchSignatures(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING));
+        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING.getCode()));
     }
 
     @Test
@@ -300,7 +300,7 @@ public class ShareServiceTest extends BeanSetup {
         final FetchSignatureRequest request = new FetchSignatureRequest();
 
         final FetchSignatureResponse response = service.fetchSignatures(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING));
+        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING.getCode()));
     }
 
     @Test
@@ -309,6 +309,6 @@ public class ShareServiceTest extends BeanSetup {
         final FetchSignatureRequest request = new FetchSignatureRequest();
 
         final FetchSignatureResponse response = service.fetchSignatures(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.ERROR));
+        assertThat(response.getReturnCode(), is(ReturnCode.ERROR.getCode()));
     }
 }

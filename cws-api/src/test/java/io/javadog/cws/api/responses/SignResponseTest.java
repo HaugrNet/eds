@@ -27,7 +27,7 @@ public final class SignResponseTest {
         final SignResponse response = new SignResponse();
         response.setSignature(signature);
 
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
         assertThat(response.getReturnMessage(), is("Ok"));
         assertThat(response.isOk(), is(true));
         assertThat(response.getSignature(), is(signature));
@@ -38,7 +38,7 @@ public final class SignResponseTest {
         final String msg = "Sign Request failed due to Verification Problems.";
         final SignResponse response = new SignResponse(ReturnCode.VERIFICATION_WARNING, msg);
 
-        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING));
+        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING.getCode()));
         assertThat(response.getReturnMessage(), is(msg));
         assertThat(response.isOk(), is(false));
         assertThat(response.getSignature(), is(nullValue()));

@@ -40,7 +40,7 @@ public final class RestClientTest {
     @Test
     public void testVersion() {
         final VersionResponse response = system.version();
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getHttpCode()));
         assertThat(response.getReturnMessage(), is("Ok"));
         assertThat(response.getVersion(), is("1.0-SNAPSHOT"));
     }
@@ -50,8 +50,8 @@ public final class RestClientTest {
         final SettingRequest request = Base.prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
 
         final SettingResponse response = system.settings(request);
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getHttpCode()));
         assertThat(response.getReturnMessage(), is("Ok"));
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
     }
 
     @Test

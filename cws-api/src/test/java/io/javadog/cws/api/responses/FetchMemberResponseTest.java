@@ -35,7 +35,7 @@ public final class FetchMemberResponseTest {
         response.setCircles(circles);
         response.setMembers(members);
 
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
         assertThat(response.getReturnMessage(), is("Ok"));
         assertThat(response.isOk(), is(true));
         assertThat(response.getMembers(), is(members));
@@ -47,7 +47,7 @@ public final class FetchMemberResponseTest {
         final String msg = "FetchMember Request failed due to Verification Problems.";
         final FetchMemberResponse response = new FetchMemberResponse(ReturnCode.VERIFICATION_WARNING, msg);
 
-        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING));
+        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING.getCode()));
         assertThat(response.getReturnMessage(), is(msg));
         assertThat(response.isOk(), is(false));
         assertThat(response.getMembers().isEmpty(), is(true));

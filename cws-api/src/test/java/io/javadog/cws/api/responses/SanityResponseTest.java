@@ -30,7 +30,7 @@ public final class SanityResponseTest {
         final SanityResponse response = new SanityResponse();
         response.setSanities(sanities);
 
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
         assertThat(response.getReturnMessage(), is("Ok"));
         assertThat(response.isOk(), is(true));
         assertThat(response.getSanities(), is(sanities));
@@ -41,7 +41,7 @@ public final class SanityResponseTest {
         final String msg = "FetchCircle Request failed due to Verification Problems.";
         final SanityResponse response = new SanityResponse(ReturnCode.VERIFICATION_WARNING, msg);
 
-        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING));
+        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING.getCode()));
         assertThat(response.getReturnMessage(), is(msg));
         assertThat(response.isOk(), is(false));
         assertThat(response.getSanities().isEmpty(), is(true));

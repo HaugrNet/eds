@@ -33,8 +33,8 @@ public abstract class CwsRequest<R extends CwsResponse> {
         this.credential = Converter.convertBytes(credential);
     }
 
-    public String returnCode() {
-        return response.getReturnCode().name();
+    public int returnCode() {
+        return response.getReturnCode();
     }
 
     public String returnMessage() {

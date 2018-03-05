@@ -123,7 +123,7 @@
 
   <xs:complexType name="cwsResult">
     <xs:sequence>
-      <xs:element name="returnCode" type="tns:returnCode"/>
+      <xs:element name="returnCode" type="xs:int"/>
       <xs:element name="returnMessage" type="xs:string"/>
     </xs:sequence>
   </xs:complexType>
@@ -371,36 +371,6 @@
     <xs:restriction base="xs:string">
       <xs:enumeration value="PASSPHRASE"/>
       <xs:enumeration value="SIGNATURE"/>
-    </xs:restriction>
-  </xs:simpleType>
-
-  <xs:simpleType name="returnCode">
-    <xs:restriction base="xs:string">
-      <xs:enumeration value="SUCCESS"/>
-      <xs:enumeration value="WARNING"/>
-      <xs:enumeration value="AUTHORIZATION_WARNING"/>
-      <xs:enumeration value="AUTHENTICATION_WARNING"/>
-      <xs:enumeration value="IDENTIFICATION_WARNING"/>
-      <xs:enumeration value="ILLEGAL_ACTION"/>
-      <xs:enumeration value="VERIFICATION_WARNING"/>
-      <xs:enumeration value="INTEGRITY_WARNING"/>
-      <xs:enumeration value="SIGNATURE_WARNING"/>
-      <xs:enumeration value="SETTING_WARNING"/>
-      <xs:enumeration value="ERROR"/>
-      <xs:enumeration value="CRYPTO_ERROR"/>
-      <xs:enumeration value="INTEGRITY_ERROR"/>
-      <xs:enumeration value="SETTING_ERROR"/>
-      <xs:enumeration value="IDENTIFICATION_ERROR"/>
-      <xs:enumeration value="DATABASE_ERROR"/>
-      <xs:enumeration value="CONSTRAINT_ERROR"/>
-    </xs:restriction>
-  </xs:simpleType>
-
-  <xs:simpleType name="classification">
-    <xs:restriction base="xs:string">
-      <xs:enumeration value="CLASS_INFO"/>
-      <xs:enumeration value="CLASS_WARNING"/>
-      <xs:enumeration value="CLASS_ERROR"/>
     </xs:restriction>
   </xs:simpleType>
 

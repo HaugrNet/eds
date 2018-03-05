@@ -4,6 +4,7 @@ Test
 !*> Setup
 !path target/cws-fitnesse.jar
 !define TEST_SYSTEM {slim}
+!define SUCCESS {200}
 
 |Import                 |
 |io.javadog.cws.fitnesse|
@@ -14,4 +15,4 @@ The !-CryptoStore-! Version request is not requiring any credentials, or - well 
 
 !|Version                                 |
 |return code?|return message?|cws version?|
-|SUCCESS     |Ok             |1.0-SNAPSHOT|
+|${SUCCESS}  |Ok             |1.0-SNAPSHOT|

@@ -29,7 +29,7 @@ public class ProcessCircleResponseTest {
         final ProcessCircleResponse response = new ProcessCircleResponse();
         response.setCircleId(circleId);
 
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
         assertThat(response.getReturnMessage(), is("Ok"));
         assertThat(response.isOk(), is(true));
         assertThat(response.getCircleId(), is(circleId));
@@ -40,7 +40,7 @@ public class ProcessCircleResponseTest {
         final String msg = "ProcessCircle Request failed due to Verification Problems.";
         final ProcessCircleResponse response = new ProcessCircleResponse(ReturnCode.VERIFICATION_WARNING, msg);
 
-        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING));
+        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING.getCode()));
         assertThat(response.getReturnMessage(), is(msg));
         assertThat(response.isOk(), is(false));
         assertThat(response.getCircleId(), is(nullValue()));

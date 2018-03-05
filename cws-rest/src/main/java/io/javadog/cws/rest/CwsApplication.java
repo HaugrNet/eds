@@ -7,6 +7,7 @@
  */
 package io.javadog.cws.rest;
 
+import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.responses.CwsResponse;
 
 import javax.ws.rs.ApplicationPath;
@@ -48,7 +49,7 @@ public class CwsApplication extends Application {
 
     public static Response buildResponse(final CwsResponse cwsResponse) {
         return Response
-                .status(cwsResponse.getReturnCode().getHttpCode())
+                .status(ReturnCode.findReturnCode(cwsResponse.getReturnCode()).getHttpCode())
                 .type(PRODUCES)
                 .entity(cwsResponse)
                 .build();

@@ -7,6 +7,9 @@
  */
 package io.javadog.cws.api.common;
 
+import static io.javadog.cws.api.common.ReturnCode.Classification.CLASS_ERROR;
+import static io.javadog.cws.api.common.ReturnCode.Classification.CLASS_INFO;
+import static io.javadog.cws.api.common.ReturnCode.Classification.CLASS_WARNING;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
@@ -27,96 +30,41 @@ import org.junit.Test;
 public class ReturnCodeTest {
 
     @Test
-    public void testSuccess() {
-        assertThat(ReturnCode.SUCCESS.getCode(), is(200));
-        assertThat(ReturnCode.SUCCESS.getHttpCode(), is(200));
-        assertThat(ReturnCode.SUCCESS.getDescription(), is("Request completed normally."));
-        assertThat(ReturnCode.SUCCESS.getClassification(), is(ReturnCode.Classification.CLASS_INFO));
+    public void testReturnCodes() {
+        // Success
+        runAssertions(ReturnCode.SUCCESS, 200, 200, CLASS_INFO, "Request completed normally.");
+
+        // Warnings
+        runAssertions(ReturnCode.WARNING, 400, 400, CLASS_WARNING, "General Warning occurred while handling the request.");
+        runAssertions(ReturnCode.AUTHORIZATION_WARNING, 401, 401, CLASS_WARNING, "The Account is not permitted to perform requested Action.");
+        runAssertions(ReturnCode.AUTHENTICATION_WARNING, 403, 403, CLASS_WARNING, "Authentication of the Account failed.");
+        runAssertions(ReturnCode.IDENTIFICATION_WARNING, 404, 404, CLASS_WARNING, "Not possible to positively identify the requested Data.");
+        runAssertions(ReturnCode.ILLEGAL_ACTION, 405, 405, CLASS_WARNING, "The Account tried to invoke an Action not allowed.");
+        runAssertions(ReturnCode.VERIFICATION_WARNING, 406, 406, CLASS_WARNING, "The provided Request information is insufficient or invalid.");
+        runAssertions(ReturnCode.INTEGRITY_WARNING, 409, 409, CLASS_WARNING, "Not possible to perform the given action, as it will lead to data integrity problems.");
+        runAssertions(ReturnCode.INTEGRITY_WARNING, 409, 409, CLASS_WARNING, "Not possible to perform the given action, as it will lead to data integrity problems.");
+        runAssertions(ReturnCode.SIGNATURE_WARNING, 491, 400, CLASS_WARNING, "There Signature is not usable.");
+        runAssertions(ReturnCode.SETTING_WARNING, 492, 400, CLASS_WARNING, "Not permitted to add, alter or delete the given Setting.");
+
+        // Errors
+        runAssertions(ReturnCode.ERROR, 500, 500, CLASS_ERROR, "General Error occurred while handling the request.");
+        runAssertions(ReturnCode.CRYPTO_ERROR, 591, 500, CLASS_ERROR, "Cryptographic Error occurred during the handling of the request.");
+        runAssertions(ReturnCode.INTEGRITY_ERROR, 592, 500, CLASS_ERROR, "The Encrypted Data is having integrity problems.");
+        runAssertions(ReturnCode.SETTING_ERROR, 593, 500, CLASS_ERROR, "Error extracting settings value.");
+        runAssertions(ReturnCode.IDENTIFICATION_ERROR, 594, 500, CLASS_ERROR, "Not possible to positively identify the Requested Data.");
+        runAssertions(ReturnCode.DATABASE_ERROR, 595, 500, CLASS_ERROR, "Database Error occurred during the handling of the request.");
+        runAssertions(ReturnCode.CONSTRAINT_ERROR, 596, 500, CLASS_ERROR, "Unique Constraint Violation in the Database.");
+
+        // Checking that findReturnCode of a non-existing returnCode value will
+        // result in a general error.
+        assertThat(ReturnCode.findReturnCode(1), is(ReturnCode.ERROR));
     }
 
-    @Test
-    public void testWarning() {
-        assertThat(ReturnCode.WARNING.getCode(), is(400));
-        assertThat(ReturnCode.WARNING.getHttpCode(), is(400));
-        assertThat(ReturnCode.WARNING.getDescription(), is("General Warning occurred while handling the request."));
-        assertThat(ReturnCode.WARNING.getClassification(), is(ReturnCode.Classification.CLASS_WARNING));
-
-        assertThat(ReturnCode.AUTHORIZATION_WARNING.getCode(), is(401));
-        assertThat(ReturnCode.AUTHORIZATION_WARNING.getHttpCode(), is(401));
-        assertThat(ReturnCode.AUTHORIZATION_WARNING.getDescription(), is("The Account is not permitted to perform requested Action."));
-        assertThat(ReturnCode.AUTHORIZATION_WARNING.getClassification(), is(ReturnCode.Classification.CLASS_WARNING));
-
-        assertThat(ReturnCode.AUTHENTICATION_WARNING.getCode(), is(403));
-        assertThat(ReturnCode.AUTHENTICATION_WARNING.getHttpCode(), is(403));
-        assertThat(ReturnCode.AUTHENTICATION_WARNING.getDescription(), is("Authentication of the Account failed."));
-        assertThat(ReturnCode.AUTHENTICATION_WARNING.getClassification(), is(ReturnCode.Classification.CLASS_WARNING));
-
-        assertThat(ReturnCode.IDENTIFICATION_WARNING.getCode(), is(404));
-        assertThat(ReturnCode.IDENTIFICATION_WARNING.getHttpCode(), is(404));
-        assertThat(ReturnCode.IDENTIFICATION_WARNING.getDescription(), is("Not possible to positively identify the requested Data."));
-        assertThat(ReturnCode.IDENTIFICATION_WARNING.getClassification(), is(ReturnCode.Classification.CLASS_WARNING));
-
-        assertThat(ReturnCode.ILLEGAL_ACTION.getCode(), is(405));
-        assertThat(ReturnCode.ILLEGAL_ACTION.getHttpCode(), is(405));
-        assertThat(ReturnCode.ILLEGAL_ACTION.getDescription(), is("The Account tried to invoke an Action not allowed."));
-        assertThat(ReturnCode.ILLEGAL_ACTION.getClassification(), is(ReturnCode.Classification.CLASS_WARNING));
-
-        assertThat(ReturnCode.VERIFICATION_WARNING.getCode(), is(406));
-        assertThat(ReturnCode.VERIFICATION_WARNING.getHttpCode(), is(406));
-        assertThat(ReturnCode.VERIFICATION_WARNING.getDescription(), is("The provided Request information is insufficient or invalid."));
-        assertThat(ReturnCode.VERIFICATION_WARNING.getClassification(), is(ReturnCode.Classification.CLASS_WARNING));
-
-        assertThat(ReturnCode.INTEGRITY_WARNING.getCode(), is(409));
-        assertThat(ReturnCode.INTEGRITY_WARNING.getHttpCode(), is(409));
-        assertThat(ReturnCode.INTEGRITY_WARNING.getDescription(), is("Not possible to perform the given action, as it will lead to data integrity problems."));
-        assertThat(ReturnCode.INTEGRITY_WARNING.getClassification(), is(ReturnCode.Classification.CLASS_WARNING));
-
-        assertThat(ReturnCode.SIGNATURE_WARNING.getCode(), is(491));
-        assertThat(ReturnCode.SIGNATURE_WARNING.getHttpCode(), is(400));
-        assertThat(ReturnCode.SIGNATURE_WARNING.getDescription(), is("There Signature is not usable."));
-        assertThat(ReturnCode.SIGNATURE_WARNING.getClassification(), is(ReturnCode.Classification.CLASS_WARNING));
-
-        assertThat(ReturnCode.SETTING_WARNING.getCode(), is(492));
-        assertThat(ReturnCode.SETTING_WARNING.getHttpCode(), is(400));
-        assertThat(ReturnCode.SETTING_WARNING.getDescription(), is("Not permitted to add, alter or delete the given Setting."));
-        assertThat(ReturnCode.SETTING_WARNING.getClassification(), is(ReturnCode.Classification.CLASS_WARNING));
-    }
-
-    @Test
-    public void testError() {
-        assertThat(ReturnCode.ERROR.getCode(), is(500));
-        assertThat(ReturnCode.ERROR.getHttpCode(), is(500));
-        assertThat(ReturnCode.ERROR.getDescription(), is("General Error occurred while handling the request."));
-        assertThat(ReturnCode.ERROR.getClassification(), is(ReturnCode.Classification.CLASS_ERROR));
-
-        assertThat(ReturnCode.CRYPTO_ERROR.getCode(), is(591));
-        assertThat(ReturnCode.CRYPTO_ERROR.getHttpCode(), is(500));
-        assertThat(ReturnCode.CRYPTO_ERROR.getDescription(), is("Cryptographic Error occurred during the handling of the request."));
-        assertThat(ReturnCode.CRYPTO_ERROR.getClassification(), is(ReturnCode.Classification.CLASS_ERROR));
-
-        assertThat(ReturnCode.INTEGRITY_ERROR.getCode(), is(592));
-        assertThat(ReturnCode.INTEGRITY_ERROR.getHttpCode(), is(500));
-        assertThat(ReturnCode.INTEGRITY_ERROR.getDescription(), is("The Encrypted Data is having integrity problems."));
-        assertThat(ReturnCode.INTEGRITY_ERROR.getClassification(), is(ReturnCode.Classification.CLASS_ERROR));
-
-        assertThat(ReturnCode.SETTING_ERROR.getCode(), is(593));
-        assertThat(ReturnCode.SETTING_ERROR.getHttpCode(), is(500));
-        assertThat(ReturnCode.SETTING_ERROR.getDescription(), is("Error extracting settings value."));
-        assertThat(ReturnCode.SETTING_ERROR.getClassification(), is(ReturnCode.Classification.CLASS_ERROR));
-
-        assertThat(ReturnCode.IDENTIFICATION_ERROR.getCode(), is(594));
-        assertThat(ReturnCode.IDENTIFICATION_ERROR.getHttpCode(), is(500));
-        assertThat(ReturnCode.IDENTIFICATION_ERROR.getDescription(), is("Not possible to positively identify the Requested Data."));
-        assertThat(ReturnCode.IDENTIFICATION_ERROR.getClassification(), is(ReturnCode.Classification.CLASS_ERROR));
-
-        assertThat(ReturnCode.DATABASE_ERROR.getCode(), is(595));
-        assertThat(ReturnCode.DATABASE_ERROR.getHttpCode(), is(500));
-        assertThat(ReturnCode.DATABASE_ERROR.getDescription(), is("Database Error occurred during the handling of the request."));
-        assertThat(ReturnCode.DATABASE_ERROR.getClassification(), is(ReturnCode.Classification.CLASS_ERROR));
-
-        assertThat(ReturnCode.CONSTRAINT_ERROR.getCode(), is(596));
-        assertThat(ReturnCode.CONSTRAINT_ERROR.getHttpCode(), is(500));
-        assertThat(ReturnCode.CONSTRAINT_ERROR.getDescription(), is("Unique Constraint Violation in the Database."));
-        assertThat(ReturnCode.CONSTRAINT_ERROR.getClassification(), is(ReturnCode.Classification.CLASS_ERROR));
+    private static void runAssertions(final ReturnCode returnCode, final int code, final int httpCode, final ReturnCode.Classification classification, final String description) {
+        assertThat(returnCode.getCode(), is(code));
+        assertThat(returnCode.getHttpCode(), is(httpCode));
+        assertThat(returnCode.getDescription(), is(description));
+        assertThat(returnCode.getClassification(), is(classification));
+        assertThat(ReturnCode.findReturnCode(code), is(returnCode));
     }
 }

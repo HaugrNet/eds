@@ -30,7 +30,7 @@ public final class ProcessDataTypeResponseTest {
         final ProcessDataTypeResponse response = new ProcessDataTypeResponse();
         response.setDataType(dataType);
 
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
         assertThat(response.getReturnMessage(), is("Ok"));
         assertThat(response.isOk(), is(true));
         assertThat(response.getDataType(), is(dataType));
@@ -41,7 +41,7 @@ public final class ProcessDataTypeResponseTest {
         final String msg = "ProcessDataType Request failed due to Verification Problems.";
         final ProcessDataTypeResponse response = new ProcessDataTypeResponse(ReturnCode.VERIFICATION_WARNING, msg);
 
-        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING));
+        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING.getCode()));
         assertThat(response.getReturnMessage(), is(msg));
         assertThat(response.isOk(), is(false));
         assertThat(response.getDataType(), is(nullValue()));

@@ -29,7 +29,7 @@ public final class ProcessDataResponseTest {
         final ProcessDataResponse response = new ProcessDataResponse();
         response.setDataId(dataId);
 
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
         assertThat(response.getReturnMessage(), is("Ok"));
         assertThat(response.isOk(), is(true));
         assertThat(response.getDataId(), is(dataId));
@@ -40,7 +40,7 @@ public final class ProcessDataResponseTest {
         final String msg = "ProcessData Request failed due to Verification Problems.";
         final ProcessDataResponse response = new ProcessDataResponse(ReturnCode.VERIFICATION_WARNING, msg);
 
-        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING));
+        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING.getCode()));
         assertThat(response.getReturnMessage(), is(msg));
         assertThat(response.isOk(), is(false));
         assertThat(response.getDataId(), is(nullValue()));

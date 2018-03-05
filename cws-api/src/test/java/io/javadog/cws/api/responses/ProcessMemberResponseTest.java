@@ -32,7 +32,7 @@ public final class ProcessMemberResponseTest {
         response.setMemberId(memberId);
         response.setSignature(TestUtilities.convert(signature));
 
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
         assertThat(response.getReturnMessage(), is("Ok"));
         assertThat(response.isOk(), is(true));
         assertThat(response.getMemberId(), is(memberId));
@@ -44,7 +44,7 @@ public final class ProcessMemberResponseTest {
         final String msg = "ProcessMember Request failed due to Verification Problems.";
         final ProcessMemberResponse response = new ProcessMemberResponse(ReturnCode.VERIFICATION_WARNING, msg);
 
-        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING));
+        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING.getCode()));
         assertThat(response.getReturnMessage(), is(msg));
         assertThat(response.isOk(), is(false));
         assertThat(response.getMemberId(), is(nullValue()));

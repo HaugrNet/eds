@@ -40,7 +40,7 @@ public final class SoapClientTest {
     public void testVersion() {
         final Management system = new ManagementSoapClient(Base.URL);
         final VersionResponse response = system.version();
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
         assertThat(response.getReturnMessage(), is("Ok"));
         assertThat(response.getVersion(), is("1.0-SNAPSHOT"));
     }
@@ -51,8 +51,8 @@ public final class SoapClientTest {
         final SettingRequest request = Base.prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
 
         final SettingResponse response = system.settings(request);
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
         assertThat(response.getReturnMessage(), is("Ok"));
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
     }
 
     @Test
@@ -61,8 +61,8 @@ public final class SoapClientTest {
         final FetchMemberRequest request = Base.prepareRequest(FetchMemberRequest.class, Constants.ADMIN_ACCOUNT);
 
         final FetchMemberResponse response = system.fetchMembers(request);
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
         assertThat(response.getReturnMessage(), is("Ok"));
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
     }
 
     @Test
@@ -76,8 +76,8 @@ public final class SoapClientTest {
         request.setNewCredential(accountName.getBytes(Charset.forName("UTF-8")));
 
         final ProcessMemberResponse response = system.processMember(request);
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
         assertThat(response.getReturnMessage(), is("Ok"));
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
     }
 
     @Test
@@ -86,8 +86,8 @@ public final class SoapClientTest {
         final FetchCircleRequest request = Base.prepareRequest(FetchCircleRequest.class, Constants.ADMIN_ACCOUNT);
 
         final FetchCircleResponse response = system.fetchCircles(request);
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
         assertThat(response.getReturnMessage(), is("Ok"));
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
     }
 
     @Test
@@ -109,7 +109,7 @@ public final class SoapClientTest {
         request.setCircleName(UUID.randomUUID().toString());
 
         final ProcessCircleResponse response = system.processCircle(request);
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
         assertThat(response.getReturnMessage(), is("Ok"));
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
     }
 }

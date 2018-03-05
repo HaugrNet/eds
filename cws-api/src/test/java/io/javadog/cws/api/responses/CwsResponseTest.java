@@ -25,7 +25,7 @@ public final class CwsResponseTest {
         response.setReturnCode(ReturnCode.ERROR);
         response.setReturnMessage(ReturnCode.ERROR.getDescription());
 
-        assertThat(response.getReturnCode(), is(ReturnCode.ERROR));
+        assertThat(response.getReturnCode(), is(ReturnCode.ERROR.getCode()));
         assertThat(response.getReturnMessage(), is(ReturnCode.ERROR.getDescription()));
         assertThat(response.isOk(), is(false));
     }
@@ -35,7 +35,7 @@ public final class CwsResponseTest {
         final String msg = "FetchCircle Request failed due to Verification Problems.";
         final CwsResponse response = new CwsResponse(ReturnCode.VERIFICATION_WARNING, msg);
 
-        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING));
+        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING.getCode()));
         assertThat(response.getReturnMessage(), is(msg));
         assertThat(response.isOk(), is(false));
     }

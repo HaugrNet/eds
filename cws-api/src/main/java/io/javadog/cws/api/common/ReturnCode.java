@@ -544,4 +544,24 @@ public enum ReturnCode {
     public String getDescription() {
         return description;
     }
+
+    /**
+     * Converts the actual code (integer value) to a ReturnCode enum value. If
+     * the value cannot be found, the ReturnCode {@link #ERROR} is then returned.
+     *
+     * @param code The integer value to convert to a ReturnCode enum value
+     * @return ReturnCode enum value
+     */
+    public static ReturnCode findReturnCode(final int code) {
+        ReturnCode found = ERROR;
+
+        for (final ReturnCode returnCode : ReturnCode.values()) {
+            if (returnCode.getCode() == code) {
+                found = returnCode;
+                break;
+            }
+        }
+
+        return found;
+    }
 }

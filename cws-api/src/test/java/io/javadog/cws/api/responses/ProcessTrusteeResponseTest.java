@@ -23,7 +23,7 @@ public final class ProcessTrusteeResponseTest {
     public void testClassflow() {
         final ProcessTrusteeResponse response = new ProcessTrusteeResponse();
 
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
         assertThat(response.getReturnMessage(), is("Ok"));
         assertThat(response.isOk(), is(true));
     }
@@ -33,7 +33,7 @@ public final class ProcessTrusteeResponseTest {
         final String msg = "ProcessTrustee Request failed due to Verification Problems.";
         final ProcessTrusteeResponse response = new ProcessTrusteeResponse(ReturnCode.VERIFICATION_WARNING, msg);
 
-        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING));
+        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING.getCode()));
         assertThat(response.getReturnMessage(), is(msg));
         assertThat(response.isOk(), is(false));
     }

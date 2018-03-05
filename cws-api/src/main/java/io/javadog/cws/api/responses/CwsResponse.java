@@ -28,7 +28,7 @@ public class CwsResponse implements Serializable {
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
     @XmlElement(name = Constants.FIELD_RETURN_CODE, required = true)
-    private ReturnCode returnCode = ReturnCode.SUCCESS;
+    private int returnCode = ReturnCode.SUCCESS.getCode();
 
     @XmlElement(name = Constants.FIELD_RETURN_MESSAGE, required = true)
     private String returnMessage = "Ok";
@@ -53,7 +53,7 @@ public class CwsResponse implements Serializable {
      * @param returnMessage The CWS Return Message
      */
     public CwsResponse(final ReturnCode returnCode, final String returnMessage) {
-        this.returnCode = returnCode;
+        this.returnCode = returnCode.getCode();
         this.returnMessage = returnMessage;
     }
 
@@ -62,10 +62,10 @@ public class CwsResponse implements Serializable {
     // =========================================================================
 
     public void setReturnCode(final ReturnCode returnCode) {
-        this.returnCode = returnCode;
+        this.returnCode = returnCode.getCode();
     }
 
-    public ReturnCode getReturnCode() {
+    public int getReturnCode() {
         return returnCode;
     }
 
@@ -78,6 +78,6 @@ public class CwsResponse implements Serializable {
     }
 
     public boolean isOk() {
-        return returnCode == ReturnCode.SUCCESS;
+        return returnCode == ReturnCode.SUCCESS.getCode();
     }
 }

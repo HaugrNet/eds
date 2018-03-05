@@ -62,7 +62,7 @@ public final class ManagementServiceTest extends BeanSetup {
             }
 
             final VersionResponse response = system.version();
-            assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
+            assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
             assertThat(response.getVersion(), is(version));
         } else {
             fail("Could not open the Class Loader, to read the '" + propertiesFile + "' file from the test resource path.");
@@ -74,7 +74,7 @@ public final class ManagementServiceTest extends BeanSetup {
         final ManagementService system = prepareFlawedSystemService();
 
         final VersionResponse response = system.version();
-        assertThat(response.getReturnCode(), is(ReturnCode.ERROR));
+        assertThat(response.getReturnCode(), is(ReturnCode.ERROR.getCode()));
     }
 
     @Test
@@ -83,7 +83,7 @@ public final class ManagementServiceTest extends BeanSetup {
         final SettingRequest request = prepareRequest(SettingRequest.class, MEMBER_1);
 
         final SettingResponse response = system.settings(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.AUTHORIZATION_WARNING));
+        assertThat(response.getReturnCode(), is(ReturnCode.AUTHORIZATION_WARNING.getCode()));
         assertThat(response.getSettings().size(), is(0));
     }
 
@@ -93,7 +93,7 @@ public final class ManagementServiceTest extends BeanSetup {
         final SettingRequest request = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
 
         final SettingResponse response = system.settings(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
     }
 
     @Test
@@ -105,7 +105,7 @@ public final class ManagementServiceTest extends BeanSetup {
         request.setSettings(map);
 
         final SettingResponse response = system.settings(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.SETTING_WARNING));
+        assertThat(response.getReturnCode(), is(ReturnCode.SETTING_WARNING.getCode()));
         assertThat(response.getSettings().size(), is(14));
     }
 
@@ -115,7 +115,7 @@ public final class ManagementServiceTest extends BeanSetup {
         final SettingRequest request = null;
 
         final SettingResponse response = system.settings(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING));
+        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING.getCode()));
     }
 
     @Test
@@ -124,7 +124,7 @@ public final class ManagementServiceTest extends BeanSetup {
         final SettingRequest request = new SettingRequest();
 
         final SettingResponse response = system.settings(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING));
+        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING.getCode()));
     }
 
     @Test
@@ -133,7 +133,7 @@ public final class ManagementServiceTest extends BeanSetup {
         final SettingRequest request = null;
 
         final SettingResponse response = system.settings(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.ERROR));
+        assertThat(response.getReturnCode(), is(ReturnCode.ERROR.getCode()));
     }
 
     @Test
@@ -142,7 +142,7 @@ public final class ManagementServiceTest extends BeanSetup {
         final SanityRequest request = prepareRequest(SanityRequest.class, Constants.ADMIN_ACCOUNT);
 
         final SanityResponse response = system.sanitized(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
     }
 
     @Test
@@ -151,7 +151,7 @@ public final class ManagementServiceTest extends BeanSetup {
         final SanityRequest request = null;
 
         final SanityResponse response = system.sanitized(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING));
+        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING.getCode()));
     }
 
     @Test
@@ -160,7 +160,7 @@ public final class ManagementServiceTest extends BeanSetup {
         final SanityRequest request = new SanityRequest();
 
         final SanityResponse response = system.sanitized(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING));
+        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING.getCode()));
     }
 
     @Test
@@ -169,7 +169,7 @@ public final class ManagementServiceTest extends BeanSetup {
         final SanityRequest request = null;
 
         final SanityResponse response = system.sanitized(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.ERROR));
+        assertThat(response.getReturnCode(), is(ReturnCode.ERROR.getCode()));
     }
 
     @Test
@@ -178,7 +178,7 @@ public final class ManagementServiceTest extends BeanSetup {
         final FetchMemberRequest request = prepareRequest(FetchMemberRequest.class, MEMBER_1);
 
         final FetchMemberResponse response = system.fetchMembers(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
     }
 
     @Test
@@ -187,7 +187,7 @@ public final class ManagementServiceTest extends BeanSetup {
         final FetchMemberRequest request = null;
 
         final FetchMemberResponse response = system.fetchMembers(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING));
+        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING.getCode()));
     }
 
     @Test
@@ -196,7 +196,7 @@ public final class ManagementServiceTest extends BeanSetup {
         final FetchMemberRequest request = new FetchMemberRequest();
 
         final FetchMemberResponse response = system.fetchMembers(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING));
+        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING.getCode()));
     }
 
     @Test
@@ -205,7 +205,7 @@ public final class ManagementServiceTest extends BeanSetup {
         final FetchMemberRequest request = null;
 
         final FetchMemberResponse response = system.fetchMembers(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.ERROR));
+        assertThat(response.getReturnCode(), is(ReturnCode.ERROR.getCode()));
     }
 
     @Test
@@ -216,7 +216,7 @@ public final class ManagementServiceTest extends BeanSetup {
         request.setNewAccountName("new Account");
 
         final ProcessMemberResponse response = system.processMember(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
     }
 
     @Test
@@ -225,7 +225,7 @@ public final class ManagementServiceTest extends BeanSetup {
         final ProcessMemberRequest request = null;
 
         final ProcessMemberResponse response = system.processMember(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING));
+        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING.getCode()));
     }
 
     @Test
@@ -234,7 +234,7 @@ public final class ManagementServiceTest extends BeanSetup {
         final ProcessMemberRequest request = new ProcessMemberRequest();
 
         final ProcessMemberResponse response = system.processMember(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING));
+        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING.getCode()));
     }
 
     @Test
@@ -243,7 +243,7 @@ public final class ManagementServiceTest extends BeanSetup {
         final ProcessMemberRequest request = null;
 
         final ProcessMemberResponse response = system.processMember(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.ERROR));
+        assertThat(response.getReturnCode(), is(ReturnCode.ERROR.getCode()));
     }
 
     @Test
@@ -252,7 +252,7 @@ public final class ManagementServiceTest extends BeanSetup {
         final FetchCircleRequest request = prepareRequest(FetchCircleRequest.class, MEMBER_1);
 
         final FetchCircleResponse response = system.fetchCircles(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
     }
 
     @Test
@@ -261,7 +261,7 @@ public final class ManagementServiceTest extends BeanSetup {
         final FetchCircleRequest request = null;
 
         final FetchCircleResponse response = system.fetchCircles(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING));
+        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING.getCode()));
     }
 
     @Test
@@ -270,7 +270,7 @@ public final class ManagementServiceTest extends BeanSetup {
         final FetchCircleRequest request = new FetchCircleRequest();
 
         final FetchCircleResponse response = system.fetchCircles(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING));
+        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING.getCode()));
     }
 
     @Test
@@ -279,7 +279,7 @@ public final class ManagementServiceTest extends BeanSetup {
         final FetchCircleRequest request = null;
 
         final FetchCircleResponse response = system.fetchCircles(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.ERROR));
+        assertThat(response.getReturnCode(), is(ReturnCode.ERROR.getCode()));
     }
 
     @Test
@@ -291,7 +291,7 @@ public final class ManagementServiceTest extends BeanSetup {
         request.setMemberId(MEMBER_1_ID);
 
         final ProcessCircleResponse response = system.processCircle(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
     }
 
     @Test
@@ -300,7 +300,7 @@ public final class ManagementServiceTest extends BeanSetup {
         final ProcessCircleRequest request = null;
 
         final ProcessCircleResponse response = system.processCircle(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING));
+        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING.getCode()));
     }
 
     @Test
@@ -309,7 +309,7 @@ public final class ManagementServiceTest extends BeanSetup {
         final ProcessCircleRequest request = new ProcessCircleRequest();
 
         final ProcessCircleResponse response = system.processCircle(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING));
+        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING.getCode()));
     }
 
     @Test
@@ -318,7 +318,7 @@ public final class ManagementServiceTest extends BeanSetup {
         final ProcessCircleRequest request = null;
 
         final ProcessCircleResponse response = system.processCircle(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.ERROR));
+        assertThat(response.getReturnCode(), is(ReturnCode.ERROR.getCode()));
     }
 
     @Test
@@ -328,7 +328,7 @@ public final class ManagementServiceTest extends BeanSetup {
         request.setCircleId(CIRCLE_1_ID);
 
         final FetchTrusteeResponse response = system.fetchTrustees(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
     }
 
     @Test
@@ -337,7 +337,7 @@ public final class ManagementServiceTest extends BeanSetup {
         final FetchTrusteeRequest request = null;
 
         final FetchTrusteeResponse response = system.fetchTrustees(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING));
+        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING.getCode()));
     }
 
     @Test
@@ -346,7 +346,7 @@ public final class ManagementServiceTest extends BeanSetup {
         final FetchTrusteeRequest request = new FetchTrusteeRequest();
 
         final FetchTrusteeResponse response = system.fetchTrustees(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING));
+        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING.getCode()));
     }
 
     @Test
@@ -355,7 +355,7 @@ public final class ManagementServiceTest extends BeanSetup {
         final FetchTrusteeRequest request = null;
 
         final FetchTrusteeResponse response = system.fetchTrustees(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.ERROR));
+        assertThat(response.getReturnCode(), is(ReturnCode.ERROR.getCode()));
     }
 
     @Test
@@ -368,7 +368,7 @@ public final class ManagementServiceTest extends BeanSetup {
         request.setTrustLevel(TrustLevel.WRITE);
 
         final ProcessTrusteeResponse response = system.processTrustee(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
     }
 
     @Test
@@ -377,7 +377,7 @@ public final class ManagementServiceTest extends BeanSetup {
         final ProcessTrusteeRequest request = null;
 
         final ProcessTrusteeResponse response = system.processTrustee(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING));
+        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING.getCode()));
     }
 
     @Test
@@ -386,7 +386,7 @@ public final class ManagementServiceTest extends BeanSetup {
         final ProcessTrusteeRequest request = new ProcessTrusteeRequest();
 
         final ProcessTrusteeResponse response = system.processTrustee(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING));
+        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING.getCode()));
     }
 
     @Test
@@ -395,6 +395,6 @@ public final class ManagementServiceTest extends BeanSetup {
         final ProcessTrusteeRequest request = null;
 
         final ProcessTrusteeResponse response = system.processTrustee(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.ERROR));
+        assertThat(response.getReturnCode(), is(ReturnCode.ERROR.getCode()));
     }
 }

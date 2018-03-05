@@ -171,14 +171,14 @@ public final class CircleServiceTest extends DatabaseSetup {
         request.setCircleName("a circle");
 
         final ProcessCircleResponse response = service.perform(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
         assertThat(response.getReturnMessage(), is("Ok"));
         assertThat(response.getCircleId(), is(not(nullValue())));
 
         final FetchCircleService fetchService = new FetchCircleService(settings, entityManager);
         final FetchCircleRequest fetchRequest = prepareRequest(FetchCircleRequest.class, MEMBER_1);
         final FetchCircleResponse fetchResponse = fetchService.perform(fetchRequest);
-        assertThat(fetchResponse.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(fetchResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
         assertThat(fetchResponse.getCircles().size(), is(4));
         // Circles are sorted by name, so our newly created Circle will be the first
         assertThat(fetchResponse.getCircles().get(0).getCircleId(), is(response.getCircleId()));
@@ -194,7 +194,7 @@ public final class CircleServiceTest extends DatabaseSetup {
         request.setMemberId(MEMBER_1_ID);
 
         final ProcessCircleResponse response = service.perform(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
         assertThat(response.getReturnMessage(), is("Ok"));
     }
 
@@ -207,7 +207,7 @@ public final class CircleServiceTest extends DatabaseSetup {
         createRequest.setCircleKey(UUID.randomUUID().toString());
 
         final ProcessCircleResponse createResponse = service.perform(createRequest);
-        assertThat(createResponse.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(createResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
         assertThat(createResponse.getCircleId(), is(not(nullValue())));
 
         final ProcessCircleRequest updateRequest = prepareRequest(ProcessCircleRequest.class, MEMBER_5);
@@ -216,12 +216,12 @@ public final class CircleServiceTest extends DatabaseSetup {
         updateRequest.setCircleId(createResponse.getCircleId());
         updateRequest.setCircleKey(UUID.randomUUID().toString());
         final ProcessCircleResponse updateResponse = service.perform(updateRequest);
-        assertThat(updateResponse.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(updateResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
 
         final FetchCircleService fetchService = new FetchCircleService(settings, entityManager);
         final FetchCircleRequest fetchRequest = prepareRequest(FetchCircleRequest.class, MEMBER_5);
         final FetchCircleResponse fetchResponse = fetchService.perform(fetchRequest);
-        assertThat(fetchResponse.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(fetchResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
         assertThat(fetchResponse.getCircles().size(), is(4));
         assertThat(fetchResponse.getCircles().get(0).getCircleId(), is(createResponse.getCircleId()));
         assertThat(fetchResponse.getCircles().get(0).getCircleKey(), is(updateRequest.getCircleKey()));
@@ -236,7 +236,7 @@ public final class CircleServiceTest extends DatabaseSetup {
         request.setCircleName("My Circle");
 
         final ProcessCircleResponse response = service.perform(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.IDENTIFICATION_WARNING));
+        assertThat(response.getReturnCode(), is(ReturnCode.IDENTIFICATION_WARNING.getCode()));
         assertThat(response.getReturnMessage(), is("Cannot create a new Circle with a non-existing Circle Administrator."));
     }
 
@@ -249,7 +249,7 @@ public final class CircleServiceTest extends DatabaseSetup {
         request.setCircleName("My Circle");
 
         final ProcessCircleResponse response = service.perform(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.IDENTIFICATION_WARNING));
+        assertThat(response.getReturnCode(), is(ReturnCode.IDENTIFICATION_WARNING.getCode()));
         assertThat(response.getReturnMessage(), is("It is not allowed for the System Administrator to be part of a Circle."));
     }
 
@@ -262,7 +262,7 @@ public final class CircleServiceTest extends DatabaseSetup {
         request.setMemberId(MEMBER_1_ID);
 
         final ProcessCircleResponse response = service.perform(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.IDENTIFICATION_WARNING));
+        assertThat(response.getReturnCode(), is(ReturnCode.IDENTIFICATION_WARNING.getCode()));
         assertThat(response.getReturnMessage(), is("A Circle with the requested name already exists."));
     }
 
@@ -275,13 +275,13 @@ public final class CircleServiceTest extends DatabaseSetup {
         request.setCircleId(CIRCLE_1_ID);
 
         final ProcessCircleResponse response = service.perform(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
         assertThat(response.getReturnMessage(), is("Ok"));
 
         final FetchCircleService fetchService = new FetchCircleService(settings, entityManager);
         final FetchCircleRequest fetchRequest = prepareRequest(FetchCircleRequest.class, Constants.ADMIN_ACCOUNT);
         final FetchCircleResponse fetchResponse = fetchService.perform(fetchRequest);
-        assertThat(fetchResponse.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(fetchResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
         assertThat(fetchResponse.getCircles().size(), is(3));
         assertThat(fetchResponse.getCircles().get(0).getCircleId(), is(CIRCLE_1_ID));
         assertThat(fetchResponse.getCircles().get(0).getCircleName(), is("Circle One"));
@@ -296,7 +296,7 @@ public final class CircleServiceTest extends DatabaseSetup {
         request.setCircleId(CIRCLE_1_ID);
 
         final ProcessCircleResponse response = service.perform(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
         assertThat(response.getReturnMessage(), is("Ok"));
     }
 
@@ -310,7 +310,7 @@ public final class CircleServiceTest extends DatabaseSetup {
         assertThat(request.validate().isEmpty(), is(true));
 
         final ProcessCircleResponse response = service.perform(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.AUTHORIZATION_WARNING));
+        assertThat(response.getReturnCode(), is(ReturnCode.AUTHORIZATION_WARNING.getCode()));
         assertThat(response.getReturnMessage(), is("Only a Circle Administrator may perform this action."));
     }
 
@@ -336,7 +336,7 @@ public final class CircleServiceTest extends DatabaseSetup {
         request.setCircleId(UUID.randomUUID().toString());
 
         final ProcessCircleResponse response = service.perform(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.IDENTIFICATION_WARNING));
+        assertThat(response.getReturnCode(), is(ReturnCode.IDENTIFICATION_WARNING.getCode()));
         assertThat(response.getReturnMessage(), is("No Circle could be found with the given Id."));
     }
 
@@ -349,7 +349,7 @@ public final class CircleServiceTest extends DatabaseSetup {
         request.setCircleId(CIRCLE_1_ID);
 
         final ProcessCircleResponse response = service.perform(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.IDENTIFICATION_WARNING));
+        assertThat(response.getReturnCode(), is(ReturnCode.IDENTIFICATION_WARNING.getCode()));
         assertThat(response.getReturnMessage(), is("A Circle with the requested name already exists."));
     }
 
@@ -362,7 +362,7 @@ public final class CircleServiceTest extends DatabaseSetup {
         request.setCircleId(CIRCLE_1_ID);
 
         final ProcessCircleResponse response = service.perform(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
         assertThat(response.getReturnMessage(), is("Ok"));
     }
 
@@ -374,7 +374,7 @@ public final class CircleServiceTest extends DatabaseSetup {
         request.setCircleId(CIRCLE_1_ID);
 
         final ProcessCircleResponse response = service.perform(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
         assertThat(response.getReturnMessage(), is("Ok"));
     }
 
@@ -386,7 +386,7 @@ public final class CircleServiceTest extends DatabaseSetup {
         request.setCircleId(CIRCLE_1_ID);
 
         final ProcessCircleResponse response = service.perform(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.AUTHORIZATION_WARNING));
+        assertThat(response.getReturnCode(), is(ReturnCode.AUTHORIZATION_WARNING.getCode()));
         assertThat(response.getReturnMessage(), is("Only the System Administrator may delete a Circle."));
     }
 
@@ -398,7 +398,7 @@ public final class CircleServiceTest extends DatabaseSetup {
         request.setCircleId(UUID.randomUUID().toString());
 
         final ProcessCircleResponse response = service.perform(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.IDENTIFICATION_WARNING));
+        assertThat(response.getReturnCode(), is(ReturnCode.IDENTIFICATION_WARNING.getCode()));
         assertThat(response.getReturnMessage(), is("No Circle could be found with the given Id."));
     }
 
@@ -407,7 +407,7 @@ public final class CircleServiceTest extends DatabaseSetup {
     // =========================================================================
 
     private static void detailedCircleAssertion(final FetchCircleResponse response, final String... circleNames) {
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
         assertThat(response.getReturnMessage(), is("Ok"));
 
         if ((circleNames != null) && (circleNames.length > 0)) {

@@ -81,7 +81,7 @@ public final class TrusteeServiceTest extends DatabaseSetup {
         // Verify that we have found the correct data
         assertThat(response, is(not(nullValue())));
         assertThat(response.isOk(), is(false));
-        assertThat(response.getReturnCode(), is(ReturnCode.IDENTIFICATION_WARNING));
+        assertThat(response.getReturnCode(), is(ReturnCode.IDENTIFICATION_WARNING.getCode()));
         assertThat(response.getReturnMessage(), is("The requested Circle cannot be found."));
     }
 
@@ -137,7 +137,7 @@ public final class TrusteeServiceTest extends DatabaseSetup {
         final FetchTrusteeResponse response = service.perform(request);
 
         assertThat(response, is(not(nullValue())));
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
         assertThat(response.getReturnMessage(), is("Ok"));
         assertThat(response.getTrustees().size(), is(3));
 
@@ -199,7 +199,7 @@ public final class TrusteeServiceTest extends DatabaseSetup {
         request.setTrustLevel(TrustLevel.WRITE);
 
         final ProcessTrusteeResponse response = service.perform(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.AUTHORIZATION_WARNING));
+        assertThat(response.getReturnCode(), is(ReturnCode.AUTHORIZATION_WARNING.getCode()));
         assertThat(response.getReturnMessage(), is("The System Administrator cannot add a Member to a Circle."));
     }
 
@@ -227,7 +227,7 @@ public final class TrusteeServiceTest extends DatabaseSetup {
         request.setTrustLevel(TrustLevel.WRITE);
 
         final ProcessTrusteeResponse response = service.perform(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
         assertThat(response.getReturnMessage(), is("Ok"));
     }
 
@@ -257,7 +257,7 @@ public final class TrusteeServiceTest extends DatabaseSetup {
         request.setTrustLevel(TrustLevel.WRITE);
 
         final ProcessTrusteeResponse response = service.perform(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.IDENTIFICATION_WARNING));
+        assertThat(response.getReturnCode(), is(ReturnCode.IDENTIFICATION_WARNING.getCode()));
         assertThat(response.getReturnMessage(), is("No Member could be found with the given Id."));
     }
 
@@ -271,7 +271,7 @@ public final class TrusteeServiceTest extends DatabaseSetup {
         request.setTrustLevel(TrustLevel.WRITE);
 
         final ProcessTrusteeResponse response = service.perform(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.IDENTIFICATION_WARNING));
+        assertThat(response.getReturnCode(), is(ReturnCode.IDENTIFICATION_WARNING.getCode()));
         assertThat(response.getReturnMessage(), is("The Member is already a trustee of the requested Circle."));
     }
 
@@ -285,7 +285,7 @@ public final class TrusteeServiceTest extends DatabaseSetup {
         request.setTrustLevel(TrustLevel.ADMIN);
 
         final ProcessTrusteeResponse response = service.perform(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.AUTHORIZATION_WARNING));
+        assertThat(response.getReturnCode(), is(ReturnCode.AUTHORIZATION_WARNING.getCode()));
         assertThat(response.getReturnMessage(), is("Only a Circle Administrator may alter a Trustee."));
     }
 
@@ -313,14 +313,14 @@ public final class TrusteeServiceTest extends DatabaseSetup {
         circleRequest.setTrustLevel(TrustLevel.ADMIN);
 
         final ProcessTrusteeResponse circleResponse = circleService.perform(circleRequest);
-        assertThat(circleResponse.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(circleResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
         assertThat(circleResponse.getReturnMessage(), is("Ok"));
 
         final FetchTrusteeService fetchService = new FetchTrusteeService(settings, entityManager);
         final FetchTrusteeRequest fetchRequest = prepareRequest(FetchTrusteeRequest.class, MEMBER_1);
         fetchRequest.setCircleId(CIRCLE_1_ID);
         final FetchTrusteeResponse fetchResponse = fetchService.perform(fetchRequest);
-        assertThat(fetchResponse.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(fetchResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
         assertThat(fetchResponse.getTrustees().get(2).getMemberId(), is(MEMBER_3_ID));
         assertThat(fetchResponse.getTrustees().get(2).getTrustLevel(), is(TrustLevel.READ));
     }
@@ -351,7 +351,7 @@ public final class TrusteeServiceTest extends DatabaseSetup {
         request.setTrustLevel(TrustLevel.WRITE);
 
         final ProcessTrusteeResponse response = service.perform(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.IDENTIFICATION_WARNING));
+        assertThat(response.getReturnCode(), is(ReturnCode.IDENTIFICATION_WARNING.getCode()));
         assertThat(response.getReturnMessage(), is("The requested Trustee could not be found."));
     }
 
@@ -364,7 +364,7 @@ public final class TrusteeServiceTest extends DatabaseSetup {
         request.setMemberId(MEMBER_2_ID);
 
         final ProcessTrusteeResponse response = service.perform(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.AUTHORIZATION_WARNING));
+        assertThat(response.getReturnCode(), is(ReturnCode.AUTHORIZATION_WARNING.getCode()));
         assertThat(response.getReturnMessage(), is("Only a Circle Administrator may remove a Trustee."));
     }
 
@@ -390,14 +390,14 @@ public final class TrusteeServiceTest extends DatabaseSetup {
         request.setMemberId(MEMBER_2_ID);
 
         final ProcessTrusteeResponse response = service.perform(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
         assertThat(response.getReturnMessage(), is("Ok"));
 
         final FetchTrusteeService fetchService = new FetchTrusteeService(settings, entityManager);
         final FetchTrusteeRequest fetchRequest = prepareRequest(FetchTrusteeRequest.class, MEMBER_1);
         fetchRequest.setCircleId(CIRCLE_1_ID);
         final FetchTrusteeResponse fetchResponse = fetchService.perform(fetchRequest);
-        assertThat(fetchResponse.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(fetchResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
         assertThat(fetchResponse.getTrustees().size(), is(2));
     }
 
@@ -425,7 +425,7 @@ public final class TrusteeServiceTest extends DatabaseSetup {
         request.setMemberId(UUID.randomUUID().toString());
 
         final ProcessTrusteeResponse response = service.perform(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.IDENTIFICATION_WARNING));
+        assertThat(response.getReturnCode(), is(ReturnCode.IDENTIFICATION_WARNING.getCode()));
         assertThat(response.getReturnMessage(), is("The requested Trustee could not be found."));
     }
 
@@ -434,7 +434,7 @@ public final class TrusteeServiceTest extends DatabaseSetup {
     // =========================================================================
 
     private static void detailedTrusteeAssertion(final FetchTrusteeResponse response, final String... memberIds) {
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
         assertThat(response.getReturnMessage(), is("Ok"));
 
         if ((memberIds != null) && (memberIds.length > 0)) {

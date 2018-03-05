@@ -24,7 +24,7 @@ public final class VerifyResponseTest {
         final VerifyResponse response = new VerifyResponse();
         response.setVerified(true);
 
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
         assertThat(response.getReturnMessage(), is("Ok"));
         assertThat(response.isOk(), is(true));
         assertThat(response.isVerified(), is(true));
@@ -35,7 +35,7 @@ public final class VerifyResponseTest {
         final String msg = "Verify Request failed due to Verification Problems.";
         final VerifyResponse response = new VerifyResponse(ReturnCode.VERIFICATION_WARNING, msg);
 
-        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING));
+        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING.getCode()));
         assertThat(response.getReturnMessage(), is(msg));
         assertThat(response.isOk(), is(false));
         assertThat(response.isVerified(), is(false));

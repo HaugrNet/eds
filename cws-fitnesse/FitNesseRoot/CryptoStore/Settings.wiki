@@ -5,6 +5,10 @@ Test
 !path target/cws-fitnesse.jar
 !define TEST_SYSTEM {slim}
 
+# Return Codes
+!define SUCCESS {200}
+!define SETTING_WARNING {492}
+
 |Import                 |
 |io.javadog.cws.fitnesse|
 *!
@@ -42,8 +46,8 @@ The !-CryptoStore-! Settings request can only be performed by the System Adminis
 |check  |value for key|cws.sanity.check.startup       |undefined|
 |check  |value for key|cws.sanity.check.interval.days |undefined|
 
-!|Settings                                                                                                                                    |
-|account name|credential|key                     |value |return code?   |return message?                                             |defined?|
-|admin       |admin     |cws.crypto.pbe.algorithm|PBE512|SETTING_WARNING|Unsupported Crypto Algorithm for 'cws.crypto.pbe.algorithm'.|        |
-|admin       |admin     |cws.crypto.pbe.algorithm|PBE256|SUCCESS        |Ok                                                          |PBE256  |
-|admin       |admin     |cws.crypto.pbe.algorithm|PBE128|SUCCESS        |Ok                                                          |PBE128  |
+!|Settings                                                                                                                                       |
+|account name|credential|key                     |value |return code?      |return message?                                             |defined?|
+|admin       |admin     |cws.crypto.pbe.algorithm|PBE512|${SETTING_WARNING}|Unsupported Crypto Algorithm for 'cws.crypto.pbe.algorithm'.|PBE128  |
+|admin       |admin     |cws.crypto.pbe.algorithm|PBE256|${SUCCESS}        |Ok                                                          |PBE256  |
+|admin       |admin     |cws.crypto.pbe.algorithm|PBE128|${SUCCESS}        |Ok                                                          |PBE128  |

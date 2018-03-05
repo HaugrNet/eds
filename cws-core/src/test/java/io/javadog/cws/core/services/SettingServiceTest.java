@@ -50,7 +50,7 @@ public final class SettingServiceTest extends DatabaseSetup {
         final SettingRequest request = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
 
         final SettingResponse response = service.perform(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
         assertThat(response.getReturnMessage(), is("Ok"));
         assertThat(response.getSettings().size(), is(14));
     }
@@ -73,7 +73,7 @@ public final class SettingServiceTest extends DatabaseSetup {
         final SettingRequest request = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
 
         final SettingResponse response = service.perform(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
         assertThat(response.getReturnMessage(), is("Ok"));
         assertThat(response.getSettings().size(), is(14));
     }
@@ -86,7 +86,7 @@ public final class SettingServiceTest extends DatabaseSetup {
         request.setSettings(mySettings);
 
         final SettingResponse response = service.perform(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
         assertThat(response.getReturnMessage(), is("Ok"));
         assertThat(response.getSettings().size(), is(14));
     }
@@ -127,14 +127,14 @@ public final class SettingServiceTest extends DatabaseSetup {
         final SettingService service = new SettingService(newSettings(), entityManager);
         final SettingRequest request = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
         final SettingResponse response = service.perform(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
 
         final Map<String, String> mySettings = new HashMap<>(response.getSettings());
         mySettings.put(StandardSetting.CWS_SALT.getKey(), "new SALT");
         request.setCredential(crypto.stringToBytes(Constants.ADMIN_ACCOUNT));
         request.setSettings(mySettings);
         final SettingResponse update = service.perform(request);
-        assertThat(update.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(update.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
     }
 
     @Test
@@ -145,7 +145,7 @@ public final class SettingServiceTest extends DatabaseSetup {
         // First invocation, retrieving the list of current values so we can
         // check that it is being updated
         final SettingResponse response = service.perform(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
         assertThat(response.getReturnMessage(), is("Ok"));
         assertThat(response.getSettings().size(), is(14));
         assertThat(response.getSettings().get(StandardSetting.CWS_CHARSET.getKey()), is("UTF-8"));
@@ -158,7 +158,7 @@ public final class SettingServiceTest extends DatabaseSetup {
         request.setCredential(crypto.stringToBytes(Constants.ADMIN_ACCOUNT));
 
         final SettingResponse update = service.perform(request);
-        assertThat(update.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(update.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
         assertThat(update.getReturnMessage(), is("Ok"));
         assertThat(update.getSettings().size(), is(14));
         assertThat(update.getSettings().get(StandardSetting.CWS_CHARSET.getKey()), is("ISO-8859-15"));
@@ -173,7 +173,7 @@ public final class SettingServiceTest extends DatabaseSetup {
         request.setSettings(mySettings);
 
         final SettingResponse update = service.perform(request);
-        assertThat(update.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(update.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
         assertThat(update.getReturnMessage(), is("Ok"));
         assertThat(update.getSettings().size(), is(15));
     }
@@ -200,7 +200,7 @@ public final class SettingServiceTest extends DatabaseSetup {
         request.setSettings(mySettings);
 
         final SettingResponse response = service.perform(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
         assertThat(response.getReturnMessage(), is("Ok"));
         assertThat(response.getSettings().size(), is(15));
         assertThat(response.getSettings().get("cws.test.setting"), is("Setting Value"));

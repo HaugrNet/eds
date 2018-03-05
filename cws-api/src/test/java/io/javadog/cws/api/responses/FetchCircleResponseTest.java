@@ -30,7 +30,7 @@ public final class FetchCircleResponseTest {
         final FetchCircleResponse response = new FetchCircleResponse();
         response.setCircles(circles);
 
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
         assertThat(response.getReturnMessage(), is("Ok"));
         assertThat(response.isOk(), is(true));
         assertThat(response.getCircles(), is(circles));
@@ -41,7 +41,7 @@ public final class FetchCircleResponseTest {
         final String msg = "FetchCircle Request failed due to Verification Problems.";
         final FetchCircleResponse response = new FetchCircleResponse(ReturnCode.VERIFICATION_WARNING, msg);
 
-        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING));
+        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING.getCode()));
         assertThat(response.getReturnMessage(), is(msg));
         assertThat(response.isOk(), is(false));
         assertThat(response.getCircles().isEmpty(), is(true));

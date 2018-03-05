@@ -37,7 +37,7 @@ public final class FetchDataResponseTest {
         response.setRecords(3L);
         response.setData(data);
 
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
         assertThat(response.getReturnMessage(), is("Ok"));
         assertThat(response.isOk(), is(true));
         assertThat(response.getMetadata(), is(metadata));
@@ -50,7 +50,7 @@ public final class FetchDataResponseTest {
         final String msg = "FetchData Request failed due to Verification Problems.";
         final FetchDataResponse response = new FetchDataResponse(ReturnCode.VERIFICATION_WARNING, msg);
 
-        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING));
+        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING.getCode()));
         assertThat(response.getReturnMessage(), is(msg));
         assertThat(response.isOk(), is(false));
         assertThat(response.getMetadata().isEmpty(), is(true));

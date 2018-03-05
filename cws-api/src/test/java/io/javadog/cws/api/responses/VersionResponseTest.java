@@ -27,7 +27,7 @@ public final class VersionResponseTest {
         final VersionResponse response = new VersionResponse();
         response.setVersion(version);
 
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS));
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
         assertThat(response.getReturnMessage(), is("Ok"));
         assertThat(response.isOk(), is(true));
         assertThat(response.getVersion(), is(version));
@@ -38,7 +38,7 @@ public final class VersionResponseTest {
         final String msg = "Version Request failed due to Verification Problems.";
         final VersionResponse response = new VersionResponse(ReturnCode.VERIFICATION_WARNING, msg);
 
-        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING));
+        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING.getCode()));
         assertThat(response.getReturnMessage(), is(msg));
         assertThat(response.isOk(), is(false));
         assertThat(response.getVersion(), is(nullValue()));

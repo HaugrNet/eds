@@ -61,7 +61,8 @@ public final class Settings extends CwsRequest<SettingResponse> {
     }
 
     public String defined() {
-        return response.getSettings().get(key);
+        final String defined = response.getSettings().get(key);
+        return (defined != null) ? defined : "undefined";
     }
 
     public String valueForKey(final String key) {

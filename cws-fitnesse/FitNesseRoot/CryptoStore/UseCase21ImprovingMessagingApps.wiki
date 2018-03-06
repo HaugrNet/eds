@@ -1,0 +1,21 @@
+----------
+!1 Improving Messaging Apps
+
+Many existing Messaging Apps, which is based on the Signal Algorithm have a
+problem with control of the commonly shared symmetric key(s). They are designed
+in a way, so the symmetric key used for encryption is stored with each client.
+
+Generally, this is a good concept - keys should be stored closely to the users,
+rather than centrally. However, the problem comes when groups exist, and someone
+is removed from the group. The Signal client has all the data to read data from
+the group stored on the device, which means that it is possible for them, via
+the Signal API, to re-attach themselves to the Group, and thus read data again.
+
+To improve the security, CWS can be used as part of the central storing of
+information, as a member who has been removed, will also have been removed from
+the central Group information. By using CWS, the person cannot be re-attached to
+the Group as they do not have access to the Group Key.
+
+The CWS API for Circles allows storing an externally controlled Symmetric Key,
+which can be used to control things. The Key is stored encrypted with the Circle
+Key, so it can only be extracted if someone has access to the Circle Key.

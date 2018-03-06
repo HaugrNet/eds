@@ -1,0 +1,15 @@
+----------
+!1 Public Key Repository
+
+Some companies rely heavily on PGP (OpenPGP or GnuPG) for their communication,
+either with e-mails or with attaching data in central systems like bug trackers,
+ticketing systems, etc.
+
+One problem for many, is that the recipients may change or keys may be updated.
+Which means that often, there's loads of additional work with ensuring that
+everybody have updated list of recipients and the correct keys.
+
+CWS allows storing a Public Key for each member, and with the internal Circles,
+it is possible to simply get a list of recipients and their keys from the CWS
+server, and integrate these into a Client which will then encrypt data based on
+these.

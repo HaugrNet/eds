@@ -1,0 +1,7 @@
+----------
+!1 Signatures
+
+Signing and verifying is also a standard feature in CWS, it allows a person to
+sign a document and let the signature follow the document, in a way so others
+can verify the signature of the document.
+

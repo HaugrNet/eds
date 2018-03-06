@@ -1,0 +1,20 @@
+----------
+!1 Simple File Repository
+
+Dropbox and other system allow users to store their data in a central location,
+and with clients installed on all devices, it is possible to access these in a
+simple, convenient way.
+
+Problem is, encryption is more often than not - an add-on!
+
+CWS can be used as such a central file repository. It doesn't care about what
+data is stored, it simply looks a the bytes and nothings else. However, if CWS
+is used for this purpose - MIMETypes must be added as so-called ''DataTypes'',
+so the data is stored and retrieved with an additional information, which will
+allow the data to be correctly read out.
+
+Alternatively, if the Client understands all the MIMETypes used, the data can
+be stored with a name that also contain the file extension.
+
+CWS Allows the creation of Folders, and adding data to a folder, so it can be
+organized in a sensible way - as the Member wishes.

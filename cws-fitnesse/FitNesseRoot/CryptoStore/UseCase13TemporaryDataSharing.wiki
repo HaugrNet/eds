@@ -1,0 +1,19 @@
+----------
+!1 Temporary Data Sharing
+
+If someone wishes to quickly share some data for reviewing, then it can be done
+by quickly create a new Circle of Trust, and only assign the people who need to
+see the data.
+
+CWS allows members to create an infinite number of Circles, quickly and with
+little fuss. Circles can also be dropped again, just as quickly. This will allow
+someone to have a quick collaboration.
+
+However, as with all other features - this is only allowed between CWS members,
+it is not possible to share data to external parties, as the unlocking of data
+requires access to the Keys, which also are stored encrypted.
+
+Note; Extending this feature with the possibility to allow anonymous access to
+the system is not impossible, but - it requires a new type of member account,
+which again is possible, and something which can easily be part of a newer
+version of CWS.

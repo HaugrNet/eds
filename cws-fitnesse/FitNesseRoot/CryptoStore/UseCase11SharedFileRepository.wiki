@@ -1,0 +1,17 @@
+----------
+!1 Shared File Repository
+
+The default way which CWS works, is by having ''Circles of Trust'', meaning a
+group with many members. Each member is granted access to the Circle Key, and
+can thus also access data.
+
+Adding someone to a Circle, means that they will get access to all data stored
+within this Circle. Not just new data, but also older data.
+
+Trustees, i.e. members of a Circle, can be anything. It is boiled down to an
+Account with an !-AccountName-! and a passphrase, who have been granted access.
+If a Circle is only controlled by a single Person, who wishes to have an Account
+per device accessing the Circle, it also means that if a device is lost or
+compromised, then this account can be removed from the Circle and and the Circle
+and all data within the Circle is still safe.
+

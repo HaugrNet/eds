@@ -1,0 +1,33 @@
+----------
+!1 Application Data Storage
+
+The initial purpose of CWS, was to act as a layer between a Cloud Application
+and their DB persistence layer. In a way, which will allow the Application to
+selectively store some data encrypted if it contain "sensitive" information.
+
+As the new EU directive GDPR (active May 25, 2018) among other things state that
+data must be stored safely, i.e. in a way so it fall 100% under EU law - it is
+almost impossible to use any US based Cloud solution, as these fall under US
+law. The case of MS v DOJ have shown that US strongly disregard non-US citizens,
+so in reality - it makes the usage of any US Cloud non-trustworthy.
+
+Yet, Clouds are here to stay. So, it gives companies a problem. Luckily CWS may
+help them part of the way, it cannot give 100% guarantee that data is secure,
+as it depends on provided information to open Keys - but if properly integrated
+into an Application, it can improve safety.
+
+CWS was originally intended for use as a backend system for other applications,
+where the data is simply passed through and thus stored encrypted, so if someone
+wishes to read the stored data, all they will see is encrypted data.
+
+As CWS only cares about bytes and nothing else. It is theoretically possible to
+store anything. If different types of Objects from the Application is stored,
+then it is also possible to add different ''DataTypes'', which will ensure that
+the Application knows how to interpretate the returned bytes.
+
+An example of this, can be a Book Store, where the information about customers
+may contain history, private and perhaps even sensitive information. Considering
+the new EU GDPR directive, storing certain information must be done in a secure
+and safe way, preferably within the EU. However, as almost all Clouds are not
+bound to EU, but is under US law, there is a problem with this, as the MS v DOJ
+case have shown.

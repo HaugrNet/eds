@@ -48,12 +48,21 @@ public final class Sign extends CwsRequest<SignResponse> {
      */
     @Override
     public void execute() {
-        final SignRequest request = new SignRequest();
-        request.setAccountName(accountName);
-        request.setCredential(credential);
+        final SignRequest request = prepareRequest(SignRequest.class);
         request.setData(data);
         request.setExpires(expires);
 
         response = CallShare.sign(request);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void reset() {
+        super.reset();
+
+        this.data = null;
+        this.expires = null;
     }
 }

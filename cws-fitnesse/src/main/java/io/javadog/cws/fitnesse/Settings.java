@@ -86,4 +86,15 @@ public final class Settings extends CwsRequest<SettingResponse> {
 
         response = CallManagement.settings(request);
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void reset() {
+        super.reset();
+
+        this.key = null;
+        this.value = null;
+    }
 }

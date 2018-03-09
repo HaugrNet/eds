@@ -7,7 +7,9 @@
  */
 package io.javadog.cws.fitnesse;
 
+import io.javadog.cws.api.requests.FetchCircleRequest;
 import io.javadog.cws.api.responses.FetchCircleResponse;
+import io.javadog.cws.fitnesse.callers.CallManagement;
 
 /**
  * @author Kim Jensen
@@ -19,6 +21,10 @@ public final class FetchCircles extends CwsRequest<FetchCircleResponse> {
     // Request & Response Setters and Getters
     // =========================================================================
 
+    public String circles() {
+        return getCircleNames();
+    }
+
     // =========================================================================
     // Standard FitNesse Fixture method(s)
     // =========================================================================
@@ -28,6 +34,10 @@ public final class FetchCircles extends CwsRequest<FetchCircleResponse> {
      */
     @Override
     public void execute() {
+        final FetchCircleRequest request = prepareRequest(FetchCircleRequest.class);
 
+        final FetchCircleResponse circleResponse = CallManagement.fetchCircles(request);
+        setCircles(circleResponse);
+        response = circleResponse;
     }
 }

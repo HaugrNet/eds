@@ -46,12 +46,21 @@ public final class Verify extends CwsRequest<VerifyResponse> {
      */
     @Override
     public void execute() {
-        final VerifyRequest request = new VerifyRequest();
-        request.setAccountName(accountName);
-        request.setCredential(credential);
+        final VerifyRequest request = prepareRequest(VerifyRequest.class);
         request.setData(data);
         request.setSignature(signature);
 
         response = CallShare.verify(request);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void reset() {
+        super.reset();
+
+        this.data = null;
+        this.signature = null;
     }
 }

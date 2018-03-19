@@ -7,7 +7,9 @@
  */
 package io.javadog.cws.fitnesse;
 
+import io.javadog.cws.api.requests.FetchTrusteeRequest;
 import io.javadog.cws.api.responses.FetchTrusteeResponse;
+import io.javadog.cws.fitnesse.callers.CallManagement;
 
 /**
  * @author Kim Jensen
@@ -28,6 +30,9 @@ public final class FetchTrustees extends CwsRequest<FetchTrusteeResponse> {
      */
     @Override
     public void execute() {
+        final FetchTrusteeRequest request = prepareRequest(FetchTrusteeRequest.class);
 
+
+        response = CallManagement.fetchTrustees(request);
     }
 }

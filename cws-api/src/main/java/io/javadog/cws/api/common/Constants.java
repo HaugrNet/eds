@@ -26,7 +26,7 @@ public final class Constants {
      * do so. Just add the following line in the beginning of all serialized
      * and derived classes:</p>
      *
-     * {@code private static final long serialVersionUID = IWSConstants.SERIAL_VERSION_UID;}
+     * {@code private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;}
      */
     public static final long SERIAL_VERSION_UID = 201701010010000L; // YYYYMMDDvvvnnnn
 

@@ -9,6 +9,7 @@ package io.javadog.cws.fitnesse;
 
 import io.javadog.cws.api.common.CredentialType;
 import io.javadog.cws.api.dtos.Circle;
+import io.javadog.cws.api.dtos.DataType;
 import io.javadog.cws.api.dtos.Member;
 import io.javadog.cws.api.requests.Authentication;
 import io.javadog.cws.api.responses.CwsResponse;
@@ -19,6 +20,7 @@ import io.javadog.cws.fitnesse.utils.Converter;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -28,17 +30,24 @@ import java.util.Objects;
  */
 public abstract class CwsRequest<R extends CwsResponse> {
 
+    // If it is not possible to find a matching value, then this should be used.
+    protected static final String UNDEFINED = "undefined";
+
     // Internal mapping of the Member AccountNames & the MemberId, so the tests
     // can refer to the names rather than the Id's, as the latter will change
     // per test run.
-    protected Map<String, String> members = new HashMap<>();
+    private final Map<String, String> members = new HashMap<>();
 
     // Internal mapping of the Circle Names & the CircleId, so the tests can
     // refer to the names rather than the Id's, as the latter will change per
     // test run.
-    protected Map<String, String> circles = new HashMap<>();
+    protected final Map<String, String> circles = new HashMap<>();
 
-    protected String accountName = null;
+    // For all Data processing, it helps to cache the existing types, so they
+    // can easily be retrieved and used if new data is being added or retrieved.
+    private final Map<String, String> dataTypes = new HashMap<>();
+
+    private String accountName = null;
     protected byte[] credential = null;
     protected R response = null;
 
@@ -106,7 +115,7 @@ public abstract class CwsRequest<R extends CwsResponse> {
                 .findFirst().orElse(null);
     }
 
-    protected String getMembersNames() {
+    protected String getMemberNames() {
         return members.keySet().toString();
     }
 
@@ -125,5 +134,19 @@ public abstract class CwsRequest<R extends CwsResponse> {
 
     protected String getCircleNames() {
         return circles.keySet().toString();
+    }
+
+    protected void setDataTypes(final List<DataType> dataTypes) {
+        for (final DataType dataType : dataTypes) {
+            this.dataTypes.put(dataType.getTypeName(), dataType.getType());
+        }
+    }
+
+    protected boolean hasDataType(final String typeName) {
+        return dataTypes.get(typeName) != null;
+    }
+
+    protected String getDataType(final String typeName) {
+        return dataTypes.getOrDefault(typeName, UNDEFINED);
     }
 }

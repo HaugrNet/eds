@@ -20,7 +20,6 @@ import io.javadog.cws.core.model.entities.SettingEntity;
 import javax.persistence.EntityManager;
 import java.nio.charset.Charset;
 import java.util.EnumSet;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -86,7 +85,7 @@ public final class SettingService extends Serviceable<SettingResponse, SettingRe
     }
 
     private Map<String, String> findChangedEntries(final SettingRequest request) {
-        final Map<String, String> map = new HashMap<>();
+        final Map<String, String> map = new ConcurrentHashMap<>();
 
         for (final Map.Entry<String, String> entry : request.getSettings().entrySet()) {
             final String key = trim(entry.getKey());

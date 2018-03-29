@@ -69,6 +69,7 @@ public abstract class CWSKey<T extends Key> {
         // From the OpenJDK bugs:
         //  o https://bugs.openjdk.java.net/browse/JDK-6263419
         //     - No way to clean the memory for a java.security.Key
+        //     - Bug is closed, but comments are interesting
         //  o https://bugs.openjdk.java.net/browse/JDK-8008795
         //     - Clean memory in JCE implementations of private key and secret key
         //  o https://bugs.openjdk.java.net/browse/JDK-8158689

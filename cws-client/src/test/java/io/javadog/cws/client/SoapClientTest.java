@@ -16,14 +16,18 @@ import io.javadog.cws.api.common.Action;
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.requests.FetchCircleRequest;
+import io.javadog.cws.api.requests.FetchDataTypeRequest;
 import io.javadog.cws.api.requests.FetchMemberRequest;
 import io.javadog.cws.api.requests.ProcessCircleRequest;
+import io.javadog.cws.api.requests.ProcessDataTypeRequest;
 import io.javadog.cws.api.requests.ProcessMemberRequest;
 import io.javadog.cws.api.requests.SettingRequest;
 import io.javadog.cws.api.responses.FetchCircleResponse;
 import io.javadog.cws.api.responses.FetchDataResponse;
+import io.javadog.cws.api.responses.FetchDataTypeResponse;
 import io.javadog.cws.api.responses.FetchMemberResponse;
 import io.javadog.cws.api.responses.ProcessCircleResponse;
+import io.javadog.cws.api.responses.ProcessDataTypeResponse;
 import io.javadog.cws.api.responses.ProcessMemberResponse;
 import io.javadog.cws.api.responses.SettingResponse;
 import io.javadog.cws.api.responses.VersionResponse;
@@ -123,25 +127,33 @@ public final class SoapClientTest {
         Base.addTrustee(management, accountName1, circleId, memberId2);
 
         // Step 2; Add 2 Data Objects
-        final String data1 = toString(Base.generateData(1024000));
-        final String data2 = toString(Base.generateData(1024000));
-        final String dataId1 = Base.addData(share, accountName2, circleId, "data1", toBytes(data1));
-        final String dataId2 = Base.addData(share, accountName1, circleId, "data2", toBytes(data2));
+        final String data1 = Base.toString(Base.generateData(1024000));
+        final String data2 = Base.toString(Base.generateData(1024000));
+        final String dataId1 = Base.addData(share, accountName2, circleId, "data1", Base.toBytes(data1));
+        final String dataId2 = Base.addData(share, accountName1, circleId, "data2", Base.toBytes(data2));
 
         // Step 3; Check the stored content of the Circle
         final FetchDataResponse response = Base.readFolderContent(share, accountName1, circleId);
         assertThat(response.getRecords(), is(2L));
         final byte[] read1 = Base.readData(share, accountName2, dataId1);
-        assertThat(toString(read1), is(data1));
+        assertThat(Base.toString(read1), is(data1));
         final byte[] read2 = Base.readData(share, accountName2, dataId2);
-        assertThat(toString(read2), is(data2));
+        assertThat(Base.toString(read2), is(data2));
     }
 
-    private static byte[] toBytes(final String str) {
-        return str.getBytes(Charset.defaultCharset());
-    }
+    @Test
+    public void testReadDataTypes() {
+        final ProcessDataTypeRequest processRequest = Base.prepareRequest(ProcessDataTypeRequest.class, Constants.ADMIN_ACCOUNT);
+        processRequest.setTypeName("ObjectType");
+        processRequest.setType("Object Mapping Rules");
+        processRequest.setAction(Action.PROCESS);
+        final ProcessDataTypeResponse processResponse = share.processDataType(processRequest);
+        assertThat(processResponse.isOk(), is(true));
+        assertThat(processResponse.getDataType().getTypeName(), is(processRequest.getTypeName()));
 
-    private static String toString(final byte[] bytes) {
-        return new String(bytes, Charset.defaultCharset());
+        final FetchDataTypeRequest fetchRequest = Base.prepareRequest(FetchDataTypeRequest.class, Constants.ADMIN_ACCOUNT);
+        final FetchDataTypeResponse fetchResponse = share.fetchDataTypes(fetchRequest);
+        assertThat(fetchResponse.isOk(), is(true));
+        assertThat(fetchResponse.getDataTypes().size(), is(3));
     }
 }

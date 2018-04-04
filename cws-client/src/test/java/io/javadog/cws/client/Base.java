@@ -142,6 +142,14 @@ public final class Base {
         return data;
     }
 
+    public static byte[] toBytes(final String str) {
+        return str.getBytes(Charset.defaultCharset());
+    }
+
+    public static String toString(final byte[] bytes) {
+        return new String(bytes, Charset.defaultCharset());
+    }
+
     private static void throwIfFailed(final CwsResponse response) {
         if (!response.isOk()) {
             throw new CWSClientException(response.getReturnMessage());

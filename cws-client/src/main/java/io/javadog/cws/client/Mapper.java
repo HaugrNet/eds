@@ -39,6 +39,8 @@ import java.util.List;
  */
 public final class Mapper {
 
+    private static final String NAMESPACE = "";
+
     /**
      * Private Constructor, this is a utility Class.
      */
@@ -50,17 +52,17 @@ public final class Mapper {
     // =========================================================================
 
     public static JAXBElement<String> convert(final String field, final String value) {
-        final QName qName = new QName("", field);
+        final QName qName = new QName(NAMESPACE, field);
         return new JAXBElement<>(qName, String.class, value);
     }
 
-    public static JAXBElement<Integer> convert(final String field, final Integer value) {
-        final QName qName = new QName("", field);
+    public static JAXBElement<Integer> convert(final String field, final int value) {
+        final QName qName = new QName(NAMESPACE, field);
         return new JAXBElement<>(qName, Integer.class, value);
     }
 
     public static JAXBElement<byte[]> convert(final String field, final byte[] value) {
-        final QName qName = new QName("", field);
+        final QName qName = new QName(NAMESPACE, field);
         return new JAXBElement<>(qName, byte[].class, value);
     }
 
@@ -100,7 +102,7 @@ public final class Mapper {
 
         if (api != null) {
             final io.javadog.cws.ws.TrustLevel value = io.javadog.cws.ws.TrustLevel.valueOf(api.name());
-            final QName qName = new QName("", Constants.FIELD_TRUSTLEVEL);
+            final QName qName = new QName(NAMESPACE, Constants.FIELD_TRUSTLEVEL);
             ws = new JAXBElement(qName, String.class, value);
         }
 

@@ -34,12 +34,12 @@ import java.util.UUID;
  */
 public final class RestClientTest {
 
-    private final Management system = new ManagementRestClient(Base.URL);
+    private final Management management = new ManagementRestClient(Base.URL);
     private final Share share = new ShareRestClient(Base.URL);
 
     @Test
     public void testVersion() {
-        final VersionResponse response = system.version();
+        final VersionResponse response = management.version();
         assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getHttpCode()));
         assertThat(response.getReturnMessage(), is("Ok"));
         assertThat(response.getVersion(), is("1.0-SNAPSHOT"));
@@ -49,7 +49,7 @@ public final class RestClientTest {
     public void testSettings() {
         final SettingRequest request = Base.prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
 
-        final SettingResponse response = system.settings(request);
+        final SettingResponse response = management.settings(request);
         assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getHttpCode()));
         assertThat(response.getReturnMessage(), is("Ok"));
     }

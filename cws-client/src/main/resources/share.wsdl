@@ -175,10 +175,10 @@
     <xs:complexContent>
       <xs:extension base="tns:authentication">
         <xs:sequence>
-          <xs:element minOccurs="0" name="circleId" nillable="true" type="xs:string"/>
-          <xs:element minOccurs="0" name="dataId" nillable="true" type="xs:string"/>
-          <xs:element minOccurs="0" name="pageNumber" nillable="true" type="xs:int"/>
-          <xs:element minOccurs="0" name="pageSize" nillable="true" type="xs:int"/>
+          <xs:element minOccurs="0" name="circleId" type="xs:string"/>
+          <xs:element minOccurs="0" name="dataId" type="xs:string"/>
+          <xs:element minOccurs="0" name="pageNumber" type="xs:int"/>
+          <xs:element minOccurs="0" name="pageSize" type="xs:int"/>
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>

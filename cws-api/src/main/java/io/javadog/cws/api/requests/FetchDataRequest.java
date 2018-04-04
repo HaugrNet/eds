@@ -32,19 +32,19 @@ public final class FetchDataRequest extends Authentication implements CircleIdRe
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
     @Pattern(regexp = Constants.ID_PATTERN_REGEX)
-    @XmlElement(name = Constants.FIELD_CIRCLE_ID, nillable = true)
+    @XmlElement(name = Constants.FIELD_CIRCLE_ID)
     private String circleId = null;
 
     @Pattern(regexp = Constants.ID_PATTERN_REGEX)
-    @XmlElement(name = Constants.FIELD_DATA_ID, nillable = true)
+    @XmlElement(name = Constants.FIELD_DATA_ID)
     private String dataId = null;
 
     @NotNull @Size(min = 1)
-    @XmlElement(name = Constants.FIELD_PAGE_NUMBER, nillable = true)
+    @XmlElement(name = Constants.FIELD_PAGE_NUMBER)
     private Integer pageNumber = 1;
 
     @NotNull @Size(min = 1, max = Constants.MAX_PAGE_SIZE)
-    @XmlElement(name = Constants.FIELD_PAGE_SIZE, nillable = true)
+    @XmlElement(name = Constants.FIELD_PAGE_SIZE)
     private Integer pageSize = Constants.MAX_PAGE_SIZE;
 
     // =========================================================================

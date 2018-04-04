@@ -7,11 +7,26 @@
  */
 package io.javadog.cws.client;
 
+import io.javadog.cws.api.Management;
+import io.javadog.cws.api.Share;
+import io.javadog.cws.api.common.Action;
+import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.CredentialType;
+import io.javadog.cws.api.common.TrustLevel;
 import io.javadog.cws.api.requests.Authentication;
+import io.javadog.cws.api.requests.ProcessCircleRequest;
+import io.javadog.cws.api.requests.ProcessDataRequest;
+import io.javadog.cws.api.requests.ProcessMemberRequest;
+import io.javadog.cws.api.requests.ProcessTrusteeRequest;
+import io.javadog.cws.api.responses.ProcessCircleResponse;
+import io.javadog.cws.api.responses.ProcessDataResponse;
+import io.javadog.cws.api.responses.ProcessMemberResponse;
+import io.javadog.cws.api.responses.ProcessTrusteeResponse;
 
 import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.Charset;
+import java.security.SecureRandom;
+import java.util.UUID;
 
 /**
  * @author Kim Jensen
@@ -37,5 +52,75 @@ public final class Base {
         } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
             throw new CWSClientException("Cannot instantiate Request Object", e);
         }
+    }
+
+    public static String createAccount(final Management management, final String accountName) {
+        final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
+        request.setAction(Action.CREATE);
+        request.setNewAccountName(accountName);
+        request.setNewCredential(accountName.getBytes(Charset.forName("UTF-8")));
+
+        final ProcessMemberResponse response = management.processMember(request);
+        if (!response.isOk()) {
+            throw new CWSClientException(response.getReturnMessage());
+        }
+
+        return response.getMemberId();
+    }
+
+    public static String createCircle(final Management management, final String circleName, final String accountName) {
+        final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, accountName);
+        request.setAction(Action.CREATE);
+        request.setCircleName(circleName);
+        request.setCircleName(UUID.randomUUID().toString());
+
+        final ProcessCircleResponse response = management.processCircle(request);
+        if (!response.isOk()) {
+            throw new CWSClientException(response.getReturnMessage());
+        }
+
+        return response.getCircleId();
+    }
+
+    public static void addTrustee(final Management management, final String circleAdminAccount, final String circleId, final String memberId) {
+        final ProcessTrusteeRequest request = prepareRequest(ProcessTrusteeRequest.class, circleAdminAccount);
+        request.setAction(Action.ADD);
+        request.setCircleId(circleId);
+        request.setMemberId(memberId);
+        request.setTrustLevel(TrustLevel.WRITE);
+
+        final ProcessTrusteeResponse response = management.processTrustee(request);
+        if (!response.isOk()) {
+            throw new CWSClientException(response.getReturnMessage());
+        }
+    }
+
+    public static String addData(final Share share, final String accountName, final String circleId, final String dataName, final byte[] data) {
+        final ProcessDataRequest request = prepareRequest(ProcessDataRequest.class, accountName);
+        request.setAction(Action.ADD);
+        request.setCircleId(circleId);
+        request.setDataName(dataName);
+        request.setData(data);
+
+        final ProcessDataResponse response = share.processData(request);
+        if (!response.isOk()) {
+            throw new CWSClientException(response.getReturnMessage());
+        }
+
+        return response.getDataId();
+    }
+
+    public static byte[] generateData(final int bytes) {
+        final byte[] data;
+
+        if (bytes > 0) {
+            data = new byte[bytes];
+            final SecureRandom random = new SecureRandom();
+            random.nextBytes(data);
+        } else {
+            data = null;
+        }
+
+        return data;
     }
 }

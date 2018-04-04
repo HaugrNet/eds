@@ -8,7 +8,6 @@
 package io.javadog.cws.client;
 
 import io.javadog.cws.api.Share;
-import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.requests.FetchDataRequest;
 import io.javadog.cws.api.requests.FetchDataTypeRequest;
 import io.javadog.cws.api.requests.FetchSignatureRequest;
@@ -211,10 +210,10 @@ public final class ShareSoapClient implements Share {
         if (api != null) {
             ws = new io.javadog.cws.ws.FetchDataRequest();
             Mapper.fillAuthentication(ws, api);
-            ws.setCircleId(Mapper.convert(Constants.FIELD_CIRCLE_ID, api.getCircleId()));
-            ws.setDataId(Mapper.convert(Constants.FIELD_DATA_ID, api.getDataId()));
-            ws.setPageNumber(Mapper.convert(Constants.FIELD_PAGE_NUMBER, api.getPageNumber()));
-            ws.setPageSize(Mapper.convert(Constants.FIELD_PAGE_SIZE, api.getPageSize()));
+            ws.setCircleId(api.getCircleId());
+            ws.setDataId(api.getDataId());
+            ws.setPageNumber(api.getPageNumber());
+            ws.setPageSize(api.getPageSize());
         }
 
         return ws;

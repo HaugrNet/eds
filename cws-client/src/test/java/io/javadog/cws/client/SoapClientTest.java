@@ -16,7 +16,6 @@ import io.javadog.cws.api.common.Action;
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.requests.FetchCircleRequest;
-import io.javadog.cws.api.requests.FetchDataRequest;
 import io.javadog.cws.api.requests.FetchMemberRequest;
 import io.javadog.cws.api.requests.ProcessCircleRequest;
 import io.javadog.cws.api.requests.ProcessMemberRequest;
@@ -115,6 +114,7 @@ public final class SoapClientTest {
 
     @Test
     public void testAddData() {
+        // Step 1; Create a new Circle with 2 Trustees
         final String accountName1 = UUID.randomUUID().toString();
         final String accountName2 = UUID.randomUUID().toString();
         final String memberId1 = Base.createAccount(management, accountName1);
@@ -122,13 +122,26 @@ public final class SoapClientTest {
         final String circleId = Base.createCircle(management, accountName1, accountName1);
         Base.addTrustee(management, accountName1, circleId, memberId2);
 
-        final String dataId1 = Base.addData(share, accountName2, circleId, "data1", Base.generateData(1024000));
-        final String dataId2 = Base.addData(share, accountName1, circleId, "data2", Base.generateData(1024000));
+        // Step 2; Add 2 Data Objects
+        final String data1 = toString(Base.generateData(1024000));
+        final String data2 = toString(Base.generateData(1024000));
+        final String dataId1 = Base.addData(share, accountName2, circleId, "data1", toBytes(data1));
+        final String dataId2 = Base.addData(share, accountName1, circleId, "data2", toBytes(data2));
 
-        final FetchDataRequest request = Base.prepareRequest(FetchDataRequest.class, accountName1);
-        request.setCircleId(circleId);
-        final FetchDataResponse response = share.fetchData(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+        // Step 3; Check the stored content of the Circle
+        final FetchDataResponse response = Base.readFolderContent(share, accountName1, circleId);
         assertThat(response.getRecords(), is(2L));
+        final byte[] read1 = Base.readData(share, accountName2, dataId1);
+        assertThat(toString(read1), is(data1));
+        final byte[] read2 = Base.readData(share, accountName2, dataId2);
+        assertThat(toString(read2), is(data2));
+    }
+
+    private static byte[] toBytes(final String str) {
+        return str.getBytes(Charset.defaultCharset());
+    }
+
+    private static String toString(final byte[] bytes) {
+        return new String(bytes, Charset.defaultCharset());
     }
 }

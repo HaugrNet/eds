@@ -14,10 +14,13 @@ import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.CredentialType;
 import io.javadog.cws.api.common.TrustLevel;
 import io.javadog.cws.api.requests.Authentication;
+import io.javadog.cws.api.requests.FetchDataRequest;
 import io.javadog.cws.api.requests.ProcessCircleRequest;
 import io.javadog.cws.api.requests.ProcessDataRequest;
 import io.javadog.cws.api.requests.ProcessMemberRequest;
 import io.javadog.cws.api.requests.ProcessTrusteeRequest;
+import io.javadog.cws.api.responses.CwsResponse;
+import io.javadog.cws.api.responses.FetchDataResponse;
 import io.javadog.cws.api.responses.ProcessCircleResponse;
 import io.javadog.cws.api.responses.ProcessDataResponse;
 import io.javadog.cws.api.responses.ProcessMemberResponse;
@@ -61,9 +64,7 @@ public final class Base {
         request.setNewCredential(accountName.getBytes(Charset.forName("UTF-8")));
 
         final ProcessMemberResponse response = management.processMember(request);
-        if (!response.isOk()) {
-            throw new CWSClientException(response.getReturnMessage());
-        }
+        throwIfFailed(response);
 
         return response.getMemberId();
     }
@@ -75,9 +76,7 @@ public final class Base {
         request.setCircleName(UUID.randomUUID().toString());
 
         final ProcessCircleResponse response = management.processCircle(request);
-        if (!response.isOk()) {
-            throw new CWSClientException(response.getReturnMessage());
-        }
+        throwIfFailed(response);
 
         return response.getCircleId();
     }
@@ -90,9 +89,7 @@ public final class Base {
         request.setTrustLevel(TrustLevel.WRITE);
 
         final ProcessTrusteeResponse response = management.processTrustee(request);
-        if (!response.isOk()) {
-            throw new CWSClientException(response.getReturnMessage());
-        }
+        throwIfFailed(response);
     }
 
     public static String addData(final Share share, final String accountName, final String circleId, final String dataName, final byte[] data) {
@@ -103,11 +100,32 @@ public final class Base {
         request.setData(data);
 
         final ProcessDataResponse response = share.processData(request);
-        if (!response.isOk()) {
-            throw new CWSClientException(response.getReturnMessage());
-        }
+        throwIfFailed(response);
 
         return response.getDataId();
+    }
+
+    public static FetchDataResponse readFolderContent(final Share share, final String accountName, final String circleId, final String... folderId) {
+        final FetchDataRequest request = prepareRequest(FetchDataRequest.class, accountName);
+        request.setCircleId(circleId);
+        if ((folderId != null) && (folderId.length == 1)) {
+            request.setDataId(folderId[0]);
+        }
+
+        final FetchDataResponse response = share.fetchData(request);
+        throwIfFailed(response);
+
+        return response;
+    }
+
+    public static byte[] readData(final Share share, final String accountName, final String dataId) {
+        final FetchDataRequest request = prepareRequest(FetchDataRequest.class, accountName);
+        request.setDataId(dataId);
+
+        final FetchDataResponse response = share.fetchData(request);
+        throwIfFailed(response);
+
+        return response.getData();
     }
 
     public static byte[] generateData(final int bytes) {
@@ -122,5 +140,11 @@ public final class Base {
         }
 
         return data;
+    }
+
+    private static void throwIfFailed(final CwsResponse response) {
+        if (!response.isOk()) {
+            throw new CWSClientException(response.getReturnMessage());
+        }
     }
 }

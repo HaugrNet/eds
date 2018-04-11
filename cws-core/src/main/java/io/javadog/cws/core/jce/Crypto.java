@@ -82,8 +82,9 @@ public final class Crypto {
     /**
      * <p>Converts the given Salted Password to a Key, which can be used for the
      * initial Cryptographic Operations. With the help of the PBKDF2 algorithm,
-     * it creates a 256 byte Key over 1024 iterations. However, for the Key to
-     * be of a good enough Quality, it should be having a length of at least 16
+     * it creates a symmetric Key over 'n' iterations, where 'n' is configurable
+     * as it may be required to have stronger checks. However, for the Key to be
+     * of a good enough Quality, it should be having a length of at least 16
      * characters and the same applies to the Salt.</p>
      *
      * @param algorithm PBE Algorithm to generate Account Symmetric Key
@@ -97,7 +98,7 @@ public final class Crypto {
             final byte[] secretSalt = stringToBytes(salt);
 
             final SecretKeyFactory factory = SecretKeyFactory.getInstance(algorithm.getTransformation());
-            final KeySpec spec = new PBEKeySpec(extendedSecret, secretSalt, 1024, algorithm.getLength());
+            final KeySpec spec = new PBEKeySpec(extendedSecret, secretSalt, settings.getPasswordIterations(), algorithm.getLength());
             final SecretKey tmpKey = factory.generateSecret(spec);
             final SecretKey secretKey = new SecretKeySpec(tmpKey.getEncoded(), algorithm.getName());
             final SecretCWSKey key = new SecretCWSKey(algorithm.getDerived(), secretKey);

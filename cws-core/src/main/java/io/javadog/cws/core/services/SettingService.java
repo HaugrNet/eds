@@ -115,14 +115,10 @@ public final class SettingService extends Serviceable<SettingResponse, SettingRe
                 deleteSetting(existing.get(key));
             } else if (existing.containsKey(key)) {
                 entity = existing.get(key);
-                if (Objects.equals(entity.getName(), StandardSetting.CWS_SALT.getKey())) {
-                    updateSaltOrThrowException(request, entity, key, value);
-                } else {
-                    persistAndUpdateSetting(entity, key, value);
-                }
+                persistAndUpdateSetting(request, entity, key, value);
             } else {
                 entity = new SettingEntity();
-                persistAndUpdateSetting(entity, key, value);
+                persistAndUpdateSetting(request, entity, key, value);
             }
         }
     }
@@ -152,6 +148,12 @@ public final class SettingService extends Serviceable<SettingResponse, SettingRe
             case PBE_ALGORITHM:
                 checkAlgorithm(KeyAlgorithm.Type.PASSWORD, setting, value);
                 break;
+            case PBE_ITERATIONS:
+                // Changing the Iterations may only be done if no other accounts
+                // exist, as it will render all accounts useless otherwise
+                checkIfMembersExist(setting);
+                checkNumber(setting, value);
+                break;
             case HASH_ALGORITHM:
                 checkAlgorithm(KeyAlgorithm.Type.SIGNATURE, setting, value);
                 break;
@@ -162,7 +164,7 @@ public final class SettingService extends Serviceable<SettingResponse, SettingRe
                 checkNumber(setting, value);
                 break;
             case CWS_SALT:
-                checkIfSaltMayBeUpdated(setting);
+                checkIfMembersExist(setting);
                 break;
             default:
                 break;
@@ -210,7 +212,7 @@ public final class SettingService extends Serviceable<SettingResponse, SettingRe
         }
     }
 
-    private void checkIfSaltMayBeUpdated(final StandardSetting setting) {
+    private void checkIfMembersExist(final StandardSetting setting) {
         // If there is no change between the existing Salt and the one from the
         // request, then we will simply ignore it.
         if (dao.countMembers() > 1) {
@@ -221,28 +223,29 @@ public final class SettingService extends Serviceable<SettingResponse, SettingRe
         }
     }
 
-    private void updateSaltOrThrowException(final SettingRequest request, final SettingEntity entity, final String key, final String value) {
-        // Updating the salt is not trivial. The pre-check ensure that no active
-        // accounts exists, so we only have to update the System Administrator
-        // account, which is used for this operation.
-
-        // First, save the updated Salt value
-        persistAndUpdateSetting(entity, key, value);
-
-        // Now the tricky part - we have to update the Admin Account also.
-        updateMemberPassword(member, request.getCredential());
-    }
-
     private void deleteSetting(final SettingEntity entity) {
         settings.remove(entity.getName());
         dao.delete(entity);
     }
 
-    private void persistAndUpdateSetting(final SettingEntity entity, final String key, final String value) {
+    private void persistAndUpdateSetting(final SettingRequest request, final SettingEntity entity, final String key, final String value) {
+        // First, just update the setting.
         entity.setName(key);
         entity.setSetting(value);
         dao.persist(entity);
         settings.set(key, value);
+
+        // Now the tricky part - if we have a critical setting (Salt or PBE
+        // Iterations), which can only be updated when no members exist, we
+        // also have to update the System Administrator account, otherwise
+        // the new change will not work correctly.
+        if (Objects.equals(key, StandardSetting.CWS_SALT.getKey()) ||
+            Objects.equals(key, StandardSetting.PBE_ITERATIONS.getKey())) {
+            // As the System Administrator is not having any Circles, the
+            // newly generated Asymmetric Key for the updated account can be
+            // ignored.
+            updateMemberPassword(member, request.getCredential());
+        }
     }
 
     private static Map<String, SettingEntity> convertSettings(final List<SettingEntity> list) {

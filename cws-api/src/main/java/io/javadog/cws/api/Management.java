@@ -95,6 +95,17 @@ public interface Management {
      *     to unlock the Private Key for the Account.</i>
      *   </li>
      *   <li>
+     *     <b>cws.crypto.pbe.iterations</b> - default value: '1024'<br>
+     *     Allowed Values: Any positive number<br>
+     *     <i>The PBE algorithm (PBKDF) is extending the Member credentials with
+     *     the Salt over a number of iterations. By default, 1024 iterations is
+     *     used, which is generally considered very weak, but it is good value
+     *     for testing and for trusted deployment environments. However, for a
+     *     non-trusted environment, is is considered too weak, and higher number
+     *     should be used for such environments. See <a href="https://en.wikipedia.org/wiki/PBKDF2">Wikipedia</a>
+     *     for more information.</i>
+     *   </li>
+     *   <li>
      *     <b>cws.crypto.hash.algorithm</b> - default value: 'SHA512'<br>
      *     Allowed Values: 'SHA256' or 'SHA512'<br>
      *     <i>For the CheckSums or Fingerprints we're generating - we just need

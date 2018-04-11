@@ -55,7 +55,7 @@ public final class ManagementServiceTest extends BeanSetup {
             final ManagementService system = prepareSystemService();
             final String version;
 
-            try (InputStream stream = loader.getResourceAsStream(propertiesFile)) {
+            try (final InputStream stream = loader.getResourceAsStream(propertiesFile)) {
                 final Properties properties = new Properties();
                 properties.load(stream);
                 version = properties.getProperty("cws.version");
@@ -106,7 +106,7 @@ public final class ManagementServiceTest extends BeanSetup {
 
         final SettingResponse response = system.settings(request);
         assertThat(response.getReturnCode(), is(ReturnCode.SETTING_WARNING.getCode()));
-        assertThat(response.getSettings().size(), is(14));
+        assertThat(response.getSettings().size(), is(StandardSetting.values().length));
     }
 
     @Test

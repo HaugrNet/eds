@@ -202,13 +202,23 @@ public abstract class Serviceable<R extends CwsResponse, V extends Authenticatio
 
     protected MemberEntity createNewAccount(final String accountName, final byte[] credential) {
         final MemberEntity account = new MemberEntity();
-        updateMemberPassword(account, credential);
         account.setName(accountName);
-        dao.persist(account);
+        updateMemberPassword(account, credential);
 
         return account;
     }
 
+    /**
+     * This method will update the Member Password, and at the same time also
+     * update the Asymmetric key belonging to the member. If the Asymmetric key
+     * is used for anything, then it must also be updated in all places it is
+     * being used. Otherwise, the action of invoking this request will result
+     * in an invalidated account.
+     *
+     * @param member   The Member to update the Asymmetric Key & Password for
+     * @param password The new Password
+     * @return The new Asymmetric Key
+     */
     protected CWSKeyPair updateMemberPassword(final MemberEntity member, final byte[] password) {
         final KeyAlgorithm pbeAlgorithm = settings.getPasswordAlgorithm();
         final KeyAlgorithm rsaAlgorithm = settings.getAsymmetricAlgorithm();
@@ -225,6 +235,7 @@ public abstract class Serviceable<R extends CwsResponse, V extends Authenticatio
         member.setRsaAlgorithm(rsaAlgorithm);
         member.setPrivateKey(privateKey);
         member.setPublicKey(publicKey);
+        dao.persist(member);
 
         return pair;
     }

@@ -129,6 +129,10 @@ public final class Settings {
         return KeyAlgorithm.valueOf(get(StandardSetting.PBE_ALGORITHM.getKey()));
     }
 
+    public Integer getPasswordIterations() {
+        return Integer.valueOf(get(StandardSetting.PBE_ITERATIONS.getKey()).trim());
+    }
+
     public HashAlgorithm getHashAlgorithm() {
         return HashAlgorithm.valueOf(get(StandardSetting.HASH_ALGORITHM.getKey()));
     }

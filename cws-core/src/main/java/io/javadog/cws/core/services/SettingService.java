@@ -19,6 +19,7 @@ import io.javadog.cws.core.model.entities.SettingEntity;
 
 import javax.persistence.EntityManager;
 import java.nio.charset.Charset;
+import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
@@ -62,6 +63,7 @@ public final class SettingService extends Serviceable<SettingResponse, SettingRe
      */
     @Override
     public SettingResponse perform(final SettingRequest request) {
+        // Pre-checks, postponing destruction of credentials
         verifyRequest(request, Permission.SETTING);
 
         // Updating the Settings should be all or nothing. If only partially
@@ -77,6 +79,9 @@ public final class SettingService extends Serviceable<SettingResponse, SettingRe
         // All issues should've been covered, meaning that we can now safely
         // update the settings in the DB & the Settings Object.
         processCheckedSettings(request, changedEntries);
+
+        // All corrections have been made, now we can destroy the credentials
+        Arrays.fill(request.getCredential(), (byte) 0);
 
         final SettingResponse response = new SettingResponse();
         response.setSettings(convert(settings));

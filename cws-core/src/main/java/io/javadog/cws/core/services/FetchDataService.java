@@ -21,6 +21,7 @@ import io.javadog.cws.core.model.entities.MetadataEntity;
 
 import javax.persistence.EntityManager;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -40,7 +41,10 @@ public final class FetchDataService extends Serviceable<FetchDataResponse, Fetch
      */
     @Override
     public FetchDataResponse perform(final FetchDataRequest request) {
+        // Pre-checks, & destruction of credentials
         verifyRequest(request, Permission.FETCH_DATA);
+        Arrays.fill(request.getCredential(), (byte) 0);
+
         final MetadataEntity root = findRootMetadata(request);
         final FetchDataResponse response;
 

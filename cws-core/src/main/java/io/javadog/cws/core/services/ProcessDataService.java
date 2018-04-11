@@ -24,6 +24,7 @@ import io.javadog.cws.core.model.entities.MetadataEntity;
 import io.javadog.cws.core.model.entities.TrusteeEntity;
 
 import javax.persistence.EntityManager;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Objects;
 import java.util.UUID;
@@ -43,7 +44,9 @@ public final class ProcessDataService extends Serviceable<ProcessDataResponse, P
      */
     @Override
     public ProcessDataResponse perform(final ProcessDataRequest request) {
+        // Pre-checks, & destruction of credentials
         verifyRequest(request, Permission.PROCESS_DATA);
+        Arrays.fill(request.getCredential(), (byte) 0);
 
         // Since the verification above is of a more general nature, it is
         // important that the processing is being double checked against the

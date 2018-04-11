@@ -16,6 +16,7 @@ import io.javadog.cws.core.model.entities.SignatureEntity;
 
 import javax.persistence.EntityManager;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -33,7 +34,9 @@ public final class FetchSignatureService extends Serviceable<FetchSignatureRespo
      */
     @Override
     public FetchSignatureResponse perform(final FetchSignatureRequest request) {
+        // Pre-checks, & destruction of credentials
         verifyRequest(request, Permission.FETCH_SIGNATURES);
+        Arrays.fill(request.getCredential(), (byte) 0);
 
         final List<SignatureEntity> found = dao.findAllSignatures(member);
         final List<Signature> signatures = new ArrayList<>(found.size());

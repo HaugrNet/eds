@@ -16,6 +16,7 @@ import io.javadog.cws.core.model.entities.SignatureEntity;
 
 import javax.persistence.EntityManager;
 import java.security.PublicKey;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.Date;
 
@@ -34,7 +35,10 @@ public final class VerifyService extends Serviceable<VerifyResponse, VerifyReque
      */
     @Override
     public VerifyResponse perform(final VerifyRequest request) {
+        // Pre-checks, & destruction of credentials
         verifyRequest(request, Permission.VERIFY_SIGNATURE);
+        Arrays.fill(request.getCredential(), (byte) 0);
+
         final byte[] signature = Base64.getDecoder().decode(request.getSignature());
         final String checksum = crypto.generateChecksum(signature);
         final SignatureEntity entity = dao.findByChecksum(checksum);

@@ -22,6 +22,7 @@ import io.javadog.cws.core.model.entities.TrusteeEntity;
 
 import javax.persistence.EntityManager;
 import java.security.PublicKey;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -40,7 +41,10 @@ public final class ProcessTrusteeService extends Serviceable<ProcessTrusteeRespo
      */
     @Override
     public ProcessTrusteeResponse perform(final ProcessTrusteeRequest request) {
+        // Pre-checks, & destruction of credentials
         verifyRequest(request, Permission.PROCESS_TRUSTEE);
+        Arrays.fill(request.getCredential(), (byte) 0);
+
         final ProcessTrusteeResponse response;
 
         switch (request.getAction()) {

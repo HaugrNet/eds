@@ -19,6 +19,7 @@ import io.javadog.cws.core.model.Settings;
 import io.javadog.cws.core.model.entities.DataTypeEntity;
 
 import javax.persistence.EntityManager;
+import java.util.Arrays;
 import java.util.Objects;
 
 /**
@@ -36,7 +37,10 @@ public final class ProcessDataTypeService extends Serviceable<ProcessDataTypeRes
      */
     @Override
     public ProcessDataTypeResponse perform(final ProcessDataTypeRequest request) {
+        // Pre-checks, & destruction of credentials
         verifyRequest(request, Permission.PROCESS_DATA_TYPE);
+        Arrays.fill(request.getCredential(), (byte) 0);
+
         final ProcessDataTypeResponse response;
 
         switch (request.getAction()) {

@@ -18,6 +18,7 @@ import io.javadog.cws.core.model.entities.TrusteeEntity;
 
 import javax.persistence.EntityManager;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -36,7 +37,10 @@ public final class FetchCircleService extends Serviceable<FetchCircleResponse, F
      */
     @Override
     public FetchCircleResponse perform(final FetchCircleRequest request) {
+        // Pre-checks, & destruction of credentials
         verifyRequest(request, Permission.FETCH_CIRCLE);
+        Arrays.fill(request.getCredential(), (byte) 0);
+
         final FetchCircleResponse response = new FetchCircleResponse();
         final List<Circle> circles;
 

@@ -17,6 +17,7 @@ import io.javadog.cws.core.model.entities.DataEntity;
 
 import javax.persistence.EntityManager;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -36,7 +37,10 @@ public final class SanityService extends Serviceable<SanityResponse, SanityReque
      */
     @Override
     public SanityResponse perform(final SanityRequest request) {
+        // Pre-checks, & destruction of credentials
         verifyRequest(request, Permission.SANITY);
+        Arrays.fill(request.getCredential(), (byte) 0);
+
         final List<DataEntity> found = findRecords(request);
         final List<Sanity> sanities = convertRecords(found);
         final SanityResponse response = new SanityResponse();

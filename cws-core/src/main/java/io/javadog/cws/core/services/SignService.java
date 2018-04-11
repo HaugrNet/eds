@@ -14,6 +14,7 @@ import io.javadog.cws.core.model.Settings;
 import io.javadog.cws.core.model.entities.SignatureEntity;
 
 import javax.persistence.EntityManager;
+import java.util.Arrays;
 import java.util.Base64;
 
 /**
@@ -31,7 +32,10 @@ public final class SignService extends Serviceable<SignResponse, SignRequest> {
      */
     @Override
     public SignResponse perform(final SignRequest request) {
+        // Pre-checks, & destruction of credentials
         verifyRequest(request, Permission.CREATE_SIGNATURE);
+        Arrays.fill(request.getCredential(), (byte) 0);
+
         final SignResponse response = new SignResponse();
 
         final byte[] rawSignature = crypto.sign(keyPair.getPrivate().getKey(), request.getData());

@@ -29,6 +29,7 @@ import io.javadog.cws.core.model.entities.TrusteeEntity;
 
 import javax.persistence.EntityManager;
 import java.security.PublicKey;
+import java.util.Arrays;
 import java.util.Objects;
 
 /**
@@ -46,7 +47,10 @@ public final class ProcessCircleService extends Serviceable<ProcessCircleRespons
      */
     @Override
     public ProcessCircleResponse perform(final ProcessCircleRequest request) {
+        // Pre-checks, & destruction of credentials
         verifyRequest(request, Permission.PROCESS_CIRCLE);
+        Arrays.fill(request.getCredential(), (byte) 0);
+
         final ProcessCircleResponse response;
         final Action action = request.getAction();
 

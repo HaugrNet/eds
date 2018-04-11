@@ -25,6 +25,7 @@ import io.javadog.cws.core.model.entities.TrusteeEntity;
 
 import javax.persistence.EntityManager;
 import java.security.PublicKey;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.EnumSet;
 import java.util.List;
@@ -57,7 +58,9 @@ public final class ProcessMemberService extends Serviceable<ProcessMemberRespons
                     response = new ProcessMemberResponse(ReturnCode.VERIFICATION_WARNING, "The " + Constants.FIELD_NEW_CREDENTIAL + " is missing in Request.");
                 }
             } else {
+                // Pre-checks, & destruction of credentials
                 verifyRequest(request, Permission.PROCESS_MEMBER);
+                Arrays.fill(request.getCredential(), (byte) 0);
 
                 switch (request.getAction()) {
                     case CREATE:

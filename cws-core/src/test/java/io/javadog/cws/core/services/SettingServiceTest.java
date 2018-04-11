@@ -21,7 +21,6 @@ import io.javadog.cws.core.enums.StandardSetting;
 import io.javadog.cws.core.exceptions.AuthorizationException;
 import io.javadog.cws.core.exceptions.CWSException;
 import io.javadog.cws.core.model.entities.MemberEntity;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import javax.persistence.Query;
@@ -119,7 +118,6 @@ public final class SettingServiceTest extends DatabaseSetup {
     }
 
     @Test
-    @Ignore("There is a bug related to the changing of critical settings.")
     public void testUpdatingSalt() {
         // Before starting, all member accounts must be removed
         final List<MemberEntity> members = dao.findAllAscending(MemberEntity.class, "id");
@@ -270,7 +268,6 @@ public final class SettingServiceTest extends DatabaseSetup {
     }
 
     @Test
-    @Ignore("There is a bug related to the changing of critical settings.")
     public void testSetPBEIntervalWithNoMembers() {
         // Before starting, all member accounts must be removed
         final List<MemberEntity> members = dao.findAllAscending(MemberEntity.class, "id");

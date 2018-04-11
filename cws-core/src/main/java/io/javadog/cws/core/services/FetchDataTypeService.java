@@ -16,6 +16,7 @@ import io.javadog.cws.core.model.entities.DataTypeEntity;
 
 import javax.persistence.EntityManager;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -36,7 +37,9 @@ public final class FetchDataTypeService extends Serviceable<FetchDataTypeRespons
      */
     @Override
     public FetchDataTypeResponse perform(final FetchDataTypeRequest request) {
+        // Pre-checks, & destruction of credentials
         verifyRequest(request, Permission.FETCH_DATA_TYPE);
+        Arrays.fill(request.getCredential(), (byte) 0);
 
         final List<DataTypeEntity> types = dao.findAllTypes();
         final List<DataType> objectTypes = new ArrayList<>(types.size());

@@ -22,6 +22,7 @@ import io.javadog.cws.core.model.entities.TrusteeEntity;
 
 import javax.persistence.EntityManager;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -40,7 +41,9 @@ public final class FetchMemberService extends Serviceable<FetchMemberResponse, F
      */
     @Override
     public FetchMemberResponse perform(final FetchMemberRequest request) {
+        // Pre-checks, & destruction of credentials
         verifyRequest(request, Permission.FETCH_MEMBER);
+        Arrays.fill(request.getCredential(), (byte) 0);
 
         final FetchMemberResponse response = new FetchMemberResponse();
 

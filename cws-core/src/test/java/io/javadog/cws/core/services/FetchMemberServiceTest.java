@@ -155,23 +155,23 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
         final FetchMemberService memberService = new FetchMemberService(mySettings, entityManager);
         final FetchMemberRequest memberRequest = prepareRequest(FetchMemberRequest.class, MEMBER_1);
         assertThat(memberRequest.validate().isEmpty(), is(true));
-        final FetchMemberResponse memberResponse = memberService.perform(memberRequest);
+        final FetchMemberResponse fetchedMemberResponse = memberService.perform(memberRequest);
 
         // Verify that we have found the correct data
-        assertThat(memberResponse, is(not(nullValue())));
-        assertThat(memberResponse.isOk(), is(true));
-        assertThat(memberResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
-        assertThat(memberResponse.getReturnMessage(), is("Ok"));
-        assertThat(memberResponse.getMembers().size(), is(5));
-        assertThat(memberResponse.getCircles().isEmpty(), is(true));
+        assertThat(fetchedMemberResponse, is(not(nullValue())));
+        assertThat(fetchedMemberResponse.isOk(), is(true));
+        assertThat(fetchedMemberResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+        assertThat(fetchedMemberResponse.getReturnMessage(), is("Ok"));
+        assertThat(fetchedMemberResponse.getMembers().size(), is(5));
+        assertThat(fetchedMemberResponse.getCircles().isEmpty(), is(true));
 
         // Check that the member information is present
-        final Member member1 = memberResponse.getMembers().get(0);
+        final Member member1 = fetchedMemberResponse.getMembers().get(0);
         assertThat(member1.getAccountName(), is(MEMBER_1));
         assertThat(member1.getMemberId(), is(MEMBER_1_ID));
         assertThat(member1.getAdded(), is(not(nullValue())));
 
-        final Member member5 = memberResponse.getMembers().get(4);
+        final Member member5 = fetchedMemberResponse.getMembers().get(4);
         assertThat(member5.getAccountName(), is(MEMBER_5));
         assertThat(member5.getMemberId(), is(MEMBER_5_ID));
         assertThat(member5.getAdded(), is(not(nullValue())));

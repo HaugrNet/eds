@@ -7,6 +7,7 @@
  */
 package io.javadog.cws.core;
 
+import io.javadog.cws.api.common.Utilities;
 import io.javadog.cws.core.enums.SanityStatus;
 import io.javadog.cws.core.jce.Crypto;
 import io.javadog.cws.core.model.CommonDao;
@@ -95,12 +96,12 @@ public class SanitizerBean {
                 // Let's update the DB with the information that the data is
                 // invalid, and return the error.
                 entity.setSanityStatus(SanityStatus.FAILED);
-                entity.setAltered(new Date());
+                entity.setAltered(Utilities.newDate());
             }
 
             // Regardless, we will always set the check date, so this
             // record will not be attempted again for a while.
-            entity.setSanityChecked(new Date());
+            entity.setSanityChecked(Utilities.newDate());
             entityManager.persist(entity);
             status = entity.getSanityStatus();
         } catch (PersistenceException e) {

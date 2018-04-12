@@ -8,6 +8,7 @@
 package io.javadog.cws.core.services;
 
 import io.javadog.cws.api.common.Constants;
+import io.javadog.cws.api.common.Utilities;
 import io.javadog.cws.api.dtos.Sanity;
 import io.javadog.cws.api.requests.SanityRequest;
 import io.javadog.cws.api.responses.SanityResponse;
@@ -50,7 +51,7 @@ public final class SanityService extends Serviceable<SanityResponse, SanityReque
     }
 
     private List<DataEntity> findRecords(final SanityRequest request) {
-        final Date since = (request.getSince() == null) ? new Date(0L) : request.getSince();
+        final Date since = (request.getSince() == null) ? Utilities.newDate(0L) : request.getSince();
         final List<DataEntity> found;
 
         if (request.getCircleId() != null) {

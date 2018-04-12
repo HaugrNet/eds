@@ -8,6 +8,7 @@
 package io.javadog.cws.core.services;
 
 import io.javadog.cws.api.common.ReturnCode;
+import io.javadog.cws.api.common.Utilities;
 import io.javadog.cws.api.requests.VerifyRequest;
 import io.javadog.cws.api.responses.VerifyResponse;
 import io.javadog.cws.core.enums.Permission;
@@ -46,7 +47,7 @@ public final class VerifyService extends Serviceable<VerifyResponse, VerifyReque
 
         if (entity != null) {
             final Date expires = entity.getExpires();
-            if ((expires != null) && expires.before(new Date())) {
+            if ((expires != null) && expires.before(Utilities.newDate())) {
                 response = new VerifyResponse(ReturnCode.SIGNATURE_WARNING, "The Signature has expired.");
             } else {
                 final PublicKey publicKey = crypto.dearmoringPublicKey(entity.getPublicKey());

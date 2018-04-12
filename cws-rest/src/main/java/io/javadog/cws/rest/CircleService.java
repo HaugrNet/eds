@@ -41,16 +41,16 @@ public class CircleService {
 
     @POST
     @Path("/createCircle")
-    @Consumes(CwsApplication.CONSUMES)
-    @Produces(CwsApplication.PRODUCES)
+    @Consumes(RestUtils.CONSUMES)
+    @Produces(RestUtils.PRODUCES)
     public Response create(@NotNull final ProcessCircleRequest createCircleRequest) {
         return processCircle(createCircleRequest, Action.CREATE, "createCircle");
     }
 
     @POST
     @Path("/updateCircle")
-    @Consumes(CwsApplication.CONSUMES)
-    @Produces(CwsApplication.PRODUCES)
+    @Consumes(RestUtils.CONSUMES)
+    @Produces(RestUtils.PRODUCES)
     public Response update(@NotNull final ProcessCircleRequest updateCircleRequest) {
         return processCircle(updateCircleRequest, Action.UPDATE, "updateCircle");
     }
@@ -58,16 +58,16 @@ public class CircleService {
     @POST
     @DELETE
     @Path("/deleteCircle")
-    @Consumes(CwsApplication.CONSUMES)
-    @Produces(CwsApplication.PRODUCES)
+    @Consumes(RestUtils.CONSUMES)
+    @Produces(RestUtils.PRODUCES)
     public Response delete(@NotNull final ProcessCircleRequest deleteCircleRequest) {
         return processCircle(deleteCircleRequest, Action.DELETE, "deleteCircle");
     }
 
     @POST
     @Path("/fetchCircles")
-    @Consumes(CwsApplication.CONSUMES)
-    @Produces(CwsApplication.PRODUCES)
+    @Consumes(RestUtils.CONSUMES)
+    @Produces(RestUtils.PRODUCES)
     public Response fetch(@NotNull final FetchCircleRequest fetchCirclesRequest) {
         final Long startTime = System.nanoTime();
         FetchCircleResponse response;
@@ -80,7 +80,7 @@ public class CircleService {
             response = new FetchCircleResponse(ReturnCode.ERROR, e.getMessage());
         }
 
-        return CwsApplication.buildResponse(response);
+        return RestUtils.buildResponse(response);
     }
 
     private Response processCircle(final ProcessCircleRequest request, final Action action, final String logAction) {
@@ -96,6 +96,6 @@ public class CircleService {
             response = new ProcessCircleResponse(ReturnCode.ERROR, e.getMessage());
         }
 
-        return CwsApplication.buildResponse(response);
+        return RestUtils.buildResponse(response);
     }
 }

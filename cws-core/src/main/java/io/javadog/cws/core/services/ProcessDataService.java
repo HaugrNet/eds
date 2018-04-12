@@ -9,6 +9,7 @@ package io.javadog.cws.core.services;
 
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
+import io.javadog.cws.api.common.Utilities;
 import io.javadog.cws.api.requests.ProcessDataRequest;
 import io.javadog.cws.api.responses.ProcessDataResponse;
 import io.javadog.cws.core.enums.KeyAlgorithm;
@@ -25,7 +26,6 @@ import io.javadog.cws.core.model.entities.TrusteeEntity;
 
 import javax.persistence.EntityManager;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -99,7 +99,7 @@ public final class ProcessDataService extends Serviceable<ProcessDataResponse, P
                 dataEntity.setInitialVector(salt);
                 dataEntity.setChecksum(crypto.generateChecksum(dataEntity.getData()));
                 dataEntity.setSanityStatus(SanityStatus.OK);
-                dataEntity.setSanityChecked(new Date());
+                dataEntity.setSanityChecked(Utilities.newDate());
 
                 dao.persist(dataEntity);
                 response = new ProcessDataResponse();
@@ -309,7 +309,7 @@ public final class ProcessDataService extends Serviceable<ProcessDataResponse, P
             entity.setInitialVector(salt);
             entity.setChecksum(checksum);
             entity.setSanityStatus(SanityStatus.OK);
-            entity.setSanityChecked(new Date());
+            entity.setSanityChecked(Utilities.newDate());
             dao.persist(entity);
         }
     }

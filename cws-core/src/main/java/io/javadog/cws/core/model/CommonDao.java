@@ -9,6 +9,7 @@ package io.javadog.cws.core.model;
 
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.common.TrustLevel;
+import io.javadog.cws.api.common.Utilities;
 import io.javadog.cws.core.enums.SanityStatus;
 import io.javadog.cws.core.exceptions.CWSException;
 import io.javadog.cws.core.model.entities.CWSEntity;
@@ -58,10 +59,10 @@ public final class CommonDao {
         }
 
         if (entity.getAdded() == null) {
-            entity.setAdded(new Date());
+            entity.setAdded(Utilities.newDate());
         }
 
-        entity.setAltered(new Date());
+        entity.setAltered(Utilities.newDate());
         entityManager.persist(entity);
     }
 

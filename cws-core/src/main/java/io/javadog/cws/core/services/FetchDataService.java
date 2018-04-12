@@ -9,6 +9,7 @@ package io.javadog.cws.core.services;
 
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
+import io.javadog.cws.api.common.Utilities;
 import io.javadog.cws.api.dtos.Metadata;
 import io.javadog.cws.api.requests.FetchDataRequest;
 import io.javadog.cws.api.responses.FetchDataResponse;
@@ -22,7 +23,6 @@ import io.javadog.cws.core.model.entities.MetadataEntity;
 import javax.persistence.EntityManager;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -130,7 +130,7 @@ public final class FetchDataService extends Serviceable<FetchDataResponse, Fetch
             // Regardless what the Status is, let's update the Object, so the
             // information is persisted. This will also prevent that the Object
             // is checked too soon.
-            entity.setSanityChecked(new Date());
+            entity.setSanityChecked(Utilities.newDate());
             dao.persist(entity);
         }
 

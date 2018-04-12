@@ -7,6 +7,7 @@
  */
 package io.javadog.cws.api.common;
 
+import java.time.Instant;
 import java.util.Date;
 
 /**
@@ -20,6 +21,33 @@ public final class Utilities {
     }
 
     /**
+     * Although this method may appear to be silly, it serves the purpose of
+     * acting as an intermediate between the old Date Object and the newer
+     * Java8 Time functionality. Once an upgrade to JavaEE8+ has been completed,
+     * so JPA where support for the Time functionality has been added, it can be
+     * removed.
+     *
+     * @param millisSinceEpoch Milli Seconds since epoch (1970-01-01 00:00:00)
+     * @return New Date
+     */
+    public static Date newDate(final long millisSinceEpoch) {
+        return Date.from(Instant.ofEpochMilli(millisSinceEpoch));
+    }
+
+    /**
+     * Although this method may appear to be silly, it serves the purpose of
+     * acting as an intermediate between the old Date Object and the newer
+     * Java8 Time functionality. Once an upgrade to JavaEE8+ has been completed,
+     * so JPA where support for the Time functionality has been added, it can be
+     * removed.
+     *
+     * @return New Date
+     */
+    public static Date newDate() {
+        return Date.from(Instant.now());
+    }
+
+    /**
      * Copy method for standard Date Objects, to have a central way to protect
      * those pesky mutable Objects.
      *
@@ -27,7 +55,7 @@ public final class Utilities {
      * @return Copy of the given Date Object
      */
     public static Date copy(final Date date) {
-        return (date != null) ? new Date(date.getTime()) : null;
+        return (date != null) ? Date.from(date.toInstant()) : null;
     }
 
     /**

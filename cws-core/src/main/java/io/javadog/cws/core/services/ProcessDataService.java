@@ -96,7 +96,7 @@ public final class ProcessDataService extends Serviceable<ProcessDataResponse, P
                 dataEntity.setMetadata(metadataEntity);
                 dataEntity.setKey(keyEntity);
                 dataEntity.setData(crypto.encrypt(circleKey, bytes));
-                dataEntity.setInitialVector(salt);
+                dataEntity.setInitialVector(crypto.encryptWithMasterKey(salt));
                 dataEntity.setChecksum(crypto.generateChecksum(dataEntity.getData()));
                 dataEntity.setSanityStatus(SanityStatus.OK);
                 dataEntity.setSanityChecked(Utilities.newDate());
@@ -306,7 +306,7 @@ public final class ProcessDataService extends Serviceable<ProcessDataResponse, P
             final String checksum = crypto.generateChecksum(encrypted);
 
             entity.setData(encrypted);
-            entity.setInitialVector(salt);
+            entity.setInitialVector(crypto.encryptWithMasterKey(salt));
             entity.setChecksum(checksum);
             entity.setSanityStatus(SanityStatus.OK);
             entity.setSanityChecked(Utilities.newDate());

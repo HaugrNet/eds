@@ -84,6 +84,7 @@ public final class DataServiceTest extends DatabaseSetup {
         fetchRequest.setDataId(saveResponse.getDataId());
         final FetchDataResponse fetchResponse = dataService.perform(fetchRequest);
         assertThat(fetchResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+        assertThat(new String(saveRequest.getData(), settings.getCharset()), is(new String(fetchResponse.getData(), settings.getCharset())));
     }
 
     @Test

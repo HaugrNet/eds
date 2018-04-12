@@ -69,9 +69,11 @@ public final class Crypto {
     // the same size. See: https://en.wikipedia.org/wiki/Initialization_vector
     private static final int IV_SIZE = 16;
 
+    private final MasterKey masterKey;
     private final Settings settings;
 
     public Crypto(final Settings settings) {
+        masterKey = MasterKey.getInstance(settings);
         this.settings = settings;
     }
 
@@ -198,6 +200,18 @@ public final class Crypto {
         } catch (NoSuchAlgorithmException | SignatureException | InvalidKeyException | IllegalArgumentException e) {
             throw new CryptoException(e.getMessage(), e);
         }
+    }
+
+    public String encryptWithMasterKey(final String toEncrypt) {
+        final byte[] bytes = stringToBytes(toEncrypt);
+        final byte[] encrypted = encrypt(masterKey.getKey(), bytes);
+        return Base64.getEncoder().encodeToString(encrypted);
+    }
+
+    public String decryptWithMasterKey(final String toDecrypt) {
+        final byte[] encrypted = Base64.getDecoder().decode(toDecrypt);
+        final byte[] decryppted = decrypt(masterKey.getKey(), encrypted);
+        return bytesToString(decryppted);
     }
 
     public byte[] encrypt(final SecretCWSKey key, final byte[] toEncrypt) {

@@ -106,7 +106,7 @@ public final class FetchDataService extends Serviceable<FetchDataResponse, Fetch
             final String checksum = crypto.generateChecksum(entity.getData());
             if (Objects.equals(checksum, entity.getChecksum())) {
                 final SecretCWSKey key = extractCircleKey(entity);
-                key.setSalt(entity.getInitialVector());
+                key.setSalt(crypto.decryptWithMasterKey(entity.getInitialVector()));
                 final byte[] bytes = crypto.decrypt(key, entity.getData());
                 final List<Metadata> metadataList = new ArrayList<>(1);
                 metadataList.add(metaData);

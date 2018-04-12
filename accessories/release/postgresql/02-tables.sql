@@ -113,7 +113,7 @@ CREATE TABLE cws_members (
   id               SERIAL,
   external_id      VARCHAR(36),
   name             VARCHAR(75),    -- Member Authentication information
-  salt             VARCHAR(36),
+  salt             VARCHAR(256),
   pbe_algorithm    VARCHAR(19) DEFAULT 'PBE128',
   rsa_algorithm    VARCHAR(19) DEFAULT 'RSA2048',
   external_key     TEXT,           -- External Public Key, with unknown length

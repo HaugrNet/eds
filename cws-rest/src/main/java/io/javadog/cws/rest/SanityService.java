@@ -37,8 +37,8 @@ public class SanityService {
 
     @POST
     @Path("/sanitized")
-    @Consumes(CwsApplication.CONSUMES)
-    @Produces(CwsApplication.PRODUCES)
+    @Consumes(RestUtils.CONSUMES)
+    @Produces(RestUtils.PRODUCES)
     public Response sanitized(@NotNull final SanityRequest sanitizedRequest) {
         final Long startTime = System.nanoTime();
         SanityResponse response;
@@ -51,6 +51,6 @@ public class SanityService {
             response = new SanityResponse(ReturnCode.ERROR, e.getMessage());
         }
 
-        return CwsApplication.buildResponse(response);
+        return RestUtils.buildResponse(response);
     }
 }

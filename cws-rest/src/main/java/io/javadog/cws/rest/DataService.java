@@ -41,16 +41,16 @@ public class DataService {
 
     @POST
     @Path("/addData")
-    @Consumes(CwsApplication.CONSUMES)
-    @Produces(CwsApplication.PRODUCES)
+    @Consumes(RestUtils.CONSUMES)
+    @Produces(RestUtils.PRODUCES)
     public Response add(@NotNull final ProcessDataRequest addDataRequest) {
         return processData(addDataRequest, Action.ADD, "addData");
     }
 
     @POST
     @Path("/updateData")
-    @Consumes(CwsApplication.CONSUMES)
-    @Produces(CwsApplication.PRODUCES)
+    @Consumes(RestUtils.CONSUMES)
+    @Produces(RestUtils.PRODUCES)
     public Response update(@NotNull final ProcessDataRequest updateDataRequest) {
         return processData(updateDataRequest, Action.UPDATE, "updateData");
     }
@@ -58,16 +58,16 @@ public class DataService {
     @POST
     @DELETE
     @Path("/deleteData")
-    @Consumes(CwsApplication.CONSUMES)
-    @Produces(CwsApplication.PRODUCES)
+    @Consumes(RestUtils.CONSUMES)
+    @Produces(RestUtils.PRODUCES)
     public Response delete(@NotNull final ProcessDataRequest deleteDataRequest) {
         return processData(deleteDataRequest, Action.DELETE, "deleteData");
     }
 
     @POST
     @Path("/fetchData")
-    @Consumes(CwsApplication.CONSUMES)
-    @Produces(CwsApplication.PRODUCES)
+    @Consumes(RestUtils.CONSUMES)
+    @Produces(RestUtils.PRODUCES)
     public Response fetch(@NotNull final FetchDataRequest fetchDataRequest) {
         final Long startTime = System.nanoTime();
         FetchDataResponse response;
@@ -80,7 +80,7 @@ public class DataService {
             response = new FetchDataResponse(ReturnCode.ERROR, e.getMessage());
         }
 
-        return CwsApplication.buildResponse(response);
+        return RestUtils.buildResponse(response);
     }
 
     private Response processData(final ProcessDataRequest request, final Action action, final String logAction) {
@@ -96,6 +96,6 @@ public class DataService {
             response = new ProcessDataResponse(ReturnCode.ERROR, e.getMessage());
         }
 
-        return CwsApplication.buildResponse(response);
+        return RestUtils.buildResponse(response);
     }
 }

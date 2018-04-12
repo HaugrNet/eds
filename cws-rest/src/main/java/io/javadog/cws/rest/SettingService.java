@@ -36,8 +36,8 @@ public class SettingService {
     @Inject private ManagementBean bean;
 
     @POST
-    @Consumes(CwsApplication.CONSUMES)
-    @Produces(CwsApplication.PRODUCES)
+    @Consumes(RestUtils.CONSUMES)
+    @Produces(RestUtils.PRODUCES)
     public Response settings(@NotNull final SettingRequest settingRequest) {
         final Long startTime = System.nanoTime();
         SettingResponse response;
@@ -50,6 +50,6 @@ public class SettingService {
             response = new SettingResponse(ReturnCode.ERROR, e.getMessage());
         }
 
-        return CwsApplication.buildResponse(response);
+        return RestUtils.buildResponse(response);
     }
 }

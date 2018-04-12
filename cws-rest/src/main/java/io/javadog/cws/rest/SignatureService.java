@@ -41,8 +41,8 @@ public class SignatureService {
 
     @POST
     @Path("/signDocument")
-    @Consumes(CwsApplication.CONSUMES)
-    @Produces(CwsApplication.PRODUCES)
+    @Consumes(RestUtils.CONSUMES)
+    @Produces(RestUtils.PRODUCES)
     public Response sign(@NotNull final SignRequest signDocumentRequest) {
         final Long startTime = System.nanoTime();
         SignResponse response;
@@ -55,13 +55,13 @@ public class SignatureService {
             response = new SignResponse(ReturnCode.ERROR, e.getMessage());
         }
 
-        return CwsApplication.buildResponse(response);
+        return RestUtils.buildResponse(response);
     }
 
     @POST
     @Path("/verifySignature")
-    @Consumes(CwsApplication.CONSUMES)
-    @Produces(CwsApplication.PRODUCES)
+    @Consumes(RestUtils.CONSUMES)
+    @Produces(RestUtils.PRODUCES)
     public Response verify(@NotNull final VerifyRequest verifySignatureRequest) {
         final Long startTime = System.nanoTime();
         VerifyResponse response;
@@ -74,13 +74,13 @@ public class SignatureService {
             response = new VerifyResponse(ReturnCode.ERROR, e.getMessage());
         }
 
-        return CwsApplication.buildResponse(response);
+        return RestUtils.buildResponse(response);
     }
 
     @POST
     @Path("/fetchSignatures")
-    @Consumes(CwsApplication.CONSUMES)
-    @Produces(CwsApplication.PRODUCES)
+    @Consumes(RestUtils.CONSUMES)
+    @Produces(RestUtils.PRODUCES)
     public Response fetch(@NotNull final FetchSignatureRequest fetchSignaturesRequest) {
         final Long startTime = System.nanoTime();
         FetchSignatureResponse response;
@@ -93,6 +93,6 @@ public class SignatureService {
             response = new FetchSignatureResponse(ReturnCode.ERROR, e.getMessage());
         }
 
-        return CwsApplication.buildResponse(response);
+        return RestUtils.buildResponse(response);
     }
 }

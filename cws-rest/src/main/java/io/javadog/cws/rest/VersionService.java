@@ -35,7 +35,7 @@ public class VersionService {
 
     @GET
     @POST
-    @Produces(CwsApplication.PRODUCES)
+    @Produces(RestUtils.PRODUCES)
     public Response version() {
         final Long startTime = System.nanoTime();
         VersionResponse response;
@@ -48,6 +48,6 @@ public class VersionService {
             response = new VersionResponse(ReturnCode.ERROR, e.getMessage());
         }
 
-        return CwsApplication.buildResponse(response);
+        return RestUtils.buildResponse(response);
     }
 }

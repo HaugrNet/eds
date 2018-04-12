@@ -41,8 +41,8 @@ public class DataTypeService {
 
     @POST
     @Path("/processDataType")
-    @Consumes(CwsApplication.CONSUMES)
-    @Produces(CwsApplication.PRODUCES)
+    @Consumes(RestUtils.CONSUMES)
+    @Produces(RestUtils.PRODUCES)
     public Response process(@NotNull final ProcessDataTypeRequest processDataTypeRequest) {
         return processDataType(processDataTypeRequest, Action.PROCESS, "processDataType");
     }
@@ -50,16 +50,16 @@ public class DataTypeService {
     @POST
     @DELETE
     @Path("/deleteDataType")
-    @Consumes(CwsApplication.CONSUMES)
-    @Produces(CwsApplication.PRODUCES)
+    @Consumes(RestUtils.CONSUMES)
+    @Produces(RestUtils.PRODUCES)
     public Response delete(@NotNull final ProcessDataTypeRequest deleteDataTypeRequest) {
         return processDataType(deleteDataTypeRequest, Action.DELETE, "deleteDataType");
     }
 
     @POST
     @Path("/fetchDataTypes")
-    @Consumes(CwsApplication.CONSUMES)
-    @Produces(CwsApplication.PRODUCES)
+    @Consumes(RestUtils.CONSUMES)
+    @Produces(RestUtils.PRODUCES)
     public Response fetch(@NotNull final FetchDataTypeRequest fetchDataTypesRequest) {
         final Long startTime = System.nanoTime();
         FetchDataTypeResponse response;
@@ -72,7 +72,7 @@ public class DataTypeService {
             response = new FetchDataTypeResponse(ReturnCode.ERROR, e.getMessage());
         }
 
-        return CwsApplication.buildResponse(response);
+        return RestUtils.buildResponse(response);
     }
 
     private Response processDataType(final ProcessDataTypeRequest request, final Action action, final String logAction) {
@@ -88,6 +88,6 @@ public class DataTypeService {
             response = new ProcessDataTypeResponse(ReturnCode.ERROR, e.getMessage());
         }
 
-        return CwsApplication.buildResponse(response);
+        return RestUtils.buildResponse(response);
     }
 }

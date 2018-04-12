@@ -41,32 +41,32 @@ public class MemberService {
 
     @POST
     @Path("/createMember")
-    @Consumes(CwsApplication.CONSUMES)
-    @Produces(CwsApplication.PRODUCES)
+    @Consumes(RestUtils.CONSUMES)
+    @Produces(RestUtils.PRODUCES)
     public Response create(@NotNull final ProcessMemberRequest createMemberRequest) {
         return processMember(createMemberRequest, Action.CREATE, "createMember");
     }
 
     @POST
     @Path("/inviteMember")
-    @Consumes(CwsApplication.CONSUMES)
-    @Produces(CwsApplication.PRODUCES)
+    @Consumes(RestUtils.CONSUMES)
+    @Produces(RestUtils.PRODUCES)
     public Response invite(@NotNull final ProcessMemberRequest inviteMemberRequest) {
         return processMember(inviteMemberRequest, Action.INVITE, "inviteMember");
     }
 
     @POST
     @Path("/updateMember")
-    @Consumes(CwsApplication.CONSUMES)
-    @Produces(CwsApplication.PRODUCES)
+    @Consumes(RestUtils.CONSUMES)
+    @Produces(RestUtils.PRODUCES)
     public Response update(@NotNull final ProcessMemberRequest updateMemberRequest) {
         return processMember(updateMemberRequest, Action.UPDATE, "updateMember");
     }
 
     @POST
     @Path("/invalidate")
-    @Consumes(CwsApplication.CONSUMES)
-    @Produces(CwsApplication.PRODUCES)
+    @Consumes(RestUtils.CONSUMES)
+    @Produces(RestUtils.PRODUCES)
     public Response invalidate(@NotNull final ProcessMemberRequest invalidateRequest) {
         return processMember(invalidateRequest, Action.INVALIDATE, "invalidate");
     }
@@ -74,16 +74,16 @@ public class MemberService {
     @POST
     @DELETE
     @Path("/deleteMember")
-    @Consumes(CwsApplication.CONSUMES)
-    @Produces(CwsApplication.PRODUCES)
+    @Consumes(RestUtils.CONSUMES)
+    @Produces(RestUtils.PRODUCES)
     public Response delete(@NotNull final ProcessMemberRequest deleteMemberRequest) {
         return processMember(deleteMemberRequest, Action.DELETE, "deleteMember");
     }
 
     @POST
     @Path("/fetchMembers")
-    @Consumes(CwsApplication.CONSUMES)
-    @Produces(CwsApplication.PRODUCES)
+    @Consumes(RestUtils.CONSUMES)
+    @Produces(RestUtils.PRODUCES)
     public Response fetch(@NotNull final FetchMemberRequest fetchMembersRequest) {
         final Long startTime = System.nanoTime();
         FetchMemberResponse response;
@@ -96,7 +96,7 @@ public class MemberService {
             response = new FetchMemberResponse(ReturnCode.ERROR, e.getMessage());
         }
 
-        return CwsApplication.buildResponse(response);
+        return RestUtils.buildResponse(response);
     }
 
     private Response processMember(final ProcessMemberRequest request, final Action action, final String logAction) {
@@ -112,6 +112,6 @@ public class MemberService {
             response = new ProcessMemberResponse(ReturnCode.ERROR, e.getMessage());
         }
 
-        return CwsApplication.buildResponse(response);
+        return RestUtils.buildResponse(response);
     }
 }

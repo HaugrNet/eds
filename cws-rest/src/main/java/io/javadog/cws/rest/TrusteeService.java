@@ -41,16 +41,16 @@ public class TrusteeService {
 
     @POST
     @Path("/addTrustee")
-    @Consumes(CwsApplication.CONSUMES)
-    @Produces(CwsApplication.PRODUCES)
+    @Consumes(RestUtils.CONSUMES)
+    @Produces(RestUtils.PRODUCES)
     public Response add(@NotNull final ProcessTrusteeRequest addTrusteeRequest) {
         return processTrustee(addTrusteeRequest, Action.ADD, "addTrustee");
     }
 
     @POST
     @Path("/alterTrustee")
-    @Consumes(CwsApplication.CONSUMES)
-    @Produces(CwsApplication.PRODUCES)
+    @Consumes(RestUtils.CONSUMES)
+    @Produces(RestUtils.PRODUCES)
     public Response alter(@NotNull final ProcessTrusteeRequest alterTrusteeRequest) {
         return processTrustee(alterTrusteeRequest, Action.ALTER, "alterTrustee");
     }
@@ -58,16 +58,16 @@ public class TrusteeService {
     @POST
     @DELETE
     @Path("/removeTrustee")
-    @Consumes(CwsApplication.CONSUMES)
-    @Produces(CwsApplication.PRODUCES)
+    @Consumes(RestUtils.CONSUMES)
+    @Produces(RestUtils.PRODUCES)
     public Response remove(@NotNull final ProcessTrusteeRequest removeTrusteeRequest) {
         return processTrustee(removeTrusteeRequest, Action.REMOVE, "removeTrustee");
     }
 
     @POST
     @Path("/fetchTrustees")
-    @Consumes(CwsApplication.CONSUMES)
-    @Produces(CwsApplication.PRODUCES)
+    @Consumes(RestUtils.CONSUMES)
+    @Produces(RestUtils.PRODUCES)
     public Response fetch(@NotNull final FetchTrusteeRequest fetchTrusteeRequest) {
         final Long startTime = System.nanoTime();
         FetchTrusteeResponse response;
@@ -80,7 +80,7 @@ public class TrusteeService {
             response = new FetchTrusteeResponse(ReturnCode.ERROR, e.getMessage());
         }
 
-        return CwsApplication.buildResponse(response);
+        return RestUtils.buildResponse(response);
     }
 
     private Response processTrustee(final ProcessTrusteeRequest request, final Action action, final String logAction) {
@@ -96,6 +96,6 @@ public class TrusteeService {
             response = new ProcessTrusteeResponse(ReturnCode.ERROR, e.getMessage());
         }
 
-        return CwsApplication.buildResponse(response);
+        return RestUtils.buildResponse(response);
     }
 }

@@ -21,8 +21,13 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
 
 /**
- * This Singleton holds the CWS Master Key, which is set upon instantiating the
- * Class.
+ * <p>This Singleton holds the CWS Master Key, which is set upon instantiating
+ * the Class. The Master Key is used by the Crypto Library. The default Master
+ * Key is based on the default settings, so having the default alone will not
+ * do anything to increase security. But, if set by the System Administrator,
+ * to a different value, will suddenly increase security. The Master Key is not
+ * persisted, and will remain in memory as long as the CWS instance is
+ * running.</p>
  *
  * @author Kim Jensen
  * @since  CWS 1.0

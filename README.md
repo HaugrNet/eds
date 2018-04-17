@@ -2,11 +2,12 @@
 --
 
 # CWS - Cryptographic Web Store
-CWS, Cryptographic Web Store or CryptoStore, is designed to be used as a backend
-component in other systems. Facilitating protected storing, sharing or
-collaboration of data between entrusted parties. It is written purely in Java EE,
-allowing it to be deployed in a wide range of different environments, depending
-on the need.
+CWS, Cryptographic Web Store, works like "PGP for the Cloud". It is designed as
+a backend component, which can be integrated into other systems or be used
+directly by other applications or apps. It us written purely in Java / Java EE,
+and it is not containing any third-party dependencies. It is build around the
+vision of allowing safe and easy exchange of data between multiple parties,
+where data is stored encrypted.
 
 The CWS focuses on Circles of Trust, where Members of a Circle will have varying
 level of access to the Data belonging to the Circle. This is achieved by a

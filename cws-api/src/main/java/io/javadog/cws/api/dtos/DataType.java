@@ -17,6 +17,19 @@ import java.io.Serializable;
 import java.util.Objects;
 
 /**
+ * <p>All data in CWS must have a designated DataType, this can be either of the
+ * two default values ('Folders' &amp; 'Data'), but it may also be something
+ * else.</p>
+ *
+ * <p>If the CWS instance it mainly used for file sharing, the DataTypes can be
+ * setup with the various supported MIME Types. If the CWS instance is used for
+ * Application Data sharing, then it may be used to contain some helpful
+ * information about what the content may reflect, i.e. Object Type and perhaps
+ * Object Version.</p>
+ *
+ * <p>If not needed, then it can be left alone. Default DataType in CWS is
+ * 'data'.</p>
+ *
  * @author Kim Jensen
  * @since  CWS 1.0
  */

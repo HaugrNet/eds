@@ -11,6 +11,8 @@ import java.time.Instant;
 import java.util.Date;
 
 /**
+ * <p>Common Utilities, primarily immutability functionality.</p>
+ *
  * @author Kim Jensen
  * @since  CWS 1.0
  */

@@ -8,6 +8,8 @@
 package io.javadog.cws.api.common;
 
 /**
+ * <p>Common Constant values used throughout the API.</p>
+ *
  * @author Kim Jensen
  * @since  CWS 1.0
  */

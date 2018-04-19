@@ -14,6 +14,9 @@ import java.util.EnumSet;
 import java.util.Set;
 
 /**
+ * <p>Different Levels of trust, used by the action checks to see if a given
+ * Member may perform a specific function.</p>
+ *
  * @author Kim Jensen
  * @since  CWS 1.0
  */

@@ -12,8 +12,11 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlType;
 
 /**
+ * <p>Common Return Codes, used for all requests, to help specify the nature of
+ * the problem which may have occurred, if processing wasn't successful.</p>
+ *
  * @author Kim Jensen
- * @since CWS 1.0
+ * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = Constants.FIELD_RETURN_CODE)

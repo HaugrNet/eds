@@ -20,6 +20,10 @@ import java.util.Date;
 import java.util.Objects;
 
 /**
+ * <p>Circles is part of the core functionality of CWS, as all data is assigned
+ * or belongs to a Circle. Circles can be considered as a Group or Collection of
+ * known and trusted members who may be granted access to the data.</p>
+ *
  * @author Kim Jensen
  * @since  CWS 1.0
  */

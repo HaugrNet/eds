@@ -15,6 +15,12 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
 /**
+ * <p>When the Management Request 'fetchCircles' is invoked, it requires a
+ * Request Object, with the Authentication information.</p>
+ *
+ * <p>For more details, please see the 'fetchcircles' request in the Management
+ * interface: {@link io.javadog.cws.api.Management#fetchCircles(FetchCircleRequest)}</p>
+ *
  * @author Kim Jensen
  * @since  CWS 1.0
  */

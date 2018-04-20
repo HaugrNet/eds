@@ -17,6 +17,20 @@ import javax.xml.bind.annotation.XmlType;
 import java.io.Serializable;
 
 /**
+ * <p>General Response Object, embedded in all other Response Objects, as it
+ * contains the processing result, i.e. return code &amp; message. If everything
+ * went good, the return code will the code 200, same as the HTTP protocol will
+ * return if everything went well. The return message will simple be 'Ok' in
+ * this case.</p>
+ *
+ * <p>If a problem occurred, either a warning (problem which can be corrected by
+ * the invoking system/member), or an error (internal problem, most likely a
+ * resource issue). The return code &amp; message should hopefully provide
+ * enough information for the System Administrator to correct the problem.</p>
+ *
+ * <p>The class {@link ReturnCode} for more information, and clarification of
+ * the individual warnings or errors which may occur.</p>
+ *
  * @author Kim Jensen
  * @since  CWS 1.0
  */

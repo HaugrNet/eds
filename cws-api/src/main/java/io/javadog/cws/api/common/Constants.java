@@ -96,6 +96,7 @@ public final class Constants {
     public static final String FIELD_SANITY = "sanity";
     public static final String FIELD_SANITIES = "sanities";
     public static final String FIELD_SETTINGS = "settings";
+    public static final String FIELD_SECRET = "secret";
     public static final String FIELD_EXPIRES = "expires";
     public static final String FIELD_VERIFICATIONS = "verifications";
     public static final String FIELD_LAST_VERIFICATION = "lastVerification";

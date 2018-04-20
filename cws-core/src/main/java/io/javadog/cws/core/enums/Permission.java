@@ -92,6 +92,13 @@ public enum Permission {
     SETTING(TrustLevel.SYSOP, "Process Settings."),
 
     /**
+     * Changing the Master Key, is only allowed to be performed by the System
+     * Administrator, and it must be done upon startup, as the system may
+     * otherwise be useless.
+     */
+    MASTER_KEY(TrustLevel.SYSOP, "Update Master Key."),
+
+    /**
      * The Sanity checks is something, which is limited to the System or Circle
      * Administrators, the System Administrator may read the information for all
      * Circles, but Circle Administrators are only allowed to read the data for

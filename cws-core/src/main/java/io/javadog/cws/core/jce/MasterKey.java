@@ -57,7 +57,7 @@ public final class MasterKey {
         }
     }
 
-    private void updateKey(final byte[] secret, final String salt) {
+    public void updateKey(final byte[] secret, final String salt) {
         synchronized (LOCK) {
             try {
                 final char[] chars = new char[secret.length];

@@ -58,7 +58,7 @@ public class BeanSetup extends DatabaseSetup {
         }
     }
 
-    protected ManagementService prepareSystemService() {
+    protected ManagementService prepareManagementService() {
         try {
             final ManagementBean bean = ManagementBean.class.getConstructor().newInstance();
             setField(bean, "entityManager", entityManager);

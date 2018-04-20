@@ -10,6 +10,7 @@ package io.javadog.cws.api;
 import io.javadog.cws.api.requests.FetchCircleRequest;
 import io.javadog.cws.api.requests.FetchMemberRequest;
 import io.javadog.cws.api.requests.FetchTrusteeRequest;
+import io.javadog.cws.api.requests.MasterKeyRequest;
 import io.javadog.cws.api.requests.ProcessCircleRequest;
 import io.javadog.cws.api.requests.ProcessMemberRequest;
 import io.javadog.cws.api.requests.ProcessTrusteeRequest;
@@ -18,6 +19,7 @@ import io.javadog.cws.api.requests.SettingRequest;
 import io.javadog.cws.api.responses.FetchCircleResponse;
 import io.javadog.cws.api.responses.FetchMemberResponse;
 import io.javadog.cws.api.responses.FetchTrusteeResponse;
+import io.javadog.cws.api.responses.MasterKeyResponse;
 import io.javadog.cws.api.responses.ProcessCircleResponse;
 import io.javadog.cws.api.responses.ProcessMemberResponse;
 import io.javadog.cws.api.responses.ProcessTrusteeResponse;
@@ -123,7 +125,14 @@ public interface Management {
      *     Administrator account - this safety precaution has been added to
      *     prevent that it is accidentally altered later. If so desired, an
      *     Administrator with access to the DB can change it later - however,
-     *     this will render *all* accounts useless.</i>
+     *     this will render *all* accounts useless.</i><br>
+     *     Please note, that updating the salt must be done before applying a
+     *     Master Key, as generating the Master Key will have to be re-initiated
+     *     after this has been done, and will be done on the default Master Key,
+     *     however, as the default Master Key is build around known information
+     *     in the CWS, and a custom is build around a provided, unpersisted
+     *     secret, it will render the system useless if the System Salt is set
+     *     after the Master Key has been provided!
      *   </li>
      *   <li>
      *     <b>cws.system.locale</b> - default value: 'EN'<br>
@@ -211,6 +220,29 @@ public interface Management {
      * @return Response Object with ReturnCode and Message
      */
     SettingResponse settings(SettingRequest request);
+
+    /**
+     * <p>The Master Key is a special symmetric key, which is used to encrypt
+     * and decrypt all Initial Vectors &amp; Member Salt values. The key is only
+     * kept in memory and is never persisted. Meaning, that it must be set when
+     * the CWS instance is started - otherwise, the entire system is rendered
+     * useless.</p>
+     *
+     * <p>There is a default Master Key, which is based on known values in the
+     * system. So, even if this key is not set by an Administrator, it is still
+     * used throughout the system. However, as the default key is based on known
+     * values, it cannot be used to enhance security. To accomplish this, it
+     * must be set by the System Administrator.</p>
+     *
+     * <p>Note, that it is very important that the MasterKey is set <b>after</b>
+     * the system Salt has been updated. As the system Salt is required by the
+     * Master Key, it and can only be updated by this request, it will make the
+     * system completely unusable.</p>
+     *
+     * @param request Request Object
+     * @return Response Object with ReturnCode and Message
+     */
+    MasterKeyResponse masterKey(MasterKeyRequest request);
 
     /**
      * <p>Data stored encrypted is nothing but a long array of bytes. If, over

@@ -11,6 +11,7 @@ import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.requests.FetchCircleRequest;
 import io.javadog.cws.api.requests.FetchMemberRequest;
 import io.javadog.cws.api.requests.FetchTrusteeRequest;
+import io.javadog.cws.api.requests.MasterKeyRequest;
 import io.javadog.cws.api.requests.ProcessCircleRequest;
 import io.javadog.cws.api.requests.ProcessMemberRequest;
 import io.javadog.cws.api.requests.ProcessTrusteeRequest;
@@ -19,6 +20,7 @@ import io.javadog.cws.api.requests.SettingRequest;
 import io.javadog.cws.api.responses.FetchCircleResponse;
 import io.javadog.cws.api.responses.FetchMemberResponse;
 import io.javadog.cws.api.responses.FetchTrusteeResponse;
+import io.javadog.cws.api.responses.MasterKeyResponse;
 import io.javadog.cws.api.responses.ProcessCircleResponse;
 import io.javadog.cws.api.responses.ProcessMemberResponse;
 import io.javadog.cws.api.responses.ProcessTrusteeResponse;
@@ -30,6 +32,7 @@ import io.javadog.cws.core.model.Settings;
 import io.javadog.cws.core.services.FetchCircleService;
 import io.javadog.cws.core.services.FetchMemberService;
 import io.javadog.cws.core.services.FetchTrusteeService;
+import io.javadog.cws.core.services.MasterKeyService;
 import io.javadog.cws.core.services.ProcessCircleService;
 import io.javadog.cws.core.services.ProcessMemberService;
 import io.javadog.cws.core.services.ProcessTrusteeService;
@@ -85,6 +88,28 @@ public class ManagementBean {
             if (e.getReturnCode() == ReturnCode.SETTING_WARNING) {
                 response.setSettings(SettingService.convert(settings));
             }
+        } finally {
+            CommonBean.destroy(service);
+        }
+
+        return response;
+    }
+
+    @Transactional(Transactional.TxType.SUPPORTS)
+    public MasterKeyResponse masterKey(final MasterKeyRequest request) {
+        MasterKeyService service = null;
+        MasterKeyResponse response;
+
+        try {
+            service = new MasterKeyService(settings, entityManager);
+            response = service.perform(request);
+        } catch (CWSException e) {
+            // Any Warning or Error thrown by the CWS contain enough information
+            // so it can be dealt with by the requesting System. Logging the
+            // error is thus not needed, as all information is provided in the
+            // response.
+            log.log(Settings.DEBUG, e.getMessage(), e);
+            response = new MasterKeyResponse(e.getReturnCode(), e.getMessage());
         } finally {
             CommonBean.destroy(service);
         }

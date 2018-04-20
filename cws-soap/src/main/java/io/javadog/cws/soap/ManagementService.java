@@ -12,6 +12,7 @@ import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.requests.FetchCircleRequest;
 import io.javadog.cws.api.requests.FetchMemberRequest;
 import io.javadog.cws.api.requests.FetchTrusteeRequest;
+import io.javadog.cws.api.requests.MasterKeyRequest;
 import io.javadog.cws.api.requests.ProcessCircleRequest;
 import io.javadog.cws.api.requests.ProcessMemberRequest;
 import io.javadog.cws.api.requests.ProcessTrusteeRequest;
@@ -20,6 +21,7 @@ import io.javadog.cws.api.requests.SettingRequest;
 import io.javadog.cws.api.responses.FetchCircleResponse;
 import io.javadog.cws.api.responses.FetchMemberResponse;
 import io.javadog.cws.api.responses.FetchTrusteeResponse;
+import io.javadog.cws.api.responses.MasterKeyResponse;
 import io.javadog.cws.api.responses.ProcessCircleResponse;
 import io.javadog.cws.api.responses.ProcessMemberResponse;
 import io.javadog.cws.api.responses.ProcessTrusteeResponse;
@@ -100,6 +102,31 @@ public class ManagementService implements Management {
             // performance of the system.
             log.log(Settings.ERROR, e.getMessage(), e);
             response = new SettingResponse(ReturnCode.ERROR, GENERAL_RETURN_MESSAGE);
+        }
+
+        return response;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @WebMethod
+    @WebResult(name = "response")
+    public MasterKeyResponse masterKey(@WebParam(name = "requesr") final MasterKeyRequest request) {
+        MasterKeyResponse response;
+
+        try {
+            final Long startTime = System.nanoTime();
+            response = bean.masterKey(request);
+            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), "masterKey", startTime));
+        } catch (RuntimeException e) {
+            // If an error occurs that has so far not been resolved, this is the
+            // final level where it can be handled. Errors can be Persistence
+            // problems or other things that will affect the reliability and/or
+            // performance of the system.
+            log.log(Settings.ERROR, e.getMessage(), e);
+            response = new MasterKeyResponse(ReturnCode.ERROR, GENERAL_RETURN_MESSAGE);
         }
 
         return response;

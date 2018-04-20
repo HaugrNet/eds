@@ -20,6 +20,10 @@ import java.util.Date;
 import java.util.Objects;
 
 /**
+ * This Object contain information about a Signature in CWS, such as when it
+ * expires, verification attempts, when it was added and when it was last used.
+ * It also contain the checksum for identification of it.
+ *
  * @author Kim Jensen
  * @since  CWS 1.0
  */

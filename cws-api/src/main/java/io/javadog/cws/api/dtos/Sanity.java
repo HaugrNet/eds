@@ -20,6 +20,12 @@ import java.util.Date;
 import java.util.Objects;
 
 /**
+ * The Sanity Object contain information about a Data record, which has failed
+ * the sanity check, i.e. the encrypted bytes have been changed, so it is no
+ * longer possible to decrypt the Object. The information returned include the
+ * Id of the Data Object which failed the sanity check, and the date at which it
+ * failed it.
+ *
  * @author Kim Jensen
  * @since  CWS 1.0
  */

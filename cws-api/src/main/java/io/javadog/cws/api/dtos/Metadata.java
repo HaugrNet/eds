@@ -20,6 +20,12 @@ import java.util.Date;
 import java.util.Objects;
 
 /**
+ * <p>The Metadata is the information which is needed as part of storing or
+ * reading Data. This includes the Id of the data, the CircleId for the Circle
+ * it belongs to. If the data is stored in a Structure, the FolderId. Another
+ * important part of the Data is the name of the Data object, and the DataType
+ * of it, and finally the date when it was added.</p>
+ *
  * @author Kim Jensen
  * @since  CWS 1.0
  */

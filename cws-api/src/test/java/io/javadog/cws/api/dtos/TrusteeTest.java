@@ -27,6 +27,7 @@ public final class TrusteeTest {
     @Test
     public void testClassflow() {
         final String memberId = UUID.randomUUID().toString();
+        final String publicKey = UUID.randomUUID().toString();
         final String circleId = UUID.randomUUID().toString();
         final TrustLevel trustLevel = TrustLevel.WRITE;
         final Date lastModified = new Date(456L);
@@ -34,12 +35,14 @@ public final class TrusteeTest {
 
         final Trustee trustee = new Trustee();
         trustee.setMemberId(memberId);
+        trustee.setPublicKey(publicKey);
         trustee.setCircleId(circleId);
         trustee.setTrustLevel(trustLevel);
         trustee.setChanged(lastModified);
         trustee.setAdded(added);
 
         assertThat(trustee.getMemberId(), is(memberId));
+        assertThat(trustee.getPublicKey(), is(publicKey));
         assertThat(trustee.getCircleId(), is(circleId));
         assertThat(trustee.getTrustLevel(), is(trustLevel));
         assertThat(trustee.getChanged(), is(lastModified));
@@ -113,6 +116,9 @@ public final class TrusteeTest {
     private static Trustee prepareTrustee(final long circleId, final String memberId, final TrustLevel trustLevel, final Date lastModified, final Date added) {
         final Trustee trustee = new Trustee();
         trustee.setMemberId(memberId);
+        // The Public Key is not part of the standard methods,
+        // so a random value will test this
+        trustee.setPublicKey(UUID.randomUUID().toString());
         trustee.setCircleId(String.valueOf(circleId));
         trustee.setTrustLevel(trustLevel);
         trustee.setChanged(lastModified);

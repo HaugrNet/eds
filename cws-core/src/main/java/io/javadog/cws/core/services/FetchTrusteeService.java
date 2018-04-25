@@ -81,6 +81,7 @@ public final class FetchTrusteeService extends Serviceable<FetchTrusteeResponse,
         final Trustee trustee = new Trustee();
 
         trustee.setMemberId(entity.getMember().getExternalId());
+        trustee.setPublicKey(entity.getMember().getMemberKey());
         trustee.setCircleId(entity.getCircle().getExternalId());
         trustee.setTrustLevel(entity.getTrustLevel());
         trustee.setChanged(entity.getAltered());

@@ -210,8 +210,9 @@ public final class Mapper {
 
         for (final io.javadog.cws.ws.Trustee wsTrustee : ws) {
             final Trustee trustee = new Trustee();
-            trustee.setCircleId(wsTrustee.getCircleId());
             trustee.setMemberId(wsTrustee.getMemberId());
+            trustee.setPublicKey(wsTrustee.getPublicKey());
+            trustee.setCircleId(wsTrustee.getCircleId());
             trustee.setTrustLevel(map(wsTrustee.getTrustLevel()));
             trustee.setChanged(map(wsTrustee.getChanged()));
             trustee.setAdded(map(wsTrustee.getAdded()));

@@ -27,7 +27,7 @@ import java.util.Objects;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = Constants.FIELD_TRUSTEE, propOrder = { Constants.FIELD_MEMBER_ID, Constants.FIELD_CIRCLE_ID, Constants.FIELD_TRUSTLEVEL, Constants.FIELD_CHANGED, Constants.FIELD_ADDED })
+@XmlType(name = Constants.FIELD_TRUSTEE, propOrder = { Constants.FIELD_MEMBER_ID, Constants.FIELD_PUBLIC_KEY, Constants.FIELD_CIRCLE_ID, Constants.FIELD_TRUSTLEVEL, Constants.FIELD_CHANGED, Constants.FIELD_ADDED })
 public final class Trustee implements Serializable {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
@@ -35,6 +35,13 @@ public final class Trustee implements Serializable {
 
     @XmlElement(name = Constants.FIELD_MEMBER_ID)
     private String memberId = null;
+
+    // The Public Key is an optional value which may or may not be provided,
+    // hence it is only stored but not used for anything. For the same reason,
+    // it is not used as part of the Standard Object methods, #equals(),
+    // #hashCode() and #toString().
+    @XmlElement(name = Constants.FIELD_PUBLIC_KEY, required = true)
+    private String publicKey = null;
 
     @XmlElement(name = Constants.FIELD_CIRCLE_ID)
     private String circleId = null;
@@ -58,6 +65,14 @@ public final class Trustee implements Serializable {
 
     public String getMemberId() {
         return memberId;
+    }
+
+    public void setPublicKey(final String publicKey) {
+        this.publicKey = publicKey;
+    }
+
+    public String getPublicKey() {
+        return publicKey;
     }
 
     public void setCircleId(final String circleId) {

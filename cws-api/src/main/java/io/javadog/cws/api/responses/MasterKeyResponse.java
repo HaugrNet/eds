@@ -21,7 +21,7 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "masterKeyResult")
-@XmlType(name = "masterKeyResult", propOrder = Constants.FIELD_SETTINGS)
+@XmlType(name = "masterKeyResult")
 public final class MasterKeyResponse extends CwsResponse {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */

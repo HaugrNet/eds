@@ -28,7 +28,7 @@ import java.util.logging.Logger;
  * @since  CWS 1.0
  */
 @Path("/masterKey")
-public final class MasterKeyService {
+public class MasterKeyService {
 
     private static final Logger log = Logger.getLogger(MasterKeyService.class.getName());
 

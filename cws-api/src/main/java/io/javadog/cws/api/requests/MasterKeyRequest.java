@@ -25,7 +25,7 @@ import java.util.Map;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "masterKeyRequest")
-@XmlType(name = "masterKeyRequest", propOrder = Constants.FIELD_SETTINGS)
+@XmlType(name = "masterKeyRequest", propOrder = Constants.FIELD_SECRET)
 public final class MasterKeyRequest extends Authentication {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */

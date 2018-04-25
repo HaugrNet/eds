@@ -113,7 +113,7 @@ public class ManagementService implements Management {
     @Override
     @WebMethod
     @WebResult(name = "response")
-    public MasterKeyResponse masterKey(@WebParam(name = "requesr") final MasterKeyRequest request) {
+    public MasterKeyResponse masterKey(@WebParam(name = "request") final MasterKeyRequest request) {
         MasterKeyResponse response;
 
         try {

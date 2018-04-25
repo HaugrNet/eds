@@ -24,7 +24,7 @@
 # Configuration settings, please only modify this section
 # -----------------------------------------------------------------------------
 readonly source="${HOME}/JavaDog.io/github/cws"
-readonly jacoco_agent="${HOME}/.m2/repository/org/jacoco/org.jacoco.agent/0.7.9/org.jacoco.agent-0.7.9-runtime.jar"
+readonly jacoco_agent="${HOME}/.m2/repository/org/jacoco/org.jacoco.agent/0.8.1/org.jacoco.agent-0.8.1-runtime.jar"
 readonly package="io.javadog.cws.*"
 readonly debugPort=8787
 readonly appDirectory="/opt/java/wildfly"

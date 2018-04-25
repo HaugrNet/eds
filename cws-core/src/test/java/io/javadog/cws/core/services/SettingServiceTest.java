@@ -117,13 +117,22 @@ public final class SettingServiceTest extends DatabaseSetup {
         service.perform(request);
     }
 
+    /**
+     * <p>Certain values in the CWS Settings are considered critical, meaning
+     * that they can only be updated if no accounts, except the system
+     * administrator, exists. However, the problem with these tests is that they
+     * seem to fail on Travis-CI. Hence, the tests are merged into a single
+     * test, to see if it helps stabilizing Travis-CI.</p>
+     */
     @Test
-    public void testUpdatingSalt() {
+    public void testUpdatingCriticalValues() {
         // Before starting, all member accounts must be removed
         final List<MemberEntity> members = dao.findAllAscending(MemberEntity.class, "id");
         for (final MemberEntity member : members) {
             dao.delete(member);
         }
+
+        prepareCause(CWSException.class, ReturnCode.SETTING_WARNING, "Invalid Integer value for 'PBE_ITERATIONS'.");
 
         final SettingService service = new SettingService(newSettings(), entityManager);
         final SettingRequest request = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
@@ -132,6 +141,7 @@ public final class SettingServiceTest extends DatabaseSetup {
 
         final Map<String, String> mySettings = new HashMap<>(response.getSettings());
         mySettings.put(StandardSetting.CWS_SALT.getKey(), "new SALT");
+        mySettings.put(StandardSetting.PBE_ITERATIONS.getKey(), "100000");
         request.setCredential(crypto.stringToBytes(Constants.ADMIN_ACCOUNT));
         request.setSettings(mySettings);
         final SettingResponse update = service.perform(request);
@@ -142,6 +152,13 @@ public final class SettingServiceTest extends DatabaseSetup {
         final SettingRequest checkRequest = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
         final SettingResponse checkResponse = service.perform(checkRequest);
         assertThat(checkResponse.isOk(), is(true));
+
+        // Finally the negative test, seeing what happens if an invalid PBE
+        // iteration count is defined
+        mySettings.put(StandardSetting.PBE_ITERATIONS.getKey(), "-100000");
+        final SettingRequest negativeRequest = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
+        negativeRequest.setSettings(mySettings);
+        service.perform(negativeRequest);
     }
 
     @Test
@@ -265,56 +282,6 @@ public final class SettingServiceTest extends DatabaseSetup {
         request2.setSettings(mySettings);
         final SettingResponse response2 = service.perform(request2);
         assertThat(response2.isOk(), is(true));
-    }
-
-    @Test
-    public void testSetPBEIntervalWithNoMembers() {
-        // Before starting, all member accounts must be removed
-        final List<MemberEntity> members = dao.findAllAscending(MemberEntity.class, "id");
-        for (final MemberEntity member : members) {
-            dao.delete(member);
-        }
-
-        final SettingService service = new SettingService(newSettings(), entityManager);
-        final SettingRequest request1 = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
-        final SettingResponse response1 = service.perform(request1);
-        assertThat(response1.isOk(), is(true));
-
-        final Map<String, String> mySettings = response1.getSettings();
-        mySettings.put(StandardSetting.PBE_ITERATIONS.getKey(), "100000");
-
-        final SettingRequest request2 = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
-        request2.setSettings(mySettings);
-        final SettingResponse response2 = service.perform(request2);
-        assertThat(response2.isOk(), is(true));
-
-        // As the Admin Account should've been updated, another request is made
-        // to verify this
-        final SettingRequest request3 = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
-        final SettingResponse response3 = service.perform(request3);
-        assertThat(response3.isOk(), is(true));
-    }
-
-    @Test
-    public void testSetNegativePBEInterval() {
-        // Before starting, all member accounts must be removed
-        final List<MemberEntity> members = dao.findAllAscending(MemberEntity.class, "id");
-        for (final MemberEntity member : members) {
-            dao.delete(member);
-        }
-
-        prepareCause(CWSException.class, ReturnCode.SETTING_WARNING, "Invalid Integer value for 'PBE_ITERATIONS'.");
-        final SettingService service = new SettingService(newSettings(), entityManager);
-        final SettingRequest request1 = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
-        final SettingResponse response1 = service.perform(request1);
-        assertThat(response1.isOk(), is(true));
-
-        final Map<String, String> mySettings = response1.getSettings();
-        mySettings.put(StandardSetting.PBE_ITERATIONS.getKey(), "-100000");
-
-        final SettingRequest request2 = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
-        request2.setSettings(mySettings);
-        service.perform(request2);
     }
 
     @Test

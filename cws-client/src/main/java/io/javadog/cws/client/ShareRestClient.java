@@ -23,8 +23,6 @@ import io.javadog.cws.api.responses.ProcessDataTypeResponse;
 import io.javadog.cws.api.responses.SignResponse;
 import io.javadog.cws.api.responses.VerifyResponse;
 
-import javax.ws.rs.core.Response;
-
 /**
  * @author Kim Jensen
  * @since  CWS 1.0
@@ -51,15 +49,15 @@ public final class ShareRestClient extends BaseRestClient implements Share {
      */
     @Override
     public ProcessDataTypeResponse processDataType(final ProcessDataTypeRequest request) {
-        final Response response;
+        final ProcessDataTypeResponse response;
 
         if ((request != null) && (request.getAction() != null)) {
             switch (request.getAction()) {
                 case PROCESS:
-                    response = runRequest("/dataTypes/process", request);
+                    response = runRequest(ProcessDataTypeResponse.class, "/dataTypes/process", request);
                     break;
                 case DELETE:
-                    response = runRequest("/dataTypes/delete", request);
+                    response = runRequest(ProcessDataTypeResponse.class, "/dataTypes/delete", request);
                     break;
                 default:
                     throw new CWSClientException("Unsupported Operation: " + request.getAction());
@@ -68,10 +66,7 @@ public final class ShareRestClient extends BaseRestClient implements Share {
             throw new CWSClientException("Cannot perform request, as the Request Object is missing or incomplete.");
         }
 
-        final ProcessDataTypeResponse cwsResponse = response.readEntity(ProcessDataTypeResponse.class);
-        close(response);
-
-        return cwsResponse;
+        return response;
     }
 
     /**
@@ -79,11 +74,7 @@ public final class ShareRestClient extends BaseRestClient implements Share {
      */
     @Override
     public FetchDataTypeResponse fetchDataTypes(final FetchDataTypeRequest request) {
-        final Response response = runRequest("/dataTypes/fetch", request);
-        final FetchDataTypeResponse cwsResponse = response.readEntity(FetchDataTypeResponse.class);
-        close(response);
-
-        return cwsResponse;
+        return runRequest(FetchDataTypeResponse.class, "/dataTypes/fetch", request);
     }
 
     /**
@@ -91,18 +82,18 @@ public final class ShareRestClient extends BaseRestClient implements Share {
      */
     @Override
     public ProcessDataResponse processData(final ProcessDataRequest request) {
-        final Response response;
+        final ProcessDataResponse response;
 
         if ((request != null) && (request.getAction() != null)) {
             switch (request.getAction()) {
                 case ADD:
-                    response = runRequest("/data/add", request);
+                    response = runRequest(ProcessDataResponse.class, "/data/add", request);
                     break;
                 case UPDATE:
-                    response = runRequest("/data/update", request);
+                    response = runRequest(ProcessDataResponse.class, "/data/update", request);
                     break;
                 case DELETE:
-                    response = runRequest("/data/delete", request);
+                    response = runRequest(ProcessDataResponse.class, "/data/delete", request);
                     break;
                 default:
                     throw new CWSClientException("Unsupported Operation: " + request.getAction());
@@ -111,10 +102,7 @@ public final class ShareRestClient extends BaseRestClient implements Share {
             throw new CWSClientException("Cannot perform request, as the Request Object is missing or incomplete.");
         }
 
-        final ProcessDataResponse cwsResponse = response.readEntity(ProcessDataResponse.class);
-        close(response);
-
-        return cwsResponse;
+        return response;
     }
 
     /**
@@ -122,11 +110,7 @@ public final class ShareRestClient extends BaseRestClient implements Share {
      */
     @Override
     public FetchDataResponse fetchData(final FetchDataRequest request) {
-        final Response response = runRequest("/data/fetch", request);
-        final FetchDataResponse cwsResponse = response.readEntity(FetchDataResponse.class);
-        close(response);
-
-        return cwsResponse;
+        return runRequest(FetchDataResponse.class, "/data/fetch", request);
     }
 
     /**
@@ -134,11 +118,7 @@ public final class ShareRestClient extends BaseRestClient implements Share {
      */
     @Override
     public SignResponse sign(final SignRequest request) {
-        final Response response = runRequest("/signatures/signDocument", request);
-        final SignResponse cwsResponse = response.readEntity(SignResponse.class);
-        close(response);
-
-        return cwsResponse;
+        return runRequest(SignResponse.class, "/signatures/signDocument", request);
     }
 
     /**
@@ -146,11 +126,7 @@ public final class ShareRestClient extends BaseRestClient implements Share {
      */
     @Override
     public VerifyResponse verify(final VerifyRequest request) {
-        final Response response = runRequest("/signatures/verifySignature", request);
-        final VerifyResponse cwsResponse = response.readEntity(VerifyResponse.class);
-        close(response);
-
-        return cwsResponse;
+        return runRequest(VerifyResponse.class, "/signatures/verifySignature", request);
     }
 
     /**
@@ -158,10 +134,6 @@ public final class ShareRestClient extends BaseRestClient implements Share {
      */
     @Override
     public FetchSignatureResponse fetchSignatures(final FetchSignatureRequest request) {
-        final Response response = runRequest("/signatures/fetch", request);
-        final FetchSignatureResponse cwsResponse = response.readEntity(FetchSignatureResponse.class);
-        close(response);
-
-        return cwsResponse;
+        return runRequest(FetchSignatureResponse.class, "/signatures/fetch", request);
     }
 }

@@ -12,6 +12,7 @@ import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.requests.FetchCircleRequest;
 import io.javadog.cws.api.requests.FetchMemberRequest;
 import io.javadog.cws.api.requests.FetchTrusteeRequest;
+import io.javadog.cws.api.requests.MasterKeyRequest;
 import io.javadog.cws.api.requests.ProcessCircleRequest;
 import io.javadog.cws.api.requests.ProcessMemberRequest;
 import io.javadog.cws.api.requests.ProcessTrusteeRequest;
@@ -20,6 +21,7 @@ import io.javadog.cws.api.requests.SettingRequest;
 import io.javadog.cws.api.responses.FetchCircleResponse;
 import io.javadog.cws.api.responses.FetchMemberResponse;
 import io.javadog.cws.api.responses.FetchTrusteeResponse;
+import io.javadog.cws.api.responses.MasterKeyResponse;
 import io.javadog.cws.api.responses.ProcessCircleResponse;
 import io.javadog.cws.api.responses.ProcessMemberResponse;
 import io.javadog.cws.api.responses.ProcessTrusteeResponse;
@@ -30,6 +32,7 @@ import io.javadog.cws.ws.FetchCircleResult;
 import io.javadog.cws.ws.FetchMemberResult;
 import io.javadog.cws.ws.FetchTrusteeResult;
 import io.javadog.cws.ws.Management_Service;
+import io.javadog.cws.ws.MasterKeyResult;
 import io.javadog.cws.ws.ProcessCircleResult;
 import io.javadog.cws.ws.ProcessMemberResult;
 import io.javadog.cws.ws.ProcessTrusteeResult;
@@ -89,6 +92,14 @@ public final class ManagementSoapClient implements Management {
     @Override
     public SettingResponse settings(final SettingRequest request) {
         return map(client.settings(map(request)));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public MasterKeyResponse masterKey(final MasterKeyRequest request) {
+        return map(client.masterKey(map(request)));
     }
 
     /**
@@ -182,6 +193,29 @@ public final class ManagementSoapClient implements Management {
             api = new SettingResponse();
             Mapper.fillResponse(api, ws);
             api.setSettings(mapSettings(ws.getSettings()));
+        }
+
+        return api;
+    }
+
+    private static io.javadog.cws.ws.MasterKeyRequest map(final MasterKeyRequest api) {
+        io.javadog.cws.ws.MasterKeyRequest ws = null;
+
+        if (api != null) {
+            ws = new io.javadog.cws.ws.MasterKeyRequest();
+            Mapper.fillAuthentication(ws, api);
+            ws.setSecret(api.getSecret());
+        }
+
+        return ws;
+    }
+
+    private static MasterKeyResponse map(final MasterKeyResult ws) {
+        MasterKeyResponse api = null;
+
+        if (ws != null) {
+            api = new MasterKeyResponse();
+            Mapper.fillResponse(api, ws);
         }
 
         return api;

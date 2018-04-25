@@ -9,7 +9,7 @@
       Owner: JavaDog.io
     </wsdl:documentation>
   <wsdl:types>
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://ws.cws.javadog.io/" elementFormDefault="unqualified" targetNamespace="http://ws.cws.javadog.io/" version="1.0">
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://ws.cws.javadog.io/" targetNamespace="http://ws.cws.javadog.io/" version="1.0">
 
   <xs:element name="fetchData" type="tns:fetchData"/>
 

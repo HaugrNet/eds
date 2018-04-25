@@ -10,7 +10,7 @@
       Owner: JavaDog.io
     </wsdl:documentation>
   <wsdl:types>
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://ws.cws.javadog.io/" elementFormDefault="unqualified" targetNamespace="http://ws.cws.javadog.io/" version="1.0">
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://ws.cws.javadog.io/" targetNamespace="http://ws.cws.javadog.io/" version="1.0">
 
   <xs:element name="fetchCircleRequest" type="tns:fetchCircleRequest"/>
 
@@ -35,6 +35,14 @@
   <xs:element name="fetchTrustees" type="tns:fetchTrustees"/>
 
   <xs:element name="fetchTrusteesResponse" type="tns:fetchTrusteesResponse"/>
+
+  <xs:element name="masterKey" type="tns:masterKey"/>
+
+  <xs:element name="masterKeyRequest" type="tns:masterKeyRequest"/>
+
+  <xs:element name="masterKeyResponse" type="tns:masterKeyResponse"/>
+
+  <xs:element name="masterKeyResult" type="tns:masterKeyResult"/>
 
   <xs:element name="processCircle" type="tns:processCircle"/>
 
@@ -82,18 +90,17 @@
 
   <xs:element name="versionResult" type="tns:versionResult"/>
 
-  <xs:complexType name="sanitized">
+  <xs:complexType name="masterKey">
     <xs:sequence>
-      <xs:element minOccurs="0" name="request" type="tns:sanityRequest"/>
+      <xs:element minOccurs="0" name="request" type="tns:masterKeyRequest"/>
     </xs:sequence>
   </xs:complexType>
 
-  <xs:complexType final="extension restriction" name="sanityRequest">
+  <xs:complexType final="extension restriction" name="masterKeyRequest">
     <xs:complexContent>
       <xs:extension base="tns:authentication">
         <xs:sequence>
-          <xs:element minOccurs="0" name="circleId" nillable="true" type="xs:string"/>
-          <xs:element minOccurs="0" name="since" type="xs:dateTime"/>
+          <xs:element name="secret" type="xs:base64Binary"/>
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>
@@ -115,6 +122,44 @@
     <xs:sequence/>
   </xs:complexType>
 
+  <xs:complexType name="masterKeyResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="response" type="tns:masterKeyResult"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType final="extension restriction" name="masterKeyResult">
+    <xs:complexContent>
+      <xs:extension base="tns:cwsResult">
+        <xs:sequence/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="cwsResult">
+    <xs:sequence>
+      <xs:element name="returnCode" type="xs:int"/>
+      <xs:element name="returnMessage" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="sanitized">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="request" type="tns:sanityRequest"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType final="extension restriction" name="sanityRequest">
+    <xs:complexContent>
+      <xs:extension base="tns:authentication">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="circleId" nillable="true" type="xs:string"/>
+          <xs:element minOccurs="0" name="since" type="xs:dateTime"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
   <xs:complexType name="sanitizedResponse">
     <xs:sequence>
       <xs:element minOccurs="0" name="response" type="tns:sanityResult"/>
@@ -129,13 +174,6 @@
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>
-  </xs:complexType>
-
-  <xs:complexType name="cwsResult">
-    <xs:sequence>
-      <xs:element name="returnCode" type="xs:int"/>
-      <xs:element name="returnMessage" type="xs:string"/>
-    </xs:sequence>
   </xs:complexType>
 
   <xs:complexType final="extension restriction" name="sanity">
@@ -485,12 +523,20 @@
 
 </xs:schema>
   </wsdl:types>
+  <wsdl:message name="masterKey">
+    <wsdl:part element="tns:masterKey" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
   <wsdl:message name="sanitized">
     <wsdl:part element="tns:sanitized" name="parameters">
     </wsdl:part>
   </wsdl:message>
   <wsdl:message name="processCircleResponse">
     <wsdl:part element="tns:processCircleResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="masterKeyResponse">
+    <wsdl:part element="tns:masterKeyResponse" name="parameters">
     </wsdl:part>
   </wsdl:message>
   <wsdl:message name="settings">
@@ -561,6 +607,12 @@
     <wsdl:documentation>The Management Service is a part the CWS, is part of the
     CWS, offering the functionality to administrate a CWS system, such as the
     Circles, Accounts, Trustees and Settings.</wsdl:documentation>
+    <wsdl:operation name="masterKey">
+      <wsdl:input message="tns:masterKey" name="masterKey">
+    </wsdl:input>
+      <wsdl:output message="tns:masterKeyResponse" name="masterKeyResponse">
+    </wsdl:output>
+    </wsdl:operation>
     <wsdl:operation name="sanitized">
       <wsdl:input message="tns:sanitized" name="sanitized">
     </wsdl:input>
@@ -618,6 +670,15 @@
   </wsdl:portType>
   <wsdl:binding name="managementSoapBinding" type="tns:management">
     <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="masterKey">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="masterKey">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="masterKeyResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
     <wsdl:operation name="sanitized">
       <soap:operation soapAction="" style="document"/>
       <wsdl:input name="sanitized">

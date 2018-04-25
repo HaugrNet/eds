@@ -11,6 +11,7 @@ import io.javadog.cws.api.Management;
 import io.javadog.cws.api.requests.FetchCircleRequest;
 import io.javadog.cws.api.requests.FetchMemberRequest;
 import io.javadog.cws.api.requests.FetchTrusteeRequest;
+import io.javadog.cws.api.requests.MasterKeyRequest;
 import io.javadog.cws.api.requests.ProcessCircleRequest;
 import io.javadog.cws.api.requests.ProcessMemberRequest;
 import io.javadog.cws.api.requests.ProcessTrusteeRequest;
@@ -19,6 +20,7 @@ import io.javadog.cws.api.requests.SettingRequest;
 import io.javadog.cws.api.responses.FetchCircleResponse;
 import io.javadog.cws.api.responses.FetchMemberResponse;
 import io.javadog.cws.api.responses.FetchTrusteeResponse;
+import io.javadog.cws.api.responses.MasterKeyResponse;
 import io.javadog.cws.api.responses.ProcessCircleResponse;
 import io.javadog.cws.api.responses.ProcessMemberResponse;
 import io.javadog.cws.api.responses.ProcessTrusteeResponse;
@@ -35,6 +37,9 @@ import javax.ws.rs.core.Response;
  * @since  CWS 1.0
  */
 public final class ManagementRestClient extends BaseRestClient implements Management {
+
+    private static final String UNSUPPORTED_OPERATION = "Unsupported Operation: ";
+    private static final String INVALID_REQUEST = "Cannot perform request, as the Request Object is missing or incomplete.";
 
     /**
      * Constructor for the CWS System REST Client. It takes the base URL for the
@@ -58,11 +63,10 @@ public final class ManagementRestClient extends BaseRestClient implements Manage
     public VersionResponse version() {
         final String url = baseURL + "/version";
         final ResteasyWebTarget target = client.target(url);
-        final Response response =  target.request().accept(MediaType.APPLICATION_XML_TYPE).get();
-        final VersionResponse versionResponse = response.readEntity(VersionResponse.class);
-        close(response);
 
-        return versionResponse;
+        try (final Response response =  target.request().accept(MediaType.APPLICATION_XML_TYPE).get()) {
+            return response.readEntity(VersionResponse.class);
+        }
     }
 
     /**
@@ -70,11 +74,15 @@ public final class ManagementRestClient extends BaseRestClient implements Manage
      */
     @Override
     public SettingResponse settings(final SettingRequest request) {
-        final Response response = runRequest("/settings", request);
-        final SettingResponse cwsResponse = response.readEntity(SettingResponse.class);
-        close(response);
+        return runRequest(SettingResponse.class, "/settings", request);
+    }
 
-        return cwsResponse;
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public MasterKeyResponse masterKey(final MasterKeyRequest request) {
+        return runRequest(MasterKeyResponse.class, "/masterKey", request);
     }
 
     /**
@@ -82,11 +90,7 @@ public final class ManagementRestClient extends BaseRestClient implements Manage
      */
     @Override
     public SanityResponse sanitized(final SanityRequest request) {
-        final Response response = runRequest("/sanity/sanitized", request);
-        final SanityResponse cwsResponse = response.readEntity(SanityResponse.class);
-        close(response);
-
-        return cwsResponse;
+        return runRequest(SanityResponse.class, "/sanity/sanitized", request);
     }
 
     /**
@@ -94,11 +98,7 @@ public final class ManagementRestClient extends BaseRestClient implements Manage
      */
     @Override
     public FetchMemberResponse fetchMembers(final FetchMemberRequest request) {
-        final Response response = runRequest("/members/fetch", request);
-        final FetchMemberResponse cwsResponse = response.readEntity(FetchMemberResponse.class);
-        close(response);
-
-        return cwsResponse;
+        return runRequest(FetchMemberResponse.class, "/members/fetch", request);
     }
 
     /**
@@ -106,36 +106,33 @@ public final class ManagementRestClient extends BaseRestClient implements Manage
      */
     @Override
     public ProcessMemberResponse processMember(final ProcessMemberRequest request) {
-        final Response response;
+        final ProcessMemberResponse response;
 
         if ((request != null) && (request.getAction() != null)) {
             switch (request.getAction()) {
                 case CREATE:
-                    response = runRequest("/members/createMember", request);
+                    response = runRequest(ProcessMemberResponse.class, "/members/createMember", request);
                     break;
                 case INVITE:
-                    response = runRequest("/members/inviteMember", request);
+                    response = runRequest(ProcessMemberResponse.class, "/members/inviteMember", request);
                     break;
                 case UPDATE:
-                    response = runRequest("/members/updateMember", request);
+                    response = runRequest(ProcessMemberResponse.class, "/members/updateMember", request);
                     break;
                 case INVALIDATE:
-                    response = runRequest("/members/invalidate", request);
+                    response = runRequest(ProcessMemberResponse.class, "/members/invalidate", request);
                     break;
                 case DELETE:
-                    response = runRequest("/members/deleteMember", request);
+                    response = runRequest(ProcessMemberResponse.class, "/members/deleteMember", request);
                     break;
                 default:
-                    throw new CWSClientException("Unsupported Operation: " + request.getAction());
+                    throw new CWSClientException(UNSUPPORTED_OPERATION + request.getAction());
             }
         } else {
-            throw new CWSClientException("Cannot perform request, as the Request Object is missing or incomplete.");
+            throw new CWSClientException(INVALID_REQUEST);
         }
 
-        final ProcessMemberResponse cwsResponse = response.readEntity(ProcessMemberResponse.class);
-        close(response);
-
-        return cwsResponse;
+        return response;
     }
 
     /**
@@ -143,11 +140,7 @@ public final class ManagementRestClient extends BaseRestClient implements Manage
      */
     @Override
     public FetchCircleResponse fetchCircles(final FetchCircleRequest request) {
-        final Response response = runRequest("/circles/fetch", request);
-        final FetchCircleResponse cwsResponse = response.readEntity(FetchCircleResponse.class);
-        close(response);
-
-        return cwsResponse;
+        return runRequest(FetchCircleResponse.class, "/circles/fetch", request);
     }
 
     /**
@@ -155,30 +148,27 @@ public final class ManagementRestClient extends BaseRestClient implements Manage
      */
     @Override
     public ProcessCircleResponse processCircle(final ProcessCircleRequest request) {
-        final Response response;
+        final ProcessCircleResponse response;
 
         if ((request != null) && (request.getAction() != null)) {
             switch (request.getAction()) {
                 case CREATE:
-                    response = runRequest("/circles/createCircle", request);
+                    response = runRequest(ProcessCircleResponse.class, "/circles/createCircle", request);
                     break;
                 case UPDATE:
-                    response = runRequest("/circles/updateCircle", request);
+                    response = runRequest(ProcessCircleResponse.class, "/circles/updateCircle", request);
                     break;
                 case DELETE:
-                    response = runRequest("/circles/deleteCircle", request);
+                    response = runRequest(ProcessCircleResponse.class, "/circles/deleteCircle", request);
                     break;
                 default:
-                    throw new CWSClientException("Unsupported Operation: " + request.getAction());
+                    throw new CWSClientException(UNSUPPORTED_OPERATION + request.getAction());
             }
         } else {
-            throw new CWSClientException("Cannot perform request, as the Request Object is missing or incomplete.");
+            throw new CWSClientException(INVALID_REQUEST);
         }
 
-        final ProcessCircleResponse cwsResponse = response.readEntity(ProcessCircleResponse.class);
-        close(response);
-
-        return cwsResponse;
+        return response;
     }
 
     /**
@@ -186,11 +176,7 @@ public final class ManagementRestClient extends BaseRestClient implements Manage
      */
     @Override
     public FetchTrusteeResponse fetchTrustees(final FetchTrusteeRequest request) {
-        final Response response = runRequest("/trustees/fetch", request);
-        final FetchTrusteeResponse cwsResponse = response.readEntity(FetchTrusteeResponse.class);
-        close(response);
-
-        return cwsResponse;
+        return runRequest(FetchTrusteeResponse.class, "/trustees/fetch", request);
     }
 
     /**
@@ -198,29 +184,26 @@ public final class ManagementRestClient extends BaseRestClient implements Manage
      */
     @Override
     public ProcessTrusteeResponse processTrustee(final ProcessTrusteeRequest request) {
-        final Response response;
+        final ProcessTrusteeResponse response;
 
         if ((request != null) && (request.getAction() != null)) {
             switch (request.getAction()) {
                 case ADD:
-                    response = runRequest("/trustees/addTrustee", request);
+                    response = runRequest(ProcessTrusteeResponse.class, "/trustees/addTrustee", request);
                     break;
                 case ALTER:
-                    response = runRequest("/trustees/alterTrustee", request);
+                    response = runRequest(ProcessTrusteeResponse.class, "/trustees/alterTrustee", request);
                     break;
                 case REMOVE:
-                    response = runRequest("/trustees/removeTrustee", request);
+                    response = runRequest(ProcessTrusteeResponse.class, "/trustees/removeTrustee", request);
                     break;
                 default:
-                    throw new CWSClientException("Unsupported Operation: " + request.getAction());
+                    throw new CWSClientException(UNSUPPORTED_OPERATION + request.getAction());
             }
         } else {
-            throw new CWSClientException("Cannot perform request, as the Request Object is missing or incomplete.");
+            throw new CWSClientException(INVALID_REQUEST);
         }
 
-        final ProcessTrusteeResponse cwsResponse = response.readEntity(ProcessTrusteeResponse.class);
-        close(response);
-
-        return cwsResponse;
+        return response;
     }
 }

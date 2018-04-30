@@ -9,6 +9,7 @@ package io.javadog.cws.core;
 
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.TrustLevel;
+import io.javadog.cws.core.enums.StandardSetting;
 import io.javadog.cws.core.enums.Status;
 import io.javadog.cws.core.jce.CWSKeyPair;
 import io.javadog.cws.core.jce.Crypto;
@@ -39,6 +40,12 @@ public final class GenerateTestData {
         append(builder, "-- is for destroying the database, which is needed of you have a real database");
         append(builder, "-- and not just an in-memory database.");
         append(builder, "-- =============================================================================");
+        append(builder, "");
+        append(builder, "-- For the testing, we're persisting the Settings also, it is not really needed,");
+        append(builder, "-- but it helps with ensuring that all corners of CWS is being checked.");
+        append(builder, "INSERT INTO cws_settings (name, setting) VALUES");
+        appendSettings(builder);
+
         append(builder, "");
         append(builder, "-- Default Administrator User, it is set at the first request to the System, and");
         append(builder, "-- is thus needed for loads of tests. Remaining Accounts is for \"member1\" to");
@@ -101,6 +108,19 @@ public final class GenerateTestData {
         createAndAppendTrustee(builder, 6, keyPair5, 3, 3, cwsKey3, TrustLevel.READ,  ';');
 
         return builder.toString();
+    }
+
+    private void appendSettings(final StringBuilder builder) {
+        final int size = StandardSetting.values().length;
+        int count = 1;
+        for (final StandardSetting setting : StandardSetting.values()) {
+            if (count < size) {
+                append(builder, "    ('" + setting.getKey() + "', '" + setting.getValue() + "'),");
+            } else {
+                append(builder, "    ('" + setting.getKey() + "', '" + setting.getValue() + "');");
+            }
+            count++;
+        }
     }
 
     private void createAndAppendMember(final StringBuilder builder, final String externalId, final String name, final CWSKeyPair keyPair, final char delimiter) {

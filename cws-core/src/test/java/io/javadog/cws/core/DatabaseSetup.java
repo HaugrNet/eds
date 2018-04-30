@@ -88,8 +88,7 @@ public class DatabaseSetup {
         final ClassLoader loader = Thread.currentThread().getContextClassLoader();
 
         if (loader != null) {
-            final String propertiesFile = "logger.properties";
-            try (InputStream stream = loader.getResourceAsStream(propertiesFile)) {
+            try (final InputStream stream = loader.getResourceAsStream("logger.properties")) {
                 final LogManager manager = LogManager.getLogManager();
                 manager.readConfiguration(stream);
             } catch (IOException e) {

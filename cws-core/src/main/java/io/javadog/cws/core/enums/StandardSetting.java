@@ -15,10 +15,10 @@ import java.util.Objects;
  */
 public enum StandardSetting {
 
-    SYMMETRIC_ALGORITHM("cws.crypto.symmetric.algorithm", "AES128"),
+    SYMMETRIC_ALGORITHM("cws.crypto.symmetric.algorithm", "AES256"),
     ASYMMETRIC_ALGORITHM("cws.crypto.asymmetric.algorithm", "RSA2048"),
     SIGNATURE_ALGORITHM("cws.crypto.signature.algorithm", "SHA512"),
-    PBE_ALGORITHM("cws.crypto.pbe.algorithm", "PBE128"),
+    PBE_ALGORITHM("cws.crypto.pbe.algorithm", "PBE256"),
     PBE_ITERATIONS("cws.crypto.pbe.iterations", "1024"),
     HASH_ALGORITHM("cws.crypto.hash.algorithm", "SHA512"),
     CWS_SALT("cws.system.salt", "Default salt, also used as kill switch. Must be set in DB."),

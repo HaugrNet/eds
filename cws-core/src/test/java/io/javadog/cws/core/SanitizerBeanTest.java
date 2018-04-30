@@ -116,11 +116,14 @@ public final class SanitizerBeanTest extends DatabaseSetup {
         try {
             final StartupBean bean = StartupBean.class.getConstructor().newInstance();
 
+            final Settings newSettings = newSettings();
+            newSettings.set(StandardSetting.SANITY_STARTUP.getKey(), sanityAtStartup);
+
             // Inject Dependencies
             setField(bean, "entityManager", entityManager);
             setField(bean, "sanitizerBean", prepareSanitizeBean());
             setField(bean, "timerService", new TestTimerService());
-            setField(bean, "settings", newSettings());
+            setField(bean, "settings", newSettings);
 
             // The Bean is updating the Settings via the DB, so we need to alter
             // the content of the DB to reflect this. As the content has not yet

@@ -13,6 +13,7 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 import io.javadog.cws.core.DatabaseSetup;
+import io.javadog.cws.core.enums.StandardSetting;
 import org.junit.Test;
 
 import java.util.List;
@@ -46,13 +47,13 @@ public final class SettingEntityTest extends DatabaseSetup {
 
         final List<SettingEntity> mySettings = dao.findAllAscending(SettingEntity.class, "id");
         assertThat(mySettings, is(not(nullValue())));
-        assertThat(mySettings.size(), is(14));
+        assertThat(mySettings.size(), is(StandardSetting.values().length + 1));
     }
 
     @Test
     public void testDaoFindSettings() {
         final List<SettingEntity> mySettings = dao.findAllAscending(SettingEntity.class, "id");
         assertThat(mySettings, is(not(nullValue())));
-        assertThat(mySettings.size(), is(13));
+        assertThat(mySettings.size(), is(StandardSetting.values().length));
     }
 }

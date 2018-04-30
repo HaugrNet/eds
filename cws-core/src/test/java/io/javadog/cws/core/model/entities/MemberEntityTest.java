@@ -146,6 +146,5 @@ public final class MemberEntityTest extends DatabaseSetup {
         final GenerateTestData generator = new GenerateTestData();
         final String sql = generator.prepareTestData();
         assertThat(sql.length() > 19000, is(true));
-        System.out.println(sql);
     }
 }

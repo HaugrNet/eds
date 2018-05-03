@@ -17,6 +17,16 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
 /**
+ * <p>This is the response Object from the CWS, when the verify request was
+ * invoked. It only contains a single boolean value, verified, which will tell
+ * if the Object was correctly verified or not. If the request failed, or there
+ * was a problem, then the default value false is set. It is therefore important
+ * to check that the request was successful before assuming that the signature
+ * check failed.</p>
+ *
+ * <p>Please see {@link CwsResponse} for information about the result of the
+ * processing.</p>
+ *
  * @author Kim Jensen
  * @since  CWS 1.0
  */

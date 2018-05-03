@@ -20,6 +20,14 @@ import javax.xml.bind.annotation.XmlType;
 import java.util.Map;
 
 /**
+ * <p>When a &quot;document&quot; needs to have its signature verified, this
+ * Object is needed as part of the CWS verify request. It requires that both
+ * the Signature and the &quot;document&quot; (bytes) is present to perform
+ * the verification check.</p>
+ *
+ * <p>Please see {@link Authentication} for information about the account and
+ * credentials information.</p>
+ *
  * @author Kim Jensen
  * @since  CWS 1.0
  */

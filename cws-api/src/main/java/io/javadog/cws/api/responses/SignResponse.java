@@ -17,6 +17,13 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
 /**
+ * <p>When the Sign request was invoked, the CWS will return an Object of this
+ * type. The Object returns the newly generated Signature, base64 encoded so it
+ * can be safely stored.</p>
+ *
+ * <p>Please see {@link CwsResponse} for information about the result of the
+ * processing.</p>
+ *
  * @author Kim Jensen
  * @since  CWS 1.0
  */

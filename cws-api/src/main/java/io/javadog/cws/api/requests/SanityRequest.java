@@ -21,6 +21,14 @@ import java.util.Date;
 import java.util.Map;
 
 /**
+ * <p>The Sanity Request Object is needed to perform the Sanity CWS Request,
+ * which is a management request to see if any Data Object have been corrupted
+ * and thus rendered useless. The CircleId is an optional field, serves a way
+ * to limit the scope of the Objects retrieved.</p>
+ *
+ * <p>Please see {@link Authentication} for information about the account and
+ * credentials information.</p>
+ *
  * @author Kim Jensen
  * @since  CWS 1.0
  */

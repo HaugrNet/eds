@@ -21,6 +21,14 @@ import java.util.Date;
 import java.util.Map;
 
 /**
+ * <p>This Object is needed, when a new Signature is being issued. The Object
+ * requires a mandatory &quot;Document&quot; or simply a data Object (byte
+ * array) upon which the Signature is generated. It is also possible to set an
+ * expiration data.</p>
+ *
+ * <p>Please see {@link Authentication} for information about the account and
+ * credentials information.</p>
+ *
  * @author Kim Jensen
  * @since  CWS 1.0
  */

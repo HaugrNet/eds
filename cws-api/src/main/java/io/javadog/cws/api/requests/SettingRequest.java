@@ -19,6 +19,17 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * <p>This request Object may only be used by the System Administrator, to alter
+ * or add/delete custom settings. Existing settings cannot be deleted, and some
+ * may only be altered before Members exists. This is to prevent that changing
+ * of values that is used to derive the internal Keys can still be properly
+ * extracted.</p>
+ *
+ * <p>The Settings field is mandatory, but can be left either empty.</p>
+ *
+ * <p>Please see {@link Authentication} for information about the account and
+ * credentials information.</p>
+ *
  * @author Kim Jensen
  * @since  CWS 1.0
  */

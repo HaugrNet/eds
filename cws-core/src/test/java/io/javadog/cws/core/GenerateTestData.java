@@ -110,7 +110,7 @@ public final class GenerateTestData {
         return builder.toString();
     }
 
-    private void appendSettings(final StringBuilder builder) {
+    private static void appendSettings(final StringBuilder builder) {
         final int size = StandardSetting.values().length;
         int count = 1;
         for (final StandardSetting setting : StandardSetting.values()) {
@@ -128,8 +128,9 @@ public final class GenerateTestData {
         final SecretCWSKey secretKey = crypto.generatePasswordKey(settings.getPasswordAlgorithm(), crypto.stringToBytes(name), salt);
         final String publicKey = crypto.armoringPublicKey(keyPair.getPublic().getKey());
         final String privateKey = crypto.armoringPrivateKey(secretKey, keyPair.getPrivate().getKey());
+        final String encryptedSalt = crypto.encryptWithMasterKey(salt);
 
-        append(builder, "    ('" + externalId + "', '" + name + "', '" + salt + "', '" + settings.getPasswordAlgorithm() + "', '" + settings.getAsymmetricAlgorithm() + "', '" + publicKey + "', '" + privateKey + "')" + delimiter);
+        append(builder, "    ('" + externalId + "', '" + name + "', '" + encryptedSalt + "', '" + settings.getPasswordAlgorithm() + "', '" + settings.getAsymmetricAlgorithm() + "', '" + publicKey + "', '" + privateKey + "')" + delimiter);
     }
 
     private void createAndAppendTrustee(final StringBuilder builder, final int memberId, final CWSKeyPair keyPair, final int circleId, final int keyId, final SecretCWSKey circleKey, final TrustLevel trustLevel, final char delimiter) {

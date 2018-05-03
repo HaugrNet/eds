@@ -225,7 +225,7 @@ public class DatabaseSetup {
         entity.setName(credential);
         entity.setPbeAlgorithm(settings.getPasswordAlgorithm());
         entity.setRsaAlgorithm(algorithm);
-        entity.setSalt(externalId);
+        entity.setSalt(crypto.encryptWithMasterKey(externalId));
         entity.setPublicKey(publicKey);
         entity.setPrivateKey(privateKey);
         persist(entity);

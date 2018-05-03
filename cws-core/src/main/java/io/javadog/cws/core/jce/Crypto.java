@@ -210,8 +210,8 @@ public final class Crypto {
 
     public String decryptWithMasterKey(final String toDecrypt) {
         final byte[] encrypted = Base64.getDecoder().decode(toDecrypt);
-        final byte[] decryppted = decrypt(masterKey.getKey(), encrypted);
-        return bytesToString(decryppted);
+        final byte[] decrypted = decrypt(masterKey.getKey(), encrypted);
+        return bytesToString(decrypted);
     }
 
     public byte[] encrypt(final SecretCWSKey key, final byte[] toEncrypt) {
@@ -325,6 +325,10 @@ public final class Crypto {
 
     public PrivateKey dearmoringPrivateKey(final SecretCWSKey decryptionKey, final String armoredKey) {
         try {
+            // We only need the name of the Asymmetric Algorithm here, not the
+            // keySize. As all Asymmetric Algorithms share the same basic
+            // algorithm and thus name, we can use the Asymmetric Algorithm
+            // from the Settings.
             final KeyAlgorithm algorithm = settings.getAsymmetricAlgorithm();
             final KeyFactory keyFactory = KeyFactory.getInstance(algorithm.getName());
             final byte[] dearmored = Base64.getDecoder().decode(armoredKey);

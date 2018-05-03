@@ -22,10 +22,10 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * <p>Base Authentication Object for all incoming Requests. It contains the name
- * of the Account, plus the credentials to unlock the Account. Both the name
- * and credentials is mandatory, whereas the type of credential is optional with
- * a fallback to PassPhrase.</p>
+ * <p>Base Authentication Object for all incoming Requests. It contains the
+ * name of the Account, plus the credentials to unlock the Account. Both the
+ * name and credentials are mandatory, whereas the type of credential is
+ * optional with a fallback to PassPhrase.</p>
  *
  * @author Kim Jensen
  * @since  CWS 1.0

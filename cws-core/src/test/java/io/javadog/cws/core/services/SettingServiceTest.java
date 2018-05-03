@@ -13,7 +13,9 @@ import static org.junit.Assert.assertThat;
 
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
+import io.javadog.cws.api.requests.MasterKeyRequest;
 import io.javadog.cws.api.requests.SettingRequest;
+import io.javadog.cws.api.responses.MasterKeyResponse;
 import io.javadog.cws.api.responses.SettingResponse;
 import io.javadog.cws.core.DatabaseSetup;
 import io.javadog.cws.core.enums.KeyAlgorithm;
@@ -24,11 +26,20 @@ import io.javadog.cws.core.model.entities.MemberEntity;
 import org.junit.Test;
 
 import javax.persistence.Query;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 /**
+ * <p>This Test Class, is testing the following Service Classes in one, as they
+ * are all fairly small but also connected.</p>
+ *
+ * <ul>
+ *   <li>MasterKeyService</li>
+ *   <li>SettingService</li>
+ * </ul>
+ *
  * @author Kim Jensen
  * @since  CWS 1.0
  */
@@ -121,8 +132,8 @@ public final class SettingServiceTest extends DatabaseSetup {
      * <p>Certain values in the CWS Settings are considered critical, meaning
      * that they can only be updated if no accounts, except the system
      * administrator, exists. However, the problem with these tests is that they
-     * seem to fail on Travis-CI. Hence, the tests are merged into a single
-     * test, to see if it helps stabilizing Travis-CI.</p>
+     * need to alter existing data, meaning that the underlying database may
+     * have a lock set, which will affect other tests.</p>
      */
     @Test
     public void testUpdatingCriticalValues() {
@@ -335,5 +346,25 @@ public final class SettingServiceTest extends DatabaseSetup {
         request3.setSettings(mySettings);
         service.perform(request3);
         assertThat(response1.isOk(), is(true));
+    }
+
+    @Test
+    public void testUpdateMasterKey() {
+        final MasterKeyService service = new MasterKeyService(settings, entityManager);
+        final MasterKeyRequest request = prepareRequest(MasterKeyRequest.class, Constants.ADMIN_ACCOUNT);
+        request.setSecret("MasterKey".getBytes(Charset.defaultCharset()));
+        request.setSecret(request.getCredential());
+
+        final MasterKeyResponse response = service.perform(request);
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+        assertThat(response.getReturnMessage(), is("MasterKey unlocked."));
+
+        // Before we're done - set the MasterKey back to the default, which is
+        // using the System Administrator account name as secret.
+        final MasterKeyRequest resetRequest = prepareRequest(MasterKeyRequest.class, Constants.ADMIN_ACCOUNT);
+        resetRequest.setSecret(resetRequest.getCredential());
+        final MasterKeyResponse resetResponse = service.perform(resetRequest);
+        assertThat(resetResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+        assertThat(resetResponse.getReturnMessage(), is("MasterKey unlocked."));
     }
 }

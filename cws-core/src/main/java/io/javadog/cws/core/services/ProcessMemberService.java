@@ -120,7 +120,7 @@ public final class ProcessMemberService extends Serviceable<ProcessMemberRespons
 
                 final MemberEntity entity = new MemberEntity();
                 entity.setName(memberName);
-                entity.setSalt(uuid);
+                entity.setSalt(crypto.encryptWithMasterKey(uuid));
                 entity.setPbeAlgorithm(settings.getPasswordAlgorithm());
                 entity.setRsaAlgorithm(settings.getSignatureAlgorithm());
                 entity.setPrivateKey(CredentialType.SIGNATURE.name());
@@ -219,7 +219,7 @@ public final class ProcessMemberService extends Serviceable<ProcessMemberRespons
 
         if (account != null) {
             if (Objects.equals(account.getPrivateKey(), CredentialType.SIGNATURE.name())) {
-                final String secret = account.getSalt();
+                final String secret = crypto.decryptWithMasterKey(account.getSalt());
                 final MemberEntity admin = dao.findMemberByName(Constants.ADMIN_ACCOUNT);
                 final PublicKey publicKey = crypto.dearmoringPublicKey(admin.getPublicKey());
 
@@ -231,7 +231,7 @@ public final class ProcessMemberService extends Serviceable<ProcessMemberRespons
                     final SecretCWSKey key = crypto.generatePasswordKey(pbeAlgorithm, newSecret, salt);
                     key.setSalt(salt);
 
-                    account.setSalt(salt);
+                    account.setSalt(crypto.encryptWithMasterKey(salt));
                     account.setPbeAlgorithm(pbeAlgorithm);
                     account.setRsaAlgorithm(pair.getAlgorithm());
                     account.setMemberKey(request.getPublicKey());

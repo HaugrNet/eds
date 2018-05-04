@@ -349,6 +349,49 @@ public final class SettingServiceTest extends DatabaseSetup {
     }
 
     @Test
+    public void testUpdateMasterKeyWithNullRequest() {
+        final MasterKeyService service = new MasterKeyService(settings, entityManager);
+        final MasterKeyRequest request = null;
+
+        final MasterKeyResponse response = service.perform(request);
+        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING.getCode()));
+        assertThat(response.getReturnMessage(), is("Cannot process the request, the given data is invalid."));
+    }
+
+    @Test
+    public void testUpdateMasterKeyWithEmptyRequest() {
+        final MasterKeyService service = new MasterKeyService(settings, entityManager);
+        final MasterKeyRequest request = new MasterKeyRequest();
+
+        final MasterKeyResponse response = service.perform(request);
+        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING.getCode()));
+        assertThat(response.getReturnMessage(), is("Cannot process the request, the given data is invalid."));
+    }
+
+    @Test
+    public void testUpdateMasterKeyAsMember() {
+        final MasterKeyService service = new MasterKeyService(settings, entityManager);
+        final MasterKeyRequest request = prepareRequest(MasterKeyRequest.class, MEMBER_1);
+        request.setSecret("New MasterKey".getBytes(Charset.defaultCharset()));
+
+        final MasterKeyResponse response = service.perform(request);
+        assertThat(response.getReturnCode(), is(ReturnCode.AUTHENTICATION_WARNING.getCode()));
+        assertThat(response.getReturnMessage(), is("Given Account is not permitted to perform this request."));
+    }
+
+    @Test
+    public void testUpdateMasterKeyAsAdminWithWrongCredentials() {
+        final MasterKeyService service = new MasterKeyService(settings, entityManager);
+        final MasterKeyRequest request = prepareRequest(MasterKeyRequest.class, Constants.ADMIN_ACCOUNT);
+        request.setCredential("root".getBytes(Charset.defaultCharset()));
+        request.setSecret("New MasterKey".getBytes(Charset.defaultCharset()));
+
+        final MasterKeyResponse response = service.perform(request);
+        assertThat(response.getReturnCode(), is(ReturnCode.AUTHENTICATION_WARNING.getCode()));
+        assertThat(response.getReturnMessage(), is("Invalid credentials."));
+    }
+
+    @Test
     public void testUpdateMasterKey() {
         final MasterKeyService service = new MasterKeyService(settings, entityManager);
         final MasterKeyRequest request = prepareRequest(MasterKeyRequest.class, Constants.ADMIN_ACCOUNT);

@@ -20,6 +20,26 @@ import javax.xml.bind.annotation.XmlType;
 import java.util.Map;
 
 /**
+ * <p>The MasterKey Request Object is needed to change the internally used
+ * MasterKey. The MasterKey is not persisted but must be set when the system is
+ * started to &quot;unlock&quot; it. The same request can also be used to lock
+ * a running system, so nothing will work.</p>
+ *
+ * <p>MasterKey's is used to encrypt/decrypt the &quot;salt&quot; of a member,
+ * which is a piece of static information used to check the member credentials.
+ * The MasterKey is also used to encrypt/decrypt all IVs or Initial Vectors,
+ * which is the initial random information used to encrypt and decrypt a piece
+ * of data in the system. So, without the MasterKey, neither Member accounts nor
+ * data can be retrieved, as it acts as a second lock for both parts.</p>
+ *
+ * <p>The secret is this a mandatory information which must be provided to alter
+ * the MasterKey. Setting a new MasterKey can only be performed before adding
+ * Member Accounts, since it is not possible to re-encrypt the Member Accounts
+ * later.</p>
+ *
+ * <p>Please see {@link Authentication} for information about the account and
+ * credentials information.</p>
+ *
  * @author Kim Jensen
  * @since  CWS 1.0
  */

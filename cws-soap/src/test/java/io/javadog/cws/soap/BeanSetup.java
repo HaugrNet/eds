@@ -12,6 +12,7 @@ import io.javadog.cws.core.DatabaseSetup;
 import io.javadog.cws.core.ManagementBean;
 import io.javadog.cws.core.ShareBean;
 import io.javadog.cws.core.exceptions.CWSException;
+import io.javadog.cws.core.model.Settings;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -47,7 +48,7 @@ public class BeanSetup extends DatabaseSetup {
         }
     }
 
-    protected static ManagementService prepareFlawedSystemService() {
+    protected ManagementService prepareFlawedManagementService() {
         try {
             final ManagementService service = ManagementService.class.getConstructor().newInstance();
             setField(service, "bean", null);
@@ -59,11 +60,17 @@ public class BeanSetup extends DatabaseSetup {
     }
 
     protected ManagementService prepareManagementService() {
+        return prepareManagementService(settings);
+    }
+
+    protected ManagementService prepareManagementService(final Settings customSettings) {
         try {
             final ManagementBean bean = ManagementBean.class.getConstructor().newInstance();
             setField(bean, "entityManager", entityManager);
+            setField(bean, "settings", customSettings);
 
             final ManagementService service = ManagementService.class.getConstructor().newInstance();
+            setField(bean, "settings", customSettings);
             setField(service, "bean", bean);
 
             return service;
@@ -71,6 +78,20 @@ public class BeanSetup extends DatabaseSetup {
             throw new CWSException(ReturnCode.ERROR, "Cannot instantiate Service Object", e);
         }
     }
+
+    //protected ManagementService prepareManagementService() {
+    //    try {
+    //        final ManagementBean bean = ManagementBean.class.getConstructor().newInstance();
+    //        setField(bean, "entityManager", entityManager);
+    //
+    //        final ManagementService service = ManagementService.class.getConstructor().newInstance();
+    //        setField(service, "bean", bean);
+    //
+    //        return service;
+    //    } catch (InstantiationException | InvocationTargetException | IllegalAccessException | NoSuchMethodException e) {
+    //        throw new CWSException(ReturnCode.ERROR, "Cannot instantiate Service Object", e);
+    //    }
+    //}
 
     // =========================================================================
     // Internal Methods

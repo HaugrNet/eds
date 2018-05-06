@@ -392,15 +392,38 @@ public final class SettingServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testUpdateMasterKey() {
+    public void testUpdatingMasterKeyZeroMembers() {
+        // Before starting, all member accounts must be removed
+        final List<MemberEntity> members = dao.findAllAscending(MemberEntity.class, "id");
+        for (final MemberEntity member : members) {
+            dao.delete(member);
+        }
+
         final MasterKeyService service = new MasterKeyService(settings, entityManager);
         final MasterKeyRequest request = prepareRequest(MasterKeyRequest.class, Constants.ADMIN_ACCOUNT);
-        request.setSecret("MasterKey".getBytes(Charset.defaultCharset()));
         request.setSecret(request.getCredential());
-
         final MasterKeyResponse response = service.perform(request);
         assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
         assertThat(response.getReturnMessage(), is("MasterKey unlocked."));
+    }
+
+    @Test
+    public void testUpdatingMasterKeyAdminOnly() {
+        // Before starting, all member accounts must be removed
+        final List<MemberEntity> members = dao.findAllAscending(MemberEntity.class, "id");
+        for (final MemberEntity member : members) {
+            if (!Constants.ADMIN_ACCOUNT.equals(member.getName())) {
+                dao.delete(member);
+            }
+        }
+
+        final MasterKeyService service = new MasterKeyService(settings, entityManager);
+        final MasterKeyRequest request = prepareRequest(MasterKeyRequest.class, Constants.ADMIN_ACCOUNT);
+        request.setSecret("MasterKey".getBytes(Charset.defaultCharset()));
+
+        final MasterKeyResponse response = service.perform(request);
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+        assertThat(response.getReturnMessage(), is("MasterKey updated."));
 
         // Before we're done - set the MasterKey back to the default, which is
         // using the System Administrator account name as secret.
@@ -408,6 +431,28 @@ public final class SettingServiceTest extends DatabaseSetup {
         resetRequest.setSecret(resetRequest.getCredential());
         final MasterKeyResponse resetResponse = service.perform(resetRequest);
         assertThat(resetResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
-        assertThat(resetResponse.getReturnMessage(), is("MasterKey unlocked."));
+        assertThat(resetResponse.getReturnMessage(), is("MasterKey updated."));
+    }
+
+    @Test
+    public void testUpdateMasterKeyWhenMembersExist() {
+        final MasterKeyService service = new MasterKeyService(settings, entityManager);
+        final MasterKeyRequest request = prepareRequest(MasterKeyRequest.class, Constants.ADMIN_ACCOUNT);
+        request.setSecret("MasterKey".getBytes(Charset.defaultCharset()));
+
+        final MasterKeyResponse response = service.perform(request);
+        assertThat(response.getReturnCode(), is(ReturnCode.ILLEGAL_ACTION.getCode()));
+        assertThat(response.getReturnMessage(), is("Cannot alter the MasterKey, as Member Accounts exists."));
+    }
+
+    @Test
+    public void testUpdateMasterKeyToCurrent() {
+        final MasterKeyService service = new MasterKeyService(settings, entityManager);
+        final MasterKeyRequest request = prepareRequest(MasterKeyRequest.class, Constants.ADMIN_ACCOUNT);
+        request.setSecret(request.getCredential());
+
+        final MasterKeyResponse response = service.perform(request);
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+        assertThat(response.getReturnMessage(), is("MasterKey unlocked."));
     }
 }

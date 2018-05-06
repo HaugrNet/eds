@@ -34,6 +34,7 @@ import io.javadog.cws.api.responses.ProcessTrusteeResponse;
 import io.javadog.cws.api.responses.SanityResponse;
 import io.javadog.cws.api.responses.SettingResponse;
 import io.javadog.cws.api.responses.VersionResponse;
+import io.javadog.cws.core.enums.KeyAlgorithm;
 import io.javadog.cws.core.enums.StandardSetting;
 import org.junit.Test;
 
@@ -73,7 +74,7 @@ public final class ManagementServiceTest extends BeanSetup {
 
     @Test
     public void testFlawedVersion() {
-        final ManagementService management = prepareFlawedSystemService();
+        final ManagementService management = prepareFlawedManagementService();
 
         final VersionResponse response = management.version();
         assertThat(response.getReturnCode(), is(ReturnCode.ERROR.getCode()));
@@ -131,7 +132,7 @@ public final class ManagementServiceTest extends BeanSetup {
 
     @Test
     public void testFlawedSettings() {
-        final ManagementService management = prepareFlawedSystemService();
+        final ManagementService management = prepareFlawedManagementService();
         final SettingRequest request = null;
 
         final SettingResponse response = management.settings(request);
@@ -149,7 +150,7 @@ public final class ManagementServiceTest extends BeanSetup {
     }
 
     @Test
-    public void testMAsterKeyWithNullRequest() {
+    public void testMasterKeyWithNullRequest() {
         final ManagementService management = prepareManagementService();
         final MasterKeyRequest request = null;
 
@@ -168,11 +169,22 @@ public final class ManagementServiceTest extends BeanSetup {
 
     @Test
     public void testFlawedMasterKey() {
-        final ManagementService management = prepareFlawedSystemService();
-        final MasterKeyRequest request = null;
+        // Testing that the system is correctly throwing an exception if there
+        // is a problem with generating new PBE based symmetric keys. To do
+        // this, we have to set the PBE algorithm to an invalid value, which
+        // will be reverted again at the end of the test.
+        settings.set(StandardSetting.PBE_ALGORITHM.getKey(), KeyAlgorithm.RSA2048.getName());
+        final ManagementService management = prepareManagementService(settings);
+        final MasterKeyRequest request = prepareRequest(MasterKeyRequest.class, Constants.ADMIN_ACCOUNT);
+        request.setSecret(request.getCredential());
 
         final MasterKeyResponse response = management.masterKey(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.ERROR.getCode()));
+        assertThat(response.getReturnCode(), is(ReturnCode.CRYPTO_ERROR.getCode()));
+        assertThat(response.getReturnMessage(), is("No enum constant io.javadog.cws.core.enums.KeyAlgorithm.RSA"));
+
+        // Before completing the test, revert the standard setting to the
+        // original value, as it will otherwise cause problems for other tests.
+        settings.set(StandardSetting.PBE_ALGORITHM.getKey(), StandardSetting.PBE_ALGORITHM.getValue());
     }
 
     @Test
@@ -204,7 +216,7 @@ public final class ManagementServiceTest extends BeanSetup {
 
     @Test
     public void testFlawedSanity() {
-        final ManagementService management = prepareFlawedSystemService();
+        final ManagementService management = prepareFlawedManagementService();
         final SanityRequest request = null;
 
         final SanityResponse response = management.sanitized(request);
@@ -240,7 +252,7 @@ public final class ManagementServiceTest extends BeanSetup {
 
     @Test
     public void testFlawedFetchMembers() {
-        final ManagementService management = prepareFlawedSystemService();
+        final ManagementService management = prepareFlawedManagementService();
         final FetchMemberRequest request = null;
 
         final FetchMemberResponse response = management.fetchMembers(request);
@@ -278,7 +290,7 @@ public final class ManagementServiceTest extends BeanSetup {
 
     @Test
     public void testFlawedProcessMember() {
-        final ManagementService management = prepareFlawedSystemService();
+        final ManagementService management = prepareFlawedManagementService();
         final ProcessMemberRequest request = null;
 
         final ProcessMemberResponse response = management.processMember(request);
@@ -314,7 +326,7 @@ public final class ManagementServiceTest extends BeanSetup {
 
     @Test
     public void testFlawedFetchCircle() {
-        final ManagementService management = prepareFlawedSystemService();
+        final ManagementService management = prepareFlawedManagementService();
         final FetchCircleRequest request = null;
 
         final FetchCircleResponse response = management.fetchCircles(request);
@@ -353,7 +365,7 @@ public final class ManagementServiceTest extends BeanSetup {
 
     @Test
     public void testFlawedProcessCircle() {
-        final ManagementService management = prepareFlawedSystemService();
+        final ManagementService management = prepareFlawedManagementService();
         final ProcessCircleRequest request = null;
 
         final ProcessCircleResponse response = management.processCircle(request);
@@ -390,7 +402,7 @@ public final class ManagementServiceTest extends BeanSetup {
 
     @Test
     public void testFlawedFetchTrustee() {
-        final ManagementService management = prepareFlawedSystemService();
+        final ManagementService management = prepareFlawedManagementService();
         final FetchTrusteeRequest request = null;
 
         final FetchTrusteeResponse response = management.fetchTrustees(request);
@@ -430,7 +442,7 @@ public final class ManagementServiceTest extends BeanSetup {
 
     @Test
     public void testFlawedProcessTrustee() {
-        final ManagementService management = prepareFlawedSystemService();
+        final ManagementService management = prepareFlawedManagementService();
         final ProcessTrusteeRequest request = null;
 
         final ProcessTrusteeResponse response = management.processTrustee(request);

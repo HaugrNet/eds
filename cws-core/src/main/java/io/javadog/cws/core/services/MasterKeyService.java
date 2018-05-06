@@ -9,6 +9,7 @@ package io.javadog.cws.core.services;
 
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
+import io.javadog.cws.api.requests.Authentication;
 import io.javadog.cws.api.requests.MasterKeyRequest;
 import io.javadog.cws.api.responses.MasterKeyResponse;
 import io.javadog.cws.core.exceptions.CryptoException;
@@ -65,7 +66,7 @@ public final class MasterKeyService extends Serviceable<MasterKeyResponse, Maste
 
         // For this request, the default account checks won't work, hence it
         // must be checked directly, with the keys
-        final MemberEntity admin = dao.findMemberByName(Constants.ADMIN_ACCOUNT);
+        final MemberEntity admin = findAdmin(request);
         final MasterKeyResponse response;
 
         // First check is with the new Key, as it is assumed that the primary
@@ -122,5 +123,15 @@ public final class MasterKeyService extends Serviceable<MasterKeyResponse, Maste
         }
 
         return result;
+    }
+
+    private MemberEntity findAdmin(final Authentication authentication) {
+        MemberEntity admin = dao.findMemberByName(Constants.ADMIN_ACCOUNT);
+
+        if (admin == null) {
+            admin = createNewAccount(Constants.ADMIN_ACCOUNT, authentication.getCredential());
+        }
+
+        return admin;
     }
 }

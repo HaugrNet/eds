@@ -21,6 +21,12 @@ import java.util.Collections;
 import java.util.List;
 
 /**
+ * <p>Retrieves a list of known {@link DataType} Objects, which is registered
+ * in the CWS instance, and can be used to map over the stored data.</p>
+ *
+ * <p>Please see {@link CwsResponse} for information about the result of the
+ * processing.</p>
+ *
  * @author Kim Jensen
  * @since  CWS 1.0
  */

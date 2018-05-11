@@ -22,6 +22,15 @@ import java.util.Collections;
 import java.util.List;
 
 /**
+ * <p>The result will depend on the request parameters, if no information was
+ * set in the request, then the list of Circles will be filled with the Circles,
+ * the requesting member is allowed to see. If a MemberId was given, then the
+ * list of Circles which both the requesting member and the requested member
+ * have in common will be returned.</p>
+ *
+ * <p>Please see {@link CwsResponse} for information about the result of the
+ * processing.</p>
+ *
  * @author Kim Jensen
  * @since  CWS 1.0
  */

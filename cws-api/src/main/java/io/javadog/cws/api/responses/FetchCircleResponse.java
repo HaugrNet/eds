@@ -21,6 +21,11 @@ import java.util.Collections;
 import java.util.List;
 
 /**
+ * <p>If the request was successful, a list of Circles will be returned.</p>
+ *
+ * <p>Please see {@link CwsResponse} for information about the result of the
+ * processing.</p>
+ *
  * @author Kim Jensen
  * @since  CWS 1.0
  */

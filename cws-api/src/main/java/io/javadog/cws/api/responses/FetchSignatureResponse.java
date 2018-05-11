@@ -21,6 +21,16 @@ import java.util.Collections;
 import java.util.List;
 
 /**
+ * <p>Retrieves a list of Signatures, which the Member has issued, complete with
+ * information about how many times each signature has been used and of they
+ * have expired or not.</p>
+ *
+ * <p>As signatures do not have an Id, a checksum of them will be returned,
+ * which os generated with the configured checksum algorithm.</p>
+ *
+ * <p>Please see {@link CwsResponse} for information about the result of the
+ * processing.</p>
+ *
  * @author Kim Jensen
  * @since  CWS 1.0
  */

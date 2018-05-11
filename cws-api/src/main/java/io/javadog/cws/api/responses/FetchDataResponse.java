@@ -23,6 +23,19 @@ import java.util.Collections;
 import java.util.List;
 
 /**
+ * <p>If the request was made generally, i.e. without a Data Id, then a list of
+ * Metadata Objects is being returned. The list is limited to the number which
+ * was requested - and the records field will then contain the total amount of
+ * entries which was found, so it is possible to perform the lookup with
+ * pagination information.</p>
+ *
+ * <p>If the request was made for a specific Data Id, and the Object exists in
+ * the database, then the list of Metadata will return a single entry, and the
+ * data field will be set with the unencrypted data.</p>
+ *
+ * <p>Please see {@link CwsResponse} for information about the result of the
+ * processing.</p>
+ *
  * @author Kim Jensen
  * @since  CWS 1.0
  */

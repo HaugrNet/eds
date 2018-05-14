@@ -18,6 +18,12 @@ import javax.xml.bind.annotation.XmlType;
 import java.util.Map;
 
 /**
+ * <p>The request will return a list with all the Member's from the system, or
+ * simply details about a single Member, if the MemberId is set.</p>
+ *
+ * <p>For more details, please see the 'fetchMembers' request in the Management
+ * interface: {@link io.javadog.cws.api.Management#fetchMembers(FetchMemberRequest)}</p>
+ *
  * @author Kim Jensen
  * @since  CWS 1.0
  */

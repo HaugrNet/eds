@@ -20,6 +20,15 @@ import javax.xml.bind.annotation.XmlType;
 import java.util.Map;
 
 /**
+ * <p>The Request Object must be filled with either a DataId or a CircleId and
+ * pagination information. The pagination include the page size which must be
+ * at least 1 and maximum 100. The page number starts with 1 for the first page,
+ * and any positive number. If the number exceeds the number of records, it will
+ * simply result in an empty list of Objects being returned.</p>
+ *
+ * <p>For more details, please see the 'fetchData' request in the Share
+ * interface: {@link io.javadog.cws.api.Share#fetchData(FetchDataRequest)}</p>
+ *
  * @author Kim Jensen
  * @since  CWS 1.0
  */

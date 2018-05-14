@@ -19,6 +19,11 @@ import javax.xml.bind.annotation.XmlType;
 import java.util.Map;
 
 /**
+ * <p>Object is used to retrieve a list of Trustees for the given CirclrId.</p>
+ *
+ * <p>For more details, please see the 'fetchTrustees' request in the Management
+ * interface: {@link io.javadog.cws.api.Management#fetchTrustees(FetchTrusteeRequest)}</p>
+ *
  * @author Kim Jensen
  * @since  CWS 1.0
  */

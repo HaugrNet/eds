@@ -21,6 +21,20 @@ import java.util.Collections;
 import java.util.List;
 
 /**
+ * <p>Returns a list of Data Objects, which have failed their sanity checks,
+ * i.e. the bytes stored which may somehow have been corrupted over time, so
+ * they no longer can be decrypted.</p>
+ *
+ * <p>If the CircleId is given in the request, then the resulting list is
+ * limited to the records for the given Circle, same applies to the timestamp,
+ * since, which means that only newer record information is being retrieved.</p>
+ *
+ * <p>For any system, having <i>any</i> results from request is considered a
+ * disaster, as the underlying data storage cannot be trusted.</p>
+ *
+ * <p>Please see {@link CwsResponse} for information about the result of the
+ * processing.</p>
+ *
  * @author Kim Jensen
  * @since  CWS 1.0
  */

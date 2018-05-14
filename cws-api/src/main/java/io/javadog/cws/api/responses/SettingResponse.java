@@ -19,6 +19,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * <p>Contains a map of current settings in this CWS instance, some of the
+ * settings is System specific, others are custom for the client. Of the System
+ * specific, not all may be updated once the CWS instance contain Members.</p>
+ *
+ * <p>Please see {@link CwsResponse} for information about the result of the
+ * processing.</p>
+ *
  * @author Kim Jensen
  * @since  CWS 1.0
  */

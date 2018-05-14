@@ -21,6 +21,12 @@ import java.util.Collections;
 import java.util.List;
 
 /**
+ * <p>Response contains a list of the Trustees who belong to the requested
+ * Circle.</p>
+ *
+ * <p>Please see {@link CwsResponse} for information about the result of the
+ * processing.</p>
+ *
  * @author Kim Jensen
  * @since  CWS 1.0
  */

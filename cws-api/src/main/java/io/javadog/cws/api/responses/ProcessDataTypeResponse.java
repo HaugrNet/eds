@@ -18,6 +18,13 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
 /**
+ * <p>When a DataType has been processed, it is not having a an Id, thus the
+ * entire DataType Object is simple returned, if the request completed
+ * successfully.</p>
+ *
+ * <p>Please see {@link CwsResponse} for information about the result of the
+ * processing.</p>
+ *
  * @author Kim Jensen
  * @since  CWS 1.0
  */

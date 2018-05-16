@@ -21,6 +21,35 @@ import javax.xml.bind.annotation.XmlType;
 import java.util.Map;
 
 /**
+ * <p>When processing a Circle, it is possible to do 3 things, either create a
+ * new Circle, update an existing Circle or delete a Circle. Circles basically
+ * only have a name (max 75 characters) and an Id, so when creating a new
+ * Circle, only a name is required, when deleting a Circle, only the CircleId is
+ * required, and when updating a circle, both is required.</p>
+ *
+ * <p>When creating a new Circle, the requesting member account is automatically
+ * assigned as the initial Circle Administrator. If a different Circle
+ * Administrator is desired, it can be set by providing the MemberId of the
+ * Account to use.</p>
+ *
+ * <p>As with all processing request, the Action must also be set, this is used
+ * to internally ascertain what should be done. This request allows the
+ * following actions:</p>
+ *
+ * <ul>
+ *   <li><b>CREATE</b> - For creating a new Circle</li>
+ *   <li><b>UPDATE</b> - For updating an existing Circle</li>
+ *   <li><b>DELETE</b> - For deleting an existing Circle</li>
+ * </ul>
+ *
+ * <p>If required, it is also possible to store an External Key for the Circle,
+ * the External Key is not used for anything internally - it is simply being
+ * read in and stored encrypted, using the internal Circle Key. The content
+ * of the External Key can thus be anything.</p>
+ *
+ * <p>For more details, please see the 'processCircle' request in the Management
+ * interface: {@link io.javadog.cws.api.Management#processCircle(ProcessCircleRequest)}</p>
+ *
  * @author Kim Jensen
  * @since  CWS 1.0
  */

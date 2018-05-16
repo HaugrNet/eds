@@ -17,6 +17,13 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
 /**
+ * <p>This response object contain the result of the processing of Circles. If
+ * the request was for creating a new Circle, then the newly created CircleId
+ * is being returned.</p>
+ *
+ * <p>Please see {@link CwsResponse} for information about the result of the
+ * processing.</p>
+ *
  * @author Kim Jensen
  * @since  CWS 1.0
  */

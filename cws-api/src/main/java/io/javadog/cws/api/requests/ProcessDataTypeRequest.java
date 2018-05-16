@@ -20,6 +20,17 @@ import javax.xml.bind.annotation.XmlType;
 import java.util.Map;
 
 /**
+ * <p>When processing a DataType, it can be to either create a new or update an
+ * existing. By default, 2 DataTypes exist, which cannot be modified.</p>
+ *
+ * <p>To create or update a custom DataType, the name of the DataType is needed
+ * together with the type itself. Generally, the name is a shorthand description
+ * of name of the actual Type, as the type may be a anything from a simple MIME
+ * Type to a rule to extract the content of a stored Object.</p>
+ *
+ * <p>For more details, please see the 'processDataType' request in the Management
+ * interface: {@link io.javadog.cws.api.Share#processDataType(ProcessDataTypeRequest)}</p>
+ *
  * @author Kim Jensen
  * @since  CWS 1.0
  */

@@ -18,7 +18,7 @@ import javax.xml.bind.annotation.XmlType;
 /**
  * <p>The response from the MasterKey request is limited to error information,
  * or information about the successful changing or altering a key. The message
- * from the response will provide more detailed informations about what happened
+ * from the response will provide more detailed information about what happened
  * internally.</p>
  *
  * <p>Please see {@link CwsResponse} for information about the result of the

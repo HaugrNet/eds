@@ -21,20 +21,10 @@ import javax.xml.bind.annotation.XmlType;
 import java.util.Map;
 
 /**
- * <p>When processing a Circle, it is possible to do 3 things, either create a
- * new Circle, update an existing Circle or delete a Circle. Circles basically
- * only have a name (max 75 characters) and an Id, so when creating a new
- * Circle, only a name is required, when deleting a Circle, only the CircleId is
- * required, and when updating a circle, both is required.</p>
- *
- * <p>When creating a new Circle, the requesting member account is automatically
- * assigned as the initial Circle Administrator. If a different Circle
- * Administrator is desired, it can be set by providing the MemberId of the
- * Account to use.</p>
- *
- * <p>As with all processing request, the Action must also be set, this is used
- * to internally ascertain what should be done. This request allows the
- * following actions:</p>
+ * <p>Circles only have an Id, a name and an optional External Circle Key, the
+ * Key is stored encrypted, if set. The name must be present, unique and between
+ * 1 and 75 characters long. When invoking the processCircle request, it is
+ * possible to perform the following actions:</p>
  *
  * <ul>
  *   <li><b>CREATE</b> - For creating a new Circle</li>
@@ -42,10 +32,21 @@ import java.util.Map;
  *   <li><b>DELETE</b> - For deleting an existing Circle</li>
  * </ul>
  *
- * <p>If required, it is also possible to store an External Key for the Circle,
- * the External Key is not used for anything internally - it is simply being
- * read in and stored encrypted, using the internal Circle Key. The content
- * of the External Key can thus be anything.</p>
+ * <p>Action <b>CREATE</b>; request requires a name for the Circle, which must
+ * be unique, have a length between 1 &amp; 75 characters. If a Member Id is
+ * also provided, then this will be the initial Circle Administrator. If no
+ * Member Id has been provided, then the requesting Member will be the initial
+ * Circle Administrator. It is also possible to set the Circle Key, which is
+ * an external Key, shared by the members of the Circle, it will be stored
+ * internally encrypted, but not used.</p>
+ *
+ * <p>Action <b>UPDATE</b>; request requires the Circle Id, and optionally a
+ * new, unique, name for the Circle, with a length between 1 &amp; 75
+ * characters. It is also possible to update the (external) Circle Key, which
+ * means that the existing Circle Key will be replaced.</p>
+ *
+ * <p>Action <b>DELETE</b>; request requires a Circle Id, and may be performed
+ * by anyone who have Administrative right in the Circle.</p>
  *
  * <p>For more details, please see the 'processCircle' request in the Management
  * interface: {@link io.javadog.cws.api.Management#processCircle(ProcessCircleRequest)}</p>

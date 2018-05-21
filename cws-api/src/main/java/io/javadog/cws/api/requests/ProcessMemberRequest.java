@@ -59,22 +59,21 @@ import java.util.Map;
  * updated. It should be noted, that the System Administrator cannot alter the
  * Account Name, as this name is specifically used several internal operations.</p>
  *
- * <p>When invoked with the INVALIDATE action, CWS will simply generate a new
- * internal asymmetric key for the Account, but not update the access to any
- * existing Circles, meaning that the Account will work as &quot;normal&quot;,
- * but no data from any Circles can be retrieved - only the metadata information
- * can be access. An invalidated Account, can be corrected again, when the
- * Circle Administrators of all Circles where the Member has access, re-issues
- * the access.</p>
+ * <p>Action <b>INVALIDATE</b>; This request does not take any parameters, as
+ * it will only work on the requesting Member, by re-generating the internal
+ * Asymmetric Key, used for accessing Circles. By re-issuing it, but not update
+ * the Circle access, the Account will appear to be working, but any request for
+ * data will result in errors. The Account can be restored, by having the access
+ * to each Circle re-created, but this must be done by the Circle Administrators
+ * of each Circle where the Member has access.</p>
  *
- * <p>If the DELETE action is used, by the System Administrator, any (other than
- * the System Administrator) Account, identified by the required Member Id, will
- * be deleted. If invoked by the Member, then the Member Account will be
- * deleted.Regardless, this action is irreversible, as all information about
- * the Account will be removed. It is important to note, that the data uploaded
- * by the, now deleted, Account is not removed, as there is no correlation
- * between Accounts and Data stored anywhere. Data is deleted, once the Circles
- * where the data is stored is being deleted.</p>
+ * <p>Action <b>DELETE</b>; if the request is invoked by the System
+ * Administrator, then it requires a Member Id, of the Member to be deleted. The
+ * Member will then be removed from the system. If a Member invokes the request,
+ * then the Member's Account will be deleted. Deleting an Account is an
+ * irreversible action. However, as there is no correlation stored regarding the
+ * data in the Circles which the Member belongs to, no data will be removed as
+ * part of this request.</p>
  *
  * <p>For more details, please see the 'processMember' request in the Management
  * interface: {@link io.javadog.cws.api.Management#processMember(ProcessMemberRequest)}</p>

@@ -24,7 +24,7 @@ import java.util.Map;
 
 /**
  * <p>The Request Object supports several actions for adding, updating and
- * deleting Data Objects in CWS. The request supporst the following Actions:</p>
+ * deleting Data Objects in CWS. The request supports the following Actions:</p>
  *
  * <ul>
  *   <li><b>ADD</b> - For adding a new Data Object</li>

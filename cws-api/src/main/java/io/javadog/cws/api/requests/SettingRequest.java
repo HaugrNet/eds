@@ -25,7 +25,7 @@ import java.util.Map;
  * of values that is used to derive the internal Keys can still be properly
  * extracted.</p>
  *
- * <p>The Settings field is mandatory, but can be left either empty.</p>
+ * <p>The Settings field is mandatory, but can be left empty.</p>
  *
  * <p>Please see {@link Authentication} for information about the account and
  * credentials information.</p>

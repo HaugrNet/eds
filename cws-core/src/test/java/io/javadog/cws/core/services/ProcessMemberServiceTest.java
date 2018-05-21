@@ -151,7 +151,7 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
         invationRequest.setAccountName("invitee");
         invationRequest.setCredentialType(CredentialType.SIGNATURE);
         invationRequest.setCredential(signature);
-        invationRequest.setNewCredential(crypto.stringToBytes("New Passphase"));
+        invationRequest.setNewCredential(crypto.stringToBytes("New Passphrase"));
         final ProcessMemberResponse invitationResponse = service.perform(invationRequest);
         assertThat(invitationResponse, is(not(nullValue())));
         assertThat(invitationResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
@@ -328,8 +328,8 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
      */
     @Test
     public void testUpdatePassphraseWithDataVerification() {
-        final String dataId = addData(MEMBER_1, CIRCLE_1_ID);
-        final byte[] data1 = fetchData(MEMBER_1, dataId);
+        final String dataId = addData();
+        final byte[] data1 = fetchData(dataId);
 
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
         final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, MEMBER_1);
@@ -437,12 +437,12 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
         assertThat(response.getReturnMessage(), is("It is not permitted to delete the Admin Account."));
     }
 
-    private String addData(final String member, final String circleId) {
+    private String addData() {
         final ProcessDataService service = new ProcessDataService(settings, entityManager);
 
-        final ProcessDataRequest dataRequest = prepareRequest(ProcessDataRequest.class, member);
+        final ProcessDataRequest dataRequest = prepareRequest(ProcessDataRequest.class, MEMBER_1);
         dataRequest.setAction(Action.ADD);
-        dataRequest.setCircleId(circleId);
+        dataRequest.setCircleId(CIRCLE_1_ID);
         dataRequest.setDataName(UUID.randomUUID().toString());
         dataRequest.setData(generateData(1048576));
 
@@ -451,9 +451,9 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
         return response.getDataId();
     }
 
-    private byte[] fetchData(final String member, final String dataId) {
+    private byte[] fetchData(final String dataId) {
         final FetchDataService service = new FetchDataService(settings, entityManager);
-        final FetchDataRequest request = prepareRequest(FetchDataRequest.class, member);
+        final FetchDataRequest request = prepareRequest(FetchDataRequest.class, MEMBER_1);
         request.setDataId(dataId);
 
         final FetchDataResponse response = service.perform(request);

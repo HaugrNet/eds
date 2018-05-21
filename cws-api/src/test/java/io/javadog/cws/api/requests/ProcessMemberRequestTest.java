@@ -178,6 +178,6 @@ public final class ProcessMemberRequestTest {
 
         final Map<String, String> errors = request.validate();
         assertThat(errors.size(), is(1));
-        assertThat(errors.get(Constants.FIELD_MEMBER_ID), is("A valid memberId is required to delete an account."));
+        assertThat(errors.get(Constants.FIELD_MEMBER_ID), is("The given memberId is invalid."));
     }
 }

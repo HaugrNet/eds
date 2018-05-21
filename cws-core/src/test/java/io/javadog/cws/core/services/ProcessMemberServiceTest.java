@@ -60,6 +60,21 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
         final ProcessMemberResponse response = service.perform(request);
 
         assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+        assertThat(response.getReturnMessage(), is("Ok"));
+    }
+
+    @Test
+    public void testAddingAsMember() {
+        final String account = "Member Added Member";
+        final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
+        final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, MEMBER_1);
+        request.setAction(Action.CREATE);
+        request.setNewAccountName(account);
+        request.setNewCredential(crypto.stringToBytes(account));
+        final ProcessMemberResponse response = service.perform(request);
+
+        assertThat(response.getReturnCode(), is(ReturnCode.ILLEGAL_ACTION.getCode()));
+        assertThat(response.getReturnMessage(), is("Members are not permitted to create new Accounts."));
     }
 
     @Test
@@ -72,18 +87,21 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
         request.setNewCredential(crypto.stringToBytes(account));
         final ProcessMemberResponse response = service.perform(request);
         assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+        assertThat(response.getReturnMessage(), is("Ok"));
 
         final ProcessMemberRequest updateRequest = prepareRequest(ProcessMemberRequest.class, account);
         updateRequest.setAction(Action.UPDATE);
         updateRequest.setPublicKey(UUID.randomUUID().toString());
         final ProcessMemberResponse updateResponse = service.perform(updateRequest);
         assertThat(updateResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+        assertThat(updateResponse.getReturnMessage(), is("Ok"));
 
         final FetchMemberService fetchService = new FetchMemberService(settings, entityManager);
         final FetchMemberRequest fetchRequest = prepareRequest(FetchMemberRequest.class, MEMBER_4);
         fetchRequest.setMemberId(response.getMemberId());
         final FetchMemberResponse fetchResponse = fetchService.perform(fetchRequest);
         assertThat(fetchResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+        assertThat(fetchResponse.getReturnMessage(), is("Ok"));
         assertThat(fetchResponse.getMembers().size(), is(1));
         assertThat(fetchResponse.getMembers().get(0).getPublicKey(), is(updateRequest.getPublicKey()));
     }
@@ -113,7 +131,8 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
         request.setNewCredential(null);
 
         final ProcessMemberResponse response = service.perform(request);
-        assertThat(response.isOk(), is(true));
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+        assertThat(response.getReturnMessage(), is("Ok"));
     }
 
     @Test
@@ -136,6 +155,7 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
         final ProcessMemberResponse invitationResponse = service.perform(invationRequest);
         assertThat(invitationResponse, is(not(nullValue())));
         assertThat(invitationResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+        assertThat(response.getReturnMessage(), is("Ok"));
     }
 
     @Test
@@ -257,7 +277,7 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
 
         final ProcessMemberResponse response = service.perform(request);
         assertThat(response.getReturnCode(), is(ReturnCode.ILLEGAL_ACTION.getCode()));
-        assertThat(response.getReturnMessage(), is("Not permitted to perform this Action."));
+        assertThat(response.getReturnMessage(), is("Members are not permitted to invite new Members."));
     }
 
     @Test
@@ -270,6 +290,20 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
 
         final ProcessMemberResponse response = service.perform(request);
         assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+        assertThat(response.getReturnMessage(), is("Ok"));
+    }
+
+    @Test
+    public void testProcessSelfChangeAdminName() {
+        prepareCause(CWSException.class, ReturnCode.ILLEGAL_ACTION, "It is not permitted for the System Administrator to change the Account name.");
+        final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
+        final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
+        request.setAction(Action.UPDATE);
+        request.setNewAccountName("root");
+        request.setNewCredential(crypto.stringToBytes("Bla bla bla"));
+        assertThat(request.validate().size(), is(0));
+
+        service.perform(request);
     }
 
     @Test
@@ -333,15 +367,38 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
     }
 
     @Test
+    public void testInvalidateAdmin() {
+        final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
+        final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
+        request.setAction(Action.INVALIDATE);
+
+        final ProcessMemberResponse response = service.perform(request);
+        assertThat(response.getReturnCode(), is(ReturnCode.ILLEGAL_ACTION.getCode()));
+        assertThat(response.getReturnMessage(), is("The System Administrator Account may not be invalidated."));
+    }
+
+    @Test
     public void testDeleteMember() {
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
         final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
         request.setAction(Action.DELETE);
-        // Member 2
-        request.setMemberId("d842fa67-5387-44e6-96e3-4e8a7ead4c8d");
+        request.setMemberId(MEMBER_2_ID);
 
         final ProcessMemberResponse response = service.perform(request);
         assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+        assertThat(response.getReturnMessage(), is("The Member 'member2' has successfully been deleted."));
+    }
+
+    @Test
+    public void testDeleteMemberAsMember() {
+        final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
+        final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, MEMBER_5);
+        request.setAction(Action.DELETE);
+        request.setMemberId(MEMBER_3_ID);
+
+        final ProcessMemberResponse response = service.perform(request);
+        assertThat(response.getReturnCode(), is(ReturnCode.ILLEGAL_ACTION.getCode()));
+        assertThat(response.getReturnMessage(), is("Members are not permitted to delete Accounts."));
     }
 
     @Test
@@ -355,6 +412,17 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
         final ProcessMemberResponse response = service.perform(request);
         assertThat(response.getReturnCode(), is(ReturnCode.IDENTIFICATION_ERROR.getCode()));
         assertThat(response.getReturnMessage(), is("No such Account exist."));
+    }
+
+    @Test
+    public void testDeleteSelf() {
+        final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
+        final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, MEMBER_3);
+        request.setAction(Action.DELETE);
+
+        final ProcessMemberResponse response = service.perform(request);
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+        assertThat(response.getReturnMessage(), is("The Member '" + MEMBER_3 + "' has been successfully deleted."));
     }
 
     @Test

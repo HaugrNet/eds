@@ -23,6 +23,31 @@ import javax.xml.bind.annotation.XmlType;
 import java.util.Map;
 
 /**
+ * <p>The Request Object supports several actions for adding, updating and
+ * deleting Data Objects in CWS. The request supporst the following Actions:</p>
+ *
+ * <ul>
+ *   <li><b>ADD</b> - For adding a new Data Object</li>
+ *   <li><b>UPDATE</b> - For updating an existing Data Object</li>
+ *   <li><b>DELETE</b> - For deleting an existing Data Object</li>
+ * </ul>
+ *
+ * <p>Action <b>ADD</b>; requires a Circle Id, and optionally a Folder Id (Data
+ * Id, where the dataType is a folder), and the name of the Object. The name
+ * must be between 1 and 75 characters, and it must be unique for the folder
+ * where it is added. As Objects created doesn't need to have any data, the data
+ * is optional.</p>
+ *
+ * <p>Action <b>UPDATE</b>; requires the Data Id, and an optional Folder Id, if
+ * the Object is suppose to be moved within the internal folder structure, or a
+ * new Data name, which must be unique for the folder where it should be placed,
+ * and the length must be between 1 and 75 characters.</p>
+ *
+ * <p>Action <b>DELETE</b>; requires the Data Id.</p>
+ *
+ * <p>For more details, please see the 'processData' request in the Share
+ * interface: {@link io.javadog.cws.api.Share#processData(ProcessDataRequest)}</p>
+ *
  * @author Kim Jensen
  * @since  CWS 1.0
  */

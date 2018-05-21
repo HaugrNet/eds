@@ -19,6 +19,15 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
 /**
+ * <p>If the request was invoked with the CREATE action, then the response will
+ * contain the newly generated Member Id. If it was invoked with the INVITE
+ * action, then it will respond with the signature - which the to-be Member can
+ * invoke the same request with, using the UPDATE action and having the
+ * credential type set to SIGNATURE.</p>
+ *
+ * <p>Please see {@link CwsResponse} for information about the result of the
+ * processing.</p>
+ *
  * @author Kim Jensen
  * @since  CWS 1.0
  */

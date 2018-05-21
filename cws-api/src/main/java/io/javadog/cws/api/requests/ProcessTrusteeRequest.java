@@ -21,6 +21,28 @@ import javax.xml.bind.annotation.XmlType;
 import java.util.Map;
 
 /**
+ * <p>Request Object for the processing of Trustee's. It supports the following
+ * actions:</p>
+ *
+ * <ul>
+ *   <li><b>ADD</b> - For adding a new Trustee</li>
+ *   <li><b>ALTER</b> - For altering an existing Trustee</li>
+ *   <li><b>REMOVE</b> - For removing an existing Trustee</li>
+ * </ul>
+ *
+ * <p>Action <b>ADD</b>; requires that both the Circle &amp; Member Id's are
+ * provided, together with the {@link TrustLevel}, for the new Trustee.</p>
+ *
+ * <p>Action <b>ALTER</b>; requires that both the Circle &amp; Member Id's are
+ * provided, together with the new {@link TrustLevel} setting for the
+ * Trustee.</p>
+ *
+ * <p>Action <b>REMOVE</b>; requires that both the Circle &amp; Member Id's are
+ * provided, so the relation can be removed.</p>
+ *
+ * <p>For more details, please see the 'processTrustee' request in the Management
+ * interface: {@link io.javadog.cws.api.Management#processTrustee(ProcessTrusteeRequest)}</p>
+ *
  * @author Kim Jensen
  * @since  CWS 1.0
  */

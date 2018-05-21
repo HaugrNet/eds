@@ -91,25 +91,33 @@ public final class ProcessMemberService extends Serviceable<ProcessMemberRespons
     }
 
     private ProcessMemberResponse createMember(final ProcessMemberRequest request) {
-        final String accountName = request.getNewAccountName().trim();
+        final ProcessMemberResponse response;
 
-        final MemberEntity found = dao.findMemberByName(accountName);
-        if (found == null) {
-            final MemberEntity created = createNewAccount(accountName, request.getNewCredential());
-            final ProcessMemberResponse response = new ProcessMemberResponse();
-            response.setMemberId(created.getExternalId());
+        // Creating new Members, can only be performed by the System
+        // Administrator, not by anyone else.
+        if (Objects.equals(Constants.ADMIN_ACCOUNT, request.getAccountName())) {
+            final String accountName = request.getNewAccountName().trim();
 
-            return response;
+            final MemberEntity found = dao.findMemberByName(accountName);
+            if (found == null) {
+                final MemberEntity created = createNewAccount(accountName, request.getNewCredential());
+                response = new ProcessMemberResponse();
+                response.setMemberId(created.getExternalId());
+            } else {
+                throw new CWSException(ReturnCode.CONSTRAINT_ERROR, "An Account with the same AccountName already exist.");
+            }
         } else {
-            throw new CWSException(ReturnCode.CONSTRAINT_ERROR, "An Account with the same AccountName already exist.");
+            response = new ProcessMemberResponse(ReturnCode.ILLEGAL_ACTION, "Members are not permitted to create new Accounts.");
         }
+
+        return response;
     }
 
     private ProcessMemberResponse inviteMember(final ProcessMemberRequest request) {
         final ProcessMemberResponse response;
 
         // Invitations can only be issued by the System Administrator, not by
-        // Circle Administrators.
+        // anyone else.
         if (Objects.equals(Constants.ADMIN_ACCOUNT, request.getAccountName())) {
             final String memberName = request.getNewAccountName().trim();
             final MemberEntity existing = dao.findMemberByName(memberName);
@@ -133,7 +141,7 @@ public final class ProcessMemberService extends Serviceable<ProcessMemberRespons
                 response = new ProcessMemberResponse(ReturnCode.CONSTRAINT_ERROR, "Cannot create an invitation, as as the account already exists.");
             }
         } else {
-            response = new ProcessMemberResponse(ReturnCode.ILLEGAL_ACTION, "Not permitted to perform this Action.");
+            response = new ProcessMemberResponse(ReturnCode.ILLEGAL_ACTION, "Members are not permitted to invite new Members.");
         }
 
         return response;
@@ -144,13 +152,17 @@ public final class ProcessMemberService extends Serviceable<ProcessMemberRespons
         response.setMemberId(member.getExternalId());
 
         if (request.getNewAccountName() != null) {
-            final String accountName = request.getNewAccountName().trim();
-            final MemberEntity existing = dao.findMemberByName(accountName);
+            if (!Objects.equals(Constants.ADMIN_ACCOUNT, member.getName())) {
+                final String accountName = request.getNewAccountName().trim();
+                final MemberEntity existing = dao.findMemberByName(accountName);
 
-            if (existing == null) {
-                member.setName(accountName);
+                if (existing == null) {
+                    member.setName(accountName);
+                } else {
+                    throw new CWSException(ReturnCode.CONSTRAINT_ERROR, "The new Account Name already exists.");
+                }
             } else {
-                throw new CWSException(ReturnCode.CONSTRAINT_ERROR, "The new Account Name already exists.");
+                throw new CWSException(ReturnCode.ILLEGAL_ACTION, "It is not permitted for the System Administrator to change the Account name.");
             }
         }
 
@@ -188,14 +200,41 @@ public final class ProcessMemberService extends Serviceable<ProcessMemberRespons
      * @return New Response Object
      */
     private ProcessMemberResponse invalidate(final ProcessMemberRequest request) {
-        updateMemberPassword(member, request.getCredential());
+        final ProcessMemberResponse response;
 
-        final ProcessMemberResponse response = new ProcessMemberResponse();
-        response.setReturnMessage("Account has been Invalidated.");
+        // Invitations can only be issued by the System Administrator, not by
+        // anyone else.
+        if (!Objects.equals(Constants.ADMIN_ACCOUNT, request.getAccountName())) {
+            updateMemberPassword(member, request.getCredential());
+
+            response = new ProcessMemberResponse();
+            response.setReturnMessage("Account has been Invalidated.");
+        } else {
+            response = new ProcessMemberResponse(ReturnCode.ILLEGAL_ACTION, "The System Administrator Account may not be invalidated.");
+        }
+
         return response;
     }
 
     private ProcessMemberResponse deleteMember(final ProcessMemberRequest request) {
+        final ProcessMemberResponse response;
+
+        if (request.getMemberId() != null) {
+            if (Objects.equals(Constants.ADMIN_ACCOUNT, member.getName())) {
+                response = processDeleteAsAdmin(request);
+            } else {
+                response = new ProcessMemberResponse(ReturnCode.ILLEGAL_ACTION, "Members are not permitted to delete Accounts.");
+            }
+        } else {
+            // Deleting self
+            dao.delete(member);
+            response = new ProcessMemberResponse(ReturnCode.SUCCESS, "The Member '" + member.getName() + "' has been successfully deleted.");
+        }
+
+        return response;
+    }
+
+    private ProcessMemberResponse processDeleteAsAdmin(final ProcessMemberRequest request) {
         final MemberEntity found = dao.find(MemberEntity.class, request.getMemberId());
         final ProcessMemberResponse response;
 
@@ -204,7 +243,7 @@ public final class ProcessMemberService extends Serviceable<ProcessMemberRespons
                 response = new ProcessMemberResponse(ReturnCode.IDENTIFICATION_ERROR, "It is not permitted to delete the Admin Account.");
             } else {
                 dao.delete(found);
-                response = new ProcessMemberResponse();
+                response = new ProcessMemberResponse(ReturnCode.SUCCESS, "The Member '" + found.getName() + "' has successfully been deleted.");
             }
         } else {
             response = new ProcessMemberResponse(ReturnCode.IDENTIFICATION_ERROR, "No such Account exist.");

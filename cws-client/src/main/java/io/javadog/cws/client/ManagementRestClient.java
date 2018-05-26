@@ -8,6 +8,7 @@
 package io.javadog.cws.client;
 
 import io.javadog.cws.api.Management;
+import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.requests.FetchCircleRequest;
 import io.javadog.cws.api.requests.FetchMemberRequest;
 import io.javadog.cws.api.requests.FetchTrusteeRequest;
@@ -53,7 +54,7 @@ public final class ManagementRestClient extends BaseRestClient implements Manage
     }
 
     // =========================================================================
-    // Implementation of the System Interface
+    // Implementation of the Management Interface
     // =========================================================================
 
     /**
@@ -61,7 +62,7 @@ public final class ManagementRestClient extends BaseRestClient implements Manage
      */
     @Override
     public VersionResponse version() {
-        final String url = baseURL + "/version";
+        final String url = baseURL + Constants.REST_VERSION;
         final ResteasyWebTarget target = client.target(url);
 
         try (final Response response =  target.request().accept(MediaType.APPLICATION_XML_TYPE).get()) {
@@ -74,7 +75,7 @@ public final class ManagementRestClient extends BaseRestClient implements Manage
      */
     @Override
     public SettingResponse settings(final SettingRequest request) {
-        return runRequest(SettingResponse.class, "/settings", request);
+        return runRequest(SettingResponse.class, Constants.REST_SETTINGS, request);
     }
 
     /**
@@ -82,7 +83,7 @@ public final class ManagementRestClient extends BaseRestClient implements Manage
      */
     @Override
     public MasterKeyResponse masterKey(final MasterKeyRequest request) {
-        return runRequest(MasterKeyResponse.class, "/masterKey", request);
+        return runRequest(MasterKeyResponse.class, Constants.REST_MASTERKEY, request);
     }
 
     /**
@@ -90,7 +91,7 @@ public final class ManagementRestClient extends BaseRestClient implements Manage
      */
     @Override
     public SanityResponse sanitized(final SanityRequest request) {
-        return runRequest(SanityResponse.class, "/sanity/sanitized", request);
+        return runRequest(SanityResponse.class, Constants.REST_SANITIZED, request);
     }
 
     /**
@@ -98,7 +99,7 @@ public final class ManagementRestClient extends BaseRestClient implements Manage
      */
     @Override
     public FetchMemberResponse fetchMembers(final FetchMemberRequest request) {
-        return runRequest(FetchMemberResponse.class, "/members/fetch", request);
+        return runRequest(FetchMemberResponse.class, Constants.REST_MEMBERS_BASE + Constants.REST_MEMBERS_FETCH, request);
     }
 
     /**
@@ -109,21 +110,22 @@ public final class ManagementRestClient extends BaseRestClient implements Manage
         final ProcessMemberResponse response;
 
         if ((request != null) && (request.getAction() != null)) {
+            final String base = Constants.REST_MEMBERS_BASE;
             switch (request.getAction()) {
                 case CREATE:
-                    response = runRequest(ProcessMemberResponse.class, "/members/createMember", request);
+                    response = runRequest(ProcessMemberResponse.class, base + Constants.REST_MEMBERS_CREATE, request);
                     break;
                 case INVITE:
-                    response = runRequest(ProcessMemberResponse.class, "/members/inviteMember", request);
+                    response = runRequest(ProcessMemberResponse.class, base + Constants.REST_MEMBERS_INVITE, request);
                     break;
                 case UPDATE:
-                    response = runRequest(ProcessMemberResponse.class, "/members/updateMember", request);
+                    response = runRequest(ProcessMemberResponse.class, base + Constants.REST_MEMBERS_UPDATE, request);
                     break;
                 case INVALIDATE:
-                    response = runRequest(ProcessMemberResponse.class, "/members/invalidate", request);
+                    response = runRequest(ProcessMemberResponse.class, base + Constants.REST_MEMBERS_INVALIDATE, request);
                     break;
                 case DELETE:
-                    response = runRequest(ProcessMemberResponse.class, "/members/deleteMember", request);
+                    response = runRequest(ProcessMemberResponse.class, base + Constants.REST_MEMBERS_DELETE, request);
                     break;
                 default:
                     throw new CWSClientException(UNSUPPORTED_OPERATION + request.getAction());
@@ -140,7 +142,7 @@ public final class ManagementRestClient extends BaseRestClient implements Manage
      */
     @Override
     public FetchCircleResponse fetchCircles(final FetchCircleRequest request) {
-        return runRequest(FetchCircleResponse.class, "/circles/fetch", request);
+        return runRequest(FetchCircleResponse.class, Constants.REST_CIRCLES_BASE + Constants.REST_CIRCLES_FETCH, request);
     }
 
     /**
@@ -151,15 +153,16 @@ public final class ManagementRestClient extends BaseRestClient implements Manage
         final ProcessCircleResponse response;
 
         if ((request != null) && (request.getAction() != null)) {
+            final String base = Constants.REST_CIRCLES_BASE;
             switch (request.getAction()) {
                 case CREATE:
-                    response = runRequest(ProcessCircleResponse.class, "/circles/createCircle", request);
+                    response = runRequest(ProcessCircleResponse.class, base + Constants.REST_CIRCLES_CREATE, request);
                     break;
                 case UPDATE:
-                    response = runRequest(ProcessCircleResponse.class, "/circles/updateCircle", request);
+                    response = runRequest(ProcessCircleResponse.class, base + Constants.REST_CIRCLES_UPDATE, request);
                     break;
                 case DELETE:
-                    response = runRequest(ProcessCircleResponse.class, "/circles/deleteCircle", request);
+                    response = runRequest(ProcessCircleResponse.class, base + Constants.REST_CIRCLES_DELETE, request);
                     break;
                 default:
                     throw new CWSClientException(UNSUPPORTED_OPERATION + request.getAction());
@@ -176,7 +179,7 @@ public final class ManagementRestClient extends BaseRestClient implements Manage
      */
     @Override
     public FetchTrusteeResponse fetchTrustees(final FetchTrusteeRequest request) {
-        return runRequest(FetchTrusteeResponse.class, "/trustees/fetch", request);
+        return runRequest(FetchTrusteeResponse.class, Constants.REST_TRUSTEES_BASE + Constants.REST_TRUSTEES_FETCH, request);
     }
 
     /**
@@ -187,15 +190,16 @@ public final class ManagementRestClient extends BaseRestClient implements Manage
         final ProcessTrusteeResponse response;
 
         if ((request != null) && (request.getAction() != null)) {
+            final String base = Constants.REST_TRUSTEES_BASE;
             switch (request.getAction()) {
                 case ADD:
-                    response = runRequest(ProcessTrusteeResponse.class, "/trustees/addTrustee", request);
+                    response = runRequest(ProcessTrusteeResponse.class, base + Constants.REST_TRUSTEES_ADD, request);
                     break;
                 case ALTER:
-                    response = runRequest(ProcessTrusteeResponse.class, "/trustees/alterTrustee", request);
+                    response = runRequest(ProcessTrusteeResponse.class, base + Constants.REST_TRUSTEES_ALTER, request);
                     break;
                 case REMOVE:
-                    response = runRequest(ProcessTrusteeResponse.class, "/trustees/removeTrustee", request);
+                    response = runRequest(ProcessTrusteeResponse.class, base + Constants.REST_TRUSTEES_REMOVE, request);
                     break;
                 default:
                     throw new CWSClientException(UNSUPPORTED_OPERATION + request.getAction());

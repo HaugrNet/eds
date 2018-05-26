@@ -8,6 +8,7 @@
 package io.javadog.cws.rest;
 
 import io.javadog.cws.api.common.Action;
+import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.requests.FetchTrusteeRequest;
 import io.javadog.cws.api.requests.ProcessTrusteeRequest;
@@ -31,7 +32,7 @@ import java.util.logging.Logger;
  * @author Kim Jensen
  * @since  CWS 1.0
  */
-@Path("/trustees")
+@Path(Constants.REST_TRUSTEES_BASE)
 public class TrusteeService {
 
     private static final Logger log = Logger.getLogger(TrusteeService.class.getName());
@@ -40,43 +41,44 @@ public class TrusteeService {
     @Inject private ManagementBean bean;
 
     @POST
-    @Path("/addTrustee")
+    @Path(Constants.REST_TRUSTEES_ADD)
     @Consumes(RestUtils.CONSUMES)
     @Produces(RestUtils.PRODUCES)
     public Response add(@NotNull final ProcessTrusteeRequest addTrusteeRequest) {
-        return processTrustee(addTrusteeRequest, Action.ADD, "addTrustee");
+        return processTrustee(addTrusteeRequest, Action.ADD, Constants.REST_TRUSTEES_ADD);
     }
 
     @POST
-    @Path("/alterTrustee")
+    @Path(Constants.REST_TRUSTEES_ALTER)
     @Consumes(RestUtils.CONSUMES)
     @Produces(RestUtils.PRODUCES)
     public Response alter(@NotNull final ProcessTrusteeRequest alterTrusteeRequest) {
-        return processTrustee(alterTrusteeRequest, Action.ALTER, "alterTrustee");
+        return processTrustee(alterTrusteeRequest, Action.ALTER, Constants.REST_TRUSTEES_ALTER);
     }
 
     @POST
     @DELETE
-    @Path("/removeTrustee")
+    @Path(Constants.REST_TRUSTEES_REMOVE)
     @Consumes(RestUtils.CONSUMES)
     @Produces(RestUtils.PRODUCES)
     public Response remove(@NotNull final ProcessTrusteeRequest removeTrusteeRequest) {
-        return processTrustee(removeTrusteeRequest, Action.REMOVE, "removeTrustee");
+        return processTrustee(removeTrusteeRequest, Action.REMOVE, Constants.REST_TRUSTEES_REMOVE);
     }
 
     @POST
-    @Path("/fetchTrustees")
+    @Path(Constants.REST_TRUSTEES_FETCH)
     @Consumes(RestUtils.CONSUMES)
     @Produces(RestUtils.PRODUCES)
     public Response fetch(@NotNull final FetchTrusteeRequest fetchTrusteeRequest) {
+        final String restAction = Constants.REST_TRUSTEES_BASE + Constants.REST_TRUSTEES_FETCH;
         final Long startTime = System.nanoTime();
         FetchTrusteeResponse response;
 
         try {
             response = bean.fetchTrustees(fetchTrusteeRequest);
-            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), "fetchCircles", startTime));
+            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), restAction, startTime));
         } catch (RuntimeException e) {
-            log.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getLocale(), "fetchCircles", startTime, e));
+            log.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getLocale(), restAction, startTime, e));
             response = new FetchTrusteeResponse(ReturnCode.ERROR, e.getMessage());
         }
 
@@ -84,15 +86,16 @@ public class TrusteeService {
     }
 
     private Response processTrustee(final ProcessTrusteeRequest request, final Action action, final String logAction) {
+        final String restAction = Constants.REST_TRUSTEES_BASE + logAction;
         final Long startTime = System.nanoTime();
         ProcessTrusteeResponse response;
 
         try {
             request.setAction(action);
             response = bean.processTrustee(request);
-            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), logAction, startTime));
+            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), restAction, startTime));
         } catch (RuntimeException e) {
-            log.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getLocale(), logAction, startTime, e));
+            log.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getLocale(), restAction, startTime, e));
             response = new ProcessTrusteeResponse(ReturnCode.ERROR, e.getMessage());
         }
 

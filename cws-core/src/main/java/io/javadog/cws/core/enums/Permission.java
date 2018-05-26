@@ -18,6 +18,11 @@ public enum Permission {
     /**
      * The list of Circles is open to everyone to retrieve.
      */
+    FETCH_TRUSTEE(TrustLevel.READ, "Fetch Trustees."),
+
+    /**
+     * The list of Circles is open to everyone to retrieve.
+     */
     FETCH_CIRCLE(TrustLevel.ALL, "Fetch Circles."),
 
     /** The list of Members is open to everyone to retrieve, but there is some

@@ -13,14 +13,17 @@ import io.javadog.cws.api.common.Action;
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.CredentialType;
 import io.javadog.cws.api.common.TrustLevel;
+import io.javadog.cws.api.dtos.Trustee;
 import io.javadog.cws.api.requests.Authentication;
 import io.javadog.cws.api.requests.FetchDataRequest;
+import io.javadog.cws.api.requests.FetchTrusteeRequest;
 import io.javadog.cws.api.requests.ProcessCircleRequest;
 import io.javadog.cws.api.requests.ProcessDataRequest;
 import io.javadog.cws.api.requests.ProcessMemberRequest;
 import io.javadog.cws.api.requests.ProcessTrusteeRequest;
 import io.javadog.cws.api.responses.CwsResponse;
 import io.javadog.cws.api.responses.FetchDataResponse;
+import io.javadog.cws.api.responses.FetchTrusteeResponse;
 import io.javadog.cws.api.responses.ProcessCircleResponse;
 import io.javadog.cws.api.responses.ProcessDataResponse;
 import io.javadog.cws.api.responses.ProcessMemberResponse;
@@ -29,6 +32,7 @@ import io.javadog.cws.api.responses.ProcessTrusteeResponse;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.Charset;
 import java.security.SecureRandom;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -90,6 +94,15 @@ public final class Base {
 
         final ProcessTrusteeResponse response = management.processTrustee(request);
         throwIfFailed(response);
+    }
+
+    public static List<Trustee> fetchTrustees(final Management management, final String memberAccount, final String circleId) {
+        final FetchTrusteeRequest request = prepareRequest(FetchTrusteeRequest.class, memberAccount);
+        request.setCircleId(circleId);
+        final FetchTrusteeResponse response = management.fetchTrustees(request);
+
+        throwIfFailed(response);
+        return response.getTrustees();
     }
 
     public static String addData(final Share share, final String accountName, final String circleId, final String dataName, final byte[] data) {

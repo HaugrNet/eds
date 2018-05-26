@@ -7,6 +7,11 @@
  */
 package io.javadog.cws.rest;
 
+import static io.javadog.cws.api.common.Constants.REST_SIGNATURES_BASE;
+import static io.javadog.cws.api.common.Constants.REST_SIGNATURES_FETCH;
+import static io.javadog.cws.api.common.Constants.REST_SIGNATURES_SIGN;
+import static io.javadog.cws.api.common.Constants.REST_SIGNATURES_VERIFY;
+
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.requests.FetchSignatureRequest;
 import io.javadog.cws.api.requests.SignRequest;
@@ -31,7 +36,7 @@ import java.util.logging.Logger;
  * @author Kim Jensen
  * @since  CWS 1.0
  */
-@Path("/signatures")
+@Path(REST_SIGNATURES_BASE)
 public class SignatureService {
 
     private static final Logger log = Logger.getLogger(SignatureService.class.getName());
@@ -40,18 +45,19 @@ public class SignatureService {
     @Inject private ShareBean bean;
 
     @POST
-    @Path("/signDocument")
+    @Path(REST_SIGNATURES_SIGN)
     @Consumes(RestUtils.CONSUMES)
     @Produces(RestUtils.PRODUCES)
     public Response sign(@NotNull final SignRequest signDocumentRequest) {
+        final String restAction = REST_SIGNATURES_BASE + REST_SIGNATURES_SIGN;
         final Long startTime = System.nanoTime();
         SignResponse response;
 
         try {
             response = bean.sign(signDocumentRequest);
-            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), "signDocument", startTime));
+            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), restAction, startTime));
         } catch (RuntimeException e) {
-            log.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getLocale(), "signDocument", startTime, e));
+            log.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getLocale(), restAction, startTime, e));
             response = new SignResponse(ReturnCode.ERROR, e.getMessage());
         }
 
@@ -59,18 +65,19 @@ public class SignatureService {
     }
 
     @POST
-    @Path("/verifySignature")
+    @Path(REST_SIGNATURES_VERIFY)
     @Consumes(RestUtils.CONSUMES)
     @Produces(RestUtils.PRODUCES)
     public Response verify(@NotNull final VerifyRequest verifySignatureRequest) {
+        final String restAction = REST_SIGNATURES_BASE + REST_SIGNATURES_VERIFY;
         final Long startTime = System.nanoTime();
         VerifyResponse response;
 
         try {
             response = bean.verify(verifySignatureRequest);
-            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), "verifySignature", startTime));
+            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), restAction, startTime));
         } catch (RuntimeException e) {
-            log.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getLocale(), "verifySignature", startTime, e));
+            log.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getLocale(), restAction, startTime, e));
             response = new VerifyResponse(ReturnCode.ERROR, e.getMessage());
         }
 
@@ -78,18 +85,19 @@ public class SignatureService {
     }
 
     @POST
-    @Path("/fetchSignatures")
+    @Path(REST_SIGNATURES_FETCH)
     @Consumes(RestUtils.CONSUMES)
     @Produces(RestUtils.PRODUCES)
     public Response fetch(@NotNull final FetchSignatureRequest fetchSignaturesRequest) {
+        final String restAction = REST_SIGNATURES_BASE + REST_SIGNATURES_FETCH;
         final Long startTime = System.nanoTime();
         FetchSignatureResponse response;
 
         try {
             response = bean.fetchSignatures(fetchSignaturesRequest);
-            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), "fetchSignatures", startTime));
+            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), restAction, startTime));
         } catch (RuntimeException e) {
-            log.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getLocale(), "fetchSignatures", startTime, e));
+            log.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getLocale(), restAction, startTime, e));
             response = new FetchSignatureResponse(ReturnCode.ERROR, e.getMessage());
         }
 

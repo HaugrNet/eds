@@ -7,6 +7,8 @@
  */
 package io.javadog.cws.rest;
 
+import static io.javadog.cws.api.common.Constants.REST_VERSION;
+
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.responses.VersionResponse;
 import io.javadog.cws.core.ManagementBean;
@@ -25,7 +27,7 @@ import java.util.logging.Logger;
  * @author Kim Jensen
  * @since  CWS 1.0
  */
-@Path("/version")
+@Path(REST_VERSION)
 public class VersionService {
 
     private static final Logger log = Logger.getLogger(VersionService.class.getName());
@@ -42,9 +44,9 @@ public class VersionService {
 
         try {
             response = bean.version();
-            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), "version", startTime));
+            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), REST_VERSION, startTime));
         } catch (RuntimeException e) {
-            log.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getLocale(), "version", startTime, e));
+            log.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getLocale(), REST_VERSION, startTime, e));
             response = new VersionResponse(ReturnCode.ERROR, e.getMessage());
         }
 

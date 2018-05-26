@@ -8,6 +8,7 @@
 package io.javadog.cws.rest;
 
 import io.javadog.cws.api.common.Action;
+import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.requests.FetchCircleRequest;
 import io.javadog.cws.api.requests.ProcessCircleRequest;
@@ -31,7 +32,7 @@ import java.util.logging.Logger;
  * @author Kim Jensen
  * @since  CWS 1.0
  */
-@Path("/circles")
+@Path(Constants.REST_CIRCLES_BASE)
 public class CircleService {
 
     private static final Logger log = Logger.getLogger(CircleService.class.getName());
@@ -40,43 +41,44 @@ public class CircleService {
     @Inject private ManagementBean bean;
 
     @POST
-    @Path("/createCircle")
     @Consumes(RestUtils.CONSUMES)
     @Produces(RestUtils.PRODUCES)
+    @Path(Constants.REST_CIRCLES_CREATE)
     public Response create(@NotNull final ProcessCircleRequest createCircleRequest) {
-        return processCircle(createCircleRequest, Action.CREATE, "createCircle");
+        return processCircle(createCircleRequest, Action.CREATE, Constants.REST_CIRCLES_CREATE);
     }
 
     @POST
-    @Path("/updateCircle")
     @Consumes(RestUtils.CONSUMES)
     @Produces(RestUtils.PRODUCES)
+    @Path(Constants.REST_CIRCLES_UPDATE)
     public Response update(@NotNull final ProcessCircleRequest updateCircleRequest) {
-        return processCircle(updateCircleRequest, Action.UPDATE, "updateCircle");
+        return processCircle(updateCircleRequest, Action.UPDATE, Constants.REST_CIRCLES_UPDATE);
     }
 
     @POST
     @DELETE
-    @Path("/deleteCircle")
     @Consumes(RestUtils.CONSUMES)
     @Produces(RestUtils.PRODUCES)
+    @Path(Constants.REST_CIRCLES_DELETE)
     public Response delete(@NotNull final ProcessCircleRequest deleteCircleRequest) {
-        return processCircle(deleteCircleRequest, Action.DELETE, "deleteCircle");
+        return processCircle(deleteCircleRequest, Action.DELETE, Constants.REST_CIRCLES_DELETE);
     }
 
     @POST
-    @Path("/fetchCircles")
     @Consumes(RestUtils.CONSUMES)
     @Produces(RestUtils.PRODUCES)
+    @Path(Constants.REST_CIRCLES_FETCH)
     public Response fetch(@NotNull final FetchCircleRequest fetchCirclesRequest) {
+        final String restAction = Constants.REST_CIRCLES_BASE + Constants.REST_CIRCLES_FETCH;
         final Long startTime = System.nanoTime();
         FetchCircleResponse response;
 
         try {
             response = bean.fetchCircles(fetchCirclesRequest);
-            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), "fetchCircles", startTime));
+            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), restAction, startTime));
         } catch (RuntimeException e) {
-            log.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getLocale(), "fetchCircles", startTime, e));
+            log.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getLocale(), restAction, startTime, e));
             response = new FetchCircleResponse(ReturnCode.ERROR, e.getMessage());
         }
 
@@ -84,15 +86,16 @@ public class CircleService {
     }
 
     private Response processCircle(final ProcessCircleRequest request, final Action action, final String logAction) {
+        final String restAction = Constants.REST_CIRCLES_BASE + logAction;
         final Long startTime = System.nanoTime();
         ProcessCircleResponse response;
 
         try {
             request.setAction(action);
             response = bean.processCircle(request);
-            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), logAction, startTime));
+            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), restAction, startTime));
         } catch (RuntimeException e) {
-            log.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getLocale(), logAction, startTime, e));
+            log.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getLocale(), restAction, startTime, e));
             response = new ProcessCircleResponse(ReturnCode.ERROR, e.getMessage());
         }
 

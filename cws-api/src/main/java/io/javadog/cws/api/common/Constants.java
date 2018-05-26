@@ -30,7 +30,7 @@ public final class Constants {
      *
      * {@code private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;}
      */
-    public static final long SERIAL_VERSION_UID = 201701010010000L; // YYYYMMDDvvvnnnn
+    public static final long SERIAL_VERSION_UID = 201806010010000L; // YYYYMMDDvvvnnnn
 
     /**
      * <p>All Id's must be compliant with a standard UUID Pattern, which this
@@ -59,6 +59,7 @@ public final class Constants {
 
     public static final int MAX_PAGE_SIZE = 100;
 
+    // =========================================================================
     // Following is a list of the Field names being used as part of the SOAP
     // WSDL file - they are listed here, so the names can be used as part of
     // the XML Class Annotations.
@@ -110,6 +111,60 @@ public final class Constants {
     public static final String FIELD_RETURN_MESSAGE = "returnMessage";
     public static final String FIELD_PAGE_NUMBER = "pageNumber";
     public static final String FIELD_PAGE_SIZE = "pageSize";
+    // =========================================================================
+
+    // =========================================================================
+    // Following is the part of the URLs for all REST based requests. It is
+    // divided into the base call, and the sub calls.
+
+    // General requests from the Management Interface
+    public static final String REST_VERSION = "/version";
+    public static final String REST_SETTINGS = "/settings";
+    public static final String REST_MASTERKEY = "/masterKey";
+    public static final String REST_SANITIZED = "/sanitized";
+
+    // Member requests from the Management Interface
+    public static final String REST_MEMBERS_BASE = "/members";
+    public static final String REST_MEMBERS_CREATE = "/createMember";
+    public static final String REST_MEMBERS_INVITE = "/inviteMember";
+    public static final String REST_MEMBERS_UPDATE = "/updateMember";
+    public static final String REST_MEMBERS_INVALIDATE = "/invalidate";
+    public static final String REST_MEMBERS_DELETE = "/deleteMember";
+    public static final String REST_MEMBERS_FETCH = "/fetchMembers";
+
+    // Circle requests from the Management Interface
+    public static final String REST_CIRCLES_BASE = "/circles";
+    public static final String REST_CIRCLES_CREATE = "/createCircle";
+    public static final String REST_CIRCLES_UPDATE = "/updateCircle";
+    public static final String REST_CIRCLES_DELETE = "/deleteCircle";
+    public static final String REST_CIRCLES_FETCH = "/fetchCircles";
+
+    // Trustee requests from the Management Interface
+    public static final String REST_TRUSTEES_BASE = "/trustees";
+    public static final String REST_TRUSTEES_ADD = "/addTrustee";
+    public static final String REST_TRUSTEES_ALTER = "/alterTrustee";
+    public static final String REST_TRUSTEES_REMOVE = "/removeTrustee";
+    public static final String REST_TRUSTEES_FETCH = "/fetchTrustees";
+
+    // DataType requests from the Share Interface
+    public static final String REST_DATATYPES_BASE = "/dataTypes";
+    public static final String REST_DATATYPES_PROCESS = "/processDataType";
+    public static final String REST_DATATYPES_DELETE = "/deleteDataType";
+    public static final String REST_DATATYPES_FETCH = "/fetchDataTypes";
+
+    // Data requests from the Share Interface
+    public static final String REST_DATA_BASE = "/data";
+    public static final String REST_DATA_ADD = "/addData";
+    public static final String REST_DATA_UPDATE = "/updateData";
+    public static final String REST_DATA_DELETE = "/deleteData";
+    public static final String REST_DATA_FETCH = "/fetchData";
+
+    // Signature requests from the Share Interface
+    public static final String REST_SIGNATURES_BASE = "/signatures";
+    public static final String REST_SIGNATURES_SIGN = "/signDocument";
+    public static final String REST_SIGNATURES_VERIFY = "/verifySignature";
+    public static final String REST_SIGNATURES_FETCH = "/fetchSignatures";
+    // =========================================================================
 
     private Constants() {
         // Private Constructor, this is a Constants Class.

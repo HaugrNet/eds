@@ -8,6 +8,7 @@
 package io.javadog.cws.rest;
 
 import io.javadog.cws.api.common.Action;
+import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.requests.FetchMemberRequest;
 import io.javadog.cws.api.requests.ProcessMemberRequest;
@@ -31,7 +32,7 @@ import java.util.logging.Logger;
  * @author Kim Jensen
  * @since  CWS 1.0
  */
-@Path("/members")
+@Path(Constants.REST_MEMBERS_BASE)
 public class MemberService {
 
     private static final Logger log = Logger.getLogger(MemberService.class.getName());
@@ -40,59 +41,60 @@ public class MemberService {
     @Inject private ManagementBean bean;
 
     @POST
-    @Path("/createMember")
     @Consumes(RestUtils.CONSUMES)
     @Produces(RestUtils.PRODUCES)
+    @Path(Constants.REST_MEMBERS_CREATE)
     public Response create(@NotNull final ProcessMemberRequest createMemberRequest) {
-        return processMember(createMemberRequest, Action.CREATE, "createMember");
+        return processMember(createMemberRequest, Action.CREATE, Constants.REST_MEMBERS_CREATE);
     }
 
     @POST
-    @Path("/inviteMember")
     @Consumes(RestUtils.CONSUMES)
     @Produces(RestUtils.PRODUCES)
+    @Path(Constants.REST_MEMBERS_INVITE)
     public Response invite(@NotNull final ProcessMemberRequest inviteMemberRequest) {
-        return processMember(inviteMemberRequest, Action.INVITE, "inviteMember");
+        return processMember(inviteMemberRequest, Action.INVITE, Constants.REST_MEMBERS_INVITE);
     }
 
     @POST
-    @Path("/updateMember")
     @Consumes(RestUtils.CONSUMES)
     @Produces(RestUtils.PRODUCES)
+    @Path(Constants.REST_MEMBERS_UPDATE)
     public Response update(@NotNull final ProcessMemberRequest updateMemberRequest) {
-        return processMember(updateMemberRequest, Action.UPDATE, "updateMember");
+        return processMember(updateMemberRequest, Action.UPDATE, Constants.REST_MEMBERS_UPDATE);
     }
 
     @POST
-    @Path("/invalidate")
     @Consumes(RestUtils.CONSUMES)
     @Produces(RestUtils.PRODUCES)
+    @Path(Constants.REST_MEMBERS_INVALIDATE)
     public Response invalidate(@NotNull final ProcessMemberRequest invalidateRequest) {
-        return processMember(invalidateRequest, Action.INVALIDATE, "invalidate");
+        return processMember(invalidateRequest, Action.INVALIDATE, Constants.REST_MEMBERS_INVALIDATE);
     }
 
     @POST
     @DELETE
-    @Path("/deleteMember")
     @Consumes(RestUtils.CONSUMES)
     @Produces(RestUtils.PRODUCES)
+    @Path(Constants.REST_MEMBERS_DELETE)
     public Response delete(@NotNull final ProcessMemberRequest deleteMemberRequest) {
-        return processMember(deleteMemberRequest, Action.DELETE, "deleteMember");
+        return processMember(deleteMemberRequest, Action.DELETE, Constants.REST_MEMBERS_DELETE);
     }
 
     @POST
-    @Path("/fetchMembers")
     @Consumes(RestUtils.CONSUMES)
     @Produces(RestUtils.PRODUCES)
+    @Path(Constants.REST_MEMBERS_FETCH)
     public Response fetch(@NotNull final FetchMemberRequest fetchMembersRequest) {
+        final String restAction = Constants.REST_MEMBERS_BASE + Constants.REST_MEMBERS_FETCH;
         final Long startTime = System.nanoTime();
         FetchMemberResponse response;
 
         try {
             response = bean.fetchMembers(fetchMembersRequest);
-            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), "fetchMembers", startTime));
+            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), restAction, startTime));
         } catch (RuntimeException e) {
-            log.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getLocale(), "fetchMembers", startTime, e));
+            log.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getLocale(), restAction, startTime, e));
             response = new FetchMemberResponse(ReturnCode.ERROR, e.getMessage());
         }
 
@@ -100,15 +102,16 @@ public class MemberService {
     }
 
     private Response processMember(final ProcessMemberRequest request, final Action action, final String logAction) {
+        final String restAction = Constants.REST_MEMBERS_BASE + logAction;
         final Long startTime = System.nanoTime();
         ProcessMemberResponse response;
 
         try {
             request.setAction(action);
             response = bean.processMember(request);
-            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), logAction, startTime));
+            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), restAction, startTime));
         } catch (RuntimeException e) {
-            log.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getLocale(), logAction, startTime, e));
+            log.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getLocale(), restAction, startTime, e));
             response = new ProcessMemberResponse(ReturnCode.ERROR, e.getMessage());
         }
 

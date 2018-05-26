@@ -8,6 +8,7 @@
 package io.javadog.cws.rest;
 
 import io.javadog.cws.api.common.Action;
+import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.requests.FetchDataTypeRequest;
 import io.javadog.cws.api.requests.ProcessDataTypeRequest;
@@ -31,7 +32,7 @@ import java.util.logging.Logger;
  * @author Kim Jensen
  * @since  CWS 1.0
  */
-@Path("/dataTypes")
+@Path(Constants.REST_DATATYPES_BASE)
 public class DataTypeService {
 
     private static final Logger log = Logger.getLogger(DataTypeService.class.getName());
@@ -40,35 +41,36 @@ public class DataTypeService {
     @Inject private ShareBean bean;
 
     @POST
-    @Path("/processDataType")
     @Consumes(RestUtils.CONSUMES)
     @Produces(RestUtils.PRODUCES)
+    @Path(Constants.REST_DATATYPES_PROCESS)
     public Response process(@NotNull final ProcessDataTypeRequest processDataTypeRequest) {
-        return processDataType(processDataTypeRequest, Action.PROCESS, "processDataType");
+        return processDataType(processDataTypeRequest, Action.PROCESS, Constants.REST_DATATYPES_PROCESS);
     }
 
     @POST
     @DELETE
-    @Path("/deleteDataType")
     @Consumes(RestUtils.CONSUMES)
     @Produces(RestUtils.PRODUCES)
+    @Path(Constants.REST_DATATYPES_DELETE)
     public Response delete(@NotNull final ProcessDataTypeRequest deleteDataTypeRequest) {
-        return processDataType(deleteDataTypeRequest, Action.DELETE, "deleteDataType");
+        return processDataType(deleteDataTypeRequest, Action.DELETE, Constants.REST_DATATYPES_DELETE);
     }
 
     @POST
-    @Path("/fetchDataTypes")
     @Consumes(RestUtils.CONSUMES)
     @Produces(RestUtils.PRODUCES)
+    @Path(Constants.REST_DATATYPES_FETCH)
     public Response fetch(@NotNull final FetchDataTypeRequest fetchDataTypesRequest) {
+        final String restAction = Constants.REST_DATATYPES_BASE + Constants.REST_DATATYPES_FETCH;
         final Long startTime = System.nanoTime();
         FetchDataTypeResponse response;
 
         try {
             response = bean.fetchDataTypes(fetchDataTypesRequest);
-            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), "fetchDataTypes", startTime));
+            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), restAction, startTime));
         } catch (RuntimeException e) {
-            log.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getLocale(), "fetchDataTypes", startTime, e));
+            log.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getLocale(), restAction, startTime, e));
             response = new FetchDataTypeResponse(ReturnCode.ERROR, e.getMessage());
         }
 
@@ -76,15 +78,16 @@ public class DataTypeService {
     }
 
     private Response processDataType(final ProcessDataTypeRequest request, final Action action, final String logAction) {
+        final String restAction = Constants.REST_DATATYPES_BASE + logAction;
         final Long startTime = System.nanoTime();
         ProcessDataTypeResponse response;
 
         try {
             request.setAction(action);
             response = bean.processDataType(request);
-            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), logAction, startTime));
+            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), restAction, startTime));
         } catch (RuntimeException e) {
-            log.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getLocale(), logAction, startTime, e));
+            log.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getLocale(), restAction, startTime, e));
             response = new ProcessDataTypeResponse(ReturnCode.ERROR, e.getMessage());
         }
 

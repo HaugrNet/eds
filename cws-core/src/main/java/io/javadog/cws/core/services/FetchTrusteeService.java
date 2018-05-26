@@ -37,7 +37,7 @@ public final class FetchTrusteeService extends Serviceable<FetchTrusteeResponse,
     @Override
     public FetchTrusteeResponse perform(final FetchTrusteeRequest request) {
         // Pre-checks, & destruction of credentials
-        verifyRequest(request, Permission.FETCH_CIRCLE);
+        verifyRequest(request, Permission.FETCH_TRUSTEE);
         Arrays.fill(request.getCredential(), (byte) 0);
 
         final FetchTrusteeResponse response = new FetchTrusteeResponse();

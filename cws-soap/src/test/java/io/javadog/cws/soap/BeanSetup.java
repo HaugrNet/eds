@@ -79,20 +79,6 @@ public class BeanSetup extends DatabaseSetup {
         }
     }
 
-    //protected ManagementService prepareManagementService() {
-    //    try {
-    //        final ManagementBean bean = ManagementBean.class.getConstructor().newInstance();
-    //        setField(bean, "entityManager", entityManager);
-    //
-    //        final ManagementService service = ManagementService.class.getConstructor().newInstance();
-    //        setField(service, "bean", bean);
-    //
-    //        return service;
-    //    } catch (InstantiationException | InvocationTargetException | IllegalAccessException | NoSuchMethodException e) {
-    //        throw new CWSException(ReturnCode.ERROR, "Cannot instantiate Service Object", e);
-    //    }
-    //}
-
     // =========================================================================
     // Internal Methods
     // =========================================================================

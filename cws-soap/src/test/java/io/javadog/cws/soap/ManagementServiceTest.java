@@ -159,12 +159,13 @@ public final class ManagementServiceTest extends BeanSetup {
     }
 
     @Test
-    public void testMasterKeyWithEmptyRequest() {
-        final ManagementService management = prepareManagementService();
+    public void testMasterKeyWithProblems() {
+        final ManagementService management = prepareFlawedManagementService();
         final MasterKeyRequest request = new MasterKeyRequest();
 
         final MasterKeyResponse response = management.masterKey(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING.getCode()));
+        assertThat(response.getReturnCode(), is(ReturnCode.ERROR.getCode()));
+        assertThat(response.getReturnMessage(), is("An unknown error occurred. Please consult the CWS System Log."));
     }
 
     @Test

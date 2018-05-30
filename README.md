@@ -131,7 +131,8 @@ features:
    requires that the Circle is being used, as a re-key operation requires access
    to the existing key.
 
-CWS 1.1 is not yet having a release date - but it 
+CWS 1.1 is not yet having a release date - but as the current feature list is
+rather short, it should not take long before it is being released.
 
 Besides these features and others which may be requested, the plan is to make
 at first a simple command line tool to use the CWS with. This tool can be used

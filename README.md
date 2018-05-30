@@ -1,13 +1,13 @@
-[CWS](https://javadog.io/) [![Build Status](https://api.travis-ci.org/JavaDogs/cws.svg)](https://travis-ci.org/JavaDogs/cws) [![CircleCI](https://circleci.com/gh/JavaDogs/cws.png?style=shield)](https://circleci.com/gh/JavaDogs/cws) [![Coverity](https://scan.coverity.com/projects/13955/badge.svg)](https://scan.coverity.com/projects/javadogs-cws) [![SonarQube](https://sonarcloud.io/api/project_badges/measure?project=io.javadog:cws&metric=alert_status)](https://sonarcloud.io/dashboard?id=io.javadog:cws) [![Codacy](https://api.codacy.com/project/badge/Grade/78366d7059554164a3f65ceabe986598)](https://www.codacy.com/app/cws/cws) [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/1566/badge)](https://bestpractices.coreinfrastructure.org/projects/1566) [![Software License](https://img.shields.io/badge/license-Apache+License+2.0-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0)
+[![Build Status](https://api.travis-ci.org/JavaDogs/cws.svg)](https://travis-ci.org/JavaDogs/cws) [![CircleCI](https://circleci.com/gh/JavaDogs/cws.png?style=shield)](https://circleci.com/gh/JavaDogs/cws) [![Coverity](https://scan.coverity.com/projects/13955/badge.svg)](https://scan.coverity.com/projects/javadogs-cws) [![SonarQube](https://sonarcloud.io/api/project_badges/measure?project=io.javadog:cws&metric=alert_status)](https://sonarcloud.io/dashboard?id=io.javadog:cws) [![Codacy](https://api.codacy.com/project/badge/Grade/78366d7059554164a3f65ceabe986598)](https://www.codacy.com/app/cws/cws) [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/1566/badge)](https://bestpractices.coreinfrastructure.org/projects/1566) [![Software License](https://img.shields.io/badge/license-Apache+License+2.0-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0)
 --
 
 # CWS - Cryptographic Web Store
-CWS, Cryptographic Web Store, works like "PGP for the Cloud". It is designed as
-a backend component, which can be integrated into other systems or be used
-directly by other applications or apps. It us written purely in Java / Java EE,
-and it is not containing any third-party dependencies. It is build around the
-vision of allowing safe and easy exchange of data between multiple parties,
-where data is stored encrypted.
+[CWS](https://javadog.io/), Cryptographic Web Store, works like "PGP for the
+Cloud". It is designed as a backend component, which can be integrated into
+other systems or be used directly by other applications or apps. It us written
+purely in Java / Java EE, and it is not containing any third-party dependencies.
+It is build around the vision of allowing safe and easy exchange of data between
+multiple parties, where data is stored encrypted.
 
 The CWS focuses on Circles of Trust, where Members of a Circle will have varying
 level of access to the Data belonging to the Circle. This is achieved by a
@@ -86,22 +86,56 @@ http://localhost:8080/cws/share?wsdl
 ```
 
 # Who is this for
-It is not designed for anyone particular, but as it provides a rather general
-API and scales depending on the deployment - it can be used by anyone who finds
-it useful. 
+Anyone for whom data protection is important may find CWS useful. It is designed
+so everything is stored encrypted in a way, so only those who the data belongs
+to may access it. This is achieved by ensuring that the full control over all
+Keys is placed with the users.
+
+# Security Features
+Besides, encrypting all data stored, the CWS also has a number of features to
+ensure that the security is as high as it can be, considering that it can be
+deployed in a "hostile" environment.
+
+ * MasterKey - The MasterKey is used to encrypt and decrypt various information
+   and it must be set at startup, since it is not persisted anywhere.
+ * Deleting sensitive data - Data, which is considered sensitive is actively
+   being deleted once it is no longer needed. This includes the credentials,
+   which a member gives to unlock their account. It should also include the
+   symmetric and private keys, but due to a not implemented feature in Java,
+   this is not the case.
+ * Invalidate Accounts, this allows a member to force the keys to be replaced
+   internally, so it is possible to log in and view Circles, but it will not be
+   possible to extract data, as the keys are not the same as the ones, which
+   was used in the Circles.
+ * Data Corruption checks, to verify if there has been alterations to encrypted
+   data, which may result in inability to properly extract information.
 
 # Release Plan
-CWS is feature complete, version 0.9.9 has been released, and now it is just a
-question of time before [Circle-CI](https://circleci.com) &amp;
-[Travis-CI](https://travis-ci.org) upgrade their Build Images to use the latest
-Java 8. Once they have upgraded, the default settings will be changed to
-ensure that the default key size for the symmetric keys is set to the highest
-value possible.
+CWS 1.0 will be released on Friday, June 1st, 2018. It is feature complete,
+documented and extensively tested.
 
-In the meantime, testing will continue to be improved, by adding a new external
-test suit using [FitNesse](http://fitnesse.org/), and also trying to perform
-Penetration Testing. Bugs and flaws will still be corrected, but no new features
-or changes will be made.
+Work on CWS 1.1, will commense afterworth, with a focus on the following
+features:
+ * Copy Data from one Circle of Trust to a second, with a property flag to
+   enable or disable the feature. By default, the feature is disabled.
+ * Move Data from one Circle of Trust to a second, with a property flag to
+   enable or disable the feature. By default, the feature is disabled. Further,
+   the feature will require that the requesting Member is a Circle Administrator
+   of the source Circle, and have write permissions in the target Circle.
+ * Search Circles, Members & Data. Although, the CWS is storing very little
+   information, it may still be necessary to search for somethnig using the
+   simple names.
+ * Re-key, i.e. force an update of the Keys used for a Circle or Member. This
+   feature will have different ways to be triggered, either being forced with
+   a request or it can be started if the key exceeds a certain age, the latter
+   requires that the Circle is being used, as a re-key operation requires access
+   to the existing key.
+
+CWS 1.1 is not yet having a release date - but it 
+
+Besides these features and others which may be requested, the plan is to make
+at first a simple command line tool to use the CWS with. This tool can be used
+as the basis for other Clients, including mobile apps and websites.
 
 # Wish to join
 The overall quality of the software can only improve if more eyes look at it and

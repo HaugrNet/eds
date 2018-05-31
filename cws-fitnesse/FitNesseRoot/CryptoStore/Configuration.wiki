@@ -20,7 +20,7 @@ anything. It is a simple static ''is alive'' request.
 
 !|Version                                 |
 |return code?|return message?|cws version?|
-|${SUCCESS}  |Ok             |1.0-SNAPSHOT|
+|${SUCCESS}  |Ok             |1.1-SNAPSHOT|
 
 !2 '''!-CryptoStore-! Settings Request'''
 The !-CryptoStore-! Settings request can only be performed by the System

@@ -111,10 +111,7 @@ deployed in a "hostile" environment.
    data, which may result in inability to properly extract information.
 
 # Release Plan
-CWS 1.0 will be released on Friday, June 1st, 2018. It is feature complete,
-documented and extensively tested.
-
-Work on CWS 1.1, will commense afterworth, with a focus on the following
+This is CWS 1.1 development branch - it will focus on the following
 features:
  * Copy Data from one Circle of Trust to a second, with a property flag to
    enable or disable the feature. By default, the feature is disabled.

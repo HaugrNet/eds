@@ -64,7 +64,7 @@ public abstract class AbstractClientTestCase {
         final VersionResponse response = getManagement().version();
         assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getHttpCode()));
         assertThat(response.getReturnMessage(), is("Ok"));
-        assertThat(response.getVersion(), is("1.0-SNAPSHOT"));
+        assertThat(response.getVersion(), is("1.1-SNAPSHOT"));
     }
 
     @Test

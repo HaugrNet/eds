@@ -60,7 +60,7 @@ public class ManagementBean {
     @Transactional(Transactional.TxType.SUPPORTS)
     public VersionResponse version() {
         final VersionResponse response = new VersionResponse();
-        response.setVersion("1.0-SNAPSHOT");
+        response.setVersion("1.1-SNAPSHOT");
 
         return response;
     }

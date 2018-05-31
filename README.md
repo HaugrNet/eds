@@ -110,34 +110,6 @@ deployed in a "hostile" environment.
  * Data Corruption checks, to verify if there has been alterations to encrypted
    data, which may result in inability to properly extract information.
 
-# Release Plan
-CWS 1.0 will be released on Friday, June 1st, 2018. It is feature complete,
-documented and extensively tested.
-
-Work on CWS 1.1, will commense afterworth, with a focus on the following
-features:
- * Copy Data from one Circle of Trust to a second, with a property flag to
-   enable or disable the feature. By default, the feature is disabled.
- * Move Data from one Circle of Trust to a second, with a property flag to
-   enable or disable the feature. By default, the feature is disabled. Further,
-   the feature will require that the requesting Member is a Circle Administrator
-   of the source Circle, and have write permissions in the target Circle.
- * Search Circles, Members & Data. Although, the CWS is storing very little
-   information, it may still be necessary to search for somethnig using the
-   simple names.
- * Re-key, i.e. force an update of the Keys used for a Circle or Member. This
-   feature will have different ways to be triggered, either being forced with
-   a request or it can be started if the key exceeds a certain age, the latter
-   requires that the Circle is being used, as a re-key operation requires access
-   to the existing key.
-
-CWS 1.1 is not yet having a release date - but as the current feature list is
-rather short, it should not take long before it is being released.
-
-Besides these features and others which may be requested, the plan is to make
-at first a simple command line tool to use the CWS with. This tool can be used
-as the basis for other Clients, including mobile apps and websites.
-
 # Wish to join
 The overall quality of the software can only improve if more eyes look at it and
 help with implementing features and adding more tests. If you wish to join,

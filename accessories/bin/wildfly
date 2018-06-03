@@ -3,6 +3,8 @@
 # WildFly Control Script
 # -----------------------------------------------------------------------------
 # History:
+#   Version 1.01 - 2018-06-04, Kim Jensen <kim@dawn.dk>
+#     o Added new Java home for Wildfly
 #   Version 1.00 - 2017-10-16, Kim Jensen <kim@dawn.dk>
 #     o Initial version
 # -----------------------------------------------------------------------------
@@ -30,13 +32,14 @@ readonly debugPort=8787
 readonly appDirectory="/opt/java/wildfly"
 
 # Java & JBoss (WildFly) settings
-JAVA_OPTS="${JAVA_OPTS} -Xms1303m -Xmx1303m -Djava.net.preferIPv4Stack=true"
+export JAVA_HOME="/opt/java/jre"
+export JAVA_OPTS="${JAVA_OPTS} -Xms1303m -Xmx1303m -Djava.net.preferIPv4Stack=true"
 export JBOSS_HOME="${appDirectory}"
 export JBOSS_PIDFILE="${source}/cws.pid"
 export JBOSS_CONFIG="standalone-cws.xml"
 export JBOSS_SCRIPT="${JBOSS_HOME}/bin/standalone.sh --server-config=${JBOSS_CONFIG} -Djboss.node.name=cws"
 export LAUNCH_JBOSS_IN_BACKGROUND=1
-export PATH="${JBOSS_HOME}/bin:${PATH}"
+export PATH="${JAVA_HOME}/bin:${JBOSS_HOME}/bin:${PATH}"
 
 # To create Coverage reports from FitNesse, we must start WildFly with an Agent,
 # which can be used. For the Coverage, we're using JaCoCo, for more information

@@ -1,5 +1,5 @@
-Thanks for downloading and testing the fourth Beta version of CWS, Cryptographic
-Web Store or CryptoStore.
+Thanks for downloading and trying the first release of CWS, Cryptographic
+Web Store.
 
 
 == Requirements ==
@@ -83,11 +83,11 @@ password to something else.
 
 Step 3: Configure Wildfly
 
-In your ${CWS_HOME} directory, there are two folders: wildfly-10 and wildfly-11.
-The configuration files needed for a cws installation are contained in these 
-directories. You will need to copy these files from these directories to your 
-Wildfly installation.  Pick the directory that matches the version of your 
-Wildfly installation and perform the following.
+In your ${CWS_HOME} directory, there are three folders: wildfly-10, wildfly-11,
+and wildfly-12. The configuration files needed for a cws installation are
+contained in these directories. You will need to copy these files from these
+directories to your Wildfly installation.  Pick the directory that matches the
+version of your Wildfly installation and perform the following.
 
 $ cd ${CWS_HOME}/wildfly-1X/modules
 $ sudo cp -r org ${JBOSS_HOME}/modules
@@ -120,14 +120,6 @@ http://localhost:8080/cws/share?wsdl
 The API is documented in the accompanying JavaDoc, which is in the api.zip file.
 
 
-== Release plan ==
-
-This release is version 0.9.0, which is the feature freeze version. Pending for
-the final 1.0 release, is the last external pen-testing results, and a review
-of the documentation. February 2nd, version 0.9.9 will be released, which is the
-final release candidate, differing from the final 1.0.0 release in the default
-key settings only. The 0.9.9 will refer to 128 bit AES keys, and once the two
-CIs (Travis & Circle) have upgraded their images to use Java 1.8.0_161 or later,
-will the default settings be raised to 256 bit.
+== Contact ==
 
 For more information, please contact Kim Jensen <kim.jensen@javadog.io>

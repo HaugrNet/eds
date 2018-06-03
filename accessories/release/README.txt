@@ -5,9 +5,9 @@ Web Store.
 == Requirements ==
 
 CWS requires:
-* a database, 
+* a database,
 * Java 8
-* a Java EE 7+ container 
+* a Java EE 7+ container
 
 
 == Test Installation Component Recommendations ==
@@ -83,11 +83,11 @@ password to something else.
 
 Step 3: Configure Wildfly
 
-In your ${CWS_HOME} directory, there are three folders: wildfly-10, wildfly-11,
-and wildfly-12. The configuration files needed for a cws installation are
-contained in these directories. You will need to copy these files from these
-directories to your Wildfly installation.  Pick the directory that matches the
-version of your Wildfly installation and perform the following.
+In your ${CWS_HOME} directory, there are several folders: wildfly-10,
+wildfly-11, wildfly-12, and wildfly-13. The configuration files needed for a cws
+installation are contained in these directories. You will need to copy these
+files from these directories to your Wildfly installation.  Pick the directory
+that matches the version of your Wildfly installation and perform the following.
 
 $ cd ${CWS_HOME}/wildfly-1X/modules
 $ sudo cp -r org ${JBOSS_HOME}/modules

@@ -2,7 +2,7 @@
 Suite
 ---
 
-!1 !-CWS - Cryptographic WebStore-!
+!1 !-CWS - Cryptographic Web Store-!
 Welcome to the !-FitNesse-! Test Suite for the !-Cryptographic WebStore-!, CWS.
 This is a simple backend system, which allows storage of data encrypted without
 the need for providing Keys, as these are stored internally.

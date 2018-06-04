@@ -14,16 +14,23 @@ Test
 |io.javadog.cws.fitnesse|
 *!
 
-!2 '''!-CryptoStore-! Version Request'''
-The !-CryptoStore-! Version request is not requiring any credentials, or - well
+!*>  Clean Database
+!|script|clean database|
+|remove circles        |
+|remove members        |
+
+*!
+
+!2 '''!-CWS-! Version Request'''
+The !-CWS-! Version request is not requiring any credentials, or - well
 anything. It is a simple static ''is alive'' request.
 
 !|Version                                 |
 |return code?|return message?|cws version?|
 |${SUCCESS}  |Ok             |1.1-SNAPSHOT|
 
-!2 '''!-CryptoStore-! Settings Request'''
-The !-CryptoStore-! Settings request can only be performed by the System
+!2 '''!-CWS-! Settings Request'''
+The !-CWS-! Settings request can only be performed by the System
 Administrator, i.e. the system super user. It is a way to both extract the
 current settings, and update existing values.
 
@@ -35,10 +42,10 @@ recommended that common best practices regarding the pick of the passphrase is
 followed - for the sake of this test, it is set to 'admin'.''
 
 !|script|Settings     |admin                          |admin                                                     |
-|check  |value for key|cws.crypto.symmetric.algorithm |AES128                                                    |
+|check  |value for key|cws.crypto.symmetric.algorithm |AES256                                                    |
 |check  |value for key|cws.crypto.asymmetric.algorithm|RSA2048                                                   |
 |check  |value for key|cws.crypto.signature.algorithm |SHA512                                                    |
-|check  |value for key|cws.crypto.pbe.algorithm       |PBE128                                                    |
+|check  |value for key|cws.crypto.pbe.algorithm       |PBE256                                                    |
 |check  |value for key|cws.crypto.hash.algorithm      |SHA512                                                    |
 |check  |value for key|cws.system.salt                |Default salt, also used as kill switch. Must be set in DB.|
 |check  |value for key|cws.system.locale              |EN                                                        |
@@ -77,8 +84,8 @@ a given Passphrase to a Symmetric Key. The allowed values are:
 
 !|Settings                                                                                                                                       |
 |account name|credential|key                     |value |return code?      |return message?                                             |defined?|
-|admin       |admin     |cws.crypto.pbe.algorithm|PBE256|${SUCCESS}        |Ok                                                          |PBE256  |
-|admin       |admin     |cws.crypto.pbe.algorithm|PBE192|${SUCCESS}        |Ok                                                          |PBE192  |
 |admin       |admin     |cws.crypto.pbe.algorithm|PBE128|${SUCCESS}        |Ok                                                          |PBE128  |
-|admin       |admin     |cws.crypto.pbe.algorithm|PBE512|${SETTING_WARNING}|Unsupported Crypto Algorithm for 'cws.crypto.pbe.algorithm'.|PBE128  |
+|admin       |admin     |cws.crypto.pbe.algorithm|PBE192|${SUCCESS}        |Ok                                                          |PBE192  |
+|admin       |admin     |cws.crypto.pbe.algorithm|PBE256|${SUCCESS}        |Ok                                                          |PBE256  |
+|admin       |admin     |cws.crypto.pbe.algorithm|PBE512|${SETTING_WARNING}|Unsupported Crypto Algorithm for 'cws.crypto.pbe.algorithm'.|PBE256  |
 

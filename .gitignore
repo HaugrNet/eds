@@ -13,3 +13,6 @@ cws.pid
 *.iml
 target
 dependency-reduced-pom.xml
+
+# FitNesse settings
+fitnesse-standalone.jar

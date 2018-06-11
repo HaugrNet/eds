@@ -18,6 +18,7 @@ import io.javadog.cws.core.enums.SanityStatus;
 import io.javadog.cws.core.jce.SecretCWSKey;
 import io.javadog.cws.core.model.Settings;
 import io.javadog.cws.core.model.entities.DataEntity;
+import io.javadog.cws.core.model.entities.DataTypeEntity;
 import io.javadog.cws.core.model.entities.MetadataEntity;
 
 import javax.persistence.EntityManager;
@@ -47,11 +48,18 @@ public final class FetchDataService extends Serviceable<FetchDataResponse, Fetch
         verifyRequest(request, Permission.FETCH_DATA);
         Arrays.fill(request.getCredential(), (byte) 0);
 
+        // It is not possible to directly compare a sub-object against a defined
+        // value, if the methods are all final - this is because it prevents the
+        // Hibernate proxy, usingByteBuddy, to override the method. Hence, the
+        // Object it should be compared against is first read out - since this
+        // will help overriding the proxying.
+        //   See: https://github.com/JavaDogs/cws/issues/45
+        final DataTypeEntity folder = dao.findDataTypeByName(Constants.FOLDER_TYPENAME);
         final MetadataEntity root = findRootMetadata(request);
         final FetchDataResponse response;
 
         if (root != null) {
-            if (Objects.equals(root.getType().getName(), Constants.FOLDER_TYPENAME)) {
+            if (Objects.equals(folder, root.getType())) {
                 final int pageNumber = request.getPageNumber();
                 final int pageSize = request.getPageSize();
                 final List<MetadataEntity> found = dao.findMetadataByMemberAndFolder(member, root.getId(), pageNumber, pageSize);

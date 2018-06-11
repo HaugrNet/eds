@@ -30,6 +30,7 @@ import io.javadog.cws.core.exceptions.VerificationException;
 import io.javadog.cws.core.model.Settings;
 import org.junit.Test;
 
+import java.util.Arrays;
 import java.util.UUID;
 
 /**
@@ -93,13 +94,23 @@ public final class CircleServiceTest extends DatabaseSetup {
         final ProcessDataResponse processDataResponse = processDataService.perform(addRequest);
         assertThat(processDataResponse.isOk(), is(true));
 
+        // Read root folder for the Circle
         final FetchDataService dataService = new FetchDataService(settings, entityManager);
-        final FetchDataRequest dataRequest = prepareRequest(FetchDataRequest.class, MEMBER_5);
-        dataRequest.setCircleId(createResponse.getCircleId());
-        final FetchDataResponse dataResponse = dataService.perform(dataRequest);
-        assertThat(dataResponse.isOk(), is(true));
-        assertThat(dataResponse.getMetadata().size(), is(1));
-        assertThat(dataResponse.getMetadata().get(0).getDataName(), is("My Data Object"));
+        final FetchDataRequest dataRootRequest = prepareRequest(FetchDataRequest.class, MEMBER_5);
+        dataRootRequest.setCircleId(createResponse.getCircleId());
+        final FetchDataResponse dataRootResponse = dataService.perform(dataRootRequest);
+        assertThat(dataRootResponse.isOk(), is(true));
+        assertThat(dataRootResponse.getMetadata().size(), is(1));
+        assertThat(dataRootResponse.getMetadata().get(0).getDataName(), is("My Data Object"));
+
+        // Read the newly created Data Object
+        final FetchDataRequest dataFileRequest = prepareRequest(FetchDataRequest.class, MEMBER_5);
+        dataFileRequest.setDataId(dataRootResponse.getMetadata().get(0).getDataId());
+        final FetchDataResponse dataFileResponse = dataService.perform(dataFileRequest);
+        assertThat(dataFileResponse.isOk(), is(true));
+        assertThat(dataFileResponse.getMetadata().size(), is(1));
+        assertThat(dataFileResponse.getMetadata().get(0).getDataName(), is("My Data Object"));
+        assertThat(Arrays.equals(dataFileResponse.getData(), addRequest.getData()), is(true));
     }
 
     @Test

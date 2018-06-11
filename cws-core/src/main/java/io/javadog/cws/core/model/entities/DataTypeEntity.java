@@ -52,7 +52,7 @@ public class DataTypeEntity extends CWSEntity {
         this.name = name;
     }
 
-    public String getName() {
+    public final String getName() {
         return name;
     }
 

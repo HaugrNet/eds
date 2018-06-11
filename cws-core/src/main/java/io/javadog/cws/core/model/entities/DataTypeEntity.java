@@ -16,6 +16,8 @@ import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
 /**
+ * <p>CWS DataType Entity, maps the DataType table from the Database.</p>
+ *
  * @author Kim Jensen
  * @since  CWS 1.0
  */
@@ -46,7 +48,7 @@ public class DataTypeEntity extends CWSEntity {
     // Entity Setters & Getters
     // =========================================================================
 
-    public void setName(final String name) {
+    public final void setName(final String name) {
         this.name = name;
     }
 
@@ -54,11 +56,11 @@ public class DataTypeEntity extends CWSEntity {
         return name;
     }
 
-    public void setType(final String type) {
+    public final void setType(final String type) {
         this.type = type;
     }
 
-    public String getType() {
+    public final String getType() {
         return type;
     }
 }

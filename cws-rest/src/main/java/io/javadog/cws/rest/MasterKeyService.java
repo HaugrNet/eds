@@ -26,6 +26,8 @@ import javax.ws.rs.core.Response;
 import java.util.logging.Logger;
 
 /**
+ * <p>REST interface for the MasterKey functionality.</p>
+ *
  * @author Kim Jensen
  * @since  CWS 1.0
  */

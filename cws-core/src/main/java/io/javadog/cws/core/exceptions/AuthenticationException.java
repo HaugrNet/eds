@@ -11,6 +11,9 @@ import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
 
 /**
+ * <p>Authentication Exception, if a problem occurred with identifying a Member
+ * in CWS.</p>
+ *
  * @author Kim Jensen
  * @since  CWS 1.0
  */

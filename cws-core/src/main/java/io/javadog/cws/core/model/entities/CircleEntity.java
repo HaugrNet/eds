@@ -17,6 +17,8 @@ import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
 /**
+ * <p>CWS Circle Entity, maps the Circle table from the Database.</p>
+ *
  * @author Kim Jensen
  * @since  CWS 1.0
  */
@@ -39,19 +41,19 @@ public class CircleEntity extends Externable {
     // Entity Setters & Getters
     // =========================================================================
 
-    public void setName(final String name) {
+    public final void setName(final String name) {
         this.name = name;
     }
 
-    public String getName() {
+    public final String getName() {
         return name;
     }
 
-    public void setCircleKey(final byte[] circleKey) {
+    public final void setCircleKey(final byte[] circleKey) {
         this.circleKey = copy(circleKey);
     }
 
-    public byte[] getCircleKey() {
+    public final byte[] getCircleKey() {
         return copy(circleKey);
     }
 }

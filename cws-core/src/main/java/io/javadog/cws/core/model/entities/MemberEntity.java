@@ -20,6 +20,8 @@ import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
 /**
+ * <p>CWS Member Entity, maps the Member table from the Database.</p>
+ *
  * @author Kim Jensen
  * @since  CWS 1.0
  */
@@ -68,59 +70,59 @@ public class MemberEntity extends Externable {
     // Entity Setters & Getters
     // =========================================================================
 
-    public void setName(final String identifier) {
+    public final void setName(final String identifier) {
         this.name = identifier;
     }
 
-    public String getName() {
+    public final String getName() {
         return name;
     }
 
-    public void setSalt(final String salt) {
+    public final void setSalt(final String salt) {
         this.salt = salt;
     }
 
-    public String getSalt() {
+    public final String getSalt() {
         return salt;
     }
 
-    public void setPbeAlgorithm(final KeyAlgorithm pbeAlgorithm) {
+    public final void setPbeAlgorithm(final KeyAlgorithm pbeAlgorithm) {
         this.pbeAlgorithm = pbeAlgorithm;
     }
 
-    public KeyAlgorithm getPbeAlgorithm() {
+    public final KeyAlgorithm getPbeAlgorithm() {
         return pbeAlgorithm;
     }
 
-    public void setRsaAlgorithm(final KeyAlgorithm algorithm) {
+    public final void setRsaAlgorithm(final KeyAlgorithm algorithm) {
         this.rsaAlgorithm = algorithm;
     }
 
-    public KeyAlgorithm getRsaAlgorithm() {
+    public final KeyAlgorithm getRsaAlgorithm() {
         return rsaAlgorithm;
     }
 
-    public void setMemberKey(final String memberKey) {
+    public final void setMemberKey(final String memberKey) {
         this.memberKey = memberKey;
     }
 
-    public String getMemberKey() {
+    public final String getMemberKey() {
         return memberKey;
     }
 
-    public void setPublicKey(final String armoredPublicKey) {
+    public final void setPublicKey(final String armoredPublicKey) {
         this.publicKey = armoredPublicKey;
     }
 
-    public String getPublicKey() {
+    public final String getPublicKey() {
         return publicKey;
     }
 
-    public void setPrivateKey(final String armoredEncryptedPrivateKey) {
+    public final void setPrivateKey(final String armoredEncryptedPrivateKey) {
         this.privateKey = armoredEncryptedPrivateKey;
     }
 
-    public String getPrivateKey() {
+    public final String getPrivateKey() {
         return privateKey;
     }
 }

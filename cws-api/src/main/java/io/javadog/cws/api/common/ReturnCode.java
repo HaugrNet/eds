@@ -345,7 +345,7 @@ public enum ReturnCode {
     // =========================================================================
 
     /**
-     * <b>HTTP Status Code 200 - OK</b><br>
+     * <b>HTTP Status Code 200 - OK</b>.<br>
      * <i>Standard response for successful HTTP requests. The actual response
      * will depend on the request method used. In a GET request, the response
      * will contain an entity corresponding to the requested resource. In a POST
@@ -355,7 +355,7 @@ public enum ReturnCode {
     SUCCESS(Classification.CLASS_INFO, 0, "Request completed normally."),
 
     /**
-     * <b>HTTP Status Code 400 - Bad Request</b><br>
+     * <b>HTTP Status Code 400 - Bad Request</b>.<br>
      * <i>The server cannot or will not process the request due to an apparent
      * client error (e.g., malformed request syntax, size too large, invalid
      * request message framing, or deceptive request routing).</i>
@@ -363,7 +363,7 @@ public enum ReturnCode {
     WARNING(Classification.CLASS_WARNING, 0, "General Warning occurred while handling the request."),
 
     /**
-     * <b>HTTP Status Code 401 - Unauthorized (RFC 7235)</b><br>
+     * <b>HTTP Status Code 401 - Unauthorized (RFC 7235)</b>.<br>
      * <i>Similar to 403 Forbidden, but specifically for use when authentication
      * is required and has failed or has not yet been provided. The response
      * must include a WWW-Authenticate header field containing a challenge
@@ -377,7 +377,7 @@ public enum ReturnCode {
     AUTHORIZATION_WARNING(Classification.CLASS_WARNING, 1, "The Account is not permitted to perform requested Action."),
 
     /**
-     * <b>HTTP Status Code 403 - Forbidden</b><br>
+     * <b>HTTP Status Code 403 - Forbidden</b>.<br>
      * <i>The request was valid, but the server is refusing action. The user
      * might not have the necessary permissions for a resource, or may need an
      * account of some sort.</i>
@@ -385,14 +385,14 @@ public enum ReturnCode {
     AUTHENTICATION_WARNING(Classification.CLASS_WARNING, 3, "Authentication of the Account failed."),
 
     /**
-     * <b>HTTP Status Code 404 - Not Found</b><br>
+     * <b>HTTP Status Code 404 - Not Found</b>.<br>
      * <i>The requested resource could not be found but may be available in the
      * future. Subsequent requests by the client are permissible.</i>
      */
     IDENTIFICATION_WARNING(Classification.CLASS_WARNING, 4, "Not possible to positively identify the requested Data."),
 
     /**
-     * <b>HTTP Status Code 405 - Method Not Allowed</b><br>
+     * <b>HTTP Status Code 405 - Method Not Allowed</b>.<br>
      * <i>A request method is not supported for the requested resource; for
      * example, a GET request on a form that requires data to be presented via
      * POST, or a PUT request on a read-only resource.</i>
@@ -400,14 +400,14 @@ public enum ReturnCode {
     ILLEGAL_ACTION(Classification.CLASS_WARNING, 5, "The Account tried to invoke an Action not allowed."),
 
     /**
-     * <b>HTTP Status Code 406 - Not Acceptable</b><br>
+     * <b>HTTP Status Code 406 - Not Acceptable</b>.<br>
      * <i>The requested resource is capable of generating only content not
      * acceptable according to the Accept headers sent in the request.</i>
      */
     VERIFICATION_WARNING(Classification.CLASS_WARNING, 6, "The provided Request information is insufficient or invalid."),
 
     /**
-     * <b>HTTP Status Code 409 - Conflict</b><br>
+     * <b>HTTP Status Code 409 - Conflict</b>.<br>
      * <i>Indicates that the request could not be processed because of conflict
      * in the request, such as an edit conflict between multiple simultaneous
      * updates.</i>
@@ -415,56 +415,56 @@ public enum ReturnCode {
     INTEGRITY_WARNING(Classification.CLASS_WARNING, 9, "Not possible to perform the given action, as it will lead to data integrity problems."),
 
     /**
-     * <b>Custom Warning 491 - Cryptographic Signature Problem</b><br>
+     * <b>Custom Warning 491 - Cryptographic Signature Problem</b>.<br>
      * <i>The Signature is not usable, as it has expired.</i>
      */
     SIGNATURE_WARNING(Classification.CLASS_WARNING, 91, "There Signature is not usable."),
 
     /**
-     * <b>Custom Warning 492 - Setting Warning</b><br>
+     * <b>Custom Warning 492 - Setting Warning</b>.<br>
      * <i>It is not permitted to add, alter or delete the given setting.</i>
      */
     SETTING_WARNING(Classification.CLASS_WARNING, 92, "Not permitted to add, alter or delete the given Setting."),
 
     /**
-     * <b>HTTP Status Code 500 - Internal Server Error</b><br>
+     * <b>HTTP Status Code 500 - Internal Server Error</b>.<br>
      * <i>A generic error message, given when an unexpected condition was
      * encountered and no more specific message is suitable.</i>
      */
     ERROR(Classification.CLASS_ERROR, 0, "General Error occurred while handling the request."),
 
     /**
-     * <b>Custom Warning 591 - General Cryptographic Error</b><br>
+     * <b>Custom Warning 591 - General Cryptographic Error</b>.<br>
      * <i>A generic cryptographic error occurred during the request.</i>
      */
     CRYPTO_ERROR(Classification.CLASS_ERROR, 91, "Cryptographic Error occurred during the handling of the request."),
 
     /**
-     * <b>Custom Warning 592 - Integrity Error</b><br>
+     * <b>Custom Warning 592 - Integrity Error</b>.<br>
      * <i>The encrypted data is having integrity errors.</i>
      */
     INTEGRITY_ERROR(Classification.CLASS_ERROR, 92, "The Encrypted Data is having integrity problems."),
 
     /**
-     * <b>Custom Warning 593 - Setting Error</b><br>
+     * <b>Custom Warning 593 - Setting Error</b>.<br>
      * <i>Error extracting the setting value.</i>
      */
     SETTING_ERROR(Classification.CLASS_ERROR, 93, "Error extracting settings value."),
 
     /**
-     * <b>Custom Warning 594 - Identification Error</b><br>
+     * <b>Custom Warning 594 - Identification Error</b>.<br>
      * <i>It is not possible to identify the requested data.</i>
      */
     IDENTIFICATION_ERROR(Classification.CLASS_ERROR, 94, "Not possible to positively identify the Requested Data."),
 
     /**
-     * <b>Custom Warning 595 - Database Error</b><br>
+     * <b>Custom Warning 595 - Database Error</b>.<br>
      * <i>A generic problem with the database occurred.</i>
      */
     DATABASE_ERROR(Classification.CLASS_ERROR, 95, "Database Error occurred during the handling of the request."),
 
     /**
-     * <b>Custom Warning 596 - Constraint Error</b><br>
+     * <b>Custom Warning 596 - Constraint Error</b>.<br>
      * <i>A unique constraint violation occurred in the database.</i>
      */
     CONSTRAINT_ERROR(Classification.CLASS_ERROR, 96, "Unique Constraint Violation in the Database.");

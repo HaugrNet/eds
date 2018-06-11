@@ -21,6 +21,8 @@ import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
 /**
+ * <p>CWS Trustee Entity, maps the Trustee table from the Database.</p>
+ *
  * @author Kim Jensen
  * @since  CWS 1.0
  */
@@ -93,43 +95,43 @@ public class TrusteeEntity extends CWSEntity {
     // Entity Setters & Getters
     // =========================================================================
 
-    public void setMember(final MemberEntity member) {
+    public final void setMember(final MemberEntity member) {
         this.member = member;
     }
 
-    public MemberEntity getMember() {
+    public final MemberEntity getMember() {
         return member;
     }
 
-    public void setCircle(final CircleEntity circle) {
+    public final void setCircle(final CircleEntity circle) {
         this.circle = circle;
     }
 
-    public CircleEntity getCircle() {
+    public final CircleEntity getCircle() {
         return circle;
     }
 
-    public void setTrustLevel(final TrustLevel trustLevel) {
+    public final void setTrustLevel(final TrustLevel trustLevel) {
         this.trustLevel = trustLevel;
     }
 
-    public TrustLevel getTrustLevel() {
+    public final TrustLevel getTrustLevel() {
         return trustLevel;
     }
 
-    public void setKey(final KeyEntity key) {
+    public final void setKey(final KeyEntity key) {
         this.key = key;
     }
 
-    public KeyEntity getKey() {
+    public final KeyEntity getKey() {
         return key;
     }
 
-    public void setCircleKey(final String armoredKey) {
+    public final void setCircleKey(final String armoredKey) {
         this.circleKey = armoredKey;
     }
 
-    public String getCircleKey() {
+    public final String getCircleKey() {
         return circleKey;
     }
 }

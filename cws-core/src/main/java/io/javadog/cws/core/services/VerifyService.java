@@ -22,6 +22,8 @@ import java.util.Base64;
 import java.util.Date;
 
 /**
+ * <p>Business Logic implementation for the CWS Verify request.</p>
+ *
  * @author Kim Jensen
  * @since  CWS 1.0
  */

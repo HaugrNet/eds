@@ -23,6 +23,8 @@ import javax.persistence.TemporalType;
 import java.util.Date;
 
 /**
+ * <p>CWS Signature Entity, maps the Signature table from the Database.</p>
+ *
  * @author Kim Jensen
  * @since  CWS 1.0
  */
@@ -62,43 +64,43 @@ public class SignatureEntity extends CWSEntity {
     // Entity Setters & Getters
     // =========================================================================
 
-    public void setPublicKey(final String publicKey) {
+    public final void setPublicKey(final String publicKey) {
         this.publicKey = publicKey;
     }
 
-    public String getPublicKey() {
+    public final String getPublicKey() {
         return publicKey;
     }
 
-    public void setMember(final MemberEntity member) {
+    public final void setMember(final MemberEntity member) {
         this.member = member;
     }
 
-    public MemberEntity getMember() {
+    public final MemberEntity getMember() {
         return member;
     }
 
-    public void setChecksum(final String checksum) {
+    public final void setChecksum(final String checksum) {
         this.checksum = checksum;
     }
 
-    public String getChecksum() {
+    public final String getChecksum() {
         return checksum;
     }
 
-    public void setVerifications(final Long verifications) {
+    public final void setVerifications(final Long verifications) {
         this.verifications = verifications;
     }
 
-    public Long getVerifications() {
+    public final Long getVerifications() {
         return verifications;
     }
 
-    public void setExpires(final Date expires) {
+    public final void setExpires(final Date expires) {
         this.expires = copy(expires);
     }
 
-    public Date getExpires() {
+    public final Date getExpires() {
         return copy(expires);
     }
 }

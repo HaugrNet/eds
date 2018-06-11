@@ -25,6 +25,8 @@ import javax.ws.rs.core.Response;
 import java.util.logging.Logger;
 
 /**
+ * <p>REST interface for the Sanity functionality.</p>
+ *
  * @author Kim Jensen
  * @since  CWS 1.0
  */

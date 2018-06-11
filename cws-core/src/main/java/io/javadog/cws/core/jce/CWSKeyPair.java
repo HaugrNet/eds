@@ -12,6 +12,8 @@ import io.javadog.cws.core.enums.KeyAlgorithm;
 import java.security.KeyPair;
 
 /**
+ * <p>The CWS KeyPair consists of a CWS PublicKey &amp; PrivateKey.</p>
+ *
  * @author Kim Jensen
  * @since  CWS 1.0
  */

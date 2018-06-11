@@ -24,6 +24,8 @@ import java.util.Objects;
 import java.util.logging.Logger;
 
 /**
+ * <p>Business Logic implementation for the CWS MasterKey request.</p>
+ *
  * @author Kim Jensen
  * @since  CWS 1.0
  */

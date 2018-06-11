@@ -34,6 +34,9 @@ import java.util.List;
 import java.util.logging.Logger;
 
 /**
+ * <p>Startup Bean for CWS, it is a singleton, which handles loading of the
+ * settings. It also runs the CWS Sanity checks.</p>
+ *
  * @author Kim Jensen
  * @since  CWS 1.0
  */

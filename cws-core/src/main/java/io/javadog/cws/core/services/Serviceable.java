@@ -42,6 +42,8 @@ import java.util.Set;
 import java.util.UUID;
 
 /**
+ * <p>Common Business Logic, used by the Business Logic classes.</p>
+ *
  * @author Kim Jensen
  * @since  CWS 1.0
  */
@@ -101,7 +103,7 @@ public abstract class Serviceable<R extends CwsResponse, V extends Authenticatio
      * @param verifiable Request Object to use for the checks
      * @param action     The Action for the permission check
      */
-    protected void verifyRequest(final V verifiable, final Permission action) {
+    protected final void verifyRequest(final V verifiable, final Permission action) {
         if (settings.isReady()) {
             // If available, let's extract the CircleId so it can be used to improve
             // accuracy of the checks and reduce the amount of data fetched from the
@@ -199,7 +201,7 @@ public abstract class Serviceable<R extends CwsResponse, V extends Authenticatio
         }
     }
 
-    protected MemberEntity createNewAccount(final String accountName, final byte[] credential) {
+    protected final MemberEntity createNewAccount(final String accountName, final byte[] credential) {
         final MemberEntity account = new MemberEntity();
         account.setName(accountName);
         updateMemberPassword(account, credential);
@@ -218,7 +220,7 @@ public abstract class Serviceable<R extends CwsResponse, V extends Authenticatio
      * @param password The new Password
      * @return The new Asymmetric Key
      */
-    protected CWSKeyPair updateMemberPassword(final MemberEntity member, final byte[] password) {
+    protected final CWSKeyPair updateMemberPassword(final MemberEntity member, final byte[] password) {
         final KeyAlgorithm pbeAlgorithm = settings.getPasswordAlgorithm();
         final KeyAlgorithm rsaAlgorithm = settings.getAsymmetricAlgorithm();
         final String salt = UUID.randomUUID().toString();
@@ -287,13 +289,13 @@ public abstract class Serviceable<R extends CwsResponse, V extends Authenticatio
         }
     }
 
-    protected SecretCWSKey extractCircleKey(final DataEntity entity) {
+    protected final SecretCWSKey extractCircleKey(final DataEntity entity) {
         final TrusteeEntity trustee = findTrustee(entity.getMetadata().getCircle().getExternalId());
 
         return crypto.extractCircleKey(entity.getKey().getAlgorithm(), keyPair.getPrivate(), trustee.getCircleKey());
     }
 
-    protected byte[] encryptExternalKey(final SecretCWSKey circleKey, final String externalKey) {
+    protected final byte[] encryptExternalKey(final SecretCWSKey circleKey, final String externalKey) {
         byte[] encryptedKey = null;
 
         if (externalKey != null) {
@@ -304,7 +306,7 @@ public abstract class Serviceable<R extends CwsResponse, V extends Authenticatio
         return encryptedKey;
     }
 
-    protected String decryptExternalKey(final TrusteeEntity trustee) {
+    protected final String decryptExternalKey(final TrusteeEntity trustee) {
         final byte[] encryptedKey = trustee.getCircle().getCircleKey();
         String externalKey = null;
 
@@ -328,7 +330,7 @@ public abstract class Serviceable<R extends CwsResponse, V extends Authenticatio
         return circle;
     }
 
-    protected TrusteeEntity findTrustee(final String externalCircleId) {
+    protected final TrusteeEntity findTrustee(final String externalCircleId) {
         TrusteeEntity found = null;
 
         for (final TrusteeEntity trustee : trustees) {

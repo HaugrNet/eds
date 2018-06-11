@@ -16,6 +16,8 @@ import java.security.Key;
 import java.util.logging.Logger;
 
 /**
+ * <p>Common CWS Key, used for all crypto operations.</p>
+ *
  * @author Kim Jensen
  * @since  CWS 1.0
  */
@@ -24,8 +26,9 @@ public abstract class CWSKey<T extends Key> {
     private static final Logger log = Logger.getLogger(CWSKey.class.getName());
 
     protected boolean destroyed = false;
-    private final KeyAlgorithm algorithm;
     protected final T key;
+
+    private final KeyAlgorithm algorithm;
 
     /**
      * Default Constructor.
@@ -40,15 +43,15 @@ public abstract class CWSKey<T extends Key> {
 
     public abstract T getKey();
 
-    public byte[] getEncoded() {
+    public final byte[] getEncoded() {
         return key.getEncoded();
     }
 
-    public KeyAlgorithm getAlgorithm() {
+    public final KeyAlgorithm getAlgorithm() {
         return algorithm;
     }
 
-    public boolean isDestroyed() {
+    public final boolean isDestroyed() {
         return destroyed;
     }
 
@@ -65,8 +68,8 @@ public abstract class CWSKey<T extends Key> {
      * Java 8, so to avoid large stacktrace in the logs, the code to destroy
      * the keys is revoked and listed as pending..</p>
      */
-    protected void destroyKey() {
-        // From the OpenJDK bugs:
+    protected static void destroyKey() {
+        // From the OpenJDK bugs: (pending feature implementation)
         //  o https://bugs.openjdk.java.net/browse/JDK-6263419
         //     - No way to clean the memory for a java.security.Key
         //     - Bug is closed, but comments are interesting

@@ -8,6 +8,8 @@
 package io.javadog.cws.core.enums;
 
 /**
+ * <p>CWS Sanity Check status.</p>
+ *
  * @author Kim Jensen
  * @since  CWS 1.0
  */

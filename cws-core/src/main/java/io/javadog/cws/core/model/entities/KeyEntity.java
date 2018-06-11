@@ -22,6 +22,8 @@ import javax.persistence.TemporalType;
 import java.util.Date;
 
 /**
+ * <p>CWS Key Entity, maps the Key table from the Database.</p>
+ *
  * @author Kim Jensen
  * @since  CWS 1.0
  */
@@ -48,35 +50,35 @@ public class KeyEntity extends CWSEntity {
     // Entity Setters & Getters
     // =========================================================================
 
-    public void setAlgorithm(final KeyAlgorithm algorithm) {
+    public final void setAlgorithm(final KeyAlgorithm algorithm) {
         this.algorithm = algorithm;
     }
 
-    public KeyAlgorithm getAlgorithm() {
+    public final KeyAlgorithm getAlgorithm() {
         return algorithm;
     }
 
-    public void setStatus(final Status status) {
+    public final void setStatus(final Status status) {
         this.status = status;
     }
 
-    public Status getStatus() {
+    public final Status getStatus() {
         return status;
     }
 
-    public void setExpires(final Date expires) {
+    public final void setExpires(final Date expires) {
         this.expires = copy(expires);
     }
 
-    public Date getExpires() {
+    public final Date getExpires() {
         return copy(expires);
     }
 
-    public void setGracePeriod(final Integer gracePeriod) {
+    public final void setGracePeriod(final Integer gracePeriod) {
         this.gracePeriod = gracePeriod;
     }
 
-    public Integer getGracePeriod() {
+    public final Integer getGracePeriod() {
         return gracePeriod;
     }
 }

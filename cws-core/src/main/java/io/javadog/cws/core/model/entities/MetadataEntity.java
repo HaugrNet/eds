@@ -19,6 +19,8 @@ import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
 /**
+ * <p>CWS Metadata Entity, maps the Metadata table from the Database.</p>
+ *
  * @author Kim Jensen
  * @since  CWS 1.0
  */
@@ -77,11 +79,11 @@ public class MetadataEntity extends Externable {
     private Long parentId = null;
 
     @ManyToOne(targetEntity = CircleEntity.class, fetch = FetchType.EAGER, optional = false)
-    @JoinColumn(name = "circle_id",  referencedColumnName = "id", nullable = false, updatable = false)
+    @JoinColumn(name = "circle_id", referencedColumnName = "id", nullable = false, updatable = false)
     private CircleEntity circle = null;
 
     @ManyToOne(targetEntity = DataTypeEntity.class, fetch = FetchType.EAGER, optional = false)
-    @JoinColumn(name = "datatype_id",  referencedColumnName = "id", nullable = false, updatable = false)
+    @JoinColumn(name = "datatype_id", referencedColumnName = "id", nullable = false, updatable = false)
     private DataTypeEntity type = null;
 
     @Column(name = "name", length = MAX_NAME_LENGTH)
@@ -91,35 +93,35 @@ public class MetadataEntity extends Externable {
     // Entity Setters & Getters
     // =========================================================================
 
-    public void setParentId(final Long parentId) {
+    public final void setParentId(final Long parentId) {
         this.parentId = parentId;
     }
 
-    public Long getParentId() {
+    public final Long getParentId() {
         return parentId;
     }
 
-    public void setCircle(final CircleEntity circle) {
+    public final void setCircle(final CircleEntity circle) {
         this.circle = circle;
     }
 
-    public CircleEntity getCircle() {
+    public final CircleEntity getCircle() {
         return circle;
     }
 
-    public void setType(final DataTypeEntity type) {
+    public final void setType(final DataTypeEntity type) {
         this.type = type;
     }
 
-    public DataTypeEntity getType() {
+    public final DataTypeEntity getType() {
         return type;
     }
 
-    public void setName(final String name) {
+    public final void setName(final String name) {
         this.name = name;
     }
 
-    public String getName() {
+    public final String getName() {
         return name;
     }
 }

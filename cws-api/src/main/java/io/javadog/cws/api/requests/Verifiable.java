@@ -38,6 +38,8 @@ public abstract class Verifiable implements Serializable {
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
+    private static final Pattern ID_PATTERN = Pattern.compile(Constants.ID_PATTERN_REGEX);
+
     /**
      * Simple Validation method, which checks if the required values are usable
      * or not.
@@ -76,11 +78,8 @@ public abstract class Verifiable implements Serializable {
     }
 
     protected static void checkValidId(final Map<String, String> errors, final String field, final String value, final String message) {
-        if (value != null) {
-            final Pattern pattern = Pattern.compile(Constants.ID_PATTERN_REGEX);
-            if (!pattern.matcher(value).matches()) {
-                errors.put(field, message);
-            }
+        if ((value != null) && !ID_PATTERN.matcher(value).matches()) {
+            errors.put(field, message);
         }
     }
 

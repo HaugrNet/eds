@@ -13,6 +13,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
+ * <p>The CWS REST Application, i.e. the listing of all CWS based REST Service
+ * classes, which should be exposed.</p>
+ *
  * @author Kim Jensen
  * @since  CWS 1.0
  */

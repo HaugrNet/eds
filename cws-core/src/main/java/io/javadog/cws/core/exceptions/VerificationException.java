@@ -11,8 +11,8 @@ import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
 
 /**
- * Verification Exception, thrown if the Request Object provided was either null
- * or invalid, meaning that the request cannot be correctly processed.
+ * <p>Verification Exception, thrown if the Request Object provided was either
+ * null or invalid, meaning that the request cannot be correctly processed.</p>
  *
  * @author Kim Jensen
  * @since  CWS 1.0

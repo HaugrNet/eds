@@ -10,6 +10,8 @@ package io.javadog.cws.core.enums;
 import io.javadog.cws.api.common.TrustLevel;
 
 /**
+ * <p>The different types of Permissions, which must be checked against.</p>
+ *
  * @author Kim Jensen
  * @since  CWS 1.0
  */

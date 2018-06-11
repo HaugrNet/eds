@@ -42,6 +42,9 @@ import javax.xml.ws.BindingType;
 import java.util.logging.Logger;
 
 /**
+ * <p>This is the CWS SOAP based WebServices class for the Management
+ * interface.</p>
+ *
  * @author Kim Jensen
  * @since  CWS 1.0
  */

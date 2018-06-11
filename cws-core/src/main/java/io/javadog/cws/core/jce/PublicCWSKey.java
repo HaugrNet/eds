@@ -12,6 +12,9 @@ import io.javadog.cws.core.enums.KeyAlgorithm;
 import java.security.PublicKey;
 
 /**
+ * <p>This is the PublicKey extension of the CWS Key, which is used for
+ * asymmetric encryption and verifying of signatures.</p>
+ *
  * @author Kim Jensen
  * @since  CWS 1.0
  */

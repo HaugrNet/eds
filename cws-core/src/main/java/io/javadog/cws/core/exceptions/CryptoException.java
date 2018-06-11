@@ -11,6 +11,9 @@ import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
 
 /**
+ * <p>Crypto Exception, thrown if an error occurred from invoking the JCE logic
+ * or in the Crypto components.</p>
+ *
  * @author Kim Jensen
  * @since  CWS 1.0
  */

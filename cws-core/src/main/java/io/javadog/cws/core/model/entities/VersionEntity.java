@@ -20,6 +20,8 @@ import javax.persistence.TemporalType;
 import java.util.Date;
 
 /**
+ * <p>CWS Version Entity, maps the Version table from the Database.</p>
+ *
  * @author Kim Jensen
  * @since  CWS 1.0
  */
@@ -30,7 +32,7 @@ import java.util.Date;
                             "order by id desc")
 )
 @Table(name = "cws_versions")
-public final class VersionEntity {
+public class VersionEntity {
 
     @Id
     @Column(name = "id", unique = true, nullable = false, insertable = false, updatable = false)
@@ -53,43 +55,43 @@ public final class VersionEntity {
     // Entity Setters & Getters
     // =========================================================================
 
-    public void setId(final Long id) {
+    public final void setId(final Long id) {
         this.id = id;
     }
 
-    public Long getId() {
+    public final Long getId() {
         return id;
     }
 
-    public void setSchemaVersion(final Integer schemaVersion) {
+    public final void setSchemaVersion(final Integer schemaVersion) {
         this.schemaVersion = schemaVersion;
     }
 
-    public Integer getSchemaVersion() {
+    public final Integer getSchemaVersion() {
         return schemaVersion;
     }
 
-    public void setCwsVersion(final String cwsVersion) {
+    public final void setCwsVersion(final String cwsVersion) {
         this.cwsVersion = cwsVersion;
     }
 
-    public String getCwsVersion() {
+    public final String getCwsVersion() {
         return cwsVersion;
     }
 
-    public void setDbVendor(final String dbVendor) {
+    public final void setDbVendor(final String dbVendor) {
         this.dbVendor = dbVendor;
     }
 
-    public String getDbVendor() {
+    public final String getDbVendor() {
         return dbVendor;
     }
 
-    public void setInstalled(final Date installed) {
+    public final void setInstalled(final Date installed) {
         this.installed = copy(installed);
     }
 
-    public Date getInstalled() {
+    public final Date getInstalled() {
         return copy(installed);
     }
 }

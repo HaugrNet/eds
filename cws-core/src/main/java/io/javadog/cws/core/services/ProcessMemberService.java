@@ -33,6 +33,8 @@ import java.util.Objects;
 import java.util.UUID;
 
 /**
+ * <p>Business Logic implementation for the CWS ProcessMember request.</p>
+ *
  * @author Kim Jensen
  * @since  CWS 1.0
  */

@@ -14,6 +14,8 @@ import io.javadog.cws.core.services.Serviceable;
 import java.util.logging.Logger;
 
 /**
+ * <p>Common functionality for the CWS Beans.</p>
+ *
  * @author Kim Jensen
  * @since  CWS 1.0
  */

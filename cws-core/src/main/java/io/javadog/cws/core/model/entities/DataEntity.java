@@ -28,6 +28,8 @@ import javax.persistence.TemporalType;
 import java.util.Date;
 
 /**
+ * <p>CWS Data Entity, maps the Data table from the Database.</p>
+ *
  * @author Kim Jensen
  * @since  CWS 1.0
  */
@@ -102,59 +104,59 @@ public class DataEntity extends CWSEntity {
     // Entity Setters & Getters
     // =========================================================================
 
-    public void setMetadata(final MetadataEntity object) {
+    public final void setMetadata(final MetadataEntity object) {
         this.metadata = object;
     }
 
-    public MetadataEntity getMetadata() {
+    public final MetadataEntity getMetadata() {
         return metadata;
     }
 
-    public void setKey(final KeyEntity key) {
+    public final void setKey(final KeyEntity key) {
         this.key = key;
     }
 
-    public KeyEntity getKey() {
+    public final KeyEntity getKey() {
         return key;
     }
 
-    public void setData(final byte[] data) {
+    public final void setData(final byte[] data) {
         this.data = copy(data);
     }
 
-    public byte[] getData() {
+    public final byte[] getData() {
         return copy(data);
     }
 
-    public void setInitialVector(final String initialVector) {
+    public final void setInitialVector(final String initialVector) {
         this.initialVector = initialVector;
     }
 
-    public String getInitialVector() {
+    public final String getInitialVector() {
         return initialVector;
     }
 
-    public void setChecksum(final String checksum) {
+    public final void setChecksum(final String checksum) {
         this.checksum = checksum;
     }
 
-    public String getChecksum() {
+    public final String getChecksum() {
         return checksum;
     }
 
-    public void setSanityStatus(final SanityStatus sanityStatus) {
+    public final void setSanityStatus(final SanityStatus sanityStatus) {
         this.sanityStatus = sanityStatus;
     }
 
-    public SanityStatus getSanityStatus() {
+    public final SanityStatus getSanityStatus() {
         return sanityStatus;
     }
 
-    public void setSanityChecked(final Date sanityChecked) {
+    public final void setSanityChecked(final Date sanityChecked) {
         this.sanityChecked = copy(sanityChecked);
     }
 
-    public Date getSanityChecked() {
+    public final Date getSanityChecked() {
         return copy(sanityChecked);
     }
 }

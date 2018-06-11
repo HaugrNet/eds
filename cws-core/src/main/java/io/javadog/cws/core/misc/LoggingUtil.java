@@ -10,6 +10,8 @@ package io.javadog.cws.core.misc;
 import java.util.Locale;
 
 /**
+ * <p>Common Logging util.</p>
+ *
  * @author Kim Jensen
  * @since  CWS 1.0
  */

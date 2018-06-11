@@ -10,6 +10,8 @@ package io.javadog.cws.core.enums;
 import java.util.Objects;
 
 /**
+ * <p>The CWS Standard Settings.</p>
+ *
  * @author Kim Jensen
  * @since  CWS 1.0
  */

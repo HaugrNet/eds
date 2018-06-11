@@ -12,6 +12,9 @@ import io.javadog.cws.core.enums.KeyAlgorithm;
 import java.security.PrivateKey;
 
 /**
+ * <p>This is the PrivateKey extension of the CWS Key, which is used for
+ * asymmetric decryption and signing.</p>
+ *
  * @author Kim Jensen
  * @since  CWS 1.0
  */

@@ -38,7 +38,7 @@ public class CWSException extends RuntimeException {
         this.returnCode = returnCode;
     }
 
-    public ReturnCode getReturnCode() {
+    public final ReturnCode getReturnCode() {
         return returnCode;
     }
 }

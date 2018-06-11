@@ -120,6 +120,7 @@ public final class Circle implements Serializable {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String toString() {
         return "Circle{" +
                 "circleId='" + circleId + '\'' +

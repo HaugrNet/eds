@@ -14,6 +14,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 /**
+ * <p>Common REST utilities, for all REST services.</p>
+ *
  * @author Kim Jensen
  * @since  CWS 1.0
  */

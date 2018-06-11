@@ -38,6 +38,8 @@ import javax.xml.ws.soap.MTOM;
 import java.util.logging.Logger;
 
 /**
+ * <p>This is the CWS SOAP based WebServices class for the Share interface.</p>
+ *
  * @author Kim Jensen
  * @since  CWS 1.0
  */

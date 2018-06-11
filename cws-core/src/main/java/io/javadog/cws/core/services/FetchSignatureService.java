@@ -20,6 +20,8 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
+ * <p>Business Logic implementation for the CWS FetchSignature request.</p>
+ *
  * @author Kim Jensen
  * @since  CWS 1.0
  */

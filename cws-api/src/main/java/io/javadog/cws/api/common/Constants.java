@@ -30,7 +30,7 @@ public final class Constants {
      *
      * {@code private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;}
      */
-    public static final long SERIAL_VERSION_UID = 201806010010000L; // YYYYMMDDvvvnnnn
+    public static final long SERIAL_VERSION_UID = 201806010010000L;
 
     /**
      * <p>All Id's must be compliant with a standard UUID Pattern, which this

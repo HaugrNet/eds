@@ -75,23 +75,23 @@ public class CwsResponse implements Serializable {
     // Standard Setters & Getters
     // =========================================================================
 
-    public void setReturnCode(final ReturnCode returnCode) {
+    public final void setReturnCode(final ReturnCode returnCode) {
         this.returnCode = returnCode.getCode();
     }
 
-    public int getReturnCode() {
+    public final int getReturnCode() {
         return returnCode;
     }
 
-    public void setReturnMessage(final String returnMessage) {
+    public final void setReturnMessage(final String returnMessage) {
         this.returnMessage = returnMessage;
     }
 
-    public String getReturnMessage() {
+    public final String getReturnMessage() {
         return returnMessage;
     }
 
-    public boolean isOk() {
+    public final boolean isOk() {
         return returnCode == ReturnCode.SUCCESS.getCode();
     }
 }

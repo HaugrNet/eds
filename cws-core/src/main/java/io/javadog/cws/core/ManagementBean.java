@@ -46,6 +46,9 @@ import javax.transaction.Transactional;
 import java.util.logging.Logger;
 
 /**
+ * <p>Java EE Bean for the Management functionality and final Error handling
+ * layer. This is also the layer where transactions are controlled.</p>
+ *
  * @author Kim Jensen
  * @since  CWS 1.0
  */

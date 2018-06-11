@@ -12,6 +12,9 @@ import io.javadog.cws.core.enums.KeyAlgorithm;
 import javax.crypto.SecretKey;
 
 /**
+ * <p>This is the SecretKey extension of the CWS Key, which is used for
+ * symmetric encryption / decryption.</p>
+ *
  * @author Kim Jensen
  * @since  CWS 1.0
  */

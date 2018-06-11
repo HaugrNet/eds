@@ -11,6 +11,9 @@ import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
 
 /**
+ * <p>Authentication Exception, thrown if a Member is not permitted to perform
+ * a requested Action.</p>
+ *
  * @author Kim Jensen
  * @since  CWS 1.0
  */

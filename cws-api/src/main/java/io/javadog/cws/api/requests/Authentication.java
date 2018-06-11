@@ -54,27 +54,27 @@ public class Authentication extends Verifiable {
     // Standard Setters & Getters
     // =========================================================================
 
-    public void setAccountName(final String accountName) {
+    public final void setAccountName(final String accountName) {
         this.accountName = accountName;
     }
 
-    public String getAccountName() {
+    public final String getAccountName() {
         return accountName;
     }
 
-    public void setCredential(final byte[] credential) {
+    public final void setCredential(final byte[] credential) {
         this.credential = copy(credential);
     }
 
-    public byte[] getCredential() {
+    public final byte[] getCredential() {
         return copy(credential);
     }
 
-    public void setCredentialType(final CredentialType credentialType) {
+    public final void setCredentialType(final CredentialType credentialType) {
         this.credentialType = credentialType;
     }
 
-    public CredentialType getCredentialType() {
+    public final CredentialType getCredentialType() {
         return credentialType;
     }
 

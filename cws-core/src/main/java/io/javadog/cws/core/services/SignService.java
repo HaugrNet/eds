@@ -18,6 +18,8 @@ import java.util.Arrays;
 import java.util.Base64;
 
 /**
+ * <p>Business Logic implementation for the CWS Sign request.</p>
+ *
  * @author Kim Jensen
  * @since  CWS 1.0
  */

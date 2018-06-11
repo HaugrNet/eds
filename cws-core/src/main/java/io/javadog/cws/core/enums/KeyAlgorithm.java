@@ -83,6 +83,9 @@ public enum KeyAlgorithm {
     RSA4096(Type.ASYMMETRIC, "RSA", Transformation.RSA, 4096, null),
     RSA8192(Type.ASYMMETRIC, "RSA", Transformation.RSA, 8192, null);
 
+    /**
+     * The Algorithm Type, i.e. how it should be used.
+     */
     public enum Type {
         SYMMETRIC,
         ASYMMETRIC,
@@ -90,6 +93,9 @@ public enum KeyAlgorithm {
         PASSWORD
     }
 
+    /**
+     * Transformation Algorithms, i.e. mapping to the internal JCE algorithms.
+     */
     public enum Transformation {
         SIG256("SHA256WithRSA"),
         SIG512("SHA512WithRSA"),

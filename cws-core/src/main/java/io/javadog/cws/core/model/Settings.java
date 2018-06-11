@@ -91,10 +91,6 @@ public final class Settings {
         return properties.getProperty(key);
     }
 
-    public Set<String> keys() {
-        return properties.stringPropertyNames();
-    }
-
     public Map<String, String> get() {
         final Map<String, String> copy = new ConcurrentHashMap<>(16);
 
@@ -103,6 +99,10 @@ public final class Settings {
         }
 
         return copy;
+    }
+
+    public Set<String> keys() {
+        return properties.stringPropertyNames();
     }
 
     public void remove(final String key) {

@@ -27,6 +27,8 @@ import java.util.List;
 import java.util.Objects;
 
 /**
+ * <p>Business Logic implementation for the CWS ProcessTrustee request.</p>
+ *
  * @author Kim Jensen
  * @since  CWS 1.0
  */

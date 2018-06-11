@@ -23,6 +23,8 @@ import java.util.Arrays;
 import java.util.Objects;
 
 /**
+ * <p>Business Logic implementation for the CWS ProcessDataType request.</p>
+ *
  * @author Kim Jensen
  * @since  CWS 1.0
  */

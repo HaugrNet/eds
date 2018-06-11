@@ -36,6 +36,8 @@ import java.util.Set;
 import java.util.UUID;
 
 /**
+ * <p>Common DAO functionality, used through the CWS.</p>
+ *
  * @author Kim Jensen
  * @since  CWS 1.0
  */

@@ -14,6 +14,8 @@ import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
 /**
+ * <p>CWS Setting Entity, maps the Setting table from the Database.</p>
+ *
  * @author Kim Jensen
  * @since  CWS 1.0
  */
@@ -36,19 +38,19 @@ public class SettingEntity extends CWSEntity {
     // Entity Setters & Getters
     // =========================================================================
 
-    public void setName(final String name) {
+    public final void setName(final String name) {
         this.name = name;
     }
 
-    public String getName() {
+    public final String getName() {
         return name;
     }
 
-    public void setSetting(final String setting) {
+    public final void setSetting(final String setting) {
         this.setting = setting;
     }
 
-    public String getSetting() {
+    public final String getSetting() {
         return setting;
     }
 }

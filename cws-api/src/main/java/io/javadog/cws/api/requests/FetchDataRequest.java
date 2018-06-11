@@ -48,11 +48,13 @@ public final class FetchDataRequest extends Authentication implements CircleIdRe
     @XmlElement(name = Constants.FIELD_DATA_ID)
     private String dataId = null;
 
-    @NotNull @Size(min = 1)
+    @NotNull
+    @Size(min = 1)
     @XmlElement(name = Constants.FIELD_PAGE_NUMBER)
     private Integer pageNumber = 1;
 
-    @NotNull @Size(min = 1, max = Constants.MAX_PAGE_SIZE)
+    @NotNull
+    @Size(min = 1, max = Constants.MAX_PAGE_SIZE)
     @XmlElement(name = Constants.FIELD_PAGE_SIZE)
     private Integer pageSize = Constants.MAX_PAGE_SIZE;
 

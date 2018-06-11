@@ -19,6 +19,9 @@ import javax.persistence.TemporalType;
 import java.util.Date;
 
 /**
+ * <p>CWS Entities contain some commonalities, this Class acts as a Super Class
+ * for other Entities.</p>
+ *
  * @author Kim Jensen
  * @since  CWS 1.0
  */
@@ -42,27 +45,27 @@ public class CWSEntity {
     // Entity Setters & Getters
     // =========================================================================
 
-    public void setId(final Long id) {
+    public final void setId(final Long id) {
         this.id = id;
     }
 
-    public Long getId() {
+    public final Long getId() {
         return id;
     }
 
-    public void setAltered(final Date modified) {
+    public final void setAltered(final Date modified) {
         this.altered = copy(modified);
     }
 
-    public Date getAltered() {
+    public final Date getAltered() {
         return copy(altered);
     }
 
-    public void setAdded(final Date created) {
+    public final void setAdded(final Date created) {
         this.added = copy(created);
     }
 
-    public Date getAdded() {
+    public final Date getAdded() {
         return copy(added);
     }
 }

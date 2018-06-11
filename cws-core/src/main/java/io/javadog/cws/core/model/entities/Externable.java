@@ -11,6 +11,10 @@ import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
 
 /**
+ * <p>For Entities, which is externally accessible, i.e. requires an Id to help
+ * identify the Objects will all extend this Class, as it contain the common
+ * Externable Id, which differs from the internal Id.</p>
+ *
  * @author Kim Jensen
  * @since  CWS 1.0
  */
@@ -24,11 +28,11 @@ public class Externable extends CWSEntity {
     // Entity Setters & Getters
     // =========================================================================
 
-    public void setExternalId(final String externalId) {
+    public final void setExternalId(final String externalId) {
         this.externalId = externalId;
     }
 
-    public String getExternalId() {
+    public final String getExternalId() {
         return externalId;
     }
 }

@@ -8,6 +8,7 @@
 package io.javadog.cws.soap;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
@@ -34,7 +35,6 @@ import io.javadog.cws.api.responses.ProcessTrusteeResponse;
 import io.javadog.cws.api.responses.SanityResponse;
 import io.javadog.cws.api.responses.SettingResponse;
 import io.javadog.cws.api.responses.VersionResponse;
-import io.javadog.cws.core.enums.KeyAlgorithm;
 import io.javadog.cws.core.enums.StandardSetting;
 import org.junit.Test;
 
@@ -170,22 +170,24 @@ public final class ManagementServiceTest extends BeanSetup {
 
     @Test
     public void testFlawedMasterKey() {
-        // Testing that the system is correctly throwing an exception if there
-        // is a problem with generating new PBE based symmetric keys. To do
-        // this, we have to set the PBE algorithm to an invalid value, which
-        // will be reverted again at the end of the test.
-        settings.set(StandardSetting.PBE_ALGORITHM.getKey(), KeyAlgorithm.RSA2048.getName());
+        // The MasterKey must be robust, meaning that it should be _really_ hard
+        // to mess with it. So, as settings are controlled and checked before
+        // being set - it is only possible to mess with the MasterKey, by doing
+        // something illegal outside of the normal work flow.
+        //   Hence, the Salt is being set to an illegal value before we start
+        // the test.
+        settings.set(StandardSetting.CWS_SALT.getKey(), "");
         final ManagementService management = prepareManagementService(settings);
         final MasterKeyRequest request = prepareRequest(MasterKeyRequest.class, Constants.ADMIN_ACCOUNT);
         request.setSecret(request.getCredential());
 
         final MasterKeyResponse response = management.masterKey(request);
         assertThat(response.getReturnCode(), is(ReturnCode.CRYPTO_ERROR.getCode()));
-        assertThat(response.getReturnMessage(), is("No enum constant io.javadog.cws.core.enums.KeyAlgorithm.RSA"));
+        assertThat(response.getReturnMessage(), is("the salt parameter must not be empty"));
 
         // Before completing the test, revert the standard setting to the
         // original value, as it will otherwise cause problems for other tests.
-        settings.set(StandardSetting.PBE_ALGORITHM.getKey(), StandardSetting.PBE_ALGORITHM.getValue());
+        settings.set(StandardSetting.CWS_SALT.getKey(), StandardSetting.CWS_SALT.getValue());
     }
 
     @Test
@@ -231,6 +233,23 @@ public final class ManagementServiceTest extends BeanSetup {
 
         final FetchMemberResponse response = management.fetchMembers(request);
         assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+        assertThat(response.getMembers().size(), is(5));
+        assertThat(response.getCircles().size(), is(0));
+        assertThat(response.getMembers().get(0).getAccountName(), is(MEMBER_1));
+        assertThat(response.getMembers().get(0).getMemberId(), is(MEMBER_1_ID));
+        assertThat(response.getMembers().get(0).getPublicKey(), is(nullValue()));
+        assertThat(response.getMembers().get(1).getAccountName(), is(MEMBER_2));
+        assertThat(response.getMembers().get(1).getMemberId(), is(MEMBER_2_ID));
+        assertThat(response.getMembers().get(1).getPublicKey(), is(nullValue()));
+        assertThat(response.getMembers().get(2).getAccountName(), is(MEMBER_3));
+        assertThat(response.getMembers().get(2).getMemberId(), is(MEMBER_3_ID));
+        assertThat(response.getMembers().get(2).getPublicKey(), is(nullValue()));
+        assertThat(response.getMembers().get(3).getAccountName(), is(MEMBER_4));
+        assertThat(response.getMembers().get(3).getMemberId(), is(MEMBER_4_ID));
+        assertThat(response.getMembers().get(3).getPublicKey(), is(nullValue()));
+        assertThat(response.getMembers().get(4).getAccountName(), is(MEMBER_5));
+        assertThat(response.getMembers().get(4).getMemberId(), is(MEMBER_5_ID));
+        assertThat(response.getMembers().get(4).getPublicKey(), is(nullValue()));
     }
 
     @Test

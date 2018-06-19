@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ CWS, Cryptographic WebStore - works as a "PGP for the Cloud".
+  ~ Copyright (C) 2016-2018, JavaDog.io
+  ~ mailto: cws AT JavaDog DOT io
+  ~
+  ~ CWS is free software; you can redistribute it and/or modify it under the
+  ~ terms of the Apache License, as published by the Apache Software Foundation.
+  ~
+  ~ CWS is distributed in the hope that it will be useful, but WITHOUT ANY
+  ~ WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+  ~ FOR A PARTICULAR PURPOSE. See the Apache License for more details.
+  ~
+  ~ You should have received a copy of the Apache License, version 2, along with
+  ~ this program; If not, you can download a copy of the License
+  ~ here: https://www.apache.org/licenses/
+  -->
+<persistence version="2.0" xmlns="http://java.sun.com/xml/ns/persistence"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd">
+
+    <persistence-unit name="cwsDS" transaction-type="JTA">
+        <jta-data-source>datasources/cwsDS</jta-data-source>
+
+        <class>io.javadog.cws.core.model.entities.SettingEntity</class>
+        <class>io.javadog.cws.core.model.entities.MemberEntity</class>
+        <class>io.javadog.cws.core.model.entities.CircleEntity</class>
+        <class>io.javadog.cws.core.model.entities.KeyEntity</class>
+        <class>io.javadog.cws.core.model.entities.TrusteeEntity</class>
+        <class>io.javadog.cws.core.model.entities.DataTypeEntity</class>
+        <class>io.javadog.cws.core.model.entities.MetadataEntity</class>
+        <class>io.javadog.cws.core.model.entities.DataEntity</class>
+        <class>io.javadog.cws.core.model.entities.SignatureEntity</class>
+        <class>io.javadog.cws.core.model.entities.VersionEntity</class>
+
+        <properties>
+            <property name="hibernate.show_sql" value="false"/>
+            <property name="hibernate.format_sql" value="true"/>
+        </properties>
+    </persistence-unit>
+</persistence>

@@ -30,7 +30,8 @@
         <module>cws-core</module>
         <module>cws-rest</module>
         <module>cws-soap</module>
-        <module>cws-war</module>
+        <module>cws-wildfly</module>
+        <module>cws-payara</module>
         <!--<module>cws-client</module>-->
         <!--<module>cws-fitnesse</module>-->
     </modules>

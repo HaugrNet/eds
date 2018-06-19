@@ -28,10 +28,6 @@ import io.javadog.cws.api.responses.ProcessTrusteeResponse;
 import io.javadog.cws.api.responses.SanityResponse;
 import io.javadog.cws.api.responses.SettingResponse;
 import io.javadog.cws.api.responses.VersionResponse;
-import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
-
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 
 /**
  * @author Kim Jensen
@@ -62,12 +58,7 @@ public final class ManagementRestClient extends BaseRestClient implements Manage
      */
     @Override
     public VersionResponse version() {
-        final String url = baseURL + Constants.REST_VERSION;
-        final ResteasyWebTarget target = client.target(url);
-
-        try (final Response response =  target.request().accept(MediaType.APPLICATION_XML_TYPE).get()) {
-            return response.readEntity(VersionResponse.class);
-        }
+        return runRequest(VersionResponse.class, Constants.REST_VERSION, null);
     }
 
     /**

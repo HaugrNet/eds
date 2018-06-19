@@ -32,14 +32,14 @@ import javax.persistence.Table;
                 query = "select t " +
                         "from TrusteeEntity t " +
                         "where t.member = :member" +
-                        "  and t.trustLevel in (:permissions) " +
+                        "  and t.trustLevel in :permissions " +
                         "order by t.id asc"),
         @NamedQuery(name = "trust.findByMemberAndExternalCircleId",
                 query = "select t " +
                         "from TrusteeEntity t " +
                         "where t.member = :member" +
                         "  and t.circle.externalId = :externalCircleId " +
-                        "  and t.trustLevel in (:permissions) " +
+                        "  and t.trustLevel in :permissions " +
                         "order by t.member.name asc"),
         @NamedQuery(name = "trustee.findByCircleAndMember",
                 query = "select t " +

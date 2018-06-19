@@ -16,7 +16,6 @@ import io.javadog.cws.core.misc.LoggingUtil;
 import io.javadog.cws.core.model.Settings;
 
 import javax.inject.Inject;
-import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -37,7 +36,6 @@ public class VersionService {
     private final Settings settings = Settings.getInstance();
     @Inject private ManagementBean bean;
 
-    @GET
     @POST
     @Produces(RestUtils.PRODUCES)
     public Response version() {

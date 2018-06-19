@@ -27,7 +27,7 @@ import javax.persistence.Table;
 @NamedQueries(
         @NamedQuery(name = "circle.findByName",
                     query = "select c from CircleEntity c " +
-                            "where lower(c.name) = lower(:name)")
+                            "where c.name = :name")
 )
 public class CircleEntity extends Externable {
 

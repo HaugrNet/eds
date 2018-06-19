@@ -33,7 +33,7 @@ import javax.persistence.Table;
         @NamedQuery(name = "member.findByName",
                 query = "select m " +
                         "from MemberEntity m " +
-                        "where lower(m.name) = lower(:name)"),
+                        "where m.name = :name"),
         @NamedQuery(name = "member.findByNameAndCircle",
                 query = "select e.member " +
                         "from TrusteeEntity e " +

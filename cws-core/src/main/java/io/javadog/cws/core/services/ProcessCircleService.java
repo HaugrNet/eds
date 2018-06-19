@@ -96,7 +96,7 @@ public final class ProcessCircleService extends Serviceable<ProcessCircleRespons
     private ProcessCircleResponse createCircle(final ProcessCircleRequest request) {
         final ProcessCircleResponse response;
 
-        final String name = request.getCircleName().trim();
+        final String name = trim(request.getCircleName());
         final CircleEntity existing = dao.findCircleByName(name);
         if (existing != null) {
             response = new ProcessCircleResponse(ReturnCode.IDENTIFICATION_WARNING, "A Circle with the requested name already exists.");

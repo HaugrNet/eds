@@ -185,7 +185,7 @@ public abstract class Serviceable<R extends CwsResponse, V extends Authenticatio
         // If the External Circle Id is given and the member is not the
         // Administrator (who cannot be part of a Circle), we will use
         // the CircleId in the checks.
-        final String account = verifiable.getAccountName().trim();
+        final String account = trim(verifiable.getAccountName());
         if ((circleId != null) && !Objects.equals(account, ADMIN_ACCOUNT)) {
             member = dao.findMemberByNameAndCircleId(account, circleId);
         } else {

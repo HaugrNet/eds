@@ -271,12 +271,4 @@ public final class SettingService extends Serviceable<SettingResponse, SettingRe
 
         return map;
     }
-
-    private static String trim(final String value) {
-        return (value != null) ? value.trim() : "";
-    }
-
-    private static boolean isEmpty(final String value) {
-        return (value == null) || value.isEmpty();
-    }
 }

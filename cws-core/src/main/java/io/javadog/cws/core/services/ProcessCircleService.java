@@ -96,7 +96,7 @@ public final class ProcessCircleService extends Serviceable<ProcessCircleRespons
     private ProcessCircleResponse createCircle(final ProcessCircleRequest request) {
         final ProcessCircleResponse response;
 
-        final String name = request.getCircleName();
+        final String name = request.getCircleName().trim();
         final CircleEntity existing = dao.findCircleByName(name);
         if (existing != null) {
             response = new ProcessCircleResponse(ReturnCode.IDENTIFICATION_WARNING, "A Circle with the requested name already exists.");
@@ -194,7 +194,7 @@ public final class ProcessCircleService extends Serviceable<ProcessCircleRespons
 
         if (entity != null) {
             entity.setCircleKey(updateExternalCircleKey(request.getCircleKey()));
-            response = checkAndUpdateCircleName(entity, request.getCircleName());
+            response = checkAndUpdateCircleName(entity, trim(request.getCircleName()));
 
             dao.persist(entity);
         } else {
@@ -219,7 +219,7 @@ public final class ProcessCircleService extends Serviceable<ProcessCircleRespons
     private ProcessCircleResponse checkAndUpdateCircleName(final CircleEntity entity, final String name) {
         ProcessCircleResponse response = new ProcessCircleResponse();
 
-        if ((name != null) && !Objects.equals(entity.getName(), name)) {
+        if (!isEmpty(name) && !Objects.equals(entity.getName(), name)) {
             final CircleEntity existing = dao.findCircleByName(name);
             if (existing == null) {
                 entity.setName(name);

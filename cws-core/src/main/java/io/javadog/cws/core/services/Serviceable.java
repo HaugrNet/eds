@@ -357,4 +357,12 @@ public abstract class Serviceable<R extends CwsResponse, V extends Authenticatio
 
         return found;
     }
+
+    protected static String trim(final String value) {
+        return (value != null) ? value.trim() : "";
+    }
+
+    protected static boolean isEmpty(final String value) {
+        return (value == null) || value.isEmpty();
+    }
 }

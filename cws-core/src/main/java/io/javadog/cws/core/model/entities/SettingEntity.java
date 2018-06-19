@@ -23,7 +23,7 @@ import javax.persistence.Table;
 @NamedQueries(
         @NamedQuery(name = "setting.readAll",
                     query = "select s from SettingEntity s " +
-                            "order by name asc")
+                            "order by s.name asc")
 )
 @Table(name = "cws_settings")
 public class SettingEntity extends CWSEntity {
@@ -38,19 +38,19 @@ public class SettingEntity extends CWSEntity {
     // Entity Setters & Getters
     // =========================================================================
 
-    public final void setName(final String name) {
+    public void setName(final String name) {
         this.name = name;
     }
 
-    public final String getName() {
+    public String getName() {
         return name;
     }
 
-    public final void setSetting(final String setting) {
+    public void setSetting(final String setting) {
         this.setting = setting;
     }
 
-    public final String getSetting() {
+    public String getSetting() {
         return setting;
     }
 }

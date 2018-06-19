@@ -93,35 +93,35 @@ public class MetadataEntity extends Externable {
     // Entity Setters & Getters
     // =========================================================================
 
-    public final void setParentId(final Long parentId) {
+    public void setParentId(final Long parentId) {
         this.parentId = parentId;
     }
 
-    public final Long getParentId() {
+    public Long getParentId() {
         return parentId;
     }
 
-    public final void setCircle(final CircleEntity circle) {
+    public void setCircle(final CircleEntity circle) {
         this.circle = circle;
     }
 
-    public final CircleEntity getCircle() {
+    public CircleEntity getCircle() {
         return circle;
     }
 
-    public final void setType(final DataTypeEntity type) {
+    public void setType(final DataTypeEntity type) {
         this.type = type;
     }
 
-    public final DataTypeEntity getType() {
+    public DataTypeEntity getType() {
         return type;
     }
 
-    public final void setName(final String name) {
+    public void setName(final String name) {
         this.name = name;
     }
 
-    public final String getName() {
+    public String getName() {
         return name;
     }
 }

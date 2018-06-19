@@ -50,35 +50,35 @@ public class KeyEntity extends CWSEntity {
     // Entity Setters & Getters
     // =========================================================================
 
-    public final void setAlgorithm(final KeyAlgorithm algorithm) {
+    public void setAlgorithm(final KeyAlgorithm algorithm) {
         this.algorithm = algorithm;
     }
 
-    public final KeyAlgorithm getAlgorithm() {
+    public KeyAlgorithm getAlgorithm() {
         return algorithm;
     }
 
-    public final void setStatus(final Status status) {
+    public void setStatus(final Status status) {
         this.status = status;
     }
 
-    public final Status getStatus() {
+    public Status getStatus() {
         return status;
     }
 
-    public final void setExpires(final Date expires) {
+    public void setExpires(final Date expires) {
         this.expires = copy(expires);
     }
 
-    public final Date getExpires() {
+    public Date getExpires() {
         return copy(expires);
     }
 
-    public final void setGracePeriod(final Integer gracePeriod) {
+    public void setGracePeriod(final Integer gracePeriod) {
         this.gracePeriod = gracePeriod;
     }
 
-    public final Integer getGracePeriod() {
+    public Integer getGracePeriod() {
         return gracePeriod;
     }
 }

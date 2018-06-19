@@ -95,43 +95,43 @@ public class TrusteeEntity extends CWSEntity {
     // Entity Setters & Getters
     // =========================================================================
 
-    public final void setMember(final MemberEntity member) {
+    public void setMember(final MemberEntity member) {
         this.member = member;
     }
 
-    public final MemberEntity getMember() {
+    public MemberEntity getMember() {
         return member;
     }
 
-    public final void setCircle(final CircleEntity circle) {
+    public void setCircle(final CircleEntity circle) {
         this.circle = circle;
     }
 
-    public final CircleEntity getCircle() {
+    public CircleEntity getCircle() {
         return circle;
     }
 
-    public final void setTrustLevel(final TrustLevel trustLevel) {
+    public void setTrustLevel(final TrustLevel trustLevel) {
         this.trustLevel = trustLevel;
     }
 
-    public final TrustLevel getTrustLevel() {
+    public TrustLevel getTrustLevel() {
         return trustLevel;
     }
 
-    public final void setKey(final KeyEntity key) {
+    public void setKey(final KeyEntity key) {
         this.key = key;
     }
 
-    public final KeyEntity getKey() {
+    public KeyEntity getKey() {
         return key;
     }
 
-    public final void setCircleKey(final String armoredKey) {
+    public void setCircleKey(final String armoredKey) {
         this.circleKey = armoredKey;
     }
 
-    public final String getCircleKey() {
+    public String getCircleKey() {
         return circleKey;
     }
 }

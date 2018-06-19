@@ -28,11 +28,11 @@ public class Externable extends CWSEntity {
     // Entity Setters & Getters
     // =========================================================================
 
-    public final void setExternalId(final String externalId) {
+    public void setExternalId(final String externalId) {
         this.externalId = externalId;
     }
 
-    public final String getExternalId() {
+    public String getExternalId() {
         return externalId;
     }
 }

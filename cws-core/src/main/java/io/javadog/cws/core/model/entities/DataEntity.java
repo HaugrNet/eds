@@ -104,59 +104,59 @@ public class DataEntity extends CWSEntity {
     // Entity Setters & Getters
     // =========================================================================
 
-    public final void setMetadata(final MetadataEntity object) {
+    public void setMetadata(final MetadataEntity object) {
         this.metadata = object;
     }
 
-    public final MetadataEntity getMetadata() {
+    public MetadataEntity getMetadata() {
         return metadata;
     }
 
-    public final void setKey(final KeyEntity key) {
+    public void setKey(final KeyEntity key) {
         this.key = key;
     }
 
-    public final KeyEntity getKey() {
+    public KeyEntity getKey() {
         return key;
     }
 
-    public final void setData(final byte[] data) {
+    public void setData(final byte[] data) {
         this.data = copy(data);
     }
 
-    public final byte[] getData() {
+    public byte[] getData() {
         return copy(data);
     }
 
-    public final void setInitialVector(final String initialVector) {
+    public void setInitialVector(final String initialVector) {
         this.initialVector = initialVector;
     }
 
-    public final String getInitialVector() {
+    public String getInitialVector() {
         return initialVector;
     }
 
-    public final void setChecksum(final String checksum) {
+    public void setChecksum(final String checksum) {
         this.checksum = checksum;
     }
 
-    public final String getChecksum() {
+    public String getChecksum() {
         return checksum;
     }
 
-    public final void setSanityStatus(final SanityStatus sanityStatus) {
+    public void setSanityStatus(final SanityStatus sanityStatus) {
         this.sanityStatus = sanityStatus;
     }
 
-    public final SanityStatus getSanityStatus() {
+    public SanityStatus getSanityStatus() {
         return sanityStatus;
     }
 
-    public final void setSanityChecked(final Date sanityChecked) {
+    public void setSanityChecked(final Date sanityChecked) {
         this.sanityChecked = copy(sanityChecked);
     }
 
-    public final Date getSanityChecked() {
+    public Date getSanityChecked() {
         return copy(sanityChecked);
     }
 }

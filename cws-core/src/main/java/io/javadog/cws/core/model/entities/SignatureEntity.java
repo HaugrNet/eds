@@ -64,43 +64,43 @@ public class SignatureEntity extends CWSEntity {
     // Entity Setters & Getters
     // =========================================================================
 
-    public final void setPublicKey(final String publicKey) {
+    public void setPublicKey(final String publicKey) {
         this.publicKey = publicKey;
     }
 
-    public final String getPublicKey() {
+    public String getPublicKey() {
         return publicKey;
     }
 
-    public final void setMember(final MemberEntity member) {
+    public void setMember(final MemberEntity member) {
         this.member = member;
     }
 
-    public final MemberEntity getMember() {
+    public MemberEntity getMember() {
         return member;
     }
 
-    public final void setChecksum(final String checksum) {
+    public void setChecksum(final String checksum) {
         this.checksum = checksum;
     }
 
-    public final String getChecksum() {
+    public String getChecksum() {
         return checksum;
     }
 
-    public final void setVerifications(final Long verifications) {
+    public void setVerifications(final Long verifications) {
         this.verifications = verifications;
     }
 
-    public final Long getVerifications() {
+    public Long getVerifications() {
         return verifications;
     }
 
-    public final void setExpires(final Date expires) {
+    public void setExpires(final Date expires) {
         this.expires = copy(expires);
     }
 
-    public final Date getExpires() {
+    public Date getExpires() {
         return copy(expires);
     }
 }

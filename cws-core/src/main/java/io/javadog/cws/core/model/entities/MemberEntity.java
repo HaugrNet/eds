@@ -33,7 +33,7 @@ import javax.persistence.Table;
         @NamedQuery(name = "member.findByName",
                 query = "select m " +
                         "from MemberEntity m " +
-                        "where lower(name) = lower(:name)"),
+                        "where lower(m.name) = lower(:name)"),
         @NamedQuery(name = "member.findByNameAndCircle",
                 query = "select e.member " +
                         "from TrusteeEntity e " +
@@ -70,59 +70,59 @@ public class MemberEntity extends Externable {
     // Entity Setters & Getters
     // =========================================================================
 
-    public final void setName(final String identifier) {
+    public void setName(final String identifier) {
         this.name = identifier;
     }
 
-    public final String getName() {
+    public String getName() {
         return name;
     }
 
-    public final void setSalt(final String salt) {
+    public void setSalt(final String salt) {
         this.salt = salt;
     }
 
-    public final String getSalt() {
+    public String getSalt() {
         return salt;
     }
 
-    public final void setPbeAlgorithm(final KeyAlgorithm pbeAlgorithm) {
+    public void setPbeAlgorithm(final KeyAlgorithm pbeAlgorithm) {
         this.pbeAlgorithm = pbeAlgorithm;
     }
 
-    public final KeyAlgorithm getPbeAlgorithm() {
+    public KeyAlgorithm getPbeAlgorithm() {
         return pbeAlgorithm;
     }
 
-    public final void setRsaAlgorithm(final KeyAlgorithm algorithm) {
+    public void setRsaAlgorithm(final KeyAlgorithm algorithm) {
         this.rsaAlgorithm = algorithm;
     }
 
-    public final KeyAlgorithm getRsaAlgorithm() {
+    public KeyAlgorithm getRsaAlgorithm() {
         return rsaAlgorithm;
     }
 
-    public final void setMemberKey(final String memberKey) {
+    public void setMemberKey(final String memberKey) {
         this.memberKey = memberKey;
     }
 
-    public final String getMemberKey() {
+    public String getMemberKey() {
         return memberKey;
     }
 
-    public final void setPublicKey(final String armoredPublicKey) {
+    public void setPublicKey(final String armoredPublicKey) {
         this.publicKey = armoredPublicKey;
     }
 
-    public final String getPublicKey() {
+    public String getPublicKey() {
         return publicKey;
     }
 
-    public final void setPrivateKey(final String armoredEncryptedPrivateKey) {
+    public void setPrivateKey(final String armoredEncryptedPrivateKey) {
         this.privateKey = armoredEncryptedPrivateKey;
     }
 
-    public final String getPrivateKey() {
+    public String getPrivateKey() {
         return privateKey;
     }
 }

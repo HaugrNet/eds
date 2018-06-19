@@ -48,19 +48,19 @@ public class DataTypeEntity extends CWSEntity {
     // Entity Setters & Getters
     // =========================================================================
 
-    public final void setName(final String name) {
+    public void setName(final String name) {
         this.name = name;
     }
 
-    public final String getName() {
+    public String getName() {
         return name;
     }
 
-    public final void setType(final String type) {
+    public void setType(final String type) {
         this.type = type;
     }
 
-    public final String getType() {
+    public String getType() {
         return type;
     }
 }

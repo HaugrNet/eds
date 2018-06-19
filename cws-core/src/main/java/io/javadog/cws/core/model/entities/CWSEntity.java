@@ -45,27 +45,27 @@ public class CWSEntity {
     // Entity Setters & Getters
     // =========================================================================
 
-    public final void setId(final Long id) {
+    public void setId(final Long id) {
         this.id = id;
     }
 
-    public final Long getId() {
+    public Long getId() {
         return id;
     }
 
-    public final void setAltered(final Date modified) {
+    public void setAltered(final Date modified) {
         this.altered = copy(modified);
     }
 
-    public final Date getAltered() {
+    public Date getAltered() {
         return copy(altered);
     }
 
-    public final void setAdded(final Date created) {
+    public void setAdded(final Date created) {
         this.added = copy(created);
     }
 
-    public final Date getAdded() {
+    public Date getAdded() {
         return copy(added);
     }
 }

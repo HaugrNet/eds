@@ -29,69 +29,69 @@ import java.util.Date;
 @NamedQueries(
         @NamedQuery(name = "version.findAll",
                     query = "select v from VersionEntity v " +
-                            "order by id desc")
+                            "order by v.id desc")
 )
 @Table(name = "cws_versions")
 public class VersionEntity {
 
     @Id
-    @Column(name = "id", unique = true, nullable = false, insertable = false, updatable = false)
-    private Long id;
+    @Column(name = "id", unique = true, nullable = false, updatable = false)
+    private Long id = null;
 
-    @Column(name = "schema_version", insertable = false, updatable = false)
-    private Integer schemaVersion;
+    @Column(name = "schema_version", updatable = false)
+    private Integer schemaVersion = null;
 
-    @Column(name = "cws_version", unique = true, nullable = false, insertable = false, updatable = false, length = 10)
-    private String cwsVersion;
+    @Column(name = "cws_version", unique = true, nullable = false, updatable = false, length = 10)
+    private String cwsVersion = null;
 
-    @Column(name = "db_vendor", nullable = false, insertable = false, updatable = false, length = 25)
-    private String dbVendor;
+    @Column(name = "db_vendor", nullable = false, updatable = false, length = 25)
+    private String dbVendor = null;
 
     @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "installed", nullable = false, insertable = false, updatable = false)
-    private Date installed;
+    @Column(name = "installed", nullable = false, updatable = false)
+    private Date installed = null;
 
     // =========================================================================
     // Entity Setters & Getters
     // =========================================================================
 
-    public final void setId(final Long id) {
+    public void setId(final Long id) {
         this.id = id;
     }
 
-    public final Long getId() {
+    public Long getId() {
         return id;
     }
 
-    public final void setSchemaVersion(final Integer schemaVersion) {
+    public void setSchemaVersion(final Integer schemaVersion) {
         this.schemaVersion = schemaVersion;
     }
 
-    public final Integer getSchemaVersion() {
+    public Integer getSchemaVersion() {
         return schemaVersion;
     }
 
-    public final void setCwsVersion(final String cwsVersion) {
+    public void setCwsVersion(final String cwsVersion) {
         this.cwsVersion = cwsVersion;
     }
 
-    public final String getCwsVersion() {
+    public String getCwsVersion() {
         return cwsVersion;
     }
 
-    public final void setDbVendor(final String dbVendor) {
+    public void setDbVendor(final String dbVendor) {
         this.dbVendor = dbVendor;
     }
 
-    public final String getDbVendor() {
+    public String getDbVendor() {
         return dbVendor;
     }
 
-    public final void setInstalled(final Date installed) {
+    public void setInstalled(final Date installed) {
         this.installed = copy(installed);
     }
 
-    public final Date getInstalled() {
+    public Date getInstalled() {
         return copy(installed);
     }
 }

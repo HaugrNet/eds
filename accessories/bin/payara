@@ -1,24 +1,21 @@
 #!/bin/bash
 # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-# WildFly Control Script
+# Payara Control Script
 # -----------------------------------------------------------------------------
 # History:
-#   Version 1.02 - 2018-06-21, Kim Jensen <kim@dawn.dk>
-#     o Added a config method to configure a new WildFly instance
-#   Version 1.01 - 2018-06-04, Kim Jensen <kim@dawn.dk>
-#     o Added new Java home for Wildfly
-#   Version 1.00 - 2017-10-16, Kim Jensen <kim@dawn.dk>
+#   Version 1.00 - 2018-06-20, Kim Jensen <kim@dawn.dk>
 #     o Initial version
 # -----------------------------------------------------------------------------
 # Methods:
 #     o show_help     ( Void )  ::  Shows help on using the script
 #     o doLock        ( Void )  ::  Creates a lock file
-#     o getProcesses  ( Void )  ::  Retrieves WildFly process count
-#     o doStart       ( Void )  ::  Attempts to start WildFly
-#     o doStop        ( Void )  ::  Attempts to stop WildFly
-#     o doDeploy      ( Void )  ::  Attempts to deploy into WildFly
-#     o doUndeploy    ( Void )  ::  Attempts to undeploy from WildFly
-#     o doStatus      ( Void )  ::  Retrieves the WildFly status
+#     o getProcesses  ( Void )  ::  Retrieves Payara process count
+#     o doConfigure   ( Void )  ::  Attempts to configure Payara
+#     o doStart       ( Void )  ::  Attempts to start Payara
+#     o doStop        ( Void )  ::  Attempts to stop Payara
+#     o doDeploy      ( Void )  ::  Attempts to deploy into Payara
+#     o doUndeploy    ( Void )  ::  Attempts to undeploy from Payara
+#     o doStatus      ( Void )  ::  Retrieves the Payara status
 #     o doLog         ( Void )  ::  Tails the server log
 #     o doClean       ( Void )  ::  Cleans existing test results
 # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -28,28 +25,35 @@
 # Configuration settings, please only modify this section
 # -----------------------------------------------------------------------------
 readonly source="${HOME}/JavaDog.io/github/cws"
-readonly debugPort=8787
+readonly appDirectory="/opt/java/payara"
+readonly domain="domain1"
+readonly dbUser="cws_user"
+readonly dbPassword="cws"
+readonly dbHost="localhost"
+readonly dbName="cws"
 
-# Java & JBoss (WildFly) settings
+# Java & JBoss (Payara) settings
 export JAVA_HOME="/opt/java/jre"
 export JAVA_OPTS="${JAVA_OPTS} -Xms1303m -Xmx1303m -Djava.net.preferIPv4Stack=true"
-export JBOSS_HOME="/opt/java/wildfly"
-export JBOSS_PIDFILE="${source}/cws.pid"
-export JBOSS_CONFIG="standalone-cws.xml"
-export JBOSS_SCRIPT="${JBOSS_HOME}/bin/standalone.sh --server-config=${JBOSS_CONFIG} -Djboss.node.name=cws"
+export GLASSFISH_HOME="${appDirectory}"
 export LAUNCH_JBOSS_IN_BACKGROUND=1
-export PATH="${JAVA_HOME}/bin:${JBOSS_HOME}/bin:${PATH}"
+export PATH="${JAVA_HOME}/bin:${GLASSFISH_HOME}/bin:${PATH}"
 
-readonly configs="${source}/accessories/release"
-readonly rawStandalone="${configs}/standalone-wildfly13.xml"
-readonly cmdStart="${JBOSS_SCRIPT} --debug ${debugPort}"
+readonly cmd="${GLASSFISH_HOME}/bin/asadmin"
+readonly cmdAddPG="${cmd} add-library ${source}/accessories/release/postgresql-43.2.2.jar"
+readonly cmdPool="${cmd} create-jdbc-connection-pool --datasourceclassname org.postgresql.xa.PGXADataSource --restype javax.sql.XADataSource --property "User=${dbUser}:Password=${dbPassword}:URL=jdbc\:postgresql\://${dbHost}/${dbName}" cwsPool"
+readonly cmdDS="${cmd} create-jdbc-resource --connectionpoolid cwsPool datasources/cwsDS"
+readonly cmdStart="${cmd} start-domain ${domain}"
+readonly cmdStop="${cmd} stop-domain ${domain}"
+readonly cmdDeploy="${cmd} deploy ${source}/cws-payara/target/cws.war"
+readonly cmdUndeploy="${cmd} undeploy cws.war"
 
 # Lock file settings for flock. Please don't change this!
 readonly scriptLockFD="200"
 readonly scriptLock="/tmp/.`basename $0`.lock"
 
 # Script specific information, should only be altered, if logic is updated
-readonly scriptVersion="1.02"
+readonly scriptVersion="1.00"
 readonly scriptAuthor="Kim Jensen"
 # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
@@ -61,46 +65,39 @@ readonly scriptAuthor="Kim Jensen"
 # Return -> Void
 # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 show_help () {
-    echo "WildFly Control script, Version ${scriptVersion} by ${scriptAuthor}"
+    echo "Payara Control script, Version ${scriptVersion} by ${scriptAuthor}"
     echo "Usage: `basename $0` [Action]"
     echo
     echo "  The Action must be one of the following:"
-    echo "    start     Attempts to start a CWS WildFly instance"
-    echo "    stop      Attempts to stop the running CWS WildFly instance"
-    echo "    deploy    Deploy the latest CWS snapshot to WildFly"
+    echo "    configure Attempts to configure a CWS Payara instance"
+    echo "    start     Attempts to start a CWS Payara instance"
+    echo "    stop      Attempts to stop the running CWS Payara instance"
+    echo "    deploy    Deploy the latest CWS snapshot to Payara"
     echo "    undeploy  Undeploy the currently deployed CWS snapshot"
-    echo "    status    Retrieves the status of the CWS WildFly instance"
+    echo "    status    Retrieves the status of the CWS Payara instance"
     echo "    log       Tail on the Server Log"
-    echo "    clean     Cleanup of WildFly, removing all deployments & log files"
+    echo "    clean     Cleanup of Payara, removing all deployments & log files"
     echo
 }
 
 
 # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-# getProcesses - Returns the number of processes associated with WildFly
+# getProcesses - Returns the number of processes associated with Payara
 # -----------------------------------------------------------------------------
 # Param  -> Void
-# Return -> 1 if WildFly is running, 0 if not
+# Return -> 1 if Payara is running, 0 if not
 # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 getProcesses () {
     currentProcesses=0
 
-    if [ -f ${JBOSS_PIDFILE} ]; then
-        read ppid < ${JBOSS_PIDFILE}
-        processes=`ps --pid ${ppid} 2>/dev/null | grep -c ${ppid} 2>/dev/null`
-        if [ "${processes}" -eq "1" ]; then
-            currentProcesses=1
-        else
-            rm -f ${JBOSS_PIDFILE}
-        fi
-    fi
+    echo "ToDo"
 
     return ${currentProcesses}
 }
 
 
 # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-# doConfigure - Attempts to configure WildFly
+# doConfigure - Attempts to configure Payara
 # -----------------------------------------------------------------------------
 # Param  -> Void
 # Return -> Void
@@ -108,24 +105,22 @@ getProcesses () {
 doConfigure () {
     getProcesses
 
-    if [ $? -ne 0 ]; then
-        echo "Configuring WildFly for CWS"
-        mkdir -p "${JBOSS_HOME}/modules/org/postgresql/main"
-        cp "${configs}/module.xml" "${JBOSS_HOME}/modules/org/postgresql/main"
-        cp "${configs}/postgresql-42.2.2.jar" "${JBOSS_HOME}/modules/org/postgresql/main"
-        cp "${rawStandalone}" "${JBOSS_HOME}/standalone/configuration/${JBOSS_CONFIG}"
-        # Theoretically the following two lines should do the trick with configuring WildFly at runtime, but it causes problems.
-        #${JBOSS_HOME}/bin/jboss-cli.sh --connect --command="/subsystem=datasources/jdbc-driver=postgresql:add(driver-name=postgresql,driver-module-name=org.postgresql,driver-xa-datasource-class-name=org.postgresql.xa.PGXADataSource)" 2>/dev/null
-        #${JBOSS_HOME}/bin/jboss-cli.sh --connect --command="data-source add --name=cwsDS --driver-name=postgresql --jndi-name=java:/datasources/cwsDS --connection-url=jdbc:postgresql://localhost:5432/cws --user-name=cws_user --password=cws --use-ccm=false --max-pool-size=25 --blocking-timeout-wait-millis=5000 --enabled=true" 2>/dev/null
-        echo "WildFly has been configured"
+    if [ $? -eq 0 ]; then
+        echo "Starting Payara ..."
+        ${cmdStart} 2>&1 &
+        echo "Payara has been started, now configuring it for CWS"
+        ${cmdAddPG}
+        ${cmdPool}
+        ${cmdDS}
+        echo "Payara has been configured"
     else
-        echo "WildFly cannot be configured when already running"
+        echo "Payara cannot be configured when already running"
     fi
 }
 
 
 # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-# doStart - Attempts to start WildFly
+# doStart - Attempts to start Payara
 # -----------------------------------------------------------------------------
 # Param  -> Void
 # Return -> Void
@@ -134,17 +129,17 @@ doStart () {
     getProcesses
 
     if [ $? -eq 0 ]; then
-        echo "Starting WildFly ..."
+        echo "Starting Payara ..."
         ${cmdStart} 2>&1 &
-        echo "WildFly has been started"
+        echo "Payara has been started"
     else
-        echo "WildFly is already running"
+        echo "Payara is already running"
     fi
 }
 
 
 # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-# doStop - Attempts to stop WildFly
+# doStop - Attempts to stop Payara
 # -----------------------------------------------------------------------------
 # Param  -> Void
 # Return -> Void
@@ -153,18 +148,17 @@ doStop () {
     getProcesses
 
     if [ $? -eq 0 ]; then
-        echo "WildFly is not running"
+        echo "Payara is not running"
     else
-        echo "Stopping WildFly ..."
-        read ppid < ${JBOSS_PIDFILE}
-        kill -15 ${ppid}
-        echo "WildFly has been stopped"
+        echo "Stopping Payara ..."
+        ${cmdStop}
+        echo "Payara has been stopped"
     fi
 }
 
 
 # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-# doDeploy - Attempts to deploy the latest snapshot to WildFly
+# doDeploy - Attempts to deploy the latest snapshot to Payara
 # -----------------------------------------------------------------------------
 # Param  -> Void
 # Return -> Void
@@ -173,16 +167,16 @@ doDeploy () {
     getProcesses
 
     if [ $? -eq 0 ]; then
-        echo "WildFly is not running"
+        echo "Payara is not running"
     else
-        echo "Deploying the latest Snapshot to WildFly"
-        ${JBOSS_HOME}/bin/jboss-cli.sh --connect --controller=localhost:9990 --command="deploy ${source}/cws-wildfly/target/cws.war --force"
+        echo "Deploying the latest Snapshot to Payara"
+        ${cmdDeploy}
     fi
 }
 
 
 # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-# doUndeploy - Undeploy's current deployed snapshot from WildFly
+# doUndeploy - Undeploy's current deployed snapshot from Payara
 # -----------------------------------------------------------------------------
 # Param  -> Void
 # Return -> Void
@@ -191,16 +185,16 @@ doUndeploy () {
     getProcesses
 
     if [ $? -eq 0 ]; then
-        echo "WildFly is not running"
+        echo "Payara is not running"
     else
-        echo "Undeploying current deployed snapshot from WildFly"
-        ${JBOSS_HOME}/bin/jboss-cli.sh --connect --controller=localhost:9990 --command="undeploy cws.war"
+        echo "Undeploying current deployed snapshot from Payara"
+        ${cmdUndeploy}
     fi
 }
 
 
 # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-# doStatus - Retrieves the WildFly Status
+# doStatus - Retrieves the Payara Status
 # -----------------------------------------------------------------------------
 # Param  -> Void
 # Return -> Void
@@ -209,21 +203,21 @@ doStatus () {
     getProcesses
 
     if [ $? -eq 0 ]; then
-        echo "WildFly is not running"
+        echo "Payara is not running"
     else
-        echo "WildFly is currently running"
+        echo "Payara is currently running"
     fi
 }
 
 
 # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-# doLog - Tail on the WildFly Server log
+# doLog - Tail on the Payara Server log
 # -----------------------------------------------------------------------------
 # Param  -> Void
 # Return -> Void
 # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 doLog () {
-    tail -f ${JBOSS_HOME}/standalone/log/server.log
+    tail -f ${GLASSFISH_HOME}/glassfish/domains/${domain}/logs/server.log
 }
 
 
@@ -237,26 +231,9 @@ doClean () {
     getProcesses
 
     if [ $? -ge 1 ]; then
-        echo "Cannot clear files when WildFly is running."
+        echo "Cannot clear files when Payara is running."
     else
-        standalone=${JBOSS_HOME}/standalone
-        configuration=${standalone}/configuration
-
-        echo "Cleaning WildFly Log files"
-        rm -fr ${standalone}/log 2>/dev/null
-        mkdir  ${standalone}/log 2>/dev/null
-        touch  ${standalone}/log/server.log 2>/dev/null
-
-        echo "Cleaning WildFly Deployments"
-        rm -fr ${standalone}/data/* 2>/dev/null
-        rm -fr ${standalone}/deployments/* 2>/dev/null
-        rm -fr ${standalone}/tmp/* 2>/dev/null
-        mkdir  ${standalone}/tmp/auth 2>/dev/null
-        rm -fr ${standalone}/work/jboss.web/default-host/* 2>/dev/null
-
-        echo "Cleaning (Reverting) WildFLy Standalone Configuration"
-        cp "${rawStandalone}" "${JBOSS_HOME}/standalone/configuration/${JBOSS_CONFIG}"
-        rm -fr ${configuration}/standalone_xml_history 2>/dev/null
+        echo "ToDo"
     fi
 }
 

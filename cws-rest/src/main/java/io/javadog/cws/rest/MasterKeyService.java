@@ -7,8 +7,7 @@
  */
 package io.javadog.cws.rest;
 
-import static io.javadog.cws.api.common.Constants.REST_MASTERKEY;
-
+import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.requests.MasterKeyRequest;
 import io.javadog.cws.api.responses.MasterKeyResponse;
@@ -31,7 +30,7 @@ import java.util.logging.Logger;
  * @author Kim Jensen
  * @since  CWS 1.0
  */
-@Path(REST_MASTERKEY)
+@Path(Constants.REST_MASTERKEY)
 public class MasterKeyService {
 
     private static final Logger log = Logger.getLogger(MasterKeyService.class.getName());
@@ -48,9 +47,9 @@ public class MasterKeyService {
 
         try {
             response = bean.masterKey(masterKeyRequest);
-            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), REST_MASTERKEY, startTime));
+            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), Constants.REST_MASTERKEY, startTime));
         } catch (RuntimeException e) {
-            log.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getLocale(), REST_MASTERKEY, startTime, e));
+            log.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getLocale(), Constants.REST_MASTERKEY, startTime, e));
             response = new MasterKeyResponse(ReturnCode.ERROR, e.getMessage());
         }
 

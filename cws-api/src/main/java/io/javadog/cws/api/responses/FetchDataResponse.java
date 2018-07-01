@@ -7,10 +7,9 @@
  */
 package io.javadog.cws.api.responses;
 
-import static io.javadog.cws.api.common.Utilities.copy;
-
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
+import io.javadog.cws.api.common.Utilities;
 import io.javadog.cws.api.dtos.Metadata;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -100,10 +99,10 @@ public final class FetchDataResponse extends CwsResponse {
     }
 
     public void setData(final byte[] data) {
-        this.data = copy(data);
+        this.data = Utilities.copy(data);
     }
 
     public byte[] getData() {
-        return copy(data);
+        return Utilities.copy(data);
     }
 }

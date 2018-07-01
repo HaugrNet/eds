@@ -7,10 +7,9 @@
  */
 package io.javadog.cws.api.requests;
 
-import static io.javadog.cws.api.common.Utilities.copy;
-
 import io.javadog.cws.api.common.Action;
 import io.javadog.cws.api.common.Constants;
+import io.javadog.cws.api.common.Utilities;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
@@ -146,11 +145,11 @@ public final class ProcessMemberRequest extends Authentication {
     }
 
     public void setNewCredential(final byte[] newCredential) {
-        this.newCredential = copy(newCredential);
+        this.newCredential = Utilities.copy(newCredential);
     }
 
     public byte[] getNewCredential() {
-        return copy(newCredential);
+        return Utilities.copy(newCredential);
     }
 
     // =========================================================================

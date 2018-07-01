@@ -7,9 +7,8 @@
  */
 package io.javadog.cws.api.requests;
 
-import static io.javadog.cws.api.common.Utilities.copy;
-
 import io.javadog.cws.api.common.Constants;
+import io.javadog.cws.api.common.Utilities;
 
 import javax.validation.constraints.Pattern;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -68,11 +67,11 @@ public final class SanityRequest extends Authentication implements CircleIdReque
     }
 
     public void setSince(final Date since) {
-        this.since = copy(since);
+        this.since = Utilities.copy(since);
     }
 
     public Date getSince() {
-        return copy(since);
+        return Utilities.copy(since);
     }
 
     // =========================================================================

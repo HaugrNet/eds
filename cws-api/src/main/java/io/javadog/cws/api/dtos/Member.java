@@ -7,9 +7,8 @@
  */
 package io.javadog.cws.api.dtos;
 
-import static io.javadog.cws.api.common.Utilities.copy;
-
 import io.javadog.cws.api.common.Constants;
+import io.javadog.cws.api.common.Utilities;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -81,11 +80,11 @@ public final class Member implements Serializable {
     }
 
     public void setAdded(final Date added) {
-        this.added = copy(added);
+        this.added = Utilities.copy(added);
     }
 
     public Date getAdded() {
-        return copy(added);
+        return Utilities.copy(added);
     }
 
     // =========================================================================

@@ -7,8 +7,8 @@
  */
 package io.javadog.cws.core.model.entities;
 
-import static io.javadog.cws.api.common.Constants.MAX_NAME_LENGTH;
-import static io.javadog.cws.api.common.Utilities.copy;
+import io.javadog.cws.api.common.Constants;
+import io.javadog.cws.api.common.Utilities;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -31,7 +31,7 @@ import javax.persistence.Table;
 )
 public class CircleEntity extends Externable {
 
-    @Column(name = "name", unique = true, nullable = false, length = MAX_NAME_LENGTH)
+    @Column(name = "name", unique = true, nullable = false, length = Constants.MAX_NAME_LENGTH)
     private String name = null;
 
     @Column(name = "external_key")
@@ -50,10 +50,10 @@ public class CircleEntity extends Externable {
     }
 
     public void setCircleKey(final byte[] circleKey) {
-        this.circleKey = copy(circleKey);
+        this.circleKey = Utilities.copy(circleKey);
     }
 
     public byte[] getCircleKey() {
-        return copy(circleKey);
+        return Utilities.copy(circleKey);
     }
 }

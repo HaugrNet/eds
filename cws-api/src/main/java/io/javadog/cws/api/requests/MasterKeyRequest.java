@@ -7,9 +7,8 @@
  */
 package io.javadog.cws.api.requests;
 
-import static io.javadog.cws.api.common.Utilities.copy;
-
 import io.javadog.cws.api.common.Constants;
+import io.javadog.cws.api.common.Utilities;
 
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -60,11 +59,11 @@ public final class MasterKeyRequest extends Authentication {
     // =========================================================================
 
     public void setSecret(final byte[] secret) {
-        this.secret = copy(secret);
+        this.secret = Utilities.copy(secret);
     }
 
     public byte[] getSecret() {
-        return copy(secret);
+        return Utilities.copy(secret);
     }
 
     // =========================================================================

@@ -54,6 +54,7 @@ public class SanitizerBean {
     private final Settings settings = Settings.getInstance();
     private final Crypto crypto = new Crypto(settings);
 
+    @Transactional(Transactional.TxType.REQUIRED)
     public void sanitize() {
         List<Long> ids = findNextBatch(BLOCK);
         int count = 0;
@@ -75,8 +76,7 @@ public class SanitizerBean {
         log.log(Settings.INFO, "Completed Sanity check, found {0} flaws out of {1} checked Data Objects.", args);
     }
 
-    @Transactional(Transactional.TxType.REQUIRES_NEW)
-    public SanityStatus processEntity(final Long id) {
+    private SanityStatus processEntity(final Long id) {
         SanityStatus status = SanityStatus.OK;
 
         try {
@@ -118,7 +118,6 @@ public class SanitizerBean {
         return status;
     }
 
-    @Transactional(Transactional.TxType.SUPPORTS)
     public List<Long> findNextBatch(final int maxResults) {
         // JPA support for Java 8 Date/Time API is not supported
         // before JavaEE8, which is still very early in adoption.

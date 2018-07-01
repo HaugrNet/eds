@@ -7,9 +7,8 @@
  */
 package io.javadog.cws.core.model.entities;
 
-import static io.javadog.cws.api.common.Constants.MAX_STRING_LENGTH;
-import static io.javadog.cws.api.common.Utilities.copy;
-
+import io.javadog.cws.api.common.Constants;
+import io.javadog.cws.api.common.Utilities;
 import io.javadog.cws.core.enums.SanityStatus;
 
 import javax.persistence.Column;
@@ -86,14 +85,14 @@ public class DataEntity extends CWSEntity {
     @Column(name = "encrypted_data", nullable = false)
     private byte[] data = null;
 
-    @Column(name = "initial_vector", nullable = false, updatable = false, length = MAX_STRING_LENGTH)
+    @Column(name = "initial_vector", nullable = false, updatable = false, length = Constants.MAX_STRING_LENGTH)
     private String initialVector = null;
 
-    @Column(name = "checksum", nullable = false, length = MAX_STRING_LENGTH)
+    @Column(name = "checksum", nullable = false, length = Constants.MAX_STRING_LENGTH)
     private String checksum = null;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "sanity_status", nullable = false, length = MAX_STRING_LENGTH)
+    @Column(name = "sanity_status", nullable = false, length = Constants.MAX_STRING_LENGTH)
     private SanityStatus sanityStatus = null;
 
     @Temporal(TemporalType.TIMESTAMP)
@@ -121,11 +120,11 @@ public class DataEntity extends CWSEntity {
     }
 
     public void setData(final byte[] data) {
-        this.data = copy(data);
+        this.data = Utilities.copy(data);
     }
 
     public byte[] getData() {
-        return copy(data);
+        return Utilities.copy(data);
     }
 
     public void setInitialVector(final String initialVector) {
@@ -153,10 +152,10 @@ public class DataEntity extends CWSEntity {
     }
 
     public void setSanityChecked(final Date sanityChecked) {
-        this.sanityChecked = copy(sanityChecked);
+        this.sanityChecked = Utilities.copy(sanityChecked);
     }
 
     public Date getSanityChecked() {
-        return copy(sanityChecked);
+        return Utilities.copy(sanityChecked);
     }
 }

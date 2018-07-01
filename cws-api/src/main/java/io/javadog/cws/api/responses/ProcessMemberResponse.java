@@ -7,10 +7,9 @@
  */
 package io.javadog.cws.api.responses;
 
-import static io.javadog.cws.api.common.Utilities.copy;
-
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
+import io.javadog.cws.api.common.Utilities;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -81,10 +80,10 @@ public final class ProcessMemberResponse extends CwsResponse {
     }
 
     public void setSignature(final byte[] signature) {
-        this.signature = copy(signature);
+        this.signature = Utilities.copy(signature);
     }
 
     public byte[] getSignature() {
-        return copy(signature);
+        return Utilities.copy(signature);
     }
 }

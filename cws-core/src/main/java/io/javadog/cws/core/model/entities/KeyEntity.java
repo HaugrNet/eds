@@ -7,8 +7,7 @@
  */
 package io.javadog.cws.core.model.entities;
 
-import static io.javadog.cws.api.common.Utilities.copy;
-
+import io.javadog.cws.api.common.Utilities;
 import io.javadog.cws.core.enums.KeyAlgorithm;
 import io.javadog.cws.core.enums.Status;
 
@@ -67,11 +66,11 @@ public class KeyEntity extends CWSEntity {
     }
 
     public void setExpires(final Date expires) {
-        this.expires = copy(expires);
+        this.expires = Utilities.copy(expires);
     }
 
     public Date getExpires() {
-        return copy(expires);
+        return Utilities.copy(expires);
     }
 
     public void setGracePeriod(final Integer gracePeriod) {

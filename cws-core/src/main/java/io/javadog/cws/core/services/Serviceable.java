@@ -7,8 +7,7 @@
  */
 package io.javadog.cws.core.services;
 
-import static io.javadog.cws.api.common.Constants.ADMIN_ACCOUNT;
-
+import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.common.TrustLevel;
 import io.javadog.cws.api.dtos.Circle;
@@ -186,14 +185,14 @@ public abstract class Serviceable<R extends CwsResponse, V extends Authenticatio
         // Administrator (who cannot be part of a Circle), we will use
         // the CircleId in the checks.
         final String account = trim(verifiable.getAccountName());
-        if ((circleId != null) && !Objects.equals(account, ADMIN_ACCOUNT)) {
+        if ((circleId != null) && !Objects.equals(account, Constants.ADMIN_ACCOUNT)) {
             member = dao.findMemberByNameAndCircleId(account, circleId);
         } else {
             member = dao.findMemberByName(account);
 
             if (member == null) {
-                if (Objects.equals(ADMIN_ACCOUNT, account)) {
-                    member = createNewAccount(ADMIN_ACCOUNT, verifiable.getCredential());
+                if (Objects.equals(Constants.ADMIN_ACCOUNT, account)) {
+                    member = createNewAccount(Constants.ADMIN_ACCOUNT, verifiable.getCredential());
                 } else {
                     throw new AuthenticationException("Could not uniquely identify an account for '" + account + "'.");
                 }
@@ -273,14 +272,14 @@ public abstract class Serviceable<R extends CwsResponse, V extends Authenticatio
     private void checkAuthorization(final Permission action, final String circleId) {
         // There is a couple of requests, which is only allowed to be made by
         // the System Administrator.
-        if ((action.getTrustLevel() == TrustLevel.SYSOP) && !Objects.equals(ADMIN_ACCOUNT, member.getName())) {
+        if ((action.getTrustLevel() == TrustLevel.SYSOP) && !Objects.equals(Constants.ADMIN_ACCOUNT, member.getName())) {
             throw new AuthorizationException("Cannot complete this request, as it is only allowed for the System Administrator.");
         }
 
         // The System Admin is automatically permitted to perform a number of
         // Actions, without being part of a Circle. So these checks must be
         // made separately based on the actual Request.
-        if (!Objects.equals(ADMIN_ACCOUNT, member.getName())) {
+        if (!Objects.equals(Constants.ADMIN_ACCOUNT, member.getName())) {
             trustees = findTrustees(member, circleId, TrustLevel.getLevels(action.getTrustLevel()));
 
             if ((action.getTrustLevel() != TrustLevel.ALL) && trustees.isEmpty()) {

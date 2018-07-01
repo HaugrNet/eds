@@ -7,8 +7,8 @@
  */
 package io.javadog.cws.core.model.entities;
 
-import static io.javadog.cws.api.common.Constants.MAX_STRING_LENGTH;
-import static io.javadog.cws.api.common.Utilities.copy;
+import io.javadog.cws.api.common.Constants;
+import io.javadog.cws.api.common.Utilities;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -50,7 +50,7 @@ public class SignatureEntity extends CWSEntity {
     @Column(name = "public_key", nullable = false, length = 3072)
     private String publicKey = null;
 
-    @Column(name = "checksum", updatable = false, length = MAX_STRING_LENGTH)
+    @Column(name = "checksum", updatable = false, length = Constants.MAX_STRING_LENGTH)
     private String checksum = null;
 
     @Column(name = "verifications")
@@ -97,10 +97,10 @@ public class SignatureEntity extends CWSEntity {
     }
 
     public void setExpires(final Date expires) {
-        this.expires = copy(expires);
+        this.expires = Utilities.copy(expires);
     }
 
     public Date getExpires() {
-        return copy(expires);
+        return Utilities.copy(expires);
     }
 }

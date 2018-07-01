@@ -251,6 +251,11 @@
                     <artifactId>build-helper-maven-plugin</artifactId>
                     <version>3.0.0</version>
                 </plugin>
+                <plugin>
+                    <groupId>com.codacy</groupId>
+                    <artifactId>codacy-coverage-reporter</artifactId>
+                    <version>4.0.1</version>
+                </plugin>
             </plugins>
         </pluginManagement>
         <plugins>
@@ -317,7 +322,7 @@
                             <goal>report</goal>
                         </goals>
                         <configuration>
-                            <dataFile>${sonar.jacoco.reportPath}</dataFile>
+                            <dataFile>${sonar.jacoco.reportPaths}</dataFile>
                             <outputDirectory>${project.basedir}/../target/jacoco</outputDirectory>
                         </configuration>
                     </execution>

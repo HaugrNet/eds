@@ -7,9 +7,8 @@
  */
 package io.javadog.cws.api.dtos;
 
-import static io.javadog.cws.api.common.Utilities.copy;
-
 import io.javadog.cws.api.common.Constants;
+import io.javadog.cws.api.common.Utilities;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -62,11 +61,11 @@ public final class Signature implements Serializable {
     }
 
     public void setExpires(final Date expires) {
-        this.expires = copy(expires);
+        this.expires = Utilities.copy(expires);
     }
 
     public Date getExpires() {
-        return copy(expires);
+        return Utilities.copy(expires);
     }
 
     public void setVerifications(final Long verifications) {
@@ -78,19 +77,19 @@ public final class Signature implements Serializable {
     }
 
     public void setLastVerification(final Date lastVerification) {
-        this.lastVerification = copy(lastVerification);
+        this.lastVerification = Utilities.copy(lastVerification);
     }
 
     public Date getLastVerification() {
-        return copy(lastVerification);
+        return Utilities.copy(lastVerification);
     }
 
     public void setAdded(final Date added) {
-        this.added = copy(added);
+        this.added = Utilities.copy(added);
     }
 
     public Date getAdded() {
-        return copy(added);
+        return Utilities.copy(added);
     }
 
     // =========================================================================

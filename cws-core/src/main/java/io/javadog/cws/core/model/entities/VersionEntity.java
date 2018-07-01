@@ -7,7 +7,7 @@
  */
 package io.javadog.cws.core.model.entities;
 
-import static io.javadog.cws.api.common.Utilities.copy;
+import io.javadog.cws.api.common.Utilities;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -88,10 +88,10 @@ public class VersionEntity {
     }
 
     public void setInstalled(final Date installed) {
-        this.installed = copy(installed);
+        this.installed = Utilities.copy(installed);
     }
 
     public Date getInstalled() {
-        return copy(installed);
+        return Utilities.copy(installed);
     }
 }

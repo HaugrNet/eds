@@ -7,9 +7,8 @@
  */
 package io.javadog.cws.api.requests;
 
-import static io.javadog.cws.api.common.Utilities.copy;
-
 import io.javadog.cws.api.common.Constants;
+import io.javadog.cws.api.common.Utilities;
 
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -51,19 +50,19 @@ public final class SignRequest extends Authentication {
     // =========================================================================
 
     public void setData(final byte[] data) {
-        this.data = copy(data);
+        this.data = Utilities.copy(data);
     }
 
     public byte[] getData() {
-        return copy(data);
+        return Utilities.copy(data);
     }
 
     public void setExpires(final Date expires) {
-        this.expires = copy(expires);
+        this.expires = Utilities.copy(expires);
     }
 
     public Date getExpires() {
-        return copy(expires);
+        return Utilities.copy(expires);
     }
 
     // =========================================================================

@@ -7,10 +7,9 @@
  */
 package io.javadog.cws.api.requests;
 
-import static io.javadog.cws.api.common.Utilities.copy;
-
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.CredentialType;
+import io.javadog.cws.api.common.Utilities;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -63,11 +62,11 @@ public class Authentication extends Verifiable {
     }
 
     public final void setCredential(final byte[] credential) {
-        this.credential = copy(credential);
+        this.credential = Utilities.copy(credential);
     }
 
     public final byte[] getCredential() {
-        return copy(credential);
+        return Utilities.copy(credential);
     }
 
     public final void setCredentialType(final CredentialType credentialType) {

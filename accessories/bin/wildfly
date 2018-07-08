@@ -3,6 +3,8 @@
 # WildFly Control Script
 # -----------------------------------------------------------------------------
 # History:
+#   Version 1.03 - 2018-07-08, Kim Jensen <kim@dawn.dk>
+#     o Added building of CWS from sources
 #   Version 1.02 - 2018-06-21, Kim Jensen <kim@dawn.dk>
 #     o Added a config method to configure a new WildFly instance
 #   Version 1.01 - 2018-06-04, Kim Jensen <kim@dawn.dk>
@@ -12,8 +14,9 @@
 # -----------------------------------------------------------------------------
 # Methods:
 #     o show_help     ( Void )  ::  Shows help on using the script
-#     o doLock        ( Void )  ::  Creates a lock file
 #     o getProcesses  ( Void )  ::  Retrieves WildFly process count
+#     o doBuild       ( Void )  ::  Build CWS from source
+#     o doConfigure   ( Void )  ::  Attempts to configure Payara
 #     o doStart       ( Void )  ::  Attempts to start WildFly
 #     o doStop        ( Void )  ::  Attempts to stop WildFly
 #     o doDeploy      ( Void )  ::  Attempts to deploy into WildFly
@@ -27,20 +30,16 @@
 # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 # Configuration settings, please only modify this section
 # -----------------------------------------------------------------------------
-readonly source="${HOME}/JavaDog.io/github/cws"
 readonly debugPort=8787
 
 # Java & JBoss (WildFly) settings
-export JAVA_HOME="/opt/java/jre"
 export JAVA_OPTS="${JAVA_OPTS} -Xms1303m -Xmx1303m -Djava.net.preferIPv4Stack=true"
-export JBOSS_HOME="/opt/java/wildfly"
-export JBOSS_PIDFILE="${source}/cws.pid"
+export JBOSS_PIDFILE="/var/run/lock/cws.pid"
 export JBOSS_CONFIG="standalone-cws.xml"
 export JBOSS_SCRIPT="${JBOSS_HOME}/bin/standalone.sh --server-config=${JBOSS_CONFIG} -Djboss.node.name=cws"
 export LAUNCH_JBOSS_IN_BACKGROUND=1
-export PATH="${JAVA_HOME}/bin:${JBOSS_HOME}/bin:${PATH}"
 
-readonly configs="${source}/accessories/release"
+readonly configs="${CWS_SOURCES}/accessories/release"
 readonly rawStandalone="${configs}/standalone-wildfly13.xml"
 readonly cmdStart="${JBOSS_SCRIPT} --debug ${debugPort}"
 
@@ -49,7 +48,7 @@ readonly scriptLockFD="200"
 readonly scriptLock="/tmp/.`basename $0`.lock"
 
 # Script specific information, should only be altered, if logic is updated
-readonly scriptVersion="1.02"
+readonly scriptVersion="1.03"
 readonly scriptAuthor="Kim Jensen"
 # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
@@ -65,6 +64,8 @@ show_help () {
     echo "Usage: `basename $0` [Action]"
     echo
     echo "  The Action must be one of the following:"
+    echo "    build     Builds the CWS from source (requires Maven)"
+    echo "    configure Attempts to configure a CWS WildFly instance"
     echo "    start     Attempts to start a CWS WildFly instance"
     echo "    stop      Attempts to stop the running CWS WildFly instance"
     echo "    deploy    Deploy the latest CWS snapshot to WildFly"
@@ -100,6 +101,19 @@ getProcesses () {
 
 
 # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+# doConfigure - Attempts to configure Payara
+# -----------------------------------------------------------------------------
+# Param  -> Void
+# Return -> Void
+# -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+doBuild () {
+    echo "Building CWS from source"
+    cd ${CWS_SOURCES}
+    mvn clean package
+}
+
+
+# -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 # doConfigure - Attempts to configure WildFly
 # -----------------------------------------------------------------------------
 # Param  -> Void
@@ -108,11 +122,11 @@ getProcesses () {
 doConfigure () {
     getProcesses
 
-    if [ $? -ne 0 ]; then
+    if [ $? -eq 0 ]; then
         echo "Configuring WildFly for CWS"
         mkdir -p "${JBOSS_HOME}/modules/org/postgresql/main"
-        cp "${configs}/module.xml" "${JBOSS_HOME}/modules/org/postgresql/main"
-        cp "${configs}/postgresql-42.2.2.jar" "${JBOSS_HOME}/modules/org/postgresql/main"
+        cp "${CWS_SOURCES}/accessories/release/module.xml" "${JBOSS_HOME}/modules/org/postgresql/main"
+        cp "${CWS_SOURCES}/accessories/release/postgresql-42.2.2.jar" "${JBOSS_HOME}/modules/org/postgresql/main"
         cp "${rawStandalone}" "${JBOSS_HOME}/standalone/configuration/${JBOSS_CONFIG}"
         # Theoretically the following two lines should do the trick with configuring WildFly at runtime, but it causes problems.
         #${JBOSS_HOME}/bin/jboss-cli.sh --connect --command="/subsystem=datasources/jdbc-driver=postgresql:add(driver-name=postgresql,driver-module-name=org.postgresql,driver-xa-datasource-class-name=org.postgresql.xa.PGXADataSource)" 2>/dev/null
@@ -176,7 +190,7 @@ doDeploy () {
         echo "WildFly is not running"
     else
         echo "Deploying the latest Snapshot to WildFly"
-        ${JBOSS_HOME}/bin/jboss-cli.sh --connect --controller=localhost:9990 --command="deploy ${source}/cws-wildfly/target/cws.war --force"
+        ${JBOSS_HOME}/bin/jboss-cli.sh --connect --controller=localhost:9990 --command="deploy ${CWS_SOURCES}/cws-wildfly/target/cws.war --force"
     fi
 }
 
@@ -273,26 +287,41 @@ if [ $? -ne 0 ]; then
     echo "Another instance is already running..."
     exit 1
 elif [ $# = 1 ]; then
-    action=${1}
-
-    if [ "${action}" = "configure" ]; then
-        doConfigure
-    elif [ "${action}" = "start" ]; then
-        doStart
-    elif [ "${action}" = "stop" ]; then
-        doStop
-    elif [ "${action}" = "deploy" ]; then
-        doDeploy
-    elif [ "${action}" = "undeploy" ]; then
-        doUndeploy
-    elif [ "${action}" = "status" ]; then
-        doStatus
-    elif [ "${action}" = "log" ]; then
-        doLog
-    elif [ "${action}" = "clean" ]; then
-        doClean
+    if [ -z "${JBOSS_HOME}"  ]; then
+        echo "Script requires that the system variable \$JBOSS_HOME is defined."
+        echo
     else
-        show_help
+        action=${1}
+
+        if [ "${action}" = "build" ]; then
+            if [ -z "${M2_HOME}" -o -z "${CWS_SOURCES}" ]; then
+                echo "Both the CWS Sources & Maven must be defined"
+                echo "  * Please install Maven and set the environment variable \$M2_HOME."
+                echo "  * Please set the \$CWS_SOURCES to the root of the CWS sources."
+            else
+                doBuild
+            fi
+        elif [ "${action}" = "configure" ]; then
+            doConfigure
+        elif [ "${action}" = "start" ]; then
+            doStart
+        elif [ "${action}" = "stop" ]; then
+            doStop
+        elif [ "${action}" = "deploy" ]; then
+            if [ -z "${CWS_SOURCES}" ]; then
+                echo "Deploying CWS requires that \$CWS_SOURCES is defined to the root of the CWS sources directory."
+            else
+                doDeploy
+            fi
+        elif [ "${action}" = "undeploy" ]; then
+            doUndeploy
+        elif [ "${action}" = "log" ]; then
+            doLog
+        elif [ "${action}" = "clean" ]; then
+            doClean
+        else
+            show_help
+        fi
     fi
 else
     show_help

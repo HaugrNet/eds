@@ -3,29 +3,28 @@
 # Payara Control Script
 # -----------------------------------------------------------------------------
 # History:
+#   Version 1.01 - 2018-07-08, Kim Jensen <kim@dawn.dk>
+#     o Corrected script to use externally defined variables
+#     o Added building of CWS from sources
 #   Version 1.00 - 2018-06-20, Kim Jensen <kim@dawn.dk>
 #     o Initial version
 # -----------------------------------------------------------------------------
 # Methods:
 #     o show_help     ( Void )  ::  Shows help on using the script
 #     o doLock        ( Void )  ::  Creates a lock file
-#     o getProcesses  ( Void )  ::  Retrieves Payara process count
+#     o doBuild       ( Void )  ::  Build CWS from source
 #     o doConfigure   ( Void )  ::  Attempts to configure Payara
 #     o doStart       ( Void )  ::  Attempts to start Payara
 #     o doStop        ( Void )  ::  Attempts to stop Payara
 #     o doDeploy      ( Void )  ::  Attempts to deploy into Payara
 #     o doUndeploy    ( Void )  ::  Attempts to undeploy from Payara
-#     o doStatus      ( Void )  ::  Retrieves the Payara status
 #     o doLog         ( Void )  ::  Tails the server log
-#     o doClean       ( Void )  ::  Cleans existing test results
 # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 
 # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 # Configuration settings, please only modify this section
 # -----------------------------------------------------------------------------
-readonly source="${HOME}/JavaDog.io/github/cws"
-readonly appDirectory="/opt/java/payara"
 readonly domain="domain1"
 readonly dbUser="cws_user"
 readonly dbPassword="cws"
@@ -33,27 +32,14 @@ readonly dbHost="localhost"
 readonly dbName="cws"
 
 # Java & JBoss (Payara) settings
-export JAVA_HOME="/opt/java/jre"
 export JAVA_OPTS="${JAVA_OPTS} -Xms1303m -Xmx1303m -Djava.net.preferIPv4Stack=true"
-export GLASSFISH_HOME="${appDirectory}"
-export LAUNCH_JBOSS_IN_BACKGROUND=1
-export PATH="${JAVA_HOME}/bin:${GLASSFISH_HOME}/bin:${PATH}"
-
-readonly cmd="${GLASSFISH_HOME}/bin/asadmin"
-readonly cmdAddPG="${cmd} add-library ${source}/accessories/release/postgresql-43.2.2.jar"
-readonly cmdPool="${cmd} create-jdbc-connection-pool --datasourceclassname org.postgresql.xa.PGXADataSource --restype javax.sql.XADataSource --property "User=${dbUser}:Password=${dbPassword}:URL=jdbc\:postgresql\://${dbHost}/${dbName}" cwsPool"
-readonly cmdDS="${cmd} create-jdbc-resource --connectionpoolid cwsPool datasources/cwsDS"
-readonly cmdStart="${cmd} start-domain ${domain}"
-readonly cmdStop="${cmd} stop-domain ${domain}"
-readonly cmdDeploy="${cmd} deploy ${source}/cws-payara/target/cws.war"
-readonly cmdUndeploy="${cmd} undeploy cws.war"
 
 # Lock file settings for flock. Please don't change this!
 readonly scriptLockFD="200"
 readonly scriptLock="/tmp/.`basename $0`.lock"
 
 # Script specific information, should only be altered, if logic is updated
-readonly scriptVersion="1.00"
+readonly scriptVersion="1.01"
 readonly scriptAuthor="Kim Jensen"
 # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
@@ -66,33 +52,31 @@ readonly scriptAuthor="Kim Jensen"
 # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 show_help () {
     echo "Payara Control script, Version ${scriptVersion} by ${scriptAuthor}"
+    echo "Note; this script is simply wrapping the Payara/Glassfish admin script."
     echo "Usage: `basename $0` [Action]"
     echo
     echo "  The Action must be one of the following:"
+    echo "    build     Builds the CWS from source (requires Maven)"
     echo "    configure Attempts to configure a CWS Payara instance"
     echo "    start     Attempts to start a CWS Payara instance"
     echo "    stop      Attempts to stop the running CWS Payara instance"
     echo "    deploy    Deploy the latest CWS snapshot to Payara"
     echo "    undeploy  Undeploy the currently deployed CWS snapshot"
-    echo "    status    Retrieves the status of the CWS Payara instance"
     echo "    log       Tail on the Server Log"
-    echo "    clean     Cleanup of Payara, removing all deployments & log files"
     echo
 }
 
 
 # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-# getProcesses - Returns the number of processes associated with Payara
+# doConfigure - Attempts to configure Payara
 # -----------------------------------------------------------------------------
 # Param  -> Void
-# Return -> 1 if Payara is running, 0 if not
+# Return -> Void
 # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-getProcesses () {
-    currentProcesses=0
-
-    echo "ToDo"
-
-    return ${currentProcesses}
+doBuild () {
+    echo "Building CWS from source"
+    cd ${CWS_SOURCES}
+    mvn clean package
 }
 
 
@@ -103,19 +87,11 @@ getProcesses () {
 # Return -> Void
 # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 doConfigure () {
-    getProcesses
+    echo "Configuring running Payara instance for CWS"
 
-    if [ $? -eq 0 ]; then
-        echo "Starting Payara ..."
-        ${cmdStart} 2>&1 &
-        echo "Payara has been started, now configuring it for CWS"
-        ${cmdAddPG}
-        ${cmdPool}
-        ${cmdDS}
-        echo "Payara has been configured"
-    else
-        echo "Payara cannot be configured when already running"
-    fi
+    ${GLASSFISH_HOME}/bin/asadmin add-library ${CWS_SOURCES}/accessories/release/postgresql-42.2.2.jar
+    ${GLASSFISH_HOME}/bin/asadmin create-jdbc-connection-pool --datasourceclassname org.postgresql.xa.PGXADataSource --restype javax.sql.XADataSource --property "User=${dbUser}:Password=${dbPassword}:URL=jdbc\:postgresql\://${dbHost}/${dbName}" cwsPool
+    ${GLASSFISH_HOME}/bin/asadmin create-jdbc-resource --connectionpoolid cwsPool datasources/cwsDS
 }
 
 
@@ -126,15 +102,9 @@ doConfigure () {
 # Return -> Void
 # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 doStart () {
-    getProcesses
+    echo "Starting Payara ..."
 
-    if [ $? -eq 0 ]; then
-        echo "Starting Payara ..."
-        ${cmdStart} 2>&1 &
-        echo "Payara has been started"
-    else
-        echo "Payara is already running"
-    fi
+    ${GLASSFISH_HOME}/bin/asadmin start-domain ${domain}
 }
 
 
@@ -145,15 +115,9 @@ doStart () {
 # Return -> Void
 # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 doStop () {
-    getProcesses
+    echo "Stopping Payara ..."
 
-    if [ $? -eq 0 ]; then
-        echo "Payara is not running"
-    else
-        echo "Stopping Payara ..."
-        ${cmdStop}
-        echo "Payara has been stopped"
-    fi
+    ${GLASSFISH_HOME}/bin/asadmin stop-domain ${domain}
 }
 
 
@@ -164,14 +128,9 @@ doStop () {
 # Return -> Void
 # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 doDeploy () {
-    getProcesses
+    echo "Deploying the latest Snapshot to Payara"
 
-    if [ $? -eq 0 ]; then
-        echo "Payara is not running"
-    else
-        echo "Deploying the latest Snapshot to Payara"
-        ${cmdDeploy}
-    fi
+    ${GLASSFISH_HOME}/bin/asadmin deploy ${CWS_SOURCES}/cws-payara/target/cws.war
 }
 
 
@@ -182,31 +141,9 @@ doDeploy () {
 # Return -> Void
 # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 doUndeploy () {
-    getProcesses
+    echo "Undeploying current deployed snapshot from Payara"
 
-    if [ $? -eq 0 ]; then
-        echo "Payara is not running"
-    else
-        echo "Undeploying current deployed snapshot from Payara"
-        ${cmdUndeploy}
-    fi
-}
-
-
-# -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-# doStatus - Retrieves the Payara Status
-# -----------------------------------------------------------------------------
-# Param  -> Void
-# Return -> Void
-# -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-doStatus () {
-    getProcesses
-
-    if [ $? -eq 0 ]; then
-        echo "Payara is not running"
-    else
-        echo "Payara is currently running"
-    fi
+    ${GLASSFISH_HOME}/bin/asadmin undeploy cws.war
 }
 
 
@@ -222,23 +159,6 @@ doLog () {
 
 
 # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-# doClean - Cleaning up logs and results
-# -----------------------------------------------------------------------------
-# Param  -> Void
-# Return -> Void
-# -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-doClean () {
-    getProcesses
-
-    if [ $? -ge 1 ]; then
-        echo "Cannot clear files when Payara is running."
-    else
-        echo "ToDo"
-    fi
-}
-
-
-# -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 # Main part, please don't touch!
 # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
@@ -250,26 +170,37 @@ if [ $? -ne 0 ]; then
     echo "Another instance is already running..."
     exit 1
 elif [ $# = 1 ]; then
-    action=${1}
-
-    if [ "${action}" = "configure" ]; then
-        doConfigure
-    elif [ "${action}" = "start" ]; then
-        doStart
-    elif [ "${action}" = "stop" ]; then
-        doStop
-    elif [ "${action}" = "deploy" ]; then
-        doDeploy
-    elif [ "${action}" = "undeploy" ]; then
-        doUndeploy
-    elif [ "${action}" = "status" ]; then
-        doStatus
-    elif [ "${action}" = "log" ]; then
-        doLog
-    elif [ "${action}" = "clean" ]; then
-        doClean
+    if [ -z "${GLASSFISH_HOME}"  ]; then
+        echo "Script requires that the system variable \$GLASSFISH_HOME is defined."
+        echo
     else
-        show_help
+        action=${1}
+
+        if [ "${action}" = "build" ]; then
+            if [ -z "${M2_HOME}" ]; then
+                echo "Maven is not defined, please install it and set the environment variable \$M2_HOME."
+            else
+                doBuild
+            fi
+        elif [ "${action}" = "configure" ]; then
+            doConfigure
+        elif [ "${action}" = "start" ]; then
+            doStart
+        elif [ "${action}" = "stop" ]; then
+            doStop
+        elif [ "${action}" = "deploy" ]; then
+            if [ -z "${CWS_SOURCES}" ]; then
+                echo "Deploying CWS requires that \$CWS_SOURCES is defined to the root of the CWS sources directory."
+            else
+                doDeploy
+            fi
+        elif [ "${action}" = "undeploy" ]; then
+            doUndeploy
+        elif [ "${action}" = "log" ]; then
+            doLog
+        else
+            show_help
+        fi
     fi
 else
     show_help

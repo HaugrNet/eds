@@ -89,7 +89,7 @@ doBuild () {
 doConfigure () {
     echo "Configuring running Payara instance for CWS"
 
-    ${GLASSFISH_HOME}/bin/asadmin add-library ${CWS_SOURCES}/accessories/release/postgresql-42.2.2.jar
+    ${GLASSFISH_HOME}/bin/asadmin add-library ${CWS_SOURCES}/accessories/release/postgresql-42.2.4.jar
     ${GLASSFISH_HOME}/bin/asadmin create-jdbc-connection-pool --datasourceclassname org.postgresql.xa.PGXADataSource --restype javax.sql.XADataSource --property "User=${dbUser}:Password=${dbPassword}:URL=jdbc\:postgresql\://${dbHost}/${dbName}" cwsPool
     ${GLASSFISH_HOME}/bin/asadmin create-jdbc-resource --connectionpoolid cwsPool datasources/cwsDS
 }

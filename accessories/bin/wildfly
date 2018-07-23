@@ -126,7 +126,7 @@ doConfigure () {
         echo "Configuring WildFly for CWS"
         mkdir -p "${JBOSS_HOME}/modules/org/postgresql/main"
         cp "${CWS_SOURCES}/accessories/release/module.xml" "${JBOSS_HOME}/modules/org/postgresql/main"
-        cp "${CWS_SOURCES}/accessories/release/postgresql-42.2.2.jar" "${JBOSS_HOME}/modules/org/postgresql/main"
+        cp "${CWS_SOURCES}/accessories/release/postgresql-42.2.4.jar" "${JBOSS_HOME}/modules/org/postgresql/main"
         cp "${rawStandalone}" "${JBOSS_HOME}/standalone/configuration/${JBOSS_CONFIG}"
         # Theoretically the following two lines should do the trick with configuring WildFly at runtime, but it causes problems.
         #${JBOSS_HOME}/bin/jboss-cli.sh --connect --command="/subsystem=datasources/jdbc-driver=postgresql:add(driver-name=postgresql,driver-module-name=org.postgresql,driver-xa-datasource-class-name=org.postgresql.xa.PGXADataSource)" 2>/dev/null

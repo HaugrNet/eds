@@ -24,7 +24,7 @@ import javax.ws.rs.core.Response;
 public class BaseRestClient {
 
     protected  ResteasyClient client = new ResteasyClientBuilder().build();
-    protected final String baseURL;
+    private final String baseURL;
 
     protected BaseRestClient(final String baseURL) {
         this.baseURL = baseURL;

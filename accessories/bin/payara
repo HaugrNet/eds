@@ -89,9 +89,9 @@ doBuild () {
 doConfigure () {
     echo "Configuring running Payara instance for CWS"
 
-    ${GLASSFISH_HOME}/bin/asadmin add-library ${CWS_SOURCES}/accessories/release/postgresql-42.2.4.jar
-    ${GLASSFISH_HOME}/bin/asadmin create-jdbc-connection-pool --datasourceclassname org.postgresql.xa.PGXADataSource --restype javax.sql.XADataSource --property "User=${dbUser}:Password=${dbPassword}:URL=jdbc\:postgresql\://${dbHost}/${dbName}" cwsPool
-    ${GLASSFISH_HOME}/bin/asadmin create-jdbc-resource --connectionpoolid cwsPool datasources/cwsDS
+    ${GLASSFISH_HOME}/glassfish/bin/asadmin add-library ${CWS_SOURCES}/accessories/release/postgresql-42.2.4.jar
+    ${GLASSFISH_HOME}/glassfish/bin/asadmin create-jdbc-connection-pool --datasourceclassname org.postgresql.xa.PGXADataSource --restype javax.sql.XADataSource --property "User=${dbUser}:Password=${dbPassword}:URL=jdbc\:postgresql\://${dbHost}/${dbName}" cwsPool
+    ${GLASSFISH_HOME}/glassfish/bin/asadmin create-jdbc-resource --connectionpoolid cwsPool datasources/cwsDS
 }
 
 
@@ -104,7 +104,7 @@ doConfigure () {
 doStart () {
     echo "Starting Payara ..."
 
-    ${GLASSFISH_HOME}/bin/asadmin start-domain ${domain}
+    ${GLASSFISH_HOME}/glassfish/bin/asadmin start-domain ${domain}
 }
 
 
@@ -117,7 +117,7 @@ doStart () {
 doStop () {
     echo "Stopping Payara ..."
 
-    ${GLASSFISH_HOME}/bin/asadmin stop-domain ${domain}
+    ${GLASSFISH_HOME}/glassfish/bin/asadmin stop-domain ${domain}
 }
 
 
@@ -130,7 +130,7 @@ doStop () {
 doDeploy () {
     echo "Deploying the latest Snapshot to Payara"
 
-    ${GLASSFISH_HOME}/bin/asadmin deploy ${CWS_SOURCES}/cws-payara/target/cws.war
+    ${GLASSFISH_HOME}/glassfish/bin/asadmin deploy --force ${CWS_SOURCES}/cws-payara/target/cws.war
 }
 
 
@@ -143,7 +143,7 @@ doDeploy () {
 doUndeploy () {
     echo "Undeploying current deployed snapshot from Payara"
 
-    ${GLASSFISH_HOME}/bin/asadmin undeploy cws.war
+    ${GLASSFISH_HOME}/glassfish/bin/asadmin undeploy cws
 }
 
 

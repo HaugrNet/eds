@@ -411,7 +411,7 @@ public final class DataServiceTest extends DatabaseSetup {
 
         request.setCredential(crypto.stringToBytes(MEMBER_1));
         final ProcessDataResponse response2 = service.perform(request);
-        assertThat(response2.getReturnCode(), is(ReturnCode.INTEGRITY_WARNING.getCode()));
+        assertThat(response2.getReturnCode(), is(ReturnCode.IDENTIFICATION_WARNING.getCode()));
         assertThat(response2.getReturnMessage(), is("Another record with the same name already exists."));
         assertThat(response2.getDataId(), is(nullValue()));
     }

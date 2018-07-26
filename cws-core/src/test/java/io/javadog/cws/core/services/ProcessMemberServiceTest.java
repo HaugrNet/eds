@@ -73,7 +73,7 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
         request.setNewCredential(crypto.stringToBytes(account));
         final ProcessMemberResponse response = service.perform(request);
 
-        assertThat(response.getReturnCode(), is(ReturnCode.ILLEGAL_ACTION.getCode()));
+        assertThat(response.getReturnCode(), is(ReturnCode.AUTHORIZATION_WARNING.getCode()));
         assertThat(response.getReturnMessage(), is("Members are not permitted to create new Accounts."));
     }
 
@@ -108,7 +108,7 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
 
     @Test
     public void testAddingWithExistingAccountName() {
-        prepareCause(CWSException.class, ReturnCode.CONSTRAINT_ERROR, "An Account with the same AccountName already exist.");
+        prepareCause(CWSException.class, ReturnCode.IDENTIFICATION_WARNING, "An Account with the same AccountName already exist.");
 
         final String account = MEMBER_4;
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);

@@ -106,10 +106,10 @@ public final class ProcessMemberService extends Serviceable<ProcessMemberRespons
                 response = new ProcessMemberResponse();
                 response.setMemberId(created.getExternalId());
             } else {
-                throw new CWSException(ReturnCode.CONSTRAINT_ERROR, "An Account with the same AccountName already exist.");
+                throw new CWSException(ReturnCode.IDENTIFICATION_WARNING, "An Account with the same AccountName already exist.");
             }
         } else {
-            response = new ProcessMemberResponse(ReturnCode.ILLEGAL_ACTION, "Members are not permitted to create new Accounts.");
+            response = new ProcessMemberResponse(ReturnCode.AUTHORIZATION_WARNING, "Members are not permitted to create new Accounts.");
         }
 
         return response;

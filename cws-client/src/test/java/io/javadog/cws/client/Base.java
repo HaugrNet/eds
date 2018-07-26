@@ -33,7 +33,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.Charset;
 import java.security.SecureRandom;
 import java.util.List;
-import java.util.UUID;
 
 /**
  * @author Kim Jensen
@@ -77,7 +76,6 @@ public final class Base {
         final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, accountName);
         request.setAction(Action.CREATE);
         request.setCircleName(circleName);
-        request.setCircleName(UUID.randomUUID().toString());
 
         final ProcessCircleResponse response = management.processCircle(request);
         throwIfFailed(response);

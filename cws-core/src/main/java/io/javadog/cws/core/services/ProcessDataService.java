@@ -112,7 +112,7 @@ public final class ProcessDataService extends Serviceable<ProcessDataResponse, P
                 response.setDataId(metadataEntity.getExternalId());
             }
         } else {
-            response = new ProcessDataResponse(ReturnCode.INTEGRITY_WARNING, "Another record with the same name already exists.");
+            response = new ProcessDataResponse(ReturnCode.IDENTIFICATION_WARNING, "Another record with the same name already exists.");
         }
 
         return response;

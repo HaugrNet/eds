@@ -4,9 +4,10 @@
 # -----------------------------------------------------------------------------
 # Configuration settings, please only modify this section
 # -----------------------------------------------------------------------------
+readonly dbHost="localhost"
+readonly dbPort="5432"
 readonly dbUser="cws_user"
 readonly dbPassword="cws"
-readonly dbHost="localhost"
 readonly dbName="cws"
 readonly wildfly=${JBOSS_HOME}
 
@@ -33,7 +34,14 @@ if [ "${action}" = "configure" ]; then
         # The startup is not backgrounded automatically, it must be forced into
         # the background, but we cannot configure WildFly until it is completed,
         # so a simple sleep is added, not optimal - but it'll do the job
-        sleep 15
+        sleep 10
+    fi
+
+    # CWS requires a data, currently only scripts for PostgreSQL exists, so
+    # this is the one being attempted to create here.
+    psql -l | grep cws > /dev/null
+    if [ $? -eq 1 ]; then
+        psql postgres -f  `dirname $0`/../postgresql/01-install.sql
     fi
 
     echo "Configuring WildFly for CWS"
@@ -41,7 +49,7 @@ if [ "${action}" = "configure" ]; then
     cp `dirname $0`/../lib/postgresql-42.2.4.jar ${wildfly}/modules/org/postgresql/main
     cp `dirname $0`/../wildfly/module.xml ${wildfly}/modules/org/postgresql/main
     ${wildfly}/bin/jboss-cli.sh --connect --command="/subsystem=datasources/jdbc-driver=postgresql:add(driver-name=postgresql,driver-module-name=org.postgresql,driver-xa-datasource-class-name=org.postgresql.xa.PGXADataSource)" 2>/dev/null
-    ${wildfly}/bin/jboss-cli.sh --connect --command="data-source add --name=cwsDS --driver-name=postgresql --jndi-name=java:/datasources/cwsDS --connection-url=jdbc:postgresql://localhost:5432/cws --user-name=cws_user --password=cws --use-ccm=false --max-pool-size=25 --blocking-timeout-wait-millis=5000 --enabled=true" 2>/dev/null
+    ${wildfly}/bin/jboss-cli.sh --connect --command="data-source add --name=cwsDS --driver-name=postgresql --jndi-name=java:/datasources/cwsDS --connection-url=jdbc:postgresql://${dbHost}:${dbPort}/${dbName} --user-name=${db_User} --password=${dbPassword} --use-ccm=false --max-pool-size=25 --blocking-timeout-wait-millis=5000 --enabled=true" 2>/dev/null
     echo "WildFly has been configured"
 elif [ "${action}" = "start" ]; then
     echo "Starting WildFly ..."

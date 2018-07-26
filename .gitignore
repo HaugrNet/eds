@@ -15,4 +15,17 @@ target
 dependency-reduced-pom.xml
 
 # FitNesse settings
+*.zip
 fitnesse-standalone.jar
+cws-fitnesse/FitNesseRoot/CWS
+cws-fitnesse/FitNesseRoot/FitNesse/
+cws-fitnesse/FitNesseRoot/FrontPage/
+cws-fitnesse/FitNesseRoot/PageFooter/
+cws-fitnesse/FitNesseRoot/PageHeader/
+cws-fitnesse/FitNesseRoot/PlugIns/
+cws-fitnesse/FitNesseRoot/RecentChanges.wiki
+cws-fitnesse/FitNesseRoot/TemplateLibrary/
+cws-fitnesse/FitNesseRoot/content.txt
+cws-fitnesse/FitNesseRoot/files/
+cws-fitnesse/FitNesseRoot/properties
+cws-fitnesse/FitNesseRoot/properties.xml

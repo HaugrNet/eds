@@ -39,9 +39,9 @@ if [ "${action}" = "configure" ]; then
 
     # CWS requires a data, currently only scripts for PostgreSQL exists, so
     # this is the one being attempted to create here.
-    psql -l | grep cws > /dev/null
+    psql -h ${dbHost} -p ${dbPort} -l | grep cws > /dev/null
     if [ $? -eq 1 ]; then
-        psql postgres -f  `dirname $0`/../postgresql/01-install.sql
+        psql -h ${dbHost} -p ${dbPort} postgres -f  `dirname $0`/../postgresql/01-install.sql
     fi
 
     echo "Configuring WildFly for CWS"

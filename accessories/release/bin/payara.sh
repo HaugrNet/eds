@@ -5,6 +5,7 @@
 # Configuration settings, please only modify this section
 # -----------------------------------------------------------------------------
 readonly dbHost="localhost"
+readonly dbPort="5432"
 readonly dbUser="cws_user"
 readonly dbPassword="cws"
 readonly dbName="cws"
@@ -35,9 +36,9 @@ if [ "${action}" = "configure" ]; then
 
     # CWS requires a data, currently only scripts for PostgreSQL exists, so
     # this is the one being attempted to create here.
-    psql -l | grep cws > /dev/null
+    psql -h ${dbHost} -p ${dbPort} -l | grep cws > /dev/null
     if [ $? -eq 1 ]; then
-        psql postgres -f  `dirname $0`/../postgresql/01-install.sql
+        psql -h ${dbHost} -p ${dbPort} postgres -f  `dirname $0`/../postgresql/01-install.sql
     fi
 
     echo "Configuring Payara for CWS"

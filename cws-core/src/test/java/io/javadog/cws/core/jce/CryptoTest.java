@@ -5,7 +5,7 @@
  * Project: CWS (cws-core)
  * =============================================================================
  */
-package io.javadog.cws.core;
+package io.javadog.cws.core.jce;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
@@ -13,14 +13,11 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 
 import io.javadog.cws.api.common.ReturnCode;
+import io.javadog.cws.core.DatabaseSetup;
 import io.javadog.cws.core.enums.KeyAlgorithm;
 import io.javadog.cws.core.enums.StandardSetting;
 import io.javadog.cws.core.exceptions.CWSException;
 import io.javadog.cws.core.exceptions.CryptoException;
-import io.javadog.cws.core.jce.CWSKeyPair;
-import io.javadog.cws.core.jce.Crypto;
-import io.javadog.cws.core.jce.PrivateCWSKey;
-import io.javadog.cws.core.jce.SecretCWSKey;
 import io.javadog.cws.core.model.Settings;
 import org.junit.Test;
 

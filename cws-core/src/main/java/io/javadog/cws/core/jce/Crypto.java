@@ -49,25 +49,23 @@ import java.util.Base64;
  * <p>CWS uses two (three) types of Encryption. Symmetric Encryption of all the
  * actual Data to be shared and Asymmetric Encryption to storing the Symmetric
  * keys. Additionally, all Private Key are be stored encrypted, and a Key is
- * derived from the Credentials to unlock it.</p>
+ * derived (using PBKDF2) from the Credentials to unlock it.</p>
  *
  * <p>The default Algorithms and Key sizes have been chosen, so they will work
- * with a standard Java 8+ installation, if larger keys are requested, then the
- * Java installation must be configured accordingly.</p>
+ * with a standard Java 8 (build 161+) installation, these uses the maximum key
+ * size allowed, if an older Java is used, then either install the Java 8
+ * Security extension from Oracle, or change the default configuration of CWS
+ * accordingly.</p>
  *
  * <p>Although Cryptography is the cornerstone of the CWS, there is no attempts
  * made towards creating or inventing various Algorithms. The risk of making
  * mistakes is too high. Instead, the CWS relies on the wisdom and maturity of
- * existing implementations.</p>
+ * existing JCE implementations in Java.</p>
  *
  * @author Kim Jensen
  * @since  CWS 1.0
  */
 public final class Crypto {
-
-    // For AES, the blocksize is always 128 bit and thus the IV must also be of
-    // the same size. See: https://en.wikipedia.org/wiki/Initialization_vector
-    private static final int IV_SIZE = 16;
 
     private final MasterKey masterKey;
     private final Settings settings;
@@ -104,7 +102,7 @@ public final class Crypto {
             final SecretKey tmpKey = factory.generateSecret(spec);
             final SecretKey secretKey = new SecretKeySpec(tmpKey.getEncoded(), algorithm.getName());
             final SecretCWSKey key = new SecretCWSKey(algorithm.getDerived(), secretKey);
-            key.setSalt(salt);
+            key.setSalt(new IVSalt(salt));
 
             return key;
         } catch (IllegalArgumentException | NoSuchAlgorithmException | InvalidKeySpecException e) {
@@ -250,7 +248,7 @@ public final class Crypto {
         }
     }
 
-    private Cipher prepareCipher(final CWSKey<?> key, final int type) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException {
+    private static Cipher prepareCipher(final CWSKey<?> key, final int type) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException {
         IvParameterSpec iv = null;
         final String instanceName;
         final Cipher cipher;
@@ -260,11 +258,7 @@ public final class Crypto {
         } else {
             final KeyAlgorithm algorithm = key.getAlgorithm();
             instanceName = algorithm.getTransformation();
-            final String salt = ((SecretCWSKey) key).getSalt();
-            final byte[] bytes = new byte[IV_SIZE];
-            System.arraycopy(salt.getBytes(settings.getCharset()), 0, bytes, 0, bytes.length);
-
-            iv = new IvParameterSpec(bytes);
+            iv = new IvParameterSpec(((SecretCWSKey) key).getSalt().getBytes());
         }
 
         cipher = Cipher.getInstance(instanceName);
@@ -371,7 +365,7 @@ public final class Crypto {
      * @return RSA KeyPair with the Public and Private Keys
      */
     public CWSKeyPair extractAsymmetricKey(final KeyAlgorithm algorithm, final SecretCWSKey key, final String salt, final String armoredPublicKey, final String armoredPrivateKey) {
-        key.setSalt(salt);
+        key.setSalt(new IVSalt(salt));
 
         // Extracting the Public Key
         final PublicKey publicKey = dearmoringPublicKey(armoredPublicKey);

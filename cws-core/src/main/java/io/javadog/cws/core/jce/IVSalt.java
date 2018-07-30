@@ -11,7 +11,7 @@ import io.javadog.cws.core.model.Settings;
 
 import java.security.SecureRandom;
 import java.util.Base64;
-import java.util.UUID;
+import java.util.logging.Logger;
 
 /**
  * <p>In CWS 1.0, the default Salt was generated as a UUID, however this is not
@@ -22,25 +22,25 @@ import java.util.UUID;
  * @author Kim Jensen
  * @since  CWS 1.1
  */
-public final class Salt {
+public final class IVSalt {
 
-    // For AES, the blocksize is always 128 bit and thus the IV must also be of
+    private static final Logger log = Logger.getLogger(IVSalt.class.getName());
+    // For AES, the block size is always 128 bit and thus the IV must also be of
     // the same size. See: https://en.wikipedia.org/wiki/Initialization_vector
     private static final int IV_SIZE = 16;
 
-    // UUIDs have a specific length, which is being used to determine if a
-    // given String is armored with Base64, or generated as a UUID.
-    private static final int UUID_LENGTH = UUID.randomUUID().toString().length();
-
     private final String armored;
 
-    public Salt() {
+    public IVSalt() {
+        // According to the SonarQube rule (from FindBugs/SpotBugs Security)
+        // https://sonarcloud.io/coding_rules?open=squid:S3329&rule_key=squid:S3329
+        // the IV should be generated using the SecureRandom class as follows.
         final byte[] random = new byte[IV_SIZE];
         new SecureRandom().nextBytes(random);
         this.armored = Base64.getEncoder().encodeToString(random);
     }
 
-    public Salt(final String armored) {
+    public IVSalt(final String armored) {
         this.armored = armored;
     }
 
@@ -49,15 +49,19 @@ public final class Salt {
     }
 
     public byte[] getBytes() {
-        final byte[] bytes;
+        final byte[] bytes = new byte[IV_SIZE];
+        // Default assumption - the Salt is a UUID
+        byte[] rawSalt = armored.getBytes(Settings.getInstance().getCharset());
 
-        if (armored.length() == UUID_LENGTH) {
-            // UUID generated Salt
-            bytes = armored.getBytes(Settings.getInstance().getCharset());
-        } else {
-            bytes = Base64.getDecoder().decode(armored);
+        if (armored.length() == 24) {
+            try {
+                rawSalt = Base64.getDecoder().decode(armored);
+            } catch (IllegalArgumentException e) {
+                log.log(Settings.DEBUG, "IVSalt is not Base64 encoded: " + e.getMessage(), e);
+            }
         }
 
+        System.arraycopy(rawSalt, 0, bytes, 0, IV_SIZE);
         return bytes;
     }
 }

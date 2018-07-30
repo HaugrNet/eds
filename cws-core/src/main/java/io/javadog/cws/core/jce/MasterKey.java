@@ -90,7 +90,7 @@ public final class MasterKey {
             final SecretKey secretKey = new SecretKeySpec(tmp.getEncoded(), ALGORITHM.getName());
 
             final SecretCWSKey newKey = new SecretCWSKey(ALGORITHM.getDerived(), secretKey);
-            newKey.setSalt(salt);
+            newKey.setSalt(new IVSalt(salt));
 
             return newKey;
         } catch (IllegalArgumentException | NoSuchAlgorithmException | InvalidKeySpecException e) {

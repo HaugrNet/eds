@@ -7,6 +7,8 @@
  */
 package io.javadog.cws.api.common;
 
+import java.util.regex.Pattern;
+
 /**
  * <p>Common Constant values used throughout the API.</p>
  *
@@ -37,6 +39,12 @@ public final class Constants {
      * regular expression matches.</p>
      */
     public static final String ID_PATTERN_REGEX = "[\\da-z]{8}-[\\da-z]{4}-[\\da-z]{4}-[\\da-z]{4}-[\\da-z]{12}";
+
+    /**
+     * <p>Pattern to test if a given value mateches a UUID, which is what CWS
+     * uses for some Ids.</p>
+     */
+    public static final Pattern ID_PATTERN = Pattern.compile(ID_PATTERN_REGEX);
 
     /**
      * <p>The System Administrator Account - this account is used as the default

@@ -24,6 +24,7 @@ import io.javadog.cws.core.exceptions.CryptoException;
 import io.javadog.cws.core.exceptions.VerificationException;
 import io.javadog.cws.core.jce.CWSKeyPair;
 import io.javadog.cws.core.jce.Crypto;
+import io.javadog.cws.core.jce.IVSalt;
 import io.javadog.cws.core.jce.SecretCWSKey;
 import io.javadog.cws.core.model.CommonDao;
 import io.javadog.cws.core.model.Settings;
@@ -38,7 +39,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.UUID;
 
 /**
  * <p>Common Business Logic, used by the Business Logic classes.</p>
@@ -222,15 +222,15 @@ public abstract class Serviceable<R extends CwsResponse, V extends Authenticatio
     protected final CWSKeyPair updateMemberPassword(final MemberEntity member, final byte[] password) {
         final KeyAlgorithm pbeAlgorithm = settings.getPasswordAlgorithm();
         final KeyAlgorithm rsaAlgorithm = settings.getAsymmetricAlgorithm();
-        final String salt = UUID.randomUUID().toString();
-        final SecretCWSKey key = crypto.generatePasswordKey(pbeAlgorithm, password, salt);
+        final IVSalt salt = new IVSalt();
+        final SecretCWSKey key = crypto.generatePasswordKey(pbeAlgorithm, password, salt.getArmored());
         key.setSalt(salt);
 
         final CWSKeyPair pair = crypto.generateAsymmetricKey(rsaAlgorithm);
         final String publicKey = crypto.armoringPublicKey(pair.getPublic().getKey());
         final String privateKey = crypto.armoringPrivateKey(key, pair.getPrivate().getKey());
 
-        member.setSalt(crypto.encryptWithMasterKey(salt));
+        member.setSalt(crypto.encryptWithMasterKey(salt.getArmored()));
         member.setPbeAlgorithm(pbeAlgorithm);
         member.setRsaAlgorithm(rsaAlgorithm);
         member.setPrivateKey(privateKey);
@@ -298,7 +298,7 @@ public abstract class Serviceable<R extends CwsResponse, V extends Authenticatio
         byte[] encryptedKey = null;
 
         if (externalKey != null) {
-            circleKey.setSalt(settings.getSalt());
+            circleKey.setSalt(new IVSalt(settings.getSalt()));
             encryptedKey = crypto.encrypt(circleKey, crypto.stringToBytes(externalKey));
         }
 
@@ -311,7 +311,7 @@ public abstract class Serviceable<R extends CwsResponse, V extends Authenticatio
 
         if (encryptedKey != null) {
             final SecretCWSKey circleKey = crypto.extractCircleKey(trustee.getKey().getAlgorithm(), keyPair.getPrivate(), trustee.getCircleKey());
-            circleKey.setSalt(settings.getSalt());
+            circleKey.setSalt(new IVSalt(settings.getSalt()));
             externalKey = crypto.bytesToString(crypto.decrypt(circleKey, encryptedKey));
         }
 

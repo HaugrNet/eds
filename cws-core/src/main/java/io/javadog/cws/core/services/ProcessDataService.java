@@ -16,6 +16,7 @@ import io.javadog.cws.core.enums.KeyAlgorithm;
 import io.javadog.cws.core.enums.Permission;
 import io.javadog.cws.core.enums.SanityStatus;
 import io.javadog.cws.core.exceptions.CWSException;
+import io.javadog.cws.core.jce.IVSalt;
 import io.javadog.cws.core.jce.SecretCWSKey;
 import io.javadog.cws.core.model.Settings;
 import io.javadog.cws.core.model.entities.DataEntity;
@@ -92,7 +93,7 @@ public final class ProcessDataService extends Serviceable<ProcessDataResponse, P
 
                 final SecretCWSKey circleKey = crypto.extractCircleKey(algorithm, keyPair.getPrivate(), trustee.getCircleKey());
                 final String salt = UUID.randomUUID().toString();
-                circleKey.setSalt(salt);
+                circleKey.setSalt(new IVSalt(salt));
 
                 final DataEntity dataEntity = new DataEntity();
                 dataEntity.setMetadata(metadataEntity);
@@ -303,7 +304,7 @@ public final class ProcessDataService extends Serviceable<ProcessDataResponse, P
 
             final SecretCWSKey circleKey = extractCircleKey(entity);
             final String salt = UUID.randomUUID().toString();
-            circleKey.setSalt(salt);
+            circleKey.setSalt(new IVSalt(salt));
             final byte[] encrypted = crypto.encrypt(circleKey, bytes);
             final String checksum = crypto.generateChecksum(encrypted);
 

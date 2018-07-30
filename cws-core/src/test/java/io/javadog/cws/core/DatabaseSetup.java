@@ -21,6 +21,7 @@ import io.javadog.cws.core.enums.Status;
 import io.javadog.cws.core.exceptions.CWSException;
 import io.javadog.cws.core.jce.CWSKeyPair;
 import io.javadog.cws.core.jce.Crypto;
+import io.javadog.cws.core.jce.IVSalt;
 import io.javadog.cws.core.jce.SecretCWSKey;
 import io.javadog.cws.core.model.CommonDao;
 import io.javadog.cws.core.model.Settings;
@@ -132,14 +133,14 @@ public class DatabaseSetup {
 
     protected MemberEntity prepareMember(final String externalId, final String accountName, final String secret, final CWSKeyPair keyPair) {
         final KeyAlgorithm pbeAlgorithm = settings.getPasswordAlgorithm();
-        final String salt = UUID.randomUUID().toString();
-        final SecretCWSKey secretKey = crypto.generatePasswordKey(pbeAlgorithm, crypto.stringToBytes(secret), salt);
+        final IVSalt salt = new IVSalt();
+        final SecretCWSKey secretKey = crypto.generatePasswordKey(pbeAlgorithm, crypto.stringToBytes(secret), salt.getArmored());
         secretKey.setSalt(salt);
 
         final MemberEntity entity = new MemberEntity();
         entity.setExternalId(externalId);
         entity.setName(accountName);
-        entity.setSalt(salt);
+        entity.setSalt(salt.getArmored());
         entity.setPbeAlgorithm(pbeAlgorithm);
         entity.setRsaAlgorithm(settings.getAsymmetricAlgorithm());
         entity.setPublicKey(crypto.armoringPublicKey(keyPair.getPublic().getKey()));

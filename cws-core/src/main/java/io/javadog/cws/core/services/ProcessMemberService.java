@@ -18,6 +18,7 @@ import io.javadog.cws.core.enums.Permission;
 import io.javadog.cws.core.exceptions.CWSException;
 import io.javadog.cws.core.exceptions.VerificationException;
 import io.javadog.cws.core.jce.CWSKeyPair;
+import io.javadog.cws.core.jce.IVSalt;
 import io.javadog.cws.core.jce.SecretCWSKey;
 import io.javadog.cws.core.model.Settings;
 import io.javadog.cws.core.model.entities.MemberEntity;
@@ -266,13 +267,13 @@ public final class ProcessMemberService extends Serviceable<ProcessMemberRespons
 
                 if (crypto.verify(publicKey, crypto.stringToBytes(secret), request.getCredential())) {
                     final KeyAlgorithm pbeAlgorithm = settings.getPasswordAlgorithm();
-                    final String salt = UUID.randomUUID().toString();
+                    final IVSalt salt = new IVSalt();
                     final byte[] newSecret = request.getNewCredential();
                     final CWSKeyPair pair = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
-                    final SecretCWSKey key = crypto.generatePasswordKey(pbeAlgorithm, newSecret, salt);
+                    final SecretCWSKey key = crypto.generatePasswordKey(pbeAlgorithm, newSecret, salt.getArmored());
                     key.setSalt(salt);
 
-                    account.setSalt(crypto.encryptWithMasterKey(salt));
+                    account.setSalt(crypto.encryptWithMasterKey(salt.getArmored()));
                     account.setPbeAlgorithm(pbeAlgorithm);
                     account.setRsaAlgorithm(pair.getAlgorithm());
                     account.setMemberKey(request.getPublicKey());

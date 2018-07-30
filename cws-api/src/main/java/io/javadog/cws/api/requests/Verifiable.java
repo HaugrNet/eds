@@ -14,7 +14,6 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlType;
 import java.io.Serializable;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 /**
  * <p>This Class contains checks for different fields that is used as part of
@@ -37,8 +36,6 @@ public abstract class Verifiable implements Serializable {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
-
-    private static final Pattern ID_PATTERN = Pattern.compile(Constants.ID_PATTERN_REGEX);
 
     /**
      * Simple Validation method, which checks if the required values are usable
@@ -78,7 +75,7 @@ public abstract class Verifiable implements Serializable {
     }
 
     protected static void checkValidId(final Map<String, String> errors, final String field, final String value, final String message) {
-        if ((value != null) && !ID_PATTERN.matcher(value).matches()) {
+        if ((value != null) && !Constants.ID_PATTERN.matcher(value).matches()) {
             errors.put(field, message);
         }
     }

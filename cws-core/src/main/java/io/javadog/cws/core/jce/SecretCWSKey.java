@@ -20,7 +20,7 @@ import javax.crypto.SecretKey;
  */
 public final class SecretCWSKey extends CWSKey<SecretKey> {
 
-    private String salt = null;
+    private IVSalt salt = null;
 
     /**
      * Default Constructor.
@@ -32,11 +32,11 @@ public final class SecretCWSKey extends CWSKey<SecretKey> {
         super(algorithm, key);
     }
 
-    public void setSalt(final String salt) {
+    public void setSalt(final IVSalt salt) {
         this.salt = salt;
     }
 
-    public String getSalt() {
+    public IVSalt getSalt() {
         return salt;
     }
 

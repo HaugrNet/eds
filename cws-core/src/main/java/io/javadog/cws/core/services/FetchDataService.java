@@ -15,6 +15,7 @@ import io.javadog.cws.api.requests.FetchDataRequest;
 import io.javadog.cws.api.responses.FetchDataResponse;
 import io.javadog.cws.core.enums.Permission;
 import io.javadog.cws.core.enums.SanityStatus;
+import io.javadog.cws.core.jce.IVSalt;
 import io.javadog.cws.core.jce.SecretCWSKey;
 import io.javadog.cws.core.model.Settings;
 import io.javadog.cws.core.model.entities.DataEntity;
@@ -116,7 +117,7 @@ public final class FetchDataService extends Serviceable<FetchDataResponse, Fetch
             final String checksum = crypto.generateChecksum(entity.getData());
             if (Objects.equals(checksum, entity.getChecksum())) {
                 final SecretCWSKey key = extractCircleKey(entity);
-                key.setSalt(crypto.decryptWithMasterKey(entity.getInitialVector()));
+                key.setSalt(new IVSalt(crypto.decryptWithMasterKey(entity.getInitialVector())));
                 final byte[] bytes = crypto.decrypt(key, entity.getData());
                 final List<Metadata> metadataList = new ArrayList<>(1);
                 metadataList.add(metaData);

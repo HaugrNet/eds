@@ -135,7 +135,7 @@ public final class CryptoTest extends DatabaseSetup {
         final String password = "MySuperSecretPassword";
         final String salt = UUID.randomUUID().toString();
         final SecretCWSKey cryptoKeys = crypto.generatePasswordKey(settings.getPasswordAlgorithm(), crypto.stringToBytes(password), salt);
-        cryptoKeys.setSalt(UUID.randomUUID().toString());
+        cryptoKeys.setSalt(new IVSalt(UUID.randomUUID().toString()));
         final CWSKeyPair keyPair = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
 
         final String armoredKey = crypto.armoringPrivateKey(cryptoKeys, keyPair.getPrivate().getKey());
@@ -149,7 +149,7 @@ public final class CryptoTest extends DatabaseSetup {
         final String secret = "MySuperSecretPassword";
         final String salt = UUID.randomUUID().toString();
         final SecretCWSKey secretKey = crypto.generatePasswordKey(settings.getPasswordAlgorithm(), crypto.stringToBytes(secret), salt);
-        secretKey.setSalt(salt);
+        secretKey.setSalt(new IVSalt(salt));
         final CWSKeyPair pair = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
 
         final String armoredPublicKey = crypto.armoringPublicKey(pair.getPublic().getKey());
@@ -170,7 +170,7 @@ public final class CryptoTest extends DatabaseSetup {
     @Test
     public void testObjectEncryption() {
         final SecretCWSKey key = crypto.generateSymmetricKey(settings.getSymmetricAlgorithm());
-        key.setSalt(UUID.randomUUID().toString());
+        key.setSalt(new IVSalt(UUID.randomUUID().toString()));
 
         // Now, we're going to encrypt some data
         final String cleartext = "This is just an example";
@@ -229,7 +229,7 @@ public final class CryptoTest extends DatabaseSetup {
         final SecretCWSKey key = crypto.generatePasswordKey(settings.getPasswordAlgorithm(), crypto.stringToBytes(password), salt);
 
         // Now, we're going to encrypt some data
-        key.setSalt(UUID.randomUUID().toString());
+        key.setSalt(new IVSalt(UUID.randomUUID().toString()));
         final String cleartext = "This is just an example";
         final byte[] encrypted = crypto.encrypt(key, crypto.stringToBytes(cleartext));
 
@@ -254,14 +254,14 @@ public final class CryptoTest extends DatabaseSetup {
 
         final String dataSalt = UUID.randomUUID().toString();
         final SecretCWSKey key = crypto.generateSymmetricKey(settings.getSymmetricAlgorithm());
-        key.setSalt(dataSalt);
+        key.setSalt(new IVSalt(dataSalt));
         final byte[] rawdata = generateData(1048576);
         final byte[] encryptedData = crypto.encrypt(key, rawdata);
 
         final CWSKeyPair keyPair = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
         final String armoredCircleKey = crypto.encryptAndArmorCircleKey(keyPair.getPublic(), key);
         final SecretCWSKey circleKey = crypto.extractCircleKey(key.getAlgorithm(), keyPair.getPrivate(), armoredCircleKey);
-        circleKey.setSalt(dataSalt);
+        circleKey.setSalt(new IVSalt(dataSalt));
         final byte[] decryptedData = crypto.decrypt(circleKey, encryptedData);
 
         assertThat(decryptedData, is(rawdata));
@@ -384,7 +384,7 @@ public final class CryptoTest extends DatabaseSetup {
         final Crypto myCrypto = new Crypto(mySettings);
         final CWSKeyPair keyPair = myCrypto.generateAsymmetricKey(mySettings.getAsymmetricAlgorithm());
         final SecretCWSKey secretKey = myCrypto.generateSymmetricKey(mySettings.getSymmetricAlgorithm());
-        secretKey.setSalt(UUID.randomUUID().toString());
+        secretKey.setSalt(new IVSalt(UUID.randomUUID().toString()));
 
         final String armoredPrivateKey = myCrypto.armoringPrivateKey(secretKey, keyPair.getPrivate().getKey());
         mySettings.set(StandardSetting.ASYMMETRIC_ALGORITHM.getKey(), KeyAlgorithm.AES128.name());
@@ -403,7 +403,7 @@ public final class CryptoTest extends DatabaseSetup {
 
         final SecretKey secretKey = generator.generateKey();
         final SecretCWSKey key = new SecretCWSKey(settings.getAsymmetricAlgorithm(), secretKey);
-        key.setSalt(UUID.randomUUID().toString());
+        key.setSalt(new IVSalt(UUID.randomUUID().toString()));
 
         return key;
     }

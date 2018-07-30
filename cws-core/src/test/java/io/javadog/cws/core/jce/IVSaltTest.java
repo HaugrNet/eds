@@ -12,27 +12,26 @@ import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
 
-import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 /**
  * @author Kim Jensen
  * @since  CWS 1.1
  */
-public class SaltTest {
+public class IVSaltTest {
 
     @Test
     public void testSaltAsUUID() {
         final String uuid = UUID.randomUUID().toString();
-        final Salt salt = new Salt(uuid);
+        final IVSalt salt = new IVSalt(uuid);
 
         assertThat(salt.getArmored(), is(uuid));
-        assertThat(salt.getBytes(), is(uuid.getBytes(StandardCharsets.UTF_8)));
+        assertThat(salt.getBytes().length, is(16));
     }
 
     @Test
     public void testDefaultSalt() {
-        final Salt salt = new Salt();
+        final IVSalt salt = new IVSalt();
 
         assertThat(salt.getArmored().length(), is(24));
         assertThat(salt.getBytes().length, is(16));

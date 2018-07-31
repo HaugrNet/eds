@@ -2,79 +2,58 @@
 --
 
 # CWS - Cryptographic Web Store
-[CWS](https://javadog.io/), Cryptographic Web Store, works like "PGP for the
-Cloud". It is designed as a backend component, which can be integrated into
-other systems or be used directly by other applications or apps. It us written
-purely in Java / Java EE, and it is not containing any third-party dependencies.
-It is build around the vision of allowing safe and easy exchange of data between
-multiple parties, where data is stored encrypted.
+[CWS](https://javadog.io/), Cryptographic Web Store, works like a "PGP for the
+Cloud". It is designed as a backend component with the vision that it should be
+possible to exchange data between multiple parties using encrypted storage.
 
-The CWS focuses on Circles of Trust, where Members of a Circle will have varying
-level of access to the Data belonging to the Circle. This is achieved by a
-combination of Symmetric and Asymmetric Encryption, guaranteeing that only
-Members with Access can view Data. Storage is safe as all data is stored
-encrypted.
+Via the public API (REST or SOAP based WebServices), it is possible to access
+the internal logic, where keys are unlocked based on user credentials and used
+to encrypt and decrypt data, storing only encrypted keys and data. Using the
+same basic mechanism as PGP, combining Asymmetric & Symmetric keys, it is
+possible for multiple parties to exchange data safely and securely.
 
-Communication is achieved via a public API, which allows both REST and SOAP
-based WebService requests. This will give a high degree of flexibility for
-anyone to integrate it into their system.
+Since CWS only focused on bytes and does not have any care for more information,
+it can be used to store either files between users or data objects between apps
+or applications. This makes CWS the perfect companion for anyone who have Data
+Protection & Privacy concerns, such as GDPR.
+
+CWS is written in Java 8 / Java EE 7, with no third-part depedencies, meaning
+that it can run on any Host or in any Cloud where a Java EE Container is
+available. The first version is using [PostgreSQL](https://www.postgresql.org/)
+as database, but thanks to the flexibility of Java EE, it is possible to use any
+database desired. Testing of CWS has been done using both
+[WildFly](http://www.wildfly.org/) and [Payara](https://payara.fish/).
 
 # Build, Install and Run
-The current version of CWS has reached the point where it can build, deploy and
-run in [WildFly](http://www.wildfly.org/) using PostgreSQL as database. To test,
-please make sure that you have Java (8+), [Maven](https://maven.apache.org/) and
-[PostgreSQL](https://www.postgresql.org/) installed and running, as well as a
-local copy of the CWS sources.
+The final version 1.0 of CWS can be downloaded from [JavaDog](https://javadog.io/),
+version 1.1 is currently being developed. The aim is to constantly have a stable
+and usable system, so if needed - please download the sources and build CWS
+yourself. The build only requires Java JDK 8 (patch level 161 or greater), and
+[Maven](https://maven.apache.org/).
 
-In the accessories folder, you can find the configuration for WildFly 10 and 11,
-the files are located in the same folder structure as you need to add them to
-your local WildFly installation.
+In the accessories/release folder, there is a number of files, which is used to
+install and run CWS. Please put the bin folder in your path, and then invoke
+either the payara.sh or wildfly.sh script, which will provide the options for
+configuring, deploying, starting & stopping CWS in either Payara or WildFly. The
+scripts can also create the database, but it does require that you have the
+correct permissions in PostgreSQL - see the README.txt file in the Accessories
+folder for details regarding this.
 
-The database files can also be found in the accessories module under
-`configuration/postgresql` where the `01-install.sql` script will create
-the database, user (with password) and setup the database with tables &amp; data
-for the initial run.
-
-Then do the following:
-
-First, setup your database: The following will create a database named cws and a
-user named cws_user as well as set up all needed tables. Note, that re-running
-the script will destroy an existing CWS database. For the initial release, no
-update scripts will be made, unless requested.
-
-```
-$ cd [ /path/to/cws/files/ ] accessories/postgresql
-$ psql postgres --file 01-install.sql
-```
-
-**Developers only**: If you want to build from source, run these steps to create the cws.war package:
+**Developers only**: If you want to build from source, run these steps to
+create the deployable WAR packages for either Payara or WildFly:
 
 ```
 $ cd [ /path/to/cws/sources ]
 $ mvn clean verify
 ```
 
+Using the Payara or WildFly scripts to deploy the correct WAR file.
 Now copy the cws.war file in place.
 
 ```
-$ cp cws.war ${WILDFLY_HOME}/standalone/deployments
-```
-
-*Note: if you built it from scratch, you will probably find it at cws-war/target/cws.war*
-
-And finally we need to also copy the wildfly configuration into place:
-
-```
-$ cd wildfly-[WILDFLYVERSION]
-$ cp -R * ${WILDFLY_HOME}
-```
-
-*Note: If you built from scratch, the configuration is located under accessories/configuration/.*
-
-And now you can start the server with this command:
-
-```
-$ ${WILDFLY_HOME}/bin/standalone.sh -c standalone-cws.xml
+$ export PATH=[ / path/to/cws/sources ]/accessories/release/bin:${PATH}
+$ payara.sh configure
+$ payara.sh deploy
 ```
 
 Now, you should have a running version of CWS which can be reached from the
@@ -98,11 +77,9 @@ deployed in a "hostile" environment.
 
  * MasterKey - The MasterKey is used to encrypt and decrypt various information
    and it must be set at startup, since it is not persisted anywhere.
- * Deleting sensitive data - Data, which is considered sensitive is actively
-   being deleted once it is no longer needed. This includes the credentials,
-   which a member gives to unlock their account. It should also include the
-   symmetric and private keys, but due to a not implemented feature in Java,
-   this is not the case.
+ * Removing sensitive data from memory - by overwriting it in memory, before it
+   is being dereferenced. This should also include the keys, but due to a not
+   implemented feature in Java, this is not the case.
  * Invalidate Accounts, this allows a member to force the keys to be replaced
    internally, so it is possible to log in and view Circles, but it will not be
    possible to extract data, as the keys are not the same as the ones, which
@@ -122,6 +99,9 @@ features:
  * Search Circles, Members & Data. Although, the CWS is storing very little
    information, it may still be necessary to search for somethnig using the
    simple names.
+ * External control of the MasterKey via a URI, so it can be referenced from a
+   central source and destroyed centrally, rather than the Administrator having
+   to unlock it manually.
  * Re-key, i.e. force an update of the Keys used for a Circle or Member. This
    feature will have different ways to be triggered, either being forced with
    a request or it can be started if the key exceeds a certain age, the latter

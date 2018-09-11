@@ -17,10 +17,10 @@ import java.util.Base64;
 import java.util.logging.Logger;
 
 /**
- * <p>In CWS 1.0, the default Salt was generated as a UUID, however this is not
- * secure enough, as the entropy is not as high as a proper random byte array.
- * Thus, this Class has been added, to handle the difference between the UUID
- * based Salts and the Random generated.</p>
+ * <p>In CWS 1.0, the default Salt was generated as a UUID, however this may
+ * not be secure enough, as the entropy is not as high as a proper random byte
+ * array. Thus, this Class has been added, to handle the difference between
+ * the UUID based Salts and the Random generated.</p>
  *
  * @author Kim Jensen
  * @since  CWS 1.1
@@ -32,7 +32,7 @@ public final class IVSalt {
     // the same size. See: https://en.wikipedia.org/wiki/Initialization_vector
     private static final int IV_SIZE = 16;
     // The armored length of the IV will always have this length.
-    private static final int IV_LENGTH = 24;
+    private static final int ARMORED_LENGTH = 24;
 
     private final String armored;
 
@@ -58,7 +58,7 @@ public final class IVSalt {
         // Default assumption - the Salt is a UUID
         byte[] rawSalt = armored.getBytes(Settings.getInstance().getCharset());
 
-        if (armored.length() == IV_LENGTH) {
+        if (armored.length() == ARMORED_LENGTH) {
             try {
                 rawSalt = Base64.getDecoder().decode(armored);
             } catch (IllegalArgumentException e) {

@@ -4,7 +4,9 @@
 # CWS - Cryptographic Web Store
 [CWS](https://javadog.io/), Cryptographic Web Store, works like a "PGP for the
 Cloud". It is designed as a backend component with the vision that it should be
-possible to exchange data between multiple parties using encrypted storage.
+possible to exchange data between multiple parties using encrypted storage,
+where both the parties involved and the data exchanged can be anything from
+simple files to complex data objects - CWS only cares about bytes.
 
 Via the public API (REST or SOAP based WebServices), it is possible to access
 the internal logic, where keys are unlocked based on user credentials and used

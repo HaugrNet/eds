@@ -1,9 +1,12 @@
 /*
- * =============================================================================
- * Copyright (c) 2016-2018, JavaDog.io
- * -----------------------------------------------------------------------------
- * Project: CWS (cws-core)
- * =============================================================================
+ * Cryptographic Web Store, CWS, open source backend service.
+ * Copyright (C) 2016-2018 JavaDog.io
+ * Apache Software License, version 2
+ * mailto:cws AT JavaDog DOT io
+ *
+ * CWS is released in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE.
  */
 package io.javadog.cws.core.jce;
 
@@ -28,6 +31,8 @@ public final class IVSalt {
     // For AES, the block size is always 128 bit and thus the IV must also be of
     // the same size. See: https://en.wikipedia.org/wiki/Initialization_vector
     private static final int IV_SIZE = 16;
+    // The armored length of the IV will always have this length.
+    private static final int IV_LENGTH = 24;
 
     private final String armored;
 
@@ -53,7 +58,7 @@ public final class IVSalt {
         // Default assumption - the Salt is a UUID
         byte[] rawSalt = armored.getBytes(Settings.getInstance().getCharset());
 
-        if (armored.length() == 24) {
+        if (armored.length() == IV_LENGTH) {
             try {
                 rawSalt = Base64.getDecoder().decode(armored);
             } catch (IllegalArgumentException e) {

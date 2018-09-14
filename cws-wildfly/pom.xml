@@ -10,7 +10,7 @@
     </parent>
     <artifactId>cws-wildfly</artifactId>
     <packaging>war</packaging>
-    <name>CWS WildFly WAR</name>
+    <name>CWS - WildFly WAR</name>
     <description>
         This module contain a WAR file, compatible with WildFly 10 - 13.
     </description>

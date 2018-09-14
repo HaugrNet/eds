@@ -10,7 +10,7 @@
     </parent>
     <artifactId>cws-core</artifactId>
     <packaging>jar</packaging>
-    <name>CWS Core</name>
+    <name>CWS - Core</name>
     <description>This is the Core Logic module for the CWS.</description>
 
     <dependencies>

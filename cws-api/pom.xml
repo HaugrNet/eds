@@ -10,7 +10,7 @@
     </parent>
     <artifactId>cws-api</artifactId>
     <packaging>jar</packaging>
-    <name>CWS API</name>
+    <name>CWS - API</name>
     <description>This module contain the public API for the CWS.</description>
 
     <dependencies>

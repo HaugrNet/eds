@@ -10,7 +10,7 @@
     </parent>
     <artifactId>cws-client</artifactId>
     <packaging>jar</packaging>
-    <name>CWS Client</name>
+    <name>CWS - Client</name>
     <description>Sample CWS Client Module, primarily for testing.</description>
 
     <dependencies>

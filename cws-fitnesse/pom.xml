@@ -10,7 +10,7 @@
     </parent>
     <artifactId>cws-fitnesse</artifactId>
     <packaging>jar</packaging>
-    <name>CWS FitNesse</name>
+    <name>CWS - FitNesse</name>
     <description>Sample CWS FitNesse Test Module</description>
 
     <dependencies>

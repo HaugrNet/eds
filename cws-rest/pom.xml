@@ -10,7 +10,7 @@
     </parent>
     <artifactId>cws-rest</artifactId>
     <packaging>jar</packaging>
-    <name>CWS REST</name>
+    <name>CWS - REST</name>
     <description>CWS REST Based WebServices.</description>
 
     <dependencies>

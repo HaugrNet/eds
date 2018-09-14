@@ -49,7 +49,7 @@ import java.util.logging.Logger;
 @TransactionAttribute(TransactionAttributeType.REQUIRED)
 public class StartupBean {
 
-    private static final Logger log = Logger.getLogger(StartupBean.class.getName());
+    private static final Logger LOG = Logger.getLogger(StartupBean.class.getName());
     private static final int DB_VERSION = 1;
 
     @PersistenceContext private EntityManager entityManager;
@@ -59,13 +59,13 @@ public class StartupBean {
 
     @PostConstruct
     public void startup() {
-        log.info("Check if Database is up-to-date.");
+        LOG.info("Check if Database is up-to-date.");
         if (checkDatabase()) {
 
-            log.info("Initialize the Settings.");
+            LOG.info("Initialize the Settings.");
             initializeSettings();
 
-            log.info("Initializing the CWS Sanitizer Service.");
+            LOG.info("Initializing the CWS Sanitizer Service.");
 
             // If requested, then simply start the sanitize as a background job
             // now. The job will process small blocks of code and save these.
@@ -104,7 +104,7 @@ public class StartupBean {
                 ready = true;
             }
         } catch (CWSException e) {
-            log.log(Settings.ERROR, "Problem with DB: " + e.getMessage(), e);
+            LOG.log(Settings.ERROR, "Problem with DB: " + e.getMessage(), e);
         }
 
         settings.set(StandardSetting.IS_READY.getKey(), String.valueOf(ready));
@@ -122,14 +122,14 @@ public class StartupBean {
 
     @Asynchronous
     public void runSanitizing() {
-        log.log(Settings.INFO, "Starting initial Sanitizing check.");
+        LOG.log(Settings.INFO, "Starting initial Sanitizing check.");
         sanitizerBean.sanitize();
     }
 
     @Timeout
     public void runSanitizing(final Timer timer) {
-        log.log(Settings.INFO, "Starting Timed Sanitizing check.");
+        LOG.log(Settings.INFO, "Starting Timed Sanitizing check.");
         sanitizerBean.sanitize();
-        log.log(Settings.INFO, "Next Sanitizing check will begin at: " + timer.getNextTimeout());
+        LOG.log(Settings.INFO, "Next Sanitizing check will begin at: " + timer.getNextTimeout());
     }
 }

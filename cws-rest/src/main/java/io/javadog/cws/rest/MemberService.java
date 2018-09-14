@@ -36,7 +36,7 @@ import java.util.logging.Logger;
 @Path(Constants.REST_MEMBERS_BASE)
 public class MemberService {
 
-    private static final Logger log = Logger.getLogger(MemberService.class.getName());
+    private static final Logger LOG = Logger.getLogger(MemberService.class.getName());
 
     private final Settings settings = Settings.getInstance();
     @Inject private ManagementBean bean;
@@ -87,14 +87,14 @@ public class MemberService {
     @Path(Constants.REST_MEMBERS_FETCH)
     public Response fetch(@NotNull final FetchMemberRequest fetchMembersRequest) {
         final String restAction = Constants.REST_MEMBERS_BASE + Constants.REST_MEMBERS_FETCH;
-        final Long startTime = System.nanoTime();
+        final long startTime = System.nanoTime();
         FetchMemberResponse response;
 
         try {
             response = bean.fetchMembers(fetchMembersRequest);
-            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), restAction, startTime));
+            LOG.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), restAction, startTime));
         } catch (RuntimeException e) {
-            log.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getLocale(), restAction, startTime, e));
+            LOG.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getLocale(), restAction, startTime, e));
             response = new FetchMemberResponse(ReturnCode.ERROR, e.getMessage());
         }
 
@@ -103,15 +103,15 @@ public class MemberService {
 
     private Response processMember(final ProcessMemberRequest request, final Action action, final String logAction) {
         final String restAction = Constants.REST_MEMBERS_BASE + logAction;
-        final Long startTime = System.nanoTime();
+        final long startTime = System.nanoTime();
         ProcessMemberResponse response;
 
         try {
             request.setAction(action);
             response = bean.processMember(request);
-            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), restAction, startTime));
+            LOG.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), restAction, startTime));
         } catch (RuntimeException e) {
-            log.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getLocale(), restAction, startTime, e));
+            LOG.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getLocale(), restAction, startTime, e));
             response = new ProcessMemberResponse(ReturnCode.ERROR, e.getMessage());
         }
 

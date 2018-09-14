@@ -56,7 +56,7 @@ import java.util.logging.Logger;
 @WebService(name = "management", targetNamespace = "http://ws.cws.javadog.io/", serviceName = "management", portName = "management")
 public class ManagementService implements Management {
 
-    private static final Logger log = Logger.getLogger(ManagementService.class.getName());
+    private static final Logger LOG = Logger.getLogger(ManagementService.class.getName());
 
     private static final String GENERAL_RETURN_MESSAGE = "An unknown error occurred. Please consult the CWS System Log.";
 
@@ -73,15 +73,15 @@ public class ManagementService implements Management {
         VersionResponse response;
 
         try {
-            final Long startTime = System.nanoTime();
+            final long startTime = System.nanoTime();
             response = bean.version();
-            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), "version", startTime));
+            LOG.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), "version", startTime));
         } catch (RuntimeException e) {
             // If an error occurs that has so far not been resolved, this is the
             // final level where it can be handled. Errors can be Persistence
             // problems or other things that will affect the reliability and/or
             // performance of the system.
-            log.log(Settings.ERROR, e.getMessage(), e);
+            LOG.log(Settings.ERROR, e.getMessage(), e);
             response = new VersionResponse(ReturnCode.ERROR, GENERAL_RETURN_MESSAGE);
         }
 
@@ -100,13 +100,13 @@ public class ManagementService implements Management {
         try {
             final Long startTime = System.nanoTime();
             response = bean.settings(request);
-            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), "settings", startTime));
+            LOG.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), "settings", startTime));
         } catch (RuntimeException e) {
             // If an error occurs that has so far not been resolved, this is the
             // final level where it can be handled. Errors can be Persistence
             // problems or other things that will affect the reliability and/or
             // performance of the system.
-            log.log(Settings.ERROR, e.getMessage(), e);
+            LOG.log(Settings.ERROR, e.getMessage(), e);
             response = new SettingResponse(ReturnCode.ERROR, GENERAL_RETURN_MESSAGE);
         }
 
@@ -125,13 +125,13 @@ public class ManagementService implements Management {
         try {
             final Long startTime = System.nanoTime();
             response = bean.masterKey(request);
-            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), "masterKey", startTime));
+            LOG.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), "masterKey", startTime));
         } catch (RuntimeException e) {
             // If an error occurs that has so far not been resolved, this is the
             // final level where it can be handled. Errors can be Persistence
             // problems or other things that will affect the reliability and/or
             // performance of the system.
-            log.log(Settings.ERROR, e.getMessage(), e);
+            LOG.log(Settings.ERROR, e.getMessage(), e);
             response = new MasterKeyResponse(ReturnCode.ERROR, GENERAL_RETURN_MESSAGE);
         }
 
@@ -150,13 +150,13 @@ public class ManagementService implements Management {
         try {
             final Long startTime = System.nanoTime();
             response = bean.sanity(request);
-            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), "sanitized", startTime));
+            LOG.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), "sanitized", startTime));
         } catch (RuntimeException e) {
             // If an error occurs that has so far not been resolved, this is the
             // final level where it can be handled. Errors can be Persistence
             // problems or other things that will affect the reliability and/or
             // performance of the system.
-            log.log(Settings.ERROR, e.getMessage(), e);
+            LOG.log(Settings.ERROR, e.getMessage(), e);
             response = new SanityResponse(ReturnCode.ERROR, GENERAL_RETURN_MESSAGE);
         }
 
@@ -175,13 +175,13 @@ public class ManagementService implements Management {
         try {
             final Long startTime = System.nanoTime();
             response = bean.fetchMembers(request);
-            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), "fetchMembers", startTime));
+            LOG.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), "fetchMembers", startTime));
         } catch (RuntimeException e) {
             // If an error occurs that has so far not been resolved, this is the
             // final level where it can be handled. Errors can be Persistence
             // problems or other things that will affect the reliability and/or
             // performance of the system.
-            log.log(Settings.ERROR, e.getMessage(), e);
+            LOG.log(Settings.ERROR, e.getMessage(), e);
             response = new FetchMemberResponse(ReturnCode.ERROR, GENERAL_RETURN_MESSAGE);
         }
 
@@ -200,13 +200,13 @@ public class ManagementService implements Management {
         try {
             final Long startTime = System.nanoTime();
             response = bean.processMember(request);
-            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), "processMember", startTime));
+            LOG.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), "processMember", startTime));
         } catch (RuntimeException e) {
             // If an error occurs that has so far not been resolved, this is the
             // final level where it can be handled. Errors can be Persistence
             // problems or other things that will affect the reliability and/or
             // performance of the system.
-            log.log(Settings.ERROR, e.getMessage(), e);
+            LOG.log(Settings.ERROR, e.getMessage(), e);
             response = new ProcessMemberResponse(ReturnCode.ERROR, GENERAL_RETURN_MESSAGE);
         }
 
@@ -225,13 +225,13 @@ public class ManagementService implements Management {
         try {
             final Long startTime = System.nanoTime();
             response = bean.fetchCircles(request);
-            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), "fetchCircles", startTime));
+            LOG.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), "fetchCircles", startTime));
         } catch (RuntimeException e) {
             // If an error occurs that has so far not been resolved, this is the
             // final level where it can be handled. Errors can be Persistence
             // problems or other things that will affect the reliability and/or
             // performance of the system.
-            log.log(Settings.ERROR, e.getMessage(), e);
+            LOG.log(Settings.ERROR, e.getMessage(), e);
             response = new FetchCircleResponse(ReturnCode.ERROR, GENERAL_RETURN_MESSAGE);
         }
 
@@ -250,13 +250,13 @@ public class ManagementService implements Management {
         try {
             final Long startTime = System.nanoTime();
             response = bean.processCircle(request);
-            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), "processCircle", startTime));
+            LOG.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), "processCircle", startTime));
         } catch (RuntimeException e) {
             // If an error occurs that has so far not been resolved, this is the
             // final level where it can be handled. Errors can be Persistence
             // problems or other things that will affect the reliability and/or
             // performance of the system.
-            log.log(Settings.ERROR, e.getMessage(), e);
+            LOG.log(Settings.ERROR, e.getMessage(), e);
             response = new ProcessCircleResponse(ReturnCode.ERROR, GENERAL_RETURN_MESSAGE);
         }
 
@@ -275,13 +275,13 @@ public class ManagementService implements Management {
         try {
             final Long startTime = System.nanoTime();
             response = bean.fetchTrustees(request);
-            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), "fetchCircles", startTime));
+            LOG.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), "fetchCircles", startTime));
         } catch (RuntimeException e) {
             // If an error occurs that has so far not been resolved, this is the
             // final level where it can be handled. Errors can be Persistence
             // problems or other things that will affect the reliability and/or
             // performance of the system.
-            log.log(Settings.ERROR, e.getMessage(), e);
+            LOG.log(Settings.ERROR, e.getMessage(), e);
             response = new FetchTrusteeResponse(ReturnCode.ERROR, GENERAL_RETURN_MESSAGE);
         }
 
@@ -300,13 +300,13 @@ public class ManagementService implements Management {
         try {
             final Long startTime = System.nanoTime();
             response = bean.processTrustee(request);
-            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), "processCircle", startTime));
+            LOG.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), "processCircle", startTime));
         } catch (RuntimeException e) {
             // If an error occurs that has so far not been resolved, this is the
             // final level where it can be handled. Errors can be Persistence
             // problems or other things that will affect the reliability and/or
             // performance of the system.
-            log.log(Settings.ERROR, e.getMessage(), e);
+            LOG.log(Settings.ERROR, e.getMessage(), e);
             response = new ProcessTrusteeResponse(ReturnCode.ERROR, GENERAL_RETURN_MESSAGE);
         }
 

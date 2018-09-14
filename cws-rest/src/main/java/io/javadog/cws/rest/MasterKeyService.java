@@ -33,7 +33,7 @@ import java.util.logging.Logger;
 @Path(Constants.REST_MASTERKEY)
 public class MasterKeyService {
 
-    private static final Logger log = Logger.getLogger(MasterKeyService.class.getName());
+    private static final Logger LOG = Logger.getLogger(MasterKeyService.class.getName());
 
     private final Settings settings = Settings.getInstance();
     @Inject private ManagementBean bean;
@@ -42,14 +42,14 @@ public class MasterKeyService {
     @Consumes(RestUtils.CONSUMES)
     @Produces(RestUtils.PRODUCES)
     public Response masterKey(@NotNull final MasterKeyRequest masterKeyRequest) {
-        final Long startTime = System.nanoTime();
+        final long startTime = System.nanoTime();
         MasterKeyResponse response;
 
         try {
             response = bean.masterKey(masterKeyRequest);
-            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), Constants.REST_MASTERKEY, startTime));
+            LOG.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), Constants.REST_MASTERKEY, startTime));
         } catch (RuntimeException e) {
-            log.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getLocale(), Constants.REST_MASTERKEY, startTime, e));
+            LOG.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getLocale(), Constants.REST_MASTERKEY, startTime, e));
             response = new MasterKeyResponse(ReturnCode.ERROR, e.getMessage());
         }
 

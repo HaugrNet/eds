@@ -34,7 +34,7 @@ import java.util.logging.Logger;
  */
 public final class MasterKeyService extends Serviceable<MasterKeyResponse, MasterKeyRequest> {
 
-    private static final Logger log = Logger.getLogger(MasterKeyService.class.getName());
+    private static final Logger LOG = Logger.getLogger(MasterKeyService.class.getName());
 
     public MasterKeyService(final Settings settings, final EntityManager entityManager) {
         super(settings, entityManager);
@@ -124,7 +124,7 @@ public final class MasterKeyService extends Serviceable<MasterKeyResponse, Maste
             key.destroy();
             result = true;
         } catch (CryptoException e) {
-            log.log(Settings.DEBUG, "Decrypting the System Administrator Account failed: " + e.getMessage(), e);
+            LOG.log(Settings.DEBUG, "Decrypting the System Administrator Account failed: " + e.getMessage(), e);
         }
 
         return result;

@@ -36,7 +36,7 @@ import java.util.logging.Logger;
 @Path(Constants.REST_CIRCLES_BASE)
 public class CircleService {
 
-    private static final Logger log = Logger.getLogger(CircleService.class.getName());
+    private static final Logger LOG = Logger.getLogger(CircleService.class.getName());
 
     private final Settings settings = Settings.getInstance();
     @Inject private ManagementBean bean;
@@ -71,14 +71,14 @@ public class CircleService {
     @Path(Constants.REST_CIRCLES_FETCH)
     public Response fetch(@NotNull final FetchCircleRequest fetchCirclesRequest) {
         final String restAction = Constants.REST_CIRCLES_BASE + Constants.REST_CIRCLES_FETCH;
-        final Long startTime = System.nanoTime();
+        final long startTime = System.nanoTime();
         FetchCircleResponse response;
 
         try {
             response = bean.fetchCircles(fetchCirclesRequest);
-            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), restAction, startTime));
+            LOG.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), restAction, startTime));
         } catch (RuntimeException e) {
-            log.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getLocale(), restAction, startTime, e));
+            LOG.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getLocale(), restAction, startTime, e));
             response = new FetchCircleResponse(ReturnCode.ERROR, e.getMessage());
         }
 
@@ -87,15 +87,15 @@ public class CircleService {
 
     private Response processCircle(final ProcessCircleRequest request, final Action action, final String logAction) {
         final String restAction = Constants.REST_CIRCLES_BASE + logAction;
-        final Long startTime = System.nanoTime();
+        final long startTime = System.nanoTime();
         ProcessCircleResponse response;
 
         try {
             request.setAction(action);
             response = bean.processCircle(request);
-            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), restAction, startTime));
+            LOG.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), restAction, startTime));
         } catch (RuntimeException e) {
-            log.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getLocale(), restAction, startTime, e));
+            LOG.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getLocale(), restAction, startTime, e));
             response = new ProcessCircleResponse(ReturnCode.ERROR, e.getMessage());
         }
 

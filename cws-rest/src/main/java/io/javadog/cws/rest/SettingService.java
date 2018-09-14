@@ -33,7 +33,7 @@ import java.util.logging.Logger;
 @Path(Constants.REST_SETTINGS)
 public class SettingService {
 
-    private static final Logger log = Logger.getLogger(SettingService.class.getName());
+    private static final Logger LOG = Logger.getLogger(SettingService.class.getName());
 
     private final Settings settings = Settings.getInstance();
     @Inject private ManagementBean bean;
@@ -42,14 +42,14 @@ public class SettingService {
     @Consumes(RestUtils.CONSUMES)
     @Produces(RestUtils.PRODUCES)
     public Response settings(@NotNull final SettingRequest settingRequest) {
-        final Long startTime = System.nanoTime();
+        final long startTime = System.nanoTime();
         SettingResponse response;
 
         try {
             response = bean.settings(settingRequest);
-            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), Constants.REST_SETTINGS, startTime));
+            LOG.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), Constants.REST_SETTINGS, startTime));
         } catch (RuntimeException e) {
-            log.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getLocale(), Constants.REST_SETTINGS, startTime, e));
+            LOG.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getLocale(), Constants.REST_SETTINGS, startTime, e));
             response = new SettingResponse(ReturnCode.ERROR, e.getMessage());
         }
 

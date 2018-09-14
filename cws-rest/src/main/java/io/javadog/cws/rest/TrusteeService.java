@@ -36,7 +36,7 @@ import java.util.logging.Logger;
 @Path(Constants.REST_TRUSTEES_BASE)
 public class TrusteeService {
 
-    private static final Logger log = Logger.getLogger(TrusteeService.class.getName());
+    private static final Logger LOG = Logger.getLogger(TrusteeService.class.getName());
 
     private final Settings settings = Settings.getInstance();
     @Inject private ManagementBean bean;
@@ -71,14 +71,14 @@ public class TrusteeService {
     @Produces(RestUtils.PRODUCES)
     public Response fetch(@NotNull final FetchTrusteeRequest fetchTrusteeRequest) {
         final String restAction = Constants.REST_TRUSTEES_BASE + Constants.REST_TRUSTEES_FETCH;
-        final Long startTime = System.nanoTime();
+        final long startTime = System.nanoTime();
         FetchTrusteeResponse response;
 
         try {
             response = bean.fetchTrustees(fetchTrusteeRequest);
-            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), restAction, startTime));
+            LOG.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), restAction, startTime));
         } catch (RuntimeException e) {
-            log.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getLocale(), restAction, startTime, e));
+            LOG.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getLocale(), restAction, startTime, e));
             response = new FetchTrusteeResponse(ReturnCode.ERROR, e.getMessage());
         }
 
@@ -87,15 +87,15 @@ public class TrusteeService {
 
     private Response processTrustee(final ProcessTrusteeRequest request, final Action action, final String logAction) {
         final String restAction = Constants.REST_TRUSTEES_BASE + logAction;
-        final Long startTime = System.nanoTime();
+        final long startTime = System.nanoTime();
         ProcessTrusteeResponse response;
 
         try {
             request.setAction(action);
             response = bean.processTrustee(request);
-            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), restAction, startTime));
+            LOG.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), restAction, startTime));
         } catch (RuntimeException e) {
-            log.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getLocale(), restAction, startTime, e));
+            LOG.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getLocale(), restAction, startTime, e));
             response = new ProcessTrusteeResponse(ReturnCode.ERROR, e.getMessage());
         }
 

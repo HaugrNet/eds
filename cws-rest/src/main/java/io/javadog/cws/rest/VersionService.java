@@ -30,7 +30,7 @@ import java.util.logging.Logger;
 @Path(Constants.REST_VERSION)
 public class VersionService {
 
-    private static final Logger log = Logger.getLogger(VersionService.class.getName());
+    private static final Logger LOG = Logger.getLogger(VersionService.class.getName());
 
     private final Settings settings = Settings.getInstance();
     @Inject private ManagementBean bean;
@@ -38,14 +38,14 @@ public class VersionService {
     @POST
     @Produces(RestUtils.PRODUCES)
     public Response version() {
-        final Long startTime = System.nanoTime();
+        final long startTime = System.nanoTime();
         VersionResponse response;
 
         try {
             response = bean.version();
-            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), Constants.REST_VERSION, startTime));
+            LOG.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), Constants.REST_VERSION, startTime));
         } catch (RuntimeException e) {
-            log.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getLocale(), Constants.REST_VERSION, startTime, e));
+            LOG.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getLocale(), Constants.REST_VERSION, startTime, e));
             response = new VersionResponse(ReturnCode.ERROR, e.getMessage());
         }
 

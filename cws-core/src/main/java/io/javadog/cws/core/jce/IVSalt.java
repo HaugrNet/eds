@@ -27,7 +27,7 @@ import java.util.logging.Logger;
  */
 public final class IVSalt {
 
-    private static final Logger log = Logger.getLogger(IVSalt.class.getName());
+    private static final Logger LOG = Logger.getLogger(IVSalt.class.getName());
     // For AES, the block size is always 128 bit and thus the IV must also be of
     // the same size. See: https://en.wikipedia.org/wiki/Initialization_vector
     private static final int IV_SIZE = 16;
@@ -62,7 +62,7 @@ public final class IVSalt {
             try {
                 rawSalt = Base64.getDecoder().decode(armored);
             } catch (IllegalArgumentException e) {
-                log.log(Settings.DEBUG, "IVSalt is not Base64 encoded: " + e.getMessage(), e);
+                LOG.log(Settings.DEBUG, "IVSalt is not Base64 encoded: " + e.getMessage(), e);
             }
         }
 

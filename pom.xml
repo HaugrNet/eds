@@ -275,7 +275,7 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
                     <!-- For Java 9+, does not work with Java 8 -->
-                    <release>8</release>
+                    <!--<release>10</release>-->
                     <showDeprecation>true</showDeprecation>
                     <showWarnings>true</showWarnings>
                     <debug>false</debug>

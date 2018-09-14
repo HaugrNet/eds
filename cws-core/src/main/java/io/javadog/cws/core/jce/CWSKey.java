@@ -26,7 +26,7 @@ import java.util.logging.Logger;
  */
 public abstract class CWSKey<T extends Key> {
 
-    private static final Logger log = Logger.getLogger(CWSKey.class.getName());
+    private static final Logger LOG = Logger.getLogger(CWSKey.class.getName());
 
     protected boolean destroyed = false;
     protected final T key;
@@ -82,6 +82,6 @@ public abstract class CWSKey<T extends Key> {
         //     - java.security.KeyPair should implement Destroyable
         //  o https://bugs.openjdk.java.net/browse/JDK-8160206
         //     - SecretKeySpec should implement destroy()
-        log.log(Settings.DEBUG, "Java support for destroying keys is not yet implemented.");
+        LOG.log(Settings.DEBUG, "Java support for destroying keys is not yet implemented.");
     }
 }

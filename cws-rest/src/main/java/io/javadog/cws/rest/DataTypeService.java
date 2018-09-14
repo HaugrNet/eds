@@ -36,7 +36,7 @@ import java.util.logging.Logger;
 @Path(Constants.REST_DATATYPES_BASE)
 public class DataTypeService {
 
-    private static final Logger log = Logger.getLogger(DataTypeService.class.getName());
+    private static final Logger LOG = Logger.getLogger(DataTypeService.class.getName());
 
     private final Settings settings = Settings.getInstance();
     @Inject private ShareBean bean;
@@ -63,14 +63,14 @@ public class DataTypeService {
     @Path(Constants.REST_DATATYPES_FETCH)
     public Response fetch(@NotNull final FetchDataTypeRequest fetchDataTypesRequest) {
         final String restAction = Constants.REST_DATATYPES_BASE + Constants.REST_DATATYPES_FETCH;
-        final Long startTime = System.nanoTime();
+        final long startTime = System.nanoTime();
         FetchDataTypeResponse response;
 
         try {
             response = bean.fetchDataTypes(fetchDataTypesRequest);
-            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), restAction, startTime));
+            LOG.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), restAction, startTime));
         } catch (RuntimeException e) {
-            log.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getLocale(), restAction, startTime, e));
+            LOG.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getLocale(), restAction, startTime, e));
             response = new FetchDataTypeResponse(ReturnCode.ERROR, e.getMessage());
         }
 
@@ -79,15 +79,15 @@ public class DataTypeService {
 
     private Response processDataType(final ProcessDataTypeRequest request, final Action action, final String logAction) {
         final String restAction = Constants.REST_DATATYPES_BASE + logAction;
-        final Long startTime = System.nanoTime();
+        final long startTime = System.nanoTime();
         ProcessDataTypeResponse response;
 
         try {
             request.setAction(action);
             response = bean.processDataType(request);
-            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), restAction, startTime));
+            LOG.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), restAction, startTime));
         } catch (RuntimeException e) {
-            log.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getLocale(), restAction, startTime, e));
+            LOG.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getLocale(), restAction, startTime, e));
             response = new ProcessDataTypeResponse(ReturnCode.ERROR, e.getMessage());
         }
 

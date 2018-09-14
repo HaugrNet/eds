@@ -33,7 +33,7 @@ import java.util.logging.Logger;
 @Path(Constants.REST_SANITIZED)
 public class SanityService {
 
-    private static final Logger log = Logger.getLogger(SanityService.class.getName());
+    private static final Logger LOG = Logger.getLogger(SanityService.class.getName());
 
     private final Settings settings = Settings.getInstance();
     @Inject private ManagementBean bean;
@@ -42,14 +42,14 @@ public class SanityService {
     @Consumes(RestUtils.CONSUMES)
     @Produces(RestUtils.PRODUCES)
     public Response sanitized(@NotNull final SanityRequest sanitizedRequest) {
-        final Long startTime = System.nanoTime();
+        final long startTime = System.nanoTime();
         SanityResponse response;
 
         try {
             response = bean.sanity(sanitizedRequest);
-            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), Constants.REST_SANITIZED, startTime));
+            LOG.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), Constants.REST_SANITIZED, startTime));
         } catch (RuntimeException e) {
-            log.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getLocale(), Constants.REST_SANITIZED, startTime, e));
+            LOG.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getLocale(), Constants.REST_SANITIZED, startTime, e));
             response = new SanityResponse(ReturnCode.ERROR, e.getMessage());
         }
 

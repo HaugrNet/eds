@@ -52,7 +52,7 @@ import java.util.logging.Logger;
 @WebService(name = "share", targetNamespace = "http://ws.cws.javadog.io/", serviceName = "share", portName = "share")
 public class ShareService implements Share {
 
-    private static final Logger log = Logger.getLogger(ShareService.class.getName());
+    private static final Logger LOG = Logger.getLogger(ShareService.class.getName());
 
     private static final String GENERAL_RETURN_MESSAGE = "An unknown error occurred. Please consult the CWS System Log.";
 
@@ -69,15 +69,15 @@ public class ShareService implements Share {
         ProcessDataTypeResponse response;
 
         try {
-            final Long startTime = System.nanoTime();
+            final long startTime = System.nanoTime();
             response = bean.processDataType(request);
-            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), "processDataType", startTime));
+            LOG.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), "processDataType", startTime));
         } catch (RuntimeException e) {
             // If an error occurs that has so far not been resolved, this is the
             // final level where it can be handled. Errors can be Persistence
             // problems or other things that will affect the reliability and/or
             // performance of the system.
-            log.log(Settings.ERROR, e.getMessage(), e);
+            LOG.log(Settings.ERROR, e.getMessage(), e);
             response = new ProcessDataTypeResponse(ReturnCode.ERROR, GENERAL_RETURN_MESSAGE);
         }
 
@@ -96,13 +96,13 @@ public class ShareService implements Share {
         try {
             final Long startTime = System.nanoTime();
             response = bean.fetchDataTypes(request);
-            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), "fetchDataTypes", startTime));
+            LOG.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), "fetchDataTypes", startTime));
         } catch (RuntimeException e) {
             // If an error occurs that has so far not been resolved, this is the
             // final level where it can be handled. Errors can be Persistence
             // problems or other things that will affect the reliability and/or
             // performance of the system.
-            log.log(Settings.ERROR, e.getMessage(), e);
+            LOG.log(Settings.ERROR, e.getMessage(), e);
             response = new FetchDataTypeResponse(ReturnCode.ERROR, GENERAL_RETURN_MESSAGE);
         }
 
@@ -121,13 +121,13 @@ public class ShareService implements Share {
         try {
             final Long startTime = System.nanoTime();
             response = bean.processData(request);
-            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), "processData", startTime));
+            LOG.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), "processData", startTime));
         } catch (RuntimeException e) {
             // If an error occurs that has so far not been resolved, this is the
             // final level where it can be handled. Errors can be Persistence
             // problems or other things that will affect the reliability and/or
             // performance of the system.
-            log.log(Settings.ERROR, e.getMessage(), e);
+            LOG.log(Settings.ERROR, e.getMessage(), e);
             response = new ProcessDataResponse(ReturnCode.ERROR, GENERAL_RETURN_MESSAGE);
         }
 
@@ -146,13 +146,13 @@ public class ShareService implements Share {
         try {
             final Long startTime = System.nanoTime();
             response = bean.fetchData(request);
-            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), "fetchData", startTime));
+            LOG.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), "fetchData", startTime));
         } catch (RuntimeException e) {
             // If an error occurs that has so far not been resolved, this is the
             // final level where it can be handled. Errors can be Persistence
             // problems or other things that will affect the reliability and/or
             // performance of the system.
-            log.log(Settings.ERROR, e.getMessage(), e);
+            LOG.log(Settings.ERROR, e.getMessage(), e);
             response = new FetchDataResponse(ReturnCode.ERROR, GENERAL_RETURN_MESSAGE);
         }
 
@@ -171,13 +171,13 @@ public class ShareService implements Share {
         try {
             final Long startTime = System.nanoTime();
             response = bean.sign(request);
-            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), "signDocument", startTime));
+            LOG.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), "signDocument", startTime));
         } catch (RuntimeException e) {
             // If an error occurs that has so far not been resolved, this is the
             // final level where it can be handled. Errors can be Persistence
             // problems or other things that will affect the reliability and/or
             // performance of the system.
-            log.log(Settings.ERROR, e.getMessage(), e);
+            LOG.log(Settings.ERROR, e.getMessage(), e);
             response = new SignResponse(ReturnCode.ERROR, GENERAL_RETURN_MESSAGE);
         }
 
@@ -196,13 +196,13 @@ public class ShareService implements Share {
         try {
             final Long startTime = System.nanoTime();
             response = bean.verify(request);
-            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), "verifySignatures", startTime));
+            LOG.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), "verifySignatures", startTime));
         } catch (RuntimeException e) {
             // If an error occurs that has so far not been resolved, this is the
             // final level where it can be handled. Errors can be Persistence
             // problems or other things that will affect the reliability and/or
             // performance of the system.
-            log.log(Settings.ERROR, e.getMessage(), e);
+            LOG.log(Settings.ERROR, e.getMessage(), e);
             response = new VerifyResponse(ReturnCode.ERROR, GENERAL_RETURN_MESSAGE);
         }
 
@@ -221,13 +221,13 @@ public class ShareService implements Share {
         try {
             final Long startTime = System.nanoTime();
             response = bean.fetchSignatures(request);
-            log.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), "fetchSignatures", startTime));
+            LOG.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), "fetchSignatures", startTime));
         } catch (RuntimeException e) {
             // If an error occurs that has so far not been resolved, this is the
             // final level where it can be handled. Errors can be Persistence
             // problems or other things that will affect the reliability and/or
             // performance of the system.
-            log.log(Settings.ERROR, e.getMessage(), e);
+            LOG.log(Settings.ERROR, e.getMessage(), e);
             response = new FetchSignatureResponse(ReturnCode.ERROR, GENERAL_RETURN_MESSAGE);
         }
 

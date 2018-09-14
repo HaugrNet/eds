@@ -24,7 +24,7 @@ import java.util.logging.Logger;
  */
 public final class CommonBean {
 
-    private static final Logger log = Logger.getLogger(CommonBean.class.getName());
+    private static final Logger LOG = Logger.getLogger(CommonBean.class.getName());
 
     /**
      * Private Constructor, this is a utility Class.
@@ -37,7 +37,7 @@ public final class CommonBean {
             try {
                 serviceable.destroy();
             } catch (CWSException e) {
-                log.log(Settings.WARN, "Failed destroying the Service: " + e.getMessage(), e);
+                LOG.log(Settings.WARN, "Failed destroying the Service: " + e.getMessage(), e);
             }
         }
     }

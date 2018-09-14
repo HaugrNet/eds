@@ -50,7 +50,7 @@ import java.util.logging.Logger;
 @Transactional
 public class SanitizerBean {
 
-    private static final Logger log = Logger.getLogger(SanitizerBean.class.getName());
+    private static final Logger LOG = Logger.getLogger(SanitizerBean.class.getName());
     private static final int BLOCK = 100;
 
     @PersistenceContext private EntityManager entityManager;
@@ -76,7 +76,7 @@ public class SanitizerBean {
         }
 
         final String[] args = { String.valueOf(flawed), String.valueOf(count) };
-        log.log(Settings.INFO, "Completed Sanity check, found {0} flaws out of {1} checked Data Objects.", args);
+        LOG.log(Settings.INFO, "Completed Sanity check, found {0} flaws out of {1} checked Data Objects.", args);
     }
 
     private SanityStatus processEntity(final Long id) {
@@ -115,7 +115,7 @@ public class SanitizerBean {
             //   2. The underlying database does not support locking, so it is
             //      not possible to continue. If this is the case, it should be
             //      reported to the CWS developers.
-            log.log(Settings.ERROR, e.getMessage(), e);
+            LOG.log(Settings.ERROR, e.getMessage(), e);
         }
 
         return status;

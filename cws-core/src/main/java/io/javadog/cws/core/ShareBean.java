@@ -51,7 +51,7 @@ import java.util.logging.Logger;
 @Stateless
 public class ShareBean {
 
-    private static final Logger log = Logger.getLogger(ShareBean.class.getName());
+    private static final Logger LOG = Logger.getLogger(ShareBean.class.getName());
 
     @PersistenceContext private EntityManager entityManager;
     private final Settings settings = Settings.getInstance();
@@ -69,7 +69,7 @@ public class ShareBean {
             // so it can be dealt with by the requesting System. Logging the
             // error is thus not needed, as all information is provided in the
             // response.
-            log.log(Settings.DEBUG, e.getMessage(), e);
+            LOG.log(Settings.DEBUG, e.getMessage(), e);
             response = new ProcessDataTypeResponse(e.getReturnCode(), e.getMessage());
         } finally {
             CommonBean.destroy(service);
@@ -91,7 +91,7 @@ public class ShareBean {
             // so it can be dealt with by the requesting System. Logging the
             // error is thus not needed, as all information is provided in the
             // response.
-            log.log(Settings.DEBUG, e.getMessage(), e);
+            LOG.log(Settings.DEBUG, e.getMessage(), e);
             response = new FetchDataTypeResponse(e.getReturnCode(), e.getMessage());
         } finally {
             CommonBean.destroy(service);
@@ -113,7 +113,7 @@ public class ShareBean {
             // so it can be dealt with by the requesting System. Logging the
             // error is thus not needed, as all information is provided in the
             // response.
-            log.log(Settings.DEBUG, e.getMessage(), e);
+            LOG.log(Settings.DEBUG, e.getMessage(), e);
             response = new ProcessDataResponse(e.getReturnCode(), e.getMessage());
         } finally {
             CommonBean.destroy(service);
@@ -135,7 +135,7 @@ public class ShareBean {
             // so it can be dealt with by the requesting System. Logging the
             // error is thus not needed, as all information is provided in the
             // response.
-            log.log(Settings.DEBUG, e.getMessage(), e);
+            LOG.log(Settings.DEBUG, e.getMessage(), e);
             response = new FetchDataResponse(e.getReturnCode(), e.getMessage());
         } finally {
             CommonBean.destroy(service);
@@ -157,7 +157,7 @@ public class ShareBean {
             // so it can be dealt with by the requesting System. Logging the
             // error is thus not needed, as all information is provided in the
             // response.
-            log.log(Settings.DEBUG, e.getMessage(), e);
+            LOG.log(Settings.DEBUG, e.getMessage(), e);
             response = new SignResponse(e.getReturnCode(), e.getMessage());
         } finally {
             CommonBean.destroy(service);
@@ -179,7 +179,7 @@ public class ShareBean {
             // so it can be dealt with by the requesting System. Logging the
             // error is thus not needed, as all information is provided in the
             // response.
-            log.log(Settings.DEBUG, e.getMessage(), e);
+            LOG.log(Settings.DEBUG, e.getMessage(), e);
             response = new VerifyResponse(e.getReturnCode(), e.getMessage());
         } finally {
             CommonBean.destroy(service);
@@ -201,7 +201,7 @@ public class ShareBean {
             // so it can be dealt with by the requesting System. Logging the
             // error is thus not needed, as all information is provided in the
             // response.
-            log.log(Settings.DEBUG, e.getMessage(), e);
+            LOG.log(Settings.DEBUG, e.getMessage(), e);
             response = new FetchSignatureResponse(e.getReturnCode(), e.getMessage());
         } finally {
             CommonBean.destroy(service);

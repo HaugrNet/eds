@@ -342,7 +342,12 @@ public final class CryptoTest extends DatabaseSetup {
 
     @Test
     public void testInvalidAsymmetricKeyEncryption() {
-        prepareCause(CryptoException.class, ReturnCode.CRYPTO_ERROR, "io.javadog.cws.core.jce.PublicCWSKey cannot be cast to io.javadog.cws.core.jce.SecretCWSKey");
+        // Java 8 & Java 11 are providing different messages. to make sure that
+        // CWS builds under Java 11, the expected error message must be
+        // corrected.
+        //    8: io.javadog.cws.core.jce.PublicCWSKey cannot be cast to io.javadog.cws.core.jce.SecretCWSKey
+        //   11: class io.javadog.cws.core.jce.PublicCWSKey cannot be cast to class io.javadog.cws.core.jce.SecretCWSKey (io.javadog.cws.core.jce.PublicCWSKey and io.javadog.cws.core.jce.SecretCWSKey are in unnamed module of loader 'app')
+        prepareCause(CryptoException.class, ReturnCode.CRYPTO_ERROR, "io.javadog.cws.core.jce.PublicCWSKey cannot be cast");
 
         final CWSKeyPair keyPair = generateKeyPair();
         final byte[] data = generateData(524288);
@@ -353,7 +358,12 @@ public final class CryptoTest extends DatabaseSetup {
 
     @Test
     public void testInvalidAsymmetricKeyDecryption() {
-        prepareCause(CryptoException.class, ReturnCode.CRYPTO_ERROR, "io.javadog.cws.core.jce.PrivateCWSKey cannot be cast to io.javadog.cws.core.jce.SecretCWSKey");
+        // Java 8 & Java 11 are providing different messages. to make sure that
+        // CWS builds under Java 11, the expected error message must be
+        // corrected.
+        //    8: io.javadog.cws.core.jce.PrivateCWSKey cannot be cast to io.javadog.cws.core.jce.SecretCWSKey
+        //   11: class io.javadog.cws.core.jce.PrivateCWSKey cannot be cast to class io.javadog.cws.core.jce.SecretCWSKey (io.javadog.cws.core.jce.PrivateCWSKey and io.javadog.cws.core.jce.SecretCWSKey are in unnamed module of loader 'app')
+        prepareCause(CryptoException.class, ReturnCode.CRYPTO_ERROR, "io.javadog.cws.core.jce.PrivateCWSKey cannot be cast");
 
         final CWSKeyPair keyPair = generateKeyPair();
         final byte[] data = generateData(524288);

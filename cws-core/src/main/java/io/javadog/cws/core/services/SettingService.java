@@ -115,17 +115,17 @@ public final class SettingService extends Serviceable<SettingResponse, SettingRe
         final Map<String, SettingEntity> existing = convertSettings(dao.findAllAscending(SettingEntity.class, "id"));
         for (final Map.Entry<String, String> entry : changedEntries.entrySet()) {
             final String key = trim(entry.getKey());
-
+            final SettingEntity existingSetting = existing.get(key);
             final String value = trim(entry.getValue());
-            final SettingEntity entity;
 
-            if (existing.containsKey(key) && isEmpty(value)) {
-                deleteSetting(existing.get(key));
-            } else if (existing.containsKey(key)) {
-                entity = existing.get(key);
-                persistAndUpdateSetting(request, entity, key, value);
+            if (existingSetting != null) {
+                if (isEmpty(value)) {
+                    deleteSetting(existingSetting);
+                } else {
+                    persistAndUpdateSetting(request, existingSetting, key, value);
+                }
             } else {
-                entity = new SettingEntity();
+                final SettingEntity entity = new SettingEntity();
                 persistAndUpdateSetting(request, entity, key, value);
             }
         }

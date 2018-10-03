@@ -17,7 +17,6 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 import java.io.Serializable;
-import java.util.Objects;
 
 /**
  * <p>All data in CWS must have a designated DataType, this can be either of the
@@ -72,29 +71,6 @@ public final class DataType implements Serializable {
     // =========================================================================
     // Standard Methods
     // =========================================================================
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-
-        if (!(obj instanceof DataType)) {
-            return false;
-        }
-
-        final DataType that = (DataType) obj;
-        return Objects.equals(typeName, that.typeName) &&
-                Objects.equals(type, that.type);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(typeName, type);
-    }
 
     @Override
     public String toString() {

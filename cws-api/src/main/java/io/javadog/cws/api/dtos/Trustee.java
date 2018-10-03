@@ -20,7 +20,6 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 import java.io.Serializable;
 import java.util.Date;
-import java.util.Objects;
 
 /**
  * <p>A Trustee, is a Member of a Circle, with a granted Trust Level.</p>
@@ -117,36 +116,8 @@ public final class Trustee implements Serializable {
      * {@inheritDoc}
      */
     @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-
-        if (!(obj instanceof Trustee)) {
-            return false;
-        }
-
-        final Trustee that = (Trustee) obj;
-        return (trustLevel == that.trustLevel) &&
-                Objects.equals(memberId, that.memberId) &&
-                Objects.equals(circleId, that.circleId) &&
-                Objects.equals(changed, that.changed) &&
-                Objects.equals(added, that.added);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int hashCode() {
-        return Objects.hash(memberId, circleId, trustLevel, changed, added);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public String toString() {
+        // Note, that the public key is omitted deliberately.
         return "Trustee{" +
                 "memberId=" + memberId +
                 ", circleId=" + circleId +

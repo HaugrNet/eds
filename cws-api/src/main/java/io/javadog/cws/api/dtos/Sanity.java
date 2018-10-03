@@ -19,7 +19,6 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 import java.io.Serializable;
 import java.util.Date;
-import java.util.Objects;
 
 /**
  * The Sanity Object contain information about a Data record, which has failed
@@ -67,32 +66,6 @@ public final class Sanity implements Serializable {
     // =========================================================================
     // Standard Methods
     // =========================================================================
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-
-        if (!(obj instanceof Sanity)) {
-            return false;
-        }
-
-        final Sanity that = (Sanity) obj;
-        return Objects.equals(dataId, that.dataId) &&
-                Objects.equals(changed, that.changed);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int hashCode() {
-        return Objects.hash(dataId, changed);
-    }
 
     /**
      * {@inheritDoc}

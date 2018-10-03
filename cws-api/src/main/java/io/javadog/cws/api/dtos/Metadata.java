@@ -19,7 +19,6 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 import java.io.Serializable;
 import java.util.Date;
-import java.util.Objects;
 
 /**
  * <p>The Metadata is the information which is needed as part of storing or
@@ -111,36 +110,6 @@ public final class Metadata implements Serializable {
     // =========================================================================
     // Standard Methods
     // =========================================================================
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-
-        if (!(obj instanceof Metadata)) {
-            return false;
-        }
-
-        final Metadata that = (Metadata) obj;
-        return Objects.equals(dataId, that.dataId) &&
-                Objects.equals(circleId, that.circleId) &&
-                Objects.equals(folderId, that.folderId) &&
-                Objects.equals(dataName, that.dataName) &&
-                Objects.equals(typeName, that.typeName) &&
-                Objects.equals(added, that.added);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int hashCode() {
-        return Objects.hash(dataId, circleId, folderId, dataName, typeName, added);
-    }
 
     /**
      * {@inheritDoc}

@@ -19,7 +19,6 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 import java.io.Serializable;
 import java.util.Date;
-import java.util.Objects;
 
 /**
  * This Object contain information about a Signature in CWS, such as when it
@@ -102,29 +101,6 @@ public final class Signature implements Serializable {
     /**
      * {@inheritDoc}
      */
-    @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-
-        if (!(obj instanceof Signature)) {
-            return false;
-        }
-
-        final Signature that = (Signature) obj;
-        return Objects.equals(checksum, that.checksum) &&
-                Objects.equals(expires, that.expires) &&
-                Objects.equals(verifications, that.verifications) &&
-                Objects.equals(lastVerification, that.lastVerification) &&
-                Objects.equals(added, that.added);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(checksum, expires, verifications, lastVerification, added);
-    }
-
     @Override
     public String toString() {
         return "Signature{" +

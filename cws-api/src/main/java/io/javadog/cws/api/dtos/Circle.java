@@ -19,7 +19,6 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 import java.io.Serializable;
 import java.util.Date;
-import java.util.Objects;
 
 /**
  * <p>Circles is part of the core functionality of CWS, as all data is assigned
@@ -96,37 +95,11 @@ public final class Circle implements Serializable {
      * {@inheritDoc}
      */
     @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-
-        if (!(obj instanceof Circle)) {
-            return false;
-        }
-
-        final Circle that = (Circle) obj;
-        return Objects.equals(circleId, that.circleId) &&
-                Objects.equals(circleName, that.circleName) &&
-                Objects.equals(added, that.added);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int hashCode() {
-        return Objects.hash(circleId, circleName, added);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public String toString() {
         return "Circle{" +
                 "circleId='" + circleId + '\'' +
                 ", circleName='" + circleName + '\'' +
+                ", circleKey='" + circleKey + '\'' +
                 ", added=" + added +
                 '}';
     }

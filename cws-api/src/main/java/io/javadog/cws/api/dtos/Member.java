@@ -19,7 +19,6 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 import java.io.Serializable;
 import java.util.Date;
-import java.util.Objects;
 
 /**
  * <p>The Member Object, is used as Accounts in CWS. The Object consists of an
@@ -93,33 +92,6 @@ public final class Member implements Serializable {
     // =========================================================================
     // Standard Methods
     // =========================================================================
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-
-        if (!(obj instanceof Member)) {
-            return false;
-        }
-
-        final Member that = (Member) obj;
-        return Objects.equals(memberId, that.memberId) &&
-                Objects.equals(accountName, that.accountName) &&
-                Objects.equals(added, that.added);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int hashCode() {
-        return Objects.hash(memberId, accountName, added);
-    }
 
     /**
      * {@inheritDoc}

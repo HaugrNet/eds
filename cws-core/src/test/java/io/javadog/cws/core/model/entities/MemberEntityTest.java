@@ -16,6 +16,7 @@ import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.core.DatabaseSetup;
 import io.javadog.cws.core.GenerateTestData;
 import io.javadog.cws.core.enums.KeyAlgorithm;
+import io.javadog.cws.core.enums.MemberRole;
 import io.javadog.cws.core.jce.CWSKeyPair;
 import org.junit.Test;
 
@@ -34,7 +35,7 @@ public final class MemberEntityTest extends DatabaseSetup {
     public void testEntity() {
         final CWSKeyPair keyPair = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
         final String externalId = UUID.randomUUID().toString();
-        final MemberEntity entity = prepareMember(externalId, "New Account Name", "My Super Secret", keyPair);
+        final MemberEntity entity = prepareMember(externalId, "New Account Name", "My Super Secret", keyPair, MemberRole.STANDARD);
         persistAndDetach(entity);
 
         final long id = entity.getId();
@@ -62,8 +63,7 @@ public final class MemberEntityTest extends DatabaseSetup {
         final String publicKey = UUID.randomUUID().toString();
         final String privateKey = UUID.randomUUID().toString();
         final String externalId = UUID.randomUUID().toString();
-        final MemberEntity entity = prepareMember(externalId, credential, algorithm, publicKey, privateKey);
-
+        final MemberEntity entity = prepareMember(externalId, credential, algorithm, publicKey, privateKey, MemberRole.STANDARD);
         final long lastModified = entity.getAltered().getTime();
 
         persist(entity);
@@ -77,7 +77,7 @@ public final class MemberEntityTest extends DatabaseSetup {
         final String publicKey = UUID.randomUUID().toString();
         final String privateKey = UUID.randomUUID().toString();
         final String externalId = UUID.randomUUID().toString();
-        final MemberEntity entity = prepareMember(externalId, credential, algorithm, publicKey, privateKey);
+        final MemberEntity entity = prepareMember(externalId, credential, algorithm, publicKey, privateKey, MemberRole.STANDARD);
         assertThat(entity.getId(), is(not(nullValue())));
 
         entityManager.persist(entity);

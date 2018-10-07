@@ -15,6 +15,7 @@ import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.requests.Authentication;
 import io.javadog.cws.api.responses.ProcessDataResponse;
 import io.javadog.cws.core.enums.KeyAlgorithm;
+import io.javadog.cws.core.enums.MemberRole;
 import io.javadog.cws.core.enums.SanityStatus;
 import io.javadog.cws.core.enums.StandardSetting;
 import io.javadog.cws.core.enums.Status;
@@ -131,7 +132,7 @@ public class DatabaseSetup {
         }
     }
 
-    protected MemberEntity prepareMember(final String externalId, final String accountName, final String secret, final CWSKeyPair keyPair) {
+    protected MemberEntity prepareMember(final String externalId, final String accountName, final String secret, final CWSKeyPair keyPair, final MemberRole role) {
         final KeyAlgorithm pbeAlgorithm = settings.getPasswordAlgorithm();
         final IVSalt salt = new IVSalt();
         final SecretCWSKey secretKey = crypto.generatePasswordKey(pbeAlgorithm, crypto.stringToBytes(secret), salt.getArmored());
@@ -145,6 +146,7 @@ public class DatabaseSetup {
         entity.setRsaAlgorithm(settings.getAsymmetricAlgorithm());
         entity.setPublicKey(crypto.armoringPublicKey(keyPair.getPublic().getKey()));
         entity.setPrivateKey(crypto.armoringPrivateKey(secretKey, keyPair.getPrivate().getKey()));
+        entity.setMemberRole(role);
         entity.setAltered(new Date());
         entity.setAdded(new Date());
 
@@ -221,7 +223,7 @@ public class DatabaseSetup {
         return entity;
     }
 
-    protected MemberEntity prepareMember(final String externalId, final String credential, final KeyAlgorithm algorithm, final String publicKey, final String privateKey) {
+    protected MemberEntity prepareMember(final String externalId, final String credential, final KeyAlgorithm algorithm, final String publicKey, final String privateKey, final MemberRole role) {
         final MemberEntity entity = new MemberEntity();
         entity.setName(credential);
         entity.setPbeAlgorithm(settings.getPasswordAlgorithm());
@@ -229,6 +231,7 @@ public class DatabaseSetup {
         entity.setSalt(crypto.encryptWithMasterKey(externalId));
         entity.setPublicKey(publicKey);
         entity.setPrivateKey(privateKey);
+        entity.setMemberRole(role);
         persist(entity);
 
         return entity;

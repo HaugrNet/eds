@@ -15,6 +15,7 @@ import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.requests.Authentication;
 import io.javadog.cws.api.requests.MasterKeyRequest;
 import io.javadog.cws.api.responses.MasterKeyResponse;
+import io.javadog.cws.core.enums.MemberRole;
 import io.javadog.cws.core.exceptions.CryptoException;
 import io.javadog.cws.core.jce.MasterKey;
 import io.javadog.cws.core.jce.SecretCWSKey;
@@ -134,7 +135,7 @@ public final class MasterKeyService extends Serviceable<MasterKeyResponse, Maste
         MemberEntity admin = dao.findMemberByName(Constants.ADMIN_ACCOUNT);
 
         if (admin == null) {
-            admin = createNewAccount(Constants.ADMIN_ACCOUNT, authentication.getCredential());
+            admin = createNewAccount(Constants.ADMIN_ACCOUNT, MemberRole.ADMIN, authentication.getCredential());
         }
 
         return admin;

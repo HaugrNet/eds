@@ -17,6 +17,7 @@ import io.javadog.cws.api.common.TrustLevel;
 import io.javadog.cws.api.requests.ProcessMemberRequest;
 import io.javadog.cws.api.responses.ProcessMemberResponse;
 import io.javadog.cws.core.enums.KeyAlgorithm;
+import io.javadog.cws.core.enums.MemberRole;
 import io.javadog.cws.core.enums.Permission;
 import io.javadog.cws.core.exceptions.CWSException;
 import io.javadog.cws.core.exceptions.VerificationException;
@@ -101,12 +102,12 @@ public final class ProcessMemberService extends Serviceable<ProcessMemberRespons
 
         // Creating new Members, can only be performed by the System
         // Administrator, not by anyone else.
-        if (Objects.equals(Constants.ADMIN_ACCOUNT, request.getAccountName())) {
+        if (member.getMemberRole() == MemberRole.ADMIN) {
             final String accountName = request.getNewAccountName().trim();
 
             final MemberEntity found = dao.findMemberByName(accountName);
             if (found == null) {
-                final MemberEntity created = createNewAccount(accountName, request.getNewCredential());
+                final MemberEntity created = createNewAccount(accountName, MemberRole.STANDARD, request.getNewCredential());
                 response = new ProcessMemberResponse();
                 response.setMemberId(created.getExternalId());
             } else {
@@ -139,6 +140,7 @@ public final class ProcessMemberService extends Serviceable<ProcessMemberRespons
                 entity.setRsaAlgorithm(settings.getSignatureAlgorithm());
                 entity.setPrivateKey(CredentialType.SIGNATURE.name());
                 entity.setPublicKey(Base64.getEncoder().encodeToString(signature));
+                entity.setMemberRole(MemberRole.STANDARD);
                 dao.persist(entity);
 
                 response = new ProcessMemberResponse();
@@ -175,7 +177,7 @@ public final class ProcessMemberService extends Serviceable<ProcessMemberRespons
         if (request.getNewCredential() != null) {
             final CWSKeyPair pair = updateMemberPassword(member, request.getNewCredential());
 
-            final List<TrusteeEntity> list = dao.findTrustByMember(member, EnumSet.allOf(TrustLevel.class));
+            final List<TrusteeEntity> list = dao.findTrusteesByMember(member, EnumSet.allOf(TrustLevel.class));
             for (final TrusteeEntity trustee : list) {
                 final KeyAlgorithm algorithm = trustee.getKey().getAlgorithm();
                 final SecretCWSKey circleKey = crypto.extractCircleKey(algorithm, keyPair.getPrivate(), trustee.getCircleKey());

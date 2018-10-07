@@ -19,6 +19,7 @@ import io.javadog.cws.api.requests.CircleIdRequest;
 import io.javadog.cws.api.requests.Verifiable;
 import io.javadog.cws.api.responses.CwsResponse;
 import io.javadog.cws.core.enums.KeyAlgorithm;
+import io.javadog.cws.core.enums.MemberRole;
 import io.javadog.cws.core.enums.Permission;
 import io.javadog.cws.core.exceptions.AuthenticationException;
 import io.javadog.cws.core.exceptions.AuthorizationException;
@@ -195,7 +196,7 @@ public abstract class Serviceable<R extends CwsResponse, V extends Authenticatio
 
             if (member == null) {
                 if (Objects.equals(Constants.ADMIN_ACCOUNT, account)) {
-                    member = createNewAccount(Constants.ADMIN_ACCOUNT, verifiable.getCredential());
+                    member = createNewAccount(Constants.ADMIN_ACCOUNT, MemberRole.ADMIN, verifiable.getCredential());
                 } else {
                     throw new AuthenticationException("Could not uniquely identify an account for '" + account + "'.");
                 }
@@ -203,9 +204,10 @@ public abstract class Serviceable<R extends CwsResponse, V extends Authenticatio
         }
     }
 
-    protected final MemberEntity createNewAccount(final String accountName, final byte[] credential) {
+    protected final MemberEntity createNewAccount(final String accountName, final MemberRole role, final byte[] credential) {
         final MemberEntity account = new MemberEntity();
         account.setName(accountName);
+        account.setMemberRole(role);
         updateMemberPassword(account, credential);
 
         return account;
@@ -352,9 +354,9 @@ public abstract class Serviceable<R extends CwsResponse, V extends Authenticatio
         final List<TrusteeEntity> found;
 
         if (circleId != null) {
-            found = dao.findTrustByMemberAndCircle(member, circleId, permissions);
+            found = dao.findTrusteesByMemberAndCircle(member, circleId, permissions);
         } else {
-            found = dao.findTrustByMember(member, permissions);
+            found = dao.findTrusteesByMember(member, permissions);
         }
 
         return found;

@@ -351,7 +351,10 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
 
     @Test
     public void testInvalidateSelf() {
-        prepareCause(CryptoException.class, ReturnCode.CRYPTO_ERROR, "Decryption error");
+        // Note, that the default error message between Java 8 & Java 11 has changed.
+        //   Java  8: Decryption error
+        //   Java 11: Message is larger than modulus
+        prepareCause(CryptoException.class, ReturnCode.CRYPTO_ERROR, "");
 
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
         final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, MEMBER_4);

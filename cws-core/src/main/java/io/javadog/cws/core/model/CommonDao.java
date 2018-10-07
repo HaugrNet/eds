@@ -122,7 +122,7 @@ public final class CommonDao {
         return found.get(0);
     }
 
-    public List<TrusteeEntity> findTrustByMember(final MemberEntity member, final Set<TrustLevel> permissions) {
+    public List<TrusteeEntity> findTrusteesByMember(final MemberEntity member, final Set<TrustLevel> permissions) {
         final Query query = entityManager.createNamedQuery("trust.findByMember");
         query.setParameter(MEMBER, member);
         query.setParameter("permissions", permissions);
@@ -130,7 +130,7 @@ public final class CommonDao {
         return findList(query);
     }
 
-    public List<TrusteeEntity> findTrustByMemberAndCircle(final MemberEntity member, final String externalCircleId, final Set<TrustLevel> permissions) {
+    public List<TrusteeEntity> findTrusteesByMemberAndCircle(final MemberEntity member, final String externalCircleId, final Set<TrustLevel> permissions) {
         final Query query = entityManager.createNamedQuery("trust.findByMemberAndExternalCircleId");
         query.setParameter(MEMBER, member);
         query.setParameter("externalCircleId", externalCircleId);

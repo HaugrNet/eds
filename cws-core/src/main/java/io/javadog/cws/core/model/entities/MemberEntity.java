@@ -12,6 +12,7 @@ package io.javadog.cws.core.model.entities;
 
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.core.enums.KeyAlgorithm;
+import io.javadog.cws.core.enums.MemberRole;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -67,6 +68,10 @@ public class MemberEntity extends Externable {
 
     @Column(name = "private_key", nullable = false, length = 16384)
     private String privateKey = null;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "member_role", nullable = false, length = 10)
+    private MemberRole memberRole = null;
 
     // =========================================================================
     // Entity Setters & Getters
@@ -126,5 +131,13 @@ public class MemberEntity extends Externable {
 
     public String getPrivateKey() {
         return privateKey;
+    }
+
+    public void setMemberRole(final MemberRole memberRole) {
+        this.memberRole = memberRole;
+    }
+
+    public MemberRole getMemberRole() {
+        return memberRole;
     }
 }

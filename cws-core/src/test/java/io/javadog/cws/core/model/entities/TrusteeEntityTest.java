@@ -15,6 +15,7 @@ import static org.junit.Assert.assertThat;
 import io.javadog.cws.api.common.TrustLevel;
 import io.javadog.cws.core.DatabaseSetup;
 import io.javadog.cws.core.enums.KeyAlgorithm;
+import io.javadog.cws.core.enums.MemberRole;
 import org.junit.Test;
 
 import java.util.UUID;
@@ -29,7 +30,7 @@ public final class TrusteeEntityTest extends DatabaseSetup {
     public void testEntity() {
         final KeyAlgorithm algorithm = settings.getAsymmetricAlgorithm();
         final String externalId = UUID.randomUUID().toString();
-        final MemberEntity member = prepareMember(externalId,  "Trustee Member", algorithm, "public Key", "private Key");
+        final MemberEntity member = prepareMember(externalId,  "Trustee Member", algorithm, "public Key", "private Key", MemberRole.STANDARD);
         final CircleEntity circle = prepareCircle(UUID.randomUUID().toString(), "Trustee Circle");
         final String circleKey = UUID.randomUUID().toString();
         final KeyEntity key = prepareKey();

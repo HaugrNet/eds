@@ -15,6 +15,7 @@ import io.javadog.cws.api.requests.FetchSignatureRequest;
 import io.javadog.cws.api.responses.FetchSignatureResponse;
 import io.javadog.cws.core.enums.Permission;
 import io.javadog.cws.core.model.Settings;
+import io.javadog.cws.core.model.SignatureDao;
 import io.javadog.cws.core.model.entities.SignatureEntity;
 
 import javax.persistence.EntityManager;
@@ -28,10 +29,10 @@ import java.util.List;
  * @author Kim Jensen
  * @since  CWS 1.0
  */
-public final class FetchSignatureService extends Serviceable<FetchSignatureResponse, FetchSignatureRequest> {
+public final class FetchSignatureService extends Serviceable<SignatureDao, FetchSignatureResponse, FetchSignatureRequest> {
 
     public FetchSignatureService(final Settings settings, final EntityManager entityManager) {
-        super(settings, entityManager);
+        super(settings, new SignatureDao(entityManager));
     }
 
     /**

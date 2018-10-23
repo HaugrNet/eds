@@ -22,6 +22,7 @@ import io.javadog.cws.core.enums.Status;
 import io.javadog.cws.core.exceptions.CWSException;
 import io.javadog.cws.core.jce.PublicCWSKey;
 import io.javadog.cws.core.jce.SecretCWSKey;
+import io.javadog.cws.core.model.CommonDao;
 import io.javadog.cws.core.model.Settings;
 import io.javadog.cws.core.model.entities.CircleEntity;
 import io.javadog.cws.core.model.entities.DataTypeEntity;
@@ -41,10 +42,10 @@ import java.util.Objects;
  * @author Kim Jensen
  * @since  CWS 1.0
  */
-public final class ProcessCircleService extends Serviceable<ProcessCircleResponse, ProcessCircleRequest> {
+public final class ProcessCircleService extends Serviceable<CommonDao, ProcessCircleResponse, ProcessCircleRequest> {
 
     public ProcessCircleService(final Settings settings, final EntityManager entityManager) {
-        super(settings, entityManager);
+        super(settings, new CommonDao(entityManager));
     }
 
     /**

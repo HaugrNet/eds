@@ -16,6 +16,7 @@ import io.javadog.cws.api.dtos.Sanity;
 import io.javadog.cws.api.requests.SanityRequest;
 import io.javadog.cws.api.responses.SanityResponse;
 import io.javadog.cws.core.enums.Permission;
+import io.javadog.cws.core.model.SanityDao;
 import io.javadog.cws.core.model.Settings;
 import io.javadog.cws.core.model.entities.DataEntity;
 
@@ -32,10 +33,10 @@ import java.util.Objects;
  * @author Kim Jensen
  * @since  CWS 1.0
  */
-public final class SanityService extends Serviceable<SanityResponse, SanityRequest> {
+public final class SanityService extends Serviceable<SanityDao, SanityResponse, SanityRequest> {
 
     public SanityService(final Settings settings, final EntityManager entityManager) {
-        super(settings, entityManager);
+        super(settings, new SanityDao(entityManager));
     }
 
     /**

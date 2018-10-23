@@ -31,7 +31,6 @@ import io.javadog.cws.core.services.FetchDataTypeService;
 import io.javadog.cws.core.services.FetchSignatureService;
 import io.javadog.cws.core.services.ProcessDataService;
 import io.javadog.cws.core.services.ProcessDataTypeService;
-import io.javadog.cws.core.services.Serviceable;
 import io.javadog.cws.core.services.SignService;
 import io.javadog.cws.core.services.VerifyService;
 
@@ -58,7 +57,7 @@ public class ShareBean {
 
     @Transactional(Transactional.TxType.REQUIRED)
     public ProcessDataTypeResponse processDataType(final ProcessDataTypeRequest request) {
-        Serviceable<ProcessDataTypeResponse, ProcessDataTypeRequest> service = null;
+        ProcessDataTypeService service = null;
         ProcessDataTypeResponse response;
 
         try {
@@ -80,7 +79,7 @@ public class ShareBean {
 
     @Transactional(Transactional.TxType.SUPPORTS)
     public FetchDataTypeResponse fetchDataTypes(final FetchDataTypeRequest request) {
-        Serviceable<FetchDataTypeResponse, FetchDataTypeRequest> service = null;
+        FetchDataTypeService service = null;
         FetchDataTypeResponse response;
 
         try {
@@ -102,7 +101,7 @@ public class ShareBean {
 
     @Transactional(Transactional.TxType.REQUIRED)
     public ProcessDataResponse processData(final ProcessDataRequest request) {
-        Serviceable<ProcessDataResponse, ProcessDataRequest> service = null;
+        ProcessDataService service = null;
         ProcessDataResponse response;
 
         try {
@@ -124,7 +123,7 @@ public class ShareBean {
 
     @Transactional(Transactional.TxType.REQUIRED)
     public FetchDataResponse fetchData(final FetchDataRequest request) {
-        Serviceable<FetchDataResponse, FetchDataRequest> service = null;
+        FetchDataService service = null;
         FetchDataResponse response;
 
         try {
@@ -146,7 +145,7 @@ public class ShareBean {
 
     @Transactional(Transactional.TxType.REQUIRED)
     public SignResponse sign(final SignRequest request) {
-        Serviceable<SignResponse, SignRequest> service = null;
+        SignService service = null;
         SignResponse response;
 
         try {
@@ -168,7 +167,7 @@ public class ShareBean {
 
     @Transactional(Transactional.TxType.SUPPORTS)
     public VerifyResponse verify(final VerifyRequest request) {
-        Serviceable<VerifyResponse, VerifyRequest> service = null;
+        VerifyService service = null;
         VerifyResponse response;
 
         try {
@@ -190,7 +189,7 @@ public class ShareBean {
 
     @Transactional(Transactional.TxType.SUPPORTS)
     public FetchSignatureResponse fetchSignatures(final FetchSignatureRequest request) {
-        Serviceable<FetchSignatureResponse, FetchSignatureRequest> service = null;
+        FetchSignatureService service = null;
         FetchSignatureResponse response;
 
         try {

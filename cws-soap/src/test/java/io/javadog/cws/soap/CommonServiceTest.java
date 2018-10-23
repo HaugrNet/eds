@@ -17,6 +17,7 @@ import io.javadog.cws.api.requests.SettingRequest;
 import io.javadog.cws.api.responses.SettingResponse;
 import io.javadog.cws.core.CommonBean;
 import io.javadog.cws.core.exceptions.CWSException;
+import io.javadog.cws.core.model.CommonDao;
 import io.javadog.cws.core.model.Settings;
 import io.javadog.cws.core.services.Serviceable;
 import io.javadog.cws.core.services.SettingService;
@@ -62,7 +63,7 @@ public final class CommonServiceTest extends BeanSetup {
      * not work, i.e. fail when invoked. It is present to help test the error
      * handling.
      */
-    private static final class FailService extends Serviceable<SettingResponse, SettingRequest> {
+    private static final class FailService extends Serviceable<CommonDao, SettingResponse, SettingRequest> {
 
         /**
          * Default Constructor.
@@ -71,7 +72,7 @@ public final class CommonServiceTest extends BeanSetup {
          * @param entityManager Entity Manager instance
          */
         private FailService(final Settings settings, final EntityManager entityManager) {
-            super(settings, entityManager);
+            super(settings, new CommonDao(entityManager));
         }
 
         /**

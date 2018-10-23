@@ -15,6 +15,7 @@ import io.javadog.cws.api.dtos.Circle;
 import io.javadog.cws.api.requests.FetchCircleRequest;
 import io.javadog.cws.api.responses.FetchCircleResponse;
 import io.javadog.cws.core.enums.Permission;
+import io.javadog.cws.core.model.CommonDao;
 import io.javadog.cws.core.model.Settings;
 import io.javadog.cws.core.model.entities.CircleEntity;
 import io.javadog.cws.core.model.entities.TrusteeEntity;
@@ -31,10 +32,10 @@ import java.util.Objects;
  * @author Kim Jensen
  * @since  CWS 1.0
  */
-public final class FetchCircleService extends Serviceable<FetchCircleResponse, FetchCircleRequest> {
+public final class FetchCircleService extends Serviceable<CommonDao, FetchCircleResponse, FetchCircleRequest> {
 
     public FetchCircleService(final Settings settings, final EntityManager entityManager) {
-        super(settings, entityManager);
+        super(settings, new CommonDao(entityManager));
     }
 
     /**

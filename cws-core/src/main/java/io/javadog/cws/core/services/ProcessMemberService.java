@@ -24,6 +24,7 @@ import io.javadog.cws.core.exceptions.VerificationException;
 import io.javadog.cws.core.jce.CWSKeyPair;
 import io.javadog.cws.core.jce.IVSalt;
 import io.javadog.cws.core.jce.SecretCWSKey;
+import io.javadog.cws.core.model.MemberDao;
 import io.javadog.cws.core.model.Settings;
 import io.javadog.cws.core.model.entities.MemberEntity;
 import io.javadog.cws.core.model.entities.TrusteeEntity;
@@ -43,10 +44,10 @@ import java.util.UUID;
  * @author Kim Jensen
  * @since  CWS 1.0
  */
-public final class ProcessMemberService extends Serviceable<ProcessMemberResponse, ProcessMemberRequest> {
+public final class ProcessMemberService extends Serviceable<MemberDao, ProcessMemberResponse, ProcessMemberRequest> {
 
     public ProcessMemberService(final Settings settings, final EntityManager entityManager) {
-        super(settings, entityManager);
+        super(settings, new MemberDao(entityManager));
     }
 
     /**

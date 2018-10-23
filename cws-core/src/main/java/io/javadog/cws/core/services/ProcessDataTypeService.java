@@ -18,6 +18,7 @@ import io.javadog.cws.api.responses.ProcessDataTypeResponse;
 import io.javadog.cws.core.enums.Permission;
 import io.javadog.cws.core.exceptions.AuthorizationException;
 import io.javadog.cws.core.exceptions.CWSException;
+import io.javadog.cws.core.model.CommonDao;
 import io.javadog.cws.core.model.Settings;
 import io.javadog.cws.core.model.entities.DataTypeEntity;
 
@@ -31,10 +32,10 @@ import java.util.Objects;
  * @author Kim Jensen
  * @since  CWS 1.0
  */
-public final class ProcessDataTypeService extends Serviceable<ProcessDataTypeResponse, ProcessDataTypeRequest> {
+public final class ProcessDataTypeService extends Serviceable<CommonDao, ProcessDataTypeResponse, ProcessDataTypeRequest> {
 
     public ProcessDataTypeService(final Settings settings, final EntityManager entityManager) {
-        super(settings, entityManager);
+        super(settings, new CommonDao(entityManager));
     }
 
     /**
@@ -112,7 +113,7 @@ public final class ProcessDataTypeService extends Serviceable<ProcessDataTypeRes
         if (entity != null) {
             // We need to check that the Data Type is not being used. If so,
             // then it is not allowed to remove it.
-            final long records = dao.countObjectTypeUsage(entity);
+            final long records = dao.countDataTypeUsage(entity);
             if (records > 0) {
                 throw new CWSException(ReturnCode.ILLEGAL_ACTION, "The Data Type '" + name + "' cannot be deleted, as it is being actively used.");
             } else {

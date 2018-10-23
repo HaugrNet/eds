@@ -13,16 +13,12 @@ package io.javadog.cws.core.model;
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.common.TrustLevel;
 import io.javadog.cws.api.common.Utilities;
-import io.javadog.cws.core.enums.SanityStatus;
 import io.javadog.cws.core.exceptions.CWSException;
 import io.javadog.cws.core.model.entities.CWSEntity;
 import io.javadog.cws.core.model.entities.CircleEntity;
-import io.javadog.cws.core.model.entities.DataEntity;
 import io.javadog.cws.core.model.entities.DataTypeEntity;
 import io.javadog.cws.core.model.entities.Externable;
 import io.javadog.cws.core.model.entities.MemberEntity;
-import io.javadog.cws.core.model.entities.MetadataEntity;
-import io.javadog.cws.core.model.entities.SignatureEntity;
 import io.javadog.cws.core.model.entities.TrusteeEntity;
 
 import javax.persistence.EntityManager;
@@ -32,32 +28,47 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
 /**
- * <p>Common DAO functionality, used through the CWS.</p>
+ * <p>Common DAO functionality, used throughout CWS.</p>
  *
  * @author Kim Jensen
  * @since  CWS 1.0
  */
-public final class CommonDao {
+public class CommonDao {
 
-    private static final String EXTERNAL_ID = "externalId";
-    private static final String MEMBER = "member";
-    private static final String PARENT_ID = "parentId";
-    private static final String STATUS = "status";
-    private static final String SINCE = "since";
+    protected static final String EXTERNAL_ID = "externalId";
+    protected static final String MEMBER = "member";
+    protected static final String PARENT_ID = "parentId";
+    protected static final String STATUS = "status";
+    protected static final String SINCE = "since";
+    protected static final String NAME = "name";
 
-    private final EntityManager entityManager;
+    protected final EntityManager entityManager;
 
+    /**
+     * <p>Default Constructor.</p>
+     *
+     * @param entityManager EntityManager instance with transactional control
+     */
     public CommonDao(final EntityManager entityManager) {
         this.entityManager = entityManager;
     }
 
+    /**
+     * <p>Persist, create or updates, an Entity. If it is derived from
+     * {@link Externable}, then a new external Id (UUID) is set if it currently
+     * does not have one.</p>
+     *
+     * <p>Regardless of an Entity is being created or updated, the method will
+     * always update the alteration data and ensure that the creation date is
+     * defined as well.</p>
+     *
+     * @param entity CWS Entity to persist (create or update)
+     */
     public void persist(final CWSEntity entity) {
         if ((entity instanceof Externable) && (((Externable) entity).getExternalId() == null)) {
             ((Externable) entity).setExternalId(UUID.randomUUID().toString());
@@ -84,7 +95,18 @@ public final class CommonDao {
         return findSingleRecord(entityManager.createQuery(query));
     }
 
-    public <E extends CWSEntity> List<E> findAllAscending(final Class<E> cwsEntity, final String orderBy) {
+    /**
+     * <p>Uses the JPA {@link CriteriaBuilder} to create a new query to find
+     * all matching records, sorted ascending according to the given
+     * parameters.</p>
+     *
+     * @param cwsEntity The CWS Entity to find all records for
+     * @param orderBy   The field to order the ascending sorting by
+     * @param <E>       The CWS Entity to use in the query
+     * @return List of sorted records from the database
+     */
+    public <E extends CWSEntity> List<E> findAllAscending(final Class<E> cwsEntity,
+                                                          final String orderBy) {
         final CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         final CriteriaQuery<E> query = builder.createQuery(cwsEntity);
         final Root<E> entity = query.from(cwsEntity);
@@ -93,7 +115,8 @@ public final class CommonDao {
         return findList(entityManager.createQuery(query));
     }
 
-    public <E extends CWSEntity> E getReference(final Class<E> cwsEntity, final Long id) {
+    public <E extends CWSEntity> E getReference(final Class<E> cwsEntity,
+                                                final Long id) {
         return entityManager.getReference(cwsEntity, id);
     }
 
@@ -108,21 +131,23 @@ public final class CommonDao {
         return findSingleRecord(query);
     }
 
-    public MemberEntity findMemberByNameAndCircleId(final String name, final String externalCircleId) {
+    public MemberEntity findMemberByNameAndCircleId(final String name,
+                                                    final String externalCircleId) {
         final Query query = entityManager.createNamedQuery("member.findByNameAndCircle");
         query.setParameter("name", name);
         query.setParameter("externalCircleId", externalCircleId);
-
         final List<MemberEntity> found = findList(query);
 
         if (found.isEmpty()) {
-            throw new CWSException(ReturnCode.IDENTIFICATION_WARNING, "No Trustee information found for member '" + name + "' and circle '" + externalCircleId + "'.");
+            throw new CWSException(ReturnCode.IDENTIFICATION_WARNING,
+                    "No Trustee information found for member '" + name + "' and circle '" + externalCircleId + "'.");
         }
 
         return found.get(0);
     }
 
-    public List<TrusteeEntity> findTrusteesByMember(final MemberEntity member, final Set<TrustLevel> permissions) {
+    public List<TrusteeEntity> findTrusteesByMember(final MemberEntity member,
+                                                    final Set<TrustLevel> permissions) {
         final Query query = entityManager.createNamedQuery("trust.findByMember");
         query.setParameter(MEMBER, member);
         query.setParameter("permissions", permissions);
@@ -130,7 +155,9 @@ public final class CommonDao {
         return findList(query);
     }
 
-    public List<TrusteeEntity> findTrusteesByMemberAndCircle(final MemberEntity member, final String externalCircleId, final Set<TrustLevel> permissions) {
+    public List<TrusteeEntity> findTrusteesByMemberAndCircle(final MemberEntity member,
+                                                             final String externalCircleId,
+                                                             final Set<TrustLevel> permissions) {
         final Query query = entityManager.createNamedQuery("trust.findByMemberAndExternalCircleId");
         query.setParameter(MEMBER, member);
         query.setParameter("externalCircleId", externalCircleId);
@@ -151,21 +178,6 @@ public final class CommonDao {
         query.setParameter("name", name);
 
         return findSingleRecord(query);
-    }
-
-    public List<CircleEntity> findCirclesForMember(final MemberEntity member) {
-        final Query query = entityManager.createNamedQuery("trustee.findCirclesByMember");
-        query.setParameter(MEMBER, member);
-
-        return findList(query);
-    }
-
-    public List<TrusteeEntity> findCirclesBothBelongTo(final MemberEntity member, final MemberEntity requested) {
-        final Query query = entityManager.createNamedQuery("trustee.findSharedCircles");
-        query.setParameter(MEMBER, member);
-        query.setParameter("requested", requested);
-
-        return findList(query);
     }
 
     public List<DataTypeEntity> findAllTypes() {
@@ -189,126 +201,20 @@ public final class CommonDao {
         return findSingleRecord(query);
     }
 
-    public long countObjectTypeUsage(final DataTypeEntity dataType) {
+    public long countDataTypeUsage(final DataTypeEntity dataType) {
         final Query query = entityManager.createNamedQuery("type.countUsage");
         query.setParameter("type", dataType);
 
         return (long) query.getSingleResult();
     }
 
-    public DataEntity findDataByMetadata(final MetadataEntity metadata) {
-        final Query query = entityManager.createNamedQuery("data.findByMetadata");
-        query.setParameter("metadata", metadata);
-
-        return findSingleRecord(query);
-    }
-
-    public DataEntity findDataByMemberAndExternalId(final MemberEntity member, final String externalId) {
-        final Query query = entityManager.createNamedQuery("data.findByMemberAndExternalId");
-        query.setParameter(MEMBER, member);
-        query.setParameter(EXTERNAL_ID, externalId);
-        query.setParameter("trustLevels", EnumSet.of(TrustLevel.ADMIN, TrustLevel.WRITE, TrustLevel.READ));
-
-        return findSingleRecord(query);
-    }
-
-    public MetadataEntity findMetaDataByMemberAndExternalId(final Long memberId, final String externalId) {
-        final Query query = entityManager.createNamedQuery("metadata.findByMemberAndExternalId");
-        query.setParameter("mid", memberId);
-        query.setParameter("eid", externalId);
-
-        return findSingleRecord(query);
-    }
-
-    public MetadataEntity findRootByMemberCircle(final Long memberId, final String circleId) {
-        final Query query = entityManager.createNamedQuery("metadata.findRootByMemberAndCircle");
-        query.setParameter("mid", memberId);
-        query.setParameter("cid", circleId);
-
-        return findSingleRecord(query);
-    }
-
-    public List<MetadataEntity> findMetadataByMemberAndFolder(final MemberEntity member, final Long parentId, final int pageNumber, final int pageSize) {
-        final Query query = entityManager.createNamedQuery("metadata.findByMemberAndFolder");
-        query.setParameter(MEMBER, member);
-        query.setParameter(PARENT_ID, parentId);
-        query.setMaxResults(pageSize);
-        query.setFirstResult((pageNumber - 1) * pageSize);
-
-        return findList(query);
-    }
-
-    public SignatureEntity findByChecksum(final String checksum) {
-        final Query query = entityManager.createNamedQuery("signature.findByChecksum");
-        query.setParameter("checksum", checksum);
-
-        return findSingleRecord(query);
-    }
-
-    public List<SignatureEntity> findAllSignatures(final MemberEntity member) {
-        final Query query = entityManager.createNamedQuery("signature.findByMember");
-        query.setParameter(MEMBER, member);
-
-        return findList(query);
-    }
-
-    public TrusteeEntity findTrusteeByCircleAndMember(final String externalCircleId, final String externalMemberId) {
+    public TrusteeEntity findTrusteeByCircleAndMember(final String externalCircleId,
+                                                      final String externalMemberId) {
         final Query query = entityManager.createNamedQuery("trustee.findByCircleAndMember");
         query.setParameter("ecid", externalCircleId);
         query.setParameter("emid", externalMemberId);
 
         return findSingleRecord(query);
-    }
-
-    public long countFolderContent(final Long parentId) {
-        final Query query = entityManager.createNamedQuery("metadata.countFolderContent");
-        query.setParameter("pid", parentId);
-
-        return (long) query.getSingleResult();
-    }
-
-    public MetadataEntity findInFolder(final MemberEntity member, final Long parentId, final String name) {
-        final Query query = entityManager.createNamedQuery("metadata.findInFolder");
-        query.setParameter(MEMBER, member);
-        query.setParameter(PARENT_ID, parentId);
-        query.setParameter("name", name);
-
-        return findSingleRecord(query);
-    }
-
-    public boolean checkIfNameIsUsed(final Long metadataId, final String name, final Long parentId) {
-        final Query query = entityManager.createNamedQuery("metadata.findByNameAndFolder");
-        query.setParameter("id", metadataId);
-        query.setParameter("name", name);
-        query.setParameter(PARENT_ID, parentId);
-
-        return findSingleRecord(query) != null;
-    }
-
-    public List<DataEntity> findFailedRecords(final Date since) {
-        final Query query = entityManager.createNamedQuery("data.findAllWithState");
-        query.setParameter(STATUS, SanityStatus.FAILED);
-        query.setParameter(SINCE, since);
-
-        return findList(query);
-    }
-
-    public List<DataEntity> findFailedRecords(final String circleId, final Date since) {
-        final Query query = entityManager.createNamedQuery("data.findAllWithStateForCircle");
-        query.setParameter(STATUS, SanityStatus.FAILED);
-        query.setParameter(SINCE, since);
-        query.setParameter(EXTERNAL_ID, circleId);
-
-        return findList(query);
-    }
-
-    public List<DataEntity> findFailedRecords(final MemberEntity circleAdministrator, final Date since) {
-        final Query query = entityManager.createNamedQuery("data.findAllWithStateForMember");
-        query.setParameter(STATUS, SanityStatus.FAILED);
-        query.setParameter(SINCE, since);
-        query.setParameter(MEMBER, circleAdministrator);
-
-        return findList(query);
     }
 
     public Long countMembers() {
@@ -322,12 +228,41 @@ public final class CommonDao {
     // Internal Methods, handling the actual lookup's to simplify error handling
     // =========================================================================
 
-    private static <E> E findSingleRecord(final Query query) {
+    /**
+     * <p>Returns the first record matching the query. If no records are found,
+     * a null is returned.</p>
+     *
+     * <p>This method is preferred to be used over the JPA Query method
+     * {@link Query#getFirstResult()}, as it throws an exception if no result
+     * was found. Rather than having Exception handling to deal with a fairly
+     * common case - a null is returned so it can be dealt with in a better
+     * way.</p>
+     *
+     * <p>The Java 8 {@link java.util.Optional} class was discarded, since all
+     * it does is wrap the null in an Object, that as well requires a check.
+     * This does not mean that the {@link java.util.Optional} class is useless,
+     * only that in this case, it is simply not used as the null has a specific
+     * meaning.</p>
+     *
+     * @param query JPA Query to run
+     * @param <E>   Entity Type to return
+     * @return First Entity matching Query or null
+     */
+    protected static <E> E findSingleRecord(final Query query) {
         final List<E> found = findList(query);
 
         return found.isEmpty() ? null : found.get(0);
     }
 
+    /**
+     * <p>Wrapper for the JPA {@link Query#getResultList()} method, as it may
+     * (according to the specifications) return a null rather than an empty
+     * list if no records could be found.</p>
+     *
+     * @param query JPA Query to execute
+     * @param <E>   Entity Type to return a list if
+     * @return List of found Entities or an empty list if none were found
+     */
     public static <E> List<E> findList(final Query query) {
         try {
             final List<E> list = query.getResultList();

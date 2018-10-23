@@ -21,6 +21,7 @@ import io.javadog.cws.core.enums.SanityStatus;
 import io.javadog.cws.core.exceptions.CWSException;
 import io.javadog.cws.core.jce.IVSalt;
 import io.javadog.cws.core.jce.SecretCWSKey;
+import io.javadog.cws.core.model.DataDao;
 import io.javadog.cws.core.model.Settings;
 import io.javadog.cws.core.model.entities.DataEntity;
 import io.javadog.cws.core.model.entities.DataTypeEntity;
@@ -39,10 +40,10 @@ import java.util.UUID;
  * @author Kim Jensen
  * @since  CWS 1.0
  */
-public final class ProcessDataService extends Serviceable<ProcessDataResponse, ProcessDataRequest> {
+public final class ProcessDataService extends Serviceable<DataDao, ProcessDataResponse, ProcessDataRequest> {
 
     public ProcessDataService(final Settings settings, final EntityManager entityManager) {
-        super(settings, entityManager);
+        super(settings, new DataDao(entityManager));
     }
 
     /**

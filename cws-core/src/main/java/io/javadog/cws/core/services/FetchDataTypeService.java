@@ -14,6 +14,7 @@ import io.javadog.cws.api.dtos.DataType;
 import io.javadog.cws.api.requests.FetchDataTypeRequest;
 import io.javadog.cws.api.responses.FetchDataTypeResponse;
 import io.javadog.cws.core.enums.Permission;
+import io.javadog.cws.core.model.CommonDao;
 import io.javadog.cws.core.model.Settings;
 import io.javadog.cws.core.model.entities.DataTypeEntity;
 
@@ -29,10 +30,10 @@ import java.util.List;
  * @author Kim Jensen
  * @since  CWS 1.0
  */
-public final class FetchDataTypeService extends Serviceable<FetchDataTypeResponse, FetchDataTypeRequest> {
+public final class FetchDataTypeService extends Serviceable<CommonDao, FetchDataTypeResponse, FetchDataTypeRequest> {
 
     public FetchDataTypeService(final Settings settings, final EntityManager entityManager) {
-        super(settings, entityManager);
+        super(settings, new CommonDao(entityManager));
     }
 
     /**

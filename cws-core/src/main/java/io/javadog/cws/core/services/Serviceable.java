@@ -37,7 +37,6 @@ import io.javadog.cws.core.model.entities.DataEntity;
 import io.javadog.cws.core.model.entities.MemberEntity;
 import io.javadog.cws.core.model.entities.TrusteeEntity;
 
-import javax.persistence.EntityManager;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -50,20 +49,20 @@ import java.util.Set;
  * @author Kim Jensen
  * @since  CWS 1.0
  */
-public abstract class Serviceable<R extends CwsResponse, V extends Authentication> {
+public abstract class Serviceable<D extends CommonDao, R extends CwsResponse, V extends Authentication> {
 
     protected final Settings settings;
-    protected final CommonDao dao;
     protected final Crypto crypto;
+    protected final D dao;
 
     protected List<TrusteeEntity> trustees = new ArrayList<>(0);
     protected MemberEntity member = null;
     protected CWSKeyPair keyPair = null;
 
-    protected Serviceable(final Settings settings, final EntityManager entityManager) {
-        this.dao = new CommonDao(entityManager);
+    protected Serviceable(final Settings settings, final D dao) {
         this.crypto = new Crypto(settings);
         this.settings = settings;
+        this.dao = dao;
     }
 
     /**

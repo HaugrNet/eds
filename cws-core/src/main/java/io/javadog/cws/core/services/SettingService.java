@@ -17,6 +17,7 @@ import io.javadog.cws.core.enums.KeyAlgorithm;
 import io.javadog.cws.core.enums.Permission;
 import io.javadog.cws.core.enums.StandardSetting;
 import io.javadog.cws.core.exceptions.CWSException;
+import io.javadog.cws.core.model.CommonDao;
 import io.javadog.cws.core.model.Settings;
 import io.javadog.cws.core.model.entities.SettingEntity;
 
@@ -53,12 +54,12 @@ import java.util.regex.Pattern;
  * @author Kim Jensen
  * @since  CWS 1.0
  */
-public final class SettingService extends Serviceable<SettingResponse, SettingRequest> {
+public final class SettingService extends Serviceable<CommonDao, SettingResponse, SettingRequest> {
 
     private static final Pattern PATTERN_NUMBER = Pattern.compile("\\d+");
 
     public SettingService(final Settings settings, final EntityManager entityManager) {
-        super(settings, entityManager);
+        super(settings, new CommonDao(entityManager));
     }
 
     /**

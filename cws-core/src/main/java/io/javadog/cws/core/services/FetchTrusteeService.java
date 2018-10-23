@@ -15,6 +15,7 @@ import io.javadog.cws.api.dtos.Trustee;
 import io.javadog.cws.api.requests.FetchTrusteeRequest;
 import io.javadog.cws.api.responses.FetchTrusteeResponse;
 import io.javadog.cws.core.enums.Permission;
+import io.javadog.cws.core.model.CommonDao;
 import io.javadog.cws.core.model.Settings;
 import io.javadog.cws.core.model.entities.CircleEntity;
 import io.javadog.cws.core.model.entities.TrusteeEntity;
@@ -30,10 +31,10 @@ import java.util.List;
  * @author Kim Jensen
  * @since  CWS 1.0
  */
-public final class FetchTrusteeService extends Serviceable<FetchTrusteeResponse, FetchTrusteeRequest> {
+public final class FetchTrusteeService extends Serviceable<CommonDao, FetchTrusteeResponse, FetchTrusteeRequest> {
 
     public FetchTrusteeService(final Settings settings, final EntityManager entityManager) {
-        super(settings, entityManager);
+        super(settings, new CommonDao(entityManager));
     }
 
     /**

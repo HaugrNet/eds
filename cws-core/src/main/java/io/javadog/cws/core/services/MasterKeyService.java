@@ -19,6 +19,7 @@ import io.javadog.cws.core.enums.MemberRole;
 import io.javadog.cws.core.exceptions.CryptoException;
 import io.javadog.cws.core.jce.MasterKey;
 import io.javadog.cws.core.jce.SecretCWSKey;
+import io.javadog.cws.core.model.CommonDao;
 import io.javadog.cws.core.model.Settings;
 import io.javadog.cws.core.model.entities.MemberEntity;
 
@@ -33,12 +34,12 @@ import java.util.logging.Logger;
  * @author Kim Jensen
  * @since  CWS 1.0
  */
-public final class MasterKeyService extends Serviceable<MasterKeyResponse, MasterKeyRequest> {
+public final class MasterKeyService extends Serviceable<CommonDao, MasterKeyResponse, MasterKeyRequest> {
 
     private static final Logger LOG = Logger.getLogger(MasterKeyService.class.getName());
 
     public MasterKeyService(final Settings settings, final EntityManager entityManager) {
-        super(settings, entityManager);
+        super(settings, new CommonDao(entityManager));
     }
 
     /**

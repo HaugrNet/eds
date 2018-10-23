@@ -73,7 +73,7 @@ import javax.persistence.Table;
         @NamedQuery(name = "metadata.countFolderContent",
                 query = "select count(m.id) " +
                         "from MetadataEntity m " +
-                        "where m.parentId = :pid")
+                        "where m.parentId = :parentId")
 })
 @Table(name = "cws_metadata")
 public class MetadataEntity extends Externable {

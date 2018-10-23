@@ -19,6 +19,7 @@ import io.javadog.cws.core.enums.Permission;
 import io.javadog.cws.core.exceptions.CWSException;
 import io.javadog.cws.core.jce.PublicCWSKey;
 import io.javadog.cws.core.jce.SecretCWSKey;
+import io.javadog.cws.core.model.CommonDao;
 import io.javadog.cws.core.model.Settings;
 import io.javadog.cws.core.model.entities.MemberEntity;
 import io.javadog.cws.core.model.entities.TrusteeEntity;
@@ -35,10 +36,10 @@ import java.util.Objects;
  * @author Kim Jensen
  * @since  CWS 1.0
  */
-public final class ProcessTrusteeService extends Serviceable<ProcessTrusteeResponse, ProcessTrusteeRequest> {
+public final class ProcessTrusteeService extends Serviceable<CommonDao, ProcessTrusteeResponse, ProcessTrusteeRequest> {
 
     public ProcessTrusteeService(final Settings settings, final EntityManager entityManager) {
-        super(settings, entityManager);
+        super(settings, new CommonDao(entityManager));
     }
 
     /**

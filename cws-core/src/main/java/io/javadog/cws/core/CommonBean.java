@@ -32,7 +32,7 @@ public final class CommonBean {
     private CommonBean() {
     }
 
-    public static void destroy(final Serviceable<?, ?> serviceable) {
+    public static void destroy(final Serviceable<?, ?, ?> serviceable) {
         if (serviceable != null) {
             try {
                 serviceable.destroy();

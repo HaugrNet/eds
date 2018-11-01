@@ -116,8 +116,8 @@ CREATE TABLE cws_members (
   external_id      VARCHAR(36),
   name             VARCHAR(75),    -- Member Authentication information
   salt             VARCHAR(256),
-  pbe_algorithm    VARCHAR(19) DEFAULT 'PBE128',
-  rsa_algorithm    VARCHAR(19) DEFAULT 'RSA2048',
+  pbe_algorithm    VARCHAR(19) DEFAULT 'PBE_236',
+  rsa_algorithm    VARCHAR(19) DEFAULT 'RSA_2048',
   external_key     LONGVARCHAR,    -- External Public Key, with unknown length
   public_key       VARCHAR(3072),  -- Public Key, stored armored
   private_key      VARCHAR(16384), -- Private Key, stored encrypted & armored

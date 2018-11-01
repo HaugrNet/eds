@@ -43,11 +43,11 @@ public final class CryptoTest extends DatabaseSetup {
         thrown.expect(CryptoException.class);
         thrown.expectMessage("AES/CBC/PKCS5Padding SecretKeyFactory not available");
         final Settings mySettings = newSettings();
-        mySettings.set(StandardSetting.PBE_ALGORITHM.getKey(), "RSA2048");
+        mySettings.set(StandardSetting.PBE_ALGORITHM.getKey(), "RSA_2048");
         final Crypto myCrypto = new Crypto(mySettings);
 
         final String salt = UUID.randomUUID().toString();
-        myCrypto.generatePasswordKey(KeyAlgorithm.AES128, crypto.stringToBytes("my secret"), salt);
+        myCrypto.generatePasswordKey(KeyAlgorithm.AES_CBC_128, crypto.stringToBytes("my secret"), salt);
     }
 
     @Test
@@ -56,7 +56,7 @@ public final class CryptoTest extends DatabaseSetup {
         for (int i = 0; i<256; i++) {
             secret[i] = (byte) i;
         }
-        final KeyAlgorithm algorithm = KeyAlgorithm.PBE128;
+        final KeyAlgorithm algorithm = KeyAlgorithm.PBE_128;
         final String salt = UUID.randomUUID().toString();
         final SecretCWSKey key = crypto.generatePasswordKey(algorithm, secret, salt);
         assertThat(key, is(not(nullValue())));
@@ -67,7 +67,7 @@ public final class CryptoTest extends DatabaseSetup {
         thrown.expect(CryptoException.class);
         thrown.expectMessage("RSA KeyGenerator not available");
 
-        crypto.generateSymmetricKey(KeyAlgorithm.RSA2048);
+        crypto.generateSymmetricKey(KeyAlgorithm.RSA_2048);
     }
 
     @Test
@@ -75,16 +75,16 @@ public final class CryptoTest extends DatabaseSetup {
         thrown.expect(CryptoException.class);
         thrown.expectMessage("AES KeyPairGenerator not available");
 
-        crypto.generateAsymmetricKey(KeyAlgorithm.AES128);
+        crypto.generateAsymmetricKey(KeyAlgorithm.AES_CBC_128);
     }
 
     @Test
     public void testGeneratingChecksumWithInvalidAlgorithm() {
         thrown.expect(CryptoException.class);
-        thrown.expectMessage("No enum constant io.javadog.cws.core.enums.HashAlgorithm.AES128");
+        thrown.expectMessage("No enum constant io.javadog.cws.core.enums.HashAlgorithm.AES_128");
 
         final Settings mySettings = newSettings();
-        mySettings.set(StandardSetting.HASH_ALGORITHM.getKey(), "AES128");
+        mySettings.set(StandardSetting.HASH_ALGORITHM.getKey(), "AES_128");
         final Crypto myCrypto = new Crypto(mySettings);
         myCrypto.generateChecksum("Bla bla bla".getBytes(settings.getCharset()));
     }
@@ -95,9 +95,9 @@ public final class CryptoTest extends DatabaseSetup {
         thrown.expectMessage("AES/CBC/PKCS5Padding Signature not available");
 
         final Settings mySettings = newSettings();
-        mySettings.set(StandardSetting.SIGNATURE_ALGORITHM.getKey(), "AES256");
+        mySettings.set(StandardSetting.SIGNATURE_ALGORITHM.getKey(), "AES_CBC_256");
         final Crypto myCrypto = new Crypto(mySettings);
-        final CWSKeyPair key = myCrypto.generateAsymmetricKey(KeyAlgorithm.RSA2048);
+        final CWSKeyPair key = myCrypto.generateAsymmetricKey(KeyAlgorithm.RSA_2048);
         myCrypto.sign(key.getPrivate().getKey(), "bla bla bla".getBytes(mySettings.getCharset()));
     }
 
@@ -381,7 +381,7 @@ public final class CryptoTest extends DatabaseSetup {
         final CWSKeyPair keyPair = myCrypto.generateAsymmetricKey(mySettings.getAsymmetricAlgorithm());
         final String armoredPublicKey = myCrypto.armoringPublicKey(keyPair.getPublic().getKey());
 
-        mySettings.set(StandardSetting.ASYMMETRIC_ALGORITHM.getKey(), KeyAlgorithm.AES128.name());
+        mySettings.set(StandardSetting.ASYMMETRIC_ALGORITHM.getKey(), KeyAlgorithm.AES_CBC_128.name());
         final PublicKey publicKey = myCrypto.dearmoringPublicKey(armoredPublicKey);
         assertThat(publicKey, is(not(nullValue())));
     }
@@ -397,7 +397,7 @@ public final class CryptoTest extends DatabaseSetup {
         secretKey.setSalt(new IVSalt(UUID.randomUUID().toString()));
 
         final String armoredPrivateKey = myCrypto.armoringPrivateKey(secretKey, keyPair.getPrivate().getKey());
-        mySettings.set(StandardSetting.ASYMMETRIC_ALGORITHM.getKey(), KeyAlgorithm.AES128.name());
+        mySettings.set(StandardSetting.ASYMMETRIC_ALGORITHM.getKey(), KeyAlgorithm.AES_CBC_128.name());
         final PrivateKey privateKey = myCrypto.dearmoringPrivateKey(secretKey, armoredPrivateKey);
         assertThat(privateKey, is(not(nullValue())));
     }

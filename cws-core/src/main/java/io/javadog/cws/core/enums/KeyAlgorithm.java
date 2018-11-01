@@ -65,26 +65,28 @@ package io.javadog.cws.core.enums;
 public enum KeyAlgorithm {
 
     // Signature Algorithms
-    SHA256(Type.SIGNATURE, "RSA", Transformation.SIG256, 256, null),
-    SHA512(Type.SIGNATURE, "RSA", Transformation.SIG512, 512, null),
+    SHA_256(Type.SIGNATURE, "RSA", Transformation.SIG256, 256, null),
+    SHA_512(Type.SIGNATURE, "RSA", Transformation.SIG512, 512, null),
 
     // Symmetric Algorithms
-    AES128(Type.SYMMETRIC, "AES", Transformation.AES, 128, null),
-    // Note, prior to Java 8u162 (January 2018) & Java 9, JCE the Unlimited
-    // Strength was disabled by default, after this - it is enabled by default:
-    //  o https://bugs.openjdk.java.net/browse/JDK-8170157
-    AES192(Type.SYMMETRIC, "AES", Transformation.AES, 192, null),
-    AES256(Type.SYMMETRIC, "AES", Transformation.AES, 256, null),
+    AES_CBC_128(Type.SYMMETRIC, "AES", Transformation.AES, 128, null),
+    AES_CBC_192(Type.SYMMETRIC, "AES", Transformation.AES, 192, null),
+    AES_CBC_256(Type.SYMMETRIC, "AES", Transformation.AES, 256, null),
+    // Following 3 are not yet production ready - the Crypto library
+    // doesn't support them yet, work in progress!
+    AES_GCM_128(Type.SYMMETRIC, "AES", Transformation.GCM, 128, null),
+    AES_GCM_192(Type.SYMMETRIC, "AES", Transformation.GCM, 192, null),
+    AES_GCM_256(Type.SYMMETRIC, "AES", Transformation.GCM, 256, null),
 
     // Password Based Encryption (PBE) Algorithms
-    PBE128(Type.PASSWORD, "AES", Transformation.PBE, 128, AES128),
-    PBE192(Type.PASSWORD, "AES", Transformation.PBE, 192, AES192),
-    PBE256(Type.PASSWORD, "AES", Transformation.PBE, 256, AES256),
+    PBE_128(Type.PASSWORD, "AES", Transformation.PBE, 128, AES_CBC_128),
+    PBE_192(Type.PASSWORD, "AES", Transformation.PBE, 192, AES_CBC_192),
+    PBE_256(Type.PASSWORD, "AES", Transformation.PBE, 256, AES_CBC_256),
 
     // Asymmetric Algorithms
-    RSA2048(Type.ASYMMETRIC, "RSA", Transformation.RSA, 2048, null),
-    RSA4096(Type.ASYMMETRIC, "RSA", Transformation.RSA, 4096, null),
-    RSA8192(Type.ASYMMETRIC, "RSA", Transformation.RSA, 8192, null);
+    RSA_2048(Type.ASYMMETRIC, "RSA", Transformation.RSA, 2048, null),
+    RSA_4096(Type.ASYMMETRIC, "RSA", Transformation.RSA, 4096, null),
+    RSA_8192(Type.ASYMMETRIC, "RSA", Transformation.RSA, 8192, null);
 
     /**
      * The Algorithm Type, i.e. how it should be used.
@@ -104,6 +106,7 @@ public enum KeyAlgorithm {
         SIG512("SHA512WithRSA"),
         PBE("PBKDF2WithHmacSHA256"),
         AES("AES/CBC/PKCS5Padding"),
+        GCM("AES/GCM/NoPadding"),
         RSA("RSA/ECB/PKCS1Padding");
 
         private final String value;

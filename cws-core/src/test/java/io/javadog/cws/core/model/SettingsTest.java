@@ -60,26 +60,26 @@ public final class SettingsTest extends DatabaseSetup {
     public void testUpdateDefaultSettings() {
         final Settings mySettings = newSettings();
 
-        mySettings.set(StandardSetting.SYMMETRIC_ALGORITHM, KeyAlgorithm.AES192.name());
-        assertThat(mySettings.getSymmetricAlgorithm(), is(KeyAlgorithm.AES192));
+        mySettings.set(StandardSetting.SYMMETRIC_ALGORITHM, KeyAlgorithm.AES_CBC_192.name());
+        assertThat(mySettings.getSymmetricAlgorithm(), is(KeyAlgorithm.AES_CBC_192));
 
-        mySettings.set(StandardSetting.ASYMMETRIC_ALGORITHM, KeyAlgorithm.RSA4096.name());
-        assertThat(mySettings.getAsymmetricAlgorithm(), is(KeyAlgorithm.RSA4096));
+        mySettings.set(StandardSetting.ASYMMETRIC_ALGORITHM, KeyAlgorithm.RSA_4096.name());
+        assertThat(mySettings.getAsymmetricAlgorithm(), is(KeyAlgorithm.RSA_4096));
 
-        mySettings.set(StandardSetting.ASYMMETRIC_ALGORITHM, KeyAlgorithm.RSA8192.name());
-        assertThat(mySettings.getAsymmetricAlgorithm(), is(KeyAlgorithm.RSA8192));
+        mySettings.set(StandardSetting.ASYMMETRIC_ALGORITHM, KeyAlgorithm.RSA_8192.name());
+        assertThat(mySettings.getAsymmetricAlgorithm(), is(KeyAlgorithm.RSA_8192));
 
-        mySettings.set(StandardSetting.SIGNATURE_ALGORITHM, KeyAlgorithm.SHA256.name());
-        assertThat(mySettings.getSignatureAlgorithm(), is(KeyAlgorithm.SHA256));
+        mySettings.set(StandardSetting.SIGNATURE_ALGORITHM, KeyAlgorithm.SHA_256.name());
+        assertThat(mySettings.getSignatureAlgorithm(), is(KeyAlgorithm.SHA_256));
 
-        mySettings.set(StandardSetting.HASH_ALGORITHM, HashAlgorithm.SHA256.name());
-        assertThat(mySettings.getHashAlgorithm(), is(HashAlgorithm.SHA256));
+        mySettings.set(StandardSetting.HASH_ALGORITHM, HashAlgorithm.SHA_256.name());
+        assertThat(mySettings.getHashAlgorithm(), is(HashAlgorithm.SHA_256));
 
-        mySettings.set(StandardSetting.PBE_ALGORITHM, KeyAlgorithm.PBE192.name());
-        assertThat(mySettings.getPasswordAlgorithm(), is(KeyAlgorithm.PBE192));
+        mySettings.set(StandardSetting.PBE_ALGORITHM, KeyAlgorithm.PBE_192.name());
+        assertThat(mySettings.getPasswordAlgorithm(), is(KeyAlgorithm.PBE_192));
 
-        mySettings.set(StandardSetting.PBE_ALGORITHM, KeyAlgorithm.PBE256.name());
-        assertThat(mySettings.getPasswordAlgorithm(), is(KeyAlgorithm.PBE256));
+        mySettings.set(StandardSetting.PBE_ALGORITHM, KeyAlgorithm.PBE_256.name());
+        assertThat(mySettings.getPasswordAlgorithm(), is(KeyAlgorithm.PBE_256));
 
         mySettings.set(StandardSetting.CWS_SALT, "UUID value");
         assertThat(mySettings.getSalt(), is("UUID value"));

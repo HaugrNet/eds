@@ -54,7 +54,7 @@ public final class MasterKey {
     // exists to protect it.
     private static final Integer ITERATIONS = Integer.valueOf(StandardSetting.PBE_ITERATIONS.getValue());
     private static final Charset CHARSET = Charset.forName(StandardSetting.CWS_CHARSET.getValue());
-    private static final KeyAlgorithm ALGORITHM = KeyAlgorithm.PBE256;
+    private static final KeyAlgorithm ALGORITHM = KeyAlgorithm.PBE_256;
     private static final Object LOCK = new Object();
     private static MasterKey instance = null;
 

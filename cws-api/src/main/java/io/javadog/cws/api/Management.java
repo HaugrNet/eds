@@ -60,15 +60,16 @@ public interface Management {
      *
      * <ul>
      *   <li>
-     *     <b>cws.crypto.symmetric.algorithm</b> - default value: 'AES128'<br>
-     *     Allowed Values: 'AES128', 'AES192', 'AES256'<br>
+     *     <b>cws.crypto.symmetric.algorithm</b> - default value: 'AES_CBC_128'<br>
+     *     Allowed Values: 'AES_CBC_128', 'AES_CBC_192', 'AES_CBC_256',
+     *     'AES_GCM_128', 'AES_GCM_192', 'AES_GCM_256'<br>
      *     <i> The Algorithm used for the Symmetric Keys in CWS. All data is
      *     stored using this Algorithm. Although it can be changed, please test
      *     the CWS carefully before doing so. And please be aware, that the
      *     information here is only used for generating new Keys, so changing
      *     things will not affect existing records.<br>
      *       The default should be sufficient for most, if increased security is
-     *     wanted, please consider installing and using the unlimited strength
+     *     wanted, please consider installing  and using the unlimited strength
      *     patch. It is worth noting, that as of January 2018 - all official
      *     Java versions comes with the unlimited strength enabled per
      *     default.<br>
@@ -77,21 +78,21 @@ public interface Management {
      *     for more information.</i>
      *   </li>
      *   <li>
-     *     <b>cws.crypto.asymmetric.algorithm</b> - default value: 'RSA2048'<br>
-     *     Allowed Values: 'RSA2048', 'RSA4096', or 'RSA8192'<br>
+     *     <b>cws.crypto.asymmetric.algorithm</b> - default value: 'RSA_2048'<br>
+     *     Allowed Values: 'RSA_2048', 'RSA_4096', or 'RSA_8192'<br>
      *     <i> Asymmetric Encryption (Public &amp; Private Key), is used for
      *     sharing the Symmetric Keys, not for encrypting any data.</i>
      *   </li>
      *   <li>
-     *     <b>cws.crypto.signature.algorithm</b> - default value: 'SHA512'<br>
-     *     Allowed Values: 'SHA256' or 'SHA512'<br>
+     *     <b>cws.crypto.signature.algorithm</b> - default value: 'SHA_512'<br>
+     *     Allowed Values: 'SHA_256' or 'SHA_512'<br>
      *     <i>When new Members are added, the System Administrator can issue a
      *     signature, which can be used by the Member when creating their new
      *     Account. The signature is made with this Algorithm.</i>
      *   </li>
      *   <li>
-     *     <b>cws.crypto.pbe.algorithm</b> - default value: 'PBE128'<br>
-     *     Allowed Values: 'PBE128', 'PBE192', or 'PBE256'<br>
+     *     <b>cws.crypto.pbe.algorithm</b> - default value: 'PBE_128'<br>
+     *     Allowed Values: 'PBE_128', 'PBE_192', or 'PBE_256'<br>
      *     <i>If a Member is using something else than a Key to unlock their
      *     Account, the CWS will use the following Password Based Encryption,
      *     PBE, algorithm to do the trick. The provided information is extended

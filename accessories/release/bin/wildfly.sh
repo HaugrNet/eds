@@ -10,6 +10,8 @@ readonly dbUser="cws_user"
 readonly dbPassword="cws"
 readonly dbName="cws"
 readonly wildfly=${JBOSS_HOME}
+# Hidden feature, if set this port is used to start JBoss/WildFly in debug mode
+readonly debugPort=${DEBUG_PORT}
 
 # Java & JBoss (WildFly) settings
 export JAVA_OPTS="${JAVA_OPTS} -Xms1303m -Xmx1303m -Djava.net.preferIPv4Stack=true"
@@ -27,17 +29,7 @@ fi
 
 action=${1}
 if [ "${action}" = "configure" ]; then
-    netstat -ant | grep ":9990 " > /dev/null
-    if [ "$?" -ne "0" ]; then
-        echo "Starting WildFly ..."
-        ${wildfly}/bin/standalone.sh -Djboss.node.name=cws &
-        # The startup is not backgrounded automatically, it must be forced into
-        # the background, but we cannot configure WildFly until it is completed,
-        # so a simple sleep is added, not optimal - but it'll do the job
-        sleep 10
-    fi
-
-    # CWS requires a data, currently only scripts for PostgreSQL exists, so
+    # CWS requires a database, currently only scripts for PostgreSQL exists, so
     # this is the one being attempted to create here.
     psql -h ${dbHost} -p ${dbPort} -l | grep cws > /dev/null
     if [ $? -eq 1 ]; then
@@ -53,16 +45,20 @@ if [ "${action}" = "configure" ]; then
     echo "WildFly has been configured"
 elif [ "${action}" = "start" ]; then
     echo "Starting WildFly ..."
-    ${wildfly}/bin/standalone.sh -Djboss.node.name=cws &
+    if [ "${debugPort}" = "" ]; then
+        ${wildfly}/bin/standalone.sh -Djboss.node.name=cws &
+    else
+        ${wildfly}/bin/standalone.sh -Djboss.node.name=cws --debug ${debugPort} &
+    fi
 elif [ "${action}" = "stop" ]; then
     echo "Stopping WildFly ..."
-    ${wildfly}/bin/jboss-cli.sh --connect --controller=localhost:9990 --command="shutdown"
+    ${wildfly}/bin/jboss-cli.sh --connect --controller=localhost --command="shutdown"
 elif [ "${action}" = "deploy" ]; then
     echo "Deploying CWS"
-    ${wildfly}/bin/jboss-cli.sh --connect --controller=localhost:9990 --command="deploy `dirname $0`/../wildfly/cws.war --force"
+    ${wildfly}/bin/jboss-cli.sh --connect --controller=localhost --command="deploy `dirname $0`/../wildfly/cws.war --force"
 elif [ "${action}" = "undeploy" ]; then
     echo "Undeploying CWS"
-    ${wildfly}/bin/jboss-cli.sh --connect --controller=localhost:9990 --command="undeploy cws.war"
+    ${wildfly}/bin/jboss-cli.sh --connect --controller=localhost --command="undeploy cws.war"
 elif [ "${action}" = "log" ]; then
     tail -f ${wildfly}/standalone/log/server.log
 else

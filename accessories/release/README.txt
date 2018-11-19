@@ -6,8 +6,8 @@ Web Store.
 
 CWS requires:
 * a database,
-* Java 8
-* a Java EE 7+ container
+* Java 8/11
+* a Java EE 7+ container, compatible with Java 8/11
 
 
 == Test Installation Component Recommendations ==
@@ -63,8 +63,10 @@ Next run the psql scripts in the "postgresql" directory of your cws installation
 
 $cd /{CWS_HOME}/postgresql/ 
 
-In this directory, start the 01-install.sql script should be run.  This will 
-automatically trigger the two other scripts. From a command line, this can be done 
+=== Fresh Installation ===
+
+In this directory, the 01-install.sql script should be run.  This will
+automatically trigger the two other scripts. From a command line, this can be done
 in one of the following two ways based on your postgres user configuration:
 
 If you run the postgres user as sudo (recommended):
@@ -81,32 +83,82 @@ You will be prompted for a password while the script is running, enter "cws" as
 the password unless you have modified the sql script and changed the cws_user 
 password to something else.
 
-Step 3: Configure Wildfly
+=== Update Installation ===
 
-In your ${CWS_HOME} directory, there are several folders: wildfly-10,
-wildfly-11, wildfly-12, and wildfly-13. The configuration files needed for a cws
-installation are contained in these directories. You will need to copy these
-files from these directories to your Wildfly installation.  Pick the directory
-that matches the version of your Wildfly installation and perform the following.
+In this directory, the 03-update.sql script should be run. From a command line,
+this can be done in one of the following two ways based on your postgres user
+configuration:
 
-$ cd ${CWS_HOME}/wildfly-1X/modules
-$ sudo cp -r org ${JBOSS_HOME}/modules
-$ cd ${CWS_HOME}/wildfly-1X/standalone 
-$ sudo cp configuration/standalone-cws.xml ${JBOSS_HOME}/standalone/configuration/standalone-cws.xml
+If you run the postgres user as sudo (recommended):
+$ cd ${CWS_HOME}/postgresql
+$ sudo -u postgresql psql -U cws_user cws --file 03-update.sql
 
-This will then install the PostgreSQL database driver and add a custom CWS 
-standalone script for starting WildFly. Once done, simply copy the cws.war file 
-into the WildFly as follows:
+Or, if you have given the postgres user a linux password:
+$ cd postgresql
+$ su postgres
+$ psql -U cws_user cws --file 03-update.sql
+$ exit
 
-$ sudo cp ${CWS_HOME}/cws.war ${JBOSS_HOME}/standalone/deployments
+You will be prompted for a password while the script is running, enter "cws" as
+the password unless you have modified the sql script and changed the cws_user
+password to something else.
 
+
+=== Step 3: Configure Wildfly ===
+
+In your ${CWS_HOME} directory, there are several folders, as of CWS 1.1 both
+Payara & WildFly are supported, in the bin directory, there is a shell script
+to install the preferred version. The scipt requires that a few environment
+variables are predefined, and can be used to start, stop, configure, deploy and
+undeploy CWS.
+
+The configure option will start the container and then apply the correct changes
+to it. Once done, the deploy and start/stop options should be all that is needed
+to further the management of CWS. The scripts uses files relative to the
+directory where it is installed, so it is important that they are being run
+from their installed directory.
+
+==== Example for Payara ====
+
+The Payara installation is requiring that the system variable "GLASSFISH_HOME"
+is being set to the installation directory of your Payara installation.
+Following is an example:
+
+$ cd [ /Path/To/CWS/Installation ]
+$ export GLASSFISH_HOME="/opt/payara"
+$ export PATH=${PATH}:`pwd`/bin
+$ payara.sh configure
+$ payara.sh deploy
+
+Done, now you should have a running CWS installation using Payara as Container.
+If there is any questions regarding the script, simply run it without arguments.
+
+==== Example for WildFly ====
+
+The WildFly installation is requiring that the system variable "JBOSS_HOME" is
+being set to the installation directory of your WildFly (JBoss) installation.
+Unfortunately, WildFly cannot be started & configured in a single action, hence
+for WildFly the following is an example:
+
+$ cd [ /Path/To/CWS/Installation ]
+$ export JBOSS_HOME="/opt/wildfly-14.0.1.Final"
+$ export PATH=${PATH}:`pwd`/bin
+$ wildfly.sh start
+$ wildfly.sh configure
+$ wildfly.sh deploy
+
+Done, now you should have a running CWS installation using WildFly as Container.
+If there is any questions regarding the script, simply run it without arguments.
 
 == Running ==
 
 With the requirements in place, and the installation completed - it is possible
-to start CWS, this is done as follows:
+to start CWS, this is done as follows (add the two exports to your environment):
 
-$ ${JBOSS_HOME}/bin/standalone.sh -c standalone-cws.xml
+$ cd [ /Path/To/CWS/Installation ]
+$ export GLASSFISH_HOME="/opt/payara"
+$ export PATH=${PATH}:`pwd`/bin
+$ wildfly.sh | payara.sh start
 
 Now, the CWS is running with both a SOAP and REST API available from port 8080,
 the WSDLs can be accessed from the following URLs:

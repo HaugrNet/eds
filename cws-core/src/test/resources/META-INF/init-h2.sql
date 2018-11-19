@@ -116,7 +116,7 @@ CREATE TABLE cws_settings (
 CREATE TABLE cws_members (
   id               INTEGER AUTO_INCREMENT,
   external_id      VARCHAR(36),
-  name             VARCHAR(75),    -- Member Authentication information
+  name             VARCHAR_IGNORECASE(75), -- Member Authentication information
   salt             VARCHAR(256),
   pbe_algorithm    VARCHAR(10) DEFAULT 'PBE_256',
   rsa_algorithm    VARCHAR(10) DEFAULT 'RSA_2048',
@@ -159,7 +159,7 @@ CREATE TABLE cws_members (
 CREATE TABLE cws_circles (
   id               INTEGER AUTO_INCREMENT,
   external_id      VARCHAR(36),
-  name             VARCHAR(75),
+  name             VARCHAR_IGNORECASE(75),
   external_key     LONGVARBINARY,  -- External Circle Key, with unknown length
   altered          TIMESTAMP DEFAULT now(),
   added            TIMESTAMP DEFAULT now(),

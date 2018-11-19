@@ -234,8 +234,17 @@ public final class CircleServiceTest extends DatabaseSetup {
         final FetchCircleResponse fetchResponse = fetchService.perform(fetchRequest);
         assertThat(fetchResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
         assertThat(fetchResponse.getCircles().size(), is(4));
-        assertThat(fetchResponse.getCircles().get(0).getCircleId(), is(createResponse.getCircleId()));
-        assertThat(fetchResponse.getCircles().get(0).getCircleKey(), is(updateRequest.getCircleKey()));
+        // Sorting alphabetically on lowercase names should reveal a correct
+        // sorting where the list is as follows:
+        //  * circle1
+        //  * circle2
+        //  * circle3
+        //  * Extra Encrypted
+        // Note, that it could be considered a bug that the list earlier was
+        // sorted with uppercase letters before lowercase letters, thus 'Z' came
+        // before 'a'. With the case insensitive indexes, it should be fixed.
+        assertThat(fetchResponse.getCircles().get(3).getCircleId(), is(createResponse.getCircleId()));
+        assertThat(fetchResponse.getCircles().get(3).getCircleKey(), is(updateRequest.getCircleKey()));
     }
 
     @Test

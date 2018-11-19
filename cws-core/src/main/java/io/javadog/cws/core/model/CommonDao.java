@@ -30,6 +30,7 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.UUID;
 
@@ -127,7 +128,7 @@ public class CommonDao {
 
     public MemberEntity findMemberByName(final String name) {
         final Query query = entityManager.createNamedQuery("member.findByName");
-        query.setParameter("name", name);
+        query.setParameter("name", toLower(name));
 
         return findSingleRecord(query);
     }
@@ -142,7 +143,7 @@ public class CommonDao {
     public MemberEntity findMemberByNameAndCircleId(final String name,
                                                     final String externalCircleId) {
         final Query query = entityManager.createNamedQuery("member.findByNameAndCircle");
-        query.setParameter("name", name);
+        query.setParameter("name", toLower(name));
         query.setParameter("externalCircleId", externalCircleId);
         final List<MemberEntity> found = findList(query);
 
@@ -183,7 +184,7 @@ public class CommonDao {
 
     public CircleEntity findCircleByName(final String name) {
         final Query query = entityManager.createNamedQuery("circle.findByName");
-        query.setParameter("name", name);
+        query.setParameter("name", toLower(name));
 
         return findSingleRecord(query);
     }
@@ -283,5 +284,17 @@ public class CommonDao {
             // This should be and will hopefully remain unreachable code.
             throw new CWSException(ReturnCode.DATABASE_ERROR, e.getMessage(), e);
         }
+    }
+
+    /**
+     * Simpler wrapper for the {@link String#toLowerCase(Locale)}, to have a
+     * standard way to invoke it which will prevent usage without a predefined
+     * Locale.
+     *
+     * @param str String to convert to lower case with the CWS Locale
+     * @return Lower case version of the String
+     */
+    private static String toLower(final String str) {
+        return (str != null) ? str.toLowerCase(Settings.getInstance().getLocale()) : null;
     }
 }

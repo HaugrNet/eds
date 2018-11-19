@@ -8,6 +8,12 @@ BEGIN;
 -- First feature release, CWS 1.1.x results requires an update of the DB
 INSERT INTO cws_versions(schema_version, cws_version, db_vendor) VALUES (2, '1.1.0', 'PostgreSQL');
 
+-- To prevent full-table scans on users and circles, a case-insensitive indexing
+-- is needed, however that won't work directly. Hence, a lowercase index is
+-- added to the names, which is used for searches.
+CREATE INDEX cws_members_name_index ON cws_members (lower(name));
+CREATE INDEX cws_circles_name_index ON cws_circles (lower(name));
+
 -- The design flaw in CWS 1.0, where upon roles were hardcoded to specific Id's
 -- and name, has to be corrected to allow for more transparency. This means that
 -- we need a new field to store the role in.
@@ -18,8 +24,6 @@ UPDATE cws_members SET member_role = 'ADMIN' WHERE id = 1;
 UPDATE cws_members SET member_role = 'STANDARD' WHERE id > 1;
 -- Now, apply the not-null constraint to this column
 ALTER TABLE cws_members ADD CONSTRAINT member_notnull_role CHECK (member_role IS NOT NULL),
-
-
 
 -- The constants have been altered, to allow for more clarity and additional
 -- values, this means that they default values must be corrected as well.

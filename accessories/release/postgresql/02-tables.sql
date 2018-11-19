@@ -148,6 +148,7 @@ CREATE TABLE cws_members (
   CONSTRAINT member_notnull_altered         CHECK (altered IS NOT NULL),
   CONSTRAINT member_notnull_added           CHECK (added IS NOT NULL)
 );
+CREATE INDEX cws_members_name_index ON cws_members (lower(name));
 
 -- =============================================================================
 -- Circles act as groupings for a collection of Members sharing data. A Circle
@@ -178,6 +179,7 @@ CREATE TABLE cws_circles (
   CONSTRAINT circle_notnull_altered         CHECK (altered IS NOT NULL),
   CONSTRAINT circle_notnull_added           CHECK (added IS NOT NULL)
 );
+CREATE INDEX cws_circles_name_index ON cws_circles (lower(name));
 
 -- =============================================================================
 -- A central part of the CWS is encryption. All data is encrypted using a series

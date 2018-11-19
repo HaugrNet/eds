@@ -39,6 +39,36 @@ import java.util.UUID;
 public final class CryptoTest extends DatabaseSetup {
 
     @Test
+    public void testGCMEncryption() {
+        final String cleartext = "This is just an example";
+
+        final KeyAlgorithm algorithm = KeyAlgorithm.AES_GCM_128;
+        final SecretCWSKey key = crypto.generateSymmetricKey(algorithm);
+        final IVSalt ivSalt = new IVSalt();
+        key.setSalt(ivSalt);
+
+        final byte[] cleartextBytes = crypto.stringToBytes(cleartext);
+        final byte[] encryptedBytes = crypto.encrypt(key, cleartextBytes);
+        final byte[] decryptedBytes = crypto.decrypt(key, encryptedBytes);
+        final String decrypted = crypto.bytesToString(decryptedBytes);
+
+        assertThat(decrypted, is(cleartext));
+    }
+
+    @Test
+    public void testShaEncryption() {
+        thrown.expect(CryptoException.class);
+        thrown.expectMessage("Cannot prepare Cipher for this Algorithm Type SIGNATURE.");
+
+        final KeyAlgorithm algorithm = KeyAlgorithm.SHA_256;
+        final PublicCWSKey key = crypto.generateAsymmetricKey(KeyAlgorithm.RSA_2048).getPublic();
+        final PublicCWSKey fakeKey = new PublicCWSKey(algorithm, key.getKey());
+        final byte[] toEncrypt = { (byte) 1, (byte) 2, (byte) 3, (byte) 4 };
+
+        crypto.encrypt(fakeKey, toEncrypt);
+    }
+
+    @Test
     public void testGeneratingPasswordKeyWithInvalidAlgorithm() {
         thrown.expect(CryptoException.class);
         thrown.expectMessage("AES/CBC/PKCS5Padding SecretKeyFactory not available");

@@ -21,6 +21,7 @@ import javax.crypto.KeyGenerator;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
@@ -36,6 +37,7 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.Signature;
 import java.security.SignatureException;
+import java.security.spec.AlgorithmParameterSpec;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
 import java.security.spec.PKCS8EncodedKeySpec;
@@ -100,7 +102,7 @@ public final class Crypto {
             final char[] extendedSecret = convertSecret(secret);
             final byte[] secretSalt = stringToBytes(salt);
 
-            final SecretKeyFactory factory = SecretKeyFactory.getInstance(algorithm.getTransformation());
+            final SecretKeyFactory factory = SecretKeyFactory.getInstance(algorithm.getTransformationValue());
             final KeySpec spec = new PBEKeySpec(extendedSecret, secretSalt, settings.getPasswordIterations(), algorithm.getLength());
             final SecretKey tmpKey = factory.generateSecret(spec);
             final SecretKey secretKey = new SecretKeySpec(tmpKey.getEncoded(), algorithm.getName());
@@ -181,7 +183,7 @@ public final class Crypto {
 
     public byte[] sign(final PrivateKey key, final byte[] message) {
         try {
-            final Signature signer = Signature.getInstance(settings.getSignatureAlgorithm().getTransformation());
+            final Signature signer = Signature.getInstance(settings.getSignatureAlgorithm().getTransformationValue());
             signer.initSign(key);
             signer.update(message);
 
@@ -193,7 +195,7 @@ public final class Crypto {
 
     public boolean verify(final PublicKey key, final byte[] message, final byte[] signature) {
         try {
-            final Signature verifier = Signature.getInstance(settings.getSignatureAlgorithm().getTransformation());
+            final Signature verifier = Signature.getInstance(settings.getSignatureAlgorithm().getTransformationValue());
             verifier.initVerify(key);
             verifier.update(message);
 
@@ -252,18 +254,34 @@ public final class Crypto {
     }
 
     private static Cipher prepareCipher(final CWSKey<?> key, final int type) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException {
-        IvParameterSpec iv = null;
+        AlgorithmParameterSpec iv = null;
         final String instanceName;
-        final Cipher cipher;
 
         if (key.getAlgorithm().getType() == KeyAlgorithm.Type.ASYMMETRIC) {
             instanceName = key.getAlgorithm().getName();
-        } else {
+        } else if (key.getAlgorithm().getType() == KeyAlgorithm.Type.SYMMETRIC) {
             final KeyAlgorithm algorithm = key.getAlgorithm();
-            instanceName = algorithm.getTransformation();
-            iv = new IvParameterSpec(((SecretCWSKey) key).getSalt().getBytes());
+            instanceName = algorithm.getTransformationValue();
+            switch (key.getAlgorithm().getTransformation()) {
+                case AES:
+                    iv = new IvParameterSpec(((SecretCWSKey) key).getSalt().getBytes());
+                    break;
+                case GCM:
+                    // Note, the default SALT (IV) size is 16 bytes, for GCM it
+                    // is preferable to only have 12 bytes - however, GCM will
+                    // also work with 16 bytes albeit slower.
+                    iv = new GCMParameterSpec(key.getAlgorithm().getLength(), ((SecretCWSKey) key).getSalt().getBytes());
+                    break;
+                default:
+                    // Unreachable Code by design, only 2 AES transformation
+                    // Algorithms exists, and they are both checked.
+                    throw new CryptoException("Cannot prepare Cipher for this Symmetric Algorithm " + key.getAlgorithm().getTransformation() + '.');
+            }
+        } else {
+            throw new CryptoException("Cannot prepare Cipher for this Algorithm Type " + key.getAlgorithm().getType() + '.');
         }
 
+        final Cipher cipher;
         cipher = Cipher.getInstance(instanceName);
         cipher.init(type, key.getKey(), iv);
 

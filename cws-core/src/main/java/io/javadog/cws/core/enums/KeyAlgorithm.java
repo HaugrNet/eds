@@ -75,8 +75,6 @@ public enum KeyAlgorithm {
     // Following 3 are not yet production ready - the Crypto library
     // doesn't support them yet, work in progress!
     AES_GCM_128(Type.SYMMETRIC, "AES", Transformation.GCM, 128, null),
-    AES_GCM_192(Type.SYMMETRIC, "AES", Transformation.GCM, 192, null),
-    AES_GCM_256(Type.SYMMETRIC, "AES", Transformation.GCM, 256, null),
 
     // Password Based Encryption (PBE) Algorithms
     PBE_128(Type.PASSWORD, "AES", Transformation.PBE, 128, AES_CBC_128),
@@ -146,7 +144,11 @@ public enum KeyAlgorithm {
         return algorithm;
     }
 
-    public String getTransformation() {
+    public Transformation getTransformation() {
+        return transformation;
+    }
+
+    public String getTransformationValue() {
         return transformation.getValue();
     }
 

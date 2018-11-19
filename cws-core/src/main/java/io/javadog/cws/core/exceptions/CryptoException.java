@@ -26,6 +26,16 @@ public final class CryptoException extends CWSException {
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
     /**
+     * Business Case Constructor, for simple examples where the logic is not
+     * permitting a given action.
+     *
+     * @param message Error description
+     */
+    public CryptoException(final String message) {
+        super(ReturnCode.CRYPTO_ERROR, message);
+    }
+
+    /**
      * To prevent that too much information about the underlying system is
      * exposed via the error text, the Cause must be separate from the message.
      * Hence, even for trivial problems we're not allowing the Cause to stand

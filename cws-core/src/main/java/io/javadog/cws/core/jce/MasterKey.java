@@ -87,7 +87,7 @@ public final class MasterKey {
 
             final String salt = settings.getSalt();
             final byte[] secretSalt = salt.getBytes(CHARSET);
-            final SecretKeyFactory keyFactory = SecretKeyFactory.getInstance(ALGORITHM.getTransformation());
+            final SecretKeyFactory keyFactory = SecretKeyFactory.getInstance(ALGORITHM.getTransformationValue());
             final KeySpec keySpec = new PBEKeySpec(chars, secretSalt, ITERATIONS, ALGORITHM.getLength());
             final SecretKey tmp = keyFactory.generateSecret(keySpec);
             final SecretKey secretKey = new SecretKeySpec(tmp.getEncoded(), ALGORITHM.getName());

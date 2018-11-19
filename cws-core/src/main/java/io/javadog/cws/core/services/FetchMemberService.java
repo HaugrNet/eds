@@ -10,12 +10,12 @@
  */
 package io.javadog.cws.core.services;
 
-import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.dtos.Circle;
 import io.javadog.cws.api.dtos.Member;
 import io.javadog.cws.api.requests.FetchMemberRequest;
 import io.javadog.cws.api.responses.FetchMemberResponse;
+import io.javadog.cws.core.enums.MemberRole;
 import io.javadog.cws.core.enums.Permission;
 import io.javadog.cws.core.exceptions.AuthorizationException;
 import io.javadog.cws.core.model.MemberDao;
@@ -84,7 +84,7 @@ public final class FetchMemberService extends Serviceable<MemberDao, FetchMember
 
         // The System Administrator cannot be part of any Circles, so
         // no need to add these.
-        if (!Objects.equals(member.getName(), Constants.ADMIN_ACCOUNT)) {
+        if (member.getMemberRole() != MemberRole.ADMIN) {
             final List<Circle> circles = new ArrayList<>(trustees.size());
             for (final TrusteeEntity trustee : trustees) {
                 final String externalKey = decryptExternalKey(trustee);
@@ -115,11 +115,11 @@ public final class FetchMemberService extends Serviceable<MemberDao, FetchMember
      * @see io.javadog.cws.core.enums.StandardSetting#SHOW_TRUSTEES
      */
     private void fetchSomeoneElse(final FetchMemberResponse response, final MemberEntity requested) {
-        if (Objects.equals(member.getName(), Constants.ADMIN_ACCOUNT)) {
+        if (member.getMemberRole() == MemberRole.ADMIN) {
             addMemberToResponse(response, requested);
             response.setCircles(findCirclesMemberBelongsTo(requested));
         } else {
-            if (Objects.equals(requested.getName(), Constants.ADMIN_ACCOUNT)) {
+            if (requested.getMemberRole() == MemberRole.ADMIN) {
                 if (settings.getExposeAdmin()) {
                     addMemberToResponse(response, requested);
                 } else {
@@ -162,8 +162,7 @@ public final class FetchMemberService extends Serviceable<MemberDao, FetchMember
             // If the Settings to expose the System Administrator is set to
             // true, then we'll also add this, however by default we will
             // otherwise skip the System Administrator.
-            final boolean isAdmin = Objects.equals(entity.getName(), Constants.ADMIN_ACCOUNT);
-            if (isAdmin) {
+            if (entity.getMemberRole() == MemberRole.ADMIN) {
                 if (exposeAdmin) {
                     circles.add(convert(entity));
                 }

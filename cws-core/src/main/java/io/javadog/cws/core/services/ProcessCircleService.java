@@ -17,6 +17,7 @@ import io.javadog.cws.api.common.TrustLevel;
 import io.javadog.cws.api.requests.ProcessCircleRequest;
 import io.javadog.cws.api.responses.ProcessCircleResponse;
 import io.javadog.cws.core.enums.KeyAlgorithm;
+import io.javadog.cws.core.enums.MemberRole;
 import io.javadog.cws.core.enums.Permission;
 import io.javadog.cws.core.enums.Status;
 import io.javadog.cws.core.exceptions.CWSException;
@@ -65,7 +66,7 @@ public final class ProcessCircleService extends Serviceable<CommonDao, ProcessCi
             // Circle in question may perform other actions on Circles.
             response = createCircle(request);
         } else {
-            if (Objects.equals(Constants.ADMIN_ACCOUNT, member.getName()) || (trustees.get(0).getTrustLevel() == TrustLevel.ADMIN)) {
+            if ((member.getMemberRole() == MemberRole.ADMIN) || (trustees.get(0).getTrustLevel() == TrustLevel.ADMIN)) {
                 switch (request.getAction()) {
                     case UPDATE:
                         response = updateCircle(request);
@@ -105,7 +106,7 @@ public final class ProcessCircleService extends Serviceable<CommonDao, ProcessCi
         if (existing != null) {
             response = new ProcessCircleResponse(ReturnCode.IDENTIFICATION_WARNING, "A Circle with the requested name already exists.");
         } else {
-            if (Objects.equals(Constants.ADMIN_ACCOUNT, member.getName())) {
+            if (member.getMemberRole() == MemberRole.ADMIN) {
                 // The administrator is creating a new Circle, which requires that
                 // a Member Id is provided as the new Circle Administrator.
                 final MemberEntity owner = dao.find(MemberEntity.class, request.getMemberId());
@@ -248,7 +249,7 @@ public final class ProcessCircleService extends Serviceable<CommonDao, ProcessCi
     private ProcessCircleResponse deleteCircle(final ProcessCircleRequest request) {
         final ProcessCircleResponse response;
 
-        if (Objects.equals(Constants.ADMIN_ACCOUNT, member.getName())) {
+        if (member.getMemberRole() == MemberRole.ADMIN) {
             final String externalId = request.getCircleId();
             final CircleEntity entity = dao.find(CircleEntity.class, externalId);
             if (entity != null) {

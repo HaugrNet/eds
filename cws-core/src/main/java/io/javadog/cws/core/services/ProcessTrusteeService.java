@@ -10,11 +10,11 @@
  */
 package io.javadog.cws.core.services;
 
-import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.common.TrustLevel;
 import io.javadog.cws.api.requests.ProcessTrusteeRequest;
 import io.javadog.cws.api.responses.ProcessTrusteeResponse;
+import io.javadog.cws.core.enums.MemberRole;
 import io.javadog.cws.core.enums.Permission;
 import io.javadog.cws.core.exceptions.CWSException;
 import io.javadog.cws.core.jce.PublicCWSKey;
@@ -28,7 +28,6 @@ import javax.persistence.EntityManager;
 import java.security.PublicKey;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * <p>Business Logic implementation for the CWS ProcessTrustee request.</p>
@@ -82,7 +81,7 @@ public final class ProcessTrusteeService extends Serviceable<CommonDao, ProcessT
     private ProcessTrusteeResponse addTrustee(final ProcessTrusteeRequest request) {
         final ProcessTrusteeResponse response;
 
-        if (Objects.equals(Constants.ADMIN_ACCOUNT, member.getName())) {
+        if (member.getMemberRole() == MemberRole.ADMIN) {
             response = new ProcessTrusteeResponse(ReturnCode.AUTHORIZATION_WARNING, "The System Administrator cannot add a Member to a Circle.");
         } else {
             final String memberId = request.getMemberId();
@@ -128,7 +127,7 @@ public final class ProcessTrusteeService extends Serviceable<CommonDao, ProcessT
     private ProcessTrusteeResponse alterTrustee(final ProcessTrusteeRequest request) {
         final ProcessTrusteeResponse response;
 
-        if (!Objects.equals(Constants.ADMIN_ACCOUNT, member.getName())) {
+        if (member.getMemberRole() != MemberRole.ADMIN) {
             final TrusteeEntity trustee = dao.findTrusteeByCircleAndMember(request.getCircleId(), request.getMemberId());
             if (trustee != null) {
                 final TrustLevel newTrustLevel = request.getTrustLevel();
@@ -149,7 +148,7 @@ public final class ProcessTrusteeService extends Serviceable<CommonDao, ProcessT
     private ProcessTrusteeResponse removeTrustee(final ProcessTrusteeRequest request) {
         final ProcessTrusteeResponse response;
 
-        if (!Objects.equals(Constants.ADMIN_ACCOUNT, member.getName())) {
+        if (member.getMemberRole() != MemberRole.ADMIN) {
             final TrusteeEntity trustee = dao.findTrusteeByCircleAndMember(request.getCircleId(), request.getMemberId());
             if (trustee != null) {
                 dao.delete(trustee);

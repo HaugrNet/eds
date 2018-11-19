@@ -126,7 +126,7 @@ public final class ProcessMemberService extends Serviceable<MemberDao, ProcessMe
 
         // Invitations can only be issued by the System Administrator, not by
         // anyone else.
-        if (Objects.equals(Constants.ADMIN_ACCOUNT, request.getAccountName())) {
+        if (member.getMemberRole() == MemberRole.ADMIN) {
             final String memberName = request.getNewAccountName().trim();
             final MemberEntity existing = dao.findMemberByName(memberName);
 
@@ -162,7 +162,9 @@ public final class ProcessMemberService extends Serviceable<MemberDao, ProcessMe
         response.setMemberId(member.getExternalId());
 
         if (!isEmpty(newAccountName)) {
-            if (!Objects.equals(Constants.ADMIN_ACCOUNT, member.getName())) {
+            if (member.getMemberRole() == MemberRole.ADMIN) {
+                throw new CWSException(ReturnCode.ILLEGAL_ACTION, "It is not permitted for the System Administrator to change the Account name.");
+            } else {
                 final MemberEntity existing = dao.findMemberByName(newAccountName);
 
                 if (existing == null) {
@@ -170,8 +172,6 @@ public final class ProcessMemberService extends Serviceable<MemberDao, ProcessMe
                 } else {
                     throw new CWSException(ReturnCode.CONSTRAINT_ERROR, "The new Account Name already exists.");
                 }
-            } else {
-                throw new CWSException(ReturnCode.ILLEGAL_ACTION, "It is not permitted for the System Administrator to change the Account name.");
             }
         }
 
@@ -213,13 +213,13 @@ public final class ProcessMemberService extends Serviceable<MemberDao, ProcessMe
 
         // Invitations can only be issued by the System Administrator, not by
         // anyone else.
-        if (!Objects.equals(Constants.ADMIN_ACCOUNT, request.getAccountName())) {
+        if (member.getMemberRole() == MemberRole.ADMIN) {
+            response = new ProcessMemberResponse(ReturnCode.ILLEGAL_ACTION, "The System Administrator Account may not be invalidated.");
+        } else {
             updateMemberPassword(member, request.getCredential());
 
             response = new ProcessMemberResponse();
             response.setReturnMessage("Account has been Invalidated.");
-        } else {
-            response = new ProcessMemberResponse(ReturnCode.ILLEGAL_ACTION, "The System Administrator Account may not be invalidated.");
         }
 
         return response;
@@ -229,7 +229,7 @@ public final class ProcessMemberService extends Serviceable<MemberDao, ProcessMe
         final ProcessMemberResponse response;
 
         if (request.getMemberId() != null) {
-            if (Objects.equals(Constants.ADMIN_ACCOUNT, member.getName())) {
+            if (member.getMemberRole() == MemberRole.ADMIN) {
                 response = processDeleteAsAdmin(request);
             } else {
                 response = new ProcessMemberResponse(ReturnCode.ILLEGAL_ACTION, "Members are not permitted to delete Accounts.");
@@ -248,7 +248,7 @@ public final class ProcessMemberService extends Serviceable<MemberDao, ProcessMe
         final ProcessMemberResponse response;
 
         if (found != null) {
-            if (Objects.equals(found.getName(), Constants.ADMIN_ACCOUNT)) {
+            if (found.getMemberRole() == MemberRole.ADMIN) {
                 response = new ProcessMemberResponse(ReturnCode.IDENTIFICATION_ERROR, "It is not permitted to delete the Admin Account.");
             } else {
                 dao.delete(found);
@@ -268,6 +268,9 @@ public final class ProcessMemberService extends Serviceable<MemberDao, ProcessMe
         if (account != null) {
             if (Objects.equals(account.getPrivateKey(), CredentialType.SIGNATURE.name())) {
                 final String secret = crypto.decryptWithMasterKey(account.getSalt());
+                // Although multiple System Administrators may exist, it will
+                // make everything very cumbersome if all their keys have to be
+                // checked. Hence, it is limited to the first.
                 final MemberEntity admin = dao.findMemberByName(Constants.ADMIN_ACCOUNT);
                 final PublicKey publicKey = crypto.dearmoringPublicKey(admin.getPublicKey());
 

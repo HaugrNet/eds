@@ -276,14 +276,14 @@ public abstract class Serviceable<D extends CommonDao, R extends CwsResponse, V 
     private void checkAuthorization(final Permission action, final String circleId) {
         // There is a couple of requests, which is only allowed to be made by
         // the System Administrator.
-        if ((action.getTrustLevel() == TrustLevel.SYSOP) && !Objects.equals(Constants.ADMIN_ACCOUNT, member.getName())) {
+        if ((action.getTrustLevel() == TrustLevel.SYSOP) && (member.getMemberRole() != MemberRole.ADMIN)) {
             throw new AuthorizationException("Cannot complete this request, as it is only allowed for the System Administrator.");
         }
 
         // The System Admin is automatically permitted to perform a number of
         // Actions, without being part of a Circle. So these checks must be
         // made separately based on the actual Request.
-        if (!Objects.equals(Constants.ADMIN_ACCOUNT, member.getName())) {
+        if (member.getMemberRole() != MemberRole.ADMIN) {
             trustees = findTrustees(member, circleId, TrustLevel.getLevels(action.getTrustLevel()));
 
             if ((action.getTrustLevel() != TrustLevel.ALL) && trustees.isEmpty()) {

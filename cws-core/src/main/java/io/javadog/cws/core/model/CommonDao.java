@@ -13,6 +13,7 @@ package io.javadog.cws.core.model;
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.common.TrustLevel;
 import io.javadog.cws.api.common.Utilities;
+import io.javadog.cws.core.enums.MemberRole;
 import io.javadog.cws.core.exceptions.CWSException;
 import io.javadog.cws.core.model.entities.CWSEntity;
 import io.javadog.cws.core.model.entities.CircleEntity;
@@ -129,6 +130,13 @@ public class CommonDao {
         query.setParameter("name", name);
 
         return findSingleRecord(query);
+    }
+
+    public List<MemberEntity> findMemberByRole(final MemberRole role) {
+        final Query query = entityManager.createNamedQuery("member.findByRole");
+        query.setParameter("role", role);
+
+        return findList(query);
     }
 
     public MemberEntity findMemberByNameAndCircleId(final String name,

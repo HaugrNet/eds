@@ -10,11 +10,11 @@
  */
 package io.javadog.cws.core.services;
 
-import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.Utilities;
 import io.javadog.cws.api.dtos.Sanity;
 import io.javadog.cws.api.requests.SanityRequest;
 import io.javadog.cws.api.responses.SanityResponse;
+import io.javadog.cws.core.enums.MemberRole;
 import io.javadog.cws.core.enums.Permission;
 import io.javadog.cws.core.model.SanityDao;
 import io.javadog.cws.core.model.Settings;
@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * <p>Business Logic implementation for the CWS Sanity request.</p>
@@ -63,7 +62,7 @@ public final class SanityService extends Serviceable<SanityDao, SanityResponse, 
         if (request.getCircleId() != null) {
             // Find for specific Circle
             found = dao.findFailedRecords(request.getCircleId(),since);
-        } else if (Objects.equals(member.getName(), Constants.ADMIN_ACCOUNT)) {
+        } else if (member.getMemberRole() == MemberRole.ADMIN) {
             // The System Administrator is allowed to retrieve all records for
             // all Circles.
             found = dao.findFailedRecords(since);

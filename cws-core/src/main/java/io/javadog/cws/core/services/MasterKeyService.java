@@ -25,6 +25,7 @@ import io.javadog.cws.core.model.entities.MemberEntity;
 
 import javax.persistence.EntityManager;
 import java.util.Base64;
+import java.util.List;
 import java.util.Objects;
 import java.util.logging.Logger;
 
@@ -133,10 +134,14 @@ public final class MasterKeyService extends Serviceable<CommonDao, MasterKeyResp
     }
 
     private MemberEntity findAdmin(final Authentication authentication) {
-        MemberEntity admin = dao.findMemberByName(Constants.ADMIN_ACCOUNT);
+        List<MemberEntity> admins = dao.findMemberByRole(MemberRole.ADMIN);
+        final MemberEntity admin;
 
-        if (admin == null) {
+        if (admins.isEmpty()) {
             admin = createNewAccount(Constants.ADMIN_ACCOUNT, MemberRole.ADMIN, authentication.getCredential());
+        } else {
+            // Fetch the first administrator, the one with Id 1.
+            admin = admins.get(0);
         }
 
         return admin;

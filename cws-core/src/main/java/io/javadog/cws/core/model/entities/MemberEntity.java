@@ -37,6 +37,11 @@ import javax.persistence.Table;
                 query = "select m " +
                         "from MemberEntity m " +
                         "where m.name = :name"),
+        @NamedQuery(name = "member.findByRole",
+                query = "select m " +
+                        "from MemberEntity m " +
+                        "where m.memberRole = :role " +
+                        "order by m.id asc"),
         @NamedQuery(name = "member.findByNameAndCircle",
                 query = "select e.member " +
                         "from TrusteeEntity e " +

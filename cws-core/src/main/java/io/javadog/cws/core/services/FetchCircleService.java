@@ -10,10 +10,10 @@
  */
 package io.javadog.cws.core.services;
 
-import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.dtos.Circle;
 import io.javadog.cws.api.requests.FetchCircleRequest;
 import io.javadog.cws.api.responses.FetchCircleResponse;
+import io.javadog.cws.core.enums.MemberRole;
 import io.javadog.cws.core.enums.Permission;
 import io.javadog.cws.core.model.CommonDao;
 import io.javadog.cws.core.model.Settings;
@@ -50,7 +50,7 @@ public final class FetchCircleService extends Serviceable<CommonDao, FetchCircle
         final FetchCircleResponse response = new FetchCircleResponse();
         final List<Circle> circles;
 
-        if (Constants.ADMIN_ACCOUNT.equals(member.getName()) || settings.getShowAllCircles()) {
+        if ((member.getMemberRole() == MemberRole.ADMIN) || settings.getShowAllCircles()) {
             final List<CircleEntity> entities = dao.findAllAscending(CircleEntity.class, "name");
             circles = new ArrayList<>(entities.size());
             for (final CircleEntity entity : entities) {

@@ -54,6 +54,8 @@ CREATE TABLE cws_versions (
 );
 -- Initial Database Version is 1, initial Production CWS release is 1.0.0
 INSERT INTO cws_versions(schema_version, cws_version, db_vendor) VALUES (1, '1.0.0', 'H2');
+-- First feature release, CWS 1.1.x results requires an update of the DB
+INSERT INTO cws_versions(schema_version, cws_version, db_vendor) VALUES (2, '1.1.0', 'H2');
 
 -- =============================================================================
 -- The CWS is configured via a set of property values, which are all stored in
@@ -116,8 +118,8 @@ CREATE TABLE cws_members (
   external_id      VARCHAR(36),
   name             VARCHAR(75),    -- Member Authentication information
   salt             VARCHAR(256),
-  pbe_algorithm    VARCHAR(19) DEFAULT 'PBE_256',
-  rsa_algorithm    VARCHAR(19) DEFAULT 'RSA_2048',
+  pbe_algorithm    VARCHAR(10) DEFAULT 'PBE_256',
+  rsa_algorithm    VARCHAR(10) DEFAULT 'RSA_2048',
   external_key     LONGVARCHAR,    -- External Public Key, with unknown length
   public_key       VARCHAR(3072),  -- Public Key, stored armored
   private_key      VARCHAR(16384), -- Private Key, stored encrypted & armored
@@ -142,6 +144,7 @@ CREATE TABLE cws_members (
   CONSTRAINT member_notnull_rsa_algorithm   CHECK (rsa_algorithm IS NOT NULL),
   CONSTRAINT member_notnull_public_key      CHECK (public_key IS NOT NULL),
   CONSTRAINT member_notnull_private_key     CHECK (private_key IS NOT NULL),
+  CONSTRAINT member_notnull_role            CHECK (member_role IS NOT NULL),
   CONSTRAINT member_notnull_altered         CHECK (altered IS NOT NULL),
   CONSTRAINT member_notnull_added           CHECK (added IS NOT NULL)
 );

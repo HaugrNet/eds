@@ -21,6 +21,13 @@ import java.util.regex.Pattern;
 public final class Constants {
 
     /**
+     * <p>The current version of the CWS, this is used to tell Clients which
+     * version is being communicated with, and the same number is also being
+     * used to generate the SerialVersionUID for all API Classes.</p>
+     */
+    public static final String CWS_VERSION = "1.1-SNAPSHOT";
+
+    /**
      * <p>All serialized classes should use this value. The value reflects the
      * current version of the system. If updates are made in one or more of the
      * serialized classes, it should be updated.</p>
@@ -35,7 +42,7 @@ public final class Constants {
      *
      * {@code private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;}
      */
-    public static final long SERIAL_VERSION_UID = 201806010010000L;
+    public static final long SERIAL_VERSION_UID = CWS_VERSION.hashCode();
 
     /**
      * <p>All Id's must be compliant with a standard UUID Pattern, which this

@@ -46,7 +46,7 @@ public final class SettingRequest extends Authentication {
 
     @NotNull
     @XmlElement(name = Constants.FIELD_SETTINGS, required = true)
-    private HashMap<String, String> settings = null;
+    private HashMap<String, String> settings = new HashMap<>(0);
 
     // =========================================================================
     // Standard Setters & Getters
@@ -57,6 +57,6 @@ public final class SettingRequest extends Authentication {
     }
 
     public Map<String, String> getSettings() {
-        return (settings == null) ? new HashMap<>(0) : new HashMap<>(settings);
+        return new HashMap<>(settings);
     }
 }

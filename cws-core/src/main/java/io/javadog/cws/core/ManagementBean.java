@@ -10,6 +10,7 @@
  */
 package io.javadog.cws.core;
 
+import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.requests.FetchCircleRequest;
 import io.javadog.cws.api.requests.FetchMemberRequest;
@@ -66,7 +67,7 @@ public class ManagementBean {
     @Transactional(Transactional.TxType.SUPPORTS)
     public VersionResponse version() {
         final VersionResponse response = new VersionResponse();
-        response.setVersion("1.1-SNAPSHOT");
+        response.setVersion(Constants.CWS_VERSION);
 
         return response;
     }

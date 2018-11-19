@@ -50,7 +50,7 @@ import java.util.logging.Logger;
 public class StartupBean {
 
     private static final Logger LOG = Logger.getLogger(StartupBean.class.getName());
-    private static final int DB_VERSION = 1;
+    private static final int DB_VERSION = 2;
 
     @PersistenceContext private EntityManager entityManager;
     @Inject private SanitizerBean sanitizerBean;

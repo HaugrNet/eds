@@ -31,12 +31,17 @@ public final class VersionEntityTest extends DatabaseSetup {
     public void testEntity() {
         final Query query = entityManager.createNamedQuery("version.findAll");
         final List<VersionEntity> found = CommonDao.findList(query);
-        assertThat(found.size(), is(1));
-        assertThat(found.get(0).getId(), is(1L));
-        assertThat(found.get(0).getCwsVersion(), is("1.0.0"));
+        assertThat(found.size(), is(2));
+        assertThat(found.get(0).getId(), is(2L));
+        assertThat(found.get(0).getCwsVersion(), is("1.1.0"));
         assertThat(found.get(0).getDbVendor(), is("H2"));
-        assertThat(found.get(0).getSchemaVersion(), is(1));
+        assertThat(found.get(0).getSchemaVersion(), is(2));
         assertThat(found.get(0).getInstalled(), is(not(nullValue())));
+        assertThat(found.get(1).getId(), is(1L));
+        assertThat(found.get(1).getCwsVersion(), is("1.0.0"));
+        assertThat(found.get(1).getDbVendor(), is("H2"));
+        assertThat(found.get(1).getSchemaVersion(), is(1));
+        assertThat(found.get(1).getInstalled(), is(not(nullValue())));
 
         // Now adding a new Entity, this must fail.
         final VersionEntity entity = new VersionEntity();

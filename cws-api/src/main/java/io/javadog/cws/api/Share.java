@@ -99,6 +99,12 @@ public interface Share {
      *   same Circle. It is not possible to move Folders, as this will break the
      *   underlying data model since it can lead to recursive data structures,
      *   folders can thus only be renamed.</li>
+     *   <li><b>{@link io.javadog.cws.api.common.Action#COPY}</b> an existing
+     *   record from one Circle to a second Circle, requires that the requesting
+     *   member have write access in both Circles.</li>
+     *   <li><b>{@link io.javadog.cws.api.common.Action#MOVE}</b> an existing
+     *   record from one Circle to a second Circle, requires that the requesting
+     *   member have write access in both Circles.</li>
      *   <li><b>{@link io.javadog.cws.api.common.Action#DELETE}</b> an existing
      *   Data Object or an existing, empty, folder. It is not possible to delete
      *   folders with Data.</li>

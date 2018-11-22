@@ -14,7 +14,6 @@ import io.javadog.cws.core.ShareBean;
 import io.javadog.cws.core.exceptions.CWSException;
 import io.javadog.cws.core.model.Settings;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 
 /**
@@ -76,26 +75,6 @@ public class BeanSetup extends DatabaseSetup {
             return service;
         } catch (InstantiationException | InvocationTargetException | IllegalAccessException | NoSuchMethodException e) {
             throw new CWSException(ReturnCode.ERROR, "Cannot instantiate Service Object", e);
-        }
-    }
-
-    // =========================================================================
-    // Internal Methods
-    // =========================================================================
-
-    private static void setField(final Object instance, final String fieldName, final Object value) {
-        try {
-            final Class<?> clazz = instance.getClass();
-            final Field field;
-
-            field = clazz.getDeclaredField(fieldName);
-            final boolean accessible = field.isAccessible();
-
-            field.setAccessible(true);
-            field.set(instance, value);
-            field.setAccessible(accessible);
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            throw new CWSException(ReturnCode.ERROR, "Cannot set Field", e);
         }
     }
 }

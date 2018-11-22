@@ -83,8 +83,10 @@ public final class Constants {
     // the XML Class Annotations.
     public static final String FIELD_IDS = "circle & data Id";
     public static final String FIELD_CIRCLE_ID = "circleId";
+    public static final String FIELD_TARGET_CIRCLE_ID = "targetCircleId";
     public static final String FIELD_MEMBER_ID = "memberId";
     public static final String FIELD_FOLDER_ID = "folderId";
+    public static final String FIELD_TARGET_FOLDER_ID = "targetFolderId";
     public static final String FIELD_DATA_ID = "dataId";
     public static final String FIELD_ACCOUNT_NAME = "accountName";
     public static final String FIELD_PUBLIC_KEY = "publicKey";

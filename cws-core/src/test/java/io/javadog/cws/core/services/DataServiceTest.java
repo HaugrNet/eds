@@ -15,6 +15,7 @@ import static org.junit.Assert.assertThat;
 import io.javadog.cws.api.common.Action;
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
+import io.javadog.cws.api.dtos.Metadata;
 import io.javadog.cws.api.requests.FetchDataRequest;
 import io.javadog.cws.api.requests.ProcessCircleRequest;
 import io.javadog.cws.api.requests.ProcessDataRequest;
@@ -76,7 +77,12 @@ public final class DataServiceTest extends DatabaseSetup {
         final FetchDataService dataService = new FetchDataService(settings, entityManager);
 
         // 1 MB large Data
-        final ProcessDataRequest saveRequest = prepareAddRequest(MEMBER_1, CIRCLE_1_ID, "My Data", 1048576);
+        final ProcessDataRequest saveRequest = prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "My Data", 1048576);
+        // Since the logic is deliberately clearing data post encryption, and
+        // it means that the bytes from the request will be overwritten by
+        // zeroes. To ensure that the check works, a String representing the
+        // byte array is stored prior.
+        final String toSave = crypto.bytesToString(saveRequest.getData());
         final ProcessDataResponse saveResponse = service.perform(saveRequest);
         assertThat(saveResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
 
@@ -84,7 +90,7 @@ public final class DataServiceTest extends DatabaseSetup {
         fetchRequest.setDataId(saveResponse.getDataId());
         final FetchDataResponse fetchResponse = dataService.perform(fetchRequest);
         assertThat(fetchResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
-        assertThat(new String(saveRequest.getData(), settings.getCharset()), is(new String(fetchResponse.getData(), settings.getCharset())));
+        assertThat(crypto.bytesToString(fetchResponse.getData()), is(toSave));
     }
 
     @Test
@@ -93,7 +99,7 @@ public final class DataServiceTest extends DatabaseSetup {
         final FetchDataService dataService = new FetchDataService(settings, entityManager);
 
         // 1 MB large Data
-        final ProcessDataRequest saveRequest = prepareAddRequest(MEMBER_1, CIRCLE_1_ID, "My Data", 1048576);
+        final ProcessDataRequest saveRequest = prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "My Data", 1048576);
         final ProcessDataResponse saveResponse = service.perform(saveRequest);
         assertThat(saveResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
 
@@ -130,9 +136,9 @@ public final class DataServiceTest extends DatabaseSetup {
         assertThat(emptyResponse.getRecords(), is(0L));
 
         // Add some data...
-        assertThat(processService.perform(prepareAddRequest(MEMBER_1, CIRCLE_1_ID, "My Data 1", 1048576)).isOk(), is(true));
-        assertThat(processService.perform(prepareAddRequest(MEMBER_1, CIRCLE_1_ID, "My Data 2", 1048576)).isOk(), is(true));
-        assertThat(processService.perform(prepareAddRequest(MEMBER_1, CIRCLE_1_ID, "My Data 3", 1048576)).isOk(), is(true));
+        assertThat(processService.perform(prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "My Data 1", 1048576)).isOk(), is(true));
+        assertThat(processService.perform(prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "My Data 2", 1048576)).isOk(), is(true));
+        assertThat(processService.perform(prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "My Data 3", 1048576)).isOk(), is(true));
 
         fetchRequest.setCredential(crypto.stringToBytes(MEMBER_1));
         final FetchDataResponse fullResponse = fetchService.perform(fetchRequest);
@@ -143,7 +149,7 @@ public final class DataServiceTest extends DatabaseSetup {
     @Test
     public void testAddEmptyData() {
         final ProcessDataService service = new ProcessDataService(settings, entityManager);
-        final ProcessDataRequest request = prepareAddRequest(MEMBER_1, CIRCLE_1_ID, "The Data", 0);
+        final ProcessDataRequest request = prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "The Data", 0);
 
         final ProcessDataResponse response = service.perform(request);
         assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
@@ -177,7 +183,7 @@ public final class DataServiceTest extends DatabaseSetup {
     @Test
     public void testAddDataWithInvalidChecksum() {
         final ProcessDataService service = new ProcessDataService(settings, entityManager);
-        final ProcessDataRequest request = prepareAddRequest(MEMBER_1, CIRCLE_1_ID, "The Data", 524288);
+        final ProcessDataRequest request = prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "The Data", 524288);
 
         final ProcessDataResponse response = service.perform(request);
         assertThat(response.isOk(), is(true));
@@ -194,7 +200,7 @@ public final class DataServiceTest extends DatabaseSetup {
     @Test
     public void testAddEmptyAndUpdateData() {
         final ProcessDataService service = new ProcessDataService(settings, entityManager);
-        final ProcessDataRequest saveRequest = prepareAddRequest(MEMBER_1, CIRCLE_1_ID, "The Data", 0);
+        final ProcessDataRequest saveRequest = prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "The Data", 0);
 
         final ProcessDataResponse saveResponse = service.perform(saveRequest);
         assertThat(saveResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
@@ -209,7 +215,7 @@ public final class DataServiceTest extends DatabaseSetup {
         prepareCause(CWSException.class, ReturnCode.INTEGRITY_WARNING, "No existing Folder could be found.");
 
         final ProcessDataService service = new ProcessDataService(settings, entityManager);
-        final ProcessDataRequest saveRequest = prepareAddRequest(MEMBER_1, CIRCLE_1_ID, "The Data", 1048576);
+        final ProcessDataRequest saveRequest = prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "The Data", 1048576);
 
         final ProcessDataResponse saveResponse = service.perform(saveRequest);
         assertThat(saveResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
@@ -224,7 +230,7 @@ public final class DataServiceTest extends DatabaseSetup {
         prepareCause(CWSException.class, ReturnCode.AUTHORIZATION_WARNING, "The requesting Account is not permitted to Process Data.");
 
         final ProcessDataService service = new ProcessDataService(settings, entityManager);
-        final ProcessDataRequest request = prepareAddRequest(MEMBER_5, CIRCLE_3_ID, "The Data", 1048576);
+        final ProcessDataRequest request = prepareAddDataRequest(MEMBER_5, CIRCLE_3_ID, "The Data", 1048576);
         assertThat(request.validate().isEmpty(), is(true));
 
         service.perform(request);
@@ -235,7 +241,7 @@ public final class DataServiceTest extends DatabaseSetup {
         prepareCause(CWSException.class, ReturnCode.AUTHORIZATION_WARNING, "The current Account is not allowed to perform the given action.");
 
         final ProcessDataService service = new ProcessDataService(settings, entityManager);
-        final ProcessDataRequest saveRequest = prepareAddRequest(MEMBER_2, CIRCLE_2_ID, "The Data", 1048576);
+        final ProcessDataRequest saveRequest = prepareAddDataRequest(MEMBER_2, CIRCLE_2_ID, "The Data", 1048576);
         final ProcessDataResponse saveResponse = service.perform(saveRequest);
         assertThat(saveResponse.isOk(), is(true));
 
@@ -249,7 +255,7 @@ public final class DataServiceTest extends DatabaseSetup {
         prepareCause(CWSException.class, ReturnCode.INTEGRITY_WARNING, "Cannot find a matching DataType for the Object.");
 
         final ProcessDataService service = new ProcessDataService(settings, entityManager);
-        final ProcessDataRequest request = prepareAddRequest(MEMBER_1, CIRCLE_1_ID, "The Data", 512);
+        final ProcessDataRequest request = prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "The Data", 512);
         request.setTypeName("Weird");
         assertThat(request.validate().isEmpty(), is(true));
 
@@ -261,7 +267,7 @@ public final class DataServiceTest extends DatabaseSetup {
         prepareCause(CWSException.class, ReturnCode.AUTHORIZATION_WARNING, "The current Account is not allowed to perform the given action.");
 
         final ProcessDataService service = new ProcessDataService(settings, entityManager);
-        final ProcessDataRequest saveRequest = prepareAddRequest(MEMBER_2, CIRCLE_2_ID, "The Data", 1048576);
+        final ProcessDataRequest saveRequest = prepareAddDataRequest(MEMBER_2, CIRCLE_2_ID, "The Data", 1048576);
         final ProcessDataResponse saveResponse = service.perform(saveRequest);
         assertThat(saveResponse.isOk(), is(true));
 
@@ -283,11 +289,12 @@ public final class DataServiceTest extends DatabaseSetup {
 
     @Test
     public void testAddDataToUnknownFolder() {
-        prepareCause(CWSException.class, ReturnCode.IDENTIFICATION_WARNING, "Provided FolderId is not a folder.");
+        final String folderId = UUID.randomUUID().toString();
+        prepareCause(CWSException.class, ReturnCode.IDENTIFICATION_WARNING, "Provided FolderId '" + folderId + "' is not a folder.");
 
         final ProcessDataService service = new ProcessDataService(settings, entityManager);
-        final ProcessDataRequest request = prepareAddRequest(MEMBER_4, CIRCLE_3_ID, "Data File", 512);
-        request.setFolderId(UUID.randomUUID().toString());
+        final ProcessDataRequest request = prepareAddDataRequest(MEMBER_4, CIRCLE_3_ID, "Data File", 512);
+        request.setFolderId(folderId);
         assertThat(request.validate().isEmpty(), is(true));
 
         service.perform(request);
@@ -295,17 +302,17 @@ public final class DataServiceTest extends DatabaseSetup {
 
     @Test
     public void testAddDataToInvalidFolder() {
-        prepareCause(CWSException.class, ReturnCode.IDENTIFICATION_WARNING, "Provided FolderId is not a folder.");
-
         final ProcessDataService service = new ProcessDataService(settings, entityManager);
-        final ProcessDataRequest request = prepareAddRequest(MEMBER_4, CIRCLE_3_ID, "Data File", 512);
+        final ProcessDataRequest request = prepareAddDataRequest(MEMBER_4, CIRCLE_3_ID, "Data File", 512);
         assertThat(request.validate().isEmpty(), is(true));
         final ProcessDataResponse response = service.perform(request);
         assertThat(response.isOk(), is(true));
+        final String folderId = response.getDataId();
 
         // We're taking the previously generated Data Id and uses that as folder.
+        prepareCause(CWSException.class, ReturnCode.IDENTIFICATION_WARNING, "Provided FolderId '" + folderId + "' is not a folder.");
         request.setCredential(crypto.stringToBytes(MEMBER_4));
-        request.setFolderId(response.getDataId());
+        request.setFolderId(folderId);
         service.perform(request);
     }
 
@@ -327,7 +334,7 @@ public final class DataServiceTest extends DatabaseSetup {
     @Test
     public void testSaveAndDeleteData() {
         final ProcessDataService service = new ProcessDataService(settings, entityManager);
-        final ProcessDataRequest saveRequest = prepareAddRequest(MEMBER_1, CIRCLE_1_ID, "The Data", 524288);
+        final ProcessDataRequest saveRequest = prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "The Data", 524288);
         final ProcessDataResponse saveResponse = service.perform(saveRequest);
         assertThat(saveResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
         assertThat(saveResponse.getReturnMessage(), is("Ok"));
@@ -343,7 +350,7 @@ public final class DataServiceTest extends DatabaseSetup {
         prepareCause(CWSException.class, ReturnCode.AUTHORIZATION_WARNING, "The current Account is not allowed to perform the given action.");
 
         final ProcessDataService service = new ProcessDataService(settings, entityManager);
-        final ProcessDataRequest saveRequest = prepareAddRequest(MEMBER_1, CIRCLE_1_ID, "Known Data", 524288);
+        final ProcessDataRequest saveRequest = prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "Known Data", 524288);
         final ProcessDataResponse saveResponse = service.perform(saveRequest);
         assertThat(saveResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
         assertThat(saveResponse.getReturnMessage(), is("Ok"));
@@ -355,7 +362,7 @@ public final class DataServiceTest extends DatabaseSetup {
     @Test
     public void testSaveAndDeleteDataWithoutAccess() {
         final ProcessDataService service = new ProcessDataService(settings, entityManager);
-        final ProcessDataRequest saveRequest = prepareAddRequest(MEMBER_1, CIRCLE_1_ID, "More Data", 524288);
+        final ProcessDataRequest saveRequest = prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "More Data", 524288);
         final ProcessDataResponse saveResponse = service.perform(saveRequest);
         assertThat(saveResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
         assertThat(saveResponse.getReturnMessage(), is("Ok"));
@@ -378,7 +385,7 @@ public final class DataServiceTest extends DatabaseSetup {
     @Test
     public void testAddUpdateAndDeleteFolder() {
         final ProcessDataService service = new ProcessDataService(settings, entityManager);
-        final ProcessDataRequest request = prepareAddRequest(MEMBER_1, CIRCLE_1_ID, "folder1", 0);
+        final ProcessDataRequest request = prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "folder1", 0);
         request.setTypeName("folder");
         final ProcessDataResponse addResponse = service.perform(request);
         assertThat(addResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
@@ -402,8 +409,8 @@ public final class DataServiceTest extends DatabaseSetup {
     @Test
     public void testAddSameFolder() {
         final ProcessDataService service = new ProcessDataService(settings, entityManager);
-        final ProcessDataRequest request = prepareAddRequest(MEMBER_1, CIRCLE_1_ID, "folder1", 0);
-        request.setTypeName("folder");
+        final ProcessDataRequest request = prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "folder1", 0);
+        request.setTypeName(Constants.FOLDER_TYPENAME);
         final ProcessDataResponse response1 = service.perform(request);
         assertThat(response1.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
         assertThat(response1.getReturnMessage(), is("Ok"));
@@ -417,16 +424,187 @@ public final class DataServiceTest extends DatabaseSetup {
     }
 
     @Test
+    public void testCopyData() {
+        final ProcessDataService dataService = new ProcessDataService(settings, entityManager);
+        final ProcessDataRequest addRequest = prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "toCopy", 524288);
+        final ProcessDataResponse addResponse = dataService.perform(addRequest);
+        assertThat(addResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+        assertThat(addResponse.getReturnMessage(), is("Ok"));
+        assertThat(addResponse.getDataId(), is(not(nullValue())));
+
+        final ProcessDataRequest copyRequest = prepareCopyDataRequest(MEMBER_1, addResponse.getDataId(), CIRCLE_2_ID, null);
+        final ProcessDataResponse copyResponse = dataService.perform(copyRequest);
+        assertThat(copyResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+        assertThat(copyResponse.getReturnMessage(), is("Ok"));
+        assertThat(copyResponse.getDataId(), is(not(nullValue())));
+        assertThat(copyResponse.getDataId(), is(not(addResponse.getDataId())));
+
+        final FetchDataService fetchService = new FetchDataService(settings, entityManager);
+        final FetchDataRequest fetchRequest1 = prepareReadRequest(MEMBER_1, null, addResponse.getDataId());
+        final FetchDataResponse fetchResponse1 = fetchService.perform(fetchRequest1);
+        assertThat(fetchResponse1.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+        final Metadata metadata1 = fetchResponse1.getMetadata().get(0);
+
+        final FetchDataRequest fetchRequest2 = prepareReadRequest(MEMBER_1, null, copyResponse.getDataId());
+        final FetchDataResponse fetchResponse2 = fetchService.perform(fetchRequest2);
+        assertThat(fetchResponse2.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+        final Metadata metadata2 = fetchResponse2.getMetadata().get(0);
+
+        // Comparing the first Object with the copied Object, name, type and
+        // data must be the same, the Id's not.
+        assertThat(metadata2.getDataName(), is(metadata1.getDataName()));
+        assertThat(metadata2.getTypeName(), is(metadata1.getTypeName()));
+        assertThat(metadata2.getDataId(), is(not(metadata1.getDataId())));
+        assertThat(metadata1.getCircleId(), is(CIRCLE_1_ID));
+        assertThat(metadata2.getCircleId(), is(CIRCLE_2_ID));
+        assertThat(fetchResponse2.getData(), is(fetchResponse1.getData()));
+    }
+
+    @Test
+    public void testMoveData() {
+        final ProcessDataService dataService = new ProcessDataService(settings, entityManager);
+        final ProcessDataRequest addRequest = prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "toMove", 524288);
+        final ProcessDataResponse addResponse = dataService.perform(addRequest);
+        assertThat(addResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+        assertThat(addResponse.getReturnMessage(), is("Ok"));
+        assertThat(addResponse.getDataId(), is(not(nullValue())));
+
+        final ProcessDataRequest moveRequest = prepareMoveDataRequest(MEMBER_1, addResponse.getDataId(), CIRCLE_2_ID, null);
+        final ProcessDataResponse moveResponse = dataService.perform(moveRequest);
+        assertThat(moveResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+        assertThat(moveResponse.getReturnMessage(), is("Ok"));
+        assertThat(moveResponse.getDataId(), is(not(nullValue())));
+        assertThat(moveResponse.getDataId(), is(not(addResponse.getDataId())));
+
+        final FetchDataService fetchService = new FetchDataService(settings, entityManager);
+        final FetchDataRequest fetchRequest1 = prepareReadRequest(MEMBER_1, null, moveResponse.getDataId());
+        final FetchDataResponse fetchResponse1 = fetchService.perform(fetchRequest1);
+        assertThat(fetchResponse1.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+
+        final FetchDataRequest fetchRequest2 = prepareReadRequest(MEMBER_1, null, addResponse.getDataId());
+        final FetchDataResponse fetchResponse2 = fetchService.perform(fetchRequest2);
+        assertThat(fetchResponse2.getReturnCode(), is(ReturnCode.IDENTIFICATION_WARNING.getCode()));
+        assertThat(fetchResponse2.getReturnMessage(), is("No information could be found for the given Id."));
+    }
+
+    @Test
+    public void testCopyFolder() {
+        prepareCause(CWSException.class, "It is not permitted to copy or move folders.");
+        final ProcessDataService dataService = new ProcessDataService(settings, entityManager);
+        final ProcessDataRequest addRequest = prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "folderToCopy", 0);
+        addRequest.setTypeName(Constants.FOLDER_TYPENAME);
+        final ProcessDataResponse addResponse = dataService.perform(addRequest);
+        assertThat(addResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+        assertThat(addResponse.getReturnMessage(), is("Ok"));
+        assertThat(addResponse.getDataId(), is(not(nullValue())));
+
+        final ProcessDataRequest copyRequest = prepareCopyDataRequest(MEMBER_1, addResponse.getDataId(), CIRCLE_2_ID, null);
+        dataService.perform(copyRequest);
+    }
+
+    @Test
+    public void testCopyEmptyData() {
+        final ProcessDataService dataService = new ProcessDataService(settings, entityManager);
+        final ProcessDataRequest addRequest = prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "emptyData", 0);
+        final ProcessDataResponse addResponse = dataService.perform(addRequest);
+        assertThat(addResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+        assertThat(addResponse.getReturnMessage(), is("Ok"));
+        assertThat(addResponse.getDataId(), is(not(nullValue())));
+
+        final ProcessDataRequest copyRequest = prepareCopyDataRequest(MEMBER_1, addResponse.getDataId(), CIRCLE_2_ID, null);
+        final ProcessDataResponse copyResponse = dataService.perform(copyRequest);
+        assertThat(copyResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+        assertThat(copyResponse.getReturnMessage(), is("Ok"));
+        assertThat(copyResponse.getDataId(), is(not(nullValue())));
+        assertThat(copyResponse.getDataId(), is(not(addResponse.getDataId())));
+
+        final FetchDataService fetchService = new FetchDataService(settings, entityManager);
+        final FetchDataRequest fetchRequest1 = prepareReadRequest(MEMBER_1, null, addResponse.getDataId());
+        final FetchDataResponse fetchResponse1 = fetchService.perform(fetchRequest1);
+        assertThat(fetchResponse1.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+        final Metadata metadata1 = fetchResponse1.getMetadata().get(0);
+
+        final FetchDataRequest fetchRequest2 = prepareReadRequest(MEMBER_1, null, copyResponse.getDataId());
+        final FetchDataResponse fetchResponse2 = fetchService.perform(fetchRequest2);
+        assertThat(fetchResponse2.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+        final Metadata metadata2 = fetchResponse2.getMetadata().get(0);
+
+        // Comparing the first Object with the copied Object, name, type and
+        // data must be the same, the Id's not.
+        assertThat(metadata2.getDataName(), is(metadata1.getDataName()));
+        assertThat(metadata2.getTypeName(), is(metadata1.getTypeName()));
+        assertThat(metadata2.getDataId(), is(not(metadata1.getDataId())));
+        assertThat(metadata1.getCircleId(), is(CIRCLE_1_ID));
+        assertThat(metadata2.getCircleId(), is(CIRCLE_2_ID));
+        assertThat(fetchResponse2.getData(), is(fetchResponse1.getData()));
+    }
+
+    @Test
+    public void testCopyDataNotExistingData() {
+        final String dataId = UUID.randomUUID().toString();
+        prepareCause(CWSException.class, "No data could be found for the given Data Id '" + dataId + "'.");
+
+        final ProcessDataService dataService = new ProcessDataService(settings, entityManager);
+        final ProcessDataRequest copyRequest = prepareCopyDataRequest(MEMBER_1, dataId, CIRCLE_2_ID, null);
+        assertThat(copyRequest.validate().size(), is(0));
+
+        dataService.perform(copyRequest);
+    }
+
+    @Test
+    public void testCopyDataToNotExistingFolder() {
+        final String folderId = UUID.randomUUID().toString();
+        prepareCause(CWSException.class, "Provided FolderId '" + folderId + "' is not a folder.");
+
+        final ProcessDataService dataService = new ProcessDataService(settings, entityManager);
+        final ProcessDataRequest addRequest = prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "toCopy", 524288);
+        final ProcessDataResponse addResponse = dataService.perform(addRequest);
+        assertThat(addResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+        assertThat(addResponse.getReturnMessage(), is("Ok"));
+        assertThat(addResponse.getDataId(), is(not(nullValue())));
+
+        final ProcessDataRequest copyRequest = prepareCopyDataRequest(MEMBER_1, addResponse.getDataId(), CIRCLE_2_ID, folderId);
+        dataService.perform(copyRequest);
+    }
+
+    @Test
+    public void testCopyDataToNonTrusteeCircle() {
+        final String dataId = UUID.randomUUID().toString();
+        prepareCause(CWSException.class, "The member has no trustee relationship with the target Circle '" + CIRCLE_1_ID  +"'.");
+
+        final ProcessDataService dataService = new ProcessDataService(settings, entityManager);
+        final ProcessDataRequest copyRequest = prepareCopyDataRequest(MEMBER_4, dataId, CIRCLE_1_ID, null);
+        assertThat(copyRequest.validate().size(), is(0));
+
+        dataService.perform(copyRequest);
+    }
+
+    @Test
+    public void testCopyDataWithoutPermissionInTarget() {
+        prepareCause(CWSException.class, "Member is not permitted to perform this action for the target Circle.");
+
+        final ProcessDataService dataService = new ProcessDataService(settings, entityManager);
+        final ProcessDataRequest addRequest = prepareAddDataRequest(MEMBER_3, CIRCLE_3_ID, "emptyData", 512);
+        final ProcessDataResponse addResponse = dataService.perform(addRequest);
+        assertThat(addResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+        assertThat(addResponse.getReturnMessage(), is("Ok"));
+        assertThat(addResponse.getDataId(), is(not(nullValue())));
+
+        final ProcessDataRequest copyRequest = prepareCopyDataRequest(MEMBER_3, addResponse.getDataId(), CIRCLE_1_ID, null);
+        dataService.perform(copyRequest);
+    }
+
+    @Test
     public void testDeleteFolderWithData() {
         final ProcessDataService dataService = new ProcessDataService(settings, entityManager);
-        final ProcessDataRequest addFolderRequest = prepareAddRequest(MEMBER_1, CIRCLE_1_ID, "folder1", 0);
+        final ProcessDataRequest addFolderRequest = prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "folder1", 0);
         addFolderRequest.setTypeName("folder");
         final ProcessDataResponse addFolderResponse = dataService.perform(addFolderRequest);
         assertThat(addFolderResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
         assertThat(addFolderResponse.getReturnMessage(), is("Ok"));
         assertThat(addFolderResponse.getDataId(), is(not(nullValue())));
 
-        final ProcessDataRequest addDataRequest = prepareAddRequest(MEMBER_1, CIRCLE_1_ID, "More Data", 524288);
+        final ProcessDataRequest addDataRequest = prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "More Data", 524288);
         addDataRequest.setFolderId(addFolderResponse.getDataId());
         final ProcessDataResponse addDataResponse = dataService.perform(addDataRequest);
         assertThat(addDataResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
@@ -440,11 +618,11 @@ public final class DataServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testMoveFolder() {
+    public void testMoveFolderWithAddRequest() {
         prepareCause(CWSException.class, ReturnCode.ILLEGAL_ACTION, "It is not permitted to move Folders.");
 
         final ProcessDataService service = new ProcessDataService(settings, entityManager);
-        final ProcessDataRequest addFolderRequest = prepareAddRequest(MEMBER_1, CIRCLE_1_ID, "folder1", 0);
+        final ProcessDataRequest addFolderRequest = prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "folder1", 0);
         addFolderRequest.setTypeName("folder");
         final ProcessDataResponse addFolderResponse1 = service.perform(addFolderRequest);
         assertThat(addFolderResponse1.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
@@ -466,16 +644,16 @@ public final class DataServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testMoveData() {
+    public void testMoveDataWithAddRequest() {
         final ProcessDataService service = new ProcessDataService(settings, entityManager);
-        final ProcessDataRequest createFolderRequest = prepareAddRequest(MEMBER_1, CIRCLE_1_ID, "folder1", 0);
+        final ProcessDataRequest createFolderRequest = prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "folder1", 0);
         createFolderRequest.setTypeName("folder");
         final ProcessDataResponse createFolderResponse = service.perform(createFolderRequest);
         assertThat(createFolderResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
         assertThat(createFolderResponse.getReturnMessage(), is("Ok"));
         assertThat(createFolderResponse.getDataId(), is(not(nullValue())));
 
-        final ProcessDataRequest addDataRequest = prepareAddRequest(MEMBER_1, CIRCLE_1_ID, "my data", 512);
+        final ProcessDataRequest addDataRequest = prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "my data", 512);
         final ProcessDataResponse addDataResponse = service.perform(addDataRequest);
         assertThat(addDataResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
         assertThat(addDataResponse.getReturnMessage(), is("Ok"));
@@ -496,21 +674,21 @@ public final class DataServiceTest extends DatabaseSetup {
         final FetchDataService readSearvice = new FetchDataService(settings, entityManager);
 
         // Step 1, create 2 folders
-        final ProcessDataRequest folderRequest1 = prepareAddRequest(MEMBER_4, CIRCLE_3_ID, "First Folder", 0);
+        final ProcessDataRequest folderRequest1 = prepareAddDataRequest(MEMBER_4, CIRCLE_3_ID, "First Folder", 0);
         folderRequest1.setTypeName(Constants.FOLDER_TYPENAME);
         final ProcessDataResponse folderResponse1 = service.perform(folderRequest1);
         assertThat(folderResponse1.isOk(), is(true));
-        final ProcessDataRequest folderRequest2 = prepareAddRequest(MEMBER_4, CIRCLE_3_ID, "Second Folder", 0);
+        final ProcessDataRequest folderRequest2 = prepareAddDataRequest(MEMBER_4, CIRCLE_3_ID, "Second Folder", 0);
         folderRequest2.setTypeName(Constants.FOLDER_TYPENAME);
         final ProcessDataResponse folderResponse2 = service.perform(folderRequest2);
         assertThat(folderResponse2.isOk(), is(true));
 
         // Step 2, Create 1 data record for each folder, with the same name
-        final ProcessDataRequest dataRequest1 = prepareAddRequest(MEMBER_4, CIRCLE_3_ID, "The Data", 524288);
+        final ProcessDataRequest dataRequest1 = prepareAddDataRequest(MEMBER_4, CIRCLE_3_ID, "The Data", 524288);
         dataRequest1.setFolderId(folderResponse1.getDataId());
         final ProcessDataResponse dataResponse1 = service.perform(dataRequest1);
         assertThat(dataResponse1.isOk(), is(true));
-        final ProcessDataRequest dataRequest2 = prepareAddRequest(MEMBER_4, CIRCLE_3_ID, "The Data", 524288);
+        final ProcessDataRequest dataRequest2 = prepareAddDataRequest(MEMBER_4, CIRCLE_3_ID, "The Data", 524288);
         dataRequest2.setFolderId(folderResponse2.getDataId());
         final ProcessDataResponse dataResponse2 = service.perform(dataRequest2);
         assertThat(dataResponse2.isOk(), is(true));
@@ -543,18 +721,18 @@ public final class DataServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testMoveDataToDifferentCircle() {
+    public void testMoveDataToDifferentCircleWithAddRequest() {
         prepareCause(CWSException.class, ReturnCode.ILLEGAL_ACTION, "Moving Data from one Circle to another is not permitted.");
 
         final ProcessDataService service = new ProcessDataService(settings, entityManager);
-        final ProcessDataRequest addFolderRequest = prepareAddRequest(MEMBER_1, CIRCLE_1_ID, "folder1", 0);
+        final ProcessDataRequest addFolderRequest = prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "folder1", 0);
         addFolderRequest.setTypeName("folder");
         final ProcessDataResponse addFolderResponse = service.perform(addFolderRequest);
         assertThat(addFolderResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
         assertThat(addFolderResponse.getReturnMessage(), is("Ok"));
         assertThat(addFolderResponse.getDataId(), is(not(nullValue())));
 
-        final ProcessDataRequest addDataRequest = prepareAddRequest(MEMBER_1, CIRCLE_2_ID, "my data", 512);
+        final ProcessDataRequest addDataRequest = prepareAddDataRequest(MEMBER_1, CIRCLE_2_ID, "my data", 512);
         final ProcessDataResponse addDataResponse = service.perform(addDataRequest);
         assertThat(addDataResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
         assertThat(addDataResponse.getReturnMessage(), is("Ok"));
@@ -569,17 +747,6 @@ public final class DataServiceTest extends DatabaseSetup {
     // Internal Helper Methods
     // =========================================================================
 
-    private static ProcessDataRequest prepareAddRequest(final String account, final String circleId, final String dataName, final int bytes) {
-        final ProcessDataRequest dataRequest = prepareRequest(ProcessDataRequest.class, account);
-        dataRequest.setAction(Action.ADD);
-        dataRequest.setCircleId(circleId);
-        dataRequest.setDataName(dataName);
-        dataRequest.setTypeName(Constants.DATA_TYPENAME);
-        dataRequest.setData(generateData(bytes));
-
-        return dataRequest;
-    }
-
     private static FetchDataRequest prepareReadRequest(final String account, final String circleId, final String dataId) {
         final FetchDataRequest dataRequest = prepareRequest(FetchDataRequest.class, account);
         dataRequest.setCircleId(circleId);
@@ -592,6 +759,26 @@ public final class DataServiceTest extends DatabaseSetup {
         final ProcessDataRequest request = prepareRequest(ProcessDataRequest.class, account);
         request.setAction(Action.UPDATE);
         request.setDataId(dataId);
+
+        return request;
+    }
+
+    private static ProcessDataRequest prepareCopyDataRequest(final String account, final String dataId, final String targetCircleId, final String targetFolderId) {
+        final ProcessDataRequest request = prepareRequest(ProcessDataRequest.class, account);
+        request.setAction(Action.COPY);
+        request.setDataId(dataId);
+        request.setTargetCircleId(targetCircleId);
+        request.setTargetFolderId(targetFolderId);
+
+        return request;
+    }
+
+    private static ProcessDataRequest prepareMoveDataRequest(final String account, final String dataId, final String targetCircleId, final String targetFolderId) {
+        final ProcessDataRequest request = prepareRequest(ProcessDataRequest.class, account);
+        request.setAction(Action.MOVE);
+        request.setDataId(dataId);
+        request.setTargetCircleId(targetCircleId);
+        request.setTargetFolderId(targetFolderId);
 
         return request;
     }

@@ -18,8 +18,6 @@ import io.javadog.cws.api.requests.FetchDataRequest;
 import io.javadog.cws.api.responses.FetchDataResponse;
 import io.javadog.cws.core.enums.Permission;
 import io.javadog.cws.core.enums.SanityStatus;
-import io.javadog.cws.core.jce.IVSalt;
-import io.javadog.cws.core.jce.SecretCWSKey;
 import io.javadog.cws.core.model.DataDao;
 import io.javadog.cws.core.model.Settings;
 import io.javadog.cws.core.model.entities.DataEntity;
@@ -55,7 +53,7 @@ public final class FetchDataService extends Serviceable<DataDao, FetchDataRespon
 
         // It is not possible to directly compare a sub-object against a defined
         // value, if the methods are all final - this is because it prevents the
-        // Hibernate proxy, usingByteBuddy, to override the method. Hence, the
+        // Hibernate proxy, using ByteBuddy, to override the method. Hence, the
         // Object it should be compared against is first read out - since this
         // will help overriding the proxying.
         //   See: https://github.com/JavaDogs/cws/issues/45
@@ -116,21 +114,18 @@ public final class FetchDataService extends Serviceable<DataDao, FetchDataRespon
         final FetchDataResponse response = new FetchDataResponse();
         final MetadataEntity parent = dao.find(MetadataEntity.class, metadata.getParentId());
         final Metadata metaData = convert(metadata, parent.getExternalId());
+        final List<Metadata> metadataList = new ArrayList<>(1);
+        metadataList.add(metaData);
 
         if (entity != null) {
             final String checksum = crypto.generateChecksum(entity.getData());
             if (Objects.equals(checksum, entity.getChecksum())) {
-                final SecretCWSKey key = extractCircleKey(entity);
-                key.setSalt(new IVSalt(crypto.decryptWithMasterKey(entity.getInitialVector())));
-                final byte[] bytes = crypto.decrypt(key, entity.getData());
-                final List<Metadata> metadataList = new ArrayList<>(1);
-                metadataList.add(metaData);
+                final byte[] bytes = decryptData(entity);
 
                 // The Object may have the Status Failed, but was corrected. But
                 // as we're going to update the Object anyway, let's just update
                 // it with an Ok flag also.
                 entity.setSanityStatus(SanityStatus.OK);
-
                 response.setMetadata(metadataList);
                 response.setData(bytes);
             } else {
@@ -147,6 +142,8 @@ public final class FetchDataService extends Serviceable<DataDao, FetchDataRespon
             // is checked too soon.
             entity.setSanityChecked(Utilities.newDate());
             dao.persist(entity);
+        } else {
+            response.setMetadata(metadataList);
         }
 
         return response;

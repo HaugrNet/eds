@@ -10,10 +10,7 @@ package io.javadog.cws.core;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
-import io.javadog.cws.api.common.Action;
-import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
-import io.javadog.cws.api.requests.ProcessDataRequest;
 import io.javadog.cws.api.responses.ProcessDataResponse;
 import io.javadog.cws.core.enums.SanityStatus;
 import io.javadog.cws.core.enums.StandardSetting;
@@ -278,33 +275,17 @@ public final class SanitizerBeanTest extends DatabaseSetup {
         }
     }
 
-    private static void setField(final Object instance, final String fieldName, final Object value) {
-        try {
-            final Class<?> clazz = instance.getClass();
-            final Field field;
-
-            field = clazz.getDeclaredField(fieldName);
-            final boolean accessible = field.isAccessible();
-
-            field.setAccessible(true);
-            field.set(instance, value);
-            field.setAccessible(accessible);
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            throw new CWSException(ReturnCode.ERROR, "Cannot set Field", e);
-        }
-    }
-
     private void prepareInvalidData() {
         final ProcessDataService service = new ProcessDataService(settings, entityManager);
-        timeWarpChecksum(service.perform(prepareAddRequest(MEMBER_1, CIRCLE_1_ID, "Valid Data1", 1048576)), new Date(1L), SanityStatus.OK);
-        falsifyChecksum(service.perform(prepareAddRequest(MEMBER_1, CIRCLE_1_ID, "Invalidated Data1", 1048576)), new Date(2L), SanityStatus.OK);
-        falsifyChecksum(service.perform(prepareAddRequest(MEMBER_1, CIRCLE_1_ID, "Invalidated Data2", 524288)), new Date(), SanityStatus.OK);
-        timeWarpChecksum(service.perform(prepareAddRequest(MEMBER_1, CIRCLE_2_ID, "Valid Data2", 1048576)), new Date(3L), SanityStatus.OK);
-        falsifyChecksum(service.perform(prepareAddRequest(MEMBER_1, CIRCLE_2_ID, "Invalidated Data3", 1048576)), new Date(4L), SanityStatus.OK);
-        falsifyChecksum(service.perform(prepareAddRequest(MEMBER_1, CIRCLE_2_ID, "Invalidated Data4", 524288)), new Date(), SanityStatus.OK);
-        timeWarpChecksum(service.perform(prepareAddRequest(MEMBER_4, CIRCLE_3_ID, "Valid Data3", 1048576)), new Date(5L), SanityStatus.OK);
-        falsifyChecksum(service.perform(prepareAddRequest(MEMBER_4, CIRCLE_3_ID, "Invalidated Data5", 1048576)), new Date(6L), SanityStatus.OK);
-        falsifyChecksum(service.perform(prepareAddRequest(MEMBER_4, CIRCLE_3_ID, "Invalidated Data6", 524288)), new Date(), SanityStatus.OK);
+        timeWarpChecksum(service.perform(prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "Valid Data1", 1048576)), new Date(1L), SanityStatus.OK);
+        falsifyChecksum(service.perform(prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "Invalidated Data1", 1048576)), new Date(2L), SanityStatus.OK);
+        falsifyChecksum(service.perform(prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "Invalidated Data2", 524288)), new Date(), SanityStatus.OK);
+        timeWarpChecksum(service.perform(prepareAddDataRequest(MEMBER_1, CIRCLE_2_ID, "Valid Data2", 1048576)), new Date(3L), SanityStatus.OK);
+        falsifyChecksum(service.perform(prepareAddDataRequest(MEMBER_1, CIRCLE_2_ID, "Invalidated Data3", 1048576)), new Date(4L), SanityStatus.OK);
+        falsifyChecksum(service.perform(prepareAddDataRequest(MEMBER_1, CIRCLE_2_ID, "Invalidated Data4", 524288)), new Date(), SanityStatus.OK);
+        timeWarpChecksum(service.perform(prepareAddDataRequest(MEMBER_4, CIRCLE_3_ID, "Valid Data3", 1048576)), new Date(5L), SanityStatus.OK);
+        falsifyChecksum(service.perform(prepareAddDataRequest(MEMBER_4, CIRCLE_3_ID, "Invalidated Data5", 1048576)), new Date(6L), SanityStatus.OK);
+        falsifyChecksum(service.perform(prepareAddDataRequest(MEMBER_4, CIRCLE_3_ID, "Invalidated Data6", 524288)), new Date(), SanityStatus.OK);
     }
 
     private void timeWarpChecksum(final ProcessDataResponse response, final Date sanityCheck, final SanityStatus status) {
@@ -319,16 +300,5 @@ public final class SanitizerBeanTest extends DatabaseSetup {
         entity.setSanityStatus(status);
         entity.setSanityChecked(sanityCheck);
         entityManager.persist(entity);
-    }
-
-    private static ProcessDataRequest prepareAddRequest(final String account, final String circleId, final String dataName, final int bytes) {
-        final ProcessDataRequest request = prepareRequest(ProcessDataRequest.class, account);
-        request.setAction(Action.ADD);
-        request.setCircleId(circleId);
-        request.setDataName(dataName);
-        request.setTypeName(Constants.DATA_TYPENAME);
-        request.setData(generateData(bytes));
-
-        return request;
     }
 }

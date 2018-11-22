@@ -55,7 +55,16 @@ import java.util.Map;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "processDataRequest")
-@XmlType(name = "processDataRequest", propOrder = { Constants.FIELD_ACTION, Constants.FIELD_DATA_ID, Constants.FIELD_CIRCLE_ID, Constants.FIELD_DATA_NAME, Constants.FIELD_FOLDER_ID, Constants.FIELD_TYPENAME, Constants.FIELD_DATA })
+@XmlType(name = "processDataRequest", propOrder = {
+        Constants.FIELD_ACTION,
+        Constants.FIELD_DATA_ID,
+        Constants.FIELD_CIRCLE_ID,
+        Constants.FIELD_TARGET_CIRCLE_ID,
+        Constants.FIELD_DATA_NAME,
+        Constants.FIELD_FOLDER_ID,
+        Constants.FIELD_TARGET_FOLDER_ID,
+        Constants.FIELD_TYPENAME,
+        Constants.FIELD_DATA })
 public final class ProcessDataRequest extends Authentication implements CircleIdRequest {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
@@ -73,6 +82,10 @@ public final class ProcessDataRequest extends Authentication implements CircleId
     @XmlElement(name = Constants.FIELD_CIRCLE_ID)
     private String circleId = null;
 
+    @Pattern(regexp = Constants.ID_PATTERN_REGEX)
+    @XmlElement(name = Constants.FIELD_TARGET_CIRCLE_ID)
+    private String targetCircleId = null;
+
     @Size(min = 1, max = Constants.MAX_NAME_LENGTH)
     @XmlElement(name = Constants.FIELD_DATA_NAME)
     private String dataName = null;
@@ -80,6 +93,10 @@ public final class ProcessDataRequest extends Authentication implements CircleId
     @Pattern(regexp = Constants.ID_PATTERN_REGEX)
     @XmlElement(name = Constants.FIELD_FOLDER_ID)
     private String folderId = null;
+
+    @Pattern(regexp = Constants.ID_PATTERN_REGEX)
+    @XmlElement(name = Constants.FIELD_TARGET_FOLDER_ID)
+    private String targetFolderId = null;
 
     @Size(min = 1, max = Constants.MAX_NAME_LENGTH)
     @XmlElement(name = Constants.FIELD_TYPENAME)
@@ -124,6 +141,14 @@ public final class ProcessDataRequest extends Authentication implements CircleId
         return circleId;
     }
 
+    public void setTargetCircleId(final String targetCircleId) {
+        this.targetCircleId = targetCircleId;
+    }
+
+    public String getTargetCircleId() {
+        return targetCircleId;
+    }
+
     public void setDataName(final String dataName) {
         this.dataName = dataName;
     }
@@ -138,6 +163,14 @@ public final class ProcessDataRequest extends Authentication implements CircleId
 
     public String getFolderId() {
         return folderId;
+    }
+
+    public void setTargetFolderId(final String targetFolderId) {
+        this.targetFolderId = targetFolderId;
+    }
+
+    public String getTargetFolderId() {
+        return targetFolderId;
     }
 
     public void setTypeName(final String typeName) {
@@ -177,12 +210,22 @@ public final class ProcessDataRequest extends Authentication implements CircleId
                     checkNotNullEmptyOrTooLong(errors, Constants.FIELD_DATA_NAME, dataName, Constants.MAX_NAME_LENGTH, "The name of the new Data Object is invalid.");
                     break;
                 case UPDATE:
-                    checkNotNullAndValidId(errors, Constants.FIELD_DATA_ID, dataId, "The Data Id is missing or invalid.");
+                    checkNotNullAndValidId(errors, Constants.FIELD_DATA_ID, dataId, "The Data Id to update is missing or invalid.");
                     checkValidId(errors, Constants.FIELD_FOLDER_ID, folderId, "The Folder Id is invalid.");
                     checkNotTooLong(errors, Constants.FIELD_DATA_NAME, dataName, Constants.MAX_NAME_LENGTH, "The new name of the Data Object is invalid.");
                     break;
+                case COPY:
+                    checkNotNullAndValidId(errors, Constants.FIELD_DATA_ID, dataId, "The Data Id to copy is missing or invalid.");
+                    checkNotNullAndValidId(errors, Constants.FIELD_TARGET_CIRCLE_ID, targetCircleId, "The target Circle Id is missing or invalid.");
+                    checkValidId(errors, Constants.FIELD_TARGET_FOLDER_ID, targetFolderId, "The target Folder Id is invalid.");
+                    break;
+                case MOVE:
+                    checkNotNullAndValidId(errors, Constants.FIELD_DATA_ID, dataId, "The Data Id to move is missing or invalid.");
+                    checkNotNullAndValidId(errors, Constants.FIELD_TARGET_CIRCLE_ID, targetCircleId, "The target Circle Id is missing or invalid.");
+                    checkValidId(errors, Constants.FIELD_TARGET_FOLDER_ID, targetFolderId, "The target Folder Id is invalid.");
+                    break;
                 case DELETE:
-                    checkNotNullAndValidId(errors, Constants.FIELD_DATA_ID, dataId, "The Id is missing or invalid.");
+                    checkNotNullAndValidId(errors, Constants.FIELD_DATA_ID, dataId, "The Data Id to delete is missing or invalid.");
                     break;
                 default:
                     errors.put(Constants.FIELD_ACTION, "Not supported Action has been provided.");

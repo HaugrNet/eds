@@ -12,6 +12,7 @@ package io.javadog.cws.core.services;
 
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
+import io.javadog.cws.api.common.TrustLevel;
 import io.javadog.cws.api.common.Utilities;
 import io.javadog.cws.api.requests.ProcessDataRequest;
 import io.javadog.cws.api.responses.ProcessDataResponse;
@@ -31,7 +32,9 @@ import io.javadog.cws.core.model.entities.TrusteeEntity;
 
 import javax.persistence.EntityManager;
 import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -67,6 +70,12 @@ public final class ProcessDataService extends Serviceable<DataDao, ProcessDataRe
             case UPDATE:
                 response = processUpdateData(request);
                 break;
+            case COPY:
+                response = processCopyData(request);
+                break;
+            case MOVE:
+                response = processMoveData(request);
+                break;
             case DELETE:
                 response = processDeleteData(request);
                 break;
@@ -80,7 +89,7 @@ public final class ProcessDataService extends Serviceable<DataDao, ProcessDataRe
 
     private ProcessDataResponse processAddData(final ProcessDataRequest request) {
         final DataTypeEntity type = findDataType(request.getTypeName());
-        final MetadataEntity parent = findParent(request);
+        final MetadataEntity parent = findParent(request.getCircleId(), request.getFolderId());
         final MetadataEntity existingName = dao.findInFolder(member, parent.getId(), request.getDataName());
         final ProcessDataResponse response;
 
@@ -90,31 +99,13 @@ public final class ProcessDataService extends Serviceable<DataDao, ProcessDataRe
 
             if (Objects.equals(Constants.FOLDER_TYPENAME, type.getName())) {
                 response = createFolder(trustee, request);
-            } else if (bytes != null) {
-                final MetadataEntity metadataEntity = createMetadataEntity(trustee, type, parent.getId(), request.getDataName());
-                final KeyEntity keyEntity = trustee.getKey();
-                final KeyAlgorithm algorithm = keyEntity.getAlgorithm();
-
-                final SecretCWSKey circleKey = crypto.extractCircleKey(algorithm, keyPair.getPrivate(), trustee.getCircleKey());
-                final String salt = UUID.randomUUID().toString();
-                circleKey.setSalt(new IVSalt(salt));
-
-                final DataEntity dataEntity = new DataEntity();
-                dataEntity.setMetadata(metadataEntity);
-                dataEntity.setKey(keyEntity);
-                dataEntity.setData(crypto.encrypt(circleKey, bytes));
-                dataEntity.setInitialVector(crypto.encryptWithMasterKey(salt));
-                dataEntity.setChecksum(crypto.generateChecksum(dataEntity.getData()));
-                dataEntity.setSanityStatus(SanityStatus.OK);
-                dataEntity.setSanityChecked(Utilities.newDate());
-
-                dao.persist(dataEntity);
-                response = new ProcessDataResponse();
-                response.setDataId(metadataEntity.getExternalId());
             } else {
-                final MetadataEntity metadataEntity = createMetadataEntity(trustee, type, parent.getId(), request.getDataName());
-                response = new ProcessDataResponse();
-                response.setDataId(metadataEntity.getExternalId());
+                final MetadataEntity metadataEntity = createMetadata(trustee, request.getDataName(), parent.getId(), type);
+                if (bytes != null) {
+                    createDataEntity(trustee, metadataEntity, bytes);
+                }
+
+                response = buildProcessDataResponse(metadataEntity.getExternalId());
             }
         } else {
             response = new ProcessDataResponse(ReturnCode.IDENTIFICATION_WARNING, "Another record with the same name already exists.");
@@ -145,11 +136,34 @@ public final class ProcessDataService extends Serviceable<DataDao, ProcessDataRe
             entity.setParentId(folderId);
             dao.persist(entity);
 
-            response = new ProcessDataResponse();
-            response.setDataId(entity.getExternalId());
+            response = buildProcessDataResponse(entity.getExternalId());
         } else {
             response = new ProcessDataResponse(ReturnCode.IDENTIFICATION_WARNING, "The requested Data Object could not be found.");
         }
+
+        return response;
+    }
+
+    private ProcessDataResponse processCopyData(final ProcessDataRequest request) {
+        final TrusteeEntity targetTrustee = findTargetTrustee(request.getTargetCircleId());
+        final MetadataEntity metadataEntity = findMetadataEntity(request.getDataId());
+        final String externalDataId = copyDataToTargetCircle(targetTrustee, metadataEntity, request);
+
+        return buildProcessDataResponse(externalDataId);
+    }
+
+    private ProcessDataResponse processMoveData(final ProcessDataRequest request) {
+        final TrusteeEntity targetTrustee = findTargetTrustee(request.getTargetCircleId());
+        final MetadataEntity metadataEntity = findMetadataEntity(request.getDataId());
+        final String externalDataId = copyDataToTargetCircle(targetTrustee, metadataEntity, request);
+        dao.delete(metadataEntity);
+
+        return buildProcessDataResponse(externalDataId);
+    }
+
+    private static ProcessDataResponse buildProcessDataResponse(final String externalDataId) {
+        final ProcessDataResponse response = new ProcessDataResponse();
+        response.setDataId(externalDataId);
 
         return response;
     }
@@ -184,6 +198,66 @@ public final class ProcessDataService extends Serviceable<DataDao, ProcessDataRe
         return response;
     }
 
+    private TrusteeEntity findTargetTrustee(final String externalCircleId) {
+        final TrusteeEntity trustee = dao.findTrusteeByCircleAndMember(externalCircleId, member.getExternalId());
+        if (trustee == null) {
+            throw new CWSException(ReturnCode.IDENTIFICATION_WARNING, "The member has no trustee relationship with the target Circle '" + externalCircleId + "'.");
+        }
+
+        final Set<TrustLevel> trustLevels = EnumSet.of(TrustLevel.ADMIN, TrustLevel.WRITE);
+        if (!trustLevels.contains(trustee.getTrustLevel())) {
+            throw new CWSException(ReturnCode.AUTHORIZATION_WARNING, "Member is not permitted to perform this action for the target Circle.");
+        }
+
+        return trustee;
+    }
+
+    private MetadataEntity findMetadataEntity(final String externalDataId) {
+        final MetadataEntity entity = dao.findMetaDataByMemberAndExternalId(member.getId(), externalDataId);
+        if (entity == null) {
+            throw new CWSException(ReturnCode.IDENTIFICATION_WARNING, "No data could be found for the given Data Id '" + externalDataId + "'.");
+        }
+        if (Objects.equals(Constants.FOLDER_TYPENAME, entity.getType().getName())) {
+            throw new CWSException(ReturnCode.ILLEGAL_ACTION, "It is not permitted to copy or move folders.");
+        }
+
+        return entity;
+    }
+
+    private String copyDataToTargetCircle(final TrusteeEntity trustee, final MetadataEntity oldMetadataEntity, final ProcessDataRequest request) {
+        final MetadataEntity folder = findParent(request.getTargetCircleId(), request.getTargetFolderId());
+        final MetadataEntity metadataEntity = createMetadata(trustee, oldMetadataEntity.getName(), folder.getId(), oldMetadataEntity.getType());
+        final DataEntity dataEntity = dao.findDataByMemberAndExternalId(member, oldMetadataEntity.getExternalId());
+        if (dataEntity != null) {
+            final byte[] bytes = decryptData(dataEntity);
+            createDataEntity(trustee, metadataEntity, bytes);
+        }
+
+        return metadataEntity.getExternalId();
+    }
+
+    private void createDataEntity(final TrusteeEntity trustee, final MetadataEntity metadataEntity, final byte[] bytes) {
+        final KeyEntity keyEntity = trustee.getKey();
+        final KeyAlgorithm algorithm = keyEntity.getAlgorithm();
+        final SecretCWSKey key = crypto.extractCircleKey(algorithm, keyPair.getPrivate(), trustee.getCircleKey());
+        key.setSalt(new IVSalt());
+
+        final String armored = key.getSalt().getArmored();
+        final DataEntity dataEntity = new DataEntity();
+        dataEntity.setMetadata(metadataEntity);
+        dataEntity.setKey(keyEntity);
+        dataEntity.setData(crypto.encrypt(key, bytes));
+        dataEntity.setInitialVector(crypto.encryptWithMasterKey(armored));
+        dataEntity.setChecksum(crypto.generateChecksum(dataEntity.getData()));
+        dataEntity.setSanityStatus(SanityStatus.OK);
+        dataEntity.setSanityChecked(Utilities.newDate());
+        dao.persist(dataEntity);
+
+        // Actively overwrite the raw Object bytes, so it no longer
+        // can be read unencrypted.
+        Arrays.fill(bytes, (byte) 0);
+    }
+
     private DataTypeEntity findDataType(final String typeName) {
         DataTypeEntity entity = null;
 
@@ -201,34 +275,23 @@ public final class ProcessDataService extends Serviceable<DataDao, ProcessDataRe
         return entity;
     }
 
-    private MetadataEntity createMetadataEntity(final TrusteeEntity trustee, final DataTypeEntity type, final Long parentId, final String name) {
-        final MetadataEntity entity = new MetadataEntity();
-        entity.setCircle(trustee.getCircle());
-        entity.setName(name);
-        entity.setParentId(parentId);
-        entity.setType(type);
-        dao.persist(entity);
-
-        return entity;
-    }
-
-    private MetadataEntity findParent(final ProcessDataRequest request) {
+    private MetadataEntity findParent(final String circleId, final String folderId) {
         final MetadataEntity entity;
 
-        if (request.getFolderId() != null) {
-            entity = dao.findMetaDataByMemberAndExternalId(member.getId(), request.getFolderId());
+        if (folderId != null) {
+            entity = dao.findMetaDataByMemberAndExternalId(member.getId(), folderId);
             if ((entity == null) || !Objects.equals(Constants.FOLDER_TYPENAME, entity.getType().getName())) {
-                throw new CWSException(ReturnCode.IDENTIFICATION_WARNING, "Provided FolderId is not a folder.");
+                throw new CWSException(ReturnCode.IDENTIFICATION_WARNING, "Provided FolderId '" + folderId + "' is not a folder.");
             }
         } else {
-            entity = dao.findRootByMemberCircle(member.getId(), request.getCircleId());
+            entity = dao.findRootByMemberCircle(member.getId(), circleId);
         }
 
         return entity;
     }
 
     private ProcessDataResponse createFolder(final TrusteeEntity trustee, final ProcessDataRequest request) {
-        final MetadataEntity parent = findParent(request);
+        final MetadataEntity parent = findParent(request.getCircleId(), request.getFolderId());
         final DataTypeEntity folderType = dao.findDataTypeByName(Constants.FOLDER_TYPENAME);
         final MetadataEntity folder = createMetadata(trustee, request.getDataName(), parent.getId(), folderType);
 

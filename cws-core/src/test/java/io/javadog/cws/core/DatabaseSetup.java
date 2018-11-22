@@ -10,9 +10,12 @@ package io.javadog.cws.core;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.hasProperty;
 
+import io.javadog.cws.api.common.Action;
+import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.CredentialType;
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.requests.Authentication;
+import io.javadog.cws.api.requests.ProcessDataRequest;
 import io.javadog.cws.api.responses.ProcessDataResponse;
 import io.javadog.cws.core.enums.KeyAlgorithm;
 import io.javadog.cws.core.enums.MemberRole;
@@ -43,6 +46,7 @@ import javax.persistence.Query;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.security.SecureRandom;
 import java.text.SimpleDateFormat;
@@ -153,15 +157,24 @@ public class DatabaseSetup {
         return entity;
     }
 
+    protected static ProcessDataRequest prepareAddDataRequest(final String account, final String circleId, final String dataName, final int bytes) {
+        final ProcessDataRequest request = prepareRequest(ProcessDataRequest.class, account);
+        request.setAction(Action.ADD);
+        request.setCircleId(circleId);
+        request.setDataName(dataName);
+        request.setTypeName(Constants.DATA_TYPENAME);
+        request.setData(generateData(bytes));
+
+        return request;
+    }
+
     protected static byte[] generateData(final int bytes) {
-        final byte[] data;
+        byte[] data = null;
 
         if (bytes > 0) {
             data = new byte[bytes];
             final SecureRandom random = new SecureRandom();
             random.nextBytes(data);
-        } else {
-            data = null;
         }
 
         return data;
@@ -293,5 +306,21 @@ public class DatabaseSetup {
         entity.setSanityStatus(status);
         entity.setSanityChecked(sanityCheck);
         entityManager.persist(entity);
+    }
+
+    protected static void setField(final Object instance, final String fieldName, final Object value) {
+        try {
+            final Class<?> clazz = instance.getClass();
+            final Field field;
+
+            field = clazz.getDeclaredField(fieldName);
+            final boolean accessible = field.isAccessible();
+
+            field.setAccessible(true);
+            field.set(instance, value);
+            field.setAccessible(accessible);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            throw new CWSException(ReturnCode.ERROR, "Cannot set Field", e);
+        }
     }
 }

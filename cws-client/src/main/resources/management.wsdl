@@ -6,11 +6,11 @@
         name="management" targetNamespace="http://ws.cws.javadog.io/">
     <wsdl:documentation>
       Service: Cryptographic WebStore Management Service
-      Version: 1.0
+      Version: 1.1
       Owner: JavaDog.io
     </wsdl:documentation>
   <wsdl:types>
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://ws.cws.javadog.io/" elementFormDefault="unqualified" targetNamespace="http://ws.cws.javadog.io/" version="1.0">
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://ws.cws.javadog.io/" targetNamespace="http://ws.cws.javadog.io/" version="1.1">
 
   <xs:element name="fetchCircleRequest" type="tns:fetchCircleRequest"/>
 
@@ -506,6 +506,8 @@
       <xs:enumeration value="INVITE"/>
       <xs:enumeration value="DELETE"/>
       <xs:enumeration value="ADD"/>
+      <xs:enumeration value="COPY"/>
+      <xs:enumeration value="MOVE"/>
       <xs:enumeration value="ALTER"/>
       <xs:enumeration value="INVALIDATE"/>
       <xs:enumeration value="REMOVE"/>

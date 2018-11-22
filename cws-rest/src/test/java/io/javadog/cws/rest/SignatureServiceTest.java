@@ -14,6 +14,7 @@ import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.requests.FetchSignatureRequest;
 import io.javadog.cws.api.requests.SignRequest;
 import io.javadog.cws.api.requests.VerifyRequest;
+import io.javadog.cws.core.DatabaseSetup;
 import io.javadog.cws.core.ShareBean;
 import io.javadog.cws.core.exceptions.CWSException;
 import org.junit.Test;
@@ -25,7 +26,7 @@ import java.lang.reflect.InvocationTargetException;
  * @author Kim Jensen
  * @since  CWS 1.0
  */
-public final class SignatureServiceTest extends BeanSetup {
+public final class SignatureServiceTest extends DatabaseSetup {
 
     @Test
     public void testSign() {

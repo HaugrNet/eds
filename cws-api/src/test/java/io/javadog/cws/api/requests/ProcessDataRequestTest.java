@@ -28,8 +28,10 @@ public final class ProcessDataRequestTest {
     public void testClassflow() {
         final String dataId = UUID.randomUUID().toString();
         final String circleId = UUID.randomUUID().toString();
+        final String targetCircleId = UUID.randomUUID().toString();
         final String dataName = "Data Name";
         final String folderId = UUID.randomUUID().toString();
+        final String targetFolderId = UUID.randomUUID().toString();
         final String typeName = "The Type";
         final byte[] data = { (byte) 1, (byte) 2, (byte) 3, (byte) 4, (byte) 5 };
 
@@ -39,8 +41,10 @@ public final class ProcessDataRequestTest {
         request.setAction(Action.ADD);
         request.setDataId(dataId);
         request.setCircleId(circleId);
+        request.setTargetCircleId(targetCircleId);
         request.setDataName(dataName);
         request.setFolderId(folderId);
+        request.setTargetFolderId(targetFolderId);
         request.setTypeName(typeName);
         request.setData(data);
         final Map<String, String> errors = request.validate();
@@ -51,8 +55,10 @@ public final class ProcessDataRequestTest {
         assertThat(request.getAction(), is(Action.ADD));
         assertThat(request.getDataId(), is(dataId));
         assertThat(request.getCircleId(), is(circleId));
+        assertThat(request.getTargetCircleId(), is(targetCircleId));
         assertThat(request.getDataName(), is(dataName));
         assertThat(request.getFolderId(), is(folderId));
+        assertThat(request.getTargetFolderId(), is(targetFolderId));
         assertThat(request.getTypeName(), is(typeName));
         assertThat(request.getData(), is(data));
     }
@@ -137,9 +143,65 @@ public final class ProcessDataRequestTest {
 
         final Map<String, String> errors = request.validate();
         assertThat(errors.size(), is(3));
-        assertThat(errors.get(Constants.FIELD_DATA_ID), is("The Data Id is missing or invalid."));
+        assertThat(errors.get(Constants.FIELD_DATA_ID), is("The Data Id to update is missing or invalid."));
         assertThat(errors.get(Constants.FIELD_FOLDER_ID), is("The Folder Id is invalid."));
         assertThat(errors.get(Constants.FIELD_DATA_NAME), is("The new name of the Data Object is invalid."));
+    }
+
+    @Test
+    public void testActionCopy() {
+        final ProcessDataRequest request = new ProcessDataRequest();
+        request.setAccountName(Constants.ADMIN_ACCOUNT);
+        request.setCredential(TestUtilities.convert(Constants.ADMIN_ACCOUNT));
+        request.setDataId(UUID.randomUUID().toString());
+        request.setTargetCircleId(UUID.randomUUID().toString());
+        request.setTargetFolderId(UUID.randomUUID().toString());
+        request.setAction(Action.COPY);
+
+        final Map<String, String> errors = request.validate();
+        assertThat(errors.isEmpty(), is(true));
+    }
+
+    @Test
+    public void testActionCopyFail() {
+        final ProcessDataRequest request = new ProcessDataRequest();
+        request.setAccountName(Constants.ADMIN_ACCOUNT);
+        request.setCredential(TestUtilities.convert(Constants.ADMIN_ACCOUNT));
+        request.setDataId(null);
+        request.setAction(Action.COPY);
+
+        final Map<String, String> errors = request.validate();
+        assertThat(errors.size(), is(2));
+        assertThat(errors.get(Constants.FIELD_DATA_ID), is("The Data Id to copy is missing or invalid."));
+        assertThat(errors.get(Constants.FIELD_TARGET_CIRCLE_ID), is("The target Circle Id is missing or invalid."));
+    }
+
+    @Test
+    public void testActionMove() {
+        final ProcessDataRequest request = new ProcessDataRequest();
+        request.setAccountName(Constants.ADMIN_ACCOUNT);
+        request.setCredential(TestUtilities.convert(Constants.ADMIN_ACCOUNT));
+        request.setDataId(UUID.randomUUID().toString());
+        request.setTargetCircleId(UUID.randomUUID().toString());
+        request.setTargetFolderId(UUID.randomUUID().toString());
+        request.setAction(Action.MOVE);
+
+        final Map<String, String> errors = request.validate();
+        assertThat(errors.isEmpty(), is(true));
+    }
+
+    @Test
+    public void testActionMoveFail() {
+        final ProcessDataRequest request = new ProcessDataRequest();
+        request.setAccountName(Constants.ADMIN_ACCOUNT);
+        request.setCredential(TestUtilities.convert(Constants.ADMIN_ACCOUNT));
+        request.setDataId(null);
+        request.setAction(Action.MOVE);
+
+        final Map<String, String> errors = request.validate();
+        assertThat(errors.size(), is(2));
+        assertThat(errors.get(Constants.FIELD_DATA_ID), is("The Data Id to move is missing or invalid."));
+        assertThat(errors.get(Constants.FIELD_TARGET_CIRCLE_ID), is("The target Circle Id is missing or invalid."));
     }
 
     @Test
@@ -164,6 +226,6 @@ public final class ProcessDataRequestTest {
 
         final Map<String, String> errors = request.validate();
         assertThat(errors.size(), is(1));
-        assertThat(errors.get(Constants.FIELD_DATA_ID), is("The Id is missing or invalid."));
+        assertThat(errors.get(Constants.FIELD_DATA_ID), is("The Data Id to delete is missing or invalid."));
     }
 }

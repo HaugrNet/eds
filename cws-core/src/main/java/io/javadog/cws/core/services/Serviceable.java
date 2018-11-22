@@ -298,6 +298,15 @@ public abstract class Serviceable<D extends CommonDao, R extends CwsResponse, V 
         return crypto.extractCircleKey(entity.getKey().getAlgorithm(), keyPair.getPrivate(), trustee.getCircleKey());
     }
 
+    protected byte[] decryptData(final DataEntity entity) {
+        final String armoredSalt = crypto.decryptWithMasterKey(entity.getInitialVector());
+        final SecretCWSKey key = extractCircleKey(entity);
+        final IVSalt salt = new IVSalt(armoredSalt);
+        key.setSalt(salt);
+
+        return crypto.decrypt(key, entity.getData());
+    }
+
     protected final byte[] encryptExternalKey(final SecretCWSKey circleKey, final String externalKey) {
         byte[] encryptedKey = null;
 

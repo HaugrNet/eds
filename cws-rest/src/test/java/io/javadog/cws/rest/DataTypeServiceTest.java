@@ -13,6 +13,7 @@ import static org.junit.Assert.assertThat;
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.requests.FetchDataTypeRequest;
 import io.javadog.cws.api.requests.ProcessDataTypeRequest;
+import io.javadog.cws.core.DatabaseSetup;
 import io.javadog.cws.core.ShareBean;
 import io.javadog.cws.core.exceptions.CWSException;
 import org.junit.Test;
@@ -24,7 +25,7 @@ import java.lang.reflect.InvocationTargetException;
  * @author Kim Jensen
  * @since  CWS 1.0
  */
-public final class DataTypeServiceTest extends BeanSetup {
+public final class DataTypeServiceTest extends DatabaseSetup {
 
     @Test
     public void testProcess() {

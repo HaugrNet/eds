@@ -13,6 +13,7 @@ import static org.junit.Assert.assertThat;
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.requests.MasterKeyRequest;
+import io.javadog.cws.core.DatabaseSetup;
 import io.javadog.cws.core.ManagementBean;
 import io.javadog.cws.core.exceptions.CWSException;
 import org.junit.Test;
@@ -24,7 +25,7 @@ import java.lang.reflect.InvocationTargetException;
  * @author Kim Jensen
  * @since  CWS 1.0
  */
-public final class MasterKeyServiceTest extends BeanSetup {
+public final class MasterKeyServiceTest extends DatabaseSetup {
 
     @Test
     public void testMasterKey() {

@@ -61,6 +61,18 @@ public enum Action {
     ADD,
 
     /**
+     * <p>This Action allows someone who have write-access to a Circle, to copy
+     * a Data Object to another Circle, where they have write access.</p>
+     */
+    COPY,
+
+    /**
+     * <p>This Action allows someone who have write-access to a Circle, to move
+     * a Data Object to another Circle, where they have write access.</p>
+     */
+    MOVE,
+
+    /**
      * <p>This Action Alters a Trustee's relation to a Circle, which means
      * change the Trust Level. If invoked by the System Administrator, then it
      * can only be used to alter the TrustLevel, not to grant access to the

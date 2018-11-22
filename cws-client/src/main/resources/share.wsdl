@@ -5,11 +5,11 @@
                   name="share" targetNamespace="http://ws.cws.javadog.io/">
     <wsdl:documentation>
       Service: Cryptographic WebStore Share Service
-      Version: 1.0
+      Version: 1.1
       Owner: JavaDog.io
     </wsdl:documentation>
   <wsdl:types>
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://ws.cws.javadog.io/" targetNamespace="http://ws.cws.javadog.io/" version="1.0">
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://ws.cws.javadog.io/" targetNamespace="http://ws.cws.javadog.io/" version="1.1">
 
   <xs:element name="fetchData" type="tns:fetchData"/>
 
@@ -80,8 +80,10 @@
           <xs:element name="action" type="tns:action"/>
           <xs:element minOccurs="0" name="dataId" type="xs:string"/>
           <xs:element minOccurs="0" name="circleId" type="xs:string"/>
+          <xs:element minOccurs="0" name="targetCircleId" type="xs:string"/>
           <xs:element minOccurs="0" name="dataName" type="xs:string"/>
           <xs:element minOccurs="0" name="folderId" type="xs:string"/>
+          <xs:element minOccurs="0" name="targetFolderId" type="xs:string"/>
           <xs:element minOccurs="0" name="typeName" type="xs:string"/>
           <xs:element minOccurs="0" name="data" type="xs:base64Binary"/>
         </xs:sequence>
@@ -361,6 +363,8 @@
       <xs:enumeration value="INVITE"/>
       <xs:enumeration value="DELETE"/>
       <xs:enumeration value="ADD"/>
+      <xs:enumeration value="COPY"/>
+      <xs:enumeration value="MOVE"/>
       <xs:enumeration value="ALTER"/>
       <xs:enumeration value="INVALIDATE"/>
       <xs:enumeration value="REMOVE"/>

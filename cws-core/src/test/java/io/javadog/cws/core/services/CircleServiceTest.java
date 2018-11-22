@@ -30,7 +30,6 @@ import io.javadog.cws.core.exceptions.VerificationException;
 import io.javadog.cws.core.model.Settings;
 import org.junit.Test;
 
-import java.util.Arrays;
 import java.util.UUID;
 
 /**
@@ -85,12 +84,14 @@ public final class CircleServiceTest extends DatabaseSetup {
         final ProcessCircleResponse createResponse = processService.perform(createRequest);
         assertThat(createResponse.isOk(), is(true));
 
+        final byte[] bytes = generateData(512);
+        final String data = crypto.bytesToString(bytes);
         final ProcessDataService processDataService = new ProcessDataService(settings, entityManager);
         final ProcessDataRequest addRequest = prepareRequest(ProcessDataRequest.class, MEMBER_5);
         addRequest.setAction(Action.ADD);
         addRequest.setCircleId(createResponse.getCircleId());
         addRequest.setDataName("My Data Object");
-        addRequest.setData(generateData(512));
+        addRequest.setData(bytes);
         final ProcessDataResponse processDataResponse = processDataService.perform(addRequest);
         assertThat(processDataResponse.isOk(), is(true));
 
@@ -110,7 +111,7 @@ public final class CircleServiceTest extends DatabaseSetup {
         assertThat(dataFileResponse.isOk(), is(true));
         assertThat(dataFileResponse.getMetadata().size(), is(1));
         assertThat(dataFileResponse.getMetadata().get(0).getDataName(), is("My Data Object"));
-        assertThat(Arrays.equals(dataFileResponse.getData(), addRequest.getData()), is(true));
+        assertThat(crypto.bytesToString(dataFileResponse.getData()), is(data));
     }
 
     @Test

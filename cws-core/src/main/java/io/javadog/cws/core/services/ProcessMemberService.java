@@ -31,8 +31,11 @@ import io.javadog.cws.core.model.entities.TrusteeEntity;
 
 import javax.persistence.EntityManager;
 import java.security.PublicKey;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.Base64;
+import java.util.Date;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
@@ -69,33 +72,46 @@ public final class ProcessMemberService extends Serviceable<MemberDao, ProcessMe
                 // Pre-checks, & destruction of credentials
                 verifyRequest(request, Permission.PROCESS_MEMBER);
                 Arrays.fill(request.getCredential(), (byte) 0);
-
-                switch (request.getAction()) {
-                    case CREATE:
-                        response = createMember(request);
-                        break;
-                    case INVITE:
-                        response = inviteMember(request);
-                        break;
-                    case UPDATE:
-                        response = processSelf(request);
-                        break;
-                    case INVALIDATE:
-                        response = invalidate(request);
-                        break;
-                    case DELETE:
-                        response = deleteMember(request);
-                        break;
-                    default:
-                        // Unreachable Code by design.
-                        throw new CWSException(ReturnCode.ILLEGAL_ACTION, "Unsupported Action.");
-                }
+                response = processActions(request);
             }
 
             return response;
         } else {
             throw new VerificationException("Cannot Process a NULL Object.");
         }
+    }
+
+    private ProcessMemberResponse processActions(final ProcessMemberRequest request) {
+        final ProcessMemberResponse response;
+
+        switch (request.getAction()) {
+            case CREATE:
+                response = createMember(request);
+                break;
+            case INVITE:
+                response = inviteMember(request);
+                break;
+            case LOGIN:
+                response = loginMember(request);
+                break;
+            case LOGOUT:
+                response = logoutMember();
+                break;
+            case UPDATE:
+                response = processSelf(request);
+                break;
+            case INVALIDATE:
+                response = invalidate(request);
+                break;
+            case DELETE:
+                response = deleteMember(request);
+                break;
+            default:
+                // Unreachable Code by design.
+                throw new CWSException(ReturnCode.ILLEGAL_ACTION, "Unsupported Action.");
+        }
+
+        return response;
     }
 
     private ProcessMemberResponse createMember(final ProcessMemberRequest request) {
@@ -156,6 +172,51 @@ public final class ProcessMemberService extends Serviceable<MemberDao, ProcessMe
         return response;
     }
 
+    private ProcessMemberResponse loginMember(final ProcessMemberRequest request) {
+        // Step 1; Based on the Session Key, we're building an encrypted file,
+        // which again will be used as the base for both the check sums and the
+        // PBE based key to encrypt the Member's private key.
+        final byte[] rawSessionKey = request.getNewCredential();
+        final byte[] masterEncrypted = crypto.encryptWithMasterKey(rawSessionKey);
+        // Done with the sessionKey, destroy in memory, so the Garbage Collector
+        // can later clean it up, this way, it should be harder for a hacker to
+        // extract it from memory.
+        Arrays.fill(rawSessionKey, (byte) 0);
+
+        // Now to the exciting part, the Salt is taken from the Member, and used
+        // to generate a new PBE based Symmetric Key, which again is used to
+        // encrypt the already encrypted SessionKey. This making it a but more
+        // challenging to extract the information, if there is no access to the
+        // MasterKey.
+        final String salt = crypto.decryptWithMasterKey(member.getSalt());
+        final SecretCWSKey key = crypto.generatePasswordKey(member.getPbeAlgorithm(), masterEncrypted, salt);
+        final String privateKey = crypto.armoringPrivateKey(key, keyPair.getPrivate().getKey());
+        final String checksum = crypto.generateChecksum(masterEncrypted);
+
+        member.setSessionChecksum(checksum);
+        member.setSessionCrypto(privateKey);
+        member.setSessionExpire(calculateSessionExpiration());
+        dao.persist(member);
+
+        // Key's no longer being used, must be destroyed.
+        key.destroy();
+
+        return new ProcessMemberResponse();
+    }
+
+    private Date calculateSessionExpiration() {
+        return Date.from(LocalDateTime
+                .now()
+                .plusMinutes(settings.getSessionTimeout())
+                .atZone(ZoneId.systemDefault())
+                .toInstant());
+    }
+
+    private ProcessMemberResponse logoutMember() {
+        dao.removeSession(member);
+        return new ProcessMemberResponse();
+    }
+
     private ProcessMemberResponse processSelf(final ProcessMemberRequest request) {
         final ProcessMemberResponse response = new ProcessMemberResponse();
         final String newAccountName = trim(request.getNewAccountName());
@@ -175,8 +236,10 @@ public final class ProcessMemberService extends Serviceable<MemberDao, ProcessMe
             }
         }
 
-        if (request.getNewCredential() != null) {
-            final CWSKeyPair pair = updateMemberPassword(member, request.getNewCredential());
+        final byte[] credential = request.getNewCredential();
+        if (credential != null) {
+            final CWSKeyPair pair = updateMemberPassword(member, credential);
+            Arrays.fill(credential, (byte) 0);
 
             final List<TrusteeEntity> list = dao.findTrusteesByMember(member, EnumSet.allOf(TrustLevel.class));
             for (final TrusteeEntity trustee : list) {
@@ -216,6 +279,7 @@ public final class ProcessMemberService extends Serviceable<MemberDao, ProcessMe
         if (member.getMemberRole() == MemberRole.ADMIN) {
             response = new ProcessMemberResponse(ReturnCode.ILLEGAL_ACTION, "The System Administrator Account may not be invalidated.");
         } else {
+            dao.removeSession(member);
             updateMemberPassword(member, request.getCredential());
 
             response = new ProcessMemberResponse();

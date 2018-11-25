@@ -8,6 +8,13 @@ BEGIN;
 -- First feature release, CWS 1.1.x results requires an update of the DB
 INSERT INTO cws_versions(schema_version, cws_version, db_vendor) VALUES (2, '1.1.0', 'PostgreSQL');
 
+-- Support for Sessions, is the most important add-on for CWS 1.1. It requires
+-- that the Members table is extended with 3 new fields:
+ALTER TABLE cws_members ADD COLUMN session_checksum VARCHAR(256);
+ALTER TABLE cws_members ADD COLUMN session_crypto   VARCHAR(16384);
+ALTER TABLE cws_members ADD COLUMN session_expire   TIMESTAMP;
+ALTER TABLE cws_members ADD CONSTRAINT member_unique_session_checksum UNIQUE (session_checksum);
+
 -- To prevent full-table scans on users and circles, a case-insensitive indexing
 -- is needed, however that won't work directly. Hence, a lowercase index is
 -- added to the names, which is used for searches.

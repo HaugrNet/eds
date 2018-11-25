@@ -40,6 +40,19 @@ public enum CredentialType {
     PASSPHRASE,
 
     /**
+     * <p>For websites, where members have a session, this can be added to the
+     * CWS for convenience - and also to prevent that a member must continuously
+     * provide the login credentials. It also helps preventing that websites
+     * have to store users credentials alongside a session. Sessions have a
+     * pre-defined maximum life-time, after which a Session is considered dead
+     * and attempts to use it after this point will lead to a user error.</p>
+     *
+     * <p>If a session is used, then the credentials will hold the user session
+     * while the accountName is omitted.</p>
+     */
+    SESSION,
+
+    /**
      * If the Signature is chosen, it is because a Member has been invited to
      * create their own Account. The Signature is provided by the System
      * Administrator to the potential Member, who can then create the Account

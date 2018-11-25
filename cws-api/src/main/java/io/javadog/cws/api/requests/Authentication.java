@@ -91,10 +91,22 @@ public class Authentication extends Verifiable {
     public Map<String, String> validate() {
         final Map<String, String> errors = new ConcurrentHashMap<>();
 
-        checkNotNullEmptyOrTooLong(errors, Constants.FIELD_ACCOUNT_NAME, accountName, Constants.MAX_NAME_LENGTH, "AccountName is missing, null or invalid.");
-        checkNotNullOrEmpty(errors, Constants.FIELD_CREDENTIAL, credential, "The Credential is missing.");
-        if (credentialType == null) {
-            credentialType = CredentialType.PASSPHRASE;
+        // If the Credential Type is undefined, it will be set to the
+        // standard, which is Passphrase
+        credentialType = (credentialType == null) ? CredentialType.PASSPHRASE : credentialType;
+
+        switch (credentialType) {
+            case SESSION:
+                checkNotNullOrEmpty(errors, Constants.FIELD_CREDENTIAL, credential, "The Session (Credential) is missing.");
+                break;
+            case SIGNATURE:
+                checkNotNullEmptyOrTooLong(errors, Constants.FIELD_ACCOUNT_NAME, accountName, Constants.MAX_NAME_LENGTH, "AccountName is missing, null or invalid.");
+                checkNotNullOrEmpty(errors, Constants.FIELD_CREDENTIAL, credential, "The Credential is missing.");
+                break;
+            default:
+                checkNotNullEmptyOrTooLong(errors, Constants.FIELD_ACCOUNT_NAME, accountName, Constants.MAX_NAME_LENGTH, "AccountName is missing, null or invalid.");
+                checkNotNullOrEmpty(errors, Constants.FIELD_CREDENTIAL, credential, "The Credential is missing.");
+                credentialType = CredentialType.PASSPHRASE;
         }
 
         return errors;

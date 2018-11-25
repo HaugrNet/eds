@@ -95,6 +95,9 @@ public final class SettingsTest extends DatabaseSetup {
 
         mySettings.set(StandardSetting.SANITY_INTERVAL, "120");
         assertThat(mySettings.getSanityInterval(), is(120));
+
+        mySettings.set(StandardSetting.SESSION_TIMEOUT, "240");
+        assertThat(mySettings.getSessionTimeout(), is(240));
     }
 
     @Test

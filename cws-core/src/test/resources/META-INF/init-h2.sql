@@ -112,6 +112,15 @@ CREATE TABLE cws_settings (
 -- the entire Application Layer.
 --   The Member Role is giving a pointer towards what kinds of permissions that
 -- a member has, it can be either admin, standard, session or guest.
+--   Sessions are important for websites, where a user is logging in, and then
+-- just works with a session onwards. To better integrate CWS into websites, it
+-- is important CWS also supports Sessions. This is done by having 3 fields in
+-- this table, the session_checksum, which is generated using the MasterKey, and
+-- used to find the member account. Secondly, the member's private key encrypted
+-- using both a PBKDF2 symmetric key and the MasterKey. And finally, the expire
+-- flag, which is pre-calculated with the "login time" and the maximum life time
+-- of a session. So a Timed service can stop any existing sessions which have
+-- not been logged out.
 -- =============================================================================
 CREATE TABLE cws_members (
   id               INTEGER AUTO_INCREMENT,
@@ -124,6 +133,9 @@ CREATE TABLE cws_members (
   public_key       VARCHAR(3072),  -- Public Key, stored armored
   private_key      VARCHAR(16384), -- Private Key, stored encrypted & armored
   member_role      VARCHAR(10) DEFAULT 'STANDARD',
+  session_checksum VARCHAR(256),   -- MasterKey Checksum of the given Session
+  session_crypto   VARCHAR(16384), -- Private Key, stored encrypted & armored
+  session_expire   TIMESTAMP,      -- Time, when the Session expires
   altered          TIMESTAMP DEFAULT now(),
   added            TIMESTAMP DEFAULT now(),
 
@@ -134,6 +146,7 @@ CREATE TABLE cws_members (
   CONSTRAINT member_unique_external_id      UNIQUE (external_id),
   CONSTRAINT member_unique_name             UNIQUE (name),
   CONSTRAINT member_unique_salt             UNIQUE (salt),
+  CONSTRAINT member_unique_session_checksum UNIQUE (session_checksum),
 
   /* Not Null Constraints */
   CONSTRAINT member_notnull_id              CHECK (id IS NOT NULL),

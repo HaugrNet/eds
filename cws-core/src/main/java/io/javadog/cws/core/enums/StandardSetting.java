@@ -34,6 +34,7 @@ public enum StandardSetting {
     SHOW_TRUSTEES("cws.show.trustees", "true"),
     SANITY_STARTUP("cws.sanity.check.startup", "true"),
     SANITY_INTERVAL("cws.sanity.check.interval.days", "180"),
+    SESSION_TIMEOUT("cws.session.timeout.minutes", "480"),
     // The isReady setting is set by the StartUp bean, and thus not persisted.
     IS_READY("cws.is.ready", "true");
 

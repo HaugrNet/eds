@@ -129,10 +129,7 @@ public final class Crypto {
      * @return Extended secret as char array
      */
     private char[] convertSecret(final byte[] secret) {
-        final char[] secretChars = new char[secret.length];
-        for (int i = 0; i < secret.length; i++) {
-            secretChars[i] = (char) secret[i];
-        }
+        final char[] secretChars = generateSecretChars(secret);
 
         final char[] salt = settings.getSalt().toCharArray();
         final char[] chars = new char[secretChars.length + salt.length];
@@ -205,9 +202,13 @@ public final class Crypto {
         }
     }
 
+    public byte[] encryptWithMasterKey(final byte[] toEncrypt) {
+        return encrypt(masterKey.getKey(), toEncrypt);
+    }
+
     public String encryptWithMasterKey(final String toEncrypt) {
         final byte[] bytes = stringToBytes(toEncrypt);
-        final byte[] encrypted = encrypt(masterKey.getKey(), bytes);
+        final byte[] encrypted = encryptWithMasterKey(bytes);
         return Base64.getEncoder().encodeToString(encrypted);
     }
 
@@ -251,6 +252,15 @@ public final class Crypto {
         } catch (ClassCastException | BadPaddingException | IllegalBlockSizeException | NoSuchPaddingException | NoSuchAlgorithmException | InvalidAlgorithmParameterException | InvalidKeyException e) {
             throw new CryptoException(e.getMessage(), e);
         }
+    }
+
+    public static char[] generateSecretChars(final byte[] secret) {
+        final char[] chars = new char[secret.length];
+        for (int i = 0; i < secret.length; i++) {
+            chars[i] = (char) secret[i];
+        }
+
+        return chars;
     }
 
     private static Cipher prepareCipher(final CWSKey<?> key, final int type) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException {

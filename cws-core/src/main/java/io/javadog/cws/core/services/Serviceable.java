@@ -11,8 +11,10 @@
 package io.javadog.cws.core.services;
 
 import io.javadog.cws.api.common.Constants;
+import io.javadog.cws.api.common.CredentialType;
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.common.TrustLevel;
+import io.javadog.cws.api.common.Utilities;
 import io.javadog.cws.api.dtos.Circle;
 import io.javadog.cws.api.requests.Authentication;
 import io.javadog.cws.api.requests.CircleIdRequest;
@@ -49,7 +51,7 @@ import java.util.Set;
  * @author Kim Jensen
  * @since  CWS 1.0
  */
-public abstract class Serviceable<D extends CommonDao, R extends CwsResponse, V extends Authentication> {
+public abstract class Serviceable<D extends CommonDao, R extends CwsResponse, A extends Authentication> {
 
     protected final Settings settings;
     protected final Crypto crypto;
@@ -77,7 +79,7 @@ public abstract class Serviceable<D extends CommonDao, R extends CwsResponse, V 
      * @return Response Object with the result of the processing
      * @throws RuntimeException if an unknown error occurred
      */
-    public abstract R perform(V request);
+    public abstract R perform(A request);
 
     /**
      * <p>To ensure that sensitive data (keys) have as short a lifespan in the
@@ -102,41 +104,60 @@ public abstract class Serviceable<D extends CommonDao, R extends CwsResponse, V 
      * properly authenticated or authorized for the request, an Exception is
      * thrown.</p>
      *
-     * @param verifiable Request Object to use for the checks
-     * @param action     The Action for the permission check
+     * @param authentication Request Object to use for the checks
+     * @param action         The Action for the permission check
      */
-    protected final void verifyRequest(final V verifiable, final Permission action) {
+    protected final void verifyRequest(final A authentication, final Permission action) {
         if (settings.isReady()) {
             // If available, let's extract the CircleId so it can be used to improve
             // accuracy of the checks and reduce the amount of data fetched from the
             // database in preparation to perform these checks.
             String circleId = null;
-            if (verifiable instanceof CircleIdRequest) {
-                circleId = ((CircleIdRequest) verifiable).getCircleId();
+            if (authentication instanceof CircleIdRequest) {
+                circleId = ((CircleIdRequest) authentication).getCircleId();
             }
 
             // Step 1; Verify if the given data is sufficient to complete the
             //         request. If not sufficient, no need to continue and involve
             //         the DB, so an Exception will be thrown.
-            verify(verifiable);
+            verify(authentication);
 
-            // Step 2; Find the Member by the given credentials, if nothing is
-            //         found, then no need to continue. Unless, the account not
-            //         found is the Administrator Account, in which case we will
-            //         add a new Account with the given Credentials.
-            //           Note; if the CircleId is already given, it will be used as
-            //         part of the lookup, thus limiting what is being searched and
-            //         also allow the checks to end earlier. However, equally
-            //         important, this check is a premature check and will *not*
-            //         count in the final Business Logic!
-            checkAccount(verifiable, circleId);
+            // Step 2; Authentication. This part is a bit more tricky, since CWS
+            //         supports that members can come in either with a username
+            //         and password or with a session.
+            if (authentication.getCredentialType() == CredentialType.SESSION) {
+                // 2.a Session Authentication. The same value (Session Key) is
+                //     used to both find the account and authenticate the
+                //     account. Hence, a special set of information is checked
+                //     as part of this process.
+                //       The verification of the Session will result in an
+                //     Exception, if the session has expired, cannot be found
+                //     or is not valid.
+                //       For valid sessions, the MasterKey has been used to
+                //     encrypt the SessionKey, before it is being used to unlock
+                //     the Member KeyPair. This is to prevent that a copy of the
+                //     database may result in someone being able to unlock the
+                //     Account details with just the SessionKey alone.
+                verifySession(authentication, circleId);
+            } else {
+                // 2.b Find the Member by the given credentials, if nothing is
+                //     found, then no need to continue. Unless, the account not
+                //     found is the Administrator Account, in which case we will
+                //     add a new Account with the given Credentials.
+                //       Note; if the CircleId is already given, it will be used
+                //     as part of the lookup, thus limiting what is being
+                //     searched and also allow the checks to end earlier.
+                //     However, equally important, this check is a premature
+                //     check and will *not* count in the final Business Logic!
+                checkAccount(authentication, circleId);
 
-            // Step 3; Check if the Member is valid, i.e. if the given Credentials
-            //         can correctly decrypt the Private Key for the Account. If
-            //         not, then an Exception is thrown.
-            checkCredentials(verifiable);
+                //     Check if the Member is valid, i.e. if the given
+                //     Credentials can correctly decrypt the Private Key for
+                //     the Account. If not, then an Exception is thrown.
+                checkCredentials(authentication.getCredential(), member.getPrivateKey());
+            }
 
-            // Step 4; Final check, ensure that the Member is having the correct
+            // Step 3; Final check, ensure that the Member is having the correct
             //         level of Access to any Circle - which doesn't necessarily
             //         mean to the requesting Circle, as it requires deeper
             //         checking.
@@ -183,11 +204,37 @@ public abstract class Serviceable<D extends CommonDao, R extends CwsResponse, V 
         }
     }
 
-    private void checkAccount(final V verifiable, final String circleId) {
+    private void verifySession(final A authentication, final String circleId) {
+        final byte[] masterEncrypted = crypto.encryptWithMasterKey(authentication.getCredential());
+        final String checksum = crypto.generateChecksum(masterEncrypted);
+        final MemberEntity memberEntity = dao.findMemberByChecksum(checksum);
+
+        if (memberEntity != null) {
+            if (Utilities.newDate().before(memberEntity.getSessionExpire())) {
+                checkCredentials(masterEncrypted, member.getSessionCrypto());
+            } else {
+                dao.removeSession(member);
+                throw new AuthenticationException("The Session has expired.");
+            }
+        } else {
+            throw new AuthenticationException("No Session could be found.");
+        }
+
+        // If the CircleId is present, find the Member Account, which matches it
+        // or throw an Exception if no match was found. If the CircleId is not
+        // present, use the found Member Entity.
+        if (circleId == null) {
+            member = memberEntity;
+        } else {
+            member = dao.findMemberByNameAndCircleId(memberEntity.getName(), circleId);
+        }
+    }
+
+    private void checkAccount(final A authentication, final String circleId) {
         // If the External Circle Id is given and the member is not the
         // Administrator (who cannot be part of a Circle), we will use
         // the CircleId in the checks.
-        final String account = trim(verifiable.getAccountName());
+        final String account = trim(authentication.getAccountName());
         if ((circleId != null) && !Objects.equals(account, Constants.ADMIN_ACCOUNT)) {
             member = dao.findMemberByNameAndCircleId(account, circleId);
         } else {
@@ -195,7 +242,7 @@ public abstract class Serviceable<D extends CommonDao, R extends CwsResponse, V 
 
             if (member == null) {
                 if (Objects.equals(Constants.ADMIN_ACCOUNT, account)) {
-                    member = createNewAccount(Constants.ADMIN_ACCOUNT, MemberRole.ADMIN, verifiable.getCredential());
+                    member = createNewAccount(Constants.ADMIN_ACCOUNT, MemberRole.ADMIN, authentication.getCredential());
                 } else {
                     throw new AuthenticationException("Could not uniquely identify an account for '" + account + "'.");
                 }
@@ -244,11 +291,11 @@ public abstract class Serviceable<D extends CommonDao, R extends CwsResponse, V 
         return pair;
     }
 
-    private void checkCredentials(final V verifiable) {
+    private void checkCredentials(final byte[] credential, final String armoredPrivateKey) {
         try {
             final String salt = crypto.decryptWithMasterKey(member.getSalt());
-            final SecretCWSKey key = crypto.generatePasswordKey(member.getPbeAlgorithm(), verifiable.getCredential(), salt);
-            keyPair = crypto.extractAsymmetricKey(member.getRsaAlgorithm(), key, salt, member.getPublicKey(), member.getPrivateKey());
+            final SecretCWSKey key = crypto.generatePasswordKey(member.getPbeAlgorithm(), credential, salt);
+            keyPair = crypto.extractAsymmetricKey(member.getRsaAlgorithm(), key, salt, member.getPublicKey(), armoredPrivateKey);
 
             // To ensure that the PBE key is no longer usable, we're destroying
             // it now.
@@ -259,7 +306,7 @@ public abstract class Serviceable<D extends CommonDao, R extends CwsResponse, V 
             // into a CWS Crypto Exception. If that is the case, the Member has
             // provided invalid credentials - with which it is not possible to
             // extract the KeyPair for the Account.
-            throw new AuthenticationException("Cannot authenticate the Account '" + verifiable.getAccountName() + "' from the given Credentials.", e);
+            throw new AuthenticationException("Cannot authenticate the Account from the given Credentials.", e);
         }
     }
 

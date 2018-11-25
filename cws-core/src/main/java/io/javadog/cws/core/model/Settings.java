@@ -176,6 +176,10 @@ public final class Settings {
         return Integer.valueOf(get(StandardSetting.SANITY_INTERVAL.getKey()).trim());
     }
 
+    public Integer getSessionTimeout() {
+        return Integer.valueOf(get(StandardSetting.SESSION_TIMEOUT.getKey()).trim());
+    }
+
     public Boolean isReady() {
         return Boolean.valueOf(get(StandardSetting.IS_READY.getKey()).trim());
     }

@@ -494,6 +494,7 @@
   <xs:simpleType name="credentialType">
     <xs:restriction base="xs:string">
       <xs:enumeration value="PASSPHRASE"/>
+      <xs:enumeration value="SESSION"/>
       <xs:enumeration value="SIGNATURE"/>
     </xs:restriction>
   </xs:simpleType>
@@ -504,6 +505,8 @@
       <xs:enumeration value="CREATE"/>
       <xs:enumeration value="UPDATE"/>
       <xs:enumeration value="INVITE"/>
+      <xs:enumeration value="LOGIN"/>
+      <xs:enumeration value="LOGOUT"/>
       <xs:enumeration value="DELETE"/>
       <xs:enumeration value="ADD"/>
       <xs:enumeration value="COPY"/>

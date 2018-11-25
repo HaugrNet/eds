@@ -50,6 +50,18 @@ public enum Action {
     INVITE,
 
     /**
+     * For creating a Session for an existing Account, the Login Action must be
+     * used.
+     */
+    LOGIN,
+
+    /**
+     * When a Session is no longer needed for an Account, the Logout Action must
+     * be used.
+     */
+    LOGOUT,
+
+    /**
      * <p>The Action Delete covers removal of records, which is a permanent
      * irreversible Action.</p>
      */

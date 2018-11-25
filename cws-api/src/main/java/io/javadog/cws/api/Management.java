@@ -218,6 +218,11 @@ public interface Management {
      *     interval, at which the sanity checks should be made. By default, it
      *     is set to 180 days but it can be altered if needed.</i>
      *   </li>
+     *   <li>
+     *     <b>cws.session.timeout.minutes</b> - default value: '480'<br>
+     *     Allowed Values: Any integer<br>
+     *     <i>The maximum amount of time a Session may be used.</i>
+     *   </li>
      * </ul>
      *
      * @param request Request Object
@@ -302,6 +307,8 @@ public interface Management {
      * following:</p>
      * <ul>
      *   <li>Add new Member</li>
+     *   <li>Login to link a Session temporarily with an Account</li>
+     *   <li>Logout to stop linking an Account with a Session</li>
      *   <li>Update existing Member</li>
      *   <li>Remove Member</li>
      * </ul>
@@ -315,6 +322,10 @@ public interface Management {
      * the System Administrator can issue a signed invitation to a potential
      * Member. If this is made, then the armoredKey, will contain a Signature,
      * rather than a Private Key in the Response.</p>
+     *
+     * <p><b>Login / Logout</b> <i>Linking and unlinking a Session with an
+     * Account. This is to help websites to use CWS without needing to store
+     * the Account credentials in an unsafe way.</i></p>
      *
      * <p><b>Update existing Member</b> <i>Updating an existing Member can only
      * be done by Members themselves. The information to update, is the

@@ -11,6 +11,7 @@
 package io.javadog.cws.core.model.entities;
 
 import io.javadog.cws.api.common.Constants;
+import io.javadog.cws.api.common.Utilities;
 import io.javadog.cws.core.enums.KeyAlgorithm;
 import io.javadog.cws.core.enums.MemberRole;
 
@@ -21,6 +22,9 @@ import javax.persistence.Enumerated;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import java.util.Date;
 
 /**
  * <p>CWS Member Entity, maps the Member table from the Database.</p>
@@ -37,6 +41,10 @@ import javax.persistence.Table;
                 query = "select m " +
                         "from MemberEntity m " +
                         "where m.name = :name"),
+        @NamedQuery(name = "member.findByChecksum",
+                query = "select m " +
+                        "from MemberEntity m " +
+                        "where m.sessionChecksum = :checksum"),
         @NamedQuery(name = "member.findByRole",
                 query = "select m " +
                         "from MemberEntity m " +
@@ -46,7 +54,13 @@ import javax.persistence.Table;
                 query = "select e.member " +
                         "from TrusteeEntity e " +
                         "where e.member.name = :name" +
-                        "  and e.circle.externalId = :externalCircleId")
+                        "  and e.circle.externalId = :externalCircleId"),
+        @NamedQuery(name = "member.removeExpiredSessions",
+                query = "update MemberEntity set" +
+                        "  sessionChecksum = null," +
+                        "  sessionCrypto = null," +
+                        "  sessionExpire = null " +
+                        "where sessionExpire > current_timestamp")
 })
 @Table(name = "cws_members")
 public class MemberEntity extends Externable {
@@ -77,6 +91,16 @@ public class MemberEntity extends Externable {
     @Enumerated(EnumType.STRING)
     @Column(name = "member_role", nullable = false, length = 10)
     private MemberRole memberRole = null;
+
+    @Column(name = "session_checksum", length = 256)
+    private String sessionChecksum = null;
+
+    @Column(name = "session_crypto", length = 16384)
+    private String sessionCrypto = null;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "session_expire")
+    private Date sessionExpire = null;
 
     // =========================================================================
     // Entity Setters & Getters
@@ -144,5 +168,29 @@ public class MemberEntity extends Externable {
 
     public MemberRole getMemberRole() {
         return memberRole;
+    }
+
+    public void setSessionChecksum(final String sessionChecksum) {
+        this.sessionChecksum = sessionChecksum;
+    }
+
+    public String getSessionChecksum() {
+        return sessionChecksum;
+    }
+
+    public void setSessionCrypto(final String sessionCrypto) {
+        this.sessionCrypto = sessionCrypto;
+    }
+
+    public String getSessionCrypto() {
+        return sessionCrypto;
+    }
+
+    public void setSessionExpire(final Date sessionExpire) {
+        this.sessionExpire = Utilities.copy(sessionExpire);
+    }
+
+    public Date getSessionExpire() {
+        return Utilities.copy(sessionExpire);
     }
 }

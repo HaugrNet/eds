@@ -61,6 +61,16 @@ public final class AuthenticationTest {
     }
 
     @Test
+    public void testSessionEmptyCredential() {
+        final Authentication authentication = new Authentication();
+        authentication.setCredentialType(CredentialType.SESSION);
+
+        final Map<String, String> errors = authentication.validate();
+        assertThat(errors.size(), is(1));
+        assertThat(errors.get(Constants.FIELD_CREDENTIAL), is("The Session (Credential) is missing."));
+    }
+
+    @Test
     public void testEmptyClassEmptyCredential() {
         final byte[] credential = CREDENTIAL;
         final Authentication authentication = new Authentication();

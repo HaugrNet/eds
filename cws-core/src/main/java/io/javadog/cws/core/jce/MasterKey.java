@@ -80,15 +80,12 @@ public final class MasterKey {
 
     public SecretCWSKey generateMasterKey(final byte[] secret) {
         try {
-            final char[] chars = new char[secret.length];
-            for (int i = 0; i < secret.length; i++) {
-                chars[i] = (char) secret[i];
-            }
+            final char[] secretChars = Crypto.generateSecretChars(secret);
 
             final String salt = settings.getSalt();
             final byte[] secretSalt = salt.getBytes(CHARSET);
             final SecretKeyFactory keyFactory = SecretKeyFactory.getInstance(ALGORITHM.getTransformationValue());
-            final KeySpec keySpec = new PBEKeySpec(chars, secretSalt, ITERATIONS, ALGORITHM.getLength());
+            final KeySpec keySpec = new PBEKeySpec(secretChars, secretSalt, ITERATIONS, ALGORITHM.getLength());
             final SecretKey tmp = keyFactory.generateSecret(keySpec);
             final SecretKey secretKey = new SecretKeySpec(tmp.getEncoded(), ALGORITHM.getName());
 

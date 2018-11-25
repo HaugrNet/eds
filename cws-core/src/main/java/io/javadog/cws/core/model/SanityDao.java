@@ -45,8 +45,7 @@ public final class SanityDao extends CommonDao {
         return findList(query);
     }
 
-    public List<DataEntity> findFailedRecords(final MemberEntity circleAdministrator,
-                                              final Date since) {
+    public List<DataEntity> findFailedRecords(final MemberEntity circleAdministrator, final Date since) {
         final Query query = entityManager.createNamedQuery("data.findAllWithStateForMember");
         query.setParameter(STATUS, SanityStatus.FAILED);
         query.setParameter(SINCE, since);
@@ -55,8 +54,7 @@ public final class SanityDao extends CommonDao {
         return findList(query);
     }
 
-    public List<DataEntity> findFailedRecords(final String circleId,
-                                              final Date since) {
+    public List<DataEntity> findFailedRecords(final String circleId, final Date since) {
         final Query query = entityManager.createNamedQuery("data.findAllWithStateForCircle");
         query.setParameter(STATUS, SanityStatus.FAILED);
         query.setParameter(SINCE, since);

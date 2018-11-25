@@ -52,7 +52,7 @@ public final class ServiceableTest extends DatabaseSetup {
 
     @Test
     public void testAccesWithInvalidPassword() {
-        prepareCause(AuthenticationException.class, ReturnCode.AUTHENTICATION_WARNING, "Cannot authenticate the Account 'admin' from the given Credentials.");
+        prepareCause(AuthenticationException.class, ReturnCode.AUTHENTICATION_WARNING, "Cannot authenticate the Account from the given Credentials.");
 
         final SettingService service = new SettingService(settings, entityManager);
         final SettingRequest request = new SettingRequest();
@@ -76,7 +76,7 @@ public final class ServiceableTest extends DatabaseSetup {
 
     @Test
     public void testAuthorizationWithInvalidCredentials() {
-        prepareCause(AuthenticationException.class, ReturnCode.AUTHENTICATION_WARNING, "Cannot authenticate the Account 'member5' from the given Credentials.");
+        prepareCause(AuthenticationException.class, ReturnCode.AUTHENTICATION_WARNING, "Cannot authenticate the Account from the given Credentials.");
 
         final FetchCircleService service = new FetchCircleService(settings, entityManager);
         final FetchCircleRequest request = prepareRequest(FetchCircleRequest.class, MEMBER_5);
@@ -88,7 +88,7 @@ public final class ServiceableTest extends DatabaseSetup {
 
     @Test
     public void testAuthorizationWithCredentialTypingMistake() {
-        prepareCause(AuthenticationException.class, ReturnCode.AUTHENTICATION_WARNING, "Cannot authenticate the Account 'member5' from the given Credentials.");
+        prepareCause(AuthenticationException.class, ReturnCode.AUTHENTICATION_WARNING, "Cannot authenticate the Account from the given Credentials.");
 
         final FetchCircleService service = new FetchCircleService(settings, entityManager);
         final FetchCircleRequest request = prepareRequest(FetchCircleRequest.class, MEMBER_5);

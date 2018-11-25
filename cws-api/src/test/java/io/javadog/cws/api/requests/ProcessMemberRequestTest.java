@@ -13,6 +13,7 @@ import static org.junit.Assert.assertThat;
 import io.javadog.cws.api.TestUtilities;
 import io.javadog.cws.api.common.Action;
 import io.javadog.cws.api.common.Constants;
+import io.javadog.cws.api.common.CredentialType;
 import org.junit.Test;
 
 import java.util.Map;
@@ -119,6 +120,53 @@ public final class ProcessMemberRequestTest {
         final Map<String, String> errors = request.validate();
         assertThat(errors.size(), is(1));
         assertThat(errors.get(Constants.FIELD_NEW_ACCOUNT_NAME), is("The New Account Name is missing."));
+    }
+
+    @Test
+    public void testActionLogin() {
+        final ProcessMemberRequest request = new ProcessMemberRequest();
+        request.setCredential(TestUtilities.convert(UUID.randomUUID().toString()));
+        request.setAccountName(Constants.ADMIN_ACCOUNT);
+        request.setCredential(TestUtilities.convert(Constants.ADMIN_ACCOUNT));
+        request.setNewCredential(TestUtilities.convert(UUID.randomUUID().toString()));
+        request.setAction(Action.LOGIN);
+
+        final Map<String, String> errors = request.validate();
+        assertThat(errors.isEmpty(), is(true));
+    }
+
+    @Test
+    public void testActionLoginFail() {
+        final ProcessMemberRequest request = new ProcessMemberRequest();
+        request.setAction(Action.LOGIN);
+
+        final Map<String, String> errors = request.validate();
+        assertThat(errors.size(), is(3));
+        assertThat(errors.get(Constants.FIELD_ACCOUNT_NAME), is("AccountName is missing, null or invalid."));
+        assertThat(errors.get(Constants.FIELD_CREDENTIAL), is("The Credential is missing."));
+        assertThat(errors.get(Constants.FIELD_NEW_CREDENTIAL), is("The Credentials are required to create new Session."));
+    }
+
+    @Test
+    public void testActionLogout() {
+        final ProcessMemberRequest request = new ProcessMemberRequest();
+        request.setCredential(TestUtilities.convert(Constants.ADMIN_ACCOUNT));
+        request.setCredentialType(CredentialType.SESSION);
+        request.setAction(Action.LOGOUT);
+
+        final Map<String, String> errors = request.validate();
+        assertThat(errors.isEmpty(), is(true));
+    }
+
+    @Test
+    public void testActionLogoutFail() {
+        final ProcessMemberRequest request = new ProcessMemberRequest();
+        request.setAction(Action.LOGOUT);
+
+        final Map<String, String> errors = request.validate();
+        assertThat(errors.size(), is(2));
+        assertThat(errors.get(Constants.FIELD_ACCOUNT_NAME), is("AccountName is missing, null or invalid."));
+        assertThat(errors.get(Constants.FIELD_CREDENTIAL), is("The Credential is missing."));
     }
 
     @Test

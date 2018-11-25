@@ -107,8 +107,7 @@ public class CommonDao {
      * @param <E>       The CWS Entity to use in the query
      * @return List of sorted records from the database
      */
-    public <E extends CWSEntity> List<E> findAllAscending(final Class<E> cwsEntity,
-                                                          final String orderBy) {
+    public <E extends CWSEntity> List<E> findAllAscending(final Class<E> cwsEntity, final String orderBy) {
         final CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         final CriteriaQuery<E> query = builder.createQuery(cwsEntity);
         final Root<E> entity = query.from(cwsEntity);
@@ -117,13 +116,20 @@ public class CommonDao {
         return findList(entityManager.createQuery(query));
     }
 
-    public <E extends CWSEntity> E getReference(final Class<E> cwsEntity,
-                                                final Long id) {
+    public <E extends CWSEntity> E getReference(final Class<E> cwsEntity, final Long id) {
         return entityManager.getReference(cwsEntity, id);
     }
 
     public <E extends CWSEntity> void delete(final E entity) {
         entityManager.remove(entity);
+    }
+
+    public void removeSession(final MemberEntity member) {
+        member.setSessionChecksum(null);
+        member.setSessionCrypto(null);
+        member.setSessionExpire(null);
+
+        persist(member);
     }
 
     public MemberEntity findMemberByName(final String name) {
@@ -138,6 +144,22 @@ public class CommonDao {
         query.setParameter("role", role);
 
         return findList(query);
+    }
+
+    /**
+     * The checksums are not having any uniqueness assigned to them, meaning
+     * that their may exist multiple checksum's with the same value - but as
+     * all checksum's are fairly short-lived (hours), the problem is ignored
+     * and only of their is an actual problem with it, will it be addressed.
+     *
+     * @param checksum Checksum of a Member SessionKey
+     * @return MemberEntity with a matching SessionKey checksum
+     */
+    public MemberEntity findMemberByChecksum(final String checksum) {
+        final Query query = entityManager.createNamedQuery("member.findByChecksum");
+        query.setParameter("checksum", checksum);
+
+        return findSingleRecord(query);
     }
 
     public MemberEntity findMemberByNameAndCircleId(final String name,

@@ -59,6 +59,7 @@ public class SanitizerBean {
 
     @Transactional(Transactional.TxType.REQUIRED)
     public void sanitize() {
+        clearExpireSessions();
         List<Long> ids = findNextBatch(BLOCK);
         int count = 0;
         int flawed = 0;
@@ -119,6 +120,12 @@ public class SanitizerBean {
         }
 
         return status;
+    }
+
+    private void clearExpireSessions() {
+        final Query query = entityManager.createNamedQuery("member.removeExpiredSessions");
+        final String logMessage = "expired " + query.executeUpdate() + " sessions.";
+        LOG.log(Settings.DEBUG, logMessage);
     }
 
     public List<Long> findNextBatch(final int maxResults) {

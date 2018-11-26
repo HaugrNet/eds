@@ -12,25 +12,19 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 
-import io.javadog.cws.api.common.Action;
 import io.javadog.cws.api.common.Constants;
-import io.javadog.cws.api.common.CredentialType;
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.dtos.Member;
 import io.javadog.cws.api.requests.FetchMemberRequest;
-import io.javadog.cws.api.requests.ProcessMemberRequest;
 import io.javadog.cws.api.responses.FetchMemberResponse;
-import io.javadog.cws.api.responses.ProcessMemberResponse;
 import io.javadog.cws.core.DatabaseSetup;
 import io.javadog.cws.core.enums.StandardSetting;
-import io.javadog.cws.core.exceptions.AuthenticationException;
 import io.javadog.cws.core.exceptions.AuthorizationException;
 import io.javadog.cws.core.exceptions.VerificationException;
 import io.javadog.cws.core.model.Settings;
 import io.javadog.cws.core.model.entities.MemberEntity;
-import org.junit.Test;
-
 import java.util.UUID;
+import org.junit.Test;
 
 /**
  * <p>Fetching members is similar to fetching Circles, in that it is possible to
@@ -473,70 +467,6 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
         assertThat(response, is(not(nullValue())));
         assertThat(response.getMembers().size(), is(1));
         assertThat(response.getCircles().size(), is(0));
-    }
-
-    @Test
-    public void testLoginWithSession() {
-        final String sessionKey = "sessionKey";
-        final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
-        final ProcessMemberRequest loginRequest = prepareLoginRequest(MEMBER_1, sessionKey);
-        final ProcessMemberResponse loginResponse = service.perform(loginRequest);
-        assertThat(loginResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
-
-        // Have to generate the SessionKey a second time, since the first request will override it.
-        final ProcessMemberRequest logoutRequest = prepareLogoutRequest(sessionKey);
-        final ProcessMemberResponse logoutResponse = service.perform(logoutRequest);
-        assertThat(logoutResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
-    }
-
-    @Test
-    public void testLogoutMissingSession() {
-        prepareCause(AuthenticationException.class, "No Session could be found.");
-
-        final String sessionKey = UUID.randomUUID().toString();
-        final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
-        final ProcessMemberRequest request = prepareLogoutRequest(sessionKey);
-        assertThat(request.validate().isEmpty(), is(true));
-
-        service.perform(request);
-    }
-
-    @Test
-    public void testLogoutExpiredSession() {
-        prepareCause(AuthenticationException.class, "The Session has expired.");
-
-        final Settings mySettings = newSettings();
-        mySettings.set(StandardSetting.SESSION_TIMEOUT.getKey(), "-1");
-        final String sessionKey = UUID.randomUUID().toString();
-
-        final ProcessMemberService service = new ProcessMemberService(mySettings, entityManager);
-        final ProcessMemberRequest loginRequest = prepareLoginRequest(MEMBER_2, sessionKey);
-        final ProcessMemberResponse loginResponse = service.perform(loginRequest);
-        assertThat(loginResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
-
-        final ProcessMemberRequest logoutRequest = prepareLogoutRequest(sessionKey);
-        service.perform(logoutRequest);
-    }
-
-    // =========================================================================
-    // Internal Helper Methods
-    // =========================================================================
-
-    private ProcessMemberRequest prepareLoginRequest(final String accountName, final String sessionKey) {
-        final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, accountName);
-        request.setNewCredential(crypto.stringToBytes(sessionKey));
-        request.setAction(Action.LOGIN);
-
-        return request;
-    }
-
-    private ProcessMemberRequest prepareLogoutRequest(final String sessionKey) {
-        final ProcessMemberRequest request = new ProcessMemberRequest();
-        request.setCredential(crypto.stringToBytes(sessionKey));
-        request.setCredentialType(CredentialType.SESSION);
-        request.setAction(Action.LOGOUT);
-
-        return request;
     }
 
     /**

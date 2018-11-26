@@ -31,11 +31,10 @@ import io.javadog.cws.core.model.entities.KeyEntity;
 import io.javadog.cws.core.model.entities.MemberEntity;
 import io.javadog.cws.core.model.entities.MetadataEntity;
 import io.javadog.cws.core.model.entities.TrusteeEntity;
-
-import javax.persistence.EntityManager;
 import java.security.PublicKey;
 import java.util.Arrays;
 import java.util.Objects;
+import javax.persistence.EntityManager;
 
 /**
  * <p>Business Logic implementation for the CWS ProcessCircle request.</p>
@@ -57,7 +56,6 @@ public final class ProcessCircleService extends Serviceable<CommonDao, ProcessCi
         // Pre-checks, & destruction of credentials
         verifyRequest(request, Permission.PROCESS_CIRCLE);
         Arrays.fill(request.getCredential(), (byte) 0);
-
         final ProcessCircleResponse response;
         final Action action = request.getAction();
 

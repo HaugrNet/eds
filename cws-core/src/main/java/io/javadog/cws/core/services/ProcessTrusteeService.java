@@ -23,11 +23,10 @@ import io.javadog.cws.core.model.CommonDao;
 import io.javadog.cws.core.model.Settings;
 import io.javadog.cws.core.model.entities.MemberEntity;
 import io.javadog.cws.core.model.entities.TrusteeEntity;
-
-import javax.persistence.EntityManager;
 import java.security.PublicKey;
 import java.util.Arrays;
 import java.util.List;
+import javax.persistence.EntityManager;
 
 /**
  * <p>Business Logic implementation for the CWS ProcessTrustee request.</p>
@@ -49,7 +48,6 @@ public final class ProcessTrusteeService extends Serviceable<CommonDao, ProcessT
         // Pre-checks, & destruction of credentials
         verifyRequest(request, Permission.PROCESS_TRUSTEE);
         Arrays.fill(request.getCredential(), (byte) 0);
-
         final ProcessTrusteeResponse response;
 
         switch (request.getAction()) {

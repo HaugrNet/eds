@@ -38,7 +38,6 @@ import io.javadog.cws.core.model.entities.CircleEntity;
 import io.javadog.cws.core.model.entities.DataEntity;
 import io.javadog.cws.core.model.entities.MemberEntity;
 import io.javadog.cws.core.model.entities.TrusteeEntity;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -154,7 +153,7 @@ public abstract class Serviceable<D extends CommonDao, R extends CwsResponse, A 
                 //     Check if the Member is valid, i.e. if the given
                 //     Credentials can correctly decrypt the Private Key for
                 //     the Account. If not, then an Exception is thrown.
-                checkCredentials(authentication.getCredential(), member.getPrivateKey());
+                checkCredentials(member, authentication.getCredential(), member.getPrivateKey());
             }
 
             // Step 3; Final check, ensure that the Member is having the correct
@@ -211,9 +210,9 @@ public abstract class Serviceable<D extends CommonDao, R extends CwsResponse, A 
 
         if (memberEntity != null) {
             if (Utilities.newDate().before(memberEntity.getSessionExpire())) {
-                checkCredentials(masterEncrypted, member.getSessionCrypto());
+                checkCredentials(memberEntity, masterEncrypted, memberEntity.getSessionCrypto());
             } else {
-                dao.removeSession(member);
+                dao.removeSession(memberEntity);
                 throw new AuthenticationException("The Session has expired.");
             }
         } else {
@@ -291,11 +290,11 @@ public abstract class Serviceable<D extends CommonDao, R extends CwsResponse, A 
         return pair;
     }
 
-    private void checkCredentials(final byte[] credential, final String armoredPrivateKey) {
+    private void checkCredentials(final MemberEntity entity, final byte[] credential, final String armoredPrivateKey) {
         try {
-            final String salt = crypto.decryptWithMasterKey(member.getSalt());
-            final SecretCWSKey key = crypto.generatePasswordKey(member.getPbeAlgorithm(), credential, salt);
-            keyPair = crypto.extractAsymmetricKey(member.getRsaAlgorithm(), key, salt, member.getPublicKey(), armoredPrivateKey);
+            final String salt = crypto.decryptWithMasterKey(entity.getSalt());
+            final SecretCWSKey key = crypto.generatePasswordKey(entity.getPbeAlgorithm(), credential, salt);
+            keyPair = crypto.extractAsymmetricKey(entity.getRsaAlgorithm(), key, salt, entity.getPublicKey(), armoredPrivateKey);
 
             // To ensure that the PBE key is no longer usable, we're destroying
             // it now.

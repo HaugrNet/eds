@@ -21,10 +21,9 @@ import io.javadog.cws.core.exceptions.CWSException;
 import io.javadog.cws.core.model.CommonDao;
 import io.javadog.cws.core.model.Settings;
 import io.javadog.cws.core.model.entities.DataTypeEntity;
-
-import javax.persistence.EntityManager;
 import java.util.Arrays;
 import java.util.Objects;
+import javax.persistence.EntityManager;
 
 /**
  * <p>Business Logic implementation for the CWS ProcessDataType request.</p>
@@ -46,7 +45,6 @@ public final class ProcessDataTypeService extends Serviceable<CommonDao, Process
         // Pre-checks, & destruction of credentials
         verifyRequest(request, Permission.PROCESS_DATA_TYPE);
         Arrays.fill(request.getCredential(), (byte) 0);
-
         final ProcessDataTypeResponse response;
 
         switch (request.getAction()) {

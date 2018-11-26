@@ -28,10 +28,9 @@ import io.javadog.cws.core.DatabaseSetup;
 import io.javadog.cws.core.enums.SanityStatus;
 import io.javadog.cws.core.exceptions.CWSException;
 import io.javadog.cws.core.exceptions.VerificationException;
-import org.junit.Test;
-
 import java.util.Date;
 import java.util.UUID;
+import org.junit.Test;
 
 /**
  * <p>Common test class for the Process & Fetch Data Services.</p>
@@ -425,66 +424,66 @@ public final class DataServiceTest extends DatabaseSetup {
 
     @Test
     public void testCopyData() {
-        final ProcessDataService dataService = new ProcessDataService(settings, entityManager);
-        final ProcessDataRequest addRequest = prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "toCopy", 524288);
-        final ProcessDataResponse addResponse = dataService.perform(addRequest);
-        assertThat(addResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
-        assertThat(addResponse.getReturnMessage(), is("Ok"));
-        assertThat(addResponse.getDataId(), is(not(nullValue())));
+        final ProcessDataService copyDataService = new ProcessDataService(settings, entityManager);
+        final ProcessDataRequest copyAddRequest = prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "toCopy", 524288);
+        final ProcessDataResponse copyAddResponse = copyDataService.perform(copyAddRequest);
+        assertThat(copyAddResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+        assertThat(copyAddResponse.getReturnMessage(), is("Ok"));
+        assertThat(copyAddResponse.getDataId(), is(not(nullValue())));
 
-        final ProcessDataRequest copyRequest = prepareCopyDataRequest(MEMBER_1, addResponse.getDataId(), CIRCLE_2_ID, null);
-        final ProcessDataResponse copyResponse = dataService.perform(copyRequest);
+        final ProcessDataRequest copyRequest = prepareCopyDataRequest(MEMBER_1, copyAddResponse.getDataId(), CIRCLE_2_ID, null);
+        final ProcessDataResponse copyResponse = copyDataService.perform(copyRequest);
         assertThat(copyResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
         assertThat(copyResponse.getReturnMessage(), is("Ok"));
         assertThat(copyResponse.getDataId(), is(not(nullValue())));
-        assertThat(copyResponse.getDataId(), is(not(addResponse.getDataId())));
+        assertThat(copyResponse.getDataId(), is(not(copyAddResponse.getDataId())));
 
-        final FetchDataService fetchService = new FetchDataService(settings, entityManager);
-        final FetchDataRequest fetchRequest1 = prepareReadRequest(MEMBER_1, null, addResponse.getDataId());
-        final FetchDataResponse fetchResponse1 = fetchService.perform(fetchRequest1);
-        assertThat(fetchResponse1.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
-        final Metadata metadata1 = fetchResponse1.getMetadata().get(0);
+        final FetchDataService copyFetchService = new FetchDataService(settings, entityManager);
+        final FetchDataRequest copyFetchRequest1 = prepareReadRequest(MEMBER_1, null, copyAddResponse.getDataId());
+        final FetchDataResponse copyFetchResponse1 = copyFetchService.perform(copyFetchRequest1);
+        assertThat(copyFetchResponse1.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+        final Metadata metadata1 = copyFetchResponse1.getMetadata().get(0);
 
-        final FetchDataRequest fetchRequest2 = prepareReadRequest(MEMBER_1, null, copyResponse.getDataId());
-        final FetchDataResponse fetchResponse2 = fetchService.perform(fetchRequest2);
-        assertThat(fetchResponse2.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
-        final Metadata metadata2 = fetchResponse2.getMetadata().get(0);
+        final FetchDataRequest copyFetchRequest2 = prepareReadRequest(MEMBER_1, null, copyResponse.getDataId());
+        final FetchDataResponse copyFetchResponse2 = copyFetchService.perform(copyFetchRequest2);
+        assertThat(copyFetchResponse2.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+        final Metadata copyMetadata2 = copyFetchResponse2.getMetadata().get(0);
 
         // Comparing the first Object with the copied Object, name, type and
         // data must be the same, the Id's not.
-        assertThat(metadata2.getDataName(), is(metadata1.getDataName()));
-        assertThat(metadata2.getTypeName(), is(metadata1.getTypeName()));
-        assertThat(metadata2.getDataId(), is(not(metadata1.getDataId())));
+        assertThat(copyMetadata2.getDataName(), is(metadata1.getDataName()));
+        assertThat(copyMetadata2.getTypeName(), is(metadata1.getTypeName()));
+        assertThat(copyMetadata2.getDataId(), is(not(metadata1.getDataId())));
         assertThat(metadata1.getCircleId(), is(CIRCLE_1_ID));
-        assertThat(metadata2.getCircleId(), is(CIRCLE_2_ID));
-        assertThat(fetchResponse2.getData(), is(fetchResponse1.getData()));
+        assertThat(copyMetadata2.getCircleId(), is(CIRCLE_2_ID));
+        assertThat(copyFetchResponse2.getData(), is(copyFetchResponse1.getData()));
     }
 
     @Test
     public void testMoveData() {
-        final ProcessDataService dataService = new ProcessDataService(settings, entityManager);
-        final ProcessDataRequest addRequest = prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "toMove", 524288);
-        final ProcessDataResponse addResponse = dataService.perform(addRequest);
-        assertThat(addResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
-        assertThat(addResponse.getReturnMessage(), is("Ok"));
-        assertThat(addResponse.getDataId(), is(not(nullValue())));
+        final ProcessDataService moveDataService = new ProcessDataService(settings, entityManager);
+        final ProcessDataRequest moveAddRequest = prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "toMove", 524288);
+        final ProcessDataResponse moveAddResponse = moveDataService.perform(moveAddRequest);
+        assertThat(moveAddResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+        assertThat(moveAddResponse.getReturnMessage(), is("Ok"));
+        assertThat(moveAddResponse.getDataId(), is(not(nullValue())));
 
-        final ProcessDataRequest moveRequest = prepareMoveDataRequest(MEMBER_1, addResponse.getDataId(), CIRCLE_2_ID, null);
-        final ProcessDataResponse moveResponse = dataService.perform(moveRequest);
+        final ProcessDataRequest moveRequest = prepareMoveDataRequest(MEMBER_1, moveAddResponse.getDataId(), CIRCLE_2_ID, null);
+        final ProcessDataResponse moveResponse = moveDataService.perform(moveRequest);
         assertThat(moveResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
         assertThat(moveResponse.getReturnMessage(), is("Ok"));
         assertThat(moveResponse.getDataId(), is(not(nullValue())));
-        assertThat(moveResponse.getDataId(), is(not(addResponse.getDataId())));
+        assertThat(moveResponse.getDataId(), is(not(moveAddResponse.getDataId())));
 
-        final FetchDataService fetchService = new FetchDataService(settings, entityManager);
-        final FetchDataRequest fetchRequest1 = prepareReadRequest(MEMBER_1, null, moveResponse.getDataId());
-        final FetchDataResponse fetchResponse1 = fetchService.perform(fetchRequest1);
-        assertThat(fetchResponse1.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+        final FetchDataService moveFetchService = new FetchDataService(settings, entityManager);
+        final FetchDataRequest moveFetchRequest1 = prepareReadRequest(MEMBER_1, null, moveResponse.getDataId());
+        final FetchDataResponse moveFetchResponse1 = moveFetchService.perform(moveFetchRequest1);
+        assertThat(moveFetchResponse1.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
 
-        final FetchDataRequest fetchRequest2 = prepareReadRequest(MEMBER_1, null, addResponse.getDataId());
-        final FetchDataResponse fetchResponse2 = fetchService.perform(fetchRequest2);
-        assertThat(fetchResponse2.getReturnCode(), is(ReturnCode.IDENTIFICATION_WARNING.getCode()));
-        assertThat(fetchResponse2.getReturnMessage(), is("No information could be found for the given Id."));
+        final FetchDataRequest moveFetchRequest2 = prepareReadRequest(MEMBER_1, null, moveAddResponse.getDataId());
+        final FetchDataResponse moveFetchResponse2 = moveFetchService.perform(moveFetchRequest2);
+        assertThat(moveFetchResponse2.getReturnCode(), is(ReturnCode.IDENTIFICATION_WARNING.getCode()));
+        assertThat(moveFetchResponse2.getReturnMessage(), is("No information could be found for the given Id."));
     }
 
     @Test
@@ -505,38 +504,38 @@ public final class DataServiceTest extends DatabaseSetup {
     @Test
     public void testCopyEmptyData() {
         final ProcessDataService dataService = new ProcessDataService(settings, entityManager);
-        final ProcessDataRequest addRequest = prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "emptyData", 0);
-        final ProcessDataResponse addResponse = dataService.perform(addRequest);
-        assertThat(addResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
-        assertThat(addResponse.getReturnMessage(), is("Ok"));
-        assertThat(addResponse.getDataId(), is(not(nullValue())));
+        final ProcessDataRequest emptyAddRequest = prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "emptyData", 0);
+        final ProcessDataResponse emptyAddResponse = dataService.perform(emptyAddRequest);
+        assertThat(emptyAddResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+        assertThat(emptyAddResponse.getReturnMessage(), is("Ok"));
+        assertThat(emptyAddResponse.getDataId(), is(not(nullValue())));
 
-        final ProcessDataRequest copyRequest = prepareCopyDataRequest(MEMBER_1, addResponse.getDataId(), CIRCLE_2_ID, null);
-        final ProcessDataResponse copyResponse = dataService.perform(copyRequest);
-        assertThat(copyResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
-        assertThat(copyResponse.getReturnMessage(), is("Ok"));
-        assertThat(copyResponse.getDataId(), is(not(nullValue())));
-        assertThat(copyResponse.getDataId(), is(not(addResponse.getDataId())));
+        final ProcessDataRequest emptyCopyRequest = prepareCopyDataRequest(MEMBER_1, emptyAddResponse.getDataId(), CIRCLE_2_ID, null);
+        final ProcessDataResponse emptyCopyResponse = dataService.perform(emptyCopyRequest);
+        assertThat(emptyCopyResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+        assertThat(emptyCopyResponse.getReturnMessage(), is("Ok"));
+        assertThat(emptyCopyResponse.getDataId(), is(not(nullValue())));
+        assertThat(emptyCopyResponse.getDataId(), is(not(emptyAddResponse.getDataId())));
 
-        final FetchDataService fetchService = new FetchDataService(settings, entityManager);
-        final FetchDataRequest fetchRequest1 = prepareReadRequest(MEMBER_1, null, addResponse.getDataId());
-        final FetchDataResponse fetchResponse1 = fetchService.perform(fetchRequest1);
-        assertThat(fetchResponse1.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
-        final Metadata metadata1 = fetchResponse1.getMetadata().get(0);
+        final FetchDataService emptyFetchService = new FetchDataService(settings, entityManager);
+        final FetchDataRequest emptyFetchRequest1 = prepareReadRequest(MEMBER_1, null, emptyAddResponse.getDataId());
+        final FetchDataResponse emptyFetchResponse1 = emptyFetchService.perform(emptyFetchRequest1);
+        assertThat(emptyFetchResponse1.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+        final Metadata metadata1 = emptyFetchResponse1.getMetadata().get(0);
 
-        final FetchDataRequest fetchRequest2 = prepareReadRequest(MEMBER_1, null, copyResponse.getDataId());
-        final FetchDataResponse fetchResponse2 = fetchService.perform(fetchRequest2);
-        assertThat(fetchResponse2.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
-        final Metadata metadata2 = fetchResponse2.getMetadata().get(0);
+        final FetchDataRequest emptyFetchRequest2 = prepareReadRequest(MEMBER_1, null, emptyCopyResponse.getDataId());
+        final FetchDataResponse emptyFetchResponse2 = emptyFetchService.perform(emptyFetchRequest2);
+        assertThat(emptyFetchResponse2.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+        final Metadata emptyMetadata2 = emptyFetchResponse2.getMetadata().get(0);
 
         // Comparing the first Object with the copied Object, name, type and
         // data must be the same, the Id's not.
-        assertThat(metadata2.getDataName(), is(metadata1.getDataName()));
-        assertThat(metadata2.getTypeName(), is(metadata1.getTypeName()));
-        assertThat(metadata2.getDataId(), is(not(metadata1.getDataId())));
+        assertThat(emptyMetadata2.getDataName(), is(metadata1.getDataName()));
+        assertThat(emptyMetadata2.getTypeName(), is(metadata1.getTypeName()));
+        assertThat(emptyMetadata2.getDataId(), is(not(metadata1.getDataId())));
         assertThat(metadata1.getCircleId(), is(CIRCLE_1_ID));
-        assertThat(metadata2.getCircleId(), is(CIRCLE_2_ID));
-        assertThat(fetchResponse2.getData(), is(fetchResponse1.getData()));
+        assertThat(emptyMetadata2.getCircleId(), is(CIRCLE_2_ID));
+        assertThat(emptyFetchResponse2.getData(), is(emptyFetchResponse1.getData()));
     }
 
     @Test

@@ -34,15 +34,6 @@ import io.javadog.cws.core.model.entities.CircleEntity;
 import io.javadog.cws.core.model.entities.DataEntity;
 import io.javadog.cws.core.model.entities.KeyEntity;
 import io.javadog.cws.core.model.entities.MemberEntity;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.rules.ExpectedException;
-
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
-import javax.persistence.Query;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
@@ -55,6 +46,14 @@ import java.util.Locale;
 import java.util.UUID;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
+import javax.persistence.Query;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.rules.ExpectedException;
 
 /**
  * @author Kim Jensen
@@ -129,6 +128,20 @@ public class DatabaseSetup {
             request.setAccountName(account);
             request.setCredential(myCrypto.stringToBytes(account));
             request.setCredentialType(CredentialType.PASSPHRASE);
+
+            return request;
+        } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
+            throw new CWSException(ReturnCode.ERROR, "Cannot instantiate Request Object", e);
+        }
+    }
+
+    protected static <T extends Authentication> T prepareSessionRequest(final Class<T> clazz, final String session) {
+        try {
+            final Crypto myCrypto = new Crypto(Settings.getInstance());
+            final T request = clazz.getConstructor().newInstance();
+
+            request.setCredential(myCrypto.stringToBytes(session));
+            request.setCredentialType(CredentialType.SESSION);
 
             return request;
         } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {

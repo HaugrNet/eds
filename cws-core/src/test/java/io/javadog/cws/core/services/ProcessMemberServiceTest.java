@@ -18,19 +18,23 @@ import io.javadog.cws.api.common.CredentialType;
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.requests.FetchDataRequest;
 import io.javadog.cws.api.requests.FetchMemberRequest;
+import io.javadog.cws.api.requests.ProcessCircleRequest;
 import io.javadog.cws.api.requests.ProcessDataRequest;
 import io.javadog.cws.api.requests.ProcessMemberRequest;
 import io.javadog.cws.api.responses.FetchDataResponse;
 import io.javadog.cws.api.responses.FetchMemberResponse;
+import io.javadog.cws.api.responses.ProcessCircleResponse;
 import io.javadog.cws.api.responses.ProcessDataResponse;
 import io.javadog.cws.api.responses.ProcessMemberResponse;
 import io.javadog.cws.core.DatabaseSetup;
+import io.javadog.cws.core.enums.StandardSetting;
+import io.javadog.cws.core.exceptions.AuthenticationException;
 import io.javadog.cws.core.exceptions.CWSException;
 import io.javadog.cws.core.exceptions.CryptoException;
-import org.junit.Test;
-
+import io.javadog.cws.core.model.Settings;
 import java.util.Base64;
 import java.util.UUID;
+import org.junit.Test;
 
 /**
  * @author Kim Jensen
@@ -281,6 +285,58 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
     }
 
     @Test
+    public void testLoginWithSession() {
+        final String sessionKey = "sessionKey";
+        final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
+        final ProcessMemberRequest loginRequest = prepareLoginRequest(MEMBER_1, sessionKey);
+        final ProcessMemberResponse loginResponse = service.perform(loginRequest);
+        assertThat(loginResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+
+        // Just performing an action using the Session
+        final ProcessCircleService circleService = new ProcessCircleService(settings, entityManager);
+        final ProcessCircleRequest circleRequest = prepareSessionRequest(ProcessCircleRequest.class, sessionKey);
+        circleRequest.setAction(Action.UPDATE);
+        circleRequest.setCircleId(CIRCLE_1_ID);
+        circleRequest.setCircleName("new Circle1 name");
+        final ProcessCircleResponse circleResponse = circleService.perform(circleRequest);
+        assertThat(circleResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+
+        // Have to generate the SessionKey a second time, since the first request will override it.
+        final ProcessMemberRequest logoutRequest = prepareLogoutRequest(sessionKey);
+        final ProcessMemberResponse logoutResponse = service.perform(logoutRequest);
+        assertThat(logoutResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+    }
+
+    @Test
+    public void testLogoutMissingSession() {
+        prepareCause(AuthenticationException.class, "No Session could be found.");
+
+        final String sessionKey = UUID.randomUUID().toString();
+        final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
+        final ProcessMemberRequest request = prepareLogoutRequest(sessionKey);
+        assertThat(request.validate().isEmpty(), is(true));
+
+        service.perform(request);
+    }
+
+    @Test
+    public void testLogoutExpiredSession() {
+        prepareCause(AuthenticationException.class, "The Session has expired.");
+
+        final Settings mySettings = newSettings();
+        mySettings.set(StandardSetting.SESSION_TIMEOUT.getKey(), "-1");
+        final String sessionKey = UUID.randomUUID().toString();
+
+        final ProcessMemberService service = new ProcessMemberService(mySettings, entityManager);
+        final ProcessMemberRequest loginRequest = prepareLoginRequest(MEMBER_2, sessionKey);
+        final ProcessMemberResponse loginResponse = service.perform(loginRequest);
+        assertThat(loginResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+
+        final ProcessMemberRequest logoutRequest = prepareLogoutRequest(sessionKey);
+        service.perform(logoutRequest);
+    }
+
+    @Test
     public void testProcessSelf() {
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
         final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, MEMBER_1);
@@ -438,6 +494,27 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
         final ProcessMemberResponse response = service.perform(request);
         assertThat(response.getReturnCode(), is(ReturnCode.IDENTIFICATION_ERROR.getCode()));
         assertThat(response.getReturnMessage(), is("It is not permitted to delete the Admin Account."));
+    }
+
+    // =========================================================================
+    // Internal Helper Methods
+    // =========================================================================
+
+    private ProcessMemberRequest prepareLoginRequest(final String accountName, final String sessionKey) {
+        final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, accountName);
+        request.setNewCredential(crypto.stringToBytes(sessionKey));
+        request.setAction(Action.LOGIN);
+
+        return request;
+    }
+
+    private ProcessMemberRequest prepareLogoutRequest(final String sessionKey) {
+        final ProcessMemberRequest request = new ProcessMemberRequest();
+        request.setCredential(crypto.stringToBytes(sessionKey));
+        request.setCredentialType(CredentialType.SESSION);
+        request.setAction(Action.LOGOUT);
+
+        return request;
     }
 
     private String addData() {

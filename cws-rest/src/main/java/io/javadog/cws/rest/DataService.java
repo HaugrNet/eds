@@ -52,6 +52,22 @@ public class DataService {
     @POST
     @Consumes(RestUtils.CONSUMES)
     @Produces(RestUtils.PRODUCES)
+    @Path(Constants.REST_DATA_COPY)
+    public Response copy(@NotNull final ProcessDataRequest updateDataRequest) {
+        return processData(updateDataRequest, Action.COPY, Constants.REST_DATA_COPY);
+    }
+
+    @POST
+    @Consumes(RestUtils.CONSUMES)
+    @Produces(RestUtils.PRODUCES)
+    @Path(Constants.REST_DATA_MOVE)
+    public Response move(@NotNull final ProcessDataRequest updateDataRequest) {
+        return processData(updateDataRequest, Action.MOVE, Constants.REST_DATA_MOVE);
+    }
+
+    @POST
+    @Consumes(RestUtils.CONSUMES)
+    @Produces(RestUtils.PRODUCES)
     @Path(Constants.REST_DATA_UPDATE)
     public Response update(@NotNull final ProcessDataRequest updateDataRequest) {
         return processData(updateDataRequest, Action.UPDATE, Constants.REST_DATA_UPDATE);

@@ -46,6 +46,42 @@ public final class DataServiceTest extends DatabaseSetup {
     }
 
     @Test
+    public void testCopy() {
+        final DataService service = prepareService();
+        final ProcessDataRequest request = new ProcessDataRequest();
+
+        final Response response = service.copy(request);
+        assertThat(response.getStatus(), is(ReturnCode.VERIFICATION_WARNING.getHttpCode()));
+    }
+
+    @Test
+    public void testFlawedCopy() {
+        final DataService service = prepareFlawedService();
+        final ProcessDataRequest request = new ProcessDataRequest();
+
+        final Response response = service.copy(request);
+        assertThat(response.getStatus(), is(ReturnCode.ERROR.getHttpCode()));
+    }
+
+    @Test
+    public void testMove() {
+        final DataService service = prepareService();
+        final ProcessDataRequest request = new ProcessDataRequest();
+
+        final Response response = service.move(request);
+        assertThat(response.getStatus(), is(ReturnCode.VERIFICATION_WARNING.getHttpCode()));
+    }
+
+    @Test
+    public void testFlawedMove() {
+        final DataService service = prepareFlawedService();
+        final ProcessDataRequest request = new ProcessDataRequest();
+
+        final Response response = service.move(request);
+        assertThat(response.getStatus(), is(ReturnCode.ERROR.getHttpCode()));
+    }
+
+    @Test
     public void testUpdate() {
         final DataService service = prepareService();
         final ProcessDataRequest request = new ProcessDataRequest();

@@ -175,6 +175,8 @@ public final class Constants {
     // Data requests from the Share Interface
     public static final String REST_DATA_BASE = "/data";
     public static final String REST_DATA_ADD = "/addData";
+    public static final String REST_DATA_COPY = "/copyData";
+    public static final String REST_DATA_MOVE = "/moveData";
     public static final String REST_DATA_UPDATE = "/updateData";
     public static final String REST_DATA_DELETE = "/deleteData";
     public static final String REST_DATA_FETCH = "/fetchData";

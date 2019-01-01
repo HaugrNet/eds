@@ -8,7 +8,6 @@
 package io.javadog.cws.core.jce;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertThat;
 
 import io.javadog.cws.core.DatabaseSetup;
@@ -58,22 +57,17 @@ public class IVSaltTest extends DatabaseSetup {
      * <p>The problem with the IVSalt changes between CWS 1.0 &amp; 1.1, is
      * that in CWS 1.0, the Salt was generated using a UUID, which was not
      * stored using Base64 encoding, since it was persisted raw. Since the code
-     * is checking for an exception, this code is generating a random array
-     * based on SecureRandom, and &quot;String&quot; armoring encoding it.</p>
-     *
-     * <p>As the logic is using Base64 logic to convert it, the source and the
-     * decoded target will differ - which the test is verifying.</p>
+     * is checking for an exception, this code is testing converting a crafted
+     * invalid string.</p>
      */
     @Test
-    public void testSecureRandom24Bytes() {
-        final byte[] random = new byte[24];
-        new SecureRandom().nextBytes(random);
-        final String armored = new String(random, settings.getCharset());
+    public void testCraftedStringAsSalt() {
+        final String armored = "==ABCDEFG123456789%&/()?";
 
         final IVSalt salt = new IVSalt(armored);
         final byte[] bytes = salt.getBytes();
 
         assertThat(salt.getArmored(), is(armored));
-        assertThat(bytes, is(not(random)));
+        assertThat(armored.substring(0, 16), is(new String(bytes, settings.getCharset())));
     }
 }

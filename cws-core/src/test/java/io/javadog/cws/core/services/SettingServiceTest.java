@@ -13,9 +13,7 @@ import static org.junit.Assert.assertThat;
 
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
-import io.javadog.cws.api.requests.MasterKeyRequest;
 import io.javadog.cws.api.requests.SettingRequest;
-import io.javadog.cws.api.responses.MasterKeyResponse;
 import io.javadog.cws.api.responses.SettingResponse;
 import io.javadog.cws.core.DatabaseSetup;
 import io.javadog.cws.core.enums.KeyAlgorithm;
@@ -26,7 +24,6 @@ import io.javadog.cws.core.model.entities.MemberEntity;
 import org.junit.Test;
 
 import javax.persistence.Query;
-import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,7 +33,6 @@ import java.util.Map;
  * are all fairly small but also connected.</p>
  *
  * <ul>
- *   <li>MasterKeyService</li>
  *   <li>SettingService</li>
  * </ul>
  *
@@ -349,110 +345,15 @@ public final class SettingServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testUpdateMasterKeyWithNullRequest() {
-        final MasterKeyService service = new MasterKeyService(settings, entityManager);
-        final MasterKeyRequest request = null;
+    public void testUpdateMasterKeyUrlSetting() {
+        prepareCause(CWSException.class, ReturnCode.SETTING_WARNING, "The setting cws.masterkey.url may not be changed with this request.");
+        final SettingService service = new SettingService(newSettings(), entityManager);
+        final SettingRequest request = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
+        final Map<String, String> newSettings = new HashMap<>();
+        newSettings.put(StandardSetting.MASTERKEY_URL.getKey(), "https://cool.url/to/new/key");
+        request.setSettings(newSettings);
+        assertThat(request.validate().isEmpty(), is(true));
 
-        final MasterKeyResponse response = service.perform(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING.getCode()));
-        assertThat(response.getReturnMessage(), is("Cannot process the request, the given data is invalid."));
-    }
-
-    @Test
-    public void testUpdateMasterKeyWithEmptyRequest() {
-        final MasterKeyService service = new MasterKeyService(settings, entityManager);
-        final MasterKeyRequest request = new MasterKeyRequest();
-
-        final MasterKeyResponse response = service.perform(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING.getCode()));
-        assertThat(response.getReturnMessage(), is("Cannot process the request, the given data is invalid."));
-    }
-
-    @Test
-    public void testUpdateMasterKeyAsMember() {
-        final MasterKeyService service = new MasterKeyService(settings, entityManager);
-        final MasterKeyRequest request = prepareRequest(MasterKeyRequest.class, MEMBER_1);
-        request.setSecret("New MasterKey".getBytes(Charset.defaultCharset()));
-
-        final MasterKeyResponse response = service.perform(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.AUTHENTICATION_WARNING.getCode()));
-        assertThat(response.getReturnMessage(), is("Given Account is not permitted to perform this request."));
-    }
-
-    @Test
-    public void testUpdateMasterKeyAsAdminWithWrongCredentials() {
-        final MasterKeyService service = new MasterKeyService(settings, entityManager);
-        final MasterKeyRequest request = prepareRequest(MasterKeyRequest.class, Constants.ADMIN_ACCOUNT);
-        request.setCredential("root".getBytes(Charset.defaultCharset()));
-        request.setSecret("New MasterKey".getBytes(Charset.defaultCharset()));
-
-        final MasterKeyResponse response = service.perform(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.AUTHENTICATION_WARNING.getCode()));
-        assertThat(response.getReturnMessage(), is("Invalid credentials."));
-    }
-
-    @Test
-    public void testUpdatingMasterKeyZeroMembers() {
-        // Before starting, all member accounts must be removed
-        final List<MemberEntity> members = dao.findAllAscending(MemberEntity.class, "id");
-        for (final MemberEntity member : members) {
-            dao.delete(member);
-        }
-
-        final MasterKeyService service = new MasterKeyService(settings, entityManager);
-        final MasterKeyRequest request = prepareRequest(MasterKeyRequest.class, Constants.ADMIN_ACCOUNT);
-        request.setSecret(request.getCredential());
-        final MasterKeyResponse response = service.perform(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
-        assertThat(response.getReturnMessage(), is("MasterKey unlocked."));
-    }
-
-    @Test
-    public void testUpdatingMasterKeyAdminOnly() {
-        // Before starting, all member accounts must be removed
-        final List<MemberEntity> members = dao.findAllAscending(MemberEntity.class, "id");
-        for (final MemberEntity member : members) {
-            if (!Constants.ADMIN_ACCOUNT.equals(member.getName())) {
-                dao.delete(member);
-            }
-        }
-
-        final MasterKeyService service = new MasterKeyService(settings, entityManager);
-        final MasterKeyRequest request = prepareRequest(MasterKeyRequest.class, Constants.ADMIN_ACCOUNT);
-        request.setSecret("MasterKey".getBytes(Charset.defaultCharset()));
-
-        final MasterKeyResponse response = service.perform(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
-        assertThat(response.getReturnMessage(), is("MasterKey updated."));
-
-        // Before we're done - set the MasterKey back to the default, which is
-        // using the System Administrator account name as secret.
-        final MasterKeyRequest resetRequest = prepareRequest(MasterKeyRequest.class, Constants.ADMIN_ACCOUNT);
-        resetRequest.setSecret(resetRequest.getCredential());
-        final MasterKeyResponse resetResponse = service.perform(resetRequest);
-        assertThat(resetResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
-        assertThat(resetResponse.getReturnMessage(), is("MasterKey updated."));
-    }
-
-    @Test
-    public void testUpdateMasterKeyWhenMembersExist() {
-        final MasterKeyService service = new MasterKeyService(settings, entityManager);
-        final MasterKeyRequest request = prepareRequest(MasterKeyRequest.class, Constants.ADMIN_ACCOUNT);
-        request.setSecret("MasterKey".getBytes(Charset.defaultCharset()));
-
-        final MasterKeyResponse response = service.perform(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.ILLEGAL_ACTION.getCode()));
-        assertThat(response.getReturnMessage(), is("Cannot alter the MasterKey, as Member Accounts exists."));
-    }
-
-    @Test
-    public void testUpdateMasterKeyToCurrent() {
-        final MasterKeyService service = new MasterKeyService(settings, entityManager);
-        final MasterKeyRequest request = prepareRequest(MasterKeyRequest.class, Constants.ADMIN_ACCOUNT);
-        request.setSecret(request.getCredential());
-
-        final MasterKeyResponse response = service.perform(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
-        assertThat(response.getReturnMessage(), is("MasterKey unlocked."));
+        service.perform(request);
     }
 }

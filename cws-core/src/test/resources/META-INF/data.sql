@@ -28,6 +28,7 @@ INSERT INTO cws_settings (name, setting) VALUES
     ('cws.sanity.check.startup', 'true'),
     ('cws.sanity.check.interval.days', '180'),
     ('cws.session.timeout.minutes', '480'),
+    ('cws.masterkey.url', ''),
     ('cws.is.ready', 'true');
 
 -- Default Administrator User, it is set at the first request to the System, and

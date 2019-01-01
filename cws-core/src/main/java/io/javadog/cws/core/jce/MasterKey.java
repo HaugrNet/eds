@@ -11,8 +11,10 @@
 package io.javadog.cws.core.jce;
 
 import io.javadog.cws.api.common.Constants;
+import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.core.enums.KeyAlgorithm;
 import io.javadog.cws.core.enums.StandardSetting;
+import io.javadog.cws.core.exceptions.CWSException;
 import io.javadog.cws.core.exceptions.CryptoException;
 import io.javadog.cws.core.model.Settings;
 
@@ -20,6 +22,11 @@ import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.net.URLConnection;
 import java.nio.charset.Charset;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
@@ -56,6 +63,7 @@ public final class MasterKey {
     private static final Charset CHARSET = Charset.forName(StandardSetting.CWS_CHARSET.getValue());
     private static final KeyAlgorithm ALGORITHM = KeyAlgorithm.PBE_256;
     private static final Object LOCK = new Object();
+    private static final int BUFFER_SIZE = 512;
     private static MasterKey instance = null;
 
     private final Settings settings;
@@ -64,7 +72,13 @@ public final class MasterKey {
     private MasterKey(final Settings settings) {
         this.settings = settings;
 
-        final byte[] secret = Constants.ADMIN_ACCOUNT.getBytes(CHARSET);
+        final String url = settings.getMasterKeyURL();
+        final byte[] secret;
+        if (url.isEmpty()) {
+            secret = Constants.ADMIN_ACCOUNT.getBytes(CHARSET);
+        } else {
+            secret = readMasterKeySecretFromUrl(url);
+        }
         key = generateMasterKey(secret);
     }
 
@@ -75,6 +89,33 @@ public final class MasterKey {
             }
 
             return instance;
+        }
+    }
+
+    public static byte[] readMasterKeySecretFromUrl(final String masterKeyUrl) {
+        try {
+            final URL url = new URL(masterKeyUrl);
+            final URLConnection connection = url.openConnection();
+            return readContent(connection);
+        } catch (IOException e) {
+            throw new CWSException(ReturnCode.NETWORK_ERROR, e.getMessage(), e);
+        }
+    }
+
+    private static byte[] readContent(final URLConnection connection) throws IOException {
+        final int length = connection.getContentLength();
+
+        try (final InputStream inputStream = connection.getInputStream();
+             final ByteArrayOutputStream outputStream = new ByteArrayOutputStream(length)) {
+            final byte[] buffer = new byte[BUFFER_SIZE];
+
+            int read = inputStream.read(buffer);
+            while (read != -1) {
+                outputStream.write(buffer, 0, read);
+                read = inputStream.read(buffer);
+            }
+
+            return outputStream.toByteArray();
         }
     }
 

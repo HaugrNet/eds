@@ -129,6 +129,7 @@ public final class Constants {
     public static final String FIELD_ACTION = "action";
     public static final String FIELD_RETURN_CODE = "returnCode";
     public static final String FIELD_RETURN_MESSAGE = "returnMessage";
+    public static final String FIELD_URL = "url";
     public static final String FIELD_PAGE_NUMBER = "pageNumber";
     public static final String FIELD_PAGE_SIZE = "pageSize";
     // =========================================================================

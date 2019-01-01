@@ -16,12 +16,14 @@ import io.javadog.cws.api.requests.Authentication;
 import io.javadog.cws.api.requests.MasterKeyRequest;
 import io.javadog.cws.api.responses.MasterKeyResponse;
 import io.javadog.cws.core.enums.MemberRole;
+import io.javadog.cws.core.enums.StandardSetting;
 import io.javadog.cws.core.exceptions.CryptoException;
 import io.javadog.cws.core.jce.MasterKey;
 import io.javadog.cws.core.jce.SecretCWSKey;
 import io.javadog.cws.core.model.CommonDao;
 import io.javadog.cws.core.model.Settings;
 import io.javadog.cws.core.model.entities.MemberEntity;
+import io.javadog.cws.core.model.entities.SettingEntity;
 
 import javax.persistence.EntityManager;
 import java.util.Base64;
@@ -70,7 +72,7 @@ public final class MasterKeyService extends Serviceable<CommonDao, MasterKeyResp
         // What if the keys are the same ?
         final MasterKey masterKey = MasterKey.getInstance(settings);
         final SecretCWSKey oldMasterKey = masterKey.getKey();
-        final SecretCWSKey newMasterKey = masterKey.generateMasterKey(request.getSecret());
+        final SecretCWSKey newMasterKey = prepareNewMasterKey(masterKey, request);
 
         // For this request, the default account checks won't work, hence it
         // must be checked directly, with the keys
@@ -108,6 +110,33 @@ public final class MasterKeyService extends Serviceable<CommonDao, MasterKeyResp
         return response;
     }
 
+    private SecretCWSKey prepareNewMasterKey(final MasterKey masterKey, final MasterKeyRequest request) {
+        byte[] rawSecret = request.getSecret();
+
+        if (rawSecret == null) {
+            rawSecret = MasterKey.readMasterKeySecretFromUrl(request.getUrl());
+            updateMasterKeySetting(request.getUrl());
+        } else {
+            // If set via a secret, the URL should be removed to prevent a
+            // restart to use the URL.
+            updateMasterKeySetting("");
+        }
+
+        return masterKey.generateMasterKey(rawSecret);
+    }
+
+    private void updateMasterKeySetting(final String url) {
+        SettingEntity entity = dao.findSettingByKey(StandardSetting.MASTERKEY_URL);
+
+        if (entity == null) {
+            entity = new SettingEntity();
+            entity.setName(StandardSetting.MASTERKEY_URL.getKey());
+        }
+
+        entity.setSetting(url);
+        dao.persist(entity);
+    }
+
     private boolean checkCredentials(final SecretCWSKey masterKey, final MemberEntity admin, final byte[] secret) {
         boolean result = false;
 
@@ -134,7 +163,7 @@ public final class MasterKeyService extends Serviceable<CommonDao, MasterKeyResp
     }
 
     private MemberEntity findAdmin(final Authentication authentication) {
-        List<MemberEntity> admins = dao.findMemberByRole(MemberRole.ADMIN);
+        final List<MemberEntity> admins = dao.findMemberByRole(MemberRole.ADMIN);
         final MemberEntity admin;
 
         if (admins.isEmpty()) {

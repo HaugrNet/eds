@@ -13,7 +13,6 @@ package io.javadog.cws.api.requests;
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.Utilities;
 
-import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -34,10 +33,11 @@ import java.util.Map;
  * of data in the system. So, without the MasterKey, neither Member accounts nor
  * data can be retrieved, as it acts as a second lock for both parts.</p>
  *
- * <p>The secret is this a mandatory information which must be provided to alter
- * the MasterKey. Setting a new MasterKey can only be performed before adding
- * Member Accounts, since it is not possible to re-encrypt the Member Accounts
- * later.</p>
+ * <p>Either the secret or a URL to a secret must be given. This is mandatory
+ * information, which must be provided to alter the MasterKey. Setting a new
+ * MasterKey can only be performed before adding Member Accounts, since it is
+ * not possible to re-encrypt the Member Accounts later, as the keys are all
+ * stores encrypted and can only be decrypted with member secrets.</p>
  *
  * <p>Please see {@link Authentication} for information about the account and
  * credentials information.</p>
@@ -47,15 +47,17 @@ import java.util.Map;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "masterKeyRequest")
-@XmlType(name = "masterKeyRequest", propOrder = Constants.FIELD_SECRET)
+@XmlType(name = "masterKeyRequest", propOrder = { Constants.FIELD_SECRET, Constants.FIELD_URL })
 public final class MasterKeyRequest extends Authentication {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
-    @NotNull
-    @XmlElement(name = Constants.FIELD_SECRET, required = true)
+    @XmlElement(name = Constants.FIELD_SECRET)
     private byte[] secret = null;
+
+    @XmlElement(name = Constants.FIELD_URL)
+    private String url = null;
 
     // =========================================================================
     // Standard Setters & Getters
@@ -69,6 +71,14 @@ public final class MasterKeyRequest extends Authentication {
         return Utilities.copy(secret);
     }
 
+    public void setUrl(final String url) {
+        this.url = url;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
     // =========================================================================
     // Standard Methods
     // =========================================================================
@@ -80,7 +90,17 @@ public final class MasterKeyRequest extends Authentication {
     public Map<String, String> validate() {
         final Map<String, String> errors = super.validate();
 
-        checkNotNullOrEmpty(errors, Constants.FIELD_SECRET, secret, "The secret for the MasterKey is missing.");
+        if ((secret == null) == (url == null)) {
+            // Both fields can neither value can be set nor missing.
+            errors.put(Constants.FIELD_SECRET, "Either the secret or the URL must be given to alter the MasterKey.");
+            errors.put(Constants.FIELD_URL, "Either the secret or the URL must be given to alter the MasterKey.");
+        } else {
+            if (secret != null) {
+                checkNotNullOrEmpty(errors, Constants.FIELD_SECRET, secret, "The secret for the MasterKey is missing.");
+            } else {
+                checkUrl(errors, url);
+            }
+        }
 
         return errors;
     }

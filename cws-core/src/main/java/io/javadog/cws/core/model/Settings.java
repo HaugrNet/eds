@@ -180,6 +180,10 @@ public final class Settings {
         return Integer.valueOf(get(StandardSetting.SESSION_TIMEOUT.getKey()).trim());
     }
 
+    public String getMasterKeyURL() {
+        return get(StandardSetting.MASTERKEY_URL.getKey()).trim();
+    }
+
     public Boolean isReady() {
         return Boolean.valueOf(get(StandardSetting.IS_READY.getKey()).trim());
     }

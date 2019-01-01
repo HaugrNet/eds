@@ -23,11 +23,14 @@ import javax.persistence.Table;
  * @since  CWS 1.0
  */
 @Entity
-@NamedQueries(
+@NamedQueries({
         @NamedQuery(name = "setting.readAll",
-                    query = "select s from SettingEntity s " +
-                            "order by s.name asc")
-)
+                query = "select s from SettingEntity s " +
+                        "order by s.name asc"),
+        @NamedQuery(name = "setting.findByName",
+                query = "select s from SettingEntity s " +
+                        "where s.name = :name")
+})
 @Table(name = "cws_settings")
 public class SettingEntity extends CWSEntity {
 

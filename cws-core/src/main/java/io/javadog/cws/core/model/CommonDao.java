@@ -14,12 +14,14 @@ import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.common.TrustLevel;
 import io.javadog.cws.api.common.Utilities;
 import io.javadog.cws.core.enums.MemberRole;
+import io.javadog.cws.core.enums.StandardSetting;
 import io.javadog.cws.core.exceptions.CWSException;
 import io.javadog.cws.core.model.entities.CWSEntity;
 import io.javadog.cws.core.model.entities.CircleEntity;
 import io.javadog.cws.core.model.entities.DataTypeEntity;
 import io.javadog.cws.core.model.entities.Externable;
 import io.javadog.cws.core.model.entities.MemberEntity;
+import io.javadog.cws.core.model.entities.SettingEntity;
 import io.javadog.cws.core.model.entities.TrusteeEntity;
 
 import javax.persistence.EntityManager;
@@ -244,6 +246,13 @@ public class CommonDao {
         final Query query = entityManager.createNamedQuery("trustee.findByCircleAndMember");
         query.setParameter("ecid", externalCircleId);
         query.setParameter("emid", externalMemberId);
+
+        return findSingleRecord(query);
+    }
+
+    public SettingEntity findSettingByKey(final StandardSetting setting) {
+        final Query query = entityManager.createNamedQuery("setting.findByName");
+        query.setParameter("name", setting.getKey());
 
         return findSingleRecord(query);
     }

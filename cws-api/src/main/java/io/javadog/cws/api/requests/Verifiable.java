@@ -16,6 +16,9 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlType;
 import java.io.Serializable;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.Map;
 
 /**
@@ -91,6 +94,19 @@ public abstract class Verifiable implements Serializable {
     protected static void checkIntegerWithMax(final Map<String, String> errors, final String field, final int value, final int max, final String message) {
         if ((value < 1) || (value > max)) {
             errors.put(field, message);
+        }
+    }
+
+    protected static void checkUrl(final Map<String, String> errors, final String value) {
+        try {
+            final URL url = new URL(value);
+            url.toURI();
+        } catch (MalformedURLException | URISyntaxException e) {
+            // The error information from the Exception is added to the
+            // error Object, which again is returned. Logging it here
+            // would be pointless and thus the Sonar warning is ignored
+            // at this place.
+            errors.put(Constants.FIELD_URL, "The URL field is invalid - " + e.getMessage());
         }
     }
 }

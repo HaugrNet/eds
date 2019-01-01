@@ -176,6 +176,7 @@ public final class SettingService extends Serviceable<CommonDao, SettingResponse
                 checkIfMembersExist(setting);
                 break;
             default:
+                checkOtherSettings(setting);
                 break;
         }
     }
@@ -229,6 +230,16 @@ public final class SettingService extends Serviceable<CommonDao, SettingResponse
             // other account exists than the System Administrator. If that is
             // the case, then an exception is thrown.
             throw new CWSException(ReturnCode.SETTING_WARNING, "The setting " + setting.getKey() + " may not be overwritten.");
+        }
+    }
+
+    private static void checkOtherSettings(final StandardSetting setting) {
+        // Currently, the only setting which have not been checked otherwise,
+        // and which is not allowed to be updated - is the MasterKey URL, since
+        // doing so may have harmful consequences. The setting may only be
+        // updated by the MasterKey request.
+        if (setting == StandardSetting.MASTERKEY_URL) {
+            throw new CWSException(ReturnCode.SETTING_WARNING, "The setting " + StandardSetting.MASTERKEY_URL.getKey() + " may not be changed with this request.");
         }
     }
 

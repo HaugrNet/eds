@@ -437,6 +437,12 @@ public enum ReturnCode {
     ERROR(Classification.CLASS_ERROR, 0, "General Error occurred while handling the request."),
 
     /**
+     * <b>HTTP Status Code 502 - Bad Gateway Error</b>.<br>
+     * <i>It was not possible to communicate with the requested URL.</i>
+     */
+    NETWORK_ERROR(Classification.CLASS_ERROR, 2, "Unable to communicate with the requested network service."),
+
+    /**
      * <b>Custom Warning 591 - General Cryptographic Error</b>.<br>
      * <i>A generic cryptographic error occurred during the request.</i>
      */

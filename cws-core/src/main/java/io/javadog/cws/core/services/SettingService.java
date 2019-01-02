@@ -1,12 +1,18 @@
 /*
- * Cryptographic Web Store, CWS, open source backend service.
- * Copyright (C) 2016-2018 JavaDog.io
- * Apache Software License, version 2
- * mailto:cws AT JavaDog DOT io
+ * CWS, Cryptographic Web Store - open source Cryptographic Storage system.
+ * Copyright (C) 2016-2019, JavaDog.io
+ * mailto: cws AT JavaDog DOT io
  *
- * CWS is released in the hope that it will be useful, but WITHOUT ANY
- * WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.
+ * CWS is free software; you can redistribute it and/or modify it under the
+ * terms of the Apache License, as published by the Apache Software Foundation.
+ *
+ * CWS is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the Apache License for more details.
+ *
+ * You should have received a copy of the Apache License, version 2, along with
+ * this program; If not, you can download a copy of the License
+ * here: https://www.apache.org/licenses/
  */
 package io.javadog.cws.core.services;
 
@@ -20,8 +26,6 @@ import io.javadog.cws.core.exceptions.CWSException;
 import io.javadog.cws.core.model.CommonDao;
 import io.javadog.cws.core.model.Settings;
 import io.javadog.cws.core.model.entities.SettingEntity;
-
-import javax.persistence.EntityManager;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.EnumSet;
@@ -31,6 +35,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
+import javax.persistence.EntityManager;
 
 /**
  * <p>The Setting Service, allows for checking and updating existing Settings

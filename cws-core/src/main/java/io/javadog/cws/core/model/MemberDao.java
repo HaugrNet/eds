@@ -1,6 +1,6 @@
 /*
  * CWS, Cryptographic Web Store - open source Cryptographic Storage system.
- * Copyright (C) 2016-2018, JavaDog.io
+ * Copyright (C) 2016-2019, JavaDog.io
  * mailto: cws AT JavaDog DOT io
  *
  * CWS is free software; you can redistribute it and/or modify it under the
@@ -19,10 +19,9 @@ package io.javadog.cws.core.model;
 import io.javadog.cws.core.model.entities.CircleEntity;
 import io.javadog.cws.core.model.entities.MemberEntity;
 import io.javadog.cws.core.model.entities.TrusteeEntity;
-
+import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
-import java.util.List;
 
 /**
  * <p>Data Access Object functionality used explicitly for the fetching &amp;

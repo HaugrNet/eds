@@ -1,30 +1,24 @@
 /*
- * Cryptographic Web Store, CWS, open source backend service.
- * Copyright (C) 2016-2018 JavaDog.io
- * Apache Software License, version 2
- * mailto:cws AT JavaDog DOT io
+ * CWS, Cryptographic Web Store - open source Cryptographic Storage system.
+ * Copyright (C) 2016-2019, JavaDog.io
+ * mailto: cws AT JavaDog DOT io
  *
- * CWS is released in the hope that it will be useful, but WITHOUT ANY
- * WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.
+ * CWS is free software; you can redistribute it and/or modify it under the
+ * terms of the Apache License, as published by the Apache Software Foundation.
+ *
+ * CWS is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the Apache License for more details.
+ *
+ * You should have received a copy of the Apache License, version 2, along with
+ * this program; If not, you can download a copy of the License
+ * here: https://www.apache.org/licenses/
  */
 package io.javadog.cws.core.jce;
 
 import io.javadog.cws.core.enums.KeyAlgorithm;
 import io.javadog.cws.core.exceptions.CryptoException;
 import io.javadog.cws.core.model.Settings;
-
-import javax.crypto.BadPaddingException;
-import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.KeyGenerator;
-import javax.crypto.NoSuchPaddingException;
-import javax.crypto.SecretKey;
-import javax.crypto.SecretKeyFactory;
-import javax.crypto.spec.GCMParameterSpec;
-import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.PBEKeySpec;
-import javax.crypto.spec.SecretKeySpec;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.Key;
@@ -43,6 +37,17 @@ import java.security.spec.KeySpec;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.KeyGenerator;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SecretKey;
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.GCMParameterSpec;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.PBEKeySpec;
+import javax.crypto.spec.SecretKeySpec;
 
 /**
  * <p>This library contain all the Cryptographic Operations, needed for CWS, to
@@ -274,6 +279,12 @@ public final class Crypto {
             instanceName = algorithm.getTransformationValue();
             switch (key.getAlgorithm().getTransformation()) {
                 case AES:
+                    // SonarQube rule S3329 (http://localhost:9000/coding_rules?open=squid:S3329&rule_key=squid:S3329
+                    // is marking this place as a vulnerability, as it cannot
+                    // ascertain that the salt is generated randomly using
+                    // secureRandom, and also stored armored in the database.
+                    // As the same salt must be used for both encryption and
+                    // decryption - the rule is simply not good enough.
                     iv = new IvParameterSpec(((SecretCWSKey) key).getSalt().getBytes());
                     break;
                 case GCM:

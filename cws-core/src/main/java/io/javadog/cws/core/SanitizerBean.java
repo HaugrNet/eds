@@ -1,12 +1,18 @@
 /*
- * Cryptographic Web Store, CWS, open source backend service.
- * Copyright (C) 2016-2018 JavaDog.io
- * Apache Software License, version 2
- * mailto:cws AT JavaDog DOT io
+ * CWS, Cryptographic Web Store - open source Cryptographic Storage system.
+ * Copyright (C) 2016-2019, JavaDog.io
+ * mailto: cws AT JavaDog DOT io
  *
- * CWS is released in the hope that it will be useful, but WITHOUT ANY
- * WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.
+ * CWS is free software; you can redistribute it and/or modify it under the
+ * terms of the Apache License, as published by the Apache Software Foundation.
+ *
+ * CWS is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the Apache License for more details.
+ *
+ * You should have received a copy of the Apache License, version 2, along with
+ * this program; If not, you can download a copy of the License
+ * here: https://www.apache.org/licenses/
  */
 package io.javadog.cws.core;
 
@@ -16,7 +22,11 @@ import io.javadog.cws.core.jce.Crypto;
 import io.javadog.cws.core.model.CommonDao;
 import io.javadog.cws.core.model.Settings;
 import io.javadog.cws.core.model.entities.DataEntity;
-
+import java.time.LocalDate;
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
+import java.util.logging.Logger;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
@@ -24,11 +34,6 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceException;
 import javax.persistence.Query;
 import javax.transaction.Transactional;
-import java.time.LocalDate;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
-import java.util.logging.Logger;
 
 /**
  * <p>Generally, the database is always trustworthy, it is a system which is

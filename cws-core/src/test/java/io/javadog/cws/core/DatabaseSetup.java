@@ -35,6 +35,7 @@ import io.javadog.cws.core.exceptions.CWSException;
 import io.javadog.cws.core.jce.CWSKeyPair;
 import io.javadog.cws.core.jce.Crypto;
 import io.javadog.cws.core.jce.IVSalt;
+import io.javadog.cws.core.jce.MasterKey;
 import io.javadog.cws.core.jce.SecretCWSKey;
 import io.javadog.cws.core.model.CommonDao;
 import io.javadog.cws.core.model.Settings;
@@ -43,6 +44,15 @@ import io.javadog.cws.core.model.entities.CircleEntity;
 import io.javadog.cws.core.model.entities.DataEntity;
 import io.javadog.cws.core.model.entities.KeyEntity;
 import io.javadog.cws.core.model.entities.MemberEntity;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.rules.ExpectedException;
+
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
+import javax.persistence.Query;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
@@ -55,14 +65,6 @@ import java.util.Locale;
 import java.util.UUID;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
-import javax.persistence.Query;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.rules.ExpectedException;
 
 /**
  * @author Kim Jensen
@@ -210,7 +212,7 @@ public class DatabaseSetup {
      * @param returnMessage The Return Message
      * @param <E>           The Exception, must extend a CWS Exception
      */
-    protected <E extends CWSException> void prepareCause(final Class<E> cause, final String returnMessage) {
+    protected <E extends Throwable> void prepareCause(final Class<E> cause, final String returnMessage) {
         thrown.expect(cause);
         thrown.expectMessage(returnMessage);
     }
@@ -242,9 +244,43 @@ public class DatabaseSetup {
     protected Settings newSettings() {
         try {
             final Constructor<Settings> constructor = Settings.class.getDeclaredConstructor();
+            final boolean accessible = constructor.isAccessible();
             constructor.setAccessible(true);
-            return constructor.newInstance();
+            final Settings instance = constructor.newInstance();
+            constructor.setAccessible(accessible);
+
+            return instance;
         } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
+            throw new CWSException(ReturnCode.ERROR, e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Testing, requiring a customized MasterKey, should use this method to get
+     * a new instance of the Singleton Class MasterKey. It requires an instance
+     * of the Settings to work, so it is possible to alter the content and thus
+     * behaviour without affecting other tests requiring the MasterKey and
+     * Settings.
+     *
+     * @param settings Customized Settings instance for the MasterKey instance
+     * @return New MasterKey instance
+     */
+    protected static MasterKey newMasterKey(final Settings settings) {
+        try {
+            final Constructor<MasterKey> constructor = MasterKey.class.getDeclaredConstructor(Settings.class);
+            final boolean accessible = constructor.isAccessible();
+            constructor.setAccessible(true);
+            final MasterKey instance = constructor.newInstance(settings);
+            constructor.setAccessible(accessible);
+
+            return instance;
+        } catch (InvocationTargetException e) {
+            final Throwable target = e.getTargetException();
+            if (target instanceof CWSException) {
+                throw new CWSException(((CWSException) target).getReturnCode(), target.getMessage(), e);
+            }
+            throw new CWSException(ReturnCode.ERROR, target.getMessage(), e);
+        } catch (SecurityException | IllegalArgumentException | NoSuchMethodException | InstantiationException | IllegalAccessException e) {
             throw new CWSException(ReturnCode.ERROR, e.getMessage(), e);
         }
     }

@@ -17,6 +17,7 @@
 package io.javadog.cws.core.services;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertThat;
 
 import io.javadog.cws.api.common.Constants;
@@ -26,15 +27,19 @@ import io.javadog.cws.api.responses.MasterKeyResponse;
 import io.javadog.cws.core.DatabaseSetup;
 import io.javadog.cws.core.enums.StandardSetting;
 import io.javadog.cws.core.exceptions.CWSException;
+import io.javadog.cws.core.jce.MasterKey;
+import io.javadog.cws.core.model.Settings;
 import io.javadog.cws.core.model.entities.MemberEntity;
+import org.junit.Test;
+
+import javax.persistence.Query;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
-import javax.persistence.Query;
-import org.junit.Test;
+import java.util.UUID;
 
 /**
  * <p>This Test Class, is testing the following Service Classes in one, as they
@@ -143,9 +148,38 @@ public final class MasterKeyServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testStartingMasterKeyWithURL() {
-        // TODO #44: Placeholder for missing test.
-        assertThat(Boolean.TRUE, is(true));
+    public void testStartingMasterKeyWithURLFailed() {
+        final String file = tempDir() + "not_existing_file.bin";
+        prepareCause(CWSException.class, ReturnCode.NETWORK_ERROR, file + " (No such file or directory)");
+
+        final Settings mySettings = newSettings();
+        mySettings.set(StandardSetting.MASTERKEY_URL.getKey(), "file://" + file);
+        assertThat(mySettings.getMasterKeyURL(), is(not(settings.getMasterKeyURL())));
+
+        newMasterKey(mySettings);
+    }
+
+    /**
+     * Testing that the MasterKey from file, where the file has the same content
+     * as the normal, unconfigured MasterKey, is the same as the default. and
+     * that a different content file will have different key.
+     *
+     * @throws IOException If unable to write to the MasterKey file
+     */
+    @Test
+    public void testStartingMasterKeyWithURLSuccess() throws IOException {
+        final String file = tempDir() + "masterKey.bin";
+        final MasterKey defaultMasterKey = MasterKey.getInstance(settings);
+        final Settings mySettings = newSettings();
+        mySettings.set(StandardSetting.MASTERKEY_URL.getKey(), "file://" + file);
+
+        Files.write(Paths.get(file), Constants.ADMIN_ACCOUNT.getBytes(settings.getCharset()));
+        final MasterKey masterKey1 = newMasterKey(mySettings);
+        assertThat(defaultMasterKey.getKey().getKey(), is(masterKey1.getKey().getKey()));
+
+        Files.write(Paths.get(file), UUID.randomUUID().toString().getBytes(settings.getCharset()));
+        final MasterKey masterKey2 = newMasterKey(mySettings);
+        assertThat(defaultMasterKey.getKey().getKey(), is(not(masterKey2.getKey().getKey())));
     }
 
     @Test

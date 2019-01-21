@@ -68,7 +68,7 @@ public interface Management {
      *   <li>
      *     <b>cws.crypto.symmetric.algorithm</b> - default value: 'AES_CBC_128'<br>
      *     Allowed Values: 'AES_CBC_128', 'AES_CBC_192', 'AES_CBC_256',
-     *     'AES_GCM_128', 'AES_GCM_192', 'AES_GCM_256'<br>
+     *     'AES_GCM_128'(pending: 'AES_GCM_192', 'AES_GCM_256')<br>
      *     <i> The Algorithm used for the Symmetric Keys in CWS. All data is
      *     stored using this Algorithm. Although it can be changed, please test
      *     the CWS carefully before doing so. And please be aware, that the
@@ -118,8 +118,8 @@ public interface Management {
      *     for more information.</i>
      *   </li>
      *   <li>
-     *     <b>cws.crypto.hash.algorithm</b> - default value: 'SHA512'<br>
-     *     Allowed Values: 'SHA256' or 'SHA512'<br>
+     *     <b>cws.crypto.hash.algorithm</b> - default value: 'SHA_512'<br>
+     *     Allowed Values: 'SHA_256' or 'SHA_512'<br>
      *     <i>For the CheckSums or Fingerprints we're generating - we just need
      *     a way to ensure that the value is both identifiable. For Signatures,
      *     it is used as part of the lookup to find a Signature in the Database

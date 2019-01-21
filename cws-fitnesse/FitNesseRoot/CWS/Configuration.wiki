@@ -42,11 +42,11 @@ recommended that common best practices regarding the pick of the passphrase is
 followed - for the sake of this test, it is set to 'admin'.''
 
 !|script|Settings     |admin                          |admin                                                     |
-|check  |value for key|cws.crypto.symmetric.algorithm |AES256                                                    |
-|check  |value for key|cws.crypto.asymmetric.algorithm|RSA2048                                                   |
-|check  |value for key|cws.crypto.signature.algorithm |SHA512                                                    |
-|check  |value for key|cws.crypto.pbe.algorithm       |PBE256                                                    |
-|check  |value for key|cws.crypto.hash.algorithm      |SHA512                                                    |
+|check  |value for key|cws.crypto.symmetric.algorithm |AES_CBC_256                                               |
+|check  |value for key|cws.crypto.asymmetric.algorithm|RSA_2048                                                  |
+|check  |value for key|cws.crypto.signature.algorithm |SHA_512                                                   |
+|check  |value for key|cws.crypto.pbe.algorithm       |PBE_256                                                   |
+|check  |value for key|cws.crypto.hash.algorithm      |SHA_512                                                   |
 |check  |value for key|cws.system.salt                |Default salt, also used as kill switch. Must be set in DB.|
 |check  |value for key|cws.system.locale              |EN                                                        |
 |check  |value for key|cws.system.charset             |UTF-8                                                     |
@@ -80,16 +80,22 @@ The primary part of all internal encryption is performed using Symmetric Keys. T
 size of the keys may be changed. The default value is '''AES256''', but if an earlier version of Java 8 is used, or if there is various
 problems with allowing this Key size, then it can be set to a lower value.
 The allowed values are:
- * '''AES128'''
- * '''AES192'''
- * '''AES256'''
+ * '''AES_CBC_128'''
+ * '''AES_CBC_192'''
+ * '''AES_CBC_256'''
+ * '''AES_GCM_128'''
 
-!|Settings                                                                                                                                                   |
-|account name|credential|key                           |value |return code?      |return message?                                                   |defined?|
-|admin       |admin     |cws.crypto.symmetric.algorithm|AES128|${SUCCESS}        |Ok                                                                |AES128  |
-|admin       |admin     |cws.crypto.symmetric.algorithm|AES192|${SUCCESS}        |Ok                                                                |AES192  |
-|admin       |admin     |cws.crypto.symmetric.algorithm|AES256|${SUCCESS}        |Ok                                                                |AES256  |
-|admin       |admin     |cws.crypto.symmetric.algorithm|AES512|${SETTING_WARNING}|Unsupported Crypto Algorithm for 'cws.crypto.symmetric.algorithm'.|AES256  |
+Pending Algorithms:
+ * '''AES_GCM_192'''
+ * '''AES_GCM_256'''
+
+!|Settings                                                                                                                                                           |
+|account name|credential|key                           |value      |return code?      |return message?                                                   |defined?   |
+|admin       |admin     |cws.crypto.symmetric.algorithm|AES_GCM_128|${SUCCESS}        |Ok                                                                |AES_GCM_128|
+|admin       |admin     |cws.crypto.symmetric.algorithm|AES_CBC_128|${SUCCESS}        |Ok                                                                |AES_CBC_128|
+|admin       |admin     |cws.crypto.symmetric.algorithm|AES_CBC_192|${SUCCESS}        |Ok                                                                |AES_CBC_192|
+|admin       |admin     |cws.crypto.symmetric.algorithm|AES_CBC_256|${SUCCESS}        |Ok                                                                |AES_CBC_256|
+|admin       |admin     |cws.crypto.symmetric.algorithm|AES_CBC_512|${SETTING_WARNING}|Unsupported Crypto Algorithm for 'cws.crypto.symmetric.algorithm'.|AES_CBC_256|
 
 ----------
 !3 Asymmetric Algorithm
@@ -98,30 +104,30 @@ Higher Key size will give higher security. However, Asymmetric encryption/decryp
 minimized. The default value is '''RSA2048''', increasing this to a higher Key size, will have a drastic performance cost, and should only be done if a higher level of
 security is needed or if enough CWS instances with enough resources is being used, so the cost can be mitigated.
 The allowed values are:
- * '''RSA2048'''
- * '''RSA4096'''
- * '''RSA8192'''
+ * '''RSA_2048'''
+ * '''RSA_4096'''
+ * '''RSA_8192'''
 
-!|Settings                                                                                                                                                      |
-|account name|credential|key                            |value  |return code?      |return message?                                                    |defined?|
-|admin       |admin     |cws.crypto.asymmetric.algorithm|RSA8192|${SUCCESS}        |Ok                                                                 |RSA8192 |
-|admin       |admin     |cws.crypto.asymmetric.algorithm|RSA4096|${SUCCESS}        |Ok                                                                 |RSA4096 |
-|admin       |admin     |cws.crypto.asymmetric.algorithm|RSA2048|${SUCCESS}        |Ok                                                                 |RSA2048 |
-|admin       |admin     |cws.crypto.asymmetric.algorithm|RSA1024|${SETTING_WARNING}|Unsupported Crypto Algorithm for 'cws.crypto.asymmetric.algorithm'.|RSA2048 |
+!|Settings                                                                                                                                                       |
+|account name|credential|key                            |value   |return code?      |return message?                                                    |defined?|
+|admin       |admin     |cws.crypto.asymmetric.algorithm|RSA_8192|${SUCCESS}        |Ok                                                                 |RSA_8192|
+|admin       |admin     |cws.crypto.asymmetric.algorithm|RSA_4096|${SUCCESS}        |Ok                                                                 |RSA_4096|
+|admin       |admin     |cws.crypto.asymmetric.algorithm|RSA_2048|${SUCCESS}        |Ok                                                                 |RSA_2048|
+|admin       |admin     |cws.crypto.asymmetric.algorithm|RSA_1024|${SETTING_WARNING}|Unsupported Crypto Algorithm for 'cws.crypto.asymmetric.algorithm'.|RSA_2048|
 
 ----------
 !3 PBE Algorithm
 The PBE, Password Based Encryption, Algorithm, which is the Algorithm used to convert a given Passphrase to a Symmetric Key,
 is based on the PBKDF2 algorithm, which again is a special way to generated a Symmetric Key, just as normal Symmetric Keys.
 The allowed values are:
- * '''PBE128'''
- * '''PBE192'''
- * '''PBE256'''
+ * '''PBE_128'''
+ * '''PBE_192'''
+ * '''PBE_256'''
 
-!|Settings                                                                                                                                       |
-|account name|credential|key                     |value |return code?      |return message?                                             |defined?|
-|admin       |admin     |cws.crypto.pbe.algorithm|PBE128|${SUCCESS}        |Ok                                                          |PBE128  |
-|admin       |admin     |cws.crypto.pbe.algorithm|PBE192|${SUCCESS}        |Ok                                                          |PBE192  |
-|admin       |admin     |cws.crypto.pbe.algorithm|PBE256|${SUCCESS}        |Ok                                                          |PBE256  |
-|admin       |admin     |cws.crypto.pbe.algorithm|PBE512|${SETTING_WARNING}|Unsupported Crypto Algorithm for 'cws.crypto.pbe.algorithm'.|PBE256  |
+!|Settings                                                                                                                                        |
+|account name|credential|key                     |value  |return code?      |return message?                                             |defined?|
+|admin       |admin     |cws.crypto.pbe.algorithm|PBE_128|${SUCCESS}        |Ok                                                          |PBE_128 |
+|admin       |admin     |cws.crypto.pbe.algorithm|PBE_192|${SUCCESS}        |Ok                                                          |PBE_192 |
+|admin       |admin     |cws.crypto.pbe.algorithm|PBE_256|${SUCCESS}        |Ok                                                          |PBE_256 |
+|admin       |admin     |cws.crypto.pbe.algorithm|PBE_512|${SETTING_WARNING}|Unsupported Crypto Algorithm for 'cws.crypto.pbe.algorithm'.|PBE_256 |
 

@@ -23,6 +23,7 @@ import io.javadog.cws.api.TestUtilities;
 import io.javadog.cws.api.common.Action;
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.CredentialType;
+import io.javadog.cws.api.common.MemberRole;
 import org.junit.Test;
 
 import java.util.Map;
@@ -44,18 +45,20 @@ public final class ProcessMemberRequestTest {
         request.setAccountName(Constants.ADMIN_ACCOUNT);
         request.setCredential(TestUtilities.convert(Constants.ADMIN_ACCOUNT));
         request.setAction(Action.CREATE);
+        request.setMemberId(memberId);
+        request.setMemberRole(MemberRole.ADMIN);
         request.setNewAccountName(newAccountName);
         request.setNewCredential(TestUtilities.convert(newCredential));
-        request.setMemberId(memberId);
         final Map<String, String> errors = request.validate();
 
         assertThat(errors.isEmpty(), is(true));
         assertThat(request.getAccountName(), is(Constants.ADMIN_ACCOUNT));
         assertThat(TestUtilities.convert(request.getCredential()), is(Constants.ADMIN_ACCOUNT));
         assertThat(request.getAction(), is(Action.CREATE));
+        assertThat(request.getMemberId(), is(memberId));
+        assertThat(request.getMemberRole(), is(MemberRole.ADMIN));
         assertThat(request.getNewAccountName(), is(newAccountName));
         assertThat(TestUtilities.convert(request.getNewCredential()), is(newCredential));
-        assertThat(request.getMemberId(), is(memberId));
     }
 
     @Test

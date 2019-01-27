@@ -100,7 +100,8 @@
     <xs:complexContent>
       <xs:extension base="tns:authentication">
         <xs:sequence>
-          <xs:element name="secret" type="xs:base64Binary"/>
+          <xs:element minOccurs="0" name="secret" type="xs:base64Binary"/>
+          <xs:element minOccurs="0" name="url" type="xs:string"/>
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>
@@ -234,6 +235,7 @@
         <xs:sequence>
           <xs:element name="action" type="tns:action"/>
           <xs:element minOccurs="0" name="memberId" nillable="true" type="xs:string"/>
+          <xs:element name="memberRole" type="tns:memberRole"/>
           <xs:element name="publicKey" type="xs:string"/>
           <xs:element minOccurs="0" name="newAccountName" nillable="true" type="xs:string"/>
           <xs:element minOccurs="0" name="newCredential" nillable="true" type="xs:base64Binary"/>
@@ -390,6 +392,7 @@
     <xs:sequence>
       <xs:element name="memberId" type="xs:string"/>
       <xs:element name="accountName" type="xs:string"/>
+      <xs:element name="memberRole" type="tns:memberRole"/>
       <xs:element name="publicKey" type="xs:string"/>
       <xs:element name="added" type="xs:dateTime"/>
     </xs:sequence>
@@ -514,6 +517,13 @@
       <xs:enumeration value="ALTER"/>
       <xs:enumeration value="INVALIDATE"/>
       <xs:enumeration value="REMOVE"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="memberRole">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="ADMIN"/>
+      <xs:enumeration value="STANDARD"/>
     </xs:restriction>
   </xs:simpleType>
 

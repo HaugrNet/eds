@@ -17,14 +17,15 @@
 package io.javadog.cws.core;
 
 import io.javadog.cws.api.common.Constants;
+import io.javadog.cws.api.common.MemberRole;
 import io.javadog.cws.api.common.TrustLevel;
-import io.javadog.cws.core.enums.MemberRole;
 import io.javadog.cws.core.enums.StandardSetting;
 import io.javadog.cws.core.enums.Status;
 import io.javadog.cws.core.jce.CWSKeyPair;
 import io.javadog.cws.core.jce.Crypto;
 import io.javadog.cws.core.jce.SecretCWSKey;
 import io.javadog.cws.core.model.Settings;
+
 import java.util.UUID;
 
 /**

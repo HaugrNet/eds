@@ -21,12 +21,13 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 
+import io.javadog.cws.api.common.MemberRole;
 import io.javadog.cws.api.common.TrustLevel;
 import io.javadog.cws.core.DatabaseSetup;
 import io.javadog.cws.core.enums.KeyAlgorithm;
-import io.javadog.cws.core.enums.MemberRole;
-import java.util.UUID;
 import org.junit.Test;
+
+import java.util.UUID;
 
 /**
  * @author Kim Jensen

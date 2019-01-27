@@ -18,8 +18,9 @@ package io.javadog.cws.api.requests;
 
 import io.javadog.cws.api.common.Action;
 import io.javadog.cws.api.common.Constants;
+import io.javadog.cws.api.common.MemberRole;
 import io.javadog.cws.api.common.Utilities;
-import java.util.Map;
+
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
@@ -28,6 +29,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
+import java.util.Map;
 
 /**
  * <p>It is possible to create new Member Accounts in 2 different ways, both
@@ -90,7 +92,7 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "processMemberRequest")
-@XmlType(name = "processMemberRequest", propOrder = { Constants.FIELD_ACTION, Constants.FIELD_MEMBER_ID, Constants.FIELD_PUBLIC_KEY, Constants.FIELD_NEW_ACCOUNT_NAME, Constants.FIELD_NEW_CREDENTIAL })
+@XmlType(name = "processMemberRequest", propOrder = { Constants.FIELD_ACTION, Constants.FIELD_MEMBER_ID, Constants.FIELD_MEMBER_ROLE, Constants.FIELD_PUBLIC_KEY, Constants.FIELD_NEW_ACCOUNT_NAME, Constants.FIELD_NEW_CREDENTIAL })
 public final class ProcessMemberRequest extends Authentication {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
@@ -103,6 +105,9 @@ public final class ProcessMemberRequest extends Authentication {
     @Pattern(regexp = Constants.ID_PATTERN_REGEX)
     @XmlElement(name = Constants.FIELD_MEMBER_ID, nillable = true)
     private String memberId = null;
+
+    @XmlElement(name = Constants.FIELD_MEMBER_ROLE, required = true)
+    private MemberRole memberRole = null;
 
     // The Public Key is an optional value which may or may not be provided,
     // hence it is only stored but not used for anything.
@@ -134,6 +139,14 @@ public final class ProcessMemberRequest extends Authentication {
 
     public String getMemberId() {
         return memberId;
+    }
+
+    public void setMemberRole(final MemberRole memberRole) {
+        this.memberRole = memberRole;
+    }
+
+    public MemberRole getMemberRole() {
+        return memberRole;
     }
 
     public void setPublicKey(final String publicKey) {

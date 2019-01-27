@@ -17,11 +17,11 @@
 package io.javadog.cws.core.services;
 
 import io.javadog.cws.api.common.Constants;
+import io.javadog.cws.api.common.MemberRole;
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.requests.Authentication;
 import io.javadog.cws.api.requests.MasterKeyRequest;
 import io.javadog.cws.api.responses.MasterKeyResponse;
-import io.javadog.cws.core.enums.MemberRole;
 import io.javadog.cws.core.enums.StandardSetting;
 import io.javadog.cws.core.exceptions.CryptoException;
 import io.javadog.cws.core.jce.MasterKey;
@@ -30,11 +30,12 @@ import io.javadog.cws.core.model.CommonDao;
 import io.javadog.cws.core.model.Settings;
 import io.javadog.cws.core.model.entities.MemberEntity;
 import io.javadog.cws.core.model.entities.SettingEntity;
+
+import javax.persistence.EntityManager;
 import java.util.Base64;
 import java.util.List;
 import java.util.Objects;
 import java.util.logging.Logger;
-import javax.persistence.EntityManager;
 
 /**
  * <p>Business Logic implementation for the CWS MasterKey request.</p>

@@ -17,10 +17,10 @@
 package io.javadog.cws.core.model.entities;
 
 import io.javadog.cws.api.common.Constants;
+import io.javadog.cws.api.common.MemberRole;
 import io.javadog.cws.api.common.Utilities;
 import io.javadog.cws.core.enums.KeyAlgorithm;
-import io.javadog.cws.core.enums.MemberRole;
-import java.util.Date;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -30,6 +30,7 @@ import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import java.util.Date;
 
 /**
  * <p>CWS Member Entity, maps the Member table from the Database.</p>

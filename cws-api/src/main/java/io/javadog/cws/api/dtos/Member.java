@@ -17,13 +17,15 @@
 package io.javadog.cws.api.dtos;
 
 import io.javadog.cws.api.common.Constants;
+import io.javadog.cws.api.common.MemberRole;
 import io.javadog.cws.api.common.Utilities;
-import java.io.Serializable;
-import java.util.Date;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
+import java.io.Serializable;
+import java.util.Date;
 
 /**
  * <p>The Member Object, is used as Accounts in CWS. The Object consists of an
@@ -36,7 +38,7 @@ import javax.xml.bind.annotation.XmlType;
  * @since  CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = Constants.FIELD_MEMBER, propOrder = { Constants.FIELD_MEMBER_ID, Constants.FIELD_ACCOUNT_NAME, Constants.FIELD_PUBLIC_KEY, Constants.FIELD_ADDED })
+@XmlType(name = Constants.FIELD_MEMBER, propOrder = { Constants.FIELD_MEMBER_ID, Constants.FIELD_ACCOUNT_NAME, Constants.FIELD_MEMBER_ROLE, Constants.FIELD_PUBLIC_KEY, Constants.FIELD_ADDED })
 public final class Member implements Serializable {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
@@ -47,6 +49,9 @@ public final class Member implements Serializable {
 
     @XmlElement(name = Constants.FIELD_ACCOUNT_NAME, required = true)
     private String accountName = null;
+
+    @XmlElement(name = Constants.FIELD_MEMBER_ROLE, required = true)
+    private MemberRole memberRole = null;
 
     // The Public Key is an optional value which may or may not be provided,
     // hence it is only stored but not used for anything. For the same reason,
@@ -78,6 +83,14 @@ public final class Member implements Serializable {
         return accountName;
     }
 
+    public void setMemberRole(final MemberRole memberRole) {
+        this.memberRole = memberRole;
+    }
+
+    public MemberRole getMemberRole() {
+        return memberRole;
+    }
+
     public void setPublicKey(final String publicKey) {
         this.publicKey = publicKey;
     }
@@ -106,6 +119,7 @@ public final class Member implements Serializable {
         return "Member{" +
                 "memberId='" + memberId + '\'' +
                 ", accountName='" + accountName + '\'' +
+                ", memberRole='" + memberRole + '\'' +
                 ", added=" + added +
                 '}';
     }

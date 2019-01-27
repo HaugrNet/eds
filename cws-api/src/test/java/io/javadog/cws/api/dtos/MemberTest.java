@@ -20,10 +20,12 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertThat;
 
+import io.javadog.cws.api.common.MemberRole;
 import io.javadog.cws.api.common.Utilities;
+import org.junit.Test;
+
 import java.util.Date;
 import java.util.UUID;
-import org.junit.Test;
 
 /**
  * @author Kim Jensen
@@ -40,10 +42,12 @@ public final class MemberTest {
         final Member member = new Member();
         member.setMemberId(memberId);
         member.setAccountName(accountName);
+        member.setMemberRole(MemberRole.STANDARD);
         member.setAdded(added);
 
         assertThat(member.getMemberId(), is(memberId));
         assertThat(member.getAccountName(), is(accountName));
+        assertThat(member.getMemberRole(), is(MemberRole.STANDARD));
         assertThat(member.getAdded(), is(added));
     }
 
@@ -55,9 +59,11 @@ public final class MemberTest {
 
         member.setMemberId(UUID.randomUUID().toString());
         member.setAccountName(UUID.randomUUID().toString());
+        member.setMemberRole(MemberRole.ADMIN);
         member.setAdded(Utilities.newDate());
         sameMember.setMemberId(member.getMemberId());
         sameMember.setAccountName(member.getAccountName());
+        sameMember.setMemberRole(member.getMemberRole());
         sameMember.setAdded(member.getAdded());
 
         assertThat(member.toString(), is(sameMember.toString()));

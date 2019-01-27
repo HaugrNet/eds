@@ -99,6 +99,7 @@ public final class Constants {
     public static final String FIELD_NEW_ACCOUNT_NAME = "newAccountName";
     public static final String FIELD_CREDENTIAL = "credential";
     public static final String FIELD_NEW_CREDENTIAL = "newCredential";
+    public static final String FIELD_MEMBER_ROLE = "memberRole";
     public static final String FIELD_CREDENTIALTYPE = "credentialType";
     public static final String FIELD_CIRCLE = "circle";
     public static final String FIELD_CIRCLES = "circles";

@@ -18,6 +18,7 @@ package io.javadog.cws.core.services;
 
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.CredentialType;
+import io.javadog.cws.api.common.MemberRole;
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.common.TrustLevel;
 import io.javadog.cws.api.common.Utilities;
@@ -27,7 +28,6 @@ import io.javadog.cws.api.requests.CircleIdRequest;
 import io.javadog.cws.api.requests.Verifiable;
 import io.javadog.cws.api.responses.CwsResponse;
 import io.javadog.cws.core.enums.KeyAlgorithm;
-import io.javadog.cws.core.enums.MemberRole;
 import io.javadog.cws.core.enums.Permission;
 import io.javadog.cws.core.exceptions.AuthenticationException;
 import io.javadog.cws.core.exceptions.AuthorizationException;
@@ -44,6 +44,7 @@ import io.javadog.cws.core.model.entities.CircleEntity;
 import io.javadog.cws.core.model.entities.DataEntity;
 import io.javadog.cws.core.model.entities.MemberEntity;
 import io.javadog.cws.core.model.entities.TrusteeEntity;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

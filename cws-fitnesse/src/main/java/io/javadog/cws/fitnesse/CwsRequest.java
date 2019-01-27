@@ -16,21 +16,24 @@
  */
 package io.javadog.cws.fitnesse;
 
+import io.javadog.cws.api.common.Action;
 import io.javadog.cws.api.common.CredentialType;
 import io.javadog.cws.api.dtos.Circle;
 import io.javadog.cws.api.dtos.DataType;
-import io.javadog.cws.api.dtos.Member;
 import io.javadog.cws.api.requests.Authentication;
 import io.javadog.cws.api.responses.CwsResponse;
 import io.javadog.cws.api.responses.FetchCircleResponse;
-import io.javadog.cws.api.responses.FetchMemberResponse;
+import io.javadog.cws.api.responses.ProcessMemberResponse;
 import io.javadog.cws.fitnesse.exceptions.StopTestException;
 import io.javadog.cws.fitnesse.utils.Converter;
+
 import java.lang.reflect.InvocationTargetException;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * @author Kim Jensen
@@ -40,6 +43,13 @@ public abstract class CwsRequest<R extends CwsResponse> {
 
     // If it is not possible to find a matching value, then this should be used.
     protected static final String UNDEFINED = "undefined";
+
+    // All Ids in CWS which is externally exposed is UUIDs, meaning that they
+    // are always unique. And as the use of them should also be made with
+    // easily identifiable, yet unique names, they are simply stored in a
+    // single internal record, where the name have "_id" appended, and this
+    // is then used to both store, delete and find Ids.
+    private static final Map<String, String> ids = new HashMap<>(16);
 
     // Internal mapping of the Member AccountNames & the MemberId, so the tests
     // can refer to the names rather than the Id's, as the latter will change
@@ -57,14 +67,19 @@ public abstract class CwsRequest<R extends CwsResponse> {
 
     private String accountName = null;
     protected byte[] credential = null;
+    private CredentialType credentialType = null;
     protected R response = null;
 
     public void setAccountName(final String accountName) {
-        this.accountName = accountName;
+        this.accountName = Converter.preCheck(accountName);
     }
 
     public void setCredential(final String credential) {
         this.credential = Converter.convertBytes(credential);
+    }
+
+    public void setCredentialType(final String credentialType) {
+        this.credentialType = Converter.findCredentialType(credentialType);
     }
 
     public int returnCode() {
@@ -81,6 +96,7 @@ public abstract class CwsRequest<R extends CwsResponse> {
             request.setCredentialType(CredentialType.PASSPHRASE);
             request.setAccountName(accountName);
             request.setCredential(credential);
+            request.setCredentialType(credentialType);
 
             return request;
         } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
@@ -102,25 +118,44 @@ public abstract class CwsRequest<R extends CwsResponse> {
     public void reset() {
         this.accountName = null;
         this.credential = null;
+        this.credentialType = null;
     }
 
     // =========================================================================
     // Operating the internal mapping of Members & Circles
     // =========================================================================
 
-    protected void setMembers(final FetchMemberResponse memberResponse) {
-        if (memberResponse != null) {
-            for (final Member member : memberResponse.getMembers()) {
-                members.put(member.getAccountName(), member.getMemberId());
-            }
+    protected void addId(final Action action, final String key, final ProcessMemberResponse response) {
+        if ((key != null) && (response != null)) {
+            addId(action, key, response.getMemberId());
         }
     }
 
-    protected String getMemberId(final String accountName) {
-        return members.entrySet().stream()
-                .filter((Map.Entry<String, String> entry) -> Objects.equals(entry.getKey(), accountName))
-                .map(Map.Entry::getValue)
-                .findFirst().orElse(null);
+    private static void addId(final Action action, final String key, final String id) {
+        final Set<Action> actions = EnumSet.of(Action.ADD, Action.CREATE, Action.PROCESS);
+        if (actions.contains(action) && (id != null)) {
+            ids.put(key + "_id", id);
+        }
+    }
+
+    protected String getId(final String key) {
+        String id = null;
+
+        if (key != null) {
+            id = ids.entrySet().stream()
+                    .filter((Map.Entry<String, String> entry) -> Objects.equals(entry.getKey(), key))
+                    .map(Map.Entry::getValue)
+                    .findFirst().orElse(null);
+        }
+
+        return id;
+    }
+
+    protected void delId(final Action action, final String key) {
+        final Set<Action> actions = EnumSet.of(Action.REMOVE, Action.DELETE);
+        if (actions.contains(action)) {
+            ids.remove(key);
+        }
     }
 
     protected String getMemberNames() {
@@ -131,13 +166,6 @@ public abstract class CwsRequest<R extends CwsResponse> {
         for (final Circle circle : circleResponse.getCircles()) {
             circles.put(circle.getCircleName(), circle.getCircleId());
         }
-    }
-
-    protected String getCircleId(final String circleName) {
-        return circles.entrySet().stream()
-                .filter((Map.Entry<String, String> entry) -> Objects.equals(entry.getKey(), circleName))
-                .map(Map.Entry::getValue)
-                .findFirst().orElse(null);
     }
 
     protected String getCircleNames() {

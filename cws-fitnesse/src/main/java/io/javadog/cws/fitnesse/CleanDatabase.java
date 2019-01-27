@@ -30,8 +30,10 @@ import io.javadog.cws.api.responses.FetchCircleResponse;
 import io.javadog.cws.api.responses.FetchMemberResponse;
 import io.javadog.cws.fitnesse.callers.CallManagement;
 import io.javadog.cws.fitnesse.exceptions.StopTestException;
+
 import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.Charset;
+import java.util.Objects;
 
 /**
  * <p>Before the testing with FitNesse can start, certain existing data must be
@@ -43,7 +45,7 @@ import java.nio.charset.Charset;
  * Members, the database should be cleaned in preparation for testing.</p>
  *
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 public final class CleanDatabase {
 
@@ -66,10 +68,10 @@ public final class CleanDatabase {
 
         final FetchMemberResponse fetchResponse = CallManagement.fetchMembers(fetchRequest);
         for (final Member member : fetchResponse.getMembers()) {
-//            if (!Objects.equals(member.getAccountName(), Constants.ADMIN_ACCOUNT)) {
+            if (!Objects.equals(member.getAccountName(), Constants.ADMIN_ACCOUNT)) {
                 processRequest.setMemberId(member.getMemberId());
                 CallManagement.processMember(processRequest);
-//            }
+            }
         }
     }
 

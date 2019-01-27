@@ -21,6 +21,7 @@ import io.javadog.cws.api.common.TrustLevel;
 import io.javadog.cws.api.requests.ProcessTrusteeRequest;
 import io.javadog.cws.api.responses.ProcessTrusteeResponse;
 import io.javadog.cws.fitnesse.callers.CallManagement;
+
 import java.util.Locale;
 
 /**
@@ -43,11 +44,11 @@ public final class ProcessTrustee extends CwsRequest<ProcessTrusteeResponse> {
     }
 
     public void setCircle(final String circle) {
-        this.circleId = getCircleId(circle);
+        this.circleId = getId(circle);
     }
 
-    public void setMember(final String member) {
-        this.memberId = getMemberId(member);
+    public void setMemberId(final String memberId) {
+        this.memberId = getId(memberId);
     }
 
     public void setTrustLevel(final String trustLevel) {

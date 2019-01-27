@@ -16,17 +16,52 @@
  */
 package io.javadog.cws.fitnesse;
 
+import io.javadog.cws.api.common.Action;
+import io.javadog.cws.api.requests.ProcessMemberRequest;
 import io.javadog.cws.api.responses.ProcessMemberResponse;
+import io.javadog.cws.fitnesse.callers.CallManagement;
+import io.javadog.cws.fitnesse.utils.Converter;
 
 /**
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 public final class ProcessMember extends CwsRequest<ProcessMemberResponse> {
+
+    private Action action = null;
+    private String memberId = null;
+    private String publicKey = null;
+    private String newAccountName = null;
+    private byte[] newCredential = null;
 
     // =========================================================================
     // Request & Response Setters and Getters
     // =========================================================================
+
+    public void setAction(final String action) {
+        this.action = Converter.findAction(action);
+    }
+
+    public void setMemberId(final String memberId) {
+        final String tmp = Converter.preCheck(memberId);
+        this.memberId = getId(tmp);
+    }
+
+    public void setPublicKey(final String publicKey) {
+        this.publicKey = Converter.preCheck(publicKey);
+    }
+
+    public void setNewAccountName(final String newAccountName) {
+        this.newAccountName = Converter.preCheck(newAccountName);
+    }
+
+    public void setNewCredential(final String newCredential) {
+        this.newCredential = Converter.convertBytes(newCredential);
+    }
+
+    public String memberId() {
+        return getId(newAccountName + "_id");
+    }
 
     // =========================================================================
     // Standard FitNesse Fixture method(s)
@@ -37,6 +72,38 @@ public final class ProcessMember extends CwsRequest<ProcessMemberResponse> {
      */
     @Override
     public void execute() {
+        final ProcessMemberRequest request = buildRequest();
+        response = CallManagement.processMember(request);
 
+        // Ensuring that the internal mapping of Ids with accounts being
+        // used is synchronized.
+        addId(action, newAccountName, response);
+        delId(action, memberId);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void reset() {
+        super.reset();
+
+        // Reset internal values
+        action = null;
+        memberId = null;
+        publicKey = null;
+        newAccountName = null;
+        newCredential = null;
+    }
+
+    private ProcessMemberRequest buildRequest() {
+        final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class);
+        request.setAction(action);
+        request.setMemberId(memberId);
+        request.setPublicKey(publicKey);
+        request.setNewAccountName(newAccountName);
+        request.setNewCredential(newCredential);
+
+        return request;
     }
 }

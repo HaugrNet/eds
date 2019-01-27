@@ -12,9 +12,7 @@ Test
 
 |Import                 |
 |io.javadog.cws.fitnesse|
-*!
 
-!*>  Clean Database
 !|script|clean database|
 |remove circles        |
 |remove members        |

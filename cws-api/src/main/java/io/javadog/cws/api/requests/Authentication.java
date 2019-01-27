@@ -19,14 +19,15 @@ package io.javadog.cws.api.requests;
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.CredentialType;
 import io.javadog.cws.api.common.Utilities;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * <p>Base Authentication Object for all incoming Requests. It contains the
@@ -96,10 +97,22 @@ public class Authentication extends Verifiable {
     public Map<String, String> validate() {
         final Map<String, String> errors = new ConcurrentHashMap<>();
 
-        // If the Credential Type is undefined, it will be set to the
-        // standard, which is Passphrase
-        credentialType = (credentialType == null) ? CredentialType.PASSPHRASE : credentialType;
+        // To properly process an Authenticated Request, then CWS requires
+        // information about the type of Credential used. If none is set, then
+        // CWS will set one based on the given information, assuming that if
+        // the account name is set, then a PassPhrase is used, otherwise a
+        // Session is used. If neither is correct, then CWS will simply fail
+        // to handle the request properly, with an error information.
+        if (credentialType == null) {
+            if (accountName != null) {
+                credentialType = CredentialType.PASSPHRASE;
+            } else {
+                credentialType = CredentialType.SESSION;
+            }
+        }
 
+        // With a defined CredentialType, it is possible to perform additional
+        // checks to ensure that the required information is present.
         switch (credentialType) {
             case SESSION:
                 checkNotNullOrEmpty(errors, Constants.FIELD_CREDENTIAL, credential, "The Session (Credential) is missing.");

@@ -23,9 +23,10 @@ import io.javadog.cws.api.TestUtilities;
 import io.javadog.cws.api.common.Action;
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.CredentialType;
+import org.junit.Test;
+
 import java.util.Map;
 import java.util.UUID;
-import org.junit.Test;
 
 /**
  * @author Kim Jensen
@@ -62,9 +63,8 @@ public final class ProcessMemberRequestTest {
         final ProcessMemberRequest request = new ProcessMemberRequest();
         final Map<String, String> errors = request.validate();
 
-        assertThat(errors.size(), is(3));
-        assertThat(errors.get(Constants.FIELD_ACCOUNT_NAME), is("AccountName is missing, null or invalid."));
-        assertThat(errors.get(Constants.FIELD_CREDENTIAL), is("The Credential is missing."));
+        assertThat(errors.size(), is(2));
+        assertThat(errors.get(Constants.FIELD_CREDENTIAL), is("The Session (Credential) is missing."));
         assertThat(errors.get(Constants.FIELD_ACTION), is("No action has been provided."));
     }
 
@@ -149,9 +149,8 @@ public final class ProcessMemberRequestTest {
         request.setAction(Action.LOGIN);
 
         final Map<String, String> errors = request.validate();
-        assertThat(errors.size(), is(3));
-        assertThat(errors.get(Constants.FIELD_ACCOUNT_NAME), is("AccountName is missing, null or invalid."));
-        assertThat(errors.get(Constants.FIELD_CREDENTIAL), is("The Credential is missing."));
+        assertThat(errors.size(), is(2));
+        assertThat(errors.get(Constants.FIELD_CREDENTIAL), is("The Session (Credential) is missing."));
         assertThat(errors.get(Constants.FIELD_NEW_CREDENTIAL), is("The Credentials are required to create new Session."));
     }
 
@@ -172,9 +171,8 @@ public final class ProcessMemberRequestTest {
         request.setAction(Action.LOGOUT);
 
         final Map<String, String> errors = request.validate();
-        assertThat(errors.size(), is(2));
-        assertThat(errors.get(Constants.FIELD_ACCOUNT_NAME), is("AccountName is missing, null or invalid."));
-        assertThat(errors.get(Constants.FIELD_CREDENTIAL), is("The Credential is missing."));
+        assertThat(errors.size(), is(1));
+        assertThat(errors.get(Constants.FIELD_CREDENTIAL), is("The Session (Credential) is missing."));
     }
 
     @Test

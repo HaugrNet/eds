@@ -48,8 +48,7 @@ public final class DataTypeServiceTest extends DatabaseSetup {
     public void testEmptyFetchRequest() {
         prepareCause(VerificationException.class, ReturnCode.VERIFICATION_WARNING,
                 "Request Object contained errors:" +
-                        "\nKey: credential, Error: The Credential is missing." +
-                        "\nKey: accountName, Error: AccountName is missing, null or invalid.");
+                        "\nKey: credential, Error: The Session (Credential) is missing.");
 
         final FetchDataTypeService service = new FetchDataTypeService(settings, entityManager);
         final FetchDataTypeRequest request = new FetchDataTypeRequest();
@@ -62,8 +61,7 @@ public final class DataTypeServiceTest extends DatabaseSetup {
     public void testEmptyProcessRequest() {
         prepareCause(VerificationException.class, ReturnCode.VERIFICATION_WARNING,
                 "Request Object contained errors:" +
-                        "\nKey: credential, Error: The Credential is missing." +
-                        "\nKey: accountName, Error: AccountName is missing, null or invalid." +
+                        "\nKey: credential, Error: The Session (Credential) is missing." +
                         "\nKey: typeName, Error: The name of the DataType is missing or invalid." +
                         "\nKey: type, Error: The type of the DataType is missing or invalid.");
 

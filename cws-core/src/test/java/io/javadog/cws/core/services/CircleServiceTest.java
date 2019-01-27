@@ -37,8 +37,9 @@ import io.javadog.cws.core.enums.StandardSetting;
 import io.javadog.cws.core.exceptions.CWSException;
 import io.javadog.cws.core.exceptions.VerificationException;
 import io.javadog.cws.core.model.Settings;
-import java.util.UUID;
 import org.junit.Test;
+
+import java.util.UUID;
 
 /**
  * <p>Common test class for the Process & Fetch Circle Services.</p>
@@ -52,8 +53,7 @@ public final class CircleServiceTest extends DatabaseSetup {
     public void testEmptyFetchRequest() {
         prepareCause(VerificationException.class, ReturnCode.VERIFICATION_WARNING,
                 "Request Object contained errors:" +
-                        "\nKey: credential, Error: The Credential is missing." +
-                        "\nKey: accountName, Error: AccountName is missing, null or invalid.");
+                        "\nKey: credential, Error: The Session (Credential) is missing.");
 
         final FetchCircleService service = new FetchCircleService(settings, entityManager);
         final FetchCircleRequest request = new FetchCircleRequest();
@@ -68,8 +68,7 @@ public final class CircleServiceTest extends DatabaseSetup {
     public void testEmptyProcessRequest() {
         prepareCause(VerificationException.class, ReturnCode.VERIFICATION_WARNING,
                 "Request Object contained errors:" +
-                        "\nKey: credential, Error: The Credential is missing." +
-                        "\nKey: accountName, Error: AccountName is missing, null or invalid." +
+                        "\nKey: credential, Error: The Session (Credential) is missing." +
                         "\nKey: action, Error: No action has been provided.");
 
         final ProcessCircleService service = new ProcessCircleService(settings, entityManager);

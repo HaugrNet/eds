@@ -37,9 +37,10 @@ import io.javadog.cws.core.DatabaseSetup;
 import io.javadog.cws.core.enums.SanityStatus;
 import io.javadog.cws.core.exceptions.CWSException;
 import io.javadog.cws.core.exceptions.VerificationException;
+import org.junit.Test;
+
 import java.util.Date;
 import java.util.UUID;
-import org.junit.Test;
 
 /**
  * <p>Common test class for the Process & Fetch Data Services.</p>
@@ -53,8 +54,7 @@ public final class DataServiceTest extends DatabaseSetup {
     public void testEmptyProcessRequest() {
         prepareCause(VerificationException.class, ReturnCode.VERIFICATION_WARNING,
                 "Request Object contained errors:" +
-                        "\nKey: credential, Error: The Credential is missing." +
-                        "\nKey: accountName, Error: AccountName is missing, null or invalid." +
+                        "\nKey: credential, Error: The Session (Credential) is missing." +
                         "\nKey: action, Error: No action has been provided.");
 
         final ProcessDataService service = new ProcessDataService(settings, entityManager);
@@ -68,9 +68,8 @@ public final class DataServiceTest extends DatabaseSetup {
     public void testEmptyFetchRequest() {
         prepareCause(VerificationException.class, ReturnCode.VERIFICATION_WARNING,
                 "Request Object contained errors:" +
-                        "\nKey: credential, Error: The Credential is missing." +
-                        "\nKey: circle & data Id, Error: Either a Circle or Data Id must be provided." +
-                        "\nKey: accountName, Error: AccountName is missing, null or invalid.");
+                        "\nKey: credential, Error: The Session (Credential) is missing." +
+                        "\nKey: circle & data Id, Error: Either a Circle or Data Id must be provided.");
 
         final FetchDataService service = new FetchDataService(settings, entityManager);
         final FetchDataRequest request = new FetchDataRequest();

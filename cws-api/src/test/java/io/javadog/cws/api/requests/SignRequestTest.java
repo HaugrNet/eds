@@ -21,9 +21,10 @@ import static org.junit.Assert.assertThat;
 
 import io.javadog.cws.api.TestUtilities;
 import io.javadog.cws.api.common.Constants;
+import org.junit.Test;
+
 import java.util.Date;
 import java.util.Map;
-import org.junit.Test;
 
 /**
  * @author Kim Jensen
@@ -55,9 +56,8 @@ public final class SignRequestTest {
         final SignRequest request = new SignRequest();
         final Map<String, String> errors = request.validate();
 
-        assertThat(errors.size(), is(3));
-        assertThat(errors.get(Constants.FIELD_ACCOUNT_NAME), is("AccountName is missing, null or invalid."));
-        assertThat(errors.get(Constants.FIELD_CREDENTIAL), is("The Credential is missing."));
+        assertThat(errors.size(), is(2));
+        assertThat(errors.get(Constants.FIELD_CREDENTIAL), is("The Session (Credential) is missing."));
         assertThat(errors.get(Constants.FIELD_DATA), is("The Data Object to create a Signature is missing."));
     }
 
@@ -67,9 +67,8 @@ public final class SignRequestTest {
         request.setData(null);
 
         final Map<String, String> errors = request.validate();
-        assertThat(errors.size(), is(3));
-        assertThat(errors.get(Constants.FIELD_ACCOUNT_NAME), is("AccountName is missing, null or invalid."));
-        assertThat(errors.get(Constants.FIELD_CREDENTIAL), is("The Credential is missing."));
+        assertThat(errors.size(), is(2));
+        assertThat(errors.get(Constants.FIELD_CREDENTIAL), is("The Session (Credential) is missing."));
         assertThat(errors.get(Constants.FIELD_DATA), is("The Data Object to create a Signature is missing."));
     }
 }

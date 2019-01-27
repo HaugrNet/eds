@@ -35,8 +35,9 @@ import io.javadog.cws.core.enums.StandardSetting;
 import io.javadog.cws.core.exceptions.AuthorizationException;
 import io.javadog.cws.core.exceptions.CWSException;
 import io.javadog.cws.core.exceptions.VerificationException;
-import java.util.UUID;
 import org.junit.Test;
+
+import java.util.UUID;
 
 /**
  * <p>Common test class for the Process & Fetch Trustee Services.</p>
@@ -50,8 +51,7 @@ public final class TrusteeServiceTest extends DatabaseSetup {
     public void testEmptyFetchRequest() {
         prepareCause(VerificationException.class, ReturnCode.VERIFICATION_WARNING,
                 "Request Object contained errors:" +
-                        "\nKey: credential, Error: The Credential is missing." +
-                        "\nKey: accountName, Error: AccountName is missing, null or invalid.");
+                        "\nKey: credential, Error: The Session (Credential) is missing.");
 
         final FetchTrusteeService service = new FetchTrusteeService(settings, entityManager);
         final FetchTrusteeRequest request = new FetchTrusteeRequest();
@@ -66,8 +66,7 @@ public final class TrusteeServiceTest extends DatabaseSetup {
     public void testEmptyProcessRequest() {
         prepareCause(VerificationException.class, ReturnCode.VERIFICATION_WARNING,
                 "Request Object contained errors:" +
-                        "\nKey: credential, Error: The Credential is missing." +
-                        "\nKey: accountName, Error: AccountName is missing, null or invalid." +
+                        "\nKey: credential, Error: The Session (Credential) is missing." +
                         "\nKey: action, Error: No action has been provided.");
 
         final ProcessTrusteeService service = new ProcessTrusteeService(settings, entityManager);

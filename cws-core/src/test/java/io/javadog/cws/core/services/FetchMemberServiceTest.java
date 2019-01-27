@@ -32,8 +32,9 @@ import io.javadog.cws.core.exceptions.AuthorizationException;
 import io.javadog.cws.core.exceptions.VerificationException;
 import io.javadog.cws.core.model.Settings;
 import io.javadog.cws.core.model.entities.MemberEntity;
-import java.util.UUID;
 import org.junit.Test;
+
+import java.util.UUID;
 
 /**
  * <p>Fetching members is similar to fetching Circles, in that it is possible to
@@ -71,8 +72,7 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
     public void testEmptyRequest() {
         prepareCause(VerificationException.class, ReturnCode.VERIFICATION_WARNING,
                 "Request Object contained errors:" +
-                        "\nKey: credential, Error: The Credential is missing." +
-                        "\nKey: accountName, Error: AccountName is missing, null or invalid.");
+                        "\nKey: credential, Error: The Session (Credential) is missing.");
 
         final FetchMemberService service = new FetchMemberService(settings, entityManager);
         final FetchMemberRequest request = new FetchMemberRequest();

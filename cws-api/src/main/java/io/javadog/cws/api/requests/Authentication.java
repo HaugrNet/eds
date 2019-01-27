@@ -56,7 +56,7 @@ public class Authentication extends Verifiable {
 
     @NotNull
     @XmlElement(name = Constants.FIELD_CREDENTIALTYPE, required = true)
-    private CredentialType credentialType = CredentialType.PASSPHRASE;
+    private CredentialType credentialType = null;
 
     // =========================================================================
     // Standard Setters & Getters

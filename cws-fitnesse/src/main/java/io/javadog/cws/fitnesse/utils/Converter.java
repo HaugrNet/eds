@@ -18,6 +18,7 @@ package io.javadog.cws.fitnesse.utils;
 
 import io.javadog.cws.api.common.Action;
 import io.javadog.cws.api.common.CredentialType;
+import io.javadog.cws.api.common.MemberRole;
 import io.javadog.cws.fitnesse.exceptions.StopTestException;
 
 import java.nio.charset.Charset;
@@ -54,6 +55,11 @@ public final class Converter {
     public static CredentialType findCredentialType(final String credentialType) {
         final String tmp = toUpper(credentialType);
         return (tmp != null) ? CredentialType.valueOf(tmp) : null;
+    }
+
+    public static MemberRole findMemberRole(final String memberRole) {
+        final String tmp = toUpper(memberRole);
+        return (tmp != null) ? MemberRole.valueOf(tmp) : null;
     }
 
     private static String toUpper(final String source) {

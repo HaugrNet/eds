@@ -228,6 +228,19 @@ public final class ProcessMemberService extends Serviceable<MemberDao, ProcessMe
         final String newAccountName = trim(request.getNewAccountName());
         response.setMemberId(member.getExternalId());
 
+        updateOwnName(newAccountName);
+        updateOwnCredential(request);
+
+        if (request.getPublicKey() != null) {
+            member.setMemberKey(request.getPublicKey());
+        }
+
+        dao.persist(member);
+
+        return response;
+    }
+
+    private void updateOwnName(final String newAccountName) {
         if (!isEmpty(newAccountName)) {
             if (member.getMemberRole() == MemberRole.ADMIN) {
                 throw new CWSException(ReturnCode.ILLEGAL_ACTION, "It is not permitted for the System Administrator to change the Account name.");
@@ -241,29 +254,27 @@ public final class ProcessMemberService extends Serviceable<MemberDao, ProcessMe
                 }
             }
         }
+    }
 
+    private void updateOwnCredential(final ProcessMemberRequest request) {
         final byte[] credential = request.getNewCredential();
         if (credential != null) {
-            final CWSKeyPair pair = updateMemberPassword(member, credential);
-            Arrays.fill(credential, (byte) 0);
+            if (request.getCredentialType() == CredentialType.PASSPHRASE) {
+                final CWSKeyPair pair = updateMemberPassword(member, credential);
+                Arrays.fill(credential, (byte) 0);
 
-            final List<TrusteeEntity> list = dao.findTrusteesByMember(member, EnumSet.allOf(TrustLevel.class));
-            for (final TrusteeEntity trustee : list) {
-                final KeyAlgorithm algorithm = trustee.getKey().getAlgorithm();
-                final SecretCWSKey circleKey = crypto.extractCircleKey(algorithm, keyPair.getPrivate(), trustee.getCircleKey());
-                trustee.setCircleKey(crypto.encryptAndArmorCircleKey(pair.getPublic(), circleKey));
+                final List<TrusteeEntity> list = dao.findTrusteesByMember(member, EnumSet.allOf(TrustLevel.class));
+                for (final TrusteeEntity trustee : list) {
+                    final KeyAlgorithm algorithm = trustee.getKey().getAlgorithm();
+                    final SecretCWSKey circleKey = crypto.extractCircleKey(algorithm, keyPair.getPrivate(), trustee.getCircleKey());
+                    trustee.setCircleKey(crypto.encryptAndArmorCircleKey(pair.getPublic(), circleKey));
 
-                dao.persist(trustee);
+                    dao.persist(trustee);
+                }
+            } else {
+                throw new CWSException(ReturnCode.VERIFICATION_WARNING, "It is only permitted to update the credentials when authenticating with Passphrase.");
             }
         }
-
-        if (request.getPublicKey() != null) {
-            member.setMemberKey(request.getPublicKey());
-        }
-
-        dao.persist(member);
-
-        return response;
     }
 
     /**

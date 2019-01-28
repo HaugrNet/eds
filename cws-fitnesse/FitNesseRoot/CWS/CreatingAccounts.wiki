@@ -24,16 +24,16 @@ Test
 !2 '''!-CWS-! Create Account Request'''
 The !-CWS-! Create Account request requires administrative priviledges to be performed.
 
-!|ProcessMember                                                                                                                                                                                           |
-|account name|credential |credential type|action    |member id|public key|new account name|new credential|member id?|return code?             |return message?                                            |
-|admin       |admin      |PASSPHRASE     |CREATE    |null     |null      |user1           |password1     |=~/\S{36}/|${SUCCESS}               |Ok                                                         |
-|user1       |password1  |null           |UPDATE    |null     |null      |null            |null          |null      |${SUCCESS}               |Ok                                                         |
-|user1       |password1  |null           |LOGIN     |null     |null      |null            |session_key   |null      |${SUCCESS}               |Ok                                                         |
-|null        |session_key|null           |UPDATE    |null     |null      |null            |new_session   |null      |${VERIFICATION_WARNING}  |=~/.*Error: AccountName is missing, null or invalid./      |
-|null        |session_key|SESSION        |LOGIN     |null     |null      |null            |new_session   |null      |${SUCCESS}               |Ok                                                         |
-|null        |new_session|SESSION        |LOGIN     |null     |null      |null            |new_session   |null      |${SUCCESS}               |Ok                                                         |
-|null        |new_session|SESSION        |CREATE    |null     |null      |user2           |password2     |null      |${AUTHORIZATION_WARNING} |Members are not permitted to create new Accounts.          |
-|user1       |password1  |PASSPHRASE     |INVALIDATE|null     |null      |null            |null          |null      |${SUCCESS}               |Account has been Invalidated.                              |
-|user1       |password1  |null           |UPDATE    |null     |null      |null            |null          |null      |${AUTHENTICATION_WARNING}|Cannot authenticate the Account from the given Credentials.|
-|null        |new_session|SESSION        |UPDATE    |null     |null      |null            |null          |null      |${AUTHENTICATION_WARNING}|No Session could be found.                                 |
-|admin       |admin      |null           |DELETE    |user1_id |null      |null            |null          |null      |${SUCCESS}               |The Member 'user1' has successfully been deleted.          |
+!|ProcessMember                                                                                                                                                                                                                   |
+|account name|credential |credential type|action    |member id|public key|new account name|new credential|member id?|return code?             |return message?                                                                    |
+|admin       |admin      |PASSPHRASE     |CREATE    |null     |null      |user1           |password1     |=~/\S{36}/|${SUCCESS}               |Ok                                                                                 |
+|user1       |password1  |null           |UPDATE    |null     |null      |null            |null          |null      |${SUCCESS}               |Ok                                                                                 |
+|user1       |password1  |null           |LOGIN     |null     |null      |null            |session_key   |null      |${SUCCESS}               |Ok                                                                                 |
+|null        |session_key|null           |UPDATE    |null     |null      |null            |new_session   |null      |${VERIFICATION_WARNING}  |It is only permitted to update the credentials when authenticating with Passphrase.|
+|null        |session_key|SESSION        |LOGIN     |null     |null      |null            |new_session   |null      |${SUCCESS}               |Ok                                                                                 |
+|null        |new_session|SESSION        |LOGIN     |null     |null      |null            |new_session   |null      |${SUCCESS}               |Ok                                                                                 |
+|null        |new_session|SESSION        |CREATE    |null     |null      |user2           |password2     |null      |${AUTHORIZATION_WARNING} |Members are not permitted to create new Accounts.                                  |
+|user1       |password1  |PASSPHRASE     |INVALIDATE|null     |null      |null            |null          |null      |${SUCCESS}               |Account has been Invalidated.                                                      |
+|user1       |password1  |null           |UPDATE    |null     |null      |null            |null          |null      |${AUTHENTICATION_WARNING}|Cannot authenticate the Account from the given Credentials.                        |
+|null        |new_session|SESSION        |UPDATE    |null     |null      |null            |null          |null      |${AUTHENTICATION_WARNING}|No Session could be found.                                                         |
+|admin       |admin      |null           |DELETE    |user1_id |null      |null            |null          |null      |${SUCCESS}               |The Member 'user1' has successfully been deleted.                                  |

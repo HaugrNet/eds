@@ -48,12 +48,13 @@ import io.javadog.cws.ws.ProcessTrusteeResult;
 import io.javadog.cws.ws.SanityResult;
 import io.javadog.cws.ws.SettingResult;
 import io.javadog.cws.ws.VersionResult;
+
+import javax.xml.namespace.QName;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.xml.namespace.QName;
 
 /**
  * @author Kim Jensen
@@ -287,6 +288,7 @@ public final class ManagementSoapClient implements Management {
             Mapper.fillAuthentication(ws, api);
             ws.setAction(Mapper.map(api.getAction()));
             ws.setMemberId(Mapper.convert(Constants.FIELD_MEMBER_ID, api.getMemberId()));
+            ws.setMemberRole(Mapper.map(api.getMemberRole()));
             ws.setPublicKey(api.getPublicKey());
             ws.setNewAccountName(Mapper.convert(Constants.FIELD_NEW_ACCOUNT_NAME, api.getNewAccountName()));
             ws.setNewCredential(Mapper.convert(Constants.FIELD_NEW_CREDENTIAL, api.getNewCredential()));

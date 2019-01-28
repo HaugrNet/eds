@@ -17,6 +17,7 @@
 package io.javadog.cws.fitnesse;
 
 import io.javadog.cws.api.common.Action;
+import io.javadog.cws.api.common.MemberRole;
 import io.javadog.cws.api.requests.ProcessMemberRequest;
 import io.javadog.cws.api.responses.ProcessMemberResponse;
 import io.javadog.cws.fitnesse.callers.CallManagement;
@@ -29,6 +30,7 @@ import io.javadog.cws.fitnesse.utils.Converter;
 public final class ProcessMember extends CwsRequest<ProcessMemberResponse> {
 
     private Action action = null;
+    private MemberRole memberRole = null;
     private String memberId = null;
     private String publicKey = null;
     private String newAccountName = null;
@@ -40,6 +42,10 @@ public final class ProcessMember extends CwsRequest<ProcessMemberResponse> {
 
     public void setAction(final String action) {
         this.action = Converter.findAction(action);
+    }
+
+    public void setMemberRole(final String memberRole) {
+        this.memberRole = Converter.findMemberRole(memberRole);
     }
 
     public void setMemberId(final String memberId) {
@@ -90,6 +96,7 @@ public final class ProcessMember extends CwsRequest<ProcessMemberResponse> {
 
         // Reset internal values
         action = null;
+        memberRole = null;
         memberId = null;
         publicKey = null;
         newAccountName = null;
@@ -99,6 +106,7 @@ public final class ProcessMember extends CwsRequest<ProcessMemberResponse> {
     private ProcessMemberRequest buildRequest() {
         final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class);
         request.setAction(action);
+        request.setMemberRole(memberRole);
         request.setMemberId(memberId);
         request.setPublicKey(publicKey);
         request.setNewAccountName(newAccountName);

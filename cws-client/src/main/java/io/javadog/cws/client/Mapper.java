@@ -19,6 +19,7 @@ package io.javadog.cws.client;
 import io.javadog.cws.api.common.Action;
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.CredentialType;
+import io.javadog.cws.api.common.MemberRole;
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.common.TrustLevel;
 import io.javadog.cws.api.dtos.Circle;
@@ -31,15 +32,16 @@ import io.javadog.cws.api.dtos.Trustee;
 import io.javadog.cws.api.requests.Authentication;
 import io.javadog.cws.api.responses.CwsResponse;
 import io.javadog.cws.ws.CwsResult;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.List;
+
 import javax.xml.bind.JAXBElement;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.List;
 
 /**
  * @author Kim Jensen
@@ -99,6 +101,14 @@ public final class Mapper {
 
     public static io.javadog.cws.ws.Action map(final Action api) {
         return (api != null) ? io.javadog.cws.ws.Action.valueOf(api.name()) : null;
+    }
+
+    private static MemberRole map(final io.javadog.cws.ws.MemberRole ws) {
+        return (ws != null) ? MemberRole.valueOf(ws.name()) : null;
+    }
+
+    public static io.javadog.cws.ws.MemberRole map(final MemberRole api) {
+        return (api != null) ? io.javadog.cws.ws.MemberRole.valueOf(api.name()) : null;
     }
 
     private static TrustLevel map(final io.javadog.cws.ws.TrustLevel ws) {
@@ -170,6 +180,7 @@ public final class Mapper {
             final Member member = new Member();
             member.setMemberId(wsMember.getMemberId());
             member.setAccountName(wsMember.getAccountName());
+            member.setMemberRole(map(wsMember.getMemberRole()));
             member.setPublicKey(wsMember.getPublicKey());
             member.setAdded(map(wsMember.getAdded()));
             api.add(member);

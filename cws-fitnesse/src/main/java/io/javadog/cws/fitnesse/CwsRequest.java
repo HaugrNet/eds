@@ -93,7 +93,6 @@ public abstract class CwsRequest<R extends CwsResponse> {
     protected <T extends Authentication> T prepareRequest(final Class<T> clazz) {
         try {
             final T request = clazz.getConstructor().newInstance();
-            request.setCredentialType(CredentialType.PASSPHRASE);
             request.setAccountName(accountName);
             request.setCredential(credential);
             request.setCredentialType(credentialType);

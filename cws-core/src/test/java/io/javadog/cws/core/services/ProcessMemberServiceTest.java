@@ -41,9 +41,10 @@ import io.javadog.cws.core.exceptions.AuthenticationException;
 import io.javadog.cws.core.exceptions.CWSException;
 import io.javadog.cws.core.exceptions.CryptoException;
 import io.javadog.cws.core.model.Settings;
+import org.junit.Test;
+
 import java.util.Base64;
 import java.util.UUID;
-import org.junit.Test;
 
 /**
  * @author Kim Jensen
@@ -146,6 +147,23 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
         final ProcessMemberResponse response = service.perform(request);
         assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
         assertThat(response.getReturnMessage(), is("Ok"));
+    }
+
+    @Test
+    public void testProcessSelfPasswordUpdateWithSession() {
+        prepareCause(CWSException.class, ReturnCode.VERIFICATION_WARNING, "It is only permitted to update the credentials when authenticating with Passphrase.");
+
+        final String session = UUID.randomUUID().toString();
+        final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
+        final ProcessMemberRequest loginRequest = prepareLoginRequest(MEMBER_5, session);
+        final ProcessMemberResponse loginResponse = service.perform(loginRequest);
+        assertThat(loginResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+        assertThat(loginResponse.getReturnMessage(), is("Ok"));
+
+        final ProcessMemberRequest passwordRequest = prepareSessionRequest(ProcessMemberRequest.class, session);
+        passwordRequest.setAction(Action.UPDATE);
+        passwordRequest.setNewCredential(loginRequest.getNewCredential());
+        service.perform(passwordRequest);
     }
 
     @Test

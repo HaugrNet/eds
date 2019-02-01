@@ -22,7 +22,6 @@ INSERT INTO cws_settings (name, setting) VALUES
     ('cws.system.salt', 'Default salt, also used as kill switch. Must be set in DB.'),
     ('cws.system.locale', 'EN'),
     ('cws.system.charset', 'UTF-8'),
-    ('cws.expose.admin', 'false'),
     ('cws.show.all.circles', 'true'),
     ('cws.show.trustees', 'true'),
     ('cws.sanity.check.startup', 'true'),

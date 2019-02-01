@@ -48,7 +48,6 @@ followed - for the sake of this test, it is set to 'admin'.''
 |check  |value for key|cws.system.salt                |Default salt, also used as kill switch. Must be set in DB.|
 |check  |value for key|cws.system.locale              |EN                                                        |
 |check  |value for key|cws.system.charset             |UTF-8                                                     |
-|check  |value for key|cws.expose.admin               |false                                                     |
 |check  |value for key|cws.show.all.circles           |true                                                      |
 |check  |value for key|cws.show.trustees              |true                                                      |
 |check  |value for key|cws.sanity.check.startup       |true                                                      |
@@ -66,7 +65,6 @@ in a list of undefined values.
 |check  |value for key|cws.system.salt                |undefined|
 |check  |value for key|cws.system.locale              |undefined|
 |check  |value for key|cws.system.charset             |undefined|
-|check  |value for key|cws.expose.admin               |undefined|
 |check  |value for key|cws.show.all.circles           |undefined|
 |check  |value for key|cws.show.trustees              |undefined|
 |check  |value for key|cws.sanity.check.startup       |undefined|

@@ -109,22 +109,6 @@ public final class SettingsTest extends DatabaseSetup {
     }
 
     @Test
-    public void testExposeAdmin() {
-        final Settings mySettings = newSettings();
-        assertThat(mySettings.getExposeAdmin(), is(false));
-        mySettings.set(StandardSetting.EXPOSE_ADMIN, "true");
-        assertThat(mySettings.getExposeAdmin(), is(true));
-        mySettings.set(StandardSetting.EXPOSE_ADMIN, "false");
-        assertThat(mySettings.getExposeAdmin(), is(false));
-        mySettings.set(StandardSetting.EXPOSE_ADMIN, " true ");
-        assertThat(mySettings.getExposeAdmin(), is(true));
-        mySettings.set(StandardSetting.EXPOSE_ADMIN, "");
-        assertThat(mySettings.getExposeAdmin(), is(false));
-        mySettings.set(StandardSetting.EXPOSE_ADMIN, " what ");
-        assertThat(mySettings.getExposeAdmin(), is(false));
-    }
-
-    @Test
     public void testShowOtherMemberInformation() {
         final Settings mySettings = newSettings();
         assertThat(mySettings.getShareTrustees(), is(true));

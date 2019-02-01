@@ -23,6 +23,7 @@ import static org.junit.Assert.fail;
 
 import io.javadog.cws.api.common.Action;
 import io.javadog.cws.api.common.Constants;
+import io.javadog.cws.api.common.MemberRole;
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.common.TrustLevel;
 import io.javadog.cws.api.requests.FetchCircleRequest;
@@ -241,23 +242,32 @@ public final class ManagementServiceTest extends BeanSetup {
 
         final FetchMemberResponse response = management.fetchMembers(request);
         assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
-        assertThat(response.getMembers().size(), is(5));
+        assertThat(response.getMembers().size(), is(6));
         assertThat(response.getCircles().size(), is(0));
-        assertThat(response.getMembers().get(0).getAccountName(), is(MEMBER_1));
-        assertThat(response.getMembers().get(0).getMemberId(), is(MEMBER_1_ID));
+        assertThat(response.getMembers().get(0).getAccountName(), is(Constants.ADMIN_ACCOUNT));
+        assertThat(response.getMembers().get(0).getMemberId(), is(ADMIN_ID));
         assertThat(response.getMembers().get(0).getPublicKey(), is(nullValue()));
-        assertThat(response.getMembers().get(1).getAccountName(), is(MEMBER_2));
-        assertThat(response.getMembers().get(1).getMemberId(), is(MEMBER_2_ID));
+        assertThat(response.getMembers().get(0).getMemberRole(), is(MemberRole.ADMIN));
+        assertThat(response.getMembers().get(1).getAccountName(), is(MEMBER_1));
+        assertThat(response.getMembers().get(1).getMemberId(), is(MEMBER_1_ID));
         assertThat(response.getMembers().get(1).getPublicKey(), is(nullValue()));
-        assertThat(response.getMembers().get(2).getAccountName(), is(MEMBER_3));
-        assertThat(response.getMembers().get(2).getMemberId(), is(MEMBER_3_ID));
+        assertThat(response.getMembers().get(1).getMemberRole(), is(MemberRole.STANDARD));
+        assertThat(response.getMembers().get(2).getAccountName(), is(MEMBER_2));
+        assertThat(response.getMembers().get(2).getMemberId(), is(MEMBER_2_ID));
         assertThat(response.getMembers().get(2).getPublicKey(), is(nullValue()));
-        assertThat(response.getMembers().get(3).getAccountName(), is(MEMBER_4));
-        assertThat(response.getMembers().get(3).getMemberId(), is(MEMBER_4_ID));
+        assertThat(response.getMembers().get(2).getMemberRole(), is(MemberRole.STANDARD));
+        assertThat(response.getMembers().get(3).getAccountName(), is(MEMBER_3));
+        assertThat(response.getMembers().get(3).getMemberId(), is(MEMBER_3_ID));
         assertThat(response.getMembers().get(3).getPublicKey(), is(nullValue()));
-        assertThat(response.getMembers().get(4).getAccountName(), is(MEMBER_5));
-        assertThat(response.getMembers().get(4).getMemberId(), is(MEMBER_5_ID));
+        assertThat(response.getMembers().get(3).getMemberRole(), is(MemberRole.STANDARD));
+        assertThat(response.getMembers().get(4).getAccountName(), is(MEMBER_4));
+        assertThat(response.getMembers().get(4).getMemberId(), is(MEMBER_4_ID));
         assertThat(response.getMembers().get(4).getPublicKey(), is(nullValue()));
+        assertThat(response.getMembers().get(4).getMemberRole(), is(MemberRole.STANDARD));
+        assertThat(response.getMembers().get(5).getAccountName(), is(MEMBER_5));
+        assertThat(response.getMembers().get(5).getMemberId(), is(MEMBER_5_ID));
+        assertThat(response.getMembers().get(5).getPublicKey(), is(nullValue()));
+        assertThat(response.getMembers().get(5).getMemberRole(), is(MemberRole.STANDARD));
     }
 
     @Test

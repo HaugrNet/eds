@@ -23,18 +23,16 @@ import io.javadog.cws.api.dtos.Member;
 import io.javadog.cws.api.requests.FetchMemberRequest;
 import io.javadog.cws.api.responses.FetchMemberResponse;
 import io.javadog.cws.core.enums.Permission;
-import io.javadog.cws.core.exceptions.AuthorizationException;
 import io.javadog.cws.core.model.MemberDao;
 import io.javadog.cws.core.model.Settings;
 import io.javadog.cws.core.model.entities.CircleEntity;
 import io.javadog.cws.core.model.entities.MemberEntity;
 import io.javadog.cws.core.model.entities.TrusteeEntity;
-
-import javax.persistence.EntityManager;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import javax.persistence.EntityManager;
 
 /**
  * <p>Business Logic implementation for the CWS FetchMember request.</p>
@@ -125,20 +123,12 @@ public final class FetchMemberService extends Serviceable<MemberDao, FetchMember
             addMemberToResponse(response, requested);
             response.setCircles(findCirclesMemberBelongsTo(requested));
         } else {
-            if (requested.getMemberRole() == MemberRole.ADMIN) {
-                if (settings.getExposeAdmin()) {
-                    addMemberToResponse(response, requested);
-                } else {
-                    throw new AuthorizationException("Not Authorized to access this information.");
-                }
-            } else {
-                addMemberToResponse(response, requested);
+            addMemberToResponse(response, requested);
 
-                if (settings.getShareTrustees()) {
-                    response.setCircles(findCirclesMemberBelongsTo(requested));
-                } else {
-                    response.setCircles(findSharedCircles(member, requested));
-                }
+            if (settings.getShareTrustees()) {
+                response.setCircles(findCirclesMemberBelongsTo(requested));
+            } else {
+                response.setCircles(findSharedCircles(member, requested));
             }
         }
     }
@@ -149,35 +139,26 @@ public final class FetchMemberService extends Serviceable<MemberDao, FetchMember
         response.setMembers(members);
     }
 
+    private static List<Member> convertMembers(final List<MemberEntity> entities) {
+        final List<Member> circles = new ArrayList<>(entities.size());
+
+        for (final MemberEntity entity : entities) {
+            circles.add(convert(entity));
+        }
+
+        return circles;
+    }
+
     private static Member convert(final MemberEntity entity) {
         final Member member = new Member();
 
         member.setMemberId(entity.getExternalId());
         member.setAccountName(entity.getName());
+        member.setMemberRole(entity.getMemberRole());
         member.setPublicKey(entity.getMemberKey());
         member.setAdded(entity.getAdded());
 
         return member;
-    }
-
-    private List<Member> convertMembers(final List<MemberEntity> entities) {
-        final List<Member> circles = new ArrayList<>(entities.size());
-        final boolean exposeAdmin = settings.getExposeAdmin();
-
-        for (final MemberEntity entity : entities) {
-            // If the Settings to expose the System Administrator is set to
-            // true, then we'll also add this, however by default we will
-            // otherwise skip the System Administrator.
-            if (entity.getMemberRole() == MemberRole.ADMIN) {
-                if (exposeAdmin) {
-                    circles.add(convert(entity));
-                }
-            } else {
-                circles.add(convert(entity));
-            }
-        }
-
-        return circles;
     }
 
     private List<Circle> findCirclesMemberBelongsTo(final MemberEntity requested) {

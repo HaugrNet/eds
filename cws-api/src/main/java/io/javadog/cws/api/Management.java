@@ -164,18 +164,6 @@ public interface Management {
      *     sure.</i>
      *   </li>
      *   <li>
-     *     <b>cws.expose.admin</b> - default value: 'false'<br>
-     *     Allowed Values: Boolean - 'true' or 'false'<br>
-     *     <i>The Administrator Account is a special Account in the CWS, it is
-     *     not permitted to be a member of any Circles, nor can it be used for
-     *     anything else than some system administrative tasks. Which is also
-     *     why it should not appear in the list of Members to be fetched or
-     *     assigned to Circles. However, rather than completely opting out on
-     *     this, it may be a good idea to expose it.<br>
-     *       Default value is 'false', meaning that the Administrator Account is
-     *       not visible unless explicitly changed to true.</i>
-     *   </li>
-     *   <li>
      *     <b>cws.show.all.circles</b> - default value: 'true'<br>
      *     Allowed Values: Boolean - 'true' or 'false'<br>
      *     <i>Exposing all Circles, means that it is possible for a member,

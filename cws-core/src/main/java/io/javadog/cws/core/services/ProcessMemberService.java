@@ -34,8 +34,6 @@ import io.javadog.cws.core.model.MemberDao;
 import io.javadog.cws.core.model.Settings;
 import io.javadog.cws.core.model.entities.MemberEntity;
 import io.javadog.cws.core.model.entities.TrusteeEntity;
-
-import javax.persistence.EntityManager;
 import java.security.PublicKey;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -46,6 +44,7 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+import javax.persistence.EntityManager;
 
 /**
  * <p>Business Logic implementation for the CWS ProcessMember request.</p>
@@ -130,7 +129,8 @@ public final class ProcessMemberService extends Serviceable<MemberDao, ProcessMe
 
             final MemberEntity found = dao.findMemberByName(accountName);
             if (found == null) {
-                final MemberEntity created = createNewAccount(accountName, MemberRole.STANDARD, request.getNewCredential());
+                final MemberRole role = whichRole(request);
+                final MemberEntity created = createNewAccount(accountName, role, request.getNewCredential());
                 response = new ProcessMemberResponse();
                 response.setMemberId(created.getExternalId());
             } else {
@@ -163,7 +163,7 @@ public final class ProcessMemberService extends Serviceable<MemberDao, ProcessMe
                 entity.setRsaAlgorithm(settings.getSignatureAlgorithm());
                 entity.setPrivateKey(CredentialType.SIGNATURE.name());
                 entity.setPublicKey(Base64.getEncoder().encodeToString(signature));
-                entity.setMemberRole(MemberRole.STANDARD);
+                entity.setMemberRole(whichRole(request));
                 dao.persist(entity);
 
                 response = new ProcessMemberResponse();
@@ -176,6 +176,10 @@ public final class ProcessMemberService extends Serviceable<MemberDao, ProcessMe
         }
 
         return response;
+    }
+
+    private static MemberRole whichRole(final ProcessMemberRequest request) {
+        return (request.getMemberRole() != null) ? request.getMemberRole() : MemberRole.STANDARD;
     }
 
     private ProcessMemberResponse loginMember(final ProcessMemberRequest request) {
@@ -223,6 +227,8 @@ public final class ProcessMemberService extends Serviceable<MemberDao, ProcessMe
         return new ProcessMemberResponse();
     }
 
+    // TODO Rename methods, as it should be possible for administrators to alter Member Roles. Members aren't allowed to alter their own role.
+    // TODO Extend testing to also check that roles are correctly set when creating or updating accounts
     private ProcessMemberResponse processSelf(final ProcessMemberRequest request) {
         final ProcessMemberResponse response = new ProcessMemberResponse();
         final String newAccountName = trim(request.getNewAccountName());
@@ -243,6 +249,7 @@ public final class ProcessMemberService extends Serviceable<MemberDao, ProcessMe
     private void updateOwnName(final String newAccountName) {
         if (!isEmpty(newAccountName)) {
             if (member.getMemberRole() == MemberRole.ADMIN) {
+                // TODO Alter this, as the Administration is now part of the Role, not the account name
                 throw new CWSException(ReturnCode.ILLEGAL_ACTION, "It is not permitted for the System Administrator to change the Account name.");
             } else {
                 final MemberEntity existing = dao.findMemberByName(newAccountName);

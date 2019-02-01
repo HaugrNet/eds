@@ -161,10 +161,6 @@ public final class Settings {
         }
     }
 
-    public Boolean getExposeAdmin() {
-        return Boolean.valueOf(get(StandardSetting.EXPOSE_ADMIN.getKey()).trim());
-    }
-
     public Boolean getShowAllCircles() {
         return Boolean.valueOf(get(StandardSetting.SHOW_CIRCLES.getKey()).trim());
     }

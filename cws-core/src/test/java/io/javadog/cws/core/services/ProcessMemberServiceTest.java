@@ -24,6 +24,7 @@ import static org.junit.Assert.assertThat;
 import io.javadog.cws.api.common.Action;
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.CredentialType;
+import io.javadog.cws.api.common.MemberRole;
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.requests.FetchDataRequest;
 import io.javadog.cws.api.requests.FetchMemberRequest;
@@ -41,10 +42,9 @@ import io.javadog.cws.core.exceptions.AuthenticationException;
 import io.javadog.cws.core.exceptions.CWSException;
 import io.javadog.cws.core.exceptions.CryptoException;
 import io.javadog.cws.core.model.Settings;
-import org.junit.Test;
-
 import java.util.Base64;
 import java.util.UUID;
+import org.junit.Test;
 
 /**
  * @author Kim Jensen
@@ -64,13 +64,43 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testAdding() {
+    public void testAddingWithoutRole() {
         final String account = "Created Member";
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
         final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
         request.setAction(Action.CREATE);
         request.setNewAccountName(account);
         request.setNewCredential(crypto.stringToBytes(account));
+        final ProcessMemberResponse response = service.perform(request);
+
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+        assertThat(response.getReturnMessage(), is("Ok"));
+    }
+
+    @Test
+    public void testAddingWithAdminRole() {
+        final String account = "Created Member";
+        final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
+        final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
+        request.setAction(Action.CREATE);
+        request.setNewAccountName(account);
+        request.setNewCredential(crypto.stringToBytes(account));
+        request.setMemberRole(MemberRole.ADMIN);
+        final ProcessMemberResponse response = service.perform(request);
+
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+        assertThat(response.getReturnMessage(), is("Ok"));
+    }
+
+    @Test
+    public void testAddingWithStandardRole() {
+        final String account = "Created Member";
+        final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
+        final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
+        request.setAction(Action.CREATE);
+        request.setNewAccountName(account);
+        request.setNewCredential(crypto.stringToBytes(account));
+        request.setMemberRole(MemberRole.STANDARD);
         final ProcessMemberResponse response = service.perform(request);
 
         assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
@@ -85,6 +115,7 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
         request.setAction(Action.CREATE);
         request.setNewAccountName(account);
         request.setNewCredential(crypto.stringToBytes(account));
+        request.setMemberRole(MemberRole.STANDARD);
         final ProcessMemberResponse response = service.perform(request);
 
         assertThat(response.getReturnCode(), is(ReturnCode.AUTHORIZATION_WARNING.getCode()));

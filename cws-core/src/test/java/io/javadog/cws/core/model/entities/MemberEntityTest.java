@@ -27,12 +27,11 @@ import io.javadog.cws.core.DatabaseSetup;
 import io.javadog.cws.core.GenerateTestData;
 import io.javadog.cws.core.enums.KeyAlgorithm;
 import io.javadog.cws.core.jce.CWSKeyPair;
-import org.junit.Test;
-
-import javax.persistence.PersistenceException;
-import javax.persistence.Query;
 import java.util.List;
 import java.util.UUID;
+import javax.persistence.PersistenceException;
+import javax.persistence.Query;
+import org.junit.Test;
 
 /**
  * @author Kim Jensen
@@ -56,6 +55,10 @@ public final class MemberEntityTest extends DatabaseSetup {
         assertThat(found.getSalt(), is(entity.getSalt()));
         assertThat(found.getPublicKey(), is(entity.getPublicKey()));
         assertThat(found.getPrivateKey(), is(entity.getPrivateKey()));
+        assertThat(found.getMemberRole(), is(MemberRole.STANDARD));
+        assertThat(found.getSessionChecksum(), is(nullValue()));
+        assertThat(found.getSessionCrypto(), is(nullValue()));
+        assertThat(found.getSessionExpire(), is(nullValue()));
     }
 
     @Test(expected = PersistenceException.class)

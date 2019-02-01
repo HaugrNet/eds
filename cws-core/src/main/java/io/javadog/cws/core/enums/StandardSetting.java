@@ -35,7 +35,6 @@ public enum StandardSetting {
     CWS_SALT("cws.system.salt", "Default salt, also used as kill switch. Must be set in DB."),
     CWS_LOCALE("cws.system.locale", "EN"),
     CWS_CHARSET("cws.system.charset", "UTF-8"),
-    EXPOSE_ADMIN("cws.expose.admin", "false"),
     SHOW_CIRCLES("cws.show.all.circles", "true"),
     SHOW_TRUSTEES("cws.show.trustees", "true"),
     SANITY_STARTUP("cws.sanity.check.startup", "true"),

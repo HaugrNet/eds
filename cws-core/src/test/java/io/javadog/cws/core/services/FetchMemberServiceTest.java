@@ -28,24 +28,18 @@ import io.javadog.cws.api.requests.FetchMemberRequest;
 import io.javadog.cws.api.responses.FetchMemberResponse;
 import io.javadog.cws.core.DatabaseSetup;
 import io.javadog.cws.core.enums.StandardSetting;
-import io.javadog.cws.core.exceptions.AuthorizationException;
 import io.javadog.cws.core.exceptions.VerificationException;
 import io.javadog.cws.core.model.Settings;
 import io.javadog.cws.core.model.entities.MemberEntity;
-import org.junit.Test;
-
 import java.util.UUID;
+import org.junit.Test;
 
 /**
  * <p>Fetching members is similar to fetching Circles, in that it is possible to
  * retrieve a list of Members in the CWS, and information about a specific
- * Member Account. However, there's also a couple of property values which
- * influence who may see what:</p>
+ * Member Account. However, there's also a property values which influence who
+ * may see what:</p>
  * <ul>
- *   <li><b>cws.expose.admin</b><br>
- *       <i>The Administrator is not a &quot;real&quot; Member, as the Account
- *       cannot belong to any Circles. It is only present as the initial
- *       Account, with permission to process Members & Circles.</i></li>
  *   <li><b>cws.show.other.member.information</b><br>
  *       <i>If two Member Accounts are connected, then they should also be able
  *       to retrieve information about each other, for all shared information.
@@ -105,31 +99,14 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
     //==========================================================================
 
     /**
-     * <p>Fetching all Accounts should per default be made with the Expose Admin
-     * flag set to false, in this case, we expect to find all (excluding the
-     * System Administrator) Accounts and no Circles.</p>
-     */
-    @Test
-    public void testFindAllMembersWithExposeAdminFalseAsAdmin() {
-        // Ensure that we have the correct settings for the Service
-        final Settings mySettings = newSettings();
-        mySettings.set(StandardSetting.EXPOSE_ADMIN, "false");
-
-        final FetchMemberRequest fetchRequest = prepareRequest(FetchMemberRequest.class, Constants.ADMIN_ACCOUNT);
-        assertThat(fetchRequest.validate().isEmpty(), is(true));
-        runRequestAndVerifyResponse(mySettings, fetchRequest, 5);
-    }
-
-    /**
      * This test expects a list of All Members, including the System
      * Administrator, which should be 6 in total. No Circles are fetched,
      * as we're not looking at a specific Member Account.
      */
     @Test
-    public void testFindAllMembersWithExposeAdminTrueAsAdmin() {
+    public void testFindAllMembersAsAdmin() {
         // Ensure that we have the correct settings for the Service
         final Settings mySettings = newSettings();
-        mySettings.set(StandardSetting.EXPOSE_ADMIN, "true");
 
         final FetchMemberRequest request = prepareRequest(FetchMemberRequest.class, Constants.ADMIN_ACCOUNT);
         assertThat(request.validate().isEmpty(), is(true));
@@ -155,10 +132,9 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
      * as we're not looking at a specific Member Account.
      */
     @Test
-    public void testFindAllMembersWithExposeAdminFalseAsMember1() {
+    public void testFindAllMembersAsMember1() {
         // Ensure that we have the correct settings for the Service
         final Settings mySettings = newSettings();
-        mySettings.set(StandardSetting.EXPOSE_ADMIN, "false");
 
         final FetchMemberService memberService = new FetchMemberService(mySettings, entityManager);
         final FetchMemberRequest memberRequest = prepareRequest(FetchMemberRequest.class, MEMBER_1);
@@ -170,44 +146,24 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
         assertThat(fetchedMemberResponse.isOk(), is(true));
         assertThat(fetchedMemberResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
         assertThat(fetchedMemberResponse.getReturnMessage(), is("Ok"));
-        assertThat(fetchedMemberResponse.getMembers().size(), is(5));
+        assertThat(fetchedMemberResponse.getMembers().size(), is(6));
         assertThat(fetchedMemberResponse.getCircles().isEmpty(), is(true));
 
         // Check that the member information is present
-        final Member member1 = fetchedMemberResponse.getMembers().get(0);
+        final Member member0 = fetchedMemberResponse.getMembers().get(0);
+        assertThat(member0.getAccountName(), is(Constants.ADMIN_ACCOUNT));
+        assertThat(member0.getMemberId(), is(ADMIN_ID));
+        assertThat(member0.getAdded(), is(not(nullValue())));
+
+        final Member member1 = fetchedMemberResponse.getMembers().get(1);
         assertThat(member1.getAccountName(), is(MEMBER_1));
         assertThat(member1.getMemberId(), is(MEMBER_1_ID));
         assertThat(member1.getAdded(), is(not(nullValue())));
 
-        final Member member5 = fetchedMemberResponse.getMembers().get(4);
+        final Member member5 = fetchedMemberResponse.getMembers().get(5);
         assertThat(member5.getAccountName(), is(MEMBER_5));
         assertThat(member5.getMemberId(), is(MEMBER_5_ID));
         assertThat(member5.getAdded(), is(not(nullValue())));
-    }
-
-    /**
-     * This test expects a list of All Members, including the System
-     * Administrator, which should be 6 in total. No Circles are fetched,
-     * as we're not looking at a specific Member Account.
-     */
-    @Test
-    public void testFindAllMembersWithExposeAdminTrueAsMember1() {
-        // Ensure that we have the correct settings for the Service
-        final Settings mySettings = newSettings();
-        mySettings.set(StandardSetting.EXPOSE_ADMIN, "true");
-
-        final FetchMemberService service = new FetchMemberService(mySettings, entityManager);
-        final FetchMemberRequest request = prepareRequest(FetchMemberRequest.class, MEMBER_1);
-        assertThat(request.validate().isEmpty(), is(true));
-        final FetchMemberResponse response = service.perform(request);
-
-        // Verify that we have found the correct data
-        assertThat(response, is(not(nullValue())));
-        assertThat(response.isOk(), is(true));
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
-        assertThat(response.getReturnMessage(), is("Ok"));
-        assertThat(response.getMembers().size(), is(6));
-        assertThat(response.getCircles().isEmpty(), is(true));
     }
 
     //==========================================================================
@@ -220,10 +176,9 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
      * be part of any Circles.</p>
      */
     @Test
-    public void testFindAdminWithExposeAdminTrueAsAdmin() {
+    public void testFindAdminAsAdmin() {
         // Ensure that we have the correct settings for the Service
         final Settings mySettings = newSettings();
-        mySettings.set(StandardSetting.EXPOSE_ADMIN, "true");
 
         final FetchMemberService fetchService = new FetchMemberService(mySettings, entityManager);
         final FetchMemberRequest fetchRequest = prepareRequest(FetchMemberRequest.class, Constants.ADMIN_ACCOUNT);
@@ -239,33 +194,6 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
         assertThat(fetchResponse.getMembers().size(), is(1));
         assertThat(fetchResponse.getCircles().isEmpty(), is(true));
         assertThat(fetchResponse.getMembers().get(0).getAccountName(), is(Constants.ADMIN_ACCOUNT));
-    }
-
-    /**
-     * <p>The System Administrator should always be able to find all Accounts,
-     * regardless of the Settings. The System Administrator is not and cannot
-     * be part of any Circles.</p>
-     */
-    @Test
-    public void testFindAdminWithExposeAdminFalseAsAdmin() {
-        // Ensure that we have the correct settings for the Service
-        final Settings mySettings = newSettings();
-        mySettings.set(StandardSetting.EXPOSE_ADMIN, "false");
-
-        final FetchMemberService fetchMemberService = new FetchMemberService(mySettings, entityManager);
-        final FetchMemberRequest fetchMemberRequest = prepareRequest(FetchMemberRequest.class, Constants.ADMIN_ACCOUNT);
-        fetchMemberRequest.setMemberId(ADMIN_ID);
-        assertThat(fetchMemberRequest.validate().isEmpty(), is(true));
-        final FetchMemberResponse fetchMemberResponse = fetchMemberService.perform(fetchMemberRequest);
-
-        // Verify that we have found the correct data
-        assertThat(fetchMemberResponse, is(not(nullValue())));
-        assertThat(fetchMemberResponse.isOk(), is(true));
-        assertThat(fetchMemberResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
-        assertThat(fetchMemberResponse.getReturnMessage(), is("Ok"));
-        assertThat(fetchMemberResponse.getMembers().size(), is(1));
-        assertThat(fetchMemberResponse.getCircles().isEmpty(), is(true));
-        assertThat(fetchMemberResponse.getMembers().get(0).getAccountName(), is(Constants.ADMIN_ACCOUNT));
     }
 
     /**
@@ -318,54 +246,6 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
         assertThat(response.getMembers().size(), is(1));
         assertThat(response.getCircles().size(), is(2));
         assertThat(response.getMembers().get(0).getAccountName(), is(member.getName()));
-    }
-
-    /**
-     * <p>The System Administrator should always be able to find all Accounts,
-     * regardless of the Settings. The System Administrator is not and cannot
-     * be part of any Circles.</p>
-     */
-    @Test
-    public void testFindAdminWithExposeAdminTrueAsMember1() {
-        // Ensure that we have the correct settings for the Service
-        final Settings mySettings = newSettings();
-        mySettings.set(StandardSetting.EXPOSE_ADMIN, "true");
-
-        final FetchMemberService memberService = new FetchMemberService(mySettings, entityManager);
-        final MemberEntity member = findFirstMember();
-        final FetchMemberRequest memberRequest = prepareRequest(FetchMemberRequest.class, member.getName());
-        memberRequest.setMemberId(ADMIN_ID);
-        assertThat(memberRequest.validate().isEmpty(), is(true));
-        final FetchMemberResponse memberResponse = memberService.perform(memberRequest);
-
-        // Verify that we have found the correct data
-        assertThat(memberResponse, is(not(nullValue())));
-        assertThat(memberResponse.isOk(), is(true));
-        assertThat(memberResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
-        assertThat(memberResponse.getReturnMessage(), is("Ok"));
-        assertThat(memberResponse.getMembers().size(), is(1));
-        assertThat(memberResponse.getCircles().isEmpty(), is(true));
-        assertThat(memberResponse.getMembers().get(0).getAccountName(), is(Constants.ADMIN_ACCOUNT));
-    }
-
-    /**
-     * <p>The System Administrator should always be able to find all Accounts,
-     * regardless of the Settings. The System Administrator is not and cannot
-     * be part of any Circles.</p>
-     */
-    @Test
-    public void testFindAdminWithExposeAdminFalseAsMember1() {
-        // Ensure that we have the correct settings for the Service
-        final Settings mySettings = newSettings();
-        mySettings.set(StandardSetting.EXPOSE_ADMIN, "false");
-
-        prepareCause(AuthorizationException.class, ReturnCode.AUTHORIZATION_WARNING, "Not Authorized to access this information.");
-        final FetchMemberService service = new FetchMemberService(mySettings, entityManager);
-        final MemberEntity member = findFirstMember();
-        final FetchMemberRequest request = prepareRequest(FetchMemberRequest.class, member.getName());
-        request.setMemberId(ADMIN_ID);
-        assertThat(request.validate().isEmpty(), is(true));
-        service.perform(request);
     }
 
     @Test

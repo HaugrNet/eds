@@ -45,7 +45,7 @@ public final class FetchDataTypes extends CwsRequest<FetchDataTypeResponse> {
     public void execute() {
         final FetchDataTypeRequest request = prepareRequest(FetchDataTypeRequest.class);
 
-        response = CallShare.fetchDataTypes(request);
+        response = CallShare.fetchDataTypes(requestType, requestUrl, request);
         setDataTypes(response.getDataTypes());
     }
 }

@@ -15,9 +15,10 @@ Test
 |Import                 |
 |io.javadog.cws.fitnesse|
 
-!|script|clean database|
-|remove circles        |
-|remove members        |
+!|script |control cws                           |
+|set type|SOAP|and url|http://localhost:8080/cws|
+|remove circles                                 |
+|remove members                                 |
 
 *!
 

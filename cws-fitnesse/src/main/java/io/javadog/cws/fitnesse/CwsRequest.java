@@ -41,6 +41,9 @@ import java.util.Set;
  */
 public abstract class CwsRequest<R extends CwsResponse> {
 
+    protected static String requestType = "SOAP";
+    protected static String requestUrl = "http://localhost:8080/cws";
+
     // If it is not possible to find a matching value, then this should be used.
     protected static final String UNDEFINED = "undefined";
 
@@ -69,6 +72,11 @@ public abstract class CwsRequest<R extends CwsResponse> {
     protected byte[] credential = null;
     private CredentialType credentialType = null;
     protected R response = null;
+
+    public static void updateTypeAndUrl(final String type, final String url) {
+        requestType = type;
+        requestUrl = url;
+    }
 
     public void setAccountName(final String accountName) {
         this.accountName = Converter.preCheck(accountName);

@@ -79,7 +79,7 @@ public final class ProcessMember extends CwsRequest<ProcessMemberResponse> {
     @Override
     public void execute() {
         final ProcessMemberRequest request = buildRequest();
-        response = CallManagement.processMember(request);
+        response = CallManagement.processMember(requestType, requestUrl, request);
 
         // Ensuring that the internal mapping of Ids with accounts being
         // used is synchronized.

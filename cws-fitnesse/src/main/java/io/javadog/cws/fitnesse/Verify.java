@@ -59,7 +59,7 @@ public final class Verify extends CwsRequest<VerifyResponse> {
         request.setData(data);
         request.setSignature(signature);
 
-        response = CallShare.verify(request);
+        response = CallShare.verify(requestType, requestUrl, request);
     }
 
     /**

@@ -20,6 +20,7 @@ import io.javadog.cws.api.requests.SignRequest;
 import io.javadog.cws.api.responses.SignResponse;
 import io.javadog.cws.fitnesse.callers.CallShare;
 import io.javadog.cws.fitnesse.utils.Converter;
+
 import java.util.Date;
 
 /**
@@ -60,7 +61,7 @@ public final class Sign extends CwsRequest<SignResponse> {
         request.setData(data);
         request.setExpires(expires);
 
-        response = CallShare.sign(request);
+        response = CallShare.sign(requestType, requestUrl, request);
     }
 
     /**

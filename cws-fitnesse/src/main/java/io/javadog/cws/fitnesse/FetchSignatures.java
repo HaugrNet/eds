@@ -45,6 +45,6 @@ public final class FetchSignatures extends CwsRequest<FetchSignatureResponse> {
     public void execute() {
         final FetchSignatureRequest request = prepareRequest(FetchSignatureRequest.class);
 
-        response = CallShare.fetchSignatures(request);
+        response = CallShare.fetchSignatures(requestType, requestUrl, request);
     }
 }

@@ -103,7 +103,7 @@ public final class FetchData extends CwsRequest<FetchDataResponse> {
         request.setPageNumber(pageNumber);
         request.setPageSize(pageSize);
 
-        response = CallShare.fetchData(request);
+        response = CallShare.fetchData(requestType, requestUrl, request);
         setIndex(0);
     }
 

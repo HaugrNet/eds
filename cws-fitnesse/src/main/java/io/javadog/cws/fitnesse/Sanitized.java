@@ -20,6 +20,7 @@ import io.javadog.cws.api.requests.SanityRequest;
 import io.javadog.cws.api.responses.SanityResponse;
 import io.javadog.cws.fitnesse.callers.CallManagement;
 import io.javadog.cws.fitnesse.utils.Converter;
+
 import java.util.Date;
 
 /**
@@ -60,7 +61,7 @@ public final class Sanitized extends CwsRequest<SanityResponse> {
         request.setCircleId(circleId);
         request.setSince(since);
 
-        response = CallManagement.sanitized(request);
+        response = CallManagement.sanitized(requestType, requestUrl, request);
     }
 
     /**

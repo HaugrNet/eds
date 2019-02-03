@@ -16,14 +16,22 @@
  */
 package io.javadog.cws.fitnesse.exceptions;
 
+import io.javadog.cws.api.common.Constants;
+
 /**
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 public final class StopTestException extends RuntimeException {
 
+    private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
+
     public StopTestException(final String message, final Throwable cause) {
         super(message, cause);
+    }
+
+    public StopTestException(final String message) {
+        super(message);
     }
 
     public StopTestException(final Throwable cause) {

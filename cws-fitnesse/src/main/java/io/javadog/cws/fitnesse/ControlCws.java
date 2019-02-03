@@ -47,17 +47,26 @@ import java.util.Objects;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-public final class CleanDatabase {
+public final class ControlCws {
+
+    private String type = "SOAP";
+    private String url = "http://localhost:8080/cws";
+
+    public void setTypeAndUrl(final String type, final String url) {
+        CwsRequest.updateTypeAndUrl(type, url);
+        this.type = type;
+        this.url = url;
+    }
 
     public void removeCircles() {
         final FetchCircleRequest fetchRequest = prepareRequest(FetchCircleRequest.class);
         final ProcessCircleRequest processRequest = prepareRequest(ProcessCircleRequest.class);
         processRequest.setAction(Action.DELETE);
 
-        final FetchCircleResponse fetchResponse = CallManagement.fetchCircles(fetchRequest);
+        final FetchCircleResponse fetchResponse = CallManagement.fetchCircles(type, url, fetchRequest);
         for (final Circle circle : fetchResponse.getCircles()) {
             processRequest.setCircleId(circle.getCircleId());
-            CallManagement.processCircle(processRequest);
+            CallManagement.processCircle(type, url, processRequest);
         }
     }
 
@@ -66,11 +75,11 @@ public final class CleanDatabase {
         final ProcessMemberRequest processRequest = prepareRequest(ProcessMemberRequest.class);
         processRequest.setAction(Action.DELETE);
 
-        final FetchMemberResponse fetchResponse = CallManagement.fetchMembers(fetchRequest);
+        final FetchMemberResponse fetchResponse = CallManagement.fetchMembers(type, url, fetchRequest);
         for (final Member member : fetchResponse.getMembers()) {
             if (!Objects.equals(member.getAccountName(), Constants.ADMIN_ACCOUNT)) {
                 processRequest.setMemberId(member.getMemberId());
-                CallManagement.processMember(processRequest);
+                CallManagement.processMember(type, url, processRequest);
             }
         }
     }

@@ -34,7 +34,9 @@ import io.javadog.cws.api.responses.ProcessTrusteeResponse;
 import io.javadog.cws.api.responses.SanityResponse;
 import io.javadog.cws.api.responses.SettingResponse;
 import io.javadog.cws.api.responses.VersionResponse;
+import io.javadog.cws.client.ManagementRestClient;
 import io.javadog.cws.client.ManagementSoapClient;
+import io.javadog.cws.fitnesse.exceptions.StopTestException;
 
 /**
  * @author Kim Jensen
@@ -42,49 +44,73 @@ import io.javadog.cws.client.ManagementSoapClient;
  */
 public final class CallManagement {
 
-    private static final Management MANAGEMENT = new ManagementSoapClient("http://localhost:8080/cws");
+    private static Management management = null;
 
     private CallManagement() {
         // Private Constructor, this is a utility Class.
+    }
+
+    private static void prepareCWS(final String type, final String url) {
+        if (management == null) {
+            switch (type) {
+                case "REST":
+                    management = new ManagementRestClient(url);
+                    break;
+                case "SOAP":
+                    management = new ManagementSoapClient(url);
+                    break;
+                default:
+                    throw new StopTestException("Unknown Request Type for CWS, supported is either REST or SOAP");
+            }
+        }
     }
 
     // =========================================================================
     // Management Interface Functionality
     // =========================================================================
 
-    public static VersionResponse version() {
-        return MANAGEMENT.version();
+    public static VersionResponse version(final String type, final String url) {
+        prepareCWS(type, url);
+        return management.version();
     }
 
-    public static SettingResponse settings(final SettingRequest request) {
-        return MANAGEMENT.settings(request);
+    public static SettingResponse settings(final String type, final String url, final SettingRequest request) {
+        prepareCWS(type, url);
+        return management.settings(request);
     }
 
-    public static SanityResponse sanitized(final SanityRequest request) {
-        return MANAGEMENT.sanitized(request);
+    public static SanityResponse sanitized(final String type, final String url, final SanityRequest request) {
+        prepareCWS(type, url);
+        return management.sanitized(request);
     }
 
-    public static FetchMemberResponse fetchMembers(final FetchMemberRequest request) {
-        return MANAGEMENT.fetchMembers(request);
+    public static FetchMemberResponse fetchMembers(final String type, final String url, final FetchMemberRequest request) {
+        prepareCWS(type, url);
+        return management.fetchMembers(request);
     }
 
-    public static ProcessMemberResponse processMember(final ProcessMemberRequest request) {
-        return MANAGEMENT.processMember(request);
+    public static ProcessMemberResponse processMember(final String type, final String url, final ProcessMemberRequest request) {
+        prepareCWS(type, url);
+        return management.processMember(request);
     }
 
-    public static FetchCircleResponse fetchCircles(final FetchCircleRequest request) {
-        return MANAGEMENT.fetchCircles(request);
+    public static FetchCircleResponse fetchCircles(final String type, final String url, final FetchCircleRequest request) {
+        prepareCWS(type, url);
+        return management.fetchCircles(request);
     }
 
-    public static ProcessCircleResponse processCircle(final ProcessCircleRequest request) {
-        return MANAGEMENT.processCircle(request);
+    public static ProcessCircleResponse processCircle(final String type, final String url, final ProcessCircleRequest request) {
+        prepareCWS(type, url);
+        return management.processCircle(request);
     }
 
-    public static FetchTrusteeResponse fetchTrustees(final FetchTrusteeRequest request) {
-        return MANAGEMENT.fetchTrustees(request);
+    public static FetchTrusteeResponse fetchTrustees(final String type, final String url, final FetchTrusteeRequest request) {
+        prepareCWS(type, url);
+        return management.fetchTrustees(request);
     }
 
-    public static ProcessTrusteeResponse processTrustee(final ProcessTrusteeRequest request) {
-        return MANAGEMENT.processTrustee(request);
+    public static ProcessTrusteeResponse processTrustee(final String type, final String url, final ProcessTrusteeRequest request) {
+        prepareCWS(type, url);
+        return management.processTrustee(request);
     }
 }

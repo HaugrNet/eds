@@ -42,6 +42,6 @@ public final class FetchTrustees extends CwsRequest<FetchTrusteeResponse> {
         final FetchTrusteeRequest request = prepareRequest(FetchTrusteeRequest.class);
 
 
-        response = CallManagement.fetchTrustees(request);
+        response = CallManagement.fetchTrustees(requestType, requestUrl, request);
     }
 }

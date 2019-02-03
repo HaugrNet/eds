@@ -19,6 +19,7 @@ package io.javadog.cws.fitnesse;
 import io.javadog.cws.api.requests.SettingRequest;
 import io.javadog.cws.api.responses.SettingResponse;
 import io.javadog.cws.fitnesse.callers.CallManagement;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -53,7 +54,7 @@ public final class Settings extends CwsRequest<SettingResponse> {
         setCredential(credential);
 
         final SettingRequest request = prepareRequest(SettingRequest.class);
-        theSettings = CallManagement.settings(request).getSettings();
+        theSettings = CallManagement.settings(requestType, requestUrl, request).getSettings();
     }
 
     // =========================================================================
@@ -92,7 +93,7 @@ public final class Settings extends CwsRequest<SettingResponse> {
         final SettingRequest request = prepareRequest(SettingRequest.class);
         request.setSettings(settings);
 
-        response = CallManagement.settings(request);
+        response = CallManagement.settings(requestType, requestUrl, request);
     }
 
     /**

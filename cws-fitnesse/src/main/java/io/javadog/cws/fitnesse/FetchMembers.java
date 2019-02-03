@@ -56,7 +56,7 @@ public final class FetchMembers extends CwsRequest<FetchMemberResponse> {
         final FetchMemberRequest request = prepareRequest(FetchMemberRequest.class);
         request.setMemberId(memberId);
 
-        response = CallManagement.fetchMembers(request);
+        response = CallManagement.fetchMembers(requestType, requestUrl, request);
     }
 
     /**

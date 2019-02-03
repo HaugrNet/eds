@@ -301,9 +301,11 @@ public interface Management {
      * following:</p>
      * <ul>
      *   <li>Add new Member</li>
+     *   <li>Alter Member Roles</li>
      *   <li>Login to link a Session temporarily with an Account</li>
      *   <li>Logout to stop linking an Account with a Session</li>
      *   <li>Update existing Member</li>
+     *   <li>Update Credential</li>
      *   <li>Remove Member</li>
      * </ul>
      *
@@ -311,6 +313,10 @@ public interface Management {
      * the System Administrator or a Circle Administrator, in preparation to
      * adding the Member to one or more Circles being administrated by the
      * Circle Administrator.</i></p>
+     *
+     * <p><b>Alter Member:</b> <i>It is possible for a System Administrator to
+     * alter Accounts, and change the Role - which may allow someone else to
+     * become System Administrator, or simply revoke the role.</i></p>
      *
      * <p>A special variant for creating new Accounts is via Invitations, where
      * the System Administrator can issue a signed invitation to a potential
@@ -321,10 +327,18 @@ public interface Management {
      * Account. This is to help websites to use CWS without needing to store
      * the Account credentials in an unsafe way.</i></p>
      *
-     * <p><b>Update existing Member</b> <i>Updating an existing Member can only
-     * be done by Members themselves. The information to update, is the
-     * Credentials and Member name. As long as the Member name doesn't conflict
-     * with existing Member names.</i></p>
+     * <p><b>Update existing Member</b> <i>This action will only affect a
+     * member's own Account. Whereby it is allowed to change the Account Name,
+     * provided the name has not been taken. It is also possible to update the
+     * credentials (PassPhrase), and to change the Public Key belonging to an
+     * account and which others may see.</i></p>
+     *
+     * <p><b>Update Credential</b> <i>It is possible for an active member to
+     * update the credentials used for authentication, but it is not possible
+     * to update the credentials for anyone else, not even an administrator can
+     * update the credentials for anyone else. The reason for this, is that the
+     * credentials is used to unlock the internal keys and this cannot be done
+     * by anyone else than the current owner of an account.</i></p>
      *
      * <p><b>Remove Member</b> <i>Removing a Member from the system, can be done
      * either by the Member (to remove themselves) or by the System

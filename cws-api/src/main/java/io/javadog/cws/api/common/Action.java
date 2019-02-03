@@ -91,11 +91,15 @@ public enum Action {
     MOVE,
 
     /**
-     * <p>This Action Alters a Trustee's relation to a Circle, which means
-     * change the Trust Level. If invoked by the System Administrator, then it
-     * can only be used to alter the TrustLevel, not to grant access to the
-     * Data by giving the Member access to the Circle Key, as the System
-     * Administrator itself is not having access to this.</p>
+     * <p>This Action is used when either altering an Account or a Trustee. If
+     * the request was ProcessMember, then it is possible to change the Role of
+     * the Member in the system, i.e. grant or revoke Administrative rights. If
+     * the request was ProcessTrustee, then it is possible for a Circle
+     * Administrator to change the Trust Level for another Trustee.</p>
+     *
+     * <p>Note; it is not possible for a System Administrator to grant someone
+     * access to a Circle of Trust, unless the System Administrator is part of
+     * the Circle.</p>
      */
     ALTER,
 

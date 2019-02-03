@@ -34,6 +34,8 @@ import io.javadog.cws.core.model.MemberDao;
 import io.javadog.cws.core.model.Settings;
 import io.javadog.cws.core.model.entities.MemberEntity;
 import io.javadog.cws.core.model.entities.TrusteeEntity;
+
+import javax.persistence.EntityManager;
 import java.security.PublicKey;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -44,7 +46,6 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
-import javax.persistence.EntityManager;
 
 /**
  * <p>Business Logic implementation for the CWS ProcessMember request.</p>
@@ -102,8 +103,11 @@ public final class ProcessMemberService extends Serviceable<MemberDao, ProcessMe
             case LOGOUT:
                 response = logoutMember();
                 break;
+            case ALTER:
+                response = alterMember(request);
+                break;
             case UPDATE:
-                response = processSelf(request);
+                response = updateMember(request);
                 break;
             case INVALIDATE:
                 response = invalidate(request);
@@ -134,7 +138,7 @@ public final class ProcessMemberService extends Serviceable<MemberDao, ProcessMe
                 response = new ProcessMemberResponse();
                 response.setMemberId(created.getExternalId());
             } else {
-                throw new CWSException(ReturnCode.IDENTIFICATION_WARNING, "An Account with the same AccountName already exist.");
+                throw new CWSException(ReturnCode.IDENTIFICATION_WARNING, "An Account with the requested AccountName already exist.");
             }
         } else {
             response = new ProcessMemberResponse(ReturnCode.AUTHORIZATION_WARNING, "Members are not permitted to create new Accounts.");
@@ -227,38 +231,47 @@ public final class ProcessMemberService extends Serviceable<MemberDao, ProcessMe
         return new ProcessMemberResponse();
     }
 
-    // TODO Rename methods, as it should be possible for administrators to alter Member Roles. Members aren't allowed to alter their own role.
-    // TODO Extend testing to also check that roles are correctly set when creating or updating accounts
-    private ProcessMemberResponse processSelf(final ProcessMemberRequest request) {
-        final ProcessMemberResponse response = new ProcessMemberResponse();
-        final String newAccountName = trim(request.getNewAccountName());
-        response.setMemberId(member.getExternalId());
-
-        updateOwnName(newAccountName);
-        updateOwnCredential(request);
-
-        if (request.getPublicKey() != null) {
-            member.setMemberKey(request.getPublicKey());
+    private ProcessMemberResponse alterMember(final ProcessMemberRequest request) {
+        if (member.getMemberRole() != MemberRole.ADMIN) {
+            throw new CWSException(ReturnCode.AUTHORIZATION_WARNING, "Only Administrators may update the Role of a member.");
         }
 
+        if (member.getExternalId().equals(request.getMemberId())) {
+            throw new CWSException(ReturnCode.ILLEGAL_ACTION, "It is not permitted to alter own account.");
+        }
+
+        final ProcessMemberResponse response = new ProcessMemberResponse();
+        final String memberId = request.getMemberId();
+        response.setMemberId(memberId);
+
+        final MemberEntity entity = dao.find(MemberEntity.class, memberId);
+        entity.setMemberRole(request.getMemberRole());
+        dao.persist(entity);
+
+        return response;
+    }
+
+    private ProcessMemberResponse updateMember(final ProcessMemberRequest request) {
+        final ProcessMemberResponse response = new ProcessMemberResponse();
+        final String newAccountName = trim(request.getNewAccountName());
+
+        updateOwnAccountName(newAccountName);
+        updateOwnCredential(request);
+        updateOwnPublicKey(request);
+        response.setMemberId(member.getExternalId());
         dao.persist(member);
 
         return response;
     }
 
-    private void updateOwnName(final String newAccountName) {
+    private void updateOwnAccountName(final String newAccountName) {
         if (!isEmpty(newAccountName)) {
-            if (member.getMemberRole() == MemberRole.ADMIN) {
-                // TODO Alter this, as the Administration is now part of the Role, not the account name
-                throw new CWSException(ReturnCode.ILLEGAL_ACTION, "It is not permitted for the System Administrator to change the Account name.");
-            } else {
-                final MemberEntity existing = dao.findMemberByName(newAccountName);
+            final MemberEntity existing = dao.findMemberByName(newAccountName);
 
-                if (existing == null) {
-                    member.setName(newAccountName);
-                } else {
-                    throw new CWSException(ReturnCode.CONSTRAINT_ERROR, "The new Account Name already exists.");
-                }
+            if (existing == null) {
+                member.setName(newAccountName);
+            } else {
+                throw new CWSException(ReturnCode.CONSTRAINT_ERROR, "The new Account Name already exists.");
             }
         }
     }
@@ -281,6 +294,12 @@ public final class ProcessMemberService extends Serviceable<MemberDao, ProcessMe
             } else {
                 throw new CWSException(ReturnCode.VERIFICATION_WARNING, "It is only permitted to update the credentials when authenticating with Passphrase.");
             }
+        }
+    }
+
+    private void updateOwnPublicKey(final ProcessMemberRequest request) {
+        if (request.getPublicKey() != null) {
+            member.setMemberKey(request.getPublicKey());
         }
     }
 

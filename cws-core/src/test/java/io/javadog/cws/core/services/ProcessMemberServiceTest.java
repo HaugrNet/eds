@@ -42,9 +42,10 @@ import io.javadog.cws.core.exceptions.AuthenticationException;
 import io.javadog.cws.core.exceptions.CWSException;
 import io.javadog.cws.core.exceptions.CryptoException;
 import io.javadog.cws.core.model.Settings;
+import org.junit.Test;
+
 import java.util.Base64;
 import java.util.UUID;
-import org.junit.Test;
 
 /**
  * @author Kim Jensen
@@ -153,7 +154,7 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
 
     @Test
     public void testAddingWithExistingAccountName() {
-        prepareCause(CWSException.class, ReturnCode.IDENTIFICATION_WARNING, "An Account with the same AccountName already exist.");
+        prepareCause(CWSException.class, ReturnCode.IDENTIFICATION_WARNING, "An Account with the requested AccountName already exist.");
 
         final String account = MEMBER_4;
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
@@ -161,6 +162,46 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
         request.setAction(Action.CREATE);
         request.setNewAccountName(account);
         request.setNewCredential(crypto.stringToBytes(account));
+        assertThat(request.validate().isEmpty(), is(true));
+
+        service.perform(request);
+    }
+
+    @Test
+    public void testAlterAccount() {
+        final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
+        final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
+        request.setAction(Action.ALTER);
+        request.setMemberId(MEMBER_1_ID);
+        request.setMemberRole(MemberRole.ADMIN);
+        final ProcessMemberResponse response = service.perform(request);
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+        assertThat(response.getReturnMessage(), is("Ok"));
+    }
+
+    @Test
+    public void testAlterSelf() {
+        prepareCause(CWSException.class, ReturnCode.ILLEGAL_ACTION, "It is not permitted to alter own account.");
+
+        final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
+        final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
+        request.setAction(Action.ALTER);
+        request.setMemberId(ADMIN_ID);
+        request.setMemberRole(MemberRole.STANDARD);
+        assertThat(request.validate().isEmpty(), is(true));
+
+        service.perform(request);
+    }
+
+    @Test
+    public void testAlterAccountAsMember() {
+        prepareCause(CWSException.class, ReturnCode.AUTHORIZATION_WARNING, "Only Administrators may update the Role of a member.");
+
+        final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
+        final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, MEMBER_3);
+        request.setAction(Action.ALTER);
+        request.setMemberId(MEMBER_1_ID);
+        request.setMemberRole(MemberRole.ADMIN);
         assertThat(request.validate().isEmpty(), is(true));
 
         service.perform(request);
@@ -405,19 +446,6 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
         final ProcessMemberResponse response = service.perform(request);
         assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
         assertThat(response.getReturnMessage(), is("Ok"));
-    }
-
-    @Test
-    public void testProcessSelfChangeAdminName() {
-        prepareCause(CWSException.class, ReturnCode.ILLEGAL_ACTION, "It is not permitted for the System Administrator to change the Account name.");
-        final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
-        final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
-        request.setAction(Action.UPDATE);
-        request.setNewAccountName("root");
-        request.setNewCredential(crypto.stringToBytes("Bla bla bla"));
-        assertThat(request.validate().size(), is(0));
-
-        service.perform(request);
     }
 
     @Test

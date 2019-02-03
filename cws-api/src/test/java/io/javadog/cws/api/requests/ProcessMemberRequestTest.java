@@ -40,6 +40,7 @@ public final class ProcessMemberRequestTest {
         final String memberId = UUID.randomUUID().toString();
         final String newAccountName = "New AccountName";
         final String newCredential = "New Credential";
+        final String publicKey = UUID.randomUUID().toString();
 
         final ProcessMemberRequest request = new ProcessMemberRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
@@ -49,6 +50,7 @@ public final class ProcessMemberRequestTest {
         request.setMemberRole(MemberRole.ADMIN);
         request.setNewAccountName(newAccountName);
         request.setNewCredential(TestUtilities.convert(newCredential));
+        request.setPublicKey(publicKey);
         final Map<String, String> errors = request.validate();
 
         assertThat(errors.isEmpty(), is(true));
@@ -59,6 +61,7 @@ public final class ProcessMemberRequestTest {
         assertThat(request.getMemberRole(), is(MemberRole.ADMIN));
         assertThat(request.getNewAccountName(), is(newAccountName));
         assertThat(TestUtilities.convert(request.getNewCredential()), is(newCredential));
+        assertThat(request.getPublicKey(), is(publicKey));
     }
 
     @Test
@@ -179,7 +182,34 @@ public final class ProcessMemberRequestTest {
     }
 
     @Test
-    public void testActionProcess() {
+    public void testActionAlter() {
+        final ProcessMemberRequest request = new ProcessMemberRequest();
+        request.setAccountName(Constants.ADMIN_ACCOUNT);
+        request.setCredential(TestUtilities.convert(Constants.ADMIN_ACCOUNT));
+        request.setMemberId(UUID.randomUUID().toString());
+        request.setMemberRole(MemberRole.ADMIN);
+        request.setAction(Action.ALTER);
+
+        final Map<String, String> errors = request.validate();
+        assertThat(errors.isEmpty(), is(true));
+    }
+
+    @Test
+    public void testActionAlterFail() {
+        final ProcessMemberRequest request = new ProcessMemberRequest();
+        request.setAccountName(Constants.ADMIN_ACCOUNT);
+        request.setCredential(TestUtilities.convert(Constants.ADMIN_ACCOUNT));
+        request.setMemberId("123");
+        request.setAction(Action.ALTER);
+
+        final Map<String, String> errors = request.validate();
+        assertThat(errors.size(), is(2));
+        assertThat(errors.get(Constants.FIELD_MEMBER_ID), is("The given memberId is invalid."));
+        assertThat(errors.get(Constants.FIELD_MEMBER_ROLE), is("The Role is missing."));
+    }
+
+    @Test
+    public void testActionUpdate() {
         final ProcessMemberRequest request = new ProcessMemberRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
         request.setCredential(TestUtilities.convert(Constants.ADMIN_ACCOUNT));
@@ -191,12 +221,12 @@ public final class ProcessMemberRequestTest {
     }
 
     @Test
-    public void testActionProcessFail() {
+    public void testActionUpdateFail() {
         final ProcessMemberRequest request = new ProcessMemberRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
         request.setCredential(TestUtilities.convert(Constants.ADMIN_ACCOUNT));
         request.setNewAccountName("Ridiculously and invalid Name for an Account - it has to exceed our total maximum, hence this awfully name.");
-        request.setAction(Action.INVITE);
+        request.setAction(Action.UPDATE);
 
         final Map<String, String> errors = request.validate();
         assertThat(errors.size(), is(1));

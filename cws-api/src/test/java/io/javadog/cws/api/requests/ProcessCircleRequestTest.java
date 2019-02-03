@@ -38,6 +38,7 @@ public final class ProcessCircleRequestTest {
         final String circleId = UUID.randomUUID().toString();
         final String circleName = "New Circle Name";
         final String memberId = UUID.randomUUID().toString();
+        final String circleKey = UUID.randomUUID().toString();
 
         final ProcessCircleRequest request = new ProcessCircleRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
@@ -46,6 +47,7 @@ public final class ProcessCircleRequestTest {
         request.setCircleId(circleId);
         request.setCircleName(circleName);
         request.setMemberId(memberId);
+        request.setCircleKey(circleKey);
         final Map<String, String> errors = request.validate();
 
         assertThat(errors.isEmpty(), is(true));
@@ -55,6 +57,7 @@ public final class ProcessCircleRequestTest {
         assertThat(request.getCircleId(), is(circleId));
         assertThat(request.getCircleName(), is(circleName));
         assertThat(request.getMemberId(), is(memberId));
+        assertThat(request.getCircleKey(), is(circleKey));
     }
 
     @Test

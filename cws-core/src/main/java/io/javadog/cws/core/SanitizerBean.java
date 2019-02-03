@@ -22,11 +22,7 @@ import io.javadog.cws.core.jce.Crypto;
 import io.javadog.cws.core.model.CommonDao;
 import io.javadog.cws.core.model.Settings;
 import io.javadog.cws.core.model.entities.DataEntity;
-import java.time.LocalDate;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
-import java.util.logging.Logger;
+
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
@@ -34,6 +30,11 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceException;
 import javax.persistence.Query;
 import javax.transaction.Transactional;
+import java.time.LocalDate;
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
+import java.util.logging.Logger;
 
 /**
  * <p>Generally, the database is always trustworthy, it is a system which is
@@ -114,7 +115,7 @@ public class SanitizerBean {
             entityManager.persist(entity);
             status = entity.getSanityStatus();
         } catch (PersistenceException e) {
-            // There is 2 potential problems which may be caught here:
+            // There are 2 potential problems which may be caught here:
             //   1. A different process (CWS instance) may be processing the
             //      record, hence it is perfectly legitimate and we can actually
             //      ignore the error. However, it is still being logged.

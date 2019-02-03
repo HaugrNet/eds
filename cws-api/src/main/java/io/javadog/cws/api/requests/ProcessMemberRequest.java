@@ -203,6 +203,10 @@ public final class ProcessMemberRequest extends Authentication {
                     break;
                 case LOGOUT:
                     break;
+                case ALTER:
+                    checkNotNullAndValidId(errors, Constants.FIELD_MEMBER_ID, memberId, "The given memberId is invalid.");
+                    checkNotNull(errors, Constants.FIELD_MEMBER_ROLE, memberRole, "The Role is missing.");
+                    break;
                 case UPDATE:
                     checkNotTooLong(errors, Constants.FIELD_NEW_ACCOUNT_NAME, newAccountName, Constants.MAX_NAME_LENGTH, newAccountErrorMessage);
                     break;

@@ -37,17 +37,20 @@ public final class MemberTest {
     public void testClassflow() {
         final String memberId = UUID.randomUUID().toString();
         final String accountName = "Member AccountName";
+        final String publicKey = UUID.randomUUID().toString();
         final Date added = new Date();
 
         final Member member = new Member();
         member.setMemberId(memberId);
         member.setAccountName(accountName);
         member.setMemberRole(MemberRole.STANDARD);
+        member.setPublicKey(publicKey);
         member.setAdded(added);
 
         assertThat(member.getMemberId(), is(memberId));
         assertThat(member.getAccountName(), is(accountName));
         assertThat(member.getMemberRole(), is(MemberRole.STANDARD));
+        assertThat(member.getPublicKey(), is(publicKey));
         assertThat(member.getAdded(), is(added));
     }
 

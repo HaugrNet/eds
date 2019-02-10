@@ -25,9 +25,10 @@ import io.javadog.cws.api.requests.ProcessMemberRequest;
 import io.javadog.cws.core.DatabaseSetup;
 import io.javadog.cws.core.ManagementBean;
 import io.javadog.cws.core.exceptions.CWSException;
-import java.lang.reflect.InvocationTargetException;
-import javax.ws.rs.core.Response;
 import org.junit.Test;
+
+import javax.ws.rs.core.Response;
+import java.lang.reflect.InvocationTargetException;
 
 /**
  * @author Kim Jensen
@@ -68,6 +69,60 @@ public final class MemberServiceTest extends DatabaseSetup {
         final ProcessMemberRequest request = new ProcessMemberRequest();
 
         final Response response = service.invite(request);
+        assertThat(response.getStatus(), is(ReturnCode.ERROR.getHttpCode()));
+    }
+
+    @Test
+    public void testLogin() {
+        final MemberService service = prepareService();
+        final ProcessMemberRequest request = new ProcessMemberRequest();
+
+        final Response response = service.login(request);
+        assertThat(response.getStatus(), is(ReturnCode.VERIFICATION_WARNING.getHttpCode()));
+    }
+
+    @Test
+    public void testFlawedLogin() {
+        final MemberService service = prepareFlawedService();
+        final ProcessMemberRequest request = new ProcessMemberRequest();
+
+        final Response response = service.login(request);
+        assertThat(response.getStatus(), is(ReturnCode.ERROR.getHttpCode()));
+    }
+
+    @Test
+    public void testLogout() {
+        final MemberService service = prepareService();
+        final ProcessMemberRequest request = new ProcessMemberRequest();
+
+        final Response response = service.logout(request);
+        assertThat(response.getStatus(), is(ReturnCode.VERIFICATION_WARNING.getHttpCode()));
+    }
+
+    @Test
+    public void testFlawedLogout() {
+        final MemberService service = prepareFlawedService();
+        final ProcessMemberRequest request = new ProcessMemberRequest();
+
+        final Response response = service.logout(request);
+        assertThat(response.getStatus(), is(ReturnCode.ERROR.getHttpCode()));
+    }
+
+    @Test
+    public void testAlter() {
+        final MemberService service = prepareService();
+        final ProcessMemberRequest request = new ProcessMemberRequest();
+
+        final Response response = service.alter(request);
+        assertThat(response.getStatus(), is(ReturnCode.VERIFICATION_WARNING.getHttpCode()));
+    }
+
+    @Test
+    public void testFlawedAlter() {
+        final MemberService service = prepareFlawedService();
+        final ProcessMemberRequest request = new ProcessMemberRequest();
+
+        final Response response = service.alter(request);
         assertThat(response.getStatus(), is(ReturnCode.ERROR.getHttpCode()));
     }
 

@@ -57,46 +57,30 @@ import java.util.Map;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "processTrusteeRequest")
-@XmlType(name = "processTrusteeRequest", propOrder = { Constants.FIELD_ACTION, Constants.FIELD_CIRCLE_ID, Constants.FIELD_MEMBER_ID, Constants.FIELD_TRUSTLEVEL })
+@XmlType(name = "processTrusteeRequest", propOrder = { Constants.FIELD_ACTION, Constants.FIELD_TRUSTLEVEL, Constants.FIELD_CIRCLE_ID, Constants.FIELD_MEMBER_ID })
 public final class ProcessTrusteeRequest extends Authentication implements CircleIdRequest, ActionRequest {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
-    @Pattern(regexp = Constants.ID_PATTERN_REGEX)
-    @XmlElement(name = Constants.FIELD_CIRCLE_ID, nillable = true)
-    private String circleId = null;
-
     @NotNull
     @XmlElement(name = Constants.FIELD_ACTION, required = true)
     private Action action = null;
+
+    @XmlElement(name = Constants.FIELD_TRUSTLEVEL, nillable = true)
+    private TrustLevel trustLevel = null;
+
+    @Pattern(regexp = Constants.ID_PATTERN_REGEX)
+    @XmlElement(name = Constants.FIELD_CIRCLE_ID, nillable = true)
+    private String circleId = null;
 
     @Pattern(regexp = Constants.ID_PATTERN_REGEX)
     @XmlElement(name = Constants.FIELD_MEMBER_ID, nillable = true)
     private String memberId = null;
 
-    @XmlElement(name = Constants.FIELD_TRUSTLEVEL, nillable = true)
-    private TrustLevel trustLevel = null;
-
     // =========================================================================
     // Standard Setters & Getters
     // =========================================================================
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void setCircleId(final String circleId) {
-        this.circleId = circleId;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getCircleId() {
-        return circleId;
-    }
 
     /**
      * {@inheritDoc}
@@ -114,20 +98,36 @@ public final class ProcessTrusteeRequest extends Authentication implements Circl
         return action;
     }
 
-    public void setMemberId(final String memberId) {
-        this.memberId = memberId;
-    }
-
-    public String getMemberId() {
-        return memberId;
-    }
-
     public void setTrustLevel(final TrustLevel trustLevel) {
         this.trustLevel = trustLevel;
     }
 
     public TrustLevel getTrustLevel() {
         return trustLevel;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setCircleId(final String circleId) {
+        this.circleId = circleId;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getCircleId() {
+        return circleId;
+    }
+
+    public void setMemberId(final String memberId) {
+        this.memberId = memberId;
+    }
+
+    public String getMemberId() {
+        return memberId;
     }
 
     // =========================================================================

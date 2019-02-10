@@ -93,7 +93,7 @@ import java.util.Map;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "processMemberRequest")
 @XmlType(name = "processMemberRequest", propOrder = { Constants.FIELD_ACTION, Constants.FIELD_MEMBER_ID, Constants.FIELD_MEMBER_ROLE, Constants.FIELD_PUBLIC_KEY, Constants.FIELD_NEW_ACCOUNT_NAME, Constants.FIELD_NEW_CREDENTIAL })
-public final class ProcessMemberRequest extends Authentication {
+public final class ProcessMemberRequest extends Authentication implements ActionRequest {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
@@ -125,10 +125,18 @@ public final class ProcessMemberRequest extends Authentication {
     // Standard Setters & Getters
     // =========================================================================
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void setAction(final Action action) {
         this.action = action;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Action getAction() {
         return action;
     }

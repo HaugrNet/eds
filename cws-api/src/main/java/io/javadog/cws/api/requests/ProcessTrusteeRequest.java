@@ -19,7 +19,7 @@ package io.javadog.cws.api.requests;
 import io.javadog.cws.api.common.Action;
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.TrustLevel;
-import java.util.Map;
+
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -27,6 +27,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
+import java.util.Map;
 
 /**
  * <p>Request Object for the processing of Trustee's. It supports the following
@@ -57,7 +58,7 @@ import javax.xml.bind.annotation.XmlType;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "processTrusteeRequest")
 @XmlType(name = "processTrusteeRequest", propOrder = { Constants.FIELD_ACTION, Constants.FIELD_CIRCLE_ID, Constants.FIELD_MEMBER_ID, Constants.FIELD_TRUSTLEVEL })
-public final class ProcessTrusteeRequest extends Authentication implements CircleIdRequest {
+public final class ProcessTrusteeRequest extends Authentication implements CircleIdRequest, ActionRequest {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
@@ -97,10 +98,18 @@ public final class ProcessTrusteeRequest extends Authentication implements Circl
         return circleId;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void setAction(final Action action) {
         this.action = action;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Action getAction() {
         return action;
     }

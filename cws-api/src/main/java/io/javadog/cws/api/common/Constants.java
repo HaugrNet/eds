@@ -155,6 +155,9 @@ public final class Constants {
     public static final String REST_MEMBERS_BASE = "/members";
     public static final String REST_MEMBERS_CREATE = "/createMember";
     public static final String REST_MEMBERS_INVITE = "/inviteMember";
+    public static final String REST_MEMBERS_LOGIN = "/login";
+    public static final String REST_MEMBERS_LOGOUT = "/logout";
+    public static final String REST_MEMBERS_ALTER = "/alterMember";
     public static final String REST_MEMBERS_UPDATE = "/updateMember";
     public static final String REST_MEMBERS_INVALIDATE = "/invalidate";
     public static final String REST_MEMBERS_DELETE = "/deleteMember";

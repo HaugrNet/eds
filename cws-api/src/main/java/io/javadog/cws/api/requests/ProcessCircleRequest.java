@@ -18,7 +18,7 @@ package io.javadog.cws.api.requests;
 
 import io.javadog.cws.api.common.Action;
 import io.javadog.cws.api.common.Constants;
-import java.util.Map;
+
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
@@ -27,6 +27,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
+import java.util.Map;
 
 /**
  * <p>Circles only have an Id, a name and an optional External Circle Key, the
@@ -65,7 +66,7 @@ import javax.xml.bind.annotation.XmlType;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "processCircleRequest")
 @XmlType(name = "processCircleRequest", propOrder = { Constants.FIELD_ACTION, Constants.FIELD_CIRCLE_ID, Constants.FIELD_CIRCLE_NAME, Constants.FIELD_MEMBER_ID, Constants.FIELD_CIRCKE_KEY })
-public final class ProcessCircleRequest extends Authentication implements CircleIdRequest {
+public final class ProcessCircleRequest extends Authentication implements CircleIdRequest, ActionRequest {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
@@ -95,10 +96,18 @@ public final class ProcessCircleRequest extends Authentication implements Circle
     // Standard Setters & Getters
     // =========================================================================
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void setAction(final Action action) {
         this.action = action;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Action getAction() {
         return action;
     }

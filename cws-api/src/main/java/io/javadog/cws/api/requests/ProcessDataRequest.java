@@ -19,7 +19,7 @@ package io.javadog.cws.api.requests;
 import io.javadog.cws.api.common.Action;
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.Utilities;
-import java.util.Map;
+
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
@@ -28,6 +28,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
+import java.util.Map;
 
 /**
  * <p>The Request Object supports several actions for adding, updating and
@@ -70,7 +71,7 @@ import javax.xml.bind.annotation.XmlType;
         Constants.FIELD_TARGET_FOLDER_ID,
         Constants.FIELD_TYPENAME,
         Constants.FIELD_DATA })
-public final class ProcessDataRequest extends Authentication implements CircleIdRequest {
+public final class ProcessDataRequest extends Authentication implements CircleIdRequest, ActionRequest {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
@@ -114,10 +115,18 @@ public final class ProcessDataRequest extends Authentication implements CircleId
     // Standard Setters & Getters
     // =========================================================================
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void setAction(final Action action) {
         this.action = action;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Action getAction() {
         return action;
     }

@@ -18,6 +18,7 @@ package io.javadog.cws.client;
 
 import io.javadog.cws.api.Management;
 import io.javadog.cws.api.common.Constants;
+import io.javadog.cws.api.requests.ActionRequest;
 import io.javadog.cws.api.requests.FetchCircleRequest;
 import io.javadog.cws.api.requests.FetchMemberRequest;
 import io.javadog.cws.api.requests.FetchTrusteeRequest;
@@ -107,31 +108,37 @@ public final class ManagementRestClient extends BaseRestClient implements Manage
      */
     @Override
     public ProcessMemberResponse processMember(final ProcessMemberRequest request) {
+        final String base = Constants.REST_MEMBERS_BASE;
         final ProcessMemberResponse response;
+        throwExceptionIfInvalid(request);
 
-        if ((request != null) && (request.getAction() != null)) {
-            final String base = Constants.REST_MEMBERS_BASE;
-            switch (request.getAction()) {
-                case CREATE:
-                    response = runRequest(ProcessMemberResponse.class, base + Constants.REST_MEMBERS_CREATE, request);
-                    break;
-                case INVITE:
-                    response = runRequest(ProcessMemberResponse.class, base + Constants.REST_MEMBERS_INVITE, request);
-                    break;
-                case UPDATE:
-                    response = runRequest(ProcessMemberResponse.class, base + Constants.REST_MEMBERS_UPDATE, request);
-                    break;
-                case INVALIDATE:
-                    response = runRequest(ProcessMemberResponse.class, base + Constants.REST_MEMBERS_INVALIDATE, request);
-                    break;
-                case DELETE:
-                    response = runRequest(ProcessMemberResponse.class, base + Constants.REST_MEMBERS_DELETE, request);
-                    break;
-                default:
-                    throw new CWSClientException(UNSUPPORTED_OPERATION + request.getAction());
-            }
-        } else {
-            throw new CWSClientException(INVALID_REQUEST);
+        switch (request.getAction()) {
+            case CREATE:
+                response = runRequest(ProcessMemberResponse.class, base + Constants.REST_MEMBERS_CREATE, request);
+                break;
+            case INVITE:
+                response = runRequest(ProcessMemberResponse.class, base + Constants.REST_MEMBERS_INVITE, request);
+                break;
+            case LOGIN:
+                response = runRequest(ProcessMemberResponse.class, base + Constants.REST_MEMBERS_LOGIN, request);
+                break;
+            case LOGOUT:
+                response = runRequest(ProcessMemberResponse.class, base + Constants.REST_MEMBERS_LOGOUT, request);
+                break;
+            case ALTER:
+                response = runRequest(ProcessMemberResponse.class, base + Constants.REST_MEMBERS_ALTER, request);
+                break;
+            case UPDATE:
+                response = runRequest(ProcessMemberResponse.class, base + Constants.REST_MEMBERS_UPDATE, request);
+                break;
+            case INVALIDATE:
+                response = runRequest(ProcessMemberResponse.class, base + Constants.REST_MEMBERS_INVALIDATE, request);
+                break;
+            case DELETE:
+                response = runRequest(ProcessMemberResponse.class, base + Constants.REST_MEMBERS_DELETE, request);
+                break;
+            default:
+                throw new CWSClientException(UNSUPPORTED_OPERATION + request.getAction());
         }
 
         return response;
@@ -150,25 +157,22 @@ public final class ManagementRestClient extends BaseRestClient implements Manage
      */
     @Override
     public ProcessCircleResponse processCircle(final ProcessCircleRequest request) {
+        final String base = Constants.REST_CIRCLES_BASE;
         final ProcessCircleResponse response;
+        throwExceptionIfInvalid(request);
 
-        if ((request != null) && (request.getAction() != null)) {
-            final String base = Constants.REST_CIRCLES_BASE;
-            switch (request.getAction()) {
-                case CREATE:
-                    response = runRequest(ProcessCircleResponse.class, base + Constants.REST_CIRCLES_CREATE, request);
-                    break;
-                case UPDATE:
-                    response = runRequest(ProcessCircleResponse.class, base + Constants.REST_CIRCLES_UPDATE, request);
-                    break;
-                case DELETE:
-                    response = runRequest(ProcessCircleResponse.class, base + Constants.REST_CIRCLES_DELETE, request);
-                    break;
-                default:
-                    throw new CWSClientException(UNSUPPORTED_OPERATION + request.getAction());
-            }
-        } else {
-            throw new CWSClientException(INVALID_REQUEST);
+        switch (request.getAction()) {
+            case CREATE:
+                response = runRequest(ProcessCircleResponse.class, base + Constants.REST_CIRCLES_CREATE, request);
+                break;
+            case UPDATE:
+                response = runRequest(ProcessCircleResponse.class, base + Constants.REST_CIRCLES_UPDATE, request);
+                break;
+            case DELETE:
+                response = runRequest(ProcessCircleResponse.class, base + Constants.REST_CIRCLES_DELETE, request);
+                break;
+            default:
+                throw new CWSClientException(UNSUPPORTED_OPERATION + request.getAction());
         }
 
         return response;
@@ -187,27 +191,30 @@ public final class ManagementRestClient extends BaseRestClient implements Manage
      */
     @Override
     public ProcessTrusteeResponse processTrustee(final ProcessTrusteeRequest request) {
+        final String base = Constants.REST_TRUSTEES_BASE;
         final ProcessTrusteeResponse response;
+        throwExceptionIfInvalid(request);
 
-        if ((request != null) && (request.getAction() != null)) {
-            final String base = Constants.REST_TRUSTEES_BASE;
-            switch (request.getAction()) {
-                case ADD:
-                    response = runRequest(ProcessTrusteeResponse.class, base + Constants.REST_TRUSTEES_ADD, request);
-                    break;
-                case ALTER:
-                    response = runRequest(ProcessTrusteeResponse.class, base + Constants.REST_TRUSTEES_ALTER, request);
-                    break;
-                case REMOVE:
-                    response = runRequest(ProcessTrusteeResponse.class, base + Constants.REST_TRUSTEES_REMOVE, request);
-                    break;
-                default:
-                    throw new CWSClientException(UNSUPPORTED_OPERATION + request.getAction());
-            }
-        } else {
-            throw new CWSClientException(INVALID_REQUEST);
+        switch (request.getAction()) {
+            case ADD:
+                response = runRequest(ProcessTrusteeResponse.class, base + Constants.REST_TRUSTEES_ADD, request);
+                break;
+            case ALTER:
+                response = runRequest(ProcessTrusteeResponse.class, base + Constants.REST_TRUSTEES_ALTER, request);
+                break;
+            case REMOVE:
+                response = runRequest(ProcessTrusteeResponse.class, base + Constants.REST_TRUSTEES_REMOVE, request);
+                break;
+            default:
+                throw new CWSClientException(UNSUPPORTED_OPERATION + request.getAction());
         }
 
         return response;
+    }
+
+    private static void throwExceptionIfInvalid(final ActionRequest request) {
+        if ((request == null) || (request.getAction() == null)) {
+            throw new CWSClientException(INVALID_REQUEST);
+        }
     }
 }

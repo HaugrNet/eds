@@ -26,7 +26,7 @@ import io.javadog.cws.api.responses.ProcessMemberResponse;
 import io.javadog.cws.core.ManagementBean;
 import io.javadog.cws.core.misc.LoggingUtil;
 import io.javadog.cws.core.model.Settings;
-import java.util.logging.Logger;
+
 import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
@@ -34,6 +34,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
+import java.util.logging.Logger;
 
 /**
  * <p>REST interface for the Member functionality.</p>
@@ -63,6 +64,30 @@ public class MemberService {
     @Path(Constants.REST_MEMBERS_INVITE)
     public Response invite(@NotNull final ProcessMemberRequest inviteMemberRequest) {
         return processMember(inviteMemberRequest, Action.INVITE, Constants.REST_MEMBERS_INVITE);
+    }
+
+    @POST
+    @Consumes(RestUtils.CONSUMES)
+    @Produces(RestUtils.PRODUCES)
+    @Path(Constants.REST_MEMBERS_LOGIN)
+    public Response login(@NotNull final ProcessMemberRequest updateMemberRequest) {
+        return processMember(updateMemberRequest, Action.LOGIN, Constants.REST_MEMBERS_LOGIN);
+    }
+
+    @POST
+    @Consumes(RestUtils.CONSUMES)
+    @Produces(RestUtils.PRODUCES)
+    @Path(Constants.REST_MEMBERS_LOGOUT)
+    public Response logout(@NotNull final ProcessMemberRequest updateMemberRequest) {
+        return processMember(updateMemberRequest, Action.LOGOUT, Constants.REST_MEMBERS_LOGOUT);
+    }
+
+    @POST
+    @Consumes(RestUtils.CONSUMES)
+    @Produces(RestUtils.PRODUCES)
+    @Path(Constants.REST_MEMBERS_ALTER)
+    public Response alter(@NotNull final ProcessMemberRequest updateMemberRequest) {
+        return processMember(updateMemberRequest, Action.ALTER, Constants.REST_MEMBERS_ALTER);
     }
 
     @POST

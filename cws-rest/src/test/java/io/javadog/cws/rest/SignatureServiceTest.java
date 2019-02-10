@@ -25,14 +25,13 @@ import io.javadog.cws.api.requests.SignRequest;
 import io.javadog.cws.api.requests.VerifyRequest;
 import io.javadog.cws.core.DatabaseSetup;
 import io.javadog.cws.core.ShareBean;
-import io.javadog.cws.core.exceptions.CWSException;
-import java.lang.reflect.InvocationTargetException;
-import javax.ws.rs.core.Response;
 import org.junit.Test;
+
+import javax.ws.rs.core.Response;
 
 /**
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 public final class SignatureServiceTest extends DatabaseSetup {
 
@@ -95,28 +94,19 @@ public final class SignatureServiceTest extends DatabaseSetup {
     // =========================================================================
 
     private static SignatureService prepareFlawedService() {
-        try {
+        final SignatureService service = instantiate(SignatureService.class);
+        setField(service, "bean", null);
 
-            final SignatureService service = SignatureService.class.getConstructor().newInstance();
-            setField(service, "bean", null);
-
-            return service;
-        } catch (InstantiationException | InvocationTargetException | IllegalAccessException | NoSuchMethodException e) {
-            throw new CWSException(ReturnCode.ERROR, "Cannot instantiate Service Object", e);
-        }
+        return service;
     }
 
     private SignatureService prepareService() {
-        try {
-            final ShareBean bean = ShareBean.class.getConstructor().newInstance();
-            setField(bean, "entityManager", entityManager);
+        final ShareBean bean = instantiate(ShareBean.class);
+        setField(bean, "entityManager", entityManager);
 
-            final SignatureService service = SignatureService.class.getConstructor().newInstance();
-            setField(service, "bean", bean);
+        final SignatureService service = instantiate(SignatureService.class);
+        setField(service, "bean", bean);
 
-            return service;
-        } catch (InstantiationException | InvocationTargetException | IllegalAccessException | NoSuchMethodException e) {
-            throw new CWSException(ReturnCode.ERROR, "Cannot instantiate Service Object", e);
-        }
+        return service;
     }
 }

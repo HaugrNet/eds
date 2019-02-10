@@ -24,11 +24,9 @@ import io.javadog.cws.api.requests.FetchMemberRequest;
 import io.javadog.cws.api.requests.ProcessMemberRequest;
 import io.javadog.cws.core.DatabaseSetup;
 import io.javadog.cws.core.ManagementBean;
-import io.javadog.cws.core.exceptions.CWSException;
 import org.junit.Test;
 
 import javax.ws.rs.core.Response;
-import java.lang.reflect.InvocationTargetException;
 
 /**
  * @author Kim Jensen
@@ -203,28 +201,19 @@ public final class MemberServiceTest extends DatabaseSetup {
     // =========================================================================
 
     private static MemberService prepareFlawedService() {
-        try {
+        final MemberService service = instantiate(MemberService.class);
+        setField(service, "bean", null);
 
-            final MemberService service = MemberService.class.getConstructor().newInstance();
-            setField(service, "bean", null);
-
-            return service;
-        } catch (InstantiationException | InvocationTargetException | IllegalAccessException | NoSuchMethodException e) {
-            throw new CWSException(ReturnCode.ERROR, "Cannot instantiate Service Object", e);
-        }
+        return service;
     }
 
     private MemberService prepareService() {
-        try {
-            final ManagementBean bean = ManagementBean.class.getConstructor().newInstance();
-            setField(bean, "entityManager", entityManager);
+        final ManagementBean bean = instantiate(ManagementBean.class);
+        setField(bean, "entityManager", entityManager);
 
-            final MemberService service = MemberService.class.getConstructor().newInstance();
-            setField(service, "bean", bean);
+        final MemberService service = instantiate(MemberService.class);
+        setField(service, "bean", bean);
 
-            return service;
-        } catch (InstantiationException | InvocationTargetException | IllegalAccessException | NoSuchMethodException e) {
-            throw new CWSException(ReturnCode.ERROR, "Cannot instantiate Service Object", e);
-        }
+        return service;
     }
 }

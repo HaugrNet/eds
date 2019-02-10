@@ -24,14 +24,13 @@ import io.javadog.cws.api.requests.FetchCircleRequest;
 import io.javadog.cws.api.requests.ProcessCircleRequest;
 import io.javadog.cws.core.DatabaseSetup;
 import io.javadog.cws.core.ManagementBean;
-import io.javadog.cws.core.exceptions.CWSException;
-import java.lang.reflect.InvocationTargetException;
-import javax.ws.rs.core.Response;
 import org.junit.Test;
+
+import javax.ws.rs.core.Response;
 
 /**
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 public final class CircleServiceTest extends DatabaseSetup {
 
@@ -112,28 +111,19 @@ public final class CircleServiceTest extends DatabaseSetup {
     // =========================================================================
 
     private static CircleService prepareFlawedService() {
-        try {
+        final CircleService service = instantiate(CircleService.class);
+        setField(service, "bean", null);
 
-            final CircleService service = CircleService.class.getConstructor().newInstance();
-            setField(service, "bean", null);
-
-            return service;
-        } catch (InstantiationException | InvocationTargetException | IllegalAccessException | NoSuchMethodException e) {
-            throw new CWSException(ReturnCode.ERROR, "Cannot instantiate Service Object", e);
-        }
+        return service;
     }
 
     private CircleService prepareService() {
-        try {
-            final ManagementBean bean = ManagementBean.class.getConstructor().newInstance();
-            setField(bean, "entityManager", entityManager);
+        final ManagementBean bean = instantiate(ManagementBean.class);
+        setField(bean, "entityManager", entityManager);
 
-            final CircleService service = CircleService.class.getConstructor().newInstance();
-            setField(service, "bean", bean);
+        final CircleService service = instantiate(CircleService.class);
+        setField(service, "bean", bean);
 
-            return service;
-        } catch (InstantiationException | InvocationTargetException | IllegalAccessException | NoSuchMethodException e) {
-            throw new CWSException(ReturnCode.ERROR, "Cannot instantiate Service Object", e);
-        }
+        return service;
     }
 }

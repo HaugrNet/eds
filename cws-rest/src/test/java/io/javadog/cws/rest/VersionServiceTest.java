@@ -22,10 +22,9 @@ import static org.junit.Assert.assertThat;
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.core.DatabaseSetup;
 import io.javadog.cws.core.ManagementBean;
-import io.javadog.cws.core.exceptions.CWSException;
-import java.lang.reflect.InvocationTargetException;
-import javax.ws.rs.core.Response;
 import org.junit.Test;
+
+import javax.ws.rs.core.Response;
 
 /**
  * @author Kim Jensen
@@ -54,28 +53,19 @@ public final class VersionServiceTest extends DatabaseSetup {
     // =========================================================================
 
     private static VersionService prepareFlawedService() {
-        try {
+        final VersionService service = instantiate(VersionService.class);
+        setField(service, "bean", null);
 
-            final VersionService service = VersionService.class.getConstructor().newInstance();
-            setField(service, "bean", null);
-
-            return service;
-        } catch (InstantiationException | InvocationTargetException | IllegalAccessException | NoSuchMethodException e) {
-            throw new CWSException(ReturnCode.ERROR, "Cannot instantiate Service Object", e);
-        }
+        return service;
     }
 
     private VersionService prepareService() {
-        try {
-            final ManagementBean bean = ManagementBean.class.getConstructor().newInstance();
-            setField(bean, "entityManager", entityManager);
+        final ManagementBean bean = instantiate(ManagementBean.class);
+        setField(bean, "entityManager", entityManager);
 
-            final VersionService service = VersionService.class.getConstructor().newInstance();
-            setField(service, "bean", bean);
+        final VersionService service = instantiate(VersionService.class);
+        setField(service, "bean", bean);
 
-            return service;
-        } catch (InstantiationException | InvocationTargetException | IllegalAccessException | NoSuchMethodException e) {
-            throw new CWSException(ReturnCode.ERROR, "Cannot instantiate Service Object", e);
-        }
+        return service;
     }
 }

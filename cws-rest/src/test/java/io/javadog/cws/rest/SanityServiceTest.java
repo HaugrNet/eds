@@ -23,14 +23,13 @@ import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.requests.SanityRequest;
 import io.javadog.cws.core.DatabaseSetup;
 import io.javadog.cws.core.ManagementBean;
-import io.javadog.cws.core.exceptions.CWSException;
-import java.lang.reflect.InvocationTargetException;
-import javax.ws.rs.core.Response;
 import org.junit.Test;
+
+import javax.ws.rs.core.Response;
 
 /**
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 public final class SanityServiceTest extends DatabaseSetup {
 
@@ -57,28 +56,19 @@ public final class SanityServiceTest extends DatabaseSetup {
     // =========================================================================
 
     private static SanityService prepareFlawedService() {
-        try {
+        final SanityService service = instantiate(SanityService.class);
+        setField(service, "bean", null);
 
-            final SanityService service = SanityService.class.getConstructor().newInstance();
-            setField(service, "bean", null);
-
-            return service;
-        } catch (InstantiationException | InvocationTargetException | IllegalAccessException | NoSuchMethodException e) {
-            throw new CWSException(ReturnCode.ERROR, "Cannot instantiate Service Object", e);
-        }
+        return service;
     }
 
     private SanityService prepareService() {
-        try {
-            final ManagementBean bean = ManagementBean.class.getConstructor().newInstance();
-            setField(bean, "entityManager", entityManager);
+        final ManagementBean bean = instantiate(ManagementBean.class);
+        setField(bean, "entityManager", entityManager);
 
-            final SanityService service = SanityService.class.getConstructor().newInstance();
-            setField(service, "bean", bean);
+        final SanityService service = instantiate(SanityService.class);
+        setField(service, "bean", bean);
 
-            return service;
-        } catch (InstantiationException | InvocationTargetException | IllegalAccessException | NoSuchMethodException e) {
-            throw new CWSException(ReturnCode.ERROR, "Cannot instantiate Service Object", e);
-        }
+        return service;
     }
 }

@@ -24,14 +24,13 @@ import io.javadog.cws.api.requests.FetchDataRequest;
 import io.javadog.cws.api.requests.ProcessDataRequest;
 import io.javadog.cws.core.DatabaseSetup;
 import io.javadog.cws.core.ShareBean;
-import io.javadog.cws.core.exceptions.CWSException;
-import java.lang.reflect.InvocationTargetException;
-import javax.ws.rs.core.Response;
 import org.junit.Test;
+
+import javax.ws.rs.core.Response;
 
 /**
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 public final class DataServiceTest extends DatabaseSetup {
 
@@ -148,28 +147,19 @@ public final class DataServiceTest extends DatabaseSetup {
     // =========================================================================
 
     private static DataService prepareFlawedService() {
-        try {
+        final DataService service = instantiate(DataService.class);
+        setField(service, "bean", null);
 
-            final DataService service = DataService.class.getConstructor().newInstance();
-            setField(service, "bean", null);
-
-            return service;
-        } catch (InstantiationException | InvocationTargetException | IllegalAccessException | NoSuchMethodException e) {
-            throw new CWSException(ReturnCode.ERROR, "Cannot instantiate Service Object", e);
-        }
+        return service;
     }
 
     private DataService prepareService() {
-        try {
-            final ShareBean bean = ShareBean.class.getConstructor().newInstance();
-            setField(bean, "entityManager", entityManager);
+        final ShareBean bean = instantiate(ShareBean.class);
+        setField(bean, "entityManager", entityManager);
 
-            final DataService service = DataService.class.getConstructor().newInstance();
-            setField(service, "bean", bean);
+        final DataService service = instantiate(DataService.class);
+        setField(service, "bean", bean);
 
-            return service;
-        } catch (InstantiationException | InvocationTargetException | IllegalAccessException | NoSuchMethodException e) {
-            throw new CWSException(ReturnCode.ERROR, "Cannot instantiate Service Object", e);
-        }
+        return service;
     }
 }

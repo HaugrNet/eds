@@ -24,14 +24,13 @@ import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.requests.MasterKeyRequest;
 import io.javadog.cws.core.DatabaseSetup;
 import io.javadog.cws.core.ManagementBean;
-import io.javadog.cws.core.exceptions.CWSException;
-import java.lang.reflect.InvocationTargetException;
-import javax.ws.rs.core.Response;
 import org.junit.Test;
+
+import javax.ws.rs.core.Response;
 
 /**
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 public final class MasterKeyServiceTest extends DatabaseSetup {
 
@@ -60,27 +59,19 @@ public final class MasterKeyServiceTest extends DatabaseSetup {
     // =========================================================================
 
     private static MasterKeyService prepareFlawedService() {
-        try {
-            final MasterKeyService service = MasterKeyService.class.getConstructor().newInstance();
-            setField(service, "bean", null);
+        final MasterKeyService service = instantiate(MasterKeyService.class);
+        setField(service, "bean", null);
 
-            return service;
-        } catch (InstantiationException | InvocationTargetException | IllegalAccessException | NoSuchMethodException e) {
-            throw new CWSException(ReturnCode.ERROR, "Cannot instantiate Service Object", e);
-        }
+        return service;
     }
 
     private MasterKeyService prepareService() {
-        try {
-            final ManagementBean bean = ManagementBean.class.getConstructor().newInstance();
-            setField(bean, "entityManager", entityManager);
+        final ManagementBean bean = instantiate(ManagementBean.class);
+        setField(bean, "entityManager", entityManager);
 
-            final MasterKeyService service = MasterKeyService.class.getConstructor().newInstance();
-            setField(service, "bean", bean);
+        final MasterKeyService service = instantiate(MasterKeyService.class);
+        setField(service, "bean", bean);
 
-            return service;
-        } catch (InstantiationException | InvocationTargetException | IllegalAccessException | NoSuchMethodException e) {
-            throw new CWSException(ReturnCode.ERROR, "Cannot instantiate Service Object", e);
-        }
+        return service;
     }
 }

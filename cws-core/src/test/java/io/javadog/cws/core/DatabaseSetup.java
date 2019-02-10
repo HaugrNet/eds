@@ -242,17 +242,7 @@ public class DatabaseSetup {
      * @return New Settings instance
      */
     protected Settings newSettings() {
-        try {
-            final Constructor<Settings> constructor = Settings.class.getDeclaredConstructor();
-            final boolean accessible = constructor.isAccessible();
-            constructor.setAccessible(true);
-            final Settings instance = constructor.newInstance();
-            constructor.setAccessible(accessible);
-
-            return instance;
-        } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
-            throw new CWSException(ReturnCode.ERROR, e.getMessage(), e);
-        }
+        return instantiate(Settings.class);
     }
 
     /**
@@ -366,6 +356,40 @@ public class DatabaseSetup {
         entityManager.persist(entity);
     }
 
+    /**
+     * <p>Instantiates a Class of the type specified. This is done by using
+     * Reflection to invoke the standard no-argument Constructor. If the
+     * Constructor is declared, then this is temporarily circumvented, so it
+     * is possible to create and return a new instance.
+     *
+     * @param clazz The Class to instantiate
+     * @param <C>   The type of Class to instantiate
+     * @return New Class instance
+     * @throws CWSException if not possible to instantiate the Object
+     */
+    protected static <C> C instantiate(final Class<C> clazz) {
+        try {
+            final Constructor<C> constructor = clazz.getDeclaredConstructor();
+            final boolean accessible = constructor.isAccessible();
+            constructor.setAccessible(true);
+            final C instance = constructor.newInstance();
+            constructor.setAccessible(accessible);
+
+            return instance;
+        } catch (NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException e) {
+            throw new CWSException(ReturnCode.ERROR, "Cannot instantiate Service Object", e);
+        }
+    }
+
+    /**
+     * <p>Uses Reflection to update an instantiated Object by altering the
+     * given field with a new value.</p>
+     *
+     * @param instance  The Object to change a Field in
+     * @param fieldName The name of the Field to change
+     * @param value     The new value to set the Field too
+     * @throws CWSException if unable to update the field
+     */
     protected static void setField(final Object instance, final String fieldName, final Object value) {
         try {
             final Class<?> clazz = instance.getClass();

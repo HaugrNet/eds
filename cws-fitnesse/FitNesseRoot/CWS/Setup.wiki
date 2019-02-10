@@ -1,0 +1,17 @@
+!path target/cws-fitnesse.jar
+!define TEST_SYSTEM {slim}
+
+# Return Codes
+!define SUCCESS {200}
+!define AUTHORIZATION_WARNING {401}
+!define AUTHENTICATION_WARNING {403}
+!define VERIFICATION_WARNING {406}
+!define SETTING_WARNING {492}
+
+|Import                 |
+|io.javadog.cws.fitnesse|
+
+!|script |control cws                           |
+|set type|SOAP|and url|http://localhost:8080/cws|
+|remove circles                                 |
+|remove members                                 |

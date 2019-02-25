@@ -24,14 +24,19 @@ import static org.junit.Assert.assertThat;
 import io.javadog.cws.api.common.Action;
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
+import io.javadog.cws.api.common.TrustLevel;
 import io.javadog.cws.api.requests.FetchCircleRequest;
 import io.javadog.cws.api.requests.FetchDataRequest;
 import io.javadog.cws.api.requests.ProcessCircleRequest;
 import io.javadog.cws.api.requests.ProcessDataRequest;
+import io.javadog.cws.api.requests.ProcessMemberRequest;
+import io.javadog.cws.api.requests.ProcessTrusteeRequest;
 import io.javadog.cws.api.responses.FetchCircleResponse;
 import io.javadog.cws.api.responses.FetchDataResponse;
 import io.javadog.cws.api.responses.ProcessCircleResponse;
 import io.javadog.cws.api.responses.ProcessDataResponse;
+import io.javadog.cws.api.responses.ProcessMemberResponse;
+import io.javadog.cws.api.responses.ProcessTrusteeResponse;
 import io.javadog.cws.core.DatabaseSetup;
 import io.javadog.cws.core.enums.StandardSetting;
 import io.javadog.cws.core.exceptions.CWSException;
@@ -215,6 +220,35 @@ public final class CircleServiceTest extends DatabaseSetup {
         final ProcessCircleResponse response = service.perform(request);
         assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
         assertThat(response.getReturnMessage(), is("Ok"));
+    }
+
+    @Test
+    public void testCreateCirleAsNewUser() {
+        final ProcessMemberService memberService = new ProcessMemberService(settings, entityManager);
+        final ProcessCircleService circleService = new ProcessCircleService(settings, entityManager);
+        final ProcessTrusteeService trusteeService = new ProcessTrusteeService(settings, entityManager);
+        final String newUser = "newUser";
+
+        final ProcessMemberRequest newMemberRequest = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
+        newMemberRequest.setAction(Action.CREATE);
+        newMemberRequest.setNewAccountName(newUser);
+        newMemberRequest.setNewCredential(crypto.stringToBytes(newUser));
+        final ProcessMemberResponse newMemberResponse = memberService.perform(newMemberRequest);
+        assertThat(newMemberResponse.getReturnMessage(), is("Ok"));
+
+        final ProcessCircleRequest newCircleRequest = prepareRequest(ProcessCircleRequest.class, newUser);
+        newCircleRequest.setAction(Action.CREATE);
+        newCircleRequest.setCircleName("new Circle");
+        final ProcessCircleResponse newCircleResponse = circleService.perform(newCircleRequest);
+        assertThat(newCircleResponse.getReturnMessage(), is("Ok"));
+
+        final ProcessTrusteeRequest newTrusteeRequest = prepareRequest(ProcessTrusteeRequest.class, newUser);
+        newTrusteeRequest.setAction(Action.ADD);
+        newTrusteeRequest.setCircleId(newCircleResponse.getCircleId());
+        newTrusteeRequest.setMemberId(MEMBER_5_ID);
+        newTrusteeRequest.setTrustLevel(TrustLevel.WRITE);
+        final ProcessTrusteeResponse newTrusteeResponse = trusteeService.perform(newTrusteeRequest);
+        assertThat(newTrusteeResponse.getReturnMessage(), is("Ok"));
     }
 
     @Test

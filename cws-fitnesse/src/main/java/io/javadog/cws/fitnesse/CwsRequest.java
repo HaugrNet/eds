@@ -23,6 +23,7 @@ import io.javadog.cws.api.dtos.DataType;
 import io.javadog.cws.api.requests.Authentication;
 import io.javadog.cws.api.responses.CwsResponse;
 import io.javadog.cws.api.responses.FetchCircleResponse;
+import io.javadog.cws.api.responses.ProcessCircleResponse;
 import io.javadog.cws.api.responses.ProcessMemberResponse;
 import io.javadog.cws.fitnesse.exceptions.StopTestException;
 import io.javadog.cws.fitnesse.utils.Converter;
@@ -135,6 +136,12 @@ public abstract class CwsRequest<R extends CwsResponse> {
     protected void addId(final Action action, final String key, final ProcessMemberResponse response) {
         if ((key != null) && (response != null)) {
             addId(action, key, response.getMemberId());
+        }
+    }
+
+    protected void addId(final Action action, final String key, final ProcessCircleResponse response) {
+        if ((key != null) && (response != null)) {
+            addId(action, key, response.getCircleId());
         }
     }
 

@@ -16,17 +16,53 @@
  */
 package io.javadog.cws.fitnesse;
 
+import io.javadog.cws.api.common.Action;
+import io.javadog.cws.api.requests.ProcessCircleRequest;
 import io.javadog.cws.api.responses.ProcessCircleResponse;
+import io.javadog.cws.fitnesse.callers.CallManagement;
+import io.javadog.cws.fitnesse.utils.Converter;
 
 /**
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 public final class ProcessCircle extends CwsRequest<ProcessCircleResponse> {
+
+    private Action action = null;
+    private String circleId = null;
+    private String circleName = null;
+    private String memberId = null;
+    private String circleKey = null;
 
     // =========================================================================
     // Request & Response Setters and Getters
     // =========================================================================
+
+    public void setAction(final String action) {
+        this.action = Converter.findAction(action);
+    }
+
+    public void setCircleId(final String circleId) {
+        final String tmp = Converter.preCheck(circleId);
+        this.circleId = getId(tmp);
+    }
+
+    public String circleId() {
+        return (response != null) ? response.getCircleId() : null;
+    }
+
+    public void setCircleName(final String circleName) {
+        this.circleName = Converter.preCheck(circleName);
+    }
+
+    public void setMemberId(final String memberId) {
+        final String tmp = Converter.preCheck(memberId);
+        this.memberId = getId(tmp);
+    }
+
+    public void setCircleKey(final String circleKey) {
+        this.circleKey = Converter.preCheck(circleKey);
+    }
 
     // =========================================================================
     // Standard FitNesse Fixture method(s)
@@ -37,6 +73,38 @@ public final class ProcessCircle extends CwsRequest<ProcessCircleResponse> {
      */
     @Override
     public void execute() {
+        final ProcessCircleRequest request = buildRequest();
+        response = CallManagement.processCircle(requestType, requestUrl, request);
 
+        // Ensuring that the internal mapping of Ids with accounts being
+        // used is synchronized.
+        addId(action, circleName, response);
+        delId(action, circleId);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void reset() {
+        super.reset();
+
+        // Reset internal values
+        action = null;
+        circleId = null;
+        circleName = null;
+        memberId = null;
+        circleKey = null;
+    }
+
+    private ProcessCircleRequest buildRequest() {
+        final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class);
+        request.setAction(action);
+        request.setCircleId(circleId);
+        request.setCircleName(circleName);
+        request.setMemberId(memberId);
+        request.setCircleKey(circleKey);
+
+        return request;
     }
 }

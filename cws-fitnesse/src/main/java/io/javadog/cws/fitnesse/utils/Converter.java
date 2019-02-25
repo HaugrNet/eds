@@ -29,7 +29,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
-import java.util.Objects;
 
 /**
  * @author Kim Jensen
@@ -70,8 +69,11 @@ public final class Converter {
     public static String preCheck(final String source) {
         String checked = source;
 
-        if ((source != null) && Objects.equals("NULL", source.trim().toUpperCase(LOCALE))) {
-            checked = null;
+        if (source != null) {
+            final String tmp = source.trim().toUpperCase(LOCALE);
+            if (tmp.isEmpty() || "NULL".equals(tmp)) {
+                checked = null;
+            }
         }
 
         return checked;

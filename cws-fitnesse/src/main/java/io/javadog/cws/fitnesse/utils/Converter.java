@@ -69,11 +69,8 @@ public final class Converter {
     public static String preCheck(final String source) {
         String checked = source;
 
-        if (source != null) {
-            final String tmp = source.trim().toUpperCase(LOCALE);
-            if (tmp.isEmpty() || "NULL".equals(tmp)) {
-                checked = null;
-            }
+        if ((source == null) || "null".equalsIgnoreCase(source.trim())) {
+            checked = null;
         }
 
         return checked;

@@ -19,6 +19,6 @@ The !-CWS-! Create Circle request can be performed by all standard accounts.
 
 !|ProcessCircle                                                                                                                                                 |
 |account name|credential|action|circle id|circle name|member id|circle key|circle id?|return code?             |return message ?                                |
-|admin       |admin     |CREATE|         |circle1    |user1_id |          |=~/\S{36}/|${SUCCESS}               |Ok                                              |
-|user1       |password1 |CREATE|         |circle2    |         |          |=~/\S{36}/|${SUCCESS}               |Ok                                              |
-|user1       |password1 |CREATE|         |circle1    |         |          |null      |${IDENTIFICATION_WARNING}|A Circle with the requested name already exists.|
+|admin       |admin     |CREATE|null     |circle1    |user1_id |null      |=~/\S{36}/|${SUCCESS}               |Ok                                              |
+|user1       |password1 |CREATE|null     |circle2    |null     |null      |=~/\S{36}/|${SUCCESS}               |Ok                                              |
+|user1       |password1 |CREATE|null     |circle1    |null     |null      |null      |${IDENTIFICATION_WARNING}|A Circle with the requested name already exists.|

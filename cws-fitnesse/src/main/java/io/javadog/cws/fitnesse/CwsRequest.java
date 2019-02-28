@@ -29,12 +29,10 @@ import io.javadog.cws.fitnesse.exceptions.StopTestException;
 import io.javadog.cws.fitnesse.utils.Converter;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 
 /**
  * @author Kim Jensen
@@ -133,22 +131,35 @@ public abstract class CwsRequest<R extends CwsResponse> {
     // Operating the internal mapping of Members & Circles
     // =========================================================================
 
-    protected void addId(final Action action, final String key, final ProcessMemberResponse response) {
-        if ((key != null) && (response != null)) {
-            addId(action, key, response.getMemberId());
+    protected static void processId(final Action action, final String currentKey, final String newKey, final ProcessMemberResponse response) {
+        if (response != null) {
+            processId(action, currentKey, newKey, response.getMemberId());
         }
     }
 
-    protected void addId(final Action action, final String key, final ProcessCircleResponse response) {
-        if ((key != null) && (response != null)) {
-            addId(action, key, response.getCircleId());
+    protected static void processId(final Action action, final String currentKey, final String newKey, final ProcessCircleResponse response) {
+        if (response != null) {
+            processId(action, currentKey, newKey, response.getCircleId());
         }
     }
 
-    private static void addId(final Action action, final String key, final String id) {
-        final Set<Action> actions = EnumSet.of(Action.ADD, Action.CREATE, Action.PROCESS);
-        if (actions.contains(action) && (id != null)) {
-            ids.put(key + "_id", id);
+    private static void processId(final Action action, final String currentKey, final String newKey, final String id) {
+        switch (action) {
+            case ADD:
+            case CREATE:
+            case PROCESS:
+                if ((newKey != null) && (id != null)) {
+                    ids.put(newKey + "_id", id);
+                }
+                break;
+            case REMOVE:
+            case DELETE:
+                if (currentKey != null) {
+                    ids.remove(currentKey);
+                }
+                break;
+            default:
+                break;
         }
     }
 
@@ -163,13 +174,6 @@ public abstract class CwsRequest<R extends CwsResponse> {
         }
 
         return id;
-    }
-
-    protected void delId(final Action action, final String key) {
-        final Set<Action> actions = EnumSet.of(Action.REMOVE, Action.DELETE);
-        if (actions.contains(action)) {
-            ids.remove(key);
-        }
     }
 
     protected String getMemberNames() {

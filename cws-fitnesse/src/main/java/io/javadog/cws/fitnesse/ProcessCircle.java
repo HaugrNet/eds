@@ -73,13 +73,18 @@ public final class ProcessCircle extends CwsRequest<ProcessCircleResponse> {
      */
     @Override
     public void execute() {
-        final ProcessCircleRequest request = buildRequest();
+        final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class);
+        request.setAction(action);
+        request.setCircleId(circleId);
+        request.setCircleName(circleName);
+        request.setMemberId(memberId);
+        request.setCircleKey(circleKey);
+
         response = CallManagement.processCircle(requestType, requestUrl, request);
 
         // Ensuring that the internal mapping of Ids with accounts being
         // used is synchronized.
-        addId(action, circleName, response);
-        delId(action, circleId);
+        processId(action, circleId, circleName, response);
     }
 
     /**
@@ -95,16 +100,5 @@ public final class ProcessCircle extends CwsRequest<ProcessCircleResponse> {
         circleName = null;
         memberId = null;
         circleKey = null;
-    }
-
-    private ProcessCircleRequest buildRequest() {
-        final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class);
-        request.setAction(action);
-        request.setCircleId(circleId);
-        request.setCircleName(circleName);
-        request.setMemberId(memberId);
-        request.setCircleKey(circleKey);
-
-        return request;
     }
 }

@@ -78,13 +78,19 @@ public final class ProcessMember extends CwsRequest<ProcessMemberResponse> {
      */
     @Override
     public void execute() {
-        final ProcessMemberRequest request = buildRequest();
+        final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class);
+        request.setAction(action);
+        request.setMemberRole(memberRole);
+        request.setMemberId(memberId);
+        request.setPublicKey(publicKey);
+        request.setNewAccountName(newAccountName);
+        request.setNewCredential(newCredential);
+
         response = CallManagement.processMember(requestType, requestUrl, request);
 
         // Ensuring that the internal mapping of Ids with accounts being
         // used is synchronized.
-        addId(action, newAccountName, response);
-        delId(action, memberId);
+        processId(action, memberId, newAccountName, response);
     }
 
     /**
@@ -101,17 +107,5 @@ public final class ProcessMember extends CwsRequest<ProcessMemberResponse> {
         publicKey = null;
         newAccountName = null;
         newCredential = null;
-    }
-
-    private ProcessMemberRequest buildRequest() {
-        final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class);
-        request.setAction(action);
-        request.setMemberRole(memberRole);
-        request.setMemberId(memberId);
-        request.setPublicKey(publicKey);
-        request.setNewAccountName(newAccountName);
-        request.setNewCredential(newCredential);
-
-        return request;
     }
 }

@@ -43,8 +43,8 @@ public final class ProcessTrustee extends CwsRequest<ProcessTrusteeResponse> {
         this.action = Action.valueOf(action.toUpperCase(Locale.ENGLISH));
     }
 
-    public void setCircle(final String circle) {
-        this.circleId = getId(circle);
+    public void setCircleId(final String circleId) {
+        this.circleId = getId(circleId);
     }
 
     public void setMemberId(final String memberId) {

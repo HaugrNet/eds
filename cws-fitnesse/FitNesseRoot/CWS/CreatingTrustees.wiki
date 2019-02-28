@@ -1,0 +1,30 @@
+---
+Test
+---
+!*> Setup
+!include Setup
+
+For the test, it is necessary to create a couple of accounts.
+|process member                                                                                                                             |
+|account name|credential|credential type|action|member id|public key|new account name|new credential|member id?|return code?|return message?|
+|admin       |admin     |PASSPHRASE     |CREATE|null     |null      |user1           |password1     |=~/\S{36}/|${SUCCESS}  |Ok             |
+|admin       |admin     |PASSPHRASE     |CREATE|null     |null      |user2           |password2     |=~/\S{36}/|${SUCCESS}  |Ok             |
+|admin       |admin     |PASSPHRASE     |CREATE|null     |null      |user3           |password3     |=~/\S{36}/|${SUCCESS}  |Ok             |
+
+*!
+
+!2 '''!-CWS-! Create Trustee Request'''
+The !-CWS-! Create Circle request can be performed by all standard accounts.
+
+
+
+|process circle                                                                                                    |
+|account name|credential|action|circle id|circle name|member id|circle key|circle id?|return code?|return message ?|
+|user1       |password1 |CREATE|null     |circle1    |null     |null      |=~/\S{36}/|${SUCCESS}  |Ok              |
+|user1       |password1 |CREATE|null     |circle2    |null     |null      |=~/\S{36}/|${SUCCESS}  |Ok              |
+
+|process trustee                                                                              |
+|account name|credential|action|circle id |member id|trust level|return code?|return message ?|
+|user1       |password1 |ADD   |circle1_id|user2_id |WRITE      |${SUCCESS}  |Ok              |
+|user1       |password1 |ADD   |circle1_id|user3_id |READ       |${SUCCESS}  |Ok              |
+|user1       |password1 |ADD   |circle2_id|user2_id |WRITE      |${SUCCESS}  |Ok              |

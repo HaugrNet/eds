@@ -34,8 +34,6 @@ import io.javadog.cws.core.model.MemberDao;
 import io.javadog.cws.core.model.Settings;
 import io.javadog.cws.core.model.entities.MemberEntity;
 import io.javadog.cws.core.model.entities.TrusteeEntity;
-
-import javax.persistence.EntityManager;
 import java.security.PublicKey;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -46,6 +44,7 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+import javax.persistence.EntityManager;
 
 /**
  * <p>Business Logic implementation for the CWS ProcessMember request.</p>
@@ -355,8 +354,8 @@ public final class ProcessMemberService extends Serviceable<MemberDao, ProcessMe
         final ProcessMemberResponse response;
 
         if (found != null) {
-            if (found.getMemberRole() == MemberRole.ADMIN) {
-                response = new ProcessMemberResponse(ReturnCode.IDENTIFICATION_ERROR, "It is not permitted to delete the Admin Account.");
+            if (Objects.equals(member.getId(), found.getId())) {
+                response = new ProcessMemberResponse(ReturnCode.IDENTIFICATION_ERROR, "It is not permitted to delete yourself.");
             } else {
                 dao.delete(found);
                 response = new ProcessMemberResponse(ReturnCode.SUCCESS, "The Member '" + found.getName() + "' has successfully been deleted.");

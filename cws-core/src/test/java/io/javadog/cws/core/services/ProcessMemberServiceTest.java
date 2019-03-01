@@ -42,10 +42,9 @@ import io.javadog.cws.core.exceptions.AuthenticationException;
 import io.javadog.cws.core.exceptions.CWSException;
 import io.javadog.cws.core.exceptions.CryptoException;
 import io.javadog.cws.core.model.Settings;
-import org.junit.Test;
-
 import java.util.Base64;
 import java.util.UUID;
+import org.junit.Test;
 
 /**
  * @author Kim Jensen
@@ -579,7 +578,7 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
 
         final ProcessMemberResponse response = service.perform(request);
         assertThat(response.getReturnCode(), is(ReturnCode.IDENTIFICATION_ERROR.getCode()));
-        assertThat(response.getReturnMessage(), is("It is not permitted to delete the Admin Account."));
+        assertThat(response.getReturnMessage(), is("It is not permitted to delete yourself."));
     }
 
     // =========================================================================

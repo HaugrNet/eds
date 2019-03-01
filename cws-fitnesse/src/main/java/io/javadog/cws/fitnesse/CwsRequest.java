@@ -27,7 +27,6 @@ import io.javadog.cws.api.responses.ProcessCircleResponse;
 import io.javadog.cws.api.responses.ProcessMemberResponse;
 import io.javadog.cws.fitnesse.exceptions.StopTestException;
 import io.javadog.cws.fitnesse.utils.Converter;
-
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.List;
@@ -89,12 +88,12 @@ public abstract class CwsRequest<R extends CwsResponse> {
         this.credentialType = Converter.findCredentialType(credentialType);
     }
 
-    public int returnCode() {
-        return response.getReturnCode();
+    public String returnCode() {
+        return (response != null) ? String.valueOf(response.getReturnCode()) : "null";
     }
 
     public String returnMessage() {
-        return response.getReturnMessage();
+        return (response != null) ? response.getReturnMessage() : "null";
     }
 
     protected <T extends Authentication> T prepareRequest(final Class<T> clazz) {

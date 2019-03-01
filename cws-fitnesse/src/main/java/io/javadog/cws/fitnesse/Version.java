@@ -30,7 +30,7 @@ public final class Version extends CwsRequest<VersionResponse> {
     // =========================================================================
 
     public String cwsVersion() {
-        return response.getVersion();
+        return (response != null) ? response.getVersion() : null;
     }
 
     // =========================================================================

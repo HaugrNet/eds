@@ -28,14 +28,15 @@ import io.javadog.cws.core.enums.StandardSetting;
 import io.javadog.cws.core.exceptions.CWSException;
 import io.javadog.cws.core.exceptions.CryptoException;
 import io.javadog.cws.core.model.Settings;
+import org.junit.Test;
+
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
 import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.util.UUID;
-import javax.crypto.KeyGenerator;
-import javax.crypto.SecretKey;
-import org.junit.Test;
 
 /**
  * Proof Of Concept, showing that the simple Cryptographic Operations will work,
@@ -215,7 +216,7 @@ public final class CryptoTest extends DatabaseSetup {
         final byte[] toEncrypt = crypto.stringToBytes(cleartext);
         final byte[] encrypted = crypto.encrypt(key, toEncrypt);
 
-        // And decrypt it so we can verifyS it
+        // And decrypt it so we can verify it
         final byte[] decrypted = crypto.decrypt(key, encrypted);
         final String result = crypto.bytesToString(decrypted);
 
@@ -242,6 +243,27 @@ public final class CryptoTest extends DatabaseSetup {
         final String result = crypto.bytesToString(decrypted);
 
         assertThat(result, is(cleartext));
+    }
+
+    /**
+     * Destruction of the Symmetric Keys is important - to ensure that the keys
+     * cannot be reused.
+     */
+    @Test
+    public void testSymmetricKeyDestruction() {
+        thrown.expect(NullPointerException.class);
+
+        final SecretCWSKey key = crypto.generateSymmetricKey(settings.getSymmetricAlgorithm());
+        key.setSalt(new IVSalt(UUID.randomUUID().toString()));
+
+        // Now, we're going to encrypt some data
+        final String cleartext = "This is just an example";
+        final byte[] toEncrypt = crypto.stringToBytes(cleartext);
+        final byte[] encrypted = crypto.encrypt(key, toEncrypt);
+
+        // Destroy the key and try to decrypt. Should fail!
+        key.destroy();
+        crypto.decrypt(key, encrypted);
     }
 
     /**

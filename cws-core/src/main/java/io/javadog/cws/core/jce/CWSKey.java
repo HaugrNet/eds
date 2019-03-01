@@ -115,20 +115,16 @@ public abstract class CWSKey<T extends Key> {
                 // expected type is a byte array, hence this little trick
                 // with comparing.
                 if (field.getType() == byte[].class) {
-                    // To preserve the original definition of the Class, the
-                    // original access information is saved, so it can be used
-                    // once we have done the hacking of the Field
-                    final boolean accessible = field.isAccessible();
-
-                    // Hacking the field, requires that it is accessible
-                    setAccessible(field, true);
+                    // Hacking the field, requires that it is accessible, yet
+                    // with saving the original value
+                    final boolean accessible = setAccessible(field, true);
 
                     // First, read out the content of the field from the Object
                     final byte[] bytes = (byte[]) field.get(key);
                     // then, fill it with zeros
                     Arrays.fill(bytes, (byte) 0);
-                    // and set it again
-                    field.set(key, bytes);
+                    // and override the reference with a null, to trigger GC
+                    field.set(key, null);
 
                     // Hacking completed, restoring the old Access information
                     setAccessible(field, accessible);
@@ -148,14 +144,21 @@ public abstract class CWSKey<T extends Key> {
      * this method will simply wrap the call to the Java 8 setAccessible
      * method.</p>
      *
+     * <p>The current value of the field accessibility is being saved prior to
+     * updating it, so it can be returned.</p>
+     *
      * <p>The name of the method has not changed between Java 8 &amp; 9.
      * Although CWS works with Java 9+, it is not planned to migrate the
      * Language Level dependency until CWS version 2.0.</p>
      *
      * @param field      The field to set the Access Flag for
      * @param accessible The Access Flag to set
+     * @return True if this field is accessible, otherwise false
      */
-    private static void setAccessible(final Field field, final boolean accessible) {
+    private static boolean setAccessible(final Field field, final boolean accessible) {
+        final boolean isAccessible = field.isAccessible();
         field.setAccessible(accessible);
+
+        return isAccessible;
     }
 }

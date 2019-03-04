@@ -133,7 +133,7 @@ public abstract class CWSKey<T extends Key> {
         } catch (IllegalAccessException | SecurityException e) {
             // This should never happen, but - if so, just log and ignore, at
             // this level, CWS should be as error prone as possible
-            LOG.log(Settings.DEBUG, "Unable to delete Key: " + e.getMessage(), e);
+            LOG.log(Settings.WARN, "Unable to delete Key: " + e.getMessage(), e);
         }
     }
 

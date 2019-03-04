@@ -22,7 +22,7 @@ import io.javadog.cws.fitnesse.callers.CallShare;
 
 /**
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 public final class FetchDataTypes extends CwsRequest<FetchDataTypeResponse> {
 
@@ -30,7 +30,7 @@ public final class FetchDataTypes extends CwsRequest<FetchDataTypeResponse> {
     // Request & Response Setters and Getters
     // =========================================================================
 
-    public String getDataTypes() {
+    public String dataTypes() {
         return response.getDataTypes().toString();
     }
 

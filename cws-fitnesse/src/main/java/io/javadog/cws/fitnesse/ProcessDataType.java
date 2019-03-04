@@ -16,17 +16,37 @@
  */
 package io.javadog.cws.fitnesse;
 
+import io.javadog.cws.api.common.Action;
+import io.javadog.cws.api.requests.ProcessDataTypeRequest;
 import io.javadog.cws.api.responses.ProcessDataTypeResponse;
+import io.javadog.cws.fitnesse.callers.CallShare;
+import io.javadog.cws.fitnesse.utils.Converter;
 
 /**
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 public final class ProcessDataType extends CwsRequest<ProcessDataTypeResponse> {
+
+    private Action action = null;
+    private String name = null;
+    private String type = null;
 
     // =========================================================================
     // Request & Response Setters and Getters
     // =========================================================================
+
+    public void setAction(final String action) {
+        this.action = Converter.findAction(action);
+    }
+
+    public void setName(final String name) {
+        this.name = Converter.preCheck(name);
+    }
+
+    public void setType(final String type) {
+        this.type = Converter.preCheck(type);
+    }
 
     // =========================================================================
     // Standard FitNesse Fixture method(s)
@@ -37,6 +57,24 @@ public final class ProcessDataType extends CwsRequest<ProcessDataTypeResponse> {
      */
     @Override
     public void execute() {
+        final ProcessDataTypeRequest request = prepareRequest(ProcessDataTypeRequest.class);
+        request.setAction(action);
+        request.setTypeName(name);
+        request.setType(type);
 
+        response = CallShare.processDataType(requestType, requestUrl, request);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void reset() {
+        super.reset();
+
+        // Reset internal values
+        action = null;
+        name = null;
+        type = null;
     }
 }

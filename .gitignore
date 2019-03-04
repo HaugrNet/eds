@@ -17,7 +17,6 @@ dependency-reduced-pom.xml
 # FitNesse settings
 *.zip
 fitnesse-standalone.jar
-cws-fitnesse/FitNesseRoot/CWS
 cws-fitnesse/FitNesseRoot/FitNesse/
 cws-fitnesse/FitNesseRoot/FrontPage/
 cws-fitnesse/FitNesseRoot/PageFooter/

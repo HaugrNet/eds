@@ -20,15 +20,20 @@ import io.javadog.cws.api.common.Action;
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.CredentialType;
 import io.javadog.cws.api.dtos.Circle;
+import io.javadog.cws.api.dtos.DataType;
 import io.javadog.cws.api.dtos.Member;
 import io.javadog.cws.api.requests.Authentication;
 import io.javadog.cws.api.requests.FetchCircleRequest;
+import io.javadog.cws.api.requests.FetchDataTypeRequest;
 import io.javadog.cws.api.requests.FetchMemberRequest;
 import io.javadog.cws.api.requests.ProcessCircleRequest;
+import io.javadog.cws.api.requests.ProcessDataTypeRequest;
 import io.javadog.cws.api.requests.ProcessMemberRequest;
 import io.javadog.cws.api.responses.FetchCircleResponse;
+import io.javadog.cws.api.responses.FetchDataTypeResponse;
 import io.javadog.cws.api.responses.FetchMemberResponse;
 import io.javadog.cws.fitnesse.callers.CallManagement;
+import io.javadog.cws.fitnesse.callers.CallShare;
 import io.javadog.cws.fitnesse.exceptions.StopTestException;
 
 import java.lang.reflect.InvocationTargetException;
@@ -80,6 +85,20 @@ public final class ControlCws {
             if (!Objects.equals(member.getAccountName(), Constants.ADMIN_ACCOUNT)) {
                 processRequest.setMemberId(member.getMemberId());
                 CallManagement.processMember(type, url, processRequest);
+            }
+        }
+    }
+
+    public void removeDataTypes() {
+        final FetchDataTypeRequest fetchRequest = prepareRequest(FetchDataTypeRequest.class);
+        final ProcessDataTypeRequest processRequest = prepareRequest(ProcessDataTypeRequest.class);
+        processRequest.setAction(Action.DELETE);
+
+        final FetchDataTypeResponse fetchResponse = CallShare.fetchDataTypes(type, url, fetchRequest);
+        for (final DataType dataType : fetchResponse.getDataTypes()) {
+            if (!dataType.getTypeName().equals(Constants.DATA_TYPENAME) && !dataType.getTypeName().equals(Constants.FOLDER_TYPENAME)) {
+                processRequest.setTypeName(dataType.getTypeName());
+                CallShare.processDataType(type, url, processRequest);
             }
         }
     }

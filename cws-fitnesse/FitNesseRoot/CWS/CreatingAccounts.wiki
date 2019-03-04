@@ -8,7 +8,7 @@ Test
 !2 '''!-CWS-! Create Account Request'''
 The !-CWS-! Create Account request requires administrative priviledges to be performed.
 
-!|ProcessMember                                                                                                                                                                                                                               |
+|process member                                                                                                                                                                                                                               |
 |account name|credential |credential type|action    |member id|public key|new account name|new credential|member role|member id?|return code?             |return message?                                                                    |
 |admin       |admin      |PASSPHRASE     |CREATE    |null     |null      |admin2          |password2     |ADMIN      |=~/\S{36}/|${SUCCESS}               |Ok                                                                                 |
 |admin       |admin      |PASSPHRASE     |CREATE    |null     |null      |user1           |password1     |STANDARD   |=~/\S{36}/|${SUCCESS}               |Ok                                                                                 |

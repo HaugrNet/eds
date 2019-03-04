@@ -1,0 +1,27 @@
+---
+Test
+---
+!*> Setup
+!include Setup
+
+For the test, it is necessary to create a couple of accounts.
+|process member                                                                                                                                         |
+|account name|credential|credential type|action|member id|public key|new account name|new credential|member role|member id?|return code?|return message?|
+|admin       |admin     |PASSPHRASE     |CREATE|null     |null      |user1           |password1     |ADMIN      |=~/\S{36}/|${SUCCESS}  |Ok             |
+|user1       |password1 |null           |LOGIN |null     |null      |null            |sessionkey    |null       |null      |${SUCCESS}  |Ok             |
+
+*!
+
+!2 '''!-CWS-! Process !-DataType-! Request'''
+The !-CWS-! Process Data Type can be made by 
+
+|process dataType                                              |
+|credential|action |name |type    |return code?|return message?|
+|sessionkey|PROCESS|type1|MIMEType|${SUCCESS}  |Ok             |
+|sessionkey|PROCESS|type1|Object2 |${SUCCESS}  |Ok             |
+|sessionkey|PROCESS|type2|Object42|${SUCCESS}  |Ok             |
+|sessionkey|DELETE |type2|null    |${SUCCESS}  |Ok             |
+
+|fetch dataTypes                                                                                                                                                                    |
+|credential|data types?                                                                                                                                |return code?|return message?|
+|sessionkey|!-[DataType{typeName='data', type='Data Object'}, DataType{typeName='folder', type='Folder'}, DataType{typeName='type1', type='Object2'}]-!|${SUCCESS}  |Ok             |

@@ -53,10 +53,11 @@ import io.javadog.cws.api.responses.SettingResponse;
 import io.javadog.cws.api.responses.SignResponse;
 import io.javadog.cws.api.responses.VerifyResponse;
 import io.javadog.cws.api.responses.VersionResponse;
+import org.junit.Test;
+
 import java.nio.charset.Charset;
 import java.util.List;
 import java.util.UUID;
-import org.junit.Test;
 
 /**
  * @author Kim Jensen
@@ -170,7 +171,9 @@ public abstract class AbstractClientTestCase {
         final FetchDataTypeRequest fetchRequest = Base.prepareRequest(FetchDataTypeRequest.class, Constants.ADMIN_ACCOUNT);
         final FetchDataTypeResponse fetchResponse = getShare().fetchDataTypes(fetchRequest);
         assertThat(fetchResponse.isOk(), is(true));
-        assertThat(fetchResponse.getDataTypes().size(), is(3));
+        // If the tests is running against a system with more DataTypes added,
+        // this test will fail if hardcoded to 3, hence it expects at least 3.
+        assertThat(fetchResponse.getDataTypes().size() >= 3, is(true));
     }
 
     @Test

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<configuration>
+    <appender name="ROLL" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <File>target/junit.log</File>
+        <encoder>
+            <pattern>%date{ISO8601}: %-5level [%thread] %logger \(%file:%line\) - %message%n</pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>target/junit.log.%d{yyyy-MM-dd}</fileNamePattern>
+        </rollingPolicy>
+    </appender>
+
+    <logger name="org.hibernate" level="warn">
+        <appender-ref ref="ROLL"/>
+    </logger>
+    <root level="debug">
+        <appender-ref ref="ROLL"/>
+    </root>
+</configuration>

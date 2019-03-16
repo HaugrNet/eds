@@ -22,7 +22,7 @@ import io.javadog.cws.fitnesse.callers.CallManagement;
 
 /**
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 public final class FetchMembers extends CwsRequest<FetchMemberResponse> {
 
@@ -37,11 +37,11 @@ public final class FetchMembers extends CwsRequest<FetchMemberResponse> {
     }
 
     public String circles() {
-        return getCircleNames();
+        return (response != null) ? response.getCircles().toString() : null;
     }
 
     public String members() {
-        return getMemberNames();
+        return (response != null) ? response.getMembers().toString() : null;
     }
 
     // =========================================================================

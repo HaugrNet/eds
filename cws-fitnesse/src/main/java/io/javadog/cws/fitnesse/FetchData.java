@@ -24,7 +24,7 @@ import io.javadog.cws.fitnesse.utils.Converter;
 
 /**
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 public final class FetchData extends CwsRequest<FetchDataResponse> {
 
@@ -39,11 +39,11 @@ public final class FetchData extends CwsRequest<FetchDataResponse> {
     // =========================================================================
 
     public void setCircleId(final String circleId) {
-        this.circleId = circleId;
+        this.circleId = getId(Converter.preCheck(circleId));
     }
 
     public void setDataId(final String dataId) {
-        this.dataId = dataId;
+        this.dataId = getId(Converter.preCheck(dataId));
     }
 
     public void setPageNumber(final String pageNumber) {
@@ -65,27 +65,27 @@ public final class FetchData extends CwsRequest<FetchDataResponse> {
     }
 
     public String circleId() {
-        return (metadata != null) ? metadata.getCircleId() : UNDEFINED;
+        return (metadata != null) ? metadata.getCircleId() : null;
     }
 
     public String dataId() {
-        return (metadata != null) ? metadata.getDataId() : UNDEFINED;
+        return (metadata != null) ? metadata.getDataId() : null;
     }
 
     public String folderId() {
-        return (metadata != null) ? metadata.getFolderId() : UNDEFINED;
+        return (metadata != null) ? metadata.getFolderId() : null;
     }
 
     public String dataName() {
-        return (metadata != null) ? metadata.getDataName() : UNDEFINED;
+        return (metadata != null) ? metadata.getDataName() : null;
     }
 
     public String typeName() {
-        return (metadata != null) ? metadata.getTypeName() : UNDEFINED;
+        return (metadata != null) ? metadata.getTypeName() : null;
     }
 
     public String added() {
-        return (metadata != null) ? Converter.convertDate(metadata.getAdded()) : UNDEFINED;
+        return (metadata != null) ? Converter.convertDate(metadata.getAdded()) : null;
     }
 
     // =========================================================================

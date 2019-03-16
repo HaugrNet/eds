@@ -26,7 +26,7 @@ import java.util.Locale;
 
 /**
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 public final class ProcessTrustee extends CwsRequest<ProcessTrusteeResponse> {
 

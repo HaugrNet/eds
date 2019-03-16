@@ -22,7 +22,7 @@ import io.javadog.cws.fitnesse.callers.CallManagement;
 
 /**
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 public final class FetchCircles extends CwsRequest<FetchCircleResponse> {
 
@@ -31,7 +31,7 @@ public final class FetchCircles extends CwsRequest<FetchCircleResponse> {
     // =========================================================================
 
     public String circles() {
-        return getCircleNames();
+        return (response != null) ? response.getCircles().toString() : null;
     }
 
     // =========================================================================
@@ -45,8 +45,6 @@ public final class FetchCircles extends CwsRequest<FetchCircleResponse> {
     public void execute() {
         final FetchCircleRequest request = prepareRequest(FetchCircleRequest.class);
 
-        final FetchCircleResponse circleResponse = CallManagement.fetchCircles(requestType, requestUrl, request);
-        setCircles(circleResponse);
-        response = circleResponse;
+        response = CallManagement.fetchCircles(requestType, requestUrl, request);
     }
 }

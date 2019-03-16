@@ -43,8 +43,7 @@ public final class ProcessCircle extends CwsRequest<ProcessCircleResponse> {
     }
 
     public void setCircleId(final String circleId) {
-        final String tmp = Converter.preCheck(circleId);
-        this.circleId = getId(tmp);
+        this.circleId = getId(Converter.preCheck(circleId));
     }
 
     public String circleId() {
@@ -56,8 +55,7 @@ public final class ProcessCircle extends CwsRequest<ProcessCircleResponse> {
     }
 
     public void setMemberId(final String memberId) {
-        final String tmp = Converter.preCheck(memberId);
-        this.memberId = getId(tmp);
+        this.memberId = getId(Converter.preCheck(memberId));
     }
 
     public void setCircleKey(final String circleKey) {

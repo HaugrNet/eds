@@ -49,8 +49,7 @@ public final class ProcessMember extends CwsRequest<ProcessMemberResponse> {
     }
 
     public void setMemberId(final String memberId) {
-        final String tmp = Converter.preCheck(memberId);
-        this.memberId = getId(tmp);
+        this.memberId = getId(Converter.preCheck(memberId));
     }
 
     public void setPublicKey(final String publicKey) {

@@ -17,7 +17,6 @@
 package io.javadog.cws.core.services;
 
 import io.javadog.cws.api.common.Action;
-import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.MemberRole;
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.common.TrustLevel;
@@ -111,14 +110,11 @@ public final class ProcessCircleService extends Serviceable<CommonDao, ProcessCi
         if (existing != null) {
             response = new ProcessCircleResponse(ReturnCode.IDENTIFICATION_WARNING, "A Circle with the requested name already exists.");
         } else {
-            if (member.getMemberRole() == MemberRole.ADMIN) {
-                // The administrator is creating a new Circle, which requires that
-                // a Member Id is provided as the new Circle Administrator.
-                final MemberEntity owner = dao.find(MemberEntity.class, request.getMemberId());
+            final String memberId = request.getMemberId();
+            if ((memberId != null) && (member.getMemberRole() == MemberRole.ADMIN)) {
+                final MemberEntity owner = dao.find(MemberEntity.class, memberId);
                 if (owner == null) {
                     response = new ProcessCircleResponse(ReturnCode.IDENTIFICATION_WARNING, "Cannot create a new Circle with a non-existing Circle Administrator.");
-                } else if (Objects.equals(owner.getName(), Constants.ADMIN_ACCOUNT)) {
-                    response = new ProcessCircleResponse(ReturnCode.IDENTIFICATION_WARNING, "It is not allowed for the System Administrator to be part of a Circle.");
                 } else {
                     response = createCircle(owner, name, request.getCircleKey());
                 }

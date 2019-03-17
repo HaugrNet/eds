@@ -155,7 +155,7 @@ public abstract class Serviceable<D extends CommonDao, R extends CwsResponse, A 
                 //     searched and also allow the checks to end earlier.
                 //     However, equally important, this check is a premature
                 //     check and will *not* count in the final Business Logic!
-                checkAccount(authentication, circleId);
+                verifyAccount(authentication, circleId);
 
                 //     Check if the Member is valid, i.e. if the given
                 //     Credentials can correctly decrypt the Private Key for
@@ -210,6 +210,13 @@ public abstract class Serviceable<D extends CommonDao, R extends CwsResponse, A 
         }
     }
 
+    /**
+     * Verifies that the given Session is valid, and if so, tries to find the
+     * Member Account based on the Session information.
+     *
+     * @param authentication Authentication information with Session
+     * @param circleId       Optional Circle Id
+     */
     private void verifySession(final A authentication, final String circleId) {
         final byte[] masterEncrypted = crypto.encryptWithMasterKey(authentication.getCredential());
         final String checksum = crypto.generateChecksum(masterEncrypted);
@@ -226,33 +233,45 @@ public abstract class Serviceable<D extends CommonDao, R extends CwsResponse, A 
             throw new AuthenticationException("No Session could be found.");
         }
 
-        // If the CircleId is present, find the Member Account, which matches it
-        // or throw an Exception if no match was found. If the CircleId is not
-        // present, use the found Member Entity.
-        if (circleId == null) {
+        checkMemberAccount(memberEntity, circleId);
+    }
+
+    /**
+     * Verifies that the given account is value, and if so, tries to find the
+     * Member Account based on the Credential information.
+     *
+     * @param authentication Authentication Account Name &amp; Credential
+     * @param circleId       Optional Circle Id
+     */
+    private void verifyAccount(final A authentication, final String circleId) {
+        final String account = trim(authentication.getAccountName());
+        MemberEntity memberEntity = dao.findMemberByName(account);
+
+        if (memberEntity == null) {
+            if (Objects.equals(Constants.ADMIN_ACCOUNT, account)) {
+                memberEntity = createNewAccount(Constants.ADMIN_ACCOUNT, MemberRole.ADMIN, authentication.getCredential());
+            } else {
+                throw new AuthenticationException("Could not uniquely identify an account for '" + account + "'.");
+            }
+        }
+
+        checkMemberAccount(memberEntity, circleId);
+    }
+
+    /**
+     * Checks if the given Member Account is an Administrator, or if the
+     * optional Circle Id is present, it checks the relation between the given
+     * Member Entity and the Circle Id. If no relation exist, then the dao used
+     * will throw a {@code CWSException} with an Identification warning.
+     *
+     * @param memberEntity MemberEntity to check
+     * @param circleId     Optional Circle Id to verify relation with
+     */
+    private void checkMemberAccount(final MemberEntity memberEntity, final String circleId) {
+        if ((circleId == null) || (memberEntity.getMemberRole() == MemberRole.ADMIN)) {
             member = memberEntity;
         } else {
             member = dao.findMemberByNameAndCircleId(memberEntity.getName(), circleId);
-        }
-    }
-
-    private void checkAccount(final A authentication, final String circleId) {
-        // If the External Circle Id is given and the member is not the
-        // Administrator (who cannot be part of a Circle), we will use
-        // the CircleId in the checks.
-        final String account = trim(authentication.getAccountName());
-        if ((circleId != null) && !Objects.equals(account, Constants.ADMIN_ACCOUNT)) {
-            member = dao.findMemberByNameAndCircleId(account, circleId);
-        } else {
-            member = dao.findMemberByName(account);
-
-            if (member == null) {
-                if (Objects.equals(Constants.ADMIN_ACCOUNT, account)) {
-                    member = createNewAccount(Constants.ADMIN_ACCOUNT, MemberRole.ADMIN, authentication.getCredential());
-                } else {
-                    throw new AuthenticationException("Could not uniquely identify an account for '" + account + "'.");
-                }
-            }
         }
     }
 
@@ -333,15 +352,13 @@ public abstract class Serviceable<D extends CommonDao, R extends CwsResponse, A 
             throw new AuthorizationException("Cannot complete this request, as it is only allowed for the System Administrator.");
         }
 
+        trustees = findTrustees(member, circleId, TrustLevel.getLevels(action.getTrustLevel()));
+
         // The System Admin is automatically permitted to perform a number of
         // Actions, without being part of a Circle. So these checks must be
         // made separately based on the actual Request.
-        if (member.getMemberRole() != MemberRole.ADMIN) {
-            trustees = findTrustees(member, circleId, TrustLevel.getLevels(action.getTrustLevel()));
-
-            if ((action.getTrustLevel() != TrustLevel.ALL) && trustees.isEmpty()) {
-                throw new AuthorizationException("The requesting Account is not permitted to " + action.getDescription());
-            }
+        if ((member.getMemberRole() != MemberRole.ADMIN) && (action.getTrustLevel() != TrustLevel.ALL) && trustees.isEmpty()) {
+            throw new AuthorizationException("The requesting Account is not permitted to " + action.getDescription());
         }
     }
 

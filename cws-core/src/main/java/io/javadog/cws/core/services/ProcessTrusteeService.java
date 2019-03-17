@@ -84,49 +84,44 @@ public final class ProcessTrusteeService extends Serviceable<CommonDao, ProcessT
      * @return Response with error information.
      */
     private ProcessTrusteeResponse addTrustee(final ProcessTrusteeRequest request) {
-        final ProcessTrusteeResponse response;
-
-        if (member.getMemberRole() == MemberRole.ADMIN) {
-            response = new ProcessTrusteeResponse(ReturnCode.AUTHORIZATION_WARNING, "The System Administrator cannot add a Member to a Circle.");
-        } else {
-            final String memberId = request.getMemberId();
-            final MemberEntity newTrusteeMember = dao.find(MemberEntity.class, memberId);
-
-            if (newTrusteeMember != null) {
-                final List<TrusteeEntity> existing = dao.findTrusteesByMemberAndCircle(newTrusteeMember, request.getCircleId(), TrustLevel.getLevels(TrustLevel.ALL));
-
-                if (existing.isEmpty()) {
-                    // Please be aware, that during re-key requests - there will
-                    // exist 2 Trustee entities, one with the old Key and one with
-                    // the new. In the unlikely event that someone is being added
-                    // during this - the logic should also reflect it. However, as
-                    // re-key is not supported in version 1.0, support for multiple
-                    // Keys can wait until this is also supported.
-                    final TrusteeEntity admin = trustees.get(0);
-                    final TrustLevel trustLevel = request.getTrustLevel();
-                    final TrusteeEntity trustee = new TrusteeEntity();
-                    trustee.setMember(newTrusteeMember);
-                    trustee.setCircle(admin.getCircle());
-                    trustee.setKey(admin.getKey());
-                    trustee.setTrustLevel(trustLevel);
-
-                    final SecretCWSKey circleKey = crypto.extractCircleKey(admin.getKey().getAlgorithm(), keyPair.getPrivate(), admin.getCircleKey());
-                    final PublicKey publicKey = crypto.dearmoringPublicKey(newTrusteeMember.getPublicKey());
-                    final PublicCWSKey cwsPublicKey = new PublicCWSKey(newTrusteeMember.getRsaAlgorithm(), publicKey);
-                    trustee.setCircleKey(crypto.encryptAndArmorCircleKey(cwsPublicKey, circleKey));
-
-                    dao.persist(trustee);
-
-                    response = new ProcessTrusteeResponse();
-                } else {
-                    response = new ProcessTrusteeResponse(ReturnCode.IDENTIFICATION_WARNING, "The Member is already a trustee of the requested Circle.");
-                }
-            } else {
-                response = new ProcessTrusteeResponse(ReturnCode.IDENTIFICATION_WARNING, "No Member could be found with the given Id.");
-            }
+        if (trustees.isEmpty()) {
+            throw new CWSException(ReturnCode.ILLEGAL_ACTION, "It is not possible to add a member to a circle, without membership.");
         }
 
-        return response;
+        final String memberId = request.getMemberId();
+        final MemberEntity newTrusteeMember = dao.find(MemberEntity.class, memberId);
+
+        if (newTrusteeMember == null) {
+            throw new CWSException(ReturnCode.IDENTIFICATION_WARNING, "No Member could be found with the given Id.");
+        }
+
+        final List<TrusteeEntity> existing = dao.findTrusteesByMemberAndCircle(newTrusteeMember, request.getCircleId(), TrustLevel.getLevels(TrustLevel.ALL));
+
+        if (!existing.isEmpty()) {
+            throw new CWSException(ReturnCode.IDENTIFICATION_WARNING, "The Member is already a trustee of the requested Circle.");
+        }
+
+        // Please be aware, that during re-key requests - there will
+        // exist 2 Trustee entities, one with the old Key and one with
+        // the new. In the unlikely event that someone is being added
+        // during this - the logic should also reflect it. However, as
+        // re-key is not supported in version 1.0, support for multiple
+        // Keys can wait until this is also supported.
+        final TrusteeEntity admin = trustees.get(0);
+        final TrustLevel trustLevel = request.getTrustLevel();
+        final TrusteeEntity trustee = new TrusteeEntity();
+        trustee.setMember(newTrusteeMember);
+        trustee.setCircle(admin.getCircle());
+        trustee.setKey(admin.getKey());
+        trustee.setTrustLevel(trustLevel);
+
+        final SecretCWSKey circleKey = crypto.extractCircleKey(admin.getKey().getAlgorithm(), keyPair.getPrivate(), admin.getCircleKey());
+        final PublicKey publicKey = crypto.dearmoringPublicKey(newTrusteeMember.getPublicKey());
+        final PublicCWSKey cwsPublicKey = new PublicCWSKey(newTrusteeMember.getRsaAlgorithm(), publicKey);
+        trustee.setCircleKey(crypto.encryptAndArmorCircleKey(cwsPublicKey, circleKey));
+
+        dao.persist(trustee);
+        return new ProcessTrusteeResponse();
     }
 
     private ProcessTrusteeResponse alterTrustee(final ProcessTrusteeRequest request) {

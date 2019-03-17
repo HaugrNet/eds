@@ -311,8 +311,8 @@ public final class CircleServiceTest extends DatabaseSetup {
         request.setCircleName("My Circle");
 
         final ProcessCircleResponse response = service.perform(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.IDENTIFICATION_WARNING.getCode()));
-        assertThat(response.getReturnMessage(), is("It is not allowed for the System Administrator to be part of a Circle."));
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+        assertThat(response.getReturnMessage(), is("Ok"));
     }
 
     @Test

@@ -27,8 +27,10 @@ import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.common.TrustLevel;
 import io.javadog.cws.api.dtos.Trustee;
 import io.javadog.cws.api.requests.FetchTrusteeRequest;
+import io.javadog.cws.api.requests.ProcessCircleRequest;
 import io.javadog.cws.api.requests.ProcessTrusteeRequest;
 import io.javadog.cws.api.responses.FetchTrusteeResponse;
+import io.javadog.cws.api.responses.ProcessCircleResponse;
 import io.javadog.cws.api.responses.ProcessTrusteeResponse;
 import io.javadog.cws.core.DatabaseSetup;
 import io.javadog.cws.core.enums.StandardSetting;
@@ -197,17 +199,42 @@ public final class TrusteeServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testAddingTrusteeAsAdmin() {
-        final ProcessTrusteeService service = new ProcessTrusteeService(settings, entityManager);
-        final ProcessTrusteeRequest request = prepareRequest(ProcessTrusteeRequest.class, Constants.ADMIN_ACCOUNT);
-        request.setAction(Action.ADD);
-        request.setCircleId(CIRCLE_1_ID);
-        request.setMemberId(MEMBER_4_ID);
-        request.setTrustLevel(TrustLevel.WRITE);
+    public void testCreatingAndAddingTrusteeAsSystemAdmin() {
+        // Step 1, create a new Circle as System Administrator
+        final ProcessCircleService circleService = new ProcessCircleService(settings, entityManager);
+        final ProcessCircleRequest circleRequest = prepareRequest(ProcessCircleRequest.class, Constants.ADMIN_ACCOUNT);
+        circleRequest.setAction(Action.CREATE);
+        circleRequest.setCircleName("Admin Circle");
+        final ProcessCircleResponse circleResponse = circleService.perform(circleRequest);
+        assertThat(circleResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+        assertThat(circleResponse.getReturnMessage(), is("Ok"));
+        assertThat(circleResponse.getCircleId(), is(not(nullValue())));
+        final String circleId = circleResponse.getCircleId();
 
-        final ProcessTrusteeResponse response = service.perform(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.AUTHORIZATION_WARNING.getCode()));
-        assertThat(response.getReturnMessage(), is("The System Administrator cannot add a Member to a Circle."));
+        // Step 2, add a new trustee to the newly created circle
+        final ProcessTrusteeService trusteeService = new ProcessTrusteeService(settings, entityManager);
+        final ProcessTrusteeRequest trusteeRequest = prepareRequest(ProcessTrusteeRequest.class, Constants.ADMIN_ACCOUNT);
+        trusteeRequest.setAction(Action.ADD);
+        trusteeRequest.setCircleId(circleId);
+        trusteeRequest.setMemberId(MEMBER_2_ID);
+        trusteeRequest.setTrustLevel(TrustLevel.WRITE);
+        final ProcessTrusteeResponse trusteeResponse = trusteeService.perform(trusteeRequest);
+        assertThat(trusteeResponse.getReturnMessage(), is("Ok"));
+        assertThat(trusteeResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+
+        // Step 3, verify that the Circle has 2 members
+        final FetchTrusteeService fetchService = new FetchTrusteeService(settings, entityManager);
+        final FetchTrusteeRequest fetchRequest = prepareRequest(FetchTrusteeRequest.class, Constants.ADMIN_ACCOUNT);
+        fetchRequest.setCircleId(circleId);
+        final FetchTrusteeResponse fetchResponse = fetchService.perform(fetchRequest);
+        assertThat(fetchResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+        assertThat(fetchResponse.getReturnMessage(), is("Ok"));
+        assertThat(fetchResponse.getTrustees(), is(not(nullValue())));
+        assertThat(fetchResponse.getTrustees().size(), is(2));
+        assertThat(fetchResponse.getTrustees().get(0).getMemberId(), is(ADMIN_ID));
+        assertThat(fetchResponse.getTrustees().get(0).getTrustLevel(), is(TrustLevel.ADMIN));
+        assertThat(fetchResponse.getTrustees().get(1).getMemberId(), is(MEMBER_2_ID));
+        assertThat(fetchResponse.getTrustees().get(1).getTrustLevel(), is(TrustLevel.WRITE));
     }
 
     @Test
@@ -256,30 +283,74 @@ public final class TrusteeServiceTest extends DatabaseSetup {
 
     @Test
     public void testAddingInvalidMemberAsTrusteeAsCircleAdmin() {
+        prepareCause(CWSException.class, ReturnCode.IDENTIFICATION_WARNING, "No Member could be found with the given Id.");
+
         final ProcessTrusteeService service = new ProcessTrusteeService(settings, entityManager);
         final ProcessTrusteeRequest request = prepareRequest(ProcessTrusteeRequest.class, MEMBER_1);
         request.setAction(Action.ADD);
         request.setCircleId(CIRCLE_1_ID);
         request.setMemberId(UUID.randomUUID().toString());
         request.setTrustLevel(TrustLevel.WRITE);
+        assertThat(request.validate().isEmpty(), is(true));
 
-        final ProcessTrusteeResponse response = service.perform(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.IDENTIFICATION_WARNING.getCode()));
-        assertThat(response.getReturnMessage(), is("No Member could be found with the given Id."));
+        service.perform(request);
     }
 
     @Test
     public void testAddingExistingTrusteeAsTrustee() {
+        prepareCause(CWSException.class, ReturnCode.IDENTIFICATION_WARNING, "The Member is already a trustee of the requested Circle.");
+
         final ProcessTrusteeService service = new ProcessTrusteeService(settings, entityManager);
         final ProcessTrusteeRequest request = prepareRequest(ProcessTrusteeRequest.class, MEMBER_1);
         request.setAction(Action.ADD);
         request.setCircleId(CIRCLE_1_ID);
         request.setMemberId(MEMBER_2_ID);
         request.setTrustLevel(TrustLevel.WRITE);
+        assertThat(request.validate().isEmpty(), is(true));
+
+        service.perform(request);
+    }
+
+    /**
+     * This test is testing a border case scenario, where a System Administrator
+     * is attempting to perform an illegal action on a Circle of Trust. The
+     * System Administrator is a member of the Circle, and is thus not allowed
+     * to perform the given action. Yet, as System Administrator, the path for
+     * verification of permissions is traversing a slightly different one than
+     * standard members. Hence, the rejection with the strange error, hinting
+     * that the Administrator is not a member if the Circle.
+     */
+    @Test
+    public void testAddingNewTrusteeAsCircleMemberAndSystemAdministrator() {
+        prepareCause(CWSException.class, ReturnCode.ILLEGAL_ACTION, "It is not possible to add a member to a circle, without membership.");
+
+        final ProcessTrusteeService service = new ProcessTrusteeService(settings, entityManager);
+        final ProcessTrusteeRequest request = prepareRequest(ProcessTrusteeRequest.class, MEMBER_1);
+        request.setAction(Action.ADD);
+        request.setCircleId(CIRCLE_1_ID);
+        request.setMemberId(ADMIN_ID);
+        request.setTrustLevel(TrustLevel.READ);
 
         final ProcessTrusteeResponse response = service.perform(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.IDENTIFICATION_WARNING.getCode()));
-        assertThat(response.getReturnMessage(), is("The Member is already a trustee of the requested Circle."));
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+        assertThat(response.getReturnMessage(), is("Ok"));
+
+        final FetchTrusteeService fetchService = new FetchTrusteeService(settings, entityManager);
+        final FetchTrusteeRequest fetchRequest = prepareRequest(FetchTrusteeRequest.class, Constants.ADMIN_ACCOUNT);
+        fetchRequest.setCircleId(CIRCLE_1_ID);
+        final FetchTrusteeResponse fetchResponse = fetchService.perform(fetchRequest);
+        assertThat(fetchResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+        assertThat(fetchResponse.getReturnMessage(), is("Ok"));
+        assertThat(fetchResponse.getTrustees(), is(not(nullValue())));
+        assertThat(fetchResponse.getTrustees().size(), is(4));
+        assertThat(fetchResponse.getTrustees().get(0).getMemberId(), is(ADMIN_ID));
+
+        final ProcessTrusteeRequest adminRequest = prepareRequest(ProcessTrusteeRequest.class, Constants.ADMIN_ACCOUNT);
+        adminRequest.setAction(Action.ADD);
+        adminRequest.setCircleId(CIRCLE_1_ID);
+        adminRequest.setMemberId(MEMBER_5_ID);
+        adminRequest.setTrustLevel(TrustLevel.READ);
+        service.perform(adminRequest);
     }
 
     @Test

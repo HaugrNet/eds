@@ -7,7 +7,7 @@ Test
 For the test, it is necessary to create a couple of accounts.
 |process member                                                                                                                                         |
 |account name|credential|credential type|action|member id|public key|new account name|new credential|member role|member id?|return code?|return message?|
-|admin       |admin     |PASSPHRASE     |CREATE|null     |null      |user1           |password1     |standard   |=~/\S{36}/|${SUCCESS}  |Ok             |
+|admin       |admin     |PASSPHRASE     |CREATE|null     |null      |user1           |password1     |admin      |=~/\S{36}/|${SUCCESS}  |Ok             |
 |admin       |admin     |PASSPHRASE     |CREATE|null     |null      |user2           |password2     |standard   |=~/\S{36}/|${SUCCESS}  |Ok             |
 |user1       |password1 |null           |LOGIN |null     |null      |null            |session1      |null       |null      |${SUCCESS}  |Ok             |
 |user2       |password2 |null           |LOGIN |null     |null      |null            |session2      |null       |null      |${SUCCESS}  |Ok             |

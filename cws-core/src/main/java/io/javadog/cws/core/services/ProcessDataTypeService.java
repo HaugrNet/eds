@@ -24,12 +24,14 @@ import io.javadog.cws.api.responses.ProcessDataTypeResponse;
 import io.javadog.cws.core.enums.Permission;
 import io.javadog.cws.core.exceptions.AuthorizationException;
 import io.javadog.cws.core.exceptions.CWSException;
+import io.javadog.cws.core.exceptions.IllegalActionException;
 import io.javadog.cws.core.model.CommonDao;
 import io.javadog.cws.core.model.Settings;
 import io.javadog.cws.core.model.entities.DataTypeEntity;
+
+import javax.persistence.EntityManager;
 import java.util.Arrays;
 import java.util.Objects;
-import javax.persistence.EntityManager;
 
 /**
  * <p>Business Logic implementation for the CWS ProcessDataType request.</p>
@@ -62,7 +64,7 @@ public final class ProcessDataTypeService extends Serviceable<CommonDao, Process
                 break;
             default:
                 // Unreachable Code by design.
-                throw new CWSException(ReturnCode.ILLEGAL_ACTION, "Unsupported Action.");
+                throw new IllegalActionException("Unsupported Action.");
         }
 
         return response;

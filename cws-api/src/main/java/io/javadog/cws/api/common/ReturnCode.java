@@ -467,22 +467,16 @@ public enum ReturnCode {
     SETTING_ERROR(Classification.CLASS_ERROR, 93, "Error extracting settings value."),
 
     /**
-     * <b>Custom Warning 594 - Identification Error</b>.<br>
-     * <i>It is not possible to identify the requested data.</i>
-     */
-    IDENTIFICATION_ERROR(Classification.CLASS_ERROR, 94, "Not possible to positively identify the Requested Data."),
-
-    /**
      * <b>Custom Warning 595 - Database Error</b>.<br>
      * <i>A generic problem with the database occurred.</i>
      */
-    DATABASE_ERROR(Classification.CLASS_ERROR, 95, "Database Error occurred during the handling of the request."),
+    DATABASE_ERROR(Classification.CLASS_ERROR, 94, "Database Error occurred during the handling of the request."),
 
     /**
      * <b>Custom Warning 596 - Constraint Error</b>.<br>
      * <i>A unique constraint violation occurred in the database.</i>
      */
-    CONSTRAINT_ERROR(Classification.CLASS_ERROR, 96, "Unique Constraint Violation in the Database.");
+    CONSTRAINT_ERROR(Classification.CLASS_ERROR, 95, "Unique Constraint Violation in the Database.");
 
     /**
      * ReturnCode Classification, i.e. Basic Severity.

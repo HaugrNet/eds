@@ -27,15 +27,12 @@ import io.javadog.cws.api.requests.FetchCircleRequest;
 import io.javadog.cws.api.requests.SettingRequest;
 import io.javadog.cws.core.DatabaseSetup;
 import io.javadog.cws.core.enums.StandardSetting;
-import io.javadog.cws.core.exceptions.AuthenticationException;
-import io.javadog.cws.core.exceptions.AuthorizationException;
-import io.javadog.cws.core.exceptions.CWSException;
 import io.javadog.cws.core.model.Settings;
 import org.junit.Test;
 
 /**
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 public final class ServiceableTest extends DatabaseSetup {
 
@@ -46,7 +43,7 @@ public final class ServiceableTest extends DatabaseSetup {
      */
     @Test
     public void testRequestWhenNotReady() {
-        prepareCause(CWSException.class, ReturnCode.DATABASE_ERROR, "The Database is invalid, CWS neither can nor will work correctly until resolved.");
+        prepareCause(ReturnCode.DATABASE_ERROR, "The Database is invalid, CWS neither can nor will work correctly until resolved.");
         final Settings mySettings = newSettings();
         mySettings.set(StandardSetting.IS_READY.getKey(), "false");
 
@@ -61,7 +58,7 @@ public final class ServiceableTest extends DatabaseSetup {
 
     @Test
     public void testAccesWithInvalidPassword() {
-        prepareCause(AuthenticationException.class, ReturnCode.AUTHENTICATION_WARNING, "Cannot authenticate the Account from the given Credentials.");
+        prepareCause(ReturnCode.AUTHENTICATION_WARNING, "Cannot authenticate the Account from the given Credentials.");
 
         final SettingService service = new SettingService(settings, entityManager);
         final SettingRequest request = new SettingRequest();
@@ -74,7 +71,7 @@ public final class ServiceableTest extends DatabaseSetup {
 
     @Test
     public void testAccessSettingsAsMember() {
-        prepareCause(AuthorizationException.class, ReturnCode.AUTHORIZATION_WARNING, "Cannot complete this request, as it is only allowed for the System Administrator.");
+        prepareCause(ReturnCode.AUTHORIZATION_WARNING, "Cannot complete this request, as it is only allowed for the System Administrator.");
 
         final SettingService service = new SettingService(settings, entityManager);
         final SettingRequest request = prepareRequest(SettingRequest.class, MEMBER_1);
@@ -85,7 +82,7 @@ public final class ServiceableTest extends DatabaseSetup {
 
     @Test
     public void testAuthorizationWithInvalidCredentials() {
-        prepareCause(AuthenticationException.class, ReturnCode.AUTHENTICATION_WARNING, "Cannot authenticate the Account from the given Credentials.");
+        prepareCause(ReturnCode.AUTHENTICATION_WARNING, "Cannot authenticate the Account from the given Credentials.");
 
         final FetchCircleService service = new FetchCircleService(settings, entityManager);
         final FetchCircleRequest request = prepareRequest(FetchCircleRequest.class, MEMBER_5);
@@ -97,7 +94,7 @@ public final class ServiceableTest extends DatabaseSetup {
 
     @Test
     public void testAuthorizationWithCredentialTypingMistake() {
-        prepareCause(AuthenticationException.class, ReturnCode.AUTHENTICATION_WARNING, "Cannot authenticate the Account from the given Credentials.");
+        prepareCause(ReturnCode.AUTHENTICATION_WARNING, "Cannot authenticate the Account from the given Credentials.");
 
         final FetchCircleService service = new FetchCircleService(settings, entityManager);
         final FetchCircleRequest request = prepareRequest(FetchCircleRequest.class, MEMBER_5);
@@ -109,7 +106,7 @@ public final class ServiceableTest extends DatabaseSetup {
 
     @Test
     public void testFetchCirclesAsNonExistingMember() {
-        prepareCause(AuthenticationException.class, ReturnCode.AUTHENTICATION_WARNING, "Could not uniquely identify an account for 'member6'.");
+        prepareCause(ReturnCode.AUTHENTICATION_WARNING, "Could not uniquely identify an account for 'member6'.");
 
         final FetchCircleService service = new FetchCircleService(settings, entityManager);
         final FetchCircleRequest request = prepareRequest(FetchCircleRequest.class, "member6");

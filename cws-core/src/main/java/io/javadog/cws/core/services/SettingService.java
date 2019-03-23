@@ -26,6 +26,8 @@ import io.javadog.cws.core.exceptions.CWSException;
 import io.javadog.cws.core.model.CommonDao;
 import io.javadog.cws.core.model.Settings;
 import io.javadog.cws.core.model.entities.SettingEntity;
+
+import javax.persistence.EntityManager;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.EnumSet;
@@ -35,7 +37,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
-import javax.persistence.EntityManager;
 
 /**
  * <p>The Setting Service, allows for checking and updating existing Settings
@@ -57,7 +58,7 @@ import javax.persistence.EntityManager;
  * error will occur.</p>
  *
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 public final class SettingService extends Serviceable<CommonDao, SettingResponse, SettingRequest> {
 
@@ -265,7 +266,7 @@ public final class SettingService extends Serviceable<CommonDao, SettingResponse
         // also have to update the System Administrator account, otherwise
         // the new change will not work correctly.
         if (Objects.equals(key, StandardSetting.CWS_SALT.getKey()) ||
-            Objects.equals(key, StandardSetting.PBE_ITERATIONS.getKey())) {
+                Objects.equals(key, StandardSetting.PBE_ITERATIONS.getKey())) {
             // As the System Administrator is not having any Circles, the
             // newly generated Asymmetric Key for the updated account can be
             // ignored.

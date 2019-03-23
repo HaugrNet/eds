@@ -25,7 +25,6 @@ import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.core.DatabaseSetup;
 import io.javadog.cws.core.enums.KeyAlgorithm;
 import io.javadog.cws.core.enums.StandardSetting;
-import io.javadog.cws.core.exceptions.CWSException;
 import io.javadog.cws.core.exceptions.CryptoException;
 import io.javadog.cws.core.model.Settings;
 import org.junit.Test;
@@ -39,11 +38,10 @@ import java.security.PublicKey;
 import java.util.UUID;
 
 /**
- * Proof Of Concept, showing that the simple Cryptographic Operations will work,
- * and how to build up the simple components.
+ * Testing the simple Cryptographic Operations.
  *
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 public final class CryptoTest extends DatabaseSetup {
 
@@ -92,7 +90,7 @@ public final class CryptoTest extends DatabaseSetup {
     @Test
     public void testPasswordWithWeirdCharacters() {
         final byte[] secret = new byte[256];
-        for (int i = 0; i<256; i++) {
+        for (int i = 0; i < 256; i++) {
             secret[i] = (byte) i;
         }
         final KeyAlgorithm algorithm = KeyAlgorithm.PBE_128;
@@ -336,7 +334,7 @@ public final class CryptoTest extends DatabaseSetup {
         final String garbage = "INVALID_ENCODING";
         mySettings.set(StandardSetting.CWS_CHARSET.getKey(), garbage);
 
-        prepareCause(CWSException.class, ReturnCode.SETTING_ERROR, "java.nio.charset.UnsupportedCharsetException: " + garbage);
+        prepareCause(ReturnCode.SETTING_ERROR, "java.nio.charset.UnsupportedCharsetException: " + garbage);
         assertThat(str, is(not(nullValue())));
         myCrypto.stringToBytes(str);
     }
@@ -350,7 +348,7 @@ public final class CryptoTest extends DatabaseSetup {
         final String garbage = "INVALID_ENCODING";
         mySettings.set(StandardSetting.CWS_CHARSET.getKey(), garbage);
 
-        prepareCause(CWSException.class, ReturnCode.SETTING_ERROR, "UnsupportedCharsetException: " + garbage);
+        prepareCause(ReturnCode.SETTING_ERROR, "UnsupportedCharsetException: " + garbage);
         assertThat(bytes, is(not(nullValue())));
         final String reversed = myCrypto.bytesToString(bytes);
         assertThat(reversed, is(str));
@@ -380,7 +378,7 @@ public final class CryptoTest extends DatabaseSetup {
 
     @Test
     public void testInvalidSymmetricKeyEncryption() throws NoSuchAlgorithmException {
-        prepareCause(CryptoException.class, ReturnCode.CRYPTO_ERROR, "No installed provider supports this key: javax.crypto.spec.SecretKeySpec");
+        prepareCause(ReturnCode.CRYPTO_ERROR, "No installed provider supports this key: javax.crypto.spec.SecretKeySpec");
 
         final SecretCWSKey key = prepareSecretCwsKey();
         final byte[] data = generateData(524288);
@@ -391,7 +389,7 @@ public final class CryptoTest extends DatabaseSetup {
 
     @Test
     public void testInvalidSymmetricKeyDecryption() throws NoSuchAlgorithmException {
-        prepareCause(CryptoException.class, ReturnCode.CRYPTO_ERROR, "No installed provider supports this key: javax.crypto.spec.SecretKeySpec");
+        prepareCause(ReturnCode.CRYPTO_ERROR, "No installed provider supports this key: javax.crypto.spec.SecretKeySpec");
 
         final SecretCWSKey key = prepareSecretCwsKey();
         final byte[] data = generateData(524288);
@@ -408,7 +406,7 @@ public final class CryptoTest extends DatabaseSetup {
         //  OpenJDK  8: io.javadog.cws.core.jce.PublicCWSKey cannot be cast to io.javadog.cws.core.jce.SecretCWSKey
         //  OpenJDK 11: class io.javadog.cws.core.jce.PublicCWSKey cannot be cast to class io.javadog.cws.core.jce.SecretCWSKey (io.javadog.cws.core.jce.PublicCWSKey and io.javadog.cws.core.jce.SecretCWSKey are in unnamed module of loader 'app')
         //  AdoptOpenJDK 11: io.javadog.cws.core.jce.PublicCWSKey incompatible with io.javadog.cws.core.jce.SecretCWSKey
-        prepareCause(CryptoException.class, ReturnCode.CRYPTO_ERROR, "io.javadog.cws.core.jce.PublicCWSKey");
+        prepareCause(ReturnCode.CRYPTO_ERROR, "io.javadog.cws.core.jce.PublicCWSKey");
 
         final CWSKeyPair keyPair = generateKeyPair();
         final byte[] data = generateData(524288);
@@ -425,7 +423,7 @@ public final class CryptoTest extends DatabaseSetup {
         //   OpenJDK  8: io.javadog.cws.core.jce.PrivateCWSKey cannot be cast to io.javadog.cws.core.jce.SecretCWSKey
         //   OpenJDK 11: class io.javadog.cws.core.jce.PrivateCWSKey cannot be cast to class io.javadog.cws.core.jce.SecretCWSKey (io.javadog.cws.core.jce.PrivateCWSKey and io.javadog.cws.core.jce.SecretCWSKey are in unnamed module of loader 'app')
         //   AdoptOpenJDK 11: io.javadog.cws.core.jce.PrivateCWSKey incompatible with io.javadog.cws.core.jce.SecretCWSKey
-        prepareCause(CryptoException.class, ReturnCode.CRYPTO_ERROR, "io.javadog.cws.core.jce.PrivateCWSKey");
+        prepareCause(ReturnCode.CRYPTO_ERROR, "io.javadog.cws.core.jce.PrivateCWSKey");
 
         final CWSKeyPair keyPair = generateKeyPair();
         final byte[] data = generateData(524288);
@@ -436,7 +434,7 @@ public final class CryptoTest extends DatabaseSetup {
 
     @Test
     public void testInvalidDearmoringPublicKey() {
-        prepareCause(CryptoException.class, ReturnCode.CRYPTO_ERROR, "AES KeyFactory not available");
+        prepareCause(ReturnCode.CRYPTO_ERROR, "AES KeyFactory not available");
 
         final Settings mySettings = newSettings();
         final Crypto myCrypto = new Crypto(mySettings);
@@ -450,7 +448,7 @@ public final class CryptoTest extends DatabaseSetup {
 
     @Test
     public void testInvalidDearmoringPrivateKey() {
-        prepareCause(CryptoException.class, ReturnCode.CRYPTO_ERROR, "AES KeyFactory not available");
+        prepareCause(ReturnCode.CRYPTO_ERROR, "AES KeyFactory not available");
 
         final Settings mySettings = newSettings();
         final Crypto myCrypto = new Crypto(mySettings);

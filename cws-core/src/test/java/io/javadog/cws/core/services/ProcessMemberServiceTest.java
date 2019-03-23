@@ -38,23 +38,21 @@ import io.javadog.cws.api.responses.ProcessDataResponse;
 import io.javadog.cws.api.responses.ProcessMemberResponse;
 import io.javadog.cws.core.DatabaseSetup;
 import io.javadog.cws.core.enums.StandardSetting;
-import io.javadog.cws.core.exceptions.AuthenticationException;
-import io.javadog.cws.core.exceptions.CWSException;
-import io.javadog.cws.core.exceptions.CryptoException;
 import io.javadog.cws.core.model.Settings;
+import org.junit.Test;
+
 import java.util.Base64;
 import java.util.UUID;
-import org.junit.Test;
 
 /**
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 public final class ProcessMemberServiceTest extends DatabaseSetup {
 
     @Test
     public void testNullRequest() {
-        prepareCause(CWSException.class, ReturnCode.VERIFICATION_WARNING, "Cannot Process a NULL Object.");
+        prepareCause(ReturnCode.VERIFICATION_WARNING, "Cannot Process a NULL Object.");
 
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
         final ProcessMemberRequest request = null;
@@ -153,7 +151,7 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
 
     @Test
     public void testAddingWithExistingAccountName() {
-        prepareCause(CWSException.class, ReturnCode.IDENTIFICATION_WARNING, "An Account with the requested AccountName already exist.");
+        prepareCause(ReturnCode.IDENTIFICATION_WARNING, "An Account with the requested AccountName already exist.");
 
         final String account = MEMBER_4;
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
@@ -180,7 +178,7 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
 
     @Test
     public void testAlterSelf() {
-        prepareCause(CWSException.class, ReturnCode.ILLEGAL_ACTION, "It is not permitted to alter own account.");
+        prepareCause(ReturnCode.ILLEGAL_ACTION, "It is not permitted to alter own account.");
 
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
         final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
@@ -194,7 +192,7 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
 
     @Test
     public void testAlterAccountAsMember() {
-        prepareCause(CWSException.class, ReturnCode.AUTHORIZATION_WARNING, "Only Administrators may update the Role of a member.");
+        prepareCause(ReturnCode.AUTHORIZATION_WARNING, "Only Administrators may update the Role of a member.");
 
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
         final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, MEMBER_3);
@@ -222,7 +220,7 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
 
     @Test
     public void testProcessSelfPasswordUpdateWithSession() {
-        prepareCause(CWSException.class, ReturnCode.VERIFICATION_WARNING, "It is only permitted to update the credentials when authenticating with Passphrase.");
+        prepareCause(ReturnCode.VERIFICATION_WARNING, "It is only permitted to update the credentials when authenticating with Passphrase.");
 
         final String session = UUID.randomUUID().toString();
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
@@ -312,7 +310,7 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
 
     @Test
     public void testInvitationWithInvalidSignature2() {
-        prepareCause(CryptoException.class, ReturnCode.CRYPTO_ERROR, "Signature length not correct: got 36 but was expecting 256");
+        prepareCause(ReturnCode.CRYPTO_ERROR, "Signature length not correct: got 36 but was expecting 256");
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
         final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
         request.setAction(Action.INVITE);
@@ -407,7 +405,7 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
 
     @Test
     public void testLogoutMissingSession() {
-        prepareCause(AuthenticationException.class, "No Session could be found.");
+        prepareCause(ReturnCode.AUTHENTICATION_WARNING, "No Session could be found.");
 
         final String sessionKey = UUID.randomUUID().toString();
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
@@ -419,7 +417,7 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
 
     @Test
     public void testLogoutExpiredSession() {
-        prepareCause(AuthenticationException.class, "The Session has expired.");
+        prepareCause(ReturnCode.AUTHENTICATION_WARNING, "The Session has expired.");
 
         final Settings mySettings = newSettings();
         mySettings.set(StandardSetting.SESSION_TIMEOUT.getKey(), "-1");
@@ -449,7 +447,7 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
 
     @Test
     public void testProcessSelfChangeAccountNameToExisting() {
-        prepareCause(CWSException.class, ReturnCode.CONSTRAINT_ERROR, "The new Account Name already exists.");
+        prepareCause(ReturnCode.CONSTRAINT_ERROR, "The new Account Name already exists.");
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
         final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, MEMBER_1);
         request.setAction(Action.UPDATE);
@@ -495,7 +493,7 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
         // Note, that the default error message between Java 8 & Java 11 has changed.
         //   Java  8: Decryption error
         //   Java 11: Message is larger than modulus
-        prepareCause(CryptoException.class, ReturnCode.CRYPTO_ERROR, "");
+        prepareCause(ReturnCode.CRYPTO_ERROR, "");
 
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
         final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, MEMBER_4);
@@ -535,27 +533,29 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
 
     @Test
     public void testDeleteMemberAsMember() {
+        prepareCause(ReturnCode.ILLEGAL_ACTION, "Members are not permitted to delete Accounts.");
+
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
         final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, MEMBER_5);
         request.setAction(Action.DELETE);
         request.setMemberId(MEMBER_3_ID);
+        assertThat(request.validate().isEmpty(), is(true));
 
-        final ProcessMemberResponse response = service.perform(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.ILLEGAL_ACTION.getCode()));
-        assertThat(response.getReturnMessage(), is("Members are not permitted to delete Accounts."));
+        service.perform(request);
     }
 
     @Test
     public void testDeleteUnknownAccount() {
+        prepareCause(ReturnCode.IDENTIFICATION_WARNING, "No such Account exist.");
+
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
         final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
         request.setAction(Action.DELETE);
         // Random MemberId, should not exist!
         request.setMemberId(UUID.randomUUID().toString());
+        assertThat(request.validate().isEmpty(), is(true));
 
-        final ProcessMemberResponse response = service.perform(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.IDENTIFICATION_ERROR.getCode()));
-        assertThat(response.getReturnMessage(), is("No such Account exist."));
+        service.perform(request);
     }
 
     @Test
@@ -571,14 +571,15 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
 
     @Test
     public void testDeleteAdmin() {
+        prepareCause(ReturnCode.ILLEGAL_ACTION, "It is not permitted to delete yourself.");
+
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
         final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
         request.setAction(Action.DELETE);
         request.setMemberId(ADMIN_ID);
+        assertThat(request.validate().isEmpty(), is(true));
 
-        final ProcessMemberResponse response = service.perform(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.IDENTIFICATION_ERROR.getCode()));
-        assertThat(response.getReturnMessage(), is("It is not permitted to delete yourself."));
+        service.perform(request);
     }
 
     // =========================================================================

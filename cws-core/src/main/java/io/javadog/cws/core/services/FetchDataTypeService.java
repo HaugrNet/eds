@@ -23,17 +23,18 @@ import io.javadog.cws.core.enums.Permission;
 import io.javadog.cws.core.model.CommonDao;
 import io.javadog.cws.core.model.Settings;
 import io.javadog.cws.core.model.entities.DataTypeEntity;
+
+import javax.persistence.EntityManager;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import javax.persistence.EntityManager;
 
 /**
  * Data Types is the basis for all shared information, as it either provides
  * the MIMEType of Files or Data Information for Objects shared.
  *
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 public final class FetchDataTypeService extends Serviceable<CommonDao, FetchDataTypeResponse, FetchDataTypeRequest> {
 

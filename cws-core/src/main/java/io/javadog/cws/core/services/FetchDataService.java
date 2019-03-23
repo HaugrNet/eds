@@ -24,22 +24,24 @@ import io.javadog.cws.api.requests.FetchDataRequest;
 import io.javadog.cws.api.responses.FetchDataResponse;
 import io.javadog.cws.core.enums.Permission;
 import io.javadog.cws.core.enums.SanityStatus;
+import io.javadog.cws.core.exceptions.CWSException;
 import io.javadog.cws.core.model.DataDao;
 import io.javadog.cws.core.model.Settings;
 import io.javadog.cws.core.model.entities.DataEntity;
 import io.javadog.cws.core.model.entities.DataTypeEntity;
 import io.javadog.cws.core.model.entities.MetadataEntity;
+
+import javax.persistence.EntityManager;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import javax.persistence.EntityManager;
 
 /**
  * <p>Business Logic implementation for the CWS FetchData request.</p>
  *
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 public final class FetchDataService extends Serviceable<DataDao, FetchDataResponse, FetchDataRequest> {
 
@@ -62,22 +64,23 @@ public final class FetchDataService extends Serviceable<DataDao, FetchDataRespon
         // Object it should be compared against is first read out - since this
         // will help overriding the proxying.
         //   See: https://github.com/JavaDogs/cws/issues/45
-        final DataTypeEntity folder = dao.findDataTypeByName(Constants.FOLDER_TYPENAME);
         final MetadataEntity root = findRootMetadata(request);
+
+        if (root == null) {
+            throw new CWSException(ReturnCode.IDENTIFICATION_WARNING, "No information could be found for the given Id.");
+        }
+
+        final DataTypeEntity folder = dao.findDataTypeByName(Constants.FOLDER_TYPENAME);
         final FetchDataResponse response;
 
-        if (root != null) {
-            if (Objects.equals(folder, root.getType())) {
-                final int pageNumber = request.getPageNumber();
-                final int pageSize = request.getPageSize();
-                final List<MetadataEntity> found = dao.findMetadataByMemberAndFolder(member, root.getId(), pageNumber, pageSize);
-                final long count = dao.countFolderContent(root.getId());
-                response = prepareResponse(root.getExternalId(), found, count);
-            } else {
-                response = readCompleteDataObject(root);
-            }
+        if (Objects.equals(folder, root.getType())) {
+            final int pageNumber = request.getPageNumber();
+            final int pageSize = request.getPageSize();
+            final List<MetadataEntity> found = dao.findMetadataByMemberAndFolder(member, root.getId(), pageNumber, pageSize);
+            final long count = dao.countFolderContent(root.getId());
+            response = prepareResponse(root.getExternalId(), found, count);
         } else {
-            response = new FetchDataResponse(ReturnCode.IDENTIFICATION_WARNING, "No information could be found for the given Id.");
+            response = readCompleteDataObject(root);
         }
 
         return response;
@@ -138,6 +141,8 @@ public final class FetchDataService extends Serviceable<DataDao, FetchDataRespon
                 // invalid, and return the error.
                 entity.setSanityStatus(SanityStatus.FAILED);
 
+                // Note, no Exception is thrown here, since the DB changes have
+                // not yet been completed.
                 response.setReturnCode(ReturnCode.INTEGRITY_ERROR);
                 response.setReturnMessage("The Encrypted Data Checksum is invalid, the data appears to have been corrupted.");
             }

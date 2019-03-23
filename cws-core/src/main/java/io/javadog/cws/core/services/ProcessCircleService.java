@@ -25,7 +25,9 @@ import io.javadog.cws.api.responses.ProcessCircleResponse;
 import io.javadog.cws.core.enums.KeyAlgorithm;
 import io.javadog.cws.core.enums.Permission;
 import io.javadog.cws.core.enums.Status;
+import io.javadog.cws.core.exceptions.AuthorizationException;
 import io.javadog.cws.core.exceptions.CWSException;
+import io.javadog.cws.core.exceptions.IllegalActionException;
 import io.javadog.cws.core.jce.PublicCWSKey;
 import io.javadog.cws.core.jce.SecretCWSKey;
 import io.javadog.cws.core.model.CommonDao;
@@ -80,10 +82,10 @@ public final class ProcessCircleService extends Serviceable<CommonDao, ProcessCi
                         break;
                     default:
                         // Unreachable Code by design.
-                        throw new CWSException(ReturnCode.ILLEGAL_ACTION, "Unsupported Action.");
+                        throw new IllegalActionException("Unsupported Action.");
                 }
             } else {
-                response = new ProcessCircleResponse(ReturnCode.AUTHORIZATION_WARNING, "Only a Circle Administrator may perform this action.");
+                throw new AuthorizationException("Only a Circle Administrator may perform this action.");
             }
         }
 
@@ -103,24 +105,24 @@ public final class ProcessCircleService extends Serviceable<CommonDao, ProcessCi
      * @return Response from the creation.
      */
     private ProcessCircleResponse createCircle(final ProcessCircleRequest request) {
-        final ProcessCircleResponse response;
-
         final String name = trim(request.getCircleName());
         final CircleEntity existing = dao.findCircleByName(name);
+
         if (existing != null) {
-            response = new ProcessCircleResponse(ReturnCode.IDENTIFICATION_WARNING, "A Circle with the requested name already exists.");
-        } else {
-            final String memberId = request.getMemberId();
-            if ((memberId != null) && (member.getMemberRole() == MemberRole.ADMIN)) {
-                final MemberEntity owner = dao.find(MemberEntity.class, memberId);
-                if (owner == null) {
-                    response = new ProcessCircleResponse(ReturnCode.IDENTIFICATION_WARNING, "Cannot create a new Circle with a non-existing Circle Administrator.");
-                } else {
-                    response = createCircle(owner, name, request.getCircleKey());
-                }
-            } else {
-                response = createCircle(member, name, request.getCircleKey());
+            throw new CWSException(ReturnCode.IDENTIFICATION_WARNING,  "A Circle with the requested name already exists.");
+        }
+
+        final String memberId = request.getMemberId();
+        final ProcessCircleResponse response;
+
+        if ((memberId != null) && (member.getMemberRole() == MemberRole.ADMIN)) {
+            final MemberEntity owner = dao.find(MemberEntity.class, memberId);
+            if (owner == null) {
+                throw new CWSException(ReturnCode.IDENTIFICATION_WARNING, "Cannot create a new Circle with a non-existing Circle Administrator.");
             }
+            response = createCircle(owner, name, request.getCircleKey());
+        } else {
+            response = createCircle(member, name, request.getCircleKey());
         }
 
         return response;
@@ -194,20 +196,15 @@ public final class ProcessCircleService extends Serviceable<CommonDao, ProcessCi
      */
     private ProcessCircleResponse updateCircle(final ProcessCircleRequest request) {
         final String externalId = request.getCircleId();
-        final ProcessCircleResponse response;
 
         final CircleEntity entity = dao.find(CircleEntity.class, externalId);
+        throwIdentificationWarningIfNoCircle(entity);
 
-        if (entity != null) {
-            entity.setCircleKey(updateExternalCircleKey(request.getCircleKey()));
-            response = checkAndUpdateCircleName(entity, trim(request.getCircleName()));
+        entity.setCircleKey(updateExternalCircleKey(request.getCircleKey()));
+        checkAndUpdateCircleName(entity, request.getCircleName());
+        dao.persist(entity);
 
-            dao.persist(entity);
-        } else {
-            response = new ProcessCircleResponse(ReturnCode.IDENTIFICATION_WARNING, "No Circle could be found with the given Id.");
-        }
-
-        return response;
+        return new ProcessCircleResponse();
     }
 
     private byte[] updateExternalCircleKey(final String externalKey) {
@@ -222,19 +219,17 @@ public final class ProcessCircleService extends Serviceable<CommonDao, ProcessCi
         return encryptedKey;
     }
 
-    private ProcessCircleResponse checkAndUpdateCircleName(final CircleEntity entity, final String name) {
-        ProcessCircleResponse response = new ProcessCircleResponse();
+    private void checkAndUpdateCircleName(final CircleEntity entity, final String name) {
+        final String trimmedNamed = trim(name);
 
-        if (!isEmpty(name) && !Objects.equals(entity.getName(), name)) {
-            final CircleEntity existing = dao.findCircleByName(name);
-            if (existing == null) {
-                entity.setName(name);
-            } else {
-                response = new ProcessCircleResponse(ReturnCode.IDENTIFICATION_WARNING, "A Circle with the requested name already exists.");
+        if (!isEmpty(trimmedNamed) && !Objects.equals(entity.getName(), trimmedNamed)) {
+            final CircleEntity existing = dao.findCircleByName(trimmedNamed);
+            if (existing != null) {
+                throw new CWSException(ReturnCode.IDENTIFICATION_WARNING, "A Circle with the requested name already exists.");
             }
-        }
 
-        return response;
+            entity.setName(trimmedNamed);
+        }
     }
 
     /**
@@ -248,22 +243,21 @@ public final class ProcessCircleService extends Serviceable<CommonDao, ProcessCi
      * @return Response Object with error information
      */
     private ProcessCircleResponse deleteCircle(final ProcessCircleRequest request) {
-        final ProcessCircleResponse response;
-
-        if (member.getMemberRole() == MemberRole.ADMIN) {
-            final String externalId = request.getCircleId();
-            final CircleEntity entity = dao.find(CircleEntity.class, externalId);
-            if (entity != null) {
-                dao.delete(entity);
-
-                response = new ProcessCircleResponse();
-            } else {
-                response = new ProcessCircleResponse(ReturnCode.IDENTIFICATION_WARNING, "No Circle could be found with the given Id.");
-            }
-        } else {
-            response = new ProcessCircleResponse(ReturnCode.AUTHORIZATION_WARNING, "Only the System Administrator may delete a Circle.");
+        if (member.getMemberRole() != MemberRole.ADMIN) {
+            throw new AuthorizationException("Only the System Administrator may delete a Circle.");
         }
 
-        return response;
+        final String externalId = request.getCircleId();
+        final CircleEntity entity = dao.find(CircleEntity.class, externalId);
+        throwIdentificationWarningIfNoCircle(entity);
+        dao.delete(entity);
+
+        return new ProcessCircleResponse();
+    }
+
+    private static void throwIdentificationWarningIfNoCircle(final Object obj) {
+        if (obj == null) {
+            throw new CWSException(ReturnCode.IDENTIFICATION_WARNING, "No Circle could be found with the given Id.");
+        }
     }
 }

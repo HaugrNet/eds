@@ -31,24 +31,20 @@ import io.javadog.cws.api.responses.FetchDataTypeResponse;
 import io.javadog.cws.api.responses.ProcessDataResponse;
 import io.javadog.cws.api.responses.ProcessDataTypeResponse;
 import io.javadog.cws.core.DatabaseSetup;
-import io.javadog.cws.core.exceptions.AuthorizationException;
-import io.javadog.cws.core.exceptions.CWSException;
-import io.javadog.cws.core.exceptions.VerificationException;
 import org.junit.Test;
 
 /**
  * <p>Common test class for the Process & Fetch DataType Services.</p>
  *
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 public final class DataTypeServiceTest extends DatabaseSetup {
 
     @Test
     public void testEmptyFetchRequest() {
-        prepareCause(VerificationException.class, ReturnCode.VERIFICATION_WARNING,
-                "Request Object contained errors:" +
-                        "\nKey: credential, Error: The Session (Credential) is missing.");
+        prepareCause(ReturnCode.VERIFICATION_WARNING, "Request Object contained errors:" +
+                "\nKey: credential, Error: The Session (Credential) is missing.");
 
         final FetchDataTypeService service = new FetchDataTypeService(settings, entityManager);
         final FetchDataTypeRequest request = new FetchDataTypeRequest();
@@ -59,11 +55,10 @@ public final class DataTypeServiceTest extends DatabaseSetup {
 
     @Test
     public void testEmptyProcessRequest() {
-        prepareCause(VerificationException.class, ReturnCode.VERIFICATION_WARNING,
-                "Request Object contained errors:" +
-                        "\nKey: credential, Error: The Session (Credential) is missing." +
-                        "\nKey: typeName, Error: The name of the DataType is missing or invalid." +
-                        "\nKey: type, Error: The type of the DataType is missing or invalid.");
+        prepareCause(ReturnCode.VERIFICATION_WARNING, "Request Object contained errors:" +
+                "\nKey: credential, Error: The Session (Credential) is missing." +
+                "\nKey: typeName, Error: The name of the DataType is missing or invalid." +
+                "\nKey: type, Error: The type of the DataType is missing or invalid.");
 
         final ProcessDataTypeService service = new ProcessDataTypeService(settings, entityManager);
         final ProcessDataTypeRequest request = new ProcessDataTypeRequest();
@@ -91,10 +86,9 @@ public final class DataTypeServiceTest extends DatabaseSetup {
 
     @Test
     public void testInvokeWithoutAnything() {
-        prepareCause(VerificationException.class, ReturnCode.VERIFICATION_WARNING,
-                "Request Object contained errors:" +
-                        "\nKey: typeName, Error: The name of the DataType is missing or invalid." +
-                        "\nKey: type, Error: The type of the DataType is missing or invalid.");
+        prepareCause(ReturnCode.VERIFICATION_WARNING, "Request Object contained errors:" +
+                "\nKey: typeName, Error: The name of the DataType is missing or invalid." +
+                "\nKey: type, Error: The type of the DataType is missing or invalid.");
 
         final ProcessDataTypeService service = new ProcessDataTypeService(settings, entityManager);
         final ProcessDataTypeRequest request = prepareRequest(ProcessDataTypeRequest.class, Constants.ADMIN_ACCOUNT);
@@ -120,8 +114,7 @@ public final class DataTypeServiceTest extends DatabaseSetup {
 
     @Test
     public void testNotAuthorizedRequest() {
-        prepareCause(AuthorizationException.class, ReturnCode.AUTHORIZATION_WARNING,
-                "The requesting Account is not permitted to Process Data Type.");
+        prepareCause(ReturnCode.AUTHORIZATION_WARNING, "The requesting Account is not permitted to Process Data Type.");
 
         final ProcessDataTypeService service = new ProcessDataTypeService(settings, entityManager);
         final ProcessDataTypeRequest request = prepareRequest(ProcessDataTypeRequest.class, MEMBER_5);
@@ -135,8 +128,7 @@ public final class DataTypeServiceTest extends DatabaseSetup {
 
     @Test
     public void testUpdateRestrictedDataTypeFolder() {
-        prepareCause(AuthorizationException.class, ReturnCode.AUTHORIZATION_WARNING,
-                "It is not permitted to update the DataType '" + Constants.FOLDER_TYPENAME + "'.");
+        prepareCause(ReturnCode.AUTHORIZATION_WARNING, "It is not permitted to update the DataType '" + Constants.FOLDER_TYPENAME + "'.");
 
         final ProcessDataTypeService service = new ProcessDataTypeService(settings, entityManager);
         final ProcessDataTypeRequest request = prepareRequest(ProcessDataTypeRequest.class, Constants.ADMIN_ACCOUNT);
@@ -150,8 +142,7 @@ public final class DataTypeServiceTest extends DatabaseSetup {
 
     @Test
     public void testUpdateRestrictedDataTypeData() {
-        prepareCause(AuthorizationException.class, ReturnCode.AUTHORIZATION_WARNING,
-                "It is not permitted to update the DataType '" + Constants.DATA_TYPENAME + "'.");
+        prepareCause(ReturnCode.AUTHORIZATION_WARNING, "It is not permitted to update the DataType '" + Constants.DATA_TYPENAME + "'.");
 
         final ProcessDataTypeService service = new ProcessDataTypeService(settings, entityManager);
         final ProcessDataTypeRequest request = prepareRequest(ProcessDataTypeRequest.class, Constants.ADMIN_ACCOUNT);
@@ -191,7 +182,7 @@ public final class DataTypeServiceTest extends DatabaseSetup {
 
     @Test
     public void testCreateAndDeleteUsedDataType() {
-        prepareCause(CWSException.class, ReturnCode.ILLEGAL_ACTION, "The Data Type 'text' cannot be deleted, as it is being actively used.");
+        prepareCause(ReturnCode.ILLEGAL_ACTION, "The Data Type 'text' cannot be deleted, as it is being actively used.");
 
         final ProcessDataTypeService service = new ProcessDataTypeService(settings, entityManager);
         final ProcessDataService dataService = new ProcessDataService(settings, entityManager);

@@ -26,6 +26,7 @@ import io.javadog.cws.core.enums.KeyAlgorithm;
 import io.javadog.cws.core.enums.Permission;
 import io.javadog.cws.core.enums.SanityStatus;
 import io.javadog.cws.core.exceptions.CWSException;
+import io.javadog.cws.core.exceptions.IllegalActionException;
 import io.javadog.cws.core.jce.IVSalt;
 import io.javadog.cws.core.jce.SecretCWSKey;
 import io.javadog.cws.core.model.DataDao;
@@ -35,12 +36,13 @@ import io.javadog.cws.core.model.entities.DataTypeEntity;
 import io.javadog.cws.core.model.entities.KeyEntity;
 import io.javadog.cws.core.model.entities.MetadataEntity;
 import io.javadog.cws.core.model.entities.TrusteeEntity;
+
+import javax.persistence.EntityManager;
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
-import javax.persistence.EntityManager;
 
 /**
  * <p>Business Logic implementation for the CWS ProcessData request.</p>
@@ -86,67 +88,56 @@ public final class ProcessDataService extends Serviceable<DataDao, ProcessDataRe
                 break;
             default:
                 // Unreachable Code by design.
-                throw new CWSException(ReturnCode.ILLEGAL_ACTION, "Unsupported Action.");
+                throw new IllegalActionException("Unsupported Action.");
         }
 
         return response;
     }
 
     private ProcessDataResponse processAddData(final ProcessDataRequest request) {
-        final DataTypeEntity type = findDataType(request.getTypeName());
         final MetadataEntity parent = findParent(request.getCircleId(), request.getFolderId());
         final MetadataEntity existingName = dao.findInFolder(member, parent.getId(), request.getDataName());
+
+        if (existingName != null) {
+            throw new CWSException(ReturnCode.IDENTIFICATION_WARNING, "Another record with the same name already exists.");
+        }
+
+        final TrusteeEntity trustee = findTrustee(request.getCircleId());
+        final DataTypeEntity type = findDataType(request.getTypeName());
+        final byte[] bytes = request.getData();
         final ProcessDataResponse response;
 
-        if (existingName == null) {
-            final TrusteeEntity trustee = findTrustee(request.getCircleId());
-            final byte[] bytes = request.getData();
-
-            if (Objects.equals(Constants.FOLDER_TYPENAME, type.getName())) {
-                response = createFolder(trustee, request);
-            } else {
-                final MetadataEntity metadataEntity = createMetadata(trustee, request.getDataName(), parent.getId(), type);
-                if (bytes != null) {
-                    createDataEntity(trustee, metadataEntity, bytes);
-                }
-
-                response = buildProcessDataResponse(metadataEntity.getExternalId());
-            }
+        if (Objects.equals(Constants.FOLDER_TYPENAME, type.getName())) {
+            response = createFolder(trustee, request);
         } else {
-            response = new ProcessDataResponse(ReturnCode.IDENTIFICATION_WARNING, "Another record with the same name already exists.");
+            final MetadataEntity metadataEntity = createMetadata(trustee, request.getDataName(), parent.getId(), type);
+            if (bytes != null) {
+                createDataEntity(trustee, metadataEntity, bytes);
+            }
+
+            response = buildProcessDataResponse(metadataEntity.getExternalId());
         }
 
         return response;
     }
 
     private ProcessDataResponse processUpdateData(final ProcessDataRequest request) {
-        final MetadataEntity entity = dao.findMetaDataByMemberAndExternalId(member.getId(), request.getDataId());
-        final ProcessDataResponse response;
+        final MetadataEntity entity = findMetadataAndTrustee(request);
 
-        if (entity != null) {
-            // Now, check if the member account is allowed to perform the requested
-            // action. If not allowed, then an Exception is thrown.
-            findTrustee(entity.getCircle().getExternalId());
-
-            // First, let's identify the folder, we're not updating it yet, only
-            // after the name has also been checked.
-            Long folderId = entity.getParentId();
-            if (request.getFolderId() != null) {
-                final MetadataEntity folder = checkFolder(entity, request.getFolderId());
-                folderId = folder.getId();
-            }
-
-            entity.setName(checkName(entity, request.getDataName(), folderId));
-            checkData(entity, request.getData());
-            entity.setParentId(folderId);
-            dao.persist(entity);
-
-            response = buildProcessDataResponse(entity.getExternalId());
-        } else {
-            response = new ProcessDataResponse(ReturnCode.IDENTIFICATION_WARNING, "The requested Data Object could not be found.");
+        // First, let's identify the folder, we're not updating it yet, only
+        // after the name has also been checked.
+        Long folderId = entity.getParentId();
+        if (request.getFolderId() != null) {
+            final MetadataEntity folder = checkFolder(entity, request.getFolderId());
+            folderId = folder.getId();
         }
 
-        return response;
+        entity.setName(checkName(entity, request.getDataName(), folderId));
+        checkData(entity, request.getData());
+        entity.setParentId(folderId);
+        dao.persist(entity);
+
+        return buildProcessDataResponse(entity.getExternalId());
     }
 
     private ProcessDataResponse processCopyData(final ProcessDataRequest request) {
@@ -173,38 +164,39 @@ public final class ProcessDataService extends Serviceable<DataDao, ProcessDataRe
         return response;
     }
 
-    private ProcessDataResponse processDeleteData(final ProcessDataRequest request) {
+    private MetadataEntity findMetadataAndTrustee(final ProcessDataRequest request) {
         final MetadataEntity entity = dao.findMetaDataByMemberAndExternalId(member.getId(), request.getDataId());
-        final ProcessDataResponse response;
 
-        if (entity != null) {
-            // Now, check if the member account is allowed to perform the requested
-            // action. If not allowed, then an Exception is thrown.
-            findTrustee(entity.getCircle().getExternalId());
-
-            if (Objects.equals(Constants.FOLDER_TYPENAME, entity.getType().getName())) {
-                // If the Entity is a Folder, then we must check if it
-                // currently has content, if so - then we cannot delete it.
-                final long count = dao.countFolderContent(entity.getId());
-                if (count > 0) {
-                    response = new ProcessDataResponse(ReturnCode.INTEGRITY_WARNING, "The requested Folder cannot be removed as it is not empty.");
-                } else {
-                    dao.delete(entity);
-                    response = new ProcessDataResponse();
-                }
-            } else {
-                dao.delete(entity);
-                response = new ProcessDataResponse();
-            }
-        } else {
-            response = new ProcessDataResponse(ReturnCode.IDENTIFICATION_WARNING, "The requested Data Object could not be found.");
+        if (entity == null) {
+            throw new CWSException(ReturnCode.IDENTIFICATION_WARNING, "The requested Data Object could not be found.");
         }
 
-        return response;
+        // Now, check if the member account is allowed to perform the requested
+        // action. If not allowed, then an Exception is thrown.
+        findTrustee(entity.getCircle().getExternalId());
+
+        return entity;
+    }
+
+    private ProcessDataResponse processDeleteData(final ProcessDataRequest request) {
+        final MetadataEntity entity = findMetadataAndTrustee(request);
+
+        if (Objects.equals(Constants.FOLDER_TYPENAME, entity.getType().getName())) {
+            // If the Entity is a Folder, then we must check if it
+            // currently has content, if so - then we cannot delete it.
+            final long count = dao.countFolderContent(entity.getId());
+            if (count > 0) {
+                throw new CWSException(ReturnCode.INTEGRITY_WARNING, "The requested Folder cannot be removed as it is not empty.");
+            }
+        }
+
+        dao.delete(entity);
+        return new ProcessDataResponse();
     }
 
     private TrusteeEntity findTargetTrustee(final String externalCircleId) {
         final TrusteeEntity trustee = dao.findTrusteeByCircleAndMember(externalCircleId, member.getExternalId());
+
         if (trustee == null) {
             throw new CWSException(ReturnCode.IDENTIFICATION_WARNING, "The member has no trustee relationship with the target Circle '" + externalCircleId + "'.");
         }
@@ -341,10 +333,10 @@ public final class ProcessDataService extends Serviceable<DataDao, ProcessDataRe
 
             if (Objects.equals(currentCircleId, foundCircleId)) {
                 if (Objects.equals(Constants.FOLDER_TYPENAME, entity.getType().getName())) {
-                    throw new CWSException(ReturnCode.ILLEGAL_ACTION, "It is not permitted to move Folders.");
+                    throw new IllegalActionException("It is not permitted to move Folders.");
                 }
             } else {
-                throw new CWSException(ReturnCode.ILLEGAL_ACTION, "Moving Data from one Circle to another is not permitted.");
+                throw new IllegalActionException("Moving Data from one Circle to another is not permitted.");
             }
         } else {
             throw new CWSException(ReturnCode.INTEGRITY_WARNING, "No existing Folder could be found.");

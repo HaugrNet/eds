@@ -59,9 +59,8 @@ public class ReturnCodeTest {
         runAssertions(ReturnCode.CRYPTO_ERROR, 591, 500, CLASS_ERROR, "Cryptographic Error occurred during the handling of the request.");
         runAssertions(ReturnCode.INTEGRITY_ERROR, 592, 500, CLASS_ERROR, "The Encrypted Data is having integrity problems.");
         runAssertions(ReturnCode.SETTING_ERROR, 593, 500, CLASS_ERROR, "Error extracting settings value.");
-        runAssertions(ReturnCode.IDENTIFICATION_ERROR, 594, 500, CLASS_ERROR, "Not possible to positively identify the Requested Data.");
-        runAssertions(ReturnCode.DATABASE_ERROR, 595, 500, CLASS_ERROR, "Database Error occurred during the handling of the request.");
-        runAssertions(ReturnCode.CONSTRAINT_ERROR, 596, 500, CLASS_ERROR, "Unique Constraint Violation in the Database.");
+        runAssertions(ReturnCode.DATABASE_ERROR, 594, 500, CLASS_ERROR, "Database Error occurred during the handling of the request.");
+        runAssertions(ReturnCode.CONSTRAINT_ERROR, 595, 500, CLASS_ERROR, "Unique Constraint Violation in the Database.");
 
         // Checking that findReturnCode of a non-existing returnCode value will
         // result in a general error.

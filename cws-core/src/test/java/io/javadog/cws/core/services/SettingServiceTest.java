@@ -27,14 +27,13 @@ import io.javadog.cws.api.responses.SettingResponse;
 import io.javadog.cws.core.DatabaseSetup;
 import io.javadog.cws.core.enums.KeyAlgorithm;
 import io.javadog.cws.core.enums.StandardSetting;
-import io.javadog.cws.core.exceptions.AuthorizationException;
-import io.javadog.cws.core.exceptions.CWSException;
 import io.javadog.cws.core.model.entities.MemberEntity;
+import org.junit.Test;
+
+import javax.persistence.Query;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.persistence.Query;
-import org.junit.Test;
 
 /**
  * <p>This Test Class, is testing the following Service Classes in one, as they
@@ -45,7 +44,7 @@ import org.junit.Test;
  * </ul>
  *
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 public final class SettingServiceTest extends DatabaseSetup {
 
@@ -72,8 +71,7 @@ public final class SettingServiceTest extends DatabaseSetup {
 
     @Test
     public void testNonAdminRequest() {
-        prepareCause(AuthorizationException.class, ReturnCode.AUTHORIZATION_WARNING,
-                "Cannot complete this request, as it is only allowed for the System Administrator.");
+        prepareCause(ReturnCode.AUTHORIZATION_WARNING, "Cannot complete this request, as it is only allowed for the System Administrator.");
 
         final SettingService service = new SettingService(newSettings(), entityManager);
         final SettingRequest request = prepareRequest(SettingRequest.class, MEMBER_1);
@@ -108,7 +106,7 @@ public final class SettingServiceTest extends DatabaseSetup {
 
     @Test
     public void testInvokingRequestWithNullKey() {
-        prepareCause(CWSException.class, ReturnCode.SETTING_WARNING, "Setting Keys may neither be null nor empty.");
+        prepareCause(ReturnCode.SETTING_WARNING, "Setting Keys may neither be null nor empty.");
         final SettingService service = new SettingService(newSettings(), entityManager);
         final SettingRequest request = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
         final Map<String, String> mySettings = new HashMap<>();
@@ -121,7 +119,7 @@ public final class SettingServiceTest extends DatabaseSetup {
 
     @Test
     public void testInvokingRequestWithEmptyKey() {
-        prepareCause(CWSException.class, ReturnCode.SETTING_WARNING, "Setting Keys may neither be null nor empty.");
+        prepareCause(ReturnCode.SETTING_WARNING, "Setting Keys may neither be null nor empty.");
         final SettingService service = new SettingService(newSettings(), entityManager);
         final SettingRequest request = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
         final Map<String, String> mySettings = new HashMap<>();
@@ -147,7 +145,7 @@ public final class SettingServiceTest extends DatabaseSetup {
             dao.delete(member);
         }
 
-        prepareCause(CWSException.class, ReturnCode.SETTING_WARNING, "Invalid Integer value for 'PBE_ITERATIONS'.");
+        prepareCause(ReturnCode.SETTING_WARNING, "Invalid Integer value for 'PBE_ITERATIONS'.");
 
         final SettingService service = new SettingService(newSettings(), entityManager);
         final SettingRequest request = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
@@ -219,7 +217,7 @@ public final class SettingServiceTest extends DatabaseSetup {
 
     @Test
     public void testInvokingRequestUpdateNotAllowedExistingSetting() {
-        prepareCause(CWSException.class, ReturnCode.SETTING_WARNING, "The setting cws.system.salt may not be overwritten.");
+        prepareCause(ReturnCode.SETTING_WARNING, "The setting cws.system.salt may not be overwritten.");
         final SettingService service = new SettingService(newSettings(), entityManager);
         final SettingRequest request = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
         final Map<String, String> mySettings = new HashMap<>();
@@ -268,7 +266,7 @@ public final class SettingServiceTest extends DatabaseSetup {
 
     @Test
     public void testDeletingStandardSetting() {
-        prepareCause(CWSException.class, ReturnCode.SETTING_WARNING, "The value for the key 'cws.system.charset' is undefined.");
+        prepareCause(ReturnCode.SETTING_WARNING, "The value for the key 'cws.system.charset' is undefined.");
         final SettingService service = new SettingService(newSettings(), entityManager);
         final SettingRequest request = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
         final Map<String, String> mySettings = new HashMap<>();
@@ -301,7 +299,7 @@ public final class SettingServiceTest extends DatabaseSetup {
 
     @Test
     public void testSetInvalidSymmetricAlgorithm() {
-        prepareCause(CWSException.class, ReturnCode.SETTING_WARNING, "Unsupported Crypto Algorithm for 'cws.crypto.symmetric.algorithm'.");
+        prepareCause(ReturnCode.SETTING_WARNING, "Unsupported Crypto Algorithm for 'cws.crypto.symmetric.algorithm'.");
         final SettingService service = new SettingService(newSettings(), entityManager);
         final SettingRequest request1 = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
         final SettingResponse response1 = service.perform(request1);
@@ -317,7 +315,7 @@ public final class SettingServiceTest extends DatabaseSetup {
 
     @Test
     public void testInvalidCharset() {
-        prepareCause(CWSException.class, ReturnCode.SETTING_WARNING, "Invalid Character set value for 'cws.system.charset'.");
+        prepareCause(ReturnCode.SETTING_WARNING, "Invalid Character set value for 'cws.system.charset'.");
         final SettingService service = new SettingService(newSettings(), entityManager);
         final SettingRequest request = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
         final Map<String, String> newSettings = new HashMap<>();
@@ -330,7 +328,7 @@ public final class SettingServiceTest extends DatabaseSetup {
 
     @Test
     public void testSanityInterval() {
-        prepareCause(CWSException.class, ReturnCode.SETTING_WARNING, "Invalid Integer value for 'SANITY_INTERVAL'.");
+        prepareCause(ReturnCode.SETTING_WARNING, "Invalid Integer value for 'SANITY_INTERVAL'.");
         final SettingService service = new SettingService(newSettings(), entityManager);
         final SettingRequest request1 = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
         final SettingResponse response1 = service.perform(request1);
@@ -354,7 +352,7 @@ public final class SettingServiceTest extends DatabaseSetup {
 
     @Test
     public void testUpdateMasterKeyUrlSetting() {
-        prepareCause(CWSException.class, ReturnCode.SETTING_WARNING, "The setting cws.masterkey.url may not be changed with this request.");
+        prepareCause(ReturnCode.SETTING_WARNING, "The setting cws.masterkey.url may not be changed with this request.");
         final SettingService service = new SettingService(newSettings(), entityManager);
         final SettingRequest request = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
         final Map<String, String> newSettings = new HashMap<>();

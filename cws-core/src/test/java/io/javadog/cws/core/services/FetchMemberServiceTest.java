@@ -28,11 +28,11 @@ import io.javadog.cws.api.requests.FetchMemberRequest;
 import io.javadog.cws.api.responses.FetchMemberResponse;
 import io.javadog.cws.core.DatabaseSetup;
 import io.javadog.cws.core.enums.StandardSetting;
-import io.javadog.cws.core.exceptions.VerificationException;
 import io.javadog.cws.core.model.Settings;
 import io.javadog.cws.core.model.entities.MemberEntity;
-import java.util.UUID;
 import org.junit.Test;
+
+import java.util.UUID;
 
 /**
  * <p>Fetching members is similar to fetching Circles, in that it is possible to
@@ -54,7 +54,7 @@ import org.junit.Test;
  * <p>The tests in this Test class reflects the above limitations.</p>
  *
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 public final class FetchMemberServiceTest extends DatabaseSetup {
 
@@ -64,9 +64,8 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
      */
     @Test
     public void testEmptyRequest() {
-        prepareCause(VerificationException.class, ReturnCode.VERIFICATION_WARNING,
-                "Request Object contained errors:" +
-                        "\nKey: credential, Error: The Session (Credential) is missing.");
+        prepareCause(ReturnCode.VERIFICATION_WARNING, "Request Object contained errors:" +
+                "\nKey: credential, Error: The Session (Credential) is missing.");
 
         final FetchMemberService service = new FetchMemberService(settings, entityManager);
         final FetchMemberRequest request = new FetchMemberRequest();
@@ -79,19 +78,16 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
 
     @Test
     public void testFindNotExistingAccount() {
+        prepareCause(ReturnCode.IDENTIFICATION_WARNING, "The requested Member cannot be found.");
+
         final FetchMemberService service = new FetchMemberService(settings, entityManager);
 
         // Build and send the Request
         final FetchMemberRequest request = prepareRequest(FetchMemberRequest.class, Constants.ADMIN_ACCOUNT);
         request.setMemberId(UUID.randomUUID().toString());
         assertThat(request.validate().isEmpty(), is(true));
-        final FetchMemberResponse response = service.perform(request);
 
-        // Verify that we have found the correct data
-        assertThat(response, is(not(nullValue())));
-        assertThat(response.isOk(), is(false));
-        assertThat(response.getReturnCode(), is(ReturnCode.IDENTIFICATION_WARNING.getCode()));
-        assertThat(response.getReturnMessage(), is("The requested Member cannot be found."));
+        service.perform(request);
     }
 
     //==========================================================================
@@ -110,10 +106,10 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
 
         final FetchMemberRequest request = prepareRequest(FetchMemberRequest.class, Constants.ADMIN_ACCOUNT);
         assertThat(request.validate().isEmpty(), is(true));
-        runRequestAndVerifyResponse(mySettings, request, 6);
+        runRequestAndVerifyResponse(mySettings, request);
     }
 
-    private void runRequestAndVerifyResponse(final Settings mySettings, final FetchMemberRequest request, final int expectedMembers) {
+    private void runRequestAndVerifyResponse(final Settings mySettings, final FetchMemberRequest request) {
         final FetchMemberService service = new FetchMemberService(mySettings, entityManager);
         final FetchMemberResponse fetchResponse = service.perform(request);
 
@@ -122,7 +118,7 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
         assertThat(fetchResponse.isOk(), is(true));
         assertThat(fetchResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
         assertThat(fetchResponse.getReturnMessage(), is("Ok"));
-        assertThat(fetchResponse.getMembers().size(), is(expectedMembers));
+        assertThat(fetchResponse.getMembers().size(), is(6));
         assertThat(fetchResponse.getCircles().isEmpty(), is(true));
     }
 
@@ -359,7 +355,6 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
     }
 
     /**
-     *
      * Finds and returns the first Member, i.e. 'member1'.
      *
      * @return Member1, which is only a member of the first Circle

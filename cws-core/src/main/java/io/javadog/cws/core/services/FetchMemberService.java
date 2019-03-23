@@ -23,22 +23,24 @@ import io.javadog.cws.api.dtos.Member;
 import io.javadog.cws.api.requests.FetchMemberRequest;
 import io.javadog.cws.api.responses.FetchMemberResponse;
 import io.javadog.cws.core.enums.Permission;
+import io.javadog.cws.core.exceptions.CWSException;
 import io.javadog.cws.core.model.MemberDao;
 import io.javadog.cws.core.model.Settings;
 import io.javadog.cws.core.model.entities.CircleEntity;
 import io.javadog.cws.core.model.entities.MemberEntity;
 import io.javadog.cws.core.model.entities.TrusteeEntity;
+
+import javax.persistence.EntityManager;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import javax.persistence.EntityManager;
 
 /**
  * <p>Business Logic implementation for the CWS FetchMember request.</p>
  *
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 public final class FetchMemberService extends Serviceable<MemberDao, FetchMemberResponse, FetchMemberRequest> {
 
@@ -63,17 +65,17 @@ public final class FetchMemberService extends Serviceable<MemberDao, FetchMember
                 // If it is the Member itself, then the CWS should just return
                 // the information already retrieved as part of the
                 // Authentication/Authorization logic.
-                fetchYourself(response);
+                addMemberToResponse(response, member);
+                response.setCircles(convertCircles(trustees));
             } else {
                 final MemberEntity requestedMember = dao.find(MemberEntity.class, request.getMemberId());
-                if (requestedMember != null) {
-                    // Request is for a different Member...
-                    fetchSomeoneElse(response, requestedMember);
-                } else {
+                if (requestedMember == null) {
                     // No such Account exist, will simply return with an error.
-                    response.setReturnCode(ReturnCode.IDENTIFICATION_WARNING);
-                    response.setReturnMessage("The requested Member cannot be found.");
+                    throw new CWSException(ReturnCode.IDENTIFICATION_WARNING, "The requested Member cannot be found.");
                 }
+
+                // Request is for a different Member...
+                fetchSomeoneElse(response, requestedMember);
             }
         } else {
             final List<MemberEntity> members = dao.findAllAscending(MemberEntity.class, "name");
@@ -83,30 +85,11 @@ public final class FetchMemberService extends Serviceable<MemberDao, FetchMember
         return response;
     }
 
-    private void fetchYourself(final FetchMemberResponse response) {
-        addMemberToResponse(response, member);
-
-        // The System Administrator cannot be part of any Circles, so
-        // no need to add these.
-        if (member.getMemberRole() != MemberRole.ADMIN) {
-            final List<Circle> circles = new ArrayList<>(trustees.size());
-            for (final TrusteeEntity trustee : trustees) {
-                final String externalKey = decryptExternalKey(trustee);
-                circles.add(convert(trustee.getCircle(), externalKey));
-            }
-            response.setCircles(circles);
-        }
-    }
-
     /**
      * <p>When requesting to see information about a different Member, a set of
      * rules must be applied. Generally, the System Administrator can always see
      * all Accounts - however, for other Members, the rules to apply must follow
      * the rules defined via the Settings.</p>
-     *
-     * <p>If the {@link io.javadog.cws.core.enums.StandardSetting#EXPOSE_ADMIN}
-     * flag is set, then a Member may view the System Administrator Account,
-     * however this setting is disabled per default.</p>
      *
      * <p>If the {@link io.javadog.cws.core.enums.StandardSetting#SHOW_TRUSTEES}
      * flag is set, then the Member may view all Circles, which the Other Member
@@ -115,7 +98,6 @@ public final class FetchMemberService extends Serviceable<MemberDao, FetchMember
      *
      * @param response  Response Object to fill
      * @param requested Requested Member to see if may be viewed
-     * @see io.javadog.cws.core.enums.StandardSetting#EXPOSE_ADMIN
      * @see io.javadog.cws.core.enums.StandardSetting#SHOW_TRUSTEES
      */
     private void fetchSomeoneElse(final FetchMemberResponse response, final MemberEntity requested) {

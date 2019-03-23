@@ -25,7 +25,10 @@ import io.javadog.cws.api.requests.ProcessMemberRequest;
 import io.javadog.cws.api.responses.ProcessMemberResponse;
 import io.javadog.cws.core.enums.KeyAlgorithm;
 import io.javadog.cws.core.enums.Permission;
+import io.javadog.cws.core.exceptions.AuthorizationException;
 import io.javadog.cws.core.exceptions.CWSException;
+import io.javadog.cws.core.exceptions.IdentificationException;
+import io.javadog.cws.core.exceptions.IllegalActionException;
 import io.javadog.cws.core.exceptions.VerificationException;
 import io.javadog.cws.core.jce.CWSKeyPair;
 import io.javadog.cws.core.jce.IVSalt;
@@ -34,6 +37,8 @@ import io.javadog.cws.core.model.MemberDao;
 import io.javadog.cws.core.model.Settings;
 import io.javadog.cws.core.model.entities.MemberEntity;
 import io.javadog.cws.core.model.entities.TrusteeEntity;
+
+import javax.persistence.EntityManager;
 import java.security.PublicKey;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -44,7 +49,6 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
-import javax.persistence.EntityManager;
 
 /**
  * <p>Business Logic implementation for the CWS ProcessMember request.</p>
@@ -116,7 +120,7 @@ public final class ProcessMemberService extends Serviceable<MemberDao, ProcessMe
                 break;
             default:
                 // Unreachable Code by design.
-                throw new CWSException(ReturnCode.ILLEGAL_ACTION, "Unsupported Action.");
+                throw new IllegalActionException("Unsupported Action.");
         }
 
         return response;
@@ -232,11 +236,11 @@ public final class ProcessMemberService extends Serviceable<MemberDao, ProcessMe
 
     private ProcessMemberResponse alterMember(final ProcessMemberRequest request) {
         if (member.getMemberRole() != MemberRole.ADMIN) {
-            throw new CWSException(ReturnCode.AUTHORIZATION_WARNING, "Only Administrators may update the Role of a member.");
+            throw new AuthorizationException("Only Administrators may update the Role of a member.");
         }
 
         if (member.getExternalId().equals(request.getMemberId())) {
-            throw new CWSException(ReturnCode.ILLEGAL_ACTION, "It is not permitted to alter own account.");
+            throw new IllegalActionException("It is not permitted to alter own account.");
         }
 
         final ProcessMemberResponse response = new ProcessMemberResponse();
@@ -335,11 +339,11 @@ public final class ProcessMemberService extends Serviceable<MemberDao, ProcessMe
         final ProcessMemberResponse response;
 
         if (request.getMemberId() != null) {
-            if (member.getMemberRole() == MemberRole.ADMIN) {
-                response = processDeleteAsAdmin(request);
-            } else {
-                response = new ProcessMemberResponse(ReturnCode.ILLEGAL_ACTION, "Members are not permitted to delete Accounts.");
+            if (member.getMemberRole() != MemberRole.ADMIN) {
+                throw new IllegalActionException("Members are not permitted to delete Accounts.");
             }
+
+            response = processDeleteAsAdmin(request);
         } else {
             // Deleting self
             dao.delete(member);
@@ -351,20 +355,16 @@ public final class ProcessMemberService extends Serviceable<MemberDao, ProcessMe
 
     private ProcessMemberResponse processDeleteAsAdmin(final ProcessMemberRequest request) {
         final MemberEntity found = dao.find(MemberEntity.class, request.getMemberId());
-        final ProcessMemberResponse response;
 
-        if (found != null) {
-            if (Objects.equals(member.getId(), found.getId())) {
-                response = new ProcessMemberResponse(ReturnCode.IDENTIFICATION_ERROR, "It is not permitted to delete yourself.");
-            } else {
-                dao.delete(found);
-                response = new ProcessMemberResponse(ReturnCode.SUCCESS, "The Member '" + found.getName() + "' has successfully been deleted.");
-            }
-        } else {
-            response = new ProcessMemberResponse(ReturnCode.IDENTIFICATION_ERROR, "No such Account exist.");
+        if (found == null) {
+            throw new IdentificationException("No such Account exist.");
+        }
+        if (Objects.equals(member.getId(), found.getId())) {
+            throw new IllegalActionException("It is not permitted to delete yourself.");
         }
 
-        return response;
+        dao.delete(found);
+        return new ProcessMemberResponse(ReturnCode.SUCCESS, "The Member '" + found.getName() + "' has successfully been deleted.");
     }
 
     private ProcessMemberResponse processInvitation(final ProcessMemberRequest request) {

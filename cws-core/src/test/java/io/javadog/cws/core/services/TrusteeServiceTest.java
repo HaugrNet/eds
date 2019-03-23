@@ -34,9 +34,6 @@ import io.javadog.cws.api.responses.ProcessCircleResponse;
 import io.javadog.cws.api.responses.ProcessTrusteeResponse;
 import io.javadog.cws.core.DatabaseSetup;
 import io.javadog.cws.core.enums.StandardSetting;
-import io.javadog.cws.core.exceptions.AuthorizationException;
-import io.javadog.cws.core.exceptions.CWSException;
-import io.javadog.cws.core.exceptions.VerificationException;
 import org.junit.Test;
 
 import java.util.UUID;
@@ -45,15 +42,14 @@ import java.util.UUID;
  * <p>Common test class for the Process & Fetch Trustee Services.</p>
  *
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 public final class TrusteeServiceTest extends DatabaseSetup {
 
     @Test
     public void testEmptyFetchRequest() {
-        prepareCause(VerificationException.class, ReturnCode.VERIFICATION_WARNING,
-                "Request Object contained errors:" +
-                        "\nKey: credential, Error: The Session (Credential) is missing.");
+        prepareCause(ReturnCode.VERIFICATION_WARNING, "Request Object contained errors:" +
+                "\nKey: credential, Error: The Session (Credential) is missing.");
 
         final FetchTrusteeService service = new FetchTrusteeService(settings, entityManager);
         final FetchTrusteeRequest request = new FetchTrusteeRequest();
@@ -66,10 +62,9 @@ public final class TrusteeServiceTest extends DatabaseSetup {
 
     @Test
     public void testEmptyProcessRequest() {
-        prepareCause(VerificationException.class, ReturnCode.VERIFICATION_WARNING,
-                "Request Object contained errors:" +
-                        "\nKey: credential, Error: The Session (Credential) is missing." +
-                        "\nKey: action, Error: No action has been provided.");
+        prepareCause(ReturnCode.VERIFICATION_WARNING, "Request Object contained errors:" +
+                "\nKey: credential, Error: The Session (Credential) is missing." +
+                "\nKey: action, Error: No action has been provided.");
 
         final ProcessTrusteeService service = new ProcessTrusteeService(settings, entityManager);
         final ProcessTrusteeRequest request = new ProcessTrusteeRequest();
@@ -82,16 +77,14 @@ public final class TrusteeServiceTest extends DatabaseSetup {
 
     @Test
     public void testFetchNotExistingCircle() {
+        prepareCause(ReturnCode.IDENTIFICATION_WARNING, "The requested Circle cannot be found.");
+
         final FetchTrusteeService service = new FetchTrusteeService(settings, entityManager);
         final FetchTrusteeRequest request = prepareRequest(FetchTrusteeRequest.class, Constants.ADMIN_ACCOUNT);
         request.setCircleId(UUID.randomUUID().toString());
-        final FetchTrusteeResponse response = service.perform(request);
+        assertThat(request.validate().isEmpty(), is(true));
 
-        // Verify that we have found the correct data
-        assertThat(response, is(not(nullValue())));
-        assertThat(response.isOk(), is(false));
-        assertThat(response.getReturnCode(), is(ReturnCode.IDENTIFICATION_WARNING.getCode()));
-        assertThat(response.getReturnMessage(), is("The requested Circle cannot be found."));
+        service.perform(request);
     }
 
     @Test
@@ -172,7 +165,7 @@ public final class TrusteeServiceTest extends DatabaseSetup {
 
     @Test
     public void testFetchCircle1WithShowTrueAsMember5() {
-        prepareCause(CWSException.class, "No Trustee information found for member 'member5' and circle '" + CIRCLE_1_ID + "'.");
+        prepareCause(ReturnCode.IDENTIFICATION_WARNING, "No Trustee information found for member 'member5' and circle '" + CIRCLE_1_ID + "'.");
 
         // Ensure that we have the correct settings for the Service
         settings.set(StandardSetting.SHOW_TRUSTEES, "true");
@@ -186,7 +179,7 @@ public final class TrusteeServiceTest extends DatabaseSetup {
 
     @Test
     public void testFetchCircle1WithShowFalseAsMember5() {
-        prepareCause(CWSException.class, "No Trustee information found for member 'member5' and circle '" + CIRCLE_1_ID + "'.");
+        prepareCause(ReturnCode.IDENTIFICATION_WARNING, "No Trustee information found for member 'member5' and circle '" + CIRCLE_1_ID + "'.");
 
         // Ensure that we have the correct settings for the Service
         settings.set(StandardSetting.SHOW_TRUSTEES, "false");
@@ -195,6 +188,7 @@ public final class TrusteeServiceTest extends DatabaseSetup {
         final FetchTrusteeRequest request = prepareRequest(FetchTrusteeRequest.class, MEMBER_5);
         assertThat(request, is(not(nullValue())));
         request.setCircleId(CIRCLE_1_ID);
+
         service.perform(request);
     }
 
@@ -239,7 +233,8 @@ public final class TrusteeServiceTest extends DatabaseSetup {
 
     @Test
     public void testAddingTrusteeAsWritingTrustee() {
-        prepareCause(AuthorizationException.class, ReturnCode.AUTHORIZATION_WARNING, "The requesting Account is not permitted to Process a Trustee");
+        prepareCause(ReturnCode.AUTHORIZATION_WARNING, "The requesting Account is not permitted to Process a Trustee");
+
         final ProcessTrusteeService service = new ProcessTrusteeService(settings, entityManager);
         final ProcessTrusteeRequest request = prepareRequest(ProcessTrusteeRequest.class, MEMBER_2);
         request.setAction(Action.ADD);
@@ -268,7 +263,7 @@ public final class TrusteeServiceTest extends DatabaseSetup {
     @Test
     public void testAddingTrusteeToInvalidCircleAsCircleAdmin() {
         final String circleId = UUID.randomUUID().toString();
-        prepareCause(CWSException.class, ReturnCode.IDENTIFICATION_WARNING, "No Trustee information found for member 'member1' and circle '" + circleId + "'.");
+        prepareCause(ReturnCode.IDENTIFICATION_WARNING, "No Trustee information found for member 'member1' and circle '" + circleId + "'.");
 
         final ProcessTrusteeService service = new ProcessTrusteeService(settings, entityManager);
         final ProcessTrusteeRequest request = prepareRequest(ProcessTrusteeRequest.class, MEMBER_1);
@@ -283,7 +278,7 @@ public final class TrusteeServiceTest extends DatabaseSetup {
 
     @Test
     public void testAddingInvalidMemberAsTrusteeAsCircleAdmin() {
-        prepareCause(CWSException.class, ReturnCode.IDENTIFICATION_WARNING, "No Member could be found with the given Id.");
+        prepareCause(ReturnCode.IDENTIFICATION_WARNING, "No Member could be found with the given Id.");
 
         final ProcessTrusteeService service = new ProcessTrusteeService(settings, entityManager);
         final ProcessTrusteeRequest request = prepareRequest(ProcessTrusteeRequest.class, MEMBER_1);
@@ -298,7 +293,7 @@ public final class TrusteeServiceTest extends DatabaseSetup {
 
     @Test
     public void testAddingExistingTrusteeAsTrustee() {
-        prepareCause(CWSException.class, ReturnCode.IDENTIFICATION_WARNING, "The Member is already a trustee of the requested Circle.");
+        prepareCause(ReturnCode.IDENTIFICATION_WARNING, "The Member is already a trustee of the requested Circle.");
 
         final ProcessTrusteeService service = new ProcessTrusteeService(settings, entityManager);
         final ProcessTrusteeRequest request = prepareRequest(ProcessTrusteeRequest.class, MEMBER_1);
@@ -322,7 +317,7 @@ public final class TrusteeServiceTest extends DatabaseSetup {
      */
     @Test
     public void testAddingNewTrusteeAsCircleMemberAndSystemAdministrator() {
-        prepareCause(CWSException.class, ReturnCode.ILLEGAL_ACTION, "It is not possible to add a member to a circle, without membership.");
+        prepareCause(ReturnCode.ILLEGAL_ACTION, "It is not possible to add a member to a circle, without membership.");
 
         final ProcessTrusteeService service = new ProcessTrusteeService(settings, entityManager);
         final ProcessTrusteeRequest request = prepareRequest(ProcessTrusteeRequest.class, MEMBER_1);
@@ -369,7 +364,7 @@ public final class TrusteeServiceTest extends DatabaseSetup {
 
     @Test
     public void testAlterTrusteeAsWritingTrustee() {
-        prepareCause(AuthorizationException.class, ReturnCode.AUTHORIZATION_WARNING, "The requesting Account is not permitted to Process a Trustee");
+        prepareCause(ReturnCode.AUTHORIZATION_WARNING, "The requesting Account is not permitted to Process a Trustee");
         final ProcessTrusteeService service = new ProcessTrusteeService(settings, entityManager);
         final ProcessTrusteeRequest request = prepareRequest(ProcessTrusteeRequest.class, MEMBER_2);
         request.setAction(Action.ALTER);
@@ -406,7 +401,7 @@ public final class TrusteeServiceTest extends DatabaseSetup {
     @Test
     public void testAlterTrusteeToInvalidCircleAsCircleAdmin() {
         final String circleId = UUID.randomUUID().toString();
-        prepareCause(CWSException.class, ReturnCode.IDENTIFICATION_WARNING, "No Trustee information found for member 'member1' and circle '" + circleId + "'.");
+        prepareCause(ReturnCode.IDENTIFICATION_WARNING, "No Trustee information found for member 'member1' and circle '" + circleId + "'.");
 
         final ProcessTrusteeService service = new ProcessTrusteeService(settings, entityManager);
         final ProcessTrusteeRequest request = prepareRequest(ProcessTrusteeRequest.class, MEMBER_1);
@@ -448,7 +443,8 @@ public final class TrusteeServiceTest extends DatabaseSetup {
 
     @Test
     public void testRemoveTrusteeAsWritingTrustee() {
-        prepareCause(AuthorizationException.class, ReturnCode.AUTHORIZATION_WARNING, "The requesting Account is not permitted to Process a Trustee");
+        prepareCause(ReturnCode.AUTHORIZATION_WARNING, "The requesting Account is not permitted to Process a Trustee");
+
         final ProcessTrusteeService service = new ProcessTrusteeService(settings, entityManager);
         final ProcessTrusteeRequest request = prepareRequest(ProcessTrusteeRequest.class, MEMBER_2);
         request.setAction(Action.REMOVE);
@@ -482,7 +478,7 @@ public final class TrusteeServiceTest extends DatabaseSetup {
     @Test
     public void testRemoveTrusteeToInvalidCircleAsCircleAdmin() {
         final String circleId = UUID.randomUUID().toString();
-        prepareCause(CWSException.class, ReturnCode.IDENTIFICATION_WARNING, "No Trustee information found for member 'member1' and circle '" + circleId + "'.");
+        prepareCause(ReturnCode.IDENTIFICATION_WARNING, "No Trustee information found for member 'member1' and circle '" + circleId + "'.");
 
         final ProcessTrusteeService service = new ProcessTrusteeService(settings, entityManager);
         final ProcessTrusteeRequest request = prepareRequest(ProcessTrusteeRequest.class, MEMBER_1);

@@ -21,14 +21,16 @@ import io.javadog.cws.api.dtos.Trustee;
 import io.javadog.cws.api.requests.FetchTrusteeRequest;
 import io.javadog.cws.api.responses.FetchTrusteeResponse;
 import io.javadog.cws.core.enums.Permission;
+import io.javadog.cws.core.exceptions.CWSException;
 import io.javadog.cws.core.model.CommonDao;
 import io.javadog.cws.core.model.Settings;
 import io.javadog.cws.core.model.entities.CircleEntity;
 import io.javadog.cws.core.model.entities.TrusteeEntity;
+
+import javax.persistence.EntityManager;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import javax.persistence.EntityManager;
 
 /**
  * <p>Business Logic implementation for the CWS FetchTrustee request.</p>
@@ -51,41 +53,22 @@ public final class FetchTrusteeService extends Serviceable<CommonDao, FetchTrust
         verifyRequest(request, Permission.FETCH_TRUSTEE);
         Arrays.fill(request.getCredential(), (byte) 0);
 
-        final FetchTrusteeResponse response = new FetchTrusteeResponse();
-
         // First retrieve the Circle via the ExternalId given. If no Circle
         // is found, the DAO will throw an Exception.
         final CircleEntity circle = dao.find(CircleEntity.class, request.getCircleId());
-
-        if (circle != null) {
-            // The Settings and the Requesting Member are both important when
-            // trying to ascertain if the Circle Trustees may be retrieved. If
-            // the requesting Member is the System Administrator, then all
-            // information may be retrieved. If the Settings allow it, then all
-            // information may be retrieved. However, if the request is made by
-            // anyone else than the System Administrator and the Settings
-            // doesn't allow exposing information, then we will only show
-            // information about Circles, which the requesting Member is allowed
-            // to access.
-            final List<TrusteeEntity> members = dao.findTrusteesByCircle(circle);
-            response.setTrustees(convertTrustees(members));
-        } else {
-            response.setReturnCode(ReturnCode.IDENTIFICATION_WARNING);
-            response.setReturnMessage("The requested Circle cannot be found.");
+        if (circle == null) {
+            throw new CWSException(ReturnCode.IDENTIFICATION_WARNING, "The requested Circle cannot be found.");
         }
+
+        final FetchTrusteeResponse response = new FetchTrusteeResponse();
+        final List<TrusteeEntity> members = dao.findTrusteesByCircle(circle);
+        final List<Trustee> currentTrustees = new ArrayList<>(members.size());
+        for (final TrusteeEntity entity : members) {
+            currentTrustees.add(convert(entity));
+        }
+        response.setTrustees(currentTrustees);
 
         return response;
-    }
-
-    private static List<Trustee> convertTrustees(final List<TrusteeEntity> entities) {
-        final List<Trustee> trustees = new ArrayList<>(entities.size());
-
-        for (final TrusteeEntity entity : entities) {
-            trustees.add(convert(entity));
-
-        }
-
-        return trustees;
     }
 
     private static Trustee convert(final TrusteeEntity entity) {

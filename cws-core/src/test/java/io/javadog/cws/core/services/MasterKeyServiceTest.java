@@ -26,7 +26,6 @@ import io.javadog.cws.api.requests.MasterKeyRequest;
 import io.javadog.cws.api.responses.MasterKeyResponse;
 import io.javadog.cws.core.DatabaseSetup;
 import io.javadog.cws.core.enums.StandardSetting;
-import io.javadog.cws.core.exceptions.CWSException;
 import io.javadog.cws.core.jce.MasterKey;
 import io.javadog.cws.core.model.Settings;
 import io.javadog.cws.core.model.entities.MemberEntity;
@@ -50,7 +49,7 @@ import java.util.UUID;
  * </ul>
  *
  * @author Kim Jensen
- * @since  CWS 1.1
+ * @since CWS 1.1
  */
 public final class MasterKeyServiceTest extends DatabaseSetup {
 
@@ -87,14 +86,14 @@ public final class MasterKeyServiceTest extends DatabaseSetup {
 
     @Test
     public void testUpdateMasterKeyAsAdminWithWrongCredentials() {
+        prepareCause(ReturnCode.AUTHENTICATION_WARNING, "Invalid credentials.");
         final MasterKeyService service = new MasterKeyService(settings, entityManager);
         final MasterKeyRequest request = prepareRequest(MasterKeyRequest.class, Constants.ADMIN_ACCOUNT);
         request.setCredential("root".getBytes(Charset.defaultCharset()));
         request.setSecret("New MasterKey".getBytes(Charset.defaultCharset()));
+        assertThat(request.validate().isEmpty(), is(true));
 
-        final MasterKeyResponse response = service.perform(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.AUTHENTICATION_WARNING.getCode()));
-        assertThat(response.getReturnMessage(), is("Invalid credentials."));
+        service.perform(request);
     }
 
     @Test
@@ -150,7 +149,7 @@ public final class MasterKeyServiceTest extends DatabaseSetup {
     @Test
     public void testStartingMasterKeyWithURLFailed() {
         final String file = tempDir() + "not_existing_file.bin";
-        prepareCause(CWSException.class, ReturnCode.NETWORK_ERROR, file + " (No such file or directory)");
+        prepareCause(ReturnCode.NETWORK_ERROR, file + " (No such file or directory)");
 
         final Settings mySettings = newSettings();
         mySettings.set(StandardSetting.MASTERKEY_URL.getKey(), "file://" + file);
@@ -184,13 +183,14 @@ public final class MasterKeyServiceTest extends DatabaseSetup {
 
     @Test
     public void testUpdateMasterKeyWhenMembersExist() {
+        prepareCause(ReturnCode.ILLEGAL_ACTION, "Cannot alter the MasterKey, as Member Accounts exists.");
+
         final MasterKeyService service = new MasterKeyService(settings, entityManager);
         final MasterKeyRequest request = prepareRequest(MasterKeyRequest.class, Constants.ADMIN_ACCOUNT);
         request.setSecret("MasterKey".getBytes(Charset.defaultCharset()));
+        assertThat(request.validate().isEmpty(), is(true));
 
-        final MasterKeyResponse response = service.perform(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.ILLEGAL_ACTION.getCode()));
-        assertThat(response.getReturnMessage(), is("Cannot alter the MasterKey, as Member Accounts exists."));
+        service.perform(request);
     }
 
     @Test
@@ -207,7 +207,7 @@ public final class MasterKeyServiceTest extends DatabaseSetup {
     @Test
     public void testUpdateMasterKeyWithUnreachabledURL() {
         final String path = tempDir() + "not_existing_file.bin";
-        prepareCause(CWSException.class, ReturnCode.NETWORK_ERROR, path + " (No such file or directory)");
+        prepareCause(ReturnCode.NETWORK_ERROR, path + " (No such file or directory)");
 
         final MasterKeyService service = new MasterKeyService(settings, entityManager);
         final MasterKeyRequest request = prepareRequest(MasterKeyRequest.class, Constants.ADMIN_ACCOUNT);

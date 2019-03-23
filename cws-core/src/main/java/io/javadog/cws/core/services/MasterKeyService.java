@@ -23,7 +23,9 @@ import io.javadog.cws.api.requests.Authentication;
 import io.javadog.cws.api.requests.MasterKeyRequest;
 import io.javadog.cws.api.responses.MasterKeyResponse;
 import io.javadog.cws.core.enums.StandardSetting;
+import io.javadog.cws.core.exceptions.AuthenticationException;
 import io.javadog.cws.core.exceptions.CryptoException;
+import io.javadog.cws.core.exceptions.IllegalActionException;
 import io.javadog.cws.core.jce.MasterKey;
 import io.javadog.cws.core.jce.SecretCWSKey;
 import io.javadog.cws.core.model.CommonDao;
@@ -106,11 +108,11 @@ public final class MasterKeyService extends Serviceable<CommonDao, MasterKeyResp
                 updateMemberPassword(admin, request.getCredential());
                 response = new MasterKeyResponse(ReturnCode.SUCCESS, "MasterKey updated.");
             } else {
-                response = new MasterKeyResponse(ReturnCode.ILLEGAL_ACTION, "Cannot alter the MasterKey, as Member Accounts exists.");
+                throw new IllegalActionException("Cannot alter the MasterKey, as Member Accounts exists.");
             }
         } else {
-            // Neither keys worked, will just return a Authentication Warning
-            response = new MasterKeyResponse(ReturnCode.AUTHENTICATION_WARNING, "Invalid credentials.");
+            // Neither keys worked, throw Authentication Exception
+            throw new AuthenticationException("Invalid credentials.");
         }
 
         return response;

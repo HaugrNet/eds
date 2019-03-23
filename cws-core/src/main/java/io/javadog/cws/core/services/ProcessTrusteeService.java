@@ -23,6 +23,7 @@ import io.javadog.cws.api.requests.ProcessTrusteeRequest;
 import io.javadog.cws.api.responses.ProcessTrusteeResponse;
 import io.javadog.cws.core.enums.Permission;
 import io.javadog.cws.core.exceptions.CWSException;
+import io.javadog.cws.core.exceptions.IllegalActionException;
 import io.javadog.cws.core.jce.PublicCWSKey;
 import io.javadog.cws.core.jce.SecretCWSKey;
 import io.javadog.cws.core.model.CommonDao;
@@ -69,7 +70,7 @@ public final class ProcessTrusteeService extends Serviceable<CommonDao, ProcessT
                 break;
             default:
                 // Unreachable Code by design.
-                throw new CWSException(ReturnCode.ILLEGAL_ACTION, "Unsupported Action.");
+                throw new IllegalActionException("Unsupported Action.");
         }
 
         return response;

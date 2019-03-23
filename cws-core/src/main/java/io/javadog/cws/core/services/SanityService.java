@@ -36,7 +36,7 @@ import java.util.List;
  * <p>Business Logic implementation for the CWS Sanity request.</p>
  *
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 public final class SanityService extends Serviceable<SanityDao, SanityResponse, SanityRequest> {
 
@@ -67,7 +67,7 @@ public final class SanityService extends Serviceable<SanityDao, SanityResponse, 
 
         if (request.getCircleId() != null) {
             // Find for specific Circle
-            found = dao.findFailedRecords(request.getCircleId(),since);
+            found = dao.findFailedRecords(request.getCircleId(), since);
         } else if (member.getMemberRole() == MemberRole.ADMIN) {
             // The System Administrator is allowed to retrieve all records for
             // all Circles.

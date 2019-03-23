@@ -55,7 +55,7 @@ import java.util.Set;
  * <p>Common Business Logic, used by the Business Logic classes.</p>
  *
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 public abstract class Serviceable<D extends CommonDao, R extends CwsResponse, A extends Authentication> {
 

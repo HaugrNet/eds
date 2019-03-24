@@ -38,7 +38,7 @@
     </scm>
 
     <properties>
-        <cxf.version>3.3.0</cxf.version>
+        <cxf.version>3.3.1</cxf.version>
         <resteasy.version>3.6.3.Final</resteasy.version>
 
         <!-- To avoid that the builds are platform specific -->
@@ -153,12 +153,12 @@
             <dependency>
                 <groupId>org.hibernate</groupId>
                 <artifactId>hibernate-core</artifactId>
-                <version>5.4.1.Final</version>
+                <version>5.4.2.Final</version>
             </dependency>
             <dependency>
                 <groupId>com.h2database</groupId>
                 <artifactId>h2</artifactId>
-                <version>1.4.198</version>
+                <version>1.4.199</version>
             </dependency>
 
             <dependency>
@@ -179,7 +179,7 @@
             <dependency>
                 <groupId>org.junit.vintage</groupId>
                 <artifactId>junit-vintage-engine</artifactId>
-                <version>5.4.0</version>
+                <version>5.4.1</version>
             </dependency>
             <dependency>
                 <groupId>org.hamcrest</groupId>
@@ -209,7 +209,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>3.0.1</version>
+                    <version>3.1.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>

@@ -349,20 +349,6 @@ public final class TrusteeServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testAlterTrusteeAsAdmin() {
-        final ProcessTrusteeService service = new ProcessTrusteeService(settings, entityManager);
-        final ProcessTrusteeRequest request = prepareRequest(ProcessTrusteeRequest.class, Constants.ADMIN_ACCOUNT);
-        request.setAction(Action.ALTER);
-        request.setCircleId(CIRCLE_1_ID);
-        request.setMemberId(MEMBER_2_ID);
-        request.setTrustLevel(TrustLevel.ADMIN);
-
-        final ProcessTrusteeResponse response = service.perform(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.AUTHORIZATION_WARNING.getCode()));
-        assertThat(response.getReturnMessage(), is("Only a Circle Administrator may alter a Trustee."));
-    }
-
-    @Test
     public void testAlterTrusteeAsWritingTrustee() {
         prepareCause(ReturnCode.AUTHORIZATION_WARNING, "The requesting Account is not permitted to Process a Trustee");
         final ProcessTrusteeService service = new ProcessTrusteeService(settings, entityManager);
@@ -416,29 +402,17 @@ public final class TrusteeServiceTest extends DatabaseSetup {
 
     @Test
     public void testAlterInvalidMemberAsTrusteeAsCircleAdmin() {
+        prepareCause(ReturnCode.IDENTIFICATION_WARNING, "The requested Trustee could not be found.");
+
         final ProcessTrusteeService service = new ProcessTrusteeService(settings, entityManager);
         final ProcessTrusteeRequest request = prepareRequest(ProcessTrusteeRequest.class, MEMBER_1);
         request.setAction(Action.ALTER);
         request.setCircleId(CIRCLE_1_ID);
         request.setMemberId(UUID.randomUUID().toString());
         request.setTrustLevel(TrustLevel.WRITE);
+        assertThat(request.validate().isEmpty(), is(true));
 
-        final ProcessTrusteeResponse response = service.perform(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.IDENTIFICATION_WARNING.getCode()));
-        assertThat(response.getReturnMessage(), is("The requested Trustee could not be found."));
-    }
-
-    @Test
-    public void testRemoveTrusteeAsAdmin() {
-        final ProcessTrusteeService service = new ProcessTrusteeService(settings, entityManager);
-        final ProcessTrusteeRequest request = prepareRequest(ProcessTrusteeRequest.class, Constants.ADMIN_ACCOUNT);
-        request.setAction(Action.REMOVE);
-        request.setCircleId(CIRCLE_1_ID);
-        request.setMemberId(MEMBER_2_ID);
-
-        final ProcessTrusteeResponse response = service.perform(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.AUTHORIZATION_WARNING.getCode()));
-        assertThat(response.getReturnMessage(), is("Only a Circle Administrator may remove a Trustee."));
+        service.perform(request);
     }
 
     @Test
@@ -492,15 +466,16 @@ public final class TrusteeServiceTest extends DatabaseSetup {
 
     @Test
     public void testRemoveInvalidMemberAsTrusteeAsCircleAdmin() {
+        prepareCause(ReturnCode.IDENTIFICATION_WARNING, "The requested Trustee could not be found.");
+
         final ProcessTrusteeService service = new ProcessTrusteeService(settings, entityManager);
         final ProcessTrusteeRequest request = prepareRequest(ProcessTrusteeRequest.class, MEMBER_1);
         request.setAction(Action.REMOVE);
         request.setCircleId(CIRCLE_1_ID);
         request.setMemberId(UUID.randomUUID().toString());
+        assertThat(request.validate().isEmpty(), is(true));
 
-        final ProcessTrusteeResponse response = service.perform(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.IDENTIFICATION_WARNING.getCode()));
-        assertThat(response.getReturnMessage(), is("The requested Trustee could not be found."));
+        service.perform(request);
     }
 
     // =========================================================================

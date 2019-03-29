@@ -16,13 +16,13 @@
  */
 package io.javadog.cws.core.services;
 
-import io.javadog.cws.api.common.MemberRole;
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.common.TrustLevel;
 import io.javadog.cws.api.requests.ProcessTrusteeRequest;
 import io.javadog.cws.api.responses.ProcessTrusteeResponse;
 import io.javadog.cws.core.enums.Permission;
 import io.javadog.cws.core.exceptions.CWSException;
+import io.javadog.cws.core.exceptions.IdentificationException;
 import io.javadog.cws.core.exceptions.IllegalActionException;
 import io.javadog.cws.core.jce.PublicCWSKey;
 import io.javadog.cws.core.jce.SecretCWSKey;
@@ -126,42 +126,27 @@ public final class ProcessTrusteeService extends Serviceable<CommonDao, ProcessT
     }
 
     private ProcessTrusteeResponse alterTrustee(final ProcessTrusteeRequest request) {
-        final ProcessTrusteeResponse response;
+        final TrusteeEntity trustee = findTrusteeForCircleAndMember(request);
+        trustee.setTrustLevel(request.getTrustLevel());
+        dao.persist(trustee);
 
-        if (member.getMemberRole() != MemberRole.ADMIN) {
-            final TrusteeEntity trustee = dao.findTrusteeByCircleAndMember(request.getCircleId(), request.getMemberId());
-            if (trustee != null) {
-                final TrustLevel newTrustLevel = request.getTrustLevel();
-                trustee.setTrustLevel(newTrustLevel);
-                dao.persist(trustee);
-
-                response = new ProcessTrusteeResponse();
-            } else {
-                response = new ProcessTrusteeResponse(ReturnCode.IDENTIFICATION_WARNING, "The requested Trustee could not be found.");
-            }
-        } else {
-            response = new ProcessTrusteeResponse(ReturnCode.AUTHORIZATION_WARNING, "Only a Circle Administrator may alter a Trustee.");
-        }
-
-        return response;
+        return new ProcessTrusteeResponse();
     }
 
     private ProcessTrusteeResponse removeTrustee(final ProcessTrusteeRequest request) {
-        final ProcessTrusteeResponse response;
+        final TrusteeEntity trustee = findTrusteeForCircleAndMember(request);
+        dao.delete(trustee);
 
-        if (member.getMemberRole() != MemberRole.ADMIN) {
-            final TrusteeEntity trustee = dao.findTrusteeByCircleAndMember(request.getCircleId(), request.getMemberId());
-            if (trustee != null) {
-                dao.delete(trustee);
+        return new ProcessTrusteeResponse();
+    }
 
-                response = new ProcessTrusteeResponse();
-            } else {
-                response = new ProcessTrusteeResponse(ReturnCode.IDENTIFICATION_WARNING, "The requested Trustee could not be found.");
-            }
-        } else {
-            response = new ProcessTrusteeResponse(ReturnCode.AUTHORIZATION_WARNING, "Only a Circle Administrator may remove a Trustee.");
+    private TrusteeEntity findTrusteeForCircleAndMember(final ProcessTrusteeRequest request) {
+        final TrusteeEntity trustee = dao.findTrusteeByCircleAndMember(request.getCircleId(), request.getMemberId());
+
+        if (trustee == null) {
+            throw new IdentificationException("The requested Trustee could not be found.");
         }
 
-        return response;
+        return trustee;
     }
 }

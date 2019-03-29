@@ -18,12 +18,13 @@ package io.javadog.cws.client;
 
 import io.javadog.cws.api.requests.Authentication;
 import io.javadog.cws.api.responses.CwsResponse;
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import org.jboss.resteasy.client.jaxrs.ResteasyClient;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
+
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 /**
  * @author Kim Jensen
@@ -42,9 +43,9 @@ public class BaseRestClient {
         final String url = baseURL + requestURL;
         client = new ResteasyClientBuilder().build();
         final ResteasyWebTarget target = client.target(url);
-        final Entity<R> entity = Entity.entity(request, MediaType.APPLICATION_XML);
+        final Entity<R> entity = Entity.entity(request, MediaType.APPLICATION_JSON);
 
-        try (final Response response = target.request().accept(MediaType.APPLICATION_XML).post(entity)) {
+        try (final Response response = target.request().accept(MediaType.APPLICATION_JSON).post(entity)) {
             return response.readEntity(clazz);
         }
     }

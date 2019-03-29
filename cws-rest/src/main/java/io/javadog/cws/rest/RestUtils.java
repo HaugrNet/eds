@@ -18,6 +18,7 @@ package io.javadog.cws.rest;
 
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.responses.CwsResponse;
+
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -30,9 +31,9 @@ import javax.ws.rs.core.Response;
 public final class RestUtils {
 
     /** REST WebService consummation media type. */
-    public static final String CONSUMES = MediaType.APPLICATION_XML;
+    public static final String CONSUMES = MediaType.APPLICATION_JSON;
     /** REST WebService production media type. */
-    public static final String PRODUCES = MediaType.APPLICATION_XML;
+    public static final String PRODUCES = MediaType.APPLICATION_JSON;
 
     private RestUtils() {
         // Private Constructor, this is a Utility Class.

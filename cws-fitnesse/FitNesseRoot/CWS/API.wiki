@@ -1,0 +1,262 @@
+---
+Test
+---
+!*> Setup
+!include .CWS.Setup
+!fixture io.javadog.cws.fitnesse
+
+|process member                                                                                                                                         |
+|account name|credential|credential type|action|member id|public key|new account name|new credential|member role|member id?|return code?|return message?|
+|admin       |admin     |PASSPHRASE     |CREATE|null     |null      |user1           |password1     |STANDARD   |=~/\S{36}/|${SUCCESS}  |Ok             |
+|admin       |admin     |PASSPHRASE     |CREATE|null     |null      |user2           |password2     |STANDARD   |=~/\S{36}/|${SUCCESS}  |Ok             |
+|admin       |admin     |PASSPHRASE     |CREATE|null     |null      |user3           |password3     |STANDARD   |=~/\S{36}/|${SUCCESS}  |Ok             |
+
+*!
+
+!anchor content
+!1 !-<img src="files/javadog.png"> API - Application Programming Interface -!
+The CWS API consists of 2 main parts, the first is the management part, which
+is used to control a CWS instance, and the second is the sharing part.
+
+[[Management has the following elements: ][#management]]
+
+ * '''[[ Version ][#version]] '''
+ * '''[[ Settings ][#settings]] '''
+ * '''[[ !-MasterKey-! ][#masterkey]] '''
+ * '''[[ Sanitized ][#sanitized]] '''
+ * '''[[ Members ][#members]] '''
+ * '''[[ Circles of Trust ][#circles]] '''
+ * '''[[ Trustees ][#trustees]] '''
+
+[[ Sharing has the following elements: ][#sharing]]
+
+ * '''[[ Data Type ][#datatype]] '''
+ * '''[[ Data ][#data]] '''
+ * '''[[ !-Signatures-! ][#signatures]] '''
+
+----
+!anchor management
+!2 Management
+Management primarily contain the functionality which is used to control
+the system, including altering settings. Adding a system specific !-MasterKey-!
+as well as creating members, Circles of Trust and assign members as trustees to
+the Circles.
+
+!anchor version
+!4 '''Version'''
+The Version request is a simple ping check, which is the only not requiring any credentials to invoke.
+
+|version                                  |
+|return code?|return message?|cws version?|
+|${SUCCESS}  |Ok             |1.1-SNAPSHOT|
+
+[[ Top ][#content]]
+!anchor settings
+!4 '''Settings'''
+The !-CWS-! Settings request can only be performed by the System
+Administrator, i.e. the system super user. It is a way to both extract the
+current settings, and update existing values.
+
+'''Important'''; ''The very first request made with the '''admin''' account will
+also set the password for the administrator. By default, the passphrase is empty
+or undefined. Which means that it can be set to anything the administrator
+prefers, thus preventing that someone forgets to change the default. It is
+recommended that common best practices regarding the pick of the passphrase is
+followed - for the sake of this test, it is set to 'admin'.''
+
+|script|Settings     |admin                          |admin                                                     |
+|check |value for key|cws.crypto.symmetric.algorithm |AES_CBC_256                                               |
+|check |value for key|cws.crypto.asymmetric.algorithm|RSA_2048                                                  |
+|check |value for key|cws.crypto.signature.algorithm |SHA_512                                                   |
+|check |value for key|cws.crypto.pbe.algorithm       |PBE_256                                                   |
+|check |value for key|cws.crypto.hash.algorithm      |SHA_512                                                   |
+|check |value for key|cws.system.salt                |Default salt, also used as kill switch. Must be set in DB.|
+|check |value for key|cws.system.locale              |EN                                                        |
+|check |value for key|cws.system.charset             |UTF-8                                                     |
+|check |value for key|cws.show.all.circles           |true                                                      |
+|check |value for key|cws.show.trustees              |true                                                      |
+|check |value for key|cws.sanity.check.startup       |true                                                      |
+|check |value for key|cws.sanity.check.interval.days |180                                                       |
+
+Note, that if a different user attempts to invoke this request, it will result
+in a list of undefined values.
+
+|script|Settings     |user1                          |password1|
+|check |value for key|cws.crypto.symmetric.algorithm |undefined|
+|check |value for key|cws.crypto.asymmetric.algorithm|undefined|
+|check |value for key|cws.crypto.signature.algorithm |undefined|
+|check |value for key|cws.crypto.pbe.algorithm       |undefined|
+|check |value for key|cws.crypto.hash.algorithm      |undefined|
+|check |value for key|cws.system.salt                |undefined|
+|check |value for key|cws.system.locale              |undefined|
+|check |value for key|cws.system.charset             |undefined|
+|check |value for key|cws.show.all.circles           |undefined|
+|check |value for key|cws.show.trustees              |undefined|
+|check |value for key|cws.sanity.check.startup       |undefined|
+|check |value for key|cws.sanity.check.interval.days |undefined|
+
+!5 Symmetric Algorithm
+The primary part of all internal encryption is performed using Symmetric Keys. These are all based on the AES algorithms and only the
+size of the keys may be changed. The default value is '''AES256''', but if an earlier version of Java 8 is used, or if there is various
+problems with allowing this Key size, then it can be set to a lower value.
+The allowed values are:
+ * '''AES_CBC_128'''
+ * '''AES_CBC_192'''
+ * '''AES_CBC_256'''
+ * '''AES_GCM_128'''
+
+Pending Algorithms:
+ * '''AES_GCM_192'''
+ * '''AES_GCM_256'''
+
+|Settings                                                                                                                                                            |
+|account name|credential|key                           |value      |return code?      |return message?                                                   |defined?   |
+|admin       |admin     |cws.crypto.symmetric.algorithm|AES_GCM_128|${SUCCESS}        |Ok                                                                |AES_GCM_128|
+|admin       |admin     |cws.crypto.symmetric.algorithm|AES_CBC_128|${SUCCESS}        |Ok                                                                |AES_CBC_128|
+|admin       |admin     |cws.crypto.symmetric.algorithm|AES_CBC_192|${SUCCESS}        |Ok                                                                |AES_CBC_192|
+|admin       |admin     |cws.crypto.symmetric.algorithm|AES_CBC_256|${SUCCESS}        |Ok                                                                |AES_CBC_256|
+|admin       |admin     |cws.crypto.symmetric.algorithm|AES_CBC_512|${SETTING_WARNING}|Unsupported Crypto Algorithm for 'cws.crypto.symmetric.algorithm'.|AES_CBC_256|
+
+!5 Asymmetric Algorithm
+Each Member Account will have a Asymmetric Key generated by default, this is used to encrypt and decrypt the Symmetric Keys, as well as Signing and Verifying signatures.
+Higher Key size will give higher security. However, Asymmetric encryption/decryption is very costly compared to Symmetric cryptography. Hence, the use of these Keys is
+minimized. The default value is '''RSA2048''', increasing this to a higher Key size, will have a drastic performance cost, and should only be done if a higher level of
+security is needed or if enough CWS instances with enough resources is being used, so the cost can be mitigated.
+The allowed values are:
+ * '''RSA_2048'''
+ * '''RSA_4096'''
+ * '''RSA_8192'''
+
+|Settings                                                                                                                                                        |
+|account name|credential|key                            |value   |return code?      |return message?                                                    |defined?|
+|admin       |admin     |cws.crypto.asymmetric.algorithm|RSA_8192|${SUCCESS}        |Ok                                                                 |RSA_8192|
+|admin       |admin     |cws.crypto.asymmetric.algorithm|RSA_4096|${SUCCESS}        |Ok                                                                 |RSA_4096|
+|admin       |admin     |cws.crypto.asymmetric.algorithm|RSA_2048|${SUCCESS}        |Ok                                                                 |RSA_2048|
+|admin       |admin     |cws.crypto.asymmetric.algorithm|RSA_1024|${SETTING_WARNING}|Unsupported Crypto Algorithm for 'cws.crypto.asymmetric.algorithm'.|RSA_2048|
+
+!5 PBE Algorithm
+The PBE, Password Based Encryption, Algorithm, which is the Algorithm used to convert a given Passphrase to a Symmetric Key,
+is based on the PBKDF2 algorithm, which again is a special way to generated a Symmetric Key, just as normal Symmetric Keys.
+The allowed values are:
+ * '''PBE_128'''
+ * '''PBE_192'''
+ * '''PBE_256'''
+
+|Settings                                                                                                                                         |
+|account name|credential|key                     |value  |return code?      |return message?                                             |defined?|
+|admin       |admin     |cws.crypto.pbe.algorithm|PBE_128|${SUCCESS}        |Ok                                                          |PBE_128 |
+|admin       |admin     |cws.crypto.pbe.algorithm|PBE_192|${SUCCESS}        |Ok                                                          |PBE_192 |
+|admin       |admin     |cws.crypto.pbe.algorithm|PBE_256|${SUCCESS}        |Ok                                                          |PBE_256 |
+|admin       |admin     |cws.crypto.pbe.algorithm|PBE_512|${SETTING_WARNING}|Unsupported Crypto Algorithm for 'cws.crypto.pbe.algorithm'.|PBE_256 |
+
+
+!anchor masterkey
+!4 '''!-MasterKey-!'''
+
+!anchor sanitized
+!4 '''Sanitized'''
+
+!anchor members
+!4 '''Members'''
+The !-CWS-! Create Account request requires administrative priviledges to be performed.
+
+|process member                                                                                                                                                                                                                                |
+|account name|credential |credential type|action    |member id |public key|new account name|new credential|member role|member id?|return code?             |return message?                                                                    |
+|admin       |admin      |PASSPHRASE     |CREATE    |null      |null      |admin2          |password2     |ADMIN      |=~/\S{36}/|${SUCCESS}               |Ok                                                                                 |
+|admin       |admin      |PASSPHRASE     |CREATE    |null      |null      |member1         |password1     |STANDARD   |=~/\S{36}/|${SUCCESS}               |Ok                                                                                 |
+|member1     |password1  |null           |UPDATE    |null      |null      |null            |null          |null       |null      |${SUCCESS}               |Ok                                                                                 |
+|member1     |password1  |null           |LOGIN     |null      |null      |null            |session_key   |null       |null      |${SUCCESS}               |Ok                                                                                 |
+|null        |session_key|null           |UPDATE    |null      |null      |null            |new_session   |null       |null      |${VERIFICATION_WARNING}  |It is only permitted to update the credentials when authenticating with Passphrase.|
+|null        |session_key|SESSION        |LOGIN     |null      |null      |null            |new_session   |null       |null      |${SUCCESS}               |Ok                                                                                 |
+|null        |new_session|SESSION        |LOGIN     |null      |null      |null            |new_session   |null       |null      |${SUCCESS}               |Ok                                                                                 |
+|null        |new_session|SESSION        |CREATE    |null      |null      |user9           |password9     |null       |null      |${AUTHORIZATION_WARNING} |Members are not permitted to create new Accounts.                                  |
+|member1     |password1  |PASSPHRASE     |INVALIDATE|null      |null      |null            |null          |null       |null      |${SUCCESS}               |Account has been Invalidated.                                                      |
+|member1     |password1  |null           |UPDATE    |null      |null      |null            |null          |null       |null      |${AUTHENTICATION_WARNING}|Cannot authenticate the Account from the given Credentials.                        |
+|null        |new_session|SESSION        |UPDATE    |null      |null      |null            |null          |null       |null      |${AUTHENTICATION_WARNING}|No Session could be found.                                                         |
+|admin       |admin      |null           |DELETE    |member1_id|null      |null            |null          |null       |null      |${SUCCESS}               |The Member 'member1' has successfully been deleted.                                |
+
+!anchor circles
+!4 '''Circles of Trust'''
+The !-CWS-! Create Circle request can be performed by all standard accounts.
+
+|process circle                                                                                                                                                 |
+|account name|credential|action|circle id|circle name|member id|circle key|circle id?|return code?             |return message ?                                |
+|admin       |admin     |CREATE|null     |circle1    |user1_id |null      |=~/\S{36}/|${SUCCESS}               |Ok                                              |
+|user1       |password1 |CREATE|null     |circle1    |null     |null      |null      |${IDENTIFICATION_WARNING}|A Circle with the requested name already exists.|
+|user1       |password1 |CREATE|null     |circle2    |null     |null      |=~/\S{36}/|${SUCCESS}               |Ok                                              |
+|user2       |password2 |CREATE|null     |circle3    |null     |null      |=~/\S{36}/|${SUCCESS}               |Ok                                              |
+
+!anchor trustees
+!4 '''Trustees'''
+The !-CWS-! Create Circle request can be performed by all standard accounts.
+
+|process trustee                                                                              |
+|account name|credential|action|circle id |member id|trust level|return code?|return message ?|
+|user1       |password1 |ADD   |circle2_id|user2_id |WRITE      |${SUCCESS}  |Ok              |
+|user1       |password1 |ADD   |circle2_id|user3_id |READ       |${SUCCESS}  |Ok              |
+|user2       |password2 |ADD   |circle3_id|user1_id |WRITE      |${SUCCESS}  |Ok              |
+
+----
+!anchor sharing
+!2 Sharing
+
+!anchor datatype
+!4 '''Data Type'''
+Since all data is stored in CWS encrypted, and CWS only cares that the bytes which
+came in, also goes out - it can be hard for an application or server using CWS to
+ascertain what is behind the bytes. For this reason, CWS supports storing data with
+a "data type".
+
+Data Types can be anything; by default 2 types exist: "folder" and "data". If nothing
+is explicitly defined, the "data" will always be picked. The "folder" is simple there
+to provide the possibility to have structures of data, and it has the unique feature
+that Data Objects can have a folder as parent. All Circles of Trust will have a standard
+folder as their root, and it is used transparently within CWS.
+
+Working with data types requires administrative permissions, the request must be made
+as either system administrator or circle administrator. In the example below, admin is
+a system administrator, user1 is a circle administrator and user2 is neither.
+
+!-<img src="files/note.png" align="left">-! Contrary to all other entities in CWS, data types do not have any id's, they
+only have a name and a custom definition. It is only allow
+
+There are 3 kinds of actions / requests which can be made for data Types
+ * Fetch !-DataTypes-!
+   * SOAP: fetchDataTypes
+   * REST: /dataTypes/fetchDataTypes
+ * Process !-DataType-!
+   * SOAP: processDataType (action PROCESS)
+   * REST: /dataTypes/processDataType
+ * Delete !-DataType-!
+   * SOAP: processDataType (action DELETE)
+   * REST: /dataTypes/deleteDataType
+
+|process dataType                                                                                                                                                   |
+|account name|credential|action |name          |type                         |return code?            |return message?                                              |
+|admin       |admin     |PROCESS|MIMEType PDF  |application/pdf              |${SUCCESS}              |Ok                                                           |
+|user1       |password1 |PROCESS|jsonObject    |{"a":b,"c":d}                |${SUCCESS}              |Ok                                                           |
+|admin       |admin     |PROCESS|Object42      |com.company.object.ObjectName|${SUCCESS}              |Ok                                                           |
+|user3       |password3 |PROCESS|Awesome Object|Cool                         |${AUTHORIZATION_WARNING}|The requesting Account is not permitted to Process Data Type.|
+|user3       |password3 |DELETE |MIMEType PDF  |                             |${AUTHORIZATION_WARNING}|The requesting Account is not permitted to Process Data Type.|
+|admin       |admin     |DELETE |MIMEType PDF  |null                         |${SUCCESS}              |Ok                                                           |
+
+|fetch dataTypes                                                                                                                                                                                                                                                                 |
+|account name|credential|data types?                                                                                                                                                                                                                |return code?|return message?|
+|admin       |admin     |!-[DataType{typeName='data', type='Data Object'}, DataType{typeName='folder', type='Folder'}, DataType{typeName='jsonObject', type='{"a":b,"c":d}'}, DataType{typeName='Object42', type='com.company.object.ObjectName'}]-!|${SUCCESS}  |Ok             |
+
+!anchor data
+!4 '''Data'''
+
+|process data                                                                                                                                                           |
+|account name|credential|action|circle id |data id |data name|type name     |data              |return code?        |return message?                                    |
+|user1       |password1 |ADD   |circle1_id|null    |data1    |folder        |null              |${SUCCESS}          |Ok                                                 |
+|user1       |password1 |ADD   |circle1_id|null    |data2    |data          |First Data Object |${SUCCESS}          |Ok                                                 |
+|user1       |password1 |ADD   |circle2_id|null    |data3    |Awesome Object|Second Data Object|${INTEGRITY_WARNING}|Cannot find a matching !-DataType-! for the Object.|
+|user1       |password1 |DELETE|null      |data1_id|null     |null          |null              |${SUCCESS}          |Ok                                                 |
+
+|fetch data                                                              |
+|account name|credential|data id |data name?|return code?|return message?|
+|user1       |password1 |data2_id|data2     |${SUCCESS}  |Ok             |
+
+!anchor signatures
+!4 '''Signatures'''

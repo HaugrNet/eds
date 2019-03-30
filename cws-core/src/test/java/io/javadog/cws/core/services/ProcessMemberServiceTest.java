@@ -107,6 +107,8 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
 
     @Test
     public void testAddingAsMember() {
+        prepareCause(ReturnCode.AUTHORIZATION_WARNING, "Members are not permitted to create new Accounts.");
+
         final String account = "Member Added Member";
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
         final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, MEMBER_1);
@@ -114,10 +116,9 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
         request.setNewAccountName(account);
         request.setNewCredential(crypto.stringToBytes(account));
         request.setMemberRole(MemberRole.STANDARD);
-        final ProcessMemberResponse response = service.perform(request);
+        assertThat(request.validate().isEmpty(), is(true));
 
-        assertThat(response.getReturnCode(), is(ReturnCode.AUTHORIZATION_WARNING.getCode()));
-        assertThat(response.getReturnMessage(), is("Members are not permitted to create new Accounts."));
+        service.perform(request);
     }
 
     @Test
@@ -289,6 +290,8 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
 
     @Test
     public void testInvitationWithInvalidSignature() {
+        prepareCause(ReturnCode.AUTHENTICATION_WARNING, "The given signature is invalid.");
+
         final String bogusSignature = "T+OoZiBpm36P868XUZYWFsW1jUFlD31x+FeQuDjcm4DmmIk+qWd8KuUzLdnETRPIxo/OuYLcpvFiPxMf0v78feiw/yVVV5+1xjO+FR/KYgB4JTaJ6p0RIEpS3rjs27bY+1OYclsk4MPRKbxZN06ZFHlSY4btk1G4ML7x0/iUCLBbOO2y3S4JZpKwAR7kAyhVeqyi8qKi13o+7z/J0KP2EhHrF8+2y3z63TKLyClZRrAhvy3/g/k0q7MccFOKDGsxxIpe2jfOHtxLEYfbgrdly/fZHEQL5vbbf/LbQ7MISfcwXSLtJMD0COXsm/V1nkmI/ficjskvNuUj+h739KEmuQ==";
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
         final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
@@ -303,9 +306,8 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
         invationRequest.setCredentialType(CredentialType.SIGNATURE);
         invationRequest.setCredential(Base64.getDecoder().decode(bogusSignature));
         invationRequest.setNewCredential(crypto.stringToBytes(UUID.randomUUID().toString()));
-        final ProcessMemberResponse invitationResponse = service.perform(invationRequest);
-        assertThat(invitationResponse.getReturnCode(), is(ReturnCode.AUTHENTICATION_WARNING.getCode()));
-        assertThat(invitationResponse.getReturnMessage(), is("The given signature is invalid."));
+
+        service.perform(invationRequest);
     }
 
     @Test
@@ -330,54 +332,59 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
 
     @Test
     public void testInvitationWithoutPendingInvitation() {
+        prepareCause(ReturnCode.VERIFICATION_WARNING, "Account does not have an invitation pending.");
+
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
         final ProcessMemberRequest request = new ProcessMemberRequest();
         request.setAccountName(MEMBER_1);
         request.setCredentialType(CredentialType.SIGNATURE);
         request.setCredential(crypto.stringToBytes(UUID.randomUUID().toString()));
         request.setNewCredential(crypto.stringToBytes(UUID.randomUUID().toString()));
+        // Processing an invitation is circumventing the normal validation check.
+        assertThat(request.getAction(), is(nullValue()));
 
-        final ProcessMemberResponse response = service.perform(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING.getCode()));
-        assertThat(response.getReturnMessage(), is("Account does not have an invitation pending."));
+        service.perform(request);
     }
 
     @Test
     public void testInvitationWithoutAccount() {
+        prepareCause(ReturnCode.IDENTIFICATION_WARNING, "Account does not exist.");
+
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
         final ProcessMemberRequest request = new ProcessMemberRequest();
         request.setNewAccountName("wannabe");
         request.setCredentialType(CredentialType.SIGNATURE);
         request.setCredential(crypto.stringToBytes(UUID.randomUUID().toString()));
         request.setNewCredential(crypto.stringToBytes(UUID.randomUUID().toString()));
+        // Processing an invitation is circumventing the normal validation check.
+        assertThat(request.getAction(), is(nullValue()));
 
-        final ProcessMemberResponse response = service.perform(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.IDENTIFICATION_WARNING.getCode()));
-        assertThat(response.getReturnMessage(), is("Account does not exist."));
+        service.perform(request);
     }
 
     @Test
     public void testInviteExistingAccount() {
+        prepareCause(ReturnCode.CONSTRAINT_ERROR, "Cannot create an invitation, as as the account already exists.");
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
         final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
         request.setAction(Action.INVITE);
         request.setNewAccountName(MEMBER_4);
+        assertThat(request.validate().isEmpty(), is(true));
 
-        final ProcessMemberResponse response = service.perform(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.CONSTRAINT_ERROR.getCode()));
-        assertThat(response.getReturnMessage(), is("Cannot create an invitation, as as the account already exists."));
+        service.perform(request);
     }
 
     @Test
     public void testInvitingWithoutPermission() {
+        prepareCause(ReturnCode.ILLEGAL_ACTION, "Members are not permitted to invite new Members.");
+
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
         final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, MEMBER_1);
         request.setAction(Action.INVITE);
         request.setNewAccountName("invitee");
+        assertThat(request.validate().isEmpty(), is(true));
 
-        final ProcessMemberResponse response = service.perform(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.ILLEGAL_ACTION.getCode()));
-        assertThat(response.getReturnMessage(), is("Members are not permitted to invite new Members."));
+        service.perform(request);
     }
 
     @Test
@@ -510,13 +517,13 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
 
     @Test
     public void testInvalidateAdmin() {
+        prepareCause(ReturnCode.ILLEGAL_ACTION, "The System Administrator Account may not be invalidated.");
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
         final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
         request.setAction(Action.INVALIDATE);
+        assertThat(request.validate().isEmpty(), is(true));
 
-        final ProcessMemberResponse response = service.perform(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.ILLEGAL_ACTION.getCode()));
-        assertThat(response.getReturnMessage(), is("The System Administrator Account may not be invalidated."));
+        service.perform(request);
     }
 
     @Test

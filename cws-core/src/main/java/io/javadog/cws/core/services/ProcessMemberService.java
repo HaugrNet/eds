@@ -25,6 +25,7 @@ import io.javadog.cws.api.requests.ProcessMemberRequest;
 import io.javadog.cws.api.responses.ProcessMemberResponse;
 import io.javadog.cws.core.enums.KeyAlgorithm;
 import io.javadog.cws.core.enums.Permission;
+import io.javadog.cws.core.exceptions.AuthenticationException;
 import io.javadog.cws.core.exceptions.AuthorizationException;
 import io.javadog.cws.core.exceptions.CWSException;
 import io.javadog.cws.core.exceptions.IdentificationException;
@@ -127,60 +128,54 @@ public final class ProcessMemberService extends Serviceable<MemberDao, ProcessMe
     }
 
     private ProcessMemberResponse createMember(final ProcessMemberRequest request) {
-        final ProcessMemberResponse response;
-
         // Creating new Members, can only be performed by the System
         // Administrator, not by anyone else.
-        if (member.getMemberRole() == MemberRole.ADMIN) {
-            final String accountName = request.getNewAccountName().trim();
-
-            final MemberEntity found = dao.findMemberByName(accountName);
-            if (found == null) {
-                final MemberRole role = whichRole(request);
-                final MemberEntity created = createNewAccount(accountName, role, request.getNewCredential());
-                response = new ProcessMemberResponse();
-                response.setMemberId(created.getExternalId());
-            } else {
-                throw new CWSException(ReturnCode.IDENTIFICATION_WARNING, "An Account with the requested AccountName already exist.");
-            }
-        } else {
-            response = new ProcessMemberResponse(ReturnCode.AUTHORIZATION_WARNING, "Members are not permitted to create new Accounts.");
+        if (member.getMemberRole() != MemberRole.ADMIN) {
+            throw new AuthorizationException("Members are not permitted to create new Accounts.");
         }
+
+        final String accountName = request.getNewAccountName().trim();
+        final MemberEntity found = dao.findMemberByName(accountName);
+        if (found != null) {
+            throw new CWSException(ReturnCode.IDENTIFICATION_WARNING, "An Account with the requested AccountName already exist.");
+        }
+
+        final MemberRole role = whichRole(request);
+        final MemberEntity created = createNewAccount(accountName, role, request.getNewCredential());
+        final ProcessMemberResponse response = new ProcessMemberResponse();
+        response.setMemberId(created.getExternalId());
 
         return response;
     }
 
     private ProcessMemberResponse inviteMember(final ProcessMemberRequest request) {
-        final ProcessMemberResponse response;
-
         // Invitations can only be issued by the System Administrator, not by
         // anyone else.
-        if (member.getMemberRole() == MemberRole.ADMIN) {
-            final String memberName = request.getNewAccountName().trim();
-            final MemberEntity existing = dao.findMemberByName(memberName);
-
-            if (existing == null) {
-                final String uuid = UUID.randomUUID().toString();
-                final byte[] signature = crypto.sign(keyPair.getPrivate().getKey(), crypto.stringToBytes(uuid));
-
-                final MemberEntity entity = new MemberEntity();
-                entity.setName(memberName);
-                entity.setSalt(crypto.encryptWithMasterKey(uuid));
-                entity.setPbeAlgorithm(settings.getPasswordAlgorithm());
-                entity.setRsaAlgorithm(settings.getSignatureAlgorithm());
-                entity.setPrivateKey(CredentialType.SIGNATURE.name());
-                entity.setPublicKey(Base64.getEncoder().encodeToString(signature));
-                entity.setMemberRole(whichRole(request));
-                dao.persist(entity);
-
-                response = new ProcessMemberResponse();
-                response.setSignature(signature);
-            } else {
-                response = new ProcessMemberResponse(ReturnCode.CONSTRAINT_ERROR, "Cannot create an invitation, as as the account already exists.");
-            }
-        } else {
-            response = new ProcessMemberResponse(ReturnCode.ILLEGAL_ACTION, "Members are not permitted to invite new Members.");
+        if (member.getMemberRole() != MemberRole.ADMIN) {
+            throw new IllegalActionException("Members are not permitted to invite new Members.");
         }
+
+        final String memberName = request.getNewAccountName().trim();
+        final MemberEntity found = dao.findMemberByName(memberName);
+        if (found != null) {
+            throw new CWSException(ReturnCode.CONSTRAINT_ERROR, "Cannot create an invitation, as as the account already exists.");
+        }
+
+        final String uuid = UUID.randomUUID().toString();
+        final byte[] signature = crypto.sign(keyPair.getPrivate().getKey(), crypto.stringToBytes(uuid));
+
+        final MemberEntity entity = new MemberEntity();
+        entity.setName(memberName);
+        entity.setSalt(crypto.encryptWithMasterKey(uuid));
+        entity.setPbeAlgorithm(settings.getPasswordAlgorithm());
+        entity.setRsaAlgorithm(settings.getSignatureAlgorithm());
+        entity.setPrivateKey(CredentialType.SIGNATURE.name());
+        entity.setPublicKey(Base64.getEncoder().encodeToString(signature));
+        entity.setMemberRole(whichRole(request));
+        dao.persist(entity);
+
+        final ProcessMemberResponse response = new ProcessMemberResponse();
+        response.setSignature(signature);
 
         return response;
     }
@@ -270,32 +265,31 @@ public final class ProcessMemberService extends Serviceable<MemberDao, ProcessMe
     private void updateOwnAccountName(final String newAccountName) {
         if (!isEmpty(newAccountName)) {
             final MemberEntity existing = dao.findMemberByName(newAccountName);
-
-            if (existing == null) {
-                member.setName(newAccountName);
-            } else {
+            if (existing != null) {
                 throw new CWSException(ReturnCode.CONSTRAINT_ERROR, "The new Account Name already exists.");
             }
+
+            member.setName(newAccountName);
         }
     }
 
     private void updateOwnCredential(final ProcessMemberRequest request) {
         final byte[] credential = request.getNewCredential();
         if (credential != null) {
-            if (request.getCredentialType() == CredentialType.PASSPHRASE) {
-                final CWSKeyPair pair = updateMemberPassword(member, credential);
-                Arrays.fill(credential, (byte) 0);
-
-                final List<TrusteeEntity> list = dao.findTrusteesByMember(member, EnumSet.allOf(TrustLevel.class));
-                for (final TrusteeEntity trustee : list) {
-                    final KeyAlgorithm algorithm = trustee.getKey().getAlgorithm();
-                    final SecretCWSKey circleKey = crypto.extractCircleKey(algorithm, keyPair.getPrivate(), trustee.getCircleKey());
-                    trustee.setCircleKey(crypto.encryptAndArmorCircleKey(pair.getPublic(), circleKey));
-
-                    dao.persist(trustee);
-                }
-            } else {
+            if (request.getCredentialType() != CredentialType.PASSPHRASE) {
                 throw new CWSException(ReturnCode.VERIFICATION_WARNING, "It is only permitted to update the credentials when authenticating with Passphrase.");
+            }
+
+            final CWSKeyPair pair = updateMemberPassword(member, credential);
+            Arrays.fill(credential, (byte) 0);
+
+            final List<TrusteeEntity> list = dao.findTrusteesByMember(member, EnumSet.allOf(TrustLevel.class));
+            for (final TrusteeEntity trustee : list) {
+                final KeyAlgorithm algorithm = trustee.getKey().getAlgorithm();
+                final SecretCWSKey circleKey = crypto.extractCircleKey(algorithm, keyPair.getPrivate(), trustee.getCircleKey());
+                trustee.setCircleKey(crypto.encryptAndArmorCircleKey(pair.getPublic(), circleKey));
+
+                dao.persist(trustee);
             }
         }
     }
@@ -318,19 +312,17 @@ public final class ProcessMemberService extends Serviceable<MemberDao, ProcessMe
      * @return New Response Object
      */
     private ProcessMemberResponse invalidate(final ProcessMemberRequest request) {
-        final ProcessMemberResponse response;
-
         // Invitations can only be issued by the System Administrator, not by
         // anyone else.
         if (member.getMemberRole() == MemberRole.ADMIN) {
-            response = new ProcessMemberResponse(ReturnCode.ILLEGAL_ACTION, "The System Administrator Account may not be invalidated.");
-        } else {
-            dao.removeSession(member);
-            updateMemberPassword(member, request.getCredential());
-
-            response = new ProcessMemberResponse();
-            response.setReturnMessage("Account has been Invalidated.");
+            throw new IllegalActionException("The System Administrator Account may not be invalidated.");
         }
+
+        dao.removeSession(member);
+        updateMemberPassword(member, request.getCredential());
+
+        final ProcessMemberResponse response = new ProcessMemberResponse();
+        response.setReturnMessage("Account has been Invalidated.");
 
         return response;
     }
@@ -369,44 +361,42 @@ public final class ProcessMemberService extends Serviceable<MemberDao, ProcessMe
 
     private ProcessMemberResponse processInvitation(final ProcessMemberRequest request) {
         final MemberEntity account = dao.findMemberByName(request.getAccountName());
-        final ProcessMemberResponse response;
-
-        if (account != null) {
-            if (Objects.equals(account.getPrivateKey(), CredentialType.SIGNATURE.name())) {
-                final String secret = crypto.decryptWithMasterKey(account.getSalt());
-                // Although multiple System Administrators may exist, it will
-                // make everything very cumbersome if all their keys have to be
-                // checked. Hence, it is limited to the first.
-                final MemberEntity admin = dao.findMemberByName(Constants.ADMIN_ACCOUNT);
-                final PublicKey publicKey = crypto.dearmoringPublicKey(admin.getPublicKey());
-
-                if (crypto.verify(publicKey, crypto.stringToBytes(secret), request.getCredential())) {
-                    final KeyAlgorithm pbeAlgorithm = settings.getPasswordAlgorithm();
-                    final IVSalt salt = new IVSalt();
-                    final byte[] newSecret = request.getNewCredential();
-                    final CWSKeyPair pair = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
-                    final SecretCWSKey key = crypto.generatePasswordKey(pbeAlgorithm, newSecret, salt.getArmored());
-                    key.setSalt(salt);
-
-                    account.setSalt(crypto.encryptWithMasterKey(salt.getArmored()));
-                    account.setPbeAlgorithm(pbeAlgorithm);
-                    account.setRsaAlgorithm(pair.getAlgorithm());
-                    account.setMemberKey(request.getPublicKey());
-                    account.setPublicKey(crypto.armoringPublicKey(pair.getPublic().getKey()));
-                    account.setPrivateKey(crypto.armoringPrivateKey(key, pair.getPrivate().getKey()));
-                    dao.persist(account);
-
-                    response = new ProcessMemberResponse();
-                    response.setMemberId(account.getExternalId());
-                } else {
-                    response = new ProcessMemberResponse(ReturnCode.AUTHENTICATION_WARNING, "The given signature is invalid.");
-                }
-            } else {
-                response = new ProcessMemberResponse(ReturnCode.VERIFICATION_WARNING, "Account does not have an invitation pending.");
-            }
-        } else {
-            response = new ProcessMemberResponse(ReturnCode.IDENTIFICATION_WARNING, "Account does not exist.");
+        if (account == null) {
+            throw new IdentificationException("Account does not exist.");
         }
+
+        if (!Objects.equals(account.getPrivateKey(), CredentialType.SIGNATURE.name())) {
+            throw new VerificationException("Account does not have an invitation pending.");
+        }
+
+        final String secret = crypto.decryptWithMasterKey(account.getSalt());
+        // Although multiple System Administrators may exist, it will
+        // make everything very cumbersome if all their keys have to be
+        // checked. Hence, it is limited to the first.
+        final MemberEntity admin = dao.findMemberByName(Constants.ADMIN_ACCOUNT);
+        final PublicKey publicKey = crypto.dearmoringPublicKey(admin.getPublicKey());
+
+        if (!crypto.verify(publicKey, crypto.stringToBytes(secret), request.getCredential())) {
+            throw new AuthenticationException("The given signature is invalid.");
+        }
+
+        final KeyAlgorithm pbeAlgorithm = settings.getPasswordAlgorithm();
+        final IVSalt salt = new IVSalt();
+        final byte[] newSecret = request.getNewCredential();
+        final CWSKeyPair pair = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
+        final SecretCWSKey key = crypto.generatePasswordKey(pbeAlgorithm, newSecret, salt.getArmored());
+        key.setSalt(salt);
+
+        account.setSalt(crypto.encryptWithMasterKey(salt.getArmored()));
+        account.setPbeAlgorithm(pbeAlgorithm);
+        account.setRsaAlgorithm(pair.getAlgorithm());
+        account.setMemberKey(request.getPublicKey());
+        account.setPublicKey(crypto.armoringPublicKey(pair.getPublic().getKey()));
+        account.setPrivateKey(crypto.armoringPrivateKey(key, pair.getPrivate().getKey()));
+        dao.persist(account);
+
+        final ProcessMemberResponse response = new ProcessMemberResponse();
+        response.setMemberId(account.getExternalId());
 
         return response;
     }

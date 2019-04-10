@@ -18,12 +18,13 @@ package io.javadog.cws.api.requests;
 
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.Utilities;
-import java.util.Map;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
+import java.util.Map;
 
 /**
  * <p>The MasterKey Request Object is needed to change the internally used
@@ -96,7 +97,7 @@ public final class MasterKeyRequest extends Authentication {
         final Map<String, String> errors = super.validate();
 
         if ((secret == null) == (url == null)) {
-            // Both fields can neither value can be set nor missing.
+            // Both fields can neither be set nor missing.
             errors.put(Constants.FIELD_SECRET, "Either the secret or the URL must be given to alter the MasterKey.");
             errors.put(Constants.FIELD_URL, "Either the secret or the URL must be given to alter the MasterKey.");
         } else {

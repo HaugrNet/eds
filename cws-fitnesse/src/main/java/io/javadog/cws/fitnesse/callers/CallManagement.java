@@ -20,6 +20,7 @@ import io.javadog.cws.api.Management;
 import io.javadog.cws.api.requests.FetchCircleRequest;
 import io.javadog.cws.api.requests.FetchMemberRequest;
 import io.javadog.cws.api.requests.FetchTrusteeRequest;
+import io.javadog.cws.api.requests.MasterKeyRequest;
 import io.javadog.cws.api.requests.ProcessCircleRequest;
 import io.javadog.cws.api.requests.ProcessMemberRequest;
 import io.javadog.cws.api.requests.ProcessTrusteeRequest;
@@ -28,6 +29,7 @@ import io.javadog.cws.api.requests.SettingRequest;
 import io.javadog.cws.api.responses.FetchCircleResponse;
 import io.javadog.cws.api.responses.FetchMemberResponse;
 import io.javadog.cws.api.responses.FetchTrusteeResponse;
+import io.javadog.cws.api.responses.MasterKeyResponse;
 import io.javadog.cws.api.responses.ProcessCircleResponse;
 import io.javadog.cws.api.responses.ProcessMemberResponse;
 import io.javadog.cws.api.responses.ProcessTrusteeResponse;
@@ -72,6 +74,11 @@ public final class CallManagement {
     public static VersionResponse version(final String type, final String url) {
         prepareCWS(type, url);
         return management.version();
+    }
+
+    public static MasterKeyResponse masterKey(final String type, final String url, final MasterKeyRequest request) {
+        prepareCWS(type, url);
+        return management.masterKey(request);
     }
 
     public static SettingResponse settings(final String type, final String url, final SettingRequest request) {

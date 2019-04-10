@@ -3,12 +3,13 @@
 
 # Return Codes
 !define SUCCESS {200}
-!define AUTHORIZATION_WARNING {401}
-!define AUTHENTICATION_WARNING {403}
-!define IDENTIFICATION_WARNING {404}
-!define VERIFICATION_WARNING {406}
-!define INTEGRITY_WARNING {409}
-!define SETTING_WARNING {492}
+!define AUTHORIZATION_WARNING  { 401 }
+!define AUTHENTICATION_WARNING { 403 }
+!define IDENTIFICATION_WARNING { 404 }
+!define ILLEGAL_ACTION         { 405 }
+!define VERIFICATION_WARNING   { 406 }
+!define INTEGRITY_WARNING      { 409 }
+!define SETTING_WARNING        { 492 }
 
 |Import                 |
 |io.javadog.cws.fitnesse|

@@ -18,6 +18,7 @@ package io.javadog.cws.core.services;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 
 import io.javadog.cws.api.common.Constants;
@@ -29,9 +30,6 @@ import io.javadog.cws.core.enums.StandardSetting;
 import io.javadog.cws.core.jce.MasterKey;
 import io.javadog.cws.core.model.Settings;
 import io.javadog.cws.core.model.entities.MemberEntity;
-import org.junit.Test;
-
-import javax.persistence.Query;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -39,6 +37,8 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.UUID;
+import javax.persistence.Query;
+import org.junit.Test;
 
 /**
  * <p>This Test Class, is testing the following Service Classes in one, as they
@@ -55,38 +55,42 @@ public final class MasterKeyServiceTest extends DatabaseSetup {
 
     @Test
     public void testUpdateMasterKeyWithNullRequest() {
+        prepareCause(ReturnCode.VERIFICATION_WARNING, "Cannot process the request, the given data is invalid.");
+
         final MasterKeyService service = new MasterKeyService(settings, entityManager);
         final MasterKeyRequest request = null;
+        assertThat(service, is(not(nullValue())));
 
-        final MasterKeyResponse response = service.perform(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING.getCode()));
-        assertThat(response.getReturnMessage(), is("Cannot process the request, the given data is invalid."));
+        service.perform(request);
     }
 
     @Test
     public void testUpdateMasterKeyWithEmptyRequest() {
+        prepareCause(ReturnCode.VERIFICATION_WARNING, "Cannot process the request, the given data is invalid.");
+
         final MasterKeyService service = new MasterKeyService(settings, entityManager);
         final MasterKeyRequest request = new MasterKeyRequest();
+        assertThat(request.validate().isEmpty(), is(false));
 
-        final MasterKeyResponse response = service.perform(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING.getCode()));
-        assertThat(response.getReturnMessage(), is("Cannot process the request, the given data is invalid."));
+        service.perform(request);
     }
 
     @Test
     public void testUpdateMasterKeyAsMember() {
+        prepareCause(ReturnCode.AUTHENTICATION_WARNING, "Given Account is not permitted to perform this request.");
+
         final MasterKeyService service = new MasterKeyService(settings, entityManager);
         final MasterKeyRequest request = prepareRequest(MasterKeyRequest.class, MEMBER_1);
         request.setSecret("New MasterKey".getBytes(Charset.defaultCharset()));
+        assertThat(request.validate().isEmpty(), is(true));
 
-        final MasterKeyResponse response = service.perform(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.AUTHENTICATION_WARNING.getCode()));
-        assertThat(response.getReturnMessage(), is("Given Account is not permitted to perform this request."));
+        service.perform(request);
     }
 
     @Test
     public void testUpdateMasterKeyAsAdminWithWrongCredentials() {
         prepareCause(ReturnCode.AUTHENTICATION_WARNING, "Invalid credentials.");
+
         final MasterKeyService service = new MasterKeyService(settings, entityManager);
         final MasterKeyRequest request = prepareRequest(MasterKeyRequest.class, Constants.ADMIN_ACCOUNT);
         request.setCredential("root".getBytes(Charset.defaultCharset()));
@@ -97,7 +101,7 @@ public final class MasterKeyServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testUpdatingMasterKeyZeroMembers() {
+    public void testUpdatingMasterKeySecretZeroMembers() {
         // Before starting, all member accounts must be removed
         final List<MemberEntity> members = dao.findAllAscending(MemberEntity.class, "id");
         for (final MemberEntity member : members) {
@@ -107,6 +111,25 @@ public final class MasterKeyServiceTest extends DatabaseSetup {
         final MasterKeyService service = new MasterKeyService(settings, entityManager);
         final MasterKeyRequest request = prepareRequest(MasterKeyRequest.class, Constants.ADMIN_ACCOUNT);
         request.setSecret(request.getCredential());
+        final MasterKeyResponse response = service.perform(request);
+        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+        assertThat(response.getReturnMessage(), is("MasterKey unlocked."));
+    }
+
+    @Test
+    public void testUpdatingMasterKeyUrlZeroMembers() throws IOException {
+        // Before starting, all member accounts must be removed
+        final String path = "file://" + tempDir() + "secret_master_key.bin";
+        Files.write(Paths.get(path), generateData(8192));
+        final List<MemberEntity> members = dao.findAllAscending(MemberEntity.class, "id");
+        for (final MemberEntity member : members) {
+            dao.delete(member);
+        }
+
+        final MasterKeyService service = new MasterKeyService(settings, entityManager);
+        final MasterKeyRequest request = prepareRequest(MasterKeyRequest.class, Constants.ADMIN_ACCOUNT);
+        request.setUrl(path);
+
         final MasterKeyResponse response = service.perform(request);
         assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
         assertThat(response.getReturnMessage(), is("MasterKey unlocked."));

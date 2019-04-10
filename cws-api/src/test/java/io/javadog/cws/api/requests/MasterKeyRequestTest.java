@@ -22,9 +22,9 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
 import io.javadog.cws.api.common.Constants;
-import org.junit.Test;
-
+import java.io.File;
 import java.util.Map;
+import org.junit.Test;
 
 /**
  * @author Kim Jensen
@@ -98,11 +98,22 @@ public final class MasterKeyRequestTest {
     }
 
     @Test
-    public void testValidUrl() {
+    public void testValidHttpUrl() {
         final MasterKeyRequest request = new MasterKeyRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
         request.setCredential(convert(Constants.ADMIN_ACCOUNT));
         request.setUrl("https://javadog.io/");
+
+        final Map<String, String> errors = request.validate();
+        assertThat(errors.isEmpty(), is(true));
+    }
+
+    @Test
+    public void testValidFileUrl() {
+        final MasterKeyRequest request = new MasterKeyRequest();
+        request.setAccountName(Constants.ADMIN_ACCOUNT);
+        request.setCredential(convert(Constants.ADMIN_ACCOUNT));
+        request.setUrl("file://" + File.separator + System.getProperty("java.io.tmpdir") + File.separator + "file_name.dat");
 
         final Map<String, String> errors = request.validate();
         assertThat(errors.isEmpty(), is(true));

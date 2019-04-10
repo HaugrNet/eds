@@ -26,18 +26,18 @@ import io.javadog.cws.core.enums.StandardSetting;
 import io.javadog.cws.core.exceptions.AuthenticationException;
 import io.javadog.cws.core.exceptions.CryptoException;
 import io.javadog.cws.core.exceptions.IllegalActionException;
-import io.javadog.cws.core.exceptions.VerificationException;
 import io.javadog.cws.core.jce.MasterKey;
 import io.javadog.cws.core.jce.SecretCWSKey;
 import io.javadog.cws.core.model.CommonDao;
 import io.javadog.cws.core.model.Settings;
 import io.javadog.cws.core.model.entities.MemberEntity;
 import io.javadog.cws.core.model.entities.SettingEntity;
+
+import javax.persistence.EntityManager;
 import java.util.Base64;
 import java.util.List;
 import java.util.Objects;
 import java.util.logging.Logger;
-import javax.persistence.EntityManager;
 
 /**
  * <p>Business Logic implementation for the CWS MasterKey request.</p>
@@ -58,9 +58,7 @@ public final class MasterKeyService extends Serviceable<CommonDao, MasterKeyResp
      */
     @Override
     public MasterKeyResponse perform(final MasterKeyRequest request) {
-        if ((request == null) || !request.validate().isEmpty()) {
-            throw new VerificationException("Cannot process the request, the given data is invalid.");
-        }
+        verify(request);
 
         if (!Objects.equals(request.getAccountName(), Constants.ADMIN_ACCOUNT)) {
             throw new AuthenticationException("Given Account is not permitted to perform this request.");

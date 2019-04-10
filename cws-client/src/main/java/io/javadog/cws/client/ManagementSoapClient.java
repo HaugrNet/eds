@@ -214,6 +214,7 @@ public final class ManagementSoapClient implements Management {
             ws = new io.javadog.cws.ws.MasterKeyRequest();
             Mapper.fillAuthentication(ws, api);
             ws.setSecret(api.getSecret());
+            ws.setUrl(api.getUrl());
         }
 
         return ws;

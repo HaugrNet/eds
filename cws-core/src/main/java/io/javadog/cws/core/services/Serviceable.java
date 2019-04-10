@@ -189,7 +189,7 @@ public abstract class Serviceable<D extends CommonDao, R extends CwsResponse, A 
      * @param verifiable Given Request Object to verify
      * @throws VerificationException if the given Object is null or invalid
      */
-    private static void verify(final Verifiable verifiable) {
+    protected static void verify(final Verifiable verifiable) {
         if (verifiable != null) {
             final Map<String, String> errors = verifiable.validate();
             if (!errors.isEmpty()) {

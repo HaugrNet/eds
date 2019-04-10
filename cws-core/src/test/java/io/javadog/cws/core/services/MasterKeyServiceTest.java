@@ -56,7 +56,7 @@ public final class MasterKeyServiceTest extends DatabaseSetup {
 
     @Test
     public void testUpdateMasterKeyWithNullRequest() {
-        prepareCause(ReturnCode.VERIFICATION_WARNING, "Cannot process the request, the given data is invalid.");
+        prepareCause(ReturnCode.VERIFICATION_WARNING, "Cannot Process a NULL Object");
 
         final MasterKeyService service = new MasterKeyService(settings, entityManager);
         final MasterKeyRequest request = null;
@@ -67,7 +67,10 @@ public final class MasterKeyServiceTest extends DatabaseSetup {
 
     @Test
     public void testUpdateMasterKeyWithEmptyRequest() {
-        prepareCause(ReturnCode.VERIFICATION_WARNING, "Cannot process the request, the given data is invalid.");
+        prepareCause(ReturnCode.VERIFICATION_WARNING, "Request Object contained errors:\n" +
+                "Key: credential, Error: The Session (Credential) is missing.\n" +
+                "Key: secret, Error: Either the secret or the URL must be given to alter the MasterKey.\n" +
+                "Key: url, Error: Either the secret or the URL must be given to alter the MasterKey.");
 
         final MasterKeyService service = new MasterKeyService(settings, entityManager);
         final MasterKeyRequest request = new MasterKeyRequest();

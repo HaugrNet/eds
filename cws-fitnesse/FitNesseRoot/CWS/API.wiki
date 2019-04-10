@@ -3,13 +3,6 @@ Test
 ---
 !*> Setup
 !include .CWS.Setup
-!fixture io.javadog.cws.fitnesse
-
-|process member                                                                                                                                         |
-|account name|credential|credential type|action|member id|public key|new account name|new credential|member role|member id?|return code?|return message?|
-|admin       |admin     |PASSPHRASE     |CREATE|null     |null      |user1           |password1     |STANDARD   |=~/\S{36}/|${SUCCESS}  |Ok             |
-|admin       |admin     |PASSPHRASE     |CREATE|null     |null      |user2           |password2     |STANDARD   |=~/\S{36}/|${SUCCESS}  |Ok             |
-|admin       |admin     |PASSPHRASE     |CREATE|null     |null      |user3           |password3     |STANDARD   |=~/\S{36}/|${SUCCESS}  |Ok             |
 
 *!
 
@@ -21,8 +14,8 @@ is used to control a CWS instance, and the second is the sharing part.
 [[Management has the following elements: ][#management]]
 
  * '''[[ Version ][#version]] '''
- * '''[[ Settings ][#settings]] '''
  * '''[[ !-MasterKey-! ][#masterkey]] '''
+ * '''[[ Settings ][#settings]] '''
  * '''[[ Sanitized ][#sanitized]] '''
  * '''[[ Members ][#members]] '''
  * '''[[ Circles of Trust ][#circles]] '''
@@ -35,6 +28,7 @@ is used to control a CWS instance, and the second is the sharing part.
  * '''[[ !-Signatures-! ][#signatures]] '''
 
 ----
+[[ Top ][#content]]
 !anchor management
 !2 Management
 Management primarily contain the functionality which is used to control
@@ -42,6 +36,14 @@ the system, including altering settings. Adding a system specific !-MasterKey-!
 as well as creating members, Circles of Trust and assign members as trustees to
 the Circles.
 
+'''Important'''; ''The very first request made with the '''admin''' account will
+also set the password for the administrator. By default, the passphrase is empty
+or undefined. Which means that it can be set to anything the administrator
+prefers, thus preventing that someone forgets to change the default. It is
+recommended that common best practices regarding the pick of the passphrase is
+followed - for the sake of this test, it is set to 'admin'.
+
+[[ Top ][#content]]
 !anchor version
 !4 '''Version'''
 The Version request is a simple ping check, which is the only not requiring any credentials to invoke.
@@ -51,18 +53,48 @@ The Version request is a simple ping check, which is the only not requiring any 
 |${SUCCESS}  |Ok             |1.1-SNAPSHOT|
 
 [[ Top ][#content]]
+!anchor masterkey
+!4 '''!-MasterKey-!'''
+The !-MasterKey-!, is a special System Key, which is not stored anywhere. It is being created at startup and lives only in the memory of
+the system until shut down. The !-MasterKey-! is used for multiple internal things, such as extra key to unlock accounts. It is therefore
+not possible to update the !-MasterKey-!, once the system is being used, since it would essentually convert the CWS database to a brick,
+since all keys becomes invalid.
+
+There are 2 ways to set the !-MasterKey-! to something else than the default, either by using the !-MasterKey WebService-! request or by
+setting a URL, from which the raw data to build the key from can be read. To prevent any problems, in the following, the !-MasterKey-! is
+reverted to the original, to ensure that the next test run will also work.
+
+|master key                                                                                              |
+|account name|credential|url                                 |secret|return code?|return message?        |
+|admin       |admin     |null                                |admin |${SUCCESS}  |!-MasterKey-! unlocked.|
+|admin       |admin     |!-https://javadog.io/img/cloud.png-!|null  |${SUCCESS}  |!-MasterKey-! updated. |
+|admin       |admin     |null                                |master|${SUCCESS}  |!-MasterKey-! updated. |
+|admin       |admin     |null                                |admin |${SUCCESS}  |!-MasterKey-! updated. |
+
+It should be noted, that unlocking can always be done, but changing the !-MasterKey-! cannot be done once member accounts exists, since
+it is not possible for an administrator to update the member keys.
+
+!*> Create Test accounts
+|process member                                                                                                                                         |
+|account name|credential|credential type|action|member id|public key|new account name|new credential|member role|member id?|return code?|return message?|
+|admin       |admin     |PASSPHRASE     |CREATE|null     |null      |user1           |password1     |STANDARD   |=~/\S{36}/|${SUCCESS}  |Ok             |
+|admin       |admin     |PASSPHRASE     |CREATE|null     |null      |user2           |password2     |STANDARD   |=~/\S{36}/|${SUCCESS}  |Ok             |
+|admin       |admin     |PASSPHRASE     |CREATE|null     |null      |user3           |password3     |STANDARD   |=~/\S{36}/|${SUCCESS}  |Ok             |
+
+*!
+
+|master key                                                                                                                                                  |
+|account name|credential|url                                 |secret    |return code?             |return message?                                           |
+|user1       |password1 |null                                |new secret|${AUTHENTICATION_WARNING}|Given Account is not permitted to perform this request.   |
+|admin       |admin     |!-https://javadog.io/img/cloud.png-!|null      |${ILLEGAL_ACTION}        |Cannot alter the !-MasterKey-!, as Member Accounts exists.|
+|admin       |admin     |null                                |master    |${ILLEGAL_ACTION}        |Cannot alter the !-MasterKey-!, as Member Accounts exists.|
+
+[[ Top ][#content]]
 !anchor settings
 !4 '''Settings'''
 The !-CWS-! Settings request can only be performed by the System
 Administrator, i.e. the system super user. It is a way to both extract the
 current settings, and update existing values.
-
-'''Important'''; ''The very first request made with the '''admin''' account will
-also set the password for the administrator. By default, the passphrase is empty
-or undefined. Which means that it can be set to anything the administrator
-prefers, thus preventing that someone forgets to change the default. It is
-recommended that common best practices regarding the pick of the passphrase is
-followed - for the sake of this test, it is set to 'admin'.''
 
 |script|Settings     |admin                          |admin                                                     |
 |check |value for key|cws.crypto.symmetric.algorithm |AES_CBC_256                                               |
@@ -150,12 +182,11 @@ The allowed values are:
 |admin       |admin     |cws.crypto.pbe.algorithm|PBE_512|${SETTING_WARNING}|Unsupported Crypto Algorithm for 'cws.crypto.pbe.algorithm'.|PBE_256 |
 
 
-!anchor masterkey
-!4 '''!-MasterKey-!'''
-
+[[ Top ][#content]]
 !anchor sanitized
 !4 '''Sanitized'''
 
+[[ Top ][#content]]
 !anchor members
 !4 '''Members'''
 The !-CWS-! Create Account request requires administrative priviledges to be performed.
@@ -175,6 +206,7 @@ The !-CWS-! Create Account request requires administrative priviledges to be per
 |null        |new_session|SESSION        |UPDATE    |null      |null      |null            |null          |null       |null      |${AUTHENTICATION_WARNING}|No Session could be found.                                                         |
 |admin       |admin      |null           |DELETE    |member1_id|null      |null            |null          |null       |null      |${SUCCESS}               |The Member 'member1' has successfully been deleted.                                |
 
+[[ Top ][#content]]
 !anchor circles
 !4 '''Circles of Trust'''
 The !-CWS-! Create Circle request can be performed by all standard accounts.
@@ -186,6 +218,7 @@ The !-CWS-! Create Circle request can be performed by all standard accounts.
 |user1       |password1 |CREATE|null     |circle2    |null     |null      |=~/\S{36}/|${SUCCESS}               |Ok                                              |
 |user2       |password2 |CREATE|null     |circle3    |null     |null      |=~/\S{36}/|${SUCCESS}               |Ok                                              |
 
+[[ Top ][#content]]
 !anchor trustees
 !4 '''Trustees'''
 The !-CWS-! Create Circle request can be performed by all standard accounts.
@@ -197,6 +230,7 @@ The !-CWS-! Create Circle request can be performed by all standard accounts.
 |user2       |password2 |ADD   |circle3_id|user1_id |WRITE      |${SUCCESS}  |Ok              |
 
 ----
+[[ Top ][#content]]
 !anchor sharing
 !2 Sharing
 
@@ -244,6 +278,7 @@ There are 3 kinds of actions / requests which can be made for data Types
 |account name|credential|data types?                                                                                                                                                                                                                |return code?|return message?|
 |admin       |admin     |!-[DataType{typeName='data', type='Data Object'}, DataType{typeName='folder', type='Folder'}, DataType{typeName='jsonObject', type='{"a":b,"c":d}'}, DataType{typeName='Object42', type='com.company.object.ObjectName'}]-!|${SUCCESS}  |Ok             |
 
+[[ Top ][#content]]
 !anchor data
 !4 '''Data'''
 
@@ -258,5 +293,6 @@ There are 3 kinds of actions / requests which can be made for data Types
 |account name|credential|data id |data name?|return code?|return message?|
 |user1       |password1 |data2_id|data2     |${SUCCESS}  |Ok             |
 
+[[ Top ][#content]]
 !anchor signatures
 !4 '''Signatures'''

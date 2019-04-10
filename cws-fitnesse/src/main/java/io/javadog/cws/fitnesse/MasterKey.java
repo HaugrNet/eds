@@ -13,7 +13,10 @@ package io.javadog.cws.fitnesse;
 import io.javadog.cws.api.requests.MasterKeyRequest;
 import io.javadog.cws.api.responses.MasterKeyResponse;
 import io.javadog.cws.fitnesse.callers.CallManagement;
+import io.javadog.cws.fitnesse.exceptions.StopTestException;
 import io.javadog.cws.fitnesse.utils.Converter;
+
+import java.util.Map;
 
 /**
  * @author Kim Jensen
@@ -48,6 +51,10 @@ public final class MasterKey extends CwsRequest<MasterKeyResponse> {
         final MasterKeyRequest request = prepareRequest(MasterKeyRequest.class);
         request.setSecret(secret);
         request.setUrl(url);
+        final Map<String, String> errors = request.validate();
+        if (!errors.isEmpty()) {
+            throw new StopTestException(errors.toString());
+        }
 
         response = CallManagement.masterKey(requestType, requestUrl, request);
     }

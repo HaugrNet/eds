@@ -30,6 +30,9 @@ import io.javadog.cws.core.enums.StandardSetting;
 import io.javadog.cws.core.jce.MasterKey;
 import io.javadog.cws.core.model.Settings;
 import io.javadog.cws.core.model.entities.MemberEntity;
+import org.junit.Test;
+
+import javax.persistence.Query;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -37,8 +40,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.UUID;
-import javax.persistence.Query;
-import org.junit.Test;
 
 /**
  * <p>This Test Class, is testing the following Service Classes in one, as they
@@ -119,7 +120,8 @@ public final class MasterKeyServiceTest extends DatabaseSetup {
     @Test
     public void testUpdatingMasterKeyUrlZeroMembers() throws IOException {
         // Before starting, all member accounts must be removed
-        final String path = "file://" + tempDir() + "secret_master_key.bin";
+        final String path = tempDir() + "secret_master_key.bin";
+        final String file = "file://" + path;
         Files.write(Paths.get(path), generateData(8192));
         final List<MemberEntity> members = dao.findAllAscending(MemberEntity.class, "id");
         for (final MemberEntity member : members) {
@@ -128,11 +130,13 @@ public final class MasterKeyServiceTest extends DatabaseSetup {
 
         final MasterKeyService service = new MasterKeyService(settings, entityManager);
         final MasterKeyRequest request = prepareRequest(MasterKeyRequest.class, Constants.ADMIN_ACCOUNT);
-        request.setUrl(path);
+        request.setUrl(file);
 
         final MasterKeyResponse response = service.perform(request);
         assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
-        assertThat(response.getReturnMessage(), is("MasterKey unlocked."));
+        assertThat(response.getReturnMessage(), is("MasterKey updated."));
+
+        revertMasterKeyToOriginal(service);
     }
 
     @Test
@@ -160,13 +164,7 @@ public final class MasterKeyServiceTest extends DatabaseSetup {
         assertThat(secretResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
         assertThat(secretResponse.getReturnMessage(), is("MasterKey updated."));
 
-        // Before we're done - set the MasterKey back to the default, which is
-        // using the System Administrator account name as secret.
-        final MasterKeyRequest resetRequest = prepareRequest(MasterKeyRequest.class, Constants.ADMIN_ACCOUNT);
-        resetRequest.setSecret(resetRequest.getCredential());
-        final MasterKeyResponse resetResponse = service.perform(resetRequest);
-        assertThat(resetResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
-        assertThat(resetResponse.getReturnMessage(), is("MasterKey updated."));
+        revertMasterKeyToOriginal(service);
     }
 
     @Test
@@ -262,5 +260,19 @@ public final class MasterKeyServiceTest extends DatabaseSetup {
         final Query query = entityManager.createQuery(jql);
         query.setParameter("name", StandardSetting.MASTERKEY_URL.getKey());
         query.executeUpdate();
+    }
+
+    /**
+     * Reverts the MasterKey to the original or default MasterKey, since other
+     * tests will otherwise fail.
+     *
+     * @param service MasterKey Service instance
+     */
+    private static void revertMasterKeyToOriginal(final MasterKeyService service) {
+        final MasterKeyRequest resetRequest = prepareRequest(MasterKeyRequest.class, Constants.ADMIN_ACCOUNT);
+        resetRequest.setSecret(resetRequest.getCredential());
+        final MasterKeyResponse resetResponse = service.perform(resetRequest);
+        assertThat(resetResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+        assertThat(resetResponse.getReturnMessage(), is("MasterKey updated."));
     }
 }

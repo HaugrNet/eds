@@ -75,7 +75,7 @@ public final class ProcessData extends CwsRequest<ProcessDataResponse> {
     }
 
     public void setTypeName(final String typeName) {
-        this.typeName = Converter.preCheck(typeName);;
+        this.typeName = Converter.preCheck(typeName);
     }
 
     public void setData(final String data) {

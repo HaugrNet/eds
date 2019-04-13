@@ -16,9 +16,12 @@
  */
 package io.javadog.cws.fitnesse;
 
+import io.javadog.cws.api.dtos.Circle;
 import io.javadog.cws.api.requests.FetchCircleRequest;
 import io.javadog.cws.api.responses.FetchCircleResponse;
 import io.javadog.cws.fitnesse.callers.CallManagement;
+
+import java.util.List;
 
 /**
  * @author Kim Jensen
@@ -31,7 +34,26 @@ public final class FetchCircles extends CwsRequest<FetchCircleResponse> {
     // =========================================================================
 
     public String circles() {
-        return (response != null) ? response.getCircles().toString() : null;
+        final StringBuilder builder = new StringBuilder("[");
+        if (response != null) {
+            final List<Circle> circles = response.getCircles();
+            for (int i = 0; i < circles.size(); i++) {
+                final Circle circle = circles.get(i);
+                if (i >= 1) {
+                    builder.append(", ");
+                }
+                builder.append("Circle{circleId='")
+                        .append(getKey(circle.getCircleId()))
+                        .append("', circleName='")
+                        .append(circle.getCircleName())
+                        .append("', circleKey='")
+                        .append(circle.getCircleKey())
+                        .append("'}");
+            }
+        }
+        builder.append(']');
+
+        return builder.toString();
     }
 
     // =========================================================================

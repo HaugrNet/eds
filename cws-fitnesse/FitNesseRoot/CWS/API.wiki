@@ -33,7 +33,7 @@ is used to control a CWS instance, and the second is the sharing part.
 !2 Management
 Management primarily contain the functionality which is used to control
 the system, including altering settings. Adding a system specific !-MasterKey-!
-as well as creating members, Circles of Trust and assign members as trustees to
+as well as creating Members, Circles of Trust and assign Members as Trustees to
 the Circles.
 
 '''Important'''; ''The very first request made with the '''admin''' account will
@@ -41,12 +41,16 @@ also set the password for the administrator. By default, the passphrase is empty
 or undefined. Which means that it can be set to anything the administrator
 prefers, thus preventing that someone forgets to change the default. It is
 recommended that common best practices regarding the pick of the passphrase is
-followed - for the sake of this test, it is set to 'admin'.
+followed - for the sake of this test, it is set to 'admin'.''
 
 [[ Top ][#content]]
 !anchor version
 !4 '''Version'''
-The Version request is a simple ping check, which is the only not requiring any credentials to invoke.
+The Version request is a simple ping check, which is the only not requiring any
+credentials to invoke.
+
+REST (POST) request is: [PROTOCOL://HOST:PORT]/cws/version
+Example: https://cws.company.com:8080/cws/version
 
 |version                                  |
 |return code?|return message?|cws version?|
@@ -63,6 +67,9 @@ since all keys becomes invalid.
 There are 2 ways to set the !-MasterKey-! to something else than the default, either by using the !-MasterKey WebService-! request or by
 setting a URL, from which the raw data to build the key from can be read. To prevent any problems, in the following, the !-MasterKey-! is
 reverted to the original, to ensure that the next test run will also work.
+
+REST (POST) request is: [PROTOCOL://HOST:PORT]/cws/masterKey
+Example: https://cws.company.com:8080/cws/masterKey
 
 |master key                                                                                              |
 |account name|credential|url                                 |secret|return code?|return message?        |
@@ -95,6 +102,9 @@ it is not possible for an administrator to update the member keys.
 The !-CWS-! Settings request can only be performed by the System
 Administrator, i.e. the system super user. It is a way to both extract the
 current settings, and update existing values.
+
+REST (POST) request is: [PROTOCOL://HOST:PORT]/cws/settings
+Example: https://cws.company.com:8080/cws/settings
 
 |script|Settings     |admin                          |admin                                                     |
 |check |value for key|cws.crypto.symmetric.algorithm |AES_CBC_256                                               |
@@ -175,21 +185,69 @@ The allowed values are:
  * '''PBE_256'''
 
 |Settings                                                                                                                                         |
-|account name|credential|key                     |value  |return code?      |return message?                                             |defined?|
-|admin       |admin     |cws.crypto.pbe.algorithm|PBE_128|${SUCCESS}        |Ok                                                          |PBE_128 |
-|admin       |admin     |cws.crypto.pbe.algorithm|PBE_192|${SUCCESS}        |Ok                                                          |PBE_192 |
-|admin       |admin     |cws.crypto.pbe.algorithm|PBE_256|${SUCCESS}        |Ok                                                          |PBE_256 |
-|admin       |admin     |cws.crypto.pbe.algorithm|PBE_512|${SETTING_WARNING}|Unsupported Crypto Algorithm for 'cws.crypto.pbe.algorithm'.|PBE_256 |
+|account name|credential|key                     |value  |defined?|return code?      |return message?                                             |
+|admin       |admin     |cws.crypto.pbe.algorithm|PBE_128|PBE_128 |${SUCCESS}        |Ok                                                          |
+|admin       |admin     |cws.crypto.pbe.algorithm|PBE_192|PBE_192 |${SUCCESS}        |Ok                                                          |
+|admin       |admin     |cws.crypto.pbe.algorithm|PBE_256|PBE_256 |${SUCCESS}        |Ok                                                          |
+|admin       |admin     |cws.crypto.pbe.algorithm|PBE_512|PBE_256 |${SETTING_WARNING}|Unsupported Crypto Algorithm for 'cws.crypto.pbe.algorithm'.|
 
 
 [[ Top ][#content]]
 !anchor sanitized
 !4 '''Sanitized'''
+Any server relies on the storage for correctness. If the storage used has flaws and the stored data is being altered as a consequence of this, then
+it may have drastic consequences. Something which is encrypted may be rendered unreadable of just a single bit has been flipped. It is therefore
+essential that the storage is always correct. To help with this, CWS has a feature build-in, which runs sanitizing checks at frequent interval,
+so all data will be checked at least once every x days, where x is defined as a system property (cws.sanity.check.interval.days).
+
+The sanitizing request is an administrative request, and the result is a list of Data Id's, of the stored Objects where their checksums no longer
+match the encrypted data. The check can be made generally or for a Circle of Trust or simply as a check if new errors have occurred since a certain
+date.
+
+REST (POST) request is: [PROTOCOL://HOST:PORT]/cws/sanitized
+Example: https://cws.company.com:8080/cws/sanitized
+
+|sanitized                                                                          |
+|account name|credential|circle id|since     |failures?|return code?|return message?|
+|admin       |admin     |null     |null      |[]       |${SUCCESS}  |Ok             |
+|admin       |admin     |null     |2019-01-01|[]       |${SUCCESS}  |Ok             |
 
 [[ Top ][#content]]
 !anchor members
 !4 '''Members'''
-The !-CWS-! Create Account request requires administrative priviledges to be performed.
+Managing Members is a core part of the Management. The following features can be
+performed with the current API:
+
+ * Create Member - Creates a new Account with a given password
+   * Only '''System Administrators''' may perform this
+   * SOAP: processMember with Action "CREATE"
+   * REST (POST) request is: [PROTOCOL://HOST:PORT]/cws/members/createMember
+ * Invite Member - Creates an invitation, so a Member can update themselves
+   * Only '''System Administrators''' may perform this
+   * SOAP: processMember with Action "INVITE"
+   * REST (POST) request is: [PROTOCOL://HOST:PORT]/cws/members/inviteMember
+ * Login - Simple way to temporarily assign a !-SessionKey-! to an account
+   * SOAP: processMember with Action "LOGIN"
+   * REST (POST) request is: [PROTOCOL://HOST:PORT]/cws/members/login
+ * Logout - Remove the temporary !-SessionKey-! from accessing the account
+   * SOAP: processMember with Action "LOGOUT"
+   * REST (POST) request is: [PROTOCOL://HOST:PORT]/cws/members/logout
+ * Alter Member Roles - Allows an Administrator to change a Members permissions
+   * Only '''System Administrators''' may perform this
+   * SOAP: processMember with Action "ALTER"
+   * REST (POST) request is: [PROTOCOL://HOST:PORT]/cws/members/alterMember
+ * Update Member - Allows a member to update their account & credentials
+   * SOAP: processMember with Action "UPDATE"
+   * REST (POST) request is: [PROTOCOL://HOST:PORT]/cws/members/updateMember
+ * Invalidate Member - Allows a member to invalidate their account, rendering it useless
+   * SOAP: processMember with Action "INVALIDATE"
+   * REST (POST) request is: [PROTOCOL://HOST:PORT]/cws/members/invalidate
+ * Delete Member - Removes a Member Account from the System permanently
+   * SOAP: processMember with Action "DELETE"
+   * REST (POST) request is: [PROTOCOL://HOST:PORT]/cws/members/deleteMember
+ * Fetch Members - Retrieve a list of one or more Members
+   * SOAP: fetchMembers
+   * REST (POST) requst is: [PROTOCOL://HOST:PORT]/cws/members/fetchMembers
 
 |process member                                                                                                                                                                                                                                |
 |account name|credential |credential type|action    |member id |public key|new account name|new credential|member role|member id?|return code?             |return message?                                                                    |
@@ -209,14 +267,44 @@ The !-CWS-! Create Account request requires administrative priviledges to be per
 [[ Top ][#content]]
 !anchor circles
 !4 '''Circles of Trust'''
-The !-CWS-! Create Circle request can be performed by all standard accounts.
+Circles of Trust is a core part of CWS, as this is the grouping of Members or
+''Trustees'', to facilitte sharing of information. There are no limits as to
+who may create a Circle of Trust. Circles of Trust do not have an Owner, but
+rather one or more Circle Administrators. The first Member to create a Circle
+will automatically become the initial Circle Administrator - or if a Member Id
+is given, then this Member will be the initial Circle Administrator.
 
-|process circle                                                                                                                                                 |
-|account name|credential|action|circle id|circle name|member id|circle key|circle id?|return code?             |return message ?                                |
-|admin       |admin     |CREATE|null     |circle1    |user1_id |null      |=~/\S{36}/|${SUCCESS}               |Ok                                              |
-|user1       |password1 |CREATE|null     |circle1    |null     |null      |null      |${IDENTIFICATION_WARNING}|A Circle with the requested name already exists.|
-|user1       |password1 |CREATE|null     |circle2    |null     |null      |=~/\S{36}/|${SUCCESS}               |Ok                                              |
-|user2       |password2 |CREATE|null     |circle3    |null     |null      |=~/\S{36}/|${SUCCESS}               |Ok                                              |
+Circles of Trust do not have much information initially - basically just their
+name, which must be unique. Circles of Trust may also have an external Circle
+Key, which means a shared Key that can be used by Trustees from a Client system.
+
+ * Create Circle - Creates a new Circle of Trust in CWS
+   * SOAP: processCircle with Action "CREATE"
+   * REST (POST) request is: [PROTOCOL://HOST:PORT]/cws/circles/createCircle
+ * Update Circle - Allows the Circle of Trust to be renamed
+   * SOAP: processCircle with Action "UPDATE"
+   * REST (POST) request is: [PROTOCOL://HOST:PORT]/cws/circles/updateCircle
+ * Delete Circle - Removes a Circle with all Trustees & Data from the System
+   * SOAP: processCircle with Action "DELETE"
+   * REST (POST) request is: [PROTOCOL://HOST:PORT]/cws/circles/deleteCircle
+ * Fetch Circles - Retrieves a list of Circles in the current CWS instance
+   * SOAP: fetchCircles
+   * REST (POST) request is: [PROTOCOL://HOST:PORT]/cws/circles/fetchCircles
+
+|process circle                                                                                                                                                       |
+|account name|credential|action|circle id|circle name|member id|circle key      |circle id?|return code?             |return message ?                                |
+|admin       |admin     |CREATE|null     |circle1    |user1_id |null            |=~/\S{36}/|${SUCCESS}               |Ok                                              |
+|user1       |password1 |CREATE|null     |circle1    |null     |null            |null      |${IDENTIFICATION_WARNING}|A Circle with the requested name already exists.|
+|user1       |password1 |CREATE|null     |circle2    |null     |null            |=~/\S{36}/|${SUCCESS}               |Ok                                              |
+|user2       |password2 |CREATE|null     |circle3    |null     |super secret key|=~/\S{36}/|${SUCCESS}               |Ok                                              |
+
+The Fetch Circles request is intended to get a listing of all the current Circles in CWS, note that only if a user is Member of a Circle,
+can they retrieve the Circle Key.
+
+|fetch circles                                                                                                                                                                                                                                                                         |
+|account name|credential|circles?                                                                                                                                                                                                                         |return code?|return message?|
+|user1       |password1 |[Circle{circleId='circle1_id', circleName='circle1', circleKey='null'}, Circle{circleId='circle2_id', circleName='circle2', circleKey='null'}, Circle{circleId='circle3_id', circleName='circle3', circleKey='null'}]            |${SUCCESS}  |Ok             |
+|user2       |password2 |[Circle{circleId='circle1_id', circleName='circle1', circleKey='null'}, Circle{circleId='circle2_id', circleName='circle2', circleKey='null'}, Circle{circleId='circle3_id', circleName='circle3', circleKey='super secret key'}]|${SUCCESS}  |Ok             |
 
 [[ Top ][#content]]
 !anchor trustees
@@ -289,9 +377,9 @@ There are 3 kinds of actions / requests which can be made for data Types
 |user1       |password1 |ADD   |circle2_id|null    |data3    |Awesome Object|Second Data Object|${INTEGRITY_WARNING}|Cannot find a matching !-DataType-! for the Object.|
 |user1       |password1 |DELETE|null      |data1_id|null     |null          |null              |${SUCCESS}          |Ok                                                 |
 
-|fetch data                                                              |
-|account name|credential|data id |data name?|return code?|return message?|
-|user1       |password1 |data2_id|data2     |${SUCCESS}  |Ok             |
+|fetch data                                                                                |
+|account name|credential|data id |data name?|data?            |return code?|return message?|
+|user1       |password1 |data2_id|data2     |First Data Object|${SUCCESS}  |Ok             |
 
 [[ Top ][#content]]
 !anchor signatures

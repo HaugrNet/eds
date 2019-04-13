@@ -155,6 +155,19 @@ public abstract class CwsRequest<R extends CwsResponse> {
         }
     }
 
+    protected String getKey(final String id) {
+        String key = null;
+
+        if (id != null) {
+            key = ids.entrySet().stream()
+                    .filter((Map.Entry<String, String> entry) -> Objects.equals(entry.getValue(), id))
+                    .map(Map.Entry::getKey)
+                    .findFirst().orElse(null);
+        }
+
+        return key;
+    }
+
     protected String getId(final String key) {
         String id = null;
 

@@ -88,6 +88,10 @@ public final class FetchData extends CwsRequest<FetchDataResponse> {
         return (metadata != null) ? Converter.convertDate(metadata.getAdded()) : null;
     }
 
+    public String data() {
+        return (response != null) ? Converter.convertBytes(response.getData()) : null;
+    }
+
     // =========================================================================
     // Standard FitNesse Fixture method(s)
     // =========================================================================

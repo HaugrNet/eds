@@ -77,17 +77,30 @@ public final class Converter {
     }
 
     public static String convertDate(final Date date) {
-        final Format formatter = new SimpleDateFormat(DATE_FORMAT, LOCALE);
-        return formatter.format(date);
+        String converted = null;
+
+        if (date != null) {
+            final Format formatter = new SimpleDateFormat(DATE_FORMAT, LOCALE);
+            converted = formatter.format(date);
+        }
+
+        return converted;
     }
 
     public static Date convertDate(final String date) {
-        try {
-            final DateFormat formatter = new SimpleDateFormat(DATE_FORMAT, LOCALE);
-            return formatter.parse(date);
-        } catch (ParseException e) {
-            throw new StopTestException(e);
+        final String checked = preCheck(date);
+        Date converted = null;
+
+        if (checked != null) {
+            try {
+                final DateFormat formatter = new SimpleDateFormat(DATE_FORMAT, LOCALE);
+                converted = formatter.parse(checked);
+            } catch (ParseException e) {
+                throw new StopTestException(e);
+            }
         }
+
+        return converted;
     }
 
     public static String convertBytes(final byte[] bytes) {

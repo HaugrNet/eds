@@ -37,7 +37,7 @@ public final class Sanitized extends CwsRequest<SanityResponse> {
     // =========================================================================
 
     public void setCircleId(final String circleId) {
-        this.circleId = circleId;
+        this.circleId = Converter.preCheck(circleId);
     }
 
     public void setSince(final String since) {

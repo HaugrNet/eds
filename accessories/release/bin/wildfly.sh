@@ -9,6 +9,8 @@ readonly dbPort="5432"
 readonly dbUser="cws_user"
 readonly dbPassword="cws"
 readonly dbName="cws"
+# Maximal file size for uploading to WildFly - 25 MB (25 * 1024 * 1024)
+readonly maxPostSize="26214400"
 readonly wildfly=${JBOSS_HOME}
 # Hidden feature, if set this port is used to start JBoss/WildFly in debug mode
 readonly debugPort=${DEBUG_PORT}
@@ -45,6 +47,9 @@ if [[ "${action}" = "configure" ]]; then
             cp `dirname $0`/../wildfly/module.xml ${wildfly}/modules/org/postgresql/main
             ${wildfly}/bin/jboss-cli.sh --connect --command="/subsystem=datasources/jdbc-driver=postgresql:add(driver-name=postgresql,driver-module-name=org.postgresql,driver-xa-datasource-class-name=org.postgresql.xa.PGXADataSource)" 2>/dev/null
             ${wildfly}/bin/jboss-cli.sh --connect --command="data-source add --name=cwsDS --driver-name=postgresql --jndi-name=java:/datasources/cwsDS --connection-url=jdbc:postgresql://${dbHost}:${dbPort}/${dbName} --user-name=${dbUser} --password=${dbPassword} --use-ccm=false --max-pool-size=25 --blocking-timeout-wait-millis=5000 --enabled=true" 2>/dev/null
+            ${wildfly}/bin/jboss-cli.sh --connect --command="/subsystem=undertow/server=default-server/http-listener=default/:write-attribute(name=max-post-size,value=${maxPostSize})" 2>/dev/null
+            echo "Restarting WildFly ..."
+            ${wildfly}/bin/jboss-cli.sh --connect --command="reload"
             echo "WildFly has been configured"
         else
             echo "WildFly have already been configured"

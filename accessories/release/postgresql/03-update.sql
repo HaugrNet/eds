@@ -30,7 +30,7 @@ ALTER TABLE cws_members ADD COLUMN member_role VARCHAR(10) DEFAULT 'STANDARD';
 UPDATE cws_members SET member_role = 'ADMIN' WHERE id = 1;
 UPDATE cws_members SET member_role = 'STANDARD' WHERE id > 1;
 -- Now, apply the not-null constraint to this column
-ALTER TABLE cws_members ADD CONSTRAINT member_notnull_role CHECK (member_role IS NOT NULL),
+ALTER TABLE cws_members ADD CONSTRAINT member_notnull_role CHECK (member_role IS NOT NULL);
 
 -- The constants have been altered, to allow for more clarity and additional
 -- values, this means that they default values must be corrected as well.

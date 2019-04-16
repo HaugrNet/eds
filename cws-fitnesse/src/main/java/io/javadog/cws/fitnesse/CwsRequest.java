@@ -18,7 +18,7 @@ package io.javadog.cws.fitnesse;
 
 import io.javadog.cws.api.common.Action;
 import io.javadog.cws.api.common.CredentialType;
-import io.javadog.cws.api.dtos.DataType;
+import io.javadog.cws.api.dtos.Circle;
 import io.javadog.cws.api.requests.Authentication;
 import io.javadog.cws.api.responses.CwsResponse;
 import io.javadog.cws.api.responses.ProcessCircleResponse;
@@ -37,7 +37,7 @@ import java.util.Objects;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-public abstract class CwsRequest<R extends CwsResponse> {
+public class CwsRequest<R extends CwsResponse> {
 
     protected static String requestType = "SOAP";
     protected static String requestUrl = "http://localhost:8080/cws";
@@ -48,10 +48,6 @@ public abstract class CwsRequest<R extends CwsResponse> {
     // single internal record, where the name have "_id" appended, and this
     // is then used to both store, delete and find Ids.
     private static final Map<String, String> ids = new HashMap<>(16);
-
-    // For all Data processing, it helps to cache the existing types, so they
-    // can easily be retrieved and used if new data is being added or retrieved.
-    private final Map<String, String> dataTypes = new HashMap<>();
 
     private String accountName = null;
     protected byte[] credential = null;
@@ -101,7 +97,9 @@ public abstract class CwsRequest<R extends CwsResponse> {
      * method, which runs the request. It builds the Request Object and saves
      * the Response Object.
      */
-    public abstract void execute();
+    public void execute() {
+        throw new StopTestException("Unsupported Action.");
+    }
 
     /**
      * When using the Fit Table Fixture, FitNesse is invoking the reset method,
@@ -116,6 +114,27 @@ public abstract class CwsRequest<R extends CwsResponse> {
     // =========================================================================
     // Operating the internal mapping of Members & Circles
     // =========================================================================
+
+    protected void addCircleInfo(final StringBuilder builder, final List<Circle> circles) {
+        for (int i = 0; i < circles.size(); i++) {
+            final Circle circle = circles.get(i);
+            if (i >= 1) {
+                builder.append(", ");
+            }
+            builder.append("Circle{circleId='")
+                    .append(getKey(circle.getCircleId()))
+                    .append("', circleName='")
+                    .append(circle.getCircleName())
+                    .append("', circleKey='")
+                    .append(circle.getCircleKey())
+                    .append("'}");
+        }
+    }
+
+    protected static void clearAndAddAdminId(final String key, final String value) {
+        ids.clear();
+        ids.put(key, value);
+    }
 
     protected static void processId(final Action action, final String currentKey, final String newKey, final ProcessMemberResponse response) {
         if (response != null) {
@@ -179,19 +198,5 @@ public abstract class CwsRequest<R extends CwsResponse> {
         }
 
         return id;
-    }
-
-    protected void setDataTypes(final List<DataType> dataTypes) {
-        for (final DataType dataType : dataTypes) {
-            this.dataTypes.put(dataType.getTypeName(), dataType.getType());
-        }
-    }
-
-    protected boolean hasDataType(final String typeName) {
-        return dataTypes.get(typeName) != null;
-    }
-
-    protected String getDataType(final String typeName) {
-        return dataTypes.getOrDefault(typeName, null);
     }
 }

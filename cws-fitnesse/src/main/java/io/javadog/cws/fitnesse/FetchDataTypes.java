@@ -16,9 +16,12 @@
  */
 package io.javadog.cws.fitnesse;
 
+import io.javadog.cws.api.dtos.DataType;
 import io.javadog.cws.api.requests.FetchDataTypeRequest;
 import io.javadog.cws.api.responses.FetchDataTypeResponse;
 import io.javadog.cws.fitnesse.callers.CallShare;
+
+import java.util.List;
 
 /**
  * @author Kim Jensen
@@ -31,7 +34,24 @@ public final class FetchDataTypes extends CwsRequest<FetchDataTypeResponse> {
     // =========================================================================
 
     public String dataTypes() {
-        return response.getDataTypes().toString();
+        final StringBuilder builder = new StringBuilder("[");
+        if (response != null) {
+            final List<DataType> dataTypes = response.getDataTypes();
+            for (int i = 0; i < dataTypes.size(); i++) {
+                final DataType dataType = dataTypes.get(i);
+                if (i >= 1) {
+                    builder.append(", ");
+                }
+                builder.append("DataType{typeName='")
+                        .append(dataType.getTypeName())
+                        .append("', type='")
+                        .append(dataType.getType())
+                        .append("'}");
+            }
+        }
+        builder.append(']');
+
+        return builder.toString();
     }
 
     // =========================================================================
@@ -46,6 +66,5 @@ public final class FetchDataTypes extends CwsRequest<FetchDataTypeResponse> {
         final FetchDataTypeRequest request = prepareRequest(FetchDataTypeRequest.class);
 
         response = CallShare.fetchDataTypes(requestType, requestUrl, request);
-        setDataTypes(response.getDataTypes());
     }
 }

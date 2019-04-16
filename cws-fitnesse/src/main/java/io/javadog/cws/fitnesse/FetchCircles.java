@@ -37,19 +37,7 @@ public final class FetchCircles extends CwsRequest<FetchCircleResponse> {
         final StringBuilder builder = new StringBuilder("[");
         if (response != null) {
             final List<Circle> circles = response.getCircles();
-            for (int i = 0; i < circles.size(); i++) {
-                final Circle circle = circles.get(i);
-                if (i >= 1) {
-                    builder.append(", ");
-                }
-                builder.append("Circle{circleId='")
-                        .append(getKey(circle.getCircleId()))
-                        .append("', circleName='")
-                        .append(circle.getCircleName())
-                        .append("', circleKey='")
-                        .append(circle.getCircleKey())
-                        .append("'}");
-            }
+            addCircleInfo(builder, circles);
         }
         builder.append(']');
 

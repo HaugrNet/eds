@@ -264,6 +264,12 @@ performed with the current API:
 |null        |new_session|SESSION        |UPDATE    |null      |null      |null            |null          |null       |null      |${AUTHENTICATION_WARNING}|No Session could be found.                                                         |
 |admin       |admin      |null           |DELETE    |member1_id|null      |null            |null          |null       |null      |${SUCCESS}               |The Member 'member1' has successfully been deleted.                                |
 
+|fetch members                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+|account name|credential|member id|members?                                                                                                                                                                                                                                                                                                                                                                                                                                                           |circles?|return code?|return message?|
+|admin       |admin     |null     |[Member{memberId='admin_id', accountName='admin', memberRole='ADMIN', publicKey='null'}, Member{memberId='admin2_id', accountName='admin2', memberRole='ADMIN', publicKey='null'}, Member{memberId='user1_id', accountName='user1', memberRole='STANDARD', publicKey='null'}, Member{memberId='user2_id', accountName='user2', memberRole='STANDARD', publicKey='null'}, Member{memberId='user3_id', accountName='user3', memberRole='STANDARD', publicKey='null'}]|[]      |${SUCCESS}  |Ok             |
+|user2       |password2 |user1_id |[Member{memberId='user1_id', accountName='user1', memberRole='STANDARD', publicKey='null'}]                                                                                                                                                                                                                                                                                                                                                                        |[]      |${SUCCESS}  |Ok             |
+
+
 [[ Top ][#content]]
 !anchor circles
 !4 '''Circles of Trust'''
@@ -316,6 +322,24 @@ The !-CWS-! Create Circle request can be performed by all standard accounts.
 |user1       |password1 |ADD   |circle2_id|user2_id |WRITE      |${SUCCESS}  |Ok              |
 |user1       |password1 |ADD   |circle2_id|user3_id |READ       |${SUCCESS}  |Ok              |
 |user2       |password2 |ADD   |circle3_id|user1_id |WRITE      |${SUCCESS}  |Ok              |
+
+If a Fetch Members for a given User is invoked now, then the list of Circles which the Member is entrusted with will also be returned.
+
+|fetch members                                                                                                                                                                                                                     |
+|account name|credential|member id|members?                                                                                   |circles?                                                               |return code?|return message?|
+|user2       |password2 |user3_id |[Member{memberId='user3_id', accountName='user3', memberRole='STANDARD', publicKey='null'}]|[Circle{circleId='circle2_id', circleName='circle2', circleKey='null'}]|${SUCCESS}  |Ok             |
+
+However, the Fetch Members request with the Circle listing is pruned, and instead the fetch Trustees should be used, as it will
+return a more accurate depiction of the relations. Note, that this request is more stringent in the results returned. System
+Administrators are allowed to retrieve most information but members are only allowed to retrieve information if a relation between
+the Member & Circle already exists.
+
+|fetch trustees                                                                                                                                                                                                                                                                                                  |
+|account name|credential|circle id |trustees?                                                                                                                                                                         |return code?             |return message?                                                 |
+|admin       |admin     |circle3_id|[Trustee{memberId='user1_id', circleId='user1_id', trustLevel='WRITE', publicKey='null'}, Trustee{memberId='user2_id', circleId='user2_id', trustLevel='ADMIN', publicKey='null'}]|${SUCCESS}               |Ok                                                              |
+|user1       |password1 |circle3_id|[Trustee{memberId='user1_id', circleId='user1_id', trustLevel='WRITE', publicKey='null'}, Trustee{memberId='user2_id', circleId='user2_id', trustLevel='ADMIN', publicKey='null'}]|${SUCCESS}               |Ok                                                              |
+|user2       |password2 |circle3_id|[Trustee{memberId='user1_id', circleId='user1_id', trustLevel='WRITE', publicKey='null'}, Trustee{memberId='user2_id', circleId='user2_id', trustLevel='ADMIN', publicKey='null'}]|${SUCCESS}               |Ok                                                              |
+|user3       |password3 |circle3_id|[]                                                                                                                                                                                |${IDENTIFICATION_WARNING}|=~/No Trustee information found for member 'user3' and circle.*/|
 
 ----
 [[ Top ][#content]]

@@ -16,9 +16,14 @@
  */
 package io.javadog.cws.fitnesse;
 
+import io.javadog.cws.api.dtos.Circle;
+import io.javadog.cws.api.dtos.Member;
 import io.javadog.cws.api.requests.FetchMemberRequest;
 import io.javadog.cws.api.responses.FetchMemberResponse;
 import io.javadog.cws.fitnesse.callers.CallManagement;
+import io.javadog.cws.fitnesse.utils.Converter;
+
+import java.util.List;
 
 /**
  * @author Kim Jensen
@@ -33,15 +38,43 @@ public final class FetchMembers extends CwsRequest<FetchMemberResponse> {
     // =========================================================================
 
     public void setMemberId(final String memberId) {
-        this.memberId = memberId;
-    }
-
-    public String circles() {
-        return (response != null) ? response.getCircles().toString() : null;
+        this.memberId = getId(Converter.preCheck(memberId));
     }
 
     public String members() {
-        return (response != null) ? response.getMembers().toString() : null;
+        final StringBuilder builder = new StringBuilder("[");
+        if (response != null) {
+            final List<Member> members = response.getMembers();
+            for (int i = 0; i < members.size(); i++) {
+                final Member member = members.get(i);
+                if (i >= 1) {
+                    builder.append(", ");
+                }
+                builder.append("Member{memberId='")
+                        .append(getKey(member.getMemberId()))
+                        .append("', accountName='")
+                        .append(member.getAccountName())
+                        .append("', memberRole='")
+                        .append(member.getMemberRole())
+                        .append("', publicKey='")
+                        .append(member.getPublicKey())
+                        .append("'}");
+            }
+        }
+        builder.append(']');
+
+        return builder.toString();
+    }
+
+    public String circles() {
+        final StringBuilder builder = new StringBuilder("[");
+        if (response != null) {
+            final List<Circle> circles = response.getCircles();
+            addCircleInfo(builder, circles);
+        }
+        builder.append(']');
+
+        return builder.toString();
     }
 
     // =========================================================================

@@ -52,7 +52,7 @@ import java.util.Objects;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-public final class ControlCws {
+public final class ControlCws extends CwsRequest<FetchMemberResponse> {
 
     private String type = "SOAP";
     private String url = "http://localhost:8080/cws";
@@ -64,8 +64,8 @@ public final class ControlCws {
     }
 
     public void removeCircles() {
-        final FetchCircleRequest fetchRequest = prepareRequest(FetchCircleRequest.class);
-        final ProcessCircleRequest processRequest = prepareRequest(ProcessCircleRequest.class);
+        final FetchCircleRequest fetchRequest = prepareAdminRequest(FetchCircleRequest.class);
+        final ProcessCircleRequest processRequest = prepareAdminRequest(ProcessCircleRequest.class);
         processRequest.setAction(Action.DELETE);
 
         final FetchCircleResponse fetchResponse = CallManagement.fetchCircles(type, url, fetchRequest);
@@ -76,17 +76,23 @@ public final class ControlCws {
     }
 
     public void removeMembers() {
-        final FetchMemberRequest fetchRequest = prepareRequest(FetchMemberRequest.class);
-        final ProcessMemberRequest processRequest = prepareRequest(ProcessMemberRequest.class);
+        final FetchMemberRequest fetchRequest = prepareAdminRequest(FetchMemberRequest.class);
+        final ProcessMemberRequest processRequest = prepareAdminRequest(ProcessMemberRequest.class);
         processRequest.setAction(Action.DELETE);
+        final String adminKey = Constants.ADMIN_ACCOUNT + "_id";
+        String adminId = null;
 
         final FetchMemberResponse fetchResponse = CallManagement.fetchMembers(type, url, fetchRequest);
         for (final Member member : fetchResponse.getMembers()) {
             if (!Objects.equals(member.getAccountName(), Constants.ADMIN_ACCOUNT)) {
                 processRequest.setMemberId(member.getMemberId());
                 CallManagement.processMember(type, url, processRequest);
+            } else {
+                adminId = member.getMemberId();
             }
         }
+
+        clearAndAddAdminId(adminKey, adminId);
     }
 
     public void removeDataTypes() {
@@ -103,7 +109,7 @@ public final class ControlCws {
         }
     }
 
-    private static <T extends Authentication> T prepareRequest(final Class<T> clazz) {
+    private static <T extends Authentication> T prepareAdminRequest(final Class<T> clazz) {
         try {
             final T request = clazz.getConstructor().newInstance();
 

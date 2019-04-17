@@ -43,7 +43,7 @@ import io.javadog.cws.api.responses.VersionResponse;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-public final class ManagementRestClient extends BaseRestClient implements Management {
+public final class ManagementRestClient extends GsonRestClient implements Management {
 
     private static final String UNSUPPORTED_OPERATION = "Unsupported Operation: ";
     private static final String INVALID_REQUEST = "Cannot perform request, as the Request Object is missing or incomplete.";

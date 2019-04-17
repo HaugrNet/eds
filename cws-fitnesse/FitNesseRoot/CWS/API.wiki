@@ -380,15 +380,15 @@ There are 3 kinds of actions / requests which can be made for data Types
 |process dataType                                                                                                                                                   |
 |account name|credential|action |name          |type                         |return code?            |return message?                                              |
 |admin       |admin     |PROCESS|MIMEType PDF  |application/pdf              |${SUCCESS}              |Ok                                                           |
-|user1       |password1 |PROCESS|jsonObject    |{"a":b,"c":d}                |${SUCCESS}              |Ok                                                           |
+|user1       |password1 |PROCESS|jsonObject    |{"a":"b","c":"d"}            |${SUCCESS}              |Ok                                                           |
 |admin       |admin     |PROCESS|Object42      |com.company.object.ObjectName|${SUCCESS}              |Ok                                                           |
 |user3       |password3 |PROCESS|Awesome Object|Cool                         |${AUTHORIZATION_WARNING}|The requesting Account is not permitted to Process Data Type.|
 |user3       |password3 |DELETE |MIMEType PDF  |                             |${AUTHORIZATION_WARNING}|The requesting Account is not permitted to Process Data Type.|
 |admin       |admin     |DELETE |MIMEType PDF  |null                         |${SUCCESS}              |Ok                                                           |
 
-|fetch dataTypes                                                                                                                                                                                                                                                                 |
-|account name|credential|data types?                                                                                                                                                                                                                |return code?|return message?|
-|admin       |admin     |!-[DataType{typeName='data', type='Data Object'}, DataType{typeName='folder', type='Folder'}, DataType{typeName='jsonObject', type='{"a":b,"c":d}'}, DataType{typeName='Object42', type='com.company.object.ObjectName'}]-!|${SUCCESS}  |Ok             |
+|fetch dataTypes                                                                                                                                                                                                                                                                                                                                   |
+|account name|credential|data types?                                                                                                                                                                                                                                                                                  |return code?|return message?|
+|admin       |admin     |!-[DataType{typeName='data', type='Data Object'}, DataType{typeName='folder', type='Folder'}, DataType{typeName='jsonObject', type='{"a":"b","c":"d"}'}, DataType{typeName='Object42', type='com.company.object.ObjectName'}, DataType{typeName='ObjectType', type='Object Mapping Rules'}]-!|${SUCCESS}  |Ok             |
 
 [[ Top ][#content]]
 !anchor data

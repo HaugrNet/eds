@@ -53,11 +53,10 @@ import io.javadog.cws.api.responses.SettingResponse;
 import io.javadog.cws.api.responses.SignResponse;
 import io.javadog.cws.api.responses.VerifyResponse;
 import io.javadog.cws.api.responses.VersionResponse;
-import org.junit.Test;
-
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.UUID;
+import org.junit.Test;
 
 /**
  * @author Kim Jensen
@@ -120,7 +119,7 @@ public abstract class AbstractClientTestCase {
         final ProcessMemberRequest request = Base.prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
         request.setAction(Action.CREATE);
         request.setNewAccountName(accountName);
-        request.setNewCredential(accountName.getBytes(Charset.forName("UTF-8")));
+        request.setNewCredential(accountName.getBytes(StandardCharsets.UTF_8));
 
         final ProcessMemberResponse response = getManagement().processMember(request);
         assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
@@ -143,7 +142,7 @@ public abstract class AbstractClientTestCase {
         final ProcessMemberRequest memberRequest = Base.prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
         memberRequest.setAction(Action.CREATE);
         memberRequest.setNewAccountName(accountName);
-        memberRequest.setNewCredential(accountName.getBytes(Charset.forName("UTF-8")));
+        memberRequest.setNewCredential(accountName.getBytes(StandardCharsets.UTF_8));
         final ProcessMemberResponse memberResponse = getManagement().processMember(memberRequest);
         assertThat(memberResponse.isOk(), is(true));
 
@@ -207,7 +206,7 @@ public abstract class AbstractClientTestCase {
     public void testSignatures() {
         // 1. Generate a Signature
         final SignRequest signRequest = Base.prepareRequest(SignRequest.class, Constants.ADMIN_ACCOUNT);
-        final byte[] document = UUID.randomUUID().toString().getBytes(Charset.forName("UTF-8"));
+        final byte[] document = UUID.randomUUID().toString().getBytes(StandardCharsets.UTF_8);
         signRequest.setData(document);
         final SignResponse signResponse = getShare().sign(signRequest);
         assertThat(signResponse.isOk(), is(true));

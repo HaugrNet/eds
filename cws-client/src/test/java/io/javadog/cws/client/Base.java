@@ -39,6 +39,7 @@ import io.javadog.cws.api.responses.ProcessMemberResponse;
 import io.javadog.cws.api.responses.ProcessTrusteeResponse;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.util.List;
 
@@ -59,7 +60,7 @@ public final class Base {
             final A request = clazz.getConstructor().newInstance();
 
             request.setAccountName(account);
-            request.setCredential(account.getBytes(Charset.forName("UTF-8")));
+            request.setCredential(account.getBytes(StandardCharsets.UTF_8));
             request.setCredentialType(CredentialType.PASSPHRASE);
 
             return request;
@@ -72,7 +73,7 @@ public final class Base {
         final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
         request.setAction(Action.CREATE);
         request.setNewAccountName(accountName);
-        request.setNewCredential(accountName.getBytes(Charset.forName("UTF-8")));
+        request.setNewCredential(accountName.getBytes(StandardCharsets.UTF_8));
 
         final ProcessMemberResponse response = management.processMember(request);
         throwIfFailed(response);

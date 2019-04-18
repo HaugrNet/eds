@@ -16,9 +16,7 @@
  */
 package io.javadog.cws.rest;
 
-import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.responses.CwsResponse;
-
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -39,9 +37,25 @@ public final class RestUtils {
         // Private Constructor, this is a Utility Class.
     }
 
+    /**
+     * <p>This method will build the response to be returned by the REST
+     * service. Please note, that rather than just taking the existing
+     * returnCode and use it, the method will always return that the request
+     * was successful, even it if wasn't.</p>
+     *
+     * <p>The reason for this, is that it is not possible to set change the
+     * error message being returned, and as it contains important information
+     * about what went wrong and how it can be fixed - is is critical that it
+     * is not lost. Hence, any request coming into CWS, which CWS and not the
+     * underlying container is responding too, will be replied with a success,
+     * even if the reply failed.</p>
+     *
+     * @param cwsResponse The CWS Response Object to convert
+     * @return The converted REST Response Object
+     */
     public static Response buildResponse(final CwsResponse cwsResponse) {
         return Response
-                .status(ReturnCode.findReturnCode(cwsResponse.getReturnCode()).getHttpCode())
+                .ok()
                 .type(PRODUCES)
                 .entity(cwsResponse)
                 .build();

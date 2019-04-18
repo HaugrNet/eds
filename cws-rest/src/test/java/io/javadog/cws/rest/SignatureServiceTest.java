@@ -25,9 +25,8 @@ import io.javadog.cws.api.requests.SignRequest;
 import io.javadog.cws.api.requests.VerifyRequest;
 import io.javadog.cws.core.DatabaseSetup;
 import io.javadog.cws.core.ShareBean;
-import org.junit.Test;
-
 import javax.ws.rs.core.Response;
+import org.junit.Test;
 
 /**
  * @author Kim Jensen
@@ -41,7 +40,7 @@ public final class SignatureServiceTest extends DatabaseSetup {
         final SignRequest request = new SignRequest();
 
         final Response response = service.sign(request);
-        assertThat(response.getStatus(), is(ReturnCode.VERIFICATION_WARNING.getHttpCode()));
+        assertThat(response.getStatus(), is(ReturnCode.SUCCESS.getHttpCode()));
     }
 
     @Test
@@ -50,7 +49,7 @@ public final class SignatureServiceTest extends DatabaseSetup {
         final SignRequest request = new SignRequest();
 
         final Response response = service.sign(request);
-        assertThat(response.getStatus(), is(ReturnCode.ERROR.getHttpCode()));
+        assertThat(response.getStatus(), is(ReturnCode.SUCCESS.getHttpCode()));
     }
 
     @Test
@@ -59,7 +58,7 @@ public final class SignatureServiceTest extends DatabaseSetup {
         final VerifyRequest request = new VerifyRequest();
 
         final Response response = service.verify(request);
-        assertThat(response.getStatus(), is(ReturnCode.VERIFICATION_WARNING.getHttpCode()));
+        assertThat(response.getStatus(), is(ReturnCode.SUCCESS.getHttpCode()));
     }
 
     @Test
@@ -68,7 +67,7 @@ public final class SignatureServiceTest extends DatabaseSetup {
         final VerifyRequest request = new VerifyRequest();
 
         final Response response = service.verify(request);
-        assertThat(response.getStatus(), is(ReturnCode.ERROR.getHttpCode()));
+        assertThat(response.getStatus(), is(ReturnCode.SUCCESS.getHttpCode()));
     }
 
     @Test
@@ -77,7 +76,7 @@ public final class SignatureServiceTest extends DatabaseSetup {
         final FetchSignatureRequest request = new FetchSignatureRequest();
 
         final Response response = service.fetch(request);
-        assertThat(response.getStatus(), is(ReturnCode.VERIFICATION_WARNING.getHttpCode()));
+        assertThat(response.getStatus(), is(ReturnCode.SUCCESS.getHttpCode()));
     }
 
     @Test
@@ -86,7 +85,7 @@ public final class SignatureServiceTest extends DatabaseSetup {
         final FetchSignatureRequest request = new FetchSignatureRequest();
 
         final Response response = service.fetch(request);
-        assertThat(response.getStatus(), is(ReturnCode.ERROR.getHttpCode()));
+        assertThat(response.getStatus(), is(ReturnCode.SUCCESS.getHttpCode()));
     }
 
     // =========================================================================

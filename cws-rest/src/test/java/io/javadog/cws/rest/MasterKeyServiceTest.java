@@ -24,9 +24,8 @@ import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.requests.MasterKeyRequest;
 import io.javadog.cws.core.DatabaseSetup;
 import io.javadog.cws.core.ManagementBean;
-import org.junit.Test;
-
 import javax.ws.rs.core.Response;
+import org.junit.Test;
 
 /**
  * @author Kim Jensen
@@ -51,7 +50,7 @@ public final class MasterKeyServiceTest extends DatabaseSetup {
         request.setSecret(Constants.ADMIN_ACCOUNT.getBytes(settings.getCharset()));
 
         final Response response = service.masterKey(request);
-        assertThat(response.getStatus(), is(ReturnCode.ERROR.getHttpCode()));
+        assertThat(response.getStatus(), is(ReturnCode.SUCCESS.getHttpCode()));
     }
 
     // =========================================================================

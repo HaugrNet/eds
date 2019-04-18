@@ -24,9 +24,8 @@ import io.javadog.cws.api.requests.FetchCircleRequest;
 import io.javadog.cws.api.requests.ProcessCircleRequest;
 import io.javadog.cws.core.DatabaseSetup;
 import io.javadog.cws.core.ManagementBean;
-import org.junit.Test;
-
 import javax.ws.rs.core.Response;
+import org.junit.Test;
 
 /**
  * @author Kim Jensen
@@ -40,7 +39,7 @@ public final class CircleServiceTest extends DatabaseSetup {
         final ProcessCircleRequest request = new ProcessCircleRequest();
 
         final Response response = service.create(request);
-        assertThat(response.getStatus(), is(ReturnCode.VERIFICATION_WARNING.getHttpCode()));
+        assertThat(response.getStatus(), is(ReturnCode.SUCCESS.getHttpCode()));
     }
 
     @Test
@@ -49,7 +48,7 @@ public final class CircleServiceTest extends DatabaseSetup {
         final ProcessCircleRequest request = new ProcessCircleRequest();
 
         final Response response = service.create(request);
-        assertThat(response.getStatus(), is(ReturnCode.ERROR.getHttpCode()));
+        assertThat(response.getStatus(), is(ReturnCode.SUCCESS.getHttpCode()));
     }
 
     @Test
@@ -58,7 +57,7 @@ public final class CircleServiceTest extends DatabaseSetup {
         final ProcessCircleRequest request = new ProcessCircleRequest();
 
         final Response response = service.update(request);
-        assertThat(response.getStatus(), is(ReturnCode.VERIFICATION_WARNING.getHttpCode()));
+        assertThat(response.getStatus(), is(ReturnCode.SUCCESS.getHttpCode()));
     }
 
     @Test
@@ -67,7 +66,7 @@ public final class CircleServiceTest extends DatabaseSetup {
         final ProcessCircleRequest request = new ProcessCircleRequest();
 
         final Response response = service.update(request);
-        assertThat(response.getStatus(), is(ReturnCode.ERROR.getHttpCode()));
+        assertThat(response.getStatus(), is(ReturnCode.SUCCESS.getHttpCode()));
     }
 
     @Test
@@ -76,7 +75,7 @@ public final class CircleServiceTest extends DatabaseSetup {
         final ProcessCircleRequest request = new ProcessCircleRequest();
 
         final Response response = service.delete(request);
-        assertThat(response.getStatus(), is(ReturnCode.VERIFICATION_WARNING.getHttpCode()));
+        assertThat(response.getStatus(), is(ReturnCode.SUCCESS.getHttpCode()));
     }
 
     @Test
@@ -85,7 +84,7 @@ public final class CircleServiceTest extends DatabaseSetup {
         final ProcessCircleRequest request = new ProcessCircleRequest();
 
         final Response response = service.delete(request);
-        assertThat(response.getStatus(), is(ReturnCode.ERROR.getHttpCode()));
+        assertThat(response.getStatus(), is(ReturnCode.SUCCESS.getHttpCode()));
     }
 
     @Test
@@ -94,7 +93,7 @@ public final class CircleServiceTest extends DatabaseSetup {
         final FetchCircleRequest request = new FetchCircleRequest();
 
         final Response response = service.fetch(request);
-        assertThat(response.getStatus(), is(ReturnCode.VERIFICATION_WARNING.getHttpCode()));
+        assertThat(response.getStatus(), is(ReturnCode.SUCCESS.getHttpCode()));
     }
 
     @Test
@@ -103,7 +102,7 @@ public final class CircleServiceTest extends DatabaseSetup {
         final FetchCircleRequest request = new FetchCircleRequest();
 
         final Response response = service.fetch(request);
-        assertThat(response.getStatus(), is(ReturnCode.ERROR.getHttpCode()));
+        assertThat(response.getStatus(), is(ReturnCode.SUCCESS.getHttpCode()));
     }
 
     // =========================================================================

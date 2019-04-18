@@ -22,9 +22,8 @@ import static org.junit.Assert.assertThat;
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.core.DatabaseSetup;
 import io.javadog.cws.core.ManagementBean;
-import org.junit.Test;
-
 import javax.ws.rs.core.Response;
+import org.junit.Test;
 
 /**
  * @author Kim Jensen
@@ -45,7 +44,7 @@ public final class VersionServiceTest extends DatabaseSetup {
         final VersionService service = prepareFlawedService();
 
         final Response response = service.version();
-        assertThat(response.getStatus(), is(ReturnCode.ERROR.getHttpCode()));
+        assertThat(response.getStatus(), is(ReturnCode.SUCCESS.getHttpCode()));
     }
 
     // =========================================================================

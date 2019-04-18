@@ -24,9 +24,8 @@ import io.javadog.cws.api.requests.FetchDataTypeRequest;
 import io.javadog.cws.api.requests.ProcessDataTypeRequest;
 import io.javadog.cws.core.DatabaseSetup;
 import io.javadog.cws.core.ShareBean;
-import org.junit.Test;
-
 import javax.ws.rs.core.Response;
+import org.junit.Test;
 
 /**
  * @author Kim Jensen
@@ -40,7 +39,7 @@ public final class DataTypeServiceTest extends DatabaseSetup {
         final ProcessDataTypeRequest request = new ProcessDataTypeRequest();
 
         final Response response = service.process(request);
-        assertThat(response.getStatus(), is(ReturnCode.VERIFICATION_WARNING.getHttpCode()));
+        assertThat(response.getStatus(), is(ReturnCode.SUCCESS.getHttpCode()));
     }
 
     @Test
@@ -49,7 +48,7 @@ public final class DataTypeServiceTest extends DatabaseSetup {
         final ProcessDataTypeRequest request = new ProcessDataTypeRequest();
 
         final Response response = service.process(request);
-        assertThat(response.getStatus(), is(ReturnCode.ERROR.getHttpCode()));
+        assertThat(response.getStatus(), is(ReturnCode.SUCCESS.getHttpCode()));
     }
 
     @Test
@@ -58,7 +57,7 @@ public final class DataTypeServiceTest extends DatabaseSetup {
         final ProcessDataTypeRequest request = new ProcessDataTypeRequest();
 
         final Response response = service.delete(request);
-        assertThat(response.getStatus(), is(ReturnCode.VERIFICATION_WARNING.getHttpCode()));
+        assertThat(response.getStatus(), is(ReturnCode.SUCCESS.getHttpCode()));
     }
 
     @Test
@@ -67,7 +66,7 @@ public final class DataTypeServiceTest extends DatabaseSetup {
         final ProcessDataTypeRequest request = new ProcessDataTypeRequest();
 
         final Response response = service.delete(request);
-        assertThat(response.getStatus(), is(ReturnCode.ERROR.getHttpCode()));
+        assertThat(response.getStatus(), is(ReturnCode.SUCCESS.getHttpCode()));
     }
 
     @Test
@@ -76,7 +75,7 @@ public final class DataTypeServiceTest extends DatabaseSetup {
         final FetchDataTypeRequest request = new FetchDataTypeRequest();
 
         final Response response = service.fetch(request);
-        assertThat(response.getStatus(), is(ReturnCode.VERIFICATION_WARNING.getHttpCode()));
+        assertThat(response.getStatus(), is(ReturnCode.SUCCESS.getHttpCode()));
     }
 
     @Test
@@ -85,7 +84,7 @@ public final class DataTypeServiceTest extends DatabaseSetup {
         final FetchDataTypeRequest request = new FetchDataTypeRequest();
 
         final Response response = service.fetch(request);
-        assertThat(response.getStatus(), is(ReturnCode.ERROR.getHttpCode()));
+        assertThat(response.getStatus(), is(ReturnCode.SUCCESS.getHttpCode()));
     }
 
     // =========================================================================

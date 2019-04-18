@@ -23,9 +23,8 @@ import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.requests.SanityRequest;
 import io.javadog.cws.core.DatabaseSetup;
 import io.javadog.cws.core.ManagementBean;
-import org.junit.Test;
-
 import javax.ws.rs.core.Response;
+import org.junit.Test;
 
 /**
  * @author Kim Jensen
@@ -39,7 +38,7 @@ public final class SanityServiceTest extends DatabaseSetup {
         final SanityRequest request = new SanityRequest();
 
         final Response response = service.sanitized(request);
-        assertThat(response.getStatus(), is(ReturnCode.VERIFICATION_WARNING.getHttpCode()));
+        assertThat(response.getStatus(), is(ReturnCode.SUCCESS.getHttpCode()));
     }
 
     @Test
@@ -48,7 +47,7 @@ public final class SanityServiceTest extends DatabaseSetup {
         final SanityRequest request = new SanityRequest();
 
         final Response response = service.sanitized(request);
-        assertThat(response.getStatus(), is(ReturnCode.ERROR.getHttpCode()));
+        assertThat(response.getStatus(), is(ReturnCode.SUCCESS.getHttpCode()));
     }
 
     // =========================================================================

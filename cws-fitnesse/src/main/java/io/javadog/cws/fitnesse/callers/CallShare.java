@@ -41,7 +41,7 @@ import io.javadog.cws.fitnesse.exceptions.StopTestException;
  */
 public final class CallShare {
 
-    private static Share share = new ShareSoapClient("http://localhost:8080/cws");
+    private static Share share = null;
 
     private CallShare() {
         // Private Constructor, this is a utility Class.

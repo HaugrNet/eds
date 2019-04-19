@@ -35,9 +35,9 @@ import io.javadog.cws.api.responses.VerifyResponse;
 
 /**
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
-public final class ShareRestClient extends BaseRestClient implements Share {
+public final class ShareRestClient extends GsonRestClient implements Share {
 
     /**
      * Constructor for the CWS Share REST Client. It takes the base URL for the

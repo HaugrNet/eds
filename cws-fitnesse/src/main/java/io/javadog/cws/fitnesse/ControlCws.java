@@ -54,13 +54,8 @@ import java.util.Objects;
  */
 public final class ControlCws extends CwsRequest<FetchMemberResponse> {
 
-    private String type = "SOAP";
-    private String url = "http://localhost:8080/cws";
-
     public void setTypeAndUrl(final String type, final String url) {
         CwsRequest.updateTypeAndUrl(type, url);
-        this.type = type;
-        this.url = url;
     }
 
     public void removeCircles() {
@@ -68,10 +63,10 @@ public final class ControlCws extends CwsRequest<FetchMemberResponse> {
         final ProcessCircleRequest processRequest = prepareAdminRequest(ProcessCircleRequest.class);
         processRequest.setAction(Action.DELETE);
 
-        final FetchCircleResponse fetchResponse = CallManagement.fetchCircles(type, url, fetchRequest);
+        final FetchCircleResponse fetchResponse = CallManagement.fetchCircles(requestType, requestUrl, fetchRequest);
         for (final Circle circle : fetchResponse.getCircles()) {
             processRequest.setCircleId(circle.getCircleId());
-            CallManagement.processCircle(type, url, processRequest);
+            CallManagement.processCircle(requestType, requestUrl, processRequest);
         }
     }
 
@@ -82,11 +77,11 @@ public final class ControlCws extends CwsRequest<FetchMemberResponse> {
         final String adminKey = Constants.ADMIN_ACCOUNT + "_id";
         String adminId = null;
 
-        final FetchMemberResponse fetchResponse = CallManagement.fetchMembers(type, url, fetchRequest);
+        final FetchMemberResponse fetchResponse = CallManagement.fetchMembers(requestType, requestUrl, fetchRequest);
         for (final Member member : fetchResponse.getMembers()) {
             if (!Objects.equals(member.getAccountName(), Constants.ADMIN_ACCOUNT)) {
                 processRequest.setMemberId(member.getMemberId());
-                CallManagement.processMember(type, url, processRequest);
+                CallManagement.processMember(requestType, requestUrl, processRequest);
             } else {
                 adminId = member.getMemberId();
             }
@@ -100,11 +95,11 @@ public final class ControlCws extends CwsRequest<FetchMemberResponse> {
         final ProcessDataTypeRequest processRequest = prepareRequest(ProcessDataTypeRequest.class);
         processRequest.setAction(Action.DELETE);
 
-        final FetchDataTypeResponse fetchResponse = CallShare.fetchDataTypes(type, url, fetchRequest);
+        final FetchDataTypeResponse fetchResponse = CallShare.fetchDataTypes(requestType, requestUrl, fetchRequest);
         for (final DataType dataType : fetchResponse.getDataTypes()) {
             if (!dataType.getTypeName().equals(Constants.DATA_TYPENAME) && !dataType.getTypeName().equals(Constants.FOLDER_TYPENAME)) {
                 processRequest.setTypeName(dataType.getTypeName());
-                CallShare.processDataType(type, url, processRequest);
+                CallShare.processDataType(requestType, requestUrl, processRequest);
             }
         }
     }

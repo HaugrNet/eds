@@ -18,21 +18,28 @@ package io.javadog.cws.client;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
+import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.requests.Authentication;
 import io.javadog.cws.api.responses.CwsResponse;
+
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
+import java.util.Base64;
 import java.util.Date;
 
 /**
@@ -81,20 +88,6 @@ public class GsonRestClient {
         }
     }
 
-    private static Gson createGsonInstance() {
-        final GsonBuilder builder = new GsonBuilder()
-                .registerTypeAdapter(Date.class, (JsonDeserializer<Date>) (json, type, context) -> {
-                    try {
-                        return new Date(Long.valueOf(json.getAsJsonPrimitive().getAsString()));
-                    } catch (NumberFormatException e) {
-                        throw new CWSClientException(e);
-                    }
-                })
-                .registerTypeAdapter(Date.class, (JsonSerializer<Date>) (date, type, context) -> new JsonPrimitive(date.getTime()));
-
-        return builder.create();
-    }
-
     private static void sendRequest(final HttpURLConnection connection, final String json) throws IOException {
         connection.setRequestMethod("POST");
         connection.setRequestProperty("Accept", CONTENT_TYPE);
@@ -122,6 +115,62 @@ public class GsonRestClient {
             }
 
             return response.toString();
+        }
+    }
+
+    // =========================================================================
+    // GSon Adapters, to process Objects which otherwise cause problems
+    // =========================================================================
+
+    private static Gson createGsonInstance() {
+        final GsonBuilder builder = new GsonBuilder()
+                .registerTypeAdapter(Date.class, new DateAdapter())
+                .registerTypeAdapter(byte[].class, new ByteArrayAdapter());
+
+        return builder.create();
+    }
+
+    /**
+     * GSon Adapter to handle Dates.
+     */
+    private static class DateAdapter implements JsonSerializer<Date>, JsonDeserializer<Date> {
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public Date deserialize(final JsonElement json, final Type typeOfT, final JsonDeserializationContext context) {
+            return Date.from(Instant.ofEpochMilli(Long.parseLong(json.getAsJsonPrimitive().getAsString())));
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public JsonElement serialize(final Date src, final Type typeOfSrc, final JsonSerializationContext context) {
+            return new JsonPrimitive(String.valueOf(src.getTime()));
+        }
+    }
+
+    /**
+     * GSon Adapter to handle Byte Arrays.
+     */
+    private static class ByteArrayAdapter implements JsonSerializer<byte[]>, JsonDeserializer<byte[]> {
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public byte[] deserialize(final JsonElement json, final Type typeOfT, final JsonDeserializationContext context) {
+            return Base64.getDecoder().decode(json.getAsJsonPrimitive().getAsString());
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public JsonElement serialize(final byte[] src, final Type typeOfSrc, final JsonSerializationContext context) {
+            return new JsonPrimitive(Base64.getEncoder().encodeToString(src));
         }
     }
 }

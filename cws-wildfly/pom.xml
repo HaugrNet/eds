@@ -11,7 +11,7 @@
     <packaging>war</packaging>
     <name>CWS - WildFly WAR</name>
     <description>
-        This module contain a WAR file, compatible with WildFly 10 - 13.
+        This module contain a WAR file, compatible with WildFly 10 - 16.
     </description>
 
     <dependencies>

@@ -39,10 +39,9 @@ import io.javadog.cws.api.responses.ProcessMemberResponse;
 import io.javadog.cws.core.DatabaseSetup;
 import io.javadog.cws.core.enums.StandardSetting;
 import io.javadog.cws.core.model.Settings;
-import org.junit.Test;
-
 import java.util.Base64;
 import java.util.UUID;
+import org.junit.Test;
 
 /**
  * @author Kim Jensen
@@ -248,12 +247,13 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
         assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
         final byte[] signature = response.getSignature();
 
-        final ProcessMemberRequest invationRequest = new ProcessMemberRequest();
-        invationRequest.setAccountName("invitee");
-        invationRequest.setCredentialType(CredentialType.SIGNATURE);
-        invationRequest.setCredential(signature);
-        invationRequest.setNewCredential(crypto.stringToBytes("New Passphrase"));
-        final ProcessMemberResponse invitationResponse = service.perform(invationRequest);
+        final ProcessMemberRequest invitationRequest = new ProcessMemberRequest();
+        invitationRequest.setAccountName("invitee");
+        invitationRequest.setAction(Action.UPDATE);
+        invitationRequest.setCredentialType(CredentialType.SIGNATURE);
+        invitationRequest.setCredential(signature);
+        invitationRequest.setNewCredential(crypto.stringToBytes("New Passphrase"));
+        final ProcessMemberResponse invitationResponse = service.perform(invitationRequest);
         assertThat(invitationResponse, is(not(nullValue())));
         assertThat(invitationResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
         assertThat(response.getReturnMessage(), is("Ok"));
@@ -261,31 +261,32 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
 
     @Test
     public void testNullNewCredentialForInvitation() {
+        prepareCause(ReturnCode.VERIFICATION_WARNING, "The newCredential is missing in Request.");
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
-
         final ProcessMemberRequest request = new ProcessMemberRequest();
         request.setAccountName("null Invitee");
+        request.setAction(Action.UPDATE);
         request.setCredentialType(CredentialType.SIGNATURE);
         request.setCredential(crypto.stringToBytes("Signature"));
+        assertThat(request.validate().isEmpty(), is(true));
 
-        final ProcessMemberResponse response = service.perform(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING.getCode()));
-        assertThat(response.getReturnMessage(), is("The newCredential is missing in Request."));
+        service.perform(request);
     }
 
     @Test
     public void testEmptyNewCredentialForInvitation() {
-        final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
+        prepareCause(ReturnCode.VERIFICATION_WARNING, "The newCredential is missing in Request.");
 
+        final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
         final ProcessMemberRequest request = new ProcessMemberRequest();
         request.setAccountName("empty Invitee");
+        request.setAction(Action.UPDATE);
         request.setCredentialType(CredentialType.SIGNATURE);
         request.setCredential(crypto.stringToBytes("Signature"));
         request.setNewCredential(crypto.stringToBytes(""));
+        assertThat(request.validate().isEmpty(), is(true));
 
-        final ProcessMemberResponse response = service.perform(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING.getCode()));
-        assertThat(response.getReturnMessage(), is("The newCredential is missing in Request."));
+        service.perform(request);
     }
 
     @Test
@@ -301,13 +302,14 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
         final ProcessMemberResponse response = service.perform(request);
         assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
 
-        final ProcessMemberRequest invationRequest = new ProcessMemberRequest();
-        invationRequest.setAccountName("invitee");
-        invationRequest.setCredentialType(CredentialType.SIGNATURE);
-        invationRequest.setCredential(Base64.getDecoder().decode(bogusSignature));
-        invationRequest.setNewCredential(crypto.stringToBytes(UUID.randomUUID().toString()));
+        final ProcessMemberRequest invitationRequest = new ProcessMemberRequest();
+        invitationRequest.setAccountName("invitee");
+        invitationRequest.setAction(Action.UPDATE);
+        invitationRequest.setCredentialType(CredentialType.SIGNATURE);
+        invitationRequest.setCredential(Base64.getDecoder().decode(bogusSignature));
+        invitationRequest.setNewCredential(crypto.stringToBytes(UUID.randomUUID().toString()));
 
-        service.perform(invationRequest);
+        service.perform(invitationRequest);
     }
 
     @Test
@@ -321,13 +323,14 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
         final ProcessMemberResponse response = service.perform(request);
         assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
 
-        final ProcessMemberRequest invationRequest = new ProcessMemberRequest();
-        invationRequest.setAccountName("invitee");
-        invationRequest.setCredentialType(CredentialType.SIGNATURE);
-        invationRequest.setCredential(crypto.stringToBytes(UUID.randomUUID().toString()));
-        invationRequest.setNewCredential(crypto.stringToBytes(UUID.randomUUID().toString()));
+        final ProcessMemberRequest invitationRequest = new ProcessMemberRequest();
+        invitationRequest.setAccountName("invitee");
+        invitationRequest.setAction(Action.UPDATE);
+        invitationRequest.setCredentialType(CredentialType.SIGNATURE);
+        invitationRequest.setCredential(crypto.stringToBytes(UUID.randomUUID().toString()));
+        invitationRequest.setNewCredential(crypto.stringToBytes(UUID.randomUUID().toString()));
 
-        service.perform(invationRequest);
+        service.perform(invitationRequest);
     }
 
     @Test
@@ -337,11 +340,11 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
         final ProcessMemberRequest request = new ProcessMemberRequest();
         request.setAccountName(MEMBER_1);
+        request.setAction(Action.UPDATE);
         request.setCredentialType(CredentialType.SIGNATURE);
         request.setCredential(crypto.stringToBytes(UUID.randomUUID().toString()));
         request.setNewCredential(crypto.stringToBytes(UUID.randomUUID().toString()));
-        // Processing an invitation is circumventing the normal validation check.
-        assertThat(request.getAction(), is(nullValue()));
+        assertThat(request.validate().isEmpty(), is(true));
 
         service.perform(request);
     }
@@ -352,12 +355,13 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
 
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
         final ProcessMemberRequest request = new ProcessMemberRequest();
+        request.setAccountName("Who knows");
         request.setNewAccountName("wannabe");
+        request.setAction(Action.UPDATE);
         request.setCredentialType(CredentialType.SIGNATURE);
         request.setCredential(crypto.stringToBytes(UUID.randomUUID().toString()));
         request.setNewCredential(crypto.stringToBytes(UUID.randomUUID().toString()));
-        // Processing an invitation is circumventing the normal validation check.
-        assertThat(request.getAction(), is(nullValue()));
+        assertThat(request.validate().isEmpty(), is(true));
 
         service.perform(request);
     }

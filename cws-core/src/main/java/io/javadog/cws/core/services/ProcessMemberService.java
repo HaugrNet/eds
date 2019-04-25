@@ -38,8 +38,6 @@ import io.javadog.cws.core.model.MemberDao;
 import io.javadog.cws.core.model.Settings;
 import io.javadog.cws.core.model.entities.MemberEntity;
 import io.javadog.cws.core.model.entities.TrusteeEntity;
-
-import javax.persistence.EntityManager;
 import java.security.PublicKey;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -50,12 +48,13 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+import javax.persistence.EntityManager;
 
 /**
  * <p>Business Logic implementation for the CWS ProcessMember request.</p>
  *
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 public final class ProcessMemberService extends Serviceable<MemberDao, ProcessMemberResponse, ProcessMemberRequest> {
 
@@ -72,12 +71,13 @@ public final class ProcessMemberService extends Serviceable<MemberDao, ProcessMe
             final ProcessMemberResponse response;
 
             if (request.getCredentialType() == CredentialType.SIGNATURE) {
+                verify(request);
                 final byte[] newCredential = request.getNewCredential();
-                if ((newCredential != null) && (newCredential.length > 0)) {
-                    response = processInvitation(request);
-                } else {
-                    response = new ProcessMemberResponse(ReturnCode.VERIFICATION_WARNING, "The " + Constants.FIELD_NEW_CREDENTIAL + " is missing in Request.");
+                if ((newCredential == null) || (newCredential.length == 0)) {
+                    throw new VerificationException("The " + Constants.FIELD_NEW_CREDENTIAL + " is missing in Request.");
                 }
+
+                response = processInvitation(request);
             } else {
                 // Pre-checks, & destruction of credentials
                 verifyRequest(request, Permission.PROCESS_MEMBER);
@@ -137,7 +137,8 @@ public final class ProcessMemberService extends Serviceable<MemberDao, ProcessMe
         final String accountName = request.getNewAccountName().trim();
         final MemberEntity found = dao.findMemberByName(accountName);
         if (found != null) {
-            throw new CWSException(ReturnCode.IDENTIFICATION_WARNING, "An Account with the requested AccountName already exist.");
+            throw new CWSException(ReturnCode.IDENTIFICATION_WARNING,
+                    "An Account with the requested AccountName already exist.");
         }
 
         final MemberRole role = whichRole(request);
@@ -158,7 +159,8 @@ public final class ProcessMemberService extends Serviceable<MemberDao, ProcessMe
         final String memberName = request.getNewAccountName().trim();
         final MemberEntity found = dao.findMemberByName(memberName);
         if (found != null) {
-            throw new CWSException(ReturnCode.CONSTRAINT_ERROR, "Cannot create an invitation, as as the account already exists.");
+            throw new CWSException(ReturnCode.CONSTRAINT_ERROR,
+                    "Cannot create an invitation, as as the account already exists.");
         }
 
         final String uuid = UUID.randomUUID().toString();
@@ -277,7 +279,8 @@ public final class ProcessMemberService extends Serviceable<MemberDao, ProcessMe
         final byte[] credential = request.getNewCredential();
         if (credential != null) {
             if (request.getCredentialType() != CredentialType.PASSPHRASE) {
-                throw new CWSException(ReturnCode.VERIFICATION_WARNING, "It is only permitted to update the credentials when authenticating with Passphrase.");
+                throw new CWSException(ReturnCode.VERIFICATION_WARNING,
+                        "It is only permitted to update the credentials when authenticating with Passphrase.");
             }
 
             final CWSKeyPair pair = updateMemberPassword(member, credential);
@@ -286,7 +289,8 @@ public final class ProcessMemberService extends Serviceable<MemberDao, ProcessMe
             final List<TrusteeEntity> list = dao.findTrusteesByMember(member, EnumSet.allOf(TrustLevel.class));
             for (final TrusteeEntity trustee : list) {
                 final KeyAlgorithm algorithm = trustee.getKey().getAlgorithm();
-                final SecretCWSKey circleKey = crypto.extractCircleKey(algorithm, keyPair.getPrivate(), trustee.getCircleKey());
+                final SecretCWSKey circleKey = crypto
+                        .extractCircleKey(algorithm, keyPair.getPrivate(), trustee.getCircleKey());
                 trustee.setCircleKey(crypto.encryptAndArmorCircleKey(pair.getPublic(), circleKey));
 
                 dao.persist(trustee);
@@ -339,7 +343,8 @@ public final class ProcessMemberService extends Serviceable<MemberDao, ProcessMe
         } else {
             // Deleting self
             dao.delete(member);
-            response = new ProcessMemberResponse(ReturnCode.SUCCESS, "The Member '" + member.getName() + "' has been successfully deleted.");
+            response = new ProcessMemberResponse(ReturnCode.SUCCESS,
+                    "The Member '" + member.getName() + "' has been successfully deleted.");
         }
 
         return response;
@@ -356,7 +361,8 @@ public final class ProcessMemberService extends Serviceable<MemberDao, ProcessMe
         }
 
         dao.delete(found);
-        return new ProcessMemberResponse(ReturnCode.SUCCESS, "The Member '" + found.getName() + "' has successfully been deleted.");
+        return new ProcessMemberResponse(ReturnCode.SUCCESS,
+                "The Member '" + found.getName() + "' has successfully been deleted.");
     }
 
     private ProcessMemberResponse processInvitation(final ProcessMemberRequest request) {

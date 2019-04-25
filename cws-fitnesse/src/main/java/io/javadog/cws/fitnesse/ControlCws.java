@@ -35,6 +35,7 @@ import io.javadog.cws.api.responses.FetchMemberResponse;
 import io.javadog.cws.fitnesse.callers.CallManagement;
 import io.javadog.cws.fitnesse.callers.CallShare;
 import io.javadog.cws.fitnesse.exceptions.StopTestException;
+
 import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.Charset;
 import java.util.Objects;
@@ -90,15 +91,15 @@ public final class ControlCws extends CwsRequest<FetchMemberResponse> {
     }
 
     public void removeDataTypes() {
-        final FetchDataTypeRequest fetchRequest = prepareRequest(FetchDataTypeRequest.class);
-        final ProcessDataTypeRequest processRequest = prepareRequest(ProcessDataTypeRequest.class);
-        processRequest.setAction(Action.DELETE);
+        final FetchDataTypeRequest fetchRequest = prepareAdminRequest(FetchDataTypeRequest.class);
+        final ProcessDataTypeRequest deleteRequest = prepareAdminRequest(ProcessDataTypeRequest.class);
+        deleteRequest.setAction(Action.DELETE);
 
         final FetchDataTypeResponse fetchResponse = CallShare.fetchDataTypes(requestType, requestUrl, fetchRequest);
         for (final DataType dataType : fetchResponse.getDataTypes()) {
             if (!dataType.getTypeName().equals(Constants.DATA_TYPENAME) && !dataType.getTypeName().equals(Constants.FOLDER_TYPENAME)) {
-                processRequest.setTypeName(dataType.getTypeName());
-                CallShare.processDataType(requestType, requestUrl, processRequest);
+                deleteRequest.setTypeName(dataType.getTypeName());
+                CallShare.processDataType(requestType, requestUrl, deleteRequest);
             }
         }
     }

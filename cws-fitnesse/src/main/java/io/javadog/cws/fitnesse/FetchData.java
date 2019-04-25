@@ -16,6 +16,7 @@
  */
 package io.javadog.cws.fitnesse;
 
+import io.javadog.cws.api.common.Action;
 import io.javadog.cws.api.dtos.Metadata;
 import io.javadog.cws.api.requests.FetchDataRequest;
 import io.javadog.cws.api.responses.FetchDataResponse;
@@ -47,14 +48,14 @@ public final class FetchData extends CwsRequest<FetchDataResponse> {
     }
 
     public void setPageNumber(final String pageNumber) {
-        this.pageNumber = Integer.parseInt(pageNumber);
+        this.pageNumber = Converter.parseInt(pageNumber, this.pageNumber);
     }
 
     public void setPageSize(final String pageSize) {
-        this.pageSize = Integer.parseInt(pageSize);
+        this.pageSize = Converter.parseInt(pageSize, this.pageSize);
     }
 
-    public void setIndex(final int index) {
+    private void setIndex(final int index) {
         if ((response != null) && (index < response.getMetadata().size())) {
             metadata = response.getMetadata().get(index);
         }
@@ -69,11 +70,26 @@ public final class FetchData extends CwsRequest<FetchDataResponse> {
     }
 
     public String dataId() {
-        return (metadata != null) ? metadata.getDataId() : null;
+        return (metadata != null) ? getKey(metadata.getDataId()) : null;
     }
 
     public String folderId() {
-        return (metadata != null) ? metadata.getFolderId() : null;
+        final String tmpId = (metadata != null) ? metadata.getFolderId() : null;
+        String folderId = null;
+
+        if (tmpId != null) {
+            final String tmpKey = getKey(tmpId);
+            if (tmpKey == null) {
+                final String circleKey = getKey(metadata.getCircleId());
+                final String newKey = circleKey.substring(0, circleKey.indexOf(EXTENSION_ID)) + "_root";
+                processId(Action.ADD, null, newKey, tmpId);
+                folderId = newKey + EXTENSION_ID;
+            } else {
+                folderId = tmpKey;
+            }
+        }
+
+        return folderId;
     }
 
     public String dataName() {
@@ -89,7 +105,7 @@ public final class FetchData extends CwsRequest<FetchDataResponse> {
     }
 
     public String data() {
-        return (response != null) ? Converter.convertBytes(response.getData()) : null;
+        return (response.getData() != null) ? Converter.convertBytes(response.getData()) : null;
     }
 
     // =========================================================================

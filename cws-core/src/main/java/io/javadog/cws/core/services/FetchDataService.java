@@ -135,6 +135,7 @@ public final class FetchDataService extends Serviceable<DataDao, FetchDataRespon
                 // it with an Ok flag also.
                 entity.setSanityStatus(SanityStatus.OK);
                 response.setMetadata(metadataList);
+                response.setRecords(1L);
                 response.setData(bytes);
             } else {
                 // Let's update the DB with the information that the data is

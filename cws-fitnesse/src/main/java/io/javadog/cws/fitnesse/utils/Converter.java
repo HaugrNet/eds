@@ -66,6 +66,17 @@ public final class Converter {
         return (tmp != null) ? tmp.trim().toUpperCase(LOCALE) : null;
     }
 
+    public static int parseInt(final String value, final int defaultValue) {
+        final String checked = preCheck(value);
+        int result = defaultValue;
+
+        if ((checked != null) && !checked.trim().isEmpty()) {
+            result = Integer.parseInt(value.trim());
+        }
+
+        return result;
+    }
+
     public static String preCheck(final String source) {
         String checked = source;
 

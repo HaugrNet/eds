@@ -474,9 +474,11 @@ There are 3 kinds of actions / requests which can be made for data Types
 |user1       |password1 |ADD   |circle2_id|null    |data3    |Awesome Object|Second Data Object|${INTEGRITY_WARNING}|Cannot find a matching !-DataType-! for the Object.|
 |user1       |password1 |DELETE|null      |data1_id|null     |null          |null              |${SUCCESS}          |Ok                                                 |
 
-|fetch data                                                                                |
-|account name|credential|data id |data name?|data?            |return code?|return message?|
-|user1       |password1 |data2_id|data2     |First Data Object|${SUCCESS}  |Ok             |
+|fetch data                                                                                                                                                              |
+|account name|credential|circle id |data id |page number|page size|records?|folder id?     |data id?|data name?|type name?|data?            |return code?|return message?|
+|user1       |password1 |circle1_id|null    |1          |1        |1       |circle1_root_id|data2_id|data2     |data      |null             |${SUCCESS}  |Ok             |
+|user1       |password1 |null      |data2_id|null       |null     |1       |circle1_root_id|data2_id|data2     |data      |First Data Object|${SUCCESS}  |Ok             |
+|user1       |password1 |circle1_id|null    |2          |1        |1       |null           |null    |null      |null      |null             |${SUCCESS}  |Ok             |
 *!
 !* Signatures
 [[ Top ][#content]]

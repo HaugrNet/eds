@@ -27,6 +27,7 @@ import io.javadog.cws.api.responses.ProcessDataResponse;
 import io.javadog.cws.api.responses.ProcessMemberResponse;
 import io.javadog.cws.fitnesse.exceptions.StopTestException;
 import io.javadog.cws.fitnesse.utils.Converter;
+
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.List;
@@ -175,7 +176,7 @@ public class CwsRequest<R extends CwsResponse> {
         }
     }
 
-    private static void processId(final Action action, final String currentKey, final String newKey, final String id) {
+    protected static void processId(final Action action, final String currentKey, final String newKey, final String id) {
         switch (action) {
             case REMOVE:
             case DELETE:

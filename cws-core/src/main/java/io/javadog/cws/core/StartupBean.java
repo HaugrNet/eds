@@ -78,15 +78,15 @@ public class StartupBean {
                 runSanitizing();
             }
 
-            // Registering the Timer Service. This will ensure that the Scheduler
-            // is invoked at frequent intervals.
+            // Registering the Timer Service. This will ensure that the
+            // Scheduler is invoked at frequent intervals.
             final TimerConfig timerConfig = new TimerConfig();
             timerConfig.setInfo("CWS Sanitizer");
 
-            // Once started, the next run should always occur as planned, regardless
-            // of restarts, as it is not guaranteed that the sanitizing is performed
-            // at startup.
-            timerConfig.setPersistent(true);
+            // To prevent starting multiple Timers, it is started in
+            // a non-persisted way, meaning that it will be cancelled once
+            // the Container is stopped.
+            timerConfig.setPersistent(false);
 
             // Starting the Timer Service every hour.
             final ScheduleExpression expression = new ScheduleExpression();

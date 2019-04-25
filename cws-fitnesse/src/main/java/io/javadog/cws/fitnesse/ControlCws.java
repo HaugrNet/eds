@@ -35,7 +35,6 @@ import io.javadog.cws.api.responses.FetchMemberResponse;
 import io.javadog.cws.fitnesse.callers.CallManagement;
 import io.javadog.cws.fitnesse.callers.CallShare;
 import io.javadog.cws.fitnesse.exceptions.StopTestException;
-
 import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.Charset;
 import java.util.Objects;
@@ -74,7 +73,6 @@ public final class ControlCws extends CwsRequest<FetchMemberResponse> {
         final FetchMemberRequest fetchRequest = prepareAdminRequest(FetchMemberRequest.class);
         final ProcessMemberRequest processRequest = prepareAdminRequest(ProcessMemberRequest.class);
         processRequest.setAction(Action.DELETE);
-        final String adminKey = Constants.ADMIN_ACCOUNT + "_id";
         String adminId = null;
 
         final FetchMemberResponse fetchResponse = CallManagement.fetchMembers(requestType, requestUrl, fetchRequest);
@@ -87,7 +85,8 @@ public final class ControlCws extends CwsRequest<FetchMemberResponse> {
             }
         }
 
-        clearAndAddAdminId(adminKey, adminId);
+        clearAndAddAdminId(adminId);
+        clearSignatures();
     }
 
     public void removeDataTypes() {

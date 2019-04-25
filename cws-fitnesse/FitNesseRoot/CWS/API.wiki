@@ -3,7 +3,7 @@ Test
 ---
 !*> Setup
 !include .CWS.Setup
-!define REST_ROOT { [ http(s)://HOST/PORT/ROOT ] }
+!define REST_ROOT {[ http(s)://HOST:PORT/ROOT ]}
 
 *!
 
@@ -111,9 +111,9 @@ it is not possible for an administrator to update the member keys.
 !*> Create Test accounts
 |process member                                                                                                                                         |
 |account name|credential|credential type|action|member id|public key|new account name|new credential|member role|member id?|return code?|return message?|
-|admin       |admin     |PASSPHRASE     |CREATE|null     |null      |user1           |password1     |STANDARD   |=~/\S{36}/|${SUCCESS}  |Ok             |
-|admin       |admin     |PASSPHRASE     |CREATE|null     |null      |user2           |password2     |STANDARD   |=~/\S{36}/|${SUCCESS}  |Ok             |
-|admin       |admin     |PASSPHRASE     |CREATE|null     |null      |user3           |password3     |STANDARD   |=~/\S{36}/|${SUCCESS}  |Ok             |
+|admin       |admin     |PASSPHRASE     |CREATE|null     |null      |user1           |password1     |STANDARD   |user1_id  |${SUCCESS}  |Ok             |
+|admin       |admin     |PASSPHRASE     |CREATE|null     |null      |user2           |password2     |STANDARD   |user2_id  |${SUCCESS}  |Ok             |
+|admin       |admin     |PASSPHRASE     |CREATE|null     |null      |user3           |password3     |STANDARD   |user3_id  |${SUCCESS}  |Ok             |
 
 *!
 
@@ -281,20 +281,23 @@ performed with the current API:
    * SOAP: fetchMembers
    * REST (POST) requst is: ${REST_ROOT}/members/fetchMembers
 
-|process member                                                                                                                                                                                                                                |
-|account name|credential |credential type|action    |member id |public key|new account name|new credential|member role|member id?|return code?             |return message?                                                                    |
-|admin       |admin      |PASSPHRASE     |CREATE    |null      |null      |admin2          |password2     |ADMIN      |=~/\S{36}/|${SUCCESS}               |Ok                                                                                 |
-|admin       |admin      |PASSPHRASE     |CREATE    |null      |null      |member1         |password1     |STANDARD   |=~/\S{36}/|${SUCCESS}               |Ok                                                                                 |
-|member1     |password1  |null           |UPDATE    |null      |null      |null            |null          |null       |null      |${SUCCESS}               |Ok                                                                                 |
-|member1     |password1  |null           |LOGIN     |null      |null      |null            |session_key   |null       |null      |${SUCCESS}               |Ok                                                                                 |
-|null        |session_key|null           |UPDATE    |null      |null      |null            |new_session   |null       |null      |${VERIFICATION_WARNING}  |It is only permitted to update the credentials when authenticating with Passphrase.|
-|null        |session_key|SESSION        |LOGIN     |null      |null      |null            |new_session   |null       |null      |${SUCCESS}               |Ok                                                                                 |
-|null        |new_session|SESSION        |LOGIN     |null      |null      |null            |new_session   |null       |null      |${SUCCESS}               |Ok                                                                                 |
-|null        |new_session|SESSION        |CREATE    |null      |null      |user9           |password9     |null       |null      |${AUTHORIZATION_WARNING} |Members are not permitted to create new Accounts.                                  |
-|member1     |password1  |PASSPHRASE     |INVALIDATE|null      |null      |null            |null          |null       |null      |${SUCCESS}               |Account has been Invalidated.                                                      |
-|member1     |password1  |null           |UPDATE    |null      |null      |null            |null          |null       |null      |${AUTHENTICATION_WARNING}|Cannot authenticate the Account from the given Credentials.                        |
-|null        |new_session|SESSION        |UPDATE    |null      |null      |null            |null          |null       |null      |${AUTHENTICATION_WARNING}|No Session could be found.                                                         |
-|admin       |admin      |null           |DELETE    |member1_id|null      |null            |null          |null       |null      |${SUCCESS}               |The Member 'member1' has successfully been deleted.                                |
+|process member                                                                                                                                                                                                                                                        |
+|account name|credential       |credential type|action    |member id |public key|new account name|new credential|member role|member id?|signature?       |return code?             |return message?                                                                    |
+|admin       |admin            |PASSPHRASE     |CREATE    |null      |null      |admin2          |password2     |ADMIN      |admin2_id |null             |${SUCCESS}               |Ok                                                                                 |
+|admin       |admin            |PASSPHRASE     |CREATE    |null      |null      |member1         |password1     |STANDARD   |member1_id|null             |${SUCCESS}               |Ok                                                                                 |
+|member1     |password1        |null           |UPDATE    |null      |null      |null            |null          |null       |null      |null             |${SUCCESS}               |Ok                                                                                 |
+|member1     |password1        |null           |LOGIN     |null      |null      |null            |session_key   |null       |null      |null             |${SUCCESS}               |Ok                                                                                 |
+|null        |session_key      |null           |UPDATE    |null      |null      |null            |new_session   |null       |null      |null             |${VERIFICATION_WARNING}  |It is only permitted to update the credentials when authenticating with Passphrase.|
+|null        |session_key      |SESSION        |LOGIN     |null      |null      |null            |new_session   |null       |null      |null             |${SUCCESS}               |Ok                                                                                 |
+|null        |new_session      |SESSION        |LOGIN     |null      |null      |null            |new_session   |null       |null      |null             |${SUCCESS}               |Ok                                                                                 |
+|null        |new_session      |SESSION        |CREATE    |null      |null      |user9           |password9     |null       |null      |null             |${AUTHORIZATION_WARNING} |Members are not permitted to create new Accounts.                                  |
+|member1     |password1        |PASSPHRASE     |INVALIDATE|null      |null      |null            |null          |null       |null      |null             |${SUCCESS}               |Account has been Invalidated.                                                      |
+|member1     |password1        |null           |UPDATE    |null      |null      |null            |null          |null       |null      |null             |${AUTHENTICATION_WARNING}|Cannot authenticate the Account from the given Credentials.                        |
+|null        |new_session      |SESSION        |UPDATE    |null      |null      |null            |null          |null       |null      |null             |${AUTHENTICATION_WARNING}|No Session could be found.                                                         |
+|admin       |admin            |null           |DELETE    |member1_id|null      |null            |null          |null       |null      |null             |${SUCCESS}               |The Member 'member1' has successfully been deleted.                                |
+|admin       |admin            |null           |INVITE    |null      |null      |invitee         |null          |null       |null      |invitee_signature|${SUCCESS}               |Ok                                                                                 |
+|invitee     |invitee_signature|SIGNATURE      |UPDATE    |null      |null      |invitee         |invitee       |null       |invitee_id|null             |${SUCCESS}               |Ok                                                                                 |
+|admin       |admin            |PASSPHRASE     |DELETE    |invitee_id|null      |null            |null          |null       |null      |null             |${SUCCESS}               |The Member 'invitee' has successfully been deleted.                                |
 
 |fetch members                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
 |account name|credential|member id|members?                                                                                                                                                                                                                                                                                                                                                                                                                                                           |circles?|return code?|return message?|
@@ -350,11 +353,26 @@ can they retrieve the Circle Key.
 !4 '''Trustees'''
 The !-CWS-! Create Circle request can be performed by all standard accounts.
 
+ * Add Trustee
+   * SOAP: processTrustee with Action "ADD"
+   * REST (POST) request is: ${REST_ROOT}/trustees/addTrustee
+ * Alter Trustee
+   * SOAP: processTrustee with Action "ALTER"
+   * REST (POST) request is: ${REST_ROOT}/trustees/alterTrustee
+ * Remove Trustee
+   * SOAP: processTrustee with Action "REMOVE"
+   * REST (POST) request is: ${REST_ROOT}/trustees/removeTrustee
+ * Fetch Trustees
+   * SOAP: fetchTrustees
+   * REST (POST) request is: ${REST_ROOT}/trustees/fetchTrustees
+
 |process trustee                                                                              |
 |account name|credential|action|circle id |member id|trust level|return code?|return message ?|
 |user1       |password1 |ADD   |circle2_id|user2_id |WRITE      |${SUCCESS}  |Ok              |
 |user1       |password1 |ADD   |circle2_id|user3_id |READ       |${SUCCESS}  |Ok              |
 |user2       |password2 |ADD   |circle3_id|user1_id |WRITE      |${SUCCESS}  |Ok              |
+|user1       |password1 |ALTER |circle2_id|user3_id |ADMIN      |${SUCCESS}  |Ok              |
+|user1       |password1 |ALTER |circle2_id|user3_id |READ       |${SUCCESS}  |Ok              |
 
 If a Fetch Members for a given User is invoked now, then the list of Circles which the Member is entrusted with will also be returned.
 
@@ -421,9 +439,9 @@ There are 3 kinds of actions / requests which can be made for data Types
 |user3       |password3 |DELETE |MIMEType PDF  |                             |${AUTHORIZATION_WARNING}|The requesting Account is not permitted to Process Data Type.|
 |admin       |admin     |DELETE |MIMEType PDF  |null                         |${SUCCESS}              |Ok                                                           |
 
-|fetch dataTypes                                                                                                                                                                                                                                                                                                                                   |
-|account name|credential|data types?                                                                                                                                                                                                                                                                                  |return code?|return message?|
-|admin       |admin     |!-[DataType{typeName='data', type='Data Object'}, DataType{typeName='folder', type='Folder'}, DataType{typeName='jsonObject', type='{"a":"b","c":"d"}'}, DataType{typeName='Object42', type='com.company.object.ObjectName'}, DataType{typeName='ObjectType', type='Object Mapping Rules'}]-!|${SUCCESS}  |Ok             |
+|fetch dataTypes                                                                                                                                                                                                                                                                     |
+|account name|credential|data types?                                                                                                                                                                                                                    |return code?|return message?|
+|admin       |admin     |!-[DataType{typeName='data', type='Data Object'}, DataType{typeName='folder', type='Folder'}, DataType{typeName='jsonObject', type='{"a":"b","c":"d"}'}, DataType{typeName='Object42', type='com.company.object.ObjectName'}]-!|${SUCCESS}  |Ok             |
 *!
 !* Data
 [[ Top ][#content]]

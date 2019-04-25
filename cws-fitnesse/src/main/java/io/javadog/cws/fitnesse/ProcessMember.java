@@ -65,7 +65,11 @@ public final class ProcessMember extends CwsRequest<ProcessMemberResponse> {
     }
 
     public String memberId() {
-        return getId(newAccountName + "_id");
+        return ((newAccountName != null) && (response.getMemberId() != null)) ? (newAccountName + EXTENSION_ID) : null;
+    }
+
+    public String signature() {
+        return ((newAccountName != null) && (response.getSignature() != null)) ? (newAccountName + EXTENSION_SIGNATURE) : null;
     }
 
     // =========================================================================
@@ -90,6 +94,7 @@ public final class ProcessMember extends CwsRequest<ProcessMemberResponse> {
         // Ensuring that the internal mapping of Ids with accounts being
         // used is synchronized.
         processId(action, memberId, newAccountName, response);
+        setSignature(newAccountName + EXTENSION_SIGNATURE, response.getSignature());
     }
 
     /**

@@ -17,6 +17,7 @@
 package io.javadog.cws.fitnesse;
 
 import io.javadog.cws.api.common.Action;
+import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.CredentialType;
 import io.javadog.cws.api.dtos.Circle;
 import io.javadog.cws.api.requests.Authentication;
@@ -26,7 +27,6 @@ import io.javadog.cws.api.responses.ProcessDataResponse;
 import io.javadog.cws.api.responses.ProcessMemberResponse;
 import io.javadog.cws.fitnesse.exceptions.StopTestException;
 import io.javadog.cws.fitnesse.utils.Converter;
-
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.List;
@@ -48,6 +48,9 @@ public class CwsRequest<R extends CwsResponse> {
     // single internal record, where the name have "_id" appended, and this
     // is then used to both store, delete and find Ids.
     private static final Map<String, String> ids = new HashMap<>(16);
+    private static final Map<String, byte[]> signatures = new HashMap<>(16);
+    protected static final String EXTENSION_ID = "_id";
+    protected static final String EXTENSION_SIGNATURE = "_signature";
 
     private String accountName = null;
     protected byte[] credential = null;
@@ -64,7 +67,11 @@ public class CwsRequest<R extends CwsResponse> {
     }
 
     public void setCredential(final String credential) {
-        this.credential = Converter.convertBytes(credential);
+        if ((credential != null) && credential.endsWith(EXTENSION_SIGNATURE)) {
+            this.credential = getSignature(credential);
+        } else {
+            this.credential = Converter.convertBytes(credential);
+        }
     }
 
     public void setCredentialType(final String credentialType) {
@@ -72,11 +79,11 @@ public class CwsRequest<R extends CwsResponse> {
     }
 
     public String returnCode() {
-        return (response != null) ? String.valueOf(response.getReturnCode()) : "null";
+        return (response != null) ? String.valueOf(response.getReturnCode()) : null;
     }
 
     public String returnMessage() {
-        return (response != null) ? response.getReturnMessage() : "null";
+        return (response != null) ? response.getReturnMessage() : null;
     }
 
     protected <T extends Authentication> T prepareRequest(final Class<T> clazz) {
@@ -115,6 +122,20 @@ public class CwsRequest<R extends CwsResponse> {
     // Operating the internal mapping of Members & Circles
     // =========================================================================
 
+    protected void clearSignatures() {
+        signatures.clear();
+    }
+
+    protected static void setSignature(final String key, final byte[] signature) {
+        if (signature != null) {
+            signatures.put(key, signature);
+        }
+    }
+
+    private static byte[] getSignature(final String key) {
+        return signatures.get(key);
+    }
+
     protected void addCircleInfo(final StringBuilder builder, final List<Circle> circles) {
         for (int i = 0; i < circles.size(); i++) {
             final Circle circle = circles.get(i);
@@ -131,9 +152,9 @@ public class CwsRequest<R extends CwsResponse> {
         }
     }
 
-    protected static void clearAndAddAdminId(final String key, final String value) {
+    protected static void clearAndAddAdminId(final String value) {
         ids.clear();
-        ids.put(key, value);
+        ids.put(Constants.ADMIN_ACCOUNT + EXTENSION_ID, value);
     }
 
     protected static void processId(final Action action, final String currentKey, final String newKey, final ProcessMemberResponse response) {
@@ -156,13 +177,6 @@ public class CwsRequest<R extends CwsResponse> {
 
     private static void processId(final Action action, final String currentKey, final String newKey, final String id) {
         switch (action) {
-            case ADD:
-            case CREATE:
-            case PROCESS:
-                if ((newKey != null) && (id != null)) {
-                    ids.put(newKey + "_id", id);
-                }
-                break;
             case REMOVE:
             case DELETE:
                 if (currentKey != null) {
@@ -170,6 +184,9 @@ public class CwsRequest<R extends CwsResponse> {
                 }
                 break;
             default:
+                if ((newKey != null) && (id != null)) {
+                    ids.put(newKey + EXTENSION_ID, id);
+                }
                 break;
         }
     }

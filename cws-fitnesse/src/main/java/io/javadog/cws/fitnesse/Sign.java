@@ -45,7 +45,7 @@ public final class Sign extends CwsRequest<SignResponse> {
     }
 
     public String signature() {
-        return response.getSignature();
+        return getSignatureKey(response.getSignature());
     }
 
     // =========================================================================
@@ -62,6 +62,7 @@ public final class Sign extends CwsRequest<SignResponse> {
         request.setExpires(expires);
 
         response = CallShare.sign(requestType, requestUrl, request);
+        setSignature(accountName + EXTENSION_SIGNATURE, response);
     }
 
     /**

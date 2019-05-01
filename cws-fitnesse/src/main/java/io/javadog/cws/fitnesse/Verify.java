@@ -39,7 +39,10 @@ public final class Verify extends CwsRequest<VerifyResponse> {
     }
 
     public void setSignature(final String signature) {
-        this.signature = signature;
+        final String checked = Converter.preCheck(signature);
+        if ((checked != null) && checked.contains(EXTENSION_SIGNATURE)) {
+            this.signature = getSignature(signature);
+        }
     }
 
     public String verified() {

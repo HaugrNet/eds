@@ -25,10 +25,14 @@ import io.javadog.cws.api.responses.CwsResponse;
 import io.javadog.cws.api.responses.ProcessCircleResponse;
 import io.javadog.cws.api.responses.ProcessDataResponse;
 import io.javadog.cws.api.responses.ProcessMemberResponse;
+import io.javadog.cws.api.responses.SignResponse;
 import io.javadog.cws.fitnesse.exceptions.StopTestException;
 import io.javadog.cws.fitnesse.utils.Converter;
 
 import java.lang.reflect.InvocationTargetException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,11 +53,11 @@ public class CwsRequest<R extends CwsResponse> {
     // single internal record, where the name have "_id" appended, and this
     // is then used to both store, delete and find Ids.
     private static final Map<String, String> ids = new HashMap<>(16);
-    private static final Map<String, byte[]> signatures = new HashMap<>(16);
+    private static final Map<String, String> signatures = new HashMap<>(16);
     protected static final String EXTENSION_ID = "_id";
     protected static final String EXTENSION_SIGNATURE = "_signature";
 
-    private String accountName = null;
+    protected String accountName = null;
     protected byte[] credential = null;
     private CredentialType credentialType = null;
     protected R response = null;
@@ -69,7 +73,7 @@ public class CwsRequest<R extends CwsResponse> {
 
     public void setCredential(final String credential) {
         if ((credential != null) && credential.endsWith(EXTENSION_SIGNATURE)) {
-            this.credential = getSignature(credential);
+            this.credential = Base64.getDecoder().decode(getSignature(credential));
         } else {
             this.credential = Converter.convertBytes(credential);
         }
@@ -127,13 +131,37 @@ public class CwsRequest<R extends CwsResponse> {
         signatures.clear();
     }
 
-    protected static void setSignature(final String key, final byte[] signature) {
-        if (signature != null) {
-            signatures.put(key, signature);
+    protected static void setSignature(final String key, final ProcessMemberResponse response) {
+        if (response != null) {
+            final byte[] signature = response.getSignature();
+            if (signature != null) {
+                signatures.put(key, Base64.getEncoder().encodeToString(signature));
+            }
         }
     }
 
-    private static byte[] getSignature(final String key) {
+    protected static void setSignature(final String baseKey, final SignResponse response) {
+        if (response != null) {
+            final String signature = response.getSignature();
+            if (signature != null) {
+                signatures.put(generateSignatureKey(baseKey), signature);
+            }
+        }
+    }
+
+    private static String generateSignatureKey(final String baseKey) {
+        int index = 1;
+
+        for (final String currentKey : signatures.keySet()) {
+            if (currentKey.startsWith(baseKey)) {
+                index++;
+            }
+        }
+
+        return baseKey + index;
+    }
+
+    protected static String getSignature(final String key) {
         return signatures.get(key);
     }
 
@@ -192,19 +220,6 @@ public class CwsRequest<R extends CwsResponse> {
         }
     }
 
-    protected String getKey(final String id) {
-        String key = null;
-
-        if (id != null) {
-            key = ids.entrySet().stream()
-                    .filter((Map.Entry<String, String> entry) -> Objects.equals(entry.getValue(), id))
-                    .map(Map.Entry::getKey)
-                    .findFirst().orElse(null);
-        }
-
-        return key;
-    }
-
     protected String getId(final String key) {
         String id = null;
 
@@ -216,5 +231,39 @@ public class CwsRequest<R extends CwsResponse> {
         }
 
         return id;
+    }
+
+    protected static String getSignatureKey(final String signature) {
+        return (signature != null) ? findKey(signatures, signature) : null;
+    }
+
+    protected String getKey(final String id) {
+        return (id != null) ? findKey(ids, id) : null;
+    }
+
+    private static String findKey(final Map<String, String> map, final String id) {
+        return map.entrySet().stream()
+                .filter((Map.Entry<String, String> entry) -> Objects.equals(entry.getValue(), id))
+                .map(Map.Entry::getKey)
+                .findFirst().orElse(null);
+    }
+
+    protected static Map<String, String> checksums() {
+        final Base64.Decoder decoder = Base64.getDecoder();
+        final Map<String, String> checksums = new HashMap<>(signatures.size());
+
+        for (final Map.Entry<String, String> signature : signatures.entrySet()) {
+            try {
+                final MessageDigest digest = MessageDigest.getInstance("SHA-512");
+                final byte[] bytes = decoder.decode(signature.getValue());
+                final byte[] hashed = digest.digest(bytes);
+
+                checksums.put(Base64.getEncoder().encodeToString(hashed), signature.getKey());
+            } catch (IllegalArgumentException | NoSuchAlgorithmException e) {
+                throw new StopTestException(e.getMessage(), e);
+            }
+        }
+
+        return checksums;
     }
 }

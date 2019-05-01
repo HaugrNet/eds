@@ -9,7 +9,12 @@
 !define ILLEGAL_ACTION         { 405 }
 !define VERIFICATION_WARNING   { 406 }
 !define INTEGRITY_WARNING      { 409 }
+!define SIGNATURE_WARNING      { 491 }
 !define SETTING_WARNING        { 492 }
+
+# Defined Dates
+!define yesterday {!today (yyyy-MM-dd) -1}
+!define tomorrow  {!today (yyyy-MM-dd) +1}
 
 |Import                 |
 |io.javadog.cws.fitnesse|

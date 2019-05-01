@@ -94,7 +94,7 @@ public final class ProcessMember extends CwsRequest<ProcessMemberResponse> {
         // Ensuring that the internal mapping of Ids with accounts being
         // used is synchronized.
         processId(action, memberId, newAccountName, response);
-        setSignature(newAccountName + EXTENSION_SIGNATURE, response.getSignature());
+        setSignature(newAccountName + EXTENSION_SIGNATURE, response);
     }
 
     /**

@@ -16,9 +16,14 @@
  */
 package io.javadog.cws.fitnesse;
 
+import io.javadog.cws.api.dtos.Signature;
 import io.javadog.cws.api.requests.FetchSignatureRequest;
 import io.javadog.cws.api.responses.FetchSignatureResponse;
 import io.javadog.cws.fitnesse.callers.CallShare;
+import io.javadog.cws.fitnesse.utils.Converter;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Kim Jensen
@@ -31,7 +36,14 @@ public final class FetchSignatures extends CwsRequest<FetchSignatureResponse> {
     // =========================================================================
 
     public String signatures() {
-        return response.getSignatures().toString();
+        final StringBuilder builder = new StringBuilder("[");
+        if (response != null) {
+            final List<Signature> signature = response.getSignatures();
+            addSignatureInfo(builder, signature);
+        }
+        builder.append(']');
+
+        return builder.toString();
     }
 
     // =========================================================================
@@ -46,5 +58,22 @@ public final class FetchSignatures extends CwsRequest<FetchSignatureResponse> {
         final FetchSignatureRequest request = prepareRequest(FetchSignatureRequest.class);
 
         response = CallShare.fetchSignatures(requestType, requestUrl, request);
+    }
+
+    private static void addSignatureInfo(final StringBuilder builder, final List<Signature> signatures) {
+        final Map<String, String> checksums = checksums();
+        for (int i = 0; i < signatures.size(); i++) {
+            final Signature signature = signatures.get(i);
+            if (i >= 1) {
+                builder.append(", ");
+            }
+            builder.append("Signature{signature='")
+                    .append(checksums.get(signature.getChecksum()))
+                    .append("', expires='")
+                    .append(Converter.convertDate(signature.getExpires()))
+                    .append("', verifications='")
+                    .append(signature.getVerifications())
+                    .append("'}");
+        }
     }
 }

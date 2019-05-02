@@ -498,21 +498,22 @@ CWS supports simply signing of documents, and later verification of same by othe
    * SOAP: fetchSignatures
    * REST (POST) request is: ${REST_ROOT}/signatures/fetchSignatures
 
-|sign                                                                                                                   |
-|account name|credential|data                                |expires     |signature?      |return code?|return message?|
-|user1       |password1 |Data to be signed already expired   |${yesterday}|user1_signature1|${SUCCESS}  |Ok             |
-|user1       |password1 |Data to be signed without expiration|null        |user1_signature2|${SUCCESS}  |Ok             |
-|user1       |password1 |Data to be signed expires tomorrow  |${tomorrow} |user1_signature3|${SUCCESS}  |Ok             |
+|sign                                                                                                                    |
+|account name|credential|data                                 |expires     |signature?      |return code?|return message?|
+|user1       |password1 |Data to be signed, already expired   |${yesterday}|user1_signature1|${SUCCESS}  |Ok             |
+|user1       |password1 |Data to be signed, without expiration|null        |user1_signature2|${SUCCESS}  |Ok             |
+|user1       |password1 |Data to be signed, expires tomorrow  |${tomorrow} |user1_signature3|${SUCCESS}  |Ok             |
 
-|verify                                                                                                                                 |
-|account name|credential|data                                |signature       |verified?|return code?        |return message?           |
-|user2       |password2 |Data to be signed already expired   |user1_signature1|false    |${SIGNATURE_WARNING}|The Signature has expired.|
-|user2       |password2 |Data to be signed without expiration|user1_signature2|true     |${SUCCESS}          |Ok                        |
-|user2       |password2 |Data to be signed expires tomorrow  |user1_signature3|true     |${SUCCESS}          |Ok                        |
+|verify                                                                                                                                  |
+|account name|credential|data                                 |signature       |verified?|return code?        |return message?           |
+|user2       |password2 |Data to be signed, already expired   |user1_signature1|false    |${SIGNATURE_WARNING}|The Signature has expired.|
+|user2       |password2 |Data to be signed, without expiration|user1_signature2|true     |${SUCCESS}          |Ok                        |
+|user2       |password2 |Data to be signed, expires tomorrow  |user1_signature3|true     |${SUCCESS}          |Ok                        |
+|user2       |password2 |Data to be signed, expires tomorrow  |user1_signature2|false    |${SUCCESS}          |Ok                        |
 
-|fetch signatures                                                                                                                                                                                                                                                                                     |
-|account name|credential|signatures?                                                                                                                                                                                                                                     |return code?|return message?|
-|user1       |password1 |[Signature{signature='user1_signature3', expires='2019-05-02', verifications='1'}, Signature{signature='user1_signature2', expires='null', verifications='1'}, Signature{signature='user1_signature1', expires='2019-04-30', verifications='0'}]|${SUCCESS}  |Ok             |
-|user2       |password2 |[]                                                                                                                                                                                                                                              |${SUCCESS}  |Ok             |
+|fetch signatures                                                                                                                                                                                                                                                                                        |
+|account name|credential|signatures?                                                                                                                                                                                                                                        |return code?|return message?|
+|user1       |password1 |[Signature{signature='user1_signature3', expires='${tomorrow}', verifications='1'}, Signature{signature='user1_signature2', expires='null', verifications='1'}, Signature{signature='user1_signature1', expires='${yesterday}', verifications='0'}]|${SUCCESS}  |Ok             |
+|user2       |password2 |[]                                                                                                                                                                                                                                                 |${SUCCESS}  |Ok             |
 
 *!

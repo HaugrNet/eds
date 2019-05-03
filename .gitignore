@@ -8,8 +8,11 @@ hs_err_pid*
 # Runtime Pid file
 cws.pid
 
-# IDEA IntellíJ settings
+# IDEA IntellíJ & MS Code settings
+.classpath
 .idea
+.project
+.settings
 *.iml
 target
 dependency-reduced-pom.xml

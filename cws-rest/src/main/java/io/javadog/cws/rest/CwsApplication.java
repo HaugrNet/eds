@@ -36,7 +36,7 @@ public class CwsApplication extends Application {
      */
     @Override
     public Set<Class<?>> getClasses() {
-        final Set<Class<?>> set = new HashSet();
+        final Set<Class<?>> set = new HashSet<>();
 
         set.add(CircleService.class);
         set.add(DataService.class);

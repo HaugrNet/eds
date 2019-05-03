@@ -34,7 +34,7 @@ public final class FetchMemberResponseTest {
 
     @Test
     public void testClassflow() {
-        final List<Circle> circles = new ArrayList(1);
+        final List<Circle> circles = new ArrayList<>(1);
         circles.add(new Circle());
         final List<Member> members = new ArrayList<>(1);
         members.add(new Member());

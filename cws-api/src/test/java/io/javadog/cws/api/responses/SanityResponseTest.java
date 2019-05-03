@@ -33,7 +33,7 @@ public final class SanityResponseTest {
 
     @Test
     public void testClassflow() {
-        final List<Sanity> sanities = new ArrayList();
+        final List<Sanity> sanities = new ArrayList<>();
 
         final SanityResponse response = new SanityResponse();
         response.setSanities(sanities);

@@ -27,6 +27,7 @@ import io.javadog.cws.core.DatabaseSetup;
 import io.javadog.cws.core.GenerateTestData;
 import io.javadog.cws.core.enums.KeyAlgorithm;
 import io.javadog.cws.core.jce.CWSKeyPair;
+import io.javadog.cws.core.model.CommonDao;
 import java.util.List;
 import java.util.UUID;
 import javax.persistence.PersistenceException;
@@ -100,7 +101,7 @@ public final class MemberEntityTest extends DatabaseSetup {
         entityManager.clear();
 
         final Query query = entityManager.createQuery("select m from MemberEntity m order by id desc");
-        final List<MemberEntity> list = query.getResultList();
+        final List<MemberEntity> list = CommonDao.findList(query);
         // Now, a couple of checks. First, that we have 2 records, the default
         // Administration Account and the newly created Account
         assertThat(list.size(), is(7));
@@ -138,7 +139,7 @@ public final class MemberEntityTest extends DatabaseSetup {
     public void testFindAll() {
         final String jql = "select m from MemberEntity m";
         final Query query = entityManager.createQuery(jql);
-        final List<MemberEntity> found = query.getResultList();
+        final List<MemberEntity> found = CommonDao.findList(query);
 
         assertThat(found.size(), is(6));
         assertThat(found.get(0).getName(), is(Constants.ADMIN_ACCOUNT));

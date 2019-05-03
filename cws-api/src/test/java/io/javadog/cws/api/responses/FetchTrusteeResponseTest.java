@@ -33,7 +33,7 @@ public final class FetchTrusteeResponseTest {
 
     @Test
     public void testClassflow() {
-        final List<Trustee> trustees = new ArrayList();
+        final List<Trustee> trustees = new ArrayList<>();
 
         final FetchTrusteeResponse response = new FetchTrusteeResponse();
         response.setTrustees(trustees);

@@ -32,7 +32,7 @@ public final class SettingResponseTest {
 
     @Test
     public void testClassflow() {
-        final Map<String, String> settings = new HashMap();
+        final Map<String, String> settings = new HashMap<>();
         settings.put("key1", "value1");
         settings.put("key2", "value2");
         settings.put("key3", "value3");

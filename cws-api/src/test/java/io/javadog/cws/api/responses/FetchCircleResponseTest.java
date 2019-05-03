@@ -33,7 +33,7 @@ public final class FetchCircleResponseTest {
 
     @Test
     public void testClassflow() {
-        final List<Circle> circles = new ArrayList();
+        final List<Circle> circles = new ArrayList<>();
 
         final FetchCircleResponse response = new FetchCircleResponse();
         response.setCircles(circles);

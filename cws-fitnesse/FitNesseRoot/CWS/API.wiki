@@ -1,6 +1,7 @@
 ---
 Test
 ---
+
 !*> Setup
 !include .CWS.Setup
 !define REST_ROOT {[ http(s)://HOST:PORT/ROOT ]}
@@ -76,6 +77,7 @@ the onle CWS request not requiring any credentials to invoke.
 |return code?|return message?|cws version?|
 |${SUCCESS}  |Ok             |1.1-SNAPSHOT|
 *!
+
 !* !-MasterKey-!
 [[ Top ][#content]]
 !anchor masterkey
@@ -123,6 +125,7 @@ it is not possible for an administrator to update the member keys.
 |admin       |admin     |!-https://javadog.io/img/cloud.png-!|null      |${ILLEGAL_ACTION}        |Cannot alter the !-MasterKey-!, as Member Accounts exists.|
 |admin       |admin     |null                                |master    |${ILLEGAL_ACTION}        |Cannot alter the !-MasterKey-!, as Member Accounts exists.|
 *!
+
 !* Settings
 [[ Top ][#content]]
 !anchor settings
@@ -221,6 +224,7 @@ The allowed values are:
 |admin       |admin     |cws.crypto.pbe.algorithm|PBE_256|PBE_256 |${SUCCESS}        |Ok                                                          |
 |admin       |admin     |cws.crypto.pbe.algorithm|PBE_512|PBE_256 |${SETTING_WARNING}|Unsupported Crypto Algorithm for 'cws.crypto.pbe.algorithm'.|
 *!
+
 !* Sanitized
 [[ Top ][#content]]
 !anchor sanitized
@@ -243,6 +247,7 @@ date.
 |admin       |admin     |null     |null      |[]       |${SUCCESS}  |Ok             |
 |admin       |admin     |null     |2019-01-01|[]       |${SUCCESS}  |Ok             |
 *!
+
 !* Members
 [[ Top ][#content]]
 !anchor members
@@ -304,6 +309,7 @@ performed with the current API:
 |admin       |admin     |null     |[Member{memberId='admin_id', accountName='admin', memberRole='ADMIN', publicKey='null'}, Member{memberId='admin2_id', accountName='admin2', memberRole='ADMIN', publicKey='null'}, Member{memberId='user1_id', accountName='user1', memberRole='STANDARD', publicKey='null'}, Member{memberId='user2_id', accountName='user2', memberRole='STANDARD', publicKey='null'}, Member{memberId='user3_id', accountName='user3', memberRole='STANDARD', publicKey='null'}]|[]      |${SUCCESS}  |Ok             |
 |user2       |password2 |user1_id |[Member{memberId='user1_id', accountName='user1', memberRole='STANDARD', publicKey='null'}]                                                                                                                                                                                                                                                                                                                                                                        |[]      |${SUCCESS}  |Ok             |
 *!
+
 !* Circles of Trust
 [[ Top ][#content]]
 !anchor circles
@@ -347,6 +353,7 @@ can they retrieve the Circle Key.
 |user1       |password1 |[Circle{circleId='circle1_id', circleName='circle1', circleKey='null'}, Circle{circleId='circle2_id', circleName='circle2', circleKey='null'}, Circle{circleId='circle3_id', circleName='circle3', circleKey='null'}]            |${SUCCESS}  |Ok             |
 |user2       |password2 |[Circle{circleId='circle1_id', circleName='circle1', circleKey='null'}, Circle{circleId='circle2_id', circleName='circle2', circleKey='null'}, Circle{circleId='circle3_id', circleName='circle3', circleKey='super secret key'}]|${SUCCESS}  |Ok             |
 *!
+
 !* Trustees
 [[ Top ][#content]]
 !anchor trustees
@@ -443,6 +450,7 @@ There are 3 kinds of actions / requests which can be made for data Types
 |account name|credential|data types?                                                                                                                                                                                                                    |return code?|return message?|
 |admin       |admin     |!-[DataType{typeName='data', type='Data Object'}, DataType{typeName='folder', type='Folder'}, DataType{typeName='jsonObject', type='{"a":"b","c":"d"}'}, DataType{typeName='Object42', type='com.company.object.ObjectName'}]-!|${SUCCESS}  |Ok             |
 *!
+
 !* Data
 [[ Top ][#content]]
 !anchor data
@@ -467,19 +475,22 @@ There are 3 kinds of actions / requests which can be made for data Types
    * SOAP: fetchData
    * REST (POST) request is: ${REST_ROOT}/data/fetchData
 
-|process data                                                                                                                                                           |
-|account name|credential|action|circle id |data id |data name|type name     |data              |return code?        |return message?                                    |
-|user1       |password1 |ADD   |circle1_id|null    |data1    |folder        |null              |${SUCCESS}          |Ok                                                 |
-|user1       |password1 |ADD   |circle1_id|null    |data2    |data          |First Data Object |${SUCCESS}          |Ok                                                 |
-|user1       |password1 |ADD   |circle2_id|null    |data3    |Awesome Object|Second Data Object|${INTEGRITY_WARNING}|Cannot find a matching !-DataType-! for the Object.|
-|user1       |password1 |DELETE|null      |data1_id|null     |null          |null              |${SUCCESS}          |Ok                                                 |
+|process data                                                                                                                                                            |
+|account name|credential|action|circle id |data id |data name|type name     |data               |return code?        |return message?                                    |
+|user1       |password1 |ADD   |circle1_id|null    |data1    |folder        |null               |${SUCCESS}          |Ok                                                 |
+|user1       |password1 |ADD   |circle1_id|null    |data2    |data          |First Data Object  |${SUCCESS}          |Ok                                                 |
+|user1       |password1 |ADD   |circle2_id|null    |data3    |Awesome Object|Second Data Object |${INTEGRITY_WARNING}|Cannot find a matching !-DataType-! for the Object.|
+|user1       |password1 |DELETE|null      |data1_id|null     |null          |null               |${SUCCESS}          |Ok                                                 |
+|user1       |password1 |ADD   |circle1_id|null    |data4    |data          |Another Data Object|${SUCCESS}          |Ok                                                 |
+|user1       |password1 |ADD   |circle1_id|null    |data5    |data          |More Data          |${SUCCESS}          |Ok                                                 |
 
-|fetch data                                                                                                                                                              |
-|account name|credential|circle id |data id |page number|page size|records?|folder id?     |data id?|data name?|type name?|data?            |return code?|return message?|
-|user1       |password1 |circle1_id|null    |1          |1        |1       |circle1_root_id|data2_id|data2     |data      |null             |${SUCCESS}  |Ok             |
-|user1       |password1 |null      |data2_id|null       |null     |1       |circle1_root_id|data2_id|data2     |data      |First Data Object|${SUCCESS}  |Ok             |
-|user1       |password1 |circle1_id|null    |2          |1        |1       |null           |null    |null      |null      |null             |${SUCCESS}  |Ok             |
+|fetch data                                                                                                                                                                                |
+|account name|credential|circle id |data id |page number|page size|records?|folder id?     |data id?            |data name?    |type name?  |data?            |return code?|return message?|
+|user1       |password1 |circle1_id|null    |1          |2        |3       |circle1_root_id|[data5_id, data4_id]|[data5, data4]|[data, data]|null             |${SUCCESS}  |Ok             |
+|user1       |password1 |null      |data2_id|null       |null     |1       |circle1_root_id|data2_id            |data2         |data        |First Data Object|${SUCCESS}  |Ok             |
+|user1       |password1 |circle1_id|null    |2          |2        |3       |circle1_root_id|[data2_id]          |[data2]       |[data]      |null             |${SUCCESS}  |Ok             |
 *!
+
 !* Signatures
 [[ Top ][#content]]
 !anchor signatures

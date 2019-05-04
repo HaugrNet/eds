@@ -23,6 +23,9 @@ import io.javadog.cws.api.responses.FetchDataResponse;
 import io.javadog.cws.fitnesse.callers.CallShare;
 import io.javadog.cws.fitnesse.utils.Converter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author Kim Jensen
  * @since CWS 1.0
@@ -33,7 +36,7 @@ public final class FetchData extends CwsRequest<FetchDataResponse> {
     private String dataId = null;
     private int pageNumber = 1;
     private int pageSize = 1;
-    private Metadata metadata = null;
+    private final List<Metadata> metadata = new ArrayList<>();
 
     // =========================================================================
     // Request & Response Setters and Getters
@@ -55,32 +58,38 @@ public final class FetchData extends CwsRequest<FetchDataResponse> {
         this.pageSize = Converter.parseInt(pageSize, this.pageSize);
     }
 
-    private void setIndex(final int index) {
-        if ((response != null) && (index < response.getMetadata().size())) {
-            metadata = response.getMetadata().get(index);
-        }
-    }
-
     public String records() {
         return Long.toString(response.getRecords());
     }
 
     public String circleId() {
-        return (metadata != null) ? metadata.getCircleId() : null;
+        return metadata.isEmpty() ? null : metadata.get(0).getCircleId();
     }
 
     public String dataId() {
-        return (metadata != null) ? getKey(metadata.getDataId()) : null;
+        final String id;
+
+        if (dataId == null) {
+            final List<String> ids = new ArrayList<>(metadata.size());
+            for (final Metadata current : metadata) {
+                ids.add(getKey(current.getDataId()));
+            }
+            id = ids.toString();
+        } else {
+            id = metadata.isEmpty() ? null : getKey(metadata.get(0).getDataId());
+        }
+
+        return id;
     }
 
     public String folderId() {
-        final String tmpId = (metadata != null) ? metadata.getFolderId() : null;
+        final String tmpId = metadata.isEmpty() ? null : metadata.get(0).getFolderId();
         String folderId = null;
 
         if (tmpId != null) {
             final String tmpKey = getKey(tmpId);
             if (tmpKey == null) {
-                final String circleKey = getKey(metadata.getCircleId());
+                final String circleKey = getKey(metadata.get(0).getCircleId());
                 final String newKey = circleKey.substring(0, circleKey.indexOf(EXTENSION_ID)) + "_root";
                 processId(Action.ADD, null, newKey, tmpId);
                 folderId = newKey + EXTENSION_ID;
@@ -93,15 +102,51 @@ public final class FetchData extends CwsRequest<FetchDataResponse> {
     }
 
     public String dataName() {
-        return (metadata != null) ? metadata.getDataName() : null;
+        final String name;
+
+        if (dataId == null) {
+            final List<String> names = new ArrayList<>(metadata.size());
+            for (final Metadata current : metadata) {
+                names.add(current.getDataName());
+            }
+            name = names.toString();
+        } else {
+            name = metadata.isEmpty() ? null : metadata.get(0).getDataName();
+        }
+
+        return name;
     }
 
     public String typeName() {
-        return (metadata != null) ? metadata.getTypeName() : null;
+        final String type;
+
+        if (dataId == null) {
+            final List<String> types = new ArrayList<>(metadata.size());
+            for (final Metadata current : metadata) {
+                types.add(current.getTypeName());
+            }
+            type = types.toString();
+        } else {
+            type = metadata.isEmpty() ? null : metadata.get(0).getTypeName();
+        }
+
+        return type;
     }
 
     public String added() {
-        return (metadata != null) ? Converter.convertDate(metadata.getAdded()) : null;
+        final String added;
+
+        if (dataId == null) {
+            final List<String> dates = new ArrayList<>(metadata.size());
+            for (final Metadata current : metadata) {
+                dates.add(Converter.convertDate(current.getAdded()));
+            }
+            added = dates.toString();
+        } else {
+            added = metadata.isEmpty() ? null : Converter.convertDate(metadata.get(0).getAdded());
+        }
+
+        return added;
     }
 
     public String data() {
@@ -124,7 +169,9 @@ public final class FetchData extends CwsRequest<FetchDataResponse> {
         request.setPageSize(pageSize);
 
         response = CallShare.fetchData(requestType, requestUrl, request);
-        setIndex(0);
+        if (response != null) {
+            metadata.addAll(response.getMetadata());
+        }
     }
 
     /**
@@ -138,6 +185,6 @@ public final class FetchData extends CwsRequest<FetchDataResponse> {
         this.dataId = null;
         this.pageNumber = 1;
         this.pageSize = 1;
-        this.metadata = null;
+        metadata.clear();
     }
 }

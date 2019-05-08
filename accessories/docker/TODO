@@ -1,0 +1,7 @@
+Create Dockerfile TODO
+
+0. [x] Base Os
+1. [x] Postgres initiating
+2. [ ] Wildfly initiating 
+3. [ ] CWS and dependencies autostart
+4. [ ] automate stuff and clean up

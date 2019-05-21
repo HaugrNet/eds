@@ -36,7 +36,7 @@ import io.javadog.cws.api.responses.VerifyResponse;
  * well as signing and verifying data.
  *
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 public interface Share {
 

@@ -16,16 +16,15 @@
  */
 package io.javadog.cws.api.dtos;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import java.util.UUID;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 public final class DataTypeTest {
 
@@ -38,8 +37,8 @@ public final class DataTypeTest {
         dataType.setTypeName(name);
         dataType.setType(type);
 
-        assertThat(dataType.getTypeName(), is(name));
-        assertThat(dataType.getType(), is(type));
+        assertEquals(name, dataType.getTypeName());
+        assertEquals(type, dataType.getType());
     }
 
     @Test
@@ -53,7 +52,7 @@ public final class DataTypeTest {
         sameDataType.setTypeName(dataType.getTypeName());
         sameDataType.setType(dataType.getType());
 
-        assertThat(dataType.toString(), is(sameDataType.toString()));
-        assertThat(dataType.toString(), is(not(emptyDataType.toString())));
+        assertEquals(sameDataType.toString(), dataType.toString());
+        assertNotEquals(emptyDataType.toString(), dataType.toString());
     }
 }

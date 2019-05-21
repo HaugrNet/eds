@@ -19,7 +19,7 @@ package io.javadog.cws.api.requests;
 import io.javadog.cws.api.common.Action;
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.Utilities;
-
+import java.util.Map;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
@@ -28,7 +28,6 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
-import java.util.Map;
 
 /**
  * <p>The Request Object supports several actions for adding, updating and
@@ -57,7 +56,7 @@ import java.util.Map;
  * interface: {@link io.javadog.cws.api.Share#processData(ProcessDataRequest)}</p>
  *
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "processDataRequest")

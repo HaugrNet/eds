@@ -16,15 +16,15 @@
  */
 package io.javadog.cws.api.responses;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import io.javadog.cws.api.common.ReturnCode;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 public final class CwsResponseTest {
 
@@ -34,9 +34,9 @@ public final class CwsResponseTest {
         response.setReturnCode(ReturnCode.ERROR);
         response.setReturnMessage(ReturnCode.ERROR.getDescription());
 
-        assertThat(response.getReturnCode(), is(ReturnCode.ERROR.getCode()));
-        assertThat(response.getReturnMessage(), is(ReturnCode.ERROR.getDescription()));
-        assertThat(response.isOk(), is(false));
+        assertEquals(ReturnCode.ERROR.getCode(), response.getReturnCode());
+        assertEquals(ReturnCode.ERROR.getDescription(), response.getReturnMessage());
+        assertFalse(response.isOk());
     }
 
     @Test
@@ -44,8 +44,8 @@ public final class CwsResponseTest {
         final String msg = "FetchCircle Request failed due to Verification Problems.";
         final CwsResponse response = new CwsResponse(ReturnCode.VERIFICATION_WARNING, msg);
 
-        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING.getCode()));
-        assertThat(response.getReturnMessage(), is(msg));
-        assertThat(response.isOk(), is(false));
+        assertEquals(ReturnCode.VERIFICATION_WARNING.getCode(), response.getReturnCode());
+        assertEquals(msg, response.getReturnMessage());
+        assertFalse(response.isOk());
     }
 }

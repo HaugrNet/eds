@@ -16,17 +16,18 @@
  */
 package io.javadog.cws.api.responses;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.javadog.cws.api.common.ReturnCode;
 import java.util.UUID;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 public final class ProcessDataResponseTest {
 
@@ -37,10 +38,10 @@ public final class ProcessDataResponseTest {
         final ProcessDataResponse response = new ProcessDataResponse();
         response.setDataId(dataId);
 
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
-        assertThat(response.getReturnMessage(), is("Ok"));
-        assertThat(response.isOk(), is(true));
-        assertThat(response.getDataId(), is(dataId));
+        assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
+        assertEquals("Ok", response.getReturnMessage());
+        assertTrue(response.isOk());
+        assertEquals(dataId, response.getDataId());
     }
 
     @Test
@@ -48,9 +49,9 @@ public final class ProcessDataResponseTest {
         final String msg = "ProcessData Request failed due to Verification Problems.";
         final ProcessDataResponse response = new ProcessDataResponse(ReturnCode.VERIFICATION_WARNING, msg);
 
-        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING.getCode()));
-        assertThat(response.getReturnMessage(), is(msg));
-        assertThat(response.isOk(), is(false));
-        assertThat(response.getDataId(), is(nullValue()));
+        assertEquals(ReturnCode.VERIFICATION_WARNING.getCode(), response.getReturnCode());
+        assertEquals(msg, response.getReturnMessage());
+        assertFalse(response.isOk());
+        assertNull(response.getDataId());
     }
 }

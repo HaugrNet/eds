@@ -18,13 +18,12 @@ package io.javadog.cws.api.requests;
 
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.Utilities;
-
+import java.util.Map;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
-import java.util.Map;
 
 /**
  * <p>The MasterKey Request Object is needed to change the internally used
@@ -49,7 +48,7 @@ import java.util.Map;
  * credentials information.</p>
  *
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "masterKeyRequest")

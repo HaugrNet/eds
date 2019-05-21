@@ -16,19 +16,19 @@
  */
 package io.javadog.cws.api.requests;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.javadog.cws.api.TestUtilities;
 import io.javadog.cws.api.common.Constants;
-import org.junit.Test;
-
 import java.util.Map;
 import java.util.UUID;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 public final class FetchTrusteeRequestTest {
 
@@ -42,10 +42,10 @@ public final class FetchTrusteeRequestTest {
         request.setCircleId(circleId);
 
         final Map<String, String> errors = request.validate();
-        assertThat(errors.isEmpty(), is(true));
-        assertThat(request.getAccountName(), is(Constants.ADMIN_ACCOUNT));
-        assertThat(TestUtilities.convert(request.getCredential()), is(Constants.ADMIN_ACCOUNT));
-        assertThat(request.getCircleId(), is(circleId));
+        assertTrue(errors.isEmpty());
+        assertEquals(Constants.ADMIN_ACCOUNT, request.getAccountName());
+        assertEquals(Constants.ADMIN_ACCOUNT, TestUtilities.convert(request.getCredential()));
+        assertEquals(circleId, request.getCircleId());
     }
 
     @Test
@@ -53,10 +53,10 @@ public final class FetchTrusteeRequestTest {
         final FetchTrusteeRequest request = new FetchTrusteeRequest();
         final Map<String, String> errors = request.validate();
 
-        assertThat(errors.isEmpty(), is(false));
-        assertThat(errors.size(), is(2));
-        assertThat(errors.get(Constants.FIELD_CREDENTIAL), is("The Session (Credential) is missing."));
-        assertThat(errors.get(Constants.FIELD_CIRCLE_ID), is("The Circle Id is missing or invalid."));
+        assertFalse(errors.isEmpty());
+        assertEquals(2, errors.size());
+        assertEquals("The Session (Credential) is missing.", errors.get(Constants.FIELD_CREDENTIAL));
+        assertEquals("The Circle Id is missing or invalid.", errors.get(Constants.FIELD_CIRCLE_ID));
     }
 
     @Test
@@ -67,9 +67,9 @@ public final class FetchTrusteeRequestTest {
         request.setCircleId(circleId);
 
         final Map<String, String> errors = request.validate();
-        assertThat(errors.isEmpty(), is(false));
-        assertThat(errors.size(), is(2));
-        assertThat(errors.get(Constants.FIELD_CREDENTIAL), is("The Session (Credential) is missing."));
-        assertThat(errors.get(Constants.FIELD_CIRCLE_ID), is("The Circle Id is missing or invalid."));
+        assertFalse(errors.isEmpty());
+        assertEquals(2, errors.size());
+        assertEquals("The Session (Credential) is missing.", errors.get(Constants.FIELD_CREDENTIAL));
+        assertEquals("The Circle Id is missing or invalid.", errors.get(Constants.FIELD_CIRCLE_ID));
     }
 }

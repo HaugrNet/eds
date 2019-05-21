@@ -41,7 +41,7 @@ import io.javadog.cws.api.responses.VersionResponse;
  * control a CWS instance.
  *
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 public interface Management {
 

@@ -16,22 +16,21 @@
  */
 package io.javadog.cws.api.requests;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.javadog.cws.api.TestUtilities;
 import io.javadog.cws.api.common.Action;
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.CredentialType;
 import io.javadog.cws.api.common.MemberRole;
-import org.junit.Test;
-
 import java.util.Map;
 import java.util.UUID;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 public final class ProcessMemberRequestTest {
 
@@ -53,15 +52,15 @@ public final class ProcessMemberRequestTest {
         request.setPublicKey(publicKey);
         final Map<String, String> errors = request.validate();
 
-        assertThat(errors.isEmpty(), is(true));
-        assertThat(request.getAccountName(), is(Constants.ADMIN_ACCOUNT));
-        assertThat(TestUtilities.convert(request.getCredential()), is(Constants.ADMIN_ACCOUNT));
-        assertThat(request.getAction(), is(Action.CREATE));
-        assertThat(request.getMemberId(), is(memberId));
-        assertThat(request.getMemberRole(), is(MemberRole.ADMIN));
-        assertThat(request.getNewAccountName(), is(newAccountName));
-        assertThat(TestUtilities.convert(request.getNewCredential()), is(newCredential));
-        assertThat(request.getPublicKey(), is(publicKey));
+        assertTrue(errors.isEmpty());
+        assertEquals(Constants.ADMIN_ACCOUNT, request.getAccountName());
+        assertEquals(Constants.ADMIN_ACCOUNT, TestUtilities.convert(request.getCredential()));
+        assertEquals(Action.CREATE, request.getAction());
+        assertEquals(memberId, request.getMemberId());
+        assertEquals(MemberRole.ADMIN, request.getMemberRole());
+        assertEquals(newAccountName, request.getNewAccountName());
+        assertEquals(newCredential, TestUtilities.convert(request.getNewCredential()));
+        assertEquals(publicKey, request.getPublicKey());
     }
 
     @Test
@@ -69,9 +68,9 @@ public final class ProcessMemberRequestTest {
         final ProcessMemberRequest request = new ProcessMemberRequest();
         final Map<String, String> errors = request.validate();
 
-        assertThat(errors.size(), is(2));
-        assertThat(errors.get(Constants.FIELD_CREDENTIAL), is("The Session (Credential) is missing."));
-        assertThat(errors.get(Constants.FIELD_ACTION), is("No action has been provided."));
+        assertEquals(2, errors.size());
+        assertEquals("The Session (Credential) is missing.", errors.get(Constants.FIELD_CREDENTIAL));
+        assertEquals("No action has been provided.", errors.get(Constants.FIELD_ACTION));
     }
 
     @Test
@@ -82,8 +81,8 @@ public final class ProcessMemberRequestTest {
         request.setAction(Action.ADD);
 
         final Map<String, String> errors = request.validate();
-        assertThat(errors.size(), is(1));
-        assertThat(errors.get(Constants.FIELD_ACTION), is("Not supported Action has been provided."));
+        assertEquals(1, errors.size());
+        assertEquals("Not supported Action has been provided.", errors.get(Constants.FIELD_ACTION));
     }
 
     @Test
@@ -96,7 +95,7 @@ public final class ProcessMemberRequestTest {
         request.setAction(Action.CREATE);
 
         final Map<String, String> errors = request.validate();
-        assertThat(errors.isEmpty(), is(true));
+        assertTrue(errors.isEmpty());
     }
 
     @Test
@@ -107,9 +106,9 @@ public final class ProcessMemberRequestTest {
         request.setAction(Action.CREATE);
 
         final Map<String, String> errors = request.validate();
-        assertThat(errors.size(), is(2));
-        assertThat(errors.get(Constants.FIELD_NEW_ACCOUNT_NAME), is("The New Account Name is missing."));
-        assertThat(errors.get(Constants.FIELD_NEW_CREDENTIAL), is("The Credentials are required to create new Account."));
+        assertEquals(2, errors.size());
+        assertEquals("The New Account Name is missing.", errors.get(Constants.FIELD_NEW_ACCOUNT_NAME));
+        assertEquals("The Credentials are required to create new Account.", errors.get(Constants.FIELD_NEW_CREDENTIAL));
     }
 
     @Test
@@ -121,7 +120,7 @@ public final class ProcessMemberRequestTest {
         request.setAction(Action.INVITE);
 
         final Map<String, String> errors = request.validate();
-        assertThat(errors.isEmpty(), is(true));
+        assertTrue(errors.isEmpty());
     }
 
     @Test
@@ -132,8 +131,8 @@ public final class ProcessMemberRequestTest {
         request.setAction(Action.INVITE);
 
         final Map<String, String> errors = request.validate();
-        assertThat(errors.size(), is(1));
-        assertThat(errors.get(Constants.FIELD_NEW_ACCOUNT_NAME), is("The New Account Name is missing."));
+        assertEquals(1, errors.size());
+        assertEquals("The New Account Name is missing.", errors.get(Constants.FIELD_NEW_ACCOUNT_NAME));
     }
 
     @Test
@@ -146,7 +145,7 @@ public final class ProcessMemberRequestTest {
         request.setAction(Action.LOGIN);
 
         final Map<String, String> errors = request.validate();
-        assertThat(errors.isEmpty(), is(true));
+        assertTrue(errors.isEmpty());
     }
 
     @Test
@@ -155,9 +154,9 @@ public final class ProcessMemberRequestTest {
         request.setAction(Action.LOGIN);
 
         final Map<String, String> errors = request.validate();
-        assertThat(errors.size(), is(2));
-        assertThat(errors.get(Constants.FIELD_CREDENTIAL), is("The Session (Credential) is missing."));
-        assertThat(errors.get(Constants.FIELD_NEW_CREDENTIAL), is("The Credentials are required to create new Session."));
+        assertEquals(2, errors.size());
+        assertEquals("The Session (Credential) is missing.", errors.get(Constants.FIELD_CREDENTIAL));
+        assertEquals("The Credentials are required to create new Session.", errors.get(Constants.FIELD_NEW_CREDENTIAL));
     }
 
     @Test
@@ -168,7 +167,7 @@ public final class ProcessMemberRequestTest {
         request.setAction(Action.LOGOUT);
 
         final Map<String, String> errors = request.validate();
-        assertThat(errors.isEmpty(), is(true));
+        assertTrue(errors.isEmpty());
     }
 
     @Test
@@ -177,8 +176,8 @@ public final class ProcessMemberRequestTest {
         request.setAction(Action.LOGOUT);
 
         final Map<String, String> errors = request.validate();
-        assertThat(errors.size(), is(1));
-        assertThat(errors.get(Constants.FIELD_CREDENTIAL), is("The Session (Credential) is missing."));
+        assertEquals(1, errors.size());
+        assertEquals("The Session (Credential) is missing.", errors.get(Constants.FIELD_CREDENTIAL));
     }
 
     @Test
@@ -191,7 +190,7 @@ public final class ProcessMemberRequestTest {
         request.setAction(Action.ALTER);
 
         final Map<String, String> errors = request.validate();
-        assertThat(errors.isEmpty(), is(true));
+        assertTrue(errors.isEmpty());
     }
 
     @Test
@@ -203,9 +202,9 @@ public final class ProcessMemberRequestTest {
         request.setAction(Action.ALTER);
 
         final Map<String, String> errors = request.validate();
-        assertThat(errors.size(), is(2));
-        assertThat(errors.get(Constants.FIELD_MEMBER_ID), is("The given memberId is invalid."));
-        assertThat(errors.get(Constants.FIELD_MEMBER_ROLE), is("The Role is missing."));
+        assertEquals(2, errors.size());
+        assertEquals("The given memberId is invalid.", errors.get(Constants.FIELD_MEMBER_ID));
+        assertEquals("The Role is missing.", errors.get(Constants.FIELD_MEMBER_ROLE));
     }
 
     @Test
@@ -217,7 +216,7 @@ public final class ProcessMemberRequestTest {
         request.setAction(Action.UPDATE);
 
         final Map<String, String> errors = request.validate();
-        assertThat(errors.isEmpty(), is(true));
+        assertTrue(errors.isEmpty());
     }
 
     @Test
@@ -229,8 +228,8 @@ public final class ProcessMemberRequestTest {
         request.setAction(Action.UPDATE);
 
         final Map<String, String> errors = request.validate();
-        assertThat(errors.size(), is(1));
-        assertThat(errors.get(Constants.FIELD_NEW_ACCOUNT_NAME), is("The newAccountName may not exceed 256 characters."));
+        assertEquals(1, errors.size());
+        assertEquals("The newAccountName may not exceed 256 characters.", errors.get(Constants.FIELD_NEW_ACCOUNT_NAME));
     }
 
     @Test
@@ -240,7 +239,7 @@ public final class ProcessMemberRequestTest {
         request.setCredential(TestUtilities.convert(Constants.ADMIN_ACCOUNT));
         request.setAction(Action.INVALIDATE);
         final Map<String, String> errors = request.validate();
-        assertThat(errors.isEmpty(), is(true));
+        assertTrue(errors.isEmpty());
     }
 
     @Test
@@ -252,7 +251,7 @@ public final class ProcessMemberRequestTest {
         request.setAction(Action.DELETE);
 
         final Map<String, String> errors = request.validate();
-        assertThat(errors.isEmpty(), is(true));
+        assertTrue(errors.isEmpty());
     }
 
     @Test
@@ -264,7 +263,7 @@ public final class ProcessMemberRequestTest {
         request.setAction(Action.DELETE);
 
         final Map<String, String> errors = request.validate();
-        assertThat(errors.size(), is(1));
-        assertThat(errors.get(Constants.FIELD_MEMBER_ID), is("The given memberId is invalid."));
+        assertEquals(1, errors.size());
+        assertEquals("The given memberId is invalid.", errors.get(Constants.FIELD_MEMBER_ID));
     }
 }

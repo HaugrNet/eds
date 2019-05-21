@@ -18,7 +18,7 @@ package io.javadog.cws.api.requests;
 
 import io.javadog.cws.api.common.Action;
 import io.javadog.cws.api.common.Constants;
-
+import java.util.Map;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
@@ -27,7 +27,6 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
-import java.util.Map;
 
 /**
  * <p>Circles only have an Id, a name and an optional External Circle Key, the
@@ -61,7 +60,7 @@ import java.util.Map;
  * interface: {@link io.javadog.cws.api.Management#processCircle(ProcessCircleRequest)}</p>
  *
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "processCircleRequest")

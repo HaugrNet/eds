@@ -31,7 +31,7 @@ import javax.xml.bind.annotation.XmlType;
  * known and trusted members who may be granted access to the data.</p>
  *
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = Constants.FIELD_CIRCLE, propOrder = { Constants.FIELD_CIRCLE_ID, Constants.FIELD_CIRCLE_NAME, Constants.FIELD_CIRCKE_KEY, Constants.FIELD_ADDED })

@@ -16,19 +16,20 @@
  */
 package io.javadog.cws.api.responses;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.dtos.Metadata;
 import java.util.ArrayList;
 import java.util.List;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 public final class FetchDataResponseTest {
 
@@ -45,12 +46,12 @@ public final class FetchDataResponseTest {
         response.setRecords(3L);
         response.setData(data);
 
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
-        assertThat(response.getReturnMessage(), is("Ok"));
-        assertThat(response.isOk(), is(true));
-        assertThat(response.getMetadata(), is(metadata));
-        assertThat(response.getRecords(), is(3L));
-        assertThat(response.getData(), is(data));
+        assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
+        assertEquals("Ok", response.getReturnMessage());
+        assertTrue(response.isOk());
+        assertEquals(metadata, response.getMetadata());
+        assertEquals(3L, response.getRecords());
+        assertEquals(data, response.getData());
     }
 
     @Test
@@ -58,10 +59,10 @@ public final class FetchDataResponseTest {
         final String msg = "FetchData Request failed due to Verification Problems.";
         final FetchDataResponse response = new FetchDataResponse(ReturnCode.VERIFICATION_WARNING, msg);
 
-        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING.getCode()));
-        assertThat(response.getReturnMessage(), is(msg));
-        assertThat(response.isOk(), is(false));
-        assertThat(response.getMetadata().isEmpty(), is(true));
-        assertThat(response.getData(), is(nullValue()));
+        assertEquals(ReturnCode.VERIFICATION_WARNING.getCode(), response.getReturnCode());
+        assertEquals(msg, response.getReturnMessage());
+        assertFalse(response.isOk());
+        assertTrue(response.getMetadata().isEmpty());
+        assertNull(response.getData());
     }
 }

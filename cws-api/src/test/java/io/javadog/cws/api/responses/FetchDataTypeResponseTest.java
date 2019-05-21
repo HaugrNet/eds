@@ -16,18 +16,19 @@
  */
 package io.javadog.cws.api.responses;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.dtos.DataType;
 import java.util.ArrayList;
 import java.util.List;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 public final class FetchDataTypeResponseTest {
 
@@ -41,10 +42,10 @@ public final class FetchDataTypeResponseTest {
         final FetchDataTypeResponse response = new FetchDataTypeResponse();
         response.setDataTypes(dataTypes);
 
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
-        assertThat(response.getReturnMessage(), is("Ok"));
-        assertThat(response.isOk(), is(true));
-        assertThat(response.getDataTypes(), is(dataTypes));
+        assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
+        assertEquals("Ok", response.getReturnMessage());
+        assertTrue(response.isOk());
+        assertEquals(dataTypes, response.getDataTypes());
     }
 
     @Test
@@ -52,9 +53,9 @@ public final class FetchDataTypeResponseTest {
         final String msg = "FetchDataType Request failed due to Verification Problems.";
         final FetchDataTypeResponse response = new FetchDataTypeResponse(ReturnCode.VERIFICATION_WARNING, msg);
 
-        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING.getCode()));
-        assertThat(response.getReturnMessage(), is(msg));
-        assertThat(response.isOk(), is(false));
-        assertThat(response.getDataTypes().isEmpty(), is(true));
+        assertEquals(ReturnCode.VERIFICATION_WARNING.getCode(), response.getReturnCode());
+        assertEquals(msg, response.getReturnMessage());
+        assertFalse(response.isOk());
+        assertTrue(response.getDataTypes().isEmpty());
     }
 }

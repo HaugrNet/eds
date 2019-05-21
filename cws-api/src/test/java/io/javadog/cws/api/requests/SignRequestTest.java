@@ -16,19 +16,19 @@
  */
 package io.javadog.cws.api.requests;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.javadog.cws.api.TestUtilities;
 import io.javadog.cws.api.common.Constants;
-import org.junit.Test;
-
 import java.util.Date;
 import java.util.Map;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 public final class SignRequestTest {
 
@@ -44,11 +44,11 @@ public final class SignRequestTest {
         request.setExpires(expires);
 
         final Map<String, String> errors = request.validate();
-        assertThat(errors.isEmpty(), is(true));
-        assertThat(request.getAccountName(), is(Constants.ADMIN_ACCOUNT));
-        assertThat(request.getCredential(), is(TestUtilities.convert(Constants.ADMIN_ACCOUNT)));
-        assertThat(request.getData(), is(data));
-        assertThat(request.getExpires(), is(expires));
+        assertTrue(errors.isEmpty());
+        assertEquals(Constants.ADMIN_ACCOUNT, request.getAccountName());
+        assertArrayEquals(TestUtilities.convert(Constants.ADMIN_ACCOUNT), request.getCredential());
+        assertArrayEquals(data, request.getData());
+        assertEquals(expires, request.getExpires());
     }
 
     @Test
@@ -56,9 +56,9 @@ public final class SignRequestTest {
         final SignRequest request = new SignRequest();
         final Map<String, String> errors = request.validate();
 
-        assertThat(errors.size(), is(2));
-        assertThat(errors.get(Constants.FIELD_CREDENTIAL), is("The Session (Credential) is missing."));
-        assertThat(errors.get(Constants.FIELD_DATA), is("The Data Object to create a Signature is missing."));
+        assertEquals(2, errors.size());
+        assertEquals("The Session (Credential) is missing.", errors.get(Constants.FIELD_CREDENTIAL));
+        assertEquals("The Data Object to create a Signature is missing.", errors.get(Constants.FIELD_DATA));
     }
 
     @Test
@@ -67,8 +67,8 @@ public final class SignRequestTest {
         request.setData(null);
 
         final Map<String, String> errors = request.validate();
-        assertThat(errors.size(), is(2));
-        assertThat(errors.get(Constants.FIELD_CREDENTIAL), is("The Session (Credential) is missing."));
-        assertThat(errors.get(Constants.FIELD_DATA), is("The Data Object to create a Signature is missing."));
+        assertEquals(2, errors.size());
+        assertEquals("The Session (Credential) is missing.", errors.get(Constants.FIELD_CREDENTIAL));
+        assertEquals("The Data Object to create a Signature is missing.", errors.get(Constants.FIELD_DATA));
     }
 }

@@ -16,20 +16,20 @@
  */
 package io.javadog.cws.api.requests;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.javadog.cws.api.TestUtilities;
 import io.javadog.cws.api.common.Action;
 import io.javadog.cws.api.common.Constants;
-import org.junit.Test;
-
 import java.util.Map;
 import java.util.UUID;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 public final class ProcessDataRequestTest {
 
@@ -58,18 +58,18 @@ public final class ProcessDataRequestTest {
         request.setData(data);
         final Map<String, String> errors = request.validate();
 
-        assertThat(errors.isEmpty(), is(true));
-        assertThat(request.getAccountName(), is(Constants.ADMIN_ACCOUNT));
-        assertThat(TestUtilities.convert(request.getCredential()), is(Constants.ADMIN_ACCOUNT));
-        assertThat(request.getAction(), is(Action.ADD));
-        assertThat(request.getDataId(), is(dataId));
-        assertThat(request.getCircleId(), is(circleId));
-        assertThat(request.getTargetCircleId(), is(targetCircleId));
-        assertThat(request.getDataName(), is(dataName));
-        assertThat(request.getFolderId(), is(folderId));
-        assertThat(request.getTargetFolderId(), is(targetFolderId));
-        assertThat(request.getTypeName(), is(typeName));
-        assertThat(request.getData(), is(data));
+        assertTrue(errors.isEmpty());
+        assertEquals(Constants.ADMIN_ACCOUNT, request.getAccountName());
+        assertEquals(Constants.ADMIN_ACCOUNT, TestUtilities.convert(request.getCredential()));
+        assertEquals(Action.ADD, request.getAction());
+        assertEquals(dataId, request.getDataId());
+        assertEquals(circleId, request.getCircleId());
+        assertEquals(targetCircleId, request.getTargetCircleId());
+        assertEquals(dataName, request.getDataName());
+        assertEquals(folderId, request.getFolderId());
+        assertEquals(targetFolderId, request.getTargetFolderId());
+        assertEquals(typeName, request.getTypeName());
+        assertArrayEquals(data, request.getData());
     }
 
     @Test
@@ -78,9 +78,9 @@ public final class ProcessDataRequestTest {
         request.setAction(null);
         final Map<String, String> errors = request.validate();
 
-        assertThat(errors.size(), is(2));
-        assertThat(errors.get(Constants.FIELD_CREDENTIAL), is("The Session (Credential) is missing."));
-        assertThat(errors.get(Constants.FIELD_ACTION), is("No action has been provided."));
+        assertEquals(2, errors.size());
+        assertEquals("The Session (Credential) is missing.", errors.get(Constants.FIELD_CREDENTIAL));
+        assertEquals("No action has been provided.", errors.get(Constants.FIELD_ACTION));
     }
 
     @Test
@@ -91,8 +91,8 @@ public final class ProcessDataRequestTest {
         request.setAction(Action.PROCESS);
 
         final Map<String, String> errors = request.validate();
-        assertThat(errors.size(), is(1));
-        assertThat(errors.get(Constants.FIELD_ACTION), is("Not supported Action has been provided."));
+        assertEquals(1, errors.size());
+        assertEquals("Not supported Action has been provided.", errors.get(Constants.FIELD_ACTION));
     }
 
     @Test
@@ -107,7 +107,7 @@ public final class ProcessDataRequestTest {
         request.setAction(Action.ADD);
 
         final Map<String, String> errors = request.validate();
-        assertThat(errors.isEmpty(), is(true));
+        assertTrue(errors.isEmpty());
     }
 
     @Test
@@ -120,9 +120,9 @@ public final class ProcessDataRequestTest {
         request.setAction(Action.ADD);
 
         final Map<String, String> errors = request.validate();
-        assertThat(errors.size(), is(3));
-        assertThat(errors.get(Constants.FIELD_CIRCLE_ID), is("The Circle Id is missing or invalid."));
-        assertThat(errors.get(Constants.FIELD_FOLDER_ID), is("The Folder Id is invalid."));
+        assertEquals(3, errors.size());
+        assertEquals("The Circle Id is missing or invalid.", errors.get(Constants.FIELD_CIRCLE_ID));
+        assertEquals("The Folder Id is invalid.", errors.get(Constants.FIELD_FOLDER_ID));
     }
 
     @Test
@@ -136,7 +136,7 @@ public final class ProcessDataRequestTest {
         request.setAction(Action.UPDATE);
 
         final Map<String, String> errors = request.validate();
-        assertThat(errors.isEmpty(), is(true));
+        assertTrue(errors.isEmpty());
     }
 
     @Test
@@ -150,10 +150,10 @@ public final class ProcessDataRequestTest {
         request.setAction(Action.UPDATE);
 
         final Map<String, String> errors = request.validate();
-        assertThat(errors.size(), is(3));
-        assertThat(errors.get(Constants.FIELD_DATA_ID), is("The Data Id to update is missing or invalid."));
-        assertThat(errors.get(Constants.FIELD_FOLDER_ID), is("The Folder Id is invalid."));
-        assertThat(errors.get(Constants.FIELD_DATA_NAME), is("The new name of the Data Object is invalid."));
+        assertEquals(3, errors.size());
+        assertEquals("The Data Id to update is missing or invalid.", errors.get(Constants.FIELD_DATA_ID));
+        assertEquals("The Folder Id is invalid.", errors.get(Constants.FIELD_FOLDER_ID));
+        assertEquals("The new name of the Data Object is invalid.", errors.get(Constants.FIELD_DATA_NAME));
     }
 
     @Test
@@ -167,7 +167,7 @@ public final class ProcessDataRequestTest {
         request.setAction(Action.COPY);
 
         final Map<String, String> errors = request.validate();
-        assertThat(errors.isEmpty(), is(true));
+        assertTrue(errors.isEmpty());
     }
 
     @Test
@@ -179,9 +179,9 @@ public final class ProcessDataRequestTest {
         request.setAction(Action.COPY);
 
         final Map<String, String> errors = request.validate();
-        assertThat(errors.size(), is(2));
-        assertThat(errors.get(Constants.FIELD_DATA_ID), is("The Data Id to copy is missing or invalid."));
-        assertThat(errors.get(Constants.FIELD_TARGET_CIRCLE_ID), is("The target Circle Id is missing or invalid."));
+        assertEquals(2, errors.size());
+        assertEquals("The Data Id to copy is missing or invalid.", errors.get(Constants.FIELD_DATA_ID));
+        assertEquals("The target Circle Id is missing or invalid.", errors.get(Constants.FIELD_TARGET_CIRCLE_ID));
     }
 
     @Test
@@ -195,7 +195,7 @@ public final class ProcessDataRequestTest {
         request.setAction(Action.MOVE);
 
         final Map<String, String> errors = request.validate();
-        assertThat(errors.isEmpty(), is(true));
+        assertTrue(errors.isEmpty());
     }
 
     @Test
@@ -207,9 +207,9 @@ public final class ProcessDataRequestTest {
         request.setAction(Action.MOVE);
 
         final Map<String, String> errors = request.validate();
-        assertThat(errors.size(), is(2));
-        assertThat(errors.get(Constants.FIELD_DATA_ID), is("The Data Id to move is missing or invalid."));
-        assertThat(errors.get(Constants.FIELD_TARGET_CIRCLE_ID), is("The target Circle Id is missing or invalid."));
+        assertEquals(2, errors.size());
+        assertEquals("The Data Id to move is missing or invalid.", errors.get(Constants.FIELD_DATA_ID));
+        assertEquals("The target Circle Id is missing or invalid.", errors.get(Constants.FIELD_TARGET_CIRCLE_ID));
     }
 
     @Test
@@ -221,7 +221,7 @@ public final class ProcessDataRequestTest {
         request.setAction(Action.DELETE);
 
         final Map<String, String> errors = request.validate();
-        assertThat(errors.isEmpty(), is(true));
+        assertTrue(errors.isEmpty());
     }
 
     @Test
@@ -233,7 +233,7 @@ public final class ProcessDataRequestTest {
         request.setAction(Action.DELETE);
 
         final Map<String, String> errors = request.validate();
-        assertThat(errors.size(), is(1));
-        assertThat(errors.get(Constants.FIELD_DATA_ID), is("The Data Id to delete is missing or invalid."));
+        assertEquals(1, errors.size());
+        assertEquals("The Data Id to delete is missing or invalid.", errors.get(Constants.FIELD_DATA_ID));
     }
 }

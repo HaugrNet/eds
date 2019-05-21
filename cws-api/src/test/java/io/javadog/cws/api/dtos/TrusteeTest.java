@@ -16,19 +16,18 @@
  */
 package io.javadog.cws.api.dtos;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import io.javadog.cws.api.common.TrustLevel;
 import io.javadog.cws.api.common.Utilities;
 import java.util.Date;
 import java.util.UUID;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 public final class TrusteeTest {
 
@@ -49,12 +48,12 @@ public final class TrusteeTest {
         trustee.setChanged(lastModified);
         trustee.setAdded(added);
 
-        assertThat(trustee.getMemberId(), is(memberId));
-        assertThat(trustee.getPublicKey(), is(publicKey));
-        assertThat(trustee.getCircleId(), is(circleId));
-        assertThat(trustee.getTrustLevel(), is(trustLevel));
-        assertThat(trustee.getChanged(), is(lastModified));
-        assertThat(trustee.getAdded(), is(added));
+        assertEquals(memberId, trustee.getMemberId());
+        assertEquals(publicKey, trustee.getPublicKey());
+        assertEquals(circleId, trustee.getCircleId());
+        assertEquals(trustLevel, trustee.getTrustLevel());
+        assertEquals(lastModified, trustee.getChanged());
+        assertEquals(added, trustee.getAdded());
     }
 
     @Test
@@ -76,7 +75,7 @@ public final class TrusteeTest {
         sameTrustee.setChanged(trustee.getChanged());
         sameTrustee.setAdded(trustee.getAdded());
 
-        assertThat(trustee.toString(), is(sameTrustee.toString()));
-        assertThat(trustee.toString(), is(not(emptyTrustee.toString())));
+        assertEquals(sameTrustee.toString(), trustee.toString());
+        assertNotEquals(emptyTrustee.toString(), trustee.toString());
     }
 }

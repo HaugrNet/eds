@@ -16,18 +16,17 @@
  */
 package io.javadog.cws.api.dtos;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import io.javadog.cws.api.common.Utilities;
 import java.util.Date;
 import java.util.UUID;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 public final class SignatureTest {
 
@@ -46,11 +45,11 @@ public final class SignatureTest {
         signature.setAdded(added);
         signature.setLastVerification(lastVerification);
 
-        assertThat(signature.getChecksum(), is(checksum));
-        assertThat(signature.getExpires(), is(expires));
-        assertThat(signature.getVerifications(), is(verifications));
-        assertThat(signature.getAdded(), is(added));
-        assertThat(signature.getLastVerification(), is(lastVerification));
+        assertEquals(checksum, signature.getChecksum());
+        assertEquals(expires, signature.getExpires());
+        assertEquals(verifications, signature.getVerifications());
+        assertEquals(added, signature.getAdded());
+        assertEquals(lastVerification, signature.getLastVerification());
     }
 
     @Test
@@ -70,7 +69,7 @@ public final class SignatureTest {
         sameSignature.setAdded(signature.getAdded());
         sameSignature.setLastVerification(signature.getLastVerification());
 
-        assertThat(signature.toString(), is(sameSignature.toString()));
-        assertThat(signature.toString(), is(not(emptySignature.toString())));
+        assertEquals(sameSignature.toString(), signature.toString());
+        assertNotEquals(emptySignature.toString(), signature.toString());
     }
 }

@@ -16,18 +16,19 @@
  */
 package io.javadog.cws.api.responses;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.dtos.Trustee;
 import java.util.ArrayList;
 import java.util.List;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 public final class FetchTrusteeResponseTest {
 
@@ -38,10 +39,10 @@ public final class FetchTrusteeResponseTest {
         final FetchTrusteeResponse response = new FetchTrusteeResponse();
         response.setTrustees(trustees);
 
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
-        assertThat(response.getReturnMessage(), is("Ok"));
-        assertThat(response.isOk(), is(true));
-        assertThat(response.getTrustees(), is(trustees));
+        assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
+        assertEquals("Ok", response.getReturnMessage());
+        assertTrue(response.isOk());
+        assertEquals(trustees, response.getTrustees());
     }
 
     @Test
@@ -49,9 +50,9 @@ public final class FetchTrusteeResponseTest {
         final String msg = "FetchCircle Request failed due to Verification Problems.";
         final FetchTrusteeResponse response = new FetchTrusteeResponse(ReturnCode.VERIFICATION_WARNING, msg);
 
-        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING.getCode()));
-        assertThat(response.getReturnMessage(), is(msg));
-        assertThat(response.isOk(), is(false));
-        assertThat(response.getTrustees().isEmpty(), is(true));
+        assertEquals(ReturnCode.VERIFICATION_WARNING.getCode(), response.getReturnCode());
+        assertEquals(msg, response.getReturnMessage());
+        assertFalse(response.isOk());
+        assertTrue(response.getTrustees().isEmpty());
     }
 }

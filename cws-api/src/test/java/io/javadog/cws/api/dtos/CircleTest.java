@@ -16,20 +16,19 @@
  */
 package io.javadog.cws.api.dtos;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import io.javadog.cws.api.common.Utilities;
 import java.util.Date;
 import java.util.UUID;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
-public class CircleTest {
+public final class CircleTest {
 
     @Test
     public void testClassflow() {
@@ -44,10 +43,10 @@ public class CircleTest {
         circle.setCircleKey(key);
         circle.setAdded(date);
 
-        assertThat(circle.getCircleId(), is(id));
-        assertThat(circle.getCircleName(), is(name));
-        assertThat(circle.getCircleKey(), is(key));
-        assertThat(circle.getAdded(), is(date));
+        assertEquals(id, circle.getCircleId());
+        assertEquals(name, circle.getCircleName());
+        assertEquals(key, circle.getCircleKey());
+        assertEquals(date, circle.getAdded());
     }
 
     @Test
@@ -65,7 +64,7 @@ public class CircleTest {
         sameCircle.setCircleKey(circle.getCircleKey());
         sameCircle.setAdded(circle.getAdded());
 
-        assertThat(circle.toString(), is(sameCircle.toString()));
-        assertThat(circle.toString(), is(not(emptyCircle.toString())));
+        assertEquals(sameCircle.toString(), circle.toString());
+        assertNotEquals(emptyCircle.toString(), circle.toString());
     }
 }

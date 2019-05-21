@@ -27,7 +27,7 @@ import javax.xml.bind.annotation.XmlType;
  * Member may perform a specific function.</p>
  *
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = Constants.FIELD_TRUSTLEVEL)

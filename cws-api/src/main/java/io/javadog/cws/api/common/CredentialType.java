@@ -31,7 +31,7 @@ import javax.xml.bind.annotation.XmlType;
  * the Key is stored as is, so it can be used by others for encryption.</p>
  *
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = Constants.FIELD_CREDENTIALTYPE)

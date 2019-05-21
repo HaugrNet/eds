@@ -16,18 +16,17 @@
  */
 package io.javadog.cws.api.dtos;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import io.javadog.cws.api.common.Utilities;
 import java.util.Date;
 import java.util.UUID;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 public final class SanityTest {
 
@@ -40,8 +39,8 @@ public final class SanityTest {
         sanity.setDataId(dataId);
         sanity.setChanged(changed);
 
-        assertThat(sanity.getDataId(), is(dataId));
-        assertThat(sanity.getChanged(), is(changed));
+        assertEquals(dataId, sanity.getDataId());
+        assertEquals(changed, sanity.getChanged());
     }
 
     @Test
@@ -55,7 +54,7 @@ public final class SanityTest {
         sameSanity.setDataId(sanity.getDataId());
         sameSanity.setChanged(sanity.getChanged());
 
-        assertThat(sanity.toString(), is(sameSanity.toString()));
-        assertThat(sanity.toString(), is(not(emptySanity.toString())));
+        assertEquals(sameSanity.toString(), sanity.toString());
+        assertNotEquals(emptySanity.toString(), sanity.toString());
     }
 }

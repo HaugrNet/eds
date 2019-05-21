@@ -25,7 +25,7 @@ import javax.xml.bind.annotation.XmlType;
  * the problem which may have occurred, if processing wasn't successful.</p>
  *
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = Constants.FIELD_RETURN_CODE)
@@ -379,7 +379,7 @@ public enum ReturnCode {
      * applicable to the requested resource. See Basic access authentication and
      * Digest access authentication. 401 semantically means "unauthenticated",
      * i.e. the user does not have the necessary credentials.<br>
-     *   Note: Some sites issue HTTP 401 when an IP address is banned from the
+     * Note: Some sites issue HTTP 401 when an IP address is banned from the
      * website (usually the website domain) and that specific address is refused
      * permission to access a website.</i>
      */

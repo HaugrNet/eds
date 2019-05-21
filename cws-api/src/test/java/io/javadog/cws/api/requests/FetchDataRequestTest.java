@@ -16,20 +16,19 @@
  */
 package io.javadog.cws.api.requests;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.javadog.cws.api.TestUtilities;
 import io.javadog.cws.api.common.Constants;
-import org.junit.Test;
-
 import java.util.Map;
 import java.util.UUID;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 public final class FetchDataRequestTest {
 
@@ -46,13 +45,13 @@ public final class FetchDataRequestTest {
         request.setPageNumber(43);
         request.setPageSize(56);
 
-        assertThat(request.validate().isEmpty(), is(true));
-        assertThat(request.getAccountName(), is(Constants.ADMIN_ACCOUNT));
-        assertThat(TestUtilities.convert(request.getCredential()), is(Constants.ADMIN_ACCOUNT));
-        assertThat(request.getCircleId(), is(circleId));
-        assertThat(request.getDataId(), is(dataId));
-        assertThat(request.getPageNumber(), is(43));
-        assertThat(request.getPageSize(), is(56));
+        assertTrue(request.validate().isEmpty());
+        assertEquals(Constants.ADMIN_ACCOUNT, request.getAccountName());
+        assertEquals(Constants.ADMIN_ACCOUNT, TestUtilities.convert(request.getCredential()));
+        assertEquals(circleId, request.getCircleId());
+        assertEquals(dataId, request.getDataId());
+        assertEquals(43, request.getPageNumber());
+        assertEquals(56, request.getPageSize());
     }
 
     @Test
@@ -60,10 +59,10 @@ public final class FetchDataRequestTest {
         final FetchDataRequest request = new FetchDataRequest();
         final Map<String, String> errors = request.validate();
 
-        assertThat(request.getDataId(), is(nullValue()));
-        assertThat(errors.size(), is(2));
-        assertThat(errors.get(Constants.FIELD_CREDENTIAL), is("The Session (Credential) is missing."));
-        assertThat(errors.get(Constants.FIELD_IDS), is("Either a Circle or Data Id must be provided."));
+        assertNull(request.getDataId());
+        assertEquals(2, errors.size());
+        assertEquals("The Session (Credential) is missing.", errors.get(Constants.FIELD_CREDENTIAL));
+        assertEquals("Either a Circle or Data Id must be provided.", errors.get(Constants.FIELD_IDS));
     }
 
     @Test
@@ -75,11 +74,11 @@ public final class FetchDataRequestTest {
         request.setPageSize(Constants.MAX_PAGE_SIZE + 1);
 
         final Map<String, String> errors = request.validate();
-        assertThat(errors.size(), is(5));
-        assertThat(errors.get(Constants.FIELD_CREDENTIAL), is("The Session (Credential) is missing."));
-        assertThat(errors.get(Constants.FIELD_CIRCLE_ID), is("The Circle Id is invalid."));
-        assertThat(errors.get(Constants.FIELD_DATA_ID), is("The Data Id is invalid."));
-        assertThat(errors.get(Constants.FIELD_PAGE_NUMBER), is("The Page Number must be a positive number, starting with 1."));
-        assertThat(errors.get(Constants.FIELD_PAGE_SIZE), is("The Page Size must be a positive number, starting with 1."));
+        assertEquals(5, errors.size());
+        assertEquals("The Session (Credential) is missing.", errors.get(Constants.FIELD_CREDENTIAL));
+        assertEquals("The Circle Id is invalid.", errors.get(Constants.FIELD_CIRCLE_ID));
+        assertEquals("The Data Id is invalid.", errors.get(Constants.FIELD_DATA_ID));
+        assertEquals("The Page Number must be a positive number, starting with 1.", errors.get(Constants.FIELD_PAGE_NUMBER));
+        assertEquals("The Page Size must be a positive number, starting with 1.", errors.get(Constants.FIELD_PAGE_SIZE));
     }
 }

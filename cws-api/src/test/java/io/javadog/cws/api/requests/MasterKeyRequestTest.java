@@ -17,18 +17,17 @@
 package io.javadog.cws.api.requests;
 
 import static io.javadog.cws.api.TestUtilities.convert;
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.javadog.cws.api.common.Constants;
 import java.io.File;
 import java.util.Map;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 public final class MasterKeyRequestTest {
 
@@ -43,8 +42,8 @@ public final class MasterKeyRequestTest {
         request.setSecret(convert(secret));
         request.setUrl(url);
 
-        assertThat(convert(request.getSecret()), is(secret));
-        assertThat(request.getUrl(), is(url));
+        assertEquals(secret, convert(request.getSecret()));
+        assertEquals(url, request.getUrl());
     }
 
     @Test
@@ -56,8 +55,8 @@ public final class MasterKeyRequestTest {
         request.setSecret(convert(secret));
 
         final Map<String, String> errors = request.validate();
-        assertThat(errors.isEmpty(), is(true));
-        assertThat(convert(request.getSecret()), is("secret"));
+        assertTrue(errors.isEmpty());
+        assertEquals("secret", convert(request.getSecret()));
     }
 
     @Test
@@ -65,10 +64,10 @@ public final class MasterKeyRequestTest {
         final MasterKeyRequest request = new MasterKeyRequest();
 
         final Map<String, String> errors = request.validate();
-        assertThat(errors.size(), is(3));
-        assertThat(errors.get(Constants.FIELD_CREDENTIAL), is("The Session (Credential) is missing."));
-        assertThat(errors.get(Constants.FIELD_SECRET), is("Either the secret or the URL must be given to alter the MasterKey."));
-        assertThat(errors.get(Constants.FIELD_URL), is("Either the secret or the URL must be given to alter the MasterKey."));
+        assertEquals(3, errors.size());
+        assertEquals("The Session (Credential) is missing.", errors.get(Constants.FIELD_CREDENTIAL));
+        assertEquals("Either the secret or the URL must be given to alter the MasterKey.", errors.get(Constants.FIELD_SECRET));
+        assertEquals("Either the secret or the URL must be given to alter the MasterKey.", errors.get(Constants.FIELD_URL));
     }
 
     @Test
@@ -80,9 +79,9 @@ public final class MasterKeyRequestTest {
         request.setUrl("url");
 
         final Map<String, String> errors = request.validate();
-        assertThat(errors.size(), is(2));
-        assertThat(errors.get(Constants.FIELD_SECRET), is("Either the secret or the URL must be given to alter the MasterKey."));
-        assertThat(errors.get(Constants.FIELD_URL), is("Either the secret or the URL must be given to alter the MasterKey."));
+        assertEquals(2, errors.size());
+        assertEquals("Either the secret or the URL must be given to alter the MasterKey.", errors.get(Constants.FIELD_SECRET));
+        assertEquals("Either the secret or the URL must be given to alter the MasterKey.", errors.get(Constants.FIELD_URL));
     }
 
     @Test
@@ -93,8 +92,8 @@ public final class MasterKeyRequestTest {
         request.setSecret(convert(""));
 
         final Map<String, String> errors = request.validate();
-        assertThat(errors.size(), is(1));
-        assertThat(errors.get(Constants.FIELD_SECRET), is("The secret for the MasterKey is missing."));
+        assertEquals(1, errors.size());
+        assertEquals("The secret for the MasterKey is missing.", errors.get(Constants.FIELD_SECRET));
     }
 
     @Test
@@ -105,7 +104,7 @@ public final class MasterKeyRequestTest {
         request.setUrl("https://javadog.io/");
 
         final Map<String, String> errors = request.validate();
-        assertThat(errors.isEmpty(), is(true));
+        assertTrue(errors.isEmpty());
     }
 
     @Test
@@ -116,7 +115,7 @@ public final class MasterKeyRequestTest {
         request.setUrl("file://" + File.separator + System.getProperty("java.io.tmpdir") + File.separator + "file_name.dat");
 
         final Map<String, String> errors = request.validate();
-        assertThat(errors.isEmpty(), is(true));
+        assertTrue(errors.isEmpty());
     }
 
     @Test
@@ -127,8 +126,8 @@ public final class MasterKeyRequestTest {
         request.setUrl("");
 
         final Map<String, String> errors = request.validate();
-        assertThat(errors.size(), is(1));
-        assertThat(errors.get(Constants.FIELD_URL), is("The URL field is invalid - no protocol: "));
+        assertEquals(1, errors.size());
+        assertEquals("The URL field is invalid - no protocol: ", errors.get(Constants.FIELD_URL));
     }
 
     @Test
@@ -139,8 +138,8 @@ public final class MasterKeyRequestTest {
         request.setUrl("protocol:///path/to/file");
 
         final Map<String, String> errors = request.validate();
-        assertThat(errors.size(), is(1));
-        assertThat(errors.get(Constants.FIELD_URL), is("The URL field is invalid - unknown protocol: protocol"));
+        assertEquals(1, errors.size());
+        assertEquals("The URL field is invalid - unknown protocol: protocol", errors.get(Constants.FIELD_URL));
     }
 
     @Test
@@ -151,8 +150,8 @@ public final class MasterKeyRequestTest {
         request.setUrl("/path/to/file");
 
         final Map<String, String> errors = request.validate();
-        assertThat(errors.size(), is(1));
-        assertThat(errors.get(Constants.FIELD_URL), is("The URL field is invalid - no protocol: /path/to/file"));
+        assertEquals(1, errors.size());
+        assertEquals("The URL field is invalid - no protocol: /path/to/file", errors.get(Constants.FIELD_URL));
     }
 
     @Test
@@ -163,7 +162,7 @@ public final class MasterKeyRequestTest {
         request.setUrl("https://weird.domain.name/not\tAllowed\nPath");
 
         final Map<String, String> errors = request.validate();
-        assertThat(errors.size(), is(1));
-        assertThat(errors.get(Constants.FIELD_URL), containsString("The URL field is invalid - Illegal character in path"));
+        assertEquals(1, errors.size());
+        assertTrue(errors.get(Constants.FIELD_URL).contains("The URL field is invalid - Illegal character in path"));
     }
 }

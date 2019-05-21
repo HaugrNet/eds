@@ -16,20 +16,19 @@
  */
 package io.javadog.cws.api.requests;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.javadog.cws.api.TestUtilities;
 import io.javadog.cws.api.common.Action;
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.CredentialType;
-import org.junit.Test;
-
 import java.util.Map;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 public final class ProcessDataTypeRequestTest {
 
@@ -47,12 +46,12 @@ public final class ProcessDataTypeRequestTest {
         request.setType(type);
         final Map<String, String> errors = request.validate();
 
-        assertThat(errors.isEmpty(), is(true));
-        assertThat(request.getAccountName(), is(Constants.ADMIN_ACCOUNT));
-        assertThat(TestUtilities.convert(request.getCredential()), is(Constants.ADMIN_ACCOUNT));
-        assertThat(request.getAction(), is(Action.PROCESS));
-        assertThat(request.getTypeName(), is(typeName));
-        assertThat(request.getType(), is(type));
+        assertTrue(errors.isEmpty());
+        assertEquals(Constants.ADMIN_ACCOUNT, request.getAccountName());
+        assertEquals(Constants.ADMIN_ACCOUNT, TestUtilities.convert(request.getCredential()));
+        assertEquals(Action.PROCESS, request.getAction());
+        assertEquals(typeName, request.getTypeName());
+        assertEquals(type, request.getType());
     }
 
     @Test
@@ -61,9 +60,9 @@ public final class ProcessDataTypeRequestTest {
         request.setAction(null);
         final Map<String, String> errors = request.validate();
 
-        assertThat(errors.size(), is(2));
-        assertThat(errors.get(Constants.FIELD_CREDENTIAL), is("The Session (Credential) is missing."));
-        assertThat(errors.get(Constants.FIELD_ACTION), is("No action has been provided."));
+        assertEquals(2, errors.size());
+        assertEquals("The Session (Credential) is missing.", errors.get(Constants.FIELD_CREDENTIAL));
+        assertEquals("No action has been provided.", errors.get(Constants.FIELD_ACTION));
     }
 
     @Test
@@ -74,8 +73,8 @@ public final class ProcessDataTypeRequestTest {
         request.setAction(Action.ADD);
 
         final Map<String, String> errors = request.validate();
-        assertThat(errors.size(), is(1));
-        assertThat(errors.get(Constants.FIELD_ACTION), is("Not supported Action has been provided."));
+        assertEquals(1, errors.size());
+        assertEquals("Not supported Action has been provided.", errors.get(Constants.FIELD_ACTION));
     }
 
     @Test
@@ -88,7 +87,7 @@ public final class ProcessDataTypeRequestTest {
         request.setAction(Action.PROCESS);
 
         final Map<String, String> errors = request.validate();
-        assertThat(errors.isEmpty(), is(true));
+        assertTrue(errors.isEmpty());
     }
 
     @Test
@@ -99,9 +98,9 @@ public final class ProcessDataTypeRequestTest {
         request.setAction(Action.PROCESS);
 
         final Map<String, String> errors = request.validate();
-        assertThat(errors.size(), is(2));
-        assertThat(errors.get(Constants.FIELD_TYPENAME), is("The name of the DataType is missing or invalid."));
-        assertThat(errors.get(Constants.FIELD_TYPE), is("The type of the DataType is missing or invalid."));
+        assertEquals(2, errors.size());
+        assertEquals("The name of the DataType is missing or invalid.", errors.get(Constants.FIELD_TYPENAME));
+        assertEquals("The type of the DataType is missing or invalid.", errors.get(Constants.FIELD_TYPE));
     }
 
     @Test
@@ -113,7 +112,7 @@ public final class ProcessDataTypeRequestTest {
         request.setAction(Action.DELETE);
 
         final Map<String, String> errors = request.validate();
-        assertThat(errors.isEmpty(), is(true));
+        assertTrue(errors.isEmpty());
     }
 
     @Test
@@ -125,7 +124,7 @@ public final class ProcessDataTypeRequestTest {
         request.setAction(Action.DELETE);
 
         final Map<String, String> errors = request.validate();
-        assertThat(errors.size(), is(1));
-        assertThat(errors.get(Constants.FIELD_TYPENAME), is("The name of the DataType is missing or invalid."));
+        assertEquals(1, errors.size());
+        assertEquals("The name of the DataType is missing or invalid.", errors.get(Constants.FIELD_TYPENAME));
     }
 }

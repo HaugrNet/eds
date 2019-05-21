@@ -16,20 +16,19 @@
  */
 package io.javadog.cws.api.requests;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.javadog.cws.api.TestUtilities;
 import io.javadog.cws.api.common.Action;
 import io.javadog.cws.api.common.Constants;
-import org.junit.Test;
-
 import java.util.Map;
 import java.util.UUID;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 public final class ProcessCircleRequestTest {
 
@@ -50,14 +49,14 @@ public final class ProcessCircleRequestTest {
         request.setCircleKey(circleKey);
         final Map<String, String> errors = request.validate();
 
-        assertThat(errors.isEmpty(), is(true));
-        assertThat(request.getAccountName(), is(Constants.ADMIN_ACCOUNT));
-        assertThat(TestUtilities.convert(request.getCredential()), is(Constants.ADMIN_ACCOUNT));
-        assertThat(request.getAction(), is(Action.CREATE));
-        assertThat(request.getCircleId(), is(circleId));
-        assertThat(request.getCircleName(), is(circleName));
-        assertThat(request.getMemberId(), is(memberId));
-        assertThat(request.getCircleKey(), is(circleKey));
+        assertTrue(errors.isEmpty());
+        assertEquals(Constants.ADMIN_ACCOUNT, request.getAccountName());
+        assertEquals(Constants.ADMIN_ACCOUNT, TestUtilities.convert(request.getCredential()));
+        assertEquals(Action.CREATE, request.getAction());
+        assertEquals(circleId, request.getCircleId());
+        assertEquals(circleName, request.getCircleName());
+        assertEquals(memberId, request.getMemberId());
+        assertEquals(circleKey, request.getCircleKey());
     }
 
     @Test
@@ -65,9 +64,9 @@ public final class ProcessCircleRequestTest {
         final ProcessCircleRequest request = new ProcessCircleRequest();
         final Map<String, String> errors = request.validate();
 
-        assertThat(errors.size(), is(2));
-        assertThat(errors.get(Constants.FIELD_CREDENTIAL), is("The Session (Credential) is missing."));
-        assertThat(errors.get(Constants.FIELD_ACTION), is("No action has been provided."));
+        assertEquals(2, errors.size());
+        assertEquals("The Session (Credential) is missing.", errors.get(Constants.FIELD_CREDENTIAL));
+        assertEquals("No action has been provided.", errors.get(Constants.FIELD_ACTION));
     }
 
     @Test
@@ -78,8 +77,8 @@ public final class ProcessCircleRequestTest {
         request.setAction(Action.PROCESS);
 
         final Map<String, String> errors = request.validate();
-        assertThat(errors.size(), is(1));
-        assertThat(errors.get(Constants.FIELD_ACTION), is("Not supported Action has been provided."));
+        assertEquals(1, errors.size());
+        assertEquals("Not supported Action has been provided.", errors.get(Constants.FIELD_ACTION));
     }
 
     @Test
@@ -92,7 +91,7 @@ public final class ProcessCircleRequestTest {
         request.setAction(Action.CREATE);
 
         final Map<String, String> errors = request.validate();
-        assertThat(errors.isEmpty(), is(true));
+        assertTrue(errors.isEmpty());
     }
 
     @Test
@@ -105,8 +104,8 @@ public final class ProcessCircleRequestTest {
         request.setAction(Action.CREATE);
 
         final Map<String, String> errors = request.validate();
-        assertThat(errors.size(), is(1));
-        assertThat(errors.get(Constants.FIELD_CIRCLE_NAME), is("Cannot create a new Circle, without the Circle Name."));
+        assertEquals(1, errors.size());
+        assertEquals("Cannot create a new Circle, without the Circle Name.", errors.get(Constants.FIELD_CIRCLE_NAME));
     }
 
     @Test
@@ -119,7 +118,7 @@ public final class ProcessCircleRequestTest {
         request.setAction(Action.UPDATE);
 
         final Map<String, String> errors = request.validate();
-        assertThat(errors.isEmpty(), is(true));
+        assertTrue(errors.isEmpty());
     }
 
     @Test
@@ -132,9 +131,9 @@ public final class ProcessCircleRequestTest {
         request.setAction(Action.UPDATE);
 
         final Map<String, String> errors = request.validate();
-        assertThat(errors.size(), is(2));
-        assertThat(errors.get(Constants.FIELD_CIRCLE_ID), is("Cannot update the Circle Name, without knowing the Circle Id."));
-        assertThat(errors.get(Constants.FIELD_CIRCLE_NAME), is("The circleName may not exceed 75 characters."));
+        assertEquals(2, errors.size());
+        assertEquals("Cannot update the Circle Name, without knowing the Circle Id.", errors.get(Constants.FIELD_CIRCLE_ID));
+        assertEquals("The circleName may not exceed 75 characters.", errors.get(Constants.FIELD_CIRCLE_NAME));
     }
 
     @Test
@@ -146,7 +145,7 @@ public final class ProcessCircleRequestTest {
         request.setAction(Action.DELETE);
 
         final Map<String, String> errors = request.validate();
-        assertThat(errors.isEmpty(), is(true));
+        assertTrue(errors.isEmpty());
     }
 
     @Test
@@ -158,7 +157,7 @@ public final class ProcessCircleRequestTest {
         request.setAction(Action.DELETE);
 
         final Map<String, String> errors = request.validate();
-        assertThat(errors.size(), is(1));
-        assertThat(errors.get(Constants.FIELD_CIRCLE_ID), is("Cannot delete a Circle, without knowing the Circle Id."));
+        assertEquals(1, errors.size());
+        assertEquals("Cannot delete a Circle, without knowing the Circle Id.", errors.get(Constants.FIELD_CIRCLE_ID));
     }
 }

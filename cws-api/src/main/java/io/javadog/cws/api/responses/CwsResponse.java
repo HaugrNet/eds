@@ -40,7 +40,7 @@ import javax.xml.bind.annotation.XmlType;
  * the individual warnings or errors which may occur.</p>
  *
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "cwsResult", propOrder = { Constants.FIELD_RETURN_CODE, Constants.FIELD_RETURN_MESSAGE })

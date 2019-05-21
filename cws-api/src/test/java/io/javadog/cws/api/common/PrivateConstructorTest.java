@@ -16,14 +16,12 @@
  */
 package io.javadog.cws.api.common;
 
-import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * <p>Private methods should never be tested, as they are part of an
@@ -36,25 +34,25 @@ import org.junit.Test;
  * kept, and that the Constructor is not made public.</p>
  *
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 public final class PrivateConstructorTest {
 
     @Test
     public void testConstantsConstructor() throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
         final Constructor<Constants> constructor = Constants.class.getDeclaredConstructor();
-        assertThat(constructor.isAccessible(), is(false));
+        assertFalse(constructor.isAccessible());
         constructor.setAccessible(true);
         final Constants constants = constructor.newInstance();
-        assertThat(constants, is(not(nullValue())));
+        assertNotNull(constants);
     }
 
     @Test
     public void testUtilitiesConstructor() throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
         final Constructor<Utilities> constructor = Utilities.class.getDeclaredConstructor();
-        assertThat(constructor.isAccessible(), is(false));
+        assertFalse(constructor.isAccessible());
         constructor.setAccessible(true);
         final Utilities utilities = constructor.newInstance();
-        assertThat(utilities, is(not(nullValue())));
+        assertNotNull(utilities);
     }
 }

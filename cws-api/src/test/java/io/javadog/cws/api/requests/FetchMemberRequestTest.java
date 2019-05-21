@@ -16,19 +16,18 @@
  */
 package io.javadog.cws.api.requests;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.javadog.cws.api.TestUtilities;
 import io.javadog.cws.api.common.Constants;
-import org.junit.Test;
-
 import java.util.Map;
 import java.util.UUID;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 public final class FetchMemberRequestTest {
 
@@ -42,10 +41,10 @@ public final class FetchMemberRequestTest {
         request.setMemberId(memberId);
         final Map<String, String> errors = request.validate();
 
-        assertThat(errors.isEmpty(), is(true));
-        assertThat(request.getAccountName(), is(Constants.ADMIN_ACCOUNT));
-        assertThat(TestUtilities.convert(request.getCredential()), is(Constants.ADMIN_ACCOUNT));
-        assertThat(request.getMemberId(), is(memberId));
+        assertTrue(errors.isEmpty());
+        assertEquals(Constants.ADMIN_ACCOUNT, request.getAccountName());
+        assertEquals(Constants.ADMIN_ACCOUNT, TestUtilities.convert(request.getCredential()));
+        assertEquals(memberId, request.getMemberId());
     }
 
     @Test
@@ -53,8 +52,8 @@ public final class FetchMemberRequestTest {
         final FetchMemberRequest request = new FetchMemberRequest();
         final Map<String, String> errors = request.validate();
 
-        assertThat(errors.size(), is(1));
-        assertThat(errors.get(Constants.FIELD_CREDENTIAL), is("The Session (Credential) is missing."));
+        assertEquals(1, errors.size());
+        assertEquals("The Session (Credential) is missing.", errors.get(Constants.FIELD_CREDENTIAL));
     }
 
     @Test
@@ -63,8 +62,8 @@ public final class FetchMemberRequestTest {
         request.setMemberId("Invalid Id");
 
         final Map<String, String> errors = request.validate();
-        assertThat(errors.size(), is(2));
-        assertThat(errors.get(Constants.FIELD_CREDENTIAL), is("The Session (Credential) is missing."));
-        assertThat(errors.get(Constants.FIELD_MEMBER_ID), is("The Member Id is invalid."));
+        assertEquals(2, errors.size());
+        assertEquals("The Session (Credential) is missing.", errors.get(Constants.FIELD_CREDENTIAL));
+        assertEquals("The Member Id is invalid.", errors.get(Constants.FIELD_MEMBER_ID));
     }
 }

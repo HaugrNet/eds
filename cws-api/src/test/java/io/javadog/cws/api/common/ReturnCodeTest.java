@@ -19,10 +19,9 @@ package io.javadog.cws.api.common;
 import static io.javadog.cws.api.common.ReturnCode.Classification.CLASS_ERROR;
 import static io.javadog.cws.api.common.ReturnCode.Classification.CLASS_INFO;
 import static io.javadog.cws.api.common.ReturnCode.Classification.CLASS_WARNING;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * <p>To ascertain why something has gone wrong, we need to look at the
@@ -34,9 +33,9 @@ import org.junit.Test;
  * systems react to the results.</p>
  *
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
-public class ReturnCodeTest {
+public final class ReturnCodeTest {
 
     @Test
     public void testReturnCodes() {
@@ -64,14 +63,14 @@ public class ReturnCodeTest {
 
         // Checking that findReturnCode of a non-existing returnCode value will
         // result in a general error.
-        assertThat(ReturnCode.findReturnCode(1), is(ReturnCode.ERROR));
+        assertEquals(ReturnCode.ERROR, ReturnCode.findReturnCode(1));
     }
 
     private static void runAssertions(final ReturnCode returnCode, final int code, final int httpCode, final ReturnCode.Classification classification, final String description) {
-        assertThat(returnCode.getCode(), is(code));
-        assertThat(returnCode.getHttpCode(), is(httpCode));
-        assertThat(returnCode.getDescription(), is(description));
-        assertThat(returnCode.getClassification(), is(classification));
-        assertThat(ReturnCode.findReturnCode(code), is(returnCode));
+        assertEquals(code, returnCode.getCode());
+        assertEquals(httpCode, returnCode.getHttpCode());
+        assertEquals(description, returnCode.getDescription());
+        assertEquals(classification, returnCode.getClassification());
+        assertEquals(returnCode, ReturnCode.findReturnCode(code));
     }
 }

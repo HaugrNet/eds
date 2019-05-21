@@ -20,7 +20,7 @@ import javax.xml.bind.annotation.XmlType;
  * for administrators it is "ADMIN".</p>
  *
  * @author Kim Jensen
- * @since  CWS 1.1
+ * @since CWS 1.1
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = Constants.FIELD_MEMBER_ROLE)

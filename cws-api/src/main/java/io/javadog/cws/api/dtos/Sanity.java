@@ -33,7 +33,7 @@ import javax.xml.bind.annotation.XmlType;
  * failed it.
  *
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = Constants.FIELD_SANITY, propOrder = { Constants.FIELD_DATA_ID, Constants.FIELD_CHANGED })

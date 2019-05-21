@@ -16,20 +16,19 @@
  */
 package io.javadog.cws.api.requests;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.javadog.cws.api.TestUtilities;
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.CredentialType;
-import org.junit.Test;
-
 import java.util.Map;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 public final class AuthenticationTest {
 
@@ -42,19 +41,19 @@ public final class AuthenticationTest {
         final CredentialType type = CredentialType.SIGNATURE;
 
         final Authentication authentication = new Authentication();
-        assertThat(authentication.getAccountName(), is(not(name)));
-        assertThat(authentication.getCredentialType(), is(not(type)));
-        assertThat(authentication.getCredential(), is(not(credentials)));
+        assertNotEquals(name, authentication.getAccountName());
+        assertNotEquals(type, authentication.getCredentialType());
+        assertNotEquals(credentials, authentication.getCredential());
 
         authentication.setAccountName(name);
         authentication.setCredentialType(type);
         authentication.setCredential(TestUtilities.convert(credentials));
-        assertThat(authentication.getAccountName(), is(name));
-        assertThat(authentication.getCredentialType(), is(type));
-        assertThat(TestUtilities.convert(authentication.getCredential()), is(credentials));
+        assertEquals(name, authentication.getAccountName());
+        assertEquals(type, authentication.getCredentialType());
+        assertEquals(credentials, TestUtilities.convert(authentication.getCredential()));
 
         final Map<String, String> errors = authentication.validate();
-        assertThat(errors.isEmpty(), is(true));
+        assertTrue(errors.isEmpty());
     }
 
     @Test
@@ -64,9 +63,9 @@ public final class AuthenticationTest {
         authentication.setCredentialType(null);
 
         final Map<String, String> errors = authentication.validate();
-        assertThat(errors.size(), is(2));
-        assertThat(errors.get(Constants.FIELD_ACCOUNT_NAME), is("AccountName is missing, null or invalid."));
-        assertThat(errors.get(Constants.FIELD_CREDENTIAL), is("The Credential is missing."));
+        assertEquals(2, errors.size());
+        assertEquals("AccountName is missing, null or invalid.", errors.get(Constants.FIELD_ACCOUNT_NAME));
+        assertEquals("The Credential is missing.", errors.get(Constants.FIELD_CREDENTIAL));
     }
 
     @Test
@@ -75,8 +74,8 @@ public final class AuthenticationTest {
         authentication.setCredentialType(CredentialType.SESSION);
 
         final Map<String, String> errors = authentication.validate();
-        assertThat(errors.size(), is(1));
-        assertThat(errors.get(Constants.FIELD_CREDENTIAL), is("The Session (Credential) is missing."));
+        assertEquals(1, errors.size());
+        assertEquals("The Session (Credential) is missing.", errors.get(Constants.FIELD_CREDENTIAL));
     }
 
     @Test
@@ -88,9 +87,9 @@ public final class AuthenticationTest {
         authentication.setCredentialType(null);
 
         final Map<String, String> errors = authentication.validate();
-        assertThat(errors.size(), is(2));
-        assertThat(errors.get(Constants.FIELD_ACCOUNT_NAME), is("AccountName is missing, null or invalid."));
-        assertThat(errors.get(Constants.FIELD_CREDENTIAL), is("The Credential is missing."));
+        assertEquals(2, errors.size());
+        assertEquals("AccountName is missing, null or invalid.", errors.get(Constants.FIELD_ACCOUNT_NAME));
+        assertEquals("The Credential is missing.", errors.get(Constants.FIELD_CREDENTIAL));
     }
 
     @Test
@@ -99,9 +98,9 @@ public final class AuthenticationTest {
         authentication.setAccountName("AccountName");
         final Map<String, String> errors = authentication.validate();
 
-        assertThat(errors.size(), is(1));
-        assertThat(errors.get(Constants.FIELD_CREDENTIAL), is("The Credential is missing."));
-        assertThat(authentication.getCredentialType(), is(CredentialType.PASSPHRASE));
+        assertEquals(1, errors.size());
+        assertEquals("The Credential is missing.", errors.get(Constants.FIELD_CREDENTIAL));
+        assertEquals(CredentialType.PASSPHRASE, authentication.getCredentialType());
     }
 
     @Test
@@ -109,8 +108,8 @@ public final class AuthenticationTest {
         final Authentication authentication = new Authentication();
         final Map<String, String> errors = authentication.validate();
 
-        assertThat(errors.size(), is(1));
-        assertThat(errors.get(Constants.FIELD_CREDENTIAL), is("The Session (Credential) is missing."));
-        assertThat(authentication.getCredentialType(), is(CredentialType.SESSION));
+        assertEquals(1, errors.size());
+        assertEquals("The Session (Credential) is missing.", errors.get(Constants.FIELD_CREDENTIAL));
+        assertEquals(CredentialType.SESSION, authentication.getCredentialType());
     }
 }

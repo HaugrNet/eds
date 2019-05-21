@@ -16,20 +16,18 @@
  */
 package io.javadog.cws.api.dtos;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import io.javadog.cws.api.common.MemberRole;
 import io.javadog.cws.api.common.Utilities;
-import org.junit.Test;
-
 import java.util.Date;
 import java.util.UUID;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 public final class MemberTest {
 
@@ -47,11 +45,11 @@ public final class MemberTest {
         member.setPublicKey(publicKey);
         member.setAdded(added);
 
-        assertThat(member.getMemberId(), is(memberId));
-        assertThat(member.getAccountName(), is(accountName));
-        assertThat(member.getMemberRole(), is(MemberRole.STANDARD));
-        assertThat(member.getPublicKey(), is(publicKey));
-        assertThat(member.getAdded(), is(added));
+        assertEquals(memberId, member.getMemberId());
+        assertEquals(accountName, member.getAccountName());
+        assertEquals(MemberRole.STANDARD, member.getMemberRole());
+        assertEquals(publicKey, member.getPublicKey());
+        assertEquals(added, member.getAdded());
     }
 
     @Test
@@ -69,7 +67,7 @@ public final class MemberTest {
         sameMember.setMemberRole(member.getMemberRole());
         sameMember.setAdded(member.getAdded());
 
-        assertThat(member.toString(), is(sameMember.toString()));
-        assertThat(member.toString(), is(not(emptyMember.toString())));
+        assertEquals(sameMember.toString(), member.toString());
+        assertNotEquals(emptyMember.toString(), member.toString());
     }
 }

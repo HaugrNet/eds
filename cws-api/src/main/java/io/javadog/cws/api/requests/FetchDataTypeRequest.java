@@ -30,7 +30,7 @@ import javax.xml.bind.annotation.XmlType;
  * interface: {@link io.javadog.cws.api.Share#fetchDataTypes(FetchDataTypeRequest)}</p>
  *
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "fetchDataTypeRequest")

@@ -36,7 +36,7 @@ import javax.xml.bind.annotation.XmlType;
  * credentials information.</p>
  *
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "verifyRequest")

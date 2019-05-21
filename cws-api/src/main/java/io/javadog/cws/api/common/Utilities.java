@@ -23,7 +23,7 @@ import java.util.Date;
  * <p>Common Utilities, primarily immutability functionality.</p>
  *
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 public final class Utilities {
 

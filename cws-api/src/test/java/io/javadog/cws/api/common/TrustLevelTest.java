@@ -22,47 +22,47 @@ import static io.javadog.cws.api.common.TrustLevel.READ;
 import static io.javadog.cws.api.common.TrustLevel.SYSOP;
 import static io.javadog.cws.api.common.TrustLevel.WRITE;
 import static io.javadog.cws.api.common.TrustLevel.isAllowed;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 public final class TrustLevelTest {
 
     @Test
     public void testIsAllowed() {
-        assertThat(isAllowed(ALL, ALL), is(true));
-        assertThat(isAllowed(ALL, READ), is(false));
-        assertThat(isAllowed(ALL, WRITE), is(false));
-        assertThat(isAllowed(ALL, ADMIN), is(false));
-        assertThat(isAllowed(ALL, SYSOP), is(false));
+        assertTrue(isAllowed(ALL, ALL));
+        assertFalse(isAllowed(ALL, READ));
+        assertFalse(isAllowed(ALL, WRITE));
+        assertFalse(isAllowed(ALL, ADMIN));
+        assertFalse(isAllowed(ALL, SYSOP));
 
-        assertThat(isAllowed(READ, ALL), is(true));
-        assertThat(isAllowed(READ, READ), is(true));
-        assertThat(isAllowed(READ, WRITE), is(false));
-        assertThat(isAllowed(READ, ADMIN), is(false));
-        assertThat(isAllowed(READ, ADMIN), is(false));
+        assertTrue(isAllowed(READ, ALL));
+        assertTrue(isAllowed(READ, READ));
+        assertFalse(isAllowed(READ, WRITE));
+        assertFalse(isAllowed(READ, ADMIN));
+        assertFalse(isAllowed(READ, ADMIN));
 
-        assertThat(isAllowed(WRITE, ALL), is(true));
-        assertThat(isAllowed(WRITE, READ), is(true));
-        assertThat(isAllowed(WRITE, WRITE), is(true));
-        assertThat(isAllowed(WRITE, ADMIN), is(false));
-        assertThat(isAllowed(WRITE, SYSOP), is(false));
+        assertTrue(isAllowed(WRITE, ALL));
+        assertTrue(isAllowed(WRITE, READ));
+        assertTrue(isAllowed(WRITE, WRITE));
+        assertFalse(isAllowed(WRITE, ADMIN));
+        assertFalse(isAllowed(WRITE, SYSOP));
 
-        assertThat(isAllowed(ADMIN, ALL), is(true));
-        assertThat(isAllowed(ADMIN, READ), is(true));
-        assertThat(isAllowed(ADMIN, WRITE), is(true));
-        assertThat(isAllowed(ADMIN, ADMIN), is(true));
-        assertThat(isAllowed(ADMIN, SYSOP), is(false));
+        assertTrue(isAllowed(ADMIN, ALL));
+        assertTrue(isAllowed(ADMIN, READ));
+        assertTrue(isAllowed(ADMIN, WRITE));
+        assertTrue(isAllowed(ADMIN, ADMIN));
+        assertFalse(isAllowed(ADMIN, SYSOP));
 
-        assertThat(isAllowed(SYSOP, ALL), is(true));
-        assertThat(isAllowed(SYSOP, READ), is(true));
-        assertThat(isAllowed(SYSOP, WRITE), is(true));
-        assertThat(isAllowed(SYSOP, ADMIN), is(true));
-        assertThat(isAllowed(SYSOP, SYSOP), is(true));
+        assertTrue(isAllowed(SYSOP, ALL));
+        assertTrue(isAllowed(SYSOP, READ));
+        assertTrue(isAllowed(SYSOP, WRITE));
+        assertTrue(isAllowed(SYSOP, ADMIN));
+        assertTrue(isAllowed(SYSOP, SYSOP));
     }
 }

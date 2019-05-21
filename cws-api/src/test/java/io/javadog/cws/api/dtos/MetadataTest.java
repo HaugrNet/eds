@@ -16,18 +16,17 @@
  */
 package io.javadog.cws.api.dtos;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import io.javadog.cws.api.common.Utilities;
 import java.util.Date;
 import java.util.UUID;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 public final class MetadataTest {
 
@@ -48,12 +47,12 @@ public final class MetadataTest {
         metadata.setTypeName(typeName);
         metadata.setAdded(added);
 
-        assertThat(metadata.getDataId(), is(id));
-        assertThat(metadata.getCircleId(), is(circleId));
-        assertThat(metadata.getFolderId(), is(folderId));
-        assertThat(metadata.getDataName(), is(dataName));
-        assertThat(metadata.getTypeName(), is(typeName));
-        assertThat(metadata.getAdded(), is(added));
+        assertEquals(id, metadata.getDataId());
+        assertEquals(circleId, metadata.getCircleId());
+        assertEquals(folderId, metadata.getFolderId());
+        assertEquals(dataName, metadata.getDataName());
+        assertEquals(typeName, metadata.getTypeName());
+        assertEquals(added, metadata.getAdded());
     }
 
     @Test
@@ -75,7 +74,7 @@ public final class MetadataTest {
         sameMetadata.setTypeName(metadata.getTypeName());
         sameMetadata.setAdded(metadata.getAdded());
 
-        assertThat(metadata.toString(), is(sameMetadata.toString()));
-        assertThat(metadata.toString(), is(not(emptyMetadata.toString())));
+        assertEquals(sameMetadata.toString(), metadata.toString());
+        assertNotEquals(emptyMetadata.toString(), metadata.toString());
     }
 }

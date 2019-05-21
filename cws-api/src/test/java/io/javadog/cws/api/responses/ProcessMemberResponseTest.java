@@ -16,18 +16,19 @@
  */
 package io.javadog.cws.api.responses;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.javadog.cws.api.TestUtilities;
 import io.javadog.cws.api.common.ReturnCode;
 import java.util.UUID;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 public final class ProcessMemberResponseTest {
 
@@ -40,11 +41,11 @@ public final class ProcessMemberResponseTest {
         response.setMemberId(memberId);
         response.setSignature(TestUtilities.convert(signature));
 
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
-        assertThat(response.getReturnMessage(), is("Ok"));
-        assertThat(response.isOk(), is(true));
-        assertThat(response.getMemberId(), is(memberId));
-        assertThat(TestUtilities.convert(response.getSignature()), is(signature));
+        assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
+        assertEquals("Ok", response.getReturnMessage());
+        assertTrue(response.isOk());
+        assertEquals(memberId, response.getMemberId());
+        assertEquals(signature, TestUtilities.convert(response.getSignature()));
     }
 
     @Test
@@ -52,10 +53,10 @@ public final class ProcessMemberResponseTest {
         final String msg = "ProcessMember Request failed due to Verification Problems.";
         final ProcessMemberResponse response = new ProcessMemberResponse(ReturnCode.VERIFICATION_WARNING, msg);
 
-        assertThat(response.getReturnCode(), is(ReturnCode.VERIFICATION_WARNING.getCode()));
-        assertThat(response.getReturnMessage(), is(msg));
-        assertThat(response.isOk(), is(false));
-        assertThat(response.getMemberId(), is(nullValue()));
-        assertThat(response.getSignature(), is(nullValue()));
+        assertEquals(ReturnCode.VERIFICATION_WARNING.getCode(), response.getReturnCode());
+        assertEquals(msg, response.getReturnMessage());
+        assertFalse(response.isOk());
+        assertNull(response.getMemberId());
+        assertNull(response.getSignature());
     }
 }

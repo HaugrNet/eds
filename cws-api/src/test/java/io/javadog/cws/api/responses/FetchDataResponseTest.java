@@ -16,6 +16,7 @@
  */
 package io.javadog.cws.api.responses;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -51,7 +52,7 @@ public final class FetchDataResponseTest {
         assertTrue(response.isOk());
         assertEquals(metadata, response.getMetadata());
         assertEquals(3L, response.getRecords());
-        assertEquals(data, response.getData());
+        assertArrayEquals(data, response.getData());
     }
 
     @Test

@@ -104,18 +104,10 @@ features:
  * External control of the MasterKey via a URI, so it can be referenced from a
    central source and destroyed centrally, rather than the Administrator having
    to unlock it manually.
- * Re-key, i.e. force an update of the Keys used for a Circle or Member. This
-   feature will have different ways to be triggered, either being forced with
-   a request or it can be started if the key exceeds a certain age, the latter
-   requires that the Circle is being used, as a re-key operation requires access
-   to the existing key.
 
-CWS 1.1 is not yet having a release date - but as the current feature list is
-rather short, it should not take long before it is being released.
-
-Besides these features and others which may be requested, the plan is to make
-at first a simple command line tool to use the CWS with. This tool can be used
-as the basis for other Clients, including mobile apps and websites.
+CWS 1.1 is not yet having a release date - All of the above listed features has
+been added, and currently focus is on API cleanup, documentation & testing with
+FitNesse.
 
 # Wish to join
 The overall quality of the software can only improve if more eyes look at it and
@@ -123,19 +115,12 @@ help with implementing features and adding more tests. If you wish to join,
 please contact Kim Jensen (see below).
 
 ### Code Quality
-Code quality if very important, which means that we aim at 200% test coverage,
-which may sound ridiulous. However, it is meant in the way that we aim at having
-both standard tests (JUnit) and external testing (FitNesse), where both suites
-are covering as much as possible. Of course, external testing cannot and should
-not cover the same bases as the standard tests.
+Code quality if very important, which means that the goal is 200% test coverage,
+which may sound ridiulous. However, so that both test suites (Junit & FitNesse)
+will each cover as close to 100% as possible. Of course, external testing cannot
+and should not cover the same bases as the standard tests.
 
-The tests written, have been written using JUnit only, i.e. no mocking. Mocking
-is unreliable in testing, as you simply test your mocks rather than your logic.
-For that reason, CWS is using faking for tests, meaning that the buildup of the
-expected result will demand a bit more work, but as the code is properly tested,
-it also has the added advantage of giving more reliable tests.
-
-The code is also checked against as mane analysis tools as possible. The final
+The code is also checked against as many analysis tools as possible. The final
 code must have 0 issues of any kind - before it is considered ready for
 submitting into the main repository.
 
@@ -146,10 +131,9 @@ for choices made. But, commenting out code is banned, if it is commented out, it
 is meaningless and should be removed.
 
 ### Style Guide
-The style guide is simple, it is more or less the default from IntelliJ. Only
-important guideline is don't use tabs. mixing tabs and spaces means that the
-code looks unreadable, and the default indentation is made with spaces. All
-Classes have a default header, which must also be applied.
+The style guide is simple is available in the accessories folder as an IntelliJ
+based Java Style Guide. It All code must be formatted using it. All Classes
+have a default header, which must also be applied.
 
 # Software License
 The CWS is released under Apache License 2 or APL2.

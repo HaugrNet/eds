@@ -21,7 +21,6 @@ import io.javadog.cws.api.common.TrustLevel;
 import io.javadog.cws.api.requests.ProcessTrusteeRequest;
 import io.javadog.cws.api.responses.ProcessTrusteeResponse;
 import io.javadog.cws.fitnesse.callers.CallManagement;
-
 import java.util.Locale;
 
 /**

@@ -34,19 +34,19 @@ import javax.persistence.TemporalType;
  * <p>CWS Signature Entity, maps the Signature table from the Database.</p>
  *
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 @Entity
 @NamedQueries({
         @NamedQuery(name = "signature.readAll",
-                    query = "select s from SignatureEntity s"),
+                query = "select s from SignatureEntity s"),
         @NamedQuery(name = "signature.findByChecksum",
-                    query = "select s from SignatureEntity s " +
-                            "where s.checksum = :checksum"),
+                query = "select s from SignatureEntity s " +
+                        "where s.checksum = :checksum"),
         @NamedQuery(name = "signature.findByMember",
-                    query = "select s from SignatureEntity s " +
-                            "where s.member = :member " +
-                            "order by s.id desc")
+                query = "select s from SignatureEntity s " +
+                        "where s.member = :member " +
+                        "order by s.id desc")
 })
 @Table(name = "cws_signatures")
 public class SignatureEntity extends CWSEntity {

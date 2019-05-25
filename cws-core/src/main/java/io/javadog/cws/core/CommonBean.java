@@ -25,7 +25,7 @@ import java.util.logging.Logger;
  * <p>Common functionality for the CWS Beans.</p>
  *
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 public final class CommonBean {
 

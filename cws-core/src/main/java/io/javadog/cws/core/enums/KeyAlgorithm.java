@@ -66,7 +66,7 @@ package io.javadog.cws.core.enums;
  * Otherwise there will be problems with them.</p>
  *
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 public enum KeyAlgorithm {
 

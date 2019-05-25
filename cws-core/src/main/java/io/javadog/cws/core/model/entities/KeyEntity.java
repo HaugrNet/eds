@@ -32,7 +32,7 @@ import javax.persistence.TemporalType;
  * <p>CWS Key Entity, maps the Key table from the Database.</p>
  *
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 @Entity
 @Table(name = "cws_keys")

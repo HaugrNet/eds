@@ -26,7 +26,7 @@ import javax.persistence.Table;
  * <p>CWS Setting Entity, maps the Setting table from the Database.</p>
  *
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 @Entity
 @NamedQueries({

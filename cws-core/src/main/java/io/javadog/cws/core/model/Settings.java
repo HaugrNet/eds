@@ -46,7 +46,7 @@ import java.util.logging.Level;
  * the CWS will only use them after a restart.</p>
  *
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 public final class Settings {
 

@@ -39,7 +39,7 @@ import javax.ws.rs.core.Response;
  * <p>REST interface for the Data functionality.</p>
  *
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 @Path(Constants.REST_DATA_BASE)
 public class DataService {
@@ -47,7 +47,8 @@ public class DataService {
     private static final Logger LOG = Logger.getLogger(DataService.class.getName());
 
     private final Settings settings = Settings.getInstance();
-    @Inject private ShareBean bean;
+    @Inject
+    private ShareBean bean;
 
     @POST
     @Consumes(RestUtils.CONSUMES)

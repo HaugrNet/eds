@@ -20,7 +20,6 @@ import io.javadog.cws.api.dtos.Circle;
 import io.javadog.cws.api.requests.FetchCircleRequest;
 import io.javadog.cws.api.responses.FetchCircleResponse;
 import io.javadog.cws.fitnesse.callers.CallManagement;
-
 import java.util.List;
 
 /**

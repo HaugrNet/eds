@@ -26,12 +26,11 @@ import io.javadog.cws.core.exceptions.IdentificationException;
 import io.javadog.cws.core.model.Settings;
 import io.javadog.cws.core.model.SignatureDao;
 import io.javadog.cws.core.model.entities.SignatureEntity;
-
-import javax.persistence.EntityManager;
 import java.security.PublicKey;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.Date;
+import javax.persistence.EntityManager;
 
 /**
  * <p>Business Logic implementation for the CWS Verify request.</p>

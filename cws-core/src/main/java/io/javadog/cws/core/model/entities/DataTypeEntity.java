@@ -27,7 +27,7 @@ import javax.persistence.Table;
  * <p>CWS DataType Entity, maps the DataType table from the Database.</p>
  *
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 @Entity
 @NamedQueries({

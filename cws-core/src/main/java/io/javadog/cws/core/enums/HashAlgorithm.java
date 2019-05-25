@@ -20,7 +20,7 @@ package io.javadog.cws.core.enums;
  * <p>The CWS Hash algorithms.</p>
  *
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 public enum HashAlgorithm {
 

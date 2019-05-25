@@ -28,14 +28,14 @@ import javax.persistence.Table;
  * <p>CWS Circle Entity, maps the Circle table from the Database.</p>
  *
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 @Entity
 @Table(name = "cws_circles")
 @NamedQueries(
         @NamedQuery(name = "circle.findByName",
-                    query = "select c from CircleEntity c " +
-                            "where c.name = :name")
+                query = "select c from CircleEntity c " +
+                        "where c.name = :name")
 )
 public class CircleEntity extends Externable {
 

@@ -23,11 +23,10 @@ import io.javadog.cws.core.enums.Permission;
 import io.javadog.cws.core.model.CommonDao;
 import io.javadog.cws.core.model.Settings;
 import io.javadog.cws.core.model.entities.DataTypeEntity;
-
-import javax.persistence.EntityManager;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import javax.persistence.EntityManager;
 
 /**
  * Data Types is the basis for all shared information, as it either provides

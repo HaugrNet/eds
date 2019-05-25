@@ -25,12 +25,11 @@ import io.javadog.cws.core.jce.CWSKeyPair;
 import io.javadog.cws.core.jce.Crypto;
 import io.javadog.cws.core.jce.SecretCWSKey;
 import io.javadog.cws.core.model.Settings;
-
 import java.util.UUID;
 
 /**
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 public final class GenerateTestData {
 
@@ -67,7 +66,7 @@ public final class GenerateTestData {
         final CWSKeyPair keyPair1 = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
         createAndAppendMember(builder, DatabaseSetup.MEMBER_1_ID, DatabaseSetup.MEMBER_1, keyPair1, MemberRole.STANDARD, ',');
         final CWSKeyPair keyPair2 = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
-        createAndAppendMember(builder, DatabaseSetup.MEMBER_2_ID, DatabaseSetup.MEMBER_2,keyPair2,  MemberRole.STANDARD, ',');
+        createAndAppendMember(builder, DatabaseSetup.MEMBER_2_ID, DatabaseSetup.MEMBER_2, keyPair2, MemberRole.STANDARD, ',');
         final CWSKeyPair keyPair3 = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
         createAndAppendMember(builder, DatabaseSetup.MEMBER_3_ID, DatabaseSetup.MEMBER_3, keyPair3, MemberRole.STANDARD, ',');
         final CWSKeyPair keyPair4 = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
@@ -107,15 +106,15 @@ public final class GenerateTestData {
         final SecretCWSKey cwsKey3 = crypto.generateSymmetricKey(settings.getSymmetricAlgorithm());
         createAndAppendTrustee(builder, 2, keyPair1, 1, 1, cwsKey1, TrustLevel.ADMIN, ',');
         createAndAppendTrustee(builder, 3, keyPair2, 1, 1, cwsKey1, TrustLevel.WRITE, ',');
-        createAndAppendTrustee(builder, 4, keyPair3, 1, 1, cwsKey1, TrustLevel.READ,  ',');
+        createAndAppendTrustee(builder, 4, keyPair3, 1, 1, cwsKey1, TrustLevel.READ, ',');
         createAndAppendTrustee(builder, 2, keyPair1, 2, 2, cwsKey2, TrustLevel.ADMIN, ',');
         createAndAppendTrustee(builder, 3, keyPair2, 2, 2, cwsKey2, TrustLevel.WRITE, ',');
-        createAndAppendTrustee(builder, 4, keyPair3, 2, 2, cwsKey2, TrustLevel.READ,  ',');
+        createAndAppendTrustee(builder, 4, keyPair3, 2, 2, cwsKey2, TrustLevel.READ, ',');
         createAndAppendTrustee(builder, 5, keyPair4, 2, 2, cwsKey2, TrustLevel.ADMIN, ',');
         createAndAppendTrustee(builder, 3, keyPair2, 3, 3, cwsKey3, TrustLevel.WRITE, ',');
         createAndAppendTrustee(builder, 4, keyPair3, 3, 3, cwsKey3, TrustLevel.WRITE, ',');
         createAndAppendTrustee(builder, 5, keyPair4, 3, 3, cwsKey3, TrustLevel.ADMIN, ',');
-        createAndAppendTrustee(builder, 6, keyPair5, 3, 3, cwsKey3, TrustLevel.READ,  ';');
+        createAndAppendTrustee(builder, 6, keyPair5, 3, 3, cwsKey3, TrustLevel.READ, ';');
 
         return builder.toString();
     }

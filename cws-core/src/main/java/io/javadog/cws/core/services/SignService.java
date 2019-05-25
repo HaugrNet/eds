@@ -22,10 +22,9 @@ import io.javadog.cws.core.enums.Permission;
 import io.javadog.cws.core.model.Settings;
 import io.javadog.cws.core.model.SignatureDao;
 import io.javadog.cws.core.model.entities.SignatureEntity;
-
-import javax.persistence.EntityManager;
 import java.util.Arrays;
 import java.util.Base64;
+import javax.persistence.EntityManager;
 
 /**
  * <p>Business Logic implementation for the CWS Sign request.</p>

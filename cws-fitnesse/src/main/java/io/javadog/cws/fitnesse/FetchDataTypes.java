@@ -20,7 +20,6 @@ import io.javadog.cws.api.dtos.DataType;
 import io.javadog.cws.api.requests.FetchDataTypeRequest;
 import io.javadog.cws.api.responses.FetchDataTypeResponse;
 import io.javadog.cws.fitnesse.callers.CallShare;
-
 import java.util.List;
 
 /**

@@ -30,7 +30,7 @@ import javax.persistence.Query;
  * processing of data.</p>
  *
  * @author Kim Jensen
- * @since  CWS 1.1
+ * @since CWS 1.1
  */
 public final class DataDao extends CommonDao {
 

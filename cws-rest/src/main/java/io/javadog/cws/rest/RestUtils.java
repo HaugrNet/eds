@@ -24,7 +24,7 @@ import javax.ws.rs.core.Response;
  * <p>Common REST utilities, for all REST services.</p>
  *
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 public final class RestUtils {
 

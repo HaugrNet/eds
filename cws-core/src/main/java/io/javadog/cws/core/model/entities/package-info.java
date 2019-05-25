@@ -19,6 +19,6 @@
  * <p>CryptoStore Entities, mapping the underlying DataModel using JPA.</p>
  *
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 package io.javadog.cws.core.model.entities;

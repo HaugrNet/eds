@@ -22,7 +22,6 @@ import io.javadog.cws.api.requests.FetchDataRequest;
 import io.javadog.cws.api.responses.FetchDataResponse;
 import io.javadog.cws.fitnesse.callers.CallShare;
 import io.javadog.cws.fitnesse.utils.Converter;
-
 import java.util.ArrayList;
 import java.util.List;
 

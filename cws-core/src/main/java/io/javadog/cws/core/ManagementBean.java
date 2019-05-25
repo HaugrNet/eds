@@ -59,14 +59,15 @@ import javax.transaction.Transactional;
  * layer. This is also the layer where transactions are controlled.</p>
  *
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 @Stateless
 public class ManagementBean {
 
     private static final Logger LOG = Logger.getLogger(ManagementBean.class.getName());
 
-    @PersistenceContext private EntityManager entityManager;
+    @PersistenceContext
+    private EntityManager entityManager;
     private final Settings settings = Settings.getInstance();
 
     @Transactional(Transactional.TxType.SUPPORTS)

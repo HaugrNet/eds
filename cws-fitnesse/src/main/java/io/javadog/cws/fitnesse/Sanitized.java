@@ -20,7 +20,6 @@ import io.javadog.cws.api.requests.SanityRequest;
 import io.javadog.cws.api.responses.SanityResponse;
 import io.javadog.cws.fitnesse.callers.CallManagement;
 import io.javadog.cws.fitnesse.utils.Converter;
-
 import java.util.Date;
 
 /**

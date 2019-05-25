@@ -36,7 +36,7 @@ import javax.ws.rs.core.Response;
  * <p>REST interface for the MasterKey functionality.</p>
  *
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 @Path(Constants.REST_MASTERKEY)
 public class MasterKeyService {
@@ -44,7 +44,8 @@ public class MasterKeyService {
     private static final Logger LOG = Logger.getLogger(MasterKeyService.class.getName());
 
     private final Settings settings = Settings.getInstance();
-    @Inject private ManagementBean bean;
+    @Inject
+    private ManagementBean bean;
 
     @POST
     @Consumes(RestUtils.CONSUMES)

@@ -27,7 +27,6 @@ import com.google.gson.JsonSerializer;
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.requests.Authentication;
 import io.javadog.cws.api.responses.CwsResponse;
-
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -105,8 +104,8 @@ public class GsonRestClient {
 
     private static String readResponse(final HttpURLConnection connection) throws IOException {
         try (final InputStream inputStream = connection.getInputStream();
-                final InputStreamReader streamReader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
-                final BufferedReader reader = new BufferedReader(streamReader)) {
+             final InputStreamReader streamReader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
+             final BufferedReader reader = new BufferedReader(streamReader)) {
             final StringBuilder response = new StringBuilder(0);
             String line = reader.readLine();
             while (line != null) {

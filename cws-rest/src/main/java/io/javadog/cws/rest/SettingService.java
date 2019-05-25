@@ -36,7 +36,7 @@ import javax.ws.rs.core.Response;
  * <p>REST interface for the Setting functionality.</p>
  *
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 @Path(Constants.REST_SETTINGS)
 public class SettingService {
@@ -44,7 +44,8 @@ public class SettingService {
     private static final Logger LOG = Logger.getLogger(SettingService.class.getName());
 
     private final Settings settings = Settings.getInstance();
-    @Inject private ManagementBean bean;
+    @Inject
+    private ManagementBean bean;
 
     @POST
     @Consumes(RestUtils.CONSUMES)

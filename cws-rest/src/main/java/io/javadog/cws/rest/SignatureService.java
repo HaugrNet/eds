@@ -40,7 +40,7 @@ import javax.ws.rs.core.Response;
  * <p>REST interface for the Signature functionality.</p>
  *
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 @Path(Constants.REST_SIGNATURES_BASE)
 public class SignatureService {
@@ -48,7 +48,8 @@ public class SignatureService {
     private static final Logger LOG = Logger.getLogger(SignatureService.class.getName());
 
     private final Settings settings = Settings.getInstance();
-    @Inject private ShareBean bean;
+    @Inject
+    private ShareBean bean;
 
     @POST
     @Path(Constants.REST_SIGNATURES_SIGN)

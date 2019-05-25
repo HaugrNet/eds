@@ -27,7 +27,7 @@ import javax.persistence.Query;
  * processing of Signatures.</p>
  *
  * @author Kim Jensen
- * @since  CWS 1.1
+ * @since CWS 1.1
  */
 public final class SignatureDao extends CommonDao {
 

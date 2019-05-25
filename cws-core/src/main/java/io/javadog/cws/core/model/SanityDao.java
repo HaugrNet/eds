@@ -28,7 +28,7 @@ import javax.persistence.Query;
  * <p>Data Access Object functionality used explicitly for Sanity Checks.</p>
  *
  * @author Kim Jensen
- * @since  CWS 1.1
+ * @since CWS 1.1
  */
 public final class SanityDao extends CommonDao {
 

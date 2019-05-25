@@ -38,17 +38,16 @@ import io.javadog.cws.core.model.entities.KeyEntity;
 import io.javadog.cws.core.model.entities.MemberEntity;
 import io.javadog.cws.core.model.entities.MetadataEntity;
 import io.javadog.cws.core.model.entities.TrusteeEntity;
-
-import javax.persistence.EntityManager;
 import java.security.PublicKey;
 import java.util.Arrays;
 import java.util.Objects;
+import javax.persistence.EntityManager;
 
 /**
  * <p>Business Logic implementation for the CWS ProcessCircle request.</p>
  *
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 public final class ProcessCircleService extends Serviceable<CommonDao, ProcessCircleResponse, ProcessCircleRequest> {
 
@@ -109,7 +108,7 @@ public final class ProcessCircleService extends Serviceable<CommonDao, ProcessCi
         final CircleEntity existing = dao.findCircleByName(name);
 
         if (existing != null) {
-            throw new CWSException(ReturnCode.IDENTIFICATION_WARNING,  "A Circle with the requested name already exists.");
+            throw new CWSException(ReturnCode.IDENTIFICATION_WARNING, "A Circle with the requested name already exists.");
         }
 
         final String memberId = request.getMemberId();

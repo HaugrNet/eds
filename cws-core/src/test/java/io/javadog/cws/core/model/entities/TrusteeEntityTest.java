@@ -30,7 +30,7 @@ import org.junit.Test;
 
 /**
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 public final class TrusteeEntityTest extends DatabaseSetup {
 
@@ -38,7 +38,7 @@ public final class TrusteeEntityTest extends DatabaseSetup {
     public void testEntity() {
         final KeyAlgorithm algorithm = settings.getAsymmetricAlgorithm();
         final String externalId = UUID.randomUUID().toString();
-        final MemberEntity member = prepareMember(externalId,  "Trustee Member", algorithm, "public Key", "private Key", MemberRole.STANDARD);
+        final MemberEntity member = prepareMember(externalId, "Trustee Member", algorithm, "public Key", "private Key", MemberRole.STANDARD);
         final CircleEntity circle = prepareCircle(UUID.randomUUID().toString(), "Trustee Circle");
         final String circleKey = UUID.randomUUID().toString();
         final KeyEntity key = prepareKey();

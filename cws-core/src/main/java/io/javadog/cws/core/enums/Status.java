@@ -20,7 +20,7 @@ package io.javadog.cws.core.enums;
  * <p>The Status for the CWS Keys.</p>
  *
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 public enum Status {
 

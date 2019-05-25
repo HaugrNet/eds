@@ -15,7 +15,6 @@ import io.javadog.cws.api.responses.MasterKeyResponse;
 import io.javadog.cws.fitnesse.callers.CallManagement;
 import io.javadog.cws.fitnesse.exceptions.StopTestException;
 import io.javadog.cws.fitnesse.utils.Converter;
-
 import java.util.Map;
 
 /**

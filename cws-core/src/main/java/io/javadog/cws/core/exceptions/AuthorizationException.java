@@ -24,7 +24,7 @@ import io.javadog.cws.api.common.ReturnCode;
  * a requested Action.</p>
  *
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 public final class AuthorizationException extends CWSException {
 

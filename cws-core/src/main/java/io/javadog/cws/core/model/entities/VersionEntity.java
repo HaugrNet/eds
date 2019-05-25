@@ -31,13 +31,13 @@ import javax.persistence.TemporalType;
  * <p>CWS Version Entity, maps the Version table from the Database.</p>
  *
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 @Entity
 @NamedQueries(
         @NamedQuery(name = "version.findAll",
-                    query = "select v from VersionEntity v " +
-                            "order by v.id desc")
+                query = "select v from VersionEntity v " +
+                        "order by v.id desc")
 )
 @Table(name = "cws_versions")
 public class VersionEntity {

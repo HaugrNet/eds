@@ -32,18 +32,17 @@ import io.javadog.cws.core.model.CommonDao;
 import io.javadog.cws.core.model.Settings;
 import io.javadog.cws.core.model.entities.MemberEntity;
 import io.javadog.cws.core.model.entities.SettingEntity;
-
-import javax.persistence.EntityManager;
 import java.util.Base64;
 import java.util.List;
 import java.util.Objects;
 import java.util.logging.Logger;
+import javax.persistence.EntityManager;
 
 /**
  * <p>Business Logic implementation for the CWS MasterKey request.</p>
  *
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 public final class MasterKeyService extends Serviceable<CommonDao, MasterKeyResponse, MasterKeyRequest> {
 

@@ -49,7 +49,7 @@ import javax.xml.ws.soap.MTOM;
  * <p>This is the CWS SOAP based WebServices class for the Share interface.</p>
  *
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 @SOAPBinding
 @MTOM(threshold = 4096)
@@ -62,7 +62,8 @@ public class ShareService implements Share {
     private static final String GENERAL_RETURN_MESSAGE = "An unknown error occurred. Please consult the CWS System Log.";
 
     private final Settings settings = Settings.getInstance();
-    @Inject private ShareBean bean;
+    @Inject
+    private ShareBean bean;
 
     /**
      * {@inheritDoc}

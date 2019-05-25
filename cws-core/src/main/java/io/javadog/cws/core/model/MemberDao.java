@@ -28,7 +28,7 @@ import javax.persistence.Query;
  * processing of Members.</p>
  *
  * @author Kim Jensen
- * @since  CWS 1.1
+ * @since CWS 1.1
  */
 public final class MemberDao extends CommonDao {
 

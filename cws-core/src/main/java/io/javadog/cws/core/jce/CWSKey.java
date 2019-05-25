@@ -18,7 +18,6 @@ package io.javadog.cws.core.jce;
 
 import io.javadog.cws.core.enums.KeyAlgorithm;
 import io.javadog.cws.core.model.Settings;
-
 import java.lang.reflect.Field;
 import java.security.Key;
 import java.util.Arrays;
@@ -28,7 +27,7 @@ import java.util.logging.Logger;
  * <p>Common CWS Key, used for all crypto operations.</p>
  *
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 public abstract class CWSKey<T extends Key> {
 

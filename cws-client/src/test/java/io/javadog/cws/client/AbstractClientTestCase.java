@@ -62,11 +62,12 @@ import org.junit.Test;
 
 /**
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 public abstract class AbstractClientTestCase {
 
     abstract Management getManagement();
+
     abstract Share getShare();
 
     @Test

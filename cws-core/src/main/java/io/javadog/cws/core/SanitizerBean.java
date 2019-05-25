@@ -22,7 +22,11 @@ import io.javadog.cws.core.jce.Crypto;
 import io.javadog.cws.core.model.CommonDao;
 import io.javadog.cws.core.model.Settings;
 import io.javadog.cws.core.model.entities.DataEntity;
-
+import java.time.LocalDate;
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
+import java.util.logging.Logger;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
@@ -30,11 +34,6 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceException;
 import javax.persistence.Query;
 import javax.transaction.Transactional;
-import java.time.LocalDate;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
-import java.util.logging.Logger;
 
 /**
  * <p>Generally, the database is always trustworthy, it is a system which is
@@ -50,7 +49,7 @@ import java.util.logging.Logger;
  * replaced with a valid record from a backup.</p>
  *
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 @Stateless
 @Transactional
@@ -59,7 +58,8 @@ public class SanitizerBean {
     private static final Logger LOG = Logger.getLogger(SanitizerBean.class.getName());
     private static final int BLOCK = 100;
 
-    @PersistenceContext private EntityManager entityManager;
+    @PersistenceContext
+    private EntityManager entityManager;
     private final Settings settings = Settings.getInstance();
     private final Crypto crypto = new Crypto(settings);
 

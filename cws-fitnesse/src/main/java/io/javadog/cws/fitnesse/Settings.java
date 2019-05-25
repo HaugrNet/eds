@@ -19,7 +19,6 @@ package io.javadog.cws.fitnesse;
 import io.javadog.cws.api.requests.SettingRequest;
 import io.javadog.cws.api.responses.SettingResponse;
 import io.javadog.cws.fitnesse.callers.CallManagement;
-
 import java.util.HashMap;
 import java.util.Map;
 

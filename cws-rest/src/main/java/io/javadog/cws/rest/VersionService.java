@@ -33,7 +33,7 @@ import javax.ws.rs.core.Response;
  * <p>REST interface for the Version functionality.</p>
  *
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 @Path(Constants.REST_VERSION)
 public class VersionService {
@@ -41,7 +41,8 @@ public class VersionService {
     private static final Logger LOG = Logger.getLogger(VersionService.class.getName());
 
     private final Settings settings = Settings.getInstance();
-    @Inject private ManagementBean bean;
+    @Inject
+    private ManagementBean bean;
 
     @POST
     @Produces(RestUtils.PRODUCES)

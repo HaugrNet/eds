@@ -50,14 +50,15 @@ import javax.transaction.Transactional;
  * This is also the layer where transactions are controlled.</p>
  *
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 @Stateless
 public class ShareBean {
 
     private static final Logger LOG = Logger.getLogger(ShareBean.class.getName());
 
-    @PersistenceContext private EntityManager entityManager;
+    @PersistenceContext
+    private EntityManager entityManager;
     private final Settings settings = Settings.getInstance();
 
     @Transactional(Transactional.TxType.REQUIRED)

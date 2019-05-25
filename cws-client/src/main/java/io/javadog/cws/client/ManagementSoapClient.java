@@ -48,17 +48,16 @@ import io.javadog.cws.ws.ProcessTrusteeResult;
 import io.javadog.cws.ws.SanityResult;
 import io.javadog.cws.ws.SettingResult;
 import io.javadog.cws.ws.VersionResult;
-
-import javax.xml.namespace.QName;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.xml.namespace.QName;
 
 /**
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 public final class ManagementSoapClient implements Management {
 

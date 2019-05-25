@@ -24,7 +24,7 @@ import java.security.PublicKey;
  * asymmetric encryption and verifying of signatures.</p>
  *
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 public final class PublicCWSKey extends CWSKey<PublicKey> {
 

@@ -26,7 +26,7 @@ import javax.ws.rs.core.Application;
  * classes, which should be exposed.</p>
  *
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 @ApplicationPath("/")
 public class CwsApplication extends Application {

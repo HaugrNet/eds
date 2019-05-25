@@ -25,7 +25,7 @@ import javax.persistence.MappedSuperclass;
  * Externable Id, which differs from the internal Id.</p>
  *
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 @MappedSuperclass
 public class Externable extends CWSEntity {

@@ -27,7 +27,7 @@ import org.junit.Test;
 
 /**
  * @author Kim Jensen
- * @since  CWS 1.1
+ * @since CWS 1.1
  */
 public class IVSaltTest extends DatabaseSetup {
 

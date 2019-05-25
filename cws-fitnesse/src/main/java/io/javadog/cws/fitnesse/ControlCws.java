@@ -35,7 +35,6 @@ import io.javadog.cws.api.responses.FetchMemberResponse;
 import io.javadog.cws.fitnesse.callers.CallManagement;
 import io.javadog.cws.fitnesse.callers.CallShare;
 import io.javadog.cws.fitnesse.exceptions.StopTestException;
-
 import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.Charset;
 import java.util.Objects;

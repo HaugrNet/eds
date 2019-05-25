@@ -24,7 +24,7 @@ import io.javadog.cws.api.common.ReturnCode;
  * null or invalid, meaning that the request cannot be correctly processed.</p>
  *
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 public final class VerificationException extends CWSException {
 

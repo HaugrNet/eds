@@ -33,7 +33,6 @@ public final class MasterKeyResponseTest {
     public void testClassflow() {
         final MasterKeyResponse response = new MasterKeyResponse();
 
-
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
         assertEquals("Ok", response.getReturnMessage());
         assertTrue(response.isOk());

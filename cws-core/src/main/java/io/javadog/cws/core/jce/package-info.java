@@ -20,6 +20,6 @@
  * basic implementation.</p>
  *
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 package io.javadog.cws.core.jce;

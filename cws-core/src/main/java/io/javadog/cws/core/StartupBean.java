@@ -46,7 +46,7 @@ import javax.persistence.Query;
  * settings. It also runs the CWS Sanity checks.</p>
  *
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 @Startup
 @Singleton
@@ -57,9 +57,12 @@ public class StartupBean {
     private static final Logger LOG = Logger.getLogger(StartupBean.class.getName());
     private static final int DB_VERSION = 2;
 
-    @PersistenceContext private EntityManager entityManager;
-    @Inject private SanitizerBean sanitizerBean;
-    @Resource private TimerService timerService;
+    @PersistenceContext
+    private EntityManager entityManager;
+    @Inject
+    private SanitizerBean sanitizerBean;
+    @Resource
+    private TimerService timerService;
     private final Settings settings = Settings.getInstance();
 
     @PostConstruct

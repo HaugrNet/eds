@@ -54,7 +54,7 @@ import javax.xml.ws.BindingType;
  * interface.</p>
  *
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 @SOAPBinding
 @BindingType(javax.xml.ws.soap.SOAPBinding.SOAP11HTTP_BINDING)
@@ -66,7 +66,8 @@ public class ManagementService implements Management {
     private static final String GENERAL_RETURN_MESSAGE = "An unknown error occurred. Please consult the CWS System Log.";
 
     private final Settings settings = Settings.getInstance();
-    @Inject private ManagementBean bean;
+    @Inject
+    private ManagementBean bean;
 
     /**
      * {@inheritDoc}

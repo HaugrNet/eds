@@ -39,7 +39,7 @@ import javax.ws.rs.core.Response;
  * <p>REST interface for the DataType functionality.</p>
  *
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 @Path(Constants.REST_DATATYPES_BASE)
 public class DataTypeService {
@@ -47,7 +47,8 @@ public class DataTypeService {
     private static final Logger LOG = Logger.getLogger(DataTypeService.class.getName());
 
     private final Settings settings = Settings.getInstance();
-    @Inject private ShareBean bean;
+    @Inject
+    private ShareBean bean;
 
     @POST
     @Consumes(RestUtils.CONSUMES)

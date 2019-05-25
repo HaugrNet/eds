@@ -36,7 +36,7 @@ import org.junit.Test;
 
 /**
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 public final class CommonServiceTest extends BeanSetup {
 

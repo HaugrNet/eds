@@ -22,7 +22,7 @@ import java.util.Objects;
  * <p>The CWS Standard Settings.</p>
  *
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 public enum StandardSetting {
 

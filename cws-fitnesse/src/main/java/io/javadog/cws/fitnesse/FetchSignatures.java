@@ -21,7 +21,6 @@ import io.javadog.cws.api.requests.FetchSignatureRequest;
 import io.javadog.cws.api.responses.FetchSignatureResponse;
 import io.javadog.cws.fitnesse.callers.CallShare;
 import io.javadog.cws.fitnesse.utils.Converter;
-
 import java.util.List;
 import java.util.Map;
 

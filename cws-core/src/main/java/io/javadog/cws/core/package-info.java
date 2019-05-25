@@ -20,6 +20,6 @@
  * to other modules as basis.</p>
  *
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 package io.javadog.cws.core;

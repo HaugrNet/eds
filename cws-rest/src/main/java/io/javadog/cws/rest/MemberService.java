@@ -26,7 +26,7 @@ import io.javadog.cws.api.responses.ProcessMemberResponse;
 import io.javadog.cws.core.ManagementBean;
 import io.javadog.cws.core.misc.LoggingUtil;
 import io.javadog.cws.core.model.Settings;
-
+import java.util.logging.Logger;
 import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
@@ -34,13 +34,12 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
-import java.util.logging.Logger;
 
 /**
  * <p>REST interface for the Member functionality.</p>
  *
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 @Path(Constants.REST_MEMBERS_BASE)
 public class MemberService {
@@ -48,7 +47,8 @@ public class MemberService {
     private static final Logger LOG = Logger.getLogger(MemberService.class.getName());
 
     private final Settings settings = Settings.getInstance();
-    @Inject private ManagementBean bean;
+    @Inject
+    private ManagementBean bean;
 
     @POST
     @Consumes(RestUtils.CONSUMES)

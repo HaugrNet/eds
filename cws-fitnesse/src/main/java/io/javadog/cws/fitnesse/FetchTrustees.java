@@ -21,7 +21,6 @@ import io.javadog.cws.api.requests.FetchTrusteeRequest;
 import io.javadog.cws.api.responses.FetchTrusteeResponse;
 import io.javadog.cws.fitnesse.callers.CallManagement;
 import io.javadog.cws.fitnesse.utils.Converter;
-
 import java.util.List;
 
 /**

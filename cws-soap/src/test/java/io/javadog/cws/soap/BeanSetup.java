@@ -26,7 +26,7 @@ import java.lang.reflect.InvocationTargetException;
 
 /**
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 public class BeanSetup extends DatabaseSetup {
 

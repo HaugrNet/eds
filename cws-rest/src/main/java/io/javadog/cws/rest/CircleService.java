@@ -39,7 +39,7 @@ import javax.ws.rs.core.Response;
  * <p>REST interface for the Circle functionality.</p>
  *
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 @Path(Constants.REST_CIRCLES_BASE)
 public class CircleService {
@@ -47,7 +47,8 @@ public class CircleService {
     private static final Logger LOG = Logger.getLogger(CircleService.class.getName());
 
     private final Settings settings = Settings.getInstance();
-    @Inject private ManagementBean bean;
+    @Inject
+    private ManagementBean bean;
 
     @POST
     @Consumes(RestUtils.CONSUMES)

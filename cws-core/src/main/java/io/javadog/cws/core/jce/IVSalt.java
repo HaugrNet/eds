@@ -28,7 +28,7 @@ import java.util.logging.Logger;
  * the UUID based Salts and the Random generated.</p>
  *
  * @author Kim Jensen
- * @since  CWS 1.1
+ * @since CWS 1.1
  */
 public final class IVSalt {
 

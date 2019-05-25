@@ -23,7 +23,7 @@ import io.javadog.cws.api.common.ReturnCode;
  * Top Exception Class for CWS.
  *
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 public class CWSException extends RuntimeException {
 

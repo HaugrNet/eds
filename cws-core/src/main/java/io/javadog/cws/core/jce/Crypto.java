@@ -73,7 +73,7 @@ import javax.crypto.spec.SecretKeySpec;
  * existing JCE implementations in Java.</p>
  *
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 public final class Crypto {
 

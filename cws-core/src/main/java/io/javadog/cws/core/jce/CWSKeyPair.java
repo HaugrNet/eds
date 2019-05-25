@@ -23,7 +23,7 @@ import java.security.KeyPair;
  * <p>The CWS KeyPair consists of a CWS PublicKey &amp; PrivateKey.</p>
  *
  * @author Kim Jensen
- * @since  CWS 1.0
+ * @since CWS 1.0
  */
 public final class CWSKeyPair {
 

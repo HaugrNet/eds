@@ -17,7 +17,8 @@
 package io.javadog.cws.soap;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.nullValue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
@@ -74,7 +75,7 @@ public final class ManagementServiceTest extends BeanSetup {
             }
 
             final VersionResponse response = management.version();
-            assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+            assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
             assertThat(response.getVersion(), is(version));
         } else {
             fail("Could not open the Class Loader, to read the '" + propertiesFile + "' file from the test resource path.");
@@ -105,7 +106,7 @@ public final class ManagementServiceTest extends BeanSetup {
         final SettingRequest request = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
 
         final SettingResponse response = management.settings(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+        assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
     }
 
     @Test
@@ -155,7 +156,7 @@ public final class ManagementServiceTest extends BeanSetup {
         request.setSecret(request.getCredential());
 
         final MasterKeyResponse response = management.masterKey(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+        assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
     }
 
     @Test
@@ -205,7 +206,7 @@ public final class ManagementServiceTest extends BeanSetup {
         final SanityRequest request = prepareRequest(SanityRequest.class, Constants.ADMIN_ACCOUNT);
 
         final SanityResponse response = management.sanitized(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+        assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
     }
 
     @Test
@@ -241,32 +242,32 @@ public final class ManagementServiceTest extends BeanSetup {
         final FetchMemberRequest request = prepareRequest(FetchMemberRequest.class, MEMBER_1);
 
         final FetchMemberResponse response = management.fetchMembers(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+        assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
         assertThat(response.getMembers().size(), is(6));
         assertThat(response.getCircles().size(), is(0));
         assertThat(response.getMembers().get(0).getAccountName(), is(Constants.ADMIN_ACCOUNT));
         assertThat(response.getMembers().get(0).getMemberId(), is(ADMIN_ID));
-        assertThat(response.getMembers().get(0).getPublicKey(), is(nullValue()));
+        assertNull(response.getMembers().get(0).getPublicKey());
         assertThat(response.getMembers().get(0).getMemberRole(), is(MemberRole.ADMIN));
         assertThat(response.getMembers().get(1).getAccountName(), is(MEMBER_1));
         assertThat(response.getMembers().get(1).getMemberId(), is(MEMBER_1_ID));
-        assertThat(response.getMembers().get(1).getPublicKey(), is(nullValue()));
+        assertNull(response.getMembers().get(1).getPublicKey());
         assertThat(response.getMembers().get(1).getMemberRole(), is(MemberRole.STANDARD));
         assertThat(response.getMembers().get(2).getAccountName(), is(MEMBER_2));
         assertThat(response.getMembers().get(2).getMemberId(), is(MEMBER_2_ID));
-        assertThat(response.getMembers().get(2).getPublicKey(), is(nullValue()));
+        assertNull(response.getMembers().get(2).getPublicKey());
         assertThat(response.getMembers().get(2).getMemberRole(), is(MemberRole.STANDARD));
         assertThat(response.getMembers().get(3).getAccountName(), is(MEMBER_3));
         assertThat(response.getMembers().get(3).getMemberId(), is(MEMBER_3_ID));
-        assertThat(response.getMembers().get(3).getPublicKey(), is(nullValue()));
+        assertNull(response.getMembers().get(3).getPublicKey());
         assertThat(response.getMembers().get(3).getMemberRole(), is(MemberRole.STANDARD));
         assertThat(response.getMembers().get(4).getAccountName(), is(MEMBER_4));
         assertThat(response.getMembers().get(4).getMemberId(), is(MEMBER_4_ID));
-        assertThat(response.getMembers().get(4).getPublicKey(), is(nullValue()));
+        assertNull(response.getMembers().get(4).getPublicKey());
         assertThat(response.getMembers().get(4).getMemberRole(), is(MemberRole.STANDARD));
         assertThat(response.getMembers().get(5).getAccountName(), is(MEMBER_5));
         assertThat(response.getMembers().get(5).getMemberId(), is(MEMBER_5_ID));
-        assertThat(response.getMembers().get(5).getPublicKey(), is(nullValue()));
+        assertNull(response.getMembers().get(5).getPublicKey());
         assertThat(response.getMembers().get(5).getMemberRole(), is(MemberRole.STANDARD));
     }
 
@@ -305,7 +306,7 @@ public final class ManagementServiceTest extends BeanSetup {
         request.setNewAccountName("new Account");
 
         final ProcessMemberResponse response = management.processMember(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+        assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
     }
 
     @Test
@@ -341,7 +342,7 @@ public final class ManagementServiceTest extends BeanSetup {
         final FetchCircleRequest request = prepareRequest(FetchCircleRequest.class, MEMBER_1);
 
         final FetchCircleResponse response = management.fetchCircles(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+        assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
     }
 
     @Test
@@ -380,7 +381,7 @@ public final class ManagementServiceTest extends BeanSetup {
         request.setMemberId(MEMBER_1_ID);
 
         final ProcessCircleResponse response = management.processCircle(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+        assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
     }
 
     @Test
@@ -417,7 +418,7 @@ public final class ManagementServiceTest extends BeanSetup {
         request.setCircleId(CIRCLE_1_ID);
 
         final FetchTrusteeResponse response = management.fetchTrustees(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+        assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
     }
 
     @Test
@@ -457,7 +458,7 @@ public final class ManagementServiceTest extends BeanSetup {
         request.setTrustLevel(TrustLevel.WRITE);
 
         final ProcessTrusteeResponse response = management.processTrustee(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+        assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
     }
 
     @Test

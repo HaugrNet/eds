@@ -17,8 +17,7 @@
 package io.javadog.cws.core.model.entities;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.CoreMatchers.nullValue;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 
 import io.javadog.cws.core.DatabaseSetup;
@@ -44,12 +43,12 @@ public final class VersionEntityTest extends DatabaseSetup {
         assertThat(found.get(0).getCwsVersion(), is("1.1.0"));
         assertThat(found.get(0).getDbVendor(), is("H2"));
         assertThat(found.get(0).getSchemaVersion(), is(2));
-        assertThat(found.get(0).getInstalled(), is(not(nullValue())));
+        assertNotNull(found.get(0).getInstalled());
         assertThat(found.get(1).getId(), is(1L));
         assertThat(found.get(1).getCwsVersion(), is("1.0.0"));
         assertThat(found.get(1).getDbVendor(), is("H2"));
         assertThat(found.get(1).getSchemaVersion(), is(1));
-        assertThat(found.get(1).getInstalled(), is(not(nullValue())));
+        assertNotNull(found.get(1).getInstalled());
 
         // Now adding a new Entity, this must fail.
         final VersionEntity entity = new VersionEntity();

@@ -17,6 +17,7 @@
 package io.javadog.cws.core.model.entities;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 
 import io.javadog.cws.core.DatabaseSetup;
@@ -46,7 +47,7 @@ public final class SignatureEntityTest extends DatabaseSetup {
 
         dao.persist(entity);
         final List<SignatureEntity> found = dao.findAllAscending(SignatureEntity.class, "id");
-        assertThat(found.isEmpty(), is(false));
+        assertFalse(found.isEmpty());
         assertThat(found.get(0).getMember(), is(member));
         assertThat(found.get(0).getPublicKey(), is(publicKey));
         assertThat(found.get(0).getChecksum(), is(checksum));

@@ -16,10 +16,9 @@
  */
 package io.javadog.cws.soap;
 
-import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.requests.SettingRequest;
@@ -44,11 +43,11 @@ public final class CommonServiceTest extends BeanSetup {
     @Test
     public void testConstantsConstructor() throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
         final Constructor<CommonBean> constructor = CommonBean.class.getDeclaredConstructor();
-        assertThat(constructor.isAccessible(), is(false));
+        assertFalse(constructor.isAccessible());
         constructor.setAccessible(true);
         final CommonBean commonBean = constructor.newInstance();
 
-        assertThat(commonBean, is(not(nullValue())));
+        assertNotNull(commonBean);
     }
 
     @Test
@@ -63,7 +62,7 @@ public final class CommonServiceTest extends BeanSetup {
         CommonBean.destroy(service);
         CommonBean.destroy(failService);
 
-        assertThat(failService.perform(null), is(nullValue()));
+        assertNull(failService.perform(null));
     }
 
     /**

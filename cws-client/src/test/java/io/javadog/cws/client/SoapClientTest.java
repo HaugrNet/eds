@@ -16,8 +16,7 @@
  */
 package io.javadog.cws.client;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 import io.javadog.cws.api.Management;
 import io.javadog.cws.api.Share;
@@ -44,7 +43,7 @@ public final class SoapClientTest extends AbstractClientTestCase {
 
     @Test
     public void testCorrectInstances() {
-        assertThat(management instanceof ManagementSoapClient, is(true));
-        assertThat(share instanceof ShareSoapClient, is(true));
+        assertTrue(management instanceof ManagementSoapClient);
+        assertTrue(share instanceof ShareSoapClient);
     }
 }

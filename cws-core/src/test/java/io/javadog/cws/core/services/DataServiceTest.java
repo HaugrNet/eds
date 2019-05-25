@@ -18,8 +18,11 @@ package io.javadog.cws.core.services;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.CoreMatchers.nullValue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 import io.javadog.cws.api.common.Action;
 import io.javadog.cws.api.common.Constants;
@@ -35,10 +38,9 @@ import io.javadog.cws.api.responses.ProcessDataResponse;
 import io.javadog.cws.api.responses.ProcessMemberResponse;
 import io.javadog.cws.core.DatabaseSetup;
 import io.javadog.cws.core.enums.SanityStatus;
-import org.junit.Test;
-
 import java.util.Date;
 import java.util.UUID;
+import org.junit.Test;
 
 /**
  * <p>Common test class for the Process & Fetch Data Services.</p>
@@ -56,7 +58,7 @@ public final class DataServiceTest extends DatabaseSetup {
 
         final ProcessDataService service = new ProcessDataService(settings, entityManager);
         final ProcessDataRequest request = new ProcessDataRequest();
-        assertThat(request.getAccountName(), is(nullValue()));
+        assertNull(request.getAccountName());
 
         service.perform(request);
     }
@@ -69,7 +71,7 @@ public final class DataServiceTest extends DatabaseSetup {
 
         final FetchDataService service = new FetchDataService(settings, entityManager);
         final FetchDataRequest request = new FetchDataRequest();
-        assertThat(request.getAccountName(), is(nullValue()));
+        assertNull(request.getAccountName());
 
         service.perform(request);
     }
@@ -87,12 +89,12 @@ public final class DataServiceTest extends DatabaseSetup {
         // byte array is stored prior.
         final String toSave = crypto.bytesToString(saveRequest.getData());
         final ProcessDataResponse saveResponse = service.perform(saveRequest);
-        assertThat(saveResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+        assertEquals(ReturnCode.SUCCESS.getCode(), saveResponse.getReturnCode());
 
         final FetchDataRequest fetchRequest = prepareRequest(FetchDataRequest.class, MEMBER_1);
         fetchRequest.setDataId(saveResponse.getDataId());
         final FetchDataResponse fetchResponse = dataService.perform(fetchRequest);
-        assertThat(fetchResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+        assertEquals(ReturnCode.SUCCESS.getCode(), fetchResponse.getReturnCode());
         assertThat(crypto.bytesToString(fetchResponse.getData()), is(toSave));
     }
 
@@ -104,7 +106,7 @@ public final class DataServiceTest extends DatabaseSetup {
         // 1 MB large Data
         final ProcessDataRequest saveRequest = prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "My Data", 1048576);
         final ProcessDataResponse saveResponse = service.perform(saveRequest);
-        assertThat(saveResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+        assertEquals(ReturnCode.SUCCESS.getCode(), saveResponse.getReturnCode());
 
         final FetchDataRequest fetchRequest1 = prepareRequest(FetchDataRequest.class, MEMBER_1);
         fetchRequest1.setDataId(saveResponse.getDataId());
@@ -115,9 +117,9 @@ public final class DataServiceTest extends DatabaseSetup {
         updateRequest.setDataName("New Name");
         updateRequest.setData(generateData(1048576));
         final ProcessDataResponse updateResponse = service.perform(updateRequest);
-        assertThat(updateResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+        assertEquals(ReturnCode.SUCCESS.getCode(), updateResponse.getReturnCode());
 
-        assertThat(saveResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+        assertEquals(ReturnCode.SUCCESS.getCode(), saveResponse.getReturnCode());
         final FetchDataRequest fetchRequest2 = prepareRequest(FetchDataRequest.class, MEMBER_1);
         fetchRequest2.setDataId(saveResponse.getDataId());
         final FetchDataResponse fetchResponse2 = dataService.perform(fetchRequest2);
@@ -135,17 +137,17 @@ public final class DataServiceTest extends DatabaseSetup {
         final FetchDataRequest fetchRequest = prepareRequest(FetchDataRequest.class, MEMBER_1);
         fetchRequest.setCircleId(CIRCLE_1_ID);
         final FetchDataResponse emptyResponse = fetchService.perform(fetchRequest);
-        assertThat(emptyResponse.isOk(), is(true));
+        assertTrue(emptyResponse.isOk());
         assertThat(emptyResponse.getRecords(), is(0L));
 
         // Add some data...
-        assertThat(processService.perform(prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "My Data 1", 1048576)).isOk(), is(true));
-        assertThat(processService.perform(prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "My Data 2", 1048576)).isOk(), is(true));
-        assertThat(processService.perform(prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "My Data 3", 1048576)).isOk(), is(true));
+        assertTrue(processService.perform(prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "My Data 1", 1048576)).isOk());
+        assertTrue(processService.perform(prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "My Data 2", 1048576)).isOk());
+        assertTrue(processService.perform(prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "My Data 3", 1048576)).isOk());
 
         fetchRequest.setCredential(crypto.stringToBytes(MEMBER_1));
         final FetchDataResponse fullResponse = fetchService.perform(fetchRequest);
-        assertThat(fullResponse.isOk(), is(true));
+        assertTrue(fullResponse.isOk());
         assertThat(fullResponse.getRecords(), is(3L));
     }
 
@@ -155,13 +157,13 @@ public final class DataServiceTest extends DatabaseSetup {
         final ProcessDataRequest request = prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "The Data", 0);
 
         final ProcessDataResponse response = service.perform(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
-        assertThat(response.getReturnMessage(), is("Ok"));
+        assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
+        assertEquals("Ok", response.getReturnMessage());
 
         final FetchDataService readService = new FetchDataService(settings, entityManager);
         final FetchDataRequest readRequest = prepareReadRequest(MEMBER_1, CIRCLE_1_ID, response.getDataId());
         final FetchDataResponse readResponse = readService.perform(readRequest);
-        assertThat(readResponse.isOk(), is(true));
+        assertTrue(readResponse.isOk());
     }
 
     @Test
@@ -173,14 +175,14 @@ public final class DataServiceTest extends DatabaseSetup {
         memberRequest.setAction(Action.CREATE);
         final ProcessMemberService memberService = new ProcessMemberService(settings, entityManager);
         final ProcessMemberResponse memberResponse = memberService.perform(memberRequest);
-        assertThat(memberResponse.isOk(), is(true));
+        assertTrue(memberResponse.isOk());
 
         final ProcessCircleRequest circleRequest = prepareRequest(ProcessCircleRequest.class, accountName);
         circleRequest.setCircleName("circleName");
         circleRequest.setAction(Action.CREATE);
         final ProcessCircleService circleService = new ProcessCircleService(settings, entityManager);
         final ProcessCircleResponse circleResponse = circleService.perform(circleRequest);
-        assertThat(circleResponse.isOk(), is(true));
+        assertTrue(circleResponse.isOk());
     }
 
     @Test
@@ -189,7 +191,7 @@ public final class DataServiceTest extends DatabaseSetup {
         final ProcessDataRequest request = prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "The Data", 524288);
 
         final ProcessDataResponse response = service.perform(request);
-        assertThat(response.isOk(), is(true));
+        assertTrue(response.isOk());
         falsifyChecksum(response, new Date(), SanityStatus.FAILED);
 
         // Now to the actual test - reading the data with invalid checksum
@@ -206,7 +208,7 @@ public final class DataServiceTest extends DatabaseSetup {
         final ProcessDataRequest saveRequest = prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "The Data", 0);
 
         final ProcessDataResponse saveResponse = service.perform(saveRequest);
-        assertThat(saveResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+        assertEquals(ReturnCode.SUCCESS.getCode(), saveResponse.getReturnCode());
 
         final ProcessDataRequest updateRequest = prepareUpdateRequest(MEMBER_1, saveResponse.getDataId());
         updateRequest.setData(generateData(1048576));
@@ -221,7 +223,7 @@ public final class DataServiceTest extends DatabaseSetup {
         final ProcessDataRequest saveRequest = prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "The Data", 1048576);
 
         final ProcessDataResponse saveResponse = service.perform(saveRequest);
-        assertThat(saveResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+        assertEquals(ReturnCode.SUCCESS.getCode(), saveResponse.getReturnCode());
 
         final ProcessDataRequest updateRequest = prepareUpdateRequest(MEMBER_1, saveResponse.getDataId());
         updateRequest.setFolderId(UUID.randomUUID().toString());
@@ -234,7 +236,7 @@ public final class DataServiceTest extends DatabaseSetup {
 
         final ProcessDataService service = new ProcessDataService(settings, entityManager);
         final ProcessDataRequest request = prepareAddDataRequest(MEMBER_5, CIRCLE_3_ID, "The Data", 1048576);
-        assertThat(request.validate().isEmpty(), is(true));
+        assertTrue(request.validate().isEmpty());
 
         service.perform(request);
     }
@@ -246,7 +248,7 @@ public final class DataServiceTest extends DatabaseSetup {
         final ProcessDataService service = new ProcessDataService(settings, entityManager);
         final ProcessDataRequest saveRequest = prepareAddDataRequest(MEMBER_2, CIRCLE_2_ID, "The Data", 1048576);
         final ProcessDataResponse saveResponse = service.perform(saveRequest);
-        assertThat(saveResponse.isOk(), is(true));
+        assertTrue(saveResponse.isOk());
 
         final ProcessDataRequest updateRequest = prepareUpdateRequest(MEMBER_3, saveResponse.getDataId());
         updateRequest.setDataName("New Name");
@@ -260,7 +262,7 @@ public final class DataServiceTest extends DatabaseSetup {
         final ProcessDataService service = new ProcessDataService(settings, entityManager);
         final ProcessDataRequest request = prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "The Data", 512);
         request.setTypeName("Weird");
-        assertThat(request.validate().isEmpty(), is(true));
+        assertTrue(request.validate().isEmpty());
 
         service.perform(request);
     }
@@ -272,7 +274,7 @@ public final class DataServiceTest extends DatabaseSetup {
         final ProcessDataService service = new ProcessDataService(settings, entityManager);
         final ProcessDataRequest saveRequest = prepareAddDataRequest(MEMBER_2, CIRCLE_2_ID, "The Data", 1048576);
         final ProcessDataResponse saveResponse = service.perform(saveRequest);
-        assertThat(saveResponse.isOk(), is(true));
+        assertTrue(saveResponse.isOk());
 
         final ProcessDataRequest updateRequest = prepareDeleteRequest(MEMBER_3, saveResponse.getDataId());
         service.perform(updateRequest);
@@ -286,7 +288,7 @@ public final class DataServiceTest extends DatabaseSetup {
         final FetchDataRequest request = prepareRequest(FetchDataRequest.class, MEMBER_4);
         request.setCircleId(CIRCLE_3_ID);
         request.setDataId(UUID.randomUUID().toString());
-        assertThat(request.validate().isEmpty(), is(true));
+        assertTrue(request.validate().isEmpty());
 
         service.perform(request);
     }
@@ -299,7 +301,7 @@ public final class DataServiceTest extends DatabaseSetup {
         final ProcessDataService service = new ProcessDataService(settings, entityManager);
         final ProcessDataRequest request = prepareAddDataRequest(MEMBER_4, CIRCLE_3_ID, "Data File", 512);
         request.setFolderId(folderId);
-        assertThat(request.validate().isEmpty(), is(true));
+        assertTrue(request.validate().isEmpty());
 
         service.perform(request);
     }
@@ -308,9 +310,9 @@ public final class DataServiceTest extends DatabaseSetup {
     public void testAddDataToInvalidFolder() {
         final ProcessDataService service = new ProcessDataService(settings, entityManager);
         final ProcessDataRequest request = prepareAddDataRequest(MEMBER_4, CIRCLE_3_ID, "Data File", 512);
-        assertThat(request.validate().isEmpty(), is(true));
+        assertTrue(request.validate().isEmpty());
         final ProcessDataResponse response = service.perform(request);
-        assertThat(response.isOk(), is(true));
+        assertTrue(response.isOk());
         final String folderId = response.getDataId();
 
         // We're taking the previously generated Data Id and uses that as folder.
@@ -331,7 +333,7 @@ public final class DataServiceTest extends DatabaseSetup {
         request.setDataId(UUID.randomUUID().toString());
         request.setDataName("New Name for our not existing Data");
         request.setData(generateData(512));
-        assertThat(request.validate().isEmpty(), is(true));
+        assertTrue(request.validate().isEmpty());
 
         service.perform(request);
     }
@@ -341,12 +343,12 @@ public final class DataServiceTest extends DatabaseSetup {
         final ProcessDataService service = new ProcessDataService(settings, entityManager);
         final ProcessDataRequest saveRequest = prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "The Data", 524288);
         final ProcessDataResponse saveResponse = service.perform(saveRequest);
-        assertThat(saveResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+        assertEquals(ReturnCode.SUCCESS.getCode(), saveResponse.getReturnCode());
         assertThat(saveResponse.getReturnMessage(), is("Ok"));
 
         final ProcessDataRequest deleteRequest = prepareDeleteRequest(MEMBER_1, saveResponse.getDataId());
         final ProcessDataResponse deleteResponse = service.perform(deleteRequest);
-        assertThat(deleteResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+        assertEquals(ReturnCode.SUCCESS.getCode(), deleteResponse.getReturnCode());
         assertThat(deleteResponse.getReturnMessage(), is("Ok"));
     }
 
@@ -357,7 +359,7 @@ public final class DataServiceTest extends DatabaseSetup {
         final ProcessDataService service = new ProcessDataService(settings, entityManager);
         final ProcessDataRequest saveRequest = prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "Known Data", 524288);
         final ProcessDataResponse saveResponse = service.perform(saveRequest);
-        assertThat(saveResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+        assertEquals(ReturnCode.SUCCESS.getCode(), saveResponse.getReturnCode());
         assertThat(saveResponse.getReturnMessage(), is("Ok"));
 
         final ProcessDataRequest deleteRequest = prepareDeleteRequest(MEMBER_3, saveResponse.getDataId());
@@ -371,11 +373,11 @@ public final class DataServiceTest extends DatabaseSetup {
         final ProcessDataService service = new ProcessDataService(settings, entityManager);
         final ProcessDataRequest saveRequest = prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "More Data", 524288);
         final ProcessDataResponse saveResponse = service.perform(saveRequest);
-        assertThat(saveResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+        assertEquals(ReturnCode.SUCCESS.getCode(), saveResponse.getReturnCode());
         assertThat(saveResponse.getReturnMessage(), is("Ok"));
 
         final ProcessDataRequest deleteRequest = prepareDeleteRequest(MEMBER_4, saveResponse.getDataId());
-        assertThat(deleteRequest.validate().isEmpty(), is(true));
+        assertTrue(deleteRequest.validate().isEmpty());
 
         service.perform(deleteRequest);
     }
@@ -386,7 +388,7 @@ public final class DataServiceTest extends DatabaseSetup {
 
         final ProcessDataService service = new ProcessDataService(settings, entityManager);
         final ProcessDataRequest request = prepareDeleteRequest(MEMBER_1, UUID.randomUUID().toString());
-        assertThat(request.validate().isEmpty(), is(true));
+        assertTrue(request.validate().isEmpty());
 
         service.perform(request);
     }
@@ -397,22 +399,22 @@ public final class DataServiceTest extends DatabaseSetup {
         final ProcessDataRequest request = prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "folder1", 0);
         request.setTypeName("folder");
         final ProcessDataResponse addResponse = service.perform(request);
-        assertThat(addResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+        assertEquals(ReturnCode.SUCCESS.getCode(), addResponse.getReturnCode());
         assertThat(addResponse.getReturnMessage(), is("Ok"));
-        assertThat(addResponse.getDataId(), is(not(nullValue())));
+        assertNotNull(addResponse.getDataId());
 
         final ProcessDataRequest updateRequest = prepareUpdateRequest(MEMBER_1, addResponse.getDataId());
         updateRequest.setDataName("updated Folder Name");
         final ProcessDataResponse updateResponse = service.perform(updateRequest);
-        assertThat(updateResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+        assertEquals(ReturnCode.SUCCESS.getCode(), updateResponse.getReturnCode());
         assertThat(updateResponse.getReturnMessage(), is("Ok"));
         assertThat(updateResponse.getDataId(), is(addResponse.getDataId()));
 
         final ProcessDataRequest deleteRequest = prepareDeleteRequest(MEMBER_1, addResponse.getDataId());
         final ProcessDataResponse deleteResponse = service.perform(deleteRequest);
-        assertThat(deleteResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+        assertEquals(ReturnCode.SUCCESS.getCode(), deleteResponse.getReturnCode());
         assertThat(deleteResponse.getReturnMessage(), is("Ok"));
-        assertThat(deleteResponse.getDataId(), is(nullValue()));
+        assertNull(deleteResponse.getDataId());
     }
 
     @Test
@@ -425,10 +427,10 @@ public final class DataServiceTest extends DatabaseSetup {
         final ProcessDataResponse response1 = service.perform(request);
         assertThat(response1.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
         assertThat(response1.getReturnMessage(), is("Ok"));
-        assertThat(response1.getDataId(), is(not(nullValue())));
+        assertNotNull(response1.getDataId());
 
         request.setCredential(crypto.stringToBytes(MEMBER_1));
-        assertThat(request.validate().isEmpty(), is(true));
+        assertTrue(request.validate().isEmpty());
 
         service.perform(request);
     }
@@ -440,13 +442,13 @@ public final class DataServiceTest extends DatabaseSetup {
         final ProcessDataResponse copyAddResponse = copyDataService.perform(copyAddRequest);
         assertThat(copyAddResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
         assertThat(copyAddResponse.getReturnMessage(), is("Ok"));
-        assertThat(copyAddResponse.getDataId(), is(not(nullValue())));
+        assertNotNull(copyAddResponse.getDataId());
 
         final ProcessDataRequest copyRequest = prepareCopyDataRequest(MEMBER_1, copyAddResponse.getDataId(), CIRCLE_2_ID, null);
         final ProcessDataResponse copyResponse = copyDataService.perform(copyRequest);
         assertThat(copyResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
         assertThat(copyResponse.getReturnMessage(), is("Ok"));
-        assertThat(copyResponse.getDataId(), is(not(nullValue())));
+        assertNotNull(copyResponse.getDataId());
         assertThat(copyResponse.getDataId(), is(not(copyAddResponse.getDataId())));
 
         final FetchDataService copyFetchService = new FetchDataService(settings, entityManager);
@@ -479,13 +481,13 @@ public final class DataServiceTest extends DatabaseSetup {
         final ProcessDataResponse moveAddResponse = moveDataService.perform(moveAddRequest);
         assertThat(moveAddResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
         assertThat(moveAddResponse.getReturnMessage(), is("Ok"));
-        assertThat(moveAddResponse.getDataId(), is(not(nullValue())));
+        assertNotNull(moveAddResponse.getDataId());
 
         final ProcessDataRequest moveRequest = prepareMoveDataRequest(MEMBER_1, moveAddResponse.getDataId(), CIRCLE_2_ID, null);
         final ProcessDataResponse moveResponse = moveDataService.perform(moveRequest);
         assertThat(moveResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
         assertThat(moveResponse.getReturnMessage(), is("Ok"));
-        assertThat(moveResponse.getDataId(), is(not(nullValue())));
+        assertNotNull(moveResponse.getDataId());
         assertThat(moveResponse.getDataId(), is(not(moveAddResponse.getDataId())));
 
         final FetchDataService moveFetchService = new FetchDataService(settings, entityManager);
@@ -505,9 +507,9 @@ public final class DataServiceTest extends DatabaseSetup {
         final ProcessDataRequest addRequest = prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "folderToCopy", 0);
         addRequest.setTypeName(Constants.FOLDER_TYPENAME);
         final ProcessDataResponse addResponse = dataService.perform(addRequest);
-        assertThat(addResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+        assertEquals(ReturnCode.SUCCESS.getCode(), addResponse.getReturnCode());
         assertThat(addResponse.getReturnMessage(), is("Ok"));
-        assertThat(addResponse.getDataId(), is(not(nullValue())));
+        assertNotNull(addResponse.getDataId());
 
         final ProcessDataRequest copyRequest = prepareCopyDataRequest(MEMBER_1, addResponse.getDataId(), CIRCLE_2_ID, null);
         dataService.perform(copyRequest);
@@ -520,13 +522,13 @@ public final class DataServiceTest extends DatabaseSetup {
         final ProcessDataResponse emptyAddResponse = dataService.perform(emptyAddRequest);
         assertThat(emptyAddResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
         assertThat(emptyAddResponse.getReturnMessage(), is("Ok"));
-        assertThat(emptyAddResponse.getDataId(), is(not(nullValue())));
+        assertNotNull(emptyAddResponse.getDataId());
 
         final ProcessDataRequest emptyCopyRequest = prepareCopyDataRequest(MEMBER_1, emptyAddResponse.getDataId(), CIRCLE_2_ID, null);
         final ProcessDataResponse emptyCopyResponse = dataService.perform(emptyCopyRequest);
         assertThat(emptyCopyResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
         assertThat(emptyCopyResponse.getReturnMessage(), is("Ok"));
-        assertThat(emptyCopyResponse.getDataId(), is(not(nullValue())));
+        assertNotNull(emptyCopyResponse.getDataId());
         assertThat(emptyCopyResponse.getDataId(), is(not(emptyAddResponse.getDataId())));
 
         final FetchDataService emptyFetchService = new FetchDataService(settings, entityManager);
@@ -570,9 +572,9 @@ public final class DataServiceTest extends DatabaseSetup {
         final ProcessDataService dataService = new ProcessDataService(settings, entityManager);
         final ProcessDataRequest addRequest = prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "toCopy", 524288);
         final ProcessDataResponse addResponse = dataService.perform(addRequest);
-        assertThat(addResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+        assertEquals(ReturnCode.SUCCESS.getCode(), addResponse.getReturnCode());
         assertThat(addResponse.getReturnMessage(), is("Ok"));
-        assertThat(addResponse.getDataId(), is(not(nullValue())));
+        assertNotNull(addResponse.getDataId());
 
         final ProcessDataRequest copyRequest = prepareCopyDataRequest(MEMBER_1, addResponse.getDataId(), CIRCLE_2_ID, folderId);
         dataService.perform(copyRequest);
@@ -597,9 +599,9 @@ public final class DataServiceTest extends DatabaseSetup {
         final ProcessDataService dataService = new ProcessDataService(settings, entityManager);
         final ProcessDataRequest addRequest = prepareAddDataRequest(MEMBER_3, CIRCLE_3_ID, "emptyData", 512);
         final ProcessDataResponse addResponse = dataService.perform(addRequest);
-        assertThat(addResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+        assertEquals(ReturnCode.SUCCESS.getCode(), addResponse.getReturnCode());
         assertThat(addResponse.getReturnMessage(), is("Ok"));
-        assertThat(addResponse.getDataId(), is(not(nullValue())));
+        assertNotNull(addResponse.getDataId());
 
         final ProcessDataRequest copyRequest = prepareCopyDataRequest(MEMBER_3, addResponse.getDataId(), CIRCLE_1_ID, null);
         dataService.perform(copyRequest);
@@ -615,7 +617,7 @@ public final class DataServiceTest extends DatabaseSetup {
         final ProcessDataResponse addFolderResponse = dataService.perform(addFolderRequest);
         assertThat(addFolderResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
         assertThat(addFolderResponse.getReturnMessage(), is("Ok"));
-        assertThat(addFolderResponse.getDataId(), is(not(nullValue())));
+        assertNotNull(addFolderResponse.getDataId());
 
         final ProcessDataRequest addDataRequest = prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "More Data", 524288);
         addDataRequest.setFolderId(addFolderResponse.getDataId());
@@ -624,7 +626,7 @@ public final class DataServiceTest extends DatabaseSetup {
         assertThat(addDataResponse.getReturnMessage(), is("Ok"));
 
         final ProcessDataRequest deleteFolderRequest = prepareDeleteRequest(MEMBER_1, addFolderResponse.getDataId());
-        assertThat(deleteFolderRequest.validate().isEmpty(), is(true));
+        assertTrue(deleteFolderRequest.validate().isEmpty());
 
         dataService.perform(deleteFolderRequest);
     }
@@ -639,7 +641,7 @@ public final class DataServiceTest extends DatabaseSetup {
         final ProcessDataResponse addFolderResponse1 = service.perform(addFolderRequest);
         assertThat(addFolderResponse1.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
         assertThat(addFolderResponse1.getReturnMessage(), is("Ok"));
-        assertThat(addFolderResponse1.getDataId(), is(not(nullValue())));
+        assertNotNull(addFolderResponse1.getDataId());
         final String folderId1 = addFolderResponse1.getDataId();
 
         addFolderRequest.setCredential(crypto.stringToBytes(MEMBER_1));
@@ -647,7 +649,7 @@ public final class DataServiceTest extends DatabaseSetup {
         final ProcessDataResponse addFolderResponse2 = service.perform(addFolderRequest);
         assertThat(addFolderResponse2.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
         assertThat(addFolderResponse2.getReturnMessage(), is("Ok"));
-        assertThat(addFolderResponse2.getDataId(), is(not(nullValue())));
+        assertNotNull(addFolderResponse2.getDataId());
         final String folderId2 = addFolderResponse2.getDataId();
 
         final ProcessDataRequest moveFolderRequest = prepareUpdateRequest(MEMBER_1, folderId2);
@@ -663,13 +665,13 @@ public final class DataServiceTest extends DatabaseSetup {
         final ProcessDataResponse createFolderResponse = service.perform(createFolderRequest);
         assertThat(createFolderResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
         assertThat(createFolderResponse.getReturnMessage(), is("Ok"));
-        assertThat(createFolderResponse.getDataId(), is(not(nullValue())));
+        assertNotNull(createFolderResponse.getDataId());
 
         final ProcessDataRequest addDataRequest = prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "my data", 512);
         final ProcessDataResponse addDataResponse = service.perform(addDataRequest);
         assertThat(addDataResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
         assertThat(addDataResponse.getReturnMessage(), is("Ok"));
-        assertThat(addDataResponse.getDataId(), is(not(nullValue())));
+        assertNotNull(addDataResponse.getDataId());
 
         final ProcessDataRequest moveDataRequest = prepareUpdateRequest(MEMBER_1, addDataResponse.getDataId());
         moveDataRequest.setFolderId(createFolderResponse.getDataId());
@@ -689,39 +691,39 @@ public final class DataServiceTest extends DatabaseSetup {
         final ProcessDataRequest folderRequest1 = prepareAddDataRequest(MEMBER_4, CIRCLE_3_ID, "First Folder", 0);
         folderRequest1.setTypeName(Constants.FOLDER_TYPENAME);
         final ProcessDataResponse folderResponse1 = service.perform(folderRequest1);
-        assertThat(folderResponse1.isOk(), is(true));
+        assertTrue(folderResponse1.isOk());
         final ProcessDataRequest folderRequest2 = prepareAddDataRequest(MEMBER_4, CIRCLE_3_ID, "Second Folder", 0);
         folderRequest2.setTypeName(Constants.FOLDER_TYPENAME);
         final ProcessDataResponse folderResponse2 = service.perform(folderRequest2);
-        assertThat(folderResponse2.isOk(), is(true));
+        assertTrue(folderResponse2.isOk());
 
         // Step 2, Create 1 data record for each folder, with the same name
         final ProcessDataRequest dataRequest1 = prepareAddDataRequest(MEMBER_4, CIRCLE_3_ID, "The Data", 524288);
         dataRequest1.setFolderId(folderResponse1.getDataId());
         final ProcessDataResponse dataResponse1 = service.perform(dataRequest1);
-        assertThat(dataResponse1.isOk(), is(true));
+        assertTrue(dataResponse1.isOk());
         final ProcessDataRequest dataRequest2 = prepareAddDataRequest(MEMBER_4, CIRCLE_3_ID, "The Data", 524288);
         dataRequest2.setFolderId(folderResponse2.getDataId());
         final ProcessDataResponse dataResponse2 = service.perform(dataRequest2);
-        assertThat(dataResponse2.isOk(), is(true));
+        assertTrue(dataResponse2.isOk());
 
         // Step 3, Verify that we have the correct data structure.
         final FetchDataRequest readRootRequest = prepareReadRequest(MEMBER_4, CIRCLE_3_ID, null);
         final FetchDataResponse readRootResponse = readSearvice.perform(readRootRequest);
-        assertThat(readRootResponse.isOk(), is(true));
+        assertTrue(readRootResponse.isOk());
         assertThat(readRootResponse.getMetadata().size(), is(2));
         assertThat(readRootResponse.getMetadata().get(0).getDataId(), is(folderResponse2.getDataId()));
         assertThat(readRootResponse.getMetadata().get(1).getDataId(), is(folderResponse1.getDataId()));
 
         final FetchDataRequest readFolder1Request = prepareReadRequest(MEMBER_4, CIRCLE_3_ID, folderResponse1.getDataId());
         final FetchDataResponse readFolder1Response = readSearvice.perform(readFolder1Request);
-        assertThat(readFolder1Response.isOk(), is(true));
+        assertTrue(readFolder1Response.isOk());
         assertThat(readFolder1Response.getMetadata().size(), is(1));
         assertThat(readFolder1Response.getMetadata().get(0).getDataId(), is(dataResponse1.getDataId()));
 
         final FetchDataRequest readFolder2Request = prepareReadRequest(MEMBER_4, CIRCLE_3_ID, folderResponse2.getDataId());
         final FetchDataResponse readFolder2Response = readSearvice.perform(readFolder2Request);
-        assertThat(readFolder2Response.isOk(), is(true));
+        assertTrue(readFolder2Response.isOk());
         assertThat(readFolder2Response.getMetadata().size(), is(1));
         assertThat(readFolder2Response.getMetadata().get(0).getDataId(), is(dataResponse2.getDataId()));
 
@@ -742,13 +744,13 @@ public final class DataServiceTest extends DatabaseSetup {
         final ProcessDataResponse addFolderResponse = service.perform(addFolderRequest);
         assertThat(addFolderResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
         assertThat(addFolderResponse.getReturnMessage(), is("Ok"));
-        assertThat(addFolderResponse.getDataId(), is(not(nullValue())));
+        assertNotNull(addFolderResponse.getDataId());
 
         final ProcessDataRequest addDataRequest = prepareAddDataRequest(MEMBER_1, CIRCLE_2_ID, "my data", 512);
         final ProcessDataResponse addDataResponse = service.perform(addDataRequest);
         assertThat(addDataResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
         assertThat(addDataResponse.getReturnMessage(), is("Ok"));
-        assertThat(addDataResponse.getDataId(), is(not(nullValue())));
+        assertNotNull(addDataResponse.getDataId());
 
         final ProcessDataRequest moveDataRequest = prepareUpdateRequest(MEMBER_1, addDataResponse.getDataId());
         moveDataRequest.setFolderId(addFolderResponse.getDataId());

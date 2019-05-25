@@ -17,9 +17,11 @@
 package io.javadog.cws.client;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.CoreMatchers.nullValue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 import io.javadog.cws.api.Management;
 import io.javadog.cws.api.Share;
@@ -70,8 +72,8 @@ public abstract class AbstractClientTestCase {
     @Test
     public void testVersion() {
         final VersionResponse response = getManagement().version();
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getHttpCode()));
-        assertThat(response.getReturnMessage(), is("Ok"));
+        assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getReturnCode());
+        assertEquals("Ok", response.getReturnMessage());
         assertThat(response.getVersion(), is("1.1-SNAPSHOT"));
     }
 
@@ -80,8 +82,8 @@ public abstract class AbstractClientTestCase {
         final SettingRequest request = Base.prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
 
         final SettingResponse response = getManagement().settings(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getHttpCode()));
-        assertThat(response.getReturnMessage(), is("Ok"));
+        assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getReturnCode());
+        assertEquals("Ok", response.getReturnMessage());
     }
 
     @Test
@@ -90,7 +92,7 @@ public abstract class AbstractClientTestCase {
         request.setSecret(request.getCredential());
 
         final MasterKeyResponse response = getManagement().masterKey(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getHttpCode()));
+        assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getReturnCode());
         assertThat(response.getReturnMessage(), is("MasterKey unlocked."));
     }
 
@@ -99,8 +101,8 @@ public abstract class AbstractClientTestCase {
         final SanityRequest request = Base.prepareRequest(SanityRequest.class, Constants.ADMIN_ACCOUNT);
 
         final SanityResponse response = getManagement().sanitized(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getHttpCode()));
-        assertThat(response.getReturnMessage(), is("Ok"));
+        assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getReturnCode());
+        assertEquals("Ok", response.getReturnMessage());
     }
 
     @Test
@@ -108,8 +110,8 @@ public abstract class AbstractClientTestCase {
         final FetchMemberRequest request = Base.prepareRequest(FetchMemberRequest.class, Constants.ADMIN_ACCOUNT);
 
         final FetchMemberResponse response = getManagement().fetchMembers(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
-        assertThat(response.getReturnMessage(), is("Ok"));
+        assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
+        assertEquals("Ok", response.getReturnMessage());
     }
 
     @Test
@@ -122,8 +124,8 @@ public abstract class AbstractClientTestCase {
         request.setNewCredential(accountName.getBytes(StandardCharsets.UTF_8));
 
         final ProcessMemberResponse response = getManagement().processMember(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
-        assertThat(response.getReturnMessage(), is("Ok"));
+        assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
+        assertEquals("Ok", response.getReturnMessage());
     }
 
     @Test
@@ -131,8 +133,8 @@ public abstract class AbstractClientTestCase {
         final FetchCircleRequest request = Base.prepareRequest(FetchCircleRequest.class, Constants.ADMIN_ACCOUNT);
 
         final FetchCircleResponse response = getManagement().fetchCircles(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
-        assertThat(response.getReturnMessage(), is("Ok"));
+        assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
+        assertEquals("Ok", response.getReturnMessage());
     }
 
     @Test
@@ -144,7 +146,7 @@ public abstract class AbstractClientTestCase {
         memberRequest.setNewAccountName(accountName);
         memberRequest.setNewCredential(accountName.getBytes(StandardCharsets.UTF_8));
         final ProcessMemberResponse memberResponse = getManagement().processMember(memberRequest);
-        assertThat(memberResponse.isOk(), is(true));
+        assertTrue(memberResponse.isOk());
 
         final ProcessCircleRequest request = Base.prepareRequest(ProcessCircleRequest.class, Constants.ADMIN_ACCOUNT);
         request.setAction(Action.CREATE);
@@ -153,8 +155,8 @@ public abstract class AbstractClientTestCase {
         request.setCircleName(UUID.randomUUID().toString());
 
         final ProcessCircleResponse response = getManagement().processCircle(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
-        assertThat(response.getReturnMessage(), is("Ok"));
+        assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
+        assertEquals("Ok", response.getReturnMessage());
     }
 
     @Test
@@ -164,15 +166,15 @@ public abstract class AbstractClientTestCase {
         processRequest.setType("Object Mapping Rules");
         processRequest.setAction(Action.PROCESS);
         final ProcessDataTypeResponse processResponse = getShare().processDataType(processRequest);
-        assertThat(processResponse.isOk(), is(true));
+        assertTrue(processResponse.isOk());
         assertThat(processResponse.getDataType().getTypeName(), is(processRequest.getTypeName()));
 
         final FetchDataTypeRequest fetchRequest = Base.prepareRequest(FetchDataTypeRequest.class, Constants.ADMIN_ACCOUNT);
         final FetchDataTypeResponse fetchResponse = getShare().fetchDataTypes(fetchRequest);
-        assertThat(fetchResponse.isOk(), is(true));
+        assertTrue(fetchResponse.isOk());
         // If the tests is running against a system with more DataTypes added,
         // this test will fail if hardcoded to 3, hence it expects at least 3.
-        assertThat(fetchResponse.getDataTypes().size() >= 3, is(true));
+        assertTrue(fetchResponse.getDataTypes().size() >= 3);
     }
 
     @Test
@@ -209,14 +211,14 @@ public abstract class AbstractClientTestCase {
         final byte[] document = UUID.randomUUID().toString().getBytes(StandardCharsets.UTF_8);
         signRequest.setData(document);
         final SignResponse signResponse = getShare().sign(signRequest);
-        assertThat(signResponse.isOk(), is(true));
-        assertThat(signResponse.getSignature(), is(not(nullValue())));
+        assertTrue(signResponse.isOk());
+        assertNotNull(signResponse.getSignature());
 
         // 2. Fetch Signatures, to see that we have at least one
         final FetchSignatureRequest fetchRequest = Base.prepareRequest(FetchSignatureRequest.class, Constants.ADMIN_ACCOUNT);
         final FetchSignatureResponse fetchResponse = getShare().fetchSignatures(fetchRequest);
-        assertThat(fetchResponse.isOk(), is(true));
-        assertThat(fetchResponse.getSignatures().isEmpty(), is(false));
+        assertTrue(fetchResponse.isOk());
+        assertFalse(fetchResponse.getSignatures().isEmpty());
 
         // 3. Verify the Document, using the created Signature
         final VerifyRequest verifyRequest = Base.prepareRequest(VerifyRequest.class, Constants.ADMIN_ACCOUNT);
@@ -224,7 +226,7 @@ public abstract class AbstractClientTestCase {
         verifyRequest.setSignature(signResponse.getSignature());
 
         final VerifyResponse verifyResponse = getShare().verify(verifyRequest);
-        assertThat(verifyResponse.isOk(), is(true));
-        assertThat(verifyResponse.isVerified(), is(true));
+        assertTrue(verifyResponse.isOk());
+        assertTrue(verifyResponse.isVerified());
     }
 }

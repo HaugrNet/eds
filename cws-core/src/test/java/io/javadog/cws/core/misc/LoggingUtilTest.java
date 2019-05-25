@@ -17,9 +17,8 @@
 package io.javadog.cws.core.misc;
 
 import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 
 import io.javadog.cws.api.common.ReturnCode;
@@ -38,10 +37,10 @@ public final class LoggingUtilTest {
     @Test
     public void testLoggingUtilConstructor() throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
         final Constructor<LoggingUtil> constructor = LoggingUtil.class.getDeclaredConstructor();
-        assertThat(constructor.isAccessible(), is(false));
+        assertFalse(constructor.isAccessible());
         constructor.setAccessible(true);
         final LoggingUtil constants = constructor.newInstance();
-        assertThat(constants, is(not(nullValue())));
+        assertNotNull(constants);
     }
 
     @Test

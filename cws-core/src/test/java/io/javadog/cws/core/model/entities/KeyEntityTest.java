@@ -18,7 +18,8 @@ package io.javadog.cws.core.model.entities;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.CoreMatchers.nullValue;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 
 import io.javadog.cws.core.DatabaseSetup;
@@ -42,10 +43,10 @@ public final class KeyEntityTest extends DatabaseSetup {
         key.setExpires(new Date());
         key.setGracePeriod(3);
         persistAndDetach(key);
-        assertThat(key.getId(), is(not(nullValue())));
+        assertNotNull(key.getId());
 
         final KeyEntity found = find(KeyEntity.class, key.getId());
-        assertThat(found, is(not(nullValue())));
+        assertNotNull(found);
         assertThat(found.getAlgorithm(), is(key.getAlgorithm()));
         assertThat(found.getStatus(), is(key.getStatus()));
         assertThat(toString(found.getExpires()), is(toString(key.getExpires())));
@@ -69,7 +70,7 @@ public final class KeyEntityTest extends DatabaseSetup {
         persistAndDetach(key);
 
         final KeyEntity found = find(KeyEntity.class, key.getId());
-        assertThat(toString(found.getExpires()), is(nullValue()));
+        assertNull(toString(found.getExpires()));
     }
 
     @Test
@@ -82,6 +83,6 @@ public final class KeyEntityTest extends DatabaseSetup {
         persistAndDetach(key);
 
         final KeyEntity found = find(KeyEntity.class, key.getId());
-        assertThat(found.getGracePeriod(), is(nullValue()));
+        assertNull(found.getGracePeriod());
     }
 }

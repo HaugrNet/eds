@@ -17,9 +17,8 @@
 package io.javadog.cws.core.model.entities;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertNotNull;
 
 import io.javadog.cws.core.DatabaseSetup;
 import io.javadog.cws.core.enums.StandardSetting;
@@ -40,7 +39,7 @@ public final class SettingEntityTest extends DatabaseSetup {
         persist(entity);
 
         final SettingEntity found = find(SettingEntity.class, entity.getId());
-        assertThat(found, is(not(nullValue())));
+        assertNotNull(found);
         assertThat(found.getName(), is("My.New.Setting"));
         assertThat(found.getSetting(), is("The Setting Value"));
 
@@ -49,19 +48,19 @@ public final class SettingEntityTest extends DatabaseSetup {
         persist(found);
 
         final SettingEntity updated = find(SettingEntity.class, entity.getId());
-        assertThat(updated, is(not(nullValue())));
+        assertNotNull(updated);
         assertThat(updated.getName(), is("My.Altered.Setting"));
         assertThat(updated.getSetting(), is("The Altered Setting"));
 
         final List<SettingEntity> mySettings = dao.findAllAscending(SettingEntity.class, "id");
-        assertThat(mySettings, is(not(nullValue())));
+        assertNotNull(mySettings);
         assertThat(mySettings.size(), is(StandardSetting.values().length + 1));
     }
 
     @Test
     public void testDaoFindSettings() {
         final List<SettingEntity> mySettings = dao.findAllAscending(SettingEntity.class, "id");
-        assertThat(mySettings, is(not(nullValue())));
+        assertNotNull(mySettings);
         assertThat(mySettings.size(), is(StandardSetting.values().length));
     }
 }

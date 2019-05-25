@@ -18,6 +18,7 @@ package io.javadog.cws.core.services;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
@@ -29,9 +30,8 @@ import io.javadog.cws.api.responses.ProcessDataResponse;
 import io.javadog.cws.api.responses.SanityResponse;
 import io.javadog.cws.core.DatabaseSetup;
 import io.javadog.cws.core.enums.SanityStatus;
-import org.junit.Test;
-
 import java.util.Date;
+import org.junit.Test;
 
 /**
  * @author Kim Jensen
@@ -45,7 +45,7 @@ public final class SanityServiceTest extends DatabaseSetup {
         final SanityRequest request = prepareRequest(SanityRequest.class, Constants.ADMIN_ACCOUNT);
         final SanityService service = new SanityService(settings, entityManager);
         final SanityResponse response = service.perform(request);
-        assertThat(response.isOk(), is(true));
+        assertTrue(response.isOk());
         assertThat(response.getSanities().size(), is(6));
     }
 
@@ -57,7 +57,7 @@ public final class SanityServiceTest extends DatabaseSetup {
         request.setSince(new Date(10000L));
         final SanityService service = new SanityService(settings, entityManager);
         final SanityResponse response = service.perform(request);
-        assertThat(response.isOk(), is(true));
+        assertTrue(response.isOk());
         assertThat(response.getSanities().size(), is(1));
     }
 
@@ -67,7 +67,7 @@ public final class SanityServiceTest extends DatabaseSetup {
         final SanityRequest request = prepareRequest(SanityRequest.class, MEMBER_1);
         final SanityService service = new SanityService(settings, entityManager);
         final SanityResponse response = service.perform(request);
-        assertThat(response.isOk(), is(true));
+        assertTrue(response.isOk());
         assertThat(response.getSanities().size(), is(4));
     }
 
@@ -78,8 +78,8 @@ public final class SanityServiceTest extends DatabaseSetup {
         request.setCircleId(CIRCLE_3_ID);
         final SanityService service = new SanityService(settings, entityManager);
         final SanityResponse response = service.perform(request);
-        assertThat(response.isOk(), is(true));
-        assertThat(response.getSanities().isEmpty(), is(true));
+        assertTrue(response.isOk());
+        assertTrue(response.getSanities().isEmpty());
     }
 
     @Test
@@ -88,7 +88,7 @@ public final class SanityServiceTest extends DatabaseSetup {
 
         final SanityService service = new SanityService(settings, entityManager);
         final SanityRequest request = prepareRequest(SanityRequest.class, MEMBER_5);
-        assertThat(request.validate().isEmpty(), is(true));
+        assertTrue(request.validate().isEmpty());
 
         service.perform(request);
     }
@@ -99,7 +99,7 @@ public final class SanityServiceTest extends DatabaseSetup {
         final ProcessDataRequest dataRequest = prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "The Data", 524288);
 
         final ProcessDataResponse response = dataService.perform(dataRequest);
-        assertThat(response.isOk(), is(true));
+        assertTrue(response.isOk());
         falsifyChecksum(response, new Date(), SanityStatus.FAILED);
 
         // Now to the actual test - reading the data with invalid checksum
@@ -113,7 +113,7 @@ public final class SanityServiceTest extends DatabaseSetup {
         final SanityRequest sanityRequest = prepareRequest(SanityRequest.class, Constants.ADMIN_ACCOUNT);
         final SanityService sanityService = new SanityService(settings, entityManager);
         final SanityResponse sanityResponse = sanityService.perform(sanityRequest);
-        assertThat(sanityResponse.isOk(), is(true));
+        assertTrue(sanityResponse.isOk());
         assertThat(sanityResponse.getSanities().size(), is(1));
         assertThat(sanityResponse.getSanities().get(0).getDataId(), is(response.getDataId()));
     }

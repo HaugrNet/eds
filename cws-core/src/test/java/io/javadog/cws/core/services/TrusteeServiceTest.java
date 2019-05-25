@@ -17,9 +17,12 @@
 package io.javadog.cws.core.services;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.CoreMatchers.nullValue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 import io.javadog.cws.api.common.Action;
 import io.javadog.cws.api.common.Constants;
@@ -34,9 +37,8 @@ import io.javadog.cws.api.responses.ProcessCircleResponse;
 import io.javadog.cws.api.responses.ProcessTrusteeResponse;
 import io.javadog.cws.core.DatabaseSetup;
 import io.javadog.cws.core.enums.StandardSetting;
-import org.junit.Test;
-
 import java.util.UUID;
+import org.junit.Test;
 
 /**
  * <p>Common test class for the Process & Fetch Trustee Services.</p>
@@ -54,7 +56,7 @@ public final class TrusteeServiceTest extends DatabaseSetup {
         final FetchTrusteeService service = new FetchTrusteeService(settings, entityManager);
         final FetchTrusteeRequest request = new FetchTrusteeRequest();
         // Just making sure that the account is missing
-        assertThat(request.getAccountName(), is(nullValue()));
+        assertNull(request.getAccountName());
 
         // Should throw a VerificationException, as the request is invalid.
         service.perform(request);
@@ -69,7 +71,7 @@ public final class TrusteeServiceTest extends DatabaseSetup {
         final ProcessTrusteeService service = new ProcessTrusteeService(settings, entityManager);
         final ProcessTrusteeRequest request = new ProcessTrusteeRequest();
         // Just making sure that the account is missing
-        assertThat(request.getAccountName(), is(nullValue()));
+        assertNull(request.getAccountName());
 
         // Should throw a VerificationException, as the request is invalid.
         service.perform(request);
@@ -82,7 +84,7 @@ public final class TrusteeServiceTest extends DatabaseSetup {
         final FetchTrusteeService service = new FetchTrusteeService(settings, entityManager);
         final FetchTrusteeRequest request = prepareRequest(FetchTrusteeRequest.class, Constants.ADMIN_ACCOUNT);
         request.setCircleId(UUID.randomUUID().toString());
-        assertThat(request.validate().isEmpty(), is(true));
+        assertTrue(request.validate().isEmpty());
 
         service.perform(request);
     }
@@ -97,7 +99,7 @@ public final class TrusteeServiceTest extends DatabaseSetup {
         request.setCircleId(CIRCLE_1_ID);
         final FetchTrusteeResponse response = service.perform(request);
 
-        assertThat(response.isOk(), is(true));
+        assertTrue(response.isOk());
         detailedTrusteeAssertion(response, MEMBER_1_ID, MEMBER_2_ID, MEMBER_3_ID);
     }
 
@@ -110,7 +112,7 @@ public final class TrusteeServiceTest extends DatabaseSetup {
         final FetchTrusteeRequest request = prepareRequest(FetchTrusteeRequest.class, Constants.ADMIN_ACCOUNT);
         request.setCircleId(CIRCLE_1_ID);
         final FetchTrusteeResponse response = service.perform(request);
-        assertThat(response.isOk(), is(true));
+        assertTrue(response.isOk());
         detailedTrusteeAssertion(response, MEMBER_1_ID, MEMBER_2_ID, MEMBER_3_ID);
     }
 
@@ -124,7 +126,7 @@ public final class TrusteeServiceTest extends DatabaseSetup {
         request.setCircleId(CIRCLE_1_ID);
         final FetchTrusteeResponse response = service.perform(request);
 
-        assertThat(response.isOk(), is(true));
+        assertTrue(response.isOk());
         detailedTrusteeAssertion(response, MEMBER_1_ID, MEMBER_2_ID, MEMBER_3_ID);
     }
 
@@ -138,9 +140,9 @@ public final class TrusteeServiceTest extends DatabaseSetup {
         request.setCircleId(CIRCLE_1_ID);
         final FetchTrusteeResponse response = service.perform(request);
 
-        assertThat(response, is(not(nullValue())));
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
-        assertThat(response.getReturnMessage(), is("Ok"));
+        assertNotNull(response);
+        assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
+        assertEquals("Ok", response.getReturnMessage());
         assertThat(response.getTrustees().size(), is(3));
 
         // Check the member records
@@ -148,19 +150,19 @@ public final class TrusteeServiceTest extends DatabaseSetup {
         assertThat(trustee1.getCircleId(), is(CIRCLE_1_ID));
         assertThat(trustee1.getMemberId(), is(MEMBER_1_ID));
         assertThat(trustee1.getTrustLevel(), is(TrustLevel.ADMIN));
-        assertThat(trustee1.getChanged().before(trustee1.getAdded()), is(false));
+        assertFalse(trustee1.getChanged().before(trustee1.getAdded()));
 
         final Trustee trustee2 = response.getTrustees().get(1);
         assertThat(trustee2.getCircleId(), is(CIRCLE_1_ID));
         assertThat(trustee2.getMemberId(), is(MEMBER_2_ID));
         assertThat(trustee2.getTrustLevel(), is(TrustLevel.WRITE));
-        assertThat(trustee2.getChanged().before(trustee2.getAdded()), is(false));
+        assertFalse(trustee2.getChanged().before(trustee2.getAdded()));
 
         final Trustee trustee3 = response.getTrustees().get(2);
         assertThat(trustee3.getCircleId(), is(CIRCLE_1_ID));
         assertThat(trustee3.getMemberId(), is(MEMBER_3_ID));
         assertThat(trustee3.getTrustLevel(), is(TrustLevel.READ));
-        assertThat(trustee3.getChanged().before(trustee3.getAdded()), is(false));
+        assertFalse(trustee3.getChanged().before(trustee3.getAdded()));
     }
 
     @Test
@@ -172,7 +174,7 @@ public final class TrusteeServiceTest extends DatabaseSetup {
 
         final FetchTrusteeService service = new FetchTrusteeService(settings, entityManager);
         final FetchTrusteeRequest request = prepareRequest(FetchTrusteeRequest.class, MEMBER_5);
-        assertThat(request, is(not(nullValue())));
+        assertNotNull(request);
         request.setCircleId(CIRCLE_1_ID);
         service.perform(request);
     }
@@ -186,7 +188,7 @@ public final class TrusteeServiceTest extends DatabaseSetup {
 
         final FetchTrusteeService service = new FetchTrusteeService(settings, entityManager);
         final FetchTrusteeRequest request = prepareRequest(FetchTrusteeRequest.class, MEMBER_5);
-        assertThat(request, is(not(nullValue())));
+        assertNotNull(request);
         request.setCircleId(CIRCLE_1_ID);
 
         service.perform(request);
@@ -202,7 +204,7 @@ public final class TrusteeServiceTest extends DatabaseSetup {
         final ProcessCircleResponse circleResponse = circleService.perform(circleRequest);
         assertThat(circleResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
         assertThat(circleResponse.getReturnMessage(), is("Ok"));
-        assertThat(circleResponse.getCircleId(), is(not(nullValue())));
+        assertNotNull(circleResponse.getCircleId());
         final String circleId = circleResponse.getCircleId();
 
         // Step 2, add a new trustee to the newly created circle
@@ -221,9 +223,9 @@ public final class TrusteeServiceTest extends DatabaseSetup {
         final FetchTrusteeRequest fetchRequest = prepareRequest(FetchTrusteeRequest.class, Constants.ADMIN_ACCOUNT);
         fetchRequest.setCircleId(circleId);
         final FetchTrusteeResponse fetchResponse = fetchService.perform(fetchRequest);
-        assertThat(fetchResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+        assertEquals(ReturnCode.SUCCESS.getCode(), fetchResponse.getReturnCode());
         assertThat(fetchResponse.getReturnMessage(), is("Ok"));
-        assertThat(fetchResponse.getTrustees(), is(not(nullValue())));
+        assertNotNull(fetchResponse.getTrustees());
         assertThat(fetchResponse.getTrustees().size(), is(2));
         assertThat(fetchResponse.getTrustees().get(0).getMemberId(), is(ADMIN_ID));
         assertThat(fetchResponse.getTrustees().get(0).getTrustLevel(), is(TrustLevel.ADMIN));
@@ -241,7 +243,7 @@ public final class TrusteeServiceTest extends DatabaseSetup {
         request.setCircleId(CIRCLE_1_ID);
         request.setMemberId(MEMBER_3_ID);
         request.setTrustLevel(TrustLevel.WRITE);
-        assertThat(request.validate().isEmpty(), is(true));
+        assertTrue(request.validate().isEmpty());
 
         service.perform(request);
     }
@@ -256,8 +258,8 @@ public final class TrusteeServiceTest extends DatabaseSetup {
         request.setTrustLevel(TrustLevel.WRITE);
 
         final ProcessTrusteeResponse response = service.perform(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
-        assertThat(response.getReturnMessage(), is("Ok"));
+        assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
+        assertEquals("Ok", response.getReturnMessage());
     }
 
     @Test
@@ -271,7 +273,7 @@ public final class TrusteeServiceTest extends DatabaseSetup {
         request.setCircleId(circleId);
         request.setMemberId(MEMBER_5_ID);
         request.setTrustLevel(TrustLevel.WRITE);
-        assertThat(request.validate().isEmpty(), is(true));
+        assertTrue(request.validate().isEmpty());
 
         service.perform(request);
     }
@@ -286,7 +288,7 @@ public final class TrusteeServiceTest extends DatabaseSetup {
         request.setCircleId(CIRCLE_1_ID);
         request.setMemberId(UUID.randomUUID().toString());
         request.setTrustLevel(TrustLevel.WRITE);
-        assertThat(request.validate().isEmpty(), is(true));
+        assertTrue(request.validate().isEmpty());
 
         service.perform(request);
     }
@@ -301,7 +303,7 @@ public final class TrusteeServiceTest extends DatabaseSetup {
         request.setCircleId(CIRCLE_1_ID);
         request.setMemberId(MEMBER_2_ID);
         request.setTrustLevel(TrustLevel.WRITE);
-        assertThat(request.validate().isEmpty(), is(true));
+        assertTrue(request.validate().isEmpty());
 
         service.perform(request);
     }
@@ -327,16 +329,16 @@ public final class TrusteeServiceTest extends DatabaseSetup {
         request.setTrustLevel(TrustLevel.READ);
 
         final ProcessTrusteeResponse response = service.perform(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
-        assertThat(response.getReturnMessage(), is("Ok"));
+        assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
+        assertEquals("Ok", response.getReturnMessage());
 
         final FetchTrusteeService fetchService = new FetchTrusteeService(settings, entityManager);
         final FetchTrusteeRequest fetchRequest = prepareRequest(FetchTrusteeRequest.class, Constants.ADMIN_ACCOUNT);
         fetchRequest.setCircleId(CIRCLE_1_ID);
         final FetchTrusteeResponse fetchResponse = fetchService.perform(fetchRequest);
-        assertThat(fetchResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+        assertEquals(ReturnCode.SUCCESS.getCode(), fetchResponse.getReturnCode());
         assertThat(fetchResponse.getReturnMessage(), is("Ok"));
-        assertThat(fetchResponse.getTrustees(), is(not(nullValue())));
+        assertNotNull(fetchResponse.getTrustees());
         assertThat(fetchResponse.getTrustees().size(), is(4));
         assertThat(fetchResponse.getTrustees().get(0).getMemberId(), is(ADMIN_ID));
 
@@ -357,7 +359,7 @@ public final class TrusteeServiceTest extends DatabaseSetup {
         request.setCircleId(CIRCLE_1_ID);
         request.setMemberId(MEMBER_2_ID);
         request.setTrustLevel(TrustLevel.ADMIN);
-        assertThat(request.validate().isEmpty(), is(true));
+        assertTrue(request.validate().isEmpty());
 
         service.perform(request);
     }
@@ -379,7 +381,7 @@ public final class TrusteeServiceTest extends DatabaseSetup {
         final FetchTrusteeRequest fetchRequest = prepareRequest(FetchTrusteeRequest.class, MEMBER_1);
         fetchRequest.setCircleId(CIRCLE_1_ID);
         final FetchTrusteeResponse fetchResponse = fetchService.perform(fetchRequest);
-        assertThat(fetchResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+        assertEquals(ReturnCode.SUCCESS.getCode(), fetchResponse.getReturnCode());
         assertThat(fetchResponse.getTrustees().get(2).getMemberId(), is(MEMBER_3_ID));
         assertThat(fetchResponse.getTrustees().get(2).getTrustLevel(), is(TrustLevel.READ));
     }
@@ -395,7 +397,7 @@ public final class TrusteeServiceTest extends DatabaseSetup {
         request.setCircleId(circleId);
         request.setMemberId(MEMBER_5_ID);
         request.setTrustLevel(TrustLevel.WRITE);
-        assertThat(request.validate().isEmpty(), is(true));
+        assertTrue(request.validate().isEmpty());
 
         service.perform(request);
     }
@@ -410,7 +412,7 @@ public final class TrusteeServiceTest extends DatabaseSetup {
         request.setCircleId(CIRCLE_1_ID);
         request.setMemberId(UUID.randomUUID().toString());
         request.setTrustLevel(TrustLevel.WRITE);
-        assertThat(request.validate().isEmpty(), is(true));
+        assertTrue(request.validate().isEmpty());
 
         service.perform(request);
     }
@@ -424,7 +426,7 @@ public final class TrusteeServiceTest extends DatabaseSetup {
         request.setAction(Action.REMOVE);
         request.setCircleId(CIRCLE_1_ID);
         request.setMemberId(MEMBER_2_ID);
-        assertThat(request.validate().isEmpty(), is(true));
+        assertTrue(request.validate().isEmpty());
 
         service.perform(request);
     }
@@ -438,14 +440,14 @@ public final class TrusteeServiceTest extends DatabaseSetup {
         request.setMemberId(MEMBER_2_ID);
 
         final ProcessTrusteeResponse response = service.perform(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
-        assertThat(response.getReturnMessage(), is("Ok"));
+        assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
+        assertEquals("Ok", response.getReturnMessage());
 
         final FetchTrusteeService fetchService = new FetchTrusteeService(settings, entityManager);
         final FetchTrusteeRequest fetchRequest = prepareRequest(FetchTrusteeRequest.class, MEMBER_1);
         fetchRequest.setCircleId(CIRCLE_1_ID);
         final FetchTrusteeResponse fetchResponse = fetchService.perform(fetchRequest);
-        assertThat(fetchResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+        assertEquals(ReturnCode.SUCCESS.getCode(), fetchResponse.getReturnCode());
         assertThat(fetchResponse.getTrustees().size(), is(2));
     }
 
@@ -459,7 +461,7 @@ public final class TrusteeServiceTest extends DatabaseSetup {
         request.setAction(Action.REMOVE);
         request.setCircleId(circleId);
         request.setMemberId(MEMBER_5_ID);
-        assertThat(request.validate().isEmpty(), is(true));
+        assertTrue(request.validate().isEmpty());
 
         service.perform(request);
     }
@@ -473,7 +475,7 @@ public final class TrusteeServiceTest extends DatabaseSetup {
         request.setAction(Action.REMOVE);
         request.setCircleId(CIRCLE_1_ID);
         request.setMemberId(UUID.randomUUID().toString());
-        assertThat(request.validate().isEmpty(), is(true));
+        assertTrue(request.validate().isEmpty());
 
         service.perform(request);
     }
@@ -483,8 +485,8 @@ public final class TrusteeServiceTest extends DatabaseSetup {
     // =========================================================================
 
     private static void detailedTrusteeAssertion(final FetchTrusteeResponse response, final String... memberIds) {
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
-        assertThat(response.getReturnMessage(), is("Ok"));
+        assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
+        assertEquals("Ok", response.getReturnMessage());
 
         if ((memberIds != null) && (memberIds.length > 0)) {
             assertThat(response.getTrustees().size(), is(memberIds.length));
@@ -492,7 +494,7 @@ public final class TrusteeServiceTest extends DatabaseSetup {
                 assertThat(response.getTrustees().get(i).getMemberId(), is(memberIds[i]));
             }
         } else {
-            assertThat(response.getTrustees().isEmpty(), is(true));
+            assertTrue(response.getTrustees().isEmpty());
         }
     }
 }

@@ -18,7 +18,9 @@ package io.javadog.cws.core.services;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
@@ -28,12 +30,11 @@ import io.javadog.cws.core.DatabaseSetup;
 import io.javadog.cws.core.enums.KeyAlgorithm;
 import io.javadog.cws.core.enums.StandardSetting;
 import io.javadog.cws.core.model.entities.MemberEntity;
-import org.junit.Test;
-
-import javax.persistence.Query;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.persistence.Query;
+import org.junit.Test;
 
 /**
  * <p>This Test Class, is testing the following Service Classes in one, as they
@@ -64,8 +65,8 @@ public final class SettingServiceTest extends DatabaseSetup {
         final SettingRequest request = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
 
         final SettingResponse response = service.perform(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
-        assertThat(response.getReturnMessage(), is("Ok"));
+        assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
+        assertEquals("Ok", response.getReturnMessage());
         assertThat(response.getSettings().size(), is(StandardSetting.values().length));
     }
 
@@ -86,8 +87,8 @@ public final class SettingServiceTest extends DatabaseSetup {
         final SettingRequest request = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
 
         final SettingResponse response = service.perform(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
-        assertThat(response.getReturnMessage(), is("Ok"));
+        assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
+        assertEquals("Ok", response.getReturnMessage());
         assertThat(response.getSettings().size(), is(StandardSetting.values().length));
     }
 
@@ -99,8 +100,8 @@ public final class SettingServiceTest extends DatabaseSetup {
         request.setSettings(mySettings);
 
         final SettingResponse response = service.perform(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
-        assertThat(response.getReturnMessage(), is("Ok"));
+        assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
+        assertEquals("Ok", response.getReturnMessage());
         assertThat(response.getSettings().size(), is(StandardSetting.values().length));
     }
 
@@ -112,7 +113,7 @@ public final class SettingServiceTest extends DatabaseSetup {
         final Map<String, String> mySettings = new HashMap<>();
         mySettings.put(null, "NullKey");
         request.setSettings(mySettings);
-        assertThat(request.validate().isEmpty(), is(true));
+        assertTrue(request.validate().isEmpty());
 
         service.perform(request);
     }
@@ -125,7 +126,7 @@ public final class SettingServiceTest extends DatabaseSetup {
         final Map<String, String> mySettings = new HashMap<>();
         mySettings.put("", "EmptyKey");
         request.setSettings(mySettings);
-        assertThat(request.validate().isEmpty(), is(true));
+        assertTrue(request.validate().isEmpty());
 
         service.perform(request);
     }
@@ -150,7 +151,7 @@ public final class SettingServiceTest extends DatabaseSetup {
         final SettingService service = new SettingService(newSettings(), entityManager);
         final SettingRequest request = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
         final SettingResponse response = service.perform(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+        assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
 
         final Map<String, String> mySettings = new HashMap<>(response.getSettings());
         mySettings.put(StandardSetting.CWS_SALT.getKey(), "new SALT");
@@ -164,7 +165,7 @@ public final class SettingServiceTest extends DatabaseSetup {
         // can still access the system, after the SALT was updated.
         final SettingRequest checkRequest = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
         final SettingResponse checkResponse = service.perform(checkRequest);
-        assertThat(checkResponse.isOk(), is(true));
+        assertTrue(checkResponse.isOk());
 
         // Finally the negative test, seeing what happens if an invalid PBE
         // iteration count is defined
@@ -182,8 +183,8 @@ public final class SettingServiceTest extends DatabaseSetup {
         // First invocation, retrieving the list of current values so we can
         // check that it is being updated
         final SettingResponse response = service.perform(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
-        assertThat(response.getReturnMessage(), is("Ok"));
+        assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
+        assertEquals("Ok", response.getReturnMessage());
         assertThat(response.getSettings().size(), is(StandardSetting.values().length));
         assertThat(response.getSettings().get(StandardSetting.CWS_CHARSET.getKey()), is("UTF-8"));
 
@@ -237,8 +238,8 @@ public final class SettingServiceTest extends DatabaseSetup {
         request.setSettings(mySettings);
 
         final SettingResponse response = service.perform(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
-        assertThat(response.getReturnMessage(), is("Ok"));
+        assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
+        assertEquals("Ok", response.getReturnMessage());
         assertThat(response.getSettings().size(), is(StandardSetting.values().length + 1));
         assertThat(response.getSettings().get("cws.test.setting"), is("Setting Value"));
     }
@@ -250,17 +251,17 @@ public final class SettingServiceTest extends DatabaseSetup {
         final Map<String, String> mySettings = new HashMap<>();
         mySettings.put("cws.test.setting", "Test Value");
         request.setSettings(mySettings);
-        assertThat(request.validate().isEmpty(), is(true));
+        assertTrue(request.validate().isEmpty());
 
         final SettingResponse response = service.perform(request);
-        assertThat(response.isOk(), is(true));
+        assertTrue(response.isOk());
         assertThat(response.getSettings().size(), is(StandardSetting.values().length + 1));
 
         mySettings.put("cws.test.setting", null);
         request.setCredential(crypto.stringToBytes(Constants.ADMIN_ACCOUNT));
         request.setSettings(mySettings);
         final SettingResponse deleteResponse = service.perform(request);
-        assertThat(deleteResponse.isOk(), is(true));
+        assertTrue(deleteResponse.isOk());
         assertThat(deleteResponse.getSettings().size(), is(StandardSetting.values().length));
     }
 
@@ -272,7 +273,7 @@ public final class SettingServiceTest extends DatabaseSetup {
         final Map<String, String> mySettings = new HashMap<>();
         mySettings.put(StandardSetting.CWS_CHARSET.getKey(), null);
         request.setSettings(mySettings);
-        assertThat(request.validate().isEmpty(), is(true));
+        assertTrue(request.validate().isEmpty());
 
         service.perform(request);
     }
@@ -282,7 +283,7 @@ public final class SettingServiceTest extends DatabaseSetup {
         final SettingService service = new SettingService(newSettings(), entityManager);
         final SettingRequest request1 = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
         final SettingResponse response1 = service.perform(request1);
-        assertThat(response1.isOk(), is(true));
+        assertTrue(response1.isOk());
 
         final Map<String, String> mySettings = response1.getSettings();
         mySettings.put(StandardSetting.SYMMETRIC_ALGORITHM.getKey(), KeyAlgorithm.AES_CBC_192.name());
@@ -294,7 +295,7 @@ public final class SettingServiceTest extends DatabaseSetup {
         final SettingRequest request2 = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
         request2.setSettings(mySettings);
         final SettingResponse response2 = service.perform(request2);
-        assertThat(response2.isOk(), is(true));
+        assertTrue(response2.isOk());
     }
 
     @Test
@@ -303,7 +304,7 @@ public final class SettingServiceTest extends DatabaseSetup {
         final SettingService service = new SettingService(newSettings(), entityManager);
         final SettingRequest request1 = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
         final SettingResponse response1 = service.perform(request1);
-        assertThat(response1.isOk(), is(true));
+        assertTrue(response1.isOk());
 
         final Map<String, String> mySettings = response1.getSettings();
         mySettings.put(StandardSetting.SYMMETRIC_ALGORITHM.getKey(), KeyAlgorithm.RSA_8192.name());
@@ -321,7 +322,7 @@ public final class SettingServiceTest extends DatabaseSetup {
         final Map<String, String> newSettings = new HashMap<>();
         newSettings.put(StandardSetting.CWS_CHARSET.getKey(), "UTF-9");
         request.setSettings(newSettings);
-        assertThat(request.validate().isEmpty(), is(true));
+        assertTrue(request.validate().isEmpty());
 
         service.perform(request);
     }
@@ -332,7 +333,7 @@ public final class SettingServiceTest extends DatabaseSetup {
         final SettingService service = new SettingService(newSettings(), entityManager);
         final SettingRequest request1 = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
         final SettingResponse response1 = service.perform(request1);
-        assertThat(response1.isOk(), is(true));
+        assertTrue(response1.isOk());
 
         final Map<String, String> mySettings = response1.getSettings();
         mySettings.put(StandardSetting.SANITY_INTERVAL.getKey(), "7");
@@ -341,13 +342,13 @@ public final class SettingServiceTest extends DatabaseSetup {
         final SettingRequest request2 = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
         request2.setSettings(mySettings);
         final SettingResponse response2 = service.perform(request2);
-        assertThat(response2.isOk(), is(true));
+        assertTrue(response2.isOk());
 
         mySettings.put(StandardSetting.SANITY_INTERVAL.getKey(), "weekly");
         final SettingRequest request3 = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
         request3.setSettings(mySettings);
         service.perform(request3);
-        assertThat(response1.isOk(), is(true));
+        assertTrue(response1.isOk());
     }
 
     @Test
@@ -358,7 +359,7 @@ public final class SettingServiceTest extends DatabaseSetup {
         final Map<String, String> newSettings = new HashMap<>();
         newSettings.put(StandardSetting.MASTERKEY_URL.getKey(), "https://cool.url/to/new/key");
         request.setSettings(newSettings);
-        assertThat(request.validate().isEmpty(), is(true));
+        assertTrue(request.validate().isEmpty());
 
         service.perform(request);
     }

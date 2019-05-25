@@ -17,9 +17,10 @@
 package io.javadog.cws.core.jce;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.CoreMatchers.nullValue;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.core.DatabaseSetup;
@@ -27,15 +28,14 @@ import io.javadog.cws.core.enums.KeyAlgorithm;
 import io.javadog.cws.core.enums.StandardSetting;
 import io.javadog.cws.core.exceptions.CryptoException;
 import io.javadog.cws.core.model.Settings;
-import org.junit.Test;
-
-import javax.crypto.KeyGenerator;
-import javax.crypto.SecretKey;
 import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.util.UUID;
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
+import org.junit.Test;
 
 /**
  * Testing the simple Cryptographic Operations.
@@ -96,7 +96,7 @@ public final class CryptoTest extends DatabaseSetup {
         final KeyAlgorithm algorithm = KeyAlgorithm.PBE_128;
         final String salt = UUID.randomUUID().toString();
         final SecretCWSKey key = crypto.generatePasswordKey(algorithm, secret, salt);
-        assertThat(key, is(not(nullValue())));
+        assertNotNull(key);
     }
 
     @Test
@@ -145,7 +145,7 @@ public final class CryptoTest extends DatabaseSetup {
         final byte[] signature = crypto.sign(keyPair.getPrivate().getKey(), message);
         final boolean verified = crypto.verify(keyPair.getPublic().getKey(), message, signature);
 
-        assertThat(verified, is(true));
+        assertTrue(verified);
     }
 
     /**
@@ -308,7 +308,7 @@ public final class CryptoTest extends DatabaseSetup {
     public void testMemberAccessCircleKey() {
         // Added this stupid assertion, as SonarQube failed to detect the
         // assertion at the end of the test.
-        assertThat(Boolean.parseBoolean("Is SonarQube rule squid:S2699 working correctly ?"), is(false));
+        assertFalse(Boolean.parseBoolean("Is SonarQube rule squid:S2699 working correctly ?"));
 
         final String dataSalt = UUID.randomUUID().toString();
         final SecretCWSKey key = crypto.generateSymmetricKey(settings.getSymmetricAlgorithm());
@@ -335,7 +335,7 @@ public final class CryptoTest extends DatabaseSetup {
         mySettings.set(StandardSetting.CWS_CHARSET.getKey(), garbage);
 
         prepareCause(ReturnCode.SETTING_ERROR, "java.nio.charset.UnsupportedCharsetException: " + garbage);
-        assertThat(str, is(not(nullValue())));
+        assertNotNull(str);
         myCrypto.stringToBytes(str);
     }
 
@@ -349,7 +349,7 @@ public final class CryptoTest extends DatabaseSetup {
         mySettings.set(StandardSetting.CWS_CHARSET.getKey(), garbage);
 
         prepareCause(ReturnCode.SETTING_ERROR, "UnsupportedCharsetException: " + garbage);
-        assertThat(bytes, is(not(nullValue())));
+        assertNotNull(bytes);
         final String reversed = myCrypto.bytesToString(bytes);
         assertThat(reversed, is(str));
     }
@@ -360,20 +360,20 @@ public final class CryptoTest extends DatabaseSetup {
         final PrivateCWSKey privateKey = keyPair.getPrivate();
         final SecretCWSKey secretKey = crypto.generateSymmetricKey(settings.getSymmetricAlgorithm());
 
-        assertThat(privateKey.isDestroyed(), is(false));
-        assertThat(secretKey.isDestroyed(), is(false));
+        assertFalse(privateKey.isDestroyed());
+        assertFalse(secretKey.isDestroyed());
 
         // First attempt at destroying should also update the flag
         privateKey.destroy();
         secretKey.destroy();
-        assertThat(privateKey.isDestroyed(), is(true));
-        assertThat(secretKey.isDestroyed(), is(true));
+        assertTrue(privateKey.isDestroyed());
+        assertTrue(secretKey.isDestroyed());
 
         // Second attempt at destroying should be ignored
         privateKey.destroy();
         secretKey.destroy();
-        assertThat(privateKey.isDestroyed(), is(true));
-        assertThat(secretKey.isDestroyed(), is(true));
+        assertTrue(privateKey.isDestroyed());
+        assertTrue(secretKey.isDestroyed());
     }
 
     @Test
@@ -384,7 +384,7 @@ public final class CryptoTest extends DatabaseSetup {
         final byte[] data = generateData(524288);
 
         final byte[] encrypted = crypto.encrypt(key, data);
-        assertThat(encrypted.length > 0, is(true));
+        assertTrue(encrypted.length > 0);
     }
 
     @Test
@@ -395,7 +395,7 @@ public final class CryptoTest extends DatabaseSetup {
         final byte[] data = generateData(524288);
 
         final byte[] decrypted = crypto.decrypt(key, data);
-        assertThat(decrypted.length > 0, is(true));
+        assertTrue(decrypted.length > 0);
     }
 
     @Test
@@ -412,7 +412,7 @@ public final class CryptoTest extends DatabaseSetup {
         final byte[] data = generateData(524288);
 
         final byte[] encrypted = crypto.encrypt(keyPair.getPublic(), data);
-        assertThat(encrypted.length > 0, is(true));
+        assertTrue(encrypted.length > 0);
     }
 
     @Test
@@ -429,7 +429,7 @@ public final class CryptoTest extends DatabaseSetup {
         final byte[] data = generateData(524288);
 
         final byte[] decrypted = crypto.decrypt(keyPair.getPrivate(), data);
-        assertThat(decrypted.length > 0, is(true));
+        assertTrue(decrypted.length > 0);
     }
 
     @Test
@@ -443,7 +443,7 @@ public final class CryptoTest extends DatabaseSetup {
 
         mySettings.set(StandardSetting.ASYMMETRIC_ALGORITHM.getKey(), KeyAlgorithm.AES_CBC_128.name());
         final PublicKey publicKey = myCrypto.dearmoringPublicKey(armoredPublicKey);
-        assertThat(publicKey, is(not(nullValue())));
+        assertNotNull(publicKey);
     }
 
     @Test
@@ -459,7 +459,7 @@ public final class CryptoTest extends DatabaseSetup {
         final String armoredPrivateKey = myCrypto.armoringPrivateKey(secretKey, keyPair.getPrivate().getKey());
         mySettings.set(StandardSetting.ASYMMETRIC_ALGORITHM.getKey(), KeyAlgorithm.AES_CBC_128.name());
         final PrivateKey privateKey = myCrypto.dearmoringPrivateKey(secretKey, armoredPrivateKey);
-        assertThat(privateKey, is(not(nullValue())));
+        assertNotNull(privateKey);
     }
 
     // =========================================================================

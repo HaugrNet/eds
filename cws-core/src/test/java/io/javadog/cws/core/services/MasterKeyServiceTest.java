@@ -18,8 +18,11 @@ package io.javadog.cws.core.services;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.CoreMatchers.nullValue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
@@ -30,9 +33,6 @@ import io.javadog.cws.core.enums.StandardSetting;
 import io.javadog.cws.core.jce.MasterKey;
 import io.javadog.cws.core.model.Settings;
 import io.javadog.cws.core.model.entities.MemberEntity;
-import org.junit.Test;
-
-import javax.persistence.Query;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -40,6 +40,8 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.UUID;
+import javax.persistence.Query;
+import org.junit.Test;
 
 /**
  * <p>This Test Class, is testing the following Service Classes in one, as they
@@ -60,7 +62,7 @@ public final class MasterKeyServiceTest extends DatabaseSetup {
 
         final MasterKeyService service = new MasterKeyService(settings, entityManager);
         final MasterKeyRequest request = null;
-        assertThat(service, is(not(nullValue())));
+        assertNotNull(service);
 
         service.perform(request);
     }
@@ -74,7 +76,7 @@ public final class MasterKeyServiceTest extends DatabaseSetup {
 
         final MasterKeyService service = new MasterKeyService(settings, entityManager);
         final MasterKeyRequest request = new MasterKeyRequest();
-        assertThat(request.validate().isEmpty(), is(false));
+        assertFalse(request.validate().isEmpty());
 
         service.perform(request);
     }
@@ -86,7 +88,7 @@ public final class MasterKeyServiceTest extends DatabaseSetup {
         final MasterKeyService service = new MasterKeyService(settings, entityManager);
         final MasterKeyRequest request = prepareRequest(MasterKeyRequest.class, MEMBER_1);
         request.setSecret("New MasterKey".getBytes(Charset.defaultCharset()));
-        assertThat(request.validate().isEmpty(), is(true));
+        assertTrue(request.validate().isEmpty());
 
         service.perform(request);
     }
@@ -99,7 +101,7 @@ public final class MasterKeyServiceTest extends DatabaseSetup {
         final MasterKeyRequest request = prepareRequest(MasterKeyRequest.class, Constants.ADMIN_ACCOUNT);
         request.setCredential("root".getBytes(Charset.defaultCharset()));
         request.setSecret("New MasterKey".getBytes(Charset.defaultCharset()));
-        assertThat(request.validate().isEmpty(), is(true));
+        assertTrue(request.validate().isEmpty());
 
         service.perform(request);
     }
@@ -116,7 +118,7 @@ public final class MasterKeyServiceTest extends DatabaseSetup {
         final MasterKeyRequest request = prepareRequest(MasterKeyRequest.class, Constants.ADMIN_ACCOUNT);
         request.setSecret(request.getCredential());
         final MasterKeyResponse response = service.perform(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+        assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
         assertThat(response.getReturnMessage(), is("MasterKey unlocked."));
     }
 
@@ -136,7 +138,7 @@ public final class MasterKeyServiceTest extends DatabaseSetup {
         request.setUrl(file);
 
         final MasterKeyResponse response = service.perform(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+        assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
         assertThat(response.getReturnMessage(), is("MasterKey updated."));
 
         revertMasterKeyToOriginal(service);
@@ -212,7 +214,7 @@ public final class MasterKeyServiceTest extends DatabaseSetup {
         final MasterKeyService service = new MasterKeyService(settings, entityManager);
         final MasterKeyRequest request = prepareRequest(MasterKeyRequest.class, Constants.ADMIN_ACCOUNT);
         request.setSecret("MasterKey".getBytes(Charset.defaultCharset()));
-        assertThat(request.validate().isEmpty(), is(true));
+        assertTrue(request.validate().isEmpty());
 
         service.perform(request);
     }
@@ -224,7 +226,7 @@ public final class MasterKeyServiceTest extends DatabaseSetup {
         request.setSecret(request.getCredential());
 
         final MasterKeyResponse response = service.perform(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+        assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
         assertThat(response.getReturnMessage(), is("MasterKey unlocked."));
     }
 
@@ -237,7 +239,7 @@ public final class MasterKeyServiceTest extends DatabaseSetup {
         final MasterKeyRequest request = prepareRequest(MasterKeyRequest.class, Constants.ADMIN_ACCOUNT);
         request.setUrl("file://" + path);
 
-        assertThat(request.validate().isEmpty(), is(true));
+        assertTrue(request.validate().isEmpty());
         service.perform(request);
     }
 

@@ -16,10 +16,8 @@
  */
 package io.javadog.cws.core.services;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
@@ -51,7 +49,7 @@ public final class ServiceableTest extends DatabaseSetup {
         final SettingRequest request = new SettingRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
         request.setCredential(crypto.stringToBytes("Invalid Credentials"));
-        assertThat(request, is(not(nullValue())));
+        assertNotNull(request);
 
         service.perform(request);
     }
@@ -64,7 +62,7 @@ public final class ServiceableTest extends DatabaseSetup {
         final SettingRequest request = new SettingRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
         request.setCredential(crypto.stringToBytes("Invalid Credentials"));
-        assertThat(request, is(not(nullValue())));
+        assertNotNull(request);
 
         service.perform(request);
     }
@@ -75,7 +73,7 @@ public final class ServiceableTest extends DatabaseSetup {
 
         final SettingService service = new SettingService(settings, entityManager);
         final SettingRequest request = prepareRequest(SettingRequest.class, MEMBER_1);
-        assertThat(request.validate().isEmpty(), is(true));
+        assertTrue(request.validate().isEmpty());
 
         service.perform(request);
     }
@@ -87,7 +85,7 @@ public final class ServiceableTest extends DatabaseSetup {
         final FetchCircleService service = new FetchCircleService(settings, entityManager);
         final FetchCircleRequest request = prepareRequest(FetchCircleRequest.class, MEMBER_5);
         request.setCredential(crypto.stringToBytes("something wrong"));
-        assertThat(request.validate().isEmpty(), is(true));
+        assertTrue(request.validate().isEmpty());
 
         service.perform(request);
     }
@@ -99,7 +97,7 @@ public final class ServiceableTest extends DatabaseSetup {
         final FetchCircleService service = new FetchCircleService(settings, entityManager);
         final FetchCircleRequest request = prepareRequest(FetchCircleRequest.class, MEMBER_5);
         request.setCredential(crypto.stringToBytes(MEMBER_4));
-        assertThat(request.validate().isEmpty(), is(true));
+        assertTrue(request.validate().isEmpty());
 
         service.perform(request);
     }
@@ -110,7 +108,7 @@ public final class ServiceableTest extends DatabaseSetup {
 
         final FetchCircleService service = new FetchCircleService(settings, entityManager);
         final FetchCircleRequest request = prepareRequest(FetchCircleRequest.class, "member6");
-        assertThat(request.validate().isEmpty(), is(true));
+        assertTrue(request.validate().isEmpty());
 
         service.perform(request);
     }

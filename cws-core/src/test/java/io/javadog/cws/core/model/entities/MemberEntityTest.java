@@ -18,8 +18,10 @@ package io.javadog.cws.core.model.entities;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.CoreMatchers.nullValue;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.MemberRole;
@@ -57,9 +59,9 @@ public final class MemberEntityTest extends DatabaseSetup {
         assertThat(found.getPublicKey(), is(entity.getPublicKey()));
         assertThat(found.getPrivateKey(), is(entity.getPrivateKey()));
         assertThat(found.getMemberRole(), is(MemberRole.STANDARD));
-        assertThat(found.getSessionChecksum(), is(nullValue()));
-        assertThat(found.getSessionCrypto(), is(nullValue()));
-        assertThat(found.getSessionExpire(), is(nullValue()));
+        assertNull(found.getSessionChecksum());
+        assertNull(found.getSessionCrypto());
+        assertNull(found.getSessionExpire());
     }
 
     @Test(expected = PersistenceException.class)
@@ -80,7 +82,7 @@ public final class MemberEntityTest extends DatabaseSetup {
         final long lastModified = entity.getAltered().getTime();
 
         persist(entity);
-        assertThat(entity.getAltered().getTime() >= lastModified, is(true));
+        assertTrue(entity.getAltered().getTime() >= lastModified);
     }
 
     @Test
@@ -91,10 +93,10 @@ public final class MemberEntityTest extends DatabaseSetup {
         final String privateKey = UUID.randomUUID().toString();
         final String externalId = UUID.randomUUID().toString();
         final MemberEntity entity = prepareMember(externalId, credential, algorithm, publicKey, privateKey, MemberRole.STANDARD);
-        assertThat(entity.getId(), is(not(nullValue())));
+        assertNotNull(entity.getId());
 
         entityManager.persist(entity);
-        assertThat(entity.getId(), is(not(nullValue())));
+        assertNotNull(entity.getId());
         // Now, let's flush all not-saved records to the DB and clear the Cache,
         // this way, a lookup will hit the database and not the Cache.
         entityManager.flush();
@@ -118,21 +120,21 @@ public final class MemberEntityTest extends DatabaseSetup {
     @Test
     public void testDaoFindMemberAdmin() {
         final MemberEntity admin = dao.findMemberByName(Constants.ADMIN_ACCOUNT);
-        assertThat(admin, is(not(nullValue())));
+        assertNotNull(admin);
         assertThat(admin.getName(), is(Constants.ADMIN_ACCOUNT));
 
         final MemberEntity adminByExternalId = dao.find(MemberEntity.class, admin.getExternalId());
-        assertThat(adminByExternalId, is(not(nullValue())));
+        assertNotNull(adminByExternalId);
         assertThat(adminByExternalId.getId(), is(admin.getId()));
     }
 
     @Test
     public void testDaoFindMemberUnknown() {
         final MemberEntity nullEntity = dao.find(MemberEntity.class, UUID.randomUUID().toString());
-        assertThat(nullEntity, is(nullValue()));
+        assertNull(nullEntity);
 
         final MemberEntity found = dao.findMemberByName("Unknown");
-        assertThat(found, is(nullValue()));
+        assertNull(found);
     }
 
     @Test
@@ -158,6 +160,6 @@ public final class MemberEntityTest extends DatabaseSetup {
     public void testPreparingTestData() {
         final GenerateTestData generator = new GenerateTestData();
         final String sql = generator.prepareTestData();
-        assertThat(sql.length() > 19000, is(true));
+        assertTrue(sql.length() > 19000);
     }
 }

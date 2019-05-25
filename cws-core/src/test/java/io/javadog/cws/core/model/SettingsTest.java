@@ -17,7 +17,9 @@
 package io.javadog.cws.core.model;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 import io.javadog.cws.core.DatabaseSetup;
 import io.javadog.cws.core.enums.HashAlgorithm;
@@ -56,10 +58,10 @@ public final class SettingsTest extends DatabaseSetup {
         final Set<KeyAlgorithm> sha = prepareSetOf(KeyAlgorithm.Type.SIGNATURE);
         final Set<KeyAlgorithm> pbe = prepareSetOf(KeyAlgorithm.Type.PASSWORD);
 
-        assertThat(aes.contains(mySettings.getSymmetricAlgorithm()), is(true));
-        assertThat(rsa.contains(mySettings.getAsymmetricAlgorithm()), is(true));
-        assertThat(sha.contains(mySettings.getSignatureAlgorithm()), is(true));
-        assertThat(pbe.contains(mySettings.getPasswordAlgorithm()), is(true));
+        assertTrue(aes.contains(mySettings.getSymmetricAlgorithm()));
+        assertTrue(rsa.contains(mySettings.getAsymmetricAlgorithm()));
+        assertTrue(sha.contains(mySettings.getSignatureAlgorithm()));
+        assertTrue(pbe.contains(mySettings.getPasswordAlgorithm()));
         assertThat(mySettings.getSalt(), is("Default salt, also used as kill switch. Must be set in DB."));
         assertThat(mySettings.getCharset().name(), is("UTF-8"));
     }
@@ -99,7 +101,7 @@ public final class SettingsTest extends DatabaseSetup {
         assertThat(mySettings.getCharset().name(), is("ISO-8859-15"));
 
         mySettings.set(StandardSetting.SANITY_STARTUP, "false");
-        assertThat(mySettings.getSanityStartup(), is(false));
+        assertFalse(mySettings.getSanityStartup());
 
         mySettings.set(StandardSetting.SANITY_INTERVAL, "120");
         assertThat(mySettings.getSanityInterval(), is(120));
@@ -111,17 +113,17 @@ public final class SettingsTest extends DatabaseSetup {
     @Test
     public void testShowOtherMemberInformation() {
         final Settings mySettings = newSettings();
-        assertThat(mySettings.getShareTrustees(), is(true));
+        assertTrue(mySettings.getShareTrustees());
         mySettings.set(StandardSetting.SHOW_TRUSTEES, "false");
-        assertThat(mySettings.getShareTrustees(), is(false));
+        assertFalse(mySettings.getShareTrustees());
         mySettings.set(StandardSetting.SHOW_TRUSTEES, "true");
-        assertThat(mySettings.getShareTrustees(), is(true));
+        assertTrue(mySettings.getShareTrustees());
         mySettings.set(StandardSetting.SHOW_TRUSTEES, " true ");
-        assertThat(mySettings.getShareTrustees(), is(true));
+        assertTrue(mySettings.getShareTrustees());
         mySettings.set(StandardSetting.SHOW_TRUSTEES, "");
-        assertThat(mySettings.getShareTrustees(), is(false));
+        assertFalse(mySettings.getShareTrustees());
         mySettings.set(StandardSetting.SHOW_TRUSTEES, " what ");
-        assertThat(mySettings.getShareTrustees(), is(false));
+        assertFalse(mySettings.getShareTrustees());
     }
 
     // =========================================================================

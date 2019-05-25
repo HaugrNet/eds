@@ -16,10 +16,8 @@
  */
 package io.javadog.cws.core.model;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import io.javadog.cws.core.DatabaseSetup;
 import io.javadog.cws.core.exceptions.CWSException;
@@ -57,8 +55,8 @@ public final class CommonDaoTest extends DatabaseSetup {
         final Query query = new FakeQuery();
         final List<Object> found = CommonDao.findList(query);
 
-        assertThat(found, is(not(nullValue())));
-        assertThat(found.isEmpty(), is(true));
+        assertNotNull(found);
+        assertTrue(found.isEmpty());
     }
 
     private static class FakeQuery implements Query {
@@ -67,7 +65,7 @@ public final class CommonDaoTest extends DatabaseSetup {
          * {@inheritDoc}
          */
         @Override
-        public List getResultList() {
+        public List<?> getResultList() {
             return null;
         }
 

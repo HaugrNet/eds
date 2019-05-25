@@ -17,7 +17,9 @@
 package io.javadog.cws.core;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.responses.ProcessDataResponse;
@@ -53,7 +55,7 @@ public final class SanitizerBeanTest extends DatabaseSetup {
         prepareInvalidData();
         prepareStartupBean("true");
 
-        assertThat(prepareSanitizeBean().findNextBatch(100).isEmpty(), is(true));
+        assertTrue(prepareSanitizeBean().findNextBatch(100).isEmpty());
     }
 
     @Test
@@ -62,7 +64,7 @@ public final class SanitizerBeanTest extends DatabaseSetup {
         query.executeUpdate();
 
         final StartupBean bean = prepareStartupBean("true");
-        assertThat(getBeanSettings(bean).isReady(), is(false));
+        assertFalse(getBeanSettings(bean).isReady());
     }
 
     @Test
@@ -71,7 +73,7 @@ public final class SanitizerBeanTest extends DatabaseSetup {
         query.executeUpdate();
 
         final StartupBean bean = prepareStartupBean("true");
-        assertThat(getBeanSettings(bean).isReady(), is(false));
+        assertFalse(getBeanSettings(bean).isReady());
     }
 
     @Test
@@ -79,7 +81,7 @@ public final class SanitizerBeanTest extends DatabaseSetup {
         prepareInvalidData();
         prepareStartupBean("false");
 
-        assertThat(prepareSanitizeBean().findNextBatch(100).isEmpty(), is(false));
+        assertFalse(prepareSanitizeBean().findNextBatch(100).isEmpty());
     }
 
     @Test
@@ -92,8 +94,8 @@ public final class SanitizerBeanTest extends DatabaseSetup {
         bean.runSanitizing(new TestTimer());
 
         final List<Long> idsAfter = sanitizerBean.findNextBatch(100);
-        assertThat(idsBefore.isEmpty(), is(false));
-        assertThat(idsAfter.isEmpty(), is(true));
+        assertFalse(idsBefore.isEmpty());
+        assertTrue(idsAfter.isEmpty());
     }
 
     @Test
@@ -110,7 +112,7 @@ public final class SanitizerBeanTest extends DatabaseSetup {
 
         // Finally, verify that all records have been sanitized.
         final List<Long> idsAfter = bean.findNextBatch(100);
-        assertThat(idsAfter.isEmpty(), is(true));
+        assertTrue(idsAfter.isEmpty());
     }
 
     // =========================================================================

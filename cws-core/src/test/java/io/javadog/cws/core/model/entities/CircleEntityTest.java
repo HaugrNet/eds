@@ -18,7 +18,7 @@ package io.javadog.cws.core.model.entities;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.CoreMatchers.nullValue;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 
 import io.javadog.cws.core.DatabaseSetup;
@@ -38,7 +38,7 @@ public final class CircleEntityTest extends DatabaseSetup {
         entityManager.clear();
 
         final CircleEntity found = find(CircleEntity.class, entity.getId());
-        assertThat(found, is(not(nullValue())));
+        assertNotNull(found);
         assertThat(found.getName(), is(entity.getName()));
 
         found.setName("Circle 2");
@@ -47,7 +47,7 @@ public final class CircleEntityTest extends DatabaseSetup {
         entityManager.clear();
 
         final CircleEntity updated = find(CircleEntity.class, entity.getId());
-        assertThat(updated, is(not(nullValue())));
+        assertNotNull(updated);
         assertThat(updated.getName(), is(not(entity.getName())));
     }
 }

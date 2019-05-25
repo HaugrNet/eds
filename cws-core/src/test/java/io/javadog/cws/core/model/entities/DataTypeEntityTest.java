@@ -17,8 +17,7 @@
 package io.javadog.cws.core.model.entities;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.CoreMatchers.nullValue;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 
 import io.javadog.cws.core.DatabaseSetup;
@@ -41,7 +40,7 @@ public final class DataTypeEntityTest extends DatabaseSetup {
         entityManager.clear();
 
         final DataTypeEntity found = find(DataTypeEntity.class, entity.getId());
-        assertThat(found, is(not(nullValue())));
+        assertNotNull(found);
     }
 
     @Test
@@ -52,7 +51,7 @@ public final class DataTypeEntityTest extends DatabaseSetup {
         persist(entity);
 
         final DataTypeEntity found = find(DataTypeEntity.class, entity.getId());
-        assertThat(found, is(not(nullValue())));
+        assertNotNull(found);
         found.setName("Name 2");
         found.setType("Type 2");
         persist(found);

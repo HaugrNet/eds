@@ -17,7 +17,10 @@
 package io.javadog.cws.core.services;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.requests.FetchSignatureRequest;
@@ -27,9 +30,8 @@ import io.javadog.cws.api.responses.FetchSignatureResponse;
 import io.javadog.cws.api.responses.SignResponse;
 import io.javadog.cws.api.responses.VerifyResponse;
 import io.javadog.cws.core.DatabaseSetup;
-import org.junit.Test;
-
 import java.util.Date;
+import org.junit.Test;
 
 /**
  * <p>This Test Class, is testing the following Service Classes in one, as they
@@ -63,11 +65,11 @@ public final class SignatureServiceTest extends DatabaseSetup {
         verifyRequest.setSignature(signResponse.getSignature());
         final VerifyResponse verifyResponse = verifyService.perform(verifyRequest);
         assertThat(verifyResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
-        assertThat(verifyResponse.isVerified(), is(true));
+        assertTrue(verifyResponse.isVerified());
 
         final FetchSignatureRequest fetchRequest = prepareRequest(FetchSignatureRequest.class, MEMBER_1);
         final FetchSignatureResponse fetchResponse = fetchService.perform(fetchRequest);
-        assertThat(fetchResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+        assertEquals(ReturnCode.SUCCESS.getCode(), fetchResponse.getReturnCode());
         assertThat(fetchResponse.getSignatures().size(), is(1));
         assertThat(fetchResponse.getSignatures().get(0).getVerifications(), is(1L));
     }
@@ -91,7 +93,7 @@ public final class SignatureServiceTest extends DatabaseSetup {
         final VerifyResponse verifyResponse = verifyService.perform(verifyRequest);
         assertThat(verifyResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
         assertThat(verifyResponse.getReturnMessage(), is("Ok"));
-        assertThat(verifyResponse.isVerified(), is(true));
+        assertTrue(verifyResponse.isVerified());
     }
 
     @Test
@@ -129,7 +131,7 @@ public final class SignatureServiceTest extends DatabaseSetup {
         final VerifyRequest verifyRequest = prepareRequest(VerifyRequest.class, MEMBER_2);
         verifyRequest.setData(data);
         verifyRequest.setSignature(signResponse.getSignature());
-        assertThat(verifyRequest.validate().isEmpty(), is(true));
+        assertTrue(verifyRequest.validate().isEmpty());
 
         verifyService.perform(verifyRequest);
     }
@@ -151,7 +153,7 @@ public final class SignatureServiceTest extends DatabaseSetup {
         verifyRequest.setSignature(signResponse.getSignature());
         final VerifyResponse verifyResponse = verifyService.perform(verifyRequest);
         assertThat(verifyResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
-        assertThat(verifyResponse.isVerified(), is(false));
+        assertFalse(verifyResponse.isVerified());
     }
 
     @Test
@@ -164,7 +166,7 @@ public final class SignatureServiceTest extends DatabaseSetup {
         final VerifyRequest request = prepareRequest(VerifyRequest.class, MEMBER_1);
         request.setData(data);
         request.setSignature(signature);
-        assertThat(request.validate().isEmpty(), is(true));
+        assertTrue(request.validate().isEmpty());
 
         verifyService.perform(request);
     }

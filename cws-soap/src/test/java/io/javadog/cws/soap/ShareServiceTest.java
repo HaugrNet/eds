@@ -17,9 +17,10 @@
 package io.javadog.cws.soap;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.CoreMatchers.nullValue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 import io.javadog.cws.api.common.Action;
 import io.javadog.cws.api.common.Constants;
@@ -55,9 +56,9 @@ public class ShareServiceTest extends BeanSetup {
         request.setType("Test Type Value");
 
         final ProcessDataTypeResponse response = service.processDataType(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
-        assertThat(response.getReturnMessage(), is("Ok"));
-        assertThat(response.getDataType(), is(not(nullValue())));
+        assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
+        assertEquals("Ok", response.getReturnMessage());
+        assertNotNull(response.getDataType());
         assertThat(response.getDataType().getTypeName(), is("TestType"));
         assertThat(response.getDataType().getType(), is("Test Type Value"));
     }
@@ -95,8 +96,8 @@ public class ShareServiceTest extends BeanSetup {
         final FetchDataTypeRequest request = prepareRequest(FetchDataTypeRequest.class, MEMBER_1);
 
         final FetchDataTypeResponse response = service.fetchDataTypes(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
-        assertThat(response.getReturnMessage(), is("Ok"));
+        assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
+        assertEquals("Ok", response.getReturnMessage());
         assertThat(response.getDataTypes().size(), is(2));
         assertThat(response.getDataTypes().get(0).getTypeName(), is("data"));
         assertThat(response.getDataTypes().get(0).getType(), is("Data Object"));
@@ -142,9 +143,9 @@ public class ShareServiceTest extends BeanSetup {
         request.setTypeName("data");
 
         final ProcessDataResponse response = service.processData(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
-        assertThat(response.getReturnMessage(), is("Ok"));
-        assertThat(response.getDataId(), is(not(nullValue())));
+        assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
+        assertEquals("Ok", response.getReturnMessage());
+        assertNotNull(response.getDataId());
     }
 
     @Test
@@ -181,9 +182,9 @@ public class ShareServiceTest extends BeanSetup {
         request.setCircleId(CIRCLE_1_ID);
 
         final FetchDataResponse response = service.fetchData(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
-        assertThat(response.getReturnMessage(), is("Ok"));
-        assertThat(response.getMetadata().isEmpty(), is(true));
+        assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
+        assertEquals("Ok", response.getReturnMessage());
+        assertTrue(response.getMetadata().isEmpty());
     }
 
     @Test
@@ -289,9 +290,9 @@ public class ShareServiceTest extends BeanSetup {
         final FetchSignatureRequest request = prepareRequest(FetchSignatureRequest.class, MEMBER_1);
 
         final FetchSignatureResponse response = service.fetchSignatures(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
-        assertThat(response.getReturnMessage(), is("Ok"));
-        assertThat(response.getSignatures().isEmpty(), is(true));
+        assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
+        assertEquals("Ok", response.getReturnMessage());
+        assertTrue(response.getSignatures().isEmpty());
     }
 
     @Test

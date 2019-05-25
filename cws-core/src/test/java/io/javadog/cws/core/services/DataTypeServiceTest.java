@@ -17,9 +17,12 @@
 package io.javadog.cws.core.services;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.CoreMatchers.nullValue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 import io.javadog.cws.api.common.Action;
 import io.javadog.cws.api.common.Constants;
@@ -48,7 +51,7 @@ public final class DataTypeServiceTest extends DatabaseSetup {
 
         final FetchDataTypeService service = new FetchDataTypeService(settings, entityManager);
         final FetchDataTypeRequest request = new FetchDataTypeRequest();
-        assertThat(request.getAccountName(), is(nullValue()));
+        assertNull(request.getAccountName());
 
         service.perform(request);
     }
@@ -62,7 +65,7 @@ public final class DataTypeServiceTest extends DatabaseSetup {
 
         final ProcessDataTypeService service = new ProcessDataTypeService(settings, entityManager);
         final ProcessDataTypeRequest request = new ProcessDataTypeRequest();
-        assertThat(request.getAccountName(), is(nullValue()));
+        assertNull(request.getAccountName());
 
         service.perform(request);
     }
@@ -73,10 +76,10 @@ public final class DataTypeServiceTest extends DatabaseSetup {
         final FetchDataTypeRequest request = prepareRequest(FetchDataTypeRequest.class, Constants.ADMIN_ACCOUNT);
         final FetchDataTypeResponse response = service.perform(request);
 
-        assertThat(response, is(not(nullValue())));
-        assertThat(response.isOk(), is(true));
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
-        assertThat(response.getReturnMessage(), is("Ok"));
+        assertNotNull(response);
+        assertTrue(response.isOk());
+        assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
+        assertEquals("Ok", response.getReturnMessage());
         assertThat(response.getDataTypes().size(), is(2));
         assertThat(response.getDataTypes().get(0).getTypeName(), is(Constants.DATA_TYPENAME));
         assertThat(response.getDataTypes().get(0).getType(), is("Data Object"));
@@ -92,8 +95,8 @@ public final class DataTypeServiceTest extends DatabaseSetup {
 
         final ProcessDataTypeService service = new ProcessDataTypeService(settings, entityManager);
         final ProcessDataTypeRequest request = prepareRequest(ProcessDataTypeRequest.class, Constants.ADMIN_ACCOUNT);
-        assertThat(request.getTypeName(), is(nullValue()));
-        assertThat(request.getType(), is(nullValue()));
+        assertNull(request.getTypeName());
+        assertNull(request.getType());
 
         service.perform(request);
     }
@@ -104,12 +107,12 @@ public final class DataTypeServiceTest extends DatabaseSetup {
         final ProcessDataTypeRequest request = prepareRequest(ProcessDataTypeRequest.class, MEMBER_1);
         request.setType("MyDataType");
         request.setTypeName("The Data Type");
-        assertThat(request.getTypeName(), is(not(nullValue())));
-        assertThat(request.getType(), is(not(nullValue())));
+        assertNotNull(request.getTypeName());
+        assertNotNull(request.getType());
 
         final ProcessDataTypeResponse response = service.perform(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
-        assertThat(response.getReturnMessage(), is("Ok"));
+        assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
+        assertEquals("Ok", response.getReturnMessage());
     }
 
     @Test
@@ -120,8 +123,8 @@ public final class DataTypeServiceTest extends DatabaseSetup {
         final ProcessDataTypeRequest request = prepareRequest(ProcessDataTypeRequest.class, MEMBER_5);
         request.setType("MyDataType");
         request.setTypeName("The Data Type");
-        assertThat(request.getTypeName(), is(not(nullValue())));
-        assertThat(request.getType(), is(not(nullValue())));
+        assertNotNull(request.getTypeName());
+        assertNotNull(request.getType());
 
         service.perform(request);
     }
@@ -134,8 +137,8 @@ public final class DataTypeServiceTest extends DatabaseSetup {
         final ProcessDataTypeRequest request = prepareRequest(ProcessDataTypeRequest.class, Constants.ADMIN_ACCOUNT);
         request.setTypeName(Constants.FOLDER_TYPENAME);
         request.setType("alternative folder");
-        assertThat(request.getTypeName(), is(not(nullValue())));
-        assertThat(request.getType(), is(not(nullValue())));
+        assertNotNull(request.getTypeName());
+        assertNotNull(request.getType());
 
         service.perform(request);
     }
@@ -148,8 +151,8 @@ public final class DataTypeServiceTest extends DatabaseSetup {
         final ProcessDataTypeRequest request = prepareRequest(ProcessDataTypeRequest.class, Constants.ADMIN_ACCOUNT);
         request.setTypeName(Constants.DATA_TYPENAME);
         request.setType("alternative data");
-        assertThat(request.getTypeName(), is(not(nullValue())));
-        assertThat(request.getType(), is(not(nullValue())));
+        assertNotNull(request.getTypeName());
+        assertNotNull(request.getType());
 
         final ProcessDataTypeResponse response = service.perform(request);
         assertThat(response.getReturnMessage(), is(""));
@@ -166,16 +169,16 @@ public final class DataTypeServiceTest extends DatabaseSetup {
         request.setType(newDataTypeType);
         final ProcessDataTypeResponse response = service.perform(request);
 
-        assertThat(response, is(not(nullValue())));
-        assertThat(response.isOk(), is(true));
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
-        assertThat(response.getReturnMessage(), is("Ok"));
+        assertNotNull(response);
+        assertTrue(response.isOk());
+        assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
+        assertEquals("Ok", response.getReturnMessage());
 
         request.setCredential(crypto.stringToBytes(Constants.ADMIN_ACCOUNT));
         request.setAction(Action.DELETE);
         final ProcessDataTypeResponse deletedResponse = service.perform(request);
-        assertThat(deletedResponse, is(not(nullValue())));
-        assertThat(deletedResponse.isOk(), is(true));
+        assertNotNull(deletedResponse);
+        assertTrue(deletedResponse.isOk());
         assertThat(deletedResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
         assertThat(deletedResponse.getReturnMessage(), is("Ok"));
     }
@@ -192,7 +195,7 @@ public final class DataTypeServiceTest extends DatabaseSetup {
         addRequest.setTypeName("text");
         addRequest.setType("text/plain");
         final ProcessDataTypeResponse addResponse = service.perform(addRequest);
-        assertThat(addResponse.isOk(), is(true));
+        assertTrue(addResponse.isOk());
 
         final ProcessDataRequest dataRequest = prepareRequest(ProcessDataRequest.class, MEMBER_1);
         dataRequest.setAction(Action.ADD);
@@ -200,7 +203,7 @@ public final class DataTypeServiceTest extends DatabaseSetup {
         dataRequest.setTypeName("text");
         dataRequest.setDataName("file.txt");
         final ProcessDataResponse dataResponse = dataService.perform(dataRequest);
-        assertThat(dataResponse.isOk(), is(true));
+        assertTrue(dataResponse.isOk());
 
         final ProcessDataTypeRequest deleteRequest = prepareRequest(ProcessDataTypeRequest.class, Constants.ADMIN_ACCOUNT);
         deleteRequest.setAction(Action.DELETE);
@@ -219,8 +222,8 @@ public final class DataTypeServiceTest extends DatabaseSetup {
         request.setType(newDataTypeType);
         final ProcessDataTypeResponse response = service.perform(request);
 
-        assertThat(response, is(not(nullValue())));
-        assertThat(response.isOk(), is(false));
+        assertNotNull(response);
+        assertFalse(response.isOk());
         assertThat(response.getReturnCode(), is(ReturnCode.IDENTIFICATION_WARNING.getCode()));
         assertThat(response.getReturnMessage(), is("No records were found with the name '" + theDataTypeName + "'."));
     }
@@ -236,9 +239,9 @@ public final class DataTypeServiceTest extends DatabaseSetup {
         request.setType(newDataTypeType);
 
         final ProcessDataTypeResponse response = service.perform(request);
-        assertThat(response.isOk(), is(true));
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
-        assertThat(response.getReturnMessage(), is("Ok"));
+        assertTrue(response.isOk());
+        assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
+        assertEquals("Ok", response.getReturnMessage());
         assertThat(response.getDataType().getTypeName(), is(theDataTypeName));
         assertThat(response.getDataType().getType(), is(newDataTypeType));
 
@@ -247,8 +250,8 @@ public final class DataTypeServiceTest extends DatabaseSetup {
         request.setTypeName(theDataTypeName);
         request.setType(updatedDataTypeType);
         final ProcessDataTypeResponse updateResponse = service.perform(request);
-        assertThat(updateResponse.isOk(), is(true));
-        assertThat(updateResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+        assertTrue(updateResponse.isOk());
+        assertEquals(ReturnCode.SUCCESS.getCode(), updateResponse.getReturnCode());
         assertThat(updateResponse.getReturnMessage(), is("Ok"));
         assertThat(updateResponse.getDataType().getTypeName(), is(theDataTypeName));
         assertThat(updateResponse.getDataType().getType(), is(updatedDataTypeType));
@@ -265,16 +268,16 @@ public final class DataTypeServiceTest extends DatabaseSetup {
         createRequest.setType(aDataTypeType);
 
         final ProcessDataTypeResponse response = dataTypeService.perform(createRequest);
-        assertThat(response.isOk(), is(true));
-        assertThat(response.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
-        assertThat(response.getReturnMessage(), is("Ok"));
+        assertTrue(response.isOk());
+        assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
+        assertEquals("Ok", response.getReturnMessage());
         assertThat(response.getDataType().getTypeName(), is(aDataTypeName));
         assertThat(response.getDataType().getType(), is(aDataTypeType));
 
         createRequest.setCredential(crypto.stringToBytes(Constants.ADMIN_ACCOUNT));
         final ProcessDataTypeResponse updateResponse = dataTypeService.perform(createRequest);
-        assertThat(updateResponse.isOk(), is(true));
-        assertThat(updateResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+        assertTrue(updateResponse.isOk());
+        assertEquals(ReturnCode.SUCCESS.getCode(), updateResponse.getReturnCode());
         assertThat(updateResponse.getReturnMessage(), is("Ok"));
         assertThat(updateResponse.getDataType().getTypeName(), is(aDataTypeName));
         assertThat(updateResponse.getDataType().getType(), is(aDataTypeType));

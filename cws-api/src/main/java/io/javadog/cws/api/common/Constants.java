@@ -150,6 +150,7 @@ public final class Constants {
     public static final String REST_SETTINGS = "/settings";
     public static final String REST_MASTERKEY = "/masterKey";
     public static final String REST_SANITIZED = "/sanitized";
+    public static final String REST_AUTHENTICATED = "/authenticated";
 
     // Member requests from the Management Interface
     public static final String REST_MEMBERS_BASE = "/members";

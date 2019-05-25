@@ -40,9 +40,9 @@ public class VersionService {
 
     private static final Logger LOG = Logger.getLogger(VersionService.class.getName());
 
-    private final Settings settings = Settings.getInstance();
     @Inject
     private ManagementBean bean;
+    private final Settings settings = Settings.getInstance();
 
     @POST
     @Produces(RestUtils.PRODUCES)

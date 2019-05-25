@@ -46,9 +46,9 @@ public class TrusteeService {
 
     private static final Logger LOG = Logger.getLogger(TrusteeService.class.getName());
 
-    private final Settings settings = Settings.getInstance();
     @Inject
     private ManagementBean bean;
+    private final Settings settings = Settings.getInstance();
 
     @POST
     @Path(Constants.REST_TRUSTEES_ADD)

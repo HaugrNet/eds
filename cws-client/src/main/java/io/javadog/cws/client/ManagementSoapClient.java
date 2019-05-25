@@ -18,6 +18,7 @@ package io.javadog.cws.client;
 
 import io.javadog.cws.api.Management;
 import io.javadog.cws.api.common.Constants;
+import io.javadog.cws.api.requests.Authentication;
 import io.javadog.cws.api.requests.FetchCircleRequest;
 import io.javadog.cws.api.requests.FetchMemberRequest;
 import io.javadog.cws.api.requests.FetchTrusteeRequest;
@@ -27,6 +28,7 @@ import io.javadog.cws.api.requests.ProcessMemberRequest;
 import io.javadog.cws.api.requests.ProcessTrusteeRequest;
 import io.javadog.cws.api.requests.SanityRequest;
 import io.javadog.cws.api.requests.SettingRequest;
+import io.javadog.cws.api.responses.CwsResponse;
 import io.javadog.cws.api.responses.FetchCircleResponse;
 import io.javadog.cws.api.responses.FetchMemberResponse;
 import io.javadog.cws.api.responses.FetchTrusteeResponse;
@@ -37,6 +39,7 @@ import io.javadog.cws.api.responses.ProcessTrusteeResponse;
 import io.javadog.cws.api.responses.SanityResponse;
 import io.javadog.cws.api.responses.SettingResponse;
 import io.javadog.cws.api.responses.VersionResponse;
+import io.javadog.cws.ws.CwsResult;
 import io.javadog.cws.ws.FetchCircleResult;
 import io.javadog.cws.ws.FetchMemberResult;
 import io.javadog.cws.ws.FetchTrusteeResult;
@@ -116,6 +119,14 @@ public final class ManagementSoapClient implements Management {
     @Override
     public SanityResponse sanitized(final SanityRequest request) {
         return map(client.sanitized(map(request)));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public CwsResponse authenticated(final Authentication request) {
+        return mapCwsResponse(client.authenticated(mapAuthentication(request)));
     }
 
     /**
@@ -250,6 +261,28 @@ public final class ManagementSoapClient implements Management {
             api = new SanityResponse();
             Mapper.fillResponse(api, ws);
             api.setSanities(Mapper.mapSanities(ws.getSanities()));
+        }
+
+        return api;
+    }
+
+    private static io.javadog.cws.ws.Authentication mapAuthentication(final Authentication api) {
+        io.javadog.cws.ws.Authentication ws = null;
+
+        if (api != null) {
+            ws = new io.javadog.cws.ws.Authentication();
+            Mapper.fillAuthentication(ws, api);
+        }
+
+        return ws;
+    }
+
+    private static CwsResponse mapCwsResponse(final CwsResult ws) {
+        CwsResponse api = null;
+
+        if (ws != null) {
+            api = new CwsResponse();
+            Mapper.fillResponse(api, ws);
         }
 
         return api;

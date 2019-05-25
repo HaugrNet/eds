@@ -38,6 +38,7 @@ public class CwsApplication extends Application {
     public Set<Class<?>> getClasses() {
         final Set<Class<?>> set = new HashSet<>();
 
+        set.add(AuthenticatedService.class);
         set.add(CircleService.class);
         set.add(DataService.class);
         set.add(DataTypeService.class);

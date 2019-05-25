@@ -17,6 +17,7 @@
 package io.javadog.cws.fitnesse.callers;
 
 import io.javadog.cws.api.Management;
+import io.javadog.cws.api.requests.Authentication;
 import io.javadog.cws.api.requests.FetchCircleRequest;
 import io.javadog.cws.api.requests.FetchMemberRequest;
 import io.javadog.cws.api.requests.FetchTrusteeRequest;
@@ -26,6 +27,7 @@ import io.javadog.cws.api.requests.ProcessMemberRequest;
 import io.javadog.cws.api.requests.ProcessTrusteeRequest;
 import io.javadog.cws.api.requests.SanityRequest;
 import io.javadog.cws.api.requests.SettingRequest;
+import io.javadog.cws.api.responses.CwsResponse;
 import io.javadog.cws.api.responses.FetchCircleResponse;
 import io.javadog.cws.api.responses.FetchMemberResponse;
 import io.javadog.cws.api.responses.FetchTrusteeResponse;
@@ -89,6 +91,11 @@ public final class CallManagement {
     public static SanityResponse sanitized(final String type, final String url, final SanityRequest request) {
         prepareCWS(type, url);
         return management.sanitized(request);
+    }
+
+    public static CwsResponse authenticated(final String type, final String url, final Authentication request) {
+        prepareCWS(type, url);
+        return management.authenticated(request);
     }
 
     public static FetchMemberResponse fetchMembers(final String type, final String url, final FetchMemberRequest request) {

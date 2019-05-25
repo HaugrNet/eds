@@ -18,6 +18,7 @@ package io.javadog.cws.soap;
 
 import io.javadog.cws.api.Management;
 import io.javadog.cws.api.common.ReturnCode;
+import io.javadog.cws.api.requests.Authentication;
 import io.javadog.cws.api.requests.FetchCircleRequest;
 import io.javadog.cws.api.requests.FetchMemberRequest;
 import io.javadog.cws.api.requests.FetchTrusteeRequest;
@@ -27,6 +28,7 @@ import io.javadog.cws.api.requests.ProcessMemberRequest;
 import io.javadog.cws.api.requests.ProcessTrusteeRequest;
 import io.javadog.cws.api.requests.SanityRequest;
 import io.javadog.cws.api.requests.SettingRequest;
+import io.javadog.cws.api.responses.CwsResponse;
 import io.javadog.cws.api.responses.FetchCircleResponse;
 import io.javadog.cws.api.responses.FetchMemberResponse;
 import io.javadog.cws.api.responses.FetchTrusteeResponse;
@@ -104,7 +106,7 @@ public class ManagementService implements Management {
         SettingResponse response;
 
         try {
-            final Long startTime = System.nanoTime();
+            final long startTime = System.nanoTime();
             response = bean.settings(request);
             LOG.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), "settings", startTime));
         } catch (RuntimeException e) {
@@ -129,7 +131,7 @@ public class ManagementService implements Management {
         MasterKeyResponse response;
 
         try {
-            final Long startTime = System.nanoTime();
+            final long startTime = System.nanoTime();
             response = bean.masterKey(request);
             LOG.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), "masterKey", startTime));
         } catch (RuntimeException e) {
@@ -154,7 +156,7 @@ public class ManagementService implements Management {
         SanityResponse response;
 
         try {
-            final Long startTime = System.nanoTime();
+            final long startTime = System.nanoTime();
             response = bean.sanity(request);
             LOG.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), "sanitized", startTime));
         } catch (RuntimeException e) {
@@ -175,11 +177,36 @@ public class ManagementService implements Management {
     @Override
     @WebMethod
     @WebResult(name = "response")
+    public CwsResponse authenticated(final Authentication request) {
+        CwsResponse response;
+
+        try {
+            final long startTime = System.nanoTime();
+            response = bean.authenticated(request);
+            LOG.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), "authentication", startTime));
+        } catch (RuntimeException e) {
+            // If an error occurs that has so far not been resolved, this is the
+            // final level where it can be handled. Errors can be Persistence
+            // problems or other things that will affect the reliability and/or
+            // performance of the system.
+            LOG.log(Settings.ERROR, e.getMessage(), e);
+            response = new CwsResponse(ReturnCode.ERROR, GENERAL_RETURN_MESSAGE);
+        }
+
+        return response;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @WebMethod
+    @WebResult(name = "response")
     public FetchMemberResponse fetchMembers(@WebParam(name = "request") final FetchMemberRequest request) {
         FetchMemberResponse response;
 
         try {
-            final Long startTime = System.nanoTime();
+            final long startTime = System.nanoTime();
             response = bean.fetchMembers(request);
             LOG.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), "fetchMembers", startTime));
         } catch (RuntimeException e) {
@@ -204,7 +231,7 @@ public class ManagementService implements Management {
         ProcessMemberResponse response;
 
         try {
-            final Long startTime = System.nanoTime();
+            final long startTime = System.nanoTime();
             response = bean.processMember(request);
             LOG.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), "processMember", startTime));
         } catch (RuntimeException e) {
@@ -229,7 +256,7 @@ public class ManagementService implements Management {
         FetchCircleResponse response;
 
         try {
-            final Long startTime = System.nanoTime();
+            final long startTime = System.nanoTime();
             response = bean.fetchCircles(request);
             LOG.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), "fetchCircles", startTime));
         } catch (RuntimeException e) {
@@ -254,7 +281,7 @@ public class ManagementService implements Management {
         ProcessCircleResponse response;
 
         try {
-            final Long startTime = System.nanoTime();
+            final long startTime = System.nanoTime();
             response = bean.processCircle(request);
             LOG.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), "processCircle", startTime));
         } catch (RuntimeException e) {
@@ -279,7 +306,7 @@ public class ManagementService implements Management {
         FetchTrusteeResponse response;
 
         try {
-            final Long startTime = System.nanoTime();
+            final long startTime = System.nanoTime();
             response = bean.fetchTrustees(request);
             LOG.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), "fetchCircles", startTime));
         } catch (RuntimeException e) {
@@ -304,7 +331,7 @@ public class ManagementService implements Management {
         ProcessTrusteeResponse response;
 
         try {
-            final Long startTime = System.nanoTime();
+            final long startTime = System.nanoTime();
             response = bean.processTrustee(request);
             LOG.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), "processCircle", startTime));
         } catch (RuntimeException e) {

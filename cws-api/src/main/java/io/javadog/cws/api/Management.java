@@ -16,6 +16,7 @@
  */
 package io.javadog.cws.api;
 
+import io.javadog.cws.api.requests.Authentication;
 import io.javadog.cws.api.requests.FetchCircleRequest;
 import io.javadog.cws.api.requests.FetchMemberRequest;
 import io.javadog.cws.api.requests.FetchTrusteeRequest;
@@ -25,6 +26,7 @@ import io.javadog.cws.api.requests.ProcessMemberRequest;
 import io.javadog.cws.api.requests.ProcessTrusteeRequest;
 import io.javadog.cws.api.requests.SanityRequest;
 import io.javadog.cws.api.requests.SettingRequest;
+import io.javadog.cws.api.responses.CwsResponse;
 import io.javadog.cws.api.responses.FetchCircleResponse;
 import io.javadog.cws.api.responses.FetchMemberResponse;
 import io.javadog.cws.api.responses.FetchTrusteeResponse;
@@ -277,6 +279,17 @@ public interface Management {
      * @return Response Object with ReturnCode and Message
      */
     SanityResponse sanitized(SanityRequest request);
+
+    /**
+     * <p>Simple check to see if a Member is authenticated to work with this
+     * CWS instance. The Response will return {@link io.javadog.cws.api.common.ReturnCode#SUCCESS}
+     * if authentication information exists, otherwise an error is returned
+     * together with a more detailed message.</p>
+     *
+     * @param request Authentication Request Object
+     * @return Response Object with Authentication and Return values
+     */
+    CwsResponse authenticated(Authentication request);
 
     /**
      * <p>Allows the retrieval of existing Member Accounts from the System, if

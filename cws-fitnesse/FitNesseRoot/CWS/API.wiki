@@ -35,6 +35,7 @@ resort to CWS logs.
  * '''[[ !-MasterKey-! ][#masterkey]] '''
  * '''[[ Settings ][#settings]] '''
  * '''[[ Sanitized ][#sanitized]] '''
+ * '''[[ Authenticated ][#authenticated]] '''
  * '''[[ Members ][#members]] '''
  * '''[[ Circles of Trust ][#circles]] '''
  * '''[[ Trustees ][#trustees]] '''
@@ -246,6 +247,20 @@ date.
 |account name|credential|circle id|since     |failures?|return code?|return message?|
 |admin       |admin     |null     |null      |[]       |${SUCCESS}  |Ok             |
 |admin       |admin     |null     |2019-01-01|[]       |${SUCCESS}  |Ok             |
+*!
+
+!* Authenticated
+[[ Top ][#content]]
+!anchor authenticated
+!4 '''Authenticated'''
+
+ * Authenticated - Check Member Authentication
+   * SOAP: authenticated
+   * REST (POST) request is: ${REST_ROOT}/authenticated
+
+|authenticated                                       |
+|account name|credential|return code?|return message?|
+|admin       |admin     |${SUCCESS}  |Ok             |
 *!
 
 !* Members

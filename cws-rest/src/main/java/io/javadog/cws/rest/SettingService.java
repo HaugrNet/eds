@@ -43,9 +43,9 @@ public class SettingService {
 
     private static final Logger LOG = Logger.getLogger(SettingService.class.getName());
 
-    private final Settings settings = Settings.getInstance();
     @Inject
     private ManagementBean bean;
+    private final Settings settings = Settings.getInstance();
 
     @POST
     @Consumes(RestUtils.CONSUMES)

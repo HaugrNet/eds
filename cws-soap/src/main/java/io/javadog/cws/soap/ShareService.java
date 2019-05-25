@@ -100,7 +100,7 @@ public class ShareService implements Share {
         FetchDataTypeResponse response;
 
         try {
-            final Long startTime = System.nanoTime();
+            final long startTime = System.nanoTime();
             response = bean.fetchDataTypes(request);
             LOG.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), "fetchDataTypes", startTime));
         } catch (RuntimeException e) {
@@ -125,7 +125,7 @@ public class ShareService implements Share {
         ProcessDataResponse response;
 
         try {
-            final Long startTime = System.nanoTime();
+            final long startTime = System.nanoTime();
             response = bean.processData(request);
             LOG.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), "processData", startTime));
         } catch (RuntimeException e) {
@@ -150,7 +150,7 @@ public class ShareService implements Share {
         FetchDataResponse response;
 
         try {
-            final Long startTime = System.nanoTime();
+            final long startTime = System.nanoTime();
             response = bean.fetchData(request);
             LOG.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), "fetchData", startTime));
         } catch (RuntimeException e) {
@@ -175,7 +175,7 @@ public class ShareService implements Share {
         SignResponse response;
 
         try {
-            final Long startTime = System.nanoTime();
+            final long startTime = System.nanoTime();
             response = bean.sign(request);
             LOG.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), "signDocument", startTime));
         } catch (RuntimeException e) {
@@ -200,7 +200,7 @@ public class ShareService implements Share {
         VerifyResponse response;
 
         try {
-            final Long startTime = System.nanoTime();
+            final long startTime = System.nanoTime();
             response = bean.verify(request);
             LOG.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), "verifySignatures", startTime));
         } catch (RuntimeException e) {
@@ -225,7 +225,7 @@ public class ShareService implements Share {
         FetchSignatureResponse response;
 
         try {
-            final Long startTime = System.nanoTime();
+            final long startTime = System.nanoTime();
             response = bean.fetchSignatures(request);
             LOG.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), "fetchSignatures", startTime));
         } catch (RuntimeException e) {

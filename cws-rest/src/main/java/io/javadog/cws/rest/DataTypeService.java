@@ -46,9 +46,9 @@ public class DataTypeService {
 
     private static final Logger LOG = Logger.getLogger(DataTypeService.class.getName());
 
-    private final Settings settings = Settings.getInstance();
     @Inject
     private ShareBean bean;
+    private final Settings settings = Settings.getInstance();
 
     @POST
     @Consumes(RestUtils.CONSUMES)

@@ -47,9 +47,9 @@ public class SignatureService {
 
     private static final Logger LOG = Logger.getLogger(SignatureService.class.getName());
 
-    private final Settings settings = Settings.getInstance();
     @Inject
     private ShareBean bean;
+    private final Settings settings = Settings.getInstance();
 
     @POST
     @Path(Constants.REST_SIGNATURES_SIGN)
@@ -77,7 +77,7 @@ public class SignatureService {
     @Produces(RestUtils.PRODUCES)
     public Response verify(@NotNull final VerifyRequest verifySignatureRequest) {
         final String restAction = Constants.REST_SIGNATURES_BASE + Constants.REST_SIGNATURES_VERIFY;
-        final Long startTime = System.nanoTime();
+        final long startTime = System.nanoTime();
         VerifyResponse response;
 
         try {
@@ -97,7 +97,7 @@ public class SignatureService {
     @Produces(RestUtils.PRODUCES)
     public Response fetch(@NotNull final FetchSignatureRequest fetchSignaturesRequest) {
         final String restAction = Constants.REST_SIGNATURES_BASE + Constants.REST_SIGNATURES_FETCH;
-        final Long startTime = System.nanoTime();
+        final long startTime = System.nanoTime();
         FetchSignatureResponse response;
 
         try {

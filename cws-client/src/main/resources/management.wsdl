@@ -10,7 +10,11 @@
       Owner: JavaDog.io
     </wsdl:documentation>
   <wsdl:types>
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://ws.cws.javadog.io/" targetNamespace="http://ws.cws.javadog.io/" version="1.1">
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://ws.cws.javadog.io/" elementFormDefault="unqualified" targetNamespace="http://ws.cws.javadog.io/" version="1.1">
+
+  <xs:element name="authenticated" type="tns:authenticated"/>
+
+  <xs:element name="authenticatedResponse" type="tns:authenticatedResponse"/>
 
   <xs:element name="fetchCircleRequest" type="tns:fetchCircleRequest"/>
 
@@ -261,6 +265,18 @@
     </xs:complexContent>
   </xs:complexType>
 
+  <xs:complexType name="authenticated">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="arg0" type="tns:authentication"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="authenticatedResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="response" type="tns:cwsResult"/>
+    </xs:sequence>
+  </xs:complexType>
+
   <xs:complexType name="settings">
     <xs:sequence>
       <xs:element minOccurs="0" name="request" type="tns:settingRequest"/>
@@ -472,9 +488,9 @@
       <xs:extension base="tns:authentication">
         <xs:sequence>
           <xs:element name="action" type="tns:action"/>
+          <xs:element minOccurs="0" name="trustLevel" nillable="true" type="tns:trustLevel"/>
           <xs:element minOccurs="0" name="circleId" nillable="true" type="xs:string"/>
           <xs:element minOccurs="0" name="memberId" nillable="true" type="xs:string"/>
-          <xs:element minOccurs="0" name="trustLevel" nillable="true" type="tns:trustLevel"/>
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>
@@ -555,8 +571,16 @@
     <wsdl:part element="tns:masterKeyResponse" name="parameters">
     </wsdl:part>
   </wsdl:message>
+  <wsdl:message name="authenticated">
+    <wsdl:part element="tns:authenticated" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
   <wsdl:message name="settings">
     <wsdl:part element="tns:settings" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="authenticatedResponse">
+    <wsdl:part element="tns:authenticatedResponse" name="parameters">
     </wsdl:part>
   </wsdl:message>
   <wsdl:message name="version">
@@ -647,6 +671,12 @@
       <wsdl:output message="tns:processMemberResponse" name="processMemberResponse">
     </wsdl:output>
     </wsdl:operation>
+    <wsdl:operation name="authenticated">
+      <wsdl:input message="tns:authenticated" name="authenticated">
+    </wsdl:input>
+      <wsdl:output message="tns:authenticatedResponse" name="authenticatedResponse">
+    </wsdl:output>
+    </wsdl:operation>
     <wsdl:operation name="settings">
       <wsdl:input message="tns:settings" name="settings">
     </wsdl:input>
@@ -719,6 +749,15 @@
         <soap:body use="literal"/>
       </wsdl:input>
       <wsdl:output name="processMemberResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="authenticated">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="authenticated">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="authenticatedResponse">
         <soap:body use="literal"/>
       </wsdl:output>
     </wsdl:operation>

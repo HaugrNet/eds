@@ -30,6 +30,6 @@ public final class CwsApplicationTest {
     @Test
     public void testApplication() {
         final CwsApplication application = new CwsApplication();
-        assertThat(application.getClasses().size(), is(10));
+        assertThat(application.getClasses().size(), is(11));
     }
 }

@@ -18,6 +18,7 @@ package io.javadog.cws.core;
 
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
+import io.javadog.cws.api.requests.Authentication;
 import io.javadog.cws.api.requests.FetchCircleRequest;
 import io.javadog.cws.api.requests.FetchMemberRequest;
 import io.javadog.cws.api.requests.FetchTrusteeRequest;
@@ -27,6 +28,7 @@ import io.javadog.cws.api.requests.ProcessMemberRequest;
 import io.javadog.cws.api.requests.ProcessTrusteeRequest;
 import io.javadog.cws.api.requests.SanityRequest;
 import io.javadog.cws.api.requests.SettingRequest;
+import io.javadog.cws.api.responses.CwsResponse;
 import io.javadog.cws.api.responses.FetchCircleResponse;
 import io.javadog.cws.api.responses.FetchMemberResponse;
 import io.javadog.cws.api.responses.FetchTrusteeResponse;
@@ -39,6 +41,7 @@ import io.javadog.cws.api.responses.SettingResponse;
 import io.javadog.cws.api.responses.VersionResponse;
 import io.javadog.cws.core.exceptions.CWSException;
 import io.javadog.cws.core.model.Settings;
+import io.javadog.cws.core.services.AuthenticatedService;
 import io.javadog.cws.core.services.FetchCircleService;
 import io.javadog.cws.core.services.FetchMemberService;
 import io.javadog.cws.core.services.FetchTrusteeService;
@@ -145,6 +148,28 @@ public class ManagementBean {
             // response.
             LOG.log(Settings.DEBUG, e.getMessage(), e);
             response = new SanityResponse(e.getReturnCode(), e.getMessage());
+        } finally {
+            CommonBean.destroy(service);
+        }
+
+        return response;
+    }
+
+    @Transactional(Transactional.TxType.SUPPORTS)
+    public CwsResponse authenticated(final Authentication request) {
+        AuthenticatedService service = null;
+        CwsResponse response;
+
+        try {
+            service = new AuthenticatedService(settings, entityManager);
+            response = service.perform(request);
+        } catch (CWSException e) {
+            // Any Warning or Error thrown by the CWS contain enough information
+            // so it can be dealt with by the requesting System. Logging the
+            // error is thus not needed, as all information is provided in the
+            // response.
+            LOG.log(Settings.DEBUG, e.getMessage(), e);
+            response = new CwsResponse(e.getReturnCode(), e.getMessage());
         } finally {
             CommonBean.destroy(service);
         }

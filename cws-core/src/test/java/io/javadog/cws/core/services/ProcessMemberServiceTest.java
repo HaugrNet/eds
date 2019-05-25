@@ -368,7 +368,7 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
 
     @Test
     public void testInviteExistingAccount() {
-        prepareCause(ReturnCode.CONSTRAINT_ERROR, "Cannot create an invitation, as as the account already exists.");
+        prepareCause(ReturnCode.CONSTRAINT_ERROR, "Cannot create an invitation, as the account already exists.");
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
         final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
         request.setAction(Action.INVITE);

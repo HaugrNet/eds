@@ -160,7 +160,7 @@ public final class ProcessMemberService extends Serviceable<MemberDao, ProcessMe
         final MemberEntity found = dao.findMemberByName(memberName);
         if (found != null) {
             throw new CWSException(ReturnCode.CONSTRAINT_ERROR,
-                    "Cannot create an invitation, as as the account already exists.");
+                    "Cannot create an invitation, as the account already exists.");
         }
 
         final String uuid = UUID.randomUUID().toString();

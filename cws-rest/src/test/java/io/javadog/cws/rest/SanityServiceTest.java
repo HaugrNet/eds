@@ -16,8 +16,7 @@
  */
 package io.javadog.cws.rest;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertEquals;
 
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.requests.SanityRequest;
@@ -38,7 +37,7 @@ public final class SanityServiceTest extends DatabaseSetup {
         final SanityRequest request = new SanityRequest();
 
         final Response response = service.sanitized(request);
-        assertThat(response.getStatus(), is(ReturnCode.SUCCESS.getHttpCode()));
+        assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
     }
 
     @Test
@@ -47,7 +46,7 @@ public final class SanityServiceTest extends DatabaseSetup {
         final SanityRequest request = new SanityRequest();
 
         final Response response = service.sanitized(request);
-        assertThat(response.getStatus(), is(ReturnCode.SUCCESS.getHttpCode()));
+        assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
     }
 
     // =========================================================================

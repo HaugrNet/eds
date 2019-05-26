@@ -16,8 +16,7 @@
  */
 package io.javadog.cws.rest;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertEquals;
 
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.requests.FetchSignatureRequest;
@@ -40,7 +39,7 @@ public final class SignatureServiceTest extends DatabaseSetup {
         final SignRequest request = new SignRequest();
 
         final Response response = service.sign(request);
-        assertThat(response.getStatus(), is(ReturnCode.SUCCESS.getHttpCode()));
+        assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
     }
 
     @Test
@@ -49,7 +48,7 @@ public final class SignatureServiceTest extends DatabaseSetup {
         final SignRequest request = new SignRequest();
 
         final Response response = service.sign(request);
-        assertThat(response.getStatus(), is(ReturnCode.SUCCESS.getHttpCode()));
+        assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
     }
 
     @Test
@@ -58,7 +57,7 @@ public final class SignatureServiceTest extends DatabaseSetup {
         final VerifyRequest request = new VerifyRequest();
 
         final Response response = service.verify(request);
-        assertThat(response.getStatus(), is(ReturnCode.SUCCESS.getHttpCode()));
+        assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
     }
 
     @Test
@@ -67,7 +66,7 @@ public final class SignatureServiceTest extends DatabaseSetup {
         final VerifyRequest request = new VerifyRequest();
 
         final Response response = service.verify(request);
-        assertThat(response.getStatus(), is(ReturnCode.SUCCESS.getHttpCode()));
+        assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
     }
 
     @Test
@@ -76,7 +75,7 @@ public final class SignatureServiceTest extends DatabaseSetup {
         final FetchSignatureRequest request = new FetchSignatureRequest();
 
         final Response response = service.fetch(request);
-        assertThat(response.getStatus(), is(ReturnCode.SUCCESS.getHttpCode()));
+        assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
     }
 
     @Test
@@ -85,7 +84,7 @@ public final class SignatureServiceTest extends DatabaseSetup {
         final FetchSignatureRequest request = new FetchSignatureRequest();
 
         final Response response = service.fetch(request);
-        assertThat(response.getStatus(), is(ReturnCode.SUCCESS.getHttpCode()));
+        assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
     }
 
     // =========================================================================

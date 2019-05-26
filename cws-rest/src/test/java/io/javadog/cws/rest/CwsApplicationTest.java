@@ -16,8 +16,7 @@
  */
 package io.javadog.cws.rest;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
@@ -30,6 +29,6 @@ public final class CwsApplicationTest {
     @Test
     public void testApplication() {
         final CwsApplication application = new CwsApplication();
-        assertThat(application.getClasses().size(), is(11));
+        assertEquals(11, application.getClasses().size());
     }
 }

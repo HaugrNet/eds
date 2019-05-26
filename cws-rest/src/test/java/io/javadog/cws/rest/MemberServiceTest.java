@@ -16,8 +16,7 @@
  */
 package io.javadog.cws.rest;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertEquals;
 
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.requests.FetchMemberRequest;
@@ -39,7 +38,7 @@ public final class MemberServiceTest extends DatabaseSetup {
         final ProcessMemberRequest request = new ProcessMemberRequest();
 
         final Response response = service.create(request);
-        assertThat(response.getStatus(), is(ReturnCode.SUCCESS.getHttpCode()));
+        assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
     }
 
     @Test
@@ -48,7 +47,7 @@ public final class MemberServiceTest extends DatabaseSetup {
         final ProcessMemberRequest request = new ProcessMemberRequest();
 
         final Response response = service.create(request);
-        assertThat(response.getStatus(), is(ReturnCode.SUCCESS.getHttpCode()));
+        assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
     }
 
     @Test
@@ -57,7 +56,7 @@ public final class MemberServiceTest extends DatabaseSetup {
         final ProcessMemberRequest request = new ProcessMemberRequest();
 
         final Response response = service.invite(request);
-        assertThat(response.getStatus(), is(ReturnCode.SUCCESS.getHttpCode()));
+        assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
     }
 
     @Test
@@ -66,7 +65,7 @@ public final class MemberServiceTest extends DatabaseSetup {
         final ProcessMemberRequest request = new ProcessMemberRequest();
 
         final Response response = service.invite(request);
-        assertThat(response.getStatus(), is(ReturnCode.SUCCESS.getHttpCode()));
+        assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
     }
 
     @Test
@@ -75,7 +74,7 @@ public final class MemberServiceTest extends DatabaseSetup {
         final ProcessMemberRequest request = new ProcessMemberRequest();
 
         final Response response = service.login(request);
-        assertThat(response.getStatus(), is(ReturnCode.SUCCESS.getHttpCode()));
+        assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
     }
 
     @Test
@@ -84,7 +83,7 @@ public final class MemberServiceTest extends DatabaseSetup {
         final ProcessMemberRequest request = new ProcessMemberRequest();
 
         final Response response = service.login(request);
-        assertThat(response.getStatus(), is(ReturnCode.SUCCESS.getHttpCode()));
+        assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
     }
 
     @Test
@@ -93,7 +92,7 @@ public final class MemberServiceTest extends DatabaseSetup {
         final ProcessMemberRequest request = new ProcessMemberRequest();
 
         final Response response = service.logout(request);
-        assertThat(response.getStatus(), is(ReturnCode.SUCCESS.getHttpCode()));
+        assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
     }
 
     @Test
@@ -102,7 +101,7 @@ public final class MemberServiceTest extends DatabaseSetup {
         final ProcessMemberRequest request = new ProcessMemberRequest();
 
         final Response response = service.logout(request);
-        assertThat(response.getStatus(), is(ReturnCode.SUCCESS.getHttpCode()));
+        assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
     }
 
     @Test
@@ -111,7 +110,7 @@ public final class MemberServiceTest extends DatabaseSetup {
         final ProcessMemberRequest request = new ProcessMemberRequest();
 
         final Response response = service.alter(request);
-        assertThat(response.getStatus(), is(ReturnCode.SUCCESS.getHttpCode()));
+        assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
     }
 
     @Test
@@ -120,7 +119,7 @@ public final class MemberServiceTest extends DatabaseSetup {
         final ProcessMemberRequest request = new ProcessMemberRequest();
 
         final Response response = service.alter(request);
-        assertThat(response.getStatus(), is(ReturnCode.SUCCESS.getHttpCode()));
+        assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
     }
 
     @Test
@@ -129,7 +128,7 @@ public final class MemberServiceTest extends DatabaseSetup {
         final ProcessMemberRequest request = new ProcessMemberRequest();
 
         final Response response = service.update(request);
-        assertThat(response.getStatus(), is(ReturnCode.SUCCESS.getHttpCode()));
+        assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
     }
 
     @Test
@@ -138,7 +137,7 @@ public final class MemberServiceTest extends DatabaseSetup {
         final ProcessMemberRequest request = new ProcessMemberRequest();
 
         final Response response = service.update(request);
-        assertThat(response.getStatus(), is(ReturnCode.SUCCESS.getHttpCode()));
+        assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
     }
 
     @Test
@@ -147,7 +146,7 @@ public final class MemberServiceTest extends DatabaseSetup {
         final ProcessMemberRequest request = new ProcessMemberRequest();
 
         final Response response = service.invalidate(request);
-        assertThat(response.getStatus(), is(ReturnCode.SUCCESS.getHttpCode()));
+        assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
     }
 
     @Test
@@ -156,7 +155,7 @@ public final class MemberServiceTest extends DatabaseSetup {
         final ProcessMemberRequest request = new ProcessMemberRequest();
 
         final Response response = service.invalidate(request);
-        assertThat(response.getStatus(), is(ReturnCode.SUCCESS.getHttpCode()));
+        assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
     }
 
     @Test
@@ -165,7 +164,7 @@ public final class MemberServiceTest extends DatabaseSetup {
         final ProcessMemberRequest request = new ProcessMemberRequest();
 
         final Response response = service.delete(request);
-        assertThat(response.getStatus(), is(ReturnCode.SUCCESS.getHttpCode()));
+        assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
     }
 
     @Test
@@ -174,7 +173,7 @@ public final class MemberServiceTest extends DatabaseSetup {
         final ProcessMemberRequest request = new ProcessMemberRequest();
 
         final Response response = service.delete(request);
-        assertThat(response.getStatus(), is(ReturnCode.SUCCESS.getHttpCode()));
+        assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
     }
 
     @Test
@@ -183,7 +182,7 @@ public final class MemberServiceTest extends DatabaseSetup {
         final FetchMemberRequest request = new FetchMemberRequest();
 
         final Response response = service.fetch(request);
-        assertThat(response.getStatus(), is(ReturnCode.SUCCESS.getHttpCode()));
+        assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
     }
 
     @Test
@@ -192,7 +191,7 @@ public final class MemberServiceTest extends DatabaseSetup {
         final FetchMemberRequest request = new FetchMemberRequest();
 
         final Response response = service.fetch(request);
-        assertThat(response.getStatus(), is(ReturnCode.SUCCESS.getHttpCode()));
+        assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
     }
 
     // =========================================================================

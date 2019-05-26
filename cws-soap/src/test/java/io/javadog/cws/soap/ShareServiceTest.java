@@ -16,10 +16,8 @@
  */
 package io.javadog.cws.soap;
 
-import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import io.javadog.cws.api.common.Action;
@@ -45,7 +43,7 @@ import org.junit.Test;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-public class ShareServiceTest extends BeanSetup {
+public final class ShareServiceTest extends BeanSetup {
 
     @Test
     public void testProcessDataType() {
@@ -59,8 +57,8 @@ public class ShareServiceTest extends BeanSetup {
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
         assertEquals("Ok", response.getReturnMessage());
         assertNotNull(response.getDataType());
-        assertThat(response.getDataType().getTypeName(), is("TestType"));
-        assertThat(response.getDataType().getType(), is("Test Type Value"));
+        assertEquals("TestType", response.getDataType().getTypeName());
+        assertEquals("Test Type Value", response.getDataType().getType());
     }
 
     @Test
@@ -87,7 +85,7 @@ public class ShareServiceTest extends BeanSetup {
         final ProcessDataTypeRequest request = new ProcessDataTypeRequest();
 
         final ProcessDataTypeResponse response = service.processDataType(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.ERROR.getCode()));
+        assertEquals(ReturnCode.ERROR.getCode(), response.getReturnCode());
     }
 
     @Test
@@ -98,11 +96,11 @@ public class ShareServiceTest extends BeanSetup {
         final FetchDataTypeResponse response = service.fetchDataTypes(request);
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
         assertEquals("Ok", response.getReturnMessage());
-        assertThat(response.getDataTypes().size(), is(2));
-        assertThat(response.getDataTypes().get(0).getTypeName(), is("data"));
-        assertThat(response.getDataTypes().get(0).getType(), is("Data Object"));
-        assertThat(response.getDataTypes().get(1).getTypeName(), is("folder"));
-        assertThat(response.getDataTypes().get(1).getType(), is("Folder"));
+        assertEquals(2, response.getDataTypes().size());
+        assertEquals("data", response.getDataTypes().get(0).getTypeName());
+        assertEquals("Data Object", response.getDataTypes().get(0).getType());
+        assertEquals("folder", response.getDataTypes().get(1).getTypeName());
+        assertEquals("Folder", response.getDataTypes().get(1).getType());
     }
 
     @Test
@@ -129,7 +127,7 @@ public class ShareServiceTest extends BeanSetup {
         final FetchDataTypeRequest request = new FetchDataTypeRequest();
 
         final FetchDataTypeResponse response = service.fetchDataTypes(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.ERROR.getCode()));
+        assertEquals(ReturnCode.ERROR.getCode(), response.getReturnCode());
     }
 
     @Test
@@ -172,7 +170,7 @@ public class ShareServiceTest extends BeanSetup {
         final ProcessDataRequest request = new ProcessDataRequest();
 
         final ProcessDataResponse response = service.processData(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.ERROR.getCode()));
+        assertEquals(ReturnCode.ERROR.getCode(), response.getReturnCode());
     }
 
     @Test
@@ -211,7 +209,7 @@ public class ShareServiceTest extends BeanSetup {
         final FetchDataRequest request = new FetchDataRequest();
 
         final FetchDataResponse response = service.fetchData(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.ERROR.getCode()));
+        assertEquals(ReturnCode.ERROR.getCode(), response.getReturnCode());
     }
 
     @Test
@@ -221,13 +219,13 @@ public class ShareServiceTest extends BeanSetup {
         final byte[] data = "alfa".getBytes(settings.getCharset());
         signRequest.setData(data);
         final SignResponse signResponse = service.sign(signRequest);
-        assertThat(signResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+        assertEquals(ReturnCode.SUCCESS.getCode(), signResponse.getReturnCode());
 
         final VerifyRequest verifyRequest = prepareRequest(VerifyRequest.class, MEMBER_2);
         verifyRequest.setData(data);
         verifyRequest.setSignature(signResponse.getSignature());
         final VerifyResponse verifyResponse = service.verify(verifyRequest);
-        assertThat(verifyResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+        assertEquals(ReturnCode.SUCCESS.getCode(), verifyResponse.getReturnCode());
     }
 
     @Test
@@ -254,7 +252,7 @@ public class ShareServiceTest extends BeanSetup {
         final SignRequest request = new SignRequest();
 
         final SignResponse response = service.sign(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.ERROR.getCode()));
+        assertEquals(ReturnCode.ERROR.getCode(), response.getReturnCode());
     }
 
     @Test
@@ -281,7 +279,7 @@ public class ShareServiceTest extends BeanSetup {
         final VerifyRequest request = new VerifyRequest();
 
         final VerifyResponse response = service.verify(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.ERROR.getCode()));
+        assertEquals(ReturnCode.ERROR.getCode(), response.getReturnCode());
     }
 
     @Test
@@ -319,6 +317,6 @@ public class ShareServiceTest extends BeanSetup {
         final FetchSignatureRequest request = new FetchSignatureRequest();
 
         final FetchSignatureResponse response = service.fetchSignatures(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.ERROR.getCode()));
+        assertEquals(ReturnCode.ERROR.getCode(), response.getReturnCode());
     }
 }

@@ -16,10 +16,8 @@
  */
 package io.javadog.cws.soap;
 
-import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -79,7 +77,7 @@ public final class ManagementServiceTest extends BeanSetup {
 
             final VersionResponse response = management.version();
             assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
-            assertThat(response.getVersion(), is(version));
+            assertEquals(version, response.getVersion());
         } else {
             fail("Could not open the Class Loader, to read the '" + propertiesFile + "' file from the test resource path.");
         }
@@ -99,8 +97,8 @@ public final class ManagementServiceTest extends BeanSetup {
         final SettingRequest request = prepareRequest(SettingRequest.class, MEMBER_1);
 
         final SettingResponse response = management.settings(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.AUTHORIZATION_WARNING.getCode()));
-        assertThat(response.getSettings().size(), is(0));
+        assertEquals(ReturnCode.AUTHORIZATION_WARNING.getCode(), response.getReturnCode());
+        assertTrue(response.getSettings().isEmpty());
     }
 
     @Test
@@ -121,8 +119,8 @@ public final class ManagementServiceTest extends BeanSetup {
         request.setSettings(map);
 
         final SettingResponse response = management.settings(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.SETTING_WARNING.getCode()));
-        assertThat(response.getSettings().size(), is(StandardSetting.values().length));
+        assertEquals(ReturnCode.SETTING_WARNING.getCode(), response.getReturnCode());
+        assertEquals(StandardSetting.values().length, response.getSettings().size());
     }
 
     @Test
@@ -178,7 +176,7 @@ public final class ManagementServiceTest extends BeanSetup {
 
         final MasterKeyResponse response = management.masterKey(request);
         assertEquals(ReturnCode.ERROR.getCode(), response.getReturnCode());
-        assertThat(response.getReturnMessage(), is("An unknown error occurred. Please consult the CWS System Log."));
+        assertEquals("An unknown error occurred. Please consult the CWS System Log.", response.getReturnMessage());
     }
 
     @Test
@@ -195,8 +193,8 @@ public final class ManagementServiceTest extends BeanSetup {
         request.setSecret(request.getCredential());
 
         final MasterKeyResponse response = management.masterKey(request);
-        assertThat(response.getReturnCode(), is(ReturnCode.CRYPTO_ERROR.getCode()));
-        assertThat(response.getReturnMessage(), is("the salt parameter must not be empty"));
+        assertEquals(ReturnCode.CRYPTO_ERROR.getCode(), response.getReturnCode());
+        assertEquals("the salt parameter must not be empty", response.getReturnMessage());
 
         // Before completing the test, revert the standard setting to the
         // original value, as it will otherwise cause problems for other tests.

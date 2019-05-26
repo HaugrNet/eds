@@ -16,8 +16,7 @@
  */
 package io.javadog.cws.rest;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertEquals;
 
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
@@ -40,7 +39,7 @@ public final class MasterKeyServiceTest extends DatabaseSetup {
         request.setSecret(Constants.ADMIN_ACCOUNT.getBytes(settings.getCharset()));
 
         final Response response = service.masterKey(request);
-        assertThat(response.getStatus(), is(ReturnCode.SUCCESS.getHttpCode()));
+        assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
     }
 
     @Test
@@ -50,7 +49,7 @@ public final class MasterKeyServiceTest extends DatabaseSetup {
         request.setSecret(Constants.ADMIN_ACCOUNT.getBytes(settings.getCharset()));
 
         final Response response = service.masterKey(request);
-        assertThat(response.getStatus(), is(ReturnCode.SUCCESS.getHttpCode()));
+        assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
     }
 
     // =========================================================================

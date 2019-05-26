@@ -16,11 +16,9 @@
  */
 package io.javadog.cws.client;
 
-import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import io.javadog.cws.api.Management;
@@ -75,7 +73,7 @@ public abstract class AbstractClientTestCase {
         final VersionResponse response = getManagement().version();
         assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getReturnCode());
         assertEquals("Ok", response.getReturnMessage());
-        assertThat(response.getVersion(), is("1.1-SNAPSHOT"));
+        assertEquals("1.1-SNAPSHOT", response.getVersion());
     }
 
     @Test
@@ -94,7 +92,7 @@ public abstract class AbstractClientTestCase {
 
         final MasterKeyResponse response = getManagement().masterKey(request);
         assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getReturnCode());
-        assertThat(response.getReturnMessage(), is("MasterKey unlocked."));
+        assertEquals("MasterKey unlocked.", response.getReturnMessage());
     }
 
     @Test
@@ -168,7 +166,7 @@ public abstract class AbstractClientTestCase {
         processRequest.setAction(Action.PROCESS);
         final ProcessDataTypeResponse processResponse = getShare().processDataType(processRequest);
         assertTrue(processResponse.isOk());
-        assertThat(processResponse.getDataType().getTypeName(), is(processRequest.getTypeName()));
+        assertEquals(processRequest.getTypeName(), processResponse.getDataType().getTypeName());
 
         final FetchDataTypeRequest fetchRequest = Base.prepareRequest(FetchDataTypeRequest.class, Constants.ADMIN_ACCOUNT);
         final FetchDataTypeResponse fetchResponse = getShare().fetchDataTypes(fetchRequest);
@@ -188,7 +186,7 @@ public abstract class AbstractClientTestCase {
         final String circleId = Base.createCircle(getManagement(), accountName1, accountName1);
         Base.addTrustee(getManagement(), accountName1, circleId, memberId2);
         final List<Trustee> trustees = Base.fetchTrustees(getManagement(), accountName1, circleId);
-        assertThat(trustees.size(), is(2));
+        assertEquals(2, trustees.size());
 
         // Step 2; Add 2 Data Objects
         final String data1 = Base.toString(Base.generateData(1024000));
@@ -198,11 +196,11 @@ public abstract class AbstractClientTestCase {
 
         // Step 3; Check the stored content of the Circle
         final FetchDataResponse response = Base.readFolderContent(getShare(), accountName1, circleId);
-        assertThat(response.getRecords(), is(2L));
+        assertEquals(2L, response.getRecords());
         final byte[] read1 = Base.readData(getShare(), accountName2, dataId1);
-        assertThat(Base.toString(read1), is(data1));
+        assertEquals(data1, Base.toString(read1));
         final byte[] read2 = Base.readData(getShare(), accountName2, dataId2);
-        assertThat(Base.toString(read2), is(data2));
+        assertEquals(data2, Base.toString(read2));
     }
 
     @Test

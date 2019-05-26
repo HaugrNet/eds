@@ -10,8 +10,7 @@
  */
 package io.javadog.cws.rest;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertEquals;
 
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.requests.Authentication;
@@ -32,7 +31,7 @@ public final class AuthenticatedServiceTest extends DatabaseSetup {
         final Authentication request = new Authentication();
 
         final Response response = service.authenticated(request);
-        assertThat(response.getStatus(), is(ReturnCode.SUCCESS.getHttpCode()));
+        assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
     }
 
     @Test
@@ -41,7 +40,7 @@ public final class AuthenticatedServiceTest extends DatabaseSetup {
         final Authentication request = new Authentication();
 
         final Response response = service.authenticated(request);
-        assertThat(response.getStatus(), is(ReturnCode.SUCCESS.getHttpCode()));
+        assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
     }
 
     // =========================================================================

@@ -16,15 +16,15 @@
  */
 package io.javadog.cws.core.model.entities;
 
-import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
 
 import io.javadog.cws.core.DatabaseSetup;
+import org.junit.Test;
+
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
-import org.junit.Test;
 
 /**
  * @author Kim Jensen
@@ -48,10 +48,10 @@ public final class SignatureEntityTest extends DatabaseSetup {
         dao.persist(entity);
         final List<SignatureEntity> found = dao.findAllAscending(SignatureEntity.class, "id");
         assertFalse(found.isEmpty());
-        assertThat(found.get(0).getMember(), is(member));
-        assertThat(found.get(0).getPublicKey(), is(publicKey));
-        assertThat(found.get(0).getChecksum(), is(checksum));
-        assertThat(found.get(0).getExpires(), is(expires));
-        assertThat(found.get(0).getVerifications(), is(123L));
+        assertEquals(member, found.get(0).getMember());
+        assertEquals(publicKey, found.get(0).getPublicKey());
+        assertEquals(checksum, found.get(0).getChecksum());
+        assertEquals(expires, found.get(0).getExpires());
+        assertEquals(Long.valueOf(123L), found.get(0).getVerifications());
     }
 }

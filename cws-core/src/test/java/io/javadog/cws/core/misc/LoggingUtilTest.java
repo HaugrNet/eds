@@ -16,17 +16,17 @@
  */
 package io.javadog.cws.core.misc;
 
-import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.core.exceptions.CWSException;
+import org.junit.Test;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Locale;
-import org.junit.Test;
 
 /**
  * @author Kim Jensen
@@ -48,7 +48,7 @@ public final class LoggingUtilTest {
         final long startTime = System.nanoTime();
         final String request = "theRequest";
         final String requestDuration = LoggingUtil.requestDuration(Locale.ENGLISH, request, startTime);
-        assertThat(requestDuration, containsString(request + " completed in "));
+        assertTrue(requestDuration.contains(request + " completed in "));
     }
 
     @Test
@@ -57,6 +57,6 @@ public final class LoggingUtilTest {
         final String request = "theRequest";
         final CWSException exception = new CWSException(ReturnCode.ERROR, "An error occurred");
         final String requestDuration = LoggingUtil.requestDuration(Locale.ENGLISH, request, startTime, exception);
-        assertThat(requestDuration, containsString(request + " completed in "));
+        assertTrue(requestDuration.contains(request + " completed in "));
     }
 }

@@ -16,9 +16,8 @@
  */
 package io.javadog.cws.core;
 
-import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import io.javadog.cws.api.common.ReturnCode;
@@ -29,12 +28,8 @@ import io.javadog.cws.core.exceptions.CWSException;
 import io.javadog.cws.core.model.Settings;
 import io.javadog.cws.core.model.entities.DataEntity;
 import io.javadog.cws.core.services.ProcessDataService;
-import java.io.Serializable;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
+import org.junit.Test;
+
 import javax.ejb.EJBException;
 import javax.ejb.ScheduleExpression;
 import javax.ejb.Timer;
@@ -42,7 +37,12 @@ import javax.ejb.TimerConfig;
 import javax.ejb.TimerHandle;
 import javax.ejb.TimerService;
 import javax.persistence.Query;
-import org.junit.Test;
+import java.io.Serializable;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
 
 /**
  * @author Kim Jensen
@@ -105,7 +105,7 @@ public final class SanitizerBeanTest extends DatabaseSetup {
 
         // Check that there is nothing to scan/check at first
         final List<Long> idsBefore = bean.findNextBatch(100);
-        assertThat(idsBefore.size(), is(6));
+        assertEquals(6, idsBefore.size());
 
         // Run the actual sanitizing
         bean.sanitize();

@@ -16,17 +16,17 @@
  */
 package io.javadog.cws.core.model.entities;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
 
 import io.javadog.cws.core.DatabaseSetup;
 import io.javadog.cws.core.enums.Status;
 import io.javadog.cws.core.model.Settings;
-import java.util.Date;
 import org.junit.Test;
+
+import java.util.Date;
 
 /**
  * @author Kim Jensen
@@ -47,16 +47,16 @@ public final class KeyEntityTest extends DatabaseSetup {
 
         final KeyEntity found = find(KeyEntity.class, key.getId());
         assertNotNull(found);
-        assertThat(found.getAlgorithm(), is(key.getAlgorithm()));
-        assertThat(found.getStatus(), is(key.getStatus()));
-        assertThat(toString(found.getExpires()), is(toString(key.getExpires())));
-        assertThat(found.getGracePeriod(), is(key.getGracePeriod()));
+        assertEquals(key.getAlgorithm(), found.getAlgorithm());
+        assertEquals(key.getStatus(), found.getStatus());
+        assertEquals(toString(key.getExpires()), toString(found.getExpires()));
+        assertEquals(key.getGracePeriod(), found.getGracePeriod());
 
         found.setStatus(Status.DEPRECATED);
         persist(found);
 
         final KeyEntity updated = find(KeyEntity.class, key.getId());
-        assertThat(updated.getStatus(), is(not(key.getStatus())));
+        assertNotEquals(key.getStatus(), updated.getStatus());
     }
 
     @Test

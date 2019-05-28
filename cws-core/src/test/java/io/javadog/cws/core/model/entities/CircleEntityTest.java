@@ -16,14 +16,14 @@
  */
 package io.javadog.cws.core.model.entities;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
 
 import io.javadog.cws.core.DatabaseSetup;
-import java.util.UUID;
 import org.junit.Test;
+
+import java.util.UUID;
 
 /**
  * @author Kim Jensen
@@ -39,7 +39,7 @@ public final class CircleEntityTest extends DatabaseSetup {
 
         final CircleEntity found = find(CircleEntity.class, entity.getId());
         assertNotNull(found);
-        assertThat(found.getName(), is(entity.getName()));
+        assertEquals(entity.getName(), found.getName());
 
         found.setName("Circle 2");
         persist(found);
@@ -48,6 +48,6 @@ public final class CircleEntityTest extends DatabaseSetup {
 
         final CircleEntity updated = find(CircleEntity.class, entity.getId());
         assertNotNull(updated);
-        assertThat(updated.getName(), is(not(entity.getName())));
+        assertNotEquals(entity.getName(), updated.getName());
     }
 }

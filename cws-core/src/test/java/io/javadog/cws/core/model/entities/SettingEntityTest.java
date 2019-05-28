@@ -16,14 +16,14 @@
  */
 package io.javadog.cws.core.model.entities;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import io.javadog.cws.core.DatabaseSetup;
 import io.javadog.cws.core.enums.StandardSetting;
-import java.util.List;
 import org.junit.Test;
+
+import java.util.List;
 
 /**
  * @author Kim Jensen
@@ -40,8 +40,8 @@ public final class SettingEntityTest extends DatabaseSetup {
 
         final SettingEntity found = find(SettingEntity.class, entity.getId());
         assertNotNull(found);
-        assertThat(found.getName(), is("My.New.Setting"));
-        assertThat(found.getSetting(), is("The Setting Value"));
+        assertEquals("My.New.Setting", found.getName());
+        assertEquals("The Setting Value", found.getSetting());
 
         found.setName("My.Altered.Setting");
         found.setSetting("The Altered Setting");
@@ -49,18 +49,18 @@ public final class SettingEntityTest extends DatabaseSetup {
 
         final SettingEntity updated = find(SettingEntity.class, entity.getId());
         assertNotNull(updated);
-        assertThat(updated.getName(), is("My.Altered.Setting"));
-        assertThat(updated.getSetting(), is("The Altered Setting"));
+        assertEquals("My.Altered.Setting", updated.getName());
+        assertEquals("The Altered Setting", updated.getSetting());
 
         final List<SettingEntity> mySettings = dao.findAllAscending(SettingEntity.class, "id");
         assertNotNull(mySettings);
-        assertThat(mySettings.size(), is(StandardSetting.values().length + 1));
+        assertEquals(StandardSetting.values().length + 1, mySettings.size());
     }
 
     @Test
     public void testDaoFindSettings() {
         final List<SettingEntity> mySettings = dao.findAllAscending(SettingEntity.class, "id");
         assertNotNull(mySettings);
-        assertThat(mySettings.size(), is(StandardSetting.values().length));
+        assertEquals(StandardSetting.values().length, mySettings.size());
     }
 }

@@ -16,26 +16,29 @@
  */
 package io.javadog.cws.core.jce;
 
-import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.core.DatabaseSetup;
 import io.javadog.cws.core.enums.KeyAlgorithm;
 import io.javadog.cws.core.enums.StandardSetting;
+import io.javadog.cws.core.exceptions.CWSException;
 import io.javadog.cws.core.exceptions.CryptoException;
 import io.javadog.cws.core.model.Settings;
+import org.junit.Test;
+
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
 import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.util.UUID;
-import javax.crypto.KeyGenerator;
-import javax.crypto.SecretKey;
-import org.junit.Test;
 
 /**
  * Testing the simple Cryptographic Operations.
@@ -46,7 +49,7 @@ import org.junit.Test;
 public final class CryptoTest extends DatabaseSetup {
 
     @Test
-    public void testGCMEncryption() {
+    public void testGCM128Encryption() {
         final String cleartext = "This is just an example";
 
         final KeyAlgorithm algorithm = KeyAlgorithm.AES_GCM_128;
@@ -59,7 +62,7 @@ public final class CryptoTest extends DatabaseSetup {
         final byte[] decryptedBytes = crypto.decrypt(key, encryptedBytes);
         final String decrypted = crypto.bytesToString(decryptedBytes);
 
-        assertThat(decrypted, is(cleartext));
+        assertEquals(cleartext, decrypted);
     }
 
     @Test
@@ -159,7 +162,7 @@ public final class CryptoTest extends DatabaseSetup {
         final String armoredKey = crypto.armoringPublicKey(key.getPublic().getKey());
         final PublicKey dearmoredKey = crypto.dearmoringPublicKey(armoredKey);
 
-        assertThat(dearmoredKey, is(key.getPublic().getKey()));
+        assertEquals(key.getPublic().getKey(), dearmoredKey);
     }
 
     /**
@@ -178,7 +181,7 @@ public final class CryptoTest extends DatabaseSetup {
         final String armoredKey = crypto.armoringPrivateKey(cryptoKeys, keyPair.getPrivate().getKey());
         final PrivateKey dearmoredKey = crypto.dearmoringPrivateKey(cryptoKeys, armoredKey);
 
-        assertThat(keyPair.getPrivate().getKey(), is(dearmoredKey));
+        assertEquals(dearmoredKey, keyPair.getPrivate().getKey());
     }
 
     @Test
@@ -193,10 +196,10 @@ public final class CryptoTest extends DatabaseSetup {
         final String armoredPrivateKey = crypto.armoringPrivateKey(secretKey, pair.getPrivate().getKey());
 
         final CWSKeyPair dearmoredPair = crypto.extractAsymmetricKey(pair.getAlgorithm(), secretKey, salt, armoredPublicKey, armoredPrivateKey);
-        assertThat(dearmoredPair.getAlgorithm(), is(pair.getAlgorithm()));
-        assertThat(dearmoredPair.getPublic().getKey(), is(pair.getPublic().getKey()));
-        assertThat(dearmoredPair.getPrivate().getKey(), is(pair.getPrivate().getKey()));
-        assertThat(dearmoredPair.getPublic().getKey().hashCode(), is(pair.getPublic().getKey().hashCode()));
+        assertEquals(pair.getAlgorithm(), dearmoredPair.getAlgorithm());
+        assertEquals(pair.getPublic().getKey(), dearmoredPair.getPublic().getKey());
+        assertEquals(pair.getPrivate().getKey(), dearmoredPair.getPrivate().getKey());
+        assertEquals(pair.getPublic().getKey().hashCode(), dearmoredPair.getPublic().getKey().hashCode());
     }
 
     /**
@@ -218,7 +221,7 @@ public final class CryptoTest extends DatabaseSetup {
         final byte[] decrypted = crypto.decrypt(key, encrypted);
         final String result = crypto.bytesToString(decrypted);
 
-        assertThat(result, is(cleartext));
+        assertEquals(cleartext, result);
     }
 
     /**
@@ -240,7 +243,7 @@ public final class CryptoTest extends DatabaseSetup {
         final byte[] decrypted = crypto.decrypt(key.getPrivate(), encrypted);
         final String result = crypto.bytesToString(decrypted);
 
-        assertThat(result, is(cleartext));
+        assertEquals(cleartext, result);
     }
 
     /**
@@ -295,7 +298,7 @@ public final class CryptoTest extends DatabaseSetup {
         final byte[] decrypted = crypto.decrypt(key, encrypted);
         final String result = crypto.bytesToString(decrypted);
 
-        assertThat(result, is(cleartext));
+        assertEquals(cleartext, result);
     }
 
     /**
@@ -322,7 +325,7 @@ public final class CryptoTest extends DatabaseSetup {
         circleKey.setSalt(new IVSalt(dataSalt));
         final byte[] decryptedData = crypto.decrypt(circleKey, encryptedData);
 
-        assertThat(decryptedData, is(rawdata));
+        assertArrayEquals(rawdata, decryptedData);
     }
 
     @Test
@@ -334,9 +337,9 @@ public final class CryptoTest extends DatabaseSetup {
         final String garbage = "INVALID_ENCODING";
         mySettings.set(StandardSetting.CWS_CHARSET.getKey(), garbage);
 
-        prepareCause(ReturnCode.SETTING_ERROR, "java.nio.charset.UnsupportedCharsetException: " + garbage);
-        assertNotNull(str);
-        myCrypto.stringToBytes(str);
+        final CWSException cause = assertThrows(CWSException.class, () -> myCrypto.stringToBytes(str));
+        assertTrue(cause.getMessage().contains("java.nio.charset.UnsupportedCharsetException: " + garbage));
+        assertEquals(ReturnCode.SETTING_ERROR, cause.getReturnCode());
     }
 
     @Test
@@ -351,7 +354,7 @@ public final class CryptoTest extends DatabaseSetup {
         prepareCause(ReturnCode.SETTING_ERROR, "UnsupportedCharsetException: " + garbage);
         assertNotNull(bytes);
         final String reversed = myCrypto.bytesToString(bytes);
-        assertThat(reversed, is(str));
+        assertEquals(str, reversed);
     }
 
     @Test

@@ -16,11 +16,10 @@
  */
 package io.javadog.cws.core.model.entities;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import io.javadog.cws.api.common.Constants;
@@ -30,11 +29,12 @@ import io.javadog.cws.core.GenerateTestData;
 import io.javadog.cws.core.enums.KeyAlgorithm;
 import io.javadog.cws.core.jce.CWSKeyPair;
 import io.javadog.cws.core.model.CommonDao;
-import java.util.List;
-import java.util.UUID;
+import org.junit.Test;
+
 import javax.persistence.PersistenceException;
 import javax.persistence.Query;
-import org.junit.Test;
+import java.util.List;
+import java.util.UUID;
 
 /**
  * @author Kim Jensen
@@ -52,13 +52,13 @@ public final class MemberEntityTest extends DatabaseSetup {
         final long id = entity.getId();
 
         final MemberEntity found = find(MemberEntity.class, id);
-        assertThat(found.getId(), is(entity.getId()));
-        assertThat(found.getExternalId(), is(entity.getExternalId()));
-        assertThat(found.getName(), is(entity.getName()));
-        assertThat(found.getSalt(), is(entity.getSalt()));
-        assertThat(found.getPublicKey(), is(entity.getPublicKey()));
-        assertThat(found.getPrivateKey(), is(entity.getPrivateKey()));
-        assertThat(found.getMemberRole(), is(MemberRole.STANDARD));
+        assertEquals(entity.getId(), found.getId());
+        assertEquals(entity.getExternalId(), found.getExternalId());
+        assertEquals(entity.getName(), found.getName());
+        assertEquals(entity.getSalt(), found.getSalt());
+        assertEquals(entity.getPublicKey(), found.getPublicKey());
+        assertEquals(entity.getPrivateKey(), found.getPrivateKey());
+        assertEquals(MemberRole.STANDARD, found.getMemberRole());
         assertNull(found.getSessionChecksum());
         assertNull(found.getSessionCrypto());
         assertNull(found.getSessionExpire());
@@ -106,26 +106,26 @@ public final class MemberEntityTest extends DatabaseSetup {
         final List<MemberEntity> list = CommonDao.findList(query);
         // Now, a couple of checks. First, that we have 2 records, the default
         // Administration Account and the newly created Account
-        assertThat(list.size(), is(7));
+        assertEquals(7, list.size());
 
         final MemberEntity found = list.get(0);
         // Next, check that the newly found entity is not the same Object as the
         // first, this is done via the Reference Pointers, since an
         // Objects.equals() will yield the same result
-        assertThat(entity.hashCode(), is(not(found.hashCode())));
+        assertNotEquals(found.hashCode(), entity.hashCode());
         // Now, we'll ensure that it is the same Entity by comparing the Id's
-        assertThat(entity.getId(), is(found.getId()));
+        assertEquals(found.getId(), entity.getId());
     }
 
     @Test
     public void testDaoFindMemberAdmin() {
         final MemberEntity admin = dao.findMemberByName(Constants.ADMIN_ACCOUNT);
         assertNotNull(admin);
-        assertThat(admin.getName(), is(Constants.ADMIN_ACCOUNT));
+        assertEquals(Constants.ADMIN_ACCOUNT, admin.getName());
 
         final MemberEntity adminByExternalId = dao.find(MemberEntity.class, admin.getExternalId());
         assertNotNull(adminByExternalId);
-        assertThat(adminByExternalId.getId(), is(admin.getId()));
+        assertEquals(admin.getId(), adminByExternalId.getId());
     }
 
     @Test
@@ -143,13 +143,13 @@ public final class MemberEntityTest extends DatabaseSetup {
         final Query query = entityManager.createQuery(jql);
         final List<MemberEntity> found = CommonDao.findList(query);
 
-        assertThat(found.size(), is(6));
-        assertThat(found.get(0).getName(), is(Constants.ADMIN_ACCOUNT));
-        assertThat(found.get(1).getName(), is(MEMBER_1));
-        assertThat(found.get(2).getName(), is(MEMBER_2));
-        assertThat(found.get(3).getName(), is(MEMBER_3));
-        assertThat(found.get(4).getName(), is(MEMBER_4));
-        assertThat(found.get(5).getName(), is(MEMBER_5));
+        assertEquals(6, found.size());
+        assertEquals(Constants.ADMIN_ACCOUNT, found.get(0).getName());
+        assertEquals(MEMBER_1, found.get(1).getName());
+        assertEquals(MEMBER_2, found.get(2).getName());
+        assertEquals(MEMBER_3, found.get(3).getName());
+        assertEquals(MEMBER_4, found.get(4).getName());
+        assertEquals(MEMBER_5, found.get(5).getName());
     }
 
     /**

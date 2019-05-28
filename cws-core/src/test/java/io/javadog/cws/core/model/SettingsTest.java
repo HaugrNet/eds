@@ -16,20 +16,20 @@
  */
 package io.javadog.cws.core.model;
 
-import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import io.javadog.cws.core.DatabaseSetup;
 import io.javadog.cws.core.enums.HashAlgorithm;
 import io.javadog.cws.core.enums.KeyAlgorithm;
 import io.javadog.cws.core.enums.StandardSetting;
+import org.junit.Test;
+
 import java.util.EnumSet;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import org.junit.Test;
 
 /**
  * @author Kim Jensen
@@ -42,11 +42,11 @@ public final class SettingsTest extends DatabaseSetup {
         final Settings mySettings = newSettings();
 
         final Map<String, String> existing = mySettings.get();
-        assertThat(existing.size(), is(StandardSetting.values().length));
+        assertEquals(StandardSetting.values().length, existing.size());
         mySettings.set("my.new.key", "the awesome value");
 
         final Map<String, String> updated = mySettings.get();
-        assertThat(updated.size(), is(existing.size() + 1));
+        assertEquals(existing.size() + 1, updated.size());
     }
 
     @Test
@@ -62,8 +62,8 @@ public final class SettingsTest extends DatabaseSetup {
         assertTrue(rsa.contains(mySettings.getAsymmetricAlgorithm()));
         assertTrue(sha.contains(mySettings.getSignatureAlgorithm()));
         assertTrue(pbe.contains(mySettings.getPasswordAlgorithm()));
-        assertThat(mySettings.getSalt(), is("Default salt, also used as kill switch. Must be set in DB."));
-        assertThat(mySettings.getCharset().name(), is("UTF-8"));
+        assertEquals("Default salt, also used as kill switch. Must be set in DB.", mySettings.getSalt());
+        assertEquals("UTF-8", mySettings.getCharset().name());
     }
 
     @Test
@@ -71,43 +71,43 @@ public final class SettingsTest extends DatabaseSetup {
         final Settings mySettings = newSettings();
 
         mySettings.set(StandardSetting.SYMMETRIC_ALGORITHM, KeyAlgorithm.AES_CBC_192.name());
-        assertThat(mySettings.getSymmetricAlgorithm(), is(KeyAlgorithm.AES_CBC_192));
+        assertEquals(KeyAlgorithm.AES_CBC_192, mySettings.getSymmetricAlgorithm());
 
         mySettings.set(StandardSetting.ASYMMETRIC_ALGORITHM, KeyAlgorithm.RSA_4096.name());
-        assertThat(mySettings.getAsymmetricAlgorithm(), is(KeyAlgorithm.RSA_4096));
+        assertEquals(KeyAlgorithm.RSA_4096, mySettings.getAsymmetricAlgorithm());
 
         mySettings.set(StandardSetting.ASYMMETRIC_ALGORITHM, KeyAlgorithm.RSA_8192.name());
-        assertThat(mySettings.getAsymmetricAlgorithm(), is(KeyAlgorithm.RSA_8192));
+        assertEquals(KeyAlgorithm.RSA_8192, mySettings.getAsymmetricAlgorithm());
 
         mySettings.set(StandardSetting.SIGNATURE_ALGORITHM, KeyAlgorithm.SHA_256.name());
-        assertThat(mySettings.getSignatureAlgorithm(), is(KeyAlgorithm.SHA_256));
+        assertEquals(KeyAlgorithm.SHA_256, mySettings.getSignatureAlgorithm());
 
         mySettings.set(StandardSetting.HASH_ALGORITHM, HashAlgorithm.SHA_256.name());
-        assertThat(mySettings.getHashAlgorithm(), is(HashAlgorithm.SHA_256));
+        assertEquals(HashAlgorithm.SHA_256, mySettings.getHashAlgorithm());
 
         mySettings.set(StandardSetting.PBE_ALGORITHM, KeyAlgorithm.PBE_192.name());
-        assertThat(mySettings.getPasswordAlgorithm(), is(KeyAlgorithm.PBE_192));
+        assertEquals(KeyAlgorithm.PBE_192, mySettings.getPasswordAlgorithm());
 
         mySettings.set(StandardSetting.PBE_ALGORITHM, KeyAlgorithm.PBE_256.name());
-        assertThat(mySettings.getPasswordAlgorithm(), is(KeyAlgorithm.PBE_256));
+        assertEquals(KeyAlgorithm.PBE_256, mySettings.getPasswordAlgorithm());
 
         mySettings.set(StandardSetting.CWS_SALT, "UUID value");
-        assertThat(mySettings.getSalt(), is("UUID value"));
+        assertEquals("UUID value", mySettings.getSalt());
 
         mySettings.set(StandardSetting.CWS_LOCALE, Locale.GERMAN.toString());
-        assertThat(mySettings.getLocale(), is(Locale.GERMAN));
+        assertEquals(Locale.GERMAN, mySettings.getLocale());
 
         mySettings.set(StandardSetting.CWS_CHARSET, "ISO-8859-15");
-        assertThat(mySettings.getCharset().name(), is("ISO-8859-15"));
+        assertEquals("ISO-8859-15", mySettings.getCharset().name());
 
         mySettings.set(StandardSetting.SANITY_STARTUP, "false");
         assertFalse(mySettings.getSanityStartup());
 
         mySettings.set(StandardSetting.SANITY_INTERVAL, "120");
-        assertThat(mySettings.getSanityInterval(), is(120));
+        assertEquals(Integer.valueOf(120), mySettings.getSanityInterval());
 
         mySettings.set(StandardSetting.SESSION_TIMEOUT, "240");
-        assertThat(mySettings.getSessionTimeout(), is(240));
+        assertEquals(Integer.valueOf(240), mySettings.getSessionTimeout());
     }
 
     @Test

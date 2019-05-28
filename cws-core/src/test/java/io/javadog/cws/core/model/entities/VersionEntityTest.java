@@ -17,16 +17,18 @@
 package io.javadog.cws.core.model.entities;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 
 import io.javadog.cws.core.DatabaseSetup;
 import io.javadog.cws.core.model.CommonDao;
-import java.util.Date;
-import java.util.List;
+import org.junit.Test;
+
 import javax.persistence.PersistenceException;
 import javax.persistence.Query;
-import org.junit.Test;
+import java.util.Date;
+import java.util.List;
 
 /**
  * @author Kim Jensen
@@ -38,16 +40,16 @@ public final class VersionEntityTest extends DatabaseSetup {
     public void testEntity() {
         final Query query = entityManager.createNamedQuery("version.findAll");
         final List<VersionEntity> found = CommonDao.findList(query);
-        assertThat(found.size(), is(2));
-        assertThat(found.get(0).getId(), is(2L));
-        assertThat(found.get(0).getCwsVersion(), is("1.1.0"));
-        assertThat(found.get(0).getDbVendor(), is("H2"));
-        assertThat(found.get(0).getSchemaVersion(), is(2));
+        assertEquals(2, found.size());
+        assertEquals(Long.valueOf(2L), found.get(0).getId());
+        assertEquals("1.1.0", found.get(0).getCwsVersion());
+        assertEquals("H2", found.get(0).getDbVendor());
+        assertEquals(Integer.valueOf(2), found.get(0).getSchemaVersion());
         assertNotNull(found.get(0).getInstalled());
-        assertThat(found.get(1).getId(), is(1L));
-        assertThat(found.get(1).getCwsVersion(), is("1.0.0"));
-        assertThat(found.get(1).getDbVendor(), is("H2"));
-        assertThat(found.get(1).getSchemaVersion(), is(1));
+        assertEquals(Long.valueOf(1L), found.get(1).getId());
+        assertEquals("1.0.0", found.get(1).getCwsVersion());
+        assertEquals("H2", found.get(1).getDbVendor());
+        assertEquals(Integer.valueOf(1), found.get(1).getSchemaVersion());
         assertNotNull(found.get(1).getInstalled());
 
         // Now adding a new Entity, this must fail.

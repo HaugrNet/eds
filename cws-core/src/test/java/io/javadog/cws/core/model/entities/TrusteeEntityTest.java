@@ -16,17 +16,17 @@
  */
 package io.javadog.cws.core.model.entities;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
 
 import io.javadog.cws.api.common.MemberRole;
 import io.javadog.cws.api.common.TrustLevel;
 import io.javadog.cws.core.DatabaseSetup;
 import io.javadog.cws.core.enums.KeyAlgorithm;
-import java.util.UUID;
 import org.junit.Test;
+
+import java.util.UUID;
 
 /**
  * @author Kim Jensen
@@ -51,9 +51,9 @@ public final class TrusteeEntityTest extends DatabaseSetup {
         persist(entity);
 
         final TrusteeEntity found = find(TrusteeEntity.class, entity.getId());
-        assertThat(found.getMember().getId(), is(member.getId()));
-        assertThat(found.getCircle().getId(), is(circle.getId()));
-        assertThat(found.getKey().getId(), is(key.getId()));
+        assertEquals(member.getId(), found.getMember().getId());
+        assertEquals(circle.getId(), found.getCircle().getId());
+        assertEquals(key.getId(), found.getKey().getId());
 
         found.setCircleKey("New Key");
         found.setTrustLevel(TrustLevel.WRITE);
@@ -61,7 +61,7 @@ public final class TrusteeEntityTest extends DatabaseSetup {
 
         final TrusteeEntity updated = find(TrusteeEntity.class, entity.getId());
         assertNotNull(updated);
-        assertThat(updated.getTrustLevel(), is(not(TrustLevel.ADMIN)));
-        assertThat(updated.getCircleKey(), is(not(circleKey)));
+        assertNotEquals(TrustLevel.ADMIN, updated.getTrustLevel());
+        assertNotEquals(circleKey, updated.getCircleKey());
     }
 }

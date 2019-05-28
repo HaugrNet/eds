@@ -16,14 +16,15 @@
  */
 package io.javadog.cws.core.jce;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
 
 import io.javadog.cws.core.DatabaseSetup;
+import org.junit.Test;
+
 import java.security.SecureRandom;
 import java.util.Base64;
 import java.util.UUID;
-import org.junit.Test;
 
 /**
  * @author Kim Jensen
@@ -36,16 +37,16 @@ public class IVSaltTest extends DatabaseSetup {
         final String uuid = UUID.randomUUID().toString();
         final IVSalt salt = new IVSalt(uuid);
 
-        assertThat(salt.getArmored(), is(uuid));
-        assertThat(salt.getBytes().length, is(16));
+        assertEquals(uuid, salt.getArmored());
+        assertEquals(16, salt.getBytes().length);
     }
 
     @Test
     public void testDefaultSalt() {
         final IVSalt salt = new IVSalt();
 
-        assertThat(salt.getArmored().length(), is(24));
-        assertThat(salt.getBytes().length, is(16));
+        assertEquals(24, salt.getArmored().length());
+        assertEquals(16, salt.getBytes().length);
     }
 
     @Test
@@ -57,8 +58,8 @@ public class IVSaltTest extends DatabaseSetup {
         final IVSalt salt = new IVSalt(armored);
         final byte[] bytes = salt.getBytes();
 
-        assertThat(salt.getArmored(), is(armored));
-        assertThat(bytes, is(random));
+        assertEquals(armored, salt.getArmored());
+        assertArrayEquals(random, bytes);
     }
 
     /**
@@ -75,7 +76,7 @@ public class IVSaltTest extends DatabaseSetup {
         final IVSalt salt = new IVSalt(armored);
         final byte[] bytes = salt.getBytes();
 
-        assertThat(salt.getArmored(), is(armored));
-        assertThat(armored.substring(0, 16), is(new String(bytes, settings.getCharset())));
+        assertEquals(armored, salt.getArmored());
+        assertEquals(new String(bytes, settings.getCharset()), armored.substring(0, 16));
     }
 }

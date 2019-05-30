@@ -29,12 +29,11 @@ import io.javadog.cws.core.GenerateTestData;
 import io.javadog.cws.core.enums.KeyAlgorithm;
 import io.javadog.cws.core.jce.CWSKeyPair;
 import io.javadog.cws.core.model.CommonDao;
-import org.junit.Test;
-
-import javax.persistence.PersistenceException;
-import javax.persistence.Query;
 import java.util.List;
 import java.util.UUID;
+import javax.persistence.PersistenceException;
+import javax.persistence.Query;
+import org.junit.Test;
 
 /**
  * @author Kim Jensen

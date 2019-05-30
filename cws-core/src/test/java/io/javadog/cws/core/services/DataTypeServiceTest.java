@@ -16,13 +16,12 @@
  */
 package io.javadog.cws.core.services;
 
-import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import io.javadog.cws.api.common.Action;
 import io.javadog.cws.api.common.Constants;
@@ -34,6 +33,7 @@ import io.javadog.cws.api.responses.FetchDataTypeResponse;
 import io.javadog.cws.api.responses.ProcessDataResponse;
 import io.javadog.cws.api.responses.ProcessDataTypeResponse;
 import io.javadog.cws.core.DatabaseSetup;
+import io.javadog.cws.core.exceptions.CWSException;
 import org.junit.Test;
 
 /**
@@ -46,28 +46,27 @@ public final class DataTypeServiceTest extends DatabaseSetup {
 
     @Test
     public void testEmptyFetchRequest() {
-        prepareCause(ReturnCode.VERIFICATION_WARNING, "Request Object contained errors:" +
-                "\nKey: credential, Error: The Session (Credential) is missing.");
-
         final FetchDataTypeService service = new FetchDataTypeService(settings, entityManager);
         final FetchDataTypeRequest request = new FetchDataTypeRequest();
-        assertNull(request.getAccountName());
 
-        service.perform(request);
+        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
+        assertEquals(ReturnCode.VERIFICATION_WARNING, cause.getReturnCode());
+        assertEquals("Request Object contained errors:" +
+                "\nKey: credential, Error: The Session (Credential) is missing.", cause.getMessage());
     }
 
     @Test
     public void testEmptyProcessRequest() {
-        prepareCause(ReturnCode.VERIFICATION_WARNING, "Request Object contained errors:" +
-                "\nKey: credential, Error: The Session (Credential) is missing." +
-                "\nKey: typeName, Error: The name of the DataType is missing or invalid." +
-                "\nKey: type, Error: The type of the DataType is missing or invalid.");
-
         final ProcessDataTypeService service = new ProcessDataTypeService(settings, entityManager);
         final ProcessDataTypeRequest request = new ProcessDataTypeRequest();
         assertNull(request.getAccountName());
 
-        service.perform(request);
+        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
+        assertEquals(ReturnCode.VERIFICATION_WARNING, cause.getReturnCode());
+        assertEquals("Request Object contained errors:" +
+                "\nKey: credential, Error: The Session (Credential) is missing." +
+                "\nKey: typeName, Error: The name of the DataType is missing or invalid." +
+                "\nKey: type, Error: The type of the DataType is missing or invalid.", cause.getMessage());
     }
 
     @Test
@@ -80,25 +79,25 @@ public final class DataTypeServiceTest extends DatabaseSetup {
         assertTrue(response.isOk());
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
         assertEquals("Ok", response.getReturnMessage());
-        assertThat(response.getDataTypes().size(), is(2));
-        assertThat(response.getDataTypes().get(0).getTypeName(), is(Constants.DATA_TYPENAME));
-        assertThat(response.getDataTypes().get(0).getType(), is("Data Object"));
-        assertThat(response.getDataTypes().get(1).getTypeName(), is(Constants.FOLDER_TYPENAME));
-        assertThat(response.getDataTypes().get(1).getType(), is("Folder"));
+        assertEquals(2, response.getDataTypes().size());
+        assertEquals(Constants.DATA_TYPENAME, response.getDataTypes().get(0).getTypeName());
+        assertEquals("Data Object", response.getDataTypes().get(0).getType());
+        assertEquals(Constants.FOLDER_TYPENAME, response.getDataTypes().get(1).getTypeName());
+        assertEquals("Folder", response.getDataTypes().get(1).getType());
     }
 
     @Test
     public void testInvokeWithoutAnything() {
-        prepareCause(ReturnCode.VERIFICATION_WARNING, "Request Object contained errors:" +
-                "\nKey: typeName, Error: The name of the DataType is missing or invalid." +
-                "\nKey: type, Error: The type of the DataType is missing or invalid.");
-
         final ProcessDataTypeService service = new ProcessDataTypeService(settings, entityManager);
         final ProcessDataTypeRequest request = prepareRequest(ProcessDataTypeRequest.class, Constants.ADMIN_ACCOUNT);
         assertNull(request.getTypeName());
         assertNull(request.getType());
 
-        service.perform(request);
+        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
+        assertEquals(ReturnCode.VERIFICATION_WARNING, cause.getReturnCode());
+        assertEquals("Request Object contained errors:" +
+                "\nKey: typeName, Error: The name of the DataType is missing or invalid." +
+                "\nKey: type, Error: The type of the DataType is missing or invalid.", cause.getMessage());
     }
 
     @Test
@@ -117,8 +116,6 @@ public final class DataTypeServiceTest extends DatabaseSetup {
 
     @Test
     public void testNotAuthorizedRequest() {
-        prepareCause(ReturnCode.AUTHORIZATION_WARNING, "The requesting Account is not permitted to Process Data Type.");
-
         final ProcessDataTypeService service = new ProcessDataTypeService(settings, entityManager);
         final ProcessDataTypeRequest request = prepareRequest(ProcessDataTypeRequest.class, MEMBER_5);
         request.setType("MyDataType");
@@ -126,13 +123,13 @@ public final class DataTypeServiceTest extends DatabaseSetup {
         assertNotNull(request.getTypeName());
         assertNotNull(request.getType());
 
-        service.perform(request);
+        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
+        assertEquals(ReturnCode.AUTHORIZATION_WARNING, cause.getReturnCode());
+        assertEquals("The requesting Account is not permitted to Process Data Type.", cause.getMessage());
     }
 
     @Test
     public void testUpdateRestrictedDataTypeFolder() {
-        prepareCause(ReturnCode.AUTHORIZATION_WARNING, "It is not permitted to update the DataType '" + Constants.FOLDER_TYPENAME + "'.");
-
         final ProcessDataTypeService service = new ProcessDataTypeService(settings, entityManager);
         final ProcessDataTypeRequest request = prepareRequest(ProcessDataTypeRequest.class, Constants.ADMIN_ACCOUNT);
         request.setTypeName(Constants.FOLDER_TYPENAME);
@@ -140,13 +137,13 @@ public final class DataTypeServiceTest extends DatabaseSetup {
         assertNotNull(request.getTypeName());
         assertNotNull(request.getType());
 
-        service.perform(request);
+        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
+        assertEquals(ReturnCode.AUTHORIZATION_WARNING, cause.getReturnCode());
+        assertEquals("It is not permitted to update the DataType '" + Constants.FOLDER_TYPENAME + "'.", cause.getMessage());
     }
 
     @Test
     public void testUpdateRestrictedDataTypeData() {
-        prepareCause(ReturnCode.AUTHORIZATION_WARNING, "It is not permitted to update the DataType '" + Constants.DATA_TYPENAME + "'.");
-
         final ProcessDataTypeService service = new ProcessDataTypeService(settings, entityManager);
         final ProcessDataTypeRequest request = prepareRequest(ProcessDataTypeRequest.class, Constants.ADMIN_ACCOUNT);
         request.setTypeName(Constants.DATA_TYPENAME);
@@ -154,8 +151,9 @@ public final class DataTypeServiceTest extends DatabaseSetup {
         assertNotNull(request.getTypeName());
         assertNotNull(request.getType());
 
-        final ProcessDataTypeResponse response = service.perform(request);
-        assertThat(response.getReturnMessage(), is(""));
+        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
+        assertEquals(ReturnCode.AUTHORIZATION_WARNING, cause.getReturnCode());
+        assertEquals("It is not permitted to update the DataType '" + Constants.DATA_TYPENAME + "'.", cause.getMessage());
     }
 
     @Test
@@ -179,14 +177,12 @@ public final class DataTypeServiceTest extends DatabaseSetup {
         final ProcessDataTypeResponse deletedResponse = service.perform(request);
         assertNotNull(deletedResponse);
         assertTrue(deletedResponse.isOk());
-        assertThat(deletedResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
-        assertThat(deletedResponse.getReturnMessage(), is("Ok"));
+        assertEquals(ReturnCode.SUCCESS.getCode(), deletedResponse.getReturnCode());
+        assertEquals("Ok", deletedResponse.getReturnMessage());
     }
 
     @Test
     public void testCreateAndDeleteUsedDataType() {
-        prepareCause(ReturnCode.ILLEGAL_ACTION, "The Data Type 'text' cannot be deleted, as it is being actively used.");
-
         final ProcessDataTypeService service = new ProcessDataTypeService(settings, entityManager);
         final ProcessDataService dataService = new ProcessDataService(settings, entityManager);
 
@@ -208,7 +204,10 @@ public final class DataTypeServiceTest extends DatabaseSetup {
         final ProcessDataTypeRequest deleteRequest = prepareRequest(ProcessDataTypeRequest.class, Constants.ADMIN_ACCOUNT);
         deleteRequest.setAction(Action.DELETE);
         deleteRequest.setTypeName("text");
-        service.perform(deleteRequest);
+
+        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(deleteRequest));
+        assertEquals(ReturnCode.ILLEGAL_ACTION, cause.getReturnCode());
+        assertEquals("The Data Type 'text' cannot be deleted, as it is being actively used.", cause.getMessage());
     }
 
     @Test
@@ -224,8 +223,8 @@ public final class DataTypeServiceTest extends DatabaseSetup {
 
         assertNotNull(response);
         assertFalse(response.isOk());
-        assertThat(response.getReturnCode(), is(ReturnCode.IDENTIFICATION_WARNING.getCode()));
-        assertThat(response.getReturnMessage(), is("No records were found with the name '" + theDataTypeName + "'."));
+        assertEquals(ReturnCode.IDENTIFICATION_WARNING.getCode(), response.getReturnCode());
+        assertEquals("No records were found with the name '" + theDataTypeName + "'.", response.getReturnMessage());
     }
 
     @Test
@@ -242,8 +241,8 @@ public final class DataTypeServiceTest extends DatabaseSetup {
         assertTrue(response.isOk());
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
         assertEquals("Ok", response.getReturnMessage());
-        assertThat(response.getDataType().getTypeName(), is(theDataTypeName));
-        assertThat(response.getDataType().getType(), is(newDataTypeType));
+        assertEquals(theDataTypeName, response.getDataType().getTypeName());
+        assertEquals(newDataTypeType, response.getDataType().getType());
 
         final String updatedDataTypeType = "updatedType";
         request.setCredential(crypto.stringToBytes(Constants.ADMIN_ACCOUNT));
@@ -252,9 +251,9 @@ public final class DataTypeServiceTest extends DatabaseSetup {
         final ProcessDataTypeResponse updateResponse = service.perform(request);
         assertTrue(updateResponse.isOk());
         assertEquals(ReturnCode.SUCCESS.getCode(), updateResponse.getReturnCode());
-        assertThat(updateResponse.getReturnMessage(), is("Ok"));
-        assertThat(updateResponse.getDataType().getTypeName(), is(theDataTypeName));
-        assertThat(updateResponse.getDataType().getType(), is(updatedDataTypeType));
+        assertEquals("Ok", updateResponse.getReturnMessage());
+        assertEquals(theDataTypeName, updateResponse.getDataType().getTypeName());
+        assertEquals(updatedDataTypeType, updateResponse.getDataType().getType());
     }
 
     @Test
@@ -271,15 +270,15 @@ public final class DataTypeServiceTest extends DatabaseSetup {
         assertTrue(response.isOk());
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
         assertEquals("Ok", response.getReturnMessage());
-        assertThat(response.getDataType().getTypeName(), is(aDataTypeName));
-        assertThat(response.getDataType().getType(), is(aDataTypeType));
+        assertEquals(aDataTypeName, response.getDataType().getTypeName());
+        assertEquals(aDataTypeType, response.getDataType().getType());
 
         createRequest.setCredential(crypto.stringToBytes(Constants.ADMIN_ACCOUNT));
         final ProcessDataTypeResponse updateResponse = dataTypeService.perform(createRequest);
         assertTrue(updateResponse.isOk());
         assertEquals(ReturnCode.SUCCESS.getCode(), updateResponse.getReturnCode());
-        assertThat(updateResponse.getReturnMessage(), is("Ok"));
-        assertThat(updateResponse.getDataType().getTypeName(), is(aDataTypeName));
-        assertThat(updateResponse.getDataType().getType(), is(aDataTypeType));
+        assertEquals("Ok", updateResponse.getReturnMessage());
+        assertEquals(aDataTypeName, updateResponse.getDataType().getTypeName());
+        assertEquals(aDataTypeType, updateResponse.getDataType().getType());
     }
 }

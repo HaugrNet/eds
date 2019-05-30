@@ -16,10 +16,8 @@
  */
 package io.javadog.cws.core.services;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
 import io.javadog.cws.api.common.Constants;
@@ -67,7 +65,7 @@ public final class SettingServiceTest extends DatabaseSetup {
         final SettingResponse response = service.perform(request);
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
         assertEquals("Ok", response.getReturnMessage());
-        assertThat(response.getSettings().size(), is(StandardSetting.values().length));
+        assertEquals(StandardSetting.values().length, response.getSettings().size());
     }
 
     @Test
@@ -76,7 +74,7 @@ public final class SettingServiceTest extends DatabaseSetup {
 
         final SettingService service = new SettingService(newSettings(), entityManager);
         final SettingRequest request = prepareRequest(SettingRequest.class, MEMBER_1);
-        assertThat(request.getAccountName(), is(not(Constants.ADMIN_ACCOUNT)));
+        assertNotEquals(Constants.ADMIN_ACCOUNT, request.getAccountName());
 
         service.perform(request);
     }
@@ -89,7 +87,7 @@ public final class SettingServiceTest extends DatabaseSetup {
         final SettingResponse response = service.perform(request);
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
         assertEquals("Ok", response.getReturnMessage());
-        assertThat(response.getSettings().size(), is(StandardSetting.values().length));
+        assertEquals(StandardSetting.values().length, response.getSettings().size());
     }
 
     @Test
@@ -102,7 +100,7 @@ public final class SettingServiceTest extends DatabaseSetup {
         final SettingResponse response = service.perform(request);
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
         assertEquals("Ok", response.getReturnMessage());
-        assertThat(response.getSettings().size(), is(StandardSetting.values().length));
+        assertEquals(StandardSetting.values().length, response.getSettings().size());
     }
 
     @Test
@@ -159,7 +157,7 @@ public final class SettingServiceTest extends DatabaseSetup {
         request.setCredential(crypto.stringToBytes(Constants.ADMIN_ACCOUNT));
         request.setSettings(mySettings);
         final SettingResponse update = service.perform(request);
-        assertThat(update.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+        assertEquals(ReturnCode.SUCCESS.getCode(), update.getReturnCode());
 
         // Running a verification check, to ensure that the System Administrator
         // can still access the system, after the SALT was updated.
@@ -185,8 +183,8 @@ public final class SettingServiceTest extends DatabaseSetup {
         final SettingResponse response = service.perform(request);
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
         assertEquals("Ok", response.getReturnMessage());
-        assertThat(response.getSettings().size(), is(StandardSetting.values().length));
-        assertThat(response.getSettings().get(StandardSetting.CWS_CHARSET.getKey()), is("UTF-8"));
+        assertEquals(StandardSetting.values().length, response.getSettings().size());
+        assertEquals("UTF-8", response.getSettings().get(StandardSetting.CWS_CHARSET.getKey()));
 
         // The internal collection used is unmodifiable. So we simply copy the
         // list from the response and update one of the existing values
@@ -196,10 +194,10 @@ public final class SettingServiceTest extends DatabaseSetup {
         request.setCredential(crypto.stringToBytes(Constants.ADMIN_ACCOUNT));
 
         final SettingResponse update = service.perform(request);
-        assertThat(update.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
-        assertThat(update.getReturnMessage(), is("Ok"));
-        assertThat(update.getSettings().size(), is(StandardSetting.values().length));
-        assertThat(update.getSettings().get(StandardSetting.CWS_CHARSET.getKey()), is("ISO-8859-15"));
+        assertEquals(ReturnCode.SUCCESS.getCode(), update.getReturnCode());
+        assertEquals("Ok", update.getReturnMessage());
+        assertEquals(StandardSetting.values().length, update.getSettings().size());
+        assertEquals("ISO-8859-15", update.getSettings().get(StandardSetting.CWS_CHARSET.getKey()));
     }
 
     @Test
@@ -211,9 +209,9 @@ public final class SettingServiceTest extends DatabaseSetup {
         request.setSettings(mySettings);
 
         final SettingResponse update = service.perform(request);
-        assertThat(update.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
-        assertThat(update.getReturnMessage(), is("Ok"));
-        assertThat(update.getSettings().size(), is(StandardSetting.values().length + 1));
+        assertEquals(ReturnCode.SUCCESS.getCode(), update.getReturnCode());
+        assertEquals("Ok", update.getReturnMessage());
+        assertEquals(StandardSetting.values().length + 1, update.getSettings().size());
     }
 
     @Test
@@ -223,7 +221,7 @@ public final class SettingServiceTest extends DatabaseSetup {
         final SettingRequest request = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
         final Map<String, String> mySettings = new HashMap<>();
         mySettings.put("cws.system.salt", "Enabling Kill Switch");
-        assertThat(mySettings.get("cws.system.salt"), is("Enabling Kill Switch"));
+        assertEquals("Enabling Kill Switch", mySettings.get("cws.system.salt"));
         request.setSettings(mySettings);
 
         service.perform(request);
@@ -240,8 +238,8 @@ public final class SettingServiceTest extends DatabaseSetup {
         final SettingResponse response = service.perform(request);
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
         assertEquals("Ok", response.getReturnMessage());
-        assertThat(response.getSettings().size(), is(StandardSetting.values().length + 1));
-        assertThat(response.getSettings().get("cws.test.setting"), is("Setting Value"));
+        assertEquals(StandardSetting.values().length + 1, response.getSettings().size());
+        assertEquals("Setting Value", response.getSettings().get("cws.test.setting"));
     }
 
     @Test
@@ -255,14 +253,14 @@ public final class SettingServiceTest extends DatabaseSetup {
 
         final SettingResponse response = service.perform(request);
         assertTrue(response.isOk());
-        assertThat(response.getSettings().size(), is(StandardSetting.values().length + 1));
+        assertEquals(StandardSetting.values().length + 1, response.getSettings().size());
 
         mySettings.put("cws.test.setting", null);
         request.setCredential(crypto.stringToBytes(Constants.ADMIN_ACCOUNT));
         request.setSettings(mySettings);
         final SettingResponse deleteResponse = service.perform(request);
         assertTrue(deleteResponse.isOk());
-        assertThat(deleteResponse.getSettings().size(), is(StandardSetting.values().length));
+        assertEquals(StandardSetting.values().length, deleteResponse.getSettings().size());
     }
 
     @Test

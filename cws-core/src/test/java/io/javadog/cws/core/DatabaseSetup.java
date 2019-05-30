@@ -16,9 +16,6 @@
  */
 package io.javadog.cws.core;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.Matchers.hasProperty;
-
 import io.javadog.cws.api.common.Action;
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.CredentialType;
@@ -44,15 +41,6 @@ import io.javadog.cws.core.model.entities.CircleEntity;
 import io.javadog.cws.core.model.entities.DataEntity;
 import io.javadog.cws.core.model.entities.KeyEntity;
 import io.javadog.cws.core.model.entities.MemberEntity;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.rules.ExpectedException;
-
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
-import javax.persistence.Query;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
@@ -65,6 +53,14 @@ import java.util.Locale;
 import java.util.UUID;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
+import javax.persistence.Query;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.rules.ExpectedException;
 
 /**
  * @author Kim Jensen
@@ -216,8 +212,6 @@ public class DatabaseSetup {
         final String propertyName = "returnCode";
         thrown.expect(CWSException.class);
         thrown.expectMessage(returnMessage);
-        thrown.expect(hasProperty(propertyName));
-        thrown.expect(hasProperty(propertyName, is(returnCode)));
     }
 
     /**

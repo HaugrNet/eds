@@ -16,10 +16,8 @@
  */
 package io.javadog.cws.core.services;
 
-import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import io.javadog.cws.api.common.ReturnCode;
@@ -58,20 +56,20 @@ public final class SignatureServiceTest extends DatabaseSetup {
         final SignRequest signRequest = prepareRequest(SignRequest.class, MEMBER_1);
         signRequest.setData(data);
         final SignResponse signResponse = signService.perform(signRequest);
-        assertThat(signResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+        assertEquals(ReturnCode.SUCCESS.getCode(), signResponse.getReturnCode());
 
         final VerifyRequest verifyRequest = prepareRequest(VerifyRequest.class, MEMBER_2);
         verifyRequest.setData(data);
         verifyRequest.setSignature(signResponse.getSignature());
         final VerifyResponse verifyResponse = verifyService.perform(verifyRequest);
-        assertThat(verifyResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+        assertEquals(ReturnCode.SUCCESS.getCode(), verifyResponse.getReturnCode());
         assertTrue(verifyResponse.isVerified());
 
         final FetchSignatureRequest fetchRequest = prepareRequest(FetchSignatureRequest.class, MEMBER_1);
         final FetchSignatureResponse fetchResponse = fetchService.perform(fetchRequest);
         assertEquals(ReturnCode.SUCCESS.getCode(), fetchResponse.getReturnCode());
-        assertThat(fetchResponse.getSignatures().size(), is(1));
-        assertThat(fetchResponse.getSignatures().get(0).getVerifications(), is(1L));
+        assertEquals(1, fetchResponse.getSignatures().size());
+        assertEquals(Long.valueOf(1L), fetchResponse.getSignatures().get(0).getVerifications());
     }
 
     @Test
@@ -85,14 +83,14 @@ public final class SignatureServiceTest extends DatabaseSetup {
         // Let our new Signature expire in 5 minutes
         signRequest.setExpires(new Date(new Date().getTime() + 300000L));
         final SignResponse signResponse = signService.perform(signRequest);
-        assertThat(signResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+        assertEquals(ReturnCode.SUCCESS.getCode(), signResponse.getReturnCode());
 
         final VerifyRequest verifyRequest = prepareRequest(VerifyRequest.class, MEMBER_2);
         verifyRequest.setData(data);
         verifyRequest.setSignature(signResponse.getSignature());
         final VerifyResponse verifyResponse = verifyService.perform(verifyRequest);
-        assertThat(verifyResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
-        assertThat(verifyResponse.getReturnMessage(), is("Ok"));
+        assertEquals(ReturnCode.SUCCESS.getCode(), verifyResponse.getReturnCode());
+        assertEquals("Ok", verifyResponse.getReturnMessage());
         assertTrue(verifyResponse.isVerified());
     }
 
@@ -106,12 +104,12 @@ public final class SignatureServiceTest extends DatabaseSetup {
         // Let our new Signature expire in 5 minutes
         signRequest.setExpires(new Date(new Date().getTime() + 300000L));
         final SignResponse signResponse = signService.perform(signRequest);
-        assertThat(signResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+        assertEquals(ReturnCode.SUCCESS.getCode(), signResponse.getReturnCode());
 
         signRequest.setCredential(crypto.stringToBytes(MEMBER_1));
         final SignResponse duplicateResponse = signService.perform(signRequest);
-        assertThat(duplicateResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
-        assertThat(duplicateResponse.getReturnMessage(), is("This document has already been signed."));
+        assertEquals(ReturnCode.SUCCESS.getCode(), duplicateResponse.getReturnCode());
+        assertEquals("This document has already been signed.", duplicateResponse.getReturnMessage());
     }
 
     @Test
@@ -126,7 +124,7 @@ public final class SignatureServiceTest extends DatabaseSetup {
         signRequest.setData(data);
         signRequest.setExpires(new Date());
         final SignResponse signResponse = signService.perform(signRequest);
-        assertThat(signResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+        assertEquals(ReturnCode.SUCCESS.getCode(), signResponse.getReturnCode());
 
         final VerifyRequest verifyRequest = prepareRequest(VerifyRequest.class, MEMBER_2);
         verifyRequest.setData(data);
@@ -145,14 +143,14 @@ public final class SignatureServiceTest extends DatabaseSetup {
         final SignRequest signRequest = prepareRequest(SignRequest.class, MEMBER_1);
         signRequest.setData(data);
         final SignResponse signResponse = signService.perform(signRequest);
-        assertThat(signResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+        assertEquals(ReturnCode.SUCCESS.getCode(), signResponse.getReturnCode());
 
         final VerifyRequest verifyRequest = prepareRequest(VerifyRequest.class, MEMBER_2);
         final byte[] wrongData = generateData(524288);
         verifyRequest.setData(wrongData);
         verifyRequest.setSignature(signResponse.getSignature());
         final VerifyResponse verifyResponse = verifyService.perform(verifyRequest);
-        assertThat(verifyResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+        assertEquals(ReturnCode.SUCCESS.getCode(), verifyResponse.getReturnCode());
         assertFalse(verifyResponse.isVerified());
     }
 

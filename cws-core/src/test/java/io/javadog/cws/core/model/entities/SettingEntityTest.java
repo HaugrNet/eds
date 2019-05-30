@@ -21,9 +21,8 @@ import static org.junit.Assert.assertNotNull;
 
 import io.javadog.cws.core.DatabaseSetup;
 import io.javadog.cws.core.enums.StandardSetting;
-import org.junit.Test;
-
 import java.util.List;
+import org.junit.Test;
 
 /**
  * @author Kim Jensen

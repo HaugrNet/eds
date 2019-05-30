@@ -24,12 +24,11 @@ import io.javadog.cws.core.DatabaseSetup;
 import io.javadog.cws.core.enums.HashAlgorithm;
 import io.javadog.cws.core.enums.KeyAlgorithm;
 import io.javadog.cws.core.enums.StandardSetting;
-import org.junit.Test;
-
 import java.util.EnumSet;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import org.junit.Test;
 
 /**
  * @author Kim Jensen

@@ -24,9 +24,8 @@ import io.javadog.cws.api.common.MemberRole;
 import io.javadog.cws.api.common.TrustLevel;
 import io.javadog.cws.core.DatabaseSetup;
 import io.javadog.cws.core.enums.KeyAlgorithm;
-import org.junit.Test;
-
 import java.util.UUID;
+import org.junit.Test;
 
 /**
  * @author Kim Jensen

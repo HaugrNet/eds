@@ -24,9 +24,8 @@ import static org.junit.Assert.assertNull;
 import io.javadog.cws.core.DatabaseSetup;
 import io.javadog.cws.core.enums.Status;
 import io.javadog.cws.core.model.Settings;
-import org.junit.Test;
-
 import java.util.Date;
+import org.junit.Test;
 
 /**
  * @author Kim Jensen

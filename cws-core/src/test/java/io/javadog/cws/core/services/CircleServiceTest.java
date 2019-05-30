@@ -16,12 +16,11 @@
  */
 package io.javadog.cws.core.services;
 
-import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import io.javadog.cws.api.common.Action;
 import io.javadog.cws.api.common.Constants;
@@ -41,6 +40,7 @@ import io.javadog.cws.api.responses.ProcessMemberResponse;
 import io.javadog.cws.api.responses.ProcessTrusteeResponse;
 import io.javadog.cws.core.DatabaseSetup;
 import io.javadog.cws.core.enums.StandardSetting;
+import io.javadog.cws.core.exceptions.CWSException;
 import io.javadog.cws.core.model.Settings;
 import java.util.UUID;
 import org.junit.Test;
@@ -55,31 +55,31 @@ public final class CircleServiceTest extends DatabaseSetup {
 
     @Test
     public void testEmptyFetchRequest() {
-        prepareCause(ReturnCode.VERIFICATION_WARNING, "Request Object contained errors:" +
-                "\nKey: credential, Error: The Session (Credential) is missing.");
-
         final FetchCircleService service = new FetchCircleService(settings, entityManager);
         final FetchCircleRequest request = new FetchCircleRequest();
         // Just making sure that the account is missing
         assertNull(request.getAccountName());
 
         // Should throw a VerificationException, as the request is invalid.
-        service.perform(request);
+        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
+        assertEquals(ReturnCode.VERIFICATION_WARNING, cause.getReturnCode());
+        assertEquals("Request Object contained errors:" +
+                "\nKey: credential, Error: The Session (Credential) is missing.", cause.getMessage());
     }
 
     @Test
     public void testEmptyProcessRequest() {
-        prepareCause(ReturnCode.VERIFICATION_WARNING, "Request Object contained errors:" +
-                "\nKey: credential, Error: The Session (Credential) is missing." +
-                "\nKey: action, Error: No action has been provided.");
-
         final ProcessCircleService service = new ProcessCircleService(settings, entityManager);
         final ProcessCircleRequest request = new ProcessCircleRequest();
         // Just making sure that the account is missing
         assertNull(request.getAccountName());
 
         // Should throw a VerificationException, as the request is invalid.
-        service.perform(request);
+        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
+        assertEquals(ReturnCode.VERIFICATION_WARNING, cause.getReturnCode());
+        assertEquals("Request Object contained errors:" +
+                "\nKey: credential, Error: The Session (Credential) is missing." +
+                "\nKey: action, Error: No action has been provided.", cause.getMessage());
     }
 
     @Test
@@ -110,17 +110,17 @@ public final class CircleServiceTest extends DatabaseSetup {
         dataRootRequest.setCircleId(createResponse.getCircleId());
         final FetchDataResponse dataRootResponse = dataService.perform(dataRootRequest);
         assertTrue(dataRootResponse.isOk());
-        assertThat(dataRootResponse.getMetadata().size(), is(1));
-        assertThat(dataRootResponse.getMetadata().get(0).getDataName(), is("My Data Object"));
+        assertEquals(1, dataRootResponse.getMetadata().size());
+        assertEquals("My Data Object", dataRootResponse.getMetadata().get(0).getDataName());
 
         // Read the newly created Data Object
         final FetchDataRequest dataFileRequest = prepareRequest(FetchDataRequest.class, MEMBER_5);
         dataFileRequest.setDataId(dataRootResponse.getMetadata().get(0).getDataId());
         final FetchDataResponse dataFileResponse = dataService.perform(dataFileRequest);
         assertTrue(dataFileResponse.isOk());
-        assertThat(dataFileResponse.getMetadata().size(), is(1));
-        assertThat(dataFileResponse.getMetadata().get(0).getDataName(), is("My Data Object"));
-        assertThat(crypto.bytesToString(dataFileResponse.getData()), is(data));
+        assertEquals(1, dataFileResponse.getMetadata().size());
+        assertEquals("My Data Object", dataFileResponse.getMetadata().get(0).getDataName());
+        assertEquals(data, crypto.bytesToString(dataFileResponse.getData()));
     }
 
     @Test
@@ -200,10 +200,10 @@ public final class CircleServiceTest extends DatabaseSetup {
         final FetchCircleRequest fetchRequest = prepareRequest(FetchCircleRequest.class, MEMBER_1);
         final FetchCircleResponse fetchResponse = fetchService.perform(fetchRequest);
         assertEquals(ReturnCode.SUCCESS.getCode(), fetchResponse.getReturnCode());
-        assertThat(fetchResponse.getCircles().size(), is(4));
+        assertEquals(4, fetchResponse.getCircles().size());
         // Circles are sorted by name, so our newly created Circle will be the first
-        assertThat(fetchResponse.getCircles().get(0).getCircleId(), is(response.getCircleId()));
-        assertThat(fetchResponse.getCircles().get(0).getCircleName(), is("a circle"));
+        assertEquals(response.getCircleId(), fetchResponse.getCircles().get(0).getCircleId());
+        assertEquals("a circle", fetchResponse.getCircles().get(0).getCircleName());
     }
 
     @Test
@@ -231,13 +231,13 @@ public final class CircleServiceTest extends DatabaseSetup {
         newMemberRequest.setNewAccountName(newUser);
         newMemberRequest.setNewCredential(crypto.stringToBytes(newUser));
         final ProcessMemberResponse newMemberResponse = memberService.perform(newMemberRequest);
-        assertThat(newMemberResponse.getReturnMessage(), is("Ok"));
+        assertEquals("Ok", newMemberResponse.getReturnMessage());
 
         final ProcessCircleRequest newCircleRequest = prepareRequest(ProcessCircleRequest.class, newUser);
         newCircleRequest.setAction(Action.CREATE);
         newCircleRequest.setCircleName("new Circle");
         final ProcessCircleResponse newCircleResponse = circleService.perform(newCircleRequest);
-        assertThat(newCircleResponse.getReturnMessage(), is("Ok"));
+        assertEquals("Ok", newCircleResponse.getReturnMessage());
 
         final ProcessTrusteeRequest newTrusteeRequest = prepareRequest(ProcessTrusteeRequest.class, newUser);
         newTrusteeRequest.setAction(Action.ADD);
@@ -245,7 +245,7 @@ public final class CircleServiceTest extends DatabaseSetup {
         newTrusteeRequest.setMemberId(MEMBER_5_ID);
         newTrusteeRequest.setTrustLevel(TrustLevel.WRITE);
         final ProcessTrusteeResponse newTrusteeResponse = trusteeService.perform(newTrusteeRequest);
-        assertThat(newTrusteeResponse.getReturnMessage(), is("Ok"));
+        assertEquals("Ok", newTrusteeResponse.getReturnMessage());
     }
 
     @Test
@@ -272,7 +272,7 @@ public final class CircleServiceTest extends DatabaseSetup {
         final FetchCircleRequest fetchRequest = prepareRequest(FetchCircleRequest.class, MEMBER_5);
         final FetchCircleResponse fetchResponse = fetchService.perform(fetchRequest);
         assertEquals(ReturnCode.SUCCESS.getCode(), fetchResponse.getReturnCode());
-        assertThat(fetchResponse.getCircles().size(), is(4));
+        assertEquals(4, fetchResponse.getCircles().size());
         // Sorting alphabetically on lowercase names should reveal a correct
         // sorting where the list is as follows:
         //  * circle1
@@ -282,14 +282,12 @@ public final class CircleServiceTest extends DatabaseSetup {
         // Note, that it could be considered a bug that the list earlier was
         // sorted with uppercase letters before lowercase letters, thus 'Z' came
         // before 'a'. With the case insensitive indexes, it should be fixed.
-        assertThat(fetchResponse.getCircles().get(3).getCircleId(), is(createResponse.getCircleId()));
-        assertThat(fetchResponse.getCircles().get(3).getCircleKey(), is(updateRequest.getCircleKey()));
+        assertEquals(createResponse.getCircleId(), fetchResponse.getCircles().get(3).getCircleId());
+        assertEquals(updateRequest.getCircleKey(), fetchResponse.getCircles().get(3).getCircleKey());
     }
 
     @Test
     public void testCreateCircleWithInvalidCircleAdmin() {
-        prepareCause(ReturnCode.IDENTIFICATION_WARNING, "Cannot create a new Circle with a non-existing Circle Administrator.");
-
         final ProcessCircleService service = new ProcessCircleService(settings, entityManager);
         final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, Constants.ADMIN_ACCOUNT);
         request.setAction(Action.CREATE);
@@ -297,7 +295,9 @@ public final class CircleServiceTest extends DatabaseSetup {
         request.setCircleName("My Circle");
         assertTrue(request.validate().isEmpty());
 
-        service.perform(request);
+        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
+        assertEquals(ReturnCode.IDENTIFICATION_WARNING, cause.getReturnCode());
+        assertEquals("Cannot create a new Circle with a non-existing Circle Administrator.", cause.getMessage());
     }
 
     @Test
@@ -315,8 +315,6 @@ public final class CircleServiceTest extends DatabaseSetup {
 
     @Test
     public void testCreateCircleWithExistingName() {
-        prepareCause(ReturnCode.IDENTIFICATION_WARNING, "A Circle with the requested name already exists.");
-
         final ProcessCircleService service = new ProcessCircleService(settings, entityManager);
         final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, Constants.ADMIN_ACCOUNT);
         request.setAction(Action.CREATE);
@@ -324,7 +322,9 @@ public final class CircleServiceTest extends DatabaseSetup {
         request.setMemberId(MEMBER_1_ID);
         assertTrue(request.validate().isEmpty());
 
-        service.perform(request);
+        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
+        assertEquals(ReturnCode.IDENTIFICATION_WARNING, cause.getReturnCode());
+        assertEquals("A Circle with the requested name already exists.", cause.getMessage());
     }
 
     @Test
@@ -343,9 +343,9 @@ public final class CircleServiceTest extends DatabaseSetup {
         final FetchCircleRequest fetchRequest = prepareRequest(FetchCircleRequest.class, Constants.ADMIN_ACCOUNT);
         final FetchCircleResponse fetchResponse = fetchService.perform(fetchRequest);
         assertEquals(ReturnCode.SUCCESS.getCode(), fetchResponse.getReturnCode());
-        assertThat(fetchResponse.getCircles().size(), is(3));
-        assertThat(fetchResponse.getCircles().get(0).getCircleId(), is(CIRCLE_1_ID));
-        assertThat(fetchResponse.getCircles().get(0).getCircleName(), is("Circle One"));
+        assertEquals(3, fetchResponse.getCircles().size());
+        assertEquals(CIRCLE_1_ID, fetchResponse.getCircles().get(0).getCircleId());
+        assertEquals("Circle One", fetchResponse.getCircles().get(0).getCircleName());
     }
 
     @Test
@@ -476,9 +476,9 @@ public final class CircleServiceTest extends DatabaseSetup {
         assertEquals("Ok", response.getReturnMessage());
 
         if ((circleNames != null) && (circleNames.length > 0)) {
-            assertThat(response.getCircles().size(), is(circleNames.length));
+            assertEquals(circleNames.length, response.getCircles().size());
             for (int i = 0; i < circleNames.length; i++) {
-                assertThat(response.getCircles().get(i).getCircleName(), is(circleNames[i]));
+                assertEquals(circleNames[i], response.getCircles().get(i).getCircleName());
             }
         } else {
             assertTrue(response.getCircles().isEmpty());

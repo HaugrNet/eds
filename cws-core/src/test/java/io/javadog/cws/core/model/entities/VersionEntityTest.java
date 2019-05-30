@@ -16,19 +16,16 @@
  */
 package io.javadog.cws.core.model.entities;
 
-import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
 
 import io.javadog.cws.core.DatabaseSetup;
 import io.javadog.cws.core.model.CommonDao;
-import org.junit.Test;
-
-import javax.persistence.PersistenceException;
-import javax.persistence.Query;
 import java.util.Date;
 import java.util.List;
+import javax.persistence.PersistenceException;
+import javax.persistence.Query;
+import org.junit.Test;
 
 /**
  * @author Kim Jensen
@@ -63,7 +60,7 @@ public final class VersionEntityTest extends DatabaseSetup {
         try {
             entityManager.persist(entity);
         } catch (PersistenceException e) {
-            assertThat(e.getMessage(), is("ids for this class must be manually assigned before calling save(): io.javadog.cws.core.model.entities.VersionEntity"));
+            assertEquals("ids for this class must be manually assigned before calling save(): io.javadog.cws.core.model.entities.VersionEntity", e.getMessage());
         }
     }
 }

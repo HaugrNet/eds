@@ -21,9 +21,8 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 
 import io.javadog.cws.core.DatabaseSetup;
-import org.junit.Test;
-
 import java.util.UUID;
+import org.junit.Test;
 
 /**
  * @author Kim Jensen

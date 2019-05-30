@@ -16,8 +16,7 @@
  */
 package io.javadog.cws.core.services;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import io.javadog.cws.api.common.Constants;
@@ -46,7 +45,7 @@ public final class SanityServiceTest extends DatabaseSetup {
         final SanityService service = new SanityService(settings, entityManager);
         final SanityResponse response = service.perform(request);
         assertTrue(response.isOk());
-        assertThat(response.getSanities().size(), is(6));
+        assertEquals(6, response.getSanities().size());
     }
 
     @Test
@@ -58,7 +57,7 @@ public final class SanityServiceTest extends DatabaseSetup {
         final SanityService service = new SanityService(settings, entityManager);
         final SanityResponse response = service.perform(request);
         assertTrue(response.isOk());
-        assertThat(response.getSanities().size(), is(1));
+        assertEquals(1, response.getSanities().size());
     }
 
     @Test
@@ -68,7 +67,7 @@ public final class SanityServiceTest extends DatabaseSetup {
         final SanityService service = new SanityService(settings, entityManager);
         final SanityResponse response = service.perform(request);
         assertTrue(response.isOk());
-        assertThat(response.getSanities().size(), is(4));
+        assertEquals(4, response.getSanities().size());
     }
 
     @Test
@@ -106,16 +105,16 @@ public final class SanityServiceTest extends DatabaseSetup {
         final FetchDataService readDataService = new FetchDataService(settings, entityManager);
         final FetchDataRequest readDattaRequest = prepareReadRequest(response.getDataId());
         final FetchDataResponse readDataResponse = readDataService.perform(readDattaRequest);
-        assertThat(readDataResponse.getReturnCode(), is(ReturnCode.INTEGRITY_ERROR.getCode()));
-        assertThat(readDataResponse.getReturnMessage(), is("The Encrypted Data Checksum is invalid, the data appears to have been corrupted."));
+        assertEquals(ReturnCode.INTEGRITY_ERROR.getCode(), readDataResponse.getReturnCode());
+        assertEquals("The Encrypted Data Checksum is invalid, the data appears to have been corrupted.", readDataResponse.getReturnMessage());
 
         // Now for the actual testing...
         final SanityRequest sanityRequest = prepareRequest(SanityRequest.class, Constants.ADMIN_ACCOUNT);
         final SanityService sanityService = new SanityService(settings, entityManager);
         final SanityResponse sanityResponse = sanityService.perform(sanityRequest);
         assertTrue(sanityResponse.isOk());
-        assertThat(sanityResponse.getSanities().size(), is(1));
-        assertThat(sanityResponse.getSanities().get(0).getDataId(), is(response.getDataId()));
+        assertEquals(1, sanityResponse.getSanities().size());
+        assertEquals(response.getDataId(), sanityResponse.getSanities().get(0).getDataId());
     }
 
     // =========================================================================

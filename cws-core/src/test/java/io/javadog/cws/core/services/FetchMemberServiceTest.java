@@ -16,12 +16,11 @@
  */
 package io.javadog.cws.core.services;
 
-import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import io.javadog.cws.api.common.Action;
 import io.javadog.cws.api.common.Constants;
@@ -69,30 +68,29 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
      */
     @Test
     public void testEmptyRequest() {
-        prepareCause(ReturnCode.VERIFICATION_WARNING, "Request Object contained errors:" +
-                "\nKey: credential, Error: The Session (Credential) is missing.");
-
         final FetchMemberService service = new FetchMemberService(settings, entityManager);
         final FetchMemberRequest request = new FetchMemberRequest();
         // Just making sure that the account is missing
         assertNull(request.getAccountName());
 
         // Should throw a VerificationException, as the request is invalid.
-        service.perform(request);
+        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
+        assertEquals(ReturnCode.VERIFICATION_WARNING, cause.getReturnCode());
+        assertEquals("Request Object contained errors:" +
+                "\nKey: credential, Error: The Session (Credential) is missing.", cause.getMessage());
     }
 
     @Test
     public void testFindNotExistingAccount() {
-        prepareCause(ReturnCode.IDENTIFICATION_WARNING, "The requested Member cannot be found.");
-
         final FetchMemberService service = new FetchMemberService(settings, entityManager);
 
         // Build and send the Request
         final FetchMemberRequest request = prepareRequest(FetchMemberRequest.class, Constants.ADMIN_ACCOUNT);
         request.setMemberId(UUID.randomUUID().toString());
-        assertTrue(request.validate().isEmpty());
 
-        service.perform(request);
+        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
+        assertEquals(ReturnCode.IDENTIFICATION_WARNING, cause.getReturnCode());
+        assertEquals("The requested Member cannot be found.", cause.getMessage());
     }
 
     /**
@@ -169,8 +167,8 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
         assertNotNull(fetchResponse);
         assertTrue(fetchResponse.isOk());
         assertEquals(ReturnCode.SUCCESS.getCode(), fetchResponse.getReturnCode());
-        assertThat(fetchResponse.getReturnMessage(), is("Ok"));
-        assertThat(fetchResponse.getMembers().size(), is(6));
+        assertEquals("Ok", fetchResponse.getReturnMessage());
+        assertEquals(6, fetchResponse.getMembers().size());
         assertTrue(fetchResponse.getCircles().isEmpty());
     }
 
@@ -192,25 +190,25 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
         // Verify that we have found the correct data
         assertNotNull(fetchedMemberResponse);
         assertTrue(fetchedMemberResponse.isOk());
-        assertThat(fetchedMemberResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
-        assertThat(fetchedMemberResponse.getReturnMessage(), is("Ok"));
-        assertThat(fetchedMemberResponse.getMembers().size(), is(6));
+        assertEquals(ReturnCode.SUCCESS.getCode(), fetchedMemberResponse.getReturnCode());
+        assertEquals("Ok", fetchedMemberResponse.getReturnMessage());
+        assertEquals(6, fetchedMemberResponse.getMembers().size());
         assertTrue(fetchedMemberResponse.getCircles().isEmpty());
 
         // Check that the member information is present
         final Member member0 = fetchedMemberResponse.getMembers().get(0);
-        assertThat(member0.getAccountName(), is(Constants.ADMIN_ACCOUNT));
-        assertThat(member0.getMemberId(), is(ADMIN_ID));
+        assertEquals(Constants.ADMIN_ACCOUNT, member0.getAccountName());
+        assertEquals(ADMIN_ID, member0.getMemberId());
         assertNotNull(member0.getAdded());
 
         final Member member1 = fetchedMemberResponse.getMembers().get(1);
-        assertThat(member1.getAccountName(), is(MEMBER_1));
-        assertThat(member1.getMemberId(), is(MEMBER_1_ID));
+        assertEquals(MEMBER_1, member1.getAccountName());
+        assertEquals(MEMBER_1_ID, member1.getMemberId());
         assertNotNull(member1.getAdded());
 
         final Member member5 = fetchedMemberResponse.getMembers().get(5);
-        assertThat(member5.getAccountName(), is(MEMBER_5));
-        assertThat(member5.getMemberId(), is(MEMBER_5_ID));
+        assertEquals(MEMBER_5, member5.getAccountName());
+        assertEquals(MEMBER_5_ID, member5.getMemberId());
         assertNotNull(member5.getAdded());
     }
 
@@ -238,10 +236,10 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
         assertNotNull(fetchResponse);
         assertTrue(fetchResponse.isOk());
         assertEquals(ReturnCode.SUCCESS.getCode(), fetchResponse.getReturnCode());
-        assertThat(fetchResponse.getReturnMessage(), is("Ok"));
-        assertThat(fetchResponse.getMembers().size(), is(1));
+        assertEquals("Ok", fetchResponse.getReturnMessage());
+        assertEquals(1, fetchResponse.getMembers().size());
         assertTrue(fetchResponse.getCircles().isEmpty());
-        assertThat(fetchResponse.getMembers().get(0).getAccountName(), is(Constants.ADMIN_ACCOUNT));
+        assertEquals(Constants.ADMIN_ACCOUNT, fetchResponse.getMembers().get(0).getAccountName());
     }
 
     /**
@@ -263,11 +261,11 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
         // Verify that we have found the correct data
         assertNotNull(memberResponse);
         assertTrue(memberResponse.isOk());
-        assertThat(memberResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
-        assertThat(memberResponse.getReturnMessage(), is("Ok"));
-        assertThat(memberResponse.getMembers().size(), is(1));
-        assertThat(memberResponse.getCircles().size(), is(2));
-        assertThat(memberResponse.getMembers().get(0).getAccountName(), is(firstMember.getName()));
+        assertEquals(ReturnCode.SUCCESS.getCode(), memberResponse.getReturnCode());
+        assertEquals("Ok", memberResponse.getReturnMessage());
+        assertEquals(1, memberResponse.getMembers().size());
+        assertEquals(2, memberResponse.getCircles().size());
+        assertEquals(firstMember.getName(), memberResponse.getMembers().get(0).getAccountName());
     }
 
     /**
@@ -291,9 +289,9 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
         assertTrue(response.isOk());
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
         assertEquals("Ok", response.getReturnMessage());
-        assertThat(response.getMembers().size(), is(1));
-        assertThat(response.getCircles().size(), is(2));
-        assertThat(response.getMembers().get(0).getAccountName(), is(member.getName()));
+        assertEquals(1, response.getMembers().size());
+        assertEquals(2, response.getCircles().size());
+        assertEquals(member.getName(), response.getMembers().get(0).getAccountName());
     }
 
     @Test
@@ -310,9 +308,9 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
 
         // Verify that we have found the correct data
         assertNotNull(memberResponse);
-        assertThat(memberResponse.getMembers().size(), is(1));
-        assertThat(memberResponse.getCircles().size(), is(2));
-        assertThat(memberResponse.getMembers().get(0).getAccountName(), is(member.getName()));
+        assertEquals(1, memberResponse.getMembers().size());
+        assertEquals(2, memberResponse.getCircles().size());
+        assertEquals(member.getName(), memberResponse.getMembers().get(0).getAccountName());
     }
 
     @Test
@@ -329,9 +327,9 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
 
         // Verify that we have found the correct data
         assertNotNull(response);
-        assertThat(response.getMembers().size(), is(1));
-        assertThat(response.getCircles().size(), is(2));
-        assertThat(response.getMembers().get(0).getAccountName(), is(member.getName()));
+        assertEquals(1, response.getMembers().size());
+        assertEquals(2, response.getCircles().size());
+        assertEquals(member.getName(), response.getMembers().get(0).getAccountName());
     }
 
     @Test
@@ -342,14 +340,18 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
 
         final FetchMemberService service = new FetchMemberService(mySettings, entityManager);
         final MemberEntity member = findFirstMember();
-        final FetchMemberRequest request = prepareRequest(FetchMemberRequest.class, "member4");
+        final FetchMemberRequest request = prepareRequest(FetchMemberRequest.class, MEMBER_4);
         request.setMemberId(member.getExternalId());
         final FetchMemberResponse response = service.perform(request);
 
         // Verify that we have found the correct data
         assertNotNull(response);
-        assertThat(response.getMembers().size(), is(1));
-        assertThat(response.getCircles().size(), is(2));
+        assertEquals(1, response.getMembers().size());
+        // Member 1 is Administrator for 2 Circles, Ciecle1 & Circle2
+        // Member 4 is Administrator for 2 Circles, Circle2 & Circle3
+        // As SHOW_TRUSTEES is enabled, we're only getting all Circles
+        // for Member 1, i.e. 2 Circles
+        assertEquals(2, response.getCircles().size());
     }
 
     @Test
@@ -365,9 +367,13 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
         final FetchMemberResponse response = service.perform(request);
 
         // Verify that we have found the correct data
-        assertNotNull(response);
-        assertThat(response.getMembers().size(), is(1));
-        assertThat(response.getCircles().size(), is(1));
+        assertEquals(1, response.getMembers().size());
+        assertEquals(MEMBER_1_ID, response.getMembers().get(0).getMemberId());
+        // Member 1 is Administrator for 2 Circles, Ciecle1 & Circle2
+        // Member 4 is Administrator for 2 Circles, Circle2 & Circle3
+        // As SHOW_TRUSTEES is disabled, we're only getting shared
+        // Circle information, meaning we only get Circle2 here.
+        assertEquals(1, response.getCircles().size());
     }
 
     @Test
@@ -384,8 +390,8 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
 
         // Verify that we have found the correct data
         assertNotNull(response);
-        assertThat(response.getMembers().size(), is(1));
-        assertThat(response.getCircles().size(), is(2));
+        assertEquals(1, response.getMembers().size());
+        assertEquals(2, response.getCircles().size());
     }
 
     @Test
@@ -402,8 +408,8 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
 
         // Verify that we have found the correct data
         assertNotNull(response);
-        assertThat(response.getMembers().size(), is(1));
-        assertThat(response.getCircles().size(), is(0));
+        assertEquals(1, response.getMembers().size());
+        assertTrue(response.getCircles().isEmpty());
     }
 
     /**

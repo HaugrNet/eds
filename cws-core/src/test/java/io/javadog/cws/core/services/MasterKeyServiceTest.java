@@ -16,13 +16,9 @@
  */
 package io.javadog.cws.core.services;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
@@ -30,6 +26,7 @@ import io.javadog.cws.api.requests.MasterKeyRequest;
 import io.javadog.cws.api.responses.MasterKeyResponse;
 import io.javadog.cws.core.DatabaseSetup;
 import io.javadog.cws.core.enums.StandardSetting;
+import io.javadog.cws.core.exceptions.CWSException;
 import io.javadog.cws.core.jce.MasterKey;
 import io.javadog.cws.core.model.Settings;
 import io.javadog.cws.core.model.entities.MemberEntity;
@@ -58,52 +55,48 @@ public final class MasterKeyServiceTest extends DatabaseSetup {
 
     @Test
     public void testUpdateMasterKeyWithNullRequest() {
-        prepareCause(ReturnCode.VERIFICATION_WARNING, "Cannot Process a NULL Object");
-
         final MasterKeyService service = new MasterKeyService(settings, entityManager);
         final MasterKeyRequest request = null;
-        assertNotNull(service);
 
-        service.perform(request);
+        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
+        assertEquals(ReturnCode.VERIFICATION_WARNING, cause.getReturnCode());
+        assertEquals("Cannot Process a NULL Object.", cause.getMessage());
     }
 
     @Test
     public void testUpdateMasterKeyWithEmptyRequest() {
-        prepareCause(ReturnCode.VERIFICATION_WARNING, "Request Object contained errors:\n" +
-                "Key: credential, Error: The Session (Credential) is missing.\n" +
-                "Key: secret, Error: Either the secret or the URL must be given to alter the MasterKey.\n" +
-                "Key: url, Error: Either the secret or the URL must be given to alter the MasterKey.");
-
         final MasterKeyService service = new MasterKeyService(settings, entityManager);
         final MasterKeyRequest request = new MasterKeyRequest();
-        assertFalse(request.validate().isEmpty());
 
-        service.perform(request);
+        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
+        assertEquals(ReturnCode.VERIFICATION_WARNING, cause.getReturnCode());
+        assertEquals("Request Object contained errors:\n" +
+                "Key: credential, Error: The Session (Credential) is missing.\n" +
+                "Key: secret, Error: Either the secret or the URL must be given to alter the MasterKey.\n" +
+                "Key: url, Error: Either the secret or the URL must be given to alter the MasterKey.", cause.getMessage());
     }
 
     @Test
     public void testUpdateMasterKeyAsMember() {
-        prepareCause(ReturnCode.AUTHENTICATION_WARNING, "Given Account is not permitted to perform this request.");
-
         final MasterKeyService service = new MasterKeyService(settings, entityManager);
         final MasterKeyRequest request = prepareRequest(MasterKeyRequest.class, MEMBER_1);
         request.setSecret("New MasterKey".getBytes(Charset.defaultCharset()));
-        assertTrue(request.validate().isEmpty());
 
-        service.perform(request);
+        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
+        assertEquals(ReturnCode.AUTHENTICATION_WARNING, cause.getReturnCode());
+        assertEquals("Given Account is not permitted to perform this request.", cause.getMessage());
     }
 
     @Test
     public void testUpdateMasterKeyAsAdminWithWrongCredentials() {
-        prepareCause(ReturnCode.AUTHENTICATION_WARNING, "Invalid credentials.");
-
         final MasterKeyService service = new MasterKeyService(settings, entityManager);
         final MasterKeyRequest request = prepareRequest(MasterKeyRequest.class, Constants.ADMIN_ACCOUNT);
         request.setCredential("root".getBytes(Charset.defaultCharset()));
         request.setSecret("New MasterKey".getBytes(Charset.defaultCharset()));
-        assertTrue(request.validate().isEmpty());
 
-        service.perform(request);
+        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
+        assertEquals(ReturnCode.AUTHENTICATION_WARNING, cause.getReturnCode());
+        assertEquals("Invalid credentials.", cause.getMessage());
     }
 
     @Test
@@ -119,7 +112,7 @@ public final class MasterKeyServiceTest extends DatabaseSetup {
         request.setSecret(request.getCredential());
         final MasterKeyResponse response = service.perform(request);
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
-        assertThat(response.getReturnMessage(), is("MasterKey unlocked."));
+        assertEquals("MasterKey unlocked.", response.getReturnMessage());
     }
 
     @Test
@@ -139,7 +132,7 @@ public final class MasterKeyServiceTest extends DatabaseSetup {
 
         final MasterKeyResponse response = service.perform(request);
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
-        assertThat(response.getReturnMessage(), is("MasterKey updated."));
+        assertEquals("MasterKey updated.", response.getReturnMessage());
 
         revertMasterKeyToOriginal(service);
     }
@@ -159,15 +152,15 @@ public final class MasterKeyServiceTest extends DatabaseSetup {
         urlRequest.setUrl("file://" + path);
 
         final MasterKeyResponse urlResponse = service.perform(urlRequest);
-        assertThat(urlResponse.getReturnMessage(), is("MasterKey updated."));
-        assertThat(urlResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+        assertEquals("MasterKey updated.", urlResponse.getReturnMessage());
+        assertEquals(ReturnCode.SUCCESS.getCode(), urlResponse.getReturnCode());
 
         final MasterKeyRequest secretRequest = prepareRequest(MasterKeyRequest.class, Constants.ADMIN_ACCOUNT);
         secretRequest.setSecret("MasterKey".getBytes(Charset.defaultCharset()));
 
         final MasterKeyResponse secretResponse = service.perform(secretRequest);
-        assertThat(secretResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
-        assertThat(secretResponse.getReturnMessage(), is("MasterKey updated."));
+        assertEquals(ReturnCode.SUCCESS.getCode(), secretResponse.getReturnCode());
+        assertEquals("MasterKey updated.", secretResponse.getReturnMessage());
 
         revertMasterKeyToOriginal(service);
     }
@@ -175,13 +168,13 @@ public final class MasterKeyServiceTest extends DatabaseSetup {
     @Test
     public void testStartingMasterKeyWithURLFailed() {
         final String file = tempDir() + "not_existing_file.bin";
-        prepareCause(ReturnCode.NETWORK_ERROR, file + " (No such file or directory)");
-
         final Settings mySettings = newSettings();
         mySettings.set(StandardSetting.MASTERKEY_URL.getKey(), "file://" + file);
-        assertThat(mySettings.getMasterKeyURL(), is(not(settings.getMasterKeyURL())));
+        assertNotEquals(settings.getMasterKeyURL(), mySettings.getMasterKeyURL());
 
-        newMasterKey(mySettings);
+        final CWSException cause = assertThrows(CWSException.class, () -> newMasterKey(mySettings));
+        assertEquals(ReturnCode.NETWORK_ERROR, cause.getReturnCode());
+        assertEquals(file + " (No such file or directory)", cause.getMessage());
     }
 
     /**
@@ -200,23 +193,22 @@ public final class MasterKeyServiceTest extends DatabaseSetup {
 
         Files.write(Paths.get(file), Constants.ADMIN_ACCOUNT.getBytes(settings.getCharset()));
         final MasterKey masterKey1 = newMasterKey(mySettings);
-        assertThat(defaultMasterKey.getKey().getKey(), is(masterKey1.getKey().getKey()));
+        assertEquals(masterKey1.getKey().getKey(), defaultMasterKey.getKey().getKey());
 
         Files.write(Paths.get(file), UUID.randomUUID().toString().getBytes(settings.getCharset()));
         final MasterKey masterKey2 = newMasterKey(mySettings);
-        assertThat(defaultMasterKey.getKey().getKey(), is(not(masterKey2.getKey().getKey())));
+        assertNotEquals(masterKey2.getKey().getKey(), defaultMasterKey.getKey().getKey());
     }
 
     @Test
     public void testUpdateMasterKeyWhenMembersExist() {
-        prepareCause(ReturnCode.ILLEGAL_ACTION, "Cannot alter the MasterKey, as Member Accounts exists.");
-
         final MasterKeyService service = new MasterKeyService(settings, entityManager);
         final MasterKeyRequest request = prepareRequest(MasterKeyRequest.class, Constants.ADMIN_ACCOUNT);
         request.setSecret("MasterKey".getBytes(Charset.defaultCharset()));
-        assertTrue(request.validate().isEmpty());
 
-        service.perform(request);
+        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
+        assertEquals(ReturnCode.ILLEGAL_ACTION, cause.getReturnCode());
+        assertEquals("Cannot alter the MasterKey, as Member Accounts exists.", cause.getMessage());
     }
 
     @Test
@@ -227,20 +219,19 @@ public final class MasterKeyServiceTest extends DatabaseSetup {
 
         final MasterKeyResponse response = service.perform(request);
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
-        assertThat(response.getReturnMessage(), is("MasterKey unlocked."));
+        assertEquals("MasterKey unlocked.", response.getReturnMessage());
     }
 
     @Test
     public void testUpdateMasterKeyWithUnreachabledURL() {
         final String path = tempDir() + "not_existing_file.bin";
-        prepareCause(ReturnCode.NETWORK_ERROR, path + " (No such file or directory)");
-
         final MasterKeyService service = new MasterKeyService(settings, entityManager);
         final MasterKeyRequest request = prepareRequest(MasterKeyRequest.class, Constants.ADMIN_ACCOUNT);
         request.setUrl("file://" + path);
 
-        assertTrue(request.validate().isEmpty());
-        service.perform(request);
+        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
+        assertEquals(ReturnCode.NETWORK_ERROR, cause.getReturnCode());
+        assertEquals(path + " (No such file or directory)", cause.getMessage());
     }
 
     // =========================================================================
@@ -276,8 +267,9 @@ public final class MasterKeyServiceTest extends DatabaseSetup {
     private static void revertMasterKeyToOriginal(final MasterKeyService service) {
         final MasterKeyRequest resetRequest = prepareRequest(MasterKeyRequest.class, Constants.ADMIN_ACCOUNT);
         resetRequest.setSecret(resetRequest.getCredential());
+
         final MasterKeyResponse resetResponse = service.perform(resetRequest);
-        assertThat(resetResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
-        assertThat(resetResponse.getReturnMessage(), is("MasterKey updated."));
+        assertEquals(ReturnCode.SUCCESS.getCode(), resetResponse.getReturnCode());
+        assertEquals("MasterKey updated.", resetResponse.getReturnMessage());
     }
 }

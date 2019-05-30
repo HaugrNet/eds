@@ -16,11 +16,11 @@
  */
 package io.javadog.cws.core.services;
 
-import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import io.javadog.cws.api.common.Action;
 import io.javadog.cws.api.common.Constants;
@@ -39,6 +39,7 @@ import io.javadog.cws.api.responses.ProcessDataResponse;
 import io.javadog.cws.api.responses.ProcessMemberResponse;
 import io.javadog.cws.core.DatabaseSetup;
 import io.javadog.cws.core.enums.StandardSetting;
+import io.javadog.cws.core.exceptions.CWSException;
 import io.javadog.cws.core.model.Settings;
 import java.util.Base64;
 import java.util.UUID;
@@ -52,13 +53,12 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
 
     @Test
     public void testNullRequest() {
-        prepareCause(ReturnCode.VERIFICATION_WARNING, "Cannot Process a NULL Object.");
-
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
         final ProcessMemberRequest request = null;
-        assertNotNull(service);
 
-        service.perform(request);
+        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
+        assertEquals(ReturnCode.VERIFICATION_WARNING, cause.getReturnCode());
+        assertEquals("Cannot Process a NULL Object.", cause.getMessage());
     }
 
     @Test
@@ -107,8 +107,6 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
 
     @Test
     public void testAddingAsMember() {
-        prepareCause(ReturnCode.AUTHORIZATION_WARNING, "Members are not permitted to create new Accounts.");
-
         final String account = "Member Added Member";
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
         final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, MEMBER_1);
@@ -116,9 +114,10 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
         request.setNewAccountName(account);
         request.setNewCredential(crypto.stringToBytes(account));
         request.setMemberRole(MemberRole.STANDARD);
-        assertTrue(request.validate().isEmpty());
 
-        service.perform(request);
+        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
+        assertEquals(ReturnCode.AUTHORIZATION_WARNING, cause.getReturnCode());
+        assertEquals("Members are not permitted to create new Accounts.", cause.getMessage());
     }
 
     @Test
@@ -138,31 +137,30 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
         updateRequest.setPublicKey(UUID.randomUUID().toString());
         final ProcessMemberResponse updateResponse = service.perform(updateRequest);
         assertEquals(ReturnCode.SUCCESS.getCode(), updateResponse.getReturnCode());
-        assertThat(updateResponse.getReturnMessage(), is("Ok"));
+        assertEquals("Ok", updateResponse.getReturnMessage());
 
         final FetchMemberService fetchService = new FetchMemberService(settings, entityManager);
         final FetchMemberRequest fetchRequest = prepareRequest(FetchMemberRequest.class, MEMBER_4);
         fetchRequest.setMemberId(response.getMemberId());
         final FetchMemberResponse fetchResponse = fetchService.perform(fetchRequest);
         assertEquals(ReturnCode.SUCCESS.getCode(), fetchResponse.getReturnCode());
-        assertThat(fetchResponse.getReturnMessage(), is("Ok"));
-        assertThat(fetchResponse.getMembers().size(), is(1));
-        assertThat(fetchResponse.getMembers().get(0).getPublicKey(), is(updateRequest.getPublicKey()));
+        assertEquals("Ok", fetchResponse.getReturnMessage());
+        assertEquals(1, fetchResponse.getMembers().size());
+        assertEquals(updateRequest.getPublicKey(), fetchResponse.getMembers().get(0).getPublicKey());
     }
 
     @Test
     public void testAddingWithExistingAccountName() {
-        prepareCause(ReturnCode.IDENTIFICATION_WARNING, "An Account with the requested AccountName already exist.");
-
         final String account = MEMBER_4;
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
         final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
         request.setAction(Action.CREATE);
         request.setNewAccountName(account);
         request.setNewCredential(crypto.stringToBytes(account));
-        assertTrue(request.validate().isEmpty());
 
-        service.perform(request);
+        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
+        assertEquals(ReturnCode.IDENTIFICATION_WARNING, cause.getReturnCode());
+        assertEquals("An Account with the requested AccountName already exist.", cause.getMessage());
     }
 
     @Test
@@ -172,6 +170,7 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
         request.setAction(Action.ALTER);
         request.setMemberId(MEMBER_1_ID);
         request.setMemberRole(MemberRole.ADMIN);
+
         final ProcessMemberResponse response = service.perform(request);
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
         assertEquals("Ok", response.getReturnMessage());
@@ -179,30 +178,28 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
 
     @Test
     public void testAlterSelf() {
-        prepareCause(ReturnCode.ILLEGAL_ACTION, "It is not permitted to alter own account.");
-
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
         final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
         request.setAction(Action.ALTER);
         request.setMemberId(ADMIN_ID);
         request.setMemberRole(MemberRole.STANDARD);
-        assertTrue(request.validate().isEmpty());
 
-        service.perform(request);
+        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
+        assertEquals(ReturnCode.ILLEGAL_ACTION, cause.getReturnCode());
+        assertEquals("It is not permitted to alter own account.", cause.getMessage());
     }
 
     @Test
     public void testAlterAccountAsMember() {
-        prepareCause(ReturnCode.AUTHORIZATION_WARNING, "Only Administrators may update the Role of a member.");
-
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
         final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, MEMBER_3);
         request.setAction(Action.ALTER);
         request.setMemberId(MEMBER_1_ID);
         request.setMemberRole(MemberRole.ADMIN);
-        assertTrue(request.validate().isEmpty());
 
-        service.perform(request);
+        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
+        assertEquals(ReturnCode.AUTHORIZATION_WARNING, cause.getReturnCode());
+        assertEquals("Only Administrators may update the Role of a member.", cause.getMessage());
     }
 
     @Test
@@ -221,19 +218,20 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
 
     @Test
     public void testProcessSelfPasswordUpdateWithSession() {
-        prepareCause(ReturnCode.VERIFICATION_WARNING, "It is only permitted to update the credentials when authenticating with Passphrase.");
-
         final String session = UUID.randomUUID().toString();
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
         final ProcessMemberRequest loginRequest = prepareLoginRequest(MEMBER_5, session);
         final ProcessMemberResponse loginResponse = service.perform(loginRequest);
-        assertThat(loginResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
-        assertThat(loginResponse.getReturnMessage(), is("Ok"));
+        assertEquals(ReturnCode.SUCCESS.getCode(), loginResponse.getReturnCode());
+        assertEquals("Ok", loginResponse.getReturnMessage());
 
         final ProcessMemberRequest passwordRequest = prepareSessionRequest(ProcessMemberRequest.class, session);
         passwordRequest.setAction(Action.UPDATE);
         passwordRequest.setNewCredential(loginRequest.getNewCredential());
-        service.perform(passwordRequest);
+
+        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(passwordRequest));
+        assertEquals(ReturnCode.VERIFICATION_WARNING, cause.getReturnCode());
+        assertEquals("It is only permitted to update the credentials when authenticating with Passphrase.", cause.getMessage());
     }
 
     @Test
@@ -254,30 +252,29 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
         invitationRequest.setCredentialType(CredentialType.SIGNATURE);
         invitationRequest.setCredential(signature);
         invitationRequest.setNewCredential(crypto.stringToBytes("New Passphrase"));
+
         final ProcessMemberResponse invitationResponse = service.perform(invitationRequest);
         assertNotNull(invitationResponse);
-        assertThat(invitationResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+        assertEquals(ReturnCode.SUCCESS.getCode(), invitationResponse.getReturnCode());
         assertEquals("Ok", response.getReturnMessage());
     }
 
     @Test
     public void testNullNewCredentialForInvitation() {
-        prepareCause(ReturnCode.VERIFICATION_WARNING, "The newCredential is missing in Request.");
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
         final ProcessMemberRequest request = new ProcessMemberRequest();
         request.setAccountName("null Invitee");
         request.setAction(Action.UPDATE);
         request.setCredentialType(CredentialType.SIGNATURE);
         request.setCredential(crypto.stringToBytes("Signature"));
-        assertTrue(request.validate().isEmpty());
 
-        service.perform(request);
+        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
+        assertEquals(ReturnCode.VERIFICATION_WARNING, cause.getReturnCode());
+        assertEquals("The newCredential is missing in Request.", cause.getMessage());
     }
 
     @Test
     public void testEmptyNewCredentialForInvitation() {
-        prepareCause(ReturnCode.VERIFICATION_WARNING, "The newCredential is missing in Request.");
-
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
         final ProcessMemberRequest request = new ProcessMemberRequest();
         request.setAccountName("empty Invitee");
@@ -285,15 +282,14 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
         request.setCredentialType(CredentialType.SIGNATURE);
         request.setCredential(crypto.stringToBytes("Signature"));
         request.setNewCredential(crypto.stringToBytes(""));
-        assertTrue(request.validate().isEmpty());
 
-        service.perform(request);
+        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
+        assertEquals(ReturnCode.VERIFICATION_WARNING, cause.getReturnCode());
+        assertEquals("The newCredential is missing in Request.", cause.getMessage());
     }
 
     @Test
     public void testInvitationWithInvalidSignature() {
-        prepareCause(ReturnCode.AUTHENTICATION_WARNING, "The given signature is invalid.");
-
         final String bogusSignature = "T+OoZiBpm36P868XUZYWFsW1jUFlD31x+FeQuDjcm4DmmIk+qWd8KuUzLdnETRPIxo/OuYLcpvFiPxMf0v78feiw/yVVV5+1xjO+FR/KYgB4JTaJ6p0RIEpS3rjs27bY+1OYclsk4MPRKbxZN06ZFHlSY4btk1G4ML7x0/iUCLBbOO2y3S4JZpKwAR7kAyhVeqyi8qKi13o+7z/J0KP2EhHrF8+2y3z63TKLyClZRrAhvy3/g/k0q7MccFOKDGsxxIpe2jfOHtxLEYfbgrdly/fZHEQL5vbbf/LbQ7MISfcwXSLtJMD0COXsm/V1nkmI/ficjskvNuUj+h739KEmuQ==";
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
         final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
@@ -310,12 +306,13 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
         invitationRequest.setCredential(Base64.getDecoder().decode(bogusSignature));
         invitationRequest.setNewCredential(crypto.stringToBytes(UUID.randomUUID().toString()));
 
-        service.perform(invitationRequest);
+        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(invitationRequest));
+        assertEquals(ReturnCode.AUTHENTICATION_WARNING, cause.getReturnCode());
+        assertEquals("The given signature is invalid.", cause.getMessage());
     }
 
     @Test
     public void testInvitationWithInvalidSignature2() {
-        prepareCause(ReturnCode.CRYPTO_ERROR, "Signature length not correct: got 36 but was expecting 256");
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
         final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
         request.setAction(Action.INVITE);
@@ -331,13 +328,13 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
         invitationRequest.setCredential(crypto.stringToBytes(UUID.randomUUID().toString()));
         invitationRequest.setNewCredential(crypto.stringToBytes(UUID.randomUUID().toString()));
 
-        service.perform(invitationRequest);
+        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(invitationRequest));
+        assertEquals(ReturnCode.CRYPTO_ERROR, cause.getReturnCode());
+        assertEquals("Signature length not correct: got 36 but was expecting 256", cause.getMessage());
     }
 
     @Test
     public void testInvitationWithoutPendingInvitation() {
-        prepareCause(ReturnCode.VERIFICATION_WARNING, "Account does not have an invitation pending.");
-
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
         final ProcessMemberRequest request = new ProcessMemberRequest();
         request.setAccountName(MEMBER_1);
@@ -345,15 +342,14 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
         request.setCredentialType(CredentialType.SIGNATURE);
         request.setCredential(crypto.stringToBytes(UUID.randomUUID().toString()));
         request.setNewCredential(crypto.stringToBytes(UUID.randomUUID().toString()));
-        assertTrue(request.validate().isEmpty());
 
-        service.perform(request);
+        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
+        assertEquals(ReturnCode.VERIFICATION_WARNING, cause.getReturnCode());
+        assertEquals("Account does not have an invitation pending.", cause.getMessage());
     }
 
     @Test
     public void testInvitationWithoutAccount() {
-        prepareCause(ReturnCode.IDENTIFICATION_WARNING, "Account does not exist.");
-
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
         final ProcessMemberRequest request = new ProcessMemberRequest();
         request.setAccountName("Who knows");
@@ -362,34 +358,34 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
         request.setCredentialType(CredentialType.SIGNATURE);
         request.setCredential(crypto.stringToBytes(UUID.randomUUID().toString()));
         request.setNewCredential(crypto.stringToBytes(UUID.randomUUID().toString()));
-        assertTrue(request.validate().isEmpty());
 
-        service.perform(request);
+        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
+        assertEquals(ReturnCode.IDENTIFICATION_WARNING, cause.getReturnCode());
+        assertEquals("Account does not exist.", cause.getMessage());
     }
 
     @Test
     public void testInviteExistingAccount() {
-        prepareCause(ReturnCode.CONSTRAINT_ERROR, "Cannot create an invitation, as the account already exists.");
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
         final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
         request.setAction(Action.INVITE);
         request.setNewAccountName(MEMBER_4);
-        assertTrue(request.validate().isEmpty());
 
-        service.perform(request);
+        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
+        assertEquals(ReturnCode.CONSTRAINT_ERROR, cause.getReturnCode());
+        assertEquals("Cannot create an invitation, as the account already exists.", cause.getMessage());
     }
 
     @Test
     public void testInvitingWithoutPermission() {
-        prepareCause(ReturnCode.ILLEGAL_ACTION, "Members are not permitted to invite new Members.");
-
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
         final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, MEMBER_1);
         request.setAction(Action.INVITE);
         request.setNewAccountName("invitee");
-        assertTrue(request.validate().isEmpty());
 
-        service.perform(request);
+        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
+        assertEquals(ReturnCode.ILLEGAL_ACTION, cause.getReturnCode());
+        assertEquals("Members are not permitted to invite new Members.", cause.getMessage());
     }
 
     @Test
@@ -398,7 +394,7 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
         final ProcessMemberRequest loginRequest = prepareLoginRequest(MEMBER_1, sessionKey);
         final ProcessMemberResponse loginResponse = service.perform(loginRequest);
-        assertThat(loginResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+        assertEquals(ReturnCode.SUCCESS.getCode(), loginResponse.getReturnCode());
 
         // Just performing an action using the Session
         final ProcessCircleService circleService = new ProcessCircleService(settings, entityManager);
@@ -407,30 +403,27 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
         circleRequest.setCircleId(CIRCLE_1_ID);
         circleRequest.setCircleName("new Circle1 name");
         final ProcessCircleResponse circleResponse = circleService.perform(circleRequest);
-        assertThat(circleResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+        assertEquals(ReturnCode.SUCCESS.getCode(), circleResponse.getReturnCode());
 
         // Have to generate the SessionKey a second time, since the first request will override it.
         final ProcessMemberRequest logoutRequest = prepareLogoutRequest(sessionKey);
         final ProcessMemberResponse logoutResponse = service.perform(logoutRequest);
-        assertThat(logoutResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+        assertEquals(ReturnCode.SUCCESS.getCode(), logoutResponse.getReturnCode());
     }
 
     @Test
     public void testLogoutMissingSession() {
-        prepareCause(ReturnCode.AUTHENTICATION_WARNING, "No Session could be found.");
-
         final String sessionKey = UUID.randomUUID().toString();
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
         final ProcessMemberRequest request = prepareLogoutRequest(sessionKey);
-        assertTrue(request.validate().isEmpty());
 
-        service.perform(request);
+        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
+        assertEquals(ReturnCode.AUTHENTICATION_WARNING, cause.getReturnCode());
+        assertEquals("No Session could be found.", cause.getMessage());
     }
 
     @Test
     public void testLogoutExpiredSession() {
-        prepareCause(ReturnCode.AUTHENTICATION_WARNING, "The Session has expired.");
-
         final Settings mySettings = newSettings();
         mySettings.set(StandardSetting.SESSION_TIMEOUT.getKey(), "-1");
         final String sessionKey = UUID.randomUUID().toString();
@@ -438,10 +431,12 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
         final ProcessMemberService service = new ProcessMemberService(mySettings, entityManager);
         final ProcessMemberRequest loginRequest = prepareLoginRequest(MEMBER_2, sessionKey);
         final ProcessMemberResponse loginResponse = service.perform(loginRequest);
-        assertThat(loginResponse.getReturnCode(), is(ReturnCode.SUCCESS.getCode()));
+        assertEquals(ReturnCode.SUCCESS.getCode(), loginResponse.getReturnCode());
 
         final ProcessMemberRequest logoutRequest = prepareLogoutRequest(sessionKey);
-        service.perform(logoutRequest);
+        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(logoutRequest));
+        assertEquals(ReturnCode.AUTHENTICATION_WARNING, cause.getReturnCode());
+        assertEquals("The Session has expired.", cause.getMessage());
     }
 
     @Test
@@ -459,15 +454,15 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
 
     @Test
     public void testProcessSelfChangeAccountNameToExisting() {
-        prepareCause(ReturnCode.CONSTRAINT_ERROR, "The new Account Name already exists.");
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
         final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, MEMBER_1);
         request.setAction(Action.UPDATE);
         request.setNewAccountName(MEMBER_2);
         request.setNewCredential(crypto.stringToBytes("Bla bla bla"));
-        assertThat(request.validate().size(), is(0));
 
-        service.perform(request);
+        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
+        assertEquals(ReturnCode.CONSTRAINT_ERROR, cause.getReturnCode());
+        assertEquals("The new Account Name already exists.", cause.getMessage());
     }
 
     /**
@@ -497,38 +492,34 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
         final FetchDataResponse dataResponse = fetchService.perform(fetchRequest);
         assertTrue(dataResponse.isOk());
         final byte[] data2 = dataResponse.getData();
-        assertThat(data1, is(data2));
+        assertArrayEquals(data2, data1);
     }
 
     @Test
     public void testInvalidateSelf() {
-        // Note, that the default error message between Java 8 & Java 11 has changed.
-        //   Java  8: Decryption error
-        //   Java 11: Message is larger than modulus
-        prepareCause(ReturnCode.CRYPTO_ERROR, "");
-
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
         final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, MEMBER_4);
         request.setAction(Action.INVALIDATE);
 
         final ProcessMemberResponse response = service.perform(request);
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
-        assertThat(response.getReturnMessage(), is("Account has been Invalidated."));
+        assertEquals("Account has been Invalidated.", response.getReturnMessage());
 
         request.setAction(Action.UPDATE);
         request.setNewCredential(crypto.stringToBytes("New Passphrase"));
-        service.perform(request);
+        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
+        assertEquals(ReturnCode.CRYPTO_ERROR, cause.getReturnCode());
     }
 
     @Test
     public void testInvalidateAdmin() {
-        prepareCause(ReturnCode.ILLEGAL_ACTION, "The System Administrator Account may not be invalidated.");
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
         final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
         request.setAction(Action.INVALIDATE);
-        assertTrue(request.validate().isEmpty());
 
-        service.perform(request);
+        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
+        assertEquals(ReturnCode.ILLEGAL_ACTION, cause.getReturnCode());
+        assertEquals("The System Administrator Account may not be invalidated.", cause.getMessage());
     }
 
     @Test
@@ -540,34 +531,32 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
 
         final ProcessMemberResponse response = service.perform(request);
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
-        assertThat(response.getReturnMessage(), is("The Member 'member2' has successfully been deleted."));
+        assertEquals("The Member 'member2' has successfully been deleted.", response.getReturnMessage());
     }
 
     @Test
     public void testDeleteMemberAsMember() {
-        prepareCause(ReturnCode.ILLEGAL_ACTION, "Members are not permitted to delete Accounts.");
-
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
         final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, MEMBER_5);
         request.setAction(Action.DELETE);
         request.setMemberId(MEMBER_3_ID);
-        assertTrue(request.validate().isEmpty());
 
-        service.perform(request);
+        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
+        assertEquals(ReturnCode.ILLEGAL_ACTION, cause.getReturnCode());
+        assertEquals("Members are not permitted to delete Accounts.", cause.getMessage());
     }
 
     @Test
     public void testDeleteUnknownAccount() {
-        prepareCause(ReturnCode.IDENTIFICATION_WARNING, "No such Account exist.");
-
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
         final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
         request.setAction(Action.DELETE);
         // Random MemberId, should not exist!
         request.setMemberId(UUID.randomUUID().toString());
-        assertTrue(request.validate().isEmpty());
 
-        service.perform(request);
+        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
+        assertEquals(ReturnCode.IDENTIFICATION_WARNING, cause.getReturnCode());
+        assertEquals("No such Account exist.", cause.getMessage());
     }
 
     @Test
@@ -578,20 +567,20 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
 
         final ProcessMemberResponse response = service.perform(request);
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
-        assertThat(response.getReturnMessage(), is("The Member '" + MEMBER_3 + "' has been successfully deleted."));
+        assertEquals("The Member '" + MEMBER_3 + "' has been successfully deleted.", response.getReturnMessage());
     }
 
     @Test
     public void testDeleteAdmin() {
-        prepareCause(ReturnCode.ILLEGAL_ACTION, "It is not permitted to delete yourself.");
-
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
         final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
         request.setAction(Action.DELETE);
         request.setMemberId(ADMIN_ID);
         assertTrue(request.validate().isEmpty());
 
-        service.perform(request);
+        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
+        assertEquals(ReturnCode.ILLEGAL_ACTION, cause.getReturnCode());
+        assertEquals("It is not permitted to delete yourself.", cause.getMessage());
     }
 
     // =========================================================================

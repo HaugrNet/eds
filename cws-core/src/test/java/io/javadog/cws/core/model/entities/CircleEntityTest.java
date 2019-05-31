@@ -16,22 +16,22 @@
  */
 package io.javadog.cws.core.model.entities;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import io.javadog.cws.core.DatabaseSetup;
 import java.util.UUID;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Kim Jensen
  * @since CWS 1.0
  */
-public final class CircleEntityTest extends DatabaseSetup {
+final class CircleEntityTest extends DatabaseSetup {
 
     @Test
-    public void testEntity() {
+    void testEntity() {
         final CircleEntity entity = prepareCircle(UUID.randomUUID().toString(), "Circle 1");
         entityManager.flush();
         entityManager.clear();

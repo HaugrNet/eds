@@ -16,23 +16,23 @@
  */
 package io.javadog.cws.core.model.entities;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import io.javadog.cws.core.DatabaseSetup;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Kim Jensen
  * @since CWS 1.0
  */
-public final class SignatureEntityTest extends DatabaseSetup {
+final class SignatureEntityTest extends DatabaseSetup {
 
     @Test
-    public void testEntity() {
+    void testEntity() {
         final MemberEntity member = find(MemberEntity.class, 6L);
         final String checksum = UUID.randomUUID().toString();
         final String publicKey = UUID.randomUUID().toString();

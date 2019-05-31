@@ -16,7 +16,7 @@
  */
 package io.javadog.cws.rest;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.requests.FetchMemberRequest;
@@ -24,16 +24,16 @@ import io.javadog.cws.api.requests.ProcessMemberRequest;
 import io.javadog.cws.core.DatabaseSetup;
 import io.javadog.cws.core.ManagementBean;
 import javax.ws.rs.core.Response;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Kim Jensen
  * @since CWS 1.0
  */
-public final class MemberServiceTest extends DatabaseSetup {
+final class MemberServiceTest extends DatabaseSetup {
 
     @Test
-    public void testCreate() {
+    void testCreate() {
         final MemberService service = prepareService();
         final ProcessMemberRequest request = new ProcessMemberRequest();
 
@@ -42,7 +42,7 @@ public final class MemberServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testFlawedCreate() {
+    void testFlawedCreate() {
         final MemberService service = prepareFlawedService();
         final ProcessMemberRequest request = new ProcessMemberRequest();
 
@@ -51,7 +51,7 @@ public final class MemberServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testInvite() {
+    void testInvite() {
         final MemberService service = prepareService();
         final ProcessMemberRequest request = new ProcessMemberRequest();
 
@@ -60,7 +60,7 @@ public final class MemberServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testFlawedInvite() {
+    void testFlawedInvite() {
         final MemberService service = prepareFlawedService();
         final ProcessMemberRequest request = new ProcessMemberRequest();
 
@@ -69,7 +69,7 @@ public final class MemberServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testLogin() {
+    void testLogin() {
         final MemberService service = prepareService();
         final ProcessMemberRequest request = new ProcessMemberRequest();
 
@@ -78,7 +78,7 @@ public final class MemberServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testFlawedLogin() {
+    void testFlawedLogin() {
         final MemberService service = prepareFlawedService();
         final ProcessMemberRequest request = new ProcessMemberRequest();
 
@@ -87,7 +87,7 @@ public final class MemberServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testLogout() {
+    void testLogout() {
         final MemberService service = prepareService();
         final ProcessMemberRequest request = new ProcessMemberRequest();
 
@@ -96,7 +96,7 @@ public final class MemberServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testFlawedLogout() {
+    void testFlawedLogout() {
         final MemberService service = prepareFlawedService();
         final ProcessMemberRequest request = new ProcessMemberRequest();
 
@@ -105,7 +105,7 @@ public final class MemberServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testAlter() {
+    void testAlter() {
         final MemberService service = prepareService();
         final ProcessMemberRequest request = new ProcessMemberRequest();
 
@@ -114,7 +114,7 @@ public final class MemberServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testFlawedAlter() {
+    void testFlawedAlter() {
         final MemberService service = prepareFlawedService();
         final ProcessMemberRequest request = new ProcessMemberRequest();
 
@@ -123,7 +123,7 @@ public final class MemberServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testUpdate() {
+    void testUpdate() {
         final MemberService service = prepareService();
         final ProcessMemberRequest request = new ProcessMemberRequest();
 
@@ -132,7 +132,7 @@ public final class MemberServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testFlawedUpdate() {
+    void testFlawedUpdate() {
         final MemberService service = prepareFlawedService();
         final ProcessMemberRequest request = new ProcessMemberRequest();
 
@@ -141,7 +141,7 @@ public final class MemberServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testInvalidate() {
+    void testInvalidate() {
         final MemberService service = prepareService();
         final ProcessMemberRequest request = new ProcessMemberRequest();
 
@@ -150,7 +150,7 @@ public final class MemberServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testFlawedInvalidate() {
+    void testFlawedInvalidate() {
         final MemberService service = prepareFlawedService();
         final ProcessMemberRequest request = new ProcessMemberRequest();
 
@@ -159,7 +159,7 @@ public final class MemberServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testDelete() {
+    void testDelete() {
         final MemberService service = prepareService();
         final ProcessMemberRequest request = new ProcessMemberRequest();
 
@@ -168,7 +168,7 @@ public final class MemberServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testFlawedDelete() {
+    void testFlawedDelete() {
         final MemberService service = prepareFlawedService();
         final ProcessMemberRequest request = new ProcessMemberRequest();
 
@@ -177,7 +177,7 @@ public final class MemberServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testFetch() {
+    void testFetch() {
         final MemberService service = prepareService();
         final FetchMemberRequest request = new FetchMemberRequest();
 
@@ -186,7 +186,7 @@ public final class MemberServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testFlawedFetch() {
+    void testFlawedFetch() {
         final MemberService service = prepareFlawedService();
         final FetchMemberRequest request = new FetchMemberRequest();
 

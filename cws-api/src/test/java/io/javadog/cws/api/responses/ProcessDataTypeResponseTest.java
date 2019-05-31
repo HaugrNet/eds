@@ -30,10 +30,10 @@ import org.junit.jupiter.api.Test;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-public final class ProcessDataTypeResponseTest {
+final class ProcessDataTypeResponseTest {
 
     @Test
-    public void testClassflow() {
+    void testClassflow() {
         final DataType dataType = new DataType();
         dataType.setTypeName("The TypeName");
         dataType.setType("The Type");
@@ -48,7 +48,7 @@ public final class ProcessDataTypeResponseTest {
     }
 
     @Test
-    public void testError() {
+    void testError() {
         final String msg = "ProcessDataType Request failed due to Verification Problems.";
         final ProcessDataTypeResponse response = new ProcessDataTypeResponse(ReturnCode.VERIFICATION_WARNING, msg);
 

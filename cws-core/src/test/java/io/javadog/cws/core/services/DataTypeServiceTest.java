@@ -16,12 +16,12 @@
  */
 package io.javadog.cws.core.services;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.javadog.cws.api.common.Action;
 import io.javadog.cws.api.common.Constants;
@@ -34,7 +34,7 @@ import io.javadog.cws.api.responses.ProcessDataResponse;
 import io.javadog.cws.api.responses.ProcessDataTypeResponse;
 import io.javadog.cws.core.DatabaseSetup;
 import io.javadog.cws.core.exceptions.CWSException;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * <p>Common test class for the Process & Fetch DataType Services.</p>
@@ -42,10 +42,10 @@ import org.junit.Test;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-public final class DataTypeServiceTest extends DatabaseSetup {
+final class DataTypeServiceTest extends DatabaseSetup {
 
     @Test
-    public void testEmptyFetchRequest() {
+    void testEmptyFetchRequest() {
         final FetchDataTypeService service = new FetchDataTypeService(settings, entityManager);
         final FetchDataTypeRequest request = new FetchDataTypeRequest();
 
@@ -56,7 +56,7 @@ public final class DataTypeServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testEmptyProcessRequest() {
+    void testEmptyProcessRequest() {
         final ProcessDataTypeService service = new ProcessDataTypeService(settings, entityManager);
         final ProcessDataTypeRequest request = new ProcessDataTypeRequest();
         assertNull(request.getAccountName());
@@ -70,7 +70,7 @@ public final class DataTypeServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testAdminFetchRequest() {
+    void testAdminFetchRequest() {
         final FetchDataTypeService service = new FetchDataTypeService(settings, entityManager);
         final FetchDataTypeRequest request = prepareRequest(FetchDataTypeRequest.class, Constants.ADMIN_ACCOUNT);
         final FetchDataTypeResponse response = service.perform(request);
@@ -87,7 +87,7 @@ public final class DataTypeServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testInvokeWithoutAnything() {
+    void testInvokeWithoutAnything() {
         final ProcessDataTypeService service = new ProcessDataTypeService(settings, entityManager);
         final ProcessDataTypeRequest request = prepareRequest(ProcessDataTypeRequest.class, Constants.ADMIN_ACCOUNT);
         assertNull(request.getTypeName());
@@ -101,7 +101,7 @@ public final class DataTypeServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testCircleAdminsAreAuthorized() {
+    void testCircleAdminsAreAuthorized() {
         final ProcessDataTypeService service = new ProcessDataTypeService(settings, entityManager);
         final ProcessDataTypeRequest request = prepareRequest(ProcessDataTypeRequest.class, MEMBER_1);
         request.setType("MyDataType");
@@ -115,7 +115,7 @@ public final class DataTypeServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testNotAuthorizedRequest() {
+    void testNotAuthorizedRequest() {
         final ProcessDataTypeService service = new ProcessDataTypeService(settings, entityManager);
         final ProcessDataTypeRequest request = prepareRequest(ProcessDataTypeRequest.class, MEMBER_5);
         request.setType("MyDataType");
@@ -129,7 +129,7 @@ public final class DataTypeServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testUpdateRestrictedDataTypeFolder() {
+    void testUpdateRestrictedDataTypeFolder() {
         final ProcessDataTypeService service = new ProcessDataTypeService(settings, entityManager);
         final ProcessDataTypeRequest request = prepareRequest(ProcessDataTypeRequest.class, Constants.ADMIN_ACCOUNT);
         request.setTypeName(Constants.FOLDER_TYPENAME);
@@ -143,7 +143,7 @@ public final class DataTypeServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testUpdateRestrictedDataTypeData() {
+    void testUpdateRestrictedDataTypeData() {
         final ProcessDataTypeService service = new ProcessDataTypeService(settings, entityManager);
         final ProcessDataTypeRequest request = prepareRequest(ProcessDataTypeRequest.class, Constants.ADMIN_ACCOUNT);
         request.setTypeName(Constants.DATA_TYPENAME);
@@ -157,7 +157,7 @@ public final class DataTypeServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testCreateAndDeleteDataType() {
+    void testCreateAndDeleteDataType() {
         final ProcessDataTypeService service = new ProcessDataTypeService(settings, entityManager);
         final ProcessDataTypeRequest request = prepareRequest(ProcessDataTypeRequest.class, Constants.ADMIN_ACCOUNT);
         request.setAction(Action.PROCESS);
@@ -182,7 +182,7 @@ public final class DataTypeServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testCreateAndDeleteUsedDataType() {
+    void testCreateAndDeleteUsedDataType() {
         final ProcessDataTypeService service = new ProcessDataTypeService(settings, entityManager);
         final ProcessDataService dataService = new ProcessDataService(settings, entityManager);
 
@@ -211,7 +211,7 @@ public final class DataTypeServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testDeleteUnknownDataType() {
+    void testDeleteUnknownDataType() {
         final ProcessDataTypeService service = new ProcessDataTypeService(settings, entityManager);
         final ProcessDataTypeRequest request = prepareRequest(ProcessDataTypeRequest.class, Constants.ADMIN_ACCOUNT);
         request.setAction(Action.DELETE);
@@ -228,7 +228,7 @@ public final class DataTypeServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testCreateAndUpdateDataType() {
+    void testCreateAndUpdateDataType() {
         final ProcessDataTypeService service = new ProcessDataTypeService(settings, entityManager);
         final ProcessDataTypeRequest request = prepareRequest(ProcessDataTypeRequest.class, Constants.ADMIN_ACCOUNT);
         request.setAction(Action.PROCESS);
@@ -257,7 +257,7 @@ public final class DataTypeServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testCreateAndRepeatDataType() {
+    void testCreateAndRepeatDataType() {
         final ProcessDataTypeService dataTypeService = new ProcessDataTypeService(settings, entityManager);
         final ProcessDataTypeRequest createRequest = prepareRequest(ProcessDataTypeRequest.class, Constants.ADMIN_ACCOUNT);
         createRequest.setAction(Action.PROCESS);

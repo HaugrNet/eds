@@ -27,10 +27,10 @@ import org.junit.jupiter.api.Test;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-public final class MasterKeyResponseTest {
+final class MasterKeyResponseTest {
 
     @Test
-    public void testClassflow() {
+    void testClassflow() {
         final MasterKeyResponse response = new MasterKeyResponse();
 
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
@@ -39,7 +39,7 @@ public final class MasterKeyResponseTest {
     }
 
     @Test
-    public void testError() {
+    void testError() {
         final String msg = "MasterKey Request failed due to Verification Problems.";
         final MasterKeyResponse response = new MasterKeyResponse(ReturnCode.VERIFICATION_WARNING, msg);
 

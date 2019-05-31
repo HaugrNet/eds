@@ -16,9 +16,10 @@
  */
 package io.javadog.cws.soap;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.requests.SettingRequest;
@@ -32,16 +33,16 @@ import io.javadog.cws.core.services.SettingService;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import javax.persistence.EntityManager;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Kim Jensen
  * @since CWS 1.0
  */
-public final class CommonServiceTest extends BeanSetup {
+final class CommonServiceTest extends BeanSetup {
 
     @Test
-    public void testConstantsConstructor() throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
+    void testConstantsConstructor() throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
         final Constructor<CommonBean> constructor = CommonBean.class.getDeclaredConstructor();
         assertFalse(constructor.isAccessible());
         constructor.setAccessible(true);
@@ -51,10 +52,7 @@ public final class CommonServiceTest extends BeanSetup {
     }
 
     @Test
-    public void testDestroy() {
-        thrown.expect(CWSException.class);
-        thrown.expectMessage("Method is not implemented.");
-
+    void testDestroy() {
         final SettingService service = new SettingService(settings, entityManager);
         final FailService failService = new FailService(settings, entityManager);
 
@@ -62,7 +60,9 @@ public final class CommonServiceTest extends BeanSetup {
         CommonBean.destroy(service);
         CommonBean.destroy(failService);
 
-        assertNull(failService.perform(null));
+        final CWSException cause = assertThrows(CWSException.class, () -> failService.perform(null));
+        assertEquals(ReturnCode.ERROR, cause.getReturnCode());
+        assertEquals("Method is not implemented.", cause.getMessage());
     }
 
     /**

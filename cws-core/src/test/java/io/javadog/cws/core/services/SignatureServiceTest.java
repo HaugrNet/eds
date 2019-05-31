@@ -16,9 +16,10 @@
  */
 package io.javadog.cws.core.services;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.requests.FetchSignatureRequest;
@@ -28,8 +29,9 @@ import io.javadog.cws.api.responses.FetchSignatureResponse;
 import io.javadog.cws.api.responses.SignResponse;
 import io.javadog.cws.api.responses.VerifyResponse;
 import io.javadog.cws.core.DatabaseSetup;
+import io.javadog.cws.core.exceptions.CWSException;
 import java.util.Date;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * <p>This Test Class, is testing the following Service Classes in one, as they
@@ -44,10 +46,10 @@ import org.junit.Test;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-public final class SignatureServiceTest extends DatabaseSetup {
+final class SignatureServiceTest extends DatabaseSetup {
 
     @Test
-    public void testSignVerifyFetch() {
+    void testSignVerifyFetch() {
         final byte[] data = generateData(1048576);
         final FetchSignatureService fetchService = new FetchSignatureService(settings, entityManager);
         final VerifyService verifyService = new VerifyService(settings, entityManager);
@@ -73,7 +75,7 @@ public final class SignatureServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testSignatureExpiringIn5Minutes() {
+    void testSignatureExpiringIn5Minutes() {
         final byte[] data = generateData(1048576);
         final VerifyService verifyService = new VerifyService(settings, entityManager);
         final SignService signService = new SignService(settings, entityManager);
@@ -95,7 +97,7 @@ public final class SignatureServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testDuplicateSigning() {
+    void testDuplicateSigning() {
         final byte[] data = generateData(1048576);
         final SignService signService = new SignService(settings, entityManager);
 
@@ -113,12 +115,10 @@ public final class SignatureServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testExpiredSignature() {
-        prepareCause(ReturnCode.SIGNATURE_WARNING, "The Signature has expired.");
-
-        final byte[] data = generateData(1048576);
+    void testExpiredSignature() {
         final VerifyService verifyService = new VerifyService(settings, entityManager);
         final SignService signService = new SignService(settings, entityManager);
+        final byte[] data = generateData(1048576);
 
         final SignRequest signRequest = prepareRequest(SignRequest.class, MEMBER_1);
         signRequest.setData(data);
@@ -129,13 +129,14 @@ public final class SignatureServiceTest extends DatabaseSetup {
         final VerifyRequest verifyRequest = prepareRequest(VerifyRequest.class, MEMBER_2);
         verifyRequest.setData(data);
         verifyRequest.setSignature(signResponse.getSignature());
-        assertTrue(verifyRequest.validate().isEmpty());
 
-        verifyService.perform(verifyRequest);
+        final CWSException cause = assertThrows(CWSException.class, () -> verifyService.perform(verifyRequest));
+        assertEquals(ReturnCode.SIGNATURE_WARNING, cause.getReturnCode());
+        assertEquals("The Signature has expired.", cause.getMessage());
     }
 
     @Test
-    public void testCorrectSignatureWrongData() {
+    void testCorrectSignatureWrongData() {
         final byte[] data = generateData(1048576);
         final VerifyService verifyService = new VerifyService(settings, entityManager);
         final SignService signService = new SignService(settings, entityManager);
@@ -155,17 +156,14 @@ public final class SignatureServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testInvalidSignature() {
-        prepareCause(ReturnCode.IDENTIFICATION_WARNING, "It was not possible to find the Signature.");
-
-        final byte[] data = generateData(524288);
-        final String signature = "VYU8uIyr54AZGeM4aUilgEItfI39/b4YpFcry8ByJYVuJoI0gxNLiw9CMCaocOfXyGkmQJuI4KvL1lhNN6jnsY51OYxsxcJKUBgMnGMRdp9mr+ryiduotTYeD9Z+IyWXdUlQ9W3N/TX1uqLwVCh9qrngXtnOXx5rnZrWybQPsoLEnVOXvkL94Et0EcIUe6spRbaR+8I4oCtGToLcMCZdD32z6suhIfqz9UFiU10W01T2ebNV4SuTf56RSZ1vyWix6C8GJhwLqWE697femoqBWh1UYgKsi5x6d1SYC7ZWSxVj61PpPJ3MfzAxVc5rqJDk1og3zfciDWPMJmF4aJ60Sg==";
-        final VerifyService verifyService = new VerifyService(settings, entityManager);
+    void testInvalidSignature() {
+        final VerifyService service = new VerifyService(settings, entityManager);
         final VerifyRequest request = prepareRequest(VerifyRequest.class, MEMBER_1);
-        request.setData(data);
-        request.setSignature(signature);
-        assertTrue(request.validate().isEmpty());
+        request.setData(generateData(524288));
+        request.setSignature("VYU8uIyr54AZGeM4aUilgEItfI39/b4YpFcry8ByJYVuJoI0gxNLiw9CMCaocOfXyGkmQJuI4KvL1lhNN6jnsY51OYxsxcJKUBgMnGMRdp9mr+ryiduotTYeD9Z+IyWXdUlQ9W3N/TX1uqLwVCh9qrngXtnOXx5rnZrWybQPsoLEnVOXvkL94Et0EcIUe6spRbaR+8I4oCtGToLcMCZdD32z6suhIfqz9UFiU10W01T2ebNV4SuTf56RSZ1vyWix6C8GJhwLqWE697femoqBWh1UYgKsi5x6d1SYC7ZWSxVj61PpPJ3MfzAxVc5rqJDk1og3zfciDWPMJmF4aJ60Sg==");
 
-        verifyService.perform(request);
+        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
+        assertEquals(ReturnCode.IDENTIFICATION_WARNING, cause.getReturnCode());
+        assertEquals("It was not possible to find the Signature.", cause.getMessage());
     }
 }

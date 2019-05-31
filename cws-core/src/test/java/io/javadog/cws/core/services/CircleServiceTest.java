@@ -16,11 +16,11 @@
  */
 package io.javadog.cws.core.services;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.javadog.cws.api.common.Action;
 import io.javadog.cws.api.common.Constants;
@@ -43,7 +43,7 @@ import io.javadog.cws.core.enums.StandardSetting;
 import io.javadog.cws.core.exceptions.CWSException;
 import io.javadog.cws.core.model.Settings;
 import java.util.UUID;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * <p>Common test class for the Process & Fetch Circle Services.</p>
@@ -51,10 +51,10 @@ import org.junit.Test;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-public final class CircleServiceTest extends DatabaseSetup {
+final class CircleServiceTest extends DatabaseSetup {
 
     @Test
-    public void testEmptyFetchRequest() {
+    void testEmptyFetchRequest() {
         final FetchCircleService service = new FetchCircleService(settings, entityManager);
         final FetchCircleRequest request = new FetchCircleRequest();
         // Just making sure that the account is missing
@@ -68,7 +68,7 @@ public final class CircleServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testEmptyProcessRequest() {
+    void testEmptyProcessRequest() {
         final ProcessCircleService service = new ProcessCircleService(settings, entityManager);
         final ProcessCircleRequest request = new ProcessCircleRequest();
         // Just making sure that the account is missing
@@ -83,7 +83,7 @@ public final class CircleServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testCreateAndReadCircle() {
+    void testCreateAndReadCircle() {
         final ProcessCircleService processService = new ProcessCircleService(settings, entityManager);
         final ProcessCircleRequest createRequest = prepareRequest(ProcessCircleRequest.class, Constants.ADMIN_ACCOUNT);
         createRequest.setAction(Action.CREATE);
@@ -124,7 +124,7 @@ public final class CircleServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testFetchAllCirclesAsAdminWithShowCirclesTrue() {
+    void testFetchAllCirclesAsAdminWithShowCirclesTrue() {
         final Settings mySettings = newSettings();
         mySettings.set(StandardSetting.SHOW_CIRCLES.getKey(), "true");
         final FetchCircleService service = new FetchCircleService(mySettings, entityManager);
@@ -136,7 +136,7 @@ public final class CircleServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testFetchAllCirclesAsAdminWithShowCirclesFalse() {
+    void testFetchAllCirclesAsAdminWithShowCirclesFalse() {
         final Settings mySettings = newSettings();
         mySettings.set(StandardSetting.SHOW_CIRCLES.getKey(), "false");
         final FetchCircleService service = new FetchCircleService(mySettings, entityManager);
@@ -148,7 +148,7 @@ public final class CircleServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testFetchAllCirclesAsMember1WithShowCirclesTrue() {
+    void testFetchAllCirclesAsMember1WithShowCirclesTrue() {
         final Settings mySettings = newSettings();
         mySettings.set(StandardSetting.SHOW_CIRCLES.getKey(), "true");
         final FetchCircleService service = new FetchCircleService(mySettings, entityManager);
@@ -160,7 +160,7 @@ public final class CircleServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testFetchAllCirclesAsMember1WithShowCirclesFalse() {
+    void testFetchAllCirclesAsMember1WithShowCirclesFalse() {
         final Settings mySettings = newSettings();
         mySettings.set(StandardSetting.SHOW_CIRCLES.getKey(), "false");
         final FetchCircleService service = new FetchCircleService(mySettings, entityManager);
@@ -172,7 +172,7 @@ public final class CircleServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testFetchAllCirclesAsMember5WithShowCirclesFalse() {
+    void testFetchAllCirclesAsMember5WithShowCirclesFalse() {
         final Settings mySettings = newSettings();
         mySettings.set(StandardSetting.SHOW_CIRCLES.getKey(), "false");
         final FetchCircleService service = new FetchCircleService(mySettings, entityManager);
@@ -184,7 +184,7 @@ public final class CircleServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testCreateCircle() {
+    void testCreateCircle() {
         final ProcessCircleService service = new ProcessCircleService(settings, entityManager);
         final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, Constants.ADMIN_ACCOUNT);
         request.setAction(Action.CREATE);
@@ -207,7 +207,7 @@ public final class CircleServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testCreateCircleAsMember() {
+    void testCreateCircleAsMember() {
         final ProcessCircleService service = new ProcessCircleService(settings, entityManager);
         final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, MEMBER_1);
         request.setAction(Action.CREATE);
@@ -220,7 +220,7 @@ public final class CircleServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testCreateCirleAsNewUser() {
+    void testCreateCirleAsNewUser() {
         final ProcessMemberService memberService = new ProcessMemberService(settings, entityManager);
         final ProcessCircleService circleService = new ProcessCircleService(settings, entityManager);
         final ProcessTrusteeService trusteeService = new ProcessTrusteeService(settings, entityManager);
@@ -249,7 +249,7 @@ public final class CircleServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testCreateCircleWithExternalCircleKey() {
+    void testCreateCircleWithExternalCircleKey() {
         final ProcessCircleService service = new ProcessCircleService(settings, entityManager);
         final ProcessCircleRequest createRequest = prepareRequest(ProcessCircleRequest.class, MEMBER_5);
         createRequest.setAction(Action.CREATE);
@@ -287,7 +287,7 @@ public final class CircleServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testCreateCircleWithInvalidCircleAdmin() {
+    void testCreateCircleWithInvalidCircleAdmin() {
         final ProcessCircleService service = new ProcessCircleService(settings, entityManager);
         final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, Constants.ADMIN_ACCOUNT);
         request.setAction(Action.CREATE);
@@ -301,7 +301,7 @@ public final class CircleServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testCreateCircleWithSystemAdminAsCircleAdmin() {
+    void testCreateCircleWithSystemAdminAsCircleAdmin() {
         final ProcessCircleService service = new ProcessCircleService(settings, entityManager);
         final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, Constants.ADMIN_ACCOUNT);
         request.setAction(Action.CREATE);
@@ -314,7 +314,7 @@ public final class CircleServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testCreateCircleWithExistingName() {
+    void testCreateCircleWithExistingName() {
         final ProcessCircleService service = new ProcessCircleService(settings, entityManager);
         final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, Constants.ADMIN_ACCOUNT);
         request.setAction(Action.CREATE);
@@ -328,7 +328,7 @@ public final class CircleServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testUpdateExistingCircleAsAdmin() {
+    void testUpdateExistingCircleAsAdmin() {
         final ProcessCircleService service = new ProcessCircleService(settings, entityManager);
         final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, Constants.ADMIN_ACCOUNT);
         request.setAction(Action.UPDATE);
@@ -349,7 +349,7 @@ public final class CircleServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testUpdateExistingCircleAsCircleAdmin() {
+    void testUpdateExistingCircleAsCircleAdmin() {
         final ProcessCircleService service = new ProcessCircleService(settings, entityManager);
         final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, MEMBER_1);
         request.setAction(Action.UPDATE);
@@ -362,62 +362,59 @@ public final class CircleServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testUpdateExistingCircleAsCircleMember() {
-        prepareCause(ReturnCode.AUTHORIZATION_WARNING, "Only a Circle Administrator may perform this action.");
-
+    void testUpdateExistingCircleAsCircleMember() {
         final ProcessCircleService service = new ProcessCircleService(settings, entityManager);
         final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, MEMBER_2);
         request.setAction(Action.UPDATE);
         request.setCircleName("Circle One");
         request.setCircleId(CIRCLE_1_ID);
-        assertTrue(request.validate().isEmpty());
 
-        service.perform(request);
+        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
+        assertEquals(ReturnCode.AUTHORIZATION_WARNING, cause.getReturnCode());
+        assertEquals("Only a Circle Administrator may perform this action.", cause.getMessage());
     }
 
     @Test
-    public void testUpdateCircleAsNonMember() {
-        prepareCause(ReturnCode.IDENTIFICATION_WARNING, "No Trustee information found for member 'member5' and circle '" + CIRCLE_1_ID + "'.");
+    void testUpdateCircleAsNonMember() {
         final ProcessCircleService service = new ProcessCircleService(settings, entityManager);
         final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, MEMBER_5);
         request.setAction(Action.UPDATE);
         request.setCircleName("Circle One");
         request.setCircleId(CIRCLE_1_ID);
-        assertTrue(request.validate().isEmpty());
 
-        service.perform(request);
+        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
+        assertEquals(ReturnCode.IDENTIFICATION_WARNING, cause.getReturnCode());
+        assertEquals("No Trustee information found for member 'member5' and circle '" + CIRCLE_1_ID + "'.", cause.getMessage());
     }
 
     @Test
-    public void testUpdateNonExistingCircle() {
-        prepareCause(ReturnCode.IDENTIFICATION_WARNING, "No Circle could be found with the given Id.");
-
+    void testUpdateNonExistingCircle() {
         final ProcessCircleService service = new ProcessCircleService(settings, entityManager);
         final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, Constants.ADMIN_ACCOUNT);
         request.setAction(Action.UPDATE);
         request.setCircleName("Circle One");
         request.setCircleId(UUID.randomUUID().toString());
-        assertTrue(request.validate().isEmpty());
 
-        service.perform(request);
+        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
+        assertEquals(ReturnCode.IDENTIFICATION_WARNING, cause.getReturnCode());
+        assertEquals("No Circle could be found with the given Id.", cause.getMessage());
     }
 
     @Test
-    public void testUpdateExistingCircleWithExistingName() {
-        prepareCause(ReturnCode.IDENTIFICATION_WARNING, "A Circle with the requested name already exists.");
-
+    void testUpdateExistingCircleWithExistingName() {
         final ProcessCircleService service = new ProcessCircleService(settings, entityManager);
         final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, MEMBER_1);
         request.setAction(Action.UPDATE);
         request.setCircleName(CIRCLE_2);
         request.setCircleId(CIRCLE_1_ID);
-        assertTrue(request.validate().isEmpty());
 
-        service.perform(request);
+        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
+        assertEquals(ReturnCode.IDENTIFICATION_WARNING, cause.getReturnCode());
+        assertEquals("A Circle with the requested name already exists.", cause.getMessage());
     }
 
     @Test
-    public void testUpdateExistingCircleWithOwnName() {
+    void testUpdateExistingCircleWithOwnName() {
         final ProcessCircleService service = new ProcessCircleService(settings, entityManager);
         final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, MEMBER_1);
         request.setAction(Action.UPDATE);
@@ -430,7 +427,7 @@ public final class CircleServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testDeleteCircleAsAdmin() {
+    void testDeleteCircleAsAdmin() {
         final ProcessCircleService service = new ProcessCircleService(settings, entityManager);
         final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, Constants.ADMIN_ACCOUNT);
         request.setAction(Action.DELETE);
@@ -442,29 +439,27 @@ public final class CircleServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testDeleteCircleAsMember() {
-        prepareCause(ReturnCode.AUTHORIZATION_WARNING, "Only the System Administrator may delete a Circle.");
-
+    void testDeleteCircleAsMember() {
         final ProcessCircleService service = new ProcessCircleService(settings, entityManager);
         final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, MEMBER_1);
         request.setAction(Action.DELETE);
         request.setCircleId(CIRCLE_1_ID);
-        assertTrue(request.validate().isEmpty());
 
-        service.perform(request);
+        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
+        assertEquals(ReturnCode.AUTHORIZATION_WARNING, cause.getReturnCode());
+        assertEquals("Only the System Administrator may delete a Circle.", cause.getMessage());
     }
 
     @Test
-    public void testDeleteNotExistingCircle() {
-        prepareCause(ReturnCode.IDENTIFICATION_WARNING, "No Circle could be found with the given Id.");
-
+    void testDeleteNotExistingCircle() {
         final ProcessCircleService service = new ProcessCircleService(settings, entityManager);
         final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, Constants.ADMIN_ACCOUNT);
         request.setAction(Action.DELETE);
         request.setCircleId(UUID.randomUUID().toString());
-        assertTrue(request.validate().isEmpty());
 
-        service.perform(request);
+        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
+        assertEquals(ReturnCode.IDENTIFICATION_WARNING, cause.getReturnCode());
+        assertEquals("No Circle could be found with the given Id.", cause.getMessage());
     }
 
     // =========================================================================

@@ -28,10 +28,10 @@ import org.junit.jupiter.api.Test;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-public final class MetadataTest {
+final class MetadataTest {
 
     @Test
-    public void testClassflow() {
+    void testClassflow() {
         final String id = UUID.randomUUID().toString();
         final String circleId = UUID.randomUUID().toString();
         final String folderId = UUID.randomUUID().toString();
@@ -56,7 +56,7 @@ public final class MetadataTest {
     }
 
     @Test
-    public void testStandardMethods() {
+    void testStandardMethods() {
         final Metadata metadata = new Metadata();
         final Metadata sameMetadata = new Metadata();
         final Metadata emptyMetadata = new Metadata();

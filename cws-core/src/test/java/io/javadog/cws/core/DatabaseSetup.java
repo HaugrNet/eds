@@ -57,10 +57,8 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import javax.persistence.Query;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 
 /**
  * @author Kim Jensen
@@ -109,21 +107,13 @@ public class DatabaseSetup {
         }
     }
 
-    /**
-     * If the test is expecting an Exception, then we'll use this as the rule.
-     * The method {@link #prepareCause(ReturnCode, String)} will provide
-     * the simplest way to setup the cause to be expected.
-     */
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
-
-    @Before
+    @BeforeEach
     public void setup() {
         entityManager.getTransaction().begin();
         settings.set(StandardSetting.IS_READY.getKey(), "true");
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         entityManager.getTransaction().rollback();
     }
@@ -199,19 +189,6 @@ public class DatabaseSetup {
         }
 
         return data;
-    }
-
-    /**
-     * Setting the cause of an error to expect. This consists of the CWS
-     * Exception, Return Code &amp; Message.
-     *
-     * @param returnCode    The Return Code
-     * @param returnMessage The Return Message
-     */
-    protected void prepareCause(final ReturnCode returnCode, final String returnMessage) {
-        final String propertyName = "returnCode";
-        thrown.expect(CWSException.class);
-        thrown.expectMessage(returnMessage);
     }
 
     /**

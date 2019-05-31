@@ -32,10 +32,10 @@ import org.junit.jupiter.api.Test;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-public final class FetchDataResponseTest {
+final class FetchDataResponseTest {
 
     @Test
-    public void testClassflow() {
+    void testClassflow() {
         final byte[] data = { (byte) 1, (byte) 2, (byte) 3, (byte) 4, (byte) 5 };
         final List<Metadata> metadata = new ArrayList<>(3);
         metadata.add(new Metadata());
@@ -56,7 +56,7 @@ public final class FetchDataResponseTest {
     }
 
     @Test
-    public void testError() {
+    void testError() {
         final String msg = "FetchData Request failed due to Verification Problems.";
         final FetchDataResponse response = new FetchDataResponse(ReturnCode.VERIFICATION_WARNING, msg);
 

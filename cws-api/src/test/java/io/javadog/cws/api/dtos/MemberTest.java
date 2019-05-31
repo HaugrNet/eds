@@ -29,10 +29,10 @@ import org.junit.jupiter.api.Test;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-public final class MemberTest {
+final class MemberTest {
 
     @Test
-    public void testClassflow() {
+    void testClassflow() {
         final String memberId = UUID.randomUUID().toString();
         final String accountName = "Member AccountName";
         final String publicKey = UUID.randomUUID().toString();
@@ -53,7 +53,7 @@ public final class MemberTest {
     }
 
     @Test
-    public void testStandardMethods() {
+    void testStandardMethods() {
         final Member member = new Member();
         final Member sameMember = new Member();
         final Member emptyMember = new Member();

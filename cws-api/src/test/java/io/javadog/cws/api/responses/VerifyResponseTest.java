@@ -27,10 +27,10 @@ import org.junit.jupiter.api.Test;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-public final class VerifyResponseTest {
+final class VerifyResponseTest {
 
     @Test
-    public void testClassflow() {
+    void testClassflow() {
         final VerifyResponse response = new VerifyResponse();
         response.setVerified(true);
 
@@ -41,7 +41,7 @@ public final class VerifyResponseTest {
     }
 
     @Test
-    public void testError() {
+    void testError() {
         final String msg = "Verify Request failed due to Verification Problems.";
         final VerifyResponse response = new VerifyResponse(ReturnCode.VERIFICATION_WARNING, msg);
 

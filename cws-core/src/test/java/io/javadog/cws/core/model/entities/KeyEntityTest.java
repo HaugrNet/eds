@@ -16,25 +16,25 @@
  */
 package io.javadog.cws.core.model.entities;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import io.javadog.cws.core.DatabaseSetup;
 import io.javadog.cws.core.enums.Status;
 import io.javadog.cws.core.model.Settings;
 import java.util.Date;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Kim Jensen
  * @since CWS 1.0
  */
-public final class KeyEntityTest extends DatabaseSetup {
+final class KeyEntityTest extends DatabaseSetup {
 
     @Test
-    public void testEntity() {
+    void testEntity() {
         final Settings mySettings = newSettings();
         final KeyEntity key = new KeyEntity();
         key.setAlgorithm(mySettings.getSymmetricAlgorithm());
@@ -59,7 +59,7 @@ public final class KeyEntityTest extends DatabaseSetup {
     }
 
     @Test
-    public void testUpdateExpires() {
+    void testUpdateExpires() {
         final KeyEntity key = prepareKey();
 
         // Now to the actual test, change the Expires, persist, detach and
@@ -73,7 +73,7 @@ public final class KeyEntityTest extends DatabaseSetup {
     }
 
     @Test
-    public void testUpdateGracePeriod() {
+    void testUpdateGracePeriod() {
         final KeyEntity key = prepareKey();
 
         // Now to the actual test, change the GracePeriod, persist, detach and

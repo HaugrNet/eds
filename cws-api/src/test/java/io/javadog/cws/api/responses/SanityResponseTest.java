@@ -30,10 +30,10 @@ import org.junit.jupiter.api.Test;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-public final class SanityResponseTest {
+final class SanityResponseTest {
 
     @Test
-    public void testClassflow() {
+    void testClassflow() {
         final List<Sanity> sanities = new ArrayList<>();
 
         final SanityResponse response = new SanityResponse();
@@ -46,7 +46,7 @@ public final class SanityResponseTest {
     }
 
     @Test
-    public void testError() {
+    void testError() {
         final String msg = "FetchCircle Request failed due to Verification Problems.";
         final SanityResponse response = new SanityResponse(ReturnCode.VERIFICATION_WARNING, msg);
 

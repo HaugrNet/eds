@@ -26,10 +26,10 @@ import org.junit.jupiter.api.Test;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-public final class DataTypeTest {
+final class DataTypeTest {
 
     @Test
-    public void testClassflow() {
+    void testClassflow() {
         final String name = "name";
         final String type = "type";
 
@@ -42,7 +42,7 @@ public final class DataTypeTest {
     }
 
     @Test
-    public void testToString() {
+    void testToString() {
         final DataType dataType = new DataType();
         final DataType sameDataType = new DataType();
         final DataType emptyDataType = new DataType();

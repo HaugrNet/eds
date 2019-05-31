@@ -28,10 +28,10 @@ import org.junit.jupiter.api.Test;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-public final class FetchDataTypeRequestTest {
+final class FetchDataTypeRequestTest {
 
     @Test
-    public void testClassflow() {
+    void testClassflow() {
         final FetchDataTypeRequest request = new FetchDataTypeRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
         request.setCredential(TestUtilities.convert(Constants.ADMIN_ACCOUNT));
@@ -43,7 +43,7 @@ public final class FetchDataTypeRequestTest {
     }
 
     @Test
-    public void testEmptyClass() {
+    void testEmptyClass() {
         final FetchDataTypeRequest request = new FetchDataTypeRequest();
         final Map<String, String> errors = request.validate();
 

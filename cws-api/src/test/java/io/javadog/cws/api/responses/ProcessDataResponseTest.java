@@ -29,10 +29,10 @@ import org.junit.jupiter.api.Test;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-public final class ProcessDataResponseTest {
+final class ProcessDataResponseTest {
 
     @Test
-    public void testClassflow() {
+    void testClassflow() {
         final String dataId = UUID.randomUUID().toString();
 
         final ProcessDataResponse response = new ProcessDataResponse();
@@ -45,7 +45,7 @@ public final class ProcessDataResponseTest {
     }
 
     @Test
-    public void testError() {
+    void testError() {
         final String msg = "ProcessData Request failed due to Verification Problems.";
         final ProcessDataResponse response = new ProcessDataResponse(ReturnCode.VERIFICATION_WARNING, msg);
 

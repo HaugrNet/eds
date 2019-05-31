@@ -16,7 +16,7 @@
  */
 package io.javadog.cws.rest;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.requests.FetchDataTypeRequest;
@@ -24,16 +24,16 @@ import io.javadog.cws.api.requests.ProcessDataTypeRequest;
 import io.javadog.cws.core.DatabaseSetup;
 import io.javadog.cws.core.ShareBean;
 import javax.ws.rs.core.Response;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Kim Jensen
  * @since CWS 1.0
  */
-public final class DataTypeServiceTest extends DatabaseSetup {
+final class DataTypeServiceTest extends DatabaseSetup {
 
     @Test
-    public void testProcess() {
+    void testProcess() {
         final DataTypeService service = prepareService();
         final ProcessDataTypeRequest request = new ProcessDataTypeRequest();
 
@@ -42,7 +42,7 @@ public final class DataTypeServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testFlawedProcess() {
+    void testFlawedProcess() {
         final DataTypeService service = prepareFlawedService();
         final ProcessDataTypeRequest request = new ProcessDataTypeRequest();
 
@@ -51,7 +51,7 @@ public final class DataTypeServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testDelete() {
+    void testDelete() {
         final DataTypeService service = prepareService();
         final ProcessDataTypeRequest request = new ProcessDataTypeRequest();
 
@@ -60,7 +60,7 @@ public final class DataTypeServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testFlawedDelete() {
+    void testFlawedDelete() {
         final DataTypeService service = prepareFlawedService();
         final ProcessDataTypeRequest request = new ProcessDataTypeRequest();
 
@@ -69,7 +69,7 @@ public final class DataTypeServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testFetch() {
+    void testFetch() {
         final DataTypeService service = prepareService();
         final FetchDataTypeRequest request = new FetchDataTypeRequest();
 
@@ -78,7 +78,7 @@ public final class DataTypeServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testFlawedFetch() {
+    void testFlawedFetch() {
         final DataTypeService service = prepareFlawedService();
         final FetchDataTypeRequest request = new FetchDataTypeRequest();
 

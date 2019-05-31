@@ -16,8 +16,8 @@
  */
 package io.javadog.cws.core.services;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import io.javadog.cws.api.common.Constants;
@@ -38,7 +38,7 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.UUID;
 import javax.persistence.Query;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * <p>This Test Class, is testing the following Service Classes in one, as they
@@ -51,10 +51,10 @@ import org.junit.Test;
  * @author Kim Jensen
  * @since CWS 1.1
  */
-public final class MasterKeyServiceTest extends DatabaseSetup {
+final class MasterKeyServiceTest extends DatabaseSetup {
 
     @Test
-    public void testUpdateMasterKeyWithNullRequest() {
+    void testUpdateMasterKeyWithNullRequest() {
         final MasterKeyService service = new MasterKeyService(settings, entityManager);
         final MasterKeyRequest request = null;
 
@@ -64,7 +64,7 @@ public final class MasterKeyServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testUpdateMasterKeyWithEmptyRequest() {
+    void testUpdateMasterKeyWithEmptyRequest() {
         final MasterKeyService service = new MasterKeyService(settings, entityManager);
         final MasterKeyRequest request = new MasterKeyRequest();
 
@@ -77,7 +77,7 @@ public final class MasterKeyServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testUpdateMasterKeyAsMember() {
+    void testUpdateMasterKeyAsMember() {
         final MasterKeyService service = new MasterKeyService(settings, entityManager);
         final MasterKeyRequest request = prepareRequest(MasterKeyRequest.class, MEMBER_1);
         request.setSecret("New MasterKey".getBytes(Charset.defaultCharset()));
@@ -88,7 +88,7 @@ public final class MasterKeyServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testUpdateMasterKeyAsAdminWithWrongCredentials() {
+    void testUpdateMasterKeyAsAdminWithWrongCredentials() {
         final MasterKeyService service = new MasterKeyService(settings, entityManager);
         final MasterKeyRequest request = prepareRequest(MasterKeyRequest.class, Constants.ADMIN_ACCOUNT);
         request.setCredential("root".getBytes(Charset.defaultCharset()));
@@ -100,7 +100,7 @@ public final class MasterKeyServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testUpdatingMasterKeySecretZeroMembers() {
+    void testUpdatingMasterKeySecretZeroMembers() {
         // Before starting, all member accounts must be removed
         final List<MemberEntity> members = dao.findAllAscending(MemberEntity.class, "id");
         for (final MemberEntity member : members) {
@@ -116,7 +116,7 @@ public final class MasterKeyServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testUpdatingMasterKeyUrlZeroMembers() throws IOException {
+    void testUpdatingMasterKeyUrlZeroMembers() throws IOException {
         // Before starting, all member accounts must be removed
         final String path = tempDir() + "secret_master_key.bin";
         final String file = "file://" + path;
@@ -138,7 +138,7 @@ public final class MasterKeyServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testUpdatingMasterKeyAdminOnly() throws IOException {
+    void testUpdatingMasterKeyAdminOnly() throws IOException {
         // Before starting, all member accounts must be removed, as well as the
         // MasterKey Setting.
         deleteNonAdminMembers();
@@ -166,7 +166,7 @@ public final class MasterKeyServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testStartingMasterKeyWithURLFailed() {
+    void testStartingMasterKeyWithURLFailed() {
         final String file = tempDir() + "not_existing_file.bin";
         final Settings mySettings = newSettings();
         mySettings.set(StandardSetting.MASTERKEY_URL.getKey(), "file://" + file);
@@ -185,7 +185,7 @@ public final class MasterKeyServiceTest extends DatabaseSetup {
      * @throws IOException If unable to write to the MasterKey file
      */
     @Test
-    public void testStartingMasterKeyWithURLSuccess() throws IOException {
+    void testStartingMasterKeyWithURLSuccess() throws IOException {
         final String file = tempDir() + "masterKey.bin";
         final MasterKey defaultMasterKey = MasterKey.getInstance(settings);
         final Settings mySettings = newSettings();
@@ -201,7 +201,7 @@ public final class MasterKeyServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testUpdateMasterKeyWhenMembersExist() {
+    void testUpdateMasterKeyWhenMembersExist() {
         final MasterKeyService service = new MasterKeyService(settings, entityManager);
         final MasterKeyRequest request = prepareRequest(MasterKeyRequest.class, Constants.ADMIN_ACCOUNT);
         request.setSecret("MasterKey".getBytes(Charset.defaultCharset()));
@@ -212,7 +212,7 @@ public final class MasterKeyServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testUpdateMasterKeyToCurrent() {
+    void testUpdateMasterKeyToCurrent() {
         final MasterKeyService service = new MasterKeyService(settings, entityManager);
         final MasterKeyRequest request = prepareRequest(MasterKeyRequest.class, Constants.ADMIN_ACCOUNT);
         request.setSecret(request.getCredential());
@@ -223,7 +223,7 @@ public final class MasterKeyServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testUpdateMasterKeyWithUnreachabledURL() {
+    void testUpdateMasterKeyWithUnreachabledURL() {
         final String path = tempDir() + "not_existing_file.bin";
         final MasterKeyService service = new MasterKeyService(settings, entityManager);
         final MasterKeyRequest request = prepareRequest(MasterKeyRequest.class, Constants.ADMIN_ACCOUNT);

@@ -16,24 +16,23 @@
  */
 package io.javadog.cws.core.jce;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import io.javadog.cws.core.DatabaseSetup;
-import org.junit.Test;
-
 import java.security.SecureRandom;
 import java.util.Base64;
 import java.util.UUID;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Kim Jensen
  * @since CWS 1.1
  */
-public class IVSaltTest extends DatabaseSetup {
+class IVSaltTest extends DatabaseSetup {
 
     @Test
-    public void testSaltAsUUID() {
+    void testSaltAsUUID() {
         final String uuid = UUID.randomUUID().toString();
         final IVSalt salt = new IVSalt(uuid);
 
@@ -42,7 +41,7 @@ public class IVSaltTest extends DatabaseSetup {
     }
 
     @Test
-    public void testDefaultSalt() {
+    void testDefaultSalt() {
         final IVSalt salt = new IVSalt();
 
         assertEquals(24, salt.getArmored().length());
@@ -50,7 +49,7 @@ public class IVSaltTest extends DatabaseSetup {
     }
 
     @Test
-    public void testSecureRandom16Bytes() {
+    void testSecureRandom16Bytes() {
         final byte[] random = new byte[16];
         new SecureRandom().nextBytes(random);
         final String armored = Base64.getEncoder().encodeToString(random);
@@ -70,7 +69,7 @@ public class IVSaltTest extends DatabaseSetup {
      * invalid string.</p>
      */
     @Test
-    public void testCraftedStringAsSalt() {
+    void testCraftedStringAsSalt() {
         final String armored = "==ABCDEFG123456789%&/()?";
 
         final IVSalt salt = new IVSalt(armored);

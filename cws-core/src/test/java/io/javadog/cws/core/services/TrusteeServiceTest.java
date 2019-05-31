@@ -16,12 +16,12 @@
  */
 package io.javadog.cws.core.services;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.javadog.cws.api.common.Action;
 import io.javadog.cws.api.common.Constants;
@@ -38,7 +38,7 @@ import io.javadog.cws.core.DatabaseSetup;
 import io.javadog.cws.core.enums.StandardSetting;
 import io.javadog.cws.core.exceptions.CWSException;
 import java.util.UUID;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * <p>Common test class for the Process & Fetch Trustee Services.</p>
@@ -46,10 +46,10 @@ import org.junit.Test;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-public final class TrusteeServiceTest extends DatabaseSetup {
+final class TrusteeServiceTest extends DatabaseSetup {
 
     @Test
-    public void testEmptyFetchRequest() {
+    void testEmptyFetchRequest() {
         final FetchTrusteeService service = new FetchTrusteeService(settings, entityManager);
         final FetchTrusteeRequest request = new FetchTrusteeRequest();
 
@@ -62,7 +62,7 @@ public final class TrusteeServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testEmptyProcessRequest() {
+    void testEmptyProcessRequest() {
         final ProcessTrusteeService service = new ProcessTrusteeService(settings, entityManager);
         final ProcessTrusteeRequest request = new ProcessTrusteeRequest();
         // Just making sure that the account is missing
@@ -77,7 +77,7 @@ public final class TrusteeServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testFetchNotExistingCircle() {
+    void testFetchNotExistingCircle() {
         final FetchTrusteeService service = new FetchTrusteeService(settings, entityManager);
         final FetchTrusteeRequest request = prepareRequest(FetchTrusteeRequest.class, Constants.ADMIN_ACCOUNT);
         request.setCircleId(UUID.randomUUID().toString());
@@ -88,7 +88,7 @@ public final class TrusteeServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testFetchCircle1WithShowTrueAsAdmin() {
+    void testFetchCircle1WithShowTrueAsAdmin() {
         // Ensure that we have the correct settings for the Service
         settings.set(StandardSetting.SHOW_TRUSTEES, "true");
 
@@ -102,7 +102,7 @@ public final class TrusteeServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testFetchCircle1WithShowFalseAsAdmin() {
+    void testFetchCircle1WithShowFalseAsAdmin() {
         // Ensure that we have the correct settings for the Service
         settings.set(StandardSetting.SHOW_TRUSTEES, "false");
 
@@ -115,7 +115,7 @@ public final class TrusteeServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testFetchCircle1WithShowTrueAsMember1() {
+    void testFetchCircle1WithShowTrueAsMember1() {
         // Ensure that we have the correct settings for the Service
         settings.set(StandardSetting.SHOW_TRUSTEES, "true");
 
@@ -129,7 +129,7 @@ public final class TrusteeServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testFetchCircle1WithShowFalseAsMember1() {
+    void testFetchCircle1WithShowFalseAsMember1() {
         // Ensure that we have the correct settings for the Service
         settings.set(StandardSetting.SHOW_TRUSTEES, "false");
 
@@ -164,7 +164,7 @@ public final class TrusteeServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testFetchCircle1WithShowTrueAsMember5() {
+    void testFetchCircle1WithShowTrueAsMember5() {
         // Ensure that we have the correct settings for the Service
         settings.set(StandardSetting.SHOW_TRUSTEES, "true");
 
@@ -179,7 +179,7 @@ public final class TrusteeServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testFetchCircle1WithShowFalseAsMember5() {
+    void testFetchCircle1WithShowFalseAsMember5() {
         // Ensure that we have the correct settings for the Service
         settings.set(StandardSetting.SHOW_TRUSTEES, "false");
 
@@ -193,7 +193,7 @@ public final class TrusteeServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testCreatingAndAddingTrusteeAsSystemAdmin() {
+    void testCreatingAndAddingTrusteeAsSystemAdmin() {
         // Step 1, create a new Circle as System Administrator
         final ProcessCircleService circleService = new ProcessCircleService(settings, entityManager);
         final ProcessCircleRequest circleRequest = prepareRequest(ProcessCircleRequest.class, Constants.ADMIN_ACCOUNT);
@@ -232,7 +232,7 @@ public final class TrusteeServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testAddingTrusteeAsWritingTrustee() {
+    void testAddingTrusteeAsWritingTrustee() {
         final ProcessTrusteeService service = new ProcessTrusteeService(settings, entityManager);
         final ProcessTrusteeRequest request = prepareRequest(ProcessTrusteeRequest.class, MEMBER_2);
         request.setAction(Action.ADD);
@@ -246,7 +246,7 @@ public final class TrusteeServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testAddingTrusteeAsCircleAdmin() {
+    void testAddingTrusteeAsCircleAdmin() {
         final ProcessTrusteeService service = new ProcessTrusteeService(settings, entityManager);
         final ProcessTrusteeRequest request = prepareRequest(ProcessTrusteeRequest.class, MEMBER_1);
         request.setAction(Action.ADD);
@@ -260,7 +260,7 @@ public final class TrusteeServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testAddingTrusteeToInvalidCircleAsCircleAdmin() {
+    void testAddingTrusteeToInvalidCircleAsCircleAdmin() {
         final ProcessTrusteeService service = new ProcessTrusteeService(settings, entityManager);
         final ProcessTrusteeRequest request = prepareRequest(ProcessTrusteeRequest.class, MEMBER_1);
         final String circleId = UUID.randomUUID().toString();
@@ -275,7 +275,7 @@ public final class TrusteeServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testAddingInvalidMemberAsTrusteeAsCircleAdmin() {
+    void testAddingInvalidMemberAsTrusteeAsCircleAdmin() {
         final ProcessTrusteeService service = new ProcessTrusteeService(settings, entityManager);
         final ProcessTrusteeRequest request = prepareRequest(ProcessTrusteeRequest.class, MEMBER_1);
         request.setAction(Action.ADD);
@@ -289,7 +289,7 @@ public final class TrusteeServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testAddingExistingTrusteeAsTrustee() {
+    void testAddingExistingTrusteeAsTrustee() {
         final ProcessTrusteeService service = new ProcessTrusteeService(settings, entityManager);
         final ProcessTrusteeRequest request = prepareRequest(ProcessTrusteeRequest.class, MEMBER_1);
         request.setAction(Action.ADD);
@@ -312,7 +312,7 @@ public final class TrusteeServiceTest extends DatabaseSetup {
      * that the Administrator is not a member if the Circle.
      */
     @Test
-    public void testAddingNewTrusteeAsCircleMemberAndSystemAdministrator() {
+    void testAddingNewTrusteeAsCircleMemberAndSystemAdministrator() {
         final ProcessTrusteeService service = new ProcessTrusteeService(settings, entityManager);
         final ProcessTrusteeRequest request = prepareRequest(ProcessTrusteeRequest.class, MEMBER_1);
         request.setAction(Action.ADD);
@@ -346,7 +346,7 @@ public final class TrusteeServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testAlterTrusteeAsWritingTrustee() {
+    void testAlterTrusteeAsWritingTrustee() {
         final ProcessTrusteeService service = new ProcessTrusteeService(settings, entityManager);
         final ProcessTrusteeRequest request = prepareRequest(ProcessTrusteeRequest.class, MEMBER_2);
         request.setAction(Action.ALTER);
@@ -360,7 +360,7 @@ public final class TrusteeServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testAlterTrusteeSetAdminAsCircleAdmin() {
+    void testAlterTrusteeSetAdminAsCircleAdmin() {
         final ProcessTrusteeService circleService = new ProcessTrusteeService(settings, entityManager);
         final ProcessTrusteeRequest circleRequest = prepareRequest(ProcessTrusteeRequest.class, MEMBER_1);
         circleRequest.setAction(Action.ALTER);
@@ -382,7 +382,7 @@ public final class TrusteeServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testAlterTrusteeToInvalidCircleAsCircleAdmin() {
+    void testAlterTrusteeToInvalidCircleAsCircleAdmin() {
         final ProcessTrusteeService service = new ProcessTrusteeService(settings, entityManager);
         final ProcessTrusteeRequest request = prepareRequest(ProcessTrusteeRequest.class, MEMBER_1);
         final String circleId = UUID.randomUUID().toString();
@@ -397,7 +397,7 @@ public final class TrusteeServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testAlterInvalidMemberAsTrusteeAsCircleAdmin() {
+    void testAlterInvalidMemberAsTrusteeAsCircleAdmin() {
         final ProcessTrusteeService service = new ProcessTrusteeService(settings, entityManager);
         final ProcessTrusteeRequest request = prepareRequest(ProcessTrusteeRequest.class, MEMBER_1);
         request.setAction(Action.ALTER);
@@ -411,7 +411,7 @@ public final class TrusteeServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testRemoveTrusteeAsWritingTrustee() {
+    void testRemoveTrusteeAsWritingTrustee() {
         final ProcessTrusteeService service = new ProcessTrusteeService(settings, entityManager);
         final ProcessTrusteeRequest request = prepareRequest(ProcessTrusteeRequest.class, MEMBER_2);
         request.setAction(Action.REMOVE);
@@ -424,7 +424,7 @@ public final class TrusteeServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testRemoveTrusteeAsCircleAdmin() {
+    void testRemoveTrusteeAsCircleAdmin() {
         final ProcessTrusteeService service = new ProcessTrusteeService(settings, entityManager);
         final ProcessTrusteeRequest request = prepareRequest(ProcessTrusteeRequest.class, MEMBER_1);
         request.setAction(Action.REMOVE);
@@ -444,7 +444,7 @@ public final class TrusteeServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testRemoveTrusteeToInvalidCircleAsCircleAdmin() {
+    void testRemoveTrusteeToInvalidCircleAsCircleAdmin() {
         final ProcessTrusteeService service = new ProcessTrusteeService(settings, entityManager);
         final ProcessTrusteeRequest request = prepareRequest(ProcessTrusteeRequest.class, MEMBER_1);
         final String circleId = UUID.randomUUID().toString();
@@ -458,7 +458,7 @@ public final class TrusteeServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testRemoveInvalidMemberAsTrusteeAsCircleAdmin() {
+    void testRemoveInvalidMemberAsTrusteeAsCircleAdmin() {
         final ProcessTrusteeService service = new ProcessTrusteeService(settings, entityManager);
         final ProcessTrusteeRequest request = prepareRequest(ProcessTrusteeRequest.class, MEMBER_1);
         request.setAction(Action.REMOVE);

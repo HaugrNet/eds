@@ -16,8 +16,8 @@
  */
 package io.javadog.cws.core.model.entities;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import io.javadog.cws.core.DatabaseSetup;
 import io.javadog.cws.core.model.CommonDao;
@@ -25,16 +25,16 @@ import java.util.Date;
 import java.util.List;
 import javax.persistence.PersistenceException;
 import javax.persistence.Query;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Kim Jensen
  * @since CWS 1.0
  */
-public final class VersionEntityTest extends DatabaseSetup {
+final class VersionEntityTest extends DatabaseSetup {
 
     @Test
-    public void testEntity() {
+    void testEntity() {
         final Query query = entityManager.createNamedQuery("version.findAll");
         final List<VersionEntity> found = CommonDao.findList(query);
         assertEquals(2, found.size());

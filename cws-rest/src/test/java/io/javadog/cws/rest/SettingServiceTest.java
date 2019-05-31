@@ -16,23 +16,23 @@
  */
 package io.javadog.cws.rest;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.requests.SettingRequest;
 import io.javadog.cws.core.DatabaseSetup;
 import io.javadog.cws.core.ManagementBean;
 import javax.ws.rs.core.Response;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Kim Jensen
  * @since CWS 1.0
  */
-public final class SettingServiceTest extends DatabaseSetup {
+final class SettingServiceTest extends DatabaseSetup {
 
     @Test
-    public void testSettings() {
+    void testSettings() {
         final SettingService service = prepareService();
         final SettingRequest request = new SettingRequest();
 
@@ -41,7 +41,7 @@ public final class SettingServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testFlawedSettings() {
+    void testFlawedSettings() {
         final SettingService service = prepareFlawedService();
         final SettingRequest request = new SettingRequest();
 

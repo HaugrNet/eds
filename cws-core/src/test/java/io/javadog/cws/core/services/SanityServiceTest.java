@@ -16,8 +16,9 @@
  */
 package io.javadog.cws.core.services;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
@@ -29,17 +30,18 @@ import io.javadog.cws.api.responses.ProcessDataResponse;
 import io.javadog.cws.api.responses.SanityResponse;
 import io.javadog.cws.core.DatabaseSetup;
 import io.javadog.cws.core.enums.SanityStatus;
+import io.javadog.cws.core.exceptions.CWSException;
 import java.util.Date;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Kim Jensen
  * @since CWS 1.0
  */
-public final class SanityServiceTest extends DatabaseSetup {
+final class SanityServiceTest extends DatabaseSetup {
 
     @Test
-    public void testRequestAsSystemAdministrator() {
+    void testRequestAsSystemAdministrator() {
         prepareInvalidData();
         final SanityRequest request = prepareRequest(SanityRequest.class, Constants.ADMIN_ACCOUNT);
         final SanityService service = new SanityService(settings, entityManager);
@@ -49,7 +51,7 @@ public final class SanityServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testRequestAsSystemAdministratorForCircle() {
+    void testRequestAsSystemAdministratorForCircle() {
         prepareInvalidData();
         final SanityRequest request = prepareRequest(SanityRequest.class, Constants.ADMIN_ACCOUNT);
         request.setCircleId(CIRCLE_3_ID);
@@ -61,7 +63,7 @@ public final class SanityServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testRequestAsCircleAdministratorForCircle() {
+    void testRequestAsCircleAdministratorForCircle() {
         prepareInvalidData();
         final SanityRequest request = prepareRequest(SanityRequest.class, MEMBER_1);
         final SanityService service = new SanityService(settings, entityManager);
@@ -71,29 +73,28 @@ public final class SanityServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testRequestAsCircleAdministratorForOtherCircle() {
-        prepareCause(ReturnCode.IDENTIFICATION_WARNING, "No Trustee information found for member '" + MEMBER_1 + "' and circle '" + CIRCLE_3_ID + "'.");
+    void testRequestAsCircleAdministratorForOtherCircle() {
+        final SanityService service = new SanityService(settings, entityManager);
         final SanityRequest request = prepareRequest(SanityRequest.class, MEMBER_1);
         request.setCircleId(CIRCLE_3_ID);
-        final SanityService service = new SanityService(settings, entityManager);
-        final SanityResponse response = service.perform(request);
-        assertTrue(response.isOk());
-        assertTrue(response.getSanities().isEmpty());
+
+        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
+        assertEquals(ReturnCode.IDENTIFICATION_WARNING, cause.getReturnCode());
+        assertEquals("No Trustee information found for member '" + MEMBER_1 + "' and circle '" + CIRCLE_3_ID + "'.", cause.getMessage());
     }
 
     @Test
-    public void testRequestAsMember() {
-        prepareCause(ReturnCode.AUTHORIZATION_WARNING, "The requesting Account is not permitted to Process last Sanity Check.");
-
+    void testRequestAsMember() {
         final SanityService service = new SanityService(settings, entityManager);
         final SanityRequest request = prepareRequest(SanityRequest.class, MEMBER_5);
-        assertTrue(request.validate().isEmpty());
 
-        service.perform(request);
+        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
+        assertEquals(ReturnCode.AUTHORIZATION_WARNING, cause.getReturnCode());
+        assertEquals("The requesting Account is not permitted to Process last Sanity Check.", cause.getMessage());
     }
 
     @Test
-    public void testWithFailedChecksums() {
+    void testWithFailedChecksums() {
         final ProcessDataService dataService = new ProcessDataService(settings, entityManager);
         final ProcessDataRequest dataRequest = prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "The Data", 524288);
 

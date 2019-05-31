@@ -28,10 +28,10 @@ import org.junit.jupiter.api.Test;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-public final class VersionResponseTest {
+final class VersionResponseTest {
 
     @Test
-    public void testClassflow() {
+    void testClassflow() {
         final String version = "1.0";
 
         final VersionResponse response = new VersionResponse();
@@ -44,7 +44,7 @@ public final class VersionResponseTest {
     }
 
     @Test
-    public void testError() {
+    void testError() {
         final String msg = "Version Request failed due to Verification Problems.";
         final VersionResponse response = new VersionResponse(ReturnCode.VERIFICATION_WARNING, msg);
 

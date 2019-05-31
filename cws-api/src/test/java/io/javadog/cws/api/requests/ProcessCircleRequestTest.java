@@ -30,10 +30,10 @@ import org.junit.jupiter.api.Test;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-public final class ProcessCircleRequestTest {
+final class ProcessCircleRequestTest {
 
     @Test
-    public void testClassflow() {
+    void testClassflow() {
         final String circleId = UUID.randomUUID().toString();
         final String circleName = "New Circle Name";
         final String memberId = UUID.randomUUID().toString();
@@ -60,7 +60,7 @@ public final class ProcessCircleRequestTest {
     }
 
     @Test
-    public void testEmptyClass() {
+    void testEmptyClass() {
         final ProcessCircleRequest request = new ProcessCircleRequest();
         final Map<String, String> errors = request.validate();
 
@@ -70,7 +70,7 @@ public final class ProcessCircleRequestTest {
     }
 
     @Test
-    public void testInvalidAction() {
+    void testInvalidAction() {
         final ProcessCircleRequest request = new ProcessCircleRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
         request.setCredential(TestUtilities.convert(Constants.ADMIN_ACCOUNT));
@@ -82,7 +82,7 @@ public final class ProcessCircleRequestTest {
     }
 
     @Test
-    public void testActionCreate() {
+    void testActionCreate() {
         final ProcessCircleRequest request = new ProcessCircleRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
         request.setCredential(TestUtilities.convert(Constants.ADMIN_ACCOUNT));
@@ -95,7 +95,7 @@ public final class ProcessCircleRequestTest {
     }
 
     @Test
-    public void testActionCreateFail() {
+    void testActionCreateFail() {
         final ProcessCircleRequest request = new ProcessCircleRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
         request.setCredential(TestUtilities.convert(Constants.ADMIN_ACCOUNT));
@@ -109,7 +109,7 @@ public final class ProcessCircleRequestTest {
     }
 
     @Test
-    public void testActionUpdate() {
+    void testActionUpdate() {
         final ProcessCircleRequest request = new ProcessCircleRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
         request.setCredential(TestUtilities.convert(Constants.ADMIN_ACCOUNT));
@@ -122,7 +122,7 @@ public final class ProcessCircleRequestTest {
     }
 
     @Test
-    public void testActionUpdateFail() {
+    void testActionUpdateFail() {
         final ProcessCircleRequest request = new ProcessCircleRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
         request.setCredential(TestUtilities.convert(Constants.ADMIN_ACCOUNT));
@@ -137,7 +137,7 @@ public final class ProcessCircleRequestTest {
     }
 
     @Test
-    public void testActionDelete() {
+    void testActionDelete() {
         final ProcessCircleRequest request = new ProcessCircleRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
         request.setCredential(TestUtilities.convert(Constants.ADMIN_ACCOUNT));
@@ -149,7 +149,7 @@ public final class ProcessCircleRequestTest {
     }
 
     @Test
-    public void testActionDeleteFail() {
+    void testActionDeleteFail() {
         final ProcessCircleRequest request = new ProcessCircleRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
         request.setCredential(TestUtilities.convert(Constants.ADMIN_ACCOUNT));

@@ -16,10 +16,10 @@
  */
 package io.javadog.cws.soap;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import io.javadog.cws.api.common.Action;
 import io.javadog.cws.api.common.Constants;
@@ -52,7 +52,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 import java.util.Properties;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Kim Jensen
@@ -61,7 +61,7 @@ import org.junit.Test;
 public final class ManagementServiceTest extends BeanSetup {
 
     @Test
-    public void testVersion() throws IOException {
+    void testVersion() throws IOException {
         final ClassLoader loader = Thread.currentThread().getContextClassLoader();
         final String propertiesFile = "cws.config";
 
@@ -84,7 +84,7 @@ public final class ManagementServiceTest extends BeanSetup {
     }
 
     @Test
-    public void testFlawedVersion() {
+    void testFlawedVersion() {
         final ManagementService management = prepareFlawedManagementService();
 
         final VersionResponse response = management.version();
@@ -92,7 +92,7 @@ public final class ManagementServiceTest extends BeanSetup {
     }
 
     @Test
-    public void testSettingsAsMember() {
+    void testSettingsAsMember() {
         final ManagementService management = prepareManagementService();
         final SettingRequest request = prepareRequest(SettingRequest.class, MEMBER_1);
 
@@ -102,7 +102,7 @@ public final class ManagementServiceTest extends BeanSetup {
     }
 
     @Test
-    public void testSettings() {
+    void testSettings() {
         final ManagementService management = prepareManagementService();
         final SettingRequest request = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
 
@@ -111,7 +111,7 @@ public final class ManagementServiceTest extends BeanSetup {
     }
 
     @Test
-    public void testUpdateSettingsWithInvalidData() {
+    void testUpdateSettingsWithInvalidData() {
         final ManagementService management = prepareManagementService();
         final SettingRequest request = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
         final Map<String, String> map = request.getSettings();
@@ -124,7 +124,7 @@ public final class ManagementServiceTest extends BeanSetup {
     }
 
     @Test
-    public void testSettingsWithNullRequest() {
+    void testSettingsWithNullRequest() {
         final ManagementService management = prepareManagementService();
         final SettingRequest request = null;
 
@@ -133,7 +133,7 @@ public final class ManagementServiceTest extends BeanSetup {
     }
 
     @Test
-    public void testSettingsWithEmptyRequest() {
+    void testSettingsWithEmptyRequest() {
         final ManagementService management = prepareManagementService();
         final SettingRequest request = new SettingRequest();
 
@@ -142,7 +142,7 @@ public final class ManagementServiceTest extends BeanSetup {
     }
 
     @Test
-    public void testFlawedSettings() {
+    void testFlawedSettings() {
         final ManagementService management = prepareFlawedManagementService();
         final SettingRequest request = null;
 
@@ -151,7 +151,7 @@ public final class ManagementServiceTest extends BeanSetup {
     }
 
     @Test
-    public void testMasterKey() {
+    void testMasterKey() {
         final ManagementService management = prepareManagementService();
         final MasterKeyRequest request = prepareRequest(MasterKeyRequest.class, Constants.ADMIN_ACCOUNT);
         request.setSecret(request.getCredential());
@@ -161,7 +161,7 @@ public final class ManagementServiceTest extends BeanSetup {
     }
 
     @Test
-    public void testMasterKeyWithNullRequest() {
+    void testMasterKeyWithNullRequest() {
         final ManagementService management = prepareManagementService();
         final MasterKeyRequest request = null;
 
@@ -170,7 +170,7 @@ public final class ManagementServiceTest extends BeanSetup {
     }
 
     @Test
-    public void testMasterKeyWithProblems() {
+    void testMasterKeyWithProblems() {
         final ManagementService management = prepareFlawedManagementService();
         final MasterKeyRequest request = new MasterKeyRequest();
 
@@ -180,7 +180,7 @@ public final class ManagementServiceTest extends BeanSetup {
     }
 
     @Test
-    public void testFlawedMasterKey() {
+    void testFlawedMasterKey() {
         // The MasterKey must be robust, meaning that it should be _really_ hard
         // to mess with it. So, as settings are controlled and checked before
         // being set - it is only possible to mess with the MasterKey, by doing
@@ -202,7 +202,7 @@ public final class ManagementServiceTest extends BeanSetup {
     }
 
     @Test
-    public void testSanity() {
+    void testSanity() {
         final ManagementService management = prepareManagementService();
         final SanityRequest request = prepareRequest(SanityRequest.class, Constants.ADMIN_ACCOUNT);
 
@@ -211,7 +211,7 @@ public final class ManagementServiceTest extends BeanSetup {
     }
 
     @Test
-    public void testSanityWithNullRequest() {
+    void testSanityWithNullRequest() {
         final ManagementService management = prepareManagementService();
         final SanityRequest request = null;
 
@@ -220,7 +220,7 @@ public final class ManagementServiceTest extends BeanSetup {
     }
 
     @Test
-    public void testSanityWithEmptyRequest() {
+    void testSanityWithEmptyRequest() {
         final ManagementService management = prepareManagementService();
         final SanityRequest request = new SanityRequest();
 
@@ -229,7 +229,7 @@ public final class ManagementServiceTest extends BeanSetup {
     }
 
     @Test
-    public void testFlawedSanity() {
+    void testFlawedSanity() {
         final ManagementService management = prepareFlawedManagementService();
         final SanityRequest request = null;
 
@@ -238,7 +238,7 @@ public final class ManagementServiceTest extends BeanSetup {
     }
 
     @Test
-    public void testAuthenticated() {
+    void testAuthenticated() {
         final ManagementService management = prepareManagementService();
         final Authentication request = prepareRequest(Authentication.class, Constants.ADMIN_ACCOUNT);
 
@@ -247,7 +247,7 @@ public final class ManagementServiceTest extends BeanSetup {
     }
 
     @Test
-    public void testAuthenticatedWithNullRequest() {
+    void testAuthenticatedWithNullRequest() {
         final ManagementService management = prepareManagementService();
         final Authentication request = null;
 
@@ -256,7 +256,7 @@ public final class ManagementServiceTest extends BeanSetup {
     }
 
     @Test
-    public void testAuthenticatedWithEmptyRequest() {
+    void testAuthenticatedWithEmptyRequest() {
         final ManagementService management = prepareManagementService();
         final Authentication request = new SanityRequest();
 
@@ -265,7 +265,7 @@ public final class ManagementServiceTest extends BeanSetup {
     }
 
     @Test
-    public void testFlawedAuthenticated() {
+    void testFlawedAuthenticated() {
         final ManagementService management = prepareFlawedManagementService();
         final Authentication request = null;
 
@@ -274,7 +274,7 @@ public final class ManagementServiceTest extends BeanSetup {
     }
 
     @Test
-    public void testFetchMembers() {
+    void testFetchMembers() {
         final ManagementService management = prepareManagementService();
         final FetchMemberRequest request = prepareRequest(FetchMemberRequest.class, MEMBER_1);
 
@@ -309,7 +309,7 @@ public final class ManagementServiceTest extends BeanSetup {
     }
 
     @Test
-    public void testFetchMembersWithNullRequest() {
+    void testFetchMembersWithNullRequest() {
         final ManagementService management = prepareManagementService();
         final FetchMemberRequest request = null;
 
@@ -318,7 +318,7 @@ public final class ManagementServiceTest extends BeanSetup {
     }
 
     @Test
-    public void testFetchMembersWithEmptyRequest() {
+    void testFetchMembersWithEmptyRequest() {
         final ManagementService management = prepareManagementService();
         final FetchMemberRequest request = new FetchMemberRequest();
 
@@ -327,7 +327,7 @@ public final class ManagementServiceTest extends BeanSetup {
     }
 
     @Test
-    public void testFlawedFetchMembers() {
+    void testFlawedFetchMembers() {
         final ManagementService management = prepareFlawedManagementService();
         final FetchMemberRequest request = null;
 
@@ -336,7 +336,7 @@ public final class ManagementServiceTest extends BeanSetup {
     }
 
     @Test
-    public void testProcessMember() {
+    void testProcessMember() {
         final ManagementService management = prepareManagementService();
         final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
         request.setAction(Action.INVITE);
@@ -347,7 +347,7 @@ public final class ManagementServiceTest extends BeanSetup {
     }
 
     @Test
-    public void testProcessMemberWithNullRequest() {
+    void testProcessMemberWithNullRequest() {
         final ManagementService management = prepareManagementService();
         final ProcessMemberRequest request = null;
 
@@ -356,7 +356,7 @@ public final class ManagementServiceTest extends BeanSetup {
     }
 
     @Test
-    public void testProcessMemberWithEmptyRequest() {
+    void testProcessMemberWithEmptyRequest() {
         final ManagementService management = prepareManagementService();
         final ProcessMemberRequest request = new ProcessMemberRequest();
 
@@ -365,7 +365,7 @@ public final class ManagementServiceTest extends BeanSetup {
     }
 
     @Test
-    public void testFlawedProcessMember() {
+    void testFlawedProcessMember() {
         final ManagementService management = prepareFlawedManagementService();
         final ProcessMemberRequest request = null;
 
@@ -374,7 +374,7 @@ public final class ManagementServiceTest extends BeanSetup {
     }
 
     @Test
-    public void testFetchCircle() {
+    void testFetchCircle() {
         final ManagementService management = prepareManagementService();
         final FetchCircleRequest request = prepareRequest(FetchCircleRequest.class, MEMBER_1);
 
@@ -383,7 +383,7 @@ public final class ManagementServiceTest extends BeanSetup {
     }
 
     @Test
-    public void testFetchCircleWithNullRequest() {
+    void testFetchCircleWithNullRequest() {
         final ManagementService management = prepareManagementService();
         final FetchCircleRequest request = null;
 
@@ -392,7 +392,7 @@ public final class ManagementServiceTest extends BeanSetup {
     }
 
     @Test
-    public void testFetchCircleWithEmptyRequest() {
+    void testFetchCircleWithEmptyRequest() {
         final ManagementService management = prepareManagementService();
         final FetchCircleRequest request = new FetchCircleRequest();
 
@@ -401,7 +401,7 @@ public final class ManagementServiceTest extends BeanSetup {
     }
 
     @Test
-    public void testFlawedFetchCircle() {
+    void testFlawedFetchCircle() {
         final ManagementService management = prepareFlawedManagementService();
         final FetchCircleRequest request = null;
 
@@ -410,7 +410,7 @@ public final class ManagementServiceTest extends BeanSetup {
     }
 
     @Test
-    public void testProcessCircle() {
+    void testProcessCircle() {
         final ManagementService management = prepareManagementService();
         final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, Constants.ADMIN_ACCOUNT);
         request.setAction(Action.CREATE);
@@ -422,7 +422,7 @@ public final class ManagementServiceTest extends BeanSetup {
     }
 
     @Test
-    public void testProcessCircleWithNullRequest() {
+    void testProcessCircleWithNullRequest() {
         final ManagementService management = prepareManagementService();
         final ProcessCircleRequest request = null;
 
@@ -431,7 +431,7 @@ public final class ManagementServiceTest extends BeanSetup {
     }
 
     @Test
-    public void testProcessCircleWithEmptyRequest() {
+    void testProcessCircleWithEmptyRequest() {
         final ManagementService management = prepareManagementService();
         final ProcessCircleRequest request = new ProcessCircleRequest();
 
@@ -440,7 +440,7 @@ public final class ManagementServiceTest extends BeanSetup {
     }
 
     @Test
-    public void testFlawedProcessCircle() {
+    void testFlawedProcessCircle() {
         final ManagementService management = prepareFlawedManagementService();
         final ProcessCircleRequest request = null;
 
@@ -449,7 +449,7 @@ public final class ManagementServiceTest extends BeanSetup {
     }
 
     @Test
-    public void testFetchTrustee() {
+    void testFetchTrustee() {
         final ManagementService management = prepareManagementService();
         final FetchTrusteeRequest request = prepareRequest(FetchTrusteeRequest.class, MEMBER_1);
         request.setCircleId(CIRCLE_1_ID);
@@ -459,7 +459,7 @@ public final class ManagementServiceTest extends BeanSetup {
     }
 
     @Test
-    public void testFetchTrusteeWithNullRequest() {
+    void testFetchTrusteeWithNullRequest() {
         final ManagementService management = prepareManagementService();
         final FetchTrusteeRequest request = null;
 
@@ -468,7 +468,7 @@ public final class ManagementServiceTest extends BeanSetup {
     }
 
     @Test
-    public void testFetchTrusteeWithEmptyRequest() {
+    void testFetchTrusteeWithEmptyRequest() {
         final ManagementService management = prepareManagementService();
         final FetchTrusteeRequest request = new FetchTrusteeRequest();
 
@@ -477,7 +477,7 @@ public final class ManagementServiceTest extends BeanSetup {
     }
 
     @Test
-    public void testFlawedFetchTrustee() {
+    void testFlawedFetchTrustee() {
         final ManagementService management = prepareFlawedManagementService();
         final FetchTrusteeRequest request = null;
 
@@ -486,7 +486,7 @@ public final class ManagementServiceTest extends BeanSetup {
     }
 
     @Test
-    public void testProcessTrustee() {
+    void testProcessTrustee() {
         final ManagementService management = prepareManagementService();
         final ProcessTrusteeRequest request = prepareRequest(ProcessTrusteeRequest.class, MEMBER_1);
         request.setAction(Action.ALTER);
@@ -499,7 +499,7 @@ public final class ManagementServiceTest extends BeanSetup {
     }
 
     @Test
-    public void testProcessTrusteeWithNullRequest() {
+    void testProcessTrusteeWithNullRequest() {
         final ManagementService management = prepareManagementService();
         final ProcessTrusteeRequest request = null;
 
@@ -508,7 +508,7 @@ public final class ManagementServiceTest extends BeanSetup {
     }
 
     @Test
-    public void testProcessTrusteeWithEmptyRequest() {
+    void testProcessTrusteeWithEmptyRequest() {
         final ManagementService management = prepareManagementService();
         final ProcessTrusteeRequest request = new ProcessTrusteeRequest();
 
@@ -517,7 +517,7 @@ public final class ManagementServiceTest extends BeanSetup {
     }
 
     @Test
-    public void testFlawedProcessTrustee() {
+    void testFlawedProcessTrustee() {
         final ManagementService management = prepareFlawedManagementService();
         final ProcessTrusteeRequest request = null;
 

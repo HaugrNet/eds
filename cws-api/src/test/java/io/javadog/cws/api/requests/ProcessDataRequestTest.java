@@ -31,10 +31,10 @@ import org.junit.jupiter.api.Test;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-public final class ProcessDataRequestTest {
+final class ProcessDataRequestTest {
 
     @Test
-    public void testClassflow() {
+    void testClassflow() {
         final String dataId = UUID.randomUUID().toString();
         final String circleId = UUID.randomUUID().toString();
         final String targetCircleId = UUID.randomUUID().toString();
@@ -73,7 +73,7 @@ public final class ProcessDataRequestTest {
     }
 
     @Test
-    public void testEmptyClass() {
+    void testEmptyClass() {
         final ProcessDataRequest request = new ProcessDataRequest();
         request.setAction(null);
         final Map<String, String> errors = request.validate();
@@ -84,7 +84,7 @@ public final class ProcessDataRequestTest {
     }
 
     @Test
-    public void testInvalidAction() {
+    void testInvalidAction() {
         final ProcessDataRequest request = new ProcessDataRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
         request.setCredential(TestUtilities.convert(Constants.ADMIN_ACCOUNT));
@@ -96,7 +96,7 @@ public final class ProcessDataRequestTest {
     }
 
     @Test
-    public void testActionAdd() {
+    void testActionAdd() {
         final ProcessDataRequest request = new ProcessDataRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
         request.setCredential(TestUtilities.convert(Constants.ADMIN_ACCOUNT));
@@ -111,7 +111,7 @@ public final class ProcessDataRequestTest {
     }
 
     @Test
-    public void testActionAddFail() {
+    void testActionAddFail() {
         final ProcessDataRequest request = new ProcessDataRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
         request.setCredential(TestUtilities.convert(Constants.ADMIN_ACCOUNT));
@@ -126,7 +126,7 @@ public final class ProcessDataRequestTest {
     }
 
     @Test
-    public void testActionUpdate() {
+    void testActionUpdate() {
         final ProcessDataRequest request = new ProcessDataRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
         request.setCredential(TestUtilities.convert(Constants.ADMIN_ACCOUNT));
@@ -140,7 +140,7 @@ public final class ProcessDataRequestTest {
     }
 
     @Test
-    public void testActionUpdateFail() {
+    void testActionUpdateFail() {
         final ProcessDataRequest request = new ProcessDataRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
         request.setCredential(TestUtilities.convert(Constants.ADMIN_ACCOUNT));
@@ -157,7 +157,7 @@ public final class ProcessDataRequestTest {
     }
 
     @Test
-    public void testActionCopy() {
+    void testActionCopy() {
         final ProcessDataRequest request = new ProcessDataRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
         request.setCredential(TestUtilities.convert(Constants.ADMIN_ACCOUNT));
@@ -171,7 +171,7 @@ public final class ProcessDataRequestTest {
     }
 
     @Test
-    public void testActionCopyFail() {
+    void testActionCopyFail() {
         final ProcessDataRequest request = new ProcessDataRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
         request.setCredential(TestUtilities.convert(Constants.ADMIN_ACCOUNT));
@@ -185,7 +185,7 @@ public final class ProcessDataRequestTest {
     }
 
     @Test
-    public void testActionMove() {
+    void testActionMove() {
         final ProcessDataRequest request = new ProcessDataRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
         request.setCredential(TestUtilities.convert(Constants.ADMIN_ACCOUNT));
@@ -199,7 +199,7 @@ public final class ProcessDataRequestTest {
     }
 
     @Test
-    public void testActionMoveFail() {
+    void testActionMoveFail() {
         final ProcessDataRequest request = new ProcessDataRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
         request.setCredential(TestUtilities.convert(Constants.ADMIN_ACCOUNT));
@@ -213,7 +213,7 @@ public final class ProcessDataRequestTest {
     }
 
     @Test
-    public void testActionDelete() {
+    void testActionDelete() {
         final ProcessDataRequest request = new ProcessDataRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
         request.setCredential(TestUtilities.convert(Constants.ADMIN_ACCOUNT));
@@ -225,7 +225,7 @@ public final class ProcessDataRequestTest {
     }
 
     @Test
-    public void testActionDeleteFail() {
+    void testActionDeleteFail() {
         final ProcessDataRequest request = new ProcessDataRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
         request.setCredential(TestUtilities.convert(Constants.ADMIN_ACCOUNT));

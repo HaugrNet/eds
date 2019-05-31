@@ -35,10 +35,10 @@ import org.junit.jupiter.api.Test;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-public final class ReturnCodeTest {
+final class ReturnCodeTest {
 
     @Test
-    public void testReturnCodes() {
+    void testReturnCodes() {
         // Success
         runAssertions(ReturnCode.SUCCESS, 200, 200, CLASS_INFO, "Request completed normally.");
 

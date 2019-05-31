@@ -30,10 +30,10 @@ import org.junit.jupiter.api.Test;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-public final class ProcessMemberResponseTest {
+final class ProcessMemberResponseTest {
 
     @Test
-    public void testClassflow() {
+    void testClassflow() {
         final String memberId = UUID.randomUUID().toString();
         final String signature = "Invitation Signature";
 
@@ -49,7 +49,7 @@ public final class ProcessMemberResponseTest {
     }
 
     @Test
-    public void testError() {
+    void testError() {
         final String msg = "ProcessMember Request failed due to Verification Problems.";
         final ProcessMemberResponse response = new ProcessMemberResponse(ReturnCode.VERIFICATION_WARNING, msg);
 

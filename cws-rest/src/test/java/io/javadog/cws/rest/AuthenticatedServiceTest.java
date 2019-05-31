@@ -10,23 +10,23 @@
  */
 package io.javadog.cws.rest;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.requests.Authentication;
 import io.javadog.cws.core.DatabaseSetup;
 import io.javadog.cws.core.ManagementBean;
 import javax.ws.rs.core.Response;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Kim Jensen
  * @since CWS 1.1
  */
-public final class AuthenticatedServiceTest extends DatabaseSetup {
+final class AuthenticatedServiceTest extends DatabaseSetup {
 
     @Test
-    public void testAuthenticate() {
+    void testAuthenticate() {
         final AuthenticatedService service = prepareService();
         final Authentication request = new Authentication();
 
@@ -35,7 +35,7 @@ public final class AuthenticatedServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testFlawedCreate() {
+    void testFlawedCreate() {
         final AuthenticatedService service = prepareFlawedService();
         final Authentication request = new Authentication();
 

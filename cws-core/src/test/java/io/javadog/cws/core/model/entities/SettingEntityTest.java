@@ -16,22 +16,22 @@
  */
 package io.javadog.cws.core.model.entities;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import io.javadog.cws.core.DatabaseSetup;
 import io.javadog.cws.core.enums.StandardSetting;
 import java.util.List;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Kim Jensen
  * @since CWS 1.0
  */
-public final class SettingEntityTest extends DatabaseSetup {
+final class SettingEntityTest extends DatabaseSetup {
 
     @Test
-    public void testEntity() {
+    void testEntity() {
         final SettingEntity entity = new SettingEntity();
         entity.setName("My.New.Setting");
         entity.setSetting("The Setting Value");
@@ -57,7 +57,7 @@ public final class SettingEntityTest extends DatabaseSetup {
     }
 
     @Test
-    public void testDaoFindSettings() {
+    void testDaoFindSettings() {
         final List<SettingEntity> mySettings = dao.findAllAscending(SettingEntity.class, "id");
         assertNotNull(mySettings);
         assertEquals(StandardSetting.values().length, mySettings.size());

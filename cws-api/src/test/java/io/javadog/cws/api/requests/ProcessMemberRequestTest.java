@@ -32,10 +32,10 @@ import org.junit.jupiter.api.Test;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-public final class ProcessMemberRequestTest {
+final class ProcessMemberRequestTest {
 
     @Test
-    public void testClassflow() {
+    void testClassflow() {
         final String memberId = UUID.randomUUID().toString();
         final String newAccountName = "New AccountName";
         final String newCredential = "New Credential";
@@ -64,7 +64,7 @@ public final class ProcessMemberRequestTest {
     }
 
     @Test
-    public void testEmptyClass() {
+    void testEmptyClass() {
         final ProcessMemberRequest request = new ProcessMemberRequest();
         final Map<String, String> errors = request.validate();
 
@@ -74,7 +74,7 @@ public final class ProcessMemberRequestTest {
     }
 
     @Test
-    public void testInvalidAction() {
+    void testInvalidAction() {
         final ProcessMemberRequest request = new ProcessMemberRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
         request.setCredential(TestUtilities.convert(Constants.ADMIN_ACCOUNT));
@@ -86,7 +86,7 @@ public final class ProcessMemberRequestTest {
     }
 
     @Test
-    public void testActionCreate() {
+    void testActionCreate() {
         final ProcessMemberRequest request = new ProcessMemberRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
         request.setCredential(TestUtilities.convert(Constants.ADMIN_ACCOUNT));
@@ -99,7 +99,7 @@ public final class ProcessMemberRequestTest {
     }
 
     @Test
-    public void testActionCreateFail() {
+    void testActionCreateFail() {
         final ProcessMemberRequest request = new ProcessMemberRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
         request.setCredential(TestUtilities.convert(Constants.ADMIN_ACCOUNT));
@@ -112,7 +112,7 @@ public final class ProcessMemberRequestTest {
     }
 
     @Test
-    public void testActionInvite() {
+    void testActionInvite() {
         final ProcessMemberRequest request = new ProcessMemberRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
         request.setCredential(TestUtilities.convert(Constants.ADMIN_ACCOUNT));
@@ -124,7 +124,7 @@ public final class ProcessMemberRequestTest {
     }
 
     @Test
-    public void testActionInviteFail() {
+    void testActionInviteFail() {
         final ProcessMemberRequest request = new ProcessMemberRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
         request.setCredential(TestUtilities.convert(Constants.ADMIN_ACCOUNT));
@@ -136,7 +136,7 @@ public final class ProcessMemberRequestTest {
     }
 
     @Test
-    public void testActionLogin() {
+    void testActionLogin() {
         final ProcessMemberRequest request = new ProcessMemberRequest();
         request.setCredential(TestUtilities.convert(UUID.randomUUID().toString()));
         request.setAccountName(Constants.ADMIN_ACCOUNT);
@@ -149,7 +149,7 @@ public final class ProcessMemberRequestTest {
     }
 
     @Test
-    public void testActionLoginFail() {
+    void testActionLoginFail() {
         final ProcessMemberRequest request = new ProcessMemberRequest();
         request.setAction(Action.LOGIN);
 
@@ -160,7 +160,7 @@ public final class ProcessMemberRequestTest {
     }
 
     @Test
-    public void testActionLogout() {
+    void testActionLogout() {
         final ProcessMemberRequest request = new ProcessMemberRequest();
         request.setCredential(TestUtilities.convert(Constants.ADMIN_ACCOUNT));
         request.setCredentialType(CredentialType.SESSION);
@@ -171,7 +171,7 @@ public final class ProcessMemberRequestTest {
     }
 
     @Test
-    public void testActionLogoutFail() {
+    void testActionLogoutFail() {
         final ProcessMemberRequest request = new ProcessMemberRequest();
         request.setAction(Action.LOGOUT);
 
@@ -181,7 +181,7 @@ public final class ProcessMemberRequestTest {
     }
 
     @Test
-    public void testActionAlter() {
+    void testActionAlter() {
         final ProcessMemberRequest request = new ProcessMemberRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
         request.setCredential(TestUtilities.convert(Constants.ADMIN_ACCOUNT));
@@ -194,7 +194,7 @@ public final class ProcessMemberRequestTest {
     }
 
     @Test
-    public void testActionAlterFail() {
+    void testActionAlterFail() {
         final ProcessMemberRequest request = new ProcessMemberRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
         request.setCredential(TestUtilities.convert(Constants.ADMIN_ACCOUNT));
@@ -208,7 +208,7 @@ public final class ProcessMemberRequestTest {
     }
 
     @Test
-    public void testActionUpdate() {
+    void testActionUpdate() {
         final ProcessMemberRequest request = new ProcessMemberRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
         request.setCredential(TestUtilities.convert(Constants.ADMIN_ACCOUNT));
@@ -220,7 +220,7 @@ public final class ProcessMemberRequestTest {
     }
 
     @Test
-    public void testActionUpdateFail() {
+    void testActionUpdateFail() {
         final ProcessMemberRequest request = new ProcessMemberRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
         request.setCredential(TestUtilities.convert(Constants.ADMIN_ACCOUNT));
@@ -233,7 +233,7 @@ public final class ProcessMemberRequestTest {
     }
 
     @Test
-    public void testInvalidate() {
+    void testInvalidate() {
         final ProcessMemberRequest request = new ProcessMemberRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
         request.setCredential(TestUtilities.convert(Constants.ADMIN_ACCOUNT));
@@ -243,7 +243,7 @@ public final class ProcessMemberRequestTest {
     }
 
     @Test
-    public void testActionDelete() {
+    void testActionDelete() {
         final ProcessMemberRequest request = new ProcessMemberRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
         request.setCredential(TestUtilities.convert(Constants.ADMIN_ACCOUNT));
@@ -255,7 +255,7 @@ public final class ProcessMemberRequestTest {
     }
 
     @Test
-    public void testActionDeleteFail() {
+    void testActionDeleteFail() {
         final ProcessMemberRequest request = new ProcessMemberRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
         request.setCredential(TestUtilities.convert(Constants.ADMIN_ACCOUNT));

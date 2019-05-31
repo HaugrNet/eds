@@ -28,10 +28,10 @@ import org.junit.jupiter.api.Test;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-public final class SanityTest {
+final class SanityTest {
 
     @Test
-    public void testClassflow() {
+    void testClassflow() {
         final String dataId = UUID.randomUUID().toString();
         final Date changed = new Date();
 
@@ -44,7 +44,7 @@ public final class SanityTest {
     }
 
     @Test
-    public void testStandardMethods() {
+    void testStandardMethods() {
         final Sanity sanity = new Sanity();
         final Sanity sameSanity = new Sanity();
         final Sanity emptySanity = new Sanity();

@@ -16,22 +16,22 @@
  */
 package io.javadog.cws.rest;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.core.DatabaseSetup;
 import io.javadog.cws.core.ManagementBean;
 import javax.ws.rs.core.Response;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Kim Jensen
  * @since CWS 1.0
  */
-public final class VersionServiceTest extends DatabaseSetup {
+final class VersionServiceTest extends DatabaseSetup {
 
     @Test
-    public void testVersion() {
+    void testVersion() {
         final VersionService service = prepareService();
 
         final Response response = service.version();
@@ -39,7 +39,7 @@ public final class VersionServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testFlawedVersion() {
+    void testFlawedVersion() {
         final VersionService service = prepareFlawedService();
 
         final Response response = service.version();

@@ -16,7 +16,7 @@
  */
 package io.javadog.cws.rest;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.requests.FetchSignatureRequest;
@@ -25,16 +25,16 @@ import io.javadog.cws.api.requests.VerifyRequest;
 import io.javadog.cws.core.DatabaseSetup;
 import io.javadog.cws.core.ShareBean;
 import javax.ws.rs.core.Response;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Kim Jensen
  * @since CWS 1.0
  */
-public final class SignatureServiceTest extends DatabaseSetup {
+final class SignatureServiceTest extends DatabaseSetup {
 
     @Test
-    public void testSign() {
+    void testSign() {
         final SignatureService service = prepareService();
         final SignRequest request = new SignRequest();
 
@@ -43,7 +43,7 @@ public final class SignatureServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testFlawedSign() {
+    void testFlawedSign() {
         final SignatureService service = prepareFlawedService();
         final SignRequest request = new SignRequest();
 
@@ -52,7 +52,7 @@ public final class SignatureServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testVerify() {
+    void testVerify() {
         final SignatureService service = prepareService();
         final VerifyRequest request = new VerifyRequest();
 
@@ -61,7 +61,7 @@ public final class SignatureServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testFlawedVerify() {
+    void testFlawedVerify() {
         final SignatureService service = prepareFlawedService();
         final VerifyRequest request = new VerifyRequest();
 
@@ -70,7 +70,7 @@ public final class SignatureServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testFetchSignatures() {
+    void testFetchSignatures() {
         final SignatureService service = prepareService();
         final FetchSignatureRequest request = new FetchSignatureRequest();
 
@@ -79,7 +79,7 @@ public final class SignatureServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testFlawedFetchSignatures() {
+    void testFlawedFetchSignatures() {
         final SignatureService service = prepareFlawedService();
         final FetchSignatureRequest request = new FetchSignatureRequest();
 

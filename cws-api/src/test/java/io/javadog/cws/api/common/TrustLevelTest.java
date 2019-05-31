@@ -31,10 +31,10 @@ import org.junit.jupiter.api.Test;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-public final class TrustLevelTest {
+final class TrustLevelTest {
 
     @Test
-    public void testIsAllowed() {
+    void testIsAllowed() {
         assertTrue(isAllowed(ALL, ALL));
         assertFalse(isAllowed(ALL, READ));
         assertFalse(isAllowed(ALL, WRITE));

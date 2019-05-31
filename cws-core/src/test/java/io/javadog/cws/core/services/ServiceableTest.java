@@ -16,8 +16,8 @@
  */
 package io.javadog.cws.core.services;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
@@ -25,14 +25,15 @@ import io.javadog.cws.api.requests.FetchCircleRequest;
 import io.javadog.cws.api.requests.SettingRequest;
 import io.javadog.cws.core.DatabaseSetup;
 import io.javadog.cws.core.enums.StandardSetting;
+import io.javadog.cws.core.exceptions.CWSException;
 import io.javadog.cws.core.model.Settings;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Kim Jensen
  * @since CWS 1.0
  */
-public final class ServiceableTest extends DatabaseSetup {
+final class ServiceableTest extends DatabaseSetup {
 
     /**
      * If there was a problem with the database check, which is made initially,
@@ -40,8 +41,7 @@ public final class ServiceableTest extends DatabaseSetup {
      * should fail.
      */
     @Test
-    public void testRequestWhenNotReady() {
-        prepareCause(ReturnCode.DATABASE_ERROR, "The Database is invalid, CWS neither can nor will work correctly until resolved.");
+    void testRequestWhenNotReady() {
         final Settings mySettings = newSettings();
         mySettings.set(StandardSetting.IS_READY.getKey(), "false");
 
@@ -49,67 +49,63 @@ public final class ServiceableTest extends DatabaseSetup {
         final SettingRequest request = new SettingRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
         request.setCredential(crypto.stringToBytes("Invalid Credentials"));
-        assertNotNull(request);
 
-        service.perform(request);
+        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
+        assertEquals(ReturnCode.DATABASE_ERROR, cause.getReturnCode());
+        assertEquals("The Database is invalid, CWS neither can nor will work correctly until resolved.", cause.getMessage());
     }
 
     @Test
-    public void testAccesWithInvalidPassword() {
-        prepareCause(ReturnCode.AUTHENTICATION_WARNING, "Cannot authenticate the Account from the given Credentials.");
-
+    void testAccesWithInvalidPassword() {
         final SettingService service = new SettingService(settings, entityManager);
         final SettingRequest request = new SettingRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
         request.setCredential(crypto.stringToBytes("Invalid Credentials"));
-        assertNotNull(request);
 
-        service.perform(request);
+        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
+        assertEquals(ReturnCode.AUTHENTICATION_WARNING, cause.getReturnCode());
+        assertEquals("Cannot authenticate the Account from the given Credentials.", cause.getMessage());
     }
 
     @Test
-    public void testAccessSettingsAsMember() {
-        prepareCause(ReturnCode.AUTHORIZATION_WARNING, "Cannot complete this request, as it is only allowed for the System Administrator.");
-
+    void testAccessSettingsAsMember() {
         final SettingService service = new SettingService(settings, entityManager);
         final SettingRequest request = prepareRequest(SettingRequest.class, MEMBER_1);
-        assertTrue(request.validate().isEmpty());
 
-        service.perform(request);
+        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
+        assertEquals(ReturnCode.AUTHORIZATION_WARNING, cause.getReturnCode());
+        assertEquals("Cannot complete this request, as it is only allowed for the System Administrator.", cause.getMessage());
     }
 
     @Test
-    public void testAuthorizationWithInvalidCredentials() {
-        prepareCause(ReturnCode.AUTHENTICATION_WARNING, "Cannot authenticate the Account from the given Credentials.");
-
+    void testAuthorizationWithInvalidCredentials() {
         final FetchCircleService service = new FetchCircleService(settings, entityManager);
         final FetchCircleRequest request = prepareRequest(FetchCircleRequest.class, MEMBER_5);
         request.setCredential(crypto.stringToBytes("something wrong"));
-        assertTrue(request.validate().isEmpty());
 
-        service.perform(request);
+        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
+        assertEquals(ReturnCode.AUTHENTICATION_WARNING, cause.getReturnCode());
+        assertEquals("Cannot authenticate the Account from the given Credentials.", cause.getMessage());
     }
 
     @Test
-    public void testAuthorizationWithCredentialTypingMistake() {
-        prepareCause(ReturnCode.AUTHENTICATION_WARNING, "Cannot authenticate the Account from the given Credentials.");
-
+    void testAuthorizationWithCredentialTypingMistake() {
         final FetchCircleService service = new FetchCircleService(settings, entityManager);
         final FetchCircleRequest request = prepareRequest(FetchCircleRequest.class, MEMBER_5);
         request.setCredential(crypto.stringToBytes(MEMBER_4));
-        assertTrue(request.validate().isEmpty());
 
-        service.perform(request);
+        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
+        assertEquals(ReturnCode.AUTHENTICATION_WARNING, cause.getReturnCode());
+        assertEquals("Cannot authenticate the Account from the given Credentials.", cause.getMessage());
     }
 
     @Test
-    public void testFetchCirclesAsNonExistingMember() {
-        prepareCause(ReturnCode.AUTHENTICATION_WARNING, "Could not uniquely identify an account for 'member6'.");
-
+    void testFetchCirclesAsNonExistingMember() {
         final FetchCircleService service = new FetchCircleService(settings, entityManager);
         final FetchCircleRequest request = prepareRequest(FetchCircleRequest.class, "member6");
-        assertTrue(request.validate().isEmpty());
 
-        service.perform(request);
+        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
+        assertEquals(ReturnCode.AUTHENTICATION_WARNING, cause.getReturnCode());
+        assertEquals("Could not uniquely identify an account for 'member6'.", cause.getMessage());
     }
 }

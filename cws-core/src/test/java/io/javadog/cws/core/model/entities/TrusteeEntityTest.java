@@ -16,25 +16,25 @@
  */
 package io.javadog.cws.core.model.entities;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import io.javadog.cws.api.common.MemberRole;
 import io.javadog.cws.api.common.TrustLevel;
 import io.javadog.cws.core.DatabaseSetup;
 import io.javadog.cws.core.enums.KeyAlgorithm;
 import java.util.UUID;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Kim Jensen
  * @since CWS 1.0
  */
-public final class TrusteeEntityTest extends DatabaseSetup {
+final class TrusteeEntityTest extends DatabaseSetup {
 
     @Test
-    public void testEntity() {
+    void testEntity() {
         final KeyAlgorithm algorithm = settings.getAsymmetricAlgorithm();
         final String externalId = UUID.randomUUID().toString();
         final MemberEntity member = prepareMember(externalId, "Trustee Member", algorithm, "public Key", "private Key", MemberRole.STANDARD);

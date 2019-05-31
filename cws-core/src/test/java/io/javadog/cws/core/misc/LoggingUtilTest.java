@@ -16,26 +16,25 @@
  */
 package io.javadog.cws.core.misc;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.core.exceptions.CWSException;
-import org.junit.Test;
-
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Locale;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Kim Jensen
  * @since CWS 1.0
  */
-public final class LoggingUtilTest {
+final class LoggingUtilTest {
 
     @Test
-    public void testLoggingUtilConstructor() throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
+    void testLoggingUtilConstructor() throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
         final Constructor<LoggingUtil> constructor = LoggingUtil.class.getDeclaredConstructor();
         assertFalse(constructor.isAccessible());
         constructor.setAccessible(true);
@@ -44,7 +43,7 @@ public final class LoggingUtilTest {
     }
 
     @Test
-    public void testRequestDuration() {
+    void testRequestDuration() {
         final long startTime = System.nanoTime();
         final String request = "theRequest";
         final String requestDuration = LoggingUtil.requestDuration(Locale.ENGLISH, request, startTime);
@@ -52,7 +51,7 @@ public final class LoggingUtilTest {
     }
 
     @Test
-    public void testRequestDurationWithException() {
+    void testRequestDurationWithException() {
         final long startTime = System.nanoTime();
         final String request = "theRequest";
         final CWSException exception = new CWSException(ReturnCode.ERROR, "An error occurred");

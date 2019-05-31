@@ -29,10 +29,10 @@ import org.junit.jupiter.api.Test;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-public class ProcessCircleResponseTest {
+class ProcessCircleResponseTest {
 
     @Test
-    public void testClassflow() {
+    void testClassflow() {
         final String circleId = UUID.randomUUID().toString();
 
         final ProcessCircleResponse response = new ProcessCircleResponse();
@@ -45,7 +45,7 @@ public class ProcessCircleResponseTest {
     }
 
     @Test
-    public void testError() {
+    void testError() {
         final String msg = "ProcessCircle Request failed due to Verification Problems.";
         final ProcessCircleResponse response = new ProcessCircleResponse(ReturnCode.VERIFICATION_WARNING, msg);
 

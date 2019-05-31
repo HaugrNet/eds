@@ -31,10 +31,10 @@ import org.junit.jupiter.api.Test;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-public final class FetchMemberResponseTest {
+final class FetchMemberResponseTest {
 
     @Test
-    public void testClassflow() {
+    void testClassflow() {
         final List<Circle> circles = new ArrayList<>(1);
         circles.add(new Circle());
         final List<Member> members = new ArrayList<>(1);
@@ -52,7 +52,7 @@ public final class FetchMemberResponseTest {
     }
 
     @Test
-    public void testError() {
+    void testError() {
         final String msg = "FetchMember Request failed due to Verification Problems.";
         final FetchMemberResponse response = new FetchMemberResponse(ReturnCode.VERIFICATION_WARNING, msg);
 

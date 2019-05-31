@@ -16,10 +16,10 @@
  */
 package io.javadog.cws.client;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.javadog.cws.api.Management;
 import io.javadog.cws.api.Share;
@@ -56,20 +56,20 @@ import io.javadog.cws.api.responses.VersionResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.UUID;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Kim Jensen
  * @since CWS 1.0
  */
-public abstract class AbstractClientTestCase {
+abstract class AbstractClientTestCase {
 
     abstract Management getManagement();
 
     abstract Share getShare();
 
     @Test
-    public void testVersion() {
+    void testVersion() {
         final VersionResponse response = getManagement().version();
         assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getReturnCode());
         assertEquals("Ok", response.getReturnMessage());
@@ -77,7 +77,7 @@ public abstract class AbstractClientTestCase {
     }
 
     @Test
-    public void testSettings() {
+    void testSettings() {
         final SettingRequest request = Base.prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
 
         final SettingResponse response = getManagement().settings(request);
@@ -86,7 +86,7 @@ public abstract class AbstractClientTestCase {
     }
 
     @Test
-    public void testMasterKey() {
+    void testMasterKey() {
         final MasterKeyRequest request = Base.prepareRequest(MasterKeyRequest.class, Constants.ADMIN_ACCOUNT);
         request.setSecret(request.getCredential());
 
@@ -96,7 +96,7 @@ public abstract class AbstractClientTestCase {
     }
 
     @Test
-    public void testSanitized() {
+    void testSanitized() {
         final SanityRequest request = Base.prepareRequest(SanityRequest.class, Constants.ADMIN_ACCOUNT);
 
         final SanityResponse response = getManagement().sanitized(request);
@@ -105,7 +105,7 @@ public abstract class AbstractClientTestCase {
     }
 
     @Test
-    public void testFetchMembers() {
+    void testFetchMembers() {
         final FetchMemberRequest request = Base.prepareRequest(FetchMemberRequest.class, Constants.ADMIN_ACCOUNT);
 
         final FetchMemberResponse response = getManagement().fetchMembers(request);
@@ -114,7 +114,7 @@ public abstract class AbstractClientTestCase {
     }
 
     @Test
-    public void testProcessMembers() {
+    void testProcessMembers() {
         final String accountName = UUID.randomUUID().toString();
 
         final ProcessMemberRequest request = Base.prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
@@ -128,7 +128,7 @@ public abstract class AbstractClientTestCase {
     }
 
     @Test
-    public void testFetchCircles() {
+    void testFetchCircles() {
         final FetchCircleRequest request = Base.prepareRequest(FetchCircleRequest.class, Constants.ADMIN_ACCOUNT);
 
         final FetchCircleResponse response = getManagement().fetchCircles(request);
@@ -137,7 +137,7 @@ public abstract class AbstractClientTestCase {
     }
 
     @Test
-    public void testProcessCircles() {
+    void testProcessCircles() {
         final String accountName = UUID.randomUUID().toString();
 
         final ProcessMemberRequest memberRequest = Base.prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
@@ -159,7 +159,7 @@ public abstract class AbstractClientTestCase {
     }
 
     @Test
-    public void testDataTypes() {
+    void testDataTypes() {
         final ProcessDataTypeRequest processRequest = Base.prepareRequest(ProcessDataTypeRequest.class, Constants.ADMIN_ACCOUNT);
         processRequest.setTypeName("ObjectType");
         processRequest.setType("Object Mapping Rules");
@@ -177,7 +177,7 @@ public abstract class AbstractClientTestCase {
     }
 
     @Test
-    public void testAddData() {
+    void testAddData() {
         // Step 1; Create a new Circle with 2 Trustees
         final String accountName1 = UUID.randomUUID().toString();
         final String accountName2 = UUID.randomUUID().toString();
@@ -204,7 +204,7 @@ public abstract class AbstractClientTestCase {
     }
 
     @Test
-    public void testSignatures() {
+    void testSignatures() {
         // 1. Generate a Signature
         final SignRequest signRequest = Base.prepareRequest(SignRequest.class, Constants.ADMIN_ACCOUNT);
         final byte[] document = UUID.randomUUID().toString().getBytes(StandardCharsets.UTF_8);

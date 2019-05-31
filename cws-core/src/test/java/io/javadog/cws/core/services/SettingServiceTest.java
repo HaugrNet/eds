@@ -16,9 +16,10 @@
  */
 package io.javadog.cws.core.services;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
@@ -27,12 +28,13 @@ import io.javadog.cws.api.responses.SettingResponse;
 import io.javadog.cws.core.DatabaseSetup;
 import io.javadog.cws.core.enums.KeyAlgorithm;
 import io.javadog.cws.core.enums.StandardSetting;
+import io.javadog.cws.core.exceptions.CWSException;
 import io.javadog.cws.core.model.entities.MemberEntity;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.persistence.Query;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * <p>This Test Class, is testing the following Service Classes in one, as they
@@ -45,10 +47,10 @@ import org.junit.Test;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-public final class SettingServiceTest extends DatabaseSetup {
+final class SettingServiceTest extends DatabaseSetup {
 
     @Test
-    public void testCreatingAdmin() {
+    void testCreatingAdmin() {
         // For most tests we need to have the Admin account present, so by
         // default it already exists. So, to test that we actually *can* create
         // the Admin Account, we first have to delete it from the DB, which
@@ -69,18 +71,18 @@ public final class SettingServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testNonAdminRequest() {
-        prepareCause(ReturnCode.AUTHORIZATION_WARNING, "Cannot complete this request, as it is only allowed for the System Administrator.");
-
+    void testNonAdminRequest() {
         final SettingService service = new SettingService(newSettings(), entityManager);
         final SettingRequest request = prepareRequest(SettingRequest.class, MEMBER_1);
         assertNotEquals(Constants.ADMIN_ACCOUNT, request.getAccountName());
 
-        service.perform(request);
+        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
+        assertEquals(ReturnCode.AUTHORIZATION_WARNING, cause.getReturnCode());
+        assertEquals("Cannot complete this request, as it is only allowed for the System Administrator.", cause.getMessage());
     }
 
     @Test
-    public void testInvokingRequestWithNullSettingsList() {
+    void testInvokingRequestWithNullSettingsList() {
         final SettingService service = new SettingService(newSettings(), entityManager);
         final SettingRequest request = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
 
@@ -91,7 +93,7 @@ public final class SettingServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testInvokingRequestWithEmptySettings() {
+    void testInvokingRequestWithEmptySettings() {
         final SettingService service = new SettingService(newSettings(), entityManager);
         final SettingRequest request = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
         final Map<String, String> mySettings = new HashMap<>();
@@ -104,29 +106,29 @@ public final class SettingServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testInvokingRequestWithNullKey() {
-        prepareCause(ReturnCode.SETTING_WARNING, "Setting Keys may neither be null nor empty.");
+    void testInvokingRequestWithNullKey() {
         final SettingService service = new SettingService(newSettings(), entityManager);
         final SettingRequest request = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
         final Map<String, String> mySettings = new HashMap<>();
         mySettings.put(null, "NullKey");
         request.setSettings(mySettings);
-        assertTrue(request.validate().isEmpty());
 
-        service.perform(request);
+        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
+        assertEquals(ReturnCode.SETTING_WARNING, cause.getReturnCode());
+        assertEquals("Setting Keys may neither be null nor empty.", cause.getMessage());
     }
 
     @Test
-    public void testInvokingRequestWithEmptyKey() {
-        prepareCause(ReturnCode.SETTING_WARNING, "Setting Keys may neither be null nor empty.");
+    void testInvokingRequestWithEmptyKey() {
         final SettingService service = new SettingService(newSettings(), entityManager);
         final SettingRequest request = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
         final Map<String, String> mySettings = new HashMap<>();
         mySettings.put("", "EmptyKey");
         request.setSettings(mySettings);
-        assertTrue(request.validate().isEmpty());
 
-        service.perform(request);
+        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
+        assertEquals(ReturnCode.SETTING_WARNING, cause.getReturnCode());
+        assertEquals("Setting Keys may neither be null nor empty.", cause.getMessage());
     }
 
     /**
@@ -137,14 +139,12 @@ public final class SettingServiceTest extends DatabaseSetup {
      * have a lock set, which will affect other tests.</p>
      */
     @Test
-    public void testUpdatingCriticalValues() {
+    void testUpdatingCriticalValues() {
         // Before starting, all member accounts must be removed
         final List<MemberEntity> members = dao.findAllAscending(MemberEntity.class, "id");
         for (final MemberEntity member : members) {
             dao.delete(member);
         }
-
-        prepareCause(ReturnCode.SETTING_WARNING, "Invalid Integer value for 'PBE_ITERATIONS'.");
 
         final SettingService service = new SettingService(newSettings(), entityManager);
         final SettingRequest request = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
@@ -170,11 +170,14 @@ public final class SettingServiceTest extends DatabaseSetup {
         mySettings.put(StandardSetting.PBE_ITERATIONS.getKey(), "-100000");
         final SettingRequest negativeRequest = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
         negativeRequest.setSettings(mySettings);
-        service.perform(negativeRequest);
+
+        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(negativeRequest));
+        assertEquals(ReturnCode.SETTING_WARNING, cause.getReturnCode());
+        assertEquals("Invalid Integer value for 'PBE_ITERATIONS'.", cause.getMessage());
     }
 
     @Test
-    public void testInvokingRequestUpdateExistingSetting() {
+    void testInvokingRequestUpdateExistingSetting() {
         final SettingService service = new SettingService(newSettings(), entityManager);
         final SettingRequest request = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
 
@@ -201,7 +204,7 @@ public final class SettingServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testAddingAndRemovingCustomSetting() {
+    void testAddingAndRemovingCustomSetting() {
         final SettingService service = new SettingService(newSettings(), entityManager);
         final SettingRequest request = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
         final Map<String, String> mySettings = new HashMap<>();
@@ -215,8 +218,7 @@ public final class SettingServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testInvokingRequestUpdateNotAllowedExistingSetting() {
-        prepareCause(ReturnCode.SETTING_WARNING, "The setting cws.system.salt may not be overwritten.");
+    void testInvokingRequestUpdateNotAllowedExistingSetting() {
         final SettingService service = new SettingService(newSettings(), entityManager);
         final SettingRequest request = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
         final Map<String, String> mySettings = new HashMap<>();
@@ -224,11 +226,13 @@ public final class SettingServiceTest extends DatabaseSetup {
         assertEquals("Enabling Kill Switch", mySettings.get("cws.system.salt"));
         request.setSettings(mySettings);
 
-        service.perform(request);
+        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
+        assertEquals(ReturnCode.SETTING_WARNING, cause.getReturnCode());
+        assertEquals("The setting cws.system.salt may not be overwritten.", cause.getMessage());
     }
 
     @Test
-    public void testInvokingRequestAddNewSetting() {
+    void testInvokingRequestAddNewSetting() {
         final SettingService service = new SettingService(newSettings(), entityManager);
         final SettingRequest request = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
         final Map<String, String> mySettings = new HashMap<>();
@@ -243,7 +247,7 @@ public final class SettingServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testDeletingCustomSetting() {
+    void testDeletingCustomSetting() {
         final SettingService service = new SettingService(newSettings(), entityManager);
         final SettingRequest request = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
         final Map<String, String> mySettings = new HashMap<>();
@@ -264,20 +268,20 @@ public final class SettingServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testDeletingStandardSetting() {
-        prepareCause(ReturnCode.SETTING_WARNING, "The value for the key 'cws.system.charset' is undefined.");
+    void testDeletingStandardSetting() {
         final SettingService service = new SettingService(newSettings(), entityManager);
         final SettingRequest request = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
         final Map<String, String> mySettings = new HashMap<>();
         mySettings.put(StandardSetting.CWS_CHARSET.getKey(), null);
         request.setSettings(mySettings);
-        assertTrue(request.validate().isEmpty());
 
-        service.perform(request);
+        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
+        assertEquals(ReturnCode.SETTING_WARNING, cause.getReturnCode());
+        assertEquals("The value for the key 'cws.system.charset' is undefined.", cause.getMessage());
     }
 
     @Test
-    public void testSetCryptoAlgorithms() {
+    void testSetCryptoAlgorithms() {
         final SettingService service = new SettingService(newSettings(), entityManager);
         final SettingRequest request1 = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
         final SettingResponse response1 = service.perform(request1);
@@ -297,8 +301,7 @@ public final class SettingServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testSetInvalidSymmetricAlgorithm() {
-        prepareCause(ReturnCode.SETTING_WARNING, "Unsupported Crypto Algorithm for 'cws.crypto.symmetric.algorithm'.");
+    void testSetInvalidSymmetricAlgorithm() {
         final SettingService service = new SettingService(newSettings(), entityManager);
         final SettingRequest request1 = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
         final SettingResponse response1 = service.perform(request1);
@@ -309,25 +312,27 @@ public final class SettingServiceTest extends DatabaseSetup {
 
         final SettingRequest request2 = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
         request2.setSettings(mySettings);
-        service.perform(request2);
+
+        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request2));
+        assertEquals(ReturnCode.SETTING_WARNING, cause.getReturnCode());
+        assertEquals("Unsupported Crypto Algorithm for 'cws.crypto.symmetric.algorithm'.", cause.getMessage());
     }
 
     @Test
-    public void testInvalidCharset() {
-        prepareCause(ReturnCode.SETTING_WARNING, "Invalid Character set value for 'cws.system.charset'.");
+    void testInvalidCharset() {
         final SettingService service = new SettingService(newSettings(), entityManager);
         final SettingRequest request = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
         final Map<String, String> newSettings = new HashMap<>();
         newSettings.put(StandardSetting.CWS_CHARSET.getKey(), "UTF-9");
         request.setSettings(newSettings);
-        assertTrue(request.validate().isEmpty());
 
-        service.perform(request);
+        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
+        assertEquals(ReturnCode.SETTING_WARNING, cause.getReturnCode());
+        assertEquals("Invalid Character set value for 'cws.system.charset'.", cause.getMessage());
     }
 
     @Test
-    public void testSanityInterval() {
-        prepareCause(ReturnCode.SETTING_WARNING, "Invalid Integer value for 'SANITY_INTERVAL'.");
+    void testSanityInterval() {
         final SettingService service = new SettingService(newSettings(), entityManager);
         final SettingRequest request1 = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
         final SettingResponse response1 = service.perform(request1);
@@ -345,20 +350,22 @@ public final class SettingServiceTest extends DatabaseSetup {
         mySettings.put(StandardSetting.SANITY_INTERVAL.getKey(), "weekly");
         final SettingRequest request3 = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
         request3.setSettings(mySettings);
-        service.perform(request3);
-        assertTrue(response1.isOk());
+
+        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request3));
+        assertEquals(ReturnCode.SETTING_WARNING, cause.getReturnCode());
+        assertEquals("Invalid Integer value for 'SANITY_INTERVAL'.", cause.getMessage());
     }
 
     @Test
-    public void testUpdateMasterKeyUrlSetting() {
-        prepareCause(ReturnCode.SETTING_WARNING, "The setting cws.masterkey.url may not be changed with this request.");
+    void testUpdateMasterKeyUrlSetting() {
         final SettingService service = new SettingService(newSettings(), entityManager);
         final SettingRequest request = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
         final Map<String, String> newSettings = new HashMap<>();
         newSettings.put(StandardSetting.MASTERKEY_URL.getKey(), "https://cool.url/to/new/key");
         request.setSettings(newSettings);
-        assertTrue(request.validate().isEmpty());
 
-        service.perform(request);
+        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
+        assertEquals(ReturnCode.SETTING_WARNING, cause.getReturnCode());
+        assertEquals("The setting cws.masterkey.url may not be changed with this request.", cause.getMessage());
     }
 }

@@ -29,10 +29,10 @@ import org.junit.jupiter.api.Test;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-public final class SettingResponseTest {
+final class SettingResponseTest {
 
     @Test
-    public void testClassflow() {
+    void testClassflow() {
         final Map<String, String> settings = new HashMap<>();
         settings.put("key1", "value1");
         settings.put("key2", "value2");
@@ -48,7 +48,7 @@ public final class SettingResponseTest {
     }
 
     @Test
-    public void testError() {
+    void testError() {
         final String msg = "Setting Request failed due to Verification Problems.";
         final SettingResponse response = new SettingResponse(ReturnCode.VERIFICATION_WARNING, msg);
 

@@ -16,13 +16,13 @@
  */
 package io.javadog.cws.core.services;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.javadog.cws.api.common.Action;
 import io.javadog.cws.api.common.Constants;
@@ -41,7 +41,7 @@ import io.javadog.cws.core.enums.SanityStatus;
 import io.javadog.cws.core.exceptions.CWSException;
 import java.util.Date;
 import java.util.UUID;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * <p>Common test class for the Process & Fetch Data Services.</p>
@@ -49,10 +49,10 @@ import org.junit.Test;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-public final class DataServiceTest extends DatabaseSetup {
+final class DataServiceTest extends DatabaseSetup {
 
     @Test
-    public void testEmptyProcessRequest() {
+    void testEmptyProcessRequest() {
         final ProcessDataService service = new ProcessDataService(settings, entityManager);
         final ProcessDataRequest request = new ProcessDataRequest();
 
@@ -64,7 +64,7 @@ public final class DataServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testEmptyFetchRequest() {
+    void testEmptyFetchRequest() {
         final FetchDataService service = new FetchDataService(settings, entityManager);
         final FetchDataRequest request = new FetchDataRequest();
 
@@ -76,7 +76,7 @@ public final class DataServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testSavingAndReadingData() {
+    void testSavingAndReadingData() {
         final ProcessDataService service = new ProcessDataService(settings, entityManager);
         final FetchDataService dataService = new FetchDataService(settings, entityManager);
 
@@ -98,7 +98,7 @@ public final class DataServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testSaveAndUpdateData() {
+    void testSaveAndUpdateData() {
         final ProcessDataService service = new ProcessDataService(settings, entityManager);
         final FetchDataService dataService = new FetchDataService(settings, entityManager);
 
@@ -129,7 +129,7 @@ public final class DataServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testAddingAndFetchingData() {
+    void testAddingAndFetchingData() {
         final ProcessDataService processService = new ProcessDataService(settings, entityManager);
         final FetchDataService fetchService = new FetchDataService(settings, entityManager);
 
@@ -151,7 +151,7 @@ public final class DataServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testAddEmptyData() {
+    void testAddEmptyData() {
         final ProcessDataService service = new ProcessDataService(settings, entityManager);
         final ProcessDataRequest request = prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "The Data", 0);
 
@@ -166,7 +166,7 @@ public final class DataServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testCreateCircleAsNewMember() {
+    void testCreateCircleAsNewMember() {
         final String accountName = "accountName";
         final ProcessMemberRequest memberRequest = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
         memberRequest.setNewAccountName(accountName);
@@ -185,7 +185,7 @@ public final class DataServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testAddDataWithInvalidChecksum() {
+    void testAddDataWithInvalidChecksum() {
         final ProcessDataService service = new ProcessDataService(settings, entityManager);
         final ProcessDataRequest request = prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "The Data", 524288);
 
@@ -202,7 +202,7 @@ public final class DataServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testAddEmptyAndUpdateData() {
+    void testAddEmptyAndUpdateData() {
         final ProcessDataService service = new ProcessDataService(settings, entityManager);
         final ProcessDataRequest saveRequest = prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "The Data", 0);
 
@@ -215,7 +215,7 @@ public final class DataServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testAddAndMoveToInvalidFolder() {
+    void testAddAndMoveToInvalidFolder() {
         final ProcessDataService service = new ProcessDataService(settings, entityManager);
         final ProcessDataRequest saveRequest = prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "The Data", 1048576);
 
@@ -231,7 +231,7 @@ public final class DataServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testAddDataWithoutPermission() {
+    void testAddDataWithoutPermission() {
         final ProcessDataService service = new ProcessDataService(settings, entityManager);
         final ProcessDataRequest request = prepareAddDataRequest(MEMBER_5, CIRCLE_3_ID, "The Data", 1048576);
 
@@ -241,7 +241,7 @@ public final class DataServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testUpdatingDataWithoutPermission() {
+    void testUpdatingDataWithoutPermission() {
         final ProcessDataService service = new ProcessDataService(settings, entityManager);
         final ProcessDataRequest saveRequest = prepareAddDataRequest(MEMBER_2, CIRCLE_2_ID, "The Data", 1048576);
         final ProcessDataResponse saveResponse = service.perform(saveRequest);
@@ -256,7 +256,7 @@ public final class DataServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testAddDataWithInvalidDataType() {
+    void testAddDataWithInvalidDataType() {
         final ProcessDataService service = new ProcessDataService(settings, entityManager);
         final ProcessDataRequest request = prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "The Data", 512);
         request.setTypeName("Weird");
@@ -267,7 +267,7 @@ public final class DataServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testDeletingDataWithoutPermission() {
+    void testDeletingDataWithoutPermission() {
         final ProcessDataService service = new ProcessDataService(settings, entityManager);
         final ProcessDataRequest saveRequest = prepareAddDataRequest(MEMBER_2, CIRCLE_2_ID, "The Data", 1048576);
         final ProcessDataResponse saveResponse = service.perform(saveRequest);
@@ -279,7 +279,7 @@ public final class DataServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testFetchingInvalidDataId() {
+    void testFetchingInvalidDataId() {
         final FetchDataService service = new FetchDataService(settings, entityManager);
         final FetchDataRequest request = prepareRequest(FetchDataRequest.class, MEMBER_4);
         request.setCircleId(CIRCLE_3_ID);
@@ -291,7 +291,7 @@ public final class DataServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testAddDataToUnknownFolder() {
+    void testAddDataToUnknownFolder() {
         final String folderId = UUID.randomUUID().toString();
 
         final ProcessDataService service = new ProcessDataService(settings, entityManager);
@@ -304,7 +304,7 @@ public final class DataServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testAddDataToInvalidFolder() {
+    void testAddDataToInvalidFolder() {
         final ProcessDataService service = new ProcessDataService(settings, entityManager);
         final ProcessDataRequest request = prepareAddDataRequest(MEMBER_4, CIRCLE_3_ID, "Data File", 512);
         final ProcessDataResponse response = service.perform(request);
@@ -321,7 +321,7 @@ public final class DataServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testUpdateNotExistingData() {
+    void testUpdateNotExistingData() {
         final ProcessDataService service = new ProcessDataService(settings, entityManager);
         final ProcessDataRequest request = prepareRequest(ProcessDataRequest.class, MEMBER_4);
         request.setAction(Action.UPDATE);
@@ -336,7 +336,7 @@ public final class DataServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testSaveAndDeleteData() {
+    void testSaveAndDeleteData() {
         final ProcessDataService service = new ProcessDataService(settings, entityManager);
         final ProcessDataRequest saveRequest = prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "The Data", 524288);
         final ProcessDataResponse saveResponse = service.perform(saveRequest);
@@ -350,7 +350,7 @@ public final class DataServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testSaveAndDeleteDataWithoutPermission() {
+    void testSaveAndDeleteDataWithoutPermission() {
         final ProcessDataService service = new ProcessDataService(settings, entityManager);
         final ProcessDataRequest saveRequest = prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "Known Data", 524288);
         final ProcessDataResponse saveResponse = service.perform(saveRequest);
@@ -364,7 +364,7 @@ public final class DataServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testSaveAndDeleteDataWithoutAccess() {
+    void testSaveAndDeleteDataWithoutAccess() {
         final ProcessDataService service = new ProcessDataService(settings, entityManager);
         final ProcessDataRequest saveRequest = prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "More Data", 524288);
         final ProcessDataResponse saveResponse = service.perform(saveRequest);
@@ -378,7 +378,7 @@ public final class DataServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testDeleteNotExistingData() {
+    void testDeleteNotExistingData() {
         final ProcessDataService service = new ProcessDataService(settings, entityManager);
         final ProcessDataRequest request = prepareDeleteRequest(MEMBER_1, UUID.randomUUID().toString());
 
@@ -388,7 +388,7 @@ public final class DataServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testAddUpdateAndDeleteFolder() {
+    void testAddUpdateAndDeleteFolder() {
         final ProcessDataService service = new ProcessDataService(settings, entityManager);
         final ProcessDataRequest request = prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "folder1", 0);
         request.setTypeName("folder");
@@ -412,7 +412,7 @@ public final class DataServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testAddSameFolder() {
+    void testAddSameFolder() {
         final ProcessDataService service = new ProcessDataService(settings, entityManager);
         final ProcessDataRequest request = prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "folder1", 0);
         request.setTypeName(Constants.FOLDER_TYPENAME);
@@ -428,7 +428,7 @@ public final class DataServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testCopyData() {
+    void testCopyData() {
         final ProcessDataService copyDataService = new ProcessDataService(settings, entityManager);
         final ProcessDataRequest copyAddRequest = prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "toCopy", 524288);
         final ProcessDataResponse copyAddResponse = copyDataService.perform(copyAddRequest);
@@ -465,7 +465,7 @@ public final class DataServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testMoveData() {
+    void testMoveData() {
         final ProcessDataService moveDataService = new ProcessDataService(settings, entityManager);
         final ProcessDataRequest moveAddRequest = prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "toMove", 524288);
         final ProcessDataResponse moveAddResponse = moveDataService.perform(moveAddRequest);
@@ -496,7 +496,7 @@ public final class DataServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testCopyFolder() {
+    void testCopyFolder() {
         final ProcessDataService dataService = new ProcessDataService(settings, entityManager);
         final ProcessDataRequest addRequest = prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "folderToCopy", 0);
         addRequest.setTypeName(Constants.FOLDER_TYPENAME);
@@ -512,7 +512,7 @@ public final class DataServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testCopyEmptyData() {
+    void testCopyEmptyData() {
         final ProcessDataService dataService = new ProcessDataService(settings, entityManager);
         final ProcessDataRequest emptyAddRequest = prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "emptyData", 0);
         final ProcessDataResponse emptyAddResponse = dataService.perform(emptyAddRequest);
@@ -549,7 +549,7 @@ public final class DataServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testCopyDataNotExistingData() {
+    void testCopyDataNotExistingData() {
         final String dataId = UUID.randomUUID().toString();
 
         final ProcessDataService dataService = new ProcessDataService(settings, entityManager);
@@ -562,7 +562,7 @@ public final class DataServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testCopyDataToNotExistingFolder() {
+    void testCopyDataToNotExistingFolder() {
         final String folderId = UUID.randomUUID().toString();
 
         final ProcessDataService dataService = new ProcessDataService(settings, entityManager);
@@ -579,7 +579,7 @@ public final class DataServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testCopyDataToNonTrusteeCircle() {
+    void testCopyDataToNonTrusteeCircle() {
         final String dataId = UUID.randomUUID().toString();
 
         final ProcessDataService dataService = new ProcessDataService(settings, entityManager);
@@ -592,7 +592,7 @@ public final class DataServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testCopyDataWithoutPermissionInTarget() {
+    void testCopyDataWithoutPermissionInTarget() {
         final ProcessDataService dataService = new ProcessDataService(settings, entityManager);
         final ProcessDataRequest addRequest = prepareAddDataRequest(MEMBER_3, CIRCLE_3_ID, "emptyData", 512);
         final ProcessDataResponse addResponse = dataService.perform(addRequest);
@@ -607,7 +607,7 @@ public final class DataServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testDeleteFolderWithData() {
+    void testDeleteFolderWithData() {
         final ProcessDataService dataService = new ProcessDataService(settings, entityManager);
         final ProcessDataRequest addFolderRequest = prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "folder1", 0);
         addFolderRequest.setTypeName("folder");
@@ -631,7 +631,7 @@ public final class DataServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testMoveFolderWithAddRequest() {
+    void testMoveFolderWithAddRequest() {
         final ProcessDataService service = new ProcessDataService(settings, entityManager);
         final ProcessDataRequest addFolderRequest = prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "folder1", 0);
         addFolderRequest.setTypeName("folder");
@@ -658,7 +658,7 @@ public final class DataServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testMoveDataWithAddRequest() {
+    void testMoveDataWithAddRequest() {
         final ProcessDataService service = new ProcessDataService(settings, entityManager);
         final ProcessDataRequest createFolderRequest = prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "folder1", 0);
         createFolderRequest.setTypeName("folder");
@@ -682,7 +682,7 @@ public final class DataServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testMovingDataToFolderWhereSameNameDataExist() {
+    void testMovingDataToFolderWhereSameNameDataExist() {
         final ProcessDataService service = new ProcessDataService(settings, entityManager);
         final FetchDataService readSearvice = new FetchDataService(settings, entityManager);
 
@@ -737,7 +737,7 @@ public final class DataServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testMoveDataToDifferentCircleWithAddRequest() {
+    void testMoveDataToDifferentCircleWithAddRequest() {
         final ProcessDataService service = new ProcessDataService(settings, entityManager);
         final ProcessDataRequest addFolderRequest = prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "folder1", 0);
         addFolderRequest.setTypeName("folder");

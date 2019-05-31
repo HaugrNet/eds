@@ -16,11 +16,11 @@
  */
 package io.javadog.cws.client;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.javadog.cws.api.Management;
 import io.javadog.cws.api.Share;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Kim Jensen
@@ -42,7 +42,7 @@ public final class RestClientTest extends AbstractClientTestCase {
     }
 
     @Test
-    public void testCorrectInstances() {
+    void testCorrectInstances() {
         assertTrue(management instanceof ManagementRestClient);
         assertTrue(share instanceof ShareRestClient);
     }

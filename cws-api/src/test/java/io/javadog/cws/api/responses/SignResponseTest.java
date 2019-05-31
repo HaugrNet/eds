@@ -28,10 +28,10 @@ import org.junit.jupiter.api.Test;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-public final class SignResponseTest {
+final class SignResponseTest {
 
     @Test
-    public void testClassflow() {
+    void testClassflow() {
         final String signature = "The Signature";
 
         final SignResponse response = new SignResponse();
@@ -44,7 +44,7 @@ public final class SignResponseTest {
     }
 
     @Test
-    public void testError() {
+    void testError() {
         final String msg = "Sign Request failed due to Verification Problems.";
         final SignResponse response = new SignResponse(ReturnCode.VERIFICATION_WARNING, msg);
 

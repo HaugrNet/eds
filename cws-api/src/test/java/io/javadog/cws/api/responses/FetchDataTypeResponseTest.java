@@ -30,10 +30,10 @@ import org.junit.jupiter.api.Test;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-public final class FetchDataTypeResponseTest {
+final class FetchDataTypeResponseTest {
 
     @Test
-    public void testClassflow() {
+    void testClassflow() {
         final List<DataType> dataTypes = new ArrayList<>(3);
         dataTypes.add(new DataType());
         dataTypes.add(new DataType());
@@ -49,7 +49,7 @@ public final class FetchDataTypeResponseTest {
     }
 
     @Test
-    public void testError() {
+    void testError() {
         final String msg = "FetchDataType Request failed due to Verification Problems.";
         final FetchDataTypeResponse response = new FetchDataTypeResponse(ReturnCode.VERIFICATION_WARNING, msg);
 

@@ -27,10 +27,10 @@ import org.junit.jupiter.api.Test;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-public final class ProcessTrusteeResponseTest {
+final class ProcessTrusteeResponseTest {
 
     @Test
-    public void testClassflow() {
+    void testClassflow() {
         final ProcessTrusteeResponse response = new ProcessTrusteeResponse();
 
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
@@ -39,7 +39,7 @@ public final class ProcessTrusteeResponseTest {
     }
 
     @Test
-    public void testError() {
+    void testError() {
         final String msg = "ProcessTrustee Request failed due to Verification Problems.";
         final ProcessTrusteeResponse response = new ProcessTrusteeResponse(ReturnCode.VERIFICATION_WARNING, msg);
 

@@ -30,10 +30,10 @@ import org.junit.jupiter.api.Test;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-public final class ProcessDataTypeRequestTest {
+final class ProcessDataTypeRequestTest {
 
     @Test
-    public void testClassflow() {
+    void testClassflow() {
         final String typeName = "DataType TypeName";
         final String type = "DataType Type";
 
@@ -55,7 +55,7 @@ public final class ProcessDataTypeRequestTest {
     }
 
     @Test
-    public void testEmptyClass() {
+    void testEmptyClass() {
         final ProcessDataTypeRequest request = new ProcessDataTypeRequest();
         request.setAction(null);
         final Map<String, String> errors = request.validate();
@@ -66,7 +66,7 @@ public final class ProcessDataTypeRequestTest {
     }
 
     @Test
-    public void testInvalidAction() {
+    void testInvalidAction() {
         final ProcessDataTypeRequest request = new ProcessDataTypeRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
         request.setCredential(TestUtilities.convert(Constants.ADMIN_ACCOUNT));
@@ -78,7 +78,7 @@ public final class ProcessDataTypeRequestTest {
     }
 
     @Test
-    public void testActionProcess() {
+    void testActionProcess() {
         final ProcessDataTypeRequest request = new ProcessDataTypeRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
         request.setCredential(TestUtilities.convert(Constants.ADMIN_ACCOUNT));
@@ -91,7 +91,7 @@ public final class ProcessDataTypeRequestTest {
     }
 
     @Test
-    public void testActionProcessFail() {
+    void testActionProcessFail() {
         final ProcessDataTypeRequest request = new ProcessDataTypeRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
         request.setCredential(TestUtilities.convert(Constants.ADMIN_ACCOUNT));
@@ -104,7 +104,7 @@ public final class ProcessDataTypeRequestTest {
     }
 
     @Test
-    public void testActionDelete() {
+    void testActionDelete() {
         final ProcessDataTypeRequest request = new ProcessDataTypeRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
         request.setCredential(TestUtilities.convert(Constants.ADMIN_ACCOUNT));
@@ -116,7 +116,7 @@ public final class ProcessDataTypeRequestTest {
     }
 
     @Test
-    public void testActionDeleteFail() {
+    void testActionDeleteFail() {
         final ProcessDataTypeRequest request = new ProcessDataTypeRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
         request.setCredential(TestUtilities.convert(Constants.ADMIN_ACCOUNT));

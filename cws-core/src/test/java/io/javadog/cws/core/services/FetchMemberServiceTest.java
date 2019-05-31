@@ -16,11 +16,11 @@
  */
 package io.javadog.cws.core.services;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.javadog.cws.api.common.Action;
 import io.javadog.cws.api.common.Constants;
@@ -36,7 +36,7 @@ import io.javadog.cws.core.exceptions.CWSException;
 import io.javadog.cws.core.model.Settings;
 import io.javadog.cws.core.model.entities.MemberEntity;
 import java.util.UUID;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * <p>Fetching members is similar to fetching Circles, in that it is possible to
@@ -60,14 +60,14 @@ import org.junit.Test;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-public final class FetchMemberServiceTest extends DatabaseSetup {
+final class FetchMemberServiceTest extends DatabaseSetup {
 
     /**
      * Testing a Request without any credentials. This should always result in
      * an error from CWS.
      */
     @Test
-    public void testEmptyRequest() {
+    void testEmptyRequest() {
         final FetchMemberService service = new FetchMemberService(settings, entityManager);
         final FetchMemberRequest request = new FetchMemberRequest();
         // Just making sure that the account is missing
@@ -81,7 +81,7 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testFindNotExistingAccount() {
+    void testFindNotExistingAccount() {
         final FetchMemberService service = new FetchMemberService(settings, entityManager);
 
         // Build and send the Request
@@ -99,7 +99,7 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
      * all members is returned.
      */
     @Test
-    public void testFindNotExistingAccount2() {
+    void testFindNotExistingAccount2() {
         // The 2 Service Classes required
         final ProcessMemberService processService = new ProcessMemberService(settings, entityManager);
         final FetchMemberService fetchService = new FetchMemberService(settings, entityManager);
@@ -150,7 +150,7 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
      * as we're not looking at a specific Member Account.
      */
     @Test
-    public void testFindAllMembersAsAdmin() {
+    void testFindAllMembersAsAdmin() {
         // Ensure that we have the correct settings for the Service
         final Settings mySettings = newSettings();
 
@@ -178,7 +178,7 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
      * as we're not looking at a specific Member Account.
      */
     @Test
-    public void testFindAllMembersAsMember1() {
+    void testFindAllMembersAsMember1() {
         // Ensure that we have the correct settings for the Service
         final Settings mySettings = newSettings();
 
@@ -222,7 +222,7 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
      * be part of any Circles.</p>
      */
     @Test
-    public void testFindAdminAsAdmin() {
+    void testFindAdminAsAdmin() {
         // Ensure that we have the correct settings for the Service
         final Settings mySettings = newSettings();
 
@@ -247,7 +247,7 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
      * regardless of the Settings.</p>
      */
     @Test
-    public void testFindMember1WithShowOtherFalseAsAdmin() {
+    void testFindMember1WithShowOtherFalseAsAdmin() {
         // Ensure that we have the correct settings for the Service
         final Settings mySettings = newSettings();
         mySettings.set(StandardSetting.SHOW_TRUSTEES, "false");
@@ -273,7 +273,7 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
      * regardless of the Settings.</p>
      */
     @Test
-    public void testFindMember1WithShowOtherTrueAsAdmin() {
+    void testFindMember1WithShowOtherTrueAsAdmin() {
         // Ensure that we have the correct settings for the Service
         final Settings mySettings = newSettings();
         mySettings.set(StandardSetting.SHOW_TRUSTEES, "true");
@@ -295,7 +295,7 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testFindMember1WithShowOtherTrueAsMember1() {
+    void testFindMember1WithShowOtherTrueAsMember1() {
         // Ensure that we have the correct settings for the Service
         final Settings mySettings = newSettings();
         mySettings.set(StandardSetting.SHOW_TRUSTEES, "true");
@@ -314,7 +314,7 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testFindMember1WithShowOtherFalseAsMember1() {
+    void testFindMember1WithShowOtherFalseAsMember1() {
         // Ensure that we have the correct settings for the Service
         final Settings mySettings = newSettings();
         mySettings.set(StandardSetting.SHOW_TRUSTEES, "false");
@@ -333,7 +333,7 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testFindMember1WithShowOtherTrueAsMember4() {
+    void testFindMember1WithShowOtherTrueAsMember4() {
         // Ensure that we have the correct settings for the Service
         final Settings mySettings = newSettings();
         mySettings.set(StandardSetting.SHOW_TRUSTEES, "true");
@@ -355,7 +355,7 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testFindMember1WithShowOtherFalseAsMember4() {
+    void testFindMember1WithShowOtherFalseAsMember4() {
         // Ensure that we have the correct settings for the Service
         final Settings mySettings = newSettings();
         mySettings.set(StandardSetting.SHOW_TRUSTEES, "false");
@@ -377,7 +377,7 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testFindMember1WithShowOtherTrueAsMember5() {
+    void testFindMember1WithShowOtherTrueAsMember5() {
         // Ensure that we have the correct settings for the Service
         final Settings mySettings = newSettings();
         mySettings.set(StandardSetting.SHOW_TRUSTEES, "true");
@@ -395,7 +395,7 @@ public final class FetchMemberServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testFindMember1WithShowOtherFalseAsMember5() {
+    void testFindMember1WithShowOtherFalseAsMember5() {
         // Ensure that we have the correct settings for the Service
         final Settings mySettings = newSettings();
         mySettings.set(StandardSetting.SHOW_TRUSTEES, "false");

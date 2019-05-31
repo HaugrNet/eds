@@ -31,10 +31,10 @@ import org.junit.jupiter.api.Test;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-public final class ProcessTrusteeRequestTest {
+final class ProcessTrusteeRequestTest {
 
     @Test
-    public void testClassflow() {
+    void testClassflow() {
         final String circleId = UUID.randomUUID().toString();
         final String memberId = UUID.randomUUID().toString();
 
@@ -57,7 +57,7 @@ public final class ProcessTrusteeRequestTest {
     }
 
     @Test
-    public void testEmptyClass() {
+    void testEmptyClass() {
         final ProcessTrusteeRequest request = new ProcessTrusteeRequest();
         final Map<String, String> errors = request.validate();
 
@@ -67,7 +67,7 @@ public final class ProcessTrusteeRequestTest {
     }
 
     @Test
-    public void testInvalidAction() {
+    void testInvalidAction() {
         final ProcessTrusteeRequest request = new ProcessTrusteeRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
         request.setCredential(TestUtilities.convert(Constants.ADMIN_ACCOUNT));
@@ -79,7 +79,7 @@ public final class ProcessTrusteeRequestTest {
     }
 
     @Test
-    public void testActionAdd() {
+    void testActionAdd() {
         final ProcessTrusteeRequest request = new ProcessTrusteeRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
         request.setCredential(TestUtilities.convert(Constants.ADMIN_ACCOUNT));
@@ -93,7 +93,7 @@ public final class ProcessTrusteeRequestTest {
     }
 
     @Test
-    public void testActionAddFail() {
+    void testActionAddFail() {
         final ProcessTrusteeRequest request = new ProcessTrusteeRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
         request.setCredential(TestUtilities.convert(Constants.ADMIN_ACCOUNT));
@@ -110,7 +110,7 @@ public final class ProcessTrusteeRequestTest {
     }
 
     @Test
-    public void testActionAlter() {
+    void testActionAlter() {
         final ProcessTrusteeRequest request = new ProcessTrusteeRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
         request.setCredential(TestUtilities.convert(Constants.ADMIN_ACCOUNT));
@@ -124,7 +124,7 @@ public final class ProcessTrusteeRequestTest {
     }
 
     @Test
-    public void testActionAlterFail() {
+    void testActionAlterFail() {
         final ProcessTrusteeRequest request = new ProcessTrusteeRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
         request.setCredential(TestUtilities.convert(Constants.ADMIN_ACCOUNT));
@@ -141,7 +141,7 @@ public final class ProcessTrusteeRequestTest {
     }
 
     @Test
-    public void testActionRemove() {
+    void testActionRemove() {
         final ProcessTrusteeRequest request = new ProcessTrusteeRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
         request.setCredential(TestUtilities.convert(Constants.ADMIN_ACCOUNT));
@@ -154,7 +154,7 @@ public final class ProcessTrusteeRequestTest {
     }
 
     @Test
-    public void testActionRemoveFail() {
+    void testActionRemoveFail() {
         final ProcessTrusteeRequest request = new ProcessTrusteeRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
         request.setCredential(TestUtilities.convert(Constants.ADMIN_ACCOUNT));

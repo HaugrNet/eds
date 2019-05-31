@@ -16,7 +16,7 @@
  */
 package io.javadog.cws.rest;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.requests.FetchTrusteeRequest;
@@ -24,16 +24,16 @@ import io.javadog.cws.api.requests.ProcessTrusteeRequest;
 import io.javadog.cws.core.DatabaseSetup;
 import io.javadog.cws.core.ManagementBean;
 import javax.ws.rs.core.Response;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Kim Jensen
  * @since CWS 1.0
  */
-public final class TrusteeServiceTest extends DatabaseSetup {
+final class TrusteeServiceTest extends DatabaseSetup {
 
     @Test
-    public void testAdd() {
+    void testAdd() {
         final TrusteeService service = prepareService();
         final ProcessTrusteeRequest request = new ProcessTrusteeRequest();
 
@@ -42,7 +42,7 @@ public final class TrusteeServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testFlawedAdd() {
+    void testFlawedAdd() {
         final TrusteeService service = prepareFlawedService();
         final ProcessTrusteeRequest request = new ProcessTrusteeRequest();
 
@@ -51,7 +51,7 @@ public final class TrusteeServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testAlter() {
+    void testAlter() {
         final TrusteeService service = prepareService();
         final ProcessTrusteeRequest request = new ProcessTrusteeRequest();
 
@@ -60,7 +60,7 @@ public final class TrusteeServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testFlawedAlter() {
+    void testFlawedAlter() {
         final TrusteeService service = prepareFlawedService();
         final ProcessTrusteeRequest request = new ProcessTrusteeRequest();
 
@@ -69,7 +69,7 @@ public final class TrusteeServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testRemove() {
+    void testRemove() {
         final TrusteeService service = prepareService();
         final ProcessTrusteeRequest request = new ProcessTrusteeRequest();
 
@@ -78,7 +78,7 @@ public final class TrusteeServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testFlawedRemove() {
+    void testFlawedRemove() {
         final TrusteeService service = prepareFlawedService();
         final ProcessTrusteeRequest request = new ProcessTrusteeRequest();
 
@@ -87,7 +87,7 @@ public final class TrusteeServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testFetch() {
+    void testFetch() {
         final TrusteeService service = prepareService();
         final FetchTrusteeRequest request = new FetchTrusteeRequest();
 
@@ -96,7 +96,7 @@ public final class TrusteeServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testFlawedFetch() {
+    void testFlawedFetch() {
         final TrusteeService service = prepareFlawedService();
         final FetchTrusteeRequest request = new FetchTrusteeRequest();
 

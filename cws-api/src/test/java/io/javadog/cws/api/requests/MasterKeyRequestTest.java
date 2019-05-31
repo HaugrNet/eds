@@ -29,10 +29,10 @@ import org.junit.jupiter.api.Test;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-public final class MasterKeyRequestTest {
+final class MasterKeyRequestTest {
 
     @Test
-    public void testClass() {
+    void testClass() {
         final String secret = "secret";
         final String url = "https://my.super.secret.url/to/a/master/key";
 
@@ -47,7 +47,7 @@ public final class MasterKeyRequestTest {
     }
 
     @Test
-    public void testClassflow() {
+    void testClassflow() {
         final String secret = "secret";
         final MasterKeyRequest request = new MasterKeyRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
@@ -60,7 +60,7 @@ public final class MasterKeyRequestTest {
     }
 
     @Test
-    public void testEmptyClass() {
+    void testEmptyClass() {
         final MasterKeyRequest request = new MasterKeyRequest();
 
         final Map<String, String> errors = request.validate();
@@ -71,7 +71,7 @@ public final class MasterKeyRequestTest {
     }
 
     @Test
-    public void testSettingBothSecretAndUrl() {
+    void testSettingBothSecretAndUrl() {
         final MasterKeyRequest request = new MasterKeyRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
         request.setCredential(convert(Constants.ADMIN_ACCOUNT));
@@ -85,7 +85,7 @@ public final class MasterKeyRequestTest {
     }
 
     @Test
-    public void testInvalidSecret() {
+    void testInvalidSecret() {
         final MasterKeyRequest request = new MasterKeyRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
         request.setCredential(convert(Constants.ADMIN_ACCOUNT));
@@ -97,7 +97,7 @@ public final class MasterKeyRequestTest {
     }
 
     @Test
-    public void testValidHttpUrl() {
+    void testValidHttpUrl() {
         final MasterKeyRequest request = new MasterKeyRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
         request.setCredential(convert(Constants.ADMIN_ACCOUNT));
@@ -108,7 +108,7 @@ public final class MasterKeyRequestTest {
     }
 
     @Test
-    public void testValidFileUrl() {
+    void testValidFileUrl() {
         final MasterKeyRequest request = new MasterKeyRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
         request.setCredential(convert(Constants.ADMIN_ACCOUNT));
@@ -119,7 +119,7 @@ public final class MasterKeyRequestTest {
     }
 
     @Test
-    public void testEmptyProtocolUrl() {
+    void testEmptyProtocolUrl() {
         final MasterKeyRequest request = new MasterKeyRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
         request.setCredential(convert(Constants.ADMIN_ACCOUNT));
@@ -131,7 +131,7 @@ public final class MasterKeyRequestTest {
     }
 
     @Test
-    public void testInvalidProtocolUrl() {
+    void testInvalidProtocolUrl() {
         final MasterKeyRequest request = new MasterKeyRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
         request.setCredential(convert(Constants.ADMIN_ACCOUNT));
@@ -143,7 +143,7 @@ public final class MasterKeyRequestTest {
     }
 
     @Test
-    public void testMissingProtocolUrl() {
+    void testMissingProtocolUrl() {
         final MasterKeyRequest request = new MasterKeyRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
         request.setCredential(convert(Constants.ADMIN_ACCOUNT));
@@ -155,7 +155,7 @@ public final class MasterKeyRequestTest {
     }
 
     @Test
-    public void testInvalidPathUrl() {
+    void testInvalidPathUrl() {
         final MasterKeyRequest request = new MasterKeyRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
         request.setCredential(convert(Constants.ADMIN_ACCOUNT));

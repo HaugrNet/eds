@@ -28,10 +28,10 @@ import org.junit.jupiter.api.Test;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-public final class SignatureTest {
+final class SignatureTest {
 
     @Test
-    public void testClassflow() {
+    void testClassflow() {
         final String checksum = UUID.randomUUID().toString();
         final Date expires = new Date(123L);
         final Long verifications = 1L;
@@ -53,7 +53,7 @@ public final class SignatureTest {
     }
 
     @Test
-    public void testStandardMethods() {
+    void testStandardMethods() {
         final Signature signature = new Signature();
         final Signature sameSignature = new Signature();
         final Signature emptySignature = new Signature();

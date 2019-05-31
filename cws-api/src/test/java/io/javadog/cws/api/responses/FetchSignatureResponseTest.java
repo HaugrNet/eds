@@ -30,10 +30,10 @@ import org.junit.jupiter.api.Test;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-public final class FetchSignatureResponseTest {
+final class FetchSignatureResponseTest {
 
     @Test
-    public void testClassflow() {
+    void testClassflow() {
         final List<Signature> signatures = new ArrayList<>(1);
         signatures.add(new Signature());
 
@@ -47,7 +47,7 @@ public final class FetchSignatureResponseTest {
     }
 
     @Test
-    public void testError() {
+    void testError() {
         final String msg = "FetchSignature Request failed due to Verification Problems.";
         final FetchSignatureResponse response = new FetchSignatureResponse(ReturnCode.VERIFICATION_WARNING, msg);
 

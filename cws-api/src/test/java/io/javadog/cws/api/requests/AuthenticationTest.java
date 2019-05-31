@@ -30,12 +30,12 @@ import org.junit.jupiter.api.Test;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-public final class AuthenticationTest {
+final class AuthenticationTest {
 
     private static final byte[] CREDENTIAL = {};
 
     @Test
-    public void testClassflow() {
+    void testClassflow() {
         final String name = "Authentication Name";
         final String credentials = "Member Passphrase";
         final CredentialType type = CredentialType.SIGNATURE;
@@ -57,7 +57,7 @@ public final class AuthenticationTest {
     }
 
     @Test
-    public void testEmptyClass() {
+    void testEmptyClass() {
         final Authentication authentication = new Authentication();
         authentication.setAccountName("");
         authentication.setCredentialType(null);
@@ -69,7 +69,7 @@ public final class AuthenticationTest {
     }
 
     @Test
-    public void testSessionEmptyCredential() {
+    void testSessionEmptyCredential() {
         final Authentication authentication = new Authentication();
         authentication.setCredentialType(CredentialType.SESSION);
 
@@ -79,7 +79,7 @@ public final class AuthenticationTest {
     }
 
     @Test
-    public void testEmptyClassEmptyCredential() {
+    void testEmptyClassEmptyCredential() {
         final byte[] credential = CREDENTIAL;
         final Authentication authentication = new Authentication();
         authentication.setAccountName("");
@@ -93,7 +93,7 @@ public final class AuthenticationTest {
     }
 
     @Test
-    public void testMissingCredentialTypePassphrase() {
+    void testMissingCredentialTypePassphrase() {
         final Authentication authentication = new Authentication();
         authentication.setAccountName("AccountName");
         final Map<String, String> errors = authentication.validate();
@@ -104,7 +104,7 @@ public final class AuthenticationTest {
     }
 
     @Test
-    public void testMissingCredentialTypeSession() {
+    void testMissingCredentialTypeSession() {
         final Authentication authentication = new Authentication();
         final Map<String, String> errors = authentication.validate();
 

@@ -29,10 +29,10 @@ import org.junit.jupiter.api.Test;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-public final class TrusteeTest {
+final class TrusteeTest {
 
     @Test
-    public void testClassflow() {
+    void testClassflow() {
         final String memberId = UUID.randomUUID().toString();
         final String publicKey = UUID.randomUUID().toString();
         final String circleId = UUID.randomUUID().toString();
@@ -57,7 +57,7 @@ public final class TrusteeTest {
     }
 
     @Test
-    public void testStandardMethods() {
+    void testStandardMethods() {
         final Trustee trustee = new Trustee();
         final Trustee sameTrustee = new Trustee();
         final Trustee emptyTrustee = new Trustee();

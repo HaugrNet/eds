@@ -16,23 +16,23 @@
  */
 package io.javadog.cws.rest;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.requests.SanityRequest;
 import io.javadog.cws.core.DatabaseSetup;
 import io.javadog.cws.core.ManagementBean;
 import javax.ws.rs.core.Response;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Kim Jensen
  * @since CWS 1.0
  */
-public final class SanityServiceTest extends DatabaseSetup {
+final class SanityServiceTest extends DatabaseSetup {
 
     @Test
-    public void testSanitized() {
+    void testSanitized() {
         final SanityService service = prepareService();
         final SanityRequest request = new SanityRequest();
 
@@ -41,7 +41,7 @@ public final class SanityServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testFlawedSanitized() {
+    void testFlawedSanitized() {
         final SanityService service = prepareFlawedService();
         final SanityRequest request = new SanityRequest();
 

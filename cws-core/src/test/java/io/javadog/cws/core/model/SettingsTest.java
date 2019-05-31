@@ -16,9 +16,9 @@
  */
 package io.javadog.cws.core.model;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.javadog.cws.core.DatabaseSetup;
 import io.javadog.cws.core.enums.HashAlgorithm;
@@ -28,16 +28,16 @@ import java.util.EnumSet;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Kim Jensen
  * @since CWS 1.0
  */
-public final class SettingsTest extends DatabaseSetup {
+final class SettingsTest extends DatabaseSetup {
 
     @Test
-    public void testSettings() {
+    void testSettings() {
         final Settings mySettings = newSettings();
 
         final Map<String, String> existing = mySettings.get();
@@ -49,7 +49,7 @@ public final class SettingsTest extends DatabaseSetup {
     }
 
     @Test
-    public void testReadingDefaultSettings() {
+    void testReadingDefaultSettings() {
         final Settings mySettings = newSettings();
 
         final Set<KeyAlgorithm> aes = prepareSetOf(KeyAlgorithm.Type.SYMMETRIC);
@@ -66,7 +66,7 @@ public final class SettingsTest extends DatabaseSetup {
     }
 
     @Test
-    public void testUpdateDefaultSettings() {
+    void testUpdateDefaultSettings() {
         final Settings mySettings = newSettings();
 
         mySettings.set(StandardSetting.SYMMETRIC_ALGORITHM, KeyAlgorithm.AES_CBC_192.name());
@@ -110,7 +110,7 @@ public final class SettingsTest extends DatabaseSetup {
     }
 
     @Test
-    public void testShowOtherMemberInformation() {
+    void testShowOtherMemberInformation() {
         final Settings mySettings = newSettings();
         assertTrue(mySettings.getShareTrustees());
         mySettings.set(StandardSetting.SHOW_TRUSTEES, "false");

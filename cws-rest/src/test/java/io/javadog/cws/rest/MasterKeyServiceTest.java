@@ -16,7 +16,7 @@
  */
 package io.javadog.cws.rest;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
@@ -24,16 +24,16 @@ import io.javadog.cws.api.requests.MasterKeyRequest;
 import io.javadog.cws.core.DatabaseSetup;
 import io.javadog.cws.core.ManagementBean;
 import javax.ws.rs.core.Response;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Kim Jensen
  * @since CWS 1.0
  */
-public final class MasterKeyServiceTest extends DatabaseSetup {
+final class MasterKeyServiceTest extends DatabaseSetup {
 
     @Test
-    public void testMasterKey() {
+    void testMasterKey() {
         final MasterKeyService service = prepareService();
         final MasterKeyRequest request = prepareRequest(MasterKeyRequest.class, Constants.ADMIN_ACCOUNT);
         request.setSecret(Constants.ADMIN_ACCOUNT.getBytes(settings.getCharset()));
@@ -43,7 +43,7 @@ public final class MasterKeyServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testFlawedMasterKey() {
+    void testFlawedMasterKey() {
         final MasterKeyService service = prepareFlawedService();
         final MasterKeyRequest request = prepareRequest(MasterKeyRequest.class, Constants.ADMIN_ACCOUNT);
         request.setSecret(Constants.ADMIN_ACCOUNT.getBytes(settings.getCharset()));

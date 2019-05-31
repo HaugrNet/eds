@@ -16,11 +16,12 @@
  */
 package io.javadog.cws.core.model.entities;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.MemberRole;
@@ -33,16 +34,16 @@ import java.util.List;
 import java.util.UUID;
 import javax.persistence.PersistenceException;
 import javax.persistence.Query;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Kim Jensen
  * @since CWS 1.0
  */
-public final class MemberEntityTest extends DatabaseSetup {
+final class MemberEntityTest extends DatabaseSetup {
 
     @Test
-    public void testEntity() {
+    void testEntity() {
         final CWSKeyPair keyPair = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
         final String externalId = UUID.randomUUID().toString();
         final MemberEntity entity = prepareMember(externalId, "New Account Name", "My Super Secret", keyPair, MemberRole.STANDARD);
@@ -63,15 +64,16 @@ public final class MemberEntityTest extends DatabaseSetup {
         assertNull(found.getSessionExpire());
     }
 
-    @Test(expected = PersistenceException.class)
-    public void testPersistDetachedEntity() {
+    @Test
+    void testPersistDetachedEntity() {
         final MemberEntity entity = new MemberEntity();
         entity.setId(12341234L);
-        entityManager.persist(entity);
+
+        assertThrows(PersistenceException.class, () -> entityManager.persist(entity));
     }
 
     @Test
-    public void testUpdateEntity() {
+    void testUpdateEntity() {
         final String credential = "Updateable Account";
         final KeyAlgorithm algorithm = settings.getAsymmetricAlgorithm();
         final String publicKey = UUID.randomUUID().toString();
@@ -85,7 +87,7 @@ public final class MemberEntityTest extends DatabaseSetup {
     }
 
     @Test
-    public void testAddContent() {
+    void testAddContent() {
         final String credential = "Account Name";
         final KeyAlgorithm algorithm = settings.getAsymmetricAlgorithm();
         final String publicKey = UUID.randomUUID().toString();
@@ -117,7 +119,7 @@ public final class MemberEntityTest extends DatabaseSetup {
     }
 
     @Test
-    public void testDaoFindMemberAdmin() {
+    void testDaoFindMemberAdmin() {
         final MemberEntity admin = dao.findMemberByName(Constants.ADMIN_ACCOUNT);
         assertNotNull(admin);
         assertEquals(Constants.ADMIN_ACCOUNT, admin.getName());
@@ -128,7 +130,7 @@ public final class MemberEntityTest extends DatabaseSetup {
     }
 
     @Test
-    public void testDaoFindMemberUnknown() {
+    void testDaoFindMemberUnknown() {
         final MemberEntity nullEntity = dao.find(MemberEntity.class, UUID.randomUUID().toString());
         assertNull(nullEntity);
 
@@ -137,7 +139,7 @@ public final class MemberEntityTest extends DatabaseSetup {
     }
 
     @Test
-    public void testFindAll() {
+    void testFindAll() {
         final String jql = "select m from MemberEntity m";
         final Query query = entityManager.createQuery(jql);
         final List<MemberEntity> found = CommonDao.findList(query);
@@ -156,7 +158,7 @@ public final class MemberEntityTest extends DatabaseSetup {
      * generation of test data for the database is working.
      */
     @Test
-    public void testPreparingTestData() {
+    void testPreparingTestData() {
         final GenerateTestData generator = new GenerateTestData();
         final String sql = generator.prepareTestData();
         assertTrue(sql.length() > 19000);

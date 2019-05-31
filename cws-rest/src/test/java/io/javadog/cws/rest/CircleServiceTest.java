@@ -16,7 +16,7 @@
  */
 package io.javadog.cws.rest;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.requests.FetchCircleRequest;
@@ -24,16 +24,16 @@ import io.javadog.cws.api.requests.ProcessCircleRequest;
 import io.javadog.cws.core.DatabaseSetup;
 import io.javadog.cws.core.ManagementBean;
 import javax.ws.rs.core.Response;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Kim Jensen
  * @since CWS 1.0
  */
-public final class CircleServiceTest extends DatabaseSetup {
+final class CircleServiceTest extends DatabaseSetup {
 
     @Test
-    public void testCreate() {
+    void testCreate() {
         final CircleService service = prepareService();
         final ProcessCircleRequest request = new ProcessCircleRequest();
 
@@ -42,7 +42,7 @@ public final class CircleServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testFlawedCreate() {
+    void testFlawedCreate() {
         final CircleService service = prepareFlawedService();
         final ProcessCircleRequest request = new ProcessCircleRequest();
 
@@ -51,7 +51,7 @@ public final class CircleServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testUpdatw() {
+    void testUpdatw() {
         final CircleService service = prepareService();
         final ProcessCircleRequest request = new ProcessCircleRequest();
 
@@ -60,7 +60,7 @@ public final class CircleServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testFlawedUpdate() {
+    void testFlawedUpdate() {
         final CircleService service = prepareFlawedService();
         final ProcessCircleRequest request = new ProcessCircleRequest();
 
@@ -69,7 +69,7 @@ public final class CircleServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testDelete() {
+    void testDelete() {
         final CircleService service = prepareService();
         final ProcessCircleRequest request = new ProcessCircleRequest();
 
@@ -78,7 +78,7 @@ public final class CircleServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testFlawedDelete() {
+    void testFlawedDelete() {
         final CircleService service = prepareFlawedService();
         final ProcessCircleRequest request = new ProcessCircleRequest();
 
@@ -87,7 +87,7 @@ public final class CircleServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testFetch() {
+    void testFetch() {
         final CircleService service = prepareService();
         final FetchCircleRequest request = new FetchCircleRequest();
 
@@ -96,7 +96,7 @@ public final class CircleServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testFlawedFetch() {
+    void testFlawedFetch() {
         final CircleService service = prepareFlawedService();
         final FetchCircleRequest request = new FetchCircleRequest();
 

@@ -31,10 +31,10 @@ import org.junit.jupiter.api.Test;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-public final class SanityRequestTest {
+final class SanityRequestTest {
 
     @Test
-    public void testClassflow() {
+    void testClassflow() {
         final String circleId = UUID.randomUUID().toString();
         final Date since = new Date();
 
@@ -53,7 +53,7 @@ public final class SanityRequestTest {
     }
 
     @Test
-    public void testEmptyClass() {
+    void testEmptyClass() {
         final SanityRequest sanityRequest = new SanityRequest();
         final Map<String, String> errors = sanityRequest.validate();
 
@@ -63,7 +63,7 @@ public final class SanityRequestTest {
     }
 
     @Test
-    public void testClassWithInvalidValues() {
+    void testClassWithInvalidValues() {
         final String circleId = "Invalid Circle Id";
 
         final SanityRequest sanityRequest = new SanityRequest();

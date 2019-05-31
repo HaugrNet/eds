@@ -29,10 +29,10 @@ import org.junit.jupiter.api.Test;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-public final class SettingRequestTest {
+final class SettingRequestTest {
 
     @Test
-    public void testClassflow() {
+    void testClassflow() {
         final Map<String, String> settings = new HashMap<>();
         settings.put("Setting1", "Value1");
 
@@ -50,7 +50,7 @@ public final class SettingRequestTest {
     }
 
     @Test
-    public void testEmptyClass() {
+    void testEmptyClass() {
         final SettingRequest request = new SettingRequest();
 
         final Map<String, String> errors = request.validate();

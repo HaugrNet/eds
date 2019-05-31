@@ -16,9 +16,9 @@
  */
 package io.javadog.cws.soap;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.javadog.cws.api.common.Action;
 import io.javadog.cws.api.common.Constants;
@@ -37,16 +37,16 @@ import io.javadog.cws.api.responses.ProcessDataResponse;
 import io.javadog.cws.api.responses.ProcessDataTypeResponse;
 import io.javadog.cws.api.responses.SignResponse;
 import io.javadog.cws.api.responses.VerifyResponse;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Kim Jensen
  * @since CWS 1.0
  */
-public final class ShareServiceTest extends BeanSetup {
+final class ShareServiceTest extends BeanSetup {
 
     @Test
-    public void testProcessDataType() {
+    void testProcessDataType() {
         final ShareService service = prepareShareService();
         final ProcessDataTypeRequest request = prepareRequest(ProcessDataTypeRequest.class, Constants.ADMIN_ACCOUNT);
         request.setAction(Action.PROCESS);
@@ -62,7 +62,7 @@ public final class ShareServiceTest extends BeanSetup {
     }
 
     @Test
-    public void testProcessDataTypeWithNullRequest() {
+    void testProcessDataTypeWithNullRequest() {
         final ShareService service = prepareShareService();
         final ProcessDataTypeRequest request = null;
 
@@ -71,7 +71,7 @@ public final class ShareServiceTest extends BeanSetup {
     }
 
     @Test
-    public void testProcessDataTypeWithEmptyRequest() {
+    void testProcessDataTypeWithEmptyRequest() {
         final ShareService service = prepareShareService();
         final ProcessDataTypeRequest request = new ProcessDataTypeRequest();
 
@@ -80,7 +80,7 @@ public final class ShareServiceTest extends BeanSetup {
     }
 
     @Test
-    public void testFlawedProcessDataType() {
+    void testFlawedProcessDataType() {
         final ShareService service = prepareFlawedShareService();
         final ProcessDataTypeRequest request = new ProcessDataTypeRequest();
 
@@ -89,7 +89,7 @@ public final class ShareServiceTest extends BeanSetup {
     }
 
     @Test
-    public void testFetchDataTypes() {
+    void testFetchDataTypes() {
         final ShareService service = prepareShareService();
         final FetchDataTypeRequest request = prepareRequest(FetchDataTypeRequest.class, MEMBER_1);
 
@@ -104,7 +104,7 @@ public final class ShareServiceTest extends BeanSetup {
     }
 
     @Test
-    public void testFetchDataTypesWithNullRequest() {
+    void testFetchDataTypesWithNullRequest() {
         final ShareService service = prepareShareService();
         final FetchDataTypeRequest request = null;
 
@@ -113,7 +113,7 @@ public final class ShareServiceTest extends BeanSetup {
     }
 
     @Test
-    public void testFetchDataTypesWithEmptyRequest() {
+    void testFetchDataTypesWithEmptyRequest() {
         final ShareService service = prepareShareService();
         final FetchDataTypeRequest request = new FetchDataTypeRequest();
 
@@ -122,7 +122,7 @@ public final class ShareServiceTest extends BeanSetup {
     }
 
     @Test
-    public void testFlawedFetchDataTypes() {
+    void testFlawedFetchDataTypes() {
         final ShareService service = prepareFlawedShareService();
         final FetchDataTypeRequest request = new FetchDataTypeRequest();
 
@@ -131,7 +131,7 @@ public final class ShareServiceTest extends BeanSetup {
     }
 
     @Test
-    public void testProcessData() {
+    void testProcessData() {
         final ShareService service = prepareShareService();
         final ProcessDataRequest request = prepareRequest(ProcessDataRequest.class, MEMBER_1);
         request.setAction(Action.ADD);
@@ -147,7 +147,7 @@ public final class ShareServiceTest extends BeanSetup {
     }
 
     @Test
-    public void testProcessDataWithNullRequest() {
+    void testProcessDataWithNullRequest() {
         final ShareService service = prepareShareService();
         final ProcessDataRequest request = null;
 
@@ -156,7 +156,7 @@ public final class ShareServiceTest extends BeanSetup {
     }
 
     @Test
-    public void testProcessDataWithEmptyRequest() {
+    void testProcessDataWithEmptyRequest() {
         final ShareService service = prepareShareService();
         final ProcessDataRequest request = new ProcessDataRequest();
 
@@ -165,7 +165,7 @@ public final class ShareServiceTest extends BeanSetup {
     }
 
     @Test
-    public void testFlawedProcessData() {
+    void testFlawedProcessData() {
         final ShareService service = prepareFlawedShareService();
         final ProcessDataRequest request = new ProcessDataRequest();
 
@@ -174,7 +174,7 @@ public final class ShareServiceTest extends BeanSetup {
     }
 
     @Test
-    public void testFetchData() {
+    void testFetchData() {
         final ShareService service = prepareShareService();
         final FetchDataRequest request = prepareRequest(FetchDataRequest.class, MEMBER_1);
         request.setCircleId(CIRCLE_1_ID);
@@ -186,7 +186,7 @@ public final class ShareServiceTest extends BeanSetup {
     }
 
     @Test
-    public void testFetchDataWithNullRequest() {
+    void testFetchDataWithNullRequest() {
         final ShareService service = prepareShareService();
         final FetchDataRequest request = null;
 
@@ -195,7 +195,7 @@ public final class ShareServiceTest extends BeanSetup {
     }
 
     @Test
-    public void testFetchDataWithEmptyRequest() {
+    void testFetchDataWithEmptyRequest() {
         final ShareService service = prepareShareService();
         final FetchDataRequest request = new FetchDataRequest();
 
@@ -204,7 +204,7 @@ public final class ShareServiceTest extends BeanSetup {
     }
 
     @Test
-    public void testFlawedFetchData() {
+    void testFlawedFetchData() {
         final ShareService service = prepareFlawedShareService();
         final FetchDataRequest request = new FetchDataRequest();
 
@@ -213,7 +213,7 @@ public final class ShareServiceTest extends BeanSetup {
     }
 
     @Test
-    public void testSignatures() {
+    void testSignatures() {
         final ShareService service = prepareShareService();
         final SignRequest signRequest = prepareRequest(SignRequest.class, MEMBER_1);
         final byte[] data = "alfa".getBytes(settings.getCharset());
@@ -229,7 +229,7 @@ public final class ShareServiceTest extends BeanSetup {
     }
 
     @Test
-    public void testSignWithNullRequest() {
+    void testSignWithNullRequest() {
         final ShareService service = prepareShareService();
         final SignRequest request = null;
 
@@ -238,7 +238,7 @@ public final class ShareServiceTest extends BeanSetup {
     }
 
     @Test
-    public void testSignWithEmptyRequest() {
+    void testSignWithEmptyRequest() {
         final ShareService service = prepareShareService();
         final SignRequest request = new SignRequest();
 
@@ -247,7 +247,7 @@ public final class ShareServiceTest extends BeanSetup {
     }
 
     @Test
-    public void testFlawedSign() {
+    void testFlawedSign() {
         final ShareService service = prepareFlawedShareService();
         final SignRequest request = new SignRequest();
 
@@ -256,7 +256,7 @@ public final class ShareServiceTest extends BeanSetup {
     }
 
     @Test
-    public void testVerifyWithNullRequest() {
+    void testVerifyWithNullRequest() {
         final ShareService service = prepareShareService();
         final VerifyRequest request = null;
 
@@ -265,7 +265,7 @@ public final class ShareServiceTest extends BeanSetup {
     }
 
     @Test
-    public void testVerifyWithEmptyRequest() {
+    void testVerifyWithEmptyRequest() {
         final ShareService service = prepareShareService();
         final VerifyRequest request = new VerifyRequest();
 
@@ -274,7 +274,7 @@ public final class ShareServiceTest extends BeanSetup {
     }
 
     @Test
-    public void testFlawedVerify() {
+    void testFlawedVerify() {
         final ShareService service = prepareFlawedShareService();
         final VerifyRequest request = new VerifyRequest();
 
@@ -283,7 +283,7 @@ public final class ShareServiceTest extends BeanSetup {
     }
 
     @Test
-    public void testFetchSignatures() {
+    void testFetchSignatures() {
         final ShareService service = prepareShareService();
         final FetchSignatureRequest request = prepareRequest(FetchSignatureRequest.class, MEMBER_1);
 
@@ -294,7 +294,7 @@ public final class ShareServiceTest extends BeanSetup {
     }
 
     @Test
-    public void testFetchSignaturesWithNullRequest() {
+    void testFetchSignaturesWithNullRequest() {
         final ShareService service = prepareShareService();
         final FetchSignatureRequest request = null;
 
@@ -303,7 +303,7 @@ public final class ShareServiceTest extends BeanSetup {
     }
 
     @Test
-    public void testFetchSignaturesWithEmptyRequest() {
+    void testFetchSignaturesWithEmptyRequest() {
         final ShareService service = prepareShareService();
         final FetchSignatureRequest request = new FetchSignatureRequest();
 
@@ -312,7 +312,7 @@ public final class ShareServiceTest extends BeanSetup {
     }
 
     @Test
-    public void testFlawedFetchSignatures() {
+    void testFlawedFetchSignatures() {
         final ShareService service = prepareFlawedShareService();
         final FetchSignatureRequest request = new FetchSignatureRequest();
 

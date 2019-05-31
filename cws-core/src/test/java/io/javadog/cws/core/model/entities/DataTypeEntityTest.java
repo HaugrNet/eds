@@ -16,20 +16,20 @@
  */
 package io.javadog.cws.core.model.entities;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import io.javadog.cws.core.DatabaseSetup;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Kim Jensen
  * @since CWS 1.0
  */
-public final class DataTypeEntityTest extends DatabaseSetup {
+final class DataTypeEntityTest extends DatabaseSetup {
 
     @Test
-    public void testEntity() {
+    void testEntity() {
         final DataTypeEntity entity = new DataTypeEntity();
         entity.setName("Name");
         entity.setType("Type");
@@ -43,7 +43,7 @@ public final class DataTypeEntityTest extends DatabaseSetup {
     }
 
     @Test
-    public void testUpdateCircle() {
+    void testUpdateCircle() {
         final DataTypeEntity entity = new DataTypeEntity();
         entity.setName("Name 1");
         entity.setType("Type 1");

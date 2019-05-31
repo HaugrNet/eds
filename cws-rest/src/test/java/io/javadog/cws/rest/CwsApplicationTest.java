@@ -16,18 +16,18 @@
  */
 package io.javadog.cws.rest;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Kim Jensen
  * @since CWS 1.0
  */
-public final class CwsApplicationTest {
+final class CwsApplicationTest {
 
     @Test
-    public void testApplication() {
+    void testApplication() {
         final CwsApplication application = new CwsApplication();
         assertEquals(11, application.getClasses().size());
     }

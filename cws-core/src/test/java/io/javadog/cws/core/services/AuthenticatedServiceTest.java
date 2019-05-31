@@ -10,15 +10,15 @@
  */
 package io.javadog.cws.core.services;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.requests.Authentication;
 import io.javadog.cws.api.responses.CwsResponse;
 import io.javadog.cws.core.DatabaseSetup;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * <p>This Test Class, is testing the Authenticated Service Class.</p>
@@ -26,10 +26,10 @@ import org.junit.Test;
  * @author Kim Jensen
  * @since CWS 1.1
  */
-public final class AuthenticatedServiceTest extends DatabaseSetup {
+final class AuthenticatedServiceTest extends DatabaseSetup {
 
     @Test
-    public void testAuthenticate() {
+    void testAuthenticate() {
         final AuthenticatedService service = new AuthenticatedService(settings, entityManager);
         final Authentication request = prepareRequest(Authentication.class, MEMBER_1);
         final CwsResponse response = service.perform(request);

@@ -28,10 +28,10 @@ import org.junit.jupiter.api.Test;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-public final class CircleTest {
+final class CircleTest {
 
     @Test
-    public void testClassflow() {
+    void testClassflow() {
         final String id = UUID.randomUUID().toString();
         final String name = "Circle Name";
         final String key = UUID.randomUUID().toString();
@@ -50,7 +50,7 @@ public final class CircleTest {
     }
 
     @Test
-    public void testToString() {
+    void testToString() {
         final Circle circle = new Circle();
         final Circle sameCircle = new Circle();
         final Circle emptyCircle = new Circle();

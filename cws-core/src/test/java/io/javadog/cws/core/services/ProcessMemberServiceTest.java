@@ -16,11 +16,11 @@
  */
 package io.javadog.cws.core.services;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.javadog.cws.api.common.Action;
 import io.javadog.cws.api.common.Constants;
@@ -43,16 +43,16 @@ import io.javadog.cws.core.exceptions.CWSException;
 import io.javadog.cws.core.model.Settings;
 import java.util.Base64;
 import java.util.UUID;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Kim Jensen
  * @since CWS 1.0
  */
-public final class ProcessMemberServiceTest extends DatabaseSetup {
+final class ProcessMemberServiceTest extends DatabaseSetup {
 
     @Test
-    public void testNullRequest() {
+    void testNullRequest() {
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
         final ProcessMemberRequest request = null;
 
@@ -62,7 +62,7 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testAddingWithoutRole() {
+    void testAddingWithoutRole() {
         final String account = "Created Member";
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
         final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
@@ -76,7 +76,7 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testAddingWithAdminRole() {
+    void testAddingWithAdminRole() {
         final String account = "Created Member";
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
         final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
@@ -91,7 +91,7 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testAddingWithStandardRole() {
+    void testAddingWithStandardRole() {
         final String account = "Created Member";
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
         final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
@@ -106,7 +106,7 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testAddingAsMember() {
+    void testAddingAsMember() {
         final String account = "Member Added Member";
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
         final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, MEMBER_1);
@@ -121,7 +121,7 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testAddingWithPublicKey() {
+    void testAddingWithPublicKey() {
         final String account = "Member with PublicKey";
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
         final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
@@ -150,7 +150,7 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testAddingWithExistingAccountName() {
+    void testAddingWithExistingAccountName() {
         final String account = MEMBER_4;
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
         final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
@@ -164,7 +164,7 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testAlterAccount() {
+    void testAlterAccount() {
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
         final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
         request.setAction(Action.ALTER);
@@ -177,7 +177,7 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testAlterSelf() {
+    void testAlterSelf() {
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
         final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
         request.setAction(Action.ALTER);
@@ -190,7 +190,7 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testAlterAccountAsMember() {
+    void testAlterAccountAsMember() {
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
         final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, MEMBER_3);
         request.setAction(Action.ALTER);
@@ -203,7 +203,7 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testProcessingSelf() {
+    void testProcessingSelf() {
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
         final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, MEMBER_5);
         request.setAction(Action.UPDATE);
@@ -217,7 +217,7 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testProcessSelfPasswordUpdateWithSession() {
+    void testProcessSelfPasswordUpdateWithSession() {
         final String session = UUID.randomUUID().toString();
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
         final ProcessMemberRequest loginRequest = prepareLoginRequest(MEMBER_5, session);
@@ -235,7 +235,7 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testInvitation() {
+    void testInvitation() {
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
         final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
         request.setAction(Action.INVITE);
@@ -260,7 +260,7 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testNullNewCredentialForInvitation() {
+    void testNullNewCredentialForInvitation() {
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
         final ProcessMemberRequest request = new ProcessMemberRequest();
         request.setAccountName("null Invitee");
@@ -274,7 +274,7 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testEmptyNewCredentialForInvitation() {
+    void testEmptyNewCredentialForInvitation() {
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
         final ProcessMemberRequest request = new ProcessMemberRequest();
         request.setAccountName("empty Invitee");
@@ -289,7 +289,7 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testInvitationWithInvalidSignature() {
+    void testInvitationWithInvalidSignature() {
         final String bogusSignature = "T+OoZiBpm36P868XUZYWFsW1jUFlD31x+FeQuDjcm4DmmIk+qWd8KuUzLdnETRPIxo/OuYLcpvFiPxMf0v78feiw/yVVV5+1xjO+FR/KYgB4JTaJ6p0RIEpS3rjs27bY+1OYclsk4MPRKbxZN06ZFHlSY4btk1G4ML7x0/iUCLBbOO2y3S4JZpKwAR7kAyhVeqyi8qKi13o+7z/J0KP2EhHrF8+2y3z63TKLyClZRrAhvy3/g/k0q7MccFOKDGsxxIpe2jfOHtxLEYfbgrdly/fZHEQL5vbbf/LbQ7MISfcwXSLtJMD0COXsm/V1nkmI/ficjskvNuUj+h739KEmuQ==";
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
         final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
@@ -312,7 +312,7 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testInvitationWithInvalidSignature2() {
+    void testInvitationWithInvalidSignature2() {
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
         final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
         request.setAction(Action.INVITE);
@@ -334,7 +334,7 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testInvitationWithoutPendingInvitation() {
+    void testInvitationWithoutPendingInvitation() {
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
         final ProcessMemberRequest request = new ProcessMemberRequest();
         request.setAccountName(MEMBER_1);
@@ -349,7 +349,7 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testInvitationWithoutAccount() {
+    void testInvitationWithoutAccount() {
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
         final ProcessMemberRequest request = new ProcessMemberRequest();
         request.setAccountName("Who knows");
@@ -365,7 +365,7 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testInviteExistingAccount() {
+    void testInviteExistingAccount() {
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
         final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
         request.setAction(Action.INVITE);
@@ -377,7 +377,7 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testInvitingWithoutPermission() {
+    void testInvitingWithoutPermission() {
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
         final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, MEMBER_1);
         request.setAction(Action.INVITE);
@@ -389,7 +389,7 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testLoginWithSession() {
+    void testLoginWithSession() {
         final String sessionKey = "sessionKey";
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
         final ProcessMemberRequest loginRequest = prepareLoginRequest(MEMBER_1, sessionKey);
@@ -412,7 +412,7 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testLogoutMissingSession() {
+    void testLogoutMissingSession() {
         final String sessionKey = UUID.randomUUID().toString();
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
         final ProcessMemberRequest request = prepareLogoutRequest(sessionKey);
@@ -423,7 +423,7 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testLogoutExpiredSession() {
+    void testLogoutExpiredSession() {
         final Settings mySettings = newSettings();
         mySettings.set(StandardSetting.SESSION_TIMEOUT.getKey(), "-1");
         final String sessionKey = UUID.randomUUID().toString();
@@ -440,7 +440,7 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testProcessSelf() {
+    void testProcessSelf() {
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
         final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, MEMBER_1);
         request.setAction(Action.UPDATE);
@@ -453,7 +453,7 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testProcessSelfChangeAccountNameToExisting() {
+    void testProcessSelfChangeAccountNameToExisting() {
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
         final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, MEMBER_1);
         request.setAction(Action.UPDATE);
@@ -473,7 +473,7 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
      * read out both before and after the change.
      */
     @Test
-    public void testUpdatePassphraseWithDataVerification() {
+    void testUpdatePassphraseWithDataVerification() {
         final String dataId = addData();
         final byte[] data1 = fetchData(dataId);
 
@@ -496,7 +496,7 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testInvalidateSelf() {
+    void testInvalidateSelf() {
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
         final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, MEMBER_4);
         request.setAction(Action.INVALIDATE);
@@ -512,7 +512,7 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testInvalidateAdmin() {
+    void testInvalidateAdmin() {
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
         final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
         request.setAction(Action.INVALIDATE);
@@ -523,7 +523,7 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testDeleteMember() {
+    void testDeleteMember() {
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
         final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
         request.setAction(Action.DELETE);
@@ -535,7 +535,7 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testDeleteMemberAsMember() {
+    void testDeleteMemberAsMember() {
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
         final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, MEMBER_5);
         request.setAction(Action.DELETE);
@@ -547,7 +547,7 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testDeleteUnknownAccount() {
+    void testDeleteUnknownAccount() {
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
         final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
         request.setAction(Action.DELETE);
@@ -560,7 +560,7 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testDeleteSelf() {
+    void testDeleteSelf() {
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
         final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, MEMBER_3);
         request.setAction(Action.DELETE);
@@ -571,7 +571,7 @@ public final class ProcessMemberServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testDeleteAdmin() {
+    void testDeleteAdmin() {
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
         final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
         request.setAction(Action.DELETE);

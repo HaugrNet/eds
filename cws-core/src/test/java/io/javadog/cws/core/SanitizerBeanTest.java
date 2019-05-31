@@ -16,9 +16,9 @@
  */
 package io.javadog.cws.core;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.responses.ProcessDataResponse;
@@ -28,8 +28,12 @@ import io.javadog.cws.core.exceptions.CWSException;
 import io.javadog.cws.core.model.Settings;
 import io.javadog.cws.core.model.entities.DataEntity;
 import io.javadog.cws.core.services.ProcessDataService;
-import org.junit.Test;
-
+import java.io.Serializable;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
 import javax.ejb.EJBException;
 import javax.ejb.ScheduleExpression;
 import javax.ejb.Timer;
@@ -37,21 +41,16 @@ import javax.ejb.TimerConfig;
 import javax.ejb.TimerHandle;
 import javax.ejb.TimerService;
 import javax.persistence.Query;
-import java.io.Serializable;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Kim Jensen
  * @since CWS 1.0
  */
-public final class SanitizerBeanTest extends DatabaseSetup {
+final class SanitizerBeanTest extends DatabaseSetup {
 
     @Test
-    public void testStartupBeanWithSanitizeCheck() {
+    void testStartupBeanWithSanitizeCheck() {
         prepareInvalidData();
         prepareStartupBean("true");
 
@@ -59,8 +58,8 @@ public final class SanitizerBeanTest extends DatabaseSetup {
     }
 
     @Test
-    public void testStartupBeanWithEmptyVersionTable() {
-        final Query query = entityManager.createNativeQuery("delete from cws_versions");
+    void testStartupBeanWithEmptyVersionTable() {
+        final Query query = entityManager.createNativeQuery("delete from cws_versions v where v.id > 0");
         query.executeUpdate();
 
         final StartupBean bean = prepareStartupBean("true");
@@ -68,7 +67,7 @@ public final class SanitizerBeanTest extends DatabaseSetup {
     }
 
     @Test
-    public void testStartupBeanWithDifferentVersion() {
+    void testStartupBeanWithDifferentVersion() {
         final Query query = entityManager.createNativeQuery("insert into cws_versions (schema_version, cws_version, db_vendor) values (9999, '99.9.9', 'H2')");
         query.executeUpdate();
 
@@ -77,7 +76,7 @@ public final class SanitizerBeanTest extends DatabaseSetup {
     }
 
     @Test
-    public void testStartupBeanWithoutSanitizeCheck() {
+    void testStartupBeanWithoutSanitizeCheck() {
         prepareInvalidData();
         prepareStartupBean("false");
 
@@ -85,7 +84,7 @@ public final class SanitizerBeanTest extends DatabaseSetup {
     }
 
     @Test
-    public void testStartupBeanTimerService() {
+    void testStartupBeanTimerService() {
         prepareInvalidData();
         final SanitizerBean sanitizerBean = prepareSanitizeBean();
         final List<Long> idsBefore = sanitizerBean.findNextBatch(100);
@@ -99,7 +98,7 @@ public final class SanitizerBeanTest extends DatabaseSetup {
     }
 
     @Test
-    public void testSantizeBean() {
+    void testSantizeBean() {
         final SanitizerBean bean = prepareSanitizeBean();
         prepareInvalidData();
 
@@ -287,18 +286,18 @@ public final class SanitizerBeanTest extends DatabaseSetup {
 
     private void prepareInvalidData() {
         final ProcessDataService service = new ProcessDataService(settings, entityManager);
-        timeWarpChecksum(service.perform(prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "Valid Data1", 1048576)), new Date(1L), SanityStatus.OK);
+        timeWarpChecksum(service.perform(prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "Valid Data1", 1048576)), new Date(1L));
         falsifyChecksum(service.perform(prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "Invalidated Data1", 1048576)), new Date(2L), SanityStatus.OK);
         falsifyChecksum(service.perform(prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "Invalidated Data2", 524288)), new Date(), SanityStatus.OK);
-        timeWarpChecksum(service.perform(prepareAddDataRequest(MEMBER_1, CIRCLE_2_ID, "Valid Data2", 1048576)), new Date(3L), SanityStatus.OK);
+        timeWarpChecksum(service.perform(prepareAddDataRequest(MEMBER_1, CIRCLE_2_ID, "Valid Data2", 1048576)), new Date(3L));
         falsifyChecksum(service.perform(prepareAddDataRequest(MEMBER_1, CIRCLE_2_ID, "Invalidated Data3", 1048576)), new Date(4L), SanityStatus.OK);
         falsifyChecksum(service.perform(prepareAddDataRequest(MEMBER_1, CIRCLE_2_ID, "Invalidated Data4", 524288)), new Date(), SanityStatus.OK);
-        timeWarpChecksum(service.perform(prepareAddDataRequest(MEMBER_4, CIRCLE_3_ID, "Valid Data3", 1048576)), new Date(5L), SanityStatus.OK);
+        timeWarpChecksum(service.perform(prepareAddDataRequest(MEMBER_4, CIRCLE_3_ID, "Valid Data3", 1048576)), new Date(5L));
         falsifyChecksum(service.perform(prepareAddDataRequest(MEMBER_4, CIRCLE_3_ID, "Invalidated Data5", 1048576)), new Date(6L), SanityStatus.OK);
         falsifyChecksum(service.perform(prepareAddDataRequest(MEMBER_4, CIRCLE_3_ID, "Invalidated Data6", 524288)), new Date(), SanityStatus.OK);
     }
 
-    private void timeWarpChecksum(final ProcessDataResponse response, final Date sanityCheck, final SanityStatus status) {
+    private void timeWarpChecksum(final ProcessDataResponse response, final Date sanityCheck) {
         // Now to the tricky part. We wish to test that the checksum is invalid,
         // and thus resulting in a correct error message. As the checksum is
         // controlled internally by CWS, it cannot be altered (rightfully) via
@@ -307,7 +306,7 @@ public final class SanitizerBeanTest extends DatabaseSetup {
         final Query query = entityManager.createQuery(jql);
         query.setParameter("eid", response.getDataId());
         final DataEntity entity = (DataEntity) query.getSingleResult();
-        entity.setSanityStatus(status);
+        entity.setSanityStatus(SanityStatus.OK);
         entity.setSanityChecked(sanityCheck);
         entityManager.persist(entity);
     }

@@ -30,10 +30,10 @@ import org.junit.jupiter.api.Test;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-public final class FetchDataRequestTest {
+final class FetchDataRequestTest {
 
     @Test
-    public void testClassflow() {
+    void testClassflow() {
         final String circleId = UUID.randomUUID().toString();
         final String dataId = UUID.randomUUID().toString();
 
@@ -55,7 +55,7 @@ public final class FetchDataRequestTest {
     }
 
     @Test
-    public void testEmptyClass() {
+    void testEmptyClass() {
         final FetchDataRequest request = new FetchDataRequest();
         final Map<String, String> errors = request.validate();
 
@@ -66,7 +66,7 @@ public final class FetchDataRequestTest {
     }
 
     @Test
-    public void testClassWithInvalidValues() {
+    void testClassWithInvalidValues() {
         final FetchDataRequest request = new FetchDataRequest();
         request.setCircleId("Invalid Circle Id");
         request.setDataId("Invalid Data Id");

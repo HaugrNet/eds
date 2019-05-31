@@ -30,10 +30,10 @@ import org.junit.jupiter.api.Test;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-public final class SignRequestTest {
+final class SignRequestTest {
 
     @Test
-    public void testClassflow() {
+    void testClassflow() {
         final byte[] data = { (byte) 1, (byte) 2, (byte) 3, (byte) 4, (byte) 5 };
         final Date expires = new Date();
 
@@ -52,7 +52,7 @@ public final class SignRequestTest {
     }
 
     @Test
-    public void testEmptyClass() {
+    void testEmptyClass() {
         final SignRequest request = new SignRequest();
         final Map<String, String> errors = request.validate();
 
@@ -62,7 +62,7 @@ public final class SignRequestTest {
     }
 
     @Test
-    public void testClassWithInvalidValues() {
+    void testClassWithInvalidValues() {
         final SignRequest request = new SignRequest();
         request.setData(null);
 

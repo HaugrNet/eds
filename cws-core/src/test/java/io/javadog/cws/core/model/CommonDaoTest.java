@@ -16,9 +16,12 @@
  */
 package io.javadog.cws.core.model;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.core.DatabaseSetup;
 import io.javadog.cws.core.exceptions.CWSException;
 import java.util.Calendar;
@@ -31,27 +34,27 @@ import javax.persistence.LockModeType;
 import javax.persistence.Parameter;
 import javax.persistence.Query;
 import javax.persistence.TemporalType;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Kim Jensen
  * @since CWS 1.0
  */
-public final class CommonDaoTest extends DatabaseSetup {
+final class CommonDaoTest extends DatabaseSetup {
 
     @Test
-    public void testInvalidDataRead() {
-        thrown.expect(CWSException.class);
-        thrown.expectMessage("org.hibernate.exception.SQLGrammarException: could not prepare statement");
-
+    void testInvalidDataRead() {
         // Creating a Query, which will attempt to read data from a record
         // which doesn't exist.
         final Query query = entityManager.createNativeQuery("select * from versions");
-        CommonDao.findList(query);
+
+        final CWSException cause = assertThrows(CWSException.class, () -> CommonDao.findList(query));
+        assertEquals(ReturnCode.DATABASE_ERROR, cause.getReturnCode());
+        assertEquals("org.hibernate.exception.SQLGrammarException: could not prepare statement", cause.getMessage());
     }
 
     @Test
-    public void testNullResultList() {
+    void testNullResultList() {
         final Query query = new FakeQuery();
         final List<Object> found = CommonDao.findList(query);
 

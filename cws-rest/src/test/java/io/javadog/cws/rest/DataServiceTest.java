@@ -16,7 +16,7 @@
  */
 package io.javadog.cws.rest;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.requests.FetchDataRequest;
@@ -24,16 +24,16 @@ import io.javadog.cws.api.requests.ProcessDataRequest;
 import io.javadog.cws.core.DatabaseSetup;
 import io.javadog.cws.core.ShareBean;
 import javax.ws.rs.core.Response;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Kim Jensen
  * @since CWS 1.0
  */
-public final class DataServiceTest extends DatabaseSetup {
+final class DataServiceTest extends DatabaseSetup {
 
     @Test
-    public void testAdd() {
+    void testAdd() {
         final DataService service = prepareService();
         final ProcessDataRequest request = new ProcessDataRequest();
 
@@ -42,7 +42,7 @@ public final class DataServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testFlawedAdd() {
+    void testFlawedAdd() {
         final DataService service = prepareFlawedService();
         final ProcessDataRequest request = new ProcessDataRequest();
 
@@ -51,7 +51,7 @@ public final class DataServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testCopy() {
+    void testCopy() {
         final DataService service = prepareService();
         final ProcessDataRequest request = new ProcessDataRequest();
 
@@ -60,7 +60,7 @@ public final class DataServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testFlawedCopy() {
+    void testFlawedCopy() {
         final DataService service = prepareFlawedService();
         final ProcessDataRequest request = new ProcessDataRequest();
 
@@ -69,7 +69,7 @@ public final class DataServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testMove() {
+    void testMove() {
         final DataService service = prepareService();
         final ProcessDataRequest request = new ProcessDataRequest();
 
@@ -78,7 +78,7 @@ public final class DataServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testFlawedMove() {
+    void testFlawedMove() {
         final DataService service = prepareFlawedService();
         final ProcessDataRequest request = new ProcessDataRequest();
 
@@ -87,7 +87,7 @@ public final class DataServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testUpdate() {
+    void testUpdate() {
         final DataService service = prepareService();
         final ProcessDataRequest request = new ProcessDataRequest();
 
@@ -96,7 +96,7 @@ public final class DataServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testFlawedUpdate() {
+    void testFlawedUpdate() {
         final DataService service = prepareFlawedService();
         final ProcessDataRequest request = new ProcessDataRequest();
 
@@ -105,7 +105,7 @@ public final class DataServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testDelete() {
+    void testDelete() {
         final DataService service = prepareService();
         final ProcessDataRequest request = new ProcessDataRequest();
 
@@ -114,7 +114,7 @@ public final class DataServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testFlawedDelete() {
+    void testFlawedDelete() {
         final DataService service = prepareFlawedService();
         final ProcessDataRequest request = new ProcessDataRequest();
 
@@ -123,7 +123,7 @@ public final class DataServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testFetch() {
+    void testFetch() {
         final DataService service = prepareService();
         final FetchDataRequest request = new FetchDataRequest();
 
@@ -132,7 +132,7 @@ public final class DataServiceTest extends DatabaseSetup {
     }
 
     @Test
-    public void testFlawedFetch() {
+    void testFlawedFetch() {
         final DataService service = prepareFlawedService();
         final FetchDataRequest request = new FetchDataRequest();
 

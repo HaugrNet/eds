@@ -28,10 +28,10 @@ import org.junit.jupiter.api.Test;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-public final class FetchSignatureRequestTest {
+final class FetchSignatureRequestTest {
 
     @Test
-    public void testClassflow() {
+    void testClassflow() {
         final FetchSignatureRequest request = new FetchSignatureRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
         request.setCredential(TestUtilities.convert(Constants.ADMIN_ACCOUNT));
@@ -43,7 +43,7 @@ public final class FetchSignatureRequestTest {
     }
 
     @Test
-    public void testEmptyClass() {
+    void testEmptyClass() {
         final FetchSignatureRequest request = new FetchSignatureRequest();
         final Map<String, String> errors = request.validate();
 

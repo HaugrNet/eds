@@ -28,10 +28,10 @@ import org.junit.jupiter.api.Test;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-public final class FetchCircleRequestTest {
+final class FetchCircleRequestTest {
 
     @Test
-    public void testClassflow() {
+    void testClassflow() {
         final FetchCircleRequest request = new FetchCircleRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
         request.setCredential(TestUtilities.convert(Constants.ADMIN_ACCOUNT));
@@ -43,7 +43,7 @@ public final class FetchCircleRequestTest {
     }
 
     @Test
-    public void testEmptyClass() {
+    void testEmptyClass() {
         final FetchCircleRequest request = new FetchCircleRequest();
         final Map<String, String> errors = request.validate();
 

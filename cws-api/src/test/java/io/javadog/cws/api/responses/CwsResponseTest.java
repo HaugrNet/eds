@@ -26,10 +26,10 @@ import org.junit.jupiter.api.Test;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-public final class CwsResponseTest {
+final class CwsResponseTest {
 
     @Test
-    public void testClassflow() {
+    void testClassflow() {
         final CwsResponse response = new CwsResponse();
         response.setReturnCode(ReturnCode.ERROR);
         response.setReturnMessage(ReturnCode.ERROR.getDescription());
@@ -40,7 +40,7 @@ public final class CwsResponseTest {
     }
 
     @Test
-    public void testError() {
+    void testError() {
         final String msg = "FetchCircle Request failed due to Verification Problems.";
         final CwsResponse response = new CwsResponse(ReturnCode.VERIFICATION_WARNING, msg);
 

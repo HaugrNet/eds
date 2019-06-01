@@ -177,6 +177,7 @@ public final class ProcessMemberService extends Serviceable<MemberDao, ProcessMe
         dao.persist(entity);
 
         final ProcessMemberResponse response = new ProcessMemberResponse();
+        response.setMemberId(entity.getExternalId());
         response.setSignature(signature);
 
         return response;

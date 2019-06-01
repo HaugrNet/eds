@@ -242,8 +242,8 @@ final class ProcessMemberServiceTest extends DatabaseSetup {
         request.setNewAccountName("invitee");
 
         final ProcessMemberResponse response = service.perform(request);
-        assertNotNull(response);
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
+        assertNotNull(response.getMemberId());
         final byte[] signature = response.getSignature();
 
         final ProcessMemberRequest invitationRequest = new ProcessMemberRequest();

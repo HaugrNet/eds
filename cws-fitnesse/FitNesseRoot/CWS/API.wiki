@@ -253,6 +253,19 @@ date.
 [[ Top ][#content]]
 !anchor authenticated
 !4 '''Authenticated'''
+CWS is designed as a backend system to be integrated into other systems, which opens
+the question of authentication checks, how to ensure that the standard authentication
+checks is aligned with CWS, so CWS can be used to store data securely.
+
+The use-cases for the authentation mechanism is check if an account may access the
+securely stored data or not. It is not designed nor intended to replace other
+security mechanisms, such as 2FA of existing mechanisms. The check is simply here
+to serve the purpose checking if accounts are aligned or not.
+
+This alignment check is required, since the user credentials are needed to unlock
+the keys internally. For this reason, the account should use a separate and different
+credential to unlock the CWS account, to prevent that poor passwords are passed on to
+also weaken the security of the CWS stored data.
 
  * Authenticated - Check Member Authentication
    * SOAP: authenticated
@@ -301,6 +314,23 @@ performed with the current API:
    * SOAP: fetchMembers
    * REST (POST) requst is: ${REST_ROOT}/members/fetchMembers
 
+Firstly, there are 2 ways to create accounts, both require system administrative
+permissions. The first way is to run the CREATE action the second is to use the
+INVITE action. The CREATE action requires that the new account is completely defined,
+i.e. that the account name and credentials. The INVITE will just require the account
+name and issue a signature that the new user can use to unlock the account.
+
+Once accounts are in usage, it may not be feasible to constantly provide both the
+account name and credentials. Hence, it is possible to perform a LOGIN. This will
+take an Account and an existing Session and link them together for a brief period of
+time, how brief is defined via the settings. The session is then the only information
+required to identify and unlock the account. Since the Session is thus used as both
+an identification and authentication value, it must be guarded well. The Account should
+by the end of a session invoke the LOGOUT.
+
+It should be noted, that it is not possible to change the credentials for an Account
+using the Session!
+
 |process member                                                                                                                                                                                                                                                        |
 |account name|credential       |credential type|action    |member id |public key|new account name|new credential|member role|member id?|signature?       |return code?             |return message?                                                                    |
 |admin       |admin            |PASSPHRASE     |CREATE    |null      |null      |admin2          |password2     |ADMIN      |admin2_id |null             |${SUCCESS}               |Ok                                                                                 |
@@ -315,7 +345,7 @@ performed with the current API:
 |member1     |password1        |null           |UPDATE    |null      |null      |null            |null          |null       |null      |null             |${AUTHENTICATION_WARNING}|Cannot authenticate the Account from the given Credentials.                        |
 |null        |new_session      |SESSION        |UPDATE    |null      |null      |null            |null          |null       |null      |null             |${AUTHENTICATION_WARNING}|No Session could be found.                                                         |
 |admin       |admin            |null           |DELETE    |member1_id|null      |null            |null          |null       |null      |null             |${SUCCESS}               |The Member 'member1' has successfully been deleted.                                |
-|admin       |admin            |null           |INVITE    |null      |null      |invitee         |null          |null       |null      |invitee_signature|${SUCCESS}               |Ok                                                                                 |
+|admin       |admin            |null           |INVITE    |null      |null      |invitee         |null          |null       |invitee_id|invitee_signature|${SUCCESS}               |Ok                                                                                 |
 |invitee     |invitee_signature|SIGNATURE      |UPDATE    |null      |null      |invitee         |invitee       |null       |invitee_id|null             |${SUCCESS}               |Ok                                                                                 |
 |admin       |admin            |PASSPHRASE     |DELETE    |invitee_id|null      |null            |null          |null       |null      |null             |${SUCCESS}               |The Member 'invitee' has successfully been deleted.                                |
 
@@ -355,10 +385,10 @@ Key, which means a shared Key that can be used by Trustees from a Client system.
 
 |process circle                                                                                                                                                       |
 |account name|credential|action|circle id|circle name|member id|circle key      |circle id?|return code?             |return message ?                                |
-|admin       |admin     |CREATE|null     |circle1    |user1_id |null            |=~/\S{36}/|${SUCCESS}               |Ok                                              |
+|admin       |admin     |CREATE|null     |circle1    |user1_id |null            |circle1_id|${SUCCESS}               |Ok                                              |
 |user1       |password1 |CREATE|null     |circle1    |null     |null            |null      |${IDENTIFICATION_WARNING}|A Circle with the requested name already exists.|
-|user1       |password1 |CREATE|null     |circle2    |null     |null            |=~/\S{36}/|${SUCCESS}               |Ok                                              |
-|user2       |password2 |CREATE|null     |circle3    |null     |super secret key|=~/\S{36}/|${SUCCESS}               |Ok                                              |
+|user1       |password1 |CREATE|null     |circle2    |null     |null            |circle2_id|${SUCCESS}               |Ok                                              |
+|user2       |password2 |CREATE|null     |circle3    |null     |super secret key|circle3_id|${SUCCESS}               |Ok                                              |
 
 The Fetch Circles request is intended to get a listing of all the current Circles in CWS, note that only if a user is Member of a Circle,
 can they retrieve the Circle Key.

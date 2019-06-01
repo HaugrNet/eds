@@ -47,7 +47,7 @@ public final class ProcessCircle extends CwsRequest<ProcessCircleResponse> {
     }
 
     public String circleId() {
-        return (response != null) ? response.getCircleId() : null;
+        return (response != null) ? getKey(response.getCircleId()) : null;
     }
 
     public void setCircleName(final String circleName) {

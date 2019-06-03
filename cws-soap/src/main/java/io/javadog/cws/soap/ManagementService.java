@@ -177,7 +177,7 @@ public class ManagementService implements Management {
     @Override
     @WebMethod
     @WebResult(name = "response")
-    public CwsResponse authenticated(final Authentication request) {
+    public CwsResponse authenticated(@WebParam(name = "request") final Authentication request) {
         CwsResponse response;
 
         try {

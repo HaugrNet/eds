@@ -28,10 +28,10 @@ database desired. Testing of CWS has been done using both
 
 # Build, Install and Run
 The final version 1.0 of CWS can be downloaded from [JavaDog](https://javadog.io/),
-version 1.1 is currently being developed. The aim is to constantly have a stable
-and usable system, so if needed - please download the sources and build CWS
-yourself. The build only requires Java JDK 8 (patch level 161 or greater), and
-[Maven](https://maven.apache.org/).
+version 1.1 is more or less feature complete and currently being tested. The aim
+is to constantly have a stable and usable system, so if needed - please download
+the sources and build CWS yourself. The build only requires Java JDK 8 (patch
+level 161 or greater), and [Maven](https://maven.apache.org/).
 
 In the accessories/release folder, there is a number of files, which is used to
 install and run CWS. Please put the bin folder in your path, and then invoke
@@ -90,24 +90,26 @@ deployed in a "hostile" environment.
    data, which may result in inability to properly extract information.
 
 # Release Plan
-This is CWS 1.1 development branch - it will focus on the following
-features:
+This is CWS 1.1 development branch, following features have been completed:
  * Copy Data from one Circle of Trust to a second, with a property flag to
    enable or disable the feature. By default, the feature is disabled.
  * Move Data from one Circle of Trust to a second, with a property flag to
    enable or disable the feature. By default, the feature is disabled. Further,
    the feature will require that the requesting Member is a Circle Administrator
    of the source Circle, and have write permissions in the target Circle.
- * Search Circles, Members & Data. Although, the CWS is storing very little
-   information, it may still be necessary to search for somethnig using the
-   simple names.
  * External control of the MasterKey via a URI, so it can be referenced from a
    central source and destroyed centrally, rather than the Administrator having
    to unlock it manually.
+ * New request - authenticated; simple check to verify if an Account has
+   permissions to access the give CWS instance
+ * Complete external testing with FitNesse.
+ * AES GCM based encryption, CBC is slowly deprecated and instead GCM based
+   encryption should be used. Currently, only 128 but AES GCM encryption is
+   supported, 129/256 bit AES GCM encryption is pending.
 
-CWS 1.1 is not yet having a release date - All of the above listed features has
-been added, and currently focus is on API cleanup, documentation & testing with
-FitNesse.
+As can be seen, the CWS 1.1 release is close to being completed and it is
+expected that it will be released in the Summer 2019. Focus for version 2.0 is
+primarily on migrating the entire code base to Java 11 and Java EE 8.
 
 # Wish to join
 The overall quality of the software can only improve if more eyes look at it and
@@ -131,9 +133,8 @@ for choices made. But, commenting out code is banned, if it is commented out, it
 is meaningless and should be removed.
 
 ### Style Guide
-The style guide is simple is available in the accessories folder as an IntelliJ
-based Java Style Guide. It All code must be formatted using it. All Classes
-have a default header, which must also be applied.
+CWS is devepoped using IntelliJ IDEA & a local SonarQube instance. The styles
+used and the SonarQube Quality Profile can be found in the accessories folder.
 
 # Software License
 The CWS is released under Apache License 2 or APL2.

@@ -20,9 +20,6 @@ import io.javadog.cws.api.common.Action;
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.Utilities;
 import java.util.Map;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -75,35 +72,27 @@ public final class ProcessDataRequest extends Authentication implements CircleId
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
-    @NotNull
     @XmlElement(name = Constants.FIELD_ACTION, required = true)
     private Action action = null;
 
-    @Pattern(regexp = Constants.ID_PATTERN_REGEX)
     @XmlElement(name = Constants.FIELD_DATA_ID)
     private String dataId = null;
 
-    @Pattern(regexp = Constants.ID_PATTERN_REGEX)
     @XmlElement(name = Constants.FIELD_CIRCLE_ID)
     private String circleId = null;
 
-    @Pattern(regexp = Constants.ID_PATTERN_REGEX)
     @XmlElement(name = Constants.FIELD_TARGET_CIRCLE_ID)
     private String targetCircleId = null;
 
-    @Size(min = 1, max = Constants.MAX_NAME_LENGTH)
     @XmlElement(name = Constants.FIELD_DATA_NAME)
     private String dataName = null;
 
-    @Pattern(regexp = Constants.ID_PATTERN_REGEX)
     @XmlElement(name = Constants.FIELD_FOLDER_ID)
     private String folderId = null;
 
-    @Pattern(regexp = Constants.ID_PATTERN_REGEX)
     @XmlElement(name = Constants.FIELD_TARGET_FOLDER_ID)
     private String targetFolderId = null;
 
-    @Size(min = 1, max = Constants.MAX_NAME_LENGTH)
     @XmlElement(name = Constants.FIELD_TYPENAME)
     private String typeName = null;
 

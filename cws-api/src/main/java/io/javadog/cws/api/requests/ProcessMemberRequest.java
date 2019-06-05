@@ -21,9 +21,6 @@ import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.MemberRole;
 import io.javadog.cws.api.common.Utilities;
 import java.util.Map;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -97,11 +94,9 @@ public final class ProcessMemberRequest extends Authentication implements Action
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
-    @NotNull
     @XmlElement(name = Constants.FIELD_ACTION, required = true)
     private Action action = null;
 
-    @Pattern(regexp = Constants.ID_PATTERN_REGEX)
     @XmlElement(name = Constants.FIELD_MEMBER_ID, nillable = true)
     private String memberId = null;
 
@@ -113,7 +108,6 @@ public final class ProcessMemberRequest extends Authentication implements Action
     @XmlElement(name = Constants.FIELD_PUBLIC_KEY, required = true)
     private String publicKey = null;
 
-    @Size(min = 1, max = Constants.MAX_NAME_LENGTH)
     @XmlElement(name = Constants.FIELD_NEW_ACCOUNT_NAME, nillable = true)
     private String newAccountName = null;
 
@@ -208,8 +202,6 @@ public final class ProcessMemberRequest extends Authentication implements Action
                 case LOGIN:
                     checkNotNullOrEmpty(errors, Constants.FIELD_NEW_CREDENTIAL, newCredential, "The Credentials are required to create new Session.");
                     break;
-                case LOGOUT:
-                    break;
                 case ALTER:
                     checkNotNullAndValidId(errors, Constants.FIELD_MEMBER_ID, memberId, "The given memberId is invalid.");
                     checkNotNull(errors, Constants.FIELD_MEMBER_ROLE, memberRole, "The Role is missing.");
@@ -217,10 +209,11 @@ public final class ProcessMemberRequest extends Authentication implements Action
                 case UPDATE:
                     checkNotTooLong(errors, Constants.FIELD_NEW_ACCOUNT_NAME, newAccountName, Constants.MAX_NAME_LENGTH, newAccountErrorMessage);
                     break;
-                case INVALIDATE:
-                    break;
                 case DELETE:
                     checkValidId(errors, Constants.FIELD_MEMBER_ID, memberId, "The given memberId is invalid.");
+                    break;
+                case LOGOUT:
+                case INVALIDATE:
                     break;
                 default:
                     errors.put(Constants.FIELD_ACTION, "Not supported Action has been provided.");

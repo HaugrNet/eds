@@ -19,8 +19,6 @@ package io.javadog.cws.api.requests;
 import io.javadog.cws.api.common.Action;
 import io.javadog.cws.api.common.Constants;
 import java.util.Map;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -53,13 +51,9 @@ public final class ProcessDataTypeRequest extends Authentication implements Acti
     @XmlElement(name = Constants.FIELD_ACTION, required = true)
     private Action action = Action.PROCESS;
 
-    @NotNull
-    @Size(min = 1, max = Constants.MAX_NAME_LENGTH)
     @XmlElement(name = Constants.FIELD_TYPENAME, required = true)
     private String typeName = null;
 
-    @NotNull
-    @Size(min = 1, max = Constants.MAX_STRING_LENGTH)
     @XmlElement(name = Constants.FIELD_TYPE)
     private String type = null;
 

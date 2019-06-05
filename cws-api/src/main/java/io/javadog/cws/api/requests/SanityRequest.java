@@ -20,7 +20,6 @@ import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.Utilities;
 import java.util.Date;
 import java.util.Map;
-import javax.validation.constraints.Pattern;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -47,7 +46,6 @@ public final class SanityRequest extends Authentication implements CircleIdReque
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
-    @Pattern(regexp = Constants.ID_PATTERN_REGEX)
     @XmlElement(name = Constants.FIELD_CIRCLE_ID, nillable = true)
     private String circleId = null;
 

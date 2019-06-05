@@ -19,7 +19,6 @@ package io.javadog.cws.api.requests;
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.Utilities;
 import java.util.Map;
-import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -46,11 +45,9 @@ public final class VerifyRequest extends Authentication {
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
-    @NotNull
     @XmlElement(name = Constants.FIELD_SIGNATURE, required = true)
     private String signature = null;
 
-    @NotNull
     @XmlElement(name = Constants.FIELD_DATA, required = true)
     private byte[] data = null;
 

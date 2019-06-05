@@ -19,7 +19,6 @@ package io.javadog.cws.api.requests;
 import io.javadog.cws.api.common.Constants;
 import java.util.HashMap;
 import java.util.Map;
-import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -49,7 +48,6 @@ public final class SettingRequest extends Authentication {
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
-    @NotNull
     @XmlElement(name = Constants.FIELD_SETTINGS, required = true)
     private HashMap<String, String> settings = new HashMap<>(0);
 

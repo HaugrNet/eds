@@ -20,7 +20,6 @@ import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.Utilities;
 import java.util.Date;
 import java.util.Map;
-import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -46,7 +45,6 @@ public final class SignRequest extends Authentication {
 
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
-    @NotNull
     @XmlElement(name = Constants.FIELD_DATA, required = true)
     private byte[] data = null;
 

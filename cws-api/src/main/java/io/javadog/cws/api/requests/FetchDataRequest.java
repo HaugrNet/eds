@@ -18,9 +18,6 @@ package io.javadog.cws.api.requests;
 
 import io.javadog.cws.api.common.Constants;
 import java.util.Map;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -48,21 +45,15 @@ public final class FetchDataRequest extends Authentication implements CircleIdRe
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
-    @Pattern(regexp = Constants.ID_PATTERN_REGEX)
     @XmlElement(name = Constants.FIELD_CIRCLE_ID)
     private String circleId = null;
 
-    @Pattern(regexp = Constants.ID_PATTERN_REGEX)
     @XmlElement(name = Constants.FIELD_DATA_ID)
     private String dataId = null;
 
-    @NotNull
-    @Size(min = 1)
     @XmlElement(name = Constants.FIELD_PAGE_NUMBER)
     private Integer pageNumber = 1;
 
-    @NotNull
-    @Size(min = 1, max = Constants.MAX_PAGE_SIZE)
     @XmlElement(name = Constants.FIELD_PAGE_SIZE)
     private Integer pageSize = Constants.MAX_PAGE_SIZE;
 

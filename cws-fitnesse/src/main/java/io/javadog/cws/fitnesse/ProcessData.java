@@ -98,7 +98,7 @@ public final class ProcessData extends CwsRequest<ProcessDataResponse> {
         request.setTargetCircleId(targetCircleId);
         request.setDataName(dataName);
         request.setFolderId(folderId);
-        request.setTargetCircleId(targetCircleId);
+        request.setTargetFolderId(targetFolderId);
         request.setTypeName(typeName);
         request.setData(data);
 

@@ -267,7 +267,7 @@
 
   <xs:complexType name="authenticated">
     <xs:sequence>
-      <xs:element minOccurs="0" name="arg0" type="tns:authentication"/>
+      <xs:element minOccurs="0" name="request" type="tns:authentication"/>
     </xs:sequence>
   </xs:complexType>
 

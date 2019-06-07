@@ -131,7 +131,7 @@ final class CryptoTest extends DatabaseSetup {
         final Crypto myCrypto = new Crypto(mySettings);
         final CWSKeyPair key = myCrypto.generateAsymmetricKey(KeyAlgorithm.RSA_2048);
 
-        final CWSException cause = assertThrows(CWSException.class, () ->  myCrypto.sign(key.getPrivate().getKey(), "bla bla bla".getBytes(mySettings.getCharset())));
+        final CWSException cause = assertThrows(CWSException.class, () -> myCrypto.sign(key.getPrivate().getKey(), "bla bla bla".getBytes(mySettings.getCharset())));
         assertEquals(ReturnCode.CRYPTO_ERROR, cause.getReturnCode());
         assertEquals("AES/CBC/PKCS5Padding Signature not available", cause.getMessage());
     }
@@ -472,8 +472,7 @@ final class CryptoTest extends DatabaseSetup {
     private CWSKeyPair generateKeyPair() {
         final CWSKeyPair generated = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
         final KeyPair keys = new KeyPair(generated.getPublic().getKey(), generated.getPrivate().getKey());
-        final CWSKeyPair keyPair = new CWSKeyPair(settings.getSymmetricAlgorithm(), keys);
 
-        return keyPair;
+        return new CWSKeyPair(settings.getSymmetricAlgorithm(), keys);
     }
 }

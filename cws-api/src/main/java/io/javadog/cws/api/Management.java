@@ -70,7 +70,7 @@ public interface Management {
      *   <li>
      *     <b>cws.crypto.symmetric.algorithm</b> - default value: 'AES_CBC_128'<br>
      *     Allowed Values: 'AES_CBC_128', 'AES_CBC_192', 'AES_CBC_256',
-     *     'AES_GCM_128'(pending: 'AES_GCM_192', 'AES_GCM_256')<br>
+     *     'AES_GCM_128'<br>
      *     <i> The Algorithm used for the Symmetric Keys in CWS. All data is
      *     stored using this Algorithm. Although it can be changed, please test
      *     the CWS carefully before doing so. And please be aware, that the

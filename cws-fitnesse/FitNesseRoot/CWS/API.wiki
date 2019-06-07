@@ -174,16 +174,13 @@ in a list of undefined values.
 !5 Symmetric Algorithm
 The primary part of all internal encryption is performed using Symmetric Keys. These are all based on the AES algorithms and only the
 size of the keys may be changed. The default value is '''AES256''', but if an earlier version of Java 8 is used, or if there is various
-problems with allowing this Key size, then it can be set to a lower value.
+problems with allowing this Key size, then it can be set to a lower value. It should be noted, that AES encryption using CBC is considered
+''old fashioned'', so it is recommendable to change the algorithm to GCM, even if the maximum bitsize allowed in Java 8 is only 128.
 The allowed values are:
  * '''AES_CBC_128'''
  * '''AES_CBC_192'''
  * '''AES_CBC_256'''
  * '''AES_GCM_128'''
-
-Pending Algorithms:
- * '''AES_GCM_192'''
- * '''AES_GCM_256'''
 
 |Settings                                                                                                                                                            |
 |account name|credential|key                           |value      |return code?      |return message?                                                   |defined?   |

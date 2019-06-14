@@ -8,6 +8,10 @@ hs_err_pid*
 # Runtime Pid file
 cws.pid
 
+# Temporary Docker files
+apt.conf
+wgetrc
+
 # IDEA IntellíJ & MS Code settings
 .classpath
 .idea

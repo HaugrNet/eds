@@ -22,7 +22,7 @@ import javax.persistence.EntityManager;
  * @author Kim Jensen
  * @since CWS 1.1
  */
-public final class AuthenticatedService extends Serviceable<CommonDao, CwsResponse, Authentication>  {
+public final class AuthenticatedService extends Serviceable<CommonDao, CwsResponse, Authentication> {
 
     public AuthenticatedService(final Settings settings, final EntityManager entityManager) {
         super(settings, new CommonDao(entityManager));

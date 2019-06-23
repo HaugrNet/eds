@@ -52,12 +52,10 @@ RUN mkdir -p ${JBOSS_HOME}/modules/org/postgresql/main/ \
   && wget -q https://jdbc.postgresql.org/download/postgresql-42.2.5.jar
 COPY release/wildfly/module.xml ${JBOSS_HOME}/modules/org/postgresql/main/
 COPY release/wildfly/standalone-full.xml ${JBOSS_HOME}/standalone/configuration
-COPY release/wildfly/cws.war ${JBOSS_HOME}/standalone/deployments
+COPY docker/cws.war ${JBOSS_HOME}/standalone/deployments
 RUN chown -R postgres ${JBOSS_HOME}/standalone
 
-# To better control the server, we're exposing PostgreSQL database (port 5432)
-# and WildFly (HTTP on port 8080)
-EXPOSE 5432/tcp
+# To be able to use CWS, we have to expose WildFly (HTTP on port 8080)
 EXPOSE 8080/tcp
 
 # Finally, we're starting the services

@@ -96,7 +96,7 @@ public final class ControlCws extends CwsRequest<FetchMemberResponse> {
 
         final FetchDataTypeResponse fetchResponse = CallShare.fetchDataTypes(requestType, requestUrl, fetchRequest);
         for (final DataType dataType : fetchResponse.getDataTypes()) {
-            if (!dataType.getTypeName().equals(Constants.DATA_TYPENAME) && !dataType.getTypeName().equals(Constants.FOLDER_TYPENAME)) {
+            if (!Constants.DATA_TYPENAME.equalsIgnoreCase(dataType.getTypeName()) && !Constants.FOLDER_TYPENAME.equalsIgnoreCase(dataType.getTypeName())) {
                 deleteRequest.setTypeName(dataType.getTypeName());
                 CallShare.processDataType(requestType, requestUrl, deleteRequest);
             }

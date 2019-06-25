@@ -31,8 +31,8 @@ import io.javadog.cws.api.responses.ProcessDataResponse;
 import io.javadog.cws.api.responses.ProcessDataTypeResponse;
 import io.javadog.cws.api.responses.SignResponse;
 import io.javadog.cws.api.responses.VerifyResponse;
-import io.javadog.cws.client.ShareRestClient;
-import io.javadog.cws.client.ShareSoapClient;
+import io.javadog.cws.client.rest.ShareRestClient;
+import io.javadog.cws.client.soap.ShareSoapClient;
 import io.javadog.cws.fitnesse.exceptions.StopTestException;
 
 /**

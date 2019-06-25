@@ -38,8 +38,8 @@ import io.javadog.cws.api.responses.ProcessTrusteeResponse;
 import io.javadog.cws.api.responses.SanityResponse;
 import io.javadog.cws.api.responses.SettingResponse;
 import io.javadog.cws.api.responses.VersionResponse;
-import io.javadog.cws.client.ManagementRestClient;
-import io.javadog.cws.client.ManagementSoapClient;
+import io.javadog.cws.client.rest.ManagementRestClient;
+import io.javadog.cws.client.soap.ManagementSoapClient;
 import io.javadog.cws.fitnesse.exceptions.StopTestException;
 
 /**

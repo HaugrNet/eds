@@ -19,7 +19,11 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>cws-client</artifactId>
+            <artifactId>cws-client-rest</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>cws-client-soap</artifactId>
         </dependency>
     </dependencies>
 

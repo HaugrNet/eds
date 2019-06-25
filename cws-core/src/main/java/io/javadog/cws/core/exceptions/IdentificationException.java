@@ -14,6 +14,8 @@ import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
 
 /**
+ * <p>CWS Specific Exception for {@link ReturnCode#IDENTIFICATION_WARNING}.</p>
+ *
  * @author Kim Jensen
  * @since CWS 1.1
  */

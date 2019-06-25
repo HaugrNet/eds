@@ -22,7 +22,7 @@ import io.javadog.cws.api.common.Action;
 public interface ActionRequest {
 
     /**
-     * <p>Defines the action which should be performed by the request</p>
+     * <p>Defines the action which should be performed by the request.</p>
      *
      * @param action The Action to be performed
      */

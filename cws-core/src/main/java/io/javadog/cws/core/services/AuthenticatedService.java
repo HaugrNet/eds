@@ -19,6 +19,8 @@ import java.util.Arrays;
 import javax.persistence.EntityManager;
 
 /**
+ * <p>Business Logic implementation for the CWS Authenticated request.</p>
+ *
  * @author Kim Jensen
  * @since CWS 1.1
  */

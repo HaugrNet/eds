@@ -69,7 +69,7 @@ public abstract class Verifiable implements Serializable {
     }
 
     static void checkNotNullOrEmpty(final Map<String, String> errors, final String field, final String value, final String message) {
-        if ((value == null) || value.trim().isEmpty()) {
+        if ((value == null) || isEmpty(value)) {
             errors.put(field, message);
         }
     }
@@ -113,5 +113,27 @@ public abstract class Verifiable implements Serializable {
             // at this place.
             errors.put(Constants.FIELD_URL, "The URL field is invalid - " + e.getMessage());
         }
+    }
+
+    /**
+     * Method added as per PMD rule InefficientEmptyStringCheck. It checks the
+     * given value to see if it contains any non-whitespace characters. If so,
+     * then it returns false - if the value has zero length or only whitespace
+     * characters, then it returns true.
+     *
+     * @param value Nullable value to check if is empty
+     * @return True if the string is empty, meaning no non-whitespace chars exist
+     */
+    private static boolean isEmpty(final String value) {
+        boolean whitespace = true;
+
+        for (int i = 0; i < value.length(); i++) {
+            if (!Character.isWhitespace(value.charAt(i))) {
+                whitespace = false;
+                break;
+            }
+        }
+
+        return whitespace;
     }
 }

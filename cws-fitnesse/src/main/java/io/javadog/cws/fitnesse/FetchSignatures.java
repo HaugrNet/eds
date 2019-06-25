@@ -25,6 +25,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * <p>FitNesse Fixture for the CWS FetchSignatures feature.</p>
+ *
  * @author Kim Jensen
  * @since CWS 1.0
  */

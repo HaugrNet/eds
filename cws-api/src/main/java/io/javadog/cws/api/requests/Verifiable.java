@@ -124,7 +124,7 @@ public abstract class Verifiable implements Serializable {
      * @param value Nullable value to check if is empty
      * @return True if the string is empty, meaning no non-whitespace chars exist
      */
-    private static boolean isEmpty(final String value) {
+    public static boolean isEmpty(final String value) {
         boolean whitespace = true;
 
         for (int i = 0; i < value.length(); i++) {

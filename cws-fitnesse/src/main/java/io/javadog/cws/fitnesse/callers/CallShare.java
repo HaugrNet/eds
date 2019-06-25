@@ -36,6 +36,8 @@ import io.javadog.cws.client.soap.ShareSoapClient;
 import io.javadog.cws.fitnesse.exceptions.StopTestException;
 
 /**
+ * <p>CWS Share invocation class.</p>
+ *
  * @author Kim Jensen
  * @since CWS 1.0
  */

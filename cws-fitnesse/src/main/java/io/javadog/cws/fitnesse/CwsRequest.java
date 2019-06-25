@@ -32,12 +32,14 @@ import java.lang.reflect.InvocationTargetException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
+ * <p>General Request Object for the FitNesse Fixtures.</p>
+ *
  * @author Kim Jensen
  * @since CWS 1.0
  */
@@ -45,21 +47,21 @@ public class CwsRequest<R extends CwsResponse> {
 
     protected static String requestType = "SOAP";
     protected static String requestUrl = "http://localhost:8080/cws";
+    protected static final String EXTENSION_ID = "_id";
+    protected static final String EXTENSION_SIGNATURE = "_signature";
 
     // All Ids in CWS which is externally exposed is UUIDs, meaning that they
     // are always unique. And as the use of them should also be made with
     // easily identifiable, yet unique names, they are simply stored in a
     // single internal record, where the name have "_id" appended, and this
     // is then used to both store, delete and find Ids.
-    private static final Map<String, String> ids = new HashMap<>(16);
-    private static final Map<String, String> signatures = new HashMap<>(16);
-    protected static final String EXTENSION_ID = "_id";
-    protected static final String EXTENSION_SIGNATURE = "_signature";
+    private static final Map<String, String> ids = new ConcurrentHashMap<>(16);
+    private static final Map<String, String> signatures = new ConcurrentHashMap<>(16);
 
     protected String accountName = null;
     protected byte[] credential = null;
-    private CredentialType credentialType = null;
     protected R response = null;
+    private CredentialType credentialType = null;
 
     public static void updateTypeAndUrl(final String type, final String url) {
         requestType = type;
@@ -249,7 +251,7 @@ public class CwsRequest<R extends CwsResponse> {
 
     protected static Map<String, String> checksums() {
         final Base64.Decoder decoder = Base64.getDecoder();
-        final Map<String, String> checksums = new HashMap<>(signatures.size());
+        final Map<String, String> checksums = new ConcurrentHashMap<>(signatures.size());
 
         for (final Map.Entry<String, String> signature : signatures.entrySet()) {
             try {

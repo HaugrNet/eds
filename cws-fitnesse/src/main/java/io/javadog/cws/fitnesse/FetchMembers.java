@@ -25,6 +25,8 @@ import io.javadog.cws.fitnesse.utils.Converter;
 import java.util.List;
 
 /**
+ * <p>FitNesse Fixture for the CWS FetchMembers feature.</p>
+ *
  * @author Kim Jensen
  * @since CWS 1.0
  */

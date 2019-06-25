@@ -15,6 +15,8 @@ import io.javadog.cws.api.responses.CwsResponse;
 import io.javadog.cws.fitnesse.callers.CallManagement;
 
 /**
+ * <p>FitNesse Fixture for the CWS Authenticated feature.</p>
+ *
  * @author Kim Jensen
  * @since CWS 1.1
  */

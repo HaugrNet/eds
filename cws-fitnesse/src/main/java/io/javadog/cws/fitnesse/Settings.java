@@ -19,16 +19,18 @@ package io.javadog.cws.fitnesse;
 import io.javadog.cws.api.requests.SettingRequest;
 import io.javadog.cws.api.responses.SettingResponse;
 import io.javadog.cws.fitnesse.callers.CallManagement;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
+ * <p>FitNesse Fixture for the CWS Settings feature.</p>
+ *
  * @author Kim Jensen
  * @since CWS 1.0
  */
 public final class Settings extends CwsRequest<SettingResponse> {
 
-    private Map<String, String> theSettings = new HashMap<>();
+    private Map<String, String> theSettings = new ConcurrentHashMap<>();
     private String key = null;
     private String value = null;
 
@@ -86,7 +88,7 @@ public final class Settings extends CwsRequest<SettingResponse> {
      */
     @Override
     public void execute() {
-        final Map<String, String> settings = new HashMap<>();
+        final Map<String, String> settings = new ConcurrentHashMap<>();
         settings.put(key, value);
 
         final SettingRequest request = prepareRequest(SettingRequest.class);

@@ -18,6 +18,8 @@ import io.javadog.cws.fitnesse.utils.Converter;
 import java.util.Map;
 
 /**
+ * <p>FitNesse Fixture for the CWS MasterKey feature.</p>
+ *
  * @author Kim Jensen
  * @since CWS 1.1
  */

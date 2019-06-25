@@ -19,6 +19,10 @@ package io.javadog.cws.fitnesse.exceptions;
 import io.javadog.cws.api.common.Constants;
 
 /**
+ * <p>FitNesse requires that an exception with the first part of the name being
+ * &quot;StopTest&quot; is used if an error occurs and the test should be
+ * stopped.</p>
+ *
  * @author Kim Jensen
  * @since CWS 1.0
  */

@@ -20,6 +20,8 @@ import io.javadog.cws.api.responses.VersionResponse;
 import io.javadog.cws.fitnesse.callers.CallManagement;
 
 /**
+ * <p>FitNesse Fixture for the CWS Version request.</p>
+ *
  * @author Kim Jensen
  * @since CWS 1.0
  */

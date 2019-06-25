@@ -23,6 +23,8 @@ import io.javadog.cws.fitnesse.callers.CallManagement;
 import java.util.List;
 
 /**
+ * <p>FitNesse Fixture for the CWS FetchCircles feature.</p>
+ *
  * @author Kim Jensen
  * @since CWS 1.0
  */

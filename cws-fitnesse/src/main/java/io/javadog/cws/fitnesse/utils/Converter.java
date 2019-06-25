@@ -19,6 +19,7 @@ package io.javadog.cws.fitnesse.utils;
 import io.javadog.cws.api.common.Action;
 import io.javadog.cws.api.common.CredentialType;
 import io.javadog.cws.api.common.MemberRole;
+import io.javadog.cws.api.requests.Verifiable;
 import io.javadog.cws.fitnesse.exceptions.StopTestException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -30,6 +31,9 @@ import java.util.Date;
 import java.util.Locale;
 
 /**
+ * <p>Common Utilities for converting data between the FitNesse WIKI pages and
+ * CWS.</p>
+ *
  * @author Kim Jensen
  * @since CWS 1.0
  */
@@ -69,7 +73,7 @@ public final class Converter {
         final String checked = preCheck(value);
         int result = defaultValue;
 
-        if ((checked != null) && !checked.trim().isEmpty()) {
+        if ((checked != null) && !Verifiable.isEmpty(checked)) {
             result = Integer.parseInt(value.trim());
         }
 

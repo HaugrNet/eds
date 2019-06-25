@@ -23,6 +23,8 @@ import io.javadog.cws.fitnesse.utils.Converter;
 import java.util.Date;
 
 /**
+ * <p>FitNesse Fixture for the CWS Sanitized feature.</p>
+ *
  * @author Kim Jensen
  * @since CWS 1.0
  */

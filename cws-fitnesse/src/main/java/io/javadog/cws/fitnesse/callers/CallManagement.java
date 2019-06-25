@@ -43,6 +43,8 @@ import io.javadog.cws.client.soap.ManagementSoapClient;
 import io.javadog.cws.fitnesse.exceptions.StopTestException;
 
 /**
+ * <p>CWS Management invocation class.</p>
+ *
  * @author Kim Jensen
  * @since CWS 1.0
  */

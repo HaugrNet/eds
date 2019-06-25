@@ -23,6 +23,8 @@ import io.javadog.cws.fitnesse.callers.CallManagement;
 import io.javadog.cws.fitnesse.utils.Converter;
 
 /**
+ * <p>FitNesse Fixture for the CWS ProcessCircle feature.</p>
+ *
  * @author Kim Jensen
  * @since CWS 1.0
  */

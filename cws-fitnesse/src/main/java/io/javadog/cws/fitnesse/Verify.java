@@ -22,6 +22,8 @@ import io.javadog.cws.fitnesse.callers.CallShare;
 import io.javadog.cws.fitnesse.utils.Converter;
 
 /**
+ * <p>FitNesse Fixture for the CWS Verify feature.</p>
+ *
  * @author Kim Jensen
  * @since CWS 1.0
  */

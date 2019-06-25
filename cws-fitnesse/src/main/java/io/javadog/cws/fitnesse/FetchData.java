@@ -26,6 +26,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * <p>FitNesse Fixture for the CWS FetchData feature.</p>
+ *
  * @author Kim Jensen
  * @since CWS 1.0
  */

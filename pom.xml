@@ -47,20 +47,20 @@
         <cxf.version>3.3.2</cxf.version>
         <xmlschema.version>2.2.4</xmlschema.version>
         <!-- Test Plugins -->
-        <junit.version>5.4.2</junit.version>
+        <junit.version>5.5.0</junit.version>
         <slf4j.version>1.7.26</slf4j.version>
         <logback.version>1.2.3</logback.version>
-        <hibernate.version>5.4.2.Final</hibernate.version>
+        <hibernate.version>5.4.3.Final</hibernate.version>
         <h2.version>1.4.199</h2.version>
         <!-- Maven Plugins -->
-        <maven.compiler.plugin>3.8.0</maven.compiler.plugin>
-        <maven.javadoc.plugin>3.1.0</maven.javadoc.plugin>
+        <maven.compiler.plugin>3.8.1</maven.compiler.plugin>
+        <maven.javadoc.plugin>3.1.1</maven.javadoc.plugin>
         <maven.source.plugin>3.1.0</maven.source.plugin>
         <maven.surefire.plugin>2.22.2</maven.surefire.plugin>
         <maven.jar.plugin>3.1.2</maven.jar.plugin>
         <maven.war.plugin>3.2.3</maven.war.plugin>
         <maven.shade.plugin>3.2.1</maven.shade.plugin>
-        <org.owasp.plugin>5.0.0</org.owasp.plugin>
+        <org.owasp.plugin>5.1.0</org.owasp.plugin>
         <org.jacoco.plugin>0.8.4</org.jacoco.plugin>
         <org.sonar.plugin>3.6.0.1398</org.sonar.plugin>
         <org.build.plugin>3.0.0</org.build.plugin>

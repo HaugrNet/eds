@@ -34,7 +34,7 @@
     </modules>
 
     <scm>
-      <connection>scm:git:https://github.com/JavaDogs/cws.git</connection>
+        <connection>scm:git:https://github.com/JavaDogs/cws.git</connection>
     </scm>
 
     <properties>

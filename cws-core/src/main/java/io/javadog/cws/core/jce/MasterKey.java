@@ -19,7 +19,6 @@ package io.javadog.cws.core.jce;
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.core.enums.KeyAlgorithm;
-import io.javadog.cws.core.enums.StandardSetting;
 import io.javadog.cws.core.exceptions.CWSException;
 import io.javadog.cws.core.exceptions.CryptoException;
 import io.javadog.cws.core.model.Settings;
@@ -29,6 +28,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
@@ -64,8 +64,8 @@ public final class MasterKey {
     //   Note, that the same philosophy has been applied to the other Settings,
     // which is being used, except for the System Salt - where other checks
     // exists to protect it.
-    private static final Integer ITERATIONS = Integer.valueOf(StandardSetting.PBE_ITERATIONS.getValue());
-    private static final Charset CHARSET = Charset.forName(StandardSetting.CWS_CHARSET.getValue());
+    private static final Integer ITERATIONS = 1024;
+    private static final Charset CHARSET = StandardCharsets.UTF_8;
     private static final KeyAlgorithm ALGORITHM = KeyAlgorithm.PBE_256;
     private static final Object LOCK = new Object();
     private static final int BUFFER_SIZE = 512;

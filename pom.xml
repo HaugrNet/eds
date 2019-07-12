@@ -31,6 +31,9 @@
         <module>cws-soap</module>
         <module>cws-wildfly</module>
         <module>cws-payara</module>
+        <module>cws-client-rest</module>
+        <module>cws-client-soap</module>
+        <module>cws-fitnesse</module>
     </modules>
 
     <scm>
@@ -78,7 +81,7 @@
              beyond our control, so error reports from this is just annoying!
              Legend: *  - zero or more characters
                      ** - zero or more directories -->
-        <sonar.exclusions>**/generated*/**</sonar.exclusions>
+        <sonar.exclusions>**/generated*/**,**/client/**,**/fitnesse/**</sonar.exclusions>
     </properties>
 
     <dependencyManagement>

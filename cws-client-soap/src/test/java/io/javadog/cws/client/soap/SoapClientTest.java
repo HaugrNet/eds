@@ -71,11 +71,13 @@ import java.security.SecureRandom;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
 
 /**
  * @author Kim Jensen
  * @since CWS 1.0
  */
+@EnabledIfSystemProperty(named = "localInstance", matches = "running")
 final class SoapClientTest {
 
     private static final String URL = "http://localhost:8080/cws";

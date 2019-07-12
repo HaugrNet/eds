@@ -33,10 +33,6 @@ public final class RESTClientException extends RuntimeException {
         super(message);
     }
 
-    public RESTClientException(final Throwable cause) {
-        super(cause);
-    }
-
     public RESTClientException(final String message, final Throwable cause) {
         super(message, cause);
     }

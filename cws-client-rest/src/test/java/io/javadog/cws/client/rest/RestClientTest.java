@@ -77,7 +77,7 @@ import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-@EnabledIfSystemProperty(named = "localInstance", matches = "running")
+@EnabledIfSystemProperty(named = "local.instance.running", matches = "true")
 final class RestClientTest {
 
     private static final String URL = "http://localhost:8080/cws";

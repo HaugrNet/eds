@@ -90,7 +90,7 @@ deployed in a "hostile" environment.
    data, which may result in inability to properly extract information.
 
 # Release Plan
-This is CWS 1.1 development branch, following features have been completed:
+This is the CWS 1.1 development branch, following features have been completed:
  * Copy Data from one Circle of Trust to a second, with a property flag to
    enable or disable the feature. By default, the feature is disabled.
  * Move Data from one Circle of Trust to a second, with a property flag to
@@ -103,13 +103,15 @@ This is CWS 1.1 development branch, following features have been completed:
  * New request - authenticated; simple check to verify if an Account has
    permissions to access the give CWS instance
  * Complete external testing with FitNesse.
- * AES GCM based encryption, CBC is slowly deprecated and instead GCM based
-   encryption should be used. Currently, only 128 but AES GCM encryption is
-   supported, 129/256 bit AES GCM encryption is pending.
+ * AES GCM based encryption, as CBC based encryption is slowly being deprecated
+   and instead GCM based encryption should be used. CWS 1.1 supports 128 bit
+   GCM AES encryption.
 
-As can be seen, the CWS 1.1 release is close to being completed and it is
-expected that it will be released in the Summer 2019. Focus for version 2.0 is
-primarily on migrating the entire code base to Java 11 and Java EE 8.
+As can be seen, CWS 1.1 release is feature complere, pending code review & pen
+testing to be completed. Release date for CWS 1.1 is estimated to happen around
+August 31st. Focus for version 2.0 is primarily on migrating the entire code
+base to Java 11 and Java EE 8, however CWS 1.1 is fully compatible with both
+Java 8 & 11.
 
 # Wish to join
 The overall quality of the software can only improve if more eyes look at it and
@@ -123,17 +125,17 @@ will each cover as close to 100% as possible. Of course, external testing cannot
 and should not cover the same bases as the standard tests.
 
 The code is also checked against as many analysis tools as possible. The final
-code must have 0 issues of any kind - before it is considered ready for
+code must have 0 issues of any kind - before it is considered ready to be
 submitting into the main repository.
 
 ### Documentation
-Docummentation of code is also important, having silly comments is meaningless,
+Documentation of code is also important, having silly comments is meaningless,
 but often it helps to add inline comments to explain intentions and reasoning
 for choices made. But, commenting out code is banned, if it is commented out, it
 is meaningless and should be removed.
 
 ### Style Guide
-CWS is devepoped using IntelliJ IDEA & a local SonarQube instance. The styles
+CWS is developed using IntelliJ IDEA & a local SonarQube instance. The styles
 used and the SonarQube Quality Profile can be found in the accessories folder.
 
 # Software License

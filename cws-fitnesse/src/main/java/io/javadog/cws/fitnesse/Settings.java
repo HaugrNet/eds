@@ -53,9 +53,14 @@ public final class Settings extends CwsRequest<SettingResponse> {
     public Settings(final String accountName, final String credential) {
         setAccountName(accountName);
         setCredential(credential);
+        theSettings.clear();
 
         final SettingRequest request = prepareRequest(SettingRequest.class);
-        theSettings = CallManagement.settings(requestType, requestUrl, request).getSettings();
+        final SettingResponse response = CallManagement.settings(requestType, requestUrl, request);
+
+        if (response != null) {
+            theSettings.putAll(response.getSettings());
+        }
     }
 
     // =========================================================================

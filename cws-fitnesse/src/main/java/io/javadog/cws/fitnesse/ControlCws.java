@@ -63,9 +63,11 @@ public final class ControlCws extends CwsRequest<FetchMemberResponse> {
         processRequest.setAction(Action.DELETE);
 
         final FetchCircleResponse fetchResponse = CallManagement.fetchCircles(requestType, requestUrl, fetchRequest);
-        for (final Circle circle : fetchResponse.getCircles()) {
-            processRequest.setCircleId(circle.getCircleId());
-            CallManagement.processCircle(requestType, requestUrl, processRequest);
+        if (fetchResponse != null) {
+            for (final Circle circle : fetchResponse.getCircles()) {
+                processRequest.setCircleId(circle.getCircleId());
+                CallManagement.processCircle(requestType, requestUrl, processRequest);
+            }
         }
     }
 
@@ -76,12 +78,14 @@ public final class ControlCws extends CwsRequest<FetchMemberResponse> {
         String adminId = null;
 
         final FetchMemberResponse fetchResponse = CallManagement.fetchMembers(requestType, requestUrl, fetchRequest);
-        for (final Member member : fetchResponse.getMembers()) {
-            if (!Objects.equals(member.getAccountName(), Constants.ADMIN_ACCOUNT)) {
-                processRequest.setMemberId(member.getMemberId());
-                CallManagement.processMember(requestType, requestUrl, processRequest);
-            } else {
-                adminId = member.getMemberId();
+        if (fetchResponse != null) {
+            for (final Member member : fetchResponse.getMembers()) {
+                if (!Objects.equals(member.getAccountName(), Constants.ADMIN_ACCOUNT)) {
+                    processRequest.setMemberId(member.getMemberId());
+                    CallManagement.processMember(requestType, requestUrl, processRequest);
+                } else {
+                    adminId = member.getMemberId();
+                }
             }
         }
 
@@ -95,10 +99,12 @@ public final class ControlCws extends CwsRequest<FetchMemberResponse> {
         deleteRequest.setAction(Action.DELETE);
 
         final FetchDataTypeResponse fetchResponse = CallShare.fetchDataTypes(requestType, requestUrl, fetchRequest);
-        for (final DataType dataType : fetchResponse.getDataTypes()) {
-            if (!Constants.DATA_TYPENAME.equalsIgnoreCase(dataType.getTypeName()) && !Constants.FOLDER_TYPENAME.equalsIgnoreCase(dataType.getTypeName())) {
-                deleteRequest.setTypeName(dataType.getTypeName());
-                CallShare.processDataType(requestType, requestUrl, deleteRequest);
+        if (fetchResponse != null) {
+            for (final DataType dataType : fetchResponse.getDataTypes()) {
+                if (!Constants.DATA_TYPENAME.equalsIgnoreCase(dataType.getTypeName()) && !Constants.FOLDER_TYPENAME.equalsIgnoreCase(dataType.getTypeName())) {
+                    deleteRequest.setTypeName(dataType.getTypeName());
+                    CallShare.processDataType(requestType, requestUrl, deleteRequest);
+                }
             }
         }
     }

@@ -85,14 +85,9 @@ final class SoapClientTest {
     private final Share share = new ShareSoapClient(URL);
 
     @Test
-    void testCorrectInstances() {
-        assertTrue(management instanceof ManagementSoapClient);
-        assertTrue(share instanceof ShareSoapClient);
-    }
-
-    @Test
     void testVersion() {
         final VersionResponse response = management.version();
+        assertNotNull(response);
         assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getReturnCode());
         assertEquals("Ok", response.getReturnMessage());
         assertEquals("1.1-SNAPSHOT", response.getVersion());
@@ -103,6 +98,7 @@ final class SoapClientTest {
         final SettingRequest request = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
 
         final SettingResponse response = management.settings(request);
+        assertNotNull(response);
         assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getReturnCode());
         assertEquals("Ok", response.getReturnMessage());
     }
@@ -113,6 +109,7 @@ final class SoapClientTest {
         request.setSecret(request.getCredential());
 
         final MasterKeyResponse response = management.masterKey(request);
+        assertNotNull(response);
         assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getReturnCode());
         assertEquals("MasterKey unlocked.", response.getReturnMessage());
     }
@@ -122,6 +119,7 @@ final class SoapClientTest {
         final SanityRequest request = prepareRequest(SanityRequest.class, Constants.ADMIN_ACCOUNT);
 
         final SanityResponse response = management.sanitized(request);
+        assertNotNull(response);
         assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getReturnCode());
         assertEquals("Ok", response.getReturnMessage());
     }
@@ -131,6 +129,7 @@ final class SoapClientTest {
         final FetchMemberRequest request = prepareRequest(FetchMemberRequest.class, Constants.ADMIN_ACCOUNT);
 
         final FetchMemberResponse response = management.fetchMembers(request);
+        assertNotNull(response);
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
         assertEquals("Ok", response.getReturnMessage());
     }
@@ -145,6 +144,7 @@ final class SoapClientTest {
         request.setNewCredential(accountName.getBytes(StandardCharsets.UTF_8));
 
         final ProcessMemberResponse response = management.processMember(request);
+        assertNotNull(response);
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
         assertEquals("Ok", response.getReturnMessage());
     }
@@ -154,6 +154,7 @@ final class SoapClientTest {
         final FetchCircleRequest request = prepareRequest(FetchCircleRequest.class, Constants.ADMIN_ACCOUNT);
 
         final FetchCircleResponse response = management.fetchCircles(request);
+        assertNotNull(response);
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
         assertEquals("Ok", response.getReturnMessage());
     }
@@ -167,6 +168,7 @@ final class SoapClientTest {
         memberRequest.setNewAccountName(accountName);
         memberRequest.setNewCredential(accountName.getBytes(StandardCharsets.UTF_8));
         final ProcessMemberResponse memberResponse = management.processMember(memberRequest);
+        assertNotNull(memberResponse);
         assertTrue(memberResponse.isOk());
 
         final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, Constants.ADMIN_ACCOUNT);
@@ -176,6 +178,7 @@ final class SoapClientTest {
         request.setCircleName(UUID.randomUUID().toString());
 
         final ProcessCircleResponse response = management.processCircle(request);
+        assertNotNull(response);
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
         assertEquals("Ok", response.getReturnMessage());
     }
@@ -187,11 +190,13 @@ final class SoapClientTest {
         processRequest.setType("Object Mapping Rules");
         processRequest.setAction(Action.PROCESS);
         final ProcessDataTypeResponse processResponse = share.processDataType(processRequest);
+        assertNotNull(processResponse);
         assertTrue(processResponse.isOk());
         assertEquals(processRequest.getTypeName(), processResponse.getDataType().getTypeName());
 
         final FetchDataTypeRequest fetchRequest = prepareRequest(FetchDataTypeRequest.class, Constants.ADMIN_ACCOUNT);
         final FetchDataTypeResponse fetchResponse = share.fetchDataTypes(fetchRequest);
+        assertNotNull(fetchResponse);
         assertTrue(fetchResponse.isOk());
         // If the tests is running against a system with more DataTypes added,
         // this test will fail if hardcoded to 3, hence it expects at least 3.
@@ -218,6 +223,7 @@ final class SoapClientTest {
 
         // Step 3; Check the stored content of the Circle
         final FetchDataResponse response = readFolderContent(accountName1, circleId);
+        assertNotNull(response);
         assertEquals(2L, response.getRecords());
         final byte[] read1 = readData(accountName2, dataId1);
         assertEquals(data1, toString(read1));
@@ -232,12 +238,14 @@ final class SoapClientTest {
         final byte[] document = UUID.randomUUID().toString().getBytes(StandardCharsets.UTF_8);
         signRequest.setData(document);
         final SignResponse signResponse = share.sign(signRequest);
+        assertNotNull(signResponse);
         assertTrue(signResponse.isOk());
         assertNotNull(signResponse.getSignature());
 
         // 2. Fetch Signatures, to see that we have at least one
         final FetchSignatureRequest fetchRequest = prepareRequest(FetchSignatureRequest.class, Constants.ADMIN_ACCOUNT);
         final FetchSignatureResponse fetchResponse = share.fetchSignatures(fetchRequest);
+        assertNotNull(fetchResponse);
         assertTrue(fetchResponse.isOk());
         assertFalse(fetchResponse.getSignatures().isEmpty());
 
@@ -247,6 +255,7 @@ final class SoapClientTest {
         verifyRequest.setSignature(signResponse.getSignature());
 
         final VerifyResponse verifyResponse = share.verify(verifyRequest);
+        assertNotNull(verifyResponse);
         assertTrue(verifyResponse.isOk());
         assertTrue(verifyResponse.isVerified());
     }

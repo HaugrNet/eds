@@ -39,6 +39,8 @@ import java.util.List;
 import java.util.UUID;
 import javax.persistence.Query;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 
 /**
  * <p>This Test Class, is testing the following Service Classes in one, as they
@@ -48,9 +50,14 @@ import org.junit.jupiter.api.Test;
  *   <li>MasterKeyService</li>
  * </ul>
  *
+ * <p>Note that this test class is not working under Windows, as the expected
+ * error messages are truncated and only contain a fraction of the information
+ * as the Linux variant contains.</p>
+ *
  * @author Kim Jensen
  * @since CWS 1.1
  */
+@DisabledOnOs(value = OS.WINDOWS)
 final class MasterKeyServiceTest extends DatabaseSetup {
 
     @Test

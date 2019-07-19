@@ -57,7 +57,7 @@ import org.junit.jupiter.api.condition.OS;
  * @author Kim Jensen
  * @since CWS 1.1
  */
-@DisabledOnOs(value = OS.WINDOWS)
+@DisabledOnOs(value = { OS.WINDOWS, OS.MAC })
 final class MasterKeyServiceTest extends DatabaseSetup {
 
     @Test

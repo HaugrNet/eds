@@ -81,9 +81,9 @@ elif [[ "${action}" = "start" ]]; then
     if [[ $? -eq 1 ]]; then
         echo "Starting WildFly ..."
         if [[ "${debugPort}" = "" ]]; then
-            ${wildfly}/bin/standalone.sh -c standalone-full.xml -Djboss.node.name=cws &
+            ${wildfly}/bin/standalone.sh -c standalone-full.xml -b 0.0.0.0 -Djboss.node.name=cws &
         else
-            ${wildfly}/bin/standalone.sh -c standalone-full.xml -Djboss.node.name=cws --debug ${debugPort} &
+            ${wildfly}/bin/standalone.sh -c standalone-full.xml -b 0.0.0.0 -Djboss.node.name=cws --debug ${debugPort} &
         fi
     else
         echo "WildFly is already running"

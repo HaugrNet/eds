@@ -37,10 +37,12 @@ import io.javadog.cws.api.responses.ProcessCircleResponse;
 import io.javadog.cws.api.responses.ProcessDataResponse;
 import io.javadog.cws.api.responses.ProcessMemberResponse;
 import io.javadog.cws.core.DatabaseSetup;
+import io.javadog.cws.core.GenerateTestData;
 import io.javadog.cws.core.enums.SanityStatus;
 import io.javadog.cws.core.exceptions.CWSException;
 import java.util.Date;
 import java.util.UUID;
+import javax.persistence.Query;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -758,6 +760,57 @@ final class DataServiceTest extends DatabaseSetup {
         final CWSException cause = assertThrows(CWSException.class, () -> service.perform(moveDataRequest));
         assertEquals(ReturnCode.ILLEGAL_ACTION, cause.getReturnCode());
         assertEquals("Moving Data from one Circle to another is not permitted.", cause.getMessage());
+    }
+
+    /**
+     * <p>See <a href="https://github.com/JavaDogs/cws/issues/57">Github</a>.</p>
+     *
+     * <p>From the stacktrace with a build using a snapshot from 2019-07-24:</p>
+     * <pre>
+     * Caused by: java.lang.NullPointerException
+     *         at deployment.cws.war//io.javadog.cws.core.services.ProcessDataService.processAddData(ProcessDataService.java:98)
+     * </pre>
+     *
+     * <p>From the description, how it was caused: <i>It might happen when
+     * adding a file and then again trying to add the same file with the
+     * same id.</i></p>
+     *
+     * <p>The Python code to add the data is:</p>
+     * <pre>
+     * def add_file(url, login, pw, circle_id, blob, uid):
+     *     data = dict(circleId=circle_id,
+     *                 dataName=uid,
+     *                 data=base64.b64encode(blob))
+     *     response = _post(url, login, pw, 'data/addData', data)
+     *     return response
+     * </pre>
+     *
+     * <p>The test that appear to fail:</p>
+     * <pre>
+     *     # ... upload file
+     *     blob = 'ABC'
+     *     uid = u'123'
+     *     data = pycws.add_file(
+     *         URL, 'admin', 'admin', circle_id, blob, uid)
+     *     assert data["returnCode"] == 200
+     *     file_id = data.get('dataId')
+     * </pre>
+     */
+    @Test
+    void testBugReport57() {
+        // It should be noted, that for a normal DB status, it was not possible
+        // to replicate the error. Hence, this attempt to corrupt the database
+        // prior to adding new data.
+        final Query query = entityManager.createQuery("delete from MetadataEntity where circle.id = :cid");
+        query.setParameter("cid", 1L);
+        query.executeUpdate();
+
+        final ProcessDataService service = new ProcessDataService(settings, entityManager);
+        final ProcessDataRequest request = prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "My Object", 1024);
+
+        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
+        assertEquals(ReturnCode.INTEGRITY_ERROR, cause.getReturnCode());
+        assertTrue(cause.getMessage().contains("No Parent could be found for the Circle"));
     }
 
     // =========================================================================

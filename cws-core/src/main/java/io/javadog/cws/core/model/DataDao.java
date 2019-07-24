@@ -45,8 +45,7 @@ public final class DataDao extends CommonDao {
         return findSingleRecord(query);
     }
 
-    public DataEntity findDataByMemberAndExternalId(final MemberEntity member,
-                                                    final String externalId) {
+    public DataEntity findDataByMemberAndExternalId(final MemberEntity member, final String externalId) {
         final Query query = entityManager.createNamedQuery("data.findByMemberAndExternalId");
         query.setParameter(MEMBER, member);
         query.setParameter(EXTERNAL_ID, externalId);
@@ -55,8 +54,7 @@ public final class DataDao extends CommonDao {
         return findSingleRecord(query);
     }
 
-    public MetadataEntity findMetaDataByMemberAndExternalId(final Long memberId,
-                                                            final String externalId) {
+    public MetadataEntity findMetaDataByMemberAndExternalId(final Long memberId, final String externalId) {
         final Query query = entityManager.createNamedQuery("metadata.findByMemberAndExternalId");
         query.setParameter("mid", memberId);
         query.setParameter("eid", externalId);
@@ -64,8 +62,7 @@ public final class DataDao extends CommonDao {
         return findSingleRecord(query);
     }
 
-    public MetadataEntity findRootByMemberCircle(final Long memberId,
-                                                 final String circleId) {
+    public MetadataEntity findRootByMemberCircle(final Long memberId, final String circleId) {
         final Query query = entityManager.createNamedQuery("metadata.findRootByMemberAndCircle");
         query.setParameter("mid", memberId);
         query.setParameter("cid", circleId);
@@ -73,10 +70,7 @@ public final class DataDao extends CommonDao {
         return findSingleRecord(query);
     }
 
-    public List<MetadataEntity> findMetadataByMemberAndFolder(final MemberEntity member,
-                                                              final Long parentId,
-                                                              final int pageNumber,
-                                                              final int pageSize) {
+    public List<MetadataEntity> findMetadataByMemberAndFolder(final MemberEntity member, final Long parentId, final int pageNumber, final int pageSize) {
         final Query query = entityManager.createNamedQuery("metadata.findByMemberAndFolder");
         query.setParameter(MEMBER, member);
         query.setParameter(PARENT_ID, parentId);
@@ -93,9 +87,7 @@ public final class DataDao extends CommonDao {
         return (long) query.getSingleResult();
     }
 
-    public boolean checkIfNameIsUsed(final Long metadataId,
-                                     final String name,
-                                     final Long parentId) {
+    public boolean checkIfNameIsUsed(final Long metadataId, final String name, final Long parentId) {
         final Query query = entityManager.createNamedQuery("metadata.findByNameAndFolder");
         query.setParameter("id", metadataId);
         query.setParameter(NAME, name);
@@ -104,9 +96,7 @@ public final class DataDao extends CommonDao {
         return findSingleRecord(query) != null;
     }
 
-    public MetadataEntity findInFolder(final MemberEntity member,
-                                       final Long parentId,
-                                       final String name) {
+    public MetadataEntity findInFolder(final MemberEntity member, final Long parentId, final String name) {
         final Query query = entityManager.createNamedQuery("metadata.findInFolder");
         query.setParameter(MEMBER, member);
         query.setParameter(PARENT_ID, parentId);

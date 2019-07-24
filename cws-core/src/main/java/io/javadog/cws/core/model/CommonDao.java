@@ -169,8 +169,7 @@ public class CommonDao {
         return findSingleRecord(query);
     }
 
-    public MemberEntity findMemberByNameAndCircleId(final String name,
-                                                    final String externalCircleId) {
+    public MemberEntity findMemberByNameAndCircleId(final String name, final String externalCircleId) {
         final Query query = entityManager.createNamedQuery("member.findByNameAndCircle");
         query.setParameter("name", toLower(name));
         query.setParameter("externalCircleId", externalCircleId);
@@ -184,8 +183,7 @@ public class CommonDao {
         return found.get(0);
     }
 
-    public List<TrusteeEntity> findTrusteesByMember(final MemberEntity member,
-                                                    final Set<TrustLevel> permissions) {
+    public List<TrusteeEntity> findTrusteesByMember(final MemberEntity member, final Set<TrustLevel> permissions) {
         final Query query = entityManager.createNamedQuery("trust.findByMember");
         query.setParameter(MEMBER, member);
         query.setParameter("permissions", permissions);
@@ -193,9 +191,7 @@ public class CommonDao {
         return findList(query);
     }
 
-    public List<TrusteeEntity> findTrusteesByMemberAndCircle(final MemberEntity member,
-                                                             final String externalCircleId,
-                                                             final Set<TrustLevel> permissions) {
+    public List<TrusteeEntity> findTrusteesByMemberAndCircle(final MemberEntity member, final String externalCircleId, final Set<TrustLevel> permissions) {
         final Query query = entityManager.createNamedQuery("trust.findByMemberAndExternalCircleId");
         query.setParameter(MEMBER, member);
         query.setParameter("externalCircleId", externalCircleId);
@@ -246,8 +242,7 @@ public class CommonDao {
         return (long) query.getSingleResult();
     }
 
-    public TrusteeEntity findTrusteeByCircleAndMember(final String externalCircleId,
-                                                      final String externalMemberId) {
+    public TrusteeEntity findTrusteeByCircleAndMember(final String externalCircleId, final String externalMemberId) {
         final Query query = entityManager.createNamedQuery("trustee.findByCircleAndMember");
         query.setParameter("ecid", externalCircleId);
         query.setParameter("emid", externalMemberId);
@@ -293,7 +288,7 @@ public class CommonDao {
      * @param <E>   Entity Type to return
      * @return First Entity matching Query or null
      */
-    protected static <E> E findSingleRecord(final Query query) {
+    static <E> E findSingleRecord(final Query query) {
         final List<E> found = findList(query);
 
         return found.isEmpty() ? null : found.get(0);

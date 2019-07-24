@@ -42,31 +42,40 @@
 
     <properties>
         <!-- Provided Dependencies -->
-        <javaee.version>7.0</javaee.version>
+        <version.dependency.javaee>7.0</version.dependency.javaee>
+
         <!-- JSON for REST -->
-        <gson.version>2.8.5</gson.version>
+        <version.dependency.gson>2.8.5</version.dependency.gson>
+
         <!-- XML for SOAP -->
-        <jaxws.version>2.3.1</jaxws.version>
-        <cxf.version>3.3.2</cxf.version>
-        <xmlschema.version>2.2.4</xmlschema.version>
+        <version.dependency.cxf>3.3.2</version.dependency.cxf>
+        <version.dependency.xmlschema>2.2.4</version.dependency.xmlschema>
+        <version.dependency.jaxws>2.3.1</version.dependency.jaxws>
+        <version.dependency.jaxb.api>2.3.1</version.dependency.jaxb.api>
+        <version.dependency.jaxb.core>2.3.0.1</version.dependency.jaxb.core>
+        <version.dependency.jaxb.impl>2.3.2</version.dependency.jaxb.impl>
+        <version.dependency.activation>1.1.1</version.dependency.activation>
+
         <!-- Test Plugins -->
-        <junit.version>5.5.0</junit.version>
-        <slf4j.version>1.7.26</slf4j.version>
-        <logback.version>1.2.3</logback.version>
-        <hibernate.version>5.4.3.Final</hibernate.version>
-        <h2.version>1.4.199</h2.version>
+        <version.dependency.junit>5.5.0</version.dependency.junit>
+        <version.dependency.slf4j>1.7.26</version.dependency.slf4j>
+        <version.dependency.logback>1.2.3</version.dependency.logback>
+        <version.dependency.hibernate>5.4.3.Final</version.dependency.hibernate>
+        <version.dependency.h2>1.4.199</version.dependency.h2>
+
         <!-- Maven Plugins -->
-        <maven.compiler.plugin>3.8.1</maven.compiler.plugin>
-        <maven.javadoc.plugin>3.1.1</maven.javadoc.plugin>
-        <maven.source.plugin>3.1.0</maven.source.plugin>
-        <maven.surefire.plugin>2.22.2</maven.surefire.plugin>
-        <maven.jar.plugin>3.1.2</maven.jar.plugin>
-        <maven.war.plugin>3.2.3</maven.war.plugin>
-        <maven.shade.plugin>3.2.1</maven.shade.plugin>
-        <org.owasp.plugin>5.1.0</org.owasp.plugin>
-        <org.jacoco.plugin>0.8.4</org.jacoco.plugin>
-        <org.sonar.plugin>3.6.0.1398</org.sonar.plugin>
-        <org.build.plugin>3.0.0</org.build.plugin>
+        <version.plugin.maven.compiler>3.8.1</version.plugin.maven.compiler>
+        <version.plugin.maven.javadoc>3.1.1</version.plugin.maven.javadoc>
+        <version.plugin.maven.source>3.1.0</version.plugin.maven.source>
+        <version.plugin.maven.surefire>2.22.2</version.plugin.maven.surefire>
+        <version.plugin.maven.jar>3.1.2</version.plugin.maven.jar>
+        <version.plugin.maven.war>3.2.3</version.plugin.maven.war>
+        <version.plugin.maven.shade>3.2.1</version.plugin.maven.shade>
+        <version.plugin.org.owasp>5.1.0</version.plugin.org.owasp>
+        <version.plugin.org.wildfly>2.0.1.Final</version.plugin.org.wildfly>
+        <version.plugin.org.jacoco>0.8.4</version.plugin.org.jacoco>
+        <version.plugin.org.sonar>3.6.0.1398</version.plugin.org.sonar>
+        <version.plugin.org.build>3.0.0</version.plugin.org.build>
 
         <!-- To avoid that the builds are platform specific -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -119,71 +128,72 @@
             <dependency>
                 <groupId>javax</groupId>
                 <artifactId>javaee-api</artifactId>
-                <version>${javaee.version}</version>
+                <version>${version.dependency.javaee}</version>
                 <scope>provided</scope>
-            </dependency>
-
-            <!-- Following is needed for Java 10+ -->
-            <dependency>
-              <groupId>javax.xml.ws</groupId>
-              <artifactId>jaxws-api</artifactId>
-              <version>${jaxws.version}</version>
             </dependency>
 
             <!-- Following is required to build & run the REST Client -->
             <dependency>
                 <groupId>com.google.code.gson</groupId>
                 <artifactId>gson</artifactId>
-                <version>${gson.version}</version>
+                <version>${version.dependency.gson}</version>
             </dependency>
 
             <!-- Following is required to build the SOAP Client. -->
             <dependency>
                 <groupId>org.apache.cxf</groupId>
                 <artifactId>cxf-rt-frontend-jaxws</artifactId>
-                <version>${cxf.version}</version>
+                <version>${version.dependency.cxf}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.cxf</groupId>
                 <artifactId>cxf-rt-transports-http</artifactId>
-                <version>${cxf.version}</version>
+                <version>${version.dependency.cxf}</version>
             </dependency>
-
-            <!-- Following is required to run the SOAP Client. -->
             <dependency>
                 <groupId>org.apache.cxf</groupId>
                 <artifactId>cxf-rt-databinding-jaxb</artifactId>
-                <version>${cxf.version}</version>
+                <version>${version.dependency.cxf}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.ws.xmlschema</groupId>
                 <artifactId>xmlschema-core</artifactId>
-                <version>${xmlschema.version}</version>
+                <version>${version.dependency.xmlschema}</version>
             </dependency>
 
             <!-- XML bindings have been removed from Java 9+ -->
             <dependency>
+                <groupId>javax.xml.ws</groupId>
+                <artifactId>jaxws-api</artifactId>
+                <version>${version.dependency.jaxws}</version>
+            </dependency>
+            <dependency>
                 <groupId>javax.xml.bind</groupId>
                 <artifactId>jaxb-api</artifactId>
-                <version>2.3.1</version>
+                <version>${version.dependency.jaxb.api}</version>
             </dependency>
             <dependency>
                 <groupId>com.sun.xml.bind</groupId>
                 <artifactId>jaxb-core</artifactId>
-                <version>2.3.0.1</version>
+                <version>${version.dependency.jaxb.core}</version>
             </dependency>
             <dependency>
                 <groupId>com.sun.xml.bind</groupId>
                 <artifactId>jaxb-impl</artifactId>
-                <version>2.3.2</version>
+                <version>${version.dependency.jaxb.impl}</version>
             </dependency>
             <dependency>
                 <groupId>javax.activation</groupId>
                 <artifactId>activation</artifactId>
-                <version>1.1.1</version>
+                <version>${version.dependency.activation}</version>
             </dependency>
 
             <!-- Dependencies used for testing -->
+            <dependency>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter-engine</artifactId>
+                <version>${version.dependency.junit}</version>
+            </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>cws-core</artifactId>
@@ -193,33 +203,27 @@
             <dependency>
                 <groupId>org.hibernate</groupId>
                 <artifactId>hibernate-core</artifactId>
-                <version>${hibernate.version}</version>
+                <version>${version.dependency.hibernate}</version>
             </dependency>
             <dependency>
                 <groupId>com.h2database</groupId>
                 <artifactId>h2</artifactId>
-                <version>${h2.version}</version>
+                <version>${version.dependency.h2}</version>
             </dependency>
-
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
-                <version>${slf4j.version}</version>
+                <version>${version.dependency.slf4j}</version>
             </dependency>
             <dependency>
                 <groupId>ch.qos.logback</groupId>
                 <artifactId>logback-classic</artifactId>
-                <version>${logback.version}</version>
+                <version>${version.dependency.logback}</version>
             </dependency>
             <dependency>
                 <groupId>ch.qos.logback</groupId>
                 <artifactId>logback-core</artifactId>
-                <version>${logback.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.junit.jupiter</groupId>
-                <artifactId>junit-jupiter-engine</artifactId>
-                <version>${junit.version}</version>
+                <version>${version.dependency.logback}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -239,42 +243,42 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>${maven.compiler.plugin}</version>
+                    <version>${version.plugin.maven.compiler}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>${maven.javadoc.plugin}</version>
+                    <version>${version.plugin.maven.javadoc}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-source-plugin</artifactId>
-                    <version>${maven.source.plugin}</version>
+                    <version>${version.plugin.maven.source}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>${maven.surefire.plugin}</version>
+                    <version>${version.plugin.maven.surefire}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-jar-plugin</artifactId>
-                    <version>${maven.jar.plugin}</version>
+                    <version>${version.plugin.maven.jar}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-war-plugin</artifactId>
-                    <version>${maven.war.plugin}</version>
+                    <version>${version.plugin.maven.war}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-shade-plugin</artifactId>
-                    <version>${maven.shade.plugin}</version>
+                    <version>${version.plugin.maven.shade}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.owasp</groupId>
                     <artifactId>dependency-check-maven</artifactId>
-                    <version>${org.owasp.plugin}</version>
+                    <version>${version.plugin.org.owasp}</version>
                     <executions>
                         <execution>
                             <phase>verify</phase>
@@ -285,19 +289,24 @@
                     </executions>
                 </plugin>
                 <plugin>
+                    <groupId>org.wildfly.plugins</groupId>
+                    <artifactId>wildfly-maven-plugin</artifactId>
+                    <version>${version.plugin.org.wildfly}</version>
+                </plugin>
+                <plugin>
                     <groupId>org.jacoco</groupId>
                     <artifactId>jacoco-maven-plugin</artifactId>
-                    <version>${org.jacoco.plugin}</version>
+                    <version>${version.plugin.org.jacoco}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.sonarsource.scanner.maven</groupId>
                     <artifactId>sonar-maven-plugin</artifactId>
-                    <version>${org.sonar.plugin}</version>
+                    <version>${version.plugin.org.sonar}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>build-helper-maven-plugin</artifactId>
-                    <version>${org.build.plugin}</version>
+                    <version>${version.plugin.org.build}</version>
                 </plugin>
             </plugins>
         </pluginManagement>

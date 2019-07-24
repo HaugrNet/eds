@@ -28,15 +28,18 @@ import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.common.TrustLevel;
 import io.javadog.cws.api.dtos.Trustee;
+import io.javadog.cws.api.requests.Authentication;
 import io.javadog.cws.api.requests.FetchTrusteeRequest;
 import io.javadog.cws.api.requests.ProcessCircleRequest;
 import io.javadog.cws.api.requests.ProcessTrusteeRequest;
+import io.javadog.cws.api.responses.CwsResponse;
 import io.javadog.cws.api.responses.FetchTrusteeResponse;
 import io.javadog.cws.api.responses.ProcessCircleResponse;
 import io.javadog.cws.api.responses.ProcessTrusteeResponse;
 import io.javadog.cws.core.DatabaseSetup;
 import io.javadog.cws.core.enums.StandardSetting;
 import io.javadog.cws.core.exceptions.CWSException;
+import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 
@@ -470,9 +473,65 @@ final class TrusteeServiceTest extends DatabaseSetup {
         assertEquals("The requested Trustee could not be found.", cause.getMessage());
     }
 
+    @Test
+    void testCreateCircleAddTrusteeAndRemoveSelf() {
+        final ProcessCircleService circleService = new ProcessCircleService(settings, entityManager);
+        final ProcessTrusteeService trusteeService = new ProcessTrusteeService(settings, entityManager);
+
+        // Step 1; Create new Circle of Trust
+        final ProcessCircleRequest createRequest = prepareRequest(ProcessCircleRequest.class, MEMBER_1);
+        createRequest.setAction(Action.CREATE);
+        createRequest.setCircleName("Awesome Circle");
+        final ProcessCircleResponse createResponse = perform(circleService, createRequest);
+        final String circleId = createResponse.getCircleId();
+
+        // Step 2; Add another user to the Circle
+        final ProcessTrusteeRequest addRequest = prepareRequest(ProcessTrusteeRequest.class, MEMBER_1);
+        addRequest.setAction(Action.ADD);
+        addRequest.setCircleId(circleId);
+        addRequest.setTrustLevel(TrustLevel.WRITE);
+        addRequest.setMemberId(MEMBER_2_ID);
+        perform(trusteeService, addRequest);
+
+        // Step 3; Remove self
+        final ProcessTrusteeRequest removeRequest = prepareRequest(ProcessTrusteeRequest.class, MEMBER_1);
+        removeRequest.setAction(Action.REMOVE);
+        removeRequest.setCircleId(circleId);
+        removeRequest.setMemberId(MEMBER_1_ID);
+        perform(trusteeService, removeRequest);
+
+        // Step 4; As Admin, make the remaining user Circle Admin
+        final ProcessTrusteeRequest alterRequest = prepareRequest(ProcessTrusteeRequest.class, Constants.ADMIN_ACCOUNT);
+        alterRequest.setAction(Action.ALTER);
+        alterRequest.setCircleId(circleId);
+        alterRequest.setMemberId(MEMBER_2_ID);
+        alterRequest.setTrustLevel(TrustLevel.ADMIN);
+        perform(trusteeService, alterRequest);
+
+        // Step 5; As member 2, I'm fetching the list of Trustees for the circle
+        final FetchTrusteeService fetchService = new FetchTrusteeService(settings, entityManager);
+        final FetchTrusteeRequest fetchRequest = prepareRequest(FetchTrusteeRequest.class, MEMBER_2);
+        fetchRequest.setCircleId(circleId);
+        final FetchTrusteeResponse fetchResponse = perform(fetchService, fetchRequest);
+        final List<Trustee> trustees = fetchResponse.getTrustees();
+        assertEquals(1, trustees.size());
+        assertEquals(TrustLevel.ADMIN, trustees.get(0).getTrustLevel());
+        assertEquals(MEMBER_2_ID, trustees.get(0).getMemberId());
+        assertEquals(circleId, trustees.get(0).getCircleId());
+    }
+
     // =========================================================================
     // Internal Helper Methods
     // =========================================================================
+
+    private <I extends Authentication, O extends CwsResponse> O perform(final Serviceable<?, O, I> service, final I request) {
+        final O response = service.perform(request);
+        assertNotNull(response);
+        assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
+        assertEquals("Ok", response.getReturnMessage());
+
+        return response;
+    }
 
     private static void detailedTrusteeAssertion(final FetchTrusteeResponse response, final String... memberIds) {
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());

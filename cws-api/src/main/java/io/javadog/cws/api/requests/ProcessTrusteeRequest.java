@@ -19,7 +19,9 @@ package io.javadog.cws.api.requests;
 import io.javadog.cws.api.common.Action;
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.TrustLevel;
+import java.util.EnumSet;
 import java.util.Map;
+import java.util.Set;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -143,11 +145,13 @@ public final class ProcessTrusteeRequest extends Authentication implements Circl
                     checkNotNullAndValidId(errors, Constants.FIELD_CIRCLE_ID, circleId, "Cannot add a Trustee to a Circle, without a Circle Id.");
                     checkNotNullAndValidId(errors, Constants.FIELD_MEMBER_ID, memberId, "Cannot add a Trustee to a Circle, without a Member Id.");
                     checkNotNull(errors, Constants.FIELD_TRUSTLEVEL, trustLevel, "Cannot add a Trustee to a Circle, without an initial TrustLevel.");
+                    checkValidTrustLevel(errors, trustLevel);
                     break;
                 case ALTER:
                     checkNotNullAndValidId(errors, Constants.FIELD_CIRCLE_ID, circleId, "Cannot alter a Trustees TrustLevel, without knowing the Circle Id.");
                     checkNotNullAndValidId(errors, Constants.FIELD_MEMBER_ID, memberId, "Cannot alter a Trustees TrustLevel, without knowing the Member Id.");
                     checkNotNull(errors, Constants.FIELD_TRUSTLEVEL, trustLevel, "Cannot alter a Trustees TrustLevel, without knowing the new TrustLevel.");
+                    checkValidTrustLevel(errors, trustLevel);
                     break;
                 case REMOVE:
                     checkNotNullAndValidId(errors, Constants.FIELD_CIRCLE_ID, circleId, "Cannot remove a Trustee from a Circle, without knowing the Circle Id.");
@@ -160,5 +164,17 @@ public final class ProcessTrusteeRequest extends Authentication implements Circl
         }
 
         return errors;
+    }
+
+    private static void checkValidTrustLevel(final Map<String, String> errors, final TrustLevel value) {
+        if (value != null) {
+            final Set<TrustLevel> allowed = EnumSet.of(TrustLevel.ADMIN, TrustLevel.WRITE, TrustLevel.READ);
+            if (!allowed.contains(value)) {
+                errors.put(Constants.FIELD_TRUSTLEVEL, "The TrustLevel must be one of ["
+                        + TrustLevel.READ + ", "
+                        + TrustLevel.WRITE + ", "
+                        + TrustLevel.ADMIN + "].");
+            }
+        }
     }
 }

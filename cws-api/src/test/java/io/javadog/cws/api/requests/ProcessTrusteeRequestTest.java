@@ -167,4 +167,19 @@ final class ProcessTrusteeRequestTest {
         assertEquals("Cannot remove a Trustee from a Circle, without knowing the Circle Id.", errors.get(Constants.FIELD_CIRCLE_ID));
         assertEquals("Cannot remove a Trustee from a Circle, without knowing the Member Id.", errors.get(Constants.FIELD_MEMBER_ID));
     }
+
+    @Test
+    void testValidTrustLevel() {
+        final ProcessTrusteeRequest request = new ProcessTrusteeRequest();
+        request.setAccountName(Constants.ADMIN_ACCOUNT);
+        request.setCredential(TestUtilities.convert(Constants.ADMIN_ACCOUNT));
+        request.setCircleId(UUID.randomUUID().toString());
+        request.setMemberId(UUID.randomUUID().toString());
+        request.setTrustLevel(TrustLevel.SYSOP);
+        request.setAction(Action.ADD);
+
+        final Map<String, String> errors = request.validate();
+        assertEquals(1, errors.size());
+        assertEquals("The TrustLevel must be one of [READ, WRITE, ADMIN].", errors.get(Constants.FIELD_TRUSTLEVEL));
+    }
 }

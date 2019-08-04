@@ -17,6 +17,11 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>cws-api</artifactId>
         </dependency>
+        <dependency>
+            <groupId>javax</groupId>
+            <artifactId>javaee-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
 
         <!-- Following is required to build the SOAP Client. -->
         <dependency>

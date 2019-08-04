@@ -16,7 +16,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>io.javadog</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>cws-soap</artifactId>
         </dependency>
         <dependency>

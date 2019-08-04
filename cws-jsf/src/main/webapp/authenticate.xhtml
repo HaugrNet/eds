@@ -1,0 +1,27 @@
+<!DOCTYPE HTML>
+<HTML xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html">
+<h:head>
+    <title>CWS Authentication</title>
+    <style type="text/css">
+        .textPlacement {
+            margin: 12px;
+        }
+    </style>
+</h:head>
+<h:body>
+    <h2>CWS Authentication Page</h2>
+    <h:form id="loginForm">
+        <div id="userNameDiv" class="textPlacement">
+            <h:outputLabel value="Username: "/>
+            <h:inputText value="#{authenticationBean.userName}"/>
+        </div>
+        <div id="passwordDiv" class="textPlacement">
+            <h:outputLabel value="Password: "/>
+            <h:inputSecret value="#{authenticationBean.password}"/>
+        </div>
+        <div id="submitBtn" class="textPlacement">
+            <h:commandButton value="Login" action="#{authenticationBean.login}"/>
+        </div>
+    </h:form>
+</h:body>
+</HTML>

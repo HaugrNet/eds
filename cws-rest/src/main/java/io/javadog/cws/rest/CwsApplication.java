@@ -16,6 +16,7 @@
  */
 package io.javadog.cws.rest;
 
+import io.javadog.cws.api.common.Constants;
 import java.util.HashSet;
 import java.util.Set;
 import javax.ws.rs.ApplicationPath;
@@ -28,7 +29,7 @@ import javax.ws.rs.core.Application;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-@ApplicationPath("/")
+@ApplicationPath(Constants.REST_API)
 public class CwsApplication extends Application {
 
     /**

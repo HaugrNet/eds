@@ -54,7 +54,7 @@ public final class Constants {
      * <p>All Id's must be compliant with a standard UUID Pattern, which this
      * regular expression matches.</p>
      */
-    public static final String ID_PATTERN_REGEX = "[\\da-z]{8}-[\\da-z]{4}-[\\da-z]{4}-[\\da-z]{4}-[\\da-z]{12}";
+    private static final String ID_PATTERN_REGEX = "[\\da-z]{8}-[\\da-z]{4}-[\\da-z]{4}-[\\da-z]{4}-[\\da-z]{12}";
 
     /**
      * <p>Pattern to test if a given value matches a UUID, which is what CWS
@@ -144,6 +144,7 @@ public final class Constants {
     // =========================================================================
     // Following is the part of the URLs for all REST based requests. It is
     // divided into the base call, and the sub calls.
+    public static final String REST_API = "/api";
 
     // General requests from the Management Interface
     public static final String REST_VERSION = "/version";

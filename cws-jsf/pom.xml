@@ -15,7 +15,7 @@
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>cws-core</artifactId>
+            <artifactId>cws-client-rest</artifactId>
         </dependency>
         <dependency>
             <groupId>javax</groupId>
@@ -30,6 +30,7 @@
     </dependencies>
 
     <build>
+        <finalName>jsf</finalName>
         <plugins>
             <plugin>
                 <groupId>org.wildfly.plugins</groupId>

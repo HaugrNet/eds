@@ -44,6 +44,9 @@
         <!-- Provided Dependencies -->
         <version.dependency.javaee>7.0</version.dependency.javaee>
 
+        <!-- Primeface for JSF -->
+        <version.dependency.primeface>7.0</version.dependency.primeface>
+
         <!-- JSON for REST -->
         <version.dependency.gson>2.8.5</version.dependency.gson>
 
@@ -117,6 +120,11 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
+                <artifactId>cws-jsf</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>cws-client-rest</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -129,7 +137,11 @@
                 <groupId>javax</groupId>
                 <artifactId>javaee-api</artifactId>
                 <version>${version.dependency.javaee}</version>
-                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.primefaces</groupId>
+                <artifactId>primefaces</artifactId>
+                <version>${version.dependency.primeface}</version>
             </dependency>
 
             <!-- Following is required to build & run the REST Client -->

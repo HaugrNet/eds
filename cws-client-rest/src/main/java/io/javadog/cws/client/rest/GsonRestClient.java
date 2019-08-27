@@ -24,6 +24,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
+import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.requests.Authentication;
 import io.javadog.cws.api.responses.CwsResponse;
@@ -54,7 +55,7 @@ public class GsonRestClient {
     private final String baseURL;
 
     protected GsonRestClient(final String baseURL) {
-        this.baseURL = baseURL;
+        this.baseURL = baseURL + Constants.REST_API;
     }
 
     protected <R extends Authentication, C extends CwsResponse> C runRequest(final Class<C> clazz, final String requestURL, final R request) {

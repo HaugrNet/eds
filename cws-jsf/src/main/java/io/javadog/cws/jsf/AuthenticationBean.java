@@ -16,18 +16,21 @@
  */
 package io.javadog.cws.jsf;
 
-import io.javadog.cws.api.Management;
 import io.javadog.cws.api.common.Action;
 import io.javadog.cws.api.common.CredentialType;
 import io.javadog.cws.api.requests.ProcessMemberRequest;
 import io.javadog.cws.api.responses.CwsResponse;
-import io.javadog.cws.client.rest.ManagementRestClient;
+import io.javadog.cws.core.ManagementBean;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.RequestScoped;
+import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
-import javax.servlet.http.HttpSession;
+import javax.inject.Inject;
 
 /**
  * @author Kim Jensen
@@ -37,31 +40,64 @@ import javax.servlet.http.HttpSession;
 @RequestScoped
 public class AuthenticationBean {
 
-    private Management client = new ManagementRestClient("http://localhost:8080/cws");
+    private static final FacesContext CONTEXT = FacesContext.getCurrentInstance();
+    private static final String COOKIE = "CWSToken";
+
+    @Inject
+    private ManagementBean client;
 
     private String userName;
     private String password;
     private String returnMessage;
 
     public String login() {
-        final FacesContext context = FacesContext.getCurrentInstance();
-        final HttpSession session = (HttpSession) context.getExternalContext().getSession(true);
+        try {
+            final ExternalContext context = CONTEXT.getExternalContext();
+            final String sessionKey = getOrCreateCookie(context);
 
-        final ProcessMemberRequest request = new ProcessMemberRequest();
-        request.setCredential(password.getBytes(StandardCharsets.UTF_8));
-        request.setCredentialType(CredentialType.PASSPHRASE);
-        request.setAccountName(userName);
-        request.setAction(Action.LOGIN);
-        request.setNewCredential(session.getId().getBytes(StandardCharsets.UTF_8));
-        final Map<String, String> validation = request.validate();
-        assert validation.isEmpty();
+            final ProcessMemberRequest request = new ProcessMemberRequest();
+            request.setCredential(toBytes(password));
+            request.setCredentialType(CredentialType.PASSPHRASE);
+            request.setAccountName(userName);
+            request.setAction(Action.LOGIN);
+            request.setNewCredential(toBytes(sessionKey));
 
-        final CwsResponse response = client.processMember(request);
-        System.out.println(response.getReturnCode());
-        System.out.println(response.getReturnMessage());
-        returnMessage = response.getReturnMessage();
+            final CwsResponse response = client.processMember(request);
+            returnMessage = response.getReturnMessage();
+            password = null;
 
-        return response.isOk() ? "success" : "failure";
+            if (response.isOk()) {
+                redirect(context, "success.xhtml");
+            } else {
+                redirect(context, "failure.xhtml");
+            }
+
+            return response.isOk() ? "success" : "failure";
+        } catch (IOException | RuntimeException e) {
+            returnMessage = e.getMessage();
+            return "fatal";
+        }
+    }
+
+    private String getOrCreateCookie(final ExternalContext context) {
+        final Map<String, Object> cookies = context.getRequestCookieMap();
+        final String cookie;
+
+        if (cookies.containsKey(COOKIE)) {
+            cookie = (String) cookies.get(COOKIE);
+        } else {
+            cookie = UUID.randomUUID().toString();
+
+            Map<String, Object> options = new ConcurrentHashMap<>();
+            options.put("path", "/");
+            context.addResponseCookie(COOKIE, cookie, options);
+        }
+
+        return cookie;
+    }
+
+    private byte[] toBytes(final String str) {
+        return str.getBytes(StandardCharsets.UTF_8);
     }
 
     public String getUserName() {
@@ -82,5 +118,9 @@ public class AuthenticationBean {
 
     public String getReturnMessage() {
         return returnMessage;
+    }
+
+    private void redirect(final ExternalContext context, final String page) throws IOException {
+        context.redirect(context.getRequestContextPath() + '/' + page);
     }
 }

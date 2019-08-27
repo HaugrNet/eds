@@ -1,0 +1,20 @@
+<!DOCTYPE HTML>
+<HTML xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html">
+<h:head>
+    <title>CWS Authentication</title>
+    <style type="text/css">
+        .successText {
+            color: green;
+            margin: 12px;
+            font-weight: bold;
+        }
+    </style>
+</h:head>
+
+<h:body>
+    <div id="result">
+        Welcome <span id="userName"><h:outputLabel class="successText" value="#{authenticationBean.userName}"/></span>
+    </div>
+</h:body>
+</HTML>

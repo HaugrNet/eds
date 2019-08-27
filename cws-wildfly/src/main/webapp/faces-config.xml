@@ -2,16 +2,17 @@
 <faces-config xmlns="http://xmlns.jcp.org/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-facesconfig_2_2.xsd" version="2.2">
 
 	<navigation-rule>
-		<from-view-id>/src/main/webapp/authenticate.xhtml</from-view-id>
+		<display-name>CWS Management</display-name>
+		<from-view-id>authenticate.xhtml</from-view-id>
 		<navigation-case>
 			<from-action>#{authenticationBean.login}</from-action>
 			<from-outcome>success</from-outcome>
-			<to-view-id>/src/main/webapp/success.xhtml</to-view-id>
+			<to-view-id>main.xhtml</to-view-id>
 		</navigation-case>
 		<navigation-case>
 			<from-action>#{authenticationBean.login}</from-action>
 			<from-outcome>failure</from-outcome>
-			<to-view-id>/src/main/webapp/failure.xhtml</to-view-id>
+			<to-view-id>authenticate.xhtml</to-view-id>
 		</navigation-case>
 	</navigation-rule>
 

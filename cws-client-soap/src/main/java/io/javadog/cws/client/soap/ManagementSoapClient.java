@@ -288,7 +288,7 @@ public final class ManagementSoapClient implements Management {
             ws.setCircleId(Mapper.convert(Constants.FIELD_CIRCLE_ID, request.getCircleId()));
             ws.setCircleName(Mapper.convert(Constants.FIELD_CIRCLE_NAME, request.getCircleName()));
             ws.setMemberId(Mapper.convert(Constants.FIELD_MEMBER_ID, request.getMemberId()));
-            ws.setCircleKey(Mapper.convert(Constants.FIELD_CIRCKE_KEY, request.getCircleKey()));
+            ws.setCircleKey(Mapper.convert(Constants.FIELD_CIRCLE_KEY, request.getCircleKey()));
 
             final ProcessCircleResult result = client.processCircle(ws);
             if (result != null) {

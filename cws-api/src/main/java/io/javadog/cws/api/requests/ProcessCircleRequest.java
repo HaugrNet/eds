@@ -61,7 +61,7 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "processCircleRequest")
-@XmlType(name = "processCircleRequest", propOrder = { Constants.FIELD_ACTION, Constants.FIELD_CIRCLE_ID, Constants.FIELD_CIRCLE_NAME, Constants.FIELD_MEMBER_ID, Constants.FIELD_CIRCKE_KEY })
+@XmlType(name = "processCircleRequest", propOrder = { Constants.FIELD_ACTION, Constants.FIELD_CIRCLE_ID, Constants.FIELD_CIRCLE_NAME, Constants.FIELD_MEMBER_ID, Constants.FIELD_CIRCLE_KEY })
 public final class ProcessCircleRequest extends Authentication implements CircleIdRequest, ActionRequest {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
@@ -81,7 +81,7 @@ public final class ProcessCircleRequest extends Authentication implements Circle
 
     // The Circle Key is an optional value which may or may not be provided,
     // hence it is only stored but not used for anything.
-    @XmlElement(name = Constants.FIELD_CIRCKE_KEY, nillable = true)
+    @XmlElement(name = Constants.FIELD_CIRCLE_KEY, nillable = true)
     private String circleKey = null;
 
     // =========================================================================

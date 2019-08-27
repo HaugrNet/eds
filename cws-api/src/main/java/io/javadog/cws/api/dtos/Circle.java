@@ -34,7 +34,7 @@ import javax.xml.bind.annotation.XmlType;
  * @since CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = Constants.FIELD_CIRCLE, propOrder = { Constants.FIELD_CIRCLE_ID, Constants.FIELD_CIRCLE_NAME, Constants.FIELD_CIRCKE_KEY, Constants.FIELD_ADDED })
+@XmlType(name = Constants.FIELD_CIRCLE, propOrder = { Constants.FIELD_CIRCLE_ID, Constants.FIELD_CIRCLE_NAME, Constants.FIELD_CIRCLE_KEY, Constants.FIELD_ADDED })
 public final class Circle implements Serializable {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
@@ -50,7 +50,7 @@ public final class Circle implements Serializable {
     // hence it is only stored but not used for anything. For the same reason,
     // it is not used as part of the Standard Object methods, #equals(),
     // #hashCode() and #toString().
-    @XmlElement(name = Constants.FIELD_CIRCKE_KEY, nillable = true)
+    @XmlElement(name = Constants.FIELD_CIRCLE_KEY, nillable = true)
     private String circleKey = null;
 
     @XmlElement(name = Constants.FIELD_ADDED, required = true)

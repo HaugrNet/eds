@@ -103,7 +103,7 @@ public final class Constants {
     public static final String FIELD_CREDENTIALTYPE = "credentialType";
     public static final String FIELD_CIRCLE = "circle";
     public static final String FIELD_CIRCLES = "circles";
-    public static final String FIELD_CIRCKE_KEY = "circleKey";
+    public static final String FIELD_CIRCLE_KEY = "circleKey";
     public static final String FIELD_CIRCLE_NAME = "circleName";
     public static final String FIELD_TRUSTEE = "trustee";
     public static final String FIELD_TRUSTEES = "trustees";

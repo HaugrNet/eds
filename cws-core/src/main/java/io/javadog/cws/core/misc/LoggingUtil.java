@@ -44,7 +44,7 @@ public final class LoggingUtil {
     public static String requestDuration(final Locale locale, final String action, final long startNanoTime) {
         final double elapsed = (System.nanoTime() - startNanoTime) / 1000000.0D;
 
-        return String.format(locale, "%s completed in %.2f ms", Constants.REST_API + '/' +  action, elapsed);
+        return String.format(locale, "%s completed in %.2f ms", action, elapsed);
     }
 
     /**
@@ -61,6 +61,6 @@ public final class LoggingUtil {
     public static String requestDuration(final Locale locale, final String action, final long startNanoTime, final Throwable cause) {
         final double elapsed = (System.nanoTime() - startNanoTime) / 1000000.0D;
 
-        return String.format(locale, "%s completed in %.2f ms with error: %s", Constants.REST_API + '/' + action, elapsed, cause.getMessage());
+        return String.format(locale, "%s completed in %.2f ms with error: %s", action, elapsed, cause.getMessage());
     }
 }

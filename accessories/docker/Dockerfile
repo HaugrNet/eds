@@ -30,16 +30,16 @@ RUN /usr/lib/postgresql/10/bin/pg_ctl -D /var/lib/postgresql/10/main -l /var/lib
 # Download & install WildFly 17
 USER root
 RUN cd /opt \
-  && wget https://download.jboss.org/wildfly/17.0.0.Final/wildfly-17.0.0.Final.tar.gz \
-  && tar zxf wildfly-17.0.0.Final.tar.gz
-ENV JBOSS_HOME=/opt/wildfly-17.0.0.Final
+  && wget https://download.jboss.org/wildfly/17.0.1.Final/wildfly-17.0.1.Final.tar.gz \
+  && tar zxf wildfly-17.0.1.Final.tar.gz
+ENV JBOSS_HOME=/opt/wildfly-17.0.1.Final
 
 # Download & install Adopt OpenJDK 11
 RUN cd /opt \
-  && wget https://github.com/AdoptOpenJDK/openjdk11-binaries/releases/download/jdk-11.0.3%2B7/OpenJDK11U-jre_x64_linux_hotspot_11.0.3_7.tar.gz
+  && wget https://github.com/AdoptOpenJDK/openjdk11-binaries/releases/download/jdk-11.0.4%2B11/OpenJDK11U-jre_x64_linux_hotspot_11.0.4_11.tar.gz
 RUN cd /opt \
-  && tar zxf OpenJDK11U-jre_x64_linux_hotspot_11.0.3_7.tar.gz
-ENV JAVA_HOME=/opt/jdk-11.0.3+7-jre
+  && tar zxf OpenJDK11U-jre_x64_linux_hotspot_11.0.4_11.tar.gz
+ENV JAVA_HOME="/opt/jdk-11.0.4+11-jre"
 
 # Update the path, to include both Java & WildFly
 ENV PATH=${JAVA_HOME}/bin:${JBOSS_HOME}/bin:${PATH}
@@ -49,7 +49,7 @@ ENV PATH=${JAVA_HOME}/bin:${JBOSS_HOME}/bin:${PATH}
 # when the server is running, we simply start everything as postgres
 RUN mkdir -p ${JBOSS_HOME}/modules/org/postgresql/main/ \
   && cd ${JBOSS_HOME}/modules/org/postgresql/main/ \
-  && wget -q https://jdbc.postgresql.org/download/postgresql-42.2.5.jar
+  && wget -q https://jdbc.postgresql.org/download/postgresql-42.2.6.jar
 COPY release/wildfly/module.xml ${JBOSS_HOME}/modules/org/postgresql/main/
 COPY release/wildfly/standalone-full.xml ${JBOSS_HOME}/standalone/configuration
 COPY docker/cws.war ${JBOSS_HOME}/standalone/deployments

@@ -34,15 +34,8 @@ if [ "${action}" = "configure" ]; then
         ${payara}/glassfish/bin/asadmin start-domain ${domain}
     fi
 
-    # CWS requires a data, currently only scripts for PostgreSQL exists, so
-    # this is the one being attempted to create here.
-    psql -h ${dbHost} -p ${dbPort} -l | grep cws > /dev/null
-    if [ $? -eq 1 ]; then
-        psql -h ${dbHost} -p ${dbPort} postgres -f  `dirname $0`/../postgresql/01-install.sql
-    fi
-
     echo "Configuring Payara for CWS"
-    ${payara}/glassfish/bin/asadmin add-library `dirname $0`/../lib/postgresql-42.2.5.jar
+    ${payara}/glassfish/bin/asadmin add-library `dirname $0`/../lib/postgresql-42.2.6.jar
     ${payara}/glassfish/bin/asadmin create-jdbc-connection-pool --datasourceclassname org.postgresql.xa.PGXADataSource --restype javax.sql.XADataSource --property "User=${dbUser}:Password=${dbPassword}:URL=jdbc\:postgresql\://${dbHost}/${dbName}" cwsPool
     ${payara}/glassfish/bin/asadmin create-jdbc-resource --connectionpoolid cwsPool datasources/cwsDS
 elif [ "${action}" = "start" ]; then

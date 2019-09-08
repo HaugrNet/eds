@@ -80,10 +80,10 @@ final class DataTypeServiceTest extends DatabaseSetup {
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
         assertEquals("Ok", response.getReturnMessage());
         assertEquals(2, response.getDataTypes().size());
-        assertEquals(Constants.DATA_TYPENAME, response.getDataTypes().get(0).getTypeName());
-        assertEquals("Data Object", response.getDataTypes().get(0).getType());
-        assertEquals(Constants.FOLDER_TYPENAME, response.getDataTypes().get(1).getTypeName());
-        assertEquals("Folder", response.getDataTypes().get(1).getType());
+        assertEquals(Constants.FOLDER_TYPENAME, response.getDataTypes().get(0).getTypeName());
+        assertEquals("Folder", response.getDataTypes().get(0).getType());
+        assertEquals(Constants.DATA_TYPENAME, response.getDataTypes().get(1).getTypeName());
+        assertEquals("Data Object", response.getDataTypes().get(1).getType());
     }
 
     @Test

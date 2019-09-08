@@ -490,7 +490,7 @@ There are 3 kinds of actions / requests which can be made for data Types
 
 |fetch dataTypes                                                                                                                                                                                                                                                                     |
 |account name|credential|data types?                                                                                                                                                                                                                    |return code?|return message?|
-|admin       |admin     |!-[DataType{typeName='data', type='Data Object'}, DataType{typeName='folder', type='Folder'}, DataType{typeName='jsonObject', type='{"a":"b","c":"d"}'}, DataType{typeName='Object42', type='com.company.object.ObjectName'}]-!|${SUCCESS}  |Ok             |
+|admin       |admin     |!-[DataType{typeName='folder', type='Folder'}, DataType{typeName='data', type='Data Object'}, DataType{typeName='jsonObject', type='{"a":"b","c":"d"}'}, DataType{typeName='Object42', type='com.company.object.ObjectName'}]-!|${SUCCESS}  |Ok             |
 *!
 
 !* Data

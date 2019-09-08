@@ -34,7 +34,7 @@ import javax.persistence.Table;
         @NamedQuery(name = "type.findAll",
                 query = "select d " +
                         "from DataTypeEntity d " +
-                        "order by d.name asc"),
+                        "order by d.id asc"),
         @NamedQuery(name = "type.findByName",
                 query = "select d from DataTypeEntity d " +
                         "where lower(d.name) = lower(:name)"),

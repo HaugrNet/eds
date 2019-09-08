@@ -29,7 +29,6 @@
         <module>cws-core</module>
         <module>cws-rest</module>
         <module>cws-soap</module>
-        <module>cws-jsf</module>
         <module>cws-wildfly</module>
         <module>cws-payara</module>
         <module>cws-client-rest</module>
@@ -44,9 +43,6 @@
     <properties>
         <!-- Provided Dependencies -->
         <version.dependency.javaee>7.0</version.dependency.javaee>
-
-        <!-- Primeface for JSF -->
-        <version.dependency.primeface>7.0</version.dependency.primeface>
 
         <!-- JSON for REST -->
         <version.dependency.gson>2.8.5</version.dependency.gson>
@@ -117,11 +113,6 @@
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>cws-soap</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>cws-jsf</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

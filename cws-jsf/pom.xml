@@ -12,6 +12,11 @@
     <name>CWS - JSF</name>
     <description>CWS JSF Based WebPages.</description>
 
+    <properties>
+        <!-- Primeface for JSF -->
+        <version.dependency.primeface>7.0</version.dependency.primeface>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -26,11 +31,11 @@
             <artifactId>javaee-api</artifactId>
             <scope>provided</scope>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>org.primefaces</groupId>-->
-<!--            <artifactId>primefaces</artifactId>-->
-<!--            <version>7.0</version>-->
-<!--        </dependency>-->
+        <dependency>
+            <groupId>org.primefaces</groupId>
+            <artifactId>primefaces</artifactId>
+            <version>${version.dependency.primeface}</version>
+        </dependency>
     </dependencies>
 
     <build>

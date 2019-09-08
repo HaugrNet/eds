@@ -68,7 +68,7 @@ followed - for the sake of this test, it is set to 'admin'.''
 !4 '''Version'''
 Returns the current Version of the running CWS instance. This method serves
 mainly as a simply way to check if the system is operational. This request is
-the onle CWS request not requiring any credentials to invoke.
+the only CWS request not requiring any credentials to invoke.
 
  * Version - Read version of running instance, act as ping
    * SOAP: version

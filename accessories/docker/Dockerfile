@@ -61,4 +61,4 @@ EXPOSE 8080/tcp
 # Finally, we're starting the services
 USER postgres
 ENTRYPOINT /usr/lib/postgresql/10/bin/pg_ctl -D /var/lib/postgresql/10/main -l /var/lib/postgresql/logfile start \
-  && ${JBOSS_HOME}/bin/standalone.sh -c standalone-full.xml
+  && ${JBOSS_HOME}/bin/standalone.sh -c standalone-full.xml -Djboss.node.name=cws -b 0.0.0.0

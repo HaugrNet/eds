@@ -161,16 +161,16 @@ public final class Settings {
         }
     }
 
-    public Boolean getShowAllCircles() {
-        return Boolean.valueOf(get(StandardSetting.SHOW_CIRCLES.getKey()).trim());
+    public boolean getShowAllCircles() {
+        return Boolean.parseBoolean(get(StandardSetting.SHOW_CIRCLES.getKey()).trim());
     }
 
-    public Boolean getShareTrustees() {
-        return Boolean.valueOf(get(StandardSetting.SHOW_TRUSTEES.getKey()).trim());
+    public boolean getShareTrustees() {
+        return Boolean.parseBoolean(get(StandardSetting.SHOW_TRUSTEES.getKey()).trim());
     }
 
-    public Boolean getSanityStartup() {
-        return Boolean.valueOf(get(StandardSetting.SANITY_STARTUP.getKey()).trim());
+    public boolean getSanityStartup() {
+        return Boolean.parseBoolean(get(StandardSetting.SANITY_STARTUP.getKey()).trim());
     }
 
     public Integer getSanityInterval() {
@@ -185,7 +185,7 @@ public final class Settings {
         return get(StandardSetting.MASTERKEY_URL.getKey()).trim();
     }
 
-    public Boolean isReady() {
-        return Boolean.valueOf(get(StandardSetting.IS_READY.getKey()).trim());
+    public boolean isReady() {
+        return Boolean.parseBoolean(get(StandardSetting.IS_READY.getKey()).trim());
     }
 }

@@ -16,7 +16,6 @@
  */
 package io.javadog.cws.core.misc;
 
-import io.javadog.cws.api.common.Constants;
 import java.util.Locale;
 
 /**

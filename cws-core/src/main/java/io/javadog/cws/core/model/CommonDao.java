@@ -31,7 +31,6 @@ import io.javadog.cws.core.model.entities.SettingEntity;
 import io.javadog.cws.core.model.entities.TrusteeEntity;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Set;
 import java.util.UUID;
 import javax.persistence.EntityManager;
@@ -49,12 +48,12 @@ import javax.persistence.criteria.Root;
  */
 public class CommonDao {
 
-    protected static final String EXTERNAL_ID = "externalId";
-    protected static final String MEMBER = "member";
-    protected static final String PARENT_ID = "parentId";
-    protected static final String STATUS = "status";
-    protected static final String SINCE = "since";
-    protected static final String NAME = "name";
+    static final String EXTERNAL_ID = "externalId";
+    static final String MEMBER = "member";
+    static final String PARENT_ID = "parentId";
+    static final String STATUS = "status";
+    static final String SINCE = "since";
+    static final String NAME = "name";
 
     protected final EntityManager entityManager;
 
@@ -141,7 +140,7 @@ public class CommonDao {
 
     public MemberEntity findMemberByName(final String name) {
         final Query query = entityManager.createNamedQuery("member.findByName");
-        query.setParameter("name", toLower(name));
+        query.setParameter("name", name);
 
         return findSingleRecord(query);
     }
@@ -171,7 +170,7 @@ public class CommonDao {
 
     public MemberEntity findMemberByNameAndCircleId(final String name, final String externalCircleId) {
         final Query query = entityManager.createNamedQuery("member.findByNameAndCircle");
-        query.setParameter("name", toLower(name));
+        query.setParameter("name", name);
         query.setParameter("externalCircleId", externalCircleId);
         final List<MemberEntity> found = findList(query);
 
@@ -209,7 +208,7 @@ public class CommonDao {
 
     public CircleEntity findCircleByName(final String name) {
         final Query query = entityManager.createNamedQuery("circle.findByName");
-        query.setParameter("name", toLower(name));
+        query.setParameter("name", name);
 
         return findSingleRecord(query);
     }
@@ -315,17 +314,5 @@ public class CommonDao {
             // This should be and will hopefully remain unreachable code.
             throw new CWSException(ReturnCode.DATABASE_ERROR, e.getMessage(), e);
         }
-    }
-
-    /**
-     * Simpler wrapper for the {@link String#toLowerCase(Locale)}, to have a
-     * standard way to invoke it which will prevent usage without a predefined
-     * Locale.
-     *
-     * @param str String to convert to lower case with the CWS Locale
-     * @return Lower case version of the String
-     */
-    private static String toLower(final String str) {
-        return (str != null) ? str.toLowerCase(Settings.getInstance().getLocale()) : null;
     }
 }

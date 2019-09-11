@@ -45,7 +45,7 @@ import javax.persistence.TemporalType;
         @NamedQuery(name = "member.findByName",
                 query = "select m " +
                         "from MemberEntity m " +
-                        "where m.name = :name"),
+                        "where lower(m.name) = lower(:name)"),
         @NamedQuery(name = "member.findByChecksum",
                 query = "select m " +
                         "from MemberEntity m " +
@@ -58,7 +58,7 @@ import javax.persistence.TemporalType;
         @NamedQuery(name = "member.findByNameAndCircle",
                 query = "select e.member " +
                         "from TrusteeEntity e " +
-                        "where e.member.name = :name" +
+                        "where lower(e.member.name) = lower(:name)" +
                         "  and e.circle.externalId = :externalCircleId"),
         @NamedQuery(name = "member.removeExpiredSessions",
                 query = "update MemberEntity set" +

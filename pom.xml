@@ -57,10 +57,10 @@
         <version.dependency.activation>1.1.1</version.dependency.activation>
 
         <!-- Test Plugins -->
-        <version.dependency.junit>5.5.0</version.dependency.junit>
-        <version.dependency.slf4j>1.7.26</version.dependency.slf4j>
+        <version.dependency.junit>5.5.2</version.dependency.junit>
+        <version.dependency.slf4j>1.7.28</version.dependency.slf4j>
         <version.dependency.logback>1.2.3</version.dependency.logback>
-        <version.dependency.hibernate>5.4.3.Final</version.dependency.hibernate>
+        <version.dependency.hibernate>5.4.4.Final</version.dependency.hibernate>
         <version.dependency.h2>1.4.199</version.dependency.h2>
 
         <!-- Maven Plugins -->

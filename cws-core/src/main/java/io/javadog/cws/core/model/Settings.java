@@ -161,15 +161,15 @@ public final class Settings {
         }
     }
 
-    public boolean getShowAllCircles() {
+    public boolean hasShowAllCircles() {
         return Boolean.parseBoolean(get(StandardSetting.SHOW_CIRCLES.getKey()).trim());
     }
 
-    public boolean getShareTrustees() {
+    public boolean hasShareTrustees() {
         return Boolean.parseBoolean(get(StandardSetting.SHOW_TRUSTEES.getKey()).trim());
     }
 
-    public boolean getSanityStartup() {
+    public boolean hasSanityStartup() {
         return Boolean.parseBoolean(get(StandardSetting.SANITY_STARTUP.getKey()).trim());
     }
 

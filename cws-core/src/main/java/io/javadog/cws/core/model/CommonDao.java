@@ -48,13 +48,12 @@ import javax.persistence.criteria.Root;
  */
 public class CommonDao {
 
-    static final String EXTERNAL_ID = "externalId";
-    static final String MEMBER = "member";
-    static final String PARENT_ID = "parentId";
-    static final String STATUS = "status";
-    static final String SINCE = "since";
-    static final String NAME = "name";
-
+    protected static final String EXTERNAL_ID = "externalId";
+    protected static final String PARENT_ID = "parentId";
+    protected static final String MEMBER = "member";
+    protected static final String STATUS = "status";
+    protected static final String SINCE = "since";
+    protected static final String NAME = "name";
     protected final EntityManager entityManager;
 
     /**

@@ -55,7 +55,7 @@ public final class FetchCircleService extends Serviceable<CommonDao, FetchCircle
         final FetchCircleResponse response = new FetchCircleResponse();
         final List<Circle> circles;
 
-        if ((member.getMemberRole() == MemberRole.ADMIN) || settings.getShowAllCircles()) {
+        if ((member.getMemberRole() == MemberRole.ADMIN) || settings.hasShowAllCircles()) {
             final List<CircleEntity> entities = dao.findAllAscending(CircleEntity.class, "name");
             circles = new ArrayList<>(entities.size());
             for (final CircleEntity entity : entities) {

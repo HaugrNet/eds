@@ -100,7 +100,7 @@ final class SettingsTest extends DatabaseSetup {
         assertEquals("ISO-8859-15", mySettings.getCharset().name());
 
         mySettings.set(StandardSetting.SANITY_STARTUP, "false");
-        assertFalse(mySettings.getSanityStartup());
+        assertFalse(mySettings.hasSanityStartup());
 
         mySettings.set(StandardSetting.SANITY_INTERVAL, "120");
         assertEquals(Integer.valueOf(120), mySettings.getSanityInterval());
@@ -112,17 +112,17 @@ final class SettingsTest extends DatabaseSetup {
     @Test
     void testShowOtherMemberInformation() {
         final Settings mySettings = newSettings();
-        assertTrue(mySettings.getShareTrustees());
+        assertTrue(mySettings.hasShareTrustees());
         mySettings.set(StandardSetting.SHOW_TRUSTEES, "false");
-        assertFalse(mySettings.getShareTrustees());
+        assertFalse(mySettings.hasShareTrustees());
         mySettings.set(StandardSetting.SHOW_TRUSTEES, "true");
-        assertTrue(mySettings.getShareTrustees());
+        assertTrue(mySettings.hasShareTrustees());
         mySettings.set(StandardSetting.SHOW_TRUSTEES, " true ");
-        assertTrue(mySettings.getShareTrustees());
+        assertTrue(mySettings.hasShareTrustees());
         mySettings.set(StandardSetting.SHOW_TRUSTEES, "");
-        assertFalse(mySettings.getShareTrustees());
+        assertFalse(mySettings.hasShareTrustees());
         mySettings.set(StandardSetting.SHOW_TRUSTEES, " what ");
-        assertFalse(mySettings.getShareTrustees());
+        assertFalse(mySettings.hasShareTrustees());
     }
 
     // =========================================================================

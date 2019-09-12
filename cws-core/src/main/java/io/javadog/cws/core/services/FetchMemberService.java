@@ -106,7 +106,7 @@ public final class FetchMemberService extends Serviceable<MemberDao, FetchMember
         } else {
             addMemberToResponse(response, requested);
 
-            if (settings.getShareTrustees()) {
+            if (settings.hasShareTrustees()) {
                 response.setCircles(findCirclesMemberBelongsTo(requested));
             } else {
                 response.setCircles(findSharedCircles(member, requested));

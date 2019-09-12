@@ -282,7 +282,7 @@ public final class ProcessDataService extends Serviceable<DataDao, ProcessDataRe
         } else {
             entity = dao.findRootByMemberCircle(member.getId(), circleId);
             if (entity == null) {
-                // Bugreport #57 states that an NPE was thrown, however it
+                // BugReport #57 states that an NPE was thrown, however it
                 // seems that the database might have entered into a strange
                 // inconsistency, hence this Exception.
                 //   The Circle must be manually corrected, which can be done

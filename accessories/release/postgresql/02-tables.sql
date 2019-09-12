@@ -471,7 +471,7 @@ CREATE TABLE cws_signatures (
   CONSTRAINT signature_member_fk            FOREIGN KEY (member_id) REFERENCES cws_members (id) ON DELETE CASCADE,
 
   /* Unique Constraints */
-  CONSTRAINT signarure_unique_checksum      UNIQUE (checksum),
+  CONSTRAINT signature_unique_checksum      UNIQUE (checksum),
 
   /* Not Null Constraints */
   CONSTRAINT signarure_notnull_id           CHECK (id IS NOT NULL),

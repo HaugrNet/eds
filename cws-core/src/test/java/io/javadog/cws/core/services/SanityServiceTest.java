@@ -104,8 +104,8 @@ final class SanityServiceTest extends DatabaseSetup {
 
         // Now to the actual test - reading the data with invalid checksum
         final FetchDataService readDataService = new FetchDataService(settings, entityManager);
-        final FetchDataRequest readDattaRequest = prepareReadRequest(response.getDataId());
-        final FetchDataResponse readDataResponse = readDataService.perform(readDattaRequest);
+        final FetchDataRequest readDataRequest = prepareReadRequest(response.getDataId());
+        final FetchDataResponse readDataResponse = readDataService.perform(readDataRequest);
         assertEquals(ReturnCode.INTEGRITY_ERROR.getCode(), readDataResponse.getReturnCode());
         assertEquals("The Encrypted Data Checksum is invalid, the data appears to have been corrupted.", readDataResponse.getReturnMessage());
 

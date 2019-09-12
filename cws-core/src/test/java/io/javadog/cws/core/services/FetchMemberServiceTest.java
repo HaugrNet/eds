@@ -347,7 +347,7 @@ final class FetchMemberServiceTest extends DatabaseSetup {
         // Verify that we have found the correct data
         assertNotNull(response);
         assertEquals(1, response.getMembers().size());
-        // Member 1 is Administrator for 2 Circles, Ciecle1 & Circle2
+        // Member 1 is Administrator for 2 Circles, Circle1 & Circle2
         // Member 4 is Administrator for 2 Circles, Circle2 & Circle3
         // As SHOW_TRUSTEES is enabled, we're only getting all Circles
         // for Member 1, i.e. 2 Circles
@@ -369,7 +369,7 @@ final class FetchMemberServiceTest extends DatabaseSetup {
         // Verify that we have found the correct data
         assertEquals(1, response.getMembers().size());
         assertEquals(MEMBER_1_ID, response.getMembers().get(0).getMemberId());
-        // Member 1 is Administrator for 2 Circles, Ciecle1 & Circle2
+        // Member 1 is Administrator for 2 Circles, Circle1 & Circle2
         // Member 4 is Administrator for 2 Circles, Circle2 & Circle3
         // As SHOW_TRUSTEES is disabled, we're only getting shared
         // Circle information, meaning we only get Circle2 here.

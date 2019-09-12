@@ -17,7 +17,7 @@ readonly debugPort=${DEBUG_PORT}
 
 # Java & JBoss (WildFly) settings
 export JAVA_OPTS="${JAVA_OPTS} -Xms1303m -Xmx1303m -Djava.net.preferIPv4Stack=true"
-readonly proxy=${http_proxy}
+readonly proxy="${http_proxy}"
 if [[ "${proxy}" != "" ]]; then
     readonly tmp=${proxy//:[[:digit:]]*/}
     readonly host=${tmp:7}

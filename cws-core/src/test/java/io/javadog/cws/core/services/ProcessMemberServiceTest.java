@@ -54,9 +54,8 @@ final class ProcessMemberServiceTest extends DatabaseSetup {
     @Test
     void testNullRequest() {
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
-        final ProcessMemberRequest request = null;
 
-        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
+        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(null));
         assertEquals(ReturnCode.VERIFICATION_WARNING, cause.getReturnCode());
         assertEquals("Cannot Process a NULL Object.", cause.getMessage());
     }

@@ -157,6 +157,7 @@ public final class SettingService extends Serviceable<CommonDao, SettingResponse
                 checkAlgorithm(KeyAlgorithm.Type.ASYMMETRIC, setting, value);
                 break;
             case SIGNATURE_ALGORITHM:
+            case HASH_ALGORITHM:
                 checkAlgorithm(KeyAlgorithm.Type.SIGNATURE, setting, value);
                 break;
             case PBE_ALGORITHM:
@@ -167,9 +168,6 @@ public final class SettingService extends Serviceable<CommonDao, SettingResponse
                 // exist, as it will render all accounts useless otherwise
                 checkIfMembersExist(setting);
                 checkNumber(setting, value);
-                break;
-            case HASH_ALGORITHM:
-                checkAlgorithm(KeyAlgorithm.Type.SIGNATURE, setting, value);
                 break;
             case CWS_CHARSET:
                 checkCharset(setting, value);
@@ -193,6 +191,7 @@ public final class SettingService extends Serviceable<CommonDao, SettingResponse
         for (final KeyAlgorithm algorithm : algorithms) {
             if (Objects.equals(algorithm.name(), value)) {
                 match = true;
+                break;
             }
         }
 

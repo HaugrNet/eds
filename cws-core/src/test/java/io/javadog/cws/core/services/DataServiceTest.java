@@ -37,7 +37,6 @@ import io.javadog.cws.api.responses.ProcessCircleResponse;
 import io.javadog.cws.api.responses.ProcessDataResponse;
 import io.javadog.cws.api.responses.ProcessMemberResponse;
 import io.javadog.cws.core.DatabaseSetup;
-import io.javadog.cws.core.GenerateTestData;
 import io.javadog.cws.core.enums.SanityStatus;
 import io.javadog.cws.core.exceptions.CWSException;
 import java.util.Date;
@@ -686,7 +685,7 @@ final class DataServiceTest extends DatabaseSetup {
     @Test
     void testMovingDataToFolderWhereSameNameDataExist() {
         final ProcessDataService service = new ProcessDataService(settings, entityManager);
-        final FetchDataService readSearvice = new FetchDataService(settings, entityManager);
+        final FetchDataService readService = new FetchDataService(settings, entityManager);
 
         // Step 1, create 2 folders
         final ProcessDataRequest folderRequest1 = prepareAddDataRequest(MEMBER_4, CIRCLE_3_ID, "First Folder", 0);
@@ -710,20 +709,20 @@ final class DataServiceTest extends DatabaseSetup {
 
         // Step 3, Verify that we have the correct data structure.
         final FetchDataRequest readRootRequest = prepareReadRequest(MEMBER_4, CIRCLE_3_ID, null);
-        final FetchDataResponse readRootResponse = readSearvice.perform(readRootRequest);
+        final FetchDataResponse readRootResponse = readService.perform(readRootRequest);
         assertTrue(readRootResponse.isOk());
         assertEquals(2, readRootResponse.getMetadata().size());
         assertEquals(folderResponse2.getDataId(), readRootResponse.getMetadata().get(0).getDataId());
         assertEquals(folderResponse1.getDataId(), readRootResponse.getMetadata().get(1).getDataId());
 
         final FetchDataRequest readFolder1Request = prepareReadRequest(MEMBER_4, CIRCLE_3_ID, folderResponse1.getDataId());
-        final FetchDataResponse readFolder1Response = readSearvice.perform(readFolder1Request);
+        final FetchDataResponse readFolder1Response = readService.perform(readFolder1Request);
         assertTrue(readFolder1Response.isOk());
         assertEquals(1, readFolder1Response.getMetadata().size());
         assertEquals(dataResponse1.getDataId(), readFolder1Response.getMetadata().get(0).getDataId());
 
         final FetchDataRequest readFolder2Request = prepareReadRequest(MEMBER_4, CIRCLE_3_ID, folderResponse2.getDataId());
-        final FetchDataResponse readFolder2Response = readSearvice.perform(readFolder2Request);
+        final FetchDataResponse readFolder2Response = readService.perform(readFolder2Request);
         assertTrue(readFolder2Response.isOk());
         assertEquals(1, readFolder2Response.getMetadata().size());
         assertEquals(dataResponse2.getDataId(), readFolder2Response.getMetadata().get(0).getDataId());

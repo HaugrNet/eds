@@ -17,6 +17,7 @@
 package io.javadog.cws.api;
 
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 /**
  * @author Kim Jensen
@@ -24,7 +25,7 @@ import java.nio.charset.Charset;
  */
 public final class TestUtilities {
 
-    private static final Charset CHARSET = Charset.forName("UTF-8");
+    private static final Charset CHARSET = StandardCharsets.UTF_8;
 
     private TestUtilities() {
         // Private Constructor, this is a Utility Class

@@ -56,7 +56,7 @@ final class ServiceableTest extends DatabaseSetup {
     }
 
     @Test
-    void testAccesWithInvalidPassword() {
+    void testAccessWithInvalidPassword() {
         final SettingService service = new SettingService(settings, entityManager);
         final SettingRequest request = new SettingRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);

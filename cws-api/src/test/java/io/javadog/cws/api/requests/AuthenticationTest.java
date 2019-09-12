@@ -80,10 +80,9 @@ final class AuthenticationTest {
 
     @Test
     void testEmptyClassEmptyCredential() {
-        final byte[] credential = CREDENTIAL;
         final Authentication authentication = new Authentication();
         authentication.setAccountName("");
-        authentication.setCredential(credential);
+        authentication.setCredential(CREDENTIAL);
         authentication.setCredentialType(null);
 
         final Map<String, String> errors = authentication.validate();

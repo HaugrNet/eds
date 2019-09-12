@@ -117,7 +117,7 @@ public final class Mapper {
         if (api != null) {
             final io.javadog.cws.ws.TrustLevel value = io.javadog.cws.ws.TrustLevel.valueOf(api.name());
             final QName qName = new QName(NAMESPACE, Constants.FIELD_TRUSTLEVEL);
-            ws = new JAXBElement(qName, String.class, value);
+            ws = new JAXBElement(qName, io.javadog.cws.ws.TrustLevel.class, value);
         }
 
         return ws;

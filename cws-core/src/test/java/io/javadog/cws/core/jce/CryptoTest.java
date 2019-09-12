@@ -309,8 +309,8 @@ final class CryptoTest extends DatabaseSetup {
         final String dataSalt = UUID.randomUUID().toString();
         final SecretCWSKey key = crypto.generateSymmetricKey(settings.getSymmetricAlgorithm());
         key.setSalt(new IVSalt(dataSalt));
-        final byte[] rawdata = generateData(1048576);
-        final byte[] encryptedData = crypto.encrypt(key, rawdata);
+        final byte[] rawData = generateData(1048576);
+        final byte[] encryptedData = crypto.encrypt(key, rawData);
 
         final CWSKeyPair keyPair = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
         final String armoredCircleKey = crypto.encryptAndArmorCircleKey(keyPair.getPublic(), key);
@@ -318,7 +318,7 @@ final class CryptoTest extends DatabaseSetup {
         circleKey.setSalt(new IVSalt(dataSalt));
         final byte[] decryptedData = crypto.decrypt(circleKey, encryptedData);
 
-        assertArrayEquals(rawdata, decryptedData);
+        assertArrayEquals(rawData, decryptedData);
     }
 
     @Test

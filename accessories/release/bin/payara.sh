@@ -35,7 +35,7 @@ if [ "${action}" = "configure" ]; then
     fi
 
     echo "Configuring Payara for CWS"
-    ${payara}/glassfish/bin/asadmin add-library `dirname $0`/../lib/postgresql-42.2.6.jar
+    ${payara}/glassfish/bin/asadmin add-library "$(dirname $0)/../lib/postgresql-42.2.6.jar"
     ${payara}/glassfish/bin/asadmin create-jdbc-connection-pool --datasourceclassname org.postgresql.xa.PGXADataSource --restype javax.sql.XADataSource --property "User=${dbUser}:Password=${dbPassword}:URL=jdbc\:postgresql\://${dbHost}/${dbName}" cwsPool
     ${payara}/glassfish/bin/asadmin create-jdbc-resource --connectionpoolid cwsPool datasources/cwsDS
 elif [ "${action}" = "start" ]; then
@@ -46,7 +46,7 @@ elif [ "${action}" = "stop" ]; then
     ${payara}/glassfish/bin/asadmin stop-domain ${domain}
 elif [ "${action}" = "deploy" ]; then
     echo "Deploying CWS"
-    ${payara}/glassfish/bin/asadmin deploy --force `dirname $0`/../payara/cws.war
+    ${payara}/glassfish/bin/asadmin deploy --force "$(dirname $0)/../payara/cws.war"
 elif [ "${action}" = "undeploy" ]; then
     echo "Undeploying CWS"
     ${payara}/glassfish/bin/asadmin undeploy cws
@@ -54,7 +54,7 @@ elif [ "${action}" = "log" ]; then
     tail -f ${payara}/glassfish/domains/${domain}/logs/server.log
 else
     echo "Payara Control script"
-    echo "Usage: `basename $0` [Action]"
+    echo "Usage: $(basename $0) [Action]"
     echo
     echo "  The Action must be one of the following:"
     echo "    configure Attempts to configure a CWS Payara instance"

@@ -220,7 +220,7 @@ final class CircleServiceTest extends DatabaseSetup {
     }
 
     @Test
-    void testCreateCirleAsNewUser() {
+    void testCreateCircleAsNewUser() {
         final ProcessMemberService memberService = new ProcessMemberService(settings, entityManager);
         final ProcessCircleService circleService = new ProcessCircleService(settings, entityManager);
         final ProcessTrusteeService trusteeService = new ProcessTrusteeService(settings, entityManager);

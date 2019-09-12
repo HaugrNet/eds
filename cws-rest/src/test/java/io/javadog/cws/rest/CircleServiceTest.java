@@ -51,7 +51,7 @@ final class CircleServiceTest extends DatabaseSetup {
     }
 
     @Test
-    void testUpdatw() {
+    void testUpdate() {
         final CircleService service = prepareService();
         final ProcessCircleRequest request = new ProcessCircleRequest();
 

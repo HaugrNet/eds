@@ -63,9 +63,8 @@ final class MasterKeyServiceTest extends DatabaseSetup {
     @Test
     void testUpdateMasterKeyWithNullRequest() {
         final MasterKeyService service = new MasterKeyService(settings, entityManager);
-        final MasterKeyRequest request = null;
 
-        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
+        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(null));
         assertEquals(ReturnCode.VERIFICATION_WARNING, cause.getReturnCode());
         assertEquals("Cannot Process a NULL Object.", cause.getMessage());
     }
@@ -230,7 +229,7 @@ final class MasterKeyServiceTest extends DatabaseSetup {
     }
 
     @Test
-    void testUpdateMasterKeyWithUnreachabledURL() {
+    void testUpdateMasterKeyWithUnreachableURL() {
         final String path = tempDir() + "not_existing_file.bin";
         final MasterKeyService service = new MasterKeyService(settings, entityManager);
         final MasterKeyRequest request = prepareRequest(MasterKeyRequest.class, Constants.ADMIN_ACCOUNT);

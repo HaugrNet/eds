@@ -64,9 +64,8 @@ final class ShareServiceTest extends BeanSetup {
     @Test
     void testProcessDataTypeWithNullRequest() {
         final ShareService service = prepareShareService();
-        final ProcessDataTypeRequest request = null;
 
-        final ProcessDataTypeResponse response = service.processDataType(request);
+        final ProcessDataTypeResponse response = service.processDataType(null);
         assertEquals(ReturnCode.VERIFICATION_WARNING.getCode(), response.getReturnCode());
     }
 
@@ -106,9 +105,8 @@ final class ShareServiceTest extends BeanSetup {
     @Test
     void testFetchDataTypesWithNullRequest() {
         final ShareService service = prepareShareService();
-        final FetchDataTypeRequest request = null;
 
-        final FetchDataTypeResponse response = service.fetchDataTypes(request);
+        final FetchDataTypeResponse response = service.fetchDataTypes(null);
         assertEquals(ReturnCode.VERIFICATION_WARNING.getCode(), response.getReturnCode());
     }
 
@@ -135,7 +133,7 @@ final class ShareServiceTest extends BeanSetup {
         final ShareService service = prepareShareService();
         final ProcessDataRequest request = prepareRequest(ProcessDataRequest.class, MEMBER_1);
         request.setAction(Action.ADD);
-        request.setData("alfa beta gamma".getBytes(settings.getCharset()));
+        request.setData("alpha beta gamma".getBytes(settings.getCharset()));
         request.setCircleId(CIRCLE_1_ID);
         request.setDataName("Data Name");
         request.setTypeName("data");
@@ -149,9 +147,8 @@ final class ShareServiceTest extends BeanSetup {
     @Test
     void testProcessDataWithNullRequest() {
         final ShareService service = prepareShareService();
-        final ProcessDataRequest request = null;
 
-        final ProcessDataResponse response = service.processData(request);
+        final ProcessDataResponse response = service.processData(null);
         assertEquals(ReturnCode.VERIFICATION_WARNING.getCode(), response.getReturnCode());
     }
 
@@ -188,9 +185,8 @@ final class ShareServiceTest extends BeanSetup {
     @Test
     void testFetchDataWithNullRequest() {
         final ShareService service = prepareShareService();
-        final FetchDataRequest request = null;
 
-        final FetchDataResponse response = service.fetchData(request);
+        final FetchDataResponse response = service.fetchData(null);
         assertEquals(ReturnCode.VERIFICATION_WARNING.getCode(), response.getReturnCode());
     }
 
@@ -216,7 +212,7 @@ final class ShareServiceTest extends BeanSetup {
     void testSignatures() {
         final ShareService service = prepareShareService();
         final SignRequest signRequest = prepareRequest(SignRequest.class, MEMBER_1);
-        final byte[] data = "alfa".getBytes(settings.getCharset());
+        final byte[] data = "alpha".getBytes(settings.getCharset());
         signRequest.setData(data);
         final SignResponse signResponse = service.sign(signRequest);
         assertEquals(ReturnCode.SUCCESS.getCode(), signResponse.getReturnCode());
@@ -231,9 +227,8 @@ final class ShareServiceTest extends BeanSetup {
     @Test
     void testSignWithNullRequest() {
         final ShareService service = prepareShareService();
-        final SignRequest request = null;
 
-        final SignResponse response = service.sign(request);
+        final SignResponse response = service.sign(null);
         assertEquals(ReturnCode.VERIFICATION_WARNING.getCode(), response.getReturnCode());
     }
 
@@ -258,9 +253,8 @@ final class ShareServiceTest extends BeanSetup {
     @Test
     void testVerifyWithNullRequest() {
         final ShareService service = prepareShareService();
-        final VerifyRequest request = null;
 
-        final VerifyResponse response = service.verify(request);
+        final VerifyResponse response = service.verify(null);
         assertEquals(ReturnCode.VERIFICATION_WARNING.getCode(), response.getReturnCode());
     }
 
@@ -296,9 +290,8 @@ final class ShareServiceTest extends BeanSetup {
     @Test
     void testFetchSignaturesWithNullRequest() {
         final ShareService service = prepareShareService();
-        final FetchSignatureRequest request = null;
 
-        final FetchSignatureResponse response = service.fetchSignatures(request);
+        final FetchSignatureResponse response = service.fetchSignatures(null);
         assertEquals(ReturnCode.VERIFICATION_WARNING.getCode(), response.getReturnCode());
     }
 

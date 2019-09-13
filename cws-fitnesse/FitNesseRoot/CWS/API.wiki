@@ -120,11 +120,10 @@ it is not possible for an administrator to update the member keys.
 
 *!
 
-|master key                                                                                                                                                  |
-|account name|credential|url                                 |secret    |return code?             |return message?                                           |
-|user1       |password1 |null                                |new secret|${AUTHENTICATION_WARNING}|Given Account is not permitted to perform this request.   |
-|admin       |admin     |!-https://javadog.io/img/cloud.png-!|null      |${ILLEGAL_ACTION}        |Cannot alter the !-MasterKey-!, as Member Accounts exists.|
-|admin       |admin     |null                                |master    |${ILLEGAL_ACTION}        |Cannot alter the !-MasterKey-!, as Member Accounts exists.|
+|master key                                                                                                                  |
+|account name|credential|url |secret    |return code?             |return message?                                           |
+|user1       |password1 |null|new secret|${AUTHENTICATION_WARNING}|Given Account is not permitted to perform this request.   |
+|admin       |admin     |null|master    |${ILLEGAL_ACTION}        |Cannot alter the !-MasterKey-!, as Member Accounts exists.|
 *!
 
 !* Settings
@@ -434,12 +433,12 @@ return a more accurate depiction of the relations. Note, that this request is mo
 Administrators are allowed to retrieve most information but members are only allowed to retrieve information if a relation between
 the Member & Circle already exists.
 
-|fetch trustees                                                                                                                                                                                                                                                                                                  |
-|account name|credential|circle id |trustees?                                                                                                                                                                         |return code?             |return message?                                                 |
-|admin       |admin     |circle3_id|[Trustee{memberId='user1_id', circleId='user1_id', trustLevel='WRITE', publicKey='null'}, Trustee{memberId='user2_id', circleId='user2_id', trustLevel='ADMIN', publicKey='null'}]|${SUCCESS}               |Ok                                                              |
-|user1       |password1 |circle3_id|[Trustee{memberId='user1_id', circleId='user1_id', trustLevel='WRITE', publicKey='null'}, Trustee{memberId='user2_id', circleId='user2_id', trustLevel='ADMIN', publicKey='null'}]|${SUCCESS}               |Ok                                                              |
-|user2       |password2 |circle3_id|[Trustee{memberId='user1_id', circleId='user1_id', trustLevel='WRITE', publicKey='null'}, Trustee{memberId='user2_id', circleId='user2_id', trustLevel='ADMIN', publicKey='null'}]|${SUCCESS}               |Ok                                                              |
-|user3       |password3 |circle3_id|[]                                                                                                                                                                                |${IDENTIFICATION_WARNING}|=~/No Trustee information found for member 'user3' and circle.*/|
+|fetch trustees                                                                                                                                                                                                                                                                                                                                                                                |
+|account name|credential|circle id |trustees?                                                                                                                                                                                                                                                       |return code?             |return message?                                                 |
+|admin       |admin     |circle3_id|[Trustee{memberId='user1_idaccountName='user1', circleId='circle3_id', circleName='null', trustLevel='WRITE', publicKey='null'}, Trustee{memberId='user2_idaccountName='user2', circleId='circle3_id', circleName='null', trustLevel='ADMIN', publicKey='null'}]|${SUCCESS}               |Ok                                                              |
+|user1       |password1 |circle3_id|[Trustee{memberId='user1_idaccountName='user1', circleId='circle3_id', circleName='null', trustLevel='WRITE', publicKey='null'}, Trustee{memberId='user2_idaccountName='user2', circleId='circle3_id', circleName='null', trustLevel='ADMIN', publicKey='null'}]|${SUCCESS}               |Ok                                                              |
+|user2       |password2 |circle3_id|[Trustee{memberId='user1_idaccountName='user1', circleId='circle3_id', circleName='null', trustLevel='WRITE', publicKey='null'}, Trustee{memberId='user2_idaccountName='user2', circleId='circle3_id', circleName='null', trustLevel='ADMIN', publicKey='null'}]|${SUCCESS}               |Ok                                                              |
+|user3       |password3 |circle3_id|[]                                                                                                                                                                                                                                                              |${IDENTIFICATION_WARNING}|=~/No Trustee information found for member 'user3' and circle.*/|
 *!
 
 ----

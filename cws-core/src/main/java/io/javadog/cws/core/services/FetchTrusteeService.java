@@ -74,8 +74,10 @@ public final class FetchTrusteeService extends Serviceable<CommonDao, FetchTrust
         final Trustee trustee = new Trustee();
 
         trustee.setMemberId(entity.getMember().getExternalId());
+        trustee.setAccountName(entity.getMember().getName());
         trustee.setPublicKey(entity.getMember().getMemberKey());
         trustee.setCircleId(entity.getCircle().getExternalId());
+        trustee.setCircleName(entity.getCircle().getName());
         trustee.setTrustLevel(entity.getTrustLevel());
         trustee.setChanged(entity.getAltered());
         trustee.setAdded(entity.getAdded());

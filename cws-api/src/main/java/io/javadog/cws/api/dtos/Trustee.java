@@ -33,7 +33,7 @@ import javax.xml.bind.annotation.XmlType;
  * @since CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = Constants.FIELD_TRUSTEE, propOrder = { Constants.FIELD_MEMBER_ID, Constants.FIELD_PUBLIC_KEY, Constants.FIELD_CIRCLE_ID, Constants.FIELD_TRUSTLEVEL, Constants.FIELD_CHANGED, Constants.FIELD_ADDED })
+@XmlType(name = Constants.FIELD_TRUSTEE, propOrder = { Constants.FIELD_MEMBER_ID, Constants.FIELD_ACCOUNT_NAME, Constants.FIELD_PUBLIC_KEY, Constants.FIELD_CIRCLE_ID, Constants.FIELD_CIRCLE_NAME, Constants.FIELD_TRUSTLEVEL, Constants.FIELD_CHANGED, Constants.FIELD_ADDED })
 public final class Trustee implements Serializable {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
@@ -41,6 +41,9 @@ public final class Trustee implements Serializable {
 
     @XmlElement(name = Constants.FIELD_MEMBER_ID)
     private String memberId = null;
+
+    @XmlElement(name = Constants.FIELD_ACCOUNT_NAME)
+    private String accountName = null;
 
     // The Public Key is an optional value which may or may not be provided,
     // hence it is only stored but not used for anything. For the same reason,
@@ -51,6 +54,9 @@ public final class Trustee implements Serializable {
 
     @XmlElement(name = Constants.FIELD_CIRCLE_ID)
     private String circleId = null;
+
+    @XmlElement(name = Constants.FIELD_CIRCLE_NAME)
+    private String circleName = null;
 
     @XmlElement(name = Constants.FIELD_TRUSTLEVEL)
     private TrustLevel trustLevel = null;
@@ -73,6 +79,14 @@ public final class Trustee implements Serializable {
         return memberId;
     }
 
+    public void setAccountName(String accountName) {
+        this.accountName = accountName;
+    }
+
+    public String getAccountName() {
+        return accountName;
+    }
+
     public void setPublicKey(final String publicKey) {
         this.publicKey = publicKey;
     }
@@ -87,6 +101,14 @@ public final class Trustee implements Serializable {
 
     public String getCircleId() {
         return circleId;
+    }
+
+    public void setCircleName(String circleName) {
+        this.circleName = circleName;
+    }
+
+    public String getCircleName() {
+        return circleName;
     }
 
     public void setTrustLevel(final TrustLevel trustLevel) {

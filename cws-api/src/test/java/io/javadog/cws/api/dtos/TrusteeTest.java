@@ -34,23 +34,29 @@ final class TrusteeTest {
     @Test
     void testClassflow() {
         final String memberId = UUID.randomUUID().toString();
+        final String accountName = UUID.randomUUID().toString();
         final String publicKey = UUID.randomUUID().toString();
         final String circleId = UUID.randomUUID().toString();
+        final String circleName = UUID.randomUUID().toString();
         final TrustLevel trustLevel = TrustLevel.WRITE;
         final Date lastModified = new Date(456L);
         final Date added = new Date(123L);
 
         final Trustee trustee = new Trustee();
         trustee.setMemberId(memberId);
+        trustee.setAccountName(accountName);
         trustee.setPublicKey(publicKey);
         trustee.setCircleId(circleId);
+        trustee.setCircleName(circleName);
         trustee.setTrustLevel(trustLevel);
         trustee.setChanged(lastModified);
         trustee.setAdded(added);
 
         assertEquals(memberId, trustee.getMemberId());
+        assertEquals(accountName, trustee.getAccountName());
         assertEquals(publicKey, trustee.getPublicKey());
         assertEquals(circleId, trustee.getCircleId());
+        assertEquals(circleName, trustee.getCircleName());
         assertEquals(trustLevel, trustee.getTrustLevel());
         assertEquals(lastModified, trustee.getChanged());
         assertEquals(added, trustee.getAdded());
@@ -63,14 +69,18 @@ final class TrusteeTest {
         final Trustee emptyTrustee = new Trustee();
 
         trustee.setMemberId(UUID.randomUUID().toString());
+        trustee.setAccountName(UUID.randomUUID().toString());
         trustee.setPublicKey(UUID.randomUUID().toString());
         trustee.setCircleId(UUID.randomUUID().toString());
+        trustee.setCircleName(UUID.randomUUID().toString());
         trustee.setTrustLevel(TrustLevel.WRITE);
         trustee.setChanged(Utilities.newDate(456L));
         trustee.setAdded(Utilities.newDate(123L));
         sameTrustee.setMemberId(trustee.getMemberId());
+        sameTrustee.setAccountName(trustee.getAccountName());
         sameTrustee.setPublicKey(trustee.getPublicKey());
         sameTrustee.setCircleId(trustee.getCircleId());
+        sameTrustee.setCircleName(trustee.getCircleName());
         sameTrustee.setTrustLevel(trustee.getTrustLevel());
         sameTrustee.setChanged(trustee.getChanged());
         sameTrustee.setAdded(trustee.getAdded());

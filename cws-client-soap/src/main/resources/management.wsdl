@@ -469,8 +469,10 @@
   <xs:complexType final="extension restriction" name="trustee">
     <xs:sequence>
       <xs:element minOccurs="0" name="memberId" type="xs:string"/>
+      <xs:element minOccurs="0" name="accountName" type="xs:string"/>
       <xs:element name="publicKey" type="xs:string"/>
       <xs:element minOccurs="0" name="circleId" type="xs:string"/>
+      <xs:element minOccurs="0" name="circleName" type="xs:string"/>
       <xs:element minOccurs="0" name="trustLevel" type="tns:trustLevel"/>
       <xs:element minOccurs="0" name="changed" type="xs:dateTime"/>
       <xs:element minOccurs="0" name="added" type="xs:dateTime"/>

@@ -53,8 +53,12 @@ public final class FetchTrustees extends CwsRequest<FetchTrusteeResponse> {
 
                 builder.append("Trustee{memberId='")
                         .append(getKey(trustee.getMemberId()))
+                        .append("accountName='")
+                        .append(trustee.getAccountName())
                         .append("', circleId='")
-                        .append(getKey(trustee.getMemberId()))
+                        .append(getKey(trustee.getCircleId()))
+                        .append("', circleName='")
+                        .append(getKey(trustee.getCircleName()))
                         .append("', trustLevel='")
                         .append(trustee.getTrustLevel())
                         .append("', publicKey='")

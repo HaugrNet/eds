@@ -56,53 +56,53 @@ public abstract class Verifiable implements Serializable {
      */
     public abstract Map<String, String> validate();
 
-    static void checkNotNull(final Map<String, String> errors, final String field, final Object value, final String message) {
+    protected static void checkNotNull(final Map<String, String> errors, final String field, final Object value, final String message) {
         if (value == null) {
             errors.put(field, message);
         }
     }
 
-    static void checkNotNullOrEmpty(final Map<String, String> errors, final String field, final byte[] value, final String message) {
+    protected static void checkNotNullOrEmpty(final Map<String, String> errors, final String field, final byte[] value, final String message) {
         if ((value == null) || (value.length == 0)) {
             errors.put(field, message);
         }
     }
 
-    static void checkNotNullOrEmpty(final Map<String, String> errors, final String field, final String value, final String message) {
+    protected static void checkNotNullOrEmpty(final Map<String, String> errors, final String field, final String value, final String message) {
         if ((value == null) || isEmpty(value)) {
             errors.put(field, message);
         }
     }
 
-    static void checkNotNullEmptyOrTooLong(final Map<String, String> errors, final String field, final String value, final int maxLength, final String message) {
+    protected static void checkNotNullEmptyOrTooLong(final Map<String, String> errors, final String field, final String value, final int maxLength, final String message) {
         checkNotNullOrEmpty(errors, field, value, message);
         checkNotTooLong(errors, field, value, maxLength, message);
     }
 
-    static void checkNotTooLong(final Map<String, String> errors, final String field, final String value, final int maxLength, final String message) {
+    protected static void checkNotTooLong(final Map<String, String> errors, final String field, final String value, final int maxLength, final String message) {
         if ((value != null) && (value.trim().length() > maxLength)) {
             errors.put(field, message);
         }
     }
 
-    static void checkValidId(final Map<String, String> errors, final String field, final String value, final String message) {
+    protected static void checkValidId(final Map<String, String> errors, final String field, final String value, final String message) {
         if ((value != null) && !Constants.ID_PATTERN.matcher(value).matches()) {
             errors.put(field, message);
         }
     }
 
-    static void checkNotNullAndValidId(final Map<String, String> errors, final String field, final String value, final String message) {
+    protected static void checkNotNullAndValidId(final Map<String, String> errors, final String field, final String value, final String message) {
         checkNotNull(errors, field, value, message);
         checkValidId(errors, field, value, message);
     }
 
-    static void checkIntegerWithMax(final Map<String, String> errors, final String field, final int value, final int max, final String message) {
+    protected static void checkIntegerWithMax(final Map<String, String> errors, final String field, final int value, final int max, final String message) {
         if ((value < 1) || (value > max)) {
             errors.put(field, message);
         }
     }
 
-    static void checkUrl(final Map<String, String> errors, final String value) {
+    protected static void checkUrl(final Map<String, String> errors, final String value) {
         try {
             final URL url = new URL(value);
             url.toURI();

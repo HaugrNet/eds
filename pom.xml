@@ -74,7 +74,7 @@
         <version.plugin.org.owasp>5.1.0</version.plugin.org.owasp>
         <version.plugin.org.wildfly>2.0.1.Final</version.plugin.org.wildfly>
         <version.plugin.org.jacoco>0.8.4</version.plugin.org.jacoco>
-        <version.plugin.org.sonar>3.6.0.1398</version.plugin.org.sonar>
+        <version.plugin.org.sonar>3.6.1.1688</version.plugin.org.sonar>
         <version.plugin.org.build>3.0.0</version.plugin.org.build>
 
         <!-- To avoid that the builds are platform specific -->

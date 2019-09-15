@@ -125,16 +125,6 @@ final class SoapClientTest {
     }
 
     @Test
-    void testFetchMembers() {
-        final FetchMemberRequest request = prepareRequest(FetchMemberRequest.class, Constants.ADMIN_ACCOUNT);
-
-        final FetchMemberResponse response = soapManagement.fetchMembers(request);
-        assertNotNull(response);
-        assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
-        assertEquals("Ok", response.getReturnMessage());
-    }
-
-    @Test
     void testProcessMembers() {
         final String accountName = UUID.randomUUID().toString();
 
@@ -150,13 +140,33 @@ final class SoapClientTest {
     }
 
     @Test
-    void testFetchCircles() {
-        final FetchCircleRequest request = prepareRequest(FetchCircleRequest.class, Constants.ADMIN_ACCOUNT);
+    void testFetchMembers() {
+        final FetchMemberRequest request = prepareRequest(FetchMemberRequest.class, Constants.ADMIN_ACCOUNT);
 
-        final FetchCircleResponse response = soapManagement.fetchCircles(request);
+        final FetchMemberResponse response = soapManagement.fetchMembers(request);
         assertNotNull(response);
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
         assertEquals("Ok", response.getReturnMessage());
+    }
+
+    @Test
+    void testDataTypes() {
+        final ProcessDataTypeRequest processRequest = prepareRequest(ProcessDataTypeRequest.class, Constants.ADMIN_ACCOUNT);
+        processRequest.setTypeName("ObjectType");
+        processRequest.setType("Object Mapping Rules");
+        processRequest.setAction(Action.PROCESS);
+        final ProcessDataTypeResponse processResponse = soapShare.processDataType(processRequest);
+        assertNotNull(processResponse);
+        assertTrue(processResponse.isOk());
+        assertEquals(processRequest.getTypeName(), processResponse.getDataType().getTypeName());
+
+        final FetchDataTypeRequest fetchRequest = prepareRequest(FetchDataTypeRequest.class, Constants.ADMIN_ACCOUNT);
+        final FetchDataTypeResponse fetchResponse = soapShare.fetchDataTypes(fetchRequest);
+        assertNotNull(fetchResponse);
+        assertTrue(fetchResponse.isOk());
+        // If the tests is running against a system with more DataTypes added,
+        // this test will fail if hardcoded to 3, hence it expects at least 3.
+        assertTrue(fetchResponse.getDataTypes().size() >= 3);
     }
 
     @Test
@@ -184,23 +194,13 @@ final class SoapClientTest {
     }
 
     @Test
-    void testDataTypes() {
-        final ProcessDataTypeRequest processRequest = prepareRequest(ProcessDataTypeRequest.class, Constants.ADMIN_ACCOUNT);
-        processRequest.setTypeName("ObjectType");
-        processRequest.setType("Object Mapping Rules");
-        processRequest.setAction(Action.PROCESS);
-        final ProcessDataTypeResponse processResponse = soapShare.processDataType(processRequest);
-        assertNotNull(processResponse);
-        assertTrue(processResponse.isOk());
-        assertEquals(processRequest.getTypeName(), processResponse.getDataType().getTypeName());
+    void testFetchCircles() {
+        final FetchCircleRequest request = prepareRequest(FetchCircleRequest.class, Constants.ADMIN_ACCOUNT);
 
-        final FetchDataTypeRequest fetchRequest = prepareRequest(FetchDataTypeRequest.class, Constants.ADMIN_ACCOUNT);
-        final FetchDataTypeResponse fetchResponse = soapShare.fetchDataTypes(fetchRequest);
-        assertNotNull(fetchResponse);
-        assertTrue(fetchResponse.isOk());
-        // If the tests is running against a system with more DataTypes added,
-        // this test will fail if hardcoded to 3, hence it expects at least 3.
-        assertTrue(fetchResponse.getDataTypes().size() >= 3);
+        final FetchCircleResponse response = soapManagement.fetchCircles(request);
+        assertNotNull(response);
+        assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
+        assertEquals("Ok", response.getReturnMessage());
     }
 
     @Test

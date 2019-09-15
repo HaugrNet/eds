@@ -246,21 +246,16 @@ final class TrusteeServiceTest extends DatabaseSetup {
     @Test
     void testFetchTrusteesWithoutParameters() {
         final FetchTrusteeService service = new FetchTrusteeService(settings, entityManager);
-        final FetchTrusteeRequest request = prepareRequest(FetchTrusteeRequest.class, MEMBER_1);
+        final FetchTrusteeRequest request = prepareRequest(FetchTrusteeRequest.class, MEMBER_5);
         final FetchTrusteeResponse response = service.perform(request);
 
         assertEquals("Ok", response.getReturnMessage());
-        assertEquals(2, response.getTrustees().size());
-        assertEquals(CIRCLE_1_ID, response.getTrustees().get(0).getCircleId());
-        assertEquals(CIRCLE_1, response.getTrustees().get(0).getCircleName());
-        assertEquals(MEMBER_1_ID, response.getTrustees().get(0).getMemberId());
-        assertEquals(MEMBER_1, response.getTrustees().get(0).getAccountName());
-        assertEquals(TrustLevel.ADMIN, response.getTrustees().get(0).getTrustLevel());
-        assertEquals(CIRCLE_2_ID, response.getTrustees().get(1).getCircleId());
-        assertEquals(CIRCLE_2, response.getTrustees().get(1).getCircleName());
-        assertEquals(MEMBER_1_ID, response.getTrustees().get(1).getMemberId());
-        assertEquals(MEMBER_1, response.getTrustees().get(1).getAccountName());
-        assertEquals(TrustLevel.ADMIN, response.getTrustees().get(1).getTrustLevel());
+        assertEquals(1, response.getTrustees().size());
+        assertEquals(CIRCLE_3_ID, response.getTrustees().get(0).getCircleId());
+        assertEquals(CIRCLE_3, response.getTrustees().get(0).getCircleName());
+        assertEquals(MEMBER_5_ID, response.getTrustees().get(0).getMemberId());
+        assertEquals(MEMBER_5, response.getTrustees().get(0).getAccountName());
+        assertEquals(TrustLevel.READ, response.getTrustees().get(0).getTrustLevel());
     }
 
     @Test

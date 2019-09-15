@@ -81,12 +81,12 @@ import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
 final class SoapClientTest {
 
     private static final String URL = "http://localhost:8080/cws";
-    private final Management management = new ManagementSoapClient(URL);
-    private final Share share = new ShareSoapClient(URL);
+    private final Management soapManagement = new ManagementSoapClient(URL);
+    private final Share soapShare = new ShareSoapClient(URL);
 
     @Test
     void testVersion() {
-        final VersionResponse response = management.version();
+        final VersionResponse response = soapManagement.version();
         assertNotNull(response);
         assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getReturnCode());
         assertEquals("Ok", response.getReturnMessage());
@@ -97,7 +97,7 @@ final class SoapClientTest {
     void testSettings() {
         final SettingRequest request = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
 
-        final SettingResponse response = management.settings(request);
+        final SettingResponse response = soapManagement.settings(request);
         assertNotNull(response);
         assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getReturnCode());
         assertEquals("Ok", response.getReturnMessage());
@@ -108,7 +108,7 @@ final class SoapClientTest {
         final MasterKeyRequest request = prepareRequest(MasterKeyRequest.class, Constants.ADMIN_ACCOUNT);
         request.setSecret(request.getCredential());
 
-        final MasterKeyResponse response = management.masterKey(request);
+        final MasterKeyResponse response = soapManagement.masterKey(request);
         assertNotNull(response);
         assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getReturnCode());
         assertEquals("MasterKey unlocked.", response.getReturnMessage());
@@ -118,7 +118,7 @@ final class SoapClientTest {
     void testSanitized() {
         final SanityRequest request = prepareRequest(SanityRequest.class, Constants.ADMIN_ACCOUNT);
 
-        final SanityResponse response = management.sanitized(request);
+        final SanityResponse response = soapManagement.sanitized(request);
         assertNotNull(response);
         assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getReturnCode());
         assertEquals("Ok", response.getReturnMessage());
@@ -128,7 +128,7 @@ final class SoapClientTest {
     void testFetchMembers() {
         final FetchMemberRequest request = prepareRequest(FetchMemberRequest.class, Constants.ADMIN_ACCOUNT);
 
-        final FetchMemberResponse response = management.fetchMembers(request);
+        final FetchMemberResponse response = soapManagement.fetchMembers(request);
         assertNotNull(response);
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
         assertEquals("Ok", response.getReturnMessage());
@@ -143,7 +143,7 @@ final class SoapClientTest {
         request.setNewAccountName(accountName);
         request.setNewCredential(accountName.getBytes(StandardCharsets.UTF_8));
 
-        final ProcessMemberResponse response = management.processMember(request);
+        final ProcessMemberResponse response = soapManagement.processMember(request);
         assertNotNull(response);
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
         assertEquals("Ok", response.getReturnMessage());
@@ -153,7 +153,7 @@ final class SoapClientTest {
     void testFetchCircles() {
         final FetchCircleRequest request = prepareRequest(FetchCircleRequest.class, Constants.ADMIN_ACCOUNT);
 
-        final FetchCircleResponse response = management.fetchCircles(request);
+        final FetchCircleResponse response = soapManagement.fetchCircles(request);
         assertNotNull(response);
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
         assertEquals("Ok", response.getReturnMessage());
@@ -167,7 +167,7 @@ final class SoapClientTest {
         memberRequest.setAction(Action.CREATE);
         memberRequest.setNewAccountName(accountName);
         memberRequest.setNewCredential(accountName.getBytes(StandardCharsets.UTF_8));
-        final ProcessMemberResponse memberResponse = management.processMember(memberRequest);
+        final ProcessMemberResponse memberResponse = soapManagement.processMember(memberRequest);
         assertNotNull(memberResponse);
         assertTrue(memberResponse.isOk());
 
@@ -177,7 +177,7 @@ final class SoapClientTest {
         request.setMemberId(memberResponse.getMemberId());
         request.setCircleName(UUID.randomUUID().toString());
 
-        final ProcessCircleResponse response = management.processCircle(request);
+        final ProcessCircleResponse response = soapManagement.processCircle(request);
         assertNotNull(response);
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
         assertEquals("Ok", response.getReturnMessage());
@@ -189,13 +189,13 @@ final class SoapClientTest {
         processRequest.setTypeName("ObjectType");
         processRequest.setType("Object Mapping Rules");
         processRequest.setAction(Action.PROCESS);
-        final ProcessDataTypeResponse processResponse = share.processDataType(processRequest);
+        final ProcessDataTypeResponse processResponse = soapShare.processDataType(processRequest);
         assertNotNull(processResponse);
         assertTrue(processResponse.isOk());
         assertEquals(processRequest.getTypeName(), processResponse.getDataType().getTypeName());
 
         final FetchDataTypeRequest fetchRequest = prepareRequest(FetchDataTypeRequest.class, Constants.ADMIN_ACCOUNT);
-        final FetchDataTypeResponse fetchResponse = share.fetchDataTypes(fetchRequest);
+        final FetchDataTypeResponse fetchResponse = soapShare.fetchDataTypes(fetchRequest);
         assertNotNull(fetchResponse);
         assertTrue(fetchResponse.isOk());
         // If the tests is running against a system with more DataTypes added,
@@ -237,14 +237,14 @@ final class SoapClientTest {
         final SignRequest signRequest = prepareRequest(SignRequest.class, Constants.ADMIN_ACCOUNT);
         final byte[] document = UUID.randomUUID().toString().getBytes(StandardCharsets.UTF_8);
         signRequest.setData(document);
-        final SignResponse signResponse = share.sign(signRequest);
+        final SignResponse signResponse = soapShare.sign(signRequest);
         assertNotNull(signResponse);
         assertTrue(signResponse.isOk());
         assertNotNull(signResponse.getSignature());
 
         // 2. Fetch Signatures, to see that we have at least one
         final FetchSignatureRequest fetchRequest = prepareRequest(FetchSignatureRequest.class, Constants.ADMIN_ACCOUNT);
-        final FetchSignatureResponse fetchResponse = share.fetchSignatures(fetchRequest);
+        final FetchSignatureResponse fetchResponse = soapShare.fetchSignatures(fetchRequest);
         assertNotNull(fetchResponse);
         assertTrue(fetchResponse.isOk());
         assertFalse(fetchResponse.getSignatures().isEmpty());
@@ -254,7 +254,7 @@ final class SoapClientTest {
         verifyRequest.setData(document);
         verifyRequest.setSignature(signResponse.getSignature());
 
-        final VerifyResponse verifyResponse = share.verify(verifyRequest);
+        final VerifyResponse verifyResponse = soapShare.verify(verifyRequest);
         assertNotNull(verifyResponse);
         assertTrue(verifyResponse.isOk());
         assertTrue(verifyResponse.isVerified());
@@ -284,7 +284,7 @@ final class SoapClientTest {
         request.setNewAccountName(accountName);
         request.setNewCredential(accountName.getBytes(StandardCharsets.UTF_8));
 
-        final ProcessMemberResponse response = management.processMember(request);
+        final ProcessMemberResponse response = soapManagement.processMember(request);
         throwIfFailed(response);
 
         return response.getMemberId();
@@ -295,7 +295,7 @@ final class SoapClientTest {
         request.setAction(Action.CREATE);
         request.setCircleName(circleName);
 
-        final ProcessCircleResponse response = management.processCircle(request);
+        final ProcessCircleResponse response = soapManagement.processCircle(request);
         throwIfFailed(response);
 
         return response.getCircleId();
@@ -308,14 +308,14 @@ final class SoapClientTest {
         request.setMemberId(memberId);
         request.setTrustLevel(TrustLevel.WRITE);
 
-        final ProcessTrusteeResponse response = management.processTrustee(request);
+        final ProcessTrusteeResponse response = soapManagement.processTrustee(request);
         throwIfFailed(response);
     }
 
     private List<Trustee> fetchTrustees(final String memberAccount, final String circleId) {
         final FetchTrusteeRequest request = prepareRequest(FetchTrusteeRequest.class, memberAccount);
         request.setCircleId(circleId);
-        final FetchTrusteeResponse response = management.fetchTrustees(request);
+        final FetchTrusteeResponse response = soapManagement.fetchTrustees(request);
 
         throwIfFailed(response);
         return response.getTrustees();
@@ -328,7 +328,7 @@ final class SoapClientTest {
         request.setDataName(dataName);
         request.setData(data);
 
-        final ProcessDataResponse response = share.processData(request);
+        final ProcessDataResponse response = soapShare.processData(request);
         throwIfFailed(response);
 
         return response.getDataId();
@@ -341,7 +341,7 @@ final class SoapClientTest {
             request.setDataId(folderId[0]);
         }
 
-        final FetchDataResponse response = share.fetchData(request);
+        final FetchDataResponse response = soapShare.fetchData(request);
         throwIfFailed(response);
 
         return response;
@@ -351,7 +351,7 @@ final class SoapClientTest {
         final FetchDataRequest request = prepareRequest(FetchDataRequest.class, accountName);
         request.setDataId(dataId);
 
-        final FetchDataResponse response = share.fetchData(request);
+        final FetchDataResponse response = soapShare.fetchData(request);
         throwIfFailed(response);
 
         return response.getData();

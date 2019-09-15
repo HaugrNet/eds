@@ -81,12 +81,12 @@ import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
 final class RestClientTest {
 
     private static final String URL = "http://localhost:8080/cws";
-    private final Management management = new ManagementRestClient(URL);
-    private final Share share = new ShareRestClient(URL);
+    private final Management restManagement = new ManagementRestClient(URL);
+    private final Share restShare = new ShareRestClient(URL);
 
     @Test
     void testVersion() {
-        final VersionResponse response = management.version();
+        final VersionResponse response = restManagement.version();
         assertNotNull(response);
         assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getReturnCode());
         assertEquals("Ok", response.getReturnMessage());
@@ -97,7 +97,7 @@ final class RestClientTest {
     void testSettings() {
         final SettingRequest request = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
 
-        final SettingResponse response = management.settings(request);
+        final SettingResponse response = restManagement.settings(request);
         assertNotNull(response);
         assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getReturnCode());
         assertEquals("Ok", response.getReturnMessage());
@@ -108,7 +108,7 @@ final class RestClientTest {
         final MasterKeyRequest request = prepareRequest(MasterKeyRequest.class, Constants.ADMIN_ACCOUNT);
         request.setSecret(request.getCredential());
 
-        final MasterKeyResponse response = management.masterKey(request);
+        final MasterKeyResponse response = restManagement.masterKey(request);
         assertNotNull(response);
         assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getReturnCode());
         assertEquals("MasterKey unlocked.", response.getReturnMessage());
@@ -118,7 +118,7 @@ final class RestClientTest {
     void testSanitized() {
         final SanityRequest request = prepareRequest(SanityRequest.class, Constants.ADMIN_ACCOUNT);
 
-        final SanityResponse response = management.sanitized(request);
+        final SanityResponse response = restManagement.sanitized(request);
         assertNotNull(response);
         assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getReturnCode());
         assertEquals("Ok", response.getReturnMessage());
@@ -128,7 +128,7 @@ final class RestClientTest {
     void testFetchMembers() {
         final FetchMemberRequest request = prepareRequest(FetchMemberRequest.class, Constants.ADMIN_ACCOUNT);
 
-        final FetchMemberResponse response = management.fetchMembers(request);
+        final FetchMemberResponse response = restManagement.fetchMembers(request);
         assertNotNull(response);
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
         assertEquals("Ok", response.getReturnMessage());
@@ -143,7 +143,7 @@ final class RestClientTest {
         request.setNewAccountName(accountName);
         request.setNewCredential(accountName.getBytes(StandardCharsets.UTF_8));
 
-        final ProcessMemberResponse response = management.processMember(request);
+        final ProcessMemberResponse response = restManagement.processMember(request);
         assertNotNull(response);
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
         assertEquals("Ok", response.getReturnMessage());
@@ -153,7 +153,7 @@ final class RestClientTest {
     void testFetchCircles() {
         final FetchCircleRequest request = prepareRequest(FetchCircleRequest.class, Constants.ADMIN_ACCOUNT);
 
-        final FetchCircleResponse response = management.fetchCircles(request);
+        final FetchCircleResponse response = restManagement.fetchCircles(request);
         assertNotNull(response);
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
         assertEquals("Ok", response.getReturnMessage());
@@ -167,7 +167,7 @@ final class RestClientTest {
         memberRequest.setAction(Action.CREATE);
         memberRequest.setNewAccountName(accountName);
         memberRequest.setNewCredential(accountName.getBytes(StandardCharsets.UTF_8));
-        final ProcessMemberResponse memberResponse = management.processMember(memberRequest);
+        final ProcessMemberResponse memberResponse = restManagement.processMember(memberRequest);
         assertNotNull(memberResponse);
         assertTrue(memberResponse.isOk());
 
@@ -177,7 +177,7 @@ final class RestClientTest {
         request.setMemberId(memberResponse.getMemberId());
         request.setCircleName(UUID.randomUUID().toString());
 
-        final ProcessCircleResponse response = management.processCircle(request);
+        final ProcessCircleResponse response = restManagement.processCircle(request);
         assertNotNull(response);
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
         assertEquals("Ok", response.getReturnMessage());
@@ -189,13 +189,13 @@ final class RestClientTest {
         processRequest.setTypeName("ObjectType");
         processRequest.setType("Object Mapping Rules");
         processRequest.setAction(Action.PROCESS);
-        final ProcessDataTypeResponse processResponse = share.processDataType(processRequest);
+        final ProcessDataTypeResponse processResponse = restShare.processDataType(processRequest);
         assertNotNull(processResponse);
         assertTrue(processResponse.isOk());
         assertEquals(processRequest.getTypeName(), processResponse.getDataType().getTypeName());
 
         final FetchDataTypeRequest fetchRequest = prepareRequest(FetchDataTypeRequest.class, Constants.ADMIN_ACCOUNT);
-        final FetchDataTypeResponse fetchResponse = share.fetchDataTypes(fetchRequest);
+        final FetchDataTypeResponse fetchResponse = restShare.fetchDataTypes(fetchRequest);
         assertNotNull(fetchResponse);
         assertTrue(fetchResponse.isOk());
         // If the tests is running against a system with more DataTypes added,
@@ -237,13 +237,13 @@ final class RestClientTest {
         final SignRequest signRequest = prepareRequest(SignRequest.class, Constants.ADMIN_ACCOUNT);
         final byte[] document = UUID.randomUUID().toString().getBytes(StandardCharsets.UTF_8);
         signRequest.setData(document);
-        final SignResponse signResponse = share.sign(signRequest);
+        final SignResponse signResponse = restShare.sign(signRequest);
         assertTrue(signResponse.isOk());
         assertNotNull(signResponse.getSignature());
 
         // 2. Fetch Signatures, to see that we have at least one
         final FetchSignatureRequest fetchRequest = prepareRequest(FetchSignatureRequest.class, Constants.ADMIN_ACCOUNT);
-        final FetchSignatureResponse fetchResponse = share.fetchSignatures(fetchRequest);
+        final FetchSignatureResponse fetchResponse = restShare.fetchSignatures(fetchRequest);
         assertNotNull(fetchResponse);
         assertTrue(fetchResponse.isOk());
         assertFalse(fetchResponse.getSignatures().isEmpty());
@@ -253,7 +253,7 @@ final class RestClientTest {
         verifyRequest.setData(document);
         verifyRequest.setSignature(signResponse.getSignature());
 
-        final VerifyResponse verifyResponse = share.verify(verifyRequest);
+        final VerifyResponse verifyResponse = restShare.verify(verifyRequest);
         assertNotNull(verifyResponse);
         assertTrue(verifyResponse.isOk());
         assertTrue(verifyResponse.isVerified());
@@ -283,7 +283,7 @@ final class RestClientTest {
         request.setNewAccountName(accountName);
         request.setNewCredential(accountName.getBytes(StandardCharsets.UTF_8));
 
-        final ProcessMemberResponse response = management.processMember(request);
+        final ProcessMemberResponse response = restManagement.processMember(request);
         throwIfFailed(response);
 
         return response.getMemberId();
@@ -294,7 +294,7 @@ final class RestClientTest {
         request.setAction(Action.CREATE);
         request.setCircleName(circleName);
 
-        final ProcessCircleResponse response = management.processCircle(request);
+        final ProcessCircleResponse response = restManagement.processCircle(request);
         throwIfFailed(response);
 
         return response.getCircleId();
@@ -307,14 +307,14 @@ final class RestClientTest {
         request.setMemberId(memberId);
         request.setTrustLevel(TrustLevel.WRITE);
 
-        final ProcessTrusteeResponse response = management.processTrustee(request);
+        final ProcessTrusteeResponse response = restManagement.processTrustee(request);
         throwIfFailed(response);
     }
 
     private List<Trustee> fetchTrustees(final String memberAccount, final String circleId) {
         final FetchTrusteeRequest request = prepareRequest(FetchTrusteeRequest.class, memberAccount);
         request.setCircleId(circleId);
-        final FetchTrusteeResponse response = management.fetchTrustees(request);
+        final FetchTrusteeResponse response = restManagement.fetchTrustees(request);
 
         throwIfFailed(response);
         return response.getTrustees();
@@ -327,7 +327,7 @@ final class RestClientTest {
         request.setDataName(dataName);
         request.setData(data);
 
-        final ProcessDataResponse response = share.processData(request);
+        final ProcessDataResponse response = restShare.processData(request);
         throwIfFailed(response);
 
         return response.getDataId();
@@ -340,7 +340,7 @@ final class RestClientTest {
             request.setDataId(folderId[0]);
         }
 
-        final FetchDataResponse response = share.fetchData(request);
+        final FetchDataResponse response = restShare.fetchData(request);
         throwIfFailed(response);
 
         return response;
@@ -350,7 +350,7 @@ final class RestClientTest {
         final FetchDataRequest request = prepareRequest(FetchDataRequest.class, accountName);
         request.setDataId(dataId);
 
-        final FetchDataResponse response = share.fetchData(request);
+        final FetchDataResponse response = restShare.fetchData(request);
         throwIfFailed(response);
 
         return response.getData();

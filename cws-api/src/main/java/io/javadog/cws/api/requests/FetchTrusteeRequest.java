@@ -35,11 +35,14 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "fetchTrusteeRequest")
-@XmlType(name = "fetchTrusteeRequest", propOrder = Constants.FIELD_CIRCLE_ID)
+@XmlType(name = "fetchTrusteeRequest", propOrder = { Constants.FIELD_MEMBER_ID, Constants.FIELD_CIRCLE_ID })
 public final class FetchTrusteeRequest extends Authentication implements CircleIdRequest {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
+
+    @XmlElement(name = Constants.FIELD_MEMBER_ID, nillable = true)
+    private String memberId = null;
 
     @XmlElement(name = Constants.FIELD_CIRCLE_ID, nillable = true)
     private String circleId = null;
@@ -47,6 +50,14 @@ public final class FetchTrusteeRequest extends Authentication implements CircleI
     // =========================================================================
     // Setters & Getters
     // =========================================================================
+
+    public void setMemberId(final String memberId) {
+        this.memberId = memberId;
+    }
+
+    public String getMemberId() {
+        return memberId;
+    }
 
     /**
      * {@inheritDoc}
@@ -75,7 +86,8 @@ public final class FetchTrusteeRequest extends Authentication implements CircleI
     public Map<String, String> validate() {
         final Map<String, String> errors = super.validate();
 
-        checkNotNullAndValidId(errors, Constants.FIELD_CIRCLE_ID, circleId, "The Circle Id is missing or invalid.");
+        checkValidId(errors, Constants.FIELD_CIRCLE_ID, circleId, "The Circle Id is invalid.");
+        checkValidId(errors, Constants.FIELD_MEMBER_ID, memberId, "The Member Id is invalid.");
 
         return errors;
     }

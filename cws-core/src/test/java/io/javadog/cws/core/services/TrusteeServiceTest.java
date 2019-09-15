@@ -60,8 +60,7 @@ final class TrusteeServiceTest extends DatabaseSetup {
         final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
         assertEquals(ReturnCode.VERIFICATION_WARNING, cause.getReturnCode());
         assertEquals("Request Object contained errors:" +
-                "\nKey: credential, Error: The Session (Credential) is missing." +
-                "\nKey: circleId, Error: The Circle Id is missing or invalid.", cause.getMessage());
+                "\nKey: credential, Error: The Session (Credential) is missing.", cause.getMessage());
     }
 
     @Test
@@ -102,6 +101,176 @@ final class TrusteeServiceTest extends DatabaseSetup {
 
         assertTrue(response.isOk());
         detailedTrusteeAssertion(response, MEMBER_1_ID, MEMBER_2_ID, MEMBER_3_ID);
+    }
+
+    @Test
+    void testFetchTrusteesAsMemberWithValidCircleId() {
+        final FetchTrusteeService service = new FetchTrusteeService(settings, entityManager);
+        final FetchTrusteeRequest request = prepareRequest(FetchTrusteeRequest.class, MEMBER_1);
+        request.setCircleId(CIRCLE_1_ID);
+        final FetchTrusteeResponse response = service.perform(request);
+
+        assertEquals("Ok", response.getReturnMessage());
+    }
+
+    @Test
+    void testFetchTrusteesAsMemberWithNonMemberCircleId() {
+        final FetchTrusteeService service = new FetchTrusteeService(settings, entityManager);
+        final FetchTrusteeRequest request = prepareRequest(FetchTrusteeRequest.class, MEMBER_1);
+        request.setCircleId(CIRCLE_3_ID);
+
+        // Should throw a VerificationException, as the request is invalid.
+        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
+        assertEquals(ReturnCode.IDENTIFICATION_WARNING, cause.getReturnCode());
+        assertEquals("No Trustee information found for member 'member1' and circle '" + CIRCLE_3_ID + "'.", cause.getMessage());
+    }
+
+    @Test
+    void testFetchTrusteesAsMemberWithInvalidCircleId() {
+        final FetchTrusteeService service = new FetchTrusteeService(settings, entityManager);
+        final FetchTrusteeRequest request = prepareRequest(FetchTrusteeRequest.class, Constants.ADMIN_ACCOUNT);
+        final String circleId = UUID.randomUUID().toString();
+        request.setCircleId(circleId);
+
+        // Should throw a VerificationException, as the request is invalid.
+        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
+        assertEquals(ReturnCode.IDENTIFICATION_WARNING, cause.getReturnCode());
+        assertEquals("The requested Circle cannot be found.", cause.getMessage());
+    }
+
+    @Test
+    void testFetchTrusteesAsAdminWithValidCircleId() {
+        final FetchTrusteeService service = new FetchTrusteeService(settings, entityManager);
+        final FetchTrusteeRequest request = prepareRequest(FetchTrusteeRequest.class, Constants.ADMIN_ACCOUNT);
+        request.setCircleId(CIRCLE_1_ID);
+        final FetchTrusteeResponse response = service.perform(request);
+
+        assertEquals("Ok", response.getReturnMessage());
+    }
+
+    @Test
+    void testFetchTrusteesAsAdminWithInvalidCircleId() {
+        final FetchTrusteeService service = new FetchTrusteeService(settings, entityManager);
+        final FetchTrusteeRequest request = prepareRequest(FetchTrusteeRequest.class, Constants.ADMIN_ACCOUNT);
+        final String circleId = UUID.randomUUID().toString();
+        request.setCircleId(circleId);
+
+        // Should throw a VerificationException, as the request is invalid.
+        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
+        assertEquals(ReturnCode.IDENTIFICATION_WARNING, cause.getReturnCode());
+        assertEquals("The requested Circle cannot be found.", cause.getMessage());
+    }
+
+    @Test
+    void testFetchTrusteesAsMemberWithValidCircleIdAndMemberId() {
+        final FetchTrusteeService service = new FetchTrusteeService(settings, entityManager);
+        final FetchTrusteeRequest request = prepareRequest(FetchTrusteeRequest.class, MEMBER_1);
+        request.setCircleId(CIRCLE_1_ID);
+        request.setMemberId(MEMBER_2_ID);
+        final FetchTrusteeResponse response = service.perform(request);
+
+        assertEquals("Ok", response.getReturnMessage());
+    }
+
+    @Test
+    void testFetchTrusteesAsNonTrusteeWithCircleIdAndMemberId() {
+        final FetchTrusteeService service = new FetchTrusteeService(settings, entityManager);
+        final FetchTrusteeRequest request = prepareRequest(FetchTrusteeRequest.class, MEMBER_1);
+        request.setCircleId(CIRCLE_3_ID);
+        request.setMemberId(MEMBER_5_ID);
+
+        // Should throw a VerificationException, as the request is invalid.
+        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
+        assertEquals(ReturnCode.IDENTIFICATION_WARNING, cause.getReturnCode());
+        assertEquals("No Trustee information found for member 'member1' and circle '" + CIRCLE_3_ID + "'.", cause.getMessage());
+    }
+
+    @Test
+    void testFetchTrusteesAsAdminWithValidCircleIdAndMemberId() {
+        final FetchTrusteeService service = new FetchTrusteeService(settings, entityManager);
+        final FetchTrusteeRequest request = prepareRequest(FetchTrusteeRequest.class, Constants.ADMIN_ACCOUNT);
+        request.setCircleId(CIRCLE_1_ID);
+        request.setMemberId(MEMBER_5_ID);
+
+        // Should throw a VerificationException, as the request is invalid.
+        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
+        assertEquals(ReturnCode.IDENTIFICATION_WARNING, cause.getReturnCode());
+        assertEquals("Unable to find any relation between given Circle & Member Id's.", cause.getMessage());
+    }
+
+    @Test
+    void testFetchTrusteesAsAdminWithNonExistingMemberId() {
+        final FetchTrusteeService service = new FetchTrusteeService(settings, entityManager);
+        final FetchTrusteeRequest request = prepareRequest(FetchTrusteeRequest.class, Constants.ADMIN_ACCOUNT);
+        request.setMemberId(UUID.randomUUID().toString());
+
+        // Should throw a VerificationException, as the request is invalid.
+        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
+        assertEquals(ReturnCode.IDENTIFICATION_WARNING, cause.getReturnCode());
+        assertEquals("Unable to find any Trustee information for the given Member Id.", cause.getMessage());
+    }
+
+    @Test
+    void testFetchTrusteesAsMemberWithNonAdminPermissions() {
+        final FetchTrusteeService service = new FetchTrusteeService(settings, entityManager);
+        final FetchTrusteeRequest request = prepareRequest(FetchTrusteeRequest.class, MEMBER_1);
+        request.setMemberId(MEMBER_2_ID);
+
+        // Should throw a VerificationException, as the request is invalid.
+        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
+        assertEquals(ReturnCode.IDENTIFICATION_WARNING, cause.getReturnCode());
+        assertEquals("Requesting Member is not authorized to inquire about other Member's.", cause.getMessage());
+    }
+
+    @Test
+    void testFetchTrusteesAsSelf() {
+        final FetchTrusteeService service = new FetchTrusteeService(settings, entityManager);
+        final FetchTrusteeRequest request = prepareRequest(FetchTrusteeRequest.class, MEMBER_1);
+        request.setMemberId(MEMBER_1_ID);
+        final FetchTrusteeResponse response = service.perform(request);
+
+        assertEquals("Ok", response.getReturnMessage());
+        assertEquals(2, response.getTrustees().size());
+        assertEquals(CIRCLE_1_ID, response.getTrustees().get(0).getCircleId());
+        assertEquals(CIRCLE_1, response.getTrustees().get(0).getCircleName());
+        assertEquals(MEMBER_1_ID, response.getTrustees().get(0).getMemberId());
+        assertEquals(MEMBER_1, response.getTrustees().get(0).getAccountName());
+        assertEquals(TrustLevel.ADMIN, response.getTrustees().get(0).getTrustLevel());
+        assertEquals(CIRCLE_2_ID, response.getTrustees().get(1).getCircleId());
+        assertEquals(CIRCLE_2, response.getTrustees().get(1).getCircleName());
+        assertEquals(MEMBER_1_ID, response.getTrustees().get(1).getMemberId());
+        assertEquals(MEMBER_1, response.getTrustees().get(1).getAccountName());
+        assertEquals(TrustLevel.ADMIN, response.getTrustees().get(1).getTrustLevel());
+    }
+
+    @Test
+    void testFetchTrusteesWithoutParameters() {
+        final FetchTrusteeService service = new FetchTrusteeService(settings, entityManager);
+        final FetchTrusteeRequest request = prepareRequest(FetchTrusteeRequest.class, MEMBER_1);
+        final FetchTrusteeResponse response = service.perform(request);
+
+        assertEquals("Ok", response.getReturnMessage());
+        assertEquals(2, response.getTrustees().size());
+        assertEquals(CIRCLE_1_ID, response.getTrustees().get(0).getCircleId());
+        assertEquals(CIRCLE_1, response.getTrustees().get(0).getCircleName());
+        assertEquals(MEMBER_1_ID, response.getTrustees().get(0).getMemberId());
+        assertEquals(MEMBER_1, response.getTrustees().get(0).getAccountName());
+        assertEquals(TrustLevel.ADMIN, response.getTrustees().get(0).getTrustLevel());
+        assertEquals(CIRCLE_2_ID, response.getTrustees().get(1).getCircleId());
+        assertEquals(CIRCLE_2, response.getTrustees().get(1).getCircleName());
+        assertEquals(MEMBER_1_ID, response.getTrustees().get(1).getMemberId());
+        assertEquals(MEMBER_1, response.getTrustees().get(1).getAccountName());
+        assertEquals(TrustLevel.ADMIN, response.getTrustees().get(1).getTrustLevel());
+    }
+
+    @Test
+    void testFetchTrusteesAsAdmin() {
+        final FetchTrusteeService service = new FetchTrusteeService(settings, entityManager);
+        final FetchTrusteeRequest request = prepareRequest(FetchTrusteeRequest.class, Constants.ADMIN_ACCOUNT);
+        request.setMemberId(MEMBER_1_ID);
+        final FetchTrusteeResponse response = service.perform(request);
+
+        assertEquals("Ok", response.getReturnMessage());
     }
 
     @Test

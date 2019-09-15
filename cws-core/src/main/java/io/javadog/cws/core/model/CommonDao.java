@@ -198,13 +198,6 @@ public class CommonDao {
         return findList(query);
     }
 
-    public List<TrusteeEntity> findTrusteesByCircle(final CircleEntity circle) {
-        final Query query = entityManager.createNamedQuery("trustee.findByCircle");
-        query.setParameter("circle", circle);
-
-        return findList(query);
-    }
-
     public CircleEntity findCircleByName(final String name) {
         final Query query = entityManager.createNamedQuery("circle.findByName");
         query.setParameter("name", name);

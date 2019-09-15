@@ -35,41 +35,33 @@ final class FetchTrusteeRequestTest {
     @Test
     void testClassflow() {
         final String circleId = UUID.randomUUID().toString();
+        final String memberId = UUID.randomUUID().toString();
 
         final FetchTrusteeRequest request = new FetchTrusteeRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
         request.setCredential(TestUtilities.convert(Constants.ADMIN_ACCOUNT));
         request.setCircleId(circleId);
+        request.setMemberId(memberId);
 
         final Map<String, String> errors = request.validate();
         assertTrue(errors.isEmpty());
         assertEquals(Constants.ADMIN_ACCOUNT, request.getAccountName());
         assertEquals(Constants.ADMIN_ACCOUNT, TestUtilities.convert(request.getCredential()));
         assertEquals(circleId, request.getCircleId());
+        assertEquals(memberId, request.getMemberId());
     }
 
     @Test
     void testEmptyClass() {
         final FetchTrusteeRequest request = new FetchTrusteeRequest();
+        request.setMemberId("my member Id");
+        request.setCircleId("my circle Id");
         final Map<String, String> errors = request.validate();
 
         assertFalse(errors.isEmpty());
-        assertEquals(2, errors.size());
+        assertEquals(3, errors.size());
         assertEquals("The Session (Credential) is missing.", errors.get(Constants.FIELD_CREDENTIAL));
-        assertEquals("The Circle Id is missing or invalid.", errors.get(Constants.FIELD_CIRCLE_ID));
-    }
-
-    @Test
-    void testClassWithInvalidValues() {
-        final String circleId = "Invalid Circle Id";
-
-        final FetchTrusteeRequest request = new FetchTrusteeRequest();
-        request.setCircleId(circleId);
-
-        final Map<String, String> errors = request.validate();
-        assertFalse(errors.isEmpty());
-        assertEquals(2, errors.size());
-        assertEquals("The Session (Credential) is missing.", errors.get(Constants.FIELD_CREDENTIAL));
-        assertEquals("The Circle Id is missing or invalid.", errors.get(Constants.FIELD_CIRCLE_ID));
+        assertEquals("The Member Id is invalid.", errors.get(Constants.FIELD_MEMBER_ID));
+        assertEquals("The Circle Id is invalid.", errors.get(Constants.FIELD_CIRCLE_ID));
     }
 }

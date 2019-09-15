@@ -312,6 +312,7 @@ public final class ManagementSoapClient implements Management {
             final io.javadog.cws.ws.FetchTrusteeRequest ws = new io.javadog.cws.ws.FetchTrusteeRequest();
             Mapper.fillAuthentication(ws, request);
             ws.setCircleId(Mapper.convert(Constants.FIELD_CIRCLE_ID, request.getCircleId()));
+            ws.setMemberId(Mapper.convert(Constants.FIELD_MEMBER_ID, request.getMemberId()));
 
             final FetchTrusteeResult result = client.fetchTrustees(ws);
             if (result != null) {

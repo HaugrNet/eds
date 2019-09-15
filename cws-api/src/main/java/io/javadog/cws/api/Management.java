@@ -407,14 +407,20 @@ public interface Management {
     ProcessCircleResponse processCircle(ProcessCircleRequest request);
 
     /**
-     * <p>With this request, it is possible to retrieve the list of Trustees,
-     * belonging to a Circle. A Trustee, is a member who has been granted access
-     * to a Circle either as Circle Administrator, Write access or Read access
-     * only.</p>
+     * <p>With this request, it is possible to retrieve a list of Trustees,
+     * belonging to either a Member, or a Circle. A Trustee, is a member who
+     * has been granted access to a Circle either as Circle Administrator,
+     * Write access or Read access only.</p>
      *
-     * <p>If No Circle was found for a given Id, or if a different error occurred
-     * during the handling of the Request, then an error is set and the list of
-     * Trustee returned will be empty</p>
+     * <p>If no MemberId or CircleId is provided, a listing of the requesting
+     * Member's Trustee information is being returned. If both MemberId and
+     * CircleId is set, then a list with either one or zero records is being
+     * returned.</p>
+     *
+     * <p>It should be noted, that the request is limited in what it returns,
+     * so unless the requesting user is System Administrator, only Trustee
+     * information from Circles of Trust, of which the user belongs too, is
+     * returned. If no information can be found, an error is returned.</p>
      *
      * @param request Fetch Circle Request Object
      * @return Fetch Circle Response Object with error information

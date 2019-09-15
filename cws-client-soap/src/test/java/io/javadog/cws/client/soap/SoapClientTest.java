@@ -204,34 +204,6 @@ final class SoapClientTest {
     }
 
     @Test
-    void testAddData() {
-        // Step 1; Create a new Circle with 2 Trustees
-        final String accountName1 = UUID.randomUUID().toString();
-        final String accountName2 = UUID.randomUUID().toString();
-        createAccount(accountName1);
-        final String memberId2 = createAccount(accountName2);
-        final String circleId = createCircle(accountName1, accountName1);
-        addTrustee(accountName1, circleId, memberId2);
-        final List<Trustee> trustees = fetchTrustees(accountName1, circleId);
-        assertEquals(2, trustees.size());
-
-        // Step 2; Add 2 Data Objects
-        final String data1 = toString(generateData());
-        final String data2 = toString(generateData());
-        final String dataId1 = addData(accountName2, circleId, "data1", toBytes(data1));
-        final String dataId2 = addData(accountName1, circleId, "data2", toBytes(data2));
-
-        // Step 3; Check the stored content of the Circle
-        final FetchDataResponse response = readFolderContent(accountName1, circleId);
-        assertNotNull(response);
-        assertEquals(2L, response.getRecords());
-        final byte[] read1 = readData(accountName2, dataId1);
-        assertEquals(data1, toString(read1));
-        final byte[] read2 = readData(accountName2, dataId2);
-        assertEquals(data2, toString(read2));
-    }
-
-    @Test
     void testSignatures() {
         // 1. Generate a Signature
         final SignRequest signRequest = prepareRequest(SignRequest.class, Constants.ADMIN_ACCOUNT);
@@ -260,9 +232,49 @@ final class SoapClientTest {
         assertTrue(verifyResponse.isVerified());
     }
 
+    @Test
+    void testAddData() {
+        // Step 1; Create a new Circle with 2 Trustees
+        final String accountName1 = UUID.randomUUID().toString();
+        final String accountName2 = UUID.randomUUID().toString();
+        createAccount(accountName1);
+        final String memberId2 = createAccount(accountName2);
+        final String circleId = createCircle(accountName1, accountName1);
+        addTrustee(accountName1, circleId, memberId2);
+        final List<Trustee> trustees = fetchTrustees(accountName1, circleId);
+        assertEquals(2, trustees.size());
+
+        // Step 2; Add 2 Data Objects
+        final String data1 = toString(generateData());
+        final String data2 = toString(generateData());
+        final String dataId1 = addData(accountName2, circleId, "data1", toBytes(data1));
+        final String dataId2 = addData(accountName1, circleId, "data2", toBytes(data2));
+
+        // Step 3; Check the stored content of the Circle
+        final FetchDataResponse response = readFolderContent(accountName1, circleId);
+        assertNotNull(response);
+        assertEquals(2L, response.getRecords());
+        final byte[] read1 = readData(accountName2, dataId1);
+        assertEquals(data1, toString(read1));
+        final byte[] read2 = readData(accountName2, dataId2);
+        assertEquals(data2, toString(read2));
+    }
+
     // =========================================================================
     // Internal functionality to help with the test setup
     // =========================================================================
+
+    private String createAccount(final String accountName) {
+        final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
+        request.setAction(Action.CREATE);
+        request.setNewAccountName(accountName);
+        request.setNewCredential(accountName.getBytes(StandardCharsets.UTF_8));
+
+        final ProcessMemberResponse response = soapManagement.processMember(request);
+        throwIfFailed(response);
+
+        return response.getMemberId();
+    }
 
     static <A extends Authentication> A prepareRequest(final Class<A> clazz, final String account) {
         try {
@@ -276,18 +288,6 @@ final class SoapClientTest {
         } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
             throw new SOAPClientException("Cannot instantiate Request Object", e);
         }
-    }
-
-    private String createAccount(final String accountName) {
-        final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
-        request.setAction(Action.CREATE);
-        request.setNewAccountName(accountName);
-        request.setNewCredential(accountName.getBytes(StandardCharsets.UTF_8));
-
-        final ProcessMemberResponse response = soapManagement.processMember(request);
-        throwIfFailed(response);
-
-        return response.getMemberId();
     }
 
     private String createCircle(final String circleName, final String accountName) {
@@ -347,6 +347,14 @@ final class SoapClientTest {
         return response;
     }
 
+    private static byte[] generateData() {
+        final byte[] data = new byte[1024000];
+        final SecureRandom random = new SecureRandom();
+        random.nextBytes(data);
+
+        return data;
+    }
+
     private byte[] readData(final String accountName, final String dataId) {
         final FetchDataRequest request = prepareRequest(FetchDataRequest.class, accountName);
         request.setDataId(dataId);
@@ -357,20 +365,12 @@ final class SoapClientTest {
         return response.getData();
     }
 
-    private static byte[] generateData() {
-        final byte[] data = new byte[1024000];
-        final SecureRandom random = new SecureRandom();
-        random.nextBytes(data);
-
-        return data;
+    private static String toString(final byte[] bytes) {
+        return new String(bytes, Charset.defaultCharset());
     }
 
     private static byte[] toBytes(final String str) {
         return str.getBytes(Charset.defaultCharset());
-    }
-
-    private static String toString(final byte[] bytes) {
-        return new String(bytes, Charset.defaultCharset());
     }
 
     private static void throwIfFailed(final CwsResponse response) {

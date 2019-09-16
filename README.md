@@ -19,7 +19,7 @@ it can be used to store either files between users or data objects between apps
 or applications. This makes CWS the perfect companion for anyone who have Data
 Protection & Privacy concerns, such as GDPR.
 
-CWS is written in Java 8 / Java EE 7, with no third-part depedencies, meaning
+CWS is written in Java 8 / Java EE 7, with no third-part dependencies, meaning
 that it can run on any Host or in any Cloud where a Java EE Container is
 available. The first version is using [PostgreSQL](https://www.postgresql.org/)
 as database, but thanks to the flexibility of Java EE, it is possible to use any
@@ -27,11 +27,11 @@ database desired. Testing of CWS has been done using both
 [WildFly](http://www.wildfly.org/) and [Payara](https://payara.fish/).
 
 # Build, Install and Run
-The final version 1.0 of CWS can be downloaded from [JavaDog](https://javadog.io/),
-version 1.1 is more or less feature complete and currently being tested. The aim
-is to constantly have a stable and usable system, so if needed - please download
-the sources and build CWS yourself. The build only requires Java JDK 8 (patch
-level 161 or greater), and [Maven](https://maven.apache.org/).
+The final version 1.1 of CWS can be downloaded from [JavaDog](https://javadog.io/),
+version 1.2 will be a minor feature release, planned for end of October, 2019.
+The aim is to constantly have a stable and usable system, so if needed - please
+download the sources and build CWS yourself. The build requires Java JDK 8
+(patch level 161 or greater), and [Maven](https://maven.apache.org/).
 
 In the accessories/release folder, there is a number of files, which is used to
 install and run CWS. Please put the bin folder in your path, and then invoke
@@ -90,28 +90,15 @@ deployed in a "hostile" environment.
    data, which may result in inability to properly extract information.
 
 # Release Plan
-This is the CWS 1.1 development branch, following features have been completed:
- * Copy Data from one Circle of Trust to a second, with a property flag to
-   enable or disable the feature. By default, the feature is disabled.
- * Move Data from one Circle of Trust to a second, with a property flag to
-   enable or disable the feature. By default, the feature is disabled. Further,
-   the feature will require that the requesting Member is a Circle Administrator
-   of the source Circle, and have write permissions in the target Circle.
- * External control of the MasterKey via a URI, so it can be referenced from a
-   central source and destroyed centrally, rather than the Administrator having
-   to unlock it manually.
- * New request - authenticated; simple check to verify if an Account has
-   permissions to access the give CWS instance
- * Complete external testing with FitNesse.
- * AES GCM based encryption, as CBC based encryption is slowly being deprecated
-   and instead GCM based encryption should be used. CWS 1.1 supports 128 bit
-   GCM AES encryption.
+This is the CWS 1.2 development branch, following features are planned:
+ * [Inventory Report](https://github.com/JavaDogs/cws/issues/56)
+ * Reviewing return message for successful changes.
 
-As can be seen, CWS 1.1 release is feature complere, pending code review & pen
-testing to be completed. Release date for CWS 1.1 is estimated to happen around
-August 31st. Focus for version 2.0 is primarily on migrating the entire code
-base to Java 11 and Java EE 8, however CWS 1.1 is fully compatible with both
-Java 8 & 11.
+CWS 1.1 has been finalized, and the development of version 1.2 has begun.
+Release date for CWS 1.2 is estimated to happen at the end of October, 2019.
+After which the focus will be on version 2.0, which will primarily be a
+technical release focusing on updating the code base to become native Java 11
+and utilize the new features in Java 11. It will also require Java EE 8.
 
 # Wish to join
 The overall quality of the software can only improve if more eyes look at it and
@@ -120,7 +107,7 @@ please contact Kim Jensen (see below).
 
 ### Code Quality
 Code quality if very important, which means that the goal is 200% test coverage,
-which may sound ridiulous. However, so that both test suites (Junit & FitNesse)
+which may sound ridiculous. However, so that both test suites (Junit & FitNesse)
 will each cover as close to 100% as possible. Of course, external testing cannot
 and should not cover the same bases as the standard tests.
 

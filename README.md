@@ -79,9 +79,9 @@ deployed in a "hostile" environment.
 
  * MasterKey - The MasterKey is used to encrypt and decrypt various information
    and it must be set at startup, since it is not persisted anywhere.
- * Removing sensitive data from memory - by overwriting it in memory, before it
-   is being dereferenced. This should also include the keys, but due to a not
-   implemented feature in Java, this is not the case.
+ * Removing sensitive data from memory, done by aggressively perform a deep
+   analysis of Objects and overwrite volatile information, to reduce the risk
+   of having sensitive information present in memory dumps.
  * Invalidate Accounts, this allows a member to force the keys to be replaced
    internally, so it is possible to log in and view Circles, but it will not be
    possible to extract data, as the keys are not the same as the ones, which
@@ -92,13 +92,19 @@ deployed in a "hostile" environment.
 # Release Plan
 This is the CWS 1.2 development branch, following features are planned:
  * [Inventory Report](https://github.com/JavaDogs/cws/issues/56)
- * Reviewing return message for successful changes.
+ * [Strange behaviour in Sanitizer Bean Test](https://github.com/JavaDogs/cws/issues/58)
+ * [Lookup Data Objects from name](https://github.com/JavaDogs/cws/issues/59)
+ * [Enhance Return messages](https://github.com/JavaDogs/cws/issues/60)
 
-CWS 1.1 has been finalized, and the development of version 1.2 has begun.
-Release date for CWS 1.2 is estimated to happen at the end of October, 2019.
-After which the focus will be on version 2.0, which will primarily be a
-technical release focusing on updating the code base to become native Java 11
-and utilize the new features in Java 11. It will also require Java EE 8.
+The CWS 1.2 release will be a fairly minor version, with some minor API
+enhancements, as well as a few improvements. Unless more urgent requests will
+be made, the focus will as quickly as possible move towards the 2.0 release
+which will focus on moving the code base to Java EE 8 & Java 11. Thus removing
+compatibility with older versions of Java.
+
+Even though the code base will be migrated, and new features will only be added
+in the 2.0+ releases, issues discovered in the 1.x releases will be addressed
+until [September 2023](https://adoptopenjdk.net/support.html).
 
 # Wish to join
 The overall quality of the software can only improve if more eyes look at it and

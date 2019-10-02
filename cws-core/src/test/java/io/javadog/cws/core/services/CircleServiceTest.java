@@ -439,15 +439,27 @@ final class CircleServiceTest extends DatabaseSetup {
     }
 
     @Test
-    void testDeleteCircleAsMember() {
+    void testDeleteCircleAsCircleMember() {
         final ProcessCircleService service = new ProcessCircleService(settings, entityManager);
-        final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, MEMBER_1);
+        final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, MEMBER_2);
         request.setAction(Action.DELETE);
         request.setCircleId(CIRCLE_1_ID);
 
         final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
         assertEquals(ReturnCode.AUTHORIZATION_WARNING, cause.getReturnCode());
-        assertEquals("Only the System Administrator may delete a Circle.", cause.getMessage());
+        assertEquals("Only a Circle Administrator may perform this action.", cause.getMessage());
+    }
+
+    @Test
+    void testDeleteCircleAsCircleAdmin() {
+        final ProcessCircleService service = new ProcessCircleService(settings, entityManager);
+        final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, MEMBER_1);
+        request.setAction(Action.DELETE);
+        request.setCircleId(CIRCLE_1_ID);
+
+        final ProcessCircleResponse response = service.perform(request);
+        assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
+        assertEquals("Ok", response.getReturnMessage());
     }
 
     @Test

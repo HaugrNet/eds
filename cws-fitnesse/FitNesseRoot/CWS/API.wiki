@@ -74,9 +74,9 @@ the only CWS request not requiring any credentials to invoke.
    * SOAP: version
    * REST (POST) request is: ${REST_ROOT}/api/version
 
-|version                                  |
-|return code?|return message?|cws version?|
-|${SUCCESS}  |Ok             |1.1.0|
+|version                                    |
+|return code?|return message?|cws version?  |
+|${SUCCESS}  |Ok             |1.1.1-SNAPSHOT|
 *!
 
 !* !-MasterKey-!
@@ -516,20 +516,23 @@ There are 3 kinds of actions / requests which can be made for data Types
    * SOAP: fetchData
    * REST (POST) request is: ${REST_ROOT}/api/data/fetchData
 
-|process data                                                                                                                                                                                              |
-|account name|credential|action|circle id |data id |data name|type name     |target folder id|target circle id|data               |return code?        |return message?                                    |
-|user1       |password1 |ADD   |circle1_id|null    |data1    |folder        |null            |null            |null               |${SUCCESS}          |Ok                                                 |
-|user1       |password1 |ADD   |circle1_id|null    |data2    |data          |null            |null            |First Data Object  |${SUCCESS}          |Ok                                                 |
-|user1       |password1 |ADD   |circle2_id|null    |data3    |Awesome Object|null            |null            |Second Data Object |${INTEGRITY_WARNING}|Cannot find a matching !-DataType-! for the Object.|
-|user1       |password1 |DELETE|null      |data1_id|null     |null          |null            |null            |null               |${SUCCESS}          |Ok                                                 |
-|user1       |password1 |ADD   |circle1_id|null    |data4    |data          |null            |null            |Another Data Object|${SUCCESS}          |Ok                                                 |
-|user1       |password1 |ADD   |circle1_id|null    |data5    |data          |null            |null            |More Data          |${SUCCESS}          |Ok                                                 |
+|process data                                                                                                                                                                                               |
+|account name|credential|action|circle id |data id  |data name|type name     |target folder id|target circle id|data               |return code?        |return message?                                    |
+|user1       |password1 |ADD   |circle1_id|null     |data1    |folder        |null            |null            |null               |${SUCCESS}          |Ok                                                 |
+|user1       |password1 |ADD   |circle1_id|null     |data2    |data          |null            |null            |First Data Object  |${SUCCESS}          |Ok                                                 |
+|user1       |password1 |ADD   |circle2_id|null     |data3    |Awesome Object|null            |null            |Second Data Object |${INTEGRITY_WARNING}|Cannot find a matching !-DataType-! for the Object.|
+|user1       |password1 |DELETE|null      |data1_id |null     |null          |null            |null            |null               |${SUCCESS}          |Ok                                                 |
+|user1       |password1 |ADD   |circle1_id|null     |data4    |data          |null            |null            |Another Data Object|${SUCCESS}          |Ok                                                 |
+|user1       |password1 |ADD   |circle1_id|null     |data5    |data          |null            |null            |More Data          |${SUCCESS}          |Ok                                                 |
+|user1       |password1 |ADD   |circle2_id|null     |status   |null          |null            |null            |initial            |${SUCCESS}          |Ok                                                 |
+|user1       |password1 |UPDATE|circle2_id|status_id|status   |null          |null            |null            |updated content    |${SUCCESS}          |Ok                                                 |
 
-|fetch data                                                                                                                                                                                |
-|account name|credential|circle id |data id |page number|page size|records?|folder id?     |data id?            |data name?    |type name?  |data?            |return code?|return message?|
-|user1       |password1 |circle1_id|null    |1          |2        |3       |circle1_root_id|[data5_id, data4_id]|[data5, data4]|[data, data]|null             |${SUCCESS}  |Ok             |
-|user1       |password1 |null      |data2_id|null       |null     |1       |circle1_root_id|data2_id            |data2         |data        |First Data Object|${SUCCESS}  |Ok             |
-|user1       |password1 |circle1_id|null    |2          |2        |3       |circle1_root_id|[data2_id]          |[data2]       |[data]      |null             |${SUCCESS}  |Ok             |
+|fetch data                                                                                                                                                                                 |
+|account name|credential|circle id |data id  |page number|page size|records?|folder id?     |data id?            |data name?    |type name?  |data?            |return code?|return message?|
+|user1       |password1 |circle1_id|null     |1          |2        |3       |circle1_root_id|[data5_id, data4_id]|[data5, data4]|[data, data]|null             |${SUCCESS}  |Ok             |
+|user1       |password1 |null      |data2_id |null       |null     |1       |circle1_root_id|data2_id            |data2         |data        |First Data Object|${SUCCESS}  |Ok             |
+|user1       |password1 |circle1_id|null     |2          |2        |3       |circle1_root_id|[data2_id]          |[data2]       |[data]      |null             |${SUCCESS}  |Ok             |
+|user1       |password1 |circle2_id|status_id|null       |null     |1       |circle2_root_id|status_id           |status        |data        |updated content  |${SUCCESS}  |Ok             |
 *!
 
 !* Signatures

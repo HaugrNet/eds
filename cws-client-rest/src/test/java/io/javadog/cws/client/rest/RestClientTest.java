@@ -90,7 +90,7 @@ final class RestClientTest {
         assertNotNull(response);
         assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getReturnCode());
         assertEquals("Ok", response.getReturnMessage());
-        assertEquals("1.1.0", response.getVersion());
+        assertEquals("1.1.1-SNAPSHOT", response.getVersion());
     }
 
     @Test

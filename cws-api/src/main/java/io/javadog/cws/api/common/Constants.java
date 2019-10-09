@@ -31,7 +31,7 @@ public final class Constants {
      * version is being communicated with, and the same number is also being
      * used to generate the SerialVersionUID for all API Classes.</p>
      */
-    public static final String CWS_VERSION = "1.1.0";
+    public static final String CWS_VERSION = "1.1.1-SNAPSHOT";
 
     /**
      * <p>All serialized classes should use this value. The value reflects the

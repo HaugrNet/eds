@@ -20,7 +20,7 @@
 |io.javadog.cws.fitnesse|
 
 !|script |control cws                           |
-|set type|REST|and url|http://localhost:8080/cws|
+|set type|SOAP|and url|http://localhost:8080/cws|
 |remove circles                                 |
 |remove members                                 |
 |remove data types                              |

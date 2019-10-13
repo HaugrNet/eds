@@ -525,14 +525,19 @@ There are 3 kinds of actions / requests which can be made for data Types
 |user1       |password1 |ADD   |circle1_id|null     |data4    |data          |null            |null            |Another Data Object|${SUCCESS}          |Ok                                                 |
 |user1       |password1 |ADD   |circle1_id|null     |data5    |data          |null            |null            |More Data          |${SUCCESS}          |Ok                                                 |
 |user1       |password1 |ADD   |circle2_id|null     |status   |null          |null            |null            |initial            |${SUCCESS}          |Ok                                                 |
-|user1       |password1 |UPDATE|circle2_id|status_id|status   |null          |null            |null            |updated content    |${SUCCESS}          |Ok                                                 |
+|user1       |password1 |UPDATE|circle2_id|status_id|null     |null          |null            |null            |updated content    |${SUCCESS}          |Ok                                                 |
+|user1       |password1 |ADD   |circle2_id|null     |data6    |null          |null            |null            |some more data     |${SUCCESS}          |Ok                                                 |
+|user1       |password1 |COPY  |circle2_id|data6_id |copied   |null          |null            |circle1_id      |null               |${SUCCESS}          |Ok                                                 |
+|user1       |password1 |MOVE  |circle2_id|data6_id |moved    |null          |null            |circle1_id      |null               |${SUCCESS}          |Ok                                                 |
+|user1       |password1 |UPDATE|circle1_id|copied_id|copied   |null          |null            |null            |null               |${SUCCESS}          |Ok                                                 |
+|user1       |password1 |UPDATE|circle1_id|moved_id |moved    |null          |null            |null            |null               |${SUCCESS}          |Ok                                                 |
 
-|fetch data                                                                                                                                                                                 |
-|account name|credential|circle id |data id  |page number|page size|records?|folder id?     |data id?            |data name?    |type name?  |data?            |return code?|return message?|
-|user1       |password1 |circle1_id|null     |1          |2        |3       |circle1_root_id|[data5_id, data4_id]|[data5, data4]|[data, data]|null             |${SUCCESS}  |Ok             |
-|user1       |password1 |null      |data2_id |null       |null     |1       |circle1_root_id|data2_id            |data2         |data        |First Data Object|${SUCCESS}  |Ok             |
-|user1       |password1 |circle1_id|null     |2          |2        |3       |circle1_root_id|[data2_id]          |[data2]       |[data]      |null             |${SUCCESS}  |Ok             |
-|user1       |password1 |circle2_id|status_id|null       |null     |1       |circle2_root_id|status_id           |status        |data        |updated content  |${SUCCESS}  |Ok             |
+|fetch data                                                                                                                                                                                   |
+|account name|credential|circle id |data id  |page number|page size|records?|folder id?     |data id?             |data name?     |type name?  |data?            |return code?|return message?|
+|user1       |password1 |circle1_id|null     |1          |2        |5       |circle1_root_id|[moved_id, copied_id]|[moved, copied]|[data, data]|null             |${SUCCESS}  |Ok             |
+|user1       |password1 |circle1_id|null     |2          |2        |5       |circle1_root_id|[data5_id, data4_id] |[data5, data4] |[data, data]|null             |${SUCCESS}  |Ok             |
+|user1       |password1 |null      |data2_id |null       |null     |1       |circle1_root_id|data2_id             |data2          |data        |First Data Object|${SUCCESS}  |Ok             |
+|user1       |password1 |circle2_id|status_id|null       |null     |1       |circle2_root_id|status_id            |status         |data        |updated content  |${SUCCESS}  |Ok             |
 *!
 
 !* Signatures

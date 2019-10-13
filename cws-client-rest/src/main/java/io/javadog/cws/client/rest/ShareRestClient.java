@@ -107,6 +107,12 @@ public final class ShareRestClient extends GsonRestClient implements Share {
                 case UPDATE:
                     response = runRequest(ProcessDataResponse.class, base + Constants.REST_DATA_UPDATE, request);
                     break;
+                case COPY:
+                    response = runRequest(ProcessDataResponse.class, base + Constants.REST_DATA_COPY, request);
+                    break;
+                case MOVE:
+                    response = runRequest(ProcessDataResponse.class, base + Constants.REST_DATA_MOVE, request);
+                    break;
                 case DELETE:
                     response = runRequest(ProcessDataResponse.class, base + Constants.REST_DATA_DELETE, request);
                     break;

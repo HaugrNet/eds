@@ -137,6 +137,8 @@ public final class ShareSoapClient implements Share {
             ws.setCircleId(request.getCircleId());
             ws.setDataName(request.getDataName());
             ws.setFolderId(request.getFolderId());
+            ws.setTargetFolderId(request.getTargetFolderId());
+            ws.setTargetCircleId(request.getTargetCircleId());
             ws.setTypeName(request.getTypeName());
             ws.setData(request.getData());
 

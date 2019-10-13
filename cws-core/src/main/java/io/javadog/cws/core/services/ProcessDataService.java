@@ -231,33 +231,20 @@ public final class ProcessDataService extends Serviceable<DataDao, ProcessDataRe
     private void checkData(final MetadataEntity metadata, final byte[] bytes) {
         if (bytes != null) {
             final TrusteeEntity trustee = findTrustee(metadata.getCircle().getExternalId());
-            DataEntity dataEntity = dao.findDataByMetadata(metadata);
+            final DataEntity dataEntity = dao.findDataByMetadata(metadata);
             encryptAndSaveData(trustee, metadata, dataEntity, bytes);
         }
     }
 
     private void encryptAndSaveData(final TrusteeEntity trustee, final MetadataEntity metadataEntity, final DataEntity oldDataEntity, final byte[] bytes) {
         if (bytes != null) {
-            if (oldDataEntity != null) {
-                // Bug: https://github.com/JavaDogs/cws/issues/63
-                // Somehow, the Object content was not correctly updated, which
-                // resulted in the decryption of updated content failed. Since
-                // the content is more or less completely updated, it was deemed
-                // safer to simply delete the old Entity, and create a fresh new
-                // entity, regardless. This seemed to have fixed the problem,
-                // and despite the solution being a hack, it seemed like the
-                // easiest and quickest way to solve the problem. It is thus
-                // left as a future exercise to find the bug and correct it.
-                dao.delete(oldDataEntity);
-            }
-
-            final DataEntity toSave = new DataEntity();
             final KeyEntity keyEntity = trustee.getKey();
             final KeyAlgorithm algorithm = keyEntity.getAlgorithm();
             final SecretCWSKey key = crypto.extractCircleKey(algorithm, keyPair.getPrivate(), trustee.getCircleKey());
             key.setSalt(new IVSalt());
-
             final String armored = key.getSalt().getArmored();
+
+            final DataEntity toSave = (oldDataEntity != null) ? oldDataEntity : new DataEntity();
             toSave.setMetadata(metadataEntity);
             toSave.setKey(keyEntity);
             toSave.setData(crypto.encrypt(key, bytes));

@@ -260,6 +260,27 @@ final class SoapClientTest {
         assertEquals(data2, toString(read2));
     }
 
+    @Test
+    void testUpdateData() {
+        final String dataName = "status";
+        final String initContent = "NEW";
+        final String updateContent = "ACCEPTED";
+
+        final String accountName = UUID.randomUUID().toString();
+        createAccount(accountName);
+        final String circleId = createCircle(accountName, accountName);
+
+        // Step 2; Add & Update Data Objects
+        final String dataId = addData(accountName, circleId, dataName, toBytes(initContent));
+        updateData(accountName, circleId, dataId, dataName, toBytes(updateContent));
+
+        // Step 3; Check the stored content of the Circle
+        final FetchDataResponse response = readFolderContent(accountName, circleId);
+        assertNotNull(response);
+        final byte[] read = readData(accountName, dataId);
+        assertEquals(updateContent, toString(read));
+    }
+
     // =========================================================================
     // Internal functionality to help with the test setup
     // =========================================================================
@@ -319,6 +340,18 @@ final class SoapClientTest {
 
         throwIfFailed(response);
         return response.getTrustees();
+    }
+
+    private void updateData(final String accountName, final String circleId, final String dataId, final String dataName, final byte[] data) {
+        final ProcessDataRequest request = prepareRequest(ProcessDataRequest.class, accountName);
+        request.setAction(Action.UPDATE);
+        request.setCircleId(circleId);
+        request.setDataId(dataId);
+        request.setDataName(dataName);
+        request.setData(data);
+
+        final ProcessDataResponse response = soapShare.processData(request);
+        throwIfFailed(response);
     }
 
     private String addData(final String accountName, final String circleId, final String dataName, final byte[] data) {

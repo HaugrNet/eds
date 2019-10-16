@@ -54,7 +54,11 @@ final class SanitizerBeanTest extends DatabaseSetup {
         prepareInvalidData();
         prepareStartupBean("true");
 
-        assertTrue(prepareSanitizeBean().findNextBatch(100).isEmpty());
+        // Note; During the release of version 1.1, this test suddenly started
+        // failing. From debugging, the question was more why id didn't fail
+        // earlier as there was suppose to be invalid data in the DB.
+        // See https://github.com/JavaDogs/cws/issues/58
+        assertFalse(prepareSanitizeBean().findNextBatch(100).isEmpty());
     }
 
     @Test

@@ -290,7 +290,7 @@ public abstract class Serviceable<D extends CommonDao, R extends CwsResponse, A 
      * being used. Otherwise, the action of invoking this request will result
      * in an invalidated account.
      *
-     * @param member   The Member to update the Asymmetric Key & Password for
+     * @param member   The Member to update the Asymmetric Key &amp; Password for
      * @param password The new Password
      * @return The new Asymmetric Key
      */
@@ -361,7 +361,7 @@ public abstract class Serviceable<D extends CommonDao, R extends CwsResponse, A 
         }
     }
 
-    protected final SecretCWSKey extractCircleKey(final DataEntity entity) {
+    private SecretCWSKey extractCircleKey(final DataEntity entity) {
         final TrusteeEntity trustee = findTrustee(entity.getMetadata().getCircle().getExternalId());
 
         return crypto.extractCircleKey(entity.getKey().getAlgorithm(), keyPair.getPrivate(), trustee.getCircleKey());

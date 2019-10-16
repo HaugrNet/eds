@@ -400,6 +400,7 @@ public final class Crypto {
      * <p>To recreate the Key Pair the Private Key has to be decrypted and then
      * both the Public and Private Keys must be converted.</p>
      *
+     * @param algorithm         CWS Key Algorithm
      * @param key               Symmetric Key to decrypt the Private Key with
      * @param salt              Base for the Initial Vector, used for decrypting
      * @param armoredPublicKey  Armored unencrypted Public Key

@@ -73,9 +73,9 @@ the only CWS request not requiring any credentials to invoke.
    * SOAP: version
    * REST (POST) request is: ${REST_ROOT}/api/version
 
-|version                                    |
-|return code?|return message?|cws version?  |
-|${SUCCESS}  |Ok             |1.1.1-SNAPSHOT|
+|version                                  |
+|return code?|return message?|cws version?|
+|${SUCCESS}  |Ok             |1.1.1       |
 *!
 
 !* !-MasterKey-!

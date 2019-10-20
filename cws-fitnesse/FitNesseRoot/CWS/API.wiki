@@ -75,7 +75,7 @@ the only CWS request not requiring any credentials to invoke.
 
 |version                                  |
 |return code?|return message?|cws version?|
-|${SUCCESS}  |Ok             |1.1.1       |
+|${SUCCESS}  |Ok             |1.2-SNAPSHOT       |
 *!
 
 !* !-MasterKey-!

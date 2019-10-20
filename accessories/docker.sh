@@ -19,3 +19,14 @@ rm docker/apt.conf docker/wgetrc docker/cws.war
 
 # Run as follows:
 # $ docker run -d -p 8080:8080 cws
+
+echo "Start the Docker container first time as follows:"
+echo "$ docker run --name cws-1.1 -d -p <PORT>:8080 cws"
+echo "replace the <PORT> with what is needed."
+echo "Once started first time, it can always be stopped and started"
+echo "with the following Docker commands:"
+echo "$ docker start cws-1.1"
+echo "$ docker stop cws-1.1"
+echo
+echo "Simple check to see if your Docker image works:"
+echo "$ curl --silent --header \"Content-Type: application/json\" --request POST \"http://localhost:<PORT>/cws/api/version\""

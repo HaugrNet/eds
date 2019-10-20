@@ -1,7 +1,6 @@
 ---
 Test
 ---
-
 !*> Setup
 !include .CWS.Setup
 !define REST_ROOT {[ http(s)://HOST:PORT/ROOT ]}
@@ -76,7 +75,7 @@ the only CWS request not requiring any credentials to invoke.
 
 |version                                  |
 |return code?|return message?|cws version?|
-|${SUCCESS}  |Ok             |1.2-SNAPSHOT|
+|${SUCCESS}  |Ok             |1.1.1       |
 *!
 
 !* !-MasterKey-!
@@ -379,12 +378,16 @@ Key, which means a shared Key that can be used by Trustees from a Client system.
    * SOAP: fetchCircles
    * REST (POST) request is: ${REST_ROOT}/api/circles/fetchCircles
 
-|process circle                                                                                                                                                       |
-|account name|credential|action|circle id|circle name|member id|circle key      |circle id?|return code?             |return message ?                                |
-|admin       |admin     |CREATE|null     |circle1    |user1_id |null            |circle1_id|${SUCCESS}               |Ok                                              |
-|user1       |password1 |CREATE|null     |circle1    |null     |null            |null      |${IDENTIFICATION_WARNING}|A Circle with the requested name already exists.|
-|user1       |password1 |CREATE|null     |circle2    |null     |null            |circle2_id|${SUCCESS}               |Ok                                              |
-|user2       |password2 |CREATE|null     |circle3    |null     |super secret key|circle3_id|${SUCCESS}               |Ok                                              |
+|process circle                                                                                                                                                            |
+|account name|credential|action|circle id |circle name    |member id|circle key      |circle id?|return code?             |return message ?                                |
+|admin       |admin     |CREATE|null      |circle1        |user1_id |null            |circle1_id|${SUCCESS}               |Ok                                              |
+|user1       |password1 |CREATE|null      |circle1        |null     |null            |null      |${IDENTIFICATION_WARNING}|A Circle with the requested name already exists.|
+|user1       |password1 |CREATE|null      |circle2        |null     |null            |circle2_id|${SUCCESS}               |Ok                                              |
+|user2       |password2 |CREATE|null      |circle3        |null     |super secret key|circle3_id|${SUCCESS}               |Ok                                              |
+|user2       |password2 |CREATE|null      |circle5        |null     |null            |circle5_id|${SUCCESS}               |Ok                                              |
+|user2       |password2 |UPDATE|circle5_id|new Circle Name|null     |null            |null      |${SUCCESS}               |Ok                                              |
+|user2       |password2 |DELETE|circle5_id|null           |null     |null            |null      |${SUCCESS}               |Ok                                              |
+
 
 The Fetch Circles request is intended to get a listing of all the current Circles in CWS, note that only if a user is Member of a Circle,
 can they retrieve the Circle Key.
@@ -516,20 +519,28 @@ There are 3 kinds of actions / requests which can be made for data Types
    * SOAP: fetchData
    * REST (POST) request is: ${REST_ROOT}/api/data/fetchData
 
-|process data                                                                                                                                                                                              |
-|account name|credential|action|circle id |data id |data name|type name     |target folder id|target circle id|data               |return code?        |return message?                                    |
-|user1       |password1 |ADD   |circle1_id|null    |data1    |folder        |null            |null            |null               |${SUCCESS}          |Ok                                                 |
-|user1       |password1 |ADD   |circle1_id|null    |data2    |data          |null            |null            |First Data Object  |${SUCCESS}          |Ok                                                 |
-|user1       |password1 |ADD   |circle2_id|null    |data3    |Awesome Object|null            |null            |Second Data Object |${INTEGRITY_WARNING}|Cannot find a matching !-DataType-! for the Object.|
-|user1       |password1 |DELETE|null      |data1_id|null     |null          |null            |null            |null               |${SUCCESS}          |Ok                                                 |
-|user1       |password1 |ADD   |circle1_id|null    |data4    |data          |null            |null            |Another Data Object|${SUCCESS}          |Ok                                                 |
-|user1       |password1 |ADD   |circle1_id|null    |data5    |data          |null            |null            |More Data          |${SUCCESS}          |Ok                                                 |
+|process data                                                                                                                                                                                               |
+|account name|credential|action|circle id |data id  |data name|type name     |target folder id|target circle id|data               |return code?        |return message?                                    |
+|user1       |password1 |ADD   |circle1_id|null     |data1    |folder        |null            |null            |null               |${SUCCESS}          |Ok                                                 |
+|user1       |password1 |ADD   |circle1_id|null     |data2    |data          |null            |null            |First Data Object  |${SUCCESS}          |Ok                                                 |
+|user1       |password1 |ADD   |circle2_id|null     |data3    |Awesome Object|null            |null            |Second Data Object |${INTEGRITY_WARNING}|Cannot find a matching !-DataType-! for the Object.|
+|user1       |password1 |DELETE|null      |data1_id |null     |null          |null            |null            |null               |${SUCCESS}          |Ok                                                 |
+|user1       |password1 |ADD   |circle1_id|null     |data4    |data          |null            |null            |Another Data Object|${SUCCESS}          |Ok                                                 |
+|user1       |password1 |ADD   |circle1_id|null     |data5    |data          |null            |null            |More Data          |${SUCCESS}          |Ok                                                 |
+|user1       |password1 |ADD   |circle2_id|null     |status   |null          |null            |null            |initial            |${SUCCESS}          |Ok                                                 |
+|user1       |password1 |UPDATE|circle2_id|status_id|null     |null          |null            |null            |updated content    |${SUCCESS}          |Ok                                                 |
+|user1       |password1 |ADD   |circle2_id|null     |data6    |null          |null            |null            |some more data     |${SUCCESS}          |Ok                                                 |
+|user1       |password1 |COPY  |circle2_id|data6_id |copied   |null          |null            |circle1_id      |null               |${SUCCESS}          |Ok                                                 |
+|user1       |password1 |MOVE  |circle2_id|data6_id |moved    |null          |null            |circle1_id      |null               |${SUCCESS}          |Ok                                                 |
+|user1       |password1 |UPDATE|circle1_id|copied_id|copied   |null          |null            |null            |null               |${SUCCESS}          |Ok                                                 |
+|user1       |password1 |UPDATE|circle1_id|moved_id |moved    |null          |null            |null            |null               |${SUCCESS}          |Ok                                                 |
 
-|fetch data                                                                                                                                                                                |
-|account name|credential|circle id |data id |page number|page size|records?|folder id?     |data id?            |data name?    |type name?  |data?            |return code?|return message?|
-|user1       |password1 |circle1_id|null    |1          |2        |3       |circle1_root_id|[data5_id, data4_id]|[data5, data4]|[data, data]|null             |${SUCCESS}  |Ok             |
-|user1       |password1 |null      |data2_id|null       |null     |1       |circle1_root_id|data2_id            |data2         |data        |First Data Object|${SUCCESS}  |Ok             |
-|user1       |password1 |circle1_id|null    |2          |2        |3       |circle1_root_id|[data2_id]          |[data2]       |[data]      |null             |${SUCCESS}  |Ok             |
+|fetch data                                                                                                                                                                                   |
+|account name|credential|circle id |data id  |page number|page size|records?|folder id?     |data id?             |data name?     |type name?  |data?            |return code?|return message?|
+|user1       |password1 |circle1_id|null     |1          |2        |5       |circle1_root_id|[moved_id, copied_id]|[moved, copied]|[data, data]|null             |${SUCCESS}  |Ok             |
+|user1       |password1 |circle1_id|null     |2          |2        |5       |circle1_root_id|[data5_id, data4_id] |[data5, data4] |[data, data]|null             |${SUCCESS}  |Ok             |
+|user1       |password1 |null      |data2_id |null       |null     |1       |circle1_root_id|data2_id             |data2          |data        |First Data Object|${SUCCESS}  |Ok             |
+|user1       |password1 |circle2_id|status_id|null       |null     |1       |circle2_root_id|status_id            |status         |data        |updated content  |${SUCCESS}  |Ok             |
 *!
 
 !* Signatures

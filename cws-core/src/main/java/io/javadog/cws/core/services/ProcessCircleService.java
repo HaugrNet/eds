@@ -242,10 +242,6 @@ public final class ProcessCircleService extends Serviceable<CommonDao, ProcessCi
      * @return Response Object with error information
      */
     private ProcessCircleResponse deleteCircle(final ProcessCircleRequest request) {
-        if (member.getMemberRole() != MemberRole.ADMIN) {
-            throw new AuthorizationException("Only the System Administrator may delete a Circle.");
-        }
-
         final String externalId = request.getCircleId();
         final CircleEntity entity = dao.find(CircleEntity.class, externalId);
         throwIdentificationWarningIfNoCircle(entity);

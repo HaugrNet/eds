@@ -43,7 +43,8 @@ import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
 
 /**
- * <p>Mapping functionality, to map between SOAP WS Classes & CWS API Classes.</p>
+ * <p>Mapping functionality, to map between SOAP WS Classes &amp; CWS API
+ * Classes.</p>
  *
  * @author Kim Jensen
  * @since CWS 1.0

@@ -93,7 +93,7 @@ public class DataEntity extends CWSEntity {
     @Column(name = "encrypted_data", nullable = false)
     private byte[] data = null;
 
-    @Column(name = "initial_vector", nullable = false, updatable = false, length = Constants.MAX_STRING_LENGTH)
+    @Column(name = "initial_vector", nullable = false, length = Constants.MAX_STRING_LENGTH)
     private String initialVector = null;
 
     @Column(name = "checksum", nullable = false, length = Constants.MAX_STRING_LENGTH)

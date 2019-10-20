@@ -39,6 +39,7 @@ import io.javadog.cws.api.responses.ProcessMemberResponse;
 import io.javadog.cws.core.DatabaseSetup;
 import io.javadog.cws.core.enums.SanityStatus;
 import io.javadog.cws.core.exceptions.CWSException;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.UUID;
 import javax.persistence.Query;
@@ -127,6 +128,39 @@ final class DataServiceTest extends DatabaseSetup {
         assertEquals(fetchResponse2.getMetadata().get(0).getDataId(), fetchResponse1.getMetadata().get(0).getDataId());
         assertEquals("My Data", fetchResponse1.getMetadata().get(0).getDataName());
         assertEquals("New Name", fetchResponse2.getMetadata().get(0).getDataName());
+    }
+
+    @Test
+    void testSaveAndUpdateSimpleData() {
+        final ProcessDataService saveService = new ProcessDataService(settings, entityManager);
+        final String dataName = "status";
+        final String initContent = "NEW";
+        final String updateContent = "ACCEPTED";
+
+        final ProcessDataRequest saveRequest = prepareRequest(ProcessDataRequest.class, MEMBER_1);
+        saveRequest.setAction(Action.ADD);
+        saveRequest.setCircleId(CIRCLE_1_ID);
+        saveRequest.setDataName(dataName);
+        saveRequest.setData(initContent.getBytes(StandardCharsets.UTF_8));
+        final ProcessDataResponse saveResponse = saveService.perform(saveRequest);
+        assertEquals(ReturnCode.SUCCESS.getCode(), saveResponse.getReturnCode());
+
+        final ProcessDataRequest updateRequest = prepareRequest(ProcessDataRequest.class, MEMBER_1);
+        updateRequest.setAction(Action.UPDATE);
+        updateRequest.setCircleId(CIRCLE_1_ID);
+        updateRequest.setDataId(saveResponse.getDataId());
+        updateRequest.setDataName(dataName);
+        updateRequest.setData(updateContent.getBytes(StandardCharsets.UTF_8));
+        final ProcessDataResponse updateResponse = saveService.perform(updateRequest);
+        assertEquals(ReturnCode.SUCCESS.getCode(), updateResponse.getReturnCode());
+
+        final FetchDataService readService = new FetchDataService(settings, entityManager);
+        final FetchDataRequest fetchRequest = prepareRequest(FetchDataRequest.class, MEMBER_1);
+        fetchRequest.setDataId(saveResponse.getDataId());
+        final FetchDataResponse fetchResponse = readService.perform(fetchRequest);
+        assertEquals(ReturnCode.SUCCESS.getCode(), fetchResponse.getReturnCode());
+        assertEquals(dataName, fetchResponse.getMetadata().get(0).getDataName());
+        assertEquals(updateContent, new String(fetchResponse.getData(), StandardCharsets.UTF_8));
     }
 
     @Test

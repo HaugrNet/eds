@@ -90,7 +90,7 @@ final class RestClientTest {
         assertNotNull(response);
         assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getReturnCode());
         assertEquals("Ok", response.getReturnMessage());
-        assertEquals("1.2-SNAPSHOT", response.getVersion());
+        assertEquals("1.1.1", response.getVersion());
     }
 
     @Test
@@ -232,6 +232,27 @@ final class RestClientTest {
     }
 
     @Test
+    void testUpdateData() {
+        final String dataName = "status";
+        final String initContent = "NEW";
+        final String updateContent = "ACCEPTED";
+
+        final String accountName = UUID.randomUUID().toString();
+        createAccount(accountName);
+        final String circleId = createCircle(accountName, accountName);
+
+        // Step 2; Add & Update Data Objects
+        final String dataId = addData(accountName, circleId, dataName, toBytes(initContent));
+        updateData(accountName, circleId, dataId, dataName, toBytes(updateContent));
+
+        // Step 3; Check the stored content of the Circle
+        final FetchDataResponse response = readFolderContent(accountName, circleId);
+        assertNotNull(response);
+        final byte[] read = readData(accountName, dataId);
+        assertEquals(updateContent, toString(read));
+    }
+
+    @Test
     void testSignatures() {
         // 1. Generate a Signature
         final SignRequest signRequest = prepareRequest(SignRequest.class, Constants.ADMIN_ACCOUNT);
@@ -331,6 +352,18 @@ final class RestClientTest {
         throwIfFailed(response);
 
         return response.getDataId();
+    }
+
+    private void updateData(final String accountName, final String circleId, final String dataId, final String dataName, final byte[] data) {
+        final ProcessDataRequest request = prepareRequest(ProcessDataRequest.class, accountName);
+        request.setAction(Action.UPDATE);
+        request.setCircleId(circleId);
+        request.setDataId(dataId);
+        request.setDataName(dataName);
+        request.setData(data);
+
+        final ProcessDataResponse response = restShare.processData(request);
+        throwIfFailed(response);
     }
 
     private FetchDataResponse readFolderContent(final String accountName, final String circleId, final String... folderId) {

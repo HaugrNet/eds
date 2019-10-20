@@ -40,7 +40,6 @@ import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.Objects;
 import java.util.Set;
-import java.util.UUID;
 import javax.persistence.EntityManager;
 
 /**
@@ -110,10 +109,7 @@ public final class ProcessDataService extends Serviceable<DataDao, ProcessDataRe
             response = createFolder(trustee, request);
         } else {
             final MetadataEntity metadataEntity = createMetadata(trustee, request.getDataName(), parent.getId(), type);
-            if (bytes != null) {
-                createDataEntity(trustee, metadataEntity, bytes);
-            }
-
+            encryptAndSaveData(trustee, metadataEntity, null, bytes);
             response = buildProcessDataResponse(metadataEntity.getExternalId());
         }
 
@@ -226,32 +222,42 @@ public final class ProcessDataService extends Serviceable<DataDao, ProcessDataRe
         final DataEntity dataEntity = dao.findDataByMemberAndExternalId(member, oldMetadataEntity.getExternalId());
         if (dataEntity != null) {
             final byte[] bytes = decryptData(dataEntity);
-            createDataEntity(trustee, metadataEntity, bytes);
+            encryptAndSaveData(trustee, metadataEntity, null, bytes);
         }
 
         return metadataEntity.getExternalId();
     }
 
-    private void createDataEntity(final TrusteeEntity trustee, final MetadataEntity metadataEntity, final byte[] bytes) {
-        final KeyEntity keyEntity = trustee.getKey();
-        final KeyAlgorithm algorithm = keyEntity.getAlgorithm();
-        final SecretCWSKey key = crypto.extractCircleKey(algorithm, keyPair.getPrivate(), trustee.getCircleKey());
-        key.setSalt(new IVSalt());
+    private void checkData(final MetadataEntity metadata, final byte[] bytes) {
+        if (bytes != null) {
+            final TrusteeEntity trustee = findTrustee(metadata.getCircle().getExternalId());
+            final DataEntity dataEntity = dao.findDataByMetadata(metadata);
+            encryptAndSaveData(trustee, metadata, dataEntity, bytes);
+        }
+    }
 
-        final String armored = key.getSalt().getArmored();
-        final DataEntity dataEntity = new DataEntity();
-        dataEntity.setMetadata(metadataEntity);
-        dataEntity.setKey(keyEntity);
-        dataEntity.setData(crypto.encrypt(key, bytes));
-        dataEntity.setInitialVector(crypto.encryptWithMasterKey(armored));
-        dataEntity.setChecksum(crypto.generateChecksum(dataEntity.getData()));
-        dataEntity.setSanityStatus(SanityStatus.OK);
-        dataEntity.setSanityChecked(Utilities.newDate());
-        dao.persist(dataEntity);
+    private void encryptAndSaveData(final TrusteeEntity trustee, final MetadataEntity metadataEntity, final DataEntity oldDataEntity, final byte[] bytes) {
+        if (bytes != null) {
+            final KeyEntity keyEntity = trustee.getKey();
+            final KeyAlgorithm algorithm = keyEntity.getAlgorithm();
+            final SecretCWSKey key = crypto.extractCircleKey(algorithm, keyPair.getPrivate(), trustee.getCircleKey());
+            key.setSalt(new IVSalt());
+            final String armored = key.getSalt().getArmored();
 
-        // Actively overwrite the raw Object bytes, so it no longer
-        // can be read unencrypted.
-        Arrays.fill(bytes, (byte) 0);
+            final DataEntity toSave = (oldDataEntity != null) ? oldDataEntity : new DataEntity();
+            toSave.setMetadata(metadataEntity);
+            toSave.setKey(keyEntity);
+            toSave.setData(crypto.encrypt(key, bytes));
+            toSave.setInitialVector(crypto.encryptWithMasterKey(armored));
+            toSave.setChecksum(crypto.generateChecksum(toSave.getData()));
+            toSave.setSanityStatus(SanityStatus.OK);
+            toSave.setSanityChecked(Utilities.newDate());
+            dao.persist(toSave);
+
+            // Actively overwrite the raw Object bytes, so it no longer
+            // can be read unencrypted.
+            Arrays.fill(bytes, (byte) 0);
+        }
     }
 
     private DataTypeEntity findDataType(final String typeName) {
@@ -360,31 +366,5 @@ public final class ProcessDataService extends Serviceable<DataDao, ProcessDataRe
         }
 
         return theName;
-    }
-
-    private void checkData(final MetadataEntity metadata, final byte[] bytes) {
-        if (bytes != null) {
-            final TrusteeEntity trustee = findTrustee(metadata.getCircle().getExternalId());
-
-            DataEntity entity = dao.findDataByMetadata(metadata);
-            if (entity == null) {
-                entity = new DataEntity();
-                entity.setMetadata(metadata);
-                entity.setKey(trustee.getKey());
-            }
-
-            final SecretCWSKey circleKey = extractCircleKey(entity);
-            final String salt = UUID.randomUUID().toString();
-            circleKey.setSalt(new IVSalt(salt));
-            final byte[] encrypted = crypto.encrypt(circleKey, bytes);
-            final String checksum = crypto.generateChecksum(encrypted);
-
-            entity.setData(encrypted);
-            entity.setInitialVector(crypto.encryptWithMasterKey(salt));
-            entity.setChecksum(checksum);
-            entity.setSanityStatus(SanityStatus.OK);
-            entity.setSanityChecked(Utilities.newDate());
-            dao.persist(entity);
-        }
     }
 }

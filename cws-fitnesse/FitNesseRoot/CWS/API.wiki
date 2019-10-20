@@ -1,7 +1,6 @@
 ---
 Test
 ---
-
 !*> Setup
 !include .CWS.Setup
 !define REST_ROOT {[ http(s)://HOST:PORT/ROOT ]}
@@ -379,12 +378,16 @@ Key, which means a shared Key that can be used by Trustees from a Client system.
    * SOAP: fetchCircles
    * REST (POST) request is: ${REST_ROOT}/api/circles/fetchCircles
 
-|process circle                                                                                                                                                       |
-|account name|credential|action|circle id|circle name|member id|circle key      |circle id?|return code?             |return message ?                                |
-|admin       |admin     |CREATE|null     |circle1    |user1_id |null            |circle1_id|${SUCCESS}               |Ok                                              |
-|user1       |password1 |CREATE|null     |circle1    |null     |null            |null      |${IDENTIFICATION_WARNING}|A Circle with the requested name already exists.|
-|user1       |password1 |CREATE|null     |circle2    |null     |null            |circle2_id|${SUCCESS}               |Ok                                              |
-|user2       |password2 |CREATE|null     |circle3    |null     |super secret key|circle3_id|${SUCCESS}               |Ok                                              |
+|process circle                                                                                                                                                            |
+|account name|credential|action|circle id |circle name    |member id|circle key      |circle id?|return code?             |return message ?                                |
+|admin       |admin     |CREATE|null      |circle1        |user1_id |null            |circle1_id|${SUCCESS}               |Ok                                              |
+|user1       |password1 |CREATE|null      |circle1        |null     |null            |null      |${IDENTIFICATION_WARNING}|A Circle with the requested name already exists.|
+|user1       |password1 |CREATE|null      |circle2        |null     |null            |circle2_id|${SUCCESS}               |Ok                                              |
+|user2       |password2 |CREATE|null      |circle3        |null     |super secret key|circle3_id|${SUCCESS}               |Ok                                              |
+|user2       |password2 |CREATE|null      |circle5        |null     |null            |circle5_id|${SUCCESS}               |Ok                                              |
+|user2       |password2 |UPDATE|circle5_id|new Circle Name|null     |null            |null      |${SUCCESS}               |Ok                                              |
+|user2       |password2 |DELETE|circle5_id|null           |null     |null            |null      |${SUCCESS}               |Ok                                              |
+
 
 The Fetch Circles request is intended to get a listing of all the current Circles in CWS, note that only if a user is Member of a Circle,
 can they retrieve the Circle Key.

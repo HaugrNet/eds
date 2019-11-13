@@ -40,6 +40,6 @@ public final class AuthenticatedService extends Serviceable<CommonDao, CwsRespon
         Arrays.fill(request.getCredential(), (byte) 0);
 
         // And done... Authentication checks all completed
-        return new CwsResponse();
+        return new CwsResponse(member.getName() + " successfully authenticated.");
     }
 }

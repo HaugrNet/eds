@@ -110,7 +110,7 @@ public final class ProcessDataService extends Serviceable<DataDao, ProcessDataRe
         } else {
             final MetadataEntity metadataEntity = createMetadata(trustee, request.getDataName(), parent.getId(), type);
             encryptAndSaveData(trustee, metadataEntity, null, bytes);
-            response = buildProcessDataResponse(metadataEntity.getExternalId());
+            response = buildProcessDataResponse(metadataEntity.getExternalId(), "The Data Object '" + request.getDataName() + "' was successfully added to the Circle '" + trustee.getCircle().getName() + "'.");
         }
 
         return response;
@@ -132,7 +132,7 @@ public final class ProcessDataService extends Serviceable<DataDao, ProcessDataRe
         entity.setParentId(folderId);
         dao.persist(entity);
 
-        return buildProcessDataResponse(entity.getExternalId());
+        return buildProcessDataResponse(entity.getExternalId(), "The Data Object '" + entity.getName() + "' was successfully updated.");
     }
 
     private ProcessDataResponse processCopyData(final ProcessDataRequest request) {
@@ -140,7 +140,7 @@ public final class ProcessDataService extends Serviceable<DataDao, ProcessDataRe
         final MetadataEntity metadataEntity = findMetadataEntity(request.getDataId());
         final String externalDataId = copyDataToTargetCircle(targetTrustee, metadataEntity, request);
 
-        return buildProcessDataResponse(externalDataId);
+        return buildProcessDataResponse(externalDataId, "The Data Object '" + metadataEntity.getName() + "' was successfully copied from '" + metadataEntity.getCircle().getName() + "' to '" + targetTrustee.getCircle().getName() + "'.");
     }
 
     private ProcessDataResponse processMoveData(final ProcessDataRequest request) {
@@ -149,11 +149,11 @@ public final class ProcessDataService extends Serviceable<DataDao, ProcessDataRe
         final String externalDataId = copyDataToTargetCircle(targetTrustee, metadataEntity, request);
         dao.delete(metadataEntity);
 
-        return buildProcessDataResponse(externalDataId);
+        return buildProcessDataResponse(externalDataId, "The Data Object '" + metadataEntity.getName() + "' was successfully moved from '" + metadataEntity.getCircle().getName() + "' to '" + targetTrustee.getCircle().getName() + "'.");
     }
 
-    private static ProcessDataResponse buildProcessDataResponse(final String externalDataId) {
-        final ProcessDataResponse response = new ProcessDataResponse();
+    private static ProcessDataResponse buildProcessDataResponse(final String externalDataId, final String returnMessage) {
+        final ProcessDataResponse response = new ProcessDataResponse(returnMessage);
         response.setDataId(externalDataId);
 
         return response;
@@ -186,7 +186,7 @@ public final class ProcessDataService extends Serviceable<DataDao, ProcessDataRe
         }
 
         dao.delete(entity);
-        return new ProcessDataResponse();
+        return new ProcessDataResponse("The requested Data Object '" + entity.getName() + "' has been removed from the Circle '" + entity.getCircle().getName() + "'.");
     }
 
     private TrusteeEntity findTargetTrustee(final String externalCircleId) {
@@ -305,7 +305,7 @@ public final class ProcessDataService extends Serviceable<DataDao, ProcessDataRe
         final DataTypeEntity folderType = dao.findDataTypeByName(Constants.FOLDER_TYPENAME);
         final MetadataEntity folder = createMetadata(trustee, request.getDataName(), parent.getId(), folderType);
 
-        final ProcessDataResponse response = new ProcessDataResponse();
+        final ProcessDataResponse response = new ProcessDataResponse("The Folder '" + request.getDataName() + "' was successfully added to the Circle '" + trustee.getCircle().getName() + "'.");
         response.setDataId(folder.getExternalId());
 
         return response;
@@ -362,7 +362,7 @@ public final class ProcessDataService extends Serviceable<DataDao, ProcessDataRe
         final String theName = (name != null) ? name.trim() : entity.getName();
 
         if (dao.checkIfNameIsUsed(entity.getId(), theName, folderId)) {
-            throw new CWSException(ReturnCode.IDENTIFICATION_WARNING, "The name provided is already being used in the given folder.");
+            throw new CWSException(ReturnCode.IDENTIFICATION_WARNING, "The name '" + theName + "' provided is already being used in the given folder.");
         }
 
         return theName;

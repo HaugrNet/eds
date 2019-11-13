@@ -137,13 +137,12 @@ public final class ProcessMemberService extends Serviceable<MemberDao, ProcessMe
         final String accountName = request.getNewAccountName().trim();
         final MemberEntity found = dao.findMemberByName(accountName);
         if (found != null) {
-            throw new CWSException(ReturnCode.IDENTIFICATION_WARNING,
-                    "An Account with the requested AccountName already exist.");
+            throw new CWSException(ReturnCode.IDENTIFICATION_WARNING, "An Account with the requested AccountName already exist.");
         }
 
         final MemberRole role = whichRole(request);
         final MemberEntity created = createNewAccount(accountName, role, request.getNewCredential());
-        final ProcessMemberResponse response = new ProcessMemberResponse();
+        final ProcessMemberResponse response = new ProcessMemberResponse("The new Member '" + request.getNewAccountName() + "' was successfully added to CWS.");
         response.setMemberId(created.getExternalId());
 
         return response;
@@ -176,7 +175,7 @@ public final class ProcessMemberService extends Serviceable<MemberDao, ProcessMe
         entity.setMemberRole(whichRole(request));
         dao.persist(entity);
 
-        final ProcessMemberResponse response = new ProcessMemberResponse();
+        final ProcessMemberResponse response = new ProcessMemberResponse("An invitation was successfully issued for '" + memberName + "'.");
         response.setMemberId(entity.getExternalId());
         response.setSignature(signature);
 
@@ -216,7 +215,7 @@ public final class ProcessMemberService extends Serviceable<MemberDao, ProcessMe
         // Key's no longer being used, must be destroyed.
         key.destroy();
 
-        return new ProcessMemberResponse();
+        return new ProcessMemberResponse("The Member '" + member.getName() + "' has successfully logged in.");
     }
 
     private Date calculateSessionExpiration() {
@@ -241,27 +240,27 @@ public final class ProcessMemberService extends Serviceable<MemberDao, ProcessMe
             throw new IllegalActionException("It is not permitted to alter own account.");
         }
 
-        final ProcessMemberResponse response = new ProcessMemberResponse();
         final String memberId = request.getMemberId();
-        response.setMemberId(memberId);
-
         final MemberEntity entity = dao.find(MemberEntity.class, memberId);
         entity.setMemberRole(request.getMemberRole());
         dao.persist(entity);
+
+        final ProcessMemberResponse response = new ProcessMemberResponse("The Member '" + entity.getName() + "' has successfully been given the new role '" + request.getMemberRole() + "'.");
+        response.setMemberId(memberId);
 
         return response;
     }
 
     private ProcessMemberResponse updateMember(final ProcessMemberRequest request) {
-        final ProcessMemberResponse response = new ProcessMemberResponse();
         final String newAccountName = trim(request.getNewAccountName());
 
         updateOwnAccountName(newAccountName);
         updateOwnCredential(request);
         updateOwnPublicKey(request);
-        response.setMemberId(member.getExternalId());
         dao.persist(member);
 
+        final ProcessMemberResponse response = new ProcessMemberResponse("The Member '" + member.getName() + "' was successfully updated.");
+        response.setMemberId(member.getExternalId());
         return response;
     }
 
@@ -280,8 +279,7 @@ public final class ProcessMemberService extends Serviceable<MemberDao, ProcessMe
         final byte[] credential = request.getNewCredential();
         if (credential != null) {
             if (request.getCredentialType() != CredentialType.PASSPHRASE) {
-                throw new CWSException(ReturnCode.VERIFICATION_WARNING,
-                        "It is only permitted to update the credentials when authenticating with Passphrase.");
+                throw new CWSException(ReturnCode.VERIFICATION_WARNING, "It is only permitted to update the credentials when authenticating with Passphrase.");
             }
 
             final CWSKeyPair pair = updateMemberPassword(member, credential);
@@ -327,7 +325,7 @@ public final class ProcessMemberService extends Serviceable<MemberDao, ProcessMe
         updateMemberPassword(member, request.getCredential());
 
         final ProcessMemberResponse response = new ProcessMemberResponse();
-        response.setReturnMessage("Account has been Invalidated.");
+        response.setReturnMessage("The Member '" + member.getName() + "' has been Invalidated.");
 
         return response;
     }
@@ -344,8 +342,7 @@ public final class ProcessMemberService extends Serviceable<MemberDao, ProcessMe
         } else {
             // Deleting self
             dao.delete(member);
-            response = new ProcessMemberResponse(ReturnCode.SUCCESS,
-                    "The Member '" + member.getName() + "' has been successfully deleted.");
+            response = new ProcessMemberResponse(ReturnCode.SUCCESS, "The Member '" + member.getName() + "' has been successfully deleted.");
         }
 
         return response;
@@ -362,8 +359,7 @@ public final class ProcessMemberService extends Serviceable<MemberDao, ProcessMe
         }
 
         dao.delete(found);
-        return new ProcessMemberResponse(ReturnCode.SUCCESS,
-                "The Member '" + found.getName() + "' has successfully been deleted.");
+        return new ProcessMemberResponse(ReturnCode.SUCCESS, "The Member '" + found.getName() + "' has successfully been deleted.");
     }
 
     private ProcessMemberResponse processInvitation(final ProcessMemberRequest request) {
@@ -402,7 +398,7 @@ public final class ProcessMemberService extends Serviceable<MemberDao, ProcessMe
         account.setPrivateKey(crypto.armoringPrivateKey(key, pair.getPrivate().getKey()));
         dao.persist(account);
 
-        final ProcessMemberResponse response = new ProcessMemberResponse();
+        final ProcessMemberResponse response = new ProcessMemberResponse("The invitation was successfully processed for '" + account.getName() + "'.");
         response.setMemberId(account.getExternalId());
 
         return response;

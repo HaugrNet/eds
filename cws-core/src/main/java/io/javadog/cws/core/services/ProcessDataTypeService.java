@@ -91,7 +91,7 @@ public final class ProcessDataTypeService extends Serviceable<CommonDao, Process
         } else {
             entity = found;
             if (Objects.equals(Constants.FOLDER_TYPENAME, entity.getName()) || Objects.equals(Constants.DATA_TYPENAME, entity.getName())) {
-                throw new AuthorizationException("It is not permitted to update the DataType '" + entity.getName() + "'.");
+                throw new AuthorizationException("It is not permitted to update the Data Type '" + entity.getName() + "'.");
             }
 
             if (!Objects.equals(type, entity.getType())) {
@@ -104,7 +104,7 @@ public final class ProcessDataTypeService extends Serviceable<CommonDao, Process
         objectType.setTypeName(name);
         objectType.setType(type);
 
-        final ProcessDataTypeResponse response = new ProcessDataTypeResponse();
+        final ProcessDataTypeResponse response = new ProcessDataTypeResponse("The Data Type '" + entity.getName() + "' was successfully processed.");
         response.setDataType(objectType);
 
         return response;
@@ -123,7 +123,7 @@ public final class ProcessDataTypeService extends Serviceable<CommonDao, Process
                 throw new CWSException(ReturnCode.ILLEGAL_ACTION, "The Data Type '" + name + "' cannot be deleted, as it is being actively used.");
             } else {
                 dao.delete(entity);
-                response = new ProcessDataTypeResponse();
+                response = new ProcessDataTypeResponse("The Data Type '" + entity.getName() + "' was successfully deleted.");
             }
         } else {
             response = new ProcessDataTypeResponse(ReturnCode.IDENTIFICATION_WARNING, "No records were found with the name '" + name + "'.");

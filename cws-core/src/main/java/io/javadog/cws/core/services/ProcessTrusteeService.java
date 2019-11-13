@@ -121,7 +121,7 @@ public final class ProcessTrusteeService extends Serviceable<CommonDao, ProcessT
         trustee.setCircleKey(crypto.encryptAndArmorCircleKey(cwsPublicKey, circleKey));
 
         dao.persist(trustee);
-        return new ProcessTrusteeResponse();
+        return new ProcessTrusteeResponse("The Member '" + trustee.getMember().getName() + "' was successfully added as trustee to '" + trustee.getCircle().getName() + "'.");
     }
 
     private ProcessTrusteeResponse alterTrustee(final ProcessTrusteeRequest request) {
@@ -129,14 +129,14 @@ public final class ProcessTrusteeService extends Serviceable<CommonDao, ProcessT
         trustee.setTrustLevel(request.getTrustLevel());
         dao.persist(trustee);
 
-        return new ProcessTrusteeResponse();
+        return new ProcessTrusteeResponse("The Trustee '" + trustee.getMember().getName() + "' has successfully been given the trust level '" + trustee.getTrustLevel() + "' in the Circle '" + trustee.getCircle().getName() + "'.");
     }
 
     private ProcessTrusteeResponse removeTrustee(final ProcessTrusteeRequest request) {
         final TrusteeEntity trustee = findTrusteeForCircleAndMember(request);
         dao.delete(trustee);
 
-        return new ProcessTrusteeResponse();
+        return new ProcessTrusteeResponse("The Trustee '" + trustee.getMember().getName() + "' was successfully removed from the Circle '" + trustee.getCircle().getName() + "'.");
     }
 
     private TrusteeEntity findTrusteeForCircleAndMember(final ProcessTrusteeRequest request) {

@@ -102,16 +102,18 @@ final class DataTypeServiceTest extends DatabaseSetup {
 
     @Test
     void testCircleAdminsAreAuthorized() {
+        final String type = "MyDataType";
+        final String name = "The Data Type";
         final ProcessDataTypeService service = new ProcessDataTypeService(settings, entityManager);
         final ProcessDataTypeRequest request = prepareRequest(ProcessDataTypeRequest.class, MEMBER_1);
-        request.setType("MyDataType");
-        request.setTypeName("The Data Type");
+        request.setType(type);
+        request.setTypeName(name);
         assertNotNull(request.getTypeName());
         assertNotNull(request.getType());
 
         final ProcessDataTypeResponse response = service.perform(request);
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
-        assertEquals("Ok", response.getReturnMessage());
+        assertEquals("The Data Type '" + name + "' was successfully processed.", response.getReturnMessage());
     }
 
     @Test
@@ -139,7 +141,7 @@ final class DataTypeServiceTest extends DatabaseSetup {
 
         final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
         assertEquals(ReturnCode.AUTHORIZATION_WARNING, cause.getReturnCode());
-        assertEquals("It is not permitted to update the DataType '" + Constants.FOLDER_TYPENAME + "'.", cause.getMessage());
+        assertEquals("It is not permitted to update the Data Type '" + Constants.FOLDER_TYPENAME + "'.", cause.getMessage());
     }
 
     @Test
@@ -153,7 +155,7 @@ final class DataTypeServiceTest extends DatabaseSetup {
 
         final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
         assertEquals(ReturnCode.AUTHORIZATION_WARNING, cause.getReturnCode());
-        assertEquals("It is not permitted to update the DataType '" + Constants.DATA_TYPENAME + "'.", cause.getMessage());
+        assertEquals("It is not permitted to update the Data Type '" + Constants.DATA_TYPENAME + "'.", cause.getMessage());
     }
 
     @Test
@@ -170,7 +172,7 @@ final class DataTypeServiceTest extends DatabaseSetup {
         assertNotNull(response);
         assertTrue(response.isOk());
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
-        assertEquals("Ok", response.getReturnMessage());
+        assertEquals("The Data Type '" + theDataTypeName + "' was successfully processed.", response.getReturnMessage());
 
         request.setCredential(crypto.stringToBytes(Constants.ADMIN_ACCOUNT));
         request.setAction(Action.DELETE);
@@ -178,7 +180,7 @@ final class DataTypeServiceTest extends DatabaseSetup {
         assertNotNull(deletedResponse);
         assertTrue(deletedResponse.isOk());
         assertEquals(ReturnCode.SUCCESS.getCode(), deletedResponse.getReturnCode());
-        assertEquals("Ok", deletedResponse.getReturnMessage());
+        assertEquals("The Data Type '" + theDataTypeName + "' was successfully deleted.", deletedResponse.getReturnMessage());
     }
 
     @Test
@@ -240,7 +242,7 @@ final class DataTypeServiceTest extends DatabaseSetup {
         final ProcessDataTypeResponse response = service.perform(request);
         assertTrue(response.isOk());
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
-        assertEquals("Ok", response.getReturnMessage());
+        assertEquals("The Data Type '" + theDataTypeName + "' was successfully processed.", response.getReturnMessage());
         assertEquals(theDataTypeName, response.getDataType().getTypeName());
         assertEquals(newDataTypeType, response.getDataType().getType());
 
@@ -251,7 +253,7 @@ final class DataTypeServiceTest extends DatabaseSetup {
         final ProcessDataTypeResponse updateResponse = service.perform(request);
         assertTrue(updateResponse.isOk());
         assertEquals(ReturnCode.SUCCESS.getCode(), updateResponse.getReturnCode());
-        assertEquals("Ok", updateResponse.getReturnMessage());
+        assertEquals("The Data Type '" + theDataTypeName + "' was successfully processed.", updateResponse.getReturnMessage());
         assertEquals(theDataTypeName, updateResponse.getDataType().getTypeName());
         assertEquals(updatedDataTypeType, updateResponse.getDataType().getType());
     }
@@ -269,7 +271,7 @@ final class DataTypeServiceTest extends DatabaseSetup {
         final ProcessDataTypeResponse response = dataTypeService.perform(createRequest);
         assertTrue(response.isOk());
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
-        assertEquals("Ok", response.getReturnMessage());
+        assertEquals("The Data Type '" + aDataTypeName + "' was successfully processed.", response.getReturnMessage());
         assertEquals(aDataTypeName, response.getDataType().getTypeName());
         assertEquals(aDataTypeType, response.getDataType().getType());
 
@@ -277,7 +279,7 @@ final class DataTypeServiceTest extends DatabaseSetup {
         final ProcessDataTypeResponse updateResponse = dataTypeService.perform(createRequest);
         assertTrue(updateResponse.isOk());
         assertEquals(ReturnCode.SUCCESS.getCode(), updateResponse.getReturnCode());
-        assertEquals("Ok", updateResponse.getReturnMessage());
+        assertEquals("The Data Type '" + aDataTypeName + "' was successfully processed.", updateResponse.getReturnMessage());
         assertEquals(aDataTypeName, updateResponse.getDataType().getTypeName());
         assertEquals(aDataTypeType, updateResponse.getDataType().getType());
     }

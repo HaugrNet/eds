@@ -65,6 +65,15 @@ public final class ProcessMemberResponse extends CwsResponse {
     }
 
     /**
+     * Constructor for more detailed responses.
+     *
+     * @param returnMessage The CWS Return Message
+     */
+    public ProcessMemberResponse(final String returnMessage) {
+        super(returnMessage);
+    }
+
+    /**
      * Error Constructor, used if an error occurred, and the request could not
      * complete successfully.
      *

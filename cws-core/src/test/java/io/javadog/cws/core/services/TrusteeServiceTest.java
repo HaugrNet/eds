@@ -361,14 +361,15 @@ final class TrusteeServiceTest extends DatabaseSetup {
 
     @Test
     void testCreatingAndAddingTrusteeAsSystemAdmin() {
+        final String circleName = "Admin Circle";
         // Step 1, create a new Circle as System Administrator
         final ProcessCircleService circleService = new ProcessCircleService(settings, entityManager);
         final ProcessCircleRequest circleRequest = prepareRequest(ProcessCircleRequest.class, Constants.ADMIN_ACCOUNT);
         circleRequest.setAction(Action.CREATE);
-        circleRequest.setCircleName("Admin Circle");
+        circleRequest.setCircleName(circleName);
         final ProcessCircleResponse circleResponse = circleService.perform(circleRequest);
         assertEquals(ReturnCode.SUCCESS.getCode(), circleResponse.getReturnCode());
-        assertEquals("Ok", circleResponse.getReturnMessage());
+        assertEquals("The Circle '" + circleName + "' was successfully created.", circleResponse.getReturnMessage());
         assertNotNull(circleResponse.getCircleId());
         final String circleId = circleResponse.getCircleId();
 
@@ -380,7 +381,7 @@ final class TrusteeServiceTest extends DatabaseSetup {
         trusteeRequest.setMemberId(MEMBER_2_ID);
         trusteeRequest.setTrustLevel(TrustLevel.WRITE);
         final ProcessTrusteeResponse trusteeResponse = trusteeService.perform(trusteeRequest);
-        assertEquals("Ok", trusteeResponse.getReturnMessage());
+        assertEquals("The Member '" + MEMBER_2 + "' was successfully added as trustee to '" + circleName + "'.", trusteeResponse.getReturnMessage());
         assertEquals(ReturnCode.SUCCESS.getCode(), trusteeResponse.getReturnCode());
 
         // Step 3, verify that the Circle has 2 members
@@ -423,7 +424,7 @@ final class TrusteeServiceTest extends DatabaseSetup {
 
         final ProcessTrusteeResponse response = service.perform(request);
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
-        assertEquals("Ok", response.getReturnMessage());
+        assertEquals("The Member '" + MEMBER_5 + "' was successfully added as trustee to '" + CIRCLE_1 + "'.", response.getReturnMessage());
     }
 
     @Test
@@ -489,7 +490,7 @@ final class TrusteeServiceTest extends DatabaseSetup {
 
         final ProcessTrusteeResponse response = service.perform(request);
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
-        assertEquals("Ok", response.getReturnMessage());
+        assertEquals("The Member '" + Constants.ADMIN_ACCOUNT + "' was successfully added as trustee to '" + CIRCLE_1 + "'.", response.getReturnMessage());
 
         final FetchTrusteeService fetchService = new FetchTrusteeService(settings, entityManager);
         final FetchTrusteeRequest fetchRequest = prepareRequest(FetchTrusteeRequest.class, Constants.ADMIN_ACCOUNT);
@@ -537,7 +538,7 @@ final class TrusteeServiceTest extends DatabaseSetup {
 
         final ProcessTrusteeResponse circleResponse = circleService.perform(circleRequest);
         assertEquals(ReturnCode.SUCCESS.getCode(), circleResponse.getReturnCode());
-        assertEquals("Ok", circleResponse.getReturnMessage());
+        assertEquals("The Trustee '" + MEMBER_2 + "' has successfully been given the trust level '" + TrustLevel.ADMIN + "' in the Circle '" + CIRCLE_1 + "'.", circleResponse.getReturnMessage());
 
         final FetchTrusteeService fetchService = new FetchTrusteeService(settings, entityManager);
         final FetchTrusteeRequest fetchRequest = prepareRequest(FetchTrusteeRequest.class, MEMBER_1);
@@ -600,7 +601,7 @@ final class TrusteeServiceTest extends DatabaseSetup {
 
         final ProcessTrusteeResponse response = service.perform(request);
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
-        assertEquals("Ok", response.getReturnMessage());
+        assertEquals("The Trustee '" + MEMBER_2 + "' was successfully removed from the Circle 'circle1'.", response.getReturnMessage());
 
         final FetchTrusteeService fetchService = new FetchTrusteeService(settings, entityManager);
         final FetchTrusteeRequest fetchRequest = prepareRequest(FetchTrusteeRequest.class, MEMBER_1);
@@ -692,7 +693,6 @@ final class TrusteeServiceTest extends DatabaseSetup {
         final O response = service.perform(request);
         assertNotNull(response);
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
-        assertEquals("Ok", response.getReturnMessage());
 
         return response;
     }

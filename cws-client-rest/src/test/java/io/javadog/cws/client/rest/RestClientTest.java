@@ -146,7 +146,7 @@ final class RestClientTest {
         final ProcessMemberResponse response = restManagement.processMember(request);
         assertNotNull(response);
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
-        assertEquals("Ok", response.getReturnMessage());
+        assertEquals("The new Member '" + accountName + "' was successfully added to CWS.", response.getReturnMessage());
     }
 
     @Test
@@ -175,12 +175,11 @@ final class RestClientTest {
         request.setAction(Action.CREATE);
         request.setCircleName(accountName);
         request.setMemberId(memberResponse.getMemberId());
-        request.setCircleName(UUID.randomUUID().toString());
 
         final ProcessCircleResponse response = restManagement.processCircle(request);
         assertNotNull(response);
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
-        assertEquals("Ok", response.getReturnMessage());
+        assertEquals("The Circle '" + accountName + "' was successfully created.", response.getReturnMessage());
     }
 
     @Test

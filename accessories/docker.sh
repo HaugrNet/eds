@@ -1,8 +1,8 @@
 #!/bin/bash
 
-CWS_PORT=${CWS_PORT:-}
-if [[ "${CWS_PORT}" = "" ]]; then
-    CWS_PORT=8080
+port=${CWS_PORT:-}
+if [[ "${port}" = "" ]]; then
+    port=8080
 fi
 
 action=${1}
@@ -11,10 +11,10 @@ container="${image}-1.1"
 source release/bin/cwsFunctions.sh
 
 # ==============================================================================
-# Check if the NSA Docker container exists
+# Check if the Docker container exists
 # ------------------------------------------------------------------------------
 # Return:
-#   True (0) if NSA exists, otherwise False (1)
+#   True (0) if CWS exists, otherwise False (1)
 # ==============================================================================
 function exists() {
     readonly exists=$(docker images -a | grep "${image}")
@@ -26,10 +26,10 @@ function exists() {
 }
 
 # ==============================================================================
-# Check if the NSA Docker is running or not
+# Check if the Docker is running or not
 # ------------------------------------------------------------------------------
 # Return:
-#   True (0) if NSA is running, otherwise False (1)
+#   True (0) if CWS is running, otherwise False (1)
 # ==============================================================================
 function running() {
     readonly alive=$(docker ps -a | grep "${image}" | grep "Exited")
@@ -56,17 +56,20 @@ function showHelp() {
             echo "    status       ( $ docker ps -f name=${container} )"
             echo "    interactive  ( $ docker exec -it ${container} bash )"
             echo
-            echo "${image^^} is currently accessible at http://localhost:${CWS_PORT}/${image}"
+            echo "${image^^} is currently accessible at http://localhost:${port}/${image}"
         else
             echo "    start        ( $ docker start ${container} )"
             echo "    remove       ( $ docker rm ${container} && docker rmi ${image} )"
         fi
     else
         echo "    build        ( $ docker build -t ${image} -f Dockerfile )"
+        echo "                 ( $ docker run --name ${container} -d -p ${port}:8080 ${image} )"
     fi
-    echo
 }
 
+# ==============================================================================
+# Builds & Runs the Docker image
+# ==============================================================================
 function doBuild() {
     if (exists); then
         echo "Cannot build the ${image^^} Docker image, as it already exists"
@@ -96,41 +99,24 @@ function doBuild() {
 
         echo
         echo "${image^^} Docker image build completed. Will now run the following command:"
-        echo "$ docker run --name ${container} -d -p ${CWS_PORT}:8080 ${image}"
-        docker run --name ${container} -d -p ${CWS_PORT}:8080 ${image} >/dev/null
+        echo "$ docker run --name ${container} -d -p ${port}:8080 ${image}"
+        docker run --name ${container} -d -p ${port}:8080 ${image} >/dev/null
         echo
         checkAlive
     fi
 }
 
+# ==============================================================================
+# Starts the Docker container
+# ==============================================================================
 function doStart() {
     if (exists && ! running); then
         echo "Starting the ${container} container"
-        docker start ${container}
+        docker start ${container} >/dev/null
         checkAlive
     else
         showHelp
     fi
-}
-
-function checkAlive() {
-    echo -n "Waiting for the docker image to start "
-    retries=0
-    started=$(docker logs cws-1.1 --since 2s 2>&1 | grep "WildFly Full" | grep "Started")
-    while [[ ${#started} -eq 0 && ${retries} -lt 30 ]]; do
-        echo -n "."
-        sleep 1
-        started=$(docker logs cws-1.1 --since 2s 2>&1 | grep "WildFly Full" | grep "Started")
-    done
-    echo
-
-    if [[ ${retries} -le 30 ]]; then
-        json=$(curl --silent --header "Content-Type: application/json" --request POST "http://localhost:${CWS_PORT}/cws/api/version")
-        echo "${image^^} version available: $(inspectResponse "${json}" "version")"
-    else
-        echo "Error starting ${image^^} :-("
-    fi
-    echo
 }
 
 # ==============================================================================
@@ -139,7 +125,7 @@ function checkAlive() {
 function doStop() {
     if (exists && running); then
         echo "Stopping the ${container} container"
-        docker stop ${container}
+        docker stop ${container} >/dev/null
     else
         showHelp
     fi
@@ -187,9 +173,32 @@ function doInteractive() {
 function doRemove() {
     if (exists && ! running); then
         echo "Removing the ${container} container & image"
-        docker rm ${container} && docker rmi ${image}
+        docker rm ${container} && docker rmi ${image} >/dev/null
     else
         showHelp
+    fi
+}
+
+# ==============================================================================
+# Shows a progress bar until the Docker container is accessible
+# ==============================================================================
+function checkAlive() {
+    echo -n "Waiting for the docker image to start "
+    retries=0
+    started=$(docker logs ${container} --since 2s 2>&1 | grep "WildFly Full" | grep "Started")
+    while [[ ${#started} -eq 0 && ${retries} -lt 30 ]]; do
+        echo -n "."
+        sleep 1
+        started=$(docker logs ${container} --since 2s 2>&1 | grep "WildFly Full" | grep "Started")
+        retries=$((retries + 1))
+    done
+    echo
+
+    if [[ ${retries} -le 30 ]]; then
+        json=$(curl --silent --header "Content-Type: application/json" --request POST "http://localhost:${port}/cws/api/version")
+        echo "${image^^} version available: $(inspectResponse "${json}" "version")"
+    else
+        echo "Error starting ${image^^} :-("
     fi
 }
 
@@ -213,3 +222,4 @@ elif [[ "${action}" = "remove" ]]; then
 else
     showHelp
 fi
+echo

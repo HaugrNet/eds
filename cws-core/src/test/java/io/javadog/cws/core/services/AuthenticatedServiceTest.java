@@ -37,6 +37,6 @@ final class AuthenticatedServiceTest extends DatabaseSetup {
         assertNotNull(response);
         assertTrue(response.isOk());
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
-        assertEquals("Ok", response.getReturnMessage());
+        assertEquals("member1 successfully authenticated.", response.getReturnMessage());
     }
 }

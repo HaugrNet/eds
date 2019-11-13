@@ -61,6 +61,7 @@ public final class SignService extends Serviceable<SignatureDao, SignResponse, S
             entity.setChecksum(checksum);
             entity.setExpires(request.getExpires());
             dao.persist(entity);
+            response.setReturnMessage("The document was successfully signed.");
         } else {
             response.setReturnMessage("This document has already been signed.");
         }

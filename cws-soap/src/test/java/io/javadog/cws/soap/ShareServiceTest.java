@@ -55,7 +55,7 @@ final class ShareServiceTest extends BeanSetup {
 
         final ProcessDataTypeResponse response = service.processDataType(request);
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
-        assertEquals("Ok", response.getReturnMessage());
+        assertEquals("The Data Type 'TestType' was successfully processed.", response.getReturnMessage());
         assertNotNull(response.getDataType());
         assertEquals("TestType", response.getDataType().getTypeName());
         assertEquals("Test Type Value", response.getDataType().getType());
@@ -140,7 +140,7 @@ final class ShareServiceTest extends BeanSetup {
 
         final ProcessDataResponse response = service.processData(request);
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
-        assertEquals("Ok", response.getReturnMessage());
+        assertEquals("The Data Object 'Data Name' was successfully added to the Circle '" + CIRCLE_1 + "'.", response.getReturnMessage());
         assertNotNull(response.getDataId());
     }
 

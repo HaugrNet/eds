@@ -74,7 +74,7 @@ public final class VerifyService extends Serviceable<SignatureDao, VerifyRespons
             dao.persist(entity);
         }
 
-        final VerifyResponse response = new VerifyResponse();
+        final VerifyResponse response = new VerifyResponse("The signature has successfully been verified.");
         response.setVerified(verified);
 
         return response;

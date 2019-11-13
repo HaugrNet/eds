@@ -185,15 +185,16 @@ final class CircleServiceTest extends DatabaseSetup {
 
     @Test
     void testCreateCircle() {
+        final String circleName = "A Circle";
         final ProcessCircleService service = new ProcessCircleService(settings, entityManager);
         final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, Constants.ADMIN_ACCOUNT);
         request.setAction(Action.CREATE);
         request.setMemberId(MEMBER_1_ID);
-        request.setCircleName("a circle");
+        request.setCircleName(circleName);
 
         final ProcessCircleResponse response = service.perform(request);
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
-        assertEquals("Ok", response.getReturnMessage());
+        assertEquals("The Circle '" + circleName + "' was successfully created.", response.getReturnMessage());
         assertNotNull(response.getCircleId());
 
         final FetchCircleService fetchService = new FetchCircleService(settings, entityManager);
@@ -203,20 +204,21 @@ final class CircleServiceTest extends DatabaseSetup {
         assertEquals(4, fetchResponse.getCircles().size());
         // Circles are sorted by name, so our newly created Circle will be the first
         assertEquals(response.getCircleId(), fetchResponse.getCircles().get(0).getCircleId());
-        assertEquals("a circle", fetchResponse.getCircles().get(0).getCircleName());
+        assertEquals(circleName, fetchResponse.getCircles().get(0).getCircleName());
     }
 
     @Test
     void testCreateCircleAsMember() {
+        final String circleName = "My Circle";
         final ProcessCircleService service = new ProcessCircleService(settings, entityManager);
         final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, MEMBER_1);
         request.setAction(Action.CREATE);
-        request.setCircleName("My Circle");
+        request.setCircleName(circleName);
         request.setMemberId(MEMBER_1_ID);
 
         final ProcessCircleResponse response = service.perform(request);
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
-        assertEquals("Ok", response.getReturnMessage());
+        assertEquals("The Circle '" + circleName + "' was successfully created.", response.getReturnMessage());
     }
 
     @Test
@@ -231,13 +233,14 @@ final class CircleServiceTest extends DatabaseSetup {
         newMemberRequest.setNewAccountName(newUser);
         newMemberRequest.setNewCredential(crypto.stringToBytes(newUser));
         final ProcessMemberResponse newMemberResponse = memberService.perform(newMemberRequest);
-        assertEquals("Ok", newMemberResponse.getReturnMessage());
+        assertEquals("The new Member '" + newUser + "' was successfully added to CWS.", newMemberResponse.getReturnMessage());
 
+        final String circleName = "New Circle";
         final ProcessCircleRequest newCircleRequest = prepareRequest(ProcessCircleRequest.class, newUser);
         newCircleRequest.setAction(Action.CREATE);
-        newCircleRequest.setCircleName("new Circle");
+        newCircleRequest.setCircleName(circleName);
         final ProcessCircleResponse newCircleResponse = circleService.perform(newCircleRequest);
-        assertEquals("Ok", newCircleResponse.getReturnMessage());
+        assertEquals("The Circle '" + circleName + "' was successfully created.", newCircleResponse.getReturnMessage());
 
         final ProcessTrusteeRequest newTrusteeRequest = prepareRequest(ProcessTrusteeRequest.class, newUser);
         newTrusteeRequest.setAction(Action.ADD);
@@ -245,7 +248,7 @@ final class CircleServiceTest extends DatabaseSetup {
         newTrusteeRequest.setMemberId(MEMBER_5_ID);
         newTrusteeRequest.setTrustLevel(TrustLevel.WRITE);
         final ProcessTrusteeResponse newTrusteeResponse = trusteeService.perform(newTrusteeRequest);
-        assertEquals("Ok", newTrusteeResponse.getReturnMessage());
+        assertEquals("The Member '" + MEMBER_5 + "' was successfully added as trustee to '" + circleName + "'.", newTrusteeResponse.getReturnMessage());
     }
 
     @Test
@@ -302,15 +305,16 @@ final class CircleServiceTest extends DatabaseSetup {
 
     @Test
     void testCreateCircleWithSystemAdminAsCircleAdmin() {
+        final String circleName = "My circle";
         final ProcessCircleService service = new ProcessCircleService(settings, entityManager);
         final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, Constants.ADMIN_ACCOUNT);
         request.setAction(Action.CREATE);
         request.setMemberId(ADMIN_ID);
-        request.setCircleName("My Circle");
+        request.setCircleName(circleName);
 
         final ProcessCircleResponse response = service.perform(request);
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
-        assertEquals("Ok", response.getReturnMessage());
+        assertEquals("The Circle '" + circleName + "' was successfully created.", response.getReturnMessage());
     }
 
     @Test
@@ -329,15 +333,16 @@ final class CircleServiceTest extends DatabaseSetup {
 
     @Test
     void testUpdateExistingCircleAsAdmin() {
+        final String circleName = "Circle One";
         final ProcessCircleService service = new ProcessCircleService(settings, entityManager);
         final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, Constants.ADMIN_ACCOUNT);
         request.setAction(Action.UPDATE);
-        request.setCircleName("Circle One");
+        request.setCircleName(circleName);
         request.setCircleId(CIRCLE_1_ID);
 
         final ProcessCircleResponse response = service.perform(request);
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
-        assertEquals("Ok", response.getReturnMessage());
+        assertEquals("The Circle '" + circleName + "' was successfully updated.", response.getReturnMessage());
 
         final FetchCircleService fetchService = new FetchCircleService(settings, entityManager);
         final FetchCircleRequest fetchRequest = prepareRequest(FetchCircleRequest.class, Constants.ADMIN_ACCOUNT);
@@ -350,15 +355,16 @@ final class CircleServiceTest extends DatabaseSetup {
 
     @Test
     void testUpdateExistingCircleAsCircleAdmin() {
+        final String circleName = "Circle One";
         final ProcessCircleService service = new ProcessCircleService(settings, entityManager);
         final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, MEMBER_1);
         request.setAction(Action.UPDATE);
-        request.setCircleName("Circle One");
+        request.setCircleName(circleName);
         request.setCircleId(CIRCLE_1_ID);
 
         final ProcessCircleResponse response = service.perform(request);
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
-        assertEquals("Ok", response.getReturnMessage());
+        assertEquals("The Circle '" + circleName + "' was successfully updated.", response.getReturnMessage());
     }
 
     @Test
@@ -423,7 +429,7 @@ final class CircleServiceTest extends DatabaseSetup {
 
         final ProcessCircleResponse response = service.perform(request);
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
-        assertEquals("Ok", response.getReturnMessage());
+        assertEquals("The Circle '" + CIRCLE_1 + "' was successfully updated.", response.getReturnMessage());
     }
 
     @Test
@@ -435,7 +441,7 @@ final class CircleServiceTest extends DatabaseSetup {
 
         final ProcessCircleResponse response = service.perform(request);
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
-        assertEquals("Ok", response.getReturnMessage());
+        assertEquals("The Circle '" + CIRCLE_1 + "' has successfully been removed from CWS.", response.getReturnMessage());
     }
 
     @Test
@@ -459,7 +465,7 @@ final class CircleServiceTest extends DatabaseSetup {
 
         final ProcessCircleResponse response = service.perform(request);
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
-        assertEquals("Ok", response.getReturnMessage());
+        assertEquals("The Circle '" + CIRCLE_1 + "' has successfully been removed from CWS.", response.getReturnMessage());
     }
 
     @Test

@@ -111,11 +111,11 @@ It should be noted, that unlocking can always be done, but changing the !-Master
 it is not possible for an administrator to update the member keys.
 
 !*> Create Test accounts
-|process member                                                                                                                                         |
-|account name|credential|credential type|action|member id|public key|new account name|new credential|member role|member id?|return code?|return message?|
-|admin       |admin     |PASSPHRASE     |CREATE|null     |null      |user1           |password1     |STANDARD   |user1_id  |${SUCCESS}  |Ok             |
-|admin       |admin     |PASSPHRASE     |CREATE|null     |null      |user2           |password2     |STANDARD   |user2_id  |${SUCCESS}  |Ok             |
-|admin       |admin     |PASSPHRASE     |CREATE|null     |null      |user3           |password3     |STANDARD   |user3_id  |${SUCCESS}  |Ok             |
+|process member                                                                                                                                                                               |
+|account name|credential|credential type|action|member id|public key|new account name|new credential|member role|member id?|return code?|return message?                                      |
+|admin       |admin     |PASSPHRASE     |CREATE|null     |null      |user1           |password1     |STANDARD   |user1_id  |${SUCCESS}  |The new Member 'user1' was successfully added to CWS.|
+|admin       |admin     |PASSPHRASE     |CREATE|null     |null      |user2           |password2     |STANDARD   |user2_id  |${SUCCESS}  |The new Member 'user2' was successfully added to CWS.|
+|admin       |admin     |PASSPHRASE     |CREATE|null     |null      |user3           |password3     |STANDARD   |user3_id  |${SUCCESS}  |The new Member 'user3' was successfully added to CWS.|
 
 *!
 
@@ -266,9 +266,9 @@ also weaken the security of the CWS stored data.
    * SOAP: authenticated
    * REST (POST) request is: ${REST_ROOT}/api/authenticated
 
-|authenticated                                       |
-|account name|credential|return code?|return message?|
-|admin       |admin     |${SUCCESS}  |Ok             |
+|authenticated                                                         |
+|account name|credential|return code?|return message?                  |
+|admin       |admin     |${SUCCESS}  |admin successfully authenticated.             |
 *!
 
 !* Members
@@ -328,20 +328,20 @@ using the Session!
 
 |process member                                                                                                                                                                                                                                                        |
 |account name|credential       |credential type|action    |member id |public key|new account name|new credential|member role|member id?|signature?       |return code?             |return message?                                                                    |
-|admin       |admin            |PASSPHRASE     |CREATE    |null      |null      |admin2          |password2     |ADMIN      |admin2_id |null             |${SUCCESS}               |Ok                                                                                 |
-|admin       |admin            |PASSPHRASE     |CREATE    |null      |null      |member1         |password1     |STANDARD   |member1_id|null             |${SUCCESS}               |Ok                                                                                 |
-|member1     |password1        |null           |UPDATE    |null      |null      |null            |null          |null       |null      |null             |${SUCCESS}               |Ok                                                                                 |
-|member1     |password1        |null           |LOGIN     |null      |null      |null            |session_key   |null       |null      |null             |${SUCCESS}               |Ok                                                                                 |
+|admin       |admin            |PASSPHRASE     |CREATE    |null      |null      |admin2          |password2     |ADMIN      |admin2_id |null             |${SUCCESS}               |The new Member 'admin2' was successfully added to CWS.                             |
+|admin       |admin            |PASSPHRASE     |CREATE    |null      |null      |member1         |password1     |STANDARD   |member1_id|null             |${SUCCESS}               |The new Member 'member1' was successfully added to CWS.                            |
+|member1     |password1        |null           |UPDATE    |null      |null      |null            |null          |null       |null      |null             |${SUCCESS}               |The Member 'member1' was successfully updated.                                     |
+|member1     |password1        |null           |LOGIN     |null      |null      |null            |session_key   |null       |null      |null             |${SUCCESS}               |The Member 'member1' has successfully logged in.                                   |
 |null        |session_key      |null           |UPDATE    |null      |null      |null            |new_session   |null       |null      |null             |${VERIFICATION_WARNING}  |It is only permitted to update the credentials when authenticating with Passphrase.|
-|null        |session_key      |SESSION        |LOGIN     |null      |null      |null            |new_session   |null       |null      |null             |${SUCCESS}               |Ok                                                                                 |
-|null        |new_session      |SESSION        |LOGIN     |null      |null      |null            |new_session   |null       |null      |null             |${SUCCESS}               |Ok                                                                                 |
+|null        |session_key      |SESSION        |LOGIN     |null      |null      |null            |new_session   |null       |null      |null             |${SUCCESS}               |The Member 'member1' has successfully logged in.                                   |
+|null        |new_session      |SESSION        |LOGIN     |null      |null      |null            |new_session   |null       |null      |null             |${SUCCESS}               |The Member 'member1' has successfully logged in.                                   |
 |null        |new_session      |SESSION        |CREATE    |null      |null      |user9           |password9     |null       |null      |null             |${AUTHORIZATION_WARNING} |Members are not permitted to create new Accounts.                                  |
-|member1     |password1        |PASSPHRASE     |INVALIDATE|null      |null      |null            |null          |null       |null      |null             |${SUCCESS}               |Account has been Invalidated.                                                      |
+|member1     |password1        |PASSPHRASE     |INVALIDATE|null      |null      |null            |null          |null       |null      |null             |${SUCCESS}               |The Member 'member1' has been Invalidated.                                         |
 |member1     |password1        |null           |UPDATE    |null      |null      |null            |null          |null       |null      |null             |${AUTHENTICATION_WARNING}|Cannot authenticate the Account from the given Credentials.                        |
 |null        |new_session      |SESSION        |UPDATE    |null      |null      |null            |null          |null       |null      |null             |${AUTHENTICATION_WARNING}|No Session could be found.                                                         |
 |admin       |admin            |null           |DELETE    |member1_id|null      |null            |null          |null       |null      |null             |${SUCCESS}               |The Member 'member1' has successfully been deleted.                                |
-|admin       |admin            |null           |INVITE    |null      |null      |invitee         |null          |null       |invitee_id|invitee_signature|${SUCCESS}               |Ok                                                                                 |
-|invitee     |invitee_signature|SIGNATURE      |UPDATE    |null      |null      |invitee         |invitee       |null       |invitee_id|null             |${SUCCESS}               |Ok                                                                                 |
+|admin       |admin            |null           |INVITE    |null      |null      |invitee         |null          |null       |invitee_id|invitee_signature|${SUCCESS}               |An invitation was successfully issued for 'invitee'.                               |
+|invitee     |invitee_signature|SIGNATURE      |UPDATE    |null      |null      |invitee         |invitee       |null       |invitee_id|null             |${SUCCESS}               |The invitation was successfully processed for 'invitee'.                           |
 |admin       |admin            |PASSPHRASE     |DELETE    |invitee_id|null      |null            |null          |null       |null      |null             |${SUCCESS}               |The Member 'invitee' has successfully been deleted.                                |
 
 |fetch members                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
@@ -378,15 +378,15 @@ Key, which means a shared Key that can be used by Trustees from a Client system.
    * SOAP: fetchCircles
    * REST (POST) request is: ${REST_ROOT}/api/circles/fetchCircles
 
-|process circle                                                                                                                                                            |
-|account name|credential|action|circle id |circle name    |member id|circle key      |circle id?|return code?             |return message ?                                |
-|admin       |admin     |CREATE|null      |circle1        |user1_id |null            |circle1_id|${SUCCESS}               |Ok                                              |
-|user1       |password1 |CREATE|null      |circle1        |null     |null            |null      |${IDENTIFICATION_WARNING}|A Circle with the requested name already exists.|
-|user1       |password1 |CREATE|null      |circle2        |null     |null            |circle2_id|${SUCCESS}               |Ok                                              |
-|user2       |password2 |CREATE|null      |circle3        |null     |super secret key|circle3_id|${SUCCESS}               |Ok                                              |
-|user2       |password2 |CREATE|null      |circle5        |null     |null            |circle5_id|${SUCCESS}               |Ok                                              |
-|user2       |password2 |UPDATE|circle5_id|new Circle Name|null     |null            |null      |${SUCCESS}               |Ok                                              |
-|user2       |password2 |DELETE|circle5_id|null           |null     |null            |null      |${SUCCESS}               |Ok                                              |
+|process circle                                                                                                                                                                                |
+|account name|credential|action|circle id |circle name    |member id|circle key      |circle id?|return code?             |return message ?                                                    |
+|admin       |admin     |CREATE|null      |circle1        |user1_id |null            |circle1_id|${SUCCESS}               |The Circle 'circle1' was successfully created.                      |
+|user1       |password1 |CREATE|null      |circle1        |null     |null            |null      |${IDENTIFICATION_WARNING}|A Circle with the requested name already exists.                    |
+|user1       |password1 |CREATE|null      |circle2        |null     |null            |circle2_id|${SUCCESS}               |The Circle 'circle2' was successfully created.                      |
+|user2       |password2 |CREATE|null      |circle3        |null     |super secret key|circle3_id|${SUCCESS}               |The Circle 'circle3' was successfully created.                      |
+|user2       |password2 |CREATE|null      |circle5        |null     |null            |circle5_id|${SUCCESS}               |The Circle 'circle5' was successfully created.                      |
+|user2       |password2 |UPDATE|circle5_id|new Circle Name|null     |null            |null      |${SUCCESS}               |The Circle 'new Circle Name' was successfully updated.              |
+|user2       |password2 |DELETE|circle5_id|null           |null     |null            |null      |${SUCCESS}               |The Circle 'new Circle Name' has successfully been removed from CWS.|
 
 
 The Fetch Circles request is intended to get a listing of all the current Circles in CWS, note that only if a user is Member of a Circle,
@@ -417,13 +417,13 @@ The !-CWS-! Create Circle request can be performed by all standard accounts.
    * SOAP: fetchTrustees
    * REST (POST) request is: ${REST_ROOT}/api/trustees/fetchTrustees
 
-|process trustee                                                                              |
-|account name|credential|action|circle id |member id|trust level|return code?|return message ?|
-|user1       |password1 |ADD   |circle2_id|user2_id |WRITE      |${SUCCESS}  |Ok              |
-|user1       |password1 |ADD   |circle2_id|user3_id |READ       |${SUCCESS}  |Ok              |
-|user2       |password2 |ADD   |circle3_id|user1_id |WRITE      |${SUCCESS}  |Ok              |
-|user1       |password1 |ALTER |circle2_id|user3_id |ADMIN      |${SUCCESS}  |Ok              |
-|user1       |password1 |ALTER |circle2_id|user3_id |READ       |${SUCCESS}  |Ok              |
+|process trustee                                                                                                                                                              |
+|account name|credential|action|circle id |member id|trust level|return code?|return message ?                                                                                |
+|user1       |password1 |ADD   |circle2_id|user2_id |WRITE      |${SUCCESS}  |The Member 'user2' was successfully added as trustee to 'circle2'.                              |
+|user1       |password1 |ADD   |circle2_id|user3_id |READ       |${SUCCESS}  |The Member 'user3' was successfully added as trustee to 'circle2'.                              |
+|user2       |password2 |ADD   |circle3_id|user1_id |WRITE      |${SUCCESS}  |The Member 'user1' was successfully added as trustee to 'circle3'.                              |
+|user1       |password1 |ALTER |circle2_id|user3_id |ADMIN      |${SUCCESS}  |The Trustee 'user3' has successfully been given the trust level 'ADMIN' in the Circle 'circle2'.|
+|user1       |password1 |ALTER |circle2_id|user3_id |READ       |${SUCCESS}  |The Trustee 'user3' has successfully been given the trust level 'READ' in the Circle 'circle2'. |
 
 If a Fetch Members for a given User is invoked now, then the list of Circles which the Member is entrusted with will also be returned.
 
@@ -483,12 +483,12 @@ There are 3 kinds of actions / requests which can be made for data Types
 
 |process dataType                                                                                                                                                   |
 |account name|credential|action |name          |type                         |return code?            |return message?                                              |
-|admin       |admin     |PROCESS|MIMEType PDF  |application/pdf              |${SUCCESS}              |Ok                                                           |
-|user1       |password1 |PROCESS|jsonObject    |{"a":"b","c":"d"}            |${SUCCESS}              |Ok                                                           |
-|admin       |admin     |PROCESS|Object42      |com.company.object.ObjectName|${SUCCESS}              |Ok                                                           |
+|admin       |admin     |PROCESS|MIMEType PDF  |application/pdf              |${SUCCESS}              |The Data Type 'MIMEType PDF' was successfully processed.     |
+|user1       |password1 |PROCESS|jsonObject    |{"a":"b","c":"d"}            |${SUCCESS}              |The Data Type 'jsonObject' was successfully processed.       |
+|admin       |admin     |PROCESS|Object42      |com.company.object.ObjectName|${SUCCESS}              |The Data Type 'Object42' was successfully processed.         |
 |user3       |password3 |PROCESS|Awesome Object|Cool                         |${AUTHORIZATION_WARNING}|The requesting Account is not permitted to Process Data Type.|
 |user3       |password3 |DELETE |MIMEType PDF  |                             |${AUTHORIZATION_WARNING}|The requesting Account is not permitted to Process Data Type.|
-|admin       |admin     |DELETE |MIMEType PDF  |null                         |${SUCCESS}              |Ok                                                           |
+|admin       |admin     |DELETE |MIMEType PDF  |null                         |${SUCCESS}              |The Data Type 'MIMEType PDF' was successfully deleted.       |
 
 |fetch dataTypes                                                                                                                                                                                                                                                                     |
 |account name|credential|data types?                                                                                                                                                                                                                    |return code?|return message?|
@@ -519,21 +519,21 @@ There are 3 kinds of actions / requests which can be made for data Types
    * SOAP: fetchData
    * REST (POST) request is: ${REST_ROOT}/api/data/fetchData
 
-|process data                                                                                                                                                                                               |
-|account name|credential|action|circle id |data id  |data name|type name     |target folder id|target circle id|data               |return code?        |return message?                                    |
-|user1       |password1 |ADD   |circle1_id|null     |data1    |folder        |null            |null            |null               |${SUCCESS}          |Ok                                                 |
-|user1       |password1 |ADD   |circle1_id|null     |data2    |data          |null            |null            |First Data Object  |${SUCCESS}          |Ok                                                 |
-|user1       |password1 |ADD   |circle2_id|null     |data3    |Awesome Object|null            |null            |Second Data Object |${INTEGRITY_WARNING}|Cannot find a matching !-DataType-! for the Object.|
-|user1       |password1 |DELETE|null      |data1_id |null     |null          |null            |null            |null               |${SUCCESS}          |Ok                                                 |
-|user1       |password1 |ADD   |circle1_id|null     |data4    |data          |null            |null            |Another Data Object|${SUCCESS}          |Ok                                                 |
-|user1       |password1 |ADD   |circle1_id|null     |data5    |data          |null            |null            |More Data          |${SUCCESS}          |Ok                                                 |
-|user1       |password1 |ADD   |circle2_id|null     |status   |null          |null            |null            |initial            |${SUCCESS}          |Ok                                                 |
-|user1       |password1 |UPDATE|circle2_id|status_id|null     |null          |null            |null            |updated content    |${SUCCESS}          |Ok                                                 |
-|user1       |password1 |ADD   |circle2_id|null     |data6    |null          |null            |null            |some more data     |${SUCCESS}          |Ok                                                 |
-|user1       |password1 |COPY  |circle2_id|data6_id |copied   |null          |null            |circle1_id      |null               |${SUCCESS}          |Ok                                                 |
-|user1       |password1 |MOVE  |circle2_id|data6_id |moved    |null          |null            |circle1_id      |null               |${SUCCESS}          |Ok                                                 |
-|user1       |password1 |UPDATE|circle1_id|copied_id|copied   |null          |null            |null            |null               |${SUCCESS}          |Ok                                                 |
-|user1       |password1 |UPDATE|circle1_id|moved_id |moved    |null          |null            |null            |null               |${SUCCESS}          |Ok                                                 |
+|process data                                                                                                                                                                                                                         |
+|account name|credential|action|circle id |data id  |data name|type name     |target folder id|target circle id|data               |return code?        |return message?                                                              |
+|user1       |password1 |ADD   |circle1_id|null     |data1    |folder        |null            |null            |null               |${SUCCESS}          |The Folder 'data1' was successfully added to the Circle 'circle1'.           |
+|user1       |password1 |ADD   |circle1_id|null     |data2    |data          |null            |null            |First Data Object  |${SUCCESS}          |The Data Object 'data2' was successfully added to the Circle 'circle1'.      |
+|user1       |password1 |ADD   |circle2_id|null     |data3    |Awesome Object|null            |null            |Second Data Object |${INTEGRITY_WARNING}|Cannot find a matching !-DataType-! for the Object.                          |
+|user1       |password1 |DELETE|null      |data1_id |null     |null          |null            |null            |null               |${SUCCESS}          |The requested Data Object 'data1' has been removed from the Circle 'circle1'.|
+|user1       |password1 |ADD   |circle1_id|null     |data4    |data          |null            |null            |Another Data Object|${SUCCESS}          |The Data Object 'data4' was successfully added to the Circle 'circle1'.      |
+|user1       |password1 |ADD   |circle1_id|null     |data5    |data          |null            |null            |More Data          |${SUCCESS}          |The Data Object 'data5' was successfully added to the Circle 'circle1'.      |
+|user1       |password1 |ADD   |circle2_id|null     |status   |null          |null            |null            |initial            |${SUCCESS}          |The Data Object 'status' was successfully added to the Circle 'circle2'.     |
+|user1       |password1 |UPDATE|circle2_id|status_id|null     |null          |null            |null            |updated content    |${SUCCESS}          |The Data Object 'status' was successfully updated.                           |
+|user1       |password1 |ADD   |circle2_id|null     |data6    |null          |null            |null            |some more data     |${SUCCESS}          |The Data Object 'data6' was successfully added to the Circle 'circle2'.      |
+|user1       |password1 |COPY  |circle2_id|data6_id |copied   |null          |null            |circle1_id      |null               |${SUCCESS}          |The Data Object 'data6' was successfully copied from 'circle2' to 'circle1'. |
+|user1       |password1 |MOVE  |circle2_id|data6_id |moved    |null          |null            |circle1_id      |null               |${SUCCESS}          |The Data Object 'data6' was successfully moved from 'circle2' to 'circle1'.  |
+|user1       |password1 |UPDATE|circle1_id|copied_id|copied   |null          |null            |null            |null               |${SUCCESS}          |The Data Object 'copied' was successfully updated.                           |
+|user1       |password1 |UPDATE|circle1_id|moved_id |moved    |null          |null            |null            |null               |${SUCCESS}          |The Data Object 'moved' was successfully updated.                            |
 
 |fetch data                                                                                                                                                                                   |
 |account name|credential|circle id |data id  |page number|page size|records?|folder id?     |data id?             |data name?     |type name?  |data?            |return code?|return message?|
@@ -561,18 +561,18 @@ CWS supports simply signing of documents, and later verification of same by othe
    * SOAP: fetchSignatures
    * REST (POST) request is: ${REST_ROOT}/api/signatures/fetchSignatures
 
-|sign                                                                                                                    |
-|account name|credential|data                                 |expires     |signature?      |return code?|return message?|
-|user1       |password1 |Data to be signed, already expired   |${yesterday}|user1_signature1|${SUCCESS}  |Ok             |
-|user1       |password1 |Data to be signed, without expiration|null        |user1_signature2|${SUCCESS}  |Ok             |
-|user1       |password1 |Data to be signed, expires tomorrow  |${tomorrow} |user1_signature3|${SUCCESS}  |Ok             |
+|sign                                                                                                                                          |
+|account name|credential|data                                 |expires     |signature?      |return code?|return message?                      |
+|user1       |password1 |Data to be signed, already expired   |${yesterday}|user1_signature1|${SUCCESS}  |The document was successfully signed.|
+|user1       |password1 |Data to be signed, without expiration|null        |user1_signature2|${SUCCESS}  |The document was successfully signed.|
+|user1       |password1 |Data to be signed, expires tomorrow  |${tomorrow} |user1_signature3|${SUCCESS}  |The document was successfully signed.|
 
-|verify                                                                                                                                  |
-|account name|credential|data                                 |signature       |verified?|return code?        |return message?           |
-|user2       |password2 |Data to be signed, already expired   |user1_signature1|false    |${SIGNATURE_WARNING}|The Signature has expired.|
-|user2       |password2 |Data to be signed, without expiration|user1_signature2|true     |${SUCCESS}          |Ok                        |
-|user2       |password2 |Data to be signed, expires tomorrow  |user1_signature3|true     |${SUCCESS}          |Ok                        |
-|user2       |password2 |Data to be signed, expires tomorrow  |user1_signature2|false    |${SUCCESS}          |Ok                        |
+|verify                                                                                                                                                     |
+|account name|credential|data                                 |signature       |verified?|return code?        |return message?                              |
+|user2       |password2 |Data to be signed, already expired   |user1_signature1|false    |${SIGNATURE_WARNING}|The Signature has expired.                   |
+|user2       |password2 |Data to be signed, without expiration|user1_signature2|true     |${SUCCESS}          |The signature has successfully been verified.|
+|user2       |password2 |Data to be signed, expires tomorrow  |user1_signature3|true     |${SUCCESS}          |The signature has successfully been verified.|
+|user2       |password2 |Data to be signed, expires tomorrow  |user1_signature2|false    |${SUCCESS}          |The signature has successfully been verified.|
 
 |fetch signatures                                                                                                                                                                                                                                                                                        |
 |account name|credential|signatures?                                                                                                                                                                                                                                        |return code?|return message?|

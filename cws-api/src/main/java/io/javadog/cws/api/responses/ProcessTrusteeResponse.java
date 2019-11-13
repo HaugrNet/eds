@@ -54,6 +54,15 @@ public final class ProcessTrusteeResponse extends CwsResponse {
     }
 
     /**
+     * Constructor for more detailed responses.
+     *
+     * @param returnMessage The CWS Return Message
+     */
+    public ProcessTrusteeResponse(final String returnMessage) {
+        super(returnMessage);
+    }
+
+    /**
      * Error Constructor, used if an error occurred, and the request could not
      * complete successfully.
      *

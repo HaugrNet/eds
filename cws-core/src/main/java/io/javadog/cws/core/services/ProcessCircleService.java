@@ -164,7 +164,7 @@ public final class ProcessCircleService extends Serviceable<CommonDao, ProcessCi
         trustee.setCircleKey(circleKey);
         dao.persist(trustee);
 
-        final ProcessCircleResponse response = new ProcessCircleResponse();
+        final ProcessCircleResponse response = new ProcessCircleResponse("The Circle '" + circle.getName() + "' was successfully created.");
         response.setCircleId(circle.getExternalId());
 
         return response;
@@ -203,7 +203,7 @@ public final class ProcessCircleService extends Serviceable<CommonDao, ProcessCi
         checkAndUpdateCircleName(entity, request.getCircleName());
         dao.persist(entity);
 
-        return new ProcessCircleResponse();
+        return new ProcessCircleResponse("The Circle '" + entity.getName() + "' was successfully updated.");
     }
 
     private byte[] updateExternalCircleKey(final String externalKey) {
@@ -247,7 +247,7 @@ public final class ProcessCircleService extends Serviceable<CommonDao, ProcessCi
         throwIdentificationWarningIfNoCircle(entity);
         dao.delete(entity);
 
-        return new ProcessCircleResponse();
+        return new ProcessCircleResponse("The Circle '" + entity.getName() + "' has successfully been removed from CWS.");
     }
 
     private static void throwIdentificationWarningIfNoCircle(final Object obj) {

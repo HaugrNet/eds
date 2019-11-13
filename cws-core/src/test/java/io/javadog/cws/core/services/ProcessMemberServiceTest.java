@@ -71,7 +71,7 @@ final class ProcessMemberServiceTest extends DatabaseSetup {
         final ProcessMemberResponse response = service.perform(request);
 
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
-        assertEquals("Ok", response.getReturnMessage());
+        assertEquals("The new Member '" + account + "' was successfully added to CWS.", response.getReturnMessage());
     }
 
     @Test
@@ -86,7 +86,7 @@ final class ProcessMemberServiceTest extends DatabaseSetup {
         final ProcessMemberResponse response = service.perform(request);
 
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
-        assertEquals("Ok", response.getReturnMessage());
+        assertEquals("The new Member '" + account + "' was successfully added to CWS.", response.getReturnMessage());
     }
 
     @Test
@@ -101,7 +101,7 @@ final class ProcessMemberServiceTest extends DatabaseSetup {
         final ProcessMemberResponse response = service.perform(request);
 
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
-        assertEquals("Ok", response.getReturnMessage());
+        assertEquals("The new Member '" + account + "' was successfully added to CWS.", response.getReturnMessage());
     }
 
     @Test
@@ -129,14 +129,14 @@ final class ProcessMemberServiceTest extends DatabaseSetup {
         request.setNewCredential(crypto.stringToBytes(account));
         final ProcessMemberResponse response = service.perform(request);
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
-        assertEquals("Ok", response.getReturnMessage());
+        assertEquals("The new Member '" + account + "' was successfully added to CWS.", response.getReturnMessage());
 
         final ProcessMemberRequest updateRequest = prepareRequest(ProcessMemberRequest.class, account);
         updateRequest.setAction(Action.UPDATE);
         updateRequest.setPublicKey(UUID.randomUUID().toString());
         final ProcessMemberResponse updateResponse = service.perform(updateRequest);
         assertEquals(ReturnCode.SUCCESS.getCode(), updateResponse.getReturnCode());
-        assertEquals("Ok", updateResponse.getReturnMessage());
+        assertEquals("The Member '" + account + "' was successfully updated.", updateResponse.getReturnMessage());
 
         final FetchMemberService fetchService = new FetchMemberService(settings, entityManager);
         final FetchMemberRequest fetchRequest = prepareRequest(FetchMemberRequest.class, MEMBER_4);
@@ -172,7 +172,7 @@ final class ProcessMemberServiceTest extends DatabaseSetup {
 
         final ProcessMemberResponse response = service.perform(request);
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
-        assertEquals("Ok", response.getReturnMessage());
+        assertEquals("The Member '" + MEMBER_1 + "' has successfully been given the new role '" + MemberRole.ADMIN + "'.", response.getReturnMessage());
     }
 
     @Test
@@ -212,7 +212,7 @@ final class ProcessMemberServiceTest extends DatabaseSetup {
 
         final ProcessMemberResponse response = service.perform(request);
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
-        assertEquals("Ok", response.getReturnMessage());
+        assertEquals("The Member '" + MEMBER_5 + "' was successfully updated.", response.getReturnMessage());
     }
 
     @Test
@@ -222,7 +222,7 @@ final class ProcessMemberServiceTest extends DatabaseSetup {
         final ProcessMemberRequest loginRequest = prepareLoginRequest(MEMBER_5, session);
         final ProcessMemberResponse loginResponse = service.perform(loginRequest);
         assertEquals(ReturnCode.SUCCESS.getCode(), loginResponse.getReturnCode());
-        assertEquals("Ok", loginResponse.getReturnMessage());
+        assertEquals("The Member '" + MEMBER_5 + "' has successfully logged in.", loginResponse.getReturnMessage());
 
         final ProcessMemberRequest passwordRequest = prepareSessionRequest(ProcessMemberRequest.class, session);
         passwordRequest.setAction(Action.UPDATE);
@@ -235,10 +235,11 @@ final class ProcessMemberServiceTest extends DatabaseSetup {
 
     @Test
     void testInvitation() {
+        final String account = "invitee";
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
         final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
         request.setAction(Action.INVITE);
-        request.setNewAccountName("invitee");
+        request.setNewAccountName(account);
 
         final ProcessMemberResponse response = service.perform(request);
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
@@ -246,7 +247,7 @@ final class ProcessMemberServiceTest extends DatabaseSetup {
         final byte[] signature = response.getSignature();
 
         final ProcessMemberRequest invitationRequest = new ProcessMemberRequest();
-        invitationRequest.setAccountName("invitee");
+        invitationRequest.setAccountName(account);
         invitationRequest.setAction(Action.UPDATE);
         invitationRequest.setCredentialType(CredentialType.SIGNATURE);
         invitationRequest.setCredential(signature);
@@ -255,7 +256,7 @@ final class ProcessMemberServiceTest extends DatabaseSetup {
         final ProcessMemberResponse invitationResponse = service.perform(invitationRequest);
         assertNotNull(invitationResponse);
         assertEquals(ReturnCode.SUCCESS.getCode(), invitationResponse.getReturnCode());
-        assertEquals("Ok", response.getReturnMessage());
+        assertEquals("An invitation was successfully issued for '" + account + "'.", response.getReturnMessage());
     }
 
     @Test
@@ -440,15 +441,16 @@ final class ProcessMemberServiceTest extends DatabaseSetup {
 
     @Test
     void testProcessSelf() {
+        final String newName = "Supreme Member";
         final ProcessMemberService service = new ProcessMemberService(settings, entityManager);
         final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, MEMBER_1);
         request.setAction(Action.UPDATE);
-        request.setNewAccountName("Supreme Member");
+        request.setNewAccountName(newName);
         request.setNewCredential(crypto.stringToBytes("Bla bla bla"));
 
         final ProcessMemberResponse response = service.perform(request);
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
-        assertEquals("Ok", response.getReturnMessage());
+        assertEquals("The Member '" + newName + "' was successfully updated.", response.getReturnMessage());
     }
 
     @Test
@@ -502,7 +504,7 @@ final class ProcessMemberServiceTest extends DatabaseSetup {
 
         final ProcessMemberResponse response = service.perform(request);
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
-        assertEquals("Account has been Invalidated.", response.getReturnMessage());
+        assertEquals("The Member '" + MEMBER_4 + "' has been Invalidated.", response.getReturnMessage());
 
         request.setAction(Action.UPDATE);
         request.setNewCredential(crypto.stringToBytes("New Passphrase"));

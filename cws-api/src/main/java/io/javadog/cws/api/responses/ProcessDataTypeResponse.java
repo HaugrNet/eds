@@ -60,6 +60,15 @@ public final class ProcessDataTypeResponse extends CwsResponse {
     }
 
     /**
+     * Constructor for more detailed responses.
+     *
+     * @param returnMessage The CWS Return Message
+     */
+    public ProcessDataTypeResponse(final String returnMessage) {
+        super(returnMessage);
+    }
+
+    /**
      * Error Constructor, used if an error occurred, and the request could not
      * complete successfully.
      *

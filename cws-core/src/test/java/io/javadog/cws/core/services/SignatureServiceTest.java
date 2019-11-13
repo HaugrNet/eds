@@ -92,7 +92,7 @@ final class SignatureServiceTest extends DatabaseSetup {
         verifyRequest.setSignature(signResponse.getSignature());
         final VerifyResponse verifyResponse = verifyService.perform(verifyRequest);
         assertEquals(ReturnCode.SUCCESS.getCode(), verifyResponse.getReturnCode());
-        assertEquals("Ok", verifyResponse.getReturnMessage());
+        assertEquals("The signature has successfully been verified.", verifyResponse.getReturnMessage());
         assertTrue(verifyResponse.isVerified());
     }
 

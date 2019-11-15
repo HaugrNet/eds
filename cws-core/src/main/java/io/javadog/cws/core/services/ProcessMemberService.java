@@ -410,6 +410,6 @@ public final class ProcessMemberService extends Serviceable<MemberDao, ProcessMe
      * @return String starting with 'the Member' and then the member name quoted
      */
     private static String theMember(final MemberEntity member) {
-        return  "The Member '" + member.getName() + "'";
+        return "The Member '" + member.getName() + "'";
     }
 }

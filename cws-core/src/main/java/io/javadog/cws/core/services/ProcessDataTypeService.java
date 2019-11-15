@@ -140,6 +140,6 @@ public final class ProcessDataTypeService extends Serviceable<CommonDao, Process
      * @return String starting with 'the Data Type' and then the type name quoted
      */
     private static String theDataType(final DataTypeEntity dataType) {
-        return  "The Data Type '" + dataType.getName() + "'";
+        return "The Data Type '" + dataType.getName() + "'";
     }
 }

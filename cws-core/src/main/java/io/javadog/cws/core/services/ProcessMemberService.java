@@ -142,7 +142,7 @@ public final class ProcessMemberService extends Serviceable<MemberDao, ProcessMe
 
         final MemberRole role = whichRole(request);
         final MemberEntity created = createNewAccount(accountName, role, request.getNewCredential());
-        final ProcessMemberResponse response = new ProcessMemberResponse("The new Member '" + request.getNewAccountName() + "' was successfully added to CWS.");
+        final ProcessMemberResponse response = new ProcessMemberResponse(theMember(created) + " was successfully added to CWS.");
         response.setMemberId(created.getExternalId());
 
         return response;
@@ -158,8 +158,7 @@ public final class ProcessMemberService extends Serviceable<MemberDao, ProcessMe
         final String memberName = request.getNewAccountName().trim();
         final MemberEntity found = dao.findMemberByName(memberName);
         if (found != null) {
-            throw new CWSException(ReturnCode.CONSTRAINT_ERROR,
-                    "Cannot create an invitation, as the account already exists.");
+            throw new CWSException(ReturnCode.CONSTRAINT_ERROR, "Cannot create an invitation, as the account already exists.");
         }
 
         final String uuid = UUID.randomUUID().toString();
@@ -215,7 +214,7 @@ public final class ProcessMemberService extends Serviceable<MemberDao, ProcessMe
         // Key's no longer being used, must be destroyed.
         key.destroy();
 
-        return new ProcessMemberResponse("The Member '" + member.getName() + "' has successfully logged in.");
+        return new ProcessMemberResponse(theMember(member) + " has successfully logged in.");
     }
 
     private Date calculateSessionExpiration() {
@@ -245,7 +244,7 @@ public final class ProcessMemberService extends Serviceable<MemberDao, ProcessMe
         entity.setMemberRole(request.getMemberRole());
         dao.persist(entity);
 
-        final ProcessMemberResponse response = new ProcessMemberResponse("The Member '" + entity.getName() + "' has successfully been given the new role '" + request.getMemberRole() + "'.");
+        final ProcessMemberResponse response = new ProcessMemberResponse(theMember(entity) + " has successfully been given the new role '" + request.getMemberRole() + "'.");
         response.setMemberId(memberId);
 
         return response;
@@ -259,7 +258,7 @@ public final class ProcessMemberService extends Serviceable<MemberDao, ProcessMe
         updateOwnPublicKey(request);
         dao.persist(member);
 
-        final ProcessMemberResponse response = new ProcessMemberResponse("The Member '" + member.getName() + "' was successfully updated.");
+        final ProcessMemberResponse response = new ProcessMemberResponse(theMember(member) + " was successfully updated.");
         response.setMemberId(member.getExternalId());
         return response;
     }
@@ -288,8 +287,7 @@ public final class ProcessMemberService extends Serviceable<MemberDao, ProcessMe
             final List<TrusteeEntity> list = dao.findTrusteesByMember(member, EnumSet.allOf(TrustLevel.class));
             for (final TrusteeEntity trustee : list) {
                 final KeyAlgorithm algorithm = trustee.getKey().getAlgorithm();
-                final SecretCWSKey circleKey = crypto
-                        .extractCircleKey(algorithm, keyPair.getPrivate(), trustee.getCircleKey());
+                final SecretCWSKey circleKey = crypto.extractCircleKey(algorithm, keyPair.getPrivate(), trustee.getCircleKey());
                 trustee.setCircleKey(crypto.encryptAndArmorCircleKey(pair.getPublic(), circleKey));
 
                 dao.persist(trustee);
@@ -325,7 +323,7 @@ public final class ProcessMemberService extends Serviceable<MemberDao, ProcessMe
         updateMemberPassword(member, request.getCredential());
 
         final ProcessMemberResponse response = new ProcessMemberResponse();
-        response.setReturnMessage("The Member '" + member.getName() + "' has been Invalidated.");
+        response.setReturnMessage(theMember(member) + " has been Invalidated.");
 
         return response;
     }
@@ -342,7 +340,7 @@ public final class ProcessMemberService extends Serviceable<MemberDao, ProcessMe
         } else {
             // Deleting self
             dao.delete(member);
-            response = new ProcessMemberResponse(ReturnCode.SUCCESS, "The Member '" + member.getName() + "' has been successfully deleted.");
+            response = new ProcessMemberResponse(ReturnCode.SUCCESS, theMember(member) + " has been successfully deleted.");
         }
 
         return response;
@@ -359,7 +357,7 @@ public final class ProcessMemberService extends Serviceable<MemberDao, ProcessMe
         }
 
         dao.delete(found);
-        return new ProcessMemberResponse(ReturnCode.SUCCESS, "The Member '" + found.getName() + "' has successfully been deleted.");
+        return new ProcessMemberResponse(ReturnCode.SUCCESS, theMember(found) + " has successfully been deleted.");
     }
 
     private ProcessMemberResponse processInvitation(final ProcessMemberRequest request) {
@@ -402,5 +400,16 @@ public final class ProcessMemberService extends Serviceable<MemberDao, ProcessMe
         response.setMemberId(account.getExternalId());
 
         return response;
+    }
+
+    /**
+     * <p>Wrapper method to ensure that the member is always presented the
+     * same way. The method simply returns the Member + member name.</p>
+     *
+     * @param member Member Entity to read the name from
+     * @return String starting with 'the Member' and then the member name quoted
+     */
+    private static String theMember(final MemberEntity member) {
+        return  "The Member '" + member.getName() + "'";
     }
 }

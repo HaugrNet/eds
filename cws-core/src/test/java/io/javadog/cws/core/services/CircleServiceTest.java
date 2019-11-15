@@ -233,7 +233,7 @@ final class CircleServiceTest extends DatabaseSetup {
         newMemberRequest.setNewAccountName(newUser);
         newMemberRequest.setNewCredential(crypto.stringToBytes(newUser));
         final ProcessMemberResponse newMemberResponse = memberService.perform(newMemberRequest);
-        assertEquals("The new Member '" + newUser + "' was successfully added to CWS.", newMemberResponse.getReturnMessage());
+        assertEquals("The Member '" + newUser + "' was successfully added to CWS.", newMemberResponse.getReturnMessage());
 
         final String circleName = "New Circle";
         final ProcessCircleRequest newCircleRequest = prepareRequest(ProcessCircleRequest.class, newUser);

@@ -71,7 +71,7 @@ final class ProcessMemberServiceTest extends DatabaseSetup {
         final ProcessMemberResponse response = service.perform(request);
 
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
-        assertEquals("The new Member '" + account + "' was successfully added to CWS.", response.getReturnMessage());
+        assertEquals("The Member '" + account + "' was successfully added to CWS.", response.getReturnMessage());
     }
 
     @Test
@@ -86,7 +86,7 @@ final class ProcessMemberServiceTest extends DatabaseSetup {
         final ProcessMemberResponse response = service.perform(request);
 
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
-        assertEquals("The new Member '" + account + "' was successfully added to CWS.", response.getReturnMessage());
+        assertEquals("The Member '" + account + "' was successfully added to CWS.", response.getReturnMessage());
     }
 
     @Test
@@ -101,7 +101,7 @@ final class ProcessMemberServiceTest extends DatabaseSetup {
         final ProcessMemberResponse response = service.perform(request);
 
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
-        assertEquals("The new Member '" + account + "' was successfully added to CWS.", response.getReturnMessage());
+        assertEquals("The Member '" + account + "' was successfully added to CWS.", response.getReturnMessage());
     }
 
     @Test
@@ -129,7 +129,7 @@ final class ProcessMemberServiceTest extends DatabaseSetup {
         request.setNewCredential(crypto.stringToBytes(account));
         final ProcessMemberResponse response = service.perform(request);
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
-        assertEquals("The new Member '" + account + "' was successfully added to CWS.", response.getReturnMessage());
+        assertEquals("The Member '" + account + "' was successfully added to CWS.", response.getReturnMessage());
 
         final ProcessMemberRequest updateRequest = prepareRequest(ProcessMemberRequest.class, account);
         updateRequest.setAction(Action.UPDATE);

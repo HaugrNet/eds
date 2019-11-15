@@ -136,7 +136,7 @@ final class SoapClientTest {
         final ProcessMemberResponse response = soapManagement.processMember(request);
         assertNotNull(response);
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
-        assertEquals("The new Member '" + accountName + "' was successfully added to CWS.", response.getReturnMessage());
+        assertEquals("The Member '" + accountName + "' was successfully added to CWS.", response.getReturnMessage());
     }
 
     @Test

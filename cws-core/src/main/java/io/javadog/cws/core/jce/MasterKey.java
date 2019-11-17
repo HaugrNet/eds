@@ -100,6 +100,13 @@ public final class MasterKey {
     public static byte[] readMasterKeySecretFromUrl(final String masterKeyUrl) {
         try {
             final URL url = new URL(masterKeyUrl);
+            // Note, that the following line is raised as a security issue by
+            // SonarQube. Normally, the rule is correct, but only if the
+            // information read is also returned. In this case, the content
+            // is simply used to read a series of controlled bytes, which
+            // again is used to generate the Symmetric Key later referred
+            // to as the MasterKey. Thus the rule is ignored at this place.
+            // See: http://localhost:9000/coding_rules?open=findsecbugs%3AURLCONNECTION_SSRF_FD&rule_key=findsecbugs%3AURLCONNECTION_SSRF_FD
             final URLConnection connection = url.openConnection();
             return readContent(connection);
         } catch (IOException e) {
@@ -124,9 +131,18 @@ public final class MasterKey {
         }
     }
 
+    public static char[] generateSecretChars(final byte[] secret) {
+        final char[] chars = new char[secret.length];
+        for (int i = 0; i < secret.length; i++) {
+            chars[i] = (char) secret[i];
+        }
+
+        return chars;
+    }
+
     public SecretCWSKey generateMasterKey(final byte[] secret) {
         try {
-            final char[] secretChars = Crypto.generateSecretChars(secret);
+            final char[] secretChars = generateSecretChars(secret);
 
             final String salt = settings.getSalt();
             final byte[] secretSalt = salt.getBytes(CHARSET);

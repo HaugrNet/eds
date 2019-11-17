@@ -134,7 +134,7 @@ public final class Crypto {
      * @return Extended secret as char array
      */
     private char[] convertSecret(final byte[] secret) {
-        final char[] secretChars = generateSecretChars(secret);
+        final char[] secretChars = MasterKey.generateSecretChars(secret);
 
         final char[] salt = settings.getSalt().toCharArray();
         final char[] chars = new char[secretChars.length + salt.length];
@@ -257,15 +257,6 @@ public final class Crypto {
         } catch (ClassCastException | BadPaddingException | IllegalBlockSizeException | NoSuchPaddingException | NoSuchAlgorithmException | InvalidAlgorithmParameterException | InvalidKeyException e) {
             throw new CryptoException(e.getMessage(), e);
         }
-    }
-
-    public static char[] generateSecretChars(final byte[] secret) {
-        final char[] chars = new char[secret.length];
-        for (int i = 0; i < secret.length; i++) {
-            chars[i] = (char) secret[i];
-        }
-
-        return chars;
     }
 
     private static Cipher prepareCipher(final CWSKey<?> key, final int type) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException {

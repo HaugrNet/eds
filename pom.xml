@@ -134,11 +134,6 @@
                 <artifactId>javaee-api</artifactId>
                 <version>${version.dependency.javaee}</version>
             </dependency>
-            <dependency>
-                <groupId>org.primefaces</groupId>
-                <artifactId>primefaces</artifactId>
-                <version>${version.dependency.primeface}</version>
-            </dependency>
 
             <!-- Following is required to build & run the REST Client -->
             <dependency>

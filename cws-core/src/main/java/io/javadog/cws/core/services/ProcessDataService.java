@@ -110,7 +110,7 @@ public final class ProcessDataService extends Serviceable<DataDao, ProcessDataRe
         } else {
             final MetadataEntity metadataEntity = createMetadata(trustee, request.getDataName(), parent.getId(), type);
             encryptAndSaveData(trustee, metadataEntity, null, bytes);
-            response = buildProcessDataResponse(metadataEntity.getExternalId(), "The Data Object '" + request.getDataName() + "' was successfully added to the Circle '" + trustee.getCircle().getName() + "'.");
+            response = buildProcessDataResponse(metadataEntity.getExternalId(), theDataObject(metadataEntity) + " was successfully added to the Circle '" + trustee.getCircle().getName() + "'.");
         }
 
         return response;
@@ -132,7 +132,7 @@ public final class ProcessDataService extends Serviceable<DataDao, ProcessDataRe
         entity.setParentId(folderId);
         dao.persist(entity);
 
-        return buildProcessDataResponse(entity.getExternalId(), "The Data Object '" + entity.getName() + "' was successfully updated.");
+        return buildProcessDataResponse(entity.getExternalId(), theDataObject(entity) + " was successfully updated.");
     }
 
     private ProcessDataResponse processCopyData(final ProcessDataRequest request) {
@@ -140,7 +140,7 @@ public final class ProcessDataService extends Serviceable<DataDao, ProcessDataRe
         final MetadataEntity metadataEntity = findMetadataEntity(request.getDataId());
         final String externalDataId = copyDataToTargetCircle(targetTrustee, metadataEntity, request);
 
-        return buildProcessDataResponse(externalDataId, "The Data Object '" + metadataEntity.getName() + "' was successfully copied from '" + metadataEntity.getCircle().getName() + "' to '" + targetTrustee.getCircle().getName() + "'.");
+        return buildProcessDataResponse(externalDataId, theDataObject(metadataEntity) + " was successfully copied from '" + metadataEntity.getCircle().getName() + "' to '" + targetTrustee.getCircle().getName() + "'.");
     }
 
     private ProcessDataResponse processMoveData(final ProcessDataRequest request) {
@@ -149,7 +149,7 @@ public final class ProcessDataService extends Serviceable<DataDao, ProcessDataRe
         final String externalDataId = copyDataToTargetCircle(targetTrustee, metadataEntity, request);
         dao.delete(metadataEntity);
 
-        return buildProcessDataResponse(externalDataId, "The Data Object '" + metadataEntity.getName() + "' was successfully moved from '" + metadataEntity.getCircle().getName() + "' to '" + targetTrustee.getCircle().getName() + "'.");
+        return buildProcessDataResponse(externalDataId, theDataObject(metadataEntity) + " was successfully moved from '" + metadataEntity.getCircle().getName() + "' to '" + targetTrustee.getCircle().getName() + "'.");
     }
 
     private static ProcessDataResponse buildProcessDataResponse(final String externalDataId, final String returnMessage) {
@@ -163,7 +163,7 @@ public final class ProcessDataService extends Serviceable<DataDao, ProcessDataRe
         final MetadataEntity entity = dao.findMetaDataByMemberAndExternalId(member.getId(), request.getDataId());
 
         if (entity == null) {
-            throw new CWSException(ReturnCode.IDENTIFICATION_WARNING, "The requested Data Object could not be found.");
+            throw new CWSException(ReturnCode.IDENTIFICATION_WARNING, "The Data Object could not be found.");
         }
 
         // Now, check if the member account is allowed to perform the requested
@@ -181,12 +181,12 @@ public final class ProcessDataService extends Serviceable<DataDao, ProcessDataRe
             // currently has content, if so - then we cannot delete it.
             final long count = dao.countFolderContent(entity.getId());
             if (count > 0) {
-                throw new CWSException(ReturnCode.INTEGRITY_WARNING, "The requested Folder cannot be removed as it is not empty.");
+                throw new CWSException(ReturnCode.INTEGRITY_WARNING, "The Folder cannot be removed as it is not empty.");
             }
         }
 
         dao.delete(entity);
-        return new ProcessDataResponse("The requested Data Object '" + entity.getName() + "' has been removed from the Circle '" + entity.getCircle().getName() + "'.");
+        return new ProcessDataResponse(theDataObject(entity) + " has been removed from the Circle '" + entity.getCircle().getName() + "'.");
     }
 
     private TrusteeEntity findTargetTrustee(final String externalCircleId) {
@@ -366,5 +366,16 @@ public final class ProcessDataService extends Serviceable<DataDao, ProcessDataRe
         }
 
         return theName;
+    }
+
+    /**
+     * <p>Wrapper method to ensure that the data object is always presented the
+     * same way. The method simply returns the Data Object + data name.</p>
+     *
+     * @param metadata Metadata Entity to read the name from
+     * @return String starting with 'the Data Object' and then the data name quoted
+     */
+    private static String theDataObject(final MetadataEntity metadata) {
+        return "The Data Object '" + metadata.getName() + "'";
     }
 }

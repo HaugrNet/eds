@@ -164,7 +164,7 @@ public final class ProcessCircleService extends Serviceable<CommonDao, ProcessCi
         trustee.setCircleKey(circleKey);
         dao.persist(trustee);
 
-        final ProcessCircleResponse response = new ProcessCircleResponse("The Circle '" + circle.getName() + "' was successfully created.");
+        final ProcessCircleResponse response = new ProcessCircleResponse(theCircle(circle) + " was successfully created.");
         response.setCircleId(circle.getExternalId());
 
         return response;
@@ -203,7 +203,7 @@ public final class ProcessCircleService extends Serviceable<CommonDao, ProcessCi
         checkAndUpdateCircleName(entity, request.getCircleName());
         dao.persist(entity);
 
-        return new ProcessCircleResponse("The Circle '" + entity.getName() + "' was successfully updated.");
+        return new ProcessCircleResponse(theCircle(entity) + " was successfully updated.");
     }
 
     private byte[] updateExternalCircleKey(final String externalKey) {
@@ -247,12 +247,23 @@ public final class ProcessCircleService extends Serviceable<CommonDao, ProcessCi
         throwIdentificationWarningIfNoCircle(entity);
         dao.delete(entity);
 
-        return new ProcessCircleResponse("The Circle '" + entity.getName() + "' has successfully been removed from CWS.");
+        return new ProcessCircleResponse(theCircle(entity) + " has successfully been removed from CWS.");
     }
 
     private static void throwIdentificationWarningIfNoCircle(final Object obj) {
         if (obj == null) {
             throw new CWSException(ReturnCode.IDENTIFICATION_WARNING, "No Circle could be found with the given Id.");
         }
+    }
+
+    /**
+     * <p>Wrapper method to ensure that the circle is always presented the
+     * same way. The method simply returns the Circle + circle name.</p>
+     *
+     * @param circle Circle Entity to read the name from
+     * @return String starting with 'the Circle' and then the circle name quoted
+     */
+    private static String theCircle(final CircleEntity circle) {
+        return "The Circle '" + circle.getName() + '\'';
     }
 }

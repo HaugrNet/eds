@@ -368,7 +368,7 @@ final class DataServiceTest extends DatabaseSetup {
 
         final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
         assertEquals(ReturnCode.IDENTIFICATION_WARNING, cause.getReturnCode());
-        assertEquals("The requested Data Object could not be found.", cause.getMessage());
+        assertEquals("The Data Object could not be found.", cause.getMessage());
     }
 
     @Test
@@ -383,7 +383,7 @@ final class DataServiceTest extends DatabaseSetup {
         final ProcessDataRequest deleteRequest = prepareDeleteRequest(MEMBER_1, saveResponse.getDataId());
         final ProcessDataResponse deleteResponse = service.perform(deleteRequest);
         assertEquals(ReturnCode.SUCCESS.getCode(), deleteResponse.getReturnCode());
-        assertEquals("The requested Data Object '" + name + "' has been removed from the Circle '" + CIRCLE_1 + "'.", deleteResponse.getReturnMessage());
+        assertEquals("The Data Object '" + name + "' has been removed from the Circle '" + CIRCLE_1 + "'.", deleteResponse.getReturnMessage());
     }
 
     @Test
@@ -413,7 +413,7 @@ final class DataServiceTest extends DatabaseSetup {
         final ProcessDataRequest deleteRequest = prepareDeleteRequest(MEMBER_4, saveResponse.getDataId());
         final CWSException cause = assertThrows(CWSException.class, () -> service.perform(deleteRequest));
         assertEquals(ReturnCode.IDENTIFICATION_WARNING, cause.getReturnCode());
-        assertEquals("The requested Data Object could not be found.", cause.getMessage());
+        assertEquals("The Data Object could not be found.", cause.getMessage());
     }
 
     @Test
@@ -423,7 +423,7 @@ final class DataServiceTest extends DatabaseSetup {
 
         final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
         assertEquals(ReturnCode.IDENTIFICATION_WARNING, cause.getReturnCode());
-        assertEquals("The requested Data Object could not be found.", cause.getMessage());
+        assertEquals("The Data Object could not be found.", cause.getMessage());
     }
 
     @Test
@@ -448,7 +448,7 @@ final class DataServiceTest extends DatabaseSetup {
         final ProcessDataRequest deleteRequest = prepareDeleteRequest(MEMBER_1, addResponse.getDataId());
         final ProcessDataResponse deleteResponse = service.perform(deleteRequest);
         assertEquals(ReturnCode.SUCCESS.getCode(), deleteResponse.getReturnCode());
-        assertEquals("The requested Data Object '" + newFolderName + "' has been removed from the Circle '" + CIRCLE_1 + "'.", deleteResponse.getReturnMessage());
+        assertEquals("The Data Object '" + newFolderName + "' has been removed from the Circle '" + CIRCLE_1 + "'.", deleteResponse.getReturnMessage());
         assertNull(deleteResponse.getDataId());
     }
 
@@ -677,7 +677,7 @@ final class DataServiceTest extends DatabaseSetup {
 
         final CWSException cause = assertThrows(CWSException.class, () -> dataService.perform(deleteFolderRequest));
         assertEquals(ReturnCode.INTEGRITY_WARNING, cause.getReturnCode());
-        assertEquals("The requested Folder cannot be removed as it is not empty.", cause.getMessage());
+        assertEquals("The Folder cannot be removed as it is not empty.", cause.getMessage());
     }
 
     @Test

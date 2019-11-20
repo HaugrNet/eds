@@ -18,7 +18,6 @@ package io.javadog.cws.core;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.javadog.cws.api.common.ReturnCode;
@@ -55,19 +54,20 @@ final class SanitizerBeanTest extends DatabaseSetup {
         prepareInvalidData();
         prepareStartupBean("true");
 
-        final List<Long> list = prepareSanitizeBean().findNextBatch(100);
-        assertNotNull(list);
+        assertTrue(prepareSanitizeBean().findNextBatch(100).isEmpty());
+    }
 
-        // Note; During the release of version 1.1, this test suddenly started
-        // failing. From debugging, the question was more why id didn't fail
-        // earlier as there was suppose to be invalid data in the DB.
-        // See https://github.com/JavaDogs/cws/issues/58
-        // assertFalse(list.isEmpty())
+    @Test
+    void testStartupBeanWithoutSanitizeCheck() {
+        prepareInvalidData();
+        prepareStartupBean("false");
+
+        assertEquals(6, prepareSanitizeBean().findNextBatch(100).size());
     }
 
     @Test
     void testStartupBeanWithEmptyVersionTable() {
-        final Query query = entityManager.createNativeQuery("delete from cws_versions v where v.id > 0");
+        final Query query = entityManager.createNativeQuery("delete from cws_versions where id > 0");
         query.executeUpdate();
 
         final StartupBean bean = prepareStartupBean("true");
@@ -81,14 +81,6 @@ final class SanitizerBeanTest extends DatabaseSetup {
 
         final StartupBean bean = prepareStartupBean("true");
         assertFalse(getBeanSettings(bean).isReady());
-    }
-
-    @Test
-    void testStartupBeanWithoutSanitizeCheck() {
-        prepareInvalidData();
-        prepareStartupBean("false");
-
-        assertFalse(prepareSanitizeBean().findNextBatch(100).isEmpty());
     }
 
     @Test

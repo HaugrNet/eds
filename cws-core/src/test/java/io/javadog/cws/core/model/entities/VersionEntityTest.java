@@ -37,22 +37,17 @@ final class VersionEntityTest extends DatabaseSetup {
     void testEntity() {
         final Query query = entityManager.createNamedQuery("version.findAll");
         final List<VersionEntity> found = CommonDao.findList(query);
-        assertEquals(3, found.size());
-        assertEquals(Long.valueOf(3L), found.get(0).getId());
-        assertEquals("1.2.0", found.get(0).getCwsVersion());
+        assertEquals(2, found.size());
+        assertEquals(Long.valueOf(2L), found.get(0).getId());
+        assertEquals("1.1.0", found.get(0).getCwsVersion());
         assertEquals("H2", found.get(0).getDbVendor());
-        assertEquals(Integer.valueOf(3), found.get(0).getSchemaVersion());
+        assertEquals(Integer.valueOf(2), found.get(0).getSchemaVersion());
         assertNotNull(found.get(0).getInstalled());
-        assertEquals(Long.valueOf(2L), found.get(1).getId());
-        assertEquals("1.1.0", found.get(1).getCwsVersion());
+        assertEquals(Long.valueOf(1L), found.get(1).getId());
+        assertEquals("1.0.0", found.get(1).getCwsVersion());
         assertEquals("H2", found.get(1).getDbVendor());
-        assertEquals(Integer.valueOf(2), found.get(1).getSchemaVersion());
+        assertEquals(Integer.valueOf(1), found.get(1).getSchemaVersion());
         assertNotNull(found.get(1).getInstalled());
-        assertEquals(Long.valueOf(1L), found.get(2).getId());
-        assertEquals("1.0.0", found.get(2).getCwsVersion());
-        assertEquals("H2", found.get(2).getDbVendor());
-        assertEquals(Integer.valueOf(1), found.get(2).getSchemaVersion());
-        assertNotNull(found.get(2).getInstalled());
 
         // Now adding a new Entity, this must fail.
         final VersionEntity entity = new VersionEntity();

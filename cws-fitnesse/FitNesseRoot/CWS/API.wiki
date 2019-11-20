@@ -75,7 +75,7 @@ the only CWS request not requiring any credentials to invoke.
 
 |version                                  |
 |return code?|return message?|cws version?|
-|${SUCCESS}  |Ok             |1.2-SNAPSHOT       |
+|${SUCCESS}  |Ok             |1.1.2       |
 *!
 
 !* !-MasterKey-!
@@ -111,11 +111,11 @@ It should be noted, that unlocking can always be done, but changing the !-Master
 it is not possible for an administrator to update the member keys.
 
 !*> Create Test accounts
-|process member                                                                                                                                                                               |
-|account name|credential|credential type|action|member id|public key|new account name|new credential|member role|member id?|return code?|return message?                                      |
-|admin       |admin     |PASSPHRASE     |CREATE|null     |null      |user1           |password1     |STANDARD   |user1_id  |${SUCCESS}  |The new Member 'user1' was successfully added to CWS.|
-|admin       |admin     |PASSPHRASE     |CREATE|null     |null      |user2           |password2     |STANDARD   |user2_id  |${SUCCESS}  |The new Member 'user2' was successfully added to CWS.|
-|admin       |admin     |PASSPHRASE     |CREATE|null     |null      |user3           |password3     |STANDARD   |user3_id  |${SUCCESS}  |The new Member 'user3' was successfully added to CWS.|
+|process member                                                                                                                                                                           |
+|account name|credential|credential type|action|member id|public key|new account name|new credential|member role|member id?|return code?|return message?                                  |
+|admin       |admin     |PASSPHRASE     |CREATE|null     |null      |user1           |password1     |STANDARD   |user1_id  |${SUCCESS}  |The Member 'user1' was successfully added to CWS.|
+|admin       |admin     |PASSPHRASE     |CREATE|null     |null      |user2           |password2     |STANDARD   |user2_id  |${SUCCESS}  |The Member 'user2' was successfully added to CWS.|
+|admin       |admin     |PASSPHRASE     |CREATE|null     |null      |user3           |password3     |STANDARD   |user3_id  |${SUCCESS}  |The Member 'user3' was successfully added to CWS.|
 
 *!
 
@@ -328,8 +328,8 @@ using the Session!
 
 |process member                                                                                                                                                                                                                                                        |
 |account name|credential       |credential type|action    |member id |public key|new account name|new credential|member role|member id?|signature?       |return code?             |return message?                                                                    |
-|admin       |admin            |PASSPHRASE     |CREATE    |null      |null      |admin2          |password2     |ADMIN      |admin2_id |null             |${SUCCESS}               |The new Member 'admin2' was successfully added to CWS.                             |
-|admin       |admin            |PASSPHRASE     |CREATE    |null      |null      |member1         |password1     |STANDARD   |member1_id|null             |${SUCCESS}               |The new Member 'member1' was successfully added to CWS.                            |
+|admin       |admin            |PASSPHRASE     |CREATE    |null      |null      |admin2          |password2     |ADMIN      |admin2_id |null             |${SUCCESS}               |The Member 'admin2' was successfully added to CWS.                                 |
+|admin       |admin            |PASSPHRASE     |CREATE    |null      |null      |member1         |password1     |STANDARD   |member1_id|null             |${SUCCESS}               |The Member 'member1' was successfully added to CWS.                                |
 |member1     |password1        |null           |UPDATE    |null      |null      |null            |null          |null       |null      |null             |${SUCCESS}               |The Member 'member1' was successfully updated.                                     |
 |member1     |password1        |null           |LOGIN     |null      |null      |null            |session_key   |null       |null      |null             |${SUCCESS}               |The Member 'member1' has successfully logged in.                                   |
 |null        |session_key      |null           |UPDATE    |null      |null      |null            |new_session   |null       |null      |null             |${VERIFICATION_WARNING}  |It is only permitted to update the credentials when authenticating with Passphrase.|
@@ -519,21 +519,21 @@ There are 3 kinds of actions / requests which can be made for data Types
    * SOAP: fetchData
    * REST (POST) request is: ${REST_ROOT}/api/data/fetchData
 
-|process data                                                                                                                                                                                                                         |
-|account name|credential|action|circle id |data id  |data name|type name     |target folder id|target circle id|data               |return code?        |return message?                                                              |
-|user1       |password1 |ADD   |circle1_id|null     |data1    |folder        |null            |null            |null               |${SUCCESS}          |The Folder 'data1' was successfully added to the Circle 'circle1'.           |
-|user1       |password1 |ADD   |circle1_id|null     |data2    |data          |null            |null            |First Data Object  |${SUCCESS}          |The Data Object 'data2' was successfully added to the Circle 'circle1'.      |
-|user1       |password1 |ADD   |circle2_id|null     |data3    |Awesome Object|null            |null            |Second Data Object |${INTEGRITY_WARNING}|Cannot find a matching !-DataType-! for the Object.                          |
-|user1       |password1 |DELETE|null      |data1_id |null     |null          |null            |null            |null               |${SUCCESS}          |The requested Data Object 'data1' has been removed from the Circle 'circle1'.|
-|user1       |password1 |ADD   |circle1_id|null     |data4    |data          |null            |null            |Another Data Object|${SUCCESS}          |The Data Object 'data4' was successfully added to the Circle 'circle1'.      |
-|user1       |password1 |ADD   |circle1_id|null     |data5    |data          |null            |null            |More Data          |${SUCCESS}          |The Data Object 'data5' was successfully added to the Circle 'circle1'.      |
-|user1       |password1 |ADD   |circle2_id|null     |status   |null          |null            |null            |initial            |${SUCCESS}          |The Data Object 'status' was successfully added to the Circle 'circle2'.     |
-|user1       |password1 |UPDATE|circle2_id|status_id|null     |null          |null            |null            |updated content    |${SUCCESS}          |The Data Object 'status' was successfully updated.                           |
-|user1       |password1 |ADD   |circle2_id|null     |data6    |null          |null            |null            |some more data     |${SUCCESS}          |The Data Object 'data6' was successfully added to the Circle 'circle2'.      |
-|user1       |password1 |COPY  |circle2_id|data6_id |copied   |null          |null            |circle1_id      |null               |${SUCCESS}          |The Data Object 'data6' was successfully copied from 'circle2' to 'circle1'. |
-|user1       |password1 |MOVE  |circle2_id|data6_id |moved    |null          |null            |circle1_id      |null               |${SUCCESS}          |The Data Object 'data6' was successfully moved from 'circle2' to 'circle1'.  |
-|user1       |password1 |UPDATE|circle1_id|copied_id|copied   |null          |null            |null            |null               |${SUCCESS}          |The Data Object 'copied' was successfully updated.                           |
-|user1       |password1 |UPDATE|circle1_id|moved_id |moved    |null          |null            |null            |null               |${SUCCESS}          |The Data Object 'moved' was successfully updated.                            |
+|process data                                                                                                                                                                                                                        |
+|account name|credential|action|circle id |data id  |data name|type name     |target folder id|target circle id|data               |return code?        |return message?                                                             |
+|user1       |password1 |ADD   |circle1_id|null     |data1    |folder        |null            |null            |null               |${SUCCESS}          |The Folder 'data1' was successfully added to the Circle 'circle1'.          |
+|user1       |password1 |ADD   |circle1_id|null     |data2    |data          |null            |null            |First Data Object  |${SUCCESS}          |The Data Object 'data2' was successfully added to the Circle 'circle1'.     |
+|user1       |password1 |ADD   |circle2_id|null     |data3    |Awesome Object|null            |null            |Second Data Object |${INTEGRITY_WARNING}|Cannot find a matching !-DataType-! for the Object.                         |
+|user1       |password1 |DELETE|null      |data1_id |null     |null          |null            |null            |null               |${SUCCESS}          |The Data Object 'data1' has been removed from the Circle 'circle1'.         |
+|user1       |password1 |ADD   |circle1_id|null     |data4    |data          |null            |null            |Another Data Object|${SUCCESS}          |The Data Object 'data4' was successfully added to the Circle 'circle1'.     |
+|user1       |password1 |ADD   |circle1_id|null     |data5    |data          |null            |null            |More Data          |${SUCCESS}          |The Data Object 'data5' was successfully added to the Circle 'circle1'.     |
+|user1       |password1 |ADD   |circle2_id|null     |status   |null          |null            |null            |initial            |${SUCCESS}          |The Data Object 'status' was successfully added to the Circle 'circle2'.    |
+|user1       |password1 |UPDATE|circle2_id|status_id|null     |null          |null            |null            |updated content    |${SUCCESS}          |The Data Object 'status' was successfully updated.                          |
+|user1       |password1 |ADD   |circle2_id|null     |data6    |null          |null            |null            |some more data     |${SUCCESS}          |The Data Object 'data6' was successfully added to the Circle 'circle2'.     |
+|user1       |password1 |COPY  |circle2_id|data6_id |copied   |null          |null            |circle1_id      |null               |${SUCCESS}          |The Data Object 'data6' was successfully copied from 'circle2' to 'circle1'.|
+|user1       |password1 |MOVE  |circle2_id|data6_id |moved    |null          |null            |circle1_id      |null               |${SUCCESS}          |The Data Object 'data6' was successfully moved from 'circle2' to 'circle1'. |
+|user1       |password1 |UPDATE|circle1_id|copied_id|copied   |null          |null            |null            |null               |${SUCCESS}          |The Data Object 'copied' was successfully updated.                          |
+|user1       |password1 |UPDATE|circle1_id|moved_id |moved    |null          |null            |null            |null               |${SUCCESS}          |The Data Object 'moved' was successfully updated.                           |
 
 |fetch data                                                                                                                                                                                   |
 |account name|credential|circle id |data id  |page number|page size|records?|folder id?     |data id?             |data name?     |type name?  |data?            |return code?|return message?|

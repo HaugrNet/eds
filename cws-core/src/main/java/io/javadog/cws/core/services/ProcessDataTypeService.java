@@ -104,7 +104,7 @@ public final class ProcessDataTypeService extends Serviceable<CommonDao, Process
         objectType.setTypeName(name);
         objectType.setType(type);
 
-        final ProcessDataTypeResponse response = new ProcessDataTypeResponse("The Data Type '" + entity.getName() + "' was successfully processed.");
+        final ProcessDataTypeResponse response = new ProcessDataTypeResponse(theDataType(entity) + " was successfully processed.");
         response.setDataType(objectType);
 
         return response;
@@ -120,15 +120,26 @@ public final class ProcessDataTypeService extends Serviceable<CommonDao, Process
             // then it is not allowed to remove it.
             final long records = dao.countDataTypeUsage(entity);
             if (records > 0) {
-                throw new CWSException(ReturnCode.ILLEGAL_ACTION, "The Data Type '" + name + "' cannot be deleted, as it is being actively used.");
+                throw new CWSException(ReturnCode.ILLEGAL_ACTION, theDataType(entity) + " cannot be deleted, as it is being actively used.");
             } else {
                 dao.delete(entity);
-                response = new ProcessDataTypeResponse("The Data Type '" + entity.getName() + "' was successfully deleted.");
+                response = new ProcessDataTypeResponse(theDataType(entity) + " was successfully deleted.");
             }
         } else {
             response = new ProcessDataTypeResponse(ReturnCode.IDENTIFICATION_WARNING, "No records were found with the name '" + name + "'.");
         }
 
         return response;
+    }
+
+    /**
+     * <p>Wrapper method to ensure that the data type is always presented the
+     * same way. The method simply returns the Data Type + type name.</p>
+     *
+     * @param dataType DataType Entity to read the name from
+     * @return String starting with 'the Data Type' and then the type name quoted
+     */
+    private static String theDataType(final DataTypeEntity dataType) {
+        return "The Data Type '" + dataType.getName() + "'";
     }
 }

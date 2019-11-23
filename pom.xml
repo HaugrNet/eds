@@ -46,7 +46,9 @@
     </modules>
 
     <scm>
+        <url>scm:git:https://github.com/JavaDogs/cws.git</url>
         <connection>scm:git:https://github.com/JavaDogs/cws.git</connection>
+        <developerConnection>scm:git:https://github.com/JavaDogs/cws.git</developerConnection>
     </scm>
 
     <distributionManagement>

@@ -51,16 +51,18 @@ final class SanitizerBeanTest extends DatabaseSetup {
 
     @Test
     void testStartupBeanWithSanitizeCheck() {
+        final String runSanitizeAtStartup = "true";
         prepareInvalidData();
-        prepareStartupBean("true");
+        prepareStartupBean(runSanitizeAtStartup);
 
         assertTrue(prepareSanitizeBean().findNextBatch(100).isEmpty());
     }
 
     @Test
     void testStartupBeanWithoutSanitizeCheck() {
+        final String runSanitizeAtStartup = "false";
         prepareInvalidData();
-        prepareStartupBean("false");
+        prepareStartupBean(runSanitizeAtStartup);
 
         assertEquals(6, prepareSanitizeBean().findNextBatch(100).size());
     }

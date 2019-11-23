@@ -146,7 +146,7 @@ final class RestClientTest {
         final ProcessMemberResponse response = restManagement.processMember(request);
         assertNotNull(response);
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
-        assertEquals("The new Member '" + accountName + "' was successfully added to CWS.", response.getReturnMessage());
+        assertEquals("The Member '" + accountName + "' was successfully added to CWS.", response.getReturnMessage());
     }
 
     @Test

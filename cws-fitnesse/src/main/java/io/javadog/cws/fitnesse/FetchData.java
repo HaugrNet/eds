@@ -35,6 +35,7 @@ public final class FetchData extends CwsRequest<FetchDataResponse> {
 
     private String circleId = null;
     private String dataId = null;
+    private String dataName = null;
     private int pageNumber = 1;
     private int pageSize = 1;
     private final List<Metadata> metadata = new ArrayList<>();
@@ -49,6 +50,10 @@ public final class FetchData extends CwsRequest<FetchDataResponse> {
 
     public void setDataId(final String dataId) {
         this.dataId = getId(Converter.preCheck(dataId));
+    }
+
+    public void setDataName(final String dataName) {
+        this.dataName = Converter.preCheck(dataName);
     }
 
     public void setPageNumber(final String pageNumber) {
@@ -70,7 +75,7 @@ public final class FetchData extends CwsRequest<FetchDataResponse> {
     public String dataId() {
         final String id;
 
-        if (dataId == null) {
+        if ((dataId == null) && (dataName == null)) {
             final List<String> ids = new ArrayList<>(metadata.size());
             for (final Metadata current : metadata) {
                 ids.add(getKey(current.getDataId()));
@@ -105,7 +110,7 @@ public final class FetchData extends CwsRequest<FetchDataResponse> {
     public String dataName() {
         final String name;
 
-        if (dataId == null) {
+        if ((dataId == null) && (dataName == null)) {
             final List<String> names = new ArrayList<>(metadata.size());
             for (final Metadata current : metadata) {
                 names.add(current.getDataName());
@@ -121,7 +126,7 @@ public final class FetchData extends CwsRequest<FetchDataResponse> {
     public String typeName() {
         final String type;
 
-        if (dataId == null) {
+        if ((dataId == null) && (dataName == null)) {
             final List<String> types = new ArrayList<>(metadata.size());
             for (final Metadata current : metadata) {
                 types.add(current.getTypeName());
@@ -166,6 +171,7 @@ public final class FetchData extends CwsRequest<FetchDataResponse> {
         final FetchDataRequest request = prepareRequest(FetchDataRequest.class);
         request.setCircleId(circleId);
         request.setDataId(dataId);
+        request.setDataName(dataName);
         request.setPageNumber(pageNumber);
         request.setPageSize(pageSize);
 

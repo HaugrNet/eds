@@ -165,6 +165,7 @@ public final class ShareSoapClient implements Share {
             Mapper.fillAuthentication(ws, request);
             ws.setCircleId(request.getCircleId());
             ws.setDataId(request.getDataId());
+            ws.setDataName(request.getDataName());
             ws.setPageNumber(request.getPageNumber());
             ws.setPageSize(request.getPageSize());
 

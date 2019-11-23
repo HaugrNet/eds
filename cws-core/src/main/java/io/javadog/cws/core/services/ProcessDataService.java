@@ -160,7 +160,7 @@ public final class ProcessDataService extends Serviceable<DataDao, ProcessDataRe
     }
 
     private MetadataEntity findMetadataAndTrustee(final ProcessDataRequest request) {
-        final MetadataEntity entity = dao.findMetaDataByMemberAndExternalId(member.getId(), request.getDataId());
+        final MetadataEntity entity = dao.findMetadataByMemberAndExternalId(member.getId(), request.getDataId());
 
         if (entity == null) {
             throw new CWSException(ReturnCode.IDENTIFICATION_WARNING, "The Data Object could not be found.");
@@ -205,7 +205,7 @@ public final class ProcessDataService extends Serviceable<DataDao, ProcessDataRe
     }
 
     private MetadataEntity findMetadataEntity(final String externalDataId) {
-        final MetadataEntity entity = dao.findMetaDataByMemberAndExternalId(member.getId(), externalDataId);
+        final MetadataEntity entity = dao.findMetadataByMemberAndExternalId(member.getId(), externalDataId);
         if (entity == null) {
             throw new CWSException(ReturnCode.IDENTIFICATION_WARNING, "No data could be found for the given Data Id '" + externalDataId + "'.");
         }
@@ -281,7 +281,7 @@ public final class ProcessDataService extends Serviceable<DataDao, ProcessDataRe
         final MetadataEntity entity;
 
         if (folderId != null) {
-            entity = dao.findMetaDataByMemberAndExternalId(member.getId(), folderId);
+            entity = dao.findMetadataByMemberAndExternalId(member.getId(), folderId);
             if ((entity == null) || !Objects.equals(Constants.FOLDER_TYPENAME, entity.getType().getName())) {
                 throw new CWSException(ReturnCode.IDENTIFICATION_WARNING, "Provided FolderId '" + folderId + "' is not a folder.");
             }
@@ -339,7 +339,7 @@ public final class ProcessDataService extends Serviceable<DataDao, ProcessDataRe
     private MetadataEntity checkFolder(final MetadataEntity entity, final String folderId) {
         final MetadataEntity folder;
 
-        folder = dao.findMetaDataByMemberAndExternalId(member.getId(), folderId);
+        folder = dao.findMetadataByMemberAndExternalId(member.getId(), folderId);
         if (folder != null) {
             final Long currentCircleId = entity.getCircle().getId();
             final Long foundCircleId = folder.getCircle().getId();

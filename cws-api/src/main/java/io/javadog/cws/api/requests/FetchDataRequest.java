@@ -39,7 +39,7 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "fetchDataRequest")
-@XmlType(name = "fetchDataRequest", propOrder = { Constants.FIELD_CIRCLE_ID, Constants.FIELD_DATA_ID, Constants.FIELD_PAGE_NUMBER, Constants.FIELD_PAGE_SIZE })
+@XmlType(name = "fetchDataRequest", propOrder = { Constants.FIELD_CIRCLE_ID, Constants.FIELD_DATA_ID, Constants.FIELD_DATA_NAME, Constants.FIELD_PAGE_NUMBER, Constants.FIELD_PAGE_SIZE })
 public final class FetchDataRequest extends Authentication implements CircleIdRequest {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
@@ -50,6 +50,9 @@ public final class FetchDataRequest extends Authentication implements CircleIdRe
 
     @XmlElement(name = Constants.FIELD_DATA_ID)
     private String dataId = null;
+
+    @XmlElement(name = Constants.FIELD_DATA_NAME)
+    private String dataName = null;
 
     @XmlElement(name = Constants.FIELD_PAGE_NUMBER)
     private Integer pageNumber = 1;
@@ -85,6 +88,14 @@ public final class FetchDataRequest extends Authentication implements CircleIdRe
         return dataId;
     }
 
+    public void setDataName(final String dataName) {
+        this.dataName = dataName;
+    }
+
+    public String getDataName() {
+        return dataName;
+    }
+
     public void setPageNumber(final int pageNumber) {
         this.pageNumber = pageNumber;
     }
@@ -112,8 +123,8 @@ public final class FetchDataRequest extends Authentication implements CircleIdRe
     public Map<String, String> validate() {
         final Map<String, String> errors = super.validate();
 
-        if ((circleId == null) && (dataId == null)) {
-            errors.put(Constants.FIELD_IDS, "Either a Circle or Data Id must be provided.");
+        if ((circleId == null) && (dataId == null) && (dataName == null)) {
+            errors.put(Constants.FIELD_IDS, "Either a Circle Id, Data Id, or Data Name must be provided.");
         }
 
         checkValidId(errors, Constants.FIELD_CIRCLE_ID, circleId, "The Circle Id is invalid.");

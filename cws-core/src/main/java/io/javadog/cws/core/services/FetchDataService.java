@@ -101,10 +101,13 @@ public final class FetchDataService extends Serviceable<DataDao, FetchDataRespon
     private MetadataEntity findRootMetadata(final FetchDataRequest request) {
         final String circleId = request.getCircleId();
         final String dataId = request.getDataId();
+        final String dataName = request.getDataName();
         final MetadataEntity found;
 
         if (dataId != null) {
-            found = dao.findMetaDataByMemberAndExternalId(member.getId(), dataId);
+            found = dao.findMetadataByMemberAndExternalId(member.getId(), dataId);
+        } else if (dataName != null) {
+            found = dao.findMetadataByMemberAndName(member.getId(), dataName);
         } else {
             found = dao.findRootByMemberCircle(member.getId(), circleId);
         }

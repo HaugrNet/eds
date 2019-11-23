@@ -54,10 +54,18 @@ public final class DataDao extends CommonDao {
         return findSingleRecord(query);
     }
 
-    public MetadataEntity findMetaDataByMemberAndExternalId(final Long memberId, final String externalId) {
+    public MetadataEntity findMetadataByMemberAndExternalId(final Long memberId, final String externalId) {
         final Query query = entityManager.createNamedQuery("metadata.findByMemberAndExternalId");
         query.setParameter("mid", memberId);
         query.setParameter("eid", externalId);
+
+        return findSingleRecord(query);
+    }
+
+    public MetadataEntity findMetadataByMemberAndName(final Long memberId, final String name) {
+        final Query query = entityManager.createNamedQuery("metadata.findByMemberAndName");
+        query.setParameter("mid", memberId);
+        query.setParameter("name", name);
 
         return findSingleRecord(query);
     }

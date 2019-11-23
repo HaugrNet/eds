@@ -36,12 +36,14 @@ final class FetchDataRequestTest {
     void testClassflow() {
         final String circleId = UUID.randomUUID().toString();
         final String dataId = UUID.randomUUID().toString();
+        final String dataName = UUID.randomUUID().toString();
 
         final FetchDataRequest request = new FetchDataRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
         request.setCredential(TestUtilities.convert(Constants.ADMIN_ACCOUNT));
         request.setCircleId(circleId);
         request.setDataId(dataId);
+        request.setDataName(dataName);
         request.setPageNumber(43);
         request.setPageSize(56);
 
@@ -50,6 +52,7 @@ final class FetchDataRequestTest {
         assertEquals(Constants.ADMIN_ACCOUNT, TestUtilities.convert(request.getCredential()));
         assertEquals(circleId, request.getCircleId());
         assertEquals(dataId, request.getDataId());
+        assertEquals(dataName, request.getDataName());
         assertEquals(43, request.getPageNumber());
         assertEquals(56, request.getPageSize());
     }
@@ -62,7 +65,7 @@ final class FetchDataRequestTest {
         assertNull(request.getDataId());
         assertEquals(2, errors.size());
         assertEquals("The Session (Credential) is missing.", errors.get(Constants.FIELD_CREDENTIAL));
-        assertEquals("Either a Circle or Data Id must be provided.", errors.get(Constants.FIELD_IDS));
+        assertEquals("Either a Circle Id, Data Id, or Data Name must be provided.", errors.get(Constants.FIELD_IDS));
     }
 
     @Test

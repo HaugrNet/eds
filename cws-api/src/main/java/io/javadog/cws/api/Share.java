@@ -125,8 +125,9 @@ public interface Share {
      * <p>Allow retrieving data for a specific Circle from the System. Unless a
      * specific Data Object is requested, the list of returned information will
      * only be the Metadata for the Data Object. If a specific Data Object is
-     * requested, then the listing will contain a single entry with the Metadata
-     * for the Object, and the data is set in the Response Object as well.</p>
+     * requested, either by Id or Name, then the listing will contain a single
+     * entry with the Metadata for the Object, and the data is set in the
+     * Response Object as well.</p>
      *
      * <p>By default, the content retrieved is a list of data for the root
      * folder for the given Circle. If a specific Folder is given, then the list

@@ -74,7 +74,7 @@ final class DataServiceTest extends DatabaseSetup {
         assertEquals(ReturnCode.VERIFICATION_WARNING, cause.getReturnCode());
         assertEquals("Request Object contained errors:" +
                 "\nKey: credential, Error: The Session (Credential) is missing." +
-                "\nKey: circle & data Id, Error: Either a Circle or Data Id must be provided.", cause.getMessage());
+                "\nKey: circle & data Id, Error: Either a Circle Id, Data Id, or Data Name must be provided.", cause.getMessage());
     }
 
     @Test
@@ -94,6 +94,24 @@ final class DataServiceTest extends DatabaseSetup {
 
         final FetchDataRequest fetchRequest = prepareRequest(FetchDataRequest.class, MEMBER_1);
         fetchRequest.setDataId(saveResponse.getDataId());
+        final FetchDataResponse fetchResponse = dataService.perform(fetchRequest);
+        assertEquals(ReturnCode.SUCCESS.getCode(), fetchResponse.getReturnCode());
+        assertEquals(toSave, crypto.bytesToString(fetchResponse.getData()));
+    }
+
+    @Test
+    void testSavingAndReadingDataByName() {
+        final ProcessDataService service = new ProcessDataService(settings, entityManager);
+        final FetchDataService dataService = new FetchDataService(settings, entityManager);
+        final String name = "My Data";
+
+        final ProcessDataRequest saveRequest = prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, name, 1048576);
+        final String toSave = crypto.bytesToString(saveRequest.getData());
+        final ProcessDataResponse saveResponse = service.perform(saveRequest);
+        assertEquals(ReturnCode.SUCCESS.getCode(), saveResponse.getReturnCode());
+
+        final FetchDataRequest fetchRequest = prepareRequest(FetchDataRequest.class, MEMBER_1);
+        fetchRequest.setDataName(name);
         final FetchDataResponse fetchResponse = dataService.perform(fetchRequest);
         assertEquals(ReturnCode.SUCCESS.getCode(), fetchResponse.getReturnCode());
         assertEquals(toSave, crypto.bytesToString(fetchResponse.getData()));
@@ -609,14 +627,14 @@ final class DataServiceTest extends DatabaseSetup {
 
     @Test
     void testCopyDataToNotExistingFolder() {
-        final String dataname = "toCopy";
+        final String dataName = "toCopy";
         final String folderId = UUID.randomUUID().toString();
 
         final ProcessDataService dataService = new ProcessDataService(settings, entityManager);
-        final ProcessDataRequest addRequest = prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, dataname, 524288);
+        final ProcessDataRequest addRequest = prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, dataName, 524288);
         final ProcessDataResponse addResponse = dataService.perform(addRequest);
         assertEquals(ReturnCode.SUCCESS.getCode(), addResponse.getReturnCode());
-        assertEquals("The Data Object '" + dataname + "' was successfully added to the Circle '" + CIRCLE_1 + "'.", addResponse.getReturnMessage());
+        assertEquals("The Data Object '" + dataName + "' was successfully added to the Circle '" + CIRCLE_1 + "'.", addResponse.getReturnMessage());
         assertNotNull(addResponse.getDataId());
 
         final ProcessDataRequest copyRequest = prepareCopyDataRequest(MEMBER_1, addResponse.getDataId(), CIRCLE_2_ID, folderId);

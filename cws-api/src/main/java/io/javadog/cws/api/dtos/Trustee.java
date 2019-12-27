@@ -33,7 +33,15 @@ import javax.xml.bind.annotation.XmlType;
  * @since CWS 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = Constants.FIELD_TRUSTEE, propOrder = { Constants.FIELD_MEMBER_ID, Constants.FIELD_ACCOUNT_NAME, Constants.FIELD_PUBLIC_KEY, Constants.FIELD_CIRCLE_ID, Constants.FIELD_CIRCLE_NAME, Constants.FIELD_TRUSTLEVEL, Constants.FIELD_CHANGED, Constants.FIELD_ADDED })
+@XmlType(name = Constants.FIELD_TRUSTEE, propOrder = {
+        Constants.FIELD_MEMBER_ID,
+        Constants.FIELD_ACCOUNT_NAME,
+        Constants.FIELD_PUBLIC_KEY,
+        Constants.FIELD_CIRCLE_ID,
+        Constants.FIELD_CIRCLE_NAME,
+        Constants.FIELD_TRUSTLEVEL,
+        Constants.FIELD_CHANGED,
+        Constants.FIELD_ADDED })
 public final class Trustee implements Serializable {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */

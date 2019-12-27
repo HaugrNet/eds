@@ -266,9 +266,9 @@ also weaken the security of the CWS stored data.
    * SOAP: authenticated
    * REST (POST) request is: ${REST_ROOT}/api/authenticated
 
-|authenticated                                                         |
-|account name|credential|return code?|return message?                  |
-|admin       |admin     |${SUCCESS}  |admin successfully authenticated.             |
+|authenticated                                                                    |
+|account name|credential|member id?|return code?|return message?                  |
+|admin       |admin     |admin_id  |${SUCCESS}  |admin successfully authenticated.|
 *!
 
 !* Members

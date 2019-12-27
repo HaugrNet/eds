@@ -27,6 +27,7 @@ import io.javadog.cws.api.requests.ProcessMemberRequest;
 import io.javadog.cws.api.requests.ProcessTrusteeRequest;
 import io.javadog.cws.api.requests.SanityRequest;
 import io.javadog.cws.api.requests.SettingRequest;
+import io.javadog.cws.api.responses.AuthenticateResponse;
 import io.javadog.cws.api.responses.CwsResponse;
 import io.javadog.cws.api.responses.FetchCircleResponse;
 import io.javadog.cws.api.responses.FetchMemberResponse;
@@ -95,7 +96,7 @@ public final class CallManagement {
         return management.sanitized(request);
     }
 
-    public static CwsResponse authenticated(final String type, final String url, final Authentication request) {
+    public static AuthenticateResponse authenticated(final String type, final String url, final Authentication request) {
         prepareCWS(type, url);
         return management.authenticated(request);
     }

@@ -28,7 +28,7 @@ import io.javadog.cws.api.requests.ProcessMemberRequest;
 import io.javadog.cws.api.requests.ProcessTrusteeRequest;
 import io.javadog.cws.api.requests.SanityRequest;
 import io.javadog.cws.api.requests.SettingRequest;
-import io.javadog.cws.api.responses.CwsResponse;
+import io.javadog.cws.api.responses.AuthenticateResponse;
 import io.javadog.cws.api.responses.FetchCircleResponse;
 import io.javadog.cws.api.responses.FetchMemberResponse;
 import io.javadog.cws.api.responses.FetchTrusteeResponse;
@@ -39,7 +39,7 @@ import io.javadog.cws.api.responses.ProcessTrusteeResponse;
 import io.javadog.cws.api.responses.SanityResponse;
 import io.javadog.cws.api.responses.SettingResponse;
 import io.javadog.cws.api.responses.VersionResponse;
-import io.javadog.cws.ws.CwsResult;
+import io.javadog.cws.ws.AuthenticateResult;
 import io.javadog.cws.ws.FetchCircleResult;
 import io.javadog.cws.ws.FetchMemberResult;
 import io.javadog.cws.ws.FetchTrusteeResult;
@@ -182,17 +182,18 @@ public final class ManagementSoapClient implements Management {
      * {@inheritDoc}
      */
     @Override
-    public CwsResponse authenticated(final Authentication request) {
-        CwsResponse response = null;
+    public AuthenticateResponse authenticated(final Authentication request) {
+        AuthenticateResponse response = null;
 
         if (request != null) {
             final io.javadog.cws.ws.Authentication ws = new io.javadog.cws.ws.Authentication();
             Mapper.fillAuthentication(ws, request);
 
-            final CwsResult result = client.authenticated(ws);
+            final AuthenticateResult result = client.authenticated(ws);
             if (result != null) {
-                response = new CwsResponse();
+                response = new AuthenticateResponse();
                 Mapper.fillResponse(response, result);
+                response.setMemberId(result.getMemberId());
             }
         }
 

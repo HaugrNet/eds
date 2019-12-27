@@ -28,7 +28,7 @@ import io.javadog.cws.api.requests.ProcessMemberRequest;
 import io.javadog.cws.api.requests.ProcessTrusteeRequest;
 import io.javadog.cws.api.requests.SanityRequest;
 import io.javadog.cws.api.requests.SettingRequest;
-import io.javadog.cws.api.responses.CwsResponse;
+import io.javadog.cws.api.responses.AuthenticateResponse;
 import io.javadog.cws.api.responses.FetchCircleResponse;
 import io.javadog.cws.api.responses.FetchMemberResponse;
 import io.javadog.cws.api.responses.FetchTrusteeResponse;
@@ -156,9 +156,9 @@ public class ManagementBean {
     }
 
     @Transactional(Transactional.TxType.SUPPORTS)
-    public CwsResponse authenticated(final Authentication request) {
+    public AuthenticateResponse authenticated(final Authentication request) {
         AuthenticatedService service = null;
-        CwsResponse response;
+        AuthenticateResponse response;
 
         try {
             service = new AuthenticatedService(settings, entityManager);
@@ -169,7 +169,7 @@ public class ManagementBean {
             // error is thus not needed, as all information is provided in the
             // response.
             LOG.log(Settings.DEBUG, e.getMessage(), e);
-            response = new CwsResponse(e.getReturnCode(), e.getMessage());
+            response = new AuthenticateResponse(e.getReturnCode(), e.getMessage());
         } finally {
             CommonBean.destroy(service);
         }

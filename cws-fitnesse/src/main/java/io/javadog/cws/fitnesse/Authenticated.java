@@ -17,7 +17,7 @@
 package io.javadog.cws.fitnesse;
 
 import io.javadog.cws.api.requests.Authentication;
-import io.javadog.cws.api.responses.CwsResponse;
+import io.javadog.cws.api.responses.AuthenticateResponse;
 import io.javadog.cws.fitnesse.callers.CallManagement;
 
 /**
@@ -26,7 +26,15 @@ import io.javadog.cws.fitnesse.callers.CallManagement;
  * @author Kim Jensen
  * @since CWS 1.1
  */
-public final class Authenticated extends CwsRequest<CwsResponse> {
+public final class Authenticated extends CwsRequest<AuthenticateResponse> {
+
+    // =========================================================================
+    // Request & Response Setters and Getters
+    // =========================================================================
+
+    public String memberId() {
+        return (response.getMemberId() != null) ? (accountName + EXTENSION_ID) : null;
+    }
 
     // =========================================================================
     // Standard FitNesse Fixture method(s)

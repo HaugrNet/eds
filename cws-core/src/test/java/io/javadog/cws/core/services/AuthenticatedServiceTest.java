@@ -22,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.requests.Authentication;
+import io.javadog.cws.api.responses.AuthenticateResponse;
 import io.javadog.cws.api.responses.CwsResponse;
 import io.javadog.cws.core.DatabaseSetup;
 import org.junit.jupiter.api.Test;
@@ -38,11 +39,12 @@ final class AuthenticatedServiceTest extends DatabaseSetup {
     void testAuthenticate() {
         final AuthenticatedService service = new AuthenticatedService(settings, entityManager);
         final Authentication request = prepareRequest(Authentication.class, MEMBER_1);
-        final CwsResponse response = service.perform(request);
+        final AuthenticateResponse response = service.perform(request);
 
         assertNotNull(response);
         assertTrue(response.isOk());
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
         assertEquals("member1 successfully authenticated.", response.getReturnMessage());
+        assertEquals(MEMBER_1_ID, response.getMemberId());
     }
 }

@@ -26,7 +26,7 @@ import io.javadog.cws.api.requests.ProcessMemberRequest;
 import io.javadog.cws.api.requests.ProcessTrusteeRequest;
 import io.javadog.cws.api.requests.SanityRequest;
 import io.javadog.cws.api.requests.SettingRequest;
-import io.javadog.cws.api.responses.CwsResponse;
+import io.javadog.cws.api.responses.AuthenticateResponse;
 import io.javadog.cws.api.responses.FetchCircleResponse;
 import io.javadog.cws.api.responses.FetchMemberResponse;
 import io.javadog.cws.api.responses.FetchTrusteeResponse;
@@ -289,7 +289,7 @@ public interface Management {
      * @param request Authentication Request Object
      * @return Response Object with Authentication and Return values
      */
-    CwsResponse authenticated(Authentication request);
+    AuthenticateResponse authenticated(Authentication request);
 
     /**
      * <p>Allows the retrieval of existing Member Accounts from the System, if

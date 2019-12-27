@@ -29,7 +29,7 @@ import io.javadog.cws.api.requests.ProcessMemberRequest;
 import io.javadog.cws.api.requests.ProcessTrusteeRequest;
 import io.javadog.cws.api.requests.SanityRequest;
 import io.javadog.cws.api.requests.SettingRequest;
-import io.javadog.cws.api.responses.CwsResponse;
+import io.javadog.cws.api.responses.AuthenticateResponse;
 import io.javadog.cws.api.responses.FetchCircleResponse;
 import io.javadog.cws.api.responses.FetchMemberResponse;
 import io.javadog.cws.api.responses.FetchTrusteeResponse;
@@ -103,8 +103,8 @@ public final class ManagementRestClient extends GsonRestClient implements Manage
      * {@inheritDoc}
      */
     @Override
-    public CwsResponse authenticated(final Authentication request) {
-        return runRequest(CwsResponse.class, Constants.REST_AUTHENTICATED, request);
+    public AuthenticateResponse authenticated(final Authentication request) {
+        return runRequest(AuthenticateResponse.class, Constants.REST_AUTHENTICATED, request);
     }
 
     /**

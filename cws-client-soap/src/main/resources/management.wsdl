@@ -6,11 +6,13 @@
         name="management" targetNamespace="http://ws.cws.javadog.io/">
     <wsdl:documentation>
       Service: Cryptographic WebStore Management Service
-      Version: 1.1
+      Version: 1.2
       Owner: JavaDog.io
     </wsdl:documentation>
   <wsdl:types>
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://ws.cws.javadog.io/" elementFormDefault="unqualified" targetNamespace="http://ws.cws.javadog.io/" version="1.1">
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://ws.cws.javadog.io/" elementFormDefault="unqualified" targetNamespace="http://ws.cws.javadog.io/" version="1.2">
+
+  <xs:element name="authenticateResult" type="tns:authenticateResult"/>
 
   <xs:element name="authenticated" type="tns:authenticated"/>
 
@@ -273,8 +275,18 @@
 
   <xs:complexType name="authenticatedResponse">
     <xs:sequence>
-      <xs:element minOccurs="0" name="response" type="tns:cwsResult"/>
+      <xs:element minOccurs="0" name="response" type="tns:authenticateResult"/>
     </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType final="extension restriction" name="authenticateResult">
+    <xs:complexContent>
+      <xs:extension base="tns:cwsResult">
+        <xs:sequence>
+          <xs:element name="memberId" type="xs:string"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
   </xs:complexType>
 
   <xs:complexType name="settings">

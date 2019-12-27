@@ -54,7 +54,7 @@ public final class Constants {
      * <p>All Id's must be compliant with a standard UUID Pattern, which this
      * regular expression matches.</p>
      */
-    private static final String ID_PATTERN_REGEX = "[\\da-z]{8}-[\\da-z]{4}-[\\da-z]{4}-[\\da-z]{4}-[\\da-z]{12}";
+    public static final String ID_PATTERN_REGEX = "[\\da-z]{8}-[\\da-z]{4}-[\\da-z]{4}-[\\da-z]{4}-[\\da-z]{12}";
 
     /**
      * <p>Pattern to test if a given value matches a UUID, which is what CWS

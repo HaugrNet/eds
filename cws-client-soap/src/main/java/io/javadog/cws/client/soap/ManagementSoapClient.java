@@ -203,6 +203,7 @@ public final class ManagementSoapClient implements Management {
             if (result != null) {
                 response = new AuthenticateResponse();
                 Mapper.fillResponse(response, result);
+                response.setMemberId(result.getMemberId());
             }
         }
 

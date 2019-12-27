@@ -142,13 +142,15 @@ public abstract class Verifiable implements Serializable {
     }
 
     /**
-     * <p>Validates an Id, to ensure that it is compliant with the expected
-     * format, specified by the {@link Constants#ID_PATTERN_REGEX} pattern.</p>
+     * <p>Checks if the given Id is valid, i.e. that it matches the standard
+     * UUID regular expression. The method takes an error map which it will add
+     * the given field to as a key with the message provided, if the id (value)
+     * it invalid.</p>
      *
-     * @param errors  Error Map
-     * @param field   Key for the Error Map
-     * @param value   The value Object to check
-     * @param message Message to add to Error Map, if validation failed
+     * @param errors  Map to store the error information in, if id is invalid
+     * @param field   Name of the field from the request/dto holding the value
+     * @param value   The value to check if is a valid Id (UUID)
+     * @param message The error message to add to the error map
      * @see Constants#ID_PATTERN_REGEX
      */
     protected static void checkValidId(final Map<String, String> errors, final String field, final String value, final String message) {
@@ -193,16 +195,19 @@ public abstract class Verifiable implements Serializable {
     }
 
     /**
-     * <p>Checks if the URL given is invalid, and adds an error message to the
-     * error map if so. As only one field exists with a URL, the field or key,
-     * is not added as parameter, neither is the error message.</p>
+     * <p>Checks if a URL is valid or not, it uses the URL methods to see if it
+     * is valid, and if not - the given error map is extended with the error
+     * information from the Exception thrown. The method is thus not logging ot
+     * re-throwing the exception, as the method is only intended as a
+     * pre-processing check.</p>
      *
-     * <p>The validation check is using the {@link URL#toURI()} method, which
-     * will throw an Exception if the URL is invalid. The Exception is caught,
-     * and the exception message is added as part of the error information.</p>
+     * <p>The key for the error map, is the {@link Constants#FIELD_URL}, which
+     * is the only CWS field holding a URL, and thus it is not a parameter to
+     * this method, although it is for the other methods.</p>
      *
-     * @param errors Error Map
-     * @param value  The value Object to check
+     * @param errors  Map to store the error information in, if URL is invalid
+     * @param value   the URL to check
+     * @see Constants#FIELD_URL
      */
     protected static void checkUrl(final Map<String, String> errors, final String value) {
         try {
@@ -218,10 +223,10 @@ public abstract class Verifiable implements Serializable {
     }
 
     /**
-     * Method added as per PMD rule InefficientEmptyStringCheck. It checks the
-     * given value to see if it contains any non-whitespace characters. If so,
-     * then it returns false - if the value has zero length or only whitespace
-     * characters, then it returns true.
+     * <p>Method added as per PMD rule InefficientEmptyStringCheck. It checks
+     * the given value to see if it contains any non-whitespace characters. If
+     * so, then it returns false - if the value has zero length or only
+     * whitespace characters, then it returns true.</p>
      *
      * @param value Nullable value to check if is empty
      * @return True if the string is empty, meaning no non-whitespace chars exist

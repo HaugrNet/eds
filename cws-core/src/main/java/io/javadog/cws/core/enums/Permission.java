@@ -102,7 +102,7 @@ public enum Permission {
     VERIFY_SIGNATURE(TrustLevel.ALL, "Verify Digital Signature."),
 
     /**
-     * Altering the settings, is only allowed to be performed by the System
+     * Altering the settings, is only allowed to be performed by a System
      * Administrator, as part of the setup or later altering the system.
      */
     SETTING(TrustLevel.SYSOP, "Process Settings."),
@@ -113,6 +113,13 @@ public enum Permission {
      * otherwise be useless.
      */
     MASTER_KEY(TrustLevel.SYSOP, "Update Master Key."),
+
+    /**
+     * Retrieving a complete listing of all metadata, is useful if the CWS is
+     * used to store part of data, and the two storage's gets out-of-sync. The
+     * request can and should only be made by a System Administrator.
+     */
+    INVENTORY(TrustLevel.SYSOP, "System Inventory."),
 
     /**
      * The Sanity checks is something, which is limited to the System or Circle

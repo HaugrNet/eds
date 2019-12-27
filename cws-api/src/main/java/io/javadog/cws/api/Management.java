@@ -20,6 +20,7 @@ import io.javadog.cws.api.requests.Authentication;
 import io.javadog.cws.api.requests.FetchCircleRequest;
 import io.javadog.cws.api.requests.FetchMemberRequest;
 import io.javadog.cws.api.requests.FetchTrusteeRequest;
+import io.javadog.cws.api.requests.InventoryRequest;
 import io.javadog.cws.api.requests.MasterKeyRequest;
 import io.javadog.cws.api.requests.ProcessCircleRequest;
 import io.javadog.cws.api.requests.ProcessMemberRequest;
@@ -30,6 +31,7 @@ import io.javadog.cws.api.responses.AuthenticateResponse;
 import io.javadog.cws.api.responses.FetchCircleResponse;
 import io.javadog.cws.api.responses.FetchMemberResponse;
 import io.javadog.cws.api.responses.FetchTrusteeResponse;
+import io.javadog.cws.api.responses.InventoryResponse;
 import io.javadog.cws.api.responses.MasterKeyResponse;
 import io.javadog.cws.api.responses.ProcessCircleResponse;
 import io.javadog.cws.api.responses.ProcessMemberResponse;
@@ -279,6 +281,17 @@ public interface Management {
      * @return Response Object with ReturnCode and Message
      */
     SanityResponse sanitized(SanityRequest request);
+
+    /**
+     * <p>This allows for Administrators to receive a complete listing of all
+     * saved records in CWS, the information retrieved is the metadata, which
+     * can then be used to synchronize a different storage system if they
+     * somehow gets out of sync.</p>
+     *
+     * @param request Paginated Request Object for the Inventory Report
+     * @return Response Object with Inventory report and Return values
+     */
+    InventoryResponse inventory(InventoryRequest request);
 
     /**
      * <p>Simple check to see if a Member is authenticated to work with this

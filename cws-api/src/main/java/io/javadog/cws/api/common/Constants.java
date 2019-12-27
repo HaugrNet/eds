@@ -123,6 +123,7 @@ public final class Constants {
     public static final String FIELD_SIGNATURES = "signatures";
     public static final String FIELD_SANITY = "sanity";
     public static final String FIELD_SANITIES = "sanities";
+    public static final String FIELD_INVENTORY = "inventory";
     public static final String FIELD_SETTINGS = "settings";
     public static final String FIELD_SECRET = "secret";
     public static final String FIELD_EXPIRES = "expires";
@@ -151,6 +152,7 @@ public final class Constants {
     public static final String REST_SETTINGS = "/settings";
     public static final String REST_MASTERKEY = "/masterKey";
     public static final String REST_SANITIZED = "/sanitized";
+    public static final String REST_INVENTORY = "/inventory";
     public static final String REST_AUTHENTICATED = "/authenticated";
 
     // Member requests from the Management Interface

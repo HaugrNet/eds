@@ -21,6 +21,7 @@ import io.javadog.cws.api.requests.Authentication;
 import io.javadog.cws.api.requests.FetchCircleRequest;
 import io.javadog.cws.api.requests.FetchMemberRequest;
 import io.javadog.cws.api.requests.FetchTrusteeRequest;
+import io.javadog.cws.api.requests.InventoryRequest;
 import io.javadog.cws.api.requests.MasterKeyRequest;
 import io.javadog.cws.api.requests.ProcessCircleRequest;
 import io.javadog.cws.api.requests.ProcessMemberRequest;
@@ -32,6 +33,7 @@ import io.javadog.cws.api.responses.CwsResponse;
 import io.javadog.cws.api.responses.FetchCircleResponse;
 import io.javadog.cws.api.responses.FetchMemberResponse;
 import io.javadog.cws.api.responses.FetchTrusteeResponse;
+import io.javadog.cws.api.responses.InventoryResponse;
 import io.javadog.cws.api.responses.MasterKeyResponse;
 import io.javadog.cws.api.responses.ProcessCircleResponse;
 import io.javadog.cws.api.responses.ProcessMemberResponse;
@@ -94,6 +96,11 @@ public final class CallManagement {
     public static SanityResponse sanitized(final String type, final String url, final SanityRequest request) {
         prepareCWS(type, url);
         return management.sanitized(request);
+    }
+
+    public static InventoryResponse inventory(final String type, final String url, final InventoryRequest request) {
+        prepareCWS(type, url);
+        return management.inventory(request);
     }
 
     public static AuthenticateResponse authenticated(final String type, final String url, final Authentication request) {

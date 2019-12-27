@@ -22,6 +22,7 @@ import io.javadog.cws.api.requests.Authentication;
 import io.javadog.cws.api.requests.FetchCircleRequest;
 import io.javadog.cws.api.requests.FetchMemberRequest;
 import io.javadog.cws.api.requests.FetchTrusteeRequest;
+import io.javadog.cws.api.requests.InventoryRequest;
 import io.javadog.cws.api.requests.MasterKeyRequest;
 import io.javadog.cws.api.requests.ProcessCircleRequest;
 import io.javadog.cws.api.requests.ProcessMemberRequest;
@@ -32,6 +33,7 @@ import io.javadog.cws.api.responses.AuthenticateResponse;
 import io.javadog.cws.api.responses.FetchCircleResponse;
 import io.javadog.cws.api.responses.FetchMemberResponse;
 import io.javadog.cws.api.responses.FetchTrusteeResponse;
+import io.javadog.cws.api.responses.InventoryResponse;
 import io.javadog.cws.api.responses.MasterKeyResponse;
 import io.javadog.cws.api.responses.ProcessCircleResponse;
 import io.javadog.cws.api.responses.ProcessMemberResponse;
@@ -45,6 +47,7 @@ import io.javadog.cws.core.services.AuthenticatedService;
 import io.javadog.cws.core.services.FetchCircleService;
 import io.javadog.cws.core.services.FetchMemberService;
 import io.javadog.cws.core.services.FetchTrusteeService;
+import io.javadog.cws.core.services.InventoryService;
 import io.javadog.cws.core.services.MasterKeyService;
 import io.javadog.cws.core.services.ProcessCircleService;
 import io.javadog.cws.core.services.ProcessMemberService;
@@ -148,6 +151,28 @@ public class ManagementBean {
             // response.
             LOG.log(Settings.DEBUG, e.getMessage(), e);
             response = new SanityResponse(e.getReturnCode(), e.getMessage());
+        } finally {
+            CommonBean.destroy(service);
+        }
+
+        return response;
+    }
+
+    @Transactional(Transactional.TxType.SUPPORTS)
+    public InventoryResponse inventory(final InventoryRequest request) {
+        InventoryService service = null;
+        InventoryResponse response;
+
+        try {
+            service = new InventoryService(settings, entityManager);
+            response = service.perform(request);
+        } catch (CWSException e) {
+            // Any Warning or Error thrown by the CWS contain enough information
+            // so it can be dealt with by the requesting System. Logging the
+            // error is thus not needed, as all information is provided in the
+            // response.
+            LOG.log(Settings.DEBUG, e.getMessage(), e);
+            response = new InventoryResponse(e.getReturnCode(), e.getMessage());
         } finally {
             CommonBean.destroy(service);
         }

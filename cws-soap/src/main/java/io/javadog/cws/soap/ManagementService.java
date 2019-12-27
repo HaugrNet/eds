@@ -22,6 +22,7 @@ import io.javadog.cws.api.requests.Authentication;
 import io.javadog.cws.api.requests.FetchCircleRequest;
 import io.javadog.cws.api.requests.FetchMemberRequest;
 import io.javadog.cws.api.requests.FetchTrusteeRequest;
+import io.javadog.cws.api.requests.InventoryRequest;
 import io.javadog.cws.api.requests.MasterKeyRequest;
 import io.javadog.cws.api.requests.ProcessCircleRequest;
 import io.javadog.cws.api.requests.ProcessMemberRequest;
@@ -32,6 +33,7 @@ import io.javadog.cws.api.responses.AuthenticateResponse;
 import io.javadog.cws.api.responses.FetchCircleResponse;
 import io.javadog.cws.api.responses.FetchMemberResponse;
 import io.javadog.cws.api.responses.FetchTrusteeResponse;
+import io.javadog.cws.api.responses.InventoryResponse;
 import io.javadog.cws.api.responses.MasterKeyResponse;
 import io.javadog.cws.api.responses.ProcessCircleResponse;
 import io.javadog.cws.api.responses.ProcessMemberResponse;
@@ -166,6 +168,31 @@ public class ManagementService implements Management {
             // performance of the system.
             LOG.log(Settings.ERROR, e.getMessage(), e);
             response = new SanityResponse(ReturnCode.ERROR, GENERAL_RETURN_MESSAGE);
+        }
+
+        return response;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @WebMethod
+    @WebResult(name = "response")
+    public InventoryResponse inventory(final InventoryRequest request) {
+        InventoryResponse response;
+
+        try {
+            final long startTime = System.nanoTime();
+            response = bean.inventory(request);
+            LOG.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), "inventory", startTime));
+        } catch (RuntimeException e) {
+            // If an error occurs that has so far not been resolved, this is the
+            // final level where it can be handled. Errors can be Persistence
+            // problems or other things that will affect the reliability and/or
+            // performance of the system.
+            LOG.log(Settings.ERROR, e.getMessage(), e);
+            response = new InventoryResponse(ReturnCode.ERROR, GENERAL_RETURN_MESSAGE);
         }
 
         return response;

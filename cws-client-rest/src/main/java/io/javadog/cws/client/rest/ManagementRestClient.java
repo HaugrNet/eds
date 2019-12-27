@@ -23,6 +23,7 @@ import io.javadog.cws.api.requests.Authentication;
 import io.javadog.cws.api.requests.FetchCircleRequest;
 import io.javadog.cws.api.requests.FetchMemberRequest;
 import io.javadog.cws.api.requests.FetchTrusteeRequest;
+import io.javadog.cws.api.requests.InventoryRequest;
 import io.javadog.cws.api.requests.MasterKeyRequest;
 import io.javadog.cws.api.requests.ProcessCircleRequest;
 import io.javadog.cws.api.requests.ProcessMemberRequest;
@@ -33,6 +34,7 @@ import io.javadog.cws.api.responses.AuthenticateResponse;
 import io.javadog.cws.api.responses.FetchCircleResponse;
 import io.javadog.cws.api.responses.FetchMemberResponse;
 import io.javadog.cws.api.responses.FetchTrusteeResponse;
+import io.javadog.cws.api.responses.InventoryResponse;
 import io.javadog.cws.api.responses.MasterKeyResponse;
 import io.javadog.cws.api.responses.ProcessCircleResponse;
 import io.javadog.cws.api.responses.ProcessMemberResponse;
@@ -97,6 +99,14 @@ public final class ManagementRestClient extends GsonRestClient implements Manage
     @Override
     public SanityResponse sanitized(final SanityRequest request) {
         return runRequest(SanityResponse.class, Constants.REST_SANITIZED, request);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public InventoryResponse inventory(final InventoryRequest request) {
+        return runRequest(InventoryResponse.class, Constants.REST_INVENTORY, request);
     }
 
     /**

@@ -40,8 +40,8 @@ import javax.xml.bind.annotation.XmlType;
         Constants.FIELD_CIRCLE_ID,
         Constants.FIELD_CIRCLE_NAME,
         Constants.FIELD_TRUSTLEVEL,
-        Constants.FIELD_CHANGED,
-        Constants.FIELD_ADDED })
+        Constants.FIELD_ADDED,
+        Constants.FIELD_CHANGED })
 public final class Trustee implements Serializable {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
@@ -69,11 +69,11 @@ public final class Trustee implements Serializable {
     @XmlElement(name = Constants.FIELD_TRUSTLEVEL)
     private TrustLevel trustLevel = null;
 
-    @XmlElement(name = Constants.FIELD_CHANGED)
-    private Date changed = null;
-
     @XmlElement(name = Constants.FIELD_ADDED)
     private Date added = null;
+
+    @XmlElement(name = Constants.FIELD_CHANGED)
+    private Date changed = null;
 
     // =========================================================================
     // Standard Setters & Getters
@@ -127,20 +127,20 @@ public final class Trustee implements Serializable {
         return trustLevel;
     }
 
-    public void setChanged(final Date changed) {
-        this.changed = Utilities.copy(changed);
-    }
-
-    public Date getChanged() {
-        return Utilities.copy(changed);
-    }
-
     public void setAdded(final Date added) {
         this.added = Utilities.copy(added);
     }
 
     public Date getAdded() {
         return Utilities.copy(added);
+    }
+
+    public void setChanged(final Date changed) {
+        this.changed = Utilities.copy(changed);
+    }
+
+    public Date getChanged() {
+        return Utilities.copy(changed);
     }
 
     // =========================================================================
@@ -157,8 +157,8 @@ public final class Trustee implements Serializable {
                 "memberId=" + memberId +
                 ", circleId=" + circleId +
                 ", trustLevel=" + trustLevel +
-                ", changed=" + changed +
                 ", added=" + added +
+                ", changed=" + changed +
                 '}';
     }
 }

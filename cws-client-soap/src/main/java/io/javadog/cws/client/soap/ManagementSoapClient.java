@@ -22,6 +22,7 @@ import io.javadog.cws.api.requests.Authentication;
 import io.javadog.cws.api.requests.FetchCircleRequest;
 import io.javadog.cws.api.requests.FetchMemberRequest;
 import io.javadog.cws.api.requests.FetchTrusteeRequest;
+import io.javadog.cws.api.requests.InventoryRequest;
 import io.javadog.cws.api.requests.MasterKeyRequest;
 import io.javadog.cws.api.requests.ProcessCircleRequest;
 import io.javadog.cws.api.requests.ProcessMemberRequest;
@@ -32,6 +33,7 @@ import io.javadog.cws.api.responses.AuthenticateResponse;
 import io.javadog.cws.api.responses.FetchCircleResponse;
 import io.javadog.cws.api.responses.FetchMemberResponse;
 import io.javadog.cws.api.responses.FetchTrusteeResponse;
+import io.javadog.cws.api.responses.InventoryResponse;
 import io.javadog.cws.api.responses.MasterKeyResponse;
 import io.javadog.cws.api.responses.ProcessCircleResponse;
 import io.javadog.cws.api.responses.ProcessMemberResponse;
@@ -182,6 +184,14 @@ public final class ManagementSoapClient implements Management {
      * {@inheritDoc}
      */
     @Override
+    public InventoryResponse inventory(final InventoryRequest request) {
+        return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public AuthenticateResponse authenticated(final Authentication request) {
         AuthenticateResponse response = null;
 
@@ -193,7 +203,6 @@ public final class ManagementSoapClient implements Management {
             if (result != null) {
                 response = new AuthenticateResponse();
                 Mapper.fillResponse(response, result);
-                response.setMemberId(result.getMemberId());
             }
         }
 

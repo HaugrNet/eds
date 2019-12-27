@@ -17,11 +17,13 @@
 package io.javadog.cws.api.requests;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.javadog.cws.api.TestUtilities;
 import io.javadog.cws.api.common.Action;
 import io.javadog.cws.api.common.Constants;
+import java.lang.reflect.Field;
 import java.util.Map;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
@@ -159,5 +161,25 @@ final class ProcessCircleRequestTest {
         final Map<String, String> errors = request.validate();
         assertEquals(1, errors.size());
         assertEquals("Cannot delete a Circle, without knowing the Circle Id.", errors.get(Constants.FIELD_CIRCLE_ID));
+    }
+
+    @Test
+    void testNonEmptyName() {
+        final ProcessCircleRequest request = new ProcessCircleRequest();
+        request.setAction(Action.CREATE);
+        request.setCircleName("  Name ");
+
+        final Map<String, String> errors = request.validate();
+        assertFalse(errors.containsKey(Constants.FIELD_CIRCLE_NAME));
+    }
+
+    @Test
+    void testEmptyName() {
+        final ProcessCircleRequest request = new ProcessCircleRequest();
+        request.setAction(Action.CREATE);
+        request.setCircleName("   ");
+
+        final Map<String, String> errors = request.validate();
+        assertEquals("Cannot create a new Circle, without the Circle Name.", errors.get(Constants.FIELD_CIRCLE_NAME));
     }
 }

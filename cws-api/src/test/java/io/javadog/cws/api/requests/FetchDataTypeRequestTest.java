@@ -1,6 +1,6 @@
 /*
  * CWS, Cryptographic Web Store - open source Cryptographic Storage system.
- * Copyright (C) 2016-2019, JavaDog.io
+ * Copyright (C) 2016-2020, JavaDog.io
  * mailto: cws AT JavaDog DOT io
  *
  * CWS is free software; you can redistribute it and/or modify it under the

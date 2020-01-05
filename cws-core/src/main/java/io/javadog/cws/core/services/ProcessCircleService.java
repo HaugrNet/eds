@@ -18,7 +18,6 @@ package io.javadog.cws.core.services;
 
 import io.javadog.cws.api.common.Action;
 import io.javadog.cws.api.common.MemberRole;
-import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.common.TrustLevel;
 import io.javadog.cws.api.requests.ProcessCircleRequest;
 import io.javadog.cws.api.responses.ProcessCircleResponse;
@@ -26,7 +25,7 @@ import io.javadog.cws.core.enums.KeyAlgorithm;
 import io.javadog.cws.core.enums.Permission;
 import io.javadog.cws.core.enums.Status;
 import io.javadog.cws.core.exceptions.AuthorizationException;
-import io.javadog.cws.core.exceptions.CWSException;
+import io.javadog.cws.core.exceptions.IdentificationException;
 import io.javadog.cws.core.exceptions.IllegalActionException;
 import io.javadog.cws.core.jce.PublicCWSKey;
 import io.javadog.cws.core.jce.SecretCWSKey;
@@ -107,18 +106,14 @@ public final class ProcessCircleService extends Serviceable<CommonDao, ProcessCi
         final String name = trim(request.getCircleName());
         final CircleEntity existing = dao.findCircleByName(name);
 
-        if (existing != null) {
-            throw new CWSException(ReturnCode.IDENTIFICATION_WARNING, "A Circle with the requested name already exists.");
-        }
+        throwExceptionIfCircleExists(existing);
 
         final String memberId = request.getMemberId();
         final ProcessCircleResponse response;
 
         if ((memberId != null) && (member.getMemberRole() == MemberRole.ADMIN)) {
             final MemberEntity owner = dao.find(MemberEntity.class, memberId);
-            if (owner == null) {
-                throw new CWSException(ReturnCode.IDENTIFICATION_WARNING, "Cannot create a new Circle with a non-existing Circle Administrator.");
-            }
+            throwExceptionIfOwnerIsNull(owner);
             response = createCircle(owner, name, request.getCircleKey());
         } else {
             response = createCircle(member, name, request.getCircleKey());
@@ -197,7 +192,7 @@ public final class ProcessCircleService extends Serviceable<CommonDao, ProcessCi
         final String externalId = request.getCircleId();
 
         final CircleEntity entity = dao.find(CircleEntity.class, externalId);
-        throwIdentificationWarningIfNoCircle(entity);
+        throwExceptionIfNoCircleExists(entity);
 
         entity.setCircleKey(updateExternalCircleKey(request.getCircleKey()));
         checkAndUpdateCircleName(entity, request.getCircleName());
@@ -223,9 +218,7 @@ public final class ProcessCircleService extends Serviceable<CommonDao, ProcessCi
 
         if (!isEmpty(trimmedNamed) && !Objects.equals(entity.getName(), trimmedNamed)) {
             final CircleEntity existing = dao.findCircleByName(trimmedNamed);
-            if (existing != null) {
-                throw new CWSException(ReturnCode.IDENTIFICATION_WARNING, "A Circle with the requested name already exists.");
-            }
+            throwExceptionIfCircleExists(existing);
 
             entity.setName(trimmedNamed);
         }
@@ -244,16 +237,10 @@ public final class ProcessCircleService extends Serviceable<CommonDao, ProcessCi
     private ProcessCircleResponse deleteCircle(final ProcessCircleRequest request) {
         final String externalId = request.getCircleId();
         final CircleEntity entity = dao.find(CircleEntity.class, externalId);
-        throwIdentificationWarningIfNoCircle(entity);
+        throwExceptionIfNoCircleExists(entity);
         dao.delete(entity);
 
         return new ProcessCircleResponse(theCircle(entity) + " has successfully been removed from CWS.");
-    }
-
-    private static void throwIdentificationWarningIfNoCircle(final Object obj) {
-        if (obj == null) {
-            throw new CWSException(ReturnCode.IDENTIFICATION_WARNING, "No Circle could be found with the given Id.");
-        }
     }
 
     /**
@@ -265,5 +252,41 @@ public final class ProcessCircleService extends Serviceable<CommonDao, ProcessCi
      */
     private static String theCircle(final CircleEntity circle) {
         return "The Circle '" + circle.getName() + '\'';
+    }
+
+    /**
+     * <p>Throws an {@link IdentificationException}, if a Circle of Trust with
+     * the requested name already exists.</p>
+     *
+     * @param obj The Object to check that it is not null
+     */
+    private static void throwExceptionIfCircleExists(final Object obj) {
+        if (obj != null) {
+            throw new IdentificationException("A Circle with the requested name already exists.");
+        }
+    }
+
+    /**
+     * <p>Throws an {@link IdentificationException}, if a Circle of Trust with
+     * the requested Id could not be found.</p>
+     *
+     * @param obj The Object to check if is null
+     */
+    private static void throwExceptionIfNoCircleExists(final Object obj) {
+        if (obj == null) {
+            throw new IdentificationException("No Circle could be found with the given Id.");
+        }
+    }
+
+    /**
+     * <p>Throws an {@link IdentificationException}, if no owner with the
+     * requested id could be found.</p>
+     *
+     * @param obj The Object to check if is null
+     */
+    private static void throwExceptionIfOwnerIsNull(final Object obj) {
+        if (obj == null) {
+            throw new IdentificationException("Cannot create a new Circle with a non-existing Circle Administrator.");
+        }
     }
 }

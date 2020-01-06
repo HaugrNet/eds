@@ -28,19 +28,26 @@ database desired. Testing of CWS has been done using both
 
 # Build, Install and Run
 The final version 1.1 of CWS can be downloaded from [JavaDog](https://javadog.io/),
-version 1.2 will be a minor feature release, planned for end of October, 2019.
+version 1.2 will be a minor feature release, planned for end of January, 2020.
 The aim is to constantly have a stable and usable system, so if needed - please
 download the sources and build CWS yourself. The build requires Java JDK 8
 (patch level 161 or greater), and [Maven](https://maven.apache.org/).
 
 In the accessories/release folder, there is a number of files, which is used to
-install and run CWS. Please put the bin folder in your path, and then invoke
-either the payara.sh or wildfly.sh script, which will provide the options for
-configuring, deploying, starting & stopping CWS in either Payara or WildFly. The
-scripts can also create the database, but it does require that you have the
-correct permissions in PostgreSQL - see the README.txt file in the Accessories
-folder for details regarding this.
+install and run CWS. Either by building CWS from scratch, using a local Payara
+or WildFly instance, or even just use the provided Docker configuration.
 
+### Docker
+In the accessories folder, there is a docker.sh script. which can be used to
+create a new CWS container, running on a port of your choice. The configuration
+will download all the required components, and handle the details for you.
+
+### Local Container
+By adding the accessories/release/bin directory in your path, you can take
+advantage of the provided Payara or WildFly scripts to help configure & deploy
+a local CWS instance using your existing container.
+
+### Build from scratch
 **Developers only**: If you want to build from source, run these steps to
 create the deployable WAR packages for either Payara or WildFly:
 
@@ -65,6 +72,10 @@ following SOAP based URL's:
 http://localhost:8080/cws/management?wsdl
 http://localhost:8080/cws/share?wsdl
 ```
+
+If you have swagger installed, please load the swagger.json file from the
+accessories/release folder, which will help you build a local client for the
+JSON based REST API.
 
 # Who is this for
 Anyone for whom data protection is important may find CWS useful. It is designed
@@ -92,9 +103,11 @@ deployed in a "hostile" environment.
 # Release Plan
 This is the CWS 1.2 development branch, following features are planned:
  * [Inventory Report](https://github.com/JavaDogs/cws/issues/56)
- * [Strange behaviour in Sanitizer Bean Test](https://github.com/JavaDogs/cws/issues/58)
+ * [Enable CORS](https://github.com/JavaDogs/cws/issues/65)
+ * [Add Swagger File](https://github.com/JavaDogs/cws/issues/67)
  * [Lookup Data Objects from name](https://github.com/JavaDogs/cws/issues/59)
- * [Enhance Return messages](https://github.com/JavaDogs/cws/issues/60)
+ * [Change Auhenticate Signature](https://github.com/JavaDogs/cws/issues/64)
+ * [Allow Deletion of Circles for System Administrators](https://github.com/JavaDogs/cws/issues/62)
 
 The CWS 1.2 release will be a fairly minor version, with some minor API
 enhancements, as well as a few improvements. Unless more urgent requests will

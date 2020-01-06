@@ -101,28 +101,28 @@ Besides, encrypting all data stored, the CWS also has a number of features to
 ensure that the security is as high as it can be, considering that it can be
 deployed in a "hostile" environment.
 
- * MasterKey - The MasterKey is used to encrypt and decrypt various information
-   and it must be set at startup, since it is not persisted anywhere.
- * Removing sensitive data from memory, done by aggressively perform a deep
-   analysis of Objects and overwrite volatile information, to reduce the risk
-   of having sensitive information present in memory dumps.
- * Invalidate Accounts, this allows a member to force the keys to be replaced
-   internally, so it is possible to log in and view Circles, but it will not be
-   possible to extract data, as the keys are not the same as the ones, which
-   was used in the Circles.
- * Data Corruption checks, to verify if there has been alterations to encrypted
-   data, which may result in inability to properly extract information.
+* MasterKey - The MasterKey is used to encrypt and decrypt various information
+  and it must be set at startup, since it is not persisted anywhere.
+* Removing sensitive data from memory, done by aggressively perform a deep
+  analysis of Objects and overwrite volatile information, to reduce the risk
+  of having sensitive information present in memory dumps.
+* Invalidate Accounts, this allows a member to force the keys to be replaced
+  internally, so it is possible to log in and view Circles, but it will not be
+  possible to extract data, as the keys are not the same as the ones, which
+  was used in the Circles.
+* Data Corruption checks, to verify if there has been alterations to encrypted
+  data, which may result in inability to properly extract information.
 
 ## Release Plan
 
 This is the CWS 1.2 development branch, following features are planned:
 
- * [Inventory Report](https://github.com/JavaDogs/cws/issues/56)
- * [Enable CORS](https://github.com/JavaDogs/cws/issues/65)
- * [Add Swagger File](https://github.com/JavaDogs/cws/issues/67)
- * [Lookup Data Objects from name](https://github.com/JavaDogs/cws/issues/59)
- * [Change Auhenticate Signature](https://github.com/JavaDogs/cws/issues/64)
- * [Allow Deletion of Circles for System Administrators](https://github.com/JavaDogs/cws/issues/62)
+* [Inventory Report](https://github.com/JavaDogs/cws/issues/56)
+* [Enable CORS](https://github.com/JavaDogs/cws/issues/65)
+* [Add Swagger File](https://github.com/JavaDogs/cws/issues/67)
+* [Lookup Data Objects from name](https://github.com/JavaDogs/cws/issues/59)
+* [Change Auhenticate Signature](https://github.com/JavaDogs/cws/issues/64)
+* [Allow Deletion of Circles for System Administrators](https://github.com/JavaDogs/cws/issues/62)
 
 The CWS 1.2 release will be a fairly minor version, with some minor API
 enhancements, as well as a few improvements. Unless more urgent requests will

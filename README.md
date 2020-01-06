@@ -1,6 +1,13 @@
 # CWS - Cryptographic Web Store
 
-[![Build Status](https://api.travis-ci.org/JavaDogs/cws.svg)](https://travis-ci.org/JavaDogs/cws) [![CircleCI](https://circleci.com/gh/JavaDogs/cws.png?style=shield)](https://circleci.com/gh/JavaDogs/cws) [![Coverity](https://scan.coverity.com/projects/13955/badge.svg)](https://scan.coverity.com/projects/javadogs-cws) [![SonarQube](https://sonarcloud.io/api/project_badges/measure?project=io.javadog:cws&metric=alert_status)](https://sonarcloud.io/dashboard?id=io.javadog:cws) [![Maintainability](https://api.codeclimate.com/v1/badges/4b40d6c7f75f9d40ae41/maintainability)](https://codeclimate.com/github/JavaDogs/cws/maintainability) [![Codacy](https://api.codacy.com/project/badge/Grade/78366d7059554164a3f65ceabe986598)](https://www.codacy.com/app/cws/cws) [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/1566/badge)](https://bestpractices.coreinfrastructure.org/projects/1566) [![Software License](https://img.shields.io/badge/license-Apache+License+2.0-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0)
+[![Build Status](https://api.travis-ci.org/JavaDogs/cws.svg)](https://travis-ci.org/JavaDogs/cws)
+[![CircleCI](https://circleci.com/gh/JavaDogs/cws.png?style=shield)](https://circleci.com/gh/JavaDogs/cws)
+[![Coverity](https://scan.coverity.com/projects/13955/badge.svg)](https://scan.coverity.com/projects/javadogs-cws)
+[![SonarQube](https://sonarcloud.io/api/project_badges/measure?project=io.javadog:cws&metric=alert_status)](https://sonarcloud.io/dashboard?id=io.javadog:cws)
+[![Maintainability](https://api.codeclimate.com/v1/badges/4b40d6c7f75f9d40ae41/maintainability)](https://codeclimate.com/github/JavaDogs/cws/maintainability)
+[![Codacy](https://api.codacy.com/project/badge/Grade/78366d7059554164a3f65ceabe986598)](https://www.codacy.com/app/cws/cws)
+[![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/1566/badge)](https://bestpractices.coreinfrastructure.org/projects/1566)
+[![Software License](https://img.shields.io/badge/license-Apache+License+2.0-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0)
 
 [CWS](https://javadog.io/), Cryptographic Web Store, works like a "PGP for the
 Cloud". It is designed as a backend component with the vision that it should be
@@ -26,7 +33,8 @@ as database, but thanks to the flexibility of Java EE, it is possible to use any
 database desired. Testing of CWS has been done using both
 [WildFly](http://www.wildfly.org/) and [Payara](https://payara.fish/).
 
-# Build, Install and Run
+## Build, Install and Run
+
 The final version 1.1 of CWS can be downloaded from [JavaDog](https://javadog.io/),
 version 1.2 will be a minor feature release, planned for end of January, 2020.
 The aim is to constantly have a stable and usable system, so if needed - please
@@ -55,17 +63,17 @@ a local CWS instance using your existing container.
 create the deployable WAR packages for either Payara or WildFly:
 
 ```
-$ cd [ /path/to/cws/sources ]
-$ mvn clean verify
+cd [ /path/to/cws/sources ]
+mvn clean verify
 ```
 
 Using the Payara or WildFly scripts to deploy the correct WAR file.
 Now copy the cws.war file in place.
 
 ```
-$ export PATH=[ / path/to/cws/sources ]/accessories/release/bin:${PATH}
-$ payara.sh configure
-$ payara.sh deploy
+export PATH=[ / path/to/cws/sources ]/accessories/release/bin:${PATH}
+payara.sh configure
+payara.sh deploy
 ```
 
 Now, you should have a running version of CWS which can be reached from the
@@ -80,14 +88,14 @@ If you have swagger installed, please load the swagger.json file from the
 accessories/release folder, which will help you build a local client for the
 JSON based REST API.
 
-# Who is this for
+## Who is this for
 
 Anyone for whom data protection is important may find CWS useful. It is designed
 so everything is stored encrypted in a way, so only those who the data belongs
 to may access it. This is achieved by ensuring that the full control over all
 Keys is placed with the users.
 
-# Security Features
+## Security Features
 
 Besides, encrypting all data stored, the CWS also has a number of features to
 ensure that the security is as high as it can be, considering that it can be
@@ -105,9 +113,10 @@ deployed in a "hostile" environment.
  * Data Corruption checks, to verify if there has been alterations to encrypted
    data, which may result in inability to properly extract information.
 
-# Release Plan
+## Release Plan
 
 This is the CWS 1.2 development branch, following features are planned:
+
  * [Inventory Report](https://github.com/JavaDogs/cws/issues/56)
  * [Enable CORS](https://github.com/JavaDogs/cws/issues/65)
  * [Add Swagger File](https://github.com/JavaDogs/cws/issues/67)
@@ -125,7 +134,7 @@ Even though the code base will be migrated, and new features will only be added
 in the 2.0+ releases, issues discovered in the 1.x releases will be addressed
 until [September 2023](https://adoptopenjdk.net/support.html).
 
-# Wish to join
+## Wish to join
 
 The overall quality of the software can only improve if more eyes look at it and
 help with implementing features and adding more tests. If you wish to join,
@@ -154,10 +163,10 @@ is meaningless and should be removed.
 CWS is developed using IntelliJ IDEA & a local SonarQube instance. The styles
 used and the SonarQube Quality Profile can be found in the accessories folder.
 
-# Software License
+## Software License
 
 The CWS is released under Apache License 2 or APL2.
 
-# Contact
+## Contact
 
 Kim.Jensen at javadog.io

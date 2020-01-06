@@ -62,32 +62,32 @@ public final class ProcessCircleService extends Serviceable<CommonDao, ProcessCi
         // Pre-checks, & destruction of credentials
         verifyRequest(request, Permission.PROCESS_CIRCLE);
         Arrays.fill(request.getCredential(), (byte) 0);
-        final ProcessCircleResponse response;
         final Action action = request.getAction();
+        final ProcessCircleResponse response;
 
         if (action == Action.CREATE) {
-            // Anyone cay create a Circle, only a Circle Administrator of the
+            // Anyone can create a Circle, only a Circle Administrator of the
             // Circle in question may perform other actions on Circles.
             response = createCircle(request);
+        } else if (hasAdminRights()) {
+            response = performNonCreateActions(request);
         } else {
-            if ((member.getMemberRole() == MemberRole.ADMIN) || (trustees.get(0).getTrustLevel() == TrustLevel.ADMIN)) {
-                switch (request.getAction()) {
-                    case UPDATE:
-                        response = updateCircle(request);
-                        break;
-                    case DELETE:
-                        response = deleteCircle(request);
-                        break;
-                    default:
-                        // Unreachable Code by design.
-                        throw new IllegalActionException("Unsupported Action.");
-                }
-            } else {
-                throw new AuthorizationException("Only a Circle Administrator may perform this action.");
-            }
+            throw new AuthorizationException("Only a Circle Administrator may perform this action.");
         }
 
         return response;
+    }
+
+    /**
+     * <p>Only a System or Circle Administrator may update or delete a Circle
+     * of Trust. The pre-checks will ensure that at least one Circle of Trust
+     * relationship exists at this point, hence the checks will always be
+     * valid and not cause any errors.</p>
+     *
+     * @return True if requesting user has administrative permissions
+     */
+    private boolean hasAdminRights() {
+        return (member.getMemberRole() == MemberRole.ADMIN) || (trustees.get(0).getTrustLevel() == TrustLevel.ADMIN);
     }
 
     /**
@@ -173,6 +173,23 @@ public final class ProcessCircleService extends Serviceable<CommonDao, ProcessCi
         entity.setParentId(0L);
         entity.setType(dataTypeEntity);
         dao.persist(entity);
+    }
+
+    private ProcessCircleResponse performNonCreateActions(final ProcessCircleRequest request) {
+        final ProcessCircleResponse response;
+
+        switch (request.getAction()) {
+            case UPDATE:
+                response = updateCircle(request);
+                break;
+            case DELETE:
+                response = deleteCircle(request);
+                break;
+            default:
+                // Unreachable Code by design.
+                throw new IllegalActionException("Unsupported Action.");
+        }
+        return response;
     }
 
     /**

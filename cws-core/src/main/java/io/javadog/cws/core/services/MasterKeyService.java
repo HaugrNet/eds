@@ -90,19 +90,10 @@ public final class MasterKeyService extends Serviceable<CommonDao, MasterKeyResp
             masterKey.setKey(newMasterKey);
             response = new MasterKeyResponse(ReturnCode.SUCCESS, "MasterKey unlocked.");
         } else if (checkCredentials(oldMasterKey, admin, request.getCredential())) {
-            // The old masterKey was needed to unlock, but a new secret has been
-            // requested - so let's update the masterKey, and also the Salt for
-            // the System Administrator... However, this can *only* be done, if
-            // no other accounts exists in the system!
-            if (dao.countMembers() == 1) {
-                // Only one account exists, the System Administrator - so we can
-                // update the key.
-                masterKey.setKey(newMasterKey);
-                updateMemberPassword(admin, request.getCredential());
-                response = new MasterKeyResponse(ReturnCode.SUCCESS, "MasterKey updated.");
-            } else {
-                throw new IllegalActionException("Cannot alter the MasterKey, as Member Accounts exists.");
-            }
+            throwExceptionIfAccountsExists();
+            masterKey.setKey(newMasterKey);
+            updateMemberPassword(admin, request.getCredential());
+            response = new MasterKeyResponse(ReturnCode.SUCCESS, "MasterKey updated.");
         } else {
             // Neither keys worked, throw Authentication Exception
             throw new AuthenticationException("Invalid credentials.");
@@ -175,5 +166,17 @@ public final class MasterKeyService extends Serviceable<CommonDao, MasterKeyResp
         }
 
         return admin;
+    }
+
+    /**
+     * The old masterKey was needed to unlock, but a new secret has been
+     * requested - so let's update the masterKey, and also the Salt for the
+     * System Administrator... However, this can *only* be done, if no other
+     * accounts exists in the system!
+     */
+    private void throwExceptionIfAccountsExists() {
+        if (dao.countMembers() != 1) {
+            throw new IllegalActionException("Cannot alter the MasterKey, as Member Accounts exists.");
+        }
     }
 }

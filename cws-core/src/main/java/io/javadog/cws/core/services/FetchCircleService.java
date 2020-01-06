@@ -53,23 +53,35 @@ public final class FetchCircleService extends Serviceable<CommonDao, FetchCircle
         Arrays.fill(request.getCredential(), (byte) 0);
 
         final FetchCircleResponse response = new FetchCircleResponse();
-        final List<Circle> circles;
 
         if ((member.getMemberRole() == MemberRole.ADMIN) || settings.hasShowAllCircles()) {
-            final List<CircleEntity> entities = dao.findAllAscending(CircleEntity.class, "name");
-            circles = new ArrayList<>(entities.size());
-            for (final CircleEntity entity : entities) {
-                circles.add(convert(entity, extractExternalCircleKey(entity)));
-            }
+            response.setCircles(fetchCirclesForAdmin());
         } else {
-            circles = new ArrayList<>(trustees.size());
-            for (final TrusteeEntity trustee : trustees) {
-                circles.add(convert(trustee.getCircle(), decryptExternalKey(trustee)));
-            }
+            response.setCircles(fetchFirclesForMember());
         }
 
-        response.setCircles(circles);
         return response;
+    }
+
+    private List<Circle> fetchCirclesForAdmin() {
+        final List<CircleEntity> entities = dao.findAllAscending(CircleEntity.class, "name");
+        final List<Circle> circles = new ArrayList<>(entities.size());
+
+        for (final CircleEntity entity : entities) {
+            circles.add(convert(entity, extractExternalCircleKey(entity)));
+        }
+
+        return circles;
+    }
+
+    private List<Circle> fetchFirclesForMember() {
+        final List<Circle> circles = new ArrayList<>(trustees.size());
+
+        for (final TrusteeEntity trustee : trustees) {
+            circles.add(convert(trustee.getCircle(), decryptExternalKey(trustee)));
+        }
+
+        return circles;
     }
 
     private String extractExternalCircleKey(final CircleEntity entity) {

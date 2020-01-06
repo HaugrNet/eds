@@ -113,65 +113,77 @@ public abstract class Serviceable<D extends CommonDao, R extends CwsResponse, A 
      * @param action         The Action for the permission check
      */
     protected final void verifyRequest(final A authentication, final Permission action) {
-        if (settings.isReady()) {
-            // If available, let's extract the CircleId so it can be used to improve
-            // accuracy of the checks and reduce the amount of data fetched from the
-            // database in preparation to perform these checks.
-            String circleId = null;
-            if (authentication instanceof CircleIdRequest) {
-                circleId = ((CircleIdRequest) authentication).getCircleId();
-            }
+        // As this is the first common logic element for all service requests,
+        // it is also the logical place to have a check to see if the system is
+        // ready to be used. If not, then an Exception is thrown.
+        throwIfSystemIsNotReady();
 
-            // Step 1; Verify if the given data is sufficient to complete the
-            //         request. If not sufficient, no need to continue and involve
-            //         the DB, so an Exception will be thrown.
-            verify(authentication);
+        // If available, let's extract the CircleId so it can be used to improve
+        // accuracy of the checks and reduce the amount of data fetched from the
+        // database in preparation to perform these checks.
+        String circleId = null;
+        if (authentication instanceof CircleIdRequest) {
+            circleId = ((CircleIdRequest) authentication).getCircleId();
+        }
 
-            // Step 2; Authentication. This part is a bit more tricky, since CWS
-            //         supports that members can come in either with a username
-            //         and password or with a session.
-            if (authentication.getCredentialType() == CredentialType.SESSION) {
-                // 2.a Session Authentication. The same value (Session Key) is
-                //     used to both find the account and authenticate the
-                //     account. Hence, a special set of information is checked
-                //     as part of this process.
-                //       The verification of the Session will result in an
-                //     Exception, if the session has expired, cannot be found
-                //     or is not valid.
-                //       For valid sessions, the MasterKey has been used to
-                //     encrypt the SessionKey, before it is being used to unlock
-                //     the Member KeyPair. This is to prevent that a copy of the
-                //     database may result in someone being able to unlock the
-                //     Account details with just the SessionKey alone.
-                verifySession(authentication, circleId);
-            } else {
-                // 2.b Find the Member by the given credentials, if nothing is
-                //     found, then no need to continue. Unless, the account not
-                //     found is the Administrator Account, in which case we will
-                //     add a new Account with the given Credentials.
-                //       Note; if the CircleId is already given, it will be used
-                //     as part of the lookup, thus limiting what is being
-                //     searched and also allow the checks to end earlier.
-                //     However, equally important, this check is a premature
-                //     check and will *not* count in the final Business Logic!
-                verifyAccount(authentication, circleId);
+        // Step 1; Verify if the given data is sufficient to complete the
+        //         request. If not sufficient, no need to continue and involve
+        //         the DB, so an Exception will be thrown.
+        verify(authentication);
 
-                //     Check if the Member is valid, i.e. if the given
-                //     Credentials can correctly decrypt the Private Key for
-                //     the Account. If not, then an Exception is thrown.
-                checkCredentials(member, authentication.getCredential(), member.getPrivateKey());
-            }
-
-            // Step 3; Final check, ensure that the Member is having the correct
-            //         level of Access to any Circle - which doesn't necessarily
-            //         mean to the requesting Circle, as it requires deeper
-            //         checking.
-            //           Note; if the CircleId is already given, then it will be
-            //         used to also check of the Member is Authorized. Again, this
-            //         check is only a premature check and will not count against
-            //         the final checks in the Business Logic.
-            checkAuthorization(action, circleId);
+        // Step 2; Authentication. This part is a bit more tricky, since CWS
+        //         supports that members can come in either with a username
+        //         and password or with a session.
+        if (authentication.getCredentialType() == CredentialType.SESSION) {
+            // 2.a Session Authentication. The same value (Session Key) is
+            //     used to both find the account and authenticate the
+            //     account. Hence, a special set of information is checked
+            //     as part of this process.
+            //       The verification of the Session will result in an
+            //     Exception, if the session has expired, cannot be found
+            //     or is not valid.
+            //       For valid sessions, the MasterKey has been used to
+            //     encrypt the SessionKey, before it is being used to unlock
+            //     the Member KeyPair. This is to prevent that a copy of the
+            //     database may result in someone being able to unlock the
+            //     Account details with just the SessionKey alone.
+            verifySession(authentication, circleId);
         } else {
+            // 2.b Find the Member by the given credentials, if nothing is
+            //     found, then no need to continue. Unless, the account not
+            //     found is the Administrator Account, in which case we will
+            //     add a new Account with the given Credentials.
+            //       Note; if the CircleId is already given, it will be used
+            //     as part of the lookup, thus limiting what is being
+            //     searched and also allow the checks to end earlier.
+            //     However, equally important, this check is a premature
+            //     check and will *not* count in the final Business Logic!
+            verifyAccount(authentication, circleId);
+
+            //     Check if the Member is valid, i.e. if the given
+            //     Credentials can correctly decrypt the Private Key for
+            //     the Account. If not, then an Exception is thrown.
+            checkCredentials(member, authentication.getCredential(), member.getPrivateKey());
+        }
+
+        // Step 3; Final check, ensure that the Member is having the correct
+        //         level of Access to any Circle - which doesn't necessarily
+        //         mean to the requesting Circle, as it requires deeper
+        //         checking.
+        //           Note; if the CircleId is already given, then it will be
+        //         used to also check of the Member is Authorized. Again, this
+        //         check is only a premature check and will not count against
+        //         the final checks in the Business Logic.
+        checkAuthorization(action, circleId);
+    }
+
+    /**
+     * <p>Checks if the ready flag is set to true in the settings, if not then
+     * a {@link CWSException} is thrown. The flag is updated to true via the
+     * {@link io.javadog.cws.core.StartupBean}.</p>
+     */
+    private void throwIfSystemIsNotReady() {
+        if (!settings.isReady()) {
             throw new CWSException(ReturnCode.DATABASE_ERROR, "The Database is invalid, CWS neither can nor will work correctly until resolved.");
         }
     }

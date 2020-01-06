@@ -84,14 +84,10 @@ public final class FetchTrusteeService extends Serviceable<TrusteeDao, FetchTrus
         // where there is no relation.
         if (memberId != null) {
             trustees = dao.findTrusteesByMemberAndCircle(memberId, circleId);
-            if (trustees.isEmpty()) {
-                throw new IdentificationException("Unable to find any relation between given Circle & Member Id's.");
-            }
+            throwExceptionIfNoRelationExists(trustees.isEmpty());
         } else {
             trustees = dao.findTrusteesByCircle(circleId);
-            if (trustees.isEmpty()) {
-                throw new IdentificationException("The requested Circle cannot be found.");
-            }
+            throwExceptionIfNoCircleExists(trustees.isEmpty());
         }
 
         return trustees;
@@ -105,9 +101,7 @@ public final class FetchTrusteeService extends Serviceable<TrusteeDao, FetchTrus
             // then it is normally only permitted to be made by a
             // System Administrator.
             trustees = dao.findTrusteesByMember(memberId);
-            if (trustees.isEmpty()) {
-                throw new IdentificationException("Unable to find any Trustee information for the given Member Id.");
-            }
+            throwExceptionIfTrusteeDoesntExist(trustees.isEmpty());
         } else if (memberId.equals(member.getExternalId())) {
             // Exception to the rule, is if the requesting user is
             // inquiring about themselves.
@@ -132,5 +126,41 @@ public final class FetchTrusteeService extends Serviceable<TrusteeDao, FetchTrus
         trustee.setAdded(entity.getAdded());
 
         return trustee;
+    }
+
+    /**
+     * <p>Throws an {@link IdentificationException} if no Trustee relationship
+     * exists between the Circle of Trust and Member Id's.</p>
+     *
+     * @param isEmpty Boolean flag to determine if an exception should be thrown
+     */
+    private static void throwExceptionIfNoRelationExists(final boolean isEmpty) {
+        if (isEmpty) {
+            throw new IdentificationException("Unable to find any relation between given Circle & Member Id's.");
+        }
+    }
+
+    /**
+     * <p>Throws an {@link IdentificationException} if a specific Trustee
+     * relation between a Circle of Trust &amp; Member Id is missing.</p>
+     *
+     * @param isEmpty Boolean flag to determine if an exception should be thrown
+     */
+    private static void throwExceptionIfTrusteeDoesntExist(final boolean isEmpty) {
+        if (isEmpty) {
+            throw new IdentificationException("Unable to find any Trustee information for the given Member Id.");
+        }
+    }
+
+    /**
+     * <p>Throws an {@link IdentificationException} if no Circles of Trust
+     * exists, with the given Id.</p>
+     *
+     * @param isEmpty Boolean flag to determine if an exception should be thrown
+     */
+    private static void throwExceptionIfNoCircleExists(final boolean isEmpty) {
+        if (isEmpty) {
+            throw new IdentificationException("The requested Circle cannot be found.");
+        }
     }
 }

@@ -116,7 +116,8 @@ public abstract class Serviceable<D extends CommonDao, R extends CwsResponse, A 
         // As this is the first common logic element for all service requests,
         // it is also the logical place to have a check to see if the system is
         // ready to be used. If not, then an Exception is thrown.
-        throwIfSystemIsNotReady();
+        throwConditionalException(!settings.isReady(),
+                ReturnCode.DATABASE_ERROR, "The Database is invalid, CWS neither can nor will work correctly until resolved.");
 
         // If available, let's extract the CircleId so it can be used to improve
         // accuracy of the checks and reduce the amount of data fetched from the
@@ -175,17 +176,6 @@ public abstract class Serviceable<D extends CommonDao, R extends CwsResponse, A 
         //         check is only a premature check and will not count against
         //         the final checks in the Business Logic.
         checkAuthorization(action, circleId);
-    }
-
-    /**
-     * <p>Checks if the ready flag is set to true in the settings, if not then
-     * a {@link CWSException} is thrown. The flag is updated to true via the
-     * {@link io.javadog.cws.core.StartupBean}.</p>
-     */
-    private void throwIfSystemIsNotReady() {
-        if (!settings.isReady()) {
-            throw new CWSException(ReturnCode.DATABASE_ERROR, "The Database is invalid, CWS neither can nor will work correctly until resolved.");
-        }
     }
 
     /**
@@ -457,5 +447,22 @@ public abstract class Serviceable<D extends CommonDao, R extends CwsResponse, A 
 
     protected static boolean isEmpty(final String value) {
         return (value == null) || value.isEmpty();
+    }
+
+    /**
+     * <p>General method to throw an Exception, if the condition has been met,
+     * i.e. of the given boolean value is true. The Exception thrown will be
+     * the general {@link CWSException} with the given {@link ReturnCode} and
+     * message.</p>
+     *
+     * @param condition  Boolean condition, if true then throw exception
+     * @param returnCode The ReturnCode for the Exception
+     * @param message    The message for te Exception
+     * @throws CWSException if the condition is true
+     */
+    static void throwConditionalException(final boolean condition, final ReturnCode returnCode, final String message) {
+        if (condition) {
+            throw new CWSException(returnCode, message);
+        }
     }
 }

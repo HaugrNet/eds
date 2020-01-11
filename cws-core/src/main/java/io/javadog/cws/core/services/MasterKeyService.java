@@ -25,7 +25,6 @@ import io.javadog.cws.api.responses.MasterKeyResponse;
 import io.javadog.cws.core.enums.StandardSetting;
 import io.javadog.cws.core.exceptions.AuthenticationException;
 import io.javadog.cws.core.exceptions.CryptoException;
-import io.javadog.cws.core.exceptions.IllegalActionException;
 import io.javadog.cws.core.jce.MasterKey;
 import io.javadog.cws.core.jce.SecretCWSKey;
 import io.javadog.cws.core.model.CommonDao;
@@ -90,7 +89,8 @@ public final class MasterKeyService extends Serviceable<CommonDao, MasterKeyResp
             masterKey.setKey(newMasterKey);
             response = new MasterKeyResponse(ReturnCode.SUCCESS, "MasterKey unlocked.");
         } else if (checkCredentials(oldMasterKey, admin, request.getCredential())) {
-            throwExceptionIfAccountsExists();
+            throwConditionalException(dao.countMembers() != 1,
+                    ReturnCode.ILLEGAL_ACTION, "Cannot alter the MasterKey, as Member Accounts exists.");
             masterKey.setKey(newMasterKey);
             updateMemberPassword(admin, request.getCredential());
             response = new MasterKeyResponse(ReturnCode.SUCCESS, "MasterKey updated.");
@@ -166,17 +166,5 @@ public final class MasterKeyService extends Serviceable<CommonDao, MasterKeyResp
         }
 
         return admin;
-    }
-
-    /**
-     * The old masterKey was needed to unlock, but a new secret has been
-     * requested - so let's update the masterKey, and also the Salt for the
-     * System Administrator... However, this can *only* be done, if no other
-     * accounts exists in the system!
-     */
-    private void throwExceptionIfAccountsExists() {
-        if (dao.countMembers() != 1) {
-            throw new IllegalActionException("Cannot alter the MasterKey, as Member Accounts exists.");
-        }
     }
 }

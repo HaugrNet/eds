@@ -17,6 +17,7 @@
 package io.javadog.cws.core.services;
 
 import io.javadog.cws.api.common.MemberRole;
+import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.dtos.Trustee;
 import io.javadog.cws.api.requests.FetchTrusteeRequest;
 import io.javadog.cws.api.responses.FetchTrusteeResponse;
@@ -84,10 +85,12 @@ public final class FetchTrusteeService extends Serviceable<TrusteeDao, FetchTrus
         // where there is no relation.
         if (memberId != null) {
             trustees = dao.findTrusteesByMemberAndCircle(memberId, circleId);
-            throwExceptionIfNoRelationExists(trustees.isEmpty());
+            throwConditionalException(trustees.isEmpty(),
+                    ReturnCode.IDENTIFICATION_WARNING, "Unable to find any relation between given Circle & Member Id's.");
         } else {
             trustees = dao.findTrusteesByCircle(circleId);
-            throwExceptionIfNoCircleExists(trustees.isEmpty());
+            throwConditionalException(trustees.isEmpty(),
+                    ReturnCode.IDENTIFICATION_WARNING, "The requested Circle cannot be found.");
         }
 
         return trustees;
@@ -101,7 +104,8 @@ public final class FetchTrusteeService extends Serviceable<TrusteeDao, FetchTrus
             // then it is normally only permitted to be made by a
             // System Administrator.
             trustees = dao.findTrusteesByMember(memberId);
-            throwExceptionIfTrusteeDoesntExist(trustees.isEmpty());
+            throwConditionalException(trustees.isEmpty(),
+                    ReturnCode.IDENTIFICATION_WARNING, "Unable to find any Trustee information for the given Member Id.");
         } else if (memberId.equals(member.getExternalId())) {
             // Exception to the rule, is if the requesting user is
             // inquiring about themselves.
@@ -126,41 +130,5 @@ public final class FetchTrusteeService extends Serviceable<TrusteeDao, FetchTrus
         trustee.setAdded(entity.getAdded());
 
         return trustee;
-    }
-
-    /**
-     * <p>Throws an {@link IdentificationException} if no Trustee relationship
-     * exists between the Circle of Trust and Member Id's.</p>
-     *
-     * @param isEmpty Boolean flag to determine if an exception should be thrown
-     */
-    private static void throwExceptionIfNoRelationExists(final boolean isEmpty) {
-        if (isEmpty) {
-            throw new IdentificationException("Unable to find any relation between given Circle & Member Id's.");
-        }
-    }
-
-    /**
-     * <p>Throws an {@link IdentificationException} if a specific Trustee
-     * relation between a Circle of Trust &amp; Member Id is missing.</p>
-     *
-     * @param isEmpty Boolean flag to determine if an exception should be thrown
-     */
-    private static void throwExceptionIfTrusteeDoesntExist(final boolean isEmpty) {
-        if (isEmpty) {
-            throw new IdentificationException("Unable to find any Trustee information for the given Member Id.");
-        }
-    }
-
-    /**
-     * <p>Throws an {@link IdentificationException} if no Circles of Trust
-     * exists, with the given Id.</p>
-     *
-     * @param isEmpty Boolean flag to determine if an exception should be thrown
-     */
-    private static void throwExceptionIfNoCircleExists(final boolean isEmpty) {
-        if (isEmpty) {
-            throw new IdentificationException("The requested Circle cannot be found.");
-        }
     }
 }

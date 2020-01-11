@@ -116,8 +116,7 @@ public abstract class Serviceable<D extends CommonDao, R extends CwsResponse, A 
         // As this is the first common logic element for all service requests,
         // it is also the logical place to have a check to see if the system is
         // ready to be used. If not, then an Exception is thrown.
-        throwConditionalException(!settings.isReady(),
-                ReturnCode.DATABASE_ERROR, "The Database is invalid, CWS neither can nor will work correctly until resolved.");
+        throwIfSystemIsNotReady();
 
         // If available, let's extract the CircleId so it can be used to improve
         // accuracy of the checks and reduce the amount of data fetched from the
@@ -176,6 +175,17 @@ public abstract class Serviceable<D extends CommonDao, R extends CwsResponse, A 
         //         check is only a premature check and will not count against
         //         the final checks in the Business Logic.
         checkAuthorization(action, circleId);
+    }
+
+    /**
+     * <p>Checks if the ready flag is set to true in the settings, if not then
+     * a {@link CWSException} is thrown. The flag is updated to true via the
+     * {@link io.javadog.cws.core.StartupBean}.</p>
+     */
+    private void throwIfSystemIsNotReady() {
+        if (!settings.isReady()) {
+            throw new CWSException(ReturnCode.DATABASE_ERROR, "The Database is invalid, CWS neither can nor will work correctly until resolved.");
+        }
     }
 
     /**
@@ -450,6 +460,22 @@ public abstract class Serviceable<D extends CommonDao, R extends CwsResponse, A 
     }
 
     /**
+     * <p>For null checks, which may otherwise cause Static Analysis problems,
+     * this method was added, which simply checks the given Object if it is
+     * null, and in that case, it invokes the method
+     * {@link #throwConditionalException(boolean, ReturnCode, String)}.</p>
+     *
+     * @param obj        Object to check, if it is null or not
+     * @param returnCode The ReturnCode for the Exception
+     * @param message    The message for the Exception
+     * @throws CWSException if the given Object is null
+     * @see #throwConditionalException(boolean, ReturnCode, String)
+     */
+    static void throwConditionalNullException(final Object obj, final ReturnCode returnCode, final String message) {
+        throwConditionalException(obj == null, returnCode, message);
+    }
+
+    /**
      * <p>General method to throw an Exception, if the condition has been met,
      * i.e. of the given boolean value is true. The Exception thrown will be
      * the general {@link CWSException} with the given {@link ReturnCode} and
@@ -457,7 +483,7 @@ public abstract class Serviceable<D extends CommonDao, R extends CwsResponse, A 
      *
      * @param condition  Boolean condition, if true then throw exception
      * @param returnCode The ReturnCode for the Exception
-     * @param message    The message for te Exception
+     * @param message    The message for the Exception
      * @throws CWSException if the condition is true
      */
     static void throwConditionalException(final boolean condition, final ReturnCode returnCode, final String message) {

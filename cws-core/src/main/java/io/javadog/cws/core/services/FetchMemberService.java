@@ -23,7 +23,6 @@ import io.javadog.cws.api.dtos.Member;
 import io.javadog.cws.api.requests.FetchMemberRequest;
 import io.javadog.cws.api.responses.FetchMemberResponse;
 import io.javadog.cws.core.enums.Permission;
-import io.javadog.cws.core.exceptions.CWSException;
 import io.javadog.cws.core.model.MemberDao;
 import io.javadog.cws.core.model.Settings;
 import io.javadog.cws.core.model.entities.CircleEntity;
@@ -68,10 +67,9 @@ public final class FetchMemberService extends Serviceable<MemberDao, FetchMember
                 response.setCircles(convertCircles(trustees));
             } else {
                 final MemberEntity requestedMember = dao.find(MemberEntity.class, request.getMemberId());
-                if (requestedMember == null) {
-                    // No such Account exist, will simply return with an error.
-                    throw new CWSException(ReturnCode.IDENTIFICATION_WARNING, "The requested Member cannot be found.");
-                }
+                // No such Account exist, will simply return with an error.
+                throwConditionalNullException(requestedMember,
+                        ReturnCode.IDENTIFICATION_WARNING, "The requested Member cannot be found.");
 
                 // Request is for a different Member...
                 fetchSomeoneElse(response, requestedMember);

@@ -23,7 +23,6 @@ import io.javadog.cws.api.requests.ProcessDataTypeRequest;
 import io.javadog.cws.api.responses.ProcessDataTypeResponse;
 import io.javadog.cws.core.enums.Permission;
 import io.javadog.cws.core.exceptions.AuthorizationException;
-import io.javadog.cws.core.exceptions.CWSException;
 import io.javadog.cws.core.exceptions.IllegalActionException;
 import io.javadog.cws.core.model.CommonDao;
 import io.javadog.cws.core.model.Settings;
@@ -111,25 +110,20 @@ public final class ProcessDataTypeService extends Serviceable<CommonDao, Process
     }
 
     private ProcessDataTypeResponse doDelete(final ProcessDataTypeRequest request) {
-        final ProcessDataTypeResponse response;
         final String name = request.getTypeName().trim();
         final DataTypeEntity entity = dao.findDataTypeByName(name);
 
-        if (entity != null) {
-            // We need to check that the Data Type is not being used. If so,
-            // then it is not allowed to remove it.
-            final long records = dao.countDataTypeUsage(entity);
-            if (records > 0) {
-                throw new CWSException(ReturnCode.ILLEGAL_ACTION, theDataType(entity) + " cannot be deleted, as it is being actively used.");
-            } else {
-                dao.delete(entity);
-                response = new ProcessDataTypeResponse(theDataType(entity) + " was successfully deleted.");
-            }
-        } else {
-            response = new ProcessDataTypeResponse(ReturnCode.IDENTIFICATION_WARNING, "No records were found with the name '" + name + "'.");
-        }
+        throwConditionalNullException(entity,
+                ReturnCode.IDENTIFICATION_WARNING, "No records were found with the name '" + name + "'.");
 
-        return response;
+        // We need to check that the Data Type is not being used. If so,
+        // then it is not allowed to remove it.
+        final long records = dao.countDataTypeUsage(entity);
+        throwConditionalException(records > 0,
+                ReturnCode.ILLEGAL_ACTION, theDataType(entity) + " cannot be deleted, as it is being actively used.");
+        dao.delete(entity);
+
+        return new ProcessDataTypeResponse(theDataType(entity) + " was successfully deleted.");
     }
 
     /**

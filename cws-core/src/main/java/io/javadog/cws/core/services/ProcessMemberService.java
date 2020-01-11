@@ -67,28 +67,24 @@ public final class ProcessMemberService extends Serviceable<MemberDao, ProcessMe
      */
     @Override
     public ProcessMemberResponse perform(final ProcessMemberRequest request) {
-        if (request != null) {
-            final ProcessMemberResponse response;
+        throwConditionalNullException(request, ReturnCode.VERIFICATION_WARNING, "Cannot Process a NULL Object.");
+        final ProcessMemberResponse response;
 
-            if (request.getCredentialType() == CredentialType.SIGNATURE) {
-                verify(request);
-                final byte[] newCredential = request.getNewCredential();
-                if ((newCredential == null) || (newCredential.length == 0)) {
-                    throw new VerificationException("The " + Constants.FIELD_NEW_CREDENTIAL + " is missing in Request.");
-                }
+        if (request.getCredentialType() == CredentialType.SIGNATURE) {
+            verify(request);
+            final byte[] newCredential = request.getNewCredential();
+            throwConditionalException((newCredential == null) || (newCredential.length == 0),
+                    ReturnCode.VERIFICATION_WARNING, "The " + Constants.FIELD_NEW_CREDENTIAL + " is missing in Request.");
 
-                response = processInvitation(request);
-            } else {
-                // Pre-checks, & destruction of credentials
-                verifyRequest(request, Permission.PROCESS_MEMBER);
-                Arrays.fill(request.getCredential(), (byte) 0);
-                response = processActions(request);
-            }
-
-            return response;
+            response = processInvitation(request);
         } else {
-            throw new VerificationException("Cannot Process a NULL Object.");
+            // Pre-checks, & destruction of credentials
+            verifyRequest(request, Permission.PROCESS_MEMBER);
+            Arrays.fill(request.getCredential(), (byte) 0);
+            response = processActions(request);
         }
+
+        return response;
     }
 
     private ProcessMemberResponse processActions(final ProcessMemberRequest request) {

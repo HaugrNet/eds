@@ -120,20 +120,24 @@ public final class SettingService extends Serviceable<CommonDao, SettingResponse
     private void processCheckedSettings(final SettingRequest request, final Map<String, String> changedEntries) {
         final Map<String, SettingEntity> existing = convertSettings(dao.findAllAscending(SettingEntity.class, "id"));
         for (final Map.Entry<String, String> entry : changedEntries.entrySet()) {
-            final String key = trim(entry.getKey());
-            final SettingEntity existingSetting = existing.get(key);
-            final String value = trim(entry.getValue());
+            processSettingRecord(request, existing, entry);
+        }
+    }
 
-            if (existingSetting != null) {
-                if (isEmpty(value)) {
-                    deleteSetting(existingSetting);
-                } else {
-                    persistAndUpdateSetting(request, existingSetting, key, value);
-                }
+    private void processSettingRecord(final SettingRequest request, final Map<String, SettingEntity> existing, final Map.Entry<String, String> entry) {
+        final String key = trim(entry.getKey());
+        final SettingEntity existingSetting = existing.get(key);
+        final String value = trim(entry.getValue());
+
+        if (existingSetting != null) {
+            if (isEmpty(value)) {
+                deleteSetting(existingSetting);
             } else {
-                final SettingEntity entity = new SettingEntity();
-                persistAndUpdateSetting(request, entity, key, value);
+                persistAndUpdateSetting(request, existingSetting, key, value);
             }
+        } else {
+            final SettingEntity entity = new SettingEntity();
+            persistAndUpdateSetting(request, entity, key, value);
         }
     }
 

@@ -17,7 +17,6 @@
 package io.javadog.cws.core.services;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -221,12 +220,10 @@ final class DataTypeServiceTest extends DatabaseSetup {
         final String newDataTypeType = "The Type information";
         request.setTypeName(theDataTypeName);
         request.setType(newDataTypeType);
-        final ProcessDataTypeResponse response = service.perform(request);
 
-        assertNotNull(response);
-        assertFalse(response.isOk());
-        assertEquals(ReturnCode.IDENTIFICATION_WARNING.getCode(), response.getReturnCode());
-        assertEquals("No records were found with the name '" + theDataTypeName + "'.", response.getReturnMessage());
+        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
+        assertEquals(ReturnCode.IDENTIFICATION_WARNING, cause.getReturnCode());
+        assertEquals("No records were found with the name '" + theDataTypeName + "'.", cause.getMessage());
     }
 
     @Test

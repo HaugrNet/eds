@@ -287,14 +287,13 @@ public final class ProcessDataService extends Serviceable<DataDao, ProcessDataRe
             }
         } else {
             entity = dao.findRootByMemberCircle(member.getId(), circleId);
-            if (entity == null) {
-                // BugReport #57 states that an NPE was thrown, however it
-                // seems that the database might have entered into a strange
-                // inconsistency, hence this Exception.
-                //   The Circle must be manually corrected, which can be done
-                // by simply adding a metadata record with the root folder
-                throw new CWSException(ReturnCode.INTEGRITY_ERROR, "No Parent could be found for the Circle '" + circleId + "', please contact the administrators.");
-            }
+            // BugReport #57 states that an NPE was thrown, however it
+            // seems that the database might have entered into a strange
+            // inconsistency, hence this Exception.
+            //   The Circle must be manually corrected, which can be done
+            // by simply adding a metadata record with the root folder
+            throwConditionalNullException(entity,
+                    ReturnCode.INTEGRITY_ERROR, "No Parent could be found for the Circle '" + circleId + "', please contact the administrators.");
         }
 
         return entity;
@@ -337,23 +336,17 @@ public final class ProcessDataService extends Serviceable<DataDao, ProcessDataRe
      * @return Metadata Entity of the Folder
      */
     private MetadataEntity checkFolder(final MetadataEntity entity, final String folderId) {
-        final MetadataEntity folder;
+        final MetadataEntity folder = dao.findMetadataByMemberAndExternalId(member.getId(), folderId);
+        throwConditionalNullException(folder,
+                ReturnCode.INTEGRITY_WARNING, "No existing Folder could be found.");
 
-        folder = dao.findMetadataByMemberAndExternalId(member.getId(), folderId);
-        if (folder != null) {
-            final Long currentCircleId = entity.getCircle().getId();
-            final Long foundCircleId = folder.getCircle().getId();
+        final Long currentCircleId = entity.getCircle().getId();
+        final Long foundCircleId = folder.getCircle().getId();
 
-            if (Objects.equals(currentCircleId, foundCircleId)) {
-                if (Objects.equals(Constants.FOLDER_TYPENAME, entity.getType().getName())) {
-                    throw new IllegalActionException("It is not permitted to move Folders.");
-                }
-            } else {
-                throw new IllegalActionException("Moving Data from one Circle to another is not permitted.");
-            }
-        } else {
-            throw new CWSException(ReturnCode.INTEGRITY_WARNING, "No existing Folder could be found.");
-        }
+        throwConditionalException(!Objects.equals(currentCircleId, foundCircleId),
+                ReturnCode.ILLEGAL_ACTION, "Moving Data from one Circle to another is not permitted.");
+        throwConditionalException(Objects.equals(Constants.FOLDER_TYPENAME, entity.getType().getName()),
+                ReturnCode.ILLEGAL_ACTION, "It is not permitted to move Folders.");
 
         return folder;
     }

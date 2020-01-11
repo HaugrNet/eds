@@ -22,7 +22,6 @@ import io.javadog.cws.api.dtos.DataType;
 import io.javadog.cws.api.requests.ProcessDataTypeRequest;
 import io.javadog.cws.api.responses.ProcessDataTypeResponse;
 import io.javadog.cws.core.enums.Permission;
-import io.javadog.cws.core.exceptions.AuthorizationException;
 import io.javadog.cws.core.exceptions.IllegalActionException;
 import io.javadog.cws.core.model.CommonDao;
 import io.javadog.cws.core.model.Settings;
@@ -89,9 +88,8 @@ public final class ProcessDataTypeService extends Serviceable<CommonDao, Process
             dao.persist(entity);
         } else {
             entity = found;
-            if (Objects.equals(Constants.FOLDER_TYPENAME, entity.getName()) || Objects.equals(Constants.DATA_TYPENAME, entity.getName())) {
-                throw new AuthorizationException("It is not permitted to update the Data Type '" + entity.getName() + "'.");
-            }
+            throwConditionalException(Objects.equals(Constants.FOLDER_TYPENAME, entity.getName()) || Objects.equals(Constants.DATA_TYPENAME, entity.getName()),
+                    ReturnCode.AUTHORIZATION_WARNING, "It is not permitted to update the Data Type '" + entity.getName() + "'.");
 
             if (!Objects.equals(type, entity.getType())) {
                 entity.setType(type);

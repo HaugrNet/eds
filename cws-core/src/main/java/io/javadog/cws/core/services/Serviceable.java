@@ -201,23 +201,22 @@ public abstract class Serviceable<D extends CommonDao, R extends CwsResponse, A 
      * @throws VerificationException if the given Object is null or invalid
      */
     protected static void verify(final Verifiable verifiable) {
-        if (verifiable != null) {
-            final Map<String, String> errors = verifiable.validate();
-            if (!errors.isEmpty()) {
-                final int capacity = errors.size() * 75;
-                final StringBuilder builder = new StringBuilder(capacity);
+        throwConditionalNullException(verifiable,
+                ReturnCode.VERIFICATION_WARNING, "Cannot Process a NULL Object.");
 
-                for (final Map.Entry<String, String> error : errors.entrySet()) {
-                    builder.append("\nKey: ");
-                    builder.append(error.getKey());
-                    builder.append(", Error: ");
-                    builder.append(error.getValue());
-                }
+        final Map<String, String> errors = verifiable.validate();
+        if (!errors.isEmpty()) {
+            final int capacity = errors.size() * 75;
+            final StringBuilder builder = new StringBuilder(capacity);
 
-                throw new VerificationException("Request Object contained errors:" + builder);
+            for (final Map.Entry<String, String> error : errors.entrySet()) {
+                builder.append("\nKey: ");
+                builder.append(error.getKey());
+                builder.append(", Error: ");
+                builder.append(error.getValue());
             }
-        } else {
-            throw new VerificationException("Cannot Process a NULL Object.");
+
+            throw new VerificationException("Request Object contained errors:" + builder);
         }
     }
 

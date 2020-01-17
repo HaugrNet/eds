@@ -17,6 +17,7 @@
 package io.javadog.cws.core.model;
 
 import io.javadog.cws.api.common.TrustLevel;
+import io.javadog.cws.api.dtos.Metadata;
 import io.javadog.cws.core.model.entities.DataEntity;
 import io.javadog.cws.core.model.entities.MemberEntity;
 import io.javadog.cws.core.model.entities.MetadataEntity;
@@ -111,5 +112,41 @@ public final class DataDao extends CommonDao {
         query.setParameter(NAME, name);
 
         return findSingleRecord(query);
+    }
+
+    public long countInventoryRecords() {
+        final Query query = entityManager.createNamedQuery("metadata.countInventoryRecords");
+
+        return (long) query.getSingleResult();
+    }
+
+    public List<MetadataEntity> readInventoryRecords(final int pageNumber, final int pageSize) {
+        final Query query = entityManager.createNamedQuery("metadata.readInventoryRecords");
+        query.setMaxResults(pageSize);
+        query.setFirstResult((pageNumber - 1) * pageSize);
+
+        return findList(query);
+    }
+
+    /**
+     * <p>Converts a Metadata Entity to a DTO. As the relation between folders
+     * and their content is made with a foreign key and not with the external
+     * Id, the external folder Id is added as second parameter.</p>
+     *
+     * @param entity   The Metadata Entity to convert to a DTO
+     * @param folderId The external folder Id
+     * @return Converted Metadata DTO
+     */
+    public static Metadata convert(final MetadataEntity entity, final String folderId) {
+        final Metadata metaData = new Metadata();
+
+        metaData.setDataId(entity.getExternalId());
+        metaData.setCircleId(entity.getCircle().getExternalId());
+        metaData.setDataName(entity.getName());
+        metaData.setTypeName(entity.getType().getName());
+        metaData.setAdded(entity.getAdded());
+        metaData.setFolderId(folderId);
+
+        return metaData;
     }
 }

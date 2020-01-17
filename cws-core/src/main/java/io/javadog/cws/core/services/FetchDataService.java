@@ -123,7 +123,7 @@ public final class FetchDataService extends Serviceable<DataDao, FetchDataRespon
         final DataEntity entity = dao.findDataByMemberAndExternalId(member, metadata.getExternalId());
         final FetchDataResponse response = new FetchDataResponse();
         final MetadataEntity parent = dao.find(MetadataEntity.class, metadata.getParentId());
-        final Metadata metaData = convert(metadata, parent.getExternalId());
+        final Metadata metaData = DataDao.convert(metadata, parent.getExternalId());
         final List<Metadata> metadataList = new ArrayList<>(1);
         metadataList.add(metaData);
 
@@ -166,7 +166,7 @@ public final class FetchDataService extends Serviceable<DataDao, FetchDataRespon
         final List<Metadata> list = new ArrayList<>(records.size());
 
         for (final MetadataEntity metadata : records) {
-            final Metadata data = convert(metadata, folderId);
+            final Metadata data = DataDao.convert(metadata, folderId);
             list.add(data);
         }
 
@@ -175,18 +175,5 @@ public final class FetchDataService extends Serviceable<DataDao, FetchDataRespon
         response.setRecords(count);
 
         return response;
-    }
-
-    private static Metadata convert(final MetadataEntity entity, final String folderId) {
-        final Metadata metaData = new Metadata();
-
-        metaData.setDataId(entity.getExternalId());
-        metaData.setCircleId(entity.getCircle().getExternalId());
-        metaData.setFolderId(folderId);
-        metaData.setDataName(entity.getName());
-        metaData.setTypeName(entity.getType().getName());
-        metaData.setAdded(entity.getAdded());
-
-        return metaData;
     }
 }

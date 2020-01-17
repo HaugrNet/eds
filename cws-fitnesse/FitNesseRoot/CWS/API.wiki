@@ -45,6 +45,10 @@ resort to CWS logs.
  * '''[[ Data ][#data]] '''
  * '''[[ !-Signatures-! ][#signatures]] '''
 
+[[ Inventory Report: ][#inventory]]
+
+ * '''[[ Inventory Report ][#inventory]] '''
+
 ----
 [[ Top ][#content]]
 !anchor management
@@ -579,5 +583,19 @@ CWS supports simply signing of documents, and later verification of same by othe
 |account name|credential|signatures?                                                                                                                                                                                                                                        |return code?|return message?|
 |user1       |password1 |[Signature{signature='user1_signature3', expires='${tomorrow}', verifications='1'}, Signature{signature='user1_signature2', expires='null', verifications='1'}, Signature{signature='user1_signature1', expires='${yesterday}', verifications='0'}]|${SUCCESS}  |Ok             |
 |user2       |password2 |[]                                                                                                                                                                                                                                                 |${SUCCESS}  |Ok             |
+
+*!
+
+!* Inventory Report
+[[ Top ][#content]]
+!ancor inventory
+!3 '''Inventory Report'''
+
+For administrators, using CWS as part of their system, to store certain or all Objects, they may require a way to synchronize the repositories. For this reason, the Inventory Report is present, it can only be invoked by a System Administrator, and will return a list of all Objects, ordered by the most recent first to the oldest last.
+
+|inventory                                                                                                                                                                                                                                                                                                                                                              |
+|account name|credential|page number|page size|records?|circle id?                                                         |data id?                                                 |data name?                             |type name?                     |return code?            |return message?                                                                  |
+|user1       |password1 |           |         |0       |[]                                                                 |[]                                                       |[]                                     |[]                             |${AUTHORIZATION_WARNING}|Cannot complete this request, as it is only allowed for the System Administrator.|
+|admin       |admin     |1          |25       |6       |[circle1_id,circle1_id,circle2_id,circle1_id,circle1_id,circle1_id]|[moved_id,copied_id,status_id,data5_id,data4_id,data2_id]|[moved,copied,status,data5,data4,data2]|[data,data,data,data,data,data]|${SUCCESS}              |Ok                                                                               |
 
 *!

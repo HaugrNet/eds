@@ -36,6 +36,7 @@ import io.javadog.cws.api.requests.FetchDataTypeRequest;
 import io.javadog.cws.api.requests.FetchMemberRequest;
 import io.javadog.cws.api.requests.FetchSignatureRequest;
 import io.javadog.cws.api.requests.FetchTrusteeRequest;
+import io.javadog.cws.api.requests.InventoryRequest;
 import io.javadog.cws.api.requests.MasterKeyRequest;
 import io.javadog.cws.api.requests.ProcessCircleRequest;
 import io.javadog.cws.api.requests.ProcessDataRequest;
@@ -53,6 +54,7 @@ import io.javadog.cws.api.responses.FetchDataTypeResponse;
 import io.javadog.cws.api.responses.FetchMemberResponse;
 import io.javadog.cws.api.responses.FetchSignatureResponse;
 import io.javadog.cws.api.responses.FetchTrusteeResponse;
+import io.javadog.cws.api.responses.InventoryResponse;
 import io.javadog.cws.api.responses.MasterKeyResponse;
 import io.javadog.cws.api.responses.ProcessCircleResponse;
 import io.javadog.cws.api.responses.ProcessDataResponse;
@@ -121,6 +123,16 @@ final class SoapClientTest {
         final SanityResponse response = soapManagement.sanitized(request);
         assertNotNull(response);
         assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getReturnCode());
+        assertEquals("Ok", response.getReturnMessage());
+    }
+
+    @Test
+    void testInventory() {
+        final InventoryRequest request = prepareRequest(InventoryRequest.class, Constants.ADMIN_ACCOUNT);
+
+        final InventoryResponse response = soapManagement.inventory(request);
+        assertNotNull(response);
+        assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
         assertEquals("Ok", response.getReturnMessage());
     }
 

@@ -29,6 +29,6 @@ final class CwsApplicationTest {
     @Test
     void testApplication() {
         final CwsApplication application = new CwsApplication();
-        assertEquals(11, application.getClasses().size());
+        assertEquals(12, application.getClasses().size());
     }
 }

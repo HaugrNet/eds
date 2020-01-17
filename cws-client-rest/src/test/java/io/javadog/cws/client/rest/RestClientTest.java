@@ -36,6 +36,7 @@ import io.javadog.cws.api.requests.FetchDataTypeRequest;
 import io.javadog.cws.api.requests.FetchMemberRequest;
 import io.javadog.cws.api.requests.FetchSignatureRequest;
 import io.javadog.cws.api.requests.FetchTrusteeRequest;
+import io.javadog.cws.api.requests.InventoryRequest;
 import io.javadog.cws.api.requests.MasterKeyRequest;
 import io.javadog.cws.api.requests.ProcessCircleRequest;
 import io.javadog.cws.api.requests.ProcessDataRequest;
@@ -53,6 +54,7 @@ import io.javadog.cws.api.responses.FetchDataTypeResponse;
 import io.javadog.cws.api.responses.FetchMemberResponse;
 import io.javadog.cws.api.responses.FetchSignatureResponse;
 import io.javadog.cws.api.responses.FetchTrusteeResponse;
+import io.javadog.cws.api.responses.InventoryResponse;
 import io.javadog.cws.api.responses.MasterKeyResponse;
 import io.javadog.cws.api.responses.ProcessCircleResponse;
 import io.javadog.cws.api.responses.ProcessDataResponse;
@@ -277,6 +279,13 @@ final class RestClientTest {
         assertNotNull(verifyResponse);
         assertTrue(verifyResponse.isOk());
         assertTrue(verifyResponse.isVerified());
+    }
+
+    @Test
+    void testInventory() {
+        final InventoryRequest request = prepareRequest(InventoryRequest.class, Constants.ADMIN_ACCOUNT);
+        final InventoryResponse response = restManagement.inventory(request);
+        assertTrue(response.isOk());
     }
 
     // =========================================================================

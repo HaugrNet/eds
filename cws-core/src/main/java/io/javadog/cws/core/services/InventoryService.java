@@ -10,13 +10,16 @@
  */
 package io.javadog.cws.core.services;
 
-import io.javadog.cws.api.common.ReturnCode;
+import io.javadog.cws.api.dtos.Metadata;
 import io.javadog.cws.api.requests.InventoryRequest;
 import io.javadog.cws.api.responses.InventoryResponse;
 import io.javadog.cws.core.enums.Permission;
 import io.javadog.cws.core.model.DataDao;
 import io.javadog.cws.core.model.Settings;
+import io.javadog.cws.core.model.entities.MetadataEntity;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import javax.persistence.EntityManager;
 
 /**
@@ -40,7 +43,19 @@ public class InventoryService extends Serviceable<DataDao, InventoryResponse, In
         verifyRequest(request, Permission.INVENTORY);
         Arrays.fill(request.getCredential(), (byte) 0);
 
-        // And done... Authentication checks all completed
-        return new InventoryResponse(ReturnCode.ILLEGAL_ACTION, "Method not implemented.");
+        final int pageNumber = request.getPageNumber();
+        final int pageSize = request.getPageSize();
+        final List<MetadataEntity> records = dao.readInventoryRecords(pageNumber, pageSize);
+        final List<Metadata> inventory = new ArrayList<>(records.size());
+        for (final MetadataEntity metadata : records) {
+            final Metadata data = DataDao.convert(metadata, "-");
+            inventory.add(data);
+        }
+
+        final InventoryResponse response = new InventoryResponse();
+        response.setRecords(dao.countInventoryRecords());
+        response.setInventory(inventory);
+
+        return response;
     }
 }

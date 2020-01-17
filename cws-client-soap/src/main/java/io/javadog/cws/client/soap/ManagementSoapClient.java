@@ -185,7 +185,24 @@ public final class ManagementSoapClient implements Management {
      */
     @Override
     public InventoryResponse inventory(final InventoryRequest request) {
-        return null;
+        InventoryResponse response = null;
+
+        if (request != null) {
+            final io.javadog.cws.ws.InventoryRequest ws = new io.javadog.cws.ws.InventoryRequest();
+            Mapper.fillAuthentication(ws, request);
+            ws.setPageNumber(request.getPageNumber());
+            ws.setPageSize(request.getPageSize());
+
+            final io.javadog.cws.ws.InventoryResult result = client.inventory(ws);
+            if (result != null) {
+                response = new InventoryResponse();
+                Mapper.fillResponse(response, result);
+                response.setInventory(Mapper.mapMetadata(result.getInventory()));
+                response.setRecords(result.getRecords());
+            }
+        }
+
+        return response;
     }
 
     /**

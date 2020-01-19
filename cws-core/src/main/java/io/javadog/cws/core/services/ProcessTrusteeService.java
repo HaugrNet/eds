@@ -24,6 +24,7 @@ import io.javadog.cws.core.enums.Permission;
 import io.javadog.cws.core.exceptions.CWSException;
 import io.javadog.cws.core.exceptions.IdentificationException;
 import io.javadog.cws.core.exceptions.IllegalActionException;
+import io.javadog.cws.core.jce.Crypto;
 import io.javadog.cws.core.jce.PublicCWSKey;
 import io.javadog.cws.core.jce.SecretCWSKey;
 import io.javadog.cws.core.model.CommonDao;
@@ -115,10 +116,10 @@ public final class ProcessTrusteeService extends Serviceable<CommonDao, ProcessT
         trustee.setKey(admin.getKey());
         trustee.setTrustLevel(trustLevel);
 
-        final SecretCWSKey circleKey = crypto.extractCircleKey(admin.getKey().getAlgorithm(), keyPair.getPrivate(), admin.getCircleKey());
+        final SecretCWSKey circleKey = Crypto.extractCircleKey(admin.getKey().getAlgorithm(), keyPair.getPrivate(), admin.getCircleKey());
         final PublicKey publicKey = crypto.dearmoringPublicKey(newTrusteeMember.getPublicKey());
         final PublicCWSKey cwsPublicKey = new PublicCWSKey(newTrusteeMember.getRsaAlgorithm(), publicKey);
-        trustee.setCircleKey(crypto.encryptAndArmorCircleKey(cwsPublicKey, circleKey));
+        trustee.setCircleKey(Crypto.encryptAndArmorCircleKey(cwsPublicKey, circleKey));
 
         dao.persist(trustee);
         return new ProcessTrusteeResponse("The Member '" + trustee.getMember().getName() + "' was successfully added as trustee to '" + trustee.getCircle().getName() + "'.");

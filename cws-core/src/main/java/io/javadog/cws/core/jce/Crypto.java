@@ -144,7 +144,7 @@ public final class Crypto {
         return chars;
     }
 
-    public SecretCWSKey generateSymmetricKey(final KeyAlgorithm algorithm) {
+    public static SecretCWSKey generateSymmetricKey(final KeyAlgorithm algorithm) {
         try {
             final KeyGenerator generator = KeyGenerator.getInstance(algorithm.getName());
             generator.init(algorithm.getLength());
@@ -156,7 +156,7 @@ public final class Crypto {
         }
     }
 
-    public CWSKeyPair generateAsymmetricKey(final KeyAlgorithm algorithm) {
+    public static CWSKeyPair generateAsymmetricKey(final KeyAlgorithm algorithm) {
         try {
             final KeyPairGenerator generator = KeyPairGenerator.getInstance(algorithm.getName());
             generator.initialize(algorithm.getLength());
@@ -223,7 +223,7 @@ public final class Crypto {
         return bytesToString(decrypted);
     }
 
-    public byte[] encrypt(final SecretCWSKey key, final byte[] toEncrypt) {
+    public static byte[] encrypt(final SecretCWSKey key, final byte[] toEncrypt) {
         try {
             final Cipher cipher = prepareCipher(key, Cipher.ENCRYPT_MODE);
             return cipher.doFinal(toEncrypt);
@@ -232,7 +232,7 @@ public final class Crypto {
         }
     }
 
-    public byte[] encrypt(final PublicCWSKey key, final byte[] toEncrypt) {
+    public static byte[] encrypt(final PublicCWSKey key, final byte[] toEncrypt) {
         try {
             final Cipher cipher = prepareCipher(key, Cipher.ENCRYPT_MODE);
             return cipher.doFinal(toEncrypt);
@@ -241,7 +241,7 @@ public final class Crypto {
         }
     }
 
-    public byte[] decrypt(final SecretCWSKey key, final byte[] toDecrypt) {
+    public static byte[] decrypt(final SecretCWSKey key, final byte[] toDecrypt) {
         try {
             final Cipher cipher = prepareCipher(key, Cipher.DECRYPT_MODE);
             return cipher.doFinal(toDecrypt);
@@ -250,7 +250,7 @@ public final class Crypto {
         }
     }
 
-    public byte[] decrypt(final PrivateCWSKey key, final byte[] toDecrypt) {
+    public static byte[] decrypt(final PrivateCWSKey key, final byte[] toDecrypt) {
         try {
             final Cipher cipher = prepareCipher(key, Cipher.DECRYPT_MODE);
             return cipher.doFinal(toDecrypt);
@@ -311,7 +311,7 @@ public final class Crypto {
      * @param key Public RSA key to armor (Base64 encoded x.509 Key)
      * @return String representation of the Key
      */
-    public String armoringPublicKey(final Key key) {
+    public static String armoringPublicKey(final Key key) {
         final X509EncodedKeySpec keySpec = new X509EncodedKeySpec(key.getEncoded());
         final byte[] rawKey = keySpec.getEncoded();
 
@@ -342,7 +342,7 @@ public final class Crypto {
      * @param privateKey    The Private RSA Key to encrypt and armor
      * @return Armored (PKCS8 and Base64 encoded encrypted key)
      */
-    public String armoringPrivateKey(final SecretCWSKey encryptionKey, final Key privateKey) {
+    public static String armoringPrivateKey(final SecretCWSKey encryptionKey, final Key privateKey) {
         final PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(privateKey.getEncoded());
         final byte[] rawKey = keySpec.getEncoded();
         final byte[] encryptedKey = encrypt(encryptionKey, rawKey);
@@ -368,13 +368,13 @@ public final class Crypto {
         }
     }
 
-    public String encryptAndArmorCircleKey(final PublicCWSKey publicKey, final SecretCWSKey circleKey) {
+    public static String encryptAndArmorCircleKey(final PublicCWSKey publicKey, final SecretCWSKey circleKey) {
         final byte[] encryptedCircleKey = encrypt(publicKey, circleKey.getEncoded());
 
         return Base64.getEncoder().encodeToString(encryptedCircleKey);
     }
 
-    public SecretCWSKey extractCircleKey(final KeyAlgorithm algorithm, final PrivateCWSKey privateKey, final String armoredCircleKey) {
+    public static SecretCWSKey extractCircleKey(final KeyAlgorithm algorithm, final PrivateCWSKey privateKey, final String armoredCircleKey) {
         final byte[] dearmoredCircleKey = Base64.getDecoder().decode(armoredCircleKey);
         final byte[] decryptedCircleKey = decrypt(privateKey, dearmoredCircleKey);
         final SecretKey key = new SecretKeySpec(decryptedCircleKey, algorithm.getName());

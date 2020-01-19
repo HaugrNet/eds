@@ -32,6 +32,7 @@ import io.javadog.cws.core.exceptions.IdentificationException;
 import io.javadog.cws.core.exceptions.IllegalActionException;
 import io.javadog.cws.core.exceptions.VerificationException;
 import io.javadog.cws.core.jce.CWSKeyPair;
+import io.javadog.cws.core.jce.Crypto;
 import io.javadog.cws.core.jce.IVSalt;
 import io.javadog.cws.core.jce.SecretCWSKey;
 import io.javadog.cws.core.model.MemberDao;
@@ -199,7 +200,7 @@ public final class ProcessMemberService extends Serviceable<MemberDao, ProcessMe
         // MasterKey.
         final String salt = crypto.decryptWithMasterKey(member.getSalt());
         final SecretCWSKey key = crypto.generatePasswordKey(member.getPbeAlgorithm(), masterEncrypted, salt);
-        final String privateKey = crypto.armoringPrivateKey(key, keyPair.getPrivate().getKey());
+        final String privateKey = Crypto.armoringPrivateKey(key, keyPair.getPrivate().getKey());
         final String checksum = crypto.generateChecksum(masterEncrypted);
 
         member.setSessionChecksum(checksum);
@@ -283,8 +284,8 @@ public final class ProcessMemberService extends Serviceable<MemberDao, ProcessMe
             final List<TrusteeEntity> list = dao.findTrusteesByMember(member, EnumSet.allOf(TrustLevel.class));
             for (final TrusteeEntity trustee : list) {
                 final KeyAlgorithm algorithm = trustee.getKey().getAlgorithm();
-                final SecretCWSKey circleKey = crypto.extractCircleKey(algorithm, keyPair.getPrivate(), trustee.getCircleKey());
-                trustee.setCircleKey(crypto.encryptAndArmorCircleKey(pair.getPublic(), circleKey));
+                final SecretCWSKey circleKey = Crypto.extractCircleKey(algorithm, keyPair.getPrivate(), trustee.getCircleKey());
+                trustee.setCircleKey(Crypto.encryptAndArmorCircleKey(pair.getPublic(), circleKey));
 
                 dao.persist(trustee);
             }
@@ -380,7 +381,7 @@ public final class ProcessMemberService extends Serviceable<MemberDao, ProcessMe
         final KeyAlgorithm pbeAlgorithm = settings.getPasswordAlgorithm();
         final IVSalt salt = new IVSalt();
         final byte[] newSecret = request.getNewCredential();
-        final CWSKeyPair pair = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
+        final CWSKeyPair pair = Crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
         final SecretCWSKey key = crypto.generatePasswordKey(pbeAlgorithm, newSecret, salt.getArmored());
         key.setSalt(salt);
 
@@ -388,8 +389,8 @@ public final class ProcessMemberService extends Serviceable<MemberDao, ProcessMe
         account.setPbeAlgorithm(pbeAlgorithm);
         account.setRsaAlgorithm(pair.getAlgorithm());
         account.setMemberKey(request.getPublicKey());
-        account.setPublicKey(crypto.armoringPublicKey(pair.getPublic().getKey()));
-        account.setPrivateKey(crypto.armoringPrivateKey(key, pair.getPrivate().getKey()));
+        account.setPublicKey(Crypto.armoringPublicKey(pair.getPublic().getKey()));
+        account.setPrivateKey(Crypto.armoringPrivateKey(key, pair.getPrivate().getKey()));
         dao.persist(account);
 
         final ProcessMemberResponse response = new ProcessMemberResponse("The invitation was successfully processed for '" + account.getName() + "'.");

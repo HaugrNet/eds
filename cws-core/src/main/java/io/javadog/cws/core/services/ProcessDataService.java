@@ -27,6 +27,7 @@ import io.javadog.cws.core.enums.Permission;
 import io.javadog.cws.core.enums.SanityStatus;
 import io.javadog.cws.core.exceptions.CWSException;
 import io.javadog.cws.core.exceptions.IllegalActionException;
+import io.javadog.cws.core.jce.Crypto;
 import io.javadog.cws.core.jce.IVSalt;
 import io.javadog.cws.core.jce.SecretCWSKey;
 import io.javadog.cws.core.model.DataDao;
@@ -240,14 +241,14 @@ public final class ProcessDataService extends Serviceable<DataDao, ProcessDataRe
         if (bytes != null) {
             final KeyEntity keyEntity = trustee.getKey();
             final KeyAlgorithm algorithm = keyEntity.getAlgorithm();
-            final SecretCWSKey key = crypto.extractCircleKey(algorithm, keyPair.getPrivate(), trustee.getCircleKey());
+            final SecretCWSKey key = Crypto.extractCircleKey(algorithm, keyPair.getPrivate(), trustee.getCircleKey());
             key.setSalt(new IVSalt());
             final String armored = key.getSalt().getArmored();
 
             final DataEntity toSave = (oldDataEntity != null) ? oldDataEntity : new DataEntity();
             toSave.setMetadata(metadataEntity);
             toSave.setKey(keyEntity);
-            toSave.setData(crypto.encrypt(key, bytes));
+            toSave.setData(Crypto.encrypt(key, bytes));
             toSave.setInitialVector(crypto.encryptWithMasterKey(armored));
             toSave.setChecksum(crypto.generateChecksum(toSave.getData()));
             toSave.setSanityStatus(SanityStatus.OK);

@@ -312,9 +312,9 @@ public abstract class Serviceable<D extends CommonDao, R extends CwsResponse, A 
         final SecretCWSKey key = crypto.generatePasswordKey(pbeAlgorithm, password, salt.getArmored());
         key.setSalt(salt);
 
-        final CWSKeyPair pair = crypto.generateAsymmetricKey(rsaAlgorithm);
-        final String publicKey = crypto.armoringPublicKey(pair.getPublic().getKey());
-        final String privateKey = crypto.armoringPrivateKey(key, pair.getPrivate().getKey());
+        final CWSKeyPair pair = Crypto.generateAsymmetricKey(rsaAlgorithm);
+        final String publicKey = Crypto.armoringPublicKey(pair.getPublic().getKey());
+        final String privateKey = Crypto.armoringPrivateKey(key, pair.getPrivate().getKey());
 
         member.setSalt(crypto.encryptWithMasterKey(salt.getArmored()));
         member.setPbeAlgorithm(pbeAlgorithm);
@@ -375,7 +375,7 @@ public abstract class Serviceable<D extends CommonDao, R extends CwsResponse, A 
     private SecretCWSKey extractCircleKey(final DataEntity entity) {
         final TrusteeEntity trustee = findTrustee(entity.getMetadata().getCircle().getExternalId());
 
-        return crypto.extractCircleKey(entity.getKey().getAlgorithm(), keyPair.getPrivate(), trustee.getCircleKey());
+        return Crypto.extractCircleKey(entity.getKey().getAlgorithm(), keyPair.getPrivate(), trustee.getCircleKey());
     }
 
     protected byte[] decryptData(final DataEntity entity) {
@@ -384,7 +384,7 @@ public abstract class Serviceable<D extends CommonDao, R extends CwsResponse, A 
         final IVSalt salt = new IVSalt(armoredSalt);
         key.setSalt(salt);
 
-        return crypto.decrypt(key, entity.getData());
+        return Crypto.decrypt(key, entity.getData());
     }
 
     protected final byte[] encryptExternalKey(final SecretCWSKey circleKey, final String externalKey) {
@@ -392,7 +392,7 @@ public abstract class Serviceable<D extends CommonDao, R extends CwsResponse, A 
 
         if (externalKey != null) {
             circleKey.setSalt(new IVSalt(settings.getSalt()));
-            encryptedKey = crypto.encrypt(circleKey, crypto.stringToBytes(externalKey));
+            encryptedKey = Crypto.encrypt(circleKey, crypto.stringToBytes(externalKey));
         }
 
         return encryptedKey;
@@ -403,9 +403,9 @@ public abstract class Serviceable<D extends CommonDao, R extends CwsResponse, A 
         String externalKey = null;
 
         if (encryptedKey != null) {
-            final SecretCWSKey circleKey = crypto.extractCircleKey(trustee.getKey().getAlgorithm(), keyPair.getPrivate(), trustee.getCircleKey());
+            final SecretCWSKey circleKey = Crypto.extractCircleKey(trustee.getKey().getAlgorithm(), keyPair.getPrivate(), trustee.getCircleKey());
             circleKey.setSalt(new IVSalt(settings.getSalt()));
-            externalKey = crypto.bytesToString(crypto.decrypt(circleKey, encryptedKey));
+            externalKey = crypto.bytesToString(Crypto.decrypt(circleKey, encryptedKey));
         }
 
         return externalKey;

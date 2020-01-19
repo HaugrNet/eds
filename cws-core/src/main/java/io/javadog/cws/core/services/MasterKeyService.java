@@ -25,6 +25,7 @@ import io.javadog.cws.api.responses.MasterKeyResponse;
 import io.javadog.cws.core.enums.StandardSetting;
 import io.javadog.cws.core.exceptions.AuthenticationException;
 import io.javadog.cws.core.exceptions.CryptoException;
+import io.javadog.cws.core.jce.Crypto;
 import io.javadog.cws.core.jce.MasterKey;
 import io.javadog.cws.core.jce.SecretCWSKey;
 import io.javadog.cws.core.model.CommonDao;
@@ -135,7 +136,7 @@ public final class MasterKeyService extends Serviceable<CommonDao, MasterKeyResp
         try {
             // First, decrypt the Salt for the Administrator, using the "MasterKey".
             final byte[] encrypted = Base64.getDecoder().decode(admin.getSalt());
-            final byte[] decrypted = crypto.decrypt(masterKey, encrypted);
+            final byte[] decrypted = Crypto.decrypt(masterKey, encrypted);
             final String salt = crypto.bytesToString(decrypted);
 
             // With the decrypted Salt, we can try to unlock the Private Key, if it

@@ -27,6 +27,7 @@ import io.javadog.cws.core.enums.Permission;
 import io.javadog.cws.core.enums.Status;
 import io.javadog.cws.core.exceptions.AuthorizationException;
 import io.javadog.cws.core.exceptions.IllegalActionException;
+import io.javadog.cws.core.jce.Crypto;
 import io.javadog.cws.core.jce.PublicCWSKey;
 import io.javadog.cws.core.jce.SecretCWSKey;
 import io.javadog.cws.core.model.CommonDao;
@@ -136,10 +137,10 @@ public final class ProcessCircleService extends Serviceable<CommonDao, ProcessCi
      */
     private ProcessCircleResponse createCircle(final MemberEntity circleAdmin, final String name, final String externalCircleKey) {
         final KeyAlgorithm algorithm = settings.getSymmetricAlgorithm();
-        final SecretCWSKey key = crypto.generateSymmetricKey(algorithm);
+        final SecretCWSKey key = Crypto.generateSymmetricKey(algorithm);
         final PublicKey publicKey = crypto.dearmoringPublicKey(circleAdmin.getPublicKey());
         final PublicCWSKey cwsPublicKey = new PublicCWSKey(circleAdmin.getRsaAlgorithm(), publicKey);
-        final String circleKey = crypto.encryptAndArmorCircleKey(cwsPublicKey, key);
+        final String circleKey = Crypto.encryptAndArmorCircleKey(cwsPublicKey, key);
         final byte[] externalKey = encryptExternalKey(key, externalCircleKey);
 
         final CircleEntity circle = new CircleEntity();
@@ -226,7 +227,7 @@ public final class ProcessCircleService extends Serviceable<CommonDao, ProcessCi
 
         if (externalKey != null) {
             final TrusteeEntity trustee = trustees.get(0);
-            final SecretCWSKey circleKey = crypto.extractCircleKey(trustee.getKey().getAlgorithm(), keyPair.getPrivate(), trustee.getCircleKey());
+            final SecretCWSKey circleKey = Crypto.extractCircleKey(trustee.getKey().getAlgorithm(), keyPair.getPrivate(), trustee.getCircleKey());
             encryptedKey = encryptExternalKey(circleKey, externalKey);
         }
 

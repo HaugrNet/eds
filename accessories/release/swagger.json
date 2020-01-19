@@ -431,6 +431,36 @@
         }
       }
     },
+    "/inventory": {
+      "post": {
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/InventoryRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+            },
+            "schema": {
+              "$ref": "#/definitions/InventoryResponse"
+            }
+          }
+        }
+      }
+    },
     "/masterKey": {
       "post": {
         "consumes": [
@@ -1310,6 +1340,50 @@
           "items": {
             "$ref": "#/definitions/Trustee"
           }
+        }
+      }
+    },
+    "InventoryRequest": {
+      "properties": {
+        "accountName": {
+          "type": "string"
+        },
+        "credential": {
+          "type": "string",
+          "format": "byte"
+        },
+        "credentialType": {
+          "type": "string",
+          "enum": [
+            "PASSPHRASE",
+            "SESSION",
+            "SIGNATURE"
+          ]
+        },
+        "pageNumber": {
+          "type": "integer"
+        },
+        "pageSize": {
+          "type": "integer"
+        }
+      }
+    },
+    "InventoryResponse": {
+      "properties": {
+        "inventory": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Metadata"
+          }
+        },
+        "records": {
+          "type": "integer"
+        },
+        "returnCode": {
+          "type": "integer"
+        },
+        "returnMessage": {
+          "type": "string"
         }
       }
     },

@@ -107,7 +107,7 @@ public final class ManagementSoapClient implements Management {
             response.setVersion(result.getVersion());
         }
 
-        return response;
+        return Mapper.checkResponse(response);
     }
 
     /**
@@ -130,7 +130,7 @@ public final class ManagementSoapClient implements Management {
             }
         }
 
-        return response;
+        return Mapper.checkResponse(response);
     }
 
     /**
@@ -153,7 +153,7 @@ public final class ManagementSoapClient implements Management {
             }
         }
 
-        return response;
+        return Mapper.checkResponse(response);
     }
 
     /**
@@ -177,7 +177,7 @@ public final class ManagementSoapClient implements Management {
             }
         }
 
-        return response;
+        return Mapper.checkResponse(response);
     }
 
     /**
@@ -202,7 +202,7 @@ public final class ManagementSoapClient implements Management {
             }
         }
 
-        return response;
+        return Mapper.checkResponse(response);
     }
 
     /**
@@ -224,7 +224,7 @@ public final class ManagementSoapClient implements Management {
             }
         }
 
-        return response;
+        return Mapper.checkResponse(response);
     }
 
     /**
@@ -248,7 +248,7 @@ public final class ManagementSoapClient implements Management {
             }
         }
 
-        return response;
+        return Mapper.checkResponse(response);
     }
 
     /**
@@ -277,7 +277,7 @@ public final class ManagementSoapClient implements Management {
             }
         }
 
-        return response;
+        return Mapper.checkResponse(response);
     }
 
     /**
@@ -299,7 +299,7 @@ public final class ManagementSoapClient implements Management {
             }
         }
 
-        return response;
+        return Mapper.checkResponse(response);
     }
 
     /**
@@ -326,7 +326,7 @@ public final class ManagementSoapClient implements Management {
             }
         }
 
-        return response;
+        return Mapper.checkResponse(response);
     }
 
     /**
@@ -350,7 +350,7 @@ public final class ManagementSoapClient implements Management {
             }
         }
 
-        return response;
+        return Mapper.checkResponse(response);
     }
 
     /**
@@ -375,7 +375,7 @@ public final class ManagementSoapClient implements Management {
             }
         }
 
-        return response;
+        return Mapper.checkResponse(response);
     }
 
     // =========================================================================

@@ -59,6 +59,23 @@ public final class Mapper {
     private Mapper() {
     }
 
+    /**
+     * <p>Throws a {@link SOAPClientException} if the given Response Object from
+     * the CWS Request is null.</p>
+     *
+     * @param response Response to check if is null or not
+     * @param <R> CWS Response Class
+     * @return CWS Response, if not null
+     * @throws SOAPClientException if the response is null
+     */
+    static <R extends CwsResponse> R checkResponse(final R response) {
+        if (response == null) {
+            throw new SOAPClientException("Request failed, CWS answered with a NULL response.");
+        }
+
+        return response;
+    }
+
     // =========================================================================
     // Mapping of JAXBElement (nullable) Objects
     // =========================================================================

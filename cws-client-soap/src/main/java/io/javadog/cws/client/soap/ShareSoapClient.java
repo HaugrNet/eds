@@ -97,7 +97,7 @@ public final class ShareSoapClient implements Share {
             }
         }
 
-        return response;
+        return Mapper.checkResponse(response);
     }
 
     /**
@@ -119,7 +119,7 @@ public final class ShareSoapClient implements Share {
             }
         }
 
-        return response;
+        return Mapper.checkResponse(response);
     }
 
     /**
@@ -150,7 +150,7 @@ public final class ShareSoapClient implements Share {
             }
         }
 
-        return response;
+        return Mapper.checkResponse(response);
     }
 
     /**
@@ -180,7 +180,7 @@ public final class ShareSoapClient implements Share {
             }
         }
 
-        return response;
+        return Mapper.checkResponse(response);
     }
 
     /**
@@ -204,7 +204,7 @@ public final class ShareSoapClient implements Share {
             }
         }
 
-        return response;
+        return Mapper.checkResponse(response);
     }
 
     /**
@@ -228,7 +228,7 @@ public final class ShareSoapClient implements Share {
             }
         }
 
-        return response;
+        return Mapper.checkResponse(response);
     }
 
     /**
@@ -250,6 +250,6 @@ public final class ShareSoapClient implements Share {
             }
         }
 
-        return response;
+        return Mapper.checkResponse(response);
     }
 }

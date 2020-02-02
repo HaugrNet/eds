@@ -68,10 +68,6 @@
 
         <!-- SonarQube Settings -->
         <sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
-        <!-- The destination file for the code coverage report has to be set to
-             the same value for each module pom. This will allow JaCoCo to sum
-             up information in the same report, providing cross-module coverage. -->
-        <sonar.jacoco.reportPaths>${project.basedir}/../target/jacoco.exec</sonar.jacoco.reportPaths>
         <!-- Sonar is by default analyzing everything. But Generated Code is
              beyond our control, so error reports from this is just annoying!
              Legend: *  - zero or more characters
@@ -307,7 +303,7 @@
                 <plugin>
                     <groupId>org.jacoco</groupId>
                     <artifactId>jacoco-maven-plugin</artifactId>
-                    <version>0.8.4</version>
+                    <version>0.8.5</version>
                 </plugin>
                 <plugin>
                     <groupId>org.sonarsource.scanner.maven</groupId>
@@ -389,30 +385,35 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <configuration>
-                    <destFile>${sonar.jacoco.reportPaths}</destFile>
-                    <append>true</append>
-                    <includes>
-                        <include>io.javadog.cws.*</include>
-                    </includes>
-                </configuration>
+                <version>0.8.5</version>
                 <executions>
                     <execution>
                         <id>pre-test</id>
+                        <phase>test-compile</phase>
                         <goals>
                             <goal>prepare-agent</goal>
                         </goals>
                     </execution>
                     <execution>
                         <id>post-test</id>
-                        <phase>prepare-package</phase>
+                        <phase>test</phase>
                         <goals>
                             <goal>report</goal>
                         </goals>
                         <configuration>
-                            <dataFile>${sonar.jacoco.reportPaths}</dataFile>
+                            <dataFile>${project.basedir}/../target/jacoco.exec</dataFile>
                             <outputDirectory>${project.basedir}/../target/jacoco</outputDirectory>
+                            <includes>
+                                <include>io.javadog.cws.*</include>
+                            </includes>
                         </configuration>
+                    </execution>
+                    <execution>
+                        <id>report</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
                     </execution>
                 </executions>
             </plugin>

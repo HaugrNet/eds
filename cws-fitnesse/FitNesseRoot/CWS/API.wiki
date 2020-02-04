@@ -155,6 +155,7 @@ current settings, and update existing values.
 |check |value for key|cws.show.trustees              |true                                                      |
 |check |value for key|cws.sanity.check.startup       |true                                                      |
 |check |value for key|cws.sanity.check.interval.days |180                                                       |
+|check |value for key|cws.cors.value                 |*                                                         |
 
 Note, that if a different user attempts to invoke this request, it will result
 in a list of undefined values.
@@ -172,6 +173,7 @@ in a list of undefined values.
 |check |value for key|cws.show.trustees              |undefined|
 |check |value for key|cws.sanity.check.startup       |undefined|
 |check |value for key|cws.sanity.check.interval.days |undefined|
+|check |value for key|cws.cors.value                 |undefined|
 
 !5 Symmetric Algorithm
 The primary part of all internal encryption is performed using Symmetric Keys. These are all based on the AES algorithms and only the

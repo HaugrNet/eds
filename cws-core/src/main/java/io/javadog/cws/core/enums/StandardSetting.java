@@ -41,6 +41,7 @@ public enum StandardSetting {
     SANITY_INTERVAL("cws.sanity.check.interval.days", "180"),
     SESSION_TIMEOUT("cws.session.timeout.minutes", "480"),
     MASTERKEY_URL("cws.masterkey.url", ""),
+    CORS("cws.cors.value", "*"),
     // The isReady setting is set by the StartUp bean, and thus not persisted.
     IS_READY("cws.is.ready", "true");
 

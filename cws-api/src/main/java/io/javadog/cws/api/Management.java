@@ -221,6 +221,19 @@ public interface Management {
      *     Allowed Values: Any integer<br>
      *     <i>The maximum amount of time a Session may be used.</i>
      *   </li>
+     *   <li>
+     *     <b>cws.masterkey.url</b> - default value: ''<br>
+     *     Allowed Values: Any valid URL<br>
+     *     <i>Reference to a series of bytes, which will be used as the secret,
+     *     when generating the MasterKey. It must be reachable for the CWS
+     *     instance(s) at startup.</i>
+     *   </li>
+     *   <li>
+     *     <b>cws.cors.value</b> - default value: '*'<br>
+     *     Allowed Values: See <a href="https://enable-cors.org/">enable-cors</a><br>
+     *     <i>The Cross Origin Resource Sharing value, which determines who may
+     *     invoke the CWS. It is required for most JavaScript based Clients.</i>
+     *   </li>
      * </ul>
      *
      * @param request Request Object

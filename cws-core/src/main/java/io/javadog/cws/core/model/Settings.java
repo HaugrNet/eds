@@ -185,6 +185,10 @@ public final class Settings {
         return get(StandardSetting.MASTERKEY_URL.getKey()).trim();
     }
 
+    public String getCORS() {
+        return get(StandardSetting.CORS.getKey()).trim();
+    }
+
     public boolean isReady() {
         return Boolean.parseBoolean(get(StandardSetting.IS_READY.getKey()).trim());
     }

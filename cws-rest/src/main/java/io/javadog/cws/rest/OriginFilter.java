@@ -24,7 +24,6 @@ import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
@@ -38,6 +37,12 @@ public final class OriginFilter implements Filter {
 
     private final Settings settings = Settings.getInstance();
 
+    private static final String KEY_ORIGIN = "Access-Control-Allow-Origin";
+    private static final String KEY_METHODS = "Access-Control-Allow-Methods";
+    private static final String KEY_HEADERS = "Access-Control-Allow-Headers";
+    private static final String VALUE_METHODS = "GET, OPTIONS, POST";
+    private static final String VALUE_HEADERS = "Content-Type, " + KEY_ORIGIN;
+
     /**
      * {@inheritDoc}
      */
@@ -50,21 +55,13 @@ public final class OriginFilter implements Filter {
      * {@inheritDoc}
      */
     @Override
-    public void doFilter(final ServletRequest request, final ServletResponse response, final FilterChain chain) throws IOException, ServletException {
-        final HttpServletResponse servletResponse = (HttpServletResponse) response;
-        final HttpServletRequest servletRequest = (HttpServletRequest) request;
+    public void doFilter(final ServletRequest request, final ServletResponse response,final FilterChain chain) throws IOException, ServletException {
+        HttpServletResponse servletResponse = (HttpServletResponse) response;
 
-        servletResponse.addHeader("Access-Control-Allow-Origin", settings.getCORS());
-        servletResponse.addHeader("Access-Control-Allow-Methods", "POST");
-        servletResponse.addHeader("Access-Control-Allow-Headers", "Content-Type");
-
-        if ("OPTIONS".equals(servletRequest.getMethod())) {
-            // For OPTIONS reply with ACCEPTED status code, per CORS handshake
-            servletResponse.setStatus(HttpServletResponse.SC_ACCEPTED);
-        } else {
-            // Otherwise, pass the request along the filter chain
-            chain.doFilter(request, response);
-        }
+        servletResponse.addHeader(KEY_ORIGIN, settings.getCORS());
+        servletResponse.addHeader(KEY_METHODS, VALUE_METHODS);
+        servletResponse.addHeader(KEY_HEADERS, VALUE_HEADERS);
+        chain.doFilter(request, response);
     }
 
     /**

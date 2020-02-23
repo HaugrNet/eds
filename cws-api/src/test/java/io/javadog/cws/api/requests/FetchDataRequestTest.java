@@ -22,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.javadog.cws.api.TestUtilities;
 import io.javadog.cws.api.common.Constants;
+import io.javadog.cws.api.common.CredentialType;
 import java.util.Map;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
@@ -83,5 +84,25 @@ final class FetchDataRequestTest {
         assertEquals("The Data Id is invalid.", errors.get(Constants.FIELD_DATA_ID));
         assertEquals("The Page Number must be a positive number, starting with 1.", errors.get(Constants.FIELD_PAGE_NUMBER));
         assertEquals("The Page Size must be a positive number, starting with 1.", errors.get(Constants.FIELD_PAGE_SIZE));
+    }
+
+    @Test
+    void testFetchCriterias() {
+        final FetchDataRequest request = new FetchDataRequest();
+        request.setAccountName("My Account");
+        request.setCredentialType(CredentialType.PASSPHRASE);
+        request.setCredential(TestUtilities.convert("My Password"));
+
+        final Map<String, String> errors1 = request.validate();
+        assertEquals(1, errors1.size());
+        assertEquals("Either a Circle Id, Data Id, or Data Name must be provided.", errors1.get(Constants.FIELD_IDS));
+
+        request.setDataName("My Data");
+        final Map<String, String> errors2 = request.validate();
+        assertEquals(0, errors2.size());
+
+        request.setDataId(UUID.randomUUID().toString());
+        final Map<String, String> errors3 = request.validate();
+        assertEquals(0, errors3.size());
     }
 }

@@ -45,6 +45,16 @@ class ProcessCircleResponseTest {
     }
 
     @Test
+    void testMessageConstructor() {
+        final String message = "Request was successfully processed.";
+        final ProcessCircleResponse response = new ProcessCircleResponse(message);
+
+        assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
+        assertEquals(message, response.getReturnMessage());
+        assertNull(response.getCircleId());
+    }
+
+    @Test
     void testError() {
         final String msg = "ProcessCircle Request failed due to Verification Problems.";
         final ProcessCircleResponse response = new ProcessCircleResponse(ReturnCode.VERIFICATION_WARNING, msg);

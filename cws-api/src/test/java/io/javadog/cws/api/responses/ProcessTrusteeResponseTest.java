@@ -18,6 +18,7 @@ package io.javadog.cws.api.responses;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.javadog.cws.api.common.ReturnCode;
@@ -36,6 +37,15 @@ final class ProcessTrusteeResponseTest {
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
         assertEquals("Ok", response.getReturnMessage());
         assertTrue(response.isOk());
+    }
+
+    @Test
+    void testMessageConstructor() {
+        final String message = "Request was successfully processed.";
+        final ProcessTrusteeResponse response = new ProcessTrusteeResponse(message);
+
+        assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
+        assertEquals(message, response.getReturnMessage());
     }
 
     @Test

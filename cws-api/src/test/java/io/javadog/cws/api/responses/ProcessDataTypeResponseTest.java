@@ -48,6 +48,16 @@ final class ProcessDataTypeResponseTest {
     }
 
     @Test
+    void testMessageConstructor() {
+        final String message = "Request was successfully processed.";
+        final ProcessDataTypeResponse response = new ProcessDataTypeResponse(message);
+
+        assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
+        assertEquals(message, response.getReturnMessage());
+        assertNull(response.getDataType());
+    }
+
+    @Test
     void testError() {
         final String msg = "ProcessDataType Request failed due to Verification Problems.";
         final ProcessDataTypeResponse response = new ProcessDataTypeResponse(ReturnCode.VERIFICATION_WARNING, msg);

@@ -49,6 +49,17 @@ final class ProcessMemberResponseTest {
     }
 
     @Test
+    void testMessageConstructor() {
+        final String message = "Request was successfully processed.";
+        final ProcessMemberResponse response = new ProcessMemberResponse(message);
+
+        assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
+        assertEquals(message, response.getReturnMessage());
+        assertNull(response.getMemberId());
+        assertNull(response.getSignature());
+    }
+
+    @Test
     void testError() {
         final String msg = "ProcessMember Request failed due to Verification Problems.";
         final ProcessMemberResponse response = new ProcessMemberResponse(ReturnCode.VERIFICATION_WARNING, msg);

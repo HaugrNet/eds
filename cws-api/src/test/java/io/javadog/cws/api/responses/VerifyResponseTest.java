@@ -18,6 +18,7 @@ package io.javadog.cws.api.responses;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.javadog.cws.api.common.ReturnCode;
@@ -38,6 +39,16 @@ final class VerifyResponseTest {
         assertEquals("Ok", response.getReturnMessage());
         assertTrue(response.isOk());
         assertTrue(response.isVerified());
+    }
+
+    @Test
+    void testMessageConstructor() {
+        final String message = "Request was successfully processed.";
+        final VerifyResponse response = new VerifyResponse(message);
+
+        assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
+        assertEquals(message, response.getReturnMessage());
+        assertFalse(response.isVerified());
     }
 
     @Test

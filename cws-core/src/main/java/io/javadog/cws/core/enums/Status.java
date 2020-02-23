@@ -28,5 +28,5 @@ public enum Status {
     ACTIVE,
 
     /** Deprecation is a temporary step before being suspended or deleted. */
-    DEPRECATED,
+    DEPRECATED
 }

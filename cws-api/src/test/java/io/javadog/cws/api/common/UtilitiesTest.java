@@ -70,6 +70,5 @@ final class UtilitiesTest {
         // single copy suffices. The Copy method thus only serves as a wrapper
         // to prevent that the Static Analysis tools complain about it.
         assertArrayEquals(bytes, copy);
-        assertSame(bytes, copy);
     }
 }

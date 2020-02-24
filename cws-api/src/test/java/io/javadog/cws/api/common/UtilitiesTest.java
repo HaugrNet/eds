@@ -16,9 +16,11 @@
  */
 package io.javadog.cws.api.common;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.util.Date;
 import org.junit.jupiter.api.Test;
@@ -32,13 +34,12 @@ final class UtilitiesTest {
     @Test
     void testNewDate() {
         final Date date1 = new Date();
-        final Date date2 = Utilities.newDate();
         final Date copy1 = Utilities.newDate(date1.getTime());
-        final Date copy2 = Utilities.newDate(date2.getTime());
-
         assertEquals(date1, copy1);
         assertNotSame(date1, copy1);
 
+        final Date date2 = Utilities.newDate();
+        final Date copy2 = Utilities.newDate(date2.getTime());
         assertEquals(date2, copy2);
         assertNotSame(date2, copy2);
     }
@@ -46,31 +47,29 @@ final class UtilitiesTest {
     @Test
     void testCopyDate() {
         final Date date1 = new Date();
-        final Date date2 = Utilities.newDate();
-        final Date date3 = null;
         final Date copy1 = Utilities.copy(date1);
-        final Date copy2 = Utilities.copy(date2);
-        final Date copy3 = Utilities.copy(date3);
-
         assertEquals(date1, copy1);
         assertNotSame(date1, copy1);
 
+        final Date date2 = Utilities.newDate();
+        final Date copy2 = Utilities.copy(date2);
         assertEquals(date2, copy2);
         assertNotSame(date2, copy2);
 
-        assertEquals(date3, copy3);
+        assertNull(Utilities.copy((Date) null));
     }
 
     @Test
     void testCopyBytes() {
-        final byte[] bytes1 = { (byte) 1, (byte) 2, (byte) 3, (byte) 4, (byte) 5, (byte) 6, (byte) 7, (byte) 8, (byte) 9, (byte) 10 };
-        final byte[] bytes2 = { (byte) 10, (byte) 9, (byte) 8, (byte) 7, (byte) 6, (byte) 5, (byte) 4, (byte) 3, (byte) 2, (byte) 1 };
-        final byte[] copy1 = Utilities.copy(bytes1);
-        final byte[] copy2 = Utilities.copy(bytes2);
-
-        assertEquals(bytes1, copy1);
-        assertSame(bytes1, copy1);
-        assertEquals(bytes2, copy2);
-        assertSame(bytes2, copy2);
+        final byte[] bytes = { (byte) 1, (byte) 2, (byte) 3, (byte) 4, (byte) 5, (byte) 6, (byte) 7, (byte) 8, (byte) 9, (byte) 10 };
+        final byte[] copy = Utilities.copy(bytes);
+        // The Byte array copy method is not deliberately not doing anything,
+        // since the incoming bytes are read out from the WebService request
+        // as a Base64 encoded String. It is thus not possible to alter them,
+        // and rather than having multiple copies of the data in memory, a
+        // single copy suffices. The Copy method thus only serves as a wrapper
+        // to prevent that the Static Analysis tools complain about it.
+        assertArrayEquals(bytes, copy);
+        assertSame(bytes, copy);
     }
 }

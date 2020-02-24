@@ -55,7 +55,7 @@ public final class OriginFilter implements Filter {
      * {@inheritDoc}
      */
     @Override
-    public void doFilter(final ServletRequest request, final ServletResponse response,final FilterChain chain) throws IOException, ServletException {
+    public void doFilter(final ServletRequest request, final ServletResponse response, final FilterChain chain) throws IOException, ServletException {
         HttpServletResponse servletResponse = (HttpServletResponse) response;
 
         servletResponse.addHeader(KEY_ORIGIN, settings.getCORS());

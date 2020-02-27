@@ -63,12 +63,12 @@ final class UtilitiesTest {
     void testCopyBytes() {
         final byte[] bytes = { (byte) 1, (byte) 2, (byte) 3, (byte) 4, (byte) 5, (byte) 6, (byte) 7, (byte) 8, (byte) 9, (byte) 10 };
         final byte[] copy = Utilities.copy(bytes);
-        // The Byte array copy method is not deliberately not doing anything,
-        // since the incoming bytes are read out from the WebService request
-        // as a Base64 encoded String. It is thus not possible to alter them,
-        // and rather than having multiple copies of the data in memory, a
-        // single copy suffices. The Copy method thus only serves as a wrapper
-        // to prevent that the Static Analysis tools complain about it.
+        // The Byte array copy method is deliberately not doing anything, since
+        // the incoming bytes are read out from the WebService request as a
+        // Base64 encoded String. It is thus not possible to alter them, and
+        // rather than having multiple copies of the data in memory, a single
+        // copy suffices. The Copy method thus only serves as a wrapper to
+        // prevent that the Static Analysis tools complain about it.
         assertArrayEquals(bytes, copy);
     }
 }

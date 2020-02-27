@@ -107,6 +107,9 @@ final class SettingsTest extends DatabaseSetup {
 
         mySettings.set(StandardSetting.SESSION_TIMEOUT, "240");
         assertEquals(Integer.valueOf(240), mySettings.getSessionTimeout());
+
+        mySettings.set(StandardSetting.CORS, "*");
+        assertEquals("*", mySettings.getCORS());
     }
 
     @Test

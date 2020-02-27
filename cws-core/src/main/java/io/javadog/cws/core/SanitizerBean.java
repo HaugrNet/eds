@@ -86,8 +86,8 @@ public class SanitizerBean {
         LOG.log(Settings.INFO, "Completed Sanity check, found {0} flaws out of {1} checked Data Objects.", args);
     }
 
-    private SanityStatus processEntity(final Long id) {
-        SanityStatus status = SanityStatus.OK;
+    SanityStatus processEntity(final Long id) {
+        SanityStatus status;
 
         try {
             // When trying to run the updates, it would be good if it could be
@@ -123,6 +123,7 @@ public class SanitizerBean {
             //      not possible to continue. If this is the case, it should be
             //      reported to the CWS developers.
             LOG.log(Settings.ERROR, e.getMessage(), e);
+            status = SanityStatus.BLOCKED;
         }
 
         return status;

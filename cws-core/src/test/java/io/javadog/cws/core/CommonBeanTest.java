@@ -14,7 +14,7 @@
  * this program; If not, you can download a copy of the License
  * here: https://www.apache.org/licenses/
  */
-package io.javadog.cws.soap;
+package io.javadog.cws.core;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -24,7 +24,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.requests.SettingRequest;
 import io.javadog.cws.api.responses.SettingResponse;
-import io.javadog.cws.core.CommonBean;
 import io.javadog.cws.core.exceptions.CWSException;
 import io.javadog.cws.core.model.CommonDao;
 import io.javadog.cws.core.model.Settings;
@@ -39,7 +38,7 @@ import org.junit.jupiter.api.Test;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-final class CommonServiceTest extends BeanSetup {
+final class CommonBeanTest extends DatabaseSetup {
 
     @Test
     void testConstantsConstructor() throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {

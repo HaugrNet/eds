@@ -37,12 +37,19 @@ public final class CommonBean {
     private CommonBean() {
     }
 
+    /**
+     * <p>Invokes the standard method {@link Serviceable#destroy()} on the given
+     * Service instance, which should ensure that any active Keys will be
+     * destroyed.</p>
+     *
+     * @param serviceable Internal Service instance to invoke destroy() on
+     */
     public static void destroy(final Serviceable<?, ?, ?> serviceable) {
         if (serviceable != null) {
             try {
                 serviceable.destroy();
             } catch (CWSException e) {
-                LOG.log(Settings.WARN, "Failed destroying the Service: " + e.getMessage(), e);
+                LOG.log(Settings.WARN, e, () -> "Failed destroying the Service: " + e.getMessage());
             }
         }
     }

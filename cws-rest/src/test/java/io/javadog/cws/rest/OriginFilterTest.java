@@ -320,6 +320,7 @@ final class OriginFilterTest extends DatabaseSetup {
          * {@inheritDoc}
          */
         @Override
+        @Deprecated
         public String getRealPath(final String path) {
             return null;
         }
@@ -457,6 +458,7 @@ final class OriginFilterTest extends DatabaseSetup {
          * {@inheritDoc}
          */
         @Override
+        @Deprecated
         public String encodeUrl(final String url) {
             return null;
         }
@@ -465,6 +467,7 @@ final class OriginFilterTest extends DatabaseSetup {
          * {@inheritDoc}
          */
         @Override
+        @Deprecated
         public String encodeRedirectUrl(final String url) {
             return null;
         }
@@ -545,6 +548,7 @@ final class OriginFilterTest extends DatabaseSetup {
          * {@inheritDoc}
          */
         @Override
+        @Deprecated
         public void setStatus(final int sc, final String sm) {
         }
 

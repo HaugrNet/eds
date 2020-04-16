@@ -155,7 +155,7 @@ current settings, and update existing values.
 |check |value for key|cws.show.trustees              |true                                                      |
 |check |value for key|cws.sanity.check.startup       |true                                                      |
 |check |value for key|cws.sanity.check.interval.days |180                                                       |
-|check |value for key|cws.cors.value                 |*                                                         |
+|check |value for key|cws.cors.value                 |!-http://localhost-!                                      |
 
 Note, that if a different user attempts to invoke this request, it will result
 in a list of undefined values.

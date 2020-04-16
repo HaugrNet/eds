@@ -32,6 +32,7 @@ import io.javadog.cws.core.model.entities.DataTypeEntity;
 import io.javadog.cws.core.model.entities.MetadataEntity;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import javax.persistence.EntityManager;
@@ -162,7 +163,7 @@ public final class FetchDataService extends Serviceable<DataDao, FetchDataRespon
         return response;
     }
 
-    private static FetchDataResponse prepareResponse(final String folderId, final List<MetadataEntity> records, final long count) {
+    private static FetchDataResponse prepareResponse(final String folderId, final Collection<MetadataEntity> records, final long count) {
         final List<Metadata> list = new ArrayList<>(records.size());
 
         for (final MetadataEntity metadata : records) {

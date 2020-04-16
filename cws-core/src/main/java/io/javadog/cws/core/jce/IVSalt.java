@@ -67,7 +67,7 @@ public final class IVSalt {
             try {
                 rawSalt = Base64.getDecoder().decode(armored);
             } catch (IllegalArgumentException e) {
-                LOG.log(Settings.DEBUG, "IVSalt is not Base64 encoded: " + e.getMessage(), e);
+                LOG.log(Settings.DEBUG, e, () -> "IVSalt is not Base64 encoded: " + e.getMessage());
             }
         }
 

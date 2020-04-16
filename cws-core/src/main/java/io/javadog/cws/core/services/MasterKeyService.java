@@ -149,7 +149,7 @@ public final class MasterKeyService extends Serviceable<CommonDao, MasterKeyResp
             key.destroy();
             result = true;
         } catch (CryptoException e) {
-            LOG.log(Settings.DEBUG, "Decrypting the System Administrator Account failed: " + e.getMessage(), e);
+            LOG.log(Settings.DEBUG, e, () -> "Decrypting the System Administrator Account failed: " + e.getMessage());
         }
 
         return result;

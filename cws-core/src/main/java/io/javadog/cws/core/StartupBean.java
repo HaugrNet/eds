@@ -112,7 +112,7 @@ public class StartupBean {
                 ready = true;
             }
         } catch (CWSException e) {
-            LOG.log(Settings.ERROR, "Problem with DB: " + e.getMessage(), e);
+            LOG.log(Settings.ERROR, e, () -> "Problem with DB: " + e.getMessage());
         }
 
         settings.set(StandardSetting.IS_READY.getKey(), String.valueOf(ready));
@@ -138,6 +138,6 @@ public class StartupBean {
     public void runSanitizing(final Timer timer) {
         LOG.log(Settings.INFO, "Starting Timed Sanitizing check.");
         sanitizerBean.sanitize();
-        LOG.log(Settings.INFO, "Next Sanitizing check will begin at: " + timer.getNextTimeout());
+        LOG.log(Settings.INFO, () -> "Next Sanitizing check will begin at: " + timer.getNextTimeout());
     }
 }

@@ -30,6 +30,7 @@ import io.javadog.cws.core.model.entities.MemberEntity;
 import io.javadog.cws.core.model.entities.TrusteeEntity;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import javax.persistence.EntityManager;
@@ -118,7 +119,7 @@ public final class FetchMemberService extends Serviceable<MemberDao, FetchMember
         response.setMembers(members);
     }
 
-    private static List<Member> convertMembers(final List<MemberEntity> entities) {
+    private static List<Member> convertMembers(final Collection<MemberEntity> entities) {
         final List<Member> circles = new ArrayList<>(entities.size());
 
         for (final MemberEntity entity : entities) {
@@ -157,7 +158,7 @@ public final class FetchMemberService extends Serviceable<MemberDao, FetchMember
         return convertCircles(circles);
     }
 
-    private List<Circle> convertCircles(final List<TrusteeEntity> trustees) {
+    private List<Circle> convertCircles(final Collection<TrusteeEntity> trustees) {
         final List<Circle> circles = new ArrayList<>(trustees.size());
         for (final TrusteeEntity trustee : trustees) {
             final String externalKey = decryptExternalKey(trustee);

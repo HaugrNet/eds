@@ -27,6 +27,7 @@ import io.javadog.cws.core.model.Settings;
 import io.javadog.cws.core.model.entities.DataEntity;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import javax.persistence.EntityManager;
@@ -80,7 +81,7 @@ public final class SanityService extends Serviceable<SanityDao, SanityResponse, 
         return found;
     }
 
-    private static List<Sanity> convertRecords(final List<DataEntity> found) {
+    private static List<Sanity> convertRecords(final Collection<DataEntity> found) {
         final List<Sanity> sanities = new ArrayList<>(found.size());
 
         for (final DataEntity entity : found) {

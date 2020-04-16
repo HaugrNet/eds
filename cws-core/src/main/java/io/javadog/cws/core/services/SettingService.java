@@ -28,8 +28,8 @@ import io.javadog.cws.core.model.Settings;
 import io.javadog.cws.core.model.entities.SettingEntity;
 import java.nio.charset.Charset;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.EnumSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -276,7 +276,7 @@ public final class SettingService extends Serviceable<CommonDao, SettingResponse
         }
     }
 
-    private static Map<String, SettingEntity> convertSettings(final List<SettingEntity> list) {
+    private static Map<String, SettingEntity> convertSettings(final Collection<SettingEntity> list) {
         final Map<String, SettingEntity> map = new ConcurrentHashMap<>(16);
 
         for (final SettingEntity setting : list) {

@@ -21,8 +21,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.requests.InventoryRequest;
-import io.javadog.cws.core.DatabaseSetup;
-import io.javadog.cws.core.ManagementBean;
 import javax.ws.rs.core.Response;
 import org.junit.jupiter.api.Test;
 
@@ -30,11 +28,11 @@ import org.junit.jupiter.api.Test;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-final class InventoryServiceTest extends DatabaseSetup {
+final class InventoryServiceTest extends BeanSetup {
 
     @Test
     void testInventory() {
-        final InventoryService service = prepareService();
+        final InventoryService service = prepareInventoryService(settings, entityManager);
         final InventoryRequest request = prepareRequest(InventoryRequest.class, Constants.ADMIN_ACCOUNT);
 
         final Response response = service.inventory(request);
@@ -43,31 +41,10 @@ final class InventoryServiceTest extends DatabaseSetup {
 
     @Test
     void testFlawedMasterKey() {
-        final InventoryService service = prepareFlawedService();
+        final InventoryService service = prepareInventoryService();
         final InventoryRequest request = prepareRequest(InventoryRequest.class, Constants.ADMIN_ACCOUNT);
 
         final Response response = service.inventory(request);
         assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
-    }
-
-    // =========================================================================
-    // Internal Test Setup Methods
-    // =========================================================================
-
-    private static InventoryService prepareFlawedService() {
-        final InventoryService service = instantiate(InventoryService.class);
-        setField(service, "bean", null);
-
-        return service;
-    }
-
-    private InventoryService prepareService() {
-        final ManagementBean bean = instantiate(ManagementBean.class);
-        setField(bean, "entityManager", entityManager);
-
-        final InventoryService service = instantiate(InventoryService.class);
-        setField(service, "bean", bean);
-
-        return service;
     }
 }

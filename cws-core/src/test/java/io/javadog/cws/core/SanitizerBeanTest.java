@@ -164,10 +164,10 @@ final class SanitizerBeanTest extends DatabaseSetup {
             newSettings.set(StandardSetting.SANITY_STARTUP.getKey(), sanityAtStartup);
 
             // Inject Dependencies
-            setField(bean, "entityManager", entityManager);
-            setField(bean, "sanitizerBean", prepareSanitizeBean());
-            setField(bean, "timerService", new TestTimerService());
-            setField(bean, "settings", newSettings);
+            inject(bean, entityManager);
+            inject(bean, prepareSanitizeBean());
+            inject(bean, new TestTimerService());
+            inject(bean, newSettings);
 
             // The Bean is updating the Settings via the DB, so we need to alter
             // the content of the DB to reflect this. As the content has not yet
@@ -194,10 +194,10 @@ final class SanitizerBeanTest extends DatabaseSetup {
             settings.set(StandardSetting.SANITY_STARTUP.getKey(), "true");
 
             // Inject Dependencies
-            setField(bean, "entityManager", new TestEntityManager());
-            setField(bean, "sanitizerBean", prepareSanitizeBean());
-            setField(bean, "timerService", new TestTimerService());
-            setField(bean, "settings", settings);
+            inject(bean, new TestEntityManager());
+            inject(bean, prepareSanitizeBean());
+            inject(bean, new TestTimerService());
+            inject(bean, settings);
 
             return bean;
         } catch (InstantiationException | InvocationTargetException | IllegalAccessException | NoSuchMethodException e) {
@@ -208,9 +208,7 @@ final class SanitizerBeanTest extends DatabaseSetup {
     private SanitizerBean prepareSanitizeBean() {
         try {
             final SanitizerBean bean = SanitizerBean.class.getConstructor().newInstance();
-
-            // Inject Dependencies
-            setField(bean, "entityManager", entityManager);
+            inject(bean, entityManager);
 
             return bean;
         } catch (InstantiationException | InvocationTargetException | IllegalAccessException | NoSuchMethodException e) {
@@ -221,9 +219,7 @@ final class SanitizerBeanTest extends DatabaseSetup {
     private SanitizerBean prepareFlawedSanitizeBean() {
         try {
             final SanitizerBean bean = SanitizerBean.class.getConstructor().newInstance();
-
-            // Inject Dependencies
-            setField(bean, "entityManager", new TestEntityManager());
+            inject(bean, new TestEntityManager());
 
             return bean;
         } catch (InstantiationException | InvocationTargetException | IllegalAccessException | NoSuchMethodException e) {

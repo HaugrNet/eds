@@ -21,8 +21,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.requests.MasterKeyRequest;
-import io.javadog.cws.core.DatabaseSetup;
-import io.javadog.cws.core.ManagementBean;
 import javax.ws.rs.core.Response;
 import org.junit.jupiter.api.Test;
 
@@ -30,11 +28,11 @@ import org.junit.jupiter.api.Test;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-final class MasterKeyServiceTest extends DatabaseSetup {
+final class MasterKeyServiceTest extends BeanSetup {
 
     @Test
     void testMasterKey() {
-        final MasterKeyService service = prepareService();
+        final MasterKeyService service = prepareMasterKeyService(settings, entityManager);
         final MasterKeyRequest request = prepareRequest(MasterKeyRequest.class, Constants.ADMIN_ACCOUNT);
         request.setSecret(Constants.ADMIN_ACCOUNT.getBytes(settings.getCharset()));
 
@@ -44,32 +42,11 @@ final class MasterKeyServiceTest extends DatabaseSetup {
 
     @Test
     void testFlawedMasterKey() {
-        final MasterKeyService service = prepareFlawedService();
+        final MasterKeyService service = prepareMasterKeyService();
         final MasterKeyRequest request = prepareRequest(MasterKeyRequest.class, Constants.ADMIN_ACCOUNT);
         request.setSecret(Constants.ADMIN_ACCOUNT.getBytes(settings.getCharset()));
 
         final Response response = service.masterKey(request);
         assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
-    }
-
-    // =========================================================================
-    // Internal Test Setup Methods
-    // =========================================================================
-
-    private static MasterKeyService prepareFlawedService() {
-        final MasterKeyService service = instantiate(MasterKeyService.class);
-        setField(service, "bean", null);
-
-        return service;
-    }
-
-    private MasterKeyService prepareService() {
-        final ManagementBean bean = instantiate(ManagementBean.class);
-        setField(bean, "entityManager", entityManager);
-
-        final MasterKeyService service = instantiate(MasterKeyService.class);
-        setField(service, "bean", bean);
-
-        return service;
     }
 }

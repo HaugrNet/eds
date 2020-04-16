@@ -20,8 +20,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.requests.SanityRequest;
-import io.javadog.cws.core.DatabaseSetup;
-import io.javadog.cws.core.ManagementBean;
 import javax.ws.rs.core.Response;
 import org.junit.jupiter.api.Test;
 
@@ -29,11 +27,11 @@ import org.junit.jupiter.api.Test;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-final class SanityServiceTest extends DatabaseSetup {
+final class SanityServiceTest extends BeanSetup {
 
     @Test
     void testSanitized() {
-        final SanityService service = prepareService();
+        final SanityService service = prepareSanityService(settings, entityManager);
         final SanityRequest request = new SanityRequest();
 
         final Response response = service.sanitized(request);
@@ -42,31 +40,10 @@ final class SanityServiceTest extends DatabaseSetup {
 
     @Test
     void testFlawedSanitized() {
-        final SanityService service = prepareFlawedService();
+        final SanityService service = prepareSanityService();
         final SanityRequest request = new SanityRequest();
 
         final Response response = service.sanitized(request);
         assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
-    }
-
-    // =========================================================================
-    // Internal Test Setup Methods
-    // =========================================================================
-
-    private static SanityService prepareFlawedService() {
-        final SanityService service = instantiate(SanityService.class);
-        setField(service, "bean", null);
-
-        return service;
-    }
-
-    private SanityService prepareService() {
-        final ManagementBean bean = instantiate(ManagementBean.class);
-        setField(bean, "entityManager", entityManager);
-
-        final SanityService service = instantiate(SanityService.class);
-        setField(service, "bean", bean);
-
-        return service;
     }
 }

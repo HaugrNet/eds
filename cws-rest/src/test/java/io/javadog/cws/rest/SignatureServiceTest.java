@@ -22,8 +22,6 @@ import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.requests.FetchSignatureRequest;
 import io.javadog.cws.api.requests.SignRequest;
 import io.javadog.cws.api.requests.VerifyRequest;
-import io.javadog.cws.core.DatabaseSetup;
-import io.javadog.cws.core.ShareBean;
 import javax.ws.rs.core.Response;
 import org.junit.jupiter.api.Test;
 
@@ -31,11 +29,11 @@ import org.junit.jupiter.api.Test;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-final class SignatureServiceTest extends DatabaseSetup {
+final class SignatureServiceTest extends BeanSetup {
 
     @Test
     void testSign() {
-        final SignatureService service = prepareService();
+        final SignatureService service = prepareSignatureService(settings, entityManager);
         final SignRequest request = new SignRequest();
 
         final Response response = service.sign(request);
@@ -44,7 +42,7 @@ final class SignatureServiceTest extends DatabaseSetup {
 
     @Test
     void testFlawedSign() {
-        final SignatureService service = prepareFlawedService();
+        final SignatureService service = prepareSignatureService();
         final SignRequest request = new SignRequest();
 
         final Response response = service.sign(request);
@@ -53,7 +51,7 @@ final class SignatureServiceTest extends DatabaseSetup {
 
     @Test
     void testVerify() {
-        final SignatureService service = prepareService();
+        final SignatureService service = prepareSignatureService(settings, entityManager);
         final VerifyRequest request = new VerifyRequest();
 
         final Response response = service.verify(request);
@@ -62,7 +60,7 @@ final class SignatureServiceTest extends DatabaseSetup {
 
     @Test
     void testFlawedVerify() {
-        final SignatureService service = prepareFlawedService();
+        final SignatureService service = prepareSignatureService();
         final VerifyRequest request = new VerifyRequest();
 
         final Response response = service.verify(request);
@@ -71,7 +69,7 @@ final class SignatureServiceTest extends DatabaseSetup {
 
     @Test
     void testFetchSignatures() {
-        final SignatureService service = prepareService();
+        final SignatureService service = prepareSignatureService(settings, entityManager);
         final FetchSignatureRequest request = new FetchSignatureRequest();
 
         final Response response = service.fetch(request);
@@ -80,31 +78,10 @@ final class SignatureServiceTest extends DatabaseSetup {
 
     @Test
     void testFlawedFetchSignatures() {
-        final SignatureService service = prepareFlawedService();
+        final SignatureService service = prepareSignatureService();
         final FetchSignatureRequest request = new FetchSignatureRequest();
 
         final Response response = service.fetch(request);
         assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
-    }
-
-    // =========================================================================
-    // Internal Test Setup Methods
-    // =========================================================================
-
-    private static SignatureService prepareFlawedService() {
-        final SignatureService service = instantiate(SignatureService.class);
-        setField(service, "bean", null);
-
-        return service;
-    }
-
-    private SignatureService prepareService() {
-        final ShareBean bean = instantiate(ShareBean.class);
-        setField(bean, "entityManager", entityManager);
-
-        final SignatureService service = instantiate(SignatureService.class);
-        setField(service, "bean", bean);
-
-        return service;
     }
 }

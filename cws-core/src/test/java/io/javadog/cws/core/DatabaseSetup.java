@@ -43,6 +43,7 @@ import io.javadog.cws.core.model.entities.KeyEntity;
 import io.javadog.cws.core.model.entities.MemberEntity;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -51,11 +52,15 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 import java.util.UUID;
+import java.util.concurrent.ThreadFactory;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
+import javax.annotation.Resource;
+import javax.ejb.TimerService;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
+import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -159,8 +164,8 @@ public class DatabaseSetup {
         entity.setSalt(salt.getArmored());
         entity.setPbeAlgorithm(pbeAlgorithm);
         entity.setRsaAlgorithm(settings.getAsymmetricAlgorithm());
-        entity.setPublicKey(crypto.armoringPublicKey(keyPair.getPublic().getKey()));
-        entity.setPrivateKey(crypto.armoringPrivateKey(secretKey, keyPair.getPrivate().getKey()));
+        entity.setPublicKey(Crypto.armoringPublicKey(keyPair.getPublic().getKey()));
+        entity.setPrivateKey(Crypto.armoringPrivateKey(secretKey, keyPair.getPrivate().getKey()));
         entity.setMemberRole(role);
         entity.setAltered(new Date());
         entity.setAdded(new Date());
@@ -199,8 +204,19 @@ public class DatabaseSetup {
      * @return New Settings instance
      */
     protected Settings newSettings() {
-        return instantiate(Settings.class);
+        try {
+            final Constructor<Settings> constructor = Settings.class.getDeclaredConstructor();
+            final boolean accessible = constructor.isAccessible();
+            constructor.setAccessible(true);
+            final Settings instance = constructor.newInstance();
+            constructor.setAccessible(accessible);
+
+            return instance;
+        } catch (NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException e) {
+            throw new CWSException(ReturnCode.ERROR, "Cannot instantiate Service Object", e);
+        }
     }
+
 
     /**
      * Testing, requiring a customized MasterKey, should use this method to get
@@ -314,27 +330,38 @@ public class DatabaseSetup {
     }
 
     /**
-     * <p>Instantiates a Class of the type specified. This is done by using
-     * Reflection to invoke the standard no-argument Constructor. If the
-     * Constructor is declared, then this is temporarily circumvented, so it
-     * is possible to create and return a new instance.
+     * <p>Simplified CDI Injection mechanism. Based on the Bean and the
+     * given Object, it tries to find the best place to inject the given Object
+     * into the Bean. Initially by simply looking at the types, but if not
+     * possible to find a match, then it also looks at the annotations.</p>
      *
-     * @param clazz The Class to instantiate
-     * @param <C>   The type of Class to instantiate
-     * @return New Class instance
-     * @throws CWSException if not possible to instantiate the Object
+     * <p>For the standard @Inject annotation, the types must be an exact
+     * match, or at least a sub-class that inherits the expected type. For
+     * other annotation such as @PersistenceContext or @Resource, the rules
+     * differ - here it is more lax in the type expectations, provided the
+     * given Object inherits from a basic Object that is normally used, such
+     * as {@link EntityManager}, {@link TimerService} or
+     * {@link ThreadFactory}.</p>
+     *
+     * @param instance Bean Instance with CDI Injection places
+     * @param value Object to inject
+     * @throws CWSException if an error occurred
      */
-    protected static <C> C instantiate(final Class<C> clazz) {
-        try {
-            final Constructor<C> constructor = clazz.getDeclaredConstructor();
-            final boolean accessible = constructor.isAccessible();
-            constructor.setAccessible(true);
-            final C instance = constructor.newInstance();
-            constructor.setAccessible(accessible);
-
-            return instance;
-        } catch (NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException e) {
-            throw new CWSException(ReturnCode.ERROR, "Cannot instantiate Service Object", e);
+    protected static void inject(final Object instance, final Object value) {
+        for (final Field field : instance.getClass().getDeclaredFields()) {
+            if (field.getType().equals(value.getClass()) || field.getType().equals(value.getClass().getSuperclass())) {
+                setField(instance, field, value);
+            } else {
+                for (final Annotation annotation : field.getAnnotations()) {
+                    if ((annotation instanceof PersistenceContext) && ((value instanceof EntityManager))) {
+                        setField(instance, field, value);
+                    } else if (annotation instanceof Resource) {
+                        if ((value instanceof  TimerService) || (value instanceof ThreadFactory)) {
+                            setField(instance, field, value);
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -342,24 +369,19 @@ public class DatabaseSetup {
      * <p>Uses Reflection to update an instantiated Object by altering the
      * given field with a new value.</p>
      *
-     * @param instance  The Object to change a Field in
-     * @param fieldName The name of the Field to change
-     * @param value     The new value to set the Field too
+     * @param instance The Object to change a Field in
+     * @param field    The Field to change
+     * @param value    The new value to set the Field too
      * @throws CWSException if unable to update the field
      */
-    protected static void setField(final Object instance, final String fieldName, final Object value) {
+    private static void setField(final Object instance, final Field field, final Object value) {
         try {
-            final Class<?> clazz = instance.getClass();
-            final Field field;
-
-            field = clazz.getDeclaredField(fieldName);
             final boolean accessible = field.isAccessible();
-
             field.setAccessible(true);
             field.set(instance, value);
             field.setAccessible(accessible);
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            throw new CWSException(ReturnCode.ERROR, "Cannot set Field", e);
+        } catch (IllegalAccessException e) {
+            throw new CWSException(ReturnCode.ERROR, e);
         }
     }
 }

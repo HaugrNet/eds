@@ -21,8 +21,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.requests.FetchCircleRequest;
 import io.javadog.cws.api.requests.ProcessCircleRequest;
-import io.javadog.cws.core.DatabaseSetup;
-import io.javadog.cws.core.ManagementBean;
 import javax.ws.rs.core.Response;
 import org.junit.jupiter.api.Test;
 
@@ -30,11 +28,11 @@ import org.junit.jupiter.api.Test;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-final class CircleServiceTest extends DatabaseSetup {
+final class CircleServiceTest extends BeanSetup {
 
     @Test
     void testCreate() {
-        final CircleService service = prepareService();
+        final CircleService service = prepareCircleService(settings, entityManager);
         final ProcessCircleRequest request = new ProcessCircleRequest();
 
         final Response response = service.create(request);
@@ -43,7 +41,7 @@ final class CircleServiceTest extends DatabaseSetup {
 
     @Test
     void testFlawedCreate() {
-        final CircleService service = prepareFlawedService();
+        final CircleService service = prepareCircleService();
         final ProcessCircleRequest request = new ProcessCircleRequest();
 
         final Response response = service.create(request);
@@ -52,7 +50,7 @@ final class CircleServiceTest extends DatabaseSetup {
 
     @Test
     void testUpdate() {
-        final CircleService service = prepareService();
+        final CircleService service = prepareCircleService(settings, entityManager);
         final ProcessCircleRequest request = new ProcessCircleRequest();
 
         final Response response = service.update(request);
@@ -61,7 +59,7 @@ final class CircleServiceTest extends DatabaseSetup {
 
     @Test
     void testFlawedUpdate() {
-        final CircleService service = prepareFlawedService();
+        final CircleService service = prepareCircleService();
         final ProcessCircleRequest request = new ProcessCircleRequest();
 
         final Response response = service.update(request);
@@ -70,7 +68,7 @@ final class CircleServiceTest extends DatabaseSetup {
 
     @Test
     void testDelete() {
-        final CircleService service = prepareService();
+        final CircleService service = prepareCircleService(settings, entityManager);
         final ProcessCircleRequest request = new ProcessCircleRequest();
 
         final Response response = service.delete(request);
@@ -79,7 +77,7 @@ final class CircleServiceTest extends DatabaseSetup {
 
     @Test
     void testFlawedDelete() {
-        final CircleService service = prepareFlawedService();
+        final CircleService service = prepareCircleService();
         final ProcessCircleRequest request = new ProcessCircleRequest();
 
         final Response response = service.delete(request);
@@ -88,7 +86,7 @@ final class CircleServiceTest extends DatabaseSetup {
 
     @Test
     void testFetch() {
-        final CircleService service = prepareService();
+        final CircleService service = prepareCircleService(settings, entityManager);
         final FetchCircleRequest request = new FetchCircleRequest();
 
         final Response response = service.fetch(request);
@@ -97,31 +95,10 @@ final class CircleServiceTest extends DatabaseSetup {
 
     @Test
     void testFlawedFetch() {
-        final CircleService service = prepareFlawedService();
+        final CircleService service = prepareCircleService();
         final FetchCircleRequest request = new FetchCircleRequest();
 
         final Response response = service.fetch(request);
         assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
-    }
-
-    // =========================================================================
-    // Internal Test Setup Methods
-    // =========================================================================
-
-    private static CircleService prepareFlawedService() {
-        final CircleService service = instantiate(CircleService.class);
-        setField(service, "bean", null);
-
-        return service;
-    }
-
-    private CircleService prepareService() {
-        final ManagementBean bean = instantiate(ManagementBean.class);
-        setField(bean, "entityManager", entityManager);
-
-        final CircleService service = instantiate(CircleService.class);
-        setField(service, "bean", bean);
-
-        return service;
     }
 }

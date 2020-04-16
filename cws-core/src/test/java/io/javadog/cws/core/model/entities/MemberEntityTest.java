@@ -29,6 +29,7 @@ import io.javadog.cws.core.DatabaseSetup;
 import io.javadog.cws.core.GenerateTestData;
 import io.javadog.cws.core.enums.KeyAlgorithm;
 import io.javadog.cws.core.jce.CWSKeyPair;
+import io.javadog.cws.core.jce.Crypto;
 import io.javadog.cws.core.model.CommonDao;
 import java.util.List;
 import java.util.UUID;
@@ -44,7 +45,7 @@ final class MemberEntityTest extends DatabaseSetup {
 
     @Test
     void testEntity() {
-        final CWSKeyPair keyPair = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
+        final CWSKeyPair keyPair = Crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
         final String externalId = UUID.randomUUID().toString();
         final MemberEntity entity = prepareMember(externalId, "New Account Name", "My Super Secret", keyPair, MemberRole.STANDARD);
         persistAndDetach(entity);

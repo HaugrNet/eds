@@ -66,7 +66,7 @@ final class ManagementServiceTest extends BeanSetup {
         final String propertiesFile = "cws.config";
 
         if (loader != null) {
-            final ManagementService management = prepareManagementService();
+            final ManagementService management = prepareManagementService(settings, entityManager);
             final String version;
 
             try (final InputStream stream = loader.getResourceAsStream(propertiesFile)) {
@@ -85,7 +85,7 @@ final class ManagementServiceTest extends BeanSetup {
 
     @Test
     void testFlawedVersion() {
-        final ManagementService management = prepareFlawedManagementService();
+        final ManagementService management = prepareManagementService();
 
         final VersionResponse response = management.version();
         assertEquals(ReturnCode.ERROR.getCode(), response.getReturnCode());
@@ -93,7 +93,7 @@ final class ManagementServiceTest extends BeanSetup {
 
     @Test
     void testSettingsAsMember() {
-        final ManagementService management = prepareManagementService();
+        final ManagementService management = prepareManagementService(settings, entityManager);
         final SettingRequest request = prepareRequest(SettingRequest.class, MEMBER_1);
 
         final SettingResponse response = management.settings(request);
@@ -103,7 +103,7 @@ final class ManagementServiceTest extends BeanSetup {
 
     @Test
     void testSettings() {
-        final ManagementService management = prepareManagementService();
+        final ManagementService management = prepareManagementService(settings, entityManager);
         final SettingRequest request = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
 
         final SettingResponse response = management.settings(request);
@@ -112,7 +112,7 @@ final class ManagementServiceTest extends BeanSetup {
 
     @Test
     void testUpdateSettingsWithInvalidData() {
-        final ManagementService management = prepareManagementService();
+        final ManagementService management = prepareManagementService(settings, entityManager);
         final SettingRequest request = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
         final Map<String, String> map = request.getSettings();
         map.put(StandardSetting.PBE_ALGORITHM.getKey(), "Hash Them");
@@ -125,7 +125,7 @@ final class ManagementServiceTest extends BeanSetup {
 
     @Test
     void testSettingsWithNullRequest() {
-        final ManagementService management = prepareManagementService();
+        final ManagementService management = prepareManagementService(settings, entityManager);
 
         final SettingResponse response = management.settings(null);
         assertEquals(ReturnCode.VERIFICATION_WARNING.getCode(), response.getReturnCode());
@@ -133,7 +133,7 @@ final class ManagementServiceTest extends BeanSetup {
 
     @Test
     void testSettingsWithEmptyRequest() {
-        final ManagementService management = prepareManagementService();
+        final ManagementService management = prepareManagementService(settings, entityManager);
         final SettingRequest request = new SettingRequest();
 
         final SettingResponse response = management.settings(request);
@@ -142,7 +142,7 @@ final class ManagementServiceTest extends BeanSetup {
 
     @Test
     void testFlawedSettings() {
-        final ManagementService management = prepareFlawedManagementService();
+        final ManagementService management = prepareManagementService();
 
         final SettingResponse response = management.settings(null);
         assertEquals(ReturnCode.ERROR.getCode(), response.getReturnCode());
@@ -150,7 +150,7 @@ final class ManagementServiceTest extends BeanSetup {
 
     @Test
     void testMasterKey() {
-        final ManagementService management = prepareManagementService();
+        final ManagementService management = prepareManagementService(settings, entityManager);
         final MasterKeyRequest request = prepareRequest(MasterKeyRequest.class, Constants.ADMIN_ACCOUNT);
         request.setSecret(request.getCredential());
 
@@ -160,7 +160,7 @@ final class ManagementServiceTest extends BeanSetup {
 
     @Test
     void testMasterKeyWithNullRequest() {
-        final ManagementService management = prepareManagementService();
+        final ManagementService management = prepareManagementService(settings, entityManager);
 
         final MasterKeyResponse response = management.masterKey(null);
         assertEquals(ReturnCode.VERIFICATION_WARNING.getCode(), response.getReturnCode());
@@ -168,7 +168,7 @@ final class ManagementServiceTest extends BeanSetup {
 
     @Test
     void testMasterKeyWithProblems() {
-        final ManagementService management = prepareFlawedManagementService();
+        final ManagementService management = prepareManagementService();
         final MasterKeyRequest request = new MasterKeyRequest();
 
         final MasterKeyResponse response = management.masterKey(request);
@@ -185,7 +185,7 @@ final class ManagementServiceTest extends BeanSetup {
         //   Hence, the Salt is being set to an illegal value before we start
         // the test.
         settings.set(StandardSetting.CWS_SALT.getKey(), "");
-        final ManagementService management = prepareManagementService(settings);
+        final ManagementService management = prepareManagementService(settings, entityManager);
         final MasterKeyRequest request = prepareRequest(MasterKeyRequest.class, Constants.ADMIN_ACCOUNT);
         request.setSecret(request.getCredential());
 
@@ -200,7 +200,7 @@ final class ManagementServiceTest extends BeanSetup {
 
     @Test
     void testSanity() {
-        final ManagementService management = prepareManagementService();
+        final ManagementService management = prepareManagementService(settings, entityManager);
         final SanityRequest request = prepareRequest(SanityRequest.class, Constants.ADMIN_ACCOUNT);
 
         final SanityResponse response = management.sanitized(request);
@@ -209,7 +209,7 @@ final class ManagementServiceTest extends BeanSetup {
 
     @Test
     void testSanityWithNullRequest() {
-        final ManagementService management = prepareManagementService();
+        final ManagementService management = prepareManagementService(settings, entityManager);
 
         final SanityResponse response = management.sanitized(null);
         assertEquals(ReturnCode.VERIFICATION_WARNING.getCode(), response.getReturnCode());
@@ -217,7 +217,7 @@ final class ManagementServiceTest extends BeanSetup {
 
     @Test
     void testSanityWithEmptyRequest() {
-        final ManagementService management = prepareManagementService();
+        final ManagementService management = prepareManagementService(settings, entityManager);
         final SanityRequest request = new SanityRequest();
 
         final SanityResponse response = management.sanitized(request);
@@ -226,7 +226,7 @@ final class ManagementServiceTest extends BeanSetup {
 
     @Test
     void testFlawedSanity() {
-        final ManagementService management = prepareFlawedManagementService();
+        final ManagementService management = prepareManagementService();
 
         final SanityResponse response = management.sanitized(null);
         assertEquals(ReturnCode.ERROR.getCode(), response.getReturnCode());
@@ -234,7 +234,7 @@ final class ManagementServiceTest extends BeanSetup {
 
     @Test
     void testAuthenticated() {
-        final ManagementService management = prepareManagementService();
+        final ManagementService management = prepareManagementService(settings, entityManager);
         final Authentication request = prepareRequest(Authentication.class, Constants.ADMIN_ACCOUNT);
 
         final CwsResponse response = management.authenticated(request);
@@ -243,7 +243,7 @@ final class ManagementServiceTest extends BeanSetup {
 
     @Test
     void testAuthenticatedWithNullRequest() {
-        final ManagementService management = prepareManagementService();
+        final ManagementService management = prepareManagementService(settings, entityManager);
 
         final CwsResponse response = management.authenticated(null);
         assertEquals(ReturnCode.VERIFICATION_WARNING.getCode(), response.getReturnCode());
@@ -251,7 +251,7 @@ final class ManagementServiceTest extends BeanSetup {
 
     @Test
     void testAuthenticatedWithEmptyRequest() {
-        final ManagementService management = prepareManagementService();
+        final ManagementService management = prepareManagementService(settings, entityManager);
         final Authentication request = new SanityRequest();
 
         final CwsResponse response = management.authenticated(request);
@@ -260,7 +260,7 @@ final class ManagementServiceTest extends BeanSetup {
 
     @Test
     void testFlawedAuthenticated() {
-        final ManagementService management = prepareFlawedManagementService();
+        final ManagementService management = prepareManagementService();
 
         final CwsResponse response = management.authenticated(null);
         assertEquals(ReturnCode.ERROR.getCode(), response.getReturnCode());
@@ -268,7 +268,7 @@ final class ManagementServiceTest extends BeanSetup {
 
     @Test
     void testFetchMembers() {
-        final ManagementService management = prepareManagementService();
+        final ManagementService management = prepareManagementService(settings, entityManager);
         final FetchMemberRequest request = prepareRequest(FetchMemberRequest.class, MEMBER_1);
 
         final FetchMemberResponse response = management.fetchMembers(request);
@@ -303,7 +303,7 @@ final class ManagementServiceTest extends BeanSetup {
 
     @Test
     void testFetchMembersWithNullRequest() {
-        final ManagementService management = prepareManagementService();
+        final ManagementService management = prepareManagementService(settings, entityManager);
 
         final FetchMemberResponse response = management.fetchMembers(null);
         assertEquals(ReturnCode.VERIFICATION_WARNING.getCode(), response.getReturnCode());
@@ -311,7 +311,7 @@ final class ManagementServiceTest extends BeanSetup {
 
     @Test
     void testFetchMembersWithEmptyRequest() {
-        final ManagementService management = prepareManagementService();
+        final ManagementService management = prepareManagementService(settings, entityManager);
         final FetchMemberRequest request = new FetchMemberRequest();
 
         final FetchMemberResponse response = management.fetchMembers(request);
@@ -320,7 +320,7 @@ final class ManagementServiceTest extends BeanSetup {
 
     @Test
     void testFlawedFetchMembers() {
-        final ManagementService management = prepareFlawedManagementService();
+        final ManagementService management = prepareManagementService();
 
         final FetchMemberResponse response = management.fetchMembers(null);
         assertEquals(ReturnCode.ERROR.getCode(), response.getReturnCode());
@@ -328,7 +328,7 @@ final class ManagementServiceTest extends BeanSetup {
 
     @Test
     void testProcessMember() {
-        final ManagementService management = prepareManagementService();
+        final ManagementService management = prepareManagementService(settings, entityManager);
         final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
         request.setAction(Action.INVITE);
         request.setNewAccountName("new Account");
@@ -339,7 +339,7 @@ final class ManagementServiceTest extends BeanSetup {
 
     @Test
     void testProcessMemberWithNullRequest() {
-        final ManagementService management = prepareManagementService();
+        final ManagementService management = prepareManagementService(settings, entityManager);
 
         final ProcessMemberResponse response = management.processMember(null);
         assertEquals(ReturnCode.VERIFICATION_WARNING.getCode(), response.getReturnCode());
@@ -347,7 +347,7 @@ final class ManagementServiceTest extends BeanSetup {
 
     @Test
     void testProcessMemberWithEmptyRequest() {
-        final ManagementService management = prepareManagementService();
+        final ManagementService management = prepareManagementService(settings, entityManager);
         final ProcessMemberRequest request = new ProcessMemberRequest();
 
         final ProcessMemberResponse response = management.processMember(request);
@@ -356,7 +356,7 @@ final class ManagementServiceTest extends BeanSetup {
 
     @Test
     void testFlawedProcessMember() {
-        final ManagementService management = prepareFlawedManagementService();
+        final ManagementService management = prepareManagementService();
 
         final ProcessMemberResponse response = management.processMember(null);
         assertEquals(ReturnCode.ERROR.getCode(), response.getReturnCode());
@@ -364,7 +364,7 @@ final class ManagementServiceTest extends BeanSetup {
 
     @Test
     void testFetchCircle() {
-        final ManagementService management = prepareManagementService();
+        final ManagementService management = prepareManagementService(settings, entityManager);
         final FetchCircleRequest request = prepareRequest(FetchCircleRequest.class, MEMBER_1);
 
         final FetchCircleResponse response = management.fetchCircles(request);
@@ -373,7 +373,7 @@ final class ManagementServiceTest extends BeanSetup {
 
     @Test
     void testFetchCircleWithNullRequest() {
-        final ManagementService management = prepareManagementService();
+        final ManagementService management = prepareManagementService(settings, entityManager);
 
         final FetchCircleResponse response = management.fetchCircles(null);
         assertEquals(ReturnCode.VERIFICATION_WARNING.getCode(), response.getReturnCode());
@@ -381,7 +381,7 @@ final class ManagementServiceTest extends BeanSetup {
 
     @Test
     void testFetchCircleWithEmptyRequest() {
-        final ManagementService management = prepareManagementService();
+        final ManagementService management = prepareManagementService(settings, entityManager);
         final FetchCircleRequest request = new FetchCircleRequest();
 
         final FetchCircleResponse response = management.fetchCircles(request);
@@ -390,7 +390,7 @@ final class ManagementServiceTest extends BeanSetup {
 
     @Test
     void testFlawedFetchCircle() {
-        final ManagementService management = prepareFlawedManagementService();
+        final ManagementService management = prepareManagementService();
 
         final FetchCircleResponse response = management.fetchCircles(null);
         assertEquals(ReturnCode.ERROR.getCode(), response.getReturnCode());
@@ -398,7 +398,7 @@ final class ManagementServiceTest extends BeanSetup {
 
     @Test
     void testProcessCircle() {
-        final ManagementService management = prepareManagementService();
+        final ManagementService management = prepareManagementService(settings, entityManager);
         final ProcessCircleRequest request = prepareRequest(ProcessCircleRequest.class, Constants.ADMIN_ACCOUNT);
         request.setAction(Action.CREATE);
         request.setCircleName("Test Circle");
@@ -410,7 +410,7 @@ final class ManagementServiceTest extends BeanSetup {
 
     @Test
     void testProcessCircleWithNullRequest() {
-        final ManagementService management = prepareManagementService();
+        final ManagementService management = prepareManagementService(settings, entityManager);
 
         final ProcessCircleResponse response = management.processCircle(null);
         assertEquals(ReturnCode.VERIFICATION_WARNING.getCode(), response.getReturnCode());
@@ -418,7 +418,7 @@ final class ManagementServiceTest extends BeanSetup {
 
     @Test
     void testProcessCircleWithEmptyRequest() {
-        final ManagementService management = prepareManagementService();
+        final ManagementService management = prepareManagementService(settings, entityManager);
         final ProcessCircleRequest request = new ProcessCircleRequest();
 
         final ProcessCircleResponse response = management.processCircle(request);
@@ -427,7 +427,7 @@ final class ManagementServiceTest extends BeanSetup {
 
     @Test
     void testFlawedProcessCircle() {
-        final ManagementService management = prepareFlawedManagementService();
+        final ManagementService management = prepareManagementService();
 
         final ProcessCircleResponse response = management.processCircle(null);
         assertEquals(ReturnCode.ERROR.getCode(), response.getReturnCode());
@@ -435,7 +435,7 @@ final class ManagementServiceTest extends BeanSetup {
 
     @Test
     void testFetchTrustee() {
-        final ManagementService management = prepareManagementService();
+        final ManagementService management = prepareManagementService(settings, entityManager);
         final FetchTrusteeRequest request = prepareRequest(FetchTrusteeRequest.class, MEMBER_1);
         request.setCircleId(CIRCLE_1_ID);
 
@@ -445,7 +445,7 @@ final class ManagementServiceTest extends BeanSetup {
 
     @Test
     void testFetchTrusteeWithNullRequest() {
-        final ManagementService management = prepareManagementService();
+        final ManagementService management = prepareManagementService(settings, entityManager);
 
         final FetchTrusteeResponse response = management.fetchTrustees(null);
         assertEquals(ReturnCode.VERIFICATION_WARNING.getCode(), response.getReturnCode());
@@ -453,7 +453,7 @@ final class ManagementServiceTest extends BeanSetup {
 
     @Test
     void testFetchTrusteeWithEmptyRequest() {
-        final ManagementService management = prepareManagementService();
+        final ManagementService management = prepareManagementService(settings, entityManager);
         final FetchTrusteeRequest request = new FetchTrusteeRequest();
 
         final FetchTrusteeResponse response = management.fetchTrustees(request);
@@ -462,7 +462,7 @@ final class ManagementServiceTest extends BeanSetup {
 
     @Test
     void testFlawedFetchTrustee() {
-        final ManagementService management = prepareFlawedManagementService();
+        final ManagementService management = prepareManagementService();
 
         final FetchTrusteeResponse response = management.fetchTrustees(null);
         assertEquals(ReturnCode.ERROR.getCode(), response.getReturnCode());
@@ -470,7 +470,7 @@ final class ManagementServiceTest extends BeanSetup {
 
     @Test
     void testProcessTrustee() {
-        final ManagementService management = prepareManagementService();
+        final ManagementService management = prepareManagementService(settings, entityManager);
         final ProcessTrusteeRequest request = prepareRequest(ProcessTrusteeRequest.class, MEMBER_1);
         request.setAction(Action.ALTER);
         request.setMemberId(MEMBER_2_ID);
@@ -483,7 +483,7 @@ final class ManagementServiceTest extends BeanSetup {
 
     @Test
     void testProcessTrusteeWithNullRequest() {
-        final ManagementService management = prepareManagementService();
+        final ManagementService management = prepareManagementService(settings, entityManager);
 
         final ProcessTrusteeResponse response = management.processTrustee(null);
         assertEquals(ReturnCode.VERIFICATION_WARNING.getCode(), response.getReturnCode());
@@ -491,7 +491,7 @@ final class ManagementServiceTest extends BeanSetup {
 
     @Test
     void testProcessTrusteeWithEmptyRequest() {
-        final ManagementService management = prepareManagementService();
+        final ManagementService management = prepareManagementService(settings, entityManager);
         final ProcessTrusteeRequest request = new ProcessTrusteeRequest();
 
         final ProcessTrusteeResponse response = management.processTrustee(request);
@@ -500,7 +500,7 @@ final class ManagementServiceTest extends BeanSetup {
 
     @Test
     void testFlawedProcessTrustee() {
-        final ManagementService management = prepareFlawedManagementService();
+        final ManagementService management = prepareManagementService();
 
         final ProcessTrusteeResponse response = management.processTrustee(null);
         assertEquals(ReturnCode.ERROR.getCode(), response.getReturnCode());

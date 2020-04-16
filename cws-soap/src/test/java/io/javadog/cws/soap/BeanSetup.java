@@ -16,73 +16,59 @@
  */
 package io.javadog.cws.soap;
 
-import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.core.DatabaseSetup;
 import io.javadog.cws.core.ManagementBean;
 import io.javadog.cws.core.ShareBean;
-import io.javadog.cws.core.exceptions.CWSException;
-import io.javadog.cws.core.model.Settings;
-import java.lang.reflect.InvocationTargetException;
 
 /**
  * @author Kim Jensen
  * @since CWS 1.0
  */
-public class BeanSetup extends DatabaseSetup {
+class BeanSetup extends DatabaseSetup {
 
-    protected static ShareService prepareFlawedShareService() {
-        try {
-            final ShareService service = ShareService.class.getConstructor().newInstance();
-            setField(service, "bean", null);
-
-            return service;
-        } catch (InstantiationException | InvocationTargetException | IllegalAccessException | NoSuchMethodException e) {
-            throw new CWSException(ReturnCode.ERROR, "Cannot instantiate Service Object", e);
+    /**
+     * <p>Prepares a Share Service instance. If the given Objects are present,
+     * then an internal Share Bean is set and so is the given resources. If no
+     * objects are given, an empty service instance is returned without any
+     * bean or other settings set.</p>
+     *
+     * @param objects Resources to be injected into Service instance
+     * @return New Service instance with given resources injected
+     */
+    protected static ShareService prepareShareService(final Object... objects) {
+        final ShareService service = new ShareService();
+        if (objects.length > 0) {
+            final ShareBean bean = new ShareBean();
+            inject(service, bean);
+            for (final Object object : objects) {
+                inject(service, object);
+                inject(bean, object);
+            }
         }
+
+        return service;
     }
 
-    protected ShareService prepareShareService() {
-        try {
-            final ShareBean bean = ShareBean.class.getConstructor().newInstance();
-            setField(bean, "entityManager", entityManager);
-
-            final ShareService service = ShareService.class.getConstructor().newInstance();
-            setField(service, "bean", bean);
-
-            return service;
-        } catch (InstantiationException | InvocationTargetException | IllegalAccessException | NoSuchMethodException e) {
-            throw new CWSException(ReturnCode.ERROR, "Cannot instantiate Service Object", e);
+    /**
+     * <p>Prepares a Management Service instance. If the given Objects are
+     * present, then an internal Management Bean is set and so is the given
+     * resources. If no objects are given, an empty service instance is
+     * returned without any bean or other settings set.</p>
+     *
+     * @param objects Resources to be injected into Service instance
+     * @return New Service instance with given resources injected
+     */
+    protected static ManagementService prepareManagementService(final Object... objects) {
+        final ManagementService service = new ManagementService();
+        if (objects.length > 0) {
+            final ManagementBean bean = new ManagementBean();
+            inject(service, bean);
+            for (final Object object : objects) {
+                inject(service, object);
+                inject(bean, object);
+            }
         }
-    }
 
-    protected ManagementService prepareFlawedManagementService() {
-        try {
-            final ManagementService service = ManagementService.class.getConstructor().newInstance();
-            setField(service, "bean", null);
-
-            return service;
-        } catch (InstantiationException | InvocationTargetException | IllegalAccessException | NoSuchMethodException e) {
-            throw new CWSException(ReturnCode.ERROR, "Cannot instantiate Service Object", e);
-        }
-    }
-
-    protected ManagementService prepareManagementService() {
-        return prepareManagementService(settings);
-    }
-
-    protected ManagementService prepareManagementService(final Settings customSettings) {
-        try {
-            final ManagementBean bean = ManagementBean.class.getConstructor().newInstance();
-            setField(bean, "entityManager", entityManager);
-            setField(bean, "settings", customSettings);
-
-            final ManagementService service = ManagementService.class.getConstructor().newInstance();
-            setField(bean, "settings", customSettings);
-            setField(service, "bean", bean);
-
-            return service;
-        } catch (InstantiationException | InvocationTargetException | IllegalAccessException | NoSuchMethodException e) {
-            throw new CWSException(ReturnCode.ERROR, "Cannot instantiate Service Object", e);
-        }
+        return service;
     }
 }

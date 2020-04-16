@@ -21,8 +21,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.requests.FetchTrusteeRequest;
 import io.javadog.cws.api.requests.ProcessTrusteeRequest;
-import io.javadog.cws.core.DatabaseSetup;
-import io.javadog.cws.core.ManagementBean;
 import javax.ws.rs.core.Response;
 import org.junit.jupiter.api.Test;
 
@@ -30,11 +28,11 @@ import org.junit.jupiter.api.Test;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-final class TrusteeServiceTest extends DatabaseSetup {
+final class TrusteeServiceTest extends BeanSetup {
 
     @Test
     void testAdd() {
-        final TrusteeService service = prepareService();
+        final TrusteeService service = prepareTrusteeService(settings, entityManager);
         final ProcessTrusteeRequest request = new ProcessTrusteeRequest();
 
         final Response response = service.add(request);
@@ -43,7 +41,7 @@ final class TrusteeServiceTest extends DatabaseSetup {
 
     @Test
     void testFlawedAdd() {
-        final TrusteeService service = prepareFlawedService();
+        final TrusteeService service = prepareTrusteeService();
         final ProcessTrusteeRequest request = new ProcessTrusteeRequest();
 
         final Response response = service.add(request);
@@ -52,7 +50,7 @@ final class TrusteeServiceTest extends DatabaseSetup {
 
     @Test
     void testAlter() {
-        final TrusteeService service = prepareService();
+        final TrusteeService service = prepareTrusteeService(settings, entityManager);
         final ProcessTrusteeRequest request = new ProcessTrusteeRequest();
 
         final Response response = service.alter(request);
@@ -61,7 +59,7 @@ final class TrusteeServiceTest extends DatabaseSetup {
 
     @Test
     void testFlawedAlter() {
-        final TrusteeService service = prepareFlawedService();
+        final TrusteeService service = prepareTrusteeService(settings, entityManager);
         final ProcessTrusteeRequest request = new ProcessTrusteeRequest();
 
         final Response response = service.alter(request);
@@ -70,7 +68,7 @@ final class TrusteeServiceTest extends DatabaseSetup {
 
     @Test
     void testRemove() {
-        final TrusteeService service = prepareService();
+        final TrusteeService service = prepareTrusteeService(settings, entityManager);
         final ProcessTrusteeRequest request = new ProcessTrusteeRequest();
 
         final Response response = service.remove(request);
@@ -79,7 +77,7 @@ final class TrusteeServiceTest extends DatabaseSetup {
 
     @Test
     void testFlawedRemove() {
-        final TrusteeService service = prepareFlawedService();
+        final TrusteeService service = prepareTrusteeService();
         final ProcessTrusteeRequest request = new ProcessTrusteeRequest();
 
         final Response response = service.remove(request);
@@ -88,7 +86,7 @@ final class TrusteeServiceTest extends DatabaseSetup {
 
     @Test
     void testFetch() {
-        final TrusteeService service = prepareService();
+        final TrusteeService service = prepareTrusteeService(settings, entityManager);
         final FetchTrusteeRequest request = new FetchTrusteeRequest();
 
         final Response response = service.fetch(request);
@@ -97,31 +95,10 @@ final class TrusteeServiceTest extends DatabaseSetup {
 
     @Test
     void testFlawedFetch() {
-        final TrusteeService service = prepareFlawedService();
+        final TrusteeService service = prepareTrusteeService();
         final FetchTrusteeRequest request = new FetchTrusteeRequest();
 
         final Response response = service.fetch(request);
         assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
-    }
-
-    // =========================================================================
-    // Internal Test Setup Methods
-    // =========================================================================
-
-    private static TrusteeService prepareFlawedService() {
-        final TrusteeService service = instantiate(TrusteeService.class);
-        setField(service, "bean", null);
-
-        return service;
-    }
-
-    private TrusteeService prepareService() {
-        final ManagementBean bean = instantiate(ManagementBean.class);
-        setField(bean, "entityManager", entityManager);
-
-        final TrusteeService service = instantiate(TrusteeService.class);
-        setField(service, "bean", bean);
-
-        return service;
     }
 }

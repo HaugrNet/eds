@@ -47,7 +47,7 @@ final class ShareServiceTest extends BeanSetup {
 
     @Test
     void testProcessDataType() {
-        final ShareService service = prepareShareService();
+        final ShareService service = prepareShareService(settings, entityManager);
         final ProcessDataTypeRequest request = prepareRequest(ProcessDataTypeRequest.class, Constants.ADMIN_ACCOUNT);
         request.setAction(Action.PROCESS);
         request.setTypeName("TestType");
@@ -63,7 +63,7 @@ final class ShareServiceTest extends BeanSetup {
 
     @Test
     void testProcessDataTypeWithNullRequest() {
-        final ShareService service = prepareShareService();
+        final ShareService service = prepareShareService(settings, entityManager);
 
         final ProcessDataTypeResponse response = service.processDataType(null);
         assertEquals(ReturnCode.VERIFICATION_WARNING.getCode(), response.getReturnCode());
@@ -71,7 +71,7 @@ final class ShareServiceTest extends BeanSetup {
 
     @Test
     void testProcessDataTypeWithEmptyRequest() {
-        final ShareService service = prepareShareService();
+        final ShareService service = prepareShareService(settings, entityManager);
         final ProcessDataTypeRequest request = new ProcessDataTypeRequest();
 
         final ProcessDataTypeResponse response = service.processDataType(request);
@@ -80,7 +80,7 @@ final class ShareServiceTest extends BeanSetup {
 
     @Test
     void testFlawedProcessDataType() {
-        final ShareService service = prepareFlawedShareService();
+        final ShareService service = prepareShareService();
         final ProcessDataTypeRequest request = new ProcessDataTypeRequest();
 
         final ProcessDataTypeResponse response = service.processDataType(request);
@@ -89,7 +89,7 @@ final class ShareServiceTest extends BeanSetup {
 
     @Test
     void testFetchDataTypes() {
-        final ShareService service = prepareShareService();
+        final ShareService service = prepareShareService(settings, entityManager);
         final FetchDataTypeRequest request = prepareRequest(FetchDataTypeRequest.class, MEMBER_1);
 
         final FetchDataTypeResponse response = service.fetchDataTypes(request);
@@ -104,7 +104,7 @@ final class ShareServiceTest extends BeanSetup {
 
     @Test
     void testFetchDataTypesWithNullRequest() {
-        final ShareService service = prepareShareService();
+        final ShareService service = prepareShareService(settings, entityManager);
 
         final FetchDataTypeResponse response = service.fetchDataTypes(null);
         assertEquals(ReturnCode.VERIFICATION_WARNING.getCode(), response.getReturnCode());
@@ -112,7 +112,7 @@ final class ShareServiceTest extends BeanSetup {
 
     @Test
     void testFetchDataTypesWithEmptyRequest() {
-        final ShareService service = prepareShareService();
+        final ShareService service = prepareShareService(settings, entityManager);
         final FetchDataTypeRequest request = new FetchDataTypeRequest();
 
         final FetchDataTypeResponse response = service.fetchDataTypes(request);
@@ -121,7 +121,7 @@ final class ShareServiceTest extends BeanSetup {
 
     @Test
     void testFlawedFetchDataTypes() {
-        final ShareService service = prepareFlawedShareService();
+        final ShareService service = prepareShareService();
         final FetchDataTypeRequest request = new FetchDataTypeRequest();
 
         final FetchDataTypeResponse response = service.fetchDataTypes(request);
@@ -130,7 +130,7 @@ final class ShareServiceTest extends BeanSetup {
 
     @Test
     void testProcessData() {
-        final ShareService service = prepareShareService();
+        final ShareService service = prepareShareService(settings, entityManager);
         final ProcessDataRequest request = prepareRequest(ProcessDataRequest.class, MEMBER_1);
         request.setAction(Action.ADD);
         request.setData("alpha beta gamma".getBytes(settings.getCharset()));
@@ -146,7 +146,7 @@ final class ShareServiceTest extends BeanSetup {
 
     @Test
     void testProcessDataWithNullRequest() {
-        final ShareService service = prepareShareService();
+        final ShareService service = prepareShareService(settings, entityManager);
 
         final ProcessDataResponse response = service.processData(null);
         assertEquals(ReturnCode.VERIFICATION_WARNING.getCode(), response.getReturnCode());
@@ -154,7 +154,7 @@ final class ShareServiceTest extends BeanSetup {
 
     @Test
     void testProcessDataWithEmptyRequest() {
-        final ShareService service = prepareShareService();
+        final ShareService service = prepareShareService(settings, entityManager);
         final ProcessDataRequest request = new ProcessDataRequest();
 
         final ProcessDataResponse response = service.processData(request);
@@ -163,7 +163,7 @@ final class ShareServiceTest extends BeanSetup {
 
     @Test
     void testFlawedProcessData() {
-        final ShareService service = prepareFlawedShareService();
+        final ShareService service = prepareShareService();
         final ProcessDataRequest request = new ProcessDataRequest();
 
         final ProcessDataResponse response = service.processData(request);
@@ -172,7 +172,7 @@ final class ShareServiceTest extends BeanSetup {
 
     @Test
     void testFetchData() {
-        final ShareService service = prepareShareService();
+        final ShareService service = prepareShareService(settings, entityManager);
         final FetchDataRequest request = prepareRequest(FetchDataRequest.class, MEMBER_1);
         request.setCircleId(CIRCLE_1_ID);
 
@@ -184,7 +184,7 @@ final class ShareServiceTest extends BeanSetup {
 
     @Test
     void testFetchDataWithNullRequest() {
-        final ShareService service = prepareShareService();
+        final ShareService service = prepareShareService(settings, entityManager);
 
         final FetchDataResponse response = service.fetchData(null);
         assertEquals(ReturnCode.VERIFICATION_WARNING.getCode(), response.getReturnCode());
@@ -192,7 +192,7 @@ final class ShareServiceTest extends BeanSetup {
 
     @Test
     void testFetchDataWithEmptyRequest() {
-        final ShareService service = prepareShareService();
+        final ShareService service = prepareShareService(settings, entityManager);
         final FetchDataRequest request = new FetchDataRequest();
 
         final FetchDataResponse response = service.fetchData(request);
@@ -201,7 +201,7 @@ final class ShareServiceTest extends BeanSetup {
 
     @Test
     void testFlawedFetchData() {
-        final ShareService service = prepareFlawedShareService();
+        final ShareService service = prepareShareService();
         final FetchDataRequest request = new FetchDataRequest();
 
         final FetchDataResponse response = service.fetchData(request);
@@ -210,7 +210,7 @@ final class ShareServiceTest extends BeanSetup {
 
     @Test
     void testSignatures() {
-        final ShareService service = prepareShareService();
+        final ShareService service = prepareShareService(settings, entityManager);
         final SignRequest signRequest = prepareRequest(SignRequest.class, MEMBER_1);
         final byte[] data = "alpha".getBytes(settings.getCharset());
         signRequest.setData(data);
@@ -226,7 +226,7 @@ final class ShareServiceTest extends BeanSetup {
 
     @Test
     void testSignWithNullRequest() {
-        final ShareService service = prepareShareService();
+        final ShareService service = prepareShareService(settings, entityManager);
 
         final SignResponse response = service.sign(null);
         assertEquals(ReturnCode.VERIFICATION_WARNING.getCode(), response.getReturnCode());
@@ -234,7 +234,7 @@ final class ShareServiceTest extends BeanSetup {
 
     @Test
     void testSignWithEmptyRequest() {
-        final ShareService service = prepareShareService();
+        final ShareService service = prepareShareService(settings, entityManager);
         final SignRequest request = new SignRequest();
 
         final SignResponse response = service.sign(request);
@@ -243,7 +243,7 @@ final class ShareServiceTest extends BeanSetup {
 
     @Test
     void testFlawedSign() {
-        final ShareService service = prepareFlawedShareService();
+        final ShareService service = prepareShareService();
         final SignRequest request = new SignRequest();
 
         final SignResponse response = service.sign(request);
@@ -252,7 +252,7 @@ final class ShareServiceTest extends BeanSetup {
 
     @Test
     void testVerifyWithNullRequest() {
-        final ShareService service = prepareShareService();
+        final ShareService service = prepareShareService(settings, entityManager);
 
         final VerifyResponse response = service.verify(null);
         assertEquals(ReturnCode.VERIFICATION_WARNING.getCode(), response.getReturnCode());
@@ -260,7 +260,7 @@ final class ShareServiceTest extends BeanSetup {
 
     @Test
     void testVerifyWithEmptyRequest() {
-        final ShareService service = prepareShareService();
+        final ShareService service = prepareShareService(settings, entityManager);
         final VerifyRequest request = new VerifyRequest();
 
         final VerifyResponse response = service.verify(request);
@@ -269,7 +269,7 @@ final class ShareServiceTest extends BeanSetup {
 
     @Test
     void testFlawedVerify() {
-        final ShareService service = prepareFlawedShareService();
+        final ShareService service = prepareShareService();
         final VerifyRequest request = new VerifyRequest();
 
         final VerifyResponse response = service.verify(request);
@@ -278,7 +278,7 @@ final class ShareServiceTest extends BeanSetup {
 
     @Test
     void testFetchSignatures() {
-        final ShareService service = prepareShareService();
+        final ShareService service = prepareShareService(settings, entityManager);
         final FetchSignatureRequest request = prepareRequest(FetchSignatureRequest.class, MEMBER_1);
 
         final FetchSignatureResponse response = service.fetchSignatures(request);
@@ -289,7 +289,7 @@ final class ShareServiceTest extends BeanSetup {
 
     @Test
     void testFetchSignaturesWithNullRequest() {
-        final ShareService service = prepareShareService();
+        final ShareService service = prepareShareService(settings, entityManager);
 
         final FetchSignatureResponse response = service.fetchSignatures(null);
         assertEquals(ReturnCode.VERIFICATION_WARNING.getCode(), response.getReturnCode());
@@ -297,7 +297,7 @@ final class ShareServiceTest extends BeanSetup {
 
     @Test
     void testFetchSignaturesWithEmptyRequest() {
-        final ShareService service = prepareShareService();
+        final ShareService service = prepareShareService(settings, entityManager);
         final FetchSignatureRequest request = new FetchSignatureRequest();
 
         final FetchSignatureResponse response = service.fetchSignatures(request);
@@ -306,7 +306,7 @@ final class ShareServiceTest extends BeanSetup {
 
     @Test
     void testFlawedFetchSignatures() {
-        final ShareService service = prepareFlawedShareService();
+        final ShareService service = prepareShareService();
         final FetchSignatureRequest request = new FetchSignatureRequest();
 
         final FetchSignatureResponse response = service.fetchSignatures(request);

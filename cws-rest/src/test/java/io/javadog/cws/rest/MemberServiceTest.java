@@ -21,8 +21,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.requests.FetchMemberRequest;
 import io.javadog.cws.api.requests.ProcessMemberRequest;
-import io.javadog.cws.core.DatabaseSetup;
-import io.javadog.cws.core.ManagementBean;
 import javax.ws.rs.core.Response;
 import org.junit.jupiter.api.Test;
 
@@ -30,11 +28,11 @@ import org.junit.jupiter.api.Test;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-final class MemberServiceTest extends DatabaseSetup {
+final class MemberServiceTest extends BeanSetup {
 
     @Test
     void testCreate() {
-        final MemberService service = prepareService();
+        final MemberService service = prepareMemberService(settings, entityManager);
         final ProcessMemberRequest request = new ProcessMemberRequest();
 
         final Response response = service.create(request);
@@ -43,7 +41,7 @@ final class MemberServiceTest extends DatabaseSetup {
 
     @Test
     void testFlawedCreate() {
-        final MemberService service = prepareFlawedService();
+        final MemberService service = prepareMemberService();
         final ProcessMemberRequest request = new ProcessMemberRequest();
 
         final Response response = service.create(request);
@@ -52,7 +50,7 @@ final class MemberServiceTest extends DatabaseSetup {
 
     @Test
     void testInvite() {
-        final MemberService service = prepareService();
+        final MemberService service = prepareMemberService(settings, entityManager);
         final ProcessMemberRequest request = new ProcessMemberRequest();
 
         final Response response = service.invite(request);
@@ -61,7 +59,7 @@ final class MemberServiceTest extends DatabaseSetup {
 
     @Test
     void testFlawedInvite() {
-        final MemberService service = prepareFlawedService();
+        final MemberService service = prepareMemberService();
         final ProcessMemberRequest request = new ProcessMemberRequest();
 
         final Response response = service.invite(request);
@@ -70,7 +68,7 @@ final class MemberServiceTest extends DatabaseSetup {
 
     @Test
     void testLogin() {
-        final MemberService service = prepareService();
+        final MemberService service = prepareMemberService(settings, entityManager);
         final ProcessMemberRequest request = new ProcessMemberRequest();
 
         final Response response = service.login(request);
@@ -79,7 +77,7 @@ final class MemberServiceTest extends DatabaseSetup {
 
     @Test
     void testFlawedLogin() {
-        final MemberService service = prepareFlawedService();
+        final MemberService service = prepareMemberService();
         final ProcessMemberRequest request = new ProcessMemberRequest();
 
         final Response response = service.login(request);
@@ -88,7 +86,7 @@ final class MemberServiceTest extends DatabaseSetup {
 
     @Test
     void testLogout() {
-        final MemberService service = prepareService();
+        final MemberService service = prepareMemberService(settings, entityManager);
         final ProcessMemberRequest request = new ProcessMemberRequest();
 
         final Response response = service.logout(request);
@@ -97,7 +95,7 @@ final class MemberServiceTest extends DatabaseSetup {
 
     @Test
     void testFlawedLogout() {
-        final MemberService service = prepareFlawedService();
+        final MemberService service = prepareMemberService();
         final ProcessMemberRequest request = new ProcessMemberRequest();
 
         final Response response = service.logout(request);
@@ -106,7 +104,7 @@ final class MemberServiceTest extends DatabaseSetup {
 
     @Test
     void testAlter() {
-        final MemberService service = prepareService();
+        final MemberService service = prepareMemberService(settings, entityManager);
         final ProcessMemberRequest request = new ProcessMemberRequest();
 
         final Response response = service.alter(request);
@@ -115,7 +113,7 @@ final class MemberServiceTest extends DatabaseSetup {
 
     @Test
     void testFlawedAlter() {
-        final MemberService service = prepareFlawedService();
+        final MemberService service = prepareMemberService();
         final ProcessMemberRequest request = new ProcessMemberRequest();
 
         final Response response = service.alter(request);
@@ -124,7 +122,7 @@ final class MemberServiceTest extends DatabaseSetup {
 
     @Test
     void testUpdate() {
-        final MemberService service = prepareService();
+        final MemberService service = prepareMemberService(settings, entityManager);
         final ProcessMemberRequest request = new ProcessMemberRequest();
 
         final Response response = service.update(request);
@@ -133,7 +131,7 @@ final class MemberServiceTest extends DatabaseSetup {
 
     @Test
     void testFlawedUpdate() {
-        final MemberService service = prepareFlawedService();
+        final MemberService service = prepareMemberService();
         final ProcessMemberRequest request = new ProcessMemberRequest();
 
         final Response response = service.update(request);
@@ -142,7 +140,7 @@ final class MemberServiceTest extends DatabaseSetup {
 
     @Test
     void testInvalidate() {
-        final MemberService service = prepareService();
+        final MemberService service = prepareMemberService(settings, entityManager);
         final ProcessMemberRequest request = new ProcessMemberRequest();
 
         final Response response = service.invalidate(request);
@@ -151,7 +149,7 @@ final class MemberServiceTest extends DatabaseSetup {
 
     @Test
     void testFlawedInvalidate() {
-        final MemberService service = prepareFlawedService();
+        final MemberService service = prepareMemberService();
         final ProcessMemberRequest request = new ProcessMemberRequest();
 
         final Response response = service.invalidate(request);
@@ -160,7 +158,7 @@ final class MemberServiceTest extends DatabaseSetup {
 
     @Test
     void testDelete() {
-        final MemberService service = prepareService();
+        final MemberService service = prepareMemberService(settings, entityManager);
         final ProcessMemberRequest request = new ProcessMemberRequest();
 
         final Response response = service.delete(request);
@@ -169,7 +167,7 @@ final class MemberServiceTest extends DatabaseSetup {
 
     @Test
     void testFlawedDelete() {
-        final MemberService service = prepareFlawedService();
+        final MemberService service = prepareMemberService();
         final ProcessMemberRequest request = new ProcessMemberRequest();
 
         final Response response = service.delete(request);
@@ -178,7 +176,7 @@ final class MemberServiceTest extends DatabaseSetup {
 
     @Test
     void testFetch() {
-        final MemberService service = prepareService();
+        final MemberService service = prepareMemberService(settings, entityManager);
         final FetchMemberRequest request = new FetchMemberRequest();
 
         final Response response = service.fetch(request);
@@ -187,31 +185,10 @@ final class MemberServiceTest extends DatabaseSetup {
 
     @Test
     void testFlawedFetch() {
-        final MemberService service = prepareFlawedService();
+        final MemberService service = prepareMemberService();
         final FetchMemberRequest request = new FetchMemberRequest();
 
         final Response response = service.fetch(request);
         assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
-    }
-
-    // =========================================================================
-    // Internal Test Setup Methods
-    // =========================================================================
-
-    private static MemberService prepareFlawedService() {
-        final MemberService service = instantiate(MemberService.class);
-        setField(service, "bean", null);
-
-        return service;
-    }
-
-    private MemberService prepareService() {
-        final ManagementBean bean = instantiate(ManagementBean.class);
-        setField(bean, "entityManager", entityManager);
-
-        final MemberService service = instantiate(MemberService.class);
-        setField(service, "bean", bean);
-
-        return service;
     }
 }

@@ -19,8 +19,6 @@ package io.javadog.cws.rest;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import io.javadog.cws.api.common.ReturnCode;
-import io.javadog.cws.core.DatabaseSetup;
-import io.javadog.cws.core.ManagementBean;
 import javax.ws.rs.core.Response;
 import org.junit.jupiter.api.Test;
 
@@ -28,11 +26,11 @@ import org.junit.jupiter.api.Test;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-final class VersionServiceTest extends DatabaseSetup {
+final class VersionServiceTest extends BeanSetup {
 
     @Test
     void testVersion() {
-        final VersionService service = prepareService();
+        final VersionService service = prepareVersionService(settings, entityManager);
 
         final Response response = service.version();
         assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
@@ -40,30 +38,9 @@ final class VersionServiceTest extends DatabaseSetup {
 
     @Test
     void testFlawedVersion() {
-        final VersionService service = prepareFlawedService();
+        final VersionService service = prepareVersionService();
 
         final Response response = service.version();
         assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
-    }
-
-    // =========================================================================
-    // Internal Test Setup Methods
-    // =========================================================================
-
-    private static VersionService prepareFlawedService() {
-        final VersionService service = instantiate(VersionService.class);
-        setField(service, "bean", null);
-
-        return service;
-    }
-
-    private VersionService prepareService() {
-        final ManagementBean bean = instantiate(ManagementBean.class);
-        setField(bean, "entityManager", entityManager);
-
-        final VersionService service = instantiate(VersionService.class);
-        setField(service, "bean", bean);
-
-        return service;
     }
 }

@@ -20,8 +20,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.requests.Authentication;
-import io.javadog.cws.core.DatabaseSetup;
-import io.javadog.cws.core.ManagementBean;
 import javax.ws.rs.core.Response;
 import org.junit.jupiter.api.Test;
 
@@ -29,11 +27,11 @@ import org.junit.jupiter.api.Test;
  * @author Kim Jensen
  * @since CWS 1.1
  */
-final class AuthenticatedServiceTest extends DatabaseSetup {
+final class AuthenticatedServiceTest extends BeanSetup {
 
     @Test
     void testAuthenticate() {
-        final AuthenticatedService service = prepareService();
+        final AuthenticatedService service = prepareAuthenticatedService(settings, entityManager);
         final Authentication request = new Authentication();
 
         final Response response = service.authenticated(request);
@@ -42,31 +40,10 @@ final class AuthenticatedServiceTest extends DatabaseSetup {
 
     @Test
     void testFlawedCreate() {
-        final AuthenticatedService service = prepareFlawedService();
+        final AuthenticatedService service = prepareAuthenticatedService();
         final Authentication request = new Authentication();
 
         final Response response = service.authenticated(request);
         assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
-    }
-
-    // =========================================================================
-    // Internal Test Setup Methods
-    // =========================================================================
-
-    private static AuthenticatedService prepareFlawedService() {
-        final AuthenticatedService service = instantiate(AuthenticatedService.class);
-        setField(service, "bean", null);
-
-        return service;
-    }
-
-    private AuthenticatedService prepareService() {
-        final ManagementBean bean = instantiate(ManagementBean.class);
-        setField(bean, "entityManager", entityManager);
-
-        final AuthenticatedService service = instantiate(AuthenticatedService.class);
-        setField(service, "bean", bean);
-
-        return service;
     }
 }

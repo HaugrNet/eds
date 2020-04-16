@@ -21,8 +21,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.requests.FetchDataTypeRequest;
 import io.javadog.cws.api.requests.ProcessDataTypeRequest;
-import io.javadog.cws.core.DatabaseSetup;
-import io.javadog.cws.core.ShareBean;
 import javax.ws.rs.core.Response;
 import org.junit.jupiter.api.Test;
 
@@ -30,11 +28,11 @@ import org.junit.jupiter.api.Test;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-final class DataTypeServiceTest extends DatabaseSetup {
+final class DataTypeServiceTest extends BeanSetup {
 
     @Test
     void testProcess() {
-        final DataTypeService service = prepareService();
+        final DataTypeService service = prepareDataTypeService(settings, entityManager);
         final ProcessDataTypeRequest request = new ProcessDataTypeRequest();
 
         final Response response = service.process(request);
@@ -43,7 +41,7 @@ final class DataTypeServiceTest extends DatabaseSetup {
 
     @Test
     void testFlawedProcess() {
-        final DataTypeService service = prepareFlawedService();
+        final DataTypeService service = prepareDataTypeService();
         final ProcessDataTypeRequest request = new ProcessDataTypeRequest();
 
         final Response response = service.process(request);
@@ -52,7 +50,7 @@ final class DataTypeServiceTest extends DatabaseSetup {
 
     @Test
     void testDelete() {
-        final DataTypeService service = prepareService();
+        final DataTypeService service = prepareDataTypeService(settings, entityManager);
         final ProcessDataTypeRequest request = new ProcessDataTypeRequest();
 
         final Response response = service.delete(request);
@@ -61,7 +59,7 @@ final class DataTypeServiceTest extends DatabaseSetup {
 
     @Test
     void testFlawedDelete() {
-        final DataTypeService service = prepareFlawedService();
+        final DataTypeService service = prepareDataTypeService();
         final ProcessDataTypeRequest request = new ProcessDataTypeRequest();
 
         final Response response = service.delete(request);
@@ -70,7 +68,7 @@ final class DataTypeServiceTest extends DatabaseSetup {
 
     @Test
     void testFetch() {
-        final DataTypeService service = prepareService();
+        final DataTypeService service = prepareDataTypeService(settings, entityManager);
         final FetchDataTypeRequest request = new FetchDataTypeRequest();
 
         final Response response = service.fetch(request);
@@ -79,31 +77,10 @@ final class DataTypeServiceTest extends DatabaseSetup {
 
     @Test
     void testFlawedFetch() {
-        final DataTypeService service = prepareFlawedService();
+        final DataTypeService service = prepareDataTypeService();
         final FetchDataTypeRequest request = new FetchDataTypeRequest();
 
         final Response response = service.fetch(request);
         assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
-    }
-
-    // =========================================================================
-    // Internal Test Setup Methods
-    // =========================================================================
-
-    private static DataTypeService prepareFlawedService() {
-        final DataTypeService service = instantiate(DataTypeService.class);
-        setField(service, "bean", null);
-
-        return service;
-    }
-
-    private DataTypeService prepareService() {
-        final ShareBean bean = instantiate(ShareBean.class);
-        setField(bean, "entityManager", entityManager);
-
-        final DataTypeService service = instantiate(DataTypeService.class);
-        setField(service, "bean", bean);
-
-        return service;
     }
 }

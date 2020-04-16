@@ -65,9 +65,7 @@ final class ShareBeanTest extends DatabaseSetup {
     private ShareBean prepareShareBean() {
         try {
             final ShareBean bean = ShareBean.class.getConstructor().newInstance();
-
-            // Inject Dependencies
-            setField(bean, "entityManager", entityManager);
+            inject(bean, entityManager);
 
             return bean;
         } catch (InstantiationException | InvocationTargetException | IllegalAccessException | NoSuchMethodException e) {

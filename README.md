@@ -12,11 +12,11 @@
 [CWS](https://javadog.io/), Cryptographic Web Store, works like a "PGP for the
 Cloud". It is designed as a backend component with the vision that it should be
 possible to exchange data between multiple parties using encrypted storage,
-where both the parties involved and the data exchanged can be anything from
+where both the parties involved, and the data exchanged can be anything from
 simple files to complex data objects - CWS only cares about bytes.
 
 Via the public API (REST or SOAP based WebServices), it is possible to access
-the internal logic, where keys are unlocked based on user credentials and used
+the internal logic, where keys are unlocked, based on user credentials and used
 to encrypt and decrypt data, storing only encrypted keys and data. Using the
 same basic mechanism as PGP, combining Asymmetric & Symmetric keys, it is
 possible for multiple parties to exchange data safely and securely.
@@ -36,10 +36,12 @@ database desired. Testing of CWS has been done using both
 ## Build, Install and Run
 
 The final version 1.1 of CWS can be downloaded from [JavaDog](https://javadog.io/),
-version 1.2 will be a minor feature release, planned for end of January, 2020.
-The aim is to constantly have a stable and usable system, so if needed - please
-download the sources and build CWS yourself. The build requires Java JDK 8
-(patch level 161 or greater), and [Maven](https://maven.apache.org/).
+version 1.2 was planned to be a minor feature release, but more and more
+features were requested, which combined with the current Pandemic, have meant
+that the release have been postponed until June, 2020. The aim is to constantly
+have a stable and usable system, so if needed - please download the sources and
+build CWS yourself. The build requires Java JDK 8 (patch level 161 or greater),
+and [Maven](https://maven.apache.org/).
 
 In the accessories/release folder, there is a number of files, which is used to
 install and run CWS. Either by building CWS from scratch, using a local Payara

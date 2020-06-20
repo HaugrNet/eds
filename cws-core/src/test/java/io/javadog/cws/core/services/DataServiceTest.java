@@ -39,10 +39,11 @@ import io.javadog.cws.api.responses.ProcessMemberResponse;
 import io.javadog.cws.core.DatabaseSetup;
 import io.javadog.cws.core.enums.SanityStatus;
 import io.javadog.cws.core.exceptions.CWSException;
+
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.UUID;
-import javax.persistence.Query;
+
 import org.junit.jupiter.api.Test;
 
 /**
@@ -874,9 +875,11 @@ final class DataServiceTest extends DatabaseSetup {
         // It should be noted, that for a normal DB status, it was not possible
         // to replicate the error. Hence, this attempt to corrupt the database
         // prior to adding new data.
-        final Query query = entityManager.createQuery("delete from MetadataEntity where circle.id = :cid");
-        query.setParameter("cid", 1L);
-        query.executeUpdate();
+        final int deleted = entityManager
+                .createQuery("delete from MetadataEntity where circle.id = :cid")
+                .setParameter("cid", 1L)
+                .executeUpdate();
+        assertEquals(1, deleted);
 
         final ProcessDataService service = new ProcessDataService(settings, entityManager);
         final ProcessDataRequest request = prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "My Object", 1024);

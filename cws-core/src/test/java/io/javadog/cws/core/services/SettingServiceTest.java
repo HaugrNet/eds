@@ -30,10 +30,11 @@ import io.javadog.cws.core.enums.KeyAlgorithm;
 import io.javadog.cws.core.enums.StandardSetting;
 import io.javadog.cws.core.exceptions.CWSException;
 import io.javadog.cws.core.model.entities.MemberEntity;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.persistence.Query;
+
 import org.junit.jupiter.api.Test;
 
 /**
@@ -57,9 +58,11 @@ final class SettingServiceTest extends DatabaseSetup {
         // we're doing here. Since each test is running within a transaction,
         // and they are rolled back after completion, this should not disturb
         // other tests.
-        final Query query = entityManager.createQuery("delete from MemberEntity where id = :id");
-        query.setParameter("id", 1L);
-        query.executeUpdate();
+        final int deleted = entityManager
+                .createQuery("delete from MemberEntity where id = :id")
+                .setParameter("id", 1L)
+                .executeUpdate();
+        assertEquals(1, deleted);
 
         final SettingService service = new SettingService(newSettings(), entityManager);
         final SettingRequest request = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);

@@ -30,6 +30,7 @@ import io.javadog.cws.core.exceptions.CWSException;
 import io.javadog.cws.core.jce.MasterKey;
 import io.javadog.cws.core.model.Settings;
 import io.javadog.cws.core.model.entities.MemberEntity;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -37,7 +38,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.UUID;
-import javax.persistence.Query;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledOnOs;
 import org.junit.jupiter.api.condition.OS;
@@ -57,7 +58,7 @@ import org.junit.jupiter.api.condition.OS;
  * @author Kim Jensen
  * @since CWS 1.1
  */
-@DisabledOnOs(value = { OS.WINDOWS, OS.MAC })
+@DisabledOnOs(value = {OS.WINDOWS, OS.MAC})
 final class MasterKeyServiceTest extends DatabaseSetup {
 
     @Test
@@ -148,7 +149,7 @@ final class MasterKeyServiceTest extends DatabaseSetup {
         // Before starting, all member accounts must be removed, as well as the
         // MasterKey Setting.
         deleteNonAdminMembers();
-        deleteMasterKeySetting();
+        assertEquals(1, deleteMasterKeySetting());
 
         final String path = tempDir() + "secret_master_key.bin";
         Files.write(Paths.get(path), generateData(8192));
@@ -257,11 +258,12 @@ final class MasterKeyServiceTest extends DatabaseSetup {
         }
     }
 
-    private void deleteMasterKeySetting() {
+    private int deleteMasterKeySetting() {
         final String jql = "delete from SettingEntity s where s.name = :name";
-        final Query query = entityManager.createQuery(jql);
-        query.setParameter("name", StandardSetting.MASTERKEY_URL.getKey());
-        query.executeUpdate();
+        return entityManager
+                .createQuery(jql)
+                .setParameter("name", StandardSetting.MASTERKEY_URL.getKey())
+                .executeUpdate();
     }
 
     /**

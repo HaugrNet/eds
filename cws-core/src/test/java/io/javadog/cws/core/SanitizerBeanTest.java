@@ -84,8 +84,10 @@ final class SanitizerBeanTest extends DatabaseSetup {
 
     @Test
     void testStartupBeanWithEmptyVersionTable() {
-        final Query query = entityManager.createNativeQuery("delete from cws_versions where id > 0");
-        query.executeUpdate();
+        final int deleted = entityManager
+                .createNativeQuery("delete from cws_versions where id > 0")
+                .executeUpdate();
+        assertTrue(deleted >= 1);
 
         final StartupBean bean = prepareStartupBean("true");
         assertFalse(getBeanSettings(bean).isReady());
@@ -93,8 +95,10 @@ final class SanitizerBeanTest extends DatabaseSetup {
 
     @Test
     void testStartupBeanWithDifferentVersion() {
-        final Query query = entityManager.createNativeQuery("insert into cws_versions (schema_version, cws_version, db_vendor) values (9999, '99.9.9', 'H2')");
-        query.executeUpdate();
+        final int inserted = entityManager
+                .createNativeQuery("insert into cws_versions (schema_version, cws_version, db_vendor) values (9999, '99.9.9', 'H2')")
+                .executeUpdate();
+        assertEquals(1, inserted);
 
         final StartupBean bean = prepareStartupBean("true");
         assertFalse(getBeanSettings(bean).isReady());
@@ -173,10 +177,12 @@ final class SanitizerBeanTest extends DatabaseSetup {
             // the content of the DB to reflect this. As the content has not yet
             // been read out - it is also not cached, hence a simply update will
             // suffice.
-            final Query query = entityManager.createQuery("update SettingEntity set setting = :setting where name = :name");
-            query.setParameter("name", StandardSetting.SANITY_STARTUP.getKey());
-            query.setParameter("setting", sanityAtStartup);
-            query.executeUpdate();
+            final int updated = entityManager
+                    .createQuery("update SettingEntity set setting = :setting where name = :name")
+                    .setParameter("name", StandardSetting.SANITY_STARTUP.getKey())
+                    .setParameter("setting", sanityAtStartup)
+                    .executeUpdate();
+            assertEquals(1, updated);
 
             // Invoke PostConstructor
             bean.startup();
@@ -838,9 +844,10 @@ final class SanitizerBeanTest extends DatabaseSetup {
         // controlled internally by CWS, it cannot be altered (rightfully) via
         // the API, hence we have to modify it directly in the database!
         final String jql = "select d from DataEntity d where d.metadata.externalId = :eid";
-        final Query query = entityManager.createQuery(jql);
-        query.setParameter("eid", response.getDataId());
-        final DataEntity entity = (DataEntity) query.getSingleResult();
+        final DataEntity entity = (DataEntity) entityManager
+                .createQuery(jql)
+                .setParameter("eid", response.getDataId())
+                .getSingleResult();
         entity.setSanityStatus(SanityStatus.OK);
         entity.setSanityChecked(sanityCheck);
         entityManager.persist(entity);

@@ -57,11 +57,8 @@ import java.util.logging.LogManager;
 import java.util.logging.Logger;
 import javax.annotation.Resource;
 import javax.ejb.TimerService;
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
-import javax.persistence.PersistenceContext;
-import javax.persistence.Query;
+import javax.persistence.*;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 
@@ -114,13 +111,19 @@ public class DatabaseSetup {
 
     @BeforeEach
     public void setup() {
-        entityManager.getTransaction().begin();
+        final EntityTransaction transaction = entityManager.getTransaction();
+        if (transaction != null) {
+            transaction.begin();
+        }
         settings.set(StandardSetting.IS_READY.getKey(), "true");
     }
 
     @AfterEach
     public void tearDown() {
-        entityManager.getTransaction().rollback();
+        final EntityTransaction transaction = entityManager.getTransaction();
+        if (transaction != null) {
+            transaction.rollback();
+        }
     }
 
     protected static <T extends Authentication> T prepareRequest(final Class<T> clazz, final String account) {

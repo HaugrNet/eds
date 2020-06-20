@@ -6,7 +6,7 @@
     <version>1.2-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>CWS</name>
-    <description>Parent pom for CWS, Cryptographic Web Store</description>
+    <description>CWS, Cryptographic Web Store</description>
     <url>https://javadog.io/</url>
 
     <organization>

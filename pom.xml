@@ -373,6 +373,12 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
+                <!-- Problem with generating JavaDoc in Java 9+, so configuring
+                     the plugin to use version 8.
+                     See: https://bugs.openjdk.java.net/browse/JDK-8212233 -->
+                <configuration>
+                    <source>8</source>
+                </configuration>
                 <executions>
                     <execution>
                         <id>attach-javadocs</id>

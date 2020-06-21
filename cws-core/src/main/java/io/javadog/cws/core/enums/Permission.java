@@ -36,7 +36,8 @@ public enum Permission {
      */
     FETCH_CIRCLE(TrustLevel.ALL, "Fetch Circles."),
 
-    /** The list of Members is open to everyone to retrieve, but there is some
+    /**
+     * The list of Members is open to everyone to retrieve, but there is some
      * settings which may limit the listing.
      */
     FETCH_MEMBER(TrustLevel.ALL, "Fetch Members."),

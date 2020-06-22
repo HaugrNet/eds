@@ -37,16 +37,18 @@ public final class MemberDao extends CommonDao {
     }
 
     public List<CircleEntity> findCirclesForMember(final MemberEntity member) {
-        final Query query = entityManager.createNamedQuery("trustee.findCirclesByMember");
-        query.setParameter(MEMBER, member);
+        final Query query = entityManager
+                .createNamedQuery("trustee.findCirclesByMember")
+                .setParameter(MEMBER, member);
 
         return findList(query);
     }
 
     public List<TrusteeEntity> findCirclesBothBelongTo(final MemberEntity member, final MemberEntity requested) {
-        final Query query = entityManager.createNamedQuery("trustee.findSharedCircles");
-        query.setParameter(MEMBER, member);
-        query.setParameter("requested", requested);
+        final Query query = entityManager
+                .createNamedQuery("trustee.findSharedCircles")
+                .setParameter(MEMBER, member)
+                .setParameter("requested", requested);
 
         return findList(query);
     }

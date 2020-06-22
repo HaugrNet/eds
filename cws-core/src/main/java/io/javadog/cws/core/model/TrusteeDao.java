@@ -35,23 +35,26 @@ public final class TrusteeDao extends CommonDao {
     }
 
     public List<TrusteeEntity> findTrusteesByMemberAndCircle(final String externalMemberId, final String externalCircleId) {
-        final Query query = entityManager.createNamedQuery("trustee.findByCircleAndMember");
-        query.setParameter("emid", externalMemberId);
-        query.setParameter("ecid", externalCircleId);
+        final Query query = entityManager
+                .createNamedQuery("trustee.findByCircleAndMember")
+                .setParameter("emid", externalMemberId)
+                .setParameter("ecid", externalCircleId);
 
         return findList(query);
     }
 
     public List<TrusteeEntity> findTrusteesByMember(final String externalMemberId) {
-        final Query query = entityManager.createNamedQuery("trustee.findByExternalMemberId");
-        query.setParameter("externalMemberId", externalMemberId);
+        final Query query = entityManager
+                .createNamedQuery("trustee.findByExternalMemberId")
+                .setParameter("externalMemberId", externalMemberId);
 
         return findList(query);
     }
 
     public List<TrusteeEntity> findTrusteesByCircle(final String externalCircleId) {
-        final Query query = entityManager.createNamedQuery("trustee.findByExternalCircleId");
-        query.setParameter("externalCircleId", externalCircleId);
+        final Query query = entityManager
+                .createNamedQuery("trustee.findByExternalCircleId")
+                .setParameter("externalCircleId", externalCircleId);
 
         return findList(query);
     }

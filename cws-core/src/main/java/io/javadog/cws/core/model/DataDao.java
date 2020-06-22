@@ -40,90 +40,101 @@ public final class DataDao extends CommonDao {
     }
 
     public DataEntity findDataByMetadata(final MetadataEntity metadata) {
-        final Query query = entityManager.createNamedQuery("data.findByMetadata");
-        query.setParameter("metadata", metadata);
+        final Query query = entityManager
+                .createNamedQuery("data.findByMetadata")
+                .setParameter("metadata", metadata);
 
         return findSingleRecord(query);
     }
 
     public DataEntity findDataByMemberAndExternalId(final MemberEntity member, final String externalId) {
-        final Query query = entityManager.createNamedQuery("data.findByMemberAndExternalId");
-        query.setParameter(MEMBER, member);
-        query.setParameter(EXTERNAL_ID, externalId);
-        query.setParameter("trustLevels", EnumSet.of(TrustLevel.ADMIN, TrustLevel.WRITE, TrustLevel.READ));
+        final Query query = entityManager
+                .createNamedQuery("data.findByMemberAndExternalId")
+                .setParameter(MEMBER, member)
+                .setParameter(EXTERNAL_ID, externalId)
+                .setParameter("trustLevels", EnumSet.of(TrustLevel.ADMIN, TrustLevel.WRITE, TrustLevel.READ));
 
         return findSingleRecord(query);
     }
 
     public MetadataEntity findMetadataByMemberAndExternalId(final Long memberId, final String externalId) {
-        final Query query = entityManager.createNamedQuery("metadata.findByMemberAndExternalId");
-        query.setParameter("mid", memberId);
-        query.setParameter("eid", externalId);
+        final Query query = entityManager
+                .createNamedQuery("metadata.findByMemberAndExternalId")
+                .setParameter("mid", memberId)
+                .setParameter("eid", externalId);
 
         return findSingleRecord(query);
     }
 
     public MetadataEntity findMetadataByMemberAndName(final Long memberId, final String name) {
-        final Query query = entityManager.createNamedQuery("metadata.findByMemberAndName");
-        query.setParameter("mid", memberId);
-        query.setParameter("name", name);
+        final Query query = entityManager
+                .createNamedQuery("metadata.findByMemberAndName")
+                .setParameter("mid", memberId)
+                .setParameter("name", name);
 
         return findSingleRecord(query);
     }
 
     public MetadataEntity findRootByMemberCircle(final Long memberId, final String circleId) {
-        final Query query = entityManager.createNamedQuery("metadata.findRootByMemberAndCircle");
-        query.setParameter("mid", memberId);
-        query.setParameter("cid", circleId);
+        final Query query = entityManager
+                .createNamedQuery("metadata.findRootByMemberAndCircle")
+                .setParameter("mid", memberId)
+                .setParameter("cid", circleId);
 
         return findSingleRecord(query);
     }
 
     public List<MetadataEntity> findMetadataByMemberAndFolder(final MemberEntity member, final Long parentId, final int pageNumber, final int pageSize) {
-        final Query query = entityManager.createNamedQuery("metadata.findByMemberAndFolder");
-        query.setParameter(MEMBER, member);
-        query.setParameter(PARENT_ID, parentId);
-        query.setMaxResults(pageSize);
-        query.setFirstResult((pageNumber - 1) * pageSize);
+        final Query query = entityManager
+                .createNamedQuery("metadata.findByMemberAndFolder")
+                .setParameter(MEMBER, member)
+                .setParameter(PARENT_ID, parentId)
+                .setMaxResults(pageSize)
+                .setFirstResult((pageNumber - 1) * pageSize);
 
         return findList(query);
     }
 
     public long countFolderContent(final Long parentId) {
-        final Query query = entityManager.createNamedQuery("metadata.countFolderContent");
-        query.setParameter(PARENT_ID, parentId);
+        final Query query = entityManager
+                .createNamedQuery("metadata.countFolderContent")
+                .setParameter(PARENT_ID, parentId);
 
         return (long) query.getSingleResult();
     }
 
     public boolean checkIfNameIsUsed(final Long metadataId, final String name, final Long parentId) {
-        final Query query = entityManager.createNamedQuery("metadata.findByNameAndFolder");
-        query.setParameter("id", metadataId);
-        query.setParameter(NAME, name);
-        query.setParameter(PARENT_ID, parentId);
+        final Query query = entityManager
+                .createNamedQuery("metadata.findByNameAndFolder")
+                .setParameter("id", metadataId)
+                .setParameter(NAME, name)
+                .setParameter(PARENT_ID, parentId);
 
         return findSingleRecord(query) != null;
     }
 
     public MetadataEntity findInFolder(final MemberEntity member, final Long parentId, final String name) {
-        final Query query = entityManager.createNamedQuery("metadata.findInFolder");
-        query.setParameter(MEMBER, member);
-        query.setParameter(PARENT_ID, parentId);
-        query.setParameter(NAME, name);
+        final Query query = entityManager
+                .createNamedQuery("metadata.findInFolder")
+                .setParameter(MEMBER, member)
+                .setParameter(PARENT_ID, parentId)
+                .setParameter(NAME, name);
 
         return findSingleRecord(query);
     }
 
     public long countInventoryRecords() {
-        final Query query = entityManager.createNamedQuery("metadata.countInventoryRecords");
+        final Query query = entityManager
+                .createNamedQuery("metadata.countInventoryRecords");
 
         return (long) query.getSingleResult();
     }
 
     public List<MetadataEntity> readInventoryRecords(final int pageNumber, final int pageSize) {
-        final Query query = entityManager.createNamedQuery("metadata.readInventoryRecords");
-        query.setMaxResults(pageSize);
-        query.setFirstResult((pageNumber - 1) * pageSize);
+        final Query query = entityManager
+                .createNamedQuery("metadata.readInventoryRecords")
+                .setMaxResults(pageSize)
+                .setFirstResult((pageNumber - 1) * pageSize);
 
         return findList(query);
     }

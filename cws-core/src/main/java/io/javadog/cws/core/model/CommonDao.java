@@ -138,15 +138,17 @@ public class CommonDao {
     }
 
     public MemberEntity findMemberByName(final String name) {
-        final Query query = entityManager.createNamedQuery("member.findByName");
-        query.setParameter("name", name);
+        final Query query = entityManager
+                .createNamedQuery("member.findByName")
+                .setParameter("name", name);
 
         return findSingleRecord(query);
     }
 
     public List<MemberEntity> findMemberByRole(final MemberRole role) {
-        final Query query = entityManager.createNamedQuery("member.findByRole");
-        query.setParameter("role", role);
+        final Query query = entityManager
+                .createNamedQuery("member.findByRole")
+                .setParameter("role", role);
 
         return findList(query);
     }
@@ -161,16 +163,18 @@ public class CommonDao {
      * @return MemberEntity with a matching SessionKey checksum
      */
     public MemberEntity findMemberByChecksum(final String checksum) {
-        final Query query = entityManager.createNamedQuery("member.findByChecksum");
-        query.setParameter("checksum", checksum);
+        final Query query = entityManager
+                .createNamedQuery("member.findByChecksum")
+                .setParameter("checksum", checksum);
 
         return findSingleRecord(query);
     }
 
     public MemberEntity findMemberByNameAndCircleId(final String name, final String externalCircleId) {
-        final Query query = entityManager.createNamedQuery("member.findByNameAndCircle");
-        query.setParameter("name", name);
-        query.setParameter("externalCircleId", externalCircleId);
+        final Query query = entityManager
+                .createNamedQuery("member.findByNameAndCircle")
+                .setParameter("name", name)
+                .setParameter("externalCircleId", externalCircleId);
         final List<MemberEntity> found = findList(query);
 
         if (found.isEmpty()) {
@@ -182,25 +186,28 @@ public class CommonDao {
     }
 
     public List<TrusteeEntity> findTrusteesByMember(final MemberEntity member, final Set<TrustLevel> permissions) {
-        final Query query = entityManager.createNamedQuery("trust.findByMember");
-        query.setParameter(MEMBER, member);
-        query.setParameter("permissions", permissions);
+        final Query query = entityManager
+                .createNamedQuery("trust.findByMember")
+                .setParameter(MEMBER, member)
+                .setParameter("permissions", permissions);
 
         return findList(query);
     }
 
     public List<TrusteeEntity> findTrusteesByMemberAndCircle(final MemberEntity member, final String externalCircleId, final Set<TrustLevel> permissions) {
-        final Query query = entityManager.createNamedQuery("trust.findByMemberAndExternalCircleId");
-        query.setParameter(MEMBER, member);
-        query.setParameter("externalCircleId", externalCircleId);
-        query.setParameter("permissions", permissions);
+        final Query query = entityManager
+                .createNamedQuery("trust.findByMemberAndExternalCircleId")
+                .setParameter(MEMBER, member)
+                .setParameter("externalCircleId", externalCircleId)
+                .setParameter("permissions", permissions);
 
         return findList(query);
     }
 
     public CircleEntity findCircleByName(final String name) {
-        final Query query = entityManager.createNamedQuery("circle.findByName");
-        query.setParameter("name", name);
+        final Query query = entityManager
+                .createNamedQuery("circle.findByName")
+                .setParameter("name", name);
 
         return findSingleRecord(query);
     }
@@ -220,30 +227,34 @@ public class CommonDao {
      * @throws CWSException if no unique value could be found
      */
     public DataTypeEntity findDataTypeByName(final String name) {
-        final Query query = entityManager.createNamedQuery("type.findByName");
-        query.setParameter("name", name);
+        final Query query = entityManager
+                .createNamedQuery("type.findByName")
+                .setParameter("name", name);
 
         return findSingleRecord(query);
     }
 
     public long countDataTypeUsage(final DataTypeEntity dataType) {
-        final Query query = entityManager.createNamedQuery("type.countUsage");
-        query.setParameter("type", dataType);
+        final Query query = entityManager
+                .createNamedQuery("type.countUsage")
+                .setParameter("type", dataType);
 
         return (long) query.getSingleResult();
     }
 
     public TrusteeEntity findTrusteeByCircleAndMember(final String externalCircleId, final String externalMemberId) {
-        final Query query = entityManager.createNamedQuery("trustee.findByCircleAndMember");
-        query.setParameter("ecid", externalCircleId);
-        query.setParameter("emid", externalMemberId);
+        final Query query = entityManager
+                .createNamedQuery("trustee.findByCircleAndMember")
+                .setParameter("ecid", externalCircleId)
+                .setParameter("emid", externalMemberId);
 
         return findSingleRecord(query);
     }
 
     public SettingEntity findSettingByKey(final StandardSetting setting) {
-        final Query query = entityManager.createNamedQuery("setting.findByName");
-        query.setParameter("name", setting.getKey());
+        final Query query = entityManager
+                .createNamedQuery("setting.findByName")
+                .setParameter("name", setting.getKey());
 
         return findSingleRecord(query);
     }

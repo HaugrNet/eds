@@ -36,15 +36,17 @@ public final class SignatureDao extends CommonDao {
     }
 
     public SignatureEntity findByChecksum(final String checksum) {
-        final Query query = entityManager.createNamedQuery("signature.findByChecksum");
-        query.setParameter("checksum", checksum);
+        final Query query = entityManager
+                .createNamedQuery("signature.findByChecksum")
+                .setParameter("checksum", checksum);
 
         return findSingleRecord(query);
     }
 
     public List<SignatureEntity> findAllSignatures(final MemberEntity member) {
-        final Query query = entityManager.createNamedQuery("signature.findByMember");
-        query.setParameter(MEMBER, member);
+        final Query query = entityManager
+                .createNamedQuery("signature.findByMember")
+                .setParameter(MEMBER, member);
 
         return findList(query);
     }

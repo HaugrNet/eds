@@ -323,8 +323,9 @@ public class DatabaseSetup {
         // controlled internally by CWS, it cannot be altered (rightfully) via
         // the API, hence we have to modify it directly in the database!
         final String jql = "select d from DataEntity d where d.metadata.externalId = :eid";
-        final Query query = entityManager.createQuery(jql);
-        query.setParameter("eid", response.getDataId());
+        final Query query = entityManager
+                .createQuery(jql)
+                .setParameter("eid", response.getDataId());
         final DataEntity entity = (DataEntity) query.getSingleResult();
         entity.setChecksum(UUID.randomUUID().toString());
         entity.setSanityStatus(status);

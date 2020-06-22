@@ -141,10 +141,11 @@ public class SanitizerBean {
         final int days = settings.getSanityInterval();
         final Date date = java.sql.Date.valueOf(LocalDate.now().minusDays(days));
 
-        final Query query = entityManager.createNamedQuery("data.findIdsForSanityCheck");
-        query.setParameter("status", SanityStatus.OK);
-        query.setParameter("date", date);
-        query.setMaxResults(maxResults);
+        final Query query = entityManager
+                .createNamedQuery("data.findIdsForSanityCheck")
+                .setParameter("status", SanityStatus.OK)
+                .setParameter("date", date)
+                .setMaxResults(maxResults);
 
         return CommonDao.findList(query);
     }

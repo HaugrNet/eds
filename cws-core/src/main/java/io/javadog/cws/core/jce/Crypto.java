@@ -190,7 +190,7 @@ public final class Crypto {
             signer.update(message);
 
             return signer.sign();
-        } catch (NoSuchAlgorithmException | SignatureException | InvalidKeyException e) {
+        } catch (SecurityException | NoSuchAlgorithmException | SignatureException | InvalidKeyException e) {
             throw new CryptoException(e.getMessage(), e);
         }
     }
@@ -202,7 +202,7 @@ public final class Crypto {
             verifier.update(message);
 
             return verifier.verify(signature);
-        } catch (NoSuchAlgorithmException | SignatureException | InvalidKeyException | IllegalArgumentException e) {
+        } catch (SecurityException | NoSuchAlgorithmException | SignatureException | InvalidKeyException | IllegalArgumentException e) {
             throw new CryptoException(e.getMessage(), e);
         }
     }
@@ -326,7 +326,7 @@ public final class Crypto {
             final X509EncodedKeySpec x509KeySpec = new X509EncodedKeySpec(rawKey);
 
             return keyFactory.generatePublic(x509KeySpec);
-        } catch (InvalidKeySpecException | NoSuchAlgorithmException e) {
+        } catch (SecurityException | InvalidKeySpecException | NoSuchAlgorithmException e) {
             throw new CryptoException(e.getMessage(), e);
         }
     }

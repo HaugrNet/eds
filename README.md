@@ -38,7 +38,7 @@ database desired. Testing of CWS has been done using both
 The final version 1.1 of CWS can be downloaded from [JavaDog](https://javadog.io/),
 version 1.2 was planned to be a minor feature release, but more and more
 features were requested, which combined with the current Pandemic, have meant
-that the release have been postponed until June, 2020. The aim is to constantly
+that the release have been postponed until July, 2020. The aim is to constantly
 have a stable and usable system, so if needed - please download the sources and
 build CWS yourself. The build requires Java JDK 8 (patch level 161 or greater),
 and [Maven](https://maven.apache.org/).

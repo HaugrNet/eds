@@ -32,8 +32,6 @@ import org.junit.jupiter.api.Test;
  */
 final class InventoryRequestTest {
 
-    private static final byte[] CREDENTIAL = {};
-
     @Test
     void testClassflow() {
         final String name = "Authentication Name";
@@ -43,7 +41,7 @@ final class InventoryRequestTest {
         final InventoryRequest inventoryRequest = new InventoryRequest();
         assertNotEquals(name, inventoryRequest.getAccountName());
         assertNotEquals(type, inventoryRequest.getCredentialType());
-        assertNotEquals(credentials, inventoryRequest.getCredential());
+        assertNotEquals(credentials, TestUtilities.convert(inventoryRequest.getCredential()));
         assertEquals(1, inventoryRequest.getPageNumber());
         assertEquals(Constants.MAX_PAGE_SIZE, inventoryRequest.getPageSize());
 

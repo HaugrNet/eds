@@ -43,7 +43,7 @@ final class AuthenticationTest {
         final Authentication authentication = new Authentication();
         assertNotEquals(name, authentication.getAccountName());
         assertNotEquals(type, authentication.getCredentialType());
-        assertNotEquals(credentials, authentication.getCredential());
+        assertNotEquals(credentials, TestUtilities.convert(authentication.getCredential()));
 
         authentication.setAccountName(name);
         authentication.setCredentialType(type);

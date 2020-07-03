@@ -48,6 +48,6 @@ public final class TestUtilities {
      * @return New String from the UTF-8 encoded Byte Array
      */
     public static String convert(final byte[] bytes) {
-        return new String(bytes, CHARSET);
+        return (bytes != null) ? new String(bytes, CHARSET) : null;
     }
 }

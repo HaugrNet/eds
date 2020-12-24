@@ -27,7 +27,7 @@ or applications. This makes CWS the perfect companion for anyone who have Data
 Protection & Privacy concerns, such as GDPR.
 
 CWS is written in Java 8 / Java EE 7, with no third-part dependencies, meaning
-that it can run on any Host or in any Cloud where a Java EE Container is
+it can run on any Host or in any Cloud where a Java EE Container is
 available. The first version is using [PostgreSQL](https://www.postgresql.org/)
 as database, but thanks to the flexibility of Java EE, it is possible to use any
 database desired. Testing of CWS has been done using both
@@ -38,7 +38,7 @@ database desired. Testing of CWS has been done using both
 The final version 1.1 of CWS can be downloaded from [JavaDog](https://javadog.io/),
 version 1.2 was planned to be a minor feature release, but more and more
 features were requested, which combined with the current Pandemic, have meant
-that the release have been postponed until September, 2020. The aim is to constantly
+that the release have been postponed until December 2020. The aim is to constantly
 have a stable and usable system, so if needed - please download the sources and
 build CWS yourself. The build requires Java JDK 8 (patch level 161 or greater),
 and [Maven](https://maven.apache.org/).
@@ -61,7 +61,7 @@ a local CWS instance using your existing container.
 
 ### Build from scratch
 
-**Developers only**: If you want to build from source, run these steps to
+**Developers only**: If you want to build from the source, run these steps to
 create the deployable WAR packages for either Payara or WildFly:
 
 ```
@@ -103,8 +103,8 @@ Besides, encrypting all data stored, the CWS also has a number of features to
 ensure that the security is as high as it can be, considering that it can be
 deployed in a "hostile" environment.
 
-* MasterKey - The MasterKey is used to encrypt and decrypt various information
-  and it must be set at startup, since it is not persisted anywhere.
+* MasterKey - The MasterKey is used to encrypt and decrypt various information,
+  and it must be set during startup, since it is not persisted anywhere.
 * Removing sensitive data from memory, done by aggressively perform a deep
   analysis of Objects and overwrite volatile information, to reduce the risk
   of having sensitive information present in memory dumps.
@@ -117,7 +117,7 @@ deployed in a "hostile" environment.
 
 ## Release Plan
 
-This is the CWS 1.2 development branch, following features are planned:
+This is the CWS 1.2 development branch, with the these features planned:
 
 * [Inventory Report](https://github.com/JavaDogs/cws/issues/56)
 * [Enable CORS](https://github.com/JavaDogs/cws/issues/65)
@@ -149,7 +149,7 @@ which may sound ridiculous. However, so that both test suites (Junit & FitNesse)
 will each cover as close to 100% as possible. Of course, external testing cannot
 and should not cover the same bases as the standard tests.
 
-The code is also checked against as many analysis tools as possible. The final
+The code is checked against as many analysis tools as possible. The final
 code must have 0 issues of any kind - before it is considered ready to be
 submitting into the main repository.
 
@@ -157,13 +157,13 @@ submitting into the main repository.
 
 Documentation of code is also important, having silly comments is meaningless,
 but often it helps to add inline comments to explain intentions and reasoning
-for choices made. But, commenting out code is banned, if it is commented out, it
+for choices made. Commenting out code is banned, if it is commented out, it
 is meaningless and should be removed.
 
 ### Style Guide
 
 CWS is developed using IntelliJ IDEA & a local SonarQube instance. The styles
-used and the SonarQube Quality Profile can be found in the accessories folder.
+used, and the SonarQube Quality Profile can be found in the accessories folder.
 
 ## Software License
 

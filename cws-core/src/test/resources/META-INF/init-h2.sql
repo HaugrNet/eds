@@ -56,6 +56,8 @@ CREATE TABLE cws_versions (
 INSERT INTO cws_versions(schema_version, cws_version, db_vendor) VALUES (1, '1.0.0', 'H2');
 -- First feature release, CWS 1.1.x results requires an update of the DB
 INSERT INTO cws_versions(schema_version, cws_version, db_vendor) VALUES (2, '1.1.0', 'H2');
+-- First feature release, CWS 1.1.x results requires an update of the DB
+INSERT INTO cws_versions(schema_version, cws_version, db_vendor) VALUES (3, '1.2.0', 'H2');
 
 -- =============================================================================
 -- The CWS is configured via a set of property values, which are all stored in

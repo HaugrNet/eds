@@ -55,7 +55,7 @@ import javax.persistence.Query;
 public class StartupBean {
 
     private static final Logger LOG = Logger.getLogger(StartupBean.class.getName());
-    private static final int DB_VERSION = 2;
+    private static final int DB_VERSION = 3;
 
     @PersistenceContext
     private EntityManager entityManager;

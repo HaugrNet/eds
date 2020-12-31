@@ -92,7 +92,7 @@ final class SoapClientTest {
         assertNotNull(response);
         assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getReturnCode());
         assertEquals("Ok", response.getReturnMessage());
-        assertEquals("1.2-SNAPSHOT", response.getVersion());
+        assertEquals("1.2.0", response.getVersion());
     }
 
     @Test

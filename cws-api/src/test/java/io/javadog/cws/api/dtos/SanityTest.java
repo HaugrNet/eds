@@ -31,7 +31,7 @@ import org.junit.jupiter.api.Test;
 final class SanityTest {
 
     @Test
-    void testClassflow() {
+    void testClassFlow() {
         final String dataId = UUID.randomUUID().toString();
         final Date changed = new Date();
 

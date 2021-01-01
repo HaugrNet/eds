@@ -31,7 +31,7 @@ import org.junit.jupiter.api.Test;
 final class MetadataTest {
 
     @Test
-    void testClassflow() {
+    void testClassFlow() {
         final String id = UUID.randomUUID().toString();
         final String circleId = UUID.randomUUID().toString();
         final String folderId = UUID.randomUUID().toString();

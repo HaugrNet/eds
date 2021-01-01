@@ -30,7 +30,7 @@ import org.junit.jupiter.api.Test;
 final class MasterKeyResponseTest {
 
     @Test
-    void testClassflow() {
+    void testClassFlow() {
         final MasterKeyResponse response = new MasterKeyResponse();
 
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());

@@ -32,7 +32,7 @@ import org.junit.jupiter.api.Test;
 final class ProcessDataResponseTest {
 
     @Test
-    void testClassflow() {
+    void testClassFlow() {
         final String dataId = UUID.randomUUID().toString();
 
         final ProcessDataResponse response = new ProcessDataResponse();

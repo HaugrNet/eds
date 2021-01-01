@@ -35,7 +35,7 @@ import org.junit.jupiter.api.Test;
 final class ProcessMemberRequestTest {
 
     @Test
-    void testClassflow() {
+    void testClassFlow() {
         final String memberId = UUID.randomUUID().toString();
         final String newAccountName = "New AccountName";
         final String newCredential = "New Credential";

@@ -36,7 +36,7 @@ final class LoggingUtilTest {
     @Test
     void testLoggingUtilConstructor() throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
         final Constructor<LoggingUtil> constructor = LoggingUtil.class.getDeclaredConstructor();
-        assertFalse(constructor.isAccessible());
+        assertFalse(constructor.canAccess(null));
         constructor.setAccessible(true);
         final LoggingUtil constants = constructor.newInstance();
         assertNotNull(constants);

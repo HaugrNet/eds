@@ -59,7 +59,7 @@ final class SettingServiceTest extends DatabaseSetup {
         // and they are rolled back after completion, this should not disturb
         // other tests.
         final int deleted = entityManager
-                .createQuery("delete from MemberEntity where id = :id")
+                .createQuery("delete from MemberEntity m where m.id = :id")
                 .setParameter("id", 1L)
                 .executeUpdate();
         assertEquals(1, deleted);

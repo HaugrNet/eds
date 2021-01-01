@@ -33,7 +33,7 @@ import org.junit.jupiter.api.Test;
 final class FetchCircleResponseTest {
 
     @Test
-    void testClassflow() {
+    void testClassFlow() {
         final List<Circle> circles = new ArrayList<>();
 
         final FetchCircleResponse response = new FetchCircleResponse();

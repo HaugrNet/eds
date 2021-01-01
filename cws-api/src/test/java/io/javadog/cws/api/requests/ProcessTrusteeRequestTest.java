@@ -34,7 +34,7 @@ import org.junit.jupiter.api.Test;
 final class ProcessTrusteeRequestTest {
 
     @Test
-    void testClassflow() {
+    void testClassFlow() {
         final String circleId = UUID.randomUUID().toString();
         final String memberId = UUID.randomUUID().toString();
 

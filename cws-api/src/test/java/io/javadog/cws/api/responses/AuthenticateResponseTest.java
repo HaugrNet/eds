@@ -32,7 +32,7 @@ import org.junit.jupiter.api.Test;
 final class AuthenticateResponseTest {
 
     @Test
-    void testClassflow() {
+    void testClassFlow() {
         final String memberId = UUID.randomUUID().toString();
 
         final AuthenticateResponse response = new AuthenticateResponse();

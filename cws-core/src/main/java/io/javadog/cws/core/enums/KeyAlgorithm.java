@@ -57,7 +57,7 @@ package io.javadog.cws.core.enums;
  * default</a>.</p>
  *
  * <p>CWS not only uses symmetric and asymmetric encryption, also password based
- * encryption, or PBE, is used, to convert member provided passphrase's into a
+ * encryption, or PBE, is used, to convert member provided passphrases into a
  * SecretKey, which can be used to unlock the Account.</p>
  *
  * <p>The listing below also refer to a derived algorithm. This is used for the

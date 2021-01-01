@@ -18,7 +18,6 @@ package io.javadog.cws.api.responses;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.javadog.cws.api.common.ReturnCode;
@@ -31,7 +30,7 @@ import org.junit.jupiter.api.Test;
 final class ProcessTrusteeResponseTest {
 
     @Test
-    void testClassflow() {
+    void testClassFlow() {
         final ProcessTrusteeResponse response = new ProcessTrusteeResponse();
 
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());

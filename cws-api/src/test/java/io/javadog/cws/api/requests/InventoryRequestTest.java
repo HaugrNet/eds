@@ -33,7 +33,7 @@ import org.junit.jupiter.api.Test;
 final class InventoryRequestTest {
 
     @Test
-    void testClassflow() {
+    void testClassFlow() {
         final String name = "Authentication Name";
         final String credentials = "Member Passphrase";
         final CredentialType type = CredentialType.SIGNATURE;

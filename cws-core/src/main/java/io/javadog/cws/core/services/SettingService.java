@@ -147,12 +147,12 @@ public final class SettingService extends Serviceable<CommonDao, SettingResponse
             if (isEmpty(entry.getValue())) {
                 throw new CWSException(ReturnCode.SETTING_WARNING, "The value for the key '" + entry.getKey() + "' is undefined.");
             } else {
-                precheckAllowedValues(standardSetting, entry.getValue());
+                checkAllowedValues(standardSetting, entry.getValue());
             }
         }
     }
 
-    private void precheckAllowedValues(final StandardSetting setting, final String value) {
+    private void checkAllowedValues(final StandardSetting setting, final String value) {
         switch (setting) {
             case SYMMETRIC_ALGORITHM:
                 checkAlgorithm(KeyAlgorithm.Type.SYMMETRIC, setting, value);

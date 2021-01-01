@@ -33,7 +33,7 @@ import org.junit.jupiter.api.Test;
 final class FetchDataTypeResponseTest {
 
     @Test
-    void testClassflow() {
+    void testClassFlow() {
         final List<DataType> dataTypes = new ArrayList<>(3);
         dataTypes.add(new DataType());
         dataTypes.add(new DataType());

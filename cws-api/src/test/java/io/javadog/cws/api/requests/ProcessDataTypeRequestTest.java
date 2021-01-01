@@ -33,7 +33,7 @@ import org.junit.jupiter.api.Test;
 final class ProcessDataTypeRequestTest {
 
     @Test
-    void testClassflow() {
+    void testClassFlow() {
         final String typeName = "DataType TypeName";
         final String type = "DataType Type";
 

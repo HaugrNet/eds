@@ -29,7 +29,7 @@ import org.junit.jupiter.api.Test;
 final class CwsResponseTest {
 
     @Test
-    void testClassflow() {
+    void testClassFlow() {
         final CwsResponse response = new CwsResponse();
         response.setReturnCode(ReturnCode.ERROR);
         response.setReturnMessage(ReturnCode.ERROR.getDescription());

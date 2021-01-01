@@ -32,7 +32,7 @@ import org.junit.jupiter.api.Test;
 final class TrusteeTest {
 
     @Test
-    void testClassflow() {
+    void testClassFlow() {
         final String memberId = UUID.randomUUID().toString();
         final String accountName = UUID.randomUUID().toString();
         final String publicKey = UUID.randomUUID().toString();

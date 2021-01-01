@@ -47,7 +47,7 @@ final class MasterKeyRequestTest {
     }
 
     @Test
-    void testClassflow() {
+    void testClassFlow() {
         final String secret = "secret";
         final MasterKeyRequest request = new MasterKeyRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);

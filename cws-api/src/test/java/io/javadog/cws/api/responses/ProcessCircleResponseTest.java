@@ -32,7 +32,7 @@ import org.junit.jupiter.api.Test;
 class ProcessCircleResponseTest {
 
     @Test
-    void testClassflow() {
+    void testClassFlow() {
         final String circleId = UUID.randomUUID().toString();
 
         final ProcessCircleResponse response = new ProcessCircleResponse();

@@ -33,7 +33,7 @@ import org.junit.jupiter.api.Test;
 final class InventoryResponseTest {
 
     @Test
-    void testClassflow() {
+    void testClassFlow() {
         final List<Metadata> inventory = new ArrayList<>(3);
         inventory.add(new Metadata());
         inventory.add(new Metadata());

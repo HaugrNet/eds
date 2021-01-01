@@ -31,7 +31,7 @@ import org.junit.jupiter.api.Test;
 final class FetchCircleRequestTest {
 
     @Test
-    void testClassflow() {
+    void testClassFlow() {
         final FetchCircleRequest request = new FetchCircleRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
         request.setCredential(TestUtilities.convert(Constants.ADMIN_ACCOUNT));

@@ -34,7 +34,7 @@ import org.junit.jupiter.api.Test;
 final class FetchDataRequestTest {
 
     @Test
-    void testClassflow() {
+    void testClassFlow() {
         final String circleId = UUID.randomUUID().toString();
         final String dataId = UUID.randomUUID().toString();
         final String dataName = UUID.randomUUID().toString();
@@ -87,7 +87,7 @@ final class FetchDataRequestTest {
     }
 
     @Test
-    void testFetchCriterias() {
+    void testFetchCriteria() {
         final FetchDataRequest request = new FetchDataRequest();
         request.setAccountName("My Account");
         request.setCredentialType(CredentialType.PASSPHRASE);

@@ -34,7 +34,7 @@ import org.junit.jupiter.api.Test;
 final class ProcessDataRequestTest {
 
     @Test
-    void testClassflow() {
+    void testClassFlow() {
         final String dataId = UUID.randomUUID().toString();
         final String circleId = UUID.randomUUID().toString();
         final String targetCircleId = UUID.randomUUID().toString();

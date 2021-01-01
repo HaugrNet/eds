@@ -31,7 +31,7 @@ import org.junit.jupiter.api.Test;
 final class SignatureTest {
 
     @Test
-    void testClassflow() {
+    void testClassFlow() {
         final String checksum = UUID.randomUUID().toString();
         final Date expires = new Date(123L);
         final Long verifications = 1L;

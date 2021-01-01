@@ -33,7 +33,7 @@ import org.junit.jupiter.api.Test;
 final class FetchSignatureResponseTest {
 
     @Test
-    void testClassflow() {
+    void testClassFlow() {
         final List<Signature> signatures = new ArrayList<>(1);
         signatures.add(new Signature());
 

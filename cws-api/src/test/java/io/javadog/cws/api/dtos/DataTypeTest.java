@@ -29,7 +29,7 @@ import org.junit.jupiter.api.Test;
 final class DataTypeTest {
 
     @Test
-    void testClassflow() {
+    void testClassFlow() {
         final String name = "name";
         final String type = "type";
 

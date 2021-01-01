@@ -43,7 +43,7 @@ final class CommonBeanTest extends DatabaseSetup {
     @Test
     void testConstantsConstructor() throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
         final Constructor<CommonBean> constructor = CommonBean.class.getDeclaredConstructor();
-        assertFalse(constructor.isAccessible());
+        assertFalse(constructor.canAccess(null));
         constructor.setAccessible(true);
         final CommonBean commonBean = constructor.newInstance();
 

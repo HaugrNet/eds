@@ -35,7 +35,7 @@ import org.junit.jupiter.api.Test;
 final class FetchDataResponseTest {
 
     @Test
-    void testClassflow() {
+    void testClassFlow() {
         final byte[] data = { (byte) 1, (byte) 2, (byte) 3, (byte) 4, (byte) 5 };
         final List<Metadata> metadata = new ArrayList<>(3);
         metadata.add(new Metadata());

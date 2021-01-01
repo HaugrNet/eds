@@ -237,7 +237,7 @@ final class SanitizerBeanTest extends DatabaseSetup {
         try {
             final Class<?> clazz = bean.getClass();
             final Field field = clazz.getDeclaredField("settings");
-            final boolean isAccessible = field.isAccessible();
+            final boolean isAccessible = field.canAccess(bean);
 
             field.setAccessible(true);
             final Settings beanSettings = (Settings) field.get(bean);

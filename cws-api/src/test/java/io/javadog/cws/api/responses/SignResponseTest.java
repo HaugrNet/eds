@@ -31,7 +31,7 @@ import org.junit.jupiter.api.Test;
 final class SignResponseTest {
 
     @Test
-    void testClassflow() {
+    void testClassFlow() {
         final String signature = "The Signature";
 
         final SignResponse response = new SignResponse();

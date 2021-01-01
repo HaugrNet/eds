@@ -31,7 +31,7 @@ import org.junit.jupiter.api.Test;
 final class FetchSignatureRequestTest {
 
     @Test
-    void testClassflow() {
+    void testClassFlow() {
         final FetchSignatureRequest request = new FetchSignatureRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
         request.setCredential(TestUtilities.convert(Constants.ADMIN_ACCOUNT));

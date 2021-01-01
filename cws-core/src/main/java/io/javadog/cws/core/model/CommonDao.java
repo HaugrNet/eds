@@ -155,8 +155,8 @@ public class CommonDao {
 
     /**
      * The checksums are not having any uniqueness assigned to them, meaning
-     * that their may exist multiple checksum's with the same value - but as
-     * all checksum's are fairly short-lived (hours), the problem is ignored
+     * that their may exist multiple checksums with the same value - but as
+     * all checksums are fairly short-lived (hours), the problem is ignored
      * and only of their is an actual problem with it, will it be addressed.
      *
      * @param checksum Checksum of a Member SessionKey
@@ -267,7 +267,7 @@ public class CommonDao {
     }
 
     // =========================================================================
-    // Internal Methods, handling the actual lookup's to simplify error handling
+    // Internal Methods, handling the actual lookup to simplify error handling
     // =========================================================================
 
     /**

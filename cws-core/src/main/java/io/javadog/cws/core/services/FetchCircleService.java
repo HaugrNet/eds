@@ -57,7 +57,7 @@ public final class FetchCircleService extends Serviceable<CommonDao, FetchCircle
         if ((member.getMemberRole() == MemberRole.ADMIN) || settings.hasShowAllCircles()) {
             response.setCircles(fetchCirclesForAdmin());
         } else {
-            response.setCircles(fetchFirclesForMember());
+            response.setCircles(fetchMemberCircles());
         }
 
         return response;
@@ -74,7 +74,7 @@ public final class FetchCircleService extends Serviceable<CommonDao, FetchCircle
         return circles;
     }
 
-    private List<Circle> fetchFirclesForMember() {
+    private List<Circle> fetchMemberCircles() {
         final List<Circle> circles = new ArrayList<>(trustees.size());
 
         for (final TrusteeEntity trustee : trustees) {

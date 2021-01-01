@@ -35,7 +35,7 @@ final class AuthenticationTest {
     private static final byte[] CREDENTIAL = {};
 
     @Test
-    void testClassflow() {
+    void testClassFlow() {
         final String name = "Authentication Name";
         final String credentials = "Member Passphrase";
         final CredentialType type = CredentialType.SIGNATURE;

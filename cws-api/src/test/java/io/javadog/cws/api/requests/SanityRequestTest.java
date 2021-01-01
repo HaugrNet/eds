@@ -34,7 +34,7 @@ import org.junit.jupiter.api.Test;
 final class SanityRequestTest {
 
     @Test
-    void testClassflow() {
+    void testClassFlow() {
         final String circleId = UUID.randomUUID().toString();
         final Date since = new Date();
 

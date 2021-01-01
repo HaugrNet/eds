@@ -33,7 +33,7 @@ import org.junit.jupiter.api.Test;
 final class SanityResponseTest {
 
     @Test
-    void testClassflow() {
+    void testClassFlow() {
         final List<Sanity> sanities = new ArrayList<>();
 
         final SanityResponse response = new SanityResponse();

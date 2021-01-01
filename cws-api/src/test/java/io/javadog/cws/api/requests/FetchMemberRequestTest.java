@@ -32,7 +32,7 @@ import org.junit.jupiter.api.Test;
 final class FetchMemberRequestTest {
 
     @Test
-    void testClassflow() {
+    void testClassFlow() {
         final String memberId = UUID.randomUUID().toString();
 
         final FetchMemberRequest request = new FetchMemberRequest();

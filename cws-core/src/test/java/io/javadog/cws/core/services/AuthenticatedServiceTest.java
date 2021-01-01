@@ -23,7 +23,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.requests.Authentication;
 import io.javadog.cws.api.responses.AuthenticateResponse;
-import io.javadog.cws.api.responses.CwsResponse;
 import io.javadog.cws.core.DatabaseSetup;
 import org.junit.jupiter.api.Test;
 

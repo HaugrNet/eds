@@ -34,7 +34,7 @@ import org.junit.jupiter.api.Test;
 final class FetchMemberResponseTest {
 
     @Test
-    void testClassflow() {
+    void testClassFlow() {
         final List<Circle> circles = new ArrayList<>(1);
         circles.add(new Circle());
         final List<Member> members = new ArrayList<>(1);

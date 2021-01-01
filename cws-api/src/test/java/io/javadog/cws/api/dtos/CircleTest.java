@@ -31,7 +31,7 @@ import org.junit.jupiter.api.Test;
 final class CircleTest {
 
     @Test
-    void testClassflow() {
+    void testClassFlow() {
         final String id = UUID.randomUUID().toString();
         final String name = "Circle Name";
         final String key = UUID.randomUUID().toString();

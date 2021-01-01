@@ -32,7 +32,7 @@ import org.junit.jupiter.api.Test;
 final class SettingRequestTest {
 
     @Test
-    void testClassflow() {
+    void testClassFlow() {
         final Map<String, String> settings = new HashMap<>();
         settings.put("Setting1", "Value1");
 

@@ -48,19 +48,19 @@ final class CryptoTest extends DatabaseSetup {
 
     @Test
     void testGCM128Encryption() {
-        final String cleartext = "This is just an example";
+        final String clearText = "This is just an example";
 
         final KeyAlgorithm algorithm = KeyAlgorithm.AES_GCM_128;
         final SecretCWSKey key = Crypto.generateSymmetricKey(algorithm);
         final IVSalt ivSalt = new IVSalt();
         key.setSalt(ivSalt);
 
-        final byte[] cleartextBytes = crypto.stringToBytes(cleartext);
-        final byte[] encryptedBytes = Crypto.encrypt(key, cleartextBytes);
+        final byte[] clearTextBytes = crypto.stringToBytes(clearText);
+        final byte[] encryptedBytes = Crypto.encrypt(key, clearTextBytes);
         final byte[] decryptedBytes = Crypto.decrypt(key, encryptedBytes);
         final String decrypted = crypto.bytesToString(decryptedBytes);
 
-        assertEquals(cleartext, decrypted);
+        assertEquals(clearText, decrypted);
     }
 
     @Test
@@ -212,15 +212,15 @@ final class CryptoTest extends DatabaseSetup {
         key.setSalt(new IVSalt(UUID.randomUUID().toString()));
 
         // Now, we're going to encrypt some data
-        final String cleartext = "This is just an example";
-        final byte[] toEncrypt = crypto.stringToBytes(cleartext);
+        final String clearText = "This is just an example";
+        final byte[] toEncrypt = crypto.stringToBytes(clearText);
         final byte[] encrypted = Crypto.encrypt(key, toEncrypt);
 
         // And decrypt it so we can verify it
         final byte[] decrypted = Crypto.decrypt(key, encrypted);
         final String result = crypto.bytesToString(decrypted);
 
-        assertEquals(cleartext, result);
+        assertEquals(clearText, result);
     }
 
     /**
@@ -235,14 +235,14 @@ final class CryptoTest extends DatabaseSetup {
     void testMemberEncryption() {
         final CWSKeyPair key = Crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
 
-        final String cleartext = "This is just an example";
-        final byte[] toEncrypt = crypto.stringToBytes(cleartext);
+        final String clearText = "This is just an example";
+        final byte[] toEncrypt = crypto.stringToBytes(clearText);
         final byte[] encrypted = Crypto.encrypt(key.getPublic(), toEncrypt);
 
         final byte[] decrypted = Crypto.decrypt(key.getPrivate(), encrypted);
         final String result = crypto.bytesToString(decrypted);
 
-        assertEquals(cleartext, result);
+        assertEquals(clearText, result);
     }
 
     /**
@@ -255,8 +255,8 @@ final class CryptoTest extends DatabaseSetup {
         key.setSalt(new IVSalt(UUID.randomUUID().toString()));
 
         // Now, we're going to encrypt some data
-        final String cleartext = "This is just an example";
-        final byte[] toEncrypt = crypto.stringToBytes(cleartext);
+        final String clearText = "This is just an example";
+        final byte[] toEncrypt = crypto.stringToBytes(clearText);
         final byte[] encrypted = Crypto.encrypt(key, toEncrypt);
 
         // Destroy the key and try to decrypt. Should fail!
@@ -288,14 +288,14 @@ final class CryptoTest extends DatabaseSetup {
 
         // Now, we're going to encrypt some data
         key.setSalt(new IVSalt(UUID.randomUUID().toString()));
-        final String cleartext = "This is just an example";
-        final byte[] encrypted = Crypto.encrypt(key, crypto.stringToBytes(cleartext));
+        final String clearText = "This is just an example";
+        final byte[] encrypted = Crypto.encrypt(key, crypto.stringToBytes(clearText));
 
         // And decrypt it so we can verify it
         final byte[] decrypted = Crypto.decrypt(key, encrypted);
         final String result = crypto.bytesToString(decrypted);
 
-        assertEquals(cleartext, result);
+        assertEquals(clearText, result);
     }
 
     /**

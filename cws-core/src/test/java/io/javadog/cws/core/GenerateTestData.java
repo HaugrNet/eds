@@ -61,17 +61,17 @@ public final class GenerateTestData {
         append(builder, "-- \"member5\", which is all used as part of the tests.");
         append(builder, "INSERT INTO cws_members (external_id, name, salt, pbe_algorithm, rsa_algorithm, public_key, private_key, member_role) VALUES");
 
-        final CWSKeyPair keyPair = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
+        final CWSKeyPair keyPair = Crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
         createAndAppendMember(builder, DatabaseSetup.ADMIN_ID, Constants.ADMIN_ACCOUNT, keyPair, MemberRole.ADMIN, ',');
-        final CWSKeyPair keyPair1 = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
+        final CWSKeyPair keyPair1 = Crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
         createAndAppendMember(builder, DatabaseSetup.MEMBER_1_ID, DatabaseSetup.MEMBER_1, keyPair1, MemberRole.STANDARD, ',');
-        final CWSKeyPair keyPair2 = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
+        final CWSKeyPair keyPair2 = Crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
         createAndAppendMember(builder, DatabaseSetup.MEMBER_2_ID, DatabaseSetup.MEMBER_2, keyPair2, MemberRole.STANDARD, ',');
-        final CWSKeyPair keyPair3 = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
+        final CWSKeyPair keyPair3 = Crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
         createAndAppendMember(builder, DatabaseSetup.MEMBER_3_ID, DatabaseSetup.MEMBER_3, keyPair3, MemberRole.STANDARD, ',');
-        final CWSKeyPair keyPair4 = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
+        final CWSKeyPair keyPair4 = Crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
         createAndAppendMember(builder, DatabaseSetup.MEMBER_4_ID, DatabaseSetup.MEMBER_4, keyPair4, MemberRole.STANDARD, ',');
-        final CWSKeyPair keyPair5 = crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
+        final CWSKeyPair keyPair5 = Crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
         createAndAppendMember(builder, DatabaseSetup.MEMBER_5_ID, DatabaseSetup.MEMBER_5, keyPair5, MemberRole.STANDARD, ';');
 
         append(builder, "");
@@ -101,9 +101,9 @@ public final class GenerateTestData {
         append(builder, "-- The Trust Level is different for each Member.");
         append(builder, "INSERT INTO cws_trustees (member_id, circle_id, key_id, trust_level, circle_key) VALUES");
 
-        final SecretCWSKey cwsKey1 = crypto.generateSymmetricKey(settings.getSymmetricAlgorithm());
-        final SecretCWSKey cwsKey2 = crypto.generateSymmetricKey(settings.getSymmetricAlgorithm());
-        final SecretCWSKey cwsKey3 = crypto.generateSymmetricKey(settings.getSymmetricAlgorithm());
+        final SecretCWSKey cwsKey1 = Crypto.generateSymmetricKey(settings.getSymmetricAlgorithm());
+        final SecretCWSKey cwsKey2 = Crypto.generateSymmetricKey(settings.getSymmetricAlgorithm());
+        final SecretCWSKey cwsKey3 = Crypto.generateSymmetricKey(settings.getSymmetricAlgorithm());
         createAndAppendTrustee(builder, 2, keyPair1, 1, 1, cwsKey1, TrustLevel.ADMIN, ',');
         createAndAppendTrustee(builder, 3, keyPair2, 1, 1, cwsKey1, TrustLevel.WRITE, ',');
         createAndAppendTrustee(builder, 4, keyPair3, 1, 1, cwsKey1, TrustLevel.READ, ',');
@@ -135,15 +135,15 @@ public final class GenerateTestData {
     private void createAndAppendMember(final StringBuilder builder, final String externalId, final String name, final CWSKeyPair keyPair, final MemberRole role, final char delimiter) {
         final String salt = UUID.randomUUID().toString();
         final SecretCWSKey secretKey = crypto.generatePasswordKey(settings.getPasswordAlgorithm(), crypto.stringToBytes(name), salt);
-        final String publicKey = crypto.armoringPublicKey(keyPair.getPublic().getKey());
-        final String privateKey = crypto.armoringPrivateKey(secretKey, keyPair.getPrivate().getKey());
+        final String publicKey = Crypto.armoringPublicKey(keyPair.getPublic().getKey());
+        final String privateKey = Crypto.armoringPrivateKey(secretKey, keyPair.getPrivate().getKey());
         final String encryptedSalt = crypto.encryptWithMasterKey(salt);
 
         append(builder, "    ('" + externalId + "', '" + name + "', '" + encryptedSalt + "', '" + settings.getPasswordAlgorithm() + "', '" + settings.getAsymmetricAlgorithm() + "', '" + publicKey + "', '" + privateKey + "', '" + role + "')" + delimiter);
     }
 
     private void createAndAppendTrustee(final StringBuilder builder, final int memberId, final CWSKeyPair keyPair, final int circleId, final int keyId, final SecretCWSKey circleKey, final TrustLevel trustLevel, final char delimiter) {
-        final String armoredKey = crypto.encryptAndArmorCircleKey(keyPair.getPublic(), circleKey);
+        final String armoredKey = Crypto.encryptAndArmorCircleKey(keyPair.getPublic(), circleKey);
 
         append(builder, "    (" + memberId + ", " + circleId + ", " + keyId + ", '" + trustLevel + "', '" + armoredKey + "')" + delimiter);
     }

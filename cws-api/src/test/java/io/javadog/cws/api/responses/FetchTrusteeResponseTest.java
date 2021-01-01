@@ -33,7 +33,7 @@ import org.junit.jupiter.api.Test;
 final class FetchTrusteeResponseTest {
 
     @Test
-    void testClassflow() {
+    void testClassFlow() {
         final List<Trustee> trustees = new ArrayList<>();
 
         final FetchTrusteeResponse response = new FetchTrusteeResponse();

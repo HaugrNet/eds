@@ -22,6 +22,8 @@ import io.javadog.cws.core.ManagementBean;
 import io.javadog.cws.core.ShareBean;
 import io.javadog.cws.core.exceptions.CWSException;
 
+import java.lang.reflect.InvocationTargetException;
+
 /**
  * @author Kim Jensen
  * @since CWS 1.0
@@ -186,9 +188,9 @@ class BeanSetup extends DatabaseSetup {
 
     private static <S, B> S prepareService(final Class<S> serviceClass, final Class<B> beanClass, final Object... objects) {
         try {
-            final S service = serviceClass.newInstance();
+            final S service = serviceClass.getConstructor().newInstance();
             if (objects.length > 0) {
-                final B bean = beanClass.newInstance();
+                final B bean = beanClass.getConstructor().newInstance();
                 inject(service, bean);
                 for (final Object object : objects) {
                     inject(service, object);
@@ -197,7 +199,7 @@ class BeanSetup extends DatabaseSetup {
             }
 
             return service;
-        } catch (InstantiationException | IllegalAccessException e) {
+        } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
             throw new CWSException(ReturnCode.ERROR, e);
         }
     }

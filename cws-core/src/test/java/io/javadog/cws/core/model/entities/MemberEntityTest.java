@@ -75,7 +75,7 @@ final class MemberEntityTest extends DatabaseSetup {
 
     @Test
     void testUpdateEntity() {
-        final String credential = "Updateable Account";
+        final String credential = "Updatable Account";
         final KeyAlgorithm algorithm = settings.getAsymmetricAlgorithm();
         final String publicKey = UUID.randomUUID().toString();
         final String privateKey = UUID.randomUUID().toString();
@@ -104,7 +104,7 @@ final class MemberEntityTest extends DatabaseSetup {
         entityManager.flush();
         entityManager.clear();
 
-        final Query query = entityManager.createQuery("select m from MemberEntity m order by id desc");
+        final Query query = entityManager.createQuery("select m from MemberEntity m order by m.id desc");
         final List<MemberEntity> list = CommonDao.findList(query);
         // Now, a couple of checks. First, that we have 2 records, the default
         // Administration Account and the newly created Account

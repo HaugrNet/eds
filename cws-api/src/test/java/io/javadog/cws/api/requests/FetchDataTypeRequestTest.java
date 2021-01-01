@@ -31,7 +31,7 @@ import org.junit.jupiter.api.Test;
 final class FetchDataTypeRequestTest {
 
     @Test
-    void testClassflow() {
+    void testClassFlow() {
         final FetchDataTypeRequest request = new FetchDataTypeRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
         request.setCredential(TestUtilities.convert(Constants.ADMIN_ACCOUNT));

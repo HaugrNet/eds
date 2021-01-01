@@ -31,7 +31,7 @@ import org.junit.jupiter.api.Test;
 final class VersionResponseTest {
 
     @Test
-    void testClassflow() {
+    void testClassFlow() {
         final String version = "1.0";
 
         final VersionResponse response = new VersionResponse();

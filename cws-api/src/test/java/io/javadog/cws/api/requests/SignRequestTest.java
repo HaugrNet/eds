@@ -33,7 +33,7 @@ import org.junit.jupiter.api.Test;
 final class SignRequestTest {
 
     @Test
-    void testClassflow() {
+    void testClassFlow() {
         final byte[] data = { (byte) 1, (byte) 2, (byte) 3, (byte) 4, (byte) 5 };
         final Date expires = new Date();
 

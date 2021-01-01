@@ -41,7 +41,7 @@ final class PrivateConstructorTest {
     @Test
     void testConstantsConstructor() throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
         final Constructor<Constants> constructor = Constants.class.getDeclaredConstructor();
-        assertFalse(constructor.isAccessible());
+        assertFalse(constructor.canAccess(null));
         constructor.setAccessible(true);
         final Constants constants = constructor.newInstance();
         assertNotNull(constants);
@@ -50,7 +50,7 @@ final class PrivateConstructorTest {
     @Test
     void testUtilitiesConstructor() throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
         final Constructor<Utilities> constructor = Utilities.class.getDeclaredConstructor();
-        assertFalse(constructor.isAccessible());
+        assertFalse(constructor.canAccess(null));
         constructor.setAccessible(true);
         final Utilities utilities = constructor.newInstance();
         assertNotNull(utilities);

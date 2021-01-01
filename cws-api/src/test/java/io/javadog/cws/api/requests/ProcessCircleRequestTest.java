@@ -23,7 +23,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import io.javadog.cws.api.TestUtilities;
 import io.javadog.cws.api.common.Action;
 import io.javadog.cws.api.common.Constants;
-import java.lang.reflect.Field;
 import java.util.Map;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
@@ -35,7 +34,7 @@ import org.junit.jupiter.api.Test;
 final class ProcessCircleRequestTest {
 
     @Test
-    void testClassflow() {
+    void testClassFlow() {
         final String circleId = UUID.randomUUID().toString();
         final String circleName = "New Circle Name";
         final String memberId = UUID.randomUUID().toString();

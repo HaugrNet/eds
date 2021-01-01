@@ -29,7 +29,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
 /**
- * <p>Response contains a list of the Metata from the CWS database.</p>
+ * <p>Response contains a list of the Metadata from the CWS database.</p>
  *
  * <p>Please see {@link CwsResponse} for information about the result of the
  * processing.</p>

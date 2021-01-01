@@ -56,8 +56,10 @@ CREATE TABLE cws_versions (
 INSERT INTO cws_versions(schema_version, cws_version, db_vendor) VALUES (1, '1.0.0', 'PostgreSQL');
 -- First feature release, CWS 1.1.x results requires an update of the DB
 INSERT INTO cws_versions(schema_version, cws_version, db_vendor) VALUES (2, '1.1.0', 'PostgreSQL');
--- First feature release, CWS 1.1.x results requires an update of the DB
+-- Second feature release, CWS 1.1.x results requires an update of the DB
 INSERT INTO cws_versions(schema_version, cws_version, db_vendor) VALUES (3, '1.2.0', 'PostgreSQL');
+-- Java Version upgrade (8->11), breaks backwards compatibility, CWS 2.x
+INSERT INTO cws_versions(schema_version, cws_version, db_vendor) VALUES (4, '2.0.0', 'PostgreSQL');
 
 -- =============================================================================
 -- The CWS is configured via a set of property values, which are all stored in

@@ -154,8 +154,8 @@ public abstract class CWSKey<T extends Key> {
      * @param accessible The Access Flag to set
      * @return True if this field is accessible, otherwise false
      */
-    private static boolean setAccessible(final Field field, final boolean accessible) {
-        final boolean isAccessible = field.isAccessible();
+    private boolean setAccessible(final Field field, final boolean accessible) {
+        final boolean isAccessible = field.canAccess(key);
         field.setAccessible(accessible);
 
         return isAccessible;

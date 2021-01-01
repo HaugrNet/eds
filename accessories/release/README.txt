@@ -1,13 +1,12 @@
-Thanks for downloading and trying the first release of CWS, Cryptographic
-Web Store.
+Thanks for downloading and trying CWS, Cryptographic Web Store.
 
 
 == Requirements ==
 
 CWS requires:
 * a database,
-* Java 8/11
-* a Java EE 7+ container, compatible with Java 8/11
+* Java 11+
+* a Jakarta EE 9+ compatible container
 
 
 == Test Installation Component Recommendations ==
@@ -17,15 +16,13 @@ PostgreSQL can be downloaded from https://postgresql.org, as it is a standard
 package for most Linux/*BSD distributions. If you do not already have postgresql
 installed, follow the installation instructions for your platform.
 
-Java 8 JDK (not Java 9)
-Java 8 is also a standard package, but can also be downloaded from 
-http://www.oracle.com/technetwork/java. Please be aware that CWS only works with 
-Java 8, not yet Java 9. If you do not have java 8, follow the instructions for
-your platform to install or upgrade java.
+Java 11 JDK
+Java 11 is the latest Long Term Support version of Java, it can be downloaded
+from https://adoptopenjdk.net/.
 
-Java EE 7+ container (Wildfly)
+Jakarta EE 9+ container (Wildfly)
 The default container used for both development and testing is WildFly 
-(https://wildfly.org) version 10 & 11. If you do not already have Wildfly 
+(https://wildfly.org) version 21+. If you do not already have Wildfly
 installed, download Wildfly and unpack it.  Follow the instructions on setting
 up Wildfly as a standalone server.
 
@@ -108,7 +105,7 @@ password to something else.
 
 In your ${CWS_HOME} directory, there are several folders, as of CWS 1.1 both
 Payara & WildFly are supported, in the bin directory, there is a shell script
-to install the preferred version. The scipt requires that a few environment
+to install the preferred version. The script requires that a few environment
 variables are predefined, and can be used to start, stop, configure, deploy and
 undeploy CWS.
 
@@ -141,7 +138,7 @@ Unfortunately, WildFly cannot be started & configured in a single action, hence
 for WildFly the following is an example:
 
 $ cd [ /Path/To/CWS/Installation ]
-$ export JBOSS_HOME="/opt/wildfly-14.0.1.Final"
+$ export JBOSS_HOME="/opt/wildfly-21.0.2.Final"
 $ export PATH=${PATH}:`pwd`/bin
 $ wildfly.sh start
 $ wildfly.sh configure

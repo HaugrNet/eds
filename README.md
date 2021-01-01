@@ -26,7 +26,7 @@ it can be used to store either files between users or data objects between apps
 or applications. This makes CWS the perfect companion for anyone who have Data
 Protection & Privacy concerns, such as GDPR.
 
-CWS is written in Java 8 / Java EE 7, with no third-part dependencies, meaning
+CWS is written in Java 11 / Jakarta EE 9, with no third-part dependencies, meaning
 it can run on any Host or in any Cloud where a Java EE Container is
 available. The first version is using [PostgreSQL](https://www.postgresql.org/)
 as database, but thanks to the flexibility of Java EE, it is possible to use any
@@ -35,12 +35,9 @@ database desired. Testing of CWS has been done using both
 
 ## Build, Install and Run
 
-The final version 1.1 of CWS can be downloaded from [JavaDog](https://javadog.io/),
-version 1.2 was planned to be a minor feature release, but more and more
-features were requested, which combined with the current Pandemic, have meant
-that the release have been postponed until December 2020. The aim is to constantly
-have a stable and usable system, so if needed - please download the sources and
-build CWS yourself. The build requires Java JDK 8 (patch level 161 or greater),
+The final version 1.2 of CWS can be downloaded from [JavaDog](https://javadog.io/),
+version 2.0 is planned to be a major technical release, focusing on upgrading both
+the required Java version & Jakarta EE version. The build requires Java JDK 11,
 and [Maven](https://maven.apache.org/).
 
 In the accessories/release folder, there is a number of files, which is used to
@@ -117,20 +114,11 @@ deployed in a "hostile" environment.
 
 ## Release Plan
 
-This is the CWS 1.2 development branch, with the these features planned:
+This is the CWS 2.0 development branch, with the these features planned:
 
-* [Inventory Report](https://github.com/JavaDogs/cws/issues/56)
-* [Enable CORS](https://github.com/JavaDogs/cws/issues/65)
-* [Add Swagger File](https://github.com/JavaDogs/cws/issues/67)
-* [Lookup Data Objects from name](https://github.com/JavaDogs/cws/issues/59)
-* [Change Auhenticate Signature](https://github.com/JavaDogs/cws/issues/64)
-* [Allow Deletion of Circles for System Administrators](https://github.com/JavaDogs/cws/issues/62)
-
-The CWS 1.2 release will be a fairly minor version, with some minor API
-enhancements, as well as a few improvements. Unless more urgent requests will
-be made, the focus will as quickly as possible move towards the 2.0 release
-which will focus on moving the code base to Java EE 8 & Java 11. Thus removing
-compatibility with older versions of Java.
+* [Migrate code base from Java 8 to Java 11](https://github.com/JavaDogs/cws/issues/71)
+* [Migrate from Java EE 7 to Jakarta EE 9](https://github.com/JavaDogs/cws/issues/70)
+* [Convert Date Objects to Java 8+ Time Objects](https://github.com/JavaDogs/cws/issues/69)
 
 Even though the code base will be migrated, and new features will only be added
 in the 2.0+ releases, issues discovered in the 1.x releases will be addressed

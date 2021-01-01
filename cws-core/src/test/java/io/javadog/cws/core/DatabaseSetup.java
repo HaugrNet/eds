@@ -155,6 +155,20 @@ public class DatabaseSetup {
         }
     }
 
+    protected MemberEntity prepareMember(final String externalId, final String credential, final KeyAlgorithm algorithm, final String publicKey, final String privateKey, final MemberRole role) {
+        final MemberEntity entity = new MemberEntity();
+        entity.setName(credential);
+        entity.setPbeAlgorithm(settings.getPasswordAlgorithm());
+        entity.setRsaAlgorithm(algorithm);
+        entity.setSalt(crypto.encryptWithMasterKey(externalId));
+        entity.setPublicKey(publicKey);
+        entity.setPrivateKey(privateKey);
+        entity.setMemberRole(role);
+        persist(entity);
+
+        return entity;
+    }
+
     protected MemberEntity prepareMember(final String externalId, final String accountName, final String secret, final CWSKeyPair keyPair, final MemberRole role) {
         final KeyAlgorithm pbeAlgorithm = settings.getPasswordAlgorithm();
         final IVSalt salt = new IVSalt();
@@ -209,17 +223,12 @@ public class DatabaseSetup {
     protected Settings newSettings() {
         try {
             final Constructor<Settings> constructor = Settings.class.getDeclaredConstructor();
-            final boolean accessible = constructor.isAccessible();
             constructor.setAccessible(true);
-            final Settings instance = constructor.newInstance();
-            constructor.setAccessible(accessible);
-
-            return instance;
+            return constructor.newInstance();
         } catch (NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException e) {
             throw new CWSException(ReturnCode.ERROR, "Cannot instantiate Service Object", e);
         }
     }
-
 
     /**
      * Testing, requiring a customized MasterKey, should use this method to get
@@ -234,12 +243,8 @@ public class DatabaseSetup {
     protected static MasterKey newMasterKey(final Settings settings) {
         try {
             final Constructor<MasterKey> constructor = MasterKey.class.getDeclaredConstructor(Settings.class);
-            final boolean accessible = constructor.isAccessible();
             constructor.setAccessible(true);
-            final MasterKey instance = constructor.newInstance(settings);
-            constructor.setAccessible(accessible);
-
-            return instance;
+            return constructor.newInstance(settings);
         } catch (InvocationTargetException e) {
             final Throwable target = e.getTargetException();
             if (target instanceof CWSException) {
@@ -255,20 +260,6 @@ public class DatabaseSetup {
         final KeyEntity entity = new KeyEntity();
         entity.setAlgorithm(settings.getSymmetricAlgorithm());
         entity.setStatus(Status.ACTIVE);
-        persist(entity);
-
-        return entity;
-    }
-
-    protected MemberEntity prepareMember(final String externalId, final String credential, final KeyAlgorithm algorithm, final String publicKey, final String privateKey, final MemberRole role) {
-        final MemberEntity entity = new MemberEntity();
-        entity.setName(credential);
-        entity.setPbeAlgorithm(settings.getPasswordAlgorithm());
-        entity.setRsaAlgorithm(algorithm);
-        entity.setSalt(crypto.encryptWithMasterKey(externalId));
-        entity.setPublicKey(publicKey);
-        entity.setPrivateKey(privateKey);
-        entity.setMemberRole(role);
         persist(entity);
 
         return entity;
@@ -380,7 +371,7 @@ public class DatabaseSetup {
      */
     private static void setField(final Object instance, final Field field, final Object value) {
         try {
-            final boolean accessible = field.isAccessible();
+            final boolean accessible = field.canAccess(instance);
             field.setAccessible(true);
             field.set(instance, value);
             field.setAccessible(accessible);

@@ -24,6 +24,7 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.FlushModeType;
 import javax.persistence.LockModeType;
+import javax.persistence.Persistence;
 import javax.persistence.PersistenceException;
 import javax.persistence.Query;
 import javax.persistence.StoredProcedureQuery;
@@ -44,11 +45,16 @@ import java.util.Map;
  */
 public final class FakeEntityManager implements EntityManager {
 
+    private static final String persistenceName = "io.javadog.cws.jpa";
+    private static final EntityManagerFactory FACTORY = Persistence.createEntityManagerFactory(persistenceName);
+    private final EntityManager entityManager = FACTORY.createEntityManager();
+
     /**
      * {@inheritDoc}
      */
     @Override
     public void persist(final Object entity) {
+        entityManager.persist(entity);
     }
 
     /**
@@ -56,7 +62,7 @@ public final class FakeEntityManager implements EntityManager {
      */
     @Override
     public <T> T merge(final T entity) {
-        return null;
+        return entityManager.merge(entity);
     }
 
     /**
@@ -64,6 +70,7 @@ public final class FakeEntityManager implements EntityManager {
      */
     @Override
     public void remove(final Object entity) {
+        entityManager.remove(entity);
     }
 
     /**
@@ -103,7 +110,7 @@ public final class FakeEntityManager implements EntityManager {
      */
     @Override
     public <T> T getReference(final Class<T> entityClass, final Object primaryKey) {
-        return null;
+        return entityManager.getReference(entityClass, primaryKey);
     }
 
     /**
@@ -111,6 +118,7 @@ public final class FakeEntityManager implements EntityManager {
      */
     @Override
     public void flush() {
+        entityManager.flush();
     }
 
     /**
@@ -118,6 +126,7 @@ public final class FakeEntityManager implements EntityManager {
      */
     @Override
     public void setFlushMode(final FlushModeType flushMode) {
+        entityManager.setFlushMode(flushMode);
     }
 
     /**
@@ -125,7 +134,7 @@ public final class FakeEntityManager implements EntityManager {
      */
     @Override
     public FlushModeType getFlushMode() {
-        return null;
+        return entityManager.getFlushMode();
     }
 
     /**
@@ -133,6 +142,7 @@ public final class FakeEntityManager implements EntityManager {
      */
     @Override
     public void lock(final Object entity, final LockModeType lockMode) {
+        entityManager.lock(entity, lockMode);
     }
 
     /**
@@ -140,6 +150,7 @@ public final class FakeEntityManager implements EntityManager {
      */
     @Override
     public void lock(final Object entity, final LockModeType lockMode, final Map<String, Object> properties) {
+        entityManager.lock(entity, lockMode, properties);
     }
 
     /**
@@ -147,6 +158,7 @@ public final class FakeEntityManager implements EntityManager {
      */
     @Override
     public void refresh(final Object entity) {
+        entityManager.refresh(entity);
     }
 
     /**
@@ -154,6 +166,7 @@ public final class FakeEntityManager implements EntityManager {
      */
     @Override
     public void refresh(final Object entity, final Map<String, Object> properties) {
+        entityManager.refresh(entity, properties);
     }
 
     /**
@@ -161,6 +174,7 @@ public final class FakeEntityManager implements EntityManager {
      */
     @Override
     public void refresh(final Object entity, final LockModeType lockMode) {
+        entityManager.refresh(entity, lockMode);
     }
 
     /**
@@ -168,6 +182,7 @@ public final class FakeEntityManager implements EntityManager {
      */
     @Override
     public void refresh(final Object entity, final LockModeType lockMode, final Map<String, Object> properties) {
+        entityManager.refresh(entity, lockMode, properties);
     }
 
     /**
@@ -175,6 +190,7 @@ public final class FakeEntityManager implements EntityManager {
      */
     @Override
     public void clear() {
+        entityManager.clear();
     }
 
     /**
@@ -182,6 +198,7 @@ public final class FakeEntityManager implements EntityManager {
      */
     @Override
     public void detach(final Object entity) {
+        entityManager.detach(entity);
     }
 
     /**
@@ -189,7 +206,7 @@ public final class FakeEntityManager implements EntityManager {
      */
     @Override
     public boolean contains(final Object entity) {
-        return false;
+        return entityManager.contains(entity);
     }
 
     /**
@@ -197,7 +214,7 @@ public final class FakeEntityManager implements EntityManager {
      */
     @Override
     public LockModeType getLockMode(final Object entity) {
-        return null;
+        return entityManager.getLockMode(entity);
     }
 
     /**
@@ -205,6 +222,7 @@ public final class FakeEntityManager implements EntityManager {
      */
     @Override
     public void setProperty(final String propertyName, final Object value) {
+        entityManager.setProperty(propertyName, value);
     }
 
     /**
@@ -212,7 +230,7 @@ public final class FakeEntityManager implements EntityManager {
      */
     @Override
     public Map<String, Object> getProperties() {
-        return null;
+        return entityManager.getProperties();
     }
 
     /**
@@ -220,7 +238,7 @@ public final class FakeEntityManager implements EntityManager {
      */
     @Override
     public Query createQuery(final String qlString) {
-        return null;
+        return entityManager.createQuery(qlString);
     }
 
     /**
@@ -228,7 +246,7 @@ public final class FakeEntityManager implements EntityManager {
      */
     @Override
     public <T> TypedQuery<T> createQuery(final CriteriaQuery<T> criteriaQuery) {
-        return null;
+        return entityManager.createQuery(criteriaQuery);
     }
 
     /**
@@ -236,7 +254,7 @@ public final class FakeEntityManager implements EntityManager {
      */
     @Override
     public Query createQuery(final CriteriaUpdate updateQuery) {
-        return null;
+        return entityManager.createQuery(updateQuery);
     }
 
     /**
@@ -244,7 +262,7 @@ public final class FakeEntityManager implements EntityManager {
      */
     @Override
     public Query createQuery(final CriteriaDelete deleteQuery) {
-        return null;
+        return entityManager.createQuery(deleteQuery);
     }
 
     /**
@@ -252,7 +270,7 @@ public final class FakeEntityManager implements EntityManager {
      */
     @Override
     public <T> TypedQuery<T> createQuery(final String qlString, final Class<T> resultClass) {
-        return null;
+        return entityManager.createQuery(qlString, resultClass);
     }
 
     /**
@@ -268,7 +286,7 @@ public final class FakeEntityManager implements EntityManager {
      */
     @Override
     public <T> TypedQuery<T> createNamedQuery(final String name, final Class<T> resultClass) {
-        return null;
+        return entityManager.createNamedQuery(name, resultClass);
     }
 
     /**
@@ -276,7 +294,7 @@ public final class FakeEntityManager implements EntityManager {
      */
     @Override
     public Query createNativeQuery(final String sqlString) {
-        return null;
+        return entityManager.createNamedQuery(sqlString);
     }
 
     /**
@@ -284,7 +302,7 @@ public final class FakeEntityManager implements EntityManager {
      */
     @Override
     public Query createNativeQuery(final String sqlString, final Class resultClass) {
-        return null;
+        return entityManager.createNativeQuery(sqlString, resultClass);
     }
 
     /**
@@ -292,7 +310,7 @@ public final class FakeEntityManager implements EntityManager {
      */
     @Override
     public Query createNativeQuery(final String sqlString, final String resultSetMapping) {
-        return null;
+        return entityManager.createNativeQuery(sqlString, resultSetMapping);
     }
 
     /**
@@ -300,7 +318,7 @@ public final class FakeEntityManager implements EntityManager {
      */
     @Override
     public StoredProcedureQuery createNamedStoredProcedureQuery(final String name) {
-        return null;
+        return entityManager.createNamedStoredProcedureQuery(name);
     }
 
     /**
@@ -308,7 +326,7 @@ public final class FakeEntityManager implements EntityManager {
      */
     @Override
     public StoredProcedureQuery createStoredProcedureQuery(final String procedureName) {
-        return null;
+        return entityManager.createStoredProcedureQuery(procedureName);
     }
 
     /**
@@ -316,7 +334,7 @@ public final class FakeEntityManager implements EntityManager {
      */
     @Override
     public StoredProcedureQuery createStoredProcedureQuery(final String procedureName, final Class... resultClasses) {
-        return null;
+        return entityManager.createStoredProcedureQuery(procedureName, resultClasses);
     }
 
     /**
@@ -324,7 +342,7 @@ public final class FakeEntityManager implements EntityManager {
      */
     @Override
     public StoredProcedureQuery createStoredProcedureQuery(final String procedureName, final String... resultSetMappings) {
-        return null;
+        return entityManager.createStoredProcedureQuery(procedureName, resultSetMappings);
     }
 
     /**
@@ -332,7 +350,7 @@ public final class FakeEntityManager implements EntityManager {
      */
     @Override
     public void joinTransaction() {
-
+        entityManager.joinTransaction();
     }
 
     /**
@@ -340,7 +358,7 @@ public final class FakeEntityManager implements EntityManager {
      */
     @Override
     public boolean isJoinedToTransaction() {
-        return false;
+        return entityManager.isJoinedToTransaction();
     }
 
     /**
@@ -348,7 +366,7 @@ public final class FakeEntityManager implements EntityManager {
      */
     @Override
     public <T> T unwrap(final Class<T> cls) {
-        return null;
+        return entityManager.unwrap(cls);
     }
 
     /**
@@ -356,7 +374,7 @@ public final class FakeEntityManager implements EntityManager {
      */
     @Override
     public Object getDelegate() {
-        return null;
+        return entityManager.getDelegate();
     }
 
     /**
@@ -364,7 +382,7 @@ public final class FakeEntityManager implements EntityManager {
      */
     @Override
     public void close() {
-
+        entityManager.close();
     }
 
     /**
@@ -372,7 +390,7 @@ public final class FakeEntityManager implements EntityManager {
      */
     @Override
     public boolean isOpen() {
-        return false;
+        return entityManager.isOpen();
     }
 
     /**
@@ -380,7 +398,7 @@ public final class FakeEntityManager implements EntityManager {
      */
     @Override
     public EntityTransaction getTransaction() {
-        return null;
+        return entityManager.getTransaction();
     }
 
     /**
@@ -388,7 +406,7 @@ public final class FakeEntityManager implements EntityManager {
      */
     @Override
     public EntityManagerFactory getEntityManagerFactory() {
-        return null;
+        return entityManager.getEntityManagerFactory();
     }
 
     /**
@@ -396,7 +414,7 @@ public final class FakeEntityManager implements EntityManager {
      */
     @Override
     public CriteriaBuilder getCriteriaBuilder() {
-        return new FakeCriteriaBuilder();
+        return entityManager.getCriteriaBuilder();
     }
 
     /**
@@ -404,7 +422,7 @@ public final class FakeEntityManager implements EntityManager {
      */
     @Override
     public Metamodel getMetamodel() {
-        return null;
+        return entityManager.getMetamodel();
     }
 
     /**
@@ -412,7 +430,7 @@ public final class FakeEntityManager implements EntityManager {
      */
     @Override
     public <T> EntityGraph<T> createEntityGraph(final Class<T> rootType) {
-        return null;
+        return entityManager.createEntityGraph(rootType);
     }
 
     /**
@@ -420,7 +438,7 @@ public final class FakeEntityManager implements EntityManager {
      */
     @Override
     public EntityGraph<?> createEntityGraph(final String graphName) {
-        return null;
+        return entityManager.createEntityGraph(graphName);
     }
 
     /**
@@ -428,7 +446,7 @@ public final class FakeEntityManager implements EntityManager {
      */
     @Override
     public EntityGraph<?> getEntityGraph(final String graphName) {
-        return null;
+        return entityManager.getEntityGraph(graphName);
     }
 
     /**
@@ -436,6 +454,6 @@ public final class FakeEntityManager implements EntityManager {
      */
     @Override
     public <T> List<EntityGraph<? super T>> getEntityGraphs(final Class<T> entityClass) {
-        return null;
+        return entityManager.getEntityGraphs(entityClass);
     }
 }

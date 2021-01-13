@@ -32,6 +32,7 @@ import io.javadog.cws.core.services.SettingService;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import javax.persistence.EntityManager;
+import io.javadog.cws.core.stubs.FailService;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -62,39 +63,5 @@ final class CommonBeanTest extends DatabaseSetup {
         final CWSException cause = assertThrows(CWSException.class, () -> failService.perform(null));
         assertEquals(ReturnCode.ERROR, cause.getReturnCode());
         assertEquals("Method is not implemented.", cause.getMessage());
-    }
-
-    /**
-     * This Class only serves the purpose of providing a Service, which will
-     * not work, i.e. fail when invoked. It is present to help test the error
-     * handling.
-     */
-    private static final class FailService extends Serviceable<CommonDao, SettingResponse, SettingRequest> {
-
-        /**
-         * Default Constructor.
-         *
-         * @param settings      CWS Settings
-         * @param entityManager Entity Manager instance
-         */
-        private FailService(final Settings settings, final EntityManager entityManager) {
-            super(settings, new CommonDao(entityManager));
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public SettingResponse perform(final SettingRequest request) {
-            throw new CWSException(ReturnCode.ERROR, "Method is not implemented.");
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void destroy() {
-            throw new CWSException(ReturnCode.CRYPTO_ERROR, "Cannot destroy failed service.");
-        }
     }
 }

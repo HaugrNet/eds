@@ -25,6 +25,7 @@ import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.core.DatabaseSetup;
 import io.javadog.cws.core.exceptions.CWSException;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -69,7 +70,7 @@ final class CommonDaoTest extends DatabaseSetup {
          */
         @Override
         public List<?> getResultList() {
-            return null;
+            return Collections.emptyList();
         }
 
         /**
@@ -93,7 +94,7 @@ final class CommonDaoTest extends DatabaseSetup {
          */
         @Override
         public Query setMaxResults(final int maxResult) {
-            return null;
+            return this;
         }
 
         /**
@@ -109,7 +110,7 @@ final class CommonDaoTest extends DatabaseSetup {
          */
         @Override
         public Query setFirstResult(final int startPosition) {
-            return null;
+            return this;
         }
 
         /**
@@ -125,7 +126,7 @@ final class CommonDaoTest extends DatabaseSetup {
          */
         @Override
         public Query setHint(final String hintName, final Object value) {
-            return null;
+            return this;
         }
 
         /**
@@ -133,7 +134,7 @@ final class CommonDaoTest extends DatabaseSetup {
          */
         @Override
         public Map<String, Object> getHints() {
-            return null;
+            return Collections.emptyMap();
         }
 
         /**
@@ -141,7 +142,7 @@ final class CommonDaoTest extends DatabaseSetup {
          */
         @Override
         public <T> Query setParameter(final Parameter<T> param, final T value) {
-            return null;
+            return this;
         }
 
         /**
@@ -149,7 +150,7 @@ final class CommonDaoTest extends DatabaseSetup {
          */
         @Override
         public Query setParameter(final Parameter<Calendar> param, final Calendar value, final TemporalType temporalType) {
-            return null;
+            return this;
         }
 
         /**
@@ -157,7 +158,7 @@ final class CommonDaoTest extends DatabaseSetup {
          */
         @Override
         public Query setParameter(final Parameter<Date> param, final Date value, final TemporalType temporalType) {
-            return null;
+            return this;
         }
 
         /**
@@ -165,7 +166,7 @@ final class CommonDaoTest extends DatabaseSetup {
          */
         @Override
         public Query setParameter(final String name, final Object value) {
-            return null;
+            return this;
         }
 
         /**
@@ -173,7 +174,7 @@ final class CommonDaoTest extends DatabaseSetup {
          */
         @Override
         public Query setParameter(final String name, final Calendar value, final TemporalType temporalType) {
-            return null;
+            return this;
         }
 
         /**
@@ -181,7 +182,7 @@ final class CommonDaoTest extends DatabaseSetup {
          */
         @Override
         public Query setParameter(final String name, final Date value, final TemporalType temporalType) {
-            return null;
+            return this;
         }
 
         /**
@@ -189,7 +190,7 @@ final class CommonDaoTest extends DatabaseSetup {
          */
         @Override
         public Query setParameter(final int position, final Object value) {
-            return null;
+            return this;
         }
 
         /**
@@ -197,7 +198,7 @@ final class CommonDaoTest extends DatabaseSetup {
          */
         @Override
         public Query setParameter(final int position, final Calendar value, final TemporalType temporalType) {
-            return null;
+            return this;
         }
 
         /**
@@ -205,7 +206,7 @@ final class CommonDaoTest extends DatabaseSetup {
          */
         @Override
         public Query setParameter(final int position, final Date value, final TemporalType temporalType) {
-            return null;
+            return this;
         }
 
         /**
@@ -213,7 +214,7 @@ final class CommonDaoTest extends DatabaseSetup {
          */
         @Override
         public Set<Parameter<?>> getParameters() {
-            return null;
+            return Collections.emptySet();
         }
 
         /**
@@ -285,7 +286,7 @@ final class CommonDaoTest extends DatabaseSetup {
          */
         @Override
         public Query setFlushMode(final FlushModeType flushMode) {
-            return null;
+            return this;
         }
 
         /**
@@ -301,7 +302,7 @@ final class CommonDaoTest extends DatabaseSetup {
          */
         @Override
         public Query setLockMode(final LockModeType lockMode) {
-            return null;
+            return this;
         }
 
         /**

@@ -2,6 +2,7 @@
 
 # Simple Bash script to map most of the Management features in CWS, so it is
 # possible to use scripting to quickly and easily setup a new CWS system.
+# Note, to help read JSON, the script requires that "jq" is installed.
 
 # Please configure this to the correct value.
 server="http://localhost:8080/cws"
@@ -213,7 +214,7 @@ function removeTrustee() {
 }
 
 # ==============================================================================
-# CWS REQUEST :: Shows a list of Trustees (AccountId & Trustlevel) for a Circle
+# CWS REQUEST :: Shows a list of Trustees (AccountId & TrustLevel) for a Circle
 # ------------------------------------------------------------------------------
 # Parameters:
 #   1) Account Name for the administrator invoking request
@@ -254,7 +255,7 @@ function inspectListResponse() {
     key2=${3}
     returnCode=$(findKey "${json}" "returnCode")
 
-    if [ "${returnCode}" == "200" ]; then
+    if [[ "${returnCode}" == "200" ]]; then
         raw=${json//[]/null}
         defaultIFS="${IFS}"
         IFS='['
@@ -265,7 +266,7 @@ function inspectListResponse() {
         read -r -a hacked3 <<<"${hacked2[0]}"
         IFS="${defaultIFS}"
         for i in "${hacked3[@]}"; do
-            if [ -n "${i}" ]; then
+            if [[ -n "${i}" ]]; then
                 first=$(findKey "${i}" "${key1}")
                 second=$(findKey "${i}" "${key2}")
                 echo "${first//\"/} :: ${second//\"/}"
@@ -292,11 +293,11 @@ function inspectListResponse() {
 #   Return code 1 -> The error message from the server
 # ==============================================================================
 function inspectResponse() {
-    json=${1}
-    key=${2}
+    local json; json="${1}"
+    local key; key="${2}"
     returnCode=$(findKey "${json}" "returnCode")
 
-    if [ "${returnCode}" == "200" ]; then
+    if [[ "${returnCode}" == "200" ]]; then
         expected=$(findKey "${json}" "${key}")
         echo "${expected//\"/}"
         return 0
@@ -315,24 +316,13 @@ function inspectResponse() {
 #   2) Key to lookup in JSON response
 # Output:
 #   Value for the requested Key
+# ------------------------------------------------------------------------------
+# Requires that "jq" is installed !
 # ==============================================================================
 function findKey() {
-    json=${1}
-    key=${2}
+    local json; json="${1}"
+    local key; key="${2}"
 
-    # Remove the start and end markers
-    tmp1=${json//\{/}
-    tmp2=${tmp1//\}/}
-
-    defaultIFS="${IFS}"
-    IFS=','
-    read -r -a json_array <<<"${tmp2}"
-    for i in "${json_array[@]}"; do
-        if [[ ${i} =~ ${key} ]]; then
-            IFS=":"
-            read -r -a tmp <<<"${i}"
-            echo "${tmp[1]}"
-        fi
-    done
-    IFS="${defaultIFS}"
+    tmp=$(echo "${json}" | jq -c ".${key}")
+    echo "${tmp//\"/}"
 }

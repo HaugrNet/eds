@@ -146,18 +146,15 @@ public abstract class CWSKey<T extends Key> {
      * <p>The current value of the field accessibility is being saved prior to
      * updating it, so it can be returned.</p>
      *
-     * <p>The name of the method has not changed between Java 8 &amp; 9.
-     * Although CWS works with Java 9+, it is not planned to migrate the
-     * Language Level dependency until CWS version 2.0.</p>
-     *
      * @param field      The field to set the Access Flag for
      * @param accessible The Access Flag to set
      * @return True if this field is accessible, otherwise false
+     * @throws SecurityException if the request is denied by the security manager
      */
     private boolean setAccessible(final Field field, final boolean accessible) {
-        final boolean isAccessible = field.canAccess(key);
+        final boolean current = field.canAccess(key);
         field.setAccessible(accessible);
 
-        return isAccessible;
+        return current;
     }
 }

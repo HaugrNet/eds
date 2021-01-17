@@ -43,6 +43,12 @@
             <artifactId>xmlschema-core</artifactId>
         </dependency>
 
+        <!-- CXF uses SLF4J as logger, this prevents warnings -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-nop</artifactId>
+        </dependency>
+
         <!-- XML bindings have been removed from Java 9+ -->
         <dependency>
             <groupId>javax.xml.ws</groupId>

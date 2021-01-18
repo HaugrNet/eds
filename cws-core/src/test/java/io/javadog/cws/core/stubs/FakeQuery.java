@@ -22,26 +22,44 @@ import javax.persistence.Parameter;
 import javax.persistence.Query;
 import javax.persistence.TemporalType;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 /**
- * This test Stub was extracted from the CommonDaoTest.
+ * <p>This wrapper is used by the FakeEntityManager to alter expected Query
+ * behavior to mimic expectations that otherwise cannot be tested unless
+ * mocking is used - but mocking have other problems.</p>
+ *
+ * <p>By using the setHint feature, certain hits are used as part of running
+ * the query, so it is possible to change behavior.</p>
+ *
+ * <p>Following hints have been added:</p>
+ * <ul>
+ *   <li><b>returnNull</b> - methods return null, instead of expected
+ *   result.</li>
+ * </ul>
  *
  * @author Kim Jensen
  * @since CWS 1.0
  */
 public final class FakeQuery implements Query {
 
+    public static final String NULLABLE = "returnNull";
+    private final Query query;
+    private boolean returnNull = false;
+
+    public FakeQuery(final Query query) {
+        this.query = query;
+    }
+
     /**
      * {@inheritDoc}
      */
     @Override
     public List<?> getResultList() {
-        return Collections.emptyList();
+        return returnNull ? null : query.getResultList();
     }
 
     /**
@@ -49,7 +67,7 @@ public final class FakeQuery implements Query {
      */
     @Override
     public Object getSingleResult() {
-        return null;
+        return returnNull ? null : query.getSingleResult();
     }
 
     /**
@@ -57,7 +75,7 @@ public final class FakeQuery implements Query {
      */
     @Override
     public int executeUpdate() {
-        return 0;
+        return query.executeUpdate();
     }
 
     /**
@@ -65,7 +83,7 @@ public final class FakeQuery implements Query {
      */
     @Override
     public Query setMaxResults(final int maxResult) {
-        return this;
+        return query.setMaxResults(maxResult);
     }
 
     /**
@@ -73,7 +91,7 @@ public final class FakeQuery implements Query {
      */
     @Override
     public int getMaxResults() {
-        return 0;
+        return query.getMaxResults();
     }
 
     /**
@@ -81,7 +99,7 @@ public final class FakeQuery implements Query {
      */
     @Override
     public Query setFirstResult(final int startPosition) {
-        return this;
+        return query.setFirstResult(startPosition);
     }
 
     /**
@@ -89,7 +107,7 @@ public final class FakeQuery implements Query {
      */
     @Override
     public int getFirstResult() {
-        return 0;
+        return query.getFirstResult();
     }
 
     /**
@@ -97,7 +115,10 @@ public final class FakeQuery implements Query {
      */
     @Override
     public Query setHint(final String hintName, final Object value) {
-        return this;
+        if (NULLABLE.equals(hintName)) {
+            returnNull = true;
+        }
+        return query.setHint(hintName, value);
     }
 
     /**
@@ -105,7 +126,7 @@ public final class FakeQuery implements Query {
      */
     @Override
     public Map<String, Object> getHints() {
-        return Collections.emptyMap();
+        return query.getHints();
     }
 
     /**
@@ -113,7 +134,7 @@ public final class FakeQuery implements Query {
      */
     @Override
     public <T> Query setParameter(final Parameter<T> param, final T value) {
-        return this;
+        return query.setParameter(param, value);
     }
 
     /**
@@ -121,7 +142,7 @@ public final class FakeQuery implements Query {
      */
     @Override
     public Query setParameter(final Parameter<Calendar> param, final Calendar value, final TemporalType temporalType) {
-        return this;
+        return query.setParameter(param, value, temporalType);
     }
 
     /**
@@ -129,7 +150,7 @@ public final class FakeQuery implements Query {
      */
     @Override
     public Query setParameter(final Parameter<Date> param, final Date value, final TemporalType temporalType) {
-        return this;
+        return query.setParameter(param, value, temporalType);
     }
 
     /**
@@ -137,7 +158,7 @@ public final class FakeQuery implements Query {
      */
     @Override
     public Query setParameter(final String name, final Object value) {
-        return this;
+        return query.setParameter(name, value);
     }
 
     /**
@@ -145,7 +166,7 @@ public final class FakeQuery implements Query {
      */
     @Override
     public Query setParameter(final String name, final Calendar value, final TemporalType temporalType) {
-        return this;
+        return query.setParameter(name, value, temporalType);
     }
 
     /**
@@ -153,7 +174,7 @@ public final class FakeQuery implements Query {
      */
     @Override
     public Query setParameter(final String name, final Date value, final TemporalType temporalType) {
-        return this;
+        return query.setParameter(name, value, temporalType);
     }
 
     /**
@@ -161,7 +182,7 @@ public final class FakeQuery implements Query {
      */
     @Override
     public Query setParameter(final int position, final Object value) {
-        return this;
+        return query.setParameter(position, value);
     }
 
     /**
@@ -169,7 +190,7 @@ public final class FakeQuery implements Query {
      */
     @Override
     public Query setParameter(final int position, final Calendar value, final TemporalType temporalType) {
-        return this;
+        return query.setParameter(position, value, temporalType);
     }
 
     /**
@@ -177,7 +198,7 @@ public final class FakeQuery implements Query {
      */
     @Override
     public Query setParameter(final int position, final Date value, final TemporalType temporalType) {
-        return this;
+        return query.setParameter(position, value, temporalType);
     }
 
     /**
@@ -185,7 +206,7 @@ public final class FakeQuery implements Query {
      */
     @Override
     public Set<Parameter<?>> getParameters() {
-        return Collections.emptySet();
+        return query.getParameters();
     }
 
     /**
@@ -193,7 +214,7 @@ public final class FakeQuery implements Query {
      */
     @Override
     public Parameter<?> getParameter(final String name) {
-        return null;
+        return query.getParameter(name);
     }
 
     /**
@@ -201,7 +222,7 @@ public final class FakeQuery implements Query {
      */
     @Override
     public <T> Parameter<T> getParameter(final String name, final Class<T> type) {
-        return null;
+        return query.getParameter(name, type);
     }
 
     /**
@@ -209,7 +230,7 @@ public final class FakeQuery implements Query {
      */
     @Override
     public Parameter<?> getParameter(final int position) {
-        return null;
+        return query.getParameter(position);
     }
 
     /**
@@ -217,7 +238,7 @@ public final class FakeQuery implements Query {
      */
     @Override
     public <T> Parameter<T> getParameter(final int position, final Class<T> type) {
-        return null;
+        return query.getParameter(position, type);
     }
 
     /**
@@ -225,7 +246,7 @@ public final class FakeQuery implements Query {
      */
     @Override
     public boolean isBound(final Parameter<?> param) {
-        return false;
+        return query.isBound(param);
     }
 
     /**
@@ -233,7 +254,7 @@ public final class FakeQuery implements Query {
      */
     @Override
     public <T> T getParameterValue(final Parameter<T> param) {
-        return null;
+        return query.getParameterValue(param);
     }
 
     /**
@@ -241,7 +262,7 @@ public final class FakeQuery implements Query {
      */
     @Override
     public Object getParameterValue(final String name) {
-        return null;
+        return query.getParameterValue(name);
     }
 
     /**
@@ -249,7 +270,7 @@ public final class FakeQuery implements Query {
      */
     @Override
     public Object getParameterValue(final int position) {
-        return null;
+        return query.getParameterValue(position);
     }
 
     /**
@@ -257,7 +278,7 @@ public final class FakeQuery implements Query {
      */
     @Override
     public Query setFlushMode(final FlushModeType flushMode) {
-        return this;
+        return query.setFlushMode(flushMode);
     }
 
     /**
@@ -265,7 +286,7 @@ public final class FakeQuery implements Query {
      */
     @Override
     public FlushModeType getFlushMode() {
-        return null;
+        return query.getFlushMode();
     }
 
     /**
@@ -273,7 +294,7 @@ public final class FakeQuery implements Query {
      */
     @Override
     public Query setLockMode(final LockModeType lockMode) {
-        return this;
+        return query.setLockMode(lockMode);
     }
 
     /**
@@ -281,7 +302,7 @@ public final class FakeQuery implements Query {
      */
     @Override
     public LockModeType getLockMode() {
-        return null;
+        return query.getLockMode();
     }
 
     /**
@@ -289,6 +310,6 @@ public final class FakeQuery implements Query {
      */
     @Override
     public <T> T unwrap(final Class<T> cls) {
-        return null;
+        return query.unwrap(cls);
     }
 }

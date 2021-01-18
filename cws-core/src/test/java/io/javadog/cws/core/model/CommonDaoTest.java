@@ -24,19 +24,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.core.DatabaseSetup;
 import io.javadog.cws.core.exceptions.CWSException;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import javax.persistence.FlushModeType;
-import javax.persistence.LockModeType;
-import javax.persistence.Parameter;
-import javax.persistence.Query;
-import javax.persistence.TemporalType;
+import io.javadog.cws.core.stubs.FakeEntityManager;
 import io.javadog.cws.core.stubs.FakeQuery;
 import org.junit.jupiter.api.Test;
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
+import java.util.List;
 
 /**
  * @author Kim Jensen
@@ -57,8 +50,11 @@ final class CommonDaoTest extends DatabaseSetup {
 
     @Test
     void testNullResultList() {
-        final Query query = new FakeQuery();
-        final List<Object> found = CommonDao.findList(query);
+        final EntityManager manager = new FakeEntityManager();
+        final String jql = "select v from VersionEntity v order by v.id desc";
+        final Query query = manager.createQuery(jql);
+        query.setHint(FakeQuery.NULLABLE, Boolean.TRUE);
+        final List<?> found = CommonDao.findList(query);
 
         assertNotNull(found);
         assertTrue(found.isEmpty());

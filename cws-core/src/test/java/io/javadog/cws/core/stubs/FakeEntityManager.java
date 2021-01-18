@@ -238,7 +238,7 @@ public final class FakeEntityManager implements EntityManager {
      */
     @Override
     public Query createQuery(final String qlString) {
-        return entityManager.createQuery(qlString);
+        return new FakeQuery(entityManager.createQuery(qlString));
     }
 
     /**
@@ -254,7 +254,7 @@ public final class FakeEntityManager implements EntityManager {
      */
     @Override
     public Query createQuery(final CriteriaUpdate updateQuery) {
-        return entityManager.createQuery(updateQuery);
+        return new FakeQuery(entityManager.createQuery(updateQuery));
     }
 
     /**
@@ -262,7 +262,7 @@ public final class FakeEntityManager implements EntityManager {
      */
     @Override
     public Query createQuery(final CriteriaDelete deleteQuery) {
-        return entityManager.createQuery(deleteQuery);
+        return new FakeQuery(entityManager.createQuery(deleteQuery));
     }
 
     /**
@@ -302,7 +302,7 @@ public final class FakeEntityManager implements EntityManager {
      */
     @Override
     public Query createNativeQuery(final String sqlString, final Class resultClass) {
-        return entityManager.createNativeQuery(sqlString, resultClass);
+        return new FakeQuery(entityManager.createNativeQuery(sqlString, resultClass));
     }
 
     /**
@@ -310,7 +310,7 @@ public final class FakeEntityManager implements EntityManager {
      */
     @Override
     public Query createNativeQuery(final String sqlString, final String resultSetMapping) {
-        return entityManager.createNativeQuery(sqlString, resultSetMapping);
+        return new FakeQuery(entityManager.createNativeQuery(sqlString, resultSetMapping));
     }
 
     /**

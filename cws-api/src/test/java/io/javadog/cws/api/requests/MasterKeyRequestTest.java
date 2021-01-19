@@ -24,6 +24,8 @@ import io.javadog.cws.api.common.Constants;
 import java.io.File;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 /**
  * @author Kim Jensen
@@ -118,51 +120,21 @@ final class MasterKeyRequestTest {
         assertTrue(errors.isEmpty());
     }
 
-    @Test
-    void testEmptyProtocolUrl() {
+    @ValueSource(strings = {
+            "",
+            "protocol:///path/to/file",
+            "/path/to/file",
+            "https://weird.domain.name/not\tAllowed\nPath"
+    })
+    @ParameterizedTest
+    void testProtocolUrl(final String url) {
         final MasterKeyRequest request = new MasterKeyRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
         request.setCredential(convert(Constants.ADMIN_ACCOUNT));
-        request.setUrl("");
+        request.setUrl(url);
 
         final Map<String, String> errors = request.validate();
         assertEquals(1, errors.size());
-        assertEquals("The URL field is invalid - no protocol: ", errors.get(Constants.FIELD_URL));
-    }
-
-    @Test
-    void testInvalidProtocolUrl() {
-        final MasterKeyRequest request = new MasterKeyRequest();
-        request.setAccountName(Constants.ADMIN_ACCOUNT);
-        request.setCredential(convert(Constants.ADMIN_ACCOUNT));
-        request.setUrl("protocol:///path/to/file");
-
-        final Map<String, String> errors = request.validate();
-        assertEquals(1, errors.size());
-        assertEquals("The URL field is invalid - unknown protocol: protocol", errors.get(Constants.FIELD_URL));
-    }
-
-    @Test
-    void testMissingProtocolUrl() {
-        final MasterKeyRequest request = new MasterKeyRequest();
-        request.setAccountName(Constants.ADMIN_ACCOUNT);
-        request.setCredential(convert(Constants.ADMIN_ACCOUNT));
-        request.setUrl("/path/to/file");
-
-        final Map<String, String> errors = request.validate();
-        assertEquals(1, errors.size());
-        assertEquals("The URL field is invalid - no protocol: /path/to/file", errors.get(Constants.FIELD_URL));
-    }
-
-    @Test
-    void testInvalidPathUrl() {
-        final MasterKeyRequest request = new MasterKeyRequest();
-        request.setAccountName(Constants.ADMIN_ACCOUNT);
-        request.setCredential(convert(Constants.ADMIN_ACCOUNT));
-        request.setUrl("https://weird.domain.name/not\tAllowed\nPath");
-
-        final Map<String, String> errors = request.validate();
-        assertEquals(1, errors.size());
-        assertTrue(errors.get(Constants.FIELD_URL).contains("The URL field is invalid - Illegal character in path"));
+        assertTrue(errors.get(Constants.FIELD_URL).startsWith("The URL field is invalid"));
     }
 }

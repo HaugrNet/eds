@@ -28,8 +28,8 @@ Protection & Privacy concerns, such as GDPR.
 
 CWS is written in Java 11 / Jakarta EE 9, with no third-part dependencies, meaning
 it can run on any Host or in any Cloud where a Java EE Container is
-available. The first version is using [PostgreSQL](https://www.postgresql.org/)
-as database, but thanks to the flexibility of Java EE, it is possible to use any
+available. Currently, only the [PostgreSQL](https://www.postgresql.org/) database
+is supported, but thanks to the flexibility of Java EE, it is possible to use any
 database desired. Testing of CWS has been done using both
 [WildFly](http://www.wildfly.org/) and [Payara](https://payara.fish/).
 

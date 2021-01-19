@@ -18,7 +18,6 @@ package io.javadog.cws.core;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.javadog.cws.api.common.Constants;
@@ -30,9 +29,7 @@ import io.javadog.cws.api.responses.AuthenticateResponse;
 import io.javadog.cws.api.responses.FetchCircleResponse;
 import io.javadog.cws.api.responses.SettingResponse;
 import io.javadog.cws.core.enums.StandardSetting;
-import io.javadog.cws.core.exceptions.CWSException;
 import io.javadog.cws.core.model.Settings;
-import io.javadog.cws.core.services.SettingService;
 import io.javadog.cws.core.setup.DatabaseSetup;
 import org.junit.jupiter.api.Test;
 
@@ -52,16 +49,26 @@ final class ManagementBeanAuthenticatedTest extends DatabaseSetup {
     @Test
     void testRequestWhenNotReady() {
         final Settings mySettings = newSettings();
+        final ManagementBean bean = prepareManagementBean(mySettings);
         mySettings.set(StandardSetting.IS_READY.getKey(), "false");
 
-        final SettingService service = new SettingService(mySettings, entityManager);
         final SettingRequest request = new SettingRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);
         request.setCredential(crypto.stringToBytes("Invalid Credentials"));
 
-        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
-        assertEquals(ReturnCode.DATABASE_ERROR, cause.getReturnCode());
-        assertEquals("The Database is invalid, CWS neither can nor will work correctly until resolved.", cause.getMessage());
+        final SettingResponse response = bean.settings(request);
+        assertEquals(ReturnCode.DATABASE_ERROR.getCode(), response.getReturnCode());
+        assertEquals("The Database is invalid, CWS neither can nor will work correctly until resolved.", response.getReturnMessage());
+    }
+
+    @Test
+    void testAuthenticateNullRequest() {
+        final ManagementBean bean = prepareManagementBean();
+        final Authentication request = null;
+
+        final AuthenticateResponse response = bean.authenticated(request);
+        assertEquals(ReturnCode.VERIFICATION_WARNING.getCode(), response.getReturnCode());
+        assertEquals("Cannot Process a NULL Object.", response.getReturnMessage());
     }
 
     @Test

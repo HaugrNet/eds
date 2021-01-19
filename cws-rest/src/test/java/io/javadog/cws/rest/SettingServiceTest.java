@@ -18,7 +18,9 @@ package io.javadog.cws.rest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
+import io.javadog.cws.api.requests.InventoryRequest;
 import io.javadog.cws.api.requests.SettingRequest;
 import javax.ws.rs.core.Response;
 import org.junit.jupiter.api.Test;
@@ -30,18 +32,18 @@ import org.junit.jupiter.api.Test;
 final class SettingServiceTest extends BeanSetup {
 
     @Test
-    void testSettings() {
+    void testSetting() {
         final SettingService service = prepareSettingService(settings, entityManager);
-        final SettingRequest request = new SettingRequest();
+        final SettingRequest request = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
 
         final Response response = service.settings(request);
         assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
     }
 
     @Test
-    void testFlawedSettings() {
+    void testFlawedSetting() {
         final SettingService service = prepareSettingService();
-        final SettingRequest request = new SettingRequest();
+        final SettingRequest request = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
 
         final Response response = service.settings(request);
         assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());

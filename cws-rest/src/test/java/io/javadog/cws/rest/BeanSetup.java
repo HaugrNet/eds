@@ -144,7 +144,7 @@ class BeanSetup extends DatabaseSetup {
      * @return New Service instance with given resources injected
      */
     protected static SettingService prepareSettingService(final Object... objects) {
-        return prepareService(SettingService.class, ShareBean.class, objects);
+        return prepareService(SettingService.class, ManagementBean.class, objects);
     }
 
     /**

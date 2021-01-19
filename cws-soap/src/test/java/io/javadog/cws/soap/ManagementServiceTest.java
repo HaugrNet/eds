@@ -17,19 +17,18 @@
 package io.javadog.cws.soap;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import io.javadog.cws.api.common.Action;
 import io.javadog.cws.api.common.Constants;
-import io.javadog.cws.api.common.MemberRole;
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.common.TrustLevel;
 import io.javadog.cws.api.requests.Authentication;
 import io.javadog.cws.api.requests.FetchCircleRequest;
 import io.javadog.cws.api.requests.FetchMemberRequest;
 import io.javadog.cws.api.requests.FetchTrusteeRequest;
+import io.javadog.cws.api.requests.InventoryRequest;
 import io.javadog.cws.api.requests.MasterKeyRequest;
 import io.javadog.cws.api.requests.ProcessCircleRequest;
 import io.javadog.cws.api.requests.ProcessMemberRequest;
@@ -40,6 +39,7 @@ import io.javadog.cws.api.responses.CwsResponse;
 import io.javadog.cws.api.responses.FetchCircleResponse;
 import io.javadog.cws.api.responses.FetchMemberResponse;
 import io.javadog.cws.api.responses.FetchTrusteeResponse;
+import io.javadog.cws.api.responses.InventoryResponse;
 import io.javadog.cws.api.responses.MasterKeyResponse;
 import io.javadog.cws.api.responses.ProcessCircleResponse;
 import io.javadog.cws.api.responses.ProcessMemberResponse;
@@ -48,11 +48,11 @@ import io.javadog.cws.api.responses.SanityResponse;
 import io.javadog.cws.api.responses.SettingResponse;
 import io.javadog.cws.api.responses.VersionResponse;
 import io.javadog.cws.core.enums.StandardSetting;
+import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 import java.util.Properties;
-import org.junit.jupiter.api.Test;
 
 /**
  * @author Kim Jensen
@@ -233,6 +233,23 @@ final class ManagementServiceTest extends BeanSetup {
     }
 
     @Test
+    void testInventory() {
+        final ManagementService management = prepareManagementService(settings, entityManager);
+        final InventoryRequest request = new InventoryRequest();
+
+        final InventoryResponse response = management.inventory(request);
+        assertEquals(ReturnCode.VERIFICATION_WARNING.getCode(), response.getReturnCode());
+    }
+
+    @Test
+    void testFlawedInventory() {
+        final ManagementService management = prepareManagementService();
+
+        final InventoryResponse response = management.inventory(null);
+        assertEquals(ReturnCode.ERROR.getCode(), response.getReturnCode());
+    }
+
+    @Test
     void testAuthenticated() {
         final ManagementService management = prepareManagementService(settings, entityManager);
         final Authentication request = prepareRequest(Authentication.class, Constants.ADMIN_ACCOUNT);
@@ -272,33 +289,14 @@ final class ManagementServiceTest extends BeanSetup {
         final FetchMemberRequest request = prepareRequest(FetchMemberRequest.class, MEMBER_1);
 
         final FetchMemberResponse response = management.fetchMembers(request);
-        assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
         assertEquals(6, response.getMembers().size());
         assertTrue(response.getCircles().isEmpty());
         assertEquals(Constants.ADMIN_ACCOUNT, response.getMembers().get(0).getAccountName());
-        assertEquals(ADMIN_ID, response.getMembers().get(0).getMemberId());
-        assertNull(response.getMembers().get(0).getPublicKey());
-        assertEquals(MemberRole.ADMIN, response.getMembers().get(0).getMemberRole());
         assertEquals(MEMBER_1, response.getMembers().get(1).getAccountName());
-        assertEquals(MEMBER_1_ID, response.getMembers().get(1).getMemberId());
-        assertNull(response.getMembers().get(1).getPublicKey());
-        assertEquals(MemberRole.STANDARD, response.getMembers().get(1).getMemberRole());
         assertEquals(MEMBER_2, response.getMembers().get(2).getAccountName());
-        assertEquals(MEMBER_2_ID, response.getMembers().get(2).getMemberId());
-        assertNull(response.getMembers().get(2).getPublicKey());
-        assertEquals(MemberRole.STANDARD, response.getMembers().get(2).getMemberRole());
         assertEquals(MEMBER_3, response.getMembers().get(3).getAccountName());
-        assertEquals(MEMBER_3_ID, response.getMembers().get(3).getMemberId());
-        assertNull(response.getMembers().get(3).getPublicKey());
-        assertEquals(MemberRole.STANDARD, response.getMembers().get(3).getMemberRole());
         assertEquals(MEMBER_4, response.getMembers().get(4).getAccountName());
-        assertEquals(MEMBER_4_ID, response.getMembers().get(4).getMemberId());
-        assertNull(response.getMembers().get(4).getPublicKey());
-        assertEquals(MemberRole.STANDARD, response.getMembers().get(4).getMemberRole());
         assertEquals(MEMBER_5, response.getMembers().get(5).getAccountName());
-        assertEquals(MEMBER_5_ID, response.getMembers().get(5).getMemberId());
-        assertNull(response.getMembers().get(5).getPublicKey());
-        assertEquals(MemberRole.STANDARD, response.getMembers().get(5).getMemberRole());
     }
 
     @Test

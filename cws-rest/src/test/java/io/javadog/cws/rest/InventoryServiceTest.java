@@ -40,7 +40,7 @@ final class InventoryServiceTest extends BeanSetup {
     }
 
     @Test
-    void testFlawedMasterKey() {
+    void testFlawedInventory() {
         final InventoryService service = prepareInventoryService();
         final InventoryRequest request = prepareRequest(InventoryRequest.class, Constants.ADMIN_ACCOUNT);
 

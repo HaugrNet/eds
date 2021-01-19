@@ -14,14 +14,13 @@
  * this program; If not, you can download a copy of the License
  * here: https://www.apache.org/licenses/
  */
-package io.javadog.cws.core.services;
+package io.javadog.cws.core;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.javadog.cws.api.common.Action;
@@ -29,22 +28,15 @@ import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.dtos.Metadata;
 import io.javadog.cws.api.requests.FetchDataRequest;
-import io.javadog.cws.api.requests.ProcessCircleRequest;
 import io.javadog.cws.api.requests.ProcessDataRequest;
-import io.javadog.cws.api.requests.ProcessMemberRequest;
 import io.javadog.cws.api.responses.FetchDataResponse;
-import io.javadog.cws.api.responses.ProcessCircleResponse;
 import io.javadog.cws.api.responses.ProcessDataResponse;
-import io.javadog.cws.api.responses.ProcessMemberResponse;
-import io.javadog.cws.core.setup.DatabaseSetup;
 import io.javadog.cws.core.enums.SanityStatus;
-import io.javadog.cws.core.exceptions.CWSException;
-
+import io.javadog.cws.core.setup.DatabaseSetup;
+import org.junit.jupiter.api.Test;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.UUID;
-
-import org.junit.jupiter.api.Test;
 
 /**
  * <p>Common test class for the Process & Fetch Data Services.</p>
@@ -52,36 +44,35 @@ import org.junit.jupiter.api.Test;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-final class DataServiceTest extends DatabaseSetup {
+final class ShareBeanDataTest extends DatabaseSetup {
 
     @Test
     void testEmptyProcessRequest() {
-        final ProcessDataService service = new ProcessDataService(settings, entityManager);
+        final ShareBean bean = prepareShareBean();
         final ProcessDataRequest request = new ProcessDataRequest();
 
-        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
-        assertEquals(ReturnCode.VERIFICATION_WARNING, cause.getReturnCode());
+        final ProcessDataResponse response = bean.processData(request);
+        assertEquals(ReturnCode.VERIFICATION_WARNING.getCode(), response.getReturnCode());
         assertEquals("Request Object contained errors:" +
                 "\nKey: credential, Error: The Session (Credential) is missing." +
-                "\nKey: action, Error: No action has been provided.", cause.getMessage());
+                "\nKey: action, Error: No action has been provided.", response.getReturnMessage());
     }
 
     @Test
     void testEmptyFetchRequest() {
-        final FetchDataService service = new FetchDataService(settings, entityManager);
+        final ShareBean bean = prepareShareBean();
         final FetchDataRequest request = new FetchDataRequest();
 
-        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
-        assertEquals(ReturnCode.VERIFICATION_WARNING, cause.getReturnCode());
+        final FetchDataResponse response = bean.fetchData(request);
+        assertEquals(ReturnCode.VERIFICATION_WARNING.getCode(), response.getReturnCode());
         assertEquals("Request Object contained errors:" +
                 "\nKey: credential, Error: The Session (Credential) is missing." +
-                "\nKey: circle & data Id, Error: Either a Circle Id, Data Id, or Data Name must be provided.", cause.getMessage());
+                "\nKey: circle & data Id, Error: Either a Circle Id, Data Id, or Data Name must be provided.", response.getReturnMessage());
     }
 
     @Test
     void testSavingAndReadingData() {
-        final ProcessDataService service = new ProcessDataService(settings, entityManager);
-        final FetchDataService dataService = new FetchDataService(settings, entityManager);
+        final ShareBean bean = prepareShareBean();
 
         // 1 MB large Data
         final ProcessDataRequest saveRequest = prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "My Data", 1048576);
@@ -90,59 +81,57 @@ final class DataServiceTest extends DatabaseSetup {
         // zeroes. To ensure that the check works, a String representing the
         // byte array is stored prior.
         final String toSave = crypto.bytesToString(saveRequest.getData());
-        final ProcessDataResponse saveResponse = service.perform(saveRequest);
+        final ProcessDataResponse saveResponse = bean.processData(saveRequest);
         assertEquals(ReturnCode.SUCCESS.getCode(), saveResponse.getReturnCode());
 
         final FetchDataRequest fetchRequest = prepareRequest(FetchDataRequest.class, MEMBER_1);
         fetchRequest.setDataId(saveResponse.getDataId());
-        final FetchDataResponse fetchResponse = dataService.perform(fetchRequest);
+        final FetchDataResponse fetchResponse = bean.fetchData(fetchRequest);
         assertEquals(ReturnCode.SUCCESS.getCode(), fetchResponse.getReturnCode());
         assertEquals(toSave, crypto.bytesToString(fetchResponse.getData()));
     }
 
     @Test
     void testSavingAndReadingDataByName() {
-        final ProcessDataService service = new ProcessDataService(settings, entityManager);
-        final FetchDataService dataService = new FetchDataService(settings, entityManager);
+        final ShareBean bean = prepareShareBean();
         final String name = "My Data";
 
         final ProcessDataRequest saveRequest = prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, name, 1048576);
         final String toSave = crypto.bytesToString(saveRequest.getData());
-        final ProcessDataResponse saveResponse = service.perform(saveRequest);
+        final ProcessDataResponse saveResponse = bean.processData(saveRequest);
         assertEquals(ReturnCode.SUCCESS.getCode(), saveResponse.getReturnCode());
 
         final FetchDataRequest fetchRequest = prepareRequest(FetchDataRequest.class, MEMBER_1);
         fetchRequest.setDataName(name);
-        final FetchDataResponse fetchResponse = dataService.perform(fetchRequest);
+        final FetchDataResponse fetchResponse = bean.fetchData(fetchRequest);
         assertEquals(ReturnCode.SUCCESS.getCode(), fetchResponse.getReturnCode());
         assertEquals(toSave, crypto.bytesToString(fetchResponse.getData()));
     }
 
     @Test
     void testSaveAndUpdateData() {
-        final ProcessDataService service = new ProcessDataService(settings, entityManager);
-        final FetchDataService dataService = new FetchDataService(settings, entityManager);
+        final ShareBean bean = prepareShareBean();
 
         // 1 MB large Data
         final ProcessDataRequest saveRequest = prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "My Data", 1048576);
-        final ProcessDataResponse saveResponse = service.perform(saveRequest);
+        final ProcessDataResponse saveResponse = bean.processData(saveRequest);
         assertEquals(ReturnCode.SUCCESS.getCode(), saveResponse.getReturnCode());
 
         final FetchDataRequest fetchRequest1 = prepareRequest(FetchDataRequest.class, MEMBER_1);
         fetchRequest1.setDataId(saveResponse.getDataId());
-        final FetchDataResponse fetchResponse1 = dataService.perform(fetchRequest1);
+        final FetchDataResponse fetchResponse1 = bean.fetchData(fetchRequest1);
         assertEquals(ReturnCode.SUCCESS.getCode(), fetchResponse1.getReturnCode());
 
         final ProcessDataRequest updateRequest = prepareUpdateRequest(MEMBER_1, saveResponse.getDataId());
         updateRequest.setDataName("New Name");
         updateRequest.setData(generateData(1048576));
-        final ProcessDataResponse updateResponse = service.perform(updateRequest);
+        final ProcessDataResponse updateResponse = bean.processData(updateRequest);
         assertEquals(ReturnCode.SUCCESS.getCode(), updateResponse.getReturnCode());
 
         assertEquals(ReturnCode.SUCCESS.getCode(), saveResponse.getReturnCode());
         final FetchDataRequest fetchRequest2 = prepareRequest(FetchDataRequest.class, MEMBER_1);
         fetchRequest2.setDataId(saveResponse.getDataId());
-        final FetchDataResponse fetchResponse2 = dataService.perform(fetchRequest2);
+        final FetchDataResponse fetchResponse2 = bean.fetchData(fetchRequest2);
         assertEquals(ReturnCode.SUCCESS.getCode(), fetchResponse2.getReturnCode());
         assertEquals(fetchResponse2.getMetadata().get(0).getDataId(), fetchResponse1.getMetadata().get(0).getDataId());
         assertEquals("My Data", fetchResponse1.getMetadata().get(0).getDataName());
@@ -151,7 +140,7 @@ final class DataServiceTest extends DatabaseSetup {
 
     @Test
     void testSaveAndUpdateSimpleData() {
-        final ProcessDataService saveService = new ProcessDataService(settings, entityManager);
+        final ShareBean bean = prepareShareBean();
         final String dataName = "status";
         final String initContent = "NEW";
         final String updateContent = "ACCEPTED";
@@ -161,7 +150,7 @@ final class DataServiceTest extends DatabaseSetup {
         saveRequest.setCircleId(CIRCLE_1_ID);
         saveRequest.setDataName(dataName);
         saveRequest.setData(initContent.getBytes(StandardCharsets.UTF_8));
-        final ProcessDataResponse saveResponse = saveService.perform(saveRequest);
+        final ProcessDataResponse saveResponse = bean.processData(saveRequest);
         assertEquals(ReturnCode.SUCCESS.getCode(), saveResponse.getReturnCode());
 
         final ProcessDataRequest updateRequest = prepareRequest(ProcessDataRequest.class, MEMBER_1);
@@ -170,13 +159,12 @@ final class DataServiceTest extends DatabaseSetup {
         updateRequest.setDataId(saveResponse.getDataId());
         updateRequest.setDataName(dataName);
         updateRequest.setData(updateContent.getBytes(StandardCharsets.UTF_8));
-        final ProcessDataResponse updateResponse = saveService.perform(updateRequest);
+        final ProcessDataResponse updateResponse = bean.processData(updateRequest);
         assertEquals(ReturnCode.SUCCESS.getCode(), updateResponse.getReturnCode());
 
-        final FetchDataService readService = new FetchDataService(settings, entityManager);
         final FetchDataRequest fetchRequest = prepareRequest(FetchDataRequest.class, MEMBER_1);
         fetchRequest.setDataId(saveResponse.getDataId());
-        final FetchDataResponse fetchResponse = readService.perform(fetchRequest);
+        final FetchDataResponse fetchResponse = bean.fetchData(fetchRequest);
         assertEquals(ReturnCode.SUCCESS.getCode(), fetchResponse.getReturnCode());
         assertEquals(dataName, fetchResponse.getMetadata().get(0).getDataName());
         assertEquals(updateContent, new String(fetchResponse.getData(), StandardCharsets.UTF_8));
@@ -184,22 +172,21 @@ final class DataServiceTest extends DatabaseSetup {
 
     @Test
     void testAddingAndFetchingData() {
-        final ProcessDataService processService = new ProcessDataService(settings, entityManager);
-        final FetchDataService fetchService = new FetchDataService(settings, entityManager);
+        final ShareBean bean = prepareShareBean();
 
         final FetchDataRequest fetchRequest = prepareRequest(FetchDataRequest.class, MEMBER_1);
         fetchRequest.setCircleId(CIRCLE_1_ID);
-        final FetchDataResponse emptyResponse = fetchService.perform(fetchRequest);
+        final FetchDataResponse emptyResponse = bean.fetchData(fetchRequest);
         assertTrue(emptyResponse.isOk());
         assertEquals(0L, emptyResponse.getRecords());
 
         // Add some data...
-        assertTrue(processService.perform(prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "My Data 1", 1048576)).isOk());
-        assertTrue(processService.perform(prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "My Data 2", 1048576)).isOk());
-        assertTrue(processService.perform(prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "My Data 3", 1048576)).isOk());
+        assertTrue(bean.processData(prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "My Data 1", 1048576)).isOk());
+        assertTrue(bean.processData(prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "My Data 2", 1048576)).isOk());
+        assertTrue(bean.processData(prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "My Data 3", 1048576)).isOk());
 
         fetchRequest.setCredential(crypto.stringToBytes(MEMBER_1));
-        final FetchDataResponse fullResponse = fetchService.perform(fetchRequest);
+        final FetchDataResponse fullResponse = bean.fetchData(fetchRequest);
         assertTrue(fullResponse.isOk());
         assertEquals(3L, fullResponse.getRecords());
     }
@@ -207,177 +194,157 @@ final class DataServiceTest extends DatabaseSetup {
     @Test
     void testAddEmptyData() {
         final String dataName = "The Data";
-        final ProcessDataService service = new ProcessDataService(settings, entityManager);
+        final ShareBean bean = prepareShareBean();
         final ProcessDataRequest request = prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, dataName, 0);
 
-        final ProcessDataResponse response = service.perform(request);
+        final ProcessDataResponse response = bean.processData(request);
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
         assertEquals("The Data Object '" + dataName + "' was successfully added to the Circle '" + CIRCLE_1 + "'.", response.getReturnMessage());
 
-        final FetchDataService readService = new FetchDataService(settings, entityManager);
         final FetchDataRequest readRequest = prepareReadRequest(MEMBER_1, CIRCLE_1_ID, response.getDataId());
-        final FetchDataResponse readResponse = readService.perform(readRequest);
+        final FetchDataResponse readResponse = bean.fetchData(readRequest);
         assertTrue(readResponse.isOk());
     }
 
     @Test
-    void testCreateCircleAsNewMember() {
-        final String accountName = "accountName";
-        final ProcessMemberRequest memberRequest = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
-        memberRequest.setNewAccountName(accountName);
-        memberRequest.setNewCredential(crypto.stringToBytes(accountName));
-        memberRequest.setAction(Action.CREATE);
-        final ProcessMemberService memberService = new ProcessMemberService(settings, entityManager);
-        final ProcessMemberResponse memberResponse = memberService.perform(memberRequest);
-        assertTrue(memberResponse.isOk());
-
-        final ProcessCircleRequest circleRequest = prepareRequest(ProcessCircleRequest.class, accountName);
-        circleRequest.setCircleName("circleName");
-        circleRequest.setAction(Action.CREATE);
-        final ProcessCircleService circleService = new ProcessCircleService(settings, entityManager);
-        final ProcessCircleResponse circleResponse = circleService.perform(circleRequest);
-        assertTrue(circleResponse.isOk());
-    }
-
-    @Test
     void testAddDataWithInvalidChecksum() {
-        final ProcessDataService service = new ProcessDataService(settings, entityManager);
+        final ShareBean bean = prepareShareBean();
         final ProcessDataRequest request = prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "The Data", 524288);
 
-        final ProcessDataResponse response = service.perform(request);
+        final ProcessDataResponse response = bean.processData(request);
         assertTrue(response.isOk());
         falsifyChecksum(response, new Date(), SanityStatus.FAILED);
 
         // Now to the actual test - reading the data with invalid checksum
-        final FetchDataService readService = new FetchDataService(settings, entityManager);
         final FetchDataRequest readRequest = prepareReadRequest(MEMBER_1, CIRCLE_1_ID, response.getDataId());
-        final FetchDataResponse readResponse = readService.perform(readRequest);
+        final FetchDataResponse readResponse = bean.fetchData(readRequest);
         assertEquals(ReturnCode.INTEGRITY_ERROR.getCode(), readResponse.getReturnCode());
         assertEquals("The Encrypted Data Checksum is invalid, the data appears to have been corrupted.", readResponse.getReturnMessage());
     }
 
     @Test
     void testAddEmptyAndUpdateData() {
-        final ProcessDataService service = new ProcessDataService(settings, entityManager);
+        final ShareBean bean = prepareShareBean();
         final ProcessDataRequest saveRequest = prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "The Data", 0);
 
-        final ProcessDataResponse saveResponse = service.perform(saveRequest);
+        final ProcessDataResponse saveResponse = bean.processData(saveRequest);
         assertEquals(ReturnCode.SUCCESS.getCode(), saveResponse.getReturnCode());
 
         final ProcessDataRequest updateRequest = prepareUpdateRequest(MEMBER_1, saveResponse.getDataId());
         updateRequest.setData(generateData(1048576));
-        service.perform(updateRequest);
+        final ProcessDataResponse updateResponse = bean.processData(updateRequest);
+        assertEquals(ReturnCode.SUCCESS.getCode(), updateResponse.getReturnCode());
     }
 
     @Test
     void testAddAndMoveToInvalidFolder() {
-        final ProcessDataService service = new ProcessDataService(settings, entityManager);
+        final ShareBean bean = prepareShareBean();
         final ProcessDataRequest saveRequest = prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "The Data", 1048576);
 
-        final ProcessDataResponse saveResponse = service.perform(saveRequest);
+        final ProcessDataResponse saveResponse = bean.processData(saveRequest);
         assertEquals(ReturnCode.SUCCESS.getCode(), saveResponse.getReturnCode());
 
         final ProcessDataRequest updateRequest = prepareUpdateRequest(MEMBER_1, saveResponse.getDataId());
         updateRequest.setFolderId(UUID.randomUUID().toString());
 
-        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(updateRequest));
-        assertEquals(ReturnCode.INTEGRITY_WARNING, cause.getReturnCode());
-        assertEquals("No existing Folder could be found.", cause.getMessage());
+        final ProcessDataResponse response = bean.processData(updateRequest);
+        assertEquals(ReturnCode.INTEGRITY_WARNING.getCode(), response.getReturnCode());
+        assertEquals("No existing Folder could be found.", response.getReturnMessage());
     }
 
     @Test
     void testAddDataWithoutPermission() {
-        final ProcessDataService service = new ProcessDataService(settings, entityManager);
+        final ShareBean bean = prepareShareBean();
         final ProcessDataRequest request = prepareAddDataRequest(MEMBER_5, CIRCLE_3_ID, "The Data", 1048576);
 
-        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
-        assertEquals(ReturnCode.AUTHORIZATION_WARNING, cause.getReturnCode());
-        assertEquals("The requesting Account is not permitted to Process Data.", cause.getMessage());
+        final ProcessDataResponse response = bean.processData(request);
+        assertEquals(ReturnCode.AUTHORIZATION_WARNING.getCode(), response.getReturnCode());
+        assertEquals("The requesting Account is not permitted to Process Data.", response.getReturnMessage());
     }
 
     @Test
     void testUpdatingDataWithoutPermission() {
-        final ProcessDataService service = new ProcessDataService(settings, entityManager);
+        final ShareBean bean = prepareShareBean();
         final ProcessDataRequest saveRequest = prepareAddDataRequest(MEMBER_2, CIRCLE_2_ID, "The Data", 1048576);
-        final ProcessDataResponse saveResponse = service.perform(saveRequest);
+        final ProcessDataResponse saveResponse = bean.processData(saveRequest);
         assertTrue(saveResponse.isOk());
 
         final ProcessDataRequest updateRequest = prepareUpdateRequest(MEMBER_3, saveResponse.getDataId());
         updateRequest.setDataName("New Name");
 
-        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(updateRequest));
-        assertEquals(ReturnCode.AUTHORIZATION_WARNING, cause.getReturnCode());
-        assertEquals("The current Account is not allowed to perform the given action.", cause.getMessage());
+        final ProcessDataResponse response = bean.processData(updateRequest);
+        assertEquals(ReturnCode.AUTHORIZATION_WARNING.getCode(), response.getReturnCode());
+        assertEquals("The current Account is not allowed to perform the given action.", response.getReturnMessage());
     }
 
     @Test
     void testAddDataWithInvalidDataType() {
-        final ProcessDataService service = new ProcessDataService(settings, entityManager);
+        final ShareBean bean = prepareShareBean();
         final ProcessDataRequest request = prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "The Data", 512);
         request.setTypeName("Weird");
 
-        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
-        assertEquals(ReturnCode.INTEGRITY_WARNING, cause.getReturnCode());
-        assertEquals("Cannot find a matching DataType for the Object.", cause.getMessage());
+        final ProcessDataResponse response = bean.processData(request);
+        assertEquals(ReturnCode.INTEGRITY_WARNING.getCode(), response.getReturnCode());
+        assertEquals("Cannot find a matching DataType for the Object.", response.getReturnMessage());
     }
 
     @Test
     void testDeletingDataWithoutPermission() {
-        final ProcessDataService service = new ProcessDataService(settings, entityManager);
+        final ShareBean bean = prepareShareBean();
         final ProcessDataRequest saveRequest = prepareAddDataRequest(MEMBER_2, CIRCLE_2_ID, "The Data", 1048576);
-        final ProcessDataResponse saveResponse = service.perform(saveRequest);
+        final ProcessDataResponse saveResponse = bean.processData(saveRequest);
 
         final ProcessDataRequest updateRequest = prepareDeleteRequest(MEMBER_3, saveResponse.getDataId());
-        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(updateRequest));
-        assertEquals(ReturnCode.AUTHORIZATION_WARNING, cause.getReturnCode());
-        assertEquals("The current Account is not allowed to perform the given action.", cause.getMessage());
+        final ProcessDataResponse response = bean.processData(updateRequest);
+        assertEquals(ReturnCode.AUTHORIZATION_WARNING.getCode(), response.getReturnCode());
+        assertEquals("The current Account is not allowed to perform the given action.", response.getReturnMessage());
     }
 
     @Test
     void testFetchingInvalidDataId() {
-        final FetchDataService service = new FetchDataService(settings, entityManager);
+        final ShareBean bean = prepareShareBean();
         final FetchDataRequest request = prepareRequest(FetchDataRequest.class, MEMBER_4);
         request.setCircleId(CIRCLE_3_ID);
         request.setDataId(UUID.randomUUID().toString());
 
-        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
-        assertEquals(ReturnCode.IDENTIFICATION_WARNING, cause.getReturnCode());
-        assertEquals("No information could be found for the given Id.", cause.getMessage());
+        final FetchDataResponse response = bean.fetchData(request);
+        assertEquals(ReturnCode.IDENTIFICATION_WARNING.getCode(), response.getReturnCode());
+        assertEquals("No information could be found for the given Id.", response.getReturnMessage());
     }
 
     @Test
     void testAddDataToUnknownFolder() {
+        final ShareBean bean = prepareShareBean();
         final String folderId = UUID.randomUUID().toString();
 
-        final ProcessDataService service = new ProcessDataService(settings, entityManager);
         final ProcessDataRequest request = prepareAddDataRequest(MEMBER_4, CIRCLE_3_ID, "Data File", 512);
         request.setFolderId(folderId);
 
-        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
-        assertEquals(ReturnCode.IDENTIFICATION_WARNING, cause.getReturnCode());
-        assertEquals("Provided FolderId '" + folderId + "' is not a folder.", cause.getMessage());
+        final ProcessDataResponse response = bean.processData(request);
+        assertEquals(ReturnCode.IDENTIFICATION_WARNING.getCode(), response.getReturnCode());
+        assertEquals("Provided FolderId '" + folderId + "' is not a folder.", response.getReturnMessage());
     }
 
     @Test
     void testAddDataToInvalidFolder() {
-        final ProcessDataService service = new ProcessDataService(settings, entityManager);
+        final ShareBean bean = prepareShareBean();
         final ProcessDataRequest request = prepareAddDataRequest(MEMBER_4, CIRCLE_3_ID, "Data File", 512);
-        final ProcessDataResponse response = service.perform(request);
-        assertTrue(response.isOk());
-        final String folderId = response.getDataId();
+        final ProcessDataResponse saveResponse = bean.processData(request);
+        assertTrue(saveResponse.isOk());
+        final String folderId = saveResponse.getDataId();
 
         // We're taking the previously generated Data Id and uses that as folder.
         request.setCredential(crypto.stringToBytes(MEMBER_4));
         request.setFolderId(folderId);
 
-        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
-        assertEquals(ReturnCode.IDENTIFICATION_WARNING, cause.getReturnCode());
-        assertEquals("Provided FolderId '" + folderId + "' is not a folder.", cause.getMessage());
+        final ProcessDataResponse response = bean.processData(request);
+        assertEquals(ReturnCode.IDENTIFICATION_WARNING.getCode(), response.getReturnCode());
+        assertEquals("Provided FolderId '" + folderId + "' is not a folder.", response.getReturnMessage());
     }
 
     @Test
     void testUpdateNotExistingData() {
-        final ProcessDataService service = new ProcessDataService(settings, entityManager);
+        final ShareBean bean = prepareShareBean();
         final ProcessDataRequest request = prepareRequest(ProcessDataRequest.class, MEMBER_4);
         request.setAction(Action.UPDATE);
         request.setCircleId(CIRCLE_2_ID);
@@ -385,73 +352,77 @@ final class DataServiceTest extends DatabaseSetup {
         request.setDataName("New Name for our not existing Data");
         request.setData(generateData(512));
 
-        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
-        assertEquals(ReturnCode.IDENTIFICATION_WARNING, cause.getReturnCode());
-        assertEquals("The Data Object could not be found.", cause.getMessage());
+        final ProcessDataResponse response = bean.processData(request);
+        assertEquals(ReturnCode.IDENTIFICATION_WARNING.getCode(), response.getReturnCode());
+        assertEquals("The Data Object could not be found.", response.getReturnMessage());
     }
 
     @Test
     void testSaveAndDeleteData() {
+        final ShareBean bean = prepareShareBean();
         final String name = "The Data";
-        final ProcessDataService service = new ProcessDataService(settings, entityManager);
+
         final ProcessDataRequest saveRequest = prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, name, 524288);
-        final ProcessDataResponse saveResponse = service.perform(saveRequest);
+        final ProcessDataResponse saveResponse = bean.processData(saveRequest);
         assertEquals(ReturnCode.SUCCESS.getCode(), saveResponse.getReturnCode());
         assertEquals("The Data Object '" + name + "' was successfully added to the Circle '" + CIRCLE_1 + "'.", saveResponse.getReturnMessage());
 
         final ProcessDataRequest deleteRequest = prepareDeleteRequest(MEMBER_1, saveResponse.getDataId());
-        final ProcessDataResponse deleteResponse = service.perform(deleteRequest);
+        final ProcessDataResponse deleteResponse = bean.processData(deleteRequest);
         assertEquals(ReturnCode.SUCCESS.getCode(), deleteResponse.getReturnCode());
         assertEquals("The Data Object '" + name + "' has been removed from the Circle '" + CIRCLE_1 + "'.", deleteResponse.getReturnMessage());
     }
 
     @Test
     void testSaveAndDeleteDataWithoutPermission() {
+        final ShareBean bean = prepareShareBean();
         final String name = "Known Data";
-        final ProcessDataService service = new ProcessDataService(settings, entityManager);
+
         final ProcessDataRequest saveRequest = prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, name, 524288);
-        final ProcessDataResponse saveResponse = service.perform(saveRequest);
+        final ProcessDataResponse saveResponse = bean.processData(saveRequest);
         assertEquals(ReturnCode.SUCCESS.getCode(), saveResponse.getReturnCode());
         assertEquals("The Data Object '" + name + "' was successfully added to the Circle '" + CIRCLE_1 + "'.", saveResponse.getReturnMessage());
 
         final ProcessDataRequest deleteRequest = prepareDeleteRequest(MEMBER_3, saveResponse.getDataId());
-        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(deleteRequest));
-        assertEquals(ReturnCode.AUTHORIZATION_WARNING, cause.getReturnCode());
-        assertEquals("The current Account is not allowed to perform the given action.", cause.getMessage());
+        final ProcessDataResponse response = bean.processData(deleteRequest);
+        assertEquals(ReturnCode.AUTHORIZATION_WARNING.getCode(), response.getReturnCode());
+        assertEquals("The current Account is not allowed to perform the given action.", response.getReturnMessage());
     }
 
     @Test
     void testSaveAndDeleteDataWithoutAccess() {
+        final ShareBean bean = prepareShareBean();
         final String dataName = "More Data";
-        final ProcessDataService service = new ProcessDataService(settings, entityManager);
+
         final ProcessDataRequest saveRequest = prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, dataName, 524288);
-        final ProcessDataResponse saveResponse = service.perform(saveRequest);
+        final ProcessDataResponse saveResponse = bean.processData(saveRequest);
         assertEquals(ReturnCode.SUCCESS.getCode(), saveResponse.getReturnCode());
         assertEquals("The Data Object '" + dataName + "' was successfully added to the Circle '" + CIRCLE_1 + "'.", saveResponse.getReturnMessage());
 
         final ProcessDataRequest deleteRequest = prepareDeleteRequest(MEMBER_4, saveResponse.getDataId());
-        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(deleteRequest));
-        assertEquals(ReturnCode.IDENTIFICATION_WARNING, cause.getReturnCode());
-        assertEquals("The Data Object could not be found.", cause.getMessage());
+        final ProcessDataResponse response = bean.processData(deleteRequest);
+        assertEquals(ReturnCode.IDENTIFICATION_WARNING.getCode(), response.getReturnCode());
+        assertEquals("The Data Object could not be found.", response.getReturnMessage());
     }
 
     @Test
     void testDeleteNotExistingData() {
-        final ProcessDataService service = new ProcessDataService(settings, entityManager);
+        final ShareBean bean = prepareShareBean();
         final ProcessDataRequest request = prepareDeleteRequest(MEMBER_1, UUID.randomUUID().toString());
 
-        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
-        assertEquals(ReturnCode.IDENTIFICATION_WARNING, cause.getReturnCode());
-        assertEquals("The Data Object could not be found.", cause.getMessage());
+        final ProcessDataResponse response = bean.processData(request);
+        assertEquals(ReturnCode.IDENTIFICATION_WARNING.getCode(), response.getReturnCode());
+        assertEquals("The Data Object could not be found.", response.getReturnMessage());
     }
 
     @Test
     void testAddUpdateAndDeleteFolder() {
+        final ShareBean bean = prepareShareBean();
         final String folderName = "folder";
-        final ProcessDataService service = new ProcessDataService(settings, entityManager);
+
         final ProcessDataRequest request = prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, folderName, 0);
         request.setTypeName("folder");
-        final ProcessDataResponse addResponse = service.perform(request);
+        final ProcessDataResponse addResponse = bean.processData(request);
         assertEquals(ReturnCode.SUCCESS.getCode(), addResponse.getReturnCode());
         assertEquals("The Folder '" + folderName + "' was successfully added to the Circle '" + CIRCLE_1 + "'.", addResponse.getReturnMessage());
         assertNotNull(addResponse.getDataId());
@@ -459,13 +430,13 @@ final class DataServiceTest extends DatabaseSetup {
         final String newFolderName = "updated Folder Name";
         final ProcessDataRequest updateRequest = prepareUpdateRequest(MEMBER_1, addResponse.getDataId());
         updateRequest.setDataName(newFolderName);
-        final ProcessDataResponse updateResponse = service.perform(updateRequest);
+        final ProcessDataResponse updateResponse = bean.processData(updateRequest);
         assertEquals(ReturnCode.SUCCESS.getCode(), updateResponse.getReturnCode());
         assertEquals("The Data Object '" + newFolderName + "' was successfully updated.", updateResponse.getReturnMessage());
         assertEquals(addResponse.getDataId(), updateResponse.getDataId());
 
         final ProcessDataRequest deleteRequest = prepareDeleteRequest(MEMBER_1, addResponse.getDataId());
-        final ProcessDataResponse deleteResponse = service.perform(deleteRequest);
+        final ProcessDataResponse deleteResponse = bean.processData(deleteRequest);
         assertEquals(ReturnCode.SUCCESS.getCode(), deleteResponse.getReturnCode());
         assertEquals("The Data Object '" + newFolderName + "' has been removed from the Circle '" + CIRCLE_1 + "'.", deleteResponse.getReturnMessage());
         assertNull(deleteResponse.getDataId());
@@ -473,46 +444,48 @@ final class DataServiceTest extends DatabaseSetup {
 
     @Test
     void testAddSameFolder() {
+        final ShareBean bean = prepareShareBean();
         final String folderName = "folder1";
-        final ProcessDataService service = new ProcessDataService(settings, entityManager);
+
         final ProcessDataRequest request = prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, folderName, 0);
         request.setTypeName(Constants.FOLDER_TYPENAME);
-        final ProcessDataResponse response1 = service.perform(request);
-        assertEquals(ReturnCode.SUCCESS.getCode(), response1.getReturnCode());
-        assertEquals("The Folder '" + folderName + "' was successfully added to the Circle '" + CIRCLE_1 + "'.", response1.getReturnMessage());
-        assertNotNull(response1.getDataId());
+        final ProcessDataResponse addResponse = bean.processData(request);
+        assertEquals(ReturnCode.SUCCESS.getCode(), addResponse.getReturnCode());
+        assertEquals("The Folder '" + folderName + "' was successfully added to the Circle '" + CIRCLE_1 + "'.", addResponse.getReturnMessage());
+        assertNotNull(addResponse.getDataId());
 
         request.setCredential(crypto.stringToBytes(MEMBER_1));
-        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
-        assertEquals(ReturnCode.IDENTIFICATION_WARNING, cause.getReturnCode());
-        assertEquals("Another record with the same name already exists.", cause.getMessage());
+
+        final ProcessDataResponse response = bean.processData(request);
+        assertEquals(ReturnCode.IDENTIFICATION_WARNING.getCode(), response.getReturnCode());
+        assertEquals("Another record with the same name already exists.", response.getReturnMessage());
     }
 
     @Test
     void testCopyData() {
+        final ShareBean bean = prepareShareBean();
         final String toCopy = "toCopy";
-        final ProcessDataService copyDataService = new ProcessDataService(settings, entityManager);
+
         final ProcessDataRequest copyAddRequest = prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, toCopy, 524288);
-        final ProcessDataResponse copyAddResponse = copyDataService.perform(copyAddRequest);
+        final ProcessDataResponse copyAddResponse = bean.processData(copyAddRequest);
         assertEquals(ReturnCode.SUCCESS.getCode(), copyAddResponse.getReturnCode());
         assertEquals("The Data Object '" + toCopy + "' was successfully added to the Circle '" + CIRCLE_1 + "'.", copyAddResponse.getReturnMessage());
         assertNotNull(copyAddResponse.getDataId());
 
         final ProcessDataRequest copyRequest = prepareCopyDataRequest(MEMBER_1, copyAddResponse.getDataId(), CIRCLE_2_ID, null);
-        final ProcessDataResponse copyResponse = copyDataService.perform(copyRequest);
+        final ProcessDataResponse copyResponse = bean.processData(copyRequest);
         assertEquals(ReturnCode.SUCCESS.getCode(), copyResponse.getReturnCode());
         assertEquals("The Data Object '" + toCopy + "' was successfully copied from '" + CIRCLE_1 + "' to '" + CIRCLE_2 + "'.", copyResponse.getReturnMessage());
         assertNotNull(copyResponse.getDataId());
         assertNotEquals(copyAddResponse.getDataId(), copyResponse.getDataId());
 
-        final FetchDataService copyFetchService = new FetchDataService(settings, entityManager);
         final FetchDataRequest copyFetchRequest1 = prepareReadRequest(MEMBER_1, null, copyAddResponse.getDataId());
-        final FetchDataResponse copyFetchResponse1 = copyFetchService.perform(copyFetchRequest1);
+        final FetchDataResponse copyFetchResponse1 = bean.fetchData(copyFetchRequest1);
         assertEquals(ReturnCode.SUCCESS.getCode(), copyFetchResponse1.getReturnCode());
         final Metadata metadata1 = copyFetchResponse1.getMetadata().get(0);
 
         final FetchDataRequest copyFetchRequest2 = prepareReadRequest(MEMBER_1, null, copyResponse.getDataId());
-        final FetchDataResponse copyFetchResponse2 = copyFetchService.perform(copyFetchRequest2);
+        final FetchDataResponse copyFetchResponse2 = bean.fetchData(copyFetchRequest2);
         assertEquals(ReturnCode.SUCCESS.getCode(), copyFetchResponse2.getReturnCode());
         final Metadata copyMetadata2 = copyFetchResponse2.getMetadata().get(0);
 
@@ -528,10 +501,11 @@ final class DataServiceTest extends DatabaseSetup {
 
     @Test
     void testMoveData() {
+        final ShareBean bean = prepareShareBean();
         final String toMove = "toMove";
-        final ProcessDataService moveDataService = new ProcessDataService(settings, entityManager);
+
         final ProcessDataRequest moveAddRequest = prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, toMove, 524288);
-        final ProcessDataResponse moveAddResponse = moveDataService.perform(moveAddRequest);
+        final ProcessDataResponse moveAddResponse = bean.processData(moveAddRequest);
         assertEquals(ReturnCode.SUCCESS.getCode(), moveAddResponse.getReturnCode());
         assertEquals("The Data Object '" + toMove + "' was successfully added to the Circle '" + CIRCLE_1 + "'.", moveAddResponse.getReturnMessage());
         assertNotNull(moveAddResponse.getDataId());
@@ -541,65 +515,65 @@ final class DataServiceTest extends DatabaseSetup {
         moveRequest.setDataId(moveAddResponse.getDataId());
         moveRequest.setTargetCircleId(CIRCLE_2_ID);
 
-        final ProcessDataResponse moveResponse = moveDataService.perform(moveRequest);
+        final ProcessDataResponse moveResponse = bean.processData(moveRequest);
         assertEquals(ReturnCode.SUCCESS.getCode(), moveResponse.getReturnCode());
         assertEquals("The Data Object '" + toMove + "' was successfully moved from '" + CIRCLE_1 + "' to '" + CIRCLE_2 + "'.", moveResponse.getReturnMessage());
         assertNotNull(moveResponse.getDataId());
         assertNotEquals(moveAddResponse.getDataId(), moveResponse.getDataId());
 
-        final FetchDataService moveFetchService = new FetchDataService(settings, entityManager);
         final FetchDataRequest moveFetchRequest1 = prepareReadRequest(MEMBER_1, null, moveResponse.getDataId());
-        final FetchDataResponse moveFetchResponse1 = moveFetchService.perform(moveFetchRequest1);
+        final FetchDataResponse moveFetchResponse1 = bean.fetchData(moveFetchRequest1);
         assertEquals(ReturnCode.SUCCESS.getCode(), moveFetchResponse1.getReturnCode());
 
         final FetchDataRequest moveFetchRequest2 = prepareReadRequest(MEMBER_1, null, moveAddResponse.getDataId());
-        final CWSException cause = assertThrows(CWSException.class, () -> moveFetchService.perform(moveFetchRequest2));
-        assertEquals(ReturnCode.IDENTIFICATION_WARNING, cause.getReturnCode());
-        assertEquals("No information could be found for the given Id.", cause.getMessage());
+        final FetchDataResponse response = bean.fetchData(moveFetchRequest2);
+        assertEquals(ReturnCode.IDENTIFICATION_WARNING.getCode(), response.getReturnCode());
+        assertEquals("No information could be found for the given Id.", response.getReturnMessage());
     }
 
     @Test
     void testCopyFolder() {
+        final ShareBean bean = prepareShareBean();
         final String folderName = "folderToCopy";
-        final ProcessDataService dataService = new ProcessDataService(settings, entityManager);
+
         final ProcessDataRequest addRequest = prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, folderName, 0);
         addRequest.setTypeName(Constants.FOLDER_TYPENAME);
-        final ProcessDataResponse addResponse = dataService.perform(addRequest);
+        final ProcessDataResponse addResponse = bean.processData(addRequest);
         assertEquals(ReturnCode.SUCCESS.getCode(), addResponse.getReturnCode());
         assertEquals("The Folder '" + folderName + "' was successfully added to the Circle '" + CIRCLE_1 + "'.", addResponse.getReturnMessage());
         assertNotNull(addResponse.getDataId());
 
         final ProcessDataRequest copyRequest = prepareCopyDataRequest(MEMBER_1, addResponse.getDataId(), CIRCLE_2_ID, null);
-        final CWSException cause = assertThrows(CWSException.class, () -> dataService.perform(copyRequest));
-        assertEquals(ReturnCode.ILLEGAL_ACTION, cause.getReturnCode());
-        assertEquals("It is not permitted to copy or move folders.", cause.getMessage());
+        final ProcessDataResponse response = bean.processData(copyRequest);
+        assertEquals(ReturnCode.ILLEGAL_ACTION.getCode(), response.getReturnCode());
+        assertEquals("It is not permitted to copy or move folders.", response.getReturnMessage());
     }
 
     @Test
     void testCopyEmptyData() {
+        final ShareBean bean = prepareShareBean();
         final String dataName = "emptyData";
-        final ProcessDataService dataService = new ProcessDataService(settings, entityManager);
+
         final ProcessDataRequest emptyAddRequest = prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, dataName, 0);
-        final ProcessDataResponse emptyAddResponse = dataService.perform(emptyAddRequest);
+        final ProcessDataResponse emptyAddResponse = bean.processData(emptyAddRequest);
         assertEquals(ReturnCode.SUCCESS.getCode(), emptyAddResponse.getReturnCode());
         assertEquals("The Data Object '" + dataName + "' was successfully added to the Circle '" + CIRCLE_1 + "'.", emptyAddResponse.getReturnMessage());
         assertNotNull(emptyAddResponse.getDataId());
 
         final ProcessDataRequest emptyCopyRequest = prepareCopyDataRequest(MEMBER_1, emptyAddResponse.getDataId(), CIRCLE_2_ID, null);
-        final ProcessDataResponse emptyCopyResponse = dataService.perform(emptyCopyRequest);
+        final ProcessDataResponse emptyCopyResponse = bean.processData(emptyCopyRequest);
         assertEquals(ReturnCode.SUCCESS.getCode(), emptyCopyResponse.getReturnCode());
         assertEquals("The Data Object '" + dataName + "' was successfully copied from '" + CIRCLE_1 + "' to '" + CIRCLE_2 + "'.", emptyCopyResponse.getReturnMessage());
         assertNotNull(emptyCopyResponse.getDataId());
         assertNotEquals(emptyAddResponse.getDataId(), emptyCopyResponse.getDataId());
 
-        final FetchDataService emptyFetchService = new FetchDataService(settings, entityManager);
         final FetchDataRequest emptyFetchRequest1 = prepareReadRequest(MEMBER_1, null, emptyAddResponse.getDataId());
-        final FetchDataResponse emptyFetchResponse1 = emptyFetchService.perform(emptyFetchRequest1);
+        final FetchDataResponse emptyFetchResponse1 = bean.fetchData(emptyFetchRequest1);
         assertEquals(ReturnCode.SUCCESS.getCode(), emptyFetchResponse1.getReturnCode());
         final Metadata metadata1 = emptyFetchResponse1.getMetadata().get(0);
 
         final FetchDataRequest emptyFetchRequest2 = prepareReadRequest(MEMBER_1, null, emptyCopyResponse.getDataId());
-        final FetchDataResponse emptyFetchResponse2 = emptyFetchService.perform(emptyFetchRequest2);
+        final FetchDataResponse emptyFetchResponse2 = bean.fetchData(emptyFetchRequest2);
         assertEquals(ReturnCode.SUCCESS.getCode(), emptyFetchResponse2.getReturnCode());
         final Metadata emptyMetadata2 = emptyFetchResponse2.getMetadata().get(0);
 
@@ -615,71 +589,73 @@ final class DataServiceTest extends DatabaseSetup {
 
     @Test
     void testCopyDataNotExistingData() {
+        final ShareBean bean = prepareShareBean();
         final String dataId = UUID.randomUUID().toString();
 
-        final ProcessDataService dataService = new ProcessDataService(settings, entityManager);
-        final ProcessDataRequest copyRequest = prepareCopyDataRequest(MEMBER_1, dataId, CIRCLE_2_ID, null);
-        assertTrue(copyRequest.validate().isEmpty());
+        final ProcessDataRequest request = prepareCopyDataRequest(MEMBER_1, dataId, CIRCLE_2_ID, null);
+        assertTrue(request.validate().isEmpty());
 
-        final CWSException cause = assertThrows(CWSException.class, () -> dataService.perform(copyRequest));
-        assertEquals(ReturnCode.IDENTIFICATION_WARNING, cause.getReturnCode());
-        assertEquals("No data could be found for the given Data Id '" + dataId + "'.", cause.getMessage());
+        final ProcessDataResponse response = bean.processData(request);
+        assertEquals(ReturnCode.IDENTIFICATION_WARNING.getCode(), response.getReturnCode());
+        assertEquals("No data could be found for the given Data Id '" + dataId + "'.", response.getReturnMessage());
     }
 
     @Test
     void testCopyDataToNotExistingFolder() {
-        final String dataName = "toCopy";
+        final ShareBean bean = prepareShareBean();
         final String folderId = UUID.randomUUID().toString();
+        final String dataName = "toCopy";
 
-        final ProcessDataService dataService = new ProcessDataService(settings, entityManager);
         final ProcessDataRequest addRequest = prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, dataName, 524288);
-        final ProcessDataResponse addResponse = dataService.perform(addRequest);
+        final ProcessDataResponse addResponse = bean.processData(addRequest);
         assertEquals(ReturnCode.SUCCESS.getCode(), addResponse.getReturnCode());
         assertEquals("The Data Object '" + dataName + "' was successfully added to the Circle '" + CIRCLE_1 + "'.", addResponse.getReturnMessage());
         assertNotNull(addResponse.getDataId());
 
         final ProcessDataRequest copyRequest = prepareCopyDataRequest(MEMBER_1, addResponse.getDataId(), CIRCLE_2_ID, folderId);
-        final CWSException cause = assertThrows(CWSException.class, () -> dataService.perform(copyRequest));
-        assertEquals(ReturnCode.IDENTIFICATION_WARNING, cause.getReturnCode());
-        assertEquals("Provided FolderId '" + folderId + "' is not a folder.", cause.getMessage());
+        final ProcessDataResponse response = bean.processData(copyRequest);
+        assertEquals(ReturnCode.IDENTIFICATION_WARNING.getCode(), response.getReturnCode());
+        assertEquals("Provided FolderId '" + folderId + "' is not a folder.", response.getReturnMessage());
     }
 
     @Test
     void testCopyDataToNonTrusteeCircle() {
+        final ShareBean bean = prepareShareBean();
         final String dataId = UUID.randomUUID().toString();
 
-        final ProcessDataService dataService = new ProcessDataService(settings, entityManager);
-        final ProcessDataRequest copyRequest = prepareCopyDataRequest(MEMBER_4, dataId, CIRCLE_1_ID, null);
-        assertTrue(copyRequest.validate().isEmpty());
+        final ProcessDataRequest request = prepareCopyDataRequest(MEMBER_4, dataId, CIRCLE_1_ID, null);
+        assertTrue(request.validate().isEmpty());
 
-        final CWSException cause = assertThrows(CWSException.class, () -> dataService.perform(copyRequest));
-        assertEquals(ReturnCode.IDENTIFICATION_WARNING, cause.getReturnCode());
-        assertEquals("The member has no trustee relationship with the target Circle '" + CIRCLE_1_ID + "'.", cause.getMessage());
+        final ProcessDataResponse response = bean.processData(request);
+        assertEquals(ReturnCode.IDENTIFICATION_WARNING.getCode(), response.getReturnCode());
+        assertEquals("The member has no trustee relationship with the target Circle '" + CIRCLE_1_ID + "'.", response.getReturnMessage());
     }
 
     @Test
     void testCopyDataWithoutPermissionInTarget() {
+        final ShareBean bean = prepareShareBean();
         final String dataName = "emptyData";
-        final ProcessDataService dataService = new ProcessDataService(settings, entityManager);
+
         final ProcessDataRequest addRequest = prepareAddDataRequest(MEMBER_3, CIRCLE_3_ID, dataName, 512);
-        final ProcessDataResponse addResponse = dataService.perform(addRequest);
+        final ProcessDataResponse addResponse = bean.processData(addRequest);
         assertEquals(ReturnCode.SUCCESS.getCode(), addResponse.getReturnCode());
         assertEquals("The Data Object '" + dataName + "' was successfully added to the Circle '" + CIRCLE_3 + "'.", addResponse.getReturnMessage());
         assertNotNull(addResponse.getDataId());
 
         final ProcessDataRequest copyRequest = prepareCopyDataRequest(MEMBER_3, addResponse.getDataId(), CIRCLE_1_ID, null);
-        final CWSException cause = assertThrows(CWSException.class, () -> dataService.perform(copyRequest));
-        assertEquals(ReturnCode.AUTHORIZATION_WARNING, cause.getReturnCode());
-        assertEquals("Member is not permitted to perform this action for the target Circle.", cause.getMessage());
+        final ProcessDataResponse response = bean.processData(copyRequest);
+        assertEquals(ReturnCode.AUTHORIZATION_WARNING.getCode(), response.getReturnCode());
+        assertEquals("Member is not permitted to perform this action for the target Circle.", response.getReturnMessage());
     }
 
     @Test
     void testDeleteFolderWithData() {
+        final ShareBean bean = prepareShareBean();
         final String folderName = "folder1";
-        final ProcessDataService dataService = new ProcessDataService(settings, entityManager);
+
         final ProcessDataRequest addFolderRequest = prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, folderName, 0);
         addFolderRequest.setTypeName(Constants.FOLDER_TYPENAME);
-        final ProcessDataResponse addFolderResponse = dataService.perform(addFolderRequest);
+        final ProcessDataResponse addFolderResponse = bean.processData(addFolderRequest);
         assertEquals(ReturnCode.SUCCESS.getCode(), addFolderResponse.getReturnCode());
         assertEquals("The Folder '" + folderName + "' was successfully added to the Circle '" + CIRCLE_1 + "'.", addFolderResponse.getReturnMessage());
         assertNotNull(addFolderResponse.getDataId());
@@ -687,25 +663,26 @@ final class DataServiceTest extends DatabaseSetup {
         final String moreData = "More Data";
         final ProcessDataRequest addDataRequest = prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, moreData, 524288);
         addDataRequest.setFolderId(addFolderResponse.getDataId());
-        final ProcessDataResponse addDataResponse = dataService.perform(addDataRequest);
+        final ProcessDataResponse addDataResponse = bean.processData(addDataRequest);
         assertEquals(ReturnCode.SUCCESS.getCode(), addDataResponse.getReturnCode());
         assertEquals("The Data Object '" + moreData + "' was successfully added to the Circle '" + CIRCLE_1 + "'.", addDataResponse.getReturnMessage());
 
         final ProcessDataRequest deleteFolderRequest = prepareDeleteRequest(MEMBER_1, addFolderResponse.getDataId());
         assertTrue(deleteFolderRequest.validate().isEmpty());
 
-        final CWSException cause = assertThrows(CWSException.class, () -> dataService.perform(deleteFolderRequest));
-        assertEquals(ReturnCode.INTEGRITY_WARNING, cause.getReturnCode());
-        assertEquals("The Folder cannot be removed as it is not empty.", cause.getMessage());
+        final ProcessDataResponse response = bean.processData(deleteFolderRequest);
+        assertEquals(ReturnCode.INTEGRITY_WARNING.getCode(), response.getReturnCode());
+        assertEquals("The Folder cannot be removed as it is not empty.", response.getReturnMessage());
     }
 
     @Test
     void testMoveFolderWithAddRequest() {
+        final ShareBean bean = prepareShareBean();
         final String folderName1 = "folder1";
-        final ProcessDataService service = new ProcessDataService(settings, entityManager);
+
         final ProcessDataRequest addFolderRequest = prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, folderName1, 0);
         addFolderRequest.setTypeName(Constants.FOLDER_TYPENAME);
-        final ProcessDataResponse addFolderResponse1 = service.perform(addFolderRequest);
+        final ProcessDataResponse addFolderResponse1 = bean.processData(addFolderRequest);
         assertEquals(ReturnCode.SUCCESS.getCode(), addFolderResponse1.getReturnCode());
         assertEquals("The Folder '" + folderName1 + "' was successfully added to the Circle '" + CIRCLE_1 + "'.", addFolderResponse1.getReturnMessage());
         assertNotNull(addFolderResponse1.getDataId());
@@ -714,7 +691,7 @@ final class DataServiceTest extends DatabaseSetup {
         final String folderName2 = "folder2";
         addFolderRequest.setCredential(crypto.stringToBytes(MEMBER_1));
         addFolderRequest.setDataName(folderName2);
-        final ProcessDataResponse addFolderResponse2 = service.perform(addFolderRequest);
+        final ProcessDataResponse addFolderResponse2 = bean.processData(addFolderRequest);
         assertEquals(ReturnCode.SUCCESS.getCode(), addFolderResponse2.getReturnCode());
         assertEquals("The Folder '" + folderName2 + "' was successfully added to the Circle '" + CIRCLE_1 + "'.", addFolderResponse2.getReturnMessage());
         assertNotNull(addFolderResponse2.getDataId());
@@ -723,32 +700,33 @@ final class DataServiceTest extends DatabaseSetup {
         final ProcessDataRequest moveFolderRequest = prepareUpdateRequest(MEMBER_1, folderId2);
         moveFolderRequest.setFolderId(folderId1);
 
-        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(moveFolderRequest));
-        assertEquals(ReturnCode.ILLEGAL_ACTION, cause.getReturnCode());
-        assertEquals("It is not permitted to move Folders.", cause.getMessage());
+        final ProcessDataResponse response = bean.processData(moveFolderRequest);
+        assertEquals(ReturnCode.ILLEGAL_ACTION.getCode(), response.getReturnCode());
+        assertEquals("It is not permitted to move Folders.", response.getReturnMessage());
     }
 
     @Test
     void testMoveDataWithAddRequest() {
+        final ShareBean bean = prepareShareBean();
         final String folderName = "folder1";
-        final ProcessDataService service = new ProcessDataService(settings, entityManager);
+
         final ProcessDataRequest createFolderRequest = prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, folderName, 0);
         createFolderRequest.setTypeName(Constants.FOLDER_TYPENAME);
-        final ProcessDataResponse createFolderResponse = service.perform(createFolderRequest);
+        final ProcessDataResponse createFolderResponse = bean.processData(createFolderRequest);
         assertEquals(ReturnCode.SUCCESS.getCode(), createFolderResponse.getReturnCode());
         assertEquals("The Folder '" + folderName + "' was successfully added to the Circle '" + CIRCLE_1 + "'.", createFolderResponse.getReturnMessage());
         assertNotNull(createFolderResponse.getDataId());
 
         final String myData = "My Data";
         final ProcessDataRequest addDataRequest = prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, myData, 512);
-        final ProcessDataResponse addDataResponse = service.perform(addDataRequest);
+        final ProcessDataResponse addDataResponse = bean.processData(addDataRequest);
         assertEquals(ReturnCode.SUCCESS.getCode(), addDataResponse.getReturnCode());
         assertEquals("The Data Object '" + myData + "' was successfully added to the Circle '" + CIRCLE_1 + "'.", addDataResponse.getReturnMessage());
         assertNotNull(addDataResponse.getDataId());
 
         final ProcessDataRequest moveDataRequest = prepareUpdateRequest(MEMBER_1, addDataResponse.getDataId());
         moveDataRequest.setFolderId(createFolderResponse.getDataId());
-        final ProcessDataResponse moveFolderResponse = service.perform(moveDataRequest);
+        final ProcessDataResponse moveFolderResponse = bean.processData(moveDataRequest);
         assertEquals(ReturnCode.SUCCESS.getCode(), moveFolderResponse.getReturnCode());
         assertEquals("The Data Object '" + myData + "' was successfully updated.", moveFolderResponse.getReturnMessage());
         assertEquals(addDataResponse.getDataId(), moveFolderResponse.getDataId());
@@ -756,46 +734,45 @@ final class DataServiceTest extends DatabaseSetup {
 
     @Test
     void testMovingDataToFolderWhereSameNameDataExist() {
-        final ProcessDataService service = new ProcessDataService(settings, entityManager);
-        final FetchDataService readService = new FetchDataService(settings, entityManager);
+        final ShareBean bean = prepareShareBean();
 
         // Step 1, create 2 folders
         final ProcessDataRequest folderRequest1 = prepareAddDataRequest(MEMBER_4, CIRCLE_3_ID, "First Folder", 0);
         folderRequest1.setTypeName(Constants.FOLDER_TYPENAME);
-        final ProcessDataResponse folderResponse1 = service.perform(folderRequest1);
+        final ProcessDataResponse folderResponse1 = bean.processData(folderRequest1);
         assertTrue(folderResponse1.isOk());
         final ProcessDataRequest folderRequest2 = prepareAddDataRequest(MEMBER_4, CIRCLE_3_ID, "Second Folder", 0);
         folderRequest2.setTypeName(Constants.FOLDER_TYPENAME);
-        final ProcessDataResponse folderResponse2 = service.perform(folderRequest2);
+        final ProcessDataResponse folderResponse2 = bean.processData(folderRequest2);
         assertTrue(folderResponse2.isOk());
 
         // Step 2, Create 1 data record for each folder, with the same name
         final String dataName = "The Data";
         final ProcessDataRequest dataRequest1 = prepareAddDataRequest(MEMBER_4, CIRCLE_3_ID, dataName, 524288);
         dataRequest1.setFolderId(folderResponse1.getDataId());
-        final ProcessDataResponse dataResponse1 = service.perform(dataRequest1);
+        final ProcessDataResponse dataResponse1 = bean.processData(dataRequest1);
         assertTrue(dataResponse1.isOk());
         final ProcessDataRequest dataRequest2 = prepareAddDataRequest(MEMBER_4, CIRCLE_3_ID, dataName, 524288);
         dataRequest2.setFolderId(folderResponse2.getDataId());
-        final ProcessDataResponse dataResponse2 = service.perform(dataRequest2);
+        final ProcessDataResponse dataResponse2 = bean.processData(dataRequest2);
         assertTrue(dataResponse2.isOk());
 
         // Step 3, Verify that we have the correct data structure.
         final FetchDataRequest readRootRequest = prepareReadRequest(MEMBER_4, CIRCLE_3_ID, null);
-        final FetchDataResponse readRootResponse = readService.perform(readRootRequest);
+        final FetchDataResponse readRootResponse = bean.fetchData(readRootRequest);
         assertTrue(readRootResponse.isOk());
         assertEquals(2, readRootResponse.getMetadata().size());
         assertEquals(folderResponse2.getDataId(), readRootResponse.getMetadata().get(0).getDataId());
         assertEquals(folderResponse1.getDataId(), readRootResponse.getMetadata().get(1).getDataId());
 
         final FetchDataRequest readFolder1Request = prepareReadRequest(MEMBER_4, CIRCLE_3_ID, folderResponse1.getDataId());
-        final FetchDataResponse readFolder1Response = readService.perform(readFolder1Request);
+        final FetchDataResponse readFolder1Response = bean.fetchData(readFolder1Request);
         assertTrue(readFolder1Response.isOk());
         assertEquals(1, readFolder1Response.getMetadata().size());
         assertEquals(dataResponse1.getDataId(), readFolder1Response.getMetadata().get(0).getDataId());
 
         final FetchDataRequest readFolder2Request = prepareReadRequest(MEMBER_4, CIRCLE_3_ID, folderResponse2.getDataId());
-        final FetchDataResponse readFolder2Response = readService.perform(readFolder2Request);
+        final FetchDataResponse readFolder2Response = bean.fetchData(readFolder2Request);
         assertTrue(readFolder2Response.isOk());
         assertEquals(1, readFolder2Response.getMetadata().size());
         assertEquals(dataResponse2.getDataId(), readFolder2Response.getMetadata().get(0).getDataId());
@@ -805,25 +782,26 @@ final class DataServiceTest extends DatabaseSetup {
         moveRequest.setDataId(dataResponse1.getDataId());
         moveRequest.setFolderId(folderResponse2.getDataId());
 
-        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(moveRequest));
-        assertEquals(ReturnCode.IDENTIFICATION_WARNING, cause.getReturnCode());
-        assertEquals("The name '" + dataName + "' provided is already being used in the given folder.", cause.getMessage());
+        final ProcessDataResponse response = bean.processData(moveRequest);
+        assertEquals(ReturnCode.IDENTIFICATION_WARNING.getCode(), response.getReturnCode());
+        assertEquals("The name '" + dataName + "' provided is already being used in the given folder.", response.getReturnMessage());
     }
 
     @Test
     void testMoveDataToDifferentCircleWithAddRequest() {
+        final ShareBean bean = prepareShareBean();
         final String folderName = "folder1";
-        final ProcessDataService service = new ProcessDataService(settings, entityManager);
+
         final ProcessDataRequest addFolderRequest = prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, folderName, 0);
         addFolderRequest.setTypeName(Constants.FOLDER_TYPENAME);
-        final ProcessDataResponse addFolderResponse = service.perform(addFolderRequest);
+        final ProcessDataResponse addFolderResponse = bean.processData(addFolderRequest);
         assertEquals(ReturnCode.SUCCESS.getCode(), addFolderResponse.getReturnCode());
         assertEquals("The Folder '" + folderName + "' was successfully added to the Circle '" + CIRCLE_1 + "'.", addFolderResponse.getReturnMessage());
         assertNotNull(addFolderResponse.getDataId());
 
         final String dataName = "My Data";
         final ProcessDataRequest addDataRequest = prepareAddDataRequest(MEMBER_1, CIRCLE_2_ID, dataName, 512);
-        final ProcessDataResponse addDataResponse = service.perform(addDataRequest);
+        final ProcessDataResponse addDataResponse = bean.processData(addDataRequest);
         assertEquals(ReturnCode.SUCCESS.getCode(), addDataResponse.getReturnCode());
         assertEquals("The Data Object '" + dataName + "' was successfully added to the Circle '" + CIRCLE_2 + "'.", addDataResponse.getReturnMessage());
         assertNotNull(addDataResponse.getDataId());
@@ -831,9 +809,9 @@ final class DataServiceTest extends DatabaseSetup {
         final ProcessDataRequest moveDataRequest = prepareUpdateRequest(MEMBER_1, addDataResponse.getDataId());
         moveDataRequest.setFolderId(addFolderResponse.getDataId());
 
-        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(moveDataRequest));
-        assertEquals(ReturnCode.ILLEGAL_ACTION, cause.getReturnCode());
-        assertEquals("Moving Data from one Circle to another is not permitted.", cause.getMessage());
+        final ProcessDataResponse response = bean.processData(moveDataRequest);
+        assertEquals(ReturnCode.ILLEGAL_ACTION.getCode(), response.getReturnCode());
+        assertEquals("Moving Data from one Circle to another is not permitted.", response.getReturnMessage());
     }
 
     /**
@@ -881,12 +859,12 @@ final class DataServiceTest extends DatabaseSetup {
                 .executeUpdate();
         assertEquals(1, deleted);
 
-        final ProcessDataService service = new ProcessDataService(settings, entityManager);
+        final ShareBean bean = prepareShareBean();
         final ProcessDataRequest request = prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "My Object", 1024);
 
-        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
-        assertEquals(ReturnCode.INTEGRITY_ERROR, cause.getReturnCode());
-        assertTrue(cause.getMessage().contains("No Parent could be found for the Circle"));
+        final ProcessDataResponse response = bean.processData(request);
+        assertEquals(ReturnCode.INTEGRITY_ERROR.getCode(), response.getReturnCode());
+        assertTrue(response.getReturnMessage().contains("No Parent could be found for the Circle"));
     }
 
     // =========================================================================

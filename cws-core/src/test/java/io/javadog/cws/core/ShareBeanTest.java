@@ -63,17 +63,6 @@ final class ShareBeanTest extends DatabaseSetup {
         assertEquals(updateContent, toString(read));
     }
 
-    private ShareBean prepareShareBean() {
-        try {
-            final ShareBean bean = ShareBean.class.getConstructor().newInstance();
-            inject(bean, entityManager);
-
-            return bean;
-        } catch (InstantiationException | InvocationTargetException | IllegalAccessException | NoSuchMethodException e) {
-            throw new CWSException(ReturnCode.ERROR, "Cannot instantiate ShareBean.", e);
-        }
-    }
-
     private String addData(final ShareBean bean, final byte[] data) {
         final ProcessDataRequest request = prepareRequest(ProcessDataRequest.class, MEMBER_1);
         request.setAction(Action.ADD);

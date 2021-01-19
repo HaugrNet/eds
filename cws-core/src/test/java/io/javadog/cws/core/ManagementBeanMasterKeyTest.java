@@ -14,7 +14,7 @@
  * this program; If not, you can download a copy of the License
  * here: https://www.apache.org/licenses/
  */
-package io.javadog.cws.core.services;
+package io.javadog.cws.core;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -24,13 +24,15 @@ import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.requests.MasterKeyRequest;
 import io.javadog.cws.api.responses.MasterKeyResponse;
-import io.javadog.cws.core.setup.DatabaseSetup;
 import io.javadog.cws.core.enums.StandardSetting;
 import io.javadog.cws.core.exceptions.CWSException;
 import io.javadog.cws.core.jce.MasterKey;
 import io.javadog.cws.core.model.Settings;
 import io.javadog.cws.core.model.entities.MemberEntity;
-
+import io.javadog.cws.core.setup.DatabaseSetup;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -38,10 +40,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.UUID;
-
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.condition.DisabledOnOs;
-import org.junit.jupiter.api.condition.OS;
 
 /**
  * <p>This Test Class, is testing the following Service Classes in one, as they
@@ -59,51 +57,51 @@ import org.junit.jupiter.api.condition.OS;
  * @since CWS 1.1
  */
 @DisabledOnOs(value = {OS.WINDOWS, OS.MAC})
-final class MasterKeyServiceTest extends DatabaseSetup {
+final class ManagementBeanMasterKeyTest extends DatabaseSetup {
 
     @Test
     void testUpdateMasterKeyWithNullRequest() {
-        final MasterKeyService service = new MasterKeyService(settings, entityManager);
+        final ManagementBean bean = prepareManagementBean();
 
-        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(null));
-        assertEquals(ReturnCode.VERIFICATION_WARNING, cause.getReturnCode());
-        assertEquals("Cannot Process a NULL Object.", cause.getMessage());
+        final MasterKeyResponse response = bean.masterKey(null);
+        assertEquals(ReturnCode.VERIFICATION_WARNING.getCode(), response.getReturnCode());
+        assertEquals("Cannot Process a NULL Object.", response.getReturnMessage());
     }
 
     @Test
     void testUpdateMasterKeyWithEmptyRequest() {
-        final MasterKeyService service = new MasterKeyService(settings, entityManager);
+        final ManagementBean bean = prepareManagementBean();
         final MasterKeyRequest request = new MasterKeyRequest();
 
-        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
-        assertEquals(ReturnCode.VERIFICATION_WARNING, cause.getReturnCode());
+        final MasterKeyResponse response = bean.masterKey(request);
+        assertEquals(ReturnCode.VERIFICATION_WARNING.getCode(), response.getReturnCode());
         assertEquals("Request Object contained errors:\n" +
                 "Key: credential, Error: The Session (Credential) is missing.\n" +
                 "Key: secret, Error: Either the secret or the URL must be given to alter the MasterKey.\n" +
-                "Key: url, Error: Either the secret or the URL must be given to alter the MasterKey.", cause.getMessage());
+                "Key: url, Error: Either the secret or the URL must be given to alter the MasterKey.", response.getReturnMessage());
     }
 
     @Test
     void testUpdateMasterKeyAsMember() {
-        final MasterKeyService service = new MasterKeyService(settings, entityManager);
+        final ManagementBean bean = prepareManagementBean();
         final MasterKeyRequest request = prepareRequest(MasterKeyRequest.class, MEMBER_1);
         request.setSecret("New MasterKey".getBytes(Charset.defaultCharset()));
 
-        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
-        assertEquals(ReturnCode.AUTHENTICATION_WARNING, cause.getReturnCode());
-        assertEquals("Given Account is not permitted to perform this request.", cause.getMessage());
+        final MasterKeyResponse response = bean.masterKey(request);
+        assertEquals(ReturnCode.AUTHENTICATION_WARNING.getCode(), response.getReturnCode());
+        assertEquals("Given Account is not permitted to perform this request.", response.getReturnMessage());
     }
 
     @Test
     void testUpdateMasterKeyAsAdminWithWrongCredentials() {
-        final MasterKeyService service = new MasterKeyService(settings, entityManager);
+        final ManagementBean bean = prepareManagementBean();
         final MasterKeyRequest request = prepareRequest(MasterKeyRequest.class, Constants.ADMIN_ACCOUNT);
         request.setCredential("root".getBytes(Charset.defaultCharset()));
         request.setSecret("New MasterKey".getBytes(Charset.defaultCharset()));
 
-        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
-        assertEquals(ReturnCode.AUTHENTICATION_WARNING, cause.getReturnCode());
-        assertEquals("Invalid credentials.", cause.getMessage());
+        final MasterKeyResponse response = bean.masterKey(request);
+        assertEquals(ReturnCode.AUTHENTICATION_WARNING.getCode(), response.getReturnCode());
+        assertEquals("Invalid credentials.", response.getReturnMessage());
     }
 
     @Test
@@ -114,10 +112,10 @@ final class MasterKeyServiceTest extends DatabaseSetup {
             dao.delete(member);
         }
 
-        final MasterKeyService service = new MasterKeyService(settings, entityManager);
+        final ManagementBean bean = prepareManagementBean();
         final MasterKeyRequest request = prepareRequest(MasterKeyRequest.class, Constants.ADMIN_ACCOUNT);
         request.setSecret(request.getCredential());
-        final MasterKeyResponse response = service.perform(request);
+        final MasterKeyResponse response = bean.masterKey(request);
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
         assertEquals("MasterKey unlocked.", response.getReturnMessage());
     }
@@ -133,15 +131,15 @@ final class MasterKeyServiceTest extends DatabaseSetup {
             dao.delete(member);
         }
 
-        final MasterKeyService service = new MasterKeyService(settings, entityManager);
+        final ManagementBean bean = prepareManagementBean();
         final MasterKeyRequest request = prepareRequest(MasterKeyRequest.class, Constants.ADMIN_ACCOUNT);
         request.setUrl(file);
 
-        final MasterKeyResponse response = service.perform(request);
+        final MasterKeyResponse response = bean.masterKey(request);
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
         assertEquals("MasterKey updated.", response.getReturnMessage());
 
-        revertMasterKeyToOriginal(service);
+        revertMasterKeyToOriginal(bean);
     }
 
     @Test
@@ -154,22 +152,22 @@ final class MasterKeyServiceTest extends DatabaseSetup {
         final String path = tempDir() + "secret_master_key.bin";
         Files.write(Paths.get(path), generateData(8192));
 
-        final MasterKeyService service = new MasterKeyService(settings, entityManager);
+        final ManagementBean bean = prepareManagementBean();
         final MasterKeyRequest urlRequest = prepareRequest(MasterKeyRequest.class, Constants.ADMIN_ACCOUNT);
         urlRequest.setUrl("file://" + path);
 
-        final MasterKeyResponse urlResponse = service.perform(urlRequest);
+        final MasterKeyResponse urlResponse = bean.masterKey(urlRequest);
         assertEquals("MasterKey updated.", urlResponse.getReturnMessage());
         assertEquals(ReturnCode.SUCCESS.getCode(), urlResponse.getReturnCode());
 
         final MasterKeyRequest secretRequest = prepareRequest(MasterKeyRequest.class, Constants.ADMIN_ACCOUNT);
         secretRequest.setSecret("MasterKey".getBytes(Charset.defaultCharset()));
 
-        final MasterKeyResponse secretResponse = service.perform(secretRequest);
+        final MasterKeyResponse secretResponse = bean.masterKey(secretRequest);
         assertEquals(ReturnCode.SUCCESS.getCode(), secretResponse.getReturnCode());
         assertEquals("MasterKey updated.", secretResponse.getReturnMessage());
 
-        revertMasterKeyToOriginal(service);
+        revertMasterKeyToOriginal(bean);
     }
 
     @Test
@@ -209,22 +207,22 @@ final class MasterKeyServiceTest extends DatabaseSetup {
 
     @Test
     void testUpdateMasterKeyWhenMembersExist() {
-        final MasterKeyService service = new MasterKeyService(settings, entityManager);
+        final ManagementBean bean = prepareManagementBean();
         final MasterKeyRequest request = prepareRequest(MasterKeyRequest.class, Constants.ADMIN_ACCOUNT);
         request.setSecret("MasterKey".getBytes(Charset.defaultCharset()));
 
-        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
-        assertEquals(ReturnCode.ILLEGAL_ACTION, cause.getReturnCode());
-        assertEquals("Cannot alter the MasterKey, as Member Accounts exists.", cause.getMessage());
+        final MasterKeyResponse response = bean.masterKey(request);
+        assertEquals(ReturnCode.ILLEGAL_ACTION.getCode(), response.getReturnCode());
+        assertEquals("Cannot alter the MasterKey, as Member Accounts exists.", response.getReturnMessage());
     }
 
     @Test
     void testUpdateMasterKeyToCurrent() {
-        final MasterKeyService service = new MasterKeyService(settings, entityManager);
+        final ManagementBean bean = prepareManagementBean();
         final MasterKeyRequest request = prepareRequest(MasterKeyRequest.class, Constants.ADMIN_ACCOUNT);
         request.setSecret(request.getCredential());
 
-        final MasterKeyResponse response = service.perform(request);
+        final MasterKeyResponse response = bean.masterKey(request);
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
         assertEquals("MasterKey unlocked.", response.getReturnMessage());
     }
@@ -232,13 +230,13 @@ final class MasterKeyServiceTest extends DatabaseSetup {
     @Test
     void testUpdateMasterKeyWithUnreachableURL() {
         final String path = tempDir() + "not_existing_file.bin";
-        final MasterKeyService service = new MasterKeyService(settings, entityManager);
+        final ManagementBean bean = prepareManagementBean();
         final MasterKeyRequest request = prepareRequest(MasterKeyRequest.class, Constants.ADMIN_ACCOUNT);
         request.setUrl("file://" + path);
 
-        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
-        assertEquals(ReturnCode.NETWORK_ERROR, cause.getReturnCode());
-        assertEquals(path + " (No such file or directory)", cause.getMessage());
+        final MasterKeyResponse response = bean.masterKey(request);
+        assertEquals(ReturnCode.NETWORK_ERROR.getCode(), response.getReturnCode());
+        assertEquals(path + " (No such file or directory)", response.getReturnMessage());
     }
 
     // =========================================================================
@@ -270,13 +268,13 @@ final class MasterKeyServiceTest extends DatabaseSetup {
      * Reverts the MasterKey to the original or default MasterKey, since other
      * tests will otherwise fail.
      *
-     * @param service MasterKey Service instance
+     * @param bean ManagementBean instance
      */
-    private static void revertMasterKeyToOriginal(final MasterKeyService service) {
+    private static void revertMasterKeyToOriginal(final ManagementBean bean) {
         final MasterKeyRequest resetRequest = prepareRequest(MasterKeyRequest.class, Constants.ADMIN_ACCOUNT);
         resetRequest.setSecret(resetRequest.getCredential());
 
-        final MasterKeyResponse resetResponse = service.perform(resetRequest);
+        final MasterKeyResponse resetResponse = bean.masterKey(resetRequest);
         assertEquals(ReturnCode.SUCCESS.getCode(), resetResponse.getReturnCode());
         assertEquals("MasterKey updated.", resetResponse.getReturnMessage());
     }

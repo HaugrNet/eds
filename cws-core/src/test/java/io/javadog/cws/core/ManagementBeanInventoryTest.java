@@ -14,9 +14,9 @@
  * this program; If not, you can download a copy of the License
  * here: https://www.apache.org/licenses/
  */
-package io.javadog.cws.core.services;
+package io.javadog.cws.core;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
@@ -25,7 +25,6 @@ import io.javadog.cws.api.requests.ProcessDataRequest;
 import io.javadog.cws.api.responses.InventoryResponse;
 import io.javadog.cws.api.responses.ProcessDataResponse;
 import io.javadog.cws.core.setup.DatabaseSetup;
-import io.javadog.cws.core.exceptions.CWSException;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -34,38 +33,38 @@ import org.junit.jupiter.api.Test;
  * @author Kim Jensen
  * @since CWS 1.2
  */
-final class InventoryServiceTest extends DatabaseSetup  {
+final class ManagementBeanInventoryTest extends DatabaseSetup  {
 
     @Test
     void testEmptyRequest() {
-        final InventoryService service = new InventoryService(settings, entityManager);
+        final ManagementBean bean = prepareManagementBean();
         final InventoryRequest request = new InventoryRequest();
 
-        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
-        assertEquals(ReturnCode.VERIFICATION_WARNING, cause.getReturnCode());
+        final InventoryResponse response = bean.inventory(request);
+        assertEquals(ReturnCode.VERIFICATION_WARNING.getCode(), response.getReturnCode());
         assertEquals("Request Object contained errors:" +
-                "\nKey: credential, Error: The Session (Credential) is missing.", cause.getMessage());
+                "\nKey: credential, Error: The Session (Credential) is missing.", response.getReturnMessage());
     }
 
     @Test
     void testReadingEmptyInventory() {
-        final InventoryService service = new InventoryService(settings, entityManager);
+        final ManagementBean bean = prepareManagementBean();
 
         final InventoryRequest request = prepareRequest(InventoryRequest.class, Constants.ADMIN_ACCOUNT);
-        final InventoryResponse response = service.perform(request);
+        final InventoryResponse response = bean.inventory(request);
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
         assertEquals(0, response.getInventory().size());
     }
 
     @Test
     void testReadingInventory() {
-        final ProcessDataService dataService = new ProcessDataService(settings, entityManager);
-        final InventoryService service = new InventoryService(settings, entityManager);
+        final ManagementBean bean = prepareManagementBean();
+        final ShareBean shareBean = prepareShareBean();
 
         // Prepare 100 Objects, so we can read them out.
         for (int i = 0; i < 100; i++) {
             final ProcessDataRequest dataRequest = prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "DataObject" + i, 1024);
-            final ProcessDataResponse saveResponse = dataService.perform(dataRequest);
+            final ProcessDataResponse saveResponse = shareBean.processData(dataRequest);
             assertEquals(ReturnCode.SUCCESS.getCode(), saveResponse.getReturnCode());
         }
 
@@ -75,7 +74,7 @@ final class InventoryServiceTest extends DatabaseSetup  {
             request.setPageSize(pageSize);
             request.setPageNumber(1);
 
-            final InventoryResponse response = service.perform(request);
+            final InventoryResponse response = bean.inventory(request);
             assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
             assertEquals(25, response.getInventory().size());
             assertEquals(100, response.getRecords());
@@ -85,7 +84,7 @@ final class InventoryServiceTest extends DatabaseSetup  {
         request.setPageSize(pageSize);
         request.setPageNumber(5);
 
-        final InventoryResponse response = service.perform(request);
+        final InventoryResponse response = bean.inventory(request);
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
         assertEquals(0, response.getInventory().size());
     }

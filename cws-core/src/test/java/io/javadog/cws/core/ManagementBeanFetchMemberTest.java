@@ -14,12 +14,11 @@
  * this program; If not, you can download a copy of the License
  * here: https://www.apache.org/licenses/
  */
-package io.javadog.cws.core.services;
+package io.javadog.cws.core;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.javadog.cws.api.common.Action;
@@ -30,13 +29,12 @@ import io.javadog.cws.api.requests.FetchMemberRequest;
 import io.javadog.cws.api.requests.ProcessMemberRequest;
 import io.javadog.cws.api.responses.FetchMemberResponse;
 import io.javadog.cws.api.responses.ProcessMemberResponse;
-import io.javadog.cws.core.setup.DatabaseSetup;
 import io.javadog.cws.core.enums.StandardSetting;
-import io.javadog.cws.core.exceptions.CWSException;
 import io.javadog.cws.core.model.Settings;
 import io.javadog.cws.core.model.entities.MemberEntity;
-import java.util.UUID;
+import io.javadog.cws.core.setup.DatabaseSetup;
 import org.junit.jupiter.api.Test;
+import java.util.UUID;
 
 /**
  * <p>Fetching members is similar to fetching Circles, in that it is possible to
@@ -60,7 +58,7 @@ import org.junit.jupiter.api.Test;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-final class FetchMemberServiceTest extends DatabaseSetup {
+final class ManagementBeanFetchMemberTest extends DatabaseSetup {
 
     /**
      * Testing a Request without any credentials. This should always result in
@@ -68,29 +66,29 @@ final class FetchMemberServiceTest extends DatabaseSetup {
      */
     @Test
     void testEmptyRequest() {
-        final FetchMemberService service = new FetchMemberService(settings, entityManager);
+        final ManagementBean bean = prepareManagementBean();
         final FetchMemberRequest request = new FetchMemberRequest();
         // Just making sure that the account is missing
         assertNull(request.getAccountName());
 
         // Should throw a VerificationException, as the request is invalid.
-        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
-        assertEquals(ReturnCode.VERIFICATION_WARNING, cause.getReturnCode());
+        final FetchMemberResponse response = bean.fetchMembers(request);
+        assertEquals(ReturnCode.VERIFICATION_WARNING.getCode(), response.getReturnCode());
         assertEquals("Request Object contained errors:" +
-                "\nKey: credential, Error: The Session (Credential) is missing.", cause.getMessage());
+                "\nKey: credential, Error: The Session (Credential) is missing.", response.getReturnMessage());
     }
 
     @Test
     void testFindNotExistingAccount() {
-        final FetchMemberService service = new FetchMemberService(settings, entityManager);
+        final ManagementBean bean = prepareManagementBean();
 
         // Build and send the Request
         final FetchMemberRequest request = prepareRequest(FetchMemberRequest.class, Constants.ADMIN_ACCOUNT);
         request.setMemberId(UUID.randomUUID().toString());
 
-        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
-        assertEquals(ReturnCode.IDENTIFICATION_WARNING, cause.getReturnCode());
-        assertEquals("The requested Member cannot be found.", cause.getMessage());
+        final FetchMemberResponse response = bean.fetchMembers(request);
+        assertEquals(ReturnCode.IDENTIFICATION_WARNING.getCode(), response.getReturnCode());
+        assertEquals("The requested Member cannot be found.", response.getReturnMessage());
     }
 
     /**
@@ -100,23 +98,21 @@ final class FetchMemberServiceTest extends DatabaseSetup {
      */
     @Test
     void testFindNotExistingAccount2() {
-        // The 2 Service Classes required
-        final ProcessMemberService processService = new ProcessMemberService(settings, entityManager);
-        final FetchMemberService fetchService = new FetchMemberService(settings, entityManager);
+        final ManagementBean bean = prepareManagementBean();
 
         // Step 1: Add a new Member
         final ProcessMemberRequest addRequest = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
         addRequest.setAction(Action.CREATE);
         addRequest.setNewAccountName("new Name");
         addRequest.setNewCredential(addRequest.getNewAccountName().getBytes(settings.getCharset()));
-        final ProcessMemberResponse addResponse = processService.perform(addRequest);
+        final ProcessMemberResponse addResponse = bean.processMember(addRequest);
         assertEquals(ReturnCode.SUCCESS.getCode(), addResponse.getReturnCode());
         assertNotNull(addResponse.getMemberId());
 
         // Step 2: Verify that we can retrieve the Member Account
         final FetchMemberRequest fetchRequest1 = prepareRequest(FetchMemberRequest.class, Constants.ADMIN_ACCOUNT);
         fetchRequest1.setMemberId(addResponse.getMemberId());
-        final FetchMemberResponse fetchResponse1 = fetchService.perform(fetchRequest1);
+        final FetchMemberResponse fetchResponse1 = bean.fetchMembers(fetchRequest1);
         assertEquals(ReturnCode.SUCCESS.getCode(), fetchResponse1.getReturnCode());
         assertEquals(1, fetchResponse1.getMembers().size());
         assertEquals(addResponse.getMemberId(), fetchResponse1.getMembers().get(0).getMemberId());
@@ -125,19 +121,16 @@ final class FetchMemberServiceTest extends DatabaseSetup {
         final ProcessMemberRequest deleteRequest = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
         deleteRequest.setMemberId(addResponse.getMemberId());
         deleteRequest.setAction(Action.DELETE);
-        final ProcessMemberResponse deleteResponse = processService.perform(deleteRequest);
+        final ProcessMemberResponse deleteResponse = bean.processMember(deleteRequest);
         assertEquals(ReturnCode.SUCCESS.getCode(), deleteResponse.getReturnCode());
 
         // Step 3: Attempt to fetch the deleted Member Account, should result
         //         in an Exception, as no such member exists.
         final FetchMemberRequest fetchRequest2 = prepareRequest(FetchMemberRequest.class, Constants.ADMIN_ACCOUNT);
         fetchRequest2.setMemberId(addResponse.getMemberId());
-        try {
-            fetchService.perform(fetchRequest2);
-        } catch (CWSException e) {
-            assertEquals(ReturnCode.IDENTIFICATION_WARNING, e.getReturnCode());
-            assertEquals("The requested Member cannot be found.", e.getMessage());
-        }
+        final FetchMemberResponse fetchResponse2 = bean.fetchMembers(fetchRequest2);
+        assertEquals(ReturnCode.IDENTIFICATION_WARNING.getCode(), fetchResponse2.getReturnCode());
+        assertEquals("The requested Member cannot be found.", fetchResponse2.getReturnMessage());
     }
 
     // =========================================================================
@@ -159,9 +152,10 @@ final class FetchMemberServiceTest extends DatabaseSetup {
         runRequestAndVerifyResponse(mySettings, request);
     }
 
+    // TODO merge if only used once...
     private void runRequestAndVerifyResponse(final Settings mySettings, final FetchMemberRequest request) {
-        final FetchMemberService service = new FetchMemberService(mySettings, entityManager);
-        final FetchMemberResponse fetchResponse = service.perform(request);
+        final ManagementBean bean = prepareManagementBean(mySettings);
+        final FetchMemberResponse fetchResponse = bean.fetchMembers(request);
 
         // Verify that we have found the correct data
         assertNotNull(fetchResponse);
@@ -182,10 +176,10 @@ final class FetchMemberServiceTest extends DatabaseSetup {
         // Ensure that we have the correct settings for the Service
         final Settings mySettings = newSettings();
 
-        final FetchMemberService memberService = new FetchMemberService(mySettings, entityManager);
+        final ManagementBean bean = prepareManagementBean(mySettings);
         final FetchMemberRequest memberRequest = prepareRequest(FetchMemberRequest.class, MEMBER_1);
         assertTrue(memberRequest.validate().isEmpty());
-        final FetchMemberResponse fetchedMemberResponse = memberService.perform(memberRequest);
+        final FetchMemberResponse fetchedMemberResponse = bean.fetchMembers(memberRequest);
 
         // Verify that we have found the correct data
         assertNotNull(fetchedMemberResponse);
@@ -226,11 +220,11 @@ final class FetchMemberServiceTest extends DatabaseSetup {
         // Ensure that we have the correct settings for the Service
         final Settings mySettings = newSettings();
 
-        final FetchMemberService fetchService = new FetchMemberService(mySettings, entityManager);
+        final ManagementBean bean = prepareManagementBean(mySettings);
         final FetchMemberRequest fetchRequest = prepareRequest(FetchMemberRequest.class, Constants.ADMIN_ACCOUNT);
         fetchRequest.setMemberId(ADMIN_ID);
         assertTrue(fetchRequest.validate().isEmpty());
-        final FetchMemberResponse fetchResponse = fetchService.perform(fetchRequest);
+        final FetchMemberResponse fetchResponse = bean.fetchMembers(fetchRequest);
 
         // Verify that we have found the correct data
         assertNotNull(fetchResponse);
@@ -252,11 +246,11 @@ final class FetchMemberServiceTest extends DatabaseSetup {
         final Settings mySettings = newSettings();
         mySettings.set(StandardSetting.SHOW_TRUSTEES, "false");
 
-        final FetchMemberService memberService = new FetchMemberService(mySettings, entityManager);
+        final ManagementBean bean = prepareManagementBean(mySettings);
         final MemberEntity firstMember = findFirstMember();
         final FetchMemberRequest memberRequest = prepareRequest(FetchMemberRequest.class, Constants.ADMIN_ACCOUNT);
         memberRequest.setMemberId(firstMember.getExternalId());
-        final FetchMemberResponse memberResponse = memberService.perform(memberRequest);
+        final FetchMemberResponse memberResponse = bean.fetchMembers(memberRequest);
 
         // Verify that we have found the correct data
         assertNotNull(memberResponse);
@@ -278,11 +272,11 @@ final class FetchMemberServiceTest extends DatabaseSetup {
         final Settings mySettings = newSettings();
         mySettings.set(StandardSetting.SHOW_TRUSTEES, "true");
 
-        final FetchMemberService service = new FetchMemberService(mySettings, entityManager);
+        final ManagementBean bean = prepareManagementBean(mySettings);
         final MemberEntity member = findFirstMember();
         final FetchMemberRequest request = prepareRequest(FetchMemberRequest.class, Constants.ADMIN_ACCOUNT);
         request.setMemberId(member.getExternalId());
-        final FetchMemberResponse response = service.perform(request);
+        final FetchMemberResponse response = bean.fetchMembers(request);
 
         // Verify that we have found the correct data
         assertNotNull(response);
@@ -300,11 +294,11 @@ final class FetchMemberServiceTest extends DatabaseSetup {
         final Settings mySettings = newSettings();
         mySettings.set(StandardSetting.SHOW_TRUSTEES, "true");
 
-        final FetchMemberService memberService = new FetchMemberService(mySettings, entityManager);
+        final ManagementBean bean = prepareManagementBean(mySettings);
         final MemberEntity member = findFirstMember();
         final FetchMemberRequest memberRequest = prepareRequest(FetchMemberRequest.class, MEMBER_1);
         memberRequest.setMemberId(member.getExternalId());
-        final FetchMemberResponse memberResponse = memberService.perform(memberRequest);
+        final FetchMemberResponse memberResponse = bean.fetchMembers(memberRequest);
 
         // Verify that we have found the correct data
         assertNotNull(memberResponse);
@@ -319,11 +313,11 @@ final class FetchMemberServiceTest extends DatabaseSetup {
         final Settings mySettings = newSettings();
         mySettings.set(StandardSetting.SHOW_TRUSTEES, "false");
 
-        final FetchMemberService service = new FetchMemberService(mySettings, entityManager);
+        final ManagementBean bean = prepareManagementBean(mySettings);
         final MemberEntity member = findFirstMember();
         final FetchMemberRequest request = prepareRequest(FetchMemberRequest.class, MEMBER_1);
         request.setMemberId(member.getExternalId());
-        final FetchMemberResponse response = service.perform(request);
+        final FetchMemberResponse response = bean.fetchMembers(request);
 
         // Verify that we have found the correct data
         assertNotNull(response);
@@ -338,11 +332,11 @@ final class FetchMemberServiceTest extends DatabaseSetup {
         final Settings mySettings = newSettings();
         mySettings.set(StandardSetting.SHOW_TRUSTEES, "true");
 
-        final FetchMemberService service = new FetchMemberService(mySettings, entityManager);
+        final ManagementBean bean = prepareManagementBean(mySettings);
         final MemberEntity member = findFirstMember();
         final FetchMemberRequest request = prepareRequest(FetchMemberRequest.class, MEMBER_4);
         request.setMemberId(member.getExternalId());
-        final FetchMemberResponse response = service.perform(request);
+        final FetchMemberResponse response = bean.fetchMembers(request);
 
         // Verify that we have found the correct data
         assertNotNull(response);
@@ -360,11 +354,11 @@ final class FetchMemberServiceTest extends DatabaseSetup {
         final Settings mySettings = newSettings();
         mySettings.set(StandardSetting.SHOW_TRUSTEES, "false");
 
-        final FetchMemberService service = new FetchMemberService(mySettings, entityManager);
+        final ManagementBean bean = prepareManagementBean(mySettings);
         final MemberEntity member = findFirstMember();
         final FetchMemberRequest request = prepareRequest(FetchMemberRequest.class, MEMBER_4);
         request.setMemberId(member.getExternalId());
-        final FetchMemberResponse response = service.perform(request);
+        final FetchMemberResponse response = bean.fetchMembers(request);
 
         // Verify that we have found the correct data
         assertEquals(1, response.getMembers().size());
@@ -382,11 +376,11 @@ final class FetchMemberServiceTest extends DatabaseSetup {
         final Settings mySettings = newSettings();
         mySettings.set(StandardSetting.SHOW_TRUSTEES, "true");
 
-        final FetchMemberService service = new FetchMemberService(mySettings, entityManager);
+        final ManagementBean bean = prepareManagementBean(mySettings);
         final MemberEntity member = findFirstMember();
         final FetchMemberRequest request = prepareRequest(FetchMemberRequest.class, MEMBER_5);
         request.setMemberId(member.getExternalId());
-        final FetchMemberResponse response = service.perform(request);
+        final FetchMemberResponse response = bean.fetchMembers(request);
 
         // Verify that we have found the correct data
         assertNotNull(response);
@@ -400,11 +394,11 @@ final class FetchMemberServiceTest extends DatabaseSetup {
         final Settings mySettings = newSettings();
         mySettings.set(StandardSetting.SHOW_TRUSTEES, "false");
 
-        final FetchMemberService service = new FetchMemberService(mySettings, entityManager);
+        final ManagementBean bean = prepareManagementBean(mySettings);
         final MemberEntity member = findFirstMember();
         final FetchMemberRequest request = prepareRequest(FetchMemberRequest.class, MEMBER_5);
         request.setMemberId(member.getExternalId());
-        final FetchMemberResponse response = service.perform(request);
+        final FetchMemberResponse response = bean.fetchMembers(request);
 
         // Verify that we have found the correct data
         assertNotNull(response);

@@ -14,11 +14,10 @@
  * this program; If not, you can download a copy of the License
  * here: https://www.apache.org/licenses/
  */
-package io.javadog.cws.core.services;
+package io.javadog.cws.core;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.javadog.cws.api.common.Constants;
@@ -28,7 +27,6 @@ import io.javadog.cws.api.responses.SettingResponse;
 import io.javadog.cws.core.setup.DatabaseSetup;
 import io.javadog.cws.core.enums.KeyAlgorithm;
 import io.javadog.cws.core.enums.StandardSetting;
-import io.javadog.cws.core.exceptions.CWSException;
 import io.javadog.cws.core.model.entities.MemberEntity;
 
 import java.util.HashMap;
@@ -48,7 +46,7 @@ import org.junit.jupiter.api.Test;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-final class SettingServiceTest extends DatabaseSetup {
+final class ManagementBeanSettingsTest extends DatabaseSetup {
 
     @Test
     void testCreatingAdmin() {
@@ -64,10 +62,10 @@ final class SettingServiceTest extends DatabaseSetup {
                 .executeUpdate();
         assertEquals(1, deleted);
 
-        final SettingService service = new SettingService(newSettings(), entityManager);
+        final ManagementBean bean = prepareManagementBean(newSettings());
         final SettingRequest request = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
 
-        final SettingResponse response = service.perform(request);
+        final SettingResponse response = bean.settings(request);
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
         assertEquals("Ok", response.getReturnMessage());
         assertEquals(StandardSetting.values().length, response.getSettings().size());
@@ -75,21 +73,21 @@ final class SettingServiceTest extends DatabaseSetup {
 
     @Test
     void testNonAdminRequest() {
-        final SettingService service = new SettingService(newSettings(), entityManager);
+        final ManagementBean bean = prepareManagementBean(newSettings());
         final SettingRequest request = prepareRequest(SettingRequest.class, MEMBER_1);
         assertNotEquals(Constants.ADMIN_ACCOUNT, request.getAccountName());
 
-        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
-        assertEquals(ReturnCode.AUTHORIZATION_WARNING, cause.getReturnCode());
-        assertEquals("Cannot complete this request, as it is only allowed for the System Administrator.", cause.getMessage());
+        final SettingResponse response = bean.settings(request);
+        assertEquals(ReturnCode.AUTHORIZATION_WARNING.getCode(), response.getReturnCode());
+        assertEquals("Cannot complete this request, as it is only allowed for the System Administrator.", response.getReturnMessage());
     }
 
     @Test
     void testInvokingRequestWithNullSettingsList() {
-        final SettingService service = new SettingService(newSettings(), entityManager);
+        final ManagementBean bean = prepareManagementBean(newSettings());
         final SettingRequest request = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
 
-        final SettingResponse response = service.perform(request);
+        final SettingResponse response = bean.settings(request);
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
         assertEquals("Ok", response.getReturnMessage());
         assertEquals(StandardSetting.values().length, response.getSettings().size());
@@ -97,12 +95,12 @@ final class SettingServiceTest extends DatabaseSetup {
 
     @Test
     void testInvokingRequestWithEmptySettings() {
-        final SettingService service = new SettingService(newSettings(), entityManager);
+        final ManagementBean bean = prepareManagementBean(newSettings());
         final SettingRequest request = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
         final Map<String, String> mySettings = new HashMap<>();
         request.setSettings(mySettings);
 
-        final SettingResponse response = service.perform(request);
+        final SettingResponse response = bean.settings(request);
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
         assertEquals("Ok", response.getReturnMessage());
         assertEquals(StandardSetting.values().length, response.getSettings().size());
@@ -110,28 +108,28 @@ final class SettingServiceTest extends DatabaseSetup {
 
     @Test
     void testInvokingRequestWithNullKey() {
-        final SettingService service = new SettingService(newSettings(), entityManager);
+        final ManagementBean bean = prepareManagementBean(newSettings());
         final SettingRequest request = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
         final Map<String, String> mySettings = new HashMap<>();
         mySettings.put(null, "NullKey");
         request.setSettings(mySettings);
 
-        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
-        assertEquals(ReturnCode.SETTING_WARNING, cause.getReturnCode());
-        assertEquals("Setting Keys may neither be null nor empty.", cause.getMessage());
+        final SettingResponse response = bean.settings(request);
+        assertEquals(ReturnCode.SETTING_WARNING.getCode(), response.getReturnCode());
+        assertEquals("Setting Keys may neither be null nor empty.", response.getReturnMessage());
     }
 
     @Test
     void testInvokingRequestWithEmptyKey() {
-        final SettingService service = new SettingService(newSettings(), entityManager);
+        final ManagementBean bean = prepareManagementBean(newSettings());
         final SettingRequest request = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
         final Map<String, String> mySettings = new HashMap<>();
         mySettings.put("", "EmptyKey");
         request.setSettings(mySettings);
 
-        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
-        assertEquals(ReturnCode.SETTING_WARNING, cause.getReturnCode());
-        assertEquals("Setting Keys may neither be null nor empty.", cause.getMessage());
+        final SettingResponse response = bean.settings(request);
+        assertEquals(ReturnCode.SETTING_WARNING.getCode(), response.getReturnCode());
+        assertEquals("Setting Keys may neither be null nor empty.", response.getReturnMessage());
     }
 
     /**
@@ -149,9 +147,9 @@ final class SettingServiceTest extends DatabaseSetup {
             dao.delete(member);
         }
 
-        final SettingService service = new SettingService(newSettings(), entityManager);
+        final ManagementBean bean = prepareManagementBean(newSettings());
         final SettingRequest request = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
-        final SettingResponse response = service.perform(request);
+        final SettingResponse response = bean.settings(request);
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
 
         final Map<String, String> mySettings = new HashMap<>(response.getSettings());
@@ -159,13 +157,13 @@ final class SettingServiceTest extends DatabaseSetup {
         mySettings.put(StandardSetting.PBE_ITERATIONS.getKey(), "100000");
         request.setCredential(crypto.stringToBytes(Constants.ADMIN_ACCOUNT));
         request.setSettings(mySettings);
-        final SettingResponse update = service.perform(request);
+        final SettingResponse update = bean.settings(request);
         assertEquals(ReturnCode.SUCCESS.getCode(), update.getReturnCode());
 
         // Running a verification check, to ensure that the System Administrator
         // can still access the system, after the SALT was updated.
         final SettingRequest checkRequest = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
-        final SettingResponse checkResponse = service.perform(checkRequest);
+        final SettingResponse checkResponse = bean.settings(checkRequest);
         assertTrue(checkResponse.isOk());
 
         // Finally the negative test, seeing what happens if an invalid PBE
@@ -174,19 +172,19 @@ final class SettingServiceTest extends DatabaseSetup {
         final SettingRequest negativeRequest = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
         negativeRequest.setSettings(mySettings);
 
-        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(negativeRequest));
-        assertEquals(ReturnCode.SETTING_WARNING, cause.getReturnCode());
-        assertEquals("Invalid Integer value for 'PBE_ITERATIONS'.", cause.getMessage());
+        final SettingResponse negativeResponse = bean.settings(negativeRequest);
+        assertEquals(ReturnCode.SETTING_WARNING.getCode(), negativeResponse.getReturnCode());
+        assertEquals("Invalid Integer value for 'PBE_ITERATIONS'.", negativeResponse.getReturnMessage());
     }
 
     @Test
     void testInvokingRequestUpdateExistingSetting() {
-        final SettingService service = new SettingService(newSettings(), entityManager);
+        final ManagementBean bean = prepareManagementBean(newSettings());
         final SettingRequest request = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
 
         // First invocation, retrieving the list of current values so we can
         // check that it is being updated
-        final SettingResponse response = service.perform(request);
+        final SettingResponse response = bean.settings(request);
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
         assertEquals("Ok", response.getReturnMessage());
         assertEquals(StandardSetting.values().length, response.getSettings().size());
@@ -199,7 +197,7 @@ final class SettingServiceTest extends DatabaseSetup {
         request.setSettings(mySettings);
         request.setCredential(crypto.stringToBytes(Constants.ADMIN_ACCOUNT));
 
-        final SettingResponse update = service.perform(request);
+        final SettingResponse update = bean.settings(request);
         assertEquals(ReturnCode.SUCCESS.getCode(), update.getReturnCode());
         assertEquals("Ok", update.getReturnMessage());
         assertEquals(StandardSetting.values().length, update.getSettings().size());
@@ -208,13 +206,13 @@ final class SettingServiceTest extends DatabaseSetup {
 
     @Test
     void testAddingAndRemovingCustomSetting() {
-        final SettingService service = new SettingService(newSettings(), entityManager);
+        final ManagementBean bean = prepareManagementBean(newSettings());
         final SettingRequest request = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
         final Map<String, String> mySettings = new HashMap<>();
         mySettings.put("my.setting.key", "value");
         request.setSettings(mySettings);
 
-        final SettingResponse update = service.perform(request);
+        final SettingResponse update = bean.settings(request);
         assertEquals(ReturnCode.SUCCESS.getCode(), update.getReturnCode());
         assertEquals("Ok", update.getReturnMessage());
         assertEquals(StandardSetting.values().length + 1, update.getSettings().size());
@@ -222,27 +220,27 @@ final class SettingServiceTest extends DatabaseSetup {
 
     @Test
     void testInvokingRequestUpdateNotAllowedExistingSetting() {
-        final SettingService service = new SettingService(newSettings(), entityManager);
+        final ManagementBean bean = prepareManagementBean(newSettings());
         final SettingRequest request = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
         final Map<String, String> mySettings = new HashMap<>();
         mySettings.put("cws.system.salt", "Enabling Kill Switch");
         assertEquals("Enabling Kill Switch", mySettings.get("cws.system.salt"));
         request.setSettings(mySettings);
 
-        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
-        assertEquals(ReturnCode.SETTING_WARNING, cause.getReturnCode());
-        assertEquals("The setting cws.system.salt may not be overwritten.", cause.getMessage());
+        final SettingResponse response = bean.settings(request);
+        assertEquals(ReturnCode.SETTING_WARNING.getCode(), response.getReturnCode());
+        assertEquals("The setting cws.system.salt may not be overwritten.", response.getReturnMessage());
     }
 
     @Test
     void testInvokingRequestAddNewSetting() {
-        final SettingService service = new SettingService(newSettings(), entityManager);
+        final ManagementBean bean = prepareManagementBean(newSettings());
         final SettingRequest request = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
         final Map<String, String> mySettings = new HashMap<>();
         mySettings.put("cws.test.setting", "Setting Value");
         request.setSettings(mySettings);
 
-        final SettingResponse response = service.perform(request);
+        final SettingResponse response = bean.settings(request);
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
         assertEquals("Ok", response.getReturnMessage());
         assertEquals(StandardSetting.values().length + 1, response.getSettings().size());
@@ -251,43 +249,43 @@ final class SettingServiceTest extends DatabaseSetup {
 
     @Test
     void testDeletingCustomSetting() {
-        final SettingService service = new SettingService(newSettings(), entityManager);
+        final ManagementBean bean = prepareManagementBean(newSettings());
         final SettingRequest request = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
         final Map<String, String> mySettings = new HashMap<>();
         mySettings.put("cws.test.setting", "Test Value");
         request.setSettings(mySettings);
         assertTrue(request.validate().isEmpty());
 
-        final SettingResponse response = service.perform(request);
+        final SettingResponse response = bean.settings(request);
         assertTrue(response.isOk());
         assertEquals(StandardSetting.values().length + 1, response.getSettings().size());
 
         mySettings.put("cws.test.setting", null);
         request.setCredential(crypto.stringToBytes(Constants.ADMIN_ACCOUNT));
         request.setSettings(mySettings);
-        final SettingResponse deleteResponse = service.perform(request);
+        final SettingResponse deleteResponse = bean.settings(request);
         assertTrue(deleteResponse.isOk());
         assertEquals(StandardSetting.values().length, deleteResponse.getSettings().size());
     }
 
     @Test
     void testDeletingStandardSetting() {
-        final SettingService service = new SettingService(newSettings(), entityManager);
+        final ManagementBean bean = prepareManagementBean(newSettings());
         final SettingRequest request = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
         final Map<String, String> mySettings = new HashMap<>();
         mySettings.put(StandardSetting.CWS_CHARSET.getKey(), null);
         request.setSettings(mySettings);
 
-        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
-        assertEquals(ReturnCode.SETTING_WARNING, cause.getReturnCode());
-        assertEquals("The value for the key 'cws.system.charset' is undefined.", cause.getMessage());
+        final SettingResponse response = bean.settings(request);
+        assertEquals(ReturnCode.SETTING_WARNING.getCode(), response.getReturnCode());
+        assertEquals("The value for the key 'cws.system.charset' is undefined.", response.getReturnMessage());
     }
 
     @Test
     void testSetCryptoAlgorithms() {
-        final SettingService service = new SettingService(newSettings(), entityManager);
+        final ManagementBean bean = prepareManagementBean(newSettings());
         final SettingRequest request1 = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
-        final SettingResponse response1 = service.perform(request1);
+        final SettingResponse response1 = bean.settings(request1);
         assertTrue(response1.isOk());
 
         final Map<String, String> mySettings = response1.getSettings();
@@ -299,15 +297,15 @@ final class SettingServiceTest extends DatabaseSetup {
 
         final SettingRequest request2 = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
         request2.setSettings(mySettings);
-        final SettingResponse response2 = service.perform(request2);
+        final SettingResponse response2 = bean.settings(request2);
         assertTrue(response2.isOk());
     }
 
     @Test
     void testSetInvalidSymmetricAlgorithm() {
-        final SettingService service = new SettingService(newSettings(), entityManager);
+        final ManagementBean bean = prepareManagementBean(newSettings());
         final SettingRequest request1 = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
-        final SettingResponse response1 = service.perform(request1);
+        final SettingResponse response1 = bean.settings(request1);
         assertTrue(response1.isOk());
 
         final Map<String, String> mySettings = response1.getSettings();
@@ -316,29 +314,29 @@ final class SettingServiceTest extends DatabaseSetup {
         final SettingRequest request2 = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
         request2.setSettings(mySettings);
 
-        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request2));
-        assertEquals(ReturnCode.SETTING_WARNING, cause.getReturnCode());
-        assertEquals("Unsupported Crypto Algorithm for 'cws.crypto.symmetric.algorithm'.", cause.getMessage());
+        final SettingResponse response2 = bean.settings(request2);
+        assertEquals(ReturnCode.SETTING_WARNING.getCode(), response2.getReturnCode());
+        assertEquals("Unsupported Crypto Algorithm for 'cws.crypto.symmetric.algorithm'.", response2.getReturnMessage());
     }
 
     @Test
     void testInvalidCharset() {
-        final SettingService service = new SettingService(newSettings(), entityManager);
+        final ManagementBean bean = prepareManagementBean(newSettings());
         final SettingRequest request = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
         final Map<String, String> newSettings = new HashMap<>();
         newSettings.put(StandardSetting.CWS_CHARSET.getKey(), "UTF-9");
         request.setSettings(newSettings);
 
-        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
-        assertEquals(ReturnCode.SETTING_WARNING, cause.getReturnCode());
-        assertEquals("Invalid Character set value for 'cws.system.charset'.", cause.getMessage());
+        final SettingResponse response = bean.settings(request);
+        assertEquals(ReturnCode.SETTING_WARNING.getCode(), response.getReturnCode());
+        assertEquals("Invalid Character set value for 'cws.system.charset'.", response.getReturnMessage());
     }
 
     @Test
     void testSanityInterval() {
-        final SettingService service = new SettingService(newSettings(), entityManager);
+        final ManagementBean bean = prepareManagementBean(newSettings());
         final SettingRequest request1 = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
-        final SettingResponse response1 = service.perform(request1);
+        final SettingResponse response1 = bean.settings(request1);
         assertTrue(response1.isOk());
 
         final Map<String, String> mySettings = response1.getSettings();
@@ -347,28 +345,28 @@ final class SettingServiceTest extends DatabaseSetup {
 
         final SettingRequest request2 = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
         request2.setSettings(mySettings);
-        final SettingResponse response2 = service.perform(request2);
+        final SettingResponse response2 = bean.settings(request2);
         assertTrue(response2.isOk());
 
         mySettings.put(StandardSetting.SANITY_INTERVAL.getKey(), "weekly");
         final SettingRequest request3 = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
         request3.setSettings(mySettings);
 
-        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request3));
-        assertEquals(ReturnCode.SETTING_WARNING, cause.getReturnCode());
-        assertEquals("Invalid Integer value for 'SANITY_INTERVAL'.", cause.getMessage());
+        final SettingResponse response3 = bean.settings(request3);
+        assertEquals(ReturnCode.SETTING_WARNING.getCode(), response3.getReturnCode());
+        assertEquals("Invalid Integer value for 'SANITY_INTERVAL'.", response3.getReturnMessage());
     }
 
     @Test
     void testUpdateMasterKeyUrlSetting() {
-        final SettingService service = new SettingService(newSettings(), entityManager);
+        final ManagementBean bean = prepareManagementBean(newSettings());
         final SettingRequest request = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
         final Map<String, String> newSettings = new HashMap<>();
         newSettings.put(StandardSetting.MASTERKEY_URL.getKey(), "https://cool.url/to/new/key");
         request.setSettings(newSettings);
 
-        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
-        assertEquals(ReturnCode.SETTING_WARNING, cause.getReturnCode());
-        assertEquals("The setting cws.masterkey.url may not be changed with this request.", cause.getMessage());
+        final SettingResponse response = bean.settings(request);
+        assertEquals(ReturnCode.SETTING_WARNING.getCode(), response.getReturnCode());
+        assertEquals("The setting cws.masterkey.url may not be changed with this request.", response.getReturnMessage());
     }
 }

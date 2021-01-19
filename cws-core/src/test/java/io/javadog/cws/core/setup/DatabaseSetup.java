@@ -24,6 +24,8 @@ import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.requests.Authentication;
 import io.javadog.cws.api.requests.ProcessDataRequest;
 import io.javadog.cws.api.responses.ProcessDataResponse;
+import io.javadog.cws.core.ManagementBean;
+import io.javadog.cws.core.ShareBean;
 import io.javadog.cws.core.enums.KeyAlgorithm;
 import io.javadog.cws.core.enums.SanityStatus;
 import io.javadog.cws.core.enums.StandardSetting;
@@ -124,6 +126,22 @@ public class DatabaseSetup {
         if (transaction != null) {
             transaction.rollback();
         }
+    }
+
+    protected ManagementBean prepareManagementBean(final Settings... settings) {
+        final ManagementBean bean = new ManagementBean();
+        inject(bean, entityManager);
+        inject(bean, ((settings != null) && (settings.length == 1)) ? settings[0] : this.settings);
+
+        return bean;
+    }
+
+    protected ShareBean prepareShareBean() {
+        final ShareBean bean = new ShareBean();
+        inject(bean, entityManager);
+        inject(bean, settings);
+
+        return bean;
     }
 
     protected static <T extends Authentication> T prepareRequest(final Class<T> clazz, final String account) {

@@ -14,16 +14,13 @@
  * this program; If not, you can download a copy of the License
  * here: https://www.apache.org/licenses/
  */
-package io.javadog.cws.core.services;
+package io.javadog.cws.core;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
-import io.javadog.cws.api.requests.Authentication;
-import io.javadog.cws.api.responses.AuthenticateResponse;
-import io.javadog.cws.core.services.AuthenticatedService;
+import io.javadog.cws.api.responses.VersionResponse;
 import io.javadog.cws.core.setup.DatabaseSetup;
 import org.junit.jupiter.api.Test;
 
@@ -31,20 +28,17 @@ import org.junit.jupiter.api.Test;
  * <p>This Test Class, is testing the Authenticated Service Class.</p>
  *
  * @author Kim Jensen
- * @since CWS 1.1
+ * @since CWS 2.0
  */
-final class AuthenticatedServiceTest extends DatabaseSetup {
+final class ManagementBeanVersionTest extends DatabaseSetup {
 
     @Test
-    void testAuthenticate() {
-        final AuthenticatedService service = new AuthenticatedService(settings, entityManager);
-        final Authentication request = prepareRequest(Authentication.class, MEMBER_1);
-        final AuthenticateResponse response = service.perform(request);
+    void testVersion() {
+        final ManagementBean bean = prepareManagementBean();
+        final VersionResponse response = bean.version();
 
-        assertNotNull(response);
-        assertTrue(response.isOk());
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
-        assertEquals("member1 successfully authenticated.", response.getReturnMessage());
-        assertEquals(MEMBER_1_ID, response.getMemberId());
+        assertEquals("Ok", response.getReturnMessage());
+        assertEquals(Constants.CWS_VERSION, response.getVersion());
     }
 }

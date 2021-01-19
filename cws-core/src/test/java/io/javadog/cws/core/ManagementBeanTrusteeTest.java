@@ -14,13 +14,12 @@
  * this program; If not, you can download a copy of the License
  * here: https://www.apache.org/licenses/
  */
-package io.javadog.cws.core.services;
+package io.javadog.cws.core;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.javadog.cws.api.common.Action;
@@ -28,17 +27,14 @@ import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.common.TrustLevel;
 import io.javadog.cws.api.dtos.Trustee;
-import io.javadog.cws.api.requests.Authentication;
 import io.javadog.cws.api.requests.FetchTrusteeRequest;
 import io.javadog.cws.api.requests.ProcessCircleRequest;
 import io.javadog.cws.api.requests.ProcessTrusteeRequest;
-import io.javadog.cws.api.responses.CwsResponse;
 import io.javadog.cws.api.responses.FetchTrusteeResponse;
 import io.javadog.cws.api.responses.ProcessCircleResponse;
 import io.javadog.cws.api.responses.ProcessTrusteeResponse;
 import io.javadog.cws.core.setup.DatabaseSetup;
 import io.javadog.cws.core.enums.StandardSetting;
-import io.javadog.cws.core.exceptions.CWSException;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
@@ -49,44 +45,43 @@ import org.junit.jupiter.api.Test;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-final class TrusteeServiceTest extends DatabaseSetup {
+final class ManagementBeanTrusteeTest extends DatabaseSetup {
 
     @Test
     void testEmptyFetchRequest() {
-        final FetchTrusteeService service = new FetchTrusteeService(settings, entityManager);
+        final ManagementBean bean = prepareManagementBean();
         final FetchTrusteeRequest request = new FetchTrusteeRequest();
 
-        // Should throw a VerificationException, as the request is invalid.
-        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
-        assertEquals(ReturnCode.VERIFICATION_WARNING, cause.getReturnCode());
+        final FetchTrusteeResponse response = bean.fetchTrustees(request);
+        assertEquals(ReturnCode.VERIFICATION_WARNING.getCode(), response.getReturnCode());
         assertEquals("Request Object contained errors:" +
-                "\nKey: credential, Error: The Session (Credential) is missing.", cause.getMessage());
+                "\nKey: credential, Error: The Session (Credential) is missing.", response.getReturnMessage());
     }
 
     @Test
     void testEmptyProcessRequest() {
-        final ProcessTrusteeService service = new ProcessTrusteeService(settings, entityManager);
+        final ManagementBean bean = prepareManagementBean();
         final ProcessTrusteeRequest request = new ProcessTrusteeRequest();
         // Just making sure that the account is missing
         assertNull(request.getAccountName());
 
         // Should throw a VerificationException, as the request is invalid.
-        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
-        assertEquals(ReturnCode.VERIFICATION_WARNING, cause.getReturnCode());
+        final ProcessTrusteeResponse response = bean.processTrustee(request);
+        assertEquals(ReturnCode.VERIFICATION_WARNING.getCode(), response.getReturnCode());
         assertEquals("Request Object contained errors:" +
                 "\nKey: credential, Error: The Session (Credential) is missing." +
-                "\nKey: action, Error: No action has been provided.", cause.getMessage());
+                "\nKey: action, Error: No action has been provided.", response.getReturnMessage());
     }
 
     @Test
     void testFetchNotExistingCircle() {
-        final FetchTrusteeService service = new FetchTrusteeService(settings, entityManager);
+        final ManagementBean bean = prepareManagementBean();
         final FetchTrusteeRequest request = prepareRequest(FetchTrusteeRequest.class, Constants.ADMIN_ACCOUNT);
         request.setCircleId(UUID.randomUUID().toString());
 
-        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
-        assertEquals(ReturnCode.IDENTIFICATION_WARNING, cause.getReturnCode());
-        assertEquals("The requested Circle cannot be found.", cause.getMessage());
+        final FetchTrusteeResponse response = bean.fetchTrustees(request);
+        assertEquals(ReturnCode.IDENTIFICATION_WARNING.getCode(), response.getReturnCode());
+        assertEquals("The requested Circle cannot be found.", response.getReturnMessage());
     }
 
     @Test
@@ -94,10 +89,10 @@ final class TrusteeServiceTest extends DatabaseSetup {
         // Ensure that we have the correct settings for the Service
         settings.set(StandardSetting.SHOW_TRUSTEES, "true");
 
-        final FetchTrusteeService service = new FetchTrusteeService(settings, entityManager);
+        final ManagementBean bean = prepareManagementBean();
         final FetchTrusteeRequest request = prepareRequest(FetchTrusteeRequest.class, Constants.ADMIN_ACCOUNT);
         request.setCircleId(CIRCLE_1_ID);
-        final FetchTrusteeResponse response = service.perform(request);
+        final FetchTrusteeResponse response = bean.fetchTrustees(request);
 
         assertTrue(response.isOk());
         detailedTrusteeAssertion(response, MEMBER_1_ID, MEMBER_2_ID, MEMBER_3_ID);
@@ -105,129 +100,122 @@ final class TrusteeServiceTest extends DatabaseSetup {
 
     @Test
     void testFetchTrusteesAsMemberWithValidCircleId() {
-        final FetchTrusteeService service = new FetchTrusteeService(settings, entityManager);
+        final ManagementBean bean = prepareManagementBean();
         final FetchTrusteeRequest request = prepareRequest(FetchTrusteeRequest.class, MEMBER_1);
         request.setCircleId(CIRCLE_1_ID);
-        final FetchTrusteeResponse response = service.perform(request);
+        final FetchTrusteeResponse response = bean.fetchTrustees(request);
 
         assertEquals("Ok", response.getReturnMessage());
     }
 
     @Test
     void testFetchTrusteesAsMemberWithNonMemberCircleId() {
-        final FetchTrusteeService service = new FetchTrusteeService(settings, entityManager);
+        final ManagementBean bean = prepareManagementBean();
         final FetchTrusteeRequest request = prepareRequest(FetchTrusteeRequest.class, MEMBER_1);
         request.setCircleId(CIRCLE_3_ID);
 
-        // Should throw a VerificationException, as the request is invalid.
-        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
-        assertEquals(ReturnCode.IDENTIFICATION_WARNING, cause.getReturnCode());
-        assertEquals("No Trustee information found for member 'member1' and circle '" + CIRCLE_3_ID + "'.", cause.getMessage());
+        final FetchTrusteeResponse response = bean.fetchTrustees(request);
+        assertEquals(ReturnCode.IDENTIFICATION_WARNING.getCode(), response.getReturnCode());
+        assertEquals("No Trustee information found for member 'member1' and circle '" + CIRCLE_3_ID + "'.", response.getReturnMessage());
     }
 
     @Test
     void testFetchTrusteesAsMemberWithInvalidCircleId() {
-        final FetchTrusteeService service = new FetchTrusteeService(settings, entityManager);
+        final ManagementBean bean = prepareManagementBean();
         final FetchTrusteeRequest request = prepareRequest(FetchTrusteeRequest.class, Constants.ADMIN_ACCOUNT);
         final String circleId = UUID.randomUUID().toString();
         request.setCircleId(circleId);
 
-        // Should throw a VerificationException, as the request is invalid.
-        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
-        assertEquals(ReturnCode.IDENTIFICATION_WARNING, cause.getReturnCode());
-        assertEquals("The requested Circle cannot be found.", cause.getMessage());
+        final FetchTrusteeResponse response = bean.fetchTrustees(request);
+        assertEquals(ReturnCode.IDENTIFICATION_WARNING.getCode(), response.getReturnCode());
+        assertEquals("The requested Circle cannot be found.", response.getReturnMessage());
     }
 
     @Test
     void testFetchTrusteesAsAdminWithValidCircleId() {
-        final FetchTrusteeService service = new FetchTrusteeService(settings, entityManager);
+        final ManagementBean bean = prepareManagementBean();
         final FetchTrusteeRequest request = prepareRequest(FetchTrusteeRequest.class, Constants.ADMIN_ACCOUNT);
         request.setCircleId(CIRCLE_1_ID);
-        final FetchTrusteeResponse response = service.perform(request);
+        final FetchTrusteeResponse response = bean.fetchTrustees(request);
 
         assertEquals("Ok", response.getReturnMessage());
     }
 
     @Test
     void testFetchTrusteesAsAdminWithInvalidCircleId() {
-        final FetchTrusteeService service = new FetchTrusteeService(settings, entityManager);
+        final ManagementBean bean = prepareManagementBean();
         final FetchTrusteeRequest request = prepareRequest(FetchTrusteeRequest.class, Constants.ADMIN_ACCOUNT);
         final String circleId = UUID.randomUUID().toString();
         request.setCircleId(circleId);
 
-        // Should throw a VerificationException, as the request is invalid.
-        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
-        assertEquals(ReturnCode.IDENTIFICATION_WARNING, cause.getReturnCode());
-        assertEquals("The requested Circle cannot be found.", cause.getMessage());
+        final FetchTrusteeResponse response = bean.fetchTrustees(request);
+        assertEquals(ReturnCode.IDENTIFICATION_WARNING.getCode(), response.getReturnCode());
+        assertEquals("The requested Circle cannot be found.", response.getReturnMessage());
     }
 
     @Test
     void testFetchTrusteesAsMemberWithValidCircleIdAndMemberId() {
-        final FetchTrusteeService service = new FetchTrusteeService(settings, entityManager);
+        final ManagementBean bean = prepareManagementBean();
         final FetchTrusteeRequest request = prepareRequest(FetchTrusteeRequest.class, MEMBER_1);
         request.setCircleId(CIRCLE_1_ID);
         request.setMemberId(MEMBER_2_ID);
-        final FetchTrusteeResponse response = service.perform(request);
+        final FetchTrusteeResponse response = bean.fetchTrustees(request);
 
         assertEquals("Ok", response.getReturnMessage());
     }
 
     @Test
     void testFetchTrusteesAsNonTrusteeWithCircleIdAndMemberId() {
-        final FetchTrusteeService service = new FetchTrusteeService(settings, entityManager);
+        final ManagementBean bean = prepareManagementBean();
         final FetchTrusteeRequest request = prepareRequest(FetchTrusteeRequest.class, MEMBER_1);
         request.setCircleId(CIRCLE_3_ID);
         request.setMemberId(MEMBER_5_ID);
 
-        // Should throw a VerificationException, as the request is invalid.
-        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
-        assertEquals(ReturnCode.IDENTIFICATION_WARNING, cause.getReturnCode());
-        assertEquals("No Trustee information found for member 'member1' and circle '" + CIRCLE_3_ID + "'.", cause.getMessage());
+        final FetchTrusteeResponse response = bean.fetchTrustees(request);
+        assertEquals(ReturnCode.IDENTIFICATION_WARNING.getCode(), response.getReturnCode());
+        assertEquals("No Trustee information found for member 'member1' and circle '" + CIRCLE_3_ID + "'.", response.getReturnMessage());
     }
 
     @Test
     void testFetchTrusteesAsAdminWithValidCircleIdAndMemberId() {
-        final FetchTrusteeService service = new FetchTrusteeService(settings, entityManager);
+        final ManagementBean bean = prepareManagementBean();
         final FetchTrusteeRequest request = prepareRequest(FetchTrusteeRequest.class, Constants.ADMIN_ACCOUNT);
         request.setCircleId(CIRCLE_1_ID);
         request.setMemberId(MEMBER_5_ID);
 
-        // Should throw a VerificationException, as the request is invalid.
-        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
-        assertEquals(ReturnCode.IDENTIFICATION_WARNING, cause.getReturnCode());
-        assertEquals("Unable to find any relation between given Circle & Member Id's.", cause.getMessage());
+        final FetchTrusteeResponse response = bean.fetchTrustees(request);
+        assertEquals(ReturnCode.IDENTIFICATION_WARNING.getCode(), response.getReturnCode());
+        assertEquals("Unable to find any relation between given Circle & Member Id's.", response.getReturnMessage());
     }
 
     @Test
     void testFetchTrusteesAsAdminWithNonExistingMemberId() {
-        final FetchTrusteeService service = new FetchTrusteeService(settings, entityManager);
+        final ManagementBean bean = prepareManagementBean();
         final FetchTrusteeRequest request = prepareRequest(FetchTrusteeRequest.class, Constants.ADMIN_ACCOUNT);
         request.setMemberId(UUID.randomUUID().toString());
 
-        // Should throw a VerificationException, as the request is invalid.
-        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
-        assertEquals(ReturnCode.IDENTIFICATION_WARNING, cause.getReturnCode());
-        assertEquals("Unable to find any Trustee information for the given Member Id.", cause.getMessage());
+        final FetchTrusteeResponse response = bean.fetchTrustees(request);
+        assertEquals(ReturnCode.IDENTIFICATION_WARNING.getCode(), response.getReturnCode());
+        assertEquals("Unable to find any Trustee information for the given Member Id.", response.getReturnMessage());
     }
 
     @Test
     void testFetchTrusteesAsMemberWithNonAdminPermissions() {
-        final FetchTrusteeService service = new FetchTrusteeService(settings, entityManager);
+        final ManagementBean bean = prepareManagementBean();
         final FetchTrusteeRequest request = prepareRequest(FetchTrusteeRequest.class, MEMBER_1);
         request.setMemberId(MEMBER_2_ID);
 
-        // Should throw a VerificationException, as the request is invalid.
-        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
-        assertEquals(ReturnCode.IDENTIFICATION_WARNING, cause.getReturnCode());
-        assertEquals("Requesting Member is not authorized to inquire about other Member's.", cause.getMessage());
+        final FetchTrusteeResponse response = bean.fetchTrustees(request);
+        assertEquals(ReturnCode.IDENTIFICATION_WARNING.getCode(), response.getReturnCode());
+        assertEquals("Requesting Member is not authorized to inquire about other Member's.", response.getReturnMessage());
     }
 
     @Test
     void testFetchTrusteesAsSelf() {
-        final FetchTrusteeService service = new FetchTrusteeService(settings, entityManager);
+        final ManagementBean bean = prepareManagementBean();
         final FetchTrusteeRequest request = prepareRequest(FetchTrusteeRequest.class, MEMBER_1);
         request.setMemberId(MEMBER_1_ID);
-        final FetchTrusteeResponse response = service.perform(request);
+        final FetchTrusteeResponse response = bean.fetchTrustees(request);
 
         assertEquals("Ok", response.getReturnMessage());
         assertEquals(2, response.getTrustees().size());
@@ -245,9 +233,9 @@ final class TrusteeServiceTest extends DatabaseSetup {
 
     @Test
     void testFetchTrusteesWithoutParameters() {
-        final FetchTrusteeService service = new FetchTrusteeService(settings, entityManager);
+        final ManagementBean bean = prepareManagementBean();
         final FetchTrusteeRequest request = prepareRequest(FetchTrusteeRequest.class, MEMBER_5);
-        final FetchTrusteeResponse response = service.perform(request);
+        final FetchTrusteeResponse response = bean.fetchTrustees(request);
 
         assertEquals("Ok", response.getReturnMessage());
         assertEquals(1, response.getTrustees().size());
@@ -260,10 +248,10 @@ final class TrusteeServiceTest extends DatabaseSetup {
 
     @Test
     void testFetchTrusteesAsAdmin() {
-        final FetchTrusteeService service = new FetchTrusteeService(settings, entityManager);
+        final ManagementBean bean = prepareManagementBean();
         final FetchTrusteeRequest request = prepareRequest(FetchTrusteeRequest.class, Constants.ADMIN_ACCOUNT);
         request.setMemberId(MEMBER_1_ID);
-        final FetchTrusteeResponse response = service.perform(request);
+        final FetchTrusteeResponse response = bean.fetchTrustees(request);
 
         assertEquals("Ok", response.getReturnMessage());
     }
@@ -273,10 +261,10 @@ final class TrusteeServiceTest extends DatabaseSetup {
         // Ensure that we have the correct settings for the Service
         settings.set(StandardSetting.SHOW_TRUSTEES, "false");
 
-        final FetchTrusteeService service = new FetchTrusteeService(settings, entityManager);
+        final ManagementBean bean = prepareManagementBean();
         final FetchTrusteeRequest request = prepareRequest(FetchTrusteeRequest.class, Constants.ADMIN_ACCOUNT);
         request.setCircleId(CIRCLE_1_ID);
-        final FetchTrusteeResponse response = service.perform(request);
+        final FetchTrusteeResponse response = bean.fetchTrustees(request);
         assertTrue(response.isOk());
         detailedTrusteeAssertion(response, MEMBER_1_ID, MEMBER_2_ID, MEMBER_3_ID);
     }
@@ -286,10 +274,10 @@ final class TrusteeServiceTest extends DatabaseSetup {
         // Ensure that we have the correct settings for the Service
         settings.set(StandardSetting.SHOW_TRUSTEES, "true");
 
-        final FetchTrusteeService service = new FetchTrusteeService(settings, entityManager);
+        final ManagementBean bean = prepareManagementBean();
         final FetchTrusteeRequest request = prepareRequest(FetchTrusteeRequest.class, MEMBER_1);
         request.setCircleId(CIRCLE_1_ID);
-        final FetchTrusteeResponse response = service.perform(request);
+        final FetchTrusteeResponse response = bean.fetchTrustees(request);
 
         assertTrue(response.isOk());
         detailedTrusteeAssertion(response, MEMBER_1_ID, MEMBER_2_ID, MEMBER_3_ID);
@@ -300,10 +288,10 @@ final class TrusteeServiceTest extends DatabaseSetup {
         // Ensure that we have the correct settings for the Service
         settings.set(StandardSetting.SHOW_TRUSTEES, "false");
 
-        final FetchTrusteeService service = new FetchTrusteeService(settings, entityManager);
+        final ManagementBean bean = prepareManagementBean();
         final FetchTrusteeRequest request = prepareRequest(FetchTrusteeRequest.class, MEMBER_1);
         request.setCircleId(CIRCLE_1_ID);
-        final FetchTrusteeResponse response = service.perform(request);
+        final FetchTrusteeResponse response = bean.fetchTrustees(request);
 
         assertNotNull(response);
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
@@ -335,14 +323,14 @@ final class TrusteeServiceTest extends DatabaseSetup {
         // Ensure that we have the correct settings for the Service
         settings.set(StandardSetting.SHOW_TRUSTEES, "true");
 
-        final FetchTrusteeService service = new FetchTrusteeService(settings, entityManager);
+        final ManagementBean bean = prepareManagementBean();
         final FetchTrusteeRequest request = prepareRequest(FetchTrusteeRequest.class, MEMBER_5);
         assertNotNull(request);
         request.setCircleId(CIRCLE_1_ID);
 
-        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
-        assertEquals(ReturnCode.IDENTIFICATION_WARNING, cause.getReturnCode());
-        assertEquals("No Trustee information found for member 'member5' and circle '" + CIRCLE_1_ID + "'.", cause.getMessage());
+        final FetchTrusteeResponse response = bean.fetchTrustees(request);
+        assertEquals(ReturnCode.IDENTIFICATION_WARNING.getCode(), response.getReturnCode());
+        assertEquals("No Trustee information found for member 'member5' and circle '" + CIRCLE_1_ID + "'.", response.getReturnMessage());
     }
 
     @Test
@@ -350,45 +338,43 @@ final class TrusteeServiceTest extends DatabaseSetup {
         // Ensure that we have the correct settings for the Service
         settings.set(StandardSetting.SHOW_TRUSTEES, "false");
 
-        final FetchTrusteeService service = new FetchTrusteeService(settings, entityManager);
+        final ManagementBean bean = prepareManagementBean();
         final FetchTrusteeRequest request = prepareRequest(FetchTrusteeRequest.class, MEMBER_5);
         request.setCircleId(CIRCLE_1_ID);
 
-        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
-        assertEquals(ReturnCode.IDENTIFICATION_WARNING, cause.getReturnCode());
-        assertEquals("No Trustee information found for member 'member5' and circle '" + CIRCLE_1_ID + "'.", cause.getMessage());
+        final FetchTrusteeResponse response = bean.fetchTrustees(request);
+        assertEquals(ReturnCode.IDENTIFICATION_WARNING.getCode(), response.getReturnCode());
+        assertEquals("No Trustee information found for member 'member5' and circle '" + CIRCLE_1_ID + "'.", response.getReturnMessage());
     }
 
     @Test
     void testCreatingAndAddingTrusteeAsSystemAdmin() {
         final String circleName = "Admin Circle";
         // Step 1, create a new Circle as System Administrator
-        final ProcessCircleService circleService = new ProcessCircleService(settings, entityManager);
+        final ManagementBean bean = prepareManagementBean();
         final ProcessCircleRequest circleRequest = prepareRequest(ProcessCircleRequest.class, Constants.ADMIN_ACCOUNT);
         circleRequest.setAction(Action.CREATE);
         circleRequest.setCircleName(circleName);
-        final ProcessCircleResponse circleResponse = circleService.perform(circleRequest);
+        final ProcessCircleResponse circleResponse = bean.processCircle(circleRequest);
         assertEquals(ReturnCode.SUCCESS.getCode(), circleResponse.getReturnCode());
         assertEquals("The Circle '" + circleName + "' was successfully created.", circleResponse.getReturnMessage());
         assertNotNull(circleResponse.getCircleId());
         final String circleId = circleResponse.getCircleId();
 
         // Step 2, add a new trustee to the newly created circle
-        final ProcessTrusteeService trusteeService = new ProcessTrusteeService(settings, entityManager);
         final ProcessTrusteeRequest trusteeRequest = prepareRequest(ProcessTrusteeRequest.class, Constants.ADMIN_ACCOUNT);
         trusteeRequest.setAction(Action.ADD);
         trusteeRequest.setCircleId(circleId);
         trusteeRequest.setMemberId(MEMBER_2_ID);
         trusteeRequest.setTrustLevel(TrustLevel.WRITE);
-        final ProcessTrusteeResponse trusteeResponse = trusteeService.perform(trusteeRequest);
+        final ProcessTrusteeResponse trusteeResponse = bean.processTrustee(trusteeRequest);
         assertEquals("The Member '" + MEMBER_2 + "' was successfully added as trustee to '" + circleName + "'.", trusteeResponse.getReturnMessage());
         assertEquals(ReturnCode.SUCCESS.getCode(), trusteeResponse.getReturnCode());
 
         // Step 3, verify that the Circle has 2 members
-        final FetchTrusteeService fetchService = new FetchTrusteeService(settings, entityManager);
         final FetchTrusteeRequest fetchRequest = prepareRequest(FetchTrusteeRequest.class, Constants.ADMIN_ACCOUNT);
         fetchRequest.setCircleId(circleId);
-        final FetchTrusteeResponse fetchResponse = fetchService.perform(fetchRequest);
+        final FetchTrusteeResponse fetchResponse = bean.fetchTrustees(fetchRequest);
         assertEquals(ReturnCode.SUCCESS.getCode(), fetchResponse.getReturnCode());
         assertEquals("Ok", fetchResponse.getReturnMessage());
         assertNotNull(fetchResponse.getTrustees());
@@ -401,35 +387,35 @@ final class TrusteeServiceTest extends DatabaseSetup {
 
     @Test
     void testAddingTrusteeAsWritingTrustee() {
-        final ProcessTrusteeService service = new ProcessTrusteeService(settings, entityManager);
+        final ManagementBean bean = prepareManagementBean();
         final ProcessTrusteeRequest request = prepareRequest(ProcessTrusteeRequest.class, MEMBER_2);
         request.setAction(Action.ADD);
         request.setCircleId(CIRCLE_1_ID);
         request.setMemberId(MEMBER_3_ID);
         request.setTrustLevel(TrustLevel.WRITE);
 
-        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
-        assertEquals(ReturnCode.AUTHORIZATION_WARNING, cause.getReturnCode());
-        assertEquals("The requesting Account is not permitted to Process a Trustee", cause.getMessage());
+        final ProcessTrusteeResponse response = bean.processTrustee(request);
+        assertEquals(ReturnCode.AUTHORIZATION_WARNING.getCode(), response.getReturnCode());
+        assertEquals("The requesting Account is not permitted to Process a Trustee", response.getReturnMessage());
     }
 
     @Test
     void testAddingTrusteeAsCircleAdmin() {
-        final ProcessTrusteeService service = new ProcessTrusteeService(settings, entityManager);
+        final ManagementBean bean = prepareManagementBean();
         final ProcessTrusteeRequest request = prepareRequest(ProcessTrusteeRequest.class, MEMBER_1);
         request.setAction(Action.ADD);
         request.setCircleId(CIRCLE_1_ID);
         request.setMemberId(MEMBER_5_ID);
         request.setTrustLevel(TrustLevel.WRITE);
 
-        final ProcessTrusteeResponse response = service.perform(request);
+        final ProcessTrusteeResponse response = bean.processTrustee(request);
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
         assertEquals("The Member '" + MEMBER_5 + "' was successfully added as trustee to '" + CIRCLE_1 + "'.", response.getReturnMessage());
     }
 
     @Test
     void testAddingTrusteeToInvalidCircleAsCircleAdmin() {
-        final ProcessTrusteeService service = new ProcessTrusteeService(settings, entityManager);
+        final ManagementBean bean = prepareManagementBean();
         final ProcessTrusteeRequest request = prepareRequest(ProcessTrusteeRequest.class, MEMBER_1);
         final String circleId = UUID.randomUUID().toString();
         request.setAction(Action.ADD);
@@ -437,37 +423,37 @@ final class TrusteeServiceTest extends DatabaseSetup {
         request.setMemberId(MEMBER_5_ID);
         request.setTrustLevel(TrustLevel.WRITE);
 
-        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
-        assertEquals(ReturnCode.IDENTIFICATION_WARNING, cause.getReturnCode());
-        assertEquals("No Trustee information found for member 'member1' and circle '" + circleId + "'.", cause.getMessage());
+        final ProcessTrusteeResponse response = bean.processTrustee(request);
+        assertEquals(ReturnCode.IDENTIFICATION_WARNING.getCode(), response.getReturnCode());
+        assertEquals("No Trustee information found for member 'member1' and circle '" + circleId + "'.", response.getReturnMessage());
     }
 
     @Test
     void testAddingInvalidMemberAsTrusteeAsCircleAdmin() {
-        final ProcessTrusteeService service = new ProcessTrusteeService(settings, entityManager);
+        final ManagementBean bean = prepareManagementBean();
         final ProcessTrusteeRequest request = prepareRequest(ProcessTrusteeRequest.class, MEMBER_1);
         request.setAction(Action.ADD);
         request.setCircleId(CIRCLE_1_ID);
         request.setMemberId(UUID.randomUUID().toString());
         request.setTrustLevel(TrustLevel.WRITE);
 
-        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
-        assertEquals(ReturnCode.IDENTIFICATION_WARNING, cause.getReturnCode());
-        assertEquals("No Member could be found with the given Id.", cause.getMessage());
+        final ProcessTrusteeResponse response = bean.processTrustee(request);
+        assertEquals(ReturnCode.IDENTIFICATION_WARNING.getCode(), response.getReturnCode());
+        assertEquals("No Member could be found with the given Id.", response.getReturnMessage());
     }
 
     @Test
     void testAddingExistingTrusteeAsTrustee() {
-        final ProcessTrusteeService service = new ProcessTrusteeService(settings, entityManager);
+        final ManagementBean bean = prepareManagementBean();
         final ProcessTrusteeRequest request = prepareRequest(ProcessTrusteeRequest.class, MEMBER_1);
         request.setAction(Action.ADD);
         request.setCircleId(CIRCLE_1_ID);
         request.setMemberId(MEMBER_2_ID);
         request.setTrustLevel(TrustLevel.WRITE);
 
-        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
-        assertEquals(ReturnCode.IDENTIFICATION_WARNING, cause.getReturnCode());
-        assertEquals("The Member is already a trustee of the requested Circle.", cause.getMessage());
+        final ProcessTrusteeResponse response = bean.processTrustee(request);
+        assertEquals(ReturnCode.IDENTIFICATION_WARNING.getCode(), response.getReturnCode());
+        assertEquals("The Member is already a trustee of the requested Circle.", response.getReturnMessage());
     }
 
     /**
@@ -481,21 +467,20 @@ final class TrusteeServiceTest extends DatabaseSetup {
      */
     @Test
     void testAddingNewTrusteeAsCircleMemberAndSystemAdministrator() {
-        final ProcessTrusteeService service = new ProcessTrusteeService(settings, entityManager);
+        final ManagementBean bean = prepareManagementBean();
         final ProcessTrusteeRequest request = prepareRequest(ProcessTrusteeRequest.class, MEMBER_1);
         request.setAction(Action.ADD);
         request.setCircleId(CIRCLE_1_ID);
         request.setMemberId(ADMIN_ID);
         request.setTrustLevel(TrustLevel.READ);
 
-        final ProcessTrusteeResponse response = service.perform(request);
+        final ProcessTrusteeResponse response = bean.processTrustee(request);
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
         assertEquals("The Member '" + Constants.ADMIN_ACCOUNT + "' was successfully added as trustee to '" + CIRCLE_1 + "'.", response.getReturnMessage());
 
-        final FetchTrusteeService fetchService = new FetchTrusteeService(settings, entityManager);
         final FetchTrusteeRequest fetchRequest = prepareRequest(FetchTrusteeRequest.class, Constants.ADMIN_ACCOUNT);
         fetchRequest.setCircleId(CIRCLE_1_ID);
-        final FetchTrusteeResponse fetchResponse = fetchService.perform(fetchRequest);
+        final FetchTrusteeResponse fetchResponse = bean.fetchTrustees(fetchRequest);
         assertEquals(ReturnCode.SUCCESS.getCode(), fetchResponse.getReturnCode());
         assertEquals("Ok", fetchResponse.getReturnMessage());
         assertNotNull(fetchResponse.getTrustees());
@@ -508,42 +493,41 @@ final class TrusteeServiceTest extends DatabaseSetup {
         adminRequest.setMemberId(MEMBER_5_ID);
         adminRequest.setTrustLevel(TrustLevel.READ);
 
-        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(adminRequest));
-        assertEquals(ReturnCode.ILLEGAL_ACTION, cause.getReturnCode());
-        assertEquals("It is not possible to add a member to a circle, without membership.", cause.getMessage());
+        final ProcessTrusteeResponse adminResponse = bean.processTrustee(adminRequest);
+        assertEquals(ReturnCode.ILLEGAL_ACTION.getCode(), adminResponse.getReturnCode());
+        assertEquals("It is not possible to add a member to a circle, without membership.", adminResponse.getReturnMessage());
     }
 
     @Test
     void testAlterTrusteeAsWritingTrustee() {
-        final ProcessTrusteeService service = new ProcessTrusteeService(settings, entityManager);
+        final ManagementBean bean = prepareManagementBean();
         final ProcessTrusteeRequest request = prepareRequest(ProcessTrusteeRequest.class, MEMBER_2);
         request.setAction(Action.ALTER);
         request.setCircleId(CIRCLE_1_ID);
         request.setMemberId(MEMBER_2_ID);
         request.setTrustLevel(TrustLevel.ADMIN);
 
-        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
-        assertEquals(ReturnCode.AUTHORIZATION_WARNING, cause.getReturnCode());
-        assertEquals("The requesting Account is not permitted to Process a Trustee", cause.getMessage());
+        final ProcessTrusteeResponse response = bean.processTrustee(request);
+        assertEquals(ReturnCode.AUTHORIZATION_WARNING.getCode(), response.getReturnCode());
+        assertEquals("The requesting Account is not permitted to Process a Trustee", response.getReturnMessage());
     }
 
     @Test
     void testAlterTrusteeSetAdminAsCircleAdmin() {
-        final ProcessTrusteeService circleService = new ProcessTrusteeService(settings, entityManager);
+        final ManagementBean bean = prepareManagementBean();
         final ProcessTrusteeRequest circleRequest = prepareRequest(ProcessTrusteeRequest.class, MEMBER_1);
         circleRequest.setAction(Action.ALTER);
         circleRequest.setCircleId(CIRCLE_1_ID);
         circleRequest.setMemberId(MEMBER_2_ID);
         circleRequest.setTrustLevel(TrustLevel.ADMIN);
 
-        final ProcessTrusteeResponse circleResponse = circleService.perform(circleRequest);
+        final ProcessTrusteeResponse circleResponse = bean.processTrustee(circleRequest);
         assertEquals(ReturnCode.SUCCESS.getCode(), circleResponse.getReturnCode());
         assertEquals("The Trustee '" + MEMBER_2 + "' has successfully been given the trust level '" + TrustLevel.ADMIN + "' in the Circle '" + CIRCLE_1 + "'.", circleResponse.getReturnMessage());
 
-        final FetchTrusteeService fetchService = new FetchTrusteeService(settings, entityManager);
         final FetchTrusteeRequest fetchRequest = prepareRequest(FetchTrusteeRequest.class, MEMBER_1);
         fetchRequest.setCircleId(CIRCLE_1_ID);
-        final FetchTrusteeResponse fetchResponse = fetchService.perform(fetchRequest);
+        final FetchTrusteeResponse fetchResponse = bean.fetchTrustees(fetchRequest);
         assertEquals(ReturnCode.SUCCESS.getCode(), fetchResponse.getReturnCode());
         assertEquals(MEMBER_3_ID, fetchResponse.getTrustees().get(2).getMemberId());
         assertEquals(TrustLevel.READ, fetchResponse.getTrustees().get(2).getTrustLevel());
@@ -551,7 +535,7 @@ final class TrusteeServiceTest extends DatabaseSetup {
 
     @Test
     void testAlterTrusteeToInvalidCircleAsCircleAdmin() {
-        final ProcessTrusteeService service = new ProcessTrusteeService(settings, entityManager);
+        final ManagementBean bean = prepareManagementBean();
         final ProcessTrusteeRequest request = prepareRequest(ProcessTrusteeRequest.class, MEMBER_1);
         final String circleId = UUID.randomUUID().toString();
         request.setAction(Action.ALTER);
@@ -559,95 +543,93 @@ final class TrusteeServiceTest extends DatabaseSetup {
         request.setMemberId(MEMBER_5_ID);
         request.setTrustLevel(TrustLevel.WRITE);
 
-        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
-        assertEquals(ReturnCode.IDENTIFICATION_WARNING, cause.getReturnCode());
-        assertEquals("No Trustee information found for member 'member1' and circle '" + circleId + "'.", cause.getMessage());
+        final ProcessTrusteeResponse response = bean.processTrustee(request);
+        assertEquals(ReturnCode.IDENTIFICATION_WARNING.getCode(), response.getReturnCode());
+        assertEquals("No Trustee information found for member 'member1' and circle '" + circleId + "'.", response.getReturnMessage());
     }
 
     @Test
     void testAlterInvalidMemberAsTrusteeAsCircleAdmin() {
-        final ProcessTrusteeService service = new ProcessTrusteeService(settings, entityManager);
+        final ManagementBean bean = prepareManagementBean();
         final ProcessTrusteeRequest request = prepareRequest(ProcessTrusteeRequest.class, MEMBER_1);
         request.setAction(Action.ALTER);
         request.setCircleId(CIRCLE_1_ID);
         request.setMemberId(UUID.randomUUID().toString());
         request.setTrustLevel(TrustLevel.WRITE);
 
-        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
-        assertEquals(ReturnCode.IDENTIFICATION_WARNING, cause.getReturnCode());
-        assertEquals("The requested Trustee could not be found.", cause.getMessage());
+        final ProcessTrusteeResponse response = bean.processTrustee(request);
+        assertEquals(ReturnCode.IDENTIFICATION_WARNING.getCode(), response.getReturnCode());
+        assertEquals("The requested Trustee could not be found.", response.getReturnMessage());
     }
 
     @Test
     void testRemoveTrusteeAsWritingTrustee() {
-        final ProcessTrusteeService service = new ProcessTrusteeService(settings, entityManager);
+        final ManagementBean bean = prepareManagementBean();
         final ProcessTrusteeRequest request = prepareRequest(ProcessTrusteeRequest.class, MEMBER_2);
         request.setAction(Action.REMOVE);
         request.setCircleId(CIRCLE_1_ID);
         request.setMemberId(MEMBER_2_ID);
 
-        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
-        assertEquals(ReturnCode.AUTHORIZATION_WARNING, cause.getReturnCode());
-        assertEquals("The requesting Account is not permitted to Process a Trustee", cause.getMessage());
+        final ProcessTrusteeResponse response = bean.processTrustee(request);
+        assertEquals(ReturnCode.AUTHORIZATION_WARNING.getCode(), response.getReturnCode());
+        assertEquals("The requesting Account is not permitted to Process a Trustee", response.getReturnMessage());
     }
 
     @Test
     void testRemoveTrusteeAsCircleAdmin() {
-        final ProcessTrusteeService service = new ProcessTrusteeService(settings, entityManager);
+        final ManagementBean bean = prepareManagementBean();
         final ProcessTrusteeRequest request = prepareRequest(ProcessTrusteeRequest.class, MEMBER_1);
         request.setAction(Action.REMOVE);
         request.setCircleId(CIRCLE_1_ID);
         request.setMemberId(MEMBER_2_ID);
 
-        final ProcessTrusteeResponse response = service.perform(request);
+        final ProcessTrusteeResponse response = bean.processTrustee(request);
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
         assertEquals("The Trustee '" + MEMBER_2 + "' was successfully removed from the Circle 'circle1'.", response.getReturnMessage());
 
-        final FetchTrusteeService fetchService = new FetchTrusteeService(settings, entityManager);
         final FetchTrusteeRequest fetchRequest = prepareRequest(FetchTrusteeRequest.class, MEMBER_1);
         fetchRequest.setCircleId(CIRCLE_1_ID);
-        final FetchTrusteeResponse fetchResponse = fetchService.perform(fetchRequest);
+        final FetchTrusteeResponse fetchResponse = bean.fetchTrustees(fetchRequest);
         assertEquals(ReturnCode.SUCCESS.getCode(), fetchResponse.getReturnCode());
         assertEquals(2, fetchResponse.getTrustees().size());
     }
 
     @Test
     void testRemoveTrusteeToInvalidCircleAsCircleAdmin() {
-        final ProcessTrusteeService service = new ProcessTrusteeService(settings, entityManager);
+        final ManagementBean bean = prepareManagementBean();
         final ProcessTrusteeRequest request = prepareRequest(ProcessTrusteeRequest.class, MEMBER_1);
         final String circleId = UUID.randomUUID().toString();
         request.setAction(Action.REMOVE);
         request.setCircleId(circleId);
         request.setMemberId(MEMBER_5_ID);
 
-        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
-        assertEquals(ReturnCode.IDENTIFICATION_WARNING, cause.getReturnCode());
-        assertEquals("No Trustee information found for member 'member1' and circle '" + circleId + "'.", cause.getMessage());
+        final ProcessTrusteeResponse response = bean.processTrustee(request);
+        assertEquals(ReturnCode.IDENTIFICATION_WARNING.getCode(), response.getReturnCode());
+        assertEquals("No Trustee information found for member 'member1' and circle '" + circleId + "'.", response.getReturnMessage());
     }
 
     @Test
     void testRemoveInvalidMemberAsTrusteeAsCircleAdmin() {
-        final ProcessTrusteeService service = new ProcessTrusteeService(settings, entityManager);
+        final ManagementBean bean = prepareManagementBean();
         final ProcessTrusteeRequest request = prepareRequest(ProcessTrusteeRequest.class, MEMBER_1);
         request.setAction(Action.REMOVE);
         request.setCircleId(CIRCLE_1_ID);
         request.setMemberId(UUID.randomUUID().toString());
 
-        final CWSException cause = assertThrows(CWSException.class, () -> service.perform(request));
-        assertEquals(ReturnCode.IDENTIFICATION_WARNING, cause.getReturnCode());
-        assertEquals("The requested Trustee could not be found.", cause.getMessage());
+        final ProcessTrusteeResponse response = bean.processTrustee(request);
+        assertEquals(ReturnCode.IDENTIFICATION_WARNING.getCode(), response.getReturnCode());
+        assertEquals("The requested Trustee could not be found.", response.getReturnMessage());
     }
 
     @Test
     void testCreateCircleAddTrusteeAndRemoveSelf() {
-        final ProcessCircleService circleService = new ProcessCircleService(settings, entityManager);
-        final ProcessTrusteeService trusteeService = new ProcessTrusteeService(settings, entityManager);
+        final ManagementBean bean = prepareManagementBean();
 
         // Step 1; Create new Circle of Trust
         final ProcessCircleRequest createRequest = prepareRequest(ProcessCircleRequest.class, MEMBER_1);
         createRequest.setAction(Action.CREATE);
         createRequest.setCircleName("Awesome Circle");
-        final ProcessCircleResponse createResponse = perform(circleService, createRequest);
+        final ProcessCircleResponse createResponse = bean.processCircle(createRequest);
         final String circleId = createResponse.getCircleId();
 
         // Step 2; Add another user to the Circle
@@ -656,14 +638,14 @@ final class TrusteeServiceTest extends DatabaseSetup {
         addRequest.setCircleId(circleId);
         addRequest.setTrustLevel(TrustLevel.WRITE);
         addRequest.setMemberId(MEMBER_2_ID);
-        perform(trusteeService, addRequest);
+        assertEquals(ReturnCode.SUCCESS.getCode(), bean.processTrustee(addRequest).getReturnCode());
 
         // Step 3; Remove self
         final ProcessTrusteeRequest removeRequest = prepareRequest(ProcessTrusteeRequest.class, MEMBER_1);
         removeRequest.setAction(Action.REMOVE);
         removeRequest.setCircleId(circleId);
         removeRequest.setMemberId(MEMBER_1_ID);
-        perform(trusteeService, removeRequest);
+        assertEquals(ReturnCode.SUCCESS.getCode(), bean.processTrustee(removeRequest).getReturnCode());
 
         // Step 4; As Admin, make the remaining user Circle Admin
         final ProcessTrusteeRequest alterRequest = prepareRequest(ProcessTrusteeRequest.class, Constants.ADMIN_ACCOUNT);
@@ -671,13 +653,12 @@ final class TrusteeServiceTest extends DatabaseSetup {
         alterRequest.setCircleId(circleId);
         alterRequest.setMemberId(MEMBER_2_ID);
         alterRequest.setTrustLevel(TrustLevel.ADMIN);
-        perform(trusteeService, alterRequest);
+        assertEquals(ReturnCode.SUCCESS.getCode(), bean.processTrustee(alterRequest).getReturnCode());
 
         // Step 5; As member 2, I'm fetching the list of Trustees for the circle
-        final FetchTrusteeService fetchService = new FetchTrusteeService(settings, entityManager);
         final FetchTrusteeRequest fetchRequest = prepareRequest(FetchTrusteeRequest.class, MEMBER_2);
         fetchRequest.setCircleId(circleId);
-        final FetchTrusteeResponse fetchResponse = perform(fetchService, fetchRequest);
+        final FetchTrusteeResponse fetchResponse = bean.fetchTrustees(fetchRequest);
         final List<Trustee> trustees = fetchResponse.getTrustees();
         assertEquals(1, trustees.size());
         assertEquals(TrustLevel.ADMIN, trustees.get(0).getTrustLevel());
@@ -688,14 +669,6 @@ final class TrusteeServiceTest extends DatabaseSetup {
     // =========================================================================
     // Internal Helper Methods
     // =========================================================================
-
-    private <I extends Authentication, O extends CwsResponse> O perform(final Serviceable<?, O, I> service, final I request) {
-        final O response = service.perform(request);
-        assertNotNull(response);
-        assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
-
-        return response;
-    }
 
     private static void detailedTrusteeAssertion(final FetchTrusteeResponse response, final String... memberIds) {
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());

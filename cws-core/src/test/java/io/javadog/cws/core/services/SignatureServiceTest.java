@@ -28,7 +28,7 @@ import io.javadog.cws.api.requests.VerifyRequest;
 import io.javadog.cws.api.responses.FetchSignatureResponse;
 import io.javadog.cws.api.responses.SignResponse;
 import io.javadog.cws.api.responses.VerifyResponse;
-import io.javadog.cws.core.DatabaseSetup;
+import io.javadog.cws.core.setup.DatabaseSetup;
 import io.javadog.cws.core.exceptions.CWSException;
 import java.util.Date;
 import org.junit.jupiter.api.Test;

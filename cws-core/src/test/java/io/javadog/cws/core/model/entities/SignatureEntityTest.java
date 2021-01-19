@@ -19,7 +19,7 @@ package io.javadog.cws.core.model.entities;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
-import io.javadog.cws.core.DatabaseSetup;
+import io.javadog.cws.core.setup.DatabaseSetup;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;

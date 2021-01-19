@@ -19,7 +19,7 @@ package io.javadog.cws.core.jce;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import io.javadog.cws.core.DatabaseSetup;
+import io.javadog.cws.core.setup.DatabaseSetup;
 import java.security.SecureRandom;
 import java.util.Base64;
 import java.util.UUID;

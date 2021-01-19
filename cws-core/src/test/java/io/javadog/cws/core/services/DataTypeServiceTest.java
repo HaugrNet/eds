@@ -31,7 +31,7 @@ import io.javadog.cws.api.requests.ProcessDataTypeRequest;
 import io.javadog.cws.api.responses.FetchDataTypeResponse;
 import io.javadog.cws.api.responses.ProcessDataResponse;
 import io.javadog.cws.api.responses.ProcessDataTypeResponse;
-import io.javadog.cws.core.DatabaseSetup;
+import io.javadog.cws.core.setup.DatabaseSetup;
 import io.javadog.cws.core.exceptions.CWSException;
 import org.junit.jupiter.api.Test;
 

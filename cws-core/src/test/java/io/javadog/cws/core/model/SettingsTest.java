@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import io.javadog.cws.core.DatabaseSetup;
+import io.javadog.cws.core.setup.DatabaseSetup;
 import io.javadog.cws.core.enums.HashAlgorithm;
 import io.javadog.cws.core.enums.KeyAlgorithm;
 import io.javadog.cws.core.enums.StandardSetting;

@@ -25,8 +25,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.MemberRole;
-import io.javadog.cws.core.DatabaseSetup;
-import io.javadog.cws.core.GenerateTestData;
+import io.javadog.cws.core.setup.DatabaseSetup;
+import io.javadog.cws.core.setup.GenerateTestData;
 import io.javadog.cws.core.enums.KeyAlgorithm;
 import io.javadog.cws.core.jce.CWSKeyPair;
 import io.javadog.cws.core.jce.Crypto;

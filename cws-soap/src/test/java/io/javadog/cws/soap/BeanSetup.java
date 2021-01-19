@@ -16,7 +16,7 @@
  */
 package io.javadog.cws.soap;
 
-import io.javadog.cws.core.DatabaseSetup;
+import io.javadog.cws.core.setup.DatabaseSetup;
 import io.javadog.cws.core.ManagementBean;
 import io.javadog.cws.core.ShareBean;
 

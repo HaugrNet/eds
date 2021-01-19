@@ -22,17 +22,12 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import io.javadog.cws.api.common.ReturnCode;
-import io.javadog.cws.api.requests.SettingRequest;
-import io.javadog.cws.api.responses.SettingResponse;
 import io.javadog.cws.core.exceptions.CWSException;
-import io.javadog.cws.core.model.CommonDao;
-import io.javadog.cws.core.model.Settings;
-import io.javadog.cws.core.services.Serviceable;
 import io.javadog.cws.core.services.SettingService;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import javax.persistence.EntityManager;
-import io.javadog.cws.core.stubs.FailService;
+import io.javadog.cws.core.setup.fakes.FailService;
+import io.javadog.cws.core.setup.DatabaseSetup;
 import org.junit.jupiter.api.Test;
 
 /**

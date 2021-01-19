@@ -24,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.javadog.cws.api.common.ReturnCode;
-import io.javadog.cws.core.DatabaseSetup;
+import io.javadog.cws.core.setup.DatabaseSetup;
 import io.javadog.cws.core.enums.KeyAlgorithm;
 import io.javadog.cws.core.enums.StandardSetting;
 import io.javadog.cws.core.exceptions.CWSException;

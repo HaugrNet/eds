@@ -24,7 +24,7 @@ import io.javadog.cws.api.requests.InventoryRequest;
 import io.javadog.cws.api.requests.ProcessDataRequest;
 import io.javadog.cws.api.responses.InventoryResponse;
 import io.javadog.cws.api.responses.ProcessDataResponse;
-import io.javadog.cws.core.DatabaseSetup;
+import io.javadog.cws.core.setup.DatabaseSetup;
 import io.javadog.cws.core.exceptions.CWSException;
 import org.junit.jupiter.api.Test;
 

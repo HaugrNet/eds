@@ -36,7 +36,7 @@ import io.javadog.cws.api.responses.CwsResponse;
 import io.javadog.cws.api.responses.FetchTrusteeResponse;
 import io.javadog.cws.api.responses.ProcessCircleResponse;
 import io.javadog.cws.api.responses.ProcessTrusteeResponse;
-import io.javadog.cws.core.DatabaseSetup;
+import io.javadog.cws.core.setup.DatabaseSetup;
 import io.javadog.cws.core.enums.StandardSetting;
 import io.javadog.cws.core.exceptions.CWSException;
 import java.util.List;

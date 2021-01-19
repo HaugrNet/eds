@@ -28,6 +28,7 @@ import io.javadog.cws.api.responses.ProcessDataResponse;
 import io.javadog.cws.core.exceptions.CWSException;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.Charset;
+import io.javadog.cws.core.setup.DatabaseSetup;
 import org.junit.jupiter.api.Test;
 
 /**

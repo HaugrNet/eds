@@ -30,7 +30,7 @@ import io.javadog.cws.api.requests.FetchMemberRequest;
 import io.javadog.cws.api.requests.ProcessMemberRequest;
 import io.javadog.cws.api.responses.FetchMemberResponse;
 import io.javadog.cws.api.responses.ProcessMemberResponse;
-import io.javadog.cws.core.DatabaseSetup;
+import io.javadog.cws.core.setup.DatabaseSetup;
 import io.javadog.cws.core.enums.StandardSetting;
 import io.javadog.cws.core.exceptions.CWSException;
 import io.javadog.cws.core.model.Settings;

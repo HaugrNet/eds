@@ -17,7 +17,7 @@
 package io.javadog.cws.rest;
 
 import io.javadog.cws.api.common.ReturnCode;
-import io.javadog.cws.core.DatabaseSetup;
+import io.javadog.cws.core.setup.DatabaseSetup;
 import io.javadog.cws.core.ManagementBean;
 import io.javadog.cws.core.ShareBean;
 import io.javadog.cws.core.exceptions.CWSException;

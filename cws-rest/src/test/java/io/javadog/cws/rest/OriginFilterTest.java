@@ -18,7 +18,7 @@ package io.javadog.cws.rest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import io.javadog.cws.core.DatabaseSetup;
+import io.javadog.cws.core.setup.DatabaseSetup;
 import io.javadog.cws.core.enums.StandardSetting;
 import java.io.BufferedReader;
 import java.io.IOException;

@@ -14,7 +14,7 @@
  * this program; If not, you can download a copy of the License
  * here: https://www.apache.org/licenses/
  */
-package io.javadog.cws.core.stubs;
+package io.javadog.cws.core.setup.fakes;
 
 import javax.persistence.FlushModeType;
 import javax.persistence.LockModeType;

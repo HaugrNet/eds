@@ -32,9 +32,10 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Date;
 import java.util.List;
-import io.javadog.cws.core.stubs.FakeEntityManager;
-import io.javadog.cws.core.stubs.FakeTimer;
-import io.javadog.cws.core.stubs.FakeTimerService;
+import io.javadog.cws.core.setup.fakes.FakeEntityManager;
+import io.javadog.cws.core.setup.fakes.FakeTimer;
+import io.javadog.cws.core.setup.fakes.FakeTimerService;
+import io.javadog.cws.core.setup.DatabaseSetup;
 import org.junit.jupiter.api.Test;
 
 /**

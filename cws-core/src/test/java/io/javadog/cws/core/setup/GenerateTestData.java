@@ -14,7 +14,7 @@
  * this program; If not, you can download a copy of the License
  * here: https://www.apache.org/licenses/
  */
-package io.javadog.cws.core;
+package io.javadog.cws.core.setup;
 
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.MemberRole;

@@ -28,7 +28,7 @@ import io.javadog.cws.api.requests.SanityRequest;
 import io.javadog.cws.api.responses.FetchDataResponse;
 import io.javadog.cws.api.responses.ProcessDataResponse;
 import io.javadog.cws.api.responses.SanityResponse;
-import io.javadog.cws.core.DatabaseSetup;
+import io.javadog.cws.core.setup.DatabaseSetup;
 import io.javadog.cws.core.enums.SanityStatus;
 import io.javadog.cws.core.exceptions.CWSException;
 import java.util.Date;

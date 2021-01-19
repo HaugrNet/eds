@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import io.javadog.cws.api.common.MemberRole;
 import io.javadog.cws.api.common.TrustLevel;
-import io.javadog.cws.core.DatabaseSetup;
+import io.javadog.cws.core.setup.DatabaseSetup;
 import io.javadog.cws.core.enums.KeyAlgorithm;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;

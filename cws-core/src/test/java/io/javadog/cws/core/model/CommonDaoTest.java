@@ -22,10 +22,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.javadog.cws.api.common.ReturnCode;
-import io.javadog.cws.core.DatabaseSetup;
+import io.javadog.cws.core.setup.DatabaseSetup;
 import io.javadog.cws.core.exceptions.CWSException;
-import io.javadog.cws.core.stubs.FakeEntityManager;
-import io.javadog.cws.core.stubs.FakeQuery;
+import io.javadog.cws.core.setup.fakes.FakeEntityManager;
+import io.javadog.cws.core.setup.fakes.FakeQuery;
 import org.junit.jupiter.api.Test;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;

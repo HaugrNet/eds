@@ -47,6 +47,33 @@ import java.util.Date;
 final class ShareBeanSignatureTest extends DatabaseSetup {
 
     @Test
+    void testSignWithNullRequest() {
+        final ShareBean bean = prepareShareBean();
+
+        final SignResponse response = bean.sign(null);
+        assertEquals(ReturnCode.VERIFICATION_WARNING.getCode(), response.getReturnCode());
+        assertEquals("Cannot Process a NULL Object.", response.getReturnMessage());
+    }
+
+    @Test
+    void testVerifyWithNullRequest() {
+        final ShareBean bean = prepareShareBean();
+
+        final VerifyResponse response = bean.verify(null);
+        assertEquals(ReturnCode.VERIFICATION_WARNING.getCode(), response.getReturnCode());
+        assertEquals("Cannot Process a NULL Object.", response.getReturnMessage());
+    }
+
+    @Test
+    void testFetchSignaturesWithNullRequest() {
+        final ShareBean bean = prepareShareBean();
+
+        final FetchSignatureResponse response = bean.fetchSignatures(null);
+        assertEquals(ReturnCode.VERIFICATION_WARNING.getCode(), response.getReturnCode());
+        assertEquals("Cannot Process a NULL Object.", response.getReturnMessage());
+    }
+
+    @Test
     void testSignVerifyFetch() {
         final ShareBean bean = prepareShareBean();
         final byte[] data = generateData(1048576);

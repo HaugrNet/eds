@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "1.2.0",
+        "version": "2.0",
         "title": "CWS - REST"
     },
     "host": "localhost:8080",

@@ -392,7 +392,7 @@
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <configuration>
                     <detectJavaApiLink>false</detectJavaApiLink>
-                    <source>${java.version}</source>
+                    <source>8</source>
                 </configuration>
                 <executions>
                     <execution>

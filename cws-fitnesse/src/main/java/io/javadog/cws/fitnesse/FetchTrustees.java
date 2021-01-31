@@ -83,7 +83,7 @@ public final class FetchTrustees extends CwsRequest<FetchTrusteeResponse> {
         final FetchTrusteeRequest request = prepareRequest(FetchTrusteeRequest.class);
         request.setCircleId(circleId);
 
-        response = CallManagement.fetchTrustees(requestType, requestUrl, request);
+        response = CallManagement.fetchTrustees(requestUrl, request);
     }
 
     /**

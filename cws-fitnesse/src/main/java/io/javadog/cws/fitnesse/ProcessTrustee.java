@@ -71,7 +71,7 @@ public final class ProcessTrustee extends CwsRequest<ProcessTrusteeResponse> {
         request.setMemberId(memberId);
         request.setTrustLevel(trustLevel);
 
-        response = CallManagement.processTrustee(requestType, requestUrl, request);
+        response = CallManagement.processTrustee(requestUrl, request);
     }
 
     /**

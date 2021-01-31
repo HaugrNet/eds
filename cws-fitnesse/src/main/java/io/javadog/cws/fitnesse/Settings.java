@@ -30,7 +30,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public final class Settings extends CwsRequest<SettingResponse> {
 
-    private Map<String, String> theSettings = new ConcurrentHashMap<>();
+    private final Map<String, String> theSettings = new ConcurrentHashMap<>();
     private String key = null;
     private String value = null;
 
@@ -56,7 +56,7 @@ public final class Settings extends CwsRequest<SettingResponse> {
         theSettings.clear();
 
         final SettingRequest request = prepareRequest(SettingRequest.class);
-        final SettingResponse response = CallManagement.settings(requestType, requestUrl, request);
+        final SettingResponse response = CallManagement.settings(requestUrl, request);
 
         if (response != null) {
             theSettings.putAll(response.getSettings());
@@ -99,7 +99,7 @@ public final class Settings extends CwsRequest<SettingResponse> {
         final SettingRequest request = prepareRequest(SettingRequest.class);
         request.setSettings(settings);
 
-        response = CallManagement.settings(requestType, requestUrl, request);
+        response = CallManagement.settings(requestUrl, request);
     }
 
     /**

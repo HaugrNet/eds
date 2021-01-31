@@ -62,7 +62,7 @@ public final class Sanitized extends CwsRequest<SanityResponse> {
         request.setCircleId(circleId);
         request.setSince(since);
 
-        response = CallManagement.sanitized(requestType, requestUrl, request);
+        response = CallManagement.sanitized(requestUrl, request);
     }
 
     /**

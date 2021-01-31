@@ -45,7 +45,6 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class CwsRequest<R extends CwsResponse> {
 
-    protected static String requestType = "SOAP";
     protected static String requestUrl = "http://localhost:8080/cws";
     protected static final String EXTENSION_ID = "_id";
     protected static final String EXTENSION_SIGNATURE = "_signature";
@@ -63,8 +62,7 @@ public class CwsRequest<R extends CwsResponse> {
     protected R response = null;
     private CredentialType credentialType = null;
 
-    public static void updateTypeAndUrl(final String type, final String url) {
-        requestType = type;
+    public static void updateUrl(final String url) {
         requestUrl = url;
     }
 

@@ -62,7 +62,7 @@ public final class Sign extends CwsRequest<SignResponse> {
         request.setData(data);
         request.setExpires(expires);
 
-        response = CallShare.sign(requestType, requestUrl, request);
+        response = CallShare.sign(requestUrl, request);
         setSignature(accountName + EXTENSION_SIGNATURE, response);
     }
 

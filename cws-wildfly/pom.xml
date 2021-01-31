@@ -20,10 +20,6 @@
             <artifactId>cws-rest</artifactId>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>cws-soap</artifactId>
-        </dependency>
-        <dependency>
             <groupId>javax</groupId>
             <artifactId>javaee-api</artifactId>
             <scope>provided</scope>

@@ -13,16 +13,16 @@ The CWS API consists of 2 main parts, the first is the management part, which
 is used to control a CWS instance, and the second is the sharing part. The full
 documentation of the API can be found [[here][https://javadog.io/apidocs/]]
 
-There is both a SOAP & REST based !-WebService-! available, the default for
-the !-FitNesse-! tests is the SOAP, since it works with both [[!-WildFly-!][https://wildfly.org/]]
-and [[Payara][https://payara.fish/]], the json based REST !-WebService-! seems
-to have problems under Payara.
+There ws both a SOAP & REST based !-WebService-! available, the default for
+the !-FitNesse-! tests is the REST, if the SOAP based !-WebServices-! are still
+required, please use version 1.2, as that is the final version with SOAP
+support, as of 2.0 SOAP support has been discontinued.
 
 Note; CWS is not a HTTP(S) Server, it is an Application, the REST requests will
 therefore always return the standard HTTP code 200, whenever an incoming request
 has been answered by the CWS. A different !-ReturnCode-! & !-ReturnMessage-! is
 set in the response, which will provide more details if the request could not
-be processed correctly. The CWS !-ReturnCodes-! is similar to the HTTP codes,
+be processed correctly. The CWS !-ReturnCodes-! are similar to the HTTP codes,
 so understanding them should be easier, but the !-ReturnMessage-! is containing
 significantly more details regarding the problem. This was decided to ensure
 that a System using CWS can better deal with the problems without having to
@@ -74,12 +74,11 @@ mainly as a simply way to check if the system is operational. This request is
 the only CWS request not requiring any credentials to invoke.
 
  * Version - Read version of running instance, act as ping
-   * SOAP: version
    * REST (POST) request is: ${REST_ROOT}/api/version
 
 |version                                  |
 |return code?|return message?|cws version?|
-|${SUCCESS}  |Ok             |1.2.0|
+|${SUCCESS}  |Ok             |2.0-SNAPSHOT|
 *!
 
 !* !-MasterKey-!
@@ -101,7 +100,6 @@ the next test run will also work.
 
  * !-MasterKey-! - Unlock & Set !-MasterKey-!
    * Only '''System Administrators''' may perform this
-   * SOAP: masterKey
    * REST (POST) request is: ${REST_ROOT}/api/masterKey
 
 |master key                                                                                              |
@@ -139,7 +137,6 @@ current settings, and update existing values.
 
  * Settings - Read & Update Settings
    * Only '''System Administrators''' may perform this
-   * SOAP: settings
    * REST (POST) request is: ${REST_ROOT}/api/settings
 
 |script|Settings     |admin                          |admin                                                     |
@@ -241,7 +238,6 @@ match the encrypted data. The check can be made generally or for a Circle of Tru
 date.
 
  * Sanitized - Read current status
-   * SOAP: sanitized
    * REST (POST) request is: ${REST_ROOT}/api/sanitized
 
 |sanitized                                                                          |
@@ -269,7 +265,6 @@ credential to unlock the CWS account, to prevent that poor passwords are passed 
 also weaken the security of the CWS stored data.
 
  * Authenticated - Check Member Authentication
-   * SOAP: authenticated
    * REST (POST) request is: ${REST_ROOT}/api/authenticated
 
 |authenticated                                                                    |
@@ -286,33 +281,24 @@ performed with the current API:
 
  * Create Member - Creates a new Account with a given password
    * Only '''System Administrators''' may perform this
-   * SOAP: processMember with Action "CREATE"
    * REST (POST) request is: ${REST_ROOT}/api/members/createMember
  * Invite Member - Creates an invitation, so a Member can update themselves
    * Only '''System Administrators''' may perform this
-   * SOAP: processMember with Action "INVITE"
    * REST (POST) request is: ${REST_ROOT}/api/members/inviteMember
  * Login - Simple way to temporarily assign a !-SessionKey-! to an account
-   * SOAP: processMember with Action "LOGIN"
    * REST (POST) request is: ${REST_ROOT}/api/members/login
  * Logout - Remove the temporary !-SessionKey-! from accessing the account
-   * SOAP: processMember with Action "LOGOUT"
    * REST (POST) request is: ${REST_ROOT}/api/members/logout
  * Alter Member Roles - Allows an Administrator to change a Members permissions
    * Only '''System Administrators''' may perform this
-   * SOAP: processMember with Action "ALTER"
    * REST (POST) request is: ${REST_ROOT}/api/members/alterMember
  * Update Member - Allows a member to update their account & credentials
-   * SOAP: processMember with Action "UPDATE"
    * REST (POST) request is: ${REST_ROOT}/api/members/updateMember
  * Invalidate Member - Allows a member to invalidate their account, rendering it useless
-   * SOAP: processMember with Action "INVALIDATE"
    * REST (POST) request is: ${REST_ROOT}/api/members/invalidate
  * Delete Member - Removes a Member Account from the System permanently
-   * SOAP: processMember with Action "DELETE"
    * REST (POST) request is: ${REST_ROOT}/api/members/deleteMember
  * Fetch Members - Retrieve a list of one or more Members
-   * SOAP: fetchMembers
    * REST (POST) requst is: ${REST_ROOT}/api/members/fetchMembers
 
 Firstly, there are 2 ways to create accounts, both require system administrative
@@ -372,16 +358,12 @@ name, which must be unique. Circles of Trust may also have an external Circle
 Key, which means a shared Key that can be used by Trustees from a Client system.
 
  * Create Circle - Creates a new Circle of Trust in CWS
-   * SOAP: processCircle with Action "CREATE"
    * REST (POST) request is: ${REST_ROOT}/api/circles/createCircle
  * Update Circle - Allows the Circle of Trust to be renamed
-   * SOAP: processCircle with Action "UPDATE"
    * REST (POST) request is: ${REST_ROOT}/api/circles/updateCircle
  * Delete Circle - Removes a Circle with all Trustees & Data from the System
-   * SOAP: processCircle with Action "DELETE"
    * REST (POST) request is: ${REST_ROOT}/api/circles/deleteCircle
  * Fetch Circles - Retrieves a list of Circles in the current CWS instance
-   * SOAP: fetchCircles
    * REST (POST) request is: ${REST_ROOT}/api/circles/fetchCircles
 
 |process circle                                                                                                                                                                                |
@@ -411,16 +393,12 @@ can they retrieve the Circle Key.
 The !-CWS-! Create Circle request can be performed by all standard accounts.
 
  * Add Trustee
-   * SOAP: processTrustee with Action "ADD"
    * REST (POST) request is: ${REST_ROOT}/api/trustees/addTrustee
  * Alter Trustee
-   * SOAP: processTrustee with Action "ALTER"
    * REST (POST) request is: ${REST_ROOT}/api/trustees/alterTrustee
  * Remove Trustee
-   * SOAP: processTrustee with Action "REMOVE"
    * REST (POST) request is: ${REST_ROOT}/api/trustees/removeTrustee
  * Fetch Trustees
-   * SOAP: fetchTrustees
    * REST (POST) request is: ${REST_ROOT}/api/trustees/fetchTrustees
 
 |process trustee                                                                                                                                                              |
@@ -478,13 +456,10 @@ only have a name and a custom definition. It is only allow
 
 There are 3 kinds of actions / requests which can be made for data Types
  * Process !-DataType-!
-   * SOAP: processDataType with Action "PROCESS"
    * REST (POST) request is: ${REST_ROOT}/api/dataTypes/processDataType
  * Delete !-DataType-!
-   * SOAP: processDataType with Action "DELETE"
    * REST (POST) request is: ${REST_ROOT}/api/dataTypes/deleteDataType
  * Fetch !-DataTypes-!
-   * SOAP: fetchDataTypes
    * REST (POST) request is: ${REST_ROOT}/api/dataTypes/fetchDataTypes
 
 |process dataType                                                                                                                                                   |
@@ -507,22 +482,16 @@ There are 3 kinds of actions / requests which can be made for data Types
 !4 '''Data'''
 
  * Add Data to a Circle of Trust
-   * SOAP: processData with Action "ADD"
    * REST (POST) request is: ${REST_ROOT}/api/data/addData
  * Copy Data from one Circle of Trust to another
-   * SOAP: processData with Action "COPY"
    * REST (POST) request is: ${REST_ROOT}/api/data/copyData
  * Move Data from one Circle of Trust to another
-   * SOAP: processData with Action "MOVE"
    * REST (POST) request is: ${REST_ROOT}/api/data/moveData
  * Update Data record in a Circle of Trust
-   * SOAP: processData with Action "UPDATE"
    * REST (POST) request is: ${REST_ROOT}/api/data/updateData
  * Delete Data record from a Circle of Trust
-   * SOAP: processData with Action "DELETE"
    * REST (POST) request is: ${REST_ROOT}/api/data/deleteData
  * Fetch Data from a Circle of Trust
-   * SOAP: fetchData
    * REST (POST) request is: ${REST_ROOT}/api/data/fetchData
 
 |process data                                                                                                                                                                                                                        |
@@ -559,13 +528,10 @@ Signing documents means creating cryptographic checksum of the document based on
 CWS supports simply signing of documents, and later verification of same by other members. Neither the document signed, nor the signarure are stored in CWS, only some meta information regarding who signed it and optionally when it expires.
 
  * Sign Document
-   * SOAP: sign
    * REST (POST) request is: ${REST_ROOT}/api/signatures/signDocument
  * Verify Signature
-   * SOAP: verify
    * REST (POST) request is: ${REST_ROOT}/api/signatures/verifySignature
  * Fetch Signatures
-   * SOAP: fetchSignatures
    * REST (POST) request is: ${REST_ROOT}/api/signatures/fetchSignatures
 
 |sign                                                                                                                                          |

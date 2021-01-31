@@ -91,7 +91,7 @@ public final class ProcessMember extends CwsRequest<ProcessMemberResponse> {
         request.setNewAccountName(newAccountName);
         request.setNewCredential(newCredential);
 
-        response = CallManagement.processMember(requestType, requestUrl, request);
+        response = CallManagement.processMember(requestUrl, request);
 
         // Ensuring that the internal mapping of Ids with accounts being
         // used is synchronized.

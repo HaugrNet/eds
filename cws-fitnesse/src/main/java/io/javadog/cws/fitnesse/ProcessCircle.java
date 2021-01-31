@@ -80,7 +80,7 @@ public final class ProcessCircle extends CwsRequest<ProcessCircleResponse> {
         request.setMemberId(memberId);
         request.setCircleKey(circleKey);
 
-        response = CallManagement.processCircle(requestType, requestUrl, request);
+        response = CallManagement.processCircle(requestUrl, request);
 
         // Ensuring that the internal mapping of Ids with accounts being
         // used is synchronized.

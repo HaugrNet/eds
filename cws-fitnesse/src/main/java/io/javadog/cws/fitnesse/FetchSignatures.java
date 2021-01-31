@@ -58,7 +58,7 @@ public final class FetchSignatures extends CwsRequest<FetchSignatureResponse> {
     public void execute() {
         final FetchSignatureRequest request = prepareRequest(FetchSignatureRequest.class);
 
-        response = CallShare.fetchSignatures(requestType, requestUrl, request);
+        response = CallShare.fetchSignatures(requestUrl, request);
     }
 
     private static void addSignatureInfo(final StringBuilder builder, final List<Signature> signatures) {

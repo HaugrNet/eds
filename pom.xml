@@ -37,11 +37,9 @@
         <module>cws-api</module>
         <module>cws-core</module>
         <module>cws-rest</module>
-        <module>cws-soap</module>
         <module>cws-wildfly</module>
         <module>cws-payara</module>
         <module>cws-client-rest</module>
-        <module>cws-client-soap</module>
         <module>cws-fitnesse</module>
     </modules>
 
@@ -94,17 +92,7 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>cws-soap</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>${project.groupId}</groupId>
                 <artifactId>cws-client-rest</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>cws-client-soap</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

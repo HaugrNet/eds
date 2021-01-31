@@ -47,6 +47,6 @@ public final class Authenticated extends CwsRequest<AuthenticateResponse> {
     public void execute() {
         final Authentication request = prepareRequest(Authentication.class);
 
-        response = CallManagement.authenticated(requestType, requestUrl, request);
+        response = CallManagement.authenticated(requestUrl, request);
     }
 }

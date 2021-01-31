@@ -44,6 +44,6 @@ public final class Version extends CwsRequest<VersionResponse> {
      */
     @Override
     public void execute() {
-        response = CallManagement.version(requestType, requestUrl);
+        response = CallManagement.version(requestUrl);
     }
 }

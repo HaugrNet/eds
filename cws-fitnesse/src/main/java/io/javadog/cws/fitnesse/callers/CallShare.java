@@ -32,8 +32,6 @@ import io.javadog.cws.api.responses.ProcessDataTypeResponse;
 import io.javadog.cws.api.responses.SignResponse;
 import io.javadog.cws.api.responses.VerifyResponse;
 import io.javadog.cws.client.rest.ShareRestClient;
-import io.javadog.cws.client.soap.ShareSoapClient;
-import io.javadog.cws.fitnesse.exceptions.StopTestException;
 
 /**
  * <p>CWS Share invocation class.</p>
@@ -49,18 +47,9 @@ public final class CallShare {
         // Private Constructor, this is a utility Class.
     }
 
-    private static void prepareCWS(final String type, final String url) {
+    private static void prepareCWS(final String url) {
         if (share == null) {
-            switch (type) {
-                case "REST":
-                    share = new ShareRestClient(url);
-                    break;
-                case "SOAP":
-                    share = new ShareSoapClient(url);
-                    break;
-                default:
-                    throw new StopTestException("Unknown Request Type for CWS, supported is either REST or SOAP");
-            }
+            share = new ShareRestClient(url);
         }
     }
 
@@ -68,38 +57,38 @@ public final class CallShare {
     // Share Interface Functionality
     // =========================================================================
 
-    public static ProcessDataTypeResponse processDataType(final String type, final String url, final ProcessDataTypeRequest request) {
-        prepareCWS(type, url);
+    public static ProcessDataTypeResponse processDataType(final String url, final ProcessDataTypeRequest request) {
+        prepareCWS(url);
         return share.processDataType(request);
     }
 
-    public static FetchDataTypeResponse fetchDataTypes(final String type, final String url, final FetchDataTypeRequest request) {
-        prepareCWS(type, url);
+    public static FetchDataTypeResponse fetchDataTypes(final String url, final FetchDataTypeRequest request) {
+        prepareCWS(url);
         return share.fetchDataTypes(request);
     }
 
-    public static ProcessDataResponse processData(final String type, final String url, final ProcessDataRequest request) {
-        prepareCWS(type, url);
+    public static ProcessDataResponse processData(final String url, final ProcessDataRequest request) {
+        prepareCWS(url);
         return share.processData(request);
     }
 
-    public static FetchDataResponse fetchData(final String type, final String url, final FetchDataRequest request) {
-        prepareCWS(type, url);
+    public static FetchDataResponse fetchData(final String url, final FetchDataRequest request) {
+        prepareCWS(url);
         return share.fetchData(request);
     }
 
-    public static SignResponse sign(final String type, final String url, final SignRequest request) {
-        prepareCWS(type, url);
+    public static SignResponse sign(final String url, final SignRequest request) {
+        prepareCWS(url);
         return share.sign(request);
     }
 
-    public static VerifyResponse verify(final String type, final String url, final VerifyRequest request) {
-        prepareCWS(type, url);
+    public static VerifyResponse verify(final String url, final VerifyRequest request) {
+        prepareCWS(url);
         return share.verify(request);
     }
 
-    public static FetchSignatureResponse fetchSignatures(final String type, final String url, final FetchSignatureRequest request) {
-        prepareCWS(type, url);
+    public static FetchSignatureResponse fetchSignatures(final String url, final FetchSignatureRequest request) {
+        prepareCWS(url);
         return share.fetchSignatures(request);
     }
 }

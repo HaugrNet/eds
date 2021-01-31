@@ -104,7 +104,7 @@ public final class ProcessData extends CwsRequest<ProcessDataResponse> {
         request.setTypeName(typeName);
         request.setData(data);
 
-        response = CallShare.processData(requestType, requestUrl, request);
+        response = CallShare.processData(requestUrl, request);
 
         // Ensuring that the internal mapping of Ids with accounts being
         // used is synchronized.

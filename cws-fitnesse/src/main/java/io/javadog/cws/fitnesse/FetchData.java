@@ -175,7 +175,7 @@ public final class FetchData extends CwsRequest<FetchDataResponse> {
         request.setPageNumber(pageNumber);
         request.setPageSize(pageSize);
 
-        response = CallShare.fetchData(requestType, requestUrl, request);
+        response = CallShare.fetchData(requestUrl, request);
         if (response != null) {
             metadata.addAll(response.getMetadata());
         }

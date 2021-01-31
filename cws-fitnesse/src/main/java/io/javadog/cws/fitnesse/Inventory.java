@@ -134,7 +134,7 @@ public final class Inventory extends CwsRequest<InventoryResponse> {
         request.setPageNumber(pageNumber);
         request.setPageSize(pageSize);
 
-        response = CallManagement.inventory(requestType, requestUrl, request);
+        response = CallManagement.inventory(requestUrl, request);
         if (response != null) {
             metadata.addAll(response.getInventory());
         }

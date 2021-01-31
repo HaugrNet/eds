@@ -15,11 +15,11 @@ possible to exchange data between multiple parties using encrypted storage,
 where both the parties involved, and the data exchanged can be anything from
 simple files to complex data objects - CWS only cares about bytes.
 
-Via the public API (REST or SOAP based WebServices), it is possible to access
-the internal logic, where keys are unlocked, based on user credentials and used
-to encrypt and decrypt data, storing only encrypted keys and data. Using the
-same basic mechanism as PGP, combining Asymmetric & Symmetric keys, it is
-possible for multiple parties to exchange data safely and securely.
+Via the public API (REST based WebServices), it is possible to access the
+internal logic, where keys are unlocked, based on user credentials and used to
+encrypt and decrypt data, storing only encrypted keys and data. Using the same
+basic mechanism as PGP, combining Asymmetric & Symmetric keys, it is possible
+for multiple parties to exchange data safely and securely.
 
 Since CWS only focused on bytes and does not have any care for more information,
 it can be used to store either files between users or data objects between apps
@@ -66,21 +66,13 @@ cd [ /path/to/cws/sources ]
 mvn clean verify
 ```
 
-Using the Payara or WildFly scripts to deploy the correct WAR file.
+Using the WildFly script to deploy the correct WAR file.
 Now copy the cws.war file in place.
 
 ```
 export PATH=[ / path/to/cws/sources ]/accessories/release/bin:${PATH}
-payara.sh configure
-payara.sh deploy
-```
-
-Now, you should have a running version of CWS which can be reached from the
-following SOAP based URL's:
-
-```
-http://localhost:8080/cws/management?wsdl
-http://localhost:8080/cws/share?wsdl
+wildfly.sh configure
+wildfly.sh deploy
 ```
 
 If you have swagger installed, please load the swagger.json file from the
@@ -117,7 +109,7 @@ deployed in a "hostile" environment.
 This is the CWS 2.0 development branch, with the these features planned:
 
 * [Migrate code base from Java 8 to Java 11](https://github.com/JavaDogs/cws/issues/71)
-* [Migrate from Java EE 7 to Jakarta EE 9](https://github.com/JavaDogs/cws/issues/70)
+* [Migrate from Java EE 7 to Jakarta EE 8](https://github.com/JavaDogs/cws/issues/70)
 * [Convert Date Objects to Java 8+ Time Objects](https://github.com/JavaDogs/cws/issues/69)
 
 Even though the code base will be migrated, and new features will only be added

@@ -64,7 +64,7 @@ public final class ProcessDataType extends CwsRequest<ProcessDataTypeResponse> {
         request.setTypeName(name);
         request.setType(type);
 
-        response = CallShare.processDataType(requestType, requestUrl, request);
+        response = CallShare.processDataType(requestUrl, request);
     }
 
     /**

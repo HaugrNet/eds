@@ -63,7 +63,7 @@ public final class MasterKey extends CwsRequest<MasterKeyResponse> {
             throw new StopTestException(errors.toString());
         }
 
-        response = CallManagement.masterKey(requestType, requestUrl, request);
+        response = CallManagement.masterKey(requestUrl, request);
     }
 
     /**

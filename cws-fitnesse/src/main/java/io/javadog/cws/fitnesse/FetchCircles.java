@@ -56,6 +56,6 @@ public final class FetchCircles extends CwsRequest<FetchCircleResponse> {
     public void execute() {
         final FetchCircleRequest request = prepareRequest(FetchCircleRequest.class);
 
-        response = CallManagement.fetchCircles(requestType, requestUrl, request);
+        response = CallManagement.fetchCircles(requestUrl, request);
     }
 }

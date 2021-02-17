@@ -24,19 +24,16 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
-import io.javadog.cws.api.common.Constants;
-import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.requests.Authentication;
 import io.javadog.cws.api.responses.CwsResponse;
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
+import javax.ws.rs.core.MediaType;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Type;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.Base64;
@@ -51,73 +48,45 @@ import java.util.Date;
  */
 public class GsonRestClient {
 
-    private static final String CONTENT_TYPE = "application/json";
+    private static final Charset CHARSET = StandardCharsets.UTF_8;
+    private static final Gson GSON = createGsonInstance();
     private final String baseURL;
 
     protected GsonRestClient(final String baseURL) {
-        this.baseURL = baseURL + Constants.REST_API;
+        this.baseURL = baseURL;
     }
 
     protected <R extends Authentication, C extends CwsResponse> C runRequest(final Class<C> clazz, final String requestURL, final R request) {
-        HttpURLConnection connection = null;
-
-        try {
-            final URL url = new URL(baseURL + requestURL);
-            final Gson gson = createGsonInstance();
-            final String json = gson.toJson(request);
-            connection = (HttpURLConnection) url.openConnection();
-
-            sendRequest(connection, json);
-            final int responseCode = connection.getResponseCode();
-            final C response;
-
-            if (responseCode == ReturnCode.SUCCESS.getCode()) {
-                final String received = readResponse(connection);
-                response = gson.fromJson(received, clazz);
-            } else {
-                response = clazz
-                        .getConstructor(ReturnCode.class, String.class)
-                        .newInstance(ReturnCode.findReturnCode(responseCode),
-                                connection.getResponseMessage());
-            }
-
-            return response;
-        } catch (IOException | InstantiationException | InvocationTargetException | NoSuchMethodException | IllegalAccessException e) {
-            throw new RESTClientException(e.getMessage(), e);
-        } finally {
-            if (connection != null) {
-                connection.disconnect();
-            }
-        }
-    }
-
-    private static void sendRequest(final HttpURLConnection connection, final String json) throws IOException {
-        connection.setRequestMethod("POST");
-        connection.setRequestProperty("Accept", CONTENT_TYPE);
+        final String json = toJson(request);
+        HttpRequest.BodyPublisher publisher;
 
         if (!"null".equals(json)) {
-            connection.setRequestProperty("Content-Type", CONTENT_TYPE + "; " + StandardCharsets.UTF_8.displayName());
-            connection.setRequestProperty("Content-Length", String.valueOf(json.length()));
-            connection.setDoOutput(true);
-
-            try (final DataOutputStream outputStream = new DataOutputStream(connection.getOutputStream())) {
-                outputStream.writeChars(json);
-            }
+            publisher = HttpRequest.BodyPublishers.ofString(json, CHARSET);
+        } else {
+            publisher = HttpRequest.BodyPublishers.noBody();
         }
-    }
 
-    private static String readResponse(final HttpURLConnection connection) throws IOException {
-        try (final InputStream inputStream = connection.getInputStream();
-             final InputStreamReader streamReader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
-             final BufferedReader reader = new BufferedReader(streamReader)) {
-            final StringBuilder response = new StringBuilder(0);
-            String line = reader.readLine();
-            while (line != null) {
-                response.append(line);
-                line = reader.readLine();
+        var httpRequest = HttpRequest
+                .newBuilder()
+                .version(HttpClient.Version.HTTP_1_1)
+                .uri(URI.create(baseURL + requestURL))
+                .header("Content-Type", MediaType.APPLICATION_JSON + "; " + CHARSET.displayName())
+                .header("Accept", MediaType.APPLICATION_JSON)
+                .POST(publisher)
+                .build();
+        try {
+            var response = HttpClient.newHttpClient().send(httpRequest, HttpResponse.BodyHandlers.ofString(CHARSET));
+
+            if (response.statusCode() == 200) {
+                return fromJson(clazz, response.body());
+            } else {
+                return null;
             }
-
-            return response.toString();
+        } catch (IOException e) {
+            throw new RESTClientException("Communication problem: " + e.getMessage(), e);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RESTClientException("Thread was interrupted: " + e.getMessage(), e);
         }
     }
 
@@ -131,6 +100,18 @@ public class GsonRestClient {
                 .registerTypeAdapter(byte[].class, new ByteArrayAdapter());
 
         return builder.create();
+    }
+
+    private static String toJson(final Object obj) {
+        final String tmp = GSON.toJson(obj);
+        // For some weird reason, the ASCII character '=' is being replaced
+        // by the UTF-8 encoded alternative in the Json. The '=' is a white
+        // space filler for Base64 encoded strings.
+        return tmp.replace("\\u003d", "=");
+    }
+
+    private static <T> T fromJson(final Class<T> type, final String json) {
+        return GSON.fromJson(json, type);
     }
 
     /**

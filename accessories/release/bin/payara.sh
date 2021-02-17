@@ -35,7 +35,7 @@ if [ "${action}" = "configure" ]; then
     fi
 
     echo "Configuring Payara for CWS"
-    ${payara}/glassfish/bin/asadmin add-library "$(dirname $0)/../lib/postgresql-42.2.8.jar"
+    ${payara}/glassfish/bin/asadmin add-library "$(dirname $0)/../lib/postgresql-42.2.18.jar"
     ${payara}/glassfish/bin/asadmin create-jdbc-connection-pool --datasourceclassname org.postgresql.xa.PGXADataSource --restype javax.sql.XADataSource --property "User=${dbUser}:Password=${dbPassword}:URL=jdbc\:postgresql\://${dbHost}/${dbName}" cwsPool
     ${payara}/glassfish/bin/asadmin create-jdbc-resource --connectionpoolid cwsPool datasources/cwsDS
 elif [ "${action}" = "start" ]; then

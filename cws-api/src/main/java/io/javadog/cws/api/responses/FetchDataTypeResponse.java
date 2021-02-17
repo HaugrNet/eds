@@ -19,14 +19,11 @@ package io.javadog.cws.api.responses;
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.dtos.DataType;
+import javax.json.bind.annotation.JsonbProperty;
+import javax.json.bind.annotation.JsonbPropertyOrder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
 
 /**
  * <p>Retrieves a list of known {@link DataType} Objects, which is registered
@@ -38,15 +35,13 @@ import javax.xml.bind.annotation.XmlType;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-@XmlAccessorType(XmlAccessType.FIELD)
-@XmlRootElement(name = "fetchDataTypeResult")
-@XmlType(name = "fetchDataTypeResult", propOrder = Constants.FIELD_DATATYPES)
+@JsonbPropertyOrder(Constants.FIELD_DATATYPES)
 public final class FetchDataTypeResponse extends CwsResponse {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
-    @XmlElement(name = Constants.FIELD_DATATYPES, required = true)
+    @JsonbProperty(Constants.FIELD_DATATYPES)
     private final List<DataType> dataTypes = new ArrayList<>(0);
 
     // =========================================================================

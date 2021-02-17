@@ -16,14 +16,13 @@
  */
 package io.javadog.cws.api.responses;
 
+import io.javadog.cws.api.common.ByteArrayAdapter;
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.common.Utilities;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
+import javax.json.bind.annotation.JsonbProperty;
+import javax.json.bind.annotation.JsonbPropertyOrder;
+import javax.json.bind.annotation.JsonbTypeAdapter;
 
 /**
  * <p>If the request was invoked with the CREATE action, then the response will
@@ -38,18 +37,17 @@ import javax.xml.bind.annotation.XmlType;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-@XmlAccessorType(XmlAccessType.FIELD)
-@XmlRootElement(name = "processMemberResult")
-@XmlType(name = "processMemberResult", propOrder = { Constants.FIELD_MEMBER_ID, Constants.FIELD_SIGNATURE })
+@JsonbPropertyOrder({ Constants.FIELD_MEMBER_ID, Constants.FIELD_SIGNATURE })
 public final class ProcessMemberResponse extends CwsResponse {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
-    @XmlElement(name = Constants.FIELD_MEMBER_ID, required = true)
+    @JsonbProperty(Constants.FIELD_MEMBER_ID)
     private String memberId = null;
 
-    @XmlElement(name = Constants.FIELD_SIGNATURE, required = true)
+    @JsonbProperty(Constants.FIELD_SIGNATURE)
+    @JsonbTypeAdapter(ByteArrayAdapter.class)
     private byte[] signature = null;
 
     // =========================================================================

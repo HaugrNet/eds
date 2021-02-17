@@ -18,11 +18,8 @@ package io.javadog.cws.api.responses;
 
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
+import javax.json.bind.annotation.JsonbProperty;
+import javax.json.bind.annotation.JsonbPropertyOrder;
 
 /**
  * <p>Returns the current version of the CWS instance running.</p>
@@ -33,15 +30,13 @@ import javax.xml.bind.annotation.XmlType;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-@XmlAccessorType(XmlAccessType.FIELD)
-@XmlRootElement(name = "versionResult")
-@XmlType(name = "versionResult", propOrder = Constants.FIELD_VERSION)
+@JsonbPropertyOrder(Constants.FIELD_VERSION)
 public final class VersionResponse extends CwsResponse {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
-    @XmlElement(name = Constants.FIELD_VERSION, required = true)
+    @JsonbProperty(Constants.FIELD_VERSION)
     private String version = null;
 
     // =========================================================================

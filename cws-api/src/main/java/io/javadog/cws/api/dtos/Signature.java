@@ -18,12 +18,11 @@ package io.javadog.cws.api.dtos;
 
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.Utilities;
+import javax.json.bind.annotation.JsonbDateFormat;
+import javax.json.bind.annotation.JsonbProperty;
+import javax.json.bind.annotation.JsonbPropertyOrder;
 import java.io.Serializable;
 import java.util.Date;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlType;
 
 /**
  * This Object contain information about a Signature in CWS, such as when it
@@ -33,26 +32,33 @@ import javax.xml.bind.annotation.XmlType;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-@XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = Constants.FIELD_SIGNATURE, propOrder = { Constants.FIELD_CHECKSUM, Constants.FIELD_EXPIRES, Constants.FIELD_VERIFICATIONS, Constants.FIELD_LAST_VERIFICATION, Constants.FIELD_ADDED })
+@JsonbPropertyOrder({
+        Constants.FIELD_CHECKSUM,
+        Constants.FIELD_EXPIRES,
+        Constants.FIELD_VERIFICATIONS,
+        Constants.FIELD_LAST_VERIFICATION,
+        Constants.FIELD_ADDED })
 public final class Signature implements Serializable {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
-    @XmlElement(name = Constants.FIELD_CHECKSUM)
+    @JsonbProperty(value = Constants.FIELD_CHECKSUM, nillable = true)
     private String checksum = null;
 
-    @XmlElement(name = Constants.FIELD_EXPIRES)
+    @JsonbProperty(value = Constants.FIELD_EXPIRES, nillable = true)
+    @JsonbDateFormat(Constants.JSON_DATE_FORMAT)
     private Date expires = null;
 
-    @XmlElement(name = Constants.FIELD_VERIFICATIONS)
+    @JsonbProperty(value = Constants.FIELD_VERIFICATIONS, nillable = true)
     private Long verifications = null;
 
-    @XmlElement(name = Constants.FIELD_LAST_VERIFICATION)
+    @JsonbProperty(value = Constants.FIELD_LAST_VERIFICATION, nillable = true)
+    @JsonbDateFormat(Constants.JSON_DATE_FORMAT)
     private Date lastVerification = null;
 
-    @XmlElement(name = Constants.FIELD_ADDED)
+    @JsonbProperty(value = Constants.FIELD_ADDED, nillable = true)
+    @JsonbDateFormat(Constants.JSON_DATE_FORMAT)
     private Date added = null;
 
     // =========================================================================

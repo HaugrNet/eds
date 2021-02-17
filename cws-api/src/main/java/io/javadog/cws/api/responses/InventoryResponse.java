@@ -19,14 +19,11 @@ package io.javadog.cws.api.responses;
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.dtos.Metadata;
+import javax.json.bind.annotation.JsonbProperty;
+import javax.json.bind.annotation.JsonbPropertyOrder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
 
 /**
  * <p>Response contains a list of the Metadata from the CWS database.</p>
@@ -37,18 +34,16 @@ import javax.xml.bind.annotation.XmlType;
  * @author Kim Jensen
  * @since CWS 1.2
  */
-@XmlAccessorType(XmlAccessType.FIELD)
-@XmlRootElement(name = "inventoryResult")
-@XmlType(name = "inventoryResult", propOrder = { Constants.FIELD_INVENTORY, Constants.FIELD_RECORDS })
+@JsonbPropertyOrder({ Constants.FIELD_INVENTORY, Constants.FIELD_RECORDS })
 public class InventoryResponse extends CwsResponse {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
-    @XmlElement(name = Constants.FIELD_INVENTORY, required = true)
+    @JsonbProperty(Constants.FIELD_INVENTORY)
     private final List<Metadata> inventory = new ArrayList<>(0);
 
-    @XmlElement(name = Constants.FIELD_RECORDS, required = true)
+    @JsonbProperty(Constants.FIELD_RECORDS)
     private long records = 0;
 
     // =========================================================================

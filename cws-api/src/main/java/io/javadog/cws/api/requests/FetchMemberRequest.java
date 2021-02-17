@@ -17,12 +17,9 @@
 package io.javadog.cws.api.requests;
 
 import io.javadog.cws.api.common.Constants;
+import javax.json.bind.annotation.JsonbProperty;
+import javax.json.bind.annotation.JsonbPropertyOrder;
 import java.util.Map;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
 
 /**
  * <p>The request will return a list with all the Member's from the system, or
@@ -34,15 +31,13 @@ import javax.xml.bind.annotation.XmlType;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-@XmlAccessorType(XmlAccessType.FIELD)
-@XmlRootElement(name = "fetchMemberRequest")
-@XmlType(name = "fetchMemberRequest", propOrder = Constants.FIELD_MEMBER_ID)
+@JsonbPropertyOrder(Constants.FIELD_MEMBER_ID)
 public final class FetchMemberRequest extends Authentication {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
-    @XmlElement(name = Constants.FIELD_MEMBER_ID, nillable = true)
+    @JsonbProperty(value = Constants.FIELD_MEMBER_ID, nillable = true)
     private String memberId = null;
 
     // =========================================================================

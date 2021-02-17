@@ -18,12 +18,9 @@ package io.javadog.cws.api.requests;
 
 import io.javadog.cws.api.common.Action;
 import io.javadog.cws.api.common.Constants;
+import javax.json.bind.annotation.JsonbProperty;
+import javax.json.bind.annotation.JsonbPropertyOrder;
 import java.util.Map;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
 
 /**
  * <p>Circles only have an Id, a name and an optional External Circle Key, the
@@ -59,29 +56,32 @@ import javax.xml.bind.annotation.XmlType;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-@XmlAccessorType(XmlAccessType.FIELD)
-@XmlRootElement(name = "processCircleRequest")
-@XmlType(name = "processCircleRequest", propOrder = { Constants.FIELD_ACTION, Constants.FIELD_CIRCLE_ID, Constants.FIELD_CIRCLE_NAME, Constants.FIELD_MEMBER_ID, Constants.FIELD_CIRCLE_KEY })
+@JsonbPropertyOrder({
+        Constants.FIELD_ACTION,
+        Constants.FIELD_CIRCLE_ID,
+        Constants.FIELD_CIRCLE_NAME,
+        Constants.FIELD_MEMBER_ID,
+        Constants.FIELD_CIRCLE_KEY })
 public final class ProcessCircleRequest extends Authentication implements CircleIdRequest, ActionRequest {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
-    @XmlElement(name = Constants.FIELD_ACTION, required = true)
+    @JsonbProperty(value = Constants.FIELD_ACTION, nillable = true)
     private Action action = null;
 
-    @XmlElement(name = Constants.FIELD_CIRCLE_ID, nillable = true)
+    @JsonbProperty(value = Constants.FIELD_CIRCLE_ID, nillable = true)
     private String circleId = null;
 
-    @XmlElement(name = Constants.FIELD_CIRCLE_NAME, nillable = true)
+    @JsonbProperty(value = Constants.FIELD_CIRCLE_NAME, nillable = true)
     private String circleName = null;
 
-    @XmlElement(name = Constants.FIELD_MEMBER_ID, nillable = true)
+    @JsonbProperty(value = Constants.FIELD_MEMBER_ID, nillable = true)
     private String memberId = null;
 
     // The Circle Key is an optional value which may or may not be provided,
     // hence it is only stored but not used for anything.
-    @XmlElement(name = Constants.FIELD_CIRCLE_KEY, nillable = true)
+    @JsonbProperty(value = Constants.FIELD_CIRCLE_KEY, nillable = true)
     private String circleKey = null;
 
     // =========================================================================

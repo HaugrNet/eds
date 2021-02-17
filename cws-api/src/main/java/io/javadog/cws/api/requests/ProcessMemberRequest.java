@@ -17,15 +17,14 @@
 package io.javadog.cws.api.requests;
 
 import io.javadog.cws.api.common.Action;
+import io.javadog.cws.api.common.ByteArrayAdapter;
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.MemberRole;
 import io.javadog.cws.api.common.Utilities;
+import javax.json.bind.annotation.JsonbProperty;
+import javax.json.bind.annotation.JsonbPropertyOrder;
+import javax.json.bind.annotation.JsonbTypeAdapter;
 import java.util.Map;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
 
 /**
  * <p>It is possible to create new Member Accounts in 2 different ways, both
@@ -86,32 +85,37 @@ import javax.xml.bind.annotation.XmlType;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-@XmlAccessorType(XmlAccessType.FIELD)
-@XmlRootElement(name = "processMemberRequest")
-@XmlType(name = "processMemberRequest", propOrder = { Constants.FIELD_ACTION, Constants.FIELD_MEMBER_ID, Constants.FIELD_MEMBER_ROLE, Constants.FIELD_PUBLIC_KEY, Constants.FIELD_NEW_ACCOUNT_NAME, Constants.FIELD_NEW_CREDENTIAL })
+@JsonbPropertyOrder({
+        Constants.FIELD_ACTION,
+        Constants.FIELD_MEMBER_ID,
+        Constants.FIELD_MEMBER_ROLE,
+        Constants.FIELD_PUBLIC_KEY,
+        Constants.FIELD_NEW_ACCOUNT_NAME,
+        Constants.FIELD_NEW_CREDENTIAL })
 public final class ProcessMemberRequest extends Authentication implements ActionRequest {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
-    @XmlElement(name = Constants.FIELD_ACTION, required = true)
+    @JsonbProperty(value = Constants.FIELD_ACTION, nillable = true)
     private Action action = null;
 
-    @XmlElement(name = Constants.FIELD_MEMBER_ID, nillable = true)
+    @JsonbProperty(value = Constants.FIELD_MEMBER_ID, nillable = true)
     private String memberId = null;
 
-    @XmlElement(name = Constants.FIELD_MEMBER_ROLE, required = true)
+    @JsonbProperty(value = Constants.FIELD_MEMBER_ROLE, nillable = true)
     private MemberRole memberRole = null;
 
     // The Public Key is an optional value which may or may not be provided,
     // hence it is only stored but not used for anything.
-    @XmlElement(name = Constants.FIELD_PUBLIC_KEY, required = true)
+    @JsonbProperty(value = Constants.FIELD_PUBLIC_KEY, nillable = true)
     private String publicKey = null;
 
-    @XmlElement(name = Constants.FIELD_NEW_ACCOUNT_NAME, nillable = true)
+    @JsonbProperty(value = Constants.FIELD_NEW_ACCOUNT_NAME, nillable = true)
     private String newAccountName = null;
 
-    @XmlElement(name = Constants.FIELD_NEW_CREDENTIAL, nillable = true)
+    @JsonbProperty(value = Constants.FIELD_NEW_CREDENTIAL, nillable = true)
+    @JsonbTypeAdapter(ByteArrayAdapter.class)
     private byte[] newCredential = null;
 
     // =========================================================================

@@ -17,12 +17,9 @@
 package io.javadog.cws.api.requests;
 
 import io.javadog.cws.api.common.Constants;
+import javax.json.bind.annotation.JsonbProperty;
+import javax.json.bind.annotation.JsonbPropertyOrder;
 import java.util.Map;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
 
 /**
  * <p>The Request Object must be filled with either a DataId or a CircleId and
@@ -37,27 +34,30 @@ import javax.xml.bind.annotation.XmlType;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-@XmlAccessorType(XmlAccessType.FIELD)
-@XmlRootElement(name = "fetchDataRequest")
-@XmlType(name = "fetchDataRequest", propOrder = { Constants.FIELD_CIRCLE_ID, Constants.FIELD_DATA_ID, Constants.FIELD_PAGE_NUMBER, Constants.FIELD_PAGE_SIZE, Constants.FIELD_DATA_NAME })
+@JsonbPropertyOrder({
+        Constants.FIELD_CIRCLE_ID,
+        Constants.FIELD_DATA_ID,
+        Constants.FIELD_PAGE_NUMBER,
+        Constants.FIELD_PAGE_SIZE,
+        Constants.FIELD_DATA_NAME })
 public final class FetchDataRequest extends Authentication implements CircleIdRequest {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
-    @XmlElement(name = Constants.FIELD_CIRCLE_ID)
+    @JsonbProperty(value = Constants.FIELD_CIRCLE_ID, nillable = true)
     private String circleId = null;
 
-    @XmlElement(name = Constants.FIELD_DATA_ID)
+    @JsonbProperty(value = Constants.FIELD_DATA_ID, nillable = true)
     private String dataId = null;
 
-    @XmlElement(name = Constants.FIELD_PAGE_NUMBER)
+    @JsonbProperty(value = Constants.FIELD_PAGE_NUMBER, nillable = true)
     private Integer pageNumber = 1;
 
-    @XmlElement(name = Constants.FIELD_PAGE_SIZE)
+    @JsonbProperty(value = Constants.FIELD_PAGE_SIZE, nillable = true)
     private Integer pageSize = Constants.MAX_PAGE_SIZE;
 
-    @XmlElement(name = Constants.FIELD_DATA_NAME)
+    @JsonbProperty(value = Constants.FIELD_DATA_NAME, nillable = true)
     private String dataName = null;
 
     // =========================================================================

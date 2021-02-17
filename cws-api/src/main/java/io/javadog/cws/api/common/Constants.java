@@ -16,6 +16,7 @@
  */
 package io.javadog.cws.api.common;
 
+import javax.json.bind.annotation.JsonbDateFormat;
 import java.util.regex.Pattern;
 
 /**
@@ -73,6 +74,8 @@ public final class Constants {
      */
     public static final String ADMIN_ACCOUNT = "admin";
 
+    public static final String JSON_DATE_FORMAT = JsonbDateFormat.TIME_IN_MILLIS;
+
     public static final String FOLDER_TYPENAME = "folder";
 
     public static final String DATA_TYPENAME = "data";
@@ -101,13 +104,10 @@ public final class Constants {
     public static final String FIELD_NEW_CREDENTIAL = "newCredential";
     public static final String FIELD_MEMBER_ROLE = "memberRole";
     public static final String FIELD_CREDENTIALTYPE = "credentialType";
-    public static final String FIELD_CIRCLE = "circle";
     public static final String FIELD_CIRCLES = "circles";
     public static final String FIELD_CIRCLE_KEY = "circleKey";
     public static final String FIELD_CIRCLE_NAME = "circleName";
-    public static final String FIELD_TRUSTEE = "trustee";
     public static final String FIELD_TRUSTEES = "trustees";
-    public static final String FIELD_MEMBER = "member";
     public static final String FIELD_MEMBERS = "members";
     public static final String FIELD_TRUSTLEVEL = "trustLevel";
     public static final String FIELD_METADATA = "metadata";
@@ -121,7 +121,6 @@ public final class Constants {
     public static final String FIELD_CHECKSUM = "checksum";
     public static final String FIELD_SIGNATURE = "signature";
     public static final String FIELD_SIGNATURES = "signatures";
-    public static final String FIELD_SANITY = "sanity";
     public static final String FIELD_SANITIES = "sanities";
     public static final String FIELD_INVENTORY = "inventory";
     public static final String FIELD_SETTINGS = "settings";
@@ -145,7 +144,7 @@ public final class Constants {
     // =========================================================================
     // Following is the part of the URLs for all REST based requests. It is
     // divided into the base call, and the sub calls.
-    public static final String REST_API = "/api";
+    public static final String REST_API = "/";
 
     // General requests from the Management Interface
     public static final String REST_VERSION = "/version";

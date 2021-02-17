@@ -17,14 +17,13 @@
 package io.javadog.cws.api.requests;
 
 import io.javadog.cws.api.common.Action;
+import io.javadog.cws.api.common.ByteArrayAdapter;
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.Utilities;
+import javax.json.bind.annotation.JsonbProperty;
+import javax.json.bind.annotation.JsonbPropertyOrder;
+import javax.json.bind.annotation.JsonbTypeAdapter;
 import java.util.Map;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
 
 /**
  * <p>The Request Object supports several actions for adding, updating and
@@ -55,9 +54,7 @@ import javax.xml.bind.annotation.XmlType;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-@XmlAccessorType(XmlAccessType.FIELD)
-@XmlRootElement(name = "processDataRequest")
-@XmlType(name = "processDataRequest", propOrder = {
+@JsonbPropertyOrder({
         Constants.FIELD_ACTION,
         Constants.FIELD_DATA_ID,
         Constants.FIELD_CIRCLE_ID,
@@ -72,31 +69,32 @@ public final class ProcessDataRequest extends Authentication implements CircleId
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
-    @XmlElement(name = Constants.FIELD_ACTION, required = true)
+    @JsonbProperty(value = Constants.FIELD_ACTION, nillable = true)
     private Action action = null;
 
-    @XmlElement(name = Constants.FIELD_DATA_ID)
+    @JsonbProperty(value = Constants.FIELD_DATA_ID, nillable = true)
     private String dataId = null;
 
-    @XmlElement(name = Constants.FIELD_CIRCLE_ID)
+    @JsonbProperty(value = Constants.FIELD_CIRCLE_ID, nillable = true)
     private String circleId = null;
 
-    @XmlElement(name = Constants.FIELD_TARGET_CIRCLE_ID)
+    @JsonbProperty(value = Constants.FIELD_TARGET_CIRCLE_ID, nillable = true)
     private String targetCircleId = null;
 
-    @XmlElement(name = Constants.FIELD_DATA_NAME)
+    @JsonbProperty(value = Constants.FIELD_DATA_NAME, nillable = true)
     private String dataName = null;
 
-    @XmlElement(name = Constants.FIELD_FOLDER_ID)
+    @JsonbProperty(value = Constants.FIELD_FOLDER_ID, nillable = true)
     private String folderId = null;
 
-    @XmlElement(name = Constants.FIELD_TARGET_FOLDER_ID)
+    @JsonbProperty(value = Constants.FIELD_TARGET_FOLDER_ID, nillable = true)
     private String targetFolderId = null;
 
-    @XmlElement(name = Constants.FIELD_TYPENAME)
+    @JsonbProperty(value = Constants.FIELD_TYPENAME, nillable = true)
     private String typeName = null;
 
-    @XmlElement(name = Constants.FIELD_DATA)
+    @JsonbProperty(value = Constants.FIELD_DATA, nillable = true)
+    @JsonbTypeAdapter(ByteArrayAdapter.class)
     private byte[] data = null;
 
     // =========================================================================

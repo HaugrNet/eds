@@ -16,10 +16,6 @@
  */
 package io.javadog.cws.api.common;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlType;
-
 /**
  * <p>This is the types of credentials allowed for the Authentication Process.
  * It can be either an Invitation (Signature, with a shared secret). Or it can
@@ -33,8 +29,6 @@ import javax.xml.bind.annotation.XmlType;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-@XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = Constants.FIELD_CREDENTIALTYPE)
 public enum CredentialType {
 
     /**

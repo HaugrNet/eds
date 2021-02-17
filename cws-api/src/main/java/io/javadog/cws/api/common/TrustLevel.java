@@ -18,9 +18,6 @@ package io.javadog.cws.api.common;
 
 import java.util.EnumSet;
 import java.util.Set;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlType;
 
 /**
  * <p>Different Levels of trust, used by the action checks to see if a given
@@ -29,8 +26,6 @@ import javax.xml.bind.annotation.XmlType;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-@XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = Constants.FIELD_TRUSTLEVEL)
 public enum TrustLevel {
 
     ALL,

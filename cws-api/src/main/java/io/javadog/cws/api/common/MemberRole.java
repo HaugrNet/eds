@@ -16,10 +16,6 @@
  */
 package io.javadog.cws.api.common;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlType;
-
 /**
  * <p>Each Member of CWS has some general permissions defined, which is linked
  * to their Role in the system. The default role for members is "STANDARD", and
@@ -28,8 +24,6 @@ import javax.xml.bind.annotation.XmlType;
  * @author Kim Jensen
  * @since CWS 1.1
  */
-@XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = Constants.FIELD_MEMBER_ROLE)
 public enum MemberRole {
 
     ADMIN,

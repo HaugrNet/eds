@@ -18,12 +18,11 @@ package io.javadog.cws.api.dtos;
 
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.Utilities;
+import javax.json.bind.annotation.JsonbDateFormat;
+import javax.json.bind.annotation.JsonbProperty;
+import javax.json.bind.annotation.JsonbPropertyOrder;
 import java.io.Serializable;
 import java.util.Date;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlType;
 
 /**
  * <p>The Metadata is the information which is needed as part of storing or
@@ -35,29 +34,35 @@ import javax.xml.bind.annotation.XmlType;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-@XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = Constants.FIELD_METADATA, propOrder = { Constants.FIELD_DATA_ID, Constants.FIELD_CIRCLE_ID, Constants.FIELD_FOLDER_ID, Constants.FIELD_DATA_NAME, Constants.FIELD_TYPENAME, Constants.FIELD_ADDED })
+@JsonbPropertyOrder({
+        Constants.FIELD_DATA_ID,
+        Constants.FIELD_CIRCLE_ID,
+        Constants.FIELD_FOLDER_ID,
+        Constants.FIELD_DATA_NAME,
+        Constants.FIELD_TYPENAME,
+        Constants.FIELD_ADDED })
 public final class Metadata implements Serializable {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
-    @XmlElement(name = Constants.FIELD_DATA_ID, required = true)
+    @JsonbProperty(value = Constants.FIELD_DATA_ID, nillable = true)
     private String dataId = null;
 
-    @XmlElement(name = Constants.FIELD_CIRCLE_ID, required = true)
+    @JsonbProperty(value = Constants.FIELD_CIRCLE_ID, nillable = true)
     private String circleId = null;
 
-    @XmlElement(name = Constants.FIELD_FOLDER_ID, required = true)
+    @JsonbProperty(value = Constants.FIELD_FOLDER_ID, nillable = true)
     private String folderId = null;
 
-    @XmlElement(name = Constants.FIELD_DATA_NAME, required = true)
+    @JsonbProperty(value = Constants.FIELD_DATA_NAME, nillable = true)
     private String dataName = null;
 
-    @XmlElement(name = Constants.FIELD_TYPENAME, required = true)
+    @JsonbProperty(value = Constants.FIELD_TYPENAME, nillable = true)
     private String typeName = null;
 
-    @XmlElement(name = Constants.FIELD_ADDED, required = true)
+    @JsonbProperty(value = Constants.FIELD_ADDED, nillable = true)
+    @JsonbDateFormat(Constants.JSON_DATE_FORMAT)
     private Date added = null;
 
     // =========================================================================

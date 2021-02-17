@@ -17,12 +17,9 @@
 package io.javadog.cws.api.requests;
 
 import io.javadog.cws.api.common.Constants;
+import javax.json.bind.annotation.JsonbProperty;
+import javax.json.bind.annotation.JsonbPropertyOrder;
 import java.util.Map;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
 
 /**
  * <p>Object is used to retrieve a list of Metadata from the CWS database.</p>
@@ -33,18 +30,16 @@ import javax.xml.bind.annotation.XmlType;
  * @author Kim Jensen
  * @since CWS 1.2
  */
-@XmlAccessorType(XmlAccessType.FIELD)
-@XmlRootElement(name = "inventoryRequest")
-@XmlType(name = "inventoryRequest", propOrder = { Constants.FIELD_PAGE_NUMBER, Constants.FIELD_PAGE_SIZE })
+@JsonbPropertyOrder({ Constants.FIELD_PAGE_NUMBER, Constants.FIELD_PAGE_SIZE })
 public class InventoryRequest extends Authentication {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
-    @XmlElement(name = Constants.FIELD_PAGE_NUMBER)
+    @JsonbProperty(value = Constants.FIELD_PAGE_NUMBER, nillable = true)
     private Integer pageNumber = 1;
 
-    @XmlElement(name = Constants.FIELD_PAGE_SIZE)
+    @JsonbProperty(value = Constants.FIELD_PAGE_SIZE, nillable = true)
     private Integer pageSize = Constants.MAX_PAGE_SIZE;
 
     // =========================================================================

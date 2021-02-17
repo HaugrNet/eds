@@ -18,11 +18,9 @@ package io.javadog.cws.api.responses;
 
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
+import javax.json.bind.annotation.JsonbProperty;
+import javax.json.bind.annotation.JsonbPropertyOrder;
 import java.io.Serializable;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlType;
 
 /**
  * <p>General Response Object, embedded in all other Response Objects, as it
@@ -42,17 +40,16 @@ import javax.xml.bind.annotation.XmlType;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-@XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "cwsResult", propOrder = { Constants.FIELD_RETURN_CODE, Constants.FIELD_RETURN_MESSAGE })
+@JsonbPropertyOrder({ Constants.FIELD_RETURN_CODE, Constants.FIELD_RETURN_MESSAGE })
 public class CwsResponse implements Serializable {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
-    @XmlElement(name = Constants.FIELD_RETURN_CODE, required = true)
+    @JsonbProperty(Constants.FIELD_RETURN_CODE)
     private int returnCode = ReturnCode.SUCCESS.getCode();
 
-    @XmlElement(name = Constants.FIELD_RETURN_MESSAGE, required = true)
+    @JsonbProperty(Constants.FIELD_RETURN_MESSAGE)
     private String returnMessage = "Ok";
 
     // =========================================================================

@@ -18,12 +18,9 @@ package io.javadog.cws.api.requests;
 
 import io.javadog.cws.api.common.Action;
 import io.javadog.cws.api.common.Constants;
+import javax.json.bind.annotation.JsonbProperty;
+import javax.json.bind.annotation.JsonbPropertyOrder;
 import java.util.Map;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
 
 /**
  * <p>When processing a DataType, it can be to either create a new or update an
@@ -40,21 +37,22 @@ import javax.xml.bind.annotation.XmlType;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-@XmlAccessorType(XmlAccessType.FIELD)
-@XmlRootElement(name = "processDataTypeRequest")
-@XmlType(name = "processDataTypeRequest", propOrder = { Constants.FIELD_ACTION, Constants.FIELD_TYPENAME, Constants.FIELD_TYPE })
+@JsonbPropertyOrder({
+        Constants.FIELD_ACTION,
+        Constants.FIELD_TYPENAME,
+        Constants.FIELD_TYPE })
 public final class ProcessDataTypeRequest extends Authentication implements ActionRequest {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
-    @XmlElement(name = Constants.FIELD_ACTION, required = true)
+    @JsonbProperty(value = Constants.FIELD_ACTION, nillable = true)
     private Action action = Action.PROCESS;
 
-    @XmlElement(name = Constants.FIELD_TYPENAME, required = true)
+    @JsonbProperty(value = Constants.FIELD_TYPENAME, nillable = true)
     private String typeName = null;
 
-    @XmlElement(name = Constants.FIELD_TYPE)
+    @JsonbProperty(value = Constants.FIELD_TYPE, nillable = true)
     private String type = null;
 
     // =========================================================================

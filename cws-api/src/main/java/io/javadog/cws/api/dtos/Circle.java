@@ -18,12 +18,11 @@ package io.javadog.cws.api.dtos;
 
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.Utilities;
+import javax.json.bind.annotation.JsonbDateFormat;
+import javax.json.bind.annotation.JsonbProperty;
+import javax.json.bind.annotation.JsonbPropertyOrder;
 import java.io.Serializable;
 import java.util.Date;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlType;
 
 /**
  * <p>Circles is part of the core functionality of CWS, as all data is assigned
@@ -33,27 +32,31 @@ import javax.xml.bind.annotation.XmlType;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-@XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = Constants.FIELD_CIRCLE, propOrder = { Constants.FIELD_CIRCLE_ID, Constants.FIELD_CIRCLE_NAME, Constants.FIELD_CIRCLE_KEY, Constants.FIELD_ADDED })
+@JsonbPropertyOrder({
+        Constants.FIELD_CIRCLE_ID,
+        Constants.FIELD_CIRCLE_NAME,
+        Constants.FIELD_CIRCLE_KEY,
+        Constants.FIELD_ADDED })
 public final class Circle implements Serializable {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
-    @XmlElement(name = Constants.FIELD_CIRCLE_ID, required = true)
+    @JsonbProperty(value = Constants.FIELD_CIRCLE_ID, nillable = true)
     private String circleId = null;
 
-    @XmlElement(name = Constants.FIELD_CIRCLE_NAME, required = true)
+    @JsonbProperty(value = Constants.FIELD_CIRCLE_NAME, nillable = true)
     private String circleName = null;
 
     // The Circle Key is an optional value which may or may not be provided,
     // hence it is only stored but not used for anything. For the same reason,
     // it is not used as part of the Standard Object methods, #equals(),
     // #hashCode() and #toString().
-    @XmlElement(name = Constants.FIELD_CIRCLE_KEY, nillable = true)
+    @JsonbProperty(value = Constants.FIELD_CIRCLE_KEY, nillable = true)
     private String circleKey = null;
 
-    @XmlElement(name = Constants.FIELD_ADDED, required = true)
+    @JsonbProperty(value = Constants.FIELD_ADDED, nillable = true)
+    @JsonbDateFormat(Constants.JSON_DATE_FORMAT)
     private Date added = null;
 
     // =========================================================================

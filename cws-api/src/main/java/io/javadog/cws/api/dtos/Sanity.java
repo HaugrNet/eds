@@ -18,12 +18,11 @@ package io.javadog.cws.api.dtos;
 
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.Utilities;
+import javax.json.bind.annotation.JsonbDateFormat;
+import javax.json.bind.annotation.JsonbProperty;
+import javax.json.bind.annotation.JsonbPropertyOrder;
 import java.io.Serializable;
 import java.util.Date;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlType;
 
 /**
  * The Sanity Object contain information about a Data record, which has failed
@@ -35,17 +34,17 @@ import javax.xml.bind.annotation.XmlType;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-@XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = Constants.FIELD_SANITY, propOrder = { Constants.FIELD_DATA_ID, Constants.FIELD_CHANGED })
+@JsonbPropertyOrder({ Constants.FIELD_DATA_ID, Constants.FIELD_CHANGED })
 public final class Sanity implements Serializable {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
-    @XmlElement(name = Constants.FIELD_DATA_ID)
+    @JsonbProperty(value = Constants.FIELD_DATA_ID, nillable = true)
     private String dataId = null;
 
-    @XmlElement(name = Constants.FIELD_CHANGED)
+    @JsonbProperty(value = Constants.FIELD_CHANGED, nillable = true)
+    @JsonbDateFormat(Constants.JSON_DATE_FORMAT)
     private Date changed = null;
 
     // =========================================================================

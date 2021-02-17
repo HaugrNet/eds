@@ -19,14 +19,11 @@ package io.javadog.cws.api.responses;
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.dtos.Circle;
+import javax.json.bind.annotation.JsonbProperty;
+import javax.json.bind.annotation.JsonbPropertyOrder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
 
 /**
  * <p>If the request was successful, a list of Circles will be returned.</p>
@@ -37,15 +34,13 @@ import javax.xml.bind.annotation.XmlType;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-@XmlAccessorType(XmlAccessType.FIELD)
-@XmlRootElement(name = "fetchCircleResult")
-@XmlType(name = "fetchCircleResult", propOrder = Constants.FIELD_CIRCLES)
+@JsonbPropertyOrder(Constants.FIELD_CIRCLES)
 public final class FetchCircleResponse extends CwsResponse {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
-    @XmlElement(name = Constants.FIELD_CIRCLES, required = true)
+    @JsonbProperty(Constants.FIELD_CIRCLES)
     private final List<Circle> circles = new ArrayList<>(0);
 
     // =========================================================================

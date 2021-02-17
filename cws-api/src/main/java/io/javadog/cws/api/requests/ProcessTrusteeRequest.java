@@ -19,14 +19,11 @@ package io.javadog.cws.api.requests;
 import io.javadog.cws.api.common.Action;
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.TrustLevel;
+import javax.json.bind.annotation.JsonbProperty;
+import javax.json.bind.annotation.JsonbPropertyOrder;
 import java.util.EnumSet;
 import java.util.Map;
 import java.util.Set;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
 
 /**
  * <p>Request Object for the processing of Trustee's. It supports the following
@@ -54,24 +51,26 @@ import javax.xml.bind.annotation.XmlType;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-@XmlAccessorType(XmlAccessType.FIELD)
-@XmlRootElement(name = "processTrusteeRequest")
-@XmlType(name = "processTrusteeRequest", propOrder = { Constants.FIELD_ACTION, Constants.FIELD_TRUSTLEVEL, Constants.FIELD_CIRCLE_ID, Constants.FIELD_MEMBER_ID })
+@JsonbPropertyOrder({
+        Constants.FIELD_ACTION,
+        Constants.FIELD_TRUSTLEVEL,
+        Constants.FIELD_CIRCLE_ID,
+        Constants.FIELD_MEMBER_ID })
 public final class ProcessTrusteeRequest extends Authentication implements CircleIdRequest, ActionRequest {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
-    @XmlElement(name = Constants.FIELD_ACTION, required = true)
+    @JsonbProperty(value = Constants.FIELD_ACTION, nillable = true)
     private Action action = null;
 
-    @XmlElement(name = Constants.FIELD_TRUSTLEVEL, nillable = true)
+    @JsonbProperty(value = Constants.FIELD_TRUSTLEVEL, nillable = true)
     private TrustLevel trustLevel = null;
 
-    @XmlElement(name = Constants.FIELD_CIRCLE_ID, nillable = true)
+    @JsonbProperty(value = Constants.FIELD_CIRCLE_ID, nillable = true)
     private String circleId = null;
 
-    @XmlElement(name = Constants.FIELD_MEMBER_ID, nillable = true)
+    @JsonbProperty(value = Constants.FIELD_MEMBER_ID, nillable = true)
     private String memberId = null;
 
     // =========================================================================

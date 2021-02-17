@@ -16,15 +16,15 @@
  */
 package io.javadog.cws.api.requests;
 
+import io.javadog.cws.api.common.ByteArrayAdapter;
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.CredentialType;
 import io.javadog.cws.api.common.Utilities;
+import javax.json.bind.annotation.JsonbProperty;
+import javax.json.bind.annotation.JsonbPropertyOrder;
+import javax.json.bind.annotation.JsonbTypeAdapter;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlType;
 
 /**
  * <p>Base Authentication Object for all incoming Requests. It contains the
@@ -35,20 +35,23 @@ import javax.xml.bind.annotation.XmlType;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-@XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "authentication", propOrder = { Constants.FIELD_ACCOUNT_NAME, Constants.FIELD_CREDENTIAL, Constants.FIELD_CREDENTIALTYPE })
+@JsonbPropertyOrder({
+        Constants.FIELD_ACCOUNT_NAME,
+        Constants.FIELD_CREDENTIAL,
+        Constants.FIELD_CREDENTIALTYPE })
 public class Authentication extends Verifiable {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
-    @XmlElement(name = Constants.FIELD_ACCOUNT_NAME, required = true)
+    @JsonbProperty(value = Constants.FIELD_ACCOUNT_NAME, nillable = true)
     private String accountName = null;
 
-    @XmlElement(name = Constants.FIELD_CREDENTIAL, required = true)
+    @JsonbProperty(value = Constants.FIELD_CREDENTIAL, nillable = true)
+    @JsonbTypeAdapter(ByteArrayAdapter.class)
     private byte[] credential = null;
 
-    @XmlElement(name = Constants.FIELD_CREDENTIALTYPE, required = true)
+    @JsonbProperty(value = Constants.FIELD_CREDENTIALTYPE, nillable = true)
     private CredentialType credentialType = null;
 
     // =========================================================================

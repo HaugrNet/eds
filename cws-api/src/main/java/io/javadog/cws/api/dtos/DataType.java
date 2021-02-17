@@ -17,11 +17,9 @@
 package io.javadog.cws.api.dtos;
 
 import io.javadog.cws.api.common.Constants;
+import javax.json.bind.annotation.JsonbProperty;
+import javax.json.bind.annotation.JsonbPropertyOrder;
 import java.io.Serializable;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlType;
 
 /**
  * <p>All data in CWS must have a designated DataType, this can be either of the
@@ -40,17 +38,16 @@ import javax.xml.bind.annotation.XmlType;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-@XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = Constants.FIELD_DATATYPE, propOrder = { Constants.FIELD_TYPENAME, Constants.FIELD_TYPE })
+@JsonbPropertyOrder({ Constants.FIELD_TYPENAME, Constants.FIELD_TYPE })
 public final class DataType implements Serializable {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
-    @XmlElement(name = Constants.FIELD_TYPENAME, required = true)
+    @JsonbProperty(value = Constants.FIELD_TYPENAME, nillable = true)
     private String typeName = null;
 
-    @XmlElement(name = Constants.FIELD_TYPE, required = true)
+    @JsonbProperty(value = Constants.FIELD_TYPE, nillable = true)
     private String type = null;
 
     // =========================================================================

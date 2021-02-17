@@ -19,14 +19,11 @@ package io.javadog.cws.api.responses;
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.dtos.Signature;
+import javax.json.bind.annotation.JsonbProperty;
+import javax.json.bind.annotation.JsonbPropertyOrder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
 
 /**
  * <p>Retrieves a list of Signatures, which the Member has issued, complete with
@@ -42,15 +39,13 @@ import javax.xml.bind.annotation.XmlType;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-@XmlAccessorType(XmlAccessType.FIELD)
-@XmlRootElement(name = "fetchSignatureResult")
-@XmlType(name = "fetchSignatureResult", propOrder = Constants.FIELD_SIGNATURES)
+@JsonbPropertyOrder(Constants.FIELD_SIGNATURES)
 public final class FetchSignatureResponse extends CwsResponse {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
-    @XmlElement(name = Constants.FIELD_SIGNATURES, required = true)
+    @JsonbProperty(Constants.FIELD_SIGNATURES)
     private final List<Signature> signatures = new ArrayList<>(0);
 
     // =========================================================================

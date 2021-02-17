@@ -19,14 +19,11 @@ package io.javadog.cws.api.responses;
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.dtos.Sanity;
+import javax.json.bind.annotation.JsonbProperty;
+import javax.json.bind.annotation.JsonbPropertyOrder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
 
 /**
  * <p>Returns a list of Data Objects, which have failed their sanity checks,
@@ -46,15 +43,13 @@ import javax.xml.bind.annotation.XmlType;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-@XmlAccessorType(XmlAccessType.FIELD)
-@XmlRootElement(name = "sanityResult")
-@XmlType(name = "sanityResult", propOrder = Constants.FIELD_SANITIES)
+@JsonbPropertyOrder(Constants.FIELD_SANITIES)
 public final class SanityResponse extends CwsResponse {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
-    @XmlElement(name = Constants.FIELD_SANITIES, required = true)
+    @JsonbProperty(Constants.FIELD_SANITIES)
     private final List<Sanity> sanities = new ArrayList<>(0);
 
     // =========================================================================

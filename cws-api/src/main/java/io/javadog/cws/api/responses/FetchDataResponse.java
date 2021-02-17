@@ -16,18 +16,17 @@
  */
 package io.javadog.cws.api.responses;
 
+import io.javadog.cws.api.common.ByteArrayAdapter;
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.common.Utilities;
 import io.javadog.cws.api.dtos.Metadata;
+import javax.json.bind.annotation.JsonbProperty;
+import javax.json.bind.annotation.JsonbPropertyOrder;
+import javax.json.bind.annotation.JsonbTypeAdapter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
 
 /**
  * <p>If the request was made generally, i.e. without a Data Id, then a list of
@@ -46,21 +45,23 @@ import javax.xml.bind.annotation.XmlType;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-@XmlAccessorType(XmlAccessType.FIELD)
-@XmlRootElement(name = "fetchDataResult")
-@XmlType(name = "fetchDataResult", propOrder = { Constants.FIELD_METADATA, Constants.FIELD_RECORDS, Constants.FIELD_DATA })
+@JsonbPropertyOrder({
+        Constants.FIELD_METADATA,
+        Constants.FIELD_RECORDS,
+        Constants.FIELD_DATA })
 public final class FetchDataResponse extends CwsResponse {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
-    @XmlElement(name = Constants.FIELD_METADATA, required = true)
+    @JsonbProperty(Constants.FIELD_METADATA)
     private final List<Metadata> metadata = new ArrayList<>(0);
 
-    @XmlElement(name = Constants.FIELD_RECORDS, required = true)
+    @JsonbProperty(Constants.FIELD_RECORDS)
     private long records = 0;
 
-    @XmlElement(name = Constants.FIELD_DATA, required = true)
+    @JsonbProperty(Constants.FIELD_DATA)
+    @JsonbTypeAdapter(ByteArrayAdapter.class)
     private byte[] data = null;
 
     // =========================================================================

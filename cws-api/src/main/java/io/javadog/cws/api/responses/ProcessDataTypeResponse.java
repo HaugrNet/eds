@@ -19,11 +19,8 @@ package io.javadog.cws.api.responses;
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.dtos.DataType;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
+import javax.json.bind.annotation.JsonbProperty;
+import javax.json.bind.annotation.JsonbPropertyOrder;
 
 /**
  * <p>When a DataType has been processed, it is not having a an Id, thus the
@@ -36,15 +33,13 @@ import javax.xml.bind.annotation.XmlType;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-@XmlAccessorType(XmlAccessType.FIELD)
-@XmlRootElement(name = "processDataTypeResult")
-@XmlType(name = "processDataTypeResult", propOrder = Constants.FIELD_DATATYPE)
+@JsonbPropertyOrder(Constants.FIELD_DATATYPE)
 public final class ProcessDataTypeResponse extends CwsResponse {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
-    @XmlElement(name = Constants.FIELD_DATATYPE, required = true)
+    @JsonbProperty(Constants.FIELD_DATATYPE)
     private DataType dataType = null;
 
     // =========================================================================

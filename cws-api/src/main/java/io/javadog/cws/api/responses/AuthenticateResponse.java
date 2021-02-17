@@ -18,11 +18,8 @@ package io.javadog.cws.api.responses;
 
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
+import javax.json.bind.annotation.JsonbProperty;
+import javax.json.bind.annotation.JsonbPropertyOrder;
 
 /**
  * <p>If the request was successful, the MemberId will be returned.</p>
@@ -33,15 +30,13 @@ import javax.xml.bind.annotation.XmlType;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-@XmlAccessorType(XmlAccessType.FIELD)
-@XmlRootElement(name = "authenticateResult")
-@XmlType(name = "authenticateResult", propOrder = Constants.FIELD_MEMBER_ID)
+@JsonbPropertyOrder(Constants.FIELD_MEMBER_ID)
 public final class AuthenticateResponse extends CwsResponse {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
-    @XmlElement(name = Constants.FIELD_MEMBER_ID, required = true)
+    @JsonbProperty(Constants.FIELD_MEMBER_ID)
     private String memberId = null;
 
     // =========================================================================

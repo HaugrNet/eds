@@ -18,13 +18,11 @@ package io.javadog.cws.api.requests;
 
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.Utilities;
+import javax.json.bind.annotation.JsonbDateFormat;
+import javax.json.bind.annotation.JsonbProperty;
+import javax.json.bind.annotation.JsonbPropertyOrder;
 import java.util.Date;
 import java.util.Map;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
 
 /**
  * <p>The Sanity Request Object is needed to perform the Sanity CWS Request,
@@ -38,18 +36,17 @@ import javax.xml.bind.annotation.XmlType;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-@XmlAccessorType(XmlAccessType.FIELD)
-@XmlRootElement(name = "sanityRequest")
-@XmlType(name = "sanityRequest", propOrder = { Constants.FIELD_CIRCLE_ID, Constants.FIELD_SINCE })
+@JsonbPropertyOrder({ Constants.FIELD_CIRCLE_ID, Constants.FIELD_SINCE })
 public final class SanityRequest extends Authentication implements CircleIdRequest {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
-    @XmlElement(name = Constants.FIELD_CIRCLE_ID, nillable = true)
+    @JsonbProperty(value = Constants.FIELD_CIRCLE_ID, nillable = true)
     private String circleId = null;
 
-    @XmlElement(name = Constants.FIELD_SINCE)
+    @JsonbProperty(value = Constants.FIELD_SINCE, nillable = true)
+    @JsonbDateFormat(Constants.JSON_DATE_FORMAT)
     private Date since = null;
 
     // =========================================================================

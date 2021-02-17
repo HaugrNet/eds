@@ -17,10 +17,6 @@
 package io.javadog.cws.api.requests;
 
 import io.javadog.cws.api.common.Constants;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
 
 /**
  * <p>When the Share Request 'FetchSignatureRequest' is invoked, it requires a
@@ -32,9 +28,6 @@ import javax.xml.bind.annotation.XmlType;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-@XmlAccessorType(XmlAccessType.FIELD)
-@XmlRootElement(name = "fetchSignatureRequest")
-@XmlType(name = "fetchSignatureRequest")
 public final class FetchSignatureRequest extends Authentication {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */

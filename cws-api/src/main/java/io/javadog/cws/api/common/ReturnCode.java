@@ -16,10 +16,6 @@
  */
 package io.javadog.cws.api.common;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlType;
-
 /**
  * <p>Common Return Codes, used for all requests, to help specify the nature of
  * the problem which may have occurred, if processing wasn't successful.</p>
@@ -27,8 +23,6 @@ import javax.xml.bind.annotation.XmlType;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-@XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = Constants.FIELD_RETURN_CODE)
 public enum ReturnCode {
 
     // =========================================================================

@@ -22,9 +22,6 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Map;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlType;
 
 /**
  * <p>This Class contains checks for different fields that is used as part of
@@ -41,8 +38,6 @@ import javax.xml.bind.annotation.XmlType;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-@XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "verifiable")
 public abstract class Verifiable implements Serializable {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
@@ -205,8 +200,8 @@ public abstract class Verifiable implements Serializable {
      * is the only CWS field holding a URL, and thus it is not a parameter to
      * this method, although it is for the other methods.</p>
      *
-     * @param errors  Map to store the error information in, if URL is invalid
-     * @param value   the URL to check
+     * @param errors Map to store the error information in, if URL is invalid
+     * @param value  the URL to check
      * @see Constants#FIELD_URL
      */
     protected static void checkUrl(final Map<String, String> errors, final String value) {

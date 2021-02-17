@@ -18,10 +18,6 @@ package io.javadog.cws.api.responses;
 
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
 
 /**
  * <p>The response from the MasterKey request is limited to error information,
@@ -35,9 +31,6 @@ import javax.xml.bind.annotation.XmlType;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-@XmlAccessorType(XmlAccessType.FIELD)
-@XmlRootElement(name = "masterKeyResult")
-@XmlType(name = "masterKeyResult")
 public final class MasterKeyResponse extends CwsResponse {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */

@@ -91,7 +91,7 @@ import javax.persistence.Table;
                 query = "select m " +
                         "from MetadataEntity m " +
                         "where m.type.name <> 'folder' " +
-                        "order by id desc"),
+                        "order by m.id desc"),
         @NamedQuery(name = "metadata.countInventoryRecords",
                 query = "select count(m.id) " +
                         "from MetadataEntity m " +

@@ -7,6 +7,32 @@
 # Please configure this to the correct value.
 server="http://localhost:8080/cws"
 
+
+# ==============================================================================
+# INTERNAL FUNCTION :: Inspects the JSON response from the CWS
+# ------------------------------------------------------------------------------
+# Parameters:
+#   1) The JSON response to process
+#   2) Key to lookup in JSON response
+# Return:
+#   0 if everything was ok, otherwise 1
+# Output:
+#   Return code 0 -> The value for the provided key
+#   Return code 1 -> The error message from the server
+# ==============================================================================
+function __inspectResponse() {
+    json="${1}"
+    key="${2}"
+
+    if [[ "$(echo "${json}" | jq ".returnCode")" == "200" ]]; then
+        echo "${json}" | jq ".${key}"
+        return 0
+    else
+        echo "${json}" | jq ".returnMessage"
+        return 1
+    fi
+}
+
 # ==============================================================================
 # CWS REQUEST :: Version - retrieves the version of the running CWS instance
 # ------------------------------------------------------------------------------
@@ -16,10 +42,28 @@ server="http://localhost:8080/cws"
 #   Return code 0 -> The version of the running CWS instance
 #   Return code 1 -> The error message from the server
 # ==============================================================================
-function version() {
-    response=$(curl --silent --header "Content-Type: application/json" --request POST "${server}/api/version")
-    inspectResponse "${response}" "version"
-    return $?
+function cwsVersion() {
+    response=$(curl --silent --header "Content-Type: application/json" --request POST "${server}/version")
+    __inspectResponse "${response}" "version"
+}
+
+# ==============================================================================
+# CWS REQUEST :: Settings - retrieves the settings for the running CWS instance
+# ------------------------------------------------------------------------------
+# Return:
+#   0 if everything was ok, otherwise 1
+# Output:
+#   Return code 0 -> The settings for the running CWS instance
+#   Return code 1 -> The error message from the server
+# ==============================================================================
+function cwsSettings() {
+    username="\"accountName\":\"${1}\""
+    password="\"credential\":\"$(echo -n "${2}" | base64)\""
+    requestJson="{${username},${password}}"
+
+    echo "Request Json: '${requestJson}'"
+    response=$(curl --silent --header "Content-Type: application/json" --request POST --data "${requestJson}" "${server}/settings")
+    __inspectResponse "${response}" "settings"
 }
 
 # ==============================================================================
@@ -37,16 +81,15 @@ function version() {
 #   Return code 0 -> The new AccountId
 #   Return code 1 -> The error message from the server
 # ==============================================================================
-function createAccount() {
-    username="\"accountName\":\"$1\""
+function cwsCreateAccount() {
+    username="\"accountName\":\"${1}\""
     password="\"credential\":\"$(echo -n "${2}" | base64)\""
     newAccount="\"newAccountName\":\"${3}\""
     newPassword="\"newCredential\":\"$(echo -n "${4}" | base64)\""
     accountType="\"memberRole\":\"${5}\""
 
-    response=$(curl --silent --header "Content-Type: application/json" --request POST --data "{${username},${password},${newAccount},${newPassword},${accountType}}" "${server}/api/members/createMember")
-    inspectResponse "${response}" "memberId"
-    return $?
+    response=$(curl --silent --header "Content-Type: application/json" --request POST --data "{${username},${password},${newAccount},${newPassword},${accountType}}" "${server}/members/createMember")
+    __inspectResponse "${response}" "memberId"
 }
 
 # ==============================================================================
@@ -62,14 +105,13 @@ function createAccount() {
 #   Return code 0 -> The Ok message from the server
 #   Return code 1 -> The error message from the server
 # ==============================================================================
-function deleteAccount() {
-    username="\"accountName\":\"$1\""
+function cwsDeleteAccount() {
+    username="\"accountName\":\"${1}\""
     password="\"credential\":\"$(echo -n "${2}" | base64)\""
     accountId="\"memberId\":\"${3//\"/}\""
 
-    response=$(curl --silent --header "Content-Type: application/json" --request POST --data "{${username},${password},${accountId}}" "${server}/api/members/deleteMember")
-    inspectResponse "${response}" "returnMessage"
-    return $?
+    response=$(curl --silent --header "Content-Type: application/json" --request POST --data "{${username},${password},${accountId}}" "${server}/members/deleteMember")
+    __inspectResponse "${response}" "returnMessage"
 }
 
 # ==============================================================================
@@ -84,13 +126,12 @@ function deleteAccount() {
 #   Return code 0 -> List of Account Names & Id's
 #   Return code 1 -> The error message from the server
 # ==============================================================================
-function listAccounts() {
-    username="\"accountName\":\"$1\""
+function cwsListAccounts() {
+    username="\"accountName\":\"${1}\""
     password="\"credential\":\"$(echo -n "${2}" | base64)\""
 
-    response=$(curl --silent --header "Content-Type: application/json" --request POST --data "{${username},${password}}" "${server}/api/members/fetchMembers")
-    inspectListResponse "${response}" "accountName" "memberId"
-    return $?
+    response=$(curl --silent --header "Content-Type: application/json" --request POST --data "{${username},${password}}" "${server}/members/fetchMembers")
+    __inspectListResponse "${response}" "accountName" "memberId"
 }
 
 # ==============================================================================
@@ -106,14 +147,13 @@ function listAccounts() {
 #   Return code 0 -> The new CircleId
 #   Return code 1 -> The error message from the server
 # ==============================================================================
-function createCircle() {
-    username="\"accountName\":\"$1\""
+function cwsCreateCircle() {
+    username="\"accountName\":\"${1}\""
     password="\"credential\":\"$(echo -n "${2}" | base64)\""
     circleId="\"circleName\":\"${3}\""
 
-    response=$(curl --silent --header "Content-Type: application/json" --request POST --data "{${username},${password},${circleId}}" "${server}/api/circles/createCircle")
-    inspectResponse "${response}" "circleId"
-    return $?
+    response=$(curl --silent --header "Content-Type: application/json" --request POST --data "{${username},${password},${circleId}}" "${server}/circles/createCircle")
+    __inspectResponse "${response}" "circleId"
 }
 
 # ==============================================================================
@@ -129,14 +169,13 @@ function createCircle() {
 #   Return code 0 -> The Ok message from the server
 #   Return code 1 -> The error message from the server
 # ==============================================================================
-function deleteCircle() {
-    username="\"accountName\":\"$1\""
+function cwsDeleteCircle() {
+    username="\"accountName\":\"${1}\""
     password="\"credential\":\"$(echo -n "${2}" | base64)\""
     circleId="\"circleId\":\"${3}\""
 
-    response=$(curl --silent --header "Content-Type: application/json" --request POST --data "{${username},${password},${circleId}}" "${server}/api/circles/deleteCircle")
-    inspectResponse "${response}" "returnMessage"
-    return $?
+    response=$(curl --silent --header "Content-Type: application/json" --request POST --data "{${username},${password},${circleId}}" "${server}/circles/deleteCircle")
+    __inspectResponse "${response}" "returnMessage"
 }
 
 # ==============================================================================
@@ -151,13 +190,13 @@ function deleteCircle() {
 #   Return code 0 -> List of Circle Names & Id's
 #   Return code 1 -> The error message from the server
 # ==============================================================================
-function listCircles() {
-    username="\"accountName\":\"$1\""
+function cwsListCircles() {
+    username="\"accountName\":\"${1}\""
     password="\"credential\":\"$(echo -n "${2}" | base64)\""
 
-    response=$(curl --silent --header "Content-Type: application/json" --request POST --data "{${username},${password}}" "${server}/api/circles/fetchCircles")
-    inspectListResponse "${response}" "circleName" "circleId"
-    return $?
+    #echo "Request JSON: $(echo "{${username},${password}}" | jq)"
+    response=$(curl --silent --header "Content-Type: application/json" --request POST --data "{${username},${password}}" "${server}/circles/fetchCircles")
+    __inspectResponse "${response}"
 }
 
 # ==============================================================================
@@ -175,17 +214,15 @@ function listCircles() {
 #   Return code 0 -> The Ok message from the server
 #   Return code 1 -> The error message from the server
 # ==============================================================================
-function addTrustee() {
-    username="\"accountName\":\"${1//\"/}\""
+function cwsAddTrustee() {
+    username="\"accountName\":\"${1}\""
     password="\"credential\":\"$(echo -n "${2}" | base64)\""
     circleId="\"circleId\":\"${3//\"/}\""
     memberId="\"memberId\":\"${4//\"/}\""
     trustLevel="\"trustLevel\":\"${5//\"/}\""
 
-    response=$(curl --silent --header "Content-Type: application/json" --request POST --data "{${username},${password},${circleId},${memberId},${trustLevel}}" "${server}/api/trustees/addTrustee")
-    echo "$response"
-    inspectResponse "${response}" "returnMessage"
-    return $?
+    response=$(curl --silent --header "Content-Type: application/json" --request POST --data "{${username},${password},${circleId},${memberId},${trustLevel}}" "${server}/trustees/addTrustee")
+    __inspectResponse "${response}" "returnMessage"
 }
 
 # ==============================================================================
@@ -202,15 +239,14 @@ function addTrustee() {
 #   Return code 0 -> The Ok message from the server
 #   Return code 1 -> The error message from the server
 # ==============================================================================
-function removeTrustee() {
-    username="\"accountName\":\"${1//\"/}\""
+function cwsRemoveTrustee() {
+    username="\"accountName\":\"${1}\""
     password="\"credential\":\"$(echo -n "${2}" | base64)\""
     circleId="\"circleId\":\"${3//\"/}\""
     memberId="\"memberId\":\"${4//\"/}\""
 
-    response=$(curl --silent --header "Content-Type: application/json" --request POST --data "{${username},${password},${circleId},${memberId}}" "${server}/api/trustees/removeTrustee")
-    inspectResponse "${response}" "returnMessage"
-    return $?
+    response=$(curl --silent --header "Content-Type: application/json" --request POST --data "{${username},${password},${circleId},${memberId}}" "${server}/trustees/removeTrustee")
+    __inspectResponse "${response}" "returnMessage"
 }
 
 # ==============================================================================
@@ -226,103 +262,11 @@ function removeTrustee() {
 #   Return code 0 -> List of Account Id's & their Circle TrustLevel
 #   Return code 1 -> The error message from the server
 # ==============================================================================
-function listTrustees() {
-    username="\"accountName\":\"$1\""
+function cwsListTrustees() {
+    username="\"accountName\":\"${1}\""
     password="\"credential\":\"$(echo -n "${2}" | base64)\""
     circleId="\"circleId\":\"${3}\""
 
-    response=$(curl --silent --header "Content-Type: application/json" --request POST --data "{${username},${password},${circleId}}" "${server}/api/trustees/fetchTrustees")
-    inspectListResponse "${response}" "memberId" "trustLevel"
-    return $?
-}
-
-# ==============================================================================
-# INTERNAL FUNCTION :: Inspects the JSON List response from the CWS
-# ------------------------------------------------------------------------------
-# Parameters:
-#   1) The JSON response to process
-#   2) First Key to lookup in the JSON List
-#   3) Second Key to lookup in the JSON List
-# Return:
-#   0 if everything was ok, otherwise 1
-# Output:
-#   Return code 0 -> The value for the provided key
-#   Return code 1 -> The error message from the server
-# ==============================================================================
-function inspectListResponse() {
-    json=${1}
-    key1=${2}
-    key2=${3}
-    returnCode=$(findKey "${json}" "returnCode")
-
-    if [[ "${returnCode}" == "200" ]]; then
-        raw=${json//[]/null}
-        defaultIFS="${IFS}"
-        IFS='['
-        read -r -a hacked1 <<<"${raw}"
-        IFS=']'
-        read -r -a hacked2 <<<"${hacked1[1]}"
-        IFS='{'
-        read -r -a hacked3 <<<"${hacked2[0]}"
-        IFS="${defaultIFS}"
-        for i in "${hacked3[@]}"; do
-            if [[ -n "${i}" ]]; then
-                first=$(findKey "${i}" "${key1}")
-                second=$(findKey "${i}" "${key2}")
-                echo "${first//\"/} :: ${second//\"/}"
-            fi
-        done
-        return 0
-    else
-        returnMessage=$(findKey "${json}" "returnMessage")
-        echo "${returnMessage//\"/}"
-        return 1
-    fi
-}
-
-# ==============================================================================
-# INTERNAL FUNCTION :: Inspects the JSON response from the CWS
-# ------------------------------------------------------------------------------
-# Parameters:
-#   1) The JSON response to process
-#   2) Key to lookup in JSON response
-# Return:
-#   0 if everything was ok, otherwise 1
-# Output:
-#   Return code 0 -> The value for the provided key
-#   Return code 1 -> The error message from the server
-# ==============================================================================
-function inspectResponse() {
-    local json; json="${1}"
-    local key; key="${2}"
-    returnCode=$(findKey "${json}" "returnCode")
-
-    if [[ "${returnCode}" == "200" ]]; then
-        expected=$(findKey "${json}" "${key}")
-        echo "${expected//\"/}"
-        return 0
-    else
-        returnMessage=$(findKey "${json}" "returnMessage")
-        echo "${returnMessage//\"/}"
-        return 1
-    fi
-}
-
-# ==============================================================================
-# INTERNAL FUNCTION :: Finds and prints the value for a given Key
-# ------------------------------------------------------------------------------
-# Parameters:
-#   1) The JSON response to process
-#   2) Key to lookup in JSON response
-# Output:
-#   Value for the requested Key
-# ------------------------------------------------------------------------------
-# Requires that "jq" is installed !
-# ==============================================================================
-function findKey() {
-    local json; json="${1}"
-    local key; key="${2}"
-
-    tmp=$(echo "${json}" | jq -c ".${key}")
-    echo "${tmp//\"/}"
+    response=$(curl --silent --header "Content-Type: application/json" --request POST --data "{${username},${password},${circleId}}" "${server}/trustees/fetchTrustees")
+    __inspectResponse "${response}" "members"
 }

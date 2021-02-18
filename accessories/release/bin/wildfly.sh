@@ -1,4 +1,5 @@
 #!/bin/bash
+
 # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 # WildFly Control Script
 # -----------------------------------------------------------------------------
@@ -26,11 +27,10 @@ if [[ "${proxy}" != "" ]]; then
 fi
 # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-
 # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 # Run the Control Script
 # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-if [[ "${wildfly}" = "" ]]; then
+if [[ "${wildfly}" == "" ]]; then
     echo "Script requires that the system variable \$JBOSS_HOME is defined."
     echo
     exit
@@ -40,26 +40,24 @@ fi
 # Run the Control Script
 # -----------------------------------------------------------------------------
 # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-function runCommand() {
-    local parameter=$1
-
-    ${wildfly}/bin/jboss-cli.sh --connect --controller=localhost --command="${parameter}" 2>/dev/null
+function runJbossCli() {
+    "${wildfly}/bin/jboss-cli.sh" --connect --controller=localhost --command="${1}" > /dev/null 2>&1
 }
 
-action=${1}
-if [[ "${action}" = "configure" ]]; then
-    if [[ $(runCommand "read-attribute server-state") ]]; then
+action="${1}"
+if [[ "${action}" == "configure" ]]; then
+    if (runJbossCli "read-attribute server-state"); then
         if [[ ! -e ${wildfly}/modules/org/postgresql/main/module.xml ]]; then
             echo "Configuring WildFly for CWS"
             mkdir -p "${wildfly}/modules/org/postgresql/main"
             cp "$(dirname "$0")/../lib/postgresql-42.2.18.jar" "${wildfly}/modules/org/postgresql/main"
             cp "$(dirname "$0")/../wildfly/module.xml" "${wildfly}/modules/org/postgresql/main"
-            runCommand "/subsystem=datasources/jdbc-driver=postgresql:add(driver-name=postgresql,driver-module-name=org.postgresql,driver-xa-datasource-class-name=org.postgresql.xa.PGXADataSource)"
-            runCommand "data-source add --name=cwsDS --driver-name=postgresql --jndi-name=java:/datasources/cwsDS --connection-url=jdbc:postgresql://${dbHost}:${dbPort}/${dbName} --user-name=${dbUser} --password=${dbPassword} --use-ccm=false --max-pool-size=25 --blocking-timeout-wait-millis=5000 --enabled=true"
-            runCommand "/subsystem=undertow/server=default-server/http-listener=default/:write-attribute(name=max-post-size,value=${maxPostSize})"
-            runCommand "/subsystem=logging/logger=io.javadog.cws:add"
+            runJbossCli "/subsystem=datasources/jdbc-driver=postgresql:add(driver-name=postgresql,driver-module-name=org.postgresql,driver-xa-datasource-class-name=org.postgresql.xa.PGXADataSource)"
+            runJbossCli "data-source add --name=cwsDS --driver-name=postgresql --jndi-name=java:/datasources/cwsDS --connection-url=jdbc:postgresql://${dbHost}:${dbPort}/${dbName} --user-name=${dbUser} --password=${dbPassword} --use-ccm=false --max-pool-size=25 --blocking-timeout-wait-millis=5000 --enabled=true"
+            runJbossCli "/subsystem=undertow/server=default-server/http-listener=default/:write-attribute(name=max-post-size,value=${maxPostSize})"
+            runJbossCli "/subsystem=logging/logger=io.javadog.cws:add"
             echo "Restarting WildFly ..."
-            runCommand "reload"
+            runJbossCli "reload"
             echo "WildFly has been configured"
         else
             echo "WildFly have already been configured"
@@ -67,11 +65,9 @@ if [[ "${action}" = "configure" ]]; then
     else
         echo "WildFly is not running, please start WildFly before configuring it"
     fi
-elif [[ "${action}" = "status" ]]; then
-    if (${wildfly}/bin/jboss-cli.sh --connect --controller=localhost --command="read-attribute server-state" >/dev/null); then
-#        ${wildfly}/bin/jboss-cli.sh --connect controller=localhost --command="deployment-info --name=cws.war" >/dev/null
-#        if [[ $? -eq 0 ]]; then
-        if [[ $(runCommand "deployment-info --name=cws.war") ]]; then
+elif [[ "${action}" == "status" ]]; then
+    if (runJbossCli "read-attribute server-state"); then
+        if (runJbossCli "deployment-info --name=cws.war"); then
             echo "WildFly is running with CWS deployed"
         else
             echo "WildFly is running"
@@ -79,52 +75,47 @@ elif [[ "${action}" = "status" ]]; then
     else
         echo "WildFly is not running"
     fi
-elif [[ "${action}" = "start" ]]; then
-    ${wildfly}/bin/jboss-cli.sh --connect --controller=localhost --command="read-attribute server-state" >/dev/null
-    if [[ $? -eq 1 ]]; then
-        echo "Starting WildFly ..."
-        if [[ "${debugPort}" = "" ]]; then
-            ${wildfly}/bin/standalone.sh -c standalone-full.xml -b 0.0.0.0 -Djboss.node.name=cws &
-        else
-            ${wildfly}/bin/standalone.sh -c standalone-full.xml -b 0.0.0.0 -Djboss.node.name=cws --debug "${debugPort}" &
-        fi
-    else
+elif [[ "${action}" == "start" ]]; then
+    if (runJbossCli "read-attribute server-state"); then
         echo "WildFly is already running"
+    else
+        echo "Starting WildFly ..."
+        if [[ "${debugPort}" == "" ]]; then
+            "${wildfly}/bin/standalone.sh" -c standalone-full.xml -b 0.0.0.0 -Djboss.node.name=cws &
+        else
+            "${wildfly}/bin/standalone.sh" -c standalone-full.xml -b 0.0.0.0 -Djboss.node.name=cws --debug "${debugPort}" &
+        fi
     fi
-elif [[ "${action}" = "stop" ]]; then
-    ${wildfly}/bin/jboss-cli.sh --connect --controller=localhost --command="read-attribute server-state" >/dev/null
-    if [[ $? -eq 0 ]]; then
+elif [[ "${action}" == "stop" ]]; then
+    if (runJbossCli "read-attribute server-state"); then
         echo "Stopping WildFly ..."
-        ${wildfly}/bin/jboss-cli.sh --connect --controller=localhost --command="shutdown"
+        runJbossCli "shutdown"
     else
         echo "WildFly is not running"
     fi
-elif [[ "${action}" = "deploy" ]]; then
-    ${wildfly}/bin/jboss-cli.sh --connect --controller=localhost --command="read-attribute server-state" >/dev/null
-    if [[ $? -eq 0 ]]; then
+elif [[ "${action}" == "deploy" ]]; then
+    if (runJbossCli "read-attribute server-state"); then
         echo "Deploying CWS"
-        ${wildfly}/bin/jboss-cli.sh --connect --controller=localhost --command="deploy `dirname $0`/../wildfly/cws.war --force"
+        runJbossCli "deploy $(dirname "${0}")/../wildfly/cws.war --force"
     else
         echo "WildFly is not running"
     fi
-elif [[ "${action}" = "undeploy" ]]; then
-    ${wildfly}/bin/jboss-cli.sh --connect --controller=localhost --command="read-attribute server-state" >/dev/null
-    if [[ $? -eq 0 ]]; then
-        ${wildfly}/bin/jboss-cli.sh --connect controller=localhost --command="deployment-info --name=cws.war" >/dev/null
-        if [[ $? -eq 0 ]]; then
+elif [[ "${action}" == "undeploy" ]]; then
+    if (runJbossCli "read-attribute server-state"); then
+        if (runJbossCli "deployment-info --name=cws.war"); then
             echo "Undeploying CWS"
-            ${wildfly}/bin/jboss-cli.sh --connect --controller=localhost --command="undeploy cws.war"
+            runJbossCli "undeploy cws.war"
         else
             echo "CWS was not deployed"
         fi
     else
         echo "WildFly is not running"
     fi
-elif [[ "${action}" = "log" ]]; then
-    tail -f ${wildfly}/standalone/log/server.log
+elif [[ "${action}" == "log" ]]; then
+    tail -f "${wildfly}/standalone/log/server.log"
 else
     echo "WildFly Control script"
-    echo "Usage: `basename $0` [Action]"
+    echo "Usage: $(basename "${0}") [Action]"
     echo
     echo "  The Action must be one of the following:"
     echo "    configure Attempts to configure a CWS WildFly instance"

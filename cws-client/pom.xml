@@ -7,7 +7,7 @@
         <version>2.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
-    <artifactId>cws-client-rest</artifactId>
+    <artifactId>cws-client</artifactId>
     <packaging>jar</packaging>
     <name>CWS - REST Client</name>
     <description>Sample CWS REST Client Module, primarily for testing.</description>

@@ -39,7 +39,7 @@
         <module>cws-rest</module>
         <module>cws-wildfly</module>
         <module>cws-payara</module>
-        <module>cws-client-rest</module>
+        <module>cws-client</module>
         <module>cws-fitnesse</module>
     </modules>
 
@@ -98,7 +98,7 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>cws-client-rest</artifactId>
+                <artifactId>cws-client</artifactId>
                 <version>${project.version}</version>
             </dependency>
 

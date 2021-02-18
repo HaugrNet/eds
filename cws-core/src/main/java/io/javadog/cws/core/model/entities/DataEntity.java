@@ -27,7 +27,6 @@ import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
@@ -41,44 +40,42 @@ import javax.persistence.TemporalType;
  * @since CWS 1.0
  */
 @Entity
-@NamedQueries({
-        @NamedQuery(name = "data.findByMetadata",
-                query = "select d " +
-                        "from DataEntity d " +
-                        "where d.metadata = :metadata"),
-        @NamedQuery(name = "data.findAllWithState",
-                query = "select d " +
-                        "from DataEntity d " +
-                        "where d.sanityStatus = :status" +
-                        "  and d.sanityChecked >= :since"),
-        @NamedQuery(name = "data.findAllWithStateForCircle",
-                query = "select d " +
-                        "from DataEntity d " +
-                        "where d.sanityStatus = :status" +
-                        "  and d.sanityChecked >= :since" +
-                        "  and d.metadata.circle.externalId = :externalId"),
-        @NamedQuery(name = "data.findAllWithStateForMember",
-                query = "select d " +
-                        "from DataEntity d, TrusteeEntity t " +
-                        "where t.circle = d.metadata.circle" +
-                        "  and d.sanityStatus = :status" +
-                        "  and d.sanityChecked >= :since" +
-                        "  and t.member = :member"),
-        @NamedQuery(name = "data.findByMemberAndExternalId",
-                query = "select d " +
-                        "from DataEntity d," +
-                        "     TrusteeEntity t " +
-                        "where d.metadata.circle.id = t.circle.id" +
-                        "  and d.metadata.externalId = :externalId" +
-                        "  and t.member = :member" +
-                        "  and t.trustLevel in :trustLevels"),
-        @NamedQuery(name = "data.findIdsForSanityCheck",
-                query = "select d.id " +
-                        "from DataEntity d " +
-                        "where d.sanityStatus = :status" +
-                        "  and d.sanityChecked <= :date " +
-                        "order by d.id asc")
-})
+@NamedQuery(name = "data.findByMetadata",
+        query = "select d " +
+                "from DataEntity d " +
+                "where d.metadata = :metadata")
+@NamedQuery(name = "data.findAllWithState",
+        query = "select d " +
+                "from DataEntity d " +
+                "where d.sanityStatus = :status" +
+                "  and d.sanityChecked >= :since")
+@NamedQuery(name = "data.findAllWithStateForCircle",
+        query = "select d " +
+                "from DataEntity d " +
+                "where d.sanityStatus = :status" +
+                "  and d.sanityChecked >= :since" +
+                "  and d.metadata.circle.externalId = :externalId")
+@NamedQuery(name = "data.findAllWithStateForMember",
+        query = "select d " +
+                "from DataEntity d, TrusteeEntity t " +
+                "where t.circle = d.metadata.circle" +
+                "  and d.sanityStatus = :status" +
+                "  and d.sanityChecked >= :since" +
+                "  and t.member = :member")
+@NamedQuery(name = "data.findByMemberAndExternalId",
+        query = "select d " +
+                "from DataEntity d," +
+                "     TrusteeEntity t " +
+                "where d.metadata.circle.id = t.circle.id" +
+                "  and d.metadata.externalId = :externalId" +
+                "  and t.member = :member" +
+                "  and t.trustLevel in :trustLevels")
+@NamedQuery(name = "data.findIdsForSanityCheck",
+        query = "select d.id " +
+                "from DataEntity d " +
+                "where d.sanityStatus = :status" +
+                "  and d.sanityChecked <= :date " +
+                "order by d.id asc")
 @Table(name = "cws_data")
 public class DataEntity extends CWSEntity {
 

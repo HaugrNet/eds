@@ -22,7 +22,6 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
@@ -33,70 +32,68 @@ import javax.persistence.Table;
  * @since CWS 1.0
  */
 @Entity
-@NamedQueries({
-        @NamedQuery(name = "metadata.findByMemberAndExternalId",
-                query = "select m " +
-                        "from MetadataEntity m," +
-                        "     TrusteeEntity t " +
-                        "where m.circle.id = t.circle.id" +
-                        "  and t.member.id = :mid" +
-                        "  and m.externalId = :eid " +
-                        "order by m.id desc"),
-        @NamedQuery(name = "metadata.findByMemberAndName",
-                query = "select m " +
-                        "from MetadataEntity m," +
-                        "     TrusteeEntity t " +
-                        "where m.circle.id = t.circle.id" +
-                        "  and t.member.id = :mid" +
-                        "  and m.name = :name " +
-                        "order by m.id desc"),
-        @NamedQuery(name = "metadata.findByMemberAndFolder",
-                query = "select m " +
-                        "from MetadataEntity m," +
-                        "     TrusteeEntity t " +
-                        "where m.circle.id = t.circle.id" +
-                        "  and t.member = :member" +
-                        "  and m.parentId = :parentId " +
-                        "order by m.id desc"),
-        @NamedQuery(name = "metadata.findRootByMemberAndCircle",
-                query = "select m " +
-                        "from MetadataEntity m," +
-                        "     TrusteeEntity t " +
-                        "where m.circle.id = t.circle.id" +
-                        "  and t.member.id = :mid" +
-                        "  and m.circle.externalId = :cid" +
-                        "  and m.type.name = 'folder'" +
-                        "  and m.name = '/'" +
-                        "  and m.parentId = 0 " +
-                        "order by m.id desc"),
-        @NamedQuery(name = "metadata.findInFolder",
-                query = "select m " +
-                        "from MetadataEntity m," +
-                        "     TrusteeEntity t " +
-                        "where m.circle.id = t.circle.id" +
-                        "  and t.member = :member" +
-                        "  and m.parentId = :parentId" +
-                        "  and lower(m.name) = lower(:name)"),
-        @NamedQuery(name = "metadata.findByNameAndFolder",
-                query = "select m " +
-                        "from MetadataEntity m " +
-                        "where m.id <> :id" +
-                        "  and m.name = :name" +
-                        "  and m.parentId = :parentId"),
-        @NamedQuery(name = "metadata.countFolderContent",
-                query = "select count(m.id) " +
-                        "from MetadataEntity m " +
-                        "where m.parentId = :parentId"),
-        @NamedQuery(name = "metadata.readInventoryRecords",
-                query = "select m " +
-                        "from MetadataEntity m " +
-                        "where m.type.name <> 'folder' " +
-                        "order by m.id desc"),
-        @NamedQuery(name = "metadata.countInventoryRecords",
-                query = "select count(m.id) " +
-                        "from MetadataEntity m " +
-                        "where m.type.name <> 'folder'")
-})
+@NamedQuery(name = "metadata.findByMemberAndExternalId",
+        query = "select m " +
+                "from MetadataEntity m," +
+                "     TrusteeEntity t " +
+                "where m.circle.id = t.circle.id" +
+                "  and t.member.id = :mid" +
+                "  and m.externalId = :eid " +
+                "order by m.id desc")
+@NamedQuery(name = "metadata.findByMemberAndName",
+        query = "select m " +
+                "from MetadataEntity m," +
+                "     TrusteeEntity t " +
+                "where m.circle.id = t.circle.id" +
+                "  and t.member.id = :mid" +
+                "  and m.name = :name " +
+                "order by m.id desc")
+@NamedQuery(name = "metadata.findByMemberAndFolder",
+        query = "select m " +
+                "from MetadataEntity m," +
+                "     TrusteeEntity t " +
+                "where m.circle.id = t.circle.id" +
+                "  and t.member = :member" +
+                "  and m.parentId = :parentId " +
+                "order by m.id desc")
+@NamedQuery(name = "metadata.findRootByMemberAndCircle",
+        query = "select m " +
+                "from MetadataEntity m," +
+                "     TrusteeEntity t " +
+                "where m.circle.id = t.circle.id" +
+                "  and t.member.id = :mid" +
+                "  and m.circle.externalId = :cid" +
+                "  and m.type.name = 'folder'" +
+                "  and m.name = '/'" +
+                "  and m.parentId = 0 " +
+                "order by m.id desc")
+@NamedQuery(name = "metadata.findInFolder",
+        query = "select m " +
+                "from MetadataEntity m," +
+                "     TrusteeEntity t " +
+                "where m.circle.id = t.circle.id" +
+                "  and t.member = :member" +
+                "  and m.parentId = :parentId" +
+                "  and lower(m.name) = lower(:name)")
+@NamedQuery(name = "metadata.findByNameAndFolder",
+        query = "select m " +
+                "from MetadataEntity m " +
+                "where m.id <> :id" +
+                "  and m.name = :name" +
+                "  and m.parentId = :parentId")
+@NamedQuery(name = "metadata.countFolderContent",
+        query = "select count(m.id) " +
+                "from MetadataEntity m " +
+                "where m.parentId = :parentId")
+@NamedQuery(name = "metadata.readInventoryRecords",
+        query = "select m " +
+                "from MetadataEntity m " +
+                "where m.type.name <> 'folder' " +
+                "order by m.id desc")
+@NamedQuery(name = "metadata.countInventoryRecords",
+        query = "select count(m.id) " +
+                "from MetadataEntity m " +
+                "where m.type.name <> 'folder'")
 @Table(name = "cws_metadata")
 public class MetadataEntity extends Externable {
 

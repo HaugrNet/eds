@@ -18,17 +18,16 @@ package io.javadog.cws.core.model.entities;
 
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.Utilities;
-import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import java.util.Date;
 
 /**
  * <p>CWS Signature Entity, maps the Signature table from the Database.</p>
@@ -37,17 +36,15 @@ import javax.persistence.TemporalType;
  * @since CWS 1.0
  */
 @Entity
-@NamedQueries({
-        @NamedQuery(name = "signature.readAll",
-                query = "select s from SignatureEntity s"),
-        @NamedQuery(name = "signature.findByChecksum",
-                query = "select s from SignatureEntity s " +
-                        "where s.checksum = :checksum"),
-        @NamedQuery(name = "signature.findByMember",
-                query = "select s from SignatureEntity s " +
-                        "where s.member = :member " +
-                        "order by s.id desc")
-})
+@NamedQuery(name = "signature.readAll",
+        query = "select s from SignatureEntity s")
+@NamedQuery(name = "signature.findByChecksum",
+        query = "select s from SignatureEntity s " +
+                "where s.checksum = :checksum")
+@NamedQuery(name = "signature.findByMember",
+        query = "select s from SignatureEntity s " +
+                "where s.member = :member " +
+                "order by s.id desc")
 @Table(name = "cws_signatures")
 public class SignatureEntity extends CWSEntity {
 

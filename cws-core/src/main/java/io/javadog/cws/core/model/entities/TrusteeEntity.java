@@ -24,7 +24,6 @@ import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
@@ -35,54 +34,52 @@ import javax.persistence.Table;
  * @since CWS 1.0
  */
 @Entity
-@NamedQueries({
-        @NamedQuery(name = "trust.findByMember",
-                query = "select t " +
-                        "from TrusteeEntity t " +
-                        "where t.member = :member" +
-                        "  and t.trustLevel in :permissions " +
-                        "order by t.id asc"),
-        @NamedQuery(name = "trust.findByMemberAndExternalCircleId",
-                query = "select t " +
-                        "from TrusteeEntity t " +
-                        "where t.member = :member" +
-                        "  and t.circle.externalId = :externalCircleId " +
-                        "  and t.trustLevel in :permissions " +
-                        "order by t.member.name asc"),
-        @NamedQuery(name = "trustee.findByCircleAndMember",
-                query = "select t " +
-                        "from TrusteeEntity t " +
-                        "where t.circle.externalId = :ecid" +
-                        "  and t.member.externalId = :emid"),
-        @NamedQuery(name = "trustee.findByExternalMemberId",
-                query = "select t " +
-                        "from TrusteeEntity t " +
-                        "where t.member.externalId = :externalMemberId " +
-                        "order by t.circle.name asc"),
-        @NamedQuery(name = "trustee.findByExternalCircleId",
-                query = "select t " +
-                        "from TrusteeEntity t " +
-                        "where t.circle.externalId = :externalCircleId " +
-                        "order by t.member.name asc"),
-        @NamedQuery(name = "trustee.findCirclesByMember",
-                query = "select t.circle " +
-                        "from TrusteeEntity t " +
-                        "where t.member = :member " +
-                        "order by t.circle.name asc"),
-        @NamedQuery(name = "trustee.findSharedCircles",
-                query = "select t1 " +
-                        "from TrusteeEntity t1," +
-                        "     TrusteeEntity t2 " +
-                        "where t1.circle.id = t2.circle.id" +
-                        "  and t1.member = :member" +
-                        "  and t2.member = :requested " +
-                        "order by t1.circle.name asc"),
-        @NamedQuery(name = "trustee.findByCircle",
-                query = "select t " +
-                        "from TrusteeEntity t " +
-                        "where t.circle = :circle " +
-                        "order by t.member.name asc")
-})
+@NamedQuery(name = "trust.findByMember",
+        query = "select t " +
+                "from TrusteeEntity t " +
+                "where t.member = :member" +
+                "  and t.trustLevel in :permissions " +
+                "order by t.id asc")
+@NamedQuery(name = "trust.findByMemberAndExternalCircleId",
+        query = "select t " +
+                "from TrusteeEntity t " +
+                "where t.member = :member" +
+                "  and t.circle.externalId = :externalCircleId " +
+                "  and t.trustLevel in :permissions " +
+                "order by t.member.name asc")
+@NamedQuery(name = "trustee.findByCircleAndMember",
+        query = "select t " +
+                "from TrusteeEntity t " +
+                "where t.circle.externalId = :ecid" +
+                "  and t.member.externalId = :emid")
+@NamedQuery(name = "trustee.findByExternalMemberId",
+        query = "select t " +
+                "from TrusteeEntity t " +
+                "where t.member.externalId = :externalMemberId " +
+                "order by t.circle.name asc")
+@NamedQuery(name = "trustee.findByExternalCircleId",
+        query = "select t " +
+                "from TrusteeEntity t " +
+                "where t.circle.externalId = :externalCircleId " +
+                "order by t.member.name asc")
+@NamedQuery(name = "trustee.findCirclesByMember",
+        query = "select t.circle " +
+                "from TrusteeEntity t " +
+                "where t.member = :member " +
+                "order by t.circle.name asc")
+@NamedQuery(name = "trustee.findSharedCircles",
+        query = "select t1 " +
+                "from TrusteeEntity t1," +
+                "     TrusteeEntity t2 " +
+                "where t1.circle.id = t2.circle.id" +
+                "  and t1.member = :member" +
+                "  and t2.member = :requested " +
+                "order by t1.circle.name asc")
+@NamedQuery(name = "trustee.findByCircle",
+        query = "select t " +
+                "from TrusteeEntity t " +
+                "where t.circle = :circle " +
+                "order by t.member.name asc")
 @Table(name = "cws_trustees")
 public class TrusteeEntity extends CWSEntity {
 

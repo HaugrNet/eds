@@ -18,7 +18,6 @@ package io.javadog.cws.core.model.entities;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
@@ -29,14 +28,12 @@ import javax.persistence.Table;
  * @since CWS 1.0
  */
 @Entity
-@NamedQueries({
-        @NamedQuery(name = "setting.readAll",
-                query = "select s from SettingEntity s " +
-                        "order by s.name asc"),
-        @NamedQuery(name = "setting.findByName",
-                query = "select s from SettingEntity s " +
-                        "where s.name = :name")
-})
+@NamedQuery(name = "setting.readAll",
+        query = "select s from SettingEntity s " +
+                "order by s.name asc")
+@NamedQuery(name = "setting.findByName",
+        query = "select s from SettingEntity s " +
+                "where s.name = :name")
 @Table(name = "cws_settings")
 public class SettingEntity extends CWSEntity {
 

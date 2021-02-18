@@ -20,7 +20,6 @@ import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.Utilities;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
@@ -32,11 +31,9 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "cws_circles")
-@NamedQueries(
-        @NamedQuery(name = "circle.findByName",
-                query = "select c from CircleEntity c " +
-                        "where lower(c.name) = lower(:name)")
-)
+@NamedQuery(name = "circle.findByName",
+        query = "select c from CircleEntity c " +
+                "where lower(c.name) = lower(:name)")
 public class CircleEntity extends Externable {
 
     @Column(name = "name", unique = true, nullable = false, length = Constants.MAX_NAME_LENGTH)

@@ -17,15 +17,14 @@
 package io.javadog.cws.core.model.entities;
 
 import io.javadog.cws.api.common.Utilities;
-import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import java.util.Date;
 
 /**
  * <p>CWS Version Entity, maps the Version table from the Database.</p>
@@ -34,11 +33,9 @@ import javax.persistence.TemporalType;
  * @since CWS 1.0
  */
 @Entity
-@NamedQueries(
-        @NamedQuery(name = "version.findAll",
-                query = "select v from VersionEntity v " +
-                        "order by v.id desc")
-)
+@NamedQuery(name = "version.findAll",
+        query = "select v from VersionEntity v " +
+                "order by v.id desc")
 @Table(name = "cws_versions")
 public class VersionEntity {
 

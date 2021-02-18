@@ -19,7 +19,6 @@ package io.javadog.cws.core.model.entities;
 import io.javadog.cws.api.common.Constants;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
@@ -30,19 +29,17 @@ import javax.persistence.Table;
  * @since CWS 1.0
  */
 @Entity
-@NamedQueries({
-        @NamedQuery(name = "type.findAll",
-                query = "select d " +
-                        "from DataTypeEntity d " +
-                        "order by d.id asc"),
-        @NamedQuery(name = "type.findByName",
-                query = "select d from DataTypeEntity d " +
-                        "where lower(d.name) = lower(:name)"),
-        @NamedQuery(name = "type.countUsage",
-                query = "select count(m.id) " +
-                        "from MetadataEntity m " +
-                        "where m.type = :type")
-})
+@NamedQuery(name = "type.findAll",
+        query = "select d " +
+                "from DataTypeEntity d " +
+                "order by d.id asc")
+@NamedQuery(name = "type.findByName",
+        query = "select d from DataTypeEntity d " +
+                "where lower(d.name) = lower(:name)")
+@NamedQuery(name = "type.countUsage",
+        query = "select count(m.id) " +
+                "from MetadataEntity m " +
+                "where m.type = :type")
 @Table(name = "cws_datatypes")
 public class DataTypeEntity extends CWSEntity {
 

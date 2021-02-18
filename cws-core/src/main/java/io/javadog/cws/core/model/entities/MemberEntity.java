@@ -25,7 +25,6 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
@@ -38,35 +37,33 @@ import javax.persistence.TemporalType;
  * @since CWS 1.0
  */
 @Entity
-@NamedQueries({
-        @NamedQuery(name = "member.countMembers",
-                query = "select count(m.id) " +
-                        "from MemberEntity m"),
-        @NamedQuery(name = "member.findByName",
-                query = "select m " +
-                        "from MemberEntity m " +
-                        "where lower(m.name) = lower(:name)"),
-        @NamedQuery(name = "member.findByChecksum",
-                query = "select m " +
-                        "from MemberEntity m " +
-                        "where m.sessionChecksum = :checksum"),
-        @NamedQuery(name = "member.findByRole",
-                query = "select m " +
-                        "from MemberEntity m " +
-                        "where m.memberRole = :role " +
-                        "order by m.id asc"),
-        @NamedQuery(name = "member.findByNameAndCircle",
-                query = "select e.member " +
-                        "from TrusteeEntity e " +
-                        "where lower(e.member.name) = lower(:name)" +
-                        "  and e.circle.externalId = :externalCircleId"),
-        @NamedQuery(name = "member.removeExpiredSessions",
-                query = "update MemberEntity set" +
-                        "  sessionChecksum = null," +
-                        "  sessionCrypto = null," +
-                        "  sessionExpire = null " +
-                        "where sessionExpire > current_timestamp")
-})
+@NamedQuery(name = "member.countMembers",
+        query = "select count(m.id) " +
+                "from MemberEntity m")
+@NamedQuery(name = "member.findByName",
+        query = "select m " +
+                "from MemberEntity m " +
+                "where lower(m.name) = lower(:name)")
+@NamedQuery(name = "member.findByChecksum",
+        query = "select m " +
+                "from MemberEntity m " +
+                "where m.sessionChecksum = :checksum")
+@NamedQuery(name = "member.findByRole",
+        query = "select m " +
+                "from MemberEntity m " +
+                "where m.memberRole = :role " +
+                "order by m.id asc")
+@NamedQuery(name = "member.findByNameAndCircle",
+        query = "select e.member " +
+                "from TrusteeEntity e " +
+                "where lower(e.member.name) = lower(:name)" +
+                "  and e.circle.externalId = :externalCircleId")
+@NamedQuery(name = "member.removeExpiredSessions",
+        query = "update MemberEntity set" +
+                "  sessionChecksum = null," +
+                "  sessionCrypto = null," +
+                "  sessionExpire = null " +
+                "where sessionExpire > current_timestamp")
 @Table(name = "cws_members")
 public class MemberEntity extends Externable {
 

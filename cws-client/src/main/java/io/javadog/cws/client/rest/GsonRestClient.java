@@ -57,25 +57,16 @@ public class GsonRestClient {
     }
 
     protected <R extends Authentication, C extends CwsResponse> C runRequest(final Class<C> clazz, final String requestURL, final R request) {
-        final String json = toJson(request);
-        HttpRequest.BodyPublisher publisher;
-
-        if (!"null".equals(json)) {
-            publisher = HttpRequest.BodyPublishers.ofString(json, CHARSET);
-        } else {
-            publisher = HttpRequest.BodyPublishers.noBody();
-        }
-
-        var httpRequest = HttpRequest
+        final HttpRequest httpRequest = HttpRequest
                 .newBuilder()
                 .version(HttpClient.Version.HTTP_1_1)
                 .uri(URI.create(baseURL + requestURL))
                 .header("Content-Type", MediaType.APPLICATION_JSON + "; " + CHARSET.displayName())
                 .header("Accept", MediaType.APPLICATION_JSON)
-                .POST(publisher)
+                .POST(prepareBodyPublisher(request))
                 .build();
         try {
-            var response = HttpClient.newHttpClient().send(httpRequest, HttpResponse.BodyHandlers.ofString(CHARSET));
+            final HttpResponse<String> response = HttpClient.newHttpClient().send(httpRequest, HttpResponse.BodyHandlers.ofString(CHARSET));
 
             if (response.statusCode() == 200) {
                 return fromJson(clazz, response.body());
@@ -88,6 +79,13 @@ public class GsonRestClient {
             Thread.currentThread().interrupt();
             throw new RESTClientException("Thread was interrupted: " + e.getMessage(), e);
         }
+    }
+
+    private static <R extends Authentication> HttpRequest.BodyPublisher prepareBodyPublisher(final R request) {
+        final String json = toJson(request);
+        return ("null".equals(json))
+                ? HttpRequest.BodyPublishers.noBody()
+                : HttpRequest.BodyPublishers.ofString(json, CHARSET);
     }
 
     // =========================================================================

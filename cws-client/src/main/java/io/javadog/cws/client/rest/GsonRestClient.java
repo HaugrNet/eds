@@ -24,6 +24,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
+import com.google.gson.JsonSyntaxException;
 import io.javadog.cws.api.requests.Authentication;
 import io.javadog.cws.api.responses.CwsResponse;
 import javax.ws.rs.core.MediaType;
@@ -61,20 +62,18 @@ public class GsonRestClient {
                 .newBuilder()
                 .version(HttpClient.Version.HTTP_1_1)
                 .uri(URI.create(baseURL + requestURL))
-                .header("Content-Type", MediaType.APPLICATION_JSON + "; " + CHARSET.displayName())
+                .header("Content-Type", MediaType.APPLICATION_JSON)
                 .header("Accept", MediaType.APPLICATION_JSON)
                 .POST(prepareBodyPublisher(request))
                 .build();
         try {
-            final HttpResponse<String> response = HttpClient.newHttpClient().send(httpRequest, HttpResponse.BodyHandlers.ofString(CHARSET));
+            final HttpResponse<String> response = HttpClient
+                    .newHttpClient()
+                    .send(httpRequest, HttpResponse.BodyHandlers.ofString(CHARSET));
 
-            if (response.statusCode() == 200) {
-                return fromJson(clazz, response.body());
-            } else {
-                return null;
-            }
-        } catch (IOException e) {
-            throw new RESTClientException("Communication problem: " + e.getMessage(), e);
+            return GSON.fromJson(response.body(), clazz);
+        } catch (IOException | JsonSyntaxException | IllegalStateException e) {
+            throw new RESTClientException("Communication / Transformation problem: " + e.getMessage(), e);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new RESTClientException("Thread was interrupted: " + e.getMessage(), e);
@@ -82,7 +81,12 @@ public class GsonRestClient {
     }
 
     private static <R extends Authentication> HttpRequest.BodyPublisher prepareBodyPublisher(final R request) {
-        final String json = toJson(request);
+        final String tmp = GSON.toJson(request);
+        // For some weird reason, the ASCII character '=' is being replaced
+        // by the UTF-8 encoded alternative in the Json. The '=' is a white
+        // space filler for Base64 encoded strings.
+        final String json = tmp.replace("\\u003d", "=");
+
         return ("null".equals(json))
                 ? HttpRequest.BodyPublishers.noBody()
                 : HttpRequest.BodyPublishers.ofString(json, CHARSET);
@@ -98,18 +102,6 @@ public class GsonRestClient {
                 .registerTypeAdapter(byte[].class, new ByteArrayAdapter());
 
         return builder.create();
-    }
-
-    private static String toJson(final Object obj) {
-        final String tmp = GSON.toJson(obj);
-        // For some weird reason, the ASCII character '=' is being replaced
-        // by the UTF-8 encoded alternative in the Json. The '=' is a white
-        // space filler for Base64 encoded strings.
-        return tmp.replace("\\u003d", "=");
-    }
-
-    private static <T> T fromJson(final Class<T> type, final String json) {
-        return GSON.fromJson(json, type);
     }
 
     /**

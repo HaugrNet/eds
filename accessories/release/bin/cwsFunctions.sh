@@ -18,9 +18,9 @@ server="http://localhost:8080/cws"
 # ==============================================================================
 function __credentials() {
     if [[ $# -eq 1 ]]; then
-        echo "\"accountName\":null,\"credential\":\"$(echo -n "${1}" | base64)\",\"\":\"SESSION\""
+        echo "\"accountName\":null,\"credential\":\"$(echo -n "${1}" | base64)\",\"credentialType\":\"SESSION\""
     else
-        echo "\"accountName\":\"${1}\",\"credential\":\"$(echo -n "${2}" | base64)\",\"\":\"PASSPHRASE\""
+        echo "\"accountName\":\"${1}\",\"credential\":\"$(echo -n "${2}" | base64)\",\"credentialType\":\"PASSPHRASE\""
     fi
 }
 

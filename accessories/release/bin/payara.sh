@@ -11,6 +11,7 @@ readonly dbPassword="cws"
 readonly dbName="cws"
 readonly domain="domain1"
 readonly payara="${GLASSFISH_HOME}"
+readonly psqlVersion="42.2.19"
 
 # Java & JBoss (Payara) settings
 export JAVA_OPTS="${JAVA_OPTS} -Xms1303m -Xmx1303m -Djava.net.preferIPv4Stack=true"
@@ -32,7 +33,8 @@ fi
 action="${1}"
 if [ "${action}" = "configure" ]; then
     echo "Configuring Payara for CWS"
-    runAsAdmin add-library "$(dirname "${0}")/../lib/postgresql-42.2.18.jar"
+    wget -q -P /tmp/ "https://jdbc.postgresql.org/download/postgresql-${psqlVersion}.jar"
+    runAsAdmin add-library "/tmp/postgresql-${psqlVersion}.jar"
     runAsAdmin create-jdbc-connection-pool --datasourceclassname org.postgresql.xa.PGXADataSource --restype javax.sql.XADataSource --property "User=${dbUser}:Password=${dbPassword}:URL=jdbc\:postgresql\://${dbHost}/${dbName}" cwsPool
     runAsAdmin create-jdbc-resource --connectionpoolid cwsPool datasources/cwsDS
 elif [ "${action}" = "start" ]; then

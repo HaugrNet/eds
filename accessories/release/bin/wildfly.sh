@@ -15,6 +15,7 @@ readonly maxPostSize="26214400"
 readonly wildfly=${JBOSS_HOME}
 # Hidden feature, if set this port is used to start JBoss/WildFly in debug mode
 readonly debugPort=${DEBUG_PORT}
+readonly psqlVersion="42.2.19"
 
 # Java & JBoss (WildFly) settings
 export JAVA_OPTS="${JAVA_OPTS} -Xms1303m -Xmx1303m -Djava.net.preferIPv4Stack=true"
@@ -49,9 +50,8 @@ if [[ "${action}" == "configure" ]]; then
     if (runJbossCli "read-attribute server-state"); then
         if [[ ! -e ${wildfly}/modules/org/postgresql/main/module.xml ]]; then
             echo "Configuring WildFly for CWS"
-            mkdir -p "${wildfly}/modules/org/postgresql/main"
-            cp "$(dirname "$0")/../lib/postgresql-42.2.18.jar" "${wildfly}/modules/org/postgresql/main"
-            cp "$(dirname "$0")/../wildfly/module.xml" "${wildfly}/modules/org/postgresql/main"
+            wget -q -P /tmp/ "https://jdbc.postgresql.org/download/postgresql-${psqlVersion}.jar"
+            runJbossCli "module add --name=org.postgresql --resources=/tmp/postgresql-${psqlVersion}.jar --dependencies=javaee.api"
             runJbossCli "/subsystem=datasources/jdbc-driver=postgresql:add(driver-name=postgresql,driver-module-name=org.postgresql,driver-xa-datasource-class-name=org.postgresql.xa.PGXADataSource)"
             runJbossCli "data-source add --name=cwsDS --driver-name=postgresql --jndi-name=java:/datasources/cwsDS --connection-url=jdbc:postgresql://${dbHost}:${dbPort}/${dbName} --user-name=${dbUser} --password=${dbPassword} --use-ccm=false --max-pool-size=25 --blocking-timeout-wait-millis=5000 --enabled=true"
             runJbossCli "/subsystem=undertow/server=default-server/http-listener=default/:write-attribute(name=max-post-size,value=${maxPostSize})"

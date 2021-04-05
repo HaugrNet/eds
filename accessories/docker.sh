@@ -7,7 +7,7 @@ fi
 
 action=${1}
 image="cws"
-container="${image}-1.1"
+container="${image}-2.0"
 source release/bin/cwsFunctions.sh
 
 # ==============================================================================
@@ -79,8 +79,8 @@ function doBuild() {
         http_proxy=${http_proxy:-}
         if [[ "${http_proxy}" != "" ]]; then
             # Proxy can be defined in many ways, to ensure that it has the correct
-            # format, the protocol and slashes are first strippped, if they were
-            # set - to prevent that they are either missing or added douple here
+            # format, the protocol and slashes are first stripped, if they were
+            # set - to prevent that they are either missing or added double here
             proxy=${http_proxy//http:\/\//}
             proxy=${proxy//\//}
             echo "Acquire::http::Proxy \"http://${proxy}/\";" > docker/apt.conf

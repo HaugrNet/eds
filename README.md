@@ -108,6 +108,7 @@ deployed in a "hostile" environment.
 
 This is the CWS 2.0 development branch, with the these features planned:
 
+* [Migrate to the haugr.net domain](https://github.com/JavaDogs/cws/issues/72)
 * [Migrate code base from Java 8 to Java 11](https://github.com/JavaDogs/cws/issues/71)
 * [Migrate from Java EE 7 to Jakarta EE 8](https://github.com/JavaDogs/cws/issues/70)
 * [Convert Date Objects to Java 8+ Time Objects](https://github.com/JavaDogs/cws/issues/69)

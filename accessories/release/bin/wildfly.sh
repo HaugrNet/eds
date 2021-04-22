@@ -40,11 +40,16 @@ fi
 # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 # Run the Control Script
 # -----------------------------------------------------------------------------
+# Param $1: Command to execute in the JBoss environment
+# Return Return value from the JBoss Client
 # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 function runJbossCli() {
-    "${wildfly}/bin/jboss-cli.sh" --connect --controller=localhost --command="${1}" > /dev/null 2>&1
+    bash "${wildfly}/bin/jboss-cli.sh" --connect --controller=localhost --command="${1}" > /dev/null 2>&1
 }
 
+# -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+# Main part
+# -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 action="${1}"
 if [[ "${action}" == "configure" ]]; then
     if (runJbossCli "read-attribute server-state"); then
@@ -56,6 +61,7 @@ if [[ "${action}" == "configure" ]]; then
             runJbossCli "data-source add --name=cwsDS --driver-name=postgresql --jndi-name=java:/datasources/cwsDS --connection-url=jdbc:postgresql://${dbHost}:${dbPort}/${dbName} --user-name=${dbUser} --password=${dbPassword} --use-ccm=false --max-pool-size=25 --blocking-timeout-wait-millis=5000 --enabled=true"
             runJbossCli "/subsystem=undertow/server=default-server/http-listener=default/:write-attribute(name=max-post-size,value=${maxPostSize})"
             runJbossCli "/subsystem=logging/logger=io.javadog.cws:add"
+            rm -f "/tmp/postgresql-${psqlVersion}.jar"
             echo "Restarting WildFly ..."
             runJbossCli "reload"
             echo "WildFly has been configured"

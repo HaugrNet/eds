@@ -35,6 +35,7 @@ if [ "${action}" = "configure" ]; then
     echo "Configuring Payara for CWS"
     wget -q -P /tmp/ "https://jdbc.postgresql.org/download/postgresql-${psqlVersion}.jar"
     runAsAdmin add-library "/tmp/postgresql-${psqlVersion}.jar"
+    rm -f "/tmp/postgresql-${psqlVersion}.jar"
     runAsAdmin create-jdbc-connection-pool --datasourceclassname org.postgresql.xa.PGXADataSource --restype javax.sql.XADataSource --property "User=${dbUser}:Password=${dbPassword}:URL=jdbc\:postgresql\://${dbHost}/${dbName}" cwsPool
     runAsAdmin create-jdbc-resource --connectionpoolid cwsPool datasources/cwsDS
 elif [ "${action}" = "start" ]; then

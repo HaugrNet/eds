@@ -55,7 +55,7 @@ public final class SanityService extends Serviceable<SanityDao, SanityResponse, 
 
         final List<DataEntity> found = findRecords(request);
         final List<Sanity> sanities = convertRecords(found);
-        final SanityResponse response = new SanityResponse();
+        final var response = new SanityResponse();
         response.setSanities(sanities);
 
         return response;
@@ -85,7 +85,7 @@ public final class SanityService extends Serviceable<SanityDao, SanityResponse, 
         final List<Sanity> sanities = new ArrayList<>(found.size());
 
         for (final DataEntity entity : found) {
-            final Sanity sanity = new Sanity();
+            final var sanity = new Sanity();
             sanity.setDataId(entity.getMetadata().getExternalId());
             sanity.setChanged(entity.getSanityChecked());
             sanities.add(sanity);

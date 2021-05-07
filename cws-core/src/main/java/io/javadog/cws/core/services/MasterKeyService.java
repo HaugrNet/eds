@@ -71,7 +71,7 @@ public final class MasterKeyService extends Serviceable<CommonDao, MasterKeyResp
         // Primarily, as updating it to an invalid key can be devastating. So
         // it is initially being saved, just in case...
         // What if the keys are the same ?
-        final MasterKey masterKey = MasterKey.getInstance(settings);
+        final var masterKey = MasterKey.getInstance(settings);
         final SecretCWSKey oldMasterKey = masterKey.getKey();
         final SecretCWSKey newMasterKey = prepareNewMasterKey(masterKey, request);
 
@@ -131,13 +131,13 @@ public final class MasterKeyService extends Serviceable<CommonDao, MasterKeyResp
     }
 
     private boolean checkCredentials(final SecretCWSKey masterKey, final MemberEntity admin, final byte[] secret) {
-        boolean result = false;
+        var result = false;
 
         try {
             // First, decrypt the Salt for the Administrator, using the "MasterKey".
             final byte[] encrypted = Base64.getDecoder().decode(admin.getSalt());
             final byte[] decrypted = Crypto.decrypt(masterKey, encrypted);
-            final String salt = crypto.bytesToString(decrypted);
+            final var salt = crypto.bytesToString(decrypted);
 
             // With the decrypted Salt, we can try to unlock the Private Key, if it
             // fails, then a CryptoException is thrown, which we'll ignore here.

@@ -56,7 +56,7 @@ public final class FetchMemberService extends Serviceable<MemberDao, FetchMember
         verifyRequest(request, Permission.FETCH_MEMBER);
         Arrays.fill(request.getCredential(), (byte) 0);
 
-        final FetchMemberResponse response = new FetchMemberResponse();
+        final var response = new FetchMemberResponse();
 
         if (request.getMemberId() != null) {
             // The request is for a specific Member
@@ -130,7 +130,7 @@ public final class FetchMemberService extends Serviceable<MemberDao, FetchMember
     }
 
     private static Member convert(final MemberEntity entity) {
-        final Member member = new Member();
+        final var member = new Member();
 
         member.setMemberId(entity.getExternalId());
         member.setAccountName(entity.getName());
@@ -145,7 +145,7 @@ public final class FetchMemberService extends Serviceable<MemberDao, FetchMember
         final List<CircleEntity> entities = dao.findCirclesForMember(requested);
         final List<Circle> circles = new ArrayList<>(entities.size());
         for (final CircleEntity entity : entities) {
-            final Circle circle = convert(entity, null);
+            final var circle = convert(entity, null);
             circles.add(circle);
         }
 

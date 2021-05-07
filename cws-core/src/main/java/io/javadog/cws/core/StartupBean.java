@@ -39,7 +39,6 @@ import javax.ejb.TransactionAttributeType;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.persistence.Query;
 
 /**
  * <p>Startup Bean for CWS, it is a singleton, which handles loading of the
@@ -83,7 +82,7 @@ public class StartupBean {
 
             // Registering the Timer Service. This will ensure that the
             // Scheduler is invoked at frequent intervals.
-            final TimerConfig timerConfig = new TimerConfig();
+            final var timerConfig = new TimerConfig();
             timerConfig.setInfo("CWS Sanitizer");
 
             // To prevent starting multiple Timers, it is started in
@@ -92,17 +91,17 @@ public class StartupBean {
             timerConfig.setPersistent(false);
 
             // Starting the Timer Service every hour.
-            final ScheduleExpression expression = new ScheduleExpression();
+            final var expression = new ScheduleExpression();
             expression.hour("*");
             timerService.createCalendarTimer(expression, timerConfig);
         }
     }
 
     private boolean checkDatabase() {
-        boolean ready = false;
+        var ready = false;
 
         try {
-            final Query query = entityManager.createNamedQuery("version.findAll");
+            final var query = entityManager.createNamedQuery("version.findAll");
             final List<VersionEntity> result = CommonDao.findList(query);
 
             // If the database is invalid, then no data could be found, meaning
@@ -120,7 +119,7 @@ public class StartupBean {
     }
 
     private void initializeSettings() {
-        final CommonDao dao = new CommonDao(entityManager);
+        final var dao = new CommonDao(entityManager);
         final List<SettingEntity> found = dao.findAllAscending(SettingEntity.class, "id");
 
         for (final SettingEntity entity : found) {

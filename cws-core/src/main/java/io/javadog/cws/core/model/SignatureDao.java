@@ -20,7 +20,6 @@ import io.javadog.cws.core.model.entities.MemberEntity;
 import io.javadog.cws.core.model.entities.SignatureEntity;
 import java.util.List;
 import javax.persistence.EntityManager;
-import javax.persistence.Query;
 
 /**
  * <p>Data Access Object functionality used explicitly for the fetching &amp;
@@ -36,7 +35,7 @@ public final class SignatureDao extends CommonDao {
     }
 
     public SignatureEntity findByChecksum(final String checksum) {
-        final Query query = entityManager
+        final var query = entityManager
                 .createNamedQuery("signature.findByChecksum")
                 .setParameter("checksum", checksum);
 
@@ -44,7 +43,7 @@ public final class SignatureDao extends CommonDao {
     }
 
     public List<SignatureEntity> findAllSignatures(final MemberEntity member) {
-        final Query query = entityManager
+        final var query = entityManager
                 .createNamedQuery("signature.findByMember")
                 .setParameter(MEMBER, member);
 

@@ -52,7 +52,7 @@ public class InventoryService extends Serviceable<DataDao, InventoryResponse, In
             inventory.add(data);
         }
 
-        final InventoryResponse response = new InventoryResponse();
+        final var response = new InventoryResponse();
         response.setRecords(dao.countInventoryRecords());
         response.setInventory(inventory);
 

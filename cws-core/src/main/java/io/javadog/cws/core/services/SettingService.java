@@ -92,7 +92,7 @@ public final class SettingService extends Serviceable<CommonDao, SettingResponse
         // All corrections have been made, now we can destroy the credentials
         Arrays.fill(request.getCredential(), (byte) 0);
 
-        final SettingResponse response = new SettingResponse();
+        final var response = new SettingResponse();
         response.setSettings(convert(settings));
 
         return response;
@@ -136,13 +136,13 @@ public final class SettingService extends Serviceable<CommonDao, SettingResponse
                 persistAndUpdateSetting(request, existingSetting, key, value);
             }
         } else {
-            final SettingEntity entity = new SettingEntity();
+            final var entity = new SettingEntity();
             persistAndUpdateSetting(request, entity, key, value);
         }
     }
 
     private void checkStandardSetting(final Map.Entry<String, String> entry) {
-        final StandardSetting standardSetting = StandardSetting.find(entry.getKey());
+        final var standardSetting = StandardSetting.find(entry.getKey());
         if (standardSetting != null) {
             if (isEmpty(entry.getValue())) {
                 throw new CWSException(ReturnCode.SETTING_WARNING, "The value for the key '" + entry.getKey() + "' is undefined.");
@@ -191,7 +191,7 @@ public final class SettingService extends Serviceable<CommonDao, SettingResponse
     private static void checkAlgorithm(final KeyAlgorithm.Type type, final StandardSetting setting, final String value) {
         final Set<KeyAlgorithm> algorithms = findEntriesForType(type);
 
-        boolean match = false;
+        var match = false;
         for (final KeyAlgorithm algorithm : algorithms) {
             if (Objects.equals(algorithm.name(), value)) {
                 match = true;

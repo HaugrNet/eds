@@ -32,7 +32,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceException;
-import javax.persistence.Query;
 import javax.transaction.Transactional;
 
 /**
@@ -67,8 +66,8 @@ public class SanitizerBean {
     public void sanitize() {
         clearExpireSessions();
         List<Long> ids = findNextBatch(BLOCK);
-        int count = 0;
-        int flawed = 0;
+        var count = 0;
+        var flawed = 0;
 
         while (!ids.isEmpty()) {
             for (final Long id : ids) {
@@ -86,7 +85,7 @@ public class SanitizerBean {
         LOG.log(Settings.INFO, "Completed Sanity check, found {0} flaws out of {1} checked Data Objects.", args);
     }
 
-    SanityStatus processEntity(final Long id) {
+    public SanityStatus processEntity(final Long id) {
         SanityStatus status;
 
         try {
@@ -130,7 +129,7 @@ public class SanitizerBean {
     }
 
     private void clearExpireSessions() {
-        final Query query = entityManager.createNamedQuery("member.removeExpiredSessions");
+        final var query = entityManager.createNamedQuery("member.removeExpiredSessions");
         final String logMessage = "expired " + query.executeUpdate() + " sessions.";
         LOG.log(Settings.DEBUG, logMessage);
     }
@@ -141,7 +140,7 @@ public class SanitizerBean {
         final int days = settings.getSanityInterval();
         final Date date = java.sql.Date.valueOf(LocalDate.now().minusDays(days));
 
-        final Query query = entityManager
+        final var query = entityManager
                 .createNamedQuery("data.findIdsForSanityCheck")
                 .setParameter("status", SanityStatus.OK)
                 .setParameter("date", date)

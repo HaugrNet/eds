@@ -39,7 +39,6 @@ import io.javadog.cws.core.model.MemberDao;
 import io.javadog.cws.core.model.Settings;
 import io.javadog.cws.core.model.entities.MemberEntity;
 import io.javadog.cws.core.model.entities.TrusteeEntity;
-import java.security.PublicKey;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Arrays;
@@ -139,7 +138,7 @@ public final class ProcessMemberService extends Serviceable<MemberDao, ProcessMe
 
         final MemberRole role = whichRole(request);
         final MemberEntity created = createNewAccount(accountName, role, request.getNewCredential());
-        final ProcessMemberResponse response = new ProcessMemberResponse(theMember(created) + " was successfully added to CWS.");
+        final var response = new ProcessMemberResponse(theMember(created) + " was successfully added to CWS.");
         response.setMemberId(created.getExternalId());
 
         return response;
@@ -158,10 +157,10 @@ public final class ProcessMemberService extends Serviceable<MemberDao, ProcessMe
             throw new CWSException(ReturnCode.CONSTRAINT_ERROR, "Cannot create an invitation, as the account already exists.");
         }
 
-        final String uuid = UUID.randomUUID().toString();
+        final var uuid = UUID.randomUUID().toString();
         final byte[] signature = crypto.sign(keyPair.getPrivate().getKey(), crypto.stringToBytes(uuid));
 
-        final MemberEntity entity = new MemberEntity();
+        final var entity = new MemberEntity();
         entity.setName(memberName);
         entity.setSalt(crypto.encryptWithMasterKey(uuid));
         entity.setPbeAlgorithm(settings.getPasswordAlgorithm());
@@ -171,7 +170,7 @@ public final class ProcessMemberService extends Serviceable<MemberDao, ProcessMe
         entity.setMemberRole(whichRole(request));
         dao.persist(entity);
 
-        final ProcessMemberResponse response = new ProcessMemberResponse("An invitation was successfully issued for '" + memberName + "'.");
+        final var response = new ProcessMemberResponse("An invitation was successfully issued for '" + memberName + "'.");
         response.setMemberId(entity.getExternalId());
         response.setSignature(signature);
 
@@ -241,7 +240,7 @@ public final class ProcessMemberService extends Serviceable<MemberDao, ProcessMe
         entity.setMemberRole(request.getMemberRole());
         dao.persist(entity);
 
-        final ProcessMemberResponse response = new ProcessMemberResponse(theMember(entity) + " has successfully been given the new role '" + request.getMemberRole() + "'.");
+        final var response = new ProcessMemberResponse(theMember(entity) + " has successfully been given the new role '" + request.getMemberRole() + "'.");
         response.setMemberId(memberId);
 
         return response;
@@ -255,7 +254,7 @@ public final class ProcessMemberService extends Serviceable<MemberDao, ProcessMe
         updateOwnPublicKey(request);
         dao.persist(member);
 
-        final ProcessMemberResponse response = new ProcessMemberResponse(theMember(member) + " was successfully updated.");
+        final var response = new ProcessMemberResponse(theMember(member) + " was successfully updated.");
         response.setMemberId(member.getExternalId());
         return response;
     }
@@ -319,7 +318,7 @@ public final class ProcessMemberService extends Serviceable<MemberDao, ProcessMe
         dao.removeSession(member);
         updateMemberPassword(member, request.getCredential());
 
-        final ProcessMemberResponse response = new ProcessMemberResponse();
+        final var response = new ProcessMemberResponse();
         response.setReturnMessage(theMember(member) + " has been Invalidated.");
 
         return response;
@@ -372,14 +371,14 @@ public final class ProcessMemberService extends Serviceable<MemberDao, ProcessMe
         // make everything very cumbersome if all their keys have to be
         // checked. Hence, it is limited to the first.
         final MemberEntity admin = dao.findMemberByName(Constants.ADMIN_ACCOUNT);
-        final PublicKey publicKey = crypto.dearmoringPublicKey(admin.getPublicKey());
+        final var publicKey = crypto.dearmoringPublicKey(admin.getPublicKey());
 
         if (!crypto.verify(publicKey, crypto.stringToBytes(secret), request.getCredential())) {
             throw new AuthenticationException("The given signature is invalid.");
         }
 
         final KeyAlgorithm pbeAlgorithm = settings.getPasswordAlgorithm();
-        final IVSalt salt = new IVSalt();
+        final var salt = new IVSalt();
         final byte[] newSecret = request.getNewCredential();
         final CWSKeyPair pair = Crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
         final SecretCWSKey key = crypto.generatePasswordKey(pbeAlgorithm, newSecret, salt.getArmored());
@@ -393,7 +392,7 @@ public final class ProcessMemberService extends Serviceable<MemberDao, ProcessMe
         account.setPrivateKey(Crypto.armoringPrivateKey(key, pair.getPrivate().getKey()));
         dao.persist(account);
 
-        final ProcessMemberResponse response = new ProcessMemberResponse("The invitation was successfully processed for '" + account.getName() + "'.");
+        final var response = new ProcessMemberResponse("The invitation was successfully processed for '" + account.getName() + "'.");
         response.setMemberId(account.getExternalId());
 
         return response;

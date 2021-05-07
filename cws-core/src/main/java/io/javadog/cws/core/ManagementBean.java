@@ -78,7 +78,7 @@ public class ManagementBean {
 
     @Transactional(Transactional.TxType.SUPPORTS)
     public VersionResponse version() {
-        final VersionResponse response = new VersionResponse();
+        final var response = new VersionResponse();
         response.setVersion(Constants.CWS_VERSION);
 
         return response;

@@ -52,7 +52,7 @@ public final class FetchCircleService extends Serviceable<CommonDao, FetchCircle
         verifyRequest(request, Permission.FETCH_CIRCLE);
         Arrays.fill(request.getCredential(), (byte) 0);
 
-        final FetchCircleResponse response = new FetchCircleResponse();
+        final var response = new FetchCircleResponse();
 
         if ((member.getMemberRole() == MemberRole.ADMIN) || settings.hasShowAllCircles()) {
             response.setCircles(fetchCirclesForAdmin());

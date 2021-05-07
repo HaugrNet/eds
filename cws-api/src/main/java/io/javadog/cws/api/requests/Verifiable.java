@@ -206,9 +206,10 @@ public abstract class Verifiable implements Serializable {
      */
     protected static void checkUrl(final Map<String, String> errors, final String value) {
         try {
-            final URL url = new URL(value);
+            final var url = new URL(value);
             url.toURI();
         } catch (MalformedURLException | URISyntaxException e) {
+            // SonarQube Warning java:S1166 - Ignored here
             // The error information from the Exception is added to the
             // error Object, which again is returned. Logging it here
             // would be pointless and thus the Sonar warning is ignored
@@ -227,9 +228,9 @@ public abstract class Verifiable implements Serializable {
      * @return True if the string is empty, meaning no non-whitespace chars exist
      */
     public static boolean isEmpty(final String value) {
-        boolean whitespace = true;
+        var whitespace = true;
 
-        for (int i = 0; i < value.length(); i++) {
+        for (var i = 0; i < value.length(); i++) {
             if (!Character.isWhitespace(value.charAt(i))) {
                 whitespace = false;
                 break;

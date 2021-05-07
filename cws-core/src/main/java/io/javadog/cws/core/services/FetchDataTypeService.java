@@ -53,13 +53,13 @@ public final class FetchDataTypeService extends Serviceable<CommonDao, FetchData
         final List<DataTypeEntity> types = dao.findAllTypes();
         final List<DataType> objectTypes = new ArrayList<>(types.size());
         for (final DataTypeEntity type : types) {
-            final DataType objectType = new DataType();
+            final var objectType = new DataType();
             objectType.setTypeName(type.getName());
             objectType.setType(type.getType());
             objectTypes.add(objectType);
         }
 
-        final FetchDataTypeResponse response = new FetchDataTypeResponse();
+        final var response = new FetchDataTypeResponse();
         response.setDataTypes(objectTypes);
 
         return response;

@@ -207,7 +207,7 @@ public abstract class Serviceable<D extends CommonDao, R extends CwsResponse, A 
         final Map<String, String> errors = verifiable.validate();
         if (!errors.isEmpty()) {
             final int capacity = errors.size() * 75;
-            final StringBuilder builder = new StringBuilder(capacity);
+            final var builder = new StringBuilder(capacity);
 
             for (final Map.Entry<String, String> error : errors.entrySet()) {
                 builder.append("\nKey: ");
@@ -230,7 +230,7 @@ public abstract class Serviceable<D extends CommonDao, R extends CwsResponse, A 
     private void verifySession(final A authentication, final String circleId) {
         final byte[] masterEncrypted = crypto.encryptWithMasterKey(authentication.getCredential());
         final String checksum = crypto.generateChecksum(masterEncrypted);
-        final MemberEntity memberEntity = dao.findMemberByChecksum(checksum);
+        final var memberEntity = dao.findMemberByChecksum(checksum);
 
         if (memberEntity != null) {
             if (Utilities.newDate().before(memberEntity.getSessionExpire())) {
@@ -255,7 +255,7 @@ public abstract class Serviceable<D extends CommonDao, R extends CwsResponse, A 
      */
     private void verifyAccount(final A authentication, final String circleId) {
         final String account = trim(authentication.getAccountName());
-        MemberEntity memberEntity = dao.findMemberByName(account);
+        var memberEntity = dao.findMemberByName(account);
 
         if (memberEntity == null) {
             if (Objects.equals(Constants.ADMIN_ACCOUNT, account)) {
@@ -286,7 +286,7 @@ public abstract class Serviceable<D extends CommonDao, R extends CwsResponse, A 
     }
 
     protected final MemberEntity createNewAccount(final String accountName, final MemberRole role, final byte[] credential) {
-        final MemberEntity account = new MemberEntity();
+        final var account = new MemberEntity();
         account.setName(accountName);
         account.setMemberRole(role);
         updateMemberPassword(account, credential);
@@ -308,7 +308,7 @@ public abstract class Serviceable<D extends CommonDao, R extends CwsResponse, A 
     protected final CWSKeyPair updateMemberPassword(final MemberEntity member, final byte[] password) {
         final KeyAlgorithm pbeAlgorithm = settings.getPasswordAlgorithm();
         final KeyAlgorithm rsaAlgorithm = settings.getAsymmetricAlgorithm();
-        final IVSalt salt = new IVSalt();
+        final var salt = new IVSalt();
         final SecretCWSKey key = crypto.generatePasswordKey(pbeAlgorithm, password, salt.getArmored());
         key.setSalt(salt);
 
@@ -381,7 +381,7 @@ public abstract class Serviceable<D extends CommonDao, R extends CwsResponse, A 
     protected byte[] decryptData(final DataEntity entity) {
         final String armoredSalt = crypto.decryptWithMasterKey(entity.getInitialVector());
         final SecretCWSKey key = extractCircleKey(entity);
-        final IVSalt salt = new IVSalt(armoredSalt);
+        final var salt = new IVSalt(armoredSalt);
         key.setSalt(salt);
 
         return Crypto.decrypt(key, entity.getData());
@@ -412,7 +412,7 @@ public abstract class Serviceable<D extends CommonDao, R extends CwsResponse, A 
     }
 
     protected static Circle convert(final CircleEntity entity, final String circleKey) {
-        final Circle circle = new Circle();
+        final var circle = new Circle();
 
         circle.setCircleId(entity.getExternalId());
         circle.setCircleName(entity.getName());
@@ -470,7 +470,7 @@ public abstract class Serviceable<D extends CommonDao, R extends CwsResponse, A 
      * @throws CWSException if the given Object is null
      * @see #throwConditionalException(boolean, ReturnCode, String)
      */
-    static void throwConditionalNullException(final Object obj, final ReturnCode returnCode, final String message) {
+    public static void throwConditionalNullException(final Object obj, final ReturnCode returnCode, final String message) {
         throwConditionalException(obj == null, returnCode, message);
     }
 
@@ -485,7 +485,7 @@ public abstract class Serviceable<D extends CommonDao, R extends CwsResponse, A 
      * @param message    The message for the Exception
      * @throws CWSException if the condition is true
      */
-    static void throwConditionalException(final boolean condition, final ReturnCode returnCode, final String message) {
+    public static void throwConditionalException(final boolean condition, final ReturnCode returnCode, final String message) {
         if (condition) {
             throw new CWSException(returnCode, message);
         }

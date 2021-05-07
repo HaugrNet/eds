@@ -53,7 +53,7 @@ public final class FetchSignatureService extends Serviceable<SignatureDao, Fetch
         final List<Signature> signatures = new ArrayList<>(found.size());
 
         for (final SignatureEntity entity : found) {
-            final Signature signature = new Signature();
+            final var signature = new Signature();
             signature.setChecksum(entity.getChecksum());
             signature.setExpires(entity.getExpires());
             signature.setVerifications(entity.getVerifications());
@@ -63,7 +63,7 @@ public final class FetchSignatureService extends Serviceable<SignatureDao, Fetch
             signatures.add(signature);
         }
 
-        final FetchSignatureResponse response = new FetchSignatureResponse();
+        final var response = new FetchSignatureResponse();
         response.setSignatures(signatures);
         return response;
     }

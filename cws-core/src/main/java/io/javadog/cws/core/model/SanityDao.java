@@ -22,7 +22,6 @@ import io.javadog.cws.core.model.entities.MemberEntity;
 import java.util.Date;
 import java.util.List;
 import javax.persistence.EntityManager;
-import javax.persistence.Query;
 
 /**
  * <p>Data Access Object functionality used explicitly for Sanity Checks.</p>
@@ -37,7 +36,7 @@ public final class SanityDao extends CommonDao {
     }
 
     public List<DataEntity> findFailedRecords(final Date since) {
-        final Query query = entityManager
+        final var query = entityManager
                 .createNamedQuery("data.findAllWithState")
                 .setParameter(STATUS, SanityStatus.FAILED)
                 .setParameter(SINCE, since);
@@ -46,7 +45,7 @@ public final class SanityDao extends CommonDao {
     }
 
     public List<DataEntity> findFailedRecords(final MemberEntity circleAdministrator, final Date since) {
-        final Query query = entityManager
+        final var query = entityManager
                 .createNamedQuery("data.findAllWithStateForMember")
                 .setParameter(STATUS, SanityStatus.FAILED)
                 .setParameter(SINCE, since)
@@ -56,7 +55,7 @@ public final class SanityDao extends CommonDao {
     }
 
     public List<DataEntity> findFailedRecords(final String circleId, final Date since) {
-        final Query query = entityManager
+        final var query = entityManager
                 .createNamedQuery("data.findAllWithStateForCircle")
                 .setParameter(STATUS, SanityStatus.FAILED)
                 .setParameter(SINCE, since)

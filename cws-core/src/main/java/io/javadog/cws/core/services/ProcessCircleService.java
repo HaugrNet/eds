@@ -38,7 +38,6 @@ import io.javadog.cws.core.model.entities.KeyEntity;
 import io.javadog.cws.core.model.entities.MemberEntity;
 import io.javadog.cws.core.model.entities.MetadataEntity;
 import io.javadog.cws.core.model.entities.TrusteeEntity;
-import java.security.PublicKey;
 import java.util.Arrays;
 import java.util.Objects;
 import javax.persistence.EntityManager;
@@ -63,7 +62,7 @@ public final class ProcessCircleService extends Serviceable<CommonDao, ProcessCi
         // Pre-checks, & destruction of credentials
         verifyRequest(request, Permission.PROCESS_CIRCLE);
         Arrays.fill(request.getCredential(), (byte) 0);
-        final Action action = request.getAction();
+        final var action = request.getAction();
         final ProcessCircleResponse response;
 
         if (action == Action.CREATE) {
@@ -138,23 +137,23 @@ public final class ProcessCircleService extends Serviceable<CommonDao, ProcessCi
     private ProcessCircleResponse createCircle(final MemberEntity circleAdmin, final String name, final String externalCircleKey) {
         final KeyAlgorithm algorithm = settings.getSymmetricAlgorithm();
         final SecretCWSKey key = Crypto.generateSymmetricKey(algorithm);
-        final PublicKey publicKey = crypto.dearmoringPublicKey(circleAdmin.getPublicKey());
-        final PublicCWSKey cwsPublicKey = new PublicCWSKey(circleAdmin.getRsaAlgorithm(), publicKey);
+        final var publicKey = crypto.dearmoringPublicKey(circleAdmin.getPublicKey());
+        final var cwsPublicKey = new PublicCWSKey(circleAdmin.getRsaAlgorithm(), publicKey);
         final String circleKey = Crypto.encryptAndArmorCircleKey(cwsPublicKey, key);
         final byte[] externalKey = encryptExternalKey(key, externalCircleKey);
 
-        final CircleEntity circle = new CircleEntity();
+        final var circle = new CircleEntity();
         circle.setName(name);
         circle.setCircleKey(externalKey);
         dao.persist(circle);
 
         createRootFolder(circle);
-        final KeyEntity keyEntity = new KeyEntity();
+        final var keyEntity = new KeyEntity();
         keyEntity.setAlgorithm(algorithm);
         keyEntity.setStatus(Status.ACTIVE);
         dao.persist(keyEntity);
 
-        final TrusteeEntity trustee = new TrusteeEntity();
+        final var trustee = new TrusteeEntity();
         trustee.setMember(circleAdmin);
         trustee.setCircle(circle);
         trustee.setKey(keyEntity);
@@ -162,15 +161,15 @@ public final class ProcessCircleService extends Serviceable<CommonDao, ProcessCi
         trustee.setCircleKey(circleKey);
         dao.persist(trustee);
 
-        final ProcessCircleResponse response = new ProcessCircleResponse(theCircle(circle) + " was successfully created.");
+        final var response = new ProcessCircleResponse(theCircle(circle) + " was successfully created.");
         response.setCircleId(circle.getExternalId());
 
         return response;
     }
 
     private void createRootFolder(final CircleEntity circle) {
-        final DataTypeEntity dataTypeEntity = dao.getReference(DataTypeEntity.class, 1L);
-        final MetadataEntity entity = new MetadataEntity();
+        final var dataTypeEntity = dao.getReference(DataTypeEntity.class, 1L);
+        final var entity = new MetadataEntity();
         entity.setCircle(circle);
         entity.setName("/");
         entity.setParentId(0L);

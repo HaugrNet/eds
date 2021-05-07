@@ -47,15 +47,15 @@ public final class SignService extends Serviceable<SignatureDao, SignResponse, S
         verifyRequest(request, Permission.CREATE_SIGNATURE);
         Arrays.fill(request.getCredential(), (byte) 0);
 
-        final SignResponse response = new SignResponse();
+        final var response = new SignResponse();
 
         final byte[] rawSignature = crypto.sign(keyPair.getPrivate().getKey(), request.getData());
-        final String signature = Base64.getEncoder().encodeToString(rawSignature);
+        final var signature = Base64.getEncoder().encodeToString(rawSignature);
         final String checksum = crypto.generateChecksum(rawSignature);
         final SignatureEntity existing = dao.findByChecksum(checksum);
 
         if (existing == null) {
-            final SignatureEntity entity = new SignatureEntity();
+            final var entity = new SignatureEntity();
             entity.setPublicKey(member.getPublicKey());
             entity.setMember(member);
             entity.setChecksum(checksum);

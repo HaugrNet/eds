@@ -94,7 +94,7 @@ public class CommonDao {
     }
 
     public <E extends Externable> E find(final Class<E> cwsEntity, final String externalId) {
-        final CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+        final var builder = entityManager.getCriteriaBuilder();
         final CriteriaQuery<E> query = builder.createQuery(cwsEntity);
         final Root<E> entity = query.from(cwsEntity);
         query.select(entity).where(builder.equal(entity.get(EXTERNAL_ID), externalId));
@@ -113,7 +113,7 @@ public class CommonDao {
      * @return List of sorted records from the database
      */
     public <E extends CWSEntity> List<E> findAllAscending(final Class<E> cwsEntity, final String orderBy) {
-        final CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+        final var builder = entityManager.getCriteriaBuilder();
         final CriteriaQuery<E> query = builder.createQuery(cwsEntity);
         final Root<E> entity = query.from(cwsEntity);
         query.orderBy(builder.asc(entity.get(orderBy)));
@@ -138,7 +138,7 @@ public class CommonDao {
     }
 
     public MemberEntity findMemberByName(final String name) {
-        final Query query = entityManager
+        final var query = entityManager
                 .createNamedQuery("member.findByName")
                 .setParameter("name", name);
 
@@ -146,7 +146,7 @@ public class CommonDao {
     }
 
     public List<MemberEntity> findMemberByRole(final MemberRole role) {
-        final Query query = entityManager
+        final var query = entityManager
                 .createNamedQuery("member.findByRole")
                 .setParameter("role", role);
 
@@ -163,7 +163,7 @@ public class CommonDao {
      * @return MemberEntity with a matching SessionKey checksum
      */
     public MemberEntity findMemberByChecksum(final String checksum) {
-        final Query query = entityManager
+        final var query = entityManager
                 .createNamedQuery("member.findByChecksum")
                 .setParameter("checksum", checksum);
 
@@ -171,7 +171,7 @@ public class CommonDao {
     }
 
     public MemberEntity findMemberByNameAndCircleId(final String name, final String externalCircleId) {
-        final Query query = entityManager
+        final var query = entityManager
                 .createNamedQuery("member.findByNameAndCircle")
                 .setParameter("name", name)
                 .setParameter("externalCircleId", externalCircleId);
@@ -186,7 +186,7 @@ public class CommonDao {
     }
 
     public List<TrusteeEntity> findTrusteesByMember(final MemberEntity member, final Set<TrustLevel> permissions) {
-        final Query query = entityManager
+        final var query = entityManager
                 .createNamedQuery("trust.findByMember")
                 .setParameter(MEMBER, member)
                 .setParameter("permissions", permissions);
@@ -195,7 +195,7 @@ public class CommonDao {
     }
 
     public List<TrusteeEntity> findTrusteesByMemberAndCircle(final MemberEntity member, final String externalCircleId, final Set<TrustLevel> permissions) {
-        final Query query = entityManager
+        final var query = entityManager
                 .createNamedQuery("trust.findByMemberAndExternalCircleId")
                 .setParameter(MEMBER, member)
                 .setParameter("externalCircleId", externalCircleId)
@@ -205,7 +205,7 @@ public class CommonDao {
     }
 
     public CircleEntity findCircleByName(final String name) {
-        final Query query = entityManager
+        final var query = entityManager
                 .createNamedQuery("circle.findByName")
                 .setParameter("name", name);
 
@@ -213,7 +213,7 @@ public class CommonDao {
     }
 
     public List<DataTypeEntity> findAllTypes() {
-        final Query query = entityManager.createNamedQuery("type.findAll");
+        final var query = entityManager.createNamedQuery("type.findAll");
 
         return findList(query);
     }
@@ -227,7 +227,7 @@ public class CommonDao {
      * @throws CWSException if no unique value could be found
      */
     public DataTypeEntity findDataTypeByName(final String name) {
-        final Query query = entityManager
+        final var query = entityManager
                 .createNamedQuery("type.findByName")
                 .setParameter("name", name);
 
@@ -235,7 +235,7 @@ public class CommonDao {
     }
 
     public long countDataTypeUsage(final DataTypeEntity dataType) {
-        final Query query = entityManager
+        final var query = entityManager
                 .createNamedQuery("type.countUsage")
                 .setParameter("type", dataType);
 
@@ -243,7 +243,7 @@ public class CommonDao {
     }
 
     public TrusteeEntity findTrusteeByCircleAndMember(final String externalCircleId, final String externalMemberId) {
-        final Query query = entityManager
+        final var query = entityManager
                 .createNamedQuery("trustee.findByCircleAndMember")
                 .setParameter("ecid", externalCircleId)
                 .setParameter("emid", externalMemberId);
@@ -252,7 +252,7 @@ public class CommonDao {
     }
 
     public SettingEntity findSettingByKey(final StandardSetting setting) {
-        final Query query = entityManager
+        final var query = entityManager
                 .createNamedQuery("setting.findByName")
                 .setParameter("name", setting.getKey());
 
@@ -260,7 +260,7 @@ public class CommonDao {
     }
 
     public Long countMembers() {
-        final Query query = entityManager.createNamedQuery("member.countMembers");
+        final var query = entityManager.createNamedQuery("member.countMembers");
         final Object obj = findSingleRecord(query);
 
         return (Long) obj;
@@ -290,7 +290,7 @@ public class CommonDao {
      * @param <E>   Entity Type to return
      * @return First Entity matching Query or null
      */
-    static <E> E findSingleRecord(final Query query) {
+    public static <E> E findSingleRecord(final Query query) {
         final List<E> found = findList(query);
 
         return found.isEmpty() ? null : found.get(0);
@@ -307,7 +307,7 @@ public class CommonDao {
      */
     public static <E> List<E> findList(final Query query) {
         try {
-            final List<E> list = query.getResultList();
+            final var list = query.getResultList();
 
             // JPA does not specify the exact behaviour of the getResultList()
             // call, hence if a null is returned, we're converting it into an

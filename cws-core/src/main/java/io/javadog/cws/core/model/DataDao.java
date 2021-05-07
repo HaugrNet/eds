@@ -24,7 +24,6 @@ import io.javadog.cws.core.model.entities.MetadataEntity;
 import java.util.EnumSet;
 import java.util.List;
 import javax.persistence.EntityManager;
-import javax.persistence.Query;
 
 /**
  * <p>Data Access Object functionality used explicitly for the fetching &amp;
@@ -40,7 +39,7 @@ public final class DataDao extends CommonDao {
     }
 
     public DataEntity findDataByMetadata(final MetadataEntity metadata) {
-        final Query query = entityManager
+        final var query = entityManager
                 .createNamedQuery("data.findByMetadata")
                 .setParameter("metadata", metadata);
 
@@ -48,7 +47,7 @@ public final class DataDao extends CommonDao {
     }
 
     public DataEntity findDataByMemberAndExternalId(final MemberEntity member, final String externalId) {
-        final Query query = entityManager
+        final var query = entityManager
                 .createNamedQuery("data.findByMemberAndExternalId")
                 .setParameter(MEMBER, member)
                 .setParameter(EXTERNAL_ID, externalId)
@@ -58,7 +57,7 @@ public final class DataDao extends CommonDao {
     }
 
     public MetadataEntity findMetadataByMemberAndExternalId(final Long memberId, final String externalId) {
-        final Query query = entityManager
+        final var query = entityManager
                 .createNamedQuery("metadata.findByMemberAndExternalId")
                 .setParameter("mid", memberId)
                 .setParameter("eid", externalId);
@@ -67,7 +66,7 @@ public final class DataDao extends CommonDao {
     }
 
     public MetadataEntity findMetadataByMemberAndName(final Long memberId, final String name) {
-        final Query query = entityManager
+        final var query = entityManager
                 .createNamedQuery("metadata.findByMemberAndName")
                 .setParameter("mid", memberId)
                 .setParameter("name", name);
@@ -76,7 +75,7 @@ public final class DataDao extends CommonDao {
     }
 
     public MetadataEntity findRootByMemberCircle(final Long memberId, final String circleId) {
-        final Query query = entityManager
+        final var query = entityManager
                 .createNamedQuery("metadata.findRootByMemberAndCircle")
                 .setParameter("mid", memberId)
                 .setParameter("cid", circleId);
@@ -85,7 +84,7 @@ public final class DataDao extends CommonDao {
     }
 
     public List<MetadataEntity> findMetadataByMemberAndFolder(final MemberEntity member, final Long parentId, final int pageNumber, final int pageSize) {
-        final Query query = entityManager
+        final var query = entityManager
                 .createNamedQuery("metadata.findByMemberAndFolder")
                 .setParameter(MEMBER, member)
                 .setParameter(PARENT_ID, parentId)
@@ -96,7 +95,7 @@ public final class DataDao extends CommonDao {
     }
 
     public long countFolderContent(final Long parentId) {
-        final Query query = entityManager
+        final var query = entityManager
                 .createNamedQuery("metadata.countFolderContent")
                 .setParameter(PARENT_ID, parentId);
 
@@ -104,7 +103,7 @@ public final class DataDao extends CommonDao {
     }
 
     public boolean checkIfNameIsUsed(final Long metadataId, final String name, final Long parentId) {
-        final Query query = entityManager
+        final var query = entityManager
                 .createNamedQuery("metadata.findByNameAndFolder")
                 .setParameter("id", metadataId)
                 .setParameter(NAME, name)
@@ -114,7 +113,7 @@ public final class DataDao extends CommonDao {
     }
 
     public MetadataEntity findInFolder(final MemberEntity member, final Long parentId, final String name) {
-        final Query query = entityManager
+        final var query = entityManager
                 .createNamedQuery("metadata.findInFolder")
                 .setParameter(MEMBER, member)
                 .setParameter(PARENT_ID, parentId)
@@ -124,14 +123,14 @@ public final class DataDao extends CommonDao {
     }
 
     public long countInventoryRecords() {
-        final Query query = entityManager
+        final var query = entityManager
                 .createNamedQuery("metadata.countInventoryRecords");
 
         return (long) query.getSingleResult();
     }
 
     public List<MetadataEntity> readInventoryRecords(final int pageNumber, final int pageSize) {
-        final Query query = entityManager
+        final var query = entityManager
                 .createNamedQuery("metadata.readInventoryRecords")
                 .setMaxResults(pageSize)
                 .setFirstResult((pageNumber - 1) * pageSize);
@@ -149,7 +148,7 @@ public final class DataDao extends CommonDao {
      * @return Converted Metadata DTO
      */
     public static Metadata convert(final MetadataEntity entity, final String folderId) {
-        final Metadata metaData = new Metadata();
+        final var metaData = new Metadata();
 
         metaData.setDataId(entity.getExternalId());
         metaData.setCircleId(entity.getCircle().getExternalId());

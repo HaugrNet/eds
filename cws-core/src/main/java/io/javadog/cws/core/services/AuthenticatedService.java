@@ -47,7 +47,7 @@ public final class AuthenticatedService extends Serviceable<CommonDao, Authentic
         Arrays.fill(request.getCredential(), (byte) 0);
 
         // And done... Authentication check completed
-        final AuthenticateResponse response = new AuthenticateResponse();
+        final var response = new AuthenticateResponse();
         response.setReturnMessage(member.getName() + " successfully authenticated.");
         response.setMemberId(member.getExternalId());
         response.setReturnCode(ReturnCode.SUCCESS);

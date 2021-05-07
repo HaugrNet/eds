@@ -97,11 +97,11 @@ public final class ProcessDataTypeService extends Serviceable<CommonDao, Process
             }
         }
 
-        final DataType objectType = new DataType();
+        final var objectType = new DataType();
         objectType.setTypeName(name);
         objectType.setType(type);
 
-        final ProcessDataTypeResponse response = new ProcessDataTypeResponse(theDataType(entity) + " was successfully processed.");
+        final var response = new ProcessDataTypeResponse(theDataType(entity) + " was successfully processed.");
         response.setDataType(objectType);
 
         return response;

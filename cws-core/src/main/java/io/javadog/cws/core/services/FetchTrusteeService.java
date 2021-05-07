@@ -71,7 +71,7 @@ public final class FetchTrusteeService extends Serviceable<TrusteeDao, FetchTrus
             currentTrustees.add(convert(entity));
         }
 
-        final FetchTrusteeResponse response = new FetchTrusteeResponse();
+        final var response = new FetchTrusteeResponse();
         response.setTrustees(currentTrustees);
 
         return response;
@@ -118,7 +118,7 @@ public final class FetchTrusteeService extends Serviceable<TrusteeDao, FetchTrus
     }
 
     private static Trustee convert(final TrusteeEntity entity) {
-        final Trustee trustee = new Trustee();
+        final var trustee = new Trustee();
 
         trustee.setMemberId(entity.getMember().getExternalId());
         trustee.setAccountName(entity.getMember().getName());

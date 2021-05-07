@@ -21,7 +21,6 @@ import io.javadog.cws.core.model.entities.MemberEntity;
 import io.javadog.cws.core.model.entities.TrusteeEntity;
 import java.util.List;
 import javax.persistence.EntityManager;
-import javax.persistence.Query;
 
 /**
  * <p>Data Access Object functionality used explicitly for the fetching &amp;
@@ -37,7 +36,7 @@ public final class MemberDao extends CommonDao {
     }
 
     public List<CircleEntity> findCirclesForMember(final MemberEntity member) {
-        final Query query = entityManager
+        final var query = entityManager
                 .createNamedQuery("trustee.findCirclesByMember")
                 .setParameter(MEMBER, member);
 
@@ -45,7 +44,7 @@ public final class MemberDao extends CommonDao {
     }
 
     public List<TrusteeEntity> findCirclesBothBelongTo(final MemberEntity member, final MemberEntity requested) {
-        final Query query = entityManager
+        final var query = entityManager
                 .createNamedQuery("trustee.findSharedCircles")
                 .setParameter(MEMBER, member)
                 .setParameter("requested", requested);

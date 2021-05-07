@@ -26,7 +26,6 @@ import io.javadog.cws.core.exceptions.IdentificationException;
 import io.javadog.cws.core.model.Settings;
 import io.javadog.cws.core.model.SignatureDao;
 import io.javadog.cws.core.model.entities.SignatureEntity;
-import java.security.PublicKey;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.Date;
@@ -66,7 +65,7 @@ public final class VerifyService extends Serviceable<SignatureDao, VerifyRespons
             throw new CWSException(ReturnCode.SIGNATURE_WARNING, "The Signature has expired.");
         }
 
-        final PublicKey publicKey = crypto.dearmoringPublicKey(entity.getPublicKey());
+        final var publicKey = crypto.dearmoringPublicKey(entity.getPublicKey());
         final boolean verified = crypto.verify(publicKey, request.getData(), signature);
 
         if (verified) {
@@ -74,7 +73,7 @@ public final class VerifyService extends Serviceable<SignatureDao, VerifyRespons
             dao.persist(entity);
         }
 
-        final VerifyResponse response = new VerifyResponse("The signature has successfully been verified.");
+        final var response = new VerifyResponse("The signature has successfully been verified.");
         response.setVerified(verified);
 
         return response;

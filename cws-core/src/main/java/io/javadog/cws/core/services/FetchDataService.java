@@ -122,9 +122,9 @@ public final class FetchDataService extends Serviceable<DataDao, FetchDataRespon
         // Circle Membership and right TrustLevel of the Member. If no Entity
         // is found, then there can be multiple reasons.
         final DataEntity entity = dao.findDataByMemberAndExternalId(member, metadata.getExternalId());
-        final FetchDataResponse response = new FetchDataResponse();
+        final var response = new FetchDataResponse();
         final MetadataEntity parent = dao.find(MetadataEntity.class, metadata.getParentId());
-        final Metadata metaData = DataDao.convert(metadata, parent.getExternalId());
+        final var metaData = DataDao.convert(metadata, parent.getExternalId());
         final List<Metadata> metadataList = new ArrayList<>(1);
         metadataList.add(metaData);
 
@@ -171,7 +171,7 @@ public final class FetchDataService extends Serviceable<DataDao, FetchDataRespon
             list.add(data);
         }
 
-        final FetchDataResponse response = new FetchDataResponse();
+        final var response = new FetchDataResponse();
         response.setMetadata(list);
         response.setRecords(count);
 

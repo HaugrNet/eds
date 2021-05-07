@@ -31,7 +31,6 @@ import io.javadog.cws.core.model.CommonDao;
 import io.javadog.cws.core.model.Settings;
 import io.javadog.cws.core.model.entities.MemberEntity;
 import io.javadog.cws.core.model.entities.TrusteeEntity;
-import java.security.PublicKey;
 import java.util.Arrays;
 import java.util.List;
 import javax.persistence.EntityManager;
@@ -109,16 +108,16 @@ public final class ProcessTrusteeService extends Serviceable<CommonDao, ProcessT
         // re-key is not supported in version 1.0, support for multiple
         // Keys can wait until this is also supported.
         final TrusteeEntity admin = trustees.get(0);
-        final TrustLevel trustLevel = request.getTrustLevel();
-        final TrusteeEntity trustee = new TrusteeEntity();
+        final var trustLevel = request.getTrustLevel();
+        final var trustee = new TrusteeEntity();
         trustee.setMember(newTrusteeMember);
         trustee.setCircle(admin.getCircle());
         trustee.setKey(admin.getKey());
         trustee.setTrustLevel(trustLevel);
 
         final SecretCWSKey circleKey = Crypto.extractCircleKey(admin.getKey().getAlgorithm(), keyPair.getPrivate(), admin.getCircleKey());
-        final PublicKey publicKey = crypto.dearmoringPublicKey(newTrusteeMember.getPublicKey());
-        final PublicCWSKey cwsPublicKey = new PublicCWSKey(newTrusteeMember.getRsaAlgorithm(), publicKey);
+        final var publicKey = crypto.dearmoringPublicKey(newTrusteeMember.getPublicKey());
+        final var cwsPublicKey = new PublicCWSKey(newTrusteeMember.getRsaAlgorithm(), publicKey);
         trustee.setCircleKey(Crypto.encryptAndArmorCircleKey(cwsPublicKey, circleKey));
 
         dao.persist(trustee);

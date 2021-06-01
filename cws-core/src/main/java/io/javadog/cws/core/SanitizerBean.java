@@ -92,7 +92,7 @@ public class SanitizerBean {
             // When trying to run the updates, it would be good if it could be
             // done using a Pessimistic locking, to prevent that other processes
             // accidentally also perform the update, as the Pessimistic locking
-            // is made at te DB level, whereas the Optimistic locking is handled
+            // is made at the DB level, whereas the Optimistic locking is handled
             // by the ORM Vendor. However, due to problems with the stability of
             // the Travis-CI builds, the locking has been removed.
             //   Even if two different CWS instances perform the same update on

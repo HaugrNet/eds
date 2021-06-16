@@ -23,11 +23,11 @@ import io.javadog.cws.api.requests.Verifiable;
 import io.javadog.cws.fitnesse.exceptions.StopTestException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.text.DateFormat;
-import java.text.Format;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.format.DateTimeParseException;
+import java.time.temporal.ChronoField;
 import java.util.Locale;
 
 /**
@@ -42,6 +42,12 @@ public final class Converter {
     private static final Locale LOCALE = Locale.ENGLISH;
     private static final String DATE_FORMAT = "yyyy-MM-dd";
     private static final Charset CHARSET = StandardCharsets.UTF_8;
+    private static final DateTimeFormatter FORMATTER = new DateTimeFormatterBuilder()
+            .appendPattern(DATE_FORMAT)
+            .parseDefaulting(ChronoField.HOUR_OF_DAY, 0)
+            .parseDefaulting(ChronoField.MINUTE_OF_HOUR, 0)
+            .parseDefaulting(ChronoField.SECOND_OF_MINUTE, 0)
+            .toFormatter();
 
     /**
      * Private Constructor, this is a utility class.
@@ -90,26 +96,20 @@ public final class Converter {
         return checked;
     }
 
-    public static String convertDate(final Date date) {
-        String converted = null;
-
-        if (date != null) {
-            final Format formatter = new SimpleDateFormat(DATE_FORMAT, LOCALE);
-            converted = formatter.format(date);
-        }
-
-        return converted;
+    public static String convertDate(final LocalDateTime date) {
+        return date != null
+                ? FORMATTER.format(date)
+                : null;
     }
 
-    public static Date convertDate(final String date) {
+    public static LocalDateTime convertDate(final String date) {
         final String checked = preCheck(date);
-        Date converted = null;
+        LocalDateTime converted = null;
 
         if (checked != null) {
             try {
-                final DateFormat formatter = new SimpleDateFormat(DATE_FORMAT, LOCALE);
-                converted = formatter.parse(checked);
-            } catch (ParseException e) {
+                converted = LocalDateTime.from(FORMATTER.parse(checked));
+            } catch (DateTimeParseException e) {
                 throw new StopTestException(e);
             }
         }

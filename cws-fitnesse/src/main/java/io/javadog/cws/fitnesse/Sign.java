@@ -20,7 +20,7 @@ import io.javadog.cws.api.requests.SignRequest;
 import io.javadog.cws.api.responses.SignResponse;
 import io.javadog.cws.fitnesse.callers.CallShare;
 import io.javadog.cws.fitnesse.utils.Converter;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 /**
  * <p>FitNesse Fixture for the CWS Sign feature.</p>
@@ -31,7 +31,7 @@ import java.util.Date;
 public final class Sign extends CwsRequest<SignResponse> {
 
     private byte[] data = null;
-    private Date expires = null;
+    private LocalDateTime expires = null;
 
     // =========================================================================
     // Request & Response Setters and Getters

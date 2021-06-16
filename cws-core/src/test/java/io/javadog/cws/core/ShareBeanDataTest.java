@@ -26,6 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import io.javadog.cws.api.common.Action;
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
+import io.javadog.cws.api.common.Utilities;
 import io.javadog.cws.api.dtos.Metadata;
 import io.javadog.cws.api.requests.FetchDataRequest;
 import io.javadog.cws.api.requests.ProcessDataRequest;
@@ -33,10 +34,9 @@ import io.javadog.cws.api.responses.FetchDataResponse;
 import io.javadog.cws.api.responses.ProcessDataResponse;
 import io.javadog.cws.core.enums.SanityStatus;
 import io.javadog.cws.core.setup.DatabaseSetup;
-import org.junit.jupiter.api.Test;
 import java.nio.charset.StandardCharsets;
-import java.util.Date;
 import java.util.UUID;
+import org.junit.jupiter.api.Test;
 
 /**
  * <p>Common test class for the Process & Fetch Data Services.</p>
@@ -213,7 +213,7 @@ final class ShareBeanDataTest extends DatabaseSetup {
 
         final ProcessDataResponse response = bean.processData(request);
         assertTrue(response.isOk());
-        falsifyChecksum(response, new Date(), SanityStatus.FAILED);
+        falsifyChecksum(response, Utilities.newDate(), SanityStatus.FAILED);
 
         // Now to the actual test - reading the data with invalid checksum
         final FetchDataRequest readRequest = prepareReadRequest(MEMBER_1, CIRCLE_1_ID, response.getDataId());

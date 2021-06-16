@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import io.javadog.cws.api.common.MemberRole;
 import io.javadog.cws.api.common.Utilities;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 
@@ -36,7 +36,7 @@ final class MemberTest {
         final String memberId = UUID.randomUUID().toString();
         final String accountName = "Member AccountName";
         final String publicKey = UUID.randomUUID().toString();
-        final Date added = new Date();
+        final LocalDateTime added = Utilities.newDate();
 
         final Member member = new Member();
         member.setMemberId(memberId);

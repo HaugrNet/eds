@@ -22,7 +22,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.javadog.cws.api.TestUtilities;
 import io.javadog.cws.api.common.Constants;
-import java.util.Date;
+import io.javadog.cws.api.common.Utilities;
+import java.time.LocalDateTime;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 
@@ -35,7 +36,7 @@ final class SignRequestTest {
     @Test
     void testClassFlow() {
         final byte[] data = { (byte) 1, (byte) 2, (byte) 3, (byte) 4, (byte) 5 };
-        final Date expires = new Date();
+        final LocalDateTime expires = Utilities.newDate();
 
         final SignRequest request = new SignRequest();
         request.setAccountName(Constants.ADMIN_ACCOUNT);

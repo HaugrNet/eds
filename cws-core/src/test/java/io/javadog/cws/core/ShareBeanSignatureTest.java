@@ -21,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.javadog.cws.api.common.ReturnCode;
+import io.javadog.cws.api.common.Utilities;
 import io.javadog.cws.api.requests.FetchSignatureRequest;
 import io.javadog.cws.api.requests.SignRequest;
 import io.javadog.cws.api.requests.VerifyRequest;
@@ -29,7 +30,6 @@ import io.javadog.cws.api.responses.SignResponse;
 import io.javadog.cws.api.responses.VerifyResponse;
 import io.javadog.cws.core.setup.DatabaseSetup;
 import org.junit.jupiter.api.Test;
-import java.util.Date;
 
 /**
  * <p>This Test Class, is testing the following Service Classes in one, as they
@@ -105,7 +105,7 @@ final class ShareBeanSignatureTest extends DatabaseSetup {
         final SignRequest signRequest = prepareRequest(SignRequest.class, MEMBER_1);
         signRequest.setData(data);
         // Let our new Signature expire in 5 minutes
-        signRequest.setExpires(new Date(new Date().getTime() + 300000L));
+        signRequest.setExpires(Utilities.newDate().plusMinutes(5));
         final SignResponse signResponse = bean.sign(signRequest);
         assertEquals(ReturnCode.SUCCESS.getCode(), signResponse.getReturnCode());
 
@@ -126,7 +126,7 @@ final class ShareBeanSignatureTest extends DatabaseSetup {
         final SignRequest signRequest = prepareRequest(SignRequest.class, MEMBER_1);
         signRequest.setData(data);
         // Let our new Signature expire in 5 minutes
-        signRequest.setExpires(new Date(new Date().getTime() + 300000L));
+        signRequest.setExpires(Utilities.newDate().plusMinutes(5));
         final SignResponse signResponse = bean.sign(signRequest);
         assertEquals(ReturnCode.SUCCESS.getCode(), signResponse.getReturnCode());
 
@@ -143,7 +143,7 @@ final class ShareBeanSignatureTest extends DatabaseSetup {
 
         final SignRequest signRequest = prepareRequest(SignRequest.class, MEMBER_1);
         signRequest.setData(data);
-        signRequest.setExpires(new Date());
+        signRequest.setExpires(Utilities.newDate());
         final SignResponse signResponse = bean.sign(signRequest);
         assertEquals(ReturnCode.SUCCESS.getCode(), signResponse.getReturnCode());
 

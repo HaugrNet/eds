@@ -21,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.javadog.cws.api.common.ReturnCode;
+import io.javadog.cws.api.common.Utilities;
 import io.javadog.cws.api.responses.ProcessDataResponse;
 import io.javadog.cws.core.enums.SanityStatus;
 import io.javadog.cws.core.enums.StandardSetting;
@@ -28,14 +29,14 @@ import io.javadog.cws.core.exceptions.CWSException;
 import io.javadog.cws.core.model.Settings;
 import io.javadog.cws.core.model.entities.DataEntity;
 import io.javadog.cws.core.services.ProcessDataService;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.util.Date;
-import java.util.List;
+import io.javadog.cws.core.setup.DatabaseSetup;
 import io.javadog.cws.core.setup.fakes.FakeEntityManager;
 import io.javadog.cws.core.setup.fakes.FakeTimer;
 import io.javadog.cws.core.setup.fakes.FakeTimerService;
-import io.javadog.cws.core.setup.DatabaseSetup;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.time.LocalDateTime;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -231,18 +232,18 @@ final class SanitizerBeanTest extends DatabaseSetup {
 
     private void prepareInvalidData() {
         final ProcessDataService service = new ProcessDataService(settings, entityManager);
-        timeWarpChecksum(service.perform(prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "Valid Data1", 1048576)), new Date(1L));
-        falsifyChecksum(service.perform(prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "Invalidated Data1", 1048576)), new Date(2L), SanityStatus.OK);
-        falsifyChecksum(service.perform(prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "Invalidated Data2", 524288)), new Date(), SanityStatus.OK);
-        timeWarpChecksum(service.perform(prepareAddDataRequest(MEMBER_1, CIRCLE_2_ID, "Valid Data2", 1048576)), new Date(3L));
-        falsifyChecksum(service.perform(prepareAddDataRequest(MEMBER_1, CIRCLE_2_ID, "Invalidated Data3", 1048576)), new Date(4L), SanityStatus.OK);
-        falsifyChecksum(service.perform(prepareAddDataRequest(MEMBER_1, CIRCLE_2_ID, "Invalidated Data4", 524288)), new Date(), SanityStatus.OK);
-        timeWarpChecksum(service.perform(prepareAddDataRequest(MEMBER_4, CIRCLE_3_ID, "Valid Data3", 1048576)), new Date(5L));
-        falsifyChecksum(service.perform(prepareAddDataRequest(MEMBER_4, CIRCLE_3_ID, "Invalidated Data5", 1048576)), new Date(6L), SanityStatus.OK);
-        falsifyChecksum(service.perform(prepareAddDataRequest(MEMBER_4, CIRCLE_3_ID, "Invalidated Data6", 524288)), new Date(), SanityStatus.OK);
+        timeWarpChecksum(service.perform(prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "Valid Data1", 1048576)), Utilities.newDate(1L));
+        falsifyChecksum(service.perform(prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "Invalidated Data1", 1048576)), Utilities.newDate(2L), SanityStatus.OK);
+        falsifyChecksum(service.perform(prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "Invalidated Data2", 524288)), Utilities.newDate(), SanityStatus.OK);
+        timeWarpChecksum(service.perform(prepareAddDataRequest(MEMBER_1, CIRCLE_2_ID, "Valid Data2", 1048576)), Utilities.newDate(3L));
+        falsifyChecksum(service.perform(prepareAddDataRequest(MEMBER_1, CIRCLE_2_ID, "Invalidated Data3", 1048576)), Utilities.newDate(4L), SanityStatus.OK);
+        falsifyChecksum(service.perform(prepareAddDataRequest(MEMBER_1, CIRCLE_2_ID, "Invalidated Data4", 524288)), Utilities.newDate(), SanityStatus.OK);
+        timeWarpChecksum(service.perform(prepareAddDataRequest(MEMBER_4, CIRCLE_3_ID, "Valid Data3", 1048576)), Utilities.newDate(5L));
+        falsifyChecksum(service.perform(prepareAddDataRequest(MEMBER_4, CIRCLE_3_ID, "Invalidated Data5", 1048576)), Utilities.newDate(6L), SanityStatus.OK);
+        falsifyChecksum(service.perform(prepareAddDataRequest(MEMBER_4, CIRCLE_3_ID, "Invalidated Data6", 524288)), Utilities.newDate(), SanityStatus.OK);
     }
 
-    private void timeWarpChecksum(final ProcessDataResponse response, final Date sanityCheck) {
+    private void timeWarpChecksum(final ProcessDataResponse response, final LocalDateTime sanityCheck) {
         // Now to the tricky part. We wish to test that the checksum is invalid,
         // and thus resulting in a correct error message. As the checksum is
         // controlled internally by CWS, it cannot be altered (rightfully) via

@@ -39,8 +39,7 @@ final class CommonDaoTest extends DatabaseSetup {
 
     @Test
     void testInvalidDataRead() {
-        // Creating a Query, which will attempt to read data from a record
-        // which doesn't exist.
+        // Creating a Query, which will attempt to read data from a non-existing record
         final Query query = entityManager.createNativeQuery("select * from versions");
 
         final CWSException cause = assertThrows(CWSException.class, () -> CommonDao.findList(query));

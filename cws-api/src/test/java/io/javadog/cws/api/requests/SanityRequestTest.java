@@ -22,7 +22,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.javadog.cws.api.TestUtilities;
 import io.javadog.cws.api.common.Constants;
-import java.util.Date;
+import io.javadog.cws.api.common.Utilities;
+import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
@@ -36,7 +37,7 @@ final class SanityRequestTest {
     @Test
     void testClassFlow() {
         final String circleId = UUID.randomUUID().toString();
-        final Date since = new Date();
+        final LocalDateTime since = Utilities.newDate();
 
         final SanityRequest sanityRequest = new SanityRequest();
         sanityRequest.setAccountName(Constants.ADMIN_ACCOUNT);

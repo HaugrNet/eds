@@ -16,15 +16,12 @@
  */
 package io.javadog.cws.core.model.entities;
 
-import io.javadog.cws.api.common.Utilities;
-import java.util.Date;
+import java.time.LocalDateTime;
 import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 
 /**
  * <p>CWS Entities contain some commonalities, this Class acts as a Super Class
@@ -41,13 +38,11 @@ public class CWSEntity {
     @Column(name = "id", unique = true, nullable = false, updatable = false)
     private Long id = null;
 
-    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "altered", nullable = false)
-    private Date altered = null;
+    private LocalDateTime altered = null;
 
-    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "added", nullable = false, updatable = false)
-    private Date added = null;
+    private LocalDateTime added = null;
 
     // =========================================================================
     // Entity Setters & Getters
@@ -61,19 +56,19 @@ public class CWSEntity {
         return id;
     }
 
-    public void setAltered(final Date modified) {
-        this.altered = Utilities.copy(modified);
+    public void setAltered(final LocalDateTime modified) {
+        this.altered = modified;
     }
 
-    public Date getAltered() {
-        return Utilities.copy(altered);
+    public LocalDateTime getAltered() {
+        return altered;
     }
 
-    public void setAdded(final Date created) {
-        this.added = Utilities.copy(created);
+    public void setAdded(final LocalDateTime created) {
+        this.added = created;
     }
 
-    public Date getAdded() {
-        return Utilities.copy(added);
+    public LocalDateTime getAdded() {
+        return added;
     }
 }

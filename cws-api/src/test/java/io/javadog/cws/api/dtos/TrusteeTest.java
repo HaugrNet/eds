@@ -21,7 +21,10 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import io.javadog.cws.api.common.TrustLevel;
 import io.javadog.cws.api.common.Utilities;
-import java.util.Date;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.Set;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 
@@ -33,14 +36,17 @@ final class TrusteeTest {
 
     @Test
     void testClassFlow() {
+        for (final String zoneId : ZoneId.getAvailableZoneIds()) {
+            System.out.println(zoneId);
+        }
         final String memberId = UUID.randomUUID().toString();
         final String accountName = UUID.randomUUID().toString();
         final String publicKey = UUID.randomUUID().toString();
         final String circleId = UUID.randomUUID().toString();
         final String circleName = UUID.randomUUID().toString();
         final TrustLevel trustLevel = TrustLevel.WRITE;
-        final Date lastModified = new Date(456L);
-        final Date added = new Date(123L);
+        final LocalDateTime lastModified = Utilities.newDate(456L);
+        final LocalDateTime added = Utilities.newDate(123L);
 
         final Trustee trustee = new Trustee();
         trustee.setMemberId(memberId);

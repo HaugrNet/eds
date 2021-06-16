@@ -19,8 +19,9 @@ package io.javadog.cws.core.model.entities;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
+import io.javadog.cws.api.common.Utilities;
 import io.javadog.cws.core.setup.DatabaseSetup;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
@@ -36,7 +37,7 @@ final class SignatureEntityTest extends DatabaseSetup {
         final MemberEntity member = find(MemberEntity.class, 6L);
         final String checksum = UUID.randomUUID().toString();
         final String publicKey = UUID.randomUUID().toString();
-        final Date expires = new Date();
+        final LocalDateTime expires = Utilities.newDate();
         final SignatureEntity entity = new SignatureEntity();
         entity.setMember(member);
         entity.setPublicKey(publicKey);

@@ -27,7 +27,6 @@ import com.google.gson.JsonSerializer;
 import com.google.gson.JsonSyntaxException;
 import io.javadog.cws.api.requests.Authentication;
 import io.javadog.cws.api.responses.CwsResponse;
-import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.net.URI;
@@ -37,8 +36,10 @@ import java.net.http.HttpResponse;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.Base64;
-import java.util.Date;
+import javax.ws.rs.core.MediaType;
 
 /**
  * <p>Common functionality for the Gson based CWS REST Clients. It handles the
@@ -98,7 +99,7 @@ public class GsonRestClient {
 
     private static Gson createGsonInstance() {
         final GsonBuilder builder = new GsonBuilder()
-                .registerTypeAdapter(Date.class, new DateAdapter())
+                .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
                 .registerTypeAdapter(byte[].class, new ByteArrayAdapter());
 
         return builder.create();
@@ -107,29 +108,29 @@ public class GsonRestClient {
     /**
      * GSon Adapter to handle Dates.
      */
-    private static class DateAdapter implements JsonSerializer<Date>, JsonDeserializer<Date> {
+    static class LocalDateTimeAdapter implements JsonSerializer<LocalDateTime>, JsonDeserializer<LocalDateTime> {
 
         /**
          * {@inheritDoc}
          */
         @Override
-        public Date deserialize(final JsonElement json, final Type typeOfT, final JsonDeserializationContext context) {
-            return Date.from(Instant.ofEpochMilli(Long.parseLong(json.getAsJsonPrimitive().getAsString())));
+        public LocalDateTime deserialize(final JsonElement json, final Type typeOfT, final JsonDeserializationContext context) {
+            return LocalDateTime.ofInstant(Instant.ofEpochMilli(Long.parseLong(json.getAsJsonPrimitive().getAsString())), ZoneOffset.UTC);
         }
 
         /**
          * {@inheritDoc}
          */
         @Override
-        public JsonElement serialize(final Date src, final Type typeOfSrc, final JsonSerializationContext context) {
-            return new JsonPrimitive(String.valueOf(src.getTime()));
+        public JsonElement serialize(final LocalDateTime src, final Type typeOfSrc, final JsonSerializationContext context) {
+            return new JsonPrimitive(src.toInstant(ZoneOffset.UTC).toEpochMilli());
         }
     }
 
     /**
      * GSon Adapter to handle Byte Arrays.
      */
-    private static class ByteArrayAdapter implements JsonSerializer<byte[]>, JsonDeserializer<byte[]> {
+    static class ByteArrayAdapter implements JsonSerializer<byte[]>, JsonDeserializer<byte[]> {
 
         /**
          * {@inheritDoc}

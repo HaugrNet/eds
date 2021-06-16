@@ -21,15 +21,15 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
+import io.javadog.cws.api.common.Utilities;
 import io.javadog.cws.api.requests.FetchDataRequest;
 import io.javadog.cws.api.requests.ProcessDataRequest;
 import io.javadog.cws.api.requests.SanityRequest;
 import io.javadog.cws.api.responses.FetchDataResponse;
 import io.javadog.cws.api.responses.ProcessDataResponse;
 import io.javadog.cws.api.responses.SanityResponse;
-import io.javadog.cws.core.setup.DatabaseSetup;
 import io.javadog.cws.core.enums.SanityStatus;
-import java.util.Date;
+import io.javadog.cws.core.setup.DatabaseSetup;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -53,7 +53,7 @@ final class ManagementBeanSanityTest extends DatabaseSetup {
         prepareInvalidData();
         final SanityRequest request = prepareRequest(SanityRequest.class, Constants.ADMIN_ACCOUNT);
         request.setCircleId(CIRCLE_3_ID);
-        request.setSince(new Date(10000L));
+        request.setSince(Utilities.newDate(10000L));
         final ManagementBean bean = prepareManagementBean();
         final SanityResponse response = bean.sanity(request);
         assertTrue(response.isOk());
@@ -98,7 +98,7 @@ final class ManagementBeanSanityTest extends DatabaseSetup {
 
         final ProcessDataResponse response = shareBean.processData(dataRequest);
         assertTrue(response.isOk());
-        falsifyChecksum(response, new Date(), SanityStatus.FAILED);
+        falsifyChecksum(response, Utilities.newDate(), SanityStatus.FAILED);
 
         // Now to the actual test - reading the data with invalid checksum
         final FetchDataRequest readDataRequest = prepareReadRequest(response.getDataId());
@@ -121,12 +121,12 @@ final class ManagementBeanSanityTest extends DatabaseSetup {
 
     private void prepareInvalidData() {
         final ShareBean bean = prepareShareBean();
-        falsifyChecksum(bean.processData(prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "Invalidated Data1", 524288)), new Date(10L), SanityStatus.FAILED);
-        falsifyChecksum(bean.processData(prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "Invalidated Data2", 1048576)), new Date(), SanityStatus.FAILED);
-        falsifyChecksum(bean.processData(prepareAddDataRequest(MEMBER_1, CIRCLE_2_ID, "Invalidated Data3", 524288)), new Date(10L), SanityStatus.FAILED);
-        falsifyChecksum(bean.processData(prepareAddDataRequest(MEMBER_1, CIRCLE_2_ID, "Invalidated Data4", 1048576)), new Date(), SanityStatus.FAILED);
-        falsifyChecksum(bean.processData(prepareAddDataRequest(MEMBER_4, CIRCLE_3_ID, "Invalidated Data5", 524288)), new Date(10L), SanityStatus.FAILED);
-        falsifyChecksum(bean.processData(prepareAddDataRequest(MEMBER_4, CIRCLE_3_ID, "Invalidated Data6", 1048576)), new Date(), SanityStatus.FAILED);
+        falsifyChecksum(bean.processData(prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "Invalidated Data1", 524288)), Utilities.newDate(10L), SanityStatus.FAILED);
+        falsifyChecksum(bean.processData(prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "Invalidated Data2", 1048576)), Utilities.newDate(), SanityStatus.FAILED);
+        falsifyChecksum(bean.processData(prepareAddDataRequest(MEMBER_1, CIRCLE_2_ID, "Invalidated Data3", 524288)), Utilities.newDate(10L), SanityStatus.FAILED);
+        falsifyChecksum(bean.processData(prepareAddDataRequest(MEMBER_1, CIRCLE_2_ID, "Invalidated Data4", 1048576)), Utilities.newDate(), SanityStatus.FAILED);
+        falsifyChecksum(bean.processData(prepareAddDataRequest(MEMBER_4, CIRCLE_3_ID, "Invalidated Data5", 524288)), Utilities.newDate(10L), SanityStatus.FAILED);
+        falsifyChecksum(bean.processData(prepareAddDataRequest(MEMBER_4, CIRCLE_3_ID, "Invalidated Data6", 1048576)), Utilities.newDate(), SanityStatus.FAILED);
     }
 
     private static FetchDataRequest prepareReadRequest(final String dataId) {

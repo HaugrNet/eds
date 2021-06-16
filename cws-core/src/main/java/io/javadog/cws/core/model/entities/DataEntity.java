@@ -19,7 +19,7 @@ package io.javadog.cws.core.model.entities;
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.Utilities;
 import io.javadog.cws.core.enums.SanityStatus;
-import java.util.Date;
+import java.time.LocalDateTime;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -30,8 +30,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 
 /**
  * <p>CWS Data Entity, maps the Data table from the Database.</p>
@@ -100,9 +98,8 @@ public class DataEntity extends CWSEntity {
     @Column(name = "sanity_status", nullable = false, length = Constants.MAX_STRING_LENGTH)
     private SanityStatus sanityStatus = null;
 
-    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "sanity_checked", nullable = false)
-    private Date sanityChecked = null;
+    private LocalDateTime sanityChecked = null;
 
     // =========================================================================
     // Entity Setters & Getters
@@ -156,11 +153,11 @@ public class DataEntity extends CWSEntity {
         return sanityStatus;
     }
 
-    public void setSanityChecked(final Date sanityChecked) {
-        this.sanityChecked = Utilities.copy(sanityChecked);
+    public void setSanityChecked(final LocalDateTime sanityChecked) {
+        this.sanityChecked = sanityChecked;
     }
 
-    public Date getSanityChecked() {
-        return Utilities.copy(sanityChecked);
+    public LocalDateTime getSanityChecked() {
+        return sanityChecked;
     }
 }

@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import io.javadog.cws.api.common.Utilities;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 
@@ -33,10 +33,10 @@ final class SignatureTest {
     @Test
     void testClassFlow() {
         final String checksum = UUID.randomUUID().toString();
-        final Date expires = new Date(123L);
+        final LocalDateTime expires = Utilities.newDate(123L);
         final Long verifications = 1L;
-        final Date added = new Date(321L);
-        final Date lastVerification = new Date();
+        final LocalDateTime added = Utilities.newDate(321L);
+        final LocalDateTime lastVerification = Utilities.newDate();
 
         final Signature signature = new Signature();
         signature.setChecksum(checksum);

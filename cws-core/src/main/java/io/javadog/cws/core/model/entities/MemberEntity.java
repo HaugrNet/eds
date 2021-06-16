@@ -18,17 +18,14 @@ package io.javadog.cws.core.model.entities;
 
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.MemberRole;
-import io.javadog.cws.api.common.Utilities;
 import io.javadog.cws.core.enums.KeyAlgorithm;
-import java.util.Date;
+import java.time.LocalDateTime;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 
 /**
  * <p>CWS Member Entity, maps the Member table from the Database.</p>
@@ -100,9 +97,8 @@ public class MemberEntity extends Externable {
     @Column(name = "session_crypto", length = 16384)
     private String sessionCrypto = null;
 
-    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "session_expire")
-    private Date sessionExpire = null;
+    private LocalDateTime sessionExpire = null;
 
     // =========================================================================
     // Entity Setters & Getters
@@ -188,11 +184,11 @@ public class MemberEntity extends Externable {
         return sessionCrypto;
     }
 
-    public void setSessionExpire(final Date sessionExpire) {
-        this.sessionExpire = Utilities.copy(sessionExpire);
+    public void setSessionExpire(final LocalDateTime sessionExpire) {
+        this.sessionExpire = sessionExpire;
     }
 
-    public Date getSessionExpire() {
-        return Utilities.copy(sessionExpire);
+    public LocalDateTime getSessionExpire() {
+        return sessionExpire;
     }
 }

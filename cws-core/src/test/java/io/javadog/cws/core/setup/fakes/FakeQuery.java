@@ -16,13 +16,13 @@
  */
 package io.javadog.cws.core.setup.fakes;
 
+import java.util.Date;
 import javax.persistence.FlushModeType;
 import javax.persistence.LockModeType;
 import javax.persistence.Parameter;
 import javax.persistence.Query;
 import javax.persistence.TemporalType;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;

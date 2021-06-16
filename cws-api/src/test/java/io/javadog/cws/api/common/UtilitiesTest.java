@@ -21,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
+import java.time.ZonedDateTime;
 import java.util.Date;
 import org.junit.jupiter.api.Test;
 
@@ -29,34 +30,6 @@ import org.junit.jupiter.api.Test;
  * @since CWS 1.2
  */
 final class UtilitiesTest {
-
-    @Test
-    void testNewDate() {
-        final Date date1 = new Date();
-        final Date copy1 = Utilities.newDate(date1.getTime());
-        assertEquals(date1, copy1);
-        assertNotSame(date1, copy1);
-
-        final Date date2 = Utilities.newDate();
-        final Date copy2 = Utilities.newDate(date2.getTime());
-        assertEquals(date2, copy2);
-        assertNotSame(date2, copy2);
-    }
-
-    @Test
-    void testCopyDate() {
-        final Date date1 = new Date();
-        final Date copy1 = Utilities.copy(date1);
-        assertEquals(date1, copy1);
-        assertNotSame(date1, copy1);
-
-        final Date date2 = Utilities.newDate();
-        final Date copy2 = Utilities.copy(date2);
-        assertEquals(date2, copy2);
-        assertNotSame(date2, copy2);
-
-        assertNull(Utilities.copy((Date) null));
-    }
 
     @Test
     void testCopyBytes() {

@@ -19,12 +19,12 @@ package io.javadog.cws.api.requests;
 import io.javadog.cws.api.common.ByteArrayAdapter;
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.Utilities;
+import java.time.LocalDateTime;
+import java.util.Map;
 import javax.json.bind.annotation.JsonbDateFormat;
 import javax.json.bind.annotation.JsonbProperty;
 import javax.json.bind.annotation.JsonbPropertyOrder;
 import javax.json.bind.annotation.JsonbTypeAdapter;
-import java.util.Date;
-import java.util.Map;
 
 /**
  * <p>This Object is needed, when a new Signature is being issued. The Object
@@ -49,7 +49,7 @@ public final class SignRequest extends Authentication {
 
     @JsonbProperty(value = Constants.FIELD_EXPIRES, nillable = true)
     @JsonbDateFormat(Constants.JSON_DATE_FORMAT)
-    private Date expires = null;
+    private LocalDateTime expires = null;
 
     // =========================================================================
     // Standard Setters & Getters
@@ -63,12 +63,12 @@ public final class SignRequest extends Authentication {
         return Utilities.copy(data);
     }
 
-    public void setExpires(final Date expires) {
-        this.expires = Utilities.copy(expires);
+    public void setExpires(final LocalDateTime expires) {
+        this.expires = expires;
     }
 
-    public Date getExpires() {
-        return Utilities.copy(expires);
+    public LocalDateTime getExpires() {
+        return expires;
     }
 
     // =========================================================================

@@ -16,15 +16,12 @@
  */
 package io.javadog.cws.core.model.entities;
 
-import io.javadog.cws.api.common.Utilities;
+import java.time.LocalDateTime;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-import java.util.Date;
 
 /**
  * <p>CWS Version Entity, maps the Version table from the Database.</p>
@@ -52,9 +49,8 @@ public class VersionEntity {
     @Column(name = "db_vendor", nullable = false, updatable = false, length = 25)
     private String dbVendor = null;
 
-    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "installed", nullable = false, updatable = false)
-    private Date installed = null;
+    private LocalDateTime installed = null;
 
     // =========================================================================
     // Entity Setters & Getters
@@ -92,11 +88,11 @@ public class VersionEntity {
         return dbVendor;
     }
 
-    public void setInstalled(final Date installed) {
-        this.installed = Utilities.copy(installed);
+    public void setInstalled(final LocalDateTime installed) {
+        this.installed = installed;
     }
 
-    public Date getInstalled() {
-        return Utilities.copy(installed);
+    public LocalDateTime getInstalled() {
+        return installed;
     }
 }

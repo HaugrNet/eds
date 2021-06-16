@@ -18,12 +18,11 @@ package io.javadog.cws.api.dtos;
 
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.MemberRole;
-import io.javadog.cws.api.common.Utilities;
+import java.io.Serializable;
+import java.time.LocalDateTime;
 import javax.json.bind.annotation.JsonbDateFormat;
 import javax.json.bind.annotation.JsonbProperty;
 import javax.json.bind.annotation.JsonbPropertyOrder;
-import java.io.Serializable;
-import java.util.Date;
 
 /**
  * <p>The Member Object, is used as Accounts in CWS. The Object consists of an
@@ -64,7 +63,7 @@ public final class Member implements Serializable {
 
     @JsonbProperty(value = Constants.FIELD_ADDED, nillable = true)
     @JsonbDateFormat(Constants.JSON_DATE_FORMAT)
-    private Date added = null;
+    private LocalDateTime added = null;
 
     // =========================================================================
     // Standard Setters & Getters
@@ -102,12 +101,12 @@ public final class Member implements Serializable {
         return publicKey;
     }
 
-    public void setAdded(final Date added) {
-        this.added = Utilities.copy(added);
+    public void setAdded(final LocalDateTime added) {
+        this.added = added;
     }
 
-    public Date getAdded() {
-        return Utilities.copy(added);
+    public LocalDateTime getAdded() {
+        return added;
     }
 
     // =========================================================================

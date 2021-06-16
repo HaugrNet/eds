@@ -303,19 +303,19 @@ final class ManagementBeanTrusteeTest extends DatabaseSetup {
         assertEquals(CIRCLE_1_ID, trustee1.getCircleId());
         assertEquals(MEMBER_1_ID, trustee1.getMemberId());
         assertEquals(TrustLevel.ADMIN, trustee1.getTrustLevel());
-        assertFalse(trustee1.getChanged().before(trustee1.getAdded()));
+        assertFalse(trustee1.getChanged().isBefore(trustee1.getAdded()));
 
         final Trustee trustee2 = response.getTrustees().get(1);
         assertEquals(CIRCLE_1_ID, trustee2.getCircleId());
         assertEquals(MEMBER_2_ID, trustee2.getMemberId());
         assertEquals(TrustLevel.WRITE, trustee2.getTrustLevel());
-        assertFalse(trustee2.getChanged().before(trustee2.getAdded()));
+        assertFalse(trustee2.getChanged().isBefore(trustee2.getAdded()));
 
         final Trustee trustee3 = response.getTrustees().get(2);
         assertEquals(CIRCLE_1_ID, trustee3.getCircleId());
         assertEquals(MEMBER_3_ID, trustee3.getMemberId());
         assertEquals(TrustLevel.READ, trustee3.getTrustLevel());
-        assertFalse(trustee3.getChanged().before(trustee3.getAdded()));
+        assertFalse(trustee3.getChanged().isBefore(trustee3.getAdded()));
     }
 
     @Test

@@ -18,12 +18,11 @@ package io.javadog.cws.api.dtos;
 
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.TrustLevel;
-import io.javadog.cws.api.common.Utilities;
+import java.io.Serializable;
+import java.time.LocalDateTime;
 import javax.json.bind.annotation.JsonbDateFormat;
 import javax.json.bind.annotation.JsonbProperty;
 import javax.json.bind.annotation.JsonbPropertyOrder;
-import java.io.Serializable;
-import java.util.Date;
 
 /**
  * <p>A Trustee, is a Member of a Circle, with a granted Trust Level.</p>
@@ -69,11 +68,11 @@ public final class Trustee implements Serializable {
 
     @JsonbProperty(value = Constants.FIELD_ADDED, nillable = true)
     @JsonbDateFormat(Constants.JSON_DATE_FORMAT)
-    private Date added = null;
+    private LocalDateTime added = null;
 
     @JsonbProperty(value = Constants.FIELD_CHANGED, nillable = true)
     @JsonbDateFormat(Constants.JSON_DATE_FORMAT)
-    private Date changed = null;
+    private LocalDateTime changed = null;
 
     // =========================================================================
     // Standard Setters & Getters
@@ -127,20 +126,20 @@ public final class Trustee implements Serializable {
         return trustLevel;
     }
 
-    public void setAdded(final Date added) {
-        this.added = Utilities.copy(added);
+    public void setAdded(final LocalDateTime added) {
+        this.added = added;
     }
 
-    public Date getAdded() {
-        return Utilities.copy(added);
+    public LocalDateTime getAdded() {
+        return added;
     }
 
-    public void setChanged(final Date changed) {
-        this.changed = Utilities.copy(changed);
+    public void setChanged(final LocalDateTime changed) {
+        this.changed = changed;
     }
 
-    public Date getChanged() {
-        return Utilities.copy(changed);
+    public LocalDateTime getChanged() {
+        return changed;
     }
 
     // =========================================================================

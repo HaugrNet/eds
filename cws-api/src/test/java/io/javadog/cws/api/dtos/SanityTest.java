@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import io.javadog.cws.api.common.Utilities;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 
@@ -33,7 +33,7 @@ final class SanityTest {
     @Test
     void testClassFlow() {
         final String dataId = UUID.randomUUID().toString();
-        final Date changed = new Date();
+        final LocalDateTime changed = Utilities.newDate();
 
         final Sanity sanity = new Sanity();
         sanity.setDataId(dataId);

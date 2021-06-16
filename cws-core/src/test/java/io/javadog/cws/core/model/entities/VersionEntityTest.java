@@ -19,9 +19,9 @@ package io.javadog.cws.core.model.entities;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import io.javadog.cws.core.setup.DatabaseSetup;
+import io.javadog.cws.api.common.Utilities;
 import io.javadog.cws.core.model.CommonDao;
-import java.util.Date;
+import io.javadog.cws.core.setup.DatabaseSetup;
 import java.util.List;
 import javax.persistence.PersistenceException;
 import javax.persistence.Query;
@@ -50,7 +50,7 @@ final class VersionEntityTest extends DatabaseSetup {
         entity.setCwsVersion("99.99.99");
         entity.setDbVendor("SuperDB");
         entity.setSchemaVersion(9999);
-        entity.setInstalled(new Date());
+        entity.setInstalled(Utilities.newDate());
 
         try {
             entityManager.persist(entity);

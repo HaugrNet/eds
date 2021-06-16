@@ -16,17 +16,14 @@
  */
 package io.javadog.cws.core.model.entities;
 
-import io.javadog.cws.api.common.Utilities;
 import io.javadog.cws.core.enums.KeyAlgorithm;
 import io.javadog.cws.core.enums.Status;
-import java.util.Date;
+import java.time.LocalDateTime;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 
 /**
  * <p>CWS Key Entity, maps the Key table from the Database.</p>
@@ -46,9 +43,8 @@ public class KeyEntity extends CWSEntity {
     @Column(name = "status", nullable = false)
     private Status status = null;
 
-    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "expires", updatable = false)
-    private Date expires = null;
+    private LocalDateTime expires = null;
 
     @Column(name = "grace_period", updatable = false)
     private Integer gracePeriod = null;
@@ -73,12 +69,12 @@ public class KeyEntity extends CWSEntity {
         return status;
     }
 
-    public void setExpires(final Date expires) {
-        this.expires = Utilities.copy(expires);
+    public void setExpires(final LocalDateTime expires) {
+        this.expires = expires;
     }
 
-    public Date getExpires() {
-        return Utilities.copy(expires);
+    public LocalDateTime getExpires() {
+        return expires;
     }
 
     public void setGracePeriod(final Integer gracePeriod) {

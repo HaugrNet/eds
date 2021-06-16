@@ -21,6 +21,7 @@ import io.javadog.cws.api.common.CredentialType;
 import io.javadog.cws.api.common.MemberRole;
 import io.javadog.cws.api.common.ReturnCode;
 import io.javadog.cws.api.common.TrustLevel;
+import io.javadog.cws.api.common.Utilities;
 import io.javadog.cws.api.requests.ProcessMemberRequest;
 import io.javadog.cws.api.responses.ProcessMemberResponse;
 import io.javadog.cws.core.enums.KeyAlgorithm;
@@ -39,11 +40,8 @@ import io.javadog.cws.core.model.MemberDao;
 import io.javadog.cws.core.model.Settings;
 import io.javadog.cws.core.model.entities.MemberEntity;
 import io.javadog.cws.core.model.entities.TrusteeEntity;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.Base64;
-import java.util.Date;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
@@ -204,21 +202,13 @@ public final class ProcessMemberService extends Serviceable<MemberDao, ProcessMe
 
         member.setSessionChecksum(checksum);
         member.setSessionCrypto(privateKey);
-        member.setSessionExpire(calculateSessionExpiration());
+        member.setSessionExpire(Utilities.newDate().plusMinutes(settings.getSessionTimeout()));
         dao.persist(member);
 
         // Key's no longer being used, must be destroyed.
         key.destroy();
 
         return new ProcessMemberResponse(theMember(member) + " has successfully logged in.");
-    }
-
-    private Date calculateSessionExpiration() {
-        return Date.from(LocalDateTime
-                .now()
-                .plusMinutes(settings.getSessionTimeout())
-                .atZone(ZoneId.systemDefault())
-                .toInstant());
     }
 
     private ProcessMemberResponse logoutMember() {

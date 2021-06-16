@@ -25,10 +25,10 @@ import io.javadog.cws.core.enums.Permission;
 import io.javadog.cws.core.model.SanityDao;
 import io.javadog.cws.core.model.Settings;
 import io.javadog.cws.core.model.entities.DataEntity;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 import javax.persistence.EntityManager;
 
@@ -62,7 +62,7 @@ public final class SanityService extends Serviceable<SanityDao, SanityResponse, 
     }
 
     private List<DataEntity> findRecords(final SanityRequest request) {
-        final Date since = (request.getSince() == null) ? Utilities.newDate(0L) : request.getSince();
+        final LocalDateTime since = (request.getSince() == null) ? Utilities.newDate(0L) : request.getSince();
         final List<DataEntity> found;
 
         if (request.getCircleId() != null) {

@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import io.javadog.cws.api.common.Utilities;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 
@@ -35,7 +35,7 @@ final class CircleTest {
         final String id = UUID.randomUUID().toString();
         final String name = "Circle Name";
         final String key = UUID.randomUUID().toString();
-        final Date date = new Date();
+        final LocalDateTime date = Utilities.newDate();
 
         final Circle circle = new Circle();
         circle.setCircleId(id);

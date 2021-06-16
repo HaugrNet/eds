@@ -21,6 +21,7 @@ import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.CredentialType;
 import io.javadog.cws.api.common.MemberRole;
 import io.javadog.cws.api.common.ReturnCode;
+import io.javadog.cws.api.common.Utilities;
 import io.javadog.cws.api.requests.Authentication;
 import io.javadog.cws.api.requests.ProcessDataRequest;
 import io.javadog.cws.api.responses.ProcessDataResponse;
@@ -51,7 +52,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.security.SecureRandom;
 import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.Locale;
 import java.util.UUID;
 import java.util.concurrent.ThreadFactory;
@@ -59,8 +60,12 @@ import java.util.logging.LogManager;
 import java.util.logging.Logger;
 import javax.annotation.Resource;
 import javax.ejb.TimerService;
-import javax.persistence.*;
-
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityTransaction;
+import javax.persistence.Persistence;
+import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 
@@ -202,8 +207,8 @@ public class DatabaseSetup {
         entity.setPublicKey(Crypto.armoringPublicKey(keyPair.getPublic().getKey()));
         entity.setPrivateKey(Crypto.armoringPrivateKey(secretKey, keyPair.getPrivate().getKey()));
         entity.setMemberRole(role);
-        entity.setAltered(new Date());
-        entity.setAdded(new Date());
+        entity.setAltered(Utilities.newDate());
+        entity.setAdded(Utilities.newDate());
 
         return entity;
     }
@@ -306,7 +311,7 @@ public class DatabaseSetup {
         return dao.find(cwsEntity, id);
     }
 
-    protected String toString(final Date date) {
+    protected String toString(final LocalDateTime date) {
         String str = null;
 
         if (date != null) {
@@ -326,7 +331,7 @@ public class DatabaseSetup {
      * @param sanityCheck The timestamp for the last sanity check
      * @param status      The Sanity Status to use
      */
-    protected void falsifyChecksum(final ProcessDataResponse response, final Date sanityCheck, final SanityStatus status) {
+    protected void falsifyChecksum(final ProcessDataResponse response, final LocalDateTime sanityCheck, final SanityStatus status) {
         // Now to the tricky part. We wish to test that the checksum is invalid,
         // and thus resulting in a correct error message. As the checksum is
         // controlled internally by CWS, it cannot be altered (rightfully) via

@@ -20,7 +20,7 @@ import io.javadog.cws.api.requests.SanityRequest;
 import io.javadog.cws.api.responses.SanityResponse;
 import io.javadog.cws.fitnesse.callers.CallManagement;
 import io.javadog.cws.fitnesse.utils.Converter;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 /**
  * <p>FitNesse Fixture for the CWS Sanitized feature.</p>
@@ -31,7 +31,7 @@ import java.util.Date;
 public final class Sanitized extends CwsRequest<SanityResponse> {
 
     private String circleId = null;
-    private Date since = null;
+    private LocalDateTime since = null;
 
     // =========================================================================
     // Request & Response Setters and Getters

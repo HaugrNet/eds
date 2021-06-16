@@ -21,10 +21,11 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
+import io.javadog.cws.api.common.Utilities;
 import io.javadog.cws.core.setup.DatabaseSetup;
 import io.javadog.cws.core.enums.Status;
 import io.javadog.cws.core.model.Settings;
-import java.util.Date;
+import java.time.LocalDateTime;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -39,7 +40,7 @@ final class KeyEntityTest extends DatabaseSetup {
         final KeyEntity key = new KeyEntity();
         key.setAlgorithm(mySettings.getSymmetricAlgorithm());
         key.setStatus(Status.ACTIVE);
-        key.setExpires(new Date());
+        key.setExpires(Utilities.newDate());
         key.setGracePeriod(3);
         persistAndDetach(key);
         assertNotNull(key.getId());
@@ -48,7 +49,7 @@ final class KeyEntityTest extends DatabaseSetup {
         assertNotNull(found);
         assertEquals(key.getAlgorithm(), found.getAlgorithm());
         assertEquals(key.getStatus(), found.getStatus());
-        assertEquals(toString(key.getExpires()), toString(found.getExpires()));
+        assertEquals(key.getExpires(), found.getExpires());
         assertEquals(key.getGracePeriod(), found.getGracePeriod());
 
         found.setStatus(Status.DEPRECATED);
@@ -64,7 +65,7 @@ final class KeyEntityTest extends DatabaseSetup {
 
         // Now to the actual test, change the Expires, persist, detach and
         // find the Entity again. Expected is no errors but the value is same.
-        final Date expires = new Date();
+        final LocalDateTime expires = Utilities.newDate();
         key.setExpires(expires);
         persistAndDetach(key);
 

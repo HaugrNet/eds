@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import io.javadog.cws.api.common.Utilities;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 
@@ -37,7 +37,7 @@ final class MetadataTest {
         final String folderId = UUID.randomUUID().toString();
         final String dataName = "Data Name";
         final String typeName = "Data Type";
-        final Date added = new Date();
+        final LocalDateTime added = Utilities.newDate();
 
         final Metadata metadata = new Metadata();
         metadata.setDataId(id);

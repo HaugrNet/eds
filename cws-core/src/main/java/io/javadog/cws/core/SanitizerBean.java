@@ -22,8 +22,7 @@ import io.javadog.cws.core.jce.Crypto;
 import io.javadog.cws.core.model.CommonDao;
 import io.javadog.cws.core.model.Settings;
 import io.javadog.cws.core.model.entities.DataEntity;
-import java.time.LocalDate;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.logging.Logger;
@@ -138,7 +137,7 @@ public class SanitizerBean {
         // JPA support for Java 8 Date/Time API is not supported
         // before JavaEE8, which is still very early in adoption.
         final int days = settings.getSanityInterval();
-        final Date date = java.sql.Date.valueOf(LocalDate.now().minusDays(days));
+        final LocalDateTime date = Utilities.newDate().minusDays(days);
 
         final var query = entityManager
                 .createNamedQuery("data.findIdsForSanityCheck")

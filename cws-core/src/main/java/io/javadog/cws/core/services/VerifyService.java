@@ -26,9 +26,9 @@ import io.javadog.cws.core.exceptions.IdentificationException;
 import io.javadog.cws.core.model.Settings;
 import io.javadog.cws.core.model.SignatureDao;
 import io.javadog.cws.core.model.entities.SignatureEntity;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Base64;
-import java.util.Date;
 import javax.persistence.EntityManager;
 
 /**
@@ -60,8 +60,8 @@ public final class VerifyService extends Serviceable<SignatureDao, VerifyRespons
             throw new IdentificationException("It was not possible to find the Signature.");
         }
 
-        final Date expires = entity.getExpires();
-        if ((expires != null) && expires.before(Utilities.newDate())) {
+        final LocalDateTime expires = entity.getExpires();
+        if ((expires != null) && expires.isBefore(Utilities.newDate())) {
             throw new CWSException(ReturnCode.SIGNATURE_WARNING, "The Signature has expired.");
         }
 

@@ -17,12 +17,12 @@
 package io.javadog.cws.api.requests;
 
 import io.javadog.cws.api.common.Constants;
-import io.javadog.cws.api.common.Utilities;
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
+import java.util.Map;
 import javax.json.bind.annotation.JsonbDateFormat;
 import javax.json.bind.annotation.JsonbProperty;
 import javax.json.bind.annotation.JsonbPropertyOrder;
-import java.util.Date;
-import java.util.Map;
 
 /**
  * <p>The Sanity Request Object is needed to perform the Sanity CWS Request,
@@ -47,7 +47,7 @@ public final class SanityRequest extends Authentication implements CircleIdReque
 
     @JsonbProperty(value = Constants.FIELD_SINCE, nillable = true)
     @JsonbDateFormat(Constants.JSON_DATE_FORMAT)
-    private Date since = null;
+    private LocalDateTime since = null;
 
     // =========================================================================
     // Setters & Getters
@@ -69,12 +69,12 @@ public final class SanityRequest extends Authentication implements CircleIdReque
         return circleId;
     }
 
-    public void setSince(final Date since) {
-        this.since = Utilities.copy(since);
+    public void setSince(final LocalDateTime since) {
+        this.since = since;
     }
 
-    public Date getSince() {
-        return Utilities.copy(since);
+    public LocalDateTime getSince() {
+        return since;
     }
 
     // =========================================================================

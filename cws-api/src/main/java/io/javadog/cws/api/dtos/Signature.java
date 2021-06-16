@@ -17,12 +17,11 @@
 package io.javadog.cws.api.dtos;
 
 import io.javadog.cws.api.common.Constants;
-import io.javadog.cws.api.common.Utilities;
+import java.io.Serializable;
+import java.time.LocalDateTime;
 import javax.json.bind.annotation.JsonbDateFormat;
 import javax.json.bind.annotation.JsonbProperty;
 import javax.json.bind.annotation.JsonbPropertyOrder;
-import java.io.Serializable;
-import java.util.Date;
 
 /**
  * This Object contain information about a Signature in CWS, such as when it
@@ -48,18 +47,18 @@ public final class Signature implements Serializable {
 
     @JsonbProperty(value = Constants.FIELD_EXPIRES, nillable = true)
     @JsonbDateFormat(Constants.JSON_DATE_FORMAT)
-    private Date expires = null;
+    private LocalDateTime expires = null;
 
     @JsonbProperty(value = Constants.FIELD_VERIFICATIONS, nillable = true)
     private Long verifications = null;
 
     @JsonbProperty(value = Constants.FIELD_LAST_VERIFICATION, nillable = true)
     @JsonbDateFormat(Constants.JSON_DATE_FORMAT)
-    private Date lastVerification = null;
+    private LocalDateTime lastVerification = null;
 
     @JsonbProperty(value = Constants.FIELD_ADDED, nillable = true)
     @JsonbDateFormat(Constants.JSON_DATE_FORMAT)
-    private Date added = null;
+    private LocalDateTime added = null;
 
     // =========================================================================
     // Standard Setters & Getters
@@ -73,12 +72,12 @@ public final class Signature implements Serializable {
         return checksum;
     }
 
-    public void setExpires(final Date expires) {
-        this.expires = Utilities.copy(expires);
+    public void setExpires(final LocalDateTime expires) {
+        this.expires = expires;
     }
 
-    public Date getExpires() {
-        return Utilities.copy(expires);
+    public LocalDateTime getExpires() {
+        return expires;
     }
 
     public void setVerifications(final Long verifications) {
@@ -89,20 +88,20 @@ public final class Signature implements Serializable {
         return verifications;
     }
 
-    public void setLastVerification(final Date lastVerification) {
-        this.lastVerification = Utilities.copy(lastVerification);
+    public void setLastVerification(final LocalDateTime lastVerification) {
+        this.lastVerification = lastVerification;
     }
 
-    public Date getLastVerification() {
-        return Utilities.copy(lastVerification);
+    public LocalDateTime getLastVerification() {
+        return lastVerification;
     }
 
-    public void setAdded(final Date added) {
-        this.added = Utilities.copy(added);
+    public void setAdded(final LocalDateTime added) {
+        this.added = added;
     }
 
-    public Date getAdded() {
-        return Utilities.copy(added);
+    public LocalDateTime getAdded() {
+        return added;
     }
 
     // =========================================================================

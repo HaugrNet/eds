@@ -19,7 +19,7 @@ package io.javadog.cws.core.model;
 import io.javadog.cws.core.enums.SanityStatus;
 import io.javadog.cws.core.model.entities.DataEntity;
 import io.javadog.cws.core.model.entities.MemberEntity;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import javax.persistence.EntityManager;
 
@@ -35,7 +35,7 @@ public final class SanityDao extends CommonDao {
         super(entityManager);
     }
 
-    public List<DataEntity> findFailedRecords(final Date since) {
+    public List<DataEntity> findFailedRecords(final LocalDateTime since) {
         final var query = entityManager
                 .createNamedQuery("data.findAllWithState")
                 .setParameter(STATUS, SanityStatus.FAILED)
@@ -44,7 +44,7 @@ public final class SanityDao extends CommonDao {
         return findList(query);
     }
 
-    public List<DataEntity> findFailedRecords(final MemberEntity circleAdministrator, final Date since) {
+    public List<DataEntity> findFailedRecords(final MemberEntity circleAdministrator, final LocalDateTime since) {
         final var query = entityManager
                 .createNamedQuery("data.findAllWithStateForMember")
                 .setParameter(STATUS, SanityStatus.FAILED)
@@ -54,7 +54,7 @@ public final class SanityDao extends CommonDao {
         return findList(query);
     }
 
-    public List<DataEntity> findFailedRecords(final String circleId, final Date since) {
+    public List<DataEntity> findFailedRecords(final String circleId, final LocalDateTime since) {
         final var query = entityManager
                 .createNamedQuery("data.findAllWithStateForCircle")
                 .setParameter(STATUS, SanityStatus.FAILED)

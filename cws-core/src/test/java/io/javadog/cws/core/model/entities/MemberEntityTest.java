@@ -31,6 +31,7 @@ import io.javadog.cws.core.enums.KeyAlgorithm;
 import io.javadog.cws.core.jce.CWSKeyPair;
 import io.javadog.cws.core.jce.Crypto;
 import io.javadog.cws.core.model.CommonDao;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import javax.persistence.PersistenceException;
@@ -81,10 +82,10 @@ final class MemberEntityTest extends DatabaseSetup {
         final String privateKey = UUID.randomUUID().toString();
         final String externalId = UUID.randomUUID().toString();
         final MemberEntity entity = prepareMember(externalId, credential, algorithm, publicKey, privateKey, MemberRole.STANDARD);
-        final long lastModified = entity.getAltered().getTime();
+        final LocalDateTime lastModified = entity.getAltered();
 
         persist(entity);
-        assertTrue(entity.getAltered().getTime() >= lastModified);
+        assertTrue(lastModified.isBefore(entity.getAltered()));
     }
 
     @Test

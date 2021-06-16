@@ -244,7 +244,7 @@ final class RestClientTest {
 
         // Step 2; Add & Update Data Objects
         final String dataId = addData(accountName, circleId, dataName, toBytes(initContent));
-        updateData(accountName, circleId, dataId, dataName, toBytes(updateContent));
+        updateData(accountName, circleId, dataId, toBytes(updateContent));
 
         // Step 3; Check the stored content of the Circle
         final FetchDataResponse response = readFolderContent(accountName, circleId);
@@ -362,12 +362,12 @@ final class RestClientTest {
         return response.getDataId();
     }
 
-    private void updateData(final String accountName, final String circleId, final String dataId, final String dataName, final byte[] data) {
+    private void updateData(final String accountName, final String circleId, final String dataId, final byte[] data) {
         final ProcessDataRequest request = prepareRequest(ProcessDataRequest.class, accountName);
         request.setAction(Action.UPDATE);
         request.setCircleId(circleId);
         request.setDataId(dataId);
-        request.setDataName(dataName);
+        request.setDataName("status");
         request.setData(data);
 
         final ProcessDataResponse response = restShare.processData(request);

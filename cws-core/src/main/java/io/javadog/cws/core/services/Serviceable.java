@@ -233,7 +233,7 @@ public abstract class Serviceable<D extends CommonDao, R extends CwsResponse, A 
         final var memberEntity = dao.findMemberByChecksum(checksum);
 
         if (memberEntity != null) {
-            if (Utilities.newDate().before(memberEntity.getSessionExpire())) {
+            if (Utilities.newDate().isBefore(memberEntity.getSessionExpire())) {
                 checkCredentials(memberEntity, masterEncrypted, memberEntity.getSessionCrypto());
             } else {
                 dao.removeSession(memberEntity);

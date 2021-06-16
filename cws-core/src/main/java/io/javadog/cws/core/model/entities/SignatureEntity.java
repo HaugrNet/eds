@@ -17,7 +17,7 @@
 package io.javadog.cws.core.model.entities;
 
 import io.javadog.cws.api.common.Constants;
-import io.javadog.cws.api.common.Utilities;
+import java.time.LocalDateTime;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -25,9 +25,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-import java.util.Date;
 
 /**
  * <p>CWS Signature Entity, maps the Signature table from the Database.</p>
@@ -61,9 +58,8 @@ public class SignatureEntity extends CWSEntity {
     @Column(name = "verifications")
     private Long verifications = 0L;
 
-    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "expires", updatable = false)
-    private Date expires = null;
+    private LocalDateTime expires = null;
 
     // =========================================================================
     // Entity Setters & Getters
@@ -101,11 +97,11 @@ public class SignatureEntity extends CWSEntity {
         return verifications;
     }
 
-    public void setExpires(final Date expires) {
-        this.expires = Utilities.copy(expires);
+    public void setExpires(final LocalDateTime expires) {
+        this.expires = expires;
     }
 
-    public Date getExpires() {
-        return Utilities.copy(expires);
+    public LocalDateTime getExpires() {
+        return expires;
     }
 }

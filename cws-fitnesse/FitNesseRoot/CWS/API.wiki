@@ -13,7 +13,7 @@ The CWS API consists of 2 main parts, the first is the management part, which
 is used to control a CWS instance, and the second is the sharing part. The full
 documentation of the API can be found [[here][https://javadog.io/apidocs/]]
 
-There ws both a SOAP & REST based !-WebService-! available, the default for
+There was both a SOAP & REST based !-WebService-! available, the default for
 the !-FitNesse-! tests is the REST, if the SOAP based !-WebServices-! are still
 required, please use version 1.2, as that is the final version with SOAP
 support, as of 2.0 SOAP support has been discontinued.

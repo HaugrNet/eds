@@ -18,7 +18,6 @@ package io.javadog.cws.api.requests;
 
 import io.javadog.cws.api.common.Constants;
 import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
 import java.util.Map;
 import javax.json.bind.annotation.JsonbDateFormat;
 import javax.json.bind.annotation.JsonbProperty;

@@ -17,6 +17,7 @@
 package io.javadog.cws.fitnesse.utils;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import io.javadog.cws.api.common.Utilities;
 import org.junit.jupiter.api.Test;
@@ -30,9 +31,16 @@ final class ConverterTest {
     @Test
     void testConvertingLocalDateTime() {
         final var date = Utilities.newDate();
-        final var str = Converter.convertDate(date);
-        final var converted = Converter.convertDate(str);
 
+        // Convert the date to String, check that it is not null (Coverity finding)
+        final var str = Converter.convertDate(date);
+        assertNotNull(str);
+
+        // Convert the String to date, check that it is not null (Coverity finding)
+        final var converted = Converter.convertDate(str);
+        assertNotNull(converted);
+
+        // Not comparing the date - as the rest is not provided
         assertEquals(converted.getYear(), date.getYear());
         assertEquals(converted.getMonth(), date.getMonth());
         assertEquals(converted.getDayOfMonth(), date.getDayOfMonth());

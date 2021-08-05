@@ -89,7 +89,7 @@ The !-MasterKey-!, is a special System Key, which is not stored anywhere. It is
 being created at startup and lives only in the memory of the system until shut
 down. The !-MasterKey-! is used for multiple internal things, such as extra key
 to unlock accounts. It is therefore not possible to update the !-MasterKey-!,
-once the system is being used, since it would essentually convert the CWS
+once the system is being used, since it would essentially convert the CWS
 database to a brick, since all keys becomes invalid.
 
 There are 2 ways to set the !-MasterKey-! to something else than the default,
@@ -176,7 +176,7 @@ in a list of undefined values.
 The primary part of all internal encryption is performed using Symmetric Keys. These are all based on the AES algorithms and only the
 size of the keys may be changed. The default value is '''AES256''', but if an earlier version of Java 8 is used, or if there is various
 problems with allowing this Key size, then it can be set to a lower value. It should be noted, that AES encryption using CBC is considered
-''old fashioned'', so it is recommendable to change the algorithm to GCM, even if the maximum bitsize allowed in Java 8 is only 128.
+''old fashioned'', so it is recommendable to change the algorithm to GCM, even if the maximum bit size allowed in Java 8 is only 128.
 The allowed values are:
  * '''AES_CBC_128'''
  * '''AES_CBC_192'''
@@ -254,7 +254,7 @@ CWS is designed as a backend system to be integrated into other systems, which o
 the question of authentication checks, how to ensure that the standard authentication
 checks is aligned with CWS, so CWS can be used to store data securely.
 
-The use-cases for the authentation mechanism is check if an account may access the
+The use-cases for the authentication mechanism is check if an account may access the
 securely stored data or not. It is not designed nor intended to replace other
 security mechanisms, such as 2FA of existing mechanisms. The check is simply here
 to serve the purpose checking if accounts are aligned or not.
@@ -299,7 +299,7 @@ performed with the current API:
  * Delete Member - Removes a Member Account from the System permanently
    * REST (POST) request is: ${REST_ROOT}/members/deleteMember
  * Fetch Members - Retrieve a list of one or more Members
-   * REST (POST) requst is: ${REST_ROOT}/members/fetchMembers
+   * REST (POST) request is: ${REST_ROOT}/members/fetchMembers
 
 Firstly, there are 2 ways to create accounts, both require system administrative
 permissions. The first way is to run the CREATE action the second is to use the
@@ -347,7 +347,7 @@ using the Session!
 !anchor circles
 !4 '''Circles of Trust'''
 Circles of Trust is a core part of CWS, as this is the grouping of Members or
-''Trustees'', to facilitte sharing of information. There are no limits as to
+''Trustees'', to facilitate sharing of information. There are no limits as to
 who may create a Circle of Trust. Circles of Trust do not have an Owner, but
 rather one or more Circle Administrators. The first Member to create a Circle
 will automatically become the initial Circle Administrator - or if a Member Id
@@ -525,7 +525,7 @@ There are 3 kinds of actions / requests which can be made for data Types
 !4 '''Signatures'''
 
 Signing documents means creating cryptographic checksum of the document based on the signing members key. The signature can then be given to others together with the document, to verify that the document has not been tampered with.
-CWS supports simply signing of documents, and later verification of same by other members. Neither the document signed, nor the signarure are stored in CWS, only some meta information regarding who signed it and optionally when it expires.
+CWS supports simply signing of documents, and later verification of same by other members. Neither the document signed, nor the signature are stored in CWS, only some meta information regarding who signed it and optionally when it expires.
 
  * Sign Document
    * REST (POST) request is: ${REST_ROOT}/signatures/signDocument
@@ -556,7 +556,7 @@ CWS supports simply signing of documents, and later verification of same by othe
 
 !* Inventory Report
 [[ Top ][#content]]
-!ancor inventory
+!anchor inventory
 !3 '''Inventory Report'''
 
 For administrators, using CWS as part of their system, to store certain or all Objects, they may require a way to synchronize the repositories. For this reason, the Inventory Report is present, it can only be invoked by a System Administrator, and will return a list of all Objects, ordered by the most recent first to the oldest last.

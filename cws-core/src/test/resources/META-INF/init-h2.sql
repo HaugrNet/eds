@@ -331,7 +331,7 @@ CREATE TABLE cws_trustees (
 -- stored in this table.
 --   The types is stored as a map. Where the keys (names) must be unique, and
 -- the values can be anything. By default, one record exists, which is a folder,
--- the folder type is used primarily internally to help structurize the Objects
+-- the folder type is used primarily internally to help structure the Objects
 -- better.
 -- =============================================================================
 CREATE TABLE cws_datatypes (
@@ -380,7 +380,7 @@ INSERT INTO cws_datatypes (datatype_name, datatype_value) VALUES
 -- that the parent Id cannot be larger than the current Id. This way, it is
 -- possible to have a recursive structure, but not to create loops.
 --   Unfortunately, having the parent Id as an Integer and not a String will
--- require additional lookup's, but it is a small price to pay to have a
+-- require additional lookup, but it is a small price to pay to have a
 -- guarantee that no loops can occur in the model.
 --   The structure is created as a recursive data structure, where the parentId
 -- is referencing a parent Folder, however - there is a check added, so it is
@@ -476,10 +476,10 @@ CREATE TABLE cws_signatures (
   CONSTRAINT signature_unique_checksum      UNIQUE (checksum),
 
   /* Not Null Constraints */
-  CONSTRAINT signarure_notnull_id           CHECK (id IS NOT NULL),
+  CONSTRAINT signature_notnull_id           CHECK (id IS NOT NULL),
   CONSTRAINT signature_notnull_public_key   CHECK (public_key IS NOT NULL),
   CONSTRAINT signature_notnull_checksum     CHECK (checksum IS NOT NULL),
-  CONSTRAINT signarure_notnull_member_id    CHECK (member_id IS NOT NULL),
-  CONSTRAINT signarure_notnull_altered      CHECK (altered IS NOT NULL),
-  CONSTRAINT signarure_notnull_added        CHECK (added IS NOT NULL)
+  CONSTRAINT signature_notnull_member_id    CHECK (member_id IS NOT NULL),
+  CONSTRAINT signature_notnull_altered      CHECK (altered IS NOT NULL),
+  CONSTRAINT signature_notnull_added        CHECK (added IS NOT NULL)
 );

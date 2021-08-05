@@ -144,7 +144,7 @@ public interface Management {
      *     Master Key, as generating the Master Key will have to be re-initiated
      *     after this has been done, and will be done on the default Master Key,
      *     however, as the default Master Key is build around known information
-     *     in the CWS, and a custom is build around a provided, unpersisted
+     *     in the CWS, and a custom is build around a provided, non-persisted
      *     secret, it will render the system useless if the System Salt is set
      *     after the Master Key has been provided!
      *   </li>

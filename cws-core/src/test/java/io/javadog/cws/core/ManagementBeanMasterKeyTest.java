@@ -184,7 +184,7 @@ final class ManagementBeanMasterKeyTest extends DatabaseSetup {
 
     /**
      * Testing that the MasterKey from file, where the file has the same content
-     * as the normal, unconfigured MasterKey, is the same as the default. and
+     * as the normal, un-configured MasterKey, is the same as the default. and
      * that a different content file will have different key.
      *
      * @throws IOException If unable to write to the MasterKey file

@@ -20,7 +20,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import io.javadog.cws.api.common.Constants;
 import io.javadog.cws.api.common.ReturnCode;
-import io.javadog.cws.api.requests.InventoryRequest;
 import io.javadog.cws.api.requests.SettingRequest;
 import javax.ws.rs.core.Response;
 import org.junit.jupiter.api.Test;

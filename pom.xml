@@ -61,6 +61,10 @@
     </distributionManagement>
 
     <properties>
+        <java.version>11</java.version>
+        <maven.compiler.source>${java.version}</maven.compiler.source>
+        <maven.compiler.target>${java.version}</maven.compiler.target>
+
         <!-- To avoid that the builds are platform specific -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
@@ -261,7 +265,7 @@
                     <showWarnings>true</showWarnings>
                     <debug>false</debug>
                     <encoding>UTF-8</encoding>
-                    <release>11</release>
+                    <release>${java.version}</release>
                 </configuration>
             </plugin>
             <plugin>

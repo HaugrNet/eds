@@ -17,12 +17,7 @@
 package io.javadog.cws.api.common;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotSame;
-import static org.junit.jupiter.api.Assertions.assertNull;
 
-import java.time.ZonedDateTime;
-import java.util.Date;
 import org.junit.jupiter.api.Test;
 
 /**

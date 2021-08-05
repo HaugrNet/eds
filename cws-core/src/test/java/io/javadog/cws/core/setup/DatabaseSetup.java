@@ -98,8 +98,8 @@ public class DatabaseSetup {
     private static final String TIMESTAMP = "yyyyMMddHHmmssSSS";
     private static final String persistenceName = "io.javadog.cws.jpa";
     private static final EntityManagerFactory FACTORY = Persistence.createEntityManagerFactory(persistenceName);
-    protected EntityManager entityManager = FACTORY.createEntityManager();
-    protected CommonDao dao = new CommonDao(entityManager);
+    protected final EntityManager entityManager = FACTORY.createEntityManager();
+    protected final CommonDao dao = new CommonDao(entityManager);
     protected final Settings settings = Settings.getInstance();
     protected final Crypto crypto = new Crypto(settings);
 

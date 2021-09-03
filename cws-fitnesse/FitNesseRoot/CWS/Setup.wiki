@@ -17,7 +17,7 @@
 !define tomorrow  {!today (yyyy-MM-dd) +1}
 
 |Import                 |
-|io.javadog.cws.fitnesse|
+|net.haugr.cws.fitnesse|
 
 !|script|control cws              |
 |setUrl |http://localhost:8080/cws|

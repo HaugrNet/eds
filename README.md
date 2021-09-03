@@ -1,4 +1,4 @@
-# CWS - Cryptographic Web Store
+# CWS - Cryptographic Web Share
 
 [![Build Status](https://api.travis-ci.org/JavaDogs/cws.svg)](https://travis-ci.org/JavaDogs/cws)
 [![CircleCI](https://circleci.com/gh/JavaDogs/cws.png?style=shield)](https://circleci.com/gh/JavaDogs/cws)
@@ -9,7 +9,7 @@
 [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/1566/badge)](https://bestpractices.coreinfrastructure.org/projects/1566)
 [![Software License](https://img.shields.io/badge/license-Apache+License+2.0-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0)
 
-[CWS](https://javadog.io/), Cryptographic Web Store, works like a "PGP for the
+[CWS](https://haugr.net/), Cryptographic Web Share, works like a "PGP for the
 Cloud". It is designed as a backend component with the vision that it should be
 possible to exchange data between multiple parties using encrypted storage,
 where both the parties involved, and the data exchanged can be anything from
@@ -35,9 +35,8 @@ database desired. Testing of CWS has been done using both
 
 ## Build, Install and Run
 
-The final version 1.2 of CWS can be downloaded from [JavaDog](https://javadog.io/),
-version 2.0 is planned to be a major technical release, focusing on upgrading both
-the required Java version & Jakarta EE version. The build requires Java JDK 11,
+The final version 2.0 of CWS can be downloaded from [haugr.net](https://haugr.net/),
+version 2.1 is planned to be a minor update. The build requires Java JDK 11,
 and [Maven](https://maven.apache.org/).
 
 In the accessories/release folder, there is a number of files, which is used to
@@ -152,4 +151,4 @@ The CWS is released under Apache License 2 or APL2.
 
 ## Contact
 
-Kim.Jensen at javadog.io
+Kim.Jensen at haugr.net

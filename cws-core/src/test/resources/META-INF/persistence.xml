@@ -6,16 +6,16 @@
         <description>JPA Test Database Setup</description>
         <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
 
-        <class>io.javadog.cws.core.model.entities.SettingEntity</class>
-        <class>io.javadog.cws.core.model.entities.MemberEntity</class>
-        <class>io.javadog.cws.core.model.entities.CircleEntity</class>
-        <class>io.javadog.cws.core.model.entities.KeyEntity</class>
-        <class>io.javadog.cws.core.model.entities.TrusteeEntity</class>
-        <class>io.javadog.cws.core.model.entities.DataTypeEntity</class>
-        <class>io.javadog.cws.core.model.entities.MetadataEntity</class>
-        <class>io.javadog.cws.core.model.entities.DataEntity</class>
-        <class>io.javadog.cws.core.model.entities.SignatureEntity</class>
-        <class>io.javadog.cws.core.model.entities.VersionEntity</class>
+        <class>net.haugr.cws.core.model.entities.SettingEntity</class>
+        <class>net.haugr.cws.core.model.entities.MemberEntity</class>
+        <class>net.haugr.cws.core.model.entities.CircleEntity</class>
+        <class>net.haugr.cws.core.model.entities.KeyEntity</class>
+        <class>net.haugr.cws.core.model.entities.TrusteeEntity</class>
+        <class>net.haugr.cws.core.model.entities.DataTypeEntity</class>
+        <class>net.haugr.cws.core.model.entities.MetadataEntity</class>
+        <class>net.haugr.cws.core.model.entities.DataEntity</class>
+        <class>net.haugr.cws.core.model.entities.SignatureEntity</class>
+        <class>net.haugr.cws.core.model.entities.VersionEntity</class>
 
         <properties>
             <!-- JPA Settings to create test DB via scripts -->

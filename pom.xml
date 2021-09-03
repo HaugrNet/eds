@@ -6,12 +6,12 @@
     <version>2.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>CWS</name>
-    <description>CWS, Cryptographic Web Store</description>
-    <url>https://javadog.io/</url>
+    <description>CWS, Cryptographic Web Share</description>
+    <url>https://haugr.net/</url>
 
     <organization>
-        <name>JavaDog.io</name>
-        <url>https://javadog.io/</url>
+        <name>haugr.net</name>
+        <url>https://haugr.net/</url>
     </organization>
 
     <licenses>
@@ -25,8 +25,8 @@
         <developer>
             <id>kim@dawn.dk</id>
             <name>Kim Nørregaard Jensen</name>
-            <organization>JavaDog.io</organization>
-            <organizationUrl>https://javadog.io/</organizationUrl>
+            <organization>haugr.net</organization>
+            <organizationUrl>https://haugr.net/</organizationUrl>
             <roles>
                 <role>developer</role>
             </roles>
@@ -61,9 +61,8 @@
     </distributionManagement>
 
     <properties>
-        <java.version>11</java.version>
-        <maven.compiler.source>${java.version}</maven.compiler.source>
-        <maven.compiler.target>${java.version}</maven.compiler.target>
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
 
         <!-- To avoid that the builds are platform specific -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -265,7 +264,7 @@
                     <showWarnings>true</showWarnings>
                     <debug>false</debug>
                     <encoding>UTF-8</encoding>
-                    <release>${java.version}</release>
+                    <release>11</release>
                 </configuration>
             </plugin>
             <plugin>

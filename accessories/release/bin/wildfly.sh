@@ -60,7 +60,7 @@ if [[ "${action}" == "configure" ]]; then
             runJbossCli "/subsystem=datasources/jdbc-driver=postgresql:add(driver-name=postgresql,driver-module-name=org.postgresql,driver-xa-datasource-class-name=org.postgresql.xa.PGXADataSource)"
             runJbossCli "data-source add --name=cwsDS --driver-name=postgresql --jndi-name=java:/datasources/cwsDS --connection-url=jdbc:postgresql://${dbHost}:${dbPort}/${dbName} --user-name=${dbUser} --password=${dbPassword} --use-ccm=false --max-pool-size=25 --blocking-timeout-wait-millis=5000 --enabled=true"
             runJbossCli "/subsystem=undertow/server=default-server/http-listener=default/:write-attribute(name=max-post-size,value=${maxPostSize})"
-            runJbossCli "/subsystem=logging/logger=io.javadog.cws:add"
+            runJbossCli "/subsystem=logging/logger=net.haugr.cws:add"
             rm -f "/tmp/postgresql-${psqlVersion}.jar"
             echo "Restarting WildFly ..."
             runJbossCli "reload"

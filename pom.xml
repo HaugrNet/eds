@@ -68,6 +68,8 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <!-- SonarQube Settings -->
+        <sonar.projectKey>io.javadog:cws</sonar.projectKey>
+        <sonar.projectName>CWS - Cryptographic Web Share</sonar.projectName>
         <sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
         <!-- Sonar is by default analyzing everything. But Generated Code is
              beyond our control, so error reports from this is just annoying!

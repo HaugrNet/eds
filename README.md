@@ -3,8 +3,8 @@
 [![CircleCI](https://circleci.com/gh/HaugrNet/cws.png?style=shield)](https://circleci.com/gh/HaugrNet/cws)
 [![SonarQube](https://sonarcloud.io/api/project_badges/measure?project=net.haugr:cws&metric=alert_status)](https://sonarcloud.io/dashboard?id=net.haugr:cws)
 [![Coverity](https://scan.coverity.com/projects/13955/badge.svg)](https://scan.coverity.com/projects/javadogs-cws)
-[![Maintainability](https://api.codeclimate.com/v1/badges/4b40d6c7f75f9d40ae41/maintainability)](https://codeclimate.com/github/JavaDogs/cws/maintainability)
-[![Codacy](https://api.codacy.com/project/badge/Grade/78366d7059554164a3f65ceabe986598)](https://app.codacy.com/gh/JavaDogs/cws/dashboard)
+[![Maintainability](https://api.codeclimate.com/v1/badges/4b40d6c7f75f9d40ae41/maintainability)](https://codeclimate.com/github/HaugrNet/cws/maintainability)
+[![Codacy](https://app.codacy.com/project/badge/Grade/d3dcde7450244032ae8adfcfd28f5888)](https://app.codacy.com/gh/HaugrNet/cws/dashboard)
 [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/1566/badge)](https://bestpractices.coreinfrastructure.org/projects/1566)
 [![Software License](https://img.shields.io/badge/license-Apache+License+2.0-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0)
 

@@ -77,16 +77,18 @@ public class CommonDao {
      * @param entity CWS Entity to persist (create or update)
      */
     public void persist(final CWSEntity entity) {
-        if ((entity instanceof Externable) && (((Externable) entity).getExternalId() == null)) {
-            ((Externable) entity).setExternalId(UUID.randomUUID().toString());
-        }
-
-        if (entity.getAdded() == null) {
-            entity.setAdded(Utilities.newDate());
-        }
-
         entity.setAltered(Utilities.newDate());
-        entityManager.persist(entity);
+        if (entity.getId() != null) {
+            entityManager.merge(entity);
+        } else {
+            if ((entity instanceof Externable) && (((Externable) entity).getExternalId() == null)) {
+                ((Externable) entity).setExternalId(UUID.randomUUID().toString());
+            }
+            if (entity.getAdded() == null) {
+                entity.setAdded(Utilities.newDate());
+            }
+            entityManager.persist(entity);
+        }
     }
 
     public <E extends CWSEntity> E find(final Class<E> cwsEntity, final Long id) {

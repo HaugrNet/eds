@@ -8,7 +8,7 @@
 [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/1566/badge)](https://bestpractices.coreinfrastructure.org/projects/1566)
 [![Software License](https://img.shields.io/badge/license-Apache+License+2.0-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0)
 
-[CWS](https://haugr.net/), Cryptographic Web Share, works like a "PGP for the
+[CWS](https://haugr.net/), Cryptographic Web Share, works as a "PGP for the
 Cloud". It is designed as a backend component with the vision that it should be
 possible to exchange data between multiple parties using encrypted storage,
 where both the parties involved, and the data exchanged can be anything from

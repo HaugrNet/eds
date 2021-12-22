@@ -34,6 +34,8 @@ public final class Utilities {
     }
 
     /**
+     * <p>Creates a LocalDateTime instance, based on given milli seconds. The
+     * LocalDateTime instance will be using UTC as offset.</p>
      *
      * @param millisSinceEpoch Milli Seconds since epoch (1970-01-01 00:00:00)
      * @return New UTC based ZonedDateTime instance

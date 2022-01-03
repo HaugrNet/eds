@@ -38,7 +38,7 @@ import java.util.Map;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-public abstract class Verifiable implements Serializable {
+public abstract class AbstractRequest implements Serializable {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;

@@ -39,7 +39,7 @@ import java.util.concurrent.ConcurrentHashMap;
         Constants.FIELD_ACCOUNT_NAME,
         Constants.FIELD_CREDENTIAL,
         Constants.FIELD_CREDENTIALTYPE })
-public class Authentication extends Verifiable {
+public class Authentication extends AbstractRequest {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;

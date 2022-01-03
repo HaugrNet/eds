@@ -27,7 +27,7 @@ import java.util.Locale;
 import net.haugr.cws.api.common.Action;
 import net.haugr.cws.api.common.CredentialType;
 import net.haugr.cws.api.common.MemberRole;
-import net.haugr.cws.api.requests.Verifiable;
+import net.haugr.cws.api.requests.AbstractRequest;
 import net.haugr.cws.fitnesse.exceptions.StopTestException;
 
 /**
@@ -79,7 +79,7 @@ public final class Converter {
         final String checked = preCheck(value);
         int result = defaultValue;
 
-        if ((checked != null) && !Verifiable.isEmpty(checked)) {
+        if ((checked != null) && !AbstractRequest.isEmpty(checked)) {
             result = Integer.parseInt(value.trim());
         }
 

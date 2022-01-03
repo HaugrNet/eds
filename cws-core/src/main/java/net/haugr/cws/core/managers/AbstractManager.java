@@ -25,7 +25,7 @@ import net.haugr.cws.api.common.Utilities;
 import net.haugr.cws.api.dtos.Circle;
 import net.haugr.cws.api.requests.Authentication;
 import net.haugr.cws.api.requests.CircleIdRequest;
-import net.haugr.cws.api.requests.Verifiable;
+import net.haugr.cws.api.requests.AbstractRequest;
 import net.haugr.cws.api.responses.CwsResponse;
 import net.haugr.cws.core.enums.KeyAlgorithm;
 import net.haugr.cws.core.enums.Permission;
@@ -198,14 +198,14 @@ public abstract class AbstractManager<D extends CommonDao, R extends CwsResponse
      * complete the request with this Request Object, the thrown Exception will
      * contain all the information needed to correct the problem.</p>
      *
-     * @param verifiable Given Request Object to verify
+     * @param request Given Request Object to verify
      * @throws VerificationException if the given Object is null or invalid
      */
-    protected static void verify(final Verifiable verifiable) {
-        throwConditionalNullException(verifiable,
+    protected static void verify(final AbstractRequest request) {
+        throwConditionalNullException(request,
                 ReturnCode.VERIFICATION_WARNING, "Cannot Process a NULL Object.");
 
-        final Map<String, String> errors = verifiable.validate();
+        final Map<String, String> errors = request.validate();
         if (!errors.isEmpty()) {
             final int capacity = errors.size() * 75;
             final var builder = new StringBuilder(capacity);

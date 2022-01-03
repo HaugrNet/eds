@@ -20,7 +20,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import net.haugr.cws.api.common.MemberRole;
 import net.haugr.cws.api.common.TrustLevel;
 import net.haugr.cws.core.setup.DatabaseSetup;
 import net.haugr.cws.core.enums.KeyAlgorithm;
@@ -47,7 +46,7 @@ final class TrusteeEntityTest extends DatabaseSetup {
         entity.setKey(key);
         entity.setTrustLevel(TrustLevel.ADMIN);
         entity.setCircleKey(circleKey);
-        persist(entity);
+        save(entity);
 
         final TrusteeEntity found = find(TrusteeEntity.class, entity.getId());
         assertEquals(member.getId(), found.getMember().getId());
@@ -56,7 +55,7 @@ final class TrusteeEntityTest extends DatabaseSetup {
 
         found.setCircleKey("New Key");
         found.setTrustLevel(TrustLevel.WRITE);
-        persist(found);
+        save(found);
 
         final TrusteeEntity updated = find(TrusteeEntity.class, entity.getId());
         assertNotNull(updated);

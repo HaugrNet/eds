@@ -189,7 +189,7 @@ public class DatabaseSetup {
         entity.setPublicKey(publicKey);
         entity.setPrivateKey(privateKey);
         entity.setMemberRole(DEFAULT_ROLE);
-        persist(entity);
+        save(entity);
 
         return entity;
     }
@@ -277,7 +277,7 @@ public class DatabaseSetup {
         final KeyEntity entity = new KeyEntity();
         entity.setAlgorithm(settings.getSymmetricAlgorithm());
         entity.setStatus(Status.ACTIVE);
-        persist(entity);
+        save(entity);
 
         return entity;
     }
@@ -286,17 +286,17 @@ public class DatabaseSetup {
         final CircleEntity entity = new CircleEntity();
         entity.setExternalId(externalId);
         entity.setName(name);
-        persist(entity);
+        save(entity);
 
         return entity;
     }
 
-    protected <E extends CWSEntity> void persist(final E entity) {
+    protected <E extends CWSEntity> void save(final E entity) {
         dao.save(entity);
     }
 
     protected <E extends CWSEntity> void persistAndDetach(final E entity) {
-        persist(entity);
+        save(entity);
         entityManager.flush();
         entityManager.clear();
     }
@@ -317,7 +317,7 @@ public class DatabaseSetup {
     }
 
     /**
-     * To properly test the cases where the SanityCheck is suppose to fail, i.e.
+     * To properly test the cases where the SanityCheck is supposed to fail, i.e.
      * the Data Checksum is not matching the data anymore - a backdoor is needed
      * into the database whereby it is achieved. This method will do just that.
      *

@@ -33,7 +33,7 @@ final class DataTypeEntityTest extends DatabaseSetup {
         final DataTypeEntity entity = new DataTypeEntity();
         entity.setName("Name");
         entity.setType("Type");
-        persist(entity);
+        save(entity);
 
         entityManager.flush();
         entityManager.clear();
@@ -47,13 +47,13 @@ final class DataTypeEntityTest extends DatabaseSetup {
         final DataTypeEntity entity = new DataTypeEntity();
         entity.setName("Name 1");
         entity.setType("Type 1");
-        persist(entity);
+        save(entity);
 
         final DataTypeEntity found = find(DataTypeEntity.class, entity.getId());
         assertNotNull(found);
         found.setName("Name 2");
         found.setType("Type 2");
-        persist(found);
+        save(found);
         assertEquals(found.getId(), entity.getId());
         assertEquals(found.getName(), entity.getName());
         assertEquals(found.getType(), entity.getType());

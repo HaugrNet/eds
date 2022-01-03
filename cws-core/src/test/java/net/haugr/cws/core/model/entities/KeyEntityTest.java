@@ -53,7 +53,7 @@ final class KeyEntityTest extends DatabaseSetup {
         assertEquals(key.getGracePeriod(), found.getGracePeriod());
 
         found.setStatus(Status.DEPRECATED);
-        persist(found);
+        save(found);
 
         final KeyEntity updated = find(KeyEntity.class, key.getId());
         assertNotEquals(key.getStatus(), updated.getStatus());

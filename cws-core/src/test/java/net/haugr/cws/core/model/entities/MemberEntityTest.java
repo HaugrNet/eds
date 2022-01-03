@@ -84,7 +84,7 @@ final class MemberEntityTest extends DatabaseSetup {
         final MemberEntity entity = prepareMember(externalId, credential, algorithm, publicKey, privateKey);
         final LocalDateTime lastModified = entity.getAltered();
 
-        persist(entity);
+        save(entity);
         assertTrue(lastModified.isBefore(entity.getAltered()));
     }
 

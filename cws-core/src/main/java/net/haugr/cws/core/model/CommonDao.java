@@ -75,9 +75,11 @@ public class CommonDao {
      * defined as well.</p>
      *
      * @param entity CWS Entity to persist (create or update)
+     * @return Created or Updated CWS Entity
      */
-    public void save(final CWSEntity entity) {
+    public CWSEntity save(final CWSEntity entity) {
         entity.setAltered(Utilities.newDate());
+        final CWSEntity saved;
 
         if (entity.getId() == null) {
             if ((entity instanceof Externable) && (((Externable) entity).getExternalId() == null)) {
@@ -88,9 +90,12 @@ public class CommonDao {
             }
 
             entityManager.persist(entity);
+            saved = entity;
         } else {
-            entityManager.merge(entity);
+            saved = entityManager.merge(entity);
         }
+
+        return saved;
     }
 
     public <E extends CWSEntity> E find(final Class<E> cwsEntity, final Long id) {
@@ -161,7 +166,7 @@ public class CommonDao {
      * The checksums are not having any uniqueness assigned to them, meaning
      * that their may exist multiple checksums with the same value - but as
      * all checksums are fairly short-lived (hours), the problem is ignored
-     * and only of their is an actual problem with it, will it be addressed.
+     * and only if there is an actual problem with it, will it be addressed.
      *
      * @param checksum Checksum of a Member SessionKey
      * @return MemberEntity with a matching SessionKey checksum
@@ -223,7 +228,7 @@ public class CommonDao {
     }
 
     /**
-     * Finds a unique DataType in the system. If none exist or it is not
+     * Finds a unique DataType in the system. If none exist, or it is not
      * possible to find a unique record, then an Exception is thrown.
      *
      * @param name Name of the DataType to find

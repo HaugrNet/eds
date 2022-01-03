@@ -41,7 +41,7 @@ final class CircleEntityTest extends DatabaseSetup {
         assertEquals(entity.getName(), found.getName());
 
         found.setName("Circle 2");
-        persist(found);
+        save(found);
         entityManager.flush();
         entityManager.clear();
 

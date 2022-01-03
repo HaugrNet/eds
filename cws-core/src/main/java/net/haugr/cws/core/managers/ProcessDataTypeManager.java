@@ -1,6 +1,6 @@
 /*
  * CWS, Cryptographic Web Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2021, haugr.net
+ * Copyright (c) 2016-2022, haugr.net
  * mailto: cws AT haugr DOT net
  *
  * CWS is free software; you can redistribute it and/or modify it under the
@@ -14,7 +14,7 @@
  * this program; If not, you can download a copy of the License
  * here: https://www.apache.org/licenses/
  */
-package net.haugr.cws.core.services;
+package net.haugr.cws.core.managers;
 
 import net.haugr.cws.api.common.Constants;
 import net.haugr.cws.api.common.ReturnCode;
@@ -36,9 +36,9 @@ import javax.persistence.EntityManager;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-public final class ProcessDataTypeService extends Serviceable<CommonDao, ProcessDataTypeResponse, ProcessDataTypeRequest> {
+public final class ProcessDataTypeManager extends AbstractManager<CommonDao, ProcessDataTypeResponse, ProcessDataTypeRequest> {
 
-    public ProcessDataTypeService(final Settings settings, final EntityManager entityManager) {
+    public ProcessDataTypeManager(final Settings settings, final EntityManager entityManager) {
         super(settings, new CommonDao(entityManager));
     }
 
@@ -85,7 +85,7 @@ public final class ProcessDataTypeService extends Serviceable<CommonDao, Process
             entity = new DataTypeEntity();
             entity.setName(name);
             entity.setType(type);
-            dao.persist(entity);
+            dao.save(entity);
         } else {
             entity = found;
             throwConditionalException(Objects.equals(Constants.FOLDER_TYPENAME, entity.getName()) || Objects.equals(Constants.DATA_TYPENAME, entity.getName()),
@@ -93,7 +93,7 @@ public final class ProcessDataTypeService extends Serviceable<CommonDao, Process
 
             if (!Objects.equals(type, entity.getType())) {
                 entity.setType(type);
-                dao.persist(entity);
+                dao.save(entity);
             }
         }
 

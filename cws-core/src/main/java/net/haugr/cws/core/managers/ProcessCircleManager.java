@@ -1,6 +1,6 @@
 /*
  * CWS, Cryptographic Web Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2021, haugr.net
+ * Copyright (c) 2016-2022, haugr.net
  * mailto: cws AT haugr DOT net
  *
  * CWS is free software; you can redistribute it and/or modify it under the
@@ -14,7 +14,7 @@
  * this program; If not, you can download a copy of the License
  * here: https://www.apache.org/licenses/
  */
-package net.haugr.cws.core.services;
+package net.haugr.cws.core.managers;
 
 import net.haugr.cws.api.common.Action;
 import net.haugr.cws.api.common.MemberRole;
@@ -48,9 +48,9 @@ import javax.persistence.EntityManager;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-public final class ProcessCircleService extends Serviceable<CommonDao, ProcessCircleResponse, ProcessCircleRequest> {
+public final class ProcessCircleManager extends AbstractManager<CommonDao, ProcessCircleResponse, ProcessCircleRequest> {
 
-    public ProcessCircleService(final Settings settings, final EntityManager entityManager) {
+    public ProcessCircleManager(final Settings settings, final EntityManager entityManager) {
         super(settings, new CommonDao(entityManager));
     }
 
@@ -132,7 +132,7 @@ public final class ProcessCircleService extends Serviceable<CommonDao, ProcessCi
      * @param circleAdmin       The initial Circle Administrator
      * @param name              The name of the new Circle
      * @param externalCircleKey External Circle Key
-     * @return Response Object with the new Circle Id
+     * @return Response Object with the new Circle ID
      */
     private ProcessCircleResponse createCircle(final MemberEntity circleAdmin, final String name, final String externalCircleKey) {
         final KeyAlgorithm algorithm = settings.getSymmetricAlgorithm();
@@ -145,13 +145,13 @@ public final class ProcessCircleService extends Serviceable<CommonDao, ProcessCi
         final var circle = new CircleEntity();
         circle.setName(name);
         circle.setCircleKey(externalKey);
-        dao.persist(circle);
+        dao.save(circle);
 
         createRootFolder(circle);
         final var keyEntity = new KeyEntity();
         keyEntity.setAlgorithm(algorithm);
         keyEntity.setStatus(Status.ACTIVE);
-        dao.persist(keyEntity);
+        dao.save(keyEntity);
 
         final var trustee = new TrusteeEntity();
         trustee.setMember(circleAdmin);
@@ -159,7 +159,7 @@ public final class ProcessCircleService extends Serviceable<CommonDao, ProcessCi
         trustee.setKey(keyEntity);
         trustee.setTrustLevel(TrustLevel.ADMIN);
         trustee.setCircleKey(circleKey);
-        dao.persist(trustee);
+        dao.save(trustee);
 
         final var response = new ProcessCircleResponse(theCircle(circle) + " was successfully created.");
         response.setCircleId(circle.getExternalId());
@@ -174,7 +174,7 @@ public final class ProcessCircleService extends Serviceable<CommonDao, ProcessCi
         entity.setName("/");
         entity.setParentId(0L);
         entity.setType(dataTypeEntity);
-        dao.persist(entity);
+        dao.save(entity);
     }
 
     private ProcessCircleResponse performNonCreateActions(final ProcessCircleRequest request) {
@@ -204,7 +204,7 @@ public final class ProcessCircleService extends Serviceable<CommonDao, ProcessCi
      * <p>Only checks needed, is to verify that the name is not already taken
      * by any other circle.</p>
      *
-     * @param request Request Object with Id and new Name for the Circle
+     * @param request Request Object with ID and new Name for the Circle
      * @return Response Object with the changed information
      */
     private ProcessCircleResponse updateCircle(final ProcessCircleRequest request) {
@@ -216,7 +216,7 @@ public final class ProcessCircleService extends Serviceable<CommonDao, ProcessCi
 
         entity.setCircleKey(updateExternalCircleKey(request.getCircleKey()));
         checkAndUpdateCircleName(entity, request.getCircleName());
-        dao.persist(entity);
+        dao.save(entity);
 
         return new ProcessCircleResponse(theCircle(entity) + " was successfully updated.");
     }
@@ -252,7 +252,7 @@ public final class ProcessCircleService extends Serviceable<CommonDao, ProcessCi
      * <p>The operation can only be performed by the System Administrator, due
      * to the nature of it.</p>
      *
-     * @param request Request Object with the Id of the Circle to delete
+     * @param request Request Object with the ID of the Circle to delete
      * @return Response Object with error information
      */
     private ProcessCircleResponse deleteCircle(final ProcessCircleRequest request) {

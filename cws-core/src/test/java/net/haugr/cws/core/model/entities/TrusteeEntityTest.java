@@ -1,6 +1,6 @@
 /*
  * CWS, Cryptographic Web Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2021, haugr.net
+ * Copyright (c) 2016-2022, haugr.net
  * mailto: cws AT haugr DOT net
  *
  * CWS is free software; you can redistribute it and/or modify it under the
@@ -20,7 +20,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import net.haugr.cws.api.common.MemberRole;
 import net.haugr.cws.api.common.TrustLevel;
 import net.haugr.cws.core.setup.DatabaseSetup;
 import net.haugr.cws.core.enums.KeyAlgorithm;
@@ -37,7 +36,7 @@ final class TrusteeEntityTest extends DatabaseSetup {
     void testEntity() {
         final KeyAlgorithm algorithm = settings.getAsymmetricAlgorithm();
         final String externalId = UUID.randomUUID().toString();
-        final MemberEntity member = prepareMember(externalId, "Trustee Member", algorithm, "public Key", "private Key", MemberRole.STANDARD);
+        final MemberEntity member = prepareMember(externalId, "Trustee Member", algorithm, "public Key", "private Key");
         final CircleEntity circle = prepareCircle(UUID.randomUUID().toString(), "Trustee Circle");
         final String circleKey = UUID.randomUUID().toString();
         final KeyEntity key = prepareKey();
@@ -47,7 +46,7 @@ final class TrusteeEntityTest extends DatabaseSetup {
         entity.setKey(key);
         entity.setTrustLevel(TrustLevel.ADMIN);
         entity.setCircleKey(circleKey);
-        persist(entity);
+        save(entity);
 
         final TrusteeEntity found = find(TrusteeEntity.class, entity.getId());
         assertEquals(member.getId(), found.getMember().getId());
@@ -56,7 +55,7 @@ final class TrusteeEntityTest extends DatabaseSetup {
 
         found.setCircleKey("New Key");
         found.setTrustLevel(TrustLevel.WRITE);
-        persist(found);
+        save(found);
 
         final TrusteeEntity updated = find(TrusteeEntity.class, entity.getId());
         assertNotNull(updated);

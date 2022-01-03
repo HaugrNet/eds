@@ -1,6 +1,6 @@
 /*
  * CWS, Cryptographic Web Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2021, haugr.net
+ * Copyright (c) 2016-2022, haugr.net
  * mailto: cws AT haugr DOT net
  *
  * CWS is free software; you can redistribute it and/or modify it under the
@@ -45,7 +45,7 @@ import java.util.Map;
  */
 public final class FakeEntityManager implements EntityManager {
 
-    private static final String persistenceName = "io.javadog.cws.jpa";
+    private static final String persistenceName = "net.haugr.cws.jpa";
     private static final EntityManagerFactory FACTORY = Persistence.createEntityManagerFactory(persistenceName);
     private final EntityManager entityManager = FACTORY.createEntityManager();
 

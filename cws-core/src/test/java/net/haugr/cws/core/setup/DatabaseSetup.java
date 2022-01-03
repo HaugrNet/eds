@@ -1,6 +1,6 @@
 /*
  * CWS, Cryptographic Web Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2021, haugr.net
+ * Copyright (c) 2016-2022, haugr.net
  * mailto: cws AT haugr DOT net
  *
  * CWS is free software; you can redistribute it and/or modify it under the
@@ -21,7 +21,6 @@ import net.haugr.cws.api.common.Constants;
 import net.haugr.cws.api.common.CredentialType;
 import net.haugr.cws.api.common.MemberRole;
 import net.haugr.cws.api.common.ReturnCode;
-import net.haugr.cws.api.common.Utilities;
 import net.haugr.cws.api.requests.Authentication;
 import net.haugr.cws.api.requests.ProcessDataRequest;
 import net.haugr.cws.api.responses.ProcessDataResponse;
@@ -95,8 +94,11 @@ public class DatabaseSetup {
     protected static final String MEMBER_4_ID = "b629f009-4da2-46ed-91b8-aa9dec54814d";
     protected static final String MEMBER_5_ID = "63cb90cc-c1fb-4c6a-b881-bec278b4e232";
 
+    private static final String DEFAULT_ACCOUNT_NAME = "New Account Name";
+    private static final MemberRole DEFAULT_ROLE = MemberRole.STANDARD;
+    private static final String DEFAULT_SECRET = "My Super Secret";
     private static final String TIMESTAMP = "yyyyMMddHHmmssSSS";
-    private static final String persistenceName = "io.javadog.cws.jpa";
+    private static final String persistenceName = "net.haugr.cws.jpa";
     private static final EntityManagerFactory FACTORY = Persistence.createEntityManagerFactory(persistenceName);
     protected final EntityManager entityManager = FACTORY.createEntityManager();
     protected final CommonDao dao = new CommonDao(entityManager);
@@ -178,39 +180,31 @@ public class DatabaseSetup {
         }
     }
 
-    protected MemberEntity prepareMember(final String externalId, final String credential, final KeyAlgorithm algorithm, final String publicKey, final String privateKey, final MemberRole role) {
+    protected MemberEntity prepareMember(final String externalId, final String accountName, final KeyAlgorithm algorithm, final String publicKey, final String privateKey) {
         final MemberEntity entity = new MemberEntity();
-        entity.setName(credential);
+        entity.setName(accountName);
         entity.setPbeAlgorithm(settings.getPasswordAlgorithm());
         entity.setRsaAlgorithm(algorithm);
         entity.setSalt(crypto.encryptWithMasterKey(externalId));
         entity.setPublicKey(publicKey);
         entity.setPrivateKey(privateKey);
-        entity.setMemberRole(role);
-        persist(entity);
+        entity.setMemberRole(DEFAULT_ROLE);
+        save(entity);
 
         return entity;
     }
 
-    protected MemberEntity prepareMember(final String externalId, final String accountName, final String secret, final CWSKeyPair keyPair, final MemberRole role) {
+    protected MemberEntity prepareMember(final String externalId, final CWSKeyPair keyPair) {
         final KeyAlgorithm pbeAlgorithm = settings.getPasswordAlgorithm();
         final IVSalt salt = new IVSalt();
-        final SecretCWSKey secretKey = crypto.generatePasswordKey(pbeAlgorithm, crypto.stringToBytes(secret), salt.getArmored());
+        final SecretCWSKey secretKey = crypto.generatePasswordKey(pbeAlgorithm, crypto.stringToBytes(DEFAULT_SECRET), salt.getArmored());
         secretKey.setSalt(salt);
 
-        final MemberEntity entity = new MemberEntity();
-        entity.setExternalId(externalId);
-        entity.setName(accountName);
-        entity.setSalt(salt.getArmored());
-        entity.setPbeAlgorithm(pbeAlgorithm);
-        entity.setRsaAlgorithm(settings.getAsymmetricAlgorithm());
-        entity.setPublicKey(Crypto.armoringPublicKey(keyPair.getPublic().getKey()));
-        entity.setPrivateKey(Crypto.armoringPrivateKey(secretKey, keyPair.getPrivate().getKey()));
-        entity.setMemberRole(role);
-        entity.setAltered(Utilities.newDate());
-        entity.setAdded(Utilities.newDate());
-
-        return entity;
+        return prepareMember(externalId,
+                DEFAULT_ACCOUNT_NAME,
+                settings.getAsymmetricAlgorithm(),
+                Crypto.armoringPublicKey(keyPair.getPublic().getKey()),
+                Crypto.armoringPrivateKey(secretKey, keyPair.getPrivate().getKey()));
     }
 
     protected static ProcessDataRequest prepareAddDataRequest(final String account, final String circleId, final String dataName, final int bytes) {
@@ -283,7 +277,7 @@ public class DatabaseSetup {
         final KeyEntity entity = new KeyEntity();
         entity.setAlgorithm(settings.getSymmetricAlgorithm());
         entity.setStatus(Status.ACTIVE);
-        persist(entity);
+        save(entity);
 
         return entity;
     }
@@ -292,17 +286,17 @@ public class DatabaseSetup {
         final CircleEntity entity = new CircleEntity();
         entity.setExternalId(externalId);
         entity.setName(name);
-        persist(entity);
+        save(entity);
 
         return entity;
     }
 
-    protected <E extends CWSEntity> void persist(final E entity) {
-        dao.persist(entity);
+    protected <E extends CWSEntity> void save(final E entity) {
+        dao.save(entity);
     }
 
     protected <E extends CWSEntity> void persistAndDetach(final E entity) {
-        persist(entity);
+        save(entity);
         entityManager.flush();
         entityManager.clear();
     }
@@ -323,7 +317,7 @@ public class DatabaseSetup {
     }
 
     /**
-     * To properly test the cases where the SanityCheck is suppose to fail, i.e.
+     * To properly test the cases where the SanityCheck is supposed to fail, i.e.
      * the Data Checksum is not matching the data anymore - a backdoor is needed
      * into the database whereby it is achieved. This method will do just that.
      *

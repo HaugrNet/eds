@@ -1,6 +1,6 @@
 /*
  * CWS, Cryptographic Web Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2021, haugr.net
+ * Copyright (c) 2016-2022, haugr.net
  * mailto: cws AT haugr DOT net
  *
  * CWS is free software; you can redistribute it and/or modify it under the
@@ -166,7 +166,7 @@ final class ManagementBeanSettingsTest extends DatabaseSetup {
         final SettingResponse checkResponse = bean.settings(checkRequest);
         assertTrue(checkResponse.isOk());
 
-        // Finally the negative test, seeing what happens if an invalid PBE
+        // Finally, the negative test, seeing what happens if an invalid PBE
         // iteration count is defined
         mySettings.put(StandardSetting.PBE_ITERATIONS.getKey(), "-100000");
         final SettingRequest negativeRequest = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
@@ -182,7 +182,7 @@ final class ManagementBeanSettingsTest extends DatabaseSetup {
         final ManagementBean bean = prepareManagementBean(newSettings());
         final SettingRequest request = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
 
-        // First invocation, retrieving the list of current values so we can
+        // First invocation, retrieving the list of current values, so we can
         // check that it is being updated
         final SettingResponse response = bean.settings(request);
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());

@@ -1,6 +1,6 @@
 /*
  * CWS, Cryptographic Web Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2021, haugr.net
+ * Copyright (c) 2016-2022, haugr.net
  * mailto: cws AT haugr DOT net
  *
  * CWS is free software; you can redistribute it and/or modify it under the
@@ -26,7 +26,7 @@ import javax.crypto.SecretKey;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-public final class SecretCWSKey extends CWSKey<SecretKey> {
+public final class SecretCWSKey extends AbstractCWSKey<SecretKey> {
 
     private IVSalt salt = null;
 

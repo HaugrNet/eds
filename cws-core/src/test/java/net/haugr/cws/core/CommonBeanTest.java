@@ -1,6 +1,6 @@
 /*
  * CWS, Cryptographic Web Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2021, haugr.net
+ * Copyright (c) 2016-2022, haugr.net
  * mailto: cws AT haugr DOT net
  *
  * CWS is free software; you can redistribute it and/or modify it under the
@@ -23,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import net.haugr.cws.api.common.ReturnCode;
 import net.haugr.cws.core.exceptions.CWSException;
-import net.haugr.cws.core.services.SettingService;
+import net.haugr.cws.core.managers.SettingManager;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import net.haugr.cws.core.setup.fakes.FailService;
@@ -48,7 +48,7 @@ final class CommonBeanTest extends DatabaseSetup {
 
     @Test
     void testDestroy() {
-        final SettingService service = new SettingService(settings, entityManager);
+        final SettingManager service = new SettingManager(settings, entityManager);
         final FailService failService = new FailService(settings, entityManager);
 
         CommonBean.destroy(null);

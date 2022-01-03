@@ -1,6 +1,6 @@
 /*
  * CWS, Cryptographic Web Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2021, haugr.net
+ * Copyright (c) 2016-2022, haugr.net
  * mailto: cws AT haugr DOT net
  *
  * CWS is free software; you can redistribute it and/or modify it under the
@@ -43,7 +43,7 @@ import net.haugr.cws.api.responses.SettingResponse;
 import net.haugr.cws.api.responses.VersionResponse;
 
 /**
- * This interface contain the functionality needed to setup, configure and
+ * This interface contains the functionality needed to set up, configure and
  * control a CWS instance.
  *
  * @author Kim Jensen

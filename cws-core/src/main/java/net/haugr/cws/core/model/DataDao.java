@@ -1,6 +1,6 @@
 /*
  * CWS, Cryptographic Web Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2021, haugr.net
+ * Copyright (c) 2016-2022, haugr.net
  * mailto: cws AT haugr DOT net
  *
  * CWS is free software; you can redistribute it and/or modify it under the
@@ -144,7 +144,7 @@ public final class DataDao extends CommonDao {
      * Id, the external folder Id is added as second parameter.</p>
      *
      * @param entity   The Metadata Entity to convert to a DTO
-     * @param folderId The external folder Id
+     * @param folderId The external folder ID
      * @return Converted Metadata DTO
      */
     public static Metadata convert(final MetadataEntity entity, final String folderId) {

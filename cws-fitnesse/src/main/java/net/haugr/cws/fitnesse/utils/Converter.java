@@ -1,6 +1,6 @@
 /*
  * CWS, Cryptographic Web Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2021, haugr.net
+ * Copyright (c) 2016-2022, haugr.net
  * mailto: cws AT haugr DOT net
  *
  * CWS is free software; you can redistribute it and/or modify it under the
@@ -27,7 +27,7 @@ import java.util.Locale;
 import net.haugr.cws.api.common.Action;
 import net.haugr.cws.api.common.CredentialType;
 import net.haugr.cws.api.common.MemberRole;
-import net.haugr.cws.api.requests.Verifiable;
+import net.haugr.cws.api.requests.AbstractRequest;
 import net.haugr.cws.fitnesse.exceptions.StopTestException;
 
 /**
@@ -79,7 +79,7 @@ public final class Converter {
         final String checked = preCheck(value);
         int result = defaultValue;
 
-        if ((checked != null) && !Verifiable.isEmpty(checked)) {
+        if ((checked != null) && !AbstractRequest.isEmpty(checked)) {
             result = Integer.parseInt(value.trim());
         }
 

@@ -1,6 +1,6 @@
 /*
  * CWS, Cryptographic Web Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2021, haugr.net
+ * Copyright (c) 2016-2022, haugr.net
  * mailto: cws AT haugr DOT net
  *
  * CWS is free software; you can redistribute it and/or modify it under the
@@ -14,7 +14,7 @@
  * this program; If not, you can download a copy of the License
  * here: https://www.apache.org/licenses/
  */
-package net.haugr.cws.core.services;
+package net.haugr.cws.core.managers;
 
 import net.haugr.cws.api.common.Constants;
 import net.haugr.cws.api.common.CredentialType;
@@ -54,9 +54,9 @@ import javax.persistence.EntityManager;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-public final class ProcessMemberService extends Serviceable<MemberDao, ProcessMemberResponse, ProcessMemberRequest> {
+public final class ProcessMemberManager extends AbstractManager<MemberDao, ProcessMemberResponse, ProcessMemberRequest> {
 
-    public ProcessMemberService(final Settings settings, final EntityManager entityManager) {
+    public ProcessMemberManager(final Settings settings, final EntityManager entityManager) {
         super(settings, new MemberDao(entityManager));
     }
 
@@ -166,7 +166,7 @@ public final class ProcessMemberService extends Serviceable<MemberDao, ProcessMe
         entity.setPrivateKey(CredentialType.SIGNATURE.name());
         entity.setPublicKey(Base64.getEncoder().encodeToString(signature));
         entity.setMemberRole(whichRole(request));
-        dao.persist(entity);
+        dao.save(entity);
 
         final var response = new ProcessMemberResponse("An invitation was successfully issued for '" + memberName + "'.");
         response.setMemberId(entity.getExternalId());
@@ -192,7 +192,7 @@ public final class ProcessMemberService extends Serviceable<MemberDao, ProcessMe
 
         // Now to the exciting part, the Salt is taken from the Member, and used
         // to generate a new PBE based Symmetric Key, which again is used to
-        // encrypt the already encrypted SessionKey. This making it a but more
+        // encrypt the already encrypted SessionKey. This making it a bit more
         // challenging to extract the information, if there is no access to the
         // MasterKey.
         final String salt = crypto.decryptWithMasterKey(member.getSalt());
@@ -203,7 +203,7 @@ public final class ProcessMemberService extends Serviceable<MemberDao, ProcessMe
         member.setSessionChecksum(checksum);
         member.setSessionCrypto(privateKey);
         member.setSessionExpire(Utilities.newDate().plusMinutes(settings.getSessionTimeout()));
-        dao.persist(member);
+        dao.save(member);
 
         // Key's no longer being used, must be destroyed.
         key.destroy();
@@ -228,7 +228,7 @@ public final class ProcessMemberService extends Serviceable<MemberDao, ProcessMe
         final String memberId = request.getMemberId();
         final MemberEntity entity = dao.find(MemberEntity.class, memberId);
         entity.setMemberRole(request.getMemberRole());
-        dao.persist(entity);
+        dao.save(entity);
 
         final var response = new ProcessMemberResponse(theMember(entity) + " has successfully been given the new role '" + request.getMemberRole() + "'.");
         response.setMemberId(memberId);
@@ -242,7 +242,7 @@ public final class ProcessMemberService extends Serviceable<MemberDao, ProcessMe
         updateOwnAccountName(newAccountName);
         updateOwnCredential(request);
         updateOwnPublicKey(request);
-        dao.persist(member);
+        dao.save(member);
 
         final var response = new ProcessMemberResponse(theMember(member) + " was successfully updated.");
         response.setMemberId(member.getExternalId());
@@ -276,7 +276,7 @@ public final class ProcessMemberService extends Serviceable<MemberDao, ProcessMe
                 final SecretCWSKey circleKey = Crypto.extractCircleKey(algorithm, keyPair.getPrivate(), trustee.getCircleKey());
                 trustee.setCircleKey(Crypto.encryptAndArmorCircleKey(pair.getPublic(), circleKey));
 
-                dao.persist(trustee);
+                dao.save(trustee);
             }
         }
     }
@@ -380,7 +380,7 @@ public final class ProcessMemberService extends Serviceable<MemberDao, ProcessMe
         account.setMemberKey(request.getPublicKey());
         account.setPublicKey(Crypto.armoringPublicKey(pair.getPublic().getKey()));
         account.setPrivateKey(Crypto.armoringPrivateKey(key, pair.getPrivate().getKey()));
-        dao.persist(account);
+        dao.save(account);
 
         final var response = new ProcessMemberResponse("The invitation was successfully processed for '" + account.getName() + "'.");
         response.setMemberId(account.getExternalId());

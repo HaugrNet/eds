@@ -1,5 +1,4 @@
-Thanks for downloading and trying CWS, Cryptographic Web Store.
-
+Thanks for downloading and trying CWS, Cryptographic Web Share.
 
 == Requirements ==
 
@@ -20,7 +19,7 @@ Java 11 JDK
 Java 11 is the latest Long Term Support version of Java, it can be downloaded
 from https://adoptopenjdk.net/.
 
-Jakarta EE 9+ container (Wildfly)
+Jakarta EE 8 container (Wildfly)
 The default container used for both development and testing is WildFly 
 (https://wildfly.org) version 21+. If you do not already have Wildfly
 installed, download Wildfly and unpack it.  Follow the instructions on setting
@@ -110,8 +109,8 @@ variables are predefined, and can be used to start, stop, configure, deploy and
 undeploy CWS.
 
 The configure option will start the container and then apply the correct changes
-to it. Once done, the deploy and start/stop options should be all that is needed
-to further the management of CWS. The scripts uses files relative to the
+to it. Once done, deploy and start/stop options should be all that is needed
+to further the management of CWS. The scripts use files relative to the
 directory where it is installed, so it is important that they are being run
 from their installed directory.
 
@@ -157,17 +156,12 @@ $ export GLASSFISH_HOME="/opt/payara"
 $ export PATH=${PATH}:`pwd`/bin
 $ wildfly.sh | payara.sh start
 
-Now, the CWS is running with both a SOAP and REST API available from port 8080,
-the WSDLs can be accessed from the following URLs:
-
-http://localhost:8080/cws/management?wsdl
-http://localhost:8080/cws/share?wsdl
-
+Now, the CWS is offers a REST API available from port 8080. The swagger.json
+ (Open API) file has a complete description of the API.
 
 == Documentation ==
 
 The API is documented in the accompanying JavaDoc, which is in the api.zip file.
-
 
 == Contact ==
 

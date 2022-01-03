@@ -1,6 +1,6 @@
 /*
  * CWS, Cryptographic Web Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2021, haugr.net
+ * Copyright (c) 2016-2022, haugr.net
  * mailto: cws AT haugr DOT net
  *
  * CWS is free software; you can redistribute it and/or modify it under the
@@ -14,7 +14,7 @@
  * this program; If not, you can download a copy of the License
  * here: https://www.apache.org/licenses/
  */
-package net.haugr.cws.core.services;
+package net.haugr.cws.core.managers;
 
 import net.haugr.cws.api.common.MemberRole;
 import net.haugr.cws.api.common.ReturnCode;
@@ -42,9 +42,9 @@ import net.haugr.cws.core.enums.StandardSetting;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-public final class FetchMemberService extends Serviceable<MemberDao, FetchMemberResponse, FetchMemberRequest> {
+public final class FetchMemberManager extends AbstractManager<MemberDao, FetchMemberResponse, FetchMemberRequest> {
 
-    public FetchMemberService(final Settings settings, final EntityManager entityManager) {
+    public FetchMemberManager(final Settings settings, final EntityManager entityManager) {
         super(settings, new MemberDao(entityManager));
     }
 
@@ -96,7 +96,7 @@ public final class FetchMemberService extends Serviceable<MemberDao, FetchMember
      * Settings is set to True.</p>
      *
      * @param response  Response Object to fill
-     * @param requested Requested Member to see if may be viewed
+     * @param requested Requested Member to see if it may be viewed
      * @see StandardSetting#SHOW_TRUSTEES
      */
     private void fetchSomeoneElse(final FetchMemberResponse response, final MemberEntity requested) {

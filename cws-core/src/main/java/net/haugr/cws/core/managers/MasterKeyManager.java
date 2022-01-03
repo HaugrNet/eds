@@ -1,6 +1,6 @@
 /*
  * CWS, Cryptographic Web Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2021, haugr.net
+ * Copyright (c) 2016-2022, haugr.net
  * mailto: cws AT haugr DOT net
  *
  * CWS is free software; you can redistribute it and/or modify it under the
@@ -14,7 +14,7 @@
  * this program; If not, you can download a copy of the License
  * here: https://www.apache.org/licenses/
  */
-package net.haugr.cws.core.services;
+package net.haugr.cws.core.managers;
 
 import net.haugr.cws.api.common.Constants;
 import net.haugr.cws.api.common.MemberRole;
@@ -44,11 +44,11 @@ import javax.persistence.EntityManager;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-public final class MasterKeyService extends Serviceable<CommonDao, MasterKeyResponse, MasterKeyRequest> {
+public final class MasterKeyManager extends AbstractManager<CommonDao, MasterKeyResponse, MasterKeyRequest> {
 
-    private static final Logger LOG = Logger.getLogger(MasterKeyService.class.getName());
+    private static final Logger LOG = Logger.getLogger(MasterKeyManager.class.getName());
 
-    public MasterKeyService(final Settings settings, final EntityManager entityManager) {
+    public MasterKeyManager(final Settings settings, final EntityManager entityManager) {
         super(settings, new CommonDao(entityManager));
     }
 
@@ -127,7 +127,7 @@ public final class MasterKeyService extends Serviceable<CommonDao, MasterKeyResp
         }
 
         entity.setSetting(url);
-        dao.persist(entity);
+        dao.save(entity);
     }
 
     private boolean checkCredentials(final SecretCWSKey masterKey, final MemberEntity admin, final byte[] secret) {
@@ -162,7 +162,7 @@ public final class MasterKeyService extends Serviceable<CommonDao, MasterKeyResp
         if (admins.isEmpty()) {
             admin = createNewAccount(Constants.ADMIN_ACCOUNT, MemberRole.ADMIN, authentication.getCredential());
         } else {
-            // Fetch the first administrator, the one with Id 1.
+            // Fetch the first administrator, the one with ID 1.
             admin = admins.get(0);
         }
 

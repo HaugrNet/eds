@@ -1,6 +1,6 @@
 /*
  * CWS, Cryptographic Web Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2021, haugr.net
+ * Copyright (c) 2016-2022, haugr.net
  * mailto: cws AT haugr DOT net
  *
  * CWS is free software; you can redistribute it and/or modify it under the
@@ -14,7 +14,7 @@
  * this program; If not, you can download a copy of the License
  * here: https://www.apache.org/licenses/
  */
-package net.haugr.cws.core.services;
+package net.haugr.cws.core.managers;
 
 import net.haugr.cws.api.common.Constants;
 import net.haugr.cws.api.common.CredentialType;
@@ -25,7 +25,7 @@ import net.haugr.cws.api.common.Utilities;
 import net.haugr.cws.api.dtos.Circle;
 import net.haugr.cws.api.requests.Authentication;
 import net.haugr.cws.api.requests.CircleIdRequest;
-import net.haugr.cws.api.requests.Verifiable;
+import net.haugr.cws.api.requests.AbstractRequest;
 import net.haugr.cws.api.responses.CwsResponse;
 import net.haugr.cws.core.enums.KeyAlgorithm;
 import net.haugr.cws.core.enums.Permission;
@@ -57,7 +57,7 @@ import net.haugr.cws.core.StartupBean;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-public abstract class Serviceable<D extends CommonDao, R extends CwsResponse, A extends Authentication> {
+public abstract class AbstractManager<D extends CommonDao, R extends CwsResponse, A extends Authentication> {
 
     protected final Settings settings;
     protected final Crypto crypto;
@@ -67,7 +67,7 @@ public abstract class Serviceable<D extends CommonDao, R extends CwsResponse, A 
     protected MemberEntity member = null;
     protected CWSKeyPair keyPair = null;
 
-    protected Serviceable(final Settings settings, final D dao) {
+    protected AbstractManager(final Settings settings, final D dao) {
         this.crypto = new Crypto(settings);
         this.settings = settings;
         this.dao = dao;
@@ -119,9 +119,9 @@ public abstract class Serviceable<D extends CommonDao, R extends CwsResponse, A 
         // ready to be used. If not, then an Exception is thrown.
         throwIfSystemIsNotReady();
 
-        // If available, let's extract the CircleId so it can be used to improve
-        // accuracy of the checks and reduce the amount of data fetched from the
-        // database in preparation to perform these checks.
+        // If available, let's extract the CircleId, so it can be used to
+        // improve accuracy of the checks and reduce the amount of data fetched
+        // from the database in preparation to perform these checks.
         String circleId = null;
         if (authentication instanceof CircleIdRequest) {
             circleId = ((CircleIdRequest) authentication).getCircleId();
@@ -146,7 +146,7 @@ public abstract class Serviceable<D extends CommonDao, R extends CwsResponse, A 
             //       For valid sessions, the MasterKey has been used to
             //     encrypt the SessionKey, before it is being used to unlock
             //     the Member KeyPair. This is to prevent that a copy of the
-            //     database may result in someone being able to unlock the
+            //     database may result in unwanted unlocking of the
             //     Account details with just the SessionKey alone.
             verifySession(authentication, circleId);
         } else {
@@ -198,14 +198,14 @@ public abstract class Serviceable<D extends CommonDao, R extends CwsResponse, A 
      * complete the request with this Request Object, the thrown Exception will
      * contain all the information needed to correct the problem.</p>
      *
-     * @param verifiable Given Request Object to verify
+     * @param request Given Request Object to verify
      * @throws VerificationException if the given Object is null or invalid
      */
-    protected static void verify(final Verifiable verifiable) {
-        throwConditionalNullException(verifiable,
+    protected static void verify(final AbstractRequest request) {
+        throwConditionalNullException(request,
                 ReturnCode.VERIFICATION_WARNING, "Cannot Process a NULL Object.");
 
-        final Map<String, String> errors = verifiable.validate();
+        final Map<String, String> errors = request.validate();
         if (!errors.isEmpty()) {
             final int capacity = errors.size() * 75;
             final var builder = new StringBuilder(capacity);
@@ -226,7 +226,7 @@ public abstract class Serviceable<D extends CommonDao, R extends CwsResponse, A 
      * Member Account based on the Session information.
      *
      * @param authentication Authentication information with Session
-     * @param circleId       Optional Circle Id
+     * @param circleId       Optional Circle ID
      */
     private void verifySession(final A authentication, final String circleId) {
         final byte[] masterEncrypted = crypto.encryptWithMasterKey(authentication.getCredential());
@@ -252,7 +252,7 @@ public abstract class Serviceable<D extends CommonDao, R extends CwsResponse, A 
      * Member Account based on the Credential information.
      *
      * @param authentication Authentication Account Name &amp; Credential
-     * @param circleId       Optional Circle Id
+     * @param circleId       Optional Circle ID
      */
     private void verifyAccount(final A authentication, final String circleId) {
         final String account = trim(authentication.getAccountName());
@@ -271,12 +271,12 @@ public abstract class Serviceable<D extends CommonDao, R extends CwsResponse, A 
 
     /**
      * Checks if the given Member Account is an Administrator, or if the
-     * optional Circle Id is present, it checks the relation between the given
-     * Member Entity and the Circle Id. If no relation exist, then the dao used
+     * optional Circle ID is present, it checks the relation between the given
+     * Member Entity and the Circle ID. If no relation exist, then the dao used
      * will throw a {@code CWSException} with an Identification warning.
      *
      * @param memberEntity MemberEntity to check
-     * @param circleId     Optional Circle Id to verify relation with
+     * @param circleId     Optional Circle ID to verify relation with
      */
     private void checkMemberAccount(final MemberEntity memberEntity, final String circleId) {
         if ((circleId == null) || (memberEntity.getMemberRole() == MemberRole.ADMIN)) {
@@ -322,7 +322,7 @@ public abstract class Serviceable<D extends CommonDao, R extends CwsResponse, A 
         member.setRsaAlgorithm(rsaAlgorithm);
         member.setPrivateKey(privateKey);
         member.setPublicKey(publicKey);
-        dao.persist(member);
+        dao.save(member);
 
         return pair;
     }

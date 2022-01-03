@@ -1,6 +1,6 @@
 /*
  * CWS, Cryptographic Web Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2021, haugr.net
+ * Copyright (c) 2016-2022, haugr.net
  * mailto: cws AT haugr DOT net
  *
  * CWS is free software; you can redistribute it and/or modify it under the
@@ -34,6 +34,8 @@ public final class Utilities {
     }
 
     /**
+     * <p>Creates a LocalDateTime instance, based on given milli seconds. The
+     * LocalDateTime instance will be using UTC as offset.</p>
      *
      * @param millisSinceEpoch Milli Seconds since epoch (1970-01-01 00:00:00)
      * @return New UTC based ZonedDateTime instance

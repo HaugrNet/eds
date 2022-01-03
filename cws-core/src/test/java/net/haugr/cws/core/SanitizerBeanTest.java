@@ -1,6 +1,6 @@
 /*
  * CWS, Cryptographic Web Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2021, haugr.net
+ * Copyright (c) 2016-2022, haugr.net
  * mailto: cws AT haugr DOT net
  *
  * CWS is free software; you can redistribute it and/or modify it under the
@@ -28,7 +28,7 @@ import net.haugr.cws.core.enums.StandardSetting;
 import net.haugr.cws.core.exceptions.CWSException;
 import net.haugr.cws.core.model.Settings;
 import net.haugr.cws.core.model.entities.DataEntity;
-import net.haugr.cws.core.services.ProcessDataService;
+import net.haugr.cws.core.managers.ProcessDataManager;
 import net.haugr.cws.core.setup.DatabaseSetup;
 import net.haugr.cws.core.setup.fakes.FakeEntityManager;
 import net.haugr.cws.core.setup.fakes.FakeTimer;
@@ -156,7 +156,7 @@ final class SanitizerBeanTest extends DatabaseSetup {
 
             // The Bean is updating the Settings via the DB, so we need to alter
             // the content of the DB to reflect this. As the content has not yet
-            // been read out - it is also not cached, hence a simply update will
+            // been read out - it is also not cached, hence a simple update will
             // suffice.
             final int updated = entityManager
                     .createQuery("update SettingEntity set setting = :setting where name = :name")
@@ -231,7 +231,7 @@ final class SanitizerBeanTest extends DatabaseSetup {
     }
 
     private void prepareInvalidData() {
-        final ProcessDataService service = new ProcessDataService(settings, entityManager);
+        final ProcessDataManager service = new ProcessDataManager(settings, entityManager);
         timeWarpChecksum(service.perform(prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "Valid Data1", 1048576)), Utilities.newDate(1L));
         falsifyChecksum(service.perform(prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "Invalidated Data1", 1048576)), Utilities.newDate(2L), SanityStatus.OK);
         falsifyChecksum(service.perform(prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "Invalidated Data2", 524288)), Utilities.newDate(), SanityStatus.OK);

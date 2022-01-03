@@ -1,6 +1,6 @@
 /*
  * CWS, Cryptographic Web Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2021, haugr.net
+ * Copyright (c) 2016-2022, haugr.net
  * mailto: cws AT haugr DOT net
  *
  * CWS is free software; you can redistribute it and/or modify it under the
@@ -14,7 +14,7 @@
  * this program; If not, you can download a copy of the License
  * here: https://www.apache.org/licenses/
  */
-package net.haugr.cws.core.services;
+package net.haugr.cws.core.managers;
 
 import net.haugr.cws.api.common.Constants;
 import net.haugr.cws.api.common.ReturnCode;
@@ -43,9 +43,9 @@ import javax.persistence.EntityManager;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-public final class FetchDataService extends Serviceable<DataDao, FetchDataResponse, FetchDataRequest> {
+public final class FetchDataManager extends AbstractManager<DataDao, FetchDataResponse, FetchDataRequest> {
 
-    public FetchDataService(final Settings settings, final EntityManager entityManager) {
+    public FetchDataManager(final Settings settings, final EntityManager entityManager) {
         super(settings, new DataDao(entityManager));
     }
 
@@ -62,7 +62,7 @@ public final class FetchDataService extends Serviceable<DataDao, FetchDataRespon
         // value, if the methods are all final - this is because it prevents the
         // Hibernate proxy, using ByteBuddy, to override the method. Hence, the
         // Object it should be compared against is first read out - since this
-        // will help overriding the proxying.
+        // will help override the proxying.
         //   See: https://github.com/JavaDogs/cws/issues/45
         final MetadataEntity root = findRootMetadata(request);
 
@@ -96,7 +96,7 @@ public final class FetchDataService extends Serviceable<DataDao, FetchDataRespon
      *
      * <p>If no record is found, then a null value is returned.</p>
      *
-     * @param request Request Object with Circle & Data Id's
+     * @param request Request Object with Circle & Data ID's
      * @return Root Metadata Record, to base the rest of the processing on
      */
     private MetadataEntity findRootMetadata(final FetchDataRequest request) {
@@ -117,7 +117,7 @@ public final class FetchDataService extends Serviceable<DataDao, FetchDataRespon
     }
 
     private FetchDataResponse readCompleteDataObject(final MetadataEntity metadata) {
-        // Following Query will read out a specific Data Record with meta data
+        // Following Query will read out a specific Data Record with metadata
         // information, if the person is allowed, which includes checks for
         // Circle Membership and right TrustLevel of the Member. If no Entity
         // is found, then there can be multiple reasons.
@@ -155,7 +155,7 @@ public final class FetchDataService extends Serviceable<DataDao, FetchDataRespon
             // information is persisted. This will also prevent that the Object
             // is checked too soon.
             entity.setSanityChecked(Utilities.newDate());
-            dao.persist(entity);
+            dao.save(entity);
         } else {
             response.setMetadata(metadataList);
         }

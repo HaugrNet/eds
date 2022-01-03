@@ -1,6 +1,6 @@
 /*
  * CWS, Cryptographic Web Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2021, haugr.net
+ * Copyright (c) 2016-2022, haugr.net
  * mailto: cws AT haugr DOT net
  *
  * CWS is free software; you can redistribute it and/or modify it under the
@@ -24,9 +24,9 @@ import javax.json.bind.annotation.JsonbProperty;
 import javax.json.bind.annotation.JsonbPropertyOrder;
 
 /**
- * This Object contain information about a Signature in CWS, such as when it
+ * This Object contains information about a Signature in CWS, such as when it
  * expires, verification attempts, when it was added and when it was last used.
- * It also contain the checksum for identification of it.
+ * It also contains the checksum for identification of it.
  *
  * @author Kim Jensen
  * @since CWS 1.0

@@ -1,6 +1,6 @@
 /*
  * CWS, Cryptographic Web Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2021, haugr.net
+ * Copyright (c) 2016-2022, haugr.net
  * mailto: cws AT haugr DOT net
  *
  * CWS is free software; you can redistribute it and/or modify it under the
@@ -14,7 +14,7 @@
  * this program; If not, you can download a copy of the License
  * here: https://www.apache.org/licenses/
  */
-package net.haugr.cws.core.services;
+package net.haugr.cws.core.managers;
 
 import net.haugr.cws.api.common.ReturnCode;
 import net.haugr.cws.api.common.TrustLevel;
@@ -41,9 +41,9 @@ import javax.persistence.EntityManager;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-public final class ProcessTrusteeService extends Serviceable<CommonDao, ProcessTrusteeResponse, ProcessTrusteeRequest> {
+public final class ProcessTrusteeManager extends AbstractManager<CommonDao, ProcessTrusteeResponse, ProcessTrusteeRequest> {
 
-    public ProcessTrusteeService(final Settings settings, final EntityManager entityManager) {
+    public ProcessTrusteeManager(final Settings settings, final EntityManager entityManager) {
         super(settings, new CommonDao(entityManager));
     }
 
@@ -76,7 +76,7 @@ public final class ProcessTrusteeService extends Serviceable<CommonDao, ProcessT
     }
 
     /**
-     * As the Circle Id is mandatory for this request, it also means that the
+     * As the Circle ID is mandatory for this request, it also means that the
      * Validation logic has extracted the Circle Administrator as the only
      * Trustee record, so we can use this to create a new Trustee record from.
      *
@@ -120,14 +120,14 @@ public final class ProcessTrusteeService extends Serviceable<CommonDao, ProcessT
         final var cwsPublicKey = new PublicCWSKey(newTrusteeMember.getRsaAlgorithm(), publicKey);
         trustee.setCircleKey(Crypto.encryptAndArmorCircleKey(cwsPublicKey, circleKey));
 
-        dao.persist(trustee);
+        dao.save(trustee);
         return new ProcessTrusteeResponse("The Member '" + trustee.getMember().getName() + "' was successfully added as trustee to '" + trustee.getCircle().getName() + "'.");
     }
 
     private ProcessTrusteeResponse alterTrustee(final ProcessTrusteeRequest request) {
         final TrusteeEntity trustee = findTrusteeForCircleAndMember(request);
         trustee.setTrustLevel(request.getTrustLevel());
-        dao.persist(trustee);
+        dao.save(trustee);
 
         return new ProcessTrusteeResponse("The Trustee '" + trustee.getMember().getName() + "' has successfully been given the trust level '" + trustee.getTrustLevel() + "' in the Circle '" + trustee.getCircle().getName() + "'.");
     }

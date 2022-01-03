@@ -1,6 +1,6 @@
 /*
  * CWS, Cryptographic Web Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2021, haugr.net
+ * Copyright (c) 2016-2022, haugr.net
  * mailto: cws AT haugr DOT net
  *
  * CWS is free software; you can redistribute it and/or modify it under the
@@ -14,7 +14,7 @@
  * this program; If not, you can download a copy of the License
  * here: https://www.apache.org/licenses/
  */
-package net.haugr.cws.core.services;
+package net.haugr.cws.core.managers;
 
 import net.haugr.cws.api.common.Constants;
 import net.haugr.cws.api.common.ReturnCode;
@@ -48,9 +48,9 @@ import javax.persistence.EntityManager;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-public final class ProcessDataService extends Serviceable<DataDao, ProcessDataResponse, ProcessDataRequest> {
+public final class ProcessDataManager extends AbstractManager<DataDao, ProcessDataResponse, ProcessDataRequest> {
 
-    public ProcessDataService(final Settings settings, final EntityManager entityManager) {
+    public ProcessDataManager(final Settings settings, final EntityManager entityManager) {
         super(settings, new DataDao(entityManager));
     }
 
@@ -64,7 +64,7 @@ public final class ProcessDataService extends Serviceable<DataDao, ProcessDataRe
         Arrays.fill(request.getCredential(), (byte) 0);
 
         // Since the verification above is of a more general nature, it is
-        // important that the processing is being double checked against the
+        // important that the processing is being double-checked against the
         // actual Circle.
         final ProcessDataResponse response;
 
@@ -130,7 +130,7 @@ public final class ProcessDataService extends Serviceable<DataDao, ProcessDataRe
         entity.setName(checkName(entity, request.getDataName(), folderId));
         checkData(entity, request.getData());
         entity.setParentId(folderId);
-        dao.persist(entity);
+        dao.save(entity);
 
         return buildProcessDataResponse(entity.getExternalId(), theDataObject(entity) + " was successfully updated.");
     }
@@ -252,7 +252,7 @@ public final class ProcessDataService extends Serviceable<DataDao, ProcessDataRe
             toSave.setChecksum(crypto.generateChecksum(toSave.getData()));
             toSave.setSanityStatus(SanityStatus.OK);
             toSave.setSanityChecked(Utilities.newDate());
-            dao.persist(toSave);
+            dao.save(toSave);
 
             // Actively overwrite the raw Object bytes, so it no longer
             // can be read unencrypted.
@@ -316,7 +316,7 @@ public final class ProcessDataService extends Serviceable<DataDao, ProcessDataRe
         entity.setName(name);
         entity.setParentId(parentId);
         entity.setType(dataType);
-        dao.persist(entity);
+        dao.save(entity);
 
         return entity;
     }
@@ -332,7 +332,7 @@ public final class ProcessDataService extends Serviceable<DataDao, ProcessDataRe
      * is the UUID or ExternalId value.</p>
      *
      * @param entity   Data Entity to check the Folder of
-     * @param folderId The External Id of the Folder to check
+     * @param folderId The External ID of the Folder to check
      * @return Metadata Entity of the Folder
      */
     private MetadataEntity checkFolder(final MetadataEntity entity, final String folderId) {

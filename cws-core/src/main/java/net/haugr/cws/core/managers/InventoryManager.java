@@ -1,6 +1,6 @@
 /*
  * CWS, Cryptographic Web Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2021, haugr.net
+ * Copyright (c) 2016-2022, haugr.net
  * mailto: cws AT haugr DOT net
  *
  * CWS is free software; you can redistribute it and/or modify it under the
@@ -14,7 +14,7 @@
  * this program; If not, you can download a copy of the License
  * here: https://www.apache.org/licenses/
  */
-package net.haugr.cws.core.services;
+package net.haugr.cws.core.managers;
 
 import net.haugr.cws.api.dtos.Metadata;
 import net.haugr.cws.api.requests.InventoryRequest;
@@ -34,9 +34,9 @@ import javax.persistence.EntityManager;
  * @author Kim Jensen
  * @since CWS 1.2
  */
-public class InventoryService extends Serviceable<DataDao, InventoryResponse, InventoryRequest> {
+public class InventoryManager extends AbstractManager<DataDao, InventoryResponse, InventoryRequest> {
 
-    public InventoryService(final Settings settings, final EntityManager entityManager) {
+    public InventoryManager(final Settings settings, final EntityManager entityManager) {
         super(settings, new DataDao(entityManager));
     }
 

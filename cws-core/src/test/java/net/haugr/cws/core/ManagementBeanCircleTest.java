@@ -1,6 +1,6 @@
 /*
  * CWS, Cryptographic Web Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2021, haugr.net
+ * Copyright (c) 2016-2022, haugr.net
  * mailto: cws AT haugr DOT net
  *
  * CWS is free software; you can redistribute it and/or modify it under the
@@ -277,7 +277,7 @@ final class ManagementBeanCircleTest extends DatabaseSetup {
         //  * Extra Encrypted
         // Note, that it could be considered a bug that the list earlier was
         // sorted with uppercase letters before lowercase letters, thus 'Z' came
-        // before 'a'. With the case insensitive indexes, it should be fixed.
+        // before 'a'. With the case-insensitive indexes, it should be fixed.
         assertEquals(createResponse.getCircleId(), fetchResponse.getCircles().get(3).getCircleId());
         assertEquals(updateRequest.getCircleKey(), fetchResponse.getCircles().get(3).getCircleKey());
     }

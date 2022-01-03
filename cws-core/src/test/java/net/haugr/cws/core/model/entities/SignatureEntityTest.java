@@ -1,6 +1,6 @@
 /*
  * CWS, Cryptographic Web Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2021, haugr.net
+ * Copyright (c) 2016-2022, haugr.net
  * mailto: cws AT haugr DOT net
  *
  * CWS is free software; you can redistribute it and/or modify it under the
@@ -45,7 +45,7 @@ final class SignatureEntityTest extends DatabaseSetup {
         entity.setExpires(expires);
         entity.setVerifications(123L);
 
-        dao.persist(entity);
+        dao.save(entity);
         final List<SignatureEntity> found = dao.findAllAscending(SignatureEntity.class, "id");
         assertFalse(found.isEmpty());
         assertEquals(member, found.get(0).getMember());

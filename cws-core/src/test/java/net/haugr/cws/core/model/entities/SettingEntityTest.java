@@ -1,6 +1,6 @@
 /*
  * CWS, Cryptographic Web Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2021, haugr.net
+ * Copyright (c) 2016-2022, haugr.net
  * mailto: cws AT haugr DOT net
  *
  * CWS is free software; you can redistribute it and/or modify it under the
@@ -35,7 +35,7 @@ final class SettingEntityTest extends DatabaseSetup {
         final SettingEntity entity = new SettingEntity();
         entity.setName("My.New.Setting");
         entity.setSetting("The Setting Value");
-        persist(entity);
+        save(entity);
 
         final SettingEntity found = find(SettingEntity.class, entity.getId());
         assertNotNull(found);
@@ -44,7 +44,7 @@ final class SettingEntityTest extends DatabaseSetup {
 
         found.setName("My.Altered.Setting");
         found.setSetting("The Altered Setting");
-        persist(found);
+        save(found);
 
         final SettingEntity updated = find(SettingEntity.class, entity.getId());
         assertNotNull(updated);

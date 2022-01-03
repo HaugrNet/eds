@@ -1,6 +1,6 @@
 /*
  * CWS, Cryptographic Web Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2021, haugr.net
+ * Copyright (c) 2016-2022, haugr.net
  * mailto: cws AT haugr DOT net
  *
  * CWS is free software; you can redistribute it and/or modify it under the
@@ -27,7 +27,7 @@ import javax.json.bind.annotation.JsonbPropertyOrder;
  * The Sanity Object contain information about a Data record, which has failed
  * the sanity check, i.e. the encrypted bytes have been changed, so it is no
  * longer possible to decrypt the Object. The information returned include the
- * Id of the Data Object which failed the sanity check, and the date at which it
+ * ID of the Data Object which failed the sanity check, and the date at which it
  * failed it.
  *
  * @author Kim Jensen

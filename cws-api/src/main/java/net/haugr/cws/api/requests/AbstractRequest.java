@@ -1,6 +1,6 @@
 /*
  * CWS, Cryptographic Web Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2021, haugr.net
+ * Copyright (c) 2016-2022, haugr.net
  * mailto: cws AT haugr DOT net
  *
  * CWS is free software; you can redistribute it and/or modify it under the
@@ -38,7 +38,7 @@ import java.util.Map;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-public abstract class Verifiable implements Serializable {
+public abstract class AbstractRequest implements Serializable {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
@@ -144,7 +144,7 @@ public abstract class Verifiable implements Serializable {
      *
      * @param errors  Map to store the error information in, if id is invalid
      * @param field   Name of the field from the request/dto holding the value
-     * @param value   The value to check if is a valid Id (UUID)
+     * @param value   The value to check if is a valid ID (UUID)
      * @param message The error message to add to the error map
      * @see Constants#ID_PATTERN_REGEX
      */

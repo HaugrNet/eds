@@ -1,6 +1,6 @@
 /*
  * CWS, Cryptographic Web Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2021, haugr.net
+ * Copyright (c) 2016-2022, haugr.net
  * mailto: cws AT haugr DOT net
  *
  * CWS is free software; you can redistribute it and/or modify it under the
@@ -48,7 +48,7 @@ final class MemberEntityTest extends DatabaseSetup {
     void testEntity() {
         final CWSKeyPair keyPair = Crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
         final String externalId = UUID.randomUUID().toString();
-        final MemberEntity entity = prepareMember(externalId, "New Account Name", "My Super Secret", keyPair, MemberRole.STANDARD);
+        final MemberEntity entity = prepareMember(externalId, keyPair);
         persistAndDetach(entity);
 
         final long id = entity.getId();
@@ -81,10 +81,10 @@ final class MemberEntityTest extends DatabaseSetup {
         final String publicKey = UUID.randomUUID().toString();
         final String privateKey = UUID.randomUUID().toString();
         final String externalId = UUID.randomUUID().toString();
-        final MemberEntity entity = prepareMember(externalId, credential, algorithm, publicKey, privateKey, MemberRole.STANDARD);
+        final MemberEntity entity = prepareMember(externalId, credential, algorithm, publicKey, privateKey);
         final LocalDateTime lastModified = entity.getAltered();
 
-        persist(entity);
+        save(entity);
         assertTrue(lastModified.isBefore(entity.getAltered()));
     }
 
@@ -95,7 +95,7 @@ final class MemberEntityTest extends DatabaseSetup {
         final String publicKey = UUID.randomUUID().toString();
         final String privateKey = UUID.randomUUID().toString();
         final String externalId = UUID.randomUUID().toString();
-        final MemberEntity entity = prepareMember(externalId, credential, algorithm, publicKey, privateKey, MemberRole.STANDARD);
+        final MemberEntity entity = prepareMember(externalId, credential, algorithm, publicKey, privateKey);
         assertNotNull(entity.getId());
 
         entityManager.persist(entity);
@@ -116,7 +116,7 @@ final class MemberEntityTest extends DatabaseSetup {
         // first, this is done via the Reference Pointers, since an
         // Objects.equals() will yield the same result
         assertNotEquals(found.hashCode(), entity.hashCode());
-        // Now, we'll ensure that it is the same Entity by comparing the Id's
+        // Now, we'll ensure that it is the same Entity by comparing the ID's
         assertEquals(found.getId(), entity.getId());
     }
 

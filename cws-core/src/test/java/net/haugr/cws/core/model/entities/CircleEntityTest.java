@@ -1,6 +1,6 @@
 /*
  * CWS, Cryptographic Web Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2021, haugr.net
+ * Copyright (c) 2016-2022, haugr.net
  * mailto: cws AT haugr DOT net
  *
  * CWS is free software; you can redistribute it and/or modify it under the
@@ -41,7 +41,7 @@ final class CircleEntityTest extends DatabaseSetup {
         assertEquals(entity.getName(), found.getName());
 
         found.setName("Circle 2");
-        persist(found);
+        save(found);
         entityManager.flush();
         entityManager.clear();
 

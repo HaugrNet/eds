@@ -14,7 +14,7 @@
  * this program; If not, you can download a copy of the License
  * here: https://www.apache.org/licenses/
  */
-package net.haugr.cws.core.services;
+package net.haugr.cws.core.managers;
 
 import net.haugr.cws.api.common.ReturnCode;
 import net.haugr.cws.api.requests.SettingRequest;
@@ -59,11 +59,11 @@ import javax.persistence.EntityManager;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-public final class SettingService extends Serviceable<CommonDao, SettingResponse, SettingRequest> {
+public final class SettingManager extends AbstractManager<CommonDao, SettingResponse, SettingRequest> {
 
     private static final Pattern PATTERN_NUMBER = Pattern.compile("\\d+");
 
-    public SettingService(final Settings settings, final EntityManager entityManager) {
+    public SettingManager(final Settings settings, final EntityManager entityManager) {
         super(settings, new CommonDao(entityManager));
     }
 

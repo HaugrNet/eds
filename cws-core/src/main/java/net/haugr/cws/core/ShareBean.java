@@ -32,13 +32,13 @@ import net.haugr.cws.api.responses.SignResponse;
 import net.haugr.cws.api.responses.VerifyResponse;
 import net.haugr.cws.core.exceptions.CWSException;
 import net.haugr.cws.core.model.Settings;
-import net.haugr.cws.core.services.FetchDataService;
-import net.haugr.cws.core.services.FetchDataTypeService;
-import net.haugr.cws.core.services.FetchSignatureService;
-import net.haugr.cws.core.services.ProcessDataService;
-import net.haugr.cws.core.services.ProcessDataTypeService;
-import net.haugr.cws.core.services.SignService;
-import net.haugr.cws.core.services.VerifyService;
+import net.haugr.cws.core.managers.FetchDataManager;
+import net.haugr.cws.core.managers.FetchDataTypeManager;
+import net.haugr.cws.core.managers.FetchSignatureManager;
+import net.haugr.cws.core.managers.ProcessDataManager;
+import net.haugr.cws.core.managers.ProcessDataTypeManager;
+import net.haugr.cws.core.managers.SignManager;
+import net.haugr.cws.core.managers.VerifyManager;
 import java.util.logging.Logger;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -63,12 +63,12 @@ public class ShareBean {
 
     @Transactional(Transactional.TxType.REQUIRED)
     public ProcessDataTypeResponse processDataType(final ProcessDataTypeRequest request) {
-        ProcessDataTypeService service = null;
+        ProcessDataTypeManager manager = null;
         ProcessDataTypeResponse response;
 
         try {
-            service = new ProcessDataTypeService(settings, entityManager);
-            response = service.perform(request);
+            manager = new ProcessDataTypeManager(settings, entityManager);
+            response = manager.perform(request);
         } catch (CWSException e) {
             // Any Warning or Error thrown by the CWS contain enough information
             // so it can be dealt with by the requesting System. Logging the
@@ -77,7 +77,7 @@ public class ShareBean {
             LOG.log(Settings.DEBUG, e.getMessage(), e);
             response = new ProcessDataTypeResponse(e.getReturnCode(), e.getMessage());
         } finally {
-            CommonBean.destroy(service);
+            CommonBean.destroy(manager);
         }
 
         return response;
@@ -85,12 +85,12 @@ public class ShareBean {
 
     @Transactional(Transactional.TxType.SUPPORTS)
     public FetchDataTypeResponse fetchDataTypes(final FetchDataTypeRequest request) {
-        FetchDataTypeService service = null;
+        FetchDataTypeManager manager = null;
         FetchDataTypeResponse response;
 
         try {
-            service = new FetchDataTypeService(settings, entityManager);
-            response = service.perform(request);
+            manager = new FetchDataTypeManager(settings, entityManager);
+            response = manager.perform(request);
         } catch (CWSException e) {
             // Any Warning or Error thrown by the CWS contain enough information
             // so it can be dealt with by the requesting System. Logging the
@@ -99,7 +99,7 @@ public class ShareBean {
             LOG.log(Settings.DEBUG, e.getMessage(), e);
             response = new FetchDataTypeResponse(e.getReturnCode(), e.getMessage());
         } finally {
-            CommonBean.destroy(service);
+            CommonBean.destroy(manager);
         }
 
         return response;
@@ -107,12 +107,12 @@ public class ShareBean {
 
     @Transactional(Transactional.TxType.REQUIRED)
     public ProcessDataResponse processData(final ProcessDataRequest request) {
-        ProcessDataService service = null;
+        ProcessDataManager manager = null;
         ProcessDataResponse response;
 
         try {
-            service = new ProcessDataService(settings, entityManager);
-            response = service.perform(request);
+            manager = new ProcessDataManager(settings, entityManager);
+            response = manager.perform(request);
         } catch (CWSException e) {
             // Any Warning or Error thrown by the CWS contain enough information
             // so it can be dealt with by the requesting System. Logging the
@@ -121,7 +121,7 @@ public class ShareBean {
             LOG.log(Settings.DEBUG, e.getMessage(), e);
             response = new ProcessDataResponse(e.getReturnCode(), e.getMessage());
         } finally {
-            CommonBean.destroy(service);
+            CommonBean.destroy(manager);
         }
 
         return response;
@@ -129,12 +129,12 @@ public class ShareBean {
 
     @Transactional(Transactional.TxType.REQUIRED)
     public FetchDataResponse fetchData(final FetchDataRequest request) {
-        FetchDataService service = null;
+        FetchDataManager manager = null;
         FetchDataResponse response;
 
         try {
-            service = new FetchDataService(settings, entityManager);
-            response = service.perform(request);
+            manager = new FetchDataManager(settings, entityManager);
+            response = manager.perform(request);
         } catch (CWSException e) {
             // Any Warning or Error thrown by the CWS contain enough information
             // so it can be dealt with by the requesting System. Logging the
@@ -143,7 +143,7 @@ public class ShareBean {
             LOG.log(Settings.DEBUG, e.getMessage(), e);
             response = new FetchDataResponse(e.getReturnCode(), e.getMessage());
         } finally {
-            CommonBean.destroy(service);
+            CommonBean.destroy(manager);
         }
 
         return response;
@@ -151,12 +151,12 @@ public class ShareBean {
 
     @Transactional(Transactional.TxType.REQUIRED)
     public SignResponse sign(final SignRequest request) {
-        SignService service = null;
+        SignManager manager = null;
         SignResponse response;
 
         try {
-            service = new SignService(settings, entityManager);
-            response = service.perform(request);
+            manager = new SignManager(settings, entityManager);
+            response = manager.perform(request);
         } catch (CWSException e) {
             // Any Warning or Error thrown by the CWS contain enough information
             // so it can be dealt with by the requesting System. Logging the
@@ -165,7 +165,7 @@ public class ShareBean {
             LOG.log(Settings.DEBUG, e.getMessage(), e);
             response = new SignResponse(e.getReturnCode(), e.getMessage());
         } finally {
-            CommonBean.destroy(service);
+            CommonBean.destroy(manager);
         }
 
         return response;
@@ -173,12 +173,12 @@ public class ShareBean {
 
     @Transactional(Transactional.TxType.SUPPORTS)
     public VerifyResponse verify(final VerifyRequest request) {
-        VerifyService service = null;
+        VerifyManager manager = null;
         VerifyResponse response;
 
         try {
-            service = new VerifyService(settings, entityManager);
-            response = service.perform(request);
+            manager = new VerifyManager(settings, entityManager);
+            response = manager.perform(request);
         } catch (CWSException e) {
             // Any Warning or Error thrown by the CWS contain enough information
             // so it can be dealt with by the requesting System. Logging the
@@ -187,7 +187,7 @@ public class ShareBean {
             LOG.log(Settings.DEBUG, e.getMessage(), e);
             response = new VerifyResponse(e.getReturnCode(), e.getMessage());
         } finally {
-            CommonBean.destroy(service);
+            CommonBean.destroy(manager);
         }
 
         return response;
@@ -195,12 +195,12 @@ public class ShareBean {
 
     @Transactional(Transactional.TxType.SUPPORTS)
     public FetchSignatureResponse fetchSignatures(final FetchSignatureRequest request) {
-        FetchSignatureService service = null;
+        FetchSignatureManager manager = null;
         FetchSignatureResponse response;
 
         try {
-            service = new FetchSignatureService(settings, entityManager);
-            response = service.perform(request);
+            manager = new FetchSignatureManager(settings, entityManager);
+            response = manager.perform(request);
         } catch (CWSException e) {
             // Any Warning or Error thrown by the CWS contain enough information
             // so it can be dealt with by the requesting System. Logging the
@@ -209,7 +209,7 @@ public class ShareBean {
             LOG.log(Settings.DEBUG, e.getMessage(), e);
             response = new FetchSignatureResponse(e.getReturnCode(), e.getMessage());
         } finally {
-            CommonBean.destroy(service);
+            CommonBean.destroy(manager);
         }
 
         return response;

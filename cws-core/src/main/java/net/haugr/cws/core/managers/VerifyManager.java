@@ -14,7 +14,7 @@
  * this program; If not, you can download a copy of the License
  * here: https://www.apache.org/licenses/
  */
-package net.haugr.cws.core.services;
+package net.haugr.cws.core.managers;
 
 import net.haugr.cws.api.common.ReturnCode;
 import net.haugr.cws.api.common.Utilities;
@@ -37,9 +37,9 @@ import javax.persistence.EntityManager;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-public final class VerifyService extends Serviceable<SignatureDao, VerifyResponse, VerifyRequest> {
+public final class VerifyManager extends AbstractManager<SignatureDao, VerifyResponse, VerifyRequest> {
 
-    public VerifyService(final Settings settings, final EntityManager entityManager) {
+    public VerifyManager(final Settings settings, final EntityManager entityManager) {
         super(settings, new SignatureDao(entityManager));
     }
 

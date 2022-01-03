@@ -14,7 +14,7 @@
  * this program; If not, you can download a copy of the License
  * here: https://www.apache.org/licenses/
  */
-package net.haugr.cws.core.services;
+package net.haugr.cws.core.managers;
 
 import net.haugr.cws.api.common.Constants;
 import net.haugr.cws.api.common.MemberRole;
@@ -44,11 +44,11 @@ import javax.persistence.EntityManager;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-public final class MasterKeyService extends Serviceable<CommonDao, MasterKeyResponse, MasterKeyRequest> {
+public final class MasterKeyManager extends AbstractManager<CommonDao, MasterKeyResponse, MasterKeyRequest> {
 
-    private static final Logger LOG = Logger.getLogger(MasterKeyService.class.getName());
+    private static final Logger LOG = Logger.getLogger(MasterKeyManager.class.getName());
 
-    public MasterKeyService(final Settings settings, final EntityManager entityManager) {
+    public MasterKeyManager(final Settings settings, final EntityManager entityManager) {
         super(settings, new CommonDao(entityManager));
     }
 

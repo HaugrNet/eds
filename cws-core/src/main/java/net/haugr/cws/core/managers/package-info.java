@@ -21,4 +21,4 @@
  * @author Kim Jensen
  * @since CWS 1.0
  */
-package net.haugr.cws.core.services;
+package net.haugr.cws.core.managers;

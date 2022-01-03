@@ -14,7 +14,7 @@
  * this program; If not, you can download a copy of the License
  * here: https://www.apache.org/licenses/
  */
-package net.haugr.cws.core.services;
+package net.haugr.cws.core.managers;
 
 import net.haugr.cws.api.common.MemberRole;
 import net.haugr.cws.api.common.ReturnCode;
@@ -42,9 +42,9 @@ import net.haugr.cws.core.enums.StandardSetting;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-public final class FetchMemberService extends Serviceable<MemberDao, FetchMemberResponse, FetchMemberRequest> {
+public final class FetchMemberManager extends AbstractManager<MemberDao, FetchMemberResponse, FetchMemberRequest> {
 
-    public FetchMemberService(final Settings settings, final EntityManager entityManager) {
+    public FetchMemberManager(final Settings settings, final EntityManager entityManager) {
         super(settings, new MemberDao(entityManager));
     }
 

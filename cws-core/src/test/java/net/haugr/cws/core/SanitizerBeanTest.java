@@ -28,7 +28,7 @@ import net.haugr.cws.core.enums.StandardSetting;
 import net.haugr.cws.core.exceptions.CWSException;
 import net.haugr.cws.core.model.Settings;
 import net.haugr.cws.core.model.entities.DataEntity;
-import net.haugr.cws.core.services.ProcessDataService;
+import net.haugr.cws.core.managers.ProcessDataManager;
 import net.haugr.cws.core.setup.DatabaseSetup;
 import net.haugr.cws.core.setup.fakes.FakeEntityManager;
 import net.haugr.cws.core.setup.fakes.FakeTimer;
@@ -231,7 +231,7 @@ final class SanitizerBeanTest extends DatabaseSetup {
     }
 
     private void prepareInvalidData() {
-        final ProcessDataService service = new ProcessDataService(settings, entityManager);
+        final ProcessDataManager service = new ProcessDataManager(settings, entityManager);
         timeWarpChecksum(service.perform(prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "Valid Data1", 1048576)), Utilities.newDate(1L));
         falsifyChecksum(service.perform(prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "Invalidated Data1", 1048576)), Utilities.newDate(2L), SanityStatus.OK);
         falsifyChecksum(service.perform(prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "Invalidated Data2", 524288)), Utilities.newDate(), SanityStatus.OK);

@@ -43,17 +43,17 @@ import net.haugr.cws.api.responses.SettingResponse;
 import net.haugr.cws.api.responses.VersionResponse;
 import net.haugr.cws.core.exceptions.CWSException;
 import net.haugr.cws.core.model.Settings;
-import net.haugr.cws.core.services.AuthenticatedService;
-import net.haugr.cws.core.services.FetchCircleService;
-import net.haugr.cws.core.services.FetchMemberService;
-import net.haugr.cws.core.services.FetchTrusteeService;
-import net.haugr.cws.core.services.InventoryService;
-import net.haugr.cws.core.services.MasterKeyService;
-import net.haugr.cws.core.services.ProcessCircleService;
-import net.haugr.cws.core.services.ProcessMemberService;
-import net.haugr.cws.core.services.ProcessTrusteeService;
-import net.haugr.cws.core.services.SanityService;
-import net.haugr.cws.core.services.SettingService;
+import net.haugr.cws.core.managers.AuthenticatedManager;
+import net.haugr.cws.core.managers.FetchCircleManager;
+import net.haugr.cws.core.managers.FetchMemberManager;
+import net.haugr.cws.core.managers.FetchTrusteeManager;
+import net.haugr.cws.core.managers.InventoryManager;
+import net.haugr.cws.core.managers.MasterKeyManager;
+import net.haugr.cws.core.managers.ProcessCircleManager;
+import net.haugr.cws.core.managers.ProcessMemberManager;
+import net.haugr.cws.core.managers.ProcessTrusteeManager;
+import net.haugr.cws.core.managers.SanityManager;
+import net.haugr.cws.core.managers.SettingManager;
 import java.util.logging.Logger;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -86,12 +86,12 @@ public class ManagementBean {
 
     @Transactional(Transactional.TxType.REQUIRED)
     public SettingResponse settings(final SettingRequest request) {
-        SettingService service = null;
+        SettingManager manager = null;
         SettingResponse response;
 
         try {
-            service = new SettingService(settings, entityManager);
-            response = service.perform(request);
+            manager = new SettingManager(settings, entityManager);
+            response = manager.perform(request);
         } catch (CWSException e) {
             // Any Warning or Error thrown by the CWS contain enough information
             // so it can be dealt with by the requesting System. Logging the
@@ -105,10 +105,10 @@ public class ManagementBean {
             // currently are - this way, an administrator will have to worry a
             // little less about the putting the system into an unusable state.
             if (e.getReturnCode() == ReturnCode.SETTING_WARNING) {
-                response.setSettings(SettingService.convert(settings));
+                response.setSettings(SettingManager.convert(settings));
             }
         } finally {
-            CommonBean.destroy(service);
+            CommonBean.destroy(manager);
         }
 
         return response;
@@ -116,12 +116,12 @@ public class ManagementBean {
 
     @Transactional(Transactional.TxType.SUPPORTS)
     public MasterKeyResponse masterKey(final MasterKeyRequest request) {
-        MasterKeyService service = null;
+        MasterKeyManager manager = null;
         MasterKeyResponse response;
 
         try {
-            service = new MasterKeyService(settings, entityManager);
-            response = service.perform(request);
+            manager = new MasterKeyManager(settings, entityManager);
+            response = manager.perform(request);
         } catch (CWSException e) {
             // Any Warning or Error thrown by the CWS contain enough information
             // so it can be dealt with by the requesting System. Logging the
@@ -130,7 +130,7 @@ public class ManagementBean {
             LOG.log(Settings.DEBUG, e.getMessage(), e);
             response = new MasterKeyResponse(e.getReturnCode(), e.getMessage());
         } finally {
-            CommonBean.destroy(service);
+            CommonBean.destroy(manager);
         }
 
         return response;
@@ -138,12 +138,12 @@ public class ManagementBean {
 
     @Transactional(Transactional.TxType.SUPPORTS)
     public SanityResponse sanity(final SanityRequest request) {
-        SanityService service = null;
+        SanityManager manager = null;
         SanityResponse response;
 
         try {
-            service = new SanityService(settings, entityManager);
-            response = service.perform(request);
+            manager = new SanityManager(settings, entityManager);
+            response = manager.perform(request);
         } catch (CWSException e) {
             // Any Warning or Error thrown by the CWS contain enough information
             // so it can be dealt with by the requesting System. Logging the
@@ -152,7 +152,7 @@ public class ManagementBean {
             LOG.log(Settings.DEBUG, e.getMessage(), e);
             response = new SanityResponse(e.getReturnCode(), e.getMessage());
         } finally {
-            CommonBean.destroy(service);
+            CommonBean.destroy(manager);
         }
 
         return response;
@@ -160,12 +160,12 @@ public class ManagementBean {
 
     @Transactional(Transactional.TxType.SUPPORTS)
     public InventoryResponse inventory(final InventoryRequest request) {
-        InventoryService service = null;
+        InventoryManager manager = null;
         InventoryResponse response;
 
         try {
-            service = new InventoryService(settings, entityManager);
-            response = service.perform(request);
+            manager = new InventoryManager(settings, entityManager);
+            response = manager.perform(request);
         } catch (CWSException e) {
             // Any Warning or Error thrown by the CWS contain enough information
             // so it can be dealt with by the requesting System. Logging the
@@ -174,7 +174,7 @@ public class ManagementBean {
             LOG.log(Settings.DEBUG, e.getMessage(), e);
             response = new InventoryResponse(e.getReturnCode(), e.getMessage());
         } finally {
-            CommonBean.destroy(service);
+            CommonBean.destroy(manager);
         }
 
         return response;
@@ -182,12 +182,12 @@ public class ManagementBean {
 
     @Transactional(Transactional.TxType.SUPPORTS)
     public AuthenticateResponse authenticated(final Authentication request) {
-        AuthenticatedService service = null;
+        AuthenticatedManager manager = null;
         AuthenticateResponse response;
 
         try {
-            service = new AuthenticatedService(settings, entityManager);
-            response = service.perform(request);
+            manager = new AuthenticatedManager(settings, entityManager);
+            response = manager.perform(request);
         } catch (CWSException e) {
             // Any Warning or Error thrown by the CWS contain enough information
             // so it can be dealt with by the requesting System. Logging the
@@ -196,7 +196,7 @@ public class ManagementBean {
             LOG.log(Settings.DEBUG, e.getMessage(), e);
             response = new AuthenticateResponse(e.getReturnCode(), e.getMessage());
         } finally {
-            CommonBean.destroy(service);
+            CommonBean.destroy(manager);
         }
 
         return response;
@@ -204,12 +204,12 @@ public class ManagementBean {
 
     @Transactional(Transactional.TxType.SUPPORTS)
     public FetchMemberResponse fetchMembers(final FetchMemberRequest request) {
-        FetchMemberService service = null;
+        FetchMemberManager manager = null;
         FetchMemberResponse response;
 
         try {
-            service = new FetchMemberService(settings, entityManager);
-            response = service.perform(request);
+            manager = new FetchMemberManager(settings, entityManager);
+            response = manager.perform(request);
         } catch (CWSException e) {
             // Any Warning or Error thrown by the CWS contain enough information
             // so it can be dealt with by the requesting System. Logging the
@@ -218,7 +218,7 @@ public class ManagementBean {
             LOG.log(Settings.DEBUG, e.getMessage(), e);
             response = new FetchMemberResponse(e.getReturnCode(), e.getMessage());
         } finally {
-            CommonBean.destroy(service);
+            CommonBean.destroy(manager);
         }
 
         return response;
@@ -226,12 +226,12 @@ public class ManagementBean {
 
     @Transactional(Transactional.TxType.REQUIRED)
     public ProcessMemberResponse processMember(final ProcessMemberRequest request) {
-        ProcessMemberService service = null;
+        ProcessMemberManager manager = null;
         ProcessMemberResponse response;
 
         try {
-            service = new ProcessMemberService(settings, entityManager);
-            response = service.perform(request);
+            manager = new ProcessMemberManager(settings, entityManager);
+            response = manager.perform(request);
         } catch (CWSException e) {
             // Any Warning or Error thrown by the CWS contain enough information
             // so it can be dealt with by the requesting System. Logging the
@@ -240,7 +240,7 @@ public class ManagementBean {
             LOG.log(Settings.DEBUG, e.getMessage(), e);
             response = new ProcessMemberResponse(e.getReturnCode(), e.getMessage());
         } finally {
-            CommonBean.destroy(service);
+            CommonBean.destroy(manager);
         }
 
         return response;
@@ -248,12 +248,12 @@ public class ManagementBean {
 
     @Transactional(Transactional.TxType.SUPPORTS)
     public FetchCircleResponse fetchCircles(final FetchCircleRequest request) {
-        FetchCircleService service = null;
+        FetchCircleManager manager = null;
         FetchCircleResponse response;
 
         try {
-            service = new FetchCircleService(settings, entityManager);
-            response = service.perform(request);
+            manager = new FetchCircleManager(settings, entityManager);
+            response = manager.perform(request);
         } catch (CWSException e) {
             // Any Warning or Error thrown by the CWS contain enough information
             // so it can be dealt with by the requesting System. Logging the
@@ -262,7 +262,7 @@ public class ManagementBean {
             LOG.log(Settings.DEBUG, e.getMessage(), e);
             response = new FetchCircleResponse(e.getReturnCode(), e.getMessage());
         } finally {
-            CommonBean.destroy(service);
+            CommonBean.destroy(manager);
         }
 
         return response;
@@ -270,12 +270,12 @@ public class ManagementBean {
 
     @Transactional(Transactional.TxType.REQUIRED)
     public ProcessCircleResponse processCircle(final ProcessCircleRequest request) {
-        ProcessCircleService service = null;
+        ProcessCircleManager manager = null;
         ProcessCircleResponse response;
 
         try {
-            service = new ProcessCircleService(settings, entityManager);
-            response = service.perform(request);
+            manager = new ProcessCircleManager(settings, entityManager);
+            response = manager.perform(request);
         } catch (CWSException e) {
             // Any Warning or Error thrown by the CWS contain enough information
             // so it can be dealt with by the requesting System. Logging the
@@ -284,7 +284,7 @@ public class ManagementBean {
             LOG.log(Settings.DEBUG, e.getMessage(), e);
             response = new ProcessCircleResponse(e.getReturnCode(), e.getMessage());
         } finally {
-            CommonBean.destroy(service);
+            CommonBean.destroy(manager);
         }
 
         return response;
@@ -292,12 +292,12 @@ public class ManagementBean {
 
     @Transactional(Transactional.TxType.SUPPORTS)
     public FetchTrusteeResponse fetchTrustees(final FetchTrusteeRequest request) {
-        FetchTrusteeService service = null;
+        FetchTrusteeManager manager = null;
         FetchTrusteeResponse response;
 
         try {
-            service = new FetchTrusteeService(settings, entityManager);
-            response = service.perform(request);
+            manager = new FetchTrusteeManager(settings, entityManager);
+            response = manager.perform(request);
         } catch (CWSException e) {
             // Any Warning or Error thrown by the CWS contain enough information
             // so it can be dealt with by the requesting System. Logging the
@@ -306,7 +306,7 @@ public class ManagementBean {
             LOG.log(Settings.DEBUG, e.getMessage(), e);
             response = new FetchTrusteeResponse(e.getReturnCode(), e.getMessage());
         } finally {
-            CommonBean.destroy(service);
+            CommonBean.destroy(manager);
         }
 
         return response;
@@ -314,12 +314,12 @@ public class ManagementBean {
 
     @Transactional(Transactional.TxType.REQUIRED)
     public ProcessTrusteeResponse processTrustee(final ProcessTrusteeRequest request) {
-        ProcessTrusteeService service = null;
+        ProcessTrusteeManager manager = null;
         ProcessTrusteeResponse response;
 
         try {
-            service = new ProcessTrusteeService(settings, entityManager);
-            response = service.perform(request);
+            manager = new ProcessTrusteeManager(settings, entityManager);
+            response = manager.perform(request);
         } catch (CWSException e) {
             // Any Warning or Error thrown by the CWS contain enough information
             // so it can be dealt with by the requesting System. Logging the
@@ -328,7 +328,7 @@ public class ManagementBean {
             LOG.log(Settings.DEBUG, e.getMessage(), e);
             response = new ProcessTrusteeResponse(e.getReturnCode(), e.getMessage());
         } finally {
-            CommonBean.destroy(service);
+            CommonBean.destroy(manager);
         }
 
         return response;

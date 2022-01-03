@@ -14,7 +14,7 @@
  * this program; If not, you can download a copy of the License
  * here: https://www.apache.org/licenses/
  */
-package net.haugr.cws.core.services;
+package net.haugr.cws.core.managers;
 
 import net.haugr.cws.api.requests.SignRequest;
 import net.haugr.cws.api.responses.SignResponse;
@@ -32,9 +32,9 @@ import javax.persistence.EntityManager;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-public final class SignService extends Serviceable<SignatureDao, SignResponse, SignRequest> {
+public final class SignManager extends AbstractManager<SignatureDao, SignResponse, SignRequest> {
 
-    public SignService(final Settings settings, final EntityManager entityManager) {
+    public SignManager(final Settings settings, final EntityManager entityManager) {
         super(settings, new SignatureDao(entityManager));
     }
 

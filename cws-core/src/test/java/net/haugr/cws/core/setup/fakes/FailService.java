@@ -22,7 +22,7 @@ import net.haugr.cws.api.responses.SettingResponse;
 import net.haugr.cws.core.exceptions.CWSException;
 import net.haugr.cws.core.model.CommonDao;
 import net.haugr.cws.core.model.Settings;
-import net.haugr.cws.core.services.Serviceable;
+import net.haugr.cws.core.managers.AbstractManager;
 import javax.persistence.EntityManager;
 
 /**
@@ -33,7 +33,7 @@ import javax.persistence.EntityManager;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-public final class FailService extends Serviceable<CommonDao, SettingResponse, SettingRequest> {
+public final class FailService extends AbstractManager<CommonDao, SettingResponse, SettingRequest> {
 
     /**
      * Default Constructor.

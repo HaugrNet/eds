@@ -14,7 +14,7 @@
  * this program; If not, you can download a copy of the License
  * here: https://www.apache.org/licenses/
  */
-package net.haugr.cws.core.services;
+package net.haugr.cws.core.managers;
 
 import net.haugr.cws.api.common.MemberRole;
 import net.haugr.cws.api.dtos.Circle;
@@ -37,9 +37,9 @@ import javax.persistence.EntityManager;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-public final class FetchCircleService extends Serviceable<CommonDao, FetchCircleResponse, FetchCircleRequest> {
+public final class FetchCircleManager extends AbstractManager<CommonDao, FetchCircleResponse, FetchCircleRequest> {
 
-    public FetchCircleService(final Settings settings, final EntityManager entityManager) {
+    public FetchCircleManager(final Settings settings, final EntityManager entityManager) {
         super(settings, new CommonDao(entityManager));
     }
 

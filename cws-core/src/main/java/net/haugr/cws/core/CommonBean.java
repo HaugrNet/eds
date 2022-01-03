@@ -18,7 +18,7 @@ package net.haugr.cws.core;
 
 import net.haugr.cws.core.exceptions.CWSException;
 import net.haugr.cws.core.model.Settings;
-import net.haugr.cws.core.services.Serviceable;
+import net.haugr.cws.core.managers.AbstractManager;
 import java.util.logging.Logger;
 
 /**
@@ -38,16 +38,16 @@ public final class CommonBean {
     }
 
     /**
-     * <p>Invokes the standard method {@link Serviceable#destroy()} on the given
+     * <p>Invokes the standard method {@link AbstractManager#destroy()} on the given
      * Service instance, which should ensure that any active Keys will be
      * destroyed.</p>
      *
-     * @param serviceable Internal Service instance to invoke destroy() on
+     * @param abstractManager Internal Service instance to invoke destroy() on
      */
-    public static void destroy(final Serviceable<?, ?, ?> serviceable) {
-        if (serviceable != null) {
+    public static void destroy(final AbstractManager<?, ?, ?> abstractManager) {
+        if (abstractManager != null) {
             try {
-                serviceable.destroy();
+                abstractManager.destroy();
             } catch (CWSException e) {
                 LOG.log(Settings.WARN, e, () -> "Failed destroying the Service: " + e.getMessage());
             }

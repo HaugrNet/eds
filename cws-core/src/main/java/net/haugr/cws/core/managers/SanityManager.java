@@ -14,7 +14,7 @@
  * this program; If not, you can download a copy of the License
  * here: https://www.apache.org/licenses/
  */
-package net.haugr.cws.core.services;
+package net.haugr.cws.core.managers;
 
 import net.haugr.cws.api.common.MemberRole;
 import net.haugr.cws.api.common.Utilities;
@@ -38,9 +38,9 @@ import javax.persistence.EntityManager;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-public final class SanityService extends Serviceable<SanityDao, SanityResponse, SanityRequest> {
+public final class SanityManager extends AbstractManager<SanityDao, SanityResponse, SanityRequest> {
 
-    public SanityService(final Settings settings, final EntityManager entityManager) {
+    public SanityManager(final Settings settings, final EntityManager entityManager) {
         super(settings, new SanityDao(entityManager));
     }
 

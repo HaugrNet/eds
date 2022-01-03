@@ -14,7 +14,7 @@
  * this program; If not, you can download a copy of the License
  * here: https://www.apache.org/licenses/
  */
-package net.haugr.cws.core.services;
+package net.haugr.cws.core.managers;
 
 import net.haugr.cws.api.common.Constants;
 import net.haugr.cws.api.common.CredentialType;
@@ -57,7 +57,7 @@ import net.haugr.cws.core.StartupBean;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-public abstract class Serviceable<D extends CommonDao, R extends CwsResponse, A extends Authentication> {
+public abstract class AbstractManager<D extends CommonDao, R extends CwsResponse, A extends Authentication> {
 
     protected final Settings settings;
     protected final Crypto crypto;
@@ -67,7 +67,7 @@ public abstract class Serviceable<D extends CommonDao, R extends CwsResponse, A 
     protected MemberEntity member = null;
     protected CWSKeyPair keyPair = null;
 
-    protected Serviceable(final Settings settings, final D dao) {
+    protected AbstractManager(final Settings settings, final D dao) {
         this.crypto = new Crypto(settings);
         this.settings = settings;
         this.dao = dao;

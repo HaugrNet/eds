@@ -14,7 +14,7 @@
  * this program; If not, you can download a copy of the License
  * here: https://www.apache.org/licenses/
  */
-package net.haugr.cws.core.services;
+package net.haugr.cws.core.managers;
 
 import net.haugr.cws.api.common.Constants;
 import net.haugr.cws.api.common.ReturnCode;
@@ -43,9 +43,9 @@ import javax.persistence.EntityManager;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-public final class FetchDataService extends Serviceable<DataDao, FetchDataResponse, FetchDataRequest> {
+public final class FetchDataManager extends AbstractManager<DataDao, FetchDataResponse, FetchDataRequest> {
 
-    public FetchDataService(final Settings settings, final EntityManager entityManager) {
+    public FetchDataManager(final Settings settings, final EntityManager entityManager) {
         super(settings, new DataDao(entityManager));
     }
 

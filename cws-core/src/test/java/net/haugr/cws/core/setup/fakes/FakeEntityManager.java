@@ -45,7 +45,7 @@ import java.util.Map;
  */
 public final class FakeEntityManager implements EntityManager {
 
-    private static final String persistenceName = "io.javadog.cws.jpa";
+    private static final String persistenceName = "net.haugr.cws.jpa";
     private static final EntityManagerFactory FACTORY = Persistence.createEntityManagerFactory(persistenceName);
     private final EntityManager entityManager = FACTORY.createEntityManager();
 

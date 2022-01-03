@@ -21,7 +21,6 @@ import net.haugr.cws.api.common.Constants;
 import net.haugr.cws.api.common.CredentialType;
 import net.haugr.cws.api.common.MemberRole;
 import net.haugr.cws.api.common.ReturnCode;
-import net.haugr.cws.api.common.Utilities;
 import net.haugr.cws.api.requests.Authentication;
 import net.haugr.cws.api.requests.ProcessDataRequest;
 import net.haugr.cws.api.responses.ProcessDataResponse;
@@ -99,7 +98,7 @@ public class DatabaseSetup {
     private static final MemberRole DEFAULT_ROLE = MemberRole.STANDARD;
     private static final String DEFAULT_SECRET = "My Super Secret";
     private static final String TIMESTAMP = "yyyyMMddHHmmssSSS";
-    private static final String persistenceName = "io.javadog.cws.jpa";
+    private static final String persistenceName = "net.haugr.cws.jpa";
     private static final EntityManagerFactory FACTORY = Persistence.createEntityManagerFactory(persistenceName);
     protected final EntityManager entityManager = FACTORY.createEntityManager();
     protected final CommonDao dao = new CommonDao(entityManager);

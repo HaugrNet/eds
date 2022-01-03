@@ -144,7 +144,7 @@ public abstract class AbstractRequest implements Serializable {
      *
      * @param errors  Map to store the error information in, if id is invalid
      * @param field   Name of the field from the request/dto holding the value
-     * @param value   The value to check if is a valid Id (UUID)
+     * @param value   The value to check if is a valid ID (UUID)
      * @param message The error message to add to the error map
      * @see Constants#ID_PATTERN_REGEX
      */

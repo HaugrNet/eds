@@ -119,9 +119,9 @@ public abstract class AbstractManager<D extends CommonDao, R extends CwsResponse
         // ready to be used. If not, then an Exception is thrown.
         throwIfSystemIsNotReady();
 
-        // If available, let's extract the CircleId so it can be used to improve
-        // accuracy of the checks and reduce the amount of data fetched from the
-        // database in preparation to perform these checks.
+        // If available, let's extract the CircleId, so it can be used to
+        // improve accuracy of the checks and reduce the amount of data fetched
+        // from the database in preparation to perform these checks.
         String circleId = null;
         if (authentication instanceof CircleIdRequest) {
             circleId = ((CircleIdRequest) authentication).getCircleId();
@@ -146,7 +146,7 @@ public abstract class AbstractManager<D extends CommonDao, R extends CwsResponse
             //       For valid sessions, the MasterKey has been used to
             //     encrypt the SessionKey, before it is being used to unlock
             //     the Member KeyPair. This is to prevent that a copy of the
-            //     database may result in someone being able to unlock the
+            //     database may result in unwanted unlocking of the
             //     Account details with just the SessionKey alone.
             verifySession(authentication, circleId);
         } else {
@@ -226,7 +226,7 @@ public abstract class AbstractManager<D extends CommonDao, R extends CwsResponse
      * Member Account based on the Session information.
      *
      * @param authentication Authentication information with Session
-     * @param circleId       Optional Circle Id
+     * @param circleId       Optional Circle ID
      */
     private void verifySession(final A authentication, final String circleId) {
         final byte[] masterEncrypted = crypto.encryptWithMasterKey(authentication.getCredential());
@@ -252,7 +252,7 @@ public abstract class AbstractManager<D extends CommonDao, R extends CwsResponse
      * Member Account based on the Credential information.
      *
      * @param authentication Authentication Account Name &amp; Credential
-     * @param circleId       Optional Circle Id
+     * @param circleId       Optional Circle ID
      */
     private void verifyAccount(final A authentication, final String circleId) {
         final String account = trim(authentication.getAccountName());
@@ -271,12 +271,12 @@ public abstract class AbstractManager<D extends CommonDao, R extends CwsResponse
 
     /**
      * Checks if the given Member Account is an Administrator, or if the
-     * optional Circle Id is present, it checks the relation between the given
-     * Member Entity and the Circle Id. If no relation exist, then the dao used
+     * optional Circle ID is present, it checks the relation between the given
+     * Member Entity and the Circle ID. If no relation exist, then the dao used
      * will throw a {@code CWSException} with an Identification warning.
      *
      * @param memberEntity MemberEntity to check
-     * @param circleId     Optional Circle Id to verify relation with
+     * @param circleId     Optional Circle ID to verify relation with
      */
     private void checkMemberAccount(final MemberEntity memberEntity, final String circleId) {
         if ((circleId == null) || (memberEntity.getMemberRole() == MemberRole.ADMIN)) {

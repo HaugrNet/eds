@@ -37,7 +37,7 @@ public enum TrustLevel {
     /**
      * Checks the given Trust Level against an expected, to verify if the given
      * level may perform an action. If the given Trust Level is the same or
-     * higher than the expected, then a trust is returned, otherwise a false is
+     * higher than the expected, then a trust is returned, otherwise false is
      * returned.
      *
      * @param level    The Trust Level to check against the expected

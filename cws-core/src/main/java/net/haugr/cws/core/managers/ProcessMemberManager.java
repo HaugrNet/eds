@@ -192,7 +192,7 @@ public final class ProcessMemberManager extends AbstractManager<MemberDao, Proce
 
         // Now to the exciting part, the Salt is taken from the Member, and used
         // to generate a new PBE based Symmetric Key, which again is used to
-        // encrypt the already encrypted SessionKey. This making it a but more
+        // encrypt the already encrypted SessionKey. This making it a bit more
         // challenging to extract the information, if there is no access to the
         // MasterKey.
         final String salt = crypto.decryptWithMasterKey(member.getSalt());

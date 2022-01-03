@@ -58,7 +58,7 @@ public final class MasterKey {
     //      case where someone changes the property accidentally.
     //   b) Hard code it to the current default.
     // The second option was chosen, as it is unlikely that anyone wishes to
-    // downgrade security and it also prevents the problems with adding checks
+    // downgrade security, and it also prevents the problems with adding checks
     // on this setting.
     //   Note, that the same philosophy has been applied to the other Settings,
     // which is being used, except for the System Salt - where other checks
@@ -104,7 +104,7 @@ public final class MasterKey {
             // information read is also returned. In this case, the content
             // is simply used to read a series of controlled bytes, which
             // again is used to generate the Symmetric Key later referred
-            // to as the MasterKey. Thus the rule is ignored at this place.
+            // to as the MasterKey. Thus, the rule is ignored at this place.
             // See: http://localhost:9000/coding_rules?open=findsecbugs%3AURLCONNECTION_SSRF_FD&rule_key=findsecbugs%3AURLCONNECTION_SSRF_FD
             final URLConnection connection = url.openConnection();
             return readContent(connection);

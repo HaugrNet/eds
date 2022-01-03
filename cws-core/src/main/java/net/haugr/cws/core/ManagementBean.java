@@ -93,10 +93,10 @@ public class ManagementBean {
             manager = new SettingManager(settings, entityManager);
             response = manager.perform(request);
         } catch (CWSException e) {
-            // Any Warning or Error thrown by the CWS contain enough information
-            // so it can be dealt with by the requesting System. Logging the
-            // error is thus not needed, as all information is provided in the
-            // response.
+            // Any Warning or Error thrown by the CWS contain enough
+            // information, so it can be dealt with by the requesting
+            // System. Logging the error is thus not needed, as all
+            // information is provided in the response.
             LOG.log(Settings.DEBUG, e.getMessage(), e);
             response = new SettingResponse(e.getReturnCode(), e.getMessage());
 
@@ -123,10 +123,10 @@ public class ManagementBean {
             manager = new MasterKeyManager(settings, entityManager);
             response = manager.perform(request);
         } catch (CWSException e) {
-            // Any Warning or Error thrown by the CWS contain enough information
-            // so it can be dealt with by the requesting System. Logging the
-            // error is thus not needed, as all information is provided in the
-            // response.
+            // Any Warning or Error thrown by the CWS contain enough
+            // information, so it can be dealt with by the requesting
+            // System. Logging the error is thus not needed, as all
+            // information is provided in the response.
             LOG.log(Settings.DEBUG, e.getMessage(), e);
             response = new MasterKeyResponse(e.getReturnCode(), e.getMessage());
         } finally {
@@ -145,10 +145,10 @@ public class ManagementBean {
             manager = new SanityManager(settings, entityManager);
             response = manager.perform(request);
         } catch (CWSException e) {
-            // Any Warning or Error thrown by the CWS contain enough information
-            // so it can be dealt with by the requesting System. Logging the
-            // error is thus not needed, as all information is provided in the
-            // response.
+            // Any Warning or Error thrown by the CWS contain enough
+            // information, so it can be dealt with by the requesting
+            // System. Logging the error is thus not needed, as all
+            // information is provided in the response.
             LOG.log(Settings.DEBUG, e.getMessage(), e);
             response = new SanityResponse(e.getReturnCode(), e.getMessage());
         } finally {
@@ -167,10 +167,10 @@ public class ManagementBean {
             manager = new InventoryManager(settings, entityManager);
             response = manager.perform(request);
         } catch (CWSException e) {
-            // Any Warning or Error thrown by the CWS contain enough information
-            // so it can be dealt with by the requesting System. Logging the
-            // error is thus not needed, as all information is provided in the
-            // response.
+            // Any Warning or Error thrown by the CWS contain enough
+            // information, so it can be dealt with by the requesting
+            // System. Logging the error is thus not needed, as all
+            // information is provided in the response.
             LOG.log(Settings.DEBUG, e.getMessage(), e);
             response = new InventoryResponse(e.getReturnCode(), e.getMessage());
         } finally {
@@ -189,10 +189,10 @@ public class ManagementBean {
             manager = new AuthenticatedManager(settings, entityManager);
             response = manager.perform(request);
         } catch (CWSException e) {
-            // Any Warning or Error thrown by the CWS contain enough information
-            // so it can be dealt with by the requesting System. Logging the
-            // error is thus not needed, as all information is provided in the
-            // response.
+            // Any Warning or Error thrown by the CWS contain enough
+            // information, so it can be dealt with by the requesting
+            // System. Logging the error is thus not needed, as all
+            // information is provided in the response.
             LOG.log(Settings.DEBUG, e.getMessage(), e);
             response = new AuthenticateResponse(e.getReturnCode(), e.getMessage());
         } finally {
@@ -211,10 +211,10 @@ public class ManagementBean {
             manager = new FetchMemberManager(settings, entityManager);
             response = manager.perform(request);
         } catch (CWSException e) {
-            // Any Warning or Error thrown by the CWS contain enough information
-            // so it can be dealt with by the requesting System. Logging the
-            // error is thus not needed, as all information is provided in the
-            // response.
+            // Any Warning or Error thrown by the CWS contain enough
+            // information, so it can be dealt with by the requesting
+            // System. Logging the error is thus not needed, as all
+            // information is provided in the response.
             LOG.log(Settings.DEBUG, e.getMessage(), e);
             response = new FetchMemberResponse(e.getReturnCode(), e.getMessage());
         } finally {
@@ -233,10 +233,10 @@ public class ManagementBean {
             manager = new ProcessMemberManager(settings, entityManager);
             response = manager.perform(request);
         } catch (CWSException e) {
-            // Any Warning or Error thrown by the CWS contain enough information
-            // so it can be dealt with by the requesting System. Logging the
-            // error is thus not needed, as all information is provided in the
-            // response.
+            // Any Warning or Error thrown by the CWS contain enough
+            // information, so it can be dealt with by the requesting
+            // System. Logging the error is thus not needed, as all
+            // information is provided in the response.
             LOG.log(Settings.DEBUG, e.getMessage(), e);
             response = new ProcessMemberResponse(e.getReturnCode(), e.getMessage());
         } finally {
@@ -255,10 +255,10 @@ public class ManagementBean {
             manager = new FetchCircleManager(settings, entityManager);
             response = manager.perform(request);
         } catch (CWSException e) {
-            // Any Warning or Error thrown by the CWS contain enough information
-            // so it can be dealt with by the requesting System. Logging the
-            // error is thus not needed, as all information is provided in the
-            // response.
+            // Any Warning or Error thrown by the CWS contain enough
+            // information, so it can be dealt with by the requesting
+            // System. Logging the error is thus not needed, as all
+            // information is provided in the response.
             LOG.log(Settings.DEBUG, e.getMessage(), e);
             response = new FetchCircleResponse(e.getReturnCode(), e.getMessage());
         } finally {
@@ -277,10 +277,10 @@ public class ManagementBean {
             manager = new ProcessCircleManager(settings, entityManager);
             response = manager.perform(request);
         } catch (CWSException e) {
-            // Any Warning or Error thrown by the CWS contain enough information
-            // so it can be dealt with by the requesting System. Logging the
-            // error is thus not needed, as all information is provided in the
-            // response.
+            // Any Warning or Error thrown by the CWS contain enough
+            // information, so it can be dealt with by the requesting
+            // System. Logging the error is thus not needed, as all
+            // information is provided in the response.
             LOG.log(Settings.DEBUG, e.getMessage(), e);
             response = new ProcessCircleResponse(e.getReturnCode(), e.getMessage());
         } finally {
@@ -299,10 +299,10 @@ public class ManagementBean {
             manager = new FetchTrusteeManager(settings, entityManager);
             response = manager.perform(request);
         } catch (CWSException e) {
-            // Any Warning or Error thrown by the CWS contain enough information
-            // so it can be dealt with by the requesting System. Logging the
-            // error is thus not needed, as all information is provided in the
-            // response.
+            // Any Warning or Error thrown by the CWS contain enough
+            // information, so it can be dealt with by the requesting
+            // System. Logging the error is thus not needed, as all
+            // information is provided in the response.
             LOG.log(Settings.DEBUG, e.getMessage(), e);
             response = new FetchTrusteeResponse(e.getReturnCode(), e.getMessage());
         } finally {
@@ -321,10 +321,10 @@ public class ManagementBean {
             manager = new ProcessTrusteeManager(settings, entityManager);
             response = manager.perform(request);
         } catch (CWSException e) {
-            // Any Warning or Error thrown by the CWS contain enough information
-            // so it can be dealt with by the requesting System. Logging the
-            // error is thus not needed, as all information is provided in the
-            // response.
+            // Any Warning or Error thrown by the CWS contain enough
+            // information, so it can be dealt with by the requesting
+            // System. Logging the error is thus not needed, as all
+            // information is provided in the response.
             LOG.log(Settings.DEBUG, e.getMessage(), e);
             response = new ProcessTrusteeResponse(e.getReturnCode(), e.getMessage());
         } finally {

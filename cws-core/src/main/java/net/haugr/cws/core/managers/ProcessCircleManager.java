@@ -132,7 +132,7 @@ public final class ProcessCircleManager extends AbstractManager<CommonDao, Proce
      * @param circleAdmin       The initial Circle Administrator
      * @param name              The name of the new Circle
      * @param externalCircleKey External Circle Key
-     * @return Response Object with the new Circle Id
+     * @return Response Object with the new Circle ID
      */
     private ProcessCircleResponse createCircle(final MemberEntity circleAdmin, final String name, final String externalCircleKey) {
         final KeyAlgorithm algorithm = settings.getSymmetricAlgorithm();
@@ -204,7 +204,7 @@ public final class ProcessCircleManager extends AbstractManager<CommonDao, Proce
      * <p>Only checks needed, is to verify that the name is not already taken
      * by any other circle.</p>
      *
-     * @param request Request Object with Id and new Name for the Circle
+     * @param request Request Object with ID and new Name for the Circle
      * @return Response Object with the changed information
      */
     private ProcessCircleResponse updateCircle(final ProcessCircleRequest request) {
@@ -252,7 +252,7 @@ public final class ProcessCircleManager extends AbstractManager<CommonDao, Proce
      * <p>The operation can only be performed by the System Administrator, due
      * to the nature of it.</p>
      *
-     * @param request Request Object with the Id of the Circle to delete
+     * @param request Request Object with the ID of the Circle to delete
      * @return Response Object with error information
      */
     private ProcessCircleResponse deleteCircle(final ProcessCircleRequest request) {

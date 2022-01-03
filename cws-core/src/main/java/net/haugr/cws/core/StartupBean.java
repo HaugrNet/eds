@@ -74,7 +74,7 @@ public class StartupBean {
 
             LOG.info("Initializing the CWS Sanitizer Service.");
 
-            // If requested, then simply start the sanitize as a background job
+            // If requested, then simply start sanitize as a background job
             // now. The job will process small blocks of code and save these.
             if (settings.hasSanityStartup()) {
                 runSanitizing();

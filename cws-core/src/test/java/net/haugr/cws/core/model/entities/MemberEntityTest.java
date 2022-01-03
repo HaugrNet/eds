@@ -116,7 +116,7 @@ final class MemberEntityTest extends DatabaseSetup {
         // first, this is done via the Reference Pointers, since an
         // Objects.equals() will yield the same result
         assertNotEquals(found.hashCode(), entity.hashCode());
-        // Now, we'll ensure that it is the same Entity by comparing the Id's
+        // Now, we'll ensure that it is the same Entity by comparing the ID's
         assertEquals(found.getId(), entity.getId());
     }
 

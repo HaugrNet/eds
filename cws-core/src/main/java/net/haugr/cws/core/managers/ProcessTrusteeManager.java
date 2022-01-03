@@ -76,7 +76,7 @@ public final class ProcessTrusteeManager extends AbstractManager<CommonDao, Proc
     }
 
     /**
-     * As the Circle Id is mandatory for this request, it also means that the
+     * As the Circle ID is mandatory for this request, it also means that the
      * Validation logic has extracted the Circle Administrator as the only
      * Trustee record, so we can use this to create a new Trustee record from.
      *

@@ -62,7 +62,7 @@ public final class FetchDataManager extends AbstractManager<DataDao, FetchDataRe
         // value, if the methods are all final - this is because it prevents the
         // Hibernate proxy, using ByteBuddy, to override the method. Hence, the
         // Object it should be compared against is first read out - since this
-        // will help overriding the proxying.
+        // will help override the proxying.
         //   See: https://github.com/JavaDogs/cws/issues/45
         final MetadataEntity root = findRootMetadata(request);
 
@@ -96,7 +96,7 @@ public final class FetchDataManager extends AbstractManager<DataDao, FetchDataRe
      *
      * <p>If no record is found, then a null value is returned.</p>
      *
-     * @param request Request Object with Circle & Data Id's
+     * @param request Request Object with Circle & Data ID's
      * @return Root Metadata Record, to base the rest of the processing on
      */
     private MetadataEntity findRootMetadata(final FetchDataRequest request) {
@@ -117,7 +117,7 @@ public final class FetchDataManager extends AbstractManager<DataDao, FetchDataRe
     }
 
     private FetchDataResponse readCompleteDataObject(final MetadataEntity metadata) {
-        // Following Query will read out a specific Data Record with meta data
+        // Following Query will read out a specific Data Record with metadata
         // information, if the person is allowed, which includes checks for
         // Circle Membership and right TrustLevel of the Member. If no Entity
         // is found, then there can be multiple reasons.

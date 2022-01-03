@@ -144,7 +144,7 @@ public final class DataDao extends CommonDao {
      * Id, the external folder Id is added as second parameter.</p>
      *
      * @param entity   The Metadata Entity to convert to a DTO
-     * @param folderId The external folder Id
+     * @param folderId The external folder ID
      * @return Converted Metadata DTO
      */
     public static Metadata convert(final MetadataEntity entity, final String folderId) {

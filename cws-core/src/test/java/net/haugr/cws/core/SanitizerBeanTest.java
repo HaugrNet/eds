@@ -156,7 +156,7 @@ final class SanitizerBeanTest extends DatabaseSetup {
 
             // The Bean is updating the Settings via the DB, so we need to alter
             // the content of the DB to reflect this. As the content has not yet
-            // been read out - it is also not cached, hence a simply update will
+            // been read out - it is also not cached, hence a simple update will
             // suffice.
             final int updated = entityManager
                     .createQuery("update SettingEntity set setting = :setting where name = :name")

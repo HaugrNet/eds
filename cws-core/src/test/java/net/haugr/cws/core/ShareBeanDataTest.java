@@ -333,7 +333,7 @@ final class ShareBeanDataTest extends DatabaseSetup {
         assertTrue(saveResponse.isOk());
         final String folderId = saveResponse.getDataId();
 
-        // We're taking the previously generated Data Id and uses that as folder.
+        // We're taking the previously generated Data ID and uses that as folder.
         request.setCredential(crypto.stringToBytes(MEMBER_4));
         request.setFolderId(folderId);
 
@@ -490,7 +490,7 @@ final class ShareBeanDataTest extends DatabaseSetup {
         final Metadata copyMetadata2 = copyFetchResponse2.getMetadata().get(0);
 
         // Comparing the first Object with the copied Object, name, type and
-        // data must be the same, the Id's not.
+        // data must be the same, the ID's not.
         assertEquals(metadata1.getDataName(), copyMetadata2.getDataName());
         assertEquals(metadata1.getTypeName(), copyMetadata2.getTypeName());
         assertNotEquals(metadata1.getDataId(), copyMetadata2.getDataId());
@@ -578,7 +578,7 @@ final class ShareBeanDataTest extends DatabaseSetup {
         final Metadata emptyMetadata2 = emptyFetchResponse2.getMetadata().get(0);
 
         // Comparing the first Object with the copied Object, name, type and
-        // data must be the same, the Id's not.
+        // data must be the same, the ID's not.
         assertEquals(metadata1.getDataName(), emptyMetadata2.getDataName());
         assertEquals(metadata1.getTypeName(), emptyMetadata2.getTypeName());
         assertNotEquals(metadata1.getDataId(), emptyMetadata2.getDataId());

@@ -96,7 +96,7 @@ public final class FetchMemberManager extends AbstractManager<MemberDao, FetchMe
      * Settings is set to True.</p>
      *
      * @param response  Response Object to fill
-     * @param requested Requested Member to see if may be viewed
+     * @param requested Requested Member to see if it may be viewed
      * @see StandardSetting#SHOW_TRUSTEES
      */
     private void fetchSomeoneElse(final FetchMemberResponse response, final MemberEntity requested) {

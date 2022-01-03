@@ -70,10 +70,10 @@ public class ShareBean {
             manager = new ProcessDataTypeManager(settings, entityManager);
             response = manager.perform(request);
         } catch (CWSException e) {
-            // Any Warning or Error thrown by the CWS contain enough information
-            // so it can be dealt with by the requesting System. Logging the
-            // error is thus not needed, as all information is provided in the
-            // response.
+            // Any Warning or Error thrown by the CWS contain enough
+            // information, so it can be dealt with by the requesting
+            // System. Logging the error is thus not needed, as all
+            // information is provided in the response.
             LOG.log(Settings.DEBUG, e.getMessage(), e);
             response = new ProcessDataTypeResponse(e.getReturnCode(), e.getMessage());
         } finally {
@@ -92,10 +92,10 @@ public class ShareBean {
             manager = new FetchDataTypeManager(settings, entityManager);
             response = manager.perform(request);
         } catch (CWSException e) {
-            // Any Warning or Error thrown by the CWS contain enough information
-            // so it can be dealt with by the requesting System. Logging the
-            // error is thus not needed, as all information is provided in the
-            // response.
+            // Any Warning or Error thrown by the CWS contain enough
+            // information, so it can be dealt with by the requesting
+            // System. Logging the error is thus not needed, as all
+            // information is provided in the response.
             LOG.log(Settings.DEBUG, e.getMessage(), e);
             response = new FetchDataTypeResponse(e.getReturnCode(), e.getMessage());
         } finally {
@@ -114,10 +114,10 @@ public class ShareBean {
             manager = new ProcessDataManager(settings, entityManager);
             response = manager.perform(request);
         } catch (CWSException e) {
-            // Any Warning or Error thrown by the CWS contain enough information
-            // so it can be dealt with by the requesting System. Logging the
-            // error is thus not needed, as all information is provided in the
-            // response.
+            // Any Warning or Error thrown by the CWS contain enough
+            // information, so it can be dealt with by the requesting
+            // System. Logging the error is thus not needed, as all
+            // information is provided in the response.
             LOG.log(Settings.DEBUG, e.getMessage(), e);
             response = new ProcessDataResponse(e.getReturnCode(), e.getMessage());
         } finally {
@@ -136,10 +136,10 @@ public class ShareBean {
             manager = new FetchDataManager(settings, entityManager);
             response = manager.perform(request);
         } catch (CWSException e) {
-            // Any Warning or Error thrown by the CWS contain enough information
-            // so it can be dealt with by the requesting System. Logging the
-            // error is thus not needed, as all information is provided in the
-            // response.
+            // Any Warning or Error thrown by the CWS contain enough
+            // information, so it can be dealt with by the requesting
+            // System. Logging the error is thus not needed, as all
+            // information is provided in the response.
             LOG.log(Settings.DEBUG, e.getMessage(), e);
             response = new FetchDataResponse(e.getReturnCode(), e.getMessage());
         } finally {
@@ -158,10 +158,10 @@ public class ShareBean {
             manager = new SignManager(settings, entityManager);
             response = manager.perform(request);
         } catch (CWSException e) {
-            // Any Warning or Error thrown by the CWS contain enough information
-            // so it can be dealt with by the requesting System. Logging the
-            // error is thus not needed, as all information is provided in the
-            // response.
+            // Any Warning or Error thrown by the CWS contain enough
+            // information, so it can be dealt with by the requesting
+            // System. Logging the error is thus not needed, as all
+            // information is provided in the response.
             LOG.log(Settings.DEBUG, e.getMessage(), e);
             response = new SignResponse(e.getReturnCode(), e.getMessage());
         } finally {
@@ -180,10 +180,10 @@ public class ShareBean {
             manager = new VerifyManager(settings, entityManager);
             response = manager.perform(request);
         } catch (CWSException e) {
-            // Any Warning or Error thrown by the CWS contain enough information
-            // so it can be dealt with by the requesting System. Logging the
-            // error is thus not needed, as all information is provided in the
-            // response.
+            // Any Warning or Error thrown by the CWS contain enough
+            // information, so it can be dealt with by the requesting
+            // System. Logging the error is thus not needed, as all
+            // information is provided in the response.
             LOG.log(Settings.DEBUG, e.getMessage(), e);
             response = new VerifyResponse(e.getReturnCode(), e.getMessage());
         } finally {
@@ -202,10 +202,10 @@ public class ShareBean {
             manager = new FetchSignatureManager(settings, entityManager);
             response = manager.perform(request);
         } catch (CWSException e) {
-            // Any Warning or Error thrown by the CWS contain enough information
-            // so it can be dealt with by the requesting System. Logging the
-            // error is thus not needed, as all information is provided in the
-            // response.
+            // Any Warning or Error thrown by the CWS contain enough
+            // information, so it can be dealt with by the requesting
+            // System. Logging the error is thus not needed, as all
+            // information is provided in the response.
             LOG.log(Settings.DEBUG, e.getMessage(), e);
             response = new FetchSignatureResponse(e.getReturnCode(), e.getMessage());
         } finally {

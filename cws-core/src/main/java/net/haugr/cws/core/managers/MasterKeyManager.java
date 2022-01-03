@@ -162,7 +162,7 @@ public final class MasterKeyManager extends AbstractManager<CommonDao, MasterKey
         if (admins.isEmpty()) {
             admin = createNewAccount(Constants.ADMIN_ACCOUNT, MemberRole.ADMIN, authentication.getCredential());
         } else {
-            // Fetch the first administrator, the one with Id 1.
+            // Fetch the first administrator, the one with ID 1.
             admin = admins.get(0);
         }
 

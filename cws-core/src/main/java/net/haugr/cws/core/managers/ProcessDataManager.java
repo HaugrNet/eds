@@ -64,7 +64,7 @@ public final class ProcessDataManager extends AbstractManager<DataDao, ProcessDa
         Arrays.fill(request.getCredential(), (byte) 0);
 
         // Since the verification above is of a more general nature, it is
-        // important that the processing is being double checked against the
+        // important that the processing is being double-checked against the
         // actual Circle.
         final ProcessDataResponse response;
 
@@ -332,7 +332,7 @@ public final class ProcessDataManager extends AbstractManager<DataDao, ProcessDa
      * is the UUID or ExternalId value.</p>
      *
      * @param entity   Data Entity to check the Folder of
-     * @param folderId The External Id of the Folder to check
+     * @param folderId The External ID of the Folder to check
      * @return Metadata Entity of the Folder
      */
     private MetadataEntity checkFolder(final MetadataEntity entity, final String folderId) {

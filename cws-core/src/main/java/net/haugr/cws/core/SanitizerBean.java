@@ -115,8 +115,9 @@ public class SanitizerBean {
         } catch (PersistenceException e) {
             // There are 2 potential problems which may be caught here:
             //   1. A different process (CWS instance) may be processing the
-            //      record, hence it is perfectly legitimate and we can actually
-            //      ignore the error. However, it is still being logged.
+            //      record, hence it is perfectly legitimate, and we can
+            //      actually ignore the error. However, it is still being
+            //      logged.
             //   2. The underlying database does not support locking, so it is
             //      not possible to continue. If this is the case, it should be
             //      reported to the CWS developers.

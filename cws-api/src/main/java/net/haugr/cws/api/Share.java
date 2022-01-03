@@ -33,7 +33,7 @@ import net.haugr.cws.api.responses.SignResponse;
 import net.haugr.cws.api.responses.VerifyResponse;
 
 /**
- * This interface contain the functionality to deal with data, dataTypes as
+ * This interface contains the functionality to deal with data, dataTypes as
  * well as signing and verifying data.
  *
  * @author Kim Jensen

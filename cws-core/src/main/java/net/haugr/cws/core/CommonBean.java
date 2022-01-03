@@ -42,7 +42,7 @@ public final class CommonBean {
      * Service instance, which should ensure that any active Keys will be
      * destroyed.</p>
      *
-     * @param abstractManager Internal Service instance to invoke destroy() on
+     * @param abstractManager Internal Manager instance to invoke destroy() on
      */
     public static void destroy(final AbstractManager<?, ?, ?> abstractManager) {
         if (abstractManager != null) {

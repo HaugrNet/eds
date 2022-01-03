@@ -43,7 +43,7 @@ import net.haugr.cws.api.responses.SettingResponse;
 import net.haugr.cws.api.responses.VersionResponse;
 
 /**
- * This interface contain the functionality needed to setup, configure and
+ * This interface contains the functionality needed to set up, configure and
  * control a CWS instance.
  *
  * @author Kim Jensen

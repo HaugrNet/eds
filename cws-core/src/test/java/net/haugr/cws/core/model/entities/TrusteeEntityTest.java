@@ -37,7 +37,7 @@ final class TrusteeEntityTest extends DatabaseSetup {
     void testEntity() {
         final KeyAlgorithm algorithm = settings.getAsymmetricAlgorithm();
         final String externalId = UUID.randomUUID().toString();
-        final MemberEntity member = prepareMember(externalId, "Trustee Member", algorithm, "public Key", "private Key", MemberRole.STANDARD);
+        final MemberEntity member = prepareMember(externalId, "Trustee Member", algorithm, "public Key", "private Key");
         final CircleEntity circle = prepareCircle(UUID.randomUUID().toString(), "Trustee Circle");
         final String circleKey = UUID.randomUUID().toString();
         final KeyEntity key = prepareKey();

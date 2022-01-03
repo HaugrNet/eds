@@ -48,7 +48,7 @@ final class MemberEntityTest extends DatabaseSetup {
     void testEntity() {
         final CWSKeyPair keyPair = Crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
         final String externalId = UUID.randomUUID().toString();
-        final MemberEntity entity = prepareMember(externalId, "New Account Name", "My Super Secret", keyPair, MemberRole.STANDARD);
+        final MemberEntity entity = prepareMember(externalId, keyPair);
         persistAndDetach(entity);
 
         final long id = entity.getId();
@@ -81,7 +81,7 @@ final class MemberEntityTest extends DatabaseSetup {
         final String publicKey = UUID.randomUUID().toString();
         final String privateKey = UUID.randomUUID().toString();
         final String externalId = UUID.randomUUID().toString();
-        final MemberEntity entity = prepareMember(externalId, credential, algorithm, publicKey, privateKey, MemberRole.STANDARD);
+        final MemberEntity entity = prepareMember(externalId, credential, algorithm, publicKey, privateKey);
         final LocalDateTime lastModified = entity.getAltered();
 
         persist(entity);
@@ -95,7 +95,7 @@ final class MemberEntityTest extends DatabaseSetup {
         final String publicKey = UUID.randomUUID().toString();
         final String privateKey = UUID.randomUUID().toString();
         final String externalId = UUID.randomUUID().toString();
-        final MemberEntity entity = prepareMember(externalId, credential, algorithm, publicKey, privateKey, MemberRole.STANDARD);
+        final MemberEntity entity = prepareMember(externalId, credential, algorithm, publicKey, privateKey);
         assertNotNull(entity.getId());
 
         entityManager.persist(entity);

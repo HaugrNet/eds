@@ -155,7 +155,7 @@ public final class FetchDataService extends Serviceable<DataDao, FetchDataRespon
             // information is persisted. This will also prevent that the Object
             // is checked too soon.
             entity.setSanityChecked(Utilities.newDate());
-            dao.persist(entity);
+            dao.save(entity);
         } else {
             response.setMetadata(metadataList);
         }

@@ -166,7 +166,7 @@ public final class ProcessMemberService extends Serviceable<MemberDao, ProcessMe
         entity.setPrivateKey(CredentialType.SIGNATURE.name());
         entity.setPublicKey(Base64.getEncoder().encodeToString(signature));
         entity.setMemberRole(whichRole(request));
-        dao.persist(entity);
+        dao.save(entity);
 
         final var response = new ProcessMemberResponse("An invitation was successfully issued for '" + memberName + "'.");
         response.setMemberId(entity.getExternalId());
@@ -203,7 +203,7 @@ public final class ProcessMemberService extends Serviceable<MemberDao, ProcessMe
         member.setSessionChecksum(checksum);
         member.setSessionCrypto(privateKey);
         member.setSessionExpire(Utilities.newDate().plusMinutes(settings.getSessionTimeout()));
-        dao.persist(member);
+        dao.save(member);
 
         // Key's no longer being used, must be destroyed.
         key.destroy();
@@ -228,7 +228,7 @@ public final class ProcessMemberService extends Serviceable<MemberDao, ProcessMe
         final String memberId = request.getMemberId();
         final MemberEntity entity = dao.find(MemberEntity.class, memberId);
         entity.setMemberRole(request.getMemberRole());
-        dao.persist(entity);
+        dao.save(entity);
 
         final var response = new ProcessMemberResponse(theMember(entity) + " has successfully been given the new role '" + request.getMemberRole() + "'.");
         response.setMemberId(memberId);
@@ -242,7 +242,7 @@ public final class ProcessMemberService extends Serviceable<MemberDao, ProcessMe
         updateOwnAccountName(newAccountName);
         updateOwnCredential(request);
         updateOwnPublicKey(request);
-        dao.persist(member);
+        dao.save(member);
 
         final var response = new ProcessMemberResponse(theMember(member) + " was successfully updated.");
         response.setMemberId(member.getExternalId());
@@ -276,7 +276,7 @@ public final class ProcessMemberService extends Serviceable<MemberDao, ProcessMe
                 final SecretCWSKey circleKey = Crypto.extractCircleKey(algorithm, keyPair.getPrivate(), trustee.getCircleKey());
                 trustee.setCircleKey(Crypto.encryptAndArmorCircleKey(pair.getPublic(), circleKey));
 
-                dao.persist(trustee);
+                dao.save(trustee);
             }
         }
     }
@@ -380,7 +380,7 @@ public final class ProcessMemberService extends Serviceable<MemberDao, ProcessMe
         account.setMemberKey(request.getPublicKey());
         account.setPublicKey(Crypto.armoringPublicKey(pair.getPublic().getKey()));
         account.setPrivateKey(Crypto.armoringPrivateKey(key, pair.getPrivate().getKey()));
-        dao.persist(account);
+        dao.save(account);
 
         final var response = new ProcessMemberResponse("The invitation was successfully processed for '" + account.getName() + "'.");
         response.setMemberId(account.getExternalId());

@@ -130,7 +130,7 @@ public final class ProcessDataService extends Serviceable<DataDao, ProcessDataRe
         entity.setName(checkName(entity, request.getDataName(), folderId));
         checkData(entity, request.getData());
         entity.setParentId(folderId);
-        dao.persist(entity);
+        dao.save(entity);
 
         return buildProcessDataResponse(entity.getExternalId(), theDataObject(entity) + " was successfully updated.");
     }
@@ -252,7 +252,7 @@ public final class ProcessDataService extends Serviceable<DataDao, ProcessDataRe
             toSave.setChecksum(crypto.generateChecksum(toSave.getData()));
             toSave.setSanityStatus(SanityStatus.OK);
             toSave.setSanityChecked(Utilities.newDate());
-            dao.persist(toSave);
+            dao.save(toSave);
 
             // Actively overwrite the raw Object bytes, so it no longer
             // can be read unencrypted.
@@ -316,7 +316,7 @@ public final class ProcessDataService extends Serviceable<DataDao, ProcessDataRe
         entity.setName(name);
         entity.setParentId(parentId);
         entity.setType(dataType);
-        dao.persist(entity);
+        dao.save(entity);
 
         return entity;
     }

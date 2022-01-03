@@ -85,7 +85,7 @@ public final class ProcessDataTypeService extends Serviceable<CommonDao, Process
             entity = new DataTypeEntity();
             entity.setName(name);
             entity.setType(type);
-            dao.persist(entity);
+            dao.save(entity);
         } else {
             entity = found;
             throwConditionalException(Objects.equals(Constants.FOLDER_TYPENAME, entity.getName()) || Objects.equals(Constants.DATA_TYPENAME, entity.getName()),
@@ -93,7 +93,7 @@ public final class ProcessDataTypeService extends Serviceable<CommonDao, Process
 
             if (!Objects.equals(type, entity.getType())) {
                 entity.setType(type);
-                dao.persist(entity);
+                dao.save(entity);
             }
         }
 

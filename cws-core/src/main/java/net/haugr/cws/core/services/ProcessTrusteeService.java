@@ -120,14 +120,14 @@ public final class ProcessTrusteeService extends Serviceable<CommonDao, ProcessT
         final var cwsPublicKey = new PublicCWSKey(newTrusteeMember.getRsaAlgorithm(), publicKey);
         trustee.setCircleKey(Crypto.encryptAndArmorCircleKey(cwsPublicKey, circleKey));
 
-        dao.persist(trustee);
+        dao.save(trustee);
         return new ProcessTrusteeResponse("The Member '" + trustee.getMember().getName() + "' was successfully added as trustee to '" + trustee.getCircle().getName() + "'.");
     }
 
     private ProcessTrusteeResponse alterTrustee(final ProcessTrusteeRequest request) {
         final TrusteeEntity trustee = findTrusteeForCircleAndMember(request);
         trustee.setTrustLevel(request.getTrustLevel());
-        dao.persist(trustee);
+        dao.save(trustee);
 
         return new ProcessTrusteeResponse("The Trustee '" + trustee.getMember().getName() + "' has successfully been given the trust level '" + trustee.getTrustLevel() + "' in the Circle '" + trustee.getCircle().getName() + "'.");
     }

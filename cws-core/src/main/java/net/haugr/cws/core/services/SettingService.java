@@ -260,7 +260,7 @@ public final class SettingService extends Serviceable<CommonDao, SettingResponse
         // First, just update the setting.
         entity.setName(key);
         entity.setSetting(value);
-        dao.persist(entity);
+        dao.save(entity);
         settings.set(key, value);
 
         // Now the tricky part - if we have a critical setting (Salt or PBE

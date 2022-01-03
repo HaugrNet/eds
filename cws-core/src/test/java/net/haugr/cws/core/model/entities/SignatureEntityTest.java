@@ -45,7 +45,7 @@ final class SignatureEntityTest extends DatabaseSetup {
         entity.setExpires(expires);
         entity.setVerifications(123L);
 
-        dao.persist(entity);
+        dao.save(entity);
         final List<SignatureEntity> found = dao.findAllAscending(SignatureEntity.class, "id");
         assertFalse(found.isEmpty());
         assertEquals(member, found.get(0).getMember());

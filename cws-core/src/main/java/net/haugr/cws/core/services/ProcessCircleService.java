@@ -145,13 +145,13 @@ public final class ProcessCircleService extends Serviceable<CommonDao, ProcessCi
         final var circle = new CircleEntity();
         circle.setName(name);
         circle.setCircleKey(externalKey);
-        dao.persist(circle);
+        dao.save(circle);
 
         createRootFolder(circle);
         final var keyEntity = new KeyEntity();
         keyEntity.setAlgorithm(algorithm);
         keyEntity.setStatus(Status.ACTIVE);
-        dao.persist(keyEntity);
+        dao.save(keyEntity);
 
         final var trustee = new TrusteeEntity();
         trustee.setMember(circleAdmin);
@@ -159,7 +159,7 @@ public final class ProcessCircleService extends Serviceable<CommonDao, ProcessCi
         trustee.setKey(keyEntity);
         trustee.setTrustLevel(TrustLevel.ADMIN);
         trustee.setCircleKey(circleKey);
-        dao.persist(trustee);
+        dao.save(trustee);
 
         final var response = new ProcessCircleResponse(theCircle(circle) + " was successfully created.");
         response.setCircleId(circle.getExternalId());
@@ -174,7 +174,7 @@ public final class ProcessCircleService extends Serviceable<CommonDao, ProcessCi
         entity.setName("/");
         entity.setParentId(0L);
         entity.setType(dataTypeEntity);
-        dao.persist(entity);
+        dao.save(entity);
     }
 
     private ProcessCircleResponse performNonCreateActions(final ProcessCircleRequest request) {
@@ -216,7 +216,7 @@ public final class ProcessCircleService extends Serviceable<CommonDao, ProcessCi
 
         entity.setCircleKey(updateExternalCircleKey(request.getCircleKey()));
         checkAndUpdateCircleName(entity, request.getCircleName());
-        dao.persist(entity);
+        dao.save(entity);
 
         return new ProcessCircleResponse(theCircle(entity) + " was successfully updated.");
     }

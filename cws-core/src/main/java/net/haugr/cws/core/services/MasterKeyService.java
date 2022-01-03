@@ -127,7 +127,7 @@ public final class MasterKeyService extends Serviceable<CommonDao, MasterKeyResp
         }
 
         entity.setSetting(url);
-        dao.persist(entity);
+        dao.save(entity);
     }
 
     private boolean checkCredentials(final SecretCWSKey masterKey, final MemberEntity admin, final byte[] secret) {

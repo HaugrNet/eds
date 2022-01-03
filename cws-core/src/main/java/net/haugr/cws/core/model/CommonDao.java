@@ -76,18 +76,20 @@ public class CommonDao {
      *
      * @param entity CWS Entity to persist (create or update)
      */
-    public void persist(final CWSEntity entity) {
+    public void save(final CWSEntity entity) {
         entity.setAltered(Utilities.newDate());
-        if (entity.getId() != null) {
-            entityManager.merge(entity);
-        } else {
+
+        if (entity.getId() == null) {
             if ((entity instanceof Externable) && (((Externable) entity).getExternalId() == null)) {
                 ((Externable) entity).setExternalId(UUID.randomUUID().toString());
             }
             if (entity.getAdded() == null) {
                 entity.setAdded(Utilities.newDate());
             }
+
             entityManager.persist(entity);
+        } else {
+            entityManager.merge(entity);
         }
     }
 
@@ -136,7 +138,7 @@ public class CommonDao {
         member.setSessionCrypto(null);
         member.setSessionExpire(null);
 
-        persist(member);
+        save(member);
     }
 
     public MemberEntity findMemberByName(final String name) {

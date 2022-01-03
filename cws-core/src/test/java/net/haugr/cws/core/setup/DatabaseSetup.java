@@ -190,8 +190,6 @@ public class DatabaseSetup {
         entity.setPublicKey(publicKey);
         entity.setPrivateKey(privateKey);
         entity.setMemberRole(DEFAULT_ROLE);
-        entity.setAltered(Utilities.newDate());
-        entity.setAdded(Utilities.newDate());
         persist(entity);
 
         return entity;
@@ -295,7 +293,7 @@ public class DatabaseSetup {
     }
 
     protected <E extends CWSEntity> void persist(final E entity) {
-        dao.persist(entity);
+        dao.save(entity);
     }
 
     protected <E extends CWSEntity> void persistAndDetach(final E entity) {

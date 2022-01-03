@@ -322,7 +322,7 @@ public abstract class Serviceable<D extends CommonDao, R extends CwsResponse, A 
         member.setRsaAlgorithm(rsaAlgorithm);
         member.setPrivateKey(privateKey);
         member.setPublicKey(publicKey);
-        dao.persist(member);
+        dao.save(member);
 
         return pair;
     }

@@ -26,7 +26,7 @@ import javax.crypto.SecretKey;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-public final class SecretCWSKey extends CWSKey<SecretKey> {
+public final class SecretCWSKey extends AbstractCWSKey<SecretKey> {
 
     private IVSalt salt = null;
 

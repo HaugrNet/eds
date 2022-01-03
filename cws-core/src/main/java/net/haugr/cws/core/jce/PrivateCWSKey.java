@@ -26,7 +26,7 @@ import java.security.PrivateKey;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-public final class PrivateCWSKey extends CWSKey<PrivateKey> {
+public final class PrivateCWSKey extends AbstractCWSKey<PrivateKey> {
 
     /**
      * Default Constructor.

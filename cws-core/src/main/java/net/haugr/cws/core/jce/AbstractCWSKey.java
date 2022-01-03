@@ -29,9 +29,9 @@ import java.util.logging.Logger;
  * @author Kim Jensen
  * @since CWS 1.0
  */
-public abstract class CWSKey<T extends Key> {
+public abstract class AbstractCWSKey<T extends Key> {
 
-    private static final Logger LOG = Logger.getLogger(CWSKey.class.getName());
+    private static final Logger LOG = Logger.getLogger(AbstractCWSKey.class.getName());
 
     protected boolean destroyed = false;
     protected final T key;
@@ -44,7 +44,7 @@ public abstract class CWSKey<T extends Key> {
      * @param algorithm Key Algorithm
      * @param key       Key
      */
-    protected CWSKey(final KeyAlgorithm algorithm, final T key) {
+    protected AbstractCWSKey(final KeyAlgorithm algorithm, final T key) {
         this.algorithm = algorithm;
         this.key = key;
     }

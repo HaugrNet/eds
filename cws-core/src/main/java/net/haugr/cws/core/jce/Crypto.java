@@ -259,7 +259,7 @@ public final class Crypto {
         }
     }
 
-    private static Cipher prepareCipher(final CWSKey<?> key, final int type) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException {
+    private static Cipher prepareCipher(final AbstractCWSKey<?> key, final int type) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException {
         AlgorithmParameterSpec iv = null;
         final String instanceName;
 

@@ -34,8 +34,8 @@ database desired. Testing of CWS has been done using both
 
 ## Build, Install and Run
 
-The final version 2.0 of CWS can be downloaded from [haugr.net](https://haugr.net/),
-version 2.1 is planned to be a minor update. The build requires Java JDK 11,
+The final version 1.2 of CWS can be downloaded from [haugr.net](https://haugr.net/),
+version 2.0 is planned to be a minor update. The build requires Java JDK 11,
 and [Maven](https://maven.apache.org/).
 
 In the accessories/release folder, there is a number of files, which is used to

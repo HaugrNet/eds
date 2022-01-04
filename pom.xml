@@ -161,7 +161,10 @@
             <dependency>
                 <groupId>com.h2database</groupId>
                 <artifactId>h2</artifactId>
-                <!-- Upgrading to 2.0.202 or later causes test problems -->
+                <!-- Due to a bug in Hibernate, the H2 testing DB is kept outdated.
+                     The tests are failing if upgrading to 2.0.202 or later:
+                     org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: NULL not allowed for column "ID"
+                     See: https://hibernate.atlassian.net/browse/HHH-14985 -->
                 <version>1.4.200</version>
                 <scope>test</scope>
             </dependency>

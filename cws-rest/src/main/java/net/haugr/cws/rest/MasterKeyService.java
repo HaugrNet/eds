@@ -16,14 +16,6 @@
  */
 package net.haugr.cws.rest;
 
-import net.haugr.cws.api.common.Constants;
-import net.haugr.cws.api.common.ReturnCode;
-import net.haugr.cws.api.requests.MasterKeyRequest;
-import net.haugr.cws.api.responses.MasterKeyResponse;
-import net.haugr.cws.core.ManagementBean;
-import net.haugr.cws.core.misc.LoggingUtil;
-import net.haugr.cws.core.model.Settings;
-import java.util.logging.Logger;
 import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
@@ -31,6 +23,15 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
+import net.haugr.cws.api.common.Constants;
+import net.haugr.cws.api.common.ReturnCode;
+import net.haugr.cws.api.requests.MasterKeyRequest;
+import net.haugr.cws.api.responses.MasterKeyResponse;
+import net.haugr.cws.core.ManagementBean;
+import net.haugr.cws.core.misc.LoggingUtil;
+import net.haugr.cws.core.model.Settings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <p>REST interface for the MasterKey functionality.</p>
@@ -41,7 +42,7 @@ import javax.ws.rs.core.Response;
 @Path(Constants.REST_MASTERKEY)
 public class MasterKeyService {
 
-    private static final Logger LOG = Logger.getLogger(MasterKeyService.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(MasterKeyService.class);
 
     @Inject
     private ManagementBean bean;
@@ -56,9 +57,9 @@ public class MasterKeyService {
 
         try {
             response = bean.masterKey(masterKeyRequest);
-            LOG.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), Constants.REST_MASTERKEY, startTime));
+            LOGGER.info(LoggingUtil.requestDuration(settings.getLocale(), Constants.REST_MASTERKEY, startTime));
         } catch (RuntimeException e) {
-            LOG.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getLocale(), Constants.REST_MASTERKEY, startTime, e));
+            LOGGER.error(LoggingUtil.requestDuration(settings.getLocale(), Constants.REST_MASTERKEY, startTime, e), e);
             response = new MasterKeyResponse(ReturnCode.ERROR, e.getMessage());
         }
 

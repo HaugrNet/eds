@@ -16,18 +16,17 @@
  */
 package net.haugr.cws.core.model;
 
-import net.haugr.cws.api.common.ReturnCode;
-import net.haugr.cws.core.enums.HashAlgorithm;
-import net.haugr.cws.core.enums.KeyAlgorithm;
-import net.haugr.cws.core.enums.StandardSetting;
-import net.haugr.cws.core.exceptions.CWSException;
 import java.nio.charset.Charset;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Level;
+import net.haugr.cws.api.common.ReturnCode;
+import net.haugr.cws.core.enums.HashAlgorithm;
+import net.haugr.cws.core.enums.KeyAlgorithm;
+import net.haugr.cws.core.enums.StandardSetting;
+import net.haugr.cws.core.exceptions.CWSException;
 
 /**
  * <p>This Class holds the general settings for the CWS. All settings used by
@@ -49,15 +48,6 @@ import java.util.logging.Level;
  * @since CWS 1.0
  */
 public final class Settings {
-
-    /** Debug log level, by default it should be off. */
-    public static final Level DEBUG = Level.FINEST;
-    /** Info log level, by default it should be off. */
-    public static final Level INFO = Level.INFO;
-    /** Warn log level, used for problems with user provided data. */
-    public static final Level WARN = Level.WARNING;
-    /** Error log level, used if an internal error occurred. */
-    public static final Level ERROR = Level.SEVERE;
 
     private static Settings instance = null;
     private static final Object LOCK = new Object();

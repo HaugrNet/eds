@@ -16,14 +16,6 @@
  */
 package net.haugr.cws.rest;
 
-import net.haugr.cws.api.common.Constants;
-import net.haugr.cws.api.common.ReturnCode;
-import net.haugr.cws.api.requests.SanityRequest;
-import net.haugr.cws.api.responses.SanityResponse;
-import net.haugr.cws.core.ManagementBean;
-import net.haugr.cws.core.misc.LoggingUtil;
-import net.haugr.cws.core.model.Settings;
-import java.util.logging.Logger;
 import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
@@ -31,6 +23,15 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
+import net.haugr.cws.api.common.Constants;
+import net.haugr.cws.api.common.ReturnCode;
+import net.haugr.cws.api.requests.SanityRequest;
+import net.haugr.cws.api.responses.SanityResponse;
+import net.haugr.cws.core.ManagementBean;
+import net.haugr.cws.core.misc.LoggingUtil;
+import net.haugr.cws.core.model.Settings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <p>REST interface for the Sanity functionality.</p>
@@ -41,7 +42,7 @@ import javax.ws.rs.core.Response;
 @Path(Constants.REST_SANITIZED)
 public class SanityService {
 
-    private static final Logger LOG = Logger.getLogger(SanityService.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(SanityService.class);
 
     @Inject
     private ManagementBean bean;
@@ -56,9 +57,9 @@ public class SanityService {
 
         try {
             response = bean.sanity(sanitizedRequest);
-            LOG.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), Constants.REST_SANITIZED, startTime));
+            LOGGER.info(LoggingUtil.requestDuration(settings.getLocale(), Constants.REST_SANITIZED, startTime));
         } catch (RuntimeException e) {
-            LOG.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getLocale(), Constants.REST_SANITIZED, startTime, e));
+            LOGGER.error(LoggingUtil.requestDuration(settings.getLocale(), Constants.REST_SANITIZED, startTime, e), e);
             response = new SanityResponse(ReturnCode.ERROR, e.getMessage());
         }
 

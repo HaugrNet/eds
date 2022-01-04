@@ -17,9 +17,9 @@
 package net.haugr.cws.core;
 
 import net.haugr.cws.core.exceptions.CWSException;
-import net.haugr.cws.core.model.Settings;
 import net.haugr.cws.core.managers.AbstractManager;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <p>Common functionality for the CWS Beans.</p>
@@ -29,7 +29,7 @@ import java.util.logging.Logger;
  */
 public final class CommonBean {
 
-    private static final Logger LOG = Logger.getLogger(CommonBean.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(CommonBean.class);
 
     /**
      * Private Constructor, this is a utility Class.
@@ -42,14 +42,14 @@ public final class CommonBean {
      * Service instance, which should ensure that any active Keys will be
      * destroyed.</p>
      *
-     * @param abstractManager Internal Manager instance to invoke destroy() on
+     * @param manager Internal Manager instance to invoke destroy() on
      */
-    public static void destroy(final AbstractManager<?, ?, ?> abstractManager) {
-        if (abstractManager != null) {
+    public static void destroy(final AbstractManager<?, ?, ?> manager) {
+        if (manager != null) {
             try {
-                abstractManager.destroy();
+                manager.destroy();
             } catch (CWSException e) {
-                LOG.log(Settings.WARN, e, () -> "Failed destroying the Service: " + e.getMessage());
+                LOGGER.warn("Failed destroying the Service: {}", e.getMessage(), e);
             }
         }
     }

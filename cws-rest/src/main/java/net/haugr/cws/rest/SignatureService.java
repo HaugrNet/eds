@@ -16,6 +16,13 @@
  */
 package net.haugr.cws.rest;
 
+import javax.inject.Inject;
+import javax.validation.constraints.NotNull;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.Response;
 import net.haugr.cws.api.common.Constants;
 import net.haugr.cws.api.common.ReturnCode;
 import net.haugr.cws.api.requests.FetchSignatureRequest;
@@ -27,14 +34,8 @@ import net.haugr.cws.api.responses.VerifyResponse;
 import net.haugr.cws.core.ShareBean;
 import net.haugr.cws.core.misc.LoggingUtil;
 import net.haugr.cws.core.model.Settings;
-import java.util.logging.Logger;
-import javax.inject.Inject;
-import javax.validation.constraints.NotNull;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.Response;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <p>REST interface for the Signature functionality.</p>
@@ -45,7 +46,7 @@ import javax.ws.rs.core.Response;
 @Path(Constants.REST_SIGNATURES_BASE)
 public class SignatureService {
 
-    private static final Logger LOG = Logger.getLogger(SignatureService.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(SignatureService.class);
 
     @Inject
     private ShareBean bean;
@@ -62,9 +63,9 @@ public class SignatureService {
 
         try {
             response = bean.sign(signDocumentRequest);
-            LOG.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), restAction, startTime));
+            LOGGER.info(LoggingUtil.requestDuration(settings.getLocale(), restAction, startTime));
         } catch (RuntimeException e) {
-            LOG.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getLocale(), restAction, startTime, e));
+            LOGGER.error(LoggingUtil.requestDuration(settings.getLocale(), restAction, startTime, e), e);
             response = new SignResponse(ReturnCode.ERROR, e.getMessage());
         }
 
@@ -82,9 +83,9 @@ public class SignatureService {
 
         try {
             response = bean.verify(verifySignatureRequest);
-            LOG.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), restAction, startTime));
+            LOGGER.info(LoggingUtil.requestDuration(settings.getLocale(), restAction, startTime));
         } catch (RuntimeException e) {
-            LOG.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getLocale(), restAction, startTime, e));
+            LOGGER.error(LoggingUtil.requestDuration(settings.getLocale(), restAction, startTime, e), e);
             response = new VerifyResponse(ReturnCode.ERROR, e.getMessage());
         }
 
@@ -102,9 +103,9 @@ public class SignatureService {
 
         try {
             response = bean.fetchSignatures(fetchSignaturesRequest);
-            LOG.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), restAction, startTime));
+            LOGGER.info(LoggingUtil.requestDuration(settings.getLocale(), restAction, startTime));
         } catch (RuntimeException e) {
-            LOG.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getLocale(), restAction, startTime, e));
+            LOGGER.error(LoggingUtil.requestDuration(settings.getLocale(), restAction, startTime, e), e);
             response = new FetchSignatureResponse(ReturnCode.ERROR, e.getMessage());
         }
 

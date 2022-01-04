@@ -16,6 +16,10 @@
  */
 package net.haugr.cws.core;
 
+import javax.ejb.Stateless;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.transaction.Transactional;
 import net.haugr.cws.api.common.Constants;
 import net.haugr.cws.api.common.ReturnCode;
 import net.haugr.cws.api.requests.Authentication;
@@ -42,7 +46,6 @@ import net.haugr.cws.api.responses.SanityResponse;
 import net.haugr.cws.api.responses.SettingResponse;
 import net.haugr.cws.api.responses.VersionResponse;
 import net.haugr.cws.core.exceptions.CWSException;
-import net.haugr.cws.core.model.Settings;
 import net.haugr.cws.core.managers.AuthenticatedManager;
 import net.haugr.cws.core.managers.FetchCircleManager;
 import net.haugr.cws.core.managers.FetchMemberManager;
@@ -54,11 +57,9 @@ import net.haugr.cws.core.managers.ProcessMemberManager;
 import net.haugr.cws.core.managers.ProcessTrusteeManager;
 import net.haugr.cws.core.managers.SanityManager;
 import net.haugr.cws.core.managers.SettingManager;
-import java.util.logging.Logger;
-import javax.ejb.Stateless;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.transaction.Transactional;
+import net.haugr.cws.core.model.Settings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <p>Java EE Bean for the Management functionality and final Error handling
@@ -70,7 +71,7 @@ import javax.transaction.Transactional;
 @Stateless
 public class ManagementBean {
 
-    private static final Logger LOG = Logger.getLogger(ManagementBean.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(ManagementBean.class);
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -97,7 +98,7 @@ public class ManagementBean {
             // information, so it can be dealt with by the requesting
             // System. Logging the error is thus not needed, as all
             // information is provided in the response.
-            LOG.log(Settings.DEBUG, e.getMessage(), e);
+            LOGGER.debug(e.getMessage(), e);
             response = new SettingResponse(e.getReturnCode(), e.getMessage());
 
             // For the case that we have a settings warning, the current
@@ -127,7 +128,7 @@ public class ManagementBean {
             // information, so it can be dealt with by the requesting
             // System. Logging the error is thus not needed, as all
             // information is provided in the response.
-            LOG.log(Settings.DEBUG, e.getMessage(), e);
+            LOGGER.debug(e.getMessage(), e);
             response = new MasterKeyResponse(e.getReturnCode(), e.getMessage());
         } finally {
             CommonBean.destroy(manager);
@@ -149,7 +150,7 @@ public class ManagementBean {
             // information, so it can be dealt with by the requesting
             // System. Logging the error is thus not needed, as all
             // information is provided in the response.
-            LOG.log(Settings.DEBUG, e.getMessage(), e);
+            LOGGER.debug(e.getMessage(), e);
             response = new SanityResponse(e.getReturnCode(), e.getMessage());
         } finally {
             CommonBean.destroy(manager);
@@ -171,7 +172,7 @@ public class ManagementBean {
             // information, so it can be dealt with by the requesting
             // System. Logging the error is thus not needed, as all
             // information is provided in the response.
-            LOG.log(Settings.DEBUG, e.getMessage(), e);
+            LOGGER.debug(e.getMessage(), e);
             response = new InventoryResponse(e.getReturnCode(), e.getMessage());
         } finally {
             CommonBean.destroy(manager);
@@ -193,7 +194,7 @@ public class ManagementBean {
             // information, so it can be dealt with by the requesting
             // System. Logging the error is thus not needed, as all
             // information is provided in the response.
-            LOG.log(Settings.DEBUG, e.getMessage(), e);
+            LOGGER.debug(e.getMessage(), e);
             response = new AuthenticateResponse(e.getReturnCode(), e.getMessage());
         } finally {
             CommonBean.destroy(manager);
@@ -215,7 +216,7 @@ public class ManagementBean {
             // information, so it can be dealt with by the requesting
             // System. Logging the error is thus not needed, as all
             // information is provided in the response.
-            LOG.log(Settings.DEBUG, e.getMessage(), e);
+            LOGGER.debug(e.getMessage(), e);
             response = new FetchMemberResponse(e.getReturnCode(), e.getMessage());
         } finally {
             CommonBean.destroy(manager);
@@ -237,7 +238,7 @@ public class ManagementBean {
             // information, so it can be dealt with by the requesting
             // System. Logging the error is thus not needed, as all
             // information is provided in the response.
-            LOG.log(Settings.DEBUG, e.getMessage(), e);
+            LOGGER.debug(e.getMessage(), e);
             response = new ProcessMemberResponse(e.getReturnCode(), e.getMessage());
         } finally {
             CommonBean.destroy(manager);
@@ -259,7 +260,7 @@ public class ManagementBean {
             // information, so it can be dealt with by the requesting
             // System. Logging the error is thus not needed, as all
             // information is provided in the response.
-            LOG.log(Settings.DEBUG, e.getMessage(), e);
+            LOGGER.debug(e.getMessage(), e);
             response = new FetchCircleResponse(e.getReturnCode(), e.getMessage());
         } finally {
             CommonBean.destroy(manager);
@@ -281,7 +282,7 @@ public class ManagementBean {
             // information, so it can be dealt with by the requesting
             // System. Logging the error is thus not needed, as all
             // information is provided in the response.
-            LOG.log(Settings.DEBUG, e.getMessage(), e);
+            LOGGER.debug(e.getMessage(), e);
             response = new ProcessCircleResponse(e.getReturnCode(), e.getMessage());
         } finally {
             CommonBean.destroy(manager);
@@ -303,7 +304,7 @@ public class ManagementBean {
             // information, so it can be dealt with by the requesting
             // System. Logging the error is thus not needed, as all
             // information is provided in the response.
-            LOG.log(Settings.DEBUG, e.getMessage(), e);
+            LOGGER.debug(e.getMessage(), e);
             response = new FetchTrusteeResponse(e.getReturnCode(), e.getMessage());
         } finally {
             CommonBean.destroy(manager);
@@ -325,7 +326,7 @@ public class ManagementBean {
             // information, so it can be dealt with by the requesting
             // System. Logging the error is thus not needed, as all
             // information is provided in the response.
-            LOG.log(Settings.DEBUG, e.getMessage(), e);
+            LOGGER.debug(e.getMessage(), e);
             response = new ProcessTrusteeResponse(e.getReturnCode(), e.getMessage());
         } finally {
             CommonBean.destroy(manager);

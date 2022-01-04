@@ -16,6 +16,13 @@
  */
 package net.haugr.cws.rest;
 
+import javax.inject.Inject;
+import javax.validation.constraints.NotNull;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.Response;
 import net.haugr.cws.api.common.Action;
 import net.haugr.cws.api.common.Constants;
 import net.haugr.cws.api.common.ReturnCode;
@@ -26,14 +33,8 @@ import net.haugr.cws.api.responses.ProcessDataTypeResponse;
 import net.haugr.cws.core.ShareBean;
 import net.haugr.cws.core.misc.LoggingUtil;
 import net.haugr.cws.core.model.Settings;
-import java.util.logging.Logger;
-import javax.inject.Inject;
-import javax.validation.constraints.NotNull;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.Response;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <p>REST interface for the DataType functionality.</p>
@@ -44,7 +45,7 @@ import javax.ws.rs.core.Response;
 @Path(Constants.REST_DATATYPES_BASE)
 public class DataTypeService {
 
-    private static final Logger LOG = Logger.getLogger(DataTypeService.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(DataTypeService.class);
 
     @Inject
     private ShareBean bean;
@@ -77,9 +78,9 @@ public class DataTypeService {
 
         try {
             response = bean.fetchDataTypes(fetchDataTypesRequest);
-            LOG.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), restAction, startTime));
+            LOGGER.info(LoggingUtil.requestDuration(settings.getLocale(), restAction, startTime));
         } catch (RuntimeException e) {
-            LOG.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getLocale(), restAction, startTime, e));
+            LOGGER.error(LoggingUtil.requestDuration(settings.getLocale(), restAction, startTime, e), e);
             response = new FetchDataTypeResponse(ReturnCode.ERROR, e.getMessage());
         }
 
@@ -94,9 +95,9 @@ public class DataTypeService {
         try {
             request.setAction(action);
             response = bean.processDataType(request);
-            LOG.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), restAction, startTime));
+            LOGGER.info(LoggingUtil.requestDuration(settings.getLocale(), restAction, startTime));
         } catch (RuntimeException e) {
-            LOG.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getLocale(), restAction, startTime, e));
+            LOGGER.error(LoggingUtil.requestDuration(settings.getLocale(), restAction, startTime, e), e);
             response = new ProcessDataTypeResponse(ReturnCode.ERROR, e.getMessage());
         }
 

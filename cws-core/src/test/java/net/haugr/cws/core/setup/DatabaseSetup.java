@@ -16,6 +16,24 @@
  */
 package net.haugr.cws.core.setup;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.security.SecureRandom;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.util.Locale;
+import java.util.UUID;
+import java.util.concurrent.ThreadFactory;
+import javax.annotation.Resource;
+import javax.ejb.TimerService;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityTransaction;
+import javax.persistence.Persistence;
+import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 import net.haugr.cws.api.common.Action;
 import net.haugr.cws.api.common.Constants;
 import net.haugr.cws.api.common.CredentialType;
@@ -43,28 +61,6 @@ import net.haugr.cws.core.model.entities.CircleEntity;
 import net.haugr.cws.core.model.entities.DataEntity;
 import net.haugr.cws.core.model.entities.KeyEntity;
 import net.haugr.cws.core.model.entities.MemberEntity;
-import java.io.IOException;
-import java.io.InputStream;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.security.SecureRandom;
-import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.util.Locale;
-import java.util.UUID;
-import java.util.concurrent.ThreadFactory;
-import java.util.logging.LogManager;
-import java.util.logging.Logger;
-import javax.annotation.Resource;
-import javax.ejb.TimerService;
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.EntityTransaction;
-import javax.persistence.Persistence;
-import javax.persistence.PersistenceContext;
-import javax.persistence.Query;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 
@@ -73,8 +69,6 @@ import org.junit.jupiter.api.BeforeEach;
  * @since CWS 1.0
  */
 public class DatabaseSetup {
-
-    private static final Logger log = Logger.getLogger(DatabaseSetup.class.getName());
 
     protected static final String MEMBER_1 = "member1";
     protected static final String MEMBER_2 = "member2";
@@ -104,19 +98,6 @@ public class DatabaseSetup {
     protected final CommonDao dao = new CommonDao(entityManager);
     protected final Settings settings = Settings.getInstance();
     protected final Crypto crypto = new Crypto(settings);
-
-    static {
-        final ClassLoader loader = Thread.currentThread().getContextClassLoader();
-
-        if (loader != null) {
-            try (final InputStream stream = loader.getResourceAsStream("logger.properties")) {
-                final LogManager manager = LogManager.getLogManager();
-                manager.readConfiguration(stream);
-            } catch (IOException e) {
-                log.log(Settings.ERROR, e.getMessage());
-            }
-        }
-    }
 
     @BeforeEach
     public void setup() {
@@ -356,7 +337,7 @@ public class DatabaseSetup {
      * {@link ThreadFactory}.</p>
      *
      * @param instance Bean Instance with CDI Injection places
-     * @param value Object to inject
+     * @param value    Object to inject
      * @throws CWSException if an error occurred
      */
     protected static void inject(final Object instance, final Object value) {
@@ -368,7 +349,7 @@ public class DatabaseSetup {
                     if ((annotation instanceof PersistenceContext) && ((value instanceof EntityManager))) {
                         setField(instance, field, value);
                     } else if (annotation instanceof Resource) {
-                        if ((value instanceof  TimerService) || (value instanceof ThreadFactory)) {
+                        if ((value instanceof TimerService) || (value instanceof ThreadFactory)) {
                             setField(instance, field, value);
                         }
                     }

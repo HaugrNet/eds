@@ -16,6 +16,10 @@
  */
 package net.haugr.cws.core.managers;
 
+import java.util.Base64;
+import java.util.List;
+import java.util.Objects;
+import javax.persistence.EntityManager;
 import net.haugr.cws.api.common.Constants;
 import net.haugr.cws.api.common.MemberRole;
 import net.haugr.cws.api.common.ReturnCode;
@@ -32,11 +36,8 @@ import net.haugr.cws.core.model.CommonDao;
 import net.haugr.cws.core.model.Settings;
 import net.haugr.cws.core.model.entities.MemberEntity;
 import net.haugr.cws.core.model.entities.SettingEntity;
-import java.util.Base64;
-import java.util.List;
-import java.util.Objects;
-import java.util.logging.Logger;
-import javax.persistence.EntityManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <p>Business Logic implementation for the CWS MasterKey request.</p>
@@ -46,7 +47,7 @@ import javax.persistence.EntityManager;
  */
 public final class MasterKeyManager extends AbstractManager<CommonDao, MasterKeyResponse, MasterKeyRequest> {
 
-    private static final Logger LOG = Logger.getLogger(MasterKeyManager.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(MasterKeyManager.class);
 
     public MasterKeyManager(final Settings settings, final EntityManager entityManager) {
         super(settings, new CommonDao(entityManager));
@@ -149,7 +150,7 @@ public final class MasterKeyManager extends AbstractManager<CommonDao, MasterKey
             key.destroy();
             result = true;
         } catch (CryptoException e) {
-            LOG.log(Settings.DEBUG, e, () -> "Decrypting the System Administrator Account failed: " + e.getMessage());
+            LOGGER.debug("Decrypting the System Administrator Account failed: {}", e.getMessage(), e);
         }
 
         return result;

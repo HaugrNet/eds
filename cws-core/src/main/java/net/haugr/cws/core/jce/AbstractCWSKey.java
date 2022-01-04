@@ -16,12 +16,12 @@
  */
 package net.haugr.cws.core.jce;
 
-import net.haugr.cws.core.enums.KeyAlgorithm;
-import net.haugr.cws.core.model.Settings;
 import java.lang.reflect.Field;
 import java.security.Key;
 import java.util.Arrays;
-import java.util.logging.Logger;
+import net.haugr.cws.core.enums.KeyAlgorithm;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <p>Common CWS Key, used for all crypto operations.</p>
@@ -31,7 +31,7 @@ import java.util.logging.Logger;
  */
 public abstract class AbstractCWSKey<T extends Key> {
 
-    private static final Logger LOG = Logger.getLogger(AbstractCWSKey.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractCWSKey.class);
 
     protected boolean destroyed = false;
     protected final T key;
@@ -132,7 +132,7 @@ public abstract class AbstractCWSKey<T extends Key> {
         } catch (IllegalAccessException | SecurityException e) {
             // This should never happen, but - if so, just log and ignore, at
             // this level, CWS should be as error-prone as possible
-            LOG.log(Settings.WARN, e, () -> "Unable to delete Key: " + e.getMessage());
+            LOGGER.warn("Unable to delete Key: {}", e.getMessage(), e);
         }
     }
 

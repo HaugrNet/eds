@@ -16,6 +16,10 @@
  */
 package net.haugr.cws.core;
 
+import javax.ejb.Stateless;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.transaction.Transactional;
 import net.haugr.cws.api.requests.FetchDataRequest;
 import net.haugr.cws.api.requests.FetchDataTypeRequest;
 import net.haugr.cws.api.requests.FetchSignatureRequest;
@@ -31,7 +35,6 @@ import net.haugr.cws.api.responses.ProcessDataTypeResponse;
 import net.haugr.cws.api.responses.SignResponse;
 import net.haugr.cws.api.responses.VerifyResponse;
 import net.haugr.cws.core.exceptions.CWSException;
-import net.haugr.cws.core.model.Settings;
 import net.haugr.cws.core.managers.FetchDataManager;
 import net.haugr.cws.core.managers.FetchDataTypeManager;
 import net.haugr.cws.core.managers.FetchSignatureManager;
@@ -39,11 +42,9 @@ import net.haugr.cws.core.managers.ProcessDataManager;
 import net.haugr.cws.core.managers.ProcessDataTypeManager;
 import net.haugr.cws.core.managers.SignManager;
 import net.haugr.cws.core.managers.VerifyManager;
-import java.util.logging.Logger;
-import javax.ejb.Stateless;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.transaction.Transactional;
+import net.haugr.cws.core.model.Settings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <p>Java EE Bean for the Share functionality and final Error handling layer.
@@ -55,7 +56,7 @@ import javax.transaction.Transactional;
 @Stateless
 public class ShareBean {
 
-    private static final Logger LOG = Logger.getLogger(ShareBean.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(ShareBean.class);
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -74,7 +75,7 @@ public class ShareBean {
             // information, so it can be dealt with by the requesting
             // System. Logging the error is thus not needed, as all
             // information is provided in the response.
-            LOG.log(Settings.DEBUG, e.getMessage(), e);
+            LOGGER.debug(e.getMessage(), e);
             response = new ProcessDataTypeResponse(e.getReturnCode(), e.getMessage());
         } finally {
             CommonBean.destroy(manager);
@@ -96,7 +97,7 @@ public class ShareBean {
             // information, so it can be dealt with by the requesting
             // System. Logging the error is thus not needed, as all
             // information is provided in the response.
-            LOG.log(Settings.DEBUG, e.getMessage(), e);
+            LOGGER.debug(e.getMessage(), e);
             response = new FetchDataTypeResponse(e.getReturnCode(), e.getMessage());
         } finally {
             CommonBean.destroy(manager);
@@ -118,7 +119,7 @@ public class ShareBean {
             // information, so it can be dealt with by the requesting
             // System. Logging the error is thus not needed, as all
             // information is provided in the response.
-            LOG.log(Settings.DEBUG, e.getMessage(), e);
+            LOGGER.debug(e.getMessage(), e);
             response = new ProcessDataResponse(e.getReturnCode(), e.getMessage());
         } finally {
             CommonBean.destroy(manager);
@@ -140,7 +141,7 @@ public class ShareBean {
             // information, so it can be dealt with by the requesting
             // System. Logging the error is thus not needed, as all
             // information is provided in the response.
-            LOG.log(Settings.DEBUG, e.getMessage(), e);
+            LOGGER.debug(e.getMessage(), e);
             response = new FetchDataResponse(e.getReturnCode(), e.getMessage());
         } finally {
             CommonBean.destroy(manager);
@@ -162,7 +163,7 @@ public class ShareBean {
             // information, so it can be dealt with by the requesting
             // System. Logging the error is thus not needed, as all
             // information is provided in the response.
-            LOG.log(Settings.DEBUG, e.getMessage(), e);
+            LOGGER.debug(e.getMessage(), e);
             response = new SignResponse(e.getReturnCode(), e.getMessage());
         } finally {
             CommonBean.destroy(manager);
@@ -184,7 +185,7 @@ public class ShareBean {
             // information, so it can be dealt with by the requesting
             // System. Logging the error is thus not needed, as all
             // information is provided in the response.
-            LOG.log(Settings.DEBUG, e.getMessage(), e);
+            LOGGER.debug(e.getMessage(), e);
             response = new VerifyResponse(e.getReturnCode(), e.getMessage());
         } finally {
             CommonBean.destroy(manager);
@@ -206,7 +207,7 @@ public class ShareBean {
             // information, so it can be dealt with by the requesting
             // System. Logging the error is thus not needed, as all
             // information is provided in the response.
-            LOG.log(Settings.DEBUG, e.getMessage(), e);
+            LOGGER.debug(e.getMessage(), e);
             response = new FetchSignatureResponse(e.getReturnCode(), e.getMessage());
         } finally {
             CommonBean.destroy(manager);

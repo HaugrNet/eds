@@ -16,10 +16,11 @@
  */
 package net.haugr.cws.core.jce;
 
-import net.haugr.cws.core.model.Settings;
 import java.security.SecureRandom;
 import java.util.Base64;
-import java.util.logging.Logger;
+import net.haugr.cws.core.model.Settings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <p>In CWS 1.0, the default Salt was generated as a UUID, however this may
@@ -32,7 +33,7 @@ import java.util.logging.Logger;
  */
 public final class IVSalt {
 
-    private static final Logger LOG = Logger.getLogger(IVSalt.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(IVSalt.class);
     // For AES, the block size is always 128 bit and thus the IV must also be of
     // the same size. See: https://en.wikipedia.org/wiki/Initialization_vector
     private static final int IV_SIZE = 16;
@@ -67,7 +68,7 @@ public final class IVSalt {
             try {
                 rawSalt = Base64.getDecoder().decode(armored);
             } catch (IllegalArgumentException e) {
-                LOG.log(Settings.DEBUG, e, () -> "IVSalt is not Base64 encoded: " + e.getMessage());
+                LOGGER.debug("IVSalt is not Base64 encoded: {}", e.getMessage(), e);
             }
         }
 

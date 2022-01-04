@@ -16,18 +16,19 @@
  */
 package net.haugr.cws.rest;
 
+import javax.inject.Inject;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.Response;
 import net.haugr.cws.api.common.Constants;
 import net.haugr.cws.api.common.ReturnCode;
 import net.haugr.cws.api.responses.VersionResponse;
 import net.haugr.cws.core.ManagementBean;
 import net.haugr.cws.core.misc.LoggingUtil;
 import net.haugr.cws.core.model.Settings;
-import java.util.logging.Logger;
-import javax.inject.Inject;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.Response;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <p>REST interface for the Version functionality.</p>
@@ -38,7 +39,7 @@ import javax.ws.rs.core.Response;
 @Path(Constants.REST_VERSION)
 public class VersionService {
 
-    private static final Logger LOG = Logger.getLogger(VersionService.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(VersionService.class);
 
     @Inject
     private ManagementBean bean;
@@ -52,9 +53,9 @@ public class VersionService {
 
         try {
             response = bean.version();
-            LOG.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), Constants.REST_VERSION, startTime));
+            LOGGER.info(LoggingUtil.requestDuration(settings.getLocale(), Constants.REST_VERSION, startTime));
         } catch (RuntimeException e) {
-            LOG.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getLocale(), Constants.REST_VERSION, startTime, e));
+            LOGGER.error(LoggingUtil.requestDuration(settings.getLocale(), Constants.REST_VERSION, startTime, e), e);
             response = new VersionResponse(ReturnCode.ERROR, e.getMessage());
         }
 

@@ -16,6 +16,13 @@
  */
 package net.haugr.cws.rest;
 
+import javax.inject.Inject;
+import javax.validation.constraints.NotNull;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.Response;
 import net.haugr.cws.api.common.Action;
 import net.haugr.cws.api.common.Constants;
 import net.haugr.cws.api.common.ReturnCode;
@@ -26,14 +33,8 @@ import net.haugr.cws.api.responses.ProcessDataResponse;
 import net.haugr.cws.core.ShareBean;
 import net.haugr.cws.core.misc.LoggingUtil;
 import net.haugr.cws.core.model.Settings;
-import java.util.logging.Logger;
-import javax.inject.Inject;
-import javax.validation.constraints.NotNull;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.Response;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <p>REST interface for the Data functionality.</p>
@@ -44,7 +45,7 @@ import javax.ws.rs.core.Response;
 @Path(Constants.REST_DATA_BASE)
 public class DataService {
 
-    private static final Logger LOG = Logger.getLogger(DataService.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(DataService.class);
 
     @Inject
     private ShareBean bean;
@@ -101,9 +102,9 @@ public class DataService {
 
         try {
             response = bean.fetchData(fetchDataRequest);
-            LOG.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), restAction, startTime));
+            LOGGER.info(LoggingUtil.requestDuration(settings.getLocale(), restAction, startTime));
         } catch (RuntimeException e) {
-            LOG.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getLocale(), restAction, startTime, e));
+            LOGGER.error(LoggingUtil.requestDuration(settings.getLocale(), restAction, startTime, e), e);
             response = new FetchDataResponse(ReturnCode.ERROR, e.getMessage());
         }
 
@@ -118,9 +119,9 @@ public class DataService {
         try {
             request.setAction(action);
             response = bean.processData(request);
-            LOG.log(Settings.INFO, () -> LoggingUtil.requestDuration(settings.getLocale(), restAction, startTime));
+            LOGGER.info(LoggingUtil.requestDuration(settings.getLocale(), restAction, startTime));
         } catch (RuntimeException e) {
-            LOG.log(Settings.ERROR, () -> LoggingUtil.requestDuration(settings.getLocale(), restAction, startTime, e));
+            LOGGER.error(LoggingUtil.requestDuration(settings.getLocale(), restAction, startTime, e), e);
             response = new ProcessDataResponse(ReturnCode.ERROR, e.getMessage());
         }
 

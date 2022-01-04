@@ -16,14 +16,7 @@
  */
 package net.haugr.cws.core;
 
-import net.haugr.cws.core.enums.StandardSetting;
-import net.haugr.cws.core.exceptions.CWSException;
-import net.haugr.cws.core.model.CommonDao;
-import net.haugr.cws.core.model.Settings;
-import net.haugr.cws.core.model.entities.SettingEntity;
-import net.haugr.cws.core.model.entities.VersionEntity;
 import java.util.List;
-import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.ejb.Asynchronous;
@@ -39,6 +32,14 @@ import javax.ejb.TransactionAttributeType;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import net.haugr.cws.core.enums.StandardSetting;
+import net.haugr.cws.core.exceptions.CWSException;
+import net.haugr.cws.core.model.CommonDao;
+import net.haugr.cws.core.model.Settings;
+import net.haugr.cws.core.model.entities.SettingEntity;
+import net.haugr.cws.core.model.entities.VersionEntity;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <p>Startup Bean for CWS, it is a singleton, which handles loading of the
@@ -53,7 +54,7 @@ import javax.persistence.PersistenceContext;
 @TransactionAttribute(TransactionAttributeType.REQUIRED)
 public class StartupBean {
 
-    private static final Logger LOG = Logger.getLogger(StartupBean.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(StartupBean.class);
     private static final int DB_VERSION = 4;
 
     @PersistenceContext
@@ -66,13 +67,13 @@ public class StartupBean {
 
     @PostConstruct
     public void startup() {
-        LOG.info("Check if Database is up-to-date.");
+        LOGGER.info("Check if Database is up-to-date.");
         if (checkDatabase()) {
 
-            LOG.info("Initialize the Settings.");
+            LOGGER.info("Initialize the Settings.");
             initializeSettings();
 
-            LOG.info("Initializing the CWS Sanitizer Service.");
+            LOGGER.info("Initializing the CWS Sanitizer Service.");
 
             // If requested, then simply start sanitize as a background job
             // now. The job will process small blocks of code and save these.
@@ -111,7 +112,7 @@ public class StartupBean {
                 ready = true;
             }
         } catch (CWSException e) {
-            LOG.log(Settings.ERROR, e, () -> "Problem with DB: " + e.getMessage());
+            LOGGER.error("Problem with DB: {}", e.getMessage(), e);
         }
 
         settings.set(StandardSetting.IS_READY.getKey(), String.valueOf(ready));
@@ -129,14 +130,14 @@ public class StartupBean {
 
     @Asynchronous
     public void runSanitizing() {
-        LOG.log(Settings.INFO, "Starting initial Sanitizing check.");
+        LOGGER.info("Starting initial Sanitizing check.");
         sanitizerBean.sanitize();
     }
 
     @Timeout
     public void runSanitizing(final Timer timer) {
-        LOG.log(Settings.INFO, "Starting Timed Sanitizing check.");
+        LOGGER.info("Starting Timed Sanitizing check.");
         sanitizerBean.sanitize();
-        LOG.log(Settings.INFO, () -> "Next Sanitizing check will begin at: " + timer.getNextTimeout());
+        LOGGER.info("Next Sanitizing check will begin at: {}", timer.getNextTimeout());
     }
 }

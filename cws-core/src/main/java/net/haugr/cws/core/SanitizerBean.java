@@ -16,22 +16,23 @@
  */
 package net.haugr.cws.core;
 
-import net.haugr.cws.api.common.Utilities;
-import net.haugr.cws.core.enums.SanityStatus;
-import net.haugr.cws.core.jce.Crypto;
-import net.haugr.cws.core.model.CommonDao;
-import net.haugr.cws.core.model.Settings;
-import net.haugr.cws.core.model.entities.DataEntity;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
-import java.util.logging.Logger;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceException;
 import javax.transaction.Transactional;
+import net.haugr.cws.api.common.Utilities;
+import net.haugr.cws.core.enums.SanityStatus;
+import net.haugr.cws.core.jce.Crypto;
+import net.haugr.cws.core.model.CommonDao;
+import net.haugr.cws.core.model.Settings;
+import net.haugr.cws.core.model.entities.DataEntity;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <p>Generally, the database is always trustworthy, it is a system which is
@@ -53,7 +54,7 @@ import javax.transaction.Transactional;
 @Transactional
 public class SanitizerBean {
 
-    private static final Logger LOG = Logger.getLogger(SanitizerBean.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(SanitizerBean.class);
     private static final int BLOCK = 100;
 
     @PersistenceContext
@@ -80,8 +81,7 @@ public class SanitizerBean {
             ids = findNextBatch(BLOCK);
         }
 
-        final String[] args = { String.valueOf(flawed), String.valueOf(count) };
-        LOG.log(Settings.INFO, "Completed Sanity check, found {0} flaws out of {1} checked Data Objects.", args);
+        LOGGER.info("Completed Sanity check, found {} flaws out of {} checked Data Objects.", flawed, count);
     }
 
     public SanityStatus processEntity(final Long id) {
@@ -121,7 +121,7 @@ public class SanitizerBean {
             //   2. The underlying database does not support locking, so it is
             //      not possible to continue. If this is the case, it should be
             //      reported to the CWS developers.
-            LOG.log(Settings.ERROR, e.getMessage(), e);
+            LOGGER.error(e.getMessage(), e);
             status = SanityStatus.BLOCKED;
         }
 
@@ -130,8 +130,7 @@ public class SanitizerBean {
 
     private void clearExpireSessions() {
         final var query = entityManager.createNamedQuery("member.removeExpiredSessions");
-        final String logMessage = "expired " + query.executeUpdate() + " sessions.";
-        LOG.log(Settings.DEBUG, logMessage);
+        LOGGER.debug("expired {} sessions.", query.executeUpdate());
     }
 
     public List<Long> findNextBatch(final int maxResults) {

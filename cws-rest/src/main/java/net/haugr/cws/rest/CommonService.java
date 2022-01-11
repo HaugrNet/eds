@@ -113,6 +113,9 @@ final class CommonService {
             }
         }
 
+        // As we only deal with existing, working & tested functionality,
+        // this is considered unreachable code, added to avoid having
+        // Needless null checks.
         throw new CWSException(ReturnCode.ILLEGAL_SERVICE, "No such method: " + invokeMethod);
     }
 

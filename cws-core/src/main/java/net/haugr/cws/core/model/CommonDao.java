@@ -16,6 +16,16 @@
  */
 package net.haugr.cws.core.model;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceException;
+import javax.persistence.Query;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 import net.haugr.cws.api.common.MemberRole;
 import net.haugr.cws.api.common.ReturnCode;
 import net.haugr.cws.api.common.TrustLevel;
@@ -29,16 +39,6 @@ import net.haugr.cws.core.model.entities.Externable;
 import net.haugr.cws.core.model.entities.MemberEntity;
 import net.haugr.cws.core.model.entities.SettingEntity;
 import net.haugr.cws.core.model.entities.TrusteeEntity;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceException;
-import javax.persistence.Query;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
 
 /**
  * <p>Common DAO functionality, used throughout CWS.</p>
@@ -85,9 +85,7 @@ public class CommonDao {
             if ((entity instanceof Externable) && (((Externable) entity).getExternalId() == null)) {
                 ((Externable) entity).setExternalId(UUID.randomUUID().toString());
             }
-            if (entity.getAdded() == null) {
-                entity.setAdded(Utilities.newDate());
-            }
+            entity.setAdded(Utilities.newDate());
 
             entityManager.persist(entity);
             saved = entity;

@@ -24,14 +24,9 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 import net.haugr.cws.api.common.Constants;
-import net.haugr.cws.api.common.ReturnCode;
 import net.haugr.cws.api.requests.MasterKeyRequest;
-import net.haugr.cws.api.responses.MasterKeyResponse;
 import net.haugr.cws.core.ManagementBean;
-import net.haugr.cws.core.misc.LoggingUtil;
 import net.haugr.cws.core.model.Settings;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * <p>REST interface for the MasterKey functionality.</p>
@@ -42,27 +37,16 @@ import org.slf4j.LoggerFactory;
 @Path(Constants.REST_MASTERKEY)
 public class MasterKeyService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(MasterKeyService.class);
+    private static final String METHOD = "masterKey";
 
     @Inject
     private ManagementBean bean;
     private final Settings settings = Settings.getInstance();
 
     @POST
-    @Consumes(RestUtils.CONSUMES)
-    @Produces(RestUtils.PRODUCES)
+    @Consumes(CommonService.CONSUMES)
+    @Produces(CommonService.PRODUCES)
     public Response masterKey(@NotNull final MasterKeyRequest masterKeyRequest) {
-        final long startTime = System.nanoTime();
-        MasterKeyResponse response;
-
-        try {
-            response = bean.masterKey(masterKeyRequest);
-            LOGGER.info(LoggingUtil.requestDuration(settings.getLocale(), Constants.REST_MASTERKEY, startTime));
-        } catch (RuntimeException e) {
-            LOGGER.error(LoggingUtil.requestDuration(settings.getLocale(), Constants.REST_MASTERKEY, startTime, e), e);
-            response = new MasterKeyResponse(ReturnCode.ERROR, e.getMessage());
-        }
-
-        return RestUtils.buildResponse(response);
+        return CommonService.runRequest(settings, bean, METHOD, masterKeyRequest, Constants.REST_MASTERKEY);
     }
 }

@@ -25,16 +25,10 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 import net.haugr.cws.api.common.Action;
 import net.haugr.cws.api.common.Constants;
-import net.haugr.cws.api.common.ReturnCode;
 import net.haugr.cws.api.requests.FetchDataRequest;
 import net.haugr.cws.api.requests.ProcessDataRequest;
-import net.haugr.cws.api.responses.FetchDataResponse;
-import net.haugr.cws.api.responses.ProcessDataResponse;
 import net.haugr.cws.core.ShareBean;
-import net.haugr.cws.core.misc.LoggingUtil;
 import net.haugr.cws.core.model.Settings;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * <p>REST interface for the Data functionality.</p>
@@ -45,86 +39,63 @@ import org.slf4j.LoggerFactory;
 @Path(Constants.REST_DATA_BASE)
 public class DataService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(DataService.class);
+    private static final String PROCESS_METHOD = "processData";
+    private static final String FETCH_METHOD = "fetchData";
 
     @Inject
     private ShareBean bean;
     private final Settings settings = Settings.getInstance();
 
     @POST
-    @Consumes(RestUtils.CONSUMES)
-    @Produces(RestUtils.PRODUCES)
     @Path(Constants.REST_DATA_ADD)
+    @Consumes(CommonService.CONSUMES)
+    @Produces(CommonService.PRODUCES)
     public Response add(@NotNull final ProcessDataRequest addDataRequest) {
-        return processData(addDataRequest, Action.ADD, Constants.REST_DATA_ADD);
+        addDataRequest.setAction(Action.ADD);
+        return CommonService.runRequest(settings, bean, PROCESS_METHOD, addDataRequest, Constants.REST_DATA_BASE + Constants.REST_DATA_ADD);
     }
 
     @POST
-    @Consumes(RestUtils.CONSUMES)
-    @Produces(RestUtils.PRODUCES)
     @Path(Constants.REST_DATA_COPY)
+    @Consumes(CommonService.CONSUMES)
+    @Produces(CommonService.PRODUCES)
     public Response copy(@NotNull final ProcessDataRequest updateDataRequest) {
-        return processData(updateDataRequest, Action.COPY, Constants.REST_DATA_COPY);
+        updateDataRequest.setAction(Action.COPY);
+        return CommonService.runRequest(settings, bean, PROCESS_METHOD, updateDataRequest, Constants.REST_DATA_BASE + Constants.REST_DATA_COPY);
     }
 
     @POST
-    @Consumes(RestUtils.CONSUMES)
-    @Produces(RestUtils.PRODUCES)
     @Path(Constants.REST_DATA_MOVE)
+    @Consumes(CommonService.CONSUMES)
+    @Produces(CommonService.PRODUCES)
     public Response move(@NotNull final ProcessDataRequest updateDataRequest) {
-        return processData(updateDataRequest, Action.MOVE, Constants.REST_DATA_MOVE);
+        updateDataRequest.setAction(Action.MOVE);
+        return CommonService.runRequest(settings, bean, PROCESS_METHOD, updateDataRequest, Constants.REST_DATA_BASE + Constants.REST_DATA_MOVE);
     }
 
     @POST
-    @Consumes(RestUtils.CONSUMES)
-    @Produces(RestUtils.PRODUCES)
     @Path(Constants.REST_DATA_UPDATE)
+    @Consumes(CommonService.CONSUMES)
+    @Produces(CommonService.PRODUCES)
     public Response update(@NotNull final ProcessDataRequest updateDataRequest) {
-        return processData(updateDataRequest, Action.UPDATE, Constants.REST_DATA_UPDATE);
+        updateDataRequest.setAction(Action.UPDATE);
+        return CommonService.runRequest(settings, bean, PROCESS_METHOD, updateDataRequest, Constants.REST_DATA_BASE + Constants.REST_DATA_UPDATE);
     }
 
     @POST
-    @Consumes(RestUtils.CONSUMES)
-    @Produces(RestUtils.PRODUCES)
     @Path(Constants.REST_DATA_DELETE)
+    @Consumes(CommonService.CONSUMES)
+    @Produces(CommonService.PRODUCES)
     public Response delete(@NotNull final ProcessDataRequest deleteDataRequest) {
-        return processData(deleteDataRequest, Action.DELETE, Constants.REST_DATA_DELETE);
+        deleteDataRequest.setAction(Action.DELETE);
+        return CommonService.runRequest(settings, bean, PROCESS_METHOD, deleteDataRequest, Constants.REST_DATA_BASE + Constants.REST_DATA_DELETE);
     }
 
     @POST
-    @Consumes(RestUtils.CONSUMES)
-    @Produces(RestUtils.PRODUCES)
     @Path(Constants.REST_DATA_FETCH)
+    @Consumes(CommonService.CONSUMES)
+    @Produces(CommonService.PRODUCES)
     public Response fetch(@NotNull final FetchDataRequest fetchDataRequest) {
-        final String restAction = Constants.REST_DATA_BASE + Constants.REST_DATA_FETCH;
-        final long startTime = System.nanoTime();
-        FetchDataResponse response;
-
-        try {
-            response = bean.fetchData(fetchDataRequest);
-            LOGGER.info(LoggingUtil.requestDuration(settings.getLocale(), restAction, startTime));
-        } catch (RuntimeException e) {
-            LOGGER.error(LoggingUtil.requestDuration(settings.getLocale(), restAction, startTime, e), e);
-            response = new FetchDataResponse(ReturnCode.ERROR, e.getMessage());
-        }
-
-        return RestUtils.buildResponse(response);
-    }
-
-    private Response processData(final ProcessDataRequest request, final Action action, final String logAction) {
-        final String restAction = Constants.REST_DATA_BASE + logAction;
-        final long startTime = System.nanoTime();
-        ProcessDataResponse response;
-
-        try {
-            request.setAction(action);
-            response = bean.processData(request);
-            LOGGER.info(LoggingUtil.requestDuration(settings.getLocale(), restAction, startTime));
-        } catch (RuntimeException e) {
-            LOGGER.error(LoggingUtil.requestDuration(settings.getLocale(), restAction, startTime, e), e);
-            response = new ProcessDataResponse(ReturnCode.ERROR, e.getMessage());
-        }
-
-        return RestUtils.buildResponse(response);
+        return CommonService.runRequest(settings, bean, FETCH_METHOD, fetchDataRequest, Constants.REST_DATA_BASE + Constants.REST_DATA_FETCH);
     }
 }

@@ -24,14 +24,9 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 import net.haugr.cws.api.common.Constants;
-import net.haugr.cws.api.common.ReturnCode;
 import net.haugr.cws.api.requests.SanityRequest;
-import net.haugr.cws.api.responses.SanityResponse;
 import net.haugr.cws.core.ManagementBean;
-import net.haugr.cws.core.misc.LoggingUtil;
 import net.haugr.cws.core.model.Settings;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * <p>REST interface for the Sanity functionality.</p>
@@ -42,27 +37,16 @@ import org.slf4j.LoggerFactory;
 @Path(Constants.REST_SANITIZED)
 public class SanityService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(SanityService.class);
+    private static final String METHOD = "sanity";
 
     @Inject
     private ManagementBean bean;
     private final Settings settings = Settings.getInstance();
 
     @POST
-    @Consumes(RestUtils.CONSUMES)
-    @Produces(RestUtils.PRODUCES)
+    @Consumes(CommonService.CONSUMES)
+    @Produces(CommonService.PRODUCES)
     public Response sanitized(@NotNull final SanityRequest sanitizedRequest) {
-        final long startTime = System.nanoTime();
-        SanityResponse response;
-
-        try {
-            response = bean.sanity(sanitizedRequest);
-            LOGGER.info(LoggingUtil.requestDuration(settings.getLocale(), Constants.REST_SANITIZED, startTime));
-        } catch (RuntimeException e) {
-            LOGGER.error(LoggingUtil.requestDuration(settings.getLocale(), Constants.REST_SANITIZED, startTime, e), e);
-            response = new SanityResponse(ReturnCode.ERROR, e.getMessage());
-        }
-
-        return RestUtils.buildResponse(response);
+        return CommonService.runRequest(settings, bean, METHOD, sanitizedRequest, Constants.REST_SANITIZED);
     }
 }

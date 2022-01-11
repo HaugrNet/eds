@@ -22,13 +22,8 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 import net.haugr.cws.api.common.Constants;
-import net.haugr.cws.api.common.ReturnCode;
-import net.haugr.cws.api.responses.VersionResponse;
 import net.haugr.cws.core.ManagementBean;
-import net.haugr.cws.core.misc.LoggingUtil;
 import net.haugr.cws.core.model.Settings;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * <p>REST interface for the Version functionality.</p>
@@ -39,26 +34,15 @@ import org.slf4j.LoggerFactory;
 @Path(Constants.REST_VERSION)
 public class VersionService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(VersionService.class);
+    private static final String METHOD = "version";
 
     @Inject
     private ManagementBean bean;
     private final Settings settings = Settings.getInstance();
 
     @POST
-    @Produces(RestUtils.PRODUCES)
+    @Produces(CommonService.PRODUCES)
     public Response version() {
-        final long startTime = System.nanoTime();
-        VersionResponse response;
-
-        try {
-            response = bean.version();
-            LOGGER.info(LoggingUtil.requestDuration(settings.getLocale(), Constants.REST_VERSION, startTime));
-        } catch (RuntimeException e) {
-            LOGGER.error(LoggingUtil.requestDuration(settings.getLocale(), Constants.REST_VERSION, startTime, e), e);
-            response = new VersionResponse(ReturnCode.ERROR, e.getMessage());
-        }
-
-        return RestUtils.buildResponse(response);
+        return CommonService.runRequest(settings, bean, METHOD, null, Constants.REST_VERSION);
     }
 }

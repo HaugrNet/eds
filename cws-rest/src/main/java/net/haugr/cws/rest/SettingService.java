@@ -24,14 +24,9 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 import net.haugr.cws.api.common.Constants;
-import net.haugr.cws.api.common.ReturnCode;
 import net.haugr.cws.api.requests.SettingRequest;
-import net.haugr.cws.api.responses.SettingResponse;
 import net.haugr.cws.core.ManagementBean;
-import net.haugr.cws.core.misc.LoggingUtil;
 import net.haugr.cws.core.model.Settings;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * <p>REST interface for the Setting functionality.</p>
@@ -42,27 +37,16 @@ import org.slf4j.LoggerFactory;
 @Path(Constants.REST_SETTINGS)
 public class SettingService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(SettingService.class);
+    private static final String METHOD = "settings";
 
     @Inject
     private ManagementBean bean;
     private final Settings settings = Settings.getInstance();
 
     @POST
-    @Consumes(RestUtils.CONSUMES)
-    @Produces(RestUtils.PRODUCES)
+    @Consumes(CommonService.CONSUMES)
+    @Produces(CommonService.PRODUCES)
     public Response settings(@NotNull final SettingRequest settingRequest) {
-        final long startTime = System.nanoTime();
-        SettingResponse response;
-
-        try {
-            response = bean.settings(settingRequest);
-            LOGGER.info(LoggingUtil.requestDuration(settings.getLocale(), Constants.REST_SETTINGS, startTime));
-        } catch (RuntimeException e) {
-            LOGGER.error(LoggingUtil.requestDuration(settings.getLocale(), Constants.REST_SETTINGS, startTime, e), e);
-            response = new SettingResponse(ReturnCode.ERROR, e.getMessage());
-        }
-
-        return RestUtils.buildResponse(response);
+        return CommonService.runRequest(settings, bean, METHOD, settingRequest, Constants.REST_SETTINGS);
     }
 }

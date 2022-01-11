@@ -24,18 +24,11 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 import net.haugr.cws.api.common.Constants;
-import net.haugr.cws.api.common.ReturnCode;
 import net.haugr.cws.api.requests.FetchSignatureRequest;
 import net.haugr.cws.api.requests.SignRequest;
 import net.haugr.cws.api.requests.VerifyRequest;
-import net.haugr.cws.api.responses.FetchSignatureResponse;
-import net.haugr.cws.api.responses.SignResponse;
-import net.haugr.cws.api.responses.VerifyResponse;
 import net.haugr.cws.core.ShareBean;
-import net.haugr.cws.core.misc.LoggingUtil;
 import net.haugr.cws.core.model.Settings;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * <p>REST interface for the Signature functionality.</p>
@@ -46,7 +39,9 @@ import org.slf4j.LoggerFactory;
 @Path(Constants.REST_SIGNATURES_BASE)
 public class SignatureService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(SignatureService.class);
+    private static final String FETCH_METHOD = "fetchSignatures";
+    private static final String VERIFY_METHOD = "verify";
+    private static final String SIGN_METHOD = "sign";
 
     @Inject
     private ShareBean bean;
@@ -54,61 +49,25 @@ public class SignatureService {
 
     @POST
     @Path(Constants.REST_SIGNATURES_SIGN)
-    @Consumes(RestUtils.CONSUMES)
-    @Produces(RestUtils.PRODUCES)
+    @Consumes(CommonService.CONSUMES)
+    @Produces(CommonService.PRODUCES)
     public Response sign(@NotNull final SignRequest signDocumentRequest) {
-        final String restAction = Constants.REST_SIGNATURES_BASE + Constants.REST_SIGNATURES_SIGN;
-        final long startTime = System.nanoTime();
-        SignResponse response;
-
-        try {
-            response = bean.sign(signDocumentRequest);
-            LOGGER.info(LoggingUtil.requestDuration(settings.getLocale(), restAction, startTime));
-        } catch (RuntimeException e) {
-            LOGGER.error(LoggingUtil.requestDuration(settings.getLocale(), restAction, startTime, e), e);
-            response = new SignResponse(ReturnCode.ERROR, e.getMessage());
-        }
-
-        return RestUtils.buildResponse(response);
+        return CommonService.runRequest(settings, bean, SIGN_METHOD, signDocumentRequest, Constants.REST_SIGNATURES_BASE + Constants.REST_SIGNATURES_SIGN);
     }
 
     @POST
     @Path(Constants.REST_SIGNATURES_VERIFY)
-    @Consumes(RestUtils.CONSUMES)
-    @Produces(RestUtils.PRODUCES)
+    @Consumes(CommonService.CONSUMES)
+    @Produces(CommonService.PRODUCES)
     public Response verify(@NotNull final VerifyRequest verifySignatureRequest) {
-        final String restAction = Constants.REST_SIGNATURES_BASE + Constants.REST_SIGNATURES_VERIFY;
-        final long startTime = System.nanoTime();
-        VerifyResponse response;
-
-        try {
-            response = bean.verify(verifySignatureRequest);
-            LOGGER.info(LoggingUtil.requestDuration(settings.getLocale(), restAction, startTime));
-        } catch (RuntimeException e) {
-            LOGGER.error(LoggingUtil.requestDuration(settings.getLocale(), restAction, startTime, e), e);
-            response = new VerifyResponse(ReturnCode.ERROR, e.getMessage());
-        }
-
-        return RestUtils.buildResponse(response);
+        return CommonService.runRequest(settings, bean, VERIFY_METHOD, verifySignatureRequest, Constants.REST_SIGNATURES_BASE + Constants.REST_SIGNATURES_VERIFY);
     }
 
     @POST
     @Path(Constants.REST_SIGNATURES_FETCH)
-    @Consumes(RestUtils.CONSUMES)
-    @Produces(RestUtils.PRODUCES)
+    @Consumes(CommonService.CONSUMES)
+    @Produces(CommonService.PRODUCES)
     public Response fetch(@NotNull final FetchSignatureRequest fetchSignaturesRequest) {
-        final String restAction = Constants.REST_SIGNATURES_BASE + Constants.REST_SIGNATURES_FETCH;
-        final long startTime = System.nanoTime();
-        FetchSignatureResponse response;
-
-        try {
-            response = bean.fetchSignatures(fetchSignaturesRequest);
-            LOGGER.info(LoggingUtil.requestDuration(settings.getLocale(), restAction, startTime));
-        } catch (RuntimeException e) {
-            LOGGER.error(LoggingUtil.requestDuration(settings.getLocale(), restAction, startTime, e), e);
-            response = new FetchSignatureResponse(ReturnCode.ERROR, e.getMessage());
-        }
-
-        return RestUtils.buildResponse(response);
+        return CommonService.runRequest(settings, bean, FETCH_METHOD, fetchSignaturesRequest, Constants.REST_SIGNATURES_BASE + Constants.REST_SIGNATURES_FETCH);
     }
 }

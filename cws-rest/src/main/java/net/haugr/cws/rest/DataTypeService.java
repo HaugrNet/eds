@@ -25,16 +25,10 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 import net.haugr.cws.api.common.Action;
 import net.haugr.cws.api.common.Constants;
-import net.haugr.cws.api.common.ReturnCode;
 import net.haugr.cws.api.requests.FetchDataTypeRequest;
 import net.haugr.cws.api.requests.ProcessDataTypeRequest;
-import net.haugr.cws.api.responses.FetchDataTypeResponse;
-import net.haugr.cws.api.responses.ProcessDataTypeResponse;
 import net.haugr.cws.core.ShareBean;
-import net.haugr.cws.core.misc.LoggingUtil;
 import net.haugr.cws.core.model.Settings;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * <p>REST interface for the DataType functionality.</p>
@@ -45,62 +39,36 @@ import org.slf4j.LoggerFactory;
 @Path(Constants.REST_DATATYPES_BASE)
 public class DataTypeService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(DataTypeService.class);
+    private static final String PROCESS_METHOD = "processDataType";
+    private static final String FETCH_METHOD = "fetchDataTypes";
 
     @Inject
     private ShareBean bean;
     private final Settings settings = Settings.getInstance();
 
     @POST
-    @Consumes(RestUtils.CONSUMES)
-    @Produces(RestUtils.PRODUCES)
     @Path(Constants.REST_DATATYPES_PROCESS)
+    @Consumes(CommonService.CONSUMES)
+    @Produces(CommonService.PRODUCES)
     public Response process(@NotNull final ProcessDataTypeRequest processDataTypeRequest) {
-        return processDataType(processDataTypeRequest, Action.PROCESS, Constants.REST_DATATYPES_PROCESS);
+        processDataTypeRequest.setAction(Action.PROCESS);
+        return CommonService.runRequest(settings, bean, PROCESS_METHOD, processDataTypeRequest, Constants.REST_DATATYPES_BASE + Constants.REST_DATATYPES_PROCESS);
     }
 
     @POST
-    @Consumes(RestUtils.CONSUMES)
-    @Produces(RestUtils.PRODUCES)
     @Path(Constants.REST_DATATYPES_DELETE)
+    @Consumes(CommonService.CONSUMES)
+    @Produces(CommonService.PRODUCES)
     public Response delete(@NotNull final ProcessDataTypeRequest deleteDataTypeRequest) {
-        return processDataType(deleteDataTypeRequest, Action.DELETE, Constants.REST_DATATYPES_DELETE);
+        deleteDataTypeRequest.setAction(Action.DELETE);
+        return CommonService.runRequest(settings, bean, PROCESS_METHOD, deleteDataTypeRequest, Constants.REST_DATATYPES_BASE + Constants.REST_DATATYPES_DELETE);
     }
 
     @POST
-    @Consumes(RestUtils.CONSUMES)
-    @Produces(RestUtils.PRODUCES)
     @Path(Constants.REST_DATATYPES_FETCH)
+    @Consumes(CommonService.CONSUMES)
+    @Produces(CommonService.PRODUCES)
     public Response fetch(@NotNull final FetchDataTypeRequest fetchDataTypesRequest) {
-        final String restAction = Constants.REST_DATATYPES_BASE + Constants.REST_DATATYPES_FETCH;
-        final long startTime = System.nanoTime();
-        FetchDataTypeResponse response;
-
-        try {
-            response = bean.fetchDataTypes(fetchDataTypesRequest);
-            LOGGER.info(LoggingUtil.requestDuration(settings.getLocale(), restAction, startTime));
-        } catch (RuntimeException e) {
-            LOGGER.error(LoggingUtil.requestDuration(settings.getLocale(), restAction, startTime, e), e);
-            response = new FetchDataTypeResponse(ReturnCode.ERROR, e.getMessage());
-        }
-
-        return RestUtils.buildResponse(response);
-    }
-
-    private Response processDataType(final ProcessDataTypeRequest request, final Action action, final String logAction) {
-        final String restAction = Constants.REST_DATATYPES_BASE + logAction;
-        final long startTime = System.nanoTime();
-        ProcessDataTypeResponse response;
-
-        try {
-            request.setAction(action);
-            response = bean.processDataType(request);
-            LOGGER.info(LoggingUtil.requestDuration(settings.getLocale(), restAction, startTime));
-        } catch (RuntimeException e) {
-            LOGGER.error(LoggingUtil.requestDuration(settings.getLocale(), restAction, startTime, e), e);
-            response = new ProcessDataTypeResponse(ReturnCode.ERROR, e.getMessage());
-        }
-
-        return RestUtils.buildResponse(response);
+        return CommonService.runRequest(settings, bean, FETCH_METHOD, fetchDataTypesRequest, Constants.REST_DATATYPES_BASE + Constants.REST_DATATYPES_FETCH);
     }
 }

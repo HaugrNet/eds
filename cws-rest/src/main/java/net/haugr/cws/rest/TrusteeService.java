@@ -25,16 +25,10 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 import net.haugr.cws.api.common.Action;
 import net.haugr.cws.api.common.Constants;
-import net.haugr.cws.api.common.ReturnCode;
 import net.haugr.cws.api.requests.FetchTrusteeRequest;
 import net.haugr.cws.api.requests.ProcessTrusteeRequest;
-import net.haugr.cws.api.responses.FetchTrusteeResponse;
-import net.haugr.cws.api.responses.ProcessTrusteeResponse;
 import net.haugr.cws.core.ManagementBean;
-import net.haugr.cws.core.misc.LoggingUtil;
 import net.haugr.cws.core.model.Settings;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * <p>REST interface for the Trustee functionality.</p>
@@ -45,7 +39,8 @@ import org.slf4j.LoggerFactory;
 @Path(Constants.REST_TRUSTEES_BASE)
 public class TrusteeService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(TrusteeService.class);
+    private static final String PROCESS_METHOD = "processTrustee";
+    private static final String FETCH_METHOD = "fetchTrustees";
 
     @Inject
     private ManagementBean bean;
@@ -53,62 +48,36 @@ public class TrusteeService {
 
     @POST
     @Path(Constants.REST_TRUSTEES_ADD)
-    @Consumes(RestUtils.CONSUMES)
-    @Produces(RestUtils.PRODUCES)
+    @Consumes(CommonService.CONSUMES)
+    @Produces(CommonService.PRODUCES)
     public Response add(@NotNull final ProcessTrusteeRequest addTrusteeRequest) {
-        return processTrustee(addTrusteeRequest, Action.ADD, Constants.REST_TRUSTEES_ADD);
+        addTrusteeRequest.setAction(Action.ADD);
+        return CommonService.runRequest(settings, bean, PROCESS_METHOD, addTrusteeRequest, Constants.REST_TRUSTEES_BASE + Constants.REST_TRUSTEES_ADD);
     }
 
     @POST
     @Path(Constants.REST_TRUSTEES_ALTER)
-    @Consumes(RestUtils.CONSUMES)
-    @Produces(RestUtils.PRODUCES)
+    @Consumes(CommonService.CONSUMES)
+    @Produces(CommonService.PRODUCES)
     public Response alter(@NotNull final ProcessTrusteeRequest alterTrusteeRequest) {
-        return processTrustee(alterTrusteeRequest, Action.ALTER, Constants.REST_TRUSTEES_ALTER);
+        alterTrusteeRequest.setAction(Action.ALTER);
+        return CommonService.runRequest(settings, bean, PROCESS_METHOD, alterTrusteeRequest, Constants.REST_TRUSTEES_BASE + Constants.REST_TRUSTEES_ALTER);
     }
 
     @POST
     @Path(Constants.REST_TRUSTEES_REMOVE)
-    @Consumes(RestUtils.CONSUMES)
-    @Produces(RestUtils.PRODUCES)
+    @Consumes(CommonService.CONSUMES)
+    @Produces(CommonService.PRODUCES)
     public Response remove(@NotNull final ProcessTrusteeRequest removeTrusteeRequest) {
-        return processTrustee(removeTrusteeRequest, Action.REMOVE, Constants.REST_TRUSTEES_REMOVE);
+        removeTrusteeRequest.setAction(Action.REMOVE);
+        return CommonService.runRequest(settings, bean, PROCESS_METHOD, removeTrusteeRequest, Constants.REST_TRUSTEES_BASE + Constants.REST_TRUSTEES_REMOVE);
     }
 
     @POST
     @Path(Constants.REST_TRUSTEES_FETCH)
-    @Consumes(RestUtils.CONSUMES)
-    @Produces(RestUtils.PRODUCES)
+    @Consumes(CommonService.CONSUMES)
+    @Produces(CommonService.PRODUCES)
     public Response fetch(@NotNull final FetchTrusteeRequest fetchTrusteeRequest) {
-        final String restAction = Constants.REST_TRUSTEES_BASE + Constants.REST_TRUSTEES_FETCH;
-        final long startTime = System.nanoTime();
-        FetchTrusteeResponse response;
-
-        try {
-            response = bean.fetchTrustees(fetchTrusteeRequest);
-            LOGGER.info(LoggingUtil.requestDuration(settings.getLocale(), restAction, startTime));
-        } catch (RuntimeException e) {
-            LOGGER.error(LoggingUtil.requestDuration(settings.getLocale(), restAction, startTime, e), e);
-            response = new FetchTrusteeResponse(ReturnCode.ERROR, e.getMessage());
-        }
-
-        return RestUtils.buildResponse(response);
-    }
-
-    private Response processTrustee(final ProcessTrusteeRequest request, final Action action, final String logAction) {
-        final String restAction = Constants.REST_TRUSTEES_BASE + logAction;
-        final long startTime = System.nanoTime();
-        ProcessTrusteeResponse response;
-
-        try {
-            request.setAction(action);
-            response = bean.processTrustee(request);
-            LOGGER.info(LoggingUtil.requestDuration(settings.getLocale(), restAction, startTime));
-        } catch (RuntimeException e) {
-            LOGGER.error(LoggingUtil.requestDuration(settings.getLocale(), restAction, startTime, e), e);
-            response = new ProcessTrusteeResponse(ReturnCode.ERROR, e.getMessage());
-        }
-
-        return RestUtils.buildResponse(response);
+        return CommonService.runRequest(settings, bean, FETCH_METHOD, fetchTrusteeRequest, Constants.REST_TRUSTEES_BASE + Constants.REST_TRUSTEES_FETCH);
     }
 }

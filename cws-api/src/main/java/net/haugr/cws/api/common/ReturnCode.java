@@ -461,16 +461,22 @@ public enum ReturnCode {
     SETTING_ERROR(Classification.CLASS_ERROR, 93, "Error extracting settings value."),
 
     /**
-     * <b>Custom Warning 595 - Database Error</b>.<br>
+     * <b>Custom Warning 594 - Database Error</b>.<br>
      * <i>A generic problem with the database occurred.</i>
      */
     DATABASE_ERROR(Classification.CLASS_ERROR, 94, "Database Error occurred during the handling of the request."),
 
     /**
-     * <b>Custom Warning 596 - Constraint Error</b>.<br>
+     * <b>Custom Warning 595 - Constraint Error</b>.<br>
      * <i>A unique constraint violation occurred in the database.</i>
      */
-    CONSTRAINT_ERROR(Classification.CLASS_ERROR, 95, "Unique Constraint Violation in the Database.");
+    CONSTRAINT_ERROR(Classification.CLASS_ERROR, 95, "Unique Constraint Violation in the Database."),
+
+    /**
+     * <b>Custom Warning 596 - Illegal Service</b>.<br>
+     * <i>A not existing service was attempted to be invoked..</i>
+     */
+    ILLEGAL_SERVICE(Classification.CLASS_ERROR, 96, "The requested service does not exist.");
 
     /**
      * ReturnCode Classification, i.e. Basic Severity.

@@ -25,16 +25,10 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 import net.haugr.cws.api.common.Action;
 import net.haugr.cws.api.common.Constants;
-import net.haugr.cws.api.common.ReturnCode;
 import net.haugr.cws.api.requests.FetchCircleRequest;
 import net.haugr.cws.api.requests.ProcessCircleRequest;
-import net.haugr.cws.api.responses.FetchCircleResponse;
-import net.haugr.cws.api.responses.ProcessCircleResponse;
 import net.haugr.cws.core.ManagementBean;
-import net.haugr.cws.core.misc.LoggingUtil;
 import net.haugr.cws.core.model.Settings;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * <p>REST interface for the Circle functionality.</p>
@@ -45,70 +39,45 @@ import org.slf4j.LoggerFactory;
 @Path(Constants.REST_CIRCLES_BASE)
 public class CircleService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(CircleService.class);
+    private static final String PROCESS_METHOD = "processCircle";
+    private static final String FETCH_METHOD = "fetchCircles";
 
     @Inject
     private ManagementBean bean;
     private final Settings settings = Settings.getInstance();
 
     @POST
-    @Consumes(RestUtils.CONSUMES)
-    @Produces(RestUtils.PRODUCES)
     @Path(Constants.REST_CIRCLES_CREATE)
+    @Consumes(CommonService.CONSUMES)
+    @Produces(CommonService.PRODUCES)
     public Response create(@NotNull final ProcessCircleRequest createCircleRequest) {
-        return processCircle(createCircleRequest, Action.CREATE, Constants.REST_CIRCLES_CREATE);
+        createCircleRequest.setAction(Action.CREATE);
+        return CommonService.runRequest(settings, bean, PROCESS_METHOD, createCircleRequest, Constants.REST_CIRCLES_BASE + Constants.REST_CIRCLES_CREATE);
     }
 
     @POST
-    @Consumes(RestUtils.CONSUMES)
-    @Produces(RestUtils.PRODUCES)
     @Path(Constants.REST_CIRCLES_UPDATE)
+    @Consumes(CommonService.CONSUMES)
+    @Produces(CommonService.PRODUCES)
     public Response update(@NotNull final ProcessCircleRequest updateCircleRequest) {
-        return processCircle(updateCircleRequest, Action.UPDATE, Constants.REST_CIRCLES_UPDATE);
+        updateCircleRequest.setAction(Action.UPDATE);
+        return CommonService.runRequest(settings, bean, PROCESS_METHOD, updateCircleRequest, Constants.REST_CIRCLES_BASE + Constants.REST_CIRCLES_UPDATE);
     }
 
     @POST
-    @Consumes(RestUtils.CONSUMES)
-    @Produces(RestUtils.PRODUCES)
     @Path(Constants.REST_CIRCLES_DELETE)
+    @Consumes(CommonService.CONSUMES)
+    @Produces(CommonService.PRODUCES)
     public Response delete(@NotNull final ProcessCircleRequest deleteCircleRequest) {
-        return processCircle(deleteCircleRequest, Action.DELETE, Constants.REST_CIRCLES_DELETE);
+        deleteCircleRequest.setAction(Action.DELETE);
+        return CommonService.runRequest(settings, bean, PROCESS_METHOD, deleteCircleRequest, Constants.REST_CIRCLES_BASE + Constants.REST_CIRCLES_DELETE);
     }
 
     @POST
-    @Consumes(RestUtils.CONSUMES)
-    @Produces(RestUtils.PRODUCES)
     @Path(Constants.REST_CIRCLES_FETCH)
+    @Consumes(CommonService.CONSUMES)
+    @Produces(CommonService.PRODUCES)
     public Response fetch(@NotNull final FetchCircleRequest fetchCirclesRequest) {
-        final String restAction = Constants.REST_CIRCLES_BASE + Constants.REST_CIRCLES_FETCH;
-        final long startTime = System.nanoTime();
-        FetchCircleResponse response;
-
-        try {
-            response = bean.fetchCircles(fetchCirclesRequest);
-            LOGGER.info(LoggingUtil.requestDuration(settings.getLocale(), restAction, startTime));
-        } catch (RuntimeException e) {
-            LOGGER.error(LoggingUtil.requestDuration(settings.getLocale(), restAction, startTime, e));
-            response = new FetchCircleResponse(ReturnCode.ERROR, e.getMessage());
-        }
-
-        return RestUtils.buildResponse(response);
-    }
-
-    private Response processCircle(final ProcessCircleRequest request, final Action action, final String logAction) {
-        final String restAction = Constants.REST_CIRCLES_BASE + logAction;
-        final long startTime = System.nanoTime();
-        ProcessCircleResponse response;
-
-        try {
-            request.setAction(action);
-            response = bean.processCircle(request);
-            LOGGER.info(LoggingUtil.requestDuration(settings.getLocale(), restAction, startTime));
-        } catch (RuntimeException e) {
-            LOGGER.error(LoggingUtil.requestDuration(settings.getLocale(), restAction, startTime, e), e);
-            response = new ProcessCircleResponse(ReturnCode.ERROR, e.getMessage());
-        }
-
-        return RestUtils.buildResponse(response);
+        return CommonService.runRequest(settings, bean, FETCH_METHOD, fetchCirclesRequest, Constants.REST_CIRCLES_BASE + Constants.REST_CIRCLES_FETCH);
     }
 }

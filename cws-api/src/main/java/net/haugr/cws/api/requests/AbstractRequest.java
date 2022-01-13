@@ -230,7 +230,7 @@ public abstract class AbstractRequest implements Serializable {
     public static boolean isEmpty(final String value) {
         var whitespace = true;
 
-        for (var i = 0; i < value.length(); i++) {
+        for (int i = 0; i < value.length(); i++) {
             if (!Character.isWhitespace(value.charAt(i))) {
                 whitespace = false;
                 break;

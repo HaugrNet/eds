@@ -88,19 +88,6 @@ public abstract class AbstractManager<D extends CommonDao, R extends CwsResponse
     public abstract R perform(A request);
 
     /**
-     * <p>To ensure that sensitive data (keys) have as short a lifespan in the
-     * memory as possible, they must be destroyed, which this method will
-     * handle.</p>
-     *
-     * @throws CryptoException if a problem occurred with destroying keys
-     */
-    public void destroy() {
-        if (keyPair != null) {
-            keyPair.getPrivate().destroy();
-        }
-    }
-
-    /**
      * <p>All incoming requests must be verified, so it is clear if the given
      * information (data) is sufficient to complete the request, and also to
      * ensure that the requesting party is authenticated and authorized for the
@@ -332,10 +319,6 @@ public abstract class AbstractManager<D extends CommonDao, R extends CwsResponse
             final String salt = crypto.decryptWithMasterKey(entity.getSalt());
             final SecretCWSKey key = crypto.generatePasswordKey(entity.getPbeAlgorithm(), credential, salt);
             keyPair = crypto.extractAsymmetricKey(entity.getRsaAlgorithm(), key, salt, entity.getPublicKey(), armoredPrivateKey);
-
-            // To ensure that the PBE key is no longer usable, we're destroying
-            // it now.
-            key.destroy();
         } catch (CryptoException e) {
             // If an incorrect Passphrase was used to generate the PBE key, then
             // a Bad Padding Exception should've been thrown, which is converted

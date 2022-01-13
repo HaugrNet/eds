@@ -21,6 +21,8 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import net.haugr.cws.api.common.Utilities;
 import net.haugr.cws.core.setup.DatabaseSetup;
 import net.haugr.cws.core.enums.Status;
@@ -49,7 +51,7 @@ final class KeyEntityTest extends DatabaseSetup {
         assertNotNull(found);
         assertEquals(key.getAlgorithm(), found.getAlgorithm());
         assertEquals(key.getStatus(), found.getStatus());
-        assertEquals(key.getExpires(), found.getExpires());
+        assertEquals(key.getExpires().toEpochSecond(ZoneOffset.UTC), found.getExpires().toEpochSecond(ZoneOffset.UTC));
         assertEquals(key.getGracePeriod(), found.getGracePeriod());
 
         found.setStatus(Status.DEPRECATED);

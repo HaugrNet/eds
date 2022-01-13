@@ -205,9 +205,6 @@ public final class ProcessMemberManager extends AbstractManager<MemberDao, Proce
         member.setSessionExpire(Utilities.newDate().plusMinutes(settings.getSessionTimeout()));
         dao.save(member);
 
-        // Key's no longer being used, must be destroyed.
-        key.destroy();
-
         return new ProcessMemberResponse(theMember(member) + " has successfully logged in.");
     }
 

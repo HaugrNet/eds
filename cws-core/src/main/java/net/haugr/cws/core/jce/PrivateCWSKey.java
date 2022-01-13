@@ -45,16 +45,4 @@ public final class PrivateCWSKey extends AbstractCWSKey<PrivateKey> {
     public PrivateKey getKey() {
         return key;
     }
-
-    /**
-     * <p>Destroys the Private Key.</p>
-     */
-    public void destroy() {
-        if (!destroyed) {
-            // Updating the flag first, so any further attempts at
-            // destroying the Key will be ignored.
-            destroyed = true;
-            destroyKey();
-        }
-    }
 }

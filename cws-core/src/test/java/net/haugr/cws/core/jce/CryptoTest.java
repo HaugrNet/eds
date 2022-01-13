@@ -18,17 +18,10 @@ package net.haugr.cws.core.jce;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import net.haugr.cws.api.common.ReturnCode;
-import net.haugr.cws.core.setup.DatabaseSetup;
-import net.haugr.cws.core.enums.KeyAlgorithm;
-import net.haugr.cws.core.enums.StandardSetting;
-import net.haugr.cws.core.exceptions.CWSException;
-import net.haugr.cws.core.model.Settings;
 import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
@@ -36,6 +29,12 @@ import java.security.PublicKey;
 import java.util.UUID;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
+import net.haugr.cws.api.common.ReturnCode;
+import net.haugr.cws.core.enums.KeyAlgorithm;
+import net.haugr.cws.core.enums.StandardSetting;
+import net.haugr.cws.core.exceptions.CWSException;
+import net.haugr.cws.core.model.Settings;
+import net.haugr.cws.core.setup.DatabaseSetup;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -246,25 +245,6 @@ final class CryptoTest extends DatabaseSetup {
     }
 
     /**
-     * Destruction of the Symmetric Keys is important - to ensure that the keys
-     * cannot be reused.
-     */
-    @Test
-    void testSymmetricKeyDestruction() {
-        final SecretCWSKey key = Crypto.generateSymmetricKey(settings.getSymmetricAlgorithm());
-        key.setSalt(new IVSalt(UUID.randomUUID().toString()));
-
-        // Now, we're going to encrypt some data
-        final String clearText = "This is just an example";
-        final byte[] toEncrypt = crypto.stringToBytes(clearText);
-        final byte[] encrypted = Crypto.encrypt(key, toEncrypt);
-
-        // Destroy the key and try to decrypt. Should fail!
-        key.destroy();
-        assertThrows(NullPointerException.class, () -> Crypto.decrypt(key, encrypted));
-    }
-
-    /**
      * <p>Members of a Circle must have both a Public and a Private Key. If they
      * are not providing a Private Key as part of initializing a Session, we
      * need a different way to retrieve it. We can, of course, generate a Key
@@ -347,28 +327,6 @@ final class CryptoTest extends DatabaseSetup {
         final CWSException cause = assertThrows(CWSException.class, () -> myCrypto.bytesToString(bytes));
         assertEquals(ReturnCode.SETTING_ERROR, cause.getReturnCode());
         assertTrue(cause.getMessage().contains("UnsupportedCharsetException: " + garbage));
-    }
-
-    @Test
-    void testDestroyingKeys() {
-        final CWSKeyPair keyPair = Crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
-        final PrivateCWSKey privateKey = keyPair.getPrivate();
-        final SecretCWSKey secretKey = Crypto.generateSymmetricKey(settings.getSymmetricAlgorithm());
-
-        assertFalse(privateKey.isDestroyed());
-        assertFalse(secretKey.isDestroyed());
-
-        // First attempt at destroying should also update the flag
-        privateKey.destroy();
-        secretKey.destroy();
-        assertTrue(privateKey.isDestroyed());
-        assertTrue(secretKey.isDestroyed());
-
-        // Second attempt at destroying should be ignored
-        privateKey.destroy();
-        secretKey.destroy();
-        assertTrue(privateKey.isDestroyed());
-        assertTrue(secretKey.isDestroyed());
     }
 
     @Test

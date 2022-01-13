@@ -64,11 +64,10 @@ public class ShareBean {
 
     @Transactional(Transactional.TxType.REQUIRED)
     public ProcessDataTypeResponse processDataType(final ProcessDataTypeRequest request) {
-        ProcessDataTypeManager manager = null;
         ProcessDataTypeResponse response;
 
         try {
-            manager = new ProcessDataTypeManager(settings, entityManager);
+            final var manager = new ProcessDataTypeManager(settings, entityManager);
             response = manager.perform(request);
         } catch (CWSException e) {
             // Any Warning or Error thrown by the CWS contain enough
@@ -77,8 +76,6 @@ public class ShareBean {
             // information is provided in the response.
             LOGGER.debug(e.getMessage(), e);
             response = new ProcessDataTypeResponse(e.getReturnCode(), e.getMessage());
-        } finally {
-            CommonBean.destroy(manager);
         }
 
         return response;
@@ -86,11 +83,10 @@ public class ShareBean {
 
     @Transactional(Transactional.TxType.SUPPORTS)
     public FetchDataTypeResponse fetchDataTypes(final FetchDataTypeRequest request) {
-        FetchDataTypeManager manager = null;
         FetchDataTypeResponse response;
 
         try {
-            manager = new FetchDataTypeManager(settings, entityManager);
+            final var manager = new FetchDataTypeManager(settings, entityManager);
             response = manager.perform(request);
         } catch (CWSException e) {
             // Any Warning or Error thrown by the CWS contain enough
@@ -99,8 +95,6 @@ public class ShareBean {
             // information is provided in the response.
             LOGGER.debug(e.getMessage(), e);
             response = new FetchDataTypeResponse(e.getReturnCode(), e.getMessage());
-        } finally {
-            CommonBean.destroy(manager);
         }
 
         return response;
@@ -108,11 +102,10 @@ public class ShareBean {
 
     @Transactional(Transactional.TxType.REQUIRED)
     public ProcessDataResponse processData(final ProcessDataRequest request) {
-        ProcessDataManager manager = null;
         ProcessDataResponse response;
 
         try {
-            manager = new ProcessDataManager(settings, entityManager);
+            final var manager = new ProcessDataManager(settings, entityManager);
             response = manager.perform(request);
         } catch (CWSException e) {
             // Any Warning or Error thrown by the CWS contain enough
@@ -121,8 +114,6 @@ public class ShareBean {
             // information is provided in the response.
             LOGGER.debug(e.getMessage(), e);
             response = new ProcessDataResponse(e.getReturnCode(), e.getMessage());
-        } finally {
-            CommonBean.destroy(manager);
         }
 
         return response;
@@ -130,11 +121,10 @@ public class ShareBean {
 
     @Transactional(Transactional.TxType.REQUIRED)
     public FetchDataResponse fetchData(final FetchDataRequest request) {
-        FetchDataManager manager = null;
         FetchDataResponse response;
 
         try {
-            manager = new FetchDataManager(settings, entityManager);
+            final var manager = new FetchDataManager(settings, entityManager);
             response = manager.perform(request);
         } catch (CWSException e) {
             // Any Warning or Error thrown by the CWS contain enough
@@ -143,8 +133,6 @@ public class ShareBean {
             // information is provided in the response.
             LOGGER.debug(e.getMessage(), e);
             response = new FetchDataResponse(e.getReturnCode(), e.getMessage());
-        } finally {
-            CommonBean.destroy(manager);
         }
 
         return response;
@@ -152,11 +140,10 @@ public class ShareBean {
 
     @Transactional(Transactional.TxType.REQUIRED)
     public SignResponse sign(final SignRequest request) {
-        SignManager manager = null;
         SignResponse response;
 
         try {
-            manager = new SignManager(settings, entityManager);
+            final var manager = new SignManager(settings, entityManager);
             response = manager.perform(request);
         } catch (CWSException e) {
             // Any Warning or Error thrown by the CWS contain enough
@@ -165,8 +152,6 @@ public class ShareBean {
             // information is provided in the response.
             LOGGER.debug(e.getMessage(), e);
             response = new SignResponse(e.getReturnCode(), e.getMessage());
-        } finally {
-            CommonBean.destroy(manager);
         }
 
         return response;
@@ -174,11 +159,10 @@ public class ShareBean {
 
     @Transactional(Transactional.TxType.SUPPORTS)
     public VerifyResponse verify(final VerifyRequest request) {
-        VerifyManager manager = null;
         VerifyResponse response;
 
         try {
-            manager = new VerifyManager(settings, entityManager);
+            final var manager = new VerifyManager(settings, entityManager);
             response = manager.perform(request);
         } catch (CWSException e) {
             // Any Warning or Error thrown by the CWS contain enough
@@ -187,8 +171,6 @@ public class ShareBean {
             // information is provided in the response.
             LOGGER.debug(e.getMessage(), e);
             response = new VerifyResponse(e.getReturnCode(), e.getMessage());
-        } finally {
-            CommonBean.destroy(manager);
         }
 
         return response;
@@ -196,11 +178,10 @@ public class ShareBean {
 
     @Transactional(Transactional.TxType.SUPPORTS)
     public FetchSignatureResponse fetchSignatures(final FetchSignatureRequest request) {
-        FetchSignatureManager manager = null;
         FetchSignatureResponse response;
 
         try {
-            manager = new FetchSignatureManager(settings, entityManager);
+            final var manager = new FetchSignatureManager(settings, entityManager);
             response = manager.perform(request);
         } catch (CWSException e) {
             // Any Warning or Error thrown by the CWS contain enough
@@ -209,8 +190,6 @@ public class ShareBean {
             // information is provided in the response.
             LOGGER.debug(e.getMessage(), e);
             response = new FetchSignatureResponse(e.getReturnCode(), e.getMessage());
-        } finally {
-            CommonBean.destroy(manager);
         }
 
         return response;

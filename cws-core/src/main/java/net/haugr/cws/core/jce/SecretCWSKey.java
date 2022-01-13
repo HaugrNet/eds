@@ -55,13 +55,4 @@ public final class SecretCWSKey extends AbstractCWSKey<SecretKey> {
     public SecretKey getKey() {
         return key;
     }
-
-    public void destroy() {
-        if (!destroyed) {
-            // Updating the flag first, so any further attempts at
-            // destroying the Key will be ignored.
-            destroyed = true;
-            destroyKey();
-        }
-    }
 }

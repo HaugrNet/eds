@@ -132,7 +132,7 @@ public final class MasterKey {
 
     public static char[] generateSecretChars(final byte[] secret) {
         final var chars = new char[secret.length];
-        for (var i = 0; i < secret.length; i++) {
+        for (int i = 0; i < secret.length; i++) {
             chars[i] = (char) secret[i];
         }
 

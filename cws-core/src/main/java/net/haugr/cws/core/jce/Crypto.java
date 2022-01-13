@@ -101,6 +101,7 @@ public final class Crypto {
      * @param secret    Provided Passphrase or Secret
      * @param salt      System specific Salt
      * @return Symmetric Key
+     * @throws CryptoException if an error occurred
      */
     public SecretCWSKey generatePasswordKey(final KeyAlgorithm algorithm, final byte[] secret, final String salt) {
         try {
@@ -397,6 +398,7 @@ public final class Crypto {
      * @param armoredPublicKey  Armored unencrypted Public Key
      * @param armoredPrivateKey Armored and encrypted Private Key
      * @return RSA KeyPair with the Public and Private Keys
+     * @throws CryptoException if an error occurred
      */
     public CWSKeyPair extractAsymmetricKey(final KeyAlgorithm algorithm, final SecretCWSKey key, final String salt, final String armoredPublicKey, final String armoredPrivateKey) {
         key.setSalt(new IVSalt(salt));

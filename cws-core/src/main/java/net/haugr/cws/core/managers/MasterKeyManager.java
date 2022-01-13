@@ -132,7 +132,7 @@ public final class MasterKeyManager extends AbstractManager<CommonDao, MasterKey
     }
 
     private boolean checkCredentials(final SecretCWSKey masterKey, final MemberEntity admin, final byte[] secret) {
-        var result = false;
+        boolean result = false;
 
         try {
             // First, decrypt the Salt for the Administrator, using the "MasterKey".
@@ -144,10 +144,6 @@ public final class MasterKeyManager extends AbstractManager<CommonDao, MasterKey
             // fails, then a CryptoException is thrown, which we'll ignore here.
             final SecretCWSKey key = crypto.generatePasswordKey(admin.getPbeAlgorithm(), secret, salt);
             crypto.extractAsymmetricKey(admin.getRsaAlgorithm(), key, salt, admin.getPublicKey(), admin.getPrivateKey());
-
-            // To ensure that the PBE key is no longer usable, we're destroying
-            // it now.
-            key.destroy();
             result = true;
         } catch (CryptoException e) {
             LOGGER.debug("Decrypting the System Administrator Account failed: {}", e.getMessage(), e);

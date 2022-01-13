@@ -26,7 +26,7 @@ import java.util.Objects;
  */
 public enum StandardSetting {
 
-    SYMMETRIC_ALGORITHM("cws.crypto.symmetric.algorithm", "AES_CBC_256"),
+    SYMMETRIC_ALGORITHM("cws.crypto.symmetric.algorithm", "AES_GCM_128"),
     ASYMMETRIC_ALGORITHM("cws.crypto.asymmetric.algorithm", "RSA_2048"),
     SIGNATURE_ALGORITHM("cws.crypto.signature.algorithm", "SHA_512"),
     PBE_ALGORITHM("cws.crypto.pbe.algorithm", "PBE_256"),

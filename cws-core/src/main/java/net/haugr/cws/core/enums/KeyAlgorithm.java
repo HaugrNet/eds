@@ -75,11 +75,14 @@ public enum KeyAlgorithm {
     SHA_512(Type.SIGNATURE, "RSA", Transformation.SIG512, 512, null),
 
     // Symmetric Algorithms
+    // The AES CBC variant is not considered safe, and are pending
+    // removal. However, removal requires that existing data can be
+    // migrated to different Algorithms, again requiring the re-key
+    // (#43) feature.
     AES_CBC_128(Type.SYMMETRIC, "AES", Transformation.AES, 128, null),
     AES_CBC_192(Type.SYMMETRIC, "AES", Transformation.AES, 192, null),
     AES_CBC_256(Type.SYMMETRIC, "AES", Transformation.AES, 256, null),
-    // Following 3 are not yet production ready - the Crypto library
-    // doesn't support them yet, work in progress!
+    // Current Production Algorithm
     AES_GCM_128(Type.SYMMETRIC, "AES", Transformation.GCM, 128, null),
 
     // Password Based Encryption (PBE) Algorithms
@@ -109,6 +112,7 @@ public enum KeyAlgorithm {
         SIG256("SHA256WithRSA"),
         SIG512("SHA512WithRSA"),
         PBE("PBKDF2WithHmacSHA256"),
+        // This Transformation is no longer recommended
         AES("AES/CBC/PKCS5Padding"),
         GCM("AES/GCM/NoPadding"),
         RSA("RSA/ECB/PKCS1Padding");

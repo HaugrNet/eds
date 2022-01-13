@@ -92,9 +92,6 @@ deployed in a "hostile" environment.
 
 * MasterKey - The MasterKey is used to encrypt and decrypt various information,
   and it must be set during startup, since it is not persisted anywhere.
-* Removing sensitive data from memory, done by aggressively perform a deep
-  analysis of Objects and overwrite volatile information, to reduce the risk
-  of having sensitive information present in memory dumps.
 * Invalidate Accounts, this allows a member to force the keys to be replaced
   internally, so it is possible to log in and view Circles, but it will not be
   possible to extract data, as the keys are not the same as the ones, which

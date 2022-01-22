@@ -71,11 +71,11 @@ public class MemberEntity extends Externable {
     private String salt = null;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "pbe_algorithm", nullable = false, length = 10)
+    @Column(name = "pbe_algorithm", nullable = false, length = 25)
     private KeyAlgorithm pbeAlgorithm = null;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "rsa_algorithm", nullable = false, length = 10)
+    @Column(name = "rsa_algorithm", nullable = false, length = 25)
     private KeyAlgorithm rsaAlgorithm = null;
 
     @Column(name = "external_key")

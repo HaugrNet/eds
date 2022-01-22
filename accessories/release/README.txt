@@ -55,50 +55,21 @@ secure user access configuration.
 
 Step 2: Run the database setup scripts
 
-Next run the psql scripts in the "postgresql" directory of your cws installation.  
-
-$cd /{CWS_HOME}/postgresql/ 
-
-=== Fresh Installation ===
-
-In this directory, the 01-install.sql script should be run.  This will
-automatically trigger the two other scripts. From a command line, this can be done
-in one of the following two ways based on your postgres user configuration:
+To either create or update a CWS installation, the 01-setup.sql script should
+be run. This will automatically trigger the other scripts. From a command
+line, this can be done in one of the following two ways based on your postgres
+user configuration:
 
 If you run the postgres user as sudo (recommended):
-$ cd ${CWS_HOME}/postgresql
-$ sudo -u postgres psql --file 01-install.sql
+$ sudo -u postgres psql --file ${CWS_HOME}/postgresql/01-setup.sql
 
 Or, if you have given the postgres user a linux password:
 $ cd postgresql
 $ su postgres
-$ psql postgres --file 01-install.sql
+$ psql postgres --file ${CWS_HOME}/postgresql/01-setup.sql
 $ exit
 
-You will be prompted for a password while the script is running, enter "cws" as
-the password unless you have modified the sql script and changed the cws_user 
-password to something else.
-
-=== Update Installation ===
-
-In this directory, the 03-update.sql script should be run. From a command line,
-this can be done in one of the following two ways based on your postgres user
-configuration:
-
-If you run the postgres user as sudo (recommended):
-$ cd ${CWS_HOME}/postgresql
-$ sudo -u postgresql psql -U cws_user cws --file 03-update.sql
-
-Or, if you have given the postgres user a linux password:
-$ cd postgresql
-$ su postgres
-$ psql -U cws_user cws --file 03-update.sql
-$ exit
-
-You will be prompted for a password while the script is running, enter "cws" as
-the password unless you have modified the sql script and changed the cws_user
-password to something else.
-
+Note; The error from creating the database may be ignored.
 
 === Step 3: Configure Wildfly ===
 

@@ -131,8 +131,8 @@ CREATE TABLE cws_members (
   external_id      VARCHAR(36),
   name             VARCHAR_IGNORECASE(75), -- Member Authentication information
   salt             VARCHAR(256),
-  pbe_algorithm    VARCHAR(10) DEFAULT 'PBE_256',
-  rsa_algorithm    VARCHAR(10) DEFAULT 'RSA_2048',
+  pbe_algorithm    VARCHAR(25) DEFAULT 'PBE_GCM_256',
+  rsa_algorithm    VARCHAR(25) DEFAULT 'RSA_2048',
   external_key     LONGVARCHAR,    -- External Public Key, with unknown length
   public_key       VARCHAR(3072),  -- Public Key, stored armored
   private_key      VARCHAR(16384), -- Private Key, stored encrypted & armored
@@ -200,51 +200,21 @@ CREATE TABLE cws_circles (
 -- A central part of the CWS is encryption. All data is encrypted using a series
 -- of Symmetric Encryption Keys. All saved Symmetric Keys are stored encrypted,
 -- however, it is still important to have certain meta-data available.
---   To generate a new Key, it is important to know what algorithm and the Key
--- length to use. There is some restrictions in the standard Java distribution
--- from Oracle and other Vendors, which means that they by default only provide
--- a limited strength encryption. The default value for the CWS, is only using
--- the limited Key lengths, if the Unlimited Key Strength library has been
--- applied, then this can be altered. But be aware, that changing the Key length
--- will both increase security, but also increase computation time. It should
--- be noted, that if Keys used has been generated using the Unlimited Strength,
--- then the underlying Java must keep using this, otherwise it will produce
--- errors. The Key size is a System Setting, and is only used when generating a
--- new key, it is therefore not stored here.
---   Symmetric Key's uses block encryption, which means that the size of the
--- data to both encrypt and decrypt must have a size that fits the block size
--- exactly. Since this is seldom the case, it is normal to apply a padding,
--- which tells how it should deal with data where the size differs from the
--- block size.
---   When using Block based encryption, the blocks can be encrypted in different
--- ways, they can be encrypted directly or with some additional information to
--- improve the strength of the encryption. By default, CWS uses continued Block
--- based encryption, CBC as Cipher Algorithm Mode. Other modes are supported by
--- Java, but unless you really know what you're doing, this should be fine.
---   When applying CBC (and other continues Block Modes), the result from one
--- block is used as the initial data to encrypt the next block. However, the
--- first block is not having any existing data to use, hence to ensure that the
--- result from an encryption is always consist - an Initial Vector is applied.
---   The Symmetric Keys have a life within CWS, and although encryption can be
--- broken, even the smallest AES keys will theoretically take years to break.
--- However, trust may not always be applicable (otherwise, why use CWS), so if
--- desired, keys can also expire. If this is desired, then new Keys must be
--- generated and data must be re-encrypted. which can be a length process.
--- During this process, data will be stored twice, one with the old key, where
--- this has been marked 'Deprecated', and of course also with the new Key, which
--- is now the default 'Active' Key. The Status tells which it is.
---   If Key's can expire, then they must also be given an expiration date. This
--- date is set when the Key is first generated. And once expired, it should no
--- longer be used. But, to ensure that the data is also re-encrypted with the
--- new Key, the CWS will allow that this can be done within a period of days
--- known as a "Grace Period". Any Circle Member with the required Trust Level
--- who accesses the CWS within the Grace Period will initiate a re-encryption
--- process. If nobody have logged in within the Grace Period, then the CWS will
--- simply refuse to process the data.
+--   To generate a new Key, it is important to know which algorithm and length
+-- to use. By default, all allowed Algorithms & key lengths are limited to what
+-- is provided by the Java Runtime Environment.
+-- Initially CWS used the AES Block encryption, CBC, which is no longer
+-- considered safe to use, hence as of CWS 2.0, the default is GCM, at the max
+-- size supported by the Java Runtime Environment, i.e. 256 bits.
+--   Theoretically, AES encryption can be broken in a finite time. To prevent
+-- that data is compromised, it is a good idea to limit the usage of a key to
+-- a given life time, forcing a re-encryption once the key has expired. It is
+-- not enforced to have an expiration, as CWS doesn't support re-key yet (see
+-- https://github.com/HaugrNet/cws/issues/43).
 -- =============================================================================
 CREATE TABLE cws_keys (
   id               INTEGER AUTO_INCREMENT,
-  algorithm        VARCHAR(256) DEFAULT 'AES128',
+  algorithm        VARCHAR(256) DEFAULT 'AES_GCM_256',
   status           VARCHAR(256) DEFAULT 'ACTIVE',
   expires          TIMESTAMP,
   grace_period     INTEGER,
@@ -408,7 +378,7 @@ CREATE TABLE cws_metadata (
   /* Other Constraints */
   CONSTRAINT metadata_notnull_id            CHECK (id IS NOT NULL),
   CONSTRAINT metadata_notnull_external_id   CHECK (external_id IS NOT NULL),
-  CONSTRAINT metadata_notafter_parent_id    CHECK (parent_id < id),
+  CONSTRAINT metadata_not_before_parent_id  CHECK (parent_id < id),
   CONSTRAINT metadata_notnull_circle_id     CHECK (circle_id IS NOT NULL),
   CONSTRAINT metadata_notnull_type_id       CHECK (datatype_id IS NOT NULL),
   CONSTRAINT metadata_notnull_altered       CHECK (altered IS NOT NULL),

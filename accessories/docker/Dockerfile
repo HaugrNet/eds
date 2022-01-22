@@ -25,7 +25,7 @@ COPY release/postgresql/*.conf /var/lib/postgresql/10/main/
 COPY release/postgresql/*.sql /var/lib/postgresql/
 RUN /usr/lib/postgresql/10/bin/pg_ctl -D /var/lib/postgresql/10/main -l /var/lib/postgresql/logfile start \
   && cd /var/lib/postgresql \
-  && psql -U postgres postgres < 01-install.sql
+  && psql -U postgres postgres < 01-setup.sql
 
 # Download & install WildFly 18
 USER root

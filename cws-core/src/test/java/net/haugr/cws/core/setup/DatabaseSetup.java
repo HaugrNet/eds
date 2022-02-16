@@ -185,7 +185,7 @@ public class DatabaseSetup {
                 DEFAULT_ACCOUNT_NAME,
                 settings.getAsymmetricAlgorithm(),
                 Crypto.armoringPublicKey(keyPair.getPublic().getKey()),
-                Crypto.armoringPrivateKey(secretKey, keyPair.getPrivate().getKey()));
+                Crypto.encryptAndArmorPrivateKey(secretKey, keyPair.getPrivate().getKey()));
     }
 
     protected static ProcessDataRequest prepareAddDataRequest(final String account, final String circleId, final String dataName, final int bytes) {

@@ -176,7 +176,7 @@ final class CryptoTest extends DatabaseSetup {
         cryptoKeys.setSalt(new IVSalt(UUID.randomUUID().toString()));
         final CWSKeyPair keyPair = Crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
 
-        final String armoredKey = Crypto.armoringPrivateKey(cryptoKeys, keyPair.getPrivate().getKey());
+        final String armoredKey = Crypto.encryptAndArmorPrivateKey(cryptoKeys, keyPair.getPrivate().getKey());
         final PrivateKey dearmoredKey = crypto.dearmoringPrivateKey(cryptoKeys, armoredKey);
 
         assertEquals(dearmoredKey, keyPair.getPrivate().getKey());
@@ -191,7 +191,7 @@ final class CryptoTest extends DatabaseSetup {
         final CWSKeyPair pair = Crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
 
         final String armoredPublicKey = Crypto.armoringPublicKey(pair.getPublic().getKey());
-        final String armoredPrivateKey = Crypto.armoringPrivateKey(secretKey, pair.getPrivate().getKey());
+        final String armoredPrivateKey = Crypto.encryptAndArmorPrivateKey(secretKey, pair.getPrivate().getKey());
 
         final CWSKeyPair dearmoredPair = crypto.extractAsymmetricKey(pair.getAlgorithm(), secretKey, salt, armoredPublicKey, armoredPrivateKey);
         assertEquals(pair.getAlgorithm(), dearmoredPair.getAlgorithm());
@@ -405,7 +405,7 @@ final class CryptoTest extends DatabaseSetup {
         final SecretCWSKey secretKey = Crypto.generateSymmetricKey(mySettings.getSymmetricAlgorithm());
         secretKey.setSalt(new IVSalt(UUID.randomUUID().toString()));
 
-        final String armoredPrivateKey = Crypto.armoringPrivateKey(secretKey, keyPair.getPrivate().getKey());
+        final String armoredPrivateKey = Crypto.encryptAndArmorPrivateKey(secretKey, keyPair.getPrivate().getKey());
         mySettings.set(StandardSetting.ASYMMETRIC_ALGORITHM.getKey(), KeyAlgorithm.AES_CBC_128.name());
 
         final CWSException cause = assertThrows(CWSException.class, () -> myCrypto.dearmoringPrivateKey(secretKey, armoredPrivateKey));

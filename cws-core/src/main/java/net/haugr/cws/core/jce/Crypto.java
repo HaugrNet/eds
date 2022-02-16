@@ -343,7 +343,7 @@ public final class Crypto {
      * @param privateKey    The Private RSA Key to encrypt and armor
      * @return Armored (PKCS8 and Base64 encoded encrypted key)
      */
-    public static String armoringPrivateKey(final SecretCWSKey encryptionKey, final Key privateKey) {
+    public static String encryptAndArmorPrivateKey(final SecretCWSKey encryptionKey, final Key privateKey) {
         final var keySpec = new PKCS8EncodedKeySpec(privateKey.getEncoded());
         final byte[] rawKey = keySpec.getEncoded();
         final byte[] encryptedKey = encrypt(encryptionKey, rawKey);

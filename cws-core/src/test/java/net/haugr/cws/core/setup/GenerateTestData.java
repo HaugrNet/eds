@@ -136,7 +136,7 @@ public final class GenerateTestData {
         final String salt = UUID.randomUUID().toString();
         final SecretCWSKey secretKey = crypto.generatePasswordKey(settings.getPasswordAlgorithm(), crypto.stringToBytes(name), salt);
         final String publicKey = Crypto.armoringPublicKey(keyPair.getPublic().getKey());
-        final String privateKey = Crypto.armoringPrivateKey(secretKey, keyPair.getPrivate().getKey());
+        final String privateKey = Crypto.encryptAndArmorPrivateKey(secretKey, keyPair.getPrivate().getKey());
         final String encryptedSalt = crypto.encryptWithMasterKey(salt);
 
         append(builder, "    ('" + externalId + "', '" + name + "', '" + encryptedSalt + "', '" + settings.getPasswordAlgorithm() + "', '" + settings.getAsymmetricAlgorithm() + "', '" + publicKey + "', '" + privateKey + "', '" + role + "')" + delimiter);

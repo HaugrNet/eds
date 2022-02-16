@@ -197,7 +197,7 @@ public final class ProcessMemberManager extends AbstractManager<MemberDao, Proce
         // MasterKey.
         final String salt = crypto.decryptWithMasterKey(member.getSalt());
         final SecretCWSKey key = crypto.generatePasswordKey(member.getPbeAlgorithm(), masterEncrypted, salt);
-        final String privateKey = Crypto.armoringPrivateKey(key, keyPair.getPrivate().getKey());
+        final String privateKey = Crypto.encryptAndArmorPrivateKey(key, keyPair.getPrivate().getKey());
         final String checksum = crypto.generateChecksum(masterEncrypted);
 
         member.setSessionChecksum(checksum);
@@ -376,7 +376,7 @@ public final class ProcessMemberManager extends AbstractManager<MemberDao, Proce
         account.setRsaAlgorithm(pair.getAlgorithm());
         account.setMemberKey(request.getPublicKey());
         account.setPublicKey(Crypto.armoringPublicKey(pair.getPublic().getKey()));
-        account.setPrivateKey(Crypto.armoringPrivateKey(key, pair.getPrivate().getKey()));
+        account.setPrivateKey(Crypto.encryptAndArmorPrivateKey(key, pair.getPrivate().getKey()));
         dao.save(account);
 
         final var response = new ProcessMemberResponse("The invitation was successfully processed for '" + account.getName() + "'.");

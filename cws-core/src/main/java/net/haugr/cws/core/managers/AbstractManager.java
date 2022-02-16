@@ -302,7 +302,7 @@ public abstract class AbstractManager<D extends CommonDao, R extends CwsResponse
 
         final CWSKeyPair pair = Crypto.generateAsymmetricKey(rsaAlgorithm);
         final String publicKey = Crypto.armoringPublicKey(pair.getPublic().getKey());
-        final String privateKey = Crypto.armoringPrivateKey(key, pair.getPrivate().getKey());
+        final String privateKey = Crypto.encryptAndArmorPrivateKey(key, pair.getPrivate().getKey());
 
         member.setSalt(crypto.encryptWithMasterKey(salt.getArmored()));
         member.setPbeAlgorithm(pbeAlgorithm);

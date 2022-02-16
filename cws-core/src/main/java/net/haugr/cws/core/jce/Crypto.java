@@ -160,12 +160,12 @@ public final class Crypto {
 
     public static CWSKeyPair generateAsymmetricKey(final KeyAlgorithm algorithm) {
         try {
-            final var generator = KeyPairGenerator.getInstance(algorithm.getName(), algorithm.getProvider());
+            final var generator = KeyPairGenerator.getInstance(algorithm.getName());
             generator.initialize(algorithm.getLength());
             final var keyPair = generator.generateKeyPair();
 
             return new CWSKeyPair(algorithm, keyPair);
-        } catch (IllegalArgumentException | NoSuchAlgorithmException | NoSuchProviderException e) {
+        } catch (IllegalArgumentException | NoSuchAlgorithmException e) {
             throw new CryptoException(e.getMessage(), e);
         }
     }

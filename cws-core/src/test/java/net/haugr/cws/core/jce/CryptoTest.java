@@ -48,28 +48,29 @@ import org.junit.jupiter.api.Test;
  */
 final class CryptoTest extends DatabaseSetup {
 
-    @Test
-    void testDefaultEC() throws Exception {
-        KeyPairGenerator kpg = KeyPairGenerator.getInstance("XDH");
-        NamedParameterSpec paramSpec = new NamedParameterSpec("X25519");
-        kpg.initialize(paramSpec);
-        // alternatively: kpg = KeyPairGenerator.getInstance("X25519")
-        KeyPair kp = kpg.generateKeyPair();
-        CWSKeyPair cwsKeyPair = new CWSKeyPair(KeyAlgorithm.X25519, kp);
-        final byte[] input = "Test Value".getBytes(StandardCharsets.UTF_8);
-        final byte[] output = Crypto.decrypt(cwsKeyPair.getPrivate(), Crypto.encrypt(cwsKeyPair.getPublic(), input));
-        assertEquals(input, output);
-
-        //KeyFactory kf = KeyFactory.getInstance("XDH");
-        //BigInteger u = new BigInteger("1234");
-        //XECPublicKeySpec pubSpec = new XECPublicKeySpec(paramSpec, u);
-        //PublicKey pubKey = kf.generatePublic(pubSpec);
-        //
-        //KeyAgreement ka = KeyAgreement.getInstance("XDH");
-        //ka.init(kp.getPrivate());
-        //ka.doPhase(pubKey, true);
-        //byte[] secret = ka.generateSecret();
-    }
+    // Following test is not complete, left commented out due to mistake by pushing incomplete code.
+    //@Test
+    //void testDefaultEC() throws Exception {
+    //    KeyPairGenerator kpg = KeyPairGenerator.getInstance("XDH");
+    //    NamedParameterSpec paramSpec = new NamedParameterSpec("X25519");
+    //    kpg.initialize(paramSpec);
+    //    // alternatively: kpg = KeyPairGenerator.getInstance("X25519")
+    //    KeyPair kp = kpg.generateKeyPair();
+    //    CWSKeyPair cwsKeyPair = new CWSKeyPair(KeyAlgorithm.X25519, kp);
+    //    final byte[] input = "Test Value".getBytes(StandardCharsets.UTF_8);
+    //    final byte[] output = Crypto.decrypt(cwsKeyPair.getPrivate(), Crypto.encrypt(cwsKeyPair.getPublic(), input));
+    //    assertEquals(input, output);
+    //
+    //    //KeyFactory kf = KeyFactory.getInstance("XDH");
+    //    //BigInteger u = new BigInteger("1234");
+    //    //XECPublicKeySpec pubSpec = new XECPublicKeySpec(paramSpec, u);
+    //    //PublicKey pubKey = kf.generatePublic(pubSpec);
+    //    //
+    //    //KeyAgreement ka = KeyAgreement.getInstance("XDH");
+    //    //ka.init(kp.getPrivate());
+    //    //ka.doPhase(pubKey, true);
+    //    //byte[] secret = ka.generateSecret();
+    //}
 
     @Test
     void testGCM128Encryption() {

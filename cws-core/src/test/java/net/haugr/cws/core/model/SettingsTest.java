@@ -84,11 +84,11 @@ final class SettingsTest extends DatabaseSetup {
         mySettings.set(StandardSetting.HASH_ALGORITHM, HashAlgorithm.SHA_256.name());
         assertEquals(HashAlgorithm.SHA_256, mySettings.getHashAlgorithm());
 
-        mySettings.set(StandardSetting.PBE_ALGORITHM, KeyAlgorithm.PBE_192.name());
-        assertEquals(KeyAlgorithm.PBE_192, mySettings.getPasswordAlgorithm());
+        mySettings.set(StandardSetting.PBE_ALGORITHM, KeyAlgorithm.PBE_CBC_192.name());
+        assertEquals(KeyAlgorithm.PBE_CBC_192, mySettings.getPasswordAlgorithm());
 
-        mySettings.set(StandardSetting.PBE_ALGORITHM, KeyAlgorithm.PBE_256.name());
-        assertEquals(KeyAlgorithm.PBE_256, mySettings.getPasswordAlgorithm());
+        mySettings.set(StandardSetting.PBE_ALGORITHM, KeyAlgorithm.PBE_CBC_256.name());
+        assertEquals(KeyAlgorithm.PBE_CBC_256, mySettings.getPasswordAlgorithm());
 
         mySettings.set(StandardSetting.CWS_SALT, "UUID value");
         assertEquals("UUID value", mySettings.getSalt());

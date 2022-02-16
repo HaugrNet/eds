@@ -22,10 +22,13 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.nio.charset.StandardCharsets;
 import java.security.KeyPair;
+import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.spec.NamedParameterSpec;
 import java.util.UUID;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
@@ -44,6 +47,29 @@ import org.junit.jupiter.api.Test;
  * @since CWS 1.0
  */
 final class CryptoTest extends DatabaseSetup {
+
+    @Test
+    void testDefaultEC() throws Exception {
+        KeyPairGenerator kpg = KeyPairGenerator.getInstance("XDH");
+        NamedParameterSpec paramSpec = new NamedParameterSpec("X25519");
+        kpg.initialize(paramSpec);
+        // alternatively: kpg = KeyPairGenerator.getInstance("X25519")
+        KeyPair kp = kpg.generateKeyPair();
+        CWSKeyPair cwsKeyPair = new CWSKeyPair(KeyAlgorithm.X25519, kp);
+        final byte[] input = "Test Value".getBytes(StandardCharsets.UTF_8);
+        final byte[] output = Crypto.decrypt(cwsKeyPair.getPrivate(), Crypto.encrypt(cwsKeyPair.getPublic(), input));
+        assertEquals(input, output);
+
+        //KeyFactory kf = KeyFactory.getInstance("XDH");
+        //BigInteger u = new BigInteger("1234");
+        //XECPublicKeySpec pubSpec = new XECPublicKeySpec(paramSpec, u);
+        //PublicKey pubKey = kf.generatePublic(pubSpec);
+        //
+        //KeyAgreement ka = KeyAgreement.getInstance("XDH");
+        //ka.init(kp.getPrivate());
+        //ka.doPhase(pubKey, true);
+        //byte[] secret = ka.generateSecret();
+    }
 
     @Test
     void testGCM128Encryption() {
@@ -93,7 +119,7 @@ final class CryptoTest extends DatabaseSetup {
         for (int i = 0; i < 256; i++) {
             secret[i] = (byte) i;
         }
-        final KeyAlgorithm algorithm = KeyAlgorithm.PBE_128;
+        final KeyAlgorithm algorithm = KeyAlgorithm.PBE_CBC_128;
         final String salt = UUID.randomUUID().toString();
         final SecretCWSKey key = crypto.generatePasswordKey(algorithm, secret, salt);
         assertNotNull(key);
@@ -103,7 +129,7 @@ final class CryptoTest extends DatabaseSetup {
     void testGeneratingSymmetricKeyWithInvalidAlgorithm() {
         final CWSException cause = assertThrows(CWSException.class, () -> Crypto.generateSymmetricKey(KeyAlgorithm.RSA_2048));
         assertEquals(ReturnCode.CRYPTO_ERROR, cause.getReturnCode());
-        assertEquals("RSA KeyGenerator not available", cause.getMessage());
+        assertEquals("no such algorithm: RSA for provider SunJCE", cause.getMessage());
     }
 
     @Test

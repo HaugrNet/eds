@@ -16,6 +16,7 @@
  */
 package net.haugr.cws.core.jce;
 
+import java.security.NoSuchProviderException;
 import net.haugr.cws.core.enums.KeyAlgorithm;
 import net.haugr.cws.core.exceptions.CryptoException;
 import net.haugr.cws.core.model.Settings;
@@ -147,24 +148,24 @@ public final class Crypto {
 
     public static SecretCWSKey generateSymmetricKey(final KeyAlgorithm algorithm) {
         try {
-            final var generator = KeyGenerator.getInstance(algorithm.getName());
+            final var generator = KeyGenerator.getInstance(algorithm.getName(), algorithm.getProvider());
             generator.init(algorithm.getLength());
             final SecretKey key = generator.generateKey();
 
             return new SecretCWSKey(algorithm, key);
-        } catch (IllegalArgumentException | NoSuchAlgorithmException e) {
+        } catch (IllegalArgumentException | NoSuchAlgorithmException | NoSuchProviderException e) {
             throw new CryptoException(e.getMessage(), e);
         }
     }
 
     public static CWSKeyPair generateAsymmetricKey(final KeyAlgorithm algorithm) {
         try {
-            final var generator = KeyPairGenerator.getInstance(algorithm.getName());
+            final var generator = KeyPairGenerator.getInstance(algorithm.getName(), algorithm.getProvider());
             generator.initialize(algorithm.getLength());
             final var keyPair = generator.generateKeyPair();
 
             return new CWSKeyPair(algorithm, keyPair);
-        } catch (IllegalArgumentException | NoSuchAlgorithmException e) {
+        } catch (IllegalArgumentException | NoSuchAlgorithmException | NoSuchProviderException e) {
             throw new CryptoException(e.getMessage(), e);
         }
     }
@@ -270,7 +271,7 @@ public final class Crypto {
             final KeyAlgorithm algorithm = key.getAlgorithm();
             instanceName = algorithm.getTransformationValue();
             switch (key.getAlgorithm().getTransformation()) {
-                case AES:
+                case AES_CBC:
                     // SonarQube rule S3329 (http://localhost:9000/coding_rules?open=squid:S3329&rule_key=squid:S3329
                     // is marking this place as a vulnerability, as it cannot
                     // ascertain that the salt is generated randomly using
@@ -279,11 +280,13 @@ public final class Crypto {
                     // decryption - the rule is simply not good enough.
                     iv = new IvParameterSpec(((SecretCWSKey) key).getSalt().getBytes());
                     break;
-                case GCM:
+                case AES_GCM_128:
+                case AES_GCM_192:
+                case AES_GCM_256:
                     // Note, the default SALT (IV) size is 16 bytes, for GCM it
                     // is preferable to only have 12 bytes - however, GCM will
                     // also work with 16 bytes albeit slower.
-                    iv = new GCMParameterSpec(key.getAlgorithm().getLength(), ((SecretCWSKey) key).getSalt().getBytes());
+                    iv = new GCMParameterSpec(128, ((SecretCWSKey) key).getSalt().getBytes());
                     break;
                 default:
                     // Unreachable Code by design, only 2 AES transformation

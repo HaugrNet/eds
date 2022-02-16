@@ -35,6 +35,16 @@ public final class Constants {
     public static final String CWS_VERSION = "2.0-SNAPSHOT";
 
     /**
+     * <p>Default Provider for the Crypto Library.</p>
+     */
+    public static final String SUN_JCE = "SunJCE";
+
+    /**
+     * <p>Default Elliptic Curve Provider for the Crypto Library.</p>
+     */
+    public static final String SUN_EC = "SunEC";
+
+    /**
      * <p>All serialized classes should use this value. The value reflects the
      * current version of the system. If updates are made in one or more of the
      * serialized classes, it should be updated.</p>

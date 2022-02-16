@@ -72,9 +72,9 @@ public interface Management {
      *
      * <ul>
      *   <li>
-     *     <b>cws.crypto.symmetric.algorithm</b> - default value: 'AES_CBC_128'<br>
+     *     <b>cws.crypto.symmetric.algorithm</b> - default value: 'AES_GCM_128'<br>
      *     Allowed Values: 'AES_CBC_128', 'AES_CBC_192', 'AES_CBC_256',
-     *     'AES_GCM_128'<br>
+     *     'AES_GCM_128', 'AES_GCM_192' or 'AES_GCM_256'<br>
      *     <i> The Algorithm used for the Symmetric Keys in CWS. All data is
      *     stored using this Algorithm. Although it can be changed, please test
      *     the CWS carefully before doing so. And please be aware, that the
@@ -86,7 +86,7 @@ public interface Management {
      *     Java versions comes with the unlimited strength enabled per
      *     default.<br>
      *       Please see <a href="http://docs.oracle.com/javase/8/docs/technotes/guides/security/StandardNames.html">Standard Names</a>
-     *     &amp; <a href="http://docs.oracle.com/javase/8/docs/api/javax/crypto/Cipher.html">Cipher</a>
+     *     &amp; <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/javax/crypto/Cipher.html">Cipher</a>
      *     for more information.</i>
      *   </li>
      *   <li>
@@ -103,8 +103,9 @@ public interface Management {
      *     Account. The signature is made with this Algorithm.</i>
      *   </li>
      *   <li>
-     *     <b>cws.crypto.pbe.algorithm</b> - default value: 'PBE_128'<br>
-     *     Allowed Values: 'PBE_128', 'PBE_192', or 'PBE_256'<br>
+     *     <b>cws.crypto.pbe.algorithm</b> - default value: 'PBE_GCM_128'<br>
+     *     Allowed Values: 'PBE_128', 'PBE_192', 'PBE_256', 'PBE_GCM_128',
+     *     'PBE_GCM_192' or 'PBE_GCM_256'<br>
      *     <i>If a Member is using something else than a Key to unlock their
      *     Account, the CWS will use the following Password Based Encryption,
      *     PBE, algorithm to do the trick. The provided information is extended

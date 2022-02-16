@@ -65,7 +65,7 @@ public final class MasterKey {
     // exists to protect it.
     private static final Integer ITERATIONS = 1024;
     private static final Charset CHARSET = StandardCharsets.UTF_8;
-    private static final KeyAlgorithm ALGORITHM = KeyAlgorithm.PBE_256;
+    private static final KeyAlgorithm ALGORITHM = KeyAlgorithm.PBE_CBC_256;
     private static final Object LOCK = new Object();
     private static final int BUFFER_SIZE = 512;
     private static MasterKey instance = null;

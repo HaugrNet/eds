@@ -16,6 +16,9 @@
  */
 package net.haugr.cws.core.enums;
 
+import static net.haugr.cws.api.common.Constants.SUN_EC;
+import static net.haugr.cws.api.common.Constants.SUN_JCE;
+
 /**
  * <p>The core part for all cryptographic operations is the Algorithms used for
  * the various cryptographic operations. CWS uses a mixture of Synchronous (AES)
@@ -30,7 +33,7 @@ package net.haugr.cws.core.enums;
  * NoPadding (require exact length) or PKCS1Padding/PKCS5Padding (default).</p>
  *
  * <p>The official list of Algorithms that Providers must support as a minimum
- * is <a href="http://docs.oracle.com/javase/8/docs/api/javax/crypto/Cipher.html">here</a>:</p>
+ * is <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/javax/crypto/Cipher.html">here</a>:</p>
  * <ol>
  *   <li>AES/CBC/NoPadding (128)</li>
  *   <li>AES/CBC/PKCS5Padding (128)</li>
@@ -71,29 +74,37 @@ package net.haugr.cws.core.enums;
 public enum KeyAlgorithm {
 
     // Signature Algorithms
-    SHA_256(Type.SIGNATURE, "RSA", Transformation.SIG256, 256, null),
-    SHA_512(Type.SIGNATURE, "RSA", Transformation.SIG512, 512, null),
+    SHA_256(Type.SIGNATURE, "RSA", Transformation.SIG256, 256, SUN_JCE, null),
+    SHA_512(Type.SIGNATURE, "RSA", Transformation.SIG512, 512, SUN_JCE, null),
 
     // Symmetric Algorithms
     // The AES CBC variant is not considered safe, and are pending
     // removal. However, removal requires that existing data can be
     // migrated to different Algorithms, again requiring the re-key
     // (#43) feature.
-    AES_CBC_128(Type.SYMMETRIC, "AES", Transformation.AES, 128, null),
-    AES_CBC_192(Type.SYMMETRIC, "AES", Transformation.AES, 192, null),
-    AES_CBC_256(Type.SYMMETRIC, "AES", Transformation.AES, 256, null),
+    AES_CBC_128(Type.SYMMETRIC, "AES", Transformation.AES_CBC, 128, SUN_JCE, null),
+    AES_CBC_192(Type.SYMMETRIC, "AES", Transformation.AES_CBC, 192, SUN_JCE, null),
+    AES_CBC_256(Type.SYMMETRIC, "AES", Transformation.AES_CBC, 256, SUN_JCE, null),
     // Current Production Algorithm
-    AES_GCM_128(Type.SYMMETRIC, "AES", Transformation.GCM, 128, null),
+    AES_GCM_128(Type.SYMMETRIC, "AES", Transformation.AES_GCM_128, 128, SUN_JCE, null),
+    AES_GCM_192(Type.SYMMETRIC, "AES", Transformation.AES_GCM_192, 192, SUN_JCE, null),
+    AES_GCM_256(Type.SYMMETRIC, "AES", Transformation.AES_GCM_256, 256, SUN_JCE, null),
 
     // Password Based Encryption (PBE) Algorithms
-    PBE_128(Type.PASSWORD, "AES", Transformation.PBE, 128, AES_CBC_128),
-    PBE_192(Type.PASSWORD, "AES", Transformation.PBE, 192, AES_CBC_192),
-    PBE_256(Type.PASSWORD, "AES", Transformation.PBE, 256, AES_CBC_256),
+    PBE_CBC_128(Type.PASSWORD, "AES", Transformation.PBE, 128, SUN_JCE, AES_CBC_128),
+    PBE_CBC_192(Type.PASSWORD, "AES", Transformation.PBE, 192, SUN_JCE, AES_CBC_192),
+    PBE_CBC_256(Type.PASSWORD, "AES", Transformation.PBE, 256, SUN_JCE, AES_CBC_256),
+    PBE_GCM_128(Type.PASSWORD, "AES", Transformation.PBE, 128, SUN_JCE, AES_GCM_128),
+    PBE_GCM_192(Type.PASSWORD, "AES", Transformation.PBE, 192, SUN_JCE, AES_GCM_192),
+    PBE_GCM_256(Type.PASSWORD, "AES", Transformation.PBE, 256, SUN_JCE, AES_GCM_256),
 
     // Asymmetric Algorithms
-    RSA_2048(Type.ASYMMETRIC, "RSA", Transformation.RSA, 2048, null),
-    RSA_4096(Type.ASYMMETRIC, "RSA", Transformation.RSA, 4096, null),
-    RSA_8192(Type.ASYMMETRIC, "RSA", Transformation.RSA, 8192, null);
+    RSA_2048(Type.ASYMMETRIC, "RSA", Transformation.RSA, 2048, SUN_JCE, null),
+    RSA_4096(Type.ASYMMETRIC, "RSA", Transformation.RSA, 4096, SUN_JCE, null),
+    RSA_8192(Type.ASYMMETRIC, "RSA", Transformation.RSA, 8192, SUN_JCE, null),
+    // Elliptic Curves (See: https://openjdk.java.net/jeps/324)
+    X25519(Type.ASYMMETRIC, "", Transformation.RSA, 123, SUN_EC, null),
+    X448(Type.ASYMMETRIC, "", Transformation.RSA, 123, SUN_EC, null);
 
     /**
      * The Algorithm Type, i.e. how it should be used.
@@ -113,8 +124,10 @@ public enum KeyAlgorithm {
         SIG512("SHA512WithRSA"),
         PBE("PBKDF2WithHmacSHA256"),
         // This Transformation is no longer recommended
-        AES("AES/CBC/PKCS5Padding"),
-        GCM("AES/GCM/NoPadding"),
+        AES_CBC("AES/CBC/PKCS5Padding"),
+        AES_GCM_128("AES_128/GCM/NoPadding"),
+        AES_GCM_192("AES_192/GCM/NoPadding"),
+        AES_GCM_256("AES_256/GCM/NoPadding"),
         RSA("RSA/ECB/PKCS1Padding");
 
         private final String value;
@@ -136,13 +149,15 @@ public enum KeyAlgorithm {
     private final String algorithm;
     private final Transformation transformation;
     private final int length;
+    private final String provider;
     private final KeyAlgorithm derived;
 
-    KeyAlgorithm(final Type type, final String algorithm, final Transformation transformation, final int length, final KeyAlgorithm derived) {
+    KeyAlgorithm(final Type type, final String algorithm, final Transformation transformation, final int length, final String provider, final KeyAlgorithm derived) {
         this.type = type;
         this.algorithm = algorithm;
         this.transformation = transformation;
         this.length = length;
+        this.provider = provider;
         this.derived = derived;
     }
 
@@ -164,6 +179,10 @@ public enum KeyAlgorithm {
 
     public int getLength() {
         return length;
+    }
+
+    public String getProvider() {
+        return provider;
     }
 
     public KeyAlgorithm getDerived() {

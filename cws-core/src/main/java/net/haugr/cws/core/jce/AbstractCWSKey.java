@@ -27,7 +27,6 @@ import net.haugr.cws.core.enums.KeyAlgorithm;
  */
 public abstract class AbstractCWSKey<T extends Key> {
 
-    protected boolean destroyed = false;
     protected final T key;
 
     private final KeyAlgorithm algorithm;

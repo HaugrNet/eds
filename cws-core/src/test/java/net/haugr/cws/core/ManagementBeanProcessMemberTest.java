@@ -628,7 +628,7 @@ final class ManagementBeanProcessMemberTest extends DatabaseSetup {
         dataRequest.setAction(Action.ADD);
         dataRequest.setCircleId(CIRCLE_1_ID);
         dataRequest.setDataName(UUID.randomUUID().toString());
-        dataRequest.setData(generateData(1048576));
+        dataRequest.setData(generateData(LARGE_SIZE_BYTES));
 
         final ProcessDataResponse response = bean.processData(dataRequest);
         assertTrue(response.isOk());

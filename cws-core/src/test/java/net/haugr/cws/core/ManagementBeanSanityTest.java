@@ -121,12 +121,12 @@ final class ManagementBeanSanityTest extends DatabaseSetup {
 
     private void prepareInvalidData() {
         final ShareBean bean = prepareShareBean();
-        falsifyChecksum(bean.processData(prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "Invalidated Data1", 524288)), Utilities.newDate(10L), SanityStatus.FAILED);
-        falsifyChecksum(bean.processData(prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "Invalidated Data2", 1048576)), Utilities.newDate(), SanityStatus.FAILED);
-        falsifyChecksum(bean.processData(prepareAddDataRequest(MEMBER_1, CIRCLE_2_ID, "Invalidated Data3", 524288)), Utilities.newDate(10L), SanityStatus.FAILED);
-        falsifyChecksum(bean.processData(prepareAddDataRequest(MEMBER_1, CIRCLE_2_ID, "Invalidated Data4", 1048576)), Utilities.newDate(), SanityStatus.FAILED);
-        falsifyChecksum(bean.processData(prepareAddDataRequest(MEMBER_4, CIRCLE_3_ID, "Invalidated Data5", 524288)), Utilities.newDate(10L), SanityStatus.FAILED);
-        falsifyChecksum(bean.processData(prepareAddDataRequest(MEMBER_4, CIRCLE_3_ID, "Invalidated Data6", 1048576)), Utilities.newDate(), SanityStatus.FAILED);
+        falsifyChecksum(bean.processData(prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "Invalidated Data1", MEDIUM_SIZE_BYTES)), Utilities.newDate(10L), SanityStatus.FAILED);
+        falsifyChecksum(bean.processData(prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "Invalidated Data2", LARGE_SIZE_BYTES)), Utilities.newDate(), SanityStatus.FAILED);
+        falsifyChecksum(bean.processData(prepareAddDataRequest(MEMBER_1, CIRCLE_2_ID, "Invalidated Data3", MEDIUM_SIZE_BYTES)), Utilities.newDate(10L), SanityStatus.FAILED);
+        falsifyChecksum(bean.processData(prepareAddDataRequest(MEMBER_1, CIRCLE_2_ID, "Invalidated Data4", LARGE_SIZE_BYTES)), Utilities.newDate(), SanityStatus.FAILED);
+        falsifyChecksum(bean.processData(prepareAddDataRequest(MEMBER_4, CIRCLE_3_ID, "Invalidated Data5", MEDIUM_SIZE_BYTES)), Utilities.newDate(10L), SanityStatus.FAILED);
+        falsifyChecksum(bean.processData(prepareAddDataRequest(MEMBER_4, CIRCLE_3_ID, "Invalidated Data6", LARGE_SIZE_BYTES)), Utilities.newDate(), SanityStatus.FAILED);
     }
 
     private static FetchDataRequest prepareReadRequest(final String dataId) {

@@ -65,10 +65,28 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 
 /**
+ * <p>Primarily, CWS is tested using an in-memory database, which offers
+ * more flexibility and greater trust than using mocking. The initial setup
+ * is more cumbersome, but the gain is also more trust in the tests - and no
+ * need to fiddle with mocks or other things.</p>
+ *
+ * <p>This class controls the setup parts of the database, and offers other
+ * small helpful utilities for the tests.</p>
+ *
  * @author Kim Jensen
  * @since CWS 1.0
  */
 public class DatabaseSetup {
+
+    // Following an upgrade of the H2 Database from 1.4.200 to 2.0.202+, it
+    // seems that the internal handling of larger LOB's have been changed,
+    // so if the value exceeds 1MB - 16 bytes, then the following  error
+    // is shown: "Value too long for column "BINARY VARYING".
+    //   To resolve it, the simplest way was to ensure that no data LOBs
+    // were generated using hardcoded sizes, and secondly, by not exceeding
+    // the maximum allowed value of 1048560 bytes.
+    protected static final int LARGE_SIZE_BYTES = 1024 * 1024 - 16;
+    protected static final int MEDIUM_SIZE_BYTES = 512 * 1024;
 
     protected static final String MEMBER_1 = "member1";
     protected static final String MEMBER_2 = "member2";

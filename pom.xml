@@ -155,17 +155,13 @@
             <dependency>
                 <groupId>org.hibernate</groupId>
                 <artifactId>hibernate-core</artifactId>
-                <version>5.6.3.Final</version>
+                <version>5.6.5.Final</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>com.h2database</groupId>
                 <artifactId>h2</artifactId>
-                <!-- Due to a bug in Hibernate, the H2 testing DB is kept outdated.
-                     The tests are failing if upgrading to 2.0.202 or later:
-                     org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: NULL not allowed for column "ID"
-                     See: https://hibernate.atlassian.net/browse/HHH-14985 -->
-                <version>1.4.200</version>
+                <version>2.1.210</version>
                 <scope>test</scope>
             </dependency>
         </dependencies>

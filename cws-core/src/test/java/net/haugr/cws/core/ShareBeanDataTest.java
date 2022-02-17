@@ -74,8 +74,7 @@ final class ShareBeanDataTest extends DatabaseSetup {
     void testSavingAndReadingData() {
         final ShareBean bean = prepareShareBean();
 
-        // 1 MB large Data
-        final ProcessDataRequest saveRequest = prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "My Data", 1048576);
+        final ProcessDataRequest saveRequest = prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "My Data", LARGE_SIZE_BYTES);
         // Since the logic is deliberately clearing data post encryption, and
         // it means that the bytes from the request will be overwritten by
         // zeroes. To ensure that the check works, a String representing the
@@ -96,7 +95,7 @@ final class ShareBeanDataTest extends DatabaseSetup {
         final ShareBean bean = prepareShareBean();
         final String name = "My Data";
 
-        final ProcessDataRequest saveRequest = prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, name, 1048576);
+        final ProcessDataRequest saveRequest = prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, name, LARGE_SIZE_BYTES);
         final String toSave = crypto.bytesToString(saveRequest.getData());
         final ProcessDataResponse saveResponse = bean.processData(saveRequest);
         assertEquals(ReturnCode.SUCCESS.getCode(), saveResponse.getReturnCode());
@@ -113,7 +112,7 @@ final class ShareBeanDataTest extends DatabaseSetup {
         final ShareBean bean = prepareShareBean();
 
         // 1 MB large Data
-        final ProcessDataRequest saveRequest = prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "My Data", 1048576);
+        final ProcessDataRequest saveRequest = prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "My Data", LARGE_SIZE_BYTES);
         final ProcessDataResponse saveResponse = bean.processData(saveRequest);
         assertEquals(ReturnCode.SUCCESS.getCode(), saveResponse.getReturnCode());
 
@@ -124,7 +123,7 @@ final class ShareBeanDataTest extends DatabaseSetup {
 
         final ProcessDataRequest updateRequest = prepareUpdateRequest(MEMBER_1, saveResponse.getDataId());
         updateRequest.setDataName("New Name");
-        updateRequest.setData(generateData(1048576));
+        updateRequest.setData(generateData(LARGE_SIZE_BYTES));
         final ProcessDataResponse updateResponse = bean.processData(updateRequest);
         assertEquals(ReturnCode.SUCCESS.getCode(), updateResponse.getReturnCode());
 
@@ -181,9 +180,9 @@ final class ShareBeanDataTest extends DatabaseSetup {
         assertEquals(0L, emptyResponse.getRecords());
 
         // Add some data...
-        assertTrue(bean.processData(prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "My Data 1", 1048576)).isOk());
-        assertTrue(bean.processData(prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "My Data 2", 1048576)).isOk());
-        assertTrue(bean.processData(prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "My Data 3", 1048576)).isOk());
+        assertTrue(bean.processData(prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "My Data 1", LARGE_SIZE_BYTES)).isOk());
+        assertTrue(bean.processData(prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "My Data 2", LARGE_SIZE_BYTES)).isOk());
+        assertTrue(bean.processData(prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "My Data 3", LARGE_SIZE_BYTES)).isOk());
 
         fetchRequest.setCredential(crypto.stringToBytes(MEMBER_1));
         final FetchDataResponse fullResponse = bean.fetchData(fetchRequest);
@@ -231,7 +230,7 @@ final class ShareBeanDataTest extends DatabaseSetup {
         assertEquals(ReturnCode.SUCCESS.getCode(), saveResponse.getReturnCode());
 
         final ProcessDataRequest updateRequest = prepareUpdateRequest(MEMBER_1, saveResponse.getDataId());
-        updateRequest.setData(generateData(1048576));
+        updateRequest.setData(generateData(LARGE_SIZE_BYTES));
         final ProcessDataResponse updateResponse = bean.processData(updateRequest);
         assertEquals(ReturnCode.SUCCESS.getCode(), updateResponse.getReturnCode());
     }
@@ -239,7 +238,7 @@ final class ShareBeanDataTest extends DatabaseSetup {
     @Test
     void testAddAndMoveToInvalidFolder() {
         final ShareBean bean = prepareShareBean();
-        final ProcessDataRequest saveRequest = prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "The Data", 1048576);
+        final ProcessDataRequest saveRequest = prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "The Data", LARGE_SIZE_BYTES);
 
         final ProcessDataResponse saveResponse = bean.processData(saveRequest);
         assertEquals(ReturnCode.SUCCESS.getCode(), saveResponse.getReturnCode());
@@ -255,7 +254,7 @@ final class ShareBeanDataTest extends DatabaseSetup {
     @Test
     void testAddDataWithoutPermission() {
         final ShareBean bean = prepareShareBean();
-        final ProcessDataRequest request = prepareAddDataRequest(MEMBER_5, CIRCLE_3_ID, "The Data", 1048576);
+        final ProcessDataRequest request = prepareAddDataRequest(MEMBER_5, CIRCLE_3_ID, "The Data", LARGE_SIZE_BYTES);
 
         final ProcessDataResponse response = bean.processData(request);
         assertEquals(ReturnCode.AUTHORIZATION_WARNING.getCode(), response.getReturnCode());
@@ -265,7 +264,7 @@ final class ShareBeanDataTest extends DatabaseSetup {
     @Test
     void testUpdatingDataWithoutPermission() {
         final ShareBean bean = prepareShareBean();
-        final ProcessDataRequest saveRequest = prepareAddDataRequest(MEMBER_2, CIRCLE_2_ID, "The Data", 1048576);
+        final ProcessDataRequest saveRequest = prepareAddDataRequest(MEMBER_2, CIRCLE_2_ID, "The Data", LARGE_SIZE_BYTES);
         final ProcessDataResponse saveResponse = bean.processData(saveRequest);
         assertTrue(saveResponse.isOk());
 
@@ -291,7 +290,7 @@ final class ShareBeanDataTest extends DatabaseSetup {
     @Test
     void testDeletingDataWithoutPermission() {
         final ShareBean bean = prepareShareBean();
-        final ProcessDataRequest saveRequest = prepareAddDataRequest(MEMBER_2, CIRCLE_2_ID, "The Data", 1048576);
+        final ProcessDataRequest saveRequest = prepareAddDataRequest(MEMBER_2, CIRCLE_2_ID, "The Data", LARGE_SIZE_BYTES);
         final ProcessDataResponse saveResponse = bean.processData(saveRequest);
 
         final ProcessDataRequest updateRequest = prepareDeleteRequest(MEMBER_3, saveResponse.getDataId());

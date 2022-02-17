@@ -232,15 +232,15 @@ final class SanitizerBeanTest extends DatabaseSetup {
 
     private void prepareInvalidData() {
         final ProcessDataManager service = new ProcessDataManager(settings, entityManager);
-        timeWarpChecksum(service.perform(prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "Valid Data1", 1048576)), Utilities.newDate(1L));
-        falsifyChecksum(service.perform(prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "Invalidated Data1", 1048576)), Utilities.newDate(2L), SanityStatus.OK);
-        falsifyChecksum(service.perform(prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "Invalidated Data2", 524288)), Utilities.newDate(), SanityStatus.OK);
-        timeWarpChecksum(service.perform(prepareAddDataRequest(MEMBER_1, CIRCLE_2_ID, "Valid Data2", 1048576)), Utilities.newDate(3L));
-        falsifyChecksum(service.perform(prepareAddDataRequest(MEMBER_1, CIRCLE_2_ID, "Invalidated Data3", 1048576)), Utilities.newDate(4L), SanityStatus.OK);
-        falsifyChecksum(service.perform(prepareAddDataRequest(MEMBER_1, CIRCLE_2_ID, "Invalidated Data4", 524288)), Utilities.newDate(), SanityStatus.OK);
-        timeWarpChecksum(service.perform(prepareAddDataRequest(MEMBER_4, CIRCLE_3_ID, "Valid Data3", 1048576)), Utilities.newDate(5L));
-        falsifyChecksum(service.perform(prepareAddDataRequest(MEMBER_4, CIRCLE_3_ID, "Invalidated Data5", 1048576)), Utilities.newDate(6L), SanityStatus.OK);
-        falsifyChecksum(service.perform(prepareAddDataRequest(MEMBER_4, CIRCLE_3_ID, "Invalidated Data6", 524288)), Utilities.newDate(), SanityStatus.OK);
+        timeWarpChecksum(service.perform(prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "Valid Data1", LARGE_SIZE_BYTES)), Utilities.newDate(1L));
+        falsifyChecksum(service.perform(prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "Invalidated Data1", LARGE_SIZE_BYTES)), Utilities.newDate(2L), SanityStatus.OK);
+        falsifyChecksum(service.perform(prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "Invalidated Data2", MEDIUM_SIZE_BYTES)), Utilities.newDate(), SanityStatus.OK);
+        timeWarpChecksum(service.perform(prepareAddDataRequest(MEMBER_1, CIRCLE_2_ID, "Valid Data2", LARGE_SIZE_BYTES)), Utilities.newDate(3L));
+        falsifyChecksum(service.perform(prepareAddDataRequest(MEMBER_1, CIRCLE_2_ID, "Invalidated Data3", LARGE_SIZE_BYTES)), Utilities.newDate(4L), SanityStatus.OK);
+        falsifyChecksum(service.perform(prepareAddDataRequest(MEMBER_1, CIRCLE_2_ID, "Invalidated Data4", MEDIUM_SIZE_BYTES)), Utilities.newDate(), SanityStatus.OK);
+        timeWarpChecksum(service.perform(prepareAddDataRequest(MEMBER_4, CIRCLE_3_ID, "Valid Data3", LARGE_SIZE_BYTES)), Utilities.newDate(5L));
+        falsifyChecksum(service.perform(prepareAddDataRequest(MEMBER_4, CIRCLE_3_ID, "Invalidated Data5", LARGE_SIZE_BYTES)), Utilities.newDate(6L), SanityStatus.OK);
+        falsifyChecksum(service.perform(prepareAddDataRequest(MEMBER_4, CIRCLE_3_ID, "Invalidated Data6", MEDIUM_SIZE_BYTES)), Utilities.newDate(), SanityStatus.OK);
     }
 
     private void timeWarpChecksum(final ProcessDataResponse response, final LocalDateTime sanityCheck) {

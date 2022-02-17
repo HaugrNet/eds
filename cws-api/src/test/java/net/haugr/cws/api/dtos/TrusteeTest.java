@@ -22,7 +22,6 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import net.haugr.cws.api.common.TrustLevel;
 import net.haugr.cws.api.common.Utilities;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 
@@ -34,9 +33,6 @@ final class TrusteeTest {
 
     @Test
     void testClassFlow() {
-        for (final String zoneId : ZoneId.getAvailableZoneIds()) {
-            System.out.println(zoneId);
-        }
         final String memberId = UUID.randomUUID().toString();
         final String accountName = UUID.randomUUID().toString();
         final String publicKey = UUID.randomUUID().toString();

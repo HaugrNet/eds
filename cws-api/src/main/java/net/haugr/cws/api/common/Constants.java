@@ -45,6 +45,13 @@ public final class Constants {
     public static final String SUN_EC = "SunEC";
 
     /**
+     * The default SALT (IV) size is 16 bytes, for GCM it is preferable to
+     * only have 12 bytes - however, GCM will also work with 16 bytes albeit
+     * slower.
+     */
+    public static final int GCM_IV_LENGTH = 128;
+
+    /**
      * <p>All serialized classes should use this value. The value reflects the
      * current version of the system. If updates are made in one or more of the
      * serialized classes, it should be updated.</p>

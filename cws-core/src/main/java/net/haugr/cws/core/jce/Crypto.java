@@ -17,6 +17,7 @@
 package net.haugr.cws.core.jce;
 
 import java.security.NoSuchProviderException;
+import net.haugr.cws.api.common.Constants;
 import net.haugr.cws.core.enums.KeyAlgorithm;
 import net.haugr.cws.core.exceptions.CryptoException;
 import net.haugr.cws.core.model.Settings;
@@ -283,10 +284,7 @@ public final class Crypto {
                 case AES_GCM_128:
                 case AES_GCM_192:
                 case AES_GCM_256:
-                    // Note, the default SALT (IV) size is 16 bytes, for GCM it
-                    // is preferable to only have 12 bytes - however, GCM will
-                    // also work with 16 bytes albeit slower.
-                    iv = new GCMParameterSpec(128, ((SecretCWSKey) key).getSalt().getBytes());
+                    iv = new GCMParameterSpec(Constants.GCM_IV_LENGTH, ((SecretCWSKey) key).getSalt().getBytes());
                     break;
                 default:
                     // Unreachable Code by design, only 2 AES transformation

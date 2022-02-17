@@ -72,7 +72,7 @@ public final class MasterKeyManager extends AbstractManager<CommonDao, MasterKey
         // Primarily, as updating it to an invalid key can be devastating. So
         // it is initially being saved, just in case...
         // What if the keys are the same ?
-        final var masterKey = MasterKey.getInstance(settings);
+        final MasterKey masterKey = MasterKey.getInstance(settings);
         final SecretCWSKey oldMasterKey = masterKey.getKey();
         final SecretCWSKey newMasterKey = prepareNewMasterKey(masterKey, request);
 
@@ -138,7 +138,7 @@ public final class MasterKeyManager extends AbstractManager<CommonDao, MasterKey
             // First, decrypt the Salt for the Administrator, using the "MasterKey".
             final byte[] encrypted = Base64.getDecoder().decode(admin.getSalt());
             final byte[] decrypted = Crypto.decrypt(masterKey, encrypted);
-            final var salt = crypto.bytesToString(decrypted);
+            final String salt = crypto.bytesToString(decrypted);
 
             // With the decrypted Salt, we can try to unlock the Private Key, if it
             // fails, then a CryptoException is thrown, which we'll ignore here.

@@ -16,6 +16,12 @@
  */
 package net.haugr.cws.core.managers;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
+import javax.persistence.EntityManager;
 import net.haugr.cws.api.common.MemberRole;
 import net.haugr.cws.api.common.ReturnCode;
 import net.haugr.cws.api.dtos.Circle;
@@ -23,18 +29,12 @@ import net.haugr.cws.api.dtos.Member;
 import net.haugr.cws.api.requests.FetchMemberRequest;
 import net.haugr.cws.api.responses.FetchMemberResponse;
 import net.haugr.cws.core.enums.Permission;
+import net.haugr.cws.core.enums.StandardSetting;
 import net.haugr.cws.core.model.MemberDao;
 import net.haugr.cws.core.model.Settings;
 import net.haugr.cws.core.model.entities.CircleEntity;
 import net.haugr.cws.core.model.entities.MemberEntity;
 import net.haugr.cws.core.model.entities.TrusteeEntity;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
-import javax.persistence.EntityManager;
-import net.haugr.cws.core.enums.StandardSetting;
 
 /**
  * <p>Business Logic implementation for the CWS FetchMember request.</p>
@@ -57,7 +57,7 @@ public final class FetchMemberManager extends AbstractManager<MemberDao, FetchMe
         verifyRequest(request, Permission.FETCH_MEMBER);
         Arrays.fill(request.getCredential(), (byte) 0);
 
-        final var response = new FetchMemberResponse();
+        final FetchMemberResponse response = new FetchMemberResponse();
 
         if (request.getMemberId() != null) {
             // The request is for a specific Member
@@ -131,7 +131,7 @@ public final class FetchMemberManager extends AbstractManager<MemberDao, FetchMe
     }
 
     private static Member convert(final MemberEntity entity) {
-        final var member = new Member();
+        final Member member = new Member();
 
         member.setMemberId(entity.getExternalId());
         member.setAccountName(entity.getName());
@@ -146,7 +146,7 @@ public final class FetchMemberManager extends AbstractManager<MemberDao, FetchMe
         final List<CircleEntity> entities = dao.findCirclesForMember(requested);
         final List<Circle> circles = new ArrayList<>(entities.size());
         for (final CircleEntity entity : entities) {
-            final var circle = convert(entity, null);
+            final Circle circle = convert(entity, null);
             circles.add(circle);
         }
 

@@ -16,6 +16,10 @@
  */
 package net.haugr.cws.core.managers;
 
+import java.security.PublicKey;
+import java.util.Arrays;
+import java.util.Objects;
+import javax.persistence.EntityManager;
 import net.haugr.cws.api.common.Action;
 import net.haugr.cws.api.common.MemberRole;
 import net.haugr.cws.api.common.ReturnCode;
@@ -38,9 +42,6 @@ import net.haugr.cws.core.model.entities.KeyEntity;
 import net.haugr.cws.core.model.entities.MemberEntity;
 import net.haugr.cws.core.model.entities.MetadataEntity;
 import net.haugr.cws.core.model.entities.TrusteeEntity;
-import java.util.Arrays;
-import java.util.Objects;
-import javax.persistence.EntityManager;
 
 /**
  * <p>Business Logic implementation for the CWS ProcessCircle request.</p>
@@ -62,7 +63,7 @@ public final class ProcessCircleManager extends AbstractManager<CommonDao, Proce
         // Pre-checks, & destruction of credentials
         verifyRequest(request, Permission.PROCESS_CIRCLE);
         Arrays.fill(request.getCredential(), (byte) 0);
-        final var action = request.getAction();
+        final Action action = request.getAction();
         final ProcessCircleResponse response;
 
         if (action == Action.CREATE) {
@@ -137,23 +138,23 @@ public final class ProcessCircleManager extends AbstractManager<CommonDao, Proce
     private ProcessCircleResponse createCircle(final MemberEntity circleAdmin, final String name, final String externalCircleKey) {
         final KeyAlgorithm algorithm = settings.getSymmetricAlgorithm();
         final SecretCWSKey key = Crypto.generateSymmetricKey(algorithm);
-        final var publicKey = crypto.dearmoringPublicKey(circleAdmin.getPublicKey());
-        final var cwsPublicKey = new PublicCWSKey(circleAdmin.getRsaAlgorithm(), publicKey);
+        final PublicKey publicKey = crypto.dearmoringPublicKey(circleAdmin.getPublicKey());
+        final PublicCWSKey cwsPublicKey = new PublicCWSKey(circleAdmin.getRsaAlgorithm(), publicKey);
         final String circleKey = Crypto.encryptAndArmorCircleKey(cwsPublicKey, key);
         final byte[] externalKey = encryptExternalKey(key, externalCircleKey);
 
-        final var circle = new CircleEntity();
+        final CircleEntity circle = new CircleEntity();
         circle.setName(name);
         circle.setCircleKey(externalKey);
         dao.save(circle);
 
         createRootFolder(circle);
-        final var keyEntity = new KeyEntity();
+        final KeyEntity keyEntity = new KeyEntity();
         keyEntity.setAlgorithm(algorithm);
         keyEntity.setStatus(Status.ACTIVE);
         dao.save(keyEntity);
 
-        final var trustee = new TrusteeEntity();
+        final TrusteeEntity trustee = new TrusteeEntity();
         trustee.setMember(circleAdmin);
         trustee.setCircle(circle);
         trustee.setKey(keyEntity);
@@ -161,15 +162,15 @@ public final class ProcessCircleManager extends AbstractManager<CommonDao, Proce
         trustee.setCircleKey(circleKey);
         dao.save(trustee);
 
-        final var response = new ProcessCircleResponse(theCircle(circle) + " was successfully created.");
+        final ProcessCircleResponse response = new ProcessCircleResponse(theCircle(circle) + " was successfully created.");
         response.setCircleId(circle.getExternalId());
 
         return response;
     }
 
     private void createRootFolder(final CircleEntity circle) {
-        final var dataTypeEntity = dao.getReference(DataTypeEntity.class, 1L);
-        final var entity = new MetadataEntity();
+        final DataTypeEntity dataTypeEntity = dao.getReference(DataTypeEntity.class, 1L);
+        final MetadataEntity entity = new MetadataEntity();
         entity.setCircle(circle);
         entity.setName("/");
         entity.setParentId(0L);

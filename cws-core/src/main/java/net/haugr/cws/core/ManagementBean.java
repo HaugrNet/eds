@@ -79,7 +79,7 @@ public class ManagementBean {
 
     @Transactional(Transactional.TxType.SUPPORTS)
     public VersionResponse version() {
-        final var response = new VersionResponse();
+        final VersionResponse response = new VersionResponse();
         response.setVersion(Constants.CWS_VERSION);
 
         return response;
@@ -90,7 +90,7 @@ public class ManagementBean {
         SettingResponse response;
 
         try {
-            final var manager = new SettingManager(settings, entityManager);
+            final SettingManager manager = new SettingManager(settings, entityManager);
             response = manager.perform(request);
         } catch (CWSException e) {
             // Any Warning or Error thrown by the CWS contain enough
@@ -117,7 +117,7 @@ public class ManagementBean {
         MasterKeyResponse response;
 
         try {
-            final var manager = new MasterKeyManager(settings, entityManager);
+            final MasterKeyManager manager = new MasterKeyManager(settings, entityManager);
             response = manager.perform(request);
         } catch (CWSException e) {
             // Any Warning or Error thrown by the CWS contain enough
@@ -136,7 +136,7 @@ public class ManagementBean {
         SanityResponse response;
 
         try {
-            final var manager = new SanityManager(settings, entityManager);
+            final SanityManager manager = new SanityManager(settings, entityManager);
             response = manager.perform(request);
         } catch (CWSException e) {
             // Any Warning or Error thrown by the CWS contain enough
@@ -155,7 +155,7 @@ public class ManagementBean {
         InventoryResponse response;
 
         try {
-            final var manager = new InventoryManager(settings, entityManager);
+            final InventoryManager manager = new InventoryManager(settings, entityManager);
             response = manager.perform(request);
         } catch (CWSException e) {
             // Any Warning or Error thrown by the CWS contain enough
@@ -174,7 +174,7 @@ public class ManagementBean {
         AuthenticateResponse response;
 
         try {
-            final var manager = new AuthenticatedManager(settings, entityManager);
+            final AuthenticatedManager manager = new AuthenticatedManager(settings, entityManager);
             response = manager.perform(request);
         } catch (CWSException e) {
             // Any Warning or Error thrown by the CWS contain enough
@@ -190,11 +190,10 @@ public class ManagementBean {
 
     @Transactional(Transactional.TxType.SUPPORTS)
     public FetchMemberResponse fetchMembers(final FetchMemberRequest request) {
-        FetchMemberManager manager;
         FetchMemberResponse response;
 
         try {
-            manager = new FetchMemberManager(settings, entityManager);
+            final FetchMemberManager manager = new FetchMemberManager(settings, entityManager);
             response = manager.perform(request);
         } catch (CWSException e) {
             // Any Warning or Error thrown by the CWS contain enough
@@ -213,7 +212,7 @@ public class ManagementBean {
         ProcessMemberResponse response;
 
         try {
-            final var manager = new ProcessMemberManager(settings, entityManager);
+            final ProcessMemberManager manager = new ProcessMemberManager(settings, entityManager);
             response = manager.perform(request);
         } catch (CWSException e) {
             // Any Warning or Error thrown by the CWS contain enough
@@ -232,7 +231,7 @@ public class ManagementBean {
         FetchCircleResponse response;
 
         try {
-            final var manager = new FetchCircleManager(settings, entityManager);
+            final FetchCircleManager manager = new FetchCircleManager(settings, entityManager);
             response = manager.perform(request);
         } catch (CWSException e) {
             // Any Warning or Error thrown by the CWS contain enough
@@ -251,7 +250,7 @@ public class ManagementBean {
         ProcessCircleResponse response;
 
         try {
-            final var manager = new ProcessCircleManager(settings, entityManager);
+            final ProcessCircleManager manager = new ProcessCircleManager(settings, entityManager);
             response = manager.perform(request);
         } catch (CWSException e) {
             // Any Warning or Error thrown by the CWS contain enough
@@ -270,7 +269,7 @@ public class ManagementBean {
         FetchTrusteeResponse response;
 
         try {
-            final var manager = new FetchTrusteeManager(settings, entityManager);
+            final FetchTrusteeManager manager = new FetchTrusteeManager(settings, entityManager);
             response = manager.perform(request);
         } catch (CWSException e) {
             // Any Warning or Error thrown by the CWS contain enough
@@ -289,7 +288,7 @@ public class ManagementBean {
         ProcessTrusteeResponse response;
 
         try {
-            final var manager = new ProcessTrusteeManager(settings, entityManager);
+            final ProcessTrusteeManager manager = new ProcessTrusteeManager(settings, entityManager);
             response = manager.perform(request);
         } catch (CWSException e) {
             // Any Warning or Error thrown by the CWS contain enough

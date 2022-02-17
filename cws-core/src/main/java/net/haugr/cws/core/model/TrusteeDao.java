@@ -16,9 +16,10 @@
  */
 package net.haugr.cws.core.model;
 
-import net.haugr.cws.core.model.entities.TrusteeEntity;
 import java.util.List;
 import javax.persistence.EntityManager;
+import javax.persistence.Query;
+import net.haugr.cws.core.model.entities.TrusteeEntity;
 
 /**
  * <p>Data Access Object functionality used explicitly for the fetching &amp;
@@ -34,7 +35,7 @@ public final class TrusteeDao extends CommonDao {
     }
 
     public List<TrusteeEntity> findTrusteesByMemberAndCircle(final String externalMemberId, final String externalCircleId) {
-        final var query = entityManager
+        final Query query = entityManager
                 .createNamedQuery("trustee.findByCircleAndMember")
                 .setParameter("emid", externalMemberId)
                 .setParameter("ecid", externalCircleId);
@@ -43,7 +44,7 @@ public final class TrusteeDao extends CommonDao {
     }
 
     public List<TrusteeEntity> findTrusteesByMember(final String externalMemberId) {
-        final var query = entityManager
+        final Query query = entityManager
                 .createNamedQuery("trustee.findByExternalMemberId")
                 .setParameter("externalMemberId", externalMemberId);
 
@@ -51,7 +52,7 @@ public final class TrusteeDao extends CommonDao {
     }
 
     public List<TrusteeEntity> findTrusteesByCircle(final String externalCircleId) {
-        final var query = entityManager
+        final Query query = entityManager
                 .createNamedQuery("trustee.findByExternalCircleId")
                 .setParameter("externalCircleId", externalCircleId);
 

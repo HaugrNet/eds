@@ -24,6 +24,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceException;
+import javax.persistence.Query;
 import javax.transaction.Transactional;
 import net.haugr.cws.api.common.Utilities;
 import net.haugr.cws.core.enums.SanityStatus;
@@ -66,8 +67,8 @@ public class SanitizerBean {
     public void sanitize() {
         clearExpireSessions();
         List<Long> ids = findNextBatch(BLOCK);
-        var count = 0;
-        var flawed = 0;
+        long count = 0;
+        long flawed = 0;
 
         while (!ids.isEmpty()) {
             for (final Long id : ids) {
@@ -129,7 +130,7 @@ public class SanitizerBean {
     }
 
     private void clearExpireSessions() {
-        final var query = entityManager.createNamedQuery("member.removeExpiredSessions");
+        final Query query = entityManager.createNamedQuery("member.removeExpiredSessions");
         LOGGER.debug("expired {} sessions.", query.executeUpdate());
     }
 
@@ -139,7 +140,7 @@ public class SanitizerBean {
         final int days = settings.getSanityInterval();
         final LocalDateTime date = Utilities.newDate().minusDays(days);
 
-        final var query = entityManager
+        final Query query = entityManager
                 .createNamedQuery("data.findIdsForSanityCheck")
                 .setParameter("status", SanityStatus.OK)
                 .setParameter("date", date)

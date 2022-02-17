@@ -16,14 +16,14 @@
  */
 package net.haugr.cws.core.managers;
 
+import java.util.Arrays;
+import javax.persistence.EntityManager;
 import net.haugr.cws.api.common.ReturnCode;
 import net.haugr.cws.api.requests.Authentication;
 import net.haugr.cws.api.responses.AuthenticateResponse;
 import net.haugr.cws.core.enums.Permission;
 import net.haugr.cws.core.model.CommonDao;
 import net.haugr.cws.core.model.Settings;
-import java.util.Arrays;
-import javax.persistence.EntityManager;
 
 /**
  * <p>Business Logic implementation for the CWS Authenticated request.</p>
@@ -47,7 +47,7 @@ public final class AuthenticatedManager extends AbstractManager<CommonDao, Authe
         Arrays.fill(request.getCredential(), (byte) 0);
 
         // And done... Authentication check completed
-        final var response = new AuthenticateResponse();
+        final AuthenticateResponse response = new AuthenticateResponse();
         response.setReturnMessage(member.getName() + " successfully authenticated.");
         response.setMemberId(member.getExternalId());
         response.setReturnCode(ReturnCode.SUCCESS);

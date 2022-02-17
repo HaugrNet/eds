@@ -16,15 +16,15 @@
  */
 package net.haugr.cws.core.managers;
 
+import java.util.Arrays;
+import java.util.Base64;
+import javax.persistence.EntityManager;
 import net.haugr.cws.api.requests.SignRequest;
 import net.haugr.cws.api.responses.SignResponse;
 import net.haugr.cws.core.enums.Permission;
 import net.haugr.cws.core.model.Settings;
 import net.haugr.cws.core.model.SignatureDao;
 import net.haugr.cws.core.model.entities.SignatureEntity;
-import java.util.Arrays;
-import java.util.Base64;
-import javax.persistence.EntityManager;
 
 /**
  * <p>Business Logic implementation for the CWS Sign request.</p>
@@ -47,15 +47,15 @@ public final class SignManager extends AbstractManager<SignatureDao, SignRespons
         verifyRequest(request, Permission.CREATE_SIGNATURE);
         Arrays.fill(request.getCredential(), (byte) 0);
 
-        final var response = new SignResponse();
+        final SignResponse response = new SignResponse();
 
         final byte[] rawSignature = crypto.sign(keyPair.getPrivate().getKey(), request.getData());
-        final var signature = Base64.getEncoder().encodeToString(rawSignature);
+        final String signature = Base64.getEncoder().encodeToString(rawSignature);
         final String checksum = crypto.generateChecksum(rawSignature);
         final SignatureEntity existing = dao.findByChecksum(checksum);
 
         if (existing == null) {
-            final var entity = new SignatureEntity();
+            final SignatureEntity entity = new SignatureEntity();
             entity.setPublicKey(member.getPublicKey());
             entity.setMember(member);
             entity.setChecksum(checksum);

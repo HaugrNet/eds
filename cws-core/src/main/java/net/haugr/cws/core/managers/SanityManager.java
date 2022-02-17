@@ -55,7 +55,7 @@ public final class SanityManager extends AbstractManager<SanityDao, SanityRespon
 
         final List<DataEntity> found = findRecords(request);
         final List<Sanity> sanities = convertRecords(found);
-        final var response = new SanityResponse();
+        final SanityResponse response = new SanityResponse();
         response.setSanities(sanities);
 
         return response;
@@ -85,7 +85,7 @@ public final class SanityManager extends AbstractManager<SanityDao, SanityRespon
         final List<Sanity> sanities = new ArrayList<>(found.size());
 
         for (final DataEntity entity : found) {
-            final var sanity = new Sanity();
+            final Sanity sanity = new Sanity();
             sanity.setDataId(entity.getMetadata().getExternalId());
             sanity.setChanged(entity.getSanityChecked());
             sanities.add(sanity);

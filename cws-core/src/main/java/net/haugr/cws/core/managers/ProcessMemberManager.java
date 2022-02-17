@@ -16,6 +16,14 @@
  */
 package net.haugr.cws.core.managers;
 
+import java.security.PublicKey;
+import java.util.Arrays;
+import java.util.Base64;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
+import javax.persistence.EntityManager;
 import net.haugr.cws.api.common.Constants;
 import net.haugr.cws.api.common.CredentialType;
 import net.haugr.cws.api.common.MemberRole;
@@ -40,13 +48,6 @@ import net.haugr.cws.core.model.MemberDao;
 import net.haugr.cws.core.model.Settings;
 import net.haugr.cws.core.model.entities.MemberEntity;
 import net.haugr.cws.core.model.entities.TrusteeEntity;
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
-import javax.persistence.EntityManager;
 
 /**
  * <p>Business Logic implementation for the CWS ProcessMember request.</p>
@@ -136,7 +137,7 @@ public final class ProcessMemberManager extends AbstractManager<MemberDao, Proce
 
         final MemberRole role = whichRole(request);
         final MemberEntity created = createNewAccount(accountName, role, request.getNewCredential());
-        final var response = new ProcessMemberResponse(theMember(created) + " was successfully added to CWS.");
+        final ProcessMemberResponse response = new ProcessMemberResponse(theMember(created) + " was successfully added to CWS.");
         response.setMemberId(created.getExternalId());
 
         return response;
@@ -155,10 +156,10 @@ public final class ProcessMemberManager extends AbstractManager<MemberDao, Proce
             throw new CWSException(ReturnCode.CONSTRAINT_ERROR, "Cannot create an invitation, as the account already exists.");
         }
 
-        final var uuid = UUID.randomUUID().toString();
+        final String uuid = UUID.randomUUID().toString();
         final byte[] signature = crypto.sign(keyPair.getPrivate().getKey(), crypto.stringToBytes(uuid));
 
-        final var entity = new MemberEntity();
+        final MemberEntity entity = new MemberEntity();
         entity.setName(memberName);
         entity.setSalt(crypto.encryptWithMasterKey(uuid));
         entity.setPbeAlgorithm(settings.getPasswordAlgorithm());
@@ -168,7 +169,7 @@ public final class ProcessMemberManager extends AbstractManager<MemberDao, Proce
         entity.setMemberRole(whichRole(request));
         dao.save(entity);
 
-        final var response = new ProcessMemberResponse("An invitation was successfully issued for '" + memberName + "'.");
+        final ProcessMemberResponse response = new ProcessMemberResponse("An invitation was successfully issued for '" + memberName + "'.");
         response.setMemberId(entity.getExternalId());
         response.setSignature(signature);
 
@@ -227,7 +228,7 @@ public final class ProcessMemberManager extends AbstractManager<MemberDao, Proce
         entity.setMemberRole(request.getMemberRole());
         dao.save(entity);
 
-        final var response = new ProcessMemberResponse(theMember(entity) + " has successfully been given the new role '" + request.getMemberRole() + "'.");
+        final ProcessMemberResponse response = new ProcessMemberResponse(theMember(entity) + " has successfully been given the new role '" + request.getMemberRole() + "'.");
         response.setMemberId(memberId);
 
         return response;
@@ -241,7 +242,7 @@ public final class ProcessMemberManager extends AbstractManager<MemberDao, Proce
         updateOwnPublicKey(request);
         dao.save(member);
 
-        final var response = new ProcessMemberResponse(theMember(member) + " was successfully updated.");
+        final ProcessMemberResponse response = new ProcessMemberResponse(theMember(member) + " was successfully updated.");
         response.setMemberId(member.getExternalId());
         return response;
     }
@@ -305,7 +306,7 @@ public final class ProcessMemberManager extends AbstractManager<MemberDao, Proce
         dao.removeSession(member);
         updateMemberPassword(member, request.getCredential());
 
-        final var response = new ProcessMemberResponse();
+        final ProcessMemberResponse response = new ProcessMemberResponse();
         response.setReturnMessage(theMember(member) + " has been Invalidated.");
 
         return response;
@@ -358,14 +359,14 @@ public final class ProcessMemberManager extends AbstractManager<MemberDao, Proce
         // make everything very cumbersome if all their keys have to be
         // checked. Hence, it is limited to the first.
         final MemberEntity admin = dao.findMemberByName(Constants.ADMIN_ACCOUNT);
-        final var publicKey = crypto.dearmoringPublicKey(admin.getPublicKey());
+        final PublicKey publicKey = crypto.dearmoringPublicKey(admin.getPublicKey());
 
         if (!crypto.verify(publicKey, crypto.stringToBytes(secret), request.getCredential())) {
             throw new AuthenticationException("The given signature is invalid.");
         }
 
         final KeyAlgorithm pbeAlgorithm = settings.getPasswordAlgorithm();
-        final var salt = new IVSalt();
+        final IVSalt salt = new IVSalt();
         final byte[] newSecret = request.getNewCredential();
         final CWSKeyPair pair = Crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
         final SecretCWSKey key = crypto.generatePasswordKey(pbeAlgorithm, newSecret, salt.getArmored());
@@ -379,7 +380,7 @@ public final class ProcessMemberManager extends AbstractManager<MemberDao, Proce
         account.setPrivateKey(Crypto.encryptAndArmorPrivateKey(key, pair.getPrivate().getKey()));
         dao.save(account);
 
-        final var response = new ProcessMemberResponse("The invitation was successfully processed for '" + account.getName() + "'.");
+        final ProcessMemberResponse response = new ProcessMemberResponse("The invitation was successfully processed for '" + account.getName() + "'.");
         response.setMemberId(account.getExternalId());
 
         return response;

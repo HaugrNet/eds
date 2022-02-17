@@ -16,6 +16,10 @@
  */
 package net.haugr.cws.core.managers;
 
+import java.security.PublicKey;
+import java.util.Arrays;
+import java.util.List;
+import javax.persistence.EntityManager;
 import net.haugr.cws.api.common.ReturnCode;
 import net.haugr.cws.api.common.TrustLevel;
 import net.haugr.cws.api.requests.ProcessTrusteeRequest;
@@ -31,9 +35,6 @@ import net.haugr.cws.core.model.CommonDao;
 import net.haugr.cws.core.model.Settings;
 import net.haugr.cws.core.model.entities.MemberEntity;
 import net.haugr.cws.core.model.entities.TrusteeEntity;
-import java.util.Arrays;
-import java.util.List;
-import javax.persistence.EntityManager;
 
 /**
  * <p>Business Logic implementation for the CWS ProcessTrustee request.</p>
@@ -108,16 +109,16 @@ public final class ProcessTrusteeManager extends AbstractManager<CommonDao, Proc
         // re-key is not supported in version 1.0, support for multiple
         // Keys can wait until this is also supported.
         final TrusteeEntity admin = trustees.get(0);
-        final var trustLevel = request.getTrustLevel();
-        final var trustee = new TrusteeEntity();
+        final TrustLevel trustLevel = request.getTrustLevel();
+        final TrusteeEntity trustee = new TrusteeEntity();
         trustee.setMember(newTrusteeMember);
         trustee.setCircle(admin.getCircle());
         trustee.setKey(admin.getKey());
         trustee.setTrustLevel(trustLevel);
 
         final SecretCWSKey circleKey = Crypto.extractCircleKey(admin.getKey().getAlgorithm(), keyPair.getPrivate(), admin.getCircleKey());
-        final var publicKey = crypto.dearmoringPublicKey(newTrusteeMember.getPublicKey());
-        final var cwsPublicKey = new PublicCWSKey(newTrusteeMember.getRsaAlgorithm(), publicKey);
+        final PublicKey publicKey = crypto.dearmoringPublicKey(newTrusteeMember.getPublicKey());
+        final PublicCWSKey cwsPublicKey = new PublicCWSKey(newTrusteeMember.getRsaAlgorithm(), publicKey);
         trustee.setCircleKey(Crypto.encryptAndArmorCircleKey(cwsPublicKey, circleKey));
 
         dao.save(trustee);

@@ -16,6 +16,10 @@
  */
 package net.haugr.cws.core.managers;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import javax.persistence.EntityManager;
 import net.haugr.cws.api.dtos.Metadata;
 import net.haugr.cws.api.requests.InventoryRequest;
 import net.haugr.cws.api.responses.InventoryResponse;
@@ -23,10 +27,6 @@ import net.haugr.cws.core.enums.Permission;
 import net.haugr.cws.core.model.DataDao;
 import net.haugr.cws.core.model.Settings;
 import net.haugr.cws.core.model.entities.MetadataEntity;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import javax.persistence.EntityManager;
 
 /**
  * <p>Business Logic implementation for the CWS Inventory request.</p>
@@ -58,7 +58,7 @@ public class InventoryManager extends AbstractManager<DataDao, InventoryResponse
             inventory.add(data);
         }
 
-        final var response = new InventoryResponse();
+        final InventoryResponse response = new InventoryResponse();
         response.setRecords(dao.countInventoryRecords());
         response.setInventory(inventory);
 

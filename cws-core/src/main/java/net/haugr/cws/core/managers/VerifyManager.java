@@ -16,6 +16,11 @@
  */
 package net.haugr.cws.core.managers;
 
+import java.security.PublicKey;
+import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.Base64;
+import javax.persistence.EntityManager;
 import net.haugr.cws.api.common.ReturnCode;
 import net.haugr.cws.api.common.Utilities;
 import net.haugr.cws.api.requests.VerifyRequest;
@@ -26,10 +31,6 @@ import net.haugr.cws.core.exceptions.IdentificationException;
 import net.haugr.cws.core.model.Settings;
 import net.haugr.cws.core.model.SignatureDao;
 import net.haugr.cws.core.model.entities.SignatureEntity;
-import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.Base64;
-import javax.persistence.EntityManager;
 
 /**
  * <p>Business Logic implementation for the CWS Verify request.</p>
@@ -65,7 +66,7 @@ public final class VerifyManager extends AbstractManager<SignatureDao, VerifyRes
             throw new CWSException(ReturnCode.SIGNATURE_WARNING, "The Signature has expired.");
         }
 
-        final var publicKey = crypto.dearmoringPublicKey(entity.getPublicKey());
+        final PublicKey publicKey = crypto.dearmoringPublicKey(entity.getPublicKey());
         final boolean verified = crypto.verify(publicKey, request.getData(), signature);
 
         if (verified) {
@@ -73,7 +74,7 @@ public final class VerifyManager extends AbstractManager<SignatureDao, VerifyRes
             dao.save(entity);
         }
 
-        final var response = new VerifyResponse("The signature has successfully been verified.");
+        final VerifyResponse response = new VerifyResponse("The signature has successfully been verified.");
         response.setVerified(verified);
 
         return response;

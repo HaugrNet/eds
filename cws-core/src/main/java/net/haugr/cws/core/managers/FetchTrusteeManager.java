@@ -16,6 +16,10 @@
  */
 package net.haugr.cws.core.managers;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import javax.persistence.EntityManager;
 import net.haugr.cws.api.common.MemberRole;
 import net.haugr.cws.api.common.ReturnCode;
 import net.haugr.cws.api.dtos.Trustee;
@@ -26,10 +30,6 @@ import net.haugr.cws.core.exceptions.IdentificationException;
 import net.haugr.cws.core.model.Settings;
 import net.haugr.cws.core.model.TrusteeDao;
 import net.haugr.cws.core.model.entities.TrusteeEntity;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import javax.persistence.EntityManager;
 
 /**
  * <p>Business Logic implementation for the CWS FetchTrustee request.</p>
@@ -71,7 +71,7 @@ public final class FetchTrusteeManager extends AbstractManager<TrusteeDao, Fetch
             currentTrustees.add(convert(entity));
         }
 
-        final var response = new FetchTrusteeResponse();
+        final FetchTrusteeResponse response = new FetchTrusteeResponse();
         response.setTrustees(currentTrustees);
 
         return response;
@@ -118,7 +118,7 @@ public final class FetchTrusteeManager extends AbstractManager<TrusteeDao, Fetch
     }
 
     private static Trustee convert(final TrusteeEntity entity) {
-        final var trustee = new Trustee();
+        final Trustee trustee = new Trustee();
 
         trustee.setMemberId(entity.getMember().getExternalId());
         trustee.setAccountName(entity.getMember().getName());

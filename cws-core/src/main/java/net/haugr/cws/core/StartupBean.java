@@ -32,6 +32,7 @@ import javax.ejb.TransactionAttributeType;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 import net.haugr.cws.core.enums.StandardSetting;
 import net.haugr.cws.core.exceptions.CWSException;
 import net.haugr.cws.core.model.CommonDao;
@@ -83,7 +84,7 @@ public class StartupBean {
 
             // Registering the Timer Service. This will ensure that the
             // Scheduler is invoked at frequent intervals.
-            final var timerConfig = new TimerConfig();
+            final TimerConfig timerConfig = new TimerConfig();
             timerConfig.setInfo("CWS Sanitizer");
 
             // To prevent starting multiple Timers, it is started in
@@ -92,17 +93,17 @@ public class StartupBean {
             timerConfig.setPersistent(false);
 
             // Starting the Timer Service every hour.
-            final var expression = new ScheduleExpression();
+            final ScheduleExpression expression = new ScheduleExpression();
             expression.hour("*");
             timerService.createCalendarTimer(expression, timerConfig);
         }
     }
 
     private boolean checkDatabase() {
-        var ready = false;
+        boolean ready = false;
 
         try {
-            final var query = entityManager.createNamedQuery("version.findAll");
+            final Query query = entityManager.createNamedQuery("version.findAll");
             final List<VersionEntity> result = CommonDao.findList(query);
 
             // If the database is invalid, then no data could be found, meaning
@@ -120,7 +121,7 @@ public class StartupBean {
     }
 
     private void initializeSettings() {
-        final var dao = new CommonDao(entityManager);
+        final CommonDao dao = new CommonDao(entityManager);
         final List<SettingEntity> found = dao.findAllAscending(SettingEntity.class, "id");
 
         for (final SettingEntity entity : found) {

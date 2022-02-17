@@ -75,15 +75,15 @@ final class CommonService {
         CwsResponse response;
 
         try {
-            final var method = findMethod(bean, invokeMethod);
+            final Method method = findMethod(bean, invokeMethod);
             response = (request == null)
                     ? (CwsResponse) method.invoke(bean)
                     : (CwsResponse) method.invoke(bean, request);
 
-            final var duration = calculateDuration(settings.getLocale(), startTime);
+            final String duration = calculateDuration(settings.getLocale(), startTime);
             LOGGER.info("{} completed in {} ms", logAction, duration);
         } catch (IllegalAccessException | InvocationTargetException | RuntimeException e) {
-            final var duration = calculateDuration(settings.getLocale(), startTime);
+            final String duration = calculateDuration(settings.getLocale(), startTime);
             LOGGER.error("{} completed in {} ms with error: {}", logAction, duration, e.getMessage(), e);
             response = new CwsResponse(ReturnCode.ERROR, e.getMessage());
         }

@@ -46,7 +46,7 @@ public final class IVSalt {
         // According to the SonarQube rule (from FindBugs/SpotBugs Security)
         // https://sonarcloud.io/coding_rules?open=squid:S3329&rule_key=squid:S3329
         // the IV should be generated using the SecureRandom class as follows.
-        final var random = new byte[IV_SIZE];
+        final byte[] random = new byte[IV_SIZE];
         new SecureRandom().nextBytes(random);
         this.armored = Base64.getEncoder().encodeToString(random);
     }
@@ -60,7 +60,7 @@ public final class IVSalt {
     }
 
     public byte[] getBytes() {
-        final var bytes = new byte[IV_SIZE];
+        final byte[] bytes = new byte[IV_SIZE];
         // Default assumption - the Salt is a UUID
         byte[] rawSalt = armored.getBytes(Settings.getInstance().getCharset());
 

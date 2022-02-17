@@ -16,6 +16,11 @@
  */
 package net.haugr.cws.core.managers;
 
+import java.util.Arrays;
+import java.util.EnumSet;
+import java.util.Objects;
+import java.util.Set;
+import javax.persistence.EntityManager;
 import net.haugr.cws.api.common.Constants;
 import net.haugr.cws.api.common.ReturnCode;
 import net.haugr.cws.api.common.TrustLevel;
@@ -34,13 +39,9 @@ import net.haugr.cws.core.model.DataDao;
 import net.haugr.cws.core.model.Settings;
 import net.haugr.cws.core.model.entities.DataEntity;
 import net.haugr.cws.core.model.entities.DataTypeEntity;
+import net.haugr.cws.core.model.entities.KeyEntity;
 import net.haugr.cws.core.model.entities.MetadataEntity;
 import net.haugr.cws.core.model.entities.TrusteeEntity;
-import java.util.Arrays;
-import java.util.EnumSet;
-import java.util.Objects;
-import java.util.Set;
-import javax.persistence.EntityManager;
 
 /**
  * <p>Business Logic implementation for the CWS ProcessData request.</p>
@@ -108,7 +109,7 @@ public final class ProcessDataManager extends AbstractManager<DataDao, ProcessDa
         if (Objects.equals(Constants.FOLDER_TYPENAME, type.getName())) {
             response = createFolder(trustee, request);
         } else {
-            final var metadataEntity = createMetadata(trustee, request.getDataName(), parent.getId(), type);
+            final MetadataEntity metadataEntity = createMetadata(trustee, request.getDataName(), parent.getId(), type);
             encryptAndSaveData(trustee, metadataEntity, null, bytes);
             response = buildProcessDataResponse(metadataEntity.getExternalId(), theDataObject(metadataEntity) + " was successfully added to the Circle '" + trustee.getCircle().getName() + "'.");
         }
@@ -137,7 +138,7 @@ public final class ProcessDataManager extends AbstractManager<DataDao, ProcessDa
 
     private ProcessDataResponse processCopyData(final ProcessDataRequest request) {
         final TrusteeEntity targetTrustee = findTargetTrustee(request.getTargetCircleId());
-        final var metadataEntity = findMetadataEntity(request.getDataId());
+        final MetadataEntity metadataEntity = findMetadataEntity(request.getDataId());
         final String externalDataId = copyDataToTargetCircle(targetTrustee, metadataEntity, request);
 
         return buildProcessDataResponse(externalDataId, theDataObject(metadataEntity) + " was successfully copied from '" + metadataEntity.getCircle().getName() + "' to '" + targetTrustee.getCircle().getName() + "'.");
@@ -145,7 +146,7 @@ public final class ProcessDataManager extends AbstractManager<DataDao, ProcessDa
 
     private ProcessDataResponse processMoveData(final ProcessDataRequest request) {
         final TrusteeEntity targetTrustee = findTargetTrustee(request.getTargetCircleId());
-        final var metadataEntity = findMetadataEntity(request.getDataId());
+        final MetadataEntity metadataEntity = findMetadataEntity(request.getDataId());
         final String externalDataId = copyDataToTargetCircle(targetTrustee, metadataEntity, request);
         dao.delete(metadataEntity);
 
@@ -153,7 +154,7 @@ public final class ProcessDataManager extends AbstractManager<DataDao, ProcessDa
     }
 
     private static ProcessDataResponse buildProcessDataResponse(final String externalDataId, final String returnMessage) {
-        final var response = new ProcessDataResponse(returnMessage);
+        final ProcessDataResponse response = new ProcessDataResponse(returnMessage);
         response.setDataId(externalDataId);
 
         return response;
@@ -218,8 +219,8 @@ public final class ProcessDataManager extends AbstractManager<DataDao, ProcessDa
 
     private String copyDataToTargetCircle(final TrusteeEntity trustee, final MetadataEntity oldMetadataEntity, final ProcessDataRequest request) {
         final MetadataEntity folder = findParent(request.getTargetCircleId(), request.getTargetFolderId());
-        final var metadataEntity = createMetadata(trustee, oldMetadataEntity.getName(), folder.getId(), oldMetadataEntity.getType());
-        final var dataEntity = dao.findDataByMemberAndExternalId(member, oldMetadataEntity.getExternalId());
+        final MetadataEntity metadataEntity = createMetadata(trustee, oldMetadataEntity.getName(), folder.getId(), oldMetadataEntity.getType());
+        final DataEntity dataEntity = dao.findDataByMemberAndExternalId(member, oldMetadataEntity.getExternalId());
         if (dataEntity != null) {
             final byte[] bytes = decryptData(dataEntity);
             encryptAndSaveData(trustee, metadataEntity, null, bytes);
@@ -231,14 +232,14 @@ public final class ProcessDataManager extends AbstractManager<DataDao, ProcessDa
     private void checkData(final MetadataEntity metadata, final byte[] bytes) {
         if (bytes != null) {
             final TrusteeEntity trustee = findTrustee(metadata.getCircle().getExternalId());
-            final var dataEntity = dao.findDataByMetadata(metadata);
+            final DataEntity dataEntity = dao.findDataByMetadata(metadata);
             encryptAndSaveData(trustee, metadata, dataEntity, bytes);
         }
     }
 
     private void encryptAndSaveData(final TrusteeEntity trustee, final MetadataEntity metadataEntity, final DataEntity oldDataEntity, final byte[] bytes) {
         if (bytes != null) {
-            final var keyEntity = trustee.getKey();
+            final KeyEntity keyEntity = trustee.getKey();
             final KeyAlgorithm algorithm = keyEntity.getAlgorithm();
             final SecretCWSKey key = Crypto.extractCircleKey(algorithm, keyPair.getPrivate(), trustee.getCircleKey());
             key.setSalt(new IVSalt());
@@ -304,14 +305,14 @@ public final class ProcessDataManager extends AbstractManager<DataDao, ProcessDa
         final DataTypeEntity folderType = dao.findDataTypeByName(Constants.FOLDER_TYPENAME);
         final MetadataEntity folder = createMetadata(trustee, request.getDataName(), parent.getId(), folderType);
 
-        final var response = new ProcessDataResponse("The Folder '" + request.getDataName() + "' was successfully added to the Circle '" + trustee.getCircle().getName() + "'.");
+        final ProcessDataResponse response = new ProcessDataResponse("The Folder '" + request.getDataName() + "' was successfully added to the Circle '" + trustee.getCircle().getName() + "'.");
         response.setDataId(folder.getExternalId());
 
         return response;
     }
 
     private MetadataEntity createMetadata(final TrusteeEntity trustee, final String name, final Long parentId, final DataTypeEntity dataType) {
-        final var entity = new MetadataEntity();
+        final MetadataEntity entity = new MetadataEntity();
         entity.setCircle(trustee.getCircle());
         entity.setName(name);
         entity.setParentId(parentId);

@@ -16,12 +16,12 @@
  */
 package net.haugr.cws.api.requests;
 
-import net.haugr.cws.api.common.Constants;
 import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Map;
+import net.haugr.cws.api.common.Constants;
 
 /**
  * <p>This Class contains checks for different fields that is used as part of
@@ -40,7 +40,9 @@ import java.util.Map;
  */
 public abstract class AbstractRequest implements Serializable {
 
-    /** {@link Constants#SERIAL_VERSION_UID}. */
+    /**
+     * {@link Constants#SERIAL_VERSION_UID}.
+     */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
     /**
@@ -206,7 +208,7 @@ public abstract class AbstractRequest implements Serializable {
      */
     protected static void checkUrl(final Map<String, String> errors, final String value) {
         try {
-            final var url = new URL(value);
+            final URL url = new URL(value);
             url.toURI();
         } catch (MalformedURLException | URISyntaxException e) {
             // SonarQube Warning java:S1166 - Ignored here
@@ -228,7 +230,7 @@ public abstract class AbstractRequest implements Serializable {
      * @return True if the string is empty, meaning no non-whitespace chars exist
      */
     public static boolean isEmpty(final String value) {
-        var whitespace = true;
+        boolean whitespace = true;
 
         for (int i = 0; i < value.length(); i++) {
             if (!Character.isWhitespace(value.charAt(i))) {

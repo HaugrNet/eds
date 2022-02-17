@@ -67,7 +67,7 @@ public class ShareBean {
         ProcessDataTypeResponse response;
 
         try {
-            final var manager = new ProcessDataTypeManager(settings, entityManager);
+            final ProcessDataTypeManager manager = new ProcessDataTypeManager(settings, entityManager);
             response = manager.perform(request);
         } catch (CWSException e) {
             // Any Warning or Error thrown by the CWS contain enough
@@ -86,7 +86,7 @@ public class ShareBean {
         FetchDataTypeResponse response;
 
         try {
-            final var manager = new FetchDataTypeManager(settings, entityManager);
+            final FetchDataTypeManager manager = new FetchDataTypeManager(settings, entityManager);
             response = manager.perform(request);
         } catch (CWSException e) {
             // Any Warning or Error thrown by the CWS contain enough
@@ -105,7 +105,7 @@ public class ShareBean {
         ProcessDataResponse response;
 
         try {
-            final var manager = new ProcessDataManager(settings, entityManager);
+            final ProcessDataManager manager = new ProcessDataManager(settings, entityManager);
             response = manager.perform(request);
         } catch (CWSException e) {
             // Any Warning or Error thrown by the CWS contain enough
@@ -124,7 +124,7 @@ public class ShareBean {
         FetchDataResponse response;
 
         try {
-            final var manager = new FetchDataManager(settings, entityManager);
+            final FetchDataManager manager = new FetchDataManager(settings, entityManager);
             response = manager.perform(request);
         } catch (CWSException e) {
             // Any Warning or Error thrown by the CWS contain enough
@@ -143,7 +143,7 @@ public class ShareBean {
         SignResponse response;
 
         try {
-            final var manager = new SignManager(settings, entityManager);
+            final SignManager manager = new SignManager(settings, entityManager);
             response = manager.perform(request);
         } catch (CWSException e) {
             // Any Warning or Error thrown by the CWS contain enough
@@ -162,7 +162,7 @@ public class ShareBean {
         VerifyResponse response;
 
         try {
-            final var manager = new VerifyManager(settings, entityManager);
+            final VerifyManager manager = new VerifyManager(settings, entityManager);
             response = manager.perform(request);
         } catch (CWSException e) {
             // Any Warning or Error thrown by the CWS contain enough
@@ -181,7 +181,7 @@ public class ShareBean {
         FetchSignatureResponse response;
 
         try {
-            final var manager = new FetchSignatureManager(settings, entityManager);
+            final FetchSignatureManager manager = new FetchSignatureManager(settings, entityManager);
             response = manager.perform(request);
         } catch (CWSException e) {
             // Any Warning or Error thrown by the CWS contain enough

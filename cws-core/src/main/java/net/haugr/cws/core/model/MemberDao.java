@@ -16,11 +16,12 @@
  */
 package net.haugr.cws.core.model;
 
+import java.util.List;
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
 import net.haugr.cws.core.model.entities.CircleEntity;
 import net.haugr.cws.core.model.entities.MemberEntity;
 import net.haugr.cws.core.model.entities.TrusteeEntity;
-import java.util.List;
-import javax.persistence.EntityManager;
 
 /**
  * <p>Data Access Object functionality used explicitly for the fetching &amp;
@@ -36,7 +37,7 @@ public final class MemberDao extends CommonDao {
     }
 
     public List<CircleEntity> findCirclesForMember(final MemberEntity member) {
-        final var query = entityManager
+        final Query query = entityManager
                 .createNamedQuery("trustee.findCirclesByMember")
                 .setParameter(MEMBER, member);
 
@@ -44,7 +45,7 @@ public final class MemberDao extends CommonDao {
     }
 
     public List<TrusteeEntity> findCirclesBothBelongTo(final MemberEntity member, final MemberEntity requested) {
-        final var query = entityManager
+        final Query query = entityManager
                 .createNamedQuery("trustee.findSharedCircles")
                 .setParameter(MEMBER, member)
                 .setParameter("requested", requested);

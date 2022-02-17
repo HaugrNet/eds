@@ -16,12 +16,13 @@
  */
 package net.haugr.cws.core.model;
 
-import net.haugr.cws.core.enums.SanityStatus;
-import net.haugr.cws.core.model.entities.DataEntity;
-import net.haugr.cws.core.model.entities.MemberEntity;
 import java.time.LocalDateTime;
 import java.util.List;
 import javax.persistence.EntityManager;
+import javax.persistence.Query;
+import net.haugr.cws.core.enums.SanityStatus;
+import net.haugr.cws.core.model.entities.DataEntity;
+import net.haugr.cws.core.model.entities.MemberEntity;
 
 /**
  * <p>Data Access Object functionality used explicitly for Sanity Checks.</p>
@@ -36,7 +37,7 @@ public final class SanityDao extends CommonDao {
     }
 
     public List<DataEntity> findFailedRecords(final LocalDateTime since) {
-        final var query = entityManager
+        final Query query = entityManager
                 .createNamedQuery("data.findAllWithState")
                 .setParameter(STATUS, SanityStatus.FAILED)
                 .setParameter(SINCE, since);
@@ -45,7 +46,7 @@ public final class SanityDao extends CommonDao {
     }
 
     public List<DataEntity> findFailedRecords(final MemberEntity circleAdministrator, final LocalDateTime since) {
-        final var query = entityManager
+        final Query query = entityManager
                 .createNamedQuery("data.findAllWithStateForMember")
                 .setParameter(STATUS, SanityStatus.FAILED)
                 .setParameter(SINCE, since)
@@ -55,7 +56,7 @@ public final class SanityDao extends CommonDao {
     }
 
     public List<DataEntity> findFailedRecords(final String circleId, final LocalDateTime since) {
-        final var query = entityManager
+        final Query query = entityManager
                 .createNamedQuery("data.findAllWithStateForCircle")
                 .setParameter(STATUS, SanityStatus.FAILED)
                 .setParameter(SINCE, since)

@@ -16,6 +16,10 @@
  */
 package net.haugr.cws.core.managers;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import javax.persistence.EntityManager;
 import net.haugr.cws.api.dtos.Signature;
 import net.haugr.cws.api.requests.FetchSignatureRequest;
 import net.haugr.cws.api.responses.FetchSignatureResponse;
@@ -23,10 +27,6 @@ import net.haugr.cws.core.enums.Permission;
 import net.haugr.cws.core.model.Settings;
 import net.haugr.cws.core.model.SignatureDao;
 import net.haugr.cws.core.model.entities.SignatureEntity;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import javax.persistence.EntityManager;
 
 /**
  * <p>Business Logic implementation for the CWS FetchSignature request.</p>
@@ -53,7 +53,7 @@ public final class FetchSignatureManager extends AbstractManager<SignatureDao, F
         final List<Signature> signatures = new ArrayList<>(found.size());
 
         for (final SignatureEntity entity : found) {
-            final var signature = new Signature();
+            final Signature signature = new Signature();
             signature.setChecksum(entity.getChecksum());
             signature.setExpires(entity.getExpires());
             signature.setVerifications(entity.getVerifications());
@@ -63,7 +63,7 @@ public final class FetchSignatureManager extends AbstractManager<SignatureDao, F
             signatures.add(signature);
         }
 
-        final var response = new FetchSignatureResponse();
+        final FetchSignatureResponse response = new FetchSignatureResponse();
         response.setSignatures(signatures);
         return response;
     }

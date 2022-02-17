@@ -16,6 +16,11 @@
  */
 package net.haugr.cws.core.managers;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+import javax.persistence.EntityManager;
 import net.haugr.cws.api.common.MemberRole;
 import net.haugr.cws.api.dtos.Circle;
 import net.haugr.cws.api.requests.FetchCircleRequest;
@@ -25,11 +30,6 @@ import net.haugr.cws.core.model.CommonDao;
 import net.haugr.cws.core.model.Settings;
 import net.haugr.cws.core.model.entities.CircleEntity;
 import net.haugr.cws.core.model.entities.TrusteeEntity;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-import javax.persistence.EntityManager;
 
 /**
  * <p>Business Logic implementation for the CWS FetchCircle request.</p>
@@ -52,7 +52,7 @@ public final class FetchCircleManager extends AbstractManager<CommonDao, FetchCi
         verifyRequest(request, Permission.FETCH_CIRCLE);
         Arrays.fill(request.getCredential(), (byte) 0);
 
-        final var response = new FetchCircleResponse();
+        final FetchCircleResponse response = new FetchCircleResponse();
 
         if ((member.getMemberRole() == MemberRole.ADMIN) || settings.hasShowAllCircles()) {
             response.setCircles(fetchCirclesForAdmin());

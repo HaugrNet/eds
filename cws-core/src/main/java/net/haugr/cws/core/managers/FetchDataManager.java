@@ -16,6 +16,12 @@
  */
 package net.haugr.cws.core.managers;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
+import javax.persistence.EntityManager;
 import net.haugr.cws.api.common.Constants;
 import net.haugr.cws.api.common.ReturnCode;
 import net.haugr.cws.api.common.Utilities;
@@ -30,12 +36,6 @@ import net.haugr.cws.core.model.Settings;
 import net.haugr.cws.core.model.entities.DataEntity;
 import net.haugr.cws.core.model.entities.DataTypeEntity;
 import net.haugr.cws.core.model.entities.MetadataEntity;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
-import javax.persistence.EntityManager;
 
 /**
  * <p>Business Logic implementation for the CWS FetchData request.</p>
@@ -122,9 +122,9 @@ public final class FetchDataManager extends AbstractManager<DataDao, FetchDataRe
         // Circle Membership and right TrustLevel of the Member. If no Entity
         // is found, then there can be multiple reasons.
         final DataEntity entity = dao.findDataByMemberAndExternalId(member, metadata.getExternalId());
-        final var response = new FetchDataResponse();
+        final FetchDataResponse response = new FetchDataResponse();
         final MetadataEntity parent = dao.find(MetadataEntity.class, metadata.getParentId());
-        final var metaData = DataDao.convert(metadata, parent.getExternalId());
+        final Metadata metaData = DataDao.convert(metadata, parent.getExternalId());
         final List<Metadata> metadataList = new ArrayList<>(1);
         metadataList.add(metaData);
 
@@ -171,7 +171,7 @@ public final class FetchDataManager extends AbstractManager<DataDao, FetchDataRe
             list.add(data);
         }
 
-        final var response = new FetchDataResponse();
+        final FetchDataResponse response = new FetchDataResponse();
         response.setMetadata(list);
         response.setRecords(count);
 

@@ -16,6 +16,10 @@
  */
 package net.haugr.cws.core.managers;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import javax.persistence.EntityManager;
 import net.haugr.cws.api.dtos.DataType;
 import net.haugr.cws.api.requests.FetchDataTypeRequest;
 import net.haugr.cws.api.responses.FetchDataTypeResponse;
@@ -23,10 +27,6 @@ import net.haugr.cws.core.enums.Permission;
 import net.haugr.cws.core.model.CommonDao;
 import net.haugr.cws.core.model.Settings;
 import net.haugr.cws.core.model.entities.DataTypeEntity;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import javax.persistence.EntityManager;
 
 /**
  * Data Types is the basis for all shared information, as it either provides
@@ -53,13 +53,13 @@ public final class FetchDataTypeManager extends AbstractManager<CommonDao, Fetch
         final List<DataTypeEntity> types = dao.findAllTypes();
         final List<DataType> objectTypes = new ArrayList<>(types.size());
         for (final DataTypeEntity type : types) {
-            final var objectType = new DataType();
+            final DataType objectType = new DataType();
             objectType.setTypeName(type.getName());
             objectType.setType(type.getType());
             objectTypes.add(objectType);
         }
 
-        final var response = new FetchDataTypeResponse();
+        final FetchDataTypeResponse response = new FetchDataTypeResponse();
         response.setDataTypes(objectTypes);
 
         return response;

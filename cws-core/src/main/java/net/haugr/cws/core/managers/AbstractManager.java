@@ -16,6 +16,11 @@
  */
 package net.haugr.cws.core.managers;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import net.haugr.cws.api.common.Constants;
 import net.haugr.cws.api.common.CredentialType;
 import net.haugr.cws.api.common.MemberRole;
@@ -23,10 +28,11 @@ import net.haugr.cws.api.common.ReturnCode;
 import net.haugr.cws.api.common.TrustLevel;
 import net.haugr.cws.api.common.Utilities;
 import net.haugr.cws.api.dtos.Circle;
+import net.haugr.cws.api.requests.AbstractRequest;
 import net.haugr.cws.api.requests.Authentication;
 import net.haugr.cws.api.requests.CircleIdRequest;
-import net.haugr.cws.api.requests.AbstractRequest;
 import net.haugr.cws.api.responses.CwsResponse;
+import net.haugr.cws.core.StartupBean;
 import net.haugr.cws.core.enums.KeyAlgorithm;
 import net.haugr.cws.core.enums.Permission;
 import net.haugr.cws.core.exceptions.AuthenticationException;
@@ -44,12 +50,6 @@ import net.haugr.cws.core.model.entities.CircleEntity;
 import net.haugr.cws.core.model.entities.DataEntity;
 import net.haugr.cws.core.model.entities.MemberEntity;
 import net.haugr.cws.core.model.entities.TrusteeEntity;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import net.haugr.cws.core.StartupBean;
 
 /**
  * <p>Common Business Logic, used by the Business Logic classes.</p>
@@ -195,7 +195,7 @@ public abstract class AbstractManager<D extends CommonDao, R extends CwsResponse
         final Map<String, String> errors = request.validate();
         if (!errors.isEmpty()) {
             final int capacity = errors.size() * 75;
-            final var builder = new StringBuilder(capacity);
+            final StringBuilder builder = new StringBuilder(capacity);
 
             for (final Map.Entry<String, String> error : errors.entrySet()) {
                 builder.append("\nKey: ");
@@ -218,7 +218,7 @@ public abstract class AbstractManager<D extends CommonDao, R extends CwsResponse
     private void verifySession(final A authentication, final String circleId) {
         final byte[] masterEncrypted = crypto.encryptWithMasterKey(authentication.getCredential());
         final String checksum = crypto.generateChecksum(masterEncrypted);
-        final var memberEntity = dao.findMemberByChecksum(checksum);
+        final MemberEntity memberEntity = dao.findMemberByChecksum(checksum);
 
         if (memberEntity != null) {
             if (Utilities.newDate().isBefore(memberEntity.getSessionExpire())) {
@@ -243,7 +243,7 @@ public abstract class AbstractManager<D extends CommonDao, R extends CwsResponse
      */
     private void verifyAccount(final A authentication, final String circleId) {
         final String account = trim(authentication.getAccountName());
-        var memberEntity = dao.findMemberByName(account);
+        MemberEntity memberEntity = dao.findMemberByName(account);
 
         if (memberEntity == null) {
             if (Objects.equals(Constants.ADMIN_ACCOUNT, account)) {
@@ -274,7 +274,7 @@ public abstract class AbstractManager<D extends CommonDao, R extends CwsResponse
     }
 
     protected final MemberEntity createNewAccount(final String accountName, final MemberRole role, final byte[] credential) {
-        final var account = new MemberEntity();
+        final MemberEntity account = new MemberEntity();
         account.setName(accountName);
         account.setMemberRole(role);
         updateMemberPassword(account, credential);
@@ -296,7 +296,7 @@ public abstract class AbstractManager<D extends CommonDao, R extends CwsResponse
     protected final CWSKeyPair updateMemberPassword(final MemberEntity member, final byte[] password) {
         final KeyAlgorithm pbeAlgorithm = settings.getPasswordAlgorithm();
         final KeyAlgorithm rsaAlgorithm = settings.getAsymmetricAlgorithm();
-        final var salt = new IVSalt();
+        final IVSalt salt = new IVSalt();
         final SecretCWSKey key = crypto.generatePasswordKey(pbeAlgorithm, password, salt.getArmored());
         key.setSalt(salt);
 
@@ -365,7 +365,7 @@ public abstract class AbstractManager<D extends CommonDao, R extends CwsResponse
     protected byte[] decryptData(final DataEntity entity) {
         final String armoredSalt = crypto.decryptWithMasterKey(entity.getInitialVector());
         final SecretCWSKey key = extractCircleKey(entity);
-        final var salt = new IVSalt(armoredSalt);
+        final IVSalt salt = new IVSalt(armoredSalt);
         key.setSalt(salt);
 
         return Crypto.decrypt(key, entity.getData());
@@ -396,7 +396,7 @@ public abstract class AbstractManager<D extends CommonDao, R extends CwsResponse
     }
 
     protected static Circle convert(final CircleEntity entity, final String circleKey) {
-        final var circle = new Circle();
+        final Circle circle = new Circle();
 
         circle.setCircleId(entity.getExternalId());
         circle.setCircleName(entity.getName());

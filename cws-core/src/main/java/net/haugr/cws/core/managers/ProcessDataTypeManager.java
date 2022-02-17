@@ -16,6 +16,9 @@
  */
 package net.haugr.cws.core.managers;
 
+import java.util.Arrays;
+import java.util.Objects;
+import javax.persistence.EntityManager;
 import net.haugr.cws.api.common.Constants;
 import net.haugr.cws.api.common.ReturnCode;
 import net.haugr.cws.api.dtos.DataType;
@@ -26,9 +29,6 @@ import net.haugr.cws.core.exceptions.IllegalActionException;
 import net.haugr.cws.core.model.CommonDao;
 import net.haugr.cws.core.model.Settings;
 import net.haugr.cws.core.model.entities.DataTypeEntity;
-import java.util.Arrays;
-import java.util.Objects;
-import javax.persistence.EntityManager;
 
 /**
  * <p>Business Logic implementation for the CWS ProcessDataType request.</p>
@@ -97,11 +97,11 @@ public final class ProcessDataTypeManager extends AbstractManager<CommonDao, Pro
             }
         }
 
-        final var objectType = new DataType();
+        final DataType objectType = new DataType();
         objectType.setTypeName(name);
         objectType.setType(type);
 
-        final var response = new ProcessDataTypeResponse(theDataType(entity) + " was successfully processed.");
+        final ProcessDataTypeResponse response = new ProcessDataTypeResponse(theDataType(entity) + " was successfully processed.");
         response.setDataType(objectType);
 
         return response;

@@ -16,16 +16,6 @@
  */
 package net.haugr.cws.core.managers;
 
-import net.haugr.cws.api.common.ReturnCode;
-import net.haugr.cws.api.requests.SettingRequest;
-import net.haugr.cws.api.responses.SettingResponse;
-import net.haugr.cws.core.enums.KeyAlgorithm;
-import net.haugr.cws.core.enums.Permission;
-import net.haugr.cws.core.enums.StandardSetting;
-import net.haugr.cws.core.exceptions.CWSException;
-import net.haugr.cws.core.model.CommonDao;
-import net.haugr.cws.core.model.Settings;
-import net.haugr.cws.core.model.entities.SettingEntity;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Collection;
@@ -36,6 +26,16 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 import javax.persistence.EntityManager;
+import net.haugr.cws.api.common.ReturnCode;
+import net.haugr.cws.api.requests.SettingRequest;
+import net.haugr.cws.api.responses.SettingResponse;
+import net.haugr.cws.core.enums.KeyAlgorithm;
+import net.haugr.cws.core.enums.Permission;
+import net.haugr.cws.core.enums.StandardSetting;
+import net.haugr.cws.core.exceptions.CWSException;
+import net.haugr.cws.core.model.CommonDao;
+import net.haugr.cws.core.model.Settings;
+import net.haugr.cws.core.model.entities.SettingEntity;
 
 /**
  * <p>The Setting Service, allows for checking and updating existing Settings
@@ -92,7 +92,7 @@ public final class SettingManager extends AbstractManager<CommonDao, SettingResp
         // All corrections have been made, now we can destroy the credentials
         Arrays.fill(request.getCredential(), (byte) 0);
 
-        final var response = new SettingResponse();
+        final SettingResponse response = new SettingResponse();
         response.setSettings(convert(settings));
 
         return response;
@@ -136,13 +136,13 @@ public final class SettingManager extends AbstractManager<CommonDao, SettingResp
                 persistAndUpdateSetting(request, existingSetting, key, value);
             }
         } else {
-            final var entity = new SettingEntity();
+            final SettingEntity entity = new SettingEntity();
             persistAndUpdateSetting(request, entity, key, value);
         }
     }
 
     private void checkStandardSetting(final Map.Entry<String, String> entry) {
-        final var standardSetting = StandardSetting.find(entry.getKey());
+        final StandardSetting standardSetting = StandardSetting.find(entry.getKey());
         if (standardSetting != null) {
             if (isEmpty(entry.getValue())) {
                 throw new CWSException(ReturnCode.SETTING_WARNING, "The value for the key '" + entry.getKey() + "' is undefined.");
@@ -191,7 +191,7 @@ public final class SettingManager extends AbstractManager<CommonDao, SettingResp
     private static void checkAlgorithm(final KeyAlgorithm.Type type, final StandardSetting setting, final String value) {
         final Set<KeyAlgorithm> algorithms = findEntriesForType(type);
 
-        var match = false;
+        boolean match = false;
         for (final KeyAlgorithm algorithm : algorithms) {
             if (Objects.equals(algorithm.name(), value)) {
                 match = true;

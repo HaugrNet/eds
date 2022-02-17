@@ -16,14 +16,9 @@
  */
 package net.haugr.cws.core.jce;
 
-import net.haugr.cws.api.common.Constants;
-import net.haugr.cws.api.common.ReturnCode;
-import net.haugr.cws.core.enums.KeyAlgorithm;
-import net.haugr.cws.core.exceptions.CWSException;
-import net.haugr.cws.core.exceptions.CryptoException;
-import net.haugr.cws.core.model.Settings;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.Charset;
@@ -35,6 +30,12 @@ import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
+import net.haugr.cws.api.common.Constants;
+import net.haugr.cws.api.common.ReturnCode;
+import net.haugr.cws.core.enums.KeyAlgorithm;
+import net.haugr.cws.core.exceptions.CWSException;
+import net.haugr.cws.core.exceptions.CryptoException;
+import net.haugr.cws.core.model.Settings;
 
 /**
  * <p>This Singleton holds the CWS Master Key, which is set upon instantiating
@@ -98,7 +99,7 @@ public final class MasterKey {
 
     public static byte[] readMasterKeySecretFromUrl(final String masterKeyUrl) {
         try {
-            final var url = new URL(masterKeyUrl);
+            final URL url = new URL(masterKeyUrl);
             // Note, that the following line is raised as a security issue by
             // SonarQube. Normally, the rule is correct, but only if the
             // information read is also returned. In this case, the content
@@ -116,9 +117,9 @@ public final class MasterKey {
     private static byte[] readContent(final URLConnection connection) throws IOException {
         final int length = connection.getContentLength();
 
-        try (final var inputStream = connection.getInputStream();
-             final var outputStream = new ByteArrayOutputStream(length)) {
-            final var buffer = new byte[BUFFER_SIZE];
+        try (final InputStream inputStream = connection.getInputStream();
+             final ByteArrayOutputStream outputStream = new ByteArrayOutputStream(length)) {
+            final byte[] buffer = new byte[BUFFER_SIZE];
 
             int read = inputStream.read(buffer);
             while (read != -1) {
@@ -131,7 +132,7 @@ public final class MasterKey {
     }
 
     public static char[] generateSecretChars(final byte[] secret) {
-        final var chars = new char[secret.length];
+        final char[] chars = new char[secret.length];
         for (int i = 0; i < secret.length; i++) {
             chars[i] = (char) secret[i];
         }
@@ -145,12 +146,12 @@ public final class MasterKey {
 
             final String salt = settings.getSalt();
             final byte[] secretSalt = salt.getBytes(CHARSET);
-            final var keyFactory = SecretKeyFactory.getInstance(ALGORITHM.getTransformationValue());
+            final SecretKeyFactory keyFactory = SecretKeyFactory.getInstance(ALGORITHM.getTransformationValue());
             final KeySpec keySpec = new PBEKeySpec(secretChars, secretSalt, ITERATIONS, ALGORITHM.getLength());
             final SecretKey tmp = keyFactory.generateSecret(keySpec);
             final SecretKey secretKey = new SecretKeySpec(tmp.getEncoded(), ALGORITHM.getName());
 
-            final var newKey = new SecretCWSKey(ALGORITHM.getDerived(), secretKey);
+            final SecretCWSKey newKey = new SecretCWSKey(ALGORITHM.getDerived(), secretKey);
             newKey.setSalt(new IVSalt(salt));
 
             return newKey;

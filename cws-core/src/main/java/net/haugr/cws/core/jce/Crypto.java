@@ -16,11 +16,6 @@
  */
 package net.haugr.cws.core.jce;
 
-import java.security.NoSuchProviderException;
-import net.haugr.cws.api.common.Constants;
-import net.haugr.cws.core.enums.KeyAlgorithm;
-import net.haugr.cws.core.exceptions.CryptoException;
-import net.haugr.cws.core.model.Settings;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.Key;
@@ -29,6 +24,7 @@ import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.Signature;
@@ -50,6 +46,10 @@ import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
+import net.haugr.cws.api.common.Constants;
+import net.haugr.cws.core.enums.KeyAlgorithm;
+import net.haugr.cws.core.exceptions.CryptoException;
+import net.haugr.cws.core.model.Settings;
 
 /**
  * <p>This library contain all the Cryptographic Operations, needed for CWS, to
@@ -110,11 +110,11 @@ public final class Crypto {
             final char[] extendedSecret = convertSecret(secret);
             final byte[] secretSalt = stringToBytes(salt);
 
-            final var factory = SecretKeyFactory.getInstance(algorithm.getTransformationValue());
+            final SecretKeyFactory factory = SecretKeyFactory.getInstance(algorithm.getTransformationValue());
             final KeySpec spec = new PBEKeySpec(extendedSecret, secretSalt, settings.getPasswordIterations(), algorithm.getLength());
             final SecretKey tmpKey = factory.generateSecret(spec);
             final SecretKey secretKey = new SecretKeySpec(tmpKey.getEncoded(), algorithm.getName());
-            final var key = new SecretCWSKey(algorithm.getDerived(), secretKey);
+            final SecretCWSKey key = new SecretCWSKey(algorithm.getDerived(), secretKey);
             key.setSalt(new IVSalt(salt));
 
             return key;
@@ -138,9 +138,9 @@ public final class Crypto {
      */
     private char[] convertSecret(final byte[] secret) {
         final char[] secretChars = MasterKey.generateSecretChars(secret);
-
         final char[] salt = settings.getSalt().toCharArray();
-        final var chars = new char[secretChars.length + salt.length];
+        final char[] chars = new char[secretChars.length + salt.length];
+
         System.arraycopy(secretChars, 0, chars, 0, secretChars.length);
         System.arraycopy(salt, 0, chars, secretChars.length, salt.length);
 
@@ -149,7 +149,7 @@ public final class Crypto {
 
     public static SecretCWSKey generateSymmetricKey(final KeyAlgorithm algorithm) {
         try {
-            final var generator = KeyGenerator.getInstance(algorithm.getName(), algorithm.getProvider());
+            final KeyGenerator generator = KeyGenerator.getInstance(algorithm.getName(), algorithm.getProvider());
             generator.init(algorithm.getLength());
             final SecretKey key = generator.generateKey();
 
@@ -161,9 +161,9 @@ public final class Crypto {
 
     public static CWSKeyPair generateAsymmetricKey(final KeyAlgorithm algorithm) {
         try {
-            final var generator = KeyPairGenerator.getInstance(algorithm.getName());
+            final KeyPairGenerator generator = KeyPairGenerator.getInstance(algorithm.getName());
             generator.initialize(algorithm.getLength());
-            final var keyPair = generator.generateKeyPair();
+            final KeyPair keyPair = generator.generateKeyPair();
 
             return new CWSKeyPair(algorithm, keyPair);
         } catch (IllegalArgumentException | NoSuchAlgorithmException e) {
@@ -173,7 +173,7 @@ public final class Crypto {
 
     public String generateChecksum(final byte[] bytes) {
         try {
-            final var digest = MessageDigest.getInstance(settings.getHashAlgorithm().getAlgorithm());
+            final MessageDigest digest = MessageDigest.getInstance(settings.getHashAlgorithm().getAlgorithm());
             final byte[] hashed = digest.digest(bytes);
 
             return Base64.getEncoder().encodeToString(hashed);
@@ -188,7 +188,7 @@ public final class Crypto {
 
     public byte[] sign(final PrivateKey key, final byte[] message) {
         try {
-            final var signer = Signature.getInstance(settings.getSignatureAlgorithm().getTransformationValue());
+            final Signature signer = Signature.getInstance(settings.getSignatureAlgorithm().getTransformationValue());
             signer.initSign(key);
             signer.update(message);
 
@@ -200,7 +200,7 @@ public final class Crypto {
 
     public boolean verify(final PublicKey key, final byte[] message, final byte[] signature) {
         try {
-            final var verifier = Signature.getInstance(settings.getSignatureAlgorithm().getTransformationValue());
+            final Signature verifier = Signature.getInstance(settings.getSignatureAlgorithm().getTransformationValue());
             verifier.initVerify(key);
             verifier.update(message);
 
@@ -228,7 +228,7 @@ public final class Crypto {
 
     public static byte[] encrypt(final SecretCWSKey key, final byte[] toEncrypt) {
         try {
-            final var cipher = prepareCipher(key, Cipher.ENCRYPT_MODE);
+            final Cipher cipher = prepareCipher(key, Cipher.ENCRYPT_MODE);
             return cipher.doFinal(toEncrypt);
         } catch (BadPaddingException | IllegalBlockSizeException | NoSuchPaddingException | NoSuchAlgorithmException | InvalidAlgorithmParameterException | InvalidKeyException e) {
             throw new CryptoException(e.getMessage(), e);
@@ -237,7 +237,7 @@ public final class Crypto {
 
     public static byte[] encrypt(final PublicCWSKey key, final byte[] toEncrypt) {
         try {
-            final var cipher = prepareCipher(key, Cipher.ENCRYPT_MODE);
+            final Cipher cipher = prepareCipher(key, Cipher.ENCRYPT_MODE);
             return cipher.doFinal(toEncrypt);
         } catch (ClassCastException | BadPaddingException | IllegalBlockSizeException | NoSuchPaddingException | NoSuchAlgorithmException | InvalidAlgorithmParameterException | InvalidKeyException e) {
             throw new CryptoException(e.getMessage(), e);
@@ -246,7 +246,7 @@ public final class Crypto {
 
     public static byte[] decrypt(final SecretCWSKey key, final byte[] toDecrypt) {
         try {
-            final var cipher = prepareCipher(key, Cipher.DECRYPT_MODE);
+            final Cipher cipher = prepareCipher(key, Cipher.DECRYPT_MODE);
             return cipher.doFinal(toDecrypt);
         } catch (BadPaddingException | IllegalBlockSizeException | NoSuchPaddingException | NoSuchAlgorithmException | InvalidAlgorithmParameterException | InvalidKeyException e) {
             throw new CryptoException(e.getMessage(), e);
@@ -255,7 +255,7 @@ public final class Crypto {
 
     public static byte[] decrypt(final PrivateCWSKey key, final byte[] toDecrypt) {
         try {
-            final var cipher = prepareCipher(key, Cipher.DECRYPT_MODE);
+            final Cipher cipher = prepareCipher(key, Cipher.DECRYPT_MODE);
             return cipher.doFinal(toDecrypt);
         } catch (ClassCastException | BadPaddingException | IllegalBlockSizeException | NoSuchPaddingException | NoSuchAlgorithmException | InvalidAlgorithmParameterException | InvalidKeyException e) {
             throw new CryptoException(e.getMessage(), e);
@@ -314,7 +314,7 @@ public final class Crypto {
      * @return String representation of the Key
      */
     public static String armoringPublicKey(final Key key) {
-        final var keySpec = new X509EncodedKeySpec(key.getEncoded());
+        final X509EncodedKeySpec keySpec = new X509EncodedKeySpec(key.getEncoded());
         final byte[] rawKey = keySpec.getEncoded();
 
         return Base64.getEncoder().encodeToString(rawKey);
@@ -323,9 +323,9 @@ public final class Crypto {
     public PublicKey dearmoringPublicKey(final String armoredKey) {
         try {
             final KeyAlgorithm algorithm = settings.getAsymmetricAlgorithm();
-            final var keyFactory = KeyFactory.getInstance(algorithm.getName());
+            final KeyFactory keyFactory = KeyFactory.getInstance(algorithm.getName());
             final byte[] rawKey = Base64.getDecoder().decode(armoredKey);
-            final var x509KeySpec = new X509EncodedKeySpec(rawKey);
+            final KeySpec x509KeySpec = new X509EncodedKeySpec(rawKey);
 
             return keyFactory.generatePublic(x509KeySpec);
         } catch (InvalidKeySpecException | NoSuchAlgorithmException e) {
@@ -345,7 +345,7 @@ public final class Crypto {
      * @return Armored (PKCS8 and Base64 encoded encrypted key)
      */
     public static String encryptAndArmorPrivateKey(final SecretCWSKey encryptionKey, final Key privateKey) {
-        final var keySpec = new PKCS8EncodedKeySpec(privateKey.getEncoded());
+        final PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(privateKey.getEncoded());
         final byte[] rawKey = keySpec.getEncoded();
         final byte[] encryptedKey = encrypt(encryptionKey, rawKey);
 
@@ -359,10 +359,10 @@ public final class Crypto {
             // algorithm and thus name, we can use the Asymmetric Algorithm
             // from the Settings.
             final KeyAlgorithm algorithm = settings.getAsymmetricAlgorithm();
-            final var keyFactory = KeyFactory.getInstance(algorithm.getName());
+            final KeyFactory keyFactory = KeyFactory.getInstance(algorithm.getName());
             final byte[] dearmored = Base64.getDecoder().decode(armoredKey);
             final byte[] rawKey = decrypt(decryptionKey, dearmored);
-            final var keySpec = new PKCS8EncodedKeySpec(rawKey);
+            final KeySpec keySpec = new PKCS8EncodedKeySpec(rawKey);
 
             return keyFactory.generatePrivate(keySpec);
         } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
@@ -404,14 +404,12 @@ public final class Crypto {
     public CWSKeyPair extractAsymmetricKey(final KeyAlgorithm algorithm, final SecretCWSKey key, final String salt, final String armoredPublicKey, final String armoredPrivateKey) {
         key.setSalt(new IVSalt(salt));
 
-        // Extracting the Public Key
-        final var publicKey = dearmoringPublicKey(armoredPublicKey);
-
-        // Extracting the Private Key
-        final var privateKey = dearmoringPrivateKey(key, armoredPrivateKey);
+        // Extracting the Public & Private Keys
+        final PublicKey publicKey = dearmoringPublicKey(armoredPublicKey);
+        final PrivateKey privateKey = dearmoringPrivateKey(key, armoredPrivateKey);
 
         // Build the CWSKeyPair
-        final var keyPair = new KeyPair(publicKey, privateKey);
+        final KeyPair keyPair = new KeyPair(publicKey, privateKey);
         return new CWSKeyPair(algorithm, keyPair);
     }
 

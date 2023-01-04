@@ -34,6 +34,9 @@ import org.slf4j.LoggerFactory;
 public final class IVSalt {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(IVSalt.class);
+    // SpotBugs: https://tinyurl.com/juhv7sdm
+    // CWE-440: https://cwe.mitre.org/data/definitions/440.html
+    private static final SecureRandom RANDOM = new SecureRandom();
     // For AES, the block size is always 128 bit and thus the IV must also be of
     // the same size. See: https://en.wikipedia.org/wiki/Initialization_vector
     private static final int IV_SIZE = 16;
@@ -47,7 +50,7 @@ public final class IVSalt {
         // https://sonarcloud.io/coding_rules?open=squid:S3329&rule_key=squid:S3329
         // the IV should be generated using the SecureRandom class as follows.
         final byte[] random = new byte[IV_SIZE];
-        new SecureRandom().nextBytes(random);
+        RANDOM.nextBytes(random);
         this.armored = Base64.getEncoder().encodeToString(random);
     }
 

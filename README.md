@@ -1,4 +1,4 @@
-# CWS - Cryptographic Web Share
+# EDS - Encrypted Data Share
 
 [![CircleCI](https://circleci.com/gh/HaugrNet/cws.png?style=shield)](https://circleci.com/gh/HaugrNet/cws)
 [![SonarQube](https://sonarcloud.io/api/project_badges/measure?project=net.haugr:cws&metric=alert_status)](https://sonarcloud.io/dashboard?id=net.haugr:cws)
@@ -8,51 +8,52 @@
 [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/1566/badge)](https://bestpractices.coreinfrastructure.org/projects/1566)
 [![Software License](https://img.shields.io/badge/license-Apache+License+2.0-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0)
 
-[CWS](https://haugr.net/), Cryptographic Web Share, works as a "PGP for the
+[EDS](https://haugr.net/), Encrypted Data Share, works as a "PGP for the
 Cloud". It is designed as a backend component with the vision that it should be
 possible to exchange data between multiple parties using encrypted storage,
 where both the parties involved, and the data exchanged can be anything from
-simple files to complex data objects - CWS only cares about bytes.
+simple files to complex data objects - EDS only cares about bytes.
 
-Via the public API (REST based WebServices), it is possible to access the
+Via the public (REST based) API, it is possible to access the
 internal logic, where keys are unlocked, based on user credentials and used to
 encrypt and decrypt data, storing only encrypted keys and data. Using the same
 basic mechanism as PGP, combining Asymmetric & Symmetric keys, it is possible
 for multiple parties to exchange data safely and securely.
 
-Since CWS only focused on bytes and does not have any care for more information,
+Since EDS only focused on bytes and does not have any care for more information,
 it can be used to store either files between users or data objects between apps
-or applications. This makes CWS the perfect companion for anyone who have Data
+or applications. This makes EDS the perfect companion for anyone who have Data
 Protection & Privacy concerns, such as GDPR.
 
-CWS is written in Java 11 / Jakarta EE 9, with no third-part dependencies, meaning
+EDS is written in Java 17 / Jakarta EE 10, with no third-part dependencies, meaning
 it can run on any Host or in any Cloud where a Java EE Container is
 available. Currently, only the [PostgreSQL](https://www.postgresql.org/) database
 is supported, but thanks to the flexibility of Java EE, it is possible to use any
-database desired. Testing of CWS has been done using both
+database desired. Testing of EDS has been done using both
 [WildFly](http://www.wildfly.org/) and [Payara](https://payara.fish/).
 
 ## Build, Install and Run
 
-The final version 1.2 of CWS can be downloaded from [haugr.net](https://haugr.net/),
-version 2.0 is planned to be a minor update. The build requires Java JDK 11,
+The final version 1.2 can be downloaded from [haugr.net](https://haugr.net/),
+version 2.0 will be a major upgrade, with new domain, project name, and various
+internal changes that makes it a breaking update. The build requires Java JDK 17,
 and [Maven](https://maven.apache.org/).
 
 In the accessories/release folder, there is a number of files, which is used to
-install and run CWS. Either by building CWS from scratch, using a local Payara
+install and run EDS. Either by building EDS from scratch, using a local Payara
 or WildFly instance, or even just use the provided Docker configuration.
 
 ### Docker
 
 In the accessories folder, there is a docker.sh script. which can be used to
-create a new CWS container, running on a port of your choice. The configuration
+create a new EDS container, running on a port of your choice. The configuration
 will download all the required components, and handle the details for you.
 
 ### Local Container
 
 By adding the accessories/release/bin directory in your path, you can take
 advantage of the provided Payara or WildFly scripts to help configure & deploy
-a local CWS instance using your existing container.
+a local EDS instance using your existing container.
 
 ### Build from scratch
 
@@ -60,15 +61,15 @@ a local CWS instance using your existing container.
 create the deployable WAR packages for either Payara or WildFly:
 
 ```
-cd [ /path/to/cws/sources ]
+cd [ /path/to/eds/sources ]
 mvn clean verify
 ```
 
 Using the WildFly script to deploy the correct WAR file.
-Now copy the cws.war file in place.
+Now copy the eds.war file in place.
 
 ```
-export PATH=[ / path/to/cws/sources ]/accessories/release/bin:${PATH}
+export PATH=[ / path/to/eds/sources ]/accessories/release/bin:${PATH}
 wildfly.sh configure
 wildfly.sh deploy
 ```
@@ -79,14 +80,14 @@ JSON based REST API.
 
 ## Who is this for
 
-Anyone for whom data protection is important may find CWS useful. It is designed
+Anyone for whom data protection is important may find EDS useful. It is designed
 so everything is stored encrypted in a way, so only those who the data belongs
 to may access it. This is achieved by ensuring that the full control over all
 Keys is placed with the users.
 
 ## Security Features
 
-Besides, encrypting all data stored, the CWS also has a number of features to
+Besides, encrypting all data stored, the EDS also has a number of features to
 ensure that the security is as high as it can be, considering that it can be
 deployed in a "hostile" environment.
 
@@ -101,12 +102,15 @@ deployed in a "hostile" environment.
 
 ## Release Plan
 
-This is the CWS 2.0 development branch, with the these features planned:
+This is the EDS 2.0 development branch, with the these features planned:
 
-* [Migrate to the haugr.net domain](https://github.com/JavaDogs/cws/issues/72)
 * [Migrate code base from Java 8 to Java 11](https://github.com/JavaDogs/cws/issues/71)
+* [Upgrade code base to Java 17](https://github.com/HaugrNet/cws/issues/82)
 * [Migrate from Java EE 7 to Jakarta EE 8](https://github.com/JavaDogs/cws/issues/70)
+* [Upgrade JavaEE/JakartaEE to JakartaEE 10](https://github.com/HaugrNet/cws/issues/81)
 * [Convert Date Objects to Java 8+ Time Objects](https://github.com/JavaDogs/cws/issues/69)
+* [Migrate to the haugr.net domain](https://github.com/JavaDogs/cws/issues/72)
+* [Rename Packages & Project to EDS](https://github.com/HaugrNet/cws/issues/80)
 
 Even though the code base will be migrated, and new features will only be added
 in the 2.0+ releases, issues discovered in the 1.x releases will be addressed
@@ -138,12 +142,12 @@ is meaningless and should be removed.
 
 ### Style Guide
 
-CWS is developed using IntelliJ IDEA & a local SonarQube instance. The styles
+EDS is developed using IntelliJ IDEA & a local SonarQube instance. The styles
 used, and the SonarQube Quality Profile can be found in the accessories folder.
 
 ## Software License
 
-The CWS is released under Apache License 2 or APL2.
+The EDS is released under Apache License 2 or APL2.
 
 ## Contact
 

@@ -1,20 +1,37 @@
 #!/bin/bash
 
-port=${CWS_PORT:-}
+#
+# EDS, Encrypted Data Share - open source Cryptographic Sharing system.
+# Copyright (c) 2016-2023, haugr.net
+# mailto: eds AT haugr DOT net
+#
+# EDS is free software; you can redistribute it and/or modify it under the
+# terms of the Apache License, as published by the Apache Software Foundation.
+#
+# EDS is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE. See the Apache License for more details.
+#
+# You should have received a copy of the Apache License, version 2, along with
+# this program; If not, you can download a copy of the License
+# here: https://www.apache.org/licenses/
+#
+
+port=${EDS_PORT:-}
 if [[ "${port}" = "" ]]; then
     port=8080
 fi
 
 action=${1}
-image="cws"
+image="eds"
 container="${image}-2.0"
-source release/bin/cwsFunctions.sh
+source release/bin/edsFunctions.sh
 
 # ==============================================================================
 # Check if the Docker container exists
 # ------------------------------------------------------------------------------
 # Return:
-#   True (0) if CWS exists, otherwise False (1)
+#   True (0) if EDS exists, otherwise False (1)
 # ==============================================================================
 function exists() {
     readonly exists=$(docker images -a | grep "${image}")
@@ -29,7 +46,7 @@ function exists() {
 # Check if the Docker is running or not
 # ------------------------------------------------------------------------------
 # Return:
-#   True (0) if CWS is running, otherwise False (1)
+#   True (0) if EDS is running, otherwise False (1)
 # ==============================================================================
 function running() {
     readonly alive=$(docker ps -a | grep "${image}" | grep "Exited")
@@ -93,9 +110,9 @@ function doBuild() {
         fi
 
         # Create Docker image
-        cp ../cws-wildfly/target/cws.war docker
+        cp ../eds-wildfly/target/eds.war docker
         docker build --build-arg HTTP_PROXY="${proxy}" --build-arg HTTPS_PROXY="${proxy}" -t ${image} -f docker/Dockerfile .
-        rm docker/apt.conf docker/wgetrc docker/cws.war
+        rm docker/apt.conf docker/wgetrc docker/eds.war
 
         echo
         echo "${image^^} Docker image build completed. Will now run the following command:"
@@ -195,7 +212,7 @@ function checkAlive() {
     echo
 
     if [[ ${retries} -le 30 ]]; then
-        json=$(curl --silent --header "Content-Type: application/json" --request POST "http://localhost:${port}/cws/api/version")
+        json=$(curl --silent --header "Content-Type: application/json" --request POST "http://localhost:${port}/eds/api/version")
         echo "${image^^} version available: $(inspectResponse "${json}" "version")"
     else
         echo "Error starting ${image^^} :-("

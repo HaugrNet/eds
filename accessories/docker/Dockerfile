@@ -1,9 +1,9 @@
 # ==============================================================================
-# Docker file for CWS
+# Docker file for EDS
 # ------------------------------------------------------------------------------
 
-# Building it, based on Ubuntu 18.04 LTS Bionic Beaver
-FROM ubuntu:18.04
+# Building it, based on Ubuntu 22.04 LTS
+FROM ubuntu:22.04
 
 # The build script handles the potential Proxy settings needed
 COPY docker/apt.conf /etc/apt/apt.conf
@@ -53,13 +53,13 @@ RUN mkdir -p ${JBOSS_HOME}/modules/org/postgresql/main/ \
   && wget -q https://jdbc.postgresql.org/download/postgresql-42.2.8.jar
 COPY release/wildfly/module.xml ${JBOSS_HOME}/modules/org/postgresql/main/
 COPY release/wildfly/standalone-full.xml ${JBOSS_HOME}/standalone/configuration
-COPY docker/cws.war ${JBOSS_HOME}/standalone/deployments
+COPY docker/eds.war ${JBOSS_HOME}/standalone/deployments
 RUN chown -R postgres ${JBOSS_HOME}/standalone
 
-# To be able to use CWS, we have to expose WildFly (HTTP on port 8080)
+# To be able to use EDS, we have to expose WildFly (HTTP on port 8080)
 EXPOSE 8080/tcp
 
 # Finally, we're starting the services
 USER postgres
 ENTRYPOINT /usr/lib/postgresql/10/bin/pg_ctl -D /var/lib/postgresql/10/main -l /var/lib/postgresql/logfile start \
-  && ${JBOSS_HOME}/bin/standalone.sh -c standalone-full.xml -Djboss.node.name=cws -b 0.0.0.0
+  && ${JBOSS_HOME}/bin/standalone.sh -c standalone-full.xml -Djboss.node.name=eds -b 0.0.0.0

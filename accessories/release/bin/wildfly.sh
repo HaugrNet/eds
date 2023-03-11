@@ -1,5 +1,22 @@
 #!/bin/bash
 
+#
+# EDS, Encrypted Data Share - open source Cryptographic Sharing system.
+# Copyright (c) 2016-2023, haugr.net
+# mailto: eds AT haugr DOT net
+#
+# EDS is free software; you can redistribute it and/or modify it under the
+# terms of the Apache License, as published by the Apache Software Foundation.
+#
+# EDS is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE. See the Apache License for more details.
+#
+# You should have received a copy of the Apache License, version 2, along with
+# this program; If not, you can download a copy of the License
+# here: https://www.apache.org/licenses/
+#
+
 # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 # WildFly Control Script
 # -----------------------------------------------------------------------------
@@ -7,9 +24,9 @@
 # -----------------------------------------------------------------------------
 readonly dbHost="localhost"
 readonly dbPort="5432"
-readonly dbUser="cws_user"
-readonly dbPassword="cws"
-readonly dbName="cws"
+readonly dbUser="eds_user"
+readonly dbPassword="eds"
+readonly dbName="eds"
 # Maximal file size for uploading to WildFly - 25 MB (25 * 1024 * 1024)
 readonly maxPostSize="26214400"
 readonly wildfly=${JBOSS_HOME}
@@ -54,13 +71,13 @@ action="${1}"
 if [[ "${action}" == "configure" ]]; then
     if (runJbossCli "read-attribute server-state"); then
         if [[ ! -e ${wildfly}/modules/org/postgresql/main/module.xml ]]; then
-            echo "Configuring WildFly for CWS"
+            echo "Configuring WildFly for EDS"
             wget -q -P /tmp/ "https://jdbc.postgresql.org/download/postgresql-${psqlVersion}.jar"
             runJbossCli "module add --name=org.postgresql --resources=/tmp/postgresql-${psqlVersion}.jar --dependencies=javaee.api"
             runJbossCli "/subsystem=datasources/jdbc-driver=postgresql:add(driver-name=postgresql,driver-module-name=org.postgresql,driver-xa-datasource-class-name=org.postgresql.xa.PGXADataSource)"
-            runJbossCli "data-source add --name=cwsDS --driver-name=postgresql --jndi-name=java:/datasources/cwsDS --connection-url=jdbc:postgresql://${dbHost}:${dbPort}/${dbName} --user-name=${dbUser} --password=${dbPassword} --use-ccm=false --max-pool-size=25 --blocking-timeout-wait-millis=5000 --enabled=true"
+            runJbossCli "data-source add --name=edsDS --driver-name=postgresql --jndi-name=java:/datasources/edsDS --connection-url=jdbc:postgresql://${dbHost}:${dbPort}/${dbName} --user-name=${dbUser} --password=${dbPassword} --use-ccm=false --max-pool-size=25 --blocking-timeout-wait-millis=5000 --enabled=true"
             runJbossCli "/subsystem=undertow/server=default-server/http-listener=default/:write-attribute(name=max-post-size,value=${maxPostSize})"
-            runJbossCli "/subsystem=logging/logger=net.haugr.cws:add"
+            runJbossCli "/subsystem=logging/logger=net.haugr.eds:add"
             rm -f "/tmp/postgresql-${psqlVersion}.jar"
             echo "Restarting WildFly ..."
             runJbossCli "reload"
@@ -73,8 +90,8 @@ if [[ "${action}" == "configure" ]]; then
     fi
 elif [[ "${action}" == "status" ]]; then
     if (runJbossCli "read-attribute server-state"); then
-        if (runJbossCli "deployment-info --name=cws.war"); then
-            echo "WildFly is running with CWS deployed"
+        if (runJbossCli "deployment-info --name=eds.war"); then
+            echo "WildFly is running with EDS deployed"
         else
             echo "WildFly is running"
         fi
@@ -87,9 +104,9 @@ elif [[ "${action}" == "start" ]]; then
     else
         echo "Starting WildFly ..."
         if [[ "${debugPort}" == "" ]]; then
-            "${wildfly}/bin/standalone.sh" -c standalone-full.xml -b 0.0.0.0 -Djboss.node.name=cws &
+            "${wildfly}/bin/standalone.sh" -c standalone-full.xml -b 0.0.0.0 -Djboss.node.name=eds &
         else
-            "${wildfly}/bin/standalone.sh" -c standalone-full.xml -b 0.0.0.0 -Djboss.node.name=cws --debug "${debugPort}" &
+            "${wildfly}/bin/standalone.sh" -c standalone-full.xml -b 0.0.0.0 -Djboss.node.name=eds --debug "${debugPort}" &
         fi
     fi
 elif [[ "${action}" == "stop" ]]; then
@@ -101,18 +118,18 @@ elif [[ "${action}" == "stop" ]]; then
     fi
 elif [[ "${action}" == "deploy" ]]; then
     if (runJbossCli "read-attribute server-state"); then
-        echo "Deploying CWS"
-        runJbossCli "deploy $(dirname "${0}")/../wildfly/cws.war --force"
+        echo "Deploying EDS"
+        runJbossCli "deploy $(dirname "${0}")/../wildfly/eds.war --force"
     else
         echo "WildFly is not running"
     fi
 elif [[ "${action}" == "undeploy" ]]; then
     if (runJbossCli "read-attribute server-state"); then
-        if (runJbossCli "deployment-info --name=cws.war"); then
-            echo "Undeploying CWS"
-            runJbossCli "undeploy cws.war"
+        if (runJbossCli "deployment-info --name=eds.war"); then
+            echo "Undeploying EDS"
+            runJbossCli "undeploy eds.war"
         else
-            echo "CWS was not deployed"
+            echo "EDS was not deployed"
         fi
     else
         echo "WildFly is not running"
@@ -124,12 +141,12 @@ else
     echo "Usage: $(basename "${0}") [Action]"
     echo
     echo "  The Action must be one of the following:"
-    echo "    configure Attempts to configure a CWS WildFly instance"
-    echo "    start     Attempts to start a CWS WildFly instance"
-    echo "    stop      Attempts to stop the running CWS WildFly instance"
+    echo "    configure Attempts to configure a EDS WildFly instance"
+    echo "    start     Attempts to start a EDS WildFly instance"
+    echo "    stop      Attempts to stop the running EDS WildFly instance"
     echo "    status    Check the current status of WildFly"
-    echo "    deploy    Deploy the latest CWS snapshot to WildFly"
-    echo "    undeploy  Undeploy the currently deployed CWS snapshot"
+    echo "    deploy    Deploy the latest EDS snapshot to WildFly"
+    echo "    undeploy  Undeploy the currently deployed EDS snapshot"
     echo "    log       Tail on the Server Log"
     echo
 fi

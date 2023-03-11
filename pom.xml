@@ -1,12 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ EDS, Encrypted Data Share - open source Cryptographic Sharing system.
+  ~ Copyright (c) 2016-2023, haugr.net
+  ~ mailto: eds AT haugr DOT net
+  ~
+  ~ EDS is free software; you can redistribute it and/or modify it under the
+  ~ terms of the Apache License, as published by the Apache Software Foundation.
+  ~
+  ~ EDS is distributed in the hope that it will be useful, but WITHOUT ANY
+  ~ WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+  ~ FOR A PARTICULAR PURPOSE. See the Apache License for more details.
+  ~
+  ~ You should have received a copy of the Apache License, version 2, along with
+  ~ this program; If not, you can download a copy of the License
+  ~ here: https://www.apache.org/licenses/
+  -->
+
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>net.haugr</groupId>
-    <artifactId>cws</artifactId>
+    <artifactId>eds</artifactId>
     <version>2.0-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <name>CWS</name>
-    <description>CWS, Cryptographic Web Share</description>
+    <name>EDS</name>
+    <description>EDS, Encrypted Data Share</description>
     <url>https://haugr.net/</url>
 
     <organization>
@@ -34,19 +51,18 @@
     </developers>
 
     <modules>
-        <module>cws-api</module>
-        <module>cws-core</module>
-        <module>cws-rest</module>
-        <module>cws-wildfly</module>
-        <module>cws-payara</module>
-        <module>cws-client</module>
-        <module>cws-fitnesse</module>
+        <module>eds-api</module>
+        <module>eds-core</module>
+        <module>eds-rest</module>
+        <module>eds-wildfly</module>
+        <module>eds-client</module>
+        <module>eds-fitnesse</module>
     </modules>
 
     <scm>
-        <url>scm:git:https://github.com/JavaDogs/cws.git</url>
-        <connection>scm:git:https://github.com/JavaDogs/cws.git</connection>
-        <developerConnection>scm:git:https://github.com/JavaDogs/cws.git</developerConnection>
+        <url>scm:git:https://github.com/JavaDogs/eds.git</url>
+        <connection>scm:git:https://github.com/JavaDogs/eds.git</connection>
+        <developerConnection>scm:git:https://github.com/JavaDogs/eds.git</developerConnection>
     </scm>
 
     <distributionManagement>
@@ -68,13 +84,13 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <!-- SonarQube Settings -->
-        <sonar.projectName>Cryptographic Web Share</sonar.projectName>
+        <sonar.projectName>Encrypted Data Share</sonar.projectName>
         <sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
         <!-- Sonar is by default analyzing everything. But Generated Code is
              beyond our control, so error reports from this is just annoying!
              Legend: *  - zero or more characters
                      ** - zero or more directories -->
-        <sonar.exclusions>**/generated*/**,**/client/**,**/fitnesse/**</sonar.exclusions>
+        <sonar.exclusions>**/client/**,**/fitnesse/**</sonar.exclusions>
     </properties>
 
     <dependencyManagement>
@@ -93,22 +109,22 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>cws-api</artifactId>
+                <artifactId>eds-api</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>cws-core</artifactId>
+                <artifactId>eds-core</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>cws-rest</artifactId>
+                <artifactId>eds-rest</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>cws-client</artifactId>
+                <artifactId>eds-client</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
@@ -116,7 +132,7 @@
             <dependency>
                 <groupId>com.google.code.gson</groupId>
                 <artifactId>gson</artifactId>
-                <version>2.10</version>
+                <version>2.10.1</version>
             </dependency>
             <dependency>
                 <groupId>org.glassfish.jersey.core</groupId>
@@ -130,18 +146,18 @@
             <dependency>
                 <groupId>org.junit.jupiter</groupId>
                 <artifactId>junit-jupiter-engine</artifactId>
-                <version>5.9.1</version>
+                <version>5.9.2</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.junit.jupiter</groupId>
                 <artifactId>junit-jupiter-params</artifactId>
-                <version>5.9.1</version>
+                <version>5.9.2</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>cws-core</artifactId>
+                <artifactId>eds-core</artifactId>
                 <version>${project.version}</version>
                 <type>test-jar</type>
                 <scope>test</scope>
@@ -149,7 +165,7 @@
             <dependency>
                 <groupId>ch.qos.logback</groupId>
                 <artifactId>logback-classic</artifactId>
-                <version>1.4.5</version>
+                <version>1.4.6</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
@@ -182,12 +198,12 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.8.1</version>
+                    <version>3.11.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>3.3.1</version>
+                    <version>3.5.0</version>
                     <executions>
                         <execution>
                             <id>attach-javadocs</id>
@@ -200,17 +216,17 @@
                 <plugin>
                     <groupId>org.sonatype.plugins</groupId>
                     <artifactId>nexus-staging-maven-plugin</artifactId>
-                    <version>1.6.8</version>
+                    <version>1.6.13</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>2.22.2</version>
+                    <version>3.0.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-jar-plugin</artifactId>
-                    <version>3.2.0</version>
+                    <version>3.3.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -220,7 +236,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-shade-plugin</artifactId>
-                    <version>3.2.4</version>
+                    <version>3.3.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -230,7 +246,7 @@
                 <plugin>
                     <groupId>org.owasp</groupId>
                     <artifactId>dependency-check-maven</artifactId>
-                    <version>6.5.2</version>
+                    <version>8.2.1</version>
                     <executions>
                         <execution>
                             <phase>verify</phase>
@@ -243,12 +259,12 @@
                 <plugin>
                     <groupId>org.wildfly.plugins</groupId>
                     <artifactId>wildfly-maven-plugin</artifactId>
-                    <version>2.1.0.Final</version>
+                    <version>4.0.0.Final</version>
                 </plugin>
                 <plugin>
                     <groupId>org.jacoco</groupId>
                     <artifactId>jacoco-maven-plugin</artifactId>
-                    <version>0.8.7</version>
+                    <version>0.8.9</version>
                 </plugin>
                 <plugin>
                     <groupId>org.sonarsource.scanner.maven</groupId>
@@ -274,7 +290,7 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <!-- Testing should be done in parallel if possible.
-                         However, some of the CWS tests have been written in a
+                         However, some of the EDS tests have been written in a
                          way, which is rather nasty, where default DB objects
                          have been deliberately altered, causing JDBC problems,
                          as it is not possible to acquire table locks.
@@ -333,7 +349,7 @@
                             <dataFile>${project.basedir}/../target/jacoco.exec</dataFile>
                             <outputDirectory>${project.basedir}/../target/jacoco</outputDirectory>
                             <includes>
-                                <include>io.javadog.cws.*</include>
+                                <include>net.haugr.eds.*</include>
                             </includes>
                         </configuration>
                     </execution>

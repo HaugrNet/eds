@@ -1,0 +1,59 @@
+<!--
+  ~ EDS, Encrypted Data Share - open source Cryptographic Sharing system.
+  ~ Copyright (c) 2016-2023, haugr.net
+  ~ mailto: eds AT haugr DOT net
+  ~
+  ~ EDS is free software; you can redistribute it and/or modify it under the
+  ~ terms of the Apache License, as published by the Apache Software Foundation.
+  ~
+  ~ EDS is distributed in the hope that it will be useful, but WITHOUT ANY
+  ~ WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+  ~ FOR A PARTICULAR PURPOSE. See the Apache License for more details.
+  ~
+  ~ You should have received a copy of the Apache License, version 2, along with
+  ~ this program; If not, you can download a copy of the License
+  ~ here: https://www.apache.org/licenses/
+  -->
+
+<persistence xmlns="http://java.sun.com/xml/ns/persistence"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd"
+        version="2.0">
+    <persistence-unit name="net.haugr.eds.jpa">
+        <description>JPA Test Database Setup</description>
+        <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+
+        <class>net.haugr.eds.core.model.entities.SettingEntity</class>
+        <class>net.haugr.eds.core.model.entities.MemberEntity</class>
+        <class>net.haugr.eds.core.model.entities.CircleEntity</class>
+        <class>net.haugr.eds.core.model.entities.KeyEntity</class>
+        <class>net.haugr.eds.core.model.entities.TrusteeEntity</class>
+        <class>net.haugr.eds.core.model.entities.DataTypeEntity</class>
+        <class>net.haugr.eds.core.model.entities.MetadataEntity</class>
+        <class>net.haugr.eds.core.model.entities.DataEntity</class>
+        <class>net.haugr.eds.core.model.entities.SignatureEntity</class>
+        <class>net.haugr.eds.core.model.entities.VersionEntity</class>
+
+        <properties>
+            <!-- JPA Settings to create test DB via scripts -->
+            <property name="javax.persistence.jdbc.url" value ="jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE"/>
+            <property name="javax.persistence.jdbc.driver" value="org.h2.Driver"/>
+            <property name="javax.persistence.jdbc.user" value="sa"/>
+            <property name="javax.persistence.jdbc.password" value="sa"/>
+            <property name="javax.persistence.schema-generation.database.action" value="create" />
+            <property name="javax.persistence.schema-generation.create-source" value="script"/>
+            <property name="javax.persistence.schema-generation.create-script-source" value="META-INF/init-h2.sql"/>
+            <property name="javax.persistence.sql-load-script-source" value="META-INF/data.sql"/>
+
+            <!-- Hibernate Settings for our test -->
+            <property name="hibernate.connection.pool_size" value="75"/>
+            <property name="hibernate.connection.autocommit" value="false"/>
+            <property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect"/>
+            <property name="hibernate.cache.provider_class" value="org.hibernate.cache.HashtableCacheProvider"/>
+            <!-- The following is needed, as Hibernate otherwise require that each table creation is on a single line. -->
+            <property name="hibernate.hbm2ddl.import_files_sql_extractor" value="org.hibernate.tool.hbm2ddl.MultipleLinesSqlCommandExtractor" />
+            <property name="show_sql" value="false"/>
+        </properties>
+
+    </persistence-unit>
+</persistence>

@@ -1,44 +1,61 @@
+/*
+ * EDS, Encrypted Data Share - open source Cryptographic Sharing system.
+ * Copyright (c) 2016-2023, haugr.net
+ * mailto: eds AT haugr DOT net
+ *
+ * EDS is free software; you can redistribute it and/or modify it under the
+ * terms of the Apache License, as published by the Apache Software Foundation.
+ *
+ * EDS is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the Apache License for more details.
+ *
+ * You should have received a copy of the Apache License, version 2, along with
+ * this program; If not, you can download a copy of the License
+ * here: https://www.apache.org/licenses/
+ */
+
 -- =============================================================================
--- PostgreSQL Create Script for CWS
+-- PostgreSQL Create Script for EDS
 -- -----------------------------------------------------------------------------
 -- This script contain the following tables:
 --  * System Specific tables
---     o cws_version    -  Simple Version information, to correlate CWS & DB version
---     o cws_settings   -  Settings for this instance of CWS
+--     o eds_version    -  Simple Version information, to correlate EDS & DB version
+--     o eds_settings   -  Settings for this instance of EDS
 --  * Accounts & Relations for access control
---     o cws_members    -  Members who may access CWS
---     o cws_circles    -  Circles of Trust that members may use for sharing data
---     o cws_keys       -  Symmetric Keys, used by Circles for sharing data
---     o cws_trustees   -  Relation information for each Member & Circle
+--     o eds_members    -  Members who may access EDS
+--     o eds_circles    -  Circles of Trust that members may use for sharing data
+--     o eds_keys       -  Symmetric Keys, used by Circles for sharing data
+--     o eds_trustees   -  Relation information for each Member & Circle
 --  * Folders & Shared (encrypted) data
---     o cws_types      -  The type of Objects (Data) to be stored
---     o cws_metadata   -  Objects to be stored, related to datatype & Circles
---     o cws_data       -  Storage of the actual encrypted data for each Object
---     o cws_signatures -  Cryptographic Signature References information
+--     o eds_types      -  The type of Objects (Data) to be stored
+--     o eds_metadata   -  Objects to be stored, related to datatype & Circles
+--     o eds_data       -  Storage of the actual encrypted data for each Object
+--     o eds_signatures -  Cryptographic Signature References information
 -- =============================================================================
 
 DO $C$
 DECLARE
-    cws_exists BOOLEAN;
+    eds_exists BOOLEAN;
 BEGIN
-    SELECT exists (SELECT * FROM pg_tables WHERE tablename  = 'cws_versions')
-    INTO cws_exists;
+    SELECT exists (SELECT * FROM pg_tables WHERE tablename  = 'eds_versions')
+    INTO eds_exists;
 
-    IF cws_exists = false THEN
+    IF eds_exists = false THEN
 
         -- =============================================================================
         -- The Version table is used to correlate the information about the current
-        -- database version with the CWS version. If not matching, then CWS will not
+        -- database version with the EDS version. If not matching, then EDS will not
         -- work correctly.
         --   The table also serves a simple purpose of acting as a break for attempts at
-        -- accidentally trying to upgrade the CWS to an invalid version.
+        -- accidentally trying to upgrade the EDS to an invalid version.
         --   The API request for "version", will also return the latest information from
         -- this table.
         -- =============================================================================
-        CREATE TABLE cws_versions (
+        CREATE TABLE eds_versions (
           id               SERIAL,
           schema_version   INTEGER,
-          cws_version      VARCHAR(10),
+          eds_version      VARCHAR(10),
           db_vendor        VARCHAR(25),
           installed        TIMESTAMP DEFAULT now(),
 
@@ -46,27 +63,27 @@ BEGIN
           CONSTRAINT version_pk                     PRIMARY KEY (id),
 
            /* Unique Constraints */
-          CONSTRAINT version_unique_version         UNIQUE (schema_version, cws_version),
+          CONSTRAINT version_unique_version         UNIQUE (schema_version, eds_version),
 
           /* Not Null Constraints */
           CONSTRAINT version_notnull_id             CHECK (id IS NOT NULL),
           CONSTRAINT version_notnull_db_version     CHECK (schema_version IS NOT NULL),
-          CONSTRAINT version_notnull_cws_version    CHECK (cws_version IS NOT NULL),
+          CONSTRAINT version_notnull_eds_version    CHECK (eds_version IS NOT NULL),
           CONSTRAINT version_notnull_db_vendor      CHECK (db_vendor IS NOT NULL),
           CONSTRAINT version_notnull_installed      CHECK (installed IS NOT NULL)
         );
-        -- Initial Database Version is 1, initial Production CWS release is 1.0.0
-        INSERT INTO cws_versions(schema_version, cws_version, db_vendor) VALUES (1, '1.0.0', 'PostgreSQL');
-        -- First feature release, CWS 1.1.x results requires an update of the DB
-        INSERT INTO cws_versions(schema_version, cws_version, db_vendor) VALUES (2, '1.1.0', 'PostgreSQL');
-        -- Second feature release, CWS 1.2.x results requires an update of the DB
-        INSERT INTO cws_versions(schema_version, cws_version, db_vendor) VALUES (3, '1.2.0', 'PostgreSQL');
-        -- Java Version upgrade (8->11), breaks backwards compatibility, CWS 2.x
-        INSERT INTO cws_versions(schema_version, cws_version, db_vendor) VALUES (4, '2.0.0', 'PostgreSQL');
+        -- Initial Database Version is 1, initial Production EDS release is 1.0.0
+        INSERT INTO eds_versions(schema_version, eds_version, db_vendor) VALUES (1, '1.0.0', 'PostgreSQL');
+        -- First feature release, EDS 1.1.x results requires an update of the DB
+        INSERT INTO eds_versions(schema_version, eds_version, db_vendor) VALUES (2, '1.1.0', 'PostgreSQL');
+        -- Second feature release, EDS 1.2.x results requires an update of the DB
+        INSERT INTO eds_versions(schema_version, eds_version, db_vendor) VALUES (3, '1.2.0', 'PostgreSQL');
+        -- Java Version upgrade (8->11), breaks backwards compatibility, EDS 2.x
+        INSERT INTO eds_versions(schema_version, eds_version, db_vendor) VALUES (4, '2.0.0', 'PostgreSQL');
 
         -- =============================================================================
-        -- The CWS is configured via a set of property values, which are all stored in
-        -- the database. This is done so the same cluster of stateless CWS instances
+        -- The EDS is configured via a set of property values, which are all stored in
+        -- the database. This is done so the same cluster of stateless EDS instances
         -- will share the same settings.
         --   The Settings consists of a series of key-value pairs, though to avoid any
         -- potential conflicts with the word "key" that is also used throughout the
@@ -77,7 +94,7 @@ BEGIN
         -- initial setup, however which values and why is described in the installation
         -- documentation.
         -- =============================================================================
-        CREATE TABLE cws_settings (
+        CREATE TABLE eds_settings (
           id               SERIAL,
           name             VARCHAR(256),
           setting          VARCHAR(256),
@@ -113,15 +130,15 @@ BEGIN
         -- and upon creating it, the provided secret (Passphrase or Private Key), is
         -- then used to derive a Symmetric Key to encrypt the Private Key. This way,
         -- there is no default secret for the System Administrator to be altered.
-        --   Note, that the first version of the CWS is not holding any mechanisms to
+        --   Note, that the first version of the EDS is not holding any mechanisms to
         -- prevent Authentication Attacks. This is a deliberate design decision as the
-        -- CWS is only suppose to be a Data Storage Facility, and this be further down
+        -- EDS is only suppose to be a Data Storage Facility, and this be further down
         -- the entire Application Layer.
         --   The Member Role is giving a pointer towards what kinds of permissions that
         -- a member has, it can be either admin, standard, session or guest.
         --   Sessions are important for websites, where a user is logging in, and then
-        -- just works with a session onwards. To better integrate CWS into websites, it
-        -- is important CWS also supports Sessions. This is done by having 3 fields in
+        -- just works with a session onwards. To better integrate EDS into websites, it
+        -- is important EDS also supports Sessions. This is done by having 3 fields in
         -- this table, the session_checksum, which is generated using the MasterKey, and
         -- used to find the member account. Secondly, the member's private key encrypted
         -- using both a PBKDF2 symmetric key and the MasterKey. And finally, the expire
@@ -129,7 +146,7 @@ BEGIN
         -- of a session. So a Timed service can stop any existing sessions which have
         -- not been logged out.
         -- =============================================================================
-        CREATE TABLE cws_members (
+        CREATE TABLE eds_members (
           id               SERIAL,
           external_id      VARCHAR(36),
           name             VARCHAR(75),    -- Member Authentication information
@@ -168,7 +185,7 @@ BEGIN
           CONSTRAINT member_notnull_altered         CHECK (altered IS NOT NULL),
           CONSTRAINT member_notnull_added           CHECK (added IS NOT NULL)
         );
-        CREATE INDEX cws_members_name_index ON cws_members (lower(name));
+        CREATE INDEX eds_members_name_index ON eds_members (lower(name));
 
         -- =============================================================================
         -- Circles act as groupings for a collection of Members sharing data. A Circle
@@ -177,7 +194,7 @@ BEGIN
         -- Circle Administrative privileges. When creating a new Circle the initial new
         -- Circle Administrator must be added, which cannot be the System Administrator.
         -- =============================================================================
-        CREATE TABLE cws_circles (
+        CREATE TABLE eds_circles (
           id               SERIAL,
           external_id      VARCHAR(36),
           name             VARCHAR(75),
@@ -199,25 +216,25 @@ BEGIN
           CONSTRAINT circle_notnull_altered         CHECK (altered IS NOT NULL),
           CONSTRAINT circle_notnull_added           CHECK (added IS NOT NULL)
         );
-        CREATE INDEX cws_circles_name_index ON cws_circles (lower(name));
+        CREATE INDEX eds_circles_name_index ON eds_circles (lower(name));
 
         -- =============================================================================
-        -- A central part of the CWS is encryption. All data is encrypted using a series
+        -- A central part of the EDS is encryption. All data is encrypted using a series
         -- of Symmetric Encryption Keys. All saved Symmetric Keys are stored encrypted,
         -- however, it is still important to have certain meta-data available.
         --   To generate a new Key, it is important to know which algorithm and length
         -- to use. By default, all allowed Algorithms & key lengths are limited to what
         -- is provided by the Java Runtime Environment.
-        -- Initially CWS used the AES Block encryption, CBC, which is no longer
-        -- considered safe to use, hence as of CWS 2.0, the default is GCM, at the max
+        -- Initially EDS used the AES Block encryption, CBC, which is no longer
+        -- considered safe to use, hence as of EDS 2.0, the default is GCM, at the max
         -- size supported by the Java Runtime Environment, i.e. 256 bits.
         --   Theoretically, AES encryption can be broken in a finite time. To prevent
         -- that data is compromised, it is a good idea to limit the usage of a key to
         -- a given life time, forcing a re-encryption once the key has expired. It is
-        -- not enforced to have an expiration, as CWS doesn't support re-key yet (see
+        -- not enforced to have an expiration, as EDS doesn't support re-key yet (see
         -- https://github.com/HaugrNet/cws/issues/43).
         -- =============================================================================
-        CREATE TABLE cws_keys (
+        CREATE TABLE eds_keys (
           id               SERIAL,
           algorithm        VARCHAR(256) DEFAULT 'AES_CBC_256',
           status           VARCHAR(256) DEFAULT 'ACTIVE',
@@ -268,7 +285,7 @@ BEGIN
         -- is stored with the relation and not within the Key table. For Guests, the Key
         -- stored is simply "Not Applicable".
         -- =============================================================================
-        CREATE TABLE cws_trustees (
+        CREATE TABLE eds_trustees (
           id               SERIAL,
           member_id        INTEGER,
           circle_id        INTEGER,
@@ -280,9 +297,9 @@ BEGIN
 
           /* Primary & Foreign Keys */
           CONSTRAINT trustee_pk                     PRIMARY KEY (id),
-          CONSTRAINT trustee_member_fk              FOREIGN KEY (member_id) REFERENCES cws_members (id) ON DELETE CASCADE,
-          CONSTRAINT trustee_circle_fk              FOREIGN KEY (circle_id) REFERENCES cws_circles (id) ON DELETE CASCADE,
-          CONSTRAINT trustee_key_fk                 FOREIGN KEY (key_id) REFERENCES cws_keys (id),
+          CONSTRAINT trustee_member_fk              FOREIGN KEY (member_id) REFERENCES eds_members (id) ON DELETE CASCADE,
+          CONSTRAINT trustee_circle_fk              FOREIGN KEY (circle_id) REFERENCES eds_circles (id) ON DELETE CASCADE,
+          CONSTRAINT trustee_key_fk                 FOREIGN KEY (key_id) REFERENCES eds_keys (id),
 
           /* Unique Constraints */
           CONSTRAINT trustee_unique_fks             UNIQUE (member_id, circle_id, key_id),
@@ -299,7 +316,7 @@ BEGIN
         );
 
         -- =============================================================================
-        -- Data stored is completely unknown to the CWS, since multiple Clients may
+        -- Data stored is completely unknown to the EDS, since multiple Clients may
         -- access the system, it cannot be guaranteed that they all know what the
         -- Objects may be. To avoid this problem, and to ensure that there is a simple
         -- way to map Objects over, they must be stored with a type. All known types are
@@ -309,7 +326,7 @@ BEGIN
         -- the folder type is used primarily internally to help structure the Objects
         -- better.
         -- =============================================================================
-        CREATE TABLE cws_datatypes (
+        CREATE TABLE eds_datatypes (
           id               SERIAL,
           datatype_name    VARCHAR(75),
           datatype_value   VARCHAR(256),
@@ -332,21 +349,21 @@ BEGIN
 
         -- Default, we have 1 Object Type, which is the folder. The rest is left to
         -- the initial setup to create
-        INSERT INTO cws_datatypes (datatype_name, datatype_value) VALUES
+        INSERT INTO eds_datatypes (datatype_name, datatype_value) VALUES
             ('folder', 'Folder'),
             ('data', 'Data Object');
 
         -- =============================================================================
-        -- The main objective of CWS, is to store data securely. This table, contain the
+        -- The main objective of EDS, is to store data securely. This table, contain the
         -- primary metadata for each Object stored, but not the data for the Object.
         -- This data is stored in the data table. It was done so, for two reasons, first
         -- as not all Objects may have data associated, and secondly to avoid references
         -- to Null data, as it usually indicates flaws in the model.
         --   Objects are stored with an external Id, which is exposed via the API, the
         -- internal Id is not exposed, but is kept for internal referencing.
-        -- All Objects are also stored with a type. CWS has two default types, the most
+        -- All Objects are also stored with a type. EDS has two default types, the most
         -- important is "Folder", which allows Members to structure their data, and the
-        -- second is simply "data", if the system using CWS has enough information to
+        -- second is simply "data", if the system using EDS has enough information to
         -- control the Data Objects.
         --   Folders are also Objects referencing the default 'Folder' type. It is
         -- possible to create sub-folders and add data to any Folder belonging to the
@@ -362,7 +379,7 @@ BEGIN
         -- not possible to create looping structures, since the Id must always be
         -- smaller than the current Id.
         -- =============================================================================
-        CREATE TABLE cws_metadata (
+        CREATE TABLE eds_metadata (
           id               SERIAL,
           external_id      VARCHAR(36),
           parent_id        INTEGER,
@@ -374,8 +391,8 @@ BEGIN
 
           /* Primary & Foreign Keys */
           CONSTRAINT metadata_pk                    PRIMARY KEY (id),
-          CONSTRAINT metadata_circle_fk             FOREIGN KEY (circle_id) REFERENCES cws_circles (id) ON DELETE CASCADE,
-          CONSTRAINT metadata_datatype_fk           FOREIGN KEY (datatype_id) REFERENCES cws_datatypes (id),
+          CONSTRAINT metadata_circle_fk             FOREIGN KEY (circle_id) REFERENCES eds_circles (id) ON DELETE CASCADE,
+          CONSTRAINT metadata_datatype_fk           FOREIGN KEY (datatype_id) REFERENCES eds_datatypes (id),
 
           /* Unique Constraints */
           CONSTRAINT metadata_unique_external_id    UNIQUE (external_id),
@@ -398,7 +415,7 @@ BEGIN
         -- Data is considered deprecated and it is pending deletion and can no longer be
         -- used.
         -- =============================================================================
-        CREATE TABLE cws_data (
+        CREATE TABLE eds_data (
           id               SERIAL,
           metadata_id      INTEGER,
           key_id           INTEGER,
@@ -412,8 +429,8 @@ BEGIN
 
           /* Primary & Foreign Keys */
           CONSTRAINT data_pk                        PRIMARY KEY (id),
-          CONSTRAINT data_metadata_fk               FOREIGN KEY (metadata_id) REFERENCES cws_metadata (id) ON DELETE CASCADE,
-          CONSTRAINT data_key_fk                    FOREIGN KEY (key_id) REFERENCES cws_keys (id) ON DELETE CASCADE,
+          CONSTRAINT data_metadata_fk               FOREIGN KEY (metadata_id) REFERENCES eds_metadata (id) ON DELETE CASCADE,
+          CONSTRAINT data_key_fk                    FOREIGN KEY (key_id) REFERENCES eds_keys (id) ON DELETE CASCADE,
 
           /* Not Null Constraints */
           CONSTRAINT data_notnull_id                CHECK (id IS NOT NULL),
@@ -429,11 +446,11 @@ BEGIN
         );
 
         -- =============================================================================
-        -- CWS also supports signatures, and part of the information for a Signature, is
+        -- EDS also supports signatures, and part of the information for a Signature, is
         -- stored in this table. Complete with number of verifications and expiration of
         -- the signature.
         -- =============================================================================
-        CREATE TABLE cws_signatures (
+        CREATE TABLE eds_signatures (
           id               SERIAL,
           public_key       VARCHAR(3072), -- Public Key, stored armored
           checksum         VARCHAR(256),
@@ -445,7 +462,7 @@ BEGIN
 
           /* Primary & Foreign Keys */
           CONSTRAINT signature_pk                   PRIMARY KEY (id),
-          CONSTRAINT signature_member_fk            FOREIGN KEY (member_id) REFERENCES cws_members (id) ON DELETE CASCADE,
+          CONSTRAINT signature_member_fk            FOREIGN KEY (member_id) REFERENCES eds_members (id) ON DELETE CASCADE,
 
           /* Unique Constraints */
           CONSTRAINT signature_unique_checksum      UNIQUE (checksum),

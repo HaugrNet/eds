@@ -814,7 +814,7 @@ final class ShareBeanDataTest extends DatabaseSetup {
     }
 
     /**
-     * <p>See <a href="https://github.com/JavaDogs/eds/issues/57">Github</a>.</p>
+     * <p>See <a href="https://github.com/HaugrNet/eds/issues/57">Github</a>.</p>
      *
      * <p>From the stacktrace with a build using a snapshot from 2019-07-24:</p>
      * <pre>

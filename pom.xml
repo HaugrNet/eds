@@ -60,9 +60,9 @@
     </modules>
 
     <scm>
-        <url>scm:git:https://github.com/JavaDogs/eds.git</url>
-        <connection>scm:git:https://github.com/JavaDogs/eds.git</connection>
-        <developerConnection>scm:git:https://github.com/JavaDogs/eds.git</developerConnection>
+        <url>scm:git:https://github.com/HaugrNet/eds.git</url>
+        <connection>scm:git:https://github.com/HaugrNet/eds.git</connection>
+        <developerConnection>scm:git:https://github.com/HaugrNet/eds.git</developerConnection>
     </scm>
 
     <distributionManagement>

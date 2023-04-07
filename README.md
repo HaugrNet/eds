@@ -104,13 +104,13 @@ deployed in a "hostile" environment.
 
 This is the EDS 2.0 development branch, with the these features planned:
 
-* [Migrate code base from Java 8 to Java 11](https://github.com/JavaDogs/cws/issues/71)
-* [Upgrade code base to Java 17](https://github.com/HaugrNet/cws/issues/82)
-* [Migrate from Java EE 7 to Jakarta EE 8](https://github.com/JavaDogs/cws/issues/70)
-* [Upgrade JavaEE/JakartaEE to JakartaEE 10](https://github.com/HaugrNet/cws/issues/81)
-* [Convert Date Objects to Java 8+ Time Objects](https://github.com/JavaDogs/cws/issues/69)
-* [Migrate to the haugr.net domain](https://github.com/JavaDogs/cws/issues/72)
-* [Rename Packages & Project to EDS](https://github.com/HaugrNet/cws/issues/80)
+* [Migrate code base from Java 8 to Java 11](https://github.com/HaugrNet/eds/issues/71)
+* [Upgrade code base to Java 17](https://github.com/HaugrNet/eds/issues/82)
+* [Migrate from Java EE 7 to Jakarta EE 8](https://github.com/HaugrNet/eds/issues/70)
+* [Upgrade JavaEE/JakartaEE to JakartaEE 10](https://github.com/HaugrNet/eds/issues/81)
+* [Convert Date Objects to Java 8+ Time Objects](https://github.com/HaugrNet/eds/issues/69)
+* [Migrate to the haugr.net domain](https://github.com/HaugrNet/eds/issues/72)
+* [Rename Packages & Project to EDS](https://github.com/HaugrNet/eds/issues/80)
 
 Even though the code base will be migrated, and new features will only be added
 in the 2.0+ releases, issues discovered in the 1.x releases will be addressed

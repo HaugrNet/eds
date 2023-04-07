@@ -51,7 +51,7 @@ import net.haugr.eds.core.model.Settings;
  */
 public final class MasterKey {
 
-    // See Bug report #46: https://github.com/JavaDogs/EDS/issues/46
+    // See Bug report #46: https://github.com/HaugrNet/eds/issues/46
     // To get around the problem of altering the MasterKey algorithm, there are
     // two choices:
     //   a) Save the chosen algorithm as a property, which is persisted and must

@@ -63,7 +63,7 @@ public final class FetchDataManager extends AbstractManager<DataDao, FetchDataRe
         // Hibernate proxy, using ByteBuddy, to override the method. Hence, the
         // Object it should be compared against is first read out - since this
         // will help override the proxying.
-        //   See: https://github.com/JavaDogs/eds/issues/45
+        //   See: https://github.com/HaugrNet/eds/issues/45
         final MetadataEntity root = findRootMetadata(request);
 
         if (root == null) {

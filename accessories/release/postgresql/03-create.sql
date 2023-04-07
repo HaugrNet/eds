@@ -232,7 +232,7 @@ BEGIN
         -- that data is compromised, it is a good idea to limit the usage of a key to
         -- a given life time, forcing a re-encryption once the key has expired. It is
         -- not enforced to have an expiration, as EDS doesn't support re-key yet (see
-        -- https://github.com/HaugrNet/cws/issues/43).
+        -- https://github.com/HaugrNet/eds/issues/43).
         -- =============================================================================
         CREATE TABLE eds_keys (
           id               SERIAL,

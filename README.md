@@ -1,11 +1,9 @@
 # EDS - Encrypted Data Share
 
-[![CircleCI](https://circleci.com/gh/HaugrNet/cws.png?style=shield)](https://circleci.com/gh/HaugrNet/cws)
-[![SonarQube](https://sonarcloud.io/api/project_badges/measure?project=net.haugr:cws&metric=alert_status)](https://sonarcloud.io/dashboard?id=net.haugr:cws)
-[![SonarQube](https://sonarcloud.io/api/project_badges/measure?project=net.haugr:cws&metric=coverage)](https://sonarcloud.io/dashboard?id=net.haugr:cws)
-[![Coverity](https://scan.coverity.com/projects/13955/badge.svg)](https://scan.coverity.com/projects/javadogs-cws)
-[![Codacy](https://app.codacy.com/project/badge/Grade/d3dcde7450244032ae8adfcfd28f5888)](https://app.codacy.com/gh/HaugrNet/cws/dashboard)
-[![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/1566/badge)](https://bestpractices.coreinfrastructure.org/projects/1566)
+[![CircleCI](https://circleci.com/gh/HaugrNet/eds.png?style=shield)](https://circleci.com/gh/HaugrNet/eds)
+[![SonarQube](https://sonarcloud.io/api/project_badges/measure?project=net.haugr:eds&metric=alert_status)](https://sonarcloud.io/dashboard?id=net.haugr:eds)
+[![SonarQube](https://sonarcloud.io/api/project_badges/measure?project=net.haugr:eds&metric=coverage)](https://sonarcloud.io/dashboard?id=net.haugr:eds)
+[![Coverity](https://scan.coverity.com/projects/28136/badge.svg)](https://scan.coverity.com/projects/haugrnet-eds)
 [![Software License](https://img.shields.io/badge/license-Apache+License+2.0-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0)
 
 [EDS](https://haugr.net/), Encrypted Data Share, works as a "PGP for the

@@ -145,25 +145,22 @@ final class ManagementBeanFetchMemberTest extends DatabaseSetup {
     @Test
     void testFindAllMembersAsAdmin() {
         // Ensure that we have the correct settings for the Service
-        final Settings mySettings = newSettings();
+        final ManagementBean bean = prepareManagementBean(newSettings());
 
+        // Prepare and verify the request
         final FetchMemberRequest request = prepareRequest(FetchMemberRequest.class, Constants.ADMIN_ACCOUNT);
         assertTrue(request.validate().isEmpty());
-        runRequestAndVerifyResponse(mySettings, request);
-    }
 
-    // TODO merge if only used once...
-    private void runRequestAndVerifyResponse(final Settings mySettings, final FetchMemberRequest request) {
-        final ManagementBean bean = prepareManagementBean(mySettings);
-        final FetchMemberResponse fetchResponse = bean.fetchMembers(request);
+        // Invoke EDS, and retrieve the response
+        final FetchMemberResponse response = bean.fetchMembers(request);
 
         // Verify that we have found the correct data
-        assertNotNull(fetchResponse);
-        assertTrue(fetchResponse.isOk());
-        assertEquals(ReturnCode.SUCCESS.getCode(), fetchResponse.getReturnCode());
-        assertEquals("Ok", fetchResponse.getReturnMessage());
-        assertEquals(6, fetchResponse.getMembers().size());
-        assertTrue(fetchResponse.getCircles().isEmpty());
+        assertNotNull(response);
+        assertTrue(response.isOk());
+        assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
+        assertEquals("Ok", response.getReturnMessage());
+        assertEquals(6, response.getMembers().size());
+        assertTrue(response.getCircles().isEmpty());
     }
 
     /**

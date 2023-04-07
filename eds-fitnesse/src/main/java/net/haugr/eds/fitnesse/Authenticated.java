@@ -32,6 +32,11 @@ public final class Authenticated extends EDSRequest<AuthenticateResponse> {
     // Request & Response Setters and Getters
     // =========================================================================
 
+    /**
+     * Retrieves a human-readable version of the MemberId.
+     *
+     * @return Readable MemberId
+     */
     public String memberId() {
         return (response.getMemberId() != null) ? (accountName + EXTENSION_ID) : null;
     }

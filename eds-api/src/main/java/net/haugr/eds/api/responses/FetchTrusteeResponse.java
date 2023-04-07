@@ -42,6 +42,7 @@ public final class FetchTrusteeResponse extends EDSResponse {
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
+    /** The List of Trustees. */
     @JsonbProperty(Constants.FIELD_TRUSTEES)
     private final List<Trustee> trustees = new ArrayList<>(0);
 
@@ -72,10 +73,20 @@ public final class FetchTrusteeResponse extends EDSResponse {
     // Setters & Getters
     // =========================================================================
 
+    /**
+     * Set the List of Trustees.
+     *
+     * @param trustees List of Trustees
+     */
     public void setTrustees(final List<Trustee> trustees) {
         this.trustees.addAll(trustees);
     }
 
+    /**
+     * Retrieves the List of Trustees
+     *
+     * @return List of Trustees
+     */
     public List<Trustee> getTrustees() {
         return Collections.unmodifiableList(trustees);
     }

@@ -46,9 +46,11 @@ public final class FetchMemberResponse extends EDSResponse {
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
+    /** The List of Members. */
     @JsonbProperty(Constants.FIELD_MEMBERS)
     private final List<Member> members = new ArrayList<>(0);
 
+    /** The List of Circles. */
     @JsonbProperty(Constants.FIELD_CIRCLES)
     private final List<Circle> circles = new ArrayList<>(0);
 
@@ -79,18 +81,38 @@ public final class FetchMemberResponse extends EDSResponse {
     // Setters & Getters
     // =========================================================================
 
+    /**
+     * Set the List of Members.
+     *
+     * @param members List of Members
+     */
     public void setMembers(final List<Member> members) {
         this.members.addAll(members);
     }
 
+    /**
+     * Retrieves the List of Members.
+     *
+     * @return List of Members
+     */
     public List<Member> getMembers() {
         return Collections.unmodifiableList(members);
     }
 
+    /**
+     * Set the List of Circles.
+     *
+     * @param circles List of Circles
+     */
     public void setCircles(final List<Circle> circles) {
         this.circles.addAll(circles);
     }
 
+    /**
+     * Retrieves the List of Circles.
+     *
+     * @return List of Circles
+     */
     public List<Circle> getCircles() {
         return Collections.unmodifiableList(circles);
     }

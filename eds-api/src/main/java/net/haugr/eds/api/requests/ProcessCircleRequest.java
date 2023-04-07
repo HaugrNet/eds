@@ -68,20 +68,25 @@ public final class ProcessCircleRequest extends Authentication implements Circle
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
+    /** The Action. */
     @JsonbProperty(value = Constants.FIELD_ACTION, nillable = true)
     private Action action = null;
 
+    /** The CircleId. */
     @JsonbProperty(value = Constants.FIELD_CIRCLE_ID, nillable = true)
     private String circleId = null;
 
+    /** The Circle Name. */
     @JsonbProperty(value = Constants.FIELD_CIRCLE_NAME, nillable = true)
     private String circleName = null;
 
+    /** The MemberId. */
     @JsonbProperty(value = Constants.FIELD_MEMBER_ID, nillable = true)
     private String memberId = null;
 
     // The Circle Key is an optional value which may or may not be provided,
     // hence it is only stored but not used for anything.
+    /** The Circle Key. */
     @JsonbProperty(value = Constants.FIELD_CIRCLE_KEY, nillable = true)
     private String circleKey = null;
 
@@ -121,26 +126,56 @@ public final class ProcessCircleRequest extends Authentication implements Circle
         return circleId;
     }
 
+    /**
+     * Set the CircleName.
+     *
+     * @param circleName CircleName
+     */
     public void setCircleName(final String circleName) {
         this.circleName = circleName;
     }
 
+    /**
+     * Retrieves the CircleName.
+     *
+     * @return CircleName
+     */
     public String getCircleName() {
         return circleName;
     }
 
+    /**
+     * Set the MemberId.
+     *
+     * @param memberId MemberId
+     */
     public void setMemberId(final String memberId) {
         this.memberId = memberId;
     }
 
+    /**
+     * Retrieves the MemberId.
+     *
+     * @return MemberId
+     */
     public String getMemberId() {
         return memberId;
     }
 
+    /**
+     * Set the CircleKey.
+     *
+     * @param circleKey CircleKey
+     */
     public void setCircleKey(final String circleKey) {
         this.circleKey = circleKey;
     }
 
+    /**
+     * Retrieves the CircleKey.
+     *
+     * @return CircleKey
+     */
     public String getCircleKey() {
         return circleKey;
     }

@@ -50,6 +50,7 @@ public final class SanityResponse extends EDSResponse {
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
+    /** The List of failed Sanity Records. */
     @JsonbProperty(Constants.FIELD_SANITIES)
     private final List<Sanity> sanities = new ArrayList<>(0);
 
@@ -80,10 +81,20 @@ public final class SanityResponse extends EDSResponse {
     // Standard Setters & Getters
     // =========================================================================
 
+    /**
+     * Set the List of failed Sanity Records.
+     *
+     * @param sanities List of failed Sanity Records
+     */
     public void setSanities(final List<Sanity> sanities) {
         this.sanities.addAll(sanities);
     }
 
+    /**
+     * Retrieves the List of failed Sanity Records.
+     *
+     * @return List of failed Sanity Records
+     */
     public List<Sanity> getSanities() {
         return Collections.unmodifiableList(sanities);
     }

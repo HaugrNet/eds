@@ -42,6 +42,7 @@ public final class VerifyResponse extends EDSResponse {
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
+    /** The Verified Flag. */
     @JsonbProperty(Constants.FIELD_VERIFIED)
     private boolean verified = false;
 
@@ -81,10 +82,20 @@ public final class VerifyResponse extends EDSResponse {
     // Standard Setters & Getters
     // =========================================================================
 
+    /**
+     * Set the Verified Flag.
+     *
+     * @param verified Verified Flag
+     */
     public void setVerified(final boolean verified) {
         this.verified = verified;
     }
 
+    /**
+     * Retrieves the Verification Information.
+     *
+     * @return Verified if true, false otherwise
+     */
     public boolean isVerified() {
         return verified;
     }

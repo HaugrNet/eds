@@ -42,6 +42,7 @@ public final class FetchDataTypeResponse extends EDSResponse {
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
+    /** The List of DataTypes. */
     @JsonbProperty(Constants.FIELD_DATATYPES)
     private final List<DataType> dataTypes = new ArrayList<>(0);
 
@@ -72,10 +73,20 @@ public final class FetchDataTypeResponse extends EDSResponse {
     // Setters & Getters
     // =========================================================================
 
+    /**
+     * Set the List of DataTypes.
+     *
+     * @param types List of DataTypes
+     */
     public void setDataTypes(final List<DataType> types) {
         dataTypes.addAll(types);
     }
 
+    /**
+     * Retrieves the List of DataTypes.
+     *
+     * @return List of DataTypes
+     */
     public List<DataType> getDataTypes() {
         return Collections.unmodifiableList(dataTypes);
     }

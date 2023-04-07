@@ -43,6 +43,12 @@ public class MasterKeyService {
     private ManagementBean bean;
     private final Settings settings = Settings.getInstance();
 
+    /**
+     * The REST MasterKey Endpoint.
+     *
+     * @param masterKeyRequest MasterKey Request
+     * @return MasterKey Response
+     */
     @POST
     @Consumes(CommonService.CONSUMES)
     @Produces(CommonService.PRODUCES)

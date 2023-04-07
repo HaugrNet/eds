@@ -40,6 +40,11 @@ public class VersionService {
     private ManagementBean bean;
     private final Settings settings = Settings.getInstance();
 
+    /**
+     * The REST Version Endpoint.
+     *
+     * @return Version Response
+     */
     @POST
     @Produces(CommonService.PRODUCES)
     public Response version() {

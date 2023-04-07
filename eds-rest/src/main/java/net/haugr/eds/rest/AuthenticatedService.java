@@ -43,6 +43,12 @@ public class AuthenticatedService {
     private ManagementBean bean;
     private final Settings settings = Settings.getInstance();
 
+    /**
+     * The REST Authentication Endpoint.
+     *
+     * @param request Authentication Request
+     * @return Authentication Response
+     */
     @POST
     @Consumes(CommonService.CONSUMES)
     @Produces(CommonService.PRODUCES)

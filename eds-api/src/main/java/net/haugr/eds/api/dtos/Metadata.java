@@ -46,21 +46,27 @@ public final class Metadata implements Serializable {
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
+    /** DataId. */
     @JsonbProperty(value = Constants.FIELD_DATA_ID, nillable = true)
     private String dataId = null;
 
+    /** CircleId. */
     @JsonbProperty(value = Constants.FIELD_CIRCLE_ID, nillable = true)
     private String circleId = null;
 
+    /** FolderId. */
     @JsonbProperty(value = Constants.FIELD_FOLDER_ID, nillable = true)
     private String folderId = null;
 
+    /** Data Name. */
     @JsonbProperty(value = Constants.FIELD_DATA_NAME, nillable = true)
     private String dataName = null;
 
+    /** Type Name. */
     @JsonbProperty(value = Constants.FIELD_TYPENAME, nillable = true)
     private String typeName = null;
 
+    /** Created Timestamp. */
     @JsonbProperty(value = Constants.FIELD_ADDED, nillable = true)
     @JsonbDateFormat(Constants.JSON_DATE_FORMAT)
     private LocalDateTime added = null;
@@ -69,50 +75,110 @@ public final class Metadata implements Serializable {
     // Standard Setters & Getters
     // =========================================================================
 
+    /**
+     * Set the DataId.
+     *
+     * @param dataId DataId
+     */
     public void setDataId(final String dataId) {
         this.dataId = dataId;
     }
 
+    /**
+     * Retrieves the DataId.
+     *
+     * @return DataId
+     */
     public String getDataId() {
         return dataId;
     }
 
+    /**
+     * Set the CircleId.
+     *
+     * @param circleId CircleId
+     */
     public void setCircleId(final String circleId) {
         this.circleId = circleId;
     }
 
+    /**
+     * Retrieves the CircleId.
+     *
+     * @return CircleId
+     */
     public String getCircleId() {
         return circleId;
     }
 
+    /**
+     * Set the FolderId.
+     *
+     * @param folderId FolderId
+     */
     public void setFolderId(final String folderId) {
         this.folderId = folderId;
     }
 
+    /**
+     * Retrieves the FolderId.
+     *
+     * @return FolderId
+     */
     public String getFolderId() {
         return folderId;
     }
 
+    /**
+     * Set the DataName.
+     *
+     * @param dataName DataName
+     */
     public void setDataName(final String dataName) {
         this.dataName = dataName;
     }
 
+    /**
+     * Retrieves the DataName.
+     *
+     * @return DataName
+     */
     public String getDataName() {
         return dataName;
     }
 
+    /**
+     * Set the TypeName.
+     *
+     * @param typeName TypeName
+     */
     public void setTypeName(final String typeName) {
         this.typeName = typeName;
     }
 
+    /**
+     * Retrieves the TypeName.
+     *
+     * @return TypeName
+     */
     public String getTypeName() {
         return typeName;
     }
 
+    /**
+     * Set the Created Timestamp.
+     *
+     * @param added Created Timestamp
+     */
     public void setAdded(final LocalDateTime added) {
         this.added = added;
     }
 
+    /**
+     * Retrieves the Created Timestamp.
+     *
+     * @return Created Timestamp
+     */
     public LocalDateTime getAdded() {
         return added;
     }

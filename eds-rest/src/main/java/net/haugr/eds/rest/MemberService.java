@@ -46,6 +46,12 @@ public class MemberService {
     private ManagementBean bean;
     private final Settings settings = Settings.getInstance();
 
+    /**
+     * The REST Create Member Endpoint.
+     *
+     * @param createMemberRequest Create Member Request
+     * @return Create Member Response
+     */
     @POST
     @Path(Constants.REST_MEMBERS_CREATE)
     @Consumes(CommonService.CONSUMES)
@@ -55,6 +61,12 @@ public class MemberService {
         return CommonService.runRequest(settings, bean, PROCESS_METHOD, createMemberRequest, Constants.REST_MEMBERS_BASE + Constants.REST_MEMBERS_CREATE);
     }
 
+    /**
+     * The REST Invite Member Endpoint.
+     *
+     * @param inviteMemberRequest Invite Member Request
+     * @return Invite Member Response
+     */
     @POST
     @Path(Constants.REST_MEMBERS_INVITE)
     @Consumes(CommonService.CONSUMES)
@@ -64,33 +76,57 @@ public class MemberService {
         return CommonService.runRequest(settings, bean, PROCESS_METHOD, inviteMemberRequest, Constants.REST_MEMBERS_BASE + Constants.REST_MEMBERS_INVITE);
     }
 
+    /**
+     * The REST Login Member Endpoint.
+     *
+     * @param loginMemberRequest Login Member Request
+     * @return Login Member Response
+     */
     @POST
     @Path(Constants.REST_MEMBERS_LOGIN)
     @Consumes(CommonService.CONSUMES)
     @Produces(CommonService.PRODUCES)
-    public Response login(@NotNull final ProcessMemberRequest updateMemberRequest) {
-        updateMemberRequest.setAction(Action.LOGIN);
-        return CommonService.runRequest(settings, bean, PROCESS_METHOD, updateMemberRequest, Constants.REST_MEMBERS_BASE + Constants.REST_MEMBERS_LOGIN);
+    public Response login(@NotNull final ProcessMemberRequest loginMemberRequest) {
+        loginMemberRequest.setAction(Action.LOGIN);
+        return CommonService.runRequest(settings, bean, PROCESS_METHOD, loginMemberRequest, Constants.REST_MEMBERS_BASE + Constants.REST_MEMBERS_LOGIN);
     }
 
+    /**
+     * The REST Logout Member Endpoint.
+     *
+     * @param logoutMemberRequest Logout Member Request
+     * @return Logout Member Response
+     */
     @POST
     @Path(Constants.REST_MEMBERS_LOGOUT)
     @Consumes(CommonService.CONSUMES)
     @Produces(CommonService.PRODUCES)
-    public Response logout(@NotNull final ProcessMemberRequest updateMemberRequest) {
-        updateMemberRequest.setAction(Action.LOGOUT);
-        return CommonService.runRequest(settings, bean, PROCESS_METHOD, updateMemberRequest, Constants.REST_MEMBERS_BASE + Constants.REST_MEMBERS_LOGOUT);
+    public Response logout(@NotNull final ProcessMemberRequest logoutMemberRequest) {
+        logoutMemberRequest.setAction(Action.LOGOUT);
+        return CommonService.runRequest(settings, bean, PROCESS_METHOD, logoutMemberRequest, Constants.REST_MEMBERS_BASE + Constants.REST_MEMBERS_LOGOUT);
     }
 
+    /**
+     * The REST Alter Member Endpoint.
+     *
+     * @param alterMemberRequest Alter Member Request
+     * @return Alter Member Response
+     */
     @POST
     @Path(Constants.REST_MEMBERS_ALTER)
     @Consumes(CommonService.CONSUMES)
     @Produces(CommonService.PRODUCES)
-    public Response alter(@NotNull final ProcessMemberRequest updateMemberRequest) {
-        updateMemberRequest.setAction(Action.ALTER);
-        return CommonService.runRequest(settings, bean, PROCESS_METHOD, updateMemberRequest, Constants.REST_MEMBERS_BASE + Constants.REST_MEMBERS_ALTER);
+    public Response alter(@NotNull final ProcessMemberRequest alterMemberRequest) {
+        alterMemberRequest.setAction(Action.ALTER);
+        return CommonService.runRequest(settings, bean, PROCESS_METHOD, alterMemberRequest, Constants.REST_MEMBERS_BASE + Constants.REST_MEMBERS_ALTER);
     }
 
+    /**
+     * The REST Update Member Endpoint.
+     *
+     * @param updateMemberRequest Update Member Request
+     * @return Update Member Response
+     */
     @POST
     @Path(Constants.REST_MEMBERS_UPDATE)
     @Consumes(CommonService.CONSUMES)
@@ -100,6 +136,12 @@ public class MemberService {
         return CommonService.runRequest(settings, bean, PROCESS_METHOD, updateMemberRequest, Constants.REST_MEMBERS_BASE + Constants.REST_MEMBERS_UPDATE);
     }
 
+    /**
+     * The REST Invalidate Member Endpoint.
+     *
+     * @param invalidateRequest Invalidate Member Request
+     * @return Invalidate Member Response
+     */
     @POST
     @Path(Constants.REST_MEMBERS_INVALIDATE)
     @Consumes(CommonService.CONSUMES)
@@ -109,6 +151,12 @@ public class MemberService {
         return CommonService.runRequest(settings, bean, PROCESS_METHOD, invalidateRequest, Constants.REST_MEMBERS_BASE + Constants.REST_MEMBERS_INVALIDATE);
     }
 
+    /**
+     * The REST Delete Member Endpoint.
+     *
+     * @param deleteMemberRequest Delete Member Request
+     * @return Delete Member Response
+     */
     @POST
     @Path(Constants.REST_MEMBERS_DELETE)
     @Consumes(CommonService.CONSUMES)
@@ -118,6 +166,12 @@ public class MemberService {
         return CommonService.runRequest(settings, bean, PROCESS_METHOD, deleteMemberRequest, Constants.REST_MEMBERS_BASE + Constants.REST_MEMBERS_DELETE);
     }
 
+    /**
+     * The REST Fetch Members Endpoint.
+     *
+     * @param fetchMembersRequest Fetch Members Request
+     * @return Fetch Members Response
+     */
     @POST
     @Path(Constants.REST_MEMBERS_FETCH)
     @Consumes(CommonService.CONSUMES)

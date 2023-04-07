@@ -38,14 +38,29 @@ public final class ProcessDataType extends EDSRequest<ProcessDataTypeResponse> {
     // Request & Response Setters and Getters
     // =========================================================================
 
+    /**
+     * Set the Action.
+     *
+     * @param action Action
+     */
     public void setAction(final String action) {
         this.action = Converter.findAction(action);
     }
 
+    /**
+     * Set the Name.
+     *
+     * @param name Name
+     */
     public void setName(final String name) {
         this.name = Converter.preCheck(name);
     }
 
+    /**
+     * Set the Type.
+     *
+     * @param type Type
+     */
     public void setType(final String type) {
         this.type = Converter.preCheck(type);
     }

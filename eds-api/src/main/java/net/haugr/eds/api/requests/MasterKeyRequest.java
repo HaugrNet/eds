@@ -55,10 +55,12 @@ public final class MasterKeyRequest extends Authentication {
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
+    /** The Secret as Bytes. */
     @JsonbProperty(value = Constants.FIELD_SECRET, nillable = true)
     @JsonbTypeAdapter(ByteArrayAdapter.class)
     private byte[] secret = null;
 
+    /** The Secret as URL. */
     @JsonbProperty(value = Constants.FIELD_URL, nillable = true)
     private String url = null;
 
@@ -66,18 +68,38 @@ public final class MasterKeyRequest extends Authentication {
     // Standard Setters & Getters
     // =========================================================================
 
+    /**
+     * Set the Secret from Bytes.
+     *
+     * @param secret Secret from Bytes
+     */
     public void setSecret(final byte[] secret) {
         this.secret = Utilities.copy(secret);
     }
 
+    /**
+     * Retrieves the Secret from Bytes.
+     *
+     * @return Secret from Bytes
+     */
     public byte[] getSecret() {
         return Utilities.copy(secret);
     }
 
+    /**
+     * Set the Secret from a URL.
+     *
+     * @param url Secret from the URL
+     */
     public void setUrl(final String url) {
         this.url = url;
     }
 
+    /**
+     * Retrieves the Secret from the URL.
+     *
+     * @return Secret from the URL
+     */
     public String getUrl() {
         return url;
     }

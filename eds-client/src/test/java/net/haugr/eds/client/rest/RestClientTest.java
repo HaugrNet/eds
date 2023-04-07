@@ -73,13 +73,13 @@ import java.security.SecureRandom;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
+import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 
 /**
  * @author Kim Jensen
  * @since EDS 1.0
  */
-@EnabledIfSystemProperty(named = "local.instance.running", matches = "true")
+@EnabledIfEnvironmentVariable(named = "local.instance.running", matches = "true")
 final class RestClientTest {
 
     private static final String URL = "http://localhost:8080/eds";

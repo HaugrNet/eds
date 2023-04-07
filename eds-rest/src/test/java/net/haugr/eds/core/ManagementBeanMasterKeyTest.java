@@ -24,12 +24,14 @@ import net.haugr.eds.api.common.Constants;
 import net.haugr.eds.api.common.ReturnCode;
 import net.haugr.eds.api.requests.MasterKeyRequest;
 import net.haugr.eds.api.responses.MasterKeyResponse;
+import net.haugr.eds.core.ManagementBean;
 import net.haugr.eds.core.enums.StandardSetting;
 import net.haugr.eds.core.exceptions.EDSException;
 import net.haugr.eds.core.jce.MasterKey;
 import net.haugr.eds.core.model.Settings;
 import net.haugr.eds.core.model.entities.MemberEntity;
 import net.haugr.eds.core.setup.DatabaseSetup;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledOnOs;
 import org.junit.jupiter.api.condition.OS;
@@ -49,9 +51,15 @@ import java.util.UUID;
  *   <li>MasterKeyService</li>
  * </ul>
  *
- * <p>Note that this test class is not working under Windows, as the expected
+ * <p>Note; this test class is not working under Windows, as the expected
  * error messages are truncated and only contain a fraction of the information
  * as the Linux variant contains.</p>
+ *
+ * <p>Note; The Class Under Test, is one changes the underlying master key, an
+ * operation that cannot be tested parallel with other tests, as it affects
+ * their expected behavior when the master key is suddenly altered. Hence, it
+ * is moved out of the Core modules and into this module, which is not tested
+ * using the parallel testing mechanism from the Maven Surefire plugin.</p>
  *
  * @author Kim Jensen
  * @since EDS 1.1

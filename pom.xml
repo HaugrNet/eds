@@ -1,21 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-  ~ EDS, Encrypted Data Share - open source Cryptographic Sharing system.
-  ~ Copyright (c) 2016-2023, haugr.net
-  ~ mailto: eds AT haugr DOT net
-  ~
-  ~ EDS is free software; you can redistribute it and/or modify it under the
-  ~ terms of the Apache License, as published by the Apache Software Foundation.
-  ~
-  ~ EDS is distributed in the hope that it will be useful, but WITHOUT ANY
-  ~ WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-  ~ FOR A PARTICULAR PURPOSE. See the Apache License for more details.
-  ~
-  ~ You should have received a copy of the Apache License, version 2, along with
-  ~ this program; If not, you can download a copy of the License
-  ~ here: https://www.apache.org/licenses/
-  -->
-
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>net.haugr</groupId>
@@ -104,7 +87,7 @@
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
-                <version>1.7.36</version>
+                <version>2.0.5</version>
                 <scope>provided</scope>
             </dependency>
             <dependency>
@@ -137,8 +120,9 @@
             <dependency>
                 <groupId>org.glassfish.jersey.core</groupId>
                 <artifactId>jersey-common</artifactId>
+                <version>2.39.1</version>
                 <!-- Upgrading from 2.x to 3.x causes the REST tests to fail. -->
-                <version>2.38</version>
+                <!-- <version>3.1.1</version> -->
                 <scope>test</scope>
             </dependency>
 
@@ -171,7 +155,9 @@
             <dependency>
                 <groupId>org.hibernate</groupId>
                 <artifactId>hibernate-core</artifactId>
-                <version>5.6.14.Final</version>
+                <version>5.6.15.Final</version>
+                <!-- Test fails, when upgrading -->
+                <!-- <version>6.2.0.Final</version> -->
                 <scope>test</scope>
             </dependency>
             <dependency>
@@ -255,11 +241,6 @@
                             </goals>
                         </execution>
                     </executions>
-                </plugin>
-                <plugin>
-                    <groupId>org.wildfly.plugins</groupId>
-                    <artifactId>wildfly-maven-plugin</artifactId>
-                    <version>4.0.0.Final</version>
                 </plugin>
                 <plugin>
                     <groupId>org.jacoco</groupId>

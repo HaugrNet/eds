@@ -28,10 +28,15 @@ import java.util.Set;
  */
 public enum TrustLevel {
 
+    /** All Trust Levels. */
     ALL,
+    /** Read Only. */
     READ,
+    /** Read &amp; Write. */
     WRITE,
+    /** Read, Write &amp; Circle Administration. */
     ADMIN,
+    /** System Operator, Read, Write &amp; Circle Administration. */
     SYSOP;
 
     /**

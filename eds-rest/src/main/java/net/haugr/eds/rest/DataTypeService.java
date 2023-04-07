@@ -46,6 +46,12 @@ public class DataTypeService {
     private ShareBean bean;
     private final Settings settings = Settings.getInstance();
 
+    /**
+     * The REST Process DataType Endpoint.
+     *
+     * @param processDataTypeRequest Process DataType Request
+     * @return Process DataType Response
+     */
     @POST
     @Path(Constants.REST_DATATYPES_PROCESS)
     @Consumes(CommonService.CONSUMES)
@@ -55,6 +61,12 @@ public class DataTypeService {
         return CommonService.runRequest(settings, bean, PROCESS_METHOD, processDataTypeRequest, Constants.REST_DATATYPES_BASE + Constants.REST_DATATYPES_PROCESS);
     }
 
+    /**
+     * The REST Delete DataType Endpoint.
+     *
+     * @param deleteDataTypeRequest Delete DataType Request
+     * @return Delete DataType Response
+     */
     @POST
     @Path(Constants.REST_DATATYPES_DELETE)
     @Consumes(CommonService.CONSUMES)
@@ -64,6 +76,12 @@ public class DataTypeService {
         return CommonService.runRequest(settings, bean, PROCESS_METHOD, deleteDataTypeRequest, Constants.REST_DATATYPES_BASE + Constants.REST_DATATYPES_DELETE);
     }
 
+    /**
+     * The REST Fetch DataTypes Endpoint.
+     *
+     * @param fetchDataTypesRequest Fetch DataTypes Request
+     * @return Fetch DataTypes Response
+     */
     @POST
     @Path(Constants.REST_DATATYPES_FETCH)
     @Consumes(CommonService.CONSUMES)

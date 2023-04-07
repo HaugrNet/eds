@@ -57,8 +57,8 @@ public final class Utilities {
      * <p>Copy method for Byte Arrays, to have a central way to protect the data
      * structures from external changes.</p>
      *
-     * <p>Note, that as the API is only exposed via a WebService (SOAP/REST),
-     * there is currently no need for a proper copying.</p>
+     * <p>Note, that as the API is only exposed via a REST Endpoint, there is no
+     * need for a proper copying.</p>
      *
      * <p>Further, the copy here is fake - meaning that it doesn't do anything.
      * This is important, as some byte arrays must be actively destroyed, which

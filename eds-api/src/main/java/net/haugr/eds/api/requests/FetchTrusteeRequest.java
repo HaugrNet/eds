@@ -38,9 +38,11 @@ public final class FetchTrusteeRequest extends Authentication implements CircleI
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
+    /** MemberId. */
     @JsonbProperty(value = Constants.FIELD_MEMBER_ID, nillable = true)
     private String memberId = null;
 
+    /** CircleId. */
     @JsonbProperty(value = Constants.FIELD_CIRCLE_ID, nillable = true)
     private String circleId = null;
 
@@ -48,10 +50,20 @@ public final class FetchTrusteeRequest extends Authentication implements CircleI
     // Setters & Getters
     // =========================================================================
 
+    /**
+     * Set the MemberId.
+     *
+     * @param memberId MemberId
+     */
     public void setMemberId(final String memberId) {
         this.memberId = memberId;
     }
 
+    /**
+     * Retrieves the MemberId.
+     *
+     * @return MemberId
+     */
     public String getMemberId() {
         return memberId;
     }

@@ -46,6 +46,7 @@ public final class FetchSignatureResponse extends EDSResponse {
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
+    /** The List of Signatures. */
     @JsonbProperty(Constants.FIELD_SIGNATURES)
     private final List<Signature> signatures = new ArrayList<>(0);
 
@@ -76,10 +77,20 @@ public final class FetchSignatureResponse extends EDSResponse {
     // Setters & Getters
     // =========================================================================
 
+    /**
+     * Set the List of Signatures.
+     *
+     * @param signatures List of Signatures
+     */
     public void setSignatures(final List<Signature> signatures) {
         this.signatures.addAll(signatures);
     }
 
+    /**
+     * Retrieves the List of Signatures.
+     *
+     * @return List of Signatures
+     */
     public List<Signature> getSignatures() {
         return Collections.unmodifiableList(signatures);
     }

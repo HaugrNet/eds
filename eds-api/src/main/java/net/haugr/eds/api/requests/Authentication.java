@@ -44,13 +44,16 @@ public class Authentication extends AbstractRequest {
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
+    /** Account Name. */
     @JsonbProperty(value = Constants.FIELD_ACCOUNT_NAME, nillable = true)
     private String accountName = null;
 
+    /** Credential (Password or Passphrase). */
     @JsonbProperty(value = Constants.FIELD_CREDENTIAL, nillable = true)
     @JsonbTypeAdapter(ByteArrayAdapter.class)
     private byte[] credential = null;
 
+    /** Credential Type. */
     @JsonbProperty(value = Constants.FIELD_CREDENTIALTYPE, nillable = true)
     private CredentialType credentialType = null;
 
@@ -58,26 +61,56 @@ public class Authentication extends AbstractRequest {
     // Standard Setters & Getters
     // =========================================================================
 
+    /**
+     * Set AccountName.
+     *
+     * @param accountName AccountName
+     */
     public final void setAccountName(final String accountName) {
         this.accountName = accountName;
     }
 
+    /**
+     * Retrieves the AccountName.
+     *
+     * @return AccountName
+     */
     public final String getAccountName() {
         return accountName;
     }
 
+    /**
+     * Sets the Credential (Password or Passphrase).
+     *
+     * @param credential Credential (Password or Passphrase)
+     */
     public final void setCredential(final byte[] credential) {
         this.credential = Utilities.copy(credential);
     }
 
+    /**
+     * Retrieves the Credential (Password or Passphrase).
+     *
+     * @return Credential (Password or Passphrase)
+     */
     public final byte[] getCredential() {
         return Utilities.copy(credential);
     }
 
+    /**
+     * Sets the Credential Type.
+     *
+     * @param credentialType Credential Type
+     */
     public final void setCredentialType(final CredentialType credentialType) {
         this.credentialType = credentialType;
     }
 
+    /**
+     * Retrieves Credential Type.
+     *
+     * @return Credential Type
+     */
     public final CredentialType getCredentialType() {
         return credentialType;
     }

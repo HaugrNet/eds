@@ -42,9 +42,11 @@ public final class Circle implements Serializable {
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
+    /** CircleId. */
     @JsonbProperty(value = Constants.FIELD_CIRCLE_ID, nillable = true)
     private String circleId = null;
 
+    /** Circle Name. */
     @JsonbProperty(value = Constants.FIELD_CIRCLE_NAME, nillable = true)
     private String circleName = null;
 
@@ -52,9 +54,11 @@ public final class Circle implements Serializable {
     // hence it is only stored but not used for anything. For the same reason,
     // it is not used as part of the Standard Object methods, #equals(),
     // #hashCode() and #toString().
+    /** Circle Key. */
     @JsonbProperty(value = Constants.FIELD_CIRCLE_KEY, nillable = true)
     private String circleKey = null;
 
+    /** Created Timestamp. */
     @JsonbProperty(value = Constants.FIELD_ADDED, nillable = true)
     @JsonbDateFormat(Constants.JSON_DATE_FORMAT)
     private LocalDateTime added = null;
@@ -63,34 +67,74 @@ public final class Circle implements Serializable {
     // Standard Setters & Getters
     // =========================================================================
 
+    /**
+     * Sets the CircleId.
+     *
+     * @param circleId CircleId
+     */
     public void setCircleId(final String circleId) {
         this.circleId = circleId;
     }
 
+    /**
+     * Retrieves the CircleId.
+     *
+     * @return CircleId
+     */
     public String getCircleId() {
         return circleId;
     }
 
+    /**
+     * Sets the CircleName.
+     *
+     * @param circleName CircleName
+     */
     public void setCircleName(final String circleName) {
         this.circleName = circleName;
     }
 
+    /**
+     * Retrieves the CircleName.
+     *
+     * @return CircleName
+     */
     public String getCircleName() {
         return circleName;
     }
 
+    /**
+     * Sets the CircleKey.
+     *
+     * @param circleKey CircleKey
+     */
     public void setCircleKey(final String circleKey) {
         this.circleKey = circleKey;
     }
 
+    /**
+     * Retrieves the CircleKey.
+     *
+     * @return CircleKey
+     */
     public String getCircleKey() {
         return circleKey;
     }
 
+    /**
+     * Sets the Created Timestamp.
+     *
+     * @param added Created Timestamp
+     */
     public void setAdded(final LocalDateTime added) {
         this.added = added;
     }
 
+    /**
+     * Retrieves the Created Timestamp
+     *
+     * @return Created Timestamp
+     */
     public LocalDateTime getAdded() {
         return added;
     }

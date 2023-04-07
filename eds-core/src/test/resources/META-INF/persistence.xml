@@ -40,7 +40,7 @@
             <property name="javax.persistence.jdbc.driver" value="org.h2.Driver"/>
             <property name="javax.persistence.jdbc.user" value="sa"/>
             <property name="javax.persistence.jdbc.password" value="sa"/>
-            <property name="javax.persistence.schema-generation.database.action" value="create" />
+            <property name="javax.persistence.schema-generation.database.action" value="drop-and-create" />
             <property name="javax.persistence.schema-generation.create-source" value="script"/>
             <property name="javax.persistence.schema-generation.create-script-source" value="META-INF/init-h2.sql"/>
             <property name="javax.persistence.sql-load-script-source" value="META-INF/data.sql"/>
@@ -49,7 +49,6 @@
             <property name="hibernate.connection.pool_size" value="75"/>
             <property name="hibernate.connection.autocommit" value="false"/>
             <property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect"/>
-            <property name="hibernate.cache.provider_class" value="org.hibernate.cache.HashtableCacheProvider"/>
             <!-- The following is needed, as Hibernate otherwise require that each table creation is on a single line. -->
             <property name="hibernate.hbm2ddl.import_files_sql_extractor" value="org.hibernate.tool.hbm2ddl.MultipleLinesSqlCommandExtractor" />
             <property name="show_sql" value="false"/>

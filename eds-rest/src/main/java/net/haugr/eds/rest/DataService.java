@@ -46,6 +46,12 @@ public class DataService {
     private ShareBean bean;
     private final Settings settings = Settings.getInstance();
 
+    /**
+     * The REST Add Data Endpoint.
+     *
+     * @param addDataRequest Add Data Request
+     * @return Add Data Response
+     */
     @POST
     @Path(Constants.REST_DATA_ADD)
     @Consumes(CommonService.CONSUMES)
@@ -55,24 +61,42 @@ public class DataService {
         return CommonService.runRequest(settings, bean, PROCESS_METHOD, addDataRequest, Constants.REST_DATA_BASE + Constants.REST_DATA_ADD);
     }
 
+    /**
+     * The REST Copy Data Endpoint.
+     *
+     * @param copyDataRequest Copy Data Request
+     * @return Copy Data Response
+     */
     @POST
     @Path(Constants.REST_DATA_COPY)
     @Consumes(CommonService.CONSUMES)
     @Produces(CommonService.PRODUCES)
-    public Response copy(@NotNull final ProcessDataRequest updateDataRequest) {
-        updateDataRequest.setAction(Action.COPY);
-        return CommonService.runRequest(settings, bean, PROCESS_METHOD, updateDataRequest, Constants.REST_DATA_BASE + Constants.REST_DATA_COPY);
+    public Response copy(@NotNull final ProcessDataRequest copyDataRequest) {
+        copyDataRequest.setAction(Action.COPY);
+        return CommonService.runRequest(settings, bean, PROCESS_METHOD, copyDataRequest, Constants.REST_DATA_BASE + Constants.REST_DATA_COPY);
     }
 
+    /**
+     * The REST Move Data Endpoint.
+     *
+     * @param moveDataRequest Move Data Request
+     * @return Move Data Response
+     */
     @POST
     @Path(Constants.REST_DATA_MOVE)
     @Consumes(CommonService.CONSUMES)
     @Produces(CommonService.PRODUCES)
-    public Response move(@NotNull final ProcessDataRequest updateDataRequest) {
-        updateDataRequest.setAction(Action.MOVE);
-        return CommonService.runRequest(settings, bean, PROCESS_METHOD, updateDataRequest, Constants.REST_DATA_BASE + Constants.REST_DATA_MOVE);
+    public Response move(@NotNull final ProcessDataRequest moveDataRequest) {
+        moveDataRequest.setAction(Action.MOVE);
+        return CommonService.runRequest(settings, bean, PROCESS_METHOD, moveDataRequest, Constants.REST_DATA_BASE + Constants.REST_DATA_MOVE);
     }
 
+    /**
+     * The REST Update Data Endpoint.
+     *
+     * @param updateDataRequest Update Data Request
+     * @return Update Data Response
+     */
     @POST
     @Path(Constants.REST_DATA_UPDATE)
     @Consumes(CommonService.CONSUMES)
@@ -82,6 +106,12 @@ public class DataService {
         return CommonService.runRequest(settings, bean, PROCESS_METHOD, updateDataRequest, Constants.REST_DATA_BASE + Constants.REST_DATA_UPDATE);
     }
 
+    /**
+     * The REST Delete Data Endpoint.
+     *
+     * @param deleteDataRequest Delete Data Request
+     * @return Delete Data Response
+     */
     @POST
     @Path(Constants.REST_DATA_DELETE)
     @Consumes(CommonService.CONSUMES)
@@ -91,6 +121,12 @@ public class DataService {
         return CommonService.runRequest(settings, bean, PROCESS_METHOD, deleteDataRequest, Constants.REST_DATA_BASE + Constants.REST_DATA_DELETE);
     }
 
+    /**
+     * The REST Fetch Data Endpoint.
+     *
+     * @param fetchDataRequest Fetch Data Request
+     * @return Fetch Data Response
+     */
     @POST
     @Path(Constants.REST_DATA_FETCH)
     @Consumes(CommonService.CONSUMES)

@@ -43,10 +43,12 @@ public final class SignRequest extends Authentication {
 
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
+    /** The Data to Sign. */
     @JsonbProperty(value = Constants.FIELD_DATA, nillable = true)
     @JsonbTypeAdapter(ByteArrayAdapter.class)
     private byte[] data = null;
 
+    /** Signature Expiration Date. */
     @JsonbProperty(value = Constants.FIELD_EXPIRES, nillable = true)
     @JsonbDateFormat(Constants.JSON_DATE_FORMAT)
     private LocalDateTime expires = null;
@@ -55,18 +57,38 @@ public final class SignRequest extends Authentication {
     // Standard Setters & Getters
     // =========================================================================
 
+    /**
+     * Set the Data to Sign.
+     *
+     * @param data Data to Sign
+     */
     public void setData(final byte[] data) {
         this.data = Utilities.copy(data);
     }
 
+    /**
+     * Retrieves the Data to Sign.
+     *
+     * @return Data to Sign
+     */
     public byte[] getData() {
         return Utilities.copy(data);
     }
 
+    /**
+     * Set the Signature Expiration Date.
+     *
+     * @param expires Signature Expiration Date
+     */
     public void setExpires(final LocalDateTime expires) {
         this.expires = expires;
     }
 
+    /**
+     * Retrieves the Signature Expiration Date.
+     *
+     * @return Signature Expiration Date
+     */
     public LocalDateTime getExpires() {
         return expires;
     }

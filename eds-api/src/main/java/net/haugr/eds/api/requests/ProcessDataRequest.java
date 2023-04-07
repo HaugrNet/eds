@@ -70,30 +70,39 @@ public final class ProcessDataRequest extends Authentication implements CircleId
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
+    /** The Action. */
     @JsonbProperty(value = Constants.FIELD_ACTION, nillable = true)
     private Action action = null;
 
+    /** The DataId. */
     @JsonbProperty(value = Constants.FIELD_DATA_ID, nillable = true)
     private String dataId = null;
 
+    /** The CircleId. */
     @JsonbProperty(value = Constants.FIELD_CIRCLE_ID, nillable = true)
     private String circleId = null;
 
+    /** The Target CircleId. */
     @JsonbProperty(value = Constants.FIELD_TARGET_CIRCLE_ID, nillable = true)
     private String targetCircleId = null;
 
+    /** The DataName. */
     @JsonbProperty(value = Constants.FIELD_DATA_NAME, nillable = true)
     private String dataName = null;
 
+    /** The FolderId. */
     @JsonbProperty(value = Constants.FIELD_FOLDER_ID, nillable = true)
     private String folderId = null;
 
+    /** The Target FolderId. */
     @JsonbProperty(value = Constants.FIELD_TARGET_FOLDER_ID, nillable = true)
     private String targetFolderId = null;
 
+    /** The TypeName. */
     @JsonbProperty(value = Constants.FIELD_TYPENAME, nillable = true)
     private String typeName = null;
 
+    /** The Data. */
     @JsonbProperty(value = Constants.FIELD_DATA, nillable = true)
     @JsonbTypeAdapter(ByteArrayAdapter.class)
     private byte[] data = null;
@@ -118,10 +127,20 @@ public final class ProcessDataRequest extends Authentication implements CircleId
         return action;
     }
 
+    /**
+     * Set the DataId.
+     *
+     * @param dataId DataId
+     */
     public void setDataId(final String dataId) {
         this.dataId = dataId;
     }
 
+    /**
+     * Retrieves the DataId.
+     *
+     * @return DataId
+     */
     public String getDataId() {
         return dataId;
     }
@@ -142,50 +161,110 @@ public final class ProcessDataRequest extends Authentication implements CircleId
         return circleId;
     }
 
+    /**
+     * Set the Target CircleId.
+     *
+     * @param targetCircleId Target CircleId
+     */
     public void setTargetCircleId(final String targetCircleId) {
         this.targetCircleId = targetCircleId;
     }
 
+    /**
+     * Retrieves the Target CircleId.
+     *
+     * @return Target CircleId
+     */
     public String getTargetCircleId() {
         return targetCircleId;
     }
 
+    /**
+     * Set the DataName.
+     *
+     * @param dataName DataName
+     */
     public void setDataName(final String dataName) {
         this.dataName = dataName;
     }
 
+    /**
+     * Retrieves the DataName.
+     *
+     * @return DataName
+     */
     public String getDataName() {
         return dataName;
     }
 
+    /**
+     * Set the FolderId.
+     *
+     * @param folderId FolderId
+     */
     public void setFolderId(final String folderId) {
         this.folderId = folderId;
     }
 
+    /**
+     * Retrieves the FolderId.
+     *
+     * @return FolderId
+     */
     public String getFolderId() {
         return folderId;
     }
 
+    /**
+     * Set the Target FolderId.
+     *
+     * @param targetFolderId Target FolderId
+     */
     public void setTargetFolderId(final String targetFolderId) {
         this.targetFolderId = targetFolderId;
     }
 
+    /**
+     * Retrieves the Target FolderId.
+     *
+     * @return Target FolderId
+     */
     public String getTargetFolderId() {
         return targetFolderId;
     }
 
+    /**
+     * Set the TypeName.
+     *
+     * @param typeName TypeName
+     */
     public void setTypeName(final String typeName) {
         this.typeName = typeName;
     }
 
+    /**
+     * Retrieves the TypeName.
+     *
+     * @return TypeName
+     */
     public String getTypeName() {
         return typeName;
     }
 
+    /**
+     * Set the Data.
+     *
+     * @param data Data
+     */
     public void setData(final byte[] data) {
         this.data = Utilities.copy(data);
     }
 
+    /**
+     * Retrieves the Data.
+     *
+     * @return Data
+     */
     public byte[] getData() {
         return Utilities.copy(data);
     }

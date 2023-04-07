@@ -40,9 +40,11 @@ public final class Sanity implements Serializable {
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
+    /** DataId. */
     @JsonbProperty(value = Constants.FIELD_DATA_ID, nillable = true)
     private String dataId = null;
 
+    /** Changed. */
     @JsonbProperty(value = Constants.FIELD_CHANGED, nillable = true)
     @JsonbDateFormat(Constants.JSON_DATE_FORMAT)
     private LocalDateTime changed = null;
@@ -51,18 +53,38 @@ public final class Sanity implements Serializable {
     // Standard Setters & Getters
     // =========================================================================
 
+    /**
+     * Set the DataId.
+     *
+     * @param dataId DataId
+     */
     public void setDataId(final String dataId) {
         this.dataId = dataId;
     }
 
+    /**
+     * Retrieves the DataId.
+     *
+     * @return DataId
+     */
     public String getDataId() {
         return dataId;
     }
 
+    /**
+     * Sets the Changed Timestamp.
+     *
+     * @param changed Changed Timestamp
+     */
     public void setChanged(final LocalDateTime changed) {
         this.changed = changed;
     }
 
+    /**
+     * Retrieves the Changed Timestamp.
+     *
+     * @return Changed Timestamp
+     */
     public LocalDateTime getChanged() {
         return changed;
     }

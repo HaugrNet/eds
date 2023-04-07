@@ -44,9 +44,11 @@ public final class ProcessMemberResponse extends EDSResponse {
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
+    /** The MemberId. */
     @JsonbProperty(Constants.FIELD_MEMBER_ID)
     private String memberId = null;
 
+    /** The Signature. */
     @JsonbProperty(Constants.FIELD_SIGNATURE)
     @JsonbTypeAdapter(ByteArrayAdapter.class)
     private byte[] signature = null;
@@ -87,18 +89,38 @@ public final class ProcessMemberResponse extends EDSResponse {
     // Standard Setters & Getters
     // =========================================================================
 
+    /**
+     * Set the MemberId.
+     *
+     * @param memberId MemberId
+     */
     public void setMemberId(final String memberId) {
         this.memberId = memberId;
     }
 
+    /**
+     * Retrieves the MemberId.
+     *
+     * @return MemberId
+     */
     public String getMemberId() {
         return memberId;
     }
 
+    /**
+     * Set the Signature.
+     *
+     * @param signature Signature
+     */
     public void setSignature(final byte[] signature) {
         this.signature = Utilities.copy(signature);
     }
 
+    /**
+     * Retrieves the Signature.
+     *
+     * @return Signature
+     */
     public byte[] getSignature() {
         return Utilities.copy(signature);
     }

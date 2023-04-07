@@ -42,9 +42,11 @@ public final class VerifyRequest extends Authentication {
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
+    /** The Signature to verify. */
     @JsonbProperty(value = Constants.FIELD_SIGNATURE, nillable = true)
     private String signature = null;
 
+    /** The Data to Verify. */
     @JsonbProperty(value = Constants.FIELD_DATA, nillable = true)
     @JsonbTypeAdapter(ByteArrayAdapter.class)
     private byte[] data = null;
@@ -53,18 +55,38 @@ public final class VerifyRequest extends Authentication {
     // Standard Setters & Getters
     // =========================================================================
 
+    /**
+     * Set the Signature to verify.
+     *
+     * @param signature Signature to verify
+     */
     public void setSignature(final String signature) {
         this.signature = signature;
     }
 
+    /**
+     * Retrieves the Signature to verify.
+     *
+     * @return Signature to verify
+     */
     public String getSignature() {
         return signature;
     }
 
+    /**
+     * Set the Data to Verify against the Signature.
+     *
+     * @param data Data to Verify
+     */
     public void setData(final byte[] data) {
         this.data = Utilities.copy(data);
     }
 
+    /**
+     * Retrieves the Data to Verify against the Signature.
+     *
+     * @return Data to Verify
+     */
     public byte[] getData() {
         return Utilities.copy(data);
     }

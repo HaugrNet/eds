@@ -47,6 +47,12 @@ public class SignatureService {
     private ShareBean bean;
     private final Settings settings = Settings.getInstance();
 
+    /**
+     * The REST Sign Document Endpoint.
+     *
+     * @param signDocumentRequest Sign Document Request
+     * @return Sign Document Response
+     */
     @POST
     @Path(Constants.REST_SIGNATURES_SIGN)
     @Consumes(CommonService.CONSUMES)
@@ -55,6 +61,12 @@ public class SignatureService {
         return CommonService.runRequest(settings, bean, SIGN_METHOD, signDocumentRequest, Constants.REST_SIGNATURES_BASE + Constants.REST_SIGNATURES_SIGN);
     }
 
+    /**
+     * The REST Verify Signature Endpoint.
+     *
+     * @param verifySignatureRequest Verify Signature Request
+     * @return Verify Signature Response
+     */
     @POST
     @Path(Constants.REST_SIGNATURES_VERIFY)
     @Consumes(CommonService.CONSUMES)
@@ -63,6 +75,12 @@ public class SignatureService {
         return CommonService.runRequest(settings, bean, VERIFY_METHOD, verifySignatureRequest, Constants.REST_SIGNATURES_BASE + Constants.REST_SIGNATURES_VERIFY);
     }
 
+    /**
+     * The REST Fetch Signatures Endpoint.
+     *
+     * @param fetchSignaturesRequest Fetch Signatures Request
+     * @return Fetch Signatures Response
+     */
     @POST
     @Path(Constants.REST_SIGNATURES_FETCH)
     @Consumes(CommonService.CONSUMES)

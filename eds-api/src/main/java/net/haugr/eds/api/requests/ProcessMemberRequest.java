@@ -99,23 +99,29 @@ public final class ProcessMemberRequest extends Authentication implements Action
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
+    /** The Action. */
     @JsonbProperty(value = Constants.FIELD_ACTION, nillable = true)
     private Action action = null;
 
+    /** The MemberId. */
     @JsonbProperty(value = Constants.FIELD_MEMBER_ID, nillable = true)
     private String memberId = null;
 
+    /** The Member Role. */
     @JsonbProperty(value = Constants.FIELD_MEMBER_ROLE, nillable = true)
     private MemberRole memberRole = null;
 
     // The Public Key is an optional value which may or may not be provided,
     // hence it is only stored but not used for anything.
+    /** The Public Key. */
     @JsonbProperty(value = Constants.FIELD_PUBLIC_KEY, nillable = true)
     private String publicKey = null;
 
+    /** The New AccountName. */
     @JsonbProperty(value = Constants.FIELD_NEW_ACCOUNT_NAME, nillable = true)
     private String newAccountName = null;
 
+    /** The New Credential (Password or Passphrase). */
     @JsonbProperty(value = Constants.FIELD_NEW_CREDENTIAL, nillable = true)
     @JsonbTypeAdapter(ByteArrayAdapter.class)
     private byte[] newCredential = null;
@@ -140,42 +146,92 @@ public final class ProcessMemberRequest extends Authentication implements Action
         return action;
     }
 
+    /**
+     * Set the MemberId.
+     *
+     * @param memberId MemberId
+     */
     public void setMemberId(final String memberId) {
         this.memberId = memberId;
     }
 
+    /**
+     * Retrieves the MemberId.
+     *
+     * @return MemberId
+     */
     public String getMemberId() {
         return memberId;
     }
 
+    /**
+     * Set the Member Role.
+     *
+     * @param memberRole Member Role
+     */
     public void setMemberRole(final MemberRole memberRole) {
         this.memberRole = memberRole;
     }
 
+    /**
+     * Retrieves the Member Role.
+     *
+     * @return Member Role
+     */
     public MemberRole getMemberRole() {
         return memberRole;
     }
 
+    /**
+     * Set the PublicKey.
+     *
+     * @param publicKey PublicKey
+     */
     public void setPublicKey(final String publicKey) {
         this.publicKey = publicKey;
     }
 
+    /**
+     * Retrieves the PublicKey.
+     *
+     * @return PublicKey
+     */
     public String getPublicKey() {
         return publicKey;
     }
 
+    /**
+     * Set the New AccountName.
+     *
+     * @param newAccountName New AccountName
+     */
     public void setNewAccountName(final String newAccountName) {
         this.newAccountName = newAccountName;
     }
 
+    /**
+     * Retrieves the New AccountName.
+     *
+     * @return New AccountName
+     */
     public String getNewAccountName() {
         return newAccountName;
     }
 
+    /**
+     * Set the New Credential (Password or Passphrase).
+     *
+     * @param newCredential New Credential
+     */
     public void setNewCredential(final byte[] newCredential) {
         this.newCredential = Utilities.copy(newCredential);
     }
 
+    /**
+     * Retrieves the New Credential (Password or Passphrase).
+     *
+     * @return New Credential
+     */
     public byte[] getNewCredential() {
         return Utilities.copy(newCredential);
     }

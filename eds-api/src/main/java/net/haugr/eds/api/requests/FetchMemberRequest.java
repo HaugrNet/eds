@@ -39,6 +39,7 @@ public final class FetchMemberRequest extends Authentication {
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
+    /** MemberId. */
     @JsonbProperty(value = Constants.FIELD_MEMBER_ID, nillable = true)
     private String memberId = null;
 
@@ -46,10 +47,20 @@ public final class FetchMemberRequest extends Authentication {
     // Setters & Getters
     // =========================================================================
 
+    /**
+     * Set the MemberId.
+     *
+     * @param memberId MemberId
+     */
     public void setMemberId(final String memberId) {
         this.memberId = memberId;
     }
 
+    /**
+     * Retrieves the MemberId.
+     *
+     * @return MemberId
+     */
     public String getMemberId() {
         return memberId;
     }

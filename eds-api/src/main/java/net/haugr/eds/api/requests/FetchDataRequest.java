@@ -46,18 +46,23 @@ public final class FetchDataRequest extends Authentication implements CircleIdRe
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
+    /** CircleId. */
     @JsonbProperty(value = Constants.FIELD_CIRCLE_ID, nillable = true)
     private String circleId = null;
 
+    /** DataId. */
     @JsonbProperty(value = Constants.FIELD_DATA_ID, nillable = true)
     private String dataId = null;
 
+    /** Page Number. */
     @JsonbProperty(value = Constants.FIELD_PAGE_NUMBER, nillable = true)
     private Integer pageNumber = 1;
 
+    /** Page Size. */
     @JsonbProperty(value = Constants.FIELD_PAGE_SIZE, nillable = true)
     private Integer pageSize = Constants.MAX_PAGE_SIZE;
 
+    /** DataName. */
     @JsonbProperty(value = Constants.FIELD_DATA_NAME, nillable = true)
     private String dataName = null;
 
@@ -81,34 +86,74 @@ public final class FetchDataRequest extends Authentication implements CircleIdRe
         return circleId;
     }
 
+    /**
+     * Set the DataId.
+     *
+     * @param dataId DataId
+     */
     public void setDataId(final String dataId) {
         this.dataId = dataId;
     }
 
+    /**
+     * Retrieves the DataId.
+     *
+     * @return DataId
+     */
     public String getDataId() {
         return dataId;
     }
 
+    /**
+     * Set the Page Number.
+     *
+     * @param pageNumber Page Number
+     */
     public void setPageNumber(final int pageNumber) {
         this.pageNumber = pageNumber;
     }
 
+    /**
+     * Retrieves the Page Number.
+     *
+     * @return Page Number
+     */
     public int getPageNumber() {
         return pageNumber;
     }
 
+    /**
+     * Set the Page Size.
+     *
+     * @param pageSize Page Size
+     */
     public void setPageSize(final Integer pageSize) {
         this.pageSize = pageSize;
     }
 
+    /**
+     * Retrieves the Page Size.
+     *
+     * @return Page Size
+     */
     public Integer getPageSize() {
         return pageSize;
     }
 
+    /**
+     * Set the DataName.
+     *
+     * @param dataName DataName
+     */
     public void setDataName(final String dataName) {
         this.dataName = dataName;
     }
 
+    /**
+     * Retrieves the DataName.
+     *
+     * @return DataName
+     */
     public String getDataName() {
         return dataName;
     }

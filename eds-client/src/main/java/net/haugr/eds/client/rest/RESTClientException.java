@@ -29,10 +29,21 @@ public final class RESTClientException extends RuntimeException {
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
+    /**
+     * Simple message Exception.
+     *
+     * @param message Exception Message
+     */
     public RESTClientException(final String message) {
         super(message);
     }
 
+    /**
+     * Message &amp; Cause Exception.
+     *
+     * @param message Exception Message
+     * @param cause   Exception Cause
+     */
     public RESTClientException(final String message, final Throwable cause) {
         super(message, cause);
     }

@@ -37,6 +37,7 @@ public final class AuthenticateResponse extends EDSResponse {
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
+    /** The MemberId. */
     @JsonbProperty(Constants.FIELD_MEMBER_ID)
     private String memberId = null;
 
@@ -67,10 +68,20 @@ public final class AuthenticateResponse extends EDSResponse {
     // Standard Setters & Getters
     // =========================================================================
 
+    /**
+     * Sets the MemberId
+     *
+     * @param memberId MemberId
+     */
     public void setMemberId(final String memberId) {
         this.memberId = memberId;
     }
 
+    /**
+     * Returns the MemberId.
+     *
+     * @return MemberId
+     */
     public String getMemberId() {
         return memberId;
     }

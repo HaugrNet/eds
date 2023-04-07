@@ -535,14 +535,29 @@ public enum ReturnCode {
         this.description = description;
     }
 
+    /**
+     * Retrieves the Return Code Classification.
+     *
+     * @return Return Code Classification
+     */
     public Classification getClassification() {
         return classification;
     }
 
+    /**
+     * Retrieves the actual Code.
+     *
+     * @return Actual Code
+     */
     public int getCode() {
         return classification.getClassificationCode() + code;
     }
 
+    /**
+     * Retrieves the HTTP version of the Classification Code.
+     *
+     * @return HTTP version of the Classification Code
+     */
     public int getHttpCode() {
         int httpCode = getCode();
 
@@ -553,6 +568,11 @@ public enum ReturnCode {
         return httpCode;
     }
 
+    /**
+     * Retrieves the Return Message description.
+     *
+     * @return Return Message Description
+     */
     public String getDescription() {
         return description;
     }

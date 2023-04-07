@@ -40,6 +40,7 @@ public final class ProcessDataTypeResponse extends EDSResponse {
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
+    /** The DataType. */
     @JsonbProperty(Constants.FIELD_DATATYPE)
     private DataType dataType = null;
 
@@ -79,10 +80,20 @@ public final class ProcessDataTypeResponse extends EDSResponse {
     // Standard Setters & Getters
     // =========================================================================
 
+    /**
+     * Set the DataType.
+     *
+     * @param dataType DataType
+     */
     public void setDataType(final DataType dataType) {
         this.dataType = dataType;
     }
 
+    /**
+     * Retrieves the DataType.
+     *
+     * @return DataType
+     */
     public DataType getDataType() {
         return dataType;
     }

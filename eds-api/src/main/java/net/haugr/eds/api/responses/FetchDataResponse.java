@@ -55,12 +55,15 @@ public final class FetchDataResponse extends EDSResponse {
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
+    /** The Metadata. */
     @JsonbProperty(Constants.FIELD_METADATA)
     private final List<Metadata> metadata = new ArrayList<>(0);
 
+    /** The Number of Records. */
     @JsonbProperty(Constants.FIELD_RECORDS)
     private long records = 0;
 
+    /** The Data. */
     @JsonbProperty(Constants.FIELD_DATA)
     @JsonbTypeAdapter(ByteArrayAdapter.class)
     private byte[] data = null;
@@ -92,26 +95,56 @@ public final class FetchDataResponse extends EDSResponse {
     // Setters & Getters
     // =========================================================================
 
+    /**
+     * Set the Metadata.
+     *
+     * @param metadata Metadata
+     */
     public void setMetadata(final List<Metadata> metadata) {
         this.metadata.addAll(metadata);
     }
 
+    /**
+     * Retrieves the Metadata.
+     *
+     * @return Metadata
+     */
     public List<Metadata> getMetadata() {
         return Collections.unmodifiableList(metadata);
     }
 
+    /**
+     * Set the Number of Records.
+     *
+     * @param records Number of Records
+     */
     public void setRecords(final long records) {
         this.records = records;
     }
 
+    /**
+     * Retrieves the Number of Records.
+     *
+     * @return Number of Records
+     */
     public long getRecords() {
         return records;
     }
 
+    /**
+     * Set the Data.
+     *
+     * @param data Data
+     */
     public void setData(final byte[] data) {
         this.data = Utilities.copy(data);
     }
 
+    /**
+     * Retrieves the Data.
+     *
+     * @return Data
+     */
     public byte[] getData() {
         return Utilities.copy(data);
     }

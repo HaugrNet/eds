@@ -41,9 +41,11 @@ public final class SanityRequest extends Authentication implements CircleIdReque
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
+    /** The CircleId. */
     @JsonbProperty(value = Constants.FIELD_CIRCLE_ID, nillable = true)
     private String circleId = null;
 
+    /** The Date since last check. */
     @JsonbProperty(value = Constants.FIELD_SINCE, nillable = true)
     @JsonbDateFormat(Constants.JSON_DATE_FORMAT)
     private LocalDateTime since = null;
@@ -68,10 +70,20 @@ public final class SanityRequest extends Authentication implements CircleIdReque
         return circleId;
     }
 
+    /**
+     * Set the Date since last check.
+     *
+     * @param since Data since last check
+     */
     public void setSince(final LocalDateTime since) {
         this.since = since;
     }
 
+    /**
+     * Retrieves the Date since last check.
+     *
+     * @return Date since last check
+     */
     public LocalDateTime getSince() {
         return since;
     }

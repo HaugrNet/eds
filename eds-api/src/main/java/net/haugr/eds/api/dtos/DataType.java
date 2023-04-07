@@ -45,9 +45,11 @@ public final class DataType implements Serializable {
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
+    /** Type Name. */
     @JsonbProperty(value = Constants.FIELD_TYPENAME, nillable = true)
     private String typeName = null;
 
+    /** Type. */
     @JsonbProperty(value = Constants.FIELD_TYPE, nillable = true)
     private String type = null;
 
@@ -55,18 +57,38 @@ public final class DataType implements Serializable {
     // Standard Setters & Getters
     // =========================================================================
 
+    /**
+     * Set the TypeName.
+     *
+     * @param typeName TypeName
+     */
     public void setTypeName(final String typeName) {
         this.typeName = typeName;
     }
 
+    /**
+     * Retrieves the TypeName.
+     *
+     * @return TypeName
+     */
     public String getTypeName() {
         return typeName;
     }
 
+    /**
+     * Set the Type.
+     *
+     * @param type Type
+     */
     public void setType(final String type) {
         this.type = type;
     }
 
+    /**
+     * Retrieves the Type.
+     *
+     * @return Type
+     */
     public String getType() {
         return type;
     }

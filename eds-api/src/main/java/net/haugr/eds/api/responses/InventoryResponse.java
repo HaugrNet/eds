@@ -41,9 +41,11 @@ public class InventoryResponse extends EDSResponse {
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
+    /** The List of Inventory Metadata. */
     @JsonbProperty(Constants.FIELD_INVENTORY)
     private final List<Metadata> inventory = new ArrayList<>(0);
 
+    /** The Number of Records. */
     @JsonbProperty(Constants.FIELD_RECORDS)
     private long records = 0;
 
@@ -74,18 +76,38 @@ public class InventoryResponse extends EDSResponse {
     // Setters & Getters
     // =========================================================================
 
+    /**
+     * Set the List of Inventory Metadata.
+     *
+     * @param inventory List of Inventory Metadata
+     */
     public void setInventory(final List<Metadata> inventory) {
         this.inventory.addAll(inventory);
     }
 
+    /**
+     * Retrieves the List of Inventory Metadata.
+     *
+     * @return List of Inventory Metadata
+     */
     public List<Metadata> getInventory() {
         return Collections.unmodifiableList(inventory);
     }
 
+    /**
+     * Set the Number of Records.
+     *
+     * @param records Number of Records
+     */
     public void setRecords(final long records) {
         this.records = records;
     }
 
+    /**
+     * Retrieves the Number of Records.
+     *
+     * @return Number of Records
+     */
     public long getRecords() {
         return records;
     }

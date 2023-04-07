@@ -24,7 +24,17 @@ package net.haugr.eds.api.requests;
  */
 public interface CircleIdRequest {
 
+    /**
+     * Sets the CircleId.
+     *
+     * @param circleId CircleId
+     */
     void setCircleId(String circleId);
 
+    /**
+     * Retrieves the CircleId.
+     *
+     * @return CircleId
+     */
     String getCircleId();
 }

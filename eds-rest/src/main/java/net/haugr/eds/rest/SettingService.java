@@ -43,6 +43,12 @@ public class SettingService {
     private ManagementBean bean;
     private final Settings settings = Settings.getInstance();
 
+    /**
+     * The REST Settings Endpoint.
+     *
+     * @param settingRequest Settings Request
+     * @return Settings Response
+     */
     @POST
     @Consumes(CommonService.CONSUMES)
     @Produces(CommonService.PRODUCES)

@@ -46,6 +46,12 @@ public class TrusteeService {
     private ManagementBean bean;
     private final Settings settings = Settings.getInstance();
 
+    /**
+     * The REST Add Trustee Endpoint.
+     *
+     * @param addTrusteeRequest Add Trustee Request
+     * @return Add Trustee Response
+     */
     @POST
     @Path(Constants.REST_TRUSTEES_ADD)
     @Consumes(CommonService.CONSUMES)
@@ -55,6 +61,12 @@ public class TrusteeService {
         return CommonService.runRequest(settings, bean, PROCESS_METHOD, addTrusteeRequest, Constants.REST_TRUSTEES_BASE + Constants.REST_TRUSTEES_ADD);
     }
 
+    /**
+     * The REST Alter Trustee Endpoint.
+     *
+     * @param alterTrusteeRequest Alter Trustee Request
+     * @return Alter Trustee Response
+     */
     @POST
     @Path(Constants.REST_TRUSTEES_ALTER)
     @Consumes(CommonService.CONSUMES)
@@ -64,6 +76,12 @@ public class TrusteeService {
         return CommonService.runRequest(settings, bean, PROCESS_METHOD, alterTrusteeRequest, Constants.REST_TRUSTEES_BASE + Constants.REST_TRUSTEES_ALTER);
     }
 
+    /**
+     * The REST Remove Trustee Endpoint.
+     *
+     * @param removeTrusteeRequest Remove Trustee Request
+     * @return Remove Trustee Response
+     */
     @POST
     @Path(Constants.REST_TRUSTEES_REMOVE)
     @Consumes(CommonService.CONSUMES)
@@ -73,6 +91,12 @@ public class TrusteeService {
         return CommonService.runRequest(settings, bean, PROCESS_METHOD, removeTrusteeRequest, Constants.REST_TRUSTEES_BASE + Constants.REST_TRUSTEES_REMOVE);
     }
 
+    /**
+     * The REST Fetch Trustees Endpoint.
+     *
+     * @param fetchTrusteeRequest Fetch Trustees Request
+     * @return Fetch Trustees Response
+     */
     @POST
     @Path(Constants.REST_TRUSTEES_FETCH)
     @Consumes(CommonService.CONSUMES)

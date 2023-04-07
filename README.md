@@ -27,8 +27,7 @@ EDS is written in Java 17 / Jakarta EE 10, with no third-part dependencies, mean
 it can run on any Host or in any Cloud where a Java EE Container is
 available. Currently, only the [PostgreSQL](https://www.postgresql.org/) database
 is supported, but thanks to the flexibility of Java EE, it is possible to use any
-database desired. Testing of EDS has been done using both
-[WildFly](http://www.wildfly.org/) and [Payara](https://payara.fish/).
+database desired. Testing of EDS has been done with [WildFly](http://www.wildfly.org/).
 
 ## Build, Install and Run
 
@@ -38,8 +37,8 @@ internal changes that makes it a breaking update. The build requires Java JDK 17
 and [Maven](https://maven.apache.org/).
 
 In the accessories/release folder, there is a number of files, which is used to
-install and run EDS. Either by building EDS from scratch, using a local Payara
-or WildFly instance, or even just use the provided Docker configuration.
+install and run EDS. Either by building EDS from scratch, using a local WildFly
+instance, or even just use the provided Docker configuration.
 
 ### Docker
 
@@ -50,13 +49,13 @@ will download all the required components, and handle the details for you.
 ### Local Container
 
 By adding the accessories/release/bin directory in your path, you can take
-advantage of the provided Payara or WildFly scripts to help configure & deploy
-a local EDS instance using your existing container.
+advantage of the provided WildFly script to help configure & deploy a local EDS
+instance using your existing container.
 
 ### Build from scratch
 
 **Developers only**: If you want to build from the source, run these steps to
-create the deployable WAR packages for either Payara or WildFly:
+create the deployable WAR package for WildFly:
 
 ```
 cd [ /path/to/eds/sources ]

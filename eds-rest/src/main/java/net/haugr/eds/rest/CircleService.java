@@ -46,6 +46,12 @@ public class CircleService {
     private ManagementBean bean;
     private final Settings settings = Settings.getInstance();
 
+    /**
+     * The REST Create Circle Endpoint.
+     *
+     * @param createCircleRequest Create Circle Request
+     * @return Create Circle Response
+     */
     @POST
     @Path(Constants.REST_CIRCLES_CREATE)
     @Consumes(CommonService.CONSUMES)
@@ -55,6 +61,12 @@ public class CircleService {
         return CommonService.runRequest(settings, bean, PROCESS_METHOD, createCircleRequest, Constants.REST_CIRCLES_BASE + Constants.REST_CIRCLES_CREATE);
     }
 
+    /**
+     * The REST Update circle Endpoint.
+     *
+     * @param updateCircleRequest Update Circle Request
+     * @return Update Circle Response
+     */
     @POST
     @Path(Constants.REST_CIRCLES_UPDATE)
     @Consumes(CommonService.CONSUMES)
@@ -64,6 +76,12 @@ public class CircleService {
         return CommonService.runRequest(settings, bean, PROCESS_METHOD, updateCircleRequest, Constants.REST_CIRCLES_BASE + Constants.REST_CIRCLES_UPDATE);
     }
 
+    /**
+     * The REST Delete Circle Endpoint.
+     *
+     * @param deleteCircleRequest Delete Circle Request
+     * @return Delete Circle Response
+     */
     @POST
     @Path(Constants.REST_CIRCLES_DELETE)
     @Consumes(CommonService.CONSUMES)
@@ -73,6 +91,12 @@ public class CircleService {
         return CommonService.runRequest(settings, bean, PROCESS_METHOD, deleteCircleRequest, Constants.REST_CIRCLES_BASE + Constants.REST_CIRCLES_DELETE);
     }
 
+    /**
+     * The REST Fetch Circles Endpoint.
+     *
+     * @param fetchCirclesRequest Fetch Circles Request
+     * @return Fetch Circles Response
+     */
     @POST
     @Path(Constants.REST_CIRCLES_FETCH)
     @Consumes(CommonService.CONSUMES)

@@ -38,6 +38,7 @@ public final class ProcessDataResponse extends EDSResponse {
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
+    /** The DataId. */
     @JsonbProperty(Constants.FIELD_DATA_ID)
     private String dataId = null;
 
@@ -77,10 +78,20 @@ public final class ProcessDataResponse extends EDSResponse {
     // Standard Setters & Getters
     // =========================================================================
 
+    /**
+     * Set the DataId.
+     *
+     * @param dataId DataId
+     */
     public void setDataId(final String dataId) {
         this.dataId = dataId;
     }
 
+    /**
+     * Retrieves the DataId.
+     *
+     * @return DataId
+     */
     public String getDataId() {
         return dataId;
     }

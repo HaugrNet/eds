@@ -41,6 +41,7 @@ public final class SettingResponse extends EDSResponse {
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
+    /** The Map of Settings. */
     @JsonbProperty(Constants.FIELD_SETTINGS)
     private final HashMap<String, String> settings = new HashMap<>();
 
@@ -71,10 +72,20 @@ public final class SettingResponse extends EDSResponse {
     // Standard Setters & Getters
     // =========================================================================
 
+    /**
+     * Set the Map of Settings.
+     *
+     * @param settings Map of Settings
+     */
     public void setSettings(final Map<String, String> settings) {
         this.settings.putAll(settings);
     }
 
+    /**
+     * Retrieves the Map of Settings.
+     *
+     * @return Map of Settings
+     */
     public Map<String, String> getSettings() {
         return new HashMap<>(settings);
     }

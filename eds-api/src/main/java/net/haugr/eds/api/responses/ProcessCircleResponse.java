@@ -39,6 +39,7 @@ public final class ProcessCircleResponse extends EDSResponse {
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
+    /** The CircleId. */
     @JsonbProperty(Constants.FIELD_CIRCLE_ID)
     private String circleId = null;
 
@@ -78,10 +79,20 @@ public final class ProcessCircleResponse extends EDSResponse {
     // Standard Setters & Getters
     // =========================================================================
 
+    /**
+     * Set the CircleId.
+     *
+     * @param circleId CircleId
+     */
     public void setCircleId(final String circleId) {
         this.circleId = circleId;
     }
 
+    /**
+     * Retrieves the CircleId.
+     *
+     * @return CircleId
+     */
     public String getCircleId() {
         return circleId;
     }

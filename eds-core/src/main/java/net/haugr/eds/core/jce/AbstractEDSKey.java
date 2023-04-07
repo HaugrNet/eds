@@ -27,6 +27,7 @@ import net.haugr.eds.core.enums.KeyAlgorithm;
  */
 public abstract class AbstractEDSKey<T extends Key> {
 
+    /** Key. */
     protected final T key;
 
     private final KeyAlgorithm algorithm;
@@ -42,12 +43,27 @@ public abstract class AbstractEDSKey<T extends Key> {
         this.key = key;
     }
 
+    /**
+     * Retrieves the Key.
+     *
+     * @return Key
+     */
     public abstract T getKey();
 
+    /**
+     * Retrieves the Encoded Bytes.
+     *
+     * @return Encoded Bytes
+     */
     public final byte[] getEncoded() {
         return key.getEncoded();
     }
 
+    /**
+     * Retrieves the Algorithm.
+     *
+     * @return Algorithm
+     */
     public final KeyAlgorithm getAlgorithm() {
         return algorithm;
     }

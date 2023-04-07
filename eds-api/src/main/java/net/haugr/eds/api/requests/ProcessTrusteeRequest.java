@@ -63,15 +63,19 @@ public final class ProcessTrusteeRequest extends Authentication implements Circl
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
+    /** The Action. */
     @JsonbProperty(value = Constants.FIELD_ACTION, nillable = true)
     private Action action = null;
 
+    /** The Trust Level. */
     @JsonbProperty(value = Constants.FIELD_TRUSTLEVEL, nillable = true)
     private TrustLevel trustLevel = null;
 
+    /** The CircleId. */
     @JsonbProperty(value = Constants.FIELD_CIRCLE_ID, nillable = true)
     private String circleId = null;
 
+    /** The MemberId. */
     @JsonbProperty(value = Constants.FIELD_MEMBER_ID, nillable = true)
     private String memberId = null;
 
@@ -95,10 +99,20 @@ public final class ProcessTrusteeRequest extends Authentication implements Circl
         return action;
     }
 
+    /**
+     * Set the Trust Level.
+     *
+     * @param trustLevel Trust Level
+     */
     public void setTrustLevel(final TrustLevel trustLevel) {
         this.trustLevel = trustLevel;
     }
 
+    /**
+     * Retrieves the Trust Level.
+     *
+     * @return Trust Level
+     */
     public TrustLevel getTrustLevel() {
         return trustLevel;
     }
@@ -119,10 +133,20 @@ public final class ProcessTrusteeRequest extends Authentication implements Circl
         return circleId;
     }
 
+    /**
+     * Set the MemberId.
+     *
+     * @param memberId MemberId
+     */
     public void setMemberId(final String memberId) {
         this.memberId = memberId;
     }
 
+    /**
+     * Retrieves the MemberId.
+     *
+     * @return MemberId
+     */
     public String getMemberId() {
         return memberId;
     }

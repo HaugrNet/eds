@@ -43,6 +43,7 @@ public final class SettingRequest extends Authentication {
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
+    /** The Map of Settings. */
     @JsonbProperty(value = Constants.FIELD_SETTINGS, nillable = true)
     private HashMap<String, String> settings = new HashMap<>(0);
 
@@ -50,10 +51,20 @@ public final class SettingRequest extends Authentication {
     // Standard Setters & Getters
     // =========================================================================
 
+    /**
+     * Set the Map of Settings.
+     *
+     * @param settings Map of Settings
+     */
     public void setSettings(final Map<String, String> settings) {
         this.settings = new HashMap<>(settings);
     }
 
+    /**
+     * Retrieves the Map of Settings.
+     *
+     * @return Map of Settings
+     */
     public Map<String, String> getSettings() {
         return new HashMap<>(settings);
     }

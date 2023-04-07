@@ -28,7 +28,9 @@ import java.security.KeyPair;
  */
 public final class EDSKeyPair {
 
+    /** Public EDS Key. */
     private final PublicEDSKey publicKey;
+    /** Private EDS Key. */
     private final PrivateEDSKey privateKey;
 
     /**
@@ -42,14 +44,29 @@ public final class EDSKeyPair {
         privateKey = new PrivateEDSKey(algorithm, key.getPrivate());
     }
 
+    /**
+     * Retrieve the Public EDS Key.
+     *
+     * @return Public EDS Key
+     */
     public PublicEDSKey getPublic() {
         return publicKey;
     }
 
+    /**
+     * Retrieve the Private EDS Key.
+     *
+     * @return Private EDS Key
+     */
     public PrivateEDSKey getPrivate() {
         return privateKey;
     }
 
+    /**
+     * Retrieve the Algorithm.
+     *
+     * @return Algorithm
+     */
     public KeyAlgorithm getAlgorithm() {
         return publicKey.getAlgorithm();
     }

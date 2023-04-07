@@ -26,6 +26,8 @@ package net.haugr.eds.api.common;
  */
 public enum MemberRole {
 
+    /** Administrator Role. */
     ADMIN,
+    /** Standard Role. */
     STANDARD
 }

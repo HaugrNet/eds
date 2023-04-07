@@ -27,6 +27,7 @@ import com.google.gson.JsonSerializer;
 import com.google.gson.JsonSyntaxException;
 import net.haugr.eds.api.requests.Authentication;
 import net.haugr.eds.api.responses.EDSResponse;
+
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.net.URI;
@@ -54,10 +55,25 @@ public class GsonRestClient {
     private static final Gson GSON = createGsonInstance();
     private final String baseURL;
 
+    /**
+     * Constructor.
+     *
+     * @param baseURL BaseURL
+     */
     protected GsonRestClient(final String baseURL) {
         this.baseURL = baseURL;
     }
 
+    /**
+     * Common handling of a Request.
+     *
+     * @param clazz      Class to invoke
+     * @param requestURL URL for the request
+     * @param request    Request Object
+     * @param <R>        EDS Response Object Type
+     * @param <C>        EDS Request (Authentication) Object Type
+     * @return Response from performing the request
+     */
     protected <R extends Authentication, C extends EDSResponse> C runRequest(final Class<C> clazz, final String requestURL, final R request) {
         final HttpRequest httpRequest = HttpRequest
                 .newBuilder()

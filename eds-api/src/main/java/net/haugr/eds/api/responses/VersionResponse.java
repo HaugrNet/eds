@@ -37,6 +37,7 @@ public final class VersionResponse extends EDSResponse {
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
+    /** The EDS Version. */
     @JsonbProperty(Constants.FIELD_VERSION)
     private String version = null;
 
@@ -67,10 +68,20 @@ public final class VersionResponse extends EDSResponse {
     // Standard Setters & Getters
     // =========================================================================
 
+    /**
+     * Set the EDS Version.
+     *
+     * @param version EDS Version
+     */
     public void setVersion(final String version) {
         this.version = version;
     }
 
+    /**
+     * Retrieves the EDS Version.
+     *
+     * @return EDS Version
+     */
     public String getVersion() {
         return version;
     }

@@ -47,9 +47,11 @@ public class EDSResponse implements Serializable {
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
+    /** The EDS Return Code. */
     @JsonbProperty(Constants.FIELD_RETURN_CODE)
     private int returnCode = ReturnCode.SUCCESS.getCode();
 
+    /** The EDS Return Message. */
     @JsonbProperty(Constants.FIELD_RETURN_MESSAGE)
     private String returnMessage = "Ok";
 
@@ -90,22 +92,47 @@ public class EDSResponse implements Serializable {
     // Standard Setters & Getters
     // =========================================================================
 
+    /**
+     * Set the Return Code.
+     *
+     * @param returnCode Return Code
+     */
     public final void setReturnCode(final ReturnCode returnCode) {
         this.returnCode = returnCode.getCode();
     }
 
+    /**
+     * Retrieves the Return Code.
+     *
+     * @return Return Code
+     */
     public final int getReturnCode() {
         return returnCode;
     }
 
+    /**
+     * Set the Return Message.
+     *
+     * @param returnMessage Return Message
+     */
     public final void setReturnMessage(final String returnMessage) {
         this.returnMessage = returnMessage;
     }
 
+    /**
+     * Retrieves the Return Message.
+     *
+     * @return Return Message
+     */
     public final String getReturnMessage() {
         return returnMessage;
     }
 
+    /**
+     * Returns true if the request completed successfully, otherwise false.
+     *
+     * @return True if successful, otherwise false
+     */
     public final boolean isOk() {
         return returnCode == ReturnCode.SUCCESS.getCode();
     }

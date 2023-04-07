@@ -43,10 +43,16 @@ public class InventoryService {
     private ManagementBean bean;
     private final Settings settings = Settings.getInstance();
 
+    /**
+     * The REST Inventory Endpoint.
+     *
+     * @param inventoryRequest Inventory Request
+     * @return Inventory Response
+     */
     @POST
     @Consumes(CommonService.CONSUMES)
     @Produces(CommonService.PRODUCES)
-    public Response inventory(@NotNull final InventoryRequest request) {
-        return CommonService.runRequest(settings, bean, METHOD, request, Constants.REST_INVENTORY);
+    public Response inventory(@NotNull final InventoryRequest inventoryRequest) {
+        return CommonService.runRequest(settings, bean, METHOD, inventoryRequest, Constants.REST_INVENTORY);
     }
 }

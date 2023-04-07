@@ -59,14 +59,25 @@ import net.haugr.eds.core.model.entities.TrusteeEntity;
  */
 public abstract class AbstractManager<D extends CommonDao, R extends EDSResponse, A extends Authentication> {
 
+    /** The Settings. */
     protected final Settings settings;
+    /** The Crypto Library. */
     protected final Crypto crypto;
+    /** The DAO Library. */
     protected final D dao;
-
+    /** List of Trustees. */
     protected List<TrusteeEntity> trustees = new ArrayList<>(0);
+    /** The Member. */
     protected MemberEntity member = null;
+    /** The Member's internal KeyPair. */
     protected EDSKeyPair keyPair = null;
 
+    /**
+     * General Constructor.
+     *
+     * @param settings Settings Instance
+     * @param dao      Manager Dao instance
+     */
     protected AbstractManager(final Settings settings, final D dao) {
         this.crypto = new Crypto(settings);
         this.settings = settings;
@@ -395,6 +406,13 @@ public abstract class AbstractManager<D extends CommonDao, R extends EDSResponse
         return externalKey;
     }
 
+    /**
+     * Converts a Circle Entity to a Circle DTO.
+     *
+     * @param entity    Circle Entity
+     * @param circleKey Optional Circle Key
+     * @return Circle DTO
+     */
     protected static Circle convert(final CircleEntity entity, final String circleKey) {
         final Circle circle = new Circle();
 
@@ -406,20 +424,22 @@ public abstract class AbstractManager<D extends CommonDao, R extends EDSResponse
         return circle;
     }
 
+    /**
+     * Finds a Trustee Entity for the current Member, based on the external
+     * CircleId.
+     *
+     * @param externalCircleId External CircleId to find Trustee Entity for
+     * @return Trustee Entity
+     * @throws EDSException if no Trustee Entity was found
+     */
     protected final TrusteeEntity findTrustee(final String externalCircleId) {
-        TrusteeEntity found = null;
-
         for (final TrusteeEntity trustee : trustees) {
             if (Objects.equals(trustee.getCircle().getExternalId(), externalCircleId)) {
-                found = trustee;
+                return trustee;
             }
         }
 
-        if (found == null) {
-            throw new EDSException(ReturnCode.AUTHORIZATION_WARNING, "The current Account is not allowed to perform the given action.");
-        }
-
-        return found;
+        throw new EDSException(ReturnCode.AUTHORIZATION_WARNING, "The current Account is not allowed to perform the given action.");
     }
 
     private List<TrusteeEntity> findTrustees(final MemberEntity member, final String circleId, final Set<TrustLevel> permissions) {

@@ -43,6 +43,12 @@ public class SanityService {
     private ManagementBean bean;
     private final Settings settings = Settings.getInstance();
 
+    /**
+     * The REST Sanitized Endpoint.
+     *
+     * @param sanitizedRequest Sanitized Request
+     * @return Sanitized Response
+     */
     @POST
     @Consumes(CommonService.CONSUMES)
     @Produces(CommonService.PRODUCES)

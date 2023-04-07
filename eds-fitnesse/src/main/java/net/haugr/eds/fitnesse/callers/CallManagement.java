@@ -66,61 +66,154 @@ public final class CallManagement {
     // Management Interface Functionality
     // =========================================================================
 
+    /**
+     * Prepares a call for the EDS Version Service, using the given URL as
+     * Endpoint.
+     *
+     * @param url     Endpoint URL for the EDS call
+     * @return Result from the call
+     */
     public static VersionResponse version(final String url) {
         prepareEDS(url);
         return management.version();
     }
 
+    /**
+     * Prepares a call for the EDS MasterKey Service, using the given URL as
+     * Endpoint, and the given Request Object as argument.
+     *
+     * @param url     Endpoint URL for the EDS call
+     * @param request Request Object for the call
+     * @return Response from the call
+     */
     public static MasterKeyResponse masterKey(final String url, final MasterKeyRequest request) {
         prepareEDS(url);
         return management.masterKey(request);
     }
 
+    /**
+     * Prepares a call for the EDS Settings Service, using the given URL as
+     * Endpoint, and the given Request Object as argument.
+     *
+     * @param url     Endpoint URL for the EDS call
+     * @param request Request Object for the call
+     * @return Response from the call
+     */
     public static SettingResponse settings(final String url, final SettingRequest request) {
         prepareEDS(url);
         return management.settings(request);
     }
 
+    /**
+     * Prepares a call for the EDS Sanitized Service, using the given URL as
+     * Endpoint, and the given Request Object as argument.
+     *
+     * @param url     Endpoint URL for the EDS call
+     * @param request Request Object for the call
+     * @return Response from the call
+     */
     public static SanityResponse sanitized(final String url, final SanityRequest request) {
         prepareEDS(url);
         return management.sanitized(request);
     }
 
+    /**
+     * Prepares a call for the EDS Inventory Service, using the given URL as
+     * Endpoint, and the given Request Object as argument.
+     *
+     * @param url     Endpoint URL for the EDS call
+     * @param request Request Object for the call
+     * @return Response from the call
+     */
     public static InventoryResponse inventory(final String url, final InventoryRequest request) {
         prepareEDS(url);
         return management.inventory(request);
     }
 
+    /**
+     * Prepares a call for the EDS Authenticated Service, using the given URL
+     * as Endpoint, and the given Request Object as argument.
+     *
+     * @param url     Endpoint URL for the EDS call
+     * @param request Request Object for the call
+     * @return Response from the call
+     */
     public static AuthenticateResponse authenticated(final String url, final Authentication request) {
         prepareEDS(url);
         return management.authenticated(request);
     }
 
+    /**
+     *
+     * @param url     Endpoint URL for the EDS call
+     * @param request Request Object for the call
+     * @return Response from the call
+     */
     public static FetchMemberResponse fetchMembers(final String url, final FetchMemberRequest request) {
         prepareEDS(url);
         return management.fetchMembers(request);
     }
 
+    /**
+     * Prepares a call for the EDS ProcessMember Service, using the given URL
+     * as Endpoint, and the given Request Object as argument.
+     *
+     * @param url     Endpoint URL for the EDS call
+     * @param request Request Object for the call
+     * @return Response from the call
+     */
     public static ProcessMemberResponse processMember(final String url, final ProcessMemberRequest request) {
         prepareEDS(url);
         return management.processMember(request);
     }
 
+    /**
+     * Prepares a call for the EDS FetchCircles Service, using the given URL
+     * as Endpoint, and the given Request Object as argument.
+     *
+     * @param url     Endpoint URL for the EDS call
+     * @param request Request Object for the call
+     * @return Response from the call
+     */
     public static FetchCircleResponse fetchCircles(final String url, final FetchCircleRequest request) {
         prepareEDS(url);
         return management.fetchCircles(request);
     }
 
+    /**
+     * Prepares a call for the EDS ProcessCircle Service, using the given URL
+     * as Endpoint, and the given Request Object as argument.
+     *
+     * @param url     Endpoint URL for the EDS call
+     * @param request Request Object for the call
+     * @return Response from the call
+     */
     public static ProcessCircleResponse processCircle(final String url, final ProcessCircleRequest request) {
         prepareEDS(url);
         return management.processCircle(request);
     }
 
+    /**
+     * Prepares a call for the EDS FetchTrustees Service, using the given URL
+     * as Endpoint, and the given Request Object as argument.
+     *
+     * @param url     Endpoint URL for the EDS call
+     * @param request Request Object for the call
+     * @return Response from the call
+     */
     public static FetchTrusteeResponse fetchTrustees(final String url, final FetchTrusteeRequest request) {
         prepareEDS(url);
         return management.fetchTrustees(request);
     }
 
+    /**
+     * Prepares a call for the EDS ProcessTrustee Service, using the given URL
+     * as Endpoint, and the given Request Object as argument.
+     *
+     * @param url     Endpoint URL for the EDS call
+     * @param request Request Object for the call
+     * @return Response from the call
+     */
     public static ProcessTrusteeResponse processTrustee(final String url, final ProcessTrusteeRequest request) {
         prepareEDS(url);
         return management.processTrustee(request);

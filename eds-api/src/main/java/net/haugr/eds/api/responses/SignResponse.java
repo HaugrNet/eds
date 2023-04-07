@@ -39,6 +39,7 @@ public final class SignResponse extends EDSResponse {
     /** {@link Constants#SERIAL_VERSION_UID}. */
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
+    /** The Signature. */
     @JsonbProperty(Constants.FIELD_SIGNATURE)
     private String signature = null;
 
@@ -69,10 +70,20 @@ public final class SignResponse extends EDSResponse {
     // Standard Setters & Getters
     // =========================================================================
 
+    /**
+     * Set the Signature.
+     *
+     * @param signature Signature
+     */
     public void setSignature(final String signature) {
         this.signature = signature;
     }
 
+    /**
+     * Retrieves the signature.
+     *
+     * @return Signature
+     */
     public String getSignature() {
         return signature;
     }

@@ -140,7 +140,7 @@ current settings, and update existing values.
    * REST (POST) request is: ${REST_ROOT}/settings
 
 |script|Settings     |admin                          |admin                                                     |
-|check |value for key|eds.crypto.symmetric.algorithm |AES_CBC_256                                               |
+|check |value for key|eds.crypto.symmetric.algorithm |AES_GCM_256                                               |
 |check |value for key|eds.crypto.asymmetric.algorithm|RSA_2048                                                  |
 |check |value for key|eds.crypto.signature.algorithm |SHA_512                                                   |
 |check |value for key|eds.crypto.pbe.algorithm       |PBE_GCM_256                                               |

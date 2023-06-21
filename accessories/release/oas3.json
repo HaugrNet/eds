@@ -1,0 +1,1988 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "EDS - REST",
+    "version": "2.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8080/eds/api"
+    },
+    {
+      "url": "https://localhost:8080/eds/api"
+    }
+  ],
+  "paths": {
+    "/authenticated": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Authentication"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthenticateResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "body"
+      }
+    },
+    "/circles/createCircle": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProcessCircleRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProcessCircleResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "body"
+      }
+    },
+    "/circles/deleteCircle": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProcessCircleRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProcessCircleResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "body"
+      }
+    },
+    "/circles/fetchCircles": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FetchCircleRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FetchCircleResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "body"
+      }
+    },
+    "/circles/updateCircle": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProcessCircleRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProcessCircleResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "body"
+      }
+    },
+    "/data/addData": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProcessDataRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProcessDataResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "body"
+      }
+    },
+    "/data/copyData": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProcessDataRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProcessDataResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "body"
+      }
+    },
+    "/data/deleteData": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProcessDataRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProcessDataResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "body"
+      }
+    },
+    "/data/fetchData": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FetchDataRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FetchDataResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "body"
+      }
+    },
+    "/data/moveData": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProcessDataRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProcessDataResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "body"
+      }
+    },
+    "/data/updateData": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProcessDataRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProcessDataResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "body"
+      }
+    },
+    "/dataTypes/deleteDataType": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProcessDataTypeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProcessDataTypeResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "body"
+      }
+    },
+    "/dataTypes/fetchDataTypes": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FetchDataTypeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FetchDataTypeResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "body"
+      }
+    },
+    "/dataTypes/processDataType": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProcessDataTypeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProcessDataTypeResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "body"
+      }
+    },
+    "/inventory": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InventoryRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InventoryResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "body"
+      }
+    },
+    "/masterKey": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MasterKeyRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MasterKeyResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "body"
+      }
+    },
+    "/members/alterMember": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProcessMemberRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProcessMemberResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "body"
+      }
+    },
+    "/members/createMember": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProcessMemberRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProcessMemberResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "body"
+      }
+    },
+    "/members/deleteMember": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProcessMemberRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProcessMemberResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "body"
+      }
+    },
+    "/members/fetchMembers": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FetchMemberRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FetchMemberResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "body"
+      }
+    },
+    "/members/invalidate": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProcessMemberRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProcessMemberResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "body"
+      }
+    },
+    "/members/inviteMember": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProcessMemberRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProcessMemberResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "body"
+      }
+    },
+    "/members/login": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProcessMemberRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProcessMemberResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "body"
+      }
+    },
+    "/members/logout": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProcessMemberRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProcessMemberResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "body"
+      }
+    },
+    "/members/updateMember": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProcessMemberRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProcessMemberResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "body"
+      }
+    },
+    "/sanitized": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SanityRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SanityResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "body"
+      }
+    },
+    "/settings": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SettingRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SettingResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "body"
+      }
+    },
+    "/signatures/fetchSignatures": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FetchSignatureRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "body"
+      }
+    },
+    "/signatures/signDocument": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SignRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SignResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "body"
+      }
+    },
+    "/signatures/verifySignature": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VerifyResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "body"
+      }
+    },
+    "/trustees/addTrustee": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProcessTrusteeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProcessTrusteeResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "body"
+      }
+    },
+    "/trustees/alterTrustee": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProcessTrusteeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProcessTrusteeResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "body"
+      }
+    },
+    "/trustees/fetchTrustees": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FetchTrusteeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FetchTrusteeResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "body"
+      }
+    },
+    "/trustees/removeTrustee": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProcessTrusteeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProcessTrusteeResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "body"
+      }
+    },
+    "/version": {
+      "post": {
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AuthenticateResponse": {
+        "type": "object",
+        "properties": {
+          "memberId": {
+            "type": "string"
+          },
+          "returnCode": {
+            "type": "integer"
+          },
+          "returnMessage": {
+            "type": "string"
+          }
+        }
+      },
+      "Authentication": {
+        "type": "object",
+        "properties": {
+          "accountName": {
+            "type": "string"
+          },
+          "credential": {
+            "pattern": "^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$",
+            "type": "string",
+            "format": "byte"
+          },
+          "credentialType": {
+            "type": "string",
+            "enum": [
+              "PASSPHRASE",
+              "SESSION",
+              "SIGNATURE"
+            ]
+          }
+        }
+      },
+      "Circle": {
+        "type": "object",
+        "properties": {
+          "added": {
+            "type": "object",
+            "properties": {}
+          },
+          "circleId": {
+            "type": "string"
+          },
+          "circleKey": {
+            "type": "string"
+          },
+          "circleName": {
+            "type": "string"
+          }
+        }
+      },
+      "DataType": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "typeName": {
+            "type": "string"
+          }
+        }
+      },
+      "FetchCircleRequest": {
+        "type": "object",
+        "properties": {
+          "accountName": {
+            "type": "string"
+          },
+          "credential": {
+            "pattern": "^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$",
+            "type": "string",
+            "format": "byte"
+          },
+          "credentialType": {
+            "type": "string",
+            "enum": [
+              "PASSPHRASE",
+              "SESSION",
+              "SIGNATURE"
+            ]
+          }
+        }
+      },
+      "FetchCircleResponse": {
+        "type": "object",
+        "properties": {
+          "circles": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Circle"
+            }
+          },
+          "returnCode": {
+            "type": "integer"
+          },
+          "returnMessage": {
+            "type": "string"
+          }
+        }
+      },
+      "FetchDataRequest": {
+        "type": "object",
+        "properties": {
+          "accountName": {
+            "type": "string"
+          },
+          "circleId": {
+            "type": "string"
+          },
+          "credential": {
+            "pattern": "^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$",
+            "type": "string",
+            "format": "byte"
+          },
+          "credentialType": {
+            "type": "string",
+            "enum": [
+              "PASSPHRASE",
+              "SESSION",
+              "SIGNATURE"
+            ]
+          },
+          "dataId": {
+            "type": "string"
+          },
+          "dataName": {
+            "type": "string"
+          },
+          "pageNumber": {
+            "type": "integer"
+          },
+          "pageSize": {
+            "type": "integer"
+          }
+        }
+      },
+      "FetchDataResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "pattern": "^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$",
+            "type": "string",
+            "format": "byte"
+          },
+          "metadata": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Metadata"
+            }
+          },
+          "records": {
+            "type": "integer"
+          },
+          "returnCode": {
+            "type": "integer"
+          },
+          "returnMessage": {
+            "type": "string"
+          }
+        }
+      },
+      "FetchDataTypeRequest": {
+        "type": "object",
+        "properties": {
+          "accountName": {
+            "type": "string"
+          },
+          "credential": {
+            "pattern": "^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$",
+            "type": "string",
+            "format": "byte"
+          },
+          "credentialType": {
+            "type": "string",
+            "enum": [
+              "PASSPHRASE",
+              "SESSION",
+              "SIGNATURE"
+            ]
+          }
+        }
+      },
+      "FetchDataTypeResponse": {
+        "type": "object",
+        "properties": {
+          "dataTypes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DataType"
+            }
+          },
+          "returnCode": {
+            "type": "integer"
+          },
+          "returnMessage": {
+            "type": "string"
+          }
+        }
+      },
+      "FetchMemberRequest": {
+        "type": "object",
+        "properties": {
+          "accountName": {
+            "type": "string"
+          },
+          "credential": {
+            "pattern": "^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$",
+            "type": "string",
+            "format": "byte"
+          },
+          "credentialType": {
+            "type": "string",
+            "enum": [
+              "PASSPHRASE",
+              "SESSION",
+              "SIGNATURE"
+            ]
+          },
+          "memberId": {
+            "type": "string"
+          }
+        }
+      },
+      "FetchMemberResponse": {
+        "type": "object",
+        "properties": {
+          "circles": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Circle"
+            }
+          },
+          "members": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Member"
+            }
+          },
+          "returnCode": {
+            "type": "integer"
+          },
+          "returnMessage": {
+            "type": "string"
+          }
+        }
+      },
+      "FetchSignatureRequest": {
+        "type": "object",
+        "properties": {
+          "accountName": {
+            "type": "string"
+          },
+          "credential": {
+            "pattern": "^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$",
+            "type": "string",
+            "format": "byte"
+          },
+          "credentialType": {
+            "type": "string",
+            "enum": [
+              "PASSPHRASE",
+              "SESSION",
+              "SIGNATURE"
+            ]
+          }
+        }
+      },
+      "FetchTrusteeRequest": {
+        "type": "object",
+        "properties": {
+          "accountName": {
+            "type": "string"
+          },
+          "circleId": {
+            "type": "string"
+          },
+          "credential": {
+            "pattern": "^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$",
+            "type": "string",
+            "format": "byte"
+          },
+          "credentialType": {
+            "type": "string",
+            "enum": [
+              "PASSPHRASE",
+              "SESSION",
+              "SIGNATURE"
+            ]
+          },
+          "memberId": {
+            "type": "string"
+          }
+        }
+      },
+      "FetchTrusteeResponse": {
+        "type": "object",
+        "properties": {
+          "returnCode": {
+            "type": "integer"
+          },
+          "returnMessage": {
+            "type": "string"
+          },
+          "trustees": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Trustee"
+            }
+          }
+        }
+      },
+      "InventoryRequest": {
+        "type": "object",
+        "properties": {
+          "accountName": {
+            "type": "string"
+          },
+          "credential": {
+            "pattern": "^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$",
+            "type": "string",
+            "format": "byte"
+          },
+          "credentialType": {
+            "type": "string",
+            "enum": [
+              "PASSPHRASE",
+              "SESSION",
+              "SIGNATURE"
+            ]
+          },
+          "pageNumber": {
+            "type": "integer"
+          },
+          "pageSize": {
+            "type": "integer"
+          }
+        }
+      },
+      "InventoryResponse": {
+        "type": "object",
+        "properties": {
+          "inventory": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Metadata"
+            }
+          },
+          "records": {
+            "type": "integer"
+          },
+          "returnCode": {
+            "type": "integer"
+          },
+          "returnMessage": {
+            "type": "string"
+          }
+        }
+      },
+      "MasterKeyRequest": {
+        "type": "object",
+        "properties": {
+          "accountName": {
+            "type": "string"
+          },
+          "credential": {
+            "pattern": "^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$",
+            "type": "string",
+            "format": "byte"
+          },
+          "credentialType": {
+            "type": "string",
+            "enum": [
+              "PASSPHRASE",
+              "SESSION",
+              "SIGNATURE"
+            ]
+          },
+          "secret": {
+            "pattern": "^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$",
+            "type": "string",
+            "format": "byte"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "MasterKeyResponse": {
+        "type": "object",
+        "properties": {
+          "returnCode": {
+            "type": "integer"
+          },
+          "returnMessage": {
+            "type": "string"
+          }
+        }
+      },
+      "Member": {
+        "type": "object",
+        "properties": {
+          "accountName": {
+            "type": "string"
+          },
+          "added": {
+            "type": "object",
+            "properties": {}
+          },
+          "memberId": {
+            "type": "string"
+          },
+          "memberRole": {
+            "type": "string",
+            "enum": [
+              "ADMIN",
+              "STANDARD"
+            ]
+          },
+          "publicKey": {
+            "type": "string"
+          }
+        }
+      },
+      "Metadata": {
+        "type": "object",
+        "properties": {
+          "added": {
+            "type": "object",
+            "properties": {}
+          },
+          "circleId": {
+            "type": "string"
+          },
+          "dataId": {
+            "type": "string"
+          },
+          "dataName": {
+            "type": "string"
+          },
+          "folderId": {
+            "type": "string"
+          },
+          "typeName": {
+            "type": "string"
+          }
+        }
+      },
+      "ProcessCircleRequest": {
+        "type": "object",
+        "properties": {
+          "accountName": {
+            "type": "string"
+          },
+          "action": {
+            "type": "string",
+            "enum": [
+              "ADD",
+              "ALTER",
+              "COPY",
+              "CREATE",
+              "DELETE",
+              "INVALIDATE",
+              "INVITE",
+              "LOGIN",
+              "LOGOUT",
+              "MOVE",
+              "PROCESS",
+              "REMOVE",
+              "UPDATE"
+            ]
+          },
+          "circleId": {
+            "type": "string"
+          },
+          "circleKey": {
+            "type": "string"
+          },
+          "circleName": {
+            "type": "string"
+          },
+          "credential": {
+            "pattern": "^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$",
+            "type": "string",
+            "format": "byte"
+          },
+          "credentialType": {
+            "type": "string",
+            "enum": [
+              "PASSPHRASE",
+              "SESSION",
+              "SIGNATURE"
+            ]
+          },
+          "memberId": {
+            "type": "string"
+          }
+        }
+      },
+      "ProcessCircleResponse": {
+        "type": "object",
+        "properties": {
+          "circleId": {
+            "type": "string"
+          },
+          "returnCode": {
+            "type": "integer"
+          },
+          "returnMessage": {
+            "type": "string"
+          }
+        }
+      },
+      "ProcessDataRequest": {
+        "type": "object",
+        "properties": {
+          "accountName": {
+            "type": "string"
+          },
+          "action": {
+            "type": "string",
+            "enum": [
+              "ADD",
+              "ALTER",
+              "COPY",
+              "CREATE",
+              "DELETE",
+              "INVALIDATE",
+              "INVITE",
+              "LOGIN",
+              "LOGOUT",
+              "MOVE",
+              "PROCESS",
+              "REMOVE",
+              "UPDATE"
+            ]
+          },
+          "circleId": {
+            "type": "string"
+          },
+          "credential": {
+            "pattern": "^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$",
+            "type": "string",
+            "format": "byte"
+          },
+          "credentialType": {
+            "type": "string",
+            "enum": [
+              "PASSPHRASE",
+              "SESSION",
+              "SIGNATURE"
+            ]
+          },
+          "data": {
+            "pattern": "^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$",
+            "type": "string",
+            "format": "byte"
+          },
+          "dataId": {
+            "type": "string"
+          },
+          "dataName": {
+            "type": "string"
+          },
+          "folderId": {
+            "type": "string"
+          },
+          "targetCircleId": {
+            "type": "string"
+          },
+          "targetFolderId": {
+            "type": "string"
+          },
+          "typeName": {
+            "type": "string"
+          }
+        }
+      },
+      "ProcessDataResponse": {
+        "type": "object",
+        "properties": {
+          "dataId": {
+            "type": "string"
+          },
+          "returnCode": {
+            "type": "integer"
+          },
+          "returnMessage": {
+            "type": "string"
+          }
+        }
+      },
+      "ProcessDataTypeRequest": {
+        "type": "object",
+        "properties": {
+          "accountName": {
+            "type": "string"
+          },
+          "action": {
+            "type": "string",
+            "enum": [
+              "ADD",
+              "ALTER",
+              "COPY",
+              "CREATE",
+              "DELETE",
+              "INVALIDATE",
+              "INVITE",
+              "LOGIN",
+              "LOGOUT",
+              "MOVE",
+              "PROCESS",
+              "REMOVE",
+              "UPDATE"
+            ]
+          },
+          "credential": {
+            "pattern": "^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$",
+            "type": "string",
+            "format": "byte"
+          },
+          "credentialType": {
+            "type": "string",
+            "enum": [
+              "PASSPHRASE",
+              "SESSION",
+              "SIGNATURE"
+            ]
+          },
+          "type": {
+            "type": "string"
+          },
+          "typeName": {
+            "type": "string"
+          }
+        }
+      },
+      "ProcessDataTypeResponse": {
+        "type": "object",
+        "properties": {
+          "dataType": {
+            "$ref": "#/components/schemas/DataType"
+          },
+          "returnCode": {
+            "type": "integer"
+          },
+          "returnMessage": {
+            "type": "string"
+          }
+        }
+      },
+      "ProcessMemberRequest": {
+        "type": "object",
+        "properties": {
+          "accountName": {
+            "type": "string"
+          },
+          "action": {
+            "type": "string",
+            "enum": [
+              "ADD",
+              "ALTER",
+              "COPY",
+              "CREATE",
+              "DELETE",
+              "INVALIDATE",
+              "INVITE",
+              "LOGIN",
+              "LOGOUT",
+              "MOVE",
+              "PROCESS",
+              "REMOVE",
+              "UPDATE"
+            ]
+          },
+          "credential": {
+            "pattern": "^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$",
+            "type": "string",
+            "format": "byte"
+          },
+          "credentialType": {
+            "type": "string",
+            "enum": [
+              "PASSPHRASE",
+              "SESSION",
+              "SIGNATURE"
+            ]
+          },
+          "memberId": {
+            "type": "string"
+          },
+          "memberRole": {
+            "type": "string",
+            "enum": [
+              "ADMIN",
+              "STANDARD"
+            ]
+          },
+          "newAccountName": {
+            "type": "string"
+          },
+          "newCredential": {
+            "pattern": "^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$",
+            "type": "string",
+            "format": "byte"
+          },
+          "publicKey": {
+            "type": "string"
+          }
+        }
+      },
+      "ProcessMemberResponse": {
+        "type": "object",
+        "properties": {
+          "memberId": {
+            "type": "string"
+          },
+          "returnCode": {
+            "type": "integer"
+          },
+          "returnMessage": {
+            "type": "string"
+          },
+          "signature": {
+            "pattern": "^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$",
+            "type": "string",
+            "format": "byte"
+          }
+        }
+      },
+      "ProcessTrusteeRequest": {
+        "type": "object",
+        "properties": {
+          "accountName": {
+            "type": "string"
+          },
+          "action": {
+            "type": "string",
+            "enum": [
+              "ADD",
+              "ALTER",
+              "COPY",
+              "CREATE",
+              "DELETE",
+              "INVALIDATE",
+              "INVITE",
+              "LOGIN",
+              "LOGOUT",
+              "MOVE",
+              "PROCESS",
+              "REMOVE",
+              "UPDATE"
+            ]
+          },
+          "circleId": {
+            "type": "string"
+          },
+          "credential": {
+            "pattern": "^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$",
+            "type": "string",
+            "format": "byte"
+          },
+          "credentialType": {
+            "type": "string",
+            "enum": [
+              "PASSPHRASE",
+              "SESSION",
+              "SIGNATURE"
+            ]
+          },
+          "memberId": {
+            "type": "string"
+          },
+          "trustLevel": {
+            "type": "string",
+            "enum": [
+              "ADMIN",
+              "ALL",
+              "READ",
+              "SYSOP",
+              "WRITE"
+            ]
+          }
+        }
+      },
+      "ProcessTrusteeResponse": {
+        "type": "object",
+        "properties": {
+          "returnCode": {
+            "type": "integer"
+          },
+          "returnMessage": {
+            "type": "string"
+          }
+        }
+      },
+      "Sanity": {
+        "type": "object",
+        "properties": {
+          "changed": {
+            "type": "object",
+            "properties": {}
+          },
+          "dataId": {
+            "type": "string"
+          }
+        }
+      },
+      "SanityRequest": {
+        "type": "object",
+        "properties": {
+          "accountName": {
+            "type": "string"
+          },
+          "circleId": {
+            "type": "string"
+          },
+          "credential": {
+            "pattern": "^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$",
+            "type": "string",
+            "format": "byte"
+          },
+          "credentialType": {
+            "type": "string",
+            "enum": [
+              "PASSPHRASE",
+              "SESSION",
+              "SIGNATURE"
+            ]
+          },
+          "since": {
+            "type": "object",
+            "properties": {}
+          }
+        }
+      },
+      "SanityResponse": {
+        "type": "object",
+        "properties": {
+          "returnCode": {
+            "type": "integer"
+          },
+          "returnMessage": {
+            "type": "string"
+          },
+          "sanities": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Sanity"
+            }
+          }
+        }
+      },
+      "SettingRequest": {
+        "type": "object",
+        "properties": {
+          "accountName": {
+            "type": "string"
+          },
+          "credential": {
+            "pattern": "^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$",
+            "type": "string",
+            "format": "byte"
+          },
+          "credentialType": {
+            "type": "string",
+            "enum": [
+              "PASSPHRASE",
+              "SESSION",
+              "SIGNATURE"
+            ]
+          },
+          "settings": {
+            "type": "object",
+            "properties": {}
+          }
+        }
+      },
+      "SettingResponse": {
+        "type": "object",
+        "properties": {
+          "returnCode": {
+            "type": "integer"
+          },
+          "returnMessage": {
+            "type": "string"
+          },
+          "settings": {
+            "type": "object",
+            "properties": {}
+          }
+        }
+      },
+      "SignRequest": {
+        "type": "object",
+        "properties": {
+          "accountName": {
+            "type": "string"
+          },
+          "credential": {
+            "pattern": "^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$",
+            "type": "string",
+            "format": "byte"
+          },
+          "credentialType": {
+            "type": "string",
+            "enum": [
+              "PASSPHRASE",
+              "SESSION",
+              "SIGNATURE"
+            ]
+          },
+          "data": {
+            "pattern": "^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$",
+            "type": "string",
+            "format": "byte"
+          },
+          "expires": {
+            "type": "object",
+            "properties": {}
+          }
+        }
+      },
+      "SignResponse": {
+        "type": "object",
+        "properties": {
+          "returnCode": {
+            "type": "integer"
+          },
+          "returnMessage": {
+            "type": "string"
+          },
+          "signature": {
+            "type": "string"
+          }
+        }
+      },
+      "Trustee": {
+        "type": "object",
+        "properties": {
+          "accountName": {
+            "type": "string"
+          },
+          "added": {
+            "type": "object",
+            "properties": {}
+          },
+          "changed": {
+            "type": "object",
+            "properties": {}
+          },
+          "circleId": {
+            "type": "string"
+          },
+          "circleName": {
+            "type": "string"
+          },
+          "memberId": {
+            "type": "string"
+          },
+          "publicKey": {
+            "type": "string"
+          },
+          "trustLevel": {
+            "type": "string",
+            "enum": [
+              "ADMIN",
+              "ALL",
+              "READ",
+              "SYSOP",
+              "WRITE"
+            ]
+          }
+        }
+      },
+      "VerifyRequest": {
+        "type": "object",
+        "properties": {
+          "accountName": {
+            "type": "string"
+          },
+          "credential": {
+            "pattern": "^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$",
+            "type": "string",
+            "format": "byte"
+          },
+          "credentialType": {
+            "type": "string",
+            "enum": [
+              "PASSPHRASE",
+              "SESSION",
+              "SIGNATURE"
+            ]
+          },
+          "data": {
+            "pattern": "^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$",
+            "type": "string",
+            "format": "byte"
+          },
+          "signature": {
+            "type": "string"
+          }
+        }
+      },
+      "VerifyResponse": {
+        "type": "object",
+        "properties": {
+          "returnCode": {
+            "type": "integer"
+          },
+          "returnMessage": {
+            "type": "string"
+          },
+          "verified": {
+            "type": "boolean"
+          }
+        }
+      },
+      "VersionResponse": {
+        "type": "object",
+        "properties": {
+          "returnCode": {
+            "type": "integer"
+          },
+          "returnMessage": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

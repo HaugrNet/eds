@@ -1,6 +1,6 @@
 /*
  * EDS, Encrypted Data Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2023, haugr.net
+ * Copyright (c) 2016-2024, haugr.net
  * mailto: eds AT haugr DOT net
  *
  * EDS is free software; you can redistribute it and/or modify it under the
@@ -17,7 +17,6 @@
 package net.haugr.eds.core.model.entities;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 

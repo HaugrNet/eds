@@ -19,6 +19,8 @@ package net.haugr.eds.core.jce;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.Charset;
@@ -99,7 +101,7 @@ public final class MasterKey {
 
     public static byte[] readMasterKeySecretFromUrl(final String masterKeyUrl) {
         try {
-            final URL url = new URL(masterKeyUrl);
+            final URL url = new URI(masterKeyUrl).toURL();
             // Note, that the following line is raised as a security issue by
             // SonarQube. Normally, the rule is correct, but only if the
             // information read is also returned. In this case, the content
@@ -109,7 +111,7 @@ public final class MasterKey {
             // See: http://localhost:9000/coding_rules?open=findsecbugs%3AURLCONNECTION_SSRF_FD&rule_key=findsecbugs%3AURLCONNECTION_SSRF_FD
             final URLConnection connection = url.openConnection();
             return readContent(connection);
-        } catch (IOException e) {
+        } catch (URISyntaxException | IOException e) {
             throw new EDSException(ReturnCode.NETWORK_ERROR, e.getMessage(), e);
         }
     }

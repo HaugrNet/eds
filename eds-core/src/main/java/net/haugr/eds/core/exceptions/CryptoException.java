@@ -19,6 +19,8 @@ package net.haugr.eds.core.exceptions;
 import net.haugr.eds.api.common.Constants;
 import net.haugr.eds.api.common.ReturnCode;
 
+import java.io.Serial;
+
 /**
  * <p>Crypto Exception, thrown if an error occurred from invoking the JCE logic
  * or in the Crypto components.</p>
@@ -29,6 +31,7 @@ import net.haugr.eds.api.common.ReturnCode;
 public final class CryptoException extends EDSException {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
+    @Serial
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
     /**

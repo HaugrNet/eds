@@ -76,9 +76,10 @@ final class ManagementBeanCircleTest extends DatabaseSetup {
         // Should throw a VerificationException, as the request is invalid.
         final ProcessCircleResponse response = bean.processCircle(request);
         assertEquals(ReturnCode.VERIFICATION_WARNING.getCode(), response.getReturnCode());
-        assertEquals("Request Object contained errors:" +
-                "\nKey: credential, Error: The Session (Credential) is missing." +
-                "\nKey: action, Error: No action has been provided.", response.getReturnMessage());
+        assertEquals("""
+                Request Object contained errors:
+                Key: credential, Error: The Session (Credential) is missing.
+                Key: action, Error: No action has been provided.""", response.getReturnMessage());
     }
 
     @Test
@@ -109,15 +110,15 @@ final class ManagementBeanCircleTest extends DatabaseSetup {
         final FetchDataResponse dataRootResponse = shareBean.fetchData(dataRootRequest);
         assertTrue(dataRootResponse.isOk());
         assertEquals(1, dataRootResponse.getMetadata().size());
-        assertEquals("My Data Object", dataRootResponse.getMetadata().get(0).getDataName());
+        assertEquals("My Data Object", dataRootResponse.getMetadata().getFirst().getDataName());
 
         // Read the newly created Data Object
         final FetchDataRequest dataFileRequest = prepareRequest(FetchDataRequest.class, MEMBER_5);
-        dataFileRequest.setDataId(dataRootResponse.getMetadata().get(0).getDataId());
+        dataFileRequest.setDataId(dataRootResponse.getMetadata().getFirst().getDataId());
         final FetchDataResponse dataFileResponse = shareBean.fetchData(dataFileRequest);
         assertTrue(dataFileResponse.isOk());
         assertEquals(1, dataFileResponse.getMetadata().size());
-        assertEquals("My Data Object", dataFileResponse.getMetadata().get(0).getDataName());
+        assertEquals("My Data Object", dataFileResponse.getMetadata().getFirst().getDataName());
         assertEquals(data, crypto.bytesToString(dataFileResponse.getData()));
     }
 
@@ -200,8 +201,8 @@ final class ManagementBeanCircleTest extends DatabaseSetup {
         assertEquals(ReturnCode.SUCCESS.getCode(), fetchResponse.getReturnCode());
         assertEquals(4, fetchResponse.getCircles().size());
         // Circles are sorted by name, so our newly created Circle will be the first
-        assertEquals(response.getCircleId(), fetchResponse.getCircles().get(0).getCircleId());
-        assertEquals(circleName, fetchResponse.getCircles().get(0).getCircleName());
+        assertEquals(response.getCircleId(), fetchResponse.getCircles().getFirst().getCircleId());
+        assertEquals(circleName, fetchResponse.getCircles().getFirst().getCircleName());
     }
 
     @Test
@@ -342,8 +343,8 @@ final class ManagementBeanCircleTest extends DatabaseSetup {
         final FetchCircleResponse fetchResponse = bean.fetchCircles(fetchRequest);
         assertEquals(ReturnCode.SUCCESS.getCode(), fetchResponse.getReturnCode());
         assertEquals(3, fetchResponse.getCircles().size());
-        assertEquals(CIRCLE_1_ID, fetchResponse.getCircles().get(0).getCircleId());
-        assertEquals("Circle One", fetchResponse.getCircles().get(0).getCircleName());
+        assertEquals(CIRCLE_1_ID, fetchResponse.getCircles().getFirst().getCircleId());
+        assertEquals("Circle One", fetchResponse.getCircles().getFirst().getCircleName());
     }
 
     @Test

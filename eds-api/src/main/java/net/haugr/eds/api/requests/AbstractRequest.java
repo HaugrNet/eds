@@ -16,10 +16,11 @@
  */
 package net.haugr.eds.api.requests;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.Map;
 import net.haugr.eds.api.common.Constants;
 
@@ -43,7 +44,14 @@ public abstract class AbstractRequest implements Serializable {
     /**
      * {@link Constants#SERIAL_VERSION_UID}.
      */
+    @Serial
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
+
+    /**
+     * Default Constructor.
+     */
+    protected AbstractRequest() {
+    }
 
     /**
      * Simple Validation method, which checks if the required values are usable
@@ -206,11 +214,13 @@ public abstract class AbstractRequest implements Serializable {
      * @param value  the URL to check
      * @see Constants#FIELD_URL
      */
+    @SuppressWarnings({ "java:S1166", "ResultOfMethodCallIgnored" })
     protected static void checkUrl(final Map<String, String> errors, final String value) {
         try {
-            final URL url = new URL(value);
-            url.toURI();
-        } catch (MalformedURLException | URISyntaxException e) {
+            // ResultOfMethodCallIgnored - ignored here, we only intend
+            // to test if a valid URL is provided.
+            new URI(value).toURL();
+        } catch (MalformedURLException | URISyntaxException | IllegalArgumentException e) {
             // SonarQube Warning java:S1166 - Ignored here
             // The error information from the Exception is added to the
             // error Object, which again is returned. Logging it here

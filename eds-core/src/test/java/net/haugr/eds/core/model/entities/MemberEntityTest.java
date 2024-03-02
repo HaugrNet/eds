@@ -112,7 +112,7 @@ final class MemberEntityTest extends DatabaseSetup {
         // Administration Account and the newly created Account
         assertEquals(7, list.size());
 
-        final MemberEntity found = list.get(0);
+        final MemberEntity found = list.getFirst();
         // Next, check that the newly found entity is not the same Object as the
         // first, this is done via the Reference Pointers, since an
         // Objects.equals() will yield the same result

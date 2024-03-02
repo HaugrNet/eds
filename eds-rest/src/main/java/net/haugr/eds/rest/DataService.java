@@ -47,6 +47,12 @@ public class DataService {
     private final Settings settings = Settings.getInstance();
 
     /**
+     * Default Constructor.
+     */
+    public DataService() {
+    }
+
+    /**
      * The REST Add Data Endpoint.
      *
      * @param addDataRequest Add Data Request

@@ -81,7 +81,7 @@ public class DatabaseSetup {
     // Following an upgrade of the H2 Database from 1.4.200 to 2.0.202+, it
     // seems that the internal handling of larger LOB's have been changed,
     // so if the value exceeds 1MB - 16 bytes, then the following  error
-    // is shown: "Value too long for column "BINARY VARYING".
+    // is shown: 'Value too long for column "BINARY VARYING".'
     //   To resolve it, the simplest way was to ensure that no data LOBs
     // were generated using hardcoded sizes, and secondly, by not exceeding
     // the maximum allowed value of 1048560 bytes.

@@ -48,6 +48,12 @@ public class SignatureService {
     private final Settings settings = Settings.getInstance();
 
     /**
+     * Default Constructor.
+     */
+    public SignatureService() {
+    }
+
+    /**
      * The REST Sign Document Endpoint.
      *
      * @param signDocumentRequest Sign Document Request

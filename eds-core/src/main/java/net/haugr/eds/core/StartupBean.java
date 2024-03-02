@@ -109,7 +109,7 @@ public class StartupBean {
             // If the database is invalid, then no data could be found, meaning
             // that the database was not properly initialized, this should
             // result in an error while reading.
-            if (!result.isEmpty() && (result.get(0).getSchemaVersion() == DB_VERSION)) {
+            if (!result.isEmpty() && (result.getFirst().getSchemaVersion() == DB_VERSION)) {
                 ready = true;
             }
         } catch (EDSException e) {

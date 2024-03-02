@@ -18,6 +18,8 @@ package net.haugr.eds.client.rest;
 
 import net.haugr.eds.api.common.Constants;
 
+import java.io.Serial;
+
 /**
  * <p>Default Exception for the EDS Client.</p>
  *
@@ -27,6 +29,7 @@ import net.haugr.eds.api.common.Constants;
 public final class RESTClientException extends RuntimeException {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
+    @Serial
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
     /**

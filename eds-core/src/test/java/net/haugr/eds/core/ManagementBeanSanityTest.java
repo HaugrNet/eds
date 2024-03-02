@@ -112,7 +112,7 @@ final class ManagementBeanSanityTest extends DatabaseSetup {
         final SanityResponse sanityResponse = bean.sanity(sanityRequest);
         assertTrue(sanityResponse.isOk());
         assertEquals(1, sanityResponse.getSanities().size());
-        assertEquals(response.getDataId(), sanityResponse.getSanities().get(0).getDataId());
+        assertEquals(response.getDataId(), sanityResponse.getSanities().getFirst().getDataId());
     }
 
     // =========================================================================

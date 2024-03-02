@@ -62,10 +62,11 @@ final class ShareBeanDataTypeTest extends DatabaseSetup {
 
         final ProcessDataTypeResponse response = bean.processDataType(request);
         assertEquals(ReturnCode.VERIFICATION_WARNING.getCode(), response.getReturnCode());
-        assertEquals("Request Object contained errors:" +
-                "\nKey: credential, Error: The Session (Credential) is missing." +
-                "\nKey: typeName, Error: The name of the DataType is missing or invalid." +
-                "\nKey: type, Error: The type of the DataType is missing or invalid.", response.getReturnMessage());
+        assertEquals("""
+                Request Object contained errors:
+                Key: credential, Error: The Session (Credential) is missing.
+                Key: typeName, Error: The name of the DataType is missing or invalid.
+                Key: type, Error: The type of the DataType is missing or invalid.""", response.getReturnMessage());
     }
 
     @Test
@@ -95,9 +96,10 @@ final class ShareBeanDataTypeTest extends DatabaseSetup {
 
         final ProcessDataTypeResponse response = bean.processDataType(request);
         assertEquals(ReturnCode.VERIFICATION_WARNING.getCode(), response.getReturnCode());
-        assertEquals("Request Object contained errors:" +
-                "\nKey: typeName, Error: The name of the DataType is missing or invalid." +
-                "\nKey: type, Error: The type of the DataType is missing or invalid.", response.getReturnMessage());
+        assertEquals("""
+                Request Object contained errors:
+                Key: typeName, Error: The name of the DataType is missing or invalid.
+                Key: type, Error: The type of the DataType is missing or invalid.""", response.getReturnMessage());
     }
 
     @Test

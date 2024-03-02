@@ -33,6 +33,12 @@ import javax.ws.rs.core.Application;
 public class EDSApplication extends Application {
 
     /**
+     * Default Constructor.
+     */
+    public EDSApplication() {
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override

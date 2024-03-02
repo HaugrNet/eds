@@ -44,6 +44,12 @@ public class InventoryService {
     private final Settings settings = Settings.getInstance();
 
     /**
+     * Default Constructor.
+     */
+    public InventoryService() {
+    }
+
+    /**
      * The REST Inventory Endpoint.
      *
      * @param inventoryRequest Inventory Request

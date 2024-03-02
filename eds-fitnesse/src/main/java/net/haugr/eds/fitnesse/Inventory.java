@@ -118,7 +118,7 @@ public final class Inventory extends EDSRequest<InventoryResponse> {
     }
 
     public String added() {
-        return metadata.isEmpty() ? null : Converter.convertDate(metadata.get(0).getAdded());
+        return metadata.isEmpty() ? null : Converter.convertDate(metadata.getFirst().getAdded());
     }
 
     // =========================================================================

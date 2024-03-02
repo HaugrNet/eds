@@ -49,10 +49,10 @@ final class SignatureEntityTest extends DatabaseSetup {
         dao.save(entity);
         final List<SignatureEntity> found = dao.findAllAscending(SignatureEntity.class, "id");
         assertFalse(found.isEmpty());
-        assertEquals(member, found.get(0).getMember());
-        assertEquals(publicKey, found.get(0).getPublicKey());
-        assertEquals(checksum, found.get(0).getChecksum());
-        assertEquals(expires, found.get(0).getExpires());
-        assertEquals(Long.valueOf(123L), found.get(0).getVerifications());
+        assertEquals(member, found.getFirst().getMember());
+        assertEquals(publicKey, found.getFirst().getPublicKey());
+        assertEquals(checksum, found.getFirst().getChecksum());
+        assertEquals(expires, found.getFirst().getExpires());
+        assertEquals(Long.valueOf(123L), found.getFirst().getVerifications());
     }
 }

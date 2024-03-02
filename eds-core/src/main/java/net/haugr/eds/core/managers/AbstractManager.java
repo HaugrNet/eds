@@ -333,7 +333,7 @@ public abstract class AbstractManager<D extends CommonDao, R extends EDSResponse
         } catch (CryptoException e) {
             // If an incorrect Passphrase was used to generate the PBE key, then
             // a Bad Padding Exception should've been thrown, which is converted
-            // into a EDS Crypto Exception. If that is the case, the Member has
+            // into an EDS Crypto Exception. If that is the case, the Member has
             // provided invalid credentials - with which it is not possible to
             // extract the KeyPair for the Account.
             throw new AuthenticationException("Cannot authenticate the Account from the given Credentials.", e);

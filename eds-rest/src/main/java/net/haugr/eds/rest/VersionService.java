@@ -41,6 +41,12 @@ public class VersionService {
     private final Settings settings = Settings.getInstance();
 
     /**
+     * Default Constructor.
+     */
+    public VersionService() {
+    }
+
+    /**
      * The REST Version Endpoint.
      *
      * @return Version Response

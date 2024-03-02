@@ -20,6 +20,7 @@ import net.haugr.eds.api.Management;
 import net.haugr.eds.api.common.Constants;
 import javax.json.bind.annotation.JsonbProperty;
 import javax.json.bind.annotation.JsonbPropertyOrder;
+import java.io.Serial;
 import java.util.Map;
 
 /**
@@ -32,9 +33,10 @@ import java.util.Map;
  * @since EDS 1.2
  */
 @JsonbPropertyOrder({ Constants.FIELD_PAGE_NUMBER, Constants.FIELD_PAGE_SIZE })
-public class InventoryRequest extends Authentication {
+public final class InventoryRequest extends Authentication {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
+    @Serial
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
     /** The Page Number. */
@@ -46,8 +48,14 @@ public class InventoryRequest extends Authentication {
     private Integer pageSize = Constants.MAX_PAGE_SIZE;
 
     // =========================================================================
-    // Setters & Getters
+    // Standard Methods (Constructor, Setters & Getters)
     // =========================================================================
+
+    /**
+     * Default Constructor.
+     */
+    public InventoryRequest() {
+    }
 
     /**
      * Set the Page Number.

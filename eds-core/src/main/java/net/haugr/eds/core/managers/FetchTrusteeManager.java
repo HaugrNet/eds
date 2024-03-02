@@ -81,7 +81,7 @@ public final class FetchTrusteeManager extends AbstractManager<TrusteeDao, Fetch
         final List<TrusteeEntity> trustees;
 
         // The pre-checks will prevent that a non-System Administrator
-        // can access information about Circles of Trust for Circle's
+        // can access information about Circles of Trust for Circles
         // where there is no relation.
         if (memberId != null) {
             trustees = dao.findTrusteesByMemberAndCircle(memberId, circleId);

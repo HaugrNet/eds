@@ -115,7 +115,7 @@ final class ManagementBeanFetchMemberTest extends DatabaseSetup {
         final FetchMemberResponse fetchResponse1 = bean.fetchMembers(fetchRequest1);
         assertEquals(ReturnCode.SUCCESS.getCode(), fetchResponse1.getReturnCode());
         assertEquals(1, fetchResponse1.getMembers().size());
-        assertEquals(addResponse.getMemberId(), fetchResponse1.getMembers().get(0).getMemberId());
+        assertEquals(addResponse.getMemberId(), fetchResponse1.getMembers().getFirst().getMemberId());
 
         // Step 3: Delete the newly created Member Account
         final ProcessMemberRequest deleteRequest = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
@@ -187,7 +187,7 @@ final class ManagementBeanFetchMemberTest extends DatabaseSetup {
         assertTrue(fetchedMemberResponse.getCircles().isEmpty());
 
         // Check that the member information is present
-        final Member member0 = fetchedMemberResponse.getMembers().get(0);
+        final Member member0 = fetchedMemberResponse.getMembers().getFirst();
         assertEquals(Constants.ADMIN_ACCOUNT, member0.getAccountName());
         assertEquals(ADMIN_ID, member0.getMemberId());
         assertNotNull(member0.getAdded());
@@ -230,7 +230,7 @@ final class ManagementBeanFetchMemberTest extends DatabaseSetup {
         assertEquals("Ok", fetchResponse.getReturnMessage());
         assertEquals(1, fetchResponse.getMembers().size());
         assertTrue(fetchResponse.getCircles().isEmpty());
-        assertEquals(Constants.ADMIN_ACCOUNT, fetchResponse.getMembers().get(0).getAccountName());
+        assertEquals(Constants.ADMIN_ACCOUNT, fetchResponse.getMembers().getFirst().getAccountName());
     }
 
     /**
@@ -256,7 +256,7 @@ final class ManagementBeanFetchMemberTest extends DatabaseSetup {
         assertEquals("Ok", memberResponse.getReturnMessage());
         assertEquals(1, memberResponse.getMembers().size());
         assertEquals(2, memberResponse.getCircles().size());
-        assertEquals(firstMember.getName(), memberResponse.getMembers().get(0).getAccountName());
+        assertEquals(firstMember.getName(), memberResponse.getMembers().getFirst().getAccountName());
     }
 
     /**
@@ -282,7 +282,7 @@ final class ManagementBeanFetchMemberTest extends DatabaseSetup {
         assertEquals("Ok", response.getReturnMessage());
         assertEquals(1, response.getMembers().size());
         assertEquals(2, response.getCircles().size());
-        assertEquals(member.getName(), response.getMembers().get(0).getAccountName());
+        assertEquals(member.getName(), response.getMembers().getFirst().getAccountName());
     }
 
     @Test
@@ -301,7 +301,7 @@ final class ManagementBeanFetchMemberTest extends DatabaseSetup {
         assertNotNull(memberResponse);
         assertEquals(1, memberResponse.getMembers().size());
         assertEquals(2, memberResponse.getCircles().size());
-        assertEquals(member.getName(), memberResponse.getMembers().get(0).getAccountName());
+        assertEquals(member.getName(), memberResponse.getMembers().getFirst().getAccountName());
     }
 
     @Test
@@ -320,7 +320,7 @@ final class ManagementBeanFetchMemberTest extends DatabaseSetup {
         assertNotNull(response);
         assertEquals(1, response.getMembers().size());
         assertEquals(2, response.getCircles().size());
-        assertEquals(member.getName(), response.getMembers().get(0).getAccountName());
+        assertEquals(member.getName(), response.getMembers().getFirst().getAccountName());
     }
 
     @Test
@@ -359,7 +359,7 @@ final class ManagementBeanFetchMemberTest extends DatabaseSetup {
 
         // Verify that we have found the correct data
         assertEquals(1, response.getMembers().size());
-        assertEquals(MEMBER_1_ID, response.getMembers().get(0).getMemberId());
+        assertEquals(MEMBER_1_ID, response.getMembers().getFirst().getMemberId());
         // Member 1 is Administrator for 2 Circles, Circle1 & Circle2
         // Member 4 is Administrator for 2 Circles, Circle2 & Circle3
         // As SHOW_TRUSTEES is disabled, we're only getting shared

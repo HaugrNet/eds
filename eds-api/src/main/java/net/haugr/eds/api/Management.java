@@ -44,7 +44,7 @@ import net.haugr.eds.api.responses.VersionResponse;
 
 /**
  * This interface contains the functionality needed to set up, configure and
- * control a EDS instance.
+ * control an EDS instance.
  *
  * @author Kim Jensen
  * @since EDS 1.0

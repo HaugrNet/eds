@@ -47,6 +47,12 @@ public class TrusteeService {
     private final Settings settings = Settings.getInstance();
 
     /**
+     * Default Constructor.
+     */
+    public TrusteeService() {
+    }
+
+    /**
      * The REST Add Trustee Endpoint.
      *
      * @param addTrusteeRequest Add Trustee Request

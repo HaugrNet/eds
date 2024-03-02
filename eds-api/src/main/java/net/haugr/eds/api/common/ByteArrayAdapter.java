@@ -32,6 +32,12 @@ import java.util.Base64;
 public final class ByteArrayAdapter implements JsonbAdapter<byte[], String> {
 
     /**
+     * Default Constructor.
+     */
+    public ByteArrayAdapter() {
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override

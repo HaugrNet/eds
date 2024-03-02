@@ -47,6 +47,12 @@ public class CircleService {
     private final Settings settings = Settings.getInstance();
 
     /**
+     * Default Constructor.
+     */
+    public CircleService() {
+    }
+
+    /**
      * The REST Create Circle Endpoint.
      *
      * @param createCircleRequest Create Circle Request

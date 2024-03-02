@@ -57,7 +57,7 @@ public final class ManagementRestClient extends GsonRestClient implements Manage
     /**
      * Constructor for the EDS System REST Client. It takes the base URL for the
      * EDS Instance to communicate with, which is the protocol, hostname, port
-     * and deployment name. For example; &quot;http://localhost:8080/eds&quot;.
+     * and deployment name. For example; &quot;localhost:8080/eds&quot;.
      *
      * @param baseURL Base URL for the EDS Instance
      */
@@ -134,34 +134,17 @@ public final class ManagementRestClient extends GsonRestClient implements Manage
         final ProcessMemberResponse response;
         throwExceptionIfInvalid(request);
 
-        switch (request.getAction()) {
-            case CREATE:
-                response = runRequest(ProcessMemberResponse.class, base + Constants.REST_MEMBERS_CREATE, request);
-                break;
-            case INVITE:
-                response = runRequest(ProcessMemberResponse.class, base + Constants.REST_MEMBERS_INVITE, request);
-                break;
-            case LOGIN:
-                response = runRequest(ProcessMemberResponse.class, base + Constants.REST_MEMBERS_LOGIN, request);
-                break;
-            case LOGOUT:
-                response = runRequest(ProcessMemberResponse.class, base + Constants.REST_MEMBERS_LOGOUT, request);
-                break;
-            case ALTER:
-                response = runRequest(ProcessMemberResponse.class, base + Constants.REST_MEMBERS_ALTER, request);
-                break;
-            case UPDATE:
-                response = runRequest(ProcessMemberResponse.class, base + Constants.REST_MEMBERS_UPDATE, request);
-                break;
-            case INVALIDATE:
-                response = runRequest(ProcessMemberResponse.class, base + Constants.REST_MEMBERS_INVALIDATE, request);
-                break;
-            case DELETE:
-                response = runRequest(ProcessMemberResponse.class, base + Constants.REST_MEMBERS_DELETE, request);
-                break;
-            default:
-                throw new RESTClientException(UNSUPPORTED_OPERATION + request.getAction());
-        }
+        response = switch (request.getAction()) {
+            case CREATE -> runRequest(ProcessMemberResponse.class, base + Constants.REST_MEMBERS_CREATE, request);
+            case INVITE -> runRequest(ProcessMemberResponse.class, base + Constants.REST_MEMBERS_INVITE, request);
+            case LOGIN -> runRequest(ProcessMemberResponse.class, base + Constants.REST_MEMBERS_LOGIN, request);
+            case LOGOUT -> runRequest(ProcessMemberResponse.class, base + Constants.REST_MEMBERS_LOGOUT, request);
+            case ALTER -> runRequest(ProcessMemberResponse.class, base + Constants.REST_MEMBERS_ALTER, request);
+            case UPDATE -> runRequest(ProcessMemberResponse.class, base + Constants.REST_MEMBERS_UPDATE, request);
+            case INVALIDATE -> runRequest(ProcessMemberResponse.class, base + Constants.REST_MEMBERS_INVALIDATE, request);
+            case DELETE -> runRequest(ProcessMemberResponse.class, base + Constants.REST_MEMBERS_DELETE, request);
+            default -> throw new RESTClientException(UNSUPPORTED_OPERATION + request.getAction());
+        };
 
         return response;
     }
@@ -183,19 +166,12 @@ public final class ManagementRestClient extends GsonRestClient implements Manage
         final ProcessCircleResponse response;
         throwExceptionIfInvalid(request);
 
-        switch (request.getAction()) {
-            case CREATE:
-                response = runRequest(ProcessCircleResponse.class, base + Constants.REST_CIRCLES_CREATE, request);
-                break;
-            case UPDATE:
-                response = runRequest(ProcessCircleResponse.class, base + Constants.REST_CIRCLES_UPDATE, request);
-                break;
-            case DELETE:
-                response = runRequest(ProcessCircleResponse.class, base + Constants.REST_CIRCLES_DELETE, request);
-                break;
-            default:
-                throw new RESTClientException(UNSUPPORTED_OPERATION + request.getAction());
-        }
+        response = switch (request.getAction()) {
+            case CREATE -> runRequest(ProcessCircleResponse.class, base + Constants.REST_CIRCLES_CREATE, request);
+            case UPDATE -> runRequest(ProcessCircleResponse.class, base + Constants.REST_CIRCLES_UPDATE, request);
+            case DELETE -> runRequest(ProcessCircleResponse.class, base + Constants.REST_CIRCLES_DELETE, request);
+            default -> throw new RESTClientException(UNSUPPORTED_OPERATION + request.getAction());
+        };
 
         return response;
     }
@@ -217,19 +193,12 @@ public final class ManagementRestClient extends GsonRestClient implements Manage
         final ProcessTrusteeResponse response;
         throwExceptionIfInvalid(request);
 
-        switch (request.getAction()) {
-            case ADD:
-                response = runRequest(ProcessTrusteeResponse.class, base + Constants.REST_TRUSTEES_ADD, request);
-                break;
-            case ALTER:
-                response = runRequest(ProcessTrusteeResponse.class, base + Constants.REST_TRUSTEES_ALTER, request);
-                break;
-            case REMOVE:
-                response = runRequest(ProcessTrusteeResponse.class, base + Constants.REST_TRUSTEES_REMOVE, request);
-                break;
-            default:
-                throw new RESTClientException(UNSUPPORTED_OPERATION + request.getAction());
-        }
+        response = switch (request.getAction()) {
+            case ADD -> runRequest(ProcessTrusteeResponse.class, base + Constants.REST_TRUSTEES_ADD, request);
+            case ALTER -> runRequest(ProcessTrusteeResponse.class, base + Constants.REST_TRUSTEES_ALTER, request);
+            case REMOVE -> runRequest(ProcessTrusteeResponse.class, base + Constants.REST_TRUSTEES_REMOVE, request);
+            default -> throw new RESTClientException(UNSUPPORTED_OPERATION + request.getAction());
+        };
 
         return response;
     }

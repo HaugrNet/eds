@@ -61,26 +61,12 @@ public enum TrustLevel {
      * @return Set with all permitted TrustLevel's
      */
     public static Set<TrustLevel> getLevels(final TrustLevel level) {
-        final EnumSet<TrustLevel> allowed;
-
-        switch (level) {
-            case SYSOP:
-                allowed = EnumSet.of(SYSOP);
-                break;
-            case ADMIN:
-                allowed = EnumSet.of(SYSOP, ADMIN);
-                break;
-            case WRITE:
-                allowed = EnumSet.of(SYSOP, ADMIN, WRITE);
-                break;
-            case READ:
-                allowed = EnumSet.of(SYSOP, ADMIN, WRITE, READ);
-                break;
-            default:
-                allowed = EnumSet.allOf(TrustLevel.class);
-                break;
-        }
-
-        return allowed;
+        return switch (level) {
+            case SYSOP -> EnumSet.of(SYSOP);
+            case ADMIN -> EnumSet.of(SYSOP, ADMIN);
+            case WRITE -> EnumSet.of(SYSOP, ADMIN, WRITE);
+            case READ -> EnumSet.of(SYSOP, ADMIN, WRITE, READ);
+            default -> EnumSet.allOf(TrustLevel.class);
+        };
     }
 }

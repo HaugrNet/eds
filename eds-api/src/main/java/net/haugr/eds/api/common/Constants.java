@@ -113,7 +113,7 @@ public final class Constants {
     // Following is a list of the Field names being used as part of the SOAP
     // WSDL file - they are listed here, so the names can be used as part of
     // the XML Class Annotations.
-    /** Field :: Circle &amp; Data Id's. */
+    /** Field :: Circle &amp; Data Ids. */
     public static final String FIELD_IDS = "circle & data Id";
     /** Field :: CircleId. */
     public static final String FIELD_CIRCLE_ID = "circleId";

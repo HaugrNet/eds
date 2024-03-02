@@ -94,7 +94,7 @@ final class ShareBeanSignatureTest extends DatabaseSetup {
         final FetchSignatureResponse fetchResponse = bean.fetchSignatures(fetchRequest);
         assertEquals(ReturnCode.SUCCESS.getCode(), fetchResponse.getReturnCode());
         assertEquals(1, fetchResponse.getSignatures().size());
-        assertEquals(Long.valueOf(1L), fetchResponse.getSignatures().get(0).getVerifications());
+        assertEquals(Long.valueOf(1L), fetchResponse.getSignatures().getFirst().getVerifications());
     }
 
     @Test

@@ -189,7 +189,7 @@ public class CommonDao {
                     "No Trustee information found for member '" + name + "' and circle '" + externalCircleId + "'.");
         }
 
-        return found.get(0);
+        return found.getFirst();
     }
 
     public List<TrusteeEntity> findTrusteesByMember(final MemberEntity member, final Set<TrustLevel> permissions) {
@@ -300,7 +300,7 @@ public class CommonDao {
     public static <E> E findSingleRecord(final Query query) {
         final List<E> found = findList(query);
 
-        return found.isEmpty() ? null : found.get(0);
+        return found.isEmpty() ? null : found.getFirst();
     }
 
     /**
@@ -312,6 +312,7 @@ public class CommonDao {
      * @param <E>   Entity Type to return a list if
      * @return List of found Entities or an empty list if none were found
      */
+    @SuppressWarnings("unchecked")
     public static <E> List<E> findList(final Query query) {
         try {
             final List<E> list = query.getResultList();

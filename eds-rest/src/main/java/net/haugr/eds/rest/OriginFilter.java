@@ -43,6 +43,12 @@ public final class OriginFilter implements Filter {
     private final Settings settings = Settings.getInstance();
 
     /**
+     * Default Constructor.
+     */
+    public OriginFilter() {
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override

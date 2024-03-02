@@ -50,21 +50,13 @@ public final class ProcessDataTypeManager extends AbstractManager<CommonDao, Pro
         // Pre-checks, & destruction of credentials
         verifyRequest(request, Permission.PROCESS_DATA_TYPE);
         Arrays.fill(request.getCredential(), (byte) 0);
-        final ProcessDataTypeResponse response;
 
-        switch (request.getAction()) {
-            case PROCESS:
-                response = doProcess(request);
-                break;
-            case DELETE:
-                response = doDelete(request);
-                break;
-            default:
-                // Unreachable Code by design.
-                throw new IllegalActionException("Unsupported Action.");
-        }
-
-        return response;
+        return switch (request.getAction()) {
+            case PROCESS -> doProcess(request);
+            case DELETE -> doDelete(request);
+            // Unreachable Code by design.
+            default -> throw new IllegalActionException("Unsupported Action.");
+        };
     }
 
     /**

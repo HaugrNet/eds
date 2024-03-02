@@ -21,6 +21,7 @@ import net.haugr.eds.api.common.Action;
 import net.haugr.eds.api.common.Constants;
 import javax.json.bind.annotation.JsonbProperty;
 import javax.json.bind.annotation.JsonbPropertyOrder;
+import java.io.Serial;
 import java.util.Map;
 
 /**
@@ -45,6 +46,7 @@ import java.util.Map;
 public final class ProcessDataTypeRequest extends Authentication implements ActionRequest {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
+    @Serial
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
     /** The Action. */
@@ -60,8 +62,14 @@ public final class ProcessDataTypeRequest extends Authentication implements Acti
     private String type = null;
 
     // =========================================================================
-    // Standard Setters & Getters
+    // Standard Methods (Constructor, Setters & Getters)
     // =========================================================================
+
+    /**
+     * Default Constructor.
+     */
+    public ProcessDataTypeRequest() {
+    }
 
     /**
      * {@inheritDoc}

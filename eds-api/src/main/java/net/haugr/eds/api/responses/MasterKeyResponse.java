@@ -19,6 +19,8 @@ package net.haugr.eds.api.responses;
 import net.haugr.eds.api.common.Constants;
 import net.haugr.eds.api.common.ReturnCode;
 
+import java.io.Serial;
+
 /**
  * <p>The response from the MasterKey request is limited to error information,
  * or information about the successful changing or altering a key. The message
@@ -34,6 +36,7 @@ import net.haugr.eds.api.common.ReturnCode;
 public final class MasterKeyResponse extends EDSResponse {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
+    @Serial
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
     // =========================================================================

@@ -44,6 +44,12 @@ public class SanityService {
     private final Settings settings = Settings.getInstance();
 
     /**
+     * Default Constructor.
+     */
+    public SanityService() {
+    }
+
+    /**
      * The REST Sanitized Endpoint.
      *
      * @param sanitizedRequest Sanitized Request

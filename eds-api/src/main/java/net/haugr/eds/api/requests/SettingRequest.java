@@ -19,6 +19,7 @@ package net.haugr.eds.api.requests;
 import net.haugr.eds.api.common.Constants;
 import javax.json.bind.annotation.JsonbProperty;
 import javax.json.bind.annotation.JsonbPropertyOrder;
+import java.io.Serial;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -41,6 +42,7 @@ import java.util.Map;
 public final class SettingRequest extends Authentication {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
+    @Serial
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
     /** The Map of Settings. */
@@ -48,8 +50,14 @@ public final class SettingRequest extends Authentication {
     private HashMap<String, String> settings = new HashMap<>(0);
 
     // =========================================================================
-    // Standard Setters & Getters
+    // Standard Methods (Constructor, Setters & Getters)
     // =========================================================================
+
+    /**
+     * Default Constructor.
+     */
+    public SettingRequest() {
+    }
 
     /**
      * Set the Map of Settings.

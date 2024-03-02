@@ -18,6 +18,7 @@ package net.haugr.eds.api.dtos;
 
 import net.haugr.eds.api.common.Constants;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import javax.json.bind.annotation.JsonbDateFormat;
@@ -38,6 +39,7 @@ import javax.json.bind.annotation.JsonbPropertyOrder;
 public final class Sanity implements Serializable {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
+    @Serial
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
     /** DataId. */
@@ -50,8 +52,14 @@ public final class Sanity implements Serializable {
     private LocalDateTime changed = null;
 
     // =========================================================================
-    // Standard Setters & Getters
+    // Standard Methods (Constructor, Setters & Getters)
     // =========================================================================
+
+    /**
+     * Default Constructor.
+     */
+    public Sanity() {
+    }
 
     /**
      * Set the DataId.

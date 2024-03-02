@@ -87,39 +87,18 @@ public final class ProcessMemberManager extends AbstractManager<MemberDao, Proce
     }
 
     private ProcessMemberResponse processActions(final ProcessMemberRequest request) {
-        final ProcessMemberResponse response;
-
-        switch (request.getAction()) {
-            case CREATE:
-                response = createMember(request);
-                break;
-            case INVITE:
-                response = inviteMember(request);
-                break;
-            case LOGIN:
-                response = loginMember(request);
-                break;
-            case LOGOUT:
-                response = logoutMember();
-                break;
-            case ALTER:
-                response = alterMember(request);
-                break;
-            case UPDATE:
-                response = updateMember(request);
-                break;
-            case INVALIDATE:
-                response = invalidate(request);
-                break;
-            case DELETE:
-                response = deleteMember(request);
-                break;
-            default:
-                // Unreachable Code by design.
-                throw new IllegalActionException("Unsupported Action.");
-        }
-
-        return response;
+        return switch (request.getAction()) {
+            case CREATE -> createMember(request);
+            case INVITE -> inviteMember(request);
+            case LOGIN -> loginMember(request);
+            case LOGOUT -> logoutMember();
+            case ALTER -> alterMember(request);
+            case UPDATE -> updateMember(request);
+            case INVALIDATE -> invalidate(request);
+            case DELETE -> deleteMember(request);
+            // Unreachable Code by design.
+            default -> throw new IllegalActionException("Unsupported Action.");
+        };
     }
 
     private ProcessMemberResponse createMember(final ProcessMemberRequest request) {

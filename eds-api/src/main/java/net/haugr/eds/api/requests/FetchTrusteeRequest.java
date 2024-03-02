@@ -21,6 +21,7 @@ import net.haugr.eds.api.common.Constants;
 
 import javax.json.bind.annotation.JsonbProperty;
 import javax.json.bind.annotation.JsonbPropertyOrder;
+import java.io.Serial;
 import java.util.Map;
 
 /**
@@ -36,6 +37,7 @@ import java.util.Map;
 public final class FetchTrusteeRequest extends Authentication implements CircleIdRequest {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
+    @Serial
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
     /** MemberId. */
@@ -47,8 +49,14 @@ public final class FetchTrusteeRequest extends Authentication implements CircleI
     private String circleId = null;
 
     // =========================================================================
-    // Setters & Getters
+    // Standard Methods (Constructor, Setters & Getters)
     // =========================================================================
+
+    /**
+     * Default Constructor.
+     */
+    public FetchTrusteeRequest() {
+    }
 
     /**
      * Set the MemberId.

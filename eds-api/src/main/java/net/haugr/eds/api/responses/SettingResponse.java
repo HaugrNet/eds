@@ -21,6 +21,7 @@ import net.haugr.eds.api.common.ReturnCode;
 
 import javax.json.bind.annotation.JsonbProperty;
 import javax.json.bind.annotation.JsonbPropertyOrder;
+import java.io.Serial;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -39,6 +40,7 @@ import java.util.Map;
 public final class SettingResponse extends EDSResponse {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
+    @Serial
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
     /** The Map of Settings. */

@@ -53,9 +53,10 @@ final class ShareBeanDataTest extends DatabaseSetup {
 
         final ProcessDataResponse response = bean.processData(request);
         assertEquals(ReturnCode.VERIFICATION_WARNING.getCode(), response.getReturnCode());
-        assertEquals("Request Object contained errors:" +
-                "\nKey: credential, Error: The Session (Credential) is missing." +
-                "\nKey: action, Error: No action has been provided.", response.getReturnMessage());
+        assertEquals("""
+                Request Object contained errors:
+                Key: credential, Error: The Session (Credential) is missing.
+                Key: action, Error: No action has been provided.""", response.getReturnMessage());
     }
 
     @Test
@@ -65,9 +66,10 @@ final class ShareBeanDataTest extends DatabaseSetup {
 
         final FetchDataResponse response = bean.fetchData(request);
         assertEquals(ReturnCode.VERIFICATION_WARNING.getCode(), response.getReturnCode());
-        assertEquals("Request Object contained errors:" +
-                "\nKey: credential, Error: The Session (Credential) is missing." +
-                "\nKey: circle & data Id, Error: Either a Circle Id, Data Id, or Data Name must be provided.", response.getReturnMessage());
+        assertEquals("""
+                Request Object contained errors:
+                Key: credential, Error: The Session (Credential) is missing.
+                Key: circle & data Id, Error: Either a Circle Id, Data Id, or Data Name must be provided.""", response.getReturnMessage());
     }
 
     @Test
@@ -132,9 +134,9 @@ final class ShareBeanDataTest extends DatabaseSetup {
         fetchRequest2.setDataId(saveResponse.getDataId());
         final FetchDataResponse fetchResponse2 = bean.fetchData(fetchRequest2);
         assertEquals(ReturnCode.SUCCESS.getCode(), fetchResponse2.getReturnCode());
-        assertEquals(fetchResponse2.getMetadata().get(0).getDataId(), fetchResponse1.getMetadata().get(0).getDataId());
-        assertEquals("My Data", fetchResponse1.getMetadata().get(0).getDataName());
-        assertEquals("New Name", fetchResponse2.getMetadata().get(0).getDataName());
+        assertEquals(fetchResponse2.getMetadata().getFirst().getDataId(), fetchResponse1.getMetadata().getFirst().getDataId());
+        assertEquals("My Data", fetchResponse1.getMetadata().getFirst().getDataName());
+        assertEquals("New Name", fetchResponse2.getMetadata().getFirst().getDataName());
     }
 
     @Test
@@ -165,7 +167,7 @@ final class ShareBeanDataTest extends DatabaseSetup {
         fetchRequest.setDataId(saveResponse.getDataId());
         final FetchDataResponse fetchResponse = bean.fetchData(fetchRequest);
         assertEquals(ReturnCode.SUCCESS.getCode(), fetchResponse.getReturnCode());
-        assertEquals(dataName, fetchResponse.getMetadata().get(0).getDataName());
+        assertEquals(dataName, fetchResponse.getMetadata().getFirst().getDataName());
         assertEquals(updateContent, new String(fetchResponse.getData(), StandardCharsets.UTF_8));
     }
 
@@ -481,12 +483,12 @@ final class ShareBeanDataTest extends DatabaseSetup {
         final FetchDataRequest copyFetchRequest1 = prepareReadRequest(MEMBER_1, null, copyAddResponse.getDataId());
         final FetchDataResponse copyFetchResponse1 = bean.fetchData(copyFetchRequest1);
         assertEquals(ReturnCode.SUCCESS.getCode(), copyFetchResponse1.getReturnCode());
-        final Metadata metadata1 = copyFetchResponse1.getMetadata().get(0);
+        final Metadata metadata1 = copyFetchResponse1.getMetadata().getFirst();
 
         final FetchDataRequest copyFetchRequest2 = prepareReadRequest(MEMBER_1, null, copyResponse.getDataId());
         final FetchDataResponse copyFetchResponse2 = bean.fetchData(copyFetchRequest2);
         assertEquals(ReturnCode.SUCCESS.getCode(), copyFetchResponse2.getReturnCode());
-        final Metadata copyMetadata2 = copyFetchResponse2.getMetadata().get(0);
+        final Metadata copyMetadata2 = copyFetchResponse2.getMetadata().getFirst();
 
         // Comparing the first Object with the copied Object, name, type and
         // data must be the same, the ID's not.
@@ -569,12 +571,12 @@ final class ShareBeanDataTest extends DatabaseSetup {
         final FetchDataRequest emptyFetchRequest1 = prepareReadRequest(MEMBER_1, null, emptyAddResponse.getDataId());
         final FetchDataResponse emptyFetchResponse1 = bean.fetchData(emptyFetchRequest1);
         assertEquals(ReturnCode.SUCCESS.getCode(), emptyFetchResponse1.getReturnCode());
-        final Metadata metadata1 = emptyFetchResponse1.getMetadata().get(0);
+        final Metadata metadata1 = emptyFetchResponse1.getMetadata().getFirst();
 
         final FetchDataRequest emptyFetchRequest2 = prepareReadRequest(MEMBER_1, null, emptyCopyResponse.getDataId());
         final FetchDataResponse emptyFetchResponse2 = bean.fetchData(emptyFetchRequest2);
         assertEquals(ReturnCode.SUCCESS.getCode(), emptyFetchResponse2.getReturnCode());
-        final Metadata emptyMetadata2 = emptyFetchResponse2.getMetadata().get(0);
+        final Metadata emptyMetadata2 = emptyFetchResponse2.getMetadata().getFirst();
 
         // Comparing the first Object with the copied Object, name, type and
         // data must be the same, the ID's not.
@@ -761,20 +763,20 @@ final class ShareBeanDataTest extends DatabaseSetup {
         final FetchDataResponse readRootResponse = bean.fetchData(readRootRequest);
         assertTrue(readRootResponse.isOk());
         assertEquals(2, readRootResponse.getMetadata().size());
-        assertEquals(folderResponse2.getDataId(), readRootResponse.getMetadata().get(0).getDataId());
+        assertEquals(folderResponse2.getDataId(), readRootResponse.getMetadata().getFirst().getDataId());
         assertEquals(folderResponse1.getDataId(), readRootResponse.getMetadata().get(1).getDataId());
 
         final FetchDataRequest readFolder1Request = prepareReadRequest(MEMBER_4, CIRCLE_3_ID, folderResponse1.getDataId());
         final FetchDataResponse readFolder1Response = bean.fetchData(readFolder1Request);
         assertTrue(readFolder1Response.isOk());
         assertEquals(1, readFolder1Response.getMetadata().size());
-        assertEquals(dataResponse1.getDataId(), readFolder1Response.getMetadata().get(0).getDataId());
+        assertEquals(dataResponse1.getDataId(), readFolder1Response.getMetadata().getFirst().getDataId());
 
         final FetchDataRequest readFolder2Request = prepareReadRequest(MEMBER_4, CIRCLE_3_ID, folderResponse2.getDataId());
         final FetchDataResponse readFolder2Response = bean.fetchData(readFolder2Request);
         assertTrue(readFolder2Response.isOk());
         assertEquals(1, readFolder2Response.getMetadata().size());
-        assertEquals(dataResponse2.getDataId(), readFolder2Response.getMetadata().get(0).getDataId());
+        assertEquals(dataResponse2.getDataId(), readFolder2Response.getMetadata().getFirst().getDataId());
 
         // Step 4, Move the data from folder 1 to folder 2.
         final ProcessDataRequest moveRequest = prepareUpdateRequest(MEMBER_4, CIRCLE_3_ID);

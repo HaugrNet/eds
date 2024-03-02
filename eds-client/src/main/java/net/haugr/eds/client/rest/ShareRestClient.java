@@ -44,7 +44,7 @@ public final class ShareRestClient extends GsonRestClient implements Share {
     /**
      * Constructor for the EDS Share REST Client. It takes the base URL for the
      * EDS Instance to communicate with, which is the protocol, hostname, port
-     * and deployment name. For example; &quot;http://localhost:8080/eds&quot;.
+     * and deployment name. For example; &quot;localhost:8080/eds&quot;.
      *
      * @param baseURL Base URL for the EDS Instance
      */
@@ -66,16 +66,11 @@ public final class ShareRestClient extends GsonRestClient implements Share {
         if ((request != null) && (request.getAction() != null)) {
             final String base = Constants.REST_DATATYPES_BASE;
 
-            switch (request.getAction()) {
-                case PROCESS:
-                    response = runRequest(ProcessDataTypeResponse.class, base + Constants.REST_DATATYPES_PROCESS, request);
-                    break;
-                case DELETE:
-                    response = runRequest(ProcessDataTypeResponse.class, base + Constants.REST_DATATYPES_DELETE, request);
-                    break;
-                default:
-                    throw new RESTClientException("Unsupported Operation: " + request.getAction());
-            }
+            response = switch (request.getAction()) {
+                case PROCESS -> runRequest(ProcessDataTypeResponse.class, base + Constants.REST_DATATYPES_PROCESS, request);
+                case DELETE -> runRequest(ProcessDataTypeResponse.class, base + Constants.REST_DATATYPES_DELETE, request);
+                default -> throw new RESTClientException("Unsupported Operation: " + request.getAction());
+            };
         } else {
             throw new RESTClientException("Cannot perform request, as the Request Object is missing or incomplete.");
         }
@@ -100,25 +95,14 @@ public final class ShareRestClient extends GsonRestClient implements Share {
 
         if ((request != null) && (request.getAction() != null)) {
             final String base = Constants.REST_DATA_BASE;
-            switch (request.getAction()) {
-                case ADD:
-                    response = runRequest(ProcessDataResponse.class, base + Constants.REST_DATA_ADD, request);
-                    break;
-                case UPDATE:
-                    response = runRequest(ProcessDataResponse.class, base + Constants.REST_DATA_UPDATE, request);
-                    break;
-                case COPY:
-                    response = runRequest(ProcessDataResponse.class, base + Constants.REST_DATA_COPY, request);
-                    break;
-                case MOVE:
-                    response = runRequest(ProcessDataResponse.class, base + Constants.REST_DATA_MOVE, request);
-                    break;
-                case DELETE:
-                    response = runRequest(ProcessDataResponse.class, base + Constants.REST_DATA_DELETE, request);
-                    break;
-                default:
-                    throw new RESTClientException("Unsupported Operation: " + request.getAction());
-            }
+            response = switch (request.getAction()) {
+                case ADD -> runRequest(ProcessDataResponse.class, base + Constants.REST_DATA_ADD, request);
+                case UPDATE -> runRequest(ProcessDataResponse.class, base + Constants.REST_DATA_UPDATE, request);
+                case COPY -> runRequest(ProcessDataResponse.class, base + Constants.REST_DATA_COPY, request);
+                case MOVE -> runRequest(ProcessDataResponse.class, base + Constants.REST_DATA_MOVE, request);
+                case DELETE -> runRequest(ProcessDataResponse.class, base + Constants.REST_DATA_DELETE, request);
+                default -> throw new RESTClientException("Unsupported Operation: " + request.getAction());
+            };
         } else {
             throw new RESTClientException("Cannot perform request, as the Request Object is missing or incomplete.");
         }

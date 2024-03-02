@@ -56,24 +56,14 @@ public final class ProcessTrusteeManager extends AbstractManager<CommonDao, Proc
         // Pre-checks, & destruction of credentials
         verifyRequest(request, Permission.PROCESS_TRUSTEE);
         Arrays.fill(request.getCredential(), (byte) 0);
-        final ProcessTrusteeResponse response;
 
-        switch (request.getAction()) {
-            case ADD:
-                response = addTrustee(request);
-                break;
-            case ALTER:
-                response = alterTrustee(request);
-                break;
-            case REMOVE:
-                response = removeTrustee(request);
-                break;
-            default:
-                // Unreachable Code by design.
-                throw new IllegalActionException("Unsupported Action.");
-        }
-
-        return response;
+        return switch (request.getAction()) {
+            case ADD -> addTrustee(request);
+            case ALTER -> alterTrustee(request);
+            case REMOVE -> removeTrustee(request);
+            // Unreachable Code by design.
+            default -> throw new IllegalActionException("Unsupported Action.");
+        };
     }
 
     /**
@@ -108,7 +98,7 @@ public final class ProcessTrusteeManager extends AbstractManager<CommonDao, Proc
         // during this - the logic should also reflect it. However, as
         // re-key is not supported in version 1.0, support for multiple
         // Keys can wait until this is also supported.
-        final TrusteeEntity admin = trustees.get(0);
+        final TrusteeEntity admin = trustees.getFirst();
         final TrustLevel trustLevel = request.getTrustLevel();
         final TrusteeEntity trustee = new TrusteeEntity();
         trustee.setMember(newTrusteeMember);

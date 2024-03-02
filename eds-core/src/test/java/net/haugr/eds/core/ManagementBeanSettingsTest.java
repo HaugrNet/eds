@@ -289,12 +289,7 @@ final class ManagementBeanSettingsTest extends DatabaseSetup {
         final SettingResponse response1 = bean.settings(request1);
         assertTrue(response1.isOk());
 
-        final Map<String, String> mySettings = response1.getSettings();
-        mySettings.put(StandardSetting.SYMMETRIC_ALGORITHM.getKey(), KeyAlgorithm.AES_CBC_192.name());
-        mySettings.put(StandardSetting.ASYMMETRIC_ALGORITHM.getKey(), KeyAlgorithm.RSA_8192.name());
-        mySettings.put(StandardSetting.SIGNATURE_ALGORITHM.getKey(), KeyAlgorithm.SHA_256.name());
-        mySettings.put(StandardSetting.PBE_ALGORITHM.getKey(), KeyAlgorithm.PBE_CBC_192.name());
-        mySettings.put(StandardSetting.HASH_ALGORITHM.getKey(), KeyAlgorithm.SHA_256.name());
+        final Map<String, String> mySettings = prepareSettingsMap(response1);
 
         final SettingRequest request2 = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
         request2.setSettings(mySettings);
@@ -369,5 +364,16 @@ final class ManagementBeanSettingsTest extends DatabaseSetup {
         final SettingResponse response = bean.settings(request);
         assertEquals(ReturnCode.SETTING_WARNING.getCode(), response.getReturnCode());
         assertEquals("The setting eds.masterkey.url may not be changed with this request.", response.getReturnMessage());
+    }
+
+    private static Map<String, String> prepareSettingsMap(final SettingResponse response) {
+        final Map<String, String> mySettings = response.getSettings();
+        mySettings.put(StandardSetting.SYMMETRIC_ALGORITHM.getKey(), KeyAlgorithm.AES_CBC_192.name());
+        mySettings.put(StandardSetting.ASYMMETRIC_ALGORITHM.getKey(), KeyAlgorithm.RSA_8192.name());
+        mySettings.put(StandardSetting.SIGNATURE_ALGORITHM.getKey(), KeyAlgorithm.SHA_256.name());
+        mySettings.put(StandardSetting.PBE_ALGORITHM.getKey(), KeyAlgorithm.PBE_CBC_192.name());
+        mySettings.put(StandardSetting.HASH_ALGORITHM.getKey(), KeyAlgorithm.SHA_256.name());
+
+        return mySettings;
     }
 }

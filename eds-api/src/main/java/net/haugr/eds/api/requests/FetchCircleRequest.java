@@ -19,6 +19,8 @@ package net.haugr.eds.api.requests;
 import net.haugr.eds.api.Management;
 import net.haugr.eds.api.common.Constants;
 
+import java.io.Serial;
+
 /**
  * <p>When the Management Request 'fetchCircles' is invoked, it requires a
  * Request Object, with the Authentication information.</p>
@@ -32,5 +34,12 @@ import net.haugr.eds.api.common.Constants;
 public final class FetchCircleRequest extends Authentication {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
+    @Serial
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
+
+    /**
+     * Default Constructor.
+     */
+    public FetchCircleRequest() {
+    }
 }

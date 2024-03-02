@@ -18,6 +18,7 @@ package net.haugr.eds.api.dtos;
 
 import net.haugr.eds.api.common.Constants;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import javax.json.bind.annotation.JsonbDateFormat;
@@ -40,6 +41,7 @@ import javax.json.bind.annotation.JsonbPropertyOrder;
 public final class Circle implements Serializable {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
+    @Serial
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
     /** CircleId. */
@@ -64,8 +66,14 @@ public final class Circle implements Serializable {
     private LocalDateTime added = null;
 
     // =========================================================================
-    // Standard Setters & Getters
+    // Standard Methods (Constructor, Setters & Getters)
     // =========================================================================
+
+    /**
+     * Default Constructor.
+     */
+    public Circle() {
+    }
 
     /**
      * Sets the CircleId.

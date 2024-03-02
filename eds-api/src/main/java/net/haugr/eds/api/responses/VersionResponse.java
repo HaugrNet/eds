@@ -21,6 +21,7 @@ import net.haugr.eds.api.common.ReturnCode;
 
 import javax.json.bind.annotation.JsonbProperty;
 import javax.json.bind.annotation.JsonbPropertyOrder;
+import java.io.Serial;
 
 /**
  * <p>Returns the current version of the EDS instance running.</p>
@@ -35,6 +36,7 @@ import javax.json.bind.annotation.JsonbPropertyOrder;
 public final class VersionResponse extends EDSResponse {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
+    @Serial
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
     /** The EDS Version. */

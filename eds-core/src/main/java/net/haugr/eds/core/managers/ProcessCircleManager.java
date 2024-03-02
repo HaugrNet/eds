@@ -88,7 +88,7 @@ public final class ProcessCircleManager extends AbstractManager<CommonDao, Proce
      * @return True if requesting user has administrative permissions
      */
     private boolean hasAdminRights() {
-        return (member.getMemberRole() == MemberRole.ADMIN) || (trustees.get(0).getTrustLevel() == TrustLevel.ADMIN);
+        return (member.getMemberRole() == MemberRole.ADMIN) || (trustees.getFirst().getTrustLevel() == TrustLevel.ADMIN);
     }
 
     /**
@@ -179,20 +179,12 @@ public final class ProcessCircleManager extends AbstractManager<CommonDao, Proce
     }
 
     private ProcessCircleResponse performNonCreateActions(final ProcessCircleRequest request) {
-        final ProcessCircleResponse response;
-
-        switch (request.getAction()) {
-            case UPDATE:
-                response = updateCircle(request);
-                break;
-            case DELETE:
-                response = deleteCircle(request);
-                break;
-            default:
-                // Unreachable Code by design.
-                throw new IllegalActionException("Unsupported Action.");
-        }
-        return response;
+        return switch (request.getAction()) {
+            case UPDATE -> updateCircle(request);
+            case DELETE -> deleteCircle(request);
+            // Unreachable Code by design.
+            default -> throw new IllegalActionException("Unsupported Action.");
+        };
     }
 
     /**
@@ -226,7 +218,7 @@ public final class ProcessCircleManager extends AbstractManager<CommonDao, Proce
         byte[] encryptedKey = null;
 
         if (externalKey != null) {
-            final TrusteeEntity trustee = trustees.get(0);
+            final TrusteeEntity trustee = trustees.getFirst();
             final SecretEDSKey circleKey = Crypto.extractCircleKey(trustee.getKey().getAlgorithm(), keyPair.getPrivate(), trustee.getCircleKey());
             encryptedKey = encryptExternalKey(circleKey, externalKey);
         }

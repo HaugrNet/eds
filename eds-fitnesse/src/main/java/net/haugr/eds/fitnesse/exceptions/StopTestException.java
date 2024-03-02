@@ -18,6 +18,8 @@ package net.haugr.eds.fitnesse.exceptions;
 
 import net.haugr.eds.api.common.Constants;
 
+import java.io.Serial;
+
 /**
  * <p>FitNesse requires that an exception with the first part of the name being
  * &quot;StopTest&quot; is used if an error occurs and the test should be
@@ -28,6 +30,7 @@ import net.haugr.eds.api.common.Constants;
  */
 public final class StopTestException extends RuntimeException {
 
+    @Serial
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
     public StopTestException(final String message, final Throwable cause) {

@@ -67,30 +67,15 @@ public final class ProcessDataManager extends AbstractManager<DataDao, ProcessDa
         // Since the verification above is of a more general nature, it is
         // important that the processing is being double-checked against the
         // actual Circle.
-        final ProcessDataResponse response;
-
-        switch (request.getAction()) {
-            case ADD:
-                response = processAddData(request);
-                break;
-            case UPDATE:
-                response = processUpdateData(request);
-                break;
-            case COPY:
-                response = processCopyData(request);
-                break;
-            case MOVE:
-                response = processMoveData(request);
-                break;
-            case DELETE:
-                response = processDeleteData(request);
-                break;
-            default:
-                // Unreachable Code by design.
-                throw new IllegalActionException("Unsupported Action.");
-        }
-
-        return response;
+        return switch (request.getAction()) {
+            case ADD -> processAddData(request);
+            case UPDATE -> processUpdateData(request);
+            case COPY -> processCopyData(request);
+            case MOVE -> processMoveData(request);
+            case DELETE -> processDeleteData(request);
+            // Unreachable Code by design.
+            default -> throw new IllegalActionException("Unsupported Action.");
+        };
     }
 
     private ProcessDataResponse processAddData(final ProcessDataRequest request) {

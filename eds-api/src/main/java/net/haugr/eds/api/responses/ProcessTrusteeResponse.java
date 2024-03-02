@@ -19,6 +19,8 @@ package net.haugr.eds.api.responses;
 import net.haugr.eds.api.common.Constants;
 import net.haugr.eds.api.common.ReturnCode;
 
+import java.io.Serial;
+
 /**
  * <p>The Response Object from the processing Trustee request. The Object is not
  * containing any other response information than the general.</p>
@@ -32,6 +34,7 @@ import net.haugr.eds.api.common.ReturnCode;
 public final class ProcessTrusteeResponse extends EDSResponse {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
+    @Serial
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
     // =========================================================================

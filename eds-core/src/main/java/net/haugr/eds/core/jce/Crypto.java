@@ -271,26 +271,22 @@ public final class Crypto {
         } else if (key.getAlgorithm().getType() == KeyAlgorithm.Type.SYMMETRIC) {
             final KeyAlgorithm algorithm = key.getAlgorithm();
             instanceName = algorithm.getTransformationValue();
-            switch (key.getAlgorithm().getTransformation()) {
-                case AES_CBC:
-                    // SonarQube rule S3329 (http://localhost:9000/coding_rules?open=squid:S3329&rule_key=squid:S3329
+            iv = switch (key.getAlgorithm().getTransformation()) {
+                case AES_CBC ->
+                    // SonarQube rule S3329 (http://localhost:9000/coding_rules?open=squid:S3329&rule_key=squid:S3329)
                     // is marking this place as a vulnerability, as it cannot
                     // ascertain that the salt is generated randomly using
                     // SecureRandom, and also stored armored in the database.
                     // As the same salt must be used for both encryption and
                     // decryption - the rule is simply not good enough.
-                    iv = new IvParameterSpec(((SecretEDSKey) key).getSalt().getBytes());
-                    break;
-                case AES_GCM_128:
-                case AES_GCM_192:
-                case AES_GCM_256:
-                    iv = new GCMParameterSpec(Constants.GCM_IV_LENGTH, ((SecretEDSKey) key).getSalt().getBytes());
-                    break;
-                default:
+                        new IvParameterSpec(((SecretEDSKey) key).getSalt().getBytes());
+                case AES_GCM_128, AES_GCM_192, AES_GCM_256 ->
+                        new GCMParameterSpec(Constants.GCM_IV_LENGTH, ((SecretEDSKey) key).getSalt().getBytes());
+                default ->
                     // Unreachable Code by design, only 2 AES transformation
                     // Algorithms exists, and they are both checked.
-                    throw new CryptoException("Cannot prepare Cipher for this Symmetric Algorithm " + key.getAlgorithm().getTransformation() + '.');
-            }
+                        throw new CryptoException("Cannot prepare Cipher for this Symmetric Algorithm " + key.getAlgorithm().getTransformation() + '.');
+            };
         } else {
             throw new CryptoException("Cannot prepare Cipher for this Algorithm Type " + key.getAlgorithm().getType() + '.');
         }

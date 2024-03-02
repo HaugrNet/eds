@@ -83,11 +83,8 @@ public class GsonRestClient {
                 .header("Accept", MediaType.APPLICATION_JSON)
                 .POST(prepareBodyPublisher(request))
                 .build();
-        try {
-            final HttpResponse<String> response = HttpClient
-                    .newHttpClient()
-                    .send(httpRequest, HttpResponse.BodyHandlers.ofString(CHARSET));
-
+        try (HttpClient client = HttpClient.newHttpClient()) {
+            HttpResponse<String> response = client.send(httpRequest, HttpResponse.BodyHandlers.ofString(CHARSET));
             return GSON.fromJson(response.body(), clazz);
         } catch (IOException | JsonSyntaxException | IllegalStateException e) {
             throw new RESTClientException("Communication / Transformation problem: " + e.getMessage(), e);

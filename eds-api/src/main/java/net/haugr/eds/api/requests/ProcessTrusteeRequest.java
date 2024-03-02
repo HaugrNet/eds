@@ -23,6 +23,7 @@ import net.haugr.eds.api.common.TrustLevel;
 
 import javax.json.bind.annotation.JsonbProperty;
 import javax.json.bind.annotation.JsonbPropertyOrder;
+import java.io.Serial;
 import java.util.EnumSet;
 import java.util.Map;
 import java.util.Set;
@@ -61,6 +62,7 @@ import java.util.Set;
 public final class ProcessTrusteeRequest extends Authentication implements CircleIdRequest, ActionRequest {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
+    @Serial
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
     /** The Action. */
@@ -80,8 +82,14 @@ public final class ProcessTrusteeRequest extends Authentication implements Circl
     private String memberId = null;
 
     // =========================================================================
-    // Standard Setters & Getters
+    // Standard Methods (Constructor, Setters & Getters)
     // =========================================================================
+
+    /**
+     * Default Constructor.
+     */
+    public ProcessTrusteeRequest() {
+    }
 
     /**
      * {@inheritDoc}

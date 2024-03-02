@@ -19,6 +19,7 @@ package net.haugr.eds.api.dtos;
 import net.haugr.eds.api.common.Constants;
 import net.haugr.eds.api.common.TrustLevel;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import javax.json.bind.annotation.JsonbDateFormat;
@@ -43,6 +44,7 @@ import javax.json.bind.annotation.JsonbPropertyOrder;
 public final class Trustee implements Serializable {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
+    @Serial
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
     /** MemberId. */
@@ -84,8 +86,14 @@ public final class Trustee implements Serializable {
     private LocalDateTime changed = null;
 
     // =========================================================================
-    // Standard Setters & Getters
+    // Standard Methods (Constructor, Setters & Getters)
     // =========================================================================
+
+    /**
+     * Default Constructor.
+     */
+    public Trustee() {
+    }
 
     /**
      * Set the MemberId.

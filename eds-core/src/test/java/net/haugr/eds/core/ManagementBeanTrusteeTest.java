@@ -69,9 +69,10 @@ final class ManagementBeanTrusteeTest extends DatabaseSetup {
         // Should throw a VerificationException, as the request is invalid.
         final ProcessTrusteeResponse response = bean.processTrustee(request);
         assertEquals(ReturnCode.VERIFICATION_WARNING.getCode(), response.getReturnCode());
-        assertEquals("Request Object contained errors:" +
-                "\nKey: credential, Error: The Session (Credential) is missing." +
-                "\nKey: action, Error: No action has been provided.", response.getReturnMessage());
+        assertEquals("""
+                Request Object contained errors:
+                Key: credential, Error: The Session (Credential) is missing.
+                Key: action, Error: No action has been provided.""", response.getReturnMessage());
     }
 
     @Test
@@ -220,9 +221,9 @@ final class ManagementBeanTrusteeTest extends DatabaseSetup {
 
         assertEquals("Ok", response.getReturnMessage());
         assertEquals(2, response.getTrustees().size());
-        assertEquals(CIRCLE_1_ID, response.getTrustees().get(0).getCircleId());
-        assertEquals(CIRCLE_1, response.getTrustees().get(0).getCircleName());
-        assertEquals(MEMBER_1_ID, response.getTrustees().get(0).getMemberId());
+        assertEquals(CIRCLE_1_ID, response.getTrustees().getFirst().getCircleId());
+        assertEquals(CIRCLE_1, response.getTrustees().getFirst().getCircleName());
+        assertEquals(MEMBER_1_ID, response.getTrustees().getFirst().getMemberId());
         assertEquals(MEMBER_1, response.getTrustees().get(0).getAccountName());
         assertEquals(TrustLevel.ADMIN, response.getTrustees().get(0).getTrustLevel());
         assertEquals(CIRCLE_2_ID, response.getTrustees().get(1).getCircleId());
@@ -240,11 +241,11 @@ final class ManagementBeanTrusteeTest extends DatabaseSetup {
 
         assertEquals("Ok", response.getReturnMessage());
         assertEquals(1, response.getTrustees().size());
-        assertEquals(CIRCLE_3_ID, response.getTrustees().get(0).getCircleId());
-        assertEquals(CIRCLE_3, response.getTrustees().get(0).getCircleName());
-        assertEquals(MEMBER_5_ID, response.getTrustees().get(0).getMemberId());
-        assertEquals(MEMBER_5, response.getTrustees().get(0).getAccountName());
-        assertEquals(TrustLevel.READ, response.getTrustees().get(0).getTrustLevel());
+        assertEquals(CIRCLE_3_ID, response.getTrustees().getFirst().getCircleId());
+        assertEquals(CIRCLE_3, response.getTrustees().getFirst().getCircleName());
+        assertEquals(MEMBER_5_ID, response.getTrustees().getFirst().getMemberId());
+        assertEquals(MEMBER_5, response.getTrustees().getFirst().getAccountName());
+        assertEquals(TrustLevel.READ, response.getTrustees().getFirst().getTrustLevel());
     }
 
     @Test
@@ -300,7 +301,7 @@ final class ManagementBeanTrusteeTest extends DatabaseSetup {
         assertEquals(3, response.getTrustees().size());
 
         // Check the member records
-        final Trustee trustee1 = response.getTrustees().get(0);
+        final Trustee trustee1 = response.getTrustees().getFirst();
         assertEquals(CIRCLE_1_ID, trustee1.getCircleId());
         assertEquals(MEMBER_1_ID, trustee1.getMemberId());
         assertEquals(TrustLevel.ADMIN, trustee1.getTrustLevel());
@@ -486,7 +487,7 @@ final class ManagementBeanTrusteeTest extends DatabaseSetup {
         assertEquals("Ok", fetchResponse.getReturnMessage());
         assertNotNull(fetchResponse.getTrustees());
         assertEquals(4, fetchResponse.getTrustees().size());
-        assertEquals(ADMIN_ID, fetchResponse.getTrustees().get(0).getMemberId());
+        assertEquals(ADMIN_ID, fetchResponse.getTrustees().getFirst().getMemberId());
 
         final ProcessTrusteeRequest adminRequest = prepareRequest(ProcessTrusteeRequest.class, Constants.ADMIN_ACCOUNT);
         adminRequest.setAction(Action.ADD);
@@ -662,9 +663,9 @@ final class ManagementBeanTrusteeTest extends DatabaseSetup {
         final FetchTrusteeResponse fetchResponse = bean.fetchTrustees(fetchRequest);
         final List<Trustee> trustees = fetchResponse.getTrustees();
         assertEquals(1, trustees.size());
-        assertEquals(TrustLevel.ADMIN, trustees.get(0).getTrustLevel());
-        assertEquals(MEMBER_2_ID, trustees.get(0).getMemberId());
-        assertEquals(circleId, trustees.get(0).getCircleId());
+        assertEquals(TrustLevel.ADMIN, trustees.getFirst().getTrustLevel());
+        assertEquals(MEMBER_2_ID, trustees.getFirst().getMemberId());
+        assertEquals(circleId, trustees.getFirst().getCircleId());
     }
 
     // =========================================================================

@@ -44,6 +44,12 @@ public class SettingService {
     private final Settings settings = Settings.getInstance();
 
     /**
+     * Default Constructor.
+     */
+    public SettingService() {
+    }
+
+    /**
      * The REST Settings Endpoint.
      *
      * @param settingRequest Settings Request

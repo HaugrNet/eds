@@ -161,7 +161,7 @@ final class ManagementBeanProcessMemberTest extends DatabaseSetup {
         assertEquals(ReturnCode.SUCCESS.getCode(), fetchResponse.getReturnCode());
         assertEquals("Ok", fetchResponse.getReturnMessage());
         assertEquals(1, fetchResponse.getMembers().size());
-        assertEquals(updateRequest.getPublicKey(), fetchResponse.getMembers().get(0).getPublicKey());
+        assertEquals(updateRequest.getPublicKey(), fetchResponse.getMembers().getFirst().getPublicKey());
     }
 
     @Test
@@ -346,7 +346,7 @@ final class ManagementBeanProcessMemberTest extends DatabaseSetup {
 
         final ProcessMemberResponse invitationResponse = bean.processMember(invitationRequest);
         assertEquals(ReturnCode.CRYPTO_ERROR.getCode(), invitationResponse.getReturnCode());
-        assertEquals("Signature length not correct: got 36 but was expecting 256", invitationResponse.getReturnMessage());
+        assertEquals("Bad signature length: got 36 but was expecting 256", invitationResponse.getReturnMessage());
     }
 
     @Test

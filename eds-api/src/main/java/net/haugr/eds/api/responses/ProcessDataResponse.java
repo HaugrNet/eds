@@ -21,6 +21,7 @@ import net.haugr.eds.api.common.ReturnCode;
 
 import javax.json.bind.annotation.JsonbProperty;
 import javax.json.bind.annotation.JsonbPropertyOrder;
+import java.io.Serial;
 
 /**
  * <p>The Response Object contain the new Data Id, when an Object was
@@ -36,6 +37,7 @@ import javax.json.bind.annotation.JsonbPropertyOrder;
 public final class ProcessDataResponse extends EDSResponse {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
+    @Serial
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
     /** The DataId. */

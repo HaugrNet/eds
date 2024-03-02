@@ -47,6 +47,12 @@ public class DataTypeService {
     private final Settings settings = Settings.getInstance();
 
     /**
+     * Default Constructor.
+     */
+    public DataTypeService() {
+    }
+
+    /**
      * The REST Process DataType Endpoint.
      *
      * @param processDataTypeRequest Process DataType Request

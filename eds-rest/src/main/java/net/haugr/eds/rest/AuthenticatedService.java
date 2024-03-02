@@ -44,6 +44,12 @@ public class AuthenticatedService {
     private final Settings settings = Settings.getInstance();
 
     /**
+     * Default Constructor.
+     */
+    public AuthenticatedService() {
+    }
+
+    /**
      * The REST Authentication Endpoint.
      *
      * @param request Authentication Request

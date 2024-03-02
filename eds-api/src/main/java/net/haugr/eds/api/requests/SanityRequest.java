@@ -17,6 +17,8 @@
 package net.haugr.eds.api.requests;
 
 import net.haugr.eds.api.common.Constants;
+
+import java.io.Serial;
 import java.time.LocalDateTime;
 import java.util.Map;
 import javax.json.bind.annotation.JsonbDateFormat;
@@ -39,6 +41,7 @@ import javax.json.bind.annotation.JsonbPropertyOrder;
 public final class SanityRequest extends Authentication implements CircleIdRequest {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
+    @Serial
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
     /** The CircleId. */
@@ -51,8 +54,14 @@ public final class SanityRequest extends Authentication implements CircleIdReque
     private LocalDateTime since = null;
 
     // =========================================================================
-    // Setters & Getters
+    // Standard Methods (Constructor, Setters & Getters)
     // =========================================================================
+
+    /**
+     * Default Constructor.
+     */
+    public SanityRequest() {
+    }
 
     /**
      * {@inheritDoc}

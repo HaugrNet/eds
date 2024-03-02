@@ -22,6 +22,7 @@ import net.haugr.eds.api.dtos.DataType;
 
 import javax.json.bind.annotation.JsonbProperty;
 import javax.json.bind.annotation.JsonbPropertyOrder;
+import java.io.Serial;
 
 /**
  * <p>When a DataType has been processed, it is not having a an Id, thus the
@@ -38,6 +39,7 @@ import javax.json.bind.annotation.JsonbPropertyOrder;
 public final class ProcessDataTypeResponse extends EDSResponse {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
+    @Serial
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
     /** The DataType. */

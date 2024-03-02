@@ -22,6 +22,7 @@ import net.haugr.eds.api.common.Utilities;
 import javax.json.bind.annotation.JsonbProperty;
 import javax.json.bind.annotation.JsonbPropertyOrder;
 import javax.json.bind.annotation.JsonbTypeAdapter;
+import java.io.Serial;
 import java.util.Map;
 
 /**
@@ -53,6 +54,7 @@ import java.util.Map;
 public final class MasterKeyRequest extends Authentication {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
+    @Serial
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
     /** The Secret as Bytes. */
@@ -65,8 +67,14 @@ public final class MasterKeyRequest extends Authentication {
     private String url = null;
 
     // =========================================================================
-    // Standard Setters & Getters
+    // Standard Methods (Constructor, Setters & Getters)
     // =========================================================================
+
+    /**
+     * Default Constructor.
+     */
+    public MasterKeyRequest() {
+    }
 
     /**
      * Set the Secret from Bytes.

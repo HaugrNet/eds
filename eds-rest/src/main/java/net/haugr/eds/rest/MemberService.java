@@ -47,6 +47,12 @@ public class MemberService {
     private final Settings settings = Settings.getInstance();
 
     /**
+     * Default Constructor.
+     */
+    public MemberService() {
+    }
+
+    /**
      * The REST Create Member Endpoint.
      *
      * @param createMemberRequest Create Member Request

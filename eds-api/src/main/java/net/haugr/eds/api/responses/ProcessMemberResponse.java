@@ -24,6 +24,7 @@ import net.haugr.eds.api.common.Utilities;
 import javax.json.bind.annotation.JsonbProperty;
 import javax.json.bind.annotation.JsonbPropertyOrder;
 import javax.json.bind.annotation.JsonbTypeAdapter;
+import java.io.Serial;
 
 /**
  * <p>If the request was invoked with the CREATE action, then the response will
@@ -42,6 +43,7 @@ import javax.json.bind.annotation.JsonbTypeAdapter;
 public final class ProcessMemberResponse extends EDSResponse {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
+    @Serial
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
     /** The MemberId. */

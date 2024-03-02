@@ -21,6 +21,7 @@ import net.haugr.eds.api.common.Action;
 import net.haugr.eds.api.common.Constants;
 import javax.json.bind.annotation.JsonbProperty;
 import javax.json.bind.annotation.JsonbPropertyOrder;
+import java.io.Serial;
 import java.util.Map;
 
 /**
@@ -66,6 +67,7 @@ import java.util.Map;
 public final class ProcessCircleRequest extends Authentication implements CircleIdRequest, ActionRequest {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
+    @Serial
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
     /** The Action. */
@@ -91,8 +93,14 @@ public final class ProcessCircleRequest extends Authentication implements Circle
     private String circleKey = null;
 
     // =========================================================================
-    // Standard Setters & Getters
+    // Standard Methods (Constructor, Setters & Getters)
     // =========================================================================
+
+    /**
+     * Default Constructor.
+     */
+    public ProcessCircleRequest() {
+    }
 
     /**
      * {@inheritDoc}

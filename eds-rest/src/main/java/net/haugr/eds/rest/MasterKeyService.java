@@ -44,6 +44,12 @@ public class MasterKeyService {
     private final Settings settings = Settings.getInstance();
 
     /**
+     * Default Constructor.
+     */
+    public MasterKeyService() {
+    }
+
+    /**
      * The REST MasterKey Endpoint.
      *
      * @param masterKeyRequest MasterKey Request

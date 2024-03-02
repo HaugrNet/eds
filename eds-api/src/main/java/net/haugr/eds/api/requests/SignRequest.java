@@ -19,6 +19,8 @@ package net.haugr.eds.api.requests;
 import net.haugr.eds.api.common.ByteArrayAdapter;
 import net.haugr.eds.api.common.Constants;
 import net.haugr.eds.api.common.Utilities;
+
+import java.io.Serial;
 import java.time.LocalDateTime;
 import java.util.Map;
 import javax.json.bind.annotation.JsonbDateFormat;
@@ -41,6 +43,7 @@ import javax.json.bind.annotation.JsonbTypeAdapter;
 @JsonbPropertyOrder({ Constants.FIELD_DATA, Constants.FIELD_EXPIRES })
 public final class SignRequest extends Authentication {
 
+    @Serial
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
     /** The Data to Sign. */
@@ -54,8 +57,14 @@ public final class SignRequest extends Authentication {
     private LocalDateTime expires = null;
 
     // =========================================================================
-    // Standard Setters & Getters
+    // Standard Methods (Constructor, Setters & Getters)
     // =========================================================================
+
+    /**
+     * Default Constructor.
+     */
+    public SignRequest() {
+    }
 
     /**
      * Set the Data to Sign.

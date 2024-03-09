@@ -35,6 +35,7 @@ public final class FetchCircles extends EDSRequest<FetchCircleResponse> {
     // =========================================================================
 
     public String circles() {
+        //noinspection DuplicatedCode
         final StringBuilder builder = new StringBuilder("[");
         if (response != null) {
             final List<Circle> circles = response.getCircles();

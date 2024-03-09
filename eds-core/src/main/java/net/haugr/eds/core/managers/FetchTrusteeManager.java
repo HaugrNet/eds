@@ -19,7 +19,7 @@ package net.haugr.eds.core.managers;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import javax.persistence.EntityManager;
+import jakarta.persistence.EntityManager;
 import net.haugr.eds.api.common.MemberRole;
 import net.haugr.eds.api.common.ReturnCode;
 import net.haugr.eds.api.dtos.Trustee;

@@ -16,9 +16,10 @@
  */
 package net.haugr.eds.api.requests;
 
+import jakarta.json.bind.annotation.JsonbNillable;
 import net.haugr.eds.api.common.Constants;
-import javax.json.bind.annotation.JsonbProperty;
-import javax.json.bind.annotation.JsonbPropertyOrder;
+import jakarta.json.bind.annotation.JsonbProperty;
+import jakarta.json.bind.annotation.JsonbPropertyOrder;
 import java.io.Serial;
 import java.util.HashMap;
 import java.util.Map;
@@ -46,7 +47,8 @@ public final class SettingRequest extends Authentication {
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
     /** The Map of Settings. */
-    @JsonbProperty(value = Constants.FIELD_SETTINGS, nillable = true)
+    @JsonbProperty(value = Constants.FIELD_SETTINGS)
+    @JsonbNillable
     private HashMap<String, String> settings = new HashMap<>(0);
 
     // =========================================================================

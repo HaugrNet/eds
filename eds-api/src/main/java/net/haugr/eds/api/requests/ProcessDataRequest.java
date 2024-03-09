@@ -16,14 +16,15 @@
  */
 package net.haugr.eds.api.requests;
 
+import jakarta.json.bind.annotation.JsonbNillable;
 import net.haugr.eds.api.Share;
 import net.haugr.eds.api.common.Action;
 import net.haugr.eds.api.common.ByteArrayAdapter;
 import net.haugr.eds.api.common.Constants;
 import net.haugr.eds.api.common.Utilities;
-import javax.json.bind.annotation.JsonbProperty;
-import javax.json.bind.annotation.JsonbPropertyOrder;
-import javax.json.bind.annotation.JsonbTypeAdapter;
+import jakarta.json.bind.annotation.JsonbProperty;
+import jakarta.json.bind.annotation.JsonbPropertyOrder;
+import jakarta.json.bind.annotation.JsonbTypeAdapter;
 import java.io.Serial;
 import java.util.Map;
 
@@ -73,40 +74,49 @@ public final class ProcessDataRequest extends Authentication implements CircleId
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
     /** The Action. */
-    @JsonbProperty(value = Constants.FIELD_ACTION, nillable = true)
+    @JsonbProperty(value = Constants.FIELD_ACTION)
+    @JsonbNillable
     private Action action = null;
 
     /** The DataId. */
-    @JsonbProperty(value = Constants.FIELD_DATA_ID, nillable = true)
+    @JsonbProperty(value = Constants.FIELD_DATA_ID)
+    @JsonbNillable
     private String dataId = null;
 
     /** The CircleId. */
-    @JsonbProperty(value = Constants.FIELD_CIRCLE_ID, nillable = true)
+    @JsonbProperty(value = Constants.FIELD_CIRCLE_ID)
+    @JsonbNillable
     private String circleId = null;
 
     /** The Target CircleId. */
-    @JsonbProperty(value = Constants.FIELD_TARGET_CIRCLE_ID, nillable = true)
+    @JsonbProperty(value = Constants.FIELD_TARGET_CIRCLE_ID)
+    @JsonbNillable
     private String targetCircleId = null;
 
     /** The DataName. */
-    @JsonbProperty(value = Constants.FIELD_DATA_NAME, nillable = true)
+    @JsonbProperty(value = Constants.FIELD_DATA_NAME)
+    @JsonbNillable
     private String dataName = null;
 
     /** The FolderId. */
-    @JsonbProperty(value = Constants.FIELD_FOLDER_ID, nillable = true)
+    @JsonbProperty(value = Constants.FIELD_FOLDER_ID)
+    @JsonbNillable
     private String folderId = null;
 
     /** The Target FolderId. */
-    @JsonbProperty(value = Constants.FIELD_TARGET_FOLDER_ID, nillable = true)
+    @JsonbProperty(value = Constants.FIELD_TARGET_FOLDER_ID)
+    @JsonbNillable
     private String targetFolderId = null;
 
     /** The TypeName. */
-    @JsonbProperty(value = Constants.FIELD_TYPENAME, nillable = true)
+    @JsonbProperty(value = Constants.FIELD_TYPENAME)
+    @JsonbNillable
     private String typeName = null;
 
     /** The Data. */
-    @JsonbProperty(value = Constants.FIELD_DATA, nillable = true)
+    @JsonbProperty(value = Constants.FIELD_DATA)
     @JsonbTypeAdapter(ByteArrayAdapter.class)
+    @JsonbNillable
     private byte[] data = null;
 
     // =========================================================================

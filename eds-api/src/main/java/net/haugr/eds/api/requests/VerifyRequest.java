@@ -16,12 +16,13 @@
  */
 package net.haugr.eds.api.requests;
 
+import jakarta.json.bind.annotation.JsonbNillable;
 import net.haugr.eds.api.common.ByteArrayAdapter;
 import net.haugr.eds.api.common.Constants;
 import net.haugr.eds.api.common.Utilities;
-import javax.json.bind.annotation.JsonbProperty;
-import javax.json.bind.annotation.JsonbPropertyOrder;
-import javax.json.bind.annotation.JsonbTypeAdapter;
+import jakarta.json.bind.annotation.JsonbProperty;
+import jakarta.json.bind.annotation.JsonbPropertyOrder;
+import jakarta.json.bind.annotation.JsonbTypeAdapter;
 import java.io.Serial;
 import java.util.Map;
 
@@ -45,12 +46,14 @@ public final class VerifyRequest extends Authentication {
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
     /** The Signature to verify. */
-    @JsonbProperty(value = Constants.FIELD_SIGNATURE, nillable = true)
+    @JsonbProperty(value = Constants.FIELD_SIGNATURE)
+    @JsonbNillable
     private String signature = null;
 
     /** The Data to Verify. */
-    @JsonbProperty(value = Constants.FIELD_DATA, nillable = true)
+    @JsonbProperty(value = Constants.FIELD_DATA)
     @JsonbTypeAdapter(ByteArrayAdapter.class)
+    @JsonbNillable
     private byte[] data = null;
 
     // =========================================================================

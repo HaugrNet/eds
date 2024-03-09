@@ -16,11 +16,12 @@
  */
 package net.haugr.eds.api.requests;
 
+import jakarta.json.bind.annotation.JsonbNillable;
 import net.haugr.eds.api.Share;
 import net.haugr.eds.api.common.Action;
 import net.haugr.eds.api.common.Constants;
-import javax.json.bind.annotation.JsonbProperty;
-import javax.json.bind.annotation.JsonbPropertyOrder;
+import jakarta.json.bind.annotation.JsonbProperty;
+import jakarta.json.bind.annotation.JsonbPropertyOrder;
 import java.io.Serial;
 import java.util.Map;
 
@@ -50,15 +51,18 @@ public final class ProcessDataTypeRequest extends Authentication implements Acti
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
     /** The Action. */
-    @JsonbProperty(value = Constants.FIELD_ACTION, nillable = true)
+    @JsonbProperty(value = Constants.FIELD_ACTION)
+    @JsonbNillable
     private Action action = Action.PROCESS;
 
     /** The TypeName. */
-    @JsonbProperty(value = Constants.FIELD_TYPENAME, nillable = true)
+    @JsonbProperty(value = Constants.FIELD_TYPENAME)
+    @JsonbNillable
     private String typeName = null;
 
     /** The Type. */
-    @JsonbProperty(value = Constants.FIELD_TYPE, nillable = true)
+    @JsonbProperty(value = Constants.FIELD_TYPE)
+    @JsonbNillable
     private String type = null;
 
     // =========================================================================

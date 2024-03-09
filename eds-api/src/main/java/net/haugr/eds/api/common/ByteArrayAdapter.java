@@ -16,7 +16,7 @@
  */
 package net.haugr.eds.api.common;
 
-import javax.json.bind.adapter.JsonbAdapter;
+import jakarta.json.bind.adapter.JsonbAdapter;
 import java.util.Base64;
 
 /**

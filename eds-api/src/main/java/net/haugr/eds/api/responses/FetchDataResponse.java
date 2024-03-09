@@ -22,9 +22,9 @@ import net.haugr.eds.api.common.ReturnCode;
 import net.haugr.eds.api.common.Utilities;
 import net.haugr.eds.api.dtos.Metadata;
 
-import javax.json.bind.annotation.JsonbProperty;
-import javax.json.bind.annotation.JsonbPropertyOrder;
-import javax.json.bind.annotation.JsonbTypeAdapter;
+import jakarta.json.bind.annotation.JsonbProperty;
+import jakarta.json.bind.annotation.JsonbPropertyOrder;
+import jakarta.json.bind.annotation.JsonbTypeAdapter;
 import java.io.Serial;
 import java.util.ArrayList;
 import java.util.Collections;

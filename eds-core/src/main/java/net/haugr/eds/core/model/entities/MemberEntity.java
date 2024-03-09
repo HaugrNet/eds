@@ -20,12 +20,12 @@ import net.haugr.eds.api.common.Constants;
 import net.haugr.eds.api.common.MemberRole;
 import net.haugr.eds.core.enums.KeyAlgorithm;
 import java.time.LocalDateTime;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.NamedQuery;
-import javax.persistence.Table;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.NamedQuery;
+import jakarta.persistence.Table;
 
 /**
  * <p>EDS Member Entity, maps the Member table from the Database.</p>

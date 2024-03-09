@@ -27,8 +27,8 @@ import net.haugr.eds.core.exceptions.EDSException;
 import net.haugr.eds.core.setup.fakes.FakeEntityManager;
 import net.haugr.eds.core.setup.fakes.FakeQuery;
 import org.junit.jupiter.api.Test;
-import javax.persistence.EntityManager;
-import javax.persistence.Query;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.Query;
 import java.util.List;
 
 /**
@@ -44,7 +44,8 @@ final class CommonDaoTest extends DatabaseSetup {
 
         final EDSException cause = assertThrows(EDSException.class, () -> CommonDao.findList(query));
         assertEquals(ReturnCode.DATABASE_ERROR, cause.getReturnCode());
-        assertEquals("org.hibernate.exception.SQLGrammarException: could not prepare statement", cause.getMessage());
+        assertEquals("could not prepare statement [Table \"VERSIONS\" not found; SQL statement:\n" +
+                "select * from versions [42102-224]] [select * from versions]", cause.getMessage());
     }
 
     @Test

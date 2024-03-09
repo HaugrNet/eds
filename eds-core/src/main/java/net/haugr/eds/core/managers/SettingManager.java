@@ -25,7 +25,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
-import javax.persistence.EntityManager;
+import jakarta.persistence.EntityManager;
 import net.haugr.eds.api.common.ReturnCode;
 import net.haugr.eds.api.requests.SettingRequest;
 import net.haugr.eds.api.responses.SettingResponse;

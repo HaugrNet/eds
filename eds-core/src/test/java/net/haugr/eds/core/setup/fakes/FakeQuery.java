@@ -17,11 +17,11 @@
 package net.haugr.eds.core.setup.fakes;
 
 import java.util.Date;
-import javax.persistence.FlushModeType;
-import javax.persistence.LockModeType;
-import javax.persistence.Parameter;
-import javax.persistence.Query;
-import javax.persistence.TemporalType;
+import jakarta.persistence.FlushModeType;
+import jakarta.persistence.LockModeType;
+import jakarta.persistence.Parameter;
+import jakarta.persistence.Query;
+import jakarta.persistence.TemporalType;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Map;

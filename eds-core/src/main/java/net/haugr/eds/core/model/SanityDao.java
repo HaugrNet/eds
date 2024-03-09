@@ -18,8 +18,8 @@ package net.haugr.eds.core.model;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import javax.persistence.EntityManager;
-import javax.persistence.Query;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.Query;
 import net.haugr.eds.core.enums.SanityStatus;
 import net.haugr.eds.core.model.entities.DataEntity;
 import net.haugr.eds.core.model.entities.MemberEntity;

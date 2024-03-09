@@ -19,11 +19,11 @@ package net.haugr.eds.core.model.entities;
 import net.haugr.eds.core.enums.KeyAlgorithm;
 import net.haugr.eds.core.enums.Status;
 import java.time.LocalDateTime;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.Table;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Table;
 
 /**
  * <p>EDS Key Entity, maps the Key table from the Database.</p>

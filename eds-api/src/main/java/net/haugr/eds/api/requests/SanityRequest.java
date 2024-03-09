@@ -16,14 +16,15 @@
  */
 package net.haugr.eds.api.requests;
 
+import jakarta.json.bind.annotation.JsonbNillable;
 import net.haugr.eds.api.common.Constants;
 
 import java.io.Serial;
 import java.time.LocalDateTime;
 import java.util.Map;
-import javax.json.bind.annotation.JsonbDateFormat;
-import javax.json.bind.annotation.JsonbProperty;
-import javax.json.bind.annotation.JsonbPropertyOrder;
+import jakarta.json.bind.annotation.JsonbDateFormat;
+import jakarta.json.bind.annotation.JsonbProperty;
+import jakarta.json.bind.annotation.JsonbPropertyOrder;
 
 /**
  * <p>The Sanity Request Object is needed to perform the Sanity EDS Request,
@@ -45,12 +46,14 @@ public final class SanityRequest extends Authentication implements CircleIdReque
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
     /** The CircleId. */
-    @JsonbProperty(value = Constants.FIELD_CIRCLE_ID, nillable = true)
+    @JsonbProperty(value = Constants.FIELD_CIRCLE_ID)
+    @JsonbNillable
     private String circleId = null;
 
     /** The Date since last check. */
-    @JsonbProperty(value = Constants.FIELD_SINCE, nillable = true)
+    @JsonbProperty(value = Constants.FIELD_SINCE)
     @JsonbDateFormat(Constants.JSON_DATE_FORMAT)
+    @JsonbNillable
     private LocalDateTime since = null;
 
     // =========================================================================

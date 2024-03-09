@@ -16,14 +16,15 @@
  */
 package net.haugr.eds.api.dtos;
 
+import jakarta.json.bind.annotation.JsonbNillable;
 import net.haugr.eds.api.common.Constants;
 
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import javax.json.bind.annotation.JsonbDateFormat;
-import javax.json.bind.annotation.JsonbProperty;
-import javax.json.bind.annotation.JsonbPropertyOrder;
+import jakarta.json.bind.annotation.JsonbDateFormat;
+import jakarta.json.bind.annotation.JsonbProperty;
+import jakarta.json.bind.annotation.JsonbPropertyOrder;
 
 /**
  * <p>Circles is part of the core functionality of EDS, as all data is assigned
@@ -45,11 +46,13 @@ public final class Circle implements Serializable {
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
     /** CircleId. */
-    @JsonbProperty(value = Constants.FIELD_CIRCLE_ID, nillable = true)
+    @JsonbProperty(value = Constants.FIELD_CIRCLE_ID)
+    @JsonbNillable
     private String circleId = null;
 
     /** Circle Name. */
-    @JsonbProperty(value = Constants.FIELD_CIRCLE_NAME, nillable = true)
+    @JsonbProperty(value = Constants.FIELD_CIRCLE_NAME)
+    @JsonbNillable
     private String circleName = null;
 
     // The Circle Key is an optional value which may or may not be provided,
@@ -57,12 +60,14 @@ public final class Circle implements Serializable {
     // it is not used as part of the Standard Object methods, #equals(),
     // #hashCode() and #toString().
     /** Circle Key. */
-    @JsonbProperty(value = Constants.FIELD_CIRCLE_KEY, nillable = true)
+    @JsonbProperty(value = Constants.FIELD_CIRCLE_KEY)
+    @JsonbNillable
     private String circleKey = null;
 
     /** Created Timestamp. */
-    @JsonbProperty(value = Constants.FIELD_ADDED, nillable = true)
+    @JsonbProperty(value = Constants.FIELD_ADDED)
     @JsonbDateFormat(Constants.JSON_DATE_FORMAT)
+    @JsonbNillable
     private LocalDateTime added = null;
 
     // =========================================================================

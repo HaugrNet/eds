@@ -16,12 +16,12 @@
 
     <dependencies>
         <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>eds-rest</artifactId>
-        </dependency>
-        <dependency>
             <groupId>jakarta.platform</groupId>
             <artifactId>jakarta.jakartaee-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>eds-rest</artifactId>
         </dependency>
     </dependencies>
 

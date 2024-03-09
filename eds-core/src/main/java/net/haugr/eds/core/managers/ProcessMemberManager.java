@@ -23,7 +23,7 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
-import javax.persistence.EntityManager;
+import jakarta.persistence.EntityManager;
 import net.haugr.eds.api.common.Constants;
 import net.haugr.eds.api.common.CredentialType;
 import net.haugr.eds.api.common.MemberRole;

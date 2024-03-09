@@ -1,5 +1,22 @@
+/*
+ * EDS, Encrypted Data Share - open source Cryptographic Sharing system.
+ * Copyright (c) 2016-2024, haugr.net
+ * mailto: eds AT haugr DOT net
+ *
+ * EDS is free software; you can redistribute it and/or modify it under the
+ * terms of the Apache License, as published by the Apache Software Foundation.
+ *
+ * EDS is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the Apache License for more details.
+ *
+ * You should have received a copy of the Apache License, version 2, along with
+ * this program; If not, you can download a copy of the License
+ * here: https://www.apache.org/licenses/
+ */
+
 -- =============================================================================
--- HSQLDB Setup Script for EDS
+-- H2 Database Setup Script for EDS
 -- -----------------------------------------------------------------------------
 -- This script contain the following tables:
 --  * System Specific tables
@@ -42,7 +59,7 @@ CREATE TABLE eds_versions (
   /* Primary & Foreign Keys */
   CONSTRAINT version_pk                     PRIMARY KEY (id),
 
-   /* Unique Constraints */
+  /* Unique Constraints */
   CONSTRAINT version_unique_version         UNIQUE (schema_version, eds_version),
 
   /* Not Null Constraints */
@@ -58,7 +75,7 @@ INSERT INTO eds_versions(schema_version, eds_version, db_vendor) VALUES (1, '1.0
 INSERT INTO eds_versions(schema_version, eds_version, db_vendor) VALUES (2, '1.1.0', 'H2');
 -- Second feature release, EDS 1.1.x results requires an update of the DB
 INSERT INTO eds_versions(schema_version, eds_version, db_vendor) VALUES (3, '1.2.0', 'H2');
--- Java Version upgrade (8->11), breaks backwards compatibility, EDS 2.x
+-- Java Version upgrade (8->21), breaks backwards compatibility, EDS 2.x
 INSERT INTO eds_versions(schema_version, eds_version, db_vendor) VALUES (4, '2.0.0', 'H2');
 
 -- =============================================================================
@@ -292,23 +309,6 @@ CREATE TABLE eds_trustees (
   CONSTRAINT trustee_notnull_altered        CHECK (altered IS NOT NULL),
   CONSTRAINT trustee_notnull_added          CHECK (added IS NOT NULL)
 );
-
-/*
- * EDS, Encrypted Data Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2024, haugr.net
- * mailto: eds AT haugr DOT net
- *
- * EDS is free software; you can redistribute it and/or modify it under the
- * terms of the Apache License, as published by the Apache Software Foundation.
- *
- * EDS is distributed in the hope that it will be useful, but WITHOUT ANY
- * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE. See the Apache License for more details.
- *
- * You should have received a copy of the Apache License, version 2, along with
- * this program; If not, you can download a copy of the License
- * here: https://www.apache.org/licenses/
- */
 
 -- =============================================================================
 -- Data stored is completely unknown to the EDS, since multiple Clients may

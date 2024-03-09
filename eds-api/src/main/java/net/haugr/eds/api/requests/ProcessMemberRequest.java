@@ -16,6 +16,7 @@
  */
 package net.haugr.eds.api.requests;
 
+import jakarta.json.bind.annotation.JsonbNillable;
 import net.haugr.eds.api.Management;
 import net.haugr.eds.api.common.Action;
 import net.haugr.eds.api.common.ByteArrayAdapter;
@@ -23,9 +24,9 @@ import net.haugr.eds.api.common.Constants;
 import net.haugr.eds.api.common.MemberRole;
 import net.haugr.eds.api.common.Utilities;
 
-import javax.json.bind.annotation.JsonbProperty;
-import javax.json.bind.annotation.JsonbPropertyOrder;
-import javax.json.bind.annotation.JsonbTypeAdapter;
+import jakarta.json.bind.annotation.JsonbProperty;
+import jakarta.json.bind.annotation.JsonbPropertyOrder;
+import jakarta.json.bind.annotation.JsonbTypeAdapter;
 import java.io.Serial;
 import java.util.Map;
 
@@ -102,30 +103,36 @@ public final class ProcessMemberRequest extends Authentication implements Action
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
     /** The Action. */
-    @JsonbProperty(value = Constants.FIELD_ACTION, nillable = true)
+    @JsonbProperty(value = Constants.FIELD_ACTION)
+    @JsonbNillable
     private Action action = null;
 
     /** The MemberId. */
-    @JsonbProperty(value = Constants.FIELD_MEMBER_ID, nillable = true)
+    @JsonbProperty(value = Constants.FIELD_MEMBER_ID)
+    @JsonbNillable
     private String memberId = null;
 
     /** The Member Role. */
-    @JsonbProperty(value = Constants.FIELD_MEMBER_ROLE, nillable = true)
+    @JsonbProperty(value = Constants.FIELD_MEMBER_ROLE)
+    @JsonbNillable
     private MemberRole memberRole = null;
 
     // The Public Key is an optional value which may or may not be provided,
     // hence it is only stored but not used for anything.
     /** The Public Key. */
-    @JsonbProperty(value = Constants.FIELD_PUBLIC_KEY, nillable = true)
+    @JsonbProperty(value = Constants.FIELD_PUBLIC_KEY)
+    @JsonbNillable
     private String publicKey = null;
 
     /** The New AccountName. */
-    @JsonbProperty(value = Constants.FIELD_NEW_ACCOUNT_NAME, nillable = true)
+    @JsonbProperty(value = Constants.FIELD_NEW_ACCOUNT_NAME)
+    @JsonbNillable
     private String newAccountName = null;
 
     /** The New Credential (Password or Passphrase). */
-    @JsonbProperty(value = Constants.FIELD_NEW_CREDENTIAL, nillable = true)
+    @JsonbProperty(value = Constants.FIELD_NEW_CREDENTIAL)
     @JsonbTypeAdapter(ByteArrayAdapter.class)
+    @JsonbNillable
     private byte[] newCredential = null;
 
     // =========================================================================

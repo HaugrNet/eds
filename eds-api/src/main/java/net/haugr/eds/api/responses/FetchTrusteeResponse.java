@@ -20,8 +20,8 @@ import net.haugr.eds.api.common.Constants;
 import net.haugr.eds.api.common.ReturnCode;
 import net.haugr.eds.api.dtos.Trustee;
 
-import javax.json.bind.annotation.JsonbProperty;
-import javax.json.bind.annotation.JsonbPropertyOrder;
+import jakarta.json.bind.annotation.JsonbProperty;
+import jakarta.json.bind.annotation.JsonbPropertyOrder;
 import java.io.Serial;
 import java.util.ArrayList;
 import java.util.Collections;

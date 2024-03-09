@@ -16,10 +16,10 @@
  */
 package net.haugr.eds.core;
 
-import javax.ejb.Stateless;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.transaction.Transactional;
+import jakarta.ejb.Stateless;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.transaction.Transactional;
 import net.haugr.eds.api.common.Constants;
 import net.haugr.eds.api.common.ReturnCode;
 import net.haugr.eds.api.requests.Authentication;

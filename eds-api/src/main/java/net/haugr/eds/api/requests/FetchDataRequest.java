@@ -16,10 +16,11 @@
  */
 package net.haugr.eds.api.requests;
 
+import jakarta.json.bind.annotation.JsonbNillable;
 import net.haugr.eds.api.Share;
 import net.haugr.eds.api.common.Constants;
-import javax.json.bind.annotation.JsonbProperty;
-import javax.json.bind.annotation.JsonbPropertyOrder;
+import jakarta.json.bind.annotation.JsonbProperty;
+import jakarta.json.bind.annotation.JsonbPropertyOrder;
 import java.io.Serial;
 import java.util.Map;
 
@@ -49,23 +50,28 @@ public final class FetchDataRequest extends Authentication implements CircleIdRe
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
     /** CircleId. */
-    @JsonbProperty(value = Constants.FIELD_CIRCLE_ID, nillable = true)
+    @JsonbProperty(value = Constants.FIELD_CIRCLE_ID)
+    @JsonbNillable
     private String circleId = null;
 
     /** DataId. */
-    @JsonbProperty(value = Constants.FIELD_DATA_ID, nillable = true)
+    @JsonbProperty(value = Constants.FIELD_DATA_ID)
+    @JsonbNillable
     private String dataId = null;
 
     /** Page Number. */
-    @JsonbProperty(value = Constants.FIELD_PAGE_NUMBER, nillable = true)
+    @JsonbProperty(value = Constants.FIELD_PAGE_NUMBER)
+    @JsonbNillable
     private Integer pageNumber = 1;
 
     /** Page Size. */
-    @JsonbProperty(value = Constants.FIELD_PAGE_SIZE, nillable = true)
+    @JsonbProperty(value = Constants.FIELD_PAGE_SIZE)
+    @JsonbNillable
     private Integer pageSize = Constants.MAX_PAGE_SIZE;
 
     /** DataName. */
-    @JsonbProperty(value = Constants.FIELD_DATA_NAME, nillable = true)
+    @JsonbProperty(value = Constants.FIELD_DATA_NAME)
+    @JsonbNillable
     private String dataName = null;
 
     // =========================================================================

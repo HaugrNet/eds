@@ -34,8 +34,8 @@ import net.haugr.eds.core.model.CommonDao;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
-import javax.persistence.PersistenceException;
-import javax.persistence.Query;
+import jakarta.persistence.PersistenceException;
+import jakarta.persistence.Query;
 
 import org.junit.jupiter.api.Test;
 

@@ -16,12 +16,13 @@
  */
 package net.haugr.eds.api.requests;
 
+import jakarta.json.bind.annotation.JsonbNillable;
 import net.haugr.eds.api.common.ByteArrayAdapter;
 import net.haugr.eds.api.common.Constants;
 import net.haugr.eds.api.common.Utilities;
-import javax.json.bind.annotation.JsonbProperty;
-import javax.json.bind.annotation.JsonbPropertyOrder;
-import javax.json.bind.annotation.JsonbTypeAdapter;
+import jakarta.json.bind.annotation.JsonbProperty;
+import jakarta.json.bind.annotation.JsonbPropertyOrder;
+import jakarta.json.bind.annotation.JsonbTypeAdapter;
 import java.io.Serial;
 import java.util.Map;
 
@@ -58,12 +59,14 @@ public final class MasterKeyRequest extends Authentication {
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
     /** The Secret as Bytes. */
-    @JsonbProperty(value = Constants.FIELD_SECRET, nillable = true)
+    @JsonbProperty(value = Constants.FIELD_SECRET)
     @JsonbTypeAdapter(ByteArrayAdapter.class)
+    @JsonbNillable
     private byte[] secret = null;
 
     /** The Secret as URL. */
-    @JsonbProperty(value = Constants.FIELD_URL, nillable = true)
+    @JsonbProperty(value = Constants.FIELD_URL)
+    @JsonbNillable
     private String url = null;
 
     // =========================================================================

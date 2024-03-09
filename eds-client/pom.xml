@@ -14,12 +14,12 @@
 
     <dependencies>
         <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>eds-api</artifactId>
-        </dependency>
-        <dependency>
             <groupId>jakarta.platform</groupId>
             <artifactId>jakarta.jakartaee-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>eds-api</artifactId>
         </dependency>
 
         <!-- Following is required to build & run the REST Client -->

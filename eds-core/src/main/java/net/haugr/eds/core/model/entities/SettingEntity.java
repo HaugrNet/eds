@@ -16,10 +16,10 @@
  */
 package net.haugr.eds.core.model.entities;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.NamedQuery;
-import javax.persistence.Table;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.NamedQuery;
+import jakarta.persistence.Table;
 
 /**
  * <p>EDS Setting Entity, maps the Setting table from the Database.</p>

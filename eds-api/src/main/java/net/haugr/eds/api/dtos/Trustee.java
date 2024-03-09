@@ -16,15 +16,16 @@
  */
 package net.haugr.eds.api.dtos;
 
+import jakarta.json.bind.annotation.JsonbNillable;
 import net.haugr.eds.api.common.Constants;
 import net.haugr.eds.api.common.TrustLevel;
 
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import javax.json.bind.annotation.JsonbDateFormat;
-import javax.json.bind.annotation.JsonbProperty;
-import javax.json.bind.annotation.JsonbPropertyOrder;
+import jakarta.json.bind.annotation.JsonbDateFormat;
+import jakarta.json.bind.annotation.JsonbProperty;
+import jakarta.json.bind.annotation.JsonbPropertyOrder;
 
 /**
  * <p>A Trustee, is a Member of a Circle, with a granted Trust Level.</p>
@@ -48,11 +49,13 @@ public final class Trustee implements Serializable {
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
     /** MemberId. */
-    @JsonbProperty(value = Constants.FIELD_MEMBER_ID, nillable = true)
+    @JsonbProperty(value = Constants.FIELD_MEMBER_ID)
+    @JsonbNillable
     private String memberId = null;
 
     /** Account Name. */
-    @JsonbProperty(value = Constants.FIELD_ACCOUNT_NAME, nillable = true)
+    @JsonbProperty(value = Constants.FIELD_ACCOUNT_NAME)
+    @JsonbNillable
     private String accountName = null;
 
     // The Public Key is an optional value which may or may not be provided,
@@ -60,29 +63,35 @@ public final class Trustee implements Serializable {
     // it is not used as part of the Standard Object methods, #equals(),
     // #hashCode() and #toString().
     /** Public Key. */
-    @JsonbProperty(value = Constants.FIELD_PUBLIC_KEY, nillable = true)
+    @JsonbProperty(value = Constants.FIELD_PUBLIC_KEY)
+    @JsonbNillable
     private String publicKey = null;
 
     /** CircleId. */
-    @JsonbProperty(value = Constants.FIELD_CIRCLE_ID, nillable = true)
+    @JsonbProperty(value = Constants.FIELD_CIRCLE_ID)
+    @JsonbNillable
     private String circleId = null;
 
     /** Circle Name. */
-    @JsonbProperty(value = Constants.FIELD_CIRCLE_NAME, nillable = true)
+    @JsonbProperty(value = Constants.FIELD_CIRCLE_NAME)
+    @JsonbNillable
     private String circleName = null;
 
     /** Trust Level. */
-    @JsonbProperty(value = Constants.FIELD_TRUSTLEVEL, nillable = true)
+    @JsonbProperty(value = Constants.FIELD_TRUSTLEVEL)
+    @JsonbNillable
     private TrustLevel trustLevel = null;
 
     /** Created Timestamp. */
-    @JsonbProperty(value = Constants.FIELD_ADDED, nillable = true)
+    @JsonbProperty(value = Constants.FIELD_ADDED)
     @JsonbDateFormat(Constants.JSON_DATE_FORMAT)
+    @JsonbNillable
     private LocalDateTime added = null;
 
     /** Last Modified Timestamp. */
-    @JsonbProperty(value = Constants.FIELD_CHANGED, nillable = true)
+    @JsonbProperty(value = Constants.FIELD_CHANGED)
     @JsonbDateFormat(Constants.JSON_DATE_FORMAT)
+    @JsonbNillable
     private LocalDateTime changed = null;
 
     // =========================================================================

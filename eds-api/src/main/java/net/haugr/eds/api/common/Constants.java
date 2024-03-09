@@ -16,7 +16,7 @@
  */
 package net.haugr.eds.api.common;
 
-import javax.json.bind.annotation.JsonbDateFormat;
+import jakarta.json.bind.annotation.JsonbDateFormat;
 import java.util.regex.Pattern;
 
 /**

@@ -16,13 +16,14 @@
  */
 package net.haugr.eds.api.requests;
 
+import jakarta.json.bind.annotation.JsonbNillable;
 import net.haugr.eds.api.common.ByteArrayAdapter;
 import net.haugr.eds.api.common.Constants;
 import net.haugr.eds.api.common.CredentialType;
 import net.haugr.eds.api.common.Utilities;
-import javax.json.bind.annotation.JsonbProperty;
-import javax.json.bind.annotation.JsonbPropertyOrder;
-import javax.json.bind.annotation.JsonbTypeAdapter;
+import jakarta.json.bind.annotation.JsonbProperty;
+import jakarta.json.bind.annotation.JsonbPropertyOrder;
+import jakarta.json.bind.annotation.JsonbTypeAdapter;
 import java.io.Serial;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -47,16 +48,19 @@ public class Authentication extends AbstractRequest {
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
     /** Account Name. */
-    @JsonbProperty(value = Constants.FIELD_ACCOUNT_NAME, nillable = true)
+    @JsonbProperty(value = Constants.FIELD_ACCOUNT_NAME)
+    @JsonbNillable
     private String accountName = null;
 
     /** Credential (Password or Passphrase). */
-    @JsonbProperty(value = Constants.FIELD_CREDENTIAL, nillable = true)
+    @JsonbProperty(value = Constants.FIELD_CREDENTIAL)
     @JsonbTypeAdapter(ByteArrayAdapter.class)
+    @JsonbNillable
     private byte[] credential = null;
 
     /** Credential Type. */
-    @JsonbProperty(value = Constants.FIELD_CREDENTIALTYPE, nillable = true)
+    @JsonbProperty(value = Constants.FIELD_CREDENTIALTYPE)
+    @JsonbNillable
     private CredentialType credentialType = null;
 
     // =========================================================================

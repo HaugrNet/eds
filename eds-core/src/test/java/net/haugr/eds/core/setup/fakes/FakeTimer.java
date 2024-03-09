@@ -16,10 +16,10 @@
  */
 package net.haugr.eds.core.setup.fakes;
 
-import javax.ejb.EJBException;
-import javax.ejb.ScheduleExpression;
-import javax.ejb.Timer;
-import javax.ejb.TimerHandle;
+import jakarta.ejb.EJBException;
+import jakarta.ejb.ScheduleExpression;
+import jakarta.ejb.Timer;
+import jakarta.ejb.TimerHandle;
 import java.io.Serializable;
 import java.util.Date;
 

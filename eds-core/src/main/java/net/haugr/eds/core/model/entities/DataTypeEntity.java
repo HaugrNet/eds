@@ -17,10 +17,10 @@
 package net.haugr.eds.core.model.entities;
 
 import net.haugr.eds.api.common.Constants;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.NamedQuery;
-import javax.persistence.Table;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.NamedQuery;
+import jakarta.persistence.Table;
 
 /**
  * <p>EDS DataType Entity, maps the DataType table from the Database.</p>

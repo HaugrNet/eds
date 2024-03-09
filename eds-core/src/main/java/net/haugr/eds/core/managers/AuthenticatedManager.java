@@ -17,7 +17,7 @@
 package net.haugr.eds.core.managers;
 
 import java.util.Arrays;
-import javax.persistence.EntityManager;
+import jakarta.persistence.EntityManager;
 import net.haugr.eds.api.common.ReturnCode;
 import net.haugr.eds.api.requests.Authentication;
 import net.haugr.eds.api.responses.AuthenticateResponse;

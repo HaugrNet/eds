@@ -18,7 +18,7 @@ package net.haugr.eds.core.managers;
 
 import java.util.Arrays;
 import java.util.Objects;
-import javax.persistence.EntityManager;
+import jakarta.persistence.EntityManager;
 import net.haugr.eds.api.common.Constants;
 import net.haugr.eds.api.common.ReturnCode;
 import net.haugr.eds.api.dtos.DataType;

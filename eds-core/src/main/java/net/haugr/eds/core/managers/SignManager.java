@@ -18,7 +18,7 @@ package net.haugr.eds.core.managers;
 
 import java.util.Arrays;
 import java.util.Base64;
-import javax.persistence.EntityManager;
+import jakarta.persistence.EntityManager;
 import net.haugr.eds.api.requests.SignRequest;
 import net.haugr.eds.api.responses.SignResponse;
 import net.haugr.eds.core.enums.Permission;

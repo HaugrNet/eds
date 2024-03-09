@@ -17,11 +17,11 @@
 package net.haugr.eds.core.model.entities;
 
 import java.time.LocalDateTime;
-import javax.persistence.Column;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.MappedSuperclass;
+import jakarta.persistence.Column;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.MappedSuperclass;
 
 /**
  * <p>EDS Entities contain some commonalities, this Class acts as a Super Class

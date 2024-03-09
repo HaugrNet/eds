@@ -19,7 +19,7 @@ package net.haugr.eds.core.managers;
 import java.security.PublicKey;
 import java.util.Arrays;
 import java.util.Objects;
-import javax.persistence.EntityManager;
+import jakarta.persistence.EntityManager;
 import net.haugr.eds.api.common.Action;
 import net.haugr.eds.api.common.MemberRole;
 import net.haugr.eds.api.common.ReturnCode;

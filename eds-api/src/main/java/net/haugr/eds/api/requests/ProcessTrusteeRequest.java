@@ -16,13 +16,14 @@
  */
 package net.haugr.eds.api.requests;
 
+import jakarta.json.bind.annotation.JsonbNillable;
 import net.haugr.eds.api.Management;
 import net.haugr.eds.api.common.Action;
 import net.haugr.eds.api.common.Constants;
 import net.haugr.eds.api.common.TrustLevel;
 
-import javax.json.bind.annotation.JsonbProperty;
-import javax.json.bind.annotation.JsonbPropertyOrder;
+import jakarta.json.bind.annotation.JsonbProperty;
+import jakarta.json.bind.annotation.JsonbPropertyOrder;
 import java.io.Serial;
 import java.util.EnumSet;
 import java.util.Map;
@@ -66,19 +67,23 @@ public final class ProcessTrusteeRequest extends Authentication implements Circl
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
     /** The Action. */
-    @JsonbProperty(value = Constants.FIELD_ACTION, nillable = true)
+    @JsonbProperty(value = Constants.FIELD_ACTION)
+    @JsonbNillable
     private Action action = null;
 
     /** The Trust Level. */
-    @JsonbProperty(value = Constants.FIELD_TRUSTLEVEL, nillable = true)
+    @JsonbProperty(value = Constants.FIELD_TRUSTLEVEL)
+    @JsonbNillable
     private TrustLevel trustLevel = null;
 
     /** The CircleId. */
-    @JsonbProperty(value = Constants.FIELD_CIRCLE_ID, nillable = true)
+    @JsonbProperty(value = Constants.FIELD_CIRCLE_ID)
+    @JsonbNillable
     private String circleId = null;
 
     /** The MemberId. */
-    @JsonbProperty(value = Constants.FIELD_MEMBER_ID, nillable = true)
+    @JsonbProperty(value = Constants.FIELD_MEMBER_ID)
+    @JsonbNillable
     private String memberId = null;
 
     // =========================================================================

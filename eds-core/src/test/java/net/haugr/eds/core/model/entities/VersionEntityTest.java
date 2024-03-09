@@ -23,8 +23,8 @@ import net.haugr.eds.api.common.Utilities;
 import net.haugr.eds.core.model.CommonDao;
 import net.haugr.eds.core.setup.DatabaseSetup;
 import java.util.List;
-import javax.persistence.PersistenceException;
-import javax.persistence.Query;
+import jakarta.persistence.PersistenceException;
+import jakarta.persistence.Query;
 
 import org.junit.jupiter.api.Test;
 

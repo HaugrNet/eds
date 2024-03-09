@@ -16,15 +16,16 @@
  */
 package net.haugr.eds.api.dtos;
 
+import jakarta.json.bind.annotation.JsonbNillable;
 import net.haugr.eds.api.common.Constants;
 import net.haugr.eds.api.common.MemberRole;
 
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import javax.json.bind.annotation.JsonbDateFormat;
-import javax.json.bind.annotation.JsonbProperty;
-import javax.json.bind.annotation.JsonbPropertyOrder;
+import jakarta.json.bind.annotation.JsonbDateFormat;
+import jakarta.json.bind.annotation.JsonbProperty;
+import jakarta.json.bind.annotation.JsonbPropertyOrder;
 
 /**
  * <p>The Member Object, is used as Accounts in EDS. The Object consists of an
@@ -49,15 +50,18 @@ public final class Member implements Serializable {
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
     /** The MemberId. */
-    @JsonbProperty(value = Constants.FIELD_MEMBER_ID, nillable = true)
+    @JsonbProperty(value = Constants.FIELD_MEMBER_ID)
+    @JsonbNillable
     private String memberId = null;
 
     /** The AccountName. */
-    @JsonbProperty(value = Constants.FIELD_ACCOUNT_NAME, nillable = true)
+    @JsonbProperty(value = Constants.FIELD_ACCOUNT_NAME)
+    @JsonbNillable
     private String accountName = null;
 
     /** The Member Role. */
-    @JsonbProperty(value = Constants.FIELD_MEMBER_ROLE, nillable = true)
+    @JsonbProperty(value = Constants.FIELD_MEMBER_ROLE)
+    @JsonbNillable
     private MemberRole memberRole = null;
 
     // The Public Key is an optional value which may or may not be provided,
@@ -65,12 +69,14 @@ public final class Member implements Serializable {
     // it is not used as part of the Standard Object methods, #equals(),
     // #hashCode() and #toString().
     /** The Public Key. */
-    @JsonbProperty(value = Constants.FIELD_PUBLIC_KEY, nillable = true)
+    @JsonbProperty(value = Constants.FIELD_PUBLIC_KEY)
+    @JsonbNillable
     private String publicKey = null;
 
     /** The Member Since. */
-    @JsonbProperty(value = Constants.FIELD_ADDED, nillable = true)
+    @JsonbProperty(value = Constants.FIELD_ADDED)
     @JsonbDateFormat(Constants.JSON_DATE_FORMAT)
+    @JsonbNillable
     private LocalDateTime added = null;
 
     // =========================================================================

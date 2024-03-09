@@ -16,14 +16,15 @@
  */
 package net.haugr.eds.api.dtos;
 
+import jakarta.json.bind.annotation.JsonbNillable;
 import net.haugr.eds.api.common.Constants;
 
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import javax.json.bind.annotation.JsonbDateFormat;
-import javax.json.bind.annotation.JsonbProperty;
-import javax.json.bind.annotation.JsonbPropertyOrder;
+import jakarta.json.bind.annotation.JsonbDateFormat;
+import jakarta.json.bind.annotation.JsonbProperty;
+import jakarta.json.bind.annotation.JsonbPropertyOrder;
 
 /**
  * This Object contains information about a Signature in EDS, such as when it
@@ -46,26 +47,31 @@ public final class Signature implements Serializable {
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
     /** CheckSum. */
-    @JsonbProperty(value = Constants.FIELD_CHECKSUM, nillable = true)
+    @JsonbProperty(value = Constants.FIELD_CHECKSUM)
+    @JsonbNillable
     private String checksum = null;
 
     /** Expiration Timestamp. */
-    @JsonbProperty(value = Constants.FIELD_EXPIRES, nillable = true)
+    @JsonbProperty(value = Constants.FIELD_EXPIRES)
     @JsonbDateFormat(Constants.JSON_DATE_FORMAT)
+    @JsonbNillable
     private LocalDateTime expires = null;
 
     /** Number of Verifications. */
-    @JsonbProperty(value = Constants.FIELD_VERIFICATIONS, nillable = true)
+    @JsonbProperty(value = Constants.FIELD_VERIFICATIONS)
+    @JsonbNillable
     private Long verifications = null;
 
     /** Last Verification Timestamp. */
-    @JsonbProperty(value = Constants.FIELD_LAST_VERIFICATION, nillable = true)
+    @JsonbProperty(value = Constants.FIELD_LAST_VERIFICATION)
     @JsonbDateFormat(Constants.JSON_DATE_FORMAT)
+    @JsonbNillable
     private LocalDateTime lastVerification = null;
 
     /** Added Timestamp. */
-    @JsonbProperty(value = Constants.FIELD_ADDED, nillable = true)
+    @JsonbProperty(value = Constants.FIELD_ADDED)
     @JsonbDateFormat(Constants.JSON_DATE_FORMAT)
+    @JsonbNillable
     private LocalDateTime added = null;
 
     // =========================================================================

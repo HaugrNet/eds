@@ -16,10 +16,11 @@
  */
 package net.haugr.eds.api.dtos;
 
+import jakarta.json.bind.annotation.JsonbNillable;
 import net.haugr.eds.api.common.Constants;
 
-import javax.json.bind.annotation.JsonbProperty;
-import javax.json.bind.annotation.JsonbPropertyOrder;
+import jakarta.json.bind.annotation.JsonbProperty;
+import jakarta.json.bind.annotation.JsonbPropertyOrder;
 import java.io.Serial;
 import java.io.Serializable;
 
@@ -48,11 +49,13 @@ public final class DataType implements Serializable {
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
     /** Type Name. */
-    @JsonbProperty(value = Constants.FIELD_TYPENAME, nillable = true)
+    @JsonbProperty(value = Constants.FIELD_TYPENAME)
+    @JsonbNillable
     private String typeName = null;
 
     /** Type. */
-    @JsonbProperty(value = Constants.FIELD_TYPE, nillable = true)
+    @JsonbProperty(value = Constants.FIELD_TYPE)
+    @JsonbNillable
     private String type = null;
 
     // =========================================================================

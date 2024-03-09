@@ -28,6 +28,7 @@
             <organization>haugr.net</organization>
             <organizationUrl>https://haugr.net/</organizationUrl>
             <roles>
+                <role>architect</role>
                 <role>developer</role>
             </roles>
         </developer>
@@ -82,7 +83,7 @@
             <dependency>
                 <groupId>jakarta.platform</groupId>
                 <artifactId>jakarta.jakartaee-api</artifactId>
-                <version>8.0.0</version>
+                <version>10.0.0</version>
                 <scope>provided</scope>
             </dependency>
             <dependency>
@@ -119,13 +120,21 @@
                 <version>2.10.1</version>
             </dependency>
             <dependency>
+                <groupId>org.glassfish.jersey.test-framework.providers</groupId>
+                <artifactId>jersey-test-framework-provider-grizzly2</artifactId>
+                <version>2.35</version>
+                <scope>test</scope>
+            </dependency>
+<!--
+            <dependency>
                 <groupId>org.glassfish.jersey.core</groupId>
                 <artifactId>jersey-common</artifactId>
                 <version>2.39.1</version>
-                <!-- Upgrading from 2.x to 3.x causes the REST tests to fail. -->
-                <!-- <version>3.1.1</version> -->
+                &lt;!&ndash; Upgrading from 2.x to 3.x causes the REST tests to fail. &ndash;&gt;
+                &lt;!&ndash; <version>3.1.1</version> &ndash;&gt;
                 <scope>test</scope>
             </dependency>
+-->
 
             <!-- Dependencies used for testing -->
             <dependency>
@@ -154,17 +163,36 @@
                 <scope>test</scope>
             </dependency>
             <dependency>
-                <groupId>org.hibernate</groupId>
-                <artifactId>hibernate-core</artifactId>
-                <version>5.6.15.Final</version>
-                <!-- Test fails, when upgrading -->
-                <!-- <version>6.2.0.Final</version> -->
-                <scope>test</scope>
-            </dependency>
-            <dependency>
                 <groupId>com.h2database</groupId>
                 <artifactId>h2</artifactId>
                 <version>2.2.224</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate.orm</groupId>
+                <artifactId>hibernate-core</artifactId>
+                <version>6.4.4.Final</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <!-- Hibernate required dependency -->
+                <groupId>org.eclipse</groupId>
+                <artifactId>yasson</artifactId>
+                <version>3.0.3</version>
+                <scope>test</scope>
+                <exclusions>
+                    <!-- Excluding 1.1.0: transitive vulnerable dependency CVE-2023-4043 7.5 Excessive Iteration vulnerability with High severity found  -->
+                    <exclusion>
+                        <groupId>org.eclipse.parsson</groupId>
+                        <artifactId>parsson</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <!-- Replaces the vulnerable dependency in org.eclipse:yasson:3.0.3 -->
+                <groupId>org.eclipse.parsson</groupId>
+                <artifactId>parsson</artifactId>
+                <version>1.1.5</version>
                 <scope>test</scope>
             </dependency>
         </dependencies>

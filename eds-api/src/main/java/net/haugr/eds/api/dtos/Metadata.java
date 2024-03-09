@@ -16,14 +16,15 @@
  */
 package net.haugr.eds.api.dtos;
 
+import jakarta.json.bind.annotation.JsonbNillable;
 import net.haugr.eds.api.common.Constants;
 
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import javax.json.bind.annotation.JsonbDateFormat;
-import javax.json.bind.annotation.JsonbProperty;
-import javax.json.bind.annotation.JsonbPropertyOrder;
+import jakarta.json.bind.annotation.JsonbDateFormat;
+import jakarta.json.bind.annotation.JsonbProperty;
+import jakarta.json.bind.annotation.JsonbPropertyOrder;
 
 /**
  * <p>The Metadata is the information which is needed as part of storing or
@@ -49,28 +50,34 @@ public final class Metadata implements Serializable {
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
     /** DataId. */
-    @JsonbProperty(value = Constants.FIELD_DATA_ID, nillable = true)
+    @JsonbProperty(value = Constants.FIELD_DATA_ID)
+    @JsonbNillable
     private String dataId = null;
 
     /** CircleId. */
-    @JsonbProperty(value = Constants.FIELD_CIRCLE_ID, nillable = true)
+    @JsonbProperty(value = Constants.FIELD_CIRCLE_ID)
+    @JsonbNillable
     private String circleId = null;
 
     /** FolderId. */
-    @JsonbProperty(value = Constants.FIELD_FOLDER_ID, nillable = true)
+    @JsonbProperty(value = Constants.FIELD_FOLDER_ID)
+    @JsonbNillable
     private String folderId = null;
 
     /** Data Name. */
-    @JsonbProperty(value = Constants.FIELD_DATA_NAME, nillable = true)
+    @JsonbProperty(value = Constants.FIELD_DATA_NAME)
+    @JsonbNillable
     private String dataName = null;
 
     /** Type Name. */
-    @JsonbProperty(value = Constants.FIELD_TYPENAME, nillable = true)
+    @JsonbProperty(value = Constants.FIELD_TYPENAME)
+    @JsonbNillable
     private String typeName = null;
 
     /** Created Timestamp. */
-    @JsonbProperty(value = Constants.FIELD_ADDED, nillable = true)
+    @JsonbProperty(value = Constants.FIELD_ADDED)
     @JsonbDateFormat(Constants.JSON_DATE_FORMAT)
+    @JsonbNillable
     private LocalDateTime added = null;
 
     // =========================================================================

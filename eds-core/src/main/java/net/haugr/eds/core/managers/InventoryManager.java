@@ -19,7 +19,7 @@ package net.haugr.eds.core.managers;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import javax.persistence.EntityManager;
+import jakarta.persistence.EntityManager;
 import net.haugr.eds.api.dtos.Metadata;
 import net.haugr.eds.api.requests.InventoryRequest;
 import net.haugr.eds.api.responses.InventoryResponse;

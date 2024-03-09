@@ -20,7 +20,7 @@ import java.security.PublicKey;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Base64;
-import javax.persistence.EntityManager;
+import jakarta.persistence.EntityManager;
 import net.haugr.eds.api.common.ReturnCode;
 import net.haugr.eds.api.common.Utilities;
 import net.haugr.eds.api.requests.VerifyRequest;

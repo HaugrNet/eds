@@ -18,22 +18,22 @@ package net.haugr.eds.core.setup.fakes;
 
 import net.haugr.eds.api.common.ReturnCode;
 import net.haugr.eds.core.exceptions.EDSException;
-import javax.persistence.EntityGraph;
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.EntityTransaction;
-import javax.persistence.FlushModeType;
-import javax.persistence.LockModeType;
-import javax.persistence.Persistence;
-import javax.persistence.PersistenceException;
-import javax.persistence.Query;
-import javax.persistence.StoredProcedureQuery;
-import javax.persistence.TypedQuery;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaDelete;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.CriteriaUpdate;
-import javax.persistence.metamodel.Metamodel;
+import jakarta.persistence.EntityGraph;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.EntityTransaction;
+import jakarta.persistence.FlushModeType;
+import jakarta.persistence.LockModeType;
+import jakarta.persistence.Persistence;
+import jakarta.persistence.PersistenceException;
+import jakarta.persistence.Query;
+import jakarta.persistence.StoredProcedureQuery;
+import jakarta.persistence.TypedQuery;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaDelete;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.CriteriaUpdate;
+import jakarta.persistence.metamodel.Metamodel;
 import java.util.List;
 import java.util.Map;
 
@@ -45,7 +45,7 @@ import java.util.Map;
  */
 public final class FakeEntityManager implements EntityManager {
 
-    private static final String persistenceName = "net.haugr.eds.jpa";
+    private static final String persistenceName = "net.haugr.jpa";
     private static final EntityManagerFactory FACTORY = Persistence.createEntityManagerFactory(persistenceName);
     private final EntityManager entityManager = FACTORY.createEntityManager();
 

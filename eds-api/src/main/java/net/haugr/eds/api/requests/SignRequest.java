@@ -16,6 +16,7 @@
  */
 package net.haugr.eds.api.requests;
 
+import jakarta.json.bind.annotation.JsonbNillable;
 import net.haugr.eds.api.common.ByteArrayAdapter;
 import net.haugr.eds.api.common.Constants;
 import net.haugr.eds.api.common.Utilities;
@@ -23,10 +24,10 @@ import net.haugr.eds.api.common.Utilities;
 import java.io.Serial;
 import java.time.LocalDateTime;
 import java.util.Map;
-import javax.json.bind.annotation.JsonbDateFormat;
-import javax.json.bind.annotation.JsonbProperty;
-import javax.json.bind.annotation.JsonbPropertyOrder;
-import javax.json.bind.annotation.JsonbTypeAdapter;
+import jakarta.json.bind.annotation.JsonbDateFormat;
+import jakarta.json.bind.annotation.JsonbProperty;
+import jakarta.json.bind.annotation.JsonbPropertyOrder;
+import jakarta.json.bind.annotation.JsonbTypeAdapter;
 
 /**
  * <p>This Object is needed, when a new Signature is being issued. The Object
@@ -47,13 +48,15 @@ public final class SignRequest extends Authentication {
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
     /** The Data to Sign. */
-    @JsonbProperty(value = Constants.FIELD_DATA, nillable = true)
+    @JsonbProperty(value = Constants.FIELD_DATA)
     @JsonbTypeAdapter(ByteArrayAdapter.class)
+    @JsonbNillable
     private byte[] data = null;
 
     /** Signature Expiration Date. */
-    @JsonbProperty(value = Constants.FIELD_EXPIRES, nillable = true)
+    @JsonbProperty(value = Constants.FIELD_EXPIRES)
     @JsonbDateFormat(Constants.JSON_DATE_FORMAT)
+    @JsonbNillable
     private LocalDateTime expires = null;
 
     // =========================================================================

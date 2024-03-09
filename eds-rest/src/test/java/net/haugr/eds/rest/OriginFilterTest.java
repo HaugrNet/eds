@@ -18,6 +18,7 @@ package net.haugr.eds.rest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import jakarta.servlet.ServletConnection;
 import net.haugr.eds.core.setup.DatabaseSetup;
 import net.haugr.eds.core.enums.StandardSetting;
 import java.io.BufferedReader;
@@ -28,19 +29,19 @@ import java.util.Enumeration;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import javax.servlet.AsyncContext;
-import javax.servlet.DispatcherType;
-import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.ServletInputStream;
-import javax.servlet.ServletOutputStream;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.AsyncContext;
+import jakarta.servlet.DispatcherType;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.FilterConfig;
+import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletInputStream;
+import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -320,15 +321,6 @@ final class OriginFilterTest extends DatabaseSetup {
          * {@inheritDoc}
          */
         @Override
-        @Deprecated
-        public String getRealPath(final String path) {
-            return null;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
         public int getRemotePort() {
             return 0;
         }
@@ -412,6 +404,30 @@ final class OriginFilterTest extends DatabaseSetup {
         public DispatcherType getDispatcherType() {
             return null;
         }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public String getRequestId() {
+            return null;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public String getProtocolRequestId() {
+            return null;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public ServletConnection getServletConnection() {
+            return null;
+        }
     }
 
     /**
@@ -451,24 +467,6 @@ final class OriginFilterTest extends DatabaseSetup {
          */
         @Override
         public String encodeRedirectURL(final String url) {
-            return null;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        @Deprecated
-        public String encodeUrl(final String url) {
-            return null;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        @Deprecated
-        public String encodeRedirectUrl(final String url) {
             return null;
         }
 
@@ -542,14 +540,6 @@ final class OriginFilterTest extends DatabaseSetup {
          */
         @Override
         public void setStatus(final int sc) {
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        @Deprecated
-        public void setStatus(final int sc, final String sm) {
         }
 
         /**

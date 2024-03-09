@@ -40,7 +40,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Base64;
-import javax.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MediaType;
 
 /**
  * <p>Common functionality for the Gson based EDS REST Clients. It handles the

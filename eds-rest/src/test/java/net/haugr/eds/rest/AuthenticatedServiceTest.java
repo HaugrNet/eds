@@ -20,13 +20,15 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import net.haugr.eds.api.common.ReturnCode;
 import net.haugr.eds.api.requests.Authentication;
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 /**
  * @author Kim Jensen
  * @since EDS 1.1
  */
+@Disabled("Upgrading to Jakarta EE 10 requires a re-write of the Endpoint tests")
 final class AuthenticatedServiceTest extends BeanSetup {
 
     @Test

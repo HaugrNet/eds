@@ -16,11 +16,12 @@
  */
 package net.haugr.eds.api.requests;
 
+import jakarta.json.bind.annotation.JsonbNillable;
 import net.haugr.eds.api.Management;
 import net.haugr.eds.api.common.Constants;
 
-import javax.json.bind.annotation.JsonbProperty;
-import javax.json.bind.annotation.JsonbPropertyOrder;
+import jakarta.json.bind.annotation.JsonbProperty;
+import jakarta.json.bind.annotation.JsonbPropertyOrder;
 import java.io.Serial;
 import java.util.Map;
 
@@ -42,7 +43,8 @@ public final class FetchMemberRequest extends Authentication {
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
     /** MemberId. */
-    @JsonbProperty(value = Constants.FIELD_MEMBER_ID, nillable = true)
+    @JsonbProperty(value = Constants.FIELD_MEMBER_ID)
+    @JsonbNillable
     private String memberId = null;
 
     // =========================================================================

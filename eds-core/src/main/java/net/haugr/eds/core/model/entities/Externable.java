@@ -16,8 +16,8 @@
  */
 package net.haugr.eds.core.model.entities;
 
-import javax.persistence.Column;
-import javax.persistence.MappedSuperclass;
+import jakarta.persistence.Column;
+import jakarta.persistence.MappedSuperclass;
 
 /**
  * <p>For Entities, which is externally accessible, i.e. requires an Id to help

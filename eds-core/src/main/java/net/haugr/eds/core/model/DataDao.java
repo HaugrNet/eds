@@ -18,8 +18,8 @@ package net.haugr.eds.core.model;
 
 import java.util.EnumSet;
 import java.util.List;
-import javax.persistence.EntityManager;
-import javax.persistence.Query;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.Query;
 import net.haugr.eds.api.common.TrustLevel;
 import net.haugr.eds.api.dtos.Metadata;
 import net.haugr.eds.core.model.entities.DataEntity;

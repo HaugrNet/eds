@@ -37,6 +37,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.UUID;
@@ -81,10 +82,11 @@ final class ManagementBeanMasterKeyTest extends DatabaseSetup {
 
         final MasterKeyResponse response = bean.masterKey(request);
         assertEquals(ReturnCode.VERIFICATION_WARNING.getCode(), response.getReturnCode());
-        assertEquals("Request Object contained errors:\n" +
-                "Key: credential, Error: The Session (Credential) is missing.\n" +
-                "Key: secret, Error: Either the secret or the URL must be given to alter the MasterKey.\n" +
-                "Key: url, Error: Either the secret or the URL must be given to alter the MasterKey.", response.getReturnMessage());
+        assertEquals("""
+                Request Object contained errors:
+                Key: credential, Error: The Session (Credential) is missing.
+                Key: secret, Error: Either the secret or the URL must be given to alter the MasterKey.
+                Key: url, Error: Either the secret or the URL must be given to alter the MasterKey.""", response.getReturnMessage());
     }
 
     @Test
@@ -201,12 +203,13 @@ final class ManagementBeanMasterKeyTest extends DatabaseSetup {
         final MasterKey defaultMasterKey = MasterKey.getInstance(settings);
         final Settings mySettings = newSettings();
         mySettings.set(StandardSetting.MASTERKEY_URL.getKey(), "file://" + file);
+        final Path path = Paths.get(file);
 
-        Files.write(Paths.get(file), Constants.ADMIN_ACCOUNT.getBytes(settings.getCharset()));
+        Files.writeString(path, Constants.ADMIN_ACCOUNT, settings.getCharset());
         final MasterKey masterKey1 = newMasterKey(mySettings);
         assertEquals(masterKey1.getKey().getKey(), defaultMasterKey.getKey().getKey());
 
-        Files.write(Paths.get(file), UUID.randomUUID().toString().getBytes(settings.getCharset()));
+        Files.writeString(path, UUID.randomUUID().toString(), settings.getCharset());
         final MasterKey masterKey2 = newMasterKey(mySettings);
         assertNotEquals(masterKey2.getKey().getKey(), defaultMasterKey.getKey().getKey());
     }

@@ -19,8 +19,8 @@ package net.haugr.eds.rest;
 import net.haugr.eds.api.common.Constants;
 import java.util.HashSet;
 import java.util.Set;
-import javax.ws.rs.ApplicationPath;
-import javax.ws.rs.core.Application;
+import jakarta.ws.rs.ApplicationPath;
+import jakarta.ws.rs.core.Application;
 
 /**
  * <p>The EDS REST Application, i.e. the listing of all EDS based REST Service

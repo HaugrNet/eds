@@ -69,7 +69,7 @@ public final class FetchData extends EDSRequest<FetchDataResponse> {
     }
 
     public String circleId() {
-        return metadata.isEmpty() ? null : metadata.get(0).getCircleId();
+        return metadata.isEmpty() ? null : metadata.getFirst().getCircleId();
     }
 
     public String dataId() {
@@ -82,20 +82,20 @@ public final class FetchData extends EDSRequest<FetchDataResponse> {
             }
             id = ids.toString();
         } else {
-            id = metadata.isEmpty() ? null : getKey(metadata.get(0).getDataId());
+            id = metadata.isEmpty() ? null : getKey(metadata.getFirst().getDataId());
         }
 
         return id;
     }
 
     public String folderId() {
-        final String tmpId = metadata.isEmpty() ? null : metadata.get(0).getFolderId();
+        final String tmpId = metadata.isEmpty() ? null : metadata.getFirst().getFolderId();
         String folderId = null;
 
         if (tmpId != null) {
             final String tmpKey = getKey(tmpId);
             if (tmpKey == null) {
-                final String circleKey = getKey(metadata.get(0).getCircleId());
+                final String circleKey = getKey(metadata.getFirst().getCircleId());
                 final String newKey = circleKey.substring(0, circleKey.indexOf(EXTENSION_ID)) + "_root";
                 processId(Action.ADD, null, newKey, tmpId);
                 folderId = newKey + EXTENSION_ID;
@@ -117,7 +117,7 @@ public final class FetchData extends EDSRequest<FetchDataResponse> {
             }
             name = names.toString();
         } else {
-            name = metadata.isEmpty() ? null : metadata.get(0).getDataName();
+            name = metadata.isEmpty() ? null : metadata.getFirst().getDataName();
         }
 
         return name;
@@ -133,7 +133,7 @@ public final class FetchData extends EDSRequest<FetchDataResponse> {
             }
             type = types.toString();
         } else {
-            type = metadata.isEmpty() ? null : metadata.get(0).getTypeName();
+            type = metadata.isEmpty() ? null : metadata.getFirst().getTypeName();
         }
 
         return type;
@@ -149,7 +149,7 @@ public final class FetchData extends EDSRequest<FetchDataResponse> {
             }
             added = dates.toString();
         } else {
-            added = metadata.isEmpty() ? null : Converter.convertDate(metadata.get(0).getAdded());
+            added = metadata.isEmpty() ? null : Converter.convertDate(metadata.getFirst().getAdded());
         }
 
         return added;

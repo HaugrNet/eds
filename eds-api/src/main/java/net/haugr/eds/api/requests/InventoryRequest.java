@@ -16,10 +16,11 @@
  */
 package net.haugr.eds.api.requests;
 
+import jakarta.json.bind.annotation.JsonbNillable;
 import net.haugr.eds.api.Management;
 import net.haugr.eds.api.common.Constants;
-import javax.json.bind.annotation.JsonbProperty;
-import javax.json.bind.annotation.JsonbPropertyOrder;
+import jakarta.json.bind.annotation.JsonbProperty;
+import jakarta.json.bind.annotation.JsonbPropertyOrder;
 import java.io.Serial;
 import java.util.Map;
 
@@ -40,11 +41,13 @@ public final class InventoryRequest extends Authentication {
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
     /** The Page Number. */
-    @JsonbProperty(value = Constants.FIELD_PAGE_NUMBER, nillable = true)
+    @JsonbProperty(value = Constants.FIELD_PAGE_NUMBER)
+    @JsonbNillable
     private Integer pageNumber = 1;
 
     /** The Page Size. */
-    @JsonbProperty(value = Constants.FIELD_PAGE_SIZE, nillable = true)
+    @JsonbProperty(value = Constants.FIELD_PAGE_SIZE)
+    @JsonbNillable
     private Integer pageSize = Constants.MAX_PAGE_SIZE;
 
     // =========================================================================

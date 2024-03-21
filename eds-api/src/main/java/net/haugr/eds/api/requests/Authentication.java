@@ -71,6 +71,7 @@ public class Authentication extends AbstractRequest {
      * Default Constructor.
      */
     public Authentication() {
+        // Empty Constructor
     }
 
     /**

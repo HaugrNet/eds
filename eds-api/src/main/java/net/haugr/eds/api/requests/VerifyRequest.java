@@ -64,6 +64,7 @@ public final class VerifyRequest extends Authentication {
      * Default Constructor.
      */
     public VerifyRequest() {
+        // Empty Constructor
     }
 
     /**

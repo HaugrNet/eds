@@ -88,6 +88,7 @@ public final class Metadata implements Serializable {
      * Default Constructor.
      */
     public Metadata() {
+        // Empty Constructor
     }
 
     /**

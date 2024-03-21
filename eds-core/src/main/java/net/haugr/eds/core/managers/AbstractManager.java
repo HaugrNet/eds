@@ -120,10 +120,9 @@ public abstract class AbstractManager<D extends CommonDao, R extends EDSResponse
         // If available, let's extract the CircleId, so it can be used to
         // improve accuracy of the checks and reduce the amount of data fetched
         // from the database in preparation to perform these checks.
-        String circleId = null;
-        if (authentication instanceof CircleIdRequest) {
-            circleId = ((CircleIdRequest) authentication).getCircleId();
-        }
+        final String circleId = authentication instanceof CircleIdRequest request
+                ? request.getCircleId()
+                : null;
 
         // Step 1; Verify if the given data is sufficient to complete the
         //         request. If not sufficient, no need to continue and involve

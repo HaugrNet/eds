@@ -41,5 +41,6 @@ public final class FetchCircleRequest extends Authentication {
      * Default Constructor.
      */
     public FetchCircleRequest() {
+        // Empty Constructor
     }
 }

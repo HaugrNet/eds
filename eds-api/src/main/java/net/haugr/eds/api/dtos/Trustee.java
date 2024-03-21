@@ -102,6 +102,7 @@ public final class Trustee implements Serializable {
      * Default Constructor.
      */
     public Trustee() {
+        // Empty Constructor
     }
 
     /**

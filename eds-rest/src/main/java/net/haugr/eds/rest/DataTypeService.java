@@ -50,6 +50,7 @@ public class DataTypeService {
      * Default Constructor.
      */
     public DataTypeService() {
+        // Empty Constructor
     }
 
     /**

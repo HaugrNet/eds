@@ -47,6 +47,7 @@ public class SanityService {
      * Default Constructor.
      */
     public SanityService() {
+        // Empty Constructor
     }
 
     /**

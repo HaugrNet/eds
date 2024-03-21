@@ -59,6 +59,7 @@ public final class FetchTrusteeRequest extends Authentication implements CircleI
      * Default Constructor.
      */
     public FetchTrusteeRequest() {
+        // Empty Constructor
     }
 
     /**

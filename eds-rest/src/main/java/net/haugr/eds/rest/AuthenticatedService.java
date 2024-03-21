@@ -47,6 +47,7 @@ public class AuthenticatedService {
      * Default Constructor.
      */
     public AuthenticatedService() {
+        // Empty Constructor
     }
 
     /**

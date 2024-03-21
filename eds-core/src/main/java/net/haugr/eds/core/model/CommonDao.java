@@ -82,8 +82,8 @@ public class CommonDao {
         final EDSEntity saved;
 
         if (entity.getId() == null) {
-            if ((entity instanceof Externable) && (((Externable) entity).getExternalId() == null)) {
-                ((Externable) entity).setExternalId(UUID.randomUUID().toString());
+            if ((entity instanceof Externable externable) && (externable.getExternalId() == null)) {
+                externable.setExternalId(UUID.randomUUID().toString());
             }
             entity.setAdded(Utilities.newDate());
 

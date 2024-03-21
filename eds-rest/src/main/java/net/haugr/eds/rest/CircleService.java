@@ -50,6 +50,7 @@ public class CircleService {
      * Default Constructor.
      */
     public CircleService() {
+        // Empty Constructor
     }
 
     /**

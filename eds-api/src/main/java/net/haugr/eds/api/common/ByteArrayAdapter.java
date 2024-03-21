@@ -35,6 +35,7 @@ public final class ByteArrayAdapter implements JsonbAdapter<byte[], String> {
      * Default Constructor.
      */
     public ByteArrayAdapter() {
+        // Empty Constructor
     }
 
     /**

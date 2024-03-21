@@ -47,6 +47,7 @@ public class SettingService {
      * Default Constructor.
      */
     public SettingService() {
+        // Empty Constructor
     }
 
     /**

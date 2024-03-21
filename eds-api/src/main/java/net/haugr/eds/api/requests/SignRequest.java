@@ -67,6 +67,7 @@ public final class SignRequest extends Authentication {
      * Default Constructor.
      */
     public SignRequest() {
+        // Empty Constructor
     }
 
     /**

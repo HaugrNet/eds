@@ -50,6 +50,7 @@ public class TrusteeService {
      * Default Constructor.
      */
     public TrusteeService() {
+        // Empty Constructor
     }
 
     /**

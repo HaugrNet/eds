@@ -87,6 +87,7 @@ public final class Member implements Serializable {
      * Default Constructor.
      */
     public Member() {
+        // Empty Constructor
     }
 
     /**

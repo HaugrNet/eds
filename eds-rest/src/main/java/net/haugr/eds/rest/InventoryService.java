@@ -47,6 +47,7 @@ public class InventoryService {
      * Default Constructor.
      */
     public InventoryService() {
+        // Empty Constructor
     }
 
     /**

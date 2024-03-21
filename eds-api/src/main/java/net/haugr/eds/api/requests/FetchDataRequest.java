@@ -82,6 +82,7 @@ public final class FetchDataRequest extends Authentication implements CircleIdRe
      * Default Constructor.
      */
     public FetchDataRequest() {
+        // Empty Constructor
     }
 
     /**

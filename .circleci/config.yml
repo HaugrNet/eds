@@ -3,7 +3,7 @@ jobs:
   build:
     docker:
       # Use a custom Docker image that includes Java 21
-      - image: openjdk:21-jdk
+      - image: maven:3.9-amazoncorretto-21
 
     working_directory: ~/repo
 

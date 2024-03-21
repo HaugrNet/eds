@@ -1,3 +1,13 @@
+Note; FitNesse is a nice testing framework, which excelled in visualizing the
+tests with documentation. Unfortunately, it seems that they do not wish to
+remove the possibility for users with older Java versions to lose access to the
+deprecated SecurityManager. This means that users of newer Java versions are
+being forced to look around for alternatives.
+
+See: https://github.com/unclebob/fitnesse/issues/1338
+
+---- old documentation ----
+
 This module contains the combined test and documentation of EDS written using
 FitNesse. The FitNesse testing tool can be downloaded from http://fitnesse.org/
 
@@ -19,7 +29,7 @@ work, FitNesse must be started from this folder.
 To access the FitNesse tests, go to http://localhost:[ PORT ]/EDS
 
 Here, the tests can be started either as a suite or individually. All the tests
-have been written so they work independently. This comes with the cost that they
+have been written, so they work independently. This comes with the cost that they
 do take a bit longer than required. But for the sake of accuracy they have been
 written so.
 

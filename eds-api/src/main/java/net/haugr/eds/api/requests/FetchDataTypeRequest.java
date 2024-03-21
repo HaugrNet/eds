@@ -41,5 +41,6 @@ public final class FetchDataTypeRequest extends Authentication {
      * Default Constructor.
      */
     public FetchDataTypeRequest() {
+        // Empty Constructor
     }
 }

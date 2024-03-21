@@ -73,6 +73,7 @@ public final class ProcessDataTypeRequest extends Authentication implements Acti
      * Default Constructor.
      */
     public ProcessDataTypeRequest() {
+        // Empty Constructor
     }
 
     /**

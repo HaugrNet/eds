@@ -78,6 +78,7 @@ public final class Circle implements Serializable {
      * Default Constructor.
      */
     public Circle() {
+        // Empty Constructor
     }
 
     /**

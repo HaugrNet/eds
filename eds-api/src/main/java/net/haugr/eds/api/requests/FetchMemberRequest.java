@@ -55,6 +55,7 @@ public final class FetchMemberRequest extends Authentication {
      * Default Constructor.
      */
     public FetchMemberRequest() {
+        // Empty Constructor
     }
 
     /**

@@ -58,6 +58,7 @@ public final class InventoryRequest extends Authentication {
      * Default Constructor.
      */
     public InventoryRequest() {
+        // Empty Constructor
     }
 
     /**

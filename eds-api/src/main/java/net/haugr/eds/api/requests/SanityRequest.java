@@ -64,6 +64,7 @@ public final class SanityRequest extends Authentication implements CircleIdReque
      * Default Constructor.
      */
     public SanityRequest() {
+        // Empty Constructor
     }
 
     /**

@@ -82,6 +82,7 @@ public final class Signature implements Serializable {
      * Default Constructor.
      */
     public Signature() {
+        // Empty Constructor
     }
 
     /**

@@ -77,6 +77,7 @@ public final class MasterKeyRequest extends Authentication {
      * Default Constructor.
      */
     public MasterKeyRequest() {
+        // Empty Constructor
     }
 
     /**

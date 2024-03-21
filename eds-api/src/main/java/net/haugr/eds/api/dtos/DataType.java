@@ -66,6 +66,7 @@ public final class DataType implements Serializable {
      * Default Constructor.
      */
     public DataType() {
+        // Empty Constructor
     }
 
     /**

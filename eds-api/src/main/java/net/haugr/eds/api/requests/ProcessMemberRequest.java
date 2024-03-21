@@ -143,6 +143,7 @@ public final class ProcessMemberRequest extends Authentication implements Action
      * Default Constructor.
      */
     public ProcessMemberRequest() {
+        // Empty Constructor
     }
 
     /**
@@ -289,8 +290,7 @@ public final class ProcessMemberRequest extends Authentication implements Action
                 case DELETE:
                     checkValidId(errors, Constants.FIELD_MEMBER_ID, memberId, "The given memberId is invalid.");
                     break;
-                case LOGOUT:
-                case INVALIDATE:
+                case LOGOUT, INVALIDATE:
                     break;
                 default:
                     errors.put(Constants.FIELD_ACTION, "Not supported Action has been provided.");

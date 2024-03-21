@@ -62,6 +62,7 @@ public final class Sanity implements Serializable {
      * Default Constructor.
      */
     public Sanity() {
+        // Empty Constructor
     }
 
     /**

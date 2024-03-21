@@ -127,6 +127,7 @@ public final class ProcessDataRequest extends Authentication implements CircleId
      * Default Constructor.
      */
     public ProcessDataRequest() {
+        // Empty Constructor
     }
 
     /**

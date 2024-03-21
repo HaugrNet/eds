@@ -106,6 +106,7 @@ public final class ProcessCircleRequest extends Authentication implements Circle
      * Default Constructor.
      */
     public ProcessCircleRequest() {
+        // Empty Constructor
     }
 
     /**

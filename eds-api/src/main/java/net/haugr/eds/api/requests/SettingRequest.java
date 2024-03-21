@@ -49,7 +49,7 @@ public final class SettingRequest extends Authentication {
     /** The Map of Settings. */
     @JsonbProperty(value = Constants.FIELD_SETTINGS)
     @JsonbNillable
-    private HashMap<String, String> settings = new HashMap<>(0);
+    private HashMap<String, String> settings = HashMap.newHashMap(0);
 
     // =========================================================================
     // Standard Methods (Constructor, Setters & Getters)
@@ -59,6 +59,7 @@ public final class SettingRequest extends Authentication {
      * Default Constructor.
      */
     public SettingRequest() {
+        // Empty Constructor
     }
 
     /**

@@ -94,6 +94,7 @@ public final class ProcessTrusteeRequest extends Authentication implements Circl
      * Default Constructor.
      */
     public ProcessTrusteeRequest() {
+        // Empty Constructor
     }
 
     /**

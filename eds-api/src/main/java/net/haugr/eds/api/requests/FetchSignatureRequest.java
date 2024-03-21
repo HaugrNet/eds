@@ -41,5 +41,6 @@ public final class FetchSignatureRequest extends Authentication {
      * Default Constructor.
      */
     public FetchSignatureRequest() {
+        // Empty Constructor
     }
 }

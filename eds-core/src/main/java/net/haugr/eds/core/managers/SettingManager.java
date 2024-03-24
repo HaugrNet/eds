@@ -160,8 +160,7 @@ public final class SettingManager extends AbstractManager<CommonDao, SettingResp
             case ASYMMETRIC_ALGORITHM:
                 checkAlgorithm(KeyAlgorithm.Type.ASYMMETRIC, setting, value);
                 break;
-            case SIGNATURE_ALGORITHM:
-            case HASH_ALGORITHM:
+            case SIGNATURE_ALGORITHM, HASH_ALGORITHM:
                 checkAlgorithm(KeyAlgorithm.Type.SIGNATURE, setting, value);
                 break;
             case PBE_ALGORITHM:

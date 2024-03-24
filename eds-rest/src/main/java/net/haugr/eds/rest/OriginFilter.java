@@ -46,6 +46,9 @@ public final class OriginFilter implements Filter {
      * Default Constructor.
      */
     public OriginFilter() {
+        // Generating JavaDoc requires an explicit Constructor, SonarQube
+        // requires explicit comment in empty methods, hence this comment
+        // for the default, empty, constructor.
     }
 
     /**

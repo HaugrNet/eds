@@ -36,6 +36,9 @@ public class EDSApplication extends Application {
      * Default Constructor.
      */
     public EDSApplication() {
+        // Generating JavaDoc requires an explicit Constructor, SonarQube
+        // requires explicit comment in empty methods, hence this comment
+        // for the default, empty, constructor.
     }
 
     /**

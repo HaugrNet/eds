@@ -64,7 +64,9 @@ public final class VerifyRequest extends Authentication {
      * Default Constructor.
      */
     public VerifyRequest() {
-        // Empty Constructor
+        // Generating JavaDoc requires an explicit Constructor, SonarQube
+        // requires explicit comment in empty methods, hence this comment
+        // for the default, empty, constructor.
     }
 
     /**

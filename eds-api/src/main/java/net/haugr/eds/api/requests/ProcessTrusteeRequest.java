@@ -94,7 +94,9 @@ public final class ProcessTrusteeRequest extends Authentication implements Circl
      * Default Constructor.
      */
     public ProcessTrusteeRequest() {
-        // Empty Constructor
+        // Generating JavaDoc requires an explicit Constructor, SonarQube
+        // requires explicit comment in empty methods, hence this comment
+        // for the default, empty, constructor.
     }
 
     /**

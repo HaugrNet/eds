@@ -41,6 +41,8 @@ public final class FetchCircleRequest extends Authentication {
      * Default Constructor.
      */
     public FetchCircleRequest() {
-        // Empty Constructor
+        // Generating JavaDoc requires an explicit Constructor, SonarQube
+        // requires explicit comment in empty methods, hence this comment
+        // for the default, empty, constructor.
     }
 }

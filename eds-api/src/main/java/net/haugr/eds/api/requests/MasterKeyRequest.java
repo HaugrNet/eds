@@ -77,7 +77,9 @@ public final class MasterKeyRequest extends Authentication {
      * Default Constructor.
      */
     public MasterKeyRequest() {
-        // Empty Constructor
+        // Generating JavaDoc requires an explicit Constructor, SonarQube
+        // requires explicit comment in empty methods, hence this comment
+        // for the default, empty, constructor.
     }
 
     /**

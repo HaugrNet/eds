@@ -143,7 +143,9 @@ public final class ProcessMemberRequest extends Authentication implements Action
      * Default Constructor.
      */
     public ProcessMemberRequest() {
-        // Empty Constructor
+        // Generating JavaDoc requires an explicit Constructor, SonarQube
+        // requires explicit comment in empty methods, hence this comment
+        // for the default, empty, constructor.
     }
 
     /**

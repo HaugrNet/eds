@@ -106,7 +106,9 @@ public final class ProcessCircleRequest extends Authentication implements Circle
      * Default Constructor.
      */
     public ProcessCircleRequest() {
-        // Empty Constructor
+        // Generating JavaDoc requires an explicit Constructor, SonarQube
+        // requires explicit comment in empty methods, hence this comment
+        // for the default, empty, constructor.
     }
 
     /**

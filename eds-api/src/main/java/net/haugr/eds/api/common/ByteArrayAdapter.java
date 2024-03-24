@@ -35,7 +35,9 @@ public final class ByteArrayAdapter implements JsonbAdapter<byte[], String> {
      * Default Constructor.
      */
     public ByteArrayAdapter() {
-        // Empty Constructor
+        // Generating JavaDoc requires an explicit Constructor, SonarQube
+        // requires explicit comment in empty methods, hence this comment
+        // for the default, empty, constructor.
     }
 
     /**

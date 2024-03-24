@@ -22,14 +22,12 @@ import net.haugr.eds.api.common.ReturnCode;
 import net.haugr.eds.api.requests.FetchTrusteeRequest;
 import net.haugr.eds.api.requests.ProcessTrusteeRequest;
 import jakarta.ws.rs.core.Response;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 /**
  * @author Kim Jensen
  * @since EDS 1.0
  */
-@Disabled("Upgrading to Jakarta EE 10 requires a re-write of the Endpoint tests")
 final class TrusteeServiceTest extends BeanSetup {
 
     @Test
@@ -37,8 +35,9 @@ final class TrusteeServiceTest extends BeanSetup {
         final TrusteeService service = prepareTrusteeService(settings, entityManager);
         final ProcessTrusteeRequest request = new ProcessTrusteeRequest();
 
-        final Response response = service.add(request);
-        assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        try (final Response response = service.add(request)) {
+            assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        }
     }
 
     @Test
@@ -46,8 +45,9 @@ final class TrusteeServiceTest extends BeanSetup {
         final TrusteeService service = prepareTrusteeService();
         final ProcessTrusteeRequest request = new ProcessTrusteeRequest();
 
-        final Response response = service.add(request);
-        assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        try (final Response response = service.add(request)) {
+            assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        }
     }
 
     @Test
@@ -55,8 +55,9 @@ final class TrusteeServiceTest extends BeanSetup {
         final TrusteeService service = prepareTrusteeService(settings, entityManager);
         final ProcessTrusteeRequest request = new ProcessTrusteeRequest();
 
-        final Response response = service.alter(request);
-        assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        try (final Response response = service.alter(request)) {
+            assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        }
     }
 
     @Test
@@ -64,8 +65,9 @@ final class TrusteeServiceTest extends BeanSetup {
         final TrusteeService service = prepareTrusteeService(settings, entityManager);
         final ProcessTrusteeRequest request = new ProcessTrusteeRequest();
 
-        final Response response = service.alter(request);
-        assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        try (final Response response = service.alter(request)) {
+            assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        }
     }
 
     @Test
@@ -73,8 +75,9 @@ final class TrusteeServiceTest extends BeanSetup {
         final TrusteeService service = prepareTrusteeService(settings, entityManager);
         final ProcessTrusteeRequest request = new ProcessTrusteeRequest();
 
-        final Response response = service.remove(request);
-        assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        try (final Response response = service.remove(request)) {
+            assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        }
     }
 
     @Test
@@ -82,8 +85,9 @@ final class TrusteeServiceTest extends BeanSetup {
         final TrusteeService service = prepareTrusteeService();
         final ProcessTrusteeRequest request = new ProcessTrusteeRequest();
 
-        final Response response = service.remove(request);
-        assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        try (final Response response = service.remove(request)) {
+            assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        }
     }
 
     @Test
@@ -91,8 +95,9 @@ final class TrusteeServiceTest extends BeanSetup {
         final TrusteeService service = prepareTrusteeService(settings, entityManager);
         final FetchTrusteeRequest request = new FetchTrusteeRequest();
 
-        final Response response = service.fetch(request);
-        assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        try (final Response response = service.fetch(request)) {
+            assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        }
     }
 
     @Test
@@ -100,7 +105,8 @@ final class TrusteeServiceTest extends BeanSetup {
         final TrusteeService service = prepareTrusteeService();
         final FetchTrusteeRequest request = new FetchTrusteeRequest();
 
-        final Response response = service.fetch(request);
-        assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        try (final Response response = service.fetch(request)) {
+            assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        }
     }
 }

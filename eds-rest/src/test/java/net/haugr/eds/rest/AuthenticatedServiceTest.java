@@ -16,19 +16,17 @@
  */
 package net.haugr.eds.rest;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
+import jakarta.ws.rs.core.Response;
 import net.haugr.eds.api.common.ReturnCode;
 import net.haugr.eds.api.requests.Authentication;
-import jakarta.ws.rs.core.Response;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Kim Jensen
  * @since EDS 1.1
  */
-@Disabled("Upgrading to Jakarta EE 10 requires a re-write of the Endpoint tests")
 final class AuthenticatedServiceTest extends BeanSetup {
 
     @Test
@@ -36,8 +34,9 @@ final class AuthenticatedServiceTest extends BeanSetup {
         final AuthenticatedService service = prepareAuthenticatedService(settings, entityManager);
         final Authentication request = new Authentication();
 
-        final Response response = service.authenticated(request);
-        assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        try (final Response response = service.authenticated(request)) {
+            assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        }
     }
 
     @Test
@@ -45,7 +44,8 @@ final class AuthenticatedServiceTest extends BeanSetup {
         final AuthenticatedService service = prepareAuthenticatedService();
         final Authentication request = new Authentication();
 
-        final Response response = service.authenticated(request);
-        assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        try (final Response response = service.authenticated(request)) {
+            assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        }
     }
 }

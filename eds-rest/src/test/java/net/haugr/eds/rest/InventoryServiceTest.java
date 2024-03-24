@@ -16,20 +16,18 @@
  */
 package net.haugr.eds.rest;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
+import jakarta.ws.rs.core.Response;
 import net.haugr.eds.api.common.Constants;
 import net.haugr.eds.api.common.ReturnCode;
 import net.haugr.eds.api.requests.InventoryRequest;
-import jakarta.ws.rs.core.Response;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Kim Jensen
  * @since EDS 1.0
  */
-@Disabled("Upgrading to Jakarta EE 10 requires a re-write of the Endpoint tests")
 final class InventoryServiceTest extends BeanSetup {
 
     @Test
@@ -37,8 +35,9 @@ final class InventoryServiceTest extends BeanSetup {
         final InventoryService service = prepareInventoryService(settings, entityManager);
         final InventoryRequest request = prepareRequest(InventoryRequest.class, Constants.ADMIN_ACCOUNT);
 
-        final Response response = service.inventory(request);
-        assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        try (final Response response = service.inventory(request)) {
+            assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        }
     }
 
     @Test
@@ -46,7 +45,8 @@ final class InventoryServiceTest extends BeanSetup {
         final InventoryService service = prepareInventoryService();
         final InventoryRequest request = prepareRequest(InventoryRequest.class, Constants.ADMIN_ACCOUNT);
 
-        final Response response = service.inventory(request);
-        assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        try (final Response response = service.inventory(request)) {
+            assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        }
     }
 }

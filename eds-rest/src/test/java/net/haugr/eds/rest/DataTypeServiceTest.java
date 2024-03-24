@@ -16,20 +16,18 @@
  */
 package net.haugr.eds.rest;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
+import jakarta.ws.rs.core.Response;
 import net.haugr.eds.api.common.ReturnCode;
 import net.haugr.eds.api.requests.FetchDataTypeRequest;
 import net.haugr.eds.api.requests.ProcessDataTypeRequest;
-import jakarta.ws.rs.core.Response;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Kim Jensen
  * @since EDS 1.0
  */
-@Disabled("Upgrading to Jakarta EE 10 requires a re-write of the Endpoint tests")
 final class DataTypeServiceTest extends BeanSetup {
 
     @Test
@@ -37,8 +35,9 @@ final class DataTypeServiceTest extends BeanSetup {
         final DataTypeService service = prepareDataTypeService(settings, entityManager);
         final ProcessDataTypeRequest request = new ProcessDataTypeRequest();
 
-        final Response response = service.process(request);
-        assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        try (final Response response = service.process(request)) {
+            assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        }
     }
 
     @Test
@@ -46,8 +45,9 @@ final class DataTypeServiceTest extends BeanSetup {
         final DataTypeService service = prepareDataTypeService();
         final ProcessDataTypeRequest request = new ProcessDataTypeRequest();
 
-        final Response response = service.process(request);
-        assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        try (final Response response = service.process(request)) {
+            assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        }
     }
 
     @Test
@@ -55,8 +55,9 @@ final class DataTypeServiceTest extends BeanSetup {
         final DataTypeService service = prepareDataTypeService(settings, entityManager);
         final ProcessDataTypeRequest request = new ProcessDataTypeRequest();
 
-        final Response response = service.delete(request);
-        assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        try (final Response response = service.delete(request)) {
+            assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        }
     }
 
     @Test
@@ -64,8 +65,9 @@ final class DataTypeServiceTest extends BeanSetup {
         final DataTypeService service = prepareDataTypeService();
         final ProcessDataTypeRequest request = new ProcessDataTypeRequest();
 
-        final Response response = service.delete(request);
-        assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        try (final Response response = service.delete(request)) {
+            assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        }
     }
 
     @Test
@@ -73,8 +75,9 @@ final class DataTypeServiceTest extends BeanSetup {
         final DataTypeService service = prepareDataTypeService(settings, entityManager);
         final FetchDataTypeRequest request = new FetchDataTypeRequest();
 
-        final Response response = service.fetch(request);
-        assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        try (final Response response = service.fetch(request)) {
+            assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        }
     }
 
     @Test
@@ -82,7 +85,8 @@ final class DataTypeServiceTest extends BeanSetup {
         final DataTypeService service = prepareDataTypeService();
         final FetchDataTypeRequest request = new FetchDataTypeRequest();
 
-        final Response response = service.fetch(request);
-        assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        try (final Response response = service.fetch(request)) {
+            assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        }
     }
 }

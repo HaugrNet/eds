@@ -22,14 +22,12 @@ import net.haugr.eds.api.common.Constants;
 import net.haugr.eds.api.common.ReturnCode;
 import net.haugr.eds.api.requests.SettingRequest;
 import jakarta.ws.rs.core.Response;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 /**
  * @author Kim Jensen
  * @since EDS 1.0
  */
-@Disabled("Upgrading to Jakarta EE 10 requires a re-write of the Endpoint tests")
 final class SettingServiceTest extends BeanSetup {
 
     @Test
@@ -37,8 +35,9 @@ final class SettingServiceTest extends BeanSetup {
         final SettingService service = prepareSettingService(settings, entityManager);
         final SettingRequest request = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
 
-        final Response response = service.settings(request);
-        assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        try (final Response response = service.settings(request)) {
+            assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        }
     }
 
     @Test
@@ -46,7 +45,8 @@ final class SettingServiceTest extends BeanSetup {
         final SettingService service = prepareSettingService();
         final SettingRequest request = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
 
-        final Response response = service.settings(request);
-        assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        try (final Response response = service.settings(request)) {
+            assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        }
     }
 }

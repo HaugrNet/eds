@@ -22,14 +22,12 @@ import net.haugr.eds.api.common.Constants;
 import net.haugr.eds.api.common.ReturnCode;
 import net.haugr.eds.api.requests.MasterKeyRequest;
 import jakarta.ws.rs.core.Response;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 /**
  * @author Kim Jensen
  * @since EDS 1.0
  */
-@Disabled("Upgrading to Jakarta EE 10 requires a re-write of the Endpoint tests")
 final class MasterKeyServiceTest extends BeanSetup {
 
     @Test
@@ -38,8 +36,9 @@ final class MasterKeyServiceTest extends BeanSetup {
         final MasterKeyRequest request = prepareRequest(MasterKeyRequest.class, Constants.ADMIN_ACCOUNT);
         request.setSecret(Constants.ADMIN_ACCOUNT.getBytes(settings.getCharset()));
 
-        final Response response = service.masterKey(request);
-        assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        try (final Response response = service.masterKey(request)) {
+            assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        }
     }
 
     @Test
@@ -48,7 +47,8 @@ final class MasterKeyServiceTest extends BeanSetup {
         final MasterKeyRequest request = prepareRequest(MasterKeyRequest.class, Constants.ADMIN_ACCOUNT);
         request.setSecret(Constants.ADMIN_ACCOUNT.getBytes(settings.getCharset()));
 
-        final Response response = service.masterKey(request);
-        assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        try (final Response response = service.masterKey(request)) {
+            assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        }
     }
 }

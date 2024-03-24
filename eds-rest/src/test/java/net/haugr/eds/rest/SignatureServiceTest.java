@@ -23,14 +23,12 @@ import net.haugr.eds.api.requests.FetchSignatureRequest;
 import net.haugr.eds.api.requests.SignRequest;
 import net.haugr.eds.api.requests.VerifyRequest;
 import jakarta.ws.rs.core.Response;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 /**
  * @author Kim Jensen
  * @since EDS 1.0
  */
-@Disabled("Upgrading to Jakarta EE 10 requires a re-write of the Endpoint tests")
 final class SignatureServiceTest extends BeanSetup {
 
     @Test
@@ -38,8 +36,9 @@ final class SignatureServiceTest extends BeanSetup {
         final SignatureService service = prepareSignatureService(settings, entityManager);
         final SignRequest request = new SignRequest();
 
-        final Response response = service.sign(request);
-        assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        try (final Response response = service.sign(request)) {
+            assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        }
     }
 
     @Test
@@ -47,8 +46,9 @@ final class SignatureServiceTest extends BeanSetup {
         final SignatureService service = prepareSignatureService();
         final SignRequest request = new SignRequest();
 
-        final Response response = service.sign(request);
-        assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        try (final Response response = service.sign(request)) {
+            assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        }
     }
 
     @Test
@@ -56,8 +56,9 @@ final class SignatureServiceTest extends BeanSetup {
         final SignatureService service = prepareSignatureService(settings, entityManager);
         final VerifyRequest request = new VerifyRequest();
 
-        final Response response = service.verify(request);
-        assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        try (final Response response = service.verify(request)) {
+            assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        }
     }
 
     @Test
@@ -65,8 +66,9 @@ final class SignatureServiceTest extends BeanSetup {
         final SignatureService service = prepareSignatureService();
         final VerifyRequest request = new VerifyRequest();
 
-        final Response response = service.verify(request);
-        assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        try (final Response response = service.verify(request)) {
+            assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        }
     }
 
     @Test
@@ -74,8 +76,9 @@ final class SignatureServiceTest extends BeanSetup {
         final SignatureService service = prepareSignatureService(settings, entityManager);
         final FetchSignatureRequest request = new FetchSignatureRequest();
 
-        final Response response = service.fetch(request);
-        assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        try (final Response response = service.fetch(request)) {
+            assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        }
     }
 
     @Test
@@ -83,7 +86,8 @@ final class SignatureServiceTest extends BeanSetup {
         final SignatureService service = prepareSignatureService();
         final FetchSignatureRequest request = new FetchSignatureRequest();
 
-        final Response response = service.fetch(request);
-        assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        try (final Response response = service.fetch(request)) {
+            assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        }
     }
 }

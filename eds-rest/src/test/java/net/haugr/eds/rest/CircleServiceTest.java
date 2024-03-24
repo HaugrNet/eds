@@ -22,14 +22,12 @@ import net.haugr.eds.api.common.ReturnCode;
 import net.haugr.eds.api.requests.FetchCircleRequest;
 import net.haugr.eds.api.requests.ProcessCircleRequest;
 import jakarta.ws.rs.core.Response;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 /**
  * @author Kim Jensen
  * @since EDS 1.0
  */
-@Disabled("Upgrading to Jakarta EE 10 requires a re-write of the Endpoint tests")
 final class CircleServiceTest extends BeanSetup {
 
     @Test
@@ -37,8 +35,9 @@ final class CircleServiceTest extends BeanSetup {
         final CircleService service = prepareCircleService(settings, entityManager);
         final ProcessCircleRequest request = new ProcessCircleRequest();
 
-        final Response response = service.create(request);
-        assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        try (final Response response = service.create(request)) {
+            assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        }
     }
 
     @Test
@@ -46,8 +45,9 @@ final class CircleServiceTest extends BeanSetup {
         final CircleService service = prepareCircleService();
         final ProcessCircleRequest request = new ProcessCircleRequest();
 
-        final Response response = service.create(request);
-        assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        try (final Response response = service.create(request)) {
+            assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        }
     }
 
     @Test
@@ -55,8 +55,9 @@ final class CircleServiceTest extends BeanSetup {
         final CircleService service = prepareCircleService(settings, entityManager);
         final ProcessCircleRequest request = new ProcessCircleRequest();
 
-        final Response response = service.update(request);
-        assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        try (final Response response = service.update(request)) {
+            assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        }
     }
 
     @Test
@@ -64,8 +65,9 @@ final class CircleServiceTest extends BeanSetup {
         final CircleService service = prepareCircleService();
         final ProcessCircleRequest request = new ProcessCircleRequest();
 
-        final Response response = service.update(request);
-        assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        try (final Response response = service.update(request)) {
+            assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        }
     }
 
     @Test
@@ -73,8 +75,9 @@ final class CircleServiceTest extends BeanSetup {
         final CircleService service = prepareCircleService(settings, entityManager);
         final ProcessCircleRequest request = new ProcessCircleRequest();
 
-        final Response response = service.delete(request);
-        assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        try (final Response response = service.delete(request)) {
+            assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        }
     }
 
     @Test
@@ -82,8 +85,9 @@ final class CircleServiceTest extends BeanSetup {
         final CircleService service = prepareCircleService();
         final ProcessCircleRequest request = new ProcessCircleRequest();
 
-        final Response response = service.delete(request);
-        assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        try (final Response response = service.delete(request)) {
+            assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        }
     }
 
     @Test
@@ -91,8 +95,9 @@ final class CircleServiceTest extends BeanSetup {
         final CircleService service = prepareCircleService(settings, entityManager);
         final FetchCircleRequest request = new FetchCircleRequest();
 
-        final Response response = service.fetch(request);
-        assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        try (final Response response = service.fetch(request)) {
+            assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        }
     }
 
     @Test
@@ -100,7 +105,8 @@ final class CircleServiceTest extends BeanSetup {
         final CircleService service = prepareCircleService();
         final FetchCircleRequest request = new FetchCircleRequest();
 
-        final Response response = service.fetch(request);
-        assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        try (final Response response = service.fetch(request)) {
+            assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        }
     }
 }

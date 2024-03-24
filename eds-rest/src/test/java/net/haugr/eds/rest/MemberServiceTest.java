@@ -22,14 +22,12 @@ import net.haugr.eds.api.common.ReturnCode;
 import net.haugr.eds.api.requests.FetchMemberRequest;
 import net.haugr.eds.api.requests.ProcessMemberRequest;
 import jakarta.ws.rs.core.Response;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 /**
  * @author Kim Jensen
  * @since EDS 1.0
  */
-@Disabled("Upgrading to Jakarta EE 10 requires a re-write of the Endpoint tests")
 final class MemberServiceTest extends BeanSetup {
 
     @Test
@@ -37,8 +35,9 @@ final class MemberServiceTest extends BeanSetup {
         final MemberService service = prepareMemberService(settings, entityManager);
         final ProcessMemberRequest request = new ProcessMemberRequest();
 
-        final Response response = service.create(request);
-        assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        try (final Response response = service.create(request)) {
+            assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        }
     }
 
     @Test
@@ -46,8 +45,9 @@ final class MemberServiceTest extends BeanSetup {
         final MemberService service = prepareMemberService();
         final ProcessMemberRequest request = new ProcessMemberRequest();
 
-        final Response response = service.create(request);
-        assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        try (final Response response = service.create(request)) {
+            assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        }
     }
 
     @Test
@@ -55,8 +55,9 @@ final class MemberServiceTest extends BeanSetup {
         final MemberService service = prepareMemberService(settings, entityManager);
         final ProcessMemberRequest request = new ProcessMemberRequest();
 
-        final Response response = service.invite(request);
-        assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        try (final Response response = service.invite(request)) {
+            assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        }
     }
 
     @Test
@@ -64,8 +65,9 @@ final class MemberServiceTest extends BeanSetup {
         final MemberService service = prepareMemberService();
         final ProcessMemberRequest request = new ProcessMemberRequest();
 
-        final Response response = service.invite(request);
-        assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        try (final Response response = service.invite(request)) {
+            assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        }
     }
 
     @Test
@@ -73,8 +75,9 @@ final class MemberServiceTest extends BeanSetup {
         final MemberService service = prepareMemberService(settings, entityManager);
         final ProcessMemberRequest request = new ProcessMemberRequest();
 
-        final Response response = service.login(request);
-        assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        try (final Response response = service.login(request)) {
+            assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        }
     }
 
     @Test
@@ -82,8 +85,9 @@ final class MemberServiceTest extends BeanSetup {
         final MemberService service = prepareMemberService();
         final ProcessMemberRequest request = new ProcessMemberRequest();
 
-        final Response response = service.login(request);
-        assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        try (final Response response = service.login(request)) {
+            assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        }
     }
 
     @Test
@@ -91,8 +95,9 @@ final class MemberServiceTest extends BeanSetup {
         final MemberService service = prepareMemberService(settings, entityManager);
         final ProcessMemberRequest request = new ProcessMemberRequest();
 
-        final Response response = service.logout(request);
-        assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        try (final Response response = service.logout(request)) {
+            assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        }
     }
 
     @Test
@@ -100,8 +105,9 @@ final class MemberServiceTest extends BeanSetup {
         final MemberService service = prepareMemberService();
         final ProcessMemberRequest request = new ProcessMemberRequest();
 
-        final Response response = service.logout(request);
-        assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        try (final Response response = service.logout(request)) {
+            assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        }
     }
 
     @Test
@@ -109,8 +115,9 @@ final class MemberServiceTest extends BeanSetup {
         final MemberService service = prepareMemberService(settings, entityManager);
         final ProcessMemberRequest request = new ProcessMemberRequest();
 
-        final Response response = service.alter(request);
-        assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        try (final Response response = service.alter(request)) {
+            assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        }
     }
 
     @Test
@@ -118,8 +125,9 @@ final class MemberServiceTest extends BeanSetup {
         final MemberService service = prepareMemberService();
         final ProcessMemberRequest request = new ProcessMemberRequest();
 
-        final Response response = service.alter(request);
-        assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        try (final Response response = service.alter(request)) {
+            assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        }
     }
 
     @Test
@@ -127,8 +135,9 @@ final class MemberServiceTest extends BeanSetup {
         final MemberService service = prepareMemberService(settings, entityManager);
         final ProcessMemberRequest request = new ProcessMemberRequest();
 
-        final Response response = service.update(request);
-        assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        try (final Response response = service.update(request)) {
+            assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        }
     }
 
     @Test
@@ -136,8 +145,9 @@ final class MemberServiceTest extends BeanSetup {
         final MemberService service = prepareMemberService();
         final ProcessMemberRequest request = new ProcessMemberRequest();
 
-        final Response response = service.update(request);
-        assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        try (final Response response = service.update(request)) {
+            assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        }
     }
 
     @Test
@@ -145,8 +155,9 @@ final class MemberServiceTest extends BeanSetup {
         final MemberService service = prepareMemberService(settings, entityManager);
         final ProcessMemberRequest request = new ProcessMemberRequest();
 
-        final Response response = service.invalidate(request);
-        assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        try (final Response response = service.invalidate(request)) {
+            assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        }
     }
 
     @Test
@@ -154,8 +165,9 @@ final class MemberServiceTest extends BeanSetup {
         final MemberService service = prepareMemberService();
         final ProcessMemberRequest request = new ProcessMemberRequest();
 
-        final Response response = service.invalidate(request);
-        assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        try (final Response response = service.invalidate(request)) {
+            assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        }
     }
 
     @Test
@@ -163,8 +175,9 @@ final class MemberServiceTest extends BeanSetup {
         final MemberService service = prepareMemberService(settings, entityManager);
         final ProcessMemberRequest request = new ProcessMemberRequest();
 
-        final Response response = service.delete(request);
-        assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        try (final Response response = service.delete(request)) {
+            assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        }
     }
 
     @Test
@@ -172,8 +185,9 @@ final class MemberServiceTest extends BeanSetup {
         final MemberService service = prepareMemberService();
         final ProcessMemberRequest request = new ProcessMemberRequest();
 
-        final Response response = service.delete(request);
-        assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        try (final Response response = service.delete(request)) {
+            assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        }
     }
 
     @Test
@@ -181,8 +195,9 @@ final class MemberServiceTest extends BeanSetup {
         final MemberService service = prepareMemberService(settings, entityManager);
         final FetchMemberRequest request = new FetchMemberRequest();
 
-        final Response response = service.fetch(request);
-        assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        try (final Response response = service.fetch(request)) {
+            assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        }
     }
 
     @Test
@@ -190,7 +205,8 @@ final class MemberServiceTest extends BeanSetup {
         final MemberService service = prepareMemberService();
         final FetchMemberRequest request = new FetchMemberRequest();
 
-        final Response response = service.fetch(request);
-        assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        try (final Response response = service.fetch(request)) {
+            assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
+        }
     }
 }

@@ -352,8 +352,8 @@
                             <goal>report</goal>
                         </goals>
                         <configuration>
-                            <dataFile>${project.basedir}/../target/jacoco.exec</dataFile>
-                            <outputDirectory>${project.basedir}/../target/jacoco</outputDirectory>
+                            <dataFile>${project.basedir}/target/jacoco.exec</dataFile>
+                            <outputDirectory>${project.basedir}/target/jacoco</outputDirectory>
                             <includes>
                                 <include>net.haugr.eds.*</include>
                             </includes>

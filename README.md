@@ -3,8 +3,8 @@
 [![CircleCI](https://circleci.com/gh/HaugrNet/eds.png?style=shield)](https://circleci.com/gh/HaugrNet/eds)
 [![SonarQube](https://sonarcloud.io/api/project_badges/measure?project=net.haugr:eds&metric=alert_status)](https://sonarcloud.io/dashboard?id=net.haugr:eds)
 [![SonarQube](https://sonarcloud.io/api/project_badges/measure?project=net.haugr:eds&metric=coverage)](https://sonarcloud.io/dashboard?id=net.haugr:eds)
-[![Coverity](https://scan.coverity.com/projects/28136/badge.svg)](https://scan.coverity.com/projects/haugrnet-eds)
 [![Software License](https://img.shields.io/badge/license-Apache+License+2.0-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0)
+<!--[![Coverity](https://scan.coverity.com/projects/28136/badge.svg)](https://scan.coverity.com/projects/haugrnet-eds)-->
 
 [EDS](https://haugr.net/), Encrypted Data Share, works as a "PGP for the
 Cloud". It is designed as a backend component with the vision that it should be
@@ -23,17 +23,19 @@ it can be used to store either files between users or data objects between apps
 or applications. This makes EDS the perfect companion for anyone who have Data
 Protection & Privacy concerns, such as GDPR.
 
-EDS is written in Java 17 / Jakarta EE 10, with no third-part dependencies, meaning
-it can run on any Host or in any Cloud where a Java EE Container is
+EDS is written in Java 21 / Jakarta EE 10, with no third-part dependencies, meaning
+it can run on any Host or in any Cloud where a Jakarta EE Container is
 available. Currently, only the [PostgreSQL](https://www.postgresql.org/) database
-is supported, but thanks to the flexibility of Java EE, it is possible to use any
+is supported, but thanks to the flexibility of Jakarta EE, it is possible to use any
 database desired. Testing of EDS has been done with [WildFly](http://www.wildfly.org/).
 
 ## Build, Install and Run
 
 The final version 1.2 can be downloaded from [haugr.net](https://haugr.net/),
 version 2.0 will be a major upgrade, with new domain, project name, and various
-internal changes that makes it a breaking update. The build requires Java JDK 17,
+internal changes that makes it a breaking update. Initial development of version
+2.0 has completed, with no more changes in the pipeline. Next phase will focus on
+testing to guarantee that the stability will remain high. The build requires Java 21,
 and [Maven](https://maven.apache.org/).
 
 In the accessories/release folder, there is a number of files, which is used to
@@ -99,8 +101,9 @@ deployed in a "hostile" environment.
 
 ## Release Plan
 
-This is the EDS 2.0 development branch, with the these features planned:
+This is the EDS 2.0 development branch, with the these features completed:
 
+* Migrate code base to Java 21
 * [Migrate code base from Java 8 to Java 11](https://github.com/HaugrNet/eds/issues/71)
 * [Upgrade code base to Java 17](https://github.com/HaugrNet/eds/issues/82)
 * [Migrate from Java EE 7 to Jakarta EE 8](https://github.com/HaugrNet/eds/issues/70)
@@ -108,10 +111,6 @@ This is the EDS 2.0 development branch, with the these features planned:
 * [Convert Date Objects to Java 8+ Time Objects](https://github.com/HaugrNet/eds/issues/69)
 * [Migrate to the haugr.net domain](https://github.com/HaugrNet/eds/issues/72)
 * [Rename Packages & Project to EDS](https://github.com/HaugrNet/eds/issues/80)
-
-Even though the code base will be migrated, and new features will only be added
-in the 2.0+ releases, issues discovered in the 1.x releases will be addressed
-until [September 2023](https://adoptopenjdk.net/support.html).
 
 ## Wish to join
 
@@ -121,10 +120,9 @@ please contact Kim Jensen (see below).
 
 ### Code Quality
 
-Code quality if very important, which means that the goal is 200% test coverage,
-which may sound ridiculous. However, so that both test suites (Junit & FitNesse)
-will each cover as close to 100% as possible. Of course, external testing cannot
-and should not cover the same bases as the standard tests.
+Code quality if very important, which is why testing & quality checks are very
+important. Unfortunately, with version 2.0, it is time to consider alternatives
+to FitNesse & Coverity from Synopsis, since neither supports Java 21.
 
 The code is checked against as many analysis tools as possible. The final
 code must have 0 issues of any kind - before it is considered ready to be
@@ -137,15 +135,10 @@ but often it helps to add inline comments to explain intentions and reasoning
 for choices made. Commenting out code is banned, if it is commented out, it
 is meaningless and should be removed.
 
-### Style Guide
-
-EDS is developed using IntelliJ IDEA & a local SonarQube instance. The styles
-used, and the SonarQube Quality Profile can be found in the accessories folder.
-
 ## Software License
 
 The EDS is released under Apache License 2 or APL2.
 
 ## Contact
 
-Kim.Jensen at haugr.net
+Kim dot Jensen at haugr dot net

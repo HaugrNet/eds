@@ -42,7 +42,7 @@ class SignatureTest {
     }
 
     @Test
-    void createSignatureWithoutExpiration() {
+    void testCreateSignatureWithoutExpiration() {
         final var document = "My Wonderful Document to sign without expiration.";
         final var signature = signDocument(document, null);
 
@@ -51,7 +51,7 @@ class SignatureTest {
     }
 
     @Test
-    void createSignatureWithExpiration() {
+    void testCreateSignatureWithExpiration() {
         final var document = "My Wonderful Document to sign";
         final var expires = Converter.convertDate(Utilities.newDate().plusDays(2));
         final var signature = signDocument(document, expires);
@@ -61,7 +61,7 @@ class SignatureTest {
     }
 
     @Test
-    void createSignatureAlreadyExpired() {
+    void testCreateSignatureAlreadyExpired() {
         final var document = "My already expired Document to sign.";
         final var expires = Converter.convertDate(Utilities.newDate().minusDays(2));
         final var signature = signDocument(document, expires);

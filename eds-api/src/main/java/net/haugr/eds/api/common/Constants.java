@@ -72,7 +72,7 @@ public final class Constants {
      * <p>All Id's must be compliant with a standard UUID Pattern, which this
      * regular expression matches.</p>
      */
-    public static final String ID_PATTERN_REGEX = "[\\da-z]{8}-[\\da-z]{4}-[\\da-z]{4}-[\\da-z]{4}-[\\da-z]{12}";
+    public static final String ID_PATTERN_REGEX = "\\b[0-9a-fA-F]{8}\\b-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-\\b[0-9a-fA-F]{12}\\b";
 
     /**
      * <p>Pattern to test if a given value matches a UUID, which is what EDS

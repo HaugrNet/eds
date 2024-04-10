@@ -19,8 +19,6 @@ package net.haugr.eds.core.jce;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.IOException;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -28,23 +26,24 @@ import java.nio.file.StandardOpenOption;
 import net.haugr.eds.api.common.ReturnCode;
 import net.haugr.eds.core.exceptions.EDSException;
 import net.haugr.eds.core.model.Settings;
+import net.haugr.eds.core.setup.DatabaseSetup;
 import org.junit.jupiter.api.Test;
 
 /**
  * @author Kim Jensen
  * @since EDS 2.0
  */
-final class MasterKeyTest {
+final class MasterKeyTest extends DatabaseSetup {
 
     private static final String URL_CONTENT = "This is my test data";
 
     @Test
     void testReadMasterKeySecretFromUrl() {
         final var settings = Settings.getInstance();
-        final MasterKey masterKey = createInstance(settings);
+        final MasterKey masterKey = prepareNewMasterKeyInstance(settings);
         final String stringURL = prepareDataUrl();
         final byte[] bytes = MasterKey.readMasterKeySecretFromUrl(stringURL);
-        SecretEDSKey key = masterKey.generateMasterKey(bytes);
+        final SecretEDSKey key = masterKey.generateMasterKey(bytes);
         masterKey.setKey(key);
 
         final String salt = masterKey.getKey().getSalt().getArmored();
@@ -59,17 +58,6 @@ final class MasterKeyTest {
 
             return uri.toString();
         } catch (IOException e) {
-            throw new EDSException(ReturnCode.ERROR, e);
-        }
-    }
-
-    private MasterKey createInstance(final Settings settings) {
-        Constructor<?> constructor = MasterKey.class.getDeclaredConstructors()[0];
-        constructor.setAccessible(true);
-
-        try {
-            return (MasterKey) constructor.newInstance(settings);
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
             throw new EDSException(ReturnCode.ERROR, e);
         }
     }

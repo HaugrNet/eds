@@ -49,6 +49,8 @@ public final class MasterKeyManager extends AbstractManager<CommonDao, MasterKey
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MasterKeyManager.class);
 
+    private final MasterKey masterKey = MasterKey.getInstance(settings);
+
     public MasterKeyManager(final Settings settings, final EntityManager entityManager) {
         super(settings, new CommonDao(entityManager));
     }
@@ -72,7 +74,6 @@ public final class MasterKeyManager extends AbstractManager<CommonDao, MasterKey
         // Primarily, as updating it to an invalid key can be devastating. So
         // it is initially being saved, just in case...
         // What if the keys are the same ?
-        final MasterKey masterKey = MasterKey.getInstance(settings);
         final SecretEDSKey oldMasterKey = masterKey.getKey();
         final SecretEDSKey newMasterKey = prepareNewMasterKey(masterKey, request);
 

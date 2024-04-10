@@ -54,12 +54,6 @@ import java.util.UUID;
  * error messages are truncated and only contain a fraction of the information
  * as the Linux variant contains.</p>
  *
- * <p>Note; The Class Under Test, is one changes the underlying master key, an
- * operation that cannot be tested parallel with other tests, as it affects
- * their expected behavior when the master key is suddenly altered. Hence, it
- * is moved out of the Core modules and into this module, which is not tested
- * using the parallel testing mechanism from the Maven Surefire plugin.</p>
- *
  * @author Kim Jensen
  * @since EDS 1.1
  */
@@ -68,7 +62,7 @@ final class ManagementBeanMasterKeyTest extends DatabaseSetup {
 
     @Test
     void testUpdateMasterKeyWithNullRequest() {
-        final ManagementBean bean = prepareManagementBean();
+        final ManagementBean bean = prepareManagementBeanWithNewMasterKey();
 
         final MasterKeyResponse response = bean.masterKey(null);
         assertEquals(ReturnCode.VERIFICATION_WARNING.getCode(), response.getReturnCode());
@@ -78,6 +72,7 @@ final class ManagementBeanMasterKeyTest extends DatabaseSetup {
     @Test
     void testUpdateMasterKeyWithEmptyRequest() {
         final ManagementBean bean = prepareManagementBean();
+        inject(bean, prepareNewMasterKeyInstance(settings));
         final MasterKeyRequest request = new MasterKeyRequest();
 
         final MasterKeyResponse response = bean.masterKey(request);
@@ -91,7 +86,7 @@ final class ManagementBeanMasterKeyTest extends DatabaseSetup {
 
     @Test
     void testUpdateMasterKeyAsMember() {
-        final ManagementBean bean = prepareManagementBean();
+        final ManagementBean bean = prepareManagementBeanWithNewMasterKey();
         final MasterKeyRequest request = prepareRequest(MasterKeyRequest.class, MEMBER_1);
         request.setSecret("New MasterKey".getBytes(Charset.defaultCharset()));
 
@@ -102,7 +97,7 @@ final class ManagementBeanMasterKeyTest extends DatabaseSetup {
 
     @Test
     void testUpdateMasterKeyAsAdminWithWrongCredentials() {
-        final ManagementBean bean = prepareManagementBean();
+        final ManagementBean bean = prepareManagementBeanWithNewMasterKey();
         final MasterKeyRequest request = prepareRequest(MasterKeyRequest.class, Constants.ADMIN_ACCOUNT);
         request.setCredential("root".getBytes(Charset.defaultCharset()));
         request.setSecret("New MasterKey".getBytes(Charset.defaultCharset()));
@@ -120,7 +115,7 @@ final class ManagementBeanMasterKeyTest extends DatabaseSetup {
             dao.delete(member);
         }
 
-        final ManagementBean bean = prepareManagementBean();
+        final ManagementBean bean = prepareManagementBeanWithNewMasterKey();
         final MasterKeyRequest request = prepareRequest(MasterKeyRequest.class, Constants.ADMIN_ACCOUNT);
         request.setSecret(request.getCredential());
         final MasterKeyResponse response = bean.masterKey(request);
@@ -200,7 +195,7 @@ final class ManagementBeanMasterKeyTest extends DatabaseSetup {
     @Test
     void testStartingMasterKeyWithURLSuccess() throws IOException {
         final String file = tempDir() + "masterKey.bin";
-        final MasterKey defaultMasterKey = MasterKey.getInstance(settings);
+        final MasterKey defaultMasterKey = prepareNewMasterKeyInstance(settings);
         final Settings mySettings = newSettings();
         mySettings.set(StandardSetting.MASTERKEY_URL.getKey(), "file://" + file);
         final Path path = Paths.get(file);
@@ -227,7 +222,7 @@ final class ManagementBeanMasterKeyTest extends DatabaseSetup {
 
     @Test
     void testUpdateMasterKeyToCurrent() {
-        final ManagementBean bean = prepareManagementBean();
+        final ManagementBean bean = prepareManagementBeanWithNewMasterKey();
         final MasterKeyRequest request = prepareRequest(MasterKeyRequest.class, Constants.ADMIN_ACCOUNT);
         request.setSecret(request.getCredential());
 
@@ -239,7 +234,7 @@ final class ManagementBeanMasterKeyTest extends DatabaseSetup {
     @Test
     void testUpdateMasterKeyWithUnreachableURL() {
         final String path = tempDir() + "not_existing_file.bin";
-        final ManagementBean bean = prepareManagementBean();
+        final ManagementBean bean = prepareManagementBeanWithNewMasterKey();
         final MasterKeyRequest request = prepareRequest(MasterKeyRequest.class, Constants.ADMIN_ACCOUNT);
         request.setUrl("file://" + path);
 

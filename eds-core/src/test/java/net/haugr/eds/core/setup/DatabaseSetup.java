@@ -134,10 +134,32 @@ public class DatabaseSetup {
         }
     }
 
+
+    protected static MasterKey prepareNewMasterKeyInstance(final Settings settings) {
+        final Constructor<?> constructor = MasterKey.class.getDeclaredConstructors()[0];
+        constructor.setAccessible(true);
+
+        try {
+            return (MasterKey) constructor.newInstance(settings);
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+            throw new EDSException(ReturnCode.ERROR, e);
+        }
+    }
+
     protected ManagementBean prepareManagementBean(final Settings... settings) {
         final ManagementBean bean = new ManagementBean();
         inject(bean, entityManager);
         inject(bean, ((settings != null) && (settings.length == 1)) ? settings[0] : this.settings);
+
+        return bean;
+    }
+
+    protected ManagementBean prepareManagementBeanWithNewMasterKey(final Settings... settings) {
+        final Settings instanceSettings = ((settings != null) && (settings.length == 1)) ? settings[0] : this.settings;
+        final ManagementBean bean = new ManagementBean();
+        inject(bean, prepareNewMasterKeyInstance(instanceSettings));
+        inject(bean, entityManager);
+        inject(bean, instanceSettings);
 
         return bean;
     }

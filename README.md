@@ -19,7 +19,7 @@ basic mechanism as PGP, combining Asymmetric & Symmetric keys, it is possible
 for multiple parties to exchange data safely and securely.
 
 Since EDS only focused on bytes and does not have any care for more information,
-it can be used to store either files between users or data objects between apps
+it can be used to share either files between users, or data objects between apps
 or applications. This makes EDS the perfect companion for anyone who have Data
 Protection & Privacy concerns, such as GDPR.
 
@@ -65,7 +65,7 @@ mvn clean verify
 ```
 
 Using the WildFly script to deploy the correct WAR file.
-Now copy the eds.war file in place.
+Now copy the ```eds.war``` file in place.
 
 ```
 export PATH=[ / path/to/eds/sources ]/accessories/release/bin:${PATH}

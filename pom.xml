@@ -1,5 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<!--
+  ~ CWS, Cryptographic Web Share - open source Cryptographic Sharing system.
+  ~ Copyright (c) 2016-2024, haugr.net
+  ~ mailto: cws AT haugr DOT net
+  ~
+  ~ CWS is free software; you can redistribute it and/or modify it under the
+  ~ terms of the Apache License, as published by the Apache Software Foundation.
+  ~
+  ~ CWS is distributed in the hope that it will be useful, but WITHOUT ANY
+  ~ WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+  ~ FOR A PARTICULAR PURPOSE. See the Apache License for more details.
+  ~
+  ~ You should have received a copy of the Apache License, version 2, along with
+  ~ this program; If not, you can download a copy of the License
+  ~ here: https://www.apache.org/licenses/
+  -->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>net.haugr</groupId>
     <artifactId>eds</artifactId>
@@ -379,6 +397,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
+                        <version>3.2.6</version>
                         <configuration>
                             <useAgent>true</useAgent>
                             <skip>false</skip>
@@ -396,6 +415,7 @@
                     <plugin>
                         <groupId>org.sonatype.plugins</groupId>
                         <artifactId>nexus-staging-maven-plugin</artifactId>
+                        <version>1.7.0</version>
                         <extensions>true</extensions>
                         <configuration>
                             <serverId>ossrh</serverId>

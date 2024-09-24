@@ -1,12 +1,12 @@
 /*
- * EDS, Encrypted Data Share - open source Cryptographic Sharing system.
+ * CWS, Cryptographic Web Share - open source Cryptographic Sharing system.
  * Copyright (c) 2016-2024, haugr.net
- * mailto: eds AT haugr DOT net
+ * mailto: cws AT haugr DOT net
  *
- * EDS is free software; you can redistribute it and/or modify it under the
+ * CWS is free software; you can redistribute it and/or modify it under the
  * terms of the Apache License, as published by the Apache Software Foundation.
  *
- * EDS is distributed in the hope that it will be useful, but WITHOUT ANY
+ * CWS is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the Apache License for more details.
  *
@@ -43,10 +43,11 @@ import java.util.Map;
  * @author Kim Jensen
  * @since EDS 1.2
  */
+@SuppressWarnings("SqlSourceToSinkFlow")
 public final class FakeEntityManager implements EntityManager {
 
-    private static final String persistenceName = "net.haugr.jpa";
-    private static final EntityManagerFactory FACTORY = Persistence.createEntityManagerFactory(persistenceName);
+    private static final String PERSISTENCE_NAME = "net.haugr.jpa";
+    private static final EntityManagerFactory FACTORY = Persistence.createEntityManagerFactory(PERSISTENCE_NAME);
     private final EntityManager entityManager = FACTORY.createEntityManager();
 
     /**

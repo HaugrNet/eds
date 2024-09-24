@@ -1,12 +1,12 @@
 /*
- * EDS, Encrypted Data Share - open source Cryptographic Sharing system.
+ * CWS, Cryptographic Web Share - open source Cryptographic Sharing system.
  * Copyright (c) 2016-2024, haugr.net
- * mailto: eds AT haugr DOT net
+ * mailto: cws AT haugr DOT net
  *
- * EDS is free software; you can redistribute it and/or modify it under the
+ * CWS is free software; you can redistribute it and/or modify it under the
  * terms of the Apache License, as published by the Apache Software Foundation.
  *
- * EDS is distributed in the hope that it will be useful, but WITHOUT ANY
+ * CWS is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the Apache License for more details.
  *
@@ -36,7 +36,7 @@ public final class FakeTimer implements Timer {
      */
     @Override
     public void cancel() throws IllegalStateException, EJBException {
-
+        // Intentionally not implemented, not needed for the testing
     }
 
     /**

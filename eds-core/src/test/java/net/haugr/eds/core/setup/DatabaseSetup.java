@@ -1,12 +1,12 @@
 /*
- * EDS, Encrypted Data Share - open source Cryptographic Sharing system.
+ * CWS, Cryptographic Web Share - open source Cryptographic Sharing system.
  * Copyright (c) 2016-2024, haugr.net
- * mailto: eds AT haugr DOT net
+ * mailto: cws AT haugr DOT net
  *
- * EDS is free software; you can redistribute it and/or modify it under the
+ * CWS is free software; you can redistribute it and/or modify it under the
  * terms of the Apache License, as published by the Apache Software Foundation.
  *
- * EDS is distributed in the hope that it will be useful, but WITHOUT ANY
+ * CWS is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the Apache License for more details.
  *
@@ -110,8 +110,8 @@ public class DatabaseSetup {
     private static final MemberRole DEFAULT_ROLE = MemberRole.STANDARD;
     private static final String DEFAULT_SECRET = "My Super Secret";
     private static final String TIMESTAMP = "yyyyMMddHHmmssSSS";
-    private static final String persistenceName = "net.haugr.jpa";
-    private static final EntityManagerFactory FACTORY = Persistence.createEntityManagerFactory(persistenceName);
+    private static final String PERSISTENCE_NAME = "net.haugr.jpa";
+    private static final EntityManagerFactory FACTORY = Persistence.createEntityManagerFactory(PERSISTENCE_NAME);
     protected final EntityManager entityManager = FACTORY.createEntityManager();
     protected final CommonDao dao = new CommonDao(entityManager);
     protected final Settings settings = Settings.getInstance();
@@ -386,12 +386,10 @@ public class DatabaseSetup {
                 setField(instance, field, value);
             } else {
                 for (final Annotation annotation : field.getAnnotations()) {
-                    if ((annotation instanceof PersistenceContext) && ((value instanceof EntityManager))) {
+                    if ((annotation instanceof PersistenceContext) && (value instanceof EntityManager)) {
                         setField(instance, field, value);
-                    } else if (annotation instanceof Resource) {
-                        if ((value instanceof TimerService) || (value instanceof ThreadFactory)) {
-                            setField(instance, field, value);
-                        }
+                    } else if ((annotation instanceof Resource) && ((value instanceof TimerService) || (value instanceof ThreadFactory))) {
+                        setField(instance, field, value);
                     }
                 }
             }

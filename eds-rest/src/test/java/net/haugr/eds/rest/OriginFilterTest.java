@@ -1,12 +1,12 @@
 /*
- * EDS, Encrypted Data Share - open source Cryptographic Sharing system.
+ * CWS, Cryptographic Web Share - open source Cryptographic Sharing system.
  * Copyright (c) 2016-2024, haugr.net
- * mailto: eds AT haugr DOT net
+ * mailto: cws AT haugr DOT net
  *
- * EDS is free software; you can redistribute it and/or modify it under the
+ * CWS is free software; you can redistribute it and/or modify it under the
  * terms of the Apache License, as published by the Apache Software Foundation.
  *
- * EDS is distributed in the hope that it will be useful, but WITHOUT ANY
+ * CWS is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the Apache License for more details.
  *
@@ -149,6 +149,7 @@ final class OriginFilterTest extends DatabaseSetup {
          */
         @Override
         public void setCharacterEncoding(final String env) {
+            // Intentionally not implemented, not needed for the testing
         }
 
         /**
@@ -276,6 +277,7 @@ final class OriginFilterTest extends DatabaseSetup {
          */
         @Override
         public void setAttribute(final String name, final Object o) {
+            // Intentionally not implemented, not needed for the testing
         }
 
         /**
@@ -283,6 +285,7 @@ final class OriginFilterTest extends DatabaseSetup {
          */
         @Override
         public void removeAttribute(final String name) {
+            // Intentionally not implemented, not needed for the testing
         }
 
         /**
@@ -443,7 +446,7 @@ final class OriginFilterTest extends DatabaseSetup {
          */
         @Override
         public void addCookie(final Cookie cookie) {
-
+            // Intentionally not implemented, not needed for the testing
         }
 
         /**
@@ -475,6 +478,7 @@ final class OriginFilterTest extends DatabaseSetup {
          */
         @Override
         public void sendError(final int sc, final String msg) {
+            // Intentionally not implemented, not needed for the testing
         }
 
         /**
@@ -482,6 +486,7 @@ final class OriginFilterTest extends DatabaseSetup {
          */
         @Override
         public void sendError(final int sc) {
+            // Intentionally not implemented, not needed for the testing
         }
 
         /**
@@ -489,6 +494,7 @@ final class OriginFilterTest extends DatabaseSetup {
          */
         @Override
         public void sendRedirect(final String location) {
+            // Intentionally not implemented, not needed for the testing
         }
 
         /**
@@ -496,6 +502,7 @@ final class OriginFilterTest extends DatabaseSetup {
          */
         @Override
         public void setDateHeader(final String name, final long date) {
+            // Intentionally not implemented, not needed for the testing
         }
 
         /**
@@ -503,6 +510,7 @@ final class OriginFilterTest extends DatabaseSetup {
          */
         @Override
         public void addDateHeader(final String name, final long date) {
+            // Intentionally not implemented, not needed for the testing
         }
 
         /**
@@ -526,6 +534,7 @@ final class OriginFilterTest extends DatabaseSetup {
          */
         @Override
         public void setIntHeader(final String name, final int value) {
+            // Intentionally not implemented, not needed for the testing
         }
 
         /**
@@ -533,6 +542,7 @@ final class OriginFilterTest extends DatabaseSetup {
          */
         @Override
         public void addIntHeader(final String name, final int value) {
+            // Intentionally not implemented, not needed for the testing
         }
 
         /**
@@ -540,6 +550,7 @@ final class OriginFilterTest extends DatabaseSetup {
          */
         @Override
         public void setStatus(final int sc) {
+            // Intentionally not implemented, not needed for the testing
         }
 
         /**
@@ -611,6 +622,7 @@ final class OriginFilterTest extends DatabaseSetup {
          */
         @Override
         public void setCharacterEncoding(final String charset) {
+            // Intentionally not implemented, not needed for the testing
         }
 
         /**
@@ -618,6 +630,7 @@ final class OriginFilterTest extends DatabaseSetup {
          */
         @Override
         public void setContentLength(final int len) {
+            // Intentionally not implemented, not needed for the testing
         }
 
         /**
@@ -625,6 +638,7 @@ final class OriginFilterTest extends DatabaseSetup {
          */
         @Override
         public void setContentLengthLong(final long len) {
+            // Intentionally not implemented, not needed for the testing
         }
 
         /**
@@ -632,6 +646,7 @@ final class OriginFilterTest extends DatabaseSetup {
          */
         @Override
         public void setContentType(final String type) {
+            // Intentionally not implemented, not needed for the testing
         }
 
         /**
@@ -639,6 +654,7 @@ final class OriginFilterTest extends DatabaseSetup {
          */
         @Override
         public void setBufferSize(final int size) {
+            // Intentionally not implemented, not needed for the testing
         }
 
         /**
@@ -654,6 +670,7 @@ final class OriginFilterTest extends DatabaseSetup {
          */
         @Override
         public void flushBuffer() {
+            // Intentionally not implemented, not needed for the testing
         }
 
         /**
@@ -661,6 +678,7 @@ final class OriginFilterTest extends DatabaseSetup {
          */
         @Override
         public void resetBuffer() {
+            // Intentionally not implemented, not needed for the testing
         }
 
         /**
@@ -676,6 +694,7 @@ final class OriginFilterTest extends DatabaseSetup {
          */
         @Override
         public void reset() {
+            // Intentionally not implemented, not needed for the testing
         }
 
         /**
@@ -683,6 +702,7 @@ final class OriginFilterTest extends DatabaseSetup {
          */
         @Override
         public void setLocale(final Locale loc) {
+            // Intentionally not implemented, not needed for the testing
         }
 
         /**
@@ -705,6 +725,7 @@ final class OriginFilterTest extends DatabaseSetup {
          */
         @Override
         public void doFilter(final ServletRequest request, final ServletResponse response) {
+            // Intentionally not implemented, not needed for the testing
         }
     }
 }

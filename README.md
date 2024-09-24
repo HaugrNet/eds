@@ -4,7 +4,7 @@
 [![SonarQube](https://sonarcloud.io/api/project_badges/measure?project=net.haugr:eds&metric=alert_status)](https://sonarcloud.io/dashboard?id=net.haugr:eds)
 [![SonarQube](https://sonarcloud.io/api/project_badges/measure?project=net.haugr:eds&metric=coverage)](https://sonarcloud.io/dashboard?id=net.haugr:eds)
 [![Software License](https://img.shields.io/badge/license-Apache+License+2.0-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0)
-<!--[![Coverity](https://scan.coverity.com/projects/28136/badge.svg)](https://scan.coverity.com/projects/haugrnet-eds)-->
+[![Coverity](https://scan.coverity.com/projects/28136/badge.svg)](https://scan.coverity.com/projects/haugrnet-eds)
 
 [EDS](https://haugr.net/), Encrypted Data Share, works as a "PGP for the
 Cloud". It is designed as a backend component with the vision that it should be

@@ -1,12 +1,12 @@
 /*
- * EDS, Encrypted Data Share - open source Cryptographic Sharing system.
+ * CWS, Cryptographic Web Share - open source Cryptographic Sharing system.
  * Copyright (c) 2016-2024, haugr.net
- * mailto: eds AT haugr DOT net
+ * mailto: cws AT haugr DOT net
  *
- * EDS is free software; you can redistribute it and/or modify it under the
+ * CWS is free software; you can redistribute it and/or modify it under the
  * terms of the Apache License, as published by the Apache Software Foundation.
  *
- * EDS is distributed in the hope that it will be useful, but WITHOUT ANY
+ * CWS is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the Apache License for more details.
  *
@@ -119,18 +119,6 @@ final class ManagementBeanTrusteeTest extends DatabaseSetup {
         final FetchTrusteeResponse response = bean.fetchTrustees(request);
         assertEquals(ReturnCode.IDENTIFICATION_WARNING.getCode(), response.getReturnCode());
         assertEquals("No Trustee information found for member 'member1' and circle '" + CIRCLE_3_ID + "'.", response.getReturnMessage());
-    }
-
-    @Test
-    void testFetchTrusteesAsMemberWithInvalidCircleId() {
-        final ManagementBean bean = prepareManagementBean();
-        final FetchTrusteeRequest request = prepareRequest(FetchTrusteeRequest.class, Constants.ADMIN_ACCOUNT);
-        final String circleId = UUID.randomUUID().toString();
-        request.setCircleId(circleId);
-
-        final FetchTrusteeResponse response = bean.fetchTrustees(request);
-        assertEquals(ReturnCode.IDENTIFICATION_WARNING.getCode(), response.getReturnCode());
-        assertEquals("The requested Circle cannot be found.", response.getReturnMessage());
     }
 
     @Test

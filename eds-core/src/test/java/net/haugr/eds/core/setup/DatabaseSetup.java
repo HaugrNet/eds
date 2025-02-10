@@ -1,6 +1,6 @@
 /*
  * CWS, Cryptographic Web Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2024, haugr.net
+ * Copyright (c) 2016-2025, haugr.net
  * mailto: cws AT haugr DOT net
  *
  * CWS is free software; you can redistribute it and/or modify it under the
@@ -386,14 +386,17 @@ public class DatabaseSetup {
                 setField(instance, field, value);
             } else {
                 for (final Annotation annotation : field.getAnnotations()) {
-                    if ((annotation instanceof PersistenceContext) && (value instanceof EntityManager)) {
-                        setField(instance, field, value);
-                    } else if ((annotation instanceof Resource) && ((value instanceof TimerService) || (value instanceof ThreadFactory))) {
+                    if (isInjectableResource(annotation, value)) {
                         setField(instance, field, value);
                     }
                 }
             }
         }
+    }
+
+    private static boolean isInjectableResource(final Annotation annotation, final Object value) {
+        return ((annotation instanceof PersistenceContext) && (value instanceof EntityManager)) ||
+                ((annotation instanceof Resource) && ((value instanceof TimerService) || (value instanceof ThreadFactory)));
     }
 
     /**

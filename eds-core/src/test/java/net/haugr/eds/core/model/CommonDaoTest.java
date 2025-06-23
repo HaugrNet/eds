@@ -16,11 +16,11 @@
  */
 package net.haugr.eds.core.model;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import jakarta.persistence.PersistenceException;
 import net.haugr.eds.api.common.ReturnCode;
 import net.haugr.eds.core.setup.DatabaseSetup;
 import net.haugr.eds.core.exceptions.EDSException;
@@ -42,21 +42,24 @@ final class CommonDaoTest extends DatabaseSetup {
         // Creating a Query, which will attempt to read data from a non-existing record
         final Query query = entityManager.createNativeQuery("select * from versions");
 
-        final EDSException cause = assertThrows(EDSException.class, () -> CommonDao.findList(query));
-        assertEquals(ReturnCode.DATABASE_ERROR, cause.getReturnCode());
-        assertEquals("could not prepare statement [Table \"VERSIONS\" not found; SQL statement:\n" +
-                "select * from versions [42102-224]] [select * from versions]", cause.getMessage());
+        assertThatThrownBy(() -> CommonDao.findList(query))
+                .isExactlyInstanceOf(EDSException.class)
+                .hasFieldOrPropertyWithValue("returnCode", ReturnCode.DATABASE_ERROR)
+                .hasMessageContaining("could not prepare statement [Table \"VERSIONS\" not found; SQL statement:")
+                .hasMessageContaining("select * from versions [42102-232]] [select * from versions]")
+                .hasCauseInstanceOf(PersistenceException.class);
     }
 
     @Test
     void testNullResultList() {
-        final EntityManager manager = new FakeEntityManager();
-        final String jql = "select v from VersionEntity v order by v.id desc";
-        final Query query = manager.createQuery(jql);
-        query.setHint(FakeQuery.NULLABLE, Boolean.TRUE);
-        final List<?> found = CommonDao.findList(query);
+        try (final EntityManager manager = new FakeEntityManager()) {
+            final String jql = "select v from VersionEntity v order by v.id desc";
+            final Query query = manager.createQuery(jql);
+            query.setHint(FakeQuery.NULLABLE, Boolean.TRUE);
+            final List<?> found = CommonDao.findList(query);
 
-        assertNotNull(found);
-        assertTrue(found.isEmpty());
+            assertNotNull(found);
+            assertTrue(found.isEmpty());
+        }
     }
 }

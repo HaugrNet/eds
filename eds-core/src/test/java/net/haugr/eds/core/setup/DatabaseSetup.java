@@ -118,7 +118,7 @@ public class DatabaseSetup {
     protected final Crypto crypto = new Crypto(settings);
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         final EntityTransaction transaction = entityManager.getTransaction();
         if (transaction != null) {
             transaction.begin();
@@ -127,7 +127,7 @@ public class DatabaseSetup {
     }
 
     @AfterEach
-    public void tearDown() {
+    void tearDown() {
         final EntityTransaction transaction = entityManager.getTransaction();
         if (transaction != null) {
             transaction.rollback();

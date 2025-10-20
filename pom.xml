@@ -84,14 +84,14 @@
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
 
-        <!-- To avoid that the builds are platform specific -->
+        <!-- Avoid builds being platform-specific -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <!-- SonarQube Settings -->
         <sonar.projectName>Encrypted Data Share</sonar.projectName>
         <sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
         <!-- Sonar is by default analyzing everything. But Generated Code is
-             beyond our control, so error reports from this is just annoying!
+             beyond our control, so error reports from this are just annoying!
              Legend: *  - zero or more characters
                      ** - zero or more directories -->
         <sonar.exclusions>**/client/**,**/fitnesse/**</sonar.exclusions>
@@ -102,7 +102,13 @@
             <dependency>
                 <groupId>jakarta.platform</groupId>
                 <artifactId>jakarta.jakartaee-api</artifactId>
-                <version>10.0.0</version>
+                <version>11.0.0</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.microprofile.openapi</groupId>
+                <artifactId>microprofile-openapi-api</artifactId>
+                <version>4.1</version>
                 <scope>provided</scope>
             </dependency>
             <dependency>
@@ -132,7 +138,7 @@
                 <version>${project.version}</version>
             </dependency>
 
-            <!-- Following is required to build & run the REST Client -->
+            <!-- The following is required to build and run the REST Client -->
             <dependency>
                 <groupId>com.google.code.gson</groupId>
                 <artifactId>gson</artifactId>
@@ -141,13 +147,13 @@
             <dependency>
                 <groupId>org.glassfish.jersey.test-framework.providers</groupId>
                 <artifactId>jersey-test-framework-provider-grizzly2</artifactId>
-                <version>3.1.5</version>
+                <version>3.1.11</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.glassfish.jersey.core</groupId>
                 <artifactId>jersey-common</artifactId>
-                <version>3.1.10</version>
+                <version>3.1.11</version>
                 <scope>test</scope>
             </dependency>
 
@@ -180,7 +186,7 @@
             <dependency>
                 <groupId>ch.qos.logback</groupId>
                 <artifactId>logback-classic</artifactId>
-                <version>1.5.18</version>
+                <version>1.5.19</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
@@ -220,7 +226,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.14.0</version>
+                    <version>3.14.1</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -308,13 +314,13 @@
                 <configuration>
                     <!-- Testing should be done in parallel if possible.
                          However, some of the EDS tests have been written in a
-                         way, which is rather nasty, where default DB objects
+                         way which is rather nasty, where default DB objects
                          have been deliberately altered, causing JDBC problems,
                          as it is not possible to acquire table locks.
-                           It should be noted, that it is not a likely use-case
+                           It should be noted that it is not a likely use-case
                          that Member Accounts are being removed and added in the
-                         way, which the tests indicate. Hence, reverting to
-                         running the tests sequentially has been decided, to
+                         way which the tests indicate. Hence, reverting to
+                         running the tests sequentially has been decided to
                          guarantee that all builds are green.
                            It is with sorrow that this decision was made, as the
                          parallel nature of the tests had the secondary goal of
@@ -390,7 +396,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
-                        <version>3.2.6</version>
+                        <version>3.2.7</version>
                         <configuration>
                             <useAgent>true</useAgent>
                             <skip>false</skip>

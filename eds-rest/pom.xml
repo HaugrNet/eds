@@ -12,12 +12,16 @@
     <artifactId>eds-rest</artifactId>
     <packaging>jar</packaging>
     <name>EDS - REST</name>
-    <description>EDS REST Based WebServices.</description>
+    <description>EDS REST-Based WebServices.</description>
 
     <dependencies>
         <dependency>
             <groupId>jakarta.platform</groupId>
             <artifactId>jakarta.jakartaee-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.microprofile.openapi</groupId>
+            <artifactId>microprofile-openapi-api</artifactId>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -78,31 +82,5 @@
             </testResource>
         </testResources>
     </build>
-
-    <profiles>
-        <profile>
-            <id>swagger</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>com.sebastian-daschner</groupId>
-                        <artifactId>jaxrs-analyzer-maven-plugin</artifactId>
-                        <version>0.17</version>
-                        <executions>
-                            <execution>
-                                <goals>
-                                    <goal>analyze-jaxrs</goal>
-                                </goals>
-                                <configuration>
-                                    <backend>swagger</backend>
-                                    <deployedDomain>haugr.net</deployedDomain>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
 
 </project>

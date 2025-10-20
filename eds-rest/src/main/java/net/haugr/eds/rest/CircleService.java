@@ -29,6 +29,8 @@ import net.haugr.eds.api.requests.FetchCircleRequest;
 import net.haugr.eds.api.requests.ProcessCircleRequest;
 import net.haugr.eds.core.ManagementBean;
 import net.haugr.eds.core.model.Settings;
+import org.eclipse.microprofile.openapi.annotations.Operation;
+import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 
 /**
  * <p>REST interface for the Circle functionality.</p>
@@ -37,6 +39,7 @@ import net.haugr.eds.core.model.Settings;
  * @since EDS 1.0
  */
 @Path(Constants.REST_CIRCLES_BASE)
+@org.eclipse.microprofile.openapi.annotations.tags.Tag(name = "Circles", description = "Operations for managing circles (create, update, delete, fetch).")
 public class CircleService {
 
     private static final String PROCESS_METHOD = "processCircle";
@@ -59,6 +62,10 @@ public class CircleService {
      * @param createCircleRequest Create Circle Request
      * @return Create Circle Response
      */
+    @Operation(
+            summary = "Create circle",
+            description = "Creates a new circle. The action is set to CREATE internally.")
+    @APIResponse(responseCode = "200", description = "Successful operation")
     @POST
     @Path(Constants.REST_CIRCLES_CREATE)
     @Consumes(CommonService.CONSUMES)
@@ -74,6 +81,10 @@ public class CircleService {
      * @param updateCircleRequest Update Circle Request
      * @return Update Circle Response
      */
+    @Operation(
+            summary = "Update circle",
+            description = "Updates an existing circle. The action is set to UPDATE internally.")
+    @APIResponse(responseCode = "200", description = "Successful operation")
     @POST
     @Path(Constants.REST_CIRCLES_UPDATE)
     @Consumes(CommonService.CONSUMES)
@@ -89,6 +100,10 @@ public class CircleService {
      * @param deleteCircleRequest Delete Circle Request
      * @return Delete Circle Response
      */
+    @Operation(
+            summary = "Delete circle",
+            description = "Deletes an existing circle. The action is set to DELETE internally.")
+    @APIResponse(responseCode = "200", description = "Successful operation")
     @POST
     @Path(Constants.REST_CIRCLES_DELETE)
     @Consumes(CommonService.CONSUMES)
@@ -104,6 +119,10 @@ public class CircleService {
      * @param fetchCirclesRequest Fetch Circles Request
      * @return Fetch Circles Response
      */
+    @Operation(
+            summary = "Fetch circles",
+            description = "Fetches circles, optionally filtered and paginated.")
+    @APIResponse(responseCode = "200", description = "Successful operation")
     @POST
     @Path(Constants.REST_CIRCLES_FETCH)
     @Consumes(CommonService.CONSUMES)

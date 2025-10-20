@@ -37,6 +37,7 @@ import net.haugr.eds.core.model.Settings;
  * @since EDS 1.0
  */
 @Path(Constants.REST_DATATYPES_BASE)
+@org.eclipse.microprofile.openapi.annotations.tags.Tag(name = "Data Types", description = "Operations for managing data types used by data objects.")
 public class DataTypeService {
 
     private static final String PROCESS_METHOD = "processDataType";
@@ -59,6 +60,10 @@ public class DataTypeService {
      * @param processDataTypeRequest Process DataType Request
      * @return Process DataType Response
      */
+    @org.eclipse.microprofile.openapi.annotations.Operation(
+            summary = "Process data type",
+            description = "Creates or updates a data type. The action is set to PROCESS internally.")
+    @org.eclipse.microprofile.openapi.annotations.responses.APIResponse(responseCode = "200", description = "Successful operation")
     @POST
     @Path(Constants.REST_DATATYPES_PROCESS)
     @Consumes(CommonService.CONSUMES)
@@ -74,6 +79,10 @@ public class DataTypeService {
      * @param deleteDataTypeRequest Delete DataType Request
      * @return Delete DataType Response
      */
+    @org.eclipse.microprofile.openapi.annotations.Operation(
+            summary = "Delete data type",
+            description = "Deletes an existing data type. The action is set to DELETE internally.")
+    @org.eclipse.microprofile.openapi.annotations.responses.APIResponse(responseCode = "200", description = "Successful operation")
     @POST
     @Path(Constants.REST_DATATYPES_DELETE)
     @Consumes(CommonService.CONSUMES)
@@ -89,6 +98,10 @@ public class DataTypeService {
      * @param fetchDataTypesRequest Fetch DataTypes Request
      * @return Fetch DataTypes Response
      */
+    @org.eclipse.microprofile.openapi.annotations.Operation(
+            summary = "Fetch data types",
+            description = "Fetches available data types.")
+    @org.eclipse.microprofile.openapi.annotations.responses.APIResponse(responseCode = "200", description = "Successful operation")
     @POST
     @Path(Constants.REST_DATATYPES_FETCH)
     @Consumes(CommonService.CONSUMES)

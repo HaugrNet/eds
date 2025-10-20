@@ -37,6 +37,7 @@ import net.haugr.eds.core.model.Settings;
  * @since EDS 1.0
  */
 @Path(Constants.REST_DATA_BASE)
+@org.eclipse.microprofile.openapi.annotations.tags.Tag(name = "Data", description = "Operations for managing data objects within circles.")
 public class DataService {
 
     private static final String PROCESS_METHOD = "processData";
@@ -59,6 +60,10 @@ public class DataService {
      * @param addDataRequest Add Data Request
      * @return Add Data Response
      */
+    @org.eclipse.microprofile.openapi.annotations.Operation(
+            summary = "Add data",
+            description = "Adds a new data object to a circle or folder. The action is set to ADD internally.")
+    @org.eclipse.microprofile.openapi.annotations.responses.APIResponse(responseCode = "200", description = "Successful operation")
     @POST
     @Path(Constants.REST_DATA_ADD)
     @Consumes(CommonService.CONSUMES)
@@ -74,6 +79,10 @@ public class DataService {
      * @param copyDataRequest Copy Data Request
      * @return Copy Data Response
      */
+    @org.eclipse.microprofile.openapi.annotations.Operation(
+            summary = "Copy data",
+            description = "Copies an existing data object to a target circle or folder. The action is set to COPY internally.")
+    @org.eclipse.microprofile.openapi.annotations.responses.APIResponse(responseCode = "200", description = "Successful operation")
     @POST
     @Path(Constants.REST_DATA_COPY)
     @Consumes(CommonService.CONSUMES)
@@ -89,6 +98,10 @@ public class DataService {
      * @param moveDataRequest Move Data Request
      * @return Move Data Response
      */
+    @org.eclipse.microprofile.openapi.annotations.Operation(
+            summary = "Move data",
+            description = "Moves an existing data object to a target circle or folder. The action is set to MOVE internally.")
+    @org.eclipse.microprofile.openapi.annotations.responses.APIResponse(responseCode = "200", description = "Successful operation")
     @POST
     @Path(Constants.REST_DATA_MOVE)
     @Consumes(CommonService.CONSUMES)
@@ -104,6 +117,10 @@ public class DataService {
      * @param updateDataRequest Update Data Request
      * @return Update Data Response
      */
+    @org.eclipse.microprofile.openapi.annotations.Operation(
+            summary = "Update data",
+            description = "Updates an existing data object, including optional rename and/or moving within the structure. The action is set to UPDATE internally.")
+    @org.eclipse.microprofile.openapi.annotations.responses.APIResponse(responseCode = "200", description = "Successful operation")
     @POST
     @Path(Constants.REST_DATA_UPDATE)
     @Consumes(CommonService.CONSUMES)
@@ -119,6 +136,10 @@ public class DataService {
      * @param deleteDataRequest Delete Data Request
      * @return Delete Data Response
      */
+    @org.eclipse.microprofile.openapi.annotations.Operation(
+            summary = "Delete data",
+            description = "Deletes an existing data object. The action is set to DELETE internally.")
+    @org.eclipse.microprofile.openapi.annotations.responses.APIResponse(responseCode = "200", description = "Successful operation")
     @POST
     @Path(Constants.REST_DATA_DELETE)
     @Consumes(CommonService.CONSUMES)
@@ -134,6 +155,10 @@ public class DataService {
      * @param fetchDataRequest Fetch Data Request
      * @return Fetch Data Response
      */
+    @org.eclipse.microprofile.openapi.annotations.Operation(
+            summary = "Fetch data",
+            description = "Fetches data objects by circle, data id, or name with paging support.")
+    @org.eclipse.microprofile.openapi.annotations.responses.APIResponse(responseCode = "200", description = "Successful operation")
     @POST
     @Path(Constants.REST_DATA_FETCH)
     @Consumes(CommonService.CONSUMES)

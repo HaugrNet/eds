@@ -32,6 +32,7 @@ import net.haugr.eds.core.model.Settings;
  * @since EDS 1.0
  */
 @Path(Constants.REST_VERSION)
+@org.eclipse.microprofile.openapi.annotations.tags.Tag(name = "Version", description = "Service for retrieving the server/version information.")
 public class VersionService {
 
     private static final String METHOD = "version";
@@ -52,6 +53,10 @@ public class VersionService {
      *
      * @return Version Response
      */
+    @org.eclipse.microprofile.openapi.annotations.Operation(
+            summary = "Get version",
+            description = "Returns version information for the EDS server.")
+    @org.eclipse.microprofile.openapi.annotations.responses.APIResponse(responseCode = "200", description = "Successful operation")
     @POST
     @Produces(CommonService.PRODUCES)
     public Response version() {

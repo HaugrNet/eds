@@ -22,17 +22,18 @@ import net.haugr.eds.api.common.ReturnCode;
 import net.haugr.eds.api.requests.FetchDataRequest;
 import net.haugr.eds.api.requests.ProcessDataRequest;
 import jakarta.ws.rs.core.Response;
+import net.haugr.eds.core.setup.DatabaseSetup;
 import org.junit.jupiter.api.Test;
 
 /**
  * @author Kim Jensen
  * @since EDS 1.0
  */
-final class DataServiceTest extends BeanSetup {
+final class DataServiceTest extends DatabaseSetup {
 
     @Test
     void testAdd() {
-        final DataService service = prepareDataService(settings, entityManager);
+        final DataService service = new DataService(prepareShareBean());
         final ProcessDataRequest request = new ProcessDataRequest();
 
         try (final Response response = service.add(request)) {
@@ -42,7 +43,7 @@ final class DataServiceTest extends BeanSetup {
 
     @Test
     void testFlawedAdd() {
-        final DataService service = prepareDataService();
+        final DataService service = new DataService();
         final ProcessDataRequest request = new ProcessDataRequest();
 
         try (final Response response = service.add(request)) {
@@ -52,7 +53,7 @@ final class DataServiceTest extends BeanSetup {
 
     @Test
     void testCopy() {
-        final DataService service = prepareDataService(settings, entityManager);
+        final DataService service = new DataService(prepareShareBean());
         final ProcessDataRequest request = new ProcessDataRequest();
 
         try (final Response response = service.copy(request)) {
@@ -62,7 +63,7 @@ final class DataServiceTest extends BeanSetup {
 
     @Test
     void testFlawedCopy() {
-        final DataService service = prepareDataService();
+        final DataService service = new DataService();
         final ProcessDataRequest request = new ProcessDataRequest();
 
         try (final Response response = service.copy(request)) {
@@ -72,7 +73,7 @@ final class DataServiceTest extends BeanSetup {
 
     @Test
     void testMove() {
-        final DataService service = prepareDataService(settings, entityManager);
+        final DataService service = new DataService(prepareShareBean());
         final ProcessDataRequest request = new ProcessDataRequest();
 
         try (final Response response = service.move(request)) {
@@ -82,7 +83,7 @@ final class DataServiceTest extends BeanSetup {
 
     @Test
     void testFlawedMove() {
-        final DataService service = prepareDataService();
+        final DataService service = new DataService();
         final ProcessDataRequest request = new ProcessDataRequest();
 
         try (final Response response = service.move(request)) {
@@ -92,7 +93,7 @@ final class DataServiceTest extends BeanSetup {
 
     @Test
     void testUpdate() {
-        final DataService service = prepareDataService(settings, entityManager);
+        final DataService service = new DataService(prepareShareBean());
         final ProcessDataRequest request = new ProcessDataRequest();
 
         try (final Response response = service.update(request)) {
@@ -102,7 +103,7 @@ final class DataServiceTest extends BeanSetup {
 
     @Test
     void testFlawedUpdate() {
-        final DataService service = prepareDataService();
+        final DataService service = new DataService();
         final ProcessDataRequest request = new ProcessDataRequest();
 
         try (final Response response = service.update(request)) {
@@ -112,7 +113,7 @@ final class DataServiceTest extends BeanSetup {
 
     @Test
     void testDelete() {
-        final DataService service = prepareDataService(settings, entityManager);
+        final DataService service = new DataService(prepareShareBean());
         final ProcessDataRequest request = new ProcessDataRequest();
 
         try (final Response response = service.delete(request)) {
@@ -122,7 +123,7 @@ final class DataServiceTest extends BeanSetup {
 
     @Test
     void testFlawedDelete() {
-        final DataService service = prepareDataService();
+        final DataService service = new DataService();
         final ProcessDataRequest request = new ProcessDataRequest();
 
         try (final Response response = service.delete(request)) {
@@ -132,7 +133,7 @@ final class DataServiceTest extends BeanSetup {
 
     @Test
     void testFetch() {
-        final DataService service = prepareDataService(settings, entityManager);
+        final DataService service = new DataService(prepareShareBean());
         final FetchDataRequest request = new FetchDataRequest();
 
         try (final Response response = service.fetch(request)) {
@@ -142,7 +143,7 @@ final class DataServiceTest extends BeanSetup {
 
     @Test
     void testFlawedFetch() {
-        final DataService service = prepareDataService();
+        final DataService service = new DataService();
         final FetchDataRequest request = new FetchDataRequest();
 
         try (final Response response = service.fetch(request)) {

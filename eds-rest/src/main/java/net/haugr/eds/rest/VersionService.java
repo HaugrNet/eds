@@ -32,19 +32,22 @@ import net.haugr.eds.core.model.Settings;
  * @since EDS 1.0
  */
 @Path(Constants.REST_VERSION)
+@org.eclipse.microprofile.openapi.annotations.tags.Tag(name = "Version", description = "Service for retrieving the server/version information.")
 public class VersionService {
 
     private static final String METHOD = "version";
 
-    @Inject
-    private ManagementBean bean;
-    private final Settings settings = Settings.getInstance();
+    private final ManagementBean managementBean;
+    private final Settings settings;
 
-    /**
-     * Default Constructor.
-     */
     public VersionService() {
-        // Empty Constructor
+        this(null);
+    }
+
+    @Inject
+    public VersionService(final ManagementBean managementBean) {
+        this.managementBean = managementBean;
+        this.settings = Settings.getInstance();
     }
 
     /**
@@ -52,9 +55,13 @@ public class VersionService {
      *
      * @return Version Response
      */
+    @org.eclipse.microprofile.openapi.annotations.Operation(
+            summary = "Get version",
+            description = "Returns version information for the EDS server.")
+    @org.eclipse.microprofile.openapi.annotations.responses.APIResponse(responseCode = "200", description = "Successful operation")
     @POST
     @Produces(CommonService.PRODUCES)
     public Response version() {
-        return CommonService.runRequest(settings, bean, METHOD, null, Constants.REST_VERSION);
+        return CommonService.runRequest(settings, managementBean, METHOD, null, Constants.REST_VERSION);
     }
 }

@@ -39,15 +39,17 @@ public class SanityService {
 
     private static final String METHOD = "sanity";
 
-    @Inject
-    private ManagementBean bean;
-    private final Settings settings = Settings.getInstance();
+    private final ManagementBean managementBean;
+    private final Settings settings;
 
-    /**
-     * Default Constructor.
-     */
     public SanityService() {
-        // Empty Constructor
+        this(null);
+    }
+
+    @Inject
+    public SanityService(final ManagementBean managementBean) {
+        this.managementBean = managementBean;
+        this.settings = Settings.getInstance();
     }
 
     /**
@@ -60,6 +62,6 @@ public class SanityService {
     @Consumes(CommonService.CONSUMES)
     @Produces(CommonService.PRODUCES)
     public Response sanitized(@NotNull final SanityRequest sanitizedRequest) {
-        return CommonService.runRequest(settings, bean, METHOD, sanitizedRequest, Constants.REST_SANITIZED);
+        return CommonService.runRequest(settings, managementBean, METHOD, sanitizedRequest, Constants.REST_SANITIZED);
     }
 }

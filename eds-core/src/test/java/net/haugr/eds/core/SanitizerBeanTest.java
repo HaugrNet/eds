@@ -26,6 +26,7 @@ import net.haugr.eds.api.responses.ProcessDataResponse;
 import net.haugr.eds.core.enums.SanityStatus;
 import net.haugr.eds.core.enums.StandardSetting;
 import net.haugr.eds.core.exceptions.EDSException;
+import net.haugr.eds.core.jce.Crypto;
 import net.haugr.eds.core.model.Settings;
 import net.haugr.eds.core.model.entities.DataEntity;
 import net.haugr.eds.core.managers.ProcessDataManager;
@@ -34,10 +35,8 @@ import net.haugr.eds.core.setup.fakes.FakeEntityManager;
 import net.haugr.eds.core.setup.fakes.FakeTimer;
 import net.haugr.eds.core.setup.fakes.FakeTimerService;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDateTime;
 import java.util.List;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -94,7 +93,7 @@ final class SanitizerBeanTest extends DatabaseSetup {
         final List<Long> idsBefore = sanitizerBean.findNextBatch(100);
 
         final StartupBean bean = prepareStartupBean("false");
-        bean.runSanitizing(new FakeTimer());
+        bean.runSanitizingWithTimeout(new FakeTimer());
 
         final List<Long> idsAfter = sanitizerBean.findNextBatch(100);
         assertFalse(idsBefore.isEmpty());
@@ -134,7 +133,8 @@ final class SanitizerBeanTest extends DatabaseSetup {
     @Test
     void testSanitizeBeanWithDatabaseProblem() {
         final SanitizerBean bean = prepareFlawedSanitizeBean();
-        final SanityStatus status = bean.processEntity(123L);
+        final Crypto crypto = new Crypto(Settings.getInstance());
+        final SanityStatus status = bean.processEntity(crypto,123L);
 
         assertEquals(SanityStatus.BLOCKED, status);
     }
@@ -144,76 +144,40 @@ final class SanitizerBeanTest extends DatabaseSetup {
     // =========================================================================
 
     private StartupBean prepareStartupBean(final String sanityAtStartup) {
-        try {
-            final StartupBean bean = StartupBean.class.getConstructor().newInstance();
+        final Settings newSettings = newSettings();
+        newSettings.set(StandardSetting.SANITY_STARTUP.getKey(), sanityAtStartup);
 
-            final Settings newSettings = newSettings();
-            newSettings.set(StandardSetting.SANITY_STARTUP.getKey(), sanityAtStartup);
+        final StartupBean bean = new StartupBean(entityManager, prepareSanitizeBean(), new FakeTimerService(), newSettings);
 
-            // Inject Dependencies
-            inject(bean, entityManager);
-            inject(bean, prepareSanitizeBean());
-            inject(bean, new FakeTimerService());
-            inject(bean, newSettings);
+        // The Bean is updating the Settings via the DB, so we need to alter
+        // the content of the DB to reflect this. As the content has not yet
+        // been read out - it is also not cached. Hence, a simple update will
+        // suffice.
+        final int updated = entityManager
+                .createQuery("update SettingEntity set setting = :setting where name = :name")
+                .setParameter("name", StandardSetting.SANITY_STARTUP.getKey())
+                .setParameter("setting", sanityAtStartup)
+                .executeUpdate();
+        assertEquals(1, updated);
 
-            // The Bean is updating the Settings via the DB, so we need to alter
-            // the content of the DB to reflect this. As the content has not yet
-            // been read out - it is also not cached, hence a simple update will
-            // suffice.
-            final int updated = entityManager
-                    .createQuery("update SettingEntity set setting = :setting where name = :name")
-                    .setParameter("name", StandardSetting.SANITY_STARTUP.getKey())
-                    .setParameter("setting", sanityAtStartup)
-                    .executeUpdate();
-            assertEquals(1, updated);
+        // Invoke PostConstructor
+        bean.startup();
 
-            // Invoke PostConstructor
-            bean.startup();
-
-            return bean;
-        } catch (InstantiationException | InvocationTargetException | IllegalAccessException | NoSuchMethodException e) {
-            throw new EDSException(ReturnCode.ERROR, "Cannot instantiate Service Object", e);
-        }
+        return bean;
     }
 
     private StartupBean prepareFlawedStartupBean(final Settings settings) {
-        try {
-            final StartupBean bean = StartupBean.class.getConstructor().newInstance();
+        settings.set(StandardSetting.SANITY_STARTUP.getKey(), "true");
 
-            settings.set(StandardSetting.SANITY_STARTUP.getKey(), "true");
-
-            // Inject Dependencies
-            inject(bean, new FakeEntityManager());
-            inject(bean, prepareSanitizeBean());
-            inject(bean, new FakeTimerService());
-            inject(bean, settings);
-
-            return bean;
-        } catch (InstantiationException | InvocationTargetException | IllegalAccessException | NoSuchMethodException e) {
-            throw new EDSException(ReturnCode.ERROR, "Cannot instantiate Service Object", e);
-        }
+        return new StartupBean(new FakeEntityManager(), prepareSanitizeBean(), new FakeTimerService(), settings);
     }
 
     private SanitizerBean prepareSanitizeBean() {
-        try {
-            final SanitizerBean bean = SanitizerBean.class.getConstructor().newInstance();
-            inject(bean, entityManager);
-
-            return bean;
-        } catch (InstantiationException | InvocationTargetException | IllegalAccessException | NoSuchMethodException e) {
-            throw new EDSException(ReturnCode.ERROR, "Cannot instantiate Service Object", e);
-        }
+        return new SanitizerBean(entityManager);
     }
 
     private SanitizerBean prepareFlawedSanitizeBean() {
-        try {
-            final SanitizerBean bean = SanitizerBean.class.getConstructor().newInstance();
-            inject(bean, new FakeEntityManager());
-
-            return bean;
-        } catch (InstantiationException | InvocationTargetException | IllegalAccessException | NoSuchMethodException e) {
-            throw new EDSException(ReturnCode.ERROR, "Cannot instantiate Service Object", e);
-        }
+        return new SanitizerBean();
     }
 
     private static Settings getBeanSettings(final StartupBean bean) {
@@ -249,7 +213,7 @@ final class SanitizerBeanTest extends DatabaseSetup {
         // Now to the tricky part. We wish to test that the checksum is invalid,
         // and thus resulting in a correct error message. As the checksum is
         // controlled internally by EDS, it cannot be altered (rightfully) via
-        // the API, hence we have to modify it directly in the database!
+        // the API. Hence, we have to modify it directly in the database!
         final String jql = "select d from DataEntity d where d.metadata.externalId = :eid";
         final DataEntity entity = (DataEntity) entityManager
                 .createQuery(jql)

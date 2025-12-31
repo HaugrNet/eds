@@ -39,15 +39,17 @@ public class SettingService {
 
     private static final String METHOD = "settings";
 
-    @Inject
-    private ManagementBean bean;
-    private final Settings settings = Settings.getInstance();
+    private final ManagementBean managementBean;
+    private final Settings settings;
 
-    /**
-     * Default Constructor.
-     */
     public SettingService() {
-        // Empty Constructor
+        this(null);
+    }
+
+    @Inject
+    public SettingService(final ManagementBean managementBean) {
+        this.managementBean = managementBean;
+        this.settings = Settings.getInstance();
     }
 
     /**
@@ -60,6 +62,6 @@ public class SettingService {
     @Consumes(CommonService.CONSUMES)
     @Produces(CommonService.PRODUCES)
     public Response settings(@NotNull final SettingRequest settingRequest) {
-        return CommonService.runRequest(settings, bean, METHOD, settingRequest, Constants.REST_SETTINGS);
+        return CommonService.runRequest(settings, managementBean, METHOD, settingRequest, Constants.REST_SETTINGS);
     }
 }

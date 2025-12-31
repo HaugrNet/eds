@@ -19,6 +19,7 @@ package net.haugr.eds.rest;
 import jakarta.ws.rs.core.Response;
 import net.haugr.eds.api.common.ReturnCode;
 import net.haugr.eds.api.requests.Authentication;
+import net.haugr.eds.core.setup.DatabaseSetup;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -27,11 +28,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author Kim Jensen
  * @since EDS 1.1
  */
-final class AuthenticatedServiceTest extends BeanSetup {
+final class AuthenticatedServiceTest extends DatabaseSetup {
 
     @Test
     void testAuthenticate() {
-        final AuthenticatedService service = prepareAuthenticatedService(settings, entityManager);
+        final AuthenticatedService service = new AuthenticatedService(prepareManagementBean());
         final Authentication request = new Authentication();
 
         try (final Response response = service.authenticated(request)) {
@@ -41,7 +42,7 @@ final class AuthenticatedServiceTest extends BeanSetup {
 
     @Test
     void testFlawedCreate() {
-        final AuthenticatedService service = prepareAuthenticatedService();
+        final AuthenticatedService service = new AuthenticatedService();
         final Authentication request = new Authentication();
 
         try (final Response response = service.authenticated(request)) {

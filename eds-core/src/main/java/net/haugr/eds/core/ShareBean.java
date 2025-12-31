@@ -17,8 +17,8 @@
 package net.haugr.eds.core;
 
 import jakarta.ejb.Stateless;
+import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
 import net.haugr.eds.api.requests.FetchDataRequest;
 import net.haugr.eds.api.requests.FetchDataTypeRequest;
@@ -58,9 +58,22 @@ public class ShareBean {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ShareBean.class);
 
-    @PersistenceContext
-    private EntityManager entityManager;
-    private final Settings settings = Settings.getInstance();
+    private final EntityManager entityManager;
+    private final Settings settings;
+
+    public ShareBean() {
+        this(null);
+    }
+
+    @Inject
+    public ShareBean(final EntityManager entityManager) {
+        this(entityManager, Settings.getInstance());
+    }
+
+    public ShareBean(final EntityManager entityManager, final Settings settings) {
+        this.entityManager = entityManager;
+        this.settings = settings;
+    }
 
     @Transactional(Transactional.TxType.REQUIRED)
     public ProcessDataTypeResponse processDataType(final ProcessDataTypeRequest request) {

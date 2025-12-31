@@ -20,17 +20,18 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import net.haugr.eds.api.common.ReturnCode;
 import jakarta.ws.rs.core.Response;
+import net.haugr.eds.core.setup.DatabaseSetup;
 import org.junit.jupiter.api.Test;
 
 /**
  * @author Kim Jensen
  * @since EDS 1.0
  */
-final class VersionServiceTest extends BeanSetup {
+final class VersionServiceTest extends DatabaseSetup {
 
     @Test
     void testVersion() {
-        final VersionService service = prepareVersionService(settings, entityManager);
+        final VersionService service = new VersionService(prepareManagementBean());
 
         try (final Response response = service.version()) {
             assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());
@@ -39,7 +40,7 @@ final class VersionServiceTest extends BeanSetup {
 
     @Test
     void testFlawedVersion() {
-        final VersionService service = prepareVersionService();
+        final VersionService service = new VersionService();
 
         try (final Response response = service.version()) {
             assertEquals(ReturnCode.SUCCESS.getHttpCode(), response.getStatus());

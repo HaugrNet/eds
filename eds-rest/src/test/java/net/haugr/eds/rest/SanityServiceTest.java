@@ -21,17 +21,18 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import net.haugr.eds.api.common.ReturnCode;
 import net.haugr.eds.api.requests.SanityRequest;
 import jakarta.ws.rs.core.Response;
+import net.haugr.eds.core.setup.DatabaseSetup;
 import org.junit.jupiter.api.Test;
 
 /**
  * @author Kim Jensen
  * @since EDS 1.0
  */
-final class SanityServiceTest extends BeanSetup {
+final class SanityServiceTest extends DatabaseSetup {
 
     @Test
     void testSanitized() {
-        final SanityService service = prepareSanityService(settings, entityManager);
+        final SanityService service = new SanityService(prepareManagementBean());
         final SanityRequest request = new SanityRequest();
 
         try (final Response response = service.sanitized(request)) {
@@ -41,7 +42,7 @@ final class SanityServiceTest extends BeanSetup {
 
     @Test
     void testFlawedSanitized() {
-        final SanityService service = prepareSanityService();
+        final SanityService service = new SanityService();
         final SanityRequest request = new SanityRequest();
 
         try (final Response response = service.sanitized(request)) {

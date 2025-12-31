@@ -16,23 +16,17 @@
  */
 package net.haugr.eds.core.setup;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.security.SecureRandom;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.Locale;
 import java.util.UUID;
-import java.util.concurrent.ThreadFactory;
-import jakarta.annotation.Resource;
-import jakarta.ejb.TimerService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.Persistence;
-import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
 import net.haugr.eds.api.common.Action;
 import net.haugr.eds.api.common.Constants;
@@ -43,6 +37,7 @@ import net.haugr.eds.api.requests.Authentication;
 import net.haugr.eds.api.requests.ProcessDataRequest;
 import net.haugr.eds.api.responses.ProcessDataResponse;
 import net.haugr.eds.core.ManagementBean;
+import net.haugr.eds.core.SanitizerBean;
 import net.haugr.eds.core.ShareBean;
 import net.haugr.eds.core.enums.KeyAlgorithm;
 import net.haugr.eds.core.enums.SanityStatus;
@@ -70,7 +65,7 @@ import org.junit.jupiter.api.BeforeEach;
  * is more cumbersome, but the gain is also more trust in the tests - and no
  * need to fiddle with mocks or other things.</p>
  *
- * <p>This class controls the setup parts of the database, and offers other
+ * <p>This class controls the setup parts of the database and offers other
  * small helpful utilities for the tests.</p>
  *
  * @author Kim Jensen
@@ -79,12 +74,12 @@ import org.junit.jupiter.api.BeforeEach;
 public class DatabaseSetup {
 
     // Following an upgrade of the H2 Database from 1.4.200 to 2.0.202+, it
-    // seems that the internal handling of larger LOB's have been changed,
-    // so if the value exceeds 1MB - 16 bytes, then the following  error
+    // seems that the internal handling of larger LOB's has been changed,
+    // so if the value exceeds 1MB - 16 bytes, then the following error
     // is shown: 'Value too long for column "BINARY VARYING".'
     //   To resolve it, the simplest way was to ensure that no data LOBs
     // were generated using hardcoded sizes, and secondly, by not exceeding
-    // the maximum allowed value of 1048560 bytes.
+    // the maximum allowed value of 1_048_560 bytes.
     protected static final int LARGE_SIZE_BYTES = 1024 * 1024 - 16;
     protected static final int MEDIUM_SIZE_BYTES = 512 * 1024;
 
@@ -146,30 +141,40 @@ public class DatabaseSetup {
         }
     }
 
-    protected ManagementBean prepareManagementBean(final Settings... settings) {
-        final ManagementBean bean = new ManagementBean();
-        inject(bean, entityManager);
-        inject(bean, ((settings != null) && (settings.length == 1)) ? settings[0] : this.settings);
-
-        return bean;
+    protected ManagementBean prepareManagementBean() {
+        return prepareManagementBean(this.settings);
     }
 
-    protected ManagementBean prepareManagementBeanWithNewMasterKey(final Settings... settings) {
-        final Settings instanceSettings = ((settings != null) && (settings.length == 1)) ? settings[0] : this.settings;
-        final ManagementBean bean = new ManagementBean();
-        inject(bean, prepareNewMasterKeyInstance(instanceSettings));
-        inject(bean, entityManager);
-        inject(bean, instanceSettings);
+    protected ManagementBean prepareManagementBean(final Settings settings) {
+        return prepareManagementBean(entityManager, settings);
+    }
 
-        return bean;
+    protected ManagementBean prepareManagementBean(final EntityManager entityManager, final Settings settings) {
+        return new ManagementBean(entityManager, settings);
     }
 
     protected ShareBean prepareShareBean() {
-        final ShareBean bean = new ShareBean();
-        inject(bean, entityManager);
-        inject(bean, settings);
+        return prepareShareBean(settings);
+    }
 
-        return bean;
+    protected ShareBean prepareShareBean(final Settings settings) {
+        return prepareShareBean(entityManager, settings);
+    }
+
+    protected ShareBean prepareShareBean(final EntityManager entityManager, final Settings settings) {
+        return new ShareBean(entityManager, settings);
+    }
+
+    protected SanitizerBean prepareSanitizerBean() {
+        return prepareSanitizerBean(settings);
+    }
+
+    protected SanitizerBean prepareSanitizerBean(final Settings settings) {
+        return prepareSanitizerBean(entityManager, settings);
+    }
+
+    protected SanitizerBean prepareSanitizerBean(final EntityManager entityManager, final Settings settings) {
+        return new SanitizerBean(entityManager, settings);
     }
 
     protected static <T extends Authentication> T prepareRequest(final Class<T> clazz, final String account) {
@@ -269,10 +274,10 @@ public class DatabaseSetup {
     }
 
     /**
-     * Testing, requiring a customized MasterKey, should use this method to get
+     * Testing requiring a customized MasterKey should use this method to get
      * a new instance of the Singleton Class MasterKey. It requires an instance
      * of the Settings to work, so it is possible to alter the content and thus
-     * behaviour without affecting other tests requiring the MasterKey and
+     * behavior without affecting other tests requiring the MasterKey and
      * Settings.
      *
      * @param settings Customized Settings instance for the MasterKey instance
@@ -338,9 +343,10 @@ public class DatabaseSetup {
     }
 
     /**
-     * To properly test the cases where the SanityCheck is supposed to fail, i.e.
-     * the Data Checksum is not matching the data anymore - a backdoor is needed
-     * into the database whereby it is achieved. This method will do just that.
+     * To properly test the cases where the SanityCheck is supposed to fail,
+     * i.e., the Data Checksum is not matching the data anymore - a backdoor
+     * is needed into the database whereby it is achieved. This method will
+     * do just that.
      *
      * @param response    Process Data Response Object
      * @param sanityCheck The timestamp for the last sanity check
@@ -350,7 +356,7 @@ public class DatabaseSetup {
         // Now to the tricky part. We wish to test that the checksum is invalid,
         // and thus resulting in a correct error message. As the checksum is
         // controlled internally by EDS, it cannot be altered (rightfully) via
-        // the API, hence we have to modify it directly in the database!
+        // the API. Hence, we have to modify it directly in the database!
         final String jql = "select d from DataEntity d where d.metadata.externalId = :eid";
         final Query query = entityManager
                 .createQuery(jql)
@@ -360,62 +366,5 @@ public class DatabaseSetup {
         entity.setSanityStatus(status);
         entity.setSanityChecked(sanityCheck);
         entityManager.persist(entity);
-    }
-
-    /**
-     * <p>Simplified CDI Injection mechanism. Based on the Bean and the
-     * given Object, it tries to find the best place to inject the given Object
-     * into the Bean. Initially by simply looking at the types, but if not
-     * possible to find a match, then it also looks at the annotations.</p>
-     *
-     * <p>For the standard @Inject annotation, the types must be an exact
-     * match, or at least a sub-class that inherits the expected type. For
-     * other annotation such as @PersistenceContext or @Resource, the rules
-     * differ - here it is more lax in the type expectations, provided the
-     * given Object inherits from a basic Object that is normally used, such
-     * as {@link EntityManager}, {@link TimerService} or
-     * {@link ThreadFactory}.</p>
-     *
-     * @param instance Bean Instance with CDI Injection places
-     * @param value    Object to inject
-     * @throws EDSException if an error occurred
-     */
-    protected static void inject(final Object instance, final Object value) {
-        for (final Field field : instance.getClass().getDeclaredFields()) {
-            if (field.getType().equals(value.getClass()) || field.getType().equals(value.getClass().getSuperclass())) {
-                setField(instance, field, value);
-            } else {
-                for (final Annotation annotation : field.getAnnotations()) {
-                    if (isInjectableResource(annotation, value)) {
-                        setField(instance, field, value);
-                    }
-                }
-            }
-        }
-    }
-
-    private static boolean isInjectableResource(final Annotation annotation, final Object value) {
-        return ((annotation instanceof PersistenceContext) && (value instanceof EntityManager)) ||
-                ((annotation instanceof Resource) && ((value instanceof TimerService) || (value instanceof ThreadFactory)));
-    }
-
-    /**
-     * <p>Uses Reflection to update an instantiated Object by altering the
-     * given field with a new value.</p>
-     *
-     * @param instance The Object to change a Field in
-     * @param field    The Field to change
-     * @param value    The new value to set the Field too
-     * @throws EDSException if unable to update the field
-     */
-    private static void setField(final Object instance, final Field field, final Object value) {
-        try {
-            final boolean accessible = field.canAccess(instance);
-            field.setAccessible(true);
-            field.set(instance, value);
-            field.setAccessible(accessible);
-        } catch (IllegalAccessException e) {
-            throw new EDSException(ReturnCode.ERROR, e);
-        }
     }
 }

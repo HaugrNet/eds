@@ -22,17 +22,18 @@ import net.haugr.eds.api.common.ReturnCode;
 import net.haugr.eds.api.requests.FetchCircleRequest;
 import net.haugr.eds.api.requests.ProcessCircleRequest;
 import jakarta.ws.rs.core.Response;
+import net.haugr.eds.core.setup.DatabaseSetup;
 import org.junit.jupiter.api.Test;
 
 /**
  * @author Kim Jensen
  * @since EDS 1.0
  */
-final class CircleServiceTest extends BeanSetup {
+final class CircleServiceTest extends DatabaseSetup {
 
     @Test
     void testCreate() {
-        final CircleService service = prepareCircleService(settings, entityManager);
+        final CircleService service = new CircleService(prepareManagementBean());
         final ProcessCircleRequest request = new ProcessCircleRequest();
 
         try (final Response response = service.create(request)) {
@@ -42,7 +43,7 @@ final class CircleServiceTest extends BeanSetup {
 
     @Test
     void testFlawedCreate() {
-        final CircleService service = prepareCircleService();
+        final CircleService service = new CircleService();
         final ProcessCircleRequest request = new ProcessCircleRequest();
 
         try (final Response response = service.create(request)) {
@@ -52,7 +53,7 @@ final class CircleServiceTest extends BeanSetup {
 
     @Test
     void testUpdate() {
-        final CircleService service = prepareCircleService(settings, entityManager);
+        final CircleService service = new CircleService(prepareManagementBean());
         final ProcessCircleRequest request = new ProcessCircleRequest();
 
         try (final Response response = service.update(request)) {
@@ -62,7 +63,7 @@ final class CircleServiceTest extends BeanSetup {
 
     @Test
     void testFlawedUpdate() {
-        final CircleService service = prepareCircleService();
+        final CircleService service = new CircleService();
         final ProcessCircleRequest request = new ProcessCircleRequest();
 
         try (final Response response = service.update(request)) {
@@ -72,7 +73,7 @@ final class CircleServiceTest extends BeanSetup {
 
     @Test
     void testDelete() {
-        final CircleService service = prepareCircleService(settings, entityManager);
+        final CircleService service = new CircleService(prepareManagementBean());
         final ProcessCircleRequest request = new ProcessCircleRequest();
 
         try (final Response response = service.delete(request)) {
@@ -82,7 +83,7 @@ final class CircleServiceTest extends BeanSetup {
 
     @Test
     void testFlawedDelete() {
-        final CircleService service = prepareCircleService();
+        final CircleService service = new CircleService();
         final ProcessCircleRequest request = new ProcessCircleRequest();
 
         try (final Response response = service.delete(request)) {
@@ -92,7 +93,7 @@ final class CircleServiceTest extends BeanSetup {
 
     @Test
     void testFetch() {
-        final CircleService service = prepareCircleService(settings, entityManager);
+        final CircleService service = new CircleService(prepareManagementBean());
         final FetchCircleRequest request = new FetchCircleRequest();
 
         try (final Response response = service.fetch(request)) {
@@ -102,7 +103,7 @@ final class CircleServiceTest extends BeanSetup {
 
     @Test
     void testFlawedFetch() {
-        final CircleService service = prepareCircleService();
+        final CircleService service = new CircleService();
         final FetchCircleRequest request = new FetchCircleRequest();
 
         try (final Response response = service.fetch(request)) {

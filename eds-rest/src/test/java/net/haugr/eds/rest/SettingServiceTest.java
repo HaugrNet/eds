@@ -22,17 +22,18 @@ import net.haugr.eds.api.common.Constants;
 import net.haugr.eds.api.common.ReturnCode;
 import net.haugr.eds.api.requests.SettingRequest;
 import jakarta.ws.rs.core.Response;
+import net.haugr.eds.core.setup.DatabaseSetup;
 import org.junit.jupiter.api.Test;
 
 /**
  * @author Kim Jensen
  * @since EDS 1.0
  */
-final class SettingServiceTest extends BeanSetup {
+final class SettingServiceTest extends DatabaseSetup {
 
     @Test
     void testSetting() {
-        final SettingService service = prepareSettingService(settings, entityManager);
+        final SettingService service = new SettingService(prepareManagementBean());
         final SettingRequest request = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
 
         try (final Response response = service.settings(request)) {
@@ -42,7 +43,7 @@ final class SettingServiceTest extends BeanSetup {
 
     @Test
     void testFlawedSetting() {
-        final SettingService service = prepareSettingService();
+        final SettingService service = new SettingService();
         final SettingRequest request = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
 
         try (final Response response = service.settings(request)) {

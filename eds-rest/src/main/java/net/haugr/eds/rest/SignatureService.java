@@ -43,15 +43,17 @@ public class SignatureService {
     private static final String VERIFY_METHOD = "verify";
     private static final String SIGN_METHOD = "sign";
 
-    @Inject
-    private ShareBean bean;
-    private final Settings settings = Settings.getInstance();
+    private final ShareBean shareBean;
+    private final Settings settings;
 
-    /**
-     * Default Constructor.
-     */
     public SignatureService() {
-        // Empty Constructor
+        this(null);
+    }
+
+    @Inject
+    public SignatureService(final ShareBean shareBean) {
+        this.shareBean = shareBean;
+        this.settings = Settings.getInstance();
     }
 
     /**
@@ -65,7 +67,7 @@ public class SignatureService {
     @Consumes(CommonService.CONSUMES)
     @Produces(CommonService.PRODUCES)
     public Response sign(@NotNull final SignRequest signDocumentRequest) {
-        return CommonService.runRequest(settings, bean, SIGN_METHOD, signDocumentRequest, Constants.REST_SIGNATURES_BASE + Constants.REST_SIGNATURES_SIGN);
+        return CommonService.runRequest(settings, shareBean, SIGN_METHOD, signDocumentRequest, Constants.REST_SIGNATURES_BASE + Constants.REST_SIGNATURES_SIGN);
     }
 
     /**
@@ -79,7 +81,7 @@ public class SignatureService {
     @Consumes(CommonService.CONSUMES)
     @Produces(CommonService.PRODUCES)
     public Response verify(@NotNull final VerifyRequest verifySignatureRequest) {
-        return CommonService.runRequest(settings, bean, VERIFY_METHOD, verifySignatureRequest, Constants.REST_SIGNATURES_BASE + Constants.REST_SIGNATURES_VERIFY);
+        return CommonService.runRequest(settings, shareBean, VERIFY_METHOD, verifySignatureRequest, Constants.REST_SIGNATURES_BASE + Constants.REST_SIGNATURES_VERIFY);
     }
 
     /**
@@ -93,6 +95,6 @@ public class SignatureService {
     @Consumes(CommonService.CONSUMES)
     @Produces(CommonService.PRODUCES)
     public Response fetch(@NotNull final FetchSignatureRequest fetchSignaturesRequest) {
-        return CommonService.runRequest(settings, bean, FETCH_METHOD, fetchSignaturesRequest, Constants.REST_SIGNATURES_BASE + Constants.REST_SIGNATURES_FETCH);
+        return CommonService.runRequest(settings, shareBean, FETCH_METHOD, fetchSignaturesRequest, Constants.REST_SIGNATURES_BASE + Constants.REST_SIGNATURES_FETCH);
     }
 }

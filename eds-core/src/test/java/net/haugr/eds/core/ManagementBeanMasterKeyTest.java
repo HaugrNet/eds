@@ -43,7 +43,7 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * <p>This Test Class, is testing the following Service Classes in one, as they
+ * <p>This Test Class is testing the following Service Classes in one, as they
  * are all fairly small but also connected.</p>
  *
  * <ul>
@@ -62,7 +62,7 @@ final class ManagementBeanMasterKeyTest extends DatabaseSetup {
 
     @Test
     void testUpdateMasterKeyWithNullRequest() {
-        final ManagementBean bean = prepareManagementBeanWithNewMasterKey();
+        final ManagementBean bean = prepareManagementBean();
 
         final MasterKeyResponse response = bean.masterKey(null);
         assertEquals(ReturnCode.VERIFICATION_WARNING.getCode(), response.getReturnCode());
@@ -72,7 +72,6 @@ final class ManagementBeanMasterKeyTest extends DatabaseSetup {
     @Test
     void testUpdateMasterKeyWithEmptyRequest() {
         final ManagementBean bean = prepareManagementBean();
-        inject(bean, prepareNewMasterKeyInstance(settings));
         final MasterKeyRequest request = new MasterKeyRequest();
 
         final MasterKeyResponse response = bean.masterKey(request);
@@ -86,7 +85,7 @@ final class ManagementBeanMasterKeyTest extends DatabaseSetup {
 
     @Test
     void testUpdateMasterKeyAsMember() {
-        final ManagementBean bean = prepareManagementBeanWithNewMasterKey();
+        final ManagementBean bean = prepareManagementBean();
         final MasterKeyRequest request = prepareRequest(MasterKeyRequest.class, MEMBER_1);
         request.setSecret("New MasterKey".getBytes(Charset.defaultCharset()));
 
@@ -97,7 +96,7 @@ final class ManagementBeanMasterKeyTest extends DatabaseSetup {
 
     @Test
     void testUpdateMasterKeyAsAdminWithWrongCredentials() {
-        final ManagementBean bean = prepareManagementBeanWithNewMasterKey();
+        final ManagementBean bean = prepareManagementBean();
         final MasterKeyRequest request = prepareRequest(MasterKeyRequest.class, Constants.ADMIN_ACCOUNT);
         request.setCredential("root".getBytes(Charset.defaultCharset()));
         request.setSecret("New MasterKey".getBytes(Charset.defaultCharset()));
@@ -115,7 +114,7 @@ final class ManagementBeanMasterKeyTest extends DatabaseSetup {
             dao.delete(member);
         }
 
-        final ManagementBean bean = prepareManagementBeanWithNewMasterKey();
+        final ManagementBean bean = prepareManagementBean();
         final MasterKeyRequest request = prepareRequest(MasterKeyRequest.class, Constants.ADMIN_ACCOUNT);
         request.setSecret(request.getCredential());
         final MasterKeyResponse response = bean.masterKey(request);
@@ -186,8 +185,8 @@ final class ManagementBeanMasterKeyTest extends DatabaseSetup {
     }
 
     /**
-     * Testing that the MasterKey from file, where the file has the same content
-     * as the normal, un-configured MasterKey, is the same as the default. and
+     * Testing that the MasterKey from a file, where the file has the same content
+     * as the normal, un-configured MasterKey, is the same as the default. And
      * that a different content file will have different key.
      *
      * @throws IOException If unable to write to the MasterKey file
@@ -222,7 +221,7 @@ final class ManagementBeanMasterKeyTest extends DatabaseSetup {
 
     @Test
     void testUpdateMasterKeyToCurrent() {
-        final ManagementBean bean = prepareManagementBeanWithNewMasterKey();
+        final ManagementBean bean = prepareManagementBean();
         final MasterKeyRequest request = prepareRequest(MasterKeyRequest.class, Constants.ADMIN_ACCOUNT);
         request.setSecret(request.getCredential());
 
@@ -234,7 +233,7 @@ final class ManagementBeanMasterKeyTest extends DatabaseSetup {
     @Test
     void testUpdateMasterKeyWithUnreachableURL() {
         final String path = tempDir() + "not_existing_file.bin";
-        final ManagementBean bean = prepareManagementBeanWithNewMasterKey();
+        final ManagementBean bean = prepareManagementBean();
         final MasterKeyRequest request = prepareRequest(MasterKeyRequest.class, Constants.ADMIN_ACCOUNT);
         request.setUrl("file://" + path);
 

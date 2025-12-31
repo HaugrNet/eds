@@ -42,15 +42,17 @@ public class MemberService {
     private static final String PROCESS_METHOD = "processMember";
     private static final String FETCH_METHOD = "fetchMembers";
 
-    @Inject
-    private ManagementBean bean;
-    private final Settings settings = Settings.getInstance();
+    private final ManagementBean managementBean;
+    private final Settings settings;
 
-    /**
-     * Default Constructor.
-     */
     public MemberService() {
-        // Empty Constructor
+        this(null);
+    }
+
+    @Inject
+    public MemberService(final ManagementBean managementBean) {
+        this.managementBean = managementBean;
+        this.settings = Settings.getInstance();
     }
 
     /**
@@ -65,7 +67,7 @@ public class MemberService {
     @Produces(CommonService.PRODUCES)
     public Response create(@NotNull final ProcessMemberRequest createMemberRequest) {
         createMemberRequest.setAction(Action.CREATE);
-        return CommonService.runRequest(settings, bean, PROCESS_METHOD, createMemberRequest, Constants.REST_MEMBERS_BASE + Constants.REST_MEMBERS_CREATE);
+        return CommonService.runRequest(settings, managementBean, PROCESS_METHOD, createMemberRequest, Constants.REST_MEMBERS_BASE + Constants.REST_MEMBERS_CREATE);
     }
 
     /**
@@ -80,7 +82,7 @@ public class MemberService {
     @Produces(CommonService.PRODUCES)
     public Response invite(@NotNull final ProcessMemberRequest inviteMemberRequest) {
         inviteMemberRequest.setAction(Action.INVITE);
-        return CommonService.runRequest(settings, bean, PROCESS_METHOD, inviteMemberRequest, Constants.REST_MEMBERS_BASE + Constants.REST_MEMBERS_INVITE);
+        return CommonService.runRequest(settings, managementBean, PROCESS_METHOD, inviteMemberRequest, Constants.REST_MEMBERS_BASE + Constants.REST_MEMBERS_INVITE);
     }
 
     /**
@@ -95,7 +97,7 @@ public class MemberService {
     @Produces(CommonService.PRODUCES)
     public Response login(@NotNull final ProcessMemberRequest loginMemberRequest) {
         loginMemberRequest.setAction(Action.LOGIN);
-        return CommonService.runRequest(settings, bean, PROCESS_METHOD, loginMemberRequest, Constants.REST_MEMBERS_BASE + Constants.REST_MEMBERS_LOGIN);
+        return CommonService.runRequest(settings, managementBean, PROCESS_METHOD, loginMemberRequest, Constants.REST_MEMBERS_BASE + Constants.REST_MEMBERS_LOGIN);
     }
 
     /**
@@ -110,7 +112,7 @@ public class MemberService {
     @Produces(CommonService.PRODUCES)
     public Response logout(@NotNull final ProcessMemberRequest logoutMemberRequest) {
         logoutMemberRequest.setAction(Action.LOGOUT);
-        return CommonService.runRequest(settings, bean, PROCESS_METHOD, logoutMemberRequest, Constants.REST_MEMBERS_BASE + Constants.REST_MEMBERS_LOGOUT);
+        return CommonService.runRequest(settings, managementBean, PROCESS_METHOD, logoutMemberRequest, Constants.REST_MEMBERS_BASE + Constants.REST_MEMBERS_LOGOUT);
     }
 
     /**
@@ -125,7 +127,7 @@ public class MemberService {
     @Produces(CommonService.PRODUCES)
     public Response alter(@NotNull final ProcessMemberRequest alterMemberRequest) {
         alterMemberRequest.setAction(Action.ALTER);
-        return CommonService.runRequest(settings, bean, PROCESS_METHOD, alterMemberRequest, Constants.REST_MEMBERS_BASE + Constants.REST_MEMBERS_ALTER);
+        return CommonService.runRequest(settings, managementBean, PROCESS_METHOD, alterMemberRequest, Constants.REST_MEMBERS_BASE + Constants.REST_MEMBERS_ALTER);
     }
 
     /**
@@ -140,7 +142,7 @@ public class MemberService {
     @Produces(CommonService.PRODUCES)
     public Response update(@NotNull final ProcessMemberRequest updateMemberRequest) {
         updateMemberRequest.setAction(Action.UPDATE);
-        return CommonService.runRequest(settings, bean, PROCESS_METHOD, updateMemberRequest, Constants.REST_MEMBERS_BASE + Constants.REST_MEMBERS_UPDATE);
+        return CommonService.runRequest(settings, managementBean, PROCESS_METHOD, updateMemberRequest, Constants.REST_MEMBERS_BASE + Constants.REST_MEMBERS_UPDATE);
     }
 
     /**
@@ -155,7 +157,7 @@ public class MemberService {
     @Produces(CommonService.PRODUCES)
     public Response invalidate(@NotNull final ProcessMemberRequest invalidateRequest) {
         invalidateRequest.setAction(Action.INVALIDATE);
-        return CommonService.runRequest(settings, bean, PROCESS_METHOD, invalidateRequest, Constants.REST_MEMBERS_BASE + Constants.REST_MEMBERS_INVALIDATE);
+        return CommonService.runRequest(settings, managementBean, PROCESS_METHOD, invalidateRequest, Constants.REST_MEMBERS_BASE + Constants.REST_MEMBERS_INVALIDATE);
     }
 
     /**
@@ -170,7 +172,7 @@ public class MemberService {
     @Produces(CommonService.PRODUCES)
     public Response delete(@NotNull final ProcessMemberRequest deleteMemberRequest) {
         deleteMemberRequest.setAction(Action.DELETE);
-        return CommonService.runRequest(settings, bean, PROCESS_METHOD, deleteMemberRequest, Constants.REST_MEMBERS_BASE + Constants.REST_MEMBERS_DELETE);
+        return CommonService.runRequest(settings, managementBean, PROCESS_METHOD, deleteMemberRequest, Constants.REST_MEMBERS_BASE + Constants.REST_MEMBERS_DELETE);
     }
 
     /**
@@ -184,6 +186,6 @@ public class MemberService {
     @Consumes(CommonService.CONSUMES)
     @Produces(CommonService.PRODUCES)
     public Response fetch(@NotNull final FetchMemberRequest fetchMembersRequest) {
-        return CommonService.runRequest(settings, bean, FETCH_METHOD, fetchMembersRequest, Constants.REST_MEMBERS_BASE + Constants.REST_MEMBERS_FETCH);
+        return CommonService.runRequest(settings, managementBean, FETCH_METHOD, fetchMembersRequest, Constants.REST_MEMBERS_BASE + Constants.REST_MEMBERS_FETCH);
     }
 }

@@ -20,6 +20,7 @@ import jakarta.ws.rs.core.Response;
 import net.haugr.eds.api.common.Constants;
 import net.haugr.eds.api.common.ReturnCode;
 import net.haugr.eds.api.requests.InventoryRequest;
+import net.haugr.eds.core.setup.DatabaseSetup;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -28,11 +29,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author Kim Jensen
  * @since EDS 1.0
  */
-final class InventoryServiceTest extends BeanSetup {
+final class InventoryServiceTest extends DatabaseSetup {
 
     @Test
     void testInventory() {
-        final InventoryService service = prepareInventoryService(settings, entityManager);
+        final InventoryService service = new InventoryService(prepareManagementBean());
         final InventoryRequest request = prepareRequest(InventoryRequest.class, Constants.ADMIN_ACCOUNT);
 
         try (final Response response = service.inventory(request)) {
@@ -42,7 +43,7 @@ final class InventoryServiceTest extends BeanSetup {
 
     @Test
     void testFlawedInventory() {
-        final InventoryService service = prepareInventoryService();
+        final InventoryService service = new InventoryService();
         final InventoryRequest request = prepareRequest(InventoryRequest.class, Constants.ADMIN_ACCOUNT);
 
         try (final Response response = service.inventory(request)) {

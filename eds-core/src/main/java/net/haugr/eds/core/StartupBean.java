@@ -18,7 +18,6 @@ package net.haugr.eds.core;
 
 import java.util.List;
 import jakarta.annotation.PostConstruct;
-import jakarta.annotation.Resource;
 import jakarta.ejb.Asynchronous;
 import jakarta.ejb.ScheduleExpression;
 import jakarta.ejb.Singleton;
@@ -31,7 +30,6 @@ import jakarta.ejb.TransactionAttribute;
 import jakarta.ejb.TransactionAttributeType;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
 import net.haugr.eds.core.enums.StandardSetting;
 import net.haugr.eds.core.exceptions.EDSException;
@@ -58,13 +56,26 @@ public class StartupBean {
     private static final Logger LOGGER = LoggerFactory.getLogger(StartupBean.class);
     private static final int DB_VERSION = 4;
 
-    @PersistenceContext
-    private EntityManager entityManager;
+    private final EntityManager entityManager;
+    private final SanitizerBean sanitizerBean;
+    private final TimerService timerService;
+    private final Settings settings;
+
+    public StartupBean() {
+        this(null, null, null);
+    }
+
     @Inject
-    private SanitizerBean sanitizerBean;
-    @Resource
-    private TimerService timerService;
-    private final Settings settings = Settings.getInstance();
+    public StartupBean(final EntityManager entityManager, final SanitizerBean sanitizerBean, final TimerService timerService) {
+        this(entityManager, sanitizerBean, timerService, Settings.getInstance());
+    }
+
+    public StartupBean(final EntityManager entityManager, final SanitizerBean sanitizerBean, final TimerService timerService, final Settings settings) {
+        this.entityManager = entityManager;
+        this.sanitizerBean = sanitizerBean;
+        this.timerService = timerService;
+        this.settings = settings;
+    }
 
     @PostConstruct
     public void startup() {
@@ -76,7 +87,7 @@ public class StartupBean {
 
             LOGGER.info("Initializing the EDS Sanitizer Service.");
 
-            // If requested, then simply start sanitize as a background job
+            // If requested, then simply start to sanitize as a background job
             // now. The job will process small blocks of code and save these.
             if (settings.hasSanityStartup()) {
                 runSanitizing();
@@ -88,7 +99,7 @@ public class StartupBean {
             timerConfig.setInfo("EDS Sanitizer");
 
             // To prevent starting multiple Timers, it is started in
-            // a non-persisted way, meaning that it will be cancelled once
+            // a non-persisted way, meaning that it will be canceled once
             // the Container is stopped.
             timerConfig.setPersistent(false);
 
@@ -107,7 +118,7 @@ public class StartupBean {
             final List<VersionEntity> result = CommonDao.findList(query);
 
             // If the database is invalid, then no data could be found, meaning
-            // that the database was not properly initialized, this should
+            // that the database was not properly initialized; this should
             // result in an error while reading.
             if (!result.isEmpty() && (result.getFirst().getSchemaVersion() == DB_VERSION)) {
                 ready = true;
@@ -136,7 +147,7 @@ public class StartupBean {
     }
 
     @Timeout
-    public void runSanitizing(final Timer timer) {
+    public void runSanitizingWithTimeout(final Timer timer) {
         LOGGER.info("Starting Timed Sanitizing check.");
         sanitizerBean.sanitize();
         LOGGER.info("Next Sanitizing check will begin at: {}", timer.getNextTimeout());

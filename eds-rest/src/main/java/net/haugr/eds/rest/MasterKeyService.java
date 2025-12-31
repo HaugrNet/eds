@@ -39,15 +39,17 @@ public class MasterKeyService {
 
     private static final String METHOD = "masterKey";
 
-    @Inject
-    private ManagementBean bean;
-    private final Settings settings = Settings.getInstance();
+    private final ManagementBean managementBean;
+    private final Settings settings;
 
-    /**
-     * Default Constructor.
-     */
     public MasterKeyService() {
-        // Empty Constructor
+        this(null);
+    }
+
+    @Inject
+    public MasterKeyService(final ManagementBean managementBean) {
+        this.managementBean = managementBean;
+        this.settings = Settings.getInstance();
     }
 
     /**
@@ -60,6 +62,6 @@ public class MasterKeyService {
     @Consumes(CommonService.CONSUMES)
     @Produces(CommonService.PRODUCES)
     public Response masterKey(@NotNull final MasterKeyRequest masterKeyRequest) {
-        return CommonService.runRequest(settings, bean, METHOD, masterKeyRequest, Constants.REST_MASTERKEY);
+        return CommonService.runRequest(settings, managementBean, METHOD, masterKeyRequest, Constants.REST_MASTERKEY);
     }
 }

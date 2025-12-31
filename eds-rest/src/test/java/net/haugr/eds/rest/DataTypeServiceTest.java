@@ -20,6 +20,7 @@ import jakarta.ws.rs.core.Response;
 import net.haugr.eds.api.common.ReturnCode;
 import net.haugr.eds.api.requests.FetchDataTypeRequest;
 import net.haugr.eds.api.requests.ProcessDataTypeRequest;
+import net.haugr.eds.core.setup.DatabaseSetup;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -28,11 +29,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author Kim Jensen
  * @since EDS 1.0
  */
-final class DataTypeServiceTest extends BeanSetup {
+final class DataTypeServiceTest extends DatabaseSetup {
 
     @Test
     void testProcess() {
-        final DataTypeService service = prepareDataTypeService(settings, entityManager);
+        final DataTypeService service = new DataTypeService(prepareShareBean());
         final ProcessDataTypeRequest request = new ProcessDataTypeRequest();
 
         try (final Response response = service.process(request)) {
@@ -42,7 +43,7 @@ final class DataTypeServiceTest extends BeanSetup {
 
     @Test
     void testFlawedProcess() {
-        final DataTypeService service = prepareDataTypeService();
+        final DataTypeService service = new DataTypeService();
         final ProcessDataTypeRequest request = new ProcessDataTypeRequest();
 
         try (final Response response = service.process(request)) {
@@ -52,7 +53,7 @@ final class DataTypeServiceTest extends BeanSetup {
 
     @Test
     void testDelete() {
-        final DataTypeService service = prepareDataTypeService(settings, entityManager);
+        final DataTypeService service = new DataTypeService(prepareShareBean());
         final ProcessDataTypeRequest request = new ProcessDataTypeRequest();
 
         try (final Response response = service.delete(request)) {
@@ -62,7 +63,7 @@ final class DataTypeServiceTest extends BeanSetup {
 
     @Test
     void testFlawedDelete() {
-        final DataTypeService service = prepareDataTypeService();
+        final DataTypeService service = new DataTypeService();
         final ProcessDataTypeRequest request = new ProcessDataTypeRequest();
 
         try (final Response response = service.delete(request)) {
@@ -72,7 +73,7 @@ final class DataTypeServiceTest extends BeanSetup {
 
     @Test
     void testFetch() {
-        final DataTypeService service = prepareDataTypeService(settings, entityManager);
+        final DataTypeService service = new DataTypeService(prepareShareBean());
         final FetchDataTypeRequest request = new FetchDataTypeRequest();
 
         try (final Response response = service.fetch(request)) {
@@ -82,7 +83,7 @@ final class DataTypeServiceTest extends BeanSetup {
 
     @Test
     void testFlawedFetch() {
-        final DataTypeService service = prepareDataTypeService();
+        final DataTypeService service = new DataTypeService();
         final FetchDataTypeRequest request = new FetchDataTypeRequest();
 
         try (final Response response = service.fetch(request)) {

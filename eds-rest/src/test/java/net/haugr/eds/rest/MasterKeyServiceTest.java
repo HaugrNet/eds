@@ -22,17 +22,18 @@ import net.haugr.eds.api.common.Constants;
 import net.haugr.eds.api.common.ReturnCode;
 import net.haugr.eds.api.requests.MasterKeyRequest;
 import jakarta.ws.rs.core.Response;
+import net.haugr.eds.core.setup.DatabaseSetup;
 import org.junit.jupiter.api.Test;
 
 /**
  * @author Kim Jensen
  * @since EDS 1.0
  */
-final class MasterKeyServiceTest extends BeanSetup {
+final class MasterKeyServiceTest extends DatabaseSetup {
 
     @Test
     void testMasterKey() {
-        final MasterKeyService service = prepareMasterKeyService(settings, entityManager);
+        final MasterKeyService service = new MasterKeyService(prepareManagementBean());
         final MasterKeyRequest request = prepareRequest(MasterKeyRequest.class, Constants.ADMIN_ACCOUNT);
         request.setSecret(Constants.ADMIN_ACCOUNT.getBytes(settings.getCharset()));
 
@@ -43,7 +44,7 @@ final class MasterKeyServiceTest extends BeanSetup {
 
     @Test
     void testFlawedMasterKey() {
-        final MasterKeyService service = prepareMasterKeyService();
+        final MasterKeyService service = new MasterKeyService();
         final MasterKeyRequest request = prepareRequest(MasterKeyRequest.class, Constants.ADMIN_ACCOUNT);
         request.setSecret(Constants.ADMIN_ACCOUNT.getBytes(settings.getCharset()));
 

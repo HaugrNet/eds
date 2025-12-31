@@ -42,15 +42,17 @@ public class TrusteeService {
     private static final String PROCESS_METHOD = "processTrustee";
     private static final String FETCH_METHOD = "fetchTrustees";
 
-    @Inject
-    private ManagementBean bean;
-    private final Settings settings = Settings.getInstance();
+    private final ManagementBean managementBean;
+    private final Settings settings;
 
-    /**
-     * Default Constructor.
-     */
     public TrusteeService() {
-        // Empty Constructor
+        this(null);
+    }
+
+    @Inject
+    public TrusteeService(final ManagementBean managementBean) {
+        this.managementBean = managementBean;
+        this.settings = Settings.getInstance();
     }
 
     /**
@@ -65,7 +67,7 @@ public class TrusteeService {
     @Produces(CommonService.PRODUCES)
     public Response add(@NotNull final ProcessTrusteeRequest addTrusteeRequest) {
         addTrusteeRequest.setAction(Action.ADD);
-        return CommonService.runRequest(settings, bean, PROCESS_METHOD, addTrusteeRequest, Constants.REST_TRUSTEES_BASE + Constants.REST_TRUSTEES_ADD);
+        return CommonService.runRequest(settings, managementBean, PROCESS_METHOD, addTrusteeRequest, Constants.REST_TRUSTEES_BASE + Constants.REST_TRUSTEES_ADD);
     }
 
     /**
@@ -80,7 +82,7 @@ public class TrusteeService {
     @Produces(CommonService.PRODUCES)
     public Response alter(@NotNull final ProcessTrusteeRequest alterTrusteeRequest) {
         alterTrusteeRequest.setAction(Action.ALTER);
-        return CommonService.runRequest(settings, bean, PROCESS_METHOD, alterTrusteeRequest, Constants.REST_TRUSTEES_BASE + Constants.REST_TRUSTEES_ALTER);
+        return CommonService.runRequest(settings, managementBean, PROCESS_METHOD, alterTrusteeRequest, Constants.REST_TRUSTEES_BASE + Constants.REST_TRUSTEES_ALTER);
     }
 
     /**
@@ -95,7 +97,7 @@ public class TrusteeService {
     @Produces(CommonService.PRODUCES)
     public Response remove(@NotNull final ProcessTrusteeRequest removeTrusteeRequest) {
         removeTrusteeRequest.setAction(Action.REMOVE);
-        return CommonService.runRequest(settings, bean, PROCESS_METHOD, removeTrusteeRequest, Constants.REST_TRUSTEES_BASE + Constants.REST_TRUSTEES_REMOVE);
+        return CommonService.runRequest(settings, managementBean, PROCESS_METHOD, removeTrusteeRequest, Constants.REST_TRUSTEES_BASE + Constants.REST_TRUSTEES_REMOVE);
     }
 
     /**
@@ -109,6 +111,6 @@ public class TrusteeService {
     @Consumes(CommonService.CONSUMES)
     @Produces(CommonService.PRODUCES)
     public Response fetch(@NotNull final FetchTrusteeRequest fetchTrusteeRequest) {
-        return CommonService.runRequest(settings, bean, FETCH_METHOD, fetchTrusteeRequest, Constants.REST_TRUSTEES_BASE + Constants.REST_TRUSTEES_FETCH);
+        return CommonService.runRequest(settings, managementBean, FETCH_METHOD, fetchTrusteeRequest, Constants.REST_TRUSTEES_BASE + Constants.REST_TRUSTEES_FETCH);
     }
 }

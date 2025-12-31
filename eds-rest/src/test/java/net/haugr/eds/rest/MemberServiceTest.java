@@ -22,17 +22,18 @@ import net.haugr.eds.api.common.ReturnCode;
 import net.haugr.eds.api.requests.FetchMemberRequest;
 import net.haugr.eds.api.requests.ProcessMemberRequest;
 import jakarta.ws.rs.core.Response;
+import net.haugr.eds.core.setup.DatabaseSetup;
 import org.junit.jupiter.api.Test;
 
 /**
  * @author Kim Jensen
  * @since EDS 1.0
  */
-final class MemberServiceTest extends BeanSetup {
+final class MemberServiceTest extends DatabaseSetup {
 
     @Test
     void testCreate() {
-        final MemberService service = prepareMemberService(settings, entityManager);
+        final MemberService service = new MemberService(prepareManagementBean());
         final ProcessMemberRequest request = new ProcessMemberRequest();
 
         try (final Response response = service.create(request)) {
@@ -42,7 +43,7 @@ final class MemberServiceTest extends BeanSetup {
 
     @Test
     void testFlawedCreate() {
-        final MemberService service = prepareMemberService();
+        final MemberService service = new MemberService();
         final ProcessMemberRequest request = new ProcessMemberRequest();
 
         try (final Response response = service.create(request)) {
@@ -52,7 +53,7 @@ final class MemberServiceTest extends BeanSetup {
 
     @Test
     void testInvite() {
-        final MemberService service = prepareMemberService(settings, entityManager);
+        final MemberService service = new MemberService(prepareManagementBean());
         final ProcessMemberRequest request = new ProcessMemberRequest();
 
         try (final Response response = service.invite(request)) {
@@ -62,7 +63,7 @@ final class MemberServiceTest extends BeanSetup {
 
     @Test
     void testFlawedInvite() {
-        final MemberService service = prepareMemberService();
+        final MemberService service = new MemberService();
         final ProcessMemberRequest request = new ProcessMemberRequest();
 
         try (final Response response = service.invite(request)) {
@@ -72,7 +73,7 @@ final class MemberServiceTest extends BeanSetup {
 
     @Test
     void testLogin() {
-        final MemberService service = prepareMemberService(settings, entityManager);
+        final MemberService service = new MemberService(prepareManagementBean());
         final ProcessMemberRequest request = new ProcessMemberRequest();
 
         try (final Response response = service.login(request)) {
@@ -82,7 +83,7 @@ final class MemberServiceTest extends BeanSetup {
 
     @Test
     void testFlawedLogin() {
-        final MemberService service = prepareMemberService();
+        final MemberService service = new MemberService();
         final ProcessMemberRequest request = new ProcessMemberRequest();
 
         try (final Response response = service.login(request)) {
@@ -92,7 +93,7 @@ final class MemberServiceTest extends BeanSetup {
 
     @Test
     void testLogout() {
-        final MemberService service = prepareMemberService(settings, entityManager);
+        final MemberService service = new MemberService(prepareManagementBean());
         final ProcessMemberRequest request = new ProcessMemberRequest();
 
         try (final Response response = service.logout(request)) {
@@ -102,7 +103,7 @@ final class MemberServiceTest extends BeanSetup {
 
     @Test
     void testFlawedLogout() {
-        final MemberService service = prepareMemberService();
+        final MemberService service = new MemberService();
         final ProcessMemberRequest request = new ProcessMemberRequest();
 
         try (final Response response = service.logout(request)) {
@@ -112,7 +113,7 @@ final class MemberServiceTest extends BeanSetup {
 
     @Test
     void testAlter() {
-        final MemberService service = prepareMemberService(settings, entityManager);
+        final MemberService service = new MemberService(prepareManagementBean());
         final ProcessMemberRequest request = new ProcessMemberRequest();
 
         try (final Response response = service.alter(request)) {
@@ -122,7 +123,7 @@ final class MemberServiceTest extends BeanSetup {
 
     @Test
     void testFlawedAlter() {
-        final MemberService service = prepareMemberService();
+        final MemberService service = new MemberService();
         final ProcessMemberRequest request = new ProcessMemberRequest();
 
         try (final Response response = service.alter(request)) {
@@ -132,7 +133,7 @@ final class MemberServiceTest extends BeanSetup {
 
     @Test
     void testUpdate() {
-        final MemberService service = prepareMemberService(settings, entityManager);
+        final MemberService service = new MemberService(prepareManagementBean());
         final ProcessMemberRequest request = new ProcessMemberRequest();
 
         try (final Response response = service.update(request)) {
@@ -142,7 +143,7 @@ final class MemberServiceTest extends BeanSetup {
 
     @Test
     void testFlawedUpdate() {
-        final MemberService service = prepareMemberService();
+        final MemberService service = new MemberService();
         final ProcessMemberRequest request = new ProcessMemberRequest();
 
         try (final Response response = service.update(request)) {
@@ -152,7 +153,7 @@ final class MemberServiceTest extends BeanSetup {
 
     @Test
     void testInvalidate() {
-        final MemberService service = prepareMemberService(settings, entityManager);
+        final MemberService service = new MemberService(prepareManagementBean());
         final ProcessMemberRequest request = new ProcessMemberRequest();
 
         try (final Response response = service.invalidate(request)) {
@@ -162,7 +163,7 @@ final class MemberServiceTest extends BeanSetup {
 
     @Test
     void testFlawedInvalidate() {
-        final MemberService service = prepareMemberService();
+        final MemberService service = new MemberService();
         final ProcessMemberRequest request = new ProcessMemberRequest();
 
         try (final Response response = service.invalidate(request)) {
@@ -172,7 +173,7 @@ final class MemberServiceTest extends BeanSetup {
 
     @Test
     void testDelete() {
-        final MemberService service = prepareMemberService(settings, entityManager);
+        final MemberService service = new MemberService(prepareManagementBean());
         final ProcessMemberRequest request = new ProcessMemberRequest();
 
         try (final Response response = service.delete(request)) {
@@ -182,7 +183,7 @@ final class MemberServiceTest extends BeanSetup {
 
     @Test
     void testFlawedDelete() {
-        final MemberService service = prepareMemberService();
+        final MemberService service = new MemberService();
         final ProcessMemberRequest request = new ProcessMemberRequest();
 
         try (final Response response = service.delete(request)) {
@@ -192,7 +193,7 @@ final class MemberServiceTest extends BeanSetup {
 
     @Test
     void testFetch() {
-        final MemberService service = prepareMemberService(settings, entityManager);
+        final MemberService service = new MemberService(prepareManagementBean());
         final FetchMemberRequest request = new FetchMemberRequest();
 
         try (final Response response = service.fetch(request)) {
@@ -202,7 +203,7 @@ final class MemberServiceTest extends BeanSetup {
 
     @Test
     void testFlawedFetch() {
-        final MemberService service = prepareMemberService();
+        final MemberService service = new MemberService();
         final FetchMemberRequest request = new FetchMemberRequest();
 
         try (final Response response = service.fetch(request)) {

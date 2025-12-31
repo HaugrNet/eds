@@ -22,17 +22,18 @@ import net.haugr.eds.api.common.ReturnCode;
 import net.haugr.eds.api.requests.FetchTrusteeRequest;
 import net.haugr.eds.api.requests.ProcessTrusteeRequest;
 import jakarta.ws.rs.core.Response;
+import net.haugr.eds.core.setup.DatabaseSetup;
 import org.junit.jupiter.api.Test;
 
 /**
  * @author Kim Jensen
  * @since EDS 1.0
  */
-final class TrusteeServiceTest extends BeanSetup {
+final class TrusteeServiceTest extends DatabaseSetup {
 
     @Test
     void testAdd() {
-        final TrusteeService service = prepareTrusteeService(settings, entityManager);
+        final TrusteeService service = new TrusteeService(prepareManagementBean());
         final ProcessTrusteeRequest request = new ProcessTrusteeRequest();
 
         try (final Response response = service.add(request)) {
@@ -42,7 +43,7 @@ final class TrusteeServiceTest extends BeanSetup {
 
     @Test
     void testFlawedAdd() {
-        final TrusteeService service = prepareTrusteeService();
+        final TrusteeService service = new TrusteeService();
         final ProcessTrusteeRequest request = new ProcessTrusteeRequest();
 
         try (final Response response = service.add(request)) {
@@ -52,7 +53,7 @@ final class TrusteeServiceTest extends BeanSetup {
 
     @Test
     void testAlter() {
-        final TrusteeService service = prepareTrusteeService(settings, entityManager);
+        final TrusteeService service = new TrusteeService(prepareManagementBean());
         final ProcessTrusteeRequest request = new ProcessTrusteeRequest();
 
         try (final Response response = service.alter(request)) {
@@ -62,7 +63,7 @@ final class TrusteeServiceTest extends BeanSetup {
 
     @Test
     void testFlawedAlter() {
-        final TrusteeService service = prepareTrusteeService();
+        final TrusteeService service = new TrusteeService();
         final ProcessTrusteeRequest request = new ProcessTrusteeRequest();
 
         try (final Response response = service.alter(request)) {
@@ -72,7 +73,7 @@ final class TrusteeServiceTest extends BeanSetup {
 
     @Test
     void testRemove() {
-        final TrusteeService service = prepareTrusteeService(settings, entityManager);
+        final TrusteeService service = new TrusteeService(prepareManagementBean());
         final ProcessTrusteeRequest request = new ProcessTrusteeRequest();
 
         try (final Response response = service.remove(request)) {
@@ -82,7 +83,7 @@ final class TrusteeServiceTest extends BeanSetup {
 
     @Test
     void testFlawedRemove() {
-        final TrusteeService service = prepareTrusteeService();
+        final TrusteeService service = new TrusteeService();
         final ProcessTrusteeRequest request = new ProcessTrusteeRequest();
 
         try (final Response response = service.remove(request)) {
@@ -92,7 +93,7 @@ final class TrusteeServiceTest extends BeanSetup {
 
     @Test
     void testFetch() {
-        final TrusteeService service = prepareTrusteeService(settings, entityManager);
+        final TrusteeService service = new TrusteeService(prepareManagementBean());
         final FetchTrusteeRequest request = new FetchTrusteeRequest();
 
         try (final Response response = service.fetch(request)) {
@@ -102,7 +103,7 @@ final class TrusteeServiceTest extends BeanSetup {
 
     @Test
     void testFlawedFetch() {
-        final TrusteeService service = prepareTrusteeService();
+        final TrusteeService service = new TrusteeService();
         final FetchTrusteeRequest request = new FetchTrusteeRequest();
 
         try (final Response response = service.fetch(request)) {

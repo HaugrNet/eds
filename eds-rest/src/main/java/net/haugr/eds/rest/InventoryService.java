@@ -39,15 +39,17 @@ public class InventoryService {
 
     private static final String METHOD = "inventory";
 
-    @Inject
-    private ManagementBean bean;
-    private final Settings settings = Settings.getInstance();
+    private final ManagementBean managementBean;
+    private final Settings settings;
 
-    /**
-     * Default Constructor.
-     */
     public InventoryService() {
-        // Empty Constructor
+        this(null);
+    }
+
+    @Inject
+    public InventoryService(final ManagementBean managementBean) {
+        this.managementBean = managementBean;
+        this.settings = Settings.getInstance();
     }
 
     /**
@@ -60,6 +62,6 @@ public class InventoryService {
     @Consumes(CommonService.CONSUMES)
     @Produces(CommonService.PRODUCES)
     public Response inventory(@NotNull final InventoryRequest inventoryRequest) {
-        return CommonService.runRequest(settings, bean, METHOD, inventoryRequest, Constants.REST_INVENTORY);
+        return CommonService.runRequest(settings, managementBean, METHOD, inventoryRequest, Constants.REST_INVENTORY);
     }
 }

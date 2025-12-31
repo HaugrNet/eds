@@ -20,10 +20,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import jakarta.ejb.Stateless;
+import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.LockModeType;
-import jakarta.persistence.PersistenceContext;
-import jakarta.persistence.PersistenceException;
 import jakarta.persistence.Query;
 import jakarta.transaction.Transactional;
 import net.haugr.eds.api.common.Utilities;
@@ -36,17 +35,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * <p>Generally, the database is always trustworthy, it is a system which is
- * designed to be entrusted with data - meaning that the bits and bytes going
- * in should match those coming out. However, if certain parts of the data is
+ * <p>Generally, the database is always trustworthy, it is a system designed
+ * to be entrusted with data - meaning that the bits and bytes going in
+ * should match those coming out. However, if certain parts of the data are
  * not accessed or used in a long time, the disc used to persist the data on
  * may develop problems which can corrupt data over time.</p>
  *
- * <p>Simplest solution is to make sure that data is used frequently and as
- * long as the data extracted matches the one that was persisted - everything
- * is fine. If a problem occurs over time, then a flag is set which will mark
- * the data invalid. This way, the corrupted record can be either removed or
- * replaced with a valid record from a backup.</p>
+ * <p>The simplest solution is to make sure that data is used frequently and
+ * as long as the data extracted matches the one that was persisted -
+ * everything is fine. If a problem occurs over time, then a flag is set which
+ * will mark the data invalid. This way, the corrupted record can be either
+ * removed or replaced with a valid record from a backup.</p>
  *
  * @author Kim Jensen
  * @since EDS 1.0
@@ -58,13 +57,26 @@ public class SanitizerBean {
     private static final Logger LOGGER = LoggerFactory.getLogger(SanitizerBean.class);
     private static final int BLOCK = 100;
 
-    @PersistenceContext
-    private EntityManager entityManager;
-    private final Settings settings = Settings.getInstance();
-    private final Crypto crypto = new Crypto(settings);
+    private final EntityManager entityManager;
+    private final Settings settings;
+
+    public SanitizerBean() {
+        this(null);
+    }
+
+    @Inject
+    public SanitizerBean(final EntityManager entityManager) {
+        this(entityManager, Settings.getInstance());
+    }
+
+    public SanitizerBean(final EntityManager entityManager, final Settings settings) {
+        this.entityManager = entityManager;
+        this.settings = settings;
+    }
 
     @Transactional(Transactional.TxType.REQUIRED)
     public void sanitize() {
+        final Crypto crypto = new Crypto(settings);
         clearExpireSessions();
         List<Long> ids = findNextBatch(BLOCK);
         long count = 0;
@@ -72,7 +84,7 @@ public class SanitizerBean {
 
         while (!ids.isEmpty()) {
             for (final Long id : ids) {
-                final SanityStatus status = processEntity(id);
+                final SanityStatus status = processEntity(crypto, id);
                 if (status == SanityStatus.FAILED) {
                     flawed++;
                 }
@@ -85,16 +97,14 @@ public class SanitizerBean {
         LOGGER.info("Completed Sanity check, found {} flaws out of {} checked Data Objects.", flawed, count);
     }
 
-    public SanityStatus processEntity(final Long id) {
+    public SanityStatus processEntity(final Crypto crypto, final Long id) {
         SanityStatus status;
 
         try {
-            // When trying to run the updates, it would be good if it could be
-            // done using a Pessimistic locking, to prevent that other processes
-            // accidentally also perform the update, as the Pessimistic locking
-            // is made at the DB level, whereas the Optimistic locking is handled
-            // by the ORM Vendor. However, due to problems with the stability of
-            // the Travis-CI builds, the locking has been removed.
+            // When updating, it would be preferable to use Pessimistic
+            // locking to prevent that other processes accidentally update
+            // also. Pessimistic locking is made at the DB level, whereas
+            // Optimistic locking is handled by the ORM Vendor.
             //   Even if two different EDS instances perform the same update on
             // an Object, it should not have any other consequences than wasted
             // CPU and DB updates.
@@ -103,7 +113,7 @@ public class SanitizerBean {
 
             if (!Objects.equals(checksum, entity.getChecksum())) {
                 // Let's update the DB with the information that the data is
-                // invalid, and return the error.
+                //  invalid and return the error.
                 entity.setSanityStatus(SanityStatus.FAILED);
                 entity.setAltered(Utilities.newDate());
             }
@@ -113,8 +123,8 @@ public class SanitizerBean {
             entity.setSanityChecked(Utilities.newDate());
             entityManager.persist(entity);
             status = entity.getSanityStatus();
-        } catch (PersistenceException e) {
-            // There are 2 potential problems which may be caught here:
+        } catch (RuntimeException e) {
+            // There are 2 (3) potential problems that may be caught here:
             //   1. A different process (EDS instance) may be processing the
             //      record, hence it is perfectly legitimate, and we can
             //      actually ignore the error. However, it is still being
@@ -122,6 +132,7 @@ public class SanitizerBean {
             //   2. The underlying database does not support locking, so it is
             //      not possible to continue. If this is the case, it should be
             //      reported to the EDS developers.
+            //   3. Unlikely - NPE caused by a missing EntityManager instance
             LOGGER.error(e.getMessage(), e);
             status = SanityStatus.BLOCKED;
         }
@@ -135,8 +146,6 @@ public class SanitizerBean {
     }
 
     public List<Long> findNextBatch(final int maxResults) {
-        // JPA support for Java 8 Date/Time API is not supported
-        // before JavaEE8, which is still very early in adoption.
         final int days = settings.getSanityInterval();
         final LocalDateTime date = Utilities.newDate().minusDays(days);
 

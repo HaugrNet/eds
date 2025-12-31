@@ -29,6 +29,8 @@ import net.haugr.eds.api.requests.FetchCircleRequest;
 import net.haugr.eds.api.requests.ProcessCircleRequest;
 import net.haugr.eds.core.ManagementBean;
 import net.haugr.eds.core.model.Settings;
+import org.eclipse.microprofile.openapi.annotations.Operation;
+import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 
 /**
  * <p>REST interface for the Circle functionality.</p>
@@ -37,20 +39,23 @@ import net.haugr.eds.core.model.Settings;
  * @since EDS 1.0
  */
 @Path(Constants.REST_CIRCLES_BASE)
+@org.eclipse.microprofile.openapi.annotations.tags.Tag(name = "Circles", description = "Operations for managing circles (create, update, delete, fetch).")
 public class CircleService {
 
     private static final String PROCESS_METHOD = "processCircle";
     private static final String FETCH_METHOD = "fetchCircles";
 
-    @Inject
-    private ManagementBean bean;
-    private final Settings settings = Settings.getInstance();
+    private final ManagementBean managementBean;
+    private final Settings settings;
 
-    /**
-     * Default Constructor.
-     */
     public CircleService() {
-        // Empty Constructor
+        this(null);
+    }
+
+    @Inject
+    public CircleService(final ManagementBean managementBean) {
+        this.managementBean = managementBean;
+        this.settings = Settings.getInstance();
     }
 
     /**
@@ -59,13 +64,17 @@ public class CircleService {
      * @param createCircleRequest Create Circle Request
      * @return Create Circle Response
      */
+    @Operation(
+            summary = "Create circle",
+            description = "Creates a new circle. The action is set to CREATE internally.")
+    @APIResponse(responseCode = "200", description = "Successful operation")
     @POST
     @Path(Constants.REST_CIRCLES_CREATE)
     @Consumes(CommonService.CONSUMES)
     @Produces(CommonService.PRODUCES)
     public Response create(@NotNull final ProcessCircleRequest createCircleRequest) {
         createCircleRequest.setAction(Action.CREATE);
-        return CommonService.runRequest(settings, bean, PROCESS_METHOD, createCircleRequest, Constants.REST_CIRCLES_BASE + Constants.REST_CIRCLES_CREATE);
+        return CommonService.runRequest(settings, managementBean, PROCESS_METHOD, createCircleRequest, Constants.REST_CIRCLES_BASE + Constants.REST_CIRCLES_CREATE);
     }
 
     /**
@@ -74,13 +83,17 @@ public class CircleService {
      * @param updateCircleRequest Update Circle Request
      * @return Update Circle Response
      */
+    @Operation(
+            summary = "Update circle",
+            description = "Updates an existing circle. The action is set to UPDATE internally.")
+    @APIResponse(responseCode = "200", description = "Successful operation")
     @POST
     @Path(Constants.REST_CIRCLES_UPDATE)
     @Consumes(CommonService.CONSUMES)
     @Produces(CommonService.PRODUCES)
     public Response update(@NotNull final ProcessCircleRequest updateCircleRequest) {
         updateCircleRequest.setAction(Action.UPDATE);
-        return CommonService.runRequest(settings, bean, PROCESS_METHOD, updateCircleRequest, Constants.REST_CIRCLES_BASE + Constants.REST_CIRCLES_UPDATE);
+        return CommonService.runRequest(settings, managementBean, PROCESS_METHOD, updateCircleRequest, Constants.REST_CIRCLES_BASE + Constants.REST_CIRCLES_UPDATE);
     }
 
     /**
@@ -89,13 +102,17 @@ public class CircleService {
      * @param deleteCircleRequest Delete Circle Request
      * @return Delete Circle Response
      */
+    @Operation(
+            summary = "Delete circle",
+            description = "Deletes an existing circle. The action is set to DELETE internally.")
+    @APIResponse(responseCode = "200", description = "Successful operation")
     @POST
     @Path(Constants.REST_CIRCLES_DELETE)
     @Consumes(CommonService.CONSUMES)
     @Produces(CommonService.PRODUCES)
     public Response delete(@NotNull final ProcessCircleRequest deleteCircleRequest) {
         deleteCircleRequest.setAction(Action.DELETE);
-        return CommonService.runRequest(settings, bean, PROCESS_METHOD, deleteCircleRequest, Constants.REST_CIRCLES_BASE + Constants.REST_CIRCLES_DELETE);
+        return CommonService.runRequest(settings, managementBean, PROCESS_METHOD, deleteCircleRequest, Constants.REST_CIRCLES_BASE + Constants.REST_CIRCLES_DELETE);
     }
 
     /**
@@ -104,11 +121,15 @@ public class CircleService {
      * @param fetchCirclesRequest Fetch Circles Request
      * @return Fetch Circles Response
      */
+    @Operation(
+            summary = "Fetch circles",
+            description = "Fetches circles, optionally filtered and paginated.")
+    @APIResponse(responseCode = "200", description = "Successful operation")
     @POST
     @Path(Constants.REST_CIRCLES_FETCH)
     @Consumes(CommonService.CONSUMES)
     @Produces(CommonService.PRODUCES)
     public Response fetch(@NotNull final FetchCircleRequest fetchCirclesRequest) {
-        return CommonService.runRequest(settings, bean, FETCH_METHOD, fetchCirclesRequest, Constants.REST_CIRCLES_BASE + Constants.REST_CIRCLES_FETCH);
+        return CommonService.runRequest(settings, managementBean, FETCH_METHOD, fetchCirclesRequest, Constants.REST_CIRCLES_BASE + Constants.REST_CIRCLES_FETCH);
     }
 }

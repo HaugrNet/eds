@@ -39,15 +39,21 @@ public class AuthenticatedService {
 
     private static final String METHOD = "authenticated";
 
-    @Inject
-    private ManagementBean bean;
-    private final Settings settings = Settings.getInstance();
+    private final ManagementBean managementBean;
+    private final Settings settings;
 
-    /**
-     * Default Constructor.
-     */
     public AuthenticatedService() {
-        // Empty Constructor
+        this(null);
+    }
+
+    @Inject
+    public AuthenticatedService(final ManagementBean managementBean) {
+        this(managementBean, Settings.getInstance());
+    }
+
+    public AuthenticatedService(final ManagementBean managementBean, final Settings settings) {
+        this.managementBean = managementBean;
+        this.settings = settings;
     }
 
     /**
@@ -60,6 +66,6 @@ public class AuthenticatedService {
     @Consumes(CommonService.CONSUMES)
     @Produces(CommonService.PRODUCES)
     public Response authenticated(@NotNull final Authentication request) {
-        return CommonService.runRequest(settings, bean, METHOD, request, Constants.REST_AUTHENTICATED);
+        return CommonService.runRequest(settings, managementBean, METHOD, request, Constants.REST_AUTHENTICATED);
     }
 }

@@ -23,17 +23,18 @@ import net.haugr.eds.api.requests.FetchSignatureRequest;
 import net.haugr.eds.api.requests.SignRequest;
 import net.haugr.eds.api.requests.VerifyRequest;
 import jakarta.ws.rs.core.Response;
+import net.haugr.eds.core.setup.DatabaseSetup;
 import org.junit.jupiter.api.Test;
 
 /**
  * @author Kim Jensen
  * @since EDS 1.0
  */
-final class SignatureServiceTest extends BeanSetup {
+final class SignatureServiceTest extends DatabaseSetup {
 
     @Test
     void testSign() {
-        final SignatureService service = prepareSignatureService(settings, entityManager);
+        final SignatureService service = new SignatureService(prepareShareBean());
         final SignRequest request = new SignRequest();
 
         try (final Response response = service.sign(request)) {
@@ -43,7 +44,7 @@ final class SignatureServiceTest extends BeanSetup {
 
     @Test
     void testFlawedSign() {
-        final SignatureService service = prepareSignatureService();
+        final SignatureService service = new SignatureService();
         final SignRequest request = new SignRequest();
 
         try (final Response response = service.sign(request)) {
@@ -53,7 +54,7 @@ final class SignatureServiceTest extends BeanSetup {
 
     @Test
     void testVerify() {
-        final SignatureService service = prepareSignatureService(settings, entityManager);
+        final SignatureService service = new SignatureService(prepareShareBean());
         final VerifyRequest request = new VerifyRequest();
 
         try (final Response response = service.verify(request)) {
@@ -63,7 +64,7 @@ final class SignatureServiceTest extends BeanSetup {
 
     @Test
     void testFlawedVerify() {
-        final SignatureService service = prepareSignatureService();
+        final SignatureService service = new SignatureService();
         final VerifyRequest request = new VerifyRequest();
 
         try (final Response response = service.verify(request)) {
@@ -73,7 +74,7 @@ final class SignatureServiceTest extends BeanSetup {
 
     @Test
     void testFetchSignatures() {
-        final SignatureService service = prepareSignatureService(settings, entityManager);
+        final SignatureService service = new SignatureService(prepareShareBean());
         final FetchSignatureRequest request = new FetchSignatureRequest();
 
         try (final Response response = service.fetch(request)) {
@@ -83,7 +84,7 @@ final class SignatureServiceTest extends BeanSetup {
 
     @Test
     void testFlawedFetchSignatures() {
-        final SignatureService service = prepareSignatureService();
+        final SignatureService service = new SignatureService();
         final FetchSignatureRequest request = new FetchSignatureRequest();
 
         try (final Response response = service.fetch(request)) {

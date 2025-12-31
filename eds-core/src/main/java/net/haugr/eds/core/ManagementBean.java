@@ -17,8 +17,8 @@
 package net.haugr.eds.core;
 
 import jakarta.ejb.Stateless;
+import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
 import net.haugr.eds.api.common.Constants;
 import net.haugr.eds.api.common.ReturnCode;
@@ -73,9 +73,22 @@ public class ManagementBean {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ManagementBean.class);
 
-    @PersistenceContext
-    private EntityManager entityManager;
-    private final Settings settings = Settings.getInstance();
+    private final EntityManager entityManager;
+    private final Settings settings;
+
+    public ManagementBean() {
+        this(null);
+    }
+
+    @Inject
+    public ManagementBean(final EntityManager entityManager) {
+        this(entityManager, Settings.getInstance());
+    }
+
+    public ManagementBean(final EntityManager entityManager, final Settings settings) {
+        this.entityManager = entityManager;
+        this.settings = settings;
+    }
 
     @Transactional(Transactional.TxType.SUPPORTS)
     public VersionResponse version() {
@@ -102,8 +115,7 @@ public class ManagementBean {
 
             // For the case that we have a settings warning, the current
             // settings should be returned, so it can be shown what they
-            // currently are - this way, an administrator will have to worry a
-            // little less about the putting the system into an unusable state.
+            // currently are.
             if (e.getReturnCode() == ReturnCode.SETTING_WARNING) {
                 response.setSettings(SettingManager.convert(settings));
             }

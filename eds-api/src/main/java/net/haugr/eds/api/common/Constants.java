@@ -46,7 +46,7 @@ public final class Constants {
 
     /**
      * The default SALT (IV) size is 16 bytes, for GCM it is preferable to
-     * only have 12 bytes - however, GCM will also work with 16 bytes albeit
+     * only have 12 bytes - however, GCM will also work with 16 bytes, albeit
      * slower.
      */
     public static final int GCM_IV_LENGTH = 128;
@@ -60,9 +60,9 @@ public final class Constants {
      * performance overhead while calculating a UID, which matches the current
      * class. See "Effective Java, 2nd Edition" - Item 75.</p>
      *
-     * <p>As this is a useless overhead and simple to avoid, it is recommended to
-     * do so. Just add the following line in the beginning of all serialized
-     * and derived classes:</p>
+     * <p>To prevent this unnecessary burden, which is easily circumvented, it
+     * is advised to implement the following: Incorporate the later line
+     * at the commencement of all classes that are serialized and derived:</p>
      *
      * {@code private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;}
      */
@@ -82,17 +82,17 @@ public final class Constants {
 
     /**
      * <p>The System Administrator Account - this account is used as the default
-     * standard administrative Member Account, and cannot be altered. Upon first
-     * attempt to process a Member, the System Administrator Account will be
+     * standard administrative Member Account and cannot be altered. Upon the
+     * first attempt to process a Member, the System Administrator Account will be
      * stored in the underlying database with the credentials provided. This
      * way, the Account Name of the System Administrator will remain well-known,
-     * however - as there are not default credentials, there's also nothing to
+     * however - as there are no default credentials, there's also nothing to
      * exploit.</p>
      */
     public static final String ADMIN_ACCOUNT = "admin";
 
     /** JSON Date Format. */
-    public static final String JSON_DATE_FORMAT = JsonbDateFormat.TIME_IN_MILLIS;
+    public static final String JSON_DATE_FORMAT = JsonbDateFormat.DEFAULT_FORMAT;
 
     /** Folder TypeName. */
     public static final String FOLDER_TYPENAME = "folder";
@@ -213,8 +213,8 @@ public final class Constants {
     public static final String FIELD_PAGE_SIZE = "pageSize";
 
     // =========================================================================
-    // Following is the part of the URLs for all REST based requests. It is
-    // divided into the base call, and the sub calls.
+    // Following is the part of the URLs for all REST-based requests. It is
+    // divided into the base call and the sub calls.
     // =========================================================================
 
     /** Root for the REST API. */
@@ -235,7 +235,7 @@ public final class Constants {
     public static final String REST_AUTHENTICATED = "/authenticated";
 
     // Member requests from the Management Interface
-    /** PATH for the REST based Members Service. */
+    /** PATH for the REST-based Members Service. */
     public static final String REST_MEMBERS_BASE = "/members";
     /** REST endpoint for creating a new Member. */
     public static final String REST_MEMBERS_CREATE = "/createMember";
@@ -257,7 +257,7 @@ public final class Constants {
     public static final String REST_MEMBERS_FETCH = "/fetchMembers";
 
     // Circle requests from the Management Interface
-    /** PATH for the REST based Circle of Trust Service. */
+    /** PATH for the REST-based Circle of Trust Service. */
     public static final String REST_CIRCLES_BASE = "/circles";
     /** REST endpoint for Creating a Circle of Trust. */
     public static final String REST_CIRCLES_CREATE = "/createCircle";
@@ -269,7 +269,7 @@ public final class Constants {
     public static final String REST_CIRCLES_FETCH = "/fetchCircles";
 
     // Trustee requests from the Management Interface
-    /** PATH for the REST based Trustee Service. */
+    /** PATH for the REST-based Trustee Service. */
     public static final String REST_TRUSTEES_BASE = "/trustees";
     /** REST endpoint for Adding a Trustee. */
     public static final String REST_TRUSTEES_ADD = "/addTrustee";
@@ -281,7 +281,7 @@ public final class Constants {
     public static final String REST_TRUSTEES_FETCH = "/fetchTrustees";
 
     // DataType requests from the Share Interface
-    /** PATH for the REST based DataType Service. */
+    /** PATH for the REST-based DataType Service. */
     public static final String REST_DATATYPES_BASE = "/dataTypes";
     /** REST endpoint for Processing a DataType. */
     public static final String REST_DATATYPES_PROCESS = "/processDataType";
@@ -291,7 +291,7 @@ public final class Constants {
     public static final String REST_DATATYPES_FETCH = "/fetchDataTypes";
 
     // Data requests from the Share Interface
-    /** Path for the REST based Data Service. */
+    /** Path for the REST-based Data Service. */
     public static final String REST_DATA_BASE = "/data";
     /** REST endpoint for Adding Data. */
     public static final String REST_DATA_ADD = "/addData";
@@ -307,7 +307,7 @@ public final class Constants {
     public static final String REST_DATA_FETCH = "/fetchData";
 
     // Signature requests from the Share Interface
-    /** Path for the REST based signature Service. */
+    /** Path for the REST-based signature Service. */
     public static final String REST_SIGNATURES_BASE = "/signatures";
     /** REST endpoint for Signing a Document. */
     public static final String REST_SIGNATURES_SIGN = "/signDocument";

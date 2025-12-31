@@ -43,7 +43,7 @@ import java.util.Base64;
 import jakarta.ws.rs.core.MediaType;
 
 /**
- * <p>Common functionality for the Gson based EDS REST Clients. It handles the
+ * <p>Common functionality for the Gson-based EDS REST Clients. It handles the
  * actual requests.</p>
  *
  * @author Kim Jensen
@@ -97,7 +97,7 @@ public class GsonRestClient {
     private static <R extends Authentication> HttpRequest.BodyPublisher prepareBodyPublisher(final R request) {
         final String tmp = GSON.toJson(request);
         // For some weird reason, the ASCII character '=' is being replaced
-        // by the UTF-8 encoded alternative in the Json. The '=' is a white
+        // by the UTF-8 encoded alternative in the JSON. The '=' is a white
         // space filler for Base64 encoded strings.
         final String json = tmp.replace("\\u003d", "=");
 
@@ -110,7 +110,7 @@ public class GsonRestClient {
     // GSon Adapters, to process Objects which otherwise cause problems
     // =========================================================================
 
-    private static Gson createGsonInstance() {
+    static Gson createGsonInstance() {
         final GsonBuilder builder = new GsonBuilder()
                 .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
                 .registerTypeAdapter(byte[].class, new ByteArrayAdapter());
@@ -128,7 +128,10 @@ public class GsonRestClient {
          */
         @Override
         public LocalDateTime deserialize(final JsonElement json, final Type typeOfT, final JsonDeserializationContext context) {
-            return LocalDateTime.ofInstant(Instant.ofEpochMilli(Long.parseLong(json.getAsJsonPrimitive().getAsString())), ZoneOffset.UTC);
+            final JsonPrimitive primitive = json.getAsJsonPrimitive();
+            return primitive.isNumber()
+                ? LocalDateTime.ofInstant(Instant.ofEpochMilli(primitive.getAsLong()), ZoneOffset.UTC)
+                : LocalDateTime.parse(primitive.getAsString());
         }
 
         /**
@@ -136,7 +139,7 @@ public class GsonRestClient {
          */
         @Override
         public JsonElement serialize(final LocalDateTime src, final Type typeOfSrc, final JsonSerializationContext context) {
-            return new JsonPrimitive(src.toInstant(ZoneOffset.UTC).toEpochMilli());
+            return new JsonPrimitive(src.toString());
         }
     }
 

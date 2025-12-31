@@ -105,7 +105,7 @@ public final class ProcessDataManager extends AbstractManager<DataDao, ProcessDa
     private ProcessDataResponse processUpdateData(final ProcessDataRequest request) {
         final MetadataEntity entity = findMetadataAndTrustee(request);
 
-        // First, let's identify the folder, we're not updating it yet, only
+        // First, let's identify the folder if we're not updating it yet, only
         // after the name has also been checked.
         Long folderId = entity.getParentId();
         if (request.getFolderId() != null) {
@@ -133,7 +133,7 @@ public final class ProcessDataManager extends AbstractManager<DataDao, ProcessDa
         final TrusteeEntity targetTrustee = findTargetTrustee(request.getTargetCircleId());
         final MetadataEntity metadataEntity = findMetadataEntity(request.getDataId());
         final String externalDataId = copyDataToTargetCircle(targetTrustee, metadataEntity, request);
-        dao.delete(metadataEntity);
+        deleteMetaDataAndDataEntities(metadataEntity);
 
         return buildProcessDataResponse(externalDataId, theDataObject(metadataEntity) + " was successfully moved from '" + metadataEntity.getCircle().getName() + "' to '" + targetTrustee.getCircle().getName() + "'.");
     }
@@ -171,7 +171,7 @@ public final class ProcessDataManager extends AbstractManager<DataDao, ProcessDa
             }
         }
 
-        dao.delete(entity);
+        deleteMetaDataAndDataEntities(entity);
         return new ProcessDataResponse(theDataObject(entity) + " has been removed from the Circle '" + entity.getCircle().getName() + "'.");
     }
 
@@ -273,7 +273,7 @@ public final class ProcessDataManager extends AbstractManager<DataDao, ProcessDa
             }
         } else {
             entity = dao.findRootByMemberCircle(member.getId(), circleId);
-            // BugReport #57 states that an NPE was thrown, however it
+            // BugReport #57 states that an NPE was thrown. However, it
             // seems that the database might have entered into a strange
             // inconsistency, hence this Exception.
             //   The Circle must be manually corrected, which can be done
@@ -307,11 +307,19 @@ public final class ProcessDataManager extends AbstractManager<DataDao, ProcessDa
         return entity;
     }
 
+    private void deleteMetaDataAndDataEntities(final MetadataEntity entity) {
+        final DataEntity dataEntity = dao.findDataByMetadata(entity);
+        if (dataEntity != null) {
+            dao.delete(dataEntity);
+        }
+        dao.delete(entity);
+    }
+
     /**
-     * <p>It is possible to move Data from one Folder to another, but it is not
-     * permitted to move a Folder, as this is fairly problematic due to the
-     * restraints in the Data Model, which has been added to prevent looping
-     * models.</p>
+     * <p>It is possible to move Data from one Folder to another. However,
+     * it is not permitted to move a Folder, as this is fairly problematic
+     * due to the restraints in the Data Model, which has been added to
+     * prevent looping models.</p>
      *
      * <p>For the same reason, the FolderId must internally remain a number, so
      * it can be checked for consistency - although the externally exposed Id
@@ -349,7 +357,7 @@ public final class ProcessDataManager extends AbstractManager<DataDao, ProcessDa
 
     /**
      * <p>Wrapper method to ensure that the data object is always presented the
-     * same way. The method simply returns the Data Object + data name.</p>
+     * same way. The method simply returns the Data Object plus the data name.</p>
      *
      * @param metadata Metadata Entity to read the name from
      * @return String starting with 'the Data Object' and then the data name quoted

@@ -20,6 +20,7 @@ import net.haugr.eds.api.common.Constants;
 import net.haugr.eds.api.common.Utilities;
 import net.haugr.eds.core.enums.SanityStatus;
 import java.time.LocalDateTime;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -77,7 +78,7 @@ import jakarta.persistence.Table;
 @Table(name = "eds_data")
 public class DataEntity extends EDSEntity {
 
-    @OneToOne(targetEntity = MetadataEntity.class, fetch = FetchType.EAGER, optional = false)
+    @OneToOne(targetEntity = MetadataEntity.class, fetch = FetchType.EAGER, cascade = CascadeType.PERSIST, optional = false)
     @JoinColumn(name = "metadata_id", referencedColumnName = "id", nullable = false, updatable = false)
     private MetadataEntity metadata = null;
 

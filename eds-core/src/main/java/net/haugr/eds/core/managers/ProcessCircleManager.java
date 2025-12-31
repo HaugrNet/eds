@@ -34,8 +34,8 @@ import net.haugr.eds.core.exceptions.IllegalActionException;
 import net.haugr.eds.core.jce.Crypto;
 import net.haugr.eds.core.jce.PublicEDSKey;
 import net.haugr.eds.core.jce.SecretEDSKey;
-import net.haugr.eds.core.model.CommonDao;
 import net.haugr.eds.core.model.Settings;
+import net.haugr.eds.core.model.TrusteeDao;
 import net.haugr.eds.core.model.entities.CircleEntity;
 import net.haugr.eds.core.model.entities.DataTypeEntity;
 import net.haugr.eds.core.model.entities.KeyEntity;
@@ -49,10 +49,10 @@ import net.haugr.eds.core.model.entities.TrusteeEntity;
  * @author Kim Jensen
  * @since EDS 1.0
  */
-public final class ProcessCircleManager extends AbstractManager<CommonDao, ProcessCircleResponse, ProcessCircleRequest> {
+public final class ProcessCircleManager extends AbstractManager<TrusteeDao, ProcessCircleResponse, ProcessCircleRequest> {
 
     public ProcessCircleManager(final Settings settings, final EntityManager entityManager) {
-        super(settings, new CommonDao(entityManager));
+        super(settings, new TrusteeDao(entityManager));
     }
 
     /**
@@ -188,16 +188,16 @@ public final class ProcessCircleManager extends AbstractManager<CommonDao, Proce
     }
 
     /**
-     * <p>Updating a Circle, means changing the name of it, as this is the only
+     * <p>Updating a Circle means changing the name of it, as this is the only
      * valid information it has. Both the System Administrator and Circle
-     * Administrator is allowed to perform this action. And as the initial
+     * Administrator are allowed to perform this action. And as the initial
      * checks already have verified that it is either of the Administrators,
      * there are no other permission checks required.</p>
      *
      * <p>Only checks needed, is to verify that the name is not already taken
      * by any other circle.</p>
      *
-     * @param request Request Object with ID and new Name for the Circle
+     * @param request Request Object with ID and a new Name for the Circle
      * @return Response Object with the changed information
      */
     private ProcessCircleResponse updateCircle(final ProcessCircleRequest request) {
@@ -239,8 +239,8 @@ public final class ProcessCircleManager extends AbstractManager<CommonDao, Proce
     }
 
     /**
-     * <p>Deleting an existing Circle, is an irreversible process, by which all
-     * the data, keys & trustees will also be deleted alongside the Circle.</p>
+     * <p>Deleting an existing Circle is an irreversible process, by which all
+     * the data, keys, and trustees will also be deleted alongside the Circle.</p>
      *
      * <p>The operation can only be performed by the System Administrator, due
      * to the nature of it.</p>
@@ -253,6 +253,13 @@ public final class ProcessCircleManager extends AbstractManager<CommonDao, Proce
         final CircleEntity entity = dao.find(CircleEntity.class, externalId);
         throwConditionalException(entity == null,
                 ReturnCode.IDENTIFICATION_WARNING, "No Circle could be found with the given Id.");
+
+        // Before deleting the Circle, all associated Trustees must be deleted.
+        // This is to avoid having orphaned Trustees.
+        for (final TrusteeEntity trustee : dao.findTrusteesByCircle(entity.getExternalId())) {
+            dao.delete(trustee);
+        }
+
         dao.delete(entity);
 
         return new ProcessCircleResponse(theCircle(entity) + " has successfully been removed from EDS.");
@@ -260,7 +267,7 @@ public final class ProcessCircleManager extends AbstractManager<CommonDao, Proce
 
     /**
      * <p>Wrapper method to ensure that the circle is always presented the
-     * same way. The method simply returns the Circle + circle name.</p>
+     * same way. The method simply returns the Circle plus circle name.</p>
      *
      * @param circle Circle Entity to read the name from
      * @return String starting with 'the Circle' and then the circle name quoted

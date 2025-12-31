@@ -67,7 +67,7 @@ public class MemberEntity extends Externable {
     @Column(name = "name", unique = true, nullable = false, length = Constants.MAX_NAME_LENGTH)
     private String name = null;
 
-    @Column(name = "salt", unique = true, nullable = false, length = 36)
+    @Column(name = "salt", unique = true, nullable = false, length = 64)
     private String salt = null;
 
     @Enumerated(EnumType.STRING)

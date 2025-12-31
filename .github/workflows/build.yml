@@ -1,0 +1,91 @@
+name: CI Build
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build with Java 25
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Temurin JDK 25
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '25'
+          cache: 'maven'
+
+      - name: Show Java and Maven versions
+        run: |
+          java -version
+          mvn -v
+
+      - name: Build (skip tests)
+        run: mvn -B -ntp -DskipTests install
+
+      # Uncomment to run unit tests instead of skipping
+      # - name: Build and run tests
+      #   run: mvn -B -ntp verify
+
+      - name: Archive build artifacts (optional)
+        if: ${{ success() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: maven-artifacts
+          path: |
+            **/target/*.jar
+            **/target/*.war
+            **/target/*.ear
+          if-no-files-found: ignore
+
+  dependency-updates:
+    name: Verify dependency and plugin updates
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Temurin JDK 25
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '25'
+          cache: 'maven'
+
+      - name: Generate dependency and plugin update report
+        run: |
+          mvn -B -ntp \
+            versions:display-parent-updates \
+            versions:display-dependency-updates \
+            versions:display-plugin-updates \
+            -DallowSnapshots=false \
+            -DoutputFile=dependency-updates.txt
+
+      - name: Show update summary
+        run: |
+          echo "===== Dependency/Plugin Update Report ====="
+          cat dependency-updates.txt || true
+
+      - name: Upload update report artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dependency-update-report
+          path: dependency-updates.txt
+          if-no-files-found: error

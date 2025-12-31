@@ -32,7 +32,7 @@ readonly maxPostSize="26214400"
 readonly wildfly=${JBOSS_HOME}
 # Hidden feature, if set this port is used to start JBoss/WildFly in debug mode
 readonly debugPort=${DEBUG_PORT}
-readonly psqlVersion="42.2.24"
+readonly psqlVersion="42.7.8"
 
 # Java & JBoss (WildFly) settings
 export JAVA_OPTS="${JAVA_OPTS} -Xms1303m -Xmx1303m -Djava.net.preferIPv4Stack=true"

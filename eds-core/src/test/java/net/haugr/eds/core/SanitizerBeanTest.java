@@ -18,6 +18,7 @@ package net.haugr.eds.core;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import net.haugr.eds.api.common.ReturnCode;
@@ -27,6 +28,7 @@ import net.haugr.eds.core.enums.SanityStatus;
 import net.haugr.eds.core.enums.StandardSetting;
 import net.haugr.eds.core.exceptions.EDSException;
 import net.haugr.eds.core.jce.Crypto;
+import net.haugr.eds.core.managers.SanityManager;
 import net.haugr.eds.core.model.Settings;
 import net.haugr.eds.core.model.entities.DataEntity;
 import net.haugr.eds.core.managers.ProcessDataManager;
@@ -47,12 +49,19 @@ import org.junit.jupiter.api.Test;
 final class SanitizerBeanTest extends DatabaseSetup {
 
     @Test
+    void testEmptyConstructor() {
+        final SanitizerBean bean = new SanitizerBean();
+
+        assertNotNull(bean);
+    }
+
+    @Test
     void testStartupBeanWithSanitizeCheck() {
         final String runSanitizeAtStartup = "true";
         prepareInvalidData();
         prepareStartupBean(runSanitizeAtStartup);
 
-        assertTrue(prepareSanitizeBean().findNextBatch(100).isEmpty());
+        assertTrue(prepareSanityManager().findNextBatch(100).isEmpty());
     }
 
     @Test
@@ -61,7 +70,7 @@ final class SanitizerBeanTest extends DatabaseSetup {
         prepareInvalidData();
         prepareStartupBean(runSanitizeAtStartup);
 
-        assertEquals(6, prepareSanitizeBean().findNextBatch(100).size());
+        assertEquals(6, prepareSanityManager().findNextBatch(100).size());
     }
 
     @Test
@@ -89,13 +98,13 @@ final class SanitizerBeanTest extends DatabaseSetup {
     @Test
     void testStartupBeanTimerService() {
         prepareInvalidData();
-        final SanitizerBean sanitizerBean = prepareSanitizeBean();
-        final List<Long> idsBefore = sanitizerBean.findNextBatch(100);
+        final SanityManager manager = prepareSanityManager();
+        final List<Long> idsBefore = manager.findNextBatch(100);
 
         final StartupBean bean = prepareStartupBean("false");
         bean.runSanitizingWithTimeout(new FakeTimer());
 
-        final List<Long> idsAfter = sanitizerBean.findNextBatch(100);
+        final List<Long> idsAfter = manager.findNextBatch(100);
         assertFalse(idsBefore.isEmpty());
         assertTrue(idsAfter.isEmpty());
     }
@@ -115,26 +124,27 @@ final class SanitizerBeanTest extends DatabaseSetup {
 
     @Test
     void testSanitizeBean() {
-        final SanitizerBean bean = prepareSanitizeBean();
+        final SanityManager manager = prepareSanityManager();
+        final SanitizerBean bean = new SanitizerBean(manager);
         prepareInvalidData();
 
         // Check that there is nothing to scan/check at first
-        final List<Long> idsBefore = bean.findNextBatch(100);
+        final List<Long> idsBefore = manager.findNextBatch(100);
         assertEquals(6, idsBefore.size());
 
         // Run the actual sanitizing
         bean.sanitize();
 
         // Finally, verify that all records have been sanitized.
-        final List<Long> idsAfter = bean.findNextBatch(100);
+        final List<Long> idsAfter = manager.findNextBatch(100);
         assertTrue(idsAfter.isEmpty());
     }
 
     @Test
     void testSanitizeBeanWithDatabaseProblem() {
-        final SanitizerBean bean = prepareFlawedSanitizeBean();
+        final SanityManager manager = prepareSanityManager();
         final Crypto crypto = new Crypto(Settings.getInstance());
-        final SanityStatus status = bean.processEntity(crypto,123L);
+        final SanityStatus status = manager.processEntity(crypto,123L);
 
         assertEquals(SanityStatus.BLOCKED, status);
     }
@@ -172,12 +182,12 @@ final class SanitizerBeanTest extends DatabaseSetup {
         return new StartupBean(new FakeEntityManager(), prepareSanitizeBean(), new FakeTimerService(), settings);
     }
 
-    private SanitizerBean prepareSanitizeBean() {
-        return new SanitizerBean(entityManager);
+    private SanityManager prepareSanityManager() {
+        return new SanityManager(settings, entityManager);
     }
 
-    private SanitizerBean prepareFlawedSanitizeBean() {
-        return new SanitizerBean();
+    private SanitizerBean prepareSanitizeBean() {
+        return new SanitizerBean(prepareSanityManager());
     }
 
     private static Settings getBeanSettings(final StartupBean bean) {

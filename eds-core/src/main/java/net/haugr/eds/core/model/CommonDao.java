@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.LockModeType;
 import jakarta.persistence.PersistenceException;
 import jakarta.persistence.Query;
 import jakarta.persistence.criteria.CriteriaBuilder;
@@ -66,6 +67,16 @@ public class CommonDao {
     }
 
     /**
+     * Prepares a new Named Query instance to be used directly.
+     *
+     * @param query Name of the Named Query
+     * @return Prepared Query
+     */
+    public Query createNamedQuery(final String query) {
+        return entityManager.createNamedQuery(query);
+    }
+
+    /**
      * <p>Persist, create or updates, an Entity. If it is derived from
      * {@link Externable}, then a new external Id (UUID) is set if it currently
      * does not have one.</p>
@@ -98,6 +109,10 @@ public class CommonDao {
 
     public <E extends EDSEntity> E find(final Class<E> edsEntity, final Long id) {
         return entityManager.find(edsEntity, id);
+    }
+
+    public <E extends EDSEntity> E find(final Class<E> edsEntity, final Long id, final LockModeType lockModeType) {
+        return entityManager.find(edsEntity, id, lockModeType);
     }
 
     public <E extends Externable> E find(final Class<E> edsEntity, final String externalId) {
@@ -162,9 +177,8 @@ public class CommonDao {
 
     /**
      * The checksums are not having any uniqueness assigned to them, meaning
-     * that their may exist multiple checksums with the same value - but as
-     * all checksums are fairly short-lived (hours), the problem is ignored
-     * and only if there is an actual problem with it, will it be addressed.
+     * that there may exist multiple checksums with the same value - but as
+     * all checksums are short-lived (hours), the problem is ignored.
      *
      * @param checksum Checksum of a Member SessionKey
      * @return MemberEntity with a matching SessionKey checksum
@@ -226,7 +240,7 @@ public class CommonDao {
     }
 
     /**
-     * Finds a unique DataType in the system. If none exist, or it is not
+     * Finds a unique DataType in the system. If none exists, or it is not
      * possible to find a unique record, then an Exception is thrown.
      *
      * @param name Name of the DataType to find
@@ -317,7 +331,7 @@ public class CommonDao {
         try {
             final List<E> list = query.getResultList();
 
-            // JPA does not specify the exact behaviour of the getResultList()
+            // JPA does not specify the exact behavior of the getResultList()
             // call, hence if a null is returned, we're converting it into an
             // empty list. Which is always easier to deal with.
             return (list != null) ? list : new ArrayList<>(0);

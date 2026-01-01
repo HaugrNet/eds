@@ -1,6 +1,6 @@
 /*
  * EDS, Encrypted Data Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2024, haugr.net
+ * Copyright (c) 2016-2026, haugr.net
  * mailto: eds AT haugr DOT net
  *
  * EDS is free software; you can redistribute it and/or modify it under the
@@ -27,9 +27,9 @@ import jakarta.json.bind.annotation.JsonbProperty;
 import jakarta.json.bind.annotation.JsonbPropertyOrder;
 
 /**
- * The Sanity Object contain information about a Data record, which has failed
- * the sanity check, i.e. the encrypted bytes have been changed, so it is no
- * longer possible to decrypt the Object. The information returned include the
+ * The Sanity Object contains information about a Data record, which has failed
+ * the sanity check, i.e., the encrypted bytes have been changed, so it is no
+ * longer possible to decrypt the Object. The information returned includes the
  * ID of the Data Object which failed the sanity check, and the date at which it
  * failed it.
  *
@@ -50,7 +50,7 @@ public final class Sanity implements Serializable {
 
     /** Changed. */
     @JsonbProperty(value = Constants.FIELD_CHANGED)
-    @JsonbDateFormat(Constants.JSON_DATE_FORMAT)
+    @JsonbDateFormat
     @JsonbNillable
     private LocalDateTime changed = null;
 

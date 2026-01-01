@@ -1,6 +1,6 @@
 /*
  * EDS, Encrypted Data Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2024, haugr.net
+ * Copyright (c) 2016-2026, haugr.net
  * mailto: eds AT haugr DOT net
  *
  * EDS is free software; you can redistribute it and/or modify it under the
@@ -20,8 +20,8 @@ import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;
 
 /**
- * <p>For Entities, which is externally accessible, i.e. requires an Id to help
- * identify the Objects will all extend this Class, as it contain the common
+ * <p>For Entities, which is externally accessible, i.e., requires an Id to help
+ * identify the Objects will all extend this Class, as it contains the common
  * Externable Id, which differs from the internal Id.</p>
  *
  * @author Kim Jensen

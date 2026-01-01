@@ -1,6 +1,6 @@
 /*
  * EDS, Encrypted Data Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2024, haugr.net
+ * Copyright (c) 2016-2026, haugr.net
  * mailto: eds AT haugr DOT net
  *
  * EDS is free software; you can redistribute it and/or modify it under the
@@ -30,8 +30,8 @@ import java.util.List;
 
 /**
  * <p>The result will depend on the request parameters, if no information was
- * set in the request, then the list of Circles will be filled with the Circles,
- * the requesting member is allowed to see. If a MemberId was given, then the
+ * set in the request, then the list of Circles will be filled with the Circles.
+ * The requesting member is allowed to see. If a MemberId was given, then the
  * list of Circles which both the requesting member and the requested member
  * have in common will be returned.</p>
  *

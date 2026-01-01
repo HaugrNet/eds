@@ -1,6 +1,6 @@
 /*
  * EDS, Encrypted Data Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2024, haugr.net
+ * Copyright (c) 2016-2026, haugr.net
  * mailto: eds AT haugr DOT net
  *
  * EDS is free software; you can redistribute it and/or modify it under the
@@ -24,7 +24,7 @@ import jakarta.json.bind.annotation.JsonbPropertyOrder;
 import java.io.Serial;
 
 /**
- * <p>This is the response Object from the EDS, when the verify request was
+ * <p>This is the response Object from the EDS, when the verified request was
  * invoked. It only contains a single boolean value, verified, which will tell
  * if the Object was correctly verified or not. If the request failed, or there
  * was a problem, then the default value false is set. It is therefore important

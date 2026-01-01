@@ -1,6 +1,6 @@
 /*
  * EDS, Encrypted Data Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2024, haugr.net
+ * Copyright (c) 2016-2026, haugr.net
  * mailto: eds AT haugr DOT net
  *
  * EDS is free software; you can redistribute it and/or modify it under the
@@ -30,14 +30,14 @@ import java.util.Set;
 /**
  * <p>This wrapper is used by the FakeEntityManager to alter expected Query
  * behavior to mimic expectations that otherwise cannot be tested unless
- * mocking is used - but mocking have other problems.</p>
+ * mocking is used - but mocking has other problems.</p>
  *
  * <p>By using the setHint feature, certain hits are used as part of running
  * the query, so it is possible to change behavior.</p>
  *
- * <p>Following hints have been added:</p>
+ * <p>The following hints have been added:</p>
  * <ul>
- *   <li><b>returnNull</b> - methods return null, instead of expected
+ *   <li><b>returnNull</b> - methods return null, instead of the expected
  *   result.</li>
  * </ul>
  *

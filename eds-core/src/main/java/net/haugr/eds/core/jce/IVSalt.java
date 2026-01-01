@@ -1,6 +1,6 @@
 /*
  * EDS, Encrypted Data Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2024, haugr.net
+ * Copyright (c) 2016-2026, haugr.net
  * mailto: eds AT haugr DOT net
  *
  * EDS is free software; you can redistribute it and/or modify it under the
@@ -23,10 +23,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * <p>In EDS 1.0, the default Salt was generated as a UUID, however this may
+ * <p>In EDS 1.0, the default Salt was generated as a UUID. However, this may
  * not be secure enough, as the entropy is not as high as a proper random byte
- * array. Thus, this Class has been added, to handle the difference between
- * the UUID based Salts and the Random generated.</p>
+ * array. Thus, this Class has been added to handle the difference between
+ * the UUID-based Salts and the Random generated.</p>
  *
  * @author Kim Jensen
  * @since EDS 1.1
@@ -37,7 +37,7 @@ public final class IVSalt {
     // SpotBugs: https://tinyurl.com/juhv7sdm
     // CWE-440: https://cwe.mitre.org/data/definitions/440.html
     private static final SecureRandom RANDOM = new SecureRandom();
-    // For AES, the block size is always 128 bit and thus the IV must also be of
+    // For AES, the block size is always 128 bit, and thus the IV must also be of
     // the same size. See: https://en.wikipedia.org/wiki/Initialization_vector
     private static final int IV_SIZE = 16;
     // The armored length of the IV will always have this length.

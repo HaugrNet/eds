@@ -1,6 +1,6 @@
 /*
  * EDS, Encrypted Data Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2024, haugr.net
+ * Copyright (c) 2016-2026, haugr.net
  * mailto: eds AT haugr DOT net
  *
  * EDS is free software; you can redistribute it and/or modify it under the
@@ -19,7 +19,7 @@ package net.haugr.eds.api.requests;
 import net.haugr.eds.api.common.Action;
 
 /**
- * <p>Processing Requests, which can perform one or more Actions must implement
+ * <p>Processing Requests, which can perform one or more Actions, must implement
  * this Interface.</p>
  *
  * @author Kim Jensen

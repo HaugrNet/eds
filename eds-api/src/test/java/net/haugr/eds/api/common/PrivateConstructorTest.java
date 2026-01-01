@@ -1,6 +1,6 @@
 /*
  * EDS, Encrypted Data Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2024, haugr.net
+ * Copyright (c) 2016-2026, haugr.net
  * mailto: eds AT haugr DOT net
  *
  * EDS is free software; you can redistribute it and/or modify it under the
@@ -25,13 +25,13 @@ import org.junit.jupiter.api.Test;
 
 /**
  * <p>Private methods should never be tested, as they are part of an
- * internal workflow. Classes should always be tested via their contract,
- * i.e. public methods.</p>
+ * internal workflow. Classes should always be tested via their contract.
+ * I.e., public methods.</p>
  *
  * <p>However, for Utility Classes, with a Private Constructor, the contract
  * disallows instantiation, so the constructor is thus not testable via
  * normal means. This little Test method will verify that the contract is
- * kept, and that the Constructor is not made public.</p>
+ * kept and that the Constructor is not made public.</p>
  *
  * @author Kim Jensen
  * @since EDS 1.0

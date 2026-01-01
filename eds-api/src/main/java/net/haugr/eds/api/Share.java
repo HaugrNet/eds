@@ -1,6 +1,6 @@
 /*
  * EDS, Encrypted Data Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2024, haugr.net
+ * Copyright (c) 2016-2026, haugr.net
  * mailto: eds AT haugr DOT net
  *
  * EDS is free software; you can redistribute it and/or modify it under the
@@ -42,13 +42,13 @@ import net.haugr.eds.api.responses.VerifyResponse;
 public interface Share {
 
     /**
-     * <p>All stored data must have a data type, i.e. a way for an external
+     * <p>All stored data must have a data type, i.e., a way for an external
      * client or system to identify and apply rules for how to work with the
      * data. By default, two data types exist; &quot;<b>data</b>&quot; &amp;
-     * &quot;<b>folder</b>&quot;, which will allow any system to operate
+     * &quot;<b>folder</b>&quot; which will allow any system to operate
      * without adding additional types.</p>
      *
-     * <p>If more data types are needed, i.e. MIME Type data or Object Creation
+     * <p>If more data types are needed, i.e., MIME Type data or Object Creation
      * information - then these must be added before they can be used, which is
      * done using this request.</p>
      *
@@ -69,7 +69,7 @@ public interface Share {
      * </ul>
      *
      * <p>As the data types are generally available, it is only allowed for
-     * Circle Administrators or the System Administrator to create new, update
+     * Circle Administrators or the System Administrator to create new, update,
      * or delete existing.</p>
      *
      * @param request Request Object
@@ -102,7 +102,7 @@ public interface Share {
      *   about the actual data type.</li>
      *   <li><b>{@link Action#UPDATE}</b> an existing
      *   record. It is possible to replace the encrypted data, rename the Data
-     *   Object and move Data Objects between different Folders belonging to the
+     *   Object, and move Data Objects between different Folders belonging to the
      *   same Circle. It is not possible to move Folders, as this will break the
      *   underlying data model since it can lead to recursive data structures,
      *   folders can thus only be renamed.</li>
@@ -134,7 +134,7 @@ public interface Share {
      * folder for the given Circle. If a specific Folder is given, then the list
      * will be the content of the provided folder. The sorting of the content
      * is always with the most recent data first. It is possible to specify how
-     * many Metadata Objects should be returned, and also which page number to
+     * many Metadata Objects should be returned and also which page number to
      * read from.</p>
      *
      * @param request Request Object
@@ -143,7 +143,7 @@ public interface Share {
     FetchDataResponse fetchData(FetchDataRequest request);
 
     /**
-     * Signs a Document using the requesting Accounts Private Key, and returning
+     * Signs a Document using the requesting Accounts Private Key and returning
      * the Signature in the Response Object. The Signature is not stored in the
      * underlying data model, rather a cryptographic fingerprint is saved to
      * make sure that it can be retrieved for someone wishing to verify the
@@ -166,8 +166,8 @@ public interface Share {
 
     /**
      * Retrieve a list of Signatures from the requesting Member Account. The
-     * list contain information about number of successful verifications which
-     * has been made with each Signature.
+     * list contains information about the number of successful verifications
+     * which have been made with each Signature.
      *
      * @param request Request Object
      * @return Response Object with ReturnCode and Message

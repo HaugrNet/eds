@@ -1,6 +1,6 @@
 /*
  * EDS, Encrypted Data Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2024, haugr.net
+ * Copyright (c) 2016-2026, haugr.net
  * mailto: eds AT haugr DOT net
  *
  * EDS is free software; you can redistribute it and/or modify it under the
@@ -28,7 +28,7 @@ import jakarta.json.bind.annotation.JsonbPropertyOrder;
 
 /**
  * This Object contains information about a Signature in EDS, such as when it
- * expires, verification attempts, when it was added and when it was last used.
+ * expires, verification attempts, when it was added, and when it was last used.
  * It also contains the checksum for identification of it.
  *
  * @author Kim Jensen
@@ -53,7 +53,7 @@ public final class Signature implements Serializable {
 
     /** Expiration Timestamp. */
     @JsonbProperty(value = Constants.FIELD_EXPIRES)
-    @JsonbDateFormat(Constants.JSON_DATE_FORMAT)
+    @JsonbDateFormat
     @JsonbNillable
     private LocalDateTime expires = null;
 
@@ -64,13 +64,13 @@ public final class Signature implements Serializable {
 
     /** Last Verification Timestamp. */
     @JsonbProperty(value = Constants.FIELD_LAST_VERIFICATION)
-    @JsonbDateFormat(Constants.JSON_DATE_FORMAT)
+    @JsonbDateFormat
     @JsonbNillable
     private LocalDateTime lastVerification = null;
 
     /** Added Timestamp. */
     @JsonbProperty(value = Constants.FIELD_ADDED)
-    @JsonbDateFormat(Constants.JSON_DATE_FORMAT)
+    @JsonbDateFormat
     @JsonbNillable
     private LocalDateTime added = null;
 

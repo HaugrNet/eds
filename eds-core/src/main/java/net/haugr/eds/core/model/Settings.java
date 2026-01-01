@@ -1,6 +1,6 @@
 /*
  * EDS, Encrypted Data Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2024, haugr.net
+ * Copyright (c) 2016-2026, haugr.net
  * mailto: eds AT haugr DOT net
  *
  * EDS is free software; you can redistribute it and/or modify it under the
@@ -30,16 +30,16 @@ import net.haugr.eds.core.exceptions.EDSException;
 
 /**
  * <p>This Class holds the general settings for the EDS. All settings used by
- * the EDS is set with default values, which may or may nor be overwritten,
+ * the EDS are set with default values, which may or may not be overwritten,
  * depending on the underlying database. It is possible to extend the settings
- * with more values, if Client Systems needs certain information shared.</p>
+ * with more values if Client Systems need certain information shared.</p>
  *
  * <p>By starting the EDS, the Settings are loaded from the Database, and
  * invoking the Settings Request will allow the System Administrator to change
  * the Settings. It is not possible for Circle Administrators to make any
  * Updates, since this may have impacts on the System.</p>
  *
- * <p>Once a EDS system is being actively used, i.e. there exist Member Accounts
+ * <p>Once an EDS system is being actively used, i.e., there exist Member Accounts
  * other than the System Administrator, then the rules regarding the
  * non-updatable values will be enforced. Updatable fields may be changed, but
  * the EDS will only use them after a restart.</p>

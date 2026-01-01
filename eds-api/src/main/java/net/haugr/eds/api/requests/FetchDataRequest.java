@@ -1,6 +1,6 @@
 /*
  * EDS, Encrypted Data Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2024, haugr.net
+ * Copyright (c) 2016-2026, haugr.net
  * mailto: eds AT haugr DOT net
  *
  * EDS is free software; you can redistribute it and/or modify it under the
@@ -26,7 +26,7 @@ import java.util.Map;
 
 /**
  * <p>The Request Object must be filled with either a DataId or a CircleId and
- * pagination information. The pagination include the page size which must be
+ * pagination information. The pagination includes the page size which must be
  * at least 1 and maximum 100. The page number starts with 1 for the first page,
  * and any positive number. If the number exceeds the number of records, it will
  * simply result in an empty list of Objects being returned.</p>

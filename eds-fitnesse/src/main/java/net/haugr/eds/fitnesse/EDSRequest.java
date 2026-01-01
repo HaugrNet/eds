@@ -1,6 +1,6 @@
 /*
  * EDS, Encrypted Data Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2024, haugr.net
+ * Copyright (c) 2016-2026, haugr.net
  * mailto: eds AT haugr DOT net
  *
  * EDS is free software; you can redistribute it and/or modify it under the
@@ -52,8 +52,8 @@ public class EDSRequest<R extends EDSResponse> {
     // All Ids in EDS which is externally exposed is UUIDs, meaning that they
     // are always unique. And as the use of them should also be made with
     // easily identifiable, yet unique names, they are simply stored in a
-    // single internal record, where the name have "_id" appended, and this
-    // is then used to both store, delete and find Ids.
+    // single internal record, where the name has "_id" appended. This is then
+    // used to both store, delete and find Ids.
     private static final Map<String, String> ids = new ConcurrentHashMap<>(16);
     private static final Map<String, String> signatures = new ConcurrentHashMap<>(16);
 
@@ -113,7 +113,7 @@ public class EDSRequest<R extends EDSResponse> {
     }
 
     /**
-     * When using the Fit Table Fixture, FitNesse is invoking the reset method,
+     * When using the Fit Table Fixture, FitNesse is invoking the reset method
      * before preparing a new line in the table to build a new request.
      */
     public void reset() {

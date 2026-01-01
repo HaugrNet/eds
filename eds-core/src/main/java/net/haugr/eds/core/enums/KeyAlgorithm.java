@@ -1,6 +1,6 @@
 /*
  * EDS, Encrypted Data Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2024, haugr.net
+ * Copyright (c) 2016-2026, haugr.net
  * mailto: eds AT haugr DOT net
  *
  * EDS is free software; you can redistribute it and/or modify it under the
@@ -24,12 +24,12 @@ import static net.haugr.eds.api.common.Constants.SUN_JCE;
  * the various cryptographic operations. EDS uses a mixture of Synchronous (AES)
  * and Asynchronous (RSA) Algorithms.</p>
  *
- * <p>The Java Cryptographic Extension (JCE) defines a number of Algorithms,
+ * <p>The Java Cryptographic Extension (JCE) defines a number of Algorithms
  * which any provider must support. Rather than allowing all of them, the EDS
- * is limiting them too two Algorithms, AES (Symmetric) and RSA (Asymmetric)
+ * is limiting them to two Algorithms, AES (Symmetric) and RSA (Asymmetric)
  * Cryptography. From the official list (see below), the Algorithms also require
  * a Block Cipher Mode, either ECB (Electronic CodeBook) or Cipher Block
- * Chaining (CBC). Padding is also a requirement, where the choices is between
+ * Chaining (CBC). Padding is also a requirement, where the choices are between
  * NoPadding (require exact length) or PKCS1Padding/PKCS5Padding (default).</p>
  *
  * <p>The official list of Algorithms that Providers must support as a minimum
@@ -59,14 +59,14 @@ import static net.haugr.eds.api.common.Constants.SUN_JCE;
  * it is <a href="https://bugs.openjdk.java.net/browse/JDK-8170157">enabled by
  * default</a>.</p>
  *
- * <p>EDS not only uses symmetric and asymmetric encryption, also password based
- * encryption, or PBE, is used, to convert member provided passphrases into a
+ * <p>EDS not only uses symmetric and asymmetric encryption. Also, password-based
+ * encryption, or PBE, is used to convert member provided passphrases into a
  * SecretKey, which can be used to unlock the Account.</p>
  *
- * <p>The listing below also refer to a derived algorithm. This is used for the
+ * <p>The listing below also refers to a derived algorithm. This is used for the
  * Password Based Encryption algorithms, as they need one algorithm to create
  * the Key, but once created, they have to be used with a different algorithm.
- * Otherwise there will be problems with them.</p>
+ * Otherwise, there will be problems with them.</p>
  *
  * @author Kim Jensen
  * @since EDS 1.0
@@ -107,7 +107,7 @@ public enum KeyAlgorithm {
     X448(Type.ASYMMETRIC, "", Transformation.RSA, 123, SUN_EC, null);
 
     /**
-     * The Algorithm Type, i.e. how it should be used.
+     * The Algorithm Type, i.e., how it should be used.
      */
     public enum Type {
         SYMMETRIC,
@@ -117,7 +117,7 @@ public enum KeyAlgorithm {
     }
 
     /**
-     * Transformation Algorithms, i.e. mapping to the internal JCE algorithms.
+     * Transformation Algorithms, i.e., mapping to the internal JCE algorithms.
      */
     public enum Transformation {
         SIG256("SHA256WithRSA"),

@@ -1,6 +1,6 @@
 /*
  * EDS, Encrypted Data Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2024, haugr.net
+ * Copyright (c) 2016-2026, haugr.net
  * mailto: eds AT haugr DOT net
  *
  * EDS is free software; you can redistribute it and/or modify it under the
@@ -56,7 +56,7 @@ public final class FetchTrusteeManager extends AbstractManager<TrusteeDao, Fetch
         final String memberId = request.getMemberId();
         final String circleId = request.getCircleId();
 
-        // Let the check-hell commence. Three factors are important, the
+        // Let the check-hell begin. Three factors are important, the
         // MemberId, CircleId and if the Member is also a System Administrator.
         if (circleId != null) {
             trustees = checkTrusteesForSpecificCircle(memberId, circleId);
@@ -107,7 +107,7 @@ public final class FetchTrusteeManager extends AbstractManager<TrusteeDao, Fetch
             throwConditionalException(trustees.isEmpty(),
                     ReturnCode.IDENTIFICATION_WARNING, "Unable to find any Trustee information for the given Member Id.");
         } else if (memberId.equals(member.getExternalId())) {
-            // Exception to the rule, is if the requesting user is
+            // Exception to the rule is if the requesting user is
             // inquiring about themselves.
             trustees = dao.findTrusteesByMember(memberId);
         } else {

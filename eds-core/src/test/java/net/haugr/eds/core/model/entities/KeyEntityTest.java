@@ -1,6 +1,6 @@
 /*
  * EDS, Encrypted Data Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2024, haugr.net
+ * Copyright (c) 2016-2026, haugr.net
  * mailto: eds AT haugr DOT net
  *
  * EDS is free software; you can redistribute it and/or modify it under the
@@ -65,8 +65,9 @@ final class KeyEntityTest extends DatabaseSetup {
     void testUpdateExpires() {
         final KeyEntity key = prepareKey();
 
-        // Now to the actual test, change the Expires, persist, detach and
-        // find the Entity again. Expected is no errors but the value is same.
+        // Now to the actual test, change the Expires, persist, detach
+        // and find the Entity again. Expected is no errors, but the
+        // value is the same.
         final LocalDateTime expires = Utilities.newDate();
         key.setExpires(expires);
         persistAndDetach(key);
@@ -79,8 +80,9 @@ final class KeyEntityTest extends DatabaseSetup {
     void testUpdateGracePeriod() {
         final KeyEntity key = prepareKey();
 
-        // Now to the actual test, change the GracePeriod, persist, detach and
-        // find the Entity again. Expected is no errors but the value is same.
+        // Now to the actual test, change the GracePeriod, persist, detach
+        // and find the Entity again. Expected is no errors, but the value
+        // is the same.
         key.setGracePeriod(3);
         persistAndDetach(key);
 

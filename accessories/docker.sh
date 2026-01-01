@@ -2,7 +2,7 @@
 
 #
 # EDS, Encrypted Data Share - open source Cryptographic Sharing system.
-# Copyright (c) 2016-2024, haugr.net
+# Copyright (c) 2016-2026, haugr.net
 # mailto: eds AT haugr DOT net
 #
 # EDS is free software; you can redistribute it and/or modify it under the
@@ -34,7 +34,8 @@ source release/bin/edsFunctions.sh
 #   True (0) if EDS exists, otherwise False (1)
 # ==============================================================================
 function exists() {
-    readonly exists=$(docker images -a | grep "${image}")
+    exists=$(docker images -a | grep "${image}")
+    readonly exists
     if [[ ${#exists} -eq 0 ]]; then
         return 1
     else
@@ -49,7 +50,8 @@ function exists() {
 #   True (0) if EDS is running, otherwise False (1)
 # ==============================================================================
 function running() {
-    readonly alive=$(docker ps -a | grep "${image}" | grep "Exited")
+    alive=$(docker ps -a | grep "${image}" | grep "Exited")
+    readonly alive
     if [[ ${#alive} -eq 0 ]]; then
         return 0
     else

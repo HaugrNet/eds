@@ -1,6 +1,6 @@
 /*
  * EDS, Encrypted Data Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2024, haugr.net
+ * Copyright (c) 2016-2026, haugr.net
  * mailto: eds AT haugr DOT net
  *
  * EDS is free software; you can redistribute it and/or modify it under the
@@ -25,13 +25,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * <p>This request Object may only be used by the System Administrator, to alter
+ * <p>This request Object may only be used by the System Administrator to alter
  * or add/delete custom settings. Existing settings cannot be deleted, and some
- * may only be altered before Members exists. This is to prevent that changing
- * of values that is used to derive the internal Keys can still be properly
+ * may only be altered before Members exist. This is to prevent that changing
+ * of values that are used to derive the internal Keys can still be properly
  * extracted.</p>
  *
- * <p>The Settings field is mandatory, but can be left empty.</p>
+ * <p>The Settings field is mandatory but can be left empty.</p>
  *
  * <p>Please see {@link Authentication} for information about the account and
  * credentials information.</p>

@@ -1,6 +1,6 @@
 /*
  * EDS, Encrypted Data Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2024, haugr.net
+ * Copyright (c) 2016-2026, haugr.net
  * mailto: eds AT haugr DOT net
  *
  * EDS is free software; you can redistribute it and/or modify it under the
@@ -17,7 +17,7 @@
 
 /**
  * <p>Java EE Beans, implementing the CryptoStore Logic and making it available
- * to other modules as basis.</p>
+ * to other modules as the basis.</p>
  *
  * @author Kim Jensen
  * @since EDS 1.0

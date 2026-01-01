@@ -1,6 +1,6 @@
 /*
  * EDS, Encrypted Data Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2024, haugr.net
+ * Copyright (c) 2016-2026, haugr.net
  * mailto: eds AT haugr DOT net
  *
  * EDS is free software; you can redistribute it and/or modify it under the
@@ -47,7 +47,7 @@ public final class CryptoException extends EDSException {
     /**
      * To prevent that too much information about the underlying system is
      * exposed via the error text, the Cause must be separate from the message.
-     * Hence, even for trivial problems we're not allowing the Cause to stand
+     * Hence, even for trivial problems, we're not allowing the Cause to stand
      * alone.
      *
      * @param message Error description

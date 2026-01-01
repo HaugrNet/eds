@@ -1,6 +1,6 @@
 /*
  * EDS, Encrypted Data Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2024, haugr.net
+ * Copyright (c) 2016-2026, haugr.net
  * mailto: eds AT haugr DOT net
  *
  * EDS is free software; you can redistribute it and/or modify it under the
@@ -102,7 +102,7 @@ public final class ProcessMemberManager extends AbstractManager<MemberDao, Proce
     }
 
     private ProcessMemberResponse createMember(final ProcessMemberRequest request) {
-        // Creating new Members, can only be performed by the System
+        // Creating new Members can only be performed by the System
         // Administrator, not by anyone else.
         if (member.getMemberRole() != MemberRole.ADMIN) {
             throw new AuthorizationException("Members are not permitted to create new Accounts.");
@@ -162,7 +162,7 @@ public final class ProcessMemberManager extends AbstractManager<MemberDao, Proce
     private ProcessMemberResponse loginMember(final ProcessMemberRequest request) {
         // Step 1; Based on the Session Key, we're building an encrypted file,
         // which again will be used as the base for both the check sums and the
-        // PBE based key to encrypt the Member's private key.
+        // PBE-based key to encrypt the Member's private key.
         final byte[] rawSessionKey = request.getNewCredential();
         final byte[] masterEncrypted = crypto.encryptWithMasterKey(rawSessionKey);
         // Done with the sessionKey, destroy in memory, so the Garbage Collector
@@ -170,10 +170,10 @@ public final class ProcessMemberManager extends AbstractManager<MemberDao, Proce
         // extract it from memory.
         Arrays.fill(rawSessionKey, (byte) 0);
 
-        // Now to the exciting part, the Salt is taken from the Member, and used
-        // to generate a new PBE based Symmetric Key, which again is used to
-        // encrypt the already encrypted SessionKey. This making it a bit more
-        // challenging to extract the information, if there is no access to the
+        // Now to the exciting part, the Salt is taken from the Member and used
+        // to generate a new PBE-based Symmetric Key, which again is used to
+        // encrypt the already encrypted SessionKey. This makes it a bit more
+        // challenging to extract the information if there is no access to the
         // MasterKey.
         final String salt = crypto.decryptWithMasterKey(member.getSalt());
         final SecretEDSKey key = crypto.generatePasswordKey(member.getPbeAlgorithm(), masterEncrypted, salt);
@@ -266,8 +266,8 @@ public final class ProcessMemberManager extends AbstractManager<MemberDao, Proce
 
     /**
      * <p>Invalidating the account means making a change, so it is still
-     * usable, i.e. the Member can still access the Account, but it is not
-     * possible to access any encrypted data, as the keys used for the
+     * usable, i.e., the Member can still access the Account, but it is not
+     * possible to access any encrypted data, as the key used for the
      * encryption has been altered.</p>
      *
      * <p>This way, the account will appear fine, but will be useless.</p>
@@ -367,7 +367,7 @@ public final class ProcessMemberManager extends AbstractManager<MemberDao, Proce
 
     /**
      * <p>Wrapper method to ensure that the member is always presented the
-     * same way. The method simply returns the Member + member name.</p>
+     * same way. The method simply returns the Member and member name.</p>
      *
      * @param member Member Entity to read the name from
      * @return String starting with 'the Member' and then the member name quoted

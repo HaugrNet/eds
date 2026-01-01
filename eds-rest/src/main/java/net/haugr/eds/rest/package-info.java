@@ -1,6 +1,6 @@
 /*
  * EDS, Encrypted Data Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2024, haugr.net
+ * Copyright (c) 2016-2026, haugr.net
  * mailto: eds AT haugr DOT net
  *
  * EDS is free software; you can redistribute it and/or modify it under the
@@ -16,7 +16,7 @@
  */
 
 /**
- * <p>REST based WebServices, implementing the Crypto Store API and using the
+ * <p>REST-based WebServices, implementing the Crypto Store API and using the
  * EDS Core module as implementation.</p>
  *
  * @author Kim Jensen

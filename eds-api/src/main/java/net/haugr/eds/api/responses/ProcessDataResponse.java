@@ -1,6 +1,6 @@
 /*
  * EDS, Encrypted Data Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2024, haugr.net
+ * Copyright (c) 2016-2026, haugr.net
  * mailto: eds AT haugr DOT net
  *
  * EDS is free software; you can redistribute it and/or modify it under the
@@ -24,7 +24,7 @@ import jakarta.json.bind.annotation.JsonbPropertyOrder;
 import java.io.Serial;
 
 /**
- * <p>The Response Object contain the new Data Id, when an Object was
+ * <p>The Response Object contains the new Data Id, when an Object was
  * successfully uploaded.</p>
  *
  * <p>Please see {@link EDSResponse} for information about the result of the

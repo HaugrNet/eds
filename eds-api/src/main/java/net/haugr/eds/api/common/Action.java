@@ -1,6 +1,6 @@
 /*
  * EDS, Encrypted Data Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2024, haugr.net
+ * Copyright (c) 2016-2026, haugr.net
  * mailto: eds AT haugr DOT net
  *
  * EDS is free software; you can redistribute it and/or modify it under the
@@ -20,7 +20,7 @@ package net.haugr.eds.api.common;
  * <p>When invoking a processing Request to the EDS, it must be with a specific
  * type of Action, which may or may not be allowed.</p>
  *
- * <p>This enumerated type contain all the allowed Actions, and each Request
+ * <p>These enumerated types contain all the allowed Actions, and each Request
  * will allow one or more of these.</p>
  *
  * @author Kim Jensen
@@ -39,7 +39,7 @@ public enum Action {
     CREATE,
 
     /**
-     * <p>The Action Update, is for updating existing records.</p>
+     * <p>The Action Update is for updating existing records.</p>
      */
     UPDATE,
 
@@ -73,13 +73,13 @@ public enum Action {
     ADD,
 
     /**
-     * <p>This Action allows someone who have write-access to a Circle, to copy
+     * <p>This Action allows someone who has write-access to a Circle to copy
      * a Data Object to another Circle, where they have write access.</p>
      */
     COPY,
 
     /**
-     * <p>This Action allows someone who have write-access to a Circle, to move
+     * <p>This Action allows someone who has write-access to a Circle to move
      * a Data Object to another Circle, where they have write access.</p>
      */
     MOVE,
@@ -87,7 +87,7 @@ public enum Action {
     /**
      * <p>This Action is used when either altering an Account or a Trustee. If
      * the request was ProcessMember, then it is possible to change the Role of
-     * the Member in the system, i.e. grant or revoke Administrative rights. If
+     * the Member in the system, i.e., grant or revoke Administrative rights. If
      * the request was ProcessTrustee, then it is possible for a Circle
      * Administrator to change the Trust Level for another Trustee.</p>
      *
@@ -98,8 +98,8 @@ public enum Action {
     ALTER,
 
     /**
-     * <p>Invalidating an Account, means that the Account is being made
-     * unreadable and it is not possible for Account to be used again.</p>
+     * <p>Invalidating an Account means that the Account is being made
+     * unreadable, and it is not possible for Account to be used again.</p>
      */
     INVALIDATE,
 

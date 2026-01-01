@@ -1,6 +1,6 @@
 /*
  * EDS, Encrypted Data Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2024, haugr.net
+ * Copyright (c) 2016-2026, haugr.net
  * mailto: eds AT haugr DOT net
  *
  * EDS is free software; you can redistribute it and/or modify it under the
@@ -15,7 +15,7 @@
  * here: https://www.apache.org/licenses/
  */
 
--- Create the users needed for EDS. Please note, that the
+-- Create the users needed for EDS. Please note that the
 -- default AppServer Configuration file is referring to these users & passwords.
 -- So, if you use a different name and password, please also update this.
 

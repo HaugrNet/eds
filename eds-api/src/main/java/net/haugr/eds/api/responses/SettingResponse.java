@@ -1,6 +1,6 @@
 /*
  * EDS, Encrypted Data Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2024, haugr.net
+ * Copyright (c) 2016-2026, haugr.net
  * mailto: eds AT haugr DOT net
  *
  * EDS is free software; you can redistribute it and/or modify it under the
@@ -26,9 +26,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * <p>Contains a map of current settings in this EDS instance, some of the
- * settings is System specific, others are custom for the client. Of the System
- * specific, not all may be updated once the EDS instance contain Members.</p>
+ * <p>Contains a map of current settings in this EDS instance, some settings
+ * are System specific, others are custom for the client. Of the System
+ * specific, not all may be updated once the EDS instance contains Members.</p>
  *
  * <p>Please see {@link EDSResponse} for information about the result of the
  * processing.</p>

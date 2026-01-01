@@ -1,6 +1,6 @@
 /*
  * EDS, Encrypted Data Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2024, haugr.net
+ * Copyright (c) 2016-2026, haugr.net
  * mailto: eds AT haugr DOT net
  *
  * EDS is free software; you can redistribute it and/or modify it under the
@@ -33,17 +33,17 @@ public enum CredentialType {
 
     /**
      * If the Passphrase is chosen, then the information will be used together
-     * with both an Account and a System specific Salt to create enough entropy
-     * to generate a Symmetric key which can be used to unlock the Asymmetric
-     * Key for the Account.
+     * with both an Account and a System-specific Salt. This should create
+     * enough entropy to generate a Symmetric key, which can be used to unlock
+     * the Asymmetric Key for the Account.
      */
     PASSPHRASE,
 
     /**
-     * <p>For websites, where members have a session, this can be added to the
+     * <p>For websites where members have a session, this can be added to the
      * EDS for convenience - and also to prevent that a member must continuously
-     * provide the login credentials. It also helps preventing that websites
-     * have to store users credentials alongside a session. Sessions have a
+     * provide the login credentials. It also helps prevent that websites
+     * have to store users' credentials alongside a session. Sessions have a
      * pre-defined maximum life-time, after which a Session is considered dead
      * and attempts to use it after this point will lead to a user error.</p>
      *

@@ -1,12 +1,12 @@
 /*
- * CWS, Cryptographic Web Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2025, haugr.net
- * mailto: cws AT haugr DOT net
+ * EDS, Encrypted Data Share - open source Cryptographic Sharing system.
+ * Copyright (c) 2016-2026, haugr.net
+ * mailto: eds AT haugr DOT net
  *
- * CWS is free software; you can redistribute it and/or modify it under the
+ * EDS is free software; you can redistribute it and/or modify it under the
  * terms of the Apache License, as published by the Apache Software Foundation.
  *
- * CWS is distributed in the hope that it will be useful, but WITHOUT ANY
+ * EDS is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the Apache License for more details.
  *

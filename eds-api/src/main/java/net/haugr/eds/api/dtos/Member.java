@@ -1,6 +1,6 @@
 /*
  * EDS, Encrypted Data Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2024, haugr.net
+ * Copyright (c) 2016-2026, haugr.net
  * mailto: eds AT haugr DOT net
  *
  * EDS is free software; you can redistribute it and/or modify it under the
@@ -28,7 +28,7 @@ import jakarta.json.bind.annotation.JsonbProperty;
 import jakarta.json.bind.annotation.JsonbPropertyOrder;
 
 /**
- * <p>The Member Object, is used as Accounts in EDS. The Object consists of an
+ * <p>The Member Object is used as Accounts in EDS. The Object consists of an
  * Authentication Object, a description, creation and modification dates.</p>
  *
  * <p>The Authentication Object is mandatory, the description is optional, and
@@ -75,7 +75,7 @@ public final class Member implements Serializable {
 
     /** The Member Since. */
     @JsonbProperty(value = Constants.FIELD_ADDED)
-    @JsonbDateFormat(Constants.JSON_DATE_FORMAT)
+    @JsonbDateFormat
     @JsonbNillable
     private LocalDateTime added = null;
 

@@ -1,6 +1,6 @@
 /*
  * EDS, Encrypted Data Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2024, haugr.net
+ * Copyright (c) 2016-2026, haugr.net
  * mailto: eds AT haugr DOT net
  *
  * EDS is free software; you can redistribute it and/or modify it under the
@@ -31,7 +31,7 @@ import net.haugr.eds.core.setup.DatabaseSetup;
 import org.junit.jupiter.api.Test;
 
 /**
- * <p>During the development of an application, using EDS to store data, it was
+ * <p>During the development of an application using EDS to store data, it was
  * discovered that an exception was thrown with the following text:</p>
  *
  * <p><i>Given final block not properly padded. Such issues can arise if a bad

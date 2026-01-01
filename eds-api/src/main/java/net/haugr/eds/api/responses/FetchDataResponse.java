@@ -1,6 +1,6 @@
 /*
  * EDS, Encrypted Data Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2024, haugr.net
+ * Copyright (c) 2016-2026, haugr.net
  * mailto: eds AT haugr DOT net
  *
  * EDS is free software; you can redistribute it and/or modify it under the
@@ -31,10 +31,10 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * <p>If the request was made generally, i.e. without a Data Id, then a list of
+ * <p>If the request was made generally, i.e., without a Data Id, then a list of
  * Metadata Objects is being returned. The list is limited to the number which
- * was requested - and the records field will then contain the total amount of
- * entries which was found, so it is possible to perform the lookup with
+ * was requested - and the records field will then contain the total number of
+ * entries which were found, so it is possible to perform the lookup with
  * pagination information.</p>
  *
  * <p>If the request was made for a specific Data Id, and the Object exists in

@@ -1,6 +1,6 @@
 /*
  * EDS, Encrypted Data Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2024, haugr.net
+ * Copyright (c) 2016-2026, haugr.net
  * mailto: eds AT haugr DOT net
  *
  * EDS is free software; you can redistribute it and/or modify it under the
@@ -33,7 +33,7 @@ import java.util.List;
  * have expired or not.</p>
  *
  * <p>As signatures do not have an Id, a checksum of them will be returned,
- * which os generated with the configured checksum algorithm.</p>
+ * which is generated with the configured checksum algorithm.</p>
  *
  * <p>Please see {@link EDSResponse} for information about the result of the
  * processing.</p>

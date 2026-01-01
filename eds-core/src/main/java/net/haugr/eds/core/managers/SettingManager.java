@@ -1,6 +1,6 @@
 /*
  * EDS, Encrypted Data Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2024, haugr.net
+ * Copyright (c) 2016-2026, haugr.net
  * mailto: eds AT haugr DOT net
  *
  * EDS is free software; you can redistribute it and/or modify it under the
@@ -38,20 +38,20 @@ import net.haugr.eds.core.model.Settings;
 import net.haugr.eds.core.model.entities.SettingEntity;
 
 /**
- * <p>The Setting Service, allows for checking and updating existing Settings
+ * <p>The Setting Service allows for checking and updating existing Settings
  * and add new Settings, needed for Clients. Certain of the existing Settings
  * have a flag that will not allow them to be updated. Most settings may or can
  * be updated, but if the Flag is present, it is for a good reason - as it
  * prevents a change that can affect the system.</p>
  *
  * <p>Version 1.0 of EDS is only having one entry which may not be altered, the
- * System Salt. Reason is that if this is being changed, it will prevent anyone
+ * System Salt. The reason is that if this is being changed, it will prevent anyone
  * from accessing the system, as the Member Keys cannot be unlocked.</p>
  *
  * <p>For the same reason, the request can <b>only</b> be invoked by the System
  * Administrator. Since changing things must be strictly limited.</p>
  *
- * <p>The Setting service is trying to be as error tolerant as possible, meaning
+ * <p>The Setting service is trying to be as error-tolerant as possible, meaning
  * that null Keys and null Values will be converted into empty Strings. If an
  * attempt at making updates to a Key, which is not permitted to be updated, an
  * error will occur.</p>
@@ -76,13 +76,13 @@ public final class SettingManager extends AbstractManager<CommonDao, SettingResp
         verifyRequest(request, Permission.SETTING);
 
         // Updating the Settings should be all or nothing. If only partially
-        // updated it may be impossible for the System Administrator to know if
+        // updated, it may be impossible for the System Administrator to know if
         // the system behaves as expected. This means that the pre-checks must
         // cover all problems, so the actual update will not result in any other
         // issues.
         //   Before making the updates, the keys and values from the request
-        // must therefore be inspected. The following method will do this, and
-        // return a new Map of keys & values for those that needs updating.
+        // must therefore be inspected. The following method will do this and
+        // return a new Map of keys & values for those that need updating.
         final Map<String, String> changedEntries = findChangedEntries(request);
 
         // All issues should've been covered, meaning that we can now safely
@@ -241,7 +241,7 @@ public final class SettingManager extends AbstractManager<CommonDao, SettingResp
     }
 
     private static void checkOtherSettings(final StandardSetting setting) {
-        // Currently, the only setting which have not been checked otherwise,
+        // Currently, the only setting that has not been checked otherwise,
         // and which is not allowed to be updated - is the MasterKey URL, since
         // doing so may have harmful consequences. The setting may only be
         // updated by the MasterKey request.
@@ -264,7 +264,7 @@ public final class SettingManager extends AbstractManager<CommonDao, SettingResp
 
         // Now the tricky part - if we have a critical setting (Salt or PBE
         // Iterations), which can only be updated when no members exist, we
-        // also have to update the System Administrator account, otherwise
+        // also have to update the System Administrator account. Otherwise,
         // the new change will not work correctly.
         if (Objects.equals(key, StandardSetting.EDS_SALT.getKey()) ||
                 Objects.equals(key, StandardSetting.PBE_ITERATIONS.getKey())) {

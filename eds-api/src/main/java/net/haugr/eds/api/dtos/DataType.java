@@ -1,6 +1,6 @@
 /*
  * EDS, Encrypted Data Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2024, haugr.net
+ * Copyright (c) 2016-2026, haugr.net
  * mailto: eds AT haugr DOT net
  *
  * EDS is free software; you can redistribute it and/or modify it under the
@@ -29,10 +29,10 @@ import java.io.Serializable;
  * two default values ('Folders' &amp; 'Data'), but it may also be something
  * else.</p>
  *
- * <p>If the EDS instance it mainly used for file sharing, the DataTypes can be
+ * <p>If the EDS instance is mainly used for file sharing, the DataTypes can be
  * setup with the various supported MIME Types. If the EDS instance is used for
  * Application Data sharing, then it may be used to contain some helpful
- * information about what the content may reflect, i.e. Object Type and perhaps
+ * information about what the content may reflect, i.e., Object Type and perhaps
  * Object Version.</p>
  *
  * <p>If not needed, then it can be left alone. Default DataType in EDS is

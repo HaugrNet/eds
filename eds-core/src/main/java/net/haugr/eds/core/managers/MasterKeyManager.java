@@ -1,6 +1,6 @@
 /*
  * EDS, Encrypted Data Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2024, haugr.net
+ * Copyright (c) 2016-2026, haugr.net
  * mailto: eds AT haugr DOT net
  *
  * EDS is free software; you can redistribute it and/or modify it under the
@@ -71,21 +71,21 @@ public final class MasterKeyManager extends AbstractManager<CommonDao, MasterKey
 
     private MasterKeyResponse checkRequest(final MasterKeyRequest request) {
         // First, retrieve the existing MasterKey, which we need to check.
-        // Primarily, as updating it to an invalid key can be devastating. So
+        // Primarily, updating it to an invalid key can be devastating. So
         // it is initially being saved, just in case...
-        // What if the keys are the same ?
+        // What if the keys are the same?
         final SecretEDSKey oldMasterKey = masterKey.getKey();
         final SecretEDSKey newMasterKey = prepareNewMasterKey(masterKey, request);
 
-        // For this request, the default account checks won't work, hence it
+        // For this request, the default account checks won't work. Hence, it
         // must be checked directly, with the keys
         final MemberEntity admin = findAdmin(request);
         final MasterKeyResponse response;
 
-        // First check is with the new Key, as it is assumed that the primary
+        // The first check is with the new Key, as it is assumed that the primary
         // invocation of this request is to unlock a system, rather than update
         // the Master Key. If this fails, then try with the old Key, and if that
-        // works, the Key should be updated. If both fails ... tough!
+        // works, the Key should be updated. If both fail... tough!
         if (checkCredentials(newMasterKey, admin, request.getCredential())) {
             // Default check, new MasterKey is correct, updating the Key to
             // reflect this.
@@ -98,7 +98,7 @@ public final class MasterKeyManager extends AbstractManager<CommonDao, MasterKey
             updateMemberPassword(admin, request.getCredential());
             response = new MasterKeyResponse(ReturnCode.SUCCESS, "MasterKey updated.");
         } else {
-            // Neither keys worked, throw Authentication Exception
+            // Neither key worked, throw Authentication Exception
             throw new AuthenticationException("Invalid credentials.");
         }
 

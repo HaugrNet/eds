@@ -1,6 +1,6 @@
 /*
  * EDS, Encrypted Data Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2024, haugr.net
+ * Copyright (c) 2016-2026, haugr.net
  * mailto: eds AT haugr DOT net
  *
  * EDS is free software; you can redistribute it and/or modify it under the
@@ -24,9 +24,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Test;
 
 /**
- * <p>To ascertain why something has gone wrong, we need to look at the
- * ReturnCode, which is given. These serve as a general purpose value that
- * is given to the User.</p>
+ * <p>To figure out why something has gone wrong, we need to look at the
+ * ReturnCode, which is given. These serve as a general purpose value
+ * given to the User.</p>
  *
  * <p>This rather primitive test serves the purpose of verifying that the
  * numbers and texts aren't accidentally altered, as this may affect how other

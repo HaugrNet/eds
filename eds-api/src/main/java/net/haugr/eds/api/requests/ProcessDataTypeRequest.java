@@ -1,6 +1,6 @@
 /*
  * EDS, Encrypted Data Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2024, haugr.net
+ * Copyright (c) 2016-2026, haugr.net
  * mailto: eds AT haugr DOT net
  *
  * EDS is free software; you can redistribute it and/or modify it under the
@@ -31,8 +31,8 @@ import java.util.Map;
  *
  * <p>To create or update a custom DataType, the name of the DataType is needed
  * together with the type itself. Generally, the name is a shorthand description
- * of name of the actual Type, as the type may be a anything from a simple MIME
- * Type to a rule to extract the content of a stored Object.</p>
+ * of the name of the actual Type, as the type may be anything from a simple
+ * MIME Type to a rule to extract the content of a stored Object.</p>
  *
  * <p>For more details, please see the 'processDataType' request in the Management
  * interface: {@link Share#processDataType(ProcessDataTypeRequest)}</p>

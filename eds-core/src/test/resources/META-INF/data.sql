@@ -1,17 +1,34 @@
+/*
+ * EDS, Encrypted Data Share - open source Cryptographic Sharing system.
+ * Copyright (c) 2016-2026, haugr.net
+ * mailto: eds AT haugr DOT net
+ *
+ * EDS is free software; you can redistribute it and/or modify it under the
+ * terms of the Apache License, as published by the Apache Software Foundation.
+ *
+ * EDS is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the Apache License for more details.
+ *
+ * You should have received a copy of the Apache License, version 2, along with
+ * this program; If not, you can download a copy of the License
+ * here: https://www.apache.org/licenses/
+ */
+
 -- =============================================================================
 -- Following is TEST data, and should not be added in a PRODUCTION environment
 -- -----------------------------------------------------------------------------
 -- Unfortunately, JPA only allow setting 3 scripts when creating the database,
--- the first is the actual model, which contain what is needed to setup the
+-- the first is the actual model, which contain what is needed to set up the
 -- database, including all tables, views, procedures, constraints, etc. The
 -- second script is for the data (this one), but as we both need to have data
 -- for production and for testing, we're adding it all here. The final script
--- is for destroying the database, which is needed of you have a real database
+-- is for destroying the database, which is needed if you have a real database
 -- and not just an in-memory database.
 -- =============================================================================
 
--- For the testing, we're persisting the Settings also, it is not really needed,
--- but it helps with ensuring that all corners of EDS is being checked.
+-- For the testing, we're persisting the Settings also, it is not really necessary,
+-- but it helps with ensuring that all corners of EDS are being checked.
 INSERT INTO eds_settings (name, setting) VALUES
                                              ('eds.crypto.symmetric.algorithm', 'AES_GCM_256'),
                                              ('eds.crypto.asymmetric.algorithm', 'RSA_2048'),
@@ -31,9 +48,9 @@ INSERT INTO eds_settings (name, setting) VALUES
                                              ('eds.cors.value', 'http://localhost'),
                                              ('eds.is.ready', 'true');
 
--- Default Administrator User, it is set at the first request to the System, and
+-- Default Administrator User, it is set at the first request to the System and
 -- is thus needed for loads of tests. Remaining Accounts is for "member1" to
--- "member5", which is all used as part of the tests.
+-- "member5", which are all used as part of the tests.
 INSERT INTO eds_members (external_id, name, salt, pbe_algorithm, rsa_algorithm, public_key, private_key, member_role) VALUES
                                                                                                                           ('d95a14e6-e1d1-424b-8834-16a79498f4d1', 'admin', 'yKUSMRTVyN4n7Vv9E1D8jzghR0m8xf7q3+viw+qH+lxplHIUXHvniMG+6qQ1vLyF3nIg7g==', 'PBE_GCM_256', 'RSA_2048', 'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAksaBtmOjoDHaCslM3CuFfBAuWE/g2vgBmhs4XV9MaIcuS3RV2zKkguuw74qvmgJhhnIQHl/KdN/rvqhkKp92ugv+cklFIJZOWBi32yhBVTkAgpuZXp25f1BbVw7AWZU7Zo1RAyr1hTqecVAcK/VanYLhXGnxUxCEGZgIa3HsS+SsIdf1W42gzQYzD+17TPTO6T/vbToWbpiDCQgbhB4EVGnMi7V6m2x4eYpJHuRH3yM3f0felqMIFqrj6qtNw4VHEXuUAaAwlUC92Ir6m8Y58k8F8z+jhFucILbSretUKBRuAb4wZq4i0n7U7c3bV1MYkIizPfCd3l/JS8j40hmlkQIDAQAB', 'wzcsxgPK6rCKq+1DjST+M9x9KwlZNtwAbDRDSVyZMiK1NGMZ5kr3/PB3xTBtPvOo5CX86xwRgvipXRW7BOU5ovc5QsDdS/yzlGEU6BJOYhGSNuowxbtcMTAPWklARS61g8Bh63wGQREVfagUmKKDj4e6/G9L6E9ZUpXQ7aYtoGdtLfYUYCZ0N2S//QO+LSAfDMlGD27b4uPMX8/sN8hjmykk58bzmF4hQajAGDvEHkrpJ61GiZs0R9+Oy2m77+l3TV4koa2VMoeidLYNvgHfgatJnvR+2zjYm9c2fN4aPopADj2ox/z7M3NDJIr497W43qLLc+lYg5zQTXvV0gv94KFWqADZhpOSe4Xt2W3I5dZnTmowePPYVlhXKKrszp9aI8hNZy1sG6cqhVXhwGSgvpKquCV7JDl6u09cOm/0xPtLHjWT5IrhP0scUtDM/2vXAIuDzM6CufB7CdATnalr//hVcpSwhzS/QXlSFa3Mu9Qe4KCfhnFcetm5g37qudjNs+3P2zpf5SW93iQQvTG0bVRYZURD6jKT2yJMw2yCXwR37SiORk6t4zgySeDB5G6bhshW6odwR6lszJ5egquKLcVv+Kobq+4XjF+rPhaj7H23qjrVnD83LtuzxSeJCilEVjVFMvmib/Rwed7Fn+O7RbD2oIh7+4R7X5dnKedmShBm/ToHhO+6sdEIdLybWl4YbmlNCpeSuER5Ebyz0O1Mw14p1Y0Z8WgYkFILnMsbJt/VPG6jDECCJ3kNPgs2jzSV/4wikpckFKGSWlyldcgBq3NY74f5Y11KKUgHTC7ARez58SnZ5cSc40MXzxZ6AL2kYukg51AytfsRa66m/mF9pVgpW3n6FfZLxApFQ0b8ntSZVbTjBtfh/TJ5r6ofNe1uAhIfubrae1FlWd9qZc87CdyssjjMB3K0btLGC62/6Jt6KVYV9fGPljOsdKLeN3misypLW9MVnCQ2WnlX4CRraPzgzJ9M7Cyevl2cfzsx84sUFUKQRbiaXwX1jK6uiWjvGe6q+PSH3ZpXW4PaQVh05ZSwiWOPg3e87rbNIMFWyWxBORFxIlpO+3mB+50gkP8zuTbp3eI5jfxMH4giODp1N0awdNu5UX8enwkcLUxaPJV2jjZUQ+r1DBqKzO3fHXiorlGPzg58TTcKvnHzwZh7dfgYnta5qYzi/GzXzzZMCSx37m0R0PlKiF0PsI9mod/xvPHJqA7Vgs3YOJnVEEwEuaN11dO+1Cz7MU3Z0C4551t5urr4kCb4/LbhCmyR84XMwsb/M6QEahr0StX96kzE7EUigIjoUv7dlv/od7dNrAWp2Kdnl6T3+hdNwH9p7nOgtnvRm8NBCStmf4bfKiyWVkH/iH1Gj2y6Hwy7a9sAcdIWByZFpBGXDToNVH9J92f4QV8TymxFON2z6aEjb1LyYaL5ruamTaeYaP0pqpTARxYxJBQdYO13jWaI5wA7QsSSOLErsseF/gGYcSKUcXPXvf5KAghWBUBtuURD3YQRGqb8wEI5CrFF9lvNXPtzayUQRCFClCIhaNwbbhOi0kj1bwpgo9Y8pN7sRhMCh3zSmwL78+riQgQZjW5fKZV7uBCCi/+Je/QFEY6JTIm2eB8Jt/qeLs+YD8brAkbLigIEUQ==', 'ADMIN'),
                                                                                                                           ('073dcc8f-ffa6-4cda-8d61-09ba9441e78e', 'member1', 'nPQSZU7Sy4gnv13wQVD8hzgnRxC9l//qj++2lLaBrQlix3pBKEUr7IpvZ2yLDVJinxJUDA==', 'PBE_GCM_256', 'RSA_2048', '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', 'STANDARD'),
@@ -50,20 +67,20 @@ INSERT INTO eds_circles (external_id, name) VALUES
                                                 ('8ba34e12-8830-4a1f-9681-b689cad52009', 'circle2'),
                                                 ('a2797176-a5b9-4dc9-867b-8c5c1bb3a9f9', 'circle3');
 
--- For each Circle, we need to have a unique Key, but with the same settings.
+-- For each Circle, we need to have a unique Key but with the same settings.
 INSERT INTO eds_keys (algorithm, status) VALUES
                                              ('AES_GCM_256', 'ACTIVE'),
                                              ('AES_GCM_256', 'ACTIVE'),
                                              ('AES_GCM_256', 'ACTIVE');
 
--- For each Circle, we need to have root folder for all data.
+-- For each Circle, we need to have a root folder for all data.
 INSERT INTO eds_metadata (external_id, parent_id, circle_id, datatype_id, name) VALUES
                                                                                     ('abeb9633-1fdc-4343-a5d9-b6a0b3d22dbb', 0, 1, 1, '/'),
                                                                                     ('b4c78387-3335-4f11-940a-59d36c67d6cf', 0, 2, 1, '/'),
                                                                                     ('5ebda360-5e3d-4e88-82fb-947d25075a4a', 0, 3, 1, '/');
 
 -- With the Members created, and the Circles and Keys added, it is possible to
--- also create a number of Trustees, in this case we add Member 1-3 to Circle 1,
+-- also create a number of Trustees. In this case we add Member 1-3 to Circle 1,
 -- Member 1-4 to Circle 2 and Member 2-5 to Circle 3.
 -- The Trust Level is different for each Member.
 INSERT INTO eds_trustees (member_id, circle_id, key_id, trust_level, circle_key) VALUES

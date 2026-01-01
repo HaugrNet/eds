@@ -1,6 +1,6 @@
 /*
  * EDS, Encrypted Data Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2024, haugr.net
+ * Copyright (c) 2016-2026, haugr.net
  * mailto: eds AT haugr DOT net
  *
  * EDS is free software; you can redistribute it and/or modify it under the
@@ -32,7 +32,7 @@ BEGIN
         INSERT INTO eds_versions(schema_version, eds_version, db_vendor) VALUES (4, '2.0.0', 'PostgreSQL');
 
         -- As the names of the Algorithm's have been extended, we also have to
-        -- update these, and set the new default as well.
+        -- update these and set the new default as well.
         ALTER TABLE eds_members ALTER COLUMN pbe_algorithm TYPE VARCHAR(25);
         ALTER TABLE eds_members ALTER COLUMN pbe_algorithm SET DEFAULT 'PBE_GCM_256';
         ALTER TABLE eds_members ALTER COLUMN rsa_algorithm TYPE VARCHAR(25);

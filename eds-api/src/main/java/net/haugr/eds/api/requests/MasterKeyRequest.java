@@ -1,6 +1,6 @@
 /*
  * EDS, Encrypted Data Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2024, haugr.net
+ * Copyright (c) 2016-2026, haugr.net
  * mailto: eds AT haugr DOT net
  *
  * EDS is free software; you can redistribute it and/or modify it under the
@@ -32,7 +32,7 @@ import java.util.Map;
  * started to &quot;unlock&quot; it. The same request can also be used to lock
  * a running system, so nothing will work.</p>
  *
- * <p>MasterKey's is used to encrypt/decrypt the &quot;salt&quot; of a member,
+ * <p>The MasterKey is used to encrypt/decrypt the &quot;salt&quot; of a member,
  * which is a piece of static information used to check the member credentials.
  * The MasterKey is also used to encrypt/decrypt all IVs or Initial Vectors,
  * which is the initial random information used to encrypt and decrypt a piece

@@ -1,6 +1,6 @@
 /*
  * EDS, Encrypted Data Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2024, haugr.net
+ * Copyright (c) 2016-2026, haugr.net
  * mailto: eds AT haugr DOT net
  *
  * EDS is free software; you can redistribute it and/or modify it under the
@@ -146,7 +146,7 @@ public class Authentication extends AbstractRequest {
         // EDS will set one based on the given information, assuming that if
         // the account name is set, then a PassPhrase is used, otherwise a
         // Session is used. If neither is correct, then EDS will simply fail
-        // to handle the request properly, with an error information.
+        // to handle the request properly, with error information.
         if (credentialType == null) {
             if (accountName != null) {
                 credentialType = CredentialType.PASSPHRASE;

@@ -1,6 +1,6 @@
 /*
  * EDS, Encrypted Data Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2024, haugr.net
+ * Copyright (c) 2016-2026, haugr.net
  * mailto: eds AT haugr DOT net
  *
  * EDS is free software; you can redistribute it and/or modify it under the
@@ -52,24 +52,24 @@ import net.haugr.eds.core.exceptions.CryptoException;
 import net.haugr.eds.core.model.Settings;
 
 /**
- * <p>This library contain all the Cryptographic Operations, needed for EDS, to
+ * <p>This library contains all the Cryptographic Operations, needed for EDS to
  * support the features required. JCA, Java Cryptography Architecture, contains
- * all the features needed, and is flexible enough, that it can be extended by
+ * all the features needed and is flexible enough that it can be extended by
  * providing different vendors - which will then allow using stronger encryption
  * if needed.</p>
  *
  * <p>EDS uses two (three) types of Encryption. Symmetric Encryption of all the
  * actual Data to be shared and Asymmetric Encryption to storing the Symmetric
- * keys. Additionally, all Private Key are be stored encrypted, and a Key is
+ * keys. Additionally, all Private Keys are stored encrypted, and a Key is
  * derived (using PBKDF2) from the Credentials to unlock it.</p>
  *
  * <p>The default Algorithms and Key sizes have been chosen, so they will work
  * with a standard Java 8 (build 161+) installation, these uses the maximum key
  * size allowed, if an older Java is used, then either install the Java 8
- * Security extension from Oracle, or change the default configuration of EDS
+ * Security extension from Oracle or change the default configuration of EDS
  * accordingly.</p>
  *
- * <p>Although Cryptography is the cornerstone of the EDS, there is no attempts
+ * <p>Although Cryptography is the cornerstone of the EDS, there are no attempts
  * made towards creating or inventing various Algorithms. The risk of making
  * mistakes is too high. Instead, the EDS relies on the wisdom and maturity of
  * existing JCE implementations in Java.</p>
@@ -101,7 +101,7 @@ public final class Crypto {
      *
      * @param algorithm PBE Algorithm to generate Account Symmetric Key
      * @param secret    Provided Passphrase or Secret
-     * @param salt      System specific Salt
+     * @param salt      System-specific Salt
      * @return Symmetric Key
      * @throws CryptoException if an error occurred
      */
@@ -131,10 +131,10 @@ public final class Crypto {
      * <p>From <a href="https://stackoverflow.com/a/9855338">Stackoverflow</a>,
      * it is clear that the solution can be complex, but as all which is needed
      * here is a way to convert the bytes to chars so a Key can be generated, a
-     * simpler conversion may be sufficient.</p>
+     * simpler conversion may be enough.</p>
      *
      * @param secret Provided Passphrase or Secret
-     * @return Extended secret as char array
+     * @return Extended secret as a char array
      */
     private char[] convertSecret(final byte[] secret) {
         final char[] secretChars = MasterKey.generateSecretChars(secret);
@@ -275,7 +275,7 @@ public final class Crypto {
                 case AES_CBC ->
                     // SonarQube rule S3329 (http://localhost:9000/coding_rules?open=squid:S3329&rule_key=squid:S3329)
                     // is marking this place as a vulnerability, as it cannot
-                    // ascertain that the salt is generated randomly using
+                    // tell that the salt is generated randomly using
                     // SecureRandom, and also stored armored in the database.
                     // As the same salt must be used for both encryption and
                     // decryption - the rule is simply not good enough.
@@ -303,7 +303,7 @@ public final class Crypto {
     // =========================================================================
 
     /**
-     * The Public RSA Key stored in EDS, is simply saved in x.509 format, stored
+     * The Public RSA Key, stored in EDS, is simply saved in x.509 format, stored
      * Base64 encoded.
      *
      * @param key Public RSA key to armor (Base64 encoded x.509 Key)
@@ -332,7 +332,7 @@ public final class Crypto {
     /**
      * The Private RSA Key stored in EDS, is stored encrypted, so it cannot be
      * extracted without some effort. To do this, a Key is needed, together with
-     * a Salt which the Initial Vector is based on. The encrypted Key, is then
+     * a Salt which the Initial Vector is based on. The encrypted Key is then
      * converted into PKCS8 and converted using Base64 encoding. The result of
      * this will make the key safe for storage in the database.
      *
@@ -381,12 +381,12 @@ public final class Crypto {
     }
 
     /**
-     * <p>The RSA KeyPair for each Member Account, is stored with an encrypted
+     * <p>The RSA KeyPair for each Member Account is stored with an encrypted
      * Private Key and armored and the Public Key armored. This way, it is easy
      * to verify that the Key's are correctly stored as they are stored purely
      * as text and nothing else.</p>
      *
-     * <p>To recreate the Key Pair the Private Key has to be decrypted and then
+     * <p>To recreate the Key Pair, the Private Key has to be decrypted, and then
      * both the Public and Private Keys must be converted.</p>
      *
      * @param algorithm         EDS Key Algorithm

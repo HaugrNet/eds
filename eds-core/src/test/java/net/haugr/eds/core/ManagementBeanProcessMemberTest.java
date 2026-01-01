@@ -1,6 +1,6 @@
 /*
  * EDS, Encrypted Data Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2024, haugr.net
+ * Copyright (c) 2016-2026, haugr.net
  * mailto: eds AT haugr DOT net
  *
  * EDS is free software; you can redistribute it and/or modify it under the
@@ -483,9 +483,9 @@ final class ManagementBeanProcessMemberTest extends DatabaseSetup {
 
     /**
      * When a member is updating the passphrase, then it will result in a new
-     * KeyPair generated internally, this means that the internal Keys must also
+     * KeyPair generated internally. This means that the internal Keys must also
      * be updated for each Circle, which the Member belongs to. This test will
-     * add some data, change the Passphrase and verify that the data can be
+     * add some data, change the Passphrase, and verify that the data can be
      * read out both before and after the change.
      */
     @Test

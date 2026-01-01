@@ -1,6 +1,6 @@
 /*
  * EDS, Encrypted Data Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2024, haugr.net
+ * Copyright (c) 2016-2026, haugr.net
  * mailto: eds AT haugr DOT net
  *
  * EDS is free software; you can redistribute it and/or modify it under the
@@ -16,7 +16,6 @@
  */
 package net.haugr.eds.api.common;
 
-import jakarta.json.bind.annotation.JsonbDateFormat;
 import java.util.regex.Pattern;
 
 /**
@@ -90,9 +89,6 @@ public final class Constants {
      * exploit.</p>
      */
     public static final String ADMIN_ACCOUNT = "admin";
-
-    /** JSON Date Format. */
-    public static final String JSON_DATE_FORMAT = JsonbDateFormat.DEFAULT_FORMAT;
 
     /** Folder TypeName. */
     public static final String FOLDER_TYPENAME = "folder";

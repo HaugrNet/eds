@@ -1,6 +1,6 @@
 /*
  * EDS, Encrypted Data Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2024, haugr.net
+ * Copyright (c) 2016-2026, haugr.net
  * mailto: eds AT haugr DOT net
  *
  * EDS is free software; you can redistribute it and/or modify it under the
@@ -18,7 +18,7 @@ package net.haugr.eds.api.common;
 
 /**
  * <p>Common Return Codes, used for all requests, to help specify the nature of
- * the problem which may have occurred, if processing wasn't successful.</p>
+ * the problem which may have occurred if processing wasn't successful.</p>
  *
  * @author Kim Jensen
  * @since EDS 1.0
@@ -30,16 +30,16 @@ public enum ReturnCode {
     // =========================================================================
     // 1xx Informational responses
     //     An informational response indicates that the request was received and
-    //     understood. It is issued on a provisional basis while request
+    //     understood. It is issued provisionally while request
     //     processing continues. It alerts the client to wait for a final
     //     response. The message consists only of the status line and optional
-    //     header fields, and is terminated by an empty line. As the HTTP/1.0
+    //     header fields and is terminated by an empty line. As the HTTP/1.0
     //     standard did not define any 1xx status codes, servers must not send a
     //     1xx response to an HTTP/1.0 compliant client except under
     //     experimental conditions.
     // -------------------------------------------------------------------------
     // 100 Continue
-    //     The server has received the request headers and the client should
+    //     The server has received the request headers, and the client should
     //     proceed to send the request body (in the case of a request for which
     //     a body needs to be sent; for example, a POST request). Sending a
     //     large request body to a server after a request has been rejected for
@@ -47,8 +47,8 @@ public enum ReturnCode {
     //     the request's headers, a client must send Expect: 100-continue as a
     //     header in its initial request and receive a 100 Continue status code
     //     in response before sending the body. If the client receives an error
-    //     code such as 403 (Forbidden) or 405 (Method Not Allowed) then it
-    //     shouldn't send the request's body. The response 417 Expectation
+    //     code such as 403 (Forbidden) or 405 (Method Not Allowed), then it
+    //     shouldn't send the request's body. Response 417 Expectation
     //     Failed indicates that the request should be repeated without the
     //     Expect header as it indicates that the server doesn't support
     //     expectations (this is the case, for example, of HTTP/1.0 servers).
@@ -79,22 +79,22 @@ public enum ReturnCode {
     // 202 Accepted
     //     The request has been accepted for processing, but the processing has
     //     not been completed. The request might or might not be eventually
-    //     acted upon, and may be disallowed when processing occurs.
+    //     acted upon and may be disallowed when processing occurs.
     // 203 Non-Authoritative Information (since HTTP/1.1)
-    //     The server is a transforming proxy (e.g. a Web accelerator) that
+    //     The server is a transforming proxy (e.g., a Web accelerator) that
     //     received a 200 OK from its origin, but is returning a modified
     //     version of the origin's response.
     // 204 No Content
     //     The server successfully processed the request and is not returning
     //     any content.
     // 205 Reset Content
-    //     The server successfully processed the request, but is not returning
+    //     The server successfully processed the request but is not returning
     //     any content. Unlike a 204 response, this response requires that the
     //     requester reset the document view.
     // 206 Partial Content (RFC 7233)
     //     The server is delivering only part of the resource (byte serving) due
     //     to a range header sent by the client. The range header is used by
-    //     HTTP clients to enable resuming of interrupted downloads, or split a
+    //     HTTP clients to enable resuming of interrupted downloads or split a
     //     download into multiple simultaneous streams.
     // 207 Multi-Status (WebDAV; RFC 4918)
     //     The message body that follows is an XML message and can contain a
@@ -132,8 +132,8 @@ public enum ReturnCode {
     //     a temporary redirect (the original describing phrase was "Moved
     //     Temporarily"), but popular browsers implemented 302 with the
     //     functionality of a 303 See Other. Therefore, HTTP/1.1 added status
-    //     codes 303 and 307 to distinguish between the two behaviours. However,
-    //     some Web applications and frameworks use the 302 status code as if it
+    //     codes 303 and 307 to distinguish between the two behaviors. However,
+    //     some Web applications and frameworks use the 302 status codes as if they
     //     were the 303.
     // 303 See Other (since HTTP/1.1)
     //     The response to the request can be found under another URI using the
@@ -143,8 +143,8 @@ public enum ReturnCode {
     // 304 Not Modified (RFC 7232)
     //     Indicates that the resource has not been modified since the version
     //     specified by the request headers If-Modified-Since or If-None-Match.
-    //     In such case, there is no need to retransmit the resource since the
-    //     client still has a previously-downloaded copy.
+    //     In such a case, there is no need to retransmit the resource since the
+    //     client still has a previously downloaded copy.
     // 305 Use Proxy (since HTTP/1.1)
     //     The requested resource is available only through a proxy, the address
     //     for which is provided in the response. Many HTTP clients (such as
@@ -170,12 +170,12 @@ public enum ReturnCode {
     //    This class of status code is intended for situations in which the
     //    error seems to have been caused by the client. Except when responding
     //    to a HEAD request, the server should include an entity containing an
-    //    explanation of the error situation, and whether it is a temporary or
+    //    explanation of the error situation and whether it is a temporary or
     //    permanent condition. These status codes are applicable to any request
     //    method. User agents should display any included entity to the user.
     // -------------------------------------------------------------------------
     // 400 Bad Request
-    //     The server cannot or will not process the request due to an apparent
+    //     The server cannot, or will not, process the request due to a clear
     //     client error (e.g., malformed request syntax, size too large, invalid
     //     request message framing, or deceptive request routing).
     // 401 Unauthorized (RFC 7235)
@@ -184,22 +184,22 @@ public enum ReturnCode {
     //     provided. The response must include a WWW-Authenticate header field
     //     containing a challenge applicable to the requested resource. See
     //     Basic access authentication and Digest access authentication. 401
-    //     semantically means "unauthenticated", i.e. the user does not have the
+    //     semantically means "unauthenticated", i.e., the user does not have the
     //     necessary credentials.
     //       Note: Some sites issue HTTP 401 when an IP address is banned from
-    //     the website (usually the website domain) and that specific address is
+    //     the website (usually the website domain), and that specific address is
     //     refused permission to access a website.
     // 402 Payment Required
-    //     Reserved for future use. The original intention was that this code
-    //     might be used as part of some form of digital cash or micropayment
-    //     scheme, as proposed for example by GNU Taler, but that has not yet
+    //     To be Reserved for future use. The original intention was that this code
+    //     might be used as part of some form of a digital cash or micropayment
+    //     scheme, as proposed, for example, by GNU Taler. However, that has not yet
     //     happened, and this code is not usually used. Google Developers API
     //     uses this status if a particular developer has exceeded the daily
     //     limit on requests.[36] Stripe API uses this code for errors with
     //     processing credit cards.
     // 403 Forbidden
     //     The request was valid, but the server is refusing action. The user
-    //     might not have the necessary permissions for a resource, or may need
+    //     might not have the necessary permissions for a resource or may need
     //     an account of some sort.
     // 404 Not Found
     //     The requested resource could not be found but may be available in the
@@ -210,7 +210,7 @@ public enum ReturnCode {
     //     via POST, or a PUT request on a read-only resource.
     // 406 Not Acceptable
     //     The requested resource is capable of generating only content not
-    //     acceptable according to the Accept headers sent in the request.
+    //     acceptable, according to the Accept headers sent in the request.
     // 407 Proxy Authentication Required (RFC 7235)
     //     The client must first authenticate itself with the proxy.
     // 408 Request Timeout
@@ -267,14 +267,14 @@ public enum ReturnCode {
     //     including Google.com.
     // 421 Misdirected Request (RFC 7540)
     //     The request was directed at a server that is not able to produce a
-    //     response. (for example because of a connection reuse)
+    //     response. (for example, because of a connection reuse)
     // 422 Unprocessable Entity (WebDAV; RFC 4918)
     //     The request was well-formed but was unable to be followed due to
     //     semantic errors.
     // 423 Locked (WebDAV; RFC 4918)
     //     The resource that is being accessed is locked.
     // 424 Failed Dependency (WebDAV; RFC 4918)
-    //     The request failed due to failure of a previous request
+    //     The request failed due to the failure of a previous request
     //     (e.g., a PROPPATCH).
     // 426 Upgrade Required
     //     The client should switch to a different protocol such as TLS/1.0,
@@ -290,12 +290,12 @@ public enum ReturnCode {
     //     Intended for use with rate-limiting schemes.
     // 431 Request Header Fields Too Large (RFC 6585)
     //     The server is unwilling to process the request because either an
-    //     individual header field, or all the header fields collectively, are
+    //     individual header field or all the header fields collectively are
     //     too large.
     // 451 Unavailable For Legal Reasons (RFC 7725)
     //     A server operator has received a legal demand to deny access to a
     //     resource or to a set of resources that includes the requested
-    //     resource. The code 451 was chosen as a reference to the novel
+    //     resource. Code 451 was chosen as a reference to the novel
     //     Fahrenheit 451 (see the Acknowledgements in the RFC).
     // =========================================================================
     // 5xx Server errors
@@ -304,7 +304,7 @@ public enum ReturnCode {
     //     in which the server is aware that it has encountered an error or is
     //     otherwise incapable of performing the request. Except when responding
     //     to a HEAD request, the server should include an entity containing an
-    //     explanation of the error situation, and indicate whether it is a
+    //     explanation of the error situation and indicate whether it is a
     //     temporary or permanent condition. Likewise, user agents should
     //     display any included entity to the user. These response codes are
     //     applicable to any request method.
@@ -371,10 +371,10 @@ public enum ReturnCode {
      * is required and has failed or has not yet been provided. The response
      * must include a WWW-Authenticate header field containing a challenge
      * applicable to the requested resource. See Basic access authentication and
-     * Digest access authentication. 401 semantically means "unauthenticated",
-     * i.e. the user does not have the necessary credentials.<br>
+     * Digest access authentication. 401 semantically means "unauthenticated".
+     * I.e., the user does not have the necessary credentials.<br>
      * Note: Some sites issue HTTP 401 when an IP address is banned from the
-     * website (usually the website domain) and that specific address is refused
+     * website (usually the website domain), and that specific address is refused
      * permission to access a website.</i>
      */
     AUTHORIZATION_WARNING(Classification.CLASS_WARNING, 1, "The Account is not permitted to perform requested Action."),
@@ -382,7 +382,7 @@ public enum ReturnCode {
     /**
      * <b>HTTP Status Code 403 - Forbidden</b>.<br>
      * <i>The request was valid, but the server is refusing action. The user
-     * might not have the necessary permissions for a resource, or may need an
+     * might not have the necessary permissions for a resource or may need an
      * account of some sort.</i>
      */
     AUTHENTICATION_WARNING(Classification.CLASS_WARNING, 3, "Authentication of the Account failed."),
@@ -405,7 +405,7 @@ public enum ReturnCode {
     /**
      * <b>HTTP Status Code 406 - Not Acceptable</b>.<br>
      * <i>The requested resource is capable of generating only content not
-     * acceptable according to the Accept headers sent in the request.</i>
+     * acceptable, according to the Accept headers sent in the request.</i>
      */
     VERIFICATION_WARNING(Classification.CLASS_WARNING, 6, "The provided Request information is insufficient or invalid."),
 
@@ -425,7 +425,7 @@ public enum ReturnCode {
 
     /**
      * <b>Custom Warning 492 - Setting Warning</b>.<br>
-     * <i>It is not permitted to add, alter or delete the given setting.</i>
+     * <i>It is not permitted to add, alter, or delete the given setting.</i>
      */
     SETTING_WARNING(Classification.CLASS_WARNING, 92, "Not permitted to add, alter or delete the given Setting."),
 
@@ -474,23 +474,23 @@ public enum ReturnCode {
 
     /**
      * <b>Custom Warning 596 - Illegal Service</b>.<br>
-     * <i>A not existing service was attempted to be invoked..</i>
+     * <i>A not existing service was attempted to be invoked.</i>
      */
     ILLEGAL_SERVICE(Classification.CLASS_ERROR, 96, "The requested service does not exist.");
 
     /**
-     * ReturnCode Classification, i.e. Basic Severity.
+     * ReturnCode Classification, i.e., Basic Severity.
      */
     public enum Classification {
 
         /**
-         * <p>The Classification Info, is used for for all Successful Responses
+         * <p>The Classification Info is used for all Successful Responses
          * from the EDS.</p>
          */
         CLASS_INFO(200),
 
         /**
-         * <p>The Classification Warning, is used for problems which prevents
+         * <p>The Classification Warning is used for problems that prevent
          * the successful completion of a Request - but where the cause of the
          * problem is something that can be corrected by the Requesting Member.
          * This is most likely due to invalid input or insufficient input data
@@ -499,11 +499,11 @@ public enum ReturnCode {
         CLASS_WARNING(400),
 
         /**
-         * <p>The Classification Error, is used for internal problems, which
+         * <p>The Classification Error is used for internal problems, which
          * prevents the EDS from successfully completing the request. These
          * errors will be caused by errors in either the implementation of the
          * logic or the quality of the existing data. Generally, this kind of
-         * problem cannot be correct by the Members, but require Administrative
+         * problem cannot be corrected by the Members but requires Administrative
          * intervention or corrections by the EDS Developers.</p>
          */
         CLASS_ERROR(500);

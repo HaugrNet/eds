@@ -1,6 +1,6 @@
 /*
  * EDS, Encrypted Data Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2024, haugr.net
+ * Copyright (c) 2016-2026, haugr.net
  * mailto: eds AT haugr DOT net
  *
  * EDS is free software; you can redistribute it and/or modify it under the
@@ -142,7 +142,7 @@ public final class DataDao extends CommonDao {
     /**
      * <p>Converts a Metadata Entity to a DTO. As the relation between folders
      * and their content is made with a foreign key and not with the external
-     * Id, the external folder Id is added as second parameter.</p>
+     * Id, the external folder Id is added as the second parameter.</p>
      *
      * @param entity   The Metadata Entity to convert to a DTO
      * @param folderId The external folder ID

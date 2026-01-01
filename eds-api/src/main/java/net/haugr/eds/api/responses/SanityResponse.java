@@ -1,6 +1,6 @@
 /*
  * EDS, Encrypted Data Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2024, haugr.net
+ * Copyright (c) 2016-2026, haugr.net
  * mailto: eds AT haugr DOT net
  *
  * EDS is free software; you can redistribute it and/or modify it under the
@@ -28,15 +28,15 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * <p>Returns a list of Data Objects, which have failed their sanity checks,
- * i.e. the bytes stored which may somehow have been corrupted over time, so
+ * <p>Returns a list of Data Objects, which have failed their sanity checks.
+ * I.e., the bytes stored which may somehow have been corrupted over time, so
  * they no longer can be decrypted.</p>
  *
  * <p>If the CircleId is given in the request, then the resulting list is
- * limited to the records for the given Circle, same applies to the timestamp,
+ * limited to the records for the given Circle, the same applies to the timestamp,
  * since, which means that only newer record information is being retrieved.</p>
  *
- * <p>For any system, having <i>any</i> results from request is considered a
+ * <p>For any system, having <i>any</i> results from a request is considered a
  * disaster, as the underlying data storage cannot be trusted.</p>
  *
  * <p>Please see {@link EDSResponse} for information about the result of the

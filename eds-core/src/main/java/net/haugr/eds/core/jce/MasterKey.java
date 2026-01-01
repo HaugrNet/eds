@@ -1,6 +1,6 @@
 /*
  * EDS, Encrypted Data Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2024, haugr.net
+ * Copyright (c) 2016-2026, haugr.net
  * mailto: eds AT haugr DOT net
  *
  * EDS is free software; you can redistribute it and/or modify it under the
@@ -43,9 +43,9 @@ import net.haugr.eds.core.model.Settings;
  * <p>This Singleton holds the EDS Master Key, which is set upon instantiating
  * the Class. The Master Key is used by the Crypto Library. The default Master
  * Key is based on the default settings, so having the default alone will not
- * do anything to increase security. But, if set by the System Administrator,
- * to a different value, will suddenly increase security. The Master Key is not
- * persisted, and will remain in memory as long as the EDS instance is
+ * do anything to increase security. But if set by the System Administrator,
+ * to a different value, it will suddenly increase security. The Master Key is not
+ * persisted and will remain in memory as long as the EDS instance is
  * running.</p>
  *
  * @author Kim Jensen
@@ -63,9 +63,9 @@ public final class MasterKey {
     // The second option was chosen, as it is unlikely that anyone wishes to
     // downgrade security, and it also prevents the problems with adding checks
     // on this setting.
-    //   Note, that the same philosophy has been applied to the other Settings,
-    // which is being used, except for the System Salt - where other checks
-    // exists to protect it.
+    //   Note that the same philosophy has been applied to the other Settings,
+    // which are being used, except for the System Salt - where other checks
+    // exist to protect it.
     private static final Integer ITERATIONS = 1024;
     private static final Charset CHARSET = StandardCharsets.UTF_8;
     private static final KeyAlgorithm ALGORITHM = KeyAlgorithm.PBE_GCM_256;
@@ -102,8 +102,8 @@ public final class MasterKey {
     public static byte[] readMasterKeySecretFromUrl(final String masterKeyUrl) {
         try {
             final URL url = new URI(masterKeyUrl).toURL();
-            // Note, that the following line is raised as a security issue by
-            // SonarQube. Normally, the rule is correct, but only if the
+            // Note that SonarQube raised the following line as a security
+            // issue. Normally, the rule is correct, but only if the
             // information read is also returned. In this case, the content
             // is simply used to read a series of controlled bytes, which
             // again is used to generate the Symmetric Key later referred

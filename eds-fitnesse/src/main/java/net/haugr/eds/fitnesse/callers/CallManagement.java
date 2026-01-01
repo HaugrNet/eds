@@ -1,6 +1,6 @@
 /*
  * EDS, Encrypted Data Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2024, haugr.net
+ * Copyright (c) 2016-2026, haugr.net
  * mailto: eds AT haugr DOT net
  *
  * EDS is free software; you can redistribute it and/or modify it under the
@@ -80,7 +80,7 @@ public final class CallManagement {
 
     /**
      * Prepares a call for the EDS MasterKey Service, using the given URL as
-     * Endpoint, and the given Request Object as argument.
+     * Endpoint and the given Request Object as argument.
      *
      * @param url     Endpoint URL for the EDS call
      * @param request Request Object for the call
@@ -93,7 +93,7 @@ public final class CallManagement {
 
     /**
      * Prepares a call for the EDS Settings Service, using the given URL as
-     * Endpoint, and the given Request Object as argument.
+     * an Endpoint and the given Request Object as an argument.
      *
      * @param url     Endpoint URL for the EDS call
      * @param request Request Object for the call
@@ -106,7 +106,7 @@ public final class CallManagement {
 
     /**
      * Prepares a call for the EDS Sanitized Service, using the given URL as
-     * Endpoint, and the given Request Object as argument.
+     * Endpoint and the given Request Object as argument.
      *
      * @param url     Endpoint URL for the EDS call
      * @param request Request Object for the call
@@ -119,7 +119,7 @@ public final class CallManagement {
 
     /**
      * Prepares a call for the EDS Inventory Service, using the given URL as
-     * Endpoint, and the given Request Object as argument.
+     * Endpoint and the given Request Object as argument.
      *
      * @param url     Endpoint URL for the EDS call
      * @param request Request Object for the call
@@ -132,7 +132,7 @@ public final class CallManagement {
 
     /**
      * Prepares a call for the EDS Authenticated Service, using the given URL
-     * as Endpoint, and the given Request Object as argument.
+     * as Endpoint and the given Request Object as argument.
      *
      * @param url     Endpoint URL for the EDS call
      * @param request Request Object for the call
@@ -156,7 +156,7 @@ public final class CallManagement {
 
     /**
      * Prepares a call for the EDS ProcessMember Service, using the given URL
-     * as Endpoint, and the given Request Object as argument.
+     * as Endpoint and the given Request Object as argument.
      *
      * @param url     Endpoint URL for the EDS call
      * @param request Request Object for the call
@@ -169,7 +169,7 @@ public final class CallManagement {
 
     /**
      * Prepares a call for the EDS FetchCircles Service, using the given URL
-     * as Endpoint, and the given Request Object as argument.
+     * as Endpoint and the given Request Object as argument.
      *
      * @param url     Endpoint URL for the EDS call
      * @param request Request Object for the call
@@ -182,7 +182,7 @@ public final class CallManagement {
 
     /**
      * Prepares a call for the EDS ProcessCircle Service, using the given URL
-     * as Endpoint, and the given Request Object as argument.
+     * as Endpoint and the given Request Object as argument.
      *
      * @param url     Endpoint URL for the EDS call
      * @param request Request Object for the call
@@ -195,7 +195,7 @@ public final class CallManagement {
 
     /**
      * Prepares a call for the EDS FetchTrustees Service, using the given URL
-     * as Endpoint, and the given Request Object as argument.
+     * as Endpoint and the given Request Object as argument.
      *
      * @param url     Endpoint URL for the EDS call
      * @param request Request Object for the call
@@ -208,7 +208,7 @@ public final class CallManagement {
 
     /**
      * Prepares a call for the EDS ProcessTrustee Service, using the given URL
-     * as Endpoint, and the given Request Object as argument.
+     * as Endpoint and the given Request Object as argument.
      *
      * @param url     Endpoint URL for the EDS call
      * @param request Request Object for the call

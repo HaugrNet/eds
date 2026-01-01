@@ -1,6 +1,6 @@
 /*
  * EDS, Encrypted Data Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2024, haugr.net
+ * Copyright (c) 2016-2026, haugr.net
  * mailto: eds AT haugr DOT net
  *
  * EDS is free software; you can redistribute it and/or modify it under the
@@ -101,8 +101,8 @@ final class MemberEntityTest extends DatabaseSetup {
 
         entityManager.persist(entity);
         assertNotNull(entity.getId());
-        // Now, let's flush all not-saved records to the DB and clear the Cache,
-        // this way, a lookup will hit the database and not the Cache.
+        // Now, let's flush all not-saved records to the DB and clear the Cache.
+        // This way, a lookup will hit the database and not the Cache.
         entityManager.flush();
         entityManager.clear();
 
@@ -113,8 +113,8 @@ final class MemberEntityTest extends DatabaseSetup {
         assertEquals(7, list.size());
 
         final MemberEntity found = list.getFirst();
-        // Next, check that the newly found entity is not the same Object as the
-        // first, this is done via the Reference Pointers, since an
+        // Next, check that the newly found entity is a different Object as the
+        // first. This is done via the Reference Pointers, since an
         // Objects.equals() will yield the same result
         assertNotEquals(found.hashCode(), entity.hashCode());
         // Now, we'll ensure that it is the same Entity by comparing the ID's

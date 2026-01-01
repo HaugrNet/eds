@@ -1,6 +1,6 @@
 /*
  * EDS, Encrypted Data Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2024, haugr.net
+ * Copyright (c) 2016-2026, haugr.net
  * mailto: eds AT haugr DOT net
  *
  * EDS is free software; you can redistribute it and/or modify it under the
@@ -56,8 +56,8 @@ public final class ManagementRestClient extends GsonRestClient implements Manage
 
     /**
      * Constructor for the EDS System REST Client. It takes the base URL for the
-     * EDS Instance to communicate with, which is the protocol, hostname, port
-     * and deployment name. For example; &quot;localhost:8080/eds&quot;.
+     * EDS Instance to communicate with, which is the protocol, hostname, port,
+     * and deployment name. For example, "localhost:8080/eds".
      *
      * @param baseURL Base URL for the EDS Instance
      */

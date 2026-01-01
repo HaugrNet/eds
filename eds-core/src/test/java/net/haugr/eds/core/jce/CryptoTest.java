@@ -1,6 +1,6 @@
 /*
  * EDS, Encrypted Data Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2024, haugr.net
+ * Copyright (c) 2016-2026, haugr.net
  * mailto: eds AT haugr DOT net
  *
  * EDS is free software; you can redistribute it and/or modify it under the
@@ -164,8 +164,8 @@ final class CryptoTest extends DatabaseSetup {
     }
 
     /**
-     * The Private Key of a Member, is stored encrypted using a Member provided
-     * passphrase which is turned into a Key. The PBE based Key is generated
+     * The Private Key of a Member is stored encrypted using a Member-provided
+     * passphrase which is turned into a Key. The PBE-based Key is generated
      * using both a Member Salt and System Salt.
      */
     @Test
@@ -201,7 +201,7 @@ final class CryptoTest extends DatabaseSetup {
     }
 
     /**
-     * There's two types of Cryptography applied in EDS. This test will
+     * There are two types of Cryptography applied in EDS. This test will
      * demonstrate the Symmetric Encryption part, which is used for all Data
      * shared within Circles.
      */
@@ -226,8 +226,8 @@ final class CryptoTest extends DatabaseSetup {
      * For the Group Members, we're storing the Symmetric Key per Member using
      * Asymmetric Encryption - this will allow that Group Members can be changed
      * independently of the Group Data. The Member's Public Key is stored with
-     * the Member, encrypted using the Member's Public Key. The Private Key
-     * which may be stored elsewhere or additionally encrypted can then be used
+     * the Member, encrypted using the Member's Public Key. The Private Key,
+     * which may be stored elsewhere or additionally encrypted, can then be used
      * by the Member to access the data.
      */
     @Test
@@ -249,11 +249,11 @@ final class CryptoTest extends DatabaseSetup {
      * are not providing a Private Key as part of initializing a Session, we
      * need a different way to retrieve it. We can, of course, generate a Key
      * Pair and store with the Member information, but storing the Private key
-     * thus, can hardly be considered a good idea! So, instead we need to
+     * thus can hardly be considered a good idea! So, instead we need to
      * encrypt it and store it so.</p>
      *
-     * <p>This means that we must take a secret information provided by the
-     * Member, and convert this into a Key, which we can then use. The standard
+     * <p>This means that we must take secret information provided by the
+     * Member and convert this into a Key, which we can then use. The standard
      * for this used to be PBKDF2 (Password-Based Key Derivation Function 2),
      * but as it has some weaknesses, a contest was made in 2015, which aimed at
      * replacing it. And the replacement is Argon2. However, as there is yet to
@@ -279,10 +279,10 @@ final class CryptoTest extends DatabaseSetup {
     }
 
     /**
-     * <p>Circles have a Key generated, which is stored encrypted per Trustee,
-     * i.e. Member with access to the Circle. The Circle Key is encrypted using
-     * the Member's Public Key, and can be decrypted using the Member's Private
-     * Key which again is unlocked during the Authentication Process.</p>
+     * <p>Circles have a Key generated, which is stored encrypted per Trustee.
+     * I.e., Member with access to the Circle. The Circle Key is encrypted using
+     * the Member's Public Key and can be decrypted using the Member's Private
+     * Key, which again is unlocked during the Authentication Process.</p>
      */
     @Test
     void testMemberAccessCircleKey() {

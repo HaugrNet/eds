@@ -1,6 +1,6 @@
 /*
  * EDS, Encrypted Data Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2024, haugr.net
+ * Copyright (c) 2016-2026, haugr.net
  * mailto: eds AT haugr DOT net
  *
  * EDS is free software; you can redistribute it and/or modify it under the
@@ -92,12 +92,12 @@ public final class ProcessTrusteeManager extends AbstractManager<CommonDao, Proc
             throw new EDSException(ReturnCode.IDENTIFICATION_WARNING, "The Member is already a trustee of the requested Circle.");
         }
 
-        // Please be aware, that during re-key requests - there will
+        // Please be aware that during re-key requests - there will
         // exist 2 Trustee entities, one with the old Key and one with
         // the new. In the unlikely event that someone is being added
         // during this - the logic should also reflect it. However, as
-        // re-key is not supported in version 1.0, support for multiple
-        // Keys can wait until this is also supported.
+        // re-keying is not supported in version 1.0, support for
+        // multiple Keys can wait until this is also supported.
         final TrusteeEntity admin = trustees.getFirst();
         final TrustLevel trustLevel = request.getTrustLevel();
         final TrusteeEntity trustee = new TrusteeEntity();

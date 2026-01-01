@@ -1,6 +1,6 @@
 /*
  * EDS, Encrypted Data Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2024, haugr.net
+ * Copyright (c) 2016-2026, haugr.net
  * mailto: eds AT haugr DOT net
  *
  * EDS is free software; you can redistribute it and/or modify it under the
@@ -77,7 +77,7 @@ final class ShareBeanDataTest extends DatabaseSetup {
         final ShareBean bean = prepareShareBean();
 
         final ProcessDataRequest saveRequest = prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "My Data", LARGE_SIZE_BYTES);
-        // Since the logic is deliberately clearing data post encryption, and
+        // Since the logic is deliberately clearing data post-encryption, and
         // it means that the bytes from the request will be overwritten by
         // zeroes. To ensure that the check works, a String representing the
         // byte array is stored prior.
@@ -334,7 +334,7 @@ final class ShareBeanDataTest extends DatabaseSetup {
         assertTrue(saveResponse.isOk());
         final String folderId = saveResponse.getDataId();
 
-        // We're taking the previously generated Data ID and uses that as folder.
+        // We're taking the previously generated Data ID and uses that as a folder.
         request.setCredential(crypto.stringToBytes(MEMBER_4));
         request.setFolderId(folderId);
 
@@ -838,7 +838,7 @@ final class ShareBeanDataTest extends DatabaseSetup {
      *     return response
      * </pre>
      *
-     * <p>The test that appear to fail:</p>
+     * <p>The tests that appear to fail:</p>
      * <pre>
      *     # ... upload file
      *     blob = 'ABC'
@@ -853,7 +853,7 @@ final class ShareBeanDataTest extends DatabaseSetup {
     void testBugReport57() {
         // It should be noted, that for a normal DB status, it was not possible
         // to replicate the error. Hence, this attempt to corrupt the database
-        // prior to adding new data.
+        // before adding new data.
         final int deleted = entityManager
                 .createQuery("delete from MetadataEntity where circle.id = :cid")
                 .setParameter("cid", 1L)

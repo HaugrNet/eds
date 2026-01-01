@@ -1,6 +1,6 @@
 /*
  * EDS, Encrypted Data Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2024, haugr.net
+ * Copyright (c) 2016-2026, haugr.net
  * mailto: eds AT haugr DOT net
  *
  * EDS is free software; you can redistribute it and/or modify it under the
@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * <p>Common Service class, for all REST calls. Contain a single method to
- * invoke the correct bean & method, with error handling.</p>
+ * invoke the correct bean and method, with error handling.</p>
  *
  * @author Kim Jensen
  * @since EDS 2.0
@@ -50,16 +50,16 @@ final class CommonService {
     /**
      * <p>This method will invoke the EDS Logic, using Reflection to find the
      * correct method and parse the Request Object into it. The response is
-     * converted into a REST Response and returned back. All successful
+     * converted into a REST Response and returned. All successful
      * requests are logged with a simple message including duration.</p>
      *
      * <p>If an error occurred, then an error log entry is added, with all
      * the information available, to help track down the problem. All known
-     * errors in EDS are properly converted to a ReturnCode plus Message, and
+     * errors in EDS are properly converted to a ReturnCode plus Message and
      * returned to the recipient for proper error handling.</p>
      *
-     * <p>As EDS is not a HTTP Service, but rather an application, all
-     * requests will respond with a success, this is to allow that any
+     * <p>As EDS is not an HTTP Service, but rather an application, all
+     * requests will respond with a success. This is to allow that any
      * request failing can also provide some additional error information,
      * which is not allowed for any non-successful calls.</p>
      *
@@ -68,7 +68,7 @@ final class CommonService {
      * @param invokeMethod The method to invoke on the EDS Bean
      * @param request      The Request Object
      * @param logAction    The Action information to be logged
-     * @return Response from EDS or error response if request failed
+     * @return Response from EDS or error response if the request failed
      */
     public static Response runRequest(final Settings settings, final Object bean, final String invokeMethod, final Authentication request, final String logAction) {
         final long startTime = System.nanoTime();
@@ -121,12 +121,12 @@ final class CommonService {
 
     /**
      * <p>Calculates the duration from the given start nano time to the
-     * current nano Time, and returns a String with the milliseconds
+     * current nano Time and returns a String with the milliseconds
      * passed.</p>
      *
      * @param locale        Locale to use for converting to String
      * @param startNanoTime Start nano time to use for calculation
-     * @return String with number of milliseconds
+     * @return String with the number of milliseconds
      */
     private static String calculateDuration(final Locale locale, final long startNanoTime) {
         return String.format(locale, "%.2f", ((System.nanoTime() - startNanoTime) / NANO_SECOND));

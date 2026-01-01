@@ -1,6 +1,6 @@
 /*
  * EDS, Encrypted Data Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2024, haugr.net
+ * Copyright (c) 2016-2026, haugr.net
  * mailto: eds AT haugr DOT net
  *
  * EDS is free software; you can redistribute it and/or modify it under the
@@ -86,10 +86,10 @@ public abstract class AbstractManager<D extends CommonDao, R extends EDSResponse
 
     /**
      * <p>The main processing method for the given Service. Takes care of the
-     * Business Logic for the request, and returns the response.</p>
+     * Business Logic for the request and returns the response.</p>
      *
-     * <p>The first step in the method, will be to verity the Request Object,
-     * to ensure that it has the required information to perform the request,
+     * <p>The first step in the method will be to verity the Request Object,
+     * to ensure that it has the required information to perform the request
      * and successfully complete it without any strange errors.</p>
      *
      * @param request Request Object to perform
@@ -467,7 +467,7 @@ public abstract class AbstractManager<D extends CommonDao, R extends EDSResponse
      * null, and in that case, it invokes the method
      * {@link #throwConditionalException(boolean, ReturnCode, String)}.</p>
      *
-     * @param obj        Object to check, if it is null or not
+     * @param obj        Object to check if it is null or not
      * @param returnCode The ReturnCode for the Exception
      * @param message    The message for the Exception
      * @throws EDSException if the given Object is null
@@ -478,12 +478,12 @@ public abstract class AbstractManager<D extends CommonDao, R extends EDSResponse
     }
 
     /**
-     * <p>General method to throw an Exception, if the condition has been met,
-     * i.e. of the given boolean value is true. The Exception thrown will be
+     * <p>General method to throw an Exception if the condition has been met,
+     * i.e. if the given boolean value is true. The Exception thrown will be
      * the general {@link EDSException} with the given {@link ReturnCode} and
      * message.</p>
      *
-     * @param condition  Boolean condition, if true then throw exception
+     * @param condition  Boolean condition. If true, then throw an exception
      * @param returnCode The ReturnCode for the Exception
      * @param message    The message for the Exception
      * @throws EDSException if the condition is true

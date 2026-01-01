@@ -1,6 +1,6 @@
 /*
  * EDS, Encrypted Data Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2024, haugr.net
+ * Copyright (c) 2016-2026, haugr.net
  * mailto: eds AT haugr DOT net
  *
  * EDS is free software; you can redistribute it and/or modify it under the
@@ -21,7 +21,7 @@ import java.util.Base64;
 
 /**
  * According to the JSON-B documentation, Byte arrays are dealt with by default
- * as BYTES, rather than BASE_64. To change this behaviour, either the
+ * as BYTES, rather than BASE_64. To change this behavior, either the
  * configuration must be set, or an adapter is required. For this, the simplest
  * solution is the adapter solution. For more information, see
  * <a href="http://json-b.net/docs/user-guide.html#binary-encoding">this</a>.

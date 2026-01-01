@@ -1,6 +1,6 @@
 /*
  * EDS, Encrypted Data Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2024, haugr.net
+ * Copyright (c) 2016-2026, haugr.net
  * mailto: eds AT haugr DOT net
  *
  * EDS is free software; you can redistribute it and/or modify it under the
@@ -34,11 +34,11 @@ public final class Utilities {
     }
 
     /**
-     * <p>Creates a LocalDateTime instance, based on given milli seconds. The
-     * LocalDateTime instance will be using UTC as offset.</p>
+     * <p>Creates a LocalDateTime instance, based on given milliseconds. The
+     * LocalDateTime instance will be using UTC as an offset.</p>
      *
      * @param millisSinceEpoch Milli Seconds since epoch (1970-01-01 00:00:00)
-     * @return New UTC based ZonedDateTime instance
+     * @return New UTC-based ZonedDateTime instance
      */
     public static LocalDateTime newDate(final long millisSinceEpoch) {
         return LocalDateTime.ofInstant(Instant.ofEpochMilli(millisSinceEpoch), ZoneOffset.UTC);
@@ -47,7 +47,7 @@ public final class Utilities {
     /**
      * Creates a new UTC based ZonedDateTime instance, to be used.
      *
-     * @return New UTC based ZonedDateTime instance
+     * @return New UTC-based ZonedDateTime instance
      */
     public static LocalDateTime newDate() {
         return LocalDateTime.now(Clock.systemUTC());
@@ -57,12 +57,12 @@ public final class Utilities {
      * <p>Copy method for Byte Arrays, to have a central way to protect the data
      * structures from external changes.</p>
      *
-     * <p>Note, that as the API is only exposed via a REST Endpoint, there is no
+     * <p>Note that as the API is only exposed via a REST Endpoint, there is no
      * need for a proper copying.</p>
      *
      * <p>Further, the copy here is fake - meaning that it doesn't do anything.
      * This is important, as some byte arrays must be actively destroyed, which
-     * is harder if multiple actual copies exists.</p>
+     * is harder if multiple actual copies exist.</p>
      *
      * @param bytes Byte Array to protect
      * @return Copy of the given Bytes

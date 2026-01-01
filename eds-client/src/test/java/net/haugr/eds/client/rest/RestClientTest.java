@@ -1,6 +1,6 @@
 /*
  * EDS, Encrypted Data Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2024, haugr.net
+ * Copyright (c) 2016-2026, haugr.net
  * mailto: eds AT haugr DOT net
  *
  * EDS is free software; you can redistribute it and/or modify it under the
@@ -199,8 +199,8 @@ final class RestClientTest {
         final FetchDataTypeResponse fetchResponse = restShare.fetchDataTypes(fetchRequest);
         assertNotNull(fetchResponse);
         assertTrue(fetchResponse.isOk());
-        // If the tests is running against a system with more DataTypes added,
-        // this test will fail if hardcoded to 3, hence it expects at least 3.
+        // If the tests are running against a system with more DataTypes added,
+        // this test will fail if hardcoded to 3. Hence, it expects at least 3.
         assertTrue(fetchResponse.getDataTypes().size() >= 3);
     }
 
@@ -263,14 +263,14 @@ final class RestClientTest {
         assertTrue(signResponse.isOk());
         assertNotNull(signResponse.getSignature());
 
-        // 2. Fetch Signatures, to see that we have at least one
+        // 2. Fetch Signatures to see that we have at least one
         final FetchSignatureRequest fetchRequest = prepareRequest(FetchSignatureRequest.class, Constants.ADMIN_ACCOUNT);
         final FetchSignatureResponse fetchResponse = restShare.fetchSignatures(fetchRequest);
         assertNotNull(fetchResponse);
         assertTrue(fetchResponse.isOk());
         assertFalse(fetchResponse.getSignatures().isEmpty());
 
-        // 3. Verify the Document, using the created Signature
+        // 3. Verify the Document using the created Signature
         final VerifyRequest verifyRequest = prepareRequest(VerifyRequest.class, Constants.ADMIN_ACCOUNT);
         verifyRequest.setData(document);
         verifyRequest.setSignature(signResponse.getSignature());

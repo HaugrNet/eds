@@ -1,6 +1,6 @@
 /*
  * EDS, Encrypted Data Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2024, haugr.net
+ * Copyright (c) 2016-2026, haugr.net
  * mailto: eds AT haugr DOT net
  *
  * EDS is free software; you can redistribute it and/or modify it under the
@@ -26,10 +26,10 @@ import java.io.Serial;
 import java.util.Map;
 
 /**
- * <p>Circles only have an Id, a name and an optional External Circle Key, the
- * Key is stored encrypted, if set. The name must be present, unique and between
- * 1 and 75 characters long. When invoking the processCircle request, it is
- * possible to perform the following actions:</p>
+ * <p>Circles only have an Id, a name, and an optional External Circle Key,
+ * the Key is stored encrypted, if set. The name must be present, unique, and
+ * between 1 and 75 characters long. When invoking the processCircle request,
+ * it is possible to perform the following actions:</p>
  *
  * <ul>
  *   <li><b>CREATE</b> - For creating a new Circle</li>
@@ -51,7 +51,7 @@ import java.util.Map;
  * means that the existing Circle Key will be replaced.</p>
  *
  * <p>Action <b>DELETE</b>; request requires a Circle Id, and may be performed
- * by anyone who have Administrative right in the Circle.</p>
+ * by anyone who has Administrative right in the Circle.</p>
  *
  * <p>For more details, please see the 'processCircle' request in the Management
  * interface: {@link Management#processCircle(ProcessCircleRequest)}</p>

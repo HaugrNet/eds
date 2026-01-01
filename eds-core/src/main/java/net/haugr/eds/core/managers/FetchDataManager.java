@@ -1,6 +1,6 @@
 /*
  * EDS, Encrypted Data Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2024, haugr.net
+ * Copyright (c) 2016-2026, haugr.net
  * mailto: eds AT haugr DOT net
  *
  * EDS is free software; you can redistribute it and/or modify it under the
@@ -59,7 +59,7 @@ public final class FetchDataManager extends AbstractManager<DataDao, FetchDataRe
         Arrays.fill(request.getCredential(), (byte) 0);
 
         // It is not possible to directly compare a sub-object against a defined
-        // value, if the methods are all final - this is because it prevents the
+        // value if the methods are all final - this is because it prevents the
         // Hibernate proxy, using ByteBuddy, to override the method. Hence, the
         // Object it should be compared against is first read out - since this
         // will help override the proxying.
@@ -91,13 +91,13 @@ public final class FetchDataManager extends AbstractManager<DataDao, FetchDataRe
      * is being requested. As all we have to go on is Id's, the information can
      * be hard to specify. Hence, we simply start by looking up the base
      * Metadata entity for the request, which can be either the root (if only a
-     * Circle is given) folder, a folder or a Data record (if DataId is
+     * Circle is given) folder, a folder, or a Data record (if DataId is
      * given).</p>
      *
      * <p>If no record is found, then a null value is returned.</p>
      *
      * @param request Request Object with Circle & Data ID's
-     * @return Root Metadata Record, to base the rest of the processing on
+     * @return Root Metadata Record to base the rest of the processing on
      */
     private MetadataEntity findRootMetadata(final FetchDataRequest request) {
         final String circleId = request.getCircleId();
@@ -117,8 +117,8 @@ public final class FetchDataManager extends AbstractManager<DataDao, FetchDataRe
     }
 
     private FetchDataResponse readCompleteDataObject(final MetadataEntity metadata) {
-        // Following Query will read out a specific Data Record with metadata
-        // information, if the person is allowed, which includes checks for
+        // The following Query will read out a specific Data Record with metadata
+        // information if the person is allowed, which includes checks for
         // Circle Membership and right TrustLevel of the Member. If no Entity
         // is found, then there can be multiple reasons.
         final DataEntity entity = dao.findDataByMemberAndExternalId(member, metadata.getExternalId());
@@ -142,7 +142,7 @@ public final class FetchDataManager extends AbstractManager<DataDao, FetchDataRe
                 response.setData(bytes);
             } else {
                 // Let's update the DB with the information that the data is
-                // invalid, and return the error.
+                // invalid and return the error.
                 entity.setSanityStatus(SanityStatus.FAILED);
 
                 // Note, no Exception is thrown here, since the DB changes have
@@ -151,7 +151,7 @@ public final class FetchDataManager extends AbstractManager<DataDao, FetchDataRe
                 response.setReturnMessage("The Encrypted Data Checksum is invalid, the data appears to have been corrupted.");
             }
 
-            // Regardless what the Status is, let's update the Object, so the
+            // Regardless of what the Status is, let's update the Object, so the
             // information is persisted. This will also prevent that the Object
             // is checked too soon.
             entity.setSanityChecked(Utilities.newDate());

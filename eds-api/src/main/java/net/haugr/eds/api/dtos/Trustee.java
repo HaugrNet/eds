@@ -1,6 +1,6 @@
 /*
  * EDS, Encrypted Data Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2024, haugr.net
+ * Copyright (c) 2016-2026, haugr.net
  * mailto: eds AT haugr DOT net
  *
  * EDS is free software; you can redistribute it and/or modify it under the
@@ -28,7 +28,7 @@ import jakarta.json.bind.annotation.JsonbProperty;
 import jakarta.json.bind.annotation.JsonbPropertyOrder;
 
 /**
- * <p>A Trustee, is a Member of a Circle, with a granted Trust Level.</p>
+ * <p>A Trustee is a Member of a Circle, with a granted Trust Level.</p>
  *
  * @author Kim Jensen
  * @since EDS 1.0
@@ -84,13 +84,13 @@ public final class Trustee implements Serializable {
 
     /** Created Timestamp. */
     @JsonbProperty(value = Constants.FIELD_ADDED)
-    @JsonbDateFormat(Constants.JSON_DATE_FORMAT)
+    @JsonbDateFormat
     @JsonbNillable
     private LocalDateTime added = null;
 
     /** Last Modified Timestamp. */
     @JsonbProperty(value = Constants.FIELD_CHANGED)
-    @JsonbDateFormat(Constants.JSON_DATE_FORMAT)
+    @JsonbDateFormat
     @JsonbNillable
     private LocalDateTime changed = null;
 
@@ -258,7 +258,7 @@ public final class Trustee implements Serializable {
      */
     @Override
     public String toString() {
-        // Note, that the public key is omitted deliberately.
+        // Note that the public key is omitted deliberately.
         return "Trustee{" +
                 "memberId=" + memberId +
                 ", circleId=" + circleId +

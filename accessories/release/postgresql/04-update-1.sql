@@ -1,6 +1,6 @@
 /*
  * EDS, Encrypted Data Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2024, haugr.net
+ * Copyright (c) 2016-2026, haugr.net
  * mailto: eds AT haugr DOT net
  *
  * EDS is free software; you can redistribute it and/or modify it under the
@@ -28,10 +28,10 @@ BEGIN
     INTO current_schema_version;
 
     IF current_schema_version < 2 THEN
-        -- First feature release, EDS 1.1.x results requires an update of the DB
+        -- The first feature release; EDS 1.1.x results, requires an update of the DB
         INSERT INTO eds_versions(schema_version, eds_version, db_vendor) VALUES (2, '1.1.0', 'PostgreSQL');
 
-        -- Support for Sessions, is the most important add-on for EDS 1.1. It requires
+        -- Support for Sessions is the most important add-on for EDS 1.1. It requires
         -- that the Members table is extended with 3 new fields:
         ALTER TABLE eds_members ADD COLUMN session_checksum VARCHAR(256);
         ALTER TABLE eds_members ADD COLUMN session_crypto   VARCHAR(16384);
@@ -39,12 +39,12 @@ BEGIN
         ALTER TABLE eds_members ADD CONSTRAINT member_unique_session_checksum UNIQUE (session_checksum);
 
         -- To prevent full-table scans on users and circles, a case-insensitive indexing
-        -- is needed, however that won't work directly. Hence, a lowercase index is
+        -- is needed. However, that won't work directly. Hence, a lowercase index is
         -- added to the names, which is used for searches.
         CREATE INDEX eds_members_name_index ON eds_members (lower(name));
         CREATE INDEX eds_circles_name_index ON eds_circles (lower(name));
 
-        -- The design flaw in EDS 1.0, where upon roles were hardcoded to specific Id's
+        -- The design flaw in EDS 1.0, whereupon roles were hardcoded to specific Id's
         -- and name, has to be corrected to allow for more transparency. This means that
         -- we need a new field to store the role in.
         ALTER TABLE eds_members ADD COLUMN member_role VARCHAR(10) DEFAULT 'STANDARD';
@@ -55,8 +55,8 @@ BEGIN
         -- Now, apply the not-null constraint to this column
         ALTER TABLE eds_members ADD CONSTRAINT member_notnull_role CHECK (member_role IS NOT NULL);
 
-        -- The constants have been altered, to allow for more clarity and additional
-        -- values, this means that they default values must be corrected as well.
+        -- The constants have been altered to allow for more clarity and additional
+        -- values. This means that the default values must be corrected as well.
         ALTER TABLE eds_members ALTER COLUMN pbe_algorithm SET DEFAULT 'PBE_256';
         ALTER TABLE eds_members ALTER COLUMN rsa_algorithm SET DEFAULT 'RSA_2048';
         ALTER TABLE eds_keys    ALTER COLUMN algorithm     SET DEFAULT 'AES_CBC_256';

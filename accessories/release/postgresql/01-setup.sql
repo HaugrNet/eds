@@ -1,6 +1,6 @@
 /*
  * EDS, Encrypted Data Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2024, haugr.net
+ * Copyright (c) 2016-2026, haugr.net
  * mailto: eds AT haugr DOT net
  *
  * EDS is free software; you can redistribute it and/or modify it under the
@@ -16,10 +16,10 @@
  */
 
 -- =============================================================================
--- This script will setup the EDS Database for PostgreSQL. It will wipe any
+-- This script will set up the EDS Database for PostgreSQL. It will wipe any
 -- existing database and roles and create everything from scratch.
 --   The script must be run by a user with the permissions to create a new
--- database, and grant permissions. To run the script, simply use this command:
+--  database and grant permissions. To run the script, simply use this command:
 -- $ psql -f 01-setup.sql postgres
 -- =============================================================================
 
@@ -33,13 +33,13 @@
 -- -----------------------------------------------------------------------------
 -- Part TWO: Creating Tables
 -- -----------------------------------------------------------------------------
--- Now, we're ready to create/update the database. First connect to it.
+-- Now, we're ready to create/update the database. First, connect to it.
 \connect eds eds_user
 
 -- If it is a fresh Database, we can run the initial setup.
 \ir 03-create.sql
 
--- Else, if DB exists, we must update it, each update checks if it is allowed.
+-- Else, if DB exists, we must update it. Each update checks if it is allowed.
 -- Update 1: EDS 1.0 -> 1.1 (First Feature Release)
 \ir 04-update-1.sql
 -- Update 2: EDS 1.1 -> 1.2 (Second Feature Release)

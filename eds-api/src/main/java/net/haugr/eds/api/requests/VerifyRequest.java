@@ -1,6 +1,6 @@
 /*
  * EDS, Encrypted Data Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2024, haugr.net
+ * Copyright (c) 2016-2026, haugr.net
  * mailto: eds AT haugr DOT net
  *
  * EDS is free software; you can redistribute it and/or modify it under the
@@ -29,7 +29,7 @@ import java.util.Map;
 /**
  * <p>When a &quot;document&quot; needs to have its signature verified, this
  * Object is needed as part of the EDS verify request. It requires that both
- * the Signature and the &quot;document&quot; (bytes) is present to perform
+ * the Signature and the &quot;document&quot; (bytes) are present to perform
  * the verification check.</p>
  *
  * <p>Please see {@link Authentication} for information about the account and

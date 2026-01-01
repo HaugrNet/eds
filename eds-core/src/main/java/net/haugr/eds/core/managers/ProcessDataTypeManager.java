@@ -1,6 +1,6 @@
 /*
  * EDS, Encrypted Data Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2024, haugr.net
+ * Copyright (c) 2016-2026, haugr.net
  * mailto: eds AT haugr DOT net
  *
  * EDS is free software; you can redistribute it and/or modify it under the
@@ -118,7 +118,7 @@ public final class ProcessDataTypeManager extends AbstractManager<CommonDao, Pro
 
     /**
      * <p>Wrapper method to ensure that the data type is always presented the
-     * same way. The method simply returns the Data Type + type name.</p>
+     * same way. The method simply returns the Data Type and type name.</p>
      *
      * @param dataType DataType Entity to read the name from
      * @return String starting with 'the Data Type' and then the type name quoted

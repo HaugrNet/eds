@@ -1,6 +1,6 @@
 /*
  * EDS, Encrypted Data Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2024, haugr.net
+ * Copyright (c) 2016-2026, haugr.net
  * mailto: eds AT haugr DOT net
  *
  * EDS is free software; you can redistribute it and/or modify it under the
@@ -104,7 +104,7 @@ final class ManagementBeanCircleTest extends DatabaseSetup {
         final ProcessDataResponse processDataResponse = shareBean.processData(addRequest);
         assertTrue(processDataResponse.isOk());
 
-        // Read root folder for the Circle
+        // Read the root folder for the Circle
         final FetchDataRequest dataRootRequest = prepareRequest(FetchDataRequest.class, MEMBER_5);
         dataRootRequest.setCircleId(createResponse.getCircleId());
         final FetchDataResponse dataRootResponse = shareBean.fetchData(dataRootRequest);

@@ -1,6 +1,6 @@
 /*
  * EDS, Encrypted Data Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2024, haugr.net
+ * Copyright (c) 2016-2026, haugr.net
  * mailto: eds AT haugr DOT net
  *
  * EDS is free software; you can redistribute it and/or modify it under the
@@ -16,10 +16,6 @@
  */
 package net.haugr.eds.client.rest;
 
-import net.haugr.eds.api.common.Constants;
-
-import java.io.Serial;
-
 /**
  * <p>Default Exception for the EDS Client.</p>
  *
@@ -27,10 +23,6 @@ import java.io.Serial;
  * @since EDS 1.0
  */
 public final class RESTClientException extends RuntimeException {
-
-    /** {@link Constants#SERIAL_VERSION_UID}. */
-    @Serial
-    private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
     /**
      * Simple message Exception.

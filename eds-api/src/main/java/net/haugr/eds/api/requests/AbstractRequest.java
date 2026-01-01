@@ -1,6 +1,6 @@
 /*
  * EDS, Encrypted Data Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2024, haugr.net
+ * Copyright (c) 2016-2026, haugr.net
  * mailto: eds AT haugr DOT net
  *
  * EDS is free software; you can redistribute it and/or modify it under the
@@ -25,7 +25,7 @@ import java.util.Map;
 import net.haugr.eds.api.common.Constants;
 
 /**
- * <p>This Class contains checks for different fields that is used as part of
+ * <p>This Class contains checks for different fields that are used as part of
  * the input and output Objects. Reason for having this, is because it is
  * important that all data is 100% reliable when it is coming in so it can be
  * processed correctly without any errors occurring.</p>
@@ -33,8 +33,8 @@ import net.haugr.eds.api.common.Constants;
  * <p>Although all Classes and Fields are annotated with the necessary checks,
  * this is not a guarantee that the data will also correctly be passed through,
  * since different frameworks may choose to discard the Annotated requirements
- * or have flaws. Hence, this simple PoJo approach will act as a last line of
- * defense before data is being processed.</p>
+ * or have flaws. Hence, this PoJo approach will act as a last line of defense
+ * before data is being processed.</p>
  *
  * @author Kim Jensen
  * @since EDS 1.0
@@ -63,12 +63,12 @@ public abstract class AbstractRequest implements Serializable {
 
     /**
      * <p>Checks that the given Object is not null, if so - then the given
-     * message will be added to the error map, using the field as key.</p>
+     * message will be added to the error map, using the field as a key.</p>
      *
      * @param errors  Error Map
      * @param field   Key for the Error Map
      * @param value   The value Object to check
-     * @param message Message to add to Error Map, if validation failed
+     * @param message Message to add to Error Map if validation failed
      */
     protected static void checkNotNull(final Map<String, String> errors, final String field, final Object value, final String message) {
         if (value == null) {
@@ -77,14 +77,14 @@ public abstract class AbstractRequest implements Serializable {
     }
 
     /**
-     * <p>Checks a byte array, to ensure that that it is neither null nor empty,
+     * <p>Checks a byte array to ensure that it is neither null nor empty,
      * if the validation failed, then the given message will be added to the
-     * error map with the field as key.</p>
+     * error map with the field as a key.</p>
      *
      * @param errors  Error Map
      * @param field   Key for the Error Map
      * @param value   The byte array to check
-     * @param message Message to add to Error Map, if validation failed
+     * @param message Message to add to Error Map if validation failed
      */
     protected static void checkNotNullOrEmpty(final Map<String, String> errors, final String field, final byte[] value, final String message) {
         if ((value == null) || (value.length == 0)) {
@@ -95,12 +95,12 @@ public abstract class AbstractRequest implements Serializable {
     /**
      * <p>Checks if the given String is neither null nor empty, if the check
      * failed, then the given message will be added to the error map using the
-     * field as key.</p>
+     * field as a key.</p>
      *
      * @param errors  Error Map
      * @param field   Key for the Error Map
      * @param value   The String to check that it is neither null nor empty
-     * @param message Message to add to Error Map, if validation failed
+     * @param message Message to add to Error Map if validation failed
      * @see #isEmpty(String)
      */
     protected static void checkNotNullOrEmpty(final Map<String, String> errors, final String field, final String value, final String message) {
@@ -119,7 +119,7 @@ public abstract class AbstractRequest implements Serializable {
      * @param field     Key for the Error Map
      * @param value     The value Object to check
      * @param maxLength The maximum length the given String may have
-     * @param message   Message to add to Error Map, if validation failed
+     * @param message   Message to add to Error Map if validation failed
      * @see #checkNotNullOrEmpty(Map, String, String, String)
      * @see #checkNotTooLong(Map, String, String, int, String)
      */
@@ -132,13 +132,13 @@ public abstract class AbstractRequest implements Serializable {
      * <p>Checks that the given String is neither null, nor that the trimmed
      * version of the String exceeds the given maximum length. If the validation
      * failed, then the message will be added to the error map, using the field
-     * as key.</p>
+     * as a key.</p>
      *
      * @param errors    Error Map
      * @param field     Key for the Error Map
      * @param value     The String to check
      * @param maxLength The max length for the given String value
-     * @param message   Message to add to Error Map, if validation failed
+     * @param message   Message to add to Error Map if validation failed
      */
     protected static void checkNotTooLong(final Map<String, String> errors, final String field, final String value, final int maxLength, final String message) {
         if ((value != null) && (value.trim().length() > maxLength)) {
@@ -147,12 +147,12 @@ public abstract class AbstractRequest implements Serializable {
     }
 
     /**
-     * <p>Checks if the given Id is valid, i.e. that it matches the standard
+     * <p>Checks if the given Id is valid, i.e., that it matches the standard
      * UUID regular expression. The method takes an error map which it will add
      * the given field to as a key with the message provided, if the id (value)
-     * it invalid.</p>
+     * is invalid.</p>
      *
-     * @param errors  Map to store the error information in, if id is invalid
+     * @param errors  Map to store the error information in if id is invalid
      * @param field   Name of the field from the request/dto holding the value
      * @param value   The value to check if is a valid ID (UUID)
      * @param message The error message to add to the error map
@@ -165,7 +165,7 @@ public abstract class AbstractRequest implements Serializable {
     }
 
     /**
-     * <p>Checks that the given value is neither null, nor an invalid Id. The
+     * <p>Checks that the given value is neither null nor an invalid Id. The
      * method is a shorthand method invoking the
      * {@link #checkNotNull(Map, String, Object, String)} &amp;
      * {@link #checkValidId(Map, String, String, String)} methods.</p>
@@ -173,7 +173,7 @@ public abstract class AbstractRequest implements Serializable {
      * @param errors  Error Map
      * @param field   Key for the Error Map
      * @param value   The value Object to check
-     * @param message Message to add to Error Map, if validation failed
+     * @param message Message to add to Error Map if validation failed
      * @see #checkNotNull(Map, String, Object, String)
      * @see #checkValidId(Map, String, String, String)
      */
@@ -183,7 +183,7 @@ public abstract class AbstractRequest implements Serializable {
     }
 
     /**
-     * <p>Checks the given Integer value, to ensure that it is valid, i.e.
+     * <p>Checks the given Integer value to ensure that it is valid, i.e.,
      * within the values 0 (zero) and the given max. If not, then the message
      * is added to the error map with the given field as key.</p>
      *
@@ -191,7 +191,7 @@ public abstract class AbstractRequest implements Serializable {
      * @param field   Key for the Error Map
      * @param value   The Integer to check
      * @param max     The maximum allowed value for the checked Integer
-     * @param message Message to add to Error Map, if validation failed
+     * @param message Message to add to Error Map if validation failed
      */
     protected static void checkIntegerWithMax(final Map<String, String> errors, final String field, final int value, final int max, final String message) {
         if ((value < 1) || (value > max)) {
@@ -210,7 +210,7 @@ public abstract class AbstractRequest implements Serializable {
      * is the only EDS field holding a URL, and thus it is not a parameter to
      * this method, although it is for the other methods.</p>
      *
-     * @param errors Map to store the error information in, if URL is invalid
+     * @param errors Map to store the error information in if URL is invalid
      * @param value  the URL to check
      * @see Constants#FIELD_URL
      */
@@ -218,13 +218,13 @@ public abstract class AbstractRequest implements Serializable {
     protected static void checkUrl(final Map<String, String> errors, final String value) {
         try {
             // ResultOfMethodCallIgnored - ignored here, we only intend
-            // to test if a valid URL is provided.
+            // to test it if a valid URL is provided.
             new URI(value).toURL();
         } catch (MalformedURLException | URISyntaxException | IllegalArgumentException e) {
             // SonarQube Warning java:S1166 - Ignored here
             // The error information from the Exception is added to the
             // error Object, which again is returned. Logging it here
-            // would be pointless and thus the Sonar warning is ignored
+            // would be pointless, and thus the Sonar warning is ignored
             // at this place.
             errors.put(Constants.FIELD_URL, "The URL field is invalid - " + e.getMessage());
         }

@@ -1,6 +1,6 @@
 /*
  * EDS, Encrypted Data Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2024, haugr.net
+ * Copyright (c) 2016-2026, haugr.net
  * mailto: eds AT haugr DOT net
  *
  * EDS is free software; you can redistribute it and/or modify it under the
@@ -37,7 +37,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 /**
- * <p>This Test Class, is testing the following Service Classes in one, as they
+ * <p>This Test Class is testing the following Service Classes in one, as they
  * are all fairly small but also connected.</p>
  *
  * <ul>
@@ -136,7 +136,7 @@ final class ManagementBeanSettingsTest extends DatabaseSetup {
     /**
      * <p>Certain values in the EDS Settings are considered critical, meaning
      * that they can only be updated if no accounts, except the system
-     * administrator, exists. However, the problem with these tests is that they
+     * administrator, exist. However, the problem with these tests is that they
      * need to alter existing data, meaning that the underlying database may
      * have a lock set, which will affect other tests.</p>
      */
@@ -161,7 +161,7 @@ final class ManagementBeanSettingsTest extends DatabaseSetup {
         final SettingResponse update = bean.settings(request);
         assertEquals(ReturnCode.SUCCESS.getCode(), update.getReturnCode());
 
-        // Running a verification check, to ensure that the System Administrator
+        // Running a verification check to ensure that the System Administrator
         // can still access the system, after the SALT was updated.
         final SettingRequest checkRequest = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
         final SettingResponse checkResponse = bean.settings(checkRequest);

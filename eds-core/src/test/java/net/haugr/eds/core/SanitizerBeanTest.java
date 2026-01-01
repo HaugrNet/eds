@@ -1,6 +1,6 @@
 /*
  * EDS, Encrypted Data Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2024, haugr.net
+ * Copyright (c) 2016-2026, haugr.net
  * mailto: eds AT haugr DOT net
  *
  * EDS is free software; you can redistribute it and/or modify it under the
@@ -51,6 +51,13 @@ final class SanitizerBeanTest extends DatabaseSetup {
     @Test
     void testEmptyConstructor() {
         final SanitizerBean bean = new SanitizerBean();
+
+        assertNotNull(bean);
+    }
+
+    @Test
+    void testEntityManagerConstructor() {
+        final SanitizerBean bean = new SanitizerBean(entityManager);
 
         assertNotNull(bean);
     }

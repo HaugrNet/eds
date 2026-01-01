@@ -1,6 +1,6 @@
 /*
  * EDS, Encrypted Data Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2024, haugr.net
+ * Copyright (c) 2016-2026, haugr.net
  * mailto: eds AT haugr DOT net
  *
  * EDS is free software; you can redistribute it and/or modify it under the
@@ -26,9 +26,9 @@ import java.io.Serializable;
 
 /**
  * <p>General Response Object, embedded in all other Response Objects, as it
- * contains the processing result, i.e. return code &amp; message. If everything
- * went good, the return code will the code 200, same as the HTTP protocol will
- * return if everything went well. The return message will simple be 'Ok' in
+ * contains the processing result, i.e., return code &amp; message. If everything
+ * went good, the return code will code 200, the same as the HTTP protocol will
+ * return if everything went well. The return message will simply be 'Ok' in
  * this case.</p>
  *
  * <p>If a problem occurred, either a warning (problem which can be corrected by

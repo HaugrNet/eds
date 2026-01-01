@@ -1,6 +1,6 @@
 /*
  * EDS, Encrypted Data Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2024, haugr.net
+ * Copyright (c) 2016-2026, haugr.net
  * mailto: eds AT haugr DOT net
  *
  * EDS is free software; you can redistribute it and/or modify it under the
@@ -30,10 +30,10 @@ import jakarta.json.bind.annotation.JsonbPropertyOrder;
 import jakarta.json.bind.annotation.JsonbTypeAdapter;
 
 /**
- * <p>This Object is needed, when a new Signature is being issued. The Object
+ * <p>This Object is needed when a new Signature is being issued. The Object
  * requires a mandatory &quot;Document&quot; or simply a data Object (byte
  * array) upon which the Signature is generated. It is also possible to set an
- * expiration data.</p>
+ * expiration date.</p>
  *
  * <p>Please see {@link Authentication} for information about the account and
  * credentials information.</p>
@@ -55,7 +55,7 @@ public final class SignRequest extends Authentication {
 
     /** Signature Expiration Date. */
     @JsonbProperty(value = Constants.FIELD_EXPIRES)
-    @JsonbDateFormat(Constants.JSON_DATE_FORMAT)
+    @JsonbDateFormat
     @JsonbNillable
     private LocalDateTime expires = null;
 

@@ -1,6 +1,6 @@
 /*
  * EDS, Encrypted Data Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2024, haugr.net
+ * Copyright (c) 2016-2026, haugr.net
  * mailto: eds AT haugr DOT net
  *
  * EDS is free software; you can redistribute it and/or modify it under the
@@ -16,28 +16,22 @@
  */
 
 -- =============================================================================
--- H2 Database Setup Script for EDS
+-- PostgreSQL Create Script for EDS
 -- -----------------------------------------------------------------------------
 -- This script contain the following tables:
 --  * System Specific tables
---     o version    -  Simple Version information, to correlate EDS & DB version
---     o settings   -  Settings for this instance of EDS
+--     o eds_version    -  Simple Version information, to correlate EDS & DB version
+--     o eds_settings   -  Settings for this instance of EDS
 --  * Accounts & Relations for access control
---     o members    -  Members who may access EDS
---     o circles    -  Circles of Trust that members may use for sharing data
---     o keys       -  Symmetric Keys, used by Circles for sharing data
---     o trustees   -  Relation information for each Member & Circle
+--     o eds_members    -  Members who may access EDS
+--     o eds_circles    -  Circles of Trust that members may use for sharing data
+--     o eds_keys       -  Symmetric Keys, used by Circles for sharing data
+--     o eds_trustees   -  Relation information for each Member & Circle
 --  * Folders & Shared (encrypted) data
---     o types      -  The type of Objects (Data) to be stored
---     o metadata   -  Objects to be stored, related to datatype & Circles
---     o data       -  Storage of the actual encrypted data for each Object
---     o signatures -  Cryptographic Signature References information
--- -----------------------------------------------------------------------------
--- Note; this is Script is the default to work with, however JPA create scripts
---       referenced in the persistence.xml file must have each create statement
---       on a single line.
---         So although it is tedious to have several versions of a Script, it is
---       needed in this case, since we otherwise get JDBC Exceptions!
+--     o eds_types      -  The type of Objects (Data) to be stored
+--     o eds_metadata   -  Objects to be stored, related to datatype & Circles
+--     o eds_data       -  Storage of the actual encrypted data for each Object
+--     o eds_signatures -  Cryptographic Signature References information
 -- =============================================================================
 
 -- =============================================================================
@@ -46,7 +40,7 @@
 -- work correctly.
 --   The table also serves a simple purpose of acting as a break for attempts at
 -- accidentally trying to upgrade the EDS to an invalid version.
---   The API request for "version", will also return the latest information from
+--   The API request for "version" will also return the latest information from
 -- this table.
 -- =============================================================================
 CREATE TABLE eds_versions (
@@ -71,9 +65,9 @@ CREATE TABLE eds_versions (
 );
 -- Initial Database Version is 1, initial Production EDS release is 1.0.0
 INSERT INTO eds_versions(schema_version, eds_version, db_vendor) VALUES (1, '1.0.0', 'H2');
--- First feature release, EDS 1.1.x results requires an update of the DB
+-- The first feature release, EDS 1.1.x results requires an update of the DB
 INSERT INTO eds_versions(schema_version, eds_version, db_vendor) VALUES (2, '1.1.0', 'H2');
--- Second feature release, EDS 1.1.x results requires an update of the DB
+-- The second feature release, EDS 1.1.x results requires an update of the DB
 INSERT INTO eds_versions(schema_version, eds_version, db_vendor) VALUES (3, '1.2.0', 'H2');
 -- Java Version upgrade (8->21), breaks backwards compatibility, EDS 2.x
 INSERT INTO eds_versions(schema_version, eds_version, db_vendor) VALUES (4, '2.0.0', 'H2');
@@ -82,13 +76,13 @@ INSERT INTO eds_versions(schema_version, eds_version, db_vendor) VALUES (4, '2.0
 -- The EDS is configured via a set of property values, which are all stored in
 -- the database. This is done so the same cluster of stateless EDS instances
 -- will share the same settings.
---   The Settings consists of a series of key-value pairs, though to avoid any
+--   The Settings consist of a series of key-value pairs, though to avoid any
 -- potential conflicts with the word "key" that is also used throughout the
--- system to mean "Cryptography Key" - the are instead referred to as
--- name-setting pairs, though the end result is the same.
+-- system to mean "Cryptography Key" - they are instead referred to as
+-- name-setting pairs.
 --   The Settings are managed via a System Administrator API request, which will
 -- only be used as part of the setup. Certain values cannot be altered after the
--- initial setup, however which values and why is described in the installation
+-- initial setup. However, which values and why are described in the installation
 -- documentation.
 -- =============================================================================
 CREATE TABLE eds_settings (
@@ -112,36 +106,36 @@ CREATE TABLE eds_settings (
 );
 
 -- =============================================================================
--- This is the Account table for all Members. By default it is empty, and the
--- first record to be added must be the System Administrator, called "admin".
---   The Account have a credential, which must be a unique (lower case)
--- identifier for the Account Holder or Member. The Account also holds a System
--- generated Public/Private Key pair, where the Public Key is stored directly
--- but the Private Key is stored encrypted using a temporary Symmetric Key that
--- is derived from the request.
+-- This is the Account table for all Members. By default, it is empty, and the
+-- first record to be added will be a System Administrator (default "admin").
+--   The Account has a credential, which must be a unique (lower case)
+-- identifier for the Account Holder or Member. The Account also holds a
+-- System-generated Public/Private Key pair, where the Public Key is stored
+-- directly, but the Private Key is stored encrypted using a temporary Symmetric
+-- Key that is derived from the request.
 --   To Authenticate the Member, the temporary Symmetric Key is used to decrypt
 -- the Private Key, and if it can successfully unlock a secret encrypted with
 -- the Public Key, then it matches. If not, then the System will Warn the
--- Member, that the Account was used incorrectly.
+-- Member that the Account was used incorrectly.
 --   The System Administrator, "admin", must be the first Member Account added,
--- and upon creating it, the provided secret (Passphrase or Private Key), is
+-- and upon creating it, the provided secret (Passphrase or Private Key) is
 -- then used to derive a Symmetric Key to encrypt the Private Key. This way,
 -- there is no default secret for the System Administrator to be altered.
 --   Note, that the first version of the EDS is not holding any mechanisms to
 -- prevent Authentication Attacks. This is a deliberate design decision as the
--- EDS is only suppose to be a Data Storage Facility, and this be further down
+-- EDS is only supposed to be a Data Storage Facility, and this be further down
 -- the entire Application Layer.
 --   The Member Role is giving a pointer towards what kinds of permissions that
 -- a member has, it can be either admin, standard, session or guest.
---   Sessions are important for websites, where a user is logging in, and then
+--   Sessions are important for websites, where a user is logging in and then
 -- just works with a session onwards. To better integrate EDS into websites, it
 -- is important EDS also supports Sessions. This is done by having 3 fields in
--- this table, the session_checksum, which is generated using the MasterKey, and
--- used to find the member account. Secondly, the member's private key encrypted
--- using both a PBKDF2 symmetric key and the MasterKey. And finally, the expire
--- flag, which is pre-calculated with the "login time" and the maximum life time
--- of a session. So a Timed service can stop any existing sessions which have
--- not been logged out.
+-- this table, the session_checksum, which is generated using the MasterKey and
+-- used to find the member account. Secondly, the member's private key is
+-- encrypted using both a PBKDF2 symmetric key and the MasterKey. And finally,
+-- the expiry flag, which is pre-calculated with the "login time" and the maximum
+-- lifetime of a session. So a Timed service can stop any existing sessions that
+-- have not been logged out.
 -- =============================================================================
 CREATE TABLE eds_members (
   id               INTEGER AUTO_INCREMENT,
@@ -187,7 +181,7 @@ CREATE TABLE eds_members (
 -- Circles act as groupings for a collection of Members sharing data. A Circle
 -- is thus having an identifying name and nothing else really.
 --   Circles can be created by either the System Administrator or a Member with
--- Circle Administrative privileges. When creating a new Circle the initial new
+-- Circle Administrative privileges. When creating a new Circle, the initial new
 -- Circle Administrator must be added, which cannot be the System Administrator.
 -- =============================================================================
 CREATE TABLE eds_circles (
@@ -215,19 +209,19 @@ CREATE TABLE eds_circles (
 
 -- =============================================================================
 -- A central part of the EDS is encryption. All data is encrypted using a series
--- of Symmetric Encryption Keys. All saved Symmetric Keys are stored encrypted,
--- however, it is still important to have certain meta-data available.
+-- of Symmetric Encryption Keys. All saved Symmetric Keys are stored encrypted.
+-- However, it is still important to have certain meta-data available.
 --   To generate a new Key, it is important to know which algorithm and length
 -- to use. By default, all allowed Algorithms & key lengths are limited to what
 -- is provided by the Java Runtime Environment.
 -- Initially EDS used the AES Block encryption, CBC, which is no longer
--- considered safe to use, hence as of EDS 2.0, the default is GCM, at the max
--- size supported by the Java Runtime Environment, i.e. 256 bits.
+-- considered safe to use. Hence as of EDS 2.0, the default is GCM, at the max
+-- size supported by the Java Runtime Environment, i.e., 256 bits.
 --   Theoretically, AES encryption can be broken in a finite time. To prevent
--- that data is compromised, it is a good idea to limit the usage of a key to
--- a given life time, forcing a re-encryption once the key has expired. It is
--- not enforced to have an expiration, as EDS doesn't support re-key yet (see
--- https://github.com/HaugrNet/eds/issues/43).
+-- that data being compromised, it is a good idea to limit the usage of a key to
+-- a given lifetime, forcing a re-encryption once the key has expired. It is
+-- not enforced to have an expiration, as EDS doesn't support re-keying yet
+-- (see https://github.com/HaugrNet/eds/issues/43).
 -- =============================================================================
 CREATE TABLE eds_keys (
   id               INTEGER AUTO_INCREMENT,
@@ -256,7 +250,7 @@ CREATE TABLE eds_keys (
 --   A Member is also having a Trust Level, which determines what the Member may
 -- or may not do within a Circle:
 --     * Guest
---         This is the lowest level, a Guest may view the meta information from a
+--         This is the lowest level. A Guest may view the meta-information from a
 --       Circle, which includes Members, Folders & Object Meta information.
 --       However, Guests do not have a copy of the Circle Key available, meaning
 --       that they cannot read the data belonging to a Circle.
@@ -266,16 +260,16 @@ CREATE TABLE eds_keys (
 --       therefore also read all the Objects belonging to a Circle
 --     * Write
 --         With this level of access, the Member may do all that Members with
---       Read rights may do, and additionally they may also create, update and
+--       Read rights may do, and additionally, they may also create, update and
 --       delete Folders and Objects belonging to the Circle.
---         Members with Write access, may also initiate a Key migration process,
+--         Members with Write access may also initiate a Key migration process,
 --       meaning that if a Key has expired, they may issue a new Key and start
 --       re-encrypting all content.
 --     * Administrator
 --         Administrators have the highest trust level, meaning that they may do
 --       all with the Circle that Members with lower level of access may. They
---       may also manage the Circle itself, meaning adding or revoking Members
---       access to the Circle and change the Trust Level of a Member.
+--       may also manage the Circle itself, meaning adding or revoking Members'
+--       access to the Circle and changing the Trust Level of a Member.
 --   A Member can only belong to a Circle with Access to the Key. the actual Key
 -- is stored with the relation and not within the Key table. For Guests, the Key
 -- stored is simply "Not Applicable".
@@ -313,12 +307,12 @@ CREATE TABLE eds_trustees (
 -- =============================================================================
 -- Data stored is completely unknown to the EDS, since multiple Clients may
 -- access the system, it cannot be guaranteed that they all know what the
--- Objects may be. To avoid this problem, and to ensure that there is a simple
+-- Objects may be. To avoid this problem and to ensure that there is a simple
 -- way to map Objects over, they must be stored with a type. All known types are
 -- stored in this table.
---   The types is stored as a map. Where the keys (names) must be unique, and
--- the values can be anything. By default, one record exists, which is a folder,
--- the folder type is used primarily internally to help structure the Objects
+--   The types are stored as a map. Where the keys (names) must be unique, and
+-- the values can be anything. By default, one record exists, which is a folder.
+-- The folder type is used primarily internally to help structure the Objects
 -- better.
 -- =============================================================================
 CREATE TABLE eds_datatypes (
@@ -349,21 +343,21 @@ INSERT INTO eds_datatypes (datatype_name, datatype_value) VALUES
     ('data', 'Data Object');
 
 -- =============================================================================
--- The main objective of EDS, is to store data securely. This table, contain the
+-- The main objective of EDS is to store data securely. This table contains the
 -- primary metadata for each Object stored, but not the data for the Object.
 -- This data is stored in the data table. It was done so, for two reasons, first
--- as not all Objects may have data associated, and secondly to avoid references
+-- as not all Objects may have data associated, and secondly, to avoid references
 -- to Null data, as it usually indicates flaws in the model.
 --   Objects are stored with an external Id, which is exposed via the API, the
--- internal Id is not exposed, but is kept for internal referencing.
+-- internal Id is not exposed but is kept for internal referencing.
 -- All Objects are also stored with a type. EDS has two default types, the most
 -- important is "Folder", which allows Members to structure their data, and the
 -- second is simply "data", if the system using EDS has enough information to
 -- control the Data Objects.
 --   Folders are also Objects referencing the default 'Folder' type. It is
--- possible to create sub-folders and add data to any Folder belonging to the
+-- possible to create subfolders and add data to any Folder belonging to the
 -- Circle in question. As it is possible to create Sub-folders, a restriction
--- has been added on the table as any Object may reference a parent, which is
+-- has been added on the table as any Object may reference a parent, which
 -- that the parent Id cannot be larger than the current Id. This way, it is
 -- possible to have a recursive structure, but not to create loops.
 --   Unfortunately, having the parent Id as an Integer and not a String will
@@ -406,9 +400,9 @@ CREATE TABLE eds_metadata (
 -- Metadata with data associated have the data & key information stored in this
 -- table, with a reference to the Metadata record. Objects which do not have any
 -- data associated will also not have a record present here.
---   All data stored here, is stored encrypted. If the Key has expired, then the
--- Data is considered deprecated and it is pending deletion and can no longer be
--- used.
+--   All data stored here is stored encrypted. If the Key has expired, then the
+-- Data is considered deprecated, and it is pending deletion and can no longer
+-- be used.
 -- =============================================================================
 CREATE TABLE eds_data (
   id               INTEGER AUTO_INCREMENT,
@@ -441,9 +435,9 @@ CREATE TABLE eds_data (
 );
 
 -- =============================================================================
--- EDS also supports signatures, and part of the information for a Signature, is
--- stored in this table. Complete with number of verifications and expiration of
--- the signature.
+-- EDS also supports signatures, and part of the information for a Signature is
+-- stored in this table. Complete with the number of verifications and
+-- expiration of the signature.
 -- =============================================================================
 CREATE TABLE eds_signatures (
   id               INTEGER AUTO_INCREMENT,

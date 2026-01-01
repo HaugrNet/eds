@@ -1,6 +1,6 @@
 /*
  * EDS, Encrypted Data Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2024, haugr.net
+ * Copyright (c) 2016-2026, haugr.net
  * mailto: eds AT haugr DOT net
  *
  * EDS is free software; you can redistribute it and/or modify it under the
@@ -29,7 +29,7 @@ import java.io.Serial;
 import java.util.Map;
 
 /**
- * <p>The Request Object supports several actions for adding, updating and
+ * <p>The Request Object supports several actions for adding, updating, and
  * deleting Data Objects in EDS. The request supports the following Actions:</p>
  *
  * <ul>
@@ -41,11 +41,11 @@ import java.util.Map;
  * <p>Action <b>ADD</b>; requires a Circle Id, and optionally a Folder Id (Data
  * Id, where the dataType is a folder), and the name of the Object. The name
  * must be between 1 and 75 characters, and it must be unique for the folder
- * where it is added. As Objects created doesn't need to have any data, the data
+ * where it is added. As created Objects do not need to have any data, the data
  * is optional.</p>
  *
  * <p>Action <b>UPDATE</b>; requires the Data Id, and an optional Folder Id, if
- * the Object is suppose to be moved within the internal folder structure, or a
+ * the Object is supposed to be moved within the internal folder structure, or a
  * new Data name, which must be unique for the folder where it should be placed,
  * and the length must be between 1 and 75 characters.</p>
  *

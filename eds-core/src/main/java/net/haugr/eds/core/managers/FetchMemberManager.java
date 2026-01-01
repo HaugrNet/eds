@@ -1,6 +1,6 @@
 /*
  * EDS, Encrypted Data Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2024, haugr.net
+ * Copyright (c) 2016-2026, haugr.net
  * mailto: eds AT haugr DOT net
  *
  * EDS is free software; you can redistribute it and/or modify it under the
@@ -69,7 +69,7 @@ public final class FetchMemberManager extends AbstractManager<MemberDao, FetchMe
                 response.setCircles(convertCircles(trustees));
             } else {
                 final MemberEntity requestedMember = dao.find(MemberEntity.class, request.getMemberId());
-                // No such Account exist, will simply return with an error.
+                // No such Account exists, will simply return with an error.
                 throwConditionalNullException(requestedMember,
                         ReturnCode.IDENTIFICATION_WARNING, "The requested Member cannot be found.");
 
@@ -92,8 +92,8 @@ public final class FetchMemberManager extends AbstractManager<MemberDao, FetchMe
      *
      * <p>If the {@link StandardSetting#SHOW_TRUSTEES}
      * flag is set, then the Member may view all Circles, which the Other Member
-     * belongs to, and not just the ones both Members share. By default, this
-     * Settings is set to True.</p>
+     * belongs to, and not just the ones both Members share. By default, these
+     * Settings are set to True.</p>
      *
      * @param response  Response Object to fill
      * @param requested Requested Member to see if it may be viewed

@@ -1,6 +1,6 @@
 /*
  * EDS, Encrypted Data Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2024, haugr.net
+ * Copyright (c) 2016-2026, haugr.net
  * mailto: eds AT haugr DOT net
  *
  * EDS is free software; you can redistribute it and/or modify it under the
@@ -28,7 +28,7 @@ import jakarta.json.bind.annotation.JsonbPropertyOrder;
 
 /**
  * <p>The Sanity Request Object is needed to perform the Sanity EDS Request,
- * which is a management request to see if any Data Object have been corrupted
+ * which is a management request to see if any Data Object has been corrupted
  * and thus rendered useless. The CircleId is an optional field, serves a way
  * to limit the scope of the Objects retrieved.</p>
  *
@@ -52,7 +52,7 @@ public final class SanityRequest extends Authentication implements CircleIdReque
 
     /** The Date since last check. */
     @JsonbProperty(value = Constants.FIELD_SINCE)
-    @JsonbDateFormat(Constants.JSON_DATE_FORMAT)
+    @JsonbDateFormat
     @JsonbNillable
     private LocalDateTime since = null;
 

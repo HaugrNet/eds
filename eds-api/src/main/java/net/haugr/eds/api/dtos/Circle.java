@@ -1,6 +1,6 @@
 /*
  * EDS, Encrypted Data Share - open source Cryptographic Sharing system.
- * Copyright (c) 2016-2024, haugr.net
+ * Copyright (c) 2016-2026, haugr.net
  * mailto: eds AT haugr DOT net
  *
  * EDS is free software; you can redistribute it and/or modify it under the
@@ -27,7 +27,7 @@ import jakarta.json.bind.annotation.JsonbProperty;
 import jakarta.json.bind.annotation.JsonbPropertyOrder;
 
 /**
- * <p>Circles is part of the core functionality of EDS, as all data is assigned
+ * <p>Circles are part of the core functionality of EDS, as all data is assigned
  * or belongs to a Circle. Circles can be considered as a Group or Collection of
  * known and trusted members who may be granted access to the data.</p>
  *
@@ -66,7 +66,7 @@ public final class Circle implements Serializable {
 
     /** Created Timestamp. */
     @JsonbProperty(value = Constants.FIELD_ADDED)
-    @JsonbDateFormat(Constants.JSON_DATE_FORMAT)
+    @JsonbDateFormat
     @JsonbNillable
     private LocalDateTime added = null;
 

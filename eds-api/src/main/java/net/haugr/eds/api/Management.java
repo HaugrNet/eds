@@ -75,11 +75,11 @@ public interface Management {
      *     <b>eds.crypto.symmetric.algorithm</b> - default value: 'AES_GCM_128'<br>
      *     Allowed Values: 'AES_CBC_128', 'AES_CBC_192', 'AES_CBC_256',
      *     'AES_GCM_128', 'AES_GCM_192' or 'AES_GCM_256'<br>
-     *     <i> The Algorithm used for the Symmetric Keys in EDS. All data is
+     *     <i>The Algorithm used for the Symmetric Keys in EDS. All data is
      *     stored using this Algorithm. Although it can be changed, please test
      *     the EDS carefully before doing so. And please be aware that the
      *     information here is only used for generating new Keys, so changing
-     *     things will not affect existing records.<br>
+     *     things will not affect existing records.</i>
      *   </li>
      *   <li>
      *     <b>eds.crypto.asymmetric.algorithm</b> - default value: 'RSA_2048'<br>

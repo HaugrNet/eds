@@ -11,10 +11,16 @@
     </parent>
     <artifactId>eds-wildfly</artifactId>
     <packaging>war</packaging>
-    <name>EDS - WildFly WAR</name>
+    <name>EDS - WildFly</name>
     <description>
-        This module contain a WAR file, compatible with WildFly 10 - 20.
+        This module contain a WAR file, compatible with WildFly 30+, and can also produce a runnable JAR.
     </description>
+
+    <properties>
+        <wildfly.version>38.0.1.Final</wildfly.version>
+        <wildfly-maven-plugin.version>5.1.5.Final</wildfly-maven-plugin.version>
+        <wildfly-datasources-galleon-pack.version>4.0.0.Final</wildfly-datasources-galleon-pack.version>
+    </properties>
 
     <dependencies>
         <dependency>
@@ -29,18 +35,48 @@
 
     <build>
         <finalName>eds</finalName>
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-                <filtering>false</filtering>
-            </resource>
-        </resources>
-        <testResources>
-            <testResource>
-                <directory>src/test/resources</directory>
-                <filtering>true</filtering>
-            </testResource>
-        </testResources>
+        <plugins>
+            <plugin>
+                <groupId>org.wildfly.plugins</groupId>
+                <artifactId>wildfly-maven-plugin</artifactId>
+                <version>${wildfly-maven-plugin.version}</version>
+                <configuration>
+                    <feature-packs>
+                        <feature-pack>
+                            <location>org.wildfly:wildfly-galleon-pack:${wildfly.version}</location>
+                        </feature-pack>
+                        <feature-pack>
+                            <location>org.wildfly:wildfly-datasources-galleon-pack:${wildfly-datasources-galleon-pack.version}</location>
+                        </feature-pack>
+                    </feature-packs>
+                    <layers>
+                        <layer>jaxrs-server</layer>
+                        <layer>ejb-lite</layer>
+                        <layer>jpa</layer>
+                        <layer>postgresql-driver</layer>
+                        <layer>management</layer>
+                    </layers>
+                    <galleon-options>
+                        <jboss-fork-embedded>true</jboss-fork-embedded>
+                    </galleon-options>
+                    <packaging-scripts>
+                        <packaging-script>
+                            <scripts>
+                                <script>src/main/resources/configure-server.cli</script>
+                            </scripts>
+                        </packaging-script>
+                    </packaging-scripts>
+                    <bootableJar>true</bootableJar>
+                    <bootable-jar-name>eds-runnable.jar</bootable-jar-name>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>package</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
     </build>
-
 </project>

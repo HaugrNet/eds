@@ -71,21 +71,23 @@ jobs:
 
       - name: Generate dependency and plugin update report
         run: |
-          mvn -B -ntp \
-            versions:display-parent-updates \
-            versions:display-dependency-updates \
-            versions:display-plugin-updates \
-            -DallowSnapshots=false \
-            -DoutputFile=dependency-updates.txt
+          echo "===== Parent Updates =====" > dependency-updates.txt
+          mvn -B -ntp versions:display-parent-updates -DallowSnapshots=false 2>&1 | tee -a dependency-updates.txt
+          echo "" >> dependency-updates.txt
+          echo "===== Dependency Updates =====" >> dependency-updates.txt
+          mvn -B -ntp versions:display-dependency-updates -DallowSnapshots=false 2>&1 | tee -a dependency-updates.txt
+          echo "" >> dependency-updates.txt
+          echo "===== Plugin Updates =====" >> dependency-updates.txt
+          mvn -B -ntp versions:display-plugin-updates -DallowSnapshots=false 2>&1 | tee -a dependency-updates.txt
 
       - name: Show update summary
         run: |
           echo "===== Dependency/Plugin Update Report ====="
-          cat dependency-updates.txt || true
+          cat dependency-updates.txt
 
       - name: Upload update report artifact
         uses: actions/upload-artifact@v4
         with:
           name: dependency-update-report
           path: dependency-updates.txt
-          if-no-files-found: error
+          if-no-files-found: warn

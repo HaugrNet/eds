@@ -158,30 +158,27 @@
                     <skip>false</skip>
                 </configuration>
             </plugin>
-            <!-- Unpack the test resources from eds-core to be used in eds-quarkus -->
+            <!-- Copy test resources from eds-core to be used in eds-quarkus -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <version>3.8.1</version>
+                <artifactId>maven-resources-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>unpack-test-resources</id>
-                        <phase>generate-resources</phase>
+                        <id>copy-test-resources</id>
+                        <phase>generate-test-resources</phase>
                         <goals>
-                            <goal>unpack</goal>
+                            <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>${project.groupId}</groupId>
-                                    <artifactId>eds-core</artifactId>
-                                    <version>${project.version}</version>
-                                    <type>test-jar</type>
-                                    <overWrite>true</overWrite>
-                                    <outputDirectory>${project.build.directory}/classes</outputDirectory>
-                                    <includes>META-INF/init-h2.sql</includes>
-                                </artifactItem>
-                            </artifactItems>
+                            <outputDirectory>${project.build.directory}/test-classes</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${project.basedir}/../eds-core/src/test/resources</directory>
+                                    <includes>
+                                        <include>META-INF/init-h2.sql</include>
+                                    </includes>
+                                </resource>
+                            </resources>
                         </configuration>
                     </execution>
                 </executions>

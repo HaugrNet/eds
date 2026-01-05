@@ -36,9 +36,7 @@
     <properties>
         <quarkus.platform.group-id>io.quarkus.platform</quarkus.platform.group-id>
         <quarkus.platform.artifact-id>quarkus-bom</quarkus.platform.artifact-id>
-        <quarkus.platform.version>3.17.6</quarkus.platform.version>
-        <compiler-plugin.version>3.13.0</compiler-plugin.version>
-        <surefire-plugin.version>3.2.5</surefire-plugin.version>
+        <quarkus.platform.version>3.17.8</quarkus.platform.version>
     </properties>
 
     <dependencyManagement>
@@ -50,12 +48,6 @@
                 <version>${quarkus.platform.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
-            </dependency>
-            <!-- Override Hibernate core version to align with Quarkus (parent manages 6.4.4.Final for tests) -->
-            <dependency>
-                <groupId>org.hibernate.orm</groupId>
-                <artifactId>hibernate-core</artifactId>
-                <version>6.6.0.Final</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -133,7 +125,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>${compiler-plugin.version}</version>
                 <configuration>
                     <compilerArgs>
                         <arg>-parameters</arg>
@@ -162,6 +153,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
+                <version>3.3.1</version>
                 <executions>
                     <execution>
                         <id>copy-test-resources</id>

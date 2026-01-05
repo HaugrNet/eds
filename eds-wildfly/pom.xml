@@ -13,12 +13,12 @@
     <packaging>war</packaging>
     <name>EDS - WildFly</name>
     <description>
-        This module contain a WAR file, compatible with WildFly 10 - 20, and can also produce a runnable JAR.
+        This module contain a WAR file, compatible with WildFly 30+, and can also produce a runnable JAR.
     </description>
 
     <properties>
         <wildfly.version>38.0.1.Final</wildfly.version>
-        <wildfly-maven-plugin.version>5.1.0.Final</wildfly-maven-plugin.version>
+        <wildfly-maven-plugin.version>5.1.5.Final</wildfly-maven-plugin.version>
         <wildfly-datasources-galleon-pack.version>4.0.0.Final</wildfly-datasources-galleon-pack.version>
     </properties>
 

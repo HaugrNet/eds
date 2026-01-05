@@ -208,7 +208,52 @@ java -Dquarkus.config.locations=/path/to/application.properties \
 | `quarkus.datasource.username` | eds_user | Database user |
 | `quarkus.datasource.password` | eds | Database password |
 
-## Option 4: Docker
+## Option 4: Spring Boot
+
+Lightweight runtime using Spring Boot framework.
+
+### Build
+
+```bash
+mvn clean package -pl eds-spring -am -DskipTests
+```
+
+### Run with Defaults
+
+```bash
+java -jar eds-spring/target/eds-runnable.jar
+```
+
+### Run with Custom Properties
+
+Pass properties via system properties:
+
+```bash
+java -Dspring.datasource.url=jdbc:postgresql://dbserver:5432/eds \
+     -Dspring.datasource.username=eds_user \
+     -Dspring.datasource.password=secret \
+     -Dserver.port=8080 \
+     -jar eds-spring/target/eds-runnable.jar
+```
+
+Or use an external config file:
+
+```bash
+java -Dspring.config.location=/path/to/application.properties \
+     -jar eds-spring/target/eds-runnable.jar
+```
+
+### Spring Boot Properties
+
+| Property | Default | Description |
+|----------|---------|-------------|
+| `server.port` | 8080 | HTTP port |
+| `server.servlet.context-path` | /eds | Application context path |
+| `spring.datasource.url` | jdbc:postgresql://localhost:5432/eds | Database URL |
+| `spring.datasource.username` | eds_user | Database user |
+| `spring.datasource.password` | eds | Database password |
+
+## Option 5: Docker
 
 Run EDS in a Docker container with embedded PostgreSQL and WildFly.
 

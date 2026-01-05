@@ -1,0 +1,15 @@
+# This script is executed when the bootable JAR is being built.
+# It configures the server with properties that will be resolved at runtime.
+
+# Set the server ports. Default values are provided.
+/socket-binding-group=standard-sockets/socket-binding=http:write-attribute(name=port,value=${jboss.http.port:8080})
+/socket-binding-group=standard-sockets/socket-binding=management-http:write-attribute(name=port,value=${jboss.management.http.port:9990})
+
+# Add the PostgreSQL datasource (driver is provided by the postgresql-driver Galleon layer)
+data-source add --name=edsDS --driver-name=postgresql --jndi-name=java:/datasources/edsDS --connection-url=${eds.db.url:jdbc:postgresql://localhost:5432/eds} --user-name=${eds.db.user:eds_user} --password=${eds.db.password:eds} --use-ccm=false --max-pool-size=25 --blocking-timeout-wait-millis=5000 --enabled=true
+
+# Make sure we allow up to 25 MB uploads via POST requests
+/subsystem=undertow/server=default-server/http-listener=default/:write-attribute(name=max-post-size,value=26214400)
+
+# Add EDS logger
+/subsystem=logging/logger=net.haugr.eds:add

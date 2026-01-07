@@ -17,7 +17,8 @@
     <packaging>jar</packaging>
 
     <properties>
-        <spring-boot.version>3.4.1</spring-boot.version>
+        <spring-boot.version>3.5.9</spring-boot.version>
+        <logback.version>1.5.23</logback.version>
     </properties>
 
     <dependencyManagement>
@@ -77,13 +78,13 @@
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-            <version>1.5.12</version>
+            <version>${logback.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-core</artifactId>
-            <version>1.5.12</version>
+            <version>${logback.version}</version>
             <scope>compile</scope>
         </dependency>
 

@@ -42,6 +42,8 @@ import net.haugr.eds.api.responses.SanityResponse;
 import net.haugr.eds.api.responses.SettingResponse;
 import net.haugr.eds.api.responses.VersionResponse;
 import net.haugr.eds.core.ManagementBean;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -52,7 +54,9 @@ import org.springframework.transaction.annotation.Transactional;
  * @since EDS 2.0
  */
 @Service
-public class SpringManagementBean extends ManagementBean {
+public class SpringManagementBean extends ManagementBean implements Logged {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(SpringManagementBean.class);
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -70,7 +74,7 @@ public class SpringManagementBean extends ManagementBean {
     @Override
     @Transactional(readOnly = true)
     public VersionResponse version() {
-        return new ManagementBean(entityManager).version();
+        return logRequest(LOGGER, "version", () -> new ManagementBean(entityManager).version());
     }
 
     /**
@@ -79,7 +83,7 @@ public class SpringManagementBean extends ManagementBean {
     @Override
     @Transactional
     public SettingResponse settings(final SettingRequest request) {
-        return new ManagementBean(entityManager).settings(request);
+        return logRequest(LOGGER, "settings", () -> new ManagementBean(entityManager).settings(request));
     }
 
     /**
@@ -88,7 +92,7 @@ public class SpringManagementBean extends ManagementBean {
     @Override
     @Transactional
     public MasterKeyResponse masterKey(final MasterKeyRequest request) {
-        return new ManagementBean(entityManager).masterKey(request);
+        return logRequest(LOGGER, "masterKey", () -> new ManagementBean(entityManager).masterKey(request));
     }
 
     /**
@@ -97,7 +101,7 @@ public class SpringManagementBean extends ManagementBean {
     @Override
     @Transactional
     public SanityResponse sanity(final SanityRequest request) {
-        return new ManagementBean(entityManager).sanity(request);
+        return logRequest(LOGGER, "sanity", () -> new ManagementBean(entityManager).sanity(request));
     }
 
     /**
@@ -106,7 +110,7 @@ public class SpringManagementBean extends ManagementBean {
     @Override
     @Transactional(readOnly = true)
     public InventoryResponse inventory(final InventoryRequest request) {
-        return new ManagementBean(entityManager).inventory(request);
+        return logRequest(LOGGER, "inventory", () -> new ManagementBean(entityManager).inventory(request));
     }
 
     /**
@@ -115,7 +119,7 @@ public class SpringManagementBean extends ManagementBean {
     @Override
     @Transactional
     public AuthenticateResponse authenticated(final Authentication request) {
-        return new ManagementBean(entityManager).authenticated(request);
+        return logRequest(LOGGER, "authenticated", () -> new ManagementBean(entityManager).authenticated(request));
     }
 
     /**
@@ -124,7 +128,7 @@ public class SpringManagementBean extends ManagementBean {
     @Override
     @Transactional(readOnly = true)
     public FetchMemberResponse fetchMembers(final FetchMemberRequest request) {
-        return new ManagementBean(entityManager).fetchMembers(request);
+        return logRequest(LOGGER, "fetchMembers", () -> new ManagementBean(entityManager).fetchMembers(request));
     }
 
     /**
@@ -133,7 +137,7 @@ public class SpringManagementBean extends ManagementBean {
     @Override
     @Transactional
     public ProcessMemberResponse processMember(final ProcessMemberRequest request) {
-        return new ManagementBean(entityManager).processMember(request);
+        return logRequest(LOGGER, "processMember[" + request.getAction() + "]", () -> new ManagementBean(entityManager).processMember(request));
     }
 
     /**
@@ -142,7 +146,7 @@ public class SpringManagementBean extends ManagementBean {
     @Override
     @Transactional(readOnly = true)
     public FetchCircleResponse fetchCircles(final FetchCircleRequest request) {
-        return new ManagementBean(entityManager).fetchCircles(request);
+        return logRequest(LOGGER, "fetchCircles", () -> new ManagementBean(entityManager).fetchCircles(request));
     }
 
     /**
@@ -151,7 +155,7 @@ public class SpringManagementBean extends ManagementBean {
     @Override
     @Transactional
     public ProcessCircleResponse processCircle(final ProcessCircleRequest request) {
-        return new ManagementBean(entityManager).processCircle(request);
+        return logRequest(LOGGER, "processCircle[" + request.getAction() + "]", () -> new ManagementBean(entityManager).processCircle(request));
     }
 
     /**
@@ -160,7 +164,7 @@ public class SpringManagementBean extends ManagementBean {
     @Override
     @Transactional(readOnly = true)
     public FetchTrusteeResponse fetchTrustees(final FetchTrusteeRequest request) {
-        return new ManagementBean(entityManager).fetchTrustees(request);
+        return logRequest(LOGGER, "fetchTrustees", () -> new ManagementBean(entityManager).fetchTrustees(request));
     }
 
     /**
@@ -169,6 +173,6 @@ public class SpringManagementBean extends ManagementBean {
     @Override
     @Transactional
     public ProcessTrusteeResponse processTrustee(final ProcessTrusteeRequest request) {
-        return new ManagementBean(entityManager).processTrustee(request);
+        return logRequest(LOGGER, "processTrustee[" + request.getAction() + "]", () -> new ManagementBean(entityManager).processTrustee(request));
     }
 }

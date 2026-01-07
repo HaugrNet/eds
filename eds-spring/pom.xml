@@ -74,7 +74,12 @@
             <scope>runtime</scope>
         </dependency>
 
-        <!-- Logging - explicit versions to avoid parent pom conflicts -->
+        <!-- Logging - explicit versions and scopes to avoid parent pom conflicts -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <scope>compile</scope>
+        </dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>

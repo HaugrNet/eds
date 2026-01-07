@@ -33,6 +33,8 @@ import net.haugr.eds.api.responses.ProcessDataTypeResponse;
 import net.haugr.eds.api.responses.SignResponse;
 import net.haugr.eds.api.responses.VerifyResponse;
 import net.haugr.eds.core.ShareBean;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,7 +45,9 @@ import org.springframework.transaction.annotation.Transactional;
  * @since EDS 2.0
  */
 @Service
-public class SpringShareBean extends ShareBean {
+public class SpringShareBean extends ShareBean implements Logged {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(SpringShareBean.class);
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -61,7 +65,7 @@ public class SpringShareBean extends ShareBean {
     @Override
     @Transactional
     public ProcessDataTypeResponse processDataType(final ProcessDataTypeRequest request) {
-        return new ShareBean(entityManager).processDataType(request);
+        return logRequest(LOGGER, "processDataType[" + request.getAction() + "]", () -> new ShareBean(entityManager).processDataType(request));
     }
 
     /**
@@ -70,7 +74,7 @@ public class SpringShareBean extends ShareBean {
     @Override
     @Transactional(readOnly = true)
     public FetchDataTypeResponse fetchDataTypes(final FetchDataTypeRequest request) {
-        return new ShareBean(entityManager).fetchDataTypes(request);
+        return logRequest(LOGGER, "fetchDataTypes", () -> new ShareBean(entityManager).fetchDataTypes(request));
     }
 
     /**
@@ -79,7 +83,7 @@ public class SpringShareBean extends ShareBean {
     @Override
     @Transactional
     public ProcessDataResponse processData(final ProcessDataRequest request) {
-        return new ShareBean(entityManager).processData(request);
+        return logRequest(LOGGER, "processData[" + request.getAction() + "]", () -> new ShareBean(entityManager).processData(request));
     }
 
     /**
@@ -88,7 +92,7 @@ public class SpringShareBean extends ShareBean {
     @Override
     @Transactional
     public FetchDataResponse fetchData(final FetchDataRequest request) {
-        return new ShareBean(entityManager).fetchData(request);
+        return logRequest(LOGGER, "fetchData", () -> new ShareBean(entityManager).fetchData(request));
     }
 
     /**
@@ -97,7 +101,7 @@ public class SpringShareBean extends ShareBean {
     @Override
     @Transactional
     public SignResponse sign(final SignRequest request) {
-        return new ShareBean(entityManager).sign(request);
+        return logRequest(LOGGER, "sign", () -> new ShareBean(entityManager).sign(request));
     }
 
     /**
@@ -106,7 +110,7 @@ public class SpringShareBean extends ShareBean {
     @Override
     @Transactional
     public VerifyResponse verify(final VerifyRequest request) {
-        return new ShareBean(entityManager).verify(request);
+        return logRequest(LOGGER, "verify", () -> new ShareBean(entityManager).verify(request));
     }
 
     /**
@@ -115,6 +119,6 @@ public class SpringShareBean extends ShareBean {
     @Override
     @Transactional(readOnly = true)
     public FetchSignatureResponse fetchSignatures(final FetchSignatureRequest request) {
-        return new ShareBean(entityManager).fetchSignatures(request);
+        return logRequest(LOGGER, "fetchSignatures", () -> new ShareBean(entityManager).fetchSignatures(request));
     }
 }

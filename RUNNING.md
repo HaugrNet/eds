@@ -253,48 +253,80 @@ java -Dspring.config.location=/path/to/application.properties \
 | `spring.datasource.username` | eds_user | Database user |
 | `spring.datasource.password` | eds | Database password |
 
-## Option 5: Docker
+## Option 5: Docker Compose
 
-Run EDS in a Docker container with embedded PostgreSQL and WildFly.
+Run EDS using Docker Compose with separate PostgreSQL and Quarkus containers.
+
+### Prerequisites
+
+- Docker and Docker Compose installed
+- Build the Quarkus JAR first
 
 ### Build and Run
 
 ```bash
-cd accessories
+# Build the Quarkus uber-jar
+mvn clean package -pl eds-quarkus -am -DskipTests
 
-# Build the Docker image and start container
-./docker.sh build
+# Start the containers
+cd accessories/docker
+docker compose up -d
 ```
 
-### Docker Control Script
+### Docker Compose Commands
 
 ```bash
-cd accessories
+cd accessories/docker
 
-# Start stopped container
-./docker.sh start
-
-# Stop running container
-./docker.sh stop
+# Start containers (detached)
+docker compose up -d
 
 # View logs
-./docker.sh logs
+docker compose logs -f
 
-# Check status
-./docker.sh status
+# View logs for specific service
+docker compose logs -f eds-app
+docker compose logs -f eds-db
 
-# Enter container shell
-./docker.sh interactive
+# Stop containers
+docker compose down
 
-# Remove container and image
-./docker.sh remove
+# Stop and remove data volume (fresh start)
+docker compose down -v
+
+# Rebuild after code changes
+docker compose up -d --build
 ```
 
-### Custom Port
+### Architecture
+
+The Docker Compose setup creates:
+
+| Service | Description |
+|---------|-------------|
+| `eds-db` | PostgreSQL 16 database with persistent volume |
+| `eds-app` | Quarkus application container |
+
+Both containers communicate over an internal `eds-network` bridge network.
+
+### Custom Configuration
+
+Override settings using environment variables in `docker-compose.yml` or via command line:
 
 ```bash
-export EDS_PORT=9080
-./docker.sh build
+# Custom port mapping
+docker compose up -d -e QUARKUS_HTTP_PORT=9080
+
+# Or edit docker-compose.yml ports section
+```
+
+### Data Persistence
+
+PostgreSQL data is stored in a named volume `eds-data`. To reset the database:
+
+```bash
+docker compose down -v
+docker compose up -d
 ```
 
 ## Verifying the Installation

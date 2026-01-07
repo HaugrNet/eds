@@ -1,0 +1,42 @@
+# ==============================================================================
+# Dockerfile for EDS Quarkus Application
+# ------------------------------------------------------------------------------
+# Builds and runs the EDS Quarkus uber-jar
+# ==============================================================================
+
+FROM eclipse-temurin:21-jre-alpine
+
+LABEL maintainer="EDS Project"
+LABEL description="EDS (Encrypted Data Share) Quarkus Application"
+
+# Set timezone
+ENV TZ=Europe/Berlin
+RUN apk add --no-cache tzdata \
+    && ln -snf /usr/share/zoneinfo/$TZ /etc/localtime \
+    && echo $TZ > /etc/timezone
+
+# Create app directory and non-root user
+RUN addgroup -S eds && adduser -S eds -G eds
+WORKDIR /app
+
+# Copy the pre-built uber-jar
+COPY eds-quarkus/target/eds-runnable.jar /app/eds-runnable.jar
+
+# Create logs directory
+RUN mkdir -p /app/logs
+
+# Set ownership
+RUN chown -R eds:eds /app
+
+# Switch to non-root user
+USER eds
+
+# Expose the application port
+EXPOSE 8080
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
+    CMD wget --no-verbose --tries=1 --spider http://localhost:8080/eds/api/version || exit 1
+
+# Run the application
+ENTRYPOINT ["java", "-jar", "/app/eds-runnable.jar"]

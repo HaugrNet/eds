@@ -18,6 +18,9 @@ package net.haugr.eds.spring;
 
 import java.util.Locale;
 import java.util.function.Supplier;
+
+import net.haugr.eds.api.common.ReturnCode;
+import net.haugr.eds.api.responses.EDSResponse;
 import org.slf4j.Logger;
 
 /**
@@ -26,6 +29,7 @@ import org.slf4j.Logger;
  */
 public interface Logged {
 
+    @SuppressWarnings("unchecked")
     default <T> T logRequest(final Logger logger, final String endpoint, final Supplier<T> action) {
         final long start = System.nanoTime();
 
@@ -39,7 +43,7 @@ public interface Logged {
             final String duration = duration(start);
             logger.error("{} failed in {} ms: {}", endpoint, duration, e.getMessage());
 
-            throw e;
+            return (T) new EDSResponse(ReturnCode.ERROR, e.getMessage());
         }
     }
 

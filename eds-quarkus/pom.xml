@@ -1,21 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-  ~ EDS, Encrypted Data Share - open source Cryptographic Sharing system.
-  ~ Copyright (c) 2016-2025, haugr.net
-  ~ mailto: eds AT haugr DOT net
-  ~
-  ~ EDS is free software; you can redistribute it and/or modify it under the
-  ~ terms of the Apache License, as published by the Apache Software Foundation.
-  ~
-  ~ EDS is distributed in the hope that it will be useful, but WITHOUT ANY
-  ~ WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-  ~ FOR A PARTICULAR PURPOSE. See the Apache License for more details.
-  ~
-  ~ You should have received a copy of the Apache License, version 2, along with
-  ~ this program; If not, you can download a copy of the License
-  ~ here: https://www.apache.org/licenses/
-  -->
-
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
@@ -36,7 +19,7 @@
     <properties>
         <quarkus.platform.group-id>io.quarkus.platform</quarkus.platform.group-id>
         <quarkus.platform.artifact-id>quarkus-bom</quarkus.platform.artifact-id>
-        <quarkus.platform.version>3.17.8</quarkus.platform.version>
+        <quarkus.platform.version>3.23.4</quarkus.platform.version>
     </properties>
 
     <dependencyManagement>
@@ -58,15 +41,10 @@
             <artifactId>jakarta.ejb-api</artifactId>
             <version>4.0.1</version>
         </dependency>
-        <!-- EDS Core module, containing the logic -->
+        <!-- EDS Core module, containing JAX-RS & logic -->
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>eds-core</artifactId>
-        </dependency>
-        <!-- EDS REST module, holding all JAX-RS resources -->
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>eds-rest</artifactId>
         </dependency>
 
         <!-- Quarkus Core -->
@@ -91,7 +69,7 @@
             <artifactId>quarkus-scheduler</artifactId>
         </dependency>
 
-        <!-- If using JPA in core: provide ORM and JDBC driver; configuration can be added later by user -->
+        <!-- If using JPA in core: provide ORM and JDBC driver; user can add configuration later -->
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-hibernate-orm</artifactId>

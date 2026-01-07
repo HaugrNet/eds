@@ -39,7 +39,6 @@
     <modules>
         <module>eds-api</module>
         <module>eds-core</module>
-        <module>eds-rest</module>
         <module>eds-wildfly</module>
         <module>eds-quarkus</module>
         <module>eds-spring</module>

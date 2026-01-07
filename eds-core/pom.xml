@@ -20,6 +20,14 @@
             <artifactId>jakarta.jakartaee-api</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.eclipse.microprofile.openapi</groupId>
+            <artifactId>microprofile-openapi-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+        <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>eds-api</artifactId>
         </dependency>
@@ -36,6 +44,10 @@
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jersey.test-framework.providers</groupId>
+            <artifactId>jersey-test-framework-provider-grizzly2</artifactId>
         </dependency>
         <dependency>
             <groupId>com.h2database</groupId>
@@ -75,24 +87,38 @@
                 </configuration>
             </plugin>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <configuration>
-                    <!-- The Classes in this module is not part of the published API,
-                         hence no need to build/generate them. -->
-                    <skip>true</skip>
-                </configuration>
+                <groupId>io.smallrye</groupId>
+                <artifactId>smallrye-open-api-maven-plugin</artifactId>
+                <version>4.2.0</version>
+                <executions>
+                    <execution>
+                        <id>generate-openapi-spec</id>
+                        <phase>process-classes</phase>
+                        <goals>
+                            <goal>generate-schema</goal>
+                        </goals>
+                        <configuration>
+                            <infoTitle>EDS - Encrypted Data Share REST API</infoTitle>
+                            <infoVersion>${project.version}</infoVersion>
+                            <infoDescription>REST API for the Encrypted Data Share (EDS) system. EDS provides secure cryptographic data sharing capabilities including member management, access control, data encryption, and digital signatures.</infoDescription>
+                            <infoContactName>Kim Jensen</infoContactName>
+                            <infoContactUrl>https://haugr.net/</infoContactUrl>
+                            <infoLicenseName>Apache License 2.0</infoLicenseName>
+                            <infoLicenseUrl>https://www.apache.org/licenses/LICENSE-2.0</infoLicenseUrl>
+                            <schemaFilename>openapi</schemaFilename>
+                            <outputDirectory>${project.build.directory}/generated</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>test-jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <configuration>
+                    <!-- The Classes in this module are not part of the published API,
+                         hence no need to build/generate them. -->
+                    <skip>true</skip>
+                </configuration>
             </plugin>
         </plugins>
     </build>

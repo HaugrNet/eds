@@ -16,8 +16,7 @@
  */
 
 /**
- * <p>REST-based WebServices, implementing the Crypto Store API and using the
- * EDS Core module as implementation.</p>
+ * <p>REST-based WebServices.</p>
  *
  * @author Kim Jensen
  * @since EDS 1.0

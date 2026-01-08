@@ -260,42 +260,44 @@ Run EDS using Docker Compose with separate PostgreSQL and Quarkus containers.
 ### Prerequisites
 
 - Docker and Docker Compose installed
-- Build the Quarkus JAR first
 
 ### Build and Run
 
 ```bash
-# Build the Quarkus uber-jar
-mvn clean package -pl eds-quarkus -am -DskipTests
+cd accessories
 
-# Start the containers
-cd accessories/docker
-docker compose up -d
+# Build Quarkus JAR and start containers
+./docker.sh build
 ```
 
-### Docker Compose Commands
+### Docker Control Script
 
 ```bash
-cd accessories/docker
+cd accessories
 
-# Start containers (detached)
-docker compose up -d
-
-# View logs
-docker compose logs -f
-
-# View logs for specific service
-docker compose logs -f eds-app
-docker compose logs -f eds-db
+# Start existing containers
+./docker.sh start
 
 # Stop containers
-docker compose down
+./docker.sh stop
 
-# Stop and remove data volume (fresh start)
-docker compose down -v
+# Restart containers
+./docker.sh restart
 
-# Rebuild after code changes
-docker compose up -d --build
+# Reset database (removes all data)
+./docker.sh reset
+
+# View logs
+./docker.sh logs
+
+# Show container status
+./docker.sh status
+
+# Enter application container shell
+./docker.sh interactive
+
+# Remove containers and images
+./docker.sh remove
 ```
 
 ### Architecture
@@ -304,7 +306,7 @@ The Docker Compose setup creates:
 
 | Service | Description |
 |---------|-------------|
-| `eds-db` | PostgreSQL 16 database with persistent volume |
+| `eds-db` | PostgreSQL 16 database |
 | `eds-app` | Quarkus application container |
 
 Both containers communicate over an internal `eds-network` bridge network.
@@ -322,11 +324,17 @@ docker compose up -d -e QUARKUS_HTTP_PORT=9080
 
 ### Data Persistence
 
-PostgreSQL data is stored in a named volume `eds-data`. To reset the database:
+Data is stored in local bind mounts under `accessories/docker/volumes/`:
+
+| Path | Description |
+|------|-------------|
+| `volumes/data/` | PostgreSQL database files |
+| `volumes/logs/` | Application logs (`eds.log`) |
+
+To reset the database:
 
 ```bash
-docker compose down -v
-docker compose up -d
+./docker.sh reset
 ```
 
 ## Verifying the Installation

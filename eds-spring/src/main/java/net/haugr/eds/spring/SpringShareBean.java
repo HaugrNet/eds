@@ -72,7 +72,7 @@ public class SpringShareBean extends ShareBean implements Logged {
      * {@inheritDoc}
      */
     @Override
-    @Transactional(readOnly = true)
+    @Transactional
     public FetchDataTypeResponse fetchDataTypes(final FetchDataTypeRequest request) {
         return logRequest(LOGGER, "fetchDataTypes", () -> new ShareBean(entityManager).fetchDataTypes(request));
     }
@@ -117,7 +117,7 @@ public class SpringShareBean extends ShareBean implements Logged {
      * {@inheritDoc}
      */
     @Override
-    @Transactional(readOnly = true)
+    @Transactional
     public FetchSignatureResponse fetchSignatures(final FetchSignatureRequest request) {
         return logRequest(LOGGER, "fetchSignatures", () -> new ShareBean(entityManager).fetchSignatures(request));
     }

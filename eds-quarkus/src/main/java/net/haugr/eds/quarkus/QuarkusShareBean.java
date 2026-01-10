@@ -69,7 +69,7 @@ public class QuarkusShareBean extends ShareBean {
      * {@inheritDoc}
      */
     @Override
-    @Transactional(Transactional.TxType.SUPPORTS)
+    @Transactional(Transactional.TxType.REQUIRED)
     public FetchDataTypeResponse fetchDataTypes(final FetchDataTypeRequest request) {
         return super.fetchDataTypes(request);
     }
@@ -114,7 +114,7 @@ public class QuarkusShareBean extends ShareBean {
      * {@inheritDoc}
      */
     @Override
-    @Transactional(Transactional.TxType.SUPPORTS)
+    @Transactional(Transactional.TxType.REQUIRED)
     public FetchSignatureResponse fetchSignatures(final FetchSignatureRequest request) {
         return super.fetchSignatures(request);
     }

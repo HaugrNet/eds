@@ -69,7 +69,7 @@ public class QuarkusManagementBean extends ManagementBean {
      * {@inheritDoc}
      */
     @Override
-    @Transactional(Transactional.TxType.SUPPORTS)
+    @Transactional(Transactional.TxType.REQUIRED)
     public VersionResponse version() {
         return super.version();
     }
@@ -105,7 +105,7 @@ public class QuarkusManagementBean extends ManagementBean {
      * {@inheritDoc}
      */
     @Override
-    @Transactional(Transactional.TxType.SUPPORTS)
+    @Transactional(Transactional.TxType.REQUIRED)
     public InventoryResponse inventory(final InventoryRequest request) {
         return super.inventory(request);
     }
@@ -123,7 +123,7 @@ public class QuarkusManagementBean extends ManagementBean {
      * {@inheritDoc}
      */
     @Override
-    @Transactional(Transactional.TxType.SUPPORTS)
+    @Transactional(Transactional.TxType.REQUIRED)
     public FetchMemberResponse fetchMembers(final FetchMemberRequest request) {
         return super.fetchMembers(request);
     }
@@ -141,7 +141,7 @@ public class QuarkusManagementBean extends ManagementBean {
      * {@inheritDoc}
      */
     @Override
-    @Transactional(Transactional.TxType.SUPPORTS)
+    @Transactional(Transactional.TxType.REQUIRED)
     public FetchCircleResponse fetchCircles(final FetchCircleRequest request) {
         return super.fetchCircles(request);
     }
@@ -159,7 +159,7 @@ public class QuarkusManagementBean extends ManagementBean {
      * {@inheritDoc}
      */
     @Override
-    @Transactional(Transactional.TxType.SUPPORTS)
+    @Transactional(Transactional.TxType.REQUIRED)
     public FetchTrusteeResponse fetchTrustees(final FetchTrusteeRequest request) {
         return super.fetchTrustees(request);
     }

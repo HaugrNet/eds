@@ -72,7 +72,7 @@ public class SpringManagementBean extends ManagementBean implements Logged {
      * {@inheritDoc}
      */
     @Override
-    @Transactional(readOnly = true)
+    @Transactional
     public VersionResponse version() {
         return logRequest(LOGGER, "version", () -> new ManagementBean(entityManager).version());
     }
@@ -108,7 +108,7 @@ public class SpringManagementBean extends ManagementBean implements Logged {
      * {@inheritDoc}
      */
     @Override
-    @Transactional(readOnly = true)
+    @Transactional
     public InventoryResponse inventory(final InventoryRequest request) {
         return logRequest(LOGGER, "inventory", () -> new ManagementBean(entityManager).inventory(request));
     }
@@ -126,7 +126,7 @@ public class SpringManagementBean extends ManagementBean implements Logged {
      * {@inheritDoc}
      */
     @Override
-    @Transactional(readOnly = true)
+    @Transactional
     public FetchMemberResponse fetchMembers(final FetchMemberRequest request) {
         return logRequest(LOGGER, "fetchMembers", () -> new ManagementBean(entityManager).fetchMembers(request));
     }
@@ -144,7 +144,7 @@ public class SpringManagementBean extends ManagementBean implements Logged {
      * {@inheritDoc}
      */
     @Override
-    @Transactional(readOnly = true)
+    @Transactional
     public FetchCircleResponse fetchCircles(final FetchCircleRequest request) {
         return logRequest(LOGGER, "fetchCircles", () -> new ManagementBean(entityManager).fetchCircles(request));
     }
@@ -162,7 +162,7 @@ public class SpringManagementBean extends ManagementBean implements Logged {
      * {@inheritDoc}
      */
     @Override
-    @Transactional(readOnly = true)
+    @Transactional
     public FetchTrusteeResponse fetchTrustees(final FetchTrusteeRequest request) {
         return logRequest(LOGGER, "fetchTrustees", () -> new ManagementBean(entityManager).fetchTrustees(request));
     }

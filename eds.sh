@@ -39,34 +39,26 @@ function jarsExist() {
 # ==============================================================================
 function showHelp() {
     echo "EDS - Encrypted Data Share Control Script"
-    echo "=========================================="
     echo
-    echo "Usage: $(basename "${0}") <command>"
+    echo "  Usage: $(basename "${0}") <command>"
     echo
-    echo "Build Commands:"
-    echo "  build            Build all modules using Maven wrapper, skipping tests"
+    echo "  Build Commands:"
+    echo "    build            Build all modules using Maven wrapper, skipping tests"
     echo
-    echo "Run Commands:"
-    echo "  run <module>     Run standalone JAR (quarkus | spring | wildfly)"
-    echo "                   * Stops Docker first to free port 8080"
-    echo "                   * Will fail if a local PostgreSQL is not running,"
-    echo "                     initialized with the EDS Database scripts."
+    echo "  Run Commands:"
+    echo "    run <module>     Run standalone JAR (quarkus | spring | wildfly)"
+    echo "                     * Stops Docker first to free port 8080"
+    echo "                     * Will fail if a local PostgreSQL is not running,"
+    echo "                       initialized with the EDS Database scripts."
     echo
-    echo "Docker Commands:"
-    echo "  prepare          Prepare Docker containers (build images)"
-    echo "  start            Start Docker containers"
-    echo "  stop             Stop Docker containers"
-    echo "  restart          Restart Docker containers"
-    echo "  status           Show container status"
-    echo "  health           Check health endpoints"
-    echo "  logs             Follow container logs"
-    echo "  cleanup          Remove containers, images, and volumes"
-    echo
-    echo "Other Commands:"
-    echo "  help             Show this help message"
-    echo
-    echo "Environment Variables:"
-    echo "  EDS_PORT         HTTP port (default: 8080)"
+    echo "  Docker Commands:"
+    echo "    start            Start (and prepare) Docker containers"
+    echo "    stop             Stop Docker containers"
+    echo "    restart          Restart Docker containers"
+    echo "    status           Show container status"
+    echo "    health           Check health endpoints"
+    echo "    logs             Follow container logs"
+    echo "    remove           Remove containers, images, and volumes"
     echo
 
     # Show current status
@@ -93,26 +85,8 @@ function showHelp() {
 # ==============================================================================
 function doBuild() {
     echo "Building all modules..."
-    "${scriptDir}"/mvnw clean package -DskipTests
-}
-
-# ==============================================================================
-# Prepare Docker containers
-# ==============================================================================
-function doPrepare() {
-    if ! jarsExist; then
-        echo "No runnable JARs found. Building Quarkus module first..."
-        doBuild quarkus || return 1
-    fi
-
-    echo "Creating volume directories..."
-    mkdir -p "${composeDir}/volumes/logs" "${composeDir}/volumes/data" 2>/dev/null
-    chmod 777 "${composeDir}/volumes/logs" "${composeDir}/volumes/data" 2>/dev/null || true
-
-    echo "Building Docker images..."
-    docker compose -f "${composeFile}" build
-
-    echo "Docker containers are prepared. Run 'start' to launch."
+    cd "${scriptDir}" || return 1
+    ./mvnw clean package -DskipTests
 }
 
 # ==============================================================================
@@ -346,9 +320,6 @@ case "${action}" in
         ;;
     run)
         doRun "$@"
-        ;;
-    prepare)
-        doPrepare
         ;;
     start)
         doStart

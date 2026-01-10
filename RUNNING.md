@@ -27,20 +27,6 @@ The `01-setup.sql` script automatically runs:
 - `03-create.sql` - Creates tables
 - `04-update-*.sql` - Applies any schema updates
 
-#### PostgreSQL Access Configuration
-
-For fresh PostgreSQL installations, add to `/etc/postgresql/<VERSION>/main/pg_hba.conf`:
-
-```
-local   all     eds_user    password
-```
-
-Then restart PostgreSQL:
-
-```bash
-sudo service postgresql restart
-```
-
 ## Option 1: WildFly Standalone Server
 
 Deploy the WAR file to an existing WildFly installation using the provided control script.
@@ -361,6 +347,8 @@ mvn clean package -pl eds-fitnesse -am -DskipTests
 
 ### Start FitNesse
 
+The fitnesse binary can be found at https://fitnesse.org/.
+
 ```bash
 cd eds-fitnesse
 java -jar fitnesse-standalone.jar -p 2080
@@ -389,5 +377,4 @@ Or visit http://localhost:2080/?shutdown in a browser.
 ## API Documentation
 
 The REST API is documented in:
-- `accessories/release/oas3.json` - OpenAPI 3.0 specification
-- `accessories/release/swagger.json` - Swagger specification
+- `accessories/release/openapi.json` - OpenAPI 3.0 specification

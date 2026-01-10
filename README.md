@@ -1,4 +1,4 @@
-# EDS - Encrypted Data Share
+# EDS – Encrypted Data Share
 
 [![CircleCI](https://circleci.com/gh/HaugrNet/eds.png?style=shield)](https://circleci.com/gh/HaugrNet/eds)
 [![SonarQube](https://sonarcloud.io/api/project_badges/measure?project=net.haugr:eds&metric=alert_status)](https://sonarcloud.io/dashboard?id=net.haugr:eds)
@@ -7,75 +7,45 @@
 [![Coverity](https://scan.coverity.com/projects/28136/badge.svg)](https://scan.coverity.com/projects/haugrnet-eds)
 
 [EDS](https://haugr.net/), Encrypted Data Share, works as a "PGP for the
-Cloud". It is designed as a backend component with the vision that it should be
-possible to exchange data between multiple parties using encrypted storage,
-where both the parties involved, and the data exchanged can be anything from
-simple files to complex data objects - EDS only cares about bytes.
+Cloud." It is designed as a backend component with the vision that it should be
+possible to exchange data between multiple parties using encrypted storage.
+The data exchanged between the parties can be anything from simple files to
+complex data objects – EDS only cares about bytes.
 
-Via the public (REST based) API, it is possible to access the
-internal logic, where keys are unlocked, based on user credentials and used to
+Via the public (REST-based) API, it is possible to access the
+internal logic, where keys are unlocked, based on user credentials, and used to
 encrypt and decrypt data, storing only encrypted keys and data. Using the same
 basic mechanism as PGP, combining Asymmetric & Symmetric keys, it is possible
 for multiple parties to exchange data safely and securely.
 
 Since EDS only focused on bytes and does not have any care for more information,
-it can be used to share either files between users, or data objects between apps
-or applications. This makes EDS the perfect companion for anyone who have Data
+it can be used to share either files between users or data objects between apps
+or applications. This makes EDS the perfect companion for anyone who has Data
 Protection & Privacy concerns, such as GDPR.
 
-EDS is written in Java 21 / Jakarta EE 10, with no third-part dependencies, meaning
+EDS is written in Java 21 / Jakarta EE 11, with no third-part dependencies, meaning
 it can run on any Host or in any Cloud where a Jakarta EE Container is
 available. Currently, only the [PostgreSQL](https://www.postgresql.org/) database
 is supported, but thanks to the flexibility of Jakarta EE, it is possible to use any
-database desired. Testing of EDS has been done with [WildFly](http://www.wildfly.org/).
+database desired. Testing of EDS has been done with [WildFly](http://www.wildfly.org/) and
+[Quarkus](https://quarkus.io/).
 
-## Build, Install and Run
+## Build, Install, and Run
 
 The final version 1.2 can be downloaded from [haugr.net](https://haugr.net/),
-version 2.0 will be a major upgrade, with new domain, project name, and various
-internal changes that makes it a breaking update. Initial development of version
-2.0 has completed, with no more changes in the pipeline. Next phase will focus on
-testing to guarantee that the stability will remain high. The build requires Java 21,
-and [Maven](https://maven.apache.org/).
+version 2.0 will be a major upgrade, with a new domain, project name, and various
+internal changes that make it a breaking update. Initial development of version
+2.0 has completed, with no more changes in the pipeline. The next phase will focus
+on testing to guarantee that the stability will remain high. The build requires
+Java 21, and [Maven](https://maven.apache.org/).
 
-In the accessories/release folder, there is a number of files, which is used to
-install and run EDS. Either by building EDS from scratch, using a local WildFly
-instance, or even just use the provided Docker configuration.
+In the root folder, there exists a small script, ```eds.sh```, which can be used to
+build the entire project, including running all tests and quality checks.
 
-### Docker
-
-In the accessories folder, there is a docker.sh script. which can be used to
-create a new EDS container, running on a port of your choice. The configuration
-will download all the required components, and handle the details for you.
-
-### Local Container
-
-By adding the accessories/release/bin directory in your path, you can take
-advantage of the provided WildFly script to help configure & deploy a local EDS
-instance using your existing container.
-
-### Build from scratch
-
-**Developers only**: If you want to build from the source, run these steps to
-create the deployable WAR package for WildFly:
-
-```
-cd [ /path/to/eds/sources ]
-mvn clean verify
-```
-
-Using the WildFly script to deploy the correct WAR file.
-Now copy the ```eds.war``` file in place.
-
-```
-export PATH=[ / path/to/eds/sources ]/accessories/release/bin:${PATH}
-wildfly.sh configure
-wildfly.sh deploy
-```
-
-If you have swagger installed, please load the swagger.json file from the
-accessories/release folder, which will help you build a local client for the
-JSON based REST API.
+### OpenAPI Specification
+in the accessories/release folder, there is an OpenAPI Specification file,
+```openapi.json```, which can be used to generate client code or documentation
+for the REST API.
 
 ## Who is this for
 
@@ -86,17 +56,17 @@ Keys is placed with the users.
 
 ## Security Features
 
-Besides, encrypting all data stored, the EDS also has a number of features to
+Besides encrypting all data stored, the EDS also has a number of features to
 ensure that the security is as high as it can be, considering that it can be
 deployed in a "hostile" environment.
 
-* MasterKey - The MasterKey is used to encrypt and decrypt various information,
+* MasterKey – The MasterKey is used to encrypt and decrypt various information,
   and it must be set during startup, since it is not persisted anywhere.
 * Invalidate Accounts, this allows a member to force the keys to be replaced
-  internally, so it is possible to log in and view Circles, but it will not be
-  possible to extract data, as the keys are not the same as the ones, which
-  was used in the Circles.
-* Data Corruption checks, to verify if there has been alterations to encrypted
+  internally, so it is possible to log in and view Circles. However, it will not
+  be possible to extract data, as the keys are different from the ones that were
+  used in the Circles.
+* Data Corruption checks to verify if there have been alterations to encrypted
   data, which may result in inability to properly extract information.
 
 ## Release Plan
@@ -120,19 +90,19 @@ please contact Kim Jensen (see below).
 
 ### Code Quality
 
-Code quality if very important, which is why testing & quality checks are very
-important. Unfortunately, with version 2.0, it is time to consider alternatives
+Code quality is important, which is why testing and quality checks are crucial.
+Unfortunately, with version 2.0, it is time to consider alternatives
 to FitNesse & Coverity from Synopsis, since neither supports Java 21.
 
 The code is checked against as many analysis tools as possible. The final
-code must have 0 issues of any kind - before it is considered ready to be
-submitting into the main repository.
+code must have zero issues of any kind before it is considered ready to be
+submitted into the main repository.
 
 ### Documentation
 
 Documentation of code is also important, having silly comments is meaningless,
 but often it helps to add inline comments to explain intentions and reasoning
-for choices made. Commenting out code is banned, if it is commented out, it
+for choices made. Commenting on code is banned, if it is commented out, it
 is meaningless and should be removed.
 
 ## Software License

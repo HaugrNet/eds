@@ -31,6 +31,12 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>eds-core</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.eclipse.microprofile.health</groupId>
+            <artifactId>microprofile-health-api</artifactId>
+            <version>4.0.1</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -55,6 +61,7 @@
                         <layer>jpa</layer>
                         <layer>postgresql-driver</layer>
                         <layer>management</layer>
+                        <layer>microprofile-health</layer>
                     </layers>
                     <galleon-options>
                         <jboss-fork-embedded>true</jboss-fork-embedded>

@@ -16,28 +16,38 @@
  */
 package net.haugr.eds.spring;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.domain.EntityScan;
-import org.springframework.scheduling.annotation.EnableScheduling;
+import jakarta.persistence.EntityManager;
+import jakarta.transaction.Transactional;
+import net.haugr.eds.core.SanitizerBean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
 
 /**
- * Spring Boot Application entry point for EDS.
+ * <p>Spring Sanitizer Bean, which handles the scheduled sanitizing of the EDS.</p>
  *
  * @author Kim Jensen
  * @since EDS 2.0
  */
-@SpringBootApplication
-@EntityScan(basePackages = "net.haugr.eds.core.model.entities")
-@EnableScheduling
-public class EDSSpringApplication {
+@Component
+public class SpringSanitizerBean extends SanitizerBean {
 
     /**
-     * Main entry point.
+     * Spring Constructor.
      *
-     * @param args Command line arguments
+     * @param entityManager EDS EntityManager instance
      */
-    public static void main(final String[] args) {
-        SpringApplication.run(EDSSpringApplication.class, args);
+    @Autowired
+    public SpringSanitizerBean(final EntityManager entityManager) {
+        super(entityManager);
+    }
+
+    /**
+     * Scheduled Sanitizing runs every hour.
+     */
+    @Scheduled(fixedRate = 3_600_000)
+    @Transactional
+    public void runSanitizing() {
+        sanitize();
     }
 }

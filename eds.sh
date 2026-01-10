@@ -1,0 +1,380 @@
+#!/bin/bash
+
+# Configuration
+scriptDir="$(cd "$(dirname "$(readlink -f "$0")")" && pwd)"
+readonly scriptDir
+readonly composeDir="${scriptDir}/accessories/docker"
+readonly composeFile="${composeDir}/docker-compose.yml"
+readonly PORT=${EDS_PORT:-8080}
+
+# ==============================================================================
+# Check if Docker Compose services are running
+# ==============================================================================
+function isRunning() {
+    local status
+    status=$(docker compose -f "${composeFile}" ps --status running -q 2>/dev/null)
+    [[ -n "${status}" ]]
+}
+
+# ==============================================================================
+# Check if Docker Compose services exist
+# ==============================================================================
+function exists() {
+    local status
+    status=$(docker compose -f "${composeFile}" ps -a -q 2>/dev/null)
+    [[ -n "${status}" ]]
+}
+
+# ==============================================================================
+# Check if runnable JARs exist
+# ==============================================================================
+function jarsExist() {
+    [[ -f "${scriptDir}/eds-quarkus/target/eds-runnable.jar" ]] || \
+    [[ -f "${scriptDir}/eds-spring/target/eds-runnable.jar" ]] || \
+    [[ -f "${scriptDir}/eds-wildfly/target/eds-runnable.jar" ]]
+}
+
+# ==============================================================================
+# Shows the help
+# ==============================================================================
+function showHelp() {
+    echo "EDS - Encrypted Data Share Control Script"
+    echo "=========================================="
+    echo
+    echo "Usage: $(basename "${0}") <command>"
+    echo
+    echo "Build Commands:"
+    echo "  build            Build all modules using Maven wrapper, skipping tests"
+    echo
+    echo "Run Commands:"
+    echo "  run <module>     Run standalone JAR (quarkus | spring | wildfly)"
+    echo "                   * Stops Docker first to free port 8080"
+    echo "                   * Will fail if a local PostgreSQL is not running,"
+    echo "                     initialized with the EDS Database scripts."
+    echo
+    echo "Docker Commands:"
+    echo "  prepare          Prepare Docker containers (build images)"
+    echo "  start            Start Docker containers"
+    echo "  stop             Stop Docker containers"
+    echo "  restart          Restart Docker containers"
+    echo "  status           Show container status"
+    echo "  health           Check health endpoints"
+    echo "  logs             Follow container logs"
+    echo "  cleanup          Remove containers, images, and volumes"
+    echo
+    echo "Other Commands:"
+    echo "  help             Show this help message"
+    echo
+    echo "Environment Variables:"
+    echo "  EDS_PORT         HTTP port (default: 8080)"
+    echo
+
+    # Show current status
+    echo "Current Status:"
+    if isRunning; then
+        echo "  Docker containers are RUNNING"
+        echo "  Access at: http://localhost:${PORT}/eds"
+    elif exists; then
+        echo "  Docker containers exist but are STOPPED"
+    else
+        echo "  Docker containers do not exist"
+    fi
+
+    if jarsExist; then
+        echo "  Runnable JARs are available"
+    else
+        echo "  Runnable JARs not found (run 'build' first)"
+    fi
+    echo
+}
+
+# ==============================================================================
+# Build using Maven wrapper
+# ==============================================================================
+function doBuild() {
+    echo "Building all modules..."
+    "${scriptDir}"/mvnw clean package -DskipTests
+}
+
+# ==============================================================================
+# Prepare Docker containers
+# ==============================================================================
+function doPrepare() {
+    if ! jarsExist; then
+        echo "No runnable JARs found. Building Quarkus module first..."
+        doBuild quarkus || return 1
+    fi
+
+    echo "Creating volume directories..."
+    mkdir -p "${composeDir}/volumes/logs" "${composeDir}/volumes/data" 2>/dev/null
+    chmod 777 "${composeDir}/volumes/logs" "${composeDir}/volumes/data" 2>/dev/null || true
+
+    echo "Building Docker images..."
+    docker compose -f "${composeFile}" build
+
+    echo "Docker containers are prepared. Run 'start' to launch."
+}
+
+# ==============================================================================
+# Start Docker containers
+# ==============================================================================
+function doStart() {
+    if isRunning; then
+        echo "EDS containers are already running."
+        return 0
+    fi
+
+    if ! jarsExist; then
+        echo "No runnable JARs found. Run 'build' first."
+        return 1
+    fi
+
+    echo "Starting EDS containers..."
+    mkdir -p "${composeDir}/volumes/logs" "${composeDir}/volumes/data" 2>/dev/null
+    chmod 777 "${composeDir}/volumes/logs" "${composeDir}/volumes/data" 2>/dev/null || true
+    docker compose -f "${composeFile}" up -d
+
+    waitForReady
+}
+
+# ==============================================================================
+# Stop Docker containers
+# ==============================================================================
+function doStop() {
+    if isRunning; then
+        echo "Stopping EDS containers..."
+        docker compose -f "${composeFile}" stop
+    else
+        echo "EDS containers are not running."
+    fi
+}
+
+# ==============================================================================
+# Restart Docker containers
+# ==============================================================================
+function doRestart() {
+    echo "Restarting EDS containers..."
+    docker compose -f "${composeFile}" restart
+    waitForReady
+}
+
+# ==============================================================================
+# Show container status
+# ==============================================================================
+function doStatus() {
+    echo "EDS Container Status:"
+    echo "====================="
+    docker compose -f "${composeFile}" ps
+}
+
+# ==============================================================================
+# Check health endpoints
+# ==============================================================================
+function doHealth() {
+    echo "EDS Health Check:"
+    echo "================="
+
+    if ! isRunning; then
+        echo "Docker containers are not running."
+        return 1
+    fi
+
+    # Check Quarkus health (default in docker-compose)
+    echo -n "Quarkus health: "
+    local quarkus_health
+    quarkus_health=$(curl -s "http://localhost:${PORT}/eds/q/health/ready" 2>/dev/null)
+    if [[ -n "${quarkus_health}" ]]; then
+        echo "${quarkus_health}" | grep -qE '"status":\s*"UP"' && echo "UP" || echo "DOWN"
+    else
+        echo "Not available"
+    fi
+
+    # Also try the version endpoint
+    echo -n "EDS API: "
+    local version_response
+    version_response=$(curl -s -X POST -H "Content-Type: application/json" \
+        "http://localhost:${PORT}/eds/version" -d '{}' 2>/dev/null)
+    if [[ -n "${version_response}" ]]; then
+        local version
+        version=$(echo "${version_response}" | grep -o '"version":"[^"]*"' | cut -d'"' -f4)
+        echo "OK (version: ${version})"
+    else
+        echo "Not responding"
+    fi
+}
+
+# ==============================================================================
+# Show container logs
+# ==============================================================================
+function doLogs() {
+    echo "Following EDS logs (Ctrl+C to exit)..."
+    docker compose -f "${composeFile}" logs -f
+}
+
+# ==============================================================================
+# Cleanup containers, images, and volumes
+# ==============================================================================
+function doCleanup() {
+    echo "Cleaning up EDS Docker resources..."
+    docker compose -f "${composeFile}" down -v --rmi local
+
+    echo "Removing volume data..."
+    rm -rf "${composeDir}/volumes/data"/*
+    rm -rf "${composeDir}/volumes/logs"/*
+
+    echo "Cleanup complete."
+}
+
+# ==============================================================================
+# Wait for application to be ready
+# ==============================================================================
+function waitForReady() {
+    echo -n "Waiting for EDS to start "
+    local retries=0
+    local max_retries=60
+
+    while [[ ${retries} -lt ${max_retries} ]]; do
+        local response
+        response=$(curl -s -X POST -H "Content-Type: application/json" \
+            "http://localhost:${PORT}/eds/version" -d '{}' 2>/dev/null)
+        if [[ -n "${response}" ]]; then
+            echo
+            local version
+            version=$(echo "${response}" | grep -o '"version":"[^"]*"' | cut -d'"' -f4)
+            echo "EDS is ready! Version: ${version}"
+            echo "Access at: http://localhost:${PORT}/eds"
+            return 0
+        fi
+        echo -n "."
+        sleep 1
+        retries=$((retries + 1))
+    done
+
+    echo
+    echo "Error: EDS did not start within ${max_retries} seconds"
+    echo "Check logs with: $(basename "${0}") logs"
+    return 1
+}
+
+# ==============================================================================
+# Prepare the proxy settings
+# ==============================================================================
+function prepareProxySettings() {
+    JAVA_TOOL_OPTIONS=""
+
+    if [[ -n "${PROXY_HOST}" ]]; then
+        JAVA_TOOL_OPTIONS="${JAVA_TOOL_OPTIONS} -Dhttp.proxyHost=${PROXY_HOST}"
+        JAVA_TOOL_OPTIONS="${JAVA_TOOL_OPTIONS} -Dhttps.proxyHost=${PROXY_HOST}"
+    fi
+
+    if [[ -n "${PROXY_PORT}" ]]; then
+        JAVA_TOOL_OPTIONS="${JAVA_TOOL_OPTIONS} -Dhttp.proxyPort=${PROXY_PORT}"
+        JAVA_TOOL_OPTIONS="${JAVA_TOOL_OPTIONS} -Dhttps.proxyPort=${PROXY_PORT}"
+    fi
+
+    if [[ -n "${NO_PROXY}" ]]; then
+        JAVA_TOOL_OPTIONS="${JAVA_TOOL_OPTIONS} -Dhttp.nonProxyHosts=${NO_PROXY}"
+    fi
+
+    export JAVA_TOOL_OPTIONS="${JAVA_TOOL_OPTIONS}"
+}
+
+# ==============================================================================
+# Run standalone JAR
+# ==============================================================================
+function doRun() {
+    local module="${1}"
+
+    if [[ -z "${module}" ]]; then
+        echo "Usage: $(basename "${0}") run <module>"
+        echo "Available modules: quarkus, spring, wildfly"
+        return 1
+    fi
+
+    local jar_file=""
+    local module_name=""
+
+    case "${module}" in
+        quarkus)
+            jar_file="${scriptDir}/eds-quarkus/target/eds-runnable.jar"
+            module_name="Quarkus"
+            ;;
+        spring)
+            jar_file="${scriptDir}/eds-spring/target/eds-runnable.jar"
+            module_name="Spring"
+            ;;
+        wildfly)
+            jar_file="${scriptDir}/eds-wildfly/target/eds-runnable.jar"
+            module_name="WildFly"
+            ;;
+        *)
+            echo "Unknown module: ${module}"
+            echo "Available modules: quarkus, spring, wildfly"
+            return 1
+            ;;
+    esac
+
+    if [[ ! -f "${jar_file}" ]]; then
+        echo "Error: ${jar_file} not found."
+        echo "Run '$(basename "${0}") build ${module}' first."
+        return 1
+    fi
+
+    # Stop Docker app container to free port 8080
+    doStop
+    prepareProxySettings
+
+    echo "Starting EDS ${module_name}..."
+    echo "JAR: ${jar_file}"
+    echo "Access at: http://localhost:${PORT}/eds"
+    echo "Press Ctrl+C to stop"
+    echo
+
+    # Run the JAR (use exec to replace shell process for clean Ctrl+C handling)
+    java -jar "${jar_file}"
+}
+
+# ==============================================================================
+# Main
+# ==============================================================================
+action="${1}"
+shift
+
+case "${action}" in
+    build)
+        doBuild "$@"
+        ;;
+    run)
+        doRun "$@"
+        ;;
+    prepare)
+        doPrepare
+        ;;
+    start)
+        doStart
+        ;;
+    stop)
+        doStop
+        ;;
+    restart)
+        doRestart
+        ;;
+    status)
+        doStatus
+        ;;
+    health)
+        doHealth
+        ;;
+    logs)
+        doLogs
+        ;;
+    cleanup|remove)
+        doCleanup
+        ;;
+    help|--help|-h)
+        showHelp
+        ;;
+    *)
+        showHelp
+        ;;
+esac

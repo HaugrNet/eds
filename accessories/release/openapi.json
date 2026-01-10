@@ -1,0 +1,1434 @@
+{
+  "openapi" : "3.1.0",
+  "tags" : [ {
+    "name" : "Authentication",
+    "description" : "Operations for verifying authentication status."
+  }, {
+    "name" : "Circles",
+    "description" : "Operations for managing circles (create, update, delete, fetch)."
+  }, {
+    "name" : "Data",
+    "description" : "Operations for managing data objects within circles."
+  }, {
+    "name" : "Data Types",
+    "description" : "Operations for managing data types used by data objects."
+  }, {
+    "name" : "Inventory",
+    "description" : "Operations for retrieving system inventory information."
+  }, {
+    "name" : "Master Key",
+    "description" : "Operations for managing the system master key."
+  }, {
+    "name" : "Members",
+    "description" : "Operations for managing member accounts (create, invite, login, logout, update, delete)."
+  }, {
+    "name" : "Sanity",
+    "description" : "Operations for performing sanity checks on data integrity."
+  }, {
+    "name" : "Settings",
+    "description" : "Operations for managing system settings."
+  }, {
+    "name" : "Signatures",
+    "description" : "Operations for signing documents and verifying signatures."
+  }, {
+    "name" : "Trustees",
+    "description" : "Operations for managing trustees (members with access to circles)."
+  }, {
+    "name" : "Version",
+    "description" : "Service for retrieving the server/version information."
+  } ],
+  "components" : {
+    "schemas" : {
+      "Action" : {
+        "type" : "string",
+        "enum" : [ "PROCESS", "CREATE", "UPDATE", "INVITE", "LOGIN", "LOGOUT", "DELETE", "ADD", "COPY", "MOVE", "ALTER", "INVALIDATE", "REMOVE" ]
+      },
+      "Authentication" : {
+        "type" : "object",
+        "properties" : {
+          "accountName" : {
+            "type" : "string"
+          },
+          "credential" : {
+            "type" : "string",
+            "format" : "binary"
+          },
+          "credentialType" : {
+            "$ref" : "#/components/schemas/CredentialType"
+          }
+        }
+      },
+      "CredentialType" : {
+        "type" : "string",
+        "enum" : [ "PASSPHRASE", "SESSION", "SIGNATURE" ]
+      },
+      "FetchCircleRequest" : {
+        "type" : "object",
+        "properties" : {
+          "accountName" : {
+            "type" : "string"
+          },
+          "credential" : {
+            "type" : "string",
+            "format" : "binary"
+          },
+          "credentialType" : {
+            "$ref" : "#/components/schemas/CredentialType"
+          }
+        }
+      },
+      "FetchDataRequest" : {
+        "type" : "object",
+        "properties" : {
+          "accountName" : {
+            "type" : "string"
+          },
+          "credential" : {
+            "type" : "string",
+            "format" : "binary"
+          },
+          "credentialType" : {
+            "$ref" : "#/components/schemas/CredentialType"
+          },
+          "circleId" : {
+            "type" : "string"
+          },
+          "dataId" : {
+            "type" : "string"
+          },
+          "pageNumber" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "pageSize" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "dataName" : {
+            "type" : "string"
+          }
+        }
+      },
+      "FetchDataTypeRequest" : {
+        "type" : "object",
+        "properties" : {
+          "accountName" : {
+            "type" : "string"
+          },
+          "credential" : {
+            "type" : "string",
+            "format" : "binary"
+          },
+          "credentialType" : {
+            "$ref" : "#/components/schemas/CredentialType"
+          }
+        }
+      },
+      "FetchMemberRequest" : {
+        "type" : "object",
+        "properties" : {
+          "accountName" : {
+            "type" : "string"
+          },
+          "credential" : {
+            "type" : "string",
+            "format" : "binary"
+          },
+          "credentialType" : {
+            "$ref" : "#/components/schemas/CredentialType"
+          },
+          "memberId" : {
+            "type" : "string"
+          }
+        }
+      },
+      "FetchSignatureRequest" : {
+        "type" : "object",
+        "properties" : {
+          "accountName" : {
+            "type" : "string"
+          },
+          "credential" : {
+            "type" : "string",
+            "format" : "binary"
+          },
+          "credentialType" : {
+            "$ref" : "#/components/schemas/CredentialType"
+          }
+        }
+      },
+      "FetchTrusteeRequest" : {
+        "type" : "object",
+        "properties" : {
+          "accountName" : {
+            "type" : "string"
+          },
+          "credential" : {
+            "type" : "string",
+            "format" : "binary"
+          },
+          "credentialType" : {
+            "$ref" : "#/components/schemas/CredentialType"
+          },
+          "memberId" : {
+            "type" : "string"
+          },
+          "circleId" : {
+            "type" : "string"
+          }
+        }
+      },
+      "InventoryRequest" : {
+        "type" : "object",
+        "properties" : {
+          "accountName" : {
+            "type" : "string"
+          },
+          "credential" : {
+            "type" : "string",
+            "format" : "binary"
+          },
+          "credentialType" : {
+            "$ref" : "#/components/schemas/CredentialType"
+          },
+          "pageNumber" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "pageSize" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        }
+      },
+      "MasterKeyRequest" : {
+        "type" : "object",
+        "properties" : {
+          "accountName" : {
+            "type" : "string"
+          },
+          "credential" : {
+            "type" : "string",
+            "format" : "binary"
+          },
+          "credentialType" : {
+            "$ref" : "#/components/schemas/CredentialType"
+          },
+          "secret" : {
+            "type" : "string",
+            "format" : "binary"
+          },
+          "url" : {
+            "type" : "string"
+          }
+        }
+      },
+      "MemberRole" : {
+        "type" : "string",
+        "enum" : [ "ADMIN", "STANDARD" ]
+      },
+      "ProcessCircleRequest" : {
+        "type" : "object",
+        "properties" : {
+          "accountName" : {
+            "type" : "string"
+          },
+          "credential" : {
+            "type" : "string",
+            "format" : "binary"
+          },
+          "credentialType" : {
+            "$ref" : "#/components/schemas/CredentialType"
+          },
+          "action" : {
+            "$ref" : "#/components/schemas/Action"
+          },
+          "circleId" : {
+            "type" : "string"
+          },
+          "circleName" : {
+            "type" : "string"
+          },
+          "memberId" : {
+            "type" : "string"
+          },
+          "circleKey" : {
+            "type" : "string"
+          }
+        }
+      },
+      "ProcessDataRequest" : {
+        "type" : "object",
+        "properties" : {
+          "accountName" : {
+            "type" : "string"
+          },
+          "credential" : {
+            "type" : "string",
+            "format" : "binary"
+          },
+          "credentialType" : {
+            "$ref" : "#/components/schemas/CredentialType"
+          },
+          "action" : {
+            "$ref" : "#/components/schemas/Action"
+          },
+          "dataId" : {
+            "type" : "string"
+          },
+          "circleId" : {
+            "type" : "string"
+          },
+          "targetCircleId" : {
+            "type" : "string"
+          },
+          "dataName" : {
+            "type" : "string"
+          },
+          "folderId" : {
+            "type" : "string"
+          },
+          "targetFolderId" : {
+            "type" : "string"
+          },
+          "typeName" : {
+            "type" : "string"
+          },
+          "data" : {
+            "type" : "string",
+            "format" : "binary"
+          }
+        }
+      },
+      "ProcessDataTypeRequest" : {
+        "type" : "object",
+        "properties" : {
+          "accountName" : {
+            "type" : "string"
+          },
+          "credential" : {
+            "type" : "string",
+            "format" : "binary"
+          },
+          "credentialType" : {
+            "$ref" : "#/components/schemas/CredentialType"
+          },
+          "action" : {
+            "$ref" : "#/components/schemas/Action"
+          },
+          "typeName" : {
+            "type" : "string"
+          },
+          "type" : {
+            "type" : "string"
+          }
+        }
+      },
+      "ProcessMemberRequest" : {
+        "type" : "object",
+        "properties" : {
+          "accountName" : {
+            "type" : "string"
+          },
+          "credential" : {
+            "type" : "string",
+            "format" : "binary"
+          },
+          "credentialType" : {
+            "$ref" : "#/components/schemas/CredentialType"
+          },
+          "action" : {
+            "$ref" : "#/components/schemas/Action"
+          },
+          "memberId" : {
+            "type" : "string"
+          },
+          "memberRole" : {
+            "$ref" : "#/components/schemas/MemberRole"
+          },
+          "publicKey" : {
+            "type" : "string"
+          },
+          "newAccountName" : {
+            "type" : "string"
+          },
+          "newCredential" : {
+            "type" : "string",
+            "format" : "binary"
+          }
+        }
+      },
+      "ProcessTrusteeRequest" : {
+        "type" : "object",
+        "properties" : {
+          "accountName" : {
+            "type" : "string"
+          },
+          "credential" : {
+            "type" : "string",
+            "format" : "binary"
+          },
+          "credentialType" : {
+            "$ref" : "#/components/schemas/CredentialType"
+          },
+          "action" : {
+            "$ref" : "#/components/schemas/Action"
+          },
+          "trustLevel" : {
+            "$ref" : "#/components/schemas/TrustLevel"
+          },
+          "circleId" : {
+            "type" : "string"
+          },
+          "memberId" : {
+            "type" : "string"
+          }
+        }
+      },
+      "SanityRequest" : {
+        "type" : "object",
+        "properties" : {
+          "accountName" : {
+            "type" : "string"
+          },
+          "credential" : {
+            "type" : "string",
+            "format" : "binary"
+          },
+          "credentialType" : {
+            "$ref" : "#/components/schemas/CredentialType"
+          },
+          "circleId" : {
+            "type" : "string"
+          },
+          "since" : {
+            "type" : "string",
+            "format" : "date-time",
+            "examples" : [ "2022-03-10T12:15:50" ]
+          }
+        }
+      },
+      "SettingRequest" : {
+        "type" : "object",
+        "properties" : {
+          "accountName" : {
+            "type" : "string"
+          },
+          "credential" : {
+            "type" : "string",
+            "format" : "binary"
+          },
+          "credentialType" : {
+            "$ref" : "#/components/schemas/CredentialType"
+          },
+          "settings" : {
+            "type" : "object",
+            "additionalProperties" : {
+              "type" : "string"
+            }
+          }
+        }
+      },
+      "SignRequest" : {
+        "type" : "object",
+        "properties" : {
+          "accountName" : {
+            "type" : "string"
+          },
+          "credential" : {
+            "type" : "string",
+            "format" : "binary"
+          },
+          "credentialType" : {
+            "$ref" : "#/components/schemas/CredentialType"
+          },
+          "data" : {
+            "type" : "string",
+            "format" : "binary"
+          },
+          "expires" : {
+            "type" : "string",
+            "format" : "date-time",
+            "examples" : [ "2022-03-10T12:15:50" ]
+          }
+        }
+      },
+      "TrustLevel" : {
+        "type" : "string",
+        "enum" : [ "ALL", "READ", "WRITE", "ADMIN", "SYSOP" ]
+      },
+      "VerifyRequest" : {
+        "type" : "object",
+        "properties" : {
+          "accountName" : {
+            "type" : "string"
+          },
+          "credential" : {
+            "type" : "string",
+            "format" : "binary"
+          },
+          "credentialType" : {
+            "$ref" : "#/components/schemas/CredentialType"
+          },
+          "signature" : {
+            "type" : "string"
+          },
+          "data" : {
+            "type" : "string",
+            "format" : "binary"
+          }
+        }
+      }
+    }
+  },
+  "paths" : {
+    "/authenticated" : {
+      "post" : {
+        "summary" : "Check authentication",
+        "description" : "Verifies if the provided credentials are valid and the member is authenticated.",
+        "tags" : [ "Authentication" ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/Authentication"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "Successful operation",
+            "content" : {
+              "application/json" : {
+                "schema" : { }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/circles/createCircle" : {
+      "post" : {
+        "summary" : "Create circle",
+        "description" : "Creates a new circle. The action is set to CREATE internally.",
+        "tags" : [ "Circles" ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/ProcessCircleRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "Successful operation",
+            "content" : {
+              "application/json" : {
+                "schema" : { }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/circles/deleteCircle" : {
+      "post" : {
+        "summary" : "Delete circle",
+        "description" : "Deletes an existing circle. The action is set to DELETE internally.",
+        "tags" : [ "Circles" ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/ProcessCircleRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "Successful operation",
+            "content" : {
+              "application/json" : {
+                "schema" : { }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/circles/fetchCircles" : {
+      "post" : {
+        "summary" : "Fetch circles",
+        "description" : "Fetches circles, optionally filtered and paginated.",
+        "tags" : [ "Circles" ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/FetchCircleRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "Successful operation",
+            "content" : {
+              "application/json" : {
+                "schema" : { }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/circles/updateCircle" : {
+      "post" : {
+        "summary" : "Update circle",
+        "description" : "Updates an existing circle. The action is set to UPDATE internally.",
+        "tags" : [ "Circles" ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/ProcessCircleRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "Successful operation",
+            "content" : {
+              "application/json" : {
+                "schema" : { }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/data/addData" : {
+      "post" : {
+        "summary" : "Add data",
+        "description" : "Adds a new data object to a circle or folder. The action is set to ADD internally.",
+        "tags" : [ "Data" ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/ProcessDataRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "Successful operation",
+            "content" : {
+              "application/json" : {
+                "schema" : { }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/data/copyData" : {
+      "post" : {
+        "summary" : "Copy data",
+        "description" : "Copies an existing data object to a target circle or folder. The action is set to COPY internally.",
+        "tags" : [ "Data" ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/ProcessDataRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "Successful operation",
+            "content" : {
+              "application/json" : {
+                "schema" : { }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/data/deleteData" : {
+      "post" : {
+        "summary" : "Delete data",
+        "description" : "Deletes an existing data object. The action is set to DELETE internally.",
+        "tags" : [ "Data" ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/ProcessDataRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "Successful operation",
+            "content" : {
+              "application/json" : {
+                "schema" : { }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/data/fetchData" : {
+      "post" : {
+        "summary" : "Fetch data",
+        "description" : "Fetches data objects by circle, data id, or name with paging support.",
+        "tags" : [ "Data" ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/FetchDataRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "Successful operation",
+            "content" : {
+              "application/json" : {
+                "schema" : { }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/data/moveData" : {
+      "post" : {
+        "summary" : "Move data",
+        "description" : "Moves an existing data object to a target circle or folder. The action is set to MOVE internally.",
+        "tags" : [ "Data" ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/ProcessDataRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "Successful operation",
+            "content" : {
+              "application/json" : {
+                "schema" : { }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/data/updateData" : {
+      "post" : {
+        "summary" : "Update data",
+        "description" : "Updates an existing data object, including optional rename and/or moving within the structure. The action is set to UPDATE internally.",
+        "tags" : [ "Data" ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/ProcessDataRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "Successful operation",
+            "content" : {
+              "application/json" : {
+                "schema" : { }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/dataTypes/deleteDataType" : {
+      "post" : {
+        "summary" : "Delete data type",
+        "description" : "Deletes an existing data type. The action is set to DELETE internally.",
+        "tags" : [ "Data Types" ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/ProcessDataTypeRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "Successful operation",
+            "content" : {
+              "application/json" : {
+                "schema" : { }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/dataTypes/fetchDataTypes" : {
+      "post" : {
+        "summary" : "Fetch data types",
+        "description" : "Fetches available data types.",
+        "tags" : [ "Data Types" ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/FetchDataTypeRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "Successful operation",
+            "content" : {
+              "application/json" : {
+                "schema" : { }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/dataTypes/processDataType" : {
+      "post" : {
+        "summary" : "Process data type",
+        "description" : "Creates or updates a data type. The action is set to PROCESS internally.",
+        "tags" : [ "Data Types" ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/ProcessDataTypeRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "Successful operation",
+            "content" : {
+              "application/json" : {
+                "schema" : { }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/inventory" : {
+      "post" : {
+        "summary" : "Get inventory",
+        "description" : "Retrieves a complete inventory of all circles and data objects accessible to the authenticated member.",
+        "tags" : [ "Inventory" ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/InventoryRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "Successful operation",
+            "content" : {
+              "application/json" : {
+                "schema" : { }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/masterKey" : {
+      "post" : {
+        "summary" : "Manage master key",
+        "description" : "Updates the system master key. Requires System Administrator privileges. The master key is used for encrypting sensitive system data.",
+        "tags" : [ "Master Key" ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/MasterKeyRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "Successful operation",
+            "content" : {
+              "application/json" : {
+                "schema" : { }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/members/alterMember" : {
+      "post" : {
+        "summary" : "Alter member",
+        "description" : "Alters a member's role. Requires System Administrator privileges and a valid member ID and role.",
+        "tags" : [ "Members" ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/ProcessMemberRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "Successful operation",
+            "content" : {
+              "application/json" : {
+                "schema" : { }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/members/createMember" : {
+      "post" : {
+        "summary" : "Create member",
+        "description" : "Creates a new member account. Requires System Administrator privileges. The account name must be unique (1-75 characters) and credentials must be provided.",
+        "tags" : [ "Members" ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/ProcessMemberRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "Successful operation",
+            "content" : {
+              "application/json" : {
+                "schema" : { }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/members/deleteMember" : {
+      "post" : {
+        "summary" : "Delete member",
+        "description" : "Deletes a member account. System Administrator can delete other members by ID; regular members can delete their own account. This action is irreversible.",
+        "tags" : [ "Members" ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/ProcessMemberRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "Successful operation",
+            "content" : {
+              "application/json" : {
+                "schema" : { }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/members/fetchMembers" : {
+      "post" : {
+        "summary" : "Fetch members",
+        "description" : "Fetches member accounts with optional filtering and pagination support.",
+        "tags" : [ "Members" ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/FetchMemberRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "Successful operation",
+            "content" : {
+              "application/json" : {
+                "schema" : { }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/members/invalidate" : {
+      "post" : {
+        "summary" : "Invalidate member",
+        "description" : "Invalidates the member's asymmetric key used for Circle access. The account appears functional but data access will fail until Circle Administrators restore access.",
+        "tags" : [ "Members" ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/ProcessMemberRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "Successful operation",
+            "content" : {
+              "application/json" : {
+                "schema" : { }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/members/inviteMember" : {
+      "post" : {
+        "summary" : "Invite member",
+        "description" : "Invites a new member by generating an invitation signature. Requires System Administrator privileges. The invited member can later set their own credentials.",
+        "tags" : [ "Members" ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/ProcessMemberRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "Successful operation",
+            "content" : {
+              "application/json" : {
+                "schema" : { }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/members/login" : {
+      "post" : {
+        "summary" : "Login member",
+        "description" : "Authenticates a member and creates a new session. Returns a session token for subsequent authenticated requests.",
+        "tags" : [ "Members" ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/ProcessMemberRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "Successful operation",
+            "content" : {
+              "application/json" : {
+                "schema" : { }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/members/logout" : {
+      "post" : {
+        "summary" : "Logout member",
+        "description" : "Terminates the current session for the authenticated member.",
+        "tags" : [ "Members" ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/ProcessMemberRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "Successful operation",
+            "content" : {
+              "application/json" : {
+                "schema" : { }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/members/updateMember" : {
+      "post" : {
+        "summary" : "Update member",
+        "description" : "Updates the authenticated member's account name and/or credentials. The System Administrator cannot change their own account name.",
+        "tags" : [ "Members" ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/ProcessMemberRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "Successful operation",
+            "content" : {
+              "application/json" : {
+                "schema" : { }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sanitized" : {
+      "post" : {
+        "summary" : "Run sanity check",
+        "description" : "Performs a sanity check on data integrity and returns any records that have been marked as corrupted or failed verification.",
+        "tags" : [ "Sanity" ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/SanityRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "Successful operation",
+            "content" : {
+              "application/json" : {
+                "schema" : { }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/settings" : {
+      "post" : {
+        "summary" : "Manage settings",
+        "description" : "Retrieves or updates system settings. Requires System Administrator privileges for updates.",
+        "tags" : [ "Settings" ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/SettingRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "Successful operation",
+            "content" : {
+              "application/json" : {
+                "schema" : { }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/signatures/fetchSignatures" : {
+      "post" : {
+        "summary" : "Fetch signatures",
+        "description" : "Fetches existing signatures with optional filtering.",
+        "tags" : [ "Signatures" ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/FetchSignatureRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "Successful operation",
+            "content" : {
+              "application/json" : {
+                "schema" : { }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/signatures/signDocument" : {
+      "post" : {
+        "summary" : "Sign document",
+        "description" : "Creates a cryptographic signature for the provided document data.",
+        "tags" : [ "Signatures" ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/SignRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "Successful operation",
+            "content" : {
+              "application/json" : {
+                "schema" : { }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/signatures/verifySignature" : {
+      "post" : {
+        "summary" : "Verify signature",
+        "description" : "Verifies a cryptographic signature against the provided document data.",
+        "tags" : [ "Signatures" ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/VerifyRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "Successful operation",
+            "content" : {
+              "application/json" : {
+                "schema" : { }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/trustees/addTrustee" : {
+      "post" : {
+        "summary" : "Add trustee",
+        "description" : "Adds a member as a trustee to a circle, granting them access to the circle's data.",
+        "tags" : [ "Trustees" ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/ProcessTrusteeRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "Successful operation",
+            "content" : {
+              "application/json" : {
+                "schema" : { }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/trustees/alterTrustee" : {
+      "post" : {
+        "summary" : "Alter trustee",
+        "description" : "Alters the trust level of an existing trustee in a circle.",
+        "tags" : [ "Trustees" ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/ProcessTrusteeRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "Successful operation",
+            "content" : {
+              "application/json" : {
+                "schema" : { }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/trustees/fetchTrustees" : {
+      "post" : {
+        "summary" : "Fetch trustees",
+        "description" : "Fetches trustees for a circle with optional filtering.",
+        "tags" : [ "Trustees" ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/FetchTrusteeRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "Successful operation",
+            "content" : {
+              "application/json" : {
+                "schema" : { }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/trustees/removeTrustee" : {
+      "post" : {
+        "summary" : "Remove trustee",
+        "description" : "Removes a trustee from a circle, revoking their access to the circle's data.",
+        "tags" : [ "Trustees" ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/ProcessTrusteeRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "Successful operation",
+            "content" : {
+              "application/json" : {
+                "schema" : { }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/version" : {
+      "post" : {
+        "summary" : "Get version",
+        "description" : "Returns version information for the EDS server.",
+        "tags" : [ "Version" ],
+        "responses" : {
+          "200" : {
+            "description" : "Successful operation",
+            "content" : {
+              "application/json" : {
+                "schema" : { }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "info" : {
+    "title" : "EDS - Encrypted Data Share REST API",
+    "version" : "2.0-SNAPSHOT",
+    "description" : "REST API for the Encrypted Data Share (EDS) system. EDS provides secure cryptographic data sharing capabilities including member management, access control, data encryption, and digital signatures.",
+    "contact" : {
+      "name" : "Kim Jensen",
+      "url" : "https://haugr.net/"
+    },
+    "license" : {
+      "name" : "Apache License 2.0",
+      "url" : "https://www.apache.org/licenses/LICENSE-2.0"
+    }
+  }
+}

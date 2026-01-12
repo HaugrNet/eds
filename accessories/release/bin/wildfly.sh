@@ -38,8 +38,7 @@ readonly psqlVersion="42.7.8"
 export JAVA_OPTS="${JAVA_OPTS} -Xms1303m -Xmx1303m -Djava.net.preferIPv4Stack=true"
 readonly proxy="${http_proxy:-}"
 if [[ "${proxy}" != "" ]]; then
-    readonly tmp=${proxy//:[[:digit:]]*/}
-    readonly host=${tmp:7}
+    readonly host=${proxy//:[[:digit:]]*/}
     readonly port=${proxy//[^0-9]/}
     export JAVA_OPTS="${JAVA_OPTS} -Dhttp.proxyHost=${host} -Dhttp.proxyPort=${port} -Dhttps.proxyHost=${host} -Dhttps.proxyPort=${port}"
 fi

@@ -39,12 +39,12 @@ public class QuarkusStartupBean extends StartupBean {
      * CDI Constructor.
      *
      * @param entityManager EDS EntityManager instance
-     * @param sanitizerBean EDS Sanitizer Bean instance
-     * @param timerService  Quarkus TimerService wrapper
+     * @param sanitizer     EDS Sanitizer Bean instance
+     * @param timer         Quarkus TimerService wrapper
      */
     @Inject
-    public QuarkusStartupBean(final EntityManager entityManager, final SanitizerBean sanitizerBean, final TimerService timerService) {
-        super(entityManager, sanitizerBean, timerService);
+    public QuarkusStartupBean(final EntityManager entityManager, final SanitizerBean sanitizer, final TimerService timer) {
+        super(entityManager, sanitizer, timer);
     }
 
     void onStart(@Observes StartupEvent event) {

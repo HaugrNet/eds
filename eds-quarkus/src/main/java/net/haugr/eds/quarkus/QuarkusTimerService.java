@@ -39,7 +39,7 @@ public class QuarkusTimerService implements TimerService {
      * {@inheritDoc}
      */
     @Override
-    public Timer createCalendarTimer(ScheduleExpression schedule) {
+    public Timer createCalendarTimer(final ScheduleExpression schedule) {
         return null;
     }
 
@@ -47,7 +47,7 @@ public class QuarkusTimerService implements TimerService {
      * {@inheritDoc}
      */
     @Override
-    public Timer createCalendarTimer(ScheduleExpression schedule, TimerConfig timerConfig) {
+    public Timer createCalendarTimer(final ScheduleExpression schedule, final TimerConfig timerConfig) {
         return null;
     }
 
@@ -55,7 +55,7 @@ public class QuarkusTimerService implements TimerService {
      * {@inheritDoc}
      */
     @Override
-    public Timer createIntervalTimer(long initialDuration, long intervalDuration, TimerConfig timerConfig) {
+    public Timer createIntervalTimer(final long initialDuration, final long intervalDuration, final TimerConfig timerConfig) {
         return null;
     }
 
@@ -63,7 +63,7 @@ public class QuarkusTimerService implements TimerService {
      * {@inheritDoc}
      */
     @Override
-    public Timer createIntervalTimer(Date initialExpiration, long intervalDuration, TimerConfig timerConfig) {
+    public Timer createIntervalTimer(final Date initialExpiration, final long intervalDuration, final TimerConfig timerConfig) {
         return null;
     }
 
@@ -71,7 +71,7 @@ public class QuarkusTimerService implements TimerService {
      * {@inheritDoc}
      */
     @Override
-    public Timer createSingleActionTimer(long duration, TimerConfig timerConfig) {
+    public Timer createSingleActionTimer(final long duration, final TimerConfig timerConfig) {
         return null;
     }
 
@@ -79,7 +79,7 @@ public class QuarkusTimerService implements TimerService {
      * {@inheritDoc}
      */
     @Override
-    public Timer createSingleActionTimer(Date expiration, TimerConfig timerConfig) {
+    public Timer createSingleActionTimer(final Date expiration, final TimerConfig timerConfig) {
         return null;
     }
 
@@ -87,7 +87,7 @@ public class QuarkusTimerService implements TimerService {
      * {@inheritDoc}
      */
     @Override
-    public Timer createTimer(long duration, Serializable info) {
+    public Timer createTimer(final long duration, final Serializable info) {
         return null;
     }
 
@@ -95,7 +95,7 @@ public class QuarkusTimerService implements TimerService {
      * {@inheritDoc}
      */
     @Override
-    public Timer createTimer(long initialDuration, long intervalDuration, Serializable info) {
+    public Timer createTimer(final long initialDuration, final long intervalDuration, final Serializable info) {
         return null;
     }
 
@@ -103,7 +103,7 @@ public class QuarkusTimerService implements TimerService {
      * {@inheritDoc}
      */
     @Override
-    public Timer createTimer(Date expiration, Serializable info) {
+    public Timer createTimer(final Date expiration, final Serializable info) {
         return null;
     }
 
@@ -111,7 +111,7 @@ public class QuarkusTimerService implements TimerService {
      * {@inheritDoc}
      */
     @Override
-    public Timer createTimer(Date expiration, long intervalDuration, Serializable info) {
+    public Timer createTimer(final Date expiration, final long intervalDuration, final Serializable info) {
         return null;
     }
 

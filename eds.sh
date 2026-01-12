@@ -50,6 +50,7 @@ function showHelp() {
     echo "                     * Stops Docker first to free port 8080"
     echo "                     * Will fail if a local PostgreSQL is not running,"
     echo "                       initialized with the EDS Database scripts."
+    echo "    run fitnesse     Runs the Fitnesse test suite"
     echo
     echo "  Docker Commands:"
     echo "    start            Start (and prepare) Docker containers"
@@ -265,47 +266,60 @@ function doRun() {
         return 1
     fi
 
-    local jar_file=""
-    local module_name=""
-
-    case "${module}" in
-        quarkus)
-            jar_file="${scriptDir}/eds-quarkus/target/eds-runnable.jar"
-            module_name="Quarkus"
-            ;;
-        spring)
-            jar_file="${scriptDir}/eds-spring/target/eds-runnable.jar"
-            module_name="Spring"
-            ;;
-        wildfly)
-            jar_file="${scriptDir}/eds-wildfly/target/eds-runnable.jar"
-            module_name="WildFly"
-            ;;
-        *)
-            echo "Unknown module: ${module}"
-            echo "Available modules: quarkus, spring, wildfly"
+    if [[ "${module}" == "fitnesse" ]]; then
+        jarFile="${scriptDir}/eds-fitnesse/fitnesse-standalone.jar"
+        if [[ -e "${jarFile}" ]]; then
+            echo "Starting FitNesse, test suite is reachable at: http://localhost:2080/EDS"
+            cd "${scriptDir}/eds-fitnesse" && java -jar "${jarFile}" -p 2080
+            return 0
+        else
+            echo "Missing the FitNesse standalone JAR file"
+            echo "Please download from https://fitnesse.org and save as ${jarFile}"
             return 1
-            ;;
-    esac
+        fi
+    else
+        local jarFile=""
+        local moduleName=""
 
-    if [[ ! -f "${jar_file}" ]]; then
-        echo "Error: ${jar_file} not found."
-        echo "Run '$(basename "${0}") build ${module}' first."
-        return 1
+        case "${module}" in
+            quarkus)
+                jarFile="${scriptDir}/eds-quarkus/target/eds-runnable.jar"
+                moduleName="Quarkus"
+                ;;
+            spring)
+                jarFile="${scriptDir}/eds-spring/target/eds-runnable.jar"
+                moduleName="Spring"
+                ;;
+            wildfly)
+                jarFile="${scriptDir}/eds-wildfly/target/eds-runnable.jar"
+                moduleName="WildFly"
+                ;;
+            *)
+                echo "Unknown module: ${module}"
+                echo "Available modules: quarkus, spring, wildfly"
+                return 1
+                ;;
+        esac
+
+        if [[ ! -f "${jarFile}" ]]; then
+            echo "Error: ${jarFile} not found."
+            echo "Run '$(basename "${0}") build ${module}' first."
+            return 1
+        fi
+
+        # Stop Docker app container to free port 8080
+        doStop
+        prepareProxySettings
+
+        echo "Starting EDS ${moduleName}..."
+        echo "JAR: ${jarFile}"
+        echo "Access at: http://localhost:${PORT}/eds"
+        echo "Press Ctrl+C to stop"
+        echo
+
+        # Run the JAR (use exec to replace shell process for clean Ctrl+C handling)
+        java -jar "${jarFile}"
     fi
-
-    # Stop Docker app container to free port 8080
-    doStop
-    prepareProxySettings
-
-    echo "Starting EDS ${module_name}..."
-    echo "JAR: ${jar_file}"
-    echo "Access at: http://localhost:${PORT}/eds"
-    echo "Press Ctrl+C to stop"
-    echo
-
-    # Run the JAR (use exec to replace shell process for clean Ctrl+C handling)
-    java -jar "${jar_file}"
 }
 
 # ==============================================================================

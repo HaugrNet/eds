@@ -55,7 +55,7 @@ public class VersionService {
      */
     @org.eclipse.microprofile.openapi.annotations.Operation(
             summary = "Get version",
-            description = "Returns version information for the EDS server.")
+            description = "Returns the current version of the running EDS instance. This method serves mainly as a simple way to check if the system is operational.")
     @org.eclipse.microprofile.openapi.annotations.responses.APIResponse(responseCode = "200", description = "Successful operation")
     @POST
     @Produces(CommonService.PRODUCES)

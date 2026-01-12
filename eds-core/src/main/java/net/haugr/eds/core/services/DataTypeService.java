@@ -61,7 +61,9 @@ public class DataTypeService {
      */
     @org.eclipse.microprofile.openapi.annotations.Operation(
             summary = "Process data type",
-            description = "Creates or updates a data type. The action is set to PROCESS internally.")
+            description = "Creates or updates a Data Type. All stored data must have a data type for external clients to identify and apply rules. " +
+                    "By default, two data types exist: 'data' and 'folder'. Additional types (like MIME Types) can be added. " +
+                    "Note: The two default types cannot be updated. Only Circle Administrators or System Administrators can manage Data Types.")
     @org.eclipse.microprofile.openapi.annotations.responses.APIResponse(responseCode = "200", description = "Successful operation")
     @POST
     @Path(Constants.REST_DATATYPES_PROCESS)
@@ -80,7 +82,8 @@ public class DataTypeService {
      */
     @org.eclipse.microprofile.openapi.annotations.Operation(
             summary = "Delete data type",
-            description = "Deletes an existing data type. The action is set to DELETE internally.")
+            description = "Removes an unused Data Type from the system. If a Type is still being used by data objects, it cannot be removed. " +
+                    "The two default types ('data' and 'folder') also cannot be removed.")
     @org.eclipse.microprofile.openapi.annotations.responses.APIResponse(responseCode = "200", description = "Successful operation")
     @POST
     @Path(Constants.REST_DATATYPES_DELETE)
@@ -99,7 +102,7 @@ public class DataTypeService {
      */
     @org.eclipse.microprofile.openapi.annotations.Operation(
             summary = "Fetch data types",
-            description = "Fetches available data types.")
+            description = "Retrieves a list of all currently available Data Types. These can be used to add/update data or to identify how existing data should be processed.")
     @org.eclipse.microprofile.openapi.annotations.responses.APIResponse(responseCode = "200", description = "Successful operation")
     @POST
     @Path(Constants.REST_DATATYPES_FETCH)

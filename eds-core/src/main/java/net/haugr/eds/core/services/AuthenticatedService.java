@@ -66,7 +66,8 @@ public class AuthenticatedService {
      */
     @Operation(
             summary = "Check authentication",
-            description = "Verifies if the provided credentials are valid and the member is authenticated.")
+            description = "Simple check to see if a Member is authenticated to work with this EDS instance. " +
+                    "The response will return SUCCESS if authentication information exists, otherwise an error is returned together with a more detailed message.")
     @APIResponse(responseCode = "200", description = "Successful operation")
     @POST
     @Consumes(CommonService.CONSUMES)

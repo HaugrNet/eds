@@ -64,7 +64,8 @@ public class TrusteeService {
      */
     @Operation(
             summary = "Add trustee",
-            description = "Adds a member as a trustee to a circle, granting them access to the circle's data.")
+            description = "Adds a new Trustee to a Circle. A Trustee is a Member that has been granted access to a Circle's Key, enabling them to encrypt and decrypt Circle Data. " +
+                    "The member must not be the System Administrator. A specific Trust level (READ, WRITE, or ADMIN) must be specified.")
     @APIResponse(responseCode = "200", description = "Successful operation")
     @POST
     @Path(Constants.REST_TRUSTEES_ADD)
@@ -83,7 +84,8 @@ public class TrusteeService {
      */
     @Operation(
             summary = "Alter trustee",
-            description = "Alters the trust level of an existing trustee in a circle.")
+            description = "Alters the level of trust for a given Trustee towards the Circle. Trust levels include: READ (can only read data), WRITE (can read and write data), " +
+                    "and ADMIN (full Circle Administrator access).")
     @APIResponse(responseCode = "200", description = "Successful operation")
     @POST
     @Path(Constants.REST_TRUSTEES_ALTER)
@@ -102,7 +104,8 @@ public class TrusteeService {
      */
     @Operation(
             summary = "Remove trustee",
-            description = "Removes a trustee from a circle, revoking their access to the circle's data.")
+            description = "Removes a Trustee from the Circle. The Account will no longer be able to access any data belonging to the Circle. " +
+                    "Requires Circle Administrator privileges.")
     @APIResponse(responseCode = "200", description = "Successful operation")
     @POST
     @Path(Constants.REST_TRUSTEES_REMOVE)
@@ -121,7 +124,8 @@ public class TrusteeService {
      */
     @Operation(
             summary = "Fetch trustees",
-            description = "Fetches trustees for a circle with optional filtering.")
+            description = "Retrieves a list of Trustees belonging to either a Member or a Circle. If no MemberId or CircleId is provided, returns the requesting Member's Trustee information. " +
+                    "If both are set, returns a list with one or zero records. Non-administrators can only see Trustee information from Circles they belong to.")
     @APIResponse(responseCode = "200", description = "Successful operation")
     @POST
     @Path(Constants.REST_TRUSTEES_FETCH)

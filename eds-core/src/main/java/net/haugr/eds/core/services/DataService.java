@@ -61,7 +61,8 @@ public class DataService {
      */
     @org.eclipse.microprofile.openapi.annotations.Operation(
             summary = "Add data",
-            description = "Adds a new data object to a circle or folder. The action is set to ADD internally.")
+            description = "Adds a new record (not existing) to the system with a given name. The name must be unique in the Folder where the data is stored. " +
+                    "If no type is specified, the 'data' type is used by default. The data is encrypted for the specified Circle and stored encrypted in the database.")
     @org.eclipse.microprofile.openapi.annotations.responses.APIResponse(responseCode = "200", description = "Successful operation")
     @POST
     @Path(Constants.REST_DATA_ADD)
@@ -80,7 +81,7 @@ public class DataService {
      */
     @org.eclipse.microprofile.openapi.annotations.Operation(
             summary = "Copy data",
-            description = "Copies an existing data object to a target circle or folder. The action is set to COPY internally.")
+            description = "Copies an existing record from one Circle to a second Circle. Requires the requesting member to have write access in both Circles.")
     @org.eclipse.microprofile.openapi.annotations.responses.APIResponse(responseCode = "200", description = "Successful operation")
     @POST
     @Path(Constants.REST_DATA_COPY)
@@ -99,7 +100,7 @@ public class DataService {
      */
     @org.eclipse.microprofile.openapi.annotations.Operation(
             summary = "Move data",
-            description = "Moves an existing data object to a target circle or folder. The action is set to MOVE internally.")
+            description = "Moves an existing record from one Circle to a second Circle. Requires the requesting member to have write access in both Circles.")
     @org.eclipse.microprofile.openapi.annotations.responses.APIResponse(responseCode = "200", description = "Successful operation")
     @POST
     @Path(Constants.REST_DATA_MOVE)
@@ -118,7 +119,8 @@ public class DataService {
      */
     @org.eclipse.microprofile.openapi.annotations.Operation(
             summary = "Update data",
-            description = "Updates an existing data object, including optional rename and/or moving within the structure. The action is set to UPDATE internally.")
+            description = "Updates an existing record. Can replace the encrypted data, rename the Data Object, and move Data Objects between different Folders in the same Circle. " +
+                    "Note: Folders cannot be moved (only renamed) as this could break the data model by creating recursive structures.")
     @org.eclipse.microprofile.openapi.annotations.responses.APIResponse(responseCode = "200", description = "Successful operation")
     @POST
     @Path(Constants.REST_DATA_UPDATE)
@@ -137,7 +139,7 @@ public class DataService {
      */
     @org.eclipse.microprofile.openapi.annotations.Operation(
             summary = "Delete data",
-            description = "Deletes an existing data object. The action is set to DELETE internally.")
+            description = "Deletes an existing Data Object or an existing empty folder. Folders containing data cannot be deleted - the contents must be deleted first.")
     @org.eclipse.microprofile.openapi.annotations.responses.APIResponse(responseCode = "200", description = "Successful operation")
     @POST
     @Path(Constants.REST_DATA_DELETE)
@@ -156,7 +158,10 @@ public class DataService {
      */
     @org.eclipse.microprofile.openapi.annotations.Operation(
             summary = "Fetch data",
-            description = "Fetches data objects by circle, data id, or name with paging support.")
+            description = "Retrieves data for a specific Circle. Unless a specific Data Object is requested (by Id or Name), only Metadata is returned. " +
+                    "If a specific object is requested, the response includes both Metadata and the actual data. " +
+                    "By default returns content from the root folder; if a Folder is specified, returns that folder's content. " +
+                    "Results are sorted with most recent data first and support pagination.")
     @org.eclipse.microprofile.openapi.annotations.responses.APIResponse(responseCode = "200", description = "Successful operation")
     @POST
     @Path(Constants.REST_DATA_FETCH)

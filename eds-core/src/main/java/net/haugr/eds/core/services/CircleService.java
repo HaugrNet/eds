@@ -63,7 +63,8 @@ public class CircleService {
      */
     @Operation(
             summary = "Create circle",
-            description = "Creates a new circle. The action is set to CREATE internally.")
+            description = "Creates a new Circle. Can be performed by any member. If a member creates a Circle, they become the initial Circle Administrator. " +
+                    "If the System Administrator creates a Circle, a Member Id is required as the System Administrator cannot be part of any Circles.")
     @APIResponse(responseCode = "200", description = "Successful operation")
     @POST
     @Path(Constants.REST_CIRCLES_CREATE)
@@ -82,7 +83,7 @@ public class CircleService {
      */
     @Operation(
             summary = "Update circle",
-            description = "Updates an existing circle. The action is set to UPDATE internally.")
+            description = "Updates an existing Circle, allowing it to be renamed. Requires Circle Administrator or System Administrator privileges.")
     @APIResponse(responseCode = "200", description = "Successful operation")
     @POST
     @Path(Constants.REST_CIRCLES_UPDATE)
@@ -101,7 +102,8 @@ public class CircleService {
      */
     @Operation(
             summary = "Delete circle",
-            description = "Deletes an existing circle. The action is set to DELETE internally.")
+            description = "Deletes an existing Circle from the System. This action cannot be reverted - once deleted, the Keys and Data will also be deleted. " +
+                    "Requires Circle Administrator or System Administrator privileges.")
     @APIResponse(responseCode = "200", description = "Successful operation")
     @POST
     @Path(Constants.REST_CIRCLES_DELETE)
@@ -120,7 +122,8 @@ public class CircleService {
      */
     @Operation(
             summary = "Fetch circles",
-            description = "Fetches circles, optionally filtered and paginated.")
+            description = "Fetches a list of all Circles in the system. The visibility of Circles depends on the 'eds.show.all.circles' setting - " +
+                    "if true, members can view Circles they are not Trustees of; if false, only Circles where the Member has a Trustee relationship are returned.")
     @APIResponse(responseCode = "200", description = "Successful operation")
     @POST
     @Path(Constants.REST_CIRCLES_FETCH)

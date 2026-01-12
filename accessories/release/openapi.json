@@ -485,7 +485,7 @@
     "/authenticated" : {
       "post" : {
         "summary" : "Check authentication",
-        "description" : "Verifies if the provided credentials are valid and the member is authenticated.",
+        "description" : "Simple check to see if a Member is authenticated to work with this EDS instance. The response will return SUCCESS if authentication information exists, otherwise an error is returned together with a more detailed message.",
         "tags" : [ "Authentication" ],
         "requestBody" : {
           "content" : {
@@ -512,7 +512,7 @@
     "/circles/createCircle" : {
       "post" : {
         "summary" : "Create circle",
-        "description" : "Creates a new circle. The action is set to CREATE internally.",
+        "description" : "Creates a new Circle. Can be performed by any member. If a member creates a Circle, they become the initial Circle Administrator. If the System Administrator creates a Circle, a Member Id is required as the System Administrator cannot be part of any Circles.",
         "tags" : [ "Circles" ],
         "requestBody" : {
           "content" : {
@@ -539,7 +539,7 @@
     "/circles/deleteCircle" : {
       "post" : {
         "summary" : "Delete circle",
-        "description" : "Deletes an existing circle. The action is set to DELETE internally.",
+        "description" : "Deletes an existing Circle from the System. This action cannot be reverted - once deleted, the Keys and Data will also be deleted. Requires Circle Administrator or System Administrator privileges.",
         "tags" : [ "Circles" ],
         "requestBody" : {
           "content" : {
@@ -566,7 +566,7 @@
     "/circles/fetchCircles" : {
       "post" : {
         "summary" : "Fetch circles",
-        "description" : "Fetches circles, optionally filtered and paginated.",
+        "description" : "Fetches a list of all Circles in the system. The visibility of Circles depends on the 'eds.show.all.circles' setting - if true, members can view Circles they are not Trustees of; if false, only Circles where the Member has a Trustee relationship are returned.",
         "tags" : [ "Circles" ],
         "requestBody" : {
           "content" : {
@@ -593,7 +593,7 @@
     "/circles/updateCircle" : {
       "post" : {
         "summary" : "Update circle",
-        "description" : "Updates an existing circle. The action is set to UPDATE internally.",
+        "description" : "Updates an existing Circle, allowing it to be renamed. Requires Circle Administrator or System Administrator privileges.",
         "tags" : [ "Circles" ],
         "requestBody" : {
           "content" : {
@@ -620,7 +620,7 @@
     "/data/addData" : {
       "post" : {
         "summary" : "Add data",
-        "description" : "Adds a new data object to a circle or folder. The action is set to ADD internally.",
+        "description" : "Adds a new record (not existing) to the system with a given name. The name must be unique in the Folder where the data is stored. If no type is specified, the 'data' type is used by default. The data is encrypted for the specified Circle and stored encrypted in the database.",
         "tags" : [ "Data" ],
         "requestBody" : {
           "content" : {
@@ -647,7 +647,7 @@
     "/data/copyData" : {
       "post" : {
         "summary" : "Copy data",
-        "description" : "Copies an existing data object to a target circle or folder. The action is set to COPY internally.",
+        "description" : "Copies an existing record from one Circle to a second Circle. Requires the requesting member to have write access in both Circles.",
         "tags" : [ "Data" ],
         "requestBody" : {
           "content" : {
@@ -674,7 +674,7 @@
     "/data/deleteData" : {
       "post" : {
         "summary" : "Delete data",
-        "description" : "Deletes an existing data object. The action is set to DELETE internally.",
+        "description" : "Deletes an existing Data Object or an existing empty folder. Folders containing data cannot be deleted - the contents must be deleted first.",
         "tags" : [ "Data" ],
         "requestBody" : {
           "content" : {
@@ -701,7 +701,7 @@
     "/data/fetchData" : {
       "post" : {
         "summary" : "Fetch data",
-        "description" : "Fetches data objects by circle, data id, or name with paging support.",
+        "description" : "Retrieves data for a specific Circle. Unless a specific Data Object is requested (by Id or Name), only Metadata is returned. If a specific object is requested, the response includes both Metadata and the actual data. By default returns content from the root folder; if a Folder is specified, returns that folder's content. Results are sorted with most recent data first and support pagination.",
         "tags" : [ "Data" ],
         "requestBody" : {
           "content" : {
@@ -728,7 +728,7 @@
     "/data/moveData" : {
       "post" : {
         "summary" : "Move data",
-        "description" : "Moves an existing data object to a target circle or folder. The action is set to MOVE internally.",
+        "description" : "Moves an existing record from one Circle to a second Circle. Requires the requesting member to have write access in both Circles.",
         "tags" : [ "Data" ],
         "requestBody" : {
           "content" : {
@@ -755,7 +755,7 @@
     "/data/updateData" : {
       "post" : {
         "summary" : "Update data",
-        "description" : "Updates an existing data object, including optional rename and/or moving within the structure. The action is set to UPDATE internally.",
+        "description" : "Updates an existing record. Can replace the encrypted data, rename the Data Object, and move Data Objects between different Folders in the same Circle. Note: Folders cannot be moved (only renamed) as this could break the data model by creating recursive structures.",
         "tags" : [ "Data" ],
         "requestBody" : {
           "content" : {
@@ -782,7 +782,7 @@
     "/dataTypes/deleteDataType" : {
       "post" : {
         "summary" : "Delete data type",
-        "description" : "Deletes an existing data type. The action is set to DELETE internally.",
+        "description" : "Removes an unused Data Type from the system. If a Type is still being used by data objects, it cannot be removed. The two default types ('data' and 'folder') also cannot be removed.",
         "tags" : [ "Data Types" ],
         "requestBody" : {
           "content" : {
@@ -809,7 +809,7 @@
     "/dataTypes/fetchDataTypes" : {
       "post" : {
         "summary" : "Fetch data types",
-        "description" : "Fetches available data types.",
+        "description" : "Retrieves a list of all currently available Data Types. These can be used to add/update data or to identify how existing data should be processed.",
         "tags" : [ "Data Types" ],
         "requestBody" : {
           "content" : {
@@ -836,7 +836,7 @@
     "/dataTypes/processDataType" : {
       "post" : {
         "summary" : "Process data type",
-        "description" : "Creates or updates a data type. The action is set to PROCESS internally.",
+        "description" : "Creates or updates a Data Type. All stored data must have a data type for external clients to identify and apply rules. By default, two data types exist: 'data' and 'folder'. Additional types (like MIME Types) can be added. Note: The two default types cannot be updated. Only Circle Administrators or System Administrators can manage Data Types.",
         "tags" : [ "Data Types" ],
         "requestBody" : {
           "content" : {
@@ -863,7 +863,7 @@
     "/inventory" : {
       "post" : {
         "summary" : "Get inventory",
-        "description" : "Retrieves a complete inventory of all circles and data objects accessible to the authenticated member.",
+        "description" : "Allows Administrators to receive a complete listing of all saved records in EDS. The information retrieved is the metadata, which can be used to synchronize a different storage system if they somehow get out of sync. Supports pagination for large datasets.",
         "tags" : [ "Inventory" ],
         "requestBody" : {
           "content" : {
@@ -890,7 +890,7 @@
     "/masterKey" : {
       "post" : {
         "summary" : "Manage master key",
-        "description" : "Updates the system master key. Requires System Administrator privileges. The master key is used for encrypting sensitive system data.",
+        "description" : "The Master Key is a special symmetric key used to encrypt and decrypt all Initial Vectors and Member Salt values. The key is only kept in memory and is never persisted, meaning it must be set when the EDS instance is started. There is a default Master Key based on known values in the system, but for enhanced security, it should be set by the System Administrator. Important: The MasterKey must be set AFTER the system Salt has been updated, as the system Salt is required by the Master Key.",
         "tags" : [ "Master Key" ],
         "requestBody" : {
           "content" : {
@@ -917,7 +917,7 @@
     "/members/alterMember" : {
       "post" : {
         "summary" : "Alter member",
-        "description" : "Alters a member's role. Requires System Administrator privileges and a valid member ID and role.",
+        "description" : "Allows a System Administrator to alter Member Accounts and change their Role. This can allow someone else to become System Administrator, or simply revoke the role. Requires a valid member ID and role.",
         "tags" : [ "Members" ],
         "requestBody" : {
           "content" : {
@@ -944,7 +944,7 @@
     "/members/createMember" : {
       "post" : {
         "summary" : "Create member",
-        "description" : "Creates a new member account. Requires System Administrator privileges. The account name must be unique (1-75 characters) and credentials must be provided.",
+        "description" : "Creates a new Member account. Can be done by the System Administrator or a Circle Administrator (in preparation to adding the Member to their Circles). The account name must be unique (1-75 characters) and credentials must be provided. For a fresh installation, the first invocation sets the key on the System Administrator account based on the security credentials provided.",
         "tags" : [ "Members" ],
         "requestBody" : {
           "content" : {
@@ -971,7 +971,7 @@
     "/members/deleteMember" : {
       "post" : {
         "summary" : "Delete member",
-        "description" : "Deletes a member account. System Administrator can delete other members by ID; regular members can delete their own account. This action is irreversible.",
+        "description" : "Removes a Member from the system. Can be done by the Member themselves or by the System Administrator. A Circle Administrator cannot remove a Member from the system. Removal automatically deletes all Data belonging to the Member (Circle relations and Member details). This action is irreversible.",
         "tags" : [ "Members" ],
         "requestBody" : {
           "content" : {
@@ -998,7 +998,7 @@
     "/members/fetchMembers" : {
       "post" : {
         "summary" : "Fetch members",
-        "description" : "Fetches member accounts with optional filtering and pagination support.",
+        "description" : "Retrieves existing Member Accounts from the System. If a specific Account is requested, a list of Circles where the Account is also a Trustee is returned. Supports optional filtering and pagination.",
         "tags" : [ "Members" ],
         "requestBody" : {
           "content" : {
@@ -1025,7 +1025,7 @@
     "/members/invalidate" : {
       "post" : {
         "summary" : "Invalidate member",
-        "description" : "Invalidates the member's asymmetric key used for Circle access. The account appears functional but data access will fail until Circle Administrators restore access.",
+        "description" : "Invalidates the member's asymmetric key used for Circle access. The account will appear correct, but it will not be possible to read or write data in any Circles. The Account can be later corrected by Circle Administrators replacing all existing Trustee records.",
         "tags" : [ "Members" ],
         "requestBody" : {
           "content" : {
@@ -1052,7 +1052,7 @@
     "/members/inviteMember" : {
       "post" : {
         "summary" : "Invite member",
-        "description" : "Invites a new member by generating an invitation signature. Requires System Administrator privileges. The invited member can later set their own credentials.",
+        "description" : "Creates a signed invitation for a potential Member. The System Administrator issues a signature which is returned in the armoredKey field (instead of a Private Key). The invited member can later use this signature to create their account with their own credentials.",
         "tags" : [ "Members" ],
         "requestBody" : {
           "content" : {
@@ -1079,7 +1079,7 @@
     "/members/login" : {
       "post" : {
         "summary" : "Login member",
-        "description" : "Authenticates a member and creates a new session. Returns a session token for subsequent authenticated requests.",
+        "description" : "Links a Session with an Account. This helps websites use EDS without needing to store account credentials unsafely. Returns a session token that can be used for subsequent authenticated requests.",
         "tags" : [ "Members" ],
         "requestBody" : {
           "content" : {
@@ -1106,7 +1106,7 @@
     "/members/logout" : {
       "post" : {
         "summary" : "Logout member",
-        "description" : "Terminates the current session for the authenticated member.",
+        "description" : "Unlinks the Session from the Account, terminating the current session for the authenticated member.",
         "tags" : [ "Members" ],
         "requestBody" : {
           "content" : {
@@ -1133,7 +1133,7 @@
     "/members/updateMember" : {
       "post" : {
         "summary" : "Update member",
-        "description" : "Updates the authenticated member's account name and/or credentials. The System Administrator cannot change their own account name.",
+        "description" : "Updates the authenticated member's own Account. Allows changing the Account Name (if not taken), updating credentials (PassPhrase), and changing the Public Key belonging to the account. The System Administrator cannot change their own account name. Note: Only the current owner can update credentials, as they are used to unlock internal keys.",
         "tags" : [ "Members" ],
         "requestBody" : {
           "content" : {
@@ -1160,7 +1160,7 @@
     "/sanitized" : {
       "post" : {
         "summary" : "Run sanity check",
-        "description" : "Performs a sanity check on data integrity and returns any records that have been marked as corrupted or failed verification.",
+        "description" : "Data stored encrypted is a long array of bytes. If over time an error occurs in the data storage and bits are flipped, the data cannot be decrypted. Stored data has a checksum written when stored and checked when read out. The built-in sanity checks run over all persisted data at predefined intervals or during startup. If a record is no longer valid (checksum becomes invalid), it is marked as failed and unusable. This request can be invoked by the System Administrator to get a complete list of all failures, or by a Circle Administrator to get failures in their Circles. A timestamp can be provided to only get failures since a certain time. The response contains a Map of ObjectIds which have failed, with the timestamp of the first failed check.",
         "tags" : [ "Sanity" ],
         "requestBody" : {
           "content" : {
@@ -1187,7 +1187,7 @@
     "/settings" : {
       "post" : {
         "summary" : "Manage settings",
-        "description" : "Retrieves or updates system settings. Requires System Administrator privileges for updates.",
+        "description" : "Allows the System Administrator to read and alter the settings of this EDS system. Some fields cannot be altered once the system is started, as it may have fatal consequences for running the system. Available settings include: eds.crypto.symmetric.algorithm (AES encryption algorithm for data), eds.crypto.asymmetric.algorithm (RSA algorithm for key sharing), eds.crypto.signature.algorithm (SHA algorithm for signatures), eds.crypto.pbe.algorithm (Password Based Encryption algorithm), eds.crypto.pbe.iterations (PBKDF iteration count), eds.crypto.hash.algorithm (hashing algorithm for checksums), eds.system.salt (system-specific salt for PBE), eds.system.locale (locale for string handling), eds.system.charset (character set for encoding), eds.show.all.circles (whether non-trustees can view all circles), eds.show.trustees (whether members can view unrelated members), eds.sanity.check.startup (enable sanity checks at startup), eds.sanity.check.interval.days (sanity check interval), eds.session.timeout.minutes (session duration), eds.masterkey.url (URL for master key secret), eds.cors.value (CORS configuration).",
         "tags" : [ "Settings" ],
         "requestBody" : {
           "content" : {
@@ -1214,7 +1214,7 @@
     "/signatures/fetchSignatures" : {
       "post" : {
         "summary" : "Fetch signatures",
-        "description" : "Fetches existing signatures with optional filtering.",
+        "description" : "Retrieves a list of Signatures from the requesting Member Account. The list contains information about the number of successful verifications made with each Signature.",
         "tags" : [ "Signatures" ],
         "requestBody" : {
           "content" : {
@@ -1241,7 +1241,7 @@
     "/signatures/signDocument" : {
       "post" : {
         "summary" : "Sign document",
-        "description" : "Creates a cryptographic signature for the provided document data.",
+        "description" : "Signs a Document using the requesting Account's Private Key. The Signature is returned in the Response Object. The Signature itself is not stored, but a cryptographic fingerprint is saved to enable later verification.",
         "tags" : [ "Signatures" ],
         "requestBody" : {
           "content" : {
@@ -1268,7 +1268,7 @@
     "/signatures/verifySignature" : {
       "post" : {
         "summary" : "Verify signature",
-        "description" : "Verifies a cryptographic signature against the provided document data.",
+        "description" : "Verifies a Document with a given Signature. If the Signature is correct, the Response Object will contain a True value; otherwise False.",
         "tags" : [ "Signatures" ],
         "requestBody" : {
           "content" : {
@@ -1295,7 +1295,7 @@
     "/trustees/addTrustee" : {
       "post" : {
         "summary" : "Add trustee",
-        "description" : "Adds a member as a trustee to a circle, granting them access to the circle's data.",
+        "description" : "Adds a new Trustee to a Circle. A Trustee is a Member that has been granted access to a Circle's Key, enabling them to encrypt and decrypt Circle Data. The member must not be the System Administrator. A specific Trust level (READ, WRITE, or ADMIN) must be specified.",
         "tags" : [ "Trustees" ],
         "requestBody" : {
           "content" : {
@@ -1322,7 +1322,7 @@
     "/trustees/alterTrustee" : {
       "post" : {
         "summary" : "Alter trustee",
-        "description" : "Alters the trust level of an existing trustee in a circle.",
+        "description" : "Alters the level of trust for a given Trustee towards the Circle. Trust levels include: READ (can only read data), WRITE (can read and write data), and ADMIN (full Circle Administrator access).",
         "tags" : [ "Trustees" ],
         "requestBody" : {
           "content" : {
@@ -1349,7 +1349,7 @@
     "/trustees/fetchTrustees" : {
       "post" : {
         "summary" : "Fetch trustees",
-        "description" : "Fetches trustees for a circle with optional filtering.",
+        "description" : "Retrieves a list of Trustees belonging to either a Member or a Circle. If no MemberId or CircleId is provided, returns the requesting Member's Trustee information. If both are set, returns a list with one or zero records. Non-administrators can only see Trustee information from Circles they belong to.",
         "tags" : [ "Trustees" ],
         "requestBody" : {
           "content" : {
@@ -1376,7 +1376,7 @@
     "/trustees/removeTrustee" : {
       "post" : {
         "summary" : "Remove trustee",
-        "description" : "Removes a trustee from a circle, revoking their access to the circle's data.",
+        "description" : "Removes a Trustee from the Circle. The Account will no longer be able to access any data belonging to the Circle. Requires Circle Administrator privileges.",
         "tags" : [ "Trustees" ],
         "requestBody" : {
           "content" : {
@@ -1403,7 +1403,7 @@
     "/version" : {
       "post" : {
         "summary" : "Get version",
-        "description" : "Returns version information for the EDS server.",
+        "description" : "Returns the current version of the running EDS instance. This method serves mainly as a simple way to check if the system is operational.",
         "tags" : [ "Version" ],
         "responses" : {
           "200" : {

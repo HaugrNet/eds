@@ -64,7 +64,8 @@ public class SignatureService {
      */
     @Operation(
             summary = "Sign document",
-            description = "Creates a cryptographic signature for the provided document data.")
+            description = "Signs a Document using the requesting Account's Private Key. The Signature is returned in the Response Object. " +
+                    "The Signature itself is not stored, but a cryptographic fingerprint is saved to enable later verification.")
     @APIResponse(responseCode = "200", description = "Successful operation")
     @POST
     @Path(Constants.REST_SIGNATURES_SIGN)
@@ -82,7 +83,7 @@ public class SignatureService {
      */
     @Operation(
             summary = "Verify signature",
-            description = "Verifies a cryptographic signature against the provided document data.")
+            description = "Verifies a Document with a given Signature. If the Signature is correct, the Response Object will contain a True value; otherwise False.")
     @APIResponse(responseCode = "200", description = "Successful operation")
     @POST
     @Path(Constants.REST_SIGNATURES_VERIFY)
@@ -100,7 +101,7 @@ public class SignatureService {
      */
     @Operation(
             summary = "Fetch signatures",
-            description = "Fetches existing signatures with optional filtering.")
+            description = "Retrieves a list of Signatures from the requesting Member Account. The list contains information about the number of successful verifications made with each Signature.")
     @APIResponse(responseCode = "200", description = "Successful operation")
     @POST
     @Path(Constants.REST_SIGNATURES_FETCH)

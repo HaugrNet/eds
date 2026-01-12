@@ -62,7 +62,25 @@ public class SettingService {
      */
     @Operation(
             summary = "Manage settings",
-            description = "Retrieves or updates system settings. Requires System Administrator privileges for updates.")
+            description = "Allows the System Administrator to read and alter the settings of this EDS system. " +
+                    "Some fields cannot be altered once the system is started, as it may have fatal consequences for running the system. " +
+                    "Available settings include: " +
+                    "eds.crypto.symmetric.algorithm (AES encryption algorithm for data), " +
+                    "eds.crypto.asymmetric.algorithm (RSA algorithm for key sharing), " +
+                    "eds.crypto.signature.algorithm (SHA algorithm for signatures), " +
+                    "eds.crypto.pbe.algorithm (Password Based Encryption algorithm), " +
+                    "eds.crypto.pbe.iterations (PBKDF iteration count), " +
+                    "eds.crypto.hash.algorithm (hashing algorithm for checksums), " +
+                    "eds.system.salt (system-specific salt for PBE), " +
+                    "eds.system.locale (locale for string handling), " +
+                    "eds.system.charset (character set for encoding), " +
+                    "eds.show.all.circles (whether non-trustees can view all circles), " +
+                    "eds.show.trustees (whether members can view unrelated members), " +
+                    "eds.sanity.check.startup (enable sanity checks at startup), " +
+                    "eds.sanity.check.interval.days (sanity check interval), " +
+                    "eds.session.timeout.minutes (session duration), " +
+                    "eds.masterkey.url (URL for master key secret), " +
+                    "eds.cors.value (CORS configuration).")
     @APIResponse(responseCode = "200", description = "Successful operation")
     @POST
     @Consumes(CommonService.CONSUMES)

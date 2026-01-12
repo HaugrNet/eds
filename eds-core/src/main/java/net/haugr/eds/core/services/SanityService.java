@@ -62,7 +62,11 @@ public class SanityService {
      */
     @Operation(
             summary = "Run sanity check",
-            description = "Performs a sanity check on data integrity and returns any records that have been marked as corrupted or failed verification.")
+            description = "Data stored encrypted is a long array of bytes. If over time an error occurs in the data storage and bits are flipped, the data cannot be decrypted. " +
+                    "Stored data has a checksum written when stored and checked when read out. The built-in sanity checks run over all persisted data at predefined intervals or during startup. " +
+                    "If a record is no longer valid (checksum becomes invalid), it is marked as failed and unusable. " +
+                    "This request can be invoked by the System Administrator to get a complete list of all failures, or by a Circle Administrator to get failures in their Circles. " +
+                    "A timestamp can be provided to only get failures since a certain time. The response contains a Map of ObjectIds which have failed, with the timestamp of the first failed check.")
     @APIResponse(responseCode = "200", description = "Successful operation")
     @POST
     @Consumes(CommonService.CONSUMES)

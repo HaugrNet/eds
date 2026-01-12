@@ -62,7 +62,10 @@ public class MasterKeyService {
      */
     @Operation(
             summary = "Manage master key",
-            description = "Updates the system master key. Requires System Administrator privileges. The master key is used for encrypting sensitive system data.")
+            description = "The Master Key is a special symmetric key used to encrypt and decrypt all Initial Vectors and Member Salt values. " +
+                    "The key is only kept in memory and is never persisted, meaning it must be set when the EDS instance is started. " +
+                    "There is a default Master Key based on known values in the system, but for enhanced security, it should be set by the System Administrator. " +
+                    "Important: The MasterKey must be set AFTER the system Salt has been updated, as the system Salt is required by the Master Key.")
     @APIResponse(responseCode = "200", description = "Successful operation")
     @POST
     @Consumes(CommonService.CONSUMES)

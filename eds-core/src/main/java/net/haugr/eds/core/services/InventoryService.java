@@ -62,7 +62,9 @@ public class InventoryService {
      */
     @Operation(
             summary = "Get inventory",
-            description = "Retrieves a complete inventory of all circles and data objects accessible to the authenticated member.")
+            description = "Allows Administrators to receive a complete listing of all saved records in EDS. " +
+                    "The information retrieved is the metadata, which can be used to synchronize a different storage system if they somehow get out of sync. " +
+                    "Supports pagination for large datasets.")
     @APIResponse(responseCode = "200", description = "Successful operation")
     @POST
     @Consumes(CommonService.CONSUMES)

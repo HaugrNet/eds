@@ -64,7 +64,9 @@ public class MemberService {
      */
     @Operation(
             summary = "Create member",
-            description = "Creates a new member account. Requires System Administrator privileges. The account name must be unique (1-75 characters) and credentials must be provided.")
+            description = "Creates a new Member account. Can be done by the System Administrator or a Circle Administrator (in preparation to adding the Member to their Circles). " +
+                    "The account name must be unique (1-75 characters) and credentials must be provided. " +
+                    "For a fresh installation, the first invocation sets the key on the System Administrator account based on the security credentials provided.")
     @APIResponse(responseCode = "200", description = "Successful operation")
     @POST
     @Path(Constants.REST_MEMBERS_CREATE)
@@ -83,7 +85,8 @@ public class MemberService {
      */
     @Operation(
             summary = "Invite member",
-            description = "Invites a new member by generating an invitation signature. Requires System Administrator privileges. The invited member can later set their own credentials.")
+            description = "Creates a signed invitation for a potential Member. The System Administrator issues a signature which is returned in the armoredKey field (instead of a Private Key). " +
+                    "The invited member can later use this signature to create their account with their own credentials.")
     @APIResponse(responseCode = "200", description = "Successful operation")
     @POST
     @Path(Constants.REST_MEMBERS_INVITE)
@@ -102,7 +105,8 @@ public class MemberService {
      */
     @Operation(
             summary = "Login member",
-            description = "Authenticates a member and creates a new session. Returns a session token for subsequent authenticated requests.")
+            description = "Links a Session with an Account. This helps websites use EDS without needing to store account credentials unsafely. " +
+                    "Returns a session token that can be used for subsequent authenticated requests.")
     @APIResponse(responseCode = "200", description = "Successful operation")
     @POST
     @Path(Constants.REST_MEMBERS_LOGIN)
@@ -121,7 +125,7 @@ public class MemberService {
      */
     @Operation(
             summary = "Logout member",
-            description = "Terminates the current session for the authenticated member.")
+            description = "Unlinks the Session from the Account, terminating the current session for the authenticated member.")
     @APIResponse(responseCode = "200", description = "Successful operation")
     @POST
     @Path(Constants.REST_MEMBERS_LOGOUT)
@@ -140,7 +144,8 @@ public class MemberService {
      */
     @Operation(
             summary = "Alter member",
-            description = "Alters a member's role. Requires System Administrator privileges and a valid member ID and role.")
+            description = "Allows a System Administrator to alter Member Accounts and change their Role. " +
+                    "This can allow someone else to become System Administrator, or simply revoke the role. Requires a valid member ID and role.")
     @APIResponse(responseCode = "200", description = "Successful operation")
     @POST
     @Path(Constants.REST_MEMBERS_ALTER)
@@ -159,7 +164,9 @@ public class MemberService {
      */
     @Operation(
             summary = "Update member",
-            description = "Updates the authenticated member's account name and/or credentials. The System Administrator cannot change their own account name.")
+            description = "Updates the authenticated member's own Account. Allows changing the Account Name (if not taken), updating credentials (PassPhrase), " +
+                    "and changing the Public Key belonging to the account. The System Administrator cannot change their own account name. " +
+                    "Note: Only the current owner can update credentials, as they are used to unlock internal keys.")
     @APIResponse(responseCode = "200", description = "Successful operation")
     @POST
     @Path(Constants.REST_MEMBERS_UPDATE)
@@ -178,7 +185,8 @@ public class MemberService {
      */
     @Operation(
             summary = "Invalidate member",
-            description = "Invalidates the member's asymmetric key used for Circle access. The account appears functional but data access will fail until Circle Administrators restore access.")
+            description = "Invalidates the member's asymmetric key used for Circle access. The account will appear correct, but it will not be possible to read or write data in any Circles. " +
+                    "The Account can be later corrected by Circle Administrators replacing all existing Trustee records.")
     @APIResponse(responseCode = "200", description = "Successful operation")
     @POST
     @Path(Constants.REST_MEMBERS_INVALIDATE)
@@ -197,7 +205,9 @@ public class MemberService {
      */
     @Operation(
             summary = "Delete member",
-            description = "Deletes a member account. System Administrator can delete other members by ID; regular members can delete their own account. This action is irreversible.")
+            description = "Removes a Member from the system. Can be done by the Member themselves or by the System Administrator. " +
+                    "A Circle Administrator cannot remove a Member from the system. Removal automatically deletes all Data belonging to the Member (Circle relations and Member details). " +
+                    "This action is irreversible.")
     @APIResponse(responseCode = "200", description = "Successful operation")
     @POST
     @Path(Constants.REST_MEMBERS_DELETE)
@@ -216,7 +226,8 @@ public class MemberService {
      */
     @Operation(
             summary = "Fetch members",
-            description = "Fetches member accounts with optional filtering and pagination support.")
+            description = "Retrieves existing Member Accounts from the System. If a specific Account is requested, a list of Circles where the Account is also a Trustee is returned. " +
+                    "Supports optional filtering and pagination.")
     @APIResponse(responseCode = "200", description = "Successful operation")
     @POST
     @Path(Constants.REST_MEMBERS_FETCH)

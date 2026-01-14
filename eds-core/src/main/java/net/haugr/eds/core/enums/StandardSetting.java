@@ -42,6 +42,8 @@ public enum StandardSetting {
     SESSION_TIMEOUT("eds.session.timeout.minutes", "480"),
     MASTERKEY_URL("eds.masterkey.url", ""),
     CORS("eds.cors.value", "http://localhost"),
+    LOGIN_RETRY_LIMIT("eds.auth.retry.limit", "5"),
+    LOGIN_RETRY_WINDOW_MINUTES("eds.auth.retry.window.minutes", "15"),
     // The isReady setting is set by the StartUp bean, and thus not persisted.
     IS_READY("eds.is.ready", "true");
 

@@ -175,7 +175,7 @@ public final class SettingManager extends AbstractManager<CommonDao, SettingResp
             case EDS_CHARSET:
                 checkCharset(setting, value);
                 break;
-            case SANITY_INTERVAL:
+            case SANITY_INTERVAL, SESSION_TIMEOUT, LOGIN_RETRY_LIMIT, LOGIN_RETRY_WINDOW_MINUTES:
                 checkNumber(setting, value);
                 break;
             case EDS_SALT:

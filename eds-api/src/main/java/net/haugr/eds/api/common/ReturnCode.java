@@ -430,6 +430,13 @@ public enum ReturnCode {
     SETTING_WARNING(Classification.CLASS_WARNING, 92, "Not permitted to add, alter or delete the given Setting."),
 
     /**
+     * <b>HTTP Status Code 429 - Too Many Requests (RFC 6585)</b>.<br>
+     * <i>The user has sent too many requests in a given amount of time.
+     * Intended for use with rate-limiting schemes.</i>
+     */
+    AUTHENTICATION_BLOCKED(Classification.CLASS_WARNING, 29, "Account temporarily blocked due to too many failed authentication attempts."),
+
+    /**
      * <b>HTTP Status Code 500 - Internal Server Error</b>.<br>
      * <i>A generic error message, given when an unexpected condition was
      * encountered and no more specific message is suitable.</i>

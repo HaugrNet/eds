@@ -18,6 +18,7 @@
         <class>net.haugr.eds.core.model.entities.DataEntity</class>
         <class>net.haugr.eds.core.model.entities.SignatureEntity</class>
         <class>net.haugr.eds.core.model.entities.VersionEntity</class>
+        <class>net.haugr.eds.core.model.entities.LoginAttemptEntity</class>
 
         <properties>
             <!-- Specify that we're using H2 Database -->

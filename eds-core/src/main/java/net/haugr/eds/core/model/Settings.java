@@ -179,6 +179,14 @@ public final class Settings {
         return get(StandardSetting.CORS.getKey()).trim();
     }
 
+    public Integer getLoginRetryLimit() {
+        return Integer.valueOf(get(StandardSetting.LOGIN_RETRY_LIMIT.getKey()).trim());
+    }
+
+    public Integer getLoginRetryWindowMinutes() {
+        return Integer.valueOf(get(StandardSetting.LOGIN_RETRY_WINDOW_MINUTES.getKey()).trim());
+    }
+
     public boolean isReady() {
         return Boolean.parseBoolean(get(StandardSetting.IS_READY.getKey()).trim());
     }

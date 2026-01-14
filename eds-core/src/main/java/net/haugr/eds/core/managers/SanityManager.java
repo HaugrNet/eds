@@ -77,6 +77,7 @@ public final class SanityManager extends AbstractManager<SanityDao, SanityRespon
     public void sanitize() {
         final Crypto crypto = new Crypto(settings);
         clearExpireSessions();
+        clearOldLoginAttempts();
         List<Long> ids = findNextBatch(BLOCK);
         long count = 0;
         long flawed = 0;
@@ -154,6 +155,13 @@ public final class SanityManager extends AbstractManager<SanityDao, SanityRespon
     private void clearExpireSessions() {
         final Query query = dao.createNamedQuery("member.removeExpiredSessions");
         LOGGER.debug("expired {} sessions.", query.executeUpdate());
+    }
+
+    private void clearOldLoginAttempts() {
+        // Keep login attempts for 24 hours for audit purposes, then clean up
+        final LocalDateTime cutoff = Utilities.newDate().minusHours(24);
+        final int deleted = dao.cleanupOldLoginAttempts(cutoff);
+        LOGGER.debug("Cleaned up {} old login attempts.", deleted);
     }
 
     private List<DataEntity> findRecords(final SanityRequest request) {

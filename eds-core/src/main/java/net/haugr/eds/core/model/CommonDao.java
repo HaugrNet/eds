@@ -37,9 +37,11 @@ import net.haugr.eds.core.model.entities.EDSEntity;
 import net.haugr.eds.core.model.entities.CircleEntity;
 import net.haugr.eds.core.model.entities.DataTypeEntity;
 import net.haugr.eds.core.model.entities.Externable;
+import net.haugr.eds.core.model.entities.LoginAttemptEntity;
 import net.haugr.eds.core.model.entities.MemberEntity;
 import net.haugr.eds.core.model.entities.SettingEntity;
 import net.haugr.eds.core.model.entities.TrusteeEntity;
+import java.time.LocalDateTime;
 
 /**
  * <p>Common DAO functionality, used throughout EDS.</p>
@@ -285,6 +287,68 @@ public class CommonDao {
         final Object obj = findSingleRecord(query);
 
         return (Long) obj;
+    }
+
+    // =========================================================================
+    // Login Attempt Methods (Rate-Limiting)
+    // =========================================================================
+
+    /**
+     * Counts the number of failed login attempts for a given account
+     * since the specified time.
+     *
+     * @param accountName Account name to check
+     * @param since       Time threshold for counting attempts
+     * @return Number of failed attempts
+     */
+    public long countRecentFailedAttempts(final String accountName, final LocalDateTime since) {
+        final Query query = entityManager
+                .createNamedQuery("loginAttempt.countRecentFailures")
+                .setParameter("accountName", accountName)
+                .setParameter(SINCE, since);
+
+        return (Long) query.getSingleResult();
+    }
+
+    /**
+     * Records a login attempt for rate-limiting tracking.
+     *
+     * @param accountName Account name that attempted login
+     * @param success     Whether the attempt was successful
+     * @param ipAddress   Optional IP address of the client
+     */
+    public void recordLoginAttempt(final String accountName, final boolean success, final String ipAddress) {
+        final LoginAttemptEntity attempt = new LoginAttemptEntity();
+        attempt.setAccountName(accountName);
+        attempt.setSuccess(success);
+        attempt.setIpAddress(ipAddress);
+        save(attempt);
+    }
+
+    /**
+     * Clears all login attempt records for a given account.
+     * Called after successful authentication.
+     *
+     * @param accountName Account name to clear attempts for
+     */
+    public void clearLoginAttempts(final String accountName) {
+        entityManager
+                .createNamedQuery("loginAttempt.deleteByAccountName")
+                .setParameter("accountName", accountName)
+                .executeUpdate();
+    }
+
+    /**
+     * Removes old login attempt records for cleanup purposes.
+     *
+     * @param cutoff Records older than this time will be deleted
+     * @return Number of records deleted
+     */
+    public int cleanupOldLoginAttempts(final LocalDateTime cutoff) {
+        return entityManager
+                .createNamedQuery("loginAttempt.deleteOlderThan")
+                .setParameter("cutoff", cutoff)
+                .executeUpdate();
     }
 
     // =========================================================================

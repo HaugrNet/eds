@@ -46,6 +46,8 @@ INSERT INTO eds_settings (name, setting) VALUES
                                              ('eds.session.timeout.minutes', '480'),
                                              ('eds.masterkey.url', ''),
                                              ('eds.cors.value', 'http://localhost'),
+                                             ('eds.auth.retry.limit', '5'),
+                                             ('eds.auth.retry.window.minutes', '15'),
                                              ('eds.is.ready', 'true');
 
 -- Default Administrator User, it is set at the first request to the System and

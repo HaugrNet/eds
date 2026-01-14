@@ -464,3 +464,27 @@ CREATE TABLE eds_signatures (
   CONSTRAINT signature_notnull_altered      CHECK (altered IS NOT NULL),
   CONSTRAINT signature_notnull_added        CHECK (added IS NOT NULL)
 );
+
+-- =============================================================================
+-- Login attempts tracking table for rate-limiting (GitHub Issue #68).
+-- This table stores authentication attempts to enable rate limiting of
+-- failed login attempts, preventing brute-force attacks.
+-- =============================================================================
+CREATE TABLE eds_login_attempts (
+  id               INTEGER AUTO_INCREMENT,
+  account_name     VARCHAR(75) NOT NULL,
+  success          BOOLEAN NOT NULL DEFAULT false,
+  ip_address       VARCHAR(45),
+  altered          TIMESTAMP DEFAULT now(),
+  added            TIMESTAMP DEFAULT now(),
+
+  /* Primary & Foreign Keys */
+  CONSTRAINT login_attempt_pk              PRIMARY KEY (id),
+
+  /* Not Null Constraints */
+  CONSTRAINT login_attempt_notnull_id      CHECK (id IS NOT NULL),
+  CONSTRAINT login_attempt_notnull_account CHECK (account_name IS NOT NULL),
+  CONSTRAINT login_attempt_notnull_success CHECK (success IS NOT NULL),
+  CONSTRAINT login_attempt_notnull_altered CHECK (altered IS NOT NULL),
+  CONSTRAINT login_attempt_notnull_added   CHECK (added IS NOT NULL)
+);

@@ -16,6 +16,7 @@
  */
 package net.haugr.eds.core.managers;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -156,12 +157,18 @@ public abstract class AbstractManager<D extends CommonDao, R extends EDSResponse
             //     searched and also allow the checks to end earlier.
             //     However, equally important, this check is a premature
             //     check and will *not* count in the final Business Logic!
+            final String account = trim(authentication.getAccountName());
+
+            //     Check rate limit before attempting authentication to
+            //     prevent brute-force attacks.
+            checkRateLimit(account);
+
             verifyAccount(authentication, circleId);
 
             //     Check if the Member is valid, i.e. if the given
             //     Credentials can correctly decrypt the Private Key for
             //     the Account. If not, then an Exception is thrown.
-            checkCredentials(member, authentication.getCredential(), member.getPrivateKey());
+            checkCredentials(account, member, authentication.getCredential(), member.getPrivateKey());
         }
 
         // Step 3; Final check, ensure that the Member is having the correct
@@ -324,17 +331,58 @@ public abstract class AbstractManager<D extends CommonDao, R extends EDSResponse
         return pair;
     }
 
-    private void checkCredentials(final MemberEntity entity, final byte[] credential, final String armoredPrivateKey) {
+    /**
+     * Checks if the account is rate-limited due to too many failed
+     * authentication attempts.
+     *
+     * @param accountName The account name to check
+     * @throws EDSException if the account is temporarily blocked
+     */
+    private void checkRateLimit(final String accountName) {
+        final int maxAttempts = settings.getLoginRetryLimit();
+        final int windowMinutes = settings.getLoginRetryWindowMinutes();
+        final LocalDateTime since = Utilities.newDate().minusMinutes(windowMinutes);
+
+        final long failedAttempts = dao.countRecentFailedAttempts(accountName, since);
+
+        if (failedAttempts >= maxAttempts) {
+            throw new EDSException(ReturnCode.AUTHENTICATION_BLOCKED,
+                    "Account temporarily blocked due to too many failed authentication attempts. Please try again later.");
+        }
+    }
+
+    private void checkCredentials(final String accountName, final MemberEntity entity, final byte[] credential, final String armoredPrivateKey) {
         try {
             final String salt = crypto.decryptWithMasterKey(entity.getSalt());
             final SecretEDSKey key = crypto.generatePasswordKey(entity.getPbeAlgorithm(), credential, salt);
             keyPair = crypto.extractAsymmetricKey(entity.getRsaAlgorithm(), key, salt, entity.getPublicKey(), armoredPrivateKey);
+
+            // Successful authentication - clear any previous failed attempts
+            dao.clearLoginAttempts(accountName);
         } catch (CryptoException e) {
             // If an incorrect Passphrase was used to generate the PBE key, then
             // a Bad Padding Exception should've been thrown, which is converted
             // into an EDS Crypto Exception. If that is the case, the Member has
             // provided invalid credentials - with which it is not possible to
             // extract the KeyPair for the Account.
+
+            // Record the failed attempt for rate-limiting
+            dao.recordLoginAttempt(accountName, false, null);
+
+            throw new AuthenticationException("Cannot authenticate the Account from the given Credentials.", e);
+        }
+    }
+
+    /**
+     * Overloaded method for session-based authentication where rate-limiting
+     * is not applicable (session keys are not guessable).
+     */
+    private void checkCredentials(final MemberEntity entity, final byte[] credential, final String armoredPrivateKey) {
+        try {
+            final String salt = crypto.decryptWithMasterKey(entity.getSalt());
+            final SecretEDSKey key = crypto.generatePasswordKey(entity.getPbeAlgorithm(), credential, salt);
+            keyPair = crypto.extractAsymmetricKey(entity.getRsaAlgorithm(), key, salt, entity.getPublicKey(), armoredPrivateKey);
+        } catch (CryptoException e) {
             throw new AuthenticationException("Cannot authenticate the Account from the given Credentials.", e);
         }
     }

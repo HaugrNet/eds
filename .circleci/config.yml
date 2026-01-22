@@ -2,8 +2,8 @@ version: 2
 jobs:
   build:
     docker:
-      # Use a custom Docker image that includes Java 21
-      - image: maven:3.9-amazoncorretto-21
+      # Use a custom Docker image that includes Java 25
+      - image: maven:3.9-amazoncorretto-25
 
     working_directory: ~/repo
 

@@ -11,9 +11,9 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <artifactId>eds-quarkus</artifactId>
-    <name>EDS - Quarkus</name>
-    <description>Quarkus runtime module</description>
+    <artifactId>eds-quarkus-test</artifactId>
+    <name>EDS - Quarkus Test (H2)</name>
+    <description>Quarkus runtime module with H2 database for testing</description>
     <packaging>jar</packaging>
 
     <properties>
@@ -79,7 +79,7 @@
             <artifactId>quarkus-smallrye-health</artifactId>
         </dependency>
 
-        <!-- If using JPA in core: provide ORM and JDBC driver; user can add configuration later -->
+        <!-- JPA/Hibernate ORM -->
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-hibernate-orm</artifactId>
@@ -89,9 +89,10 @@
             <groupId>org.hibernate.orm</groupId>
             <artifactId>hibernate-core</artifactId>
         </dependency>
+        <!-- H2 Database for testing -->
         <dependency>
             <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-jdbc-postgresql</artifactId>
+            <artifactId>quarkus-jdbc-h2</artifactId>
         </dependency>
 
         <!-- Logging API compatibility -->
@@ -99,7 +100,7 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
         </dependency>
-        
+
         <!-- Test -->
         <dependency>
             <groupId>io.quarkus</groupId>
@@ -146,32 +147,6 @@
                         <ignoredEntry>META-INF/maven/org.jctools/jctools-core/pom.properties</ignoredEntry>
                     </ignoredEntries>
                 </configuration>
-            </plugin>
-            <!-- Copy test resources from eds-core to be used in eds-quarkus -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-resources-plugin</artifactId>
-                <version>3.3.1</version>
-                <executions>
-                    <execution>
-                        <id>copy-test-resources</id>
-                        <phase>generate-test-resources</phase>
-                        <goals>
-                            <goal>copy-resources</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${project.build.directory}/test-classes</outputDirectory>
-                            <resources>
-                                <resource>
-                                    <directory>${project.basedir}/../eds-core/src/test/resources</directory>
-                                    <includes>
-                                        <include>META-INF/init-h2.sql</include>
-                                    </includes>
-                                </resource>
-                            </resources>
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
     </build>

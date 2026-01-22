@@ -14,7 +14,6 @@
  * this program; If not, you can download a copy of the License
  * here: https://www.apache.org/licenses/
  */
-
 package net.haugr.eds.fitnesse;
 
 import static org.junit.jupiter.api.Assertions.*;

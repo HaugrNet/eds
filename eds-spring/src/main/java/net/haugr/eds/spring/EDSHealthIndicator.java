@@ -34,6 +34,9 @@ public class EDSHealthIndicator implements HealthIndicator {
 
     private final Settings settings;
 
+    /**
+     * Default Constructor.
+     */
     public EDSHealthIndicator() {
         this.settings = Settings.getInstance();
     }

@@ -16,7 +16,7 @@
  */
 
 -- =============================================================================
--- PostgreSQL Create Script for EDS
+-- H2 Create Script for EDS
 -- -----------------------------------------------------------------------------
 -- This script contain the following tables:
 --  * System Specific tables
@@ -255,9 +255,8 @@ CREATE TABLE eds_keys (
 --       However, Guests do not have a copy of the Circle Key available, meaning
 --       that they cannot read the data belonging to a Circle.
 --     * Read
---         With this level of access, the Member may do what the Guest can do,
---       but contrary to a Guest, they do have access to the Circle Key, and may
---       therefore also read all the Objects belonging to a Circle
+--         Same as Guest access, but with access to the Circle Key, allowing
+--       reading of Objects belonging to a Circle.
 --     * Write
 --         With this level of access, the Member may do all that Members with
 --       Read rights may do, and additionally, they may also create, update and
@@ -348,8 +347,8 @@ INSERT INTO eds_datatypes (datatype_name, datatype_value) VALUES
 -- This data is stored in the data table. It was done so, for two reasons, first
 -- as not all Objects may have data associated, and secondly, to avoid references
 -- to Null data, as it usually indicates flaws in the model.
---   Objects are stored with an external Id, which is exposed via the API, the
--- internal Id is not exposed but is kept for internal referencing.
+--   Objects are stored with an external ID, which is exposed via the API, the
+-- internal ID is not exposed but is kept for internal referencing.
 -- All Objects are also stored with a type. EDS has two default types, the most
 -- important is "Folder", which allows Members to structure their data, and the
 -- second is simply "data", if the system using EDS has enough information to
@@ -358,14 +357,14 @@ INSERT INTO eds_datatypes (datatype_name, datatype_value) VALUES
 -- possible to create subfolders and add data to any Folder belonging to the
 -- Circle in question. As it is possible to create Sub-folders, a restriction
 -- has been added on the table as any Object may reference a parent, which
--- that the parent Id cannot be larger than the current Id. This way, it is
+-- that the parent ID cannot be larger than the current ID. This way, it is
 -- possible to have a recursive structure, but not to create loops.
---   Unfortunately, having the parent Id as an Integer and not a String will
+--   Unfortunately, having the parent ID as an Integer and not a String will
 -- require additional lookup, but it is a small price to pay to have a
 -- guarantee that no loops can occur in the model.
 --   The structure is created as a recursive data structure, where the parentId
 -- is referencing a parent Folder, however - there is a check added, so it is
--- not possible to create looping structures, since the Id must always be
+-- not possible to create looping structures, since the ID must always be
 -- smaller than the current Id.
 -- =============================================================================
 CREATE TABLE eds_metadata (

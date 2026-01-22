@@ -19,12 +19,12 @@
     <properties>
         <quarkus.platform.group-id>io.quarkus.platform</quarkus.platform.group-id>
         <quarkus.platform.artifact-id>quarkus-bom</quarkus.platform.artifact-id>
-        <quarkus.platform.version>3.30.5</quarkus.platform.version>
+        <quarkus.platform.version>3.30.7</quarkus.platform.version>
     </properties>
 
     <dependencyManagement>
         <dependencies>
-            <!-- Override parent pom's Hibernate 6.x with version compatible with Quarkus 3.30.5 -->
+            <!-- Override parent pom's Hibernate 6.x with version compatible with Quarkus 3.30.7 -->
             <dependency>
                 <groupId>org.hibernate.orm</groupId>
                 <artifactId>hibernate-core</artifactId>
@@ -140,6 +140,11 @@
                 </executions>
                 <configuration>
                     <skip>false</skip>
+                    <ignoredEntries>
+                        <ignoredEntry>META-INF/quarkus-config-doc/quarkus-config-model-version</ignoredEntry>
+                        <ignoredEntry>META-INF/quarkus-config-doc/quarkus-config-model.json</ignoredEntry>
+                        <ignoredEntry>META-INF/maven/org.jctools/jctools-core/pom.properties</ignoredEntry>
+                    </ignoredEntries>
                 </configuration>
             </plugin>
             <!-- Copy test resources from eds-core to be used in eds-quarkus -->

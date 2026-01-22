@@ -39,6 +39,9 @@ public class EDSHealthCheck implements HealthCheck {
 
     private final Settings settings;
 
+    /**
+     * Default Constructor.
+     */
     public EDSHealthCheck() {
         this.settings = Settings.getInstance();
     }

@@ -24,7 +24,7 @@
 
     <dependencyManagement>
         <dependencies>
-            <!-- Override parent pom's Hibernate 6.x with version compatible with Quarkus 3.30.7 -->
+            <!-- Override parent pom's Hibernate 6.x with a version compatible with Quarkus 3.30.7 -->
             <dependency>
                 <groupId>org.hibernate.orm</groupId>
                 <artifactId>hibernate-core</artifactId>

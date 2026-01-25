@@ -41,7 +41,8 @@
         <module>eds-core</module>
         <module>eds-wildfly</module>
         <module>eds-quarkus</module>
-        <module>eds-quarkus-test</module>
+        <module>eds-quarkus-pg</module>
+        <module>eds-quarkus-h2</module>
         <module>eds-spring</module>
         <module>eds-client</module>
         <module>eds-fitnesse</module>
@@ -122,6 +123,11 @@
                 <artifactId>eds-client</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>eds-quarkus</artifactId>
+                <version>${project.version}</version>
+            </dependency>
 
             <!-- The following is required to build and run the REST Client -->
             <dependency>
@@ -177,7 +183,7 @@
             <dependency>
                 <groupId>com.h2database</groupId>
                 <artifactId>h2</artifactId>
-                <version>2.3.232</version>
+                <version>2.4.240</version>
                 <scope>test</scope>
             </dependency>
             <dependency>

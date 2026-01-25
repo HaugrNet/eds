@@ -89,11 +89,6 @@
             <groupId>org.hibernate.orm</groupId>
             <artifactId>hibernate-core</artifactId>
         </dependency>
-        <dependency>
-            <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-jdbc-postgresql</artifactId>
-        </dependency>
-
         <!-- Logging API compatibility -->
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -132,14 +127,14 @@
                 <executions>
                     <execution>
                         <goals>
-                            <goal>build</goal>
                             <goal>generate-code</goal>
                             <goal>generate-code-tests</goal>
                         </goals>
                     </execution>
                 </executions>
                 <configuration>
-                    <skip>false</skip>
+                    <!-- Skip build for base module - variant modules will build -->
+                    <skip>true</skip>
                     <ignoredEntries>
                         <ignoredEntry>META-INF/quarkus-config-doc/quarkus-config-model-version</ignoredEntry>
                         <ignoredEntry>META-INF/quarkus-config-doc/quarkus-config-model.json</ignoredEntry>

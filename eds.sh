@@ -46,10 +46,11 @@ function showHelp() {
     echo "    build            Build all modules using Maven wrapper, skipping tests"
     echo
     echo "  Run Commands:"
-    echo "    run <module>     Run standalone JAR (quarkus | spring | wildfly)"
+    echo "    run <module>     Run standalone JAR (quarkus | spring | wildfly | test)"
     echo "                     * Stops Docker first to free port 8080"
-    echo "                     * Will fail if a local PostgreSQL is not running,"
-    echo "                       initialized with the EDS Database scripts."
+    echo "                     * Quarkus, Spring & WildFly all requires a running EDS"
+    echo "                       PostgreSQL database."
+    echo "                     * Test will launch Quarkus with an in-memory database."
     echo "    run fitnesse     Runs the Fitnesse test suite"
     echo
     echo "  Docker Commands:"
@@ -262,7 +263,7 @@ function doRun() {
 
     if [[ -z "${module}" ]]; then
         echo "Usage: $(basename "${0}") run <module>"
-        echo "Available modules: quarkus, spring, wildfly"
+        echo "Available modules: quarkus, spring, wildfly, test"
         return 1
     fi
 
@@ -283,7 +284,7 @@ function doRun() {
 
         case "${module}" in
             quarkus)
-                jarFile="${scriptDir}/eds-quarkus/target/eds-runnable.jar"
+                jarFile="${scriptDir}/eds-quarkus-pg/target/eds-runnable.jar"
                 moduleName="Quarkus"
                 ;;
             spring)
@@ -294,9 +295,13 @@ function doRun() {
                 jarFile="${scriptDir}/eds-wildfly/target/eds-runnable.jar"
                 moduleName="WildFly"
                 ;;
+            test)
+                jarFile="${scriptDir}/eds-quarkus-h2/target/eds-runnable.jar"
+                moduleName="Quarkus"
+                ;;
             *)
                 echo "Unknown module: ${module}"
-                echo "Available modules: quarkus, spring, wildfly"
+                echo "Available modules: quarkus, spring, wildfly, test"
                 return 1
                 ;;
         esac

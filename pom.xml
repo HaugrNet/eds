@@ -41,7 +41,8 @@
         <module>eds-core</module>
         <module>eds-wildfly</module>
         <module>eds-quarkus</module>
-        <module>eds-quarkus-test</module>
+        <module>eds-quarkus-pg</module>
+        <module>eds-quarkus-h2</module>
         <module>eds-spring</module>
         <module>eds-client</module>
         <module>eds-fitnesse</module>
@@ -120,6 +121,11 @@
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>eds-client</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>eds-quarkus</artifactId>
                 <version>${project.version}</version>
             </dependency>
 

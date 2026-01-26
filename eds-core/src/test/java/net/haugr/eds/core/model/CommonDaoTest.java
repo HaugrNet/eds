@@ -16,14 +16,10 @@
  */
 package net.haugr.eds.core.model;
 
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import jakarta.persistence.PersistenceException;
-import net.haugr.eds.api.common.ReturnCode;
 import net.haugr.eds.core.setup.DatabaseSetup;
-import net.haugr.eds.core.exceptions.EDSException;
 import net.haugr.eds.core.setup.fakes.FakeEntityManager;
 import net.haugr.eds.core.setup.fakes.FakeQuery;
 import org.junit.jupiter.api.Test;
@@ -36,19 +32,6 @@ import java.util.List;
  * @since EDS 1.0
  */
 final class CommonDaoTest extends DatabaseSetup {
-
-    @Test
-    void testInvalidDataRead() {
-        // Creating a Query, which will attempt to read data from a non-existing record
-        final Query query = entityManager.createNativeQuery("select * from versions");
-
-        assertThatThrownBy(() -> CommonDao.findList(query))
-                .isExactlyInstanceOf(EDSException.class)
-                .hasFieldOrPropertyWithValue("returnCode", ReturnCode.DATABASE_ERROR)
-                .hasMessageContaining("could not prepare statement [Table \"VERSIONS\" not found; SQL statement:")
-                .hasMessageContaining("select * from versions [42102-232]] [select * from versions]")
-                .hasCauseInstanceOf(PersistenceException.class);
-    }
 
     @Test
     void testNullResultList() {

@@ -194,10 +194,6 @@ function doCleanup() {
     echo "Cleaning up EDS Docker resources..."
     docker compose -f "${composeFile}" down -v --rmi local
 
-    echo "Removing volume data..."
-    rm -rf "${composeDir}/volumes/data"/*
-    rm -rf "${composeDir}/volumes/logs"/*
-
     echo "Cleanup complete."
 }
 

@@ -105,9 +105,10 @@ the next test run will also work.
 |master key                                                                                              |
 |account name|credential|url                                 |secret|return code?|return message?        |
 |admin       |admin     |null                                |admin |${SUCCESS}  |!-MasterKey-! unlocked.|
-|admin       |admin     |!-https://javadog.io/img/cloud.png-!|null  |${SUCCESS}  |!-MasterKey-! updated. |
 |admin       |admin     |null                                |master|${SUCCESS}  |!-MasterKey-! updated. |
 |admin       |admin     |null                                |admin |${SUCCESS}  |!-MasterKey-! updated. |
+# The reading of a file via the internet is not working, behind a proxy
+#|admin       |admin     |!-https://javadog.io/img/cloud.png-!|null  |${SUCCESS}  |!-MasterKey-! updated. |
 
 It should be noted, that unlocking can always be done, but changing the !-MasterKey-! cannot be done once member accounts exists, since
 it is not possible for an administrator to update the member keys.

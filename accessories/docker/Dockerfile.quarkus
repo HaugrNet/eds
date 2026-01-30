@@ -20,7 +20,7 @@ RUN addgroup -S eds && adduser -S eds -G eds
 WORKDIR /app
 
 # Copy the pre-built uber-jar
-COPY eds-quarkus/target/eds-runnable.jar /app/eds-runnable.jar
+COPY eds-quarkus-pg/target/eds-runnable.jar /app/eds-runnable.jar
 
 # Create logs directory
 RUN mkdir -p /app/logs

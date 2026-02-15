@@ -24,6 +24,10 @@
             <artifactId>microprofile-openapi-api</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.eclipse.microprofile.health</groupId>
+            <artifactId>microprofile-health-api</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
         </dependency>
@@ -101,7 +105,7 @@
                         <configuration>
                             <infoTitle>EDS - Encrypted Data Share REST API</infoTitle>
                             <infoVersion>${project.version}</infoVersion>
-                            <infoDescription>REST API for the Encrypted Data Share (EDS) system. EDS provides secure cryptographic data sharing capabilities including member management, access control, data encryption, and digital signatures.</infoDescription>
+                            <infoDescription>REST API and core logic for EDS, Encrypted Data Share.</infoDescription>
                             <infoContactName>Kim Jensen</infoContactName>
                             <infoContactUrl>https://haugr.net/</infoContactUrl>
                             <infoLicenseName>Apache License 2.0</infoLicenseName>

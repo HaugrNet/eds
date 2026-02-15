@@ -1421,7 +1421,7 @@
   "info" : {
     "title" : "EDS - Encrypted Data Share REST API",
     "version" : "2.0-SNAPSHOT",
-    "description" : "REST API for the Encrypted Data Share (EDS) system. EDS provides secure cryptographic data sharing capabilities including member management, access control, data encryption, and digital signatures.",
+    "description" : "REST API and core logic for EDS, Encrypted Data Share.",
     "contact" : {
       "name" : "Kim Jensen",
       "url" : "https://haugr.net/"

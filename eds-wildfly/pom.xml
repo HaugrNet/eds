@@ -17,7 +17,7 @@
     </description>
 
     <properties>
-        <wildfly.version>39.0.0.Final</wildfly.version>
+        <wildfly.version>39.0.1.Final</wildfly.version>
         <wildfly-maven-plugin.version>5.1.5.Final</wildfly-maven-plugin.version>
         <wildfly-datasources-galleon-pack.version>4.0.0.Final</wildfly-datasources-galleon-pack.version>
     </properties>
@@ -30,12 +30,6 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>eds-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.microprofile.health</groupId>
-            <artifactId>microprofile-health-api</artifactId>
-            <version>4.0.1</version>
-            <scope>provided</scope>
         </dependency>
     </dependencies>
 

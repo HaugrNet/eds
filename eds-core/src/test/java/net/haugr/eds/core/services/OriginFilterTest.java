@@ -19,6 +19,8 @@ package net.haugr.eds.core.services;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import jakarta.servlet.ServletConnection;
+import java.nio.charset.Charset;
+import java.util.function.Supplier;
 import net.haugr.eds.core.setup.DatabaseSetup;
 import net.haugr.eds.core.enums.StandardSetting;
 import java.io.BufferedReader;
@@ -101,7 +103,7 @@ final class OriginFilterTest extends DatabaseSetup {
          * {@inheritDoc}
          */
         @Override
-        public String getInitParameter(String name) {
+        public String getInitParameter(final String name) {
             return null;
         }
 
@@ -188,7 +190,7 @@ final class OriginFilterTest extends DatabaseSetup {
          * {@inheritDoc}
          */
         @Override
-        public String getParameter(String name) {
+        public String getParameter(final String name) {
             return null;
         }
 
@@ -501,6 +503,31 @@ final class OriginFilterTest extends DatabaseSetup {
          * {@inheritDoc}
          */
         @Override
+        public void sendRedirect(final String location, final boolean clearBuffer) throws IOException {
+            HttpServletResponse.super.sendRedirect(location, clearBuffer);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void sendRedirect(final String location, final int sc) throws IOException {
+            HttpServletResponse.super.sendRedirect(location, sc);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void sendRedirect(final String s, final int i, final boolean b) throws IOException {
+            // Intentionally not implemented, not needed for the testing
+            throw new IOException("Not implemented.");
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public void setDateHeader(final String name, final long date) {
             // Intentionally not implemented, not needed for the testing
         }
@@ -517,7 +544,7 @@ final class OriginFilterTest extends DatabaseSetup {
          * {@inheritDoc}
          */
         @Override
-        public void setHeader(String name, String value) {
+        public void setHeader(final String name, final String value) {
             addHeader(name, value);
         }
 
@@ -589,6 +616,22 @@ final class OriginFilterTest extends DatabaseSetup {
          * {@inheritDoc}
          */
         @Override
+        public void setTrailerFields(final Supplier<Map<String, String>> supplier) {
+            HttpServletResponse.super.setTrailerFields(supplier);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public Supplier<Map<String, String>> getTrailerFields() {
+            return HttpServletResponse.super.getTrailerFields();
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public String getCharacterEncoding() {
             return null;
         }
@@ -623,6 +666,14 @@ final class OriginFilterTest extends DatabaseSetup {
         @Override
         public void setCharacterEncoding(final String charset) {
             // Intentionally not implemented, not needed for the testing
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void setCharacterEncoding(final Charset encoding) {
+            HttpServletResponse.super.setCharacterEncoding(encoding);
         }
 
         /**

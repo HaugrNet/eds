@@ -29,9 +29,8 @@ function exists() {
 # Check if runnable JARs exist
 # ==============================================================================
 function jarsExist() {
-    [[ -f "${scriptDir}/eds-quarkus/target/eds-runnable.jar" ]] || \
-    [[ -f "${scriptDir}/eds-spring/target/eds-runnable.jar" ]] || \
-    [[ -f "${scriptDir}/eds-wildfly/target/eds-runnable.jar" ]]
+    [[ -f "${scriptDir}/eds-quarkus-h2/target/eds-runnable.jar" ]] || \
+    [[ -f "${scriptDir}/eds-quarkus-pg/target/eds-runnable.jar" ]]
 }
 
 # ==============================================================================
@@ -46,10 +45,8 @@ function showHelp() {
     echo "    build            Build all modules using Maven wrapper, skipping tests"
     echo
     echo "  Run Commands:"
-    echo "    run <module>     Run standalone JAR (quarkus | spring | wildfly | test)"
-    echo "                     * Stops Docker first to free port 8080"
-    echo "                     * Quarkus, Spring & WildFly all requires a running EDS"
-    echo "                       PostgreSQL database."
+    echo "    run <module>     Run standalone JAR (quarkus | test)"
+    echo "                     * Quarkus requires a running EDS PostgreSQL database."
     echo "                     * Test will launch Quarkus with an in-memory database."
     echo "    run fitnesse     Runs the Fitnesse test suite"
     echo
@@ -229,29 +226,6 @@ function waitForReady() {
 }
 
 # ==============================================================================
-# Prepare the proxy settings
-# ==============================================================================
-function prepareProxySettings() {
-    JAVA_TOOL_OPTIONS=""
-
-    if [[ -n "${PROXY_HOST}" ]]; then
-        JAVA_TOOL_OPTIONS="${JAVA_TOOL_OPTIONS} -Dhttp.proxyHost=${PROXY_HOST}"
-        JAVA_TOOL_OPTIONS="${JAVA_TOOL_OPTIONS} -Dhttps.proxyHost=${PROXY_HOST}"
-    fi
-
-    if [[ -n "${PROXY_PORT}" ]]; then
-        JAVA_TOOL_OPTIONS="${JAVA_TOOL_OPTIONS} -Dhttp.proxyPort=${PROXY_PORT}"
-        JAVA_TOOL_OPTIONS="${JAVA_TOOL_OPTIONS} -Dhttps.proxyPort=${PROXY_PORT}"
-    fi
-
-    if [[ -n "${NO_PROXY}" ]]; then
-        JAVA_TOOL_OPTIONS="${JAVA_TOOL_OPTIONS} -Dhttp.nonProxyHosts=${NO_PROXY}"
-    fi
-
-    export JAVA_TOOL_OPTIONS="${JAVA_TOOL_OPTIONS}"
-}
-
-# ==============================================================================
 # Run standalone JAR
 # ==============================================================================
 function doRun() {
@@ -283,21 +257,13 @@ function doRun() {
                 jarFile="${scriptDir}/eds-quarkus-pg/target/eds-runnable.jar"
                 moduleName="Quarkus"
                 ;;
-            spring)
-                jarFile="${scriptDir}/eds-spring/target/eds-runnable.jar"
-                moduleName="Spring"
-                ;;
-            wildfly)
-                jarFile="${scriptDir}/eds-wildfly/target/eds-runnable.jar"
-                moduleName="WildFly"
-                ;;
             test)
                 jarFile="${scriptDir}/eds-quarkus-h2/target/eds-runnable.jar"
                 moduleName="Quarkus"
                 ;;
             *)
                 echo "Unknown module: ${module}"
-                echo "Available modules: quarkus, spring, wildfly, test"
+                echo "Available modules: quarkus | test"
                 return 1
                 ;;
         esac
@@ -310,7 +276,6 @@ function doRun() {
 
         # Stop Docker app container to free port 8080
         doStop
-        prepareProxySettings
 
         echo "Starting EDS ${moduleName}..."
         echo "JAR: ${jarFile}"

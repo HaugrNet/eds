@@ -14,30 +14,35 @@
  * this program; If not, you can download a copy of the License
  * here: https://www.apache.org/licenses/
  */
-package net.haugr.eds.spring;
+package net.haugr.eds.core;
 
+import jakarta.enterprise.context.ApplicationScoped;
 import net.haugr.eds.core.model.Settings;
-import org.springframework.boot.actuate.health.Health;
-import org.springframework.boot.actuate.health.HealthIndicator;
-import org.springframework.stereotype.Component;
+import org.eclipse.microprofile.health.HealthCheck;
+import org.eclipse.microprofile.health.HealthCheckResponse;
+import org.eclipse.microprofile.health.Readiness;
 
 /**
- * <p>Spring Boot Health Indicator for EDS. Reports the health status based on
- * whether the EDS system has been properly initialized (database schema
+ * <p>MicroProfile Health Check for EDS on WildFly. Reports the readiness status
+ * based on whether the EDS system has been properly initialized (database schema
  * verified, settings loaded).</p>
+ *
+ * <p>This check is used for Kubernetes readiness probes. Liveness is handled
+ * by the default WildFly liveness check.</p>
  *
  * @author Kim Jensen
  * @since EDS 2.0
  */
-@Component("edsHealthIndicator")
-public class EDSHealthIndicator implements HealthIndicator {
+@Readiness
+@ApplicationScoped
+public class EDSHealthCheck implements HealthCheck {
 
     private final Settings settings;
 
     /**
      * Default Constructor.
      */
-    public EDSHealthIndicator() {
+    public EDSHealthCheck() {
         this.settings = Settings.getInstance();
     }
 
@@ -45,14 +50,16 @@ public class EDSHealthIndicator implements HealthIndicator {
      * {@inheritDoc}
      */
     @Override
-    public Health health() {
+    public HealthCheckResponse call() {
         if (settings.isReady()) {
-            return Health.up()
-                    .withDetail("status", "EDS is ready")
+            return HealthCheckResponse.named("EDS")
+                    .up()
+                    .withData("status", "EDS is ready")
                     .build();
         } else {
-            return Health.down()
-                    .withDetail("status", "EDS is not ready - database may not be initialized")
+            return HealthCheckResponse.named("EDS")
+                    .down()
+                    .withData("status", "EDS is not ready - database may not be initialized")
                     .build();
         }
     }

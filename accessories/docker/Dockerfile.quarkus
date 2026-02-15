@@ -1,13 +1,13 @@
 # ==============================================================================
 # Dockerfile for EDS Quarkus Application
 # ------------------------------------------------------------------------------
-# Builds and runs the EDS Quarkus uber-jar
+# Runs the EDS Quarkus
 # ==============================================================================
 
-FROM eclipse-temurin:21-jre-alpine
+FROM eclipse-temurin:25-jre-alpine
 
 LABEL maintainer="EDS Project"
-LABEL description="EDS (Encrypted Data Share) Quarkus Application"
+LABEL description="EDS Quarkus Application"
 
 # Set timezone
 ENV TZ=Europe/Berlin

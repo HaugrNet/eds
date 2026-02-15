@@ -1,0 +1,28 @@
+# ==============================================================================
+# Podman file for the EDS Quarkus Application
+# ------------------------------------------------------------------------------
+# Runs the EDS Quarkus
+# ==============================================================================
+
+FROM eclipse-temurin:25-jre-alpine
+
+LABEL maintainer="EDS Project"
+LABEL description="EDS Quarkus Application"
+
+# Create app directory
+WORKDIR /app
+
+# Create a non-root user and group 'eds'
+RUN addgroup -S eds && adduser -S eds -G eds
+
+# Copy the pre-built uber-jar and set permissions
+COPY --chown=eds:eds eds-runnable.jar /app/eds-runnable.jar
+
+# Expose the application port
+EXPOSE 8080
+
+# Switch to non-root user
+USER eds
+
+# Run the application
+ENTRYPOINT ["java", "-jar", "/app/eds-runnable.jar"]

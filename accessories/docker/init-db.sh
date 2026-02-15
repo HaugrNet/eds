@@ -2,7 +2,7 @@
 # ==============================================================================
 # PostgreSQL Initialization Script for EDS
 # ------------------------------------------------------------------------------
-# This script is executed by the PostgreSQL Docker container during first start.
+# This script is executed by the PostgreSQL container during first start.
 # It creates the EDS database, user, and schema.
 # ==============================================================================
 

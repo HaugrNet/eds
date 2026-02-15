@@ -4,11 +4,12 @@
 scriptDir="$(cd "$(dirname "$(readlink -f "$0")")" && pwd)"
 readonly scriptDir
 readonly composeDir="${scriptDir}/accessories/docker"
+readonly podmanDir="${scriptDir}/accessories/podman"
 readonly composeFile="${composeDir}/docker-compose.yml"
 readonly PORT=${EDS_PORT:-8080}
 
 # ==============================================================================
-# Check if Docker Compose services are running
+# Check if Compose services are running
 # ==============================================================================
 function isRunning() {
     local status
@@ -17,7 +18,7 @@ function isRunning() {
 }
 
 # ==============================================================================
-# Check if Docker Compose services exist
+# Check if Compose services exist
 # ==============================================================================
 function exists() {
     local status
@@ -41,34 +42,29 @@ function showHelp() {
     echo
     echo "  Usage: $(basename "${0}") <command>"
     echo
-    echo "  Build Commands:"
-    echo "    build            Build all modules using Maven wrapper, skipping tests"
-    echo
     echo "  Run Commands:"
     echo "    run <module>     Run standalone JAR (quarkus | test)"
     echo "                     * Quarkus requires a running EDS PostgreSQL database."
     echo "                     * Test will launch Quarkus with an in-memory database."
     echo "    run fitnesse     Runs the Fitnesse test suite"
     echo
-    echo "  Docker Commands:"
-    echo "    start            Start (and prepare) Docker containers"
-    echo "    stop             Stop Docker containers"
-    echo "    restart          Restart Docker containers"
-    echo "    status           Show container status"
-    echo "    health           Check health endpoints"
+    echo "  Container Commands:"
+    echo "    start            Start (build/prepare) containers"
+    echo "    stop             Stop containers"
+    echo "    status           Check health endpoints"
     echo "    logs             Follow container logs"
-    echo "    remove           Remove containers, images, and volumes"
+    echo "    remove           Remove containers & images"
     echo
 
     # Show current status
     echo "Current Status:"
     if isRunning; then
-        echo "  Docker containers are RUNNING"
+        echo "  Containers are RUNNING"
         echo "  Access at: http://localhost:${PORT}/eds"
     elif exists; then
-        echo "  Docker containers exist but are STOPPED"
+        echo "  Containers exist but are STOPPED"
     else
-        echo "  Docker containers do not exist"
+        echo "  Containers do not exist"
     fi
 
     if jarsExist; then
@@ -83,13 +79,16 @@ function showHelp() {
 # Build using Maven wrapper
 # ==============================================================================
 function doBuild() {
-    echo "Building all modules..."
-    cd "${scriptDir}" || return 1
-    ./mvnw clean package -DskipTests
+    echo "Minimalistic build of the Quarkus Uber Jar"
+    echo "In case of errors, please following line to /etc/containers/registries.conf"
+    echo "unqualified-search-registries = [\"docker.io\"]"
+
+    podman build -f "${scriptDir}/build.container" -t eds-builder .
+    podman run --rm -v "${scriptDir}":/app -v "${HOME}/.m2":/root/.m2 eds-builder
 }
 
 # ==============================================================================
-# Start Docker containers
+# Start containers
 # ==============================================================================
 function doStart() {
     if isRunning; then
@@ -98,8 +97,7 @@ function doStart() {
     fi
 
     if ! jarsExist; then
-        echo "No runnable JARs found. Run 'build' first."
-        return 1
+        doBuild
     fi
 
     echo "Starting EDS containers..."
@@ -111,7 +109,7 @@ function doStart() {
 }
 
 # ==============================================================================
-# Stop Docker containers
+# Stop containers
 # ==============================================================================
 function doStop() {
     if isRunning; then
@@ -123,7 +121,7 @@ function doStop() {
 }
 
 # ==============================================================================
-# Restart Docker containers
+# Restart containers
 # ==============================================================================
 function doRestart() {
     echo "Restarting EDS containers..."
@@ -147,32 +145,27 @@ function doHealth() {
     echo "EDS Health Check:"
     echo "================="
 
-    if ! isRunning; then
-        echo "Docker containers are not running."
-        return 1
-    fi
-
     # Check Quarkus health (default in docker-compose)
     echo -n "Quarkus health: "
     local quarkus_health
     quarkus_health=$(curl -s "http://localhost:${PORT}/eds/q/health/ready" 2>/dev/null)
     if [[ -n "${quarkus_health}" ]]; then
         echo "${quarkus_health}" | grep -qE '"status":\s*"UP"' && echo "UP" || echo "DOWN"
-    else
-        echo "Not available"
-    fi
 
-    # Also try the version endpoint
-    echo -n "EDS API: "
-    local version_response
-    version_response=$(curl -s -X POST -H "Content-Type: application/json" \
-        "http://localhost:${PORT}/eds/version" -d '{}' 2>/dev/null)
-    if [[ -n "${version_response}" ]]; then
-        local version
-        version=$(echo "${version_response}" | grep -o '"version":"[^"]*"' | cut -d'"' -f4)
-        echo "OK (version: ${version})"
+        # Also try the version endpoint
+        echo -n "EDS API: "
+        local version_response
+        version_response=$(curl -s -X POST -H "Content-Type: application/json" \
+            "http://localhost:${PORT}/eds/version" -d '{}' 2>/dev/null)
+        if [[ -n "${version_response}" ]]; then
+            local version
+            version=$(echo "${version_response}" | grep -o '"version":"[^"]*"' | cut -d'"' -f4)
+            echo "${version}"
+        else
+            echo "Not responding"
+        fi
     else
-        echo "Not responding"
+        echo "Not running"
     fi
 }
 
@@ -188,7 +181,7 @@ function doLogs() {
 # Cleanup containers, images, and volumes
 # ==============================================================================
 function doCleanup() {
-    echo "Cleaning up EDS Docker resources..."
+    echo "Cleaning up EDS container resources..."
     docker compose -f "${composeFile}" down -v --rmi local
 
     echo "Cleanup complete."
@@ -233,7 +226,7 @@ function doRun() {
 
     if [[ -z "${module}" ]]; then
         echo "Usage: $(basename "${0}") run <module>"
-        echo "Available modules: quarkus, spring, wildfly, test"
+        echo "Available modules: quarkus, test"
         return 1
     fi
 
@@ -274,7 +267,7 @@ function doRun() {
             return 1
         fi
 
-        # Stop Docker app container to free port 8080
+        # Stop the EDS container(s) to free port 8080
         doStop
 
         echo "Starting EDS ${moduleName}..."
@@ -310,20 +303,35 @@ case "${action}" in
     restart)
         doRestart
         ;;
-    status)
-        doStatus
-        ;;
-    health)
+    status|health)
         doHealth
         ;;
     logs)
-        doLogs
+        echo "Following EDS logs (Ctrl+C to exit)..."
+        docker compose -f "${composeFile}" logs -f
         ;;
-    cleanup|remove)
+    pbuild)
+        cp "${scriptDir}/eds-quarkus-pg/target/eds-runnable.jar" "${podmanDir}"
+        podman build -f "${podmanDir}/eds-quarkus.container" -t eds-quarkus "${podmanDir}"
+        rm "${podmanDir}/eds-runnable.jar"
+        ;;
+    pstart)
+        podman run -d \
+          --rm \
+          --network=host \
+          -e DB_URL=jdbc:postgresql://localhost:5432/eds \
+          --name eds-quarkus \
+          eds-quarkus
+        ;;
+    pstop)
+        podman stop eds-quarkus
+        ;;
+    plogs)
+        echo "Following EDS logs (Ctrl+C to exit)..."
+        podman logs eds-quarkus -f
+        ;;
+    clean|cleanup|remove)
         doCleanup
-        ;;
-    help|--help|-h)
-        showHelp
         ;;
     *)
         showHelp

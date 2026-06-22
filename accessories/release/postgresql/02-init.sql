@@ -15,9 +15,11 @@
  * here: https://www.apache.org/licenses/
  */
 
--- Create the users needed for EDS. Please note that the
--- default AppServer Configuration file is referring to these users & passwords.
--- So, if you use a different name and password, please also update this.
+-- Create the users and database needed for EDS. The role name, password and
+-- database name must be supplied by the caller via the psql variables
+-- :eds_user, :eds_password and :eds_db (set with `psql -v eds_user=...
+-- -v eds_password=... -v eds_db=...`). This avoids shipping defaults in
+-- source control.
 
 DO $I$
 DECLARE
@@ -25,18 +27,28 @@ DECLARE
     -- Following is commented out (see below)
     -- db_exists BOOLEAN;
 BEGIN
-    SELECT exists (SELECT FROM pg_user WHERE usename = 'eds_user') INTO user_exists;
+    IF length(:'eds_user') = 0 THEN
+        RAISE EXCEPTION 'eds_user psql variable is required (pass via -v eds_user=...)';
+    END IF;
+    IF length(:'eds_password') = 0 THEN
+        RAISE EXCEPTION 'eds_password psql variable is required (pass via -v eds_password=...)';
+    END IF;
+    IF length(:'eds_db') = 0 THEN
+        RAISE EXCEPTION 'eds_db psql variable is required (pass via -v eds_db=...)';
+    END IF;
+
+    SELECT exists (SELECT FROM pg_user WHERE usename = :'eds_user') INTO user_exists;
     IF user_exists = false THEN
-        CREATE ROLE eds_user WITH LOGIN PASSWORD 'eds';
+        EXECUTE format('CREATE ROLE %I WITH LOGIN PASSWORD %L', :'eds_user', :'eds_password');
     END IF;
 
     -- It is not possible to run the following inside a function, hence it is
     -- commented out. It is left as an exercise for later to see if a solution
     -- to prevent an error when creating the database can be found.
-    -- SELECT exists (SELECT FROM pg_database WHERE datname = 'eds') INTO db_exists;
+    -- SELECT exists (SELECT FROM pg_database WHERE datname = :'eds_db') INTO db_exists;
     -- IF db_exists = false THEN
     --     -- Create the EDS database for the EDS User
-    --     CREATE DATABASE eds WITH OWNER = eds_user;
+    --     CREATE DATABASE :"eds_db" WITH OWNER = :"eds_user";
     -- END IF;
 
     -- Save changes
@@ -44,4 +56,4 @@ BEGIN
 END $I$;
 
 -- Create the EDS database for the EDS User
-CREATE DATABASE eds WITH OWNER = eds_user;
+CREATE DATABASE :"eds_db" WITH OWNER = :"eds_user";

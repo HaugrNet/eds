@@ -57,10 +57,10 @@ import jakarta.persistence.Table;
                 "  and e.circle.externalId = :externalCircleId")
 @NamedQuery(name = "member.removeExpiredSessions",
         query = "update MemberEntity set" +
-                "  sessionChecksum = null," +
-                "  sessionCrypto = null," +
-                "  sessionExpire = null " +
-                "where sessionExpire > current_timestamp")
+                " sessionChecksum = null," +
+                " sessionCrypto = null," +
+                " sessionExpire = null " +
+                "where sessionExpire <= current_timestamp")
 @Table(name = "eds_members")
 public class MemberEntity extends Externable {
 

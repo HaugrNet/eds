@@ -23,7 +23,7 @@ it can be used to share either files between users or data objects between apps
 or applications. This makes EDS the perfect companion for anyone who has Data
 Protection & Privacy concerns, such as GDPR.
 
-EDS is written in Java 21 / Jakarta EE 11, with no third-part dependencies, meaning
+EDS is written in Java 25 / Jakarta EE 11, with no third-part dependencies, meaning
 it can run on any Host or in any Cloud where a Jakarta EE Container is
 available. Currently, only the [PostgreSQL](https://www.postgresql.org/) database
 is supported, but thanks to the flexibility of Jakarta EE, it is possible to use any
@@ -37,7 +37,7 @@ version 2.0 will be a major upgrade, with a new domain, project name, and variou
 internal changes that make it a breaking update. Initial development of version
 2.0 has completed, with no more changes in the pipeline. The next phase will focus
 on testing to guarantee that the stability will remain high. The build requires
-Java 21, and [Maven](https://maven.apache.org/).
+Java 25, and [Maven](https://maven.apache.org/).
 
 In the root folder, there exists a small script, ```eds.sh```, which can be used to
 build the entire project, including running all tests and quality checks.
@@ -73,7 +73,7 @@ deployed in a "hostile" environment.
 
 This is the EDS 2.0 development branch, with the these features completed:
 
-* Migrate code base to Java 21
+* Migrate code base to Java 25
 * [Migrate code base from Java 8 to Java 11](https://github.com/HaugrNet/eds/issues/71)
 * [Upgrade code base to Java 17](https://github.com/HaugrNet/eds/issues/82)
 * [Migrate from Java EE 7 to Jakarta EE 8](https://github.com/HaugrNet/eds/issues/70)
@@ -92,7 +92,7 @@ please contact Kim Jensen (see below).
 
 Code quality is important, which is why testing and quality checks are crucial.
 Unfortunately, with version 2.0, it is time to consider alternatives
-to FitNesse & Coverity from Synopsis, since neither supports Java 21.
+to FitNesse & Coverity from Synopsis, since neither supports Java 25.
 
 The code is checked against as many analysis tools as possible. The final
 code must have zero issues of any kind before it is considered ready to be

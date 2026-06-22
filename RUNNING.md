@@ -6,7 +6,7 @@ EDS can be deployed using multiple runtime options. All require a PostgreSQL dat
 
 ### Java
 
-EDS requires Java 21 or later.
+EDS requires Java 25 or later.
 
 ### PostgreSQL Database Setup
 

@@ -41,7 +41,7 @@ public final class IVSalt {
     // the same size. See: https://en.wikipedia.org/wiki/Initialization_vector
     private static final int IV_SIZE = 16;
     // The armored length of the IV will always have this length.
-    private static final int ARMORED_LENGTH = 24;
+    public static final int ARMORED_LENGTH = 24;
 
     private final String armored;
 

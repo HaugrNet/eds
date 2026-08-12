@@ -15,45 +15,66 @@
  * here: https://www.apache.org/licenses/
  */
 
--- Create the users and database needed for EDS. The role name, password and
+-- Create the role and database needed for EDS. The role name, password and
 -- database name must be supplied by the caller via the psql variables
 -- :eds_user, :eds_password and :eds_db (set with `psql -v eds_user=...
 -- -v eds_password=... -v eds_db=...`). This avoids shipping defaults in
 -- source control.
+--
+-- Note: the statements below deliberately avoid a DO block. psql does not
+-- perform variable interpolation inside dollar-quoted strings, so :'eds_user'
+-- and friends would be sent verbatim to the server and fail with a syntax
+-- error. Instead, the statements are generated client side with format() and
+-- executed with \gexec, which also lets us create the database (which cannot
+-- run inside a function) conditionally.
 
-DO $I$
-DECLARE
-    user_exists BOOLEAN;
-    -- Following is commented out (see below)
-    -- db_exists BOOLEAN;
-BEGIN
-    IF length(:'eds_user') = 0 THEN
-        RAISE EXCEPTION 'eds_user psql variable is required (pass via -v eds_user=...)';
-    END IF;
-    IF length(:'eds_password') = 0 THEN
-        RAISE EXCEPTION 'eds_password psql variable is required (pass via -v eds_password=...)';
-    END IF;
-    IF length(:'eds_db') = 0 THEN
-        RAISE EXCEPTION 'eds_db psql variable is required (pass via -v eds_db=...)';
-    END IF;
+-- Ensure all three variables were supplied. Unset variables must be caught
+-- first, because psql leaves :'var' untouched when var is undefined, which the
+-- server then rejects with an opaque syntax error. Each failure raises a
+-- server side exception so that psql exits non-zero under ON_ERROR_STOP=1, and
+-- then quits so that nothing is created from incomplete input.
+\if :{?eds_user}
+\else
+DO $I$ BEGIN RAISE EXCEPTION 'eds_user psql variable is required (pass via -v eds_user=...)'; END $I$;
+\quit
+\endif
+\if :{?eds_password}
+\else
+DO $I$ BEGIN RAISE EXCEPTION 'eds_password psql variable is required (pass via -v eds_password=...)'; END $I$;
+\quit
+\endif
+\if :{?eds_db}
+\else
+DO $I$ BEGIN RAISE EXCEPTION 'eds_db psql variable is required (pass via -v eds_db=...)'; END $I$;
+\quit
+\endif
 
-    SELECT exists (SELECT FROM pg_user WHERE usename = :'eds_user') INTO user_exists;
-    IF user_exists = false THEN
-        EXECUTE format('CREATE ROLE %I WITH LOGIN PASSWORD %L', :'eds_user', :'eds_password');
-    END IF;
+-- The variables exist, so they can now be interpolated and checked for empty
+-- values, which format('%I') would otherwise turn into an invalid identifier.
+SELECT length(:'eds_user') = 0 AS eds_user_empty,
+       length(:'eds_password') = 0 AS eds_password_empty,
+       length(:'eds_db') = 0 AS eds_db_empty
+\gset
 
-    -- It is not possible to run the following inside a function, hence it is
-    -- commented out. It is left as an exercise for later to see if a solution
-    -- to prevent an error when creating the database can be found.
-    -- SELECT exists (SELECT FROM pg_database WHERE datname = :'eds_db') INTO db_exists;
-    -- IF db_exists = false THEN
-    --     -- Create the EDS database for the EDS User
-    --     CREATE DATABASE :"eds_db" WITH OWNER = :"eds_user";
-    -- END IF;
+\if :eds_user_empty
+DO $I$ BEGIN RAISE EXCEPTION 'eds_user psql variable must not be empty'; END $I$;
+\quit
+\endif
+\if :eds_password_empty
+DO $I$ BEGIN RAISE EXCEPTION 'eds_password psql variable must not be empty'; END $I$;
+\quit
+\endif
+\if :eds_db_empty
+DO $I$ BEGIN RAISE EXCEPTION 'eds_db psql variable must not be empty'; END $I$;
+\quit
+\endif
 
-    -- Save changes
-    COMMIT;
-END $I$;
+-- Create the EDS role, unless it already exists.
+SELECT format('CREATE ROLE %I WITH LOGIN PASSWORD %L', :'eds_user', :'eds_password')
+WHERE NOT EXISTS (SELECT FROM pg_roles WHERE rolname = :'eds_user')
+\gexec
 
--- Create the EDS database for the EDS User
-CREATE DATABASE :"eds_db" WITH OWNER = :"eds_user";
+-- Create the EDS database for the EDS role, unless it already exists.
+SELECT format('CREATE DATABASE %I WITH OWNER = %I', :'eds_db', :'eds_user')
+WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = :'eds_db')
+\gexec

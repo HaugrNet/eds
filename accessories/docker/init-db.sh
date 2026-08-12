@@ -28,8 +28,11 @@ fi
 
 # Step 1: Create the EDS role and database. Role name, password and database
 # name are passed in via psql variables so none are hardcoded in 02-init.sql.
+# The script is idempotent (it skips the role and the database when they already
+# exist), so ON_ERROR_STOP=1 is used to surface real failures instead of letting
+# a broken bootstrap fall through to the schema step.
 echo "Creating EDS user and database..."
-psql -v ON_ERROR_STOP=0 \
+psql -v ON_ERROR_STOP=1 \
      -v eds_user="${EDS_USER}" \
      -v eds_password="${EDS_DB_PASSWORD}" \
      -v eds_db="${EDS_DB}" \

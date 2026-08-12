@@ -17,6 +17,7 @@
 package net.haugr.eds.core.managers;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -385,8 +386,13 @@ public abstract class AbstractManager<D extends CommonDao, R extends EDSResponse
         byte[] encryptedKey = null;
 
         if (externalKey != null) {
-            circleKey.setSalt(new IVSalt(settings.getSalt()));
-            encryptedKey = Crypto.encrypt(circleKey, crypto.stringToBytes(externalKey));
+            final IVSalt iv = new IVSalt();
+            circleKey.setSalt(iv);
+            final byte[] ciphertext = Crypto.encrypt(circleKey, crypto.stringToBytes(externalKey));
+            final byte[] ivBytes = iv.getArmored().getBytes(settings.getCharset());
+            encryptedKey = new byte[ivBytes.length + ciphertext.length];
+            System.arraycopy(ivBytes, 0, encryptedKey, 0, ivBytes.length);
+            System.arraycopy(ciphertext, 0, encryptedKey, ivBytes.length, ciphertext.length);
         }
 
         return encryptedKey;
@@ -398,8 +404,10 @@ public abstract class AbstractManager<D extends CommonDao, R extends EDSResponse
 
         if (encryptedKey != null) {
             final SecretEDSKey circleKey = Crypto.extractCircleKey(trustee.getKey().getAlgorithm(), keyPair.getPrivate(), trustee.getCircleKey());
-            circleKey.setSalt(new IVSalt(settings.getSalt()));
-            externalKey = crypto.bytesToString(Crypto.decrypt(circleKey, encryptedKey));
+            final byte[] ivBytes = Arrays.copyOfRange(encryptedKey, 0, IVSalt.ARMORED_LENGTH);
+            final byte[] ciphertext = Arrays.copyOfRange(encryptedKey, IVSalt.ARMORED_LENGTH, encryptedKey.length);
+            circleKey.setSalt(new IVSalt(new String(ivBytes, settings.getCharset())));
+            externalKey = crypto.bytesToString(Crypto.decrypt(circleKey, ciphertext));
         }
 
         return externalKey;

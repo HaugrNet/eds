@@ -1,0 +1,13 @@
+# Grype configuration, used by the vulnerability scan in the CI Build.
+#
+# Vulnerabilities which have been reviewed and found not to affect EDS can be
+# suppressed here. Every entry must have a comment explaining why it does not
+# apply, so the decision can be re-evaluated later. Example:
+#
+# ignore:
+#   # EDS never calls the affected API, see <link to analysis>
+#   - vulnerability: CVE-2025-12345
+#     package:
+#       name: some-library
+#       version: 1.2.3
+ignore: []

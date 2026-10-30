@@ -47,6 +47,42 @@ in the accessories/release folder, there is an OpenAPI Specification file,
 ```openapi.json```, which can be used to generate client code or documentation
 for the REST API.
 
+### Software Bill of Materials (SBOM)
+The build can generate [CycloneDX](https://cyclonedx.org/) SBOM files
+(specification 1.6), in both JSON and XML format, via the
+[CycloneDX Maven Plugin](https://github.com/CycloneDX/cyclonedx-maven-plugin).
+SBOM generation is disabled by default, and is enabled with the ```sbom```
+profile:
+
+```bash
+mvn clean package -Psbom -DskipTests
+```
+
+This produces the following files:
+
+* ```target/eds-<version>-cyclonedx.(json|xml)``` – the aggregated SBOM,
+  covering all modules of the project.
+* ```<module>/target/<module>-<version>-cyclonedx.(json|xml)``` – an SBOM for
+  each individual module, e.g. ```eds-quarkus-pg/target/eds-quarkus-pg-2.0-SNAPSHOT-cyclonedx.json```.
+
+The SBOM files are attached to the build, so they will also be installed or
+deployed together with the other artifacts when running ```mvn install -Psbom```
+or ```mvn deploy -Psbom -Prelease```. Test scoped dependencies are not included.
+
+Note, the plugin needs online access to Maven repositories, so it is skipped
+when Maven runs in offline mode (```-o```).
+
+The CI Build scans the aggregated SBOM with [Grype](https://github.com/anchore/grype),
+and fails if a vulnerability with severity High or Critical is found. The same
+scan can be run locally with:
+
+```bash
+grype sbom:target/eds-2.0-SNAPSHOT-cyclonedx.json --fail-on high
+```
+
+Vulnerabilities which have been reviewed and found not to apply to EDS, can be
+suppressed in ```.grype.yaml```, together with a justification.
+
 ## Who is this for
 
 Anyone for whom data protection is important may find EDS useful. It is designed

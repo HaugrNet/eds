@@ -36,7 +36,7 @@ jobs:
           mvn -v
 
       - name: Build (skip tests)
-        run: mvn -B -ntp -DskipTests install
+        run: mvn -B -ntp -DskipTests -Psbom install
 
       # Uncomment to run unit tests instead of skipping
       # - name: Build and run tests
@@ -51,6 +51,29 @@ jobs:
             **/target/*.jar
             **/target/*.war
             **/target/*.ear
+          if-no-files-found: ignore
+
+      - name: Install Grype
+        id: grype
+        uses: anchore/scan-action/download-grype@v6
+
+      # Scans the aggregated SBOM, and fails the build if any vulnerability
+      # with severity High or Critical is found. Findings which have been
+      # reviewed and found not to apply, can be suppressed in .grype.yaml
+      - name: Scan SBOM for vulnerabilities
+        run: |
+          sbom=$(ls target/eds-*-cyclonedx.json)
+          ${{ steps.grype.outputs.cmd }} "sbom:${sbom}" \
+              --fail-on high \
+              -o table \
+              -o json=grype-report.json
+
+      - name: Upload vulnerability report
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: grype-report
+          path: grype-report.json
           if-no-files-found: ignore
 
   dependency-updates:

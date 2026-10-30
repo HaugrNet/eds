@@ -80,6 +80,52 @@
              Legend: *  - zero or more characters
                      ** - zero or more directories -->
         <sonar.exclusions>**/client/**,**/fitnesse/**</sonar.exclusions>
+
+        <!-- Dependency versions -->
+        <version.jakartaee-api>11.0.0</version.jakartaee-api>
+        <version.jakarta.ejb-api>4.0.1</version.jakarta.ejb-api>
+        <version.microprofile-openapi-api>4.1.1</version.microprofile-openapi-api>
+        <version.microprofile-health-api>4.0.1</version.microprofile-health-api>
+        <version.slf4j>2.0.17</version.slf4j>
+        <version.gson>2.13.2</version.gson>
+        <version.jersey>4.0.2</version.jersey>
+        <version.junit>5.13.1</version.junit>
+        <version.assertj>3.27.7</version.assertj>
+        <version.logback>1.5.30</version.logback>
+        <version.h2>2.4.240</version.h2>
+        <version.hibernate-core>6.6.40.Final</version.hibernate-core>
+        <version.yasson>3.0.4</version.yasson>
+
+        <!-- Quarkus versions, the Hibernate version must match the version
+             used by the Quarkus Platform BOM, see the Quarkus modules. -->
+        <version.quarkus>3.40.1.1</version.quarkus>
+        <version.hibernate-core.quarkus>7.4.9.Final</version.hibernate-core.quarkus>
+
+        <!-- WildFly versions -->
+        <version.wildfly>39.0.1.Final</version.wildfly>
+        <version.wildfly-datasources-galleon-pack>4.0.0.Final</version.wildfly-datasources-galleon-pack>
+
+        <!-- Plugin versions -->
+        <version.maven-clean-plugin>3.2.0</version.maven-clean-plugin>
+        <version.maven-compiler-plugin>3.14.1</version.maven-compiler-plugin>
+        <version.maven-resources-plugin>3.3.1</version.maven-resources-plugin>
+        <version.maven-surefire-plugin>3.5.3</version.maven-surefire-plugin>
+        <version.maven-jar-plugin>3.4.2</version.maven-jar-plugin>
+        <version.maven-war-plugin>3.4.0</version.maven-war-plugin>
+        <version.maven-shade-plugin>3.6.0</version.maven-shade-plugin>
+        <version.maven-assembly-plugin>3.7.1</version.maven-assembly-plugin>
+        <version.maven-install-plugin>3.1.2</version.maven-install-plugin>
+        <version.maven-deploy-plugin>3.1.2</version.maven-deploy-plugin>
+        <version.maven-site-plugin>3.12.1</version.maven-site-plugin>
+        <version.maven-javadoc-plugin>3.11.2</version.maven-javadoc-plugin>
+        <version.maven-gpg-plugin>3.2.7</version.maven-gpg-plugin>
+        <version.nexus-staging-maven-plugin>1.7.0</version.nexus-staging-maven-plugin>
+        <version.dependency-check-maven>12.1.3</version.dependency-check-maven>
+        <version.jacoco-maven-plugin>0.8.13</version.jacoco-maven-plugin>
+        <version.sonar-maven-plugin>5.1.0.4751</version.sonar-maven-plugin>
+        <version.cyclonedx-maven-plugin>2.9.1</version.cyclonedx-maven-plugin>
+        <version.smallrye-open-api-maven-plugin>4.2.0</version.smallrye-open-api-maven-plugin>
+        <version.wildfly-maven-plugin>5.1.5.Final</version.wildfly-maven-plugin>
     </properties>
 
     <dependencyManagement>
@@ -87,25 +133,25 @@
             <dependency>
                 <groupId>jakarta.platform</groupId>
                 <artifactId>jakarta.jakartaee-api</artifactId>
-                <version>11.0.0</version>
+                <version>${version.jakartaee-api}</version>
                 <scope>provided</scope>
             </dependency>
             <dependency>
                 <groupId>org.eclipse.microprofile.openapi</groupId>
                 <artifactId>microprofile-openapi-api</artifactId>
-                <version>4.1.1</version>
+                <version>${version.microprofile-openapi-api}</version>
                 <scope>provided</scope>
             </dependency>
             <dependency>
                 <groupId>org.eclipse.microprofile.health</groupId>
                 <artifactId>microprofile-health-api</artifactId>
-                <version>4.0.1</version>
+                <version>${version.microprofile-health-api}</version>
                 <scope>provided</scope>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
-                <version>2.0.17</version>
+                <version>${version.slf4j}</version>
                 <scope>provided</scope>
             </dependency>
             <dependency>
@@ -138,18 +184,18 @@
             <dependency>
                 <groupId>com.google.code.gson</groupId>
                 <artifactId>gson</artifactId>
-                <version>2.13.2</version>
+                <version>${version.gson}</version>
             </dependency>
             <dependency>
                 <groupId>org.glassfish.jersey.test-framework.providers</groupId>
                 <artifactId>jersey-test-framework-provider-grizzly2</artifactId>
-                <version>4.0.2</version>
+                <version>${version.jersey}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.glassfish.jersey.core</groupId>
                 <artifactId>jersey-common</artifactId>
-                <version>4.0.2</version>
+                <version>${version.jersey}</version>
                 <scope>test</scope>
             </dependency>
 
@@ -157,19 +203,19 @@
             <dependency>
                 <groupId>org.junit.jupiter</groupId>
                 <artifactId>junit-jupiter-engine</artifactId>
-                <version>5.13.1</version>
+                <version>${version.junit}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.junit.jupiter</groupId>
                 <artifactId>junit-jupiter-params</artifactId>
-                <version>5.13.1</version>
+                <version>${version.junit}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.assertj</groupId>
                 <artifactId>assertj-core</artifactId>
-                <version>3.27.7</version>
+                <version>${version.assertj}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
@@ -182,26 +228,26 @@
             <dependency>
                 <groupId>ch.qos.logback</groupId>
                 <artifactId>logback-classic</artifactId>
-                <version>1.5.30</version>
+                <version>${version.logback}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>com.h2database</groupId>
                 <artifactId>h2</artifactId>
-                <version>2.4.240</version>
+                <version>${version.h2}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.hibernate.orm</groupId>
                 <artifactId>hibernate-core</artifactId>
-                <version>6.6.40.Final</version>
+                <version>${version.hibernate-core}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <!-- Hibernate required dependency -->
                 <groupId>org.eclipse</groupId>
                 <artifactId>yasson</artifactId>
-                <version>3.0.4</version>
+                <version>${version.yasson}</version>
                 <scope>test</scope>
             </dependency>
         </dependencies>
@@ -221,13 +267,18 @@
             <plugins>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-clean-plugin</artifactId>
+                    <version>${version.maven-clean-plugin}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.14.1</version>
+                    <version>${version.maven-compiler-plugin}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>3.11.2</version>
+                    <version>${version.maven-javadoc-plugin}</version>
                     <executions>
                         <execution>
                             <id>attach-javadocs</id>
@@ -240,37 +291,57 @@
                 <plugin>
                     <groupId>org.sonatype.plugins</groupId>
                     <artifactId>nexus-staging-maven-plugin</artifactId>
-                    <version>1.7.0</version>
+                    <version>${version.nexus-staging-maven-plugin}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>3.5.3</version>
+                    <version>${version.maven-surefire-plugin}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-jar-plugin</artifactId>
-                    <version>3.4.2</version>
+                    <version>${version.maven-jar-plugin}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-war-plugin</artifactId>
-                    <version>3.4.0</version>
+                    <version>${version.maven-war-plugin}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-shade-plugin</artifactId>
-                    <version>3.6.0</version>
+                    <version>${version.maven-shade-plugin}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-assembly-plugin</artifactId>
+                    <version>${version.maven-assembly-plugin}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-install-plugin</artifactId>
+                    <version>${version.maven-install-plugin}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-deploy-plugin</artifactId>
+                    <version>${version.maven-deploy-plugin}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-site-plugin</artifactId>
+                    <version>${version.maven-site-plugin}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-gpg-plugin</artifactId>
-                    <version>3.2.7</version>
+                    <version>${version.maven-gpg-plugin}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.owasp</groupId>
                     <artifactId>dependency-check-maven</artifactId>
-                    <version>12.1.3</version>
+                    <version>${version.dependency-check-maven}</version>
                     <executions>
                         <execution>
                             <phase>verify</phase>
@@ -283,12 +354,23 @@
                 <plugin>
                     <groupId>org.jacoco</groupId>
                     <artifactId>jacoco-maven-plugin</artifactId>
-                    <version>0.8.13</version>
+                    <version>${version.jacoco-maven-plugin}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.cyclonedx</groupId>
+                    <artifactId>cyclonedx-maven-plugin</artifactId>
+                    <version>${version.cyclonedx-maven-plugin}</version>
+                    <configuration>
+                        <projectType>application</projectType>
+                        <schemaVersion>1.6</schemaVersion>
+                        <outputFormat>all</outputFormat>
+                        <includeTestScope>false</includeTestScope>
+                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.sonarsource.scanner.maven</groupId>
                     <artifactId>sonar-maven-plugin</artifactId>
-                    <version>5.1.0.4751</version>
+                    <version>${version.sonar-maven-plugin}</version>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -387,6 +469,37 @@
     </build>
 
     <profiles>
+        <!-- Generates CycloneDX Software Bill of Materials (SBOM) files, see
+             README.md for details. Each module gets its own SBOM in
+             <module>/target/<module>-<version>-cyclonedx.(json|xml), and the
+             aggregated SBOM for the entire project is written to the root
+             target folder as eds-<version>-cyclonedx.(json|xml). -->
+        <profile>
+            <id>sbom</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.cyclonedx</groupId>
+                        <artifactId>cyclonedx-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <!-- makeAggregateBom writes the aggregated
+                                     SBOM in the root module, and a module
+                                     specific SBOM in all other modules. -->
+                                <id>sbom</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>makeAggregateBom</goal>
+                                </goals>
+                                <configuration>
+                                    <outputName>${project.artifactId}-${project.version}-cyclonedx</outputName>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
         <profile>
             <id>release</id>
             <build>
@@ -394,7 +507,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
-                        <version>3.2.7</version>
+                        <version>${version.maven-gpg-plugin}</version>
                         <configuration>
                             <useAgent>true</useAgent>
                             <skip>false</skip>
@@ -412,7 +525,7 @@
                     <plugin>
                         <groupId>org.sonatype.plugins</groupId>
                         <artifactId>nexus-staging-maven-plugin</artifactId>
-                        <version>1.7.0</version>
+                        <version>${version.nexus-staging-maven-plugin}</version>
                         <extensions>true</extensions>
                         <configuration>
                             <serverId>ossrh</serverId>

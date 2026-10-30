@@ -106,14 +106,15 @@ public interface Management {
      *     to unlock the Private Key for the Account.</i>
      *   </li>
      *   <li>
-     *     <b>eds.crypto.pbe.iterations</b> - default value: '1024'<br>
+     *     <b>eds.crypto.pbe.iterations</b> - default value: '600000'<br>
      *     Allowed Values: Any positive number<br>
-     *     <i>The PBE algorithm (PBKDF) is extending the Member credentials with
-     *     the Salt over a number of iterations. By default, 1024 iterations are
-     *     used, which is generally considered very weak, but it is good value
-     *     for testing and for trusted deployment environments. However, for a
-     *     non-trusted environment, it is considered too weak, and a higher number
-     *     should be used for such environments. See <a href="https://en.wikipedia.org/wiki/PBKDF2">Wikipedia</a>
+     *     <i>The PBE algorithm (PBKDF2 with HMAC-SHA256) is extending the Member
+     *     credentials with the Salt over a number of iterations. The higher the
+     *     number, the more costly it is to guess the credentials, if the
+     *     database is stolen - but it is also more costly for each request
+     *     made with credentials. The default follows the recommendation from
+     *     the <a href="https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html">OWASP Password Storage Cheat Sheet</a>.
+     *     Lowering it is only advisable for testing. See <a href="https://en.wikipedia.org/wiki/PBKDF2">Wikipedia</a>
      *     for more information.</i>
      *   </li>
      *   <li>

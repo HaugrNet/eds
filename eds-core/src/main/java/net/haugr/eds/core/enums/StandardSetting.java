@@ -30,7 +30,8 @@ public enum StandardSetting {
     ASYMMETRIC_ALGORITHM("eds.crypto.asymmetric.algorithm", "RSA_2048"),
     SIGNATURE_ALGORITHM("eds.crypto.signature.algorithm", "SHA_512"),
     PBE_ALGORITHM("eds.crypto.pbe.algorithm", "PBE_GCM_256"),
-    PBE_ITERATIONS("eds.crypto.pbe.iterations", "1024"),
+    // OWASP Password Storage Cheat Sheet recommendation for PBKDF2-HMAC-SHA256
+    PBE_ITERATIONS("eds.crypto.pbe.iterations", "600000"),
     HASH_ALGORITHM("eds.crypto.hash.algorithm", "SHA_512"),
     EDS_SALT("eds.system.salt", "Default salt, also used as kill switch. Must be set in DB."),
     EDS_LOCALE("eds.system.locale", "EN"),

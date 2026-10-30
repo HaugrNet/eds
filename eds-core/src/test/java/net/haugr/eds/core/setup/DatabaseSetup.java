@@ -101,6 +101,9 @@ public class DatabaseSetup {
     protected static final String MEMBER_4_ID = "b629f009-4da2-46ed-91b8-aa9dec54814d";
     protected static final String MEMBER_5_ID = "63cb90cc-c1fb-4c6a-b881-bec278b4e232";
 
+    // The PBE iterations should be at least 600.000, but as this is slow, for testing, we use
+    // a lower number. If changed, please re-generate the test data!
+    private static final String TEST_PBE_ITERATIONS = "1024";
     private static final String DEFAULT_ACCOUNT_NAME = "New Account Name";
     private static final MemberRole DEFAULT_ROLE = MemberRole.STANDARD;
     private static final String DEFAULT_SECRET = "My Super Secret";
@@ -119,6 +122,10 @@ public class DatabaseSetup {
             transaction.begin();
         }
         settings.set(StandardSetting.IS_READY.getKey(), "true");
+        // The test data (data.sql) was generated with this number of
+        // iterations. In production, the StartupBean loads the persisted
+        // value, but the tests are not using the StartupBean.
+        settings.set(StandardSetting.PBE_ITERATIONS.getKey(), TEST_PBE_ITERATIONS);
     }
 
     @AfterEach
@@ -267,7 +274,10 @@ public class DatabaseSetup {
         try {
             final Constructor<Settings> constructor = Settings.class.getDeclaredConstructor();
             constructor.setAccessible(true);
-            return constructor.newInstance();
+            final Settings mySettings = constructor.newInstance();
+            mySettings.set(StandardSetting.PBE_ITERATIONS.getKey(), TEST_PBE_ITERATIONS);
+
+            return mySettings;
         } catch (NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException e) {
             throw new EDSException(ReturnCode.ERROR, "Cannot instantiate Service Object", e);
         }

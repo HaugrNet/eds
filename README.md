@@ -83,6 +83,29 @@ grype sbom:target/eds-2.0-SNAPSHOT-cyclonedx.json --fail-on high
 Vulnerabilities which have been reviewed and found not to apply to EDS, can be
 suppressed in ```.grype.yaml```, together with a justification.
 
+#### Container SBOMs
+The Maven SBOM only covers the Java libraries. The containers from the Docker
+Compose setup in ```accessories/docker``` also contain operating system
+packages and a Java runtime, so the CI Build generates a CycloneDX SBOM for
+each container image with [Syft](https://github.com/anchore/syft):
+
+* ```target/container-eds-quarkus-cyclonedx.json``` – the EDS image, built
+  from ```accessories/docker/Dockerfile.quarkus```.
+* ```target/container-postgres-cyclonedx.json``` – the PostgreSQL image
+  referenced in ```docker-compose.yml```.
+
+Both are scanned with Grype. The EDS image fails the build on High or Critical
+findings, the PostgreSQL image is a 3rd party image, so its findings are only
+reported. All SBOMs and vulnerability reports are available as build artifacts.
+The container SBOMs can be generated locally, after the Maven build, with:
+
+```bash
+docker build -f accessories/docker/Dockerfile.quarkus -t eds-quarkus:local .
+syft scan eds-quarkus:local -o cyclonedx-json=target/container-eds-quarkus-cyclonedx.json
+syft scan postgres:18-alpine -o cyclonedx-json=target/container-postgres-cyclonedx.json
+grype sbom:target/container-eds-quarkus-cyclonedx.json --fail-on high
+```
+
 ## Who is this for
 
 Anyone for whom data protection is important may find EDS useful. It is designed

@@ -247,7 +247,7 @@ The Docker Compose setup creates:
 
 | Service | Description |
 |---------|-------------|
-| `eds-db` | PostgreSQL 16 database |
+| `eds-db` | PostgreSQL 18 database |
 | `eds-app` | Quarkus application container |
 
 Both containers communicate over an internal `eds-network` bridge network.
@@ -277,6 +277,35 @@ To reset the database:
 ```bash
 ./docker.sh reset
 ```
+
+#### Upgrading from PostgreSQL 16
+
+The database container was upgraded from PostgreSQL 16 to 18. PostgreSQL
+cannot start on data files from an older major version, and from version 18
+the image stores its data in `volumes/data/18/docker`, instead of directly in
+`volumes/data/`. An existing database must therefore be migrated, by dumping
+it with the old version, and restoring it into a fresh PostgreSQL 18 database.
+Run the commands from `accessories/docker`, and replace `eds` with the value of
+`EDS_DB_NAME` if it has been changed in `.env`:
+
+```bash
+# 1. With the old (postgres:16-alpine) setup still running, dump the EDS database
+docker exec eds-postgres pg_dump -U postgres -d eds --clean --if-exists > eds-backup.sql
+docker compose down
+
+# 2. Move the old data aside, and start the new database. The init scripts
+#    create the EDS role, database and an empty schema during the first start
+mv volumes/data volumes/data-pg16
+mkdir volumes/data
+docker compose up -d eds-db
+
+# 3. Restore the dump, the --clean option replaces the empty schema
+docker exec -i eds-postgres psql -v ON_ERROR_STOP=1 -U postgres -d eds < eds-backup.sql
+docker compose up -d
+```
+
+Once EDS is verified to work, `volumes/data-pg16` and `eds-backup.sql` can be
+deleted.
 
 ## Verifying the Installation
 

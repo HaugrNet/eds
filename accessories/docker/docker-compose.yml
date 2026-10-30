@@ -14,7 +14,7 @@
 services:
   # PostgreSQL Database
   eds-db:
-    image: postgres:16-alpine
+    image: postgres:18-alpine
     container_name: eds-postgres
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
@@ -25,7 +25,7 @@ services:
       EDS_DB_NAME: ${EDS_DB_NAME:-eds}
       TZ: Europe/Berlin
     volumes:
-      - ./volumes/data:/var/lib/postgresql/data
+      - ./volumes/data:/var/lib/postgresql
       - ./init-db.sh:/docker-entrypoint-initdb.d/01-init-db.sh:ro
       - ../release/postgresql/02-init.sql:/docker-entrypoint-initdb.d/sql/02-init.sql:ro
       - ../release/postgresql/03-create.sql:/docker-entrypoint-initdb.d/sql/03-create.sql:ro

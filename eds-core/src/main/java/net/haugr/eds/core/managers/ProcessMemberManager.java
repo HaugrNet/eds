@@ -17,6 +17,7 @@
 package net.haugr.eds.core.managers;
 
 import java.security.PublicKey;
+import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.EnumSet;
@@ -56,6 +57,10 @@ import net.haugr.eds.core.model.entities.TrusteeEntity;
  * @since EDS 1.0
  */
 public final class ProcessMemberManager extends AbstractManager<MemberDao, ProcessMemberResponse, ProcessMemberRequest> {
+
+    private static final SecureRandom RANDOM = new SecureRandom();
+    private static final int INVALIDATED_PASSWORD_LENGTH = 64;
+    private static final String SYSTEM_ADMINISTRATOR_NOT_DELETABLE = "The System Administrator Account may not be deleted.";
 
     public ProcessMemberManager(final Settings settings, final EntityManager entityManager) {
         super(settings, new MemberDao(entityManager));
@@ -204,6 +209,9 @@ public final class ProcessMemberManager extends AbstractManager<MemberDao, Proce
 
         final String memberId = request.getMemberId();
         final MemberEntity entity = dao.find(MemberEntity.class, memberId);
+        if (isSystemAdministrator(entity)) {
+            throw new IllegalActionException("The role of the System Administrator Account may not be altered.");
+        }
         entity.setMemberRole(request.getMemberRole());
         dao.save(entity);
 
@@ -228,6 +236,13 @@ public final class ProcessMemberManager extends AbstractManager<MemberDao, Proce
 
     private void updateOwnAccountName(final String newAccountName) {
         if (!isEmpty(newAccountName)) {
+            if (isSystemAdministrator(member)) {
+                throw new IllegalActionException("The System Administrator Account may not be renamed.");
+            }
+            if (Constants.ADMIN_ACCOUNT.equalsIgnoreCase(newAccountName)) {
+                throw new IllegalActionException("The Account Name '" + Constants.ADMIN_ACCOUNT + "' is reserved for the System Administrator.");
+            }
+
             final MemberEntity existing = dao.findMemberByName(newAccountName);
             if (existing != null) {
                 throw new EDSException(ReturnCode.CONSTRAINT_ERROR, "The new Account Name already exists.");
@@ -282,8 +297,15 @@ public final class ProcessMemberManager extends AbstractManager<MemberDao, Proce
             throw new IllegalActionException("The System Administrator Account may not be invalidated.");
         }
 
+        // The credential of the request has already been overwritten with
+        // zeros, so it cannot be used. Instead, the Account is given a random
+        // password, which is never revealed.
+        final byte[] randomPassword = new byte[INVALIDATED_PASSWORD_LENGTH];
+        RANDOM.nextBytes(randomPassword);
+
         dao.removeSession(member);
-        updateMemberPassword(member, request.getCredential());
+        updateMemberPassword(member, randomPassword);
+        Arrays.fill(randomPassword, (byte) 0);
 
         final ProcessMemberResponse response = new ProcessMemberResponse();
         response.setReturnMessage(theMember(member) + " has been Invalidated.");
@@ -302,6 +324,9 @@ public final class ProcessMemberManager extends AbstractManager<MemberDao, Proce
             response = processDeleteAsAdmin(request);
         } else {
             // Deleting self
+            if (isSystemAdministrator(member)) {
+                throw new IllegalActionException(SYSTEM_ADMINISTRATOR_NOT_DELETABLE);
+            }
             dao.delete(member);
             response = new ProcessMemberResponse(ReturnCode.SUCCESS, theMember(member) + " has been successfully deleted.");
         }
@@ -317,6 +342,9 @@ public final class ProcessMemberManager extends AbstractManager<MemberDao, Proce
         }
         if (Objects.equals(member.getId(), found.getId())) {
             throw new IllegalActionException("It is not permitted to delete yourself.");
+        }
+        if (isSystemAdministrator(found)) {
+            throw new IllegalActionException(SYSTEM_ADMINISTRATOR_NOT_DELETABLE);
         }
 
         dao.delete(found);
@@ -363,6 +391,15 @@ public final class ProcessMemberManager extends AbstractManager<MemberDao, Proce
         response.setMemberId(account.getExternalId());
 
         return response;
+    }
+
+    /**
+     * The System Administrator Account is recreated by name, by whoever uses
+     * the name first, if it no longer exists. Hence, it may neither be
+     * renamed, deleted nor have its role altered.
+     */
+    private static boolean isSystemAdministrator(final MemberEntity entity) {
+        return (entity != null) && Constants.ADMIN_ACCOUNT.equalsIgnoreCase(entity.getName());
     }
 
     /**

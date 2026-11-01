@@ -29,6 +29,7 @@ import net.haugr.eds.core.exceptions.EDSException;
 import net.haugr.eds.core.jce.MasterKey;
 import net.haugr.eds.core.model.Settings;
 import net.haugr.eds.core.model.entities.MemberEntity;
+import net.haugr.eds.core.model.entities.SettingEntity;
 import net.haugr.eds.core.setup.DatabaseSetup;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledOnOs;
@@ -242,12 +243,63 @@ final class ManagementBeanMasterKeyTest extends DatabaseSetup {
         assertEquals(path + " (No such file or directory)", response.getReturnMessage());
     }
 
+    @Test
+    void testUpdateMasterKeyUrlWithWrongCredentialsKeepsSetting() throws IOException {
+        final String before = currentMasterKeyUrl();
+        final String path = tempDir() + "unauthenticated_master_key.bin";
+        Files.write(Paths.get(path), generateData(8192));
+
+        final ManagementBean bean = prepareManagementBean();
+        final MasterKeyRequest request = prepareRequest(MasterKeyRequest.class, Constants.ADMIN_ACCOUNT);
+        request.setCredential("root".getBytes(Charset.defaultCharset()));
+        request.setUrl("file://" + path);
+
+        final MasterKeyResponse response = bean.masterKey(request);
+        assertEquals(ReturnCode.AUTHENTICATION_WARNING.getCode(), response.getReturnCode());
+        assertEquals("Invalid credentials.", response.getReturnMessage());
+        assertEquals(before, currentMasterKeyUrl());
+    }
+
+    @Test
+    void testUpdateMasterKeySecretWithWrongCredentialsKeepsSetting() {
+        final String before = currentMasterKeyUrl();
+
+        final ManagementBean bean = prepareManagementBean();
+        final MasterKeyRequest request = prepareRequest(MasterKeyRequest.class, Constants.ADMIN_ACCOUNT);
+        request.setCredential("root".getBytes(Charset.defaultCharset()));
+        request.setSecret("New MasterKey".getBytes(Charset.defaultCharset()));
+
+        final MasterKeyResponse response = bean.masterKey(request);
+        assertEquals(ReturnCode.AUTHENTICATION_WARNING.getCode(), response.getReturnCode());
+        assertEquals(before, currentMasterKeyUrl());
+    }
+
+    @Test
+    void testUpdateMasterKeyUrlWhenMembersExistKeepsSetting() throws IOException {
+        final String before = currentMasterKeyUrl();
+        final String path = tempDir() + "rejected_master_key.bin";
+        Files.write(Paths.get(path), generateData(8192));
+
+        final ManagementBean bean = prepareManagementBean();
+        final MasterKeyRequest request = prepareRequest(MasterKeyRequest.class, Constants.ADMIN_ACCOUNT);
+        request.setUrl("file://" + path);
+
+        final MasterKeyResponse response = bean.masterKey(request);
+        assertEquals(ReturnCode.ILLEGAL_ACTION.getCode(), response.getReturnCode());
+        assertEquals(before, currentMasterKeyUrl());
+    }
+
     // =========================================================================
     // Internal helper methods
     // =========================================================================
 
     private static String tempDir() {
         return System.getProperty("java.io.tmpdir") + File.separator;
+    }
+
+    private String currentMasterKeyUrl() {
+        final SettingEntity entity = dao.findSettingByKey(StandardSetting.MASTERKEY_URL);
+        return (entity != null) ? entity.getSetting() : null;
     }
 
     private void deleteNonAdminMembers() {

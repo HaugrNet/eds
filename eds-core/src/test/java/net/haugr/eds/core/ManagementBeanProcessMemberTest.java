@@ -18,6 +18,7 @@ package net.haugr.eds.core;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -522,10 +523,12 @@ final class ManagementBeanProcessMemberTest extends DatabaseSetup {
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
         assertEquals("The Member '" + MEMBER_4 + "' has been Invalidated.", response.getReturnMessage());
 
+        // The request credential has been overwritten with zeros, which must
+        // not unlock the invalidated account.
         request.setAction(Action.UPDATE);
         request.setNewCredential(crypto.stringToBytes("New Passphrase"));
         final ProcessMemberResponse response2 = bean.processMember(request);
-        assertEquals(ReturnCode.CRYPTO_ERROR.getCode(), response2.getReturnCode());
+        assertEquals(ReturnCode.AUTHENTICATION_WARNING.getCode(), response2.getReturnCode());
     }
 
     @Test
@@ -600,9 +603,112 @@ final class ManagementBeanProcessMemberTest extends DatabaseSetup {
         assertEquals("It is not permitted to delete yourself.", response.getReturnMessage());
     }
 
+    @Test
+    void testInvalidatedAccountCannotUseZeroedCredential() {
+        final ManagementBean bean = prepareManagementBean();
+        final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, MEMBER_4);
+        final int credentialLength = request.getCredential().length;
+        request.setAction(Action.INVALIDATE);
+
+        final ProcessMemberResponse response = bean.processMember(request);
+        assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
+
+        // The credential of the request was overwritten with zeros, which must
+        // not have become the new password of the invalidated account.
+        final FetchMemberRequest fetchRequest = prepareRequest(FetchMemberRequest.class, MEMBER_4);
+        fetchRequest.setCredential(new byte[credentialLength]);
+        final FetchMemberResponse fetchResponse = bean.fetchMembers(fetchRequest);
+        assertFalse(fetchResponse.isOk());
+
+        // Neither may the original credential be used any longer.
+        final FetchMemberRequest originalRequest = prepareRequest(FetchMemberRequest.class, MEMBER_4);
+        assertFalse(bean.fetchMembers(originalRequest).isOk());
+    }
+
+    @Test
+    void testDeleteSelfAsSystemAdministrator() {
+        final ManagementBean bean = prepareManagementBean();
+        final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
+        request.setAction(Action.DELETE);
+
+        final ProcessMemberResponse response = bean.processMember(request);
+        assertEquals(ReturnCode.ILLEGAL_ACTION.getCode(), response.getReturnCode());
+        assertEquals("The System Administrator Account may not be deleted.", response.getReturnMessage());
+        assertNotNull(dao.findMemberByName(Constants.ADMIN_ACCOUNT));
+    }
+
+    @Test
+    void testDeleteSystemAdministratorAsOtherAdmin() {
+        final ManagementBean bean = prepareManagementBean();
+        final String otherAdmin = createAdministrator(bean);
+
+        final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, otherAdmin);
+        request.setAction(Action.DELETE);
+        request.setMemberId(ADMIN_ID);
+
+        final ProcessMemberResponse response = bean.processMember(request);
+        assertEquals(ReturnCode.ILLEGAL_ACTION.getCode(), response.getReturnCode());
+        assertEquals("The System Administrator Account may not be deleted.", response.getReturnMessage());
+        assertNotNull(dao.findMemberByName(Constants.ADMIN_ACCOUNT));
+    }
+
+    @Test
+    void testAlterSystemAdministratorRoleAsOtherAdmin() {
+        final ManagementBean bean = prepareManagementBean();
+        final String otherAdmin = createAdministrator(bean);
+
+        final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, otherAdmin);
+        request.setAction(Action.ALTER);
+        request.setMemberId(ADMIN_ID);
+        request.setMemberRole(MemberRole.STANDARD);
+
+        final ProcessMemberResponse response = bean.processMember(request);
+        assertEquals(ReturnCode.ILLEGAL_ACTION.getCode(), response.getReturnCode());
+        assertEquals("The role of the System Administrator Account may not be altered.", response.getReturnMessage());
+        assertEquals(MemberRole.ADMIN, dao.findMemberByName(Constants.ADMIN_ACCOUNT).getMemberRole());
+    }
+
+    @Test
+    void testRenameSystemAdministrator() {
+        final ManagementBean bean = prepareManagementBean();
+        final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
+        request.setAction(Action.UPDATE);
+        request.setNewAccountName("root");
+
+        final ProcessMemberResponse response = bean.processMember(request);
+        assertEquals(ReturnCode.ILLEGAL_ACTION.getCode(), response.getReturnCode());
+        assertEquals("The System Administrator Account may not be renamed.", response.getReturnMessage());
+        assertNotNull(dao.findMemberByName(Constants.ADMIN_ACCOUNT));
+    }
+
+    @Test
+    void testRenameMemberToSystemAdministrator() {
+        final ManagementBean bean = prepareManagementBean();
+        final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, MEMBER_1);
+        request.setAction(Action.UPDATE);
+        request.setNewAccountName("ADMIN");
+
+        final ProcessMemberResponse response = bean.processMember(request);
+        assertEquals(ReturnCode.ILLEGAL_ACTION.getCode(), response.getReturnCode());
+        assertEquals("The Account Name 'admin' is reserved for the System Administrator.", response.getReturnMessage());
+        assertNotNull(dao.findMemberByName(MEMBER_1));
+    }
+
     // =========================================================================
     // Internal Helper Methods
     // =========================================================================
+
+    private String createAdministrator(final ManagementBean bean) {
+        final String account = "second admin";
+        final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
+        request.setAction(Action.CREATE);
+        request.setNewAccountName(account);
+        request.setNewCredential(crypto.stringToBytes(account));
+        request.setMemberRole(MemberRole.ADMIN);
+        assertTrue(bean.processMember(request).isOk());
+
+        return account;
+    }
 
     private ProcessMemberRequest prepareLoginRequest(final String accountName, final String sessionKey) {
         final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, accountName);

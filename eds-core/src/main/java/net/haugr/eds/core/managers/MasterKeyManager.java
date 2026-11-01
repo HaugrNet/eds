@@ -90,11 +90,13 @@ public final class MasterKeyManager extends AbstractManager<CommonDao, MasterKey
             // Default check, new MasterKey is correct, updating the Key to
             // reflect this.
             masterKey.setKey(newMasterKey);
+            updateMasterKeySetting(request);
             response = new MasterKeyResponse(ReturnCode.SUCCESS, "MasterKey unlocked.");
         } else if (checkCredentials(oldMasterKey, admin, request.getCredential())) {
             throwConditionalException(dao.countMembers() != 1,
                     ReturnCode.ILLEGAL_ACTION, "Cannot alter the MasterKey, as Member Accounts exists.");
             masterKey.setKey(newMasterKey);
+            updateMasterKeySetting(request);
             updateMemberPassword(admin, request.getCredential());
             response = new MasterKeyResponse(ReturnCode.SUCCESS, "MasterKey updated.");
         } else {
@@ -105,22 +107,27 @@ public final class MasterKeyManager extends AbstractManager<CommonDao, MasterKey
         return response;
     }
 
-    private SecretEDSKey prepareNewMasterKey(final MasterKey masterKey, final MasterKeyRequest request) {
+    private static SecretEDSKey prepareNewMasterKey(final MasterKey masterKey, final MasterKeyRequest request) {
         byte[] rawSecret = request.getSecret();
 
         if (rawSecret == null) {
             rawSecret = MasterKey.readMasterKeySecretFromUrl(request.getUrl());
-            updateMasterKeySetting(request.getUrl());
-        } else {
-            // If set via a secret, the URL should be removed to prevent a
-            // restart to use the URL.
-            updateMasterKeySetting("");
         }
 
         return masterKey.generateMasterKey(rawSecret);
     }
 
-    private void updateMasterKeySetting(final String url) {
+    /**
+     * Stores the URL of the new MasterKey, so it is used after a restart. It
+     * must only be invoked once the System Administrator credentials have
+     * been verified, as the URL is otherwise open for anyone to change.
+     *
+     * @param request Request Object with the new MasterKey
+     */
+    private void updateMasterKeySetting(final MasterKeyRequest request) {
+        // If set via a secret, the URL should be removed to prevent a
+        // restart to use the URL.
+        final String url = (request.getSecret() == null) ? request.getUrl() : "";
         SettingEntity entity = dao.findSettingByKey(StandardSetting.MASTERKEY_URL);
 
         if (entity == null) {

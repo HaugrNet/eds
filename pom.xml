@@ -39,10 +39,7 @@
     <modules>
         <module>eds-api</module>
         <module>eds-core</module>
-        <module>eds-wildfly</module>
         <module>eds-quarkus</module>
-        <module>eds-quarkus-pg</module>
-        <module>eds-quarkus-h2</module>
         <module>eds-client</module>
         <module>eds-fitnesse</module>
     </modules>
@@ -83,7 +80,6 @@
 
         <!-- Dependency versions -->
         <version.jakartaee-api>11.0.0</version.jakartaee-api>
-        <version.jakarta.ejb-api>4.0.1</version.jakarta.ejb-api>
         <version.microprofile-openapi-api>4.1.1</version.microprofile-openapi-api>
         <version.microprofile-health-api>4.0.1</version.microprofile-health-api>
         <version.slf4j>2.0.17</version.slf4j>
@@ -100,10 +96,9 @@
              used by the Quarkus Platform BOM, see the Quarkus modules. -->
         <version.quarkus>3.40.1.1</version.quarkus>
         <version.hibernate-core.quarkus>7.4.9.Final</version.hibernate-core.quarkus>
-
-        <!-- WildFly versions -->
-        <version.wildfly>39.0.1.Final</version.wildfly>
-        <version.wildfly-datasources-galleon-pack>4.0.0.Final</version.wildfly-datasources-galleon-pack>
+        <!-- JUnit version used by the Quarkus BOM, the Quarkus test framework
+             does not work with the version.junit set above -->
+        <version.junit.quarkus>6.1.3</version.junit.quarkus>
 
         <!-- Plugin versions -->
         <version.maven-clean-plugin>3.2.0</version.maven-clean-plugin>
@@ -125,7 +120,6 @@
         <version.sonar-maven-plugin>5.1.0.4751</version.sonar-maven-plugin>
         <version.cyclonedx-maven-plugin>2.9.1</version.cyclonedx-maven-plugin>
         <version.smallrye-open-api-maven-plugin>4.2.0</version.smallrye-open-api-maven-plugin>
-        <version.wildfly-maven-plugin>5.1.5.Final</version.wildfly-maven-plugin>
     </properties>
 
     <dependencyManagement>

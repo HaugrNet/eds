@@ -17,16 +17,19 @@
 package net.haugr.eds.core;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import jakarta.ejb.Timer;
 import net.haugr.eds.core.enums.StandardSetting;
+import net.haugr.eds.core.model.SchemaManager;
+import net.haugr.eds.core.model.SchemaManager.Outcome;
 import net.haugr.eds.core.setup.DatabaseSetup;
 import net.haugr.eds.core.setup.fakes.FakeEntityManager;
-import net.haugr.eds.core.setup.fakes.FakeTimer;
-import net.haugr.eds.core.setup.fakes.FakeTimerService;
+import net.haugr.eds.core.setup.fakes.FakeUnreachableDataSource;
+import org.h2.jdbcx.JdbcDataSource;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -45,23 +48,50 @@ final class StartupBeanTest extends DatabaseSetup {
     @Test
     void testStartupWithEmptyDB() {
         final var entityManager = new FakeEntityManager();
-        final var timerService = new FakeTimerService();
         final var sanitizerBean = prepareSanitizerBean(settings);
-        final var bean = new StartupBean(entityManager, sanitizerBean, timerService, settings);
+        final var bean = new StartupBean(entityManager, sanitizerBean, settings);
 
-        bean.startup();
+        assertEquals(Outcome.FAILED, bean.startup());
 
         assertFalse(Boolean.parseBoolean(settings.get(StandardSetting.IS_READY.getKey())));
     }
 
     @Test
     void testStartupWithValidDB() {
-        final var timerService = new FakeTimerService();
         final var sanitizerBean = prepareSanitizerBean();
 
-        final StartupBean bean = new StartupBean(entityManager, sanitizerBean, timerService, settings);
+        final StartupBean bean = new StartupBean(entityManager, sanitizerBean, settings);
 
-        bean.startup();
+        assertEquals(Outcome.READY, bean.startup());
+
+        assertTrue(Boolean.parseBoolean(settings.get(StandardSetting.IS_READY.getKey())));
+        assertNull(bean.getLastConnectionError());
+    }
+
+    @Test
+    void testStartupWithUnreachableDatabase() {
+        // The startup must stop before verifying the database, so the
+        // EntityManager is never used.
+        final var schemaManager = new SchemaManager(new FakeUnreachableDataSource());
+        final var bean = new StartupBean(null, prepareSanitizerBean(), schemaManager, settings);
+
+        assertEquals(Outcome.UNREACHABLE, bean.startup());
+
+        assertFalse(Boolean.parseBoolean(settings.get(StandardSetting.IS_READY.getKey())));
+        assertEquals(FakeUnreachableDataSource.MESSAGE, bean.getLastConnectionError());
+    }
+
+    @Test
+    void testStartupWithSchemaManagerAndExistingSchema() {
+        // The same in-memory database as the EntityManager of the tests, where
+        // the schema exists, so the full startup is run.
+        final JdbcDataSource dataSource = new JdbcDataSource();
+        dataSource.setURL("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1");
+        dataSource.setUser("sa");
+        dataSource.setPassword("");
+        final var bean = new StartupBean(entityManager, prepareSanitizerBean(), new SchemaManager(dataSource), settings);
+
+        assertEquals(Outcome.READY, bean.startup());
 
         assertTrue(Boolean.parseBoolean(settings.get(StandardSetting.IS_READY.getKey())));
     }
@@ -69,8 +99,7 @@ final class StartupBeanTest extends DatabaseSetup {
     @Test
     void testStartupWithSanityCheck() {
         final var sanitizerBean = prepareSanitizerBean();
-        final var timerService = new FakeTimerService();
-        final var bean = new StartupBean(entityManager, sanitizerBean, timerService, settings);
+        final var bean = new StartupBean(entityManager, sanitizerBean, settings);
         settings.set(StandardSetting.SANITY_STARTUP.getKey(), "true");
 
         bean.startup();
@@ -81,17 +110,8 @@ final class StartupBeanTest extends DatabaseSetup {
     @Test
     void testRunSanitizing() {
         final var sanitizerBean = prepareSanitizerBean();
-        final var bean = new StartupBean(entityManager, sanitizerBean, null, settings);
+        final var bean = new StartupBean(entityManager, sanitizerBean, settings);
 
         assertDoesNotThrow(bean::runSanitizing);
-    }
-
-    @Test
-    void testRunSanitizingWithTimer() {
-        final var sanitizerBean = prepareSanitizerBean();
-        final var bean = new StartupBean(entityManager, sanitizerBean, null, settings);
-        final Timer timer = new FakeTimer();
-
-        assertDoesNotThrow(() -> bean.runSanitizingWithTimeout(timer));
     }
 }

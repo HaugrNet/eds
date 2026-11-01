@@ -53,26 +53,22 @@ jobs:
             **/target/*.ear
           if-no-files-found: ignore
 
-      # The EDS container image is built from the uber-jar produced above, and
-      # the PostgreSQL image is the one referenced in the Docker Compose setup
+      # The EDS container image is built from the uber-jar produced above. EDS
+      # does not ship a database container, it uses an existing PostgreSQL
       - name: Build EDS container image
-        run: |
-          docker build -f accessories/docker/Dockerfile.quarkus -t eds-quarkus:ci .
-          echo "POSTGRES_IMAGE=$(yq -r '.services["eds-db"].image' accessories/docker/docker-compose.yml)" >> "$GITHUB_ENV"
+        run: docker build -f accessories/docker/Dockerfile.quarkus -t eds-quarkus:ci .
 
       - name: Install Syft
         id: syft
         uses: anchore/sbom-action/download-syft@v0
 
-      # Container SBOMs cover the operating system packages and the Java
-      # runtime of the images, in addition to the libraries in the uber-jar
-      - name: Generate container SBOMs
+      # The container SBOM covers the operating system packages and the Java
+      # runtime of the image, in addition to the libraries in the uber-jar
+      - name: Generate container SBOM
         id: container-sbom
         run: |
           ${{ steps.syft.outputs.cmd }} scan eds-quarkus:ci \
               -o cyclonedx-json=target/container-eds-quarkus-cyclonedx.json
-          ${{ steps.syft.outputs.cmd }} scan "${POSTGRES_IMAGE}" \
-              -o cyclonedx-json=target/container-postgres-cyclonedx.json
 
       - name: Install Grype
         id: grype
@@ -90,14 +86,10 @@ jobs:
               -o json=grype-report.json
 
       # The EDS image fails the build on High or Critical findings, like the
-      # Maven SBOM. The PostgreSQL image is a 3rd party image, which is only
-      # reported, as findings there must be fixed upstream
-      - name: Scan container SBOMs for vulnerabilities
+      # Maven SBOM
+      - name: Scan container SBOM for vulnerabilities
         if: ${{ !cancelled() && steps.container-sbom.outcome == 'success' }}
         run: |
-          ${{ steps.grype.outputs.cmd }} sbom:target/container-postgres-cyclonedx.json \
-              -o table \
-              -o json=grype-report-postgres-container.json
           ${{ steps.grype.outputs.cmd }} sbom:target/container-eds-quarkus-cyclonedx.json \
               --fail-on high \
               -o table \

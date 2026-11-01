@@ -23,12 +23,12 @@ it can be used to share either files between users or data objects between apps
 or applications. This makes EDS the perfect companion for anyone who has Data
 Protection & Privacy concerns, such as GDPR.
 
-EDS is written in Java 25 / Jakarta EE 11, with no third-part dependencies, meaning
-it can run on any Host or in any Cloud where a Jakarta EE Container is
-available. Currently, only the [PostgreSQL](https://www.postgresql.org/) database
-is supported, but thanks to the flexibility of Jakarta EE, it is possible to use any
-database desired. Testing of EDS has been done with [WildFly](http://www.wildfly.org/) and
-[Quarkus](https://quarkus.io/).
+EDS is written in Java 25 / Jakarta EE 11, with no third-part dependencies, and
+runs on [Quarkus](https://quarkus.io/), either as a JAR or as a container, on any
+Host or in any Cloud. For production, it uses a
+[PostgreSQL](https://www.postgresql.org/) database, and creates the tables itself;
+without a database configured, it uses an in-memory H2 database, for tests and
+demos. See [RUNNING.md](RUNNING.md) for details.
 
 ## Build, Install, and Run
 
@@ -63,7 +63,7 @@ This produces the following files:
 * ```target/eds-<version>-cyclonedx.(json|xml)``` – the aggregated SBOM,
   covering all modules of the project.
 * ```<module>/target/<module>-<version>-cyclonedx.(json|xml)``` – an SBOM for
-  each individual module, e.g. ```eds-quarkus-pg/target/eds-quarkus-pg-2.0-SNAPSHOT-cyclonedx.json```.
+  each individual module, e.g. ```eds-quarkus/target/eds-quarkus-2.0-SNAPSHOT-cyclonedx.json```.
 
 The SBOM files are attached to the build, so they will also be installed or
 deployed together with the other artifacts when running ```mvn install -Psbom```
@@ -83,30 +83,26 @@ grype sbom:target/eds-2.0-SNAPSHOT-cyclonedx.json --fail-on high
 Vulnerabilities which have been reviewed and found not to apply to EDS, can be
 suppressed in ```.grype.yaml```, together with a justification.
 
-#### Container SBOMs
-The Maven SBOM only covers the Java libraries. The containers from the Docker
-Compose setup in ```accessories/docker``` also contain operating system
-packages and a Java runtime, so the CI Build generates a CycloneDX SBOM for
-each container image with [Syft](https://github.com/anchore/syft):
+#### Container SBOM
+The Maven SBOM only covers the Java libraries. The EDS container image, built
+from ```accessories/docker/Dockerfile.quarkus```, also contains operating
+system packages and a Java runtime, so the CI Build generates a CycloneDX SBOM
+for it with [Syft](https://github.com/anchore/syft), written to
+```target/container-eds-quarkus-cyclonedx.json```. EDS does not ship a database
+container, it uses an existing PostgreSQL database.
 
-* ```target/container-eds-quarkus-cyclonedx.json``` – the EDS image, built
-  from ```accessories/docker/Dockerfile.quarkus```.
-* ```target/container-postgres-cyclonedx.json``` – the PostgreSQL image
-  referenced in ```docker-compose.yml```.
-
-Both are scanned with Grype. The EDS image fails the build on High or Critical
-findings, the PostgreSQL image is a 3rd party image, so its findings are only
-reported. All SBOMs and vulnerability reports are available as build artifacts.
-The container SBOMs can be generated locally, after the Maven build, with:
+The container SBOM is scanned with Grype, and fails the build on High or
+Critical findings, like the Maven SBOM. All SBOMs and vulnerability reports are
+available as build artifacts. The container SBOM can be generated locally,
+after the Maven build, with:
 
 ```bash
 docker build -f accessories/docker/Dockerfile.quarkus -t eds-quarkus:local .
 syft scan eds-quarkus:local -o cyclonedx-json=target/container-eds-quarkus-cyclonedx.json
-syft scan postgres:18-alpine -o cyclonedx-json=target/container-postgres-cyclonedx.json
 grype sbom:target/container-eds-quarkus-cyclonedx.json --fail-on high
 ```
 
-All of the above, the Maven build, the container images, the SBOMs and the
+All of the above, the Maven build, the container image, the SBOMs and the
 scans, can also be run in one step, with the same pass/fail rules as the CI
 Build. It requires Docker, Syft, Grype and jq:
 

@@ -13,7 +13,7 @@
 
     <artifactId>eds-quarkus</artifactId>
     <name>EDS - Quarkus</name>
-    <description>Quarkus runtime module</description>
+    <description>Quarkus runtime module, which selects PostgreSQL or the in-memory H2 database at startup</description>
     <packaging>jar</packaging>
 
     <properties>
@@ -29,6 +29,17 @@
                 <artifactId>hibernate-core</artifactId>
                 <version>${version.hibernate-core.quarkus}</version>
             </dependency>
+            <!-- Override parent pom's JUnit 5.x with the version used by the Quarkus BOM -->
+            <dependency>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter-engine</artifactId>
+                <version>${version.junit.quarkus}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter-params</artifactId>
+                <version>${version.junit.quarkus}</version>
+            </dependency>
             <!-- Import Quarkus BOM -->
             <dependency>
                 <groupId>${quarkus.platform.group-id}</groupId>
@@ -41,11 +52,6 @@
     </dependencyManagement>
 
     <dependencies>
-        <dependency>
-            <groupId>jakarta.ejb</groupId>
-            <artifactId>jakarta.ejb-api</artifactId>
-            <version>${version.jakarta.ejb-api}</version>
-        </dependency>
         <!-- EDS Core module, containing JAX-RS & logic -->
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -93,6 +99,16 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
         </dependency>
+
+        <!-- Both JDBC Drivers are included, the database is selected at startup -->
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-jdbc-postgresql</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-jdbc-h2</artifactId>
+        </dependency>
         
         <!-- Test -->
         <dependency>
@@ -109,6 +125,16 @@
 
     <build>
         <plugins>
+            <!-- The Quarkus tests require the JBoss Log Manager -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <systemPropertyVariables>
+                        <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
+                    </systemPropertyVariables>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -126,46 +152,20 @@
                 <executions>
                     <execution>
                         <goals>
+                            <goal>build</goal>
                             <goal>generate-code</goal>
                             <goal>generate-code-tests</goal>
                         </goals>
                     </execution>
                 </executions>
                 <configuration>
-                    <!-- Skip build for base module - variant modules will build -->
-                    <skip>true</skip>
+                    <skip>false</skip>
                     <ignoredEntries>
                         <ignoredEntry>META-INF/quarkus-config-doc/quarkus-config-model-version</ignoredEntry>
                         <ignoredEntry>META-INF/quarkus-config-doc/quarkus-config-model.json</ignoredEntry>
                         <ignoredEntry>META-INF/maven/org.jctools/jctools-core/pom.properties</ignoredEntry>
                     </ignoredEntries>
                 </configuration>
-            </plugin>
-            <!-- Copy test resources from eds-core to be used in eds-quarkus -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-resources-plugin</artifactId>
-                <version>${version.maven-resources-plugin}</version>
-                <executions>
-                    <execution>
-                        <id>copy-test-resources</id>
-                        <phase>generate-test-resources</phase>
-                        <goals>
-                            <goal>copy-resources</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${project.build.directory}/test-classes</outputDirectory>
-                            <resources>
-                                <resource>
-                                    <directory>${project.basedir}/../eds-core/src/test/resources</directory>
-                                    <includes>
-                                        <include>META-INF/init-h2.sql</include>
-                                    </includes>
-                                </resource>
-                            </resources>
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
     </build>

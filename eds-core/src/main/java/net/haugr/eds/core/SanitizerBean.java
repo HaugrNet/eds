@@ -16,7 +16,7 @@
  */
 package net.haugr.eds.core;
 
-import jakarta.ejb.Stateless;
+import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
@@ -36,10 +36,13 @@ import net.haugr.eds.core.model.Settings;
  * will mark the data invalid. This way, the corrupted record can be either
  * removed or replaced with a valid record from a backup.</p>
  *
+ * <p>The Sanity checks are run hourly by the runtime (see the
+ * SanitizerSchedule in eds-quarkus), and optionally at startup.</p>
+ *
  * @author Kim Jensen
  * @since EDS 1.0
  */
-@Stateless
+@ApplicationScoped
 @Transactional
 public class SanitizerBean {
 
@@ -62,7 +65,6 @@ public class SanitizerBean {
         this.manager = manager;
     }
 
-    @Transactional(Transactional.TxType.REQUIRED)
     public void sanitize() {
         manager.sanitize();
     }

@@ -1,6 +1,8 @@
 # Running EDS
 
-EDS can be deployed using multiple runtime options. All require a PostgreSQL database.
+EDS runs on Quarkus, either directly as a JAR, or as a container. It uses
+PostgreSQL when configured, and otherwise an in-memory H2 database for tests
+and demos.
 
 ## Prerequisites
 
@@ -10,148 +12,39 @@ EDS requires Java 25 or later.
 
 ### PostgreSQL Database Setup
 
-Use the provided SQL scripts to set up the database:
+PostgreSQL is only needed for production use; for tests and demos, EDS runs
+without any database configuration, using the in-memory H2 database.
 
-```bash
-# Run as postgres user (recommended)
-sudo -u postgres psql --file accessories/release/postgresql/01-setup.sql
+The PostgreSQL database, user and password are a prerequisite, provided by
+whoever runs the database server. EDS does not need, and should not have,
+the rights to create them. For example:
 
-# Or if postgres has a Linux password
-su postgres
-psql postgres --file accessories/release/postgresql/01-setup.sql
-exit
+```sql
+CREATE ROLE eds_user WITH LOGIN PASSWORD 'secret';
+CREATE DATABASE eds WITH OWNER = eds_user;
 ```
 
-The `01-setup.sql` script automatically runs:
-- `02-init.sql` - Creates database and user
-- `03-create.sql` - Creates tables
-- `04-update-*.sql` - Applies any schema updates
+Nothing else is needed: at startup, EDS detects an empty database, and
+creates the tables itself, in a single transaction. If several EDS instances
+start at the same time, only one of them creates the tables.
 
-## Option 1: WildFly Standalone Server
+The schema is shared between PostgreSQL and the in-memory H2 database, see
+`eds-core/src/main/resources/META-INF/eds-schema.sql`. EDS 2.0 requires a
+fresh database, as earlier versions cannot be upgraded in place.
 
-Deploy the WAR file to an existing WildFly installation using the provided control script.
+## Option 1: Quarkus
 
-### Build
+Lightweight runtime using the Quarkus framework. A single JAR supports both
+databases, and selects one at startup:
 
-```bash
-mvn clean package -pl eds-wildfly -am -DskipTests
-```
+| `EDS_DB_URL` | Database |
+|--------------|----------|
+| Set | PostgreSQL at the given JDBC URL. If it cannot be reached, EDS stays not ready and retries until it is reachable; it never falls back to H2. |
+| Not set | In-memory H2. All data is lost when EDS stops, so this is only meant for tests and evaluation. |
 
-### Setup Environment
-
-```bash
-export JBOSS_HOME="/path/to/wildfly"
-export PATH="${PATH}:$(pwd)/accessories/release/bin"
-```
-
-### Using the Control Script
-
-```bash
-cd accessories
-
-# Start WildFly
-wildfly.sh start
-
-# Configure WildFly (downloads PostgreSQL driver, creates datasource)
-wildfly.sh configure
-
-# Deploy EDS
-wildfly.sh deploy
-
-# Check status
-wildfly.sh status
-
-# View logs
-wildfly.sh log
-
-# Undeploy
-wildfly.sh undeploy
-
-# Stop WildFly
-wildfly.sh stop
-```
-
-#### Debug Mode
-
-Start WildFly with remote debugging enabled:
-
-```bash
-export DEBUG_PORT=8787
-wildfly.sh start
-```
-
-#### Script Configuration
-
-Edit `accessories/release/bin/wildfly.sh` to customize:
-
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `dbHost` | localhost | Database host |
-| `dbPort` | 5432 | Database port |
-| `dbUser` | eds_user | Database user |
-| `dbPassword` | eds | Database password |
-| `dbName` | eds | Database name |
-| `maxPostSize` | 26214400 | Max upload size (25 MB) |
-
-## Option 2: WildFly Bootable JAR (Galleon)
-
-Self-contained executable JAR with embedded WildFly server.
-
-### Build
-
-```bash
-mvn clean package -pl eds-wildfly -am -DskipTests
-```
-
-### Run with Defaults
-
-```bash
-java -jar eds-wildfly/target/eds-runnable.jar
-```
-
-### Run with Custom Properties
-
-Create a properties file (e.g., `eds.properties`):
-
-```properties
-# Database
-eds.db.url=jdbc:postgresql://dbserver:5432/eds
-eds.db.user=eds_user
-eds.db.password=secret
-
-# Server ports
-jboss.http.port=8080
-jboss.management.http.port=9990
-```
-
-Run with properties file:
-
-```bash
-java -jar eds-wildfly/target/eds-runnable.jar --properties=eds.properties
-```
-
-Or pass properties directly:
-
-```bash
-java -Deds.db.url=jdbc:postgresql://dbserver:5432/eds \
-     -Deds.db.user=eds_user \
-     -Deds.db.password=secret \
-     -jar eds-wildfly/target/eds-runnable.jar
-```
-
-### Bootable JAR Properties
-
-| Property | Default | Description |
-|----------|---------|-------------|
-| `eds.db.url` | jdbc:postgresql://localhost:5432/eds | Database JDBC URL |
-| `eds.db.user` | eds_user | Database user |
-| `eds.db.password` | eds | Database password |
-| `jboss.http.port` | 8080 | HTTP port |
-| `jboss.management.http.port` | 9990 | Management port |
-
-## Option 3: Quarkus
-
-Lightweight runtime using Quarkus framework.
+For PostgreSQL, the role and database must exist, see
+[PostgreSQL Database Setup](#postgresql-database-setup). If the schema is
+missing, EDS creates it at startup, in a single transaction.
 
 ### Build
 
@@ -159,160 +52,116 @@ Lightweight runtime using Quarkus framework.
 mvn clean package -pl eds-quarkus -am -DskipTests
 ```
 
-### Run with Defaults
+### Run
 
 ```bash
+# In-memory H2 database
+java -jar eds-quarkus/target/eds-runnable.jar
+
+# PostgreSQL
+EDS_DB_URL=jdbc:postgresql://dbserver:5432/eds \
+EDS_DB_USERNAME=eds_user \
+EDS_DB_PASSWORD=secret \
 java -jar eds-quarkus/target/eds-runnable.jar
 ```
 
-### Run with Custom Properties
-
-Pass properties via system properties:
-
-```bash
-java -Dquarkus.datasource.jdbc.url=jdbc:postgresql://dbserver:5432/eds \
-     -Dquarkus.datasource.username=eds_user \
-     -Dquarkus.datasource.password=secret \
-     -Dquarkus.http.port=8080 \
-     -jar eds-quarkus/target/eds-runnable.jar
-```
-
-Or use an external config file:
+The URL can also be given as system property, `-Deds.db.url=...`. Other
+Quarkus properties can be passed as system properties, e.g.
+`-Dquarkus.http.port=8080`, or via an external config file:
 
 ```bash
 java -Dquarkus.config.locations=/path/to/application.properties \
      -jar eds-quarkus/target/eds-runnable.jar
 ```
 
-### Quarkus Properties
+### Properties
 
 | Property | Default | Description |
 |----------|---------|-------------|
+| `EDS_DB_URL` / `eds.db.url` | (none, H2) | PostgreSQL JDBC URL, selects the database |
+| `EDS_DB_USERNAME` | eds_user | PostgreSQL user |
+| `EDS_DB_PASSWORD` | (empty) | PostgreSQL password |
+| `EDS_DB_RETRY_INTERVAL` | 10s | How often to retry, while PostgreSQL cannot be reached |
 | `quarkus.http.port` | 8080 | HTTP port |
-| `quarkus.http.root-path` | /eds | Application context path |
-| `quarkus.datasource.jdbc.url` | jdbc:postgresql://localhost:5432/eds | Database URL |
-| `quarkus.datasource.username` | eds_user | Database user |
-| `quarkus.datasource.password` | eds | Database password |
+| `quarkus.http.root-path` | /eds | Application context path (build time) |
+| `quarkus.management.port` | 9000 | Management port, with the health endpoints |
 
-## Option 4: Docker Compose
+## Option 2: Docker Compose
 
-Run EDS using Docker Compose with separate PostgreSQL and Quarkus containers.
+Run EDS as a single Quarkus container, using Docker Compose. EDS does not ship
+a database container. Like the Quarkus JAR (see Option 1), it uses an existing
+PostgreSQL database when `EDS_DB_URL` is set, and otherwise the in-memory H2
+database.
 
 ### Prerequisites
 
 - Docker and Docker Compose installed
+- For PostgreSQL: a database, user and password, see
+  [PostgreSQL Database Setup](#postgresql-database-setup); EDS creates the tables
 
-### Build and Run
+### Configuration
 
-```bash
-cd accessories
-
-# Build Quarkus JAR and start containers
-./docker.sh build
-```
-
-### Docker Control Script
+Without configuration, the container starts with the in-memory H2 database.
+For PostgreSQL, create `accessories/docker/.env` with the database connection:
 
 ```bash
-cd accessories
+# PostgreSQL connection
+EDS_DB_URL=jdbc:postgresql://host.docker.internal:5432/eds
+EDS_DB_PASSWORD=...
+EDS_DB_USERNAME=eds_user        # Default: eds_user
 
-# Start existing containers
-./docker.sh start
-
-# Stop containers
-./docker.sh stop
-
-# Restart containers
-./docker.sh restart
-
-# Reset database (removes all data)
-./docker.sh reset
-
-# View logs
-./docker.sh logs
-
-# Show container status
-./docker.sh status
-
-# Enter application container shell
-./docker.sh interactive
-
-# Remove containers and images
-./docker.sh remove
+# Optional
+EDS_CERTS_DIR=/path/to/certs    # Enables TLS, together with:
+EDS_TLS_CERT=/app/certs/tls.crt
+EDS_TLS_KEY=/app/certs/tls.key
+EDS_INSECURE_REQUESTS=enabled   # enabled | redirect | disabled
 ```
 
-### Architecture
+Inside the container, `localhost` is the container itself. For a PostgreSQL
+running on the Docker host, use `host.docker.internal`, which the Compose
+setup maps to the host. PostgreSQL must then also accept connections from the
+Docker network (`listen_addresses` in `postgresql.conf` and a matching entry
+in `pg_hba.conf`).
 
-The Docker Compose setup creates:
+### Control Script
 
-| Service | Description |
-|---------|-------------|
-| `eds-db` | PostgreSQL 18 database |
-| `eds-app` | Quarkus application container |
-
-Both containers communicate over an internal `eds-network` bridge network.
-
-### Custom Configuration
-
-Override settings using environment variables in `docker-compose.yml` or via command line:
+The containers are managed with `eds.sh` from the project root:
 
 ```bash
-# Custom port mapping
-docker compose up -d -e QUARKUS_HTTP_PORT=9080
-
-# Or edit docker-compose.yml ports section
+./eds.sh start     # Build the JAR if missing, start the container, wait until ready
+./eds.sh stop      # Stop the container
+./eds.sh restart   # Restart the container
+./eds.sh status    # Health and version of the running container
+./eds.sh logs      # Follow the container logs
+./eds.sh remove    # Remove the container and image
 ```
+
+### Health Checks
+
+The health endpoints are served on the management port `9000`, which is only
+exposed to the container network, not published to the host:
+
+| Endpoint | Purpose |
+|----------|---------|
+| `/q/health/live` | Liveness, the application is running |
+| `/q/health/ready` | Readiness, the database and EDS are ready |
+| `/q/health/started` | Startup completed |
+
+The container `HEALTHCHECK` uses the readiness endpoint. For Kubernetes, use
+the same endpoints for the probes, on port `9000`.
 
 ### Data Persistence
 
-Data is stored in local bind mounts under `accessories/docker/volumes/`:
-
-| Path | Description |
-|------|-------------|
-| `volumes/data/` | PostgreSQL database files |
-| `volumes/logs/` | Application logs (`eds.log`) |
-
-To reset the database:
-
-```bash
-./docker.sh reset
-```
-
-#### Upgrading from PostgreSQL 16
-
-The database container was upgraded from PostgreSQL 16 to 18. PostgreSQL
-cannot start on data files from an older major version, and from version 18
-the image stores its data in `volumes/data/18/docker`, instead of directly in
-`volumes/data/`. An existing database must therefore be migrated, by dumping
-it with the old version, and restoring it into a fresh PostgreSQL 18 database.
-Run the commands from `accessories/docker`, and replace `eds` with the value of
-`EDS_DB_NAME` if it has been changed in `.env`:
-
-```bash
-# 1. With the old (postgres:16-alpine) setup still running, dump the EDS database
-docker exec eds-postgres pg_dump -U postgres -d eds --clean --if-exists > eds-backup.sql
-docker compose down
-
-# 2. Move the old data aside, and start the new database. The init scripts
-#    create the EDS role, database and an empty schema during the first start
-mv volumes/data volumes/data-pg16
-mkdir volumes/data
-docker compose up -d eds-db
-
-# 3. Restore the dump, the --clean option replaces the empty schema
-docker exec -i eds-postgres psql -v ON_ERROR_STOP=1 -U postgres -d eds < eds-backup.sql
-docker compose up -d
-```
-
-Once EDS is verified to work, `volumes/data-pg16` and `eds-backup.sql` can be
-deleted.
+With PostgreSQL, all data is stored in the database; with H2, it is lost when
+the container stops. The container only writes its logs to a local bind
+mount, `accessories/docker/volumes/logs/` (`eds.log`).
 
 ## Verifying the Installation
 
 After starting, verify EDS is running:
 
 ```bash
-curl http://localhost:8080/eds/api/version
+curl -X POST -H "Content-Type: application/json" -d '{}' http://localhost:8080/eds/version
 ```
 
 ## FitNesse Integration Testing

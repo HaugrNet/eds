@@ -4,4 +4,4 @@ LABEL description="EDS Quarkus Builder"
 RUN apk add --no-cache maven
 WORKDIR /app
 COPY . .
-CMD ["mvn", "clean", "package", "-DskipTests", "-Dmaven.javadoc.skip=true", "-pl", "!eds-wildfly"]
+CMD ["mvn", "clean", "package", "-DskipTests", "-Dmaven.javadoc.skip=true"]

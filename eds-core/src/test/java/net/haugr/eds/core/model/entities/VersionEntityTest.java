@@ -38,10 +38,10 @@ final class VersionEntityTest extends DatabaseSetup {
     void testEntity() {
         final Query query = entityManager.createNamedQuery("version.findAll");
         final List<VersionEntity> found = CommonDao.findList(query);
-        assertEquals(4, found.size());
-        assertEquals(Long.valueOf(4L), found.getFirst().getId());
+        // EDS 2.0 is a clean break, so only the current version is registered.
+        assertEquals(1, found.size());
+        assertEquals(Long.valueOf(1L), found.getFirst().getId());
         assertEquals("2.0.0", found.getFirst().getEDSVersion());
-        assertEquals("H2", found.getFirst().getDBVendor());
         assertEquals(Integer.valueOf(4), found.getFirst().getSchemaVersion());
         assertNotNull(found.getFirst().getInstalled());
 
@@ -49,7 +49,6 @@ final class VersionEntityTest extends DatabaseSetup {
         final VersionEntity entity = new VersionEntity();
         entity.setId(9999L);
         entity.setEDSVersion("99.99.99");
-        entity.setDBVendor("SuperDB");
         entity.setSchemaVersion(9999);
         entity.setInstalled(Utilities.newDate());
 

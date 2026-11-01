@@ -9,6 +9,7 @@ readonly composeFile="${composeDir}/docker-compose.yml"
 readonly dockerFile="${composeDir}/Dockerfile.quarkus"
 readonly targetDir="${scriptDir}/target"
 readonly sbomImage="eds-quarkus:sbom-check"
+readonly appJar="${scriptDir}/eds-quarkus/target/eds-runnable.jar"
 readonly PORT=${EDS_PORT:-8080}
 
 # ==============================================================================
@@ -33,8 +34,7 @@ function exists() {
 # Check if runnable JARs exist
 # ==============================================================================
 function jarsExist() {
-    [[ -f "${scriptDir}/eds-quarkus-h2/target/eds-runnable.jar" ]] || \
-    [[ -f "${scriptDir}/eds-quarkus-pg/target/eds-runnable.jar" ]]
+    [[ -f "${appJar}" ]]
 }
 
 # ==============================================================================
@@ -47,8 +47,9 @@ function showHelp() {
     echo
     echo "  Run Commands:"
     echo "    run <module>       Run standalone JAR (quarkus | test)"
-    echo "                       * Quarkus requires a running EDS PostgreSQL database."
-    echo "                       * Test will launch Quarkus with an in-memory database."
+    echo "                       * Quarkus uses PostgreSQL, at EDS_DB_URL, or by default"
+    echo "                         at jdbc:postgresql://localhost:5432/eds."
+    echo "                       * Test uses the in-memory H2 database."
     echo "    run fitnesse       Runs the Fitnesse test suite"
     echo
     echo "  Container Commands:"
@@ -110,8 +111,8 @@ function doStart() {
     fi
 
     echo "Starting EDS containers..."
-    mkdir -p "${composeDir}/volumes/logs" "${composeDir}/volumes/data" 2>/dev/null
-    chmod 777 "${composeDir}/volumes/logs" "${composeDir}/volumes/data" 2>/dev/null || true
+    mkdir -p "${composeDir}/volumes/logs" 2>/dev/null
+    chmod 777 "${composeDir}/volumes/logs" 2>/dev/null || true
     docker compose -f "${composeFile}" up -d
 
     waitForReady
@@ -254,17 +255,19 @@ function doRun() {
             return 1
         fi
     else
-        local jarFile=""
+        # The same JAR is used for both, the database is selected by
+        # EDS_DB_URL: set means PostgreSQL, unset means in-memory H2.
+        local jarFile="${appJar}"
         local moduleName=""
+        local databaseUrl=""
 
         case "${module}" in
             quarkus)
-                jarFile="${scriptDir}/eds-quarkus-pg/target/eds-runnable.jar"
-                moduleName="Quarkus"
+                moduleName="Quarkus (PostgreSQL)"
+                databaseUrl="${EDS_DB_URL:-jdbc:postgresql://localhost:5432/eds}"
                 ;;
             test)
-                jarFile="${scriptDir}/eds-quarkus-h2/target/eds-runnable.jar"
-                moduleName="Quarkus"
+                moduleName="Quarkus (in-memory H2)"
                 ;;
             *)
                 echo "Unknown module: ${module}"
@@ -289,7 +292,7 @@ function doRun() {
         echo
 
         # Run the JAR (use exec to replace shell process for clean Ctrl+C handling)
-        java -jar "${jarFile}"
+        EDS_DB_URL="${databaseUrl}" java -jar "${jarFile}"
     fi
 }
 
@@ -297,24 +300,21 @@ function doRun() {
 # SBOM Check
 # ------------------------------------------------------------------------------
 # Builds everything and checks the Software Bill of Materials (SBOM) for both
-# the Maven build and the containers, the same way as the CI Build does:
+# the Maven build and the EDS container, the same way as the CI Build does:
 #
 #   1. Maven build with the "sbom" profile, producing the CycloneDX SBOMs.
-#   2. Builds the EDS container image, and pulls the PostgreSQL image that the
-#      Docker Compose setup uses.
-#   3. Generates a CycloneDX SBOM for each container image with Syft.
-#   4. Validates all SBOMs, and scans them for vulnerabilities with Grype.
+#   2. Builds the EDS container image.
+#   3. Generates a CycloneDX SBOM for the container image with Syft.
+#   4. Validates the SBOMs, and scans them for vulnerabilities with Grype.
 #
-# The Maven SBOM and the EDS image fail the check on High or Critical
-# findings. PostgreSQL is a 3rd party image, so its findings are only
-# reported. Reviewed findings can be suppressed in .grype.yaml.
+# Both fail the check on High or Critical findings. Reviewed findings can be
+# suppressed in .grype.yaml.
 #
 # Requires: java 25, docker, syft, grype, jq (and network access, as the
 # CycloneDX plugin is skipped when Maven runs offline).
 # ==============================================================================
 sbomFailures=()
 sbomMavenFile=""
-sbomPostgresImage=""
 sbomLogDir=""
 
 function sbomSection() {
@@ -381,17 +381,10 @@ function sbomPrerequisites() {
         result=1
     fi
 
-    # The PostgreSQL image is the one referenced in the Docker Compose setup
-    sbomPostgresImage=$(sed -n 's/^[[:space:]]*image:[[:space:]]*\(postgres[^[:space:]]*\).*/\1/p' "${composeFile}" | head -1)
-    if [[ -z "${sbomPostgresImage}" ]]; then
-        sbomFail "No PostgreSQL image found in ${composeFile#"${scriptDir}"/}"
-        result=1
-    fi
-
     return ${result}
 }
 
-# Maven build with the SBOM profile, and the container images
+# Maven build with the SBOM profile, and the container image
 function sbomBuild() {
     local mvn="mvn"
     [[ -x "${scriptDir}/mvnw" ]] && mvn="${scriptDir}/mvnw"
@@ -400,17 +393,13 @@ function sbomBuild() {
         "${mvn}" -B -q -ntp -DskipTests -Psbom clean package || return 1
     sbomRun "Built image ${sbomImage}" docker-build \
         docker build -q -f "${dockerFile}" -t "${sbomImage}" .
-    sbomRun "Pulled image ${sbomPostgresImage}" docker-pull \
-        docker pull -q "${sbomPostgresImage}"
 }
 
-# Container SBOMs, generated with Syft
+# Container SBOM, generated with Syft
 function sbomGenerateContainerSboms() {
     mkdir -p "${targetDir}"
     sbomRun "Syft SBOM for ${sbomImage}" syft-eds \
         syft scan "${sbomImage}" -q -o "cyclonedx-json=${targetDir}/container-eds-quarkus-cyclonedx.json"
-    sbomRun "Syft SBOM for ${sbomPostgresImage}" syft-postgres \
-        syft scan "${sbomPostgresImage}" -q -o "cyclonedx-json=${targetDir}/container-postgres-cyclonedx.json"
 }
 
 # Counts the components with a Maven package URL in an SBOM
@@ -455,7 +444,6 @@ function sbomValidateAll() {
     local edsSbom="${targetDir}/container-eds-quarkus-cyclonedx.json"
     sbomValidate "Maven" "${sbomMavenFile:-${targetDir}/eds-<version>-cyclonedx.json}" "1.6"
     sbomValidate "EDS image" "${edsSbom}" ""
-    sbomValidate "PostgreSQL image" "${targetDir}/container-postgres-cyclonedx.json" ""
 
     # The EDS image is built from the uber-jar, so it must also contain the
     # Java libraries, not only the operating system packages and the JRE.
@@ -510,7 +498,6 @@ function sbomScan() {
 function sbomScanAll() {
     sbomScan "Maven" "${sbomMavenFile}" "grype-report.json" gate
     sbomScan "EDS image" "${targetDir}/container-eds-quarkus-cyclonedx.json" "grype-report-eds-container.json" gate
-    sbomScan "PostgreSQL image" "${targetDir}/container-postgres-cyclonedx.json" "grype-report-postgres-container.json"
 }
 
 # Prints the summary, and returns the result
@@ -565,7 +552,7 @@ function doSbom() {
     sbomSection "SBOMs"
     sbomValidateAll
 
-    sbomSection "Vulnerabilities (fails on High or Critical, except PostgreSQL)"
+    sbomSection "Vulnerabilities (fails on High or Critical)"
     sbomScanAll
 
     echo
@@ -603,7 +590,7 @@ case "${action}" in
         docker compose -f "${composeFile}" logs -f
         ;;
     pbuild)
-        cp "${scriptDir}/eds-quarkus-pg/target/eds-runnable.jar" "${podmanDir}"
+        cp "${appJar}" "${podmanDir}"
         podman build -f "${podmanDir}/eds-quarkus.container" -t eds-quarkus "${podmanDir}"
         rm "${podmanDir}/eds-runnable.jar"
         ;;
@@ -611,7 +598,9 @@ case "${action}" in
         podman run -d \
           --rm \
           --network=host \
-          -e DB_URL=jdbc:postgresql://localhost:5432/eds \
+          -e EDS_DB_URL="${EDS_DB_URL:-jdbc:postgresql://localhost:5432/eds}" \
+          -e EDS_DB_USERNAME="${EDS_DB_USERNAME:-eds_user}" \
+          -e EDS_DB_PASSWORD="${EDS_DB_PASSWORD:-}" \
           --name eds-quarkus \
           eds-quarkus
         ;;

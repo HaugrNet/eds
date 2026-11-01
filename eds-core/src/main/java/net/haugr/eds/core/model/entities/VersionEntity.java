@@ -46,9 +46,6 @@ public class VersionEntity {
     @Column(name = "eds_version", unique = true, nullable = false, updatable = false, length = 10)
     private String edsVersion = null;
 
-    @Column(name = "db_vendor", nullable = false, updatable = false, length = 25)
-    private String dbVendor = null;
-
     @Column(name = "installed", nullable = false, updatable = false)
     private LocalDateTime installed = null;
 
@@ -78,14 +75,6 @@ public class VersionEntity {
 
     public String getEDSVersion() {
         return edsVersion;
-    }
-
-    public void setDBVendor(final String dbVendor) {
-        this.dbVendor = dbVendor;
-    }
-
-    public String getDBVendor() {
-        return dbVendor;
     }
 
     public void setInstalled(final LocalDateTime installed) {

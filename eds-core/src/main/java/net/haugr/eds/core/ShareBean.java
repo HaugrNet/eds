@@ -16,7 +16,7 @@
  */
 package net.haugr.eds.core;
 
-import jakarta.ejb.Stateless;
+import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
@@ -47,13 +47,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * <p>Java EE Bean for the Share functionality and final Error handling layer.
- * This is also the layer where transactions are controlled.</p>
+ * <p>CDI Bean for the Share functionality and final Error handling layer.
+ * This is also the layer where transactions are controlled: every business
+ * method runs in a transaction (REQUIRED). Even reading requests may write,
+ * as the System Administrator account is created on its first use.</p>
  *
  * @author Kim Jensen
  * @since EDS 1.0
  */
-@Stateless
+@ApplicationScoped
+@Transactional
 public class ShareBean {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ShareBean.class);
@@ -75,7 +78,6 @@ public class ShareBean {
         this.settings = settings;
     }
 
-    @Transactional(Transactional.TxType.REQUIRED)
     public ProcessDataTypeResponse processDataType(final ProcessDataTypeRequest request) {
         ProcessDataTypeResponse response;
 
@@ -94,7 +96,6 @@ public class ShareBean {
         return response;
     }
 
-    @Transactional(Transactional.TxType.SUPPORTS)
     public FetchDataTypeResponse fetchDataTypes(final FetchDataTypeRequest request) {
         FetchDataTypeResponse response;
 
@@ -113,7 +114,6 @@ public class ShareBean {
         return response;
     }
 
-    @Transactional(Transactional.TxType.REQUIRED)
     public ProcessDataResponse processData(final ProcessDataRequest request) {
         ProcessDataResponse response;
 
@@ -132,7 +132,6 @@ public class ShareBean {
         return response;
     }
 
-    @Transactional(Transactional.TxType.REQUIRED)
     public FetchDataResponse fetchData(final FetchDataRequest request) {
         FetchDataResponse response;
 
@@ -151,7 +150,6 @@ public class ShareBean {
         return response;
     }
 
-    @Transactional(Transactional.TxType.REQUIRED)
     public SignResponse sign(final SignRequest request) {
         SignResponse response;
 
@@ -170,7 +168,6 @@ public class ShareBean {
         return response;
     }
 
-    @Transactional(Transactional.TxType.SUPPORTS)
     public VerifyResponse verify(final VerifyRequest request) {
         VerifyResponse response;
 
@@ -189,7 +186,6 @@ public class ShareBean {
         return response;
     }
 
-    @Transactional(Transactional.TxType.SUPPORTS)
     public FetchSignatureResponse fetchSignatures(final FetchSignatureRequest request) {
         FetchSignatureResponse response;
 

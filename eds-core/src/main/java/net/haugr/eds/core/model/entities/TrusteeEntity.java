@@ -46,7 +46,7 @@ import jakarta.persistence.Table;
                 "where t.member = :member" +
                 "  and t.circle.externalId = :externalCircleId " +
                 "  and t.trustLevel in :permissions " +
-                "order by t.member.name asc")
+                "order by lower(t.member.name) asc")
 @NamedQuery(name = "trustee.findByCircleAndMember",
         query = "select t " +
                 "from TrusteeEntity t " +
@@ -56,17 +56,17 @@ import jakarta.persistence.Table;
         query = "select t " +
                 "from TrusteeEntity t " +
                 "where t.member.externalId = :externalMemberId " +
-                "order by t.circle.name asc")
+                "order by lower(t.circle.name) asc")
 @NamedQuery(name = "trustee.findByExternalCircleId",
         query = "select t " +
                 "from TrusteeEntity t " +
                 "where t.circle.externalId = :externalCircleId " +
-                "order by t.member.name asc")
+                "order by lower(t.member.name) asc")
 @NamedQuery(name = "trustee.findCirclesByMember",
         query = "select t.circle " +
                 "from TrusteeEntity t " +
                 "where t.member = :member " +
-                "order by t.circle.name asc")
+                "order by lower(t.circle.name) asc")
 @NamedQuery(name = "trustee.findSharedCircles",
         query = "select t1 " +
                 "from TrusteeEntity t1," +
@@ -74,12 +74,12 @@ import jakarta.persistence.Table;
                 "where t1.circle.id = t2.circle.id" +
                 "  and t1.member = :member" +
                 "  and t2.member = :requested " +
-                "order by t1.circle.name asc")
+                "order by lower(t1.circle.name) asc")
 @NamedQuery(name = "trustee.findByCircle",
         query = "select t " +
                 "from TrusteeEntity t " +
                 "where t.circle = :circle " +
-                "order by t.member.name asc")
+                "order by lower(t.member.name) asc")
 @Table(name = "eds_trustees")
 public class TrusteeEntity extends EDSEntity {
 

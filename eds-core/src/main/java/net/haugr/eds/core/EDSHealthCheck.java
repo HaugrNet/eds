@@ -23,12 +23,12 @@ import org.eclipse.microprofile.health.HealthCheckResponse;
 import org.eclipse.microprofile.health.Readiness;
 
 /**
- * <p>MicroProfile Health Check for EDS on WildFly. Reports the readiness status
- * based on whether the EDS system has been properly initialized (database schema
- * verified, settings loaded).</p>
+ * <p>MicroProfile Health Check for EDS. Reports the readiness status based on
+ * whether the EDS system has been properly initialized (database schema
+ * prepared and verified, settings loaded).</p>
  *
- * <p>This check is used for Kubernetes readiness probes. Liveness is handled
- * by the default WildFly liveness check.</p>
+ * <p>This check is used for the readiness probes. Liveness is handled by the
+ * default liveness check of the runtime.</p>
  *
  * @author Kim Jensen
  * @since EDS 2.0

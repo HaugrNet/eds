@@ -17,23 +17,15 @@
 package net.haugr.eds.core;
 
 import java.util.List;
-import jakarta.annotation.PostConstruct;
-import jakarta.ejb.Asynchronous;
-import jakarta.ejb.ScheduleExpression;
-import jakarta.ejb.Singleton;
-import jakarta.ejb.Startup;
-import jakarta.ejb.Timeout;
-import jakarta.ejb.Timer;
-import jakarta.ejb.TimerConfig;
-import jakarta.ejb.TimerService;
-import jakarta.ejb.TransactionAttribute;
-import jakarta.ejb.TransactionAttributeType;
+import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import net.haugr.eds.core.enums.StandardSetting;
 import net.haugr.eds.core.exceptions.EDSException;
 import net.haugr.eds.core.model.CommonDao;
+import net.haugr.eds.core.model.SchemaManager;
+import net.haugr.eds.core.model.SchemaManager.Outcome;
 import net.haugr.eds.core.model.Settings;
 import net.haugr.eds.core.model.entities.SettingEntity;
 import net.haugr.eds.core.model.entities.VersionEntity;
@@ -41,16 +33,26 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * <p>Startup Bean for EDS, it is a singleton, which handles loading of the
- * settings. It also runs the EDS Sanity checks.</p>
+ * <p>Startup Bean for EDS, which prepares and verifies the database, loads
+ * the settings, and, if requested, runs an initial EDS Sanity check. The
+ * regular (hourly) Sanity checks are scheduled by the runtime.</p>
+ *
+ * <p>If a {@link SchemaManager} is given, the startup first creates the EDS
+ * schema, if it is missing, so an empty database (with only the database,
+ * user and password prepared) is filled automatically. Without one, the
+ * schema must already exist, as is the case for the tests.</p>
+ *
+ * <p>The bean does not start itself; the runtime invokes {@link #startup()},
+ * and may repeat it while the outcome is {@link Outcome#UNREACHABLE}. The
+ * runtime must also provide the {@link SchemaManager} for the database.</p>
+ *
+ * <p>The startup is deliberately not transactional, as the SchemaManager
+ * commits the schema itself, and the verification only reads.</p>
  *
  * @author Kim Jensen
  * @since EDS 1.0
  */
-@Startup
-@Singleton
-@Asynchronous
-@TransactionAttribute(TransactionAttributeType.REQUIRED)
+@ApplicationScoped
 public class StartupBean {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(StartupBean.class);
@@ -58,56 +60,96 @@ public class StartupBean {
 
     private final EntityManager entityManager;
     private final SanitizerBean sanitizerBean;
-    private final TimerService timerService;
+    private final SchemaManager schemaManager;
     private final Settings settings;
 
     public StartupBean() {
-        this(null, null, null);
+        this(null, null);
     }
 
+    public StartupBean(final EntityManager entityManager, final SanitizerBean sanitizerBean) {
+        this(entityManager, sanitizerBean, Settings.getInstance());
+    }
+
+    public StartupBean(final EntityManager entityManager, final SanitizerBean sanitizerBean, final Settings settings) {
+        this(entityManager, sanitizerBean, null, settings);
+    }
+
+    /**
+     * CDI Constructor.
+     *
+     * @param entityManager EDS EntityManager instance
+     * @param sanitizerBean EDS Sanitizer Bean instance
+     * @param schemaManager Creates the schema if missing, provided by the
+     *                      runtime for the selected database
+     */
     @Inject
-    public StartupBean(final EntityManager entityManager, final SanitizerBean sanitizerBean, final TimerService timerService) {
-        this(entityManager, sanitizerBean, timerService, Settings.getInstance());
+    public StartupBean(final EntityManager entityManager, final SanitizerBean sanitizerBean, final SchemaManager schemaManager) {
+        this(entityManager, sanitizerBean, schemaManager, Settings.getInstance());
     }
 
-    public StartupBean(final EntityManager entityManager, final SanitizerBean sanitizerBean, final TimerService timerService, final Settings settings) {
+    /**
+     * Full Constructor.
+     *
+     * @param entityManager EDS EntityManager instance
+     * @param sanitizerBean EDS Sanitizer Bean instance
+     * @param schemaManager Creates the schema if missing, or null if the
+     *                      schema is created otherwise
+     * @param settings      EDS Settings
+     */
+    public StartupBean(final EntityManager entityManager, final SanitizerBean sanitizerBean, final SchemaManager schemaManager, final Settings settings) {
         this.entityManager = entityManager;
         this.sanitizerBean = sanitizerBean;
-        this.timerService = timerService;
+        this.schemaManager = schemaManager;
         this.settings = settings;
     }
 
-    @PostConstruct
-    public void startup() {
-        LOGGER.info("Check if Database is up-to-date.");
-        if (checkDatabase()) {
-
-            LOGGER.info("Initialize the Settings.");
-            initializeSettings();
-
-            LOGGER.info("Initializing the EDS Sanitizer Service.");
-
-            // If requested, then simply start to sanitize as a background job
-            // now. The job will process small blocks of code and save these.
-            if (settings.hasSanityStartup()) {
-                runSanitizing();
+    /**
+     * <p>Starts EDS: prepares the database (if a SchemaManager is given),
+     * verifies it, loads the Settings, and starts the Sanity checks.</p>
+     *
+     * <p>EDS is only reported ready, if the outcome is {@link Outcome#READY}.
+     * The outcome {@link Outcome#UNREACHABLE} means that the database could
+     * not be reached, and that the startup may be repeated. A database which
+     * is reachable, but cannot be prepared, or has a different schema
+     * version, is reported as {@link Outcome#FAILED}.</p>
+     *
+     * @return The outcome of the startup
+     */
+    public Outcome startup() {
+        if (schemaManager != null) {
+            final Outcome prepared = schemaManager.prepare();
+            if (prepared != Outcome.READY) {
+                settings.set(StandardSetting.IS_READY.getKey(), "false");
+                return prepared;
             }
-
-            // Registering the Timer Service. This will ensure that the
-            // Scheduler is invoked at frequent intervals.
-            final TimerConfig timerConfig = new TimerConfig();
-            timerConfig.setInfo("EDS Sanitizer");
-
-            // To prevent starting multiple Timers, it is started in
-            // a non-persisted way, meaning that it will be canceled once
-            // the Container is stopped.
-            timerConfig.setPersistent(false);
-
-            // Starting the Timer Service every hour.
-            final ScheduleExpression expression = new ScheduleExpression();
-            expression.hour("*");
-            timerService.createCalendarTimer(expression, timerConfig);
         }
+
+        LOGGER.info("Check if Database is up-to-date.");
+        if (!checkDatabase()) {
+            return Outcome.FAILED;
+        }
+
+        LOGGER.info("Initialize the Settings.");
+        initializeSettings();
+
+        // If requested, run an initial Sanity check now. The regular checks
+        // are scheduled by the runtime (see SanitizerSchedule in eds-quarkus).
+        if (settings.hasSanityStartup()) {
+            runSanitizing();
+        }
+
+        return Outcome.READY;
+    }
+
+    /**
+     * Returns the message of the last failed connection attempt, if the
+     * database could not be reached.
+     *
+     * @return Message of the last connection failure, or null
+     */
+    public String getLastConnectionError() {
+        return (schemaManager != null) ? schemaManager.getLastConnectionError() : null;
     }
 
     private boolean checkDatabase() {
@@ -140,16 +182,8 @@ public class StartupBean {
         }
     }
 
-    @Asynchronous
     public void runSanitizing() {
         LOGGER.info("Starting initial Sanitizing check.");
         sanitizerBean.sanitize();
-    }
-
-    @Timeout
-    public void runSanitizingWithTimeout(final Timer timer) {
-        LOGGER.info("Starting Timed Sanitizing check.");
-        sanitizerBean.sanitize();
-        LOGGER.info("Next Sanitizing check will begin at: {}", timer.getNextTimeout());
     }
 }

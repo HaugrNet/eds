@@ -34,8 +34,6 @@ import net.haugr.eds.core.model.entities.DataEntity;
 import net.haugr.eds.core.managers.ProcessDataManager;
 import net.haugr.eds.core.setup.DatabaseSetup;
 import net.haugr.eds.core.setup.fakes.FakeEntityManager;
-import net.haugr.eds.core.setup.fakes.FakeTimer;
-import net.haugr.eds.core.setup.fakes.FakeTimerService;
 import java.lang.reflect.Field;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -94,7 +92,7 @@ final class SanitizerBeanTest extends DatabaseSetup {
     @Test
     void testStartupBeanWithDifferentVersion() {
         final int inserted = entityManager
-                .createNativeQuery("insert into eds_versions (schema_version, eds_version, db_vendor) values (9999, '99.9.9', 'H2')")
+                .createNativeQuery("insert into eds_versions (schema_version, eds_version) values (9999, '99.9.9')")
                 .executeUpdate();
         assertEquals(1, inserted);
 
@@ -103,13 +101,13 @@ final class SanitizerBeanTest extends DatabaseSetup {
     }
 
     @Test
-    void testStartupBeanTimerService() {
+    void testStartupBeanSanitizing() {
         prepareInvalidData();
         final SanityManager manager = prepareSanityManager();
         final List<Long> idsBefore = manager.findNextBatch(100);
 
         final StartupBean bean = prepareStartupBean("false");
-        bean.runSanitizingWithTimeout(new FakeTimer());
+        bean.runSanitizing();
 
         final List<Long> idsAfter = manager.findNextBatch(100);
         assertFalse(idsBefore.isEmpty());
@@ -164,7 +162,7 @@ final class SanitizerBeanTest extends DatabaseSetup {
         final Settings newSettings = newSettings();
         newSettings.set(StandardSetting.SANITY_STARTUP.getKey(), sanityAtStartup);
 
-        final StartupBean bean = new StartupBean(entityManager, prepareSanitizeBean(), new FakeTimerService(), newSettings);
+        final StartupBean bean = new StartupBean(entityManager, prepareSanitizeBean(), newSettings);
 
         // The Bean is updating the Settings via the DB, so we need to alter
         // the content of the DB to reflect this. As the content has not yet
@@ -177,7 +175,7 @@ final class SanitizerBeanTest extends DatabaseSetup {
                 .executeUpdate();
         assertEquals(1, updated);
 
-        // Invoke PostConstructor
+        // Run the startup, as the runtime does
         bean.startup();
 
         return bean;
@@ -186,7 +184,7 @@ final class SanitizerBeanTest extends DatabaseSetup {
     private StartupBean prepareFlawedStartupBean(final Settings settings) {
         settings.set(StandardSetting.SANITY_STARTUP.getKey(), "true");
 
-        return new StartupBean(new FakeEntityManager(), prepareSanitizeBean(), new FakeTimerService(), settings);
+        return new StartupBean(new FakeEntityManager(), prepareSanitizeBean(), settings);
     }
 
     private SanityManager prepareSanityManager() {

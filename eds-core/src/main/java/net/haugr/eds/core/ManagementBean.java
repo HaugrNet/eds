@@ -16,7 +16,7 @@
  */
 package net.haugr.eds.core;
 
-import jakarta.ejb.Stateless;
+import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
@@ -62,13 +62,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * <p>Java EE Bean for the Management functionality and final Error handling
- * layer. This is also the layer where transactions are controlled.</p>
+ * <p>CDI Bean for the Management functionality and final Error handling
+ * layer. This is also the layer where transactions are controlled: every
+ * business method runs in a transaction (REQUIRED). Even reading requests
+ * may write, as the System Administrator account is created on its first
+ * use.</p>
  *
  * @author Kim Jensen
  * @since EDS 1.0
  */
-@Stateless
+@ApplicationScoped
+@Transactional
 public class ManagementBean {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ManagementBean.class);
@@ -90,7 +94,6 @@ public class ManagementBean {
         this.settings = settings;
     }
 
-    @Transactional(Transactional.TxType.SUPPORTS)
     public VersionResponse version() {
         final VersionResponse response = new VersionResponse();
         response.setVersion(Constants.EDS_VERSION);
@@ -98,7 +101,6 @@ public class ManagementBean {
         return response;
     }
 
-    @Transactional(Transactional.TxType.REQUIRED)
     public SettingResponse settings(final SettingRequest request) {
         SettingResponse response;
 
@@ -124,7 +126,6 @@ public class ManagementBean {
         return response;
     }
 
-    @Transactional(Transactional.TxType.SUPPORTS)
     public MasterKeyResponse masterKey(final MasterKeyRequest request) {
         MasterKeyResponse response;
 
@@ -143,7 +144,6 @@ public class ManagementBean {
         return response;
     }
 
-    @Transactional(Transactional.TxType.SUPPORTS)
     public SanityResponse sanity(final SanityRequest request) {
         SanityResponse response;
 
@@ -162,7 +162,6 @@ public class ManagementBean {
         return response;
     }
 
-    @Transactional(Transactional.TxType.SUPPORTS)
     public InventoryResponse inventory(final InventoryRequest request) {
         InventoryResponse response;
 
@@ -181,7 +180,6 @@ public class ManagementBean {
         return response;
     }
 
-    @Transactional(Transactional.TxType.SUPPORTS)
     public AuthenticateResponse authenticated(final Authentication request) {
         AuthenticateResponse response;
 
@@ -200,7 +198,6 @@ public class ManagementBean {
         return response;
     }
 
-    @Transactional(Transactional.TxType.SUPPORTS)
     public FetchMemberResponse fetchMembers(final FetchMemberRequest request) {
         FetchMemberResponse response;
 
@@ -219,7 +216,6 @@ public class ManagementBean {
         return response;
     }
 
-    @Transactional(Transactional.TxType.REQUIRED)
     public ProcessMemberResponse processMember(final ProcessMemberRequest request) {
         ProcessMemberResponse response;
 
@@ -238,7 +234,6 @@ public class ManagementBean {
         return response;
     }
 
-    @Transactional(Transactional.TxType.SUPPORTS)
     public FetchCircleResponse fetchCircles(final FetchCircleRequest request) {
         FetchCircleResponse response;
 
@@ -257,7 +252,6 @@ public class ManagementBean {
         return response;
     }
 
-    @Transactional(Transactional.TxType.REQUIRED)
     public ProcessCircleResponse processCircle(final ProcessCircleRequest request) {
         ProcessCircleResponse response;
 
@@ -276,7 +270,6 @@ public class ManagementBean {
         return response;
     }
 
-    @Transactional(Transactional.TxType.SUPPORTS)
     public FetchTrusteeResponse fetchTrustees(final FetchTrusteeRequest request) {
         FetchTrusteeResponse response;
 
@@ -295,7 +288,6 @@ public class ManagementBean {
         return response;
     }
 
-    @Transactional(Transactional.TxType.REQUIRED)
     public ProcessTrusteeResponse processTrustee(final ProcessTrusteeRequest request) {
         ProcessTrusteeResponse response;
 

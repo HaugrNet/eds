@@ -279,7 +279,8 @@ final class ManagementBeanCircleTest extends DatabaseSetup {
         //  * Extra Encrypted
         // Note, that it could be considered a bug that the list earlier was
         // sorted with uppercase letters before lowercase letters, thus 'Z' came
-        // before 'a'. With the case-insensitive indexes, it should be fixed.
+        // before 'a'. The queries sort on lower(name), so the order is the same
+        // for all databases, regardless of their collation.
         assertEquals(createResponse.getCircleId(), fetchResponse.getCircles().get(3).getCircleId());
         assertEquals(updateRequest.getCircleKey(), fetchResponse.getCircles().get(3).getCircleKey());
     }

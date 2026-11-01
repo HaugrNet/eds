@@ -26,6 +26,7 @@ import jakarta.persistence.PersistenceException;
 import jakarta.persistence.Query;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Path;
 import jakarta.persistence.criteria.Root;
 import net.haugr.eds.api.common.MemberRole;
 import net.haugr.eds.api.common.ReturnCode;
@@ -129,6 +130,9 @@ public class CommonDao {
      * all matching records, sorted ascending according to the given
      * parameters.</p>
      *
+     * <p>Text fields are sorted case-insensitively, so the order is the same
+     * for all databases, regardless of their collation.</p>
+     *
      * @param edsEntity The EDS Entity to find all records for
      * @param orderBy   The field to order the ascending sorting by
      * @param <E>       The EDS Entity to use in the query
@@ -138,7 +142,12 @@ public class CommonDao {
         final CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         final CriteriaQuery<E> query = builder.createQuery(edsEntity);
         final Root<E> entity = query.from(edsEntity);
-        query.orderBy(builder.asc(entity.get(orderBy)));
+        final Path<Object> field = entity.get(orderBy);
+        if (String.class.equals(field.getJavaType())) {
+            query.orderBy(builder.asc(builder.lower(field.as(String.class))));
+        } else {
+            query.orderBy(builder.asc(field));
+        }
 
         return findList(entityManager.createQuery(query));
     }

@@ -104,7 +104,7 @@ final class ManagementBeanFetchMemberTest extends DatabaseSetup {
         final ProcessMemberRequest addRequest = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
         addRequest.setAction(Action.CREATE);
         addRequest.setNewAccountName("new Name");
-        addRequest.setNewCredential(addRequest.getNewAccountName().getBytes(settings.getCharset()));
+        addRequest.setNewCredential(credentialOf(addRequest.getNewAccountName()));
         final ProcessMemberResponse addResponse = bean.processMember(addRequest);
         assertEquals(ReturnCode.SUCCESS.getCode(), addResponse.getReturnCode());
         assertNotNull(addResponse.getMemberId());

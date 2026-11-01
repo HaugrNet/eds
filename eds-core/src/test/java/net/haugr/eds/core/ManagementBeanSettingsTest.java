@@ -156,7 +156,7 @@ final class ManagementBeanSettingsTest extends DatabaseSetup {
         final Map<String, String> mySettings = new HashMap<>(response.getSettings());
         mySettings.put(StandardSetting.EDS_SALT.getKey(), "new SALT");
         mySettings.put(StandardSetting.PBE_ITERATIONS.getKey(), "100000");
-        request.setCredential(crypto.stringToBytes(Constants.ADMIN_ACCOUNT));
+        request.setCredential(credentialOf(Constants.ADMIN_ACCOUNT));
         request.setSettings(mySettings);
         final SettingResponse update = bean.settings(request);
         assertEquals(ReturnCode.SUCCESS.getCode(), update.getReturnCode());
@@ -196,7 +196,7 @@ final class ManagementBeanSettingsTest extends DatabaseSetup {
         final Map<String, String> mySettings = new HashMap<>(response.getSettings());
         mySettings.put(StandardSetting.EDS_CHARSET.getKey(), "ISO-8859-15");
         request.setSettings(mySettings);
-        request.setCredential(crypto.stringToBytes(Constants.ADMIN_ACCOUNT));
+        request.setCredential(credentialOf(Constants.ADMIN_ACCOUNT));
 
         final SettingResponse update = bean.settings(request);
         assertEquals(ReturnCode.SUCCESS.getCode(), update.getReturnCode());
@@ -262,7 +262,7 @@ final class ManagementBeanSettingsTest extends DatabaseSetup {
         assertEquals(StandardSetting.values().length + 1, response.getSettings().size());
 
         mySettings.put("eds.test.setting", null);
-        request.setCredential(crypto.stringToBytes(Constants.ADMIN_ACCOUNT));
+        request.setCredential(credentialOf(Constants.ADMIN_ACCOUNT));
         request.setSettings(mySettings);
         final SettingResponse deleteResponse = bean.settings(request);
         assertTrue(deleteResponse.isOk());

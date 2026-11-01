@@ -18,6 +18,7 @@ package net.haugr.eds.core;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import net.haugr.eds.api.common.Constants;
@@ -27,6 +28,7 @@ import net.haugr.eds.api.responses.MasterKeyResponse;
 import net.haugr.eds.core.enums.StandardSetting;
 import net.haugr.eds.core.exceptions.EDSException;
 import net.haugr.eds.core.jce.MasterKey;
+import net.haugr.eds.core.jce.SecretEDSKey;
 import net.haugr.eds.core.model.Settings;
 import net.haugr.eds.core.model.entities.MemberEntity;
 import net.haugr.eds.core.model.entities.SettingEntity;
@@ -88,7 +90,7 @@ final class ManagementBeanMasterKeyTest extends DatabaseSetup {
     void testUpdateMasterKeyAsMember() {
         final ManagementBean bean = prepareManagementBean();
         final MasterKeyRequest request = prepareRequest(MasterKeyRequest.class, MEMBER_1);
-        request.setSecret("New MasterKey".getBytes(Charset.defaultCharset()));
+        request.setSecret(NEW_MASTERKEY_SECRET.getBytes(Charset.defaultCharset()));
 
         final MasterKeyResponse response = bean.masterKey(request);
         assertEquals(ReturnCode.AUTHENTICATION_WARNING.getCode(), response.getReturnCode());
@@ -100,7 +102,7 @@ final class ManagementBeanMasterKeyTest extends DatabaseSetup {
         final ManagementBean bean = prepareManagementBean();
         final MasterKeyRequest request = prepareRequest(MasterKeyRequest.class, Constants.ADMIN_ACCOUNT);
         request.setCredential("root".getBytes(Charset.defaultCharset()));
-        request.setSecret("New MasterKey".getBytes(Charset.defaultCharset()));
+        request.setSecret(NEW_MASTERKEY_SECRET.getBytes(Charset.defaultCharset()));
 
         final MasterKeyResponse response = bean.masterKey(request);
         assertEquals(ReturnCode.AUTHENTICATION_WARNING.getCode(), response.getReturnCode());
@@ -117,7 +119,7 @@ final class ManagementBeanMasterKeyTest extends DatabaseSetup {
 
         final ManagementBean bean = prepareManagementBean();
         final MasterKeyRequest request = prepareRequest(MasterKeyRequest.class, Constants.ADMIN_ACCOUNT);
-        request.setSecret(request.getCredential());
+        request.setSecret(defaultMasterKeySecret());
         final MasterKeyResponse response = bean.masterKey(request);
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
         assertEquals("MasterKey unlocked.", response.getReturnMessage());
@@ -142,7 +144,7 @@ final class ManagementBeanMasterKeyTest extends DatabaseSetup {
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
         assertEquals("MasterKey updated.", response.getReturnMessage());
 
-        revertMasterKeyToOriginal(bean);
+        revertMasterKeyToOriginal();
     }
 
     @Test
@@ -164,13 +166,13 @@ final class ManagementBeanMasterKeyTest extends DatabaseSetup {
         assertEquals(ReturnCode.SUCCESS.getCode(), urlResponse.getReturnCode());
 
         final MasterKeyRequest secretRequest = prepareRequest(MasterKeyRequest.class, Constants.ADMIN_ACCOUNT);
-        secretRequest.setSecret("MasterKey".getBytes(Charset.defaultCharset()));
+        secretRequest.setSecret(NEW_MASTERKEY_SECRET.getBytes(Charset.defaultCharset()));
 
         final MasterKeyResponse secretResponse = bean.masterKey(secretRequest);
         assertEquals(ReturnCode.SUCCESS.getCode(), secretResponse.getReturnCode());
         assertEquals("MasterKey updated.", secretResponse.getReturnMessage());
 
-        revertMasterKeyToOriginal(bean);
+        revertMasterKeyToOriginal();
     }
 
     @Test
@@ -213,7 +215,7 @@ final class ManagementBeanMasterKeyTest extends DatabaseSetup {
     void testUpdateMasterKeyWhenMembersExist() {
         final ManagementBean bean = prepareManagementBean();
         final MasterKeyRequest request = prepareRequest(MasterKeyRequest.class, Constants.ADMIN_ACCOUNT);
-        request.setSecret("MasterKey".getBytes(Charset.defaultCharset()));
+        request.setSecret(NEW_MASTERKEY_SECRET.getBytes(Charset.defaultCharset()));
 
         final MasterKeyResponse response = bean.masterKey(request);
         assertEquals(ReturnCode.ILLEGAL_ACTION.getCode(), response.getReturnCode());
@@ -224,7 +226,7 @@ final class ManagementBeanMasterKeyTest extends DatabaseSetup {
     void testUpdateMasterKeyToCurrent() {
         final ManagementBean bean = prepareManagementBean();
         final MasterKeyRequest request = prepareRequest(MasterKeyRequest.class, Constants.ADMIN_ACCOUNT);
-        request.setSecret(request.getCredential());
+        request.setSecret(defaultMasterKeySecret());
 
         final MasterKeyResponse response = bean.masterKey(request);
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
@@ -267,7 +269,7 @@ final class ManagementBeanMasterKeyTest extends DatabaseSetup {
         final ManagementBean bean = prepareManagementBean();
         final MasterKeyRequest request = prepareRequest(MasterKeyRequest.class, Constants.ADMIN_ACCOUNT);
         request.setCredential("root".getBytes(Charset.defaultCharset()));
-        request.setSecret("New MasterKey".getBytes(Charset.defaultCharset()));
+        request.setSecret(NEW_MASTERKEY_SECRET.getBytes(Charset.defaultCharset()));
 
         final MasterKeyResponse response = bean.masterKey(request);
         assertEquals(ReturnCode.AUTHENTICATION_WARNING.getCode(), response.getReturnCode());
@@ -287,6 +289,38 @@ final class ManagementBeanMasterKeyTest extends DatabaseSetup {
         final MasterKeyResponse response = bean.masterKey(request);
         assertEquals(ReturnCode.ILLEGAL_ACTION.getCode(), response.getReturnCode());
         assertEquals(before, currentMasterKeyUrl());
+    }
+
+    @Test
+    void testUpdateMasterKeyWithWeakSecret() {
+        deleteNonAdminMembers();
+        final SecretEDSKey before = MasterKey.getInstance(settings).getKey();
+
+        final ManagementBean bean = prepareManagementBean();
+        final MasterKeyRequest request = prepareRequest(MasterKeyRequest.class, Constants.ADMIN_ACCOUNT);
+        request.setSecret("New MasterKey".getBytes(Charset.defaultCharset()));
+
+        final MasterKeyResponse response = bean.masterKey(request);
+        assertEquals(ReturnCode.VERIFICATION_WARNING.getCode(), response.getReturnCode());
+        assertEquals("The MasterKey secret is too weak. It must have at least 15 characters and must not be easy to guess.", response.getReturnMessage());
+        assertSame(before, MasterKey.getInstance(settings).getKey());
+    }
+
+    /**
+     * The default MasterKey secret is weak, but unlocking with an existing
+     * MasterKey must remain possible, only new MasterKeys are verified.
+     */
+    @Test
+    void testUnlockWithWeakDefaultMasterKey() {
+        deleteNonAdminMembers();
+
+        final ManagementBean bean = prepareManagementBean();
+        final MasterKeyRequest request = prepareRequest(MasterKeyRequest.class, Constants.ADMIN_ACCOUNT);
+        request.setSecret(defaultMasterKeySecret());
+
+        final MasterKeyResponse response = bean.masterKey(request);
+        assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
+        assertEquals("MasterKey unlocked.", response.getReturnMessage());
     }
 
     // =========================================================================
@@ -320,17 +354,23 @@ final class ManagementBeanMasterKeyTest extends DatabaseSetup {
     }
 
     /**
-     * Reverts the MasterKey to the original or default MasterKey, since other
-     * tests will otherwise fail.
+     * Without a MasterKey URL, the default MasterKey is derived from the name
+     * of the System Administrator Account.
      *
-     * @param bean ManagementBean instance
+     * @return The secret of the default MasterKey
      */
-    private static void revertMasterKeyToOriginal(final ManagementBean bean) {
-        final MasterKeyRequest resetRequest = prepareRequest(MasterKeyRequest.class, Constants.ADMIN_ACCOUNT);
-        resetRequest.setSecret(resetRequest.getCredential());
+    private static byte[] defaultMasterKeySecret() {
+        return Constants.ADMIN_ACCOUNT.getBytes(Charset.defaultCharset());
+    }
 
-        final MasterKeyResponse resetResponse = bean.masterKey(resetRequest);
-        assertEquals(ReturnCode.SUCCESS.getCode(), resetResponse.getReturnCode());
-        assertEquals("MasterKey updated.", resetResponse.getReturnMessage());
+    /**
+     * Reverts the MasterKey to the original or default MasterKey, since other
+     * tests will otherwise fail. The default MasterKey secret is too weak to
+     * be set via a request, so the in-memory MasterKey is reset directly. The
+     * database changes are rolled back after each test.
+     */
+    private void revertMasterKeyToOriginal() {
+        final SecretEDSKey defaultKey = prepareNewMasterKeyInstance(settings).getKey();
+        MasterKey.getInstance(settings).setKey(defaultKey);
     }
 }

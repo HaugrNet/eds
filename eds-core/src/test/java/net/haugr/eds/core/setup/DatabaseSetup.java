@@ -104,9 +104,17 @@ public class DatabaseSetup {
     // The PBE iterations should be at least 600.000, but as this is slow, for testing, we use
     // a lower number. If changed, please re-generate the test data!
     private static final String TEST_PBE_ITERATIONS = "1024";
+    // Secrets must pass the EntropyVerifier, so the test credentials are
+    // derived from the account name and a random suffix, which on its own
+    // is strong enough. If changed, please re-generate the test data!
+    private static final String PASSPHRASE_SUFFIX = " pjvgr.yxupm-37i23.8kq4h_9s";
+    // A new MasterKey secret, which differs from the default MasterKey.
+    protected static final String NEW_MASTERKEY_SECRET = passphraseOf("MasterKey");
+    // A new Passphrase for an existing or invited Account.
+    protected static final String NEW_PASSPHRASE = passphraseOf("New Passphrase");
     private static final String DEFAULT_ACCOUNT_NAME = "New Account Name";
     private static final MemberRole DEFAULT_ROLE = MemberRole.STANDARD;
-    private static final String DEFAULT_SECRET = "My Super Secret";
+    private static final String DEFAULT_SECRET = passphraseOf("My Super Secret");
     private static final String TIMESTAMP = "yyyyMMddHHmmssSSS";
     private static final String PERSISTENCE_NAME = "net.haugr.jpa";
     private static final EntityManagerFactory FACTORY = Persistence.createEntityManagerFactory(PERSISTENCE_NAME);
@@ -184,13 +192,33 @@ public class DatabaseSetup {
         return new SanitizerBean(entityManager, settings);
     }
 
+    /**
+     * Returns the Passphrase used in the tests for the given Account.
+     *
+     * @param account Account Name
+     * @return Passphrase for the Account
+     */
+    protected static String passphraseOf(final String account) {
+        return account + PASSPHRASE_SUFFIX;
+    }
+
+    /**
+     * Returns the Passphrase used in the tests for the given Account, as
+     * the bytes used as Credential in the Requests.
+     *
+     * @param account Account Name
+     * @return Passphrase for the Account as bytes
+     */
+    protected static byte[] credentialOf(final String account) {
+        return new Crypto(Settings.getInstance()).stringToBytes(passphraseOf(account));
+    }
+
     protected static <T extends Authentication> T prepareRequest(final Class<T> clazz, final String account) {
         try {
-            final Crypto myCrypto = new Crypto(Settings.getInstance());
             final T request = clazz.getConstructor().newInstance();
 
             request.setAccountName(account);
-            request.setCredential(myCrypto.stringToBytes(account));
+            request.setCredential(credentialOf(account));
             request.setCredentialType(CredentialType.PASSPHRASE);
 
             return request;

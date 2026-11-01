@@ -224,6 +224,12 @@ public final class ProcessMemberManager extends AbstractManager<MemberDao, Proce
     private ProcessMemberResponse updateMember(final ProcessMemberRequest request) {
         final String newAccountName = trim(request.getNewAccountName());
 
+        // The new Credential is verified before anything is changed, so a
+        // weak Credential doesn't leave the Account partially updated.
+        if ((request.getNewCredential() != null) && (request.getCredentialType() == CredentialType.PASSPHRASE)) {
+            verifyEntropy("Credential", request.getNewCredential(), member.getName(), newAccountName);
+        }
+
         updateOwnAccountName(newAccountName);
         updateOwnCredential(request);
         updateOwnPublicKey(request);
@@ -372,9 +378,11 @@ public final class ProcessMemberManager extends AbstractManager<MemberDao, Proce
             throw new AuthenticationException("The given signature is invalid.");
         }
 
+        final byte[] newSecret = request.getNewCredential();
+        verifyEntropy("Credential", newSecret, account.getName());
+
         final KeyAlgorithm pbeAlgorithm = settings.getPasswordAlgorithm();
         final IVSalt salt = new IVSalt();
-        final byte[] newSecret = request.getNewCredential();
         final EDSKeyPair pair = Crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
         final SecretEDSKey key = crypto.generatePasswordKey(pbeAlgorithm, newSecret, salt.getArmored());
         key.setSalt(salt);

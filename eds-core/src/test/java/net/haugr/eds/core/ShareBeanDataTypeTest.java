@@ -181,7 +181,7 @@ final class ShareBeanDataTypeTest extends DatabaseSetup {
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
         assertEquals("The Data Type '" + theDataTypeName + "' was successfully processed.", response.getReturnMessage());
 
-        request.setCredential(crypto.stringToBytes(Constants.ADMIN_ACCOUNT));
+        request.setCredential(credentialOf(Constants.ADMIN_ACCOUNT));
         request.setAction(Action.DELETE);
         final ProcessDataTypeResponse deletedResponse = bean.processDataType(request);
         assertNotNull(deletedResponse);
@@ -253,7 +253,7 @@ final class ShareBeanDataTypeTest extends DatabaseSetup {
         assertEquals(newDataTypeType, response.getDataType().getType());
 
         final String updatedDataTypeType = "updatedType";
-        request.setCredential(crypto.stringToBytes(Constants.ADMIN_ACCOUNT));
+        request.setCredential(credentialOf(Constants.ADMIN_ACCOUNT));
         request.setTypeName(theDataTypeName);
         request.setType(updatedDataTypeType);
 
@@ -283,7 +283,7 @@ final class ShareBeanDataTypeTest extends DatabaseSetup {
         assertEquals(aDataTypeName, response.getDataType().getTypeName());
         assertEquals(aDataTypeType, response.getDataType().getType());
 
-        createRequest.setCredential(crypto.stringToBytes(Constants.ADMIN_ACCOUNT));
+        createRequest.setCredential(credentialOf(Constants.ADMIN_ACCOUNT));
         final ProcessDataTypeResponse updateResponse = bean.processDataType(createRequest);
         assertTrue(updateResponse.isOk());
         assertEquals(ReturnCode.SUCCESS.getCode(), updateResponse.getReturnCode());

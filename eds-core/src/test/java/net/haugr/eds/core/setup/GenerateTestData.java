@@ -135,7 +135,7 @@ public final class GenerateTestData {
 
     private void createAndAppendMember(final StringBuilder builder, final String externalId, final String name, final EDSKeyPair keyPair, final MemberRole role, final char delimiter) {
         final String salt = UUID.randomUUID().toString();
-        final SecretEDSKey secretKey = crypto.generatePasswordKey(settings.getPasswordAlgorithm(), crypto.stringToBytes(name), salt);
+        final SecretEDSKey secretKey = crypto.generatePasswordKey(settings.getPasswordAlgorithm(), DatabaseSetup.credentialOf(name), salt);
         final String publicKey = Crypto.armoringPublicKey(keyPair.getPublic().getKey());
         final String privateKey = Crypto.encryptAndArmorPrivateKey(secretKey, keyPair.getPrivate().getKey());
         final String encryptedSalt = crypto.encryptWithMasterKey(salt);

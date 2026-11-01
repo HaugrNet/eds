@@ -20,6 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import net.haugr.eds.api.common.Action;
@@ -39,6 +40,7 @@ import net.haugr.eds.api.responses.ProcessDataResponse;
 import net.haugr.eds.api.responses.ProcessMemberResponse;
 import net.haugr.eds.core.enums.StandardSetting;
 import net.haugr.eds.core.model.Settings;
+import net.haugr.eds.core.model.entities.MemberEntity;
 import net.haugr.eds.core.setup.DatabaseSetup;
 import org.junit.jupiter.api.Test;
 import java.util.Base64;
@@ -66,7 +68,7 @@ final class ManagementBeanProcessMemberTest extends DatabaseSetup {
         final String accountName = "accountName";
         final ProcessMemberRequest memberRequest = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
         memberRequest.setNewAccountName(accountName);
-        memberRequest.setNewCredential(crypto.stringToBytes(accountName));
+        memberRequest.setNewCredential(credentialOf(accountName));
         memberRequest.setAction(Action.CREATE);
         final ProcessMemberResponse memberResponse = bean.processMember(memberRequest);
         assertTrue(memberResponse.isOk());
@@ -85,7 +87,7 @@ final class ManagementBeanProcessMemberTest extends DatabaseSetup {
         final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
         request.setAction(Action.CREATE);
         request.setNewAccountName(account);
-        request.setNewCredential(crypto.stringToBytes(account));
+        request.setNewCredential(credentialOf(account));
         final ProcessMemberResponse response = bean.processMember(request);
 
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
@@ -99,7 +101,7 @@ final class ManagementBeanProcessMemberTest extends DatabaseSetup {
         final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
         request.setAction(Action.CREATE);
         request.setNewAccountName(account);
-        request.setNewCredential(crypto.stringToBytes(account));
+        request.setNewCredential(credentialOf(account));
         request.setMemberRole(MemberRole.ADMIN);
         final ProcessMemberResponse response = bean.processMember(request);
 
@@ -114,7 +116,7 @@ final class ManagementBeanProcessMemberTest extends DatabaseSetup {
         final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
         request.setAction(Action.CREATE);
         request.setNewAccountName(account);
-        request.setNewCredential(crypto.stringToBytes(account));
+        request.setNewCredential(credentialOf(account));
         request.setMemberRole(MemberRole.STANDARD);
         final ProcessMemberResponse response = bean.processMember(request);
 
@@ -129,7 +131,7 @@ final class ManagementBeanProcessMemberTest extends DatabaseSetup {
         final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, MEMBER_1);
         request.setAction(Action.CREATE);
         request.setNewAccountName(account);
-        request.setNewCredential(crypto.stringToBytes(account));
+        request.setNewCredential(credentialOf(account));
         request.setMemberRole(MemberRole.STANDARD);
 
         final ProcessMemberResponse response = bean.processMember(request);
@@ -144,7 +146,7 @@ final class ManagementBeanProcessMemberTest extends DatabaseSetup {
         final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
         request.setAction(Action.CREATE);
         request.setNewAccountName(account);
-        request.setNewCredential(crypto.stringToBytes(account));
+        request.setNewCredential(credentialOf(account));
         final ProcessMemberResponse response = bean.processMember(request);
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
         assertEquals("The Member '" + account + "' was successfully added to EDS.", response.getReturnMessage());
@@ -172,7 +174,7 @@ final class ManagementBeanProcessMemberTest extends DatabaseSetup {
         final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
         request.setAction(Action.CREATE);
         request.setNewAccountName(account);
-        request.setNewCredential(crypto.stringToBytes(account));
+        request.setNewCredential(credentialOf(account));
 
         final ProcessMemberResponse response = bean.processMember(request);
         assertEquals(ReturnCode.IDENTIFICATION_WARNING.getCode(), response.getReturnCode());
@@ -268,7 +270,7 @@ final class ManagementBeanProcessMemberTest extends DatabaseSetup {
         invitationRequest.setAction(Action.UPDATE);
         invitationRequest.setCredentialType(CredentialType.SIGNATURE);
         invitationRequest.setCredential(signature);
-        invitationRequest.setNewCredential(crypto.stringToBytes("New Passphrase"));
+        invitationRequest.setNewCredential(crypto.stringToBytes(NEW_PASSPHRASE));
 
         final ProcessMemberResponse invitationResponse = bean.processMember(invitationRequest);
         assertNotNull(invitationResponse);
@@ -462,7 +464,7 @@ final class ManagementBeanProcessMemberTest extends DatabaseSetup {
         final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, MEMBER_1);
         request.setAction(Action.UPDATE);
         request.setNewAccountName(newName);
-        request.setNewCredential(crypto.stringToBytes("Bla bla bla"));
+        request.setNewCredential(crypto.stringToBytes(NEW_PASSPHRASE));
 
         final ProcessMemberResponse response = bean.processMember(request);
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
@@ -475,7 +477,7 @@ final class ManagementBeanProcessMemberTest extends DatabaseSetup {
         final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, MEMBER_1);
         request.setAction(Action.UPDATE);
         request.setNewAccountName(MEMBER_2);
-        request.setNewCredential(crypto.stringToBytes("Bla bla bla"));
+        request.setNewCredential(crypto.stringToBytes(NEW_PASSPHRASE));
 
         final ProcessMemberResponse response = bean.processMember(request);
         assertEquals(ReturnCode.CONSTRAINT_ERROR.getCode(), response.getReturnCode());
@@ -499,12 +501,12 @@ final class ManagementBeanProcessMemberTest extends DatabaseSetup {
 
         final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, MEMBER_1);
         request.setAction(Action.UPDATE);
-        request.setNewCredential(crypto.stringToBytes("My new Passphrase"));
+        request.setNewCredential(crypto.stringToBytes(NEW_PASSPHRASE));
         final ProcessMemberResponse response = bean.processMember(request);
         assertTrue(response.isOk());
 
         final FetchDataRequest fetchRequest = prepareRequest(FetchDataRequest.class, MEMBER_1);
-        fetchRequest.setCredential(crypto.stringToBytes("My new Passphrase"));
+        fetchRequest.setCredential(crypto.stringToBytes(NEW_PASSPHRASE));
         fetchRequest.setDataId(dataId);
 
         final FetchDataResponse dataResponse = shareBean.fetchData(fetchRequest);
@@ -526,7 +528,7 @@ final class ManagementBeanProcessMemberTest extends DatabaseSetup {
         // The request credential has been overwritten with zeros, which must
         // not unlock the invalidated account.
         request.setAction(Action.UPDATE);
-        request.setNewCredential(crypto.stringToBytes("New Passphrase"));
+        request.setNewCredential(crypto.stringToBytes(NEW_PASSPHRASE));
         final ProcessMemberResponse response2 = bean.processMember(request);
         assertEquals(ReturnCode.AUTHENTICATION_WARNING.getCode(), response2.getReturnCode());
     }
@@ -695,6 +697,100 @@ final class ManagementBeanProcessMemberTest extends DatabaseSetup {
     }
 
     // =========================================================================
+    // Entropy Verification of new Credentials
+    // =========================================================================
+
+    private static final String WEAK_CREDENTIAL_MESSAGE = "The Credential is too weak. It must have at least 15 characters and must not be easy to guess.";
+
+    @Test
+    void testCreateMemberWithWeakCredential() {
+        final String account = "weak member";
+        final ManagementBean bean = prepareManagementBean();
+        final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
+        request.setAction(Action.CREATE);
+        request.setNewAccountName(account);
+        request.setNewCredential(crypto.stringToBytes("Password123!"));
+
+        final ProcessMemberResponse response = bean.processMember(request);
+        assertEquals(ReturnCode.VERIFICATION_WARNING.getCode(), response.getReturnCode());
+        assertEquals(WEAK_CREDENTIAL_MESSAGE, response.getReturnMessage());
+        assertNull(dao.findMemberByName(account));
+    }
+
+    @Test
+    void testCreateMemberWithAccountNameAsCredential() {
+        final String account = "a rather long account name";
+        final ManagementBean bean = prepareManagementBean();
+        final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
+        request.setAction(Action.CREATE);
+        request.setNewAccountName(account);
+        request.setNewCredential(crypto.stringToBytes(account));
+
+        final ProcessMemberResponse response = bean.processMember(request);
+        assertEquals(ReturnCode.VERIFICATION_WARNING.getCode(), response.getReturnCode());
+        assertEquals(WEAK_CREDENTIAL_MESSAGE, response.getReturnMessage());
+        assertNull(dao.findMemberByName(account));
+    }
+
+    @Test
+    void testUpdateSelfWithWeakCredential() {
+        final String newName = "Renamed Member";
+        final ManagementBean bean = prepareManagementBean();
+        final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, MEMBER_1);
+        request.setAction(Action.UPDATE);
+        request.setNewAccountName(newName);
+        request.setNewCredential(crypto.stringToBytes("qwertzuiop123456"));
+
+        final ProcessMemberResponse response = bean.processMember(request);
+        assertEquals(ReturnCode.VERIFICATION_WARNING.getCode(), response.getReturnCode());
+        assertEquals(WEAK_CREDENTIAL_MESSAGE, response.getReturnMessage());
+
+        // Nothing may have been changed, so the old Credential still works.
+        assertNull(dao.findMemberByName(newName));
+        final FetchMemberRequest fetchRequest = prepareRequest(FetchMemberRequest.class, MEMBER_1);
+        assertTrue(bean.fetchMembers(fetchRequest).isOk());
+    }
+
+    @Test
+    void testInvitationWithWeakCredential() {
+        final String account = "weak invitee";
+        final ManagementBean bean = prepareManagementBean();
+        final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
+        request.setAction(Action.INVITE);
+        request.setNewAccountName(account);
+        final ProcessMemberResponse response = bean.processMember(request);
+        assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
+
+        final ProcessMemberRequest invitationRequest = new ProcessMemberRequest();
+        invitationRequest.setAccountName(account);
+        invitationRequest.setAction(Action.UPDATE);
+        invitationRequest.setCredentialType(CredentialType.SIGNATURE);
+        invitationRequest.setCredential(response.getSignature());
+        invitationRequest.setNewCredential(crypto.stringToBytes("weak invitee"));
+
+        final ProcessMemberResponse invitationResponse = bean.processMember(invitationRequest);
+        assertEquals(ReturnCode.VERIFICATION_WARNING.getCode(), invitationResponse.getReturnCode());
+        assertEquals(WEAK_CREDENTIAL_MESSAGE, invitationResponse.getReturnMessage());
+        assertEquals(CredentialType.SIGNATURE.name(), dao.findMemberByName(account).getPrivateKey());
+    }
+
+    @Test
+    void testCreateSystemAdministratorWithWeakCredential() {
+        for (final MemberEntity entity : dao.findAllAscending(MemberEntity.class, "id")) {
+            dao.delete(entity);
+        }
+
+        final ManagementBean bean = prepareManagementBean();
+        final FetchMemberRequest request = prepareRequest(FetchMemberRequest.class, Constants.ADMIN_ACCOUNT);
+        request.setCredential(crypto.stringToBytes(Constants.ADMIN_ACCOUNT));
+
+        final FetchMemberResponse response = bean.fetchMembers(request);
+        assertEquals(ReturnCode.VERIFICATION_WARNING.getCode(), response.getReturnCode());
+        assertEquals(WEAK_CREDENTIAL_MESSAGE, response.getReturnMessage());
+        assertNull(dao.findMemberByName(Constants.ADMIN_ACCOUNT));
+    }
+
+    // =========================================================================
     // Internal Helper Methods
     // =========================================================================
 
@@ -703,7 +799,7 @@ final class ManagementBeanProcessMemberTest extends DatabaseSetup {
         final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
         request.setAction(Action.CREATE);
         request.setNewAccountName(account);
-        request.setNewCredential(crypto.stringToBytes(account));
+        request.setNewCredential(credentialOf(account));
         request.setMemberRole(MemberRole.ADMIN);
         assertTrue(bean.processMember(request).isOk());
 

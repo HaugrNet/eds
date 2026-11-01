@@ -75,7 +75,8 @@ public final class MasterKeyManager extends AbstractManager<CommonDao, MasterKey
         // it is initially being saved, just in case...
         // What if the keys are the same?
         final SecretEDSKey oldMasterKey = masterKey.getKey();
-        final SecretEDSKey newMasterKey = prepareNewMasterKey(masterKey, request);
+        final byte[] rawSecret = readRawSecret(request);
+        final SecretEDSKey newMasterKey = masterKey.generateMasterKey(rawSecret);
 
         // For this request, the default account checks won't work. Hence, it
         // must be checked directly, with the keys
@@ -95,6 +96,9 @@ public final class MasterKeyManager extends AbstractManager<CommonDao, MasterKey
         } else if (checkCredentials(oldMasterKey, admin, request.getCredential())) {
             throwConditionalException(dao.countMembers() != 1,
                     ReturnCode.ILLEGAL_ACTION, "Cannot alter the MasterKey, as Member Accounts exists.");
+            // Only a new MasterKey is verified. Unlocking with an existing
+            // MasterKey must remain possible, even if it is weak.
+            verifyEntropy("MasterKey secret", rawSecret);
             masterKey.setKey(newMasterKey);
             updateMasterKeySetting(request);
             updateMemberPassword(admin, request.getCredential());
@@ -107,14 +111,14 @@ public final class MasterKeyManager extends AbstractManager<CommonDao, MasterKey
         return response;
     }
 
-    private static SecretEDSKey prepareNewMasterKey(final MasterKey masterKey, final MasterKeyRequest request) {
+    private static byte[] readRawSecret(final MasterKeyRequest request) {
         byte[] rawSecret = request.getSecret();
 
         if (rawSecret == null) {
             rawSecret = MasterKey.readMasterKeySecretFromUrl(request.getUrl());
         }
 
-        return masterKey.generateMasterKey(rawSecret);
+        return rawSecret;
     }
 
     /**

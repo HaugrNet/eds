@@ -53,6 +53,12 @@ import net.haugr.eds.fitnesse.exceptions.StopTestException;
  */
 public final class ControlEds extends EDSRequest<FetchMemberResponse> {
 
+    /**
+     * Passphrase of the System Administrator Account, it must match the
+     * ADMIN_PASSPHRASE defined on the FitNesse Setup page.
+     */
+    public static final String ADMIN_PASSPHRASE = "admin pjvgr.yxupm-37i23.8kq4h_9s";
+
     public void setUrl(final String url) {
         updateUrl(url);
     }
@@ -114,7 +120,7 @@ public final class ControlEds extends EDSRequest<FetchMemberResponse> {
             final T request = clazz.getConstructor().newInstance();
 
             request.setAccountName(Constants.ADMIN_ACCOUNT);
-            request.setCredential(Constants.ADMIN_ACCOUNT.getBytes(Charset.defaultCharset()));
+            request.setCredential(ADMIN_PASSPHRASE.getBytes(Charset.defaultCharset()));
             request.setCredentialType(CredentialType.PASSPHRASE);
 
             return request;

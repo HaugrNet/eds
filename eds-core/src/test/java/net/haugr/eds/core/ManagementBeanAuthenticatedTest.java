@@ -121,7 +121,7 @@ final class ManagementBeanAuthenticatedTest extends DatabaseSetup {
     void testAuthorizationWithCredentialTypingMistake() {
         final ManagementBean bean = prepareManagementBean();
         final FetchCircleRequest request = prepareRequest(FetchCircleRequest.class, MEMBER_5);
-        request.setCredential(crypto.stringToBytes(MEMBER_4));
+        request.setCredential(credentialOf(MEMBER_4));
 
         final FetchCircleResponse response = bean.fetchCircles(request);
         assertEquals(ReturnCode.AUTHENTICATION_WARNING.getCode(), response.getReturnCode());

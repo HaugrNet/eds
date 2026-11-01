@@ -186,7 +186,7 @@ final class ShareBeanDataTest extends DatabaseSetup {
         assertTrue(bean.processData(prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "My Data 2", LARGE_SIZE_BYTES)).isOk());
         assertTrue(bean.processData(prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "My Data 3", LARGE_SIZE_BYTES)).isOk());
 
-        fetchRequest.setCredential(crypto.stringToBytes(MEMBER_1));
+        fetchRequest.setCredential(credentialOf(MEMBER_1));
         final FetchDataResponse fullResponse = bean.fetchData(fetchRequest);
         assertTrue(fullResponse.isOk());
         assertEquals(3L, fullResponse.getRecords());
@@ -335,7 +335,7 @@ final class ShareBeanDataTest extends DatabaseSetup {
         final String folderId = saveResponse.getDataId();
 
         // We're taking the previously generated Data ID and uses that as a folder.
-        request.setCredential(crypto.stringToBytes(MEMBER_4));
+        request.setCredential(credentialOf(MEMBER_4));
         request.setFolderId(folderId);
 
         final ProcessDataResponse response = bean.processData(request);
@@ -455,7 +455,7 @@ final class ShareBeanDataTest extends DatabaseSetup {
         assertEquals("The Folder '" + folderName + "' was successfully added to the Circle '" + CIRCLE_1 + "'.", addResponse.getReturnMessage());
         assertNotNull(addResponse.getDataId());
 
-        request.setCredential(crypto.stringToBytes(MEMBER_1));
+        request.setCredential(credentialOf(MEMBER_1));
 
         final ProcessDataResponse response = bean.processData(request);
         assertEquals(ReturnCode.IDENTIFICATION_WARNING.getCode(), response.getReturnCode());
@@ -690,7 +690,7 @@ final class ShareBeanDataTest extends DatabaseSetup {
         final String folderId1 = addFolderResponse1.getDataId();
 
         final String folderName2 = "folder2";
-        addFolderRequest.setCredential(crypto.stringToBytes(MEMBER_1));
+        addFolderRequest.setCredential(credentialOf(MEMBER_1));
         addFolderRequest.setDataName(folderName2);
         final ProcessDataResponse addFolderResponse2 = bean.processData(addFolderRequest);
         assertEquals(ReturnCode.SUCCESS.getCode(), addFolderResponse2.getReturnCode());

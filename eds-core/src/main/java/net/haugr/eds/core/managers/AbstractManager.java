@@ -42,6 +42,7 @@ import net.haugr.eds.core.exceptions.EDSException;
 import net.haugr.eds.core.exceptions.CryptoException;
 import net.haugr.eds.core.exceptions.VerificationException;
 import net.haugr.eds.core.jce.EDSKeyPair;
+import net.haugr.eds.core.jce.EntropyVerifier;
 import net.haugr.eds.core.jce.Crypto;
 import net.haugr.eds.core.jce.IVSalt;
 import net.haugr.eds.core.jce.SecretEDSKey;
@@ -59,6 +60,9 @@ import net.haugr.eds.core.model.entities.TrusteeEntity;
  * @since EDS 1.0
  */
 public abstract class AbstractManager<D extends CommonDao, R extends EDSResponse, A extends Authentication> {
+
+    /** Verifies the strength of new secrets, it is immutable and thread-safe. */
+    private static final EntropyVerifier ENTROPY_VERIFIER = new EntropyVerifier();
 
     /** The Settings. */
     protected final Settings settings;
@@ -285,12 +289,34 @@ public abstract class AbstractManager<D extends CommonDao, R extends EDSResponse
     }
 
     protected final MemberEntity createNewAccount(final String accountName, final MemberRole role, final byte[] credential) {
+        verifyEntropy("Credential", credential, accountName);
+
         final MemberEntity account = new MemberEntity();
         account.setName(accountName);
         account.setMemberRole(role);
         updateMemberPassword(account, credential);
 
         return account;
+    }
+
+    /**
+     * Verifies that a new secret, chosen by the caller, is strong enough to
+     * be used, see {@link EntropyVerifier}. It must only be invoked for new
+     * secrets, not for existing secrets used to unlock something, as these
+     * may have been set before the verification was introduced.
+     *
+     * @param name    Name of the secret, used in the error message
+     * @param secret  The new secret to verify
+     * @param context Terms an attacker can guess, such as the account name
+     * @throws VerificationException if the secret is too weak
+     */
+    protected static void verifyEntropy(final String name, final byte[] secret, final String... context) {
+        final EntropyVerifier.Result result = ENTROPY_VERIFIER.verify(secret, context);
+
+        if (!result.isAcceptable()) {
+            throw new VerificationException("The " + name + " is too weak. It must have at least "
+                    + EntropyVerifier.MINIMUM_LENGTH + " characters and must not be easy to guess.");
+        }
     }
 
     /**

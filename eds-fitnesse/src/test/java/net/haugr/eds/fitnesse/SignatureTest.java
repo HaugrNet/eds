@@ -72,7 +72,7 @@ class SignatureTest {
     private static Sign signDocument(final String document, final String expires) {
         final var sign = new Sign();
         sign.setAccountName("admin");
-        sign.setCredential("admin");
+        sign.setCredential(ControlEds.ADMIN_PASSPHRASE);
         sign.setData(document);
         sign.setExpires(expires);
         sign.execute();
@@ -83,7 +83,7 @@ class SignatureTest {
     private static Verify verifySignature(final String document, final String signature) {
         final var verify = new Verify();
         verify.setAccountName("admin");
-        verify.setCredential("admin");
+        verify.setCredential(ControlEds.ADMIN_PASSPHRASE);
         verify.setData(document);
         verify.setSignature(signature);
         verify.execute();

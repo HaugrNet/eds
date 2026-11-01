@@ -227,7 +227,7 @@ final class ManagementBeanCircleTest extends DatabaseSetup {
         final ProcessMemberRequest newMemberRequest = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
         newMemberRequest.setAction(Action.CREATE);
         newMemberRequest.setNewAccountName(newUser);
-        newMemberRequest.setNewCredential(crypto.stringToBytes(newUser));
+        newMemberRequest.setNewCredential(credentialOf(newUser));
         final ProcessMemberResponse newMemberResponse = bean.processMember(newMemberRequest);
         assertEquals("The Member '" + newUser + "' was successfully added to EDS.", newMemberResponse.getReturnMessage());
 
@@ -260,7 +260,7 @@ final class ManagementBeanCircleTest extends DatabaseSetup {
         assertNotNull(createResponse.getCircleId());
 
         final ProcessCircleRequest updateRequest = prepareRequest(ProcessCircleRequest.class, MEMBER_5);
-        updateRequest.setCredential(crypto.stringToBytes(MEMBER_5));
+        updateRequest.setCredential(credentialOf(MEMBER_5));
         updateRequest.setAction(Action.UPDATE);
         updateRequest.setCircleId(createResponse.getCircleId());
         updateRequest.setCircleKey(UUID.randomUUID().toString());

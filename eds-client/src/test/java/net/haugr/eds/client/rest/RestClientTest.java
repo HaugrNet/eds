@@ -83,6 +83,10 @@ import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 final class RestClientTest {
 
     private static final String URL = "http://localhost:8080/eds";
+    // Secrets must pass the EntropyVerifier, so the test credentials are
+    // derived from the account name and a random suffix, which on its own
+    // is strong enough. Same convention as the eds-core tests.
+    private static final String PASSPHRASE_SUFFIX = " pjvgr.yxupm-37i23.8kq4h_9s";
     private final Management restManagement = new ManagementRestClient(URL);
     private final Share restShare = new ShareRestClient(URL);
 
@@ -108,7 +112,9 @@ final class RestClientTest {
     @Test
     void testMasterKey() {
         final MasterKeyRequest request = prepareRequest(MasterKeyRequest.class, Constants.ADMIN_ACCOUNT);
-        request.setSecret(request.getCredential());
+        // Without a MasterKey URL, the default MasterKey is derived from the
+        // name of the System Administrator Account.
+        request.setSecret(Constants.ADMIN_ACCOUNT.getBytes(StandardCharsets.UTF_8));
 
         final MasterKeyResponse response = restManagement.masterKey(request);
         assertNotNull(response);
@@ -143,7 +149,7 @@ final class RestClientTest {
         final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
         request.setAction(Action.CREATE);
         request.setNewAccountName(accountName);
-        request.setNewCredential(accountName.getBytes(StandardCharsets.UTF_8));
+        request.setNewCredential(credentialOf(accountName));
 
         final ProcessMemberResponse response = restManagement.processMember(request);
         assertNotNull(response);
@@ -168,7 +174,7 @@ final class RestClientTest {
         final ProcessMemberRequest memberRequest = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
         memberRequest.setAction(Action.CREATE);
         memberRequest.setNewAccountName(accountName);
-        memberRequest.setNewCredential(accountName.getBytes(StandardCharsets.UTF_8));
+        memberRequest.setNewCredential(credentialOf(accountName));
         final ProcessMemberResponse memberResponse = restManagement.processMember(memberRequest);
         assertNotNull(memberResponse);
         assertTrue(memberResponse.isOk());
@@ -297,7 +303,7 @@ final class RestClientTest {
             final A request = clazz.getConstructor().newInstance();
 
             request.setAccountName(account);
-            request.setCredential(account.getBytes(StandardCharsets.UTF_8));
+            request.setCredential(credentialOf(account));
             request.setCredentialType(CredentialType.PASSPHRASE);
 
             return request;
@@ -306,11 +312,15 @@ final class RestClientTest {
         }
     }
 
+    static byte[] credentialOf(final String account) {
+        return (account + PASSPHRASE_SUFFIX).getBytes(StandardCharsets.UTF_8);
+    }
+
     private String createAccount(final String accountName) {
         final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
         request.setAction(Action.CREATE);
         request.setNewAccountName(accountName);
-        request.setNewCredential(accountName.getBytes(StandardCharsets.UTF_8));
+        request.setNewCredential(credentialOf(accountName));
 
         final ProcessMemberResponse response = restManagement.processMember(request);
         throwIfFailed(response);

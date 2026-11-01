@@ -130,7 +130,7 @@ final class ShareBeanSignatureTest extends DatabaseSetup {
         final SignResponse signResponse = bean.sign(signRequest);
         assertEquals(ReturnCode.SUCCESS.getCode(), signResponse.getReturnCode());
 
-        signRequest.setCredential(crypto.stringToBytes(MEMBER_1));
+        signRequest.setCredential(credentialOf(MEMBER_1));
         final SignResponse duplicateResponse = bean.sign(signRequest);
         assertEquals(ReturnCode.SUCCESS.getCode(), duplicateResponse.getReturnCode());
         assertEquals("This document has already been signed.", duplicateResponse.getReturnMessage());

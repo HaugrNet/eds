@@ -12,6 +12,16 @@
 !define SIGNATURE_WARNING      { 491 }
 !define SETTING_WARNING        { 492 }
 
+# Credentials, all secrets must pass the EDS Entropy Verifier. The
+# Administrator Passphrase must match the one used in the ControlEds fixture.
+!define ADMIN_PASSPHRASE   {admin pjvgr.yxupm-37i23.8kq4h_9s}
+!define PASSPHRASE_1       {password1 pjvgr.yxupm-37i23.8kq4h_9s}
+!define PASSPHRASE_2       {password2 pjvgr.yxupm-37i23.8kq4h_9s}
+!define PASSPHRASE_3       {password3 pjvgr.yxupm-37i23.8kq4h_9s}
+!define PASSPHRASE_9       {password9 pjvgr.yxupm-37i23.8kq4h_9s}
+!define INVITEE_PASSPHRASE {invitee pjvgr.yxupm-37i23.8kq4h_9s}
+!define MASTERKEY_SECRET   {master pjvgr.yxupm-37i23.8kq4h_9s}
+
 # Defined Dates
 !define yesterday {!today (yyyy-MM-dd) -1}
 !define tomorrow  {!today (yyyy-MM-dd) +1}

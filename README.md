@@ -106,6 +106,15 @@ syft scan postgres:18-alpine -o cyclonedx-json=target/container-postgres-cyclone
 grype sbom:target/container-eds-quarkus-cyclonedx.json --fail-on high
 ```
 
+All of the above, the Maven build, the container images, the SBOMs and the
+scans, can also be run in one step, with the same pass/fail rules as the CI
+Build. It requires Docker, Syft, Grype and jq:
+
+```bash
+./eds.sh sbom                # Full build, SBOMs and scans
+./eds.sh sbom --skip-build   # Reuse the existing build, only rescan
+```
+
 ## Who is this for
 
 Anyone for whom data protection is important may find EDS useful. It is designed

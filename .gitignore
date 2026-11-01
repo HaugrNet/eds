@@ -8,7 +8,7 @@ hs_err_pid*
 # Runtime Pid file
 eds.pid
 
-# Temporary Docker files
+# Temporary container build files
 apt.conf
 wgetrc
 

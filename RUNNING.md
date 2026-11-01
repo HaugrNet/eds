@@ -86,54 +86,64 @@ java -Dquarkus.config.locations=/path/to/application.properties \
 | `quarkus.http.root-path` | /eds | Application context path (build time) |
 | `quarkus.management.port` | 9000 | Management port, with the health endpoints |
 
-## Option 2: Docker Compose
+## Option 2: Podman Container
 
-Run EDS as a single Quarkus container, using Docker Compose. EDS does not ship
+Run EDS as a single Quarkus container, with rootless Podman. EDS does not ship
 a database container. Like the Quarkus JAR (see Option 1), it uses an existing
 PostgreSQL database when `EDS_DB_URL` is set, and otherwise the in-memory H2
-database.
+database. The image is defined in `accessories/podman/Containerfile`.
 
 ### Prerequisites
 
-- Docker and Docker Compose installed
+- Podman installed, running rootless
 - For PostgreSQL: a database, user and password, see
   [PostgreSQL Database Setup](#postgresql-database-setup); EDS creates the tables
 
 ### Configuration
 
 Without configuration, the container starts with the in-memory H2 database.
-For PostgreSQL, create `accessories/docker/.env` with the database connection:
+For PostgreSQL, create `accessories/podman/eds.env` with the database
+connection. The file is ignored by Git, as it holds the password. Comments
+must be on their own lines, as the values are read up to the end of the line:
 
 ```bash
-# PostgreSQL connection
-EDS_DB_URL=jdbc:postgresql://host.docker.internal:5432/eds
+# PostgreSQL connection, the username defaults to eds_user
+EDS_DB_URL=jdbc:postgresql://host.containers.internal:5432/eds
+EDS_DB_USERNAME=eds_user
 EDS_DB_PASSWORD=...
-EDS_DB_USERNAME=eds_user        # Default: eds_user
 
-# Optional
-EDS_CERTS_DIR=/path/to/certs    # Enables TLS, together with:
+# Optional, enables TLS with the certificate and key from EDS_CERTS_DIR
+EDS_CERTS_DIR=/path/to/certs
 EDS_TLS_CERT=/app/certs/tls.crt
 EDS_TLS_KEY=/app/certs/tls.key
-EDS_INSECURE_REQUESTS=enabled   # enabled | redirect | disabled
+# Plain HTTP requests: enabled | redirect | disabled
+EDS_INSECURE_REQUESTS=enabled
 ```
 
+The same variables can also be set in the environment of `eds.sh`, which then
+take precedence over the file.
+
 Inside the container, `localhost` is the container itself. For a PostgreSQL
-running on the Docker host, use `host.docker.internal`, which the Compose
-setup maps to the host. PostgreSQL must then also accept connections from the
-Docker network (`listen_addresses` in `postgresql.conf` and a matching entry
-in `pg_hba.conf`).
+running on the host, use `host.containers.internal`, which Podman maps to the
+host. Connections to it don't reach services that only listen on the loopback
+interface, so PostgreSQL must also listen on a host address
+(`listen_addresses` in `postgresql.conf`) and accept the connection (a
+matching entry in `pg_hba.conf`).
+
+On systems with SELinux, like RHEL, the log and certificate mounts are
+relabelled for the container.
 
 ### Control Script
 
-The containers are managed with `eds.sh` from the project root:
+The container is managed with `eds.sh` from the project root:
 
 ```bash
-./eds.sh start     # Build the JAR if missing, start the container, wait until ready
-./eds.sh stop      # Stop the container
-./eds.sh restart   # Restart the container
-./eds.sh status    # Health and version of the running container
-./eds.sh logs      # Follow the container logs
-./eds.sh remove    # Remove the container and image
+./eds.sh build --containers        # Build the JAR and the container image
+./eds.sh run container             # Start the container, wait until ready
+./eds.sh stop container            # Stop the container
+./eds.sh stop container --remove   # Remove the container and image
+./eds.sh check status              # Build, health and version of the container
+./eds.sh check logs                # Follow the container logs
 ```
 
 ### Health Checks
@@ -147,14 +157,18 @@ exposed to the container network, not published to the host:
 | `/q/health/ready` | Readiness, the database and EDS are ready |
 | `/q/health/started` | Startup completed |
 
-The container `HEALTHCHECK` uses the readiness endpoint. For Kubernetes, use
-the same endpoints for the probes, on port `9000`.
+The container `HEALTHCHECK` uses the readiness endpoint, which is why the
+image is built in the Docker format; the OCI format doesn't support it. For
+Kubernetes, use the same endpoints for the probes, on port `9000`.
 
 ### Data Persistence
 
 With PostgreSQL, all data is stored in the database; with H2, it is lost when
 the container stops. The container only writes its logs to a local bind
-mount, `accessories/docker/volumes/logs/` (`eds.log`).
+mount, `accessories/podman/logs/` (`eds.log`). The `eds` user of the image
+(UID 1001) is mapped to the host user, so the logs are owned by the host user.
+`run container` always creates a new container, from the current image and
+configuration.
 
 ## Verifying the Installation
 

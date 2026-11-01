@@ -1,10 +1,17 @@
 # ==============================================================================
-# Dockerfile for EDS Quarkus Application
+# Containerfile for the EDS Quarkus Application
 # ------------------------------------------------------------------------------
-# Runs the EDS Quarkus
+# Runs the EDS uber-jar, which must be built first. The build context is the
+# eds-quarkus/target folder, and the image must be built in the Docker format,
+# as the OCI format doesn't support the HEALTHCHECK instruction:
+#
+#   podman build --format docker -f accessories/podman/Containerfile \
+#       -t eds-quarkus:local eds-quarkus/target
+#
+# Or simply: ./eds.sh build --containers
 # ==============================================================================
 
-FROM eclipse-temurin:25-jre-alpine
+FROM docker.io/library/eclipse-temurin:25-jre-alpine
 
 LABEL maintainer="EDS Project"
 LABEL description="EDS Quarkus Application"
@@ -15,12 +22,13 @@ RUN apk add --no-cache tzdata \
     && ln -snf /usr/share/zoneinfo/$TZ /etc/localtime \
     && echo $TZ > /etc/timezone
 
-# Create app directory and non-root user
-RUN addgroup -S eds && adduser -S eds -G eds
+# Create app directory and non-root user. The fixed UID and GID allow the
+# user to be mapped to the host user, so the logs are owned by the host user.
+RUN addgroup -S -g 1001 eds && adduser -S -u 1001 -G eds eds
 WORKDIR /app
 
-# Copy the pre-built uber-jar
-COPY eds-quarkus/target/eds-runnable.jar /app/eds-runnable.jar
+# Copy the pre-built uber-jar, the build context is eds-quarkus/target
+COPY eds-runnable.jar /app/eds-runnable.jar
 
 # Create logs directory
 RUN mkdir -p /app/logs

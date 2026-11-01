@@ -53,21 +53,27 @@ jobs:
             **/target/*.ear
           if-no-files-found: ignore
 
-      # The EDS container image is built from the uber-jar produced above. EDS
-      # does not ship a database container, it uses an existing PostgreSQL
+      # The EDS container image is built from the uber-jar produced above, with
+      # Podman. EDS does not ship a database container, it uses an existing
+      # PostgreSQL. The Docker format keeps the HEALTHCHECK, which the OCI
+      # format doesn't support.
       - name: Build EDS container image
-        run: docker build -f accessories/docker/Dockerfile.quarkus -t eds-quarkus:ci .
+        run: |
+          podman build --format docker -f accessories/podman/Containerfile \
+              -t eds-quarkus:ci eds-quarkus/target
 
       - name: Install Syft
         id: syft
         uses: anchore/sbom-action/download-syft@v0
 
       # The container SBOM covers the operating system packages and the Java
-      # runtime of the image, in addition to the libraries in the uber-jar
+      # runtime of the image, in addition to the libraries in the uber-jar.
+      # Syft reads the image from an archive, exported by Podman.
       - name: Generate container SBOM
         id: container-sbom
         run: |
-          ${{ steps.syft.outputs.cmd }} scan eds-quarkus:ci \
+          podman save --format oci-archive -o "${RUNNER_TEMP}/eds-quarkus.tar" eds-quarkus:ci
+          ${{ steps.syft.outputs.cmd }} scan "oci-archive:${RUNNER_TEMP}/eds-quarkus.tar" \
               -o cyclonedx-json=target/container-eds-quarkus-cyclonedx.json
 
       - name: Install Grype

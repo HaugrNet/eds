@@ -40,7 +40,18 @@ on testing to guarantee that the stability will remain high. The build requires
 Java 25, and [Maven](https://maven.apache.org/).
 
 In the root folder, there exists a small script, ```eds.sh```, which can be used to
-build the entire project, including running all tests and quality checks.
+build the entire project, run the EDS container and the FitNesse test suite:
+
+```bash
+./eds.sh build [--test] [--sbom] [--containers] [--podman]
+./eds.sh run container | run fitnesse
+./eds.sh stop container [--remove] | stop fitnesse
+./eds.sh check status | check logs
+```
+
+With ```--podman```, the Maven build runs in the Podman build container,
+```build.container```, so only Podman is needed instead of a local Java. The
+container image and the SBOM scans are still built and run on the host.
 
 ### OpenAPI Specification
 in the accessories/release folder, there is an OpenAPI Specification file,
@@ -85,7 +96,7 @@ suppressed in ```.grype.yaml```, together with a justification.
 
 #### Container SBOM
 The Maven SBOM only covers the Java libraries. The EDS container image, built
-from ```accessories/docker/Dockerfile.quarkus```, also contains operating
+from ```accessories/podman/Containerfile```, also contains operating
 system packages and a Java runtime, so the CI Build generates a CycloneDX SBOM
 for it with [Syft](https://github.com/anchore/syft), written to
 ```target/container-eds-quarkus-cyclonedx.json```. EDS does not ship a database
@@ -97,18 +108,20 @@ available as build artifacts. The container SBOM can be generated locally,
 after the Maven build, with:
 
 ```bash
-docker build -f accessories/docker/Dockerfile.quarkus -t eds-quarkus:local .
-syft scan eds-quarkus:local -o cyclonedx-json=target/container-eds-quarkus-cyclonedx.json
+#  It's built with --format docker, because Podman's default OCI format silently drops the HEALTHCHECK
+podman build --format docker -f accessories/podman/Containerfile -t eds-quarkus:local eds-quarkus/target
+podman save --format oci-archive -o target/eds-quarkus.tar eds-quarkus:local
+syft scan oci-archive:target/eds-quarkus.tar -o cyclonedx-json=target/container-eds-quarkus-cyclonedx.json
 grype sbom:target/container-eds-quarkus-cyclonedx.json --fail-on high
 ```
 
 All of the above, the Maven build, the container image, the SBOMs and the
 scans, can also be run in one step, with the same pass/fail rules as the CI
-Build. It requires Docker, Syft, Grype and jq:
+Build. It requires Podman, Syft, Grype and jq:
 
 ```bash
-./eds.sh sbom                # Full build, SBOMs and scans
-./eds.sh sbom --skip-build   # Reuse the existing build, only rescan
+./eds.sh build --sbom --containers   # Maven & container SBOMs and scans
+./eds.sh build --sbom                # Only the Maven SBOM and scan
 ```
 
 ## Who is this for

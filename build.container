@@ -1,7 +1,12 @@
-FROM eclipse-temurin:25-jdk-alpine
+# ==============================================================================
+# EDS Build Container
+# ------------------------------------------------------------------------------
+# Used by "eds.sh build --podman" to run the Maven build without a local Java.
+# The project and the local Maven repository are mounted at run time, and the
+# Maven Wrapper of the project is used, so the image only holds the JDK.
+# ==============================================================================
+FROM docker.io/library/eclipse-temurin:25-jdk-alpine
 LABEL maintainer="EDS Project"
-LABEL description="EDS Quarkus Builder"
-RUN apk add --no-cache maven
+LABEL description="EDS Build Container"
 WORKDIR /app
-COPY . .
-CMD ["mvn", "clean", "package", "-DskipTests", "-Dmaven.javadoc.skip=true"]
+CMD ["./mvnw", "-B", "-ntp", "-DskipTests", "clean", "install"]

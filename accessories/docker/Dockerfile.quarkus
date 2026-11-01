@@ -31,12 +31,17 @@ RUN chown -R eds:eds /app
 # Switch to non-root user
 USER eds
 
-# Expose the application port
+# Expose the application port, and the management port (health endpoints),
+# which must only be reachable by the orchestrator, not published publicly.
 EXPOSE 8080
+EXPOSE 9000
 
-# Health check
+# Health check, using the MicroProfile readiness endpoint on the management
+# port. It reports UP (HTTP 200) only when both the database and EDS are
+# ready, otherwise HTTP 503. Plain HTTP, so it also works when the
+# application port is TLS-only (EDS_INSECURE_REQUESTS=disabled).
 HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
-    CMD wget --no-verbose --tries=1 --spider http://localhost:8080/eds/api/version || exit 1
+    CMD wget -q -T 4 -O /dev/null http://localhost:9000/q/health/ready || exit 1
 
 # Run the application
 ENTRYPOINT ["java", "-jar", "/app/eds-runnable.jar"]

@@ -66,6 +66,10 @@ services:
     ports:
       - "8080:8080"
       - "8443:8443"
+    # Management port (health endpoints), internal network only; do not
+    # publish it under "ports".
+    expose:
+      - "9000"
     networks:
       - eds-network
     depends_on:

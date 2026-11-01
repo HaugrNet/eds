@@ -1,0 +1,156 @@
+# EDS entropy blocklist, used by net.haugr.eds.core.jce.EntropyVerifier.
+#
+# One entry per line; empty lines and lines starting with '#' are ignored.
+# Entries are compared case-insensitively and with common leetspeak
+# substitutions, so "P@ssw0rd" matches "password". Entries shorter than four
+# characters are ignored, as they are covered by the literal costs.
+#
+# This bundled list is deliberately small. For production use, replace it with
+# a larger list of breached and common passwords (e.g. the 100,000 most common
+# entries from a breach corpus), loaded via the EntropyVerifier(Collection)
+# constructor.
+
+# Product and context terms
+eds
+haugr
+encrypted
+data share
+admin
+administrator
+root
+master
+masterkey
+secret
+default
+changeme
+change me
+system
+circle
+member
+trustee
+
+# Common English passwords and words
+password
+passw0rd
+passphrase
+welcome
+letmein
+let me in
+qwerty
+dragon
+monkey
+shadow
+sunshine
+princess
+football
+baseball
+soccer
+hockey
+iloveyou
+i love you
+trustno1
+superman
+batman
+spiderman
+starwars
+pokemon
+hello
+freedom
+whatever
+nothing
+login
+access
+mustang
+michael
+jennifer
+jordan
+hunter
+ranger
+buster
+summer
+winter
+spring
+autumn
+monday
+friday
+january
+february
+march
+april
+june
+july
+august
+september
+october
+november
+december
+computer
+internet
+security
+service
+cheese
+chocolate
+cookie
+flower
+orange
+banana
+purple
+silver
+golden
+diamond
+lovely
+abcdef
+abc123
+correct horse battery staple
+correcthorsebatterystaple
+
+# Common German passwords and words
+passwort
+kennwort
+geheim
+hallo
+schatz
+liebe
+ichliebedich
+sommer
+herbst
+fruehling
+frühling
+januar
+februar
+maerz
+märz
+oktober
+dezember
+montag
+freitag
+fussball
+fußball
+schalke
+bayern
+borussia
+dortmund
+deutschland
+berlin
+hamburg
+muenchen
+münchen
+willkommen
+sicherheit
+benutzer
+anmelden
+
+# Common French passwords and words
+motdepasse
+mot de passe
+bonjour
+soleil
+amour
+jetaime
+je t'aime
+chouchou
+doudou
+marseille
+paris
+france
+bienvenue

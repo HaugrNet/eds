@@ -164,6 +164,9 @@ public class StartupBean {
             // result in an error while reading.
             if (!result.isEmpty() && (result.getFirst().getSchemaVersion() == DB_VERSION)) {
                 ready = true;
+            } else if (!result.isEmpty()) {
+                LOGGER.error("The database has the schema version {}, but this EDS needs the version {}. "
+                        + "EDS 2.0 has no upgrade in place, so a fresh database is needed.", result.getFirst().getSchemaVersion(), DB_VERSION);
             }
         } catch (EDSException e) {
             LOGGER.error("Problem with DB: {}", e.getMessage(), e);

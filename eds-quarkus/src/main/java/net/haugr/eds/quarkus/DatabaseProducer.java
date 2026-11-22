@@ -25,6 +25,7 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import jakarta.persistence.EntityManager;
 import javax.sql.DataSource;
+import net.haugr.eds.core.model.ConnectionSource;
 import net.haugr.eds.core.model.SchemaManager;
 
 /**
@@ -91,11 +92,32 @@ public class DatabaseProducer {
      * @return SchemaManager for the selected database
      */
     @Produces
+    // Singleton, not ApplicationScoped: SchemaManager has no constructor without arguments, so it can't
+    // have a client proxy, and it needs none; it is made once, with the DataSource of the database.
     @Singleton
     public SchemaManager schemaManager() {
-        return new SchemaManager(switch (DatabaseSelection.selected()) {
+        return new SchemaManager(dataSource());
+    }
+
+    /**
+     * Opens Connections of the active datasource outside the request's
+     * transaction, for reading the source of a large copy (PLAN.md, S4).
+     *
+     * @return ConnectionSource for the selected database
+     */
+    @Produces
+    // Singleton, not ApplicationScoped: a client proxy would add nothing to this stateless lambda over the
+    // DataSource, which lives as long as EDS, and nothing would be made later than at injection.
+    @Singleton
+    public ConnectionSource connectionSource() {
+        final DataSource dataSource = dataSource();
+        return dataSource::getConnection;
+    }
+
+    private DataSource dataSource() {
+        return switch (DatabaseSelection.selected()) {
             case POSTGRESQL -> postgresqlDataSource.get();
             case H2 -> h2DataSource.get();
-        });
+        };
     }
 }

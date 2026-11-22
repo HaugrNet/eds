@@ -21,6 +21,7 @@ import io.quarkus.scheduler.Scheduled;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.event.Observes;
 import jakarta.inject.Inject;
+import net.haugr.eds.core.ManagementBean;
 import net.haugr.eds.core.StartupBean;
 import net.haugr.eds.core.enums.StandardSetting;
 import net.haugr.eds.core.model.SchemaManager.Outcome;
@@ -72,6 +73,7 @@ public class DatabaseStartup {
     }
 
     private final StartupBean startupBean;
+    private final ManagementBean managementBean;
     private final Settings settings;
     private final Database database;
     private State state = State.PENDING;
@@ -80,22 +82,25 @@ public class DatabaseStartup {
     /**
      * CDI Constructor.
      *
-     * @param startupBean The EDS StartupBean
+     * @param startupBean    The EDS StartupBean
+     * @param managementBean The EDS ManagementBean, loads the MasterKey
      */
     @Inject
-    public DatabaseStartup(final StartupBean startupBean) {
-        this(startupBean, Settings.getInstance(), DatabaseSelection.selected());
+    public DatabaseStartup(final StartupBean startupBean, final ManagementBean managementBean) {
+        this(startupBean, managementBean, Settings.getInstance(), DatabaseSelection.selected());
     }
 
     /**
      * Constructor with all dependencies, for testing.
      *
-     * @param startupBean The EDS StartupBean
-     * @param settings    The EDS Settings
-     * @param database    The selected database
+     * @param startupBean    The EDS StartupBean
+     * @param managementBean The EDS ManagementBean, or null to skip loading the MasterKey
+     * @param settings       The EDS Settings
+     * @param database       The selected database
      */
-    DatabaseStartup(final StartupBean startupBean, final Settings settings, final Database database) {
+    DatabaseStartup(final StartupBean startupBean, final ManagementBean managementBean, final Settings settings, final Database database) {
         this.startupBean = startupBean;
+        this.managementBean = managementBean;
         this.settings = settings;
         this.database = database;
     }
@@ -154,6 +159,10 @@ public class DatabaseStartup {
                     LOGGER.infof("The database is reachable, after %d attempts.", attempts);
                 }
                 state = State.STARTED;
+                if (managementBean != null) {
+                    // Without a valid MasterKey source, EDS stays locked.
+                    managementBean.loadMasterKey();
+                }
             }
         }
     }

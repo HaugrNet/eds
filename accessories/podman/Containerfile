@@ -8,17 +8,32 @@
 #   podman build --format docker -f accessories/podman/Containerfile \
 #       -t eds-quarkus:local eds-quarkus/target
 #
-# Or simply: ./eds.sh build --containers
+# Or simply: ./eds.sh build rune
+#
+# The same file makes the image of the stone alone, which has no web app
+# (neither Rune nor Quinoa is in its JAR), from the JAR built with -Dstone:
+#
+#   podman build --format docker -f accessories/podman/Containerfile \
+#       --build-arg JAR=eds-stone.jar -t eds-stone:local eds-quarkus/target
+#
+# Or simply: ./eds.sh build stone
 # ==============================================================================
 
 FROM docker.io/library/eclipse-temurin:25-jre-alpine
 
+# The uber-jar in the build context: eds-rune.jar is EDS with Rune,
+# eds-stone.jar the stone alone.
+ARG JAR=eds-rune.jar
+
 LABEL maintainer="EDS Project"
 LABEL description="EDS Quarkus Application"
 
-# Set timezone
+# Set timezone. The packages of the base image are upgraded first, so the
+# security fixes of Alpine are in the image without waiting for a new base
+# image; --no-cache fetches a fresh package index and keeps none of it.
 ENV TZ=Europe/Berlin
-RUN apk add --no-cache tzdata \
+RUN apk upgrade --no-cache \
+    && apk add --no-cache tzdata \
     && ln -snf /usr/share/zoneinfo/$TZ /etc/localtime \
     && echo $TZ > /etc/timezone
 
@@ -27,8 +42,9 @@ RUN apk add --no-cache tzdata \
 RUN addgroup -S -g 1001 eds && adduser -S -u 1001 -G eds eds
 WORKDIR /app
 
-# Copy the pre-built uber-jar, the build context is eds-quarkus/target
-COPY eds-runnable.jar /app/eds-runnable.jar
+# Copy the pre-built uber-jar from the build context. It has the same name
+# in both images, so they are started the same way.
+COPY ${JAR} /app/eds.jar
 
 # Create logs directory
 RUN mkdir -p /app/logs
@@ -52,4 +68,4 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
     CMD wget -q -T 4 -O /dev/null http://localhost:9000/q/health/ready || exit 1
 
 # Run the application
-ENTRYPOINT ["java", "-jar", "/app/eds-runnable.jar"]
+ENTRYPOINT ["java", "-jar", "/app/eds.jar"]

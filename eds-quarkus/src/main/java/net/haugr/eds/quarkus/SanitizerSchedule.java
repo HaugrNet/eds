@@ -20,6 +20,7 @@ import io.quarkus.scheduler.Scheduled;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import net.haugr.eds.core.SanitizerBean;
+import net.haugr.eds.core.jce.MasterKey;
 
 /**
  * <p>Schedules the hourly EDS Sanity checks, with the Quarkus Scheduler. The
@@ -49,10 +50,22 @@ public class SanitizerSchedule {
     }
 
     /**
-     * Runs the hourly Sanity check.
+     * <p>Runs the hourly Sanity check, unless EDS is not yet started.</p>
+     *
+     * <p>The scheduler may fire this before startup has finished. On a fresh
+     * database that is the window in which the schema is still being created,
+     * so a run then would hit tables that do not exist yet. The MasterKey is
+     * the reliable "started" signal: it is loaded only after the schema exists
+     * (its key check value is read from {@code eds_masterkey}), so an unlocked
+     * MasterKey means the schema is in place. While EDS is locked there is also
+     * nothing useful to sanitize, so the check is simply skipped until the next
+     * hour. The initial Sanity check at startup is run separately, by
+     * {@code StartupBean}, after the schema and the MasterKey are ready.</p>
      */
     @Scheduled(identity = "eds-sanitizer", every = "1h")
     void runSanitizing() {
-        sanitizerBean.sanitize();
+        if (MasterKey.getInstance().isUnlocked()) {
+            sanitizerBean.sanitize();
+        }
     }
 }

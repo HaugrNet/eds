@@ -62,13 +62,51 @@
             <artifactId>h2</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.hibernate.orm</groupId>
             <artifactId>hibernate-core</artifactId>
-            <scope>test</scope>
+            <!-- Session.doReturningWork() gives the JDBC connection for
+                 streaming the encrypted data, see DataDao -->
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.eclipse</groupId>
             <artifactId>yasson</artifactId>
+        </dependency>
+        <!-- Runs the OpenAPI filter as the smallrye-open-api-maven-plugin
+             does, so its coverage counts (OpenApiFilterTest). -->
+        <dependency>
+            <groupId>io.smallrye</groupId>
+            <artifactId>smallrye-open-api-core</artifactId>
+            <version>${version.smallrye-open-api}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.smallrye</groupId>
+            <artifactId>smallrye-open-api-jaxrs</artifactId>
+            <version>${version.smallrye-open-api}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.smallrye.config</groupId>
+            <artifactId>smallrye-config</artifactId>
+            <version>${version.smallrye-config}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.logging</groupId>
+            <artifactId>jboss-logging</artifactId>
+            <version>${version.jboss-logging}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.smallrye</groupId>
+            <artifactId>jandex</artifactId>
+            <version>${version.jandex}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
@@ -109,38 +147,28 @@
                         <configuration>
                             <infoTitle>EDS - Encrypted Data Share REST API</infoTitle>
                             <infoVersion>${project.version}</infoVersion>
-                            <infoDescription>REST API and core logic for EDS, Encrypted Data Share.</infoDescription>
                             <infoContactName>Kim Jensen</infoContactName>
                             <infoContactUrl>https://haugr.net/</infoContactUrl>
                             <infoLicenseName>Apache License 2.0</infoLicenseName>
                             <infoLicenseUrl>https://www.apache.org/licenses/LICENSE-2.0</infoLicenseUrl>
+                            <!-- OpenAPI 3.0.x for now, for the widest generator
+                                 support; a move to 3.1 is a later step (PLAN.md, OpenAPI). -->
+                            <openApiVersion>3.0.3</openApiVersion>
+                            <!-- The contract's paths stay relative to the API root
+                                 (/api/v1, the @ApplicationPath of EDSApplication);
+                                 clients are given that root as their base URL. -->
+                            <applicationPathDisable>true</applicationPathDisable>
+                            <filter>net.haugr.eds.core.services.openapi.EDSOpenApiFilter</filter>
+                            <!-- Subclasses (all requests extend Authentication, all responses
+                                 EDSResponse) are rendered as allOf with a reference to the parent
+                                 schema, so the common fields are documented once. -->
+                            <systemPropertyVariables>
+                                <mp.openapi.extensions.smallrye.auto-inheritance>
+                                    BOTH
+                                </mp.openapi.extensions.smallrye.auto-inheritance>
+                            </systemPropertyVariables>
                             <schemaFilename>openapi</schemaFilename>
                             <outputDirectory>${project.build.directory}/generated</outputDirectory>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-resources-plugin</artifactId>
-                <version>${version.maven-resources-plugin}</version>
-                <executions>
-                    <execution>
-                        <id>copy-openapi-to-release</id>
-                        <phase>prepare-package</phase>
-                        <goals>
-                            <goal>copy-resources</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${project.basedir}/../accessories/release</outputDirectory>
-                            <resources>
-                                <resource>
-                                    <directory>${project.build.directory}/generated</directory>
-                                    <includes>
-                                        <include>openapi.json</include>
-                                    </includes>
-                                </resource>
-                            </resources>
                         </configuration>
                     </execution>
                 </executions>

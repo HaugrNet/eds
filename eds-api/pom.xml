@@ -19,6 +19,13 @@
             <groupId>jakarta.platform</groupId>
             <artifactId>jakarta.jakartaee-api</artifactId>
         </dependency>
+        <!-- OpenAPI annotations (@Schema) documenting the API objects. Scope
+             provided (managed in the parent): only needed when the OpenAPI
+             specification is generated, not at runtime. -->
+        <dependency>
+            <groupId>org.eclipse.microprofile.openapi</groupId>
+            <artifactId>microprofile-openapi-api</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>org.junit.jupiter</groupId>

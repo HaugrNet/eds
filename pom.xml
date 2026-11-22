@@ -40,7 +40,6 @@
         <module>eds-api</module>
         <module>eds-core</module>
         <module>eds-quarkus</module>
-        <module>eds-client</module>
         <module>eds-fitnesse</module>
     </modules>
 
@@ -72,6 +71,11 @@
         <!-- SonarQube Settings -->
         <sonar.projectName>Encrypted Data Share</sonar.projectName>
         <sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
+        <!-- The coverage of all modules together, as the tests of
+             eds-quarkus also cover eds-core and eds-api (eds-quarkus/pom.xml).
+             The path is built from two properties, so no line is too long. -->
+        <eds.jacoco.dir>${maven.multiModuleProjectDirectory}/eds-quarkus/target/jacoco-aggregate</eds.jacoco.dir>
+        <sonar.coverage.jacoco.xmlReportPaths>${eds.jacoco.dir}/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
         <!-- Sonar is by default analyzing everything. But Generated Code is
              beyond our control, so error reports from this are just annoying!
              Legend: *  - zero or more characters
@@ -83,18 +87,21 @@
         <version.microprofile-openapi-api>4.1.1</version.microprofile-openapi-api>
         <version.microprofile-health-api>4.0.1</version.microprofile-health-api>
         <version.slf4j>2.0.17</version.slf4j>
-        <version.gson>2.13.2</version.gson>
         <version.jersey>4.0.2</version.jersey>
         <version.junit>5.13.1</version.junit>
         <version.assertj>3.27.7</version.assertj>
         <version.logback>1.5.30</version.logback>
         <version.h2>2.4.240</version.h2>
+        <!-- Test scope only, must match the version in the Quarkus Platform BOM -->
+        <version.postgresql>42.7.13</version.postgresql>
         <version.hibernate-core>6.6.40.Final</version.hibernate-core>
         <version.yasson>3.0.4</version.yasson>
 
         <!-- Quarkus versions, the Hibernate version must match the version
              used by the Quarkus Platform BOM, see the Quarkus modules. -->
         <version.quarkus>3.40.1.1</version.quarkus>
+        <!-- Client generation from the contract: Java in eds-fitnesse, TypeScript in eds-quarkus -->
+        <version.openapi-generator>7.26.0</version.openapi-generator>
         <version.hibernate-core.quarkus>7.4.9.Final</version.hibernate-core.quarkus>
         <!-- JUnit version used by the Quarkus BOM, the Quarkus test framework
              does not work with the version.junit set above -->
@@ -103,6 +110,7 @@
         <!-- Plugin versions -->
         <version.maven-clean-plugin>3.2.0</version.maven-clean-plugin>
         <version.maven-compiler-plugin>3.14.1</version.maven-compiler-plugin>
+        <version.maven-dependency-plugin>3.8.1</version.maven-dependency-plugin>
         <version.maven-resources-plugin>3.3.1</version.maven-resources-plugin>
         <version.maven-surefire-plugin>3.5.3</version.maven-surefire-plugin>
         <version.maven-jar-plugin>3.4.2</version.maven-jar-plugin>
@@ -120,6 +128,14 @@
         <version.sonar-maven-plugin>5.1.0.4751</version.sonar-maven-plugin>
         <version.cyclonedx-maven-plugin>2.9.1</version.cyclonedx-maven-plugin>
         <version.smallrye-open-api-maven-plugin>4.2.0</version.smallrye-open-api-maven-plugin>
+        <!-- The scanner of the plugin above, for the test which runs the
+             OpenAPI filter as the build does (eds-core, OpenApiFilterTest);
+             only eds-core declares these, so Quarkus keeps its own versions -->
+        <version.smallrye-open-api>${version.smallrye-open-api-maven-plugin}</version.smallrye-open-api>
+        <version.smallrye-config>3.13.4</version.smallrye-config>
+        <!-- Both need these; Hibernate brings older ones, which they only extend -->
+        <version.jboss-logging>3.6.1.Final</version.jboss-logging>
+        <version.jandex>3.5.0</version.jandex>
     </properties>
 
     <dependencyManagement>
@@ -171,21 +187,10 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>eds-client</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>${project.groupId}</groupId>
                 <artifactId>eds-quarkus</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
-            <!-- The following is required to build and run the REST Client -->
-            <dependency>
-                <groupId>com.google.code.gson</groupId>
-                <artifactId>gson</artifactId>
-                <version>${version.gson}</version>
-            </dependency>
             <dependency>
                 <groupId>org.glassfish.jersey.test-framework.providers</groupId>
                 <artifactId>jersey-test-framework-provider-grizzly2</artifactId>
@@ -235,6 +240,12 @@
                 <groupId>com.h2database</groupId>
                 <artifactId>h2</artifactId>
                 <version>${version.h2}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.postgresql</groupId>
+                <artifactId>postgresql</artifactId>
+                <version>${version.postgresql}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
@@ -493,6 +504,12 @@
                                 </goals>
                                 <configuration>
                                     <outputName>${project.artifactId}-${project.version}-cyclonedx</outputName>
+                                    <!-- The SBOM lists what is shipped: the
+                                         FitNesse test module is not, so its
+                                         libraries are left out. -->
+                                    <excludeArtifactId>
+                                        <artifactId>eds-fitnesse</artifactId>
+                                    </excludeArtifactId>
                                 </configuration>
                             </execution>
                         </executions>

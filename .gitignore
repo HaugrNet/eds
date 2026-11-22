@@ -35,3 +35,12 @@ eds-fitnesse/FitNesseRoot/content.txt
 eds-fitnesse/FitNesseRoot/files/
 eds-fitnesse/FitNesseRoot/properties
 eds-fitnesse/FitNesseRoot/properties.xml
+
+# PWA (eds-quarkus/src/main/webui): generated client, Node, build output
+eds-quarkus/src/main/webui/src/api/
+eds-quarkus/src/main/webui/node/
+eds-quarkus/src/main/webui/node_modules/
+eds-quarkus/src/main/webui/dist/
+eds-quarkus/.quinoa/
+# The flow test of Rune builds one user for Node here (scripts/flow)
+eds-quarkus/src/main/webui/scripts/flow/dist/

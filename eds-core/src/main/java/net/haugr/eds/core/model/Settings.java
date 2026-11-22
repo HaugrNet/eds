@@ -17,12 +17,14 @@
 package net.haugr.eds.core.model;
 
 import java.nio.charset.Charset;
+import java.time.LocalDateTime;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import net.haugr.eds.api.common.ReturnCode;
+import net.haugr.eds.api.common.Utilities;
 import net.haugr.eds.core.enums.HashAlgorithm;
 import net.haugr.eds.core.enums.KeyAlgorithm;
 import net.haugr.eds.core.enums.StandardSetting;
@@ -119,10 +121,6 @@ public final class Settings {
         return KeyAlgorithm.valueOf(get(StandardSetting.ASYMMETRIC_ALGORITHM.getKey()));
     }
 
-    public KeyAlgorithm getSignatureAlgorithm() {
-        return KeyAlgorithm.valueOf(get(StandardSetting.SIGNATURE_ALGORITHM.getKey()));
-    }
-
     public KeyAlgorithm getPasswordAlgorithm() {
         return KeyAlgorithm.valueOf(get(StandardSetting.PBE_ALGORITHM.getKey()));
     }
@@ -133,10 +131,6 @@ public final class Settings {
 
     public HashAlgorithm getHashAlgorithm() {
         return HashAlgorithm.valueOf(get(StandardSetting.HASH_ALGORITHM.getKey()));
-    }
-
-    public String getSalt() {
-        return get(StandardSetting.EDS_SALT.getKey());
     }
 
     public Locale getLocale() {
@@ -167,8 +161,81 @@ public final class Settings {
         return Integer.valueOf(get(StandardSetting.SANITY_INTERVAL.getKey()).trim());
     }
 
+    /**
+     * Days until the next rotation of a Circle Secret (PLAN.md, Crypto C6);
+     * 0 for none but those asked for.
+     *
+     * @return Days
+     */
+    public int getCircleSecretRotationDays() {
+        return Integer.parseInt(get(StandardSetting.CIRCLE_SECRET_ROTATION_DAYS.getKey()).trim());
+    }
+
+    /**
+     * When the next rotation of a Circle Secret is due, counted from now.
+     *
+     * @return The time, or null if the period is 0
+     */
+    public LocalDateTime nextCircleSecretRotation() {
+        final int days = getCircleSecretRotationDays();
+        return (days > 0) ? Utilities.newDate().plusDays(days) : null;
+    }
+
+    public int getCircleSecretRotationThreads() {
+        return Math.max(1, Integer.parseInt(get(StandardSetting.CIRCLE_SECRET_ROTATION_THREADS.getKey()).trim()));
+    }
+
+    public Integer getInvitationTimeout() {
+        return Integer.valueOf(get(StandardSetting.INVITATION_TIMEOUT.getKey()).trim());
+    }
+
+    public long getStreamMaxObjectSize() {
+        return Long.parseLong(get(StandardSetting.STREAM_MAX_OBJECT_SIZE.getKey()).trim());
+    }
+
+    public int getStreamTransactionTimeout() {
+        return Integer.parseInt(get(StandardSetting.STREAM_TRANSACTION_TIMEOUT.getKey()).trim());
+    }
+
+    public long getDataMaxInlineSize() {
+        return Long.parseLong(get(StandardSetting.DATA_MAX_INLINE_SIZE.getKey()).trim());
+    }
+
+    public long getDataMaxTotalSize() {
+        return Long.parseLong(get(StandardSetting.DATA_MAX_TOTAL_SIZE.getKey()).trim());
+    }
+
+    public int getSanityMaxObjects() {
+        return Integer.parseInt(get(StandardSetting.SANITY_MAX_OBJECTS.getKey()).trim());
+    }
+
+    public int getStreamReadBatchSize() {
+        return Integer.parseInt(get(StandardSetting.STREAM_READ_BATCH_SIZE.getKey()).trim());
+    }
+
     public Integer getSessionTimeout() {
         return Integer.valueOf(get(StandardSetting.SESSION_TIMEOUT.getKey()).trim());
+    }
+
+    public int getSessionMaxPerMember() {
+        return Math.max(1, Integer.parseInt(get(StandardSetting.SESSION_MAX_PER_MEMBER.getKey()).trim()));
+    }
+
+    public String getStoneName() {
+        final String name = get(StandardSetting.STONE_NAME.getKey());
+        return ((name == null) || name.isBlank()) ? null : name.trim();
+    }
+
+    public long getStatusLoadInterval() {
+        return Long.parseLong(get(StandardSetting.STATUS_LOAD_INTERVAL.getKey()).trim());
+    }
+
+    public long getStatusInventoryInterval() {
+        return Math.max(1, Long.parseLong(get(StandardSetting.STATUS_INVENTORY_INTERVAL.getKey()).trim()));
+    }
+
+    public long getDownloadTokenLifetime() {
+        return Long.parseLong(get(StandardSetting.DOWNLOAD_TOKEN_LIFETIME.getKey()).trim());
     }
 
     public String getMasterKeyURL() {

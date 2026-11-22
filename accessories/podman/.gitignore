@@ -1,3 +1,4 @@
 # Container logs, and the local configuration, which may hold passwords
 logs/
 eds.env
+masterkey

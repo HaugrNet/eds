@@ -12,13 +12,19 @@
     </parent>
 
     <artifactId>eds-quarkus</artifactId>
+    <packaging>jar</packaging>
     <name>EDS - Quarkus</name>
     <description>Quarkus runtime module, which selects PostgreSQL or the in-memory H2 database at startup</description>
-    <packaging>jar</packaging>
 
     <properties>
-        <quarkus.platform.group-id>io.quarkus.platform</quarkus.platform.group-id>
-        <quarkus.platform.artifact-id>quarkus-bom</quarkus.platform.artifact-id>
+        <!-- The stone alone (-Dstone) is built in a folder of its own,
+             target/stone, so its build doesn't remove the JAR of the EDS with
+             Rune; its JAR is written beside that one, in target -->
+        <eds.build.dir>${project.basedir}/target</eds.build.dir>
+        <eds.stone>false</eds.stone>
+        <quarkus.package.output-name>eds-rune</quarkus.package.output-name>
+        <!-- The MasterKey source of the tests, see the surefire plugin below -->
+        <test.masterkey.url>file://${project.basedir}/src/test/resources/test-masterkey.txt</test.masterkey.url>
     </properties>
 
     <dependencyManagement>
@@ -42,8 +48,8 @@
             </dependency>
             <!-- Import Quarkus BOM -->
             <dependency>
-                <groupId>${quarkus.platform.group-id}</groupId>
-                <artifactId>${quarkus.platform.artifact-id}</artifactId>
+                <groupId>io.quarkus.platform</groupId>
+                <artifactId>quarkus-bom</artifactId>
                 <version>${version.quarkus}</version>
                 <type>pom</type>
                 <scope>import</scope>
@@ -56,6 +62,12 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>eds-core</artifactId>
+        </dependency>
+        <!-- Also reached through eds-core; named here so the merged coverage
+             report (jacoco report-aggregate, below) includes eds-api. -->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>eds-api</artifactId>
         </dependency>
 
         <!-- Quarkus Core -->
@@ -82,6 +94,11 @@
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-smallrye-health</artifactId>
+        </dependency>
+        <!-- Jakarta WebSocket, for the chat endpoint of eds-core (PLAN.md, L4) -->
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-websockets</artifactId>
         </dependency>
 
         <!-- If using JPA in core: provide ORM and JDBC driver; user can add configuration later -->
@@ -116,6 +133,15 @@
             <artifactId>quarkus-junit5</artifactId>
             <scope>test</scope>
         </dependency>
+        <!-- Quarkus rewrites the classes of this module as it loads them,
+             so the JaCoCo agent doesn't recognise them; this extension
+             measures them in the @QuarkusTest tests (target/jacoco-quarkus.exec,
+             merged by the report-aggregate below). -->
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-jacoco</artifactId>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>io.rest-assured</groupId>
             <artifactId>rest-assured</artifactId>
@@ -124,6 +150,7 @@
     </dependencies>
 
     <build>
+        <directory>${eds.build.dir}</directory>
         <plugins>
             <!-- The Quarkus tests require the JBoss Log Manager -->
             <plugin>
@@ -132,6 +159,12 @@
                 <configuration>
                     <systemPropertyVariables>
                         <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
+                        <!-- Test-only MasterKey source; without one, EDS stays locked -->
+                        <eds.masterkey.url>${test.masterkey.url}</eds.masterkey.url>
+                        <!-- Which of the two was built: EdsPwaTest or EdsStoneTest -->
+                        <eds.stone>${eds.stone}</eds.stone>
+                        <!-- The merged report is made by report-aggregate -->
+                        <quarkus.jacoco.report>false</quarkus.jacoco.report>
                     </systemPropertyVariables>
                 </configuration>
             </plugin>
@@ -167,6 +200,27 @@
                     </ignoredEntries>
                 </configuration>
             </plugin>
+            <!-- The tests here reach eds-core and eds-api through REST and
+                 the socket, so their coverage is merged with that of the
+                 tests of those modules. SonarQube reads the merged report,
+                 see sonar.coverage.jacoco.xmlReportPaths in the root pom. -->
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>report-aggregate</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>report-aggregate</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.basedir}/target/jacoco-aggregate</outputDirectory>
+                            <includeCurrentProject>true</includeCurrentProject>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 
@@ -178,6 +232,22 @@
                     <name>quarkus.profile</name>
                 </property>
             </activation>
+        </profile>
+        <!-- The stone alone: the REST API and the chat, without a web app.
+             Built to target/eds-stone.jar with: mvn -Dstone -pl eds-quarkus package -->
+        <profile>
+            <id>stone</id>
+            <activation>
+                <property>
+                    <name>stone</name>
+                </property>
+            </activation>
+            <properties>
+                <eds.build.dir>${project.basedir}/target/stone</eds.build.dir>
+                <eds.stone>true</eds.stone>
+                <quarkus.package.output-name>eds-stone</quarkus.package.output-name>
+                <quarkus.package.output-directory>${project.basedir}/target</quarkus.package.output-directory>
+            </properties>
         </profile>
     </profiles>
 

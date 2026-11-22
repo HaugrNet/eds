@@ -16,6 +16,8 @@
  */
 package net.haugr.eds.api.responses;
 
+import org.eclipse.microprofile.openapi.annotations.enums.SchemaType;
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import net.haugr.eds.api.common.ByteArrayAdapter;
 import net.haugr.eds.api.common.Constants;
 import net.haugr.eds.api.common.ReturnCode;
@@ -51,6 +53,7 @@ import java.util.List;
         Constants.FIELD_METADATA,
         Constants.FIELD_RECORDS,
         Constants.FIELD_DATA })
+@Schema(description = "The fetched Data Objects: one entry with its content when fetching a single Data Object, otherwise a page of metadata without content.")
 public final class FetchDataResponse extends EDSResponse {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
@@ -58,14 +61,17 @@ public final class FetchDataResponse extends EDSResponse {
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
     /** The Metadata. */
+    @Schema(description = "The metadata of the Data Objects found.")
     @JsonbProperty(Constants.FIELD_METADATA)
     private final List<Metadata> metadata = new ArrayList<>(0);
 
     /** The Number of Records. */
+    @Schema(description = "Total number of records found, for paging.", examples = { "42" })
     @JsonbProperty(Constants.FIELD_RECORDS)
     private long records = 0;
 
     /** The Data. */
+    @Schema(description = "The content of the Data Object, Base64-encoded; only set when fetching a single Data Object.", type = SchemaType.STRING, format = "byte")
     @JsonbProperty(Constants.FIELD_DATA)
     @JsonbTypeAdapter(ByteArrayAdapter.class)
     private byte[] data = null;

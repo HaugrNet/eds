@@ -16,6 +16,7 @@
  */
 package net.haugr.eds.api.dtos;
 
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import jakarta.json.bind.annotation.JsonbNillable;
 import net.haugr.eds.api.common.Constants;
 
@@ -42,6 +43,7 @@ import java.io.Serializable;
  * @since EDS 1.0
  */
 @JsonbPropertyOrder({ Constants.FIELD_TYPENAME, Constants.FIELD_TYPE })
+@Schema(description = "A Data Type, describing how to interpret Data Objects of this type. `data`, `folder`, `thumbnail` and `entry` (an entry of a feature) always exist.")
 public final class DataType implements Serializable {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
@@ -49,11 +51,13 @@ public final class DataType implements Serializable {
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
     /** Type Name. */
+    @Schema(description = "Name of the Data Type, e.g. `data` or `folder`.", maxLength = Constants.MAX_NAME_LENGTH, examples = { "data" })
     @JsonbProperty(value = Constants.FIELD_TYPENAME)
     @JsonbNillable
     private String typeName = null;
 
     /** Type. */
+    @Schema(description = "The definition of the type, e.g. a MIME type or a description of the content. Free text.", maxLength = Constants.MAX_STRING_LENGTH, examples = { "application/pdf" })
     @JsonbProperty(value = Constants.FIELD_TYPE)
     @JsonbNillable
     private String type = null;

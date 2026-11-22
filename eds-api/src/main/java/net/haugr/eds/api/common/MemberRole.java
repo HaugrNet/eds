@@ -16,6 +16,8 @@
  */
 package net.haugr.eds.api.common;
 
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
+
 /**
  * <p>Each Member of EDS has some general permissions defined, which is linked
  * to their Role in the system. The default role for members is "STANDARD", and
@@ -24,6 +26,9 @@ package net.haugr.eds.api.common;
  * @author Kim Jensen
  * @since EDS 1.1
  */
+@Schema(description = "A Member's role in EDS. Values: ADMIN (System Administrator: manages Members, Circles and settings; "
+        + "a stone may have several, of which the first, see firstAdministrator, alone gives the MasterKey and makes "
+        + "or unmakes administrators), STANDARD (regular Member). An invitation always makes a STANDARD Member.")
 public enum MemberRole {
 
     /** Administrator Role. */

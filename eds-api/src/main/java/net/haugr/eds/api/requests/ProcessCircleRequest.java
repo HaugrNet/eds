@@ -16,6 +16,7 @@
  */
 package net.haugr.eds.api.requests;
 
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import jakarta.json.bind.annotation.JsonbNillable;
 import net.haugr.eds.api.Management;
 import net.haugr.eds.api.common.Action;
@@ -63,30 +64,45 @@ import java.util.Map;
         Constants.FIELD_ACTION,
         Constants.FIELD_CIRCLE_ID,
         Constants.FIELD_CIRCLE_NAME,
+        Constants.FIELD_AVATAR,
         Constants.FIELD_MEMBER_ID,
-        Constants.FIELD_CIRCLE_KEY })
+        Constants.FIELD_CIRCLE_KEY,
+        Constants.FIELD_SECRET })
+@Schema(description = "Request to create, update or delete a Circle. Which fields are used depends on the endpoint.")
 public final class ProcessCircleRequest extends Authentication implements CircleIdRequest, ActionRequest {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
     @Serial
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
+    private static final String CHARACTERS = " characters.";
 
     /** The Action. */
+    @Schema(description = "Set by the endpoint; a value sent in the request is ignored.")
     @JsonbProperty(value = Constants.FIELD_ACTION)
     @JsonbNillable
     private Action action = null;
 
     /** The CircleId. */
+    @Schema(description = "ID of the Circle to update or delete.", pattern = Constants.ID_PATTERN_REGEX, examples = { "5d2a0c7e-8c4f-4d7b-9a2e-3f1b6c0d9e8a" })
     @JsonbProperty(value = Constants.FIELD_CIRCLE_ID)
     @JsonbNillable
     private String circleId = null;
 
     /** The Circle Name. */
+    @Schema(description = "Name of the Circle, unique in EDS. Required when creating.", maxLength = Constants.MAX_NAME_LENGTH, examples = { "Project Phoenix" })
     @JsonbProperty(value = Constants.FIELD_CIRCLE_NAME)
     @JsonbNillable
     private String circleName = null;
 
+    /** The Avatar. */
+    @Schema(description = "The Circle's avatar, the ID of a picture the clients know. When updating, an empty value removes it, null leaves it as it is.",
+            pattern = Constants.AVATAR_PATTERN_REGEX, maxLength = Constants.MAX_AVATAR_LENGTH, examples = { "longship" })
+    @JsonbProperty(value = Constants.FIELD_AVATAR)
+    @JsonbNillable
+    private String avatar = null;
+
     /** The MemberId. */
+    @Schema(description = "When creating: ID of the Member who becomes the Circle's first administrator.", pattern = Constants.ID_PATTERN_REGEX, examples = { "5d2a0c7e-8c4f-4d7b-9a2e-3f1b6c0d9e8a" })
     @JsonbProperty(value = Constants.FIELD_MEMBER_ID)
     @JsonbNillable
     private String memberId = null;
@@ -94,9 +110,18 @@ public final class ProcessCircleRequest extends Authentication implements Circle
     // The Circle Key is an optional value which may or may not be provided,
     // hence it is only stored but not used for anything.
     /** The Circle Key. */
+    @Schema(description = "Optional external key to store with the Circle, see Circle.circleKey.")
     @JsonbProperty(value = Constants.FIELD_CIRCLE_KEY)
     @JsonbNillable
     private String circleKey = null;
+
+    /** The secret of the first administrator in the new Circle. */
+    @Schema(description = "When creating: the secret of the Circle's first administrator in it, text which EDS "
+            + "stores without looking inside, e.g. a key of the Circle wrapped for them by a client.",
+            maxLength = Constants.MAX_SECRET_LENGTH)
+    @JsonbProperty(value = Constants.FIELD_SECRET)
+    @JsonbNillable
+    private String secret = null;
 
     // =========================================================================
     // Standard Methods (Constructor, Setters & Getters)
@@ -214,14 +239,22 @@ public final class ProcessCircleRequest extends Authentication implements Circle
             switch (action) {
                 case CREATE:
                     checkNotNullOrEmpty(errors, Constants.FIELD_CIRCLE_NAME, circleName, "Cannot create a new Circle, without the Circle Name.");
-                    checkNotTooLong(errors, Constants.FIELD_CIRCLE_NAME, circleName, Constants.MAX_NAME_LENGTH, "The " + Constants.FIELD_CIRCLE_NAME + " may not exceed " + Constants.MAX_NAME_LENGTH + " characters.");
+                    checkNotTooLong(errors, Constants.FIELD_CIRCLE_NAME, circleName, Constants.MAX_NAME_LENGTH,
+                            "The " + Constants.FIELD_CIRCLE_NAME + " may not exceed " + Constants.MAX_NAME_LENGTH + CHARACTERS);
+                    checkValidAvatar(errors, avatar);
+                    checkNotTooLong(errors, Constants.FIELD_SECRET, secret, Constants.MAX_SECRET_LENGTH, "The secret must be at most " + Constants.MAX_SECRET_LENGTH + CHARACTERS);
                     break;
                 case UPDATE:
                     checkNotNullAndValidId(errors, Constants.FIELD_CIRCLE_ID, circleId, "Cannot update the Circle Name, without knowing the Circle Id.");
-                    checkNotTooLong(errors, Constants.FIELD_CIRCLE_NAME, circleName, Constants.MAX_NAME_LENGTH, "The " + Constants.FIELD_CIRCLE_NAME + " may not exceed " + Constants.MAX_NAME_LENGTH + " characters.");
+                    checkNotTooLong(errors, Constants.FIELD_CIRCLE_NAME, circleName, Constants.MAX_NAME_LENGTH,
+                            "The " + Constants.FIELD_CIRCLE_NAME + " may not exceed " + Constants.MAX_NAME_LENGTH + CHARACTERS);
+                    checkValidAvatar(errors, avatar);
                     break;
                 case DELETE:
                     checkNotNullAndValidId(errors, Constants.FIELD_CIRCLE_ID, circleId, "Cannot delete a Circle, without knowing the Circle Id.");
+                    break;
+                case ROTATE:
+                    checkNotNullAndValidId(errors, Constants.FIELD_CIRCLE_ID, circleId, "Cannot rotate the Circle Secret, without knowing the Circle Id.");
                     break;
                 default:
                     errors.put(Constants.FIELD_ACTION, "Not supported Action has been provided.");
@@ -230,5 +263,41 @@ public final class ProcessCircleRequest extends Authentication implements Circle
         }
 
         return errors;
+    }
+
+    /**
+     * The Avatar
+     *
+     * @param avatar The Avatar
+     */
+    public void setAvatar(final String avatar) {
+        this.avatar = avatar;
+    }
+
+    /**
+     * The Avatar
+     *
+     * @return The Avatar
+     */
+    public String getAvatar() {
+        return avatar;
+    }
+
+    /**
+     * Sets the secret of the first administrator in the new Circle.
+     *
+     * @param secret The secret of the first administrator in the new Circle
+     */
+    public void setSecret(final String secret) {
+        this.secret = secret;
+    }
+
+    /**
+     * Retrieves the secret of the first administrator in the new Circle.
+     *
+     * @return The secret of the first administrator in the new Circle
+     */
+    public String getSecret() {
+        return secret;
     }
 }

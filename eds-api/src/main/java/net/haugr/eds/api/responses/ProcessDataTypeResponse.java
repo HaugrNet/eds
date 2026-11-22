@@ -16,6 +16,7 @@
  */
 package net.haugr.eds.api.responses;
 
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import net.haugr.eds.api.common.Constants;
 import net.haugr.eds.api.common.ReturnCode;
 import net.haugr.eds.api.dtos.DataType;
@@ -36,6 +37,7 @@ import java.io.Serial;
  * @since EDS 1.0
  */
 @JsonbPropertyOrder(Constants.FIELD_DATATYPE)
+@Schema(description = "Result of processing a Data Type.")
 public final class ProcessDataTypeResponse extends EDSResponse {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
@@ -43,6 +45,7 @@ public final class ProcessDataTypeResponse extends EDSResponse {
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
     /** The DataType. */
+    @Schema(description = "The Data Type as stored.")
     @JsonbProperty(Constants.FIELD_DATATYPE)
     private DataType dataType = null;
 

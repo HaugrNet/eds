@@ -23,6 +23,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Map;
 import net.haugr.eds.api.common.Constants;
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
 
 /**
  * <p>This Class contains checks for different fields that are used as part of
@@ -39,6 +40,8 @@ import net.haugr.eds.api.common.Constants;
  * @author Kim Jensen
  * @since EDS 1.0
  */
+// Only holds validation helpers and no fields, so it isn't part of the API schema.
+@Schema(hidden = true)
 public abstract class AbstractRequest implements Serializable {
 
     /**
@@ -143,6 +146,32 @@ public abstract class AbstractRequest implements Serializable {
     protected static void checkNotTooLong(final Map<String, String> errors, final String field, final String value, final int maxLength, final String message) {
         if ((value != null) && (value.trim().length() > maxLength)) {
             errors.put(field, message);
+        }
+    }
+
+    /**
+     * Checks an avatar, if given: the ID of a picture the clients know, made
+     * of lowercase letters, digits and hyphens; empty to remove it.
+     *
+     * @param errors Map to add the error to
+     * @param value  The avatar, may be null
+     */
+    protected static void checkValidAvatar(final Map<String, String> errors, final String value) {
+        if ((value != null) && !Constants.AVATAR_PATTERN.matcher(value).matches()) {
+            errors.put(Constants.FIELD_AVATAR, "The avatar must be at most " + Constants.MAX_AVATAR_LENGTH + " lowercase letters, digits or hyphens.");
+        }
+    }
+
+    /**
+     * Checks a Name Key, if given: Base64url without padding, at most
+     * {@link Constants#MAX_NAME_KEY_LENGTH} characters.
+     *
+     * @param errors Map to add the error to
+     * @param value  The Name Key, may be null
+     */
+    protected static void checkValidNameKey(final Map<String, String> errors, final String value) {
+        if ((value != null) && !Constants.NAME_KEY_PATTERN.matcher(value).matches()) {
+            errors.put(Constants.FIELD_NAME_KEY, "The Name Key must be 1 to " + Constants.MAX_NAME_KEY_LENGTH + " Base64url characters, without padding.");
         }
     }
 

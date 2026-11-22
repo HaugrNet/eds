@@ -16,6 +16,7 @@
  */
 package net.haugr.eds.api.requests;
 
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import jakarta.json.bind.annotation.JsonbNillable;
 import net.haugr.eds.api.common.Constants;
 import jakarta.json.bind.annotation.JsonbProperty;
@@ -40,6 +41,7 @@ import java.util.Map;
  * @since EDS 1.0
  */
 @JsonbPropertyOrder(Constants.FIELD_SETTINGS)
+@Schema(description = "Request to read or change settings (System Administrator only). An empty map only reads them.")
 public final class SettingRequest extends Authentication {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
@@ -47,6 +49,7 @@ public final class SettingRequest extends Authentication {
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
     /** The Map of Settings. */
+    @Schema(description = "Settings to add or change, as key-value pairs. An empty value deletes a custom setting; standard settings can't be deleted, and some can't be changed once Members exist.")
     @JsonbProperty(value = Constants.FIELD_SETTINGS)
     @JsonbNillable
     private HashMap<String, String> settings = HashMap.newHashMap(0);

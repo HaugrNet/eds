@@ -16,6 +16,8 @@
  */
 package net.haugr.eds.api.requests;
 
+import org.eclipse.microprofile.openapi.annotations.enums.SchemaType;
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import jakarta.json.bind.annotation.JsonbNillable;
 import net.haugr.eds.api.common.Constants;
 
@@ -39,6 +41,7 @@ import jakarta.json.bind.annotation.JsonbPropertyOrder;
  * @since EDS 1.0
  */
 @JsonbPropertyOrder({ Constants.FIELD_CIRCLE_ID, Constants.FIELD_SINCE })
+@Schema(description = "Request for the Data Objects that failed the sanity check.")
 public final class SanityRequest extends Authentication implements CircleIdRequest {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
@@ -46,11 +49,14 @@ public final class SanityRequest extends Authentication implements CircleIdReque
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
     /** The CircleId. */
+    @Schema(description = "Optional ID of a Circle, to limit the result to that Circle.", pattern = Constants.ID_PATTERN_REGEX, examples = { "5d2a0c7e-8c4f-4d7b-9a2e-3f1b6c0d9e8a" })
     @JsonbProperty(value = Constants.FIELD_CIRCLE_ID)
     @JsonbNillable
     private String circleId = null;
 
     /** The Date since last check. */
+    @Schema(description = "Optional: only return failures after this time. In UTC, as ISO-8601 without a time-zone suffix.",
+            type = SchemaType.STRING, format = "local-date-time", examples = { "2026-11-01T21:50:41.123456" })
     @JsonbProperty(value = Constants.FIELD_SINCE)
     @JsonbDateFormat
     @JsonbNillable

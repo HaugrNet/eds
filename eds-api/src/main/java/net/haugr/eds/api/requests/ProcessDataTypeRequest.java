@@ -16,6 +16,7 @@
  */
 package net.haugr.eds.api.requests;
 
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import jakarta.json.bind.annotation.JsonbNillable;
 import net.haugr.eds.api.Share;
 import net.haugr.eds.api.common.Action;
@@ -44,6 +45,7 @@ import java.util.Map;
         Constants.FIELD_ACTION,
         Constants.FIELD_TYPENAME,
         Constants.FIELD_TYPE })
+@Schema(description = "Request to create, update or delete a Data Type. The default types `data`, `folder`, `thumbnail` and `entry` can't be changed, and `thumbnail` and `entry` can't be deleted.")
 public final class ProcessDataTypeRequest extends Authentication implements ActionRequest {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
@@ -51,16 +53,19 @@ public final class ProcessDataTypeRequest extends Authentication implements Acti
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
     /** The Action. */
+    @Schema(description = "Set by the endpoint; a value sent in the request is ignored.")
     @JsonbProperty(value = Constants.FIELD_ACTION)
     @JsonbNillable
     private Action action = Action.PROCESS;
 
     /** The TypeName. */
+    @Schema(description = "Name of the Data Type.", maxLength = Constants.MAX_NAME_LENGTH, examples = { "pdf" })
     @JsonbProperty(value = Constants.FIELD_TYPENAME)
     @JsonbNillable
     private String typeName = null;
 
     /** The Type. */
+    @Schema(description = "The definition of the type, e.g. a MIME type. Free text.", maxLength = Constants.MAX_STRING_LENGTH, examples = { "application/pdf" })
     @JsonbProperty(value = Constants.FIELD_TYPE)
     @JsonbNillable
     private String type = null;

@@ -16,6 +16,8 @@
  */
 package net.haugr.eds.api.responses;
 
+import org.eclipse.microprofile.openapi.annotations.enums.SchemaType;
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import net.haugr.eds.api.common.ByteArrayAdapter;
 import net.haugr.eds.api.common.Constants;
 import net.haugr.eds.api.common.ReturnCode;
@@ -29,9 +31,9 @@ import java.io.Serial;
 /**
  * <p>If the request was invoked with the CREATE action, then the response will
  * contain the newly generated Member Id. If it was invoked with the INVITE
- * action, then it will respond with the signature - which the to-be Member can
- * invoke the same request with, using the UPDATE action and having the
- * credential type set to SIGNATURE.</p>
+ * action, then it will respond with the invitation token - which the to-be
+ * Member can invoke the update request with, having the credential type set
+ * to INVITATION.</p>
  *
  * <p>Please see {@link EDSResponse} for information about the result of the
  * processing.</p>
@@ -39,7 +41,8 @@ import java.io.Serial;
  * @author Kim Jensen
  * @since EDS 1.0
  */
-@JsonbPropertyOrder({ Constants.FIELD_MEMBER_ID, Constants.FIELD_SIGNATURE })
+@JsonbPropertyOrder({ Constants.FIELD_MEMBER_ID, Constants.FIELD_INVITATION, Constants.FIELD_SESSION })
+@Schema(description = "Result of processing a Member.")
 public final class ProcessMemberResponse extends EDSResponse {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
@@ -47,13 +50,25 @@ public final class ProcessMemberResponse extends EDSResponse {
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
     /** The MemberId. */
+    @Schema(description = "ID of the Member; for a new Member, its new ID.", pattern = Constants.ID_PATTERN_REGEX, examples = { "5d2a0c7e-8c4f-4d7b-9a2e-3f1b6c0d9e8a" })
     @JsonbProperty(Constants.FIELD_MEMBER_ID)
     private String memberId = null;
 
-    /** The Signature. */
-    @JsonbProperty(Constants.FIELD_SIGNATURE)
+    /** The Invitation token. */
+    @Schema(description = "The invitation token, Base64-encoded, when inviting a Member. It is only returned here; "
+            + "EDS stores just a keyed hash of it. The invited Member sends it as credential with credential type INVITATION.",
+            type = SchemaType.STRING, format = "byte")
+    @JsonbProperty(Constants.FIELD_INVITATION)
     @JsonbTypeAdapter(ByteArrayAdapter.class)
-    private byte[] signature = null;
+    private byte[] invitation = null;
+
+    /** The Session token. */
+    @Schema(description = "The session token, Base64-encoded, after a login. It is only returned here; "
+            + "EDS stores just a keyed hash of it. Send it as credential with credential type SESSION.",
+            type = SchemaType.STRING, format = "byte")
+    @JsonbProperty(Constants.FIELD_SESSION)
+    @JsonbTypeAdapter(ByteArrayAdapter.class)
+    private byte[] session = null;
 
     // =========================================================================
     // Object Constructors
@@ -110,20 +125,38 @@ public final class ProcessMemberResponse extends EDSResponse {
     }
 
     /**
-     * Set the Signature.
+     * Set the Invitation token.
      *
-     * @param signature Signature
+     * @param invitation Invitation token
      */
-    public void setSignature(final byte[] signature) {
-        this.signature = Utilities.copy(signature);
+    public void setInvitation(final byte[] invitation) {
+        this.invitation = Utilities.copy(invitation);
     }
 
     /**
-     * Retrieves the Signature.
+     * Retrieves the Invitation token.
      *
-     * @return Signature
+     * @return Invitation token
      */
-    public byte[] getSignature() {
-        return Utilities.copy(signature);
+    public byte[] getInvitation() {
+        return Utilities.copy(invitation);
+    }
+
+    /**
+     * Set the Session token.
+     *
+     * @param session Session token
+     */
+    public void setSession(final byte[] session) {
+        this.session = Utilities.copy(session);
+    }
+
+    /**
+     * Retrieves the Session token.
+     *
+     * @return Session token
+     */
+    public byte[] getSession() {
+        return Utilities.copy(session);
     }
 }

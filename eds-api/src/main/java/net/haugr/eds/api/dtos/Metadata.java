@@ -16,6 +16,8 @@
  */
 package net.haugr.eds.api.dtos;
 
+import org.eclipse.microprofile.openapi.annotations.enums.SchemaType;
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import jakarta.json.bind.annotation.JsonbNillable;
 import net.haugr.eds.api.common.Constants;
 
@@ -41,8 +43,13 @@ import jakarta.json.bind.annotation.JsonbPropertyOrder;
         Constants.FIELD_CIRCLE_ID,
         Constants.FIELD_FOLDER_ID,
         Constants.FIELD_DATA_NAME,
+        Constants.FIELD_NAME_KEY,
         Constants.FIELD_TYPENAME,
+        Constants.FIELD_MEDIA_TYPE,
+        Constants.FIELD_SIZE,
+        Constants.FIELD_THUMBNAIL_ID,
         Constants.FIELD_ADDED })
+@Schema(description = "The metadata of a Data Object (data or folder), without its content.")
 public final class Metadata implements Serializable {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
@@ -50,31 +57,63 @@ public final class Metadata implements Serializable {
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
     /** DataId. */
+    @Schema(description = "ID of the Data Object.", pattern = Constants.ID_PATTERN_REGEX, examples = { "5d2a0c7e-8c4f-4d7b-9a2e-3f1b6c0d9e8a" })
     @JsonbProperty(value = Constants.FIELD_DATA_ID)
     @JsonbNillable
     private String dataId = null;
 
     /** CircleId. */
+    @Schema(description = "ID of the Circle.", pattern = Constants.ID_PATTERN_REGEX, examples = { "5d2a0c7e-8c4f-4d7b-9a2e-3f1b6c0d9e8a" })
     @JsonbProperty(value = Constants.FIELD_CIRCLE_ID)
     @JsonbNillable
     private String circleId = null;
 
     /** FolderId. */
+    @Schema(description = "ID of the folder the Data Object is in; null for a Circle's root folder.", pattern = Constants.ID_PATTERN_REGEX, examples = { "5d2a0c7e-8c4f-4d7b-9a2e-3f1b6c0d9e8a" })
     @JsonbProperty(value = Constants.FIELD_FOLDER_ID)
     @JsonbNillable
     private String folderId = null;
 
     /** Data Name. */
+    @Schema(description = "Name of the Data Object, unique within its folder.", maxLength = Constants.MAX_DATA_NAME_LENGTH, examples = { "report.pdf" })
     @JsonbProperty(value = Constants.FIELD_DATA_NAME)
     @JsonbNillable
     private String dataName = null;
 
+    /** Name Key. */
+    @Schema(description = "Name Key of the Data Object, the keyed hash of its name a client of a chamber sent; null if none was sent.",
+            maxLength = Constants.MAX_NAME_KEY_LENGTH, pattern = Constants.NAME_KEY_PATTERN_REGEX, examples = { "Xo3f0Qm8tVd2bJcR1uYk7nWz5aLpE4sHgC9vT6yNqMI" })
+    @JsonbProperty(value = Constants.FIELD_NAME_KEY)
+    @JsonbNillable
+    private String nameKey = null;
+
     /** Type Name. */
+    @Schema(description = "Name of the Data Type, e.g. `data` or `folder`.", maxLength = Constants.MAX_NAME_LENGTH, examples = { "data" })
     @JsonbProperty(value = Constants.FIELD_TYPENAME)
     @JsonbNillable
     private String typeName = null;
 
+    /** Media Type. */
+    @Schema(description = "Media type of the content, if set.", maxLength = Constants.MAX_MEDIA_TYPE_LENGTH, examples = { "video/mp4" })
+    @JsonbProperty(value = Constants.FIELD_MEDIA_TYPE)
+    @JsonbNillable
+    private String mediaType = null;
+
+    /** Size of the content. */
+    @Schema(description = "Size of the content in bytes (the plaintext, not the stored encrypted form); null for a folder or a Data Object without content.", minimum = "0", examples = { "1048576" })
+    @JsonbProperty(value = Constants.FIELD_SIZE)
+    @JsonbNillable
+    private Long size = null;
+
+    /** Thumbnail of the content. */
+    @Schema(description = "ID of the thumbnail of the content, if one was stored (PUT /data/{dataId}/thumbnail); download it as content. "
+            + "Replacing the content removes the thumbnail.", pattern = Constants.ID_PATTERN_REGEX, examples = { "9b1d4e7a-2f3c-4a5b-8c6d-7e8f9a0b1c2d" })
+    @JsonbProperty(value = Constants.FIELD_THUMBNAIL_ID)
+    private String thumbnailId = null;
+
     /** Created Timestamp. */
+    @Schema(description = "When the record was created. In UTC, as ISO-8601 without a time-zone suffix.",
+            type = SchemaType.STRING, format = "local-date-time", examples = { "2026-11-01T21:50:41.123456" })
     @JsonbProperty(value = Constants.FIELD_ADDED)
     @JsonbDateFormat
     @JsonbNillable
@@ -164,6 +203,24 @@ public final class Metadata implements Serializable {
     }
 
     /**
+     * Set the NameKey.
+     *
+     * @param nameKey NameKey
+     */
+    public void setNameKey(final String nameKey) {
+        this.nameKey = nameKey;
+    }
+
+    /**
+     * Retrieves the NameKey.
+     *
+     * @return NameKey
+     */
+    public String getNameKey() {
+        return nameKey;
+    }
+
+    /**
      * Set the TypeName.
      *
      * @param typeName TypeName
@@ -203,6 +260,30 @@ public final class Metadata implements Serializable {
     // Standard Methods
     // =========================================================================
 
+    public void setMediaType(final String mediaType) {
+        this.mediaType = mediaType;
+    }
+
+    public String getMediaType() {
+        return mediaType;
+    }
+
+    public void setSize(final Long size) {
+        this.size = size;
+    }
+
+    public Long getSize() {
+        return size;
+    }
+
+    public void setThumbnailId(final String thumbnailId) {
+        this.thumbnailId = thumbnailId;
+    }
+
+    public String getThumbnailId() {
+        return thumbnailId;
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -213,7 +294,11 @@ public final class Metadata implements Serializable {
                 ", circleId='" + circleId + '\'' +
                 ", folderId='" + folderId + '\'' +
                 ", dataName='" + dataName + '\'' +
+                ", nameKey='" + nameKey + '\'' +
                 ", typeName=" + typeName +
+                ", mediaType='" + mediaType + '\'' +
+                ", size=" + size +
+                ", thumbnailId='" + thumbnailId + '\'' +
                 ", added=" + added +
                 '}';
     }

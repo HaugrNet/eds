@@ -16,6 +16,8 @@
  */
 package net.haugr.eds.api.dtos;
 
+import org.eclipse.microprofile.openapi.annotations.enums.SchemaType;
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import jakarta.json.bind.annotation.JsonbNillable;
 import net.haugr.eds.api.common.Constants;
 import net.haugr.eds.api.common.TrustLevel;
@@ -36,12 +38,16 @@ import jakarta.json.bind.annotation.JsonbPropertyOrder;
 @JsonbPropertyOrder({
         Constants.FIELD_MEMBER_ID,
         Constants.FIELD_ACCOUNT_NAME,
+        Constants.FIELD_AVATAR,
         Constants.FIELD_PUBLIC_KEY,
         Constants.FIELD_CIRCLE_ID,
         Constants.FIELD_CIRCLE_NAME,
+        Constants.FIELD_CIRCLE_AVATAR,
         Constants.FIELD_TRUSTLEVEL,
+        Constants.FIELD_SECRET,
         Constants.FIELD_ADDED,
         Constants.FIELD_CHANGED })
+@Schema(description = "A Trustee: a Member's membership of a Circle, with the trust level granted.")
 public final class Trustee implements Serializable {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
@@ -49,11 +55,13 @@ public final class Trustee implements Serializable {
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
     /** MemberId. */
+    @Schema(description = "ID of the Member.", pattern = Constants.ID_PATTERN_REGEX, examples = { "5d2a0c7e-8c4f-4d7b-9a2e-3f1b6c0d9e8a" })
     @JsonbProperty(value = Constants.FIELD_MEMBER_ID)
     @JsonbNillable
     private String memberId = null;
 
     /** Account Name. */
+    @Schema(description = "The Member's account name, unique in EDS.", maxLength = Constants.MAX_NAME_LENGTH, examples = { "alice" })
     @JsonbProperty(value = Constants.FIELD_ACCOUNT_NAME)
     @JsonbNillable
     private String accountName = null;
@@ -63,32 +71,62 @@ public final class Trustee implements Serializable {
     // it is not used as part of the Standard Object methods, #equals(),
     // #hashCode() and #toString().
     /** Public Key. */
+    @Schema(description = "The Member's external public key, if registered.")
     @JsonbProperty(value = Constants.FIELD_PUBLIC_KEY)
     @JsonbNillable
     private String publicKey = null;
 
+    // Like the Public Key, the secret is only stored, and not part of the
+    // Standard Object methods.
+    /** Secret. */
+    @Schema(description = "The Trustee's secret in the Circle: text which EDS stores without looking inside, e.g. a key of the Circle wrapped for this Member by a client. "
+            + "Only returned to the Member themselves and to the administrators of the Circle; null without one.",
+            maxLength = Constants.MAX_SECRET_LENGTH)
+    @JsonbProperty(value = Constants.FIELD_SECRET)
+    @JsonbNillable
+    private String secret = null;
+
     /** CircleId. */
+    @Schema(description = "ID of the Circle.", pattern = Constants.ID_PATTERN_REGEX, examples = { "5d2a0c7e-8c4f-4d7b-9a2e-3f1b6c0d9e8a" })
     @JsonbProperty(value = Constants.FIELD_CIRCLE_ID)
     @JsonbNillable
     private String circleId = null;
 
     /** Circle Name. */
+    @Schema(description = "Name of the Circle, unique in EDS.", maxLength = Constants.MAX_NAME_LENGTH, examples = { "Project Phoenix" })
     @JsonbProperty(value = Constants.FIELD_CIRCLE_NAME)
     @JsonbNillable
     private String circleName = null;
 
+    /** The Member's Avatar. */
+    @Schema(description = "The Member's avatar, see Member.avatar.", pattern = Constants.AVATAR_PATTERN_REGEX, maxLength = Constants.MAX_AVATAR_LENGTH, examples = { "raven" })
+    @JsonbProperty(value = Constants.FIELD_AVATAR)
+    @JsonbNillable
+    private String avatar = null;
+
+    /** The Circle's Avatar. */
+    @Schema(description = "The Circle's avatar, see Circle.avatar.", pattern = Constants.AVATAR_PATTERN_REGEX, maxLength = Constants.MAX_AVATAR_LENGTH, examples = { "longship" })
+    @JsonbProperty(value = Constants.FIELD_CIRCLE_AVATAR)
+    @JsonbNillable
+    private String circleAvatar = null;
+
     /** Trust Level. */
+    @Schema(description = "The Member's trust level in the Circle: READ, WRITE or ADMIN.")
     @JsonbProperty(value = Constants.FIELD_TRUSTLEVEL)
     @JsonbNillable
     private TrustLevel trustLevel = null;
 
     /** Created Timestamp. */
+    @Schema(description = "When the Member was added to the Circle. In UTC, as ISO-8601 without a time-zone suffix.",
+            type = SchemaType.STRING, format = "local-date-time", examples = { "2026-11-01T21:50:41.123456" })
     @JsonbProperty(value = Constants.FIELD_ADDED)
     @JsonbDateFormat
     @JsonbNillable
     private LocalDateTime added = null;
 
     /** Last Modified Timestamp. */
+    @Schema(description = "When the trust level was last changed. In UTC, as ISO-8601 without a time-zone suffix.",
+            type = SchemaType.STRING, format = "local-date-time", examples = { "2026-11-01T21:50:41.123456" })
     @JsonbProperty(value = Constants.FIELD_CHANGED)
     @JsonbDateFormat
     @JsonbNillable
@@ -266,5 +304,59 @@ public final class Trustee implements Serializable {
                 ", added=" + added +
                 ", changed=" + changed +
                 '}';
+    }
+
+    /**
+     * The Member's Avatar
+     *
+     * @param avatar The Member's Avatar
+     */
+    public void setAvatar(final String avatar) {
+        this.avatar = avatar;
+    }
+
+    /**
+     * The Member's Avatar
+     *
+     * @return The Member's Avatar
+     */
+    public String getAvatar() {
+        return avatar;
+    }
+
+    /**
+     * The Circle's Avatar
+     *
+     * @param circleAvatar The Circle's Avatar
+     */
+    public void setCircleAvatar(final String circleAvatar) {
+        this.circleAvatar = circleAvatar;
+    }
+
+    /**
+     * The Circle's Avatar
+     *
+     * @return The Circle's Avatar
+     */
+    public String getCircleAvatar() {
+        return circleAvatar;
+    }
+
+    /**
+     * Sets the Trustee's secret in the Circle.
+     *
+     * @param secret The Trustee's secret in the Circle
+     */
+    public void setSecret(final String secret) {
+        this.secret = secret;
+    }
+
+    /**
+     * Retrieves the Trustee's secret in the Circle.
+     *
+     * @return The Trustee's secret in the Circle
+     */
+    public String getSecret() {
+        return secret;
     }
 }

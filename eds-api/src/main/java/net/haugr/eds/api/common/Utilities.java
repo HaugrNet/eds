@@ -54,18 +54,26 @@ public final class Utilities {
     }
 
     /**
-     * <p>Copy method for Byte Arrays, to have a central way to protect the data
-     * structures from external changes.</p>
+     * <p><b>Deliberately does not copy</b>: it returns the given array itself.</p>
      *
-     * <p>Note that as the API is only exposed via a REST Endpoint, there is no
-     * need for a proper copying.</p>
+     * <p>The method exists for SonarQube, whose rule S2384 ("Mutable members
+     * should not be stored or returned directly") flags getters and setters
+     * that store or return byte arrays as they are. Routing them through this
+     * method marks the place as reviewed, without making a copy.</p>
      *
-     * <p>Further, the copy here is fake - meaning that it doesn't do anything.
-     * This is important, as some byte arrays must be actively destroyed, which
-     * is harder if multiple actual copies exist.</p>
+     * <p>Not copying is intended. Byte arrays such as credentials, tokens and
+     * plaintext must be actively overwritten once used, and every real copy
+     * would be another copy left in memory. As the API is only exposed via
+     * REST, other code can't change the arrays of a request or response in
+     * between.</p>
      *
-     * @param bytes Byte Array to protect
-     * @return Copy of the given Bytes
+     * <p>Callers must therefore treat the result as the same array: clearing
+     * it (e.g. with {@code Arrays.fill}) after passing it to a request or
+     * response also clears the value there. Make an explicit copy if the
+     * value is still needed.</p>
+     *
+     * @param bytes Byte Array, may be null
+     * @return The same Byte Array
      */
     public static byte[] copy(final byte[] bytes) {
         return bytes;

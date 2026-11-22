@@ -16,6 +16,7 @@
  */
 package net.haugr.eds.api.responses;
 
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import net.haugr.eds.api.common.Constants;
 import net.haugr.eds.api.common.ReturnCode;
 
@@ -32,7 +33,8 @@ import java.io.Serial;
  * @author Kim Jensen
  * @since EDS 1.0
  */
-@JsonbPropertyOrder(Constants.FIELD_VERSION)
+@JsonbPropertyOrder({Constants.FIELD_VERSION, Constants.FIELD_DATABASE, Constants.FIELD_PERSISTENT, Constants.FIELD_STORAGE_CEILING})
+@Schema(description = "The EDS version, and what kind of system this is.")
 public final class VersionResponse extends EDSResponse {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
@@ -40,8 +42,30 @@ public final class VersionResponse extends EDSResponse {
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
     /** The EDS Version. */
+    @Schema(description = "The version of the running EDS.", examples = { "2.0-SNAPSHOT" })
     @JsonbProperty(Constants.FIELD_VERSION)
     private String version = null;
+
+    /** The product name of the database behind the EDS instance. */
+    @Schema(description = "The product name of the database EDS is running on, as reported by the JDBC driver. "
+            + "Absent if the database has not been reached since EDS started.",
+            examples = { "PostgreSQL" })
+    @JsonbProperty(Constants.FIELD_DATABASE)
+    private String database = null;
+
+    /** Whether the data survives a restart of EDS. */
+    @Schema(description = "False if this is a test system on an in-memory database (H2), where all data is lost when EDS stops; "
+            + "true if the database is persistent, which makes this a production-grade system. Absent if the database has not been reached since EDS started.",
+            examples = { "true" })
+    @JsonbProperty(Constants.FIELD_PERSISTENT)
+    private Boolean persistent = null;
+
+    /** The storage ceiling. */
+    @Schema(description = "The ceiling for all stored content together, in bytes of encrypted content: eds.data.max.total.size if it is positive, "
+            + "otherwise 2 GiB on a test system and 250 GiB on a production system. Absent if the database has not been reached since EDS started.",
+            examples = { "268435456000" })
+    @JsonbProperty(Constants.FIELD_STORAGE_CEILING)
+    private Long storageCeiling = null;
 
     // =========================================================================
     // Object Constructors
@@ -86,5 +110,63 @@ public final class VersionResponse extends EDSResponse {
      */
     public String getVersion() {
         return version;
+    }
+
+    /**
+     * Set the product name of the database.
+     *
+     * @param database Database product name
+     */
+    public void setDatabase(final String database) {
+        this.database = database;
+    }
+
+    /**
+     * Retrieves the product name of the database, e.g. "H2" or "PostgreSQL".
+     *
+     * @return Database product name, or null if not known yet
+     */
+    public String getDatabase() {
+        return database;
+    }
+
+    /**
+     * Set whether the data survives a restart of EDS.
+     *
+     * @param persistent True for a persistent database
+     */
+    public void setPersistent(final Boolean persistent) {
+        this.persistent = persistent;
+    }
+
+    /**
+     * Retrieves whether the data survives a restart of EDS. False means a
+     * test system, running on an in-memory database.
+     *
+     * @return True if persistent, false if not, null if not known yet
+     */
+    public Boolean getPersistent() {
+        return persistent;
+    }
+
+    /**
+     * Set the storage ceiling.
+     *
+     * @param storageCeiling Ceiling in bytes of encrypted content
+     */
+    public void setStorageCeiling(final Long storageCeiling) {
+        this.storageCeiling = storageCeiling;
+    }
+
+    /**
+     * Retrieves the ceiling for all stored content together, in bytes of
+     * encrypted content: {@code eds.data.max.total.size} if it is positive,
+     * otherwise the default for the kind of system.
+     *
+     * @return Ceiling in bytes, or null if the database has not been reached
+     *         since EDS started
+     */
+    public Long getStorageCeiling() {
+        return storageCeiling;
     }
 }

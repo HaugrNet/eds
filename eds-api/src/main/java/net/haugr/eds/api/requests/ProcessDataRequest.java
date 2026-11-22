@@ -16,6 +16,8 @@
  */
 package net.haugr.eds.api.requests;
 
+import org.eclipse.microprofile.openapi.annotations.enums.SchemaType;
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import jakarta.json.bind.annotation.JsonbNillable;
 import net.haugr.eds.api.Share;
 import net.haugr.eds.api.common.Action;
@@ -63,10 +65,13 @@ import java.util.Map;
         Constants.FIELD_CIRCLE_ID,
         Constants.FIELD_TARGET_CIRCLE_ID,
         Constants.FIELD_DATA_NAME,
+        Constants.FIELD_NAME_KEY,
         Constants.FIELD_FOLDER_ID,
         Constants.FIELD_TARGET_FOLDER_ID,
         Constants.FIELD_TYPENAME,
+        Constants.FIELD_MEDIA_TYPE,
         Constants.FIELD_DATA })
+@Schema(description = "Request to add, update, copy, move or delete a Data Object. Which fields are used depends on the endpoint.")
 public final class ProcessDataRequest extends Authentication implements CircleIdRequest, ActionRequest {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
@@ -74,46 +79,74 @@ public final class ProcessDataRequest extends Authentication implements CircleId
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
     /** The Action. */
+    @Schema(description = "Set by the endpoint; a value sent in the request is ignored.")
     @JsonbProperty(value = Constants.FIELD_ACTION)
     @JsonbNillable
     private Action action = null;
 
     /** The DataId. */
+    @Schema(description = "ID of the Data Object to update, copy, move or delete.", pattern = Constants.ID_PATTERN_REGEX, examples = { "5d2a0c7e-8c4f-4d7b-9a2e-3f1b6c0d9e8a" })
     @JsonbProperty(value = Constants.FIELD_DATA_ID)
     @JsonbNillable
     private String dataId = null;
 
     /** The CircleId. */
+    @Schema(description = "ID of the Circle to add the Data Object to.", pattern = Constants.ID_PATTERN_REGEX, examples = { "5d2a0c7e-8c4f-4d7b-9a2e-3f1b6c0d9e8a" })
     @JsonbProperty(value = Constants.FIELD_CIRCLE_ID)
     @JsonbNillable
     private String circleId = null;
 
     /** The Target CircleId. */
+    @Schema(description = "ID of the Circle to copy or move the Data Object to.", pattern = Constants.ID_PATTERN_REGEX, examples = { "5d2a0c7e-8c4f-4d7b-9a2e-3f1b6c0d9e8a" })
     @JsonbProperty(value = Constants.FIELD_TARGET_CIRCLE_ID)
     @JsonbNillable
     private String targetCircleId = null;
 
     /** The DataName. */
+    @Schema(description = "Name of the Data Object, unique within its folder.", maxLength = Constants.MAX_DATA_NAME_LENGTH, examples = { "report.pdf" })
     @JsonbProperty(value = Constants.FIELD_DATA_NAME)
     @JsonbNillable
     private String dataName = null;
 
+    /** The NameKey. */
+    @Schema(description = "Name Key of the Data Object: a keyed hash of its name, which a client of a chamber sends next to the "
+            + "encrypted name, so the stone can keep the name unique within its folder without reading it. Opaque to the stone, "
+            + "Base64url without padding. Kept with the Data Object; it is replaced when a new dataName is given, and dropped "
+            + "if that comes without a Name Key. For a copy or a move, it is the Name Key in the target Circle.",
+            maxLength = Constants.MAX_NAME_KEY_LENGTH, pattern = Constants.NAME_KEY_PATTERN_REGEX, examples = { "Xo3f0Qm8tVd2bJcR1uYk7nWz5aLpE4sHgC9vT6yNqMI" })
+    @JsonbProperty(value = Constants.FIELD_NAME_KEY)
+    @JsonbNillable
+    private String nameKey = null;
+
     /** The FolderId. */
+    @Schema(description = "ID of the folder to add the Data Object to; omit for the Circle's root folder.", pattern = Constants.ID_PATTERN_REGEX, examples = { "5d2a0c7e-8c4f-4d7b-9a2e-3f1b6c0d9e8a" })
     @JsonbProperty(value = Constants.FIELD_FOLDER_ID)
     @JsonbNillable
     private String folderId = null;
 
     /** The Target FolderId. */
+    @Schema(description = "ID of the folder to copy or move the Data Object to; omit for the target Circle's root folder.",
+            pattern = Constants.ID_PATTERN_REGEX, examples = { "5d2a0c7e-8c4f-4d7b-9a2e-3f1b6c0d9e8a" })
     @JsonbProperty(value = Constants.FIELD_TARGET_FOLDER_ID)
     @JsonbNillable
     private String targetFolderId = null;
 
     /** The TypeName. */
+    @Schema(description = "Name of the Data Type; omit for `data`.", maxLength = Constants.MAX_NAME_LENGTH, examples = { "data" })
     @JsonbProperty(value = Constants.FIELD_TYPENAME)
     @JsonbNillable
     private String typeName = null;
 
+    /** Media Type. */
+    @Schema(description = "Media type of the content, e.g. `video/mp4`, used when serving it. Without it, the content is "
+            + "served as `application/octet-stream`. Only a few types are shown inline, see the content download.",
+            maxLength = Constants.MAX_MEDIA_TYPE_LENGTH, pattern = Constants.MEDIA_TYPE_PATTERN_REGEX, examples = { "video/mp4" })
+    @JsonbProperty(value = Constants.FIELD_MEDIA_TYPE)
+    @JsonbNillable
+    private String mediaType = null;
+
     /** The Data. */
+    @Schema(description = "The content, Base64-encoded. Optional: a Data Object may have no content.", type = SchemaType.STRING, format = "byte")
     @JsonbProperty(value = Constants.FIELD_DATA)
     @JsonbTypeAdapter(ByteArrayAdapter.class)
     @JsonbNillable
@@ -219,6 +252,24 @@ public final class ProcessDataRequest extends Authentication implements CircleId
     }
 
     /**
+     * Set the NameKey.
+     *
+     * @param nameKey NameKey
+     */
+    public void setNameKey(final String nameKey) {
+        this.nameKey = nameKey;
+    }
+
+    /**
+     * Retrieves the NameKey.
+     *
+     * @return NameKey
+     */
+    public String getNameKey() {
+        return nameKey;
+    }
+
+    /**
      * Set the FolderId.
      *
      * @param folderId FolderId
@@ -272,6 +323,14 @@ public final class ProcessDataRequest extends Authentication implements CircleId
         return typeName;
     }
 
+    public void setMediaType(final String mediaType) {
+        this.mediaType = mediaType;
+    }
+
+    public String getMediaType() {
+        return mediaType;
+    }
+
     /**
      * Set the Data.
      *
@@ -300,6 +359,10 @@ public final class ProcessDataRequest extends Authentication implements CircleId
     @Override
     public Map<String, String> validate() {
         final Map<String, String> errors = super.validate();
+        if ((mediaType != null) && !java.util.regex.Pattern.matches(Constants.MEDIA_TYPE_PATTERN_REGEX, mediaType)) {
+            errors.put(Constants.FIELD_MEDIA_TYPE, "The Media Type is invalid.");
+        }
+        checkValidNameKey(errors, nameKey);
 
         if (action == null) {
             errors.put(Constants.FIELD_ACTION, "No action has been provided.");
@@ -308,12 +371,12 @@ public final class ProcessDataRequest extends Authentication implements CircleId
                 case ADD:
                     checkNotNullAndValidId(errors, Constants.FIELD_CIRCLE_ID, circleId, "The Circle Id is missing or invalid.");
                     checkValidId(errors, Constants.FIELD_FOLDER_ID, folderId, "The Folder Id is invalid.");
-                    checkNotNullEmptyOrTooLong(errors, Constants.FIELD_DATA_NAME, dataName, Constants.MAX_NAME_LENGTH, "The name of the new Data Object is invalid.");
+                    checkNotNullEmptyOrTooLong(errors, Constants.FIELD_DATA_NAME, dataName, Constants.MAX_DATA_NAME_LENGTH, "The name of the new Data Object is invalid.");
                     break;
                 case UPDATE:
                     checkNotNullAndValidId(errors, Constants.FIELD_DATA_ID, dataId, "The Data Id to update is missing or invalid.");
                     checkValidId(errors, Constants.FIELD_FOLDER_ID, folderId, "The Folder Id is invalid.");
-                    checkNotTooLong(errors, Constants.FIELD_DATA_NAME, dataName, Constants.MAX_NAME_LENGTH, "The new name of the Data Object is invalid.");
+                    checkNotTooLong(errors, Constants.FIELD_DATA_NAME, dataName, Constants.MAX_DATA_NAME_LENGTH, "The new name of the Data Object is invalid.");
                     break;
                 case COPY:
                     checkNotNullAndValidId(errors, Constants.FIELD_DATA_ID, dataId, "The Data Id to copy is missing or invalid.");

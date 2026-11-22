@@ -16,6 +16,8 @@
  */
 package net.haugr.eds.api.dtos;
 
+import org.eclipse.microprofile.openapi.annotations.enums.SchemaType;
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import jakarta.json.bind.annotation.JsonbNillable;
 import net.haugr.eds.api.common.Constants;
 
@@ -37,6 +39,7 @@ import jakarta.json.bind.annotation.JsonbPropertyOrder;
  * @since EDS 1.0
  */
 @JsonbPropertyOrder({ Constants.FIELD_DATA_ID, Constants.FIELD_CHANGED })
+@Schema(description = "A Data Object that failed the sanity check: its stored bytes have changed, so it can no longer be decrypted. Any entry means the storage can't be trusted.")
 public final class Sanity implements Serializable {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
@@ -44,11 +47,14 @@ public final class Sanity implements Serializable {
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
     /** DataId. */
+    @Schema(description = "ID of the Data Object.", pattern = Constants.ID_PATTERN_REGEX, examples = { "5d2a0c7e-8c4f-4d7b-9a2e-3f1b6c0d9e8a" })
     @JsonbProperty(value = Constants.FIELD_DATA_ID)
     @JsonbNillable
     private String dataId = null;
 
     /** Changed. */
+    @Schema(description = "When the Data Object failed the sanity check. In UTC, as ISO-8601 without a time-zone suffix.",
+            type = SchemaType.STRING, format = "local-date-time", examples = { "2026-11-01T21:50:41.123456" })
     @JsonbProperty(value = Constants.FIELD_CHANGED)
     @JsonbDateFormat
     @JsonbNillable

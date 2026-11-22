@@ -16,6 +16,7 @@
  */
 package net.haugr.eds.api.responses;
 
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import net.haugr.eds.api.common.Constants;
 import net.haugr.eds.api.common.ReturnCode;
 
@@ -33,6 +34,7 @@ import java.io.Serial;
  * @since EDS 1.0
  */
 @JsonbPropertyOrder(Constants.FIELD_MEMBER_ID)
+@Schema(description = "Result of an authentication check.")
 public final class AuthenticateResponse extends EDSResponse {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
@@ -40,6 +42,7 @@ public final class AuthenticateResponse extends EDSResponse {
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
     /** The MemberId. */
+    @Schema(description = "ID of the authenticated Member, if successful.", pattern = Constants.ID_PATTERN_REGEX, examples = { "5d2a0c7e-8c4f-4d7b-9a2e-3f1b6c0d9e8a" })
     @JsonbProperty(Constants.FIELD_MEMBER_ID)
     private String memberId = null;
 

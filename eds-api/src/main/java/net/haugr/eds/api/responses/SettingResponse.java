@@ -16,13 +16,16 @@
  */
 package net.haugr.eds.api.responses;
 
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import net.haugr.eds.api.common.Constants;
 import net.haugr.eds.api.common.ReturnCode;
 
 import jakarta.json.bind.annotation.JsonbProperty;
 import jakarta.json.bind.annotation.JsonbPropertyOrder;
 import java.io.Serial;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -36,7 +39,8 @@ import java.util.Map;
  * @author Kim Jensen
  * @since EDS 1.0
  */
-@JsonbPropertyOrder(Constants.FIELD_SETTINGS)
+@JsonbPropertyOrder({ Constants.FIELD_SETTINGS, Constants.FIELD_ALLOWED_VALUES })
+@Schema(description = "The current settings.")
 public final class SettingResponse extends EDSResponse {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
@@ -44,8 +48,14 @@ public final class SettingResponse extends EDSResponse {
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
     /** The Map of Settings. */
+    @Schema(description = "All settings, as key-value pairs.")
     @JsonbProperty(Constants.FIELD_SETTINGS)
-    private final HashMap<String, String> settings = new HashMap<>();
+    private final Map<String, String> settings = new HashMap<>();
+
+    /** The allowed values of the settings with a fixed choice. */
+    @Schema(description = "The values EDS accepts for the settings with a fixed choice (the supported algorithms), by setting key; other settings aren't listed.")
+    @JsonbProperty(Constants.FIELD_ALLOWED_VALUES)
+    private final Map<String, List<String>> allowedValues = new HashMap<>();
 
     // =========================================================================
     // Object Constructors
@@ -90,5 +100,25 @@ public final class SettingResponse extends EDSResponse {
      */
     public Map<String, String> getSettings() {
         return new HashMap<>(settings);
+    }
+
+    /**
+     * Set the allowed values of the settings with a fixed choice.
+     *
+     * @param allowedValues Setting keys with their allowed values
+     */
+    public void setAllowedValues(final Map<String, List<String>> allowedValues) {
+        allowedValues.forEach((key, values) -> this.allowedValues.put(key, new ArrayList<>(values)));
+    }
+
+    /**
+     * Retrieves the allowed values of the settings with a fixed choice.
+     *
+     * @return Setting keys with their allowed values
+     */
+    public Map<String, List<String>> getAllowedValues() {
+        final Map<String, List<String>> copy = new HashMap<>();
+        allowedValues.forEach((key, values) -> copy.put(key, new ArrayList<>(values)));
+        return copy;
     }
 }

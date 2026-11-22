@@ -43,12 +43,11 @@ public final class Constants {
      */
     public static final String SUN_EC = "SunEC";
 
-    /**
-     * The default SALT (IV) size is 16 bytes, for GCM it is preferable to
-     * only have 12 bytes - however, GCM will also work with 16 bytes, albeit
-     * slower.
-     */
-    public static final int GCM_IV_LENGTH = 128;
+    /** Length of the AES-GCM authentication tag, in bits. */
+    public static final int GCM_TAG_BITS = 128;
+
+    /** Length of the AES-GCM nonce (IV), in bytes; 96 bits as recommended by NIST SP 800-38D. */
+    public static final int GCM_NONCE_BYTES = 12;
 
     /**
      * <p>All serialized classes should use this value. The value reflects the
@@ -80,13 +79,11 @@ public final class Constants {
     public static final Pattern ID_PATTERN = Pattern.compile(ID_PATTERN_REGEX);
 
     /**
-     * <p>The System Administrator Account - this account is used as the default
-     * standard administrative Member Account and cannot be altered. Upon the
-     * first attempt to process a Member, the System Administrator Account will be
-     * stored in the underlying database with the credentials provided. This
-     * way, the Account Name of the System Administrator will remain well-known,
-     * however - as there are no default credentials, there's also nothing to
-     * exploit.</p>
+     * <p>The name which the tests and the examples give the System
+     * Administrator. A stone doesn't ask for it: it has no account to begin
+     * with, and the first who comes to it becomes its System Administrator,
+     * under the name and with the credentials given, whatever the name. So
+     * there is neither a default name nor default credentials to exploit.</p>
      */
     public static final String ADMIN_ACCOUNT = "admin";
 
@@ -96,8 +93,58 @@ public final class Constants {
     /** Data TypeName. */
     public static final String DATA_TYPENAME = "data";
 
+    /** Names starting with this prefix are hidden: listings skip them, unless asked for. */
+    public static final String HIDDEN_PREFIX = ".";
+
+    /** Thumbnail TypeName, the Data Type of the thumbnail of a Data Object (PLAN.md, L5). */
+    public static final String THUMBNAIL_TYPENAME = "thumbnail";
+
+    /** Name prefix of a thumbnail, followed by the ID of its Data Object; hidden. */
+    public static final String THUMBNAIL_PREFIX = ".thumbnail-";
+
+    /** Largest thumbnail, in bytes. */
+    public static final int MAX_THUMBNAIL_SIZE = 262144;
+
     /** Max Name Length. */
     public static final int MAX_NAME_LENGTH = 75;
+
+    /**
+     * The largest stored name of a Data Object (file or folder). Larger than
+     * {@link #MAX_NAME_LENGTH}, which stays the limit of a name a person
+     * chooses, because a client of a chamber (E2E.md) encrypts the name before
+     * the stone gets it, and the ciphertext of a 75-character name, Base64url
+     * encoded, is longer. The stone never looks inside the name; it only
+     * stores it, so the only need is room for the encrypted form.
+     */
+    public static final int MAX_DATA_NAME_LENGTH = 512;
+
+    /**
+     * The Name Key of a Data Object: a keyed hash of its name, which a client
+     * of a chamber (E2E.md) sends next to the encrypted name. The ciphertext
+     * differs each time, so the stone can't compare two names; it compares
+     * the Name Keys instead, to keep a name unique within its folder. Opaque
+     * to the stone, Base64url without padding; an HMAC-SHA256 is 43
+     * characters.
+     */
+    public static final int MAX_NAME_KEY_LENGTH = 128;
+
+    /** {@link #MAX_NAME_KEY_LENGTH} Base64url characters, without padding. */
+    public static final String NAME_KEY_PATTERN_REGEX = "^[A-Za-z0-9_-]{1,128}$";
+
+    /** {@link #NAME_KEY_PATTERN_REGEX} compiled. */
+    public static final Pattern NAME_KEY_PATTERN = Pattern.compile(NAME_KEY_PATTERN_REGEX);
+
+    /**
+     * An avatar: the ID of one of the clients' pictures, e.g. "raven". EDS
+     * only stores it; lowercase letters, digits and hyphens.
+     */
+    public static final String AVATAR_PATTERN_REGEX = "^[a-z0-9-]{0,32}$";
+
+    /** {@link #AVATAR_PATTERN_REGEX} compiled. */
+    public static final Pattern AVATAR_PATTERN = Pattern.compile(AVATAR_PATTERN_REGEX);
+
+    /** Max Avatar Length. */
+    public static final int MAX_AVATAR_LENGTH = 32;
 
     /** Max String Length. */
     public static final int MAX_STRING_LENGTH = 256;
@@ -135,12 +182,17 @@ public final class Constants {
     public static final String FIELD_NEW_CREDENTIAL = "newCredential";
     /** Field :: MemberRole. */
     public static final String FIELD_MEMBER_ROLE = "memberRole";
+    public static final String FIELD_FIRST_ADMINISTRATOR = "firstAdministrator";
     /** Field :: CredentialType. */
     public static final String FIELD_CREDENTIALTYPE = "credentialType";
     /** Field :: Circles. */
     public static final String FIELD_CIRCLES = "circles";
     /** Field :: CircleKey. */
     public static final String FIELD_CIRCLE_KEY = "circleKey";
+    /** Field :: Avatar. */
+    public static final String FIELD_AVATAR = "avatar";
+    /** Field :: Circle Avatar. */
+    public static final String FIELD_CIRCLE_AVATAR = "circleAvatar";
     /** Field :: CircleName. */
     public static final String FIELD_CIRCLE_NAME = "circleName";
     /** Field :: Trustees. */
@@ -153,6 +205,10 @@ public final class Constants {
     public static final String FIELD_METADATA = "metadata";
     /** Field :: DataName. */
     public static final String FIELD_DATA_NAME = "dataName";
+    /** Field :: NameKey, see {@link #MAX_NAME_KEY_LENGTH}. */
+    public static final String FIELD_NAME_KEY = "nameKey";
+    /** Field :: IncludeHidden. */
+    public static final String FIELD_INCLUDE_HIDDEN = "includeHidden";
     /** Field :: Records. */
     public static final String FIELD_RECORDS = "records";
     /** Field :: Data. */
@@ -167,17 +223,138 @@ public final class Constants {
     public static final String FIELD_TYPE = "type";
     /** Field :: Checksum. */
     public static final String FIELD_CHECKSUM = "checksum";
-    /** Field :: Signature. */
-    public static final String FIELD_SIGNATURE = "signature";
-    /** Field :: Signatures. */
-    public static final String FIELD_SIGNATURES = "signatures";
+    /** Field :: Invitation. */
+    public static final String FIELD_INVITATION = "invitation";
+    /** Field :: Session. */
+    public static final String FIELD_SESSION = "session";
+    /** Field :: ETag. */
+    public static final String FIELD_ETAG = "etag";
+    /** Field :: Media Type. */
+    public static final String FIELD_MEDIA_TYPE = "mediaType";
+    /** Maximum length of a Media Type. */
+    public static final int MAX_MEDIA_TYPE_LENGTH = 255;
+    /** A Media Type, type/subtype without parameters (RFC 6838). */
+    public static final String MEDIA_TYPE_PATTERN_REGEX = "^[a-zA-Z0-9][a-zA-Z0-9!#$&^_.+-]{0,126}/[a-zA-Z0-9][a-zA-Z0-9!#$&^_.+-]{0,126}$";
     /** Field :: Sanities. */
     public static final String FIELD_SANITIES = "sanities";
-    /** Field :: Inventory. */
+    /** Field :: Inventory, what a stone holds, as a part of its status (STATUS.md). */
     public static final String FIELD_INVENTORY = "inventory";
     /** Field :: Settings. */
     public static final String FIELD_SETTINGS = "settings";
-    /** Field :: Secret. */
+
+    /** Field :: Features (FEATURES.md). */
+    public static final String FIELD_FEATURES = "features";
+    /** Field :: Feature, the name of a feature. */
+    public static final String FIELD_FEATURE = "feature";
+    /** Field :: Declaration of a feature. */
+    public static final String FIELD_DECLARATION = "declaration";
+    /** Field :: State of a feature in a Circle. */
+    public static final String FIELD_STATE = "state";
+    /** Field :: Entries of a feature. */
+    public static final String FIELD_ENTRIES = "entries";
+    /** Field :: EntryId. */
+    public static final String FIELD_ENTRY_ID = "entryId";
+    /** Field :: Kind of an entry. */
+    public static final String FIELD_KIND = "kind";
+    /** Field :: Position of an entry in its feature. */
+    public static final String FIELD_POSITION = "position";
+    /** Field :: About, the entry which an entry is about. */
+    public static final String FIELD_ABOUT = "about";
+    /** Field :: Name. */
+    public static final String FIELD_NAME = "name";
+    /** Field :: Content of an entry. */
+    public static final String FIELD_CONTENT = "content";
+    /** Field :: Closed. */
+    public static final String FIELD_CLOSED = "closed";
+    /** Field :: Count. */
+    public static final String FIELD_COUNT = "count";
+
+    /** Max length of the name of a feature, and of a kind of its entries (FEATURES.md). */
+    public static final int MAX_FEATURE_NAME_LENGTH = 32;
+    /** Max length of the declaration of a feature. */
+    public static final int MAX_DECLARATION_LENGTH = 16384;
+    /** Max number of entries in one listing. */
+    public static final int MAX_ENTRY_PAGE = 200;
+    /** Entry TypeName: the Data Type of the entries of the features of a Circle (FEATURES.md). */
+    public static final String ENTRY_TYPENAME = "entry";
+    /** Field :: Ref, which a client gives a frame, and gets back with the answer. */
+    public static final String FIELD_REF = "ref";
+    /** Field :: Entry. */
+    public static final String FIELD_ENTRY = "entry";
+    /** Field :: After, a position. */
+    public static final String FIELD_AFTER = "after";
+    /** Field :: Before, a position. */
+    public static final String FIELD_BEFORE = "before";
+    /** Field :: OldestFirst. */
+    public static final String FIELD_OLDEST_FIRST = "oldestFirst";
+    /** Field :: Limit. */
+    public static final String FIELD_LIMIT = "limit";
+    /** Field :: Bare, without the content of the entries. */
+    public static final String FIELD_BARE = "bare";
+    /** Field :: Signal, a short text which is passed on and not stored. */
+    public static final String FIELD_SIGNAL = "signal";
+    /** Field :: To, the Member a signal is for. */
+    public static final String FIELD_TO = "to";
+    /** Field :: Unseen, joining a Circle without being shown as present. */
+    public static final String FIELD_UNSEEN = "unseen";
+    /** Field :: Present, the Members who are present in a Circle. */
+    public static final String FIELD_PRESENT = "present";
+
+    /** Max length of a signal (FEATURES.md). */
+    public static final int MAX_SIGNAL_LENGTH = 32768;
+    /** The longest content, Base64-encoded, which an announcement of an entry carries; a longer one is fetched. */
+    public static final int MAX_ANNOUNCED_CONTENT = 16384;
+    /** Field :: Load, how busy a stone is, as a part of its status (STATUS.md). */
+    public static final String FIELD_LOAD = "load";
+    /** Field :: Day, the load of the last day in steps. */
+    public static final String FIELD_DAY = "day";
+    /** Field :: Samples. */
+    public static final String FIELD_SAMPLES = "samples";
+    /** Field :: Values. */
+    public static final String FIELD_VALUES = "values";
+    /** Field :: Sequence. */
+    public static final String FIELD_SEQUENCE = "sequence";
+    /** Field :: Time. */
+    public static final String FIELD_TIME = "time";
+    /** Field :: Interval. */
+    public static final String FIELD_INTERVAL = "interval";
+    /** Field :: Awake. */
+    public static final String FIELD_AWAKE = "awake";
+    /** Field :: Started. */
+    public static final String FIELD_STARTED = "started";
+    /** Field :: DatabaseMark. */
+    public static final String FIELD_DATABASE_MARK = "databaseMark";
+    /** Field :: Label. */
+    public static final String FIELD_LABEL = "label";
+    /** Field :: Key. */
+    public static final String FIELD_KEY = "key";
+    /** Field :: Keys. */
+    public static final String FIELD_KEYS = "keys";
+
+    /** Max length of the name of a stone (STATUS.md). */
+    public static final int MAX_STONE_NAME_LENGTH = 64;
+    /** REST endpoint for the status of the stone (STATUS.md). */
+    public static final String REST_STATUS_BASE = "/status";
+    /** REST endpoint for the status keys of the stone. */
+    public static final String REST_STATUS_KEYS = "/keys";
+    /** REST endpoint for the features of the stone. */
+    public static final String REST_FEATURES_BASE = "/features";
+
+    /** Field :: Vault, a Member's own opaque text (E2E.md). */
+    public static final String FIELD_VAULT = "vault";
+
+    /** Field :: Secrets, the secrets of several Trustees (E2E.md). */
+    public static final String FIELD_SECRETS = "secrets";
+
+    /** Max length of a Trustee's secret (E2E.md): room for hybrid post-quantum wraps and several device keys. */
+    public static final int MAX_SECRET_LENGTH = 65536;
+
+    /** Max length of a Member's vault (E2E.md). */
+    public static final int MAX_VAULT_LENGTH = 65536;
+    public static final String FIELD_ALLOWED_VALUES = "allowedValues";
+    /** Max length of a Member's settings for clients (JSON text). */
+    public static final int MAX_MEMBER_SETTINGS_LENGTH = 4096;
+    /** Field :: Secret: the MasterKey's in its request, and the opaque text of a Member in a Circle (E2E.md). */
     public static final String FIELD_SECRET = "secret";
     /** Field :: Expires. */
     public static final String FIELD_EXPIRES = "expires";
@@ -186,13 +363,33 @@ public final class Constants {
     /** Field :: Last Verification. */
     public static final String FIELD_LAST_VERIFICATION = "lastVerification";
     /** Field :: Added */
+    public static final String FIELD_SIZE = "size";
+    /** Field :: Thumbnail Id. */
+    public static final String FIELD_THUMBNAIL_ID = "thumbnailId";
+    /** Field :: Token. */
+    public static final String FIELD_TOKEN = "token";
     public static final String FIELD_ADDED = "added";
     /** Field :: Changed. */
     public static final String FIELD_CHANGED = "changed";
+    /** Field :: When the current Circle Secret was made (PLAN.md, Crypto C6). */
+    public static final String FIELD_SECRET_ROTATED = "secretRotated";
+    /** Field :: When the Circle Secret is to be rotated next. */
+    public static final String FIELD_ROTATION_DUE = "rotationDue";
+    /** Field :: The rotation of the Circle Secret under way. */
+    public static final String FIELD_ROTATION = "rotation";
+    /** Field :: Objects of a Circle. */
+    public static final String FIELD_OBJECTS = "objects";
+    /** Field :: Objects re-encrypted. */
+    public static final String FIELD_OBJECTS_DONE = "objectsDone";
     /** Field :: Since. */
     public static final String FIELD_SINCE = "since";
     /** Field :: Version. */
     public static final String FIELD_VERSION = "version";
+    /** Field :: Database. */
+    public static final String FIELD_DATABASE = "database";
+    /** Field :: Persistent. */
+    public static final String FIELD_PERSISTENT = "persistent";
+    public static final String FIELD_STORAGE_CEILING = "storageCeiling";
     /** Field :: Verified.  */
     public static final String FIELD_VERIFIED = "verified";
     /** Field :: Action. */
@@ -213,20 +410,23 @@ public final class Constants {
     // divided into the base call and the sub calls.
     // =========================================================================
 
-    /** Root for the REST API. */
-    public static final String REST_API = "/";
+    /**
+     * Root of the REST API, and of the WebSocket. Rune is served at the
+     * root of the stone (`/`), the API below it, with its version in the path.
+     */
+    public static final String REST_API = "/api/v1";
 
     // General requests from the Management Interface
     /** REST endpoint for the Version Service. */
     public static final String REST_VERSION = "/version";
+    /** Path of the OpenAPI specification (PLAN.md, L2). */
+    public static final String REST_SPECIFICATION = "/openapi.json";
     /** REST endpoint for the Settings Service. */
     public static final String REST_SETTINGS = "/settings";
     /** REST endpoint for the MasterKey Service. */
     public static final String REST_MASTERKEY = "/masterKey";
     /** REST endpoint for the Sanitized Service. */
     public static final String REST_SANITIZED = "/sanitized";
-    /** REST endpoint for the Inventory Service. */
-    public static final String REST_INVENTORY = "/inventory";
     /** REST endpoint for the Authenticated Service. */
     public static final String REST_AUTHENTICATED = "/authenticated";
 
@@ -263,6 +463,8 @@ public final class Constants {
     public static final String REST_CIRCLES_DELETE = "/deleteCircle";
     /** REST endpoint for Fetching Circles of Trust. */
     public static final String REST_CIRCLES_FETCH = "/fetchCircles";
+    /** REST endpoint for Rotating the Circle Secret of a Circle of Trust. */
+    public static final String REST_CIRCLES_ROTATE = "/rotateCircle";
 
     // Trustee requests from the Management Interface
     /** PATH for the REST-based Trustee Service. */
@@ -273,6 +475,8 @@ public final class Constants {
     public static final String REST_TRUSTEES_ALTER = "/alterTrustee";
     /** REST endpoint for Removing a Trustee. */
     public static final String REST_TRUSTEES_REMOVE = "/removeTrustee";
+    /** REST endpoint to set the secrets of several Trustees of a Circle (E2E.md). */
+    public static final String REST_TRUSTEES_SECRETS = "/setSecrets";
     /** REST endpoint for Fetching Trustees. */
     public static final String REST_TRUSTEES_FETCH = "/fetchTrustees";
 
@@ -301,16 +505,18 @@ public final class Constants {
     public static final String REST_DATA_DELETE = "/deleteData";
     /** REST endpoint for Fetching Data. */
     public static final String REST_DATA_FETCH = "/fetchData";
-
-    // Signature requests from the Share Interface
-    /** Path for the REST-based signature Service. */
-    public static final String REST_SIGNATURES_BASE = "/signatures";
-    /** REST endpoint for Signing a Document. */
-    public static final String REST_SIGNATURES_SIGN = "/signDocument";
-    /** REST endpoint for Verifying a Signature. */
-    public static final String REST_SIGNATURES_VERIFY = "/verifySignature";
-    /** REST endpoint for Fetching Signatures. */
-    public static final String REST_SIGNATURES_FETCH = "/fetchSignatures";
+    /** Path parameter for the Data Id of the content resource. */
+    public static final String PATH_DATA_ID = "dataId";
+    /** REST resource for the content of a Data Object (upload and download). */
+    public static final String REST_DATA_CONTENT = "/{" + PATH_DATA_ID + "}/content";
+    /** REST resource for a download token of a Data Object (PLAN.md, L5). */
+    public static final String REST_DATA_TOKEN = "/{" + PATH_DATA_ID + "}/token";
+    /** REST resource for the thumbnail of a Data Object (PLAN.md, L5). */
+    public static final String REST_DATA_THUMBNAIL = "/{" + PATH_DATA_ID + "}/thumbnail";
+    /** Query parameter with a download token, for clients that can't send headers. */
+    public static final String QUERY_TOKEN = "token";
+    /** WebSocket endpoint of the stone (FEATURES.md): the features of the Circles, and what changes in them. */
+    public static final String WS_SOCKET = REST_API + "/socket";
 
     // =========================================================================
 

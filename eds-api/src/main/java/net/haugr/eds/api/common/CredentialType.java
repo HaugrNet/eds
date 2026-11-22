@@ -16,10 +16,12 @@
  */
 package net.haugr.eds.api.common;
 
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
+
 /**
  * <p>This is the types of credentials allowed for the Authentication Process.
- * It can be either an Invitation (Signature, with a shared secret). Or it can
- * be a Passphrase, which together a System &amp; Account Salt.</p>
+ * It can be a Passphrase, a Session, or an Invitation token issued by the
+ * System Administrator.</p>
  *
  * <p>Regardless of the type, the information given will be used to decrypt the
  * Asymmetric Key, which was generated and stored with the Account. The Private
@@ -29,6 +31,9 @@ package net.haugr.eds.api.common;
  * @author Kim Jensen
  * @since EDS 1.0
  */
+@Schema(description = "How the credential in a request is to be used. Values: PASSPHRASE (default; the credential is the Member's "
+        + "passphrase), SESSION (the credential is a session key from a login; the account name is omitted), "
+        + "INVITATION (the credential is the invitation token from an invite; used once to set the new Member's passphrase).")
 public enum CredentialType {
 
     /**
@@ -53,10 +58,10 @@ public enum CredentialType {
     SESSION,
 
     /**
-     * If the Signature is chosen, it is because a Member has been invited to
-     * create their own Account. The Signature is provided by the System
-     * Administrator to the potential Member, who can then create the Account
-     * with a higher degree of control over the Credentials.
+     * If the Invitation is chosen, it is because a Member has been invited to
+     * create their own Account. The invitation token is returned once to the
+     * System Administrator, who passes it on to the potential Member. The
+     * Member then uses it once to set their own Credentials.
      */
-    SIGNATURE
+    INVITATION
 }

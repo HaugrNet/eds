@@ -16,6 +16,7 @@
  */
 package net.haugr.eds.api.requests;
 
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import net.haugr.eds.api.Management;
 import net.haugr.eds.api.common.Constants;
 
@@ -31,6 +32,7 @@ import java.io.Serial;
  * @author Kim Jensen
  * @since EDS 1.0
  */
+@Schema(description = "Request for the Circles visible to the requesting Member.")
 public final class FetchCircleRequest extends Authentication {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */

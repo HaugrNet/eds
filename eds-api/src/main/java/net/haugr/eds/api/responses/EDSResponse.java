@@ -16,6 +16,7 @@
  */
 package net.haugr.eds.api.responses;
 
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import net.haugr.eds.api.common.Constants;
 import net.haugr.eds.api.common.ReturnCode;
 
@@ -43,6 +44,7 @@ import java.io.Serializable;
  * @since EDS 1.0
  */
 @JsonbPropertyOrder({ Constants.FIELD_RETURN_CODE, Constants.FIELD_RETURN_MESSAGE })
+@Schema(description = "Common part of every EDS response.")
 public class EDSResponse implements Serializable {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
@@ -50,10 +52,12 @@ public class EDSResponse implements Serializable {
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
     /** The EDS Return Code. */
+    @Schema(description = "Outcome of the request, see the EDSResponse schema.")
     @JsonbProperty(Constants.FIELD_RETURN_CODE)
     private int returnCode = ReturnCode.SUCCESS.getCode();
 
     /** The EDS Return Message. */
+    @Schema(description = "Human-readable explanation of the outcome.")
     @JsonbProperty(Constants.FIELD_RETURN_MESSAGE)
     private String returnMessage = "Ok";
 

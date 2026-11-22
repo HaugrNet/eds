@@ -231,9 +231,6 @@ public enum ReturnCode {
     //     the resource from their indices.[41] Most use cases do not require
     //     clients and search engines to purge the resource, and a "404 Not
     //     Found" may be used instead.
-    // 411 Length Required
-    //     The request did not specify the length of its content, which is
-    //     required by the requested resource.
     // 412 Precondition Failed (RFC 7232)
     //     The server does not meet one of the preconditions that the requester
     //     put on the request.
@@ -418,10 +415,22 @@ public enum ReturnCode {
     INTEGRITY_WARNING(Classification.CLASS_WARNING, 9, "Not possible to perform the given action, as it will lead to data integrity problems."),
 
     /**
-     * <b>Custom Warning 491 - Cryptographic Signature Problem</b>.<br>
-     * <i>The Signature is not usable, as it has expired.</i>
+     * <b>HTTP Status Code 412 - Precondition Failed</b>.<br>
+     * <i>A condition of the request, such as If-Match, isn't met.</i>
      */
-    SIGNATURE_WARNING(Classification.CLASS_WARNING, 91, "There Signature is not usable."),
+    PRECONDITION_FAILED(Classification.CLASS_WARNING, 12, "A precondition of the request is not met."),
+
+    /**
+     * <b>HTTP Status Code 413 - Content Too Large</b>.<br>
+     * <i>The content is larger than the configured maximum.</i>
+     */
+    CONTENT_TOO_LARGE(Classification.CLASS_WARNING, 13, "The content is larger than allowed."),
+
+    /**
+     * <b>HTTP Status Code 416 - Range Not Satisfiable</b>.<br>
+     * <i>The requested byte range is outside the content.</i>
+     */
+    RANGE_NOT_SATISFIABLE(Classification.CLASS_WARNING, 16, "The requested range is outside the content."),
 
     /**
      * <b>Custom Warning 492 - Setting Warning</b>.<br>
@@ -441,6 +450,13 @@ public enum ReturnCode {
      * <i>It was not possible to communicate with the requested URL.</i>
      */
     NETWORK_ERROR(Classification.CLASS_ERROR, 2, "Unable to communicate with the requested network service."),
+
+    /**
+     * <b>HTTP Status Code 507 - Insufficient Storage</b>.<br>
+     * <i>Storing the content would exceed the configured ceiling for all
+     * stored content ({@code eds.data.max.total.size}).</i>
+     */
+    INSUFFICIENT_STORAGE(Classification.CLASS_ERROR, 7, "The storage limit for content is reached."),
 
     /**
      * <b>Custom Warning 591 - General Cryptographic Error</b>.<br>

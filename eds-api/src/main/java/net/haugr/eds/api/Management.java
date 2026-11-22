@@ -22,7 +22,6 @@ import net.haugr.eds.api.requests.Authentication;
 import net.haugr.eds.api.requests.FetchCircleRequest;
 import net.haugr.eds.api.requests.FetchMemberRequest;
 import net.haugr.eds.api.requests.FetchTrusteeRequest;
-import net.haugr.eds.api.requests.InventoryRequest;
 import net.haugr.eds.api.requests.MasterKeyRequest;
 import net.haugr.eds.api.requests.ProcessCircleRequest;
 import net.haugr.eds.api.requests.ProcessMemberRequest;
@@ -33,7 +32,6 @@ import net.haugr.eds.api.responses.AuthenticateResponse;
 import net.haugr.eds.api.responses.FetchCircleResponse;
 import net.haugr.eds.api.responses.FetchMemberResponse;
 import net.haugr.eds.api.responses.FetchTrusteeResponse;
-import net.haugr.eds.api.responses.InventoryResponse;
 import net.haugr.eds.api.responses.MasterKeyResponse;
 import net.haugr.eds.api.responses.ProcessCircleResponse;
 import net.haugr.eds.api.responses.ProcessMemberResponse;
@@ -72,9 +70,8 @@ public interface Management {
      *
      * <ul>
      *   <li>
-     *     <b>eds.crypto.symmetric.algorithm</b> - default value: 'AES_GCM_128'<br>
-     *     Allowed Values: 'AES_CBC_128', 'AES_CBC_192', 'AES_CBC_256',
-     *     'AES_GCM_128', 'AES_GCM_192' or 'AES_GCM_256'<br>
+     *     <b>eds.crypto.symmetric.algorithm</b> - default value: 'AES_GCM_256'<br>
+     *     Allowed Values: 'AES_GCM_256'<br>
      *     <i>The Algorithm used for the Symmetric Keys in EDS. All data is
      *     stored using this Algorithm. Although it can be changed, please test
      *     the EDS carefully before doing so. And please be aware that the
@@ -82,22 +79,14 @@ public interface Management {
      *     things will not affect existing records.</i>
      *   </li>
      *   <li>
-     *     <b>eds.crypto.asymmetric.algorithm</b> - default value: 'RSA_2048'<br>
-     *     Allowed Values: 'RSA_2048', 'RSA_4096', or 'RSA_8192'<br>
+     *     <b>eds.crypto.asymmetric.algorithm</b> - default value: 'MLKEM1024_P384'<br>
+     *     Allowed Values: 'MLKEM1024_P384' (hybrid ML-KEM-1024 + ECDH P-384)<br>
      *     <i> Asymmetric Encryption (Public &amp; Private Key) is used for
      *     sharing the Symmetric Keys, not for encrypting any data.</i>
      *   </li>
      *   <li>
-     *     <b>eds.crypto.signature.algorithm</b> - default value: 'SHA_512'<br>
-     *     Allowed Values: 'SHA_256' or 'SHA_512'<br>
-     *     <i>When new Members are added, the System Administrator can issue a
-     *     signature, which can be used by the Member when creating their new
-     *     Account. The signature is made with this Algorithm.</i>
-     *   </li>
-     *   <li>
-     *     <b>eds.crypto.pbe.algorithm</b> - default value: 'PBE_GCM_128'<br>
-     *     Allowed Values: 'PBE_128', 'PBE_192', 'PBE_256', 'PBE_GCM_128',
-     *     'PBE_GCM_192' or 'PBE_GCM_256'<br>
+     *     <b>eds.crypto.pbe.algorithm</b> - default value: 'PBE_GCM_256'<br>
+     *     Allowed Values: 'PBE_GCM_256'<br>
      *     <i>If a Member is using something else than a Key to unlock their
      *     Account, the EDS will use the following Password Based Encryption,
      *     PBE, algorithm to do the trick. The provided information is extended
@@ -106,10 +95,13 @@ public interface Management {
      *     to unlock the Private Key for the Account.</i>
      *   </li>
      *   <li>
-     *     <b>eds.crypto.pbe.iterations</b> - default value: '600000'<br>
-     *     Allowed Values: Any positive number<br>
-     *     <i>The PBE algorithm (PBKDF2 with HMAC-SHA256) is extending the Member
-     *     credentials with the Salt over a number of iterations. The higher the
+     *     <b>eds.crypto.pbe.iterations</b> - default value: '210000'<br>
+     *     Allowed Values: A number, at least 1000<br>
+     *     <i>The PBE algorithm (PBKDF2 with HMAC-SHA512) is extending the Member
+     *     credentials with the Salt over a number of iterations. The setting
+     *     is used when a passphrase is set, and kept with the account, which
+     *     uses its own number at each login; so it can be changed at any
+     *     time, and counts from the next change of a passphrase. The higher the
      *     number, the more costly it is to guess the credentials, if the
      *     database is stolen - but it is also more costly for each request
      *     made with credentials. The default follows the recommendation from
@@ -119,30 +111,10 @@ public interface Management {
      *   </li>
      *   <li>
      *     <b>eds.crypto.hash.algorithm</b> - default value: 'SHA_512'<br>
-     *     Allowed Values: 'SHA_256' or 'SHA_512'<br>
-     *     <i>For the CheckSums or Fingerprints we're generating - we just need
-     *     a way to ensure that the value is both identifiable. For Signatures,
-     *     it is used as part of the lookup to find a Signature in the Database,
-     *     and for stored Data Objects, it is a simple mechanism to ensure the
-     *     integrity of the stored data.</i>
-     *   </li>
-     *   <li>
-     *     <b>eds.system.salt</b> - default value: -<br>
-     *     Allowed Values: Anything, but it should be hard to guess.<br>
-     *     <i>This is the System-specific Salt, which will be applied whenever
-     *     PBE is used to unlock the Private Key of a Member Account. This Salt
-     *     can only be altered as long as no account exists other than the System
-     *     Administrator account - this safety precaution has been added to
-     *     prevent that it is accidentally altered later. If so desired, an
-     *     Administrator with access to the DB can change it later - however,
-     *     this will render *all* accounts useless.</i><br>
-     *     Please note that updating the salt must be done before applying a
-     *     Master Key, as generating the Master Key will have to be re-initiated
-     *     after this has been done and will be done on the default Master Key.
-     *     However, as the default Master Key is built around known information
-     *     in the EDS, and a custom is built around a provided, non-persisted
-     *     secret. It will render the system useless if the System Salt is set
-     *     after the Master Key has been provided.
+     *     Allowed Values: 'SHA_384' or 'SHA_512'<br>
+     *     <i>For the CheckSums or Fingerprints we're generating - for stored
+     *     Data Objects, it is a simple mechanism to ensure the integrity of
+     *     the stored data.</i>
      *   </li>
      *   <li>
      *     <b>eds.system.locale</b> - default value: 'EN'<br>
@@ -164,7 +136,7 @@ public interface Management {
      *     sure.</i>
      *   </li>
      *   <li>
-     *     <b>eds.show.all.circles</b> - default value: 'true'<br>
+     *     <b>eds.show.all.circles</b> - default value: 'false'<br>
      *     Allowed Values: Boolean - 'true' or 'false'<br>
      *     <i>Exposing all Circles means that it is possible for a member,
      *     other than the System Administrator, to be able to view Circles who
@@ -218,6 +190,12 @@ public interface Management {
      *     <i>The maximum amount of time a Session may be used.</i>
      *   </li>
      *   <li>
+     *     <b>eds.session.max.per.member</b> - default value: '10'<br>
+     *     Allowed Values: Any integer from 1<br>
+     *     <i>The Sessions a Member may have at a time, one per login. A
+     *     further login ends the Session which expires first.</i>
+     *   </li>
+     *   <li>
      *     <b>eds.masterkey.url</b> - default value: ''<br>
      *     Allowed Values: Any valid URL<br>
      *     <i>Reference to a series of bytes, which will be used as the secret
@@ -249,11 +227,6 @@ public interface Management {
      * used throughout the system. However, as the default key is based on known
      * values, it cannot be used to enhance security. To achieve this, it
      * must be set by the System Administrator.</p>
-     *
-     * <p>Note that it is very important that the MasterKey is set <b>after</b>
-     * the system Salt has been updated. As the system Salt is required by the
-     * Master Key, it and can only be updated by this request, it will make the
-     * system completely unusable.</p>
      *
      * @param request Request Object
      * @return Response Object with ReturnCode and Message
@@ -289,17 +262,6 @@ public interface Management {
      * @return Response Object with ReturnCode and Message
      */
     SanityResponse sanitized(SanityRequest request);
-
-    /**
-     * <p>This allows for Administrators to receive a complete listing of all
-     * saved records in EDS. The information retrieved is the metadata, which
-     * can then be used to synchronize a different storage system if they
-     * somehow get out of sync.</p>
-     *
-     * @param request Paginated Request Object for the Inventory Report
-     * @return Response Object with Inventory report and Return values
-     */
-    InventoryResponse inventory(InventoryRequest request);
 
     /**
      * <p>Simple check to see if a Member is authenticated to work with this
@@ -353,9 +315,9 @@ public interface Management {
      * become System Administrator, or simply revoke the role.</i></p>
      *
      * <p>A special variant for creating new Accounts is via Invitations, where
-     * the System Administrator can issue a signed invitation to a potential
-     * Member. If this is made, then the armoredKey will contain a Signature,
-     * rather than a Private Key in the Response.</p>
+     * the System Administrator can issue an invitation to a potential Member.
+     * The Response then contains a one-time invitation token, which the
+     * Member uses to set their own credentials.</p>
      *
      * <p><b>Login / Logout</b> <i>Linking and unlinking a Session with an
      * Account. This is to help websites to use EDS without needing to store

@@ -16,6 +16,7 @@
  */
 package net.haugr.eds.api.responses;
 
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import net.haugr.eds.api.common.Constants;
 import net.haugr.eds.api.common.ReturnCode;
 import net.haugr.eds.api.dtos.Sanity;
@@ -46,6 +47,7 @@ import java.util.List;
  * @since EDS 1.0
  */
 @JsonbPropertyOrder(Constants.FIELD_SANITIES)
+@Schema(description = "The Data Objects that failed the sanity check. Any entry means the storage can't be trusted.")
 public final class SanityResponse extends EDSResponse {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
@@ -53,6 +55,7 @@ public final class SanityResponse extends EDSResponse {
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
     /** The List of failed Sanity Records. */
+    @Schema(description = "The failed Data Objects.")
     @JsonbProperty(Constants.FIELD_SANITIES)
     private final List<Sanity> sanities = new ArrayList<>(0);
 

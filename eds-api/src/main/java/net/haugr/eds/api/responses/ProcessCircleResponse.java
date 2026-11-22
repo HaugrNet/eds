@@ -16,6 +16,7 @@
  */
 package net.haugr.eds.api.responses;
 
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import net.haugr.eds.api.common.Constants;
 import net.haugr.eds.api.common.ReturnCode;
 
@@ -35,6 +36,7 @@ import java.io.Serial;
  * @since EDS 1.0
  */
 @JsonbPropertyOrder(Constants.FIELD_CIRCLE_ID)
+@Schema(description = "Result of processing a Circle.")
 public final class ProcessCircleResponse extends EDSResponse {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
@@ -42,6 +44,7 @@ public final class ProcessCircleResponse extends EDSResponse {
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
     /** The CircleId. */
+    @Schema(description = "ID of the Circle; for a new Circle, its new ID.", pattern = Constants.ID_PATTERN_REGEX, examples = { "5d2a0c7e-8c4f-4d7b-9a2e-3f1b6c0d9e8a" })
     @JsonbProperty(Constants.FIELD_CIRCLE_ID)
     private String circleId = null;
 

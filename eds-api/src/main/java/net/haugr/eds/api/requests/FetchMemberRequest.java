@@ -16,6 +16,7 @@
  */
 package net.haugr.eds.api.requests;
 
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import jakarta.json.bind.annotation.JsonbNillable;
 import net.haugr.eds.api.Management;
 import net.haugr.eds.api.common.Constants;
@@ -36,6 +37,7 @@ import java.util.Map;
  * @since EDS 1.0
  */
 @JsonbPropertyOrder(Constants.FIELD_MEMBER_ID)
+@Schema(description = "Request for Members: all Members, or one Member (with the Circles both Members share).")
 public final class FetchMemberRequest extends Authentication {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
@@ -43,6 +45,7 @@ public final class FetchMemberRequest extends Authentication {
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
     /** MemberId. */
+    @Schema(description = "ID of the Member to fetch; omit to fetch all Members.", pattern = Constants.ID_PATTERN_REGEX, examples = { "5d2a0c7e-8c4f-4d7b-9a2e-3f1b6c0d9e8a" })
     @JsonbProperty(value = Constants.FIELD_MEMBER_ID)
     @JsonbNillable
     private String memberId = null;

@@ -16,6 +16,7 @@
  */
 package net.haugr.eds.api.responses;
 
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import net.haugr.eds.api.common.Constants;
 import net.haugr.eds.api.common.ReturnCode;
 import net.haugr.eds.api.dtos.Trustee;
@@ -38,6 +39,7 @@ import java.util.List;
  * @since EDS 1.0
  */
 @JsonbPropertyOrder(Constants.FIELD_TRUSTEES)
+@Schema(description = "The Trustees found.")
 public final class FetchTrusteeResponse extends EDSResponse {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
@@ -45,6 +47,7 @@ public final class FetchTrusteeResponse extends EDSResponse {
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
     /** The List of Trustees. */
+    @Schema(description = "The Trustees.")
     @JsonbProperty(Constants.FIELD_TRUSTEES)
     private final List<Trustee> trustees = new ArrayList<>(0);
 

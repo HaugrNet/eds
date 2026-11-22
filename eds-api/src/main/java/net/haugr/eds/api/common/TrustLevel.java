@@ -16,6 +16,7 @@
  */
 package net.haugr.eds.api.common;
 
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import java.util.EnumSet;
 import java.util.Set;
 
@@ -26,6 +27,9 @@ import java.util.Set;
  * @author Kim Jensen
  * @since EDS 1.0
  */
+@Schema(description = "A Member's trust level in a Circle; each level includes the ones before it. Values: READ (read the Circle's data), "
+        + "WRITE (also add, change and delete data), ADMIN (also manage the Circle and its Trustees). ALL and SYSOP are used internally for permission checks: "
+        + "ALL means any Member, SYSOP means the System Administrator; they can't be granted to a Trustee.")
 public enum TrustLevel {
 
     /** All Trust Levels. */

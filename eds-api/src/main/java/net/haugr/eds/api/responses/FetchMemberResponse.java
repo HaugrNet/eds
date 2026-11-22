@@ -16,6 +16,7 @@
  */
 package net.haugr.eds.api.responses;
 
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import net.haugr.eds.api.common.Constants;
 import net.haugr.eds.api.common.ReturnCode;
 import net.haugr.eds.api.dtos.Circle;
@@ -42,6 +43,7 @@ import java.util.List;
  * @since EDS 1.0
  */
 @JsonbPropertyOrder({ Constants.FIELD_MEMBERS, Constants.FIELD_CIRCLES })
+@Schema(description = "The Members found. When fetching one Member, circles lists the Circles both Members share; otherwise the Circles visible to the requesting Member.")
 public final class FetchMemberResponse extends EDSResponse {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
@@ -49,10 +51,12 @@ public final class FetchMemberResponse extends EDSResponse {
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
     /** The List of Members. */
+    @Schema(description = "The Members.")
     @JsonbProperty(Constants.FIELD_MEMBERS)
     private final List<Member> members = new ArrayList<>(0);
 
     /** The List of Circles. */
+    @Schema(description = "The Circles, see the response description.")
     @JsonbProperty(Constants.FIELD_CIRCLES)
     private final List<Circle> circles = new ArrayList<>(0);
 

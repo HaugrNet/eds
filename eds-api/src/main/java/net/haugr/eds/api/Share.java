@@ -19,18 +19,12 @@ package net.haugr.eds.api;
 import net.haugr.eds.api.common.Action;
 import net.haugr.eds.api.requests.FetchDataRequest;
 import net.haugr.eds.api.requests.FetchDataTypeRequest;
-import net.haugr.eds.api.requests.FetchSignatureRequest;
 import net.haugr.eds.api.requests.ProcessDataRequest;
 import net.haugr.eds.api.requests.ProcessDataTypeRequest;
-import net.haugr.eds.api.requests.SignRequest;
-import net.haugr.eds.api.requests.VerifyRequest;
 import net.haugr.eds.api.responses.FetchDataResponse;
 import net.haugr.eds.api.responses.FetchDataTypeResponse;
-import net.haugr.eds.api.responses.FetchSignatureResponse;
 import net.haugr.eds.api.responses.ProcessDataResponse;
 import net.haugr.eds.api.responses.ProcessDataTypeResponse;
-import net.haugr.eds.api.responses.SignResponse;
-import net.haugr.eds.api.responses.VerifyResponse;
 
 /**
  * This interface contains the functionality to deal with data, dataTypes as
@@ -141,36 +135,4 @@ public interface Share {
      * @return Response Object with ReturnCode and Message
      */
     FetchDataResponse fetchData(FetchDataRequest request);
-
-    /**
-     * Signs a Document using the requesting Accounts Private Key and returning
-     * the Signature in the Response Object. The Signature is not stored in the
-     * underlying data model, rather a cryptographic fingerprint is saved to
-     * make sure that it can be retrieved for someone wishing to verify the
-     * document against the signature.
-     *
-     * @param request Request Object
-     * @return Response Object with ReturnCode and Message
-     */
-    SignResponse sign(SignRequest request);
-
-    /**
-     * Verifies a Document with a given Signature. If the Signature is correct,
-     * then the Response Object will contain a True value, otherwise a False
-     * value.
-     *
-     * @param request Request Object
-     * @return Response Object with ReturnCode and Message
-     */
-    VerifyResponse verify(VerifyRequest request);
-
-    /**
-     * Retrieve a list of Signatures from the requesting Member Account. The
-     * list contains information about the number of successful verifications
-     * which have been made with each Signature.
-     *
-     * @param request Request Object
-     * @return Response Object with ReturnCode and Message
-     */
-    FetchSignatureResponse fetchSignatures(FetchSignatureRequest request);
 }

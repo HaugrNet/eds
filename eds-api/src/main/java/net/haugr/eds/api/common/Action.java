@@ -16,6 +16,8 @@
  */
 package net.haugr.eds.api.common;
 
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
+
 /**
  * <p>When invoking a processing Request to the EDS, it must be with a specific
  * type of Action, which may or may not be allowed.</p>
@@ -26,6 +28,13 @@ package net.haugr.eds.api.common;
  * @author Kim Jensen
  * @since EDS 1.0
  */
+@Schema(description = "The operation a processing request performs. The endpoints set it themselves, so clients normally don't send it. Values: "
+        + "PROCESS (generic processing), CREATE (create a Member or Circle), UPDATE (update a Member, Circle, Data Object or Data Type), "
+        + "INVITE (invite a new Member), LOGIN (start a session), LOGOUT (end a session), DELETE (delete a Member, Circle, "
+        + "Data Object or Data Type), ADD (add a Data Object or Trustee), COPY (copy a Data Object to another Circle), MOVE (move "
+        + "a Data Object to another Circle or folder), ALTER (change a Member's role or a Trustee's trust level), INVALIDATE "
+        + "(invalidate a Member's credentials), REMOVE (remove a Trustee), SECRETS (set the secrets of several Trustees of a Circle), "
+        + "ROTATE (rotate the Circle Secret of a Circle).")
 public enum Action {
 
     /**
@@ -108,5 +117,19 @@ public enum Action {
      * from a Circle. A Circle Administrator cannot remove themselves from a
      * Circle.</p>
      */
-    REMOVE
+    REMOVE,
+
+    /**
+     * <p>This Action allows a Circle Administrator to set the secrets of
+     * several Trustees of a Circle, and the Circle's external key, in one
+     * step, where either all or nothing is changed (E2E.md).</p>
+     */
+    SECRETS,
+
+    /**
+     * <p>This Action allows a Circle Administrator to have the Circle Secret
+     * rotated now (PLAN.md, Crypto C6): the Circle gets a new secret, and its
+     * Data Objects are re-encrypted with it in the background.</p>
+     */
+    ROTATE
 }

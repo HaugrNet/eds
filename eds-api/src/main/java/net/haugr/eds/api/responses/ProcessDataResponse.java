@@ -16,6 +16,7 @@
  */
 package net.haugr.eds.api.responses;
 
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import net.haugr.eds.api.common.Constants;
 import net.haugr.eds.api.common.ReturnCode;
 
@@ -33,7 +34,8 @@ import java.io.Serial;
  * @author Kim Jensen
  * @since EDS 1.0
  */
-@JsonbPropertyOrder(Constants.FIELD_DATA_ID)
+@JsonbPropertyOrder({ Constants.FIELD_DATA_ID, Constants.FIELD_ETAG })
+@Schema(description = "Result of processing a Data Object.")
 public final class ProcessDataResponse extends EDSResponse {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
@@ -41,8 +43,14 @@ public final class ProcessDataResponse extends EDSResponse {
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
     /** The DataId. */
+    @Schema(description = "ID of the Data Object; for an added or copied Data Object, its new ID.", pattern = Constants.ID_PATTERN_REGEX, examples = { "5d2a0c7e-8c4f-4d7b-9a2e-3f1b6c0d9e8a" })
     @JsonbProperty(Constants.FIELD_DATA_ID)
     private String dataId = null;
+
+    /** The ETag of the content. */
+    @Schema(description = "ETag of the stored content, after a content upload. It changes with every write of the content.", examples = { "\"q3V0b2dlbmVyYXRlZA\"" })
+    @JsonbProperty(Constants.FIELD_ETAG)
+    private String etag = null;
 
     // =========================================================================
     // Object Constructors
@@ -96,5 +104,23 @@ public final class ProcessDataResponse extends EDSResponse {
      */
     public String getDataId() {
         return dataId;
+    }
+
+    /**
+     * Set the ETag of the stored content.
+     *
+     * @param etag ETag
+     */
+    public void setEtag(final String etag) {
+        this.etag = etag;
+    }
+
+    /**
+     * Retrieves the ETag of the stored content.
+     *
+     * @return ETag
+     */
+    public String getEtag() {
+        return etag;
     }
 }

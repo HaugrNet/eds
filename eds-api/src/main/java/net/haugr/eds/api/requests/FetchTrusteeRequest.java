@@ -16,6 +16,7 @@
  */
 package net.haugr.eds.api.requests;
 
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import jakarta.json.bind.annotation.JsonbNillable;
 import net.haugr.eds.api.Management;
 import net.haugr.eds.api.common.Constants;
@@ -35,6 +36,7 @@ import java.util.Map;
  * @since EDS 1.0
  */
 @JsonbPropertyOrder({ Constants.FIELD_MEMBER_ID, Constants.FIELD_CIRCLE_ID })
+@Schema(description = "Request for the Trustees of a Circle, optionally limited to one Member.")
 public final class FetchTrusteeRequest extends Authentication implements CircleIdRequest {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
@@ -42,11 +44,13 @@ public final class FetchTrusteeRequest extends Authentication implements CircleI
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
     /** MemberId. */
+    @Schema(description = "Optional ID of a Member, to fetch only that Member's Trustee record.", pattern = Constants.ID_PATTERN_REGEX, examples = { "5d2a0c7e-8c4f-4d7b-9a2e-3f1b6c0d9e8a" })
     @JsonbProperty(value = Constants.FIELD_MEMBER_ID)
     @JsonbNillable
     private String memberId = null;
 
     /** CircleId. */
+    @Schema(description = "ID of the Circle whose Trustees to fetch.", pattern = Constants.ID_PATTERN_REGEX, examples = { "5d2a0c7e-8c4f-4d7b-9a2e-3f1b6c0d9e8a" })
     @JsonbProperty(value = Constants.FIELD_CIRCLE_ID)
     @JsonbNillable
     private String circleId = null;

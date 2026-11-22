@@ -16,6 +16,8 @@
  */
 package net.haugr.eds.api.requests;
 
+import org.eclipse.microprofile.openapi.annotations.enums.SchemaType;
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import jakarta.json.bind.annotation.JsonbNillable;
 import net.haugr.eds.api.common.ByteArrayAdapter;
 import net.haugr.eds.api.common.Constants;
@@ -52,6 +54,7 @@ import java.util.Map;
  * @since EDS 1.0
  */
 @JsonbPropertyOrder({ Constants.FIELD_SECRET, Constants.FIELD_URL })
+@Schema(description = "Request to set the MasterKey from a secret or a URL (System Administrator only). The MasterKey protects the stored keys; without it, EDS can't read any data.")
 public final class MasterKeyRequest extends Authentication {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
@@ -59,12 +62,16 @@ public final class MasterKeyRequest extends Authentication {
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
     /** The Secret as Bytes. */
+    @Schema(description = "The MasterKey secret, Base64-encoded. Must meet the entropy rules (at "
+            + "least 15 characters, not a common value, an estimated 128 bits or more).",
+            type = SchemaType.STRING, format = "byte")
     @JsonbProperty(value = Constants.FIELD_SECRET)
     @JsonbTypeAdapter(ByteArrayAdapter.class)
     @JsonbNillable
     private byte[] secret = null;
 
     /** The Secret as URL. */
+    @Schema(description = "URL to read the MasterKey secret from, instead of sending the secret.", examples = { "https://keys.example.com/eds-masterkey" })
     @JsonbProperty(value = Constants.FIELD_URL)
     @JsonbNillable
     private String url = null;

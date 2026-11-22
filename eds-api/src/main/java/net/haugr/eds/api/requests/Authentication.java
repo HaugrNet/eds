@@ -16,6 +16,8 @@
  */
 package net.haugr.eds.api.requests;
 
+import org.eclipse.microprofile.openapi.annotations.enums.SchemaType;
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import jakarta.json.bind.annotation.JsonbNillable;
 import net.haugr.eds.api.common.ByteArrayAdapter;
 import net.haugr.eds.api.common.Constants;
@@ -41,6 +43,7 @@ import java.util.concurrent.ConcurrentHashMap;
         Constants.FIELD_ACCOUNT_NAME,
         Constants.FIELD_CREDENTIAL,
         Constants.FIELD_CREDENTIALTYPE })
+@Schema(description = "Credentials identifying the requesting Member; part of every request that needs one. With credentialType SESSION, accountName is omitted and credential holds the session key.")
 public class Authentication extends AbstractRequest {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
@@ -48,17 +51,21 @@ public class Authentication extends AbstractRequest {
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
     /** Account Name. */
+    @Schema(description = "Account name of the requesting Member. Omitted for sessions.", maxLength = Constants.MAX_NAME_LENGTH, examples = { "alice" })
     @JsonbProperty(value = Constants.FIELD_ACCOUNT_NAME)
     @JsonbNillable
     private String accountName = null;
 
     /** Credential (Password or Passphrase). */
+    @Schema(description = "The credential, Base64-encoded: the passphrase (as UTF-8 bytes) or the session key.",
+            type = SchemaType.STRING, format = "byte", examples = { "Y29ycmVjdCBob3JzZSBiYXR0ZXJ5IHN0YXBsZQ==" })
     @JsonbProperty(value = Constants.FIELD_CREDENTIAL)
     @JsonbTypeAdapter(ByteArrayAdapter.class)
     @JsonbNillable
     private byte[] credential = null;
 
     /** Credential Type. */
+    @Schema(description = "How to use the credential: PASSPHRASE (default) or SESSION.")
     @JsonbProperty(value = Constants.FIELD_CREDENTIALTYPE)
     @JsonbNillable
     private CredentialType credentialType = null;
@@ -161,7 +168,7 @@ public class Authentication extends AbstractRequest {
             case SESSION:
                 checkNotNullOrEmpty(errors, Constants.FIELD_CREDENTIAL, credential, "The Session (Credential) is missing.");
                 break;
-            case SIGNATURE:
+            case INVITATION:
                 checkNotNullEmptyOrTooLong(errors, Constants.FIELD_ACCOUNT_NAME, accountName, Constants.MAX_NAME_LENGTH, "AccountName is missing, null or invalid.");
                 checkNotNullOrEmpty(errors, Constants.FIELD_CREDENTIAL, credential, "The Credential is missing.");
                 break;

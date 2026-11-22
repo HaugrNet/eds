@@ -16,6 +16,7 @@
  */
 package net.haugr.eds.api.requests;
 
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import jakarta.json.bind.annotation.JsonbNillable;
 import net.haugr.eds.api.Share;
 import net.haugr.eds.api.common.Constants;
@@ -42,7 +43,9 @@ import java.util.Map;
         Constants.FIELD_DATA_ID,
         Constants.FIELD_PAGE_NUMBER,
         Constants.FIELD_PAGE_SIZE,
-        Constants.FIELD_DATA_NAME })
+        Constants.FIELD_DATA_NAME,
+        Constants.FIELD_INCLUDE_HIDDEN })
+@Schema(description = "Request for Data Objects: one Data Object (by dataId or dataName) including its content, or a page of the metadata in a Circle (by circleId).")
 public final class FetchDataRequest extends Authentication implements CircleIdRequest {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */
@@ -50,29 +53,40 @@ public final class FetchDataRequest extends Authentication implements CircleIdRe
     private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
 
     /** CircleId. */
+    @Schema(description = "ID of the Circle to list, when fetching a page of metadata.", pattern = Constants.ID_PATTERN_REGEX, examples = { "5d2a0c7e-8c4f-4d7b-9a2e-3f1b6c0d9e8a" })
     @JsonbProperty(value = Constants.FIELD_CIRCLE_ID)
     @JsonbNillable
     private String circleId = null;
 
     /** DataId. */
+    @Schema(description = "ID of the Data Object to fetch, including its content.", pattern = Constants.ID_PATTERN_REGEX, examples = { "5d2a0c7e-8c4f-4d7b-9a2e-3f1b6c0d9e8a" })
     @JsonbProperty(value = Constants.FIELD_DATA_ID)
     @JsonbNillable
     private String dataId = null;
 
     /** Page Number. */
+    @Schema(description = "Page to return, starting at 1. A page beyond the last record returns an empty list.", minimum = "1", defaultValue = "1", examples = { "1" })
     @JsonbProperty(value = Constants.FIELD_PAGE_NUMBER)
     @JsonbNillable
     private Integer pageNumber = 1;
 
     /** Page Size. */
+    @Schema(description = "Number of records per page, from 1 to 100.", minimum = "1", maximum = "100", defaultValue = "100", examples = { "20" })
     @JsonbProperty(value = Constants.FIELD_PAGE_SIZE)
     @JsonbNillable
     private Integer pageSize = Constants.MAX_PAGE_SIZE;
 
     /** DataName. */
+    @Schema(description = "Name of the Data Object to fetch, if no dataId is given.", maxLength = Constants.MAX_DATA_NAME_LENGTH, examples = { "report.pdf" })
     @JsonbProperty(value = Constants.FIELD_DATA_NAME)
     @JsonbNillable
     private String dataName = null;
+
+    @Schema(description = "Also list the hidden entries of a folder, whose names start with a dot, like the folder of a feature with its entries; default false.",
+            defaultValue = "false", examples = { "false" })
+    @JsonbProperty(value = Constants.FIELD_INCLUDE_HIDDEN)
+    @JsonbNillable
+    private Boolean includeHidden = false;
 
     // =========================================================================
     // Standard Methods (Constructor, Setters & Getters)
@@ -173,6 +187,23 @@ public final class FetchDataRequest extends Authentication implements CircleIdRe
      */
     public String getDataName() {
         return dataName;
+    }
+
+    public void setIncludeHidden(final Boolean includeHidden) {
+        this.includeHidden = includeHidden;
+    }
+
+    public Boolean getIncludeHidden() {
+        return includeHidden;
+    }
+
+    /**
+     * Whether a folder listing includes the hidden entries.
+     *
+     * @return True if the hidden entries are listed
+     */
+    public boolean includesHidden() {
+        return Boolean.TRUE.equals(includeHidden);
     }
 
     // =========================================================================

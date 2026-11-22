@@ -16,6 +16,7 @@
  */
 package net.haugr.eds.api.requests;
 
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import net.haugr.eds.api.Share;
 import net.haugr.eds.api.common.Constants;
 
@@ -31,6 +32,7 @@ import java.io.Serial;
  * @author Kim Jensen
  * @since EDS 1.0
  */
+@Schema(description = "Request for all Data Types.")
 public final class FetchDataTypeRequest extends Authentication {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */

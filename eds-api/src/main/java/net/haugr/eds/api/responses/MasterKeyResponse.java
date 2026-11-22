@@ -16,6 +16,7 @@
  */
 package net.haugr.eds.api.responses;
 
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import net.haugr.eds.api.common.Constants;
 import net.haugr.eds.api.common.ReturnCode;
 
@@ -33,6 +34,7 @@ import java.io.Serial;
  * @author Kim Jensen
  * @since EDS 1.0
  */
+@Schema(description = "Result of a MasterKey request; returnMessage says what happened.")
 public final class MasterKeyResponse extends EDSResponse {
 
     /** {@link Constants#SERIAL_VERSION_UID}. */

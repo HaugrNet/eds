@@ -16,8 +16,6 @@
  */
 package net.haugr.eds.core.model.entities;
 
-import net.haugr.eds.api.common.Constants;
-import java.time.LocalDateTime;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -25,53 +23,54 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.NamedQuery;
 import jakarta.persistence.Table;
+import java.time.LocalDateTime;
 
 /**
- * <p>EDS Signature Entity, maps the Signature table from the Database.</p>
+ * <p>A Session of a Member (PLAN.md, Crypto §2a and "Several sessions"). A
+ * Member may have several, one per login: the keyed hash of the Session
+ * token for the lookup, the Session copy of the Member's private keys, and
+ * the expiry, which is part of the AADs of that copy.</p>
  *
  * @author Kim Jensen
- * @since EDS 1.0
+ * @since EDS 2.0
  */
 @Entity
-@NamedQuery(name = "signature.readAll",
-        query = "select s from SignatureEntity s")
-@NamedQuery(name = "signature.findByChecksum",
-        query = "select s from SignatureEntity s " +
+@NamedQuery(name = "session.findByChecksum",
+        query = "select s " +
+                "from SessionEntity s " +
                 "where s.checksum = :checksum")
-@NamedQuery(name = "signature.findByMember",
-        query = "select s from SignatureEntity s " +
+@NamedQuery(name = "session.findByMember",
+        query = "select s " +
+                "from SessionEntity s " +
                 "where s.member = :member " +
-                "order by s.id desc")
-@Table(name = "eds_signatures")
-public class SignatureEntity extends EDSEntity {
+                "order by s.expire asc, s.id asc")
+@NamedQuery(name = "session.removeByMember",
+        query = "delete from SessionEntity s " +
+                "where s.member = :member")
+@NamedQuery(name = "session.removeAll",
+        query = "delete from SessionEntity s")
+@NamedQuery(name = "session.removeExpired",
+        query = "delete from SessionEntity s " +
+                "where s.expire <= current_timestamp")
+@Table(name = "eds_sessions")
+public class SessionEntity extends EDSEntity {
 
-    @ManyToOne(targetEntity = MemberEntity.class, fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(targetEntity = MemberEntity.class, fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "member_id", referencedColumnName = "id", nullable = false, updatable = false)
     private MemberEntity member = null;
 
-    @Column(name = "public_key", nullable = false, length = 3072)
-    private String publicKey = null;
-
-    @Column(name = "checksum", updatable = false, length = Constants.MAX_STRING_LENGTH)
+    @Column(name = "checksum", unique = true, nullable = false, updatable = false, length = 256)
     private String checksum = null;
 
-    @Column(name = "verifications")
-    private Long verifications = 0L;
+    @Column(name = "crypto", nullable = false, updatable = false, length = 16384)
+    private String crypto = null;
 
-    @Column(name = "expires", updatable = false)
-    private LocalDateTime expires = null;
+    @Column(name = "expire", nullable = false, updatable = false)
+    private LocalDateTime expire = null;
 
     // =========================================================================
     // Entity Setters & Getters
     // =========================================================================
-
-    public void setPublicKey(final String publicKey) {
-        this.publicKey = publicKey;
-    }
-
-    public String getPublicKey() {
-        return publicKey;
-    }
 
     public void setMember(final MemberEntity member) {
         this.member = member;
@@ -89,19 +88,19 @@ public class SignatureEntity extends EDSEntity {
         return checksum;
     }
 
-    public void setVerifications(final Long verifications) {
-        this.verifications = verifications;
+    public void setCrypto(final String crypto) {
+        this.crypto = crypto;
     }
 
-    public Long getVerifications() {
-        return verifications;
+    public String getCrypto() {
+        return crypto;
     }
 
-    public void setExpires(final LocalDateTime expires) {
-        this.expires = expires;
+    public void setExpire(final LocalDateTime expire) {
+        this.expire = expire;
     }
 
-    public LocalDateTime getExpires() {
-        return expires;
+    public LocalDateTime getExpire() {
+        return expire;
     }
 }

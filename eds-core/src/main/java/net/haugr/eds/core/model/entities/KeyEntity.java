@@ -18,22 +18,43 @@ package net.haugr.eds.core.model.entities;
 
 import net.haugr.eds.core.enums.KeyAlgorithm;
 import net.haugr.eds.core.enums.Status;
-import java.time.LocalDateTime;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.NamedQuery;
 import jakarta.persistence.Table;
 
 /**
- * <p>EDS Key Entity, maps the Key table from the Database.</p>
+ * <p>EDS Key Entity, maps the Key table from the Database: a Circle Secret
+ * of a Circle. The secret itself is only kept wrapped, with the Trustees; a
+ * Circle has one ACTIVE secret, and while it is rotated also the RETIRING
+ * one (PLAN.md, Crypto C6).</p>
  *
  * @author Kim Jensen
  * @since EDS 1.0
  */
 @Entity
+@NamedQuery(name = "key.findByCircleAndStatus",
+        query = "select k " +
+                "from KeyEntity k " +
+                "where k.circle = :circle" +
+                "  and k.status = :status " +
+                "order by k.id desc")
+@NamedQuery(name = "key.findForCircles",
+        query = "select k " +
+                "from KeyEntity k " +
+                "where k.circle in :circles" +
+                "  and k.status = :status")
 @Table(name = "eds_keys")
 public class KeyEntity extends EDSEntity {
+
+    @ManyToOne(targetEntity = CircleEntity.class, fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "circle_id", referencedColumnName = "id", nullable = false, updatable = false)
+    private CircleEntity circle = null;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "algorithm", nullable = false, updatable = false, length = 10)
@@ -43,15 +64,17 @@ public class KeyEntity extends EDSEntity {
     @Column(name = "status", nullable = false)
     private Status status = null;
 
-    @Column(name = "expires", updatable = false)
-    private LocalDateTime expires = null;
-
-    @Column(name = "grace_period", updatable = false)
-    private Integer gracePeriod = null;
-
     // =========================================================================
     // Entity Setters & Getters
     // =========================================================================
+
+    public void setCircle(final CircleEntity circle) {
+        this.circle = circle;
+    }
+
+    public CircleEntity getCircle() {
+        return circle;
+    }
 
     public void setAlgorithm(final KeyAlgorithm algorithm) {
         this.algorithm = algorithm;
@@ -69,19 +92,4 @@ public class KeyEntity extends EDSEntity {
         return status;
     }
 
-    public void setExpires(final LocalDateTime expires) {
-        this.expires = expires;
-    }
-
-    public LocalDateTime getExpires() {
-        return expires;
-    }
-
-    public void setGracePeriod(final Integer gracePeriod) {
-        this.gracePeriod = gracePeriod;
-    }
-
-    public Integer getGracePeriod() {
-        return gracePeriod;
-    }
 }

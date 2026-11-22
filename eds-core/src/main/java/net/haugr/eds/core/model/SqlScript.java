@@ -49,41 +49,52 @@ public final class SqlScript {
     public static List<String> split(final String script) {
         final List<String> statements = new ArrayList<>();
         final StringBuilder current = new StringBuilder();
-        final int length = script.length();
         int i = 0;
-
-        while (i < length) {
-            final char c = script.charAt(i);
-            final char next = (i + 1 < length) ? script.charAt(i + 1) : '\0';
-
-            if (c == '-' && next == '-') {
-                // Line comment, skip to the end of the line
-                while (i < length && script.charAt(i) != '\n') {
-                    i++;
-                }
-            } else if (c == '/' && next == '*') {
-                // Block comment, skip to the closing marker
-                final int end = script.indexOf("*/", i + 2);
-                i = (end < 0) ? length : end + 2;
-                current.append(' ');
-            } else if (c == '\'' || c == '"') {
-                // String literal or quoted identifier; a doubled quote is an
-                // escaped quote, which the loop handles as two literals
-                final int end = script.indexOf(c, i + 1);
-                final int stop = (end < 0) ? length : end + 1;
-                current.append(script, i, stop);
-                i = stop;
-            } else if (c == ';') {
-                addStatement(statements, current);
-                i++;
-            } else {
-                current.append(c);
-                i++;
-            }
+        while (i < script.length()) {
+            i = step(script, i, current, statements);
         }
         addStatement(statements, current);
 
         return statements;
+    }
+
+    /**
+     * Takes what starts at the given position: a comment, a quoted part, the
+     * end of a statement, or a single character.
+     *
+     * @return The position after it
+     */
+    private static int step(final String script, final int i, final StringBuilder current, final List<String> statements) {
+        final int length = script.length();
+        final char c = script.charAt(i);
+        final char next = (i + 1 < length) ? script.charAt(i + 1) : '\0';
+
+        if (c == '-' && next == '-') {
+            // Line comment, skip to the end of the line
+            final int end = script.indexOf('\n', i);
+            return (end < 0) ? length : end;
+        }
+        if (c == '/' && next == '*') {
+            // Block comment, skip to the closing marker
+            final int end = script.indexOf("*/", i + 2);
+            current.append(' ');
+            return (end < 0) ? length : (end + 2);
+        }
+        if (c == '\'' || c == '"') {
+            // String literal or quoted identifier; a doubled quote is an
+            // escaped quote, which the loop handles as two literals
+            final int end = script.indexOf(c, i + 1);
+            final int stop = (end < 0) ? length : (end + 1);
+            current.append(script, i, stop);
+            return stop;
+        }
+        if (c == ';') {
+            addStatement(statements, current);
+        } else {
+            current.append(c);
+        }
+
+        return i + 1;
     }
 
     private static void addStatement(final List<String> statements, final StringBuilder current) {

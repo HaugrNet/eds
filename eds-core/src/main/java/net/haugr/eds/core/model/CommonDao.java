@@ -38,7 +38,9 @@ import net.haugr.eds.core.model.entities.EDSEntity;
 import net.haugr.eds.core.model.entities.CircleEntity;
 import net.haugr.eds.core.model.entities.DataTypeEntity;
 import net.haugr.eds.core.model.entities.Externable;
+import net.haugr.eds.core.model.entities.MasterKeyEntity;
 import net.haugr.eds.core.model.entities.MemberEntity;
+import net.haugr.eds.core.model.entities.SessionEntity;
 import net.haugr.eds.core.model.entities.SettingEntity;
 import net.haugr.eds.core.model.entities.TrusteeEntity;
 
@@ -57,6 +59,16 @@ public class CommonDao {
     protected static final String SINCE = "since";
     protected static final String NAME = "name";
     protected final EntityManager entityManager;
+
+    /**
+     * The Entity Manager of this DAO, for a DAO of another kind which is to
+     * work in the same persistence context.
+     *
+     * @return The Entity Manager
+     */
+    public EntityManager entityManager() {
+        return entityManager;
+    }
 
     /**
      * <p>Default Constructor.</p>
@@ -156,16 +168,109 @@ public class CommonDao {
         return entityManager.getReference(edsEntity, id);
     }
 
+    /**
+     * Locks the row of a Circle until the end of the transaction, so writes
+     * which must not run in parallel for one Circle are serialized.
+     *
+     * @param circle The Circle
+     */
+    public void lockCircle(final CircleEntity circle) {
+        entityManager.lock(circle, LockModeType.PESSIMISTIC_WRITE);
+    }
+
+    /**
+     * Locks the rows of several Circles, in the order of their IDs, so two
+     * transactions which lock some of the same never wait for each other.
+     *
+     * @param circles The Circles
+     */
+    public void lockCircles(final java.util.Collection<CircleEntity> circles) {
+        circles.stream()
+                .collect(java.util.stream.Collectors.toMap(CircleEntity::getId, java.util.function.Function.identity(), (a, b) -> a, java.util.TreeMap::new))
+                .values()
+                .forEach(this::lockCircle);
+    }
+
+    /**
+     * Deletes the content of all Data Objects of a Circle, before the Circle
+     * itself and its Circle Secrets are deleted.
+     *
+     * @param circle The Circle
+     */
+    public void deleteContentOfCircle(final CircleEntity circle) {
+        entityManager.flush();
+        entityManager.createNamedQuery("data.deleteByCircle")
+                .setParameter("circle", circle)
+                .executeUpdate();
+    }
+
+    /**
+     * Deletes a Circle, whose Trustees and content are deleted already; the
+     * database takes its Circle Secrets, folders, features and invitations
+     * with it.
+     *
+     * @param circle The Circle
+     */
+    public void deleteCircle(final CircleEntity circle) {
+        entityManager.flush();
+        entityManager.detach(circle);
+        entityManager.createQuery("delete from CircleEntity c where c.id = :id")
+                .setParameter("id", circle.getId())
+                .executeUpdate();
+    }
+
+    /**
+     * Reads the entity anew from the database, e.g. after the row of its
+     * Circle was locked, so it shows what was committed until then. What
+     * this transaction changed is written first, so it isn't lost.
+     *
+     * @param entity The entity
+     * @param <E>    Entity type
+     */
+    public <E extends EDSEntity> void refresh(final E entity) {
+        entityManager.flush();
+        entityManager.refresh(entity);
+    }
+
     public <E extends EDSEntity> void delete(final E entity) {
         entityManager.remove(entity);
     }
 
-    public void removeSession(final MemberEntity member) {
-        member.setSessionChecksum(null);
-        member.setSessionCrypto(null);
-        member.setSessionExpire(null);
+    /**
+     * Ends one Session.
+     *
+     * @param session The Session to end
+     */
+    public void removeSession(final SessionEntity session) {
+        entityManager.remove(session);
+    }
 
-        save(member);
+    /**
+     * Ends all Sessions of a Member (PLAN.md, "Several sessions").
+     *
+     * @param member The Member, who may be new and not yet saved
+     */
+    public void removeSessions(final MemberEntity member) {
+        member.setSessionExpire(null);
+        if (member.getId() != null) {
+            entityManager
+                    .createNamedQuery("session.removeByMember")
+                    .setParameter(MEMBER, member)
+                    .executeUpdate();
+        }
+    }
+
+    /**
+     * The Sessions of a Member, the one which expires first at the top.
+     *
+     * @param member The Member
+     * @return Their Sessions
+     */
+    public List<SessionEntity> findSessions(final MemberEntity member) {
+        return entityManager
+                .createNamedQuery("session.findByMember", SessionEntity.class)
+                .setParameter(MEMBER, member)
+                .getResultList();
     }
 
     public MemberEntity findMemberByName(final String name) {
@@ -192,9 +297,9 @@ public class CommonDao {
      * @param checksum Checksum of a Member SessionKey
      * @return MemberEntity with a matching SessionKey checksum
      */
-    public MemberEntity findMemberByChecksum(final String checksum) {
+    public SessionEntity findSessionByChecksum(final String checksum) {
         final Query query = entityManager
-                .createNamedQuery("member.findByChecksum")
+                .createNamedQuery("session.findByChecksum")
                 .setParameter("checksum", checksum);
 
         return findSingleRecord(query);
@@ -287,6 +392,46 @@ public class CommonDao {
                 .setParameter("name", setting.getKey());
 
         return findSingleRecord(query);
+    }
+
+    public EntityManager getEntityManager() {
+        return entityManager;
+    }
+
+    /**
+     * Detaches the entity from the persistence context, so later changes
+     * made directly via JDBC aren't overwritten by a flush.
+     *
+     * @param entity Entity to detach
+     */
+    public void detach(final EDSEntity entity) {
+        entityManager.detach(entity);
+    }
+
+    /**
+     * Finds the current MasterKey record, i.e. the one with the highest
+     * version, or null if no MasterKey was set up yet.
+     *
+     * @return Current MasterKey record, or null
+     */
+    public MasterKeyEntity findCurrentMasterKey() {
+        final Query query = entityManager
+                .createNamedQuery("masterkey.findAllByVersion")
+                .setMaxResults(1);
+
+        return findSingleRecord(query);
+    }
+
+    /**
+     * Lets those who come to a stone without accounts in one at a time,
+     * until the transaction ends: the row of the schema version, which
+     * every stone has, is locked for it. What is locked says nothing; it
+     * is a row which is there before any account is.
+     */
+    public void lockForTheFirstAccount() {
+        entityManager.createQuery("select v from VersionEntity v order by v.id asc")
+                .setLockMode(LockModeType.PESSIMISTIC_WRITE)
+                .getResultList();
     }
 
     public Long countMembers() {

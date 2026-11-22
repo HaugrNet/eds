@@ -67,6 +67,25 @@ import jakarta.persistence.Table;
                 "  and m.name = '/'" +
                 "  and m.parentId = 0 " +
                 "order by m.id desc")
+@NamedQuery(name = "metadata.findVisibleByMemberAndFolder",
+        query = "select m " +
+                "from MetadataEntity m," +
+                "     TrusteeEntity t " +
+                "where m.circle.id = t.circle.id" +
+                "  and t.member = :member" +
+                "  and m.parentId = :parentId" +
+                "  and m.name not like '.%' " +
+                "order by m.id desc")
+@NamedQuery(name = "metadata.countVisibleFolderContent",
+        query = "select count(m.id) " +
+                "from MetadataEntity m " +
+                "where m.parentId = :parentId" +
+                "  and m.name not like '.%'")
+@NamedQuery(name = "metadata.findThumbnails",
+        query = "select m " +
+                "from MetadataEntity m " +
+                "where m.parentId in :parentIds" +
+                "  and m.type.name = 'thumbnail'")
 @NamedQuery(name = "metadata.findInFolder",
         query = "select m " +
                 "from MetadataEntity m," +
@@ -75,6 +94,12 @@ import jakarta.persistence.Table;
                 "  and t.member = :member" +
                 "  and m.parentId = :parentId" +
                 "  and lower(m.name) = lower(:name)")
+@NamedQuery(name = "metadata.findByNameKeyInFolder",
+        query = "select m " +
+                "from MetadataEntity m " +
+                "where m.id <> :id" +
+                "  and m.nameKey = :nameKey" +
+                "  and m.parentId = :parentId")
 @NamedQuery(name = "metadata.findByNameAndFolder",
         query = "select m " +
                 "from MetadataEntity m " +
@@ -85,15 +110,6 @@ import jakarta.persistence.Table;
         query = "select count(m.id) " +
                 "from MetadataEntity m " +
                 "where m.parentId = :parentId")
-@NamedQuery(name = "metadata.readInventoryRecords",
-        query = "select m " +
-                "from MetadataEntity m " +
-                "where m.type.name <> 'folder' " +
-                "order by m.id desc")
-@NamedQuery(name = "metadata.countInventoryRecords",
-        query = "select count(m.id) " +
-                "from MetadataEntity m " +
-                "where m.type.name <> 'folder'")
 @Table(name = "eds_metadata")
 public class MetadataEntity extends Externable {
 
@@ -108,8 +124,19 @@ public class MetadataEntity extends Externable {
     @JoinColumn(name = "datatype_id", referencedColumnName = "id", nullable = false, updatable = false)
     private DataTypeEntity type = null;
 
-    @Column(name = "name", length = Constants.MAX_NAME_LENGTH)
+    @Column(name = "name", length = Constants.MAX_DATA_NAME_LENGTH)
     private String name = null;
+
+    /**
+     * The keyed hash of the name a client of a chamber sends (E2E.md), as the
+     * name itself is ciphertext which differs each time. Unique within the
+     * folder, like the name; null where none was sent.
+     */
+    @Column(name = "name_key", length = Constants.MAX_NAME_KEY_LENGTH)
+    private String nameKey = null;
+
+    @Column(name = "media_type")
+    private String mediaType = null;
 
     // =========================================================================
     // Entity Setters & Getters
@@ -145,5 +172,21 @@ public class MetadataEntity extends Externable {
 
     public String getName() {
         return name;
+    }
+
+    public void setNameKey(final String nameKey) {
+        this.nameKey = nameKey;
+    }
+
+    public String getNameKey() {
+        return nameKey;
+    }
+
+    public void setMediaType(final String mediaType) {
+        this.mediaType = mediaType;
+    }
+
+    public String getMediaType() {
+        return mediaType;
     }
 }

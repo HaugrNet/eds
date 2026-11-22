@@ -58,9 +58,9 @@ public class SchemaManager {
     private static final String SCHEMA_SCRIPT = "META-INF/eds-schema.sql";
     private static final String VERSION_TABLE = "eds_versions";
     private static final String POSTGRESQL = "PostgreSQL";
-    // Arbitrary, but fixed, key for the PostgreSQL advisory lock, which
-    // serializes the schema creation between EDS instances ("EDSSCHMA").
-    private static final long SCHEMA_LOCK_KEY = 0x4544535343484D41L;
+    // The PostgreSQL advisory lock which serializes the schema creation
+    // between EDS instances; its key is arbitrary, but fixed ("EDSSCHMA").
+    private static final String SCHEMA_LOCK = "SELECT pg_advisory_xact_lock(" + 0x4544535343484D41L + ')';
 
     /**
      * The outcome of preparing the database.
@@ -79,6 +79,8 @@ public class SchemaManager {
 
     private final DataSource dataSource;
     private volatile String lastConnectionError = null;
+    private volatile String databaseProduct = null;
+    private volatile Boolean persistent = null;
 
     /**
      * Creates a new Schema Manager for the given datasource.
@@ -97,6 +99,10 @@ public class SchemaManager {
      *
      * @return The outcome
      */
+    // A refused connection is not swallowed: its message is kept for the
+    // caller, who decides how to report and retry it, rather than logged
+    // here at every attempt.
+    @SuppressWarnings("java:S1166")
     public Outcome prepare() {
         final Connection connection;
         try {
@@ -107,6 +113,12 @@ public class SchemaManager {
         }
 
         try (connection) {
+            final DatabaseMetaData metaData = connection.getMetaData();
+            final String product = metaData.getDatabaseProductName();
+            databaseProduct = product;
+            // H2 is persistent when it is file based, and not when it is
+            // in-memory; everything else is PostgreSQL, which persists.
+            persistent = persistentDatabase(connection);
             if (tableExists(connection.getMetaData(), VERSION_TABLE)) {
                 LOGGER.info("The EDS schema exists.");
             } else {
@@ -114,9 +126,45 @@ public class SchemaManager {
             }
             return Outcome.READY;
         } catch (SQLException | IOException e) {
-            LOGGER.error("Cannot prepare the EDS database: {}", e.getMessage(), e);
+            LOGGER.error("Cannot prepare the EDS database.", e);
             return Outcome.FAILED;
         }
+    }
+
+    /** The ceiling of a test system, unless eds.data.max.total.size sets one. */
+    public static final long TEST_SYSTEM_BYTES = 2L << 30;
+
+    /** The ceiling of a production system, unless eds.data.max.total.size sets one. */
+    public static final long PRODUCTION_SYSTEM_BYTES = 250L << 30;
+
+    /**
+     * The ceiling that applies for all stored content together: the setting
+     * {@code eds.data.max.total.size} if it is positive, otherwise the default
+     * for the kind of system (2 GiB test, 250 GiB production).
+     *
+     * @param settings   EDS Settings
+     * @param connection Connection of the EDS database
+     * @return Ceiling in bytes of encrypted content
+     */
+    public static long ceiling(final Settings settings, final Connection connection) throws SQLException {
+        final long configured = settings.getDataMaxTotalSize();
+        if (configured > 0) {
+            return configured;
+        }
+        return persistentDatabase(connection) ? PRODUCTION_SYSTEM_BYTES : TEST_SYSTEM_BYTES;
+    }
+
+    /**
+     * Whether the database keeps its data over a restart: everything except
+     * in-memory H2.
+     *
+     * @param connection Connection of the EDS database
+     * @return True if the data survives a restart
+     */
+    public static boolean persistentDatabase(final Connection connection) throws SQLException {
+        final DatabaseMetaData metaData = connection.getMetaData();
+        final String url = metaData.getURL();
+        return !(url != null && url.toLowerCase(Locale.ROOT).startsWith("jdbc:h2:mem:"));
     }
 
     /**
@@ -128,6 +176,32 @@ public class SchemaManager {
         return lastConnectionError;
     }
 
+    /**
+     * Returns the product name of the database, e.g. "H2" or "PostgreSQL".
+     *
+     * @return Database product name, or null if the database has not been
+     *         reached since EDS started
+     */
+    public String getDatabaseProduct() {
+        return databaseProduct;
+    }
+
+    /**
+     * Returns whether the data survives a restart of EDS. In-memory H2 means
+     * a test system, as it loses everything when it stops.
+     *
+     * @return True if persistent, false if not, null if the database has not
+     *         been reached since EDS started
+     */
+    public Boolean isPersistent() {
+        return persistent;
+    }
+
+    // The statements are those of the schema script in the EDS JAR, never
+    // anything from outside. They run one by one, not as a batch: they are
+    // DDL, run once, a failure stops at its statement, and drivers differ in
+    // what they allow in a batch.
+    @SuppressWarnings({"findsecbugs:SQL_INJECTION_JDBC", "java:S6912"})
     private static void createSchema(final Connection connection) throws SQLException, IOException {
         final List<String> statements = SqlScript.split(readSchema());
         final boolean postgresql = POSTGRESQL.equalsIgnoreCase(connection.getMetaData().getDatabaseProductName());
@@ -139,7 +213,7 @@ public class SchemaManager {
                 // Blocks while another instance holds the lock, i.e. while it
                 // creates the schema. The lock is released by the commit or
                 // rollback, or if the connection is lost.
-                statement.execute("SELECT pg_advisory_xact_lock(" + SCHEMA_LOCK_KEY + ')');
+                statement.execute(SCHEMA_LOCK);
                 if (tableExists(connection.getMetaData(), VERSION_TABLE)) {
                     connection.commit();
                     LOGGER.info("The EDS schema was created by another EDS instance.");
@@ -169,11 +243,14 @@ public class SchemaManager {
 
     /**
      * Databases differ in how they store unquoted identifiers (PostgreSQL in
-     * lower case, H2 in upper case), so the metadata is asked for both.
+     * lower case, H2 in upper case), so the metadata is asked for both. Only
+     * the Connection's current schema counts, where the tables are created;
+     * EDS tables in another schema of the same database are not this EDS.
      */
     private static boolean tableExists(final DatabaseMetaData metaData, final String table) throws SQLException {
+        final String schema = metaData.getConnection().getSchema();
         for (final String name : List.of(table.toLowerCase(Locale.ROOT), table.toUpperCase(Locale.ROOT))) {
-            try (ResultSet tables = metaData.getTables(null, null, name, new String[] { "TABLE" })) {
+            try (ResultSet tables = metaData.getTables(null, schema, name, new String[] { "TABLE" })) {
                 if (tables.next()) {
                     return true;
                 }

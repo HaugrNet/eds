@@ -36,6 +36,20 @@ public final class MemberDao extends CommonDao {
         super(entityManager);
     }
 
+    /**
+     * The Circles which the Member is the last Trustee of: without the
+     * Member, nobody could unwrap their Circle Secrets.
+     *
+     * @param member The Member
+     * @return Names of the Circles
+     */
+    public List<String> findCircleNamesOfLastTrustee(final MemberEntity member) {
+        return entityManager
+                .createNamedQuery("trustee.findCircleNamesOfLastTrustee", String.class)
+                .setParameter(MEMBER, member)
+                .getResultList();
+    }
+
     public List<CircleEntity> findCirclesForMember(final MemberEntity member) {
         final Query query = entityManager
                 .createNamedQuery("trustee.findCirclesByMember")
@@ -51,5 +65,17 @@ public final class MemberDao extends CommonDao {
                 .setParameter("requested", requested);
 
         return findList(query);
+    }
+
+    /**
+     * Reads the room access of a Member's pending invitation.
+     *
+     * @param member The invited Member
+     * @return The Circles to join when the invitation is accepted
+     */
+    public List<net.haugr.eds.core.model.entities.InvitationEntity> findInvitations(final MemberEntity member) {
+        return entityManager.createNamedQuery("invitation.findByMember", net.haugr.eds.core.model.entities.InvitationEntity.class)
+                .setParameter("member", member)
+                .getResultList();
     }
 }

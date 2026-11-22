@@ -26,6 +26,7 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.NamedQuery;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 
 /**
  * <p>EDS Member Entity, maps the Member table from the Database.</p>
@@ -41,10 +42,6 @@ import jakarta.persistence.Table;
         query = "select m " +
                 "from MemberEntity m " +
                 "where lower(m.name) = lower(:name)")
-@NamedQuery(name = "member.findByChecksum",
-        query = "select m " +
-                "from MemberEntity m " +
-                "where m.sessionChecksum = :checksum")
 @NamedQuery(name = "member.findByRole",
         query = "select m " +
                 "from MemberEntity m " +
@@ -55,33 +52,36 @@ import jakarta.persistence.Table;
                 "from TrusteeEntity e " +
                 "where lower(e.member.name) = lower(:name)" +
                 "  and e.circle.externalId = :externalCircleId")
-@NamedQuery(name = "member.removeExpiredSessions",
-        query = "update MemberEntity set" +
-                " sessionChecksum = null," +
-                " sessionCrypto = null," +
-                " sessionExpire = null " +
-                "where sessionExpire <= current_timestamp")
+@NamedQuery(name = "member.removeExpiredInvitations",
+        query = "delete from MemberEntity " +
+                "where invitationExpire <= current_timestamp")
 @Table(name = "eds_members")
 public class MemberEntity extends Externable {
 
     @Column(name = "name", unique = true, nullable = false, length = Constants.MAX_NAME_LENGTH)
     private String name = null;
 
-    @Column(name = "salt", unique = true, nullable = false, length = 64)
+    @Column(name = "salt", unique = true, nullable = false, length = 256)
     private String salt = null;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "pbe_algorithm", nullable = false, length = 25)
     private KeyAlgorithm pbeAlgorithm = null;
 
+    // The PBKDF2 iterations the keys of this account were protected with:
+    // the setting at the time the passphrase was set. Used at each login, so
+    // the setting can change without locking anyone out.
+    @Column(name = "pbe_iterations", nullable = false)
+    private Integer pbeIterations = null;
+
     @Enumerated(EnumType.STRING)
-    @Column(name = "rsa_algorithm", nullable = false, length = 25)
-    private KeyAlgorithm rsaAlgorithm = null;
+    @Column(name = "key_algorithm", nullable = false, length = 25)
+    private KeyAlgorithm keyAlgorithm = null;
 
     @Column(name = "external_key")
     private String memberKey = null;
 
-    @Column(name = "public_key", nullable = false, length = 3072)
+    @Column(name = "public_key", nullable = false, length = 4096)
     private String publicKey = null;
 
     @Column(name = "private_key", nullable = false, length = 16384)
@@ -91,14 +91,31 @@ public class MemberEntity extends Externable {
     @Column(name = "member_role", nullable = false, length = 10)
     private MemberRole memberRole = null;
 
-    @Column(name = "session_checksum", length = 256)
-    private String sessionChecksum = null;
+    @Column(name = "avatar", length = Constants.MAX_AVATAR_LENGTH)
+    private String avatar = null;
 
-    @Column(name = "session_crypto", length = 16384)
-    private String sessionCrypto = null;
+    // The Member's own settings for clients (language, theme, ...), a JSON
+    // object which EDS only stores.
+    @Column(name = "settings", length = Constants.MAX_MEMBER_SETTINGS_LENGTH)
+    private String settings = null;
 
-    @Column(name = "session_expire")
+    /**
+     * The Member's vault (E2E.md): text of a client, stored as given and
+     * returned to the Member only.
+     */
+    @Column(name = "external_vault", length = Constants.MAX_VAULT_LENGTH)
+    private String vault = null;
+
+    /**
+     * The expiry of the Session this request came with, or which a login
+     * just made (PLAN.md, "Several sessions"). Not stored with the Member:
+     * the Sessions are rows of their own, see {@link SessionEntity}.
+     */
+    @Transient
     private LocalDateTime sessionExpire = null;
+
+    @Column(name = "invitation_expire")
+    private LocalDateTime invitationExpire = null;
 
     // =========================================================================
     // Entity Setters & Getters
@@ -128,12 +145,20 @@ public class MemberEntity extends Externable {
         return pbeAlgorithm;
     }
 
-    public void setRsaAlgorithm(final KeyAlgorithm algorithm) {
-        this.rsaAlgorithm = algorithm;
+    public void setPbeIterations(final Integer pbeIterations) {
+        this.pbeIterations = pbeIterations;
     }
 
-    public KeyAlgorithm getRsaAlgorithm() {
-        return rsaAlgorithm;
+    public Integer getPbeIterations() {
+        return pbeIterations;
+    }
+
+    public void setKeyAlgorithm(final KeyAlgorithm algorithm) {
+        this.keyAlgorithm = algorithm;
+    }
+
+    public KeyAlgorithm getKeyAlgorithm() {
+        return keyAlgorithm;
     }
 
     public void setMemberKey(final String memberKey) {
@@ -168,20 +193,20 @@ public class MemberEntity extends Externable {
         return memberRole;
     }
 
-    public void setSessionChecksum(final String sessionChecksum) {
-        this.sessionChecksum = sessionChecksum;
+    public void setAvatar(final String avatar) {
+        this.avatar = avatar;
     }
 
-    public String getSessionChecksum() {
-        return sessionChecksum;
+    public String getAvatar() {
+        return avatar;
     }
 
-    public void setSessionCrypto(final String sessionCrypto) {
-        this.sessionCrypto = sessionCrypto;
+    public void setSettings(final String settings) {
+        this.settings = settings;
     }
 
-    public String getSessionCrypto() {
-        return sessionCrypto;
+    public String getSettings() {
+        return settings;
     }
 
     public void setSessionExpire(final LocalDateTime sessionExpire) {
@@ -190,5 +215,21 @@ public class MemberEntity extends Externable {
 
     public LocalDateTime getSessionExpire() {
         return sessionExpire;
+    }
+
+    public void setInvitationExpire(final LocalDateTime invitationExpire) {
+        this.invitationExpire = invitationExpire;
+    }
+
+    public LocalDateTime getInvitationExpire() {
+        return invitationExpire;
+    }
+
+    public void setVault(final String vault) {
+        this.vault = vault;
+    }
+
+    public String getVault() {
+        return vault;
     }
 }

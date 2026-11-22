@@ -54,12 +54,6 @@ public enum Permission {
     FETCH_DATA_TYPE(TrustLevel.READ, "Fetch Data Types."),
 
     /**
-     * Fetching Signatures is a Member-only feature, whereby a Member may
-     * receive a list of their own Signatures, with status information.
-     */
-    FETCH_SIGNATURES(TrustLevel.ALL, "Fetch Signatures."),
-
-    /**
      * Processing of Members is limited to the System Administrator. However,
      * any given Member may update their own settings, which include accountName
      * and Passphrase.
@@ -93,16 +87,6 @@ public enum Permission {
     PROCESS_DATA_TYPE(TrustLevel.WRITE, "Process Data Type."),
 
     /**
-     * Anyone may create a Digital Signature for a given Document.
-     */
-    CREATE_SIGNATURE(TrustLevel.ALL, "Create Digital Signature."),
-
-    /**
-     * Anyone may verify a digital Signature for a Document.
-     */
-    VERIFY_SIGNATURE(TrustLevel.ALL, "Verify Digital Signature."),
-
-    /**
      * Altering the settings is only allowed to be performed by a System
      * Administrator, as part of the setup or later altering the system.
      */
@@ -114,13 +98,6 @@ public enum Permission {
      * otherwise be useless.
      */
     MASTER_KEY(TrustLevel.SYSOP, "Update Master Key."),
-
-    /**
-     * Retrieving a complete listing of all metadata is useful if the EDS is
-     * used to store part of data, and the two storage's gets out-of-sync. The
-     * request can and should only be made by a System Administrator.
-     */
-    INVENTORY(TrustLevel.SYSOP, "System Inventory."),
 
     /**
      * The Sanity checks are something limited to the System or Circle

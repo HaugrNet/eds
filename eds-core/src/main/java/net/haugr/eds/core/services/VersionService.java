@@ -55,8 +55,10 @@ public class VersionService {
      */
     @org.eclipse.microprofile.openapi.annotations.Operation(
             summary = "Get version",
-            description = "Returns the current version of the running EDS instance. This method serves mainly as a simple way to check if the system is operational.")
-    @org.eclipse.microprofile.openapi.annotations.responses.APIResponse(responseCode = "200", description = "Successful operation")
+            description = "Returns the version of the running EDS; also usable as a simple liveness check.")
+    @org.eclipse.microprofile.openapi.annotations.responses.APIResponse(responseCode = "200", description = "The outcome of the request; see returnCode.",
+            content = @org.eclipse.microprofile.openapi.annotations.media.Content(mediaType = jakarta.ws.rs.core.MediaType.APPLICATION_JSON,
+                    schema = @org.eclipse.microprofile.openapi.annotations.media.Schema(implementation = net.haugr.eds.api.responses.VersionResponse.class)))
     @POST
     @Produces(CommonService.PRODUCES)
     public Response version() {

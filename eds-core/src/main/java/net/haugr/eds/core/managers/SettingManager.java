@@ -17,18 +17,23 @@
 package net.haugr.eds.core.managers;
 
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 import jakarta.persistence.EntityManager;
+import net.haugr.eds.api.common.Constants;
 import net.haugr.eds.api.common.ReturnCode;
 import net.haugr.eds.api.requests.SettingRequest;
 import net.haugr.eds.api.responses.SettingResponse;
+import net.haugr.eds.core.enums.HashAlgorithm;
 import net.haugr.eds.core.enums.KeyAlgorithm;
 import net.haugr.eds.core.enums.Permission;
 import net.haugr.eds.core.enums.StandardSetting;
@@ -44,9 +49,9 @@ import net.haugr.eds.core.model.entities.SettingEntity;
  * be updated, but if the Flag is present, it is for a good reason - as it
  * prevents a change that can affect the system.</p>
  *
- * <p>Version 1.0 of EDS is only having one entry which may not be altered, the
- * System Salt. The reason is that if this is being changed, it will prevent anyone
- * from accessing the system, as the Member Keys cannot be unlocked.</p>
+ * <p>The only entry which may not be altered here is the MasterKey URL, which
+ * is changed with the MasterKey request. The PBE iterations count for new
+ * passphrases; each account keeps those of its own.</p>
  *
  * <p>For the same reason, the request can <b>only</b> be invoked by the System
  * Administrator. Since changing things must be strictly limited.</p>
@@ -62,6 +67,7 @@ import net.haugr.eds.core.model.entities.SettingEntity;
 public final class SettingManager extends AbstractManager<CommonDao, SettingResponse, SettingRequest> {
 
     private static final Pattern PATTERN_NUMBER = Pattern.compile("\\d+");
+    private static final int MIN_PBE_ITERATIONS = 1000;
 
     public SettingManager(final Settings settings, final EntityManager entityManager) {
         super(settings, new CommonDao(entityManager));
@@ -94,6 +100,7 @@ public final class SettingManager extends AbstractManager<CommonDao, SettingResp
 
         final SettingResponse response = new SettingResponse();
         response.setSettings(convert(settings));
+        response.setAllowedValues(allowedValues());
 
         return response;
     }
@@ -145,6 +152,10 @@ public final class SettingManager extends AbstractManager<CommonDao, SettingResp
         final StandardSetting standardSetting = StandardSetting.find(entry.getKey());
         if (standardSetting != null) {
             if (isEmpty(entry.getValue())) {
+                // A stone needn't have a name.
+                if (standardSetting == StandardSetting.STONE_NAME) {
+                    return;
+                }
                 throw new EDSException(ReturnCode.SETTING_WARNING, "The value for the key '" + entry.getKey() + "' is undefined.");
             } else {
                 checkAllowedValues(standardSetting, entry.getValue());
@@ -160,30 +171,60 @@ public final class SettingManager extends AbstractManager<CommonDao, SettingResp
             case ASYMMETRIC_ALGORITHM:
                 checkAlgorithm(KeyAlgorithm.Type.ASYMMETRIC, setting, value);
                 break;
-            case SIGNATURE_ALGORITHM, HASH_ALGORITHM:
-                checkAlgorithm(KeyAlgorithm.Type.SIGNATURE, setting, value);
+            case HASH_ALGORITHM:
+                checkHashAlgorithm(setting, value);
                 break;
             case PBE_ALGORITHM:
                 checkAlgorithm(KeyAlgorithm.Type.PASSWORD, setting, value);
                 break;
             case PBE_ITERATIONS:
-                // Changing the Iterations may only be done if no other accounts
-                // exist, as it will render all accounts useless otherwise
-                checkIfMembersExist(setting);
-                checkNumber(setting, value);
+                // Each account keeps the iterations of its passphrase, so
+                // the setting only counts for new passphrases.
+                checkIterations(setting, value);
                 break;
             case EDS_CHARSET:
                 checkCharset(setting, value);
                 break;
-            case SANITY_INTERVAL:
+            case SANITY_INTERVAL, INVITATION_TIMEOUT, SESSION_MAX_PER_MEMBER, DOWNLOAD_TOKEN_LIFETIME, STREAM_MAX_OBJECT_SIZE,
+                 STREAM_TRANSACTION_TIMEOUT, STREAM_READ_BATCH_SIZE, DATA_MAX_INLINE_SIZE, DATA_MAX_TOTAL_SIZE, SANITY_MAX_OBJECTS:
                 checkNumber(setting, value);
                 break;
-            case EDS_SALT:
-                checkIfMembersExist(setting);
+            case STONE_NAME:
+                if (value.trim().length() > Constants.MAX_STONE_NAME_LENGTH) {
+                    throw new EDSException(ReturnCode.SETTING_WARNING, "The value for '" + setting.getKey() + "' has at most " + Constants.MAX_STONE_NAME_LENGTH + " characters.");
+                }
+                break;
+            case STATUS_LOAD_INTERVAL:
+                checkRange(setting, value, 0, 3600);
+                break;
+            case STATUS_INVENTORY_INTERVAL:
+                checkRange(setting, value, 1, 10080);
+                break;
+            case CIRCLE_SECRET_ROTATION_DAYS:
+                checkRange(setting, value, 0, 36500);
+                break;
+            case CIRCLE_SECRET_ROTATION_THREADS:
+                checkRange(setting, value, 1, 64);
                 break;
             default:
                 checkOtherSettings(setting);
                 break;
+        }
+    }
+
+    private static void checkRange(final StandardSetting setting, final String value, final int min, final int max) {
+        checkNumber(setting, value);
+        if ((value.length() > 9) || (Integer.parseInt(value) < min) || (Integer.parseInt(value) > max)) {
+            throw new EDSException(ReturnCode.SETTING_WARNING, "The value for '" + setting.getKey() + "' must be from " + min + " to " + max + '.');
+        }
+    }
+
+    private static void checkHashAlgorithm(final StandardSetting setting, final String value) {
+        final boolean match = Arrays.stream(HashAlgorithm.values())
+                .anyMatch(algorithm -> Objects.equals(algorithm.name(), value));
+
+        if (!match) {
+            throw new EDSException(ReturnCode.SETTING_WARNING, "Unsupported Crypto Algorithm for '" + setting.getKey() + "'.");
         }
     }
 
@@ -229,14 +270,11 @@ public final class SettingManager extends AbstractManager<CommonDao, SettingResp
         }
     }
 
-    private void checkIfMembersExist(final StandardSetting setting) {
-        // If there is no change between the existing Salt and the one from the
-        // request, then we will simply ignore it.
-        if (dao.countMembers() > 1) {
-            // It is only allowed to update the System Salt provided that no
-            // other account exists than the System Administrator. If that is
-            // the case, then an exception is thrown.
-            throw new EDSException(ReturnCode.SETTING_WARNING, "The setting " + setting.getKey() + " may not be overwritten.");
+    private static void checkIterations(final StandardSetting setting, final String value) {
+        checkNumber(setting, value);
+        // Fewer make the passphrases easy to guess; more than an int can't be used.
+        if ((value.length() > 9) || (Integer.parseInt(value) < MIN_PBE_ITERATIONS)) {
+            throw new EDSException(ReturnCode.SETTING_WARNING, "The value for '" + setting.getKey() + "' must be from " + MIN_PBE_ITERATIONS + " to 999999999.");
         }
     }
 
@@ -261,18 +299,6 @@ public final class SettingManager extends AbstractManager<CommonDao, SettingResp
         entity.setSetting(value);
         dao.save(entity);
         settings.set(key, value);
-
-        // Now the tricky part - if we have a critical setting (Salt or PBE
-        // Iterations), which can only be updated when no members exist, we
-        // also have to update the System Administrator account. Otherwise,
-        // the new change will not work correctly.
-        if (Objects.equals(key, StandardSetting.EDS_SALT.getKey()) ||
-                Objects.equals(key, StandardSetting.PBE_ITERATIONS.getKey())) {
-            // As the System Administrator is not having any Circles, the
-            // newly generated Asymmetric Key for the updated account can be
-            // ignored.
-            updateMemberPassword(member, request.getCredential());
-        }
     }
 
     private static Map<String, SettingEntity> convertSettings(final Collection<SettingEntity> list) {
@@ -283,6 +309,31 @@ public final class SettingManager extends AbstractManager<CommonDao, SettingResp
         }
 
         return map;
+    }
+
+    /**
+     * The values EDS accepts for the settings with a fixed choice: the
+     * algorithms it supports.
+     *
+     * @return Setting keys with their allowed values
+     */
+    public static Map<String, List<String>> allowedValues() {
+        final Map<String, List<String>> map = new HashMap<>();
+        map.put(StandardSetting.SYMMETRIC_ALGORITHM.getKey(), names(findEntriesForType(KeyAlgorithm.Type.SYMMETRIC)));
+        map.put(StandardSetting.ASYMMETRIC_ALGORITHM.getKey(), names(findEntriesForType(KeyAlgorithm.Type.ASYMMETRIC)));
+        map.put(StandardSetting.PBE_ALGORITHM.getKey(), names(findEntriesForType(KeyAlgorithm.Type.PASSWORD)));
+        map.put(StandardSetting.HASH_ALGORITHM.getKey(), names(EnumSet.allOf(HashAlgorithm.class)));
+
+        return map;
+    }
+
+    private static List<String> names(final Collection<? extends Enum<?>> values) {
+        final List<String> names = new ArrayList<>(values.size());
+        for (final Enum<?> value : values) {
+            names.add(value.name());
+        }
+
+        return names;
     }
 
     public static Map<String, String> convert(final Settings settings) {

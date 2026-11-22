@@ -16,12 +16,9 @@
  */
 package net.haugr.eds.core.managers;
 
-import java.util.Base64;
+import java.security.MessageDigest;
 import java.util.List;
-import java.util.Objects;
 import jakarta.persistence.EntityManager;
-import net.haugr.eds.api.common.Constants;
-import net.haugr.eds.api.common.MemberRole;
 import net.haugr.eds.api.common.ReturnCode;
 import net.haugr.eds.api.requests.Authentication;
 import net.haugr.eds.api.requests.MasterKeyRequest;
@@ -29,31 +26,106 @@ import net.haugr.eds.api.responses.MasterKeyResponse;
 import net.haugr.eds.core.enums.StandardSetting;
 import net.haugr.eds.core.exceptions.AuthenticationException;
 import net.haugr.eds.core.exceptions.CryptoException;
-import net.haugr.eds.core.jce.Crypto;
+import net.haugr.eds.core.exceptions.EDSException;
 import net.haugr.eds.core.jce.MasterKey;
-import net.haugr.eds.core.jce.SecretEDSKey;
 import net.haugr.eds.core.model.CommonDao;
 import net.haugr.eds.core.model.Settings;
+import net.haugr.eds.core.model.entities.MasterKeyEntity;
 import net.haugr.eds.core.model.entities.MemberEntity;
 import net.haugr.eds.core.model.entities.SettingEntity;
+import net.haugr.eds.core.model.entities.CircleEntity;
+import net.haugr.eds.core.model.entities.TrusteeEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * <p>Business Logic implementation for the EDS MasterKey request.</p>
+ * <p>Business Logic for the EDS MasterKey (PLAN.md, Crypto §1): loading it at
+ * startup, unlocking a locked EDS, the first setup, and rotating it.</p>
+ *
+ * <p>The database only holds the version and key check value (KCV) of the
+ * MasterKey. A secret whose KCV doesn't match the stored one is rejected,
+ * without decrypting anything.</p>
  *
  * @author Kim Jensen
  * @since EDS 1.0
  */
 public final class MasterKeyManager extends AbstractManager<CommonDao, MasterKeyResponse, MasterKeyRequest> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(MasterKeyManager.class);
+    /** Environment variable, which overrides the {@code eds.masterkey.url} setting. */
+    public static final String MASTERKEY_URL_ENV = "EDS_MASTERKEY_URL";
 
-    private final MasterKey masterKey = MasterKey.getInstance(settings);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MasterKeyManager.class);
+    private static final String INVALID_CREDENTIALS = "Invalid credentials.";
+
+    private final MasterKey masterKey = MasterKey.getInstance();
 
     public MasterKeyManager(final Settings settings, final EntityManager entityManager) {
         super(settings, new CommonDao(entityManager));
     }
+
+    // =========================================================================
+    // Startup
+    // =========================================================================
+
+    /**
+     * <p>Loads the MasterKey from the external source at startup. The source
+     * is the URL in the environment variable {@value #MASTERKEY_URL_ENV}, the
+     * system property {@code eds.masterkey.url}, or the
+     * {@code eds.masterkey.url} setting, in this order.</p>
+     *
+     * <p>Without a source, or if the source can't be read or doesn't match
+     * the stored key check value, EDS stays locked. It can then be unlocked
+     * with the MasterKey request. There is no fallback secret.</p>
+     *
+     * @return True if EDS was unlocked
+     */
+    public boolean loadAtStartup() {
+        final String url = findMasterKeyUrl();
+        boolean unlocked = false;
+
+        if (url.isEmpty()) {
+            LOGGER.warn("No MasterKey source is configured ({} or {}), EDS is locked until it is unlocked with the MasterKey request.",
+                    MASTERKEY_URL_ENV, StandardSetting.MASTERKEY_URL.getKey());
+        } else {
+            try {
+                final byte[] secret = MasterKey.readMasterKeySecretFromUrl(url);
+                final MasterKeyEntity stored = dao.findCurrentMasterKey();
+
+                if (stored == null) {
+                    setupMasterKey(secret);
+                    LOGGER.info("The MasterKey was set up, version 1.");
+                    unlocked = true;
+                } else if (matches(MasterKey.derive(secret), stored)) {
+                    masterKey.install(MasterKey.derive(secret), stored.getVersion());
+                    LOGGER.info("The MasterKey was loaded, version {}.", stored.getVersion());
+                    unlocked = true;
+                } else {
+                    LOGGER.error("The MasterKey from the configured source doesn't match the stored key check value, EDS is locked.");
+                }
+            } catch (EDSException e) {
+                LOGGER.error("The MasterKey could not be loaded, EDS is locked: {}", e.getMessage(), e);
+                masterKey.lock();
+            }
+        }
+
+        return unlocked;
+    }
+
+    private String findMasterKeyUrl() {
+        String url = System.getenv(MASTERKEY_URL_ENV);
+        if ((url == null) || url.isBlank()) {
+            url = System.getProperty(StandardSetting.MASTERKEY_URL.getKey());
+        }
+        if ((url == null) || url.isBlank()) {
+            url = settings.getMasterKeyURL();
+        }
+
+        return url.trim();
+    }
+
+    // =========================================================================
+    // MasterKey Request
+    // =========================================================================
 
     /**
      * {@inheritDoc}
@@ -62,53 +134,130 @@ public final class MasterKeyManager extends AbstractManager<CommonDao, MasterKey
     public MasterKeyResponse perform(final MasterKeyRequest request) {
         verify(request);
 
-        if (!Objects.equals(request.getAccountName(), Constants.ADMIN_ACCOUNT)) {
-            throw new AuthenticationException("Given Account is not permitted to perform this request.");
-        }
+        checkPermitted(request);
 
-        return checkRequest(request);
+        final byte[] rawSecret = readRawSecret(request);
+        return masterKey.isUnlocked() ? processUnlocked(request, rawSecret) : processLocked(request, rawSecret);
     }
 
-    private MasterKeyResponse checkRequest(final MasterKeyRequest request) {
-        // First, retrieve the existing MasterKey, which we need to check.
-        // Primarily, updating it to an invalid key can be devastating. So
-        // it is initially being saved, just in case...
-        // What if the keys are the same?
-        final SecretEDSKey oldMasterKey = masterKey.getKey();
-        final byte[] rawSecret = readRawSecret(request);
-        final SecretEDSKey newMasterKey = masterKey.generateMasterKey(rawSecret);
+    private MasterKeyResponse processLocked(final MasterKeyRequest request, final byte[] rawSecret) {
+        final MasterKeyEntity stored = dao.findCurrentMasterKey();
+        final MasterKey.Material material = MasterKey.derive(rawSecret);
 
-        // For this request, the default account checks won't work. Hence, it
-        // must be checked directly, with the keys
+        if (stored == null) {
+            // First setup of this instance.
+            setupMasterKey(rawSecret);
+        } else if (matches(material, stored)) {
+            masterKey.install(material, stored.getVersion());
+        } else {
+            throw new AuthenticationException(INVALID_CREDENTIALS);
+        }
+
+        // The MasterKey is correct; the System Administrator must still
+        // authenticate, otherwise EDS stays locked.
         final MemberEntity admin = findAdmin(request);
+        if (!canOpenKeys(admin, request.getCredential())) {
+            masterKey.lock();
+            throw new AuthenticationException(INVALID_CREDENTIALS);
+        }
+        updateMasterKeySetting(request);
+
+        return new MasterKeyResponse(ReturnCode.SUCCESS, "MasterKey unlocked.");
+    }
+
+    private MasterKeyResponse processUnlocked(final MasterKeyRequest request, final byte[] rawSecret) {
+        final MemberEntity admin = findAdmin(request);
+        if (!canOpenKeys(admin, request.getCredential())) {
+            throw new AuthenticationException(INVALID_CREDENTIALS);
+        }
+
+        final MasterKey.Material material = MasterKey.derive(rawSecret);
         final MasterKeyResponse response;
 
-        // The first check is with the new Key, as it is assumed that the primary
-        // invocation of this request is to unlock a system, rather than update
-        // the Master Key. If this fails, then try with the old Key, and if that
-        // works, the Key should be updated. If both fail... tough!
-        if (checkCredentials(newMasterKey, admin, request.getCredential())) {
-            // Default check, new MasterKey is correct, updating the Key to
-            // reflect this.
-            masterKey.setKey(newMasterKey);
+        if (MessageDigest.isEqual(crypto.stringToBytes(material.kcv()), crypto.stringToBytes(masterKey.getKcv()))) {
             updateMasterKeySetting(request);
             response = new MasterKeyResponse(ReturnCode.SUCCESS, "MasterKey unlocked.");
-        } else if (checkCredentials(oldMasterKey, admin, request.getCredential())) {
-            throwConditionalException(dao.countMembers() != 1,
-                    ReturnCode.ILLEGAL_ACTION, "Cannot alter the MasterKey, as Member Accounts exists.");
-            // Only a new MasterKey is verified. Unlocking with an existing
-            // MasterKey must remain possible, even if it is weak.
-            verifyEntropy("MasterKey secret", rawSecret);
-            masterKey.setKey(newMasterKey);
-            updateMasterKeySetting(request);
-            updateMemberPassword(admin, request.getCredential());
-            response = new MasterKeyResponse(ReturnCode.SUCCESS, "MasterKey updated.");
         } else {
-            // Neither key worked, throw Authentication Exception
-            throw new AuthenticationException("Invalid credentials.");
+            verifyEntropy("MasterKey secret", rawSecret);
+            rotate(material);
+            updateMasterKeySetting(request);
+            response = new MasterKeyResponse(ReturnCode.SUCCESS, "MasterKey updated.");
         }
 
         return response;
+    }
+
+    // =========================================================================
+    // Internal Methods
+    // =========================================================================
+
+    /**
+     * <p>Rotates the MasterKey (PLAN.md, Crypto §1): every outer layer is
+     * re-wrapped with the new MasterKey in the request's transaction, so a
+     * failure leaves the old MasterKey in place. Data Objects are not
+     * touched, as the MasterKey isn't part of the data path.</p>
+     *
+     * <ul>
+     *   <li>Member salts and private keys are re-wrapped.</li>
+     *   <li>Sessions end, and pending invitations are deleted, as their
+     *   tokens are keyed with the old MasterKey.</li>
+     *   <li>The Circle Secrets of all Trustees are re-wrapped.</li>
+     * </ul>
+     *
+     * @param material The new MasterKey
+     */
+    private void rotate(final MasterKey.Material material) {
+        final int version = masterKey.getVersion() + 1;
+
+        // Every Session ends: their outer layer is of the old MasterKey.
+        dao.createNamedQuery("session.removeAll").executeUpdate();
+
+        for (final MemberEntity entity : dao.findAllAscending(MemberEntity.class, "id")) {
+            if (ProcessMemberManager.INVITATION_MARKER.equals(entity.getPrivateKey())) {
+                dao.delete(entity);
+            } else {
+                entity.setSalt(crypto.rewrapWithMasterKey(memberSaltAad(entity), entity.getSalt(), material, version));
+                entity.setPrivateKey(crypto.rewrapWithMasterKey(memberOuterAad(entity), entity.getPrivateKey(), material, version));
+                dao.save(entity);
+            }
+        }
+
+        // No rotation of a Circle Secret may change a Trustee row meanwhile
+        // (PLAN.md, Crypto C6), or one of the two would undo the other.
+        final List<TrusteeEntity> allTrustees = dao.findAllAscending(TrusteeEntity.class, "id");
+        dao.lockCircles(dao.findAllAscending(CircleEntity.class, "id"));
+        allTrustees.forEach(dao::refresh);
+        for (final TrusteeEntity trustee : allTrustees) {
+            final String aad = TRUSTEE_OUTER_AAD + trusteeBinding(trustee.getCircle(), trustee.getMember(), trustee.getKey());
+            trustee.setCircleKey(crypto.rewrapWithMasterKey(aad, trustee.getCircleKey(), material, version));
+            // The retiring Circle Secret, while it is rotated (PLAN.md, Crypto C6).
+            if (trustee.getPreviousKey() != null) {
+                final String previousAad = TRUSTEE_OUTER_AAD + trusteeBinding(trustee.getCircle(), trustee.getMember(), trustee.getPreviousKey());
+                trustee.setPreviousCircleKey(crypto.rewrapWithMasterKey(previousAad, trustee.getPreviousCircleKey(), material, version));
+            }
+            dao.save(trustee);
+        }
+
+        saveMasterKey(version, material.kcv());
+        masterKey.install(material, version);
+    }
+
+    private void setupMasterKey(final byte[] secret) {
+        verifyEntropy("MasterKey secret", secret);
+        final MasterKey.Material material = MasterKey.derive(secret);
+        masterKey.install(material, 1);
+        saveMasterKey(1, material.kcv());
+    }
+
+    private void saveMasterKey(final int version, final String kcv) {
+        final MasterKeyEntity entity = new MasterKeyEntity();
+        entity.setVersion(version);
+        entity.setKcv(kcv);
+        dao.save(entity);
+    }
+
+    private boolean matches(final MasterKey.Material material, final MasterKeyEntity stored) {
+        return MessageDigest.isEqual(crypto.stringToBytes(material.kcv()), crypto.stringToBytes(stored.getKcv()));
     }
 
     private static byte[] readRawSecret(final MasterKeyRequest request) {
@@ -122,11 +271,11 @@ public final class MasterKeyManager extends AbstractManager<CommonDao, MasterKey
     }
 
     /**
-     * Stores the URL of the new MasterKey, so it is used after a restart. It
+     * Stores the URL of the MasterKey, so it is used after a restart. It
      * must only be invoked once the System Administrator credentials have
      * been verified, as the URL is otherwise open for anyone to change.
      *
-     * @param request Request Object with the new MasterKey
+     * @param request Request Object with the MasterKey
      */
     private void updateMasterKeySetting(final MasterKeyRequest request) {
         // If set via a secret, the URL should be removed to prevent a
@@ -143,19 +292,13 @@ public final class MasterKeyManager extends AbstractManager<CommonDao, MasterKey
         dao.save(entity);
     }
 
-    private boolean checkCredentials(final SecretEDSKey masterKey, final MemberEntity admin, final byte[] secret) {
+    private boolean canOpenKeys(final MemberEntity admin, final byte[] secret) {
         boolean result = false;
 
         try {
-            // First, decrypt the Salt for the Administrator, using the "MasterKey".
-            final byte[] encrypted = Base64.getDecoder().decode(admin.getSalt());
-            final byte[] decrypted = Crypto.decrypt(masterKey, encrypted);
-            final String salt = crypto.bytesToString(decrypted);
-
-            // With the decrypted Salt, we can try to unlock the Private Key, if it
-            // fails, then a CryptoException is thrown, which we'll ignore here.
-            final SecretEDSKey key = crypto.generatePasswordKey(admin.getPbeAlgorithm(), secret, salt);
-            crypto.extractAsymmetricKey(admin.getRsaAlgorithm(), key, salt, admin.getPublicKey(), admin.getPrivateKey());
+            // If the Password Key can't unlock the Private Key, then a
+            // CryptoException is thrown, which we'll ignore here.
+            openMemberKeys(admin, secret);
             result = true;
         } catch (CryptoException e) {
             LOGGER.debug("Decrypting the System Administrator Account failed: {}", e.getMessage(), e);
@@ -164,17 +307,25 @@ public final class MasterKeyManager extends AbstractManager<CommonDao, MasterKey
         return result;
     }
 
-    private MemberEntity findAdmin(final Authentication authentication) {
-        final List<MemberEntity> admins = dao.findMemberByRole(MemberRole.ADMIN);
-        final MemberEntity admin;
-
-        if (admins.isEmpty()) {
-            admin = createNewAccount(Constants.ADMIN_ACCOUNT, MemberRole.ADMIN, authentication.getCredential());
-        } else {
-            // Fetch the first administrator, the one with ID 1.
-            admin = admins.getFirst();
+    /**
+     * Only the System Administrator may give the MasterKey: the first
+     * account of the stone, whatever its name. On a stone without accounts
+     * nobody is it yet, and who gives the first MasterKey becomes it. This
+     * is checked before anything is done with the secret.
+     */
+    private void checkPermitted(final Authentication authentication) {
+        final MemberEntity admin = systemAdministrator();
+        final boolean permitted = (admin != null)
+                ? admin.getName().equalsIgnoreCase(trim(authentication.getAccountName()))
+                : (dao.countMembers() == 0);
+        if (!permitted) {
+            throw new AuthenticationException("Given Account is not permitted to perform this request.");
         }
+    }
 
-        return admin;
+    private MemberEntity findAdmin(final Authentication authentication) {
+        final MemberEntity admin = systemAdministrator();
+
+        return (admin != null) ? admin : claimStone(trim(authentication.getAccountName()), authentication.getCredential());
     }
 }

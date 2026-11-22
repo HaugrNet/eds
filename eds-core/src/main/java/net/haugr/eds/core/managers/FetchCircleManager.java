@@ -18,17 +18,22 @@ package net.haugr.eds.core.managers;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import jakarta.persistence.EntityManager;
 import net.haugr.eds.api.common.MemberRole;
 import net.haugr.eds.api.dtos.Circle;
+import net.haugr.eds.api.dtos.CircleRotation;
 import net.haugr.eds.api.requests.FetchCircleRequest;
 import net.haugr.eds.api.responses.FetchCircleResponse;
 import net.haugr.eds.core.enums.Permission;
-import net.haugr.eds.core.model.CommonDao;
+import net.haugr.eds.core.enums.Status;
+import net.haugr.eds.core.model.RotationDao;
 import net.haugr.eds.core.model.Settings;
 import net.haugr.eds.core.model.entities.CircleEntity;
+import net.haugr.eds.core.model.entities.KeyEntity;
 import net.haugr.eds.core.model.entities.TrusteeEntity;
 
 /**
@@ -37,10 +42,10 @@ import net.haugr.eds.core.model.entities.TrusteeEntity;
  * @author Kim Jensen
  * @since EDS 1.0
  */
-public final class FetchCircleManager extends AbstractManager<CommonDao, FetchCircleResponse, FetchCircleRequest> {
+public final class FetchCircleManager extends AbstractManager<RotationDao, FetchCircleResponse, FetchCircleRequest> {
 
     public FetchCircleManager(final Settings settings, final EntityManager entityManager) {
-        super(settings, new CommonDao(entityManager));
+        super(settings, new RotationDao(entityManager));
     }
 
     /**
@@ -70,18 +75,61 @@ public final class FetchCircleManager extends AbstractManager<CommonDao, FetchCi
         for (final CircleEntity entity : entities) {
             circles.add(convert(entity, extractExternalCircleKey(entity)));
         }
+        addRotations(entities, circles);
 
         return circles;
     }
 
     private List<Circle> fetchMemberCircles() {
+        final List<CircleEntity> entities = new ArrayList<>(trustees.size());
         final List<Circle> circles = new ArrayList<>(trustees.size());
 
         for (final TrusteeEntity trustee : trustees) {
+            entities.add(trustee.getCircle());
             circles.add(convert(trustee.getCircle(), decryptExternalKey(trustee)));
         }
+        addRotations(entities, circles);
+        // By name, like the list of all Circles, regardless of the case.
+        circles.sort(java.util.Comparator.comparing((Circle circle) -> circle.getCircleName().toLowerCase(java.util.Locale.ROOT)));
 
         return circles;
+    }
+
+    /**
+     * Adds what the Circles tell about the rotation of their Circle Secrets
+     * (PLAN.md, Crypto C6): when the current secret was made, when the next
+     * rotation is due, and the rotation under way.
+     *
+     * @param entities The Circles
+     * @param circles  Their DTOs, in the same order
+     */
+    private void addRotations(final List<CircleEntity> entities, final List<Circle> circles) {
+        final Map<Long, KeyEntity> active = byCircle(dao.findKeys(entities, Status.ACTIVE));
+        final Map<Long, KeyEntity> retiring = byCircle(dao.findKeys(entities, Status.RETIRING));
+        for (int i = 0; i < entities.size(); i++) {
+            final CircleEntity entity = entities.get(i);
+            final Circle circle = circles.get(i);
+            final KeyEntity current = active.get(entity.getId());
+            circle.setSecretRotated((current != null) ? current.getAdded() : null);
+            circle.setRotationDue(entity.getRotateCircleKeyDue());
+            final KeyEntity previous = retiring.get(entity.getId());
+            if (previous != null) {
+                final CircleRotation rotation = new CircleRotation();
+                final long objects = dao.countData(entity);
+                rotation.setStarted(circle.getSecretRotated());
+                rotation.setObjects(objects);
+                rotation.setObjectsDone(objects - dao.countDataOnKey(previous));
+                circle.setRotation(rotation);
+            }
+        }
+    }
+
+    private static Map<Long, KeyEntity> byCircle(final List<KeyEntity> keys) {
+        final Map<Long, KeyEntity> map = HashMap.newHashMap(keys.size());
+        for (final KeyEntity key : keys) {
+            map.put(key.getCircle().getId(), key);
+        }
+        return map;
     }
 
     private String extractExternalCircleKey(final CircleEntity entity) {

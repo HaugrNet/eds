@@ -19,6 +19,11 @@ package net.haugr.eds.core.managers;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import net.haugr.eds.core.jce.SecretEDSKey;
+import net.haugr.eds.api.common.TrustLevel;
+import java.util.Objects;
+import java.util.Map;
+import java.util.HashMap;
 import jakarta.persistence.EntityManager;
 import net.haugr.eds.api.common.MemberRole;
 import net.haugr.eds.api.common.ReturnCode;
@@ -66,9 +71,20 @@ public final class FetchTrusteeManager extends AbstractManager<TrusteeDao, Fetch
             trustees = dao.findTrusteesByMember(member.getExternalId());
         }
 
+        // A Trustee's secret (E2E.md) is shown to the Member themselves and
+        // to the administrators of the Circle, which takes the requesting
+        // Member's own Trustee record of that Circle.
+        final Map<String, TrusteeEntity> own = new HashMap<>();
+        for (final TrusteeEntity mine : dao.findTrusteesByMember(member.getExternalId())) {
+            own.put(mine.getCircle().getExternalId(), mine);
+        }
+        final Map<String, SecretEDSKey> circleKeys = new HashMap<>();
+
         final List<Trustee> currentTrustees = new ArrayList<>(trustees.size());
         for (final TrusteeEntity entity : trustees) {
-            currentTrustees.add(convert(entity));
+            final Trustee trustee = convert(entity);
+            trustee.setSecret(secretOf(entity, own.get(entity.getCircle().getExternalId()), circleKeys));
+            currentTrustees.add(trustee);
         }
 
         final FetchTrusteeResponse response = new FetchTrusteeResponse();
@@ -117,14 +133,30 @@ public final class FetchTrusteeManager extends AbstractManager<TrusteeDao, Fetch
         return trustees;
     }
 
+    private String secretOf(final TrusteeEntity entity, final TrusteeEntity mine, final Map<String, SecretEDSKey> circleKeys) {
+        String secret = null;
+
+        if ((entity.getExternalKey() != null) && (mine != null)) {
+            final boolean self = Objects.equals(entity.getMember().getExternalId(), member.getExternalId());
+            if (self || TrustLevel.getLevels(TrustLevel.ADMIN).contains(mine.getTrustLevel())) {
+                final SecretEDSKey circleKey = circleKeys.computeIfAbsent(mine.getCircle().getExternalId(), _ -> unwrapCircleKey(mine));
+                secret = openTrusteeSecret(circleKey, entity);
+            }
+        }
+
+        return secret;
+    }
+
     private static Trustee convert(final TrusteeEntity entity) {
         final Trustee trustee = new Trustee();
 
         trustee.setMemberId(entity.getMember().getExternalId());
         trustee.setAccountName(entity.getMember().getName());
+        trustee.setAvatar(entity.getMember().getAvatar());
         trustee.setPublicKey(entity.getMember().getMemberKey());
         trustee.setCircleId(entity.getCircle().getExternalId());
         trustee.setCircleName(entity.getCircle().getName());
+        trustee.setCircleAvatar(entity.getCircle().getAvatar());
         trustee.setTrustLevel(entity.getTrustLevel());
         trustee.setChanged(entity.getAltered());
         trustee.setAdded(entity.getAdded());

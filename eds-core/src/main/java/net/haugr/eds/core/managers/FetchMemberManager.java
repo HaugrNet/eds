@@ -66,6 +66,10 @@ public final class FetchMemberManager extends AbstractManager<MemberDao, FetchMe
                 // the information already retrieved as part of the
                 // Authentication/Authorization logic.
                 addMemberToResponse(response, member);
+                // Their settings for clients are theirs alone.
+                response.getMembers().getFirst().setSettings(member.getSettings());
+                // As is their vault (E2E.md).
+                response.getMembers().getFirst().setVault(member.getVault());
                 response.setCircles(convertCircles(trustees));
             } else {
                 final MemberEntity requestedMember = dao.find(MemberEntity.class, request.getMemberId());
@@ -78,7 +82,7 @@ public final class FetchMemberManager extends AbstractManager<MemberDao, FetchMe
             }
         } else {
             final List<MemberEntity> members = dao.findAllAscending(MemberEntity.class, "name");
-            response.setMembers(convertMembers(members));
+            response.setMembers(convertMembers(members, firstAdministratorId()));
         }
 
         return response;
@@ -114,28 +118,36 @@ public final class FetchMemberManager extends AbstractManager<MemberDao, FetchMe
         }
     }
 
-    private static void addMemberToResponse(final FetchMemberResponse response, final MemberEntity memberEntity) {
+    private void addMemberToResponse(final FetchMemberResponse response, final MemberEntity memberEntity) {
         final List<Member> members = new ArrayList<>(1);
-        members.add(convert(memberEntity));
+        members.add(convert(memberEntity, firstAdministratorId()));
         response.setMembers(members);
     }
 
-    private static List<Member> convertMembers(final Collection<MemberEntity> entities) {
+    /** The internal Id of the first System Administrator, or null on a stone without accounts. */
+    private Long firstAdministratorId() {
+        final MemberEntity first = systemAdministrator();
+        return (first != null) ? first.getId() : null;
+    }
+
+    private static List<Member> convertMembers(final Collection<MemberEntity> entities, final Long firstAdministratorId) {
         final List<Member> circles = new ArrayList<>(entities.size());
 
         for (final MemberEntity entity : entities) {
-            circles.add(convert(entity));
+            circles.add(convert(entity, firstAdministratorId));
         }
 
         return circles;
     }
 
-    private static Member convert(final MemberEntity entity) {
+    private static Member convert(final MemberEntity entity, final Long firstAdministratorId) {
         final Member member = new Member();
 
         member.setMemberId(entity.getExternalId());
         member.setAccountName(entity.getName());
         member.setMemberRole(entity.getMemberRole());
+        member.setFirstAdministrator(Objects.equals(entity.getId(), firstAdministratorId));
+        member.setAvatar(entity.getAvatar());
         member.setPublicKey(entity.getMemberKey());
         member.setAdded(entity.getAdded());
 

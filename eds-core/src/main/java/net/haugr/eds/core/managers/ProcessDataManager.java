@@ -33,9 +33,12 @@ import net.haugr.eds.core.enums.SanityStatus;
 import net.haugr.eds.core.exceptions.EDSException;
 import net.haugr.eds.core.exceptions.IllegalActionException;
 import net.haugr.eds.core.jce.Crypto;
-import net.haugr.eds.core.jce.IVSalt;
+import net.haugr.eds.core.jce.DataFormat;
 import net.haugr.eds.core.jce.SecretEDSKey;
+import net.haugr.eds.core.model.ConnectionSource;
 import net.haugr.eds.core.model.DataDao;
+import net.haugr.eds.core.stream.ContentCopier;
+import net.haugr.eds.core.model.EncryptedDataStore;
 import net.haugr.eds.core.model.Settings;
 import net.haugr.eds.core.model.entities.DataEntity;
 import net.haugr.eds.core.model.entities.DataTypeEntity;
@@ -51,8 +54,21 @@ import net.haugr.eds.core.model.entities.TrusteeEntity;
  */
 public final class ProcessDataManager extends AbstractManager<DataDao, ProcessDataResponse, ProcessDataRequest> {
 
+    private final ConnectionSource readers;
+
     public ProcessDataManager(final Settings settings, final EntityManager entityManager) {
+        this(settings, entityManager, null);
+    }
+
+    /**
+     * @param settings      EDS Settings
+     * @param entityManager EntityManager
+     * @param readers       Opens the Connection which reads the source of a
+     *                      large copy, or null if large content can't be copied
+     */
+    public ProcessDataManager(final Settings settings, final EntityManager entityManager, final ConnectionSource readers) {
         super(settings, new DataDao(entityManager));
+        this.readers = readers;
     }
 
     /**
@@ -80,22 +96,27 @@ public final class ProcessDataManager extends AbstractManager<DataDao, ProcessDa
 
     private ProcessDataResponse processAddData(final ProcessDataRequest request) {
         final MetadataEntity parent = findParent(request.getCircleId(), request.getFolderId());
+        FeatureFolder.refuseIf(FeatureFolder.isFeatureFolder(dao, parent) || FeatureFolder.isReservedName(dao, parent, request.getDataName()));
         final MetadataEntity existingName = dao.findInFolder(member, parent.getId(), request.getDataName());
 
         if (existingName != null) {
             throw new EDSException(ReturnCode.IDENTIFICATION_WARNING, "Another record with the same name already exists.");
         }
+        checkNameKey(null, request.getNameKey(), parent.getId());
 
         final TrusteeEntity trustee = findTrustee(request.getCircleId());
         final DataTypeEntity type = findDataType(request.getTypeName());
+        FeatureFolder.refuseIf(Objects.equals(Constants.ENTRY_TYPENAME, type.getName()));
+        Thumbnails.refuseIf(Objects.equals(Constants.THUMBNAIL_TYPENAME, type.getName()));
         final byte[] bytes = request.getData();
+        checkInlineSize(bytes);
         final ProcessDataResponse response;
 
         if (Objects.equals(Constants.FOLDER_TYPENAME, type.getName())) {
             response = createFolder(trustee, request);
         } else {
-            final MetadataEntity metadataEntity = createMetadata(trustee, request.getDataName(), parent.getId(), type);
-            encryptAndSaveData(trustee, metadataEntity, null, bytes);
+            final MetadataEntity metadataEntity = createMetadata(trustee, request.getDataName(), request.getNameKey(), parent.getId(), type, request.getMediaType());
+            encryptAndSaveData(trustee, metadataEntity, bytes);
             response = buildProcessDataResponse(metadataEntity.getExternalId(), theDataObject(metadataEntity) + " was successfully added to the Circle '" + trustee.getCircle().getName() + "'.");
         }
 
@@ -104,16 +125,35 @@ public final class ProcessDataManager extends AbstractManager<DataDao, ProcessDa
 
     private ProcessDataResponse processUpdateData(final ProcessDataRequest request) {
         final MetadataEntity entity = findMetadataAndTrustee(request);
+        FeatureFolder.refuseIf(FeatureFolder.isFeature(dao, entity));
+        Thumbnails.refuseIf(Thumbnails.isThumbnail(entity));
 
         // First, let's identify the folder if we're not updating it yet, only
         // after the name has also been checked.
         Long folderId = entity.getParentId();
+        MetadataEntity folder = null;
         if (request.getFolderId() != null) {
-            final MetadataEntity folder = checkFolder(entity, request.getFolderId());
+            folder = checkFolder(entity, request.getFolderId());
+            FeatureFolder.refuseIf(FeatureFolder.isFeatureFolder(dao, folder));
             folderId = folder.getId();
         }
 
+        if (folder == null) {
+            folder = dao.find(MetadataEntity.class, folderId);
+        }
+        FeatureFolder.refuseIf(FeatureFolder.isReservedName(dao, folder, (request.getDataName() != null) ? request.getDataName() : entity.getName()));
         entity.setName(checkName(entity, request.getDataName(), folderId));
+        // A new name comes with its own Name Key, or with none, so the old
+        // one never outlives the name it was made from. A Name Key alone is
+        // added to the present name, e.g. for an object stored before it.
+        // Checked before it is set, as the query flushes the managed entity.
+        final String nameKey = ((request.getDataName() != null) || (request.getNameKey() != null)) ? request.getNameKey() : entity.getNameKey();
+        checkNameKey(entity.getId(), nameKey, folderId);
+        entity.setNameKey(nameKey);
+        if (request.getMediaType() != null) {
+            entity.setMediaType(request.getMediaType());
+        }
+        checkInlineSize(request.getData());
         checkData(entity, request.getData());
         entity.setParentId(folderId);
         dao.save(entity);
@@ -124,18 +164,22 @@ public final class ProcessDataManager extends AbstractManager<DataDao, ProcessDa
     private ProcessDataResponse processCopyData(final ProcessDataRequest request) {
         final TrusteeEntity targetTrustee = findTargetTrustee(request.getTargetCircleId());
         final MetadataEntity metadataEntity = findMetadataEntity(request.getDataId());
-        final String externalDataId = copyDataToTargetCircle(targetTrustee, metadataEntity, request);
+        Thumbnails.refuseIf(Thumbnails.isThumbnail(metadataEntity));
+        final String externalDataId = copyDataToTargetCircle(targetTrustee, metadataEntity, request, true);
 
-        return buildProcessDataResponse(externalDataId, theDataObject(metadataEntity) + " was successfully copied from '" + metadataEntity.getCircle().getName() + "' to '" + targetTrustee.getCircle().getName() + "'.");
+        return buildProcessDataResponse(externalDataId, theDataObject(metadataEntity) + " was successfully copied from '"
+                + metadataEntity.getCircle().getName() + "' to '" + targetTrustee.getCircle().getName() + "'.");
     }
 
     private ProcessDataResponse processMoveData(final ProcessDataRequest request) {
         final TrusteeEntity targetTrustee = findTargetTrustee(request.getTargetCircleId());
         final MetadataEntity metadataEntity = findMetadataEntity(request.getDataId());
-        final String externalDataId = copyDataToTargetCircle(targetTrustee, metadataEntity, request);
+        Thumbnails.refuseIf(Thumbnails.isThumbnail(metadataEntity));
+        final String externalDataId = copyDataToTargetCircle(targetTrustee, metadataEntity, request, false);
         deleteMetaDataAndDataEntities(metadataEntity);
 
-        return buildProcessDataResponse(externalDataId, theDataObject(metadataEntity) + " was successfully moved from '" + metadataEntity.getCircle().getName() + "' to '" + targetTrustee.getCircle().getName() + "'.");
+        return buildProcessDataResponse(externalDataId, theDataObject(metadataEntity) + " was successfully moved from '"
+                + metadataEntity.getCircle().getName() + "' to '" + targetTrustee.getCircle().getName() + "'.");
     }
 
     private static ProcessDataResponse buildProcessDataResponse(final String externalDataId, final String returnMessage) {
@@ -161,6 +205,7 @@ public final class ProcessDataManager extends AbstractManager<DataDao, ProcessDa
 
     private ProcessDataResponse processDeleteData(final ProcessDataRequest request) {
         final MetadataEntity entity = findMetadataAndTrustee(request);
+        FeatureFolder.refuseIf(FeatureFolder.isFeature(dao, entity));
 
         if (Objects.equals(Constants.FOLDER_TYPENAME, entity.getType().getName())) {
             // If the Entity is a Folder, then we must check if it
@@ -198,17 +243,53 @@ public final class ProcessDataManager extends AbstractManager<DataDao, ProcessDa
         if (Objects.equals(Constants.FOLDER_TYPENAME, entity.getType().getName())) {
             throw new EDSException(ReturnCode.ILLEGAL_ACTION, "It is not permitted to copy or move folders.");
         }
+        FeatureFolder.refuseIf(FeatureFolder.isEntry(entity));
 
         return entity;
     }
 
-    private String copyDataToTargetCircle(final TrusteeEntity trustee, final MetadataEntity oldMetadataEntity, final ProcessDataRequest request) {
+    /**
+     * Copies the content to a new Data Object in the target Circle,
+     * re-encrypted chunk by chunk (PLAN.md, S4), so large content is
+     * never held in memory as a whole. A move removes the source afterwards,
+     * so only a copy counts against the storage ceiling.
+     */
+    private String copyDataToTargetCircle(final TrusteeEntity trustee, final MetadataEntity oldMetadataEntity, final ProcessDataRequest request, final boolean addsContent) {
         final MetadataEntity folder = findParent(request.getTargetCircleId(), request.getTargetFolderId());
-        final MetadataEntity metadataEntity = createMetadata(trustee, oldMetadataEntity.getName(), folder.getId(), oldMetadataEntity.getType());
-        final DataEntity dataEntity = dao.findDataByMemberAndExternalId(member, oldMetadataEntity.getExternalId());
-        if (dataEntity != null) {
-            final byte[] bytes = decryptData(dataEntity);
-            encryptAndSaveData(trustee, metadataEntity, null, bytes);
+        FeatureFolder.refuseIf(FeatureFolder.isFeatureFolder(dao, folder) || FeatureFolder.isReservedName(dao, folder, oldMetadataEntity.getName()));
+        // The Name Key is made with a key of the Circle, so the old one is
+        // meaningless in the target Circle; only the request can give one.
+        checkNameKey(null, request.getNameKey(), folder.getId());
+        final MetadataEntity metadataEntity = createMetadata(trustee, oldMetadataEntity.getName(), request.getNameKey(), folder.getId(), oldMetadataEntity.getType(), oldMetadataEntity.getMediaType());
+        final Object[] info = dao.findContentInfo(oldMetadataEntity);
+        if (info != null) {
+            final long sourceId = (Long) info[0];
+            final long sourceKeyId = (Long) info[1];
+            final TrusteeEntity sourceTrustee = findTrustee(oldMetadataEntity.getCircle().getExternalId());
+            final DataFormat.Context sourceContext = new DataFormat.Context(oldMetadataEntity.getCircle().getExternalId(), oldMetadataEntity.getExternalId(), sourceKeyId);
+            final long sourceLength = dao.withConnection(connection -> EncryptedDataStore.length(connection, sourceId));
+            if (addsContent) {
+                StorageCeiling.check(settings, dao, -1, sourceLength);
+            }
+            final ContentCopier.Source source = new ContentCopier.Source(sourceId, sourceLength, unwrapCircleKey(sourceTrustee, sourceKeyId), sourceContext);
+
+            final DataEntity target = new DataEntity();
+            target.setMetadata(metadataEntity);
+            target.setKey(trustee.getKey());
+            target.setData(new byte[0]);
+            target.setChecksum("pending");
+            target.setSanityStatus(SanityStatus.OK);
+            target.setSanityChecked(Utilities.newDate());
+            dao.save(target);
+            final long targetId = target.getId();
+            final DataFormat.Context targetContext = dataContext(target);
+            final SecretEDSKey targetSecret = unwrapCircleKey(trustee);
+            final String algorithm = settings.getHashAlgorithm().getAlgorithm();
+            dao.withConnection(connection -> {
+                dao.detach(target);
+                return ContentCopier.copy(connection, readers, source, new ContentCopier.Target(targetId, targetSecret, targetContext),
+                        settings.getStreamReadBatchSize(), algorithm, settings.getDataMaxInlineSize());
+            });
         }
 
         return metadataEntity.getExternalId();
@@ -217,32 +298,44 @@ public final class ProcessDataManager extends AbstractManager<DataDao, ProcessDa
     private void checkData(final MetadataEntity metadata, final byte[] bytes) {
         if (bytes != null) {
             final TrusteeEntity trustee = findTrustee(metadata.getCircle().getExternalId());
-            final DataEntity dataEntity = dao.findDataByMetadata(metadata);
-            encryptAndSaveData(trustee, metadata, dataEntity, bytes);
+            // The old content is replaced, without loading it; its thumbnail
+            // no longer matches.
+            dao.deleteContent(metadata);
+            dao.deleteThumbnails(metadata);
+            encryptAndSaveData(trustee, metadata, bytes);
         }
     }
 
-    private void encryptAndSaveData(final TrusteeEntity trustee, final MetadataEntity metadataEntity, final DataEntity oldDataEntity, final byte[] bytes) {
+    private void checkInlineSize(final byte[] bytes) {
+        if ((bytes != null) && (bytes.length > settings.getDataMaxInlineSize())) {
+            throw new EDSException(ReturnCode.CONTENT_TOO_LARGE, "The data is larger than the " + settings.getDataMaxInlineSize()
+                    + " bytes allowed in the request; upload it with the content endpoint (PUT " + Constants.REST_DATA_BASE + Constants.REST_DATA_CONTENT + ").");
+        }
+    }
+
+    private void encryptAndSaveData(final TrusteeEntity trustee, final MetadataEntity metadataEntity, final byte[] bytes) {
         if (bytes != null) {
             final KeyEntity keyEntity = trustee.getKey();
-            final KeyAlgorithm algorithm = keyEntity.getAlgorithm();
-            final SecretEDSKey key = Crypto.extractCircleKey(algorithm, keyPair.getPrivate(), trustee.getCircleKey());
-            key.setSalt(new IVSalt());
-            final String armored = key.getSalt().getArmored();
+            final SecretEDSKey circleSecret = unwrapCircleKey(trustee);
 
-            final DataEntity toSave = (oldDataEntity != null) ? oldDataEntity : new DataEntity();
-            toSave.setMetadata(metadataEntity);
-            toSave.setKey(keyEntity);
-            toSave.setData(Crypto.encrypt(key, bytes));
-            toSave.setInitialVector(crypto.encryptWithMasterKey(armored));
-            toSave.setChecksum(crypto.generateChecksum(toSave.getData()));
-            toSave.setSanityStatus(SanityStatus.OK);
-            toSave.setSanityChecked(Utilities.newDate());
-            dao.save(toSave);
-
-            // Actively overwrite the raw Object bytes, so it no longer
-            // can be read unencrypted.
-            Arrays.fill(bytes, (byte) 0);
+            // A new object key (random HKDF salt) on every write, see
+            // DataFormat and PLAN.md, Crypto §4.
+            try {
+                final DataEntity toSave = new DataEntity();
+                toSave.setMetadata(metadataEntity);
+                toSave.setKey(keyEntity);
+                toSave.setData(DataFormat.encrypt(circleSecret, dataContext(toSave), bytes));
+                // An update has removed the old content already.
+                StorageCeiling.check(settings, dao, -1, toSave.getData().length);
+                toSave.setChecksum(crypto.generateChecksum(toSave.getData()));
+                toSave.setSanityStatus(SanityStatus.OK);
+                toSave.setSanityChecked(Utilities.newDate());
+                dao.save(toSave);
+            } finally {
+                // Actively overwrite the raw Object bytes, so it no longer
+                // can be read unencrypted.
+                Arrays.fill(bytes, (byte) 0);
+            }
         }
     }
 
@@ -288,7 +381,7 @@ public final class ProcessDataManager extends AbstractManager<DataDao, ProcessDa
     private ProcessDataResponse createFolder(final TrusteeEntity trustee, final ProcessDataRequest request) {
         final MetadataEntity parent = findParent(request.getCircleId(), request.getFolderId());
         final DataTypeEntity folderType = dao.findDataTypeByName(Constants.FOLDER_TYPENAME);
-        final MetadataEntity folder = createMetadata(trustee, request.getDataName(), parent.getId(), folderType);
+        final MetadataEntity folder = createMetadata(trustee, request.getDataName(), request.getNameKey(), parent.getId(), folderType, null);
 
         final ProcessDataResponse response = new ProcessDataResponse("The Folder '" + request.getDataName() + "' was successfully added to the Circle '" + trustee.getCircle().getName() + "'.");
         response.setDataId(folder.getExternalId());
@@ -296,10 +389,12 @@ public final class ProcessDataManager extends AbstractManager<DataDao, ProcessDa
         return response;
     }
 
-    private MetadataEntity createMetadata(final TrusteeEntity trustee, final String name, final Long parentId, final DataTypeEntity dataType) {
+    private MetadataEntity createMetadata(final TrusteeEntity trustee, final String name, final String nameKey, final Long parentId, final DataTypeEntity dataType, final String mediaType) {
         final MetadataEntity entity = new MetadataEntity();
+        entity.setMediaType(mediaType);
         entity.setCircle(trustee.getCircle());
         entity.setName(name);
+        entity.setNameKey(nameKey);
         entity.setParentId(parentId);
         entity.setType(dataType);
         dao.save(entity);
@@ -308,10 +403,10 @@ public final class ProcessDataManager extends AbstractManager<DataDao, ProcessDa
     }
 
     private void deleteMetaDataAndDataEntities(final MetadataEntity entity) {
-        final DataEntity dataEntity = dao.findDataByMetadata(entity);
-        if (dataEntity != null) {
-            dao.delete(dataEntity);
-        }
+        // The content may be large; it is deleted without loading it. A
+        // thumbnail goes with its Data Object (a moved one doesn't keep it).
+        dao.deleteThumbnails(entity);
+        dao.deleteContent(entity);
         dao.delete(entity);
     }
 
@@ -353,6 +448,23 @@ public final class ProcessDataManager extends AbstractManager<DataDao, ProcessDa
         }
 
         return theName;
+    }
+
+    /**
+     * In a chamber (E2E.md) the name is ciphertext which differs each time, so
+     * {@link #checkName(MetadataEntity, String, Long)} can't find a repeated
+     * name; the client sends a Name Key, a keyed hash of the name, and that
+     * is kept unique within the folder instead.
+     *
+     * @param metadataId The Data Object which may keep its own Name Key, or
+     *                   null for a new one
+     * @param nameKey    The Name Key, or null if none was given
+     * @param folderId   The folder the Data Object is or goes in
+     */
+    private void checkNameKey(final Long metadataId, final String nameKey, final Long folderId) {
+        if ((nameKey != null) && dao.checkIfNameKeyIsUsed(metadataId, nameKey, folderId)) {
+            throw new EDSException(ReturnCode.IDENTIFICATION_WARNING, "Another record with the same name already exists.");
+        }
     }
 
     /**

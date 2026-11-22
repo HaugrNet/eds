@@ -16,17 +16,18 @@
  */
 package net.haugr.eds.core.managers;
 
-import jakarta.persistence.LockModeType;
 import jakarta.persistence.Query;
 import net.haugr.eds.api.common.MemberRole;
 import net.haugr.eds.api.common.Utilities;
 import net.haugr.eds.api.dtos.Sanity;
 import net.haugr.eds.api.requests.SanityRequest;
 import net.haugr.eds.api.responses.SanityResponse;
+import net.haugr.eds.core.enums.HashAlgorithm;
 import net.haugr.eds.core.enums.Permission;
 import net.haugr.eds.core.enums.SanityStatus;
-import net.haugr.eds.core.jce.Crypto;
 import net.haugr.eds.core.model.CommonDao;
+import net.haugr.eds.core.model.DataDao;
+import net.haugr.eds.core.model.EncryptedDataStore;
 import net.haugr.eds.core.model.SanityDao;
 import net.haugr.eds.core.model.Settings;
 import net.haugr.eds.core.model.entities.DataEntity;
@@ -51,7 +52,6 @@ import org.slf4j.LoggerFactory;
 public final class SanityManager extends AbstractManager<SanityDao, SanityResponse, SanityRequest> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SanityManager.class);
-    private static final int BLOCK = 100;
 
     public SanityManager(final Settings settings, final EntityManager entityManager) {
         super(settings, new SanityDao(entityManager));
@@ -74,26 +74,44 @@ public final class SanityManager extends AbstractManager<SanityDao, SanityRespon
         return response;
     }
 
-    public void sanitize() {
-        final Crypto crypto = new Crypto(settings);
+    /**
+     * The check is switched off with an interval of 0 days.
+     *
+     * @return True if the Data Objects are checked
+     */
+    public boolean isEnabled() {
+        return settings.getSanityInterval() > 0;
+    }
+
+    /**
+     * Whether a run has checked as many Data Objects as allowed
+     * ({@code eds.sanity.check.max.objects}, 0 for no limit).
+     *
+     * @param checked Checked so far
+     * @return True if the run must stop
+     */
+    public boolean reachedLimit(final long checked) {
+        final int max = settings.getSanityMaxObjects();
+        return (max > 0) && (checked >= max);
+    }
+
+    /**
+     * Removes expired Sessions and Invitations.
+     */
+    public void clearExpired() {
         clearExpireSessions();
-        List<Long> ids = findNextBatch(BLOCK);
-        long count = 0;
-        long flawed = 0;
+        clearExpiredInvitations();
+    }
 
-        while (!ids.isEmpty()) {
-            for (final Long id : ids) {
-                final SanityStatus status = processEntity(crypto, id);
-                if (status == SanityStatus.FAILED) {
-                    flawed++;
-                }
-                count++;
-            }
-
-            ids = findNextBatch(BLOCK);
-        }
-
-        LOGGER.info("Completed Sanity check, found {} flaws out of {} checked Data Objects.", flawed, count);
+    /**
+     * Counts the Data Objects marked as failed.
+     *
+     * @return Number of failed Data Objects
+     */
+    public long countFailed() {
+        return (Long) dao.createNamedQuery("data.countWithStatus")
+                .setParameter("status", SanityStatus.FAILED)
+                .getSingleResult();
     }
 
     public List<Long> findNextBatch(final int maxResults) {
@@ -108,52 +126,104 @@ public final class SanityManager extends AbstractManager<SanityDao, SanityRespon
         return CommonDao.findList(query);
     }
 
-    public SanityStatus processEntity(final Crypto crypto, final Long id) {
+    /**
+     * <p>Checks one Data Object: the digest over the stored ciphertext is
+     * computed while reading it in batches (never the whole value), and
+     * compared with the stored checksum. No key is needed. Not a security
+     * control, the GCM tags are (PLAN.md, Crypto §4); it finds silent corruption.</p>
+     *
+     * <p>The digest is made with the algorithm the checksum was stored with,
+     * which is told by its length. So changing the hash algorithm setting
+     * doesn't fail the content stored before the change.</p>
+     *
+     * @param id Internal Id of the content
+     * @return The new Sanity status
+     */
+    public SanityStatus processEntity(final Long id) {
         SanityStatus status;
 
         try {
-            // When updating, it would be preferable to use Pessimistic
-            // locking to prevent that other processes accidentally update
-            // also. Pessimistic locking is made at the DB level, whereas
-            // Optimistic locking is handled by the ORM Vendor.
-            //   Even if two different EDS instances perform the same update on
-            // an Object, it should not have any other consequences than wasted
-            // CPU and DB updates.
-            final DataEntity entity = dao.find(DataEntity.class, id, LockModeType.NONE);
-            final String checksum = crypto.generateChecksum(entity.getData());
+            final String stored = (String) dao.createNamedQuery("data.findChecksum").setParameter("id", id).getSingleResult();
+            final String algorithm = checksumAlgorithm(stored, settings.getHashAlgorithm());
+            final int batchSize = settings.getStreamReadBatchSize();
+            final DataDao dataDao = new DataDao(dao.getEntityManager());
+            final String checksum = dataDao.withConnection(connection -> digest(connection, id, algorithm, batchSize));
 
-            if (!Objects.equals(checksum, entity.getChecksum())) {
-                // Let's update the DB with the information that the data is
-                //  invalid and return the error.
-                entity.setSanityStatus(SanityStatus.FAILED);
-                entity.setAltered(Utilities.newDate());
+            status = Objects.equals(checksum, stored) ? SanityStatus.OK : SanityStatus.FAILED;
+            if (status == SanityStatus.FAILED) {
+                LOGGER.error("The Data Object with the internal Id {} failed the sanity check; its stored data is damaged.", id);
             }
-
-            // Regardless, we will always set the check date, so this
-            // record will not be attempted again for a while.
-            entity.setSanityChecked(Utilities.newDate());
-            dao.save(entity);
-            status = entity.getSanityStatus();
+            // Regardless, the check date is set, so the record is not checked
+            // again for a while.
+            dataDao.updateSanityStatus(id, status);
         } catch (RuntimeException e) {
-            // There are 2 (3) potential problems that may be caught here:
-            //   1. A different process (EDS instance) may be processing the
-            //      record, hence it is perfectly legitimate, and we can
-            //      actually ignore the error. However, it is still being
-            //      logged.
-            //   2. The underlying database does not support locking, so it is
-            //      not possible to continue. If this is the case, it should be
-            //      reported to the EDS developers.
-            //   3. Unlikely - NPE caused by a missing EntityManager instance
-            LOGGER.error(e.getMessage(), e);
+            // Another EDS instance may be processing the record, or the
+            // database failed; the record is checked again later.
+            LOGGER.error("The sanity check of the Data Object with the internal Id {} failed.", id, e);
             status = SanityStatus.BLOCKED;
         }
 
         return status;
     }
 
+    private static String digest(final java.sql.Connection connection, final long id, final String algorithm, final int batchSize) throws java.sql.SQLException {
+        try {
+            final java.security.MessageDigest digest = java.security.MessageDigest.getInstance(algorithm);
+            final long length = EncryptedDataStore.length(connection, id);
+            try (java.io.InputStream stream = EncryptedDataStore.open(connection, id, 0, Math.max(0, length), batchSize)) {
+                final byte[] buffer = new byte[64 * 1024];
+                int read = stream.read(buffer);
+                while (read != -1) {
+                    digest.update(buffer, 0, read);
+                    read = stream.read(buffer);
+                }
+            }
+            return java.util.Base64.getEncoder().encodeToString(digest.digest());
+        } catch (java.security.NoSuchAlgorithmException | java.io.IOException e) {
+            throw new net.haugr.eds.core.exceptions.EDSException(net.haugr.eds.api.common.ReturnCode.INTEGRITY_ERROR, e.getMessage(), e);
+        }
+    }
+
+    /**
+     * <p>The algorithm a stored checksum was made with. The checksums are
+     * Base64 encoded digests, and the supported algorithms differ in the
+     * length of their digest (SHA-384: 48 bytes, SHA-512: 64 bytes), so the
+     * length of the checksum tells the algorithm. A checksum of any other
+     * length is checked with the current algorithm, and fails.</p>
+     *
+     * @param stored  The stored checksum
+     * @param current The hash algorithm of the settings
+     * @return Name of the digest algorithm to check the content with
+     */
+    static String checksumAlgorithm(final String stored, final HashAlgorithm current) {
+        if (stored != null) {
+            for (final HashAlgorithm candidate : HashAlgorithm.values()) {
+                if (stored.length() == checksumLength(candidate)) {
+                    return candidate.getAlgorithm();
+                }
+            }
+        }
+
+        return current.getAlgorithm();
+    }
+
+    private static int checksumLength(final HashAlgorithm algorithm) {
+        try {
+            final int bytes = java.security.MessageDigest.getInstance(algorithm.getAlgorithm()).getDigestLength();
+            return ((bytes + 2) / 3) * 4;
+        } catch (java.security.NoSuchAlgorithmException e) {
+            throw new net.haugr.eds.core.exceptions.EDSException(net.haugr.eds.api.common.ReturnCode.INTEGRITY_ERROR, e.getMessage(), e);
+        }
+    }
+
     private void clearExpireSessions() {
-        final Query query = dao.createNamedQuery("member.removeExpiredSessions");
+        final Query query = dao.createNamedQuery("session.removeExpired");
         LOGGER.debug("expired {} sessions.", query.executeUpdate());
+    }
+
+    private void clearExpiredInvitations() {
+        final Query query = dao.createNamedQuery("member.removeExpiredInvitations");
+        LOGGER.debug("removed {} expired invitations.", query.executeUpdate());
     }
 
     private List<DataEntity> findRecords(final SanityRequest request) {

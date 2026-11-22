@@ -16,6 +16,10 @@
  */
 package net.haugr.eds.core.services;
 
+import org.eclipse.microprofile.openapi.annotations.media.Content;
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
+import jakarta.ws.rs.core.MediaType;
+import net.haugr.eds.api.responses.AuthenticateResponse;
 import jakarta.inject.Inject;
 import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.Consumes;
@@ -66,9 +70,9 @@ public class AuthenticatedService {
      */
     @Operation(
             summary = "Check authentication",
-            description = "Simple check to see if a Member is authenticated to work with this EDS instance. " +
-                    "The response will return SUCCESS if authentication information exists, otherwise an error is returned together with a more detailed message.")
-    @APIResponse(responseCode = "200", description = "Successful operation")
+            description = "Checks the credentials and returns the Member's ID.")
+    @APIResponse(responseCode = "200", description = "The outcome of the request; see returnCode.",
+            content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = AuthenticateResponse.class)))
     @POST
     @Consumes(CommonService.CONSUMES)
     @Produces(CommonService.PRODUCES)

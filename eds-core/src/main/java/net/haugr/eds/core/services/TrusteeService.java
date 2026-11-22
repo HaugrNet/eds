@@ -16,6 +16,11 @@
  */
 package net.haugr.eds.core.services;
 
+import org.eclipse.microprofile.openapi.annotations.media.Content;
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
+import jakarta.ws.rs.core.MediaType;
+import net.haugr.eds.api.responses.FetchTrusteeResponse;
+import net.haugr.eds.api.responses.ProcessTrusteeResponse;
 import jakarta.inject.Inject;
 import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.Consumes;
@@ -64,9 +69,9 @@ public class TrusteeService {
      */
     @Operation(
             summary = "Add trustee",
-            description = "Adds a new Trustee to a Circle. A Trustee is a Member that has been granted access to a Circle's Key, enabling them to encrypt and decrypt Circle Data. " +
-                    "The member must not be the System Administrator. A specific Trust level (READ, WRITE, or ADMIN) must be specified.")
-    @APIResponse(responseCode = "200", description = "Successful operation")
+            description = "Adds a Member to a Circle with a trust level.")
+    @APIResponse(responseCode = "200", description = "The outcome of the request; see returnCode.",
+            content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = ProcessTrusteeResponse.class)))
     @POST
     @Path(Constants.REST_TRUSTEES_ADD)
     @Consumes(CommonService.CONSUMES)
@@ -84,9 +89,9 @@ public class TrusteeService {
      */
     @Operation(
             summary = "Alter trustee",
-            description = "Alters the level of trust for a given Trustee towards the Circle. Trust levels include: READ (can only read data), WRITE (can read and write data), " +
-                    "and ADMIN (full Circle Administrator access).")
-    @APIResponse(responseCode = "200", description = "Successful operation")
+            description = "Changes a Trustee's trust level, their secret, or both.")
+    @APIResponse(responseCode = "200", description = "The outcome of the request; see returnCode.",
+            content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = ProcessTrusteeResponse.class)))
     @POST
     @Path(Constants.REST_TRUSTEES_ALTER)
     @Consumes(CommonService.CONSUMES)
@@ -97,6 +102,26 @@ public class TrusteeService {
     }
 
     /**
+     * The REST Set Secrets Endpoint (E2E.md).
+     *
+     * @param setSecretsRequest Set Secrets Request
+     * @return Set Secrets Response
+     */
+    @Operation(
+            summary = "Set secrets",
+            description = "Sets the secrets of several Trustees of a Circle, all or none.")
+    @APIResponse(responseCode = "200", description = "The outcome of the request; see returnCode.",
+            content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = ProcessTrusteeResponse.class)))
+    @POST
+    @Path(Constants.REST_TRUSTEES_SECRETS)
+    @Consumes(CommonService.CONSUMES)
+    @Produces(CommonService.PRODUCES)
+    public Response secrets(@NotNull final ProcessTrusteeRequest setSecretsRequest) {
+        setSecretsRequest.setAction(Action.SECRETS);
+        return CommonService.runRequest(settings, () -> managementBean.processTrustee(setSecretsRequest), Constants.REST_TRUSTEES_BASE + Constants.REST_TRUSTEES_SECRETS);
+    }
+
+    /**
      * The REST Remove Trustee Endpoint.
      *
      * @param removeTrusteeRequest Remove Trustee Request
@@ -104,9 +129,9 @@ public class TrusteeService {
      */
     @Operation(
             summary = "Remove trustee",
-            description = "Removes a Trustee from the Circle. The Account will no longer be able to access any data belonging to the Circle. " +
-                    "Requires Circle Administrator privileges.")
-    @APIResponse(responseCode = "200", description = "Successful operation")
+            description = "Removes a Member from a Circle.")
+    @APIResponse(responseCode = "200", description = "The outcome of the request; see returnCode.",
+            content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = ProcessTrusteeResponse.class)))
     @POST
     @Path(Constants.REST_TRUSTEES_REMOVE)
     @Consumes(CommonService.CONSUMES)
@@ -124,9 +149,9 @@ public class TrusteeService {
      */
     @Operation(
             summary = "Fetch trustees",
-            description = "Retrieves a list of Trustees belonging to either a Member or a Circle. If no MemberId or CircleId is provided, returns the requesting Member's Trustee information. " +
-                    "If both are set, returns a list with one or zero records. Non-administrators can only see Trustee information from Circles they belong to.")
-    @APIResponse(responseCode = "200", description = "Successful operation")
+            description = "Returns Trustee records of a Circle and/or a Member.")
+    @APIResponse(responseCode = "200", description = "The outcome of the request; see returnCode.",
+            content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = FetchTrusteeResponse.class)))
     @POST
     @Path(Constants.REST_TRUSTEES_FETCH)
     @Consumes(CommonService.CONSUMES)

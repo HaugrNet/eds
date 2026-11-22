@@ -20,8 +20,16 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
+import jakarta.transaction.UserTransaction;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import net.haugr.eds.api.common.Utilities;
+import net.haugr.eds.core.enums.SanityStatus;
 import net.haugr.eds.core.managers.SanityManager;
 import net.haugr.eds.core.model.Settings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <p>Generally, the database is always trustworthy, it is a system designed
@@ -46,26 +54,91 @@ import net.haugr.eds.core.model.Settings;
 @Transactional
 public class SanitizerBean {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(SanitizerBean.class);
+    private static final int BLOCK = 100;
+
     private final SanityManager manager;
+    private final Settings settings;
+    private final UserTransaction userTransaction;
 
     public SanitizerBean() {
         this(null, Settings.getInstance());
     }
 
     @Inject
-    public SanitizerBean(final EntityManager entityManager) {
-        this(entityManager, Settings.getInstance());
+    public SanitizerBean(final EntityManager entityManager, final UserTransaction userTransaction) {
+        this(new SanityManager(Settings.getInstance(), entityManager), Settings.getInstance(), userTransaction);
     }
 
     public SanitizerBean(final EntityManager entityManager, final Settings settings) {
-        this(new SanityManager(settings, entityManager));
+        this(new SanityManager(settings, entityManager), settings, null);
     }
 
     public SanitizerBean(final SanityManager manager) {
-        this.manager = manager;
+        this(manager, Settings.getInstance(), null);
     }
 
+    public SanitizerBean(final SanityManager manager, final Settings settings, final UserTransaction userTransaction) {
+        this.manager = manager;
+        this.settings = settings;
+        this.userTransaction = userTransaction;
+    }
+
+    /**
+     * <p>Runs the sanity check (PLAN.md, S4). Each Data Object is checked
+     * in its own transaction with the stream timeout, as reading a large
+     * object takes time; a run checks at most
+     * {@code eds.sanity.check.max.objects}. The outcome is kept in the
+     * {@link SanityReport} for the health check.</p>
+     */
+    @Transactional(Transactional.TxType.NOT_SUPPORTED)
     public void sanitize() {
-        manager.sanitize();
+        final int timeout = settings.getStreamTransactionTimeout();
+        StreamTransaction.run(userTransaction, timeout, () -> {
+            manager.clearExpired();
+            return null;
+        });
+
+        final boolean enabled = manager.isEnabled();
+        final Counts counts = enabled ? checkAll(timeout) : new Counts(0, 0);
+
+        final long failedTotal = StreamTransaction.run(userTransaction, timeout, manager::countFailed);
+        SanityReport.completed(Utilities.newDate(), enabled, counts.checked(), counts.flawed(), failedTotal);
+        LOGGER.info("Completed Sanity check, found {} flaws out of {} checked Data Objects; {} are marked as failed.", counts.flawed(), counts.checked(), failedTotal);
+    }
+
+    /**
+     * Checks the Data Objects, batch by batch, until none are left or the
+     * limit of a run is reached. A batch with nothing new ends the run too.
+     *
+     * @param timeout Timeout of each transaction, in seconds
+     * @return How many were checked, and how many of them had a flaw
+     */
+    // The set of the Ids seen is read through add(), false for one seen before.
+    @SuppressWarnings("fb-contrib:WOC_WRITE_ONLY_COLLECTION_LOCAL")
+    private Counts checkAll(final int timeout) {
+        final Set<Long> seen = new HashSet<>();
+        long checked = 0;
+        long flawed = 0;
+        List<Long> ids = StreamTransaction.run(userTransaction, timeout, () -> manager.findNextBatch(BLOCK));
+        while (!ids.isEmpty() && !manager.reachedLimit(checked)) {
+            boolean progress = false;
+            for (final Long id : ids) {
+                if (seen.add(id) && !manager.reachedLimit(checked)) {
+                    progress = true;
+                    final SanityStatus status = StreamTransaction.run(userTransaction, timeout, () -> manager.processEntity(id));
+                    if (status == SanityStatus.FAILED) {
+                        flawed++;
+                    }
+                    checked++;
+                }
+            }
+            ids = progress ? StreamTransaction.run(userTransaction, timeout, () -> manager.findNextBatch(BLOCK)) : List.of();
+        }
+
+        return new Counts(checked, flawed);
+    }
+
+    private record Counts(long checked, long flawed) {
     }
 }

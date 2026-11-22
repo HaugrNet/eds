@@ -16,6 +16,10 @@
  */
 package net.haugr.eds.core.services;
 
+import org.eclipse.microprofile.openapi.annotations.media.Content;
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
+import jakarta.ws.rs.core.MediaType;
+import net.haugr.eds.api.responses.MasterKeyResponse;
 import jakarta.inject.Inject;
 import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.Consumes;
@@ -62,11 +66,9 @@ public class MasterKeyService {
      */
     @Operation(
             summary = "Manage master key",
-            description = "The Master Key is a special symmetric key used to encrypt and decrypt all Initial Vectors and Member Salt values. " +
-                    "The key is only kept in memory and is never persisted, meaning it must be set when the EDS instance is started. " +
-                    "There is a default Master Key based on known values in the system, but for enhanced security, it should be set by the System Administrator. " +
-                    "Important: The MasterKey must be set AFTER the system Salt has been updated, as the system Salt is required by the Master Key.")
-    @APIResponse(responseCode = "200", description = "Successful operation")
+            description = "Unlocks EDS with the MasterKey after a restart, or sets a new MasterKey while no other Members exist.")
+    @APIResponse(responseCode = "200", description = "The outcome of the request; see returnCode.",
+            content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = MasterKeyResponse.class)))
     @POST
     @Consumes(CommonService.CONSUMES)
     @Produces(CommonService.PRODUCES)

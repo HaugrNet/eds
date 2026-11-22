@@ -27,6 +27,10 @@ public enum Status {
     /** Active means that this can be used safely. */
     ACTIVE,
 
-    /** Deprecation is a temporary step before being suspended or deleted. */
-    DEPRECATED
+    /**
+     * A Circle Secret which is being rotated (PLAN.md, Crypto C6): objects
+     * which are not yet re-encrypted are still on it, nothing new is written
+     * with it. It is deleted when no object is left on it.
+     */
+    RETIRING
 }

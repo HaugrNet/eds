@@ -16,6 +16,20 @@
  */
 package net.haugr.eds.core.services;
 
+import org.eclipse.microprofile.openapi.annotations.security.SecurityRequirement;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.HeaderParam;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.core.HttpHeaders;
+import net.haugr.eds.api.responses.EDSResponse;
+import org.eclipse.microprofile.openapi.annotations.parameters.Parameter;
+import org.eclipse.microprofile.openapi.annotations.media.Content;
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
+import jakarta.ws.rs.core.MediaType;
+import net.haugr.eds.api.responses.FetchMemberResponse;
+import net.haugr.eds.api.responses.ProcessMemberResponse;
 import jakarta.inject.Inject;
 import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.Consumes;
@@ -64,10 +78,12 @@ public class MemberService {
      */
     @Operation(
             summary = "Create member",
-            description = "Creates a new Member account. Can be done by the System Administrator or a Circle Administrator (in preparation to adding the Member to their Circles). " +
-                    "The account name must be unique (1-75 characters) and credentials must be provided. " +
-                    "For a fresh installation, the first invocation sets the key on the System Administrator account based on the security credentials provided.")
-    @APIResponse(responseCode = "200", description = "Successful operation")
+            description = "Creates a Member account with a passphrase (System Administrator only; only the first System Administrator "
+                    + "may give it the role ADMIN). The System Administrator is not created by anyone: a stone has no account to begin "
+                    + "with, and whoever first comes to it becomes its System Administrator, under the account name and with the "
+                    + "passphrase given. No name is set for it.")
+    @APIResponse(responseCode = "200", description = "The outcome of the request; see returnCode.",
+            content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = ProcessMemberResponse.class)))
     @POST
     @Path(Constants.REST_MEMBERS_CREATE)
     @Consumes(CommonService.CONSUMES)
@@ -85,9 +101,11 @@ public class MemberService {
      */
     @Operation(
             summary = "Invite member",
-            description = "Creates a signed invitation for a potential Member. The System Administrator issues a signature which is returned in the armoredKey field (instead of a Private Key). " +
-                    "The invited member can later use this signature to create their account with their own credentials.")
-    @APIResponse(responseCode = "200", description = "Successful operation")
+            description = "Creates an invitation for a new Member, who then sets their own passphrase. An invitation always makes "
+                    + "a user (STANDARD): a request with the role ADMIN is refused, as a link which falls into the wrong hands must "
+                    + "not give more. An administrator is made by creating the account, or by changing the role afterwards.")
+    @APIResponse(responseCode = "200", description = "The outcome of the request; see returnCode.",
+            content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = ProcessMemberResponse.class)))
     @POST
     @Path(Constants.REST_MEMBERS_INVITE)
     @Consumes(CommonService.CONSUMES)
@@ -105,9 +123,9 @@ public class MemberService {
      */
     @Operation(
             summary = "Login member",
-            description = "Links a Session with an Account. This helps websites use EDS without needing to store account credentials unsafely. " +
-                    "Returns a session token that can be used for subsequent authenticated requests.")
-    @APIResponse(responseCode = "200", description = "Successful operation")
+            description = "Starts a session with a session key chosen by the client, so later requests don't need the passphrase.")
+    @APIResponse(responseCode = "200", description = "The outcome of the request; see returnCode.",
+            content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = ProcessMemberResponse.class)))
     @POST
     @Path(Constants.REST_MEMBERS_LOGIN)
     @Consumes(CommonService.CONSUMES)
@@ -125,8 +143,9 @@ public class MemberService {
      */
     @Operation(
             summary = "Logout member",
-            description = "Unlinks the Session from the Account, terminating the current session for the authenticated member.")
-    @APIResponse(responseCode = "200", description = "Successful operation")
+            description = "Ends the requesting Member's session.")
+    @APIResponse(responseCode = "200", description = "The outcome of the request; see returnCode.",
+            content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = ProcessMemberResponse.class)))
     @POST
     @Path(Constants.REST_MEMBERS_LOGOUT)
     @Consumes(CommonService.CONSUMES)
@@ -144,9 +163,9 @@ public class MemberService {
      */
     @Operation(
             summary = "Alter member",
-            description = "Allows a System Administrator to alter Member Accounts and change their Role. " +
-                    "This can allow someone else to become System Administrator, or simply revoke the role. Requires a valid member ID and role.")
-    @APIResponse(responseCode = "200", description = "Successful operation")
+            description = "Changes another Member's role. Only the first System Administrator may, and its own role can't be changed.")
+    @APIResponse(responseCode = "200", description = "The outcome of the request; see returnCode.",
+            content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = ProcessMemberResponse.class)))
     @POST
     @Path(Constants.REST_MEMBERS_ALTER)
     @Consumes(CommonService.CONSUMES)
@@ -164,10 +183,9 @@ public class MemberService {
      */
     @Operation(
             summary = "Update member",
-            description = "Updates the authenticated member's own Account. Allows changing the Account Name (if not taken), updating credentials (PassPhrase), " +
-                    "and changing the Public Key belonging to the account. The System Administrator cannot change their own account name. " +
-                    "Note: Only the current owner can update credentials, as they are used to unlock internal keys.")
-    @APIResponse(responseCode = "200", description = "Successful operation")
+            description = "Updates the requesting Member's own account: name, passphrase and/or external public key. Also accepts invitations.")
+    @APIResponse(responseCode = "200", description = "The outcome of the request; see returnCode.",
+            content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = ProcessMemberResponse.class)))
     @POST
     @Path(Constants.REST_MEMBERS_UPDATE)
     @Consumes(CommonService.CONSUMES)
@@ -185,9 +203,9 @@ public class MemberService {
      */
     @Operation(
             summary = "Invalidate member",
-            description = "Invalidates the member's asymmetric key used for Circle access. The account will appear correct, but it will not be possible to read or write data in any Circles. " +
-                    "The Account can be later corrected by Circle Administrators replacing all existing Trustee records.")
-    @APIResponse(responseCode = "200", description = "Successful operation")
+            description = "Invalidates the requesting Member's own credentials, so the account can no longer be used.")
+    @APIResponse(responseCode = "200", description = "The outcome of the request; see returnCode.",
+            content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = ProcessMemberResponse.class)))
     @POST
     @Path(Constants.REST_MEMBERS_INVALIDATE)
     @Consumes(CommonService.CONSUMES)
@@ -205,10 +223,9 @@ public class MemberService {
      */
     @Operation(
             summary = "Delete member",
-            description = "Removes a Member from the system. Can be done by the Member themselves or by the System Administrator. " +
-                    "A Circle Administrator cannot remove a Member from the system. Removal automatically deletes all Data belonging to the Member (Circle relations and Member details). " +
-                    "This action is irreversible.")
-    @APIResponse(responseCode = "200", description = "Successful operation")
+            description = "Deletes the requesting Member's own account, or (System Administrator only) another account.")
+    @APIResponse(responseCode = "200", description = "The outcome of the request; see returnCode.",
+            content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = ProcessMemberResponse.class)))
     @POST
     @Path(Constants.REST_MEMBERS_DELETE)
     @Consumes(CommonService.CONSUMES)
@@ -226,14 +243,151 @@ public class MemberService {
      */
     @Operation(
             summary = "Fetch members",
-            description = "Retrieves existing Member Accounts from the System. If a specific Account is requested, a list of Circles where the Account is also a Trustee is returned. " +
-                    "Supports optional filtering and pagination.")
-    @APIResponse(responseCode = "200", description = "Successful operation")
+            description = "Returns all Members, or one Member with the Circles the requester may see.")
+    @APIResponse(responseCode = "200", description = "The outcome of the request; see returnCode.",
+            content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = FetchMemberResponse.class)))
     @POST
     @Path(Constants.REST_MEMBERS_FETCH)
     @Consumes(CommonService.CONSUMES)
     @Produces(CommonService.PRODUCES)
     public Response fetch(@NotNull final FetchMemberRequest fetchMembersRequest) {
         return CommonService.runRequest(settings, () -> managementBean.fetchMembers(fetchMembersRequest), Constants.REST_MEMBERS_BASE + Constants.REST_MEMBERS_FETCH);
+    }
+
+    // =========================================================================
+    // ID-based resource API (PLAN.md, L1)
+    // =========================================================================
+
+    /**
+     * List members: {@code GET /members} (ID-based resource API, PLAN.md, L1).
+     *
+     * @param authorization Authorization header with the Session token
+     * @return FetchMemberResponse
+     */
+    @Operation(operationId = "getMembers", summary = "List members", description = "Returns the Members the requesting Member may see; as fetchMembers.")
+    @APIResponse(responseCode = "200", description = CommonService.RESOURCE_SUCCESS,
+            content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = FetchMemberResponse.class)))
+    @APIResponse(responseCode = "4xx", description = CommonService.RESOURCE_WARNING,
+            content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = EDSResponse.class)))
+    @APIResponse(responseCode = "5xx", description = CommonService.RESOURCE_ERROR,
+            content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = EDSResponse.class)))
+    @GET
+    @Produces(CommonService.PRODUCES)
+    @SecurityRequirement(name = CommonService.SESSION_SCHEME)
+    public Response getMembers(
+            @Parameter(hidden = true) @HeaderParam(HttpHeaders.AUTHORIZATION) final String authorization) {
+        final FetchMemberRequest request = new FetchMemberRequest();
+        return CommonService.runResourceRequest(settings, authorization, request, managementBean::fetchMembers, "GET /members");
+    }
+
+    /**
+     * Get member: {@code GET /members/{memberId}} (ID-based resource API, PLAN.md, L1).
+     *
+     * @param authorization Authorization header with the Session token
+     * @param memberId ID of the Member.
+     * @return FetchMemberResponse
+     */
+    @Operation(operationId = "getMemberById", summary = "Get member", description = "Returns one Member and the Circles it shares with the requesting Member; as fetchMembers with a memberId.")
+    @APIResponse(responseCode = "200", description = CommonService.RESOURCE_SUCCESS,
+            content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = FetchMemberResponse.class)))
+    @APIResponse(responseCode = "4xx", description = CommonService.RESOURCE_WARNING,
+            content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = EDSResponse.class)))
+    @APIResponse(responseCode = "5xx", description = CommonService.RESOURCE_ERROR,
+            content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = EDSResponse.class)))
+    @GET
+    @Path("/{memberId}")
+    @Produces(CommonService.PRODUCES)
+    @SecurityRequirement(name = CommonService.SESSION_SCHEME)
+    public Response getMemberById(
+            @Parameter(hidden = true) @HeaderParam(HttpHeaders.AUTHORIZATION) final String authorization,
+            @Parameter(description = "ID of the Member.", required = true) @PathParam("memberId") final String memberId) {
+        final FetchMemberRequest request = new FetchMemberRequest();
+        request.setMemberId(memberId);
+        return CommonService.runResourceRequest(settings, authorization, request, managementBean::fetchMembers, "GET /members/{memberId}");
+    }
+
+    /**
+     * Create member: {@code POST /members} (ID-based resource API, PLAN.md, L1).
+     *
+     * @param authorization Authorization header with the Session token
+     * @param body          The request body
+     * @return ProcessMemberResponse
+     */
+    @Operation(operationId = "postMembers", summary = "Create member", description = "Creates a new Member; as createMember. "
+            + "Any administrator may create a user (STANDARD); only the first System Administrator may create an administrator (ADMIN).")
+    @APIResponse(responseCode = "200", description = CommonService.RESOURCE_SUCCESS,
+            content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = ProcessMemberResponse.class)))
+    @APIResponse(responseCode = "4xx", description = CommonService.RESOURCE_WARNING,
+            content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = EDSResponse.class)))
+    @APIResponse(responseCode = "5xx", description = CommonService.RESOURCE_ERROR,
+            content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = EDSResponse.class)))
+    @POST
+    @Consumes(CommonService.CONSUMES)
+    @Produces(CommonService.PRODUCES)
+    @SecurityRequirement(name = CommonService.SESSION_SCHEME)
+    public Response postMembers(
+            @Parameter(hidden = true) @HeaderParam(HttpHeaders.AUTHORIZATION) final String authorization,
+            final ProcessMemberRequest body) {
+        final ProcessMemberRequest request = (body != null) ? body : new ProcessMemberRequest();
+        request.setAction(Action.CREATE);
+        return CommonService.runResourceRequest(settings, authorization, request, managementBean::processMember, "POST /members");
+    }
+
+    /**
+     * Alter member role: {@code PUT /members/{memberId}} (ID-based resource API, PLAN.md, L1).
+     *
+     * @param authorization Authorization header with the Session token
+     * @param memberId ID of the Member.
+     * @param body          The request body
+     * @return ProcessMemberResponse
+     */
+    @Operation(operationId = "putMemberById", summary = "Alter member role",
+            description = "Changes the role of a Member; as alterMember. Only the first System Administrator may, and its own role can't be changed.")
+    @APIResponse(responseCode = "200", description = CommonService.RESOURCE_SUCCESS,
+            content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = ProcessMemberResponse.class)))
+    @APIResponse(responseCode = "4xx", description = CommonService.RESOURCE_WARNING,
+            content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = EDSResponse.class)))
+    @APIResponse(responseCode = "5xx", description = CommonService.RESOURCE_ERROR,
+            content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = EDSResponse.class)))
+    @PUT
+    @Path("/{memberId}")
+    @Consumes(CommonService.CONSUMES)
+    @Produces(CommonService.PRODUCES)
+    @SecurityRequirement(name = CommonService.SESSION_SCHEME)
+    public Response putMemberById(
+            @Parameter(hidden = true) @HeaderParam(HttpHeaders.AUTHORIZATION) final String authorization,
+            @Parameter(description = "ID of the Member.", required = true) @PathParam("memberId") final String memberId,
+            final ProcessMemberRequest body) {
+        final ProcessMemberRequest request = (body != null) ? body : new ProcessMemberRequest();
+        request.setAction(Action.ALTER);
+        request.setMemberId(memberId);
+        return CommonService.runResourceRequest(settings, authorization, request, managementBean::processMember, "PUT /members/{memberId}");
+    }
+
+    /**
+     * Delete member: {@code DELETE /members/{memberId}} (ID-based resource API, PLAN.md, L1).
+     *
+     * @param authorization Authorization header with the Session token
+     * @param memberId ID of the Member.
+     * @return ProcessMemberResponse
+     */
+    @Operation(operationId = "deleteMemberById", summary = "Delete member", description = "Deletes a Member; as deleteMember with a memberId.")
+    @APIResponse(responseCode = "200", description = CommonService.RESOURCE_SUCCESS,
+            content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = ProcessMemberResponse.class)))
+    @APIResponse(responseCode = "4xx", description = CommonService.RESOURCE_WARNING,
+            content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = EDSResponse.class)))
+    @APIResponse(responseCode = "5xx", description = CommonService.RESOURCE_ERROR,
+            content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = EDSResponse.class)))
+    @DELETE
+    @Path("/{memberId}")
+    @Produces(CommonService.PRODUCES)
+    @SecurityRequirement(name = CommonService.SESSION_SCHEME)
+    public Response deleteMemberById(
+            @Parameter(hidden = true) @HeaderParam(HttpHeaders.AUTHORIZATION) final String authorization,
+            @Parameter(description = "ID of the Member.", required = true) @PathParam("memberId") final String memberId) {
+        final ProcessMemberRequest request = new ProcessMemberRequest();
+        request.setAction(Action.DELETE);
+        request.setMemberId(memberId);
+        return CommonService.runResourceRequest(settings, authorization, request, managementBean::processMember, "DELETE /members/{memberId}");
     }
 }

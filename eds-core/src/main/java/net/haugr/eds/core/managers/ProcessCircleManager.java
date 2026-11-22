@@ -16,7 +16,6 @@
  */
 package net.haugr.eds.core.managers;
 
-import java.security.PublicKey;
 import java.util.Arrays;
 import java.util.Objects;
 import jakarta.persistence.EntityManager;
@@ -24,6 +23,7 @@ import net.haugr.eds.api.common.Action;
 import net.haugr.eds.api.common.MemberRole;
 import net.haugr.eds.api.common.ReturnCode;
 import net.haugr.eds.api.common.TrustLevel;
+import net.haugr.eds.api.common.Utilities;
 import net.haugr.eds.api.requests.ProcessCircleRequest;
 import net.haugr.eds.api.responses.ProcessCircleResponse;
 import net.haugr.eds.core.enums.KeyAlgorithm;
@@ -32,7 +32,6 @@ import net.haugr.eds.core.enums.Status;
 import net.haugr.eds.core.exceptions.AuthorizationException;
 import net.haugr.eds.core.exceptions.IllegalActionException;
 import net.haugr.eds.core.jce.Crypto;
-import net.haugr.eds.core.jce.PublicEDSKey;
 import net.haugr.eds.core.jce.SecretEDSKey;
 import net.haugr.eds.core.model.Settings;
 import net.haugr.eds.core.model.TrusteeDao;
@@ -50,6 +49,8 @@ import net.haugr.eds.core.model.entities.TrusteeEntity;
  * @since EDS 1.0
  */
 public final class ProcessCircleManager extends AbstractManager<TrusteeDao, ProcessCircleResponse, ProcessCircleRequest> {
+
+    private static final String NO_SUCH_CIRCLE = "No Circle could be found with the given Id.";
 
     public ProcessCircleManager(final Settings settings, final EntityManager entityManager) {
         super(settings, new TrusteeDao(entityManager));
@@ -117,9 +118,9 @@ public final class ProcessCircleManager extends AbstractManager<TrusteeDao, Proc
             final MemberEntity owner = dao.find(MemberEntity.class, memberId);
             throwConditionalException(owner == null,
                     ReturnCode.IDENTIFICATION_WARNING, "Cannot create a new Circle with a non-existing Circle Administrator.");
-            response = createCircle(owner, name, request.getCircleKey());
+            response = createCircle(owner, name, request.getCircleKey(), request.getAvatar(), request.getSecret());
         } else {
-            response = createCircle(member, name, request.getCircleKey());
+            response = createCircle(member, name, request.getCircleKey(), request.getAvatar(), request.getSecret());
         }
 
         return response;
@@ -133,26 +134,34 @@ public final class ProcessCircleManager extends AbstractManager<TrusteeDao, Proc
      * @param circleAdmin       The initial Circle Administrator
      * @param name              The name of the new Circle
      * @param externalCircleKey External Circle Key
+     * @param avatar            Avatar of the Circle
+     * @param secret            The secret of the first administrator in the Circle
      * @return Response Object with the new Circle ID
      */
-    private ProcessCircleResponse createCircle(final MemberEntity circleAdmin, final String name, final String externalCircleKey) {
+    private ProcessCircleResponse createCircle(final MemberEntity circleAdmin, final String name, final String externalCircleKey, final String avatar, final String secret) {
         final KeyAlgorithm algorithm = settings.getSymmetricAlgorithm();
+        // The Circle Secret: random 256 bits (PLAN.md, Crypto §3).
         final SecretEDSKey key = Crypto.generateSymmetricKey(algorithm);
-        final PublicKey publicKey = crypto.dearmoringPublicKey(circleAdmin.getPublicKey());
-        final PublicEDSKey edsPublicKey = new PublicEDSKey(circleAdmin.getRsaAlgorithm(), publicKey);
-        final String circleKey = Crypto.encryptAndArmorCircleKey(edsPublicKey, key);
-        final byte[] externalKey = encryptExternalKey(key, externalCircleKey);
 
+        // The Circle is saved first, as its ID is part of the AADs.
         final CircleEntity circle = new CircleEntity();
         circle.setName(name);
-        circle.setCircleKey(externalKey);
+        circle.setAvatar(isEmpty(avatar) ? null : avatar);
+        // The first rotation of the Circle Secret is due a period from now
+        // (PLAN.md, Crypto C6).
+        circle.setRotateCircleKeyDue(settings.nextCircleSecretRotation());
         dao.save(circle);
+        circle.setCircleKey(encryptExternalKey(key, circle, externalCircleKey));
 
         createRootFolder(circle);
+        // The key row is saved before the secret is wrapped, as its ID is
+        // part of the AADs.
         final KeyEntity keyEntity = new KeyEntity();
+        keyEntity.setCircle(circle);
         keyEntity.setAlgorithm(algorithm);
         keyEntity.setStatus(Status.ACTIVE);
         dao.save(keyEntity);
+        final String circleKey = wrapCircleKey(circleAdmin, circle, keyEntity, key);
 
         final TrusteeEntity trustee = new TrusteeEntity();
         trustee.setMember(circleAdmin);
@@ -160,6 +169,8 @@ public final class ProcessCircleManager extends AbstractManager<TrusteeDao, Proc
         trustee.setKey(keyEntity);
         trustee.setTrustLevel(TrustLevel.ADMIN);
         trustee.setCircleKey(circleKey);
+        // The first administrator's secret in the Circle (E2E.md).
+        trustee.setExternalKey(sealTrusteeSecret(key, circle, circleAdmin, secret));
         dao.save(trustee);
 
         final ProcessCircleResponse response = new ProcessCircleResponse(theCircle(circle) + " was successfully created.");
@@ -182,6 +193,7 @@ public final class ProcessCircleManager extends AbstractManager<TrusteeDao, Proc
         return switch (request.getAction()) {
             case UPDATE -> updateCircle(request);
             case DELETE -> deleteCircle(request);
+            case ROTATE -> rotateCircle(request);
             // Unreachable Code by design.
             default -> throw new IllegalActionException("Unsupported Action.");
         };
@@ -205,10 +217,17 @@ public final class ProcessCircleManager extends AbstractManager<TrusteeDao, Proc
 
         final CircleEntity entity = dao.find(CircleEntity.class, externalId);
         throwConditionalException(entity == null,
-                ReturnCode.IDENTIFICATION_WARNING, "No Circle could be found with the given Id.");
+                ReturnCode.IDENTIFICATION_WARNING, NO_SUCH_CIRCLE);
 
-        entity.setCircleKey(updateExternalCircleKey(request.getCircleKey()));
+        // Without a new external key, the stored one stays, as the name does.
+        if (request.getCircleKey() != null) {
+            entity.setCircleKey(updateExternalCircleKey(request.getCircleKey()));
+        }
         checkAndUpdateCircleName(entity, request.getCircleName());
+        if (request.getAvatar() != null) {
+            // An empty avatar removes it.
+            entity.setAvatar(request.getAvatar().isEmpty() ? null : request.getAvatar());
+        }
         dao.save(entity);
 
         return new ProcessCircleResponse(theCircle(entity) + " was successfully updated.");
@@ -218,9 +237,13 @@ public final class ProcessCircleManager extends AbstractManager<TrusteeDao, Proc
         byte[] encryptedKey = null;
 
         if (externalKey != null) {
+            // The Circle is locked first, so the current Circle Secret is
+            // used, also if a rotation started meanwhile; see PLAN.md, Crypto C6.
             final TrusteeEntity trustee = trustees.getFirst();
-            final SecretEDSKey circleKey = Crypto.extractCircleKey(trustee.getKey().getAlgorithm(), keyPair.getPrivate(), trustee.getCircleKey());
-            encryptedKey = encryptExternalKey(circleKey, externalKey);
+            dao.lockCircle(trustee.getCircle());
+            dao.refresh(trustee);
+            final SecretEDSKey circleKey = unwrapCircleKey(trustee);
+            encryptedKey = encryptExternalKey(circleKey, trustee.getCircle(), externalKey);
         }
 
         return encryptedKey;
@@ -239,6 +262,33 @@ public final class ProcessCircleManager extends AbstractManager<TrusteeDao, Proc
     }
 
     /**
+     * <p>Rotates the Circle Secret now (PLAN.md, Crypto C6): the rotation is
+     * set due, and starts in the background with the secret of the
+     * requesting Circle administrator; for the System Administrator, who
+     * needn't be a Trustee, at the next request of a Trustee.</p>
+     *
+     * @param request Request Object with the ID of the Circle
+     * @return Response Object
+     */
+    private ProcessCircleResponse rotateCircle(final ProcessCircleRequest request) {
+        final CircleEntity entity = dao.find(CircleEntity.class, request.getCircleId());
+        throwConditionalException(entity == null,
+                ReturnCode.IDENTIFICATION_WARNING, NO_SUCH_CIRCLE);
+
+        dao.lockCircle(entity);
+        entity.setRotateCircleKeyDue(Utilities.newDate());
+        dao.save(entity);
+        for (final TrusteeEntity trustee : trustees) {
+            if (Objects.equals(trustee.getCircle().getId(), entity.getId())) {
+                // Unwrapping hands the secret to the rotation.
+                unwrapCircleKey(trustee);
+            }
+        }
+
+        return new ProcessCircleResponse("The Circle Secret of the " + theCircle(entity).substring(4) + " is being rotated.");
+    }
+
+    /**
      * <p>Deleting an existing Circle is an irreversible process, by which all
      * the data, keys, and trustees will also be deleted alongside the Circle.</p>
      *
@@ -252,15 +302,17 @@ public final class ProcessCircleManager extends AbstractManager<TrusteeDao, Proc
         final String externalId = request.getCircleId();
         final CircleEntity entity = dao.find(CircleEntity.class, externalId);
         throwConditionalException(entity == null,
-                ReturnCode.IDENTIFICATION_WARNING, "No Circle could be found with the given Id.");
+                ReturnCode.IDENTIFICATION_WARNING, NO_SUCH_CIRCLE);
 
         // Before deleting the Circle, all associated Trustees must be deleted.
         // This is to avoid having orphaned Trustees.
         for (final TrusteeEntity trustee : dao.findTrusteesByCircle(entity.getExternalId())) {
             dao.delete(trustee);
         }
-
-        dao.delete(entity);
+        // The content goes before the Circle Secrets it is encrypted with,
+        // which go with the Circle.
+        dao.deleteContentOfCircle(entity);
+        dao.deleteCircle(entity);
 
         return new ProcessCircleResponse(theCircle(entity) + " has successfully been removed from EDS.");
     }

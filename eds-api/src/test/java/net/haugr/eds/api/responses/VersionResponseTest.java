@@ -19,6 +19,7 @@ package net.haugr.eds.api.responses;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import net.haugr.eds.api.common.ReturnCode;
@@ -41,6 +42,13 @@ final class VersionResponseTest {
         assertEquals("Ok", response.getReturnMessage());
         assertTrue(response.isOk());
         assertEquals(version, response.getVersion());
+        assertNull(response.getDatabase());
+        assertNull(response.getPersistent());
+
+        response.setDatabase("H2");
+        response.setPersistent(Boolean.FALSE);
+        assertEquals("H2", response.getDatabase());
+        assertSame(Boolean.FALSE, response.getPersistent());
     }
 
     @Test
@@ -52,5 +60,7 @@ final class VersionResponseTest {
         assertEquals(msg, response.getReturnMessage());
         assertFalse(response.isOk());
         assertNull(response.getVersion());
+        assertNull(response.getDatabase());
+        assertNull(response.getPersistent());
     }
 }

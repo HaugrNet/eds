@@ -16,11 +16,9 @@
  */
 package net.haugr.eds.fitnesse;
 
-import net.haugr.eds.api.requests.MasterKeyRequest;
-import net.haugr.eds.api.responses.MasterKeyResponse;
-import java.util.Map;
+import net.haugr.eds.client.model.MasterKeyRequest;
+import net.haugr.eds.client.model.MasterKeyResponse;
 import net.haugr.eds.fitnesse.callers.CallManagement;
-import net.haugr.eds.fitnesse.exceptions.StopTestException;
 import net.haugr.eds.fitnesse.utils.Converter;
 
 /**
@@ -58,10 +56,6 @@ public final class MasterKey extends EDSRequest<MasterKeyResponse> {
         final MasterKeyRequest request = prepareRequest(MasterKeyRequest.class);
         request.setSecret(secret);
         request.setUrl(url);
-        final Map<String, String> errors = request.validate();
-        if (!errors.isEmpty()) {
-            throw new StopTestException(errors.toString());
-        }
 
         response = CallManagement.masterKey(requestUrl, request);
     }

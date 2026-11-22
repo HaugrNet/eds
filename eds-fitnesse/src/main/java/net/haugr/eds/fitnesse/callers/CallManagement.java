@@ -16,206 +16,121 @@
  */
 package net.haugr.eds.fitnesse.callers;
 
-import net.haugr.eds.api.Management;
-import net.haugr.eds.api.requests.Authentication;
-import net.haugr.eds.api.requests.FetchCircleRequest;
-import net.haugr.eds.api.requests.FetchMemberRequest;
-import net.haugr.eds.api.requests.FetchTrusteeRequest;
-import net.haugr.eds.api.requests.InventoryRequest;
-import net.haugr.eds.api.requests.MasterKeyRequest;
-import net.haugr.eds.api.requests.ProcessCircleRequest;
-import net.haugr.eds.api.requests.ProcessMemberRequest;
-import net.haugr.eds.api.requests.ProcessTrusteeRequest;
-import net.haugr.eds.api.requests.SanityRequest;
-import net.haugr.eds.api.requests.SettingRequest;
-import net.haugr.eds.api.responses.AuthenticateResponse;
-import net.haugr.eds.api.responses.FetchCircleResponse;
-import net.haugr.eds.api.responses.FetchMemberResponse;
-import net.haugr.eds.api.responses.FetchTrusteeResponse;
-import net.haugr.eds.api.responses.InventoryResponse;
-import net.haugr.eds.api.responses.MasterKeyResponse;
-import net.haugr.eds.api.responses.ProcessCircleResponse;
-import net.haugr.eds.api.responses.ProcessMemberResponse;
-import net.haugr.eds.api.responses.ProcessTrusteeResponse;
-import net.haugr.eds.api.responses.SanityResponse;
-import net.haugr.eds.api.responses.SettingResponse;
-import net.haugr.eds.api.responses.VersionResponse;
-import net.haugr.eds.client.rest.ManagementRestClient;
+import net.haugr.eds.client.api.AuthenticationApi;
+import net.haugr.eds.client.api.CirclesApi;
+import net.haugr.eds.client.api.MasterKeyApi;
+import net.haugr.eds.client.api.MembersApi;
+import net.haugr.eds.client.api.SanityApi;
+import net.haugr.eds.client.api.SettingsApi;
+import net.haugr.eds.client.api.TrusteesApi;
+import net.haugr.eds.client.api.VersionApi;
+import net.haugr.eds.client.model.Authentication;
+import net.haugr.eds.client.model.AuthenticateResponse;
+import net.haugr.eds.client.model.FetchCircleRequest;
+import net.haugr.eds.client.model.FetchCircleResponse;
+import net.haugr.eds.client.model.FetchMemberRequest;
+import net.haugr.eds.client.model.FetchMemberResponse;
+import net.haugr.eds.client.model.FetchTrusteeRequest;
+import net.haugr.eds.client.model.FetchTrusteeResponse;
+import net.haugr.eds.client.model.MasterKeyRequest;
+import net.haugr.eds.client.model.MasterKeyResponse;
+import net.haugr.eds.client.model.ProcessCircleRequest;
+import net.haugr.eds.client.model.ProcessCircleResponse;
+import net.haugr.eds.client.model.ProcessMemberRequest;
+import net.haugr.eds.client.model.ProcessMemberResponse;
+import net.haugr.eds.client.model.ProcessTrusteeRequest;
+import net.haugr.eds.client.model.ProcessTrusteeResponse;
+import net.haugr.eds.client.model.SanityRequest;
+import net.haugr.eds.client.model.SanityResponse;
+import net.haugr.eds.client.model.SettingRequest;
+import net.haugr.eds.client.model.SettingResponse;
+import net.haugr.eds.client.model.VersionResponse;
+import net.haugr.eds.fitnesse.exceptions.StopTestException;
 
 /**
- * <p>EDS Management invocation class.</p>
+ * <p>Calls of the management operations, with the client generated from the
+ * API contract. The process requests go to the endpoint of their action.</p>
  *
  * @author Kim Jensen
- * @since EDS 1.0
+ * @since EDS 1.1
  */
 public final class CallManagement {
 
-    private static Management management = null;
+    private static final String UNSUPPORTED = "Unsupported action: ";
 
     private CallManagement() {
         // Private Constructor, this is a utility Class.
     }
 
-    private static void prepareEDS(final String url) {
-        if (management == null) {
-            management = new ManagementRestClient(url);
-        }
-    }
-
-    // =========================================================================
-    // Management Interface Functionality
-    // =========================================================================
-
-    /**
-     * Prepares a call for the EDS Version Service, using the given URL as
-     * Endpoint.
-     *
-     * @param url     Endpoint URL for the EDS call
-     * @return Result from the call
-     */
     public static VersionResponse version(final String url) {
-        prepareEDS(url);
-        return management.version();
+        return Calls.run(url, VersionResponse.class, () -> Calls.api(url, VersionApi.class, VersionApi::new).version());
     }
 
-    /**
-     * Prepares a call for the EDS MasterKey Service, using the given URL as
-     * Endpoint and the given Request Object as argument.
-     *
-     * @param url     Endpoint URL for the EDS call
-     * @param request Request Object for the call
-     * @return Response from the call
-     */
     public static MasterKeyResponse masterKey(final String url, final MasterKeyRequest request) {
-        prepareEDS(url);
-        return management.masterKey(request);
+        return Calls.run(url, MasterKeyResponse.class, () -> Calls.api(url, MasterKeyApi.class, MasterKeyApi::new).masterKey(request));
     }
 
-    /**
-     * Prepares a call for the EDS Settings Service, using the given URL as
-     * an Endpoint and the given Request Object as an argument.
-     *
-     * @param url     Endpoint URL for the EDS call
-     * @param request Request Object for the call
-     * @return Response from the call
-     */
     public static SettingResponse settings(final String url, final SettingRequest request) {
-        prepareEDS(url);
-        return management.settings(request);
+        return Calls.run(url, SettingResponse.class, () -> Calls.api(url, SettingsApi.class, SettingsApi::new).settings(request));
     }
 
-    /**
-     * Prepares a call for the EDS Sanitized Service, using the given URL as
-     * Endpoint and the given Request Object as argument.
-     *
-     * @param url     Endpoint URL for the EDS call
-     * @param request Request Object for the call
-     * @return Response from the call
-     */
     public static SanityResponse sanitized(final String url, final SanityRequest request) {
-        prepareEDS(url);
-        return management.sanitized(request);
+        return Calls.run(url, SanityResponse.class, () -> Calls.api(url, SanityApi.class, SanityApi::new).sanitized(request));
     }
 
-    /**
-     * Prepares a call for the EDS Inventory Service, using the given URL as
-     * Endpoint and the given Request Object as argument.
-     *
-     * @param url     Endpoint URL for the EDS call
-     * @param request Request Object for the call
-     * @return Response from the call
-     */
-    public static InventoryResponse inventory(final String url, final InventoryRequest request) {
-        prepareEDS(url);
-        return management.inventory(request);
-    }
-
-    /**
-     * Prepares a call for the EDS Authenticated Service, using the given URL
-     * as Endpoint and the given Request Object as argument.
-     *
-     * @param url     Endpoint URL for the EDS call
-     * @param request Request Object for the call
-     * @return Response from the call
-     */
     public static AuthenticateResponse authenticated(final String url, final Authentication request) {
-        prepareEDS(url);
-        return management.authenticated(request);
+        return Calls.run(url, AuthenticateResponse.class, () -> Calls.api(url, AuthenticationApi.class, AuthenticationApi::new).authenticated(request));
     }
 
-    /**
-     *
-     * @param url     Endpoint URL for the EDS call
-     * @param request Request Object for the call
-     * @return Response from the call
-     */
     public static FetchMemberResponse fetchMembers(final String url, final FetchMemberRequest request) {
-        prepareEDS(url);
-        return management.fetchMembers(request);
+        return Calls.run(url, FetchMemberResponse.class, () -> Calls.api(url, MembersApi.class, MembersApi::new).fetchMembers(request));
     }
 
-    /**
-     * Prepares a call for the EDS ProcessMember Service, using the given URL
-     * as Endpoint and the given Request Object as argument.
-     *
-     * @param url     Endpoint URL for the EDS call
-     * @param request Request Object for the call
-     * @return Response from the call
-     */
     public static ProcessMemberResponse processMember(final String url, final ProcessMemberRequest request) {
-        prepareEDS(url);
-        return management.processMember(request);
+        final MembersApi api = Calls.api(url, MembersApi.class, MembersApi::new);
+        return Calls.run(url, ProcessMemberResponse.class, () -> switch (request.getAction()) {
+            case CREATE -> api.createMember(request);
+            case INVITE -> api.inviteMember(request);
+            case LOGIN -> api.login(request);
+            case LOGOUT -> api.logout(request);
+            case ALTER -> api.alterMember(request);
+            case UPDATE -> api.updateMember(request);
+            case INVALIDATE -> api.invalidate(request);
+            case DELETE -> api.deleteMember(request);
+            default -> throw new StopTestException(UNSUPPORTED + request.getAction());
+        });
     }
 
-    /**
-     * Prepares a call for the EDS FetchCircles Service, using the given URL
-     * as Endpoint and the given Request Object as argument.
-     *
-     * @param url     Endpoint URL for the EDS call
-     * @param request Request Object for the call
-     * @return Response from the call
-     */
     public static FetchCircleResponse fetchCircles(final String url, final FetchCircleRequest request) {
-        prepareEDS(url);
-        return management.fetchCircles(request);
+        return Calls.run(url, FetchCircleResponse.class, () -> Calls.api(url, CirclesApi.class, CirclesApi::new).fetchCircles(request));
     }
 
-    /**
-     * Prepares a call for the EDS ProcessCircle Service, using the given URL
-     * as Endpoint and the given Request Object as argument.
-     *
-     * @param url     Endpoint URL for the EDS call
-     * @param request Request Object for the call
-     * @return Response from the call
-     */
     public static ProcessCircleResponse processCircle(final String url, final ProcessCircleRequest request) {
-        prepareEDS(url);
-        return management.processCircle(request);
+        final CirclesApi api = Calls.api(url, CirclesApi.class, CirclesApi::new);
+        return Calls.run(url, ProcessCircleResponse.class, () -> switch (request.getAction()) {
+            case CREATE -> api.createCircle(request);
+            case UPDATE -> api.updateCircle(request);
+            case DELETE -> api.deleteCircle(request);
+            case ROTATE -> api.rotateCircle(request);
+            default -> throw new StopTestException(UNSUPPORTED + request.getAction());
+        });
     }
 
-    /**
-     * Prepares a call for the EDS FetchTrustees Service, using the given URL
-     * as Endpoint and the given Request Object as argument.
-     *
-     * @param url     Endpoint URL for the EDS call
-     * @param request Request Object for the call
-     * @return Response from the call
-     */
     public static FetchTrusteeResponse fetchTrustees(final String url, final FetchTrusteeRequest request) {
-        prepareEDS(url);
-        return management.fetchTrustees(request);
+        return Calls.run(url, FetchTrusteeResponse.class, () -> Calls.api(url, TrusteesApi.class, TrusteesApi::new).fetchTrustees(request));
     }
 
-    /**
-     * Prepares a call for the EDS ProcessTrustee Service, using the given URL
-     * as Endpoint and the given Request Object as argument.
-     *
-     * @param url     Endpoint URL for the EDS call
-     * @param request Request Object for the call
-     * @return Response from the call
-     */
     public static ProcessTrusteeResponse processTrustee(final String url, final ProcessTrusteeRequest request) {
-        prepareEDS(url);
-        return management.processTrustee(request);
+        final TrusteesApi api = Calls.api(url, TrusteesApi.class, TrusteesApi::new);
+        return Calls.run(url, ProcessTrusteeResponse.class, () -> switch (request.getAction()) {
+            case ADD -> api.addTrustee(request);
+            case ALTER -> api.alterTrustee(request);
+            case REMOVE -> api.removeTrustee(request);
+            default -> throw new StopTestException(UNSUPPORTED + request.getAction());
+        });
+    }
+
+    public static ProcessTrusteeResponse setSecrets(final String url, final ProcessTrusteeRequest request) {
+        return Calls.run(url, ProcessTrusteeResponse.class, () -> Calls.api(url, TrusteesApi.class, TrusteesApi::new).setSecrets(request));
     }
 }

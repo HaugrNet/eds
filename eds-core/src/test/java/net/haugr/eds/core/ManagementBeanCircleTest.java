@@ -17,10 +17,15 @@
 package net.haugr.eds.core;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import jakarta.enterprise.event.Event;
+import java.lang.reflect.Proxy;
+import java.util.ArrayList;
+import java.util.List;
 import net.haugr.eds.api.common.Action;
 import net.haugr.eds.api.common.Constants;
 import net.haugr.eds.api.common.ReturnCode;
@@ -40,6 +45,7 @@ import net.haugr.eds.api.responses.ProcessTrusteeResponse;
 import net.haugr.eds.core.setup.DatabaseSetup;
 import net.haugr.eds.core.enums.StandardSetting;
 import net.haugr.eds.core.model.Settings;
+import net.haugr.eds.core.socket.AccessChange;
 import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
@@ -51,6 +57,26 @@ import org.junit.jupiter.api.Test;
  * @since EDS 1.0
  */
 final class ManagementBeanCircleTest extends DatabaseSetup {
+
+    @Test
+    void testOnlyASuccessfulChangeIsAnnounced() {
+        final List<Object> announced = new ArrayList<>();
+        final ManagementBean bean = new ManagementBean(entityManager, settings, null, announcer(announced));
+
+        final ProcessCircleRequest create = prepareRequest(ProcessCircleRequest.class, MEMBER_1);
+        create.setAction(Action.CREATE);
+        create.setCircleName("announced");
+        final ProcessCircleResponse created = bean.processCircle(create);
+        assertTrue(created.isOk(), created.getReturnMessage());
+        assertEquals(List.of(AccessChange.INSTANCE), announced);
+
+        // The same name again fails, and isn't announced.
+        final ProcessCircleRequest again = prepareRequest(ProcessCircleRequest.class, MEMBER_1);
+        again.setAction(Action.CREATE);
+        again.setCircleName("announced");
+        assertFalse(bean.processCircle(again).isOk());
+        assertEquals(1, announced.size());
+    }
 
     @Test
     void testEmptyFetchRequest() {
@@ -150,7 +176,7 @@ final class ManagementBeanCircleTest extends DatabaseSetup {
     void testFetchAllCirclesAsMember1WithShowCirclesTrue() {
         final Settings mySettings = newSettings();
         mySettings.set(StandardSetting.SHOW_CIRCLES.getKey(), "true");
-        final ManagementBean bean = prepareManagementBean();
+        final ManagementBean bean = prepareManagementBean(mySettings);
         final FetchCircleRequest request = prepareRequest(FetchCircleRequest.class, MEMBER_1);
         final FetchCircleResponse response = bean.fetchCircles(request);
 
@@ -196,10 +222,12 @@ final class ManagementBeanCircleTest extends DatabaseSetup {
         assertEquals("The Circle '" + circleName + "' was successfully created.", response.getReturnMessage());
         assertNotNull(response.getCircleId());
 
+        // By default (eds.show.all.circles false), a Member gets only their
+        // own Circles: circle1, circle2 and the new one.
         final FetchCircleRequest fetchRequest = prepareRequest(FetchCircleRequest.class, MEMBER_1);
         final FetchCircleResponse fetchResponse = bean.fetchCircles(fetchRequest);
         assertEquals(ReturnCode.SUCCESS.getCode(), fetchResponse.getReturnCode());
-        assertEquals(4, fetchResponse.getCircles().size());
+        assertEquals(3, fetchResponse.getCircles().size());
         // Circles are sorted by name, so our newly created Circle will be the first
         assertEquals(response.getCircleId(), fetchResponse.getCircles().getFirst().getCircleId());
         assertEquals(circleName, fetchResponse.getCircles().getFirst().getCircleName());
@@ -267,22 +295,21 @@ final class ManagementBeanCircleTest extends DatabaseSetup {
         final ProcessCircleResponse updateResponse = bean.processCircle(updateRequest);
         assertEquals(ReturnCode.SUCCESS.getCode(), updateResponse.getReturnCode());
 
+        // member5's own Circles only: circle3 and the new one.
         final FetchCircleRequest fetchRequest = prepareRequest(FetchCircleRequest.class, MEMBER_5);
         final FetchCircleResponse fetchResponse = bean.fetchCircles(fetchRequest);
         assertEquals(ReturnCode.SUCCESS.getCode(), fetchResponse.getReturnCode());
-        assertEquals(4, fetchResponse.getCircles().size());
+        assertEquals(2, fetchResponse.getCircles().size());
         // Sorting alphabetically on lowercase names should reveal a correct
         // sorting where the list is as follows:
-        //  * circle1
-        //  * circle2
         //  * circle3
         //  * Extra Encrypted
         // Note, that it could be considered a bug that the list earlier was
         // sorted with uppercase letters before lowercase letters, thus 'Z' came
         // before 'a'. The queries sort on lower(name), so the order is the same
         // for all databases, regardless of their collation.
-        assertEquals(createResponse.getCircleId(), fetchResponse.getCircles().get(3).getCircleId());
-        assertEquals(updateRequest.getCircleKey(), fetchResponse.getCircles().get(3).getCircleKey());
+        assertEquals(createResponse.getCircleId(), fetchResponse.getCircles().get(1).getCircleId());
+        assertEquals(updateRequest.getCircleKey(), fetchResponse.getCircles().get(1).getCircleKey());
     }
 
     @Test
@@ -491,5 +518,18 @@ final class ManagementBeanCircleTest extends DatabaseSetup {
         } else {
             assertTrue(response.getCircles().isEmpty());
         }
+    }
+
+    /** An Event which keeps what is fired. */
+    @SuppressWarnings("unchecked")
+    private static Event<AccessChange> announcer(final List<Object> announced) {
+        return (Event<AccessChange>) Proxy.newProxyInstance(ManagementBeanCircleTest.class.getClassLoader(), new Class<?>[] { Event.class },
+                (proxy, method, args) -> {
+                    if ("fire".equals(method.getName())) {
+                        announced.add(args[0]);
+                        return null;
+                    }
+                    throw new UnsupportedOperationException(method.getName());
+                });
     }
 }

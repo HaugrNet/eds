@@ -555,14 +555,21 @@ final class ManagementBeanTrusteeTest extends DatabaseSetup {
     @Test
     void testRemoveTrusteeAsWritingTrustee() {
         final ManagementBean bean = prepareManagementBean();
+        // A writing Trustee may not remove another Trustee...
+        final ProcessTrusteeRequest other = prepareRequest(ProcessTrusteeRequest.class, MEMBER_2);
+        other.setAction(Action.REMOVE);
+        other.setCircleId(CIRCLE_1_ID);
+        other.setMemberId(MEMBER_3_ID);
+        final ProcessTrusteeResponse refused = bean.processTrustee(other);
+        assertEquals(ReturnCode.AUTHORIZATION_WARNING.getCode(), refused.getReturnCode());
+        assertEquals("The requesting Account is not permitted to Process a Trustee", refused.getReturnMessage());
+
+        // ...but may leave the Circle, i.e. remove themselves.
         final ProcessTrusteeRequest request = prepareRequest(ProcessTrusteeRequest.class, MEMBER_2);
         request.setAction(Action.REMOVE);
         request.setCircleId(CIRCLE_1_ID);
         request.setMemberId(MEMBER_2_ID);
-
-        final ProcessTrusteeResponse response = bean.processTrustee(request);
-        assertEquals(ReturnCode.AUTHORIZATION_WARNING.getCode(), response.getReturnCode());
-        assertEquals("The requesting Account is not permitted to Process a Trustee", response.getReturnMessage());
+        assertEquals(ReturnCode.SUCCESS.getCode(), bean.processTrustee(request).getReturnCode());
     }
 
     @Test

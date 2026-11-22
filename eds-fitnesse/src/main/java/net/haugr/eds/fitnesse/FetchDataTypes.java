@@ -16,9 +16,9 @@
  */
 package net.haugr.eds.fitnesse;
 
-import net.haugr.eds.api.dtos.DataType;
-import net.haugr.eds.api.requests.FetchDataTypeRequest;
-import net.haugr.eds.api.responses.FetchDataTypeResponse;
+import net.haugr.eds.client.model.DataType;
+import net.haugr.eds.client.model.FetchDataTypeRequest;
+import net.haugr.eds.client.model.FetchDataTypeResponse;
 import java.util.List;
 import net.haugr.eds.fitnesse.callers.CallShare;
 

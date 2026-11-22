@@ -17,10 +17,16 @@
 package net.haugr.eds.core.setup;
 
 import java.lang.reflect.Constructor;
+import java.nio.charset.StandardCharsets;
+import javax.sql.DataSource;
+import java.util.Map;
+import java.sql.DriverManager;
+import java.lang.reflect.Proxy;
 import java.lang.reflect.InvocationTargetException;
 import java.security.SecureRandom;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Locale;
 import java.util.UUID;
 import jakarta.persistence.EntityManager;
@@ -44,12 +50,12 @@ import net.haugr.eds.core.enums.SanityStatus;
 import net.haugr.eds.core.enums.StandardSetting;
 import net.haugr.eds.core.enums.Status;
 import net.haugr.eds.core.exceptions.EDSException;
-import net.haugr.eds.core.jce.EDSKeyPair;
+import net.haugr.eds.core.jce.MemberKeyPair;
 import net.haugr.eds.core.jce.Crypto;
-import net.haugr.eds.core.jce.IVSalt;
 import net.haugr.eds.core.jce.MasterKey;
 import net.haugr.eds.core.jce.SecretEDSKey;
 import net.haugr.eds.core.model.CommonDao;
+import net.haugr.eds.core.model.SchemaManager;
 import net.haugr.eds.core.model.Settings;
 import net.haugr.eds.core.model.entities.EDSEntity;
 import net.haugr.eds.core.model.entities.CircleEntity;
@@ -108,6 +114,9 @@ public class DatabaseSetup {
     // derived from the account name and a random suffix, which on its own
     // is strong enough. If changed, please re-generate the test data!
     private static final String PASSPHRASE_SUFFIX = " pjvgr.yxupm-37i23.8kq4h_9s";
+    // The MasterKey secret of the test data (data.sql), installed before each
+    // test. If changed, please re-generate the test data!
+    protected static final String TEST_MASTERKEY_SECRET = passphraseOf("Test MasterKey");
     // A new MasterKey secret, which differs from the default MasterKey.
     protected static final String NEW_MASTERKEY_SECRET = passphraseOf("MasterKey");
     // A new Passphrase for an existing or invited Account.
@@ -119,7 +128,24 @@ public class DatabaseSetup {
     private static final String PERSISTENCE_NAME = "net.haugr.jpa";
     private static final EntityManagerFactory FACTORY = Persistence.createEntityManagerFactory(PERSISTENCE_NAME);
     protected final EntityManager entityManager = FACTORY.createEntityManager();
+    // The database of the tests, for the SchemaManager: connections of their own, made from the
+    // settings of the persistence unit, so it's the same database whichever it is.
+    protected final DataSource dataSource = (DataSource) Proxy.newProxyInstance(
+            DatabaseSetup.class.getClassLoader(), new Class<?>[] { DataSource.class }, (proxy, method, args) -> {
+                if ("getConnection".equals(method.getName())) {
+                    final Map<String, Object> properties = FACTORY.getProperties();
+                    // Hibernate masks the user and password in the factory's
+                    // properties; the persistence unit (H2 in memory) has "sa"
+                    // and an empty password.
+                    return DriverManager.getConnection(
+                            String.valueOf(properties.get("jakarta.persistence.jdbc.url")),
+                            System.getProperty("jakarta.persistence.jdbc.user", "sa"),
+                            System.getProperty("jakarta.persistence.jdbc.password", ""));
+                }
+                throw new UnsupportedOperationException(method.getName());
+            });
     protected final CommonDao dao = new CommonDao(entityManager);
+    protected final SchemaManager schemaManager = new SchemaManager(dataSource);
     protected final Settings settings = Settings.getInstance();
     protected final Crypto crypto = new Crypto(settings);
 
@@ -130,6 +156,7 @@ public class DatabaseSetup {
             transaction.begin();
         }
         settings.set(StandardSetting.IS_READY.getKey(), "true");
+        installTestMasterKey();
         // The test data (data.sql) was generated with this number of
         // iterations. In production, the StartupBean loads the persisted
         // value, but the tests are not using the StartupBean.
@@ -145,15 +172,13 @@ public class DatabaseSetup {
     }
 
 
-    protected static MasterKey prepareNewMasterKeyInstance(final Settings settings) {
-        final Constructor<?> constructor = MasterKey.class.getDeclaredConstructors()[0];
-        constructor.setAccessible(true);
-
-        try {
-            return (MasterKey) constructor.newInstance(settings);
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-            throw new EDSException(ReturnCode.ERROR, e);
-        }
+    /**
+     * Installs the MasterKey, which the test data was generated with, as
+     * version 1. Tests may change or lock the MasterKey, so it is installed
+     * again before each test.
+     */
+    protected static void installTestMasterKey() {
+        MasterKey.getInstance().install(MasterKey.derive(TEST_MASTERKEY_SECRET.getBytes(StandardCharsets.UTF_8)), 1);
     }
 
     protected ManagementBean prepareManagementBean() {
@@ -165,7 +190,9 @@ public class DatabaseSetup {
     }
 
     protected ManagementBean prepareManagementBean(final EntityManager entityManager, final Settings settings) {
-        return new ManagementBean(entityManager, settings);
+        // The schema manager knows the database, which the version request
+        // reports; H2 in memory here.
+        return new ManagementBean(entityManager, schemaManager, settings, null, null);
     }
 
     protected ShareBean prepareShareBean() {
@@ -227,12 +254,20 @@ public class DatabaseSetup {
         }
     }
 
-    protected static <T extends Authentication> T prepareSessionRequest(final Class<T> clazz, final String session) {
+    /**
+     * Prepares a Request with the Session token from a login. The token is
+     * copied, as EDS overwrites the credential of a request after use.
+     *
+     * @param clazz   Request class
+     * @param session Session token, as returned by the login
+     * @param <T>     Request type
+     * @return New Request
+     */
+    protected static <T extends Authentication> T prepareSessionRequest(final Class<T> clazz, final byte[] session) {
         try {
-            final Crypto myCrypto = new Crypto(Settings.getInstance());
             final T request = clazz.getConstructor().newInstance();
 
-            request.setCredential(myCrypto.stringToBytes(session));
+            request.setCredential(Arrays.copyOf(session, session.length));
             request.setCredentialType(CredentialType.SESSION);
 
             return request;
@@ -245,8 +280,9 @@ public class DatabaseSetup {
         final MemberEntity entity = new MemberEntity();
         entity.setName(accountName);
         entity.setPbeAlgorithm(settings.getPasswordAlgorithm());
-        entity.setRsaAlgorithm(algorithm);
-        entity.setSalt(crypto.encryptWithMasterKey(externalId));
+        entity.setPbeIterations(settings.getPasswordIterations());
+        entity.setKeyAlgorithm(algorithm);
+        entity.setSalt(crypto.sealWithMasterKey("eds/member/salt|" + externalId, crypto.stringToBytes(externalId)));
         entity.setPublicKey(publicKey);
         entity.setPrivateKey(privateKey);
         entity.setMemberRole(DEFAULT_ROLE);
@@ -255,17 +291,16 @@ public class DatabaseSetup {
         return entity;
     }
 
-    protected MemberEntity prepareMember(final String externalId, final EDSKeyPair keyPair) {
+    protected MemberEntity prepareMember(final String externalId, final MemberKeyPair keyPair) {
         final KeyAlgorithm pbeAlgorithm = settings.getPasswordAlgorithm();
-        final IVSalt salt = new IVSalt();
-        final SecretEDSKey secretKey = crypto.generatePasswordKey(pbeAlgorithm, crypto.stringToBytes(DEFAULT_SECRET), salt.getArmored());
-        secretKey.setSalt(salt);
+        final byte[] salt = generateData(16);
+        final SecretEDSKey secretKey = crypto.generatePasswordKey(pbeAlgorithm, crypto.stringToBytes(DEFAULT_SECRET), salt, settings.getPasswordIterations());
 
         return prepareMember(externalId,
                 DEFAULT_ACCOUNT_NAME,
                 settings.getAsymmetricAlgorithm(),
-                Crypto.armoringPublicKey(keyPair.getPublic().getKey()),
-                Crypto.encryptAndArmorPrivateKey(secretKey, keyPair.getPrivate().getKey()));
+                keyPair.getPublic().armored(),
+                crypto.protectPrivateKeys(secretKey, crypto.stringToBytes("eds/member/key|" + externalId), "eds/member/key-outer|" + externalId, keyPair));
     }
 
     protected static ProcessDataRequest prepareAddDataRequest(final String account, final String circleId, final String dataName, final int bytes) {
@@ -298,6 +333,20 @@ public class DatabaseSetup {
      *
      * @return New Settings instance
      */
+    // Reflection reaches what the test checks; it is not the contract.
+    @SuppressWarnings("fb-contrib:RFI_SET_ACCESSIBLE")
+    /**
+     * An EntityManager which is closed already, as one whose database is
+     * gone: every use of it fails.
+     *
+     * @return The closed EntityManager
+     */
+    protected EntityManager closedEntityManager() {
+        try (EntityManager closed = entityManager.getEntityManagerFactory().createEntityManager()) {
+            return closed;
+        }
+    }
+
     protected Settings newSettings() {
         try {
             final Constructor<Settings> constructor = Settings.class.getDeclaredConstructor();
@@ -311,34 +360,10 @@ public class DatabaseSetup {
         }
     }
 
-    /**
-     * Testing requiring a customized MasterKey should use this method to get
-     * a new instance of the Singleton Class MasterKey. It requires an instance
-     * of the Settings to work, so it is possible to alter the content and thus
-     * behavior without affecting other tests requiring the MasterKey and
-     * Settings.
-     *
-     * @param settings Customized Settings instance for the MasterKey instance
-     * @return New MasterKey instance
-     */
-    protected static MasterKey newMasterKey(final Settings settings) {
-        try {
-            final Constructor<MasterKey> constructor = MasterKey.class.getDeclaredConstructor(Settings.class);
-            constructor.setAccessible(true);
-            return constructor.newInstance(settings);
-        } catch (InvocationTargetException e) {
-            final Throwable target = e.getTargetException();
-            if (target instanceof EDSException) {
-                throw new EDSException(((EDSException) target).getReturnCode(), target.getMessage(), e);
-            }
-            throw new EDSException(ReturnCode.ERROR, target.getMessage(), e);
-        } catch (SecurityException | IllegalArgumentException | NoSuchMethodException | InstantiationException | IllegalAccessException e) {
-            throw new EDSException(ReturnCode.ERROR, e.getMessage(), e);
-        }
-    }
-
     protected KeyEntity prepareKey() {
         final KeyEntity entity = new KeyEntity();
+        // The Circle Secret of the first Circle of the test data.
+        entity.setCircle(find(CircleEntity.class, 1L));
         entity.setAlgorithm(settings.getSymmetricAlgorithm());
         entity.setStatus(Status.ACTIVE);
         save(entity);

@@ -17,6 +17,10 @@
 package net.haugr.eds.core;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import net.haugr.eds.api.common.Constants;
 import net.haugr.eds.api.common.ReturnCode;
@@ -34,11 +38,37 @@ final class ManagementBeanVersionTest extends DatabaseSetup {
 
     @Test
     void testVersion() {
+        // As at the startup of EDS, which makes the database known.
+        schemaManager.prepare();
         final ManagementBean bean = prepareManagementBean();
         final VersionResponse response = bean.version();
 
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
         assertEquals("Ok", response.getReturnMessage());
         assertEquals(Constants.EDS_VERSION, response.getVersion());
+        // The tests run on in-memory H2, which makes this a test system.
+        assertEquals("H2", response.getDatabase());
+        assertSame(Boolean.FALSE, response.getPersistent());
+        assertNotNull(response.getStorageCeiling());
+    }
+
+    @Test
+    void testVersionWithoutTheSchemaManager() {
+        final VersionResponse response = new ManagementBean(entityManager, settings).version();
+
+        assertEquals(Constants.EDS_VERSION, response.getVersion());
+        assertNull(response.getDatabase());
+        assertNull(response.getPersistent());
+        assertNull(response.getStorageCeiling());
+    }
+
+    @Test
+    void testTheStorageCeilingIsLeftOutWhenTheDatabaseFails() {
+        schemaManager.prepare();
+        final VersionResponse response = new ManagementBean(closedEntityManager(), schemaManager, settings, null, null).version();
+
+        assertTrue(response.isOk(), response.getReturnMessage());
+        assertEquals("H2", response.getDatabase());
+        assertNull(response.getStorageCeiling());
     }
 }

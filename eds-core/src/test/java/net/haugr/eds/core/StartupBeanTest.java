@@ -81,6 +81,8 @@ final class StartupBeanTest extends DatabaseSetup {
         assertEquals(FakeUnreachableDataSource.MESSAGE, bean.getLastConnectionError());
     }
 
+    // The in-memory test database has H2's default account.
+    @SuppressWarnings("findsecbugs:HARD_CODE_PASSWORD")
     @Test
     void testStartupWithSchemaManagerAndExistingSchema() {
         // The same in-memory database as the EntityManager of the tests, where

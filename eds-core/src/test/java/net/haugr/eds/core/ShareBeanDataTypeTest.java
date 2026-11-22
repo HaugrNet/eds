@@ -79,11 +79,14 @@ final class ShareBeanDataTypeTest extends DatabaseSetup {
         assertTrue(response.isOk());
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
         assertEquals("Ok", response.getReturnMessage());
-        assertEquals(2, response.getDataTypes().size());
+        assertEquals(4, response.getDataTypes().size());
         assertEquals(Constants.FOLDER_TYPENAME, response.getDataTypes().get(0).getTypeName());
         assertEquals("Folder", response.getDataTypes().get(0).getType());
         assertEquals(Constants.DATA_TYPENAME, response.getDataTypes().get(1).getTypeName());
         assertEquals("Data Object", response.getDataTypes().get(1).getType());
+        assertEquals(Constants.THUMBNAIL_TYPENAME, response.getDataTypes().get(2).getTypeName());
+        assertEquals("Thumbnail", response.getDataTypes().get(2).getType());
+        assertEquals(Constants.ENTRY_TYPENAME, response.getDataTypes().get(3).getTypeName());
     }
 
     @Test

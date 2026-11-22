@@ -107,9 +107,11 @@ final class SqlScriptTest {
     void testEdsSchemaScript() throws IOException {
         final List<String> statements = SqlScript.split(readResource("META-INF/eds-schema.sql"));
 
-        // 10 tables, the version row and the default data types
-        assertEquals(12, statements.size());
-        assertEquals(10, statements.stream().filter(s -> s.startsWith("CREATE TABLE ")).count());
+        // 17 tables, 13 indexes for foreign keys and one for the Circles due
+        // to rotate their secret, the version row and the default data types
+        assertEquals(33, statements.size());
+        assertEquals(17, statements.stream().filter(s -> s.startsWith("CREATE TABLE ")).count());
+        assertEquals(14, statements.stream().filter(s -> s.startsWith("CREATE INDEX ")).count());
         assertEquals(2, statements.stream().filter(s -> s.startsWith("INSERT INTO ")).count());
         assertTrue(statements.stream().noneMatch(s -> s.contains("--") || s.contains("/*")));
     }

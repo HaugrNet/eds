@@ -16,8 +16,8 @@
  */
 package net.haugr.eds.fitnesse;
 
-import net.haugr.eds.api.requests.SanityRequest;
-import net.haugr.eds.api.responses.SanityResponse;
+import net.haugr.eds.client.model.SanityRequest;
+import net.haugr.eds.client.model.SanityResponse;
 import java.time.LocalDateTime;
 import net.haugr.eds.fitnesse.callers.CallManagement;
 import net.haugr.eds.fitnesse.utils.Converter;
@@ -31,7 +31,7 @@ import net.haugr.eds.fitnesse.utils.Converter;
 public final class Sanitized extends EDSRequest<SanityResponse> {
 
     private String circleId = null;
-    private LocalDateTime since = null;
+    private String since = null;
 
     // =========================================================================
     // Request & Response Setters and Getters
@@ -42,7 +42,7 @@ public final class Sanitized extends EDSRequest<SanityResponse> {
     }
 
     public void setSince(final String since) {
-        this.since = Converter.convertDate(since);
+        this.since = Converter.toTimestamp(since);
     }
 
     public String failures() {

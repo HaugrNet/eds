@@ -19,22 +19,24 @@ package net.haugr.eds.fitnesse;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.Charset;
 import java.util.Objects;
-import net.haugr.eds.api.common.Action;
-import net.haugr.eds.api.common.Constants;
-import net.haugr.eds.api.common.CredentialType;
-import net.haugr.eds.api.dtos.Circle;
-import net.haugr.eds.api.dtos.DataType;
-import net.haugr.eds.api.dtos.Member;
-import net.haugr.eds.api.requests.Authentication;
-import net.haugr.eds.api.requests.FetchCircleRequest;
-import net.haugr.eds.api.requests.FetchDataTypeRequest;
-import net.haugr.eds.api.requests.FetchMemberRequest;
-import net.haugr.eds.api.requests.ProcessCircleRequest;
-import net.haugr.eds.api.requests.ProcessDataTypeRequest;
-import net.haugr.eds.api.requests.ProcessMemberRequest;
-import net.haugr.eds.api.responses.FetchCircleResponse;
-import net.haugr.eds.api.responses.FetchDataTypeResponse;
-import net.haugr.eds.api.responses.FetchMemberResponse;
+import net.haugr.eds.client.model.Action;
+import net.haugr.eds.fitnesse.utils.Constants;
+import net.haugr.eds.client.model.CredentialType;
+import net.haugr.eds.client.model.Circle;
+import net.haugr.eds.client.model.DataType;
+import net.haugr.eds.client.model.Member;
+import net.haugr.eds.client.model.Authentication;
+import net.haugr.eds.client.model.FetchCircleRequest;
+import net.haugr.eds.client.model.FetchDataTypeRequest;
+import net.haugr.eds.client.model.FetchMemberRequest;
+import net.haugr.eds.client.model.MasterKeyRequest;
+import net.haugr.eds.client.model.ProcessCircleRequest;
+import net.haugr.eds.client.model.ProcessDataTypeRequest;
+import net.haugr.eds.client.model.ProcessMemberRequest;
+import net.haugr.eds.client.model.FetchCircleResponse;
+import net.haugr.eds.client.model.FetchDataTypeResponse;
+import net.haugr.eds.client.model.FetchMemberResponse;
+import net.haugr.eds.client.model.MasterKeyResponse;
 import net.haugr.eds.fitnesse.callers.CallManagement;
 import net.haugr.eds.fitnesse.callers.CallShare;
 import net.haugr.eds.fitnesse.exceptions.StopTestException;
@@ -60,7 +62,27 @@ public final class ControlEds extends EDSRequest<FetchMemberResponse> {
     public static final String ADMIN_PASSPHRASE = "admin pjvgr.yxupm-37i23.8kq4h_9s";
 
     public void setUrl(final String url) {
-        updateUrl(url);
+        // The environment variable EDS_URL replaces the URL of the WIKI, so
+        // the suites can run against an EDS started for them (mvn -Pfitnesse
+        // verify). FitNesse passes its environment on to the test system.
+        final String override = System.getenv("EDS_URL");
+        updateUrl(((override != null) && !override.isBlank()) ? override : url);
+    }
+
+    /**
+     * <p>EDS starts locked, unless a MasterKey source is configured. This
+     * unlocks EDS with the given secret, or sets up the MasterKey on a fresh
+     * instance. On an unlocked EDS with the same MasterKey, it does nothing.</p>
+     *
+     * @param secret MasterKey secret
+     * @return The return message
+     */
+    public String unlockMasterKey(final String secret) {
+        final MasterKeyRequest request = prepareAdminRequest(MasterKeyRequest.class);
+        request.setSecret(secret.getBytes(Charset.defaultCharset()));
+
+        final MasterKeyResponse response = CallManagement.masterKey(requestUrl, request);
+        return (response != null) ? response.getReturnMessage() : null;
     }
 
     public void removeCircles() {
@@ -96,7 +118,7 @@ public final class ControlEds extends EDSRequest<FetchMemberResponse> {
         }
 
         clearAndAddAdminId(adminId);
-        clearSignatures();
+        clearInvitations();
     }
 
     public void removeDataTypes() {
@@ -107,7 +129,8 @@ public final class ControlEds extends EDSRequest<FetchMemberResponse> {
         final FetchDataTypeResponse fetchResponse = CallShare.fetchDataTypes(requestUrl, fetchRequest);
         if (fetchResponse != null) {
             for (final DataType dataType : fetchResponse.getDataTypes()) {
-                if (!Constants.DATA_TYPENAME.equalsIgnoreCase(dataType.getTypeName()) && !Constants.FOLDER_TYPENAME.equalsIgnoreCase(dataType.getTypeName())) {
+                if (!Constants.DATA_TYPENAME.equalsIgnoreCase(dataType.getTypeName()) && !Constants.FOLDER_TYPENAME.equalsIgnoreCase(dataType.getTypeName())
+                        && !Constants.ENTRY_TYPENAME.equalsIgnoreCase(dataType.getTypeName()) && !Constants.THUMBNAIL_TYPENAME.equalsIgnoreCase(dataType.getTypeName())) {
                     deleteRequest.setTypeName(dataType.getTypeName());
                     CallShare.processDataType(requestUrl, deleteRequest);
                 }

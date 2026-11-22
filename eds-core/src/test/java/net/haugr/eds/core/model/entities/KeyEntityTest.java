@@ -18,14 +18,10 @@ package net.haugr.eds.core.model.entities;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 
-import java.time.ZoneOffset;
-import net.haugr.eds.api.common.Utilities;
 import net.haugr.eds.core.setup.DatabaseSetup;
 import net.haugr.eds.core.enums.Status;
 import net.haugr.eds.core.model.Settings;
-import java.time.LocalDateTime;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -40,10 +36,9 @@ final class KeyEntityTest extends DatabaseSetup {
     void testEntity() {
         final Settings mySettings = newSettings();
         final KeyEntity key = new KeyEntity();
+        key.setCircle(find(CircleEntity.class, 1L));
         key.setAlgorithm(mySettings.getSymmetricAlgorithm());
         key.setStatus(Status.ACTIVE);
-        key.setExpires(Utilities.newDate());
-        key.setGracePeriod(3);
         persistAndDetach(key);
         assertNotNull(key.getId());
 
@@ -51,10 +46,9 @@ final class KeyEntityTest extends DatabaseSetup {
         assertNotNull(found);
         Assertions.assertEquals(key.getAlgorithm(), found.getAlgorithm());
         Assertions.assertEquals(key.getStatus(), found.getStatus());
-        assertEquals(key.getExpires().toEpochSecond(ZoneOffset.UTC), found.getExpires().toEpochSecond(ZoneOffset.UTC));
-        assertEquals(key.getGracePeriod(), found.getGracePeriod());
+        assertEquals(1L, found.getCircle().getId());
 
-        found.setStatus(Status.DEPRECATED);
+        found.setStatus(Status.RETIRING);
         save(found);
 
         final KeyEntity updated = find(KeyEntity.class, key.getId());
@@ -62,31 +56,14 @@ final class KeyEntityTest extends DatabaseSetup {
     }
 
     @Test
-    void testUpdateExpires() {
+    void testCircleCannotChange() {
         final KeyEntity key = prepareKey();
 
-        // Now to the actual test, change the Expires, persist, detach
-        // and find the Entity again. Expected is no errors, but the
-        // value is the same.
-        final LocalDateTime expires = Utilities.newDate();
-        key.setExpires(expires);
+        // The Circle of a secret is set once: a changed Circle isn't saved.
+        key.setCircle(find(CircleEntity.class, 2L));
         persistAndDetach(key);
 
         final KeyEntity found = find(KeyEntity.class, key.getId());
-        assertNull(toString(found.getExpires()));
-    }
-
-    @Test
-    void testUpdateGracePeriod() {
-        final KeyEntity key = prepareKey();
-
-        // Now to the actual test, change the GracePeriod, persist, detach
-        // and find the Entity again. Expected is no errors, but the value
-        // is the same.
-        key.setGracePeriod(3);
-        persistAndDetach(key);
-
-        final KeyEntity found = find(KeyEntity.class, key.getId());
-        assertNull(found.getGracePeriod());
+        assertEquals(1L, found.getCircle().getId());
     }
 }

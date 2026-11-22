@@ -14,18 +14,59 @@
     <name>EDS - FitNesse</name>
     <description>Sample EDS FitNesse Test Module</description>
 
+    <!-- Test module, not production code: third-party libraries are allowed
+         here (decided 2026-11-05). The fixtures use a Java client generated from
+         the API contract in eds-api, and nothing else of EDS. -->
+    <properties>
+        <version.jackson>2.22.3</version.jackson>
+        <version.jakarta.annotation-api>3.0.0</version.jakarta.annotation-api>
+        <version.fitnesse>20260313</version.fitnesse>
+        <version.maven-failsafe-plugin>3.5.3</version.maven-failsafe-plugin>
+        <contract.dir>${project.build.directory}/contract</contract.dir>
+    </properties>
+
     <dependencies>
+        <!-- Only for the contract (openapi.json), unpacked before generation -->
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>eds-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- Runtime of the generated client (library native: java.net.http + Jackson) -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>${version.jackson}</version>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>eds-client</artifactId>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
+            <version>${version.jackson}</version>
         </dependency>
+        <dependency>
+            <groupId>jakarta.annotation</groupId>
+            <artifactId>jakarta.annotation-api</artifactId>
+            <version>${version.jakarta.annotation-api}</version>
+        </dependency>
+
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.fitnesse</groupId>
+            <artifactId>fitnesse</artifactId>
+            <version>${version.fitnesse}</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- The big-data test of the rotation (CircleRotationIT) checks the
+             PostgreSQL database of its stone directly. -->
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
@@ -38,6 +79,66 @@
             </resource>
         </resources>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>${version.maven-dependency-plugin}</version>
+                <executions>
+                    <execution>
+                        <id>unpack-contract</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>${project.groupId}</groupId>
+                                    <artifactId>eds-api</artifactId>
+                                    <version>${project.version}</version>
+                                    <includes>openapi.json</includes>
+                                    <outputDirectory>${contract.dir}</outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.openapitools</groupId>
+                <artifactId>openapi-generator-maven-plugin</artifactId>
+                <version>${version.openapi-generator}</version>
+                <executions>
+                    <execution>
+                        <id>generate-client</id>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <inputSpec>${contract.dir}/openapi.json</inputSpec>
+                            <generatorName>java</generatorName>
+                            <library>native</library>
+                            <apiPackage>net.haugr.eds.client.api</apiPackage>
+                            <modelPackage>net.haugr.eds.client.model</modelPackage>
+                            <invokerPackage>net.haugr.eds.client</invokerPackage>
+                            <generateApiTests>false</generateApiTests>
+                            <generateModelTests>false</generateModelTests>
+                            <generateApiDocumentation>false</generateApiDocumentation>
+                            <generateModelDocumentation>false</generateModelDocumentation>
+                            <!-- The requests and responses extend Authentication and
+                                 EDSResponse, as in eds-api, via allOf with a $ref -->
+                            <openapiNormalizer>REF_AS_PARENT_IN_ALLOF=true</openapiNormalizer>
+                            <configOptions>
+                                <useJakartaEe>true</useJakartaEe>
+                                <dateLibrary>java8</dateLibrary>
+                                <openApiNullable>false</openApiNullable>
+                                <hideGenerationTimestamp>true</hideGenerationTimestamp>
+                                <sourceFolder>src/gen/java</sourceFolder>
+                            </configOptions>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
@@ -71,5 +172,104 @@
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <!-- Acceptance tests: mvn -Pfitnesse verify starts the eds-quarkus
+             runner JAR, runs the FitNesse suites against it, and stops it
+             (FitNesseSuiteIT). Build eds-quarkus first, e.g. with
+             mvn -Pfitnesse install from the root. -->
+        <profile>
+            <id>fitnesse</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-failsafe-plugin</artifactId>
+                        <version>${version.maven-failsafe-plugin}</version>
+                        <configuration>
+                            <excludes>
+                                <exclude>**/StoneLoadIT.java</exclude>
+                                <exclude>**/CircleRotationIT.java</exclude>
+                            </excludes>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>integration-test</goal>
+                                    <goal>verify</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <!-- Big-data test of the rotation of a Circle Secret (PLAN.md, Crypto
+             C6): mvn -Protation verify, with EDS_DB_URL (PostgreSQL, empty)
+             in the environment, fills a Circle of a stone of its own with
+             -Deds.rotation.size of content, rotates its secret and checks
+             everything afterwards (CircleRotationIT); the report is
+             target/rotation-report.txt. -->
+        <profile>
+            <id>rotation</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-failsafe-plugin</artifactId>
+                        <version>${version.maven-failsafe-plugin}</version>
+                        <configuration>
+                            <includes>
+                                <include>**/CircleRotationIT.java</include>
+                            </includes>
+                            <trimStackTrace>false</trimStackTrace>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>integration-test</goal>
+                                    <goal>verify</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <!-- Load test: mvn -Pload verify starts the stone (eds-stone.jar of
+             eds-quarkus, unlocked with a MasterKey file of its own), runs
+             many users against it at once, checks what it holds afterwards,
+             and stops it (StoneLoadIT). The size of the run is set with
+             -Deds.load.* properties, see LoadSettings; the report is
+             target/load-report.txt. -->
+        <profile>
+            <id>load</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-failsafe-plugin</artifactId>
+                        <version>${version.maven-failsafe-plugin}</version>
+                        <configuration>
+                            <includes>
+                                <include>**/StoneLoadIT.java</include>
+                            </includes>
+                            <trimStackTrace>false</trimStackTrace>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>integration-test</goal>
+                                    <goal>verify</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
 </project>

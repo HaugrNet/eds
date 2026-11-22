@@ -38,6 +38,8 @@ import org.junit.jupiter.api.Test;
  */
 final class PrivateConstructorTest {
 
+    // Reflection reaches what the test checks; it is not the contract.
+    @SuppressWarnings("fb-contrib:RFI_SET_ACCESSIBLE")
     @Test
     void testConstantsConstructor() throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
         final Constructor<Constants> constructor = Constants.class.getDeclaredConstructor();
@@ -47,6 +49,8 @@ final class PrivateConstructorTest {
         assertNotNull(constants);
     }
 
+    // Reflection reaches what the test checks; it is not the contract.
+    @SuppressWarnings("fb-contrib:RFI_SET_ACCESSIBLE")
     @Test
     void testUtilitiesConstructor() throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
         final Constructor<Utilities> constructor = Utilities.class.getDeclaredConstructor();

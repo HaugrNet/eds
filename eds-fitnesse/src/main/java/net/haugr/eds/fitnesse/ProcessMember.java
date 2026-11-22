@@ -16,10 +16,10 @@
  */
 package net.haugr.eds.fitnesse;
 
-import net.haugr.eds.api.common.Action;
-import net.haugr.eds.api.common.MemberRole;
-import net.haugr.eds.api.requests.ProcessMemberRequest;
-import net.haugr.eds.api.responses.ProcessMemberResponse;
+import net.haugr.eds.client.model.Action;
+import net.haugr.eds.client.model.MemberRole;
+import net.haugr.eds.client.model.ProcessMemberRequest;
+import net.haugr.eds.client.model.ProcessMemberResponse;
 import net.haugr.eds.fitnesse.callers.CallManagement;
 import net.haugr.eds.fitnesse.utils.Converter;
 
@@ -37,6 +37,7 @@ public final class ProcessMember extends EDSRequest<ProcessMemberResponse> {
     private String publicKey = null;
     private String newAccountName = null;
     private byte[] newCredential = null;
+    private String newCredentialName = null;
 
     // =========================================================================
     // Request & Response Setters and Getters
@@ -64,14 +65,15 @@ public final class ProcessMember extends EDSRequest<ProcessMemberResponse> {
 
     public void setNewCredential(final String newCredential) {
         this.newCredential = Converter.convertBytes(newCredential);
+        this.newCredentialName = Converter.preCheck(newCredential);
     }
 
     public String memberId() {
         return ((newAccountName != null) && (response.getMemberId() != null)) ? (newAccountName + EXTENSION_ID) : null;
     }
 
-    public String signature() {
-        return ((newAccountName != null) && (response.getSignature() != null)) ? (newAccountName + EXTENSION_SIGNATURE) : null;
+    public String invitation() {
+        return ((newAccountName != null) && (response.getInvitation() != null)) ? (newAccountName + EXTENSION_INVITATION) : null;
     }
 
     // =========================================================================
@@ -96,7 +98,12 @@ public final class ProcessMember extends EDSRequest<ProcessMemberResponse> {
         // Ensuring that the internal mapping of Ids with accounts being
         // used is synchronized.
         processId(action, memberId, newAccountName, response);
-        setSignature(newAccountName + EXTENSION_SIGNATURE, response);
+        setInvitation(newAccountName + EXTENSION_INVITATION, response);
+        if (action == Action.LOGIN) {
+            // EDS generates the Session token, it is kept under the name
+            // given as new credential.
+            setSession(newCredentialName, response);
+        }
     }
 
     /**
@@ -113,5 +120,6 @@ public final class ProcessMember extends EDSRequest<ProcessMemberResponse> {
         publicKey = null;
         newAccountName = null;
         newCredential = null;
+        newCredentialName = null;
     }
 }

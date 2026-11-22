@@ -16,7 +16,7 @@
  */
 package net.haugr.eds.fitnesse;
 
-import net.haugr.eds.api.responses.VersionResponse;
+import net.haugr.eds.client.model.VersionResponse;
 import net.haugr.eds.fitnesse.callers.CallManagement;
 
 /**
@@ -33,6 +33,14 @@ public final class Version extends EDSRequest<VersionResponse> {
 
     public String edsVersion() {
         return (response != null) ? response.getVersion() : null;
+    }
+
+    public String database() {
+        return (response != null) ? response.getDatabase() : null;
+    }
+
+    public String persistent() {
+        return (response != null && response.getPersistent() != null) ? String.valueOf(response.getPersistent()) : null;
     }
 
     // =========================================================================

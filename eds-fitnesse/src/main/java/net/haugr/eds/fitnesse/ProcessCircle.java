@@ -16,9 +16,9 @@
  */
 package net.haugr.eds.fitnesse;
 
-import net.haugr.eds.api.common.Action;
-import net.haugr.eds.api.requests.ProcessCircleRequest;
-import net.haugr.eds.api.responses.ProcessCircleResponse;
+import net.haugr.eds.client.model.Action;
+import net.haugr.eds.client.model.ProcessCircleRequest;
+import net.haugr.eds.client.model.ProcessCircleResponse;
 import net.haugr.eds.fitnesse.callers.CallManagement;
 import net.haugr.eds.fitnesse.utils.Converter;
 

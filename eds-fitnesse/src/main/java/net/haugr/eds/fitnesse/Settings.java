@@ -16,8 +16,8 @@
  */
 package net.haugr.eds.fitnesse;
 
-import net.haugr.eds.api.requests.SettingRequest;
-import net.haugr.eds.api.responses.SettingResponse;
+import net.haugr.eds.client.model.SettingRequest;
+import net.haugr.eds.client.model.SettingResponse;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import net.haugr.eds.fitnesse.callers.CallManagement;
@@ -56,9 +56,9 @@ public final class Settings extends EDSRequest<SettingResponse> {
         theSettings.clear();
 
         final SettingRequest request = prepareRequest(SettingRequest.class);
-        final SettingResponse response = CallManagement.settings(requestUrl, request);
+        response = CallManagement.settings(requestUrl, request);
 
-        if (response != null) {
+        if ((response != null) && (response.getSettings() != null)) {
             theSettings.putAll(response.getSettings());
         }
     }

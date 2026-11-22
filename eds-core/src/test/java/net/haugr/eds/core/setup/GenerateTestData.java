@@ -21,8 +21,9 @@ import net.haugr.eds.api.common.MemberRole;
 import net.haugr.eds.api.common.TrustLevel;
 import net.haugr.eds.core.enums.StandardSetting;
 import net.haugr.eds.core.enums.Status;
-import net.haugr.eds.core.jce.EDSKeyPair;
+import net.haugr.eds.core.jce.MemberKeyPair;
 import net.haugr.eds.core.jce.Crypto;
+import net.haugr.eds.core.jce.MasterKey;
 import net.haugr.eds.core.jce.SecretEDSKey;
 import net.haugr.eds.core.model.Settings;
 
@@ -60,19 +61,22 @@ public final class GenerateTestData {
         append(builder, "-- Default Administrator User, it is set at the first request to the System, and");
         append(builder, "-- is thus needed for loads of tests. Remaining Accounts is for \"member1\" to");
         append(builder, "-- \"member5\", which is all used as part of the tests.");
-        append(builder, "INSERT INTO eds_members (external_id, name, salt, pbe_algorithm, rsa_algorithm, public_key, private_key, member_role) VALUES");
+        append(builder, "INSERT INTO eds_masterkey (version, kcv) VALUES");
+        append(builder, "    (1, '" + MasterKey.getInstance().getKcv() + "');");
+        append(builder, "");
+        append(builder, "INSERT INTO eds_members (external_id, name, salt, pbe_algorithm, pbe_iterations, key_algorithm, public_key, private_key, member_role) VALUES");
 
-        final EDSKeyPair keyPair = Crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
+        final MemberKeyPair keyPair = MemberKeyPair.generate(settings.getAsymmetricAlgorithm());
         createAndAppendMember(builder, DatabaseSetup.ADMIN_ID, Constants.ADMIN_ACCOUNT, keyPair, MemberRole.ADMIN, ',');
-        final EDSKeyPair keyPair1 = Crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
+        final MemberKeyPair keyPair1 = MemberKeyPair.generate(settings.getAsymmetricAlgorithm());
         createAndAppendMember(builder, DatabaseSetup.MEMBER_1_ID, DatabaseSetup.MEMBER_1, keyPair1, MemberRole.STANDARD, ',');
-        final EDSKeyPair keyPair2 = Crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
+        final MemberKeyPair keyPair2 = MemberKeyPair.generate(settings.getAsymmetricAlgorithm());
         createAndAppendMember(builder, DatabaseSetup.MEMBER_2_ID, DatabaseSetup.MEMBER_2, keyPair2, MemberRole.STANDARD, ',');
-        final EDSKeyPair keyPair3 = Crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
+        final MemberKeyPair keyPair3 = MemberKeyPair.generate(settings.getAsymmetricAlgorithm());
         createAndAppendMember(builder, DatabaseSetup.MEMBER_3_ID, DatabaseSetup.MEMBER_3, keyPair3, MemberRole.STANDARD, ',');
-        final EDSKeyPair keyPair4 = Crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
+        final MemberKeyPair keyPair4 = MemberKeyPair.generate(settings.getAsymmetricAlgorithm());
         createAndAppendMember(builder, DatabaseSetup.MEMBER_4_ID, DatabaseSetup.MEMBER_4, keyPair4, MemberRole.STANDARD, ',');
-        final EDSKeyPair keyPair5 = Crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
+        final MemberKeyPair keyPair5 = MemberKeyPair.generate(settings.getAsymmetricAlgorithm());
         createAndAppendMember(builder, DatabaseSetup.MEMBER_5_ID, DatabaseSetup.MEMBER_5, keyPair5, MemberRole.STANDARD, ';');
 
         append(builder, "");
@@ -85,10 +89,10 @@ public final class GenerateTestData {
         append(builder, "    ('" + DatabaseSetup.CIRCLE_3_ID + "', '" + DatabaseSetup.CIRCLE_3 + "');");
         append(builder, "");
         append(builder, "-- For each Circle, we need to have a unique Key, but with the same settings.");
-        append(builder, "INSERT INTO eds_keys (algorithm, status) VALUES");
-        append(builder, "    ('" + settings.getSymmetricAlgorithm() + "', '" + Status.ACTIVE + "'),");
-        append(builder, "    ('" + settings.getSymmetricAlgorithm() + "', '" + Status.ACTIVE + "'),");
-        append(builder, "    ('" + settings.getSymmetricAlgorithm() + "', '" + Status.ACTIVE + "');");
+        append(builder, "INSERT INTO eds_keys (circle_id, algorithm, status) VALUES");
+        append(builder, "    (1, '" + settings.getSymmetricAlgorithm() + "', '" + Status.ACTIVE + "'),");
+        append(builder, "    (2, '" + settings.getSymmetricAlgorithm() + "', '" + Status.ACTIVE + "'),");
+        append(builder, "    (3, '" + settings.getSymmetricAlgorithm() + "', '" + Status.ACTIVE + "');");
         append(builder, "");
         append(builder, "-- For each Circle, we need to have root folder for all data.");
         append(builder, "INSERT INTO eds_metadata (external_id, parent_id, circle_id, datatype_id, name) VALUES");
@@ -133,18 +137,36 @@ public final class GenerateTestData {
         }
     }
 
-    private void createAndAppendMember(final StringBuilder builder, final String externalId, final String name, final EDSKeyPair keyPair, final MemberRole role, final char delimiter) {
-        final String salt = UUID.randomUUID().toString();
-        final SecretEDSKey secretKey = crypto.generatePasswordKey(settings.getPasswordAlgorithm(), DatabaseSetup.credentialOf(name), salt);
-        final String publicKey = Crypto.armoringPublicKey(keyPair.getPublic().getKey());
-        final String privateKey = Crypto.encryptAndArmorPrivateKey(secretKey, keyPair.getPrivate().getKey());
-        final String encryptedSalt = crypto.encryptWithMasterKey(salt);
+    private void createAndAppendMember(final StringBuilder builder, final String externalId, final String name, final MemberKeyPair keyPair, final MemberRole role, final char delimiter) {
+        // Must match AbstractManager: random salt protected by the MasterKey,
+        // and the private keys double wrapped, with AADs binding them to the
+        // Member.
+        final byte[] salt = DatabaseSetup.generateData(16);
+        final SecretEDSKey secretKey = crypto.generatePasswordKey(settings.getPasswordAlgorithm(), DatabaseSetup.credentialOf(name), salt, settings.getPasswordIterations());
+        final String publicKey = keyPair.getPublic().armored();
+        final byte[] innerAad = crypto.stringToBytes("eds/member/key|" + externalId + '|' + settings.getAsymmetricAlgorithm());
+        final String outerAad = "eds/member/key-outer|" + externalId + '|' + settings.getAsymmetricAlgorithm();
+        final String privateKey = crypto.protectPrivateKeys(secretKey, innerAad, outerAad, keyPair);
+        final String encryptedSalt = crypto.sealWithMasterKey("eds/member/salt|" + externalId, salt);
 
-        append(builder, "    ('" + externalId + "', '" + name + "', '" + encryptedSalt + "', '" + settings.getPasswordAlgorithm() + "', '" + settings.getAsymmetricAlgorithm() + "', '" + publicKey + "', '" + privateKey + "', '" + role + "')" + delimiter);
+        append(builder, "    ('" + externalId + "', '" + name + "', '" + encryptedSalt + "', '" + settings.getPasswordAlgorithm() + "', "
+                + settings.getPasswordIterations() + ", '" + settings.getAsymmetricAlgorithm() + "', '" + publicKey + "', '" + privateKey + "', '"
+                + role + "')" + delimiter);
     }
 
-    private void createAndAppendTrustee(final StringBuilder builder, final int memberId, final EDSKeyPair keyPair, final int circleId, final int keyId, final SecretEDSKey circleKey, final TrustLevel trustLevel, final char delimiter) {
-        final String armoredKey = Crypto.encryptAndArmorCircleKey(keyPair.getPublic(), circleKey);
+    private static final String[] MEMBER_IDS = {
+            DatabaseSetup.ADMIN_ID, DatabaseSetup.MEMBER_1_ID, DatabaseSetup.MEMBER_2_ID,
+            DatabaseSetup.MEMBER_3_ID, DatabaseSetup.MEMBER_4_ID, DatabaseSetup.MEMBER_5_ID };
+    private static final String[] CIRCLE_IDS = { DatabaseSetup.CIRCLE_1_ID, DatabaseSetup.CIRCLE_2_ID, DatabaseSetup.CIRCLE_3_ID };
+
+    private void createAndAppendTrustee(final StringBuilder builder, final int memberId, final MemberKeyPair keyPair, final int circleId,
+                                        final int keyId, final SecretEDSKey circleKey, final TrustLevel trustLevel, final char delimiter) {
+        // Must match AbstractManager.wrapCircleKey: hybrid KEM inside,
+        // MasterKey outside, both bound to the Circle, the Member and the
+        // version of the secret (its key row).
+        final String binding = CIRCLE_IDS[circleId - 1] + '|' + MEMBER_IDS[memberId - 1] + '|' + keyId;
+        final String inner = Crypto.wrapCircleKey(keyPair.getPublic(), crypto.stringToBytes("eds/trustee|" + binding), circleKey);
+        final String armoredKey = crypto.sealWithMasterKey("eds/trustee-outer|" + binding, crypto.stringToBytes(inner));
 
         append(builder, "    (" + memberId + ", " + circleId + ", " + keyId + ", '" + trustLevel + "', '" + armoredKey + "')" + delimiter);
     }

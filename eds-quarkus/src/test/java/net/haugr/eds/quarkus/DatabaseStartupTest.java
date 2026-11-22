@@ -118,7 +118,7 @@ final class DatabaseStartupTest {
     }
 
     private DatabaseStartup create(final StartupBean startupBean) {
-        return new DatabaseStartup(startupBean, settings, Database.POSTGRESQL);
+        return new DatabaseStartup(startupBean, null, settings, Database.POSTGRESQL);
     }
 
     /**

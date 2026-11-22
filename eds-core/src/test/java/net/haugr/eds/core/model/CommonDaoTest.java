@@ -35,7 +35,7 @@ final class CommonDaoTest extends DatabaseSetup {
 
     @Test
     void testNullResultList() {
-        try (final EntityManager manager = new FakeEntityManager()) {
+        try (EntityManager manager = new FakeEntityManager()) {
             final String jql = "select v from VersionEntity v order by v.id desc";
             final Query query = manager.createQuery(jql);
             query.setHint(FakeQuery.NULLABLE, Boolean.TRUE);

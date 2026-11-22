@@ -17,23 +17,22 @@
 package net.haugr.eds.fitnesse;
 
 import java.lang.reflect.InvocationTargetException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
-import net.haugr.eds.api.common.Action;
-import net.haugr.eds.api.common.Constants;
-import net.haugr.eds.api.common.CredentialType;
-import net.haugr.eds.api.dtos.Circle;
-import net.haugr.eds.api.requests.Authentication;
-import net.haugr.eds.api.responses.EDSResponse;
-import net.haugr.eds.api.responses.ProcessCircleResponse;
-import net.haugr.eds.api.responses.ProcessDataResponse;
-import net.haugr.eds.api.responses.ProcessMemberResponse;
-import net.haugr.eds.api.responses.SignResponse;
+import net.haugr.eds.client.model.Action;
+import net.haugr.eds.fitnesse.utils.Constants;
+import net.haugr.eds.client.model.CredentialType;
+import net.haugr.eds.client.model.Circle;
+import net.haugr.eds.client.model.Authentication;
+import net.haugr.eds.client.model.EDSResponse;
+import net.haugr.eds.client.model.ProcessCircleResponse;
+import net.haugr.eds.client.model.ProcessDataResponse;
+import net.haugr.eds.client.model.ProcessMemberResponse;
+import net.haugr.eds.client.model.TrusteeSecret;
 import net.haugr.eds.fitnesse.exceptions.StopTestException;
 import net.haugr.eds.fitnesse.utils.Converter;
 
@@ -45,9 +44,9 @@ import net.haugr.eds.fitnesse.utils.Converter;
  */
 public class EDSRequest<R extends EDSResponse> {
 
-    protected static String requestUrl = "http://localhost:8080/eds";
+    protected static String requestUrl = "http://localhost:8080/api/v1";
     protected static final String EXTENSION_ID = "_id";
-    protected static final String EXTENSION_SIGNATURE = "_signature";
+    protected static final String EXTENSION_INVITATION = "_invitation";
 
     // All Ids in EDS which is externally exposed is UUIDs, meaning that they
     // are always unique. And as the use of them should also be made with
@@ -55,7 +54,10 @@ public class EDSRequest<R extends EDSResponse> {
     // single internal record, where the name has "_id" appended. This is then
     // used to both store, delete and find Ids.
     private static final Map<String, String> ids = new ConcurrentHashMap<>(16);
-    private static final Map<String, String> signatures = new ConcurrentHashMap<>(16);
+    private static final Map<String, String> invitations = new ConcurrentHashMap<>(16);
+    // EDS generates the Session tokens; the tests refer to them by the name
+    // given in the "new credential" column of the login.
+    private static final Map<String, String> sessions = new ConcurrentHashMap<>(16);
 
     protected String accountName = null;
     protected byte[] credential = null;
@@ -71,8 +73,10 @@ public class EDSRequest<R extends EDSResponse> {
     }
 
     public void setCredential(final String credential) {
-        if ((credential != null) && credential.endsWith(EXTENSION_SIGNATURE)) {
-            this.credential = Base64.getDecoder().decode(getSignature(credential));
+        if ((credential != null) && credential.endsWith(EXTENSION_INVITATION)) {
+            this.credential = Base64.getDecoder().decode(invitations.get(credential));
+        } else if ((credential != null) && sessions.containsKey(credential)) {
+            this.credential = Base64.getDecoder().decode(sessions.get(credential));
         } else {
             this.credential = Converter.convertBytes(credential);
         }
@@ -126,42 +130,60 @@ public class EDSRequest<R extends EDSResponse> {
     // Operating the internal mapping of Members & Circles
     // =========================================================================
 
-    protected void clearSignatures() {
-        signatures.clear();
+    protected void clearInvitations() {
+        invitations.clear();
+        sessions.clear();
     }
 
-    protected static void setSignature(final String key, final ProcessMemberResponse response) {
+    protected static void setSession(final String name, final ProcessMemberResponse response) {
+        if ((name != null) && (response != null) && (response.getSession() != null)) {
+            sessions.put(name, Base64.getEncoder().encodeToString(response.getSession()));
+        }
+    }
+
+    /**
+     * Keeps a status key under a name, so it can be given as credential,
+     * like a Session.
+     *
+     * @param name Name of the key in the tests
+     * @param key  The key, Base64 (URL-safe), as EDS returns it
+     */
+    protected static void setStatusKey(final String name, final String key) {
+        if ((name != null) && (key != null)) {
+            sessions.put(name, Base64.getEncoder().encodeToString(Base64.getUrlDecoder().decode(key)));
+        }
+    }
+
+    /**
+     * The secrets of Trustees from a cell, as {@code member_id=secret, ...},
+     * where the Member IDs are given by their names; an empty secret
+     * removes it, and "null" gives an empty list.
+     *
+     * @param cell The cell
+     * @return The secrets
+     */
+    protected List<TrusteeSecret> trusteeSecrets(final String cell) {
+        final List<TrusteeSecret> secrets = new ArrayList<>();
+        if ((cell != null) && !"null".equals(cell)) {
+            for (final String pair : cell.split(",")) {
+                final int equals = pair.indexOf('=');
+                final String key = pair.substring(0, equals).trim();
+                final String id = getId(key);
+                secrets.add(new TrusteeSecret()
+                        .memberId((id != null) ? id : key)
+                        .secret(pair.substring(equals + 1).trim()));
+            }
+        }
+        return secrets;
+    }
+
+    protected static void setInvitation(final String key, final ProcessMemberResponse response) {
         if (response != null) {
-            final byte[] signature = response.getSignature();
-            if (signature != null) {
-                signatures.put(key, Base64.getEncoder().encodeToString(signature));
+            final byte[] invitation = response.getInvitation();
+            if (invitation != null) {
+                invitations.put(key, Base64.getEncoder().encodeToString(invitation));
             }
         }
-    }
-
-    protected static void setSignature(final String baseKey, final SignResponse response) {
-        if (response != null) {
-            final String signature = response.getSignature();
-            if (signature != null) {
-                signatures.put(generateSignatureKey(baseKey), signature);
-            }
-        }
-    }
-
-    private static String generateSignatureKey(final String baseKey) {
-        int index = 1;
-
-        for (final String currentKey : signatures.keySet()) {
-            if (currentKey.startsWith(baseKey)) {
-                index++;
-            }
-        }
-
-        return baseKey + index;
-    }
-
-    protected static String getSignature(final String key) {
-        return signatures.get(key);
     }
 
     protected void addCircleInfo(final StringBuilder builder, final List<Circle> circles) {
@@ -232,10 +254,6 @@ public class EDSRequest<R extends EDSResponse> {
         return id;
     }
 
-    protected static String getSignatureKey(final String signature) {
-        return (signature != null) ? findKey(signatures, signature) : null;
-    }
-
     protected String getKey(final String id) {
         return (id != null) ? findKey(ids, id) : null;
     }
@@ -245,24 +263,5 @@ public class EDSRequest<R extends EDSResponse> {
                 .filter((Map.Entry<String, String> entry) -> Objects.equals(entry.getValue(), id))
                 .map(Map.Entry::getKey)
                 .findFirst().orElse(null);
-    }
-
-    protected static Map<String, String> checksums() {
-        final Base64.Decoder decoder = Base64.getDecoder();
-        final Map<String, String> checksums = new ConcurrentHashMap<>(signatures.size());
-
-        for (final Map.Entry<String, String> signature : signatures.entrySet()) {
-            try {
-                final MessageDigest digest = MessageDigest.getInstance("SHA-512");
-                final byte[] bytes = decoder.decode(signature.getValue());
-                final byte[] hashed = digest.digest(bytes);
-
-                checksums.put(Base64.getEncoder().encodeToString(hashed), signature.getKey());
-            } catch (IllegalArgumentException | NoSuchAlgorithmException e) {
-                throw new StopTestException(e.getMessage(), e);
-            }
-        }
-
-        return checksums;
     }
 }

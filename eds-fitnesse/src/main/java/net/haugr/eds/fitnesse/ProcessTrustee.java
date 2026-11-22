@@ -16,15 +16,21 @@
  */
 package net.haugr.eds.fitnesse;
 
-import net.haugr.eds.api.common.Action;
-import net.haugr.eds.api.common.TrustLevel;
-import net.haugr.eds.api.requests.ProcessTrusteeRequest;
-import net.haugr.eds.api.responses.ProcessTrusteeResponse;
+import net.haugr.eds.client.model.Action;
+import net.haugr.eds.client.model.TrustLevel;
+import net.haugr.eds.client.model.ProcessTrusteeRequest;
+import net.haugr.eds.client.model.ProcessTrusteeResponse;
+import net.haugr.eds.client.model.TrusteeSecret;
+import java.util.List;
 import java.util.Locale;
 import net.haugr.eds.fitnesse.callers.CallManagement;
+import net.haugr.eds.fitnesse.utils.Converter;
 
 /**
- * <p>FitNesse Fixture for the EDS ProcessTrustee feature.</p>
+ * <p>FitNesse Fixture for the EDS ProcessTrustee feature. Besides the
+ * actions ADD, ALTER and REMOVE, the action SECRETS sets the secrets of
+ * several Trustees at once (setSecrets), from the column "secrets", as
+ * {@code member_id=secret, ...}, and the column "circle key".</p>
  *
  * @author Kim Jensen
  * @since EDS 1.0
@@ -35,13 +41,19 @@ public final class ProcessTrustee extends EDSRequest<ProcessTrusteeResponse> {
     private String circleId = null;
     private String memberId = null;
     private TrustLevel trustLevel = null;
+    private String secret = null;
+    private boolean manySecrets = false;
+    private List<TrusteeSecret> secrets = null;
+    private String circleKey = null;
 
     // =========================================================================
     // Request & Response Setters and Getters
     // =========================================================================
 
     public void setAction(final String action) {
-        this.action = Action.valueOf(action.toUpperCase(Locale.ENGLISH));
+        final String value = action.toUpperCase(Locale.ENGLISH);
+        manySecrets = "SECRETS".equals(value);
+        this.action = manySecrets ? null : Action.valueOf(value);
     }
 
     public void setCircleId(final String circleId) {
@@ -53,7 +65,26 @@ public final class ProcessTrustee extends EDSRequest<ProcessTrusteeResponse> {
     }
 
     public void setTrustLevel(final String trustLevel) {
-        this.trustLevel = TrustLevel.valueOf(trustLevel.toUpperCase(Locale.ENGLISH));
+        final String value = Converter.preCheck(trustLevel);
+        this.trustLevel = (value != null) ? TrustLevel.valueOf(value.toUpperCase(Locale.ENGLISH)) : null;
+    }
+
+    public void setSecret(final String secret) {
+        this.secret = secret;
+    }
+
+    /**
+     * The secrets of several Trustees, as {@code member_id=secret, ...}; an
+     * empty secret removes it.
+     *
+     * @param secrets Secrets by the names of the Member IDs
+     */
+    public void setSecrets(final String secrets) {
+        this.secrets = trusteeSecrets(secrets);
+    }
+
+    public void setCircleKey(final String circleKey) {
+        this.circleKey = Converter.preCheck(circleKey);
     }
 
     // =========================================================================
@@ -70,8 +101,13 @@ public final class ProcessTrustee extends EDSRequest<ProcessTrusteeResponse> {
         request.setCircleId(circleId);
         request.setMemberId(memberId);
         request.setTrustLevel(trustLevel);
+        request.setSecret(secret);
+        request.setSecrets(secrets);
+        request.setCircleKey(circleKey);
 
-        response = CallManagement.processTrustee(requestUrl, request);
+        response = manySecrets
+                ? CallManagement.setSecrets(requestUrl, request)
+                : CallManagement.processTrustee(requestUrl, request);
     }
 
     /**
@@ -85,5 +121,9 @@ public final class ProcessTrustee extends EDSRequest<ProcessTrusteeResponse> {
         this.circleId = null;
         this.memberId = null;
         this.trustLevel = null;
+        this.secret = null;
+        this.manySecrets = false;
+        this.secrets = null;
+        this.circleKey = null;
     }
 }

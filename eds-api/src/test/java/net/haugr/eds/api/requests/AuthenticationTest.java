@@ -38,7 +38,7 @@ final class AuthenticationTest {
     void testClassFlow() {
         final String name = "Authentication Name";
         final String credentials = "Member Passphrase";
-        final CredentialType type = CredentialType.SIGNATURE;
+        final CredentialType type = CredentialType.INVITATION;
 
         final Authentication authentication = new Authentication();
         assertNotEquals(name, authentication.getAccountName());

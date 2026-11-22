@@ -16,9 +16,9 @@
  */
 package net.haugr.eds.fitnesse;
 
-import net.haugr.eds.api.common.Action;
-import net.haugr.eds.api.requests.ProcessDataRequest;
-import net.haugr.eds.api.responses.ProcessDataResponse;
+import net.haugr.eds.client.model.Action;
+import net.haugr.eds.client.model.ProcessDataRequest;
+import net.haugr.eds.client.model.ProcessDataResponse;
 import net.haugr.eds.fitnesse.callers.CallShare;
 import net.haugr.eds.fitnesse.utils.Converter;
 
@@ -38,6 +38,7 @@ public final class ProcessData extends EDSRequest<ProcessDataResponse> {
     private String folderId = null;
     private String targetFolderId = null;
     private String typeName = null;
+    private String mediaType = null;
     private byte[] data = null;
 
     // =========================================================================
@@ -99,6 +100,15 @@ public final class ProcessData extends EDSRequest<ProcessDataResponse> {
     }
 
     /**
+     * Set the Media Type.
+     *
+     * @param mediaType Media Type
+     */
+    public void setMediaType(final String mediaType) {
+        this.mediaType = Converter.preCheck(mediaType);
+    }
+
+    /**
      * Set the Human-Readable FolderId.
      *
      * @param folderId Human-Readable FolderId
@@ -152,6 +162,7 @@ public final class ProcessData extends EDSRequest<ProcessDataResponse> {
         request.setFolderId(folderId);
         request.setTargetFolderId(targetFolderId);
         request.setTypeName(typeName);
+        request.setMediaType(mediaType);
         request.setData(data);
 
         response = CallShare.processData(requestUrl, request);
@@ -177,6 +188,7 @@ public final class ProcessData extends EDSRequest<ProcessDataResponse> {
         folderId = null;
         targetFolderId = null;
         typeName = null;
+        mediaType = null;
         data = null;
     }
 }

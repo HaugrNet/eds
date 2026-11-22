@@ -21,15 +21,19 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.quarkus.test.junit.QuarkusTest;
+import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import net.haugr.eds.api.common.Constants;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -59,10 +63,17 @@ final class EdsH2ApplicationTest {
     @ConfigProperty(name = "quarkus.datasource.pg.active")
     boolean postgresqlActive;
 
+    @BeforeEach
+    void apiRoot() {
+        // The REST API is below Constants.REST_API; Quarkus only knows the root
+        // of the application.
+        RestAssured.basePath = Constants.REST_API;
+    }
+
     @Test
     void testH2IsSelected() {
         assertTrue(h2Active);
-        assertTrue(!postgresqlActive);
+        assertFalse(postgresqlActive);
         assertEquals(DatabaseSelection.Database.H2, DatabaseSelection.selected());
     }
 

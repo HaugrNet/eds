@@ -50,11 +50,14 @@ final class ReturnCodeTest {
         runAssertions(ReturnCode.ILLEGAL_ACTION, 405, 405, CLASS_WARNING, "The Account tried to invoke an Action not allowed.");
         runAssertions(ReturnCode.VERIFICATION_WARNING, 406, 406, CLASS_WARNING, "The provided Request information is insufficient or invalid.");
         runAssertions(ReturnCode.INTEGRITY_WARNING, 409, 409, CLASS_WARNING, "Not possible to perform the given action, as it will lead to data integrity problems.");
-        runAssertions(ReturnCode.SIGNATURE_WARNING, 491, 400, CLASS_WARNING, "There Signature is not usable.");
+        runAssertions(ReturnCode.PRECONDITION_FAILED, 412, 412, CLASS_WARNING, "A precondition of the request is not met.");
+        runAssertions(ReturnCode.CONTENT_TOO_LARGE, 413, 413, CLASS_WARNING, "The content is larger than allowed.");
+        runAssertions(ReturnCode.RANGE_NOT_SATISFIABLE, 416, 416, CLASS_WARNING, "The requested range is outside the content.");
         runAssertions(ReturnCode.SETTING_WARNING, 492, 400, CLASS_WARNING, "Not permitted to add, alter or delete the given Setting.");
 
         // Errors
         runAssertions(ReturnCode.ERROR, 500, 500, CLASS_ERROR, "General Error occurred while handling the request.");
+        runAssertions(ReturnCode.INSUFFICIENT_STORAGE, 507, 507, CLASS_ERROR, "The storage limit for content is reached.");
         runAssertions(ReturnCode.CRYPTO_ERROR, 591, 500, CLASS_ERROR, "Cryptographic Error occurred during the handling of the request.");
         runAssertions(ReturnCode.INTEGRITY_ERROR, 592, 500, CLASS_ERROR, "The Encrypted Data is having integrity problems.");
         runAssertions(ReturnCode.SETTING_ERROR, 593, 500, CLASS_ERROR, "Error extracting settings value.");

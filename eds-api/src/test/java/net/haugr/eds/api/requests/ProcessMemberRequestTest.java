@@ -154,9 +154,8 @@ final class ProcessMemberRequestTest {
         request.setAction(Action.LOGIN);
 
         final Map<String, String> errors = request.validate();
-        assertEquals(2, errors.size());
+        assertEquals(1, errors.size());
         assertEquals("The Session (Credential) is missing.", errors.get(Constants.FIELD_CREDENTIAL));
-        assertEquals("The Credentials are required to create new Session.", errors.get(Constants.FIELD_NEW_CREDENTIAL));
     }
 
     @Test
@@ -229,7 +228,7 @@ final class ProcessMemberRequestTest {
 
         final Map<String, String> errors = request.validate();
         assertEquals(1, errors.size());
-        assertEquals("The newAccountName may not exceed 256 characters.", errors.get(Constants.FIELD_NEW_ACCOUNT_NAME));
+        assertEquals("The newAccountName may not exceed 75 characters.", errors.get(Constants.FIELD_NEW_ACCOUNT_NAME));
     }
 
     @Test

@@ -28,7 +28,7 @@ import net.haugr.eds.api.common.MemberRole;
 import net.haugr.eds.core.setup.DatabaseSetup;
 import net.haugr.eds.core.setup.GenerateTestData;
 import net.haugr.eds.core.enums.KeyAlgorithm;
-import net.haugr.eds.core.jce.EDSKeyPair;
+import net.haugr.eds.core.jce.MemberKeyPair;
 import net.haugr.eds.core.jce.Crypto;
 import net.haugr.eds.core.model.CommonDao;
 import java.time.LocalDateTime;
@@ -47,7 +47,7 @@ final class MemberEntityTest extends DatabaseSetup {
 
     @Test
     void testEntity() {
-        final EDSKeyPair keyPair = Crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
+        final MemberKeyPair keyPair = MemberKeyPair.generate(settings.getAsymmetricAlgorithm());
         final String externalId = UUID.randomUUID().toString();
         final MemberEntity entity = prepareMember(externalId, keyPair);
         persistAndDetach(entity);
@@ -62,8 +62,6 @@ final class MemberEntityTest extends DatabaseSetup {
         assertEquals(entity.getPublicKey(), found.getPublicKey());
         assertEquals(entity.getPrivateKey(), found.getPrivateKey());
         assertEquals(MemberRole.STANDARD, found.getMemberRole());
-        assertNull(found.getSessionChecksum());
-        assertNull(found.getSessionCrypto());
         assertNull(found.getSessionExpire());
     }
 
@@ -158,12 +156,18 @@ final class MemberEntityTest extends DatabaseSetup {
 
     /**
      * This test is not really testing anything, only assuring that the
-     * generation of test data for the database is working.
+     * generation of test data for the database is working. To re-generate the
+     * test data (data.sql), run it with the system property eds.testdata set
+     * to a file, which then gets the SQL.
      */
     @Test
-    void testPreparingTestData() {
+    void testPreparingTestData() throws java.io.IOException {
         final GenerateTestData generator = new GenerateTestData();
         final String sql = generator.prepareTestData();
         assertTrue(sql.length() > 19000);
+        final String file = System.getProperty("eds.testdata");
+        if (file != null) {
+            java.nio.file.Files.writeString(java.nio.file.Path.of(file), sql);
+        }
     }
 }

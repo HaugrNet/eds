@@ -16,9 +16,9 @@
  */
 package net.haugr.eds.fitnesse;
 
-import net.haugr.eds.api.dtos.Trustee;
-import net.haugr.eds.api.requests.FetchTrusteeRequest;
-import net.haugr.eds.api.responses.FetchTrusteeResponse;
+import net.haugr.eds.client.model.Trustee;
+import net.haugr.eds.client.model.FetchTrusteeRequest;
+import net.haugr.eds.client.model.FetchTrusteeResponse;
 import java.util.List;
 import net.haugr.eds.fitnesse.callers.CallManagement;
 import net.haugr.eds.fitnesse.utils.Converter;
@@ -53,7 +53,7 @@ public final class FetchTrustees extends EDSRequest<FetchTrusteeResponse> {
 
                 builder.append("Trustee{memberId='")
                         .append(getKey(trustee.getMemberId()))
-                        .append("accountName='")
+                        .append("', accountName='")
                         .append(trustee.getAccountName())
                         .append("', circleId='")
                         .append(getKey(trustee.getCircleId()))
@@ -68,6 +68,33 @@ public final class FetchTrustees extends EDSRequest<FetchTrusteeResponse> {
         }
         builder.append(']');
 
+        return builder.toString();
+    }
+
+    /**
+     * The secrets of the Trustees (E2E.md), as the requesting Member gets
+     * them: their own, and all of a Circle they administer.
+     *
+     * @return The account names with their secrets
+     */
+    public String secrets() {
+        final StringBuilder builder = new StringBuilder("[");
+
+        if (response != null) {
+            final List<Trustee> trustees = response.getTrustees();
+            for (int i = 0; i < trustees.size(); i++) {
+                final Trustee trustee = trustees.get(i);
+                if (i >= 1) {
+                    builder.append(", ");
+                }
+                builder.append(trustee.getAccountName())
+                        .append("='")
+                        .append(trustee.getSecret())
+                        .append('\'');
+            }
+        }
+
+        builder.append(']');
         return builder.toString();
     }
 

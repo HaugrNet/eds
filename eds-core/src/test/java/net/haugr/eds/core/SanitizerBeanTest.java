@@ -27,7 +27,6 @@ import net.haugr.eds.api.responses.ProcessDataResponse;
 import net.haugr.eds.core.enums.SanityStatus;
 import net.haugr.eds.core.enums.StandardSetting;
 import net.haugr.eds.core.exceptions.EDSException;
-import net.haugr.eds.core.jce.Crypto;
 import net.haugr.eds.core.managers.SanityManager;
 import net.haugr.eds.core.model.Settings;
 import net.haugr.eds.core.model.entities.DataEntity;
@@ -38,6 +37,9 @@ import java.lang.reflect.Field;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
+import java.io.ByteArrayInputStream;
+import net.haugr.eds.core.model.DataDao;
+import net.haugr.eds.core.model.EncryptedDataStore;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -55,7 +57,7 @@ final class SanitizerBeanTest extends DatabaseSetup {
 
     @Test
     void testEntityManagerConstructor() {
-        final SanitizerBean bean = new SanitizerBean(entityManager);
+        final SanitizerBean bean = new SanitizerBean(entityManager, settings);
 
         assertNotNull(bean);
     }
@@ -148,10 +150,89 @@ final class SanitizerBeanTest extends DatabaseSetup {
     @Test
     void testSanitizeBeanWithDatabaseProblem() {
         final SanityManager manager = prepareSanityManager();
-        final Crypto crypto = new Crypto(Settings.getInstance());
-        final SanityStatus status = manager.processEntity(crypto,123L);
+        final SanityStatus status = manager.processEntity(123L);
 
         assertEquals(SanityStatus.BLOCKED, status);
+    }
+
+    /**
+     * The sanity check reads each blob in batches and compares the SHA-512 of
+     * the ciphertext; a damaged blob is marked as failed and reported.
+     */
+    @Test
+    void testSanitizeFindsDamagedContent() {
+        final ShareBean shareBean = prepareShareBean();
+        final ProcessDataResponse added = shareBean.processData(prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "scrubbed", 300_000));
+        assertTrue(added.isOk(), added.getReturnMessage());
+        final DataDao dao = new DataDao(entityManager);
+        final long id = (Long) dao.findContentInfo(dao.findMetadataByMemberAndExternalId(dao.findMemberByName(MEMBER_1).getId(), added.getDataId()))[0];
+
+        // Damage one byte of the stored data, keeping the stored checksum,
+        // and make the object due for a check.
+        final byte[] stored = dao.withConnection(connection -> EncryptedDataStore.read(connection, id, 0, 400_000));
+        stored[stored.length / 2] ^= 1;
+        final String checksum = (String) entityManager.createQuery("select d.checksum from DataEntity d where d.id = :id").setParameter("id", id).getSingleResult();
+        dao.withConnection(connection -> EncryptedDataStore.write(connection, id, new ByteArrayInputStream(stored), stored.length, "SHA-512"));
+        entityManager.createQuery("update DataEntity d set d.checksum = :checksum, d.sanityChecked = :checked where d.id = :id")
+                .setParameter("checksum", checksum)
+                .setParameter("checked", Utilities.newDate().minusYears(10))
+                .setParameter("id", id)
+                .executeUpdate();
+
+        new SanitizerBean(entityManager, settings).sanitize();
+
+        entityManager.clear();
+        assertEquals(SanityStatus.FAILED, entityManager.find(DataEntity.class, id).getSanityStatus());
+        final SanityReport.Snapshot report = SanityReport.current();
+        assertTrue(report.enabled());
+        assertTrue(report.flawed() >= 1);
+        assertTrue(report.failedTotal() >= 1);
+        assertNotNull(report.lastRun());
+    }
+
+    /**
+     * Content is checked with the algorithm its checksum was stored with, so
+     * a change of the hash algorithm setting doesn't fail the content stored
+     * before it.
+     */
+    @Test
+    void testSanitizeKeepsContentOfAnotherHashAlgorithm() throws Exception {
+        final ShareBean shareBean = prepareShareBean();
+        final ProcessDataResponse added = shareBean.processData(prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "older hash", 100_000));
+        assertTrue(added.isOk(), added.getReturnMessage());
+        final DataDao dao = new DataDao(entityManager);
+        final long id = (Long) dao.findContentInfo(dao.findMetadataByMemberAndExternalId(dao.findMemberByName(MEMBER_1).getId(), added.getDataId()))[0];
+
+        // The checksum as the other algorithm than the current one stores it.
+        final String other = "SHA-512".equals(settings.getHashAlgorithm().getAlgorithm()) ? "SHA-384" : "SHA-512";
+        final byte[] stored = dao.withConnection(connection -> EncryptedDataStore.read(connection, id, 0, 200_000));
+        final String checksum = java.util.Base64.getEncoder().encodeToString(java.security.MessageDigest.getInstance(other).digest(stored));
+        entityManager.createQuery("update DataEntity d set d.checksum = :checksum where d.id = :id")
+                .setParameter("checksum", checksum)
+                .setParameter("id", id)
+                .executeUpdate();
+
+        assertEquals(SanityStatus.OK, new SanityManager(settings, entityManager).processEntity(id));
+    }
+
+    @Test
+    void testSanitizeCanBeSwitchedOffAndLimited() {
+        final SanityManager manager = prepareSanityManager();
+        prepareInvalidData();
+        final int due = manager.findNextBatch(100).size();
+        assertTrue(due > 2);
+
+        final Settings off = newSettings();
+        off.set(StandardSetting.SANITY_INTERVAL.getKey(), "0");
+        new SanitizerBean(entityManager, off).sanitize();
+        assertEquals(due, manager.findNextBatch(100).size());
+        assertFalse(SanityReport.current().enabled());
+
+        final Settings limited = newSettings();
+        limited.set(StandardSetting.SANITY_MAX_OBJECTS.getKey(), "2");
+        new SanitizerBean(entityManager, limited).sanitize();
+        assertEquals(2, SanityReport.current().checked());
+        assertEquals(due - 2, manager.findNextBatch(100).size());
     }
 
     // =========================================================================
@@ -195,6 +276,8 @@ final class SanitizerBeanTest extends DatabaseSetup {
         return new SanitizerBean(prepareSanityManager());
     }
 
+    // Reflection reaches what the test checks; it is not the contract.
+    @SuppressWarnings("fb-contrib:RFI_SET_ACCESSIBLE")
     private static Settings getBeanSettings(final StartupBean bean) {
         try {
             final Class<?> clazz = bean.getClass();

@@ -146,7 +146,10 @@ final class ProcessDataRequestTest {
         request.setCredential(TestUtilities.convert(Constants.ADMIN_ACCOUNT));
         request.setDataId(null);
         request.setFolderId("Invalid Folder Id");
-        request.setDataName("Too long new name for the Data, it is only allowed to be under 75 characters long, and this should hopefully exceed that.");
+        // The stored name may hold a client-encrypted name (E2E.md), so the
+        // limit is MAX_DATA_NAME_LENGTH, not the 75 a person may type; a name
+        // past it is still refused.
+        request.setDataName("x".repeat(Constants.MAX_DATA_NAME_LENGTH + 1));
         request.setAction(Action.UPDATE);
 
         final Map<String, String> errors = request.validate();

@@ -24,10 +24,9 @@ import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoField;
 import java.util.Locale;
-import net.haugr.eds.api.common.Action;
-import net.haugr.eds.api.common.CredentialType;
-import net.haugr.eds.api.common.MemberRole;
-import net.haugr.eds.api.requests.AbstractRequest;
+import net.haugr.eds.client.model.Action;
+import net.haugr.eds.client.model.CredentialType;
+import net.haugr.eds.client.model.MemberRole;
 import net.haugr.eds.fitnesse.exceptions.StopTestException;
 
 /**
@@ -79,7 +78,7 @@ public final class Converter {
         final String checked = preCheck(value);
         int result = defaultValue;
 
-        if ((checked != null) && !AbstractRequest.isEmpty(checked)) {
+        if ((checked != null) && !checked.isBlank()) {
             result = Integer.parseInt(value.trim());
         }
 
@@ -100,6 +99,31 @@ public final class Converter {
         return date != null
                 ? FORMATTER.format(date)
                 : null;
+    }
+
+    /**
+     * The date of a timestamp from EDS, which the contract has as an ISO-8601
+     * local date-time (format {@code local-date-time}) in UTC.
+     *
+     * @param timestamp Timestamp from a response
+     * @return The date, as yyyy-MM-dd
+     */
+    public static String convertTimestamp(final String timestamp) {
+        return timestamp != null
+                ? convertDate(LocalDateTime.parse(timestamp))
+                : null;
+    }
+
+    /**
+     * A date from the WIKI as timestamp for a request, in the format of the
+     * contract.
+     *
+     * @param date Date as yyyy-MM-dd
+     * @return The timestamp, ISO-8601 local date-time
+     */
+    public static String toTimestamp(final String date) {
+        final LocalDateTime converted = convertDate(date);
+        return (converted != null) ? converted.toString() : null;
     }
 
     public static LocalDateTime convertDate(final String date) {

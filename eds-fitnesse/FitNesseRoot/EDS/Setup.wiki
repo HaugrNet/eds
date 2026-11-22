@@ -9,8 +9,10 @@
 !define ILLEGAL_ACTION         { 405 }
 !define VERIFICATION_WARNING   { 406 }
 !define INTEGRITY_WARNING      { 409 }
-!define SIGNATURE_WARNING      { 491 }
+!define PRECONDITION_FAILED    { 412 }
+!define RANGE_NOT_SATISFIABLE  { 416 }
 !define SETTING_WARNING        { 492 }
+!define CRYPTO_ERROR           { 591 }
 
 # Credentials, all secrets must pass the EDS Entropy Verifier. The
 # Administrator Passphrase must match the one used in the ControlEds fixture.
@@ -20,6 +22,7 @@
 !define PASSPHRASE_3       {password3 pjvgr.yxupm-37i23.8kq4h_9s}
 !define PASSPHRASE_9       {password9 pjvgr.yxupm-37i23.8kq4h_9s}
 !define INVITEE_PASSPHRASE {invitee pjvgr.yxupm-37i23.8kq4h_9s}
+!define MASTERKEY_DEFAULT  {fitnesse masterkey pjvgr.yxupm-37i23.8kq4h_9s}
 !define MASTERKEY_SECRET   {master pjvgr.yxupm-37i23.8kq4h_9s}
 
 # Defined Dates
@@ -30,7 +33,8 @@
 |net.haugr.eds.fitnesse|
 
 !|script|control eds              |
-|setUrl |http://localhost:8080/eds|
+|setUrl |http://localhost:8080/api/v1|
+|check  |unlock master key|${MASTERKEY_DEFAULT}|!-MasterKey-! unlocked.|
 |remove circles                   |
 |remove members                   |
 |remove data types                |

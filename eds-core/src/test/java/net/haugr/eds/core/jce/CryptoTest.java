@@ -18,15 +18,18 @@ package net.haugr.eds.core.jce;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.util.UUID;
+import java.util.Arrays;
+import java.util.Base64;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.atomic.AtomicBoolean;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import net.haugr.eds.api.common.ReturnCode;
@@ -46,45 +49,181 @@ import org.junit.jupiter.api.Test;
 final class CryptoTest extends DatabaseSetup {
 
     @Test
-    void testGCM128Encryption() {
+    void testGCM256Encryption() {
         final String clearText = "This is just an example";
 
-        final KeyAlgorithm algorithm = KeyAlgorithm.AES_GCM_128;
+        final KeyAlgorithm algorithm = KeyAlgorithm.AES_GCM_256;
         final SecretEDSKey key = Crypto.generateSymmetricKey(algorithm);
-        final IVSalt ivSalt = new IVSalt();
-        key.setSalt(ivSalt);
+        final Nonce nonce = Nonce.random();
+        final byte[] aad = crypto.stringToBytes("test/aad");
 
         final byte[] clearTextBytes = crypto.stringToBytes(clearText);
-        final byte[] encryptedBytes = Crypto.encrypt(key, clearTextBytes);
-        final byte[] decryptedBytes = Crypto.decrypt(key, encryptedBytes);
+        final byte[] encryptedBytes = Crypto.seal(key, nonce, aad, clearTextBytes);
+        final byte[] decryptedBytes = Crypto.open(key, nonce, aad, encryptedBytes);
         final String decrypted = crypto.bytesToString(decryptedBytes);
 
         assertEquals(clearText, decrypted);
     }
 
     @Test
-    void testShaEncryption() {
-        final KeyAlgorithm algorithm = KeyAlgorithm.SHA_256;
-        final PublicEDSKey key = Crypto.generateAsymmetricKey(KeyAlgorithm.RSA_2048).getPublic();
-        final PublicEDSKey fakeKey = new PublicEDSKey(algorithm, key.getKey());
-        final byte[] toEncrypt = { (byte) 1, (byte) 2, (byte) 3, (byte) 4 };
+    void testSealingTwiceGivesDifferentResults() {
+        final SecretEDSKey key = Crypto.generateSymmetricKey(KeyAlgorithm.AES_GCM_256);
+        final byte[] aad = crypto.stringToBytes("test/aad");
+        final byte[] plain = crypto.stringToBytes("The same value");
 
-        final EDSException cause = assertThrows(EDSException.class, () -> Crypto.encrypt(fakeKey, toEncrypt));
+        final byte[] first = Crypto.seal(key, aad, plain);
+        final byte[] second = Crypto.seal(key, aad, plain);
+        assertFalse(Arrays.equals(first, second));
+        assertArrayEquals(plain, Crypto.open(key, aad, first));
+        assertArrayEquals(plain, Crypto.open(key, aad, second));
+    }
+
+    @Test
+    void testOpenWithWrongAadFails() {
+        final SecretEDSKey key = Crypto.generateSymmetricKey(KeyAlgorithm.AES_GCM_256);
+        final byte[] sealed = Crypto.seal(key, crypto.stringToBytes("member|1"), crypto.stringToBytes("secret"));
+        final byte[] otherAad = crypto.stringToBytes("member|2");
+
+        final EDSException cause = assertThrows(EDSException.class, () -> Crypto.open(key, otherAad, sealed));
         assertEquals(ReturnCode.CRYPTO_ERROR, cause.getReturnCode());
-        assertEquals("Cannot prepare Cipher for this Algorithm Type SIGNATURE.", cause.getMessage());
+    }
+
+    @Test
+    void testOpenWithTamperedCiphertextFails() {
+        final SecretEDSKey key = Crypto.generateSymmetricKey(KeyAlgorithm.AES_GCM_256);
+        final byte[] aad = crypto.stringToBytes("test/aad");
+        final byte[] sealed = Crypto.seal(key, aad, crypto.stringToBytes("secret"));
+        sealed[sealed.length - 1] ^= 1;
+
+        assertThrows(EDSException.class, () -> Crypto.open(key, aad, sealed));
+    }
+
+    @Test
+    void testOpenTooShortValueFails() {
+        final SecretEDSKey key = Crypto.generateSymmetricKey(KeyAlgorithm.AES_GCM_256);
+        final byte[] aad = crypto.stringToBytes("test/aad");
+
+        final EDSException cause = assertThrows(EDSException.class, () -> Crypto.open(key, aad, new byte[5]));
+        assertEquals("The sealed value is too short.", cause.getMessage());
+        final EDSException missing = assertThrows(EDSException.class, () -> Crypto.open(key, aad, null));
+        assertEquals("The sealed value is too short.", missing.getMessage());
+    }
+
+    @Test
+    void testOpenWithMasterKeyRefusesWhatIsntBase64() {
+        final EDSException cause = assertThrows(EDSException.class, () -> crypto.openWithMasterKey("eds/test", "not base64 !"));
+        assertEquals(ReturnCode.CRYPTO_ERROR, cause.getReturnCode());
+    }
+
+    @Test
+    void testNonceLength() {
+        assertEquals(12, Nonce.random().getBytes().length);
+        assertThrows(EDSException.class, () -> Nonce.of(new byte[16]));
+        assertThrows(EDSException.class, () -> Nonce.of(null));
+    }
+
+    /**
+     * Every MasterKey encryption uses a random nonce (fixes the fixed-IV
+     * nonce reuse found 2026-10-22), so two encryptions of the same value
+     * differ.
+     */
+    @Test
+    void testMasterKeyEncryptionsDiffer() {
+        final byte[] value = crypto.stringToBytes("member salt");
+
+        final String first = crypto.sealWithMasterKey("eds/test", value);
+        final String second = crypto.sealWithMasterKey("eds/test", value);
+        assertNotEquals(first, second);
+        assertArrayEquals(value, crypto.openWithMasterKey("eds/test", first));
+        assertArrayEquals(value, crypto.openWithMasterKey("eds/test", second));
+    }
+
+    @Test
+    void testMasterKeyEncryptionIsBoundToAadAndVersion() {
+        final byte[] value = crypto.stringToBytes("member salt");
+        final String sealed = crypto.sealWithMasterKey("eds/test|1", value);
+
+        assertThrows(EDSException.class, () -> crypto.openWithMasterKey("eds/test|2", sealed));
+
+        // The same MasterKey, but another version, can't open it either.
+        MasterKey.getInstance().install(MasterKey.derive(crypto.stringToBytes(TEST_MASTERKEY_SECRET)), 2);
+        assertThrows(EDSException.class, () -> crypto.openWithMasterKey("eds/test|1", sealed));
+    }
+
+    @Test
+    void testMasterKeyEncryptionDuringRotationCanBeOpened() throws InterruptedException {
+        // Values are sealed while the MasterKey is replaced again and again,
+        // as in a rotation under load. Each value must be sealed with the
+        // key and the version of one and the same MasterKey, else it can
+        // never be opened again.
+        final MasterKey masterKey = MasterKey.getInstance();
+        final MasterKey.Material first = MasterKey.derive(crypto.stringToBytes(TEST_MASTERKEY_SECRET));
+        final MasterKey.Material second = MasterKey.derive(crypto.stringToBytes(NEW_MASTERKEY_SECRET));
+        final byte[] value = crypto.stringToBytes("member salt");
+        final Queue<String> sealed = new ConcurrentLinkedQueue<>();
+        final AtomicBoolean running = new AtomicBoolean(true);
+
+        final Thread[] sealers = new Thread[4];
+        for (int i = 0; i < sealers.length; i++) {
+            sealers[i] = Thread.ofPlatform().start(() -> {
+                while (running.get()) {
+                    sealed.add(crypto.sealWithMasterKey("eds/test", value));
+                }
+            });
+        }
+        boolean toSecond = true;
+        while (sealed.size() < 50_000) {
+            if (toSecond) {
+                masterKey.install(second, 2);
+            } else {
+                masterKey.install(first, 1);
+            }
+            toSecond = !toSecond;
+        }
+        running.set(false);
+        for (final Thread sealer : sealers) {
+            sealer.join();
+        }
+
+        assertFalse(sealed.isEmpty());
+        int unreadable = 0;
+        for (final String one : sealed) {
+            if (!opens(masterKey, first, 1, one, value) && !opens(masterKey, second, 2, one, value)) {
+                unreadable++;
+            }
+        }
+        assertEquals(0, unreadable, "of " + sealed.size() + " values");
+    }
+
+    private boolean opens(final MasterKey masterKey, final MasterKey.Material material, final int version, final String sealed, final byte[] value) {
+        masterKey.install(material, version);
+        try {
+            return Arrays.equals(value, crypto.openWithMasterKey("eds/test", sealed));
+        } catch (EDSException _) {
+            return false;
+        }
+    }
+
+    @Test
+    void testMasterKeyEncryptionWithOtherMasterKeyFails() {
+        final String sealed = crypto.sealWithMasterKey("eds/test", crypto.stringToBytes("member salt"));
+
+        MasterKey.getInstance().install(MasterKey.derive(crypto.stringToBytes(NEW_MASTERKEY_SECRET)), 1);
+        assertThrows(EDSException.class, () -> crypto.openWithMasterKey("eds/test", sealed));
     }
 
     @Test
     void testGeneratingPasswordKeyWithInvalidAlgorithm() {
         final Settings mySettings = newSettings();
-        mySettings.set(StandardSetting.PBE_ALGORITHM.getKey(), "RSA_2048");
+        mySettings.set(StandardSetting.PBE_ALGORITHM.getKey(), "MLKEM1024_P384");
         final Crypto myCrypto = new Crypto(mySettings);
-        final String salt = UUID.randomUUID().toString();
+        final byte[] salt = generateData(16);
         final byte[] bytes = crypto.stringToBytes("my secret");
+        final int iterations = settings.getPasswordIterations();
 
-        final EDSException cause = assertThrows(EDSException.class, () -> myCrypto.generatePasswordKey(KeyAlgorithm.AES_CBC_128, bytes, salt));
+        final EDSException cause = assertThrows(EDSException.class, () -> myCrypto.generatePasswordKey(KeyAlgorithm.AES_GCM_256, bytes, salt, iterations));
         assertEquals(ReturnCode.CRYPTO_ERROR, cause.getReturnCode());
-        assertEquals("AES/CBC/PKCS5Padding SecretKeyFactory not available", cause.getMessage());
+        assertEquals("AES_256/GCM/NoPadding SecretKeyFactory not available", cause.getMessage());
     }
 
     @Test
@@ -93,24 +232,17 @@ final class CryptoTest extends DatabaseSetup {
         for (int i = 0; i < 256; i++) {
             secret[i] = (byte) i;
         }
-        final KeyAlgorithm algorithm = KeyAlgorithm.PBE_CBC_128;
-        final String salt = UUID.randomUUID().toString();
-        final SecretEDSKey key = crypto.generatePasswordKey(algorithm, secret, salt);
+        final KeyAlgorithm algorithm = KeyAlgorithm.PBE_GCM_256;
+        final byte[] salt = generateData(16);
+        final SecretEDSKey key = crypto.generatePasswordKey(algorithm, secret, salt, settings.getPasswordIterations());
         assertNotNull(key);
     }
 
     @Test
     void testGeneratingSymmetricKeyWithInvalidAlgorithm() {
-        final EDSException cause = assertThrows(EDSException.class, () -> Crypto.generateSymmetricKey(KeyAlgorithm.RSA_2048));
+        final EDSException cause = assertThrows(EDSException.class, () -> Crypto.generateSymmetricKey(KeyAlgorithm.MLKEM1024_P384));
         assertEquals(ReturnCode.CRYPTO_ERROR, cause.getReturnCode());
-        assertEquals("no such algorithm: RSA for provider SunJCE", cause.getMessage());
-    }
-
-    @Test
-    void testGeneratingAsymmetricKeyWithInvalidAlgorithm() {
-        final EDSException cause = assertThrows(EDSException.class, () -> Crypto.generateAsymmetricKey(KeyAlgorithm.AES_CBC_128));
-        assertEquals(ReturnCode.CRYPTO_ERROR, cause.getReturnCode());
-        assertEquals("AES KeyPairGenerator not available", cause.getMessage());
+        assertEquals("no such algorithm: ML-KEM-1024+P-384 for provider SunJCE", cause.getMessage());
     }
 
     @Test
@@ -126,78 +258,17 @@ final class CryptoTest extends DatabaseSetup {
     }
 
     @Test
-    void testSigningWithInvalidAlgorithm() {
-        final Settings mySettings = newSettings();
-        mySettings.set(StandardSetting.SIGNATURE_ALGORITHM.getKey(), "AES_CBC_256");
-        final Crypto myCrypto = new Crypto(mySettings);
-        final EDSKeyPair key = Crypto.generateAsymmetricKey(KeyAlgorithm.RSA_2048);
-        final PrivateKey privateKey = key.getPrivate().getKey();
-        final byte[] bytes = "bla bla bla".getBytes(mySettings.getCharset());
+    void testHmacWithMasterKey() {
+        final byte[] value = "invitation token".getBytes(settings.getCharset());
+        final byte[] other = "another token".getBytes(settings.getCharset());
 
-        final EDSException cause = assertThrows(EDSException.class, () -> myCrypto.sign(privateKey, bytes));
-        assertEquals(ReturnCode.CRYPTO_ERROR, cause.getReturnCode());
-        assertEquals("AES/CBC/PKCS5Padding Signature not available", cause.getMessage());
-    }
-
-    @Test
-    void testSignature() {
-        final EDSKeyPair keyPair = Crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
-        final byte[] message = "Message to Sign".getBytes(settings.getCharset());
-        final byte[] signature = crypto.sign(keyPair.getPrivate().getKey(), message);
-        final boolean verified = crypto.verify(keyPair.getPublic().getKey(), message, signature);
-
-        assertTrue(verified);
-    }
-
-    /**
-     * The Public Key is stored armored in the database, meaning converted into
-     * a Base64 encoded String, which can easily be read out again.
-     */
-    @Test
-    void testArmoringPublicKey() {
-        final EDSKeyPair key = Crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
-
-        final String armoredKey = Crypto.armoringPublicKey(key.getPublic().getKey());
-        final PublicKey dearmoredKey = crypto.dearmoringPublicKey(armoredKey);
-
-        assertEquals(key.getPublic().getKey(), dearmoredKey);
-    }
-
-    /**
-     * The Private Key of a Member is stored encrypted using a Member-provided
-     * passphrase which is turned into a Key. The PBE-based Key is generated
-     * using both a Member Salt and System Salt.
-     */
-    @Test
-    void testArmoringPrivateKey() {
-        final String password = "MySuperSecretPassword";
-        final String salt = UUID.randomUUID().toString();
-        final SecretEDSKey cryptoKeys = crypto.generatePasswordKey(settings.getPasswordAlgorithm(), crypto.stringToBytes(password), salt);
-        cryptoKeys.setSalt(new IVSalt(UUID.randomUUID().toString()));
-        final EDSKeyPair keyPair = Crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
-
-        final String armoredKey = Crypto.encryptAndArmorPrivateKey(cryptoKeys, keyPair.getPrivate().getKey());
-        final PrivateKey dearmoredKey = crypto.dearmoringPrivateKey(cryptoKeys, armoredKey);
-
-        assertEquals(dearmoredKey, keyPair.getPrivate().getKey());
-    }
-
-    @Test
-    void testArmoringAsymmetricKey() {
-        final String secret = "MySuperSecretPassword";
-        final String salt = UUID.randomUUID().toString();
-        final SecretEDSKey secretKey = crypto.generatePasswordKey(settings.getPasswordAlgorithm(), crypto.stringToBytes(secret), salt);
-        secretKey.setSalt(new IVSalt(salt));
-        final EDSKeyPair pair = Crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
-
-        final String armoredPublicKey = Crypto.armoringPublicKey(pair.getPublic().getKey());
-        final String armoredPrivateKey = Crypto.encryptAndArmorPrivateKey(secretKey, pair.getPrivate().getKey());
-
-        final EDSKeyPair dearmoredPair = crypto.extractAsymmetricKey(pair.getAlgorithm(), secretKey, salt, armoredPublicKey, armoredPrivateKey);
-        assertEquals(pair.getAlgorithm(), dearmoredPair.getAlgorithm());
-        assertEquals(pair.getPublic().getKey(), dearmoredPair.getPublic().getKey());
-        assertEquals(pair.getPrivate().getKey(), dearmoredPair.getPrivate().getKey());
-        assertEquals(pair.getPublic().getKey().hashCode(), dearmoredPair.getPublic().getKey().hashCode());
+        final String hmac = crypto.hmacWithMasterKey("eds/test", value);
+        assertEquals(hmac, crypto.hmacWithMasterKey("eds/test", value));
+        assertNotEquals(hmac, crypto.hmacWithMasterKey("eds/test", other));
+        // The label separates the purposes.
+        assertNotEquals(hmac, crypto.hmacWithMasterKey("eds/other", value));
+        // HMAC-SHA512 gives 64 bytes.
+        assertEquals(64, Base64.getDecoder().decode(hmac).length);
     }
 
     /**
@@ -208,37 +279,15 @@ final class CryptoTest extends DatabaseSetup {
     @Test
     void testObjectEncryption() {
         final SecretEDSKey key = Crypto.generateSymmetricKey(settings.getSymmetricAlgorithm());
-        key.setSalt(new IVSalt(UUID.randomUUID().toString()));
+        final byte[] aad = crypto.stringToBytes("eds/data");
 
         // Now, we're going to encrypt some data
         final String clearText = "This is just an example";
         final byte[] toEncrypt = crypto.stringToBytes(clearText);
-        final byte[] encrypted = Crypto.encrypt(key, toEncrypt);
+        final byte[] encrypted = Crypto.seal(key, aad, toEncrypt);
 
         // And decrypt it so we can verify it
-        final byte[] decrypted = Crypto.decrypt(key, encrypted);
-        final String result = crypto.bytesToString(decrypted);
-
-        assertEquals(clearText, result);
-    }
-
-    /**
-     * For the Group Members, we're storing the Symmetric Key per Member using
-     * Asymmetric Encryption - this will allow that Group Members can be changed
-     * independently of the Group Data. The Member's Public Key is stored with
-     * the Member, encrypted using the Member's Public Key. The Private Key,
-     * which may be stored elsewhere or additionally encrypted, can then be used
-     * by the Member to access the data.
-     */
-    @Test
-    void testMemberEncryption() {
-        final EDSKeyPair key = Crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
-
-        final String clearText = "This is just an example";
-        final byte[] toEncrypt = crypto.stringToBytes(clearText);
-        final byte[] encrypted = Crypto.encrypt(key.getPublic(), toEncrypt);
-
-        final byte[] decrypted = Crypto.decrypt(key.getPrivate(), encrypted);
+        final byte[] decrypted = Crypto.open(key, aad, encrypted);
         final String result = crypto.bytesToString(decrypted);
 
         assertEquals(clearText, result);
@@ -263,42 +312,19 @@ final class CryptoTest extends DatabaseSetup {
     @Test
     void testPasswordToKey() {
         final String password = "MySuperSecretPassword";
-        final String salt = "SystemSpecificSalt";
-        final SecretEDSKey key = crypto.generatePasswordKey(settings.getPasswordAlgorithm(), crypto.stringToBytes(password), salt);
+        final byte[] salt = crypto.stringToBytes("MemberSpecificSalt");
+        final SecretEDSKey key = crypto.generatePasswordKey(settings.getPasswordAlgorithm(), crypto.stringToBytes(password), salt, settings.getPasswordIterations());
+        final byte[] aad = crypto.stringToBytes("test/aad");
 
         // Now, we're going to encrypt some data
-        key.setSalt(new IVSalt(UUID.randomUUID().toString()));
         final String clearText = "This is just an example";
-        final byte[] encrypted = Crypto.encrypt(key, crypto.stringToBytes(clearText));
+        final byte[] encrypted = Crypto.seal(key, aad, crypto.stringToBytes(clearText));
 
         // And decrypt it so we can verify it
-        final byte[] decrypted = Crypto.decrypt(key, encrypted);
+        final byte[] decrypted = Crypto.open(key, aad, encrypted);
         final String result = crypto.bytesToString(decrypted);
 
         assertEquals(clearText, result);
-    }
-
-    /**
-     * <p>Circles have a Key generated, which is stored encrypted per Trustee.
-     * I.e., Member with access to the Circle. The Circle Key is encrypted using
-     * the Member's Public Key and can be decrypted using the Member's Private
-     * Key, which again is unlocked during the Authentication Process.</p>
-     */
-    @Test
-    void testMemberAccessCircleKey() {
-        final String dataSalt = UUID.randomUUID().toString();
-        final SecretEDSKey key = Crypto.generateSymmetricKey(settings.getSymmetricAlgorithm());
-        key.setSalt(new IVSalt(dataSalt));
-        final byte[] rawData = generateData(1048576);
-        final byte[] encryptedData = Crypto.encrypt(key, rawData);
-
-        final EDSKeyPair keyPair = Crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
-        final String armoredCircleKey = Crypto.encryptAndArmorCircleKey(keyPair.getPublic(), key);
-        final SecretEDSKey circleKey = Crypto.extractCircleKey(key.getAlgorithm(), keyPair.getPrivate(), armoredCircleKey);
-        circleKey.setSalt(new IVSalt(dataSalt));
-        final byte[] decryptedData = Crypto.decrypt(circleKey, encryptedData);
-
-        assertArrayEquals(rawData, decryptedData);
     }
 
     @Test
@@ -334,9 +360,12 @@ final class CryptoTest extends DatabaseSetup {
         final SecretEDSKey key = prepareSecretEDSKey();
         final byte[] data = generateData(524288);
 
-        final EDSException cause = assertThrows(EDSException.class, () -> Crypto.encrypt(key, data));
+        final Nonce nonce = Nonce.random();
+        final byte[] aad = crypto.stringToBytes("test/aad");
+
+        final EDSException cause = assertThrows(EDSException.class, () -> Crypto.seal(key, nonce, aad, data));
         assertEquals(ReturnCode.CRYPTO_ERROR, cause.getReturnCode());
-        assertEquals("No installed provider supports this key: javax.crypto.spec.SecretKeySpec", cause.getMessage());
+        assertEquals("Cannot prepare Cipher for this Algorithm Type ASYMMETRIC.", cause.getMessage());
     }
 
     @Test
@@ -344,61 +373,12 @@ final class CryptoTest extends DatabaseSetup {
         final SecretEDSKey key = prepareSecretEDSKey();
         final byte[] data = generateData(524288);
 
-        final EDSException cause = assertThrows(EDSException.class, () -> Crypto.decrypt(key, data));
+        final Nonce nonce = Nonce.random();
+        final byte[] aad = crypto.stringToBytes("test/aad");
+
+        final EDSException cause = assertThrows(EDSException.class, () -> Crypto.open(key, nonce, aad, data));
         assertEquals(ReturnCode.CRYPTO_ERROR, cause.getReturnCode());
-        assertEquals("No installed provider supports this key: javax.crypto.spec.SecretKeySpec", cause.getMessage());
-    }
-
-    @Test
-    void testInvalidAsymmetricKeyEncryption() {
-        final EDSKeyPair keyPair = generateKeyPair();
-        final byte[] data = generateData(524288);
-        final PublicEDSKey publicKey = keyPair.getPublic();
-
-        final EDSException cause = assertThrows(EDSException.class, () -> Crypto.encrypt(publicKey, data));
-        assertEquals(ReturnCode.CRYPTO_ERROR, cause.getReturnCode());
-        assertTrue(cause.getMessage().contains("PublicEDSKey"));
-    }
-
-    @Test
-    void testInvalidAsymmetricKeyDecryption() {
-        final EDSKeyPair keyPair = generateKeyPair();
-        final byte[] data = generateData(524288);
-        final PrivateEDSKey privateKey = keyPair.getPrivate();
-
-        final EDSException cause = assertThrows(EDSException.class, () -> Crypto.decrypt(privateKey, data));
-        assertEquals(ReturnCode.CRYPTO_ERROR, cause.getReturnCode());
-        assertTrue(cause.getMessage().contains("PrivateEDSKey"));
-    }
-
-    @Test
-    void testInvalidDearmoringPublicKey() {
-        final Settings mySettings = newSettings();
-        final Crypto myCrypto = new Crypto(mySettings);
-        final EDSKeyPair keyPair = Crypto.generateAsymmetricKey(mySettings.getAsymmetricAlgorithm());
-        final String armoredPublicKey = Crypto.armoringPublicKey(keyPair.getPublic().getKey());
-
-        mySettings.set(StandardSetting.ASYMMETRIC_ALGORITHM.getKey(), KeyAlgorithm.AES_CBC_128.name());
-
-        final EDSException cause = assertThrows(EDSException.class, () -> myCrypto.dearmoringPublicKey(armoredPublicKey));
-        assertEquals(ReturnCode.CRYPTO_ERROR, cause.getReturnCode());
-        assertEquals("AES KeyFactory not available", cause.getMessage());
-    }
-
-    @Test
-    void testInvalidDearmoringPrivateKey() {
-        final Settings mySettings = newSettings();
-        final Crypto myCrypto = new Crypto(mySettings);
-        final EDSKeyPair keyPair = Crypto.generateAsymmetricKey(mySettings.getAsymmetricAlgorithm());
-        final SecretEDSKey secretKey = Crypto.generateSymmetricKey(mySettings.getSymmetricAlgorithm());
-        secretKey.setSalt(new IVSalt(UUID.randomUUID().toString()));
-
-        final String armoredPrivateKey = Crypto.encryptAndArmorPrivateKey(secretKey, keyPair.getPrivate().getKey());
-        mySettings.set(StandardSetting.ASYMMETRIC_ALGORITHM.getKey(), KeyAlgorithm.AES_CBC_128.name());
-
-        final EDSException cause = assertThrows(EDSException.class, () -> myCrypto.dearmoringPrivateKey(secretKey, armoredPrivateKey));
-        assertEquals(ReturnCode.CRYPTO_ERROR, cause.getReturnCode());
-        assertEquals("AES KeyFactory not available", cause.getMessage());
+        assertEquals("Cannot prepare Cipher for this Algorithm Type ASYMMETRIC.", cause.getMessage());
     }
 
     // =========================================================================
@@ -411,16 +391,6 @@ final class CryptoTest extends DatabaseSetup {
         generator.init(algorithm.getLength());
 
         final SecretKey secretKey = generator.generateKey();
-        final SecretEDSKey key = new SecretEDSKey(settings.getAsymmetricAlgorithm(), secretKey);
-        key.setSalt(new IVSalt(UUID.randomUUID().toString()));
-
-        return key;
-    }
-
-    private EDSKeyPair generateKeyPair() {
-        final EDSKeyPair generated = Crypto.generateAsymmetricKey(settings.getAsymmetricAlgorithm());
-        final KeyPair keys = new KeyPair(generated.getPublic().getKey(), generated.getPrivate().getKey());
-
-        return new EDSKeyPair(settings.getSymmetricAlgorithm(), keys);
+        return new SecretEDSKey(settings.getAsymmetricAlgorithm(), secretKey);
     }
 }

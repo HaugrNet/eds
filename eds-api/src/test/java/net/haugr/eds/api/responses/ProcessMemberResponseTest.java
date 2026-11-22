@@ -37,17 +37,19 @@ final class ProcessMemberResponseTest {
     @Test
     void testClassFlow() {
         final String memberId = UUID.randomUUID().toString();
-        final String signature = "Invitation Signature";
+        final String invitation = "Invitation Token";
 
         final ProcessMemberResponse response = new ProcessMemberResponse();
         response.setMemberId(memberId);
-        response.setSignature(TestUtilities.convert(signature));
+        response.setInvitation(TestUtilities.convert(invitation));
+        response.setSession(TestUtilities.convert("Session Token"));
 
         Assertions.assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
         assertEquals("Ok", response.getReturnMessage());
         assertTrue(response.isOk());
         assertEquals(memberId, response.getMemberId());
-        assertEquals(signature, TestUtilities.convert(response.getSignature()));
+        assertEquals(invitation, TestUtilities.convert(response.getInvitation()));
+        assertEquals("Session Token", TestUtilities.convert(response.getSession()));
     }
 
     @Test
@@ -58,7 +60,7 @@ final class ProcessMemberResponseTest {
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
         assertEquals(message, response.getReturnMessage());
         assertNull(response.getMemberId());
-        assertNull(response.getSignature());
+        assertNull(response.getInvitation());
     }
 
     @Test
@@ -70,6 +72,6 @@ final class ProcessMemberResponseTest {
         assertEquals(msg, response.getReturnMessage());
         assertFalse(response.isOk());
         assertNull(response.getMemberId());
-        assertNull(response.getSignature());
+        assertNull(response.getInvitation());
     }
 }

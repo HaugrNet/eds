@@ -53,15 +53,12 @@ final class SettingsTest extends DatabaseSetup {
         final Settings mySettings = newSettings();
 
         final Set<KeyAlgorithm> aes = prepareSetOf(KeyAlgorithm.Type.SYMMETRIC);
-        final Set<KeyAlgorithm> rsa = prepareSetOf(KeyAlgorithm.Type.ASYMMETRIC);
-        final Set<KeyAlgorithm> sha = prepareSetOf(KeyAlgorithm.Type.SIGNATURE);
+        final Set<KeyAlgorithm> asymmetric = prepareSetOf(KeyAlgorithm.Type.ASYMMETRIC);
         final Set<KeyAlgorithm> pbe = prepareSetOf(KeyAlgorithm.Type.PASSWORD);
 
         assertTrue(aes.contains(mySettings.getSymmetricAlgorithm()));
-        assertTrue(rsa.contains(mySettings.getAsymmetricAlgorithm()));
-        assertTrue(sha.contains(mySettings.getSignatureAlgorithm()));
+        assertTrue(asymmetric.contains(mySettings.getAsymmetricAlgorithm()));
         assertTrue(pbe.contains(mySettings.getPasswordAlgorithm()));
-        assertEquals("Default salt, also used as kill switch. Must be set in DB.", mySettings.getSalt());
         assertEquals("UTF-8", mySettings.getCharset().name());
     }
 
@@ -69,29 +66,20 @@ final class SettingsTest extends DatabaseSetup {
     void testUpdateDefaultSettings() {
         final Settings mySettings = newSettings();
 
-        mySettings.set(StandardSetting.SYMMETRIC_ALGORITHM, KeyAlgorithm.AES_CBC_192.name());
-        assertEquals(KeyAlgorithm.AES_CBC_192, mySettings.getSymmetricAlgorithm());
+        mySettings.set(StandardSetting.SYMMETRIC_ALGORITHM, KeyAlgorithm.AES_GCM_256.name());
+        assertEquals(KeyAlgorithm.AES_GCM_256, mySettings.getSymmetricAlgorithm());
 
-        mySettings.set(StandardSetting.ASYMMETRIC_ALGORITHM, KeyAlgorithm.RSA_4096.name());
-        assertEquals(KeyAlgorithm.RSA_4096, mySettings.getAsymmetricAlgorithm());
+        mySettings.set(StandardSetting.ASYMMETRIC_ALGORITHM, KeyAlgorithm.MLKEM1024_P384.name());
+        assertEquals(KeyAlgorithm.MLKEM1024_P384, mySettings.getAsymmetricAlgorithm());
 
-        mySettings.set(StandardSetting.ASYMMETRIC_ALGORITHM, KeyAlgorithm.RSA_8192.name());
-        assertEquals(KeyAlgorithm.RSA_8192, mySettings.getAsymmetricAlgorithm());
+        mySettings.set(StandardSetting.HASH_ALGORITHM, HashAlgorithm.SHA_384.name());
+        assertEquals(HashAlgorithm.SHA_384, mySettings.getHashAlgorithm());
 
-        mySettings.set(StandardSetting.SIGNATURE_ALGORITHM, KeyAlgorithm.SHA_256.name());
-        assertEquals(KeyAlgorithm.SHA_256, mySettings.getSignatureAlgorithm());
+        mySettings.set(StandardSetting.PBE_ALGORITHM, KeyAlgorithm.PBE_GCM_256.name());
+        assertEquals(KeyAlgorithm.PBE_GCM_256, mySettings.getPasswordAlgorithm());
 
-        mySettings.set(StandardSetting.HASH_ALGORITHM, HashAlgorithm.SHA_256.name());
-        assertEquals(HashAlgorithm.SHA_256, mySettings.getHashAlgorithm());
-
-        mySettings.set(StandardSetting.PBE_ALGORITHM, KeyAlgorithm.PBE_CBC_192.name());
-        assertEquals(KeyAlgorithm.PBE_CBC_192, mySettings.getPasswordAlgorithm());
-
-        mySettings.set(StandardSetting.PBE_ALGORITHM, KeyAlgorithm.PBE_CBC_256.name());
-        assertEquals(KeyAlgorithm.PBE_CBC_256, mySettings.getPasswordAlgorithm());
-
-        mySettings.set(StandardSetting.EDS_SALT, "UUID value");
-        assertEquals("UUID value", mySettings.getSalt());
+        mySettings.set(StandardSetting.INVITATION_TIMEOUT, "24");
+        assertEquals(24, mySettings.getInvitationTimeout());
 
         mySettings.set(StandardSetting.EDS_LOCALE, Locale.GERMAN.toString());
         assertEquals(Locale.GERMAN, mySettings.getLocale());

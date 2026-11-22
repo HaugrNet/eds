@@ -16,10 +16,10 @@
  */
 package net.haugr.eds.fitnesse;
 
-import net.haugr.eds.api.common.Action;
-import net.haugr.eds.api.dtos.Metadata;
-import net.haugr.eds.api.requests.FetchDataRequest;
-import net.haugr.eds.api.responses.FetchDataResponse;
+import net.haugr.eds.client.model.Action;
+import net.haugr.eds.client.model.Metadata;
+import net.haugr.eds.client.model.FetchDataRequest;
+import net.haugr.eds.client.model.FetchDataResponse;
 import java.util.ArrayList;
 import java.util.List;
 import net.haugr.eds.fitnesse.callers.CallShare;
@@ -145,11 +145,11 @@ public final class FetchData extends EDSRequest<FetchDataResponse> {
         if (dataId == null) {
             final List<String> dates = new ArrayList<>(metadata.size());
             for (final Metadata current : metadata) {
-                dates.add(Converter.convertDate(current.getAdded()));
+                dates.add(Converter.convertTimestamp(current.getAdded()));
             }
             added = dates.toString();
         } else {
-            added = metadata.isEmpty() ? null : Converter.convertDate(metadata.getFirst().getAdded());
+            added = metadata.isEmpty() ? null : Converter.convertTimestamp(metadata.getFirst().getAdded());
         }
 
         return added;

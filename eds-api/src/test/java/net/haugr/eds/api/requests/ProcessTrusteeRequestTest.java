@@ -137,7 +137,7 @@ final class ProcessTrusteeRequestTest {
         assertEquals(3, errors.size());
         assertEquals("Cannot alter a Trustees TrustLevel, without knowing the Circle Id.", errors.get(Constants.FIELD_CIRCLE_ID));
         assertEquals("Cannot alter a Trustees TrustLevel, without knowing the Member Id.", errors.get(Constants.FIELD_MEMBER_ID));
-        assertEquals("Cannot alter a Trustees TrustLevel, without knowing the new TrustLevel.", errors.get(Constants.FIELD_TRUSTLEVEL));
+        assertEquals("Cannot alter a Trustee, without a new TrustLevel or a secret.", errors.get(Constants.FIELD_TRUSTLEVEL));
     }
 
     @Test

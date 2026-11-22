@@ -73,6 +73,194 @@ final class ShareBeanDataTest extends DatabaseSetup {
     }
 
     @Test
+    void testStoredNameMayHoldAnEncryptedName() {
+        // A client of a chamber (E2E.md) stores the file name encrypted, so
+        // the stored name is longer than the 75 a person may type: up to
+        // MAX_DATA_NAME_LENGTH. The stone only stores it, and gives it back.
+        final ShareBean bean = prepareShareBean();
+        final String longName = "E".repeat(Constants.MAX_DATA_NAME_LENGTH);
+
+        final ProcessDataRequest add = prepareRequest(ProcessDataRequest.class, MEMBER_1);
+        add.setAction(Action.ADD);
+        add.setCircleId(CIRCLE_1_ID);
+        add.setDataName(longName);
+        add.setTypeName(Constants.DATA_TYPENAME);
+        add.setData(generateData(100));
+        final ProcessDataResponse stored = bean.processData(add);
+        assertEquals(ReturnCode.SUCCESS.getCode(), stored.getReturnCode(), stored.getReturnMessage());
+
+        final FetchDataRequest fetch = prepareRequest(FetchDataRequest.class, MEMBER_1);
+        fetch.setDataId(stored.getDataId());
+        assertEquals(longName, bean.fetchData(fetch).getMetadata().getFirst().getDataName());
+
+        // One character more is refused.
+        final ProcessDataRequest tooLong = prepareRequest(ProcessDataRequest.class, MEMBER_1);
+        tooLong.setAction(Action.ADD);
+        tooLong.setCircleId(CIRCLE_1_ID);
+        tooLong.setDataName(longName + "E");
+        tooLong.setTypeName(Constants.DATA_TYPENAME);
+        tooLong.setData(generateData(10));
+        assertEquals(ReturnCode.VERIFICATION_WARNING.getCode(), bean.processData(tooLong).getReturnCode());
+    }
+
+    @Test
+    void testNameKeyKeepsAnEncryptedNameUnique() {
+        // In a chamber (E2E.md) the stored name is ciphertext which differs
+        // each time, so the client sends a Name Key, a keyed hash of the
+        // name, and the stone keeps that unique within the folder.
+        final ShareBean bean = prepareShareBean();
+        final String key = nameKey();
+
+        final ProcessDataResponse first = bean.processData(addWithNameKey(MEMBER_1, CIRCLE_1_ID, null, key, Constants.DATA_TYPENAME));
+        assertEquals(ReturnCode.SUCCESS.getCode(), first.getReturnCode(), first.getReturnMessage());
+        assertEquals(key, fetchNameKey(bean, first.getDataId()));
+
+        // The same name, encrypted again: a different stored name, the same Name Key.
+        final ProcessDataResponse again = bean.processData(addWithNameKey(MEMBER_1, CIRCLE_1_ID, null, key, Constants.DATA_TYPENAME));
+        assertEquals(ReturnCode.IDENTIFICATION_WARNING.getCode(), again.getReturnCode());
+        assertEquals("Another record with the same name already exists.", again.getReturnMessage());
+        final ProcessDataResponse folder = bean.processData(addWithNameKey(MEMBER_1, CIRCLE_1_ID, null, key, Constants.FOLDER_TYPENAME));
+        assertEquals(ReturnCode.IDENTIFICATION_WARNING.getCode(), folder.getReturnCode());
+
+        // Another name, or the same Name Key in another folder or Circle, is fine.
+        final ProcessDataResponse other = bean.processData(addWithNameKey(MEMBER_1, CIRCLE_1_ID, null, nameKey(), Constants.DATA_TYPENAME));
+        assertEquals(ReturnCode.SUCCESS.getCode(), other.getReturnCode(), other.getReturnMessage());
+        final ProcessDataResponse subFolder = bean.processData(addWithNameKey(MEMBER_1, CIRCLE_1_ID, null, nameKey(), Constants.FOLDER_TYPENAME));
+        assertEquals(ReturnCode.SUCCESS.getCode(), subFolder.getReturnCode(), subFolder.getReturnMessage());
+        final ProcessDataResponse inFolder = bean.processData(addWithNameKey(MEMBER_1, CIRCLE_1_ID, subFolder.getDataId(), key, Constants.DATA_TYPENAME));
+        assertEquals(ReturnCode.SUCCESS.getCode(), inFolder.getReturnCode(), inFolder.getReturnMessage());
+        final ProcessDataResponse inCircle2 = bean.processData(addWithNameKey(MEMBER_1, CIRCLE_2_ID, null, key, Constants.DATA_TYPENAME));
+        assertEquals(ReturnCode.SUCCESS.getCode(), inCircle2.getReturnCode(), inCircle2.getReturnMessage());
+
+        // Without a Name Key, nothing changes for a client which doesn't know chambers.
+        final ProcessDataResponse plain = bean.processData(addWithNameKey(MEMBER_1, CIRCLE_1_ID, null, null, Constants.DATA_TYPENAME));
+        assertEquals(ReturnCode.SUCCESS.getCode(), plain.getReturnCode(), plain.getReturnMessage());
+        assertNull(fetchNameKey(bean, plain.getDataId()));
+    }
+
+    @Test
+    void testNameKeyOnUpdate() {
+        final ShareBean bean = prepareShareBean();
+        final String taken = nameKey();
+        final String own = nameKey();
+        assertEquals(ReturnCode.SUCCESS.getCode(), bean.processData(addWithNameKey(MEMBER_1, CIRCLE_1_ID, null, taken, Constants.DATA_TYPENAME)).getReturnCode());
+        final String dataId = bean.processData(addWithNameKey(MEMBER_1, CIRCLE_1_ID, null, own, Constants.DATA_TYPENAME)).getDataId();
+
+        // A rename to a name which is used is refused.
+        final ProcessDataRequest toTaken = updateWithNameKey(dataId, "renamed-" + UUID.randomUUID(), taken);
+        assertEquals(ReturnCode.IDENTIFICATION_WARNING.getCode(), bean.processData(toTaken).getReturnCode());
+        assertEquals(own, fetchNameKey(bean, dataId));
+
+        // Keeping its own Name Key, e.g. when only the content changes, is fine.
+        final ProcessDataRequest content = updateWithNameKey(dataId, null, null);
+        content.setData(generateData(64));
+        assertEquals(ReturnCode.SUCCESS.getCode(), bean.processData(content).getReturnCode());
+        assertEquals(own, fetchNameKey(bean, dataId));
+
+        // A new name without a Name Key drops the old one, which was made from the old name.
+        assertEquals(ReturnCode.SUCCESS.getCode(), bean.processData(updateWithNameKey(dataId, "renamed-" + UUID.randomUUID(), null)).getReturnCode());
+        assertNull(fetchNameKey(bean, dataId));
+
+        // A Name Key alone is added to the present name, if it isn't used.
+        assertEquals(ReturnCode.IDENTIFICATION_WARNING.getCode(), bean.processData(updateWithNameKey(dataId, null, taken)).getReturnCode());
+        final String added = nameKey();
+        assertEquals(ReturnCode.SUCCESS.getCode(), bean.processData(updateWithNameKey(dataId, null, added)).getReturnCode());
+        assertEquals(added, fetchNameKey(bean, dataId));
+
+        // A move to a folder where the Name Key is used is refused.
+        final String folderId = bean.processData(addWithNameKey(MEMBER_1, CIRCLE_1_ID, null, nameKey(), Constants.FOLDER_TYPENAME)).getDataId();
+        assertEquals(ReturnCode.SUCCESS.getCode(), bean.processData(addWithNameKey(MEMBER_1, CIRCLE_1_ID, folderId, added, Constants.DATA_TYPENAME)).getReturnCode());
+        final ProcessDataRequest move = updateWithNameKey(dataId, null, null);
+        move.setFolderId(folderId);
+        final ProcessDataResponse moved = bean.processData(move);
+        assertEquals(ReturnCode.IDENTIFICATION_WARNING.getCode(), moved.getReturnCode());
+        assertEquals("Another record with the same name already exists.", moved.getReturnMessage());
+    }
+
+    @Test
+    void testNameKeyOnCopyToAnotherCircle() {
+        // The Name Key is made with a key of the Circle, so a copy or a move
+        // only has the one the request gives for the target Circle.
+        final ShareBean bean = prepareShareBean();
+        final String key = nameKey();
+        final String dataId = bean.processData(addWithNameKey(MEMBER_1, CIRCLE_1_ID, null, key, Constants.DATA_TYPENAME)).getDataId();
+
+        final ProcessDataRequest withoutKey = prepareRequest(ProcessDataRequest.class, MEMBER_1);
+        withoutKey.setAction(Action.COPY);
+        withoutKey.setDataId(dataId);
+        withoutKey.setTargetCircleId(CIRCLE_2_ID);
+        final ProcessDataResponse copied = bean.processData(withoutKey);
+        assertEquals(ReturnCode.SUCCESS.getCode(), copied.getReturnCode(), copied.getReturnMessage());
+        assertNull(fetchNameKey(bean, copied.getDataId()));
+
+        final String targetKey = nameKey();
+        final ProcessDataRequest withKey = prepareRequest(ProcessDataRequest.class, MEMBER_1);
+        withKey.setAction(Action.COPY);
+        withKey.setDataId(dataId);
+        withKey.setTargetCircleId(CIRCLE_2_ID);
+        withKey.setNameKey(targetKey);
+        final ProcessDataResponse keyed = bean.processData(withKey);
+        assertEquals(ReturnCode.SUCCESS.getCode(), keyed.getReturnCode(), keyed.getReturnMessage());
+        assertEquals(targetKey, fetchNameKey(bean, keyed.getDataId()));
+
+        final ProcessDataRequest moveSame = prepareRequest(ProcessDataRequest.class, MEMBER_1);
+        moveSame.setAction(Action.MOVE);
+        moveSame.setDataId(dataId);
+        moveSame.setTargetCircleId(CIRCLE_2_ID);
+        moveSame.setNameKey(targetKey);
+        assertEquals(ReturnCode.IDENTIFICATION_WARNING.getCode(), bean.processData(moveSame).getReturnCode());
+        assertEquals(key, fetchNameKey(bean, dataId));
+    }
+
+    @Test
+    void testInvalidNameKey() {
+        final ShareBean bean = prepareShareBean();
+        for (final String invalid : new String[] { "", "with=padding", "with space", "K".repeat(Constants.MAX_NAME_KEY_LENGTH + 1) }) {
+            final ProcessDataResponse response = bean.processData(addWithNameKey(MEMBER_1, CIRCLE_1_ID, null, invalid, Constants.DATA_TYPENAME));
+            assertEquals(ReturnCode.VERIFICATION_WARNING.getCode(), response.getReturnCode(), invalid);
+        }
+        final ProcessDataResponse longest = bean.processData(addWithNameKey(MEMBER_1, CIRCLE_1_ID, null, "K".repeat(Constants.MAX_NAME_KEY_LENGTH), Constants.DATA_TYPENAME));
+        assertEquals(ReturnCode.SUCCESS.getCode(), longest.getReturnCode(), longest.getReturnMessage());
+    }
+
+    /** A Name Key as a client would send it: Base64url, here random. */
+    private static String nameKey() {
+        return (UUID.randomUUID().toString() + UUID.randomUUID()).replace("-", "_").substring(0, 43);
+    }
+
+    /** An encrypted name differs each time, so a random stored name stands in for it. */
+    private static ProcessDataRequest addWithNameKey(final String account, final String circleId, final String folderId, final String nameKey, final String typeName) {
+        final ProcessDataRequest request = prepareRequest(ProcessDataRequest.class, account);
+        request.setAction(Action.ADD);
+        request.setCircleId(circleId);
+        request.setFolderId(folderId);
+        request.setDataName("ciphertext-" + UUID.randomUUID());
+        request.setNameKey(nameKey);
+        request.setTypeName(typeName);
+        if (Constants.DATA_TYPENAME.equals(typeName)) {
+            request.setData(generateData(32));
+        }
+        return request;
+    }
+
+    private static ProcessDataRequest updateWithNameKey(final String dataId, final String dataName, final String nameKey) {
+        final ProcessDataRequest request = prepareRequest(ProcessDataRequest.class, MEMBER_1);
+        request.setAction(Action.UPDATE);
+        request.setDataId(dataId);
+        request.setDataName(dataName);
+        request.setNameKey(nameKey);
+        return request;
+    }
+
+    private static String fetchNameKey(final ShareBean bean, final String dataId) {
+        final FetchDataRequest fetch = prepareRequest(FetchDataRequest.class, MEMBER_1);
+        fetch.setDataId(dataId);
+        final FetchDataResponse response = bean.fetchData(fetch);
+        assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode(), response.getReturnMessage());
+        return response.getMetadata().getFirst().getNameKey();
+    }
+
+    @Test
     void testSavingAndReadingData() {
         final ShareBean bean = prepareShareBean();
 

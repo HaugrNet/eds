@@ -16,57 +16,67 @@
  */
 package net.haugr.eds.core;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.Arrays;
+import net.haugr.eds.api.common.Action;
+import net.haugr.eds.api.requests.FetchDataRequest;
+import net.haugr.eds.api.requests.ProcessDataRequest;
+import net.haugr.eds.api.requests.ProcessMemberRequest;
+import net.haugr.eds.api.responses.FetchDataResponse;
+import net.haugr.eds.api.responses.ProcessDataResponse;
+import net.haugr.eds.api.responses.ProcessMemberResponse;
 import net.haugr.eds.api.common.Constants;
 import net.haugr.eds.api.common.ReturnCode;
+import net.haugr.eds.api.requests.FetchMemberRequest;
 import net.haugr.eds.api.requests.MasterKeyRequest;
+import net.haugr.eds.api.responses.FetchMemberResponse;
 import net.haugr.eds.api.responses.MasterKeyResponse;
 import net.haugr.eds.core.enums.StandardSetting;
-import net.haugr.eds.core.exceptions.EDSException;
 import net.haugr.eds.core.jce.MasterKey;
-import net.haugr.eds.core.jce.SecretEDSKey;
+import net.haugr.eds.core.managers.MasterKeyManager;
 import net.haugr.eds.core.model.Settings;
+import net.haugr.eds.core.model.entities.MasterKeyEntity;
 import net.haugr.eds.core.model.entities.MemberEntity;
 import net.haugr.eds.core.model.entities.SettingEntity;
 import net.haugr.eds.core.setup.DatabaseSetup;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.condition.DisabledOnOs;
-import org.junit.jupiter.api.condition.OS;
-import java.io.File;
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.List;
-import java.util.UUID;
 
 /**
- * <p>This Test Class is testing the following Service Classes in one, as they
- * are all fairly small but also connected.</p>
- *
- * <ul>
- *   <li>MasterKeyService</li>
- * </ul>
- *
- * <p>Note; this test class is not working under Windows, as the expected
- * error messages are truncated and only contain a fraction of the information
- * as the Linux variant contains.</p>
+ * <p>Tests for the MasterKey lifecycle (PLAN.md, Crypto §1 and phase C2): loading
+ * at startup, unlocking, first setup and changing it. The test MasterKey is
+ * installed again before each test, and the database changes are rolled
+ * back.</p>
  *
  * @author Kim Jensen
- * @since EDS 1.1
+ * @since EDS 1.0
  */
-@DisabledOnOs(value = {OS.WINDOWS, OS.MAC})
 final class ManagementBeanMasterKeyTest extends DatabaseSetup {
+
+    private static final String LOCKED_MESSAGE = "EDS is locked, the MasterKey is not loaded.";
+
+    // =========================================================================
+    // Request validation
+    // =========================================================================
 
     @Test
     void testUpdateMasterKeyWithNullRequest() {
         final ManagementBean bean = prepareManagementBean();
 
+        // Null is passed on purpose, to check how it is refused.
+        @SuppressWarnings("findbugs:NP_NULL_PARAM_DEREF_ALL_TARGETS_DANGEROUS")
         final MasterKeyResponse response = bean.masterKey(null);
         assertEquals(ReturnCode.VERIFICATION_WARNING.getCode(), response.getReturnCode());
         assertEquals("Cannot Process a NULL Object.", response.getReturnMessage());
@@ -90,19 +100,23 @@ final class ManagementBeanMasterKeyTest extends DatabaseSetup {
     void testUpdateMasterKeyAsMember() {
         final ManagementBean bean = prepareManagementBean();
         final MasterKeyRequest request = prepareRequest(MasterKeyRequest.class, MEMBER_1);
-        request.setSecret(NEW_MASTERKEY_SECRET.getBytes(Charset.defaultCharset()));
+        request.setSecret(bytes(NEW_MASTERKEY_SECRET));
 
         final MasterKeyResponse response = bean.masterKey(request);
         assertEquals(ReturnCode.AUTHENTICATION_WARNING.getCode(), response.getReturnCode());
         assertEquals("Given Account is not permitted to perform this request.", response.getReturnMessage());
     }
 
+    // =========================================================================
+    // Unlocked EDS
+    // =========================================================================
+
     @Test
     void testUpdateMasterKeyAsAdminWithWrongCredentials() {
         final ManagementBean bean = prepareManagementBean();
         final MasterKeyRequest request = prepareRequest(MasterKeyRequest.class, Constants.ADMIN_ACCOUNT);
-        request.setCredential("root".getBytes(Charset.defaultCharset()));
-        request.setSecret(NEW_MASTERKEY_SECRET.getBytes(Charset.defaultCharset()));
+        request.setCredential(bytes("root"));
+        request.setSecret(bytes(NEW_MASTERKEY_SECRET));
 
         final MasterKeyResponse response = bean.masterKey(request);
         assertEquals(ReturnCode.AUTHENTICATION_WARNING.getCode(), response.getReturnCode());
@@ -110,127 +124,74 @@ final class ManagementBeanMasterKeyTest extends DatabaseSetup {
     }
 
     @Test
-    void testUpdatingMasterKeySecretZeroMembers() {
-        // Before starting, all member accounts must be removed
-        final List<MemberEntity> members = dao.findAllAscending(MemberEntity.class, "id");
-        for (final MemberEntity member : members) {
-            dao.delete(member);
-        }
-
+    void testUpdateMasterKeyToCurrent() {
         final ManagementBean bean = prepareManagementBean();
         final MasterKeyRequest request = prepareRequest(MasterKeyRequest.class, Constants.ADMIN_ACCOUNT);
-        request.setSecret(defaultMasterKeySecret());
+        request.setSecret(bytes(TEST_MASTERKEY_SECRET));
+
         final MasterKeyResponse response = bean.masterKey(request);
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
         assertEquals("MasterKey unlocked.", response.getReturnMessage());
+        assertEquals(1, MasterKey.getInstance().getVersion());
     }
 
     @Test
-    void testUpdatingMasterKeyUrlZeroMembers() throws IOException {
-        // Before starting, all member accounts must be removed
-        final String path = tempDir() + "secret_master_key.bin";
-        final String file = "file://" + path;
-        Files.write(Paths.get(path), generateData(8192));
-        final List<MemberEntity> members = dao.findAllAscending(MemberEntity.class, "id");
-        for (final MemberEntity member : members) {
-            dao.delete(member);
-        }
+    void testChangeMasterKeyAdminOnly() {
+        deleteNonAdminMembers();
+        final String kcvBefore = MasterKey.getInstance().getKcv();
 
         final ManagementBean bean = prepareManagementBean();
         final MasterKeyRequest request = prepareRequest(MasterKeyRequest.class, Constants.ADMIN_ACCOUNT);
-        request.setUrl(file);
+        request.setSecret(bytes(NEW_MASTERKEY_SECRET));
 
         final MasterKeyResponse response = bean.masterKey(request);
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
         assertEquals("MasterKey updated.", response.getReturnMessage());
 
-        revertMasterKeyToOriginal();
+        // A new version and KCV are stored, and the System Administrator
+        // account was re-protected with the new MasterKey.
+        assertEquals(2, MasterKey.getInstance().getVersion());
+        final MasterKeyEntity stored = dao.findCurrentMasterKey();
+        assertEquals(2, stored.getVersion());
+        assertNotEquals(kcvBefore, stored.getKcv());
+        assertEquals(MasterKey.getInstance().getKcv(), stored.getKcv());
+
+        final FetchMemberResponse fetched = bean.fetchMembers(prepareRequest(FetchMemberRequest.class, Constants.ADMIN_ACCOUNT));
+        assertTrue(fetched.isOk(), fetched.getReturnMessage());
     }
 
+    // The paths are the test's own resources and temporary files.
+    @SuppressWarnings("findsecbugs:PATH_TRAVERSAL_IN")
     @Test
-    void testUpdatingMasterKeyAdminOnly() throws IOException {
-        // Before starting, all member accounts must be removed, as well as the
-        // MasterKey Setting.
+    void testChangeMasterKeyViaUrl() throws IOException {
         deleteNonAdminMembers();
-        assertEquals(1, deleteMasterKeySetting());
-
         final String path = tempDir() + "secret_master_key.bin";
         Files.write(Paths.get(path), generateData(8192));
 
         final ManagementBean bean = prepareManagementBean();
-        final MasterKeyRequest urlRequest = prepareRequest(MasterKeyRequest.class, Constants.ADMIN_ACCOUNT);
-        urlRequest.setUrl("file://" + path);
-
-        final MasterKeyResponse urlResponse = bean.masterKey(urlRequest);
-        assertEquals("MasterKey updated.", urlResponse.getReturnMessage());
-        assertEquals(ReturnCode.SUCCESS.getCode(), urlResponse.getReturnCode());
-
-        final MasterKeyRequest secretRequest = prepareRequest(MasterKeyRequest.class, Constants.ADMIN_ACCOUNT);
-        secretRequest.setSecret(NEW_MASTERKEY_SECRET.getBytes(Charset.defaultCharset()));
-
-        final MasterKeyResponse secretResponse = bean.masterKey(secretRequest);
-        assertEquals(ReturnCode.SUCCESS.getCode(), secretResponse.getReturnCode());
-        assertEquals("MasterKey updated.", secretResponse.getReturnMessage());
-
-        revertMasterKeyToOriginal();
-    }
-
-    @Test
-    void testStartingMasterKeyWithURLFailed() {
-        final String file = tempDir() + "not_existing_file.bin";
-        final Settings mySettings = newSettings();
-        mySettings.set(StandardSetting.MASTERKEY_URL.getKey(), "file://" + file);
-        assertNotEquals(settings.getMasterKeyURL(), mySettings.getMasterKeyURL());
-
-        final EDSException cause = assertThrows(EDSException.class, () -> newMasterKey(mySettings));
-        assertEquals(ReturnCode.NETWORK_ERROR, cause.getReturnCode());
-        assertEquals(file + " (No such file or directory)", cause.getMessage());
-    }
-
-    /**
-     * Testing that the MasterKey from a file, where the file has the same content
-     * as the normal, un-configured MasterKey, is the same as the default. And
-     * that a different content file will have different key.
-     *
-     * @throws IOException If unable to write to the MasterKey file
-     */
-    @Test
-    void testStartingMasterKeyWithURLSuccess() throws IOException {
-        final String file = tempDir() + "masterKey.bin";
-        final MasterKey defaultMasterKey = prepareNewMasterKeyInstance(settings);
-        final Settings mySettings = newSettings();
-        mySettings.set(StandardSetting.MASTERKEY_URL.getKey(), "file://" + file);
-        final Path path = Paths.get(file);
-
-        Files.writeString(path, Constants.ADMIN_ACCOUNT, settings.getCharset());
-        final MasterKey masterKey1 = newMasterKey(mySettings);
-        assertEquals(masterKey1.getKey().getKey(), defaultMasterKey.getKey().getKey());
-
-        Files.writeString(path, UUID.randomUUID().toString(), settings.getCharset());
-        final MasterKey masterKey2 = newMasterKey(mySettings);
-        assertNotEquals(masterKey2.getKey().getKey(), defaultMasterKey.getKey().getKey());
-    }
-
-    @Test
-    void testUpdateMasterKeyWhenMembersExist() {
-        final ManagementBean bean = prepareManagementBean();
         final MasterKeyRequest request = prepareRequest(MasterKeyRequest.class, Constants.ADMIN_ACCOUNT);
-        request.setSecret(NEW_MASTERKEY_SECRET.getBytes(Charset.defaultCharset()));
-
-        final MasterKeyResponse response = bean.masterKey(request);
-        assertEquals(ReturnCode.ILLEGAL_ACTION.getCode(), response.getReturnCode());
-        assertEquals("Cannot alter the MasterKey, as Member Accounts exists.", response.getReturnMessage());
-    }
-
-    @Test
-    void testUpdateMasterKeyToCurrent() {
-        final ManagementBean bean = prepareManagementBean();
-        final MasterKeyRequest request = prepareRequest(MasterKeyRequest.class, Constants.ADMIN_ACCOUNT);
-        request.setSecret(defaultMasterKeySecret());
+        request.setUrl("file://" + path);
 
         final MasterKeyResponse response = bean.masterKey(request);
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
-        assertEquals("MasterKey unlocked.", response.getReturnMessage());
+        assertEquals("MasterKey updated.", response.getReturnMessage());
+        assertEquals("file://" + path, currentMasterKeyUrl());
+    }
+
+    @Test
+    void testUpdateMasterKeyWithWeakSecret() {
+        deleteNonAdminMembers();
+        final String kcvBefore = MasterKey.getInstance().getKcv();
+
+        final ManagementBean bean = prepareManagementBean();
+        final MasterKeyRequest request = prepareRequest(MasterKeyRequest.class, Constants.ADMIN_ACCOUNT);
+        request.setSecret(bytes("New MasterKey"));
+
+        final MasterKeyResponse response = bean.masterKey(request);
+        assertEquals(ReturnCode.VERIFICATION_WARNING.getCode(), response.getReturnCode());
+        assertEquals("The MasterKey secret is too weak. Use at least 20 random characters (letters, digits and symbols), or a passphrase of several random words.", response.getReturnMessage());
+        assertEquals(kcvBefore, MasterKey.getInstance().getKcv());
+        assertEquals(1, MasterKey.getInstance().getVersion());
     }
 
     @Test
@@ -245,6 +206,8 @@ final class ManagementBeanMasterKeyTest extends DatabaseSetup {
         assertEquals(path + " (No such file or directory)", response.getReturnMessage());
     }
 
+    // The paths are the test's own resources and temporary files.
+    @SuppressWarnings("findsecbugs:PATH_TRAVERSAL_IN")
     @Test
     void testUpdateMasterKeyUrlWithWrongCredentialsKeepsSetting() throws IOException {
         final String before = currentMasterKeyUrl();
@@ -253,7 +216,7 @@ final class ManagementBeanMasterKeyTest extends DatabaseSetup {
 
         final ManagementBean bean = prepareManagementBean();
         final MasterKeyRequest request = prepareRequest(MasterKeyRequest.class, Constants.ADMIN_ACCOUNT);
-        request.setCredential("root".getBytes(Charset.defaultCharset()));
+        request.setCredential(bytes("root"));
         request.setUrl("file://" + path);
 
         final MasterKeyResponse response = bean.masterKey(request);
@@ -262,73 +225,323 @@ final class ManagementBeanMasterKeyTest extends DatabaseSetup {
         assertEquals(before, currentMasterKeyUrl());
     }
 
+    /**
+     * Rotating the MasterKey with Members, Circles and Data (PLAN.md, Crypto §1):
+     * every outer layer is re-wrapped, the Data Objects are not touched, and
+     * everything can still be read afterwards.
+     */
     @Test
-    void testUpdateMasterKeySecretWithWrongCredentialsKeepsSetting() {
-        final String before = currentMasterKeyUrl();
+    void testRotateMasterKeyWithMembersAndData() {
+        final ShareBean shareBean = prepareShareBean();
+        final ProcessDataRequest addRequest = prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "rotation data", 200_000);
+        final byte[] content = Arrays.copyOf(addRequest.getData(), addRequest.getData().length);
+        final ProcessDataResponse added = shareBean.processData(addRequest);
+        assertTrue(added.isOk(), added.getReturnMessage());
+        final byte[] storedBefore = storedData(added.getDataId());
+        final String trusteeBefore = firstTrusteeKey();
 
         final ManagementBean bean = prepareManagementBean();
         final MasterKeyRequest request = prepareRequest(MasterKeyRequest.class, Constants.ADMIN_ACCOUNT);
-        request.setCredential("root".getBytes(Charset.defaultCharset()));
-        request.setSecret(NEW_MASTERKEY_SECRET.getBytes(Charset.defaultCharset()));
-
+        request.setSecret(bytes(NEW_MASTERKEY_SECRET));
         final MasterKeyResponse response = bean.masterKey(request);
-        assertEquals(ReturnCode.AUTHENTICATION_WARNING.getCode(), response.getReturnCode());
-        assertEquals(before, currentMasterKeyUrl());
+        assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode(), response.getReturnMessage());
+        assertEquals("MasterKey updated.", response.getReturnMessage());
+        assertEquals(2, MasterKey.getInstance().getVersion());
+        assertEquals(2, dao.findCurrentMasterKey().getVersion());
+
+        // The outer layers changed, the Data Object didn't.
+        assertNotEquals(trusteeBefore, firstTrusteeKey());
+        assertArrayEquals(storedBefore, storedData(added.getDataId()));
+
+        // Members still log in, and the data reads as before, also by
+        // another Trustee of the Circle.
+        final FetchDataRequest fetch1 = prepareRequest(FetchDataRequest.class, MEMBER_1);
+        fetch1.setDataId(added.getDataId());
+        final FetchDataResponse fetched1 = shareBean.fetchData(fetch1);
+        assertTrue(fetched1.isOk(), fetched1.getReturnMessage());
+        assertArrayEquals(content, fetched1.getData());
+        final FetchDataRequest fetch2 = prepareRequest(FetchDataRequest.class, MEMBER_2);
+        fetch2.setDataId(added.getDataId());
+        assertArrayEquals(content, shareBean.fetchData(fetch2).getData());
+
+        // The old MasterKey is no longer accepted when unlocking.
+        MasterKey.getInstance().lock();
+        final MasterKeyRequest oldKey = prepareRequest(MasterKeyRequest.class, Constants.ADMIN_ACCOUNT);
+        oldKey.setSecret(bytes(TEST_MASTERKEY_SECRET));
+        assertEquals(ReturnCode.AUTHENTICATION_WARNING.getCode(), bean.masterKey(oldKey).getReturnCode());
     }
 
     @Test
-    void testUpdateMasterKeyUrlWhenMembersExistKeepsSetting() throws IOException {
+    void testRotationEndsSessionsAndVoidsInvitations() {
+        final ManagementBean bean = prepareManagementBean();
+        final ProcessMemberRequest login = prepareRequest(ProcessMemberRequest.class, MEMBER_1);
+        login.setAction(Action.LOGIN);
+        final ProcessMemberResponse loginResponse = bean.processMember(login);
+        assertTrue(loginResponse.isOk());
+        final ProcessMemberRequest invite = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
+        invite.setAction(Action.INVITE);
+        invite.setNewAccountName("rotation invitee");
+        assertTrue(bean.processMember(invite).isOk());
+
+        final MasterKeyRequest request = prepareRequest(MasterKeyRequest.class, Constants.ADMIN_ACCOUNT);
+        request.setSecret(bytes(NEW_MASTERKEY_SECRET));
+        assertEquals(ReturnCode.SUCCESS.getCode(), bean.masterKey(request).getReturnCode());
+
+        assertNull(dao.findMemberByName("rotation invitee"));
+        final FetchMemberResponse viaSession = bean.fetchMembers(prepareSessionRequest(FetchMemberRequest.class, loginResponse.getSession()));
+        assertEquals(ReturnCode.AUTHENTICATION_WARNING.getCode(), viaSession.getReturnCode());
+    }
+
+    // The paths are the test's own resources and temporary files.
+    @SuppressWarnings("findsecbugs:PATH_TRAVERSAL_IN")
+    @Test
+    void testRotationWithWrongCredentialsKeepsSetting() throws IOException {
         final String before = currentMasterKeyUrl();
         final String path = tempDir() + "rejected_master_key.bin";
         Files.write(Paths.get(path), generateData(8192));
 
         final ManagementBean bean = prepareManagementBean();
         final MasterKeyRequest request = prepareRequest(MasterKeyRequest.class, Constants.ADMIN_ACCOUNT);
+        request.setCredential(bytes("wrong credential"));
         request.setUrl("file://" + path);
 
         final MasterKeyResponse response = bean.masterKey(request);
-        assertEquals(ReturnCode.ILLEGAL_ACTION.getCode(), response.getReturnCode());
+        assertEquals(ReturnCode.AUTHENTICATION_WARNING.getCode(), response.getReturnCode());
         assertEquals(before, currentMasterKeyUrl());
+        assertEquals(1, MasterKey.getInstance().getVersion());
+    }
+
+    // =========================================================================
+    // Locked EDS
+    // =========================================================================
+
+    @Test
+    void testRequestsFailWhileLocked() {
+        MasterKey.getInstance().lock();
+
+        final ManagementBean bean = prepareManagementBean();
+        final FetchMemberResponse response = bean.fetchMembers(prepareRequest(FetchMemberRequest.class, Constants.ADMIN_ACCOUNT));
+        assertEquals(ReturnCode.CRYPTO_ERROR.getCode(), response.getReturnCode());
+        assertEquals(LOCKED_MESSAGE, response.getReturnMessage());
     }
 
     @Test
-    void testUpdateMasterKeyWithWeakSecret() {
-        deleteNonAdminMembers();
-        final SecretEDSKey before = MasterKey.getInstance(settings).getKey();
+    void testUnlockWithCorrectMasterKey() {
+        MasterKey.getInstance().lock();
 
         final ManagementBean bean = prepareManagementBean();
         final MasterKeyRequest request = prepareRequest(MasterKeyRequest.class, Constants.ADMIN_ACCOUNT);
-        request.setSecret("New MasterKey".getBytes(Charset.defaultCharset()));
-
-        final MasterKeyResponse response = bean.masterKey(request);
-        assertEquals(ReturnCode.VERIFICATION_WARNING.getCode(), response.getReturnCode());
-        assertEquals("The MasterKey secret is too weak. It must have at least 15 characters and must not be easy to guess.", response.getReturnMessage());
-        assertSame(before, MasterKey.getInstance(settings).getKey());
-    }
-
-    /**
-     * The default MasterKey secret is weak, but unlocking with an existing
-     * MasterKey must remain possible, only new MasterKeys are verified.
-     */
-    @Test
-    void testUnlockWithWeakDefaultMasterKey() {
-        deleteNonAdminMembers();
-
-        final ManagementBean bean = prepareManagementBean();
-        final MasterKeyRequest request = prepareRequest(MasterKeyRequest.class, Constants.ADMIN_ACCOUNT);
-        request.setSecret(defaultMasterKeySecret());
+        request.setSecret(bytes(TEST_MASTERKEY_SECRET));
 
         final MasterKeyResponse response = bean.masterKey(request);
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
         assertEquals("MasterKey unlocked.", response.getReturnMessage());
+        assertTrue(MasterKey.getInstance().isUnlocked());
+        assertTrue(bean.fetchMembers(prepareRequest(FetchMemberRequest.class, MEMBER_1)).isOk());
+    }
+
+    /**
+     * A wrong MasterKey is rejected by the key check value, before anything
+     * is decrypted, and EDS stays locked.
+     */
+    @Test
+    void testUnlockWithWrongMasterKeyIsRejectedByKcv() {
+        MasterKey.getInstance().lock();
+
+        final ManagementBean bean = prepareManagementBean();
+        final MasterKeyRequest request = prepareRequest(MasterKeyRequest.class, Constants.ADMIN_ACCOUNT);
+        request.setSecret(bytes(NEW_MASTERKEY_SECRET));
+
+        final MasterKeyResponse response = bean.masterKey(request);
+        assertEquals(ReturnCode.AUTHENTICATION_WARNING.getCode(), response.getReturnCode());
+        assertEquals("Invalid credentials.", response.getReturnMessage());
+        assertFalse(MasterKey.getInstance().isUnlocked());
+    }
+
+    @Test
+    void testUnlockWithWrongAdminCredentialsStaysLocked() {
+        MasterKey.getInstance().lock();
+
+        final ManagementBean bean = prepareManagementBean();
+        final MasterKeyRequest request = prepareRequest(MasterKeyRequest.class, Constants.ADMIN_ACCOUNT);
+        request.setCredential(bytes("root"));
+        request.setSecret(bytes(TEST_MASTERKEY_SECRET));
+
+        final MasterKeyResponse response = bean.masterKey(request);
+        assertEquals(ReturnCode.AUTHENTICATION_WARNING.getCode(), response.getReturnCode());
+        assertFalse(MasterKey.getInstance().isUnlocked());
+    }
+
+    @Test
+    void testFirstSetup() {
+        deleteAllMembers();
+        deleteMasterKeyRecords();
+        MasterKey.getInstance().lock();
+
+        final ManagementBean bean = prepareManagementBean();
+        final MasterKeyRequest request = prepareRequest(MasterKeyRequest.class, Constants.ADMIN_ACCOUNT);
+        request.setSecret(bytes(NEW_MASTERKEY_SECRET));
+
+        final MasterKeyResponse response = bean.masterKey(request);
+        assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
+        assertEquals("MasterKey unlocked.", response.getReturnMessage());
+
+        final MasterKeyEntity stored = dao.findCurrentMasterKey();
+        assertNotNull(stored);
+        assertEquals(1, stored.getVersion());
+        assertEquals(MasterKey.derive(bytes(NEW_MASTERKEY_SECRET)).kcv(), stored.getKcv());
+        assertNotNull(dao.findMemberByName(Constants.ADMIN_ACCOUNT));
+    }
+
+    /**
+     * The name of the System Administrator is not given by the stone: who
+     * gives a stone without accounts its first MasterKey becomes it, under
+     * the name given. After that, the name "admin" is a name like any other.
+     */
+    @Test
+    void testFirstSetupUnderAnotherName() {
+        deleteAllMembers();
+        deleteMasterKeyRecords();
+        MasterKey.getInstance().lock();
+
+        final ManagementBean bean = prepareManagementBean();
+        final MasterKeyRequest request = prepareRequest(MasterKeyRequest.class, "sysop");
+        request.setSecret(bytes(NEW_MASTERKEY_SECRET));
+
+        final MasterKeyResponse response = bean.masterKey(request);
+        assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode(), response.getReturnMessage());
+        assertEquals(net.haugr.eds.api.common.MemberRole.ADMIN, dao.findMemberByName("sysop").getMemberRole());
+        assertNull(dao.findMemberByName(Constants.ADMIN_ACCOUNT));
+        assertEquals(1L, dao.countMembers());
+
+        // Nobody else may give the MasterKey, also not under the name "admin".
+        final MasterKeyRequest other = prepareRequest(MasterKeyRequest.class, Constants.ADMIN_ACCOUNT);
+        other.setSecret(bytes(NEW_MASTERKEY_SECRET));
+        final MasterKeyResponse refused = bean.masterKey(other);
+        assertEquals(ReturnCode.AUTHENTICATION_WARNING.getCode(), refused.getReturnCode());
+        assertEquals("Given Account is not permitted to perform this request.", refused.getReturnMessage());
+        assertNull(dao.findMemberByName(Constants.ADMIN_ACCOUNT));
+
+        // The one who became it may, again.
+        final MasterKeyRequest again = prepareRequest(MasterKeyRequest.class, "sysop");
+        again.setSecret(bytes(NEW_MASTERKEY_SECRET));
+        assertEquals(ReturnCode.SUCCESS.getCode(), bean.masterKey(again).getReturnCode());
+    }
+
+    /**
+     * Another account with the role of an administrator is not the System
+     * Administrator, and may not give the MasterKey.
+     */
+    @Test
+    void testUpdateMasterKeyAsOtherAdministrator() {
+        final ManagementBean bean = prepareManagementBean();
+        final net.haugr.eds.api.requests.ProcessMemberRequest create = prepareRequest(net.haugr.eds.api.requests.ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
+        create.setAction(net.haugr.eds.api.common.Action.CREATE);
+        create.setNewAccountName("second admin");
+        create.setNewCredential(credentialOf("second admin"));
+        create.setMemberRole(net.haugr.eds.api.common.MemberRole.ADMIN);
+        assertTrue(bean.processMember(create).isOk());
+
+        final MasterKeyRequest request = prepareRequest(MasterKeyRequest.class, "second admin");
+        request.setSecret(bytes(NEW_MASTERKEY_SECRET));
+        final MasterKeyResponse response = bean.masterKey(request);
+        assertEquals(ReturnCode.AUTHENTICATION_WARNING.getCode(), response.getReturnCode());
+        assertEquals("Given Account is not permitted to perform this request.", response.getReturnMessage());
+    }
+
+    @Test
+    void testFirstSetupWithWeakSecret() {
+        deleteAllMembers();
+        deleteMasterKeyRecords();
+        MasterKey.getInstance().lock();
+
+        final ManagementBean bean = prepareManagementBean();
+        final MasterKeyRequest request = prepareRequest(MasterKeyRequest.class, Constants.ADMIN_ACCOUNT);
+        request.setSecret(bytes(Constants.ADMIN_ACCOUNT));
+
+        final MasterKeyResponse response = bean.masterKey(request);
+        assertEquals(ReturnCode.VERIFICATION_WARNING.getCode(), response.getReturnCode());
+        assertFalse(MasterKey.getInstance().isUnlocked());
+    }
+
+    // =========================================================================
+    // Startup
+    // =========================================================================
+
+    /**
+     * There is no fallback MasterKey: without a source, EDS stays locked.
+     */
+    @Test
+    void testStartupWithoutSourceStaysLocked() {
+        MasterKey.getInstance().lock();
+        final Settings mySettings = newSettings();
+        mySettings.set(StandardSetting.MASTERKEY_URL.getKey(), "");
+
+        assertFalse(new MasterKeyManager(mySettings, entityManager).loadAtStartup());
+        assertFalse(MasterKey.getInstance().isUnlocked());
+    }
+
+    @Test
+    void testStartupWithUnreadableSourceStaysLocked() {
+        MasterKey.getInstance().lock();
+        final Settings mySettings = newSettings();
+        mySettings.set(StandardSetting.MASTERKEY_URL.getKey(), "file://" + tempDir() + "not_existing_file.bin");
+
+        assertFalse(new MasterKeyManager(mySettings, entityManager).loadAtStartup());
+        assertFalse(MasterKey.getInstance().isUnlocked());
+    }
+
+    @Test
+    void testStartupWithWrongSourceStaysLocked() throws IOException {
+        MasterKey.getInstance().lock();
+        final Settings mySettings = newSettings();
+        mySettings.set(StandardSetting.MASTERKEY_URL.getKey(), writeMasterKeyFile("wrong_master_key.bin", NEW_MASTERKEY_SECRET));
+
+        assertFalse(new MasterKeyManager(mySettings, entityManager).loadAtStartup());
+        assertFalse(MasterKey.getInstance().isUnlocked());
+    }
+
+    @Test
+    void testStartupWithCorrectSource() throws IOException {
+        MasterKey.getInstance().lock();
+        final Settings mySettings = newSettings();
+        mySettings.set(StandardSetting.MASTERKEY_URL.getKey(), writeMasterKeyFile("test_master_key.bin", TEST_MASTERKEY_SECRET));
+
+        assertTrue(new MasterKeyManager(mySettings, entityManager).loadAtStartup());
+        assertTrue(MasterKey.getInstance().isUnlocked());
+        assertEquals(1, MasterKey.getInstance().getVersion());
+    }
+
+    @Test
+    void testStartupFirstSetup() throws IOException {
+        deleteAllMembers();
+        deleteMasterKeyRecords();
+        MasterKey.getInstance().lock();
+        final Settings mySettings = newSettings();
+        mySettings.set(StandardSetting.MASTERKEY_URL.getKey(), writeMasterKeyFile("new_master_key.bin", NEW_MASTERKEY_SECRET));
+
+        assertTrue(new MasterKeyManager(mySettings, entityManager).loadAtStartup());
+        assertEquals(1, dao.findCurrentMasterKey().getVersion());
     }
 
     // =========================================================================
     // Internal helper methods
     // =========================================================================
 
+    private static byte[] bytes(final String value) {
+        return value.getBytes(StandardCharsets.UTF_8);
+    }
+
     private static String tempDir() {
         return System.getProperty("java.io.tmpdir") + File.separator;
+    }
+
+    // The paths are the test's own resources and temporary files.
+    @SuppressWarnings("findsecbugs:PATH_TRAVERSAL_IN")
+    private static String writeMasterKeyFile(final String name, final String secret) throws IOException {
+        final String path = tempDir() + name;
+        Files.writeString(Paths.get(path), secret, StandardCharsets.UTF_8);
+        return "file://" + path;
     }
 
     private String currentMasterKeyUrl() {
@@ -345,32 +558,32 @@ final class ManagementBeanMasterKeyTest extends DatabaseSetup {
         }
     }
 
-    private int deleteMasterKeySetting() {
-        final String jql = "delete from SettingEntity s where s.name = :name";
-        return entityManager
-                .createQuery(jql)
-                .setParameter("name", StandardSetting.MASTERKEY_URL.getKey())
-                .executeUpdate();
+    private void deleteAllMembers() {
+        for (final MemberEntity member : dao.findAllAscending(MemberEntity.class, "id")) {
+            dao.delete(member);
+        }
     }
 
-    /**
-     * Without a MasterKey URL, the default MasterKey is derived from the name
-     * of the System Administrator Account.
-     *
-     * @return The secret of the default MasterKey
-     */
-    private static byte[] defaultMasterKeySecret() {
-        return Constants.ADMIN_ACCOUNT.getBytes(Charset.defaultCharset());
+    private byte[] storedData(final String dataId) {
+        // What is in the database, part by part, whatever the EntityManager holds.
+        final java.io.ByteArrayOutputStream stored = new java.io.ByteArrayOutputStream();
+        final java.util.List<?> parts = entityManager.createNativeQuery("SELECT p.part FROM eds_data_parts p JOIN eds_data d ON d.id = p.data_id " +
+                        "JOIN eds_metadata m ON m.id = d.metadata_id WHERE m.external_id = :id ORDER BY p.part_offset")
+                .setParameter("id", dataId)
+                .getResultList();
+        for (final Object part : parts) {
+            stored.writeBytes((byte[]) part);
+        }
+        return stored.toByteArray();
     }
 
-    /**
-     * Reverts the MasterKey to the original or default MasterKey, since other
-     * tests will otherwise fail. The default MasterKey secret is too weak to
-     * be set via a request, so the in-memory MasterKey is reset directly. The
-     * database changes are rolled back after each test.
-     */
-    private void revertMasterKeyToOriginal() {
-        final SecretEDSKey defaultKey = prepareNewMasterKeyInstance(settings).getKey();
-        MasterKey.getInstance(settings).setKey(defaultKey);
+    private String firstTrusteeKey() {
+        return (String) entityManager.createQuery("select t.circleKey from TrusteeEntity t order by t.id")
+                .setMaxResults(1)
+                .getSingleResult();
+    }
+
+    private void deleteMasterKeyRecords() {
+        entityManager.createQuery("delete from MasterKeyEntity").executeUpdate();
     }
 }

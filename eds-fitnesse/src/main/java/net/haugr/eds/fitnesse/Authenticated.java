@@ -16,8 +16,8 @@
  */
 package net.haugr.eds.fitnesse;
 
-import net.haugr.eds.api.requests.Authentication;
-import net.haugr.eds.api.responses.AuthenticateResponse;
+import net.haugr.eds.client.model.Authentication;
+import net.haugr.eds.client.model.AuthenticateResponse;
 import net.haugr.eds.fitnesse.callers.CallManagement;
 
 /**

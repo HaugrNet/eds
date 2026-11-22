@@ -16,10 +16,10 @@
  */
 package net.haugr.eds.fitnesse;
 
-import net.haugr.eds.api.dtos.Circle;
-import net.haugr.eds.api.dtos.Member;
-import net.haugr.eds.api.requests.FetchMemberRequest;
-import net.haugr.eds.api.responses.FetchMemberResponse;
+import net.haugr.eds.client.model.Circle;
+import net.haugr.eds.client.model.Member;
+import net.haugr.eds.client.model.FetchMemberRequest;
+import net.haugr.eds.client.model.FetchMemberResponse;
 import java.util.List;
 import net.haugr.eds.fitnesse.callers.CallManagement;
 import net.haugr.eds.fitnesse.utils.Converter;

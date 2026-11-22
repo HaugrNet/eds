@@ -34,6 +34,8 @@ import java.util.Set;
 import net.haugr.eds.core.jce.EntropyVerifier.Result;
 import net.haugr.eds.core.jce.EntropyVerifier.Violation;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 /**
  * Tests for the {@link EntropyVerifier}. Random input is generated with a
@@ -93,29 +95,21 @@ final class EntropyVerifierTest {
         assertTrue(result.estimatedBits() < 50, "Estimate: " + result.estimatedBits());
     }
 
-    @Test
-    void testRepeatsAreDetected() {
-        final Result result = verify("abcXYZ123abcXYZ123abcXYZ123abcXYZ123");
+    /**
+     * Repeats, sequences and keyboard patterns (German keyboard rows,
+     * partly reversed) are detected, each estimated below its bound.
+     */
+    @ParameterizedTest
+    @CsvSource({
+            "abcXYZ123abcXYZ123abcXYZ123abcXYZ123, 60",
+            "abcdefghijklmnopqrstuvwxyz0123456789, 40",
+            "qwertzuiopasdfghjklmnbvcxy, 50"
+    })
+    void testPatternsAreDetected(final String secret, final int bound) {
+        final Result result = verify(secret);
 
         assertFalse(result.isAcceptable());
-        assertTrue(result.estimatedBits() < 60, "Estimate: " + result.estimatedBits());
-    }
-
-    @Test
-    void testSequencesAreDetected() {
-        final Result result = verify("abcdefghijklmnopqrstuvwxyz0123456789");
-
-        assertFalse(result.isAcceptable());
-        assertTrue(result.estimatedBits() < 40, "Estimate: " + result.estimatedBits());
-    }
-
-    @Test
-    void testKeyboardPatternsAreDetected() {
-        // German keyboard rows, partly reversed.
-        final Result result = verify("qwertzuiopasdfghjklmnbvcxy");
-
-        assertFalse(result.isAcceptable());
-        assertTrue(result.estimatedBits() < 50, "Estimate: " + result.estimatedBits());
+        assertTrue(result.estimatedBits() < bound, "Estimate: " + result.estimatedBits());
     }
 
     @Test
@@ -286,10 +280,53 @@ final class EntropyVerifierTest {
     }
 
     @Test
+    void testOnlyWholeEntriesOfTheBlocklistAreBlocked() {
+        final EntropyVerifier custom = new EntropyVerifier(Arrays.asList(null, "rumpelstilzchen", " "));
+
+        // A part of an entry is neither blocked nor a word of the blocklist.
+        assertFalse(custom.verify(bytes("rumpelstilz")).violations().contains(Violation.BLOCKLISTED));
+        assertTrue(custom.verify(bytes("rumpelstilz")).estimatedBits() > custom.verify(bytes("rumpelstilzchen")).estimatedBits());
+    }
+
+    @Test
+    void testAnUpperCaseLetterWithinAWordCostsMoreThanAtItsStart() {
+        final EntropyVerifier custom = new EntropyVerifier(List.of("rumpelstilzchen"));
+
+        final double first = custom.verify(bytes("Rumpelstilzchen")).estimatedBits();
+        final double within = custom.verify(bytes("rumpelStilzchen")).estimatedBits();
+
+        assertTrue(within > first, within + " should be more than " + first);
+        final double two = custom.verify(bytes("RumpelStilzchen")).estimatedBits();
+        assertTrue(two > first, two + " should be more than " + first);
+        // All in upper case is as easily guessed as the first letter.
+        assertEquals(first, custom.verify(bytes("RUMPELSTILZCHEN")).estimatedBits(), 0.000001);
+    }
+
+    @Test
+    void testUpperCaseOnlyCountsAsOneAlphabet() {
+        final Result upper = verify("ZXQJVKWPBGMFHDY");
+        final Result lower = verify("zxqjvkwpbgmfhdy");
+
+        assertEquals(lower.estimatedBits(), upper.estimatedBits(), 0.000001);
+        assertEquals(lower.violations(), upper.violations());
+    }
+
+    @Test
+    void testMissingContextTermsAreIgnored() {
+        final String secret = "KimJensenKimJensen2026";
+        final double without = verify(secret).estimatedBits();
+
+        assertEquals(without, VERIFIER.verify(bytes(secret), (String[]) null).estimatedBits(), 0.000001);
+        assertEquals(VERIFIER.verify(bytes(secret), "kim").estimatedBits(), VERIFIER.verify(bytes(secret), "kim", null).estimatedBits(), 0.000001);
+    }
+
+    @Test
     void testViolationsAreImmutable() {
         final Result result = verify("password");
 
-        assertThrows(UnsupportedOperationException.class, () -> result.violations().clear());
+        final Set<Violation> violations = result.violations();
+
+        assertThrows(UnsupportedOperationException.class, violations::clear);
     }
 
     @Test
@@ -312,6 +349,8 @@ final class EntropyVerifierTest {
         return value.getBytes(StandardCharsets.UTF_8);
     }
 
+    // Seeded on purpose: the test data must be the same in every run.
+    @SuppressWarnings("findsecbugs:PREDICTABLE_RANDOM")
     private static byte[] randomBytes(final int length, final long seed) {
         final byte[] bytes = new byte[length];
         new Random(seed).nextBytes(bytes);
@@ -320,6 +359,8 @@ final class EntropyVerifierTest {
     }
 
     private static String randomText(final int length, final long seed) {
+        // Seeded on purpose: the test data must be the same in every run.
+        @SuppressWarnings("findsecbugs:PREDICTABLE_RANDOM")
         final Random random = new Random(seed);
         final StringBuilder builder = new StringBuilder(length);
         for (int i = 0; i < length; i++) {

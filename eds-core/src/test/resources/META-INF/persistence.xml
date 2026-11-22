@@ -13,11 +13,17 @@
         <class>net.haugr.eds.core.model.entities.CircleEntity</class>
         <class>net.haugr.eds.core.model.entities.KeyEntity</class>
         <class>net.haugr.eds.core.model.entities.TrusteeEntity</class>
+        <class>net.haugr.eds.core.model.entities.InvitationEntity</class>
+        <class>net.haugr.eds.core.model.entities.SessionEntity</class>
+        <class>net.haugr.eds.core.model.entities.FeatureEntity</class>
+        <class>net.haugr.eds.core.model.entities.CircleFeatureEntity</class>
+        <class>net.haugr.eds.core.model.entities.EntryEntity</class>
+        <class>net.haugr.eds.core.model.entities.StatusKeyEntity</class>
         <class>net.haugr.eds.core.model.entities.DataTypeEntity</class>
         <class>net.haugr.eds.core.model.entities.MetadataEntity</class>
         <class>net.haugr.eds.core.model.entities.DataEntity</class>
-        <class>net.haugr.eds.core.model.entities.SignatureEntity</class>
         <class>net.haugr.eds.core.model.entities.VersionEntity</class>
+        <class>net.haugr.eds.core.model.entities.MasterKeyEntity</class>
 
         <properties>
             <!-- Specify that we're using H2 Database -->

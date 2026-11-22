@@ -16,7 +16,6 @@
  */
 package net.haugr.eds.fitnesse.exceptions;
 
-import net.haugr.eds.api.common.Constants;
 
 import java.io.Serial;
 
@@ -31,7 +30,7 @@ import java.io.Serial;
 public final class StopTestException extends RuntimeException {
 
     @Serial
-    private static final long serialVersionUID = Constants.SERIAL_VERSION_UID;
+    private static final long serialVersionUID = 1L;
 
     public StopTestException(final String message, final Throwable cause) {
         super(message, cause);

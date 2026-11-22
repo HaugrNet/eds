@@ -61,11 +61,46 @@ final class ManagementBeanAuthenticatedTest extends DatabaseSetup {
         assertEquals("The Database is invalid, EDS neither can nor will work correctly until resolved.", response.getReturnMessage());
     }
 
+    /**
+     * A stone has no account to begin with, and no name for one: the first
+     * who comes becomes its System Administrator, under the name given.
+     * After that an unknown name is unknown, "admin" as any other.
+     */
+    @Test
+    void testFirstAccountBecomesSystemAdministrator() {
+        for (final net.haugr.eds.core.model.entities.MemberEntity member : dao.findAllAscending(net.haugr.eds.core.model.entities.MemberEntity.class, "id")) {
+            dao.delete(member);
+        }
+        assertEquals(0L, dao.countMembers());
+        final ManagementBean bean = prepareManagementBean();
+
+        final AuthenticateResponse first = bean.authenticated(prepareRequest(Authentication.class, "dude"));
+        assertEquals(ReturnCode.SUCCESS.getCode(), first.getReturnCode(), first.getReturnMessage());
+        assertEquals(net.haugr.eds.api.common.MemberRole.ADMIN, dao.findMemberByName("dude").getMemberRole());
+        assertEquals(1L, dao.countMembers());
+
+        // The stone has an account now, so nobody else is made one by coming.
+        for (final String name : new String[] { Constants.ADMIN_ACCOUNT, "sysop" }) {
+            final AuthenticateResponse later = bean.authenticated(prepareRequest(Authentication.class, name));
+            assertEquals(ReturnCode.AUTHENTICATION_WARNING.getCode(), later.getReturnCode());
+            assertEquals("Could not uniquely identify an account for '" + name + "'.", later.getReturnMessage());
+        }
+        assertEquals(1L, dao.countMembers());
+
+        // And the first one is known again, by the passphrase it came with.
+        assertEquals(ReturnCode.SUCCESS.getCode(), bean.authenticated(prepareRequest(Authentication.class, "dude")).getReturnCode());
+        final Authentication wrong = prepareRequest(Authentication.class, "dude");
+        wrong.setCredential(credentialOf("someone else"));
+        assertEquals(ReturnCode.AUTHENTICATION_WARNING.getCode(), bean.authenticated(wrong).getReturnCode());
+    }
+
     @Test
     void testAuthenticateNullRequest() {
         final ManagementBean bean = prepareManagementBean();
         final Authentication request = null;
 
+        // Null is passed on purpose, to check how it is refused.
+        @SuppressWarnings("findbugs:NP_NULL_PARAM_DEREF_ALL_TARGETS_DANGEROUS")
         final AuthenticateResponse response = bean.authenticated(request);
         assertEquals(ReturnCode.VERIFICATION_WARNING.getCode(), response.getReturnCode());
         assertEquals("Cannot Process a NULL Object.", response.getReturnMessage());

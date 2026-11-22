@@ -19,7 +19,8 @@ package net.haugr.eds.fitnesse.utils;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import net.haugr.eds.api.common.Utilities;
+import java.time.Clock;
+import java.time.LocalDateTime;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -30,7 +31,7 @@ final class ConverterTest {
 
     @Test
     void testConvertingLocalDateTime() {
-        final var date = Utilities.newDate();
+        final var date = LocalDateTime.now(Clock.systemUTC());
 
         // Convert the date to String, check that it is not null (Coverity finding)
         final var str = Converter.convertDate(date);
@@ -44,5 +45,11 @@ final class ConverterTest {
         assertEquals(converted.getYear(), date.getYear());
         assertEquals(converted.getMonth(), date.getMonth());
         assertEquals(converted.getDayOfMonth(), date.getDayOfMonth());
+    }
+
+    @Test
+    void testConvertingTimestamps() {
+        assertEquals("2026-11-01", Converter.convertTimestamp("2026-11-01T21:50:41.123456"));
+        assertEquals("2026-11-01T00:00", Converter.toTimestamp("2026-11-01"));
     }
 }

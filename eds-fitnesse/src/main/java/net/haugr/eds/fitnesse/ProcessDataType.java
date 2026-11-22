@@ -16,9 +16,9 @@
  */
 package net.haugr.eds.fitnesse;
 
-import net.haugr.eds.api.common.Action;
-import net.haugr.eds.api.requests.ProcessDataTypeRequest;
-import net.haugr.eds.api.responses.ProcessDataTypeResponse;
+import net.haugr.eds.client.model.Action;
+import net.haugr.eds.client.model.ProcessDataTypeRequest;
+import net.haugr.eds.client.model.ProcessDataTypeResponse;
 import net.haugr.eds.fitnesse.callers.CallShare;
 import net.haugr.eds.fitnesse.utils.Converter;
 

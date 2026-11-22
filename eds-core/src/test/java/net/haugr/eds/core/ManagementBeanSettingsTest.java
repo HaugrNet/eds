@@ -25,6 +25,7 @@ import net.haugr.eds.api.common.ReturnCode;
 import net.haugr.eds.api.requests.SettingRequest;
 import net.haugr.eds.api.responses.SettingResponse;
 import net.haugr.eds.core.setup.DatabaseSetup;
+import net.haugr.eds.core.enums.HashAlgorithm;
 import net.haugr.eds.core.enums.KeyAlgorithm;
 import net.haugr.eds.core.enums.StandardSetting;
 import net.haugr.eds.core.model.entities.MemberEntity;
@@ -51,12 +52,31 @@ final class ManagementBeanSettingsTest extends DatabaseSetup {
 
     @Test
     void testCreatingAdmin() {
-        // For most tests we need to have the Admin account present, so by
-        // default it already exists. So, to test that we actually *can* create
-        // the Admin Account, we first have to delete it from the DB, which
-        // we're doing here. Since each test is running within a transaction,
-        // and they are rolled back after completion, this should not disturb
-        // other tests.
+        // For most tests the System Administrator is present, so by default
+        // it already exists. To test that a stone without accounts takes
+        // the first who comes as its System Administrator, all accounts are
+        // deleted first. Each test runs in a transaction which is rolled
+        // back, so this doesn't disturb other tests.
+        entityManager.createQuery("delete from MemberEntity m").executeUpdate();
+
+        // The name is the choice of whoever comes; the stone sets none.
+        final ManagementBean bean = prepareManagementBean(newSettings());
+        final SettingRequest request = prepareRequest(SettingRequest.class, "sysop");
+
+        final SettingResponse response = bean.settings(request);
+        assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
+        assertEquals("Ok", response.getReturnMessage());
+        Assertions.assertEquals(StandardSetting.values().length, response.getSettings().size());
+    }
+
+    /**
+     * Only a stone without accounts takes a first one. With the System
+     * Administrator gone but other accounts left, which the stone itself
+     * never lets happen, nobody becomes it by using a name: the name
+     * "admin" was made anew by whoever used it first, before 2026-11-18.
+     */
+    @Test
+    void testNoAdminIsMadeWhileThereAreAccounts() {
         final int deleted = entityManager
                 .createQuery("delete from MemberEntity m where m.id = :id")
                 .setParameter("id", 1L)
@@ -64,12 +84,9 @@ final class ManagementBeanSettingsTest extends DatabaseSetup {
         assertEquals(1, deleted);
 
         final ManagementBean bean = prepareManagementBean(newSettings());
-        final SettingRequest request = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
-
-        final SettingResponse response = bean.settings(request);
-        assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
-        assertEquals("Ok", response.getReturnMessage());
-        Assertions.assertEquals(StandardSetting.values().length, response.getSettings().size());
+        final SettingResponse response = bean.settings(prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT));
+        assertEquals(ReturnCode.AUTHENTICATION_WARNING.getCode(), response.getReturnCode());
+        assertEquals("Could not uniquely identify an account for 'admin'.", response.getReturnMessage());
     }
 
     @Test
@@ -154,7 +171,6 @@ final class ManagementBeanSettingsTest extends DatabaseSetup {
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
 
         final Map<String, String> mySettings = new HashMap<>(response.getSettings());
-        mySettings.put(StandardSetting.EDS_SALT.getKey(), "new SALT");
         mySettings.put(StandardSetting.PBE_ITERATIONS.getKey(), "100000");
         request.setCredential(credentialOf(Constants.ADMIN_ACCOUNT));
         request.setSettings(mySettings);
@@ -162,7 +178,7 @@ final class ManagementBeanSettingsTest extends DatabaseSetup {
         assertEquals(ReturnCode.SUCCESS.getCode(), update.getReturnCode());
 
         // Running a verification check to ensure that the System Administrator
-        // can still access the system, after the SALT was updated.
+        // can still access the system, after the iterations were updated.
         final SettingRequest checkRequest = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
         final SettingResponse checkResponse = bean.settings(checkRequest);
         assertTrue(checkResponse.isOk());
@@ -220,17 +236,43 @@ final class ManagementBeanSettingsTest extends DatabaseSetup {
     }
 
     @Test
-    void testInvokingRequestUpdateNotAllowedExistingSetting() {
+    void testChangingIterationsWithMembers() {
+        // The accounts keep the iterations of their passphrases, so the
+        // setting may change while Members exist: it counts for new
+        // passphrases only.
         final ManagementBean bean = prepareManagementBean(newSettings());
         final SettingRequest request = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
         final Map<String, String> mySettings = new HashMap<>();
-        mySettings.put("eds.system.salt", "Enabling Kill Switch");
-        assertEquals("Enabling Kill Switch", mySettings.get("eds.system.salt"));
+        mySettings.put("eds.crypto.pbe.iterations", "2048");
         request.setSettings(mySettings);
 
         final SettingResponse response = bean.settings(request);
-        assertEquals(ReturnCode.SETTING_WARNING.getCode(), response.getReturnCode());
-        assertEquals("The setting eds.system.salt may not be overwritten.", response.getReturnMessage());
+        assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
+        assertEquals("2048", response.getSettings().get("eds.crypto.pbe.iterations"));
+
+        // The System Administrator still logs in, with the iterations of the account.
+        final SettingResponse again = bean.settings(prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT));
+        assertTrue(again.isOk());
+
+        // Too few iterations are refused.
+        final SettingRequest weak = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
+        weak.setSettings(Map.of("eds.crypto.pbe.iterations", "999"));
+        final SettingResponse refused = bean.settings(weak);
+        assertEquals(ReturnCode.SETTING_WARNING.getCode(), refused.getReturnCode());
+        assertEquals("The value for 'eds.crypto.pbe.iterations' must be from 1000 to 999999999.", refused.getReturnMessage());
+    }
+
+    @Test
+    void testAllowedValues() {
+        final ManagementBean bean = prepareManagementBean(newSettings());
+        final SettingResponse response = bean.settings(prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT));
+        assertTrue(response.isOk());
+        final Map<String, java.util.List<String>> allowed = response.getAllowedValues();
+        assertEquals(4, allowed.size());
+        assertEquals(java.util.List.of("AES_GCM_256"), allowed.get("eds.crypto.symmetric.algorithm"));
+        assertEquals(java.util.List.of("MLKEM1024_P384"), allowed.get("eds.crypto.asymmetric.algorithm"));
+        assertEquals(java.util.List.of("PBE_GCM_256"), allowed.get("eds.crypto.pbe.algorithm"));
+        assertEquals(java.util.List.of("SHA_384", "SHA_512"), allowed.get("eds.crypto.hash.algorithm"));
     }
 
     @Test
@@ -305,7 +347,7 @@ final class ManagementBeanSettingsTest extends DatabaseSetup {
         assertTrue(response1.isOk());
 
         final Map<String, String> mySettings = response1.getSettings();
-        mySettings.put(StandardSetting.SYMMETRIC_ALGORITHM.getKey(), KeyAlgorithm.RSA_8192.name());
+        mySettings.put(StandardSetting.SYMMETRIC_ALGORITHM.getKey(), KeyAlgorithm.MLKEM1024_P384.name());
 
         final SettingRequest request2 = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
         request2.setSettings(mySettings);
@@ -313,6 +355,24 @@ final class ManagementBeanSettingsTest extends DatabaseSetup {
         final SettingResponse response2 = bean.settings(request2);
         assertEquals(ReturnCode.SETTING_WARNING.getCode(), response2.getReturnCode());
         assertEquals("Unsupported Crypto Algorithm for 'eds.crypto.symmetric.algorithm'.", response2.getReturnMessage());
+    }
+
+    @Test
+    void testSetInvalidHashAlgorithm() {
+        final ManagementBean bean = prepareManagementBean(newSettings());
+        final SettingRequest request1 = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
+        final SettingResponse response1 = bean.settings(request1);
+        assertTrue(response1.isOk());
+
+        final Map<String, String> mySettings = response1.getSettings();
+        mySettings.put(StandardSetting.HASH_ALGORITHM.getKey(), "SHA_256");
+
+        final SettingRequest request2 = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
+        request2.setSettings(mySettings);
+
+        final SettingResponse response2 = bean.settings(request2);
+        assertEquals(ReturnCode.SETTING_WARNING.getCode(), response2.getReturnCode());
+        assertEquals("Unsupported Crypto Algorithm for 'eds.crypto.hash.algorithm'.", response2.getReturnMessage());
     }
 
     @Test
@@ -366,13 +426,81 @@ final class ManagementBeanSettingsTest extends DatabaseSetup {
         assertEquals("The setting eds.masterkey.url may not be changed with this request.", response.getReturnMessage());
     }
 
+    @Test
+    void testStoneName() {
+        final ManagementBean bean = prepareManagementBean(newSettings());
+        final String key = StandardSetting.STONE_NAME.getKey();
+
+        assertEquals(ReturnCode.SUCCESS.getCode(), change(bean, key, "Test Stone").getReturnCode());
+        final SettingResponse tooLong = change(bean, key, "x".repeat(Constants.MAX_STONE_NAME_LENGTH + 1));
+        assertEquals(ReturnCode.SETTING_WARNING.getCode(), tooLong.getReturnCode());
+        assertEquals("The value for 'eds.stone.name' has at most 64 characters.", tooLong.getReturnMessage());
+
+        // A stone needn't have a name, so the name can be removed again.
+        assertEquals(ReturnCode.SUCCESS.getCode(), change(bean, key, "").getReturnCode());
+    }
+
+    @Test
+    void testStatusIntervals() {
+        final ManagementBean bean = prepareManagementBean(newSettings());
+        final String load = StandardSetting.STATUS_LOAD_INTERVAL.getKey();
+        final String inventory = StandardSetting.STATUS_INVENTORY_INTERVAL.getKey();
+
+        assertEquals(ReturnCode.SUCCESS.getCode(), change(bean, load, "10").getReturnCode());
+        final SettingResponse tooOften = change(bean, load, "3601");
+        assertEquals(ReturnCode.SETTING_WARNING.getCode(), tooOften.getReturnCode());
+        assertEquals("The value for 'eds.status.load.interval.seconds' must be from 0 to 3600.", tooOften.getReturnMessage());
+        // More digits than an int has are refused, not parsed.
+        assertEquals("The value for 'eds.status.load.interval.seconds' must be from 0 to 3600.", change(bean, load, "12345678901").getReturnMessage());
+        assertEquals(ReturnCode.SUCCESS.getCode(), change(bean, load, StandardSetting.STATUS_LOAD_INTERVAL.getValue()).getReturnCode());
+
+        assertEquals(ReturnCode.SUCCESS.getCode(), change(bean, inventory, "120").getReturnCode());
+        final SettingResponse never = change(bean, inventory, "0");
+        assertEquals(ReturnCode.SETTING_WARNING.getCode(), never.getReturnCode());
+        assertEquals("The value for 'eds.status.inventory.interval.minutes' must be from 1 to 10080.", never.getReturnMessage());
+        assertEquals(ReturnCode.SUCCESS.getCode(), change(bean, inventory, StandardSetting.STATUS_INVENTORY_INTERVAL.getValue()).getReturnCode());
+    }
+
+    @Test
+    void testCircleSecretRotationSettings() {
+        final ManagementBean bean = prepareManagementBean(newSettings());
+        final String days = StandardSetting.CIRCLE_SECRET_ROTATION_DAYS.getKey();
+        final String threads = StandardSetting.CIRCLE_SECRET_ROTATION_THREADS.getKey();
+
+        assertEquals(ReturnCode.SUCCESS.getCode(), change(bean, days, "0").getReturnCode());
+        assertEquals("The value for 'eds.circle.secret.rotation.days' must be from 0 to 36500.", change(bean, days, "36501").getReturnMessage());
+        assertEquals(ReturnCode.SUCCESS.getCode(), change(bean, days, StandardSetting.CIRCLE_SECRET_ROTATION_DAYS.getValue()).getReturnCode());
+
+        assertEquals(ReturnCode.SUCCESS.getCode(), change(bean, threads, "8").getReturnCode());
+        assertEquals("The value for 'eds.circle.secret.rotation.threads' must be from 1 to 64.", change(bean, threads, "0").getReturnMessage());
+        assertEquals(ReturnCode.SUCCESS.getCode(), change(bean, threads, StandardSetting.CIRCLE_SECRET_ROTATION_THREADS.getValue()).getReturnCode());
+    }
+
+    @Test
+    void testIterationsFitAnInt() {
+        final ManagementBean bean = prepareManagementBean(newSettings());
+
+        final SettingResponse response = change(bean, StandardSetting.PBE_ITERATIONS.getKey(), "12345678901");
+        assertEquals(ReturnCode.SETTING_WARNING.getCode(), response.getReturnCode());
+        assertTrue(response.getReturnMessage().endsWith("to 999999999."), response.getReturnMessage());
+    }
+
+    private SettingResponse change(final ManagementBean bean, final String key, final String value) {
+        final SettingRequest request = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
+        final Map<String, String> settings = new HashMap<>();
+        settings.put(key, value);
+        request.setSettings(settings);
+
+        return bean.settings(request);
+    }
+
     private static Map<String, String> prepareSettingsMap(final SettingResponse response) {
         final Map<String, String> mySettings = response.getSettings();
-        mySettings.put(StandardSetting.SYMMETRIC_ALGORITHM.getKey(), KeyAlgorithm.AES_CBC_192.name());
-        mySettings.put(StandardSetting.ASYMMETRIC_ALGORITHM.getKey(), KeyAlgorithm.RSA_8192.name());
-        mySettings.put(StandardSetting.SIGNATURE_ALGORITHM.getKey(), KeyAlgorithm.SHA_256.name());
-        mySettings.put(StandardSetting.PBE_ALGORITHM.getKey(), KeyAlgorithm.PBE_CBC_192.name());
-        mySettings.put(StandardSetting.HASH_ALGORITHM.getKey(), KeyAlgorithm.SHA_256.name());
+        mySettings.put(StandardSetting.SYMMETRIC_ALGORITHM.getKey(), KeyAlgorithm.AES_GCM_256.name());
+        mySettings.put(StandardSetting.ASYMMETRIC_ALGORITHM.getKey(), KeyAlgorithm.MLKEM1024_P384.name());
+        mySettings.put(StandardSetting.PBE_ALGORITHM.getKey(), KeyAlgorithm.PBE_GCM_256.name());
+        mySettings.put(StandardSetting.HASH_ALGORITHM.getKey(), HashAlgorithm.SHA_384.name());
+        mySettings.put(StandardSetting.INVITATION_TIMEOUT.getKey(), "24");
 
         return mySettings;
     }

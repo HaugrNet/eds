@@ -19,6 +19,7 @@ package net.haugr.eds.core;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -28,6 +29,8 @@ import net.haugr.eds.api.common.Constants;
 import net.haugr.eds.api.common.CredentialType;
 import net.haugr.eds.api.common.MemberRole;
 import net.haugr.eds.api.common.ReturnCode;
+import net.haugr.eds.api.common.Utilities;
+import net.haugr.eds.api.dtos.Member;
 import net.haugr.eds.api.requests.FetchDataRequest;
 import net.haugr.eds.api.requests.FetchMemberRequest;
 import net.haugr.eds.api.requests.ProcessCircleRequest;
@@ -39,10 +42,14 @@ import net.haugr.eds.api.responses.ProcessCircleResponse;
 import net.haugr.eds.api.responses.ProcessDataResponse;
 import net.haugr.eds.api.responses.ProcessMemberResponse;
 import net.haugr.eds.core.enums.StandardSetting;
+import net.haugr.eds.core.jce.Crypto;
 import net.haugr.eds.core.model.Settings;
 import net.haugr.eds.core.model.entities.MemberEntity;
+import net.haugr.eds.core.model.entities.SessionEntity;
 import net.haugr.eds.core.setup.DatabaseSetup;
 import org.junit.jupiter.api.Test;
+import java.security.SecureRandom;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.UUID;
 
@@ -51,6 +58,8 @@ import java.util.UUID;
  * @since EDS 1.0
  */
 final class ManagementBeanProcessMemberTest extends DatabaseSetup {
+
+    private static final SecureRandom RANDOM = new SecureRandom();
 
     @Test
     void testNullRequest() {
@@ -107,6 +116,141 @@ final class ManagementBeanProcessMemberTest extends DatabaseSetup {
 
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
         assertEquals("The Member '" + account + "' was successfully added to EDS.", response.getReturnMessage());
+    }
+
+    // =========================================================================
+    // Several administrators: the first one rules, invitations make users
+    // =========================================================================
+
+    /**
+     * An invitation never makes an administrator, also not when the first
+     * System Administrator asks for it: a link in the wrong hands must not
+     * give more than a user.
+     */
+    @Test
+    void testInvitationAsAdministratorIsRefused() {
+        final ManagementBean bean = prepareManagementBean();
+        final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
+        request.setAction(Action.INVITE);
+        request.setNewAccountName("would be admin");
+        request.setMemberRole(MemberRole.ADMIN);
+
+        final ProcessMemberResponse response = bean.processMember(request);
+        assertEquals(ReturnCode.ILLEGAL_ACTION.getCode(), response.getReturnCode());
+        assertEquals("An invitation makes a user; an administrator is made by creating the account, or by changing the role afterwards.", response.getReturnMessage());
+        assertNull(dao.findMemberByName("would be admin"));
+    }
+
+    @Test
+    void testInvitationMakesAUser() {
+        final ManagementBean bean = prepareManagementBean();
+        final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
+        request.setAction(Action.INVITE);
+        request.setNewAccountName("invited user");
+        request.setMemberRole(MemberRole.STANDARD);
+
+        assertTrue(bean.processMember(request).isOk());
+        assertEquals(MemberRole.STANDARD, dao.findMemberByName("invited user").getMemberRole());
+    }
+
+    /**
+     * Another administrator runs users, but doesn't make, unmake or delete
+     * administrators; that is for the first one alone.
+     */
+    @Test
+    void testOtherAdministratorDoesNotRuleAdministrators() {
+        final ManagementBean bean = prepareManagementBean();
+        final String otherAdmin = createAdministrator(bean);
+        final String thirdAdmin = "third admin";
+        final ProcessMemberRequest third = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
+        third.setAction(Action.CREATE);
+        third.setNewAccountName(thirdAdmin);
+        third.setNewCredential(credentialOf(thirdAdmin));
+        third.setMemberRole(MemberRole.ADMIN);
+        assertTrue(bean.processMember(third).isOk());
+        final String thirdId = dao.findMemberByName(thirdAdmin).getExternalId();
+
+        // A user, yes.
+        final ProcessMemberRequest user = prepareRequest(ProcessMemberRequest.class, otherAdmin);
+        user.setAction(Action.CREATE);
+        user.setNewAccountName("made by the other");
+        user.setNewCredential(credentialOf("made by the other"));
+        final ProcessMemberResponse made = bean.processMember(user);
+        assertEquals(ReturnCode.SUCCESS.getCode(), made.getReturnCode(), made.getReturnMessage());
+        assertEquals(MemberRole.STANDARD, dao.findMemberByName("made by the other").getMemberRole());
+
+        // An administrator, no.
+        final ProcessMemberRequest admin = prepareRequest(ProcessMemberRequest.class, otherAdmin);
+        admin.setAction(Action.CREATE);
+        admin.setNewAccountName("another admin");
+        admin.setNewCredential(credentialOf("another admin"));
+        admin.setMemberRole(MemberRole.ADMIN);
+        final ProcessMemberResponse refused = bean.processMember(admin);
+        assertEquals(ReturnCode.AUTHORIZATION_WARNING.getCode(), refused.getReturnCode());
+        assertEquals("Only the first System Administrator may make, unmake or delete administrators.", refused.getReturnMessage());
+        assertNull(dao.findMemberByName("another admin"));
+
+        // Nor a role.
+        final ProcessMemberRequest alter = prepareRequest(ProcessMemberRequest.class, otherAdmin);
+        alter.setAction(Action.ALTER);
+        alter.setMemberId(MEMBER_1_ID);
+        alter.setMemberRole(MemberRole.ADMIN);
+        assertEquals(ReturnCode.AUTHORIZATION_WARNING.getCode(), bean.processMember(alter).getReturnCode());
+        assertEquals(MemberRole.STANDARD, dao.findMemberByName(MEMBER_1).getMemberRole());
+
+        // Nor another administrator deleted; a user may be.
+        final ProcessMemberRequest delete = prepareRequest(ProcessMemberRequest.class, otherAdmin);
+        delete.setAction(Action.DELETE);
+        delete.setMemberId(thirdId);
+        final ProcessMemberResponse kept = bean.processMember(delete);
+        assertEquals(ReturnCode.AUTHORIZATION_WARNING.getCode(), kept.getReturnCode());
+        assertEquals("Only the first System Administrator may make, unmake or delete administrators.", kept.getReturnMessage());
+        assertNotNull(dao.findMemberByName(thirdAdmin));
+        final ProcessMemberRequest deleteUser = prepareRequest(ProcessMemberRequest.class, otherAdmin);
+        deleteUser.setAction(Action.DELETE);
+        deleteUser.setMemberId(made.getMemberId());
+        assertTrue(bean.processMember(deleteUser).isOk());
+    }
+
+    /**
+     * The first System Administrator makes and unmakes administrators, and
+     * deletes them; the member data tells who it is.
+     */
+    @Test
+    void testFirstAdministratorRulesAdministrators() {
+        final ManagementBean bean = prepareManagementBean();
+        final String otherAdmin = createAdministrator(bean);
+        final String otherId = dao.findMemberByName(otherAdmin).getExternalId();
+
+        final ProcessMemberRequest demote = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
+        demote.setAction(Action.ALTER);
+        demote.setMemberId(otherId);
+        demote.setMemberRole(MemberRole.STANDARD);
+        assertTrue(bean.processMember(demote).isOk());
+        assertEquals(MemberRole.STANDARD, dao.findMemberByName(otherAdmin).getMemberRole());
+
+        final ProcessMemberRequest promote = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
+        promote.setAction(Action.ALTER);
+        promote.setMemberId(otherId);
+        promote.setMemberRole(MemberRole.ADMIN);
+        assertTrue(bean.processMember(promote).isOk());
+
+        // Who is the first is told to every Member who sees the list.
+        final FetchMemberResponse members = bean.fetchMembers(prepareRequest(FetchMemberRequest.class, MEMBER_1));
+        assertTrue(members.isOk(), members.getReturnMessage());
+        assertEquals(1, members.getMembers().stream().filter(Member::isFirstAdministrator).count());
+        assertTrue(members.getMembers().stream().filter(Member::isFirstAdministrator).allMatch(m -> ADMIN_ID.equals(m.getMemberId())));
+        assertTrue(members.getMembers().stream().anyMatch(m -> otherId.equals(m.getMemberId()) && !m.isFirstAdministrator() && (m.getMemberRole() == MemberRole.ADMIN)));
+        final FetchMemberRequest one = prepareRequest(FetchMemberRequest.class, MEMBER_1);
+        one.setMemberId(ADMIN_ID);
+        assertTrue(bean.fetchMembers(one).getMembers().getFirst().isFirstAdministrator());
+
+        final ProcessMemberRequest delete = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
+        delete.setAction(Action.DELETE);
+        delete.setMemberId(otherId);
+        final ProcessMemberResponse deleted = bean.processMember(delete);
+        assertEquals(ReturnCode.SUCCESS.getCode(), deleted.getReturnCode(), deleted.getReturnMessage());
+        assertNull(dao.findMemberByName(otherAdmin));
     }
 
     @Test
@@ -195,6 +339,19 @@ final class ManagementBeanProcessMemberTest extends DatabaseSetup {
     }
 
     @Test
+    void testAlterUnknownAccount() {
+        final ManagementBean bean = prepareManagementBean();
+        final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
+        request.setAction(Action.ALTER);
+        request.setMemberId(UUID.randomUUID().toString());
+        request.setMemberRole(MemberRole.ADMIN);
+
+        final ProcessMemberResponse response = bean.processMember(request);
+        assertEquals(ReturnCode.IDENTIFICATION_WARNING.getCode(), response.getReturnCode());
+        assertEquals("The requested Member cannot be found.", response.getReturnMessage());
+    }
+
+    @Test
     void testAlterSelf() {
         final ManagementBean bean = prepareManagementBean();
         final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
@@ -236,16 +393,15 @@ final class ManagementBeanProcessMemberTest extends DatabaseSetup {
 
     @Test
     void testProcessSelfPasswordUpdateWithSession() {
-        final String session = UUID.randomUUID().toString();
         final ManagementBean bean = prepareManagementBean();
-        final ProcessMemberRequest loginRequest = prepareLoginRequest(MEMBER_5, session);
+        final ProcessMemberRequest loginRequest = prepareLoginRequest(MEMBER_5);
         final ProcessMemberResponse loginResponse = bean.processMember(loginRequest);
         assertEquals(ReturnCode.SUCCESS.getCode(), loginResponse.getReturnCode());
         assertEquals("The Member '" + MEMBER_5 + "' has successfully logged in.", loginResponse.getReturnMessage());
 
-        final ProcessMemberRequest passwordRequest = prepareSessionRequest(ProcessMemberRequest.class, session);
+        final ProcessMemberRequest passwordRequest = prepareSessionRequest(ProcessMemberRequest.class, loginResponse.getSession());
         passwordRequest.setAction(Action.UPDATE);
-        passwordRequest.setNewCredential(loginRequest.getNewCredential());
+        passwordRequest.setNewCredential(crypto.stringToBytes(NEW_PASSPHRASE));
 
         final ProcessMemberResponse response = bean.processMember(passwordRequest);
         assertEquals(ReturnCode.VERIFICATION_WARNING.getCode(), response.getReturnCode());
@@ -263,13 +419,13 @@ final class ManagementBeanProcessMemberTest extends DatabaseSetup {
         final ProcessMemberResponse response = bean.processMember(request);
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
         assertNotNull(response.getMemberId());
-        final byte[] signature = response.getSignature();
+        final byte[] invitation = response.getInvitation();
 
         final ProcessMemberRequest invitationRequest = new ProcessMemberRequest();
         invitationRequest.setAccountName(account);
         invitationRequest.setAction(Action.UPDATE);
-        invitationRequest.setCredentialType(CredentialType.SIGNATURE);
-        invitationRequest.setCredential(signature);
+        invitationRequest.setCredentialType(CredentialType.INVITATION);
+        invitationRequest.setCredential(invitation);
         invitationRequest.setNewCredential(crypto.stringToBytes(NEW_PASSPHRASE));
 
         final ProcessMemberResponse invitationResponse = bean.processMember(invitationRequest);
@@ -284,8 +440,8 @@ final class ManagementBeanProcessMemberTest extends DatabaseSetup {
         final ProcessMemberRequest request = new ProcessMemberRequest();
         request.setAccountName("null Invitee");
         request.setAction(Action.UPDATE);
-        request.setCredentialType(CredentialType.SIGNATURE);
-        request.setCredential(crypto.stringToBytes("Signature"));
+        request.setCredentialType(CredentialType.INVITATION);
+        request.setCredential(crypto.stringToBytes("Invitation"));
 
         final ProcessMemberResponse response = bean.processMember(request);
         assertEquals(ReturnCode.VERIFICATION_WARNING.getCode(), response.getReturnCode());
@@ -298,8 +454,8 @@ final class ManagementBeanProcessMemberTest extends DatabaseSetup {
         final ProcessMemberRequest request = new ProcessMemberRequest();
         request.setAccountName("empty Invitee");
         request.setAction(Action.UPDATE);
-        request.setCredentialType(CredentialType.SIGNATURE);
-        request.setCredential(crypto.stringToBytes("Signature"));
+        request.setCredentialType(CredentialType.INVITATION);
+        request.setCredential(crypto.stringToBytes("Invitation"));
         request.setNewCredential(crypto.stringToBytes(""));
 
         final ProcessMemberResponse response = bean.processMember(request);
@@ -308,8 +464,7 @@ final class ManagementBeanProcessMemberTest extends DatabaseSetup {
     }
 
     @Test
-    void testInvitationWithInvalidSignature() {
-        final String bogusSignature = "T+OoZiBpm36P868XUZYWFsW1jUFlD31x+FeQuDjcm4DmmIk+qWd8KuUzLdnETRPIxo/OuYLcpvFiPxMf0v78feiw/yVVV5+1xjO+FR/KYgB4JTaJ6p0RIEpS3rjs27bY+1OYclsk4MPRKbxZN06ZFHlSY4btk1G4ML7x0/iUCLBbOO2y3S4JZpKwAR7kAyhVeqyi8qKi13o+7z/J0KP2EhHrF8+2y3z63TKLyClZRrAhvy3/g/k0q7MccFOKDGsxxIpe2jfOHtxLEYfbgrdly/fZHEQL5vbbf/LbQ7MISfcwXSLtJMD0COXsm/V1nkmI/ficjskvNuUj+h739KEmuQ==";
+    void testInvitationWithInvalidToken() {
         final ManagementBean bean = prepareManagementBean();
         final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
         request.setAction(Action.INVITE);
@@ -318,38 +473,105 @@ final class ManagementBeanProcessMemberTest extends DatabaseSetup {
         final ProcessMemberResponse response = bean.processMember(request);
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
 
+        final byte[] bogusToken = new byte[32];
+        RANDOM.nextBytes(bogusToken);
         final ProcessMemberRequest invitationRequest = new ProcessMemberRequest();
         invitationRequest.setAccountName("invitee");
         invitationRequest.setAction(Action.UPDATE);
-        invitationRequest.setCredentialType(CredentialType.SIGNATURE);
-        invitationRequest.setCredential(Base64.getDecoder().decode(bogusSignature));
-        invitationRequest.setNewCredential(crypto.stringToBytes(UUID.randomUUID().toString()));
+        invitationRequest.setCredentialType(CredentialType.INVITATION);
+        invitationRequest.setCredential(bogusToken);
+        invitationRequest.setNewCredential(crypto.stringToBytes(NEW_PASSPHRASE));
 
         final ProcessMemberResponse invitationResponse = bean.processMember(invitationRequest);
         assertEquals(ReturnCode.AUTHENTICATION_WARNING.getCode(), invitationResponse.getReturnCode());
-        assertEquals("The given signature is invalid.", invitationResponse.getReturnMessage());
+        assertEquals("The given invitation is invalid.", invitationResponse.getReturnMessage());
     }
 
     @Test
-    void testInvitationWithInvalidSignature2() {
+    void testExpiredInvitation() {
+        final String account = "late invitee";
         final ManagementBean bean = prepareManagementBean();
         final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
         request.setAction(Action.INVITE);
-        request.setNewAccountName("invitee");
+        request.setNewAccountName(account);
 
         final ProcessMemberResponse response = bean.processMember(request);
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
 
+        final MemberEntity invitee = dao.findMemberByName(account);
+        invitee.setInvitationExpire(Utilities.newDate().minusMinutes(1));
+        dao.save(invitee);
+
         final ProcessMemberRequest invitationRequest = new ProcessMemberRequest();
-        invitationRequest.setAccountName("invitee");
+        invitationRequest.setAccountName(account);
         invitationRequest.setAction(Action.UPDATE);
-        invitationRequest.setCredentialType(CredentialType.SIGNATURE);
-        invitationRequest.setCredential(crypto.stringToBytes(UUID.randomUUID().toString()));
-        invitationRequest.setNewCredential(crypto.stringToBytes(UUID.randomUUID().toString()));
+        invitationRequest.setCredentialType(CredentialType.INVITATION);
+        invitationRequest.setCredential(response.getInvitation());
+        invitationRequest.setNewCredential(crypto.stringToBytes(NEW_PASSPHRASE));
 
         final ProcessMemberResponse invitationResponse = bean.processMember(invitationRequest);
-        assertEquals(ReturnCode.CRYPTO_ERROR.getCode(), invitationResponse.getReturnCode());
-        assertEquals("Bad signature length: got 36 but was expecting 256", invitationResponse.getReturnMessage());
+        assertEquals(ReturnCode.AUTHENTICATION_WARNING.getCode(), invitationResponse.getReturnCode());
+        assertEquals("The invitation has expired.", invitationResponse.getReturnMessage());
+    }
+
+    @Test
+    void testInvitationTokenIsOnlyStoredAsKeyedHash() {
+        final String account = "hashed invitee";
+        final ManagementBean bean = prepareManagementBean();
+        final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
+        request.setAction(Action.INVITE);
+        request.setNewAccountName(account);
+
+        final ProcessMemberResponse response = bean.processMember(request);
+        assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
+        final byte[] token = response.getInvitation();
+        assertEquals(32, token.length);
+
+        final MemberEntity invitee = dao.findMemberByName(account);
+        final String armoredToken = Base64.getEncoder().encodeToString(token);
+        assertNotEquals(armoredToken, invitee.getSalt());
+        assertFalse(invitee.getSalt().contains(armoredToken));
+        assertFalse(invitee.getPublicKey().contains(armoredToken));
+        assertFalse(invitee.getPrivateKey().contains(armoredToken));
+        assertEquals(crypto.hmacWithMasterKey("eds/invitation", token), invitee.getSalt());
+        assertNotNull(invitee.getInvitationExpire());
+    }
+
+    @Test
+    void testInvitationCanOnlyBeUsedOnce() {
+        final String account = "once invitee";
+        final ManagementBean bean = prepareManagementBean();
+        final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
+        request.setAction(Action.INVITE);
+        request.setNewAccountName(account);
+
+        final ProcessMemberResponse response = bean.processMember(request);
+        assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
+        final byte[] token = response.getInvitation();
+
+        final ProcessMemberRequest first = new ProcessMemberRequest();
+        first.setAccountName(account);
+        first.setAction(Action.UPDATE);
+        first.setCredentialType(CredentialType.INVITATION);
+        first.setCredential(Arrays.copyOf(token, token.length));
+        first.setNewCredential(crypto.stringToBytes(NEW_PASSPHRASE));
+        assertEquals(ReturnCode.SUCCESS.getCode(), bean.processMember(first).getReturnCode());
+        assertNull(dao.findMemberByName(account).getInvitationExpire());
+
+        final ProcessMemberRequest second = new ProcessMemberRequest();
+        second.setAccountName(account);
+        second.setAction(Action.UPDATE);
+        second.setCredentialType(CredentialType.INVITATION);
+        second.setCredential(token);
+        second.setNewCredential(crypto.stringToBytes(NEW_PASSPHRASE));
+        final ProcessMemberResponse secondResponse = bean.processMember(second);
+        assertEquals(ReturnCode.VERIFICATION_WARNING.getCode(), secondResponse.getReturnCode());
+        assertEquals("Account does not have an invitation pending.", secondResponse.getReturnMessage());
+
+        // The new passphrase works for the account.
+        final FetchMemberRequest fetchRequest = prepareRequest(FetchMemberRequest.class, account);
+        fetchRequest.setCredential(crypto.stringToBytes(NEW_PASSPHRASE));
+        assertTrue(bean.fetchMembers(fetchRequest).isOk());
     }
 
     @Test
@@ -358,7 +580,7 @@ final class ManagementBeanProcessMemberTest extends DatabaseSetup {
         final ProcessMemberRequest request = new ProcessMemberRequest();
         request.setAccountName(MEMBER_1);
         request.setAction(Action.UPDATE);
-        request.setCredentialType(CredentialType.SIGNATURE);
+        request.setCredentialType(CredentialType.INVITATION);
         request.setCredential(crypto.stringToBytes(UUID.randomUUID().toString()));
         request.setNewCredential(crypto.stringToBytes(UUID.randomUUID().toString()));
 
@@ -374,7 +596,7 @@ final class ManagementBeanProcessMemberTest extends DatabaseSetup {
         request.setAccountName("Who knows");
         request.setNewAccountName("wannabe");
         request.setAction(Action.UPDATE);
-        request.setCredentialType(CredentialType.SIGNATURE);
+        request.setCredentialType(CredentialType.INVITATION);
         request.setCredential(crypto.stringToBytes(UUID.randomUUID().toString()));
         request.setNewCredential(crypto.stringToBytes(UUID.randomUUID().toString()));
 
@@ -404,54 +626,108 @@ final class ManagementBeanProcessMemberTest extends DatabaseSetup {
 
         final ProcessMemberResponse response = bean.processMember(request);
         assertEquals(ReturnCode.ILLEGAL_ACTION.getCode(), response.getReturnCode());
-        assertEquals("Members are not permitted to invite new Members.", response.getReturnMessage());
+        assertEquals("Members may only invite into a Circle which they administer.", response.getReturnMessage());
     }
 
     @Test
     void testLoginWithSession() {
-        final String sessionKey = "sessionKey";
         final ManagementBean bean = prepareManagementBean();
-        final ProcessMemberRequest loginRequest = prepareLoginRequest(MEMBER_1, sessionKey);
+        final ProcessMemberRequest loginRequest = prepareLoginRequest(MEMBER_1);
         final ProcessMemberResponse loginResponse = bean.processMember(loginRequest);
         assertEquals(ReturnCode.SUCCESS.getCode(), loginResponse.getReturnCode());
 
         // Just performing an action using the Session
-        final ProcessCircleRequest circleRequest = prepareSessionRequest(ProcessCircleRequest.class, sessionKey);
+        final ProcessCircleRequest circleRequest = prepareSessionRequest(ProcessCircleRequest.class, loginResponse.getSession());
         circleRequest.setAction(Action.UPDATE);
         circleRequest.setCircleId(CIRCLE_1_ID);
         circleRequest.setCircleName("new Circle1 name");
         final ProcessCircleResponse circleResponse = bean.processCircle(circleRequest);
         assertEquals(ReturnCode.SUCCESS.getCode(), circleResponse.getReturnCode());
 
-        // Have to generate the SessionKey a second time, since the first request will override it.
-        final ProcessMemberRequest logoutRequest = prepareLogoutRequest(sessionKey);
+        final ProcessMemberRequest logoutRequest = prepareLogoutRequest(loginResponse.getSession());
         final ProcessMemberResponse logoutResponse = bean.processMember(logoutRequest);
         assertEquals(ReturnCode.SUCCESS.getCode(), logoutResponse.getReturnCode());
     }
 
     @Test
     void testLogoutMissingSession() {
-        final String sessionKey = UUID.randomUUID().toString();
         final ManagementBean bean = prepareManagementBean();
-        final ProcessMemberRequest request = prepareLogoutRequest(sessionKey);
+        final ProcessMemberRequest request = prepareLogoutRequest(generateData(32));
 
         final ProcessMemberResponse response = bean.processMember(request);
         assertEquals(ReturnCode.AUTHENTICATION_WARNING.getCode(), response.getReturnCode());
         assertEquals("No Session could be found.", response.getReturnMessage());
     }
 
+    /**
+     * Requests with a Session don't run PBKDF2 (PLAN.md, Crypto §2a), only the
+     * login with the passphrase does.
+     */
     @Test
+    void testSessionRequestsRunNoPbkdf2() {
+        final ManagementBean bean = prepareManagementBean();
+        final long beforeLogin = Crypto.passwordKeyDerivations();
+        final ProcessMemberResponse loginResponse = bean.processMember(prepareLoginRequest(MEMBER_1));
+        assertEquals(ReturnCode.SUCCESS.getCode(), loginResponse.getReturnCode());
+        assertEquals(beforeLogin + 1, Crypto.passwordKeyDerivations());
+
+        final long beforeRequests = Crypto.passwordKeyDerivations();
+        for (int i = 0; i < 3; i++) {
+            final FetchMemberResponse response = bean.fetchMembers(prepareSessionRequest(FetchMemberRequest.class, loginResponse.getSession()));
+            assertTrue(response.isOk(), response.getReturnMessage());
+        }
+        assertEquals(beforeRequests, Crypto.passwordKeyDerivations());
+    }
+
+    @Test
+    void testSessionTokenIsOnlyStoredAsKeyedHash() {
+        final ManagementBean bean = prepareManagementBean();
+        final ProcessMemberResponse loginResponse = bean.processMember(prepareLoginRequest(MEMBER_1));
+        final byte[] token = loginResponse.getSession();
+        assertEquals(32, token.length);
+
+        final SessionEntity entity = dao.findSessionByChecksum(crypto.hmacWithMasterKey("eds/session/lookup", token));
+        final String armoredToken = Base64.getEncoder().encodeToString(token);
+        assertNotNull(entity);
+        assertEquals(MEMBER_1, entity.getMember().getName());
+        assertNotEquals(armoredToken, entity.getChecksum());
+        assertFalse(entity.getCrypto().contains(armoredToken));
+    }
+
+    @Test
+    void testUnknownSessionIsRejected() {
+        final ManagementBean bean = prepareManagementBean();
+        final FetchMemberResponse response = bean.fetchMembers(prepareSessionRequest(FetchMemberRequest.class, generateData(32)));
+        assertEquals(ReturnCode.AUTHENTICATION_WARNING.getCode(), response.getReturnCode());
+        assertEquals("No Session could be found.", response.getReturnMessage());
+    }
+
+    @Test
+    void testPasswordChangeEndsSession() {
+        final ManagementBean bean = prepareManagementBean();
+        final ProcessMemberResponse loginResponse = bean.processMember(prepareLoginRequest(MEMBER_1));
+        assertTrue(loginResponse.isOk());
+
+        final ProcessMemberRequest update = prepareRequest(ProcessMemberRequest.class, MEMBER_1);
+        update.setAction(Action.UPDATE);
+        update.setNewCredential(crypto.stringToBytes(NEW_PASSPHRASE));
+        assertTrue(bean.processMember(update).isOk());
+
+        final FetchMemberResponse response = bean.fetchMembers(prepareSessionRequest(FetchMemberRequest.class, loginResponse.getSession()));
+        assertEquals(ReturnCode.AUTHENTICATION_WARNING.getCode(), response.getReturnCode());
+    }
+
+        @Test
     void testLogoutExpiredSession() {
         final Settings mySettings = newSettings();
         mySettings.set(StandardSetting.SESSION_TIMEOUT.getKey(), "-1");
-        final String sessionKey = UUID.randomUUID().toString();
 
         final ManagementBean bean = prepareManagementBean(mySettings);
-        final ProcessMemberRequest loginRequest = prepareLoginRequest(MEMBER_2, sessionKey);
+        final ProcessMemberRequest loginRequest = prepareLoginRequest(MEMBER_2);
         final ProcessMemberResponse loginResponse = bean.processMember(loginRequest);
         assertEquals(ReturnCode.SUCCESS.getCode(), loginResponse.getReturnCode());
 
-        final ProcessMemberRequest logoutRequest = prepareLogoutRequest(sessionKey);
+        final ProcessMemberRequest logoutRequest = prepareLogoutRequest(loginResponse.getSession());
         final ProcessMemberResponse logoutResponse = bean.processMember(logoutRequest);
         assertEquals(ReturnCode.AUTHENTICATION_WARNING.getCode(), logoutResponse.getReturnCode());
         assertEquals("The Session has expired.", logoutResponse.getReturnMessage());
@@ -664,9 +940,11 @@ final class ManagementBeanProcessMemberTest extends DatabaseSetup {
         request.setMemberId(ADMIN_ID);
         request.setMemberRole(MemberRole.STANDARD);
 
+        // Only the first System Administrator changes roles, so another
+        // administrator is refused before it comes to whose role it is.
         final ProcessMemberResponse response = bean.processMember(request);
-        assertEquals(ReturnCode.ILLEGAL_ACTION.getCode(), response.getReturnCode());
-        assertEquals("The role of the System Administrator Account may not be altered.", response.getReturnMessage());
+        assertEquals(ReturnCode.AUTHORIZATION_WARNING.getCode(), response.getReturnCode());
+        assertEquals("Only the first System Administrator may make, unmake or delete administrators.", response.getReturnMessage());
         assertEquals(MemberRole.ADMIN, dao.findMemberByName(Constants.ADMIN_ACCOUNT).getMemberRole());
     }
 
@@ -677,10 +955,44 @@ final class ManagementBeanProcessMemberTest extends DatabaseSetup {
         request.setAction(Action.UPDATE);
         request.setNewAccountName("root");
 
+        // The System Administrator is known by being the first account of
+        // the stone, not by a name, and may change its name as others do.
         final ProcessMemberResponse response = bean.processMember(request);
-        assertEquals(ReturnCode.ILLEGAL_ACTION.getCode(), response.getReturnCode());
-        assertEquals("The System Administrator Account may not be renamed.", response.getReturnMessage());
-        assertNotNull(dao.findMemberByName(Constants.ADMIN_ACCOUNT));
+        assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode(), response.getReturnMessage());
+        assertNull(dao.findMemberByName(Constants.ADMIN_ACCOUNT));
+        assertEquals(MemberRole.ADMIN, dao.findMemberByName("root").getMemberRole());
+        assertEquals(ADMIN_ID, dao.findMemberByName("root").getExternalId());
+    }
+
+    /**
+     * With another name it is still the System Administrator: the first
+     * account of the stone, which another administrator can neither take
+     * the role from nor delete.
+     */
+    @Test
+    void testRenamedSystemAdministratorIsStillProtected() {
+        final ManagementBean bean = prepareManagementBean();
+        final String otherAdmin = createAdministrator(bean);
+        final ProcessMemberRequest rename = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
+        rename.setAction(Action.UPDATE);
+        rename.setNewAccountName("root");
+        assertTrue(bean.processMember(rename).isOk());
+
+        final ProcessMemberRequest alter = prepareRequest(ProcessMemberRequest.class, otherAdmin);
+        alter.setAction(Action.ALTER);
+        alter.setMemberId(ADMIN_ID);
+        alter.setMemberRole(MemberRole.STANDARD);
+        final ProcessMemberResponse altered = bean.processMember(alter);
+        assertEquals(ReturnCode.AUTHORIZATION_WARNING.getCode(), altered.getReturnCode());
+        assertEquals("Only the first System Administrator may make, unmake or delete administrators.", altered.getReturnMessage());
+
+        final ProcessMemberRequest delete = prepareRequest(ProcessMemberRequest.class, otherAdmin);
+        delete.setAction(Action.DELETE);
+        delete.setMemberId(ADMIN_ID);
+        final ProcessMemberResponse deleted = bean.processMember(delete);
+        assertEquals(ReturnCode.ILLEGAL_ACTION.getCode(), deleted.getReturnCode());
+        assertEquals("The System Administrator Account may not be deleted.", deleted.getReturnMessage());
+        assertEquals(MemberRole.ADMIN, dao.findMemberByName("root").getMemberRole());
     }
 
     @Test
@@ -690,9 +1002,11 @@ final class ManagementBeanProcessMemberTest extends DatabaseSetup {
         request.setAction(Action.UPDATE);
         request.setNewAccountName("ADMIN");
 
+        // No name is reserved; this one is taken, as the System
+        // Administrator of the tests has it.
         final ProcessMemberResponse response = bean.processMember(request);
-        assertEquals(ReturnCode.ILLEGAL_ACTION.getCode(), response.getReturnCode());
-        assertEquals("The Account Name 'admin' is reserved for the System Administrator.", response.getReturnMessage());
+        assertEquals(ReturnCode.CONSTRAINT_ERROR.getCode(), response.getReturnCode());
+        assertEquals("The new Account Name already exists.", response.getReturnMessage());
         assertNotNull(dao.findMemberByName(MEMBER_1));
     }
 
@@ -700,7 +1014,7 @@ final class ManagementBeanProcessMemberTest extends DatabaseSetup {
     // Entropy Verification of new Credentials
     // =========================================================================
 
-    private static final String WEAK_CREDENTIAL_MESSAGE = "The Credential is too weak. It must have at least 15 characters and must not be easy to guess.";
+    private static final String WEAK_CREDENTIAL_MESSAGE = "The Credential is too weak. Use at least 20 random characters (letters, digits and symbols), or a passphrase of several random words.";
 
     @Test
     void testCreateMemberWithWeakCredential() {
@@ -764,14 +1078,14 @@ final class ManagementBeanProcessMemberTest extends DatabaseSetup {
         final ProcessMemberRequest invitationRequest = new ProcessMemberRequest();
         invitationRequest.setAccountName(account);
         invitationRequest.setAction(Action.UPDATE);
-        invitationRequest.setCredentialType(CredentialType.SIGNATURE);
-        invitationRequest.setCredential(response.getSignature());
+        invitationRequest.setCredentialType(CredentialType.INVITATION);
+        invitationRequest.setCredential(response.getInvitation());
         invitationRequest.setNewCredential(crypto.stringToBytes("weak invitee"));
 
         final ProcessMemberResponse invitationResponse = bean.processMember(invitationRequest);
         assertEquals(ReturnCode.VERIFICATION_WARNING.getCode(), invitationResponse.getReturnCode());
         assertEquals(WEAK_CREDENTIAL_MESSAGE, invitationResponse.getReturnMessage());
-        assertEquals(CredentialType.SIGNATURE.name(), dao.findMemberByName(account).getPrivateKey());
+        assertEquals("INVITATION", dao.findMemberByName(account).getPrivateKey());
     }
 
     @Test
@@ -806,17 +1120,16 @@ final class ManagementBeanProcessMemberTest extends DatabaseSetup {
         return account;
     }
 
-    private ProcessMemberRequest prepareLoginRequest(final String accountName, final String sessionKey) {
+    private static ProcessMemberRequest prepareLoginRequest(final String accountName) {
         final ProcessMemberRequest request = prepareRequest(ProcessMemberRequest.class, accountName);
-        request.setNewCredential(crypto.stringToBytes(sessionKey));
         request.setAction(Action.LOGIN);
 
         return request;
     }
 
-    private ProcessMemberRequest prepareLogoutRequest(final String sessionKey) {
+    private static ProcessMemberRequest prepareLogoutRequest(final byte[] session) {
         final ProcessMemberRequest request = new ProcessMemberRequest();
-        request.setCredential(crypto.stringToBytes(sessionKey));
+        request.setCredential(Arrays.copyOf(session, session.length));
         request.setCredentialType(CredentialType.SESSION);
         request.setAction(Action.LOGOUT);
 

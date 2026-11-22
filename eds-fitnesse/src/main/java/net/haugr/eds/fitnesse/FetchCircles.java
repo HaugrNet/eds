@@ -16,9 +16,9 @@
  */
 package net.haugr.eds.fitnesse;
 
-import net.haugr.eds.api.dtos.Circle;
-import net.haugr.eds.api.requests.FetchCircleRequest;
-import net.haugr.eds.api.responses.FetchCircleResponse;
+import net.haugr.eds.client.model.Circle;
+import net.haugr.eds.client.model.FetchCircleRequest;
+import net.haugr.eds.client.model.FetchCircleResponse;
 import java.util.List;
 import net.haugr.eds.fitnesse.callers.CallManagement;
 

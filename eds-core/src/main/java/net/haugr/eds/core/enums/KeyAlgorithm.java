@@ -16,95 +16,38 @@
  */
 package net.haugr.eds.core.enums;
 
-import static net.haugr.eds.api.common.Constants.SUN_EC;
 import static net.haugr.eds.api.common.Constants.SUN_JCE;
 
 /**
- * <p>The core part for all cryptographic operations is the Algorithms used for
- * the various cryptographic operations. EDS uses a mixture of Synchronous (AES)
- * and Asynchronous (RSA) Algorithms.</p>
+ * <p>The Algorithms EDS uses (PLAN.md, Crypto, "Algorithm baseline"). The set is
+ * deliberately small, so it meets BSI TR-02102, ANSSI and NSA CNSA 2.0 at the
+ * same time:</p>
+ * <ul>
+ *   <li><b>AES_GCM_256</b> - symmetric encryption of keys and data.</li>
+ *   <li><b>PBE_GCM_256</b> - PBKDF2-HMAC-SHA512 for Member passphrases, the
+ *   derived key is used with AES-256-GCM.</li>
+ *   <li><b>MLKEM1024_P384</b> - the Member keys, hybrid key encapsulation with
+ *   ML-KEM-1024 and ECDH P-384.</li>
+ * </ul>
  *
- * <p>The Java Cryptographic Extension (JCE) defines a number of Algorithms
- * which any provider must support. Rather than allowing all of them, the EDS
- * is limiting them to two Algorithms, AES (Symmetric) and RSA (Asymmetric)
- * Cryptography. From the official list (see below), the Algorithms also require
- * a Block Cipher Mode, either ECB (Electronic CodeBook) or Cipher Block
- * Chaining (CBC). Padding is also a requirement, where the choices are between
- * NoPadding (require exact length) or PKCS1Padding/PKCS5Padding (default).</p>
- *
- * <p>The official list of Algorithms that Providers must support as a minimum
- * is <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/javax/crypto/Cipher.html">here</a>:</p>
- * <ol>
- *   <li>AES/CBC/NoPadding (128)</li>
- *   <li>AES/CBC/PKCS5Padding (128)</li>
- *   <li>AES/ECB/NoPadding (128)</li>
- *   <li>AES/ECB/PKCS5Padding (128)</li>
- *   <li>DES/CBC/NoPadding (56)</li>
- *   <li>DES/CBC/PKCS5Padding (56)</li>
- *   <li>DES/ECB/NoPadding (56)</li>
- *   <li>DES/ECB/PKCS5Padding (56)</li>
- *   <li>DESede/CBC/NoPadding (168)</li>
- *   <li>DESede/CBC/PKCS5Padding (168)</li>
- *   <li>DESede/ECB/NoPadding (168)</li>
- *   <li>DESede/ECB/PKCS5Padding (168)</li>
- *   <li>RSA/ECB/PKCS1Padding (1024, 2048)</li>
- *   <li>RSA/ECB/OAEPWithSHA-1AndMGF1Padding (1024, 2048)</li>
- *   <li>RSA/ECB/OAEPWithSHA-256AndMGF1Padding (1024, 2048)</li>
- * </ol>
- *
- * <p>To limit the choices, EDS is simply focusing on 2 Algorithms only and only
- * allow the KeySize to be optional. This enum is listing those - however, not
- * all the Algorithms are available unless the JCE Unlimited Strength
- * Jurisdiction Policy Files are added. However, as of Java 8u162 and Java 9,
- * it is <a href="https://bugs.openjdk.java.net/browse/JDK-8170157">enabled by
- * default</a>.</p>
- *
- * <p>EDS not only uses symmetric and asymmetric encryption. Also, password-based
- * encryption, or PBE, is used to convert member provided passphrases into a
- * SecretKey, which can be used to unlock the Account.</p>
- *
- * <p>The listing below also refers to a derived algorithm. This is used for the
- * Password Based Encryption algorithms, as they need one algorithm to create
- * the Key, but once created, they have to be used with a different algorithm.
- * Otherwise, there will be problems with them.</p>
+ * <p>The derived algorithm is used for the Password Based Encryption
+ * algorithm, as it needs one algorithm to create the Key, and another to use
+ * it.</p>
  *
  * @author Kim Jensen
  * @since EDS 1.0
  */
 public enum KeyAlgorithm {
 
-    // Signature Algorithms
-    SHA_256(Type.SIGNATURE, "RSA", Transformation.SIG256, 256, SUN_JCE, null),
-    SHA_512(Type.SIGNATURE, "RSA", Transformation.SIG512, 512, SUN_JCE, null),
-
-    // Symmetric Algorithms
-    // The AES CBC variant is not considered safe, and are pending
-    // removal. However, removal requires that existing data can be
-    // migrated to different Algorithms, again requiring the re-key
-    // (#43) feature.
-    AES_CBC_128(Type.SYMMETRIC, "AES", Transformation.AES_CBC, 128, SUN_JCE, null),
-    AES_CBC_192(Type.SYMMETRIC, "AES", Transformation.AES_CBC, 192, SUN_JCE, null),
-    AES_CBC_256(Type.SYMMETRIC, "AES", Transformation.AES_CBC, 256, SUN_JCE, null),
-    // Current Production Algorithm
-    AES_GCM_128(Type.SYMMETRIC, "AES", Transformation.AES_GCM_128, 128, SUN_JCE, null),
-    AES_GCM_192(Type.SYMMETRIC, "AES", Transformation.AES_GCM_192, 192, SUN_JCE, null),
+    // Symmetric Algorithms; only AES-256-GCM remains (CNSA 2.0 / BSI TR-02102).
     AES_GCM_256(Type.SYMMETRIC, "AES", Transformation.AES_GCM_256, 256, SUN_JCE, null),
 
     // Password Based Encryption (PBE) Algorithms
-    PBE_CBC_128(Type.PASSWORD, "AES", Transformation.PBE, 128, SUN_JCE, AES_CBC_128),
-    PBE_CBC_192(Type.PASSWORD, "AES", Transformation.PBE, 192, SUN_JCE, AES_CBC_192),
-    PBE_CBC_256(Type.PASSWORD, "AES", Transformation.PBE, 256, SUN_JCE, AES_CBC_256),
-    PBE_GCM_128(Type.PASSWORD, "AES", Transformation.PBE, 128, SUN_JCE, AES_GCM_128),
-    PBE_GCM_192(Type.PASSWORD, "AES", Transformation.PBE, 192, SUN_JCE, AES_GCM_192),
     PBE_GCM_256(Type.PASSWORD, "AES", Transformation.PBE, 256, SUN_JCE, AES_GCM_256),
 
-    // Asymmetric Algorithms
-    RSA_2048(Type.ASYMMETRIC, "RSA", Transformation.RSA, 2048, SUN_JCE, null),
-    RSA_4096(Type.ASYMMETRIC, "RSA", Transformation.RSA, 4096, SUN_JCE, null),
-    RSA_8192(Type.ASYMMETRIC, "RSA", Transformation.RSA, 8192, SUN_JCE, null),
-    // Elliptic Curves (See: https://openjdk.java.net/jeps/324)
-    X25519(Type.ASYMMETRIC, "", Transformation.RSA, 123, SUN_EC, null),
-    X448(Type.ASYMMETRIC, "", Transformation.RSA, 123, SUN_EC, null);
+    // Asymmetric Algorithms; the Member keys are a hybrid of ML-KEM-1024 and
+    // ECDH P-384, see HybridKem (PLAN.md, Crypto §2 and §3).
+    MLKEM1024_P384(Type.ASYMMETRIC, "ML-KEM-1024+P-384", Transformation.HYBRID_KEM, 1024, SUN_JCE, null);
 
     /**
      * The Algorithm Type, i.e., how it should be used.
@@ -112,7 +55,6 @@ public enum KeyAlgorithm {
     public enum Type {
         SYMMETRIC,
         ASYMMETRIC,
-        SIGNATURE,
         PASSWORD
     }
 
@@ -120,15 +62,9 @@ public enum KeyAlgorithm {
      * Transformation Algorithms, i.e., mapping to the internal JCE algorithms.
      */
     public enum Transformation {
-        SIG256("SHA256WithRSA"),
-        SIG512("SHA512WithRSA"),
-        PBE("PBKDF2WithHmacSHA256"),
-        // This Transformation is no longer recommended
-        AES_CBC("AES/CBC/PKCS5Padding"),
-        AES_GCM_128("AES_128/GCM/NoPadding"),
-        AES_GCM_192("AES_192/GCM/NoPadding"),
+        PBE("PBKDF2WithHmacSHA512"),
         AES_GCM_256("AES_256/GCM/NoPadding"),
-        RSA("RSA/ECB/PKCS1Padding");
+        HYBRID_KEM("ML-KEM-1024/ECDH-P384/HKDF-SHA512/AES-256-GCM");
 
         private final String value;
 

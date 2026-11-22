@@ -35,6 +35,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import net.haugr.eds.core.exceptions.CryptoException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <p>Estimates the entropy of a secret and verifies that it meets the EDS
@@ -103,6 +105,8 @@ import net.haugr.eds.core.exceptions.CryptoException;
  * @since EDS 2.0
  */
 public final class EntropyVerifier {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(EntropyVerifier.class);
 
     /** Minimum number of symbols, following NIST SP 800-63B. */
     public static final int MINIMUM_LENGTH = 15;
@@ -295,13 +299,13 @@ public final class EntropyVerifier {
                 addSequences(cost, original, i, literalBits);
                 if (!binary) {
                     addKeyboardPatterns(cost, lowered, i);
-                    addWords(cost, original, lowered, normalized, i, words, dictionaryBits, 0.0);
-                    addWords(cost, original, lowered, normalized, i, reversedWords, dictionaryBits, REVERSED_BITS);
-                    addWords(cost, original, lowered, normalized, i, context, dictionaryBits, 0.0);
+                    addWords(cost, original, lowered, normalized, i, words, dictionaryBits);
+                    addWords(cost, original, lowered, normalized, i, reversedWords, dictionaryBits + REVERSED_BITS);
+                    addWords(cost, original, lowered, normalized, i, context, dictionaryBits);
                 }
             }
 
-            final EnumSet<Violation> violations = EnumSet.noneOf(Violation.class);
+            final Set<Violation> violations = EnumSet.noneOf(Violation.class);
             if (all.length < MINIMUM_LENGTH) {
                 violations.add(Violation.TOO_SHORT);
             }
@@ -383,17 +387,18 @@ public final class EntropyVerifier {
     }
 
     /**
-     * A dictionary word costs the choice of word, plus its capitalisation,
-     * the use of leetspeak and the direction.
+     * A dictionary word costs the choice of word (with the direction, when
+     * it is read backwards: the word bits), plus its capitalisation and the
+     * use of leetspeak.
      */
     private static void addWords(final double[] cost, final int[] original, final int[] lowered, final int[] normalized,
-                                 final int i, final Trie trie, final double dictionaryBits, final double extraBits) {
+                                 final int i, final Trie trie, final double wordBits) {
         Trie.Node node = trie.root;
         for (int k = i; k < normalized.length && node != null; k++) {
             node = node.children.get(normalized[k]);
             if (node != null && node.terminal) {
                 final int len = k - i + 1;
-                final double bits = dictionaryBits + extraBits
+                final double bits = wordBits
                         + caseBits(original, i, len)
                         + leetBits(lowered, normalized, i, len);
                 relax(cost, i, len, bits);
@@ -482,6 +487,9 @@ public final class EntropyVerifier {
      * Decodes the secret as strict UTF-8. Returns null if the secret is not
      * valid UTF-8 or contains control characters, i.e. if it is binary.
      */
+    // Null tells that the secret is binary, not text; an empty array would
+    // be the text of an empty secret.
+    @SuppressWarnings("java:S1168")
     private static int[] decodeText(final byte[] secret) {
         final CharsetDecoder decoder = StandardCharsets.UTF_8.newDecoder()
                 .onMalformedInput(CodingErrorAction.REPORT)
@@ -500,6 +508,8 @@ public final class EntropyVerifier {
 
             return codePoints;
         } catch (CharacterCodingException e) {
+            // No UTF-8, so the secret is binary; the message holds no part of it.
+            LOGGER.trace("The secret is checked as binary, as it is no UTF-8.", e);
             return null;
         } finally {
             if (chars != null && chars.hasArray()) {
@@ -634,7 +644,7 @@ public final class EntropyVerifier {
         private boolean add(final int[] word) {
             Node node = root;
             for (final int cp : word) {
-                node = node.children.computeIfAbsent(cp, key -> new Node());
+                node = node.children.computeIfAbsent(cp, _ -> new Node());
             }
 
             final boolean added = !node.terminal;

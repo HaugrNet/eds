@@ -29,8 +29,6 @@ import javax.crypto.SecretKey;
  */
 public final class SecretEDSKey extends AbstractEDSKey<SecretKey> {
 
-    private IVSalt salt = null;
-
     /**
      * Default Constructor.
      *
@@ -39,14 +37,6 @@ public final class SecretEDSKey extends AbstractEDSKey<SecretKey> {
      */
     public SecretEDSKey(final KeyAlgorithm algorithm, final SecretKey key) {
         super(algorithm, key);
-    }
-
-    public void setSalt(final IVSalt salt) {
-        this.salt = salt;
-    }
-
-    public IVSalt getSalt() {
-        return salt;
     }
 
     /**

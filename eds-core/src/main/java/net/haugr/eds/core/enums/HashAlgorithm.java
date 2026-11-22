@@ -24,7 +24,6 @@ package net.haugr.eds.core.enums;
  */
 public enum HashAlgorithm {
 
-    SHA_256("SHA-256"),
     SHA_384("SHA-384"),
     SHA_512("SHA-512");
 

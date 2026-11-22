@@ -18,32 +18,25 @@ package net.haugr.eds.core.jce;
 
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
-import java.security.Key;
-import java.security.KeyFactory;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.security.Signature;
-import java.security.SignatureException;
-import java.security.spec.AlgorithmParameterSpec;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
-import java.security.spec.PKCS8EncodedKeySpec;
-import java.security.spec.X509EncodedKeySpec;
+import java.util.Arrays;
 import java.util.Base64;
+import java.util.concurrent.atomic.LongAdder;
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.KDF;
 import javax.crypto.KeyGenerator;
+import javax.crypto.Mac;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.GCMParameterSpec;
-import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.HKDFParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 import net.haugr.eds.api.common.Constants;
@@ -79,11 +72,19 @@ import net.haugr.eds.core.model.Settings;
  */
 public final class Crypto {
 
+    private static final String HMAC_ALGORITHM = "HmacSHA512";
+    private static final String HKDF_ALGORITHM = "HKDF-SHA512";
+    private static final int DERIVED_KEY_BYTES = 32;
+    // Counts the PBKDF2 derivations, so tests can prove that requests with a
+    // Session don't run PBKDF2 (PLAN.md, C3).
+    private static final LongAdder PASSWORD_KEY_DERIVATIONS = new LongAdder();
+    private static final byte LABEL_SEPARATOR = 0;
+
     private final MasterKey masterKey;
     private final Settings settings;
 
     public Crypto(final Settings settings) {
-        masterKey = MasterKey.getInstance(settings);
+        masterKey = MasterKey.getInstance();
         this.settings = settings;
     }
 
@@ -101,50 +102,52 @@ public final class Crypto {
      *
      * @param algorithm PBE Algorithm to generate Account Symmetric Key
      * @param secret    Provided Passphrase or Secret
-     * @param salt      System-specific Salt
+     * @param salt       Member-specific random Salt
+     * @param iterations PBKDF2 iterations: those of the Member's account, or
+     *                   the current setting for a new passphrase
      * @return Symmetric Key
      * @throws CryptoException if an error occurred
      */
-    public SecretEDSKey generatePasswordKey(final KeyAlgorithm algorithm, final byte[] secret, final String salt) {
+    // Part of the instance API of Crypto, which every caller holds; made
+    // static, each call through an instance would be a finding instead.
+    @SuppressWarnings("java:S2325")
+    public SecretEDSKey generatePasswordKey(final KeyAlgorithm algorithm, final byte[] secret, final byte[] salt, final int iterations) {
         try {
-            final char[] extendedSecret = convertSecret(secret);
-            final byte[] secretSalt = stringToBytes(salt);
+            PASSWORD_KEY_DERIVATIONS.increment();
+            final char[] extendedSecret = generateSecretChars(secret);
 
             final SecretKeyFactory factory = SecretKeyFactory.getInstance(algorithm.getTransformationValue());
-            final KeySpec spec = new PBEKeySpec(extendedSecret, secretSalt, settings.getPasswordIterations(), algorithm.getLength());
+            final KeySpec spec = new PBEKeySpec(extendedSecret, salt, iterations, algorithm.getLength());
+            Arrays.fill(extendedSecret, (char) 0);
             final SecretKey tmpKey = factory.generateSecret(spec);
             final SecretKey secretKey = new SecretKeySpec(tmpKey.getEncoded(), algorithm.getName());
-            final SecretEDSKey key = new SecretEDSKey(algorithm.getDerived(), secretKey);
-            key.setSalt(new IVSalt(salt));
 
-            return key;
+            return new SecretEDSKey(algorithm.getDerived(), secretKey);
         } catch (IllegalArgumentException | NoSuchAlgorithmException | InvalidKeySpecException e) {
             throw new CryptoException(e.getMessage(), e);
         }
     }
 
     /**
-     * <p>Converting the given secret (byte array) into a char array with the
-     * salt from the system appended without using the String Object is not
-     * trivial.</p>
-     *
-     * <p>From <a href="https://stackoverflow.com/a/9855338">Stackoverflow</a>,
-     * it is clear that the solution can be complex, but as all which is needed
-     * here is a way to convert the bytes to chars so a Key can be generated, a
-     * simpler conversion may be enough.</p>
-     *
-     * @param secret Provided Passphrase or Secret
-     * @return Extended secret as a char array
+     * The secret as chars for PBKDF2, one char per byte, without going over a
+     * String, which couldn't be wiped afterwards.
      */
-    private char[] convertSecret(final byte[] secret) {
-        final char[] secretChars = MasterKey.generateSecretChars(secret);
-        final char[] salt = settings.getSalt().toCharArray();
-        final char[] chars = new char[secretChars.length + salt.length];
-
-        System.arraycopy(secretChars, 0, chars, 0, secretChars.length);
-        System.arraycopy(salt, 0, chars, secretChars.length, salt.length);
+    private static char[] generateSecretChars(final byte[] secret) {
+        final char[] chars = new char[secret.length];
+        for (int i = 0; i < secret.length; i++) {
+            chars[i] = (char) secret[i];
+        }
 
         return chars;
+    }
+
+    /**
+     * Returns the number of PBKDF2 derivations made since the start.
+     *
+     * @return Number of PBKDF2 derivations
+     */
+    public static long passwordKeyDerivations() {
+        return PASSWORD_KEY_DERIVATIONS.sum();
     }
 
     public static SecretEDSKey generateSymmetricKey(final KeyAlgorithm algorithm) {
@@ -155,18 +158,6 @@ public final class Crypto {
 
             return new SecretEDSKey(algorithm, key);
         } catch (IllegalArgumentException | NoSuchAlgorithmException | NoSuchProviderException e) {
-            throw new CryptoException(e.getMessage(), e);
-        }
-    }
-
-    public static EDSKeyPair generateAsymmetricKey(final KeyAlgorithm algorithm) {
-        try {
-            final KeyPairGenerator generator = KeyPairGenerator.getInstance(algorithm.getName());
-            generator.initialize(algorithm.getLength());
-            final KeyPair keyPair = generator.generateKeyPair();
-
-            return new EDSKeyPair(algorithm, keyPair);
-        } catch (IllegalArgumentException | NoSuchAlgorithmException e) {
             throw new CryptoException(e.getMessage(), e);
         }
     }
@@ -183,230 +174,294 @@ public final class Crypto {
     }
 
     // =========================================================================
-    // Standard Cryptographic Operations; Sign, Verify, Encrypt & Decrypt
+    // Standard Cryptographic Operations; HMAC, Encrypt & Decrypt
     // =========================================================================
 
-    public byte[] sign(final PrivateKey key, final byte[] message) {
-        try {
-            final Signature signer = Signature.getInstance(settings.getSignatureAlgorithm().getTransformationValue());
-            signer.initSign(key);
-            signer.update(message);
+    /**
+     * <p>Generates a keyed lookup token, HMAC-SHA512, for the given value.
+     * The HMAC key is the MasterKey's {@value MasterKey#HMAC_LABEL} subkey,
+     * and the label separates the purposes, so a token for one purpose can't
+     * be used for another. Used for values which must be found again, but not
+     * be readable from the database, such as invitation tokens and sessions.</p>
+     *
+     * <p>As the key is derived from the MasterKey, all tokens become void if
+     * the MasterKey changes.</p>
+     *
+     * @param label Purpose of the token, e.g. "eds/invitation"
+     * @param value The value to generate the token for
+     * @return Base64 encoded HMAC-SHA512 of label and value
+     */
+    public String hmacWithMasterKey(final String label, final byte[] value) {
+        return Base64.getEncoder().encodeToString(hmacBytesWithMasterKey(label, value));
+    }
 
-            return signer.sign();
-        } catch (NoSuchAlgorithmException | SignatureException | InvalidKeyException e) {
+    /**
+     * Same as {@link #hmacWithMasterKey(String, byte[])}, returning the raw
+     * HMAC bytes.
+     *
+     * @param label Purpose of the token
+     * @param value The value to generate the token for
+     * @return HMAC-SHA512 of label and value
+     */
+    public byte[] hmacBytesWithMasterKey(final String label, final byte[] value) {
+        try {
+            final Mac mac = Mac.getInstance(HMAC_ALGORITHM);
+            mac.init(new SecretKeySpec(masterKey.getHmacKey(), HMAC_ALGORITHM));
+            mac.update(stringToBytes(label));
+            mac.update(LABEL_SEPARATOR);
+
+            return mac.doFinal(value);
+        } catch (NoSuchAlgorithmException | InvalidKeyException e) {
             throw new CryptoException(e.getMessage(), e);
         }
     }
 
-    public boolean verify(final PublicKey key, final byte[] message, final byte[] signature) {
-        try {
-            final Signature verifier = Signature.getInstance(settings.getSignatureAlgorithm().getTransformationValue());
-            verifier.initVerify(key);
-            verifier.update(message);
+    /**
+     * <p>Encrypts the value with the MasterKey wrap key, using a random nonce
+     * and the given AAD extended with the MasterKey version. Two encryptions
+     * of the same value never give the same result.</p>
+     *
+     * @param aad   Additional authenticated data, binding the value to its use
+     * @param value The value to protect
+     * @return Base64 encoded nonce and ciphertext
+     */
+    public String sealWithMasterKey(final String aad, final byte[] value) {
+        final MasterKey.Installed current = masterKey.current();
+        final byte[] sealed = seal(current.material().wrapKey(), masterKeyAad(aad, current.version()), value);
+        return Base64.getEncoder().encodeToString(sealed);
+    }
 
-            return verifier.verify(signature);
-        } catch (NoSuchAlgorithmException | SignatureException | InvalidKeyException | IllegalArgumentException e) {
+    /**
+     * Reverses {@link #sealWithMasterKey(String, byte[])}. Fails if the AAD,
+     * the MasterKey or its version differ.
+     *
+     * @param aad    Additional authenticated data, as given when sealing
+     * @param sealed Base64 encoded nonce and ciphertext
+     * @return The protected value
+     */
+    public byte[] openWithMasterKey(final String aad, final String sealed) {
+        try {
+            final MasterKey.Installed current = masterKey.current();
+            return open(current.material().wrapKey(), masterKeyAad(aad, current.version()), Base64.getDecoder().decode(sealed));
+        } catch (IllegalArgumentException e) {
             throw new CryptoException(e.getMessage(), e);
         }
     }
 
-    public byte[] encryptWithMasterKey(final byte[] toEncrypt) {
-        return encrypt(masterKey.getKey(), toEncrypt);
+    /**
+     * Re-wraps a value from the current MasterKey to a new one, for a
+     * MasterKey rotation (PLAN.md, Crypto §1). The value itself is not exposed.
+     *
+     * @param aad        AAD of the value
+     * @param sealed     Value, sealed with the current MasterKey
+     * @param newKey     The new MasterKey
+     * @param newVersion The version of the new MasterKey
+     * @return The value, sealed with the new MasterKey
+     */
+    public String rewrapWithMasterKey(final String aad, final String sealed, final MasterKey.Material newKey, final int newVersion) {
+        final byte[] value = openWithMasterKey(aad, sealed);
+        final byte[] resealed = seal(newKey.wrapKey(), masterKeyAad(aad, newVersion), value);
+        Arrays.fill(value, (byte) 0);
+
+        return Base64.getEncoder().encodeToString(resealed);
     }
 
-    public String encryptWithMasterKey(final String toEncrypt) {
-        final byte[] bytes = stringToBytes(toEncrypt);
-        final byte[] encrypted = encryptWithMasterKey(bytes);
-        return Base64.getEncoder().encodeToString(encrypted);
+    private byte[] masterKeyAad(final String aad, final int version) {
+        return stringToBytes(aad + "|mk" + version + '|' + KeyAlgorithm.AES_GCM_256.name());
     }
 
-    public String decryptWithMasterKey(final String toDecrypt) {
-        final byte[] encrypted = Base64.getDecoder().decode(toDecrypt);
-        final byte[] decrypted = decrypt(masterKey.getKey(), encrypted);
-        return bytesToString(decrypted);
-    }
-
-    public static byte[] encrypt(final SecretEDSKey key, final byte[] toEncrypt) {
+    /**
+     * <p>AES-GCM encryption with an explicit nonce and AAD. The caller is
+     * responsible for never reusing a nonce with the same key.</p>
+     *
+     * @param key   Symmetric Key
+     * @param nonce 96-bit nonce
+     * @param aad   Additional authenticated data, may be empty
+     * @param plain Plaintext
+     * @return Ciphertext with the authentication tag appended
+     */
+    public static byte[] seal(final SecretEDSKey key, final Nonce nonce, final byte[] aad, final byte[] plain) {
         try {
-            final Cipher cipher = prepareCipher(key, Cipher.ENCRYPT_MODE);
-            return cipher.doFinal(toEncrypt);
+            final Cipher cipher = prepareGcmCipher(key, nonce, Cipher.ENCRYPT_MODE);
+            cipher.updateAAD(aad);
+            return cipher.doFinal(plain);
         } catch (BadPaddingException | IllegalBlockSizeException | NoSuchPaddingException | NoSuchAlgorithmException | InvalidAlgorithmParameterException | InvalidKeyException e) {
             throw new CryptoException(e.getMessage(), e);
         }
     }
 
-    public static byte[] encrypt(final PublicEDSKey key, final byte[] toEncrypt) {
+    /**
+     * Reverses {@link #seal(SecretEDSKey, Nonce, byte[], byte[])}, and
+     * verifies the authentication tag.
+     *
+     * @param key        Symmetric Key
+     * @param nonce      96-bit nonce, as used when sealing
+     * @param aad        Additional authenticated data, as used when sealing
+     * @param ciphertext Ciphertext with the authentication tag
+     * @return Plaintext
+     */
+    public static byte[] open(final SecretEDSKey key, final Nonce nonce, final byte[] aad, final byte[] ciphertext) {
         try {
-            final Cipher cipher = prepareCipher(key, Cipher.ENCRYPT_MODE);
-            return cipher.doFinal(toEncrypt);
-        } catch (ClassCastException | BadPaddingException | IllegalBlockSizeException | NoSuchPaddingException | NoSuchAlgorithmException | InvalidAlgorithmParameterException | InvalidKeyException e) {
-            throw new CryptoException(e.getMessage(), e);
-        }
-    }
-
-    public static byte[] decrypt(final SecretEDSKey key, final byte[] toDecrypt) {
-        try {
-            final Cipher cipher = prepareCipher(key, Cipher.DECRYPT_MODE);
-            return cipher.doFinal(toDecrypt);
+            final Cipher cipher = prepareGcmCipher(key, nonce, Cipher.DECRYPT_MODE);
+            cipher.updateAAD(aad);
+            return cipher.doFinal(ciphertext);
         } catch (BadPaddingException | IllegalBlockSizeException | NoSuchPaddingException | NoSuchAlgorithmException | InvalidAlgorithmParameterException | InvalidKeyException e) {
             throw new CryptoException(e.getMessage(), e);
         }
     }
 
-    public static byte[] decrypt(final PrivateEDSKey key, final byte[] toDecrypt) {
-        try {
-            final Cipher cipher = prepareCipher(key, Cipher.DECRYPT_MODE);
-            return cipher.doFinal(toDecrypt);
-        } catch (ClassCastException | BadPaddingException | IllegalBlockSizeException | NoSuchPaddingException | NoSuchAlgorithmException | InvalidAlgorithmParameterException | InvalidKeyException e) {
-            throw new CryptoException(e.getMessage(), e);
-        }
+    /**
+     * Seals with a random nonce, which is prepended to the result.
+     *
+     * @param key   Symmetric Key
+     * @param aad   Additional authenticated data
+     * @param plain Plaintext
+     * @return Nonce followed by ciphertext and tag
+     */
+    public static byte[] seal(final SecretEDSKey key, final byte[] aad, final byte[] plain) {
+        final Nonce nonce = Nonce.random();
+        final byte[] ciphertext = seal(key, nonce, aad, plain);
+        final byte[] result = new byte[Constants.GCM_NONCE_BYTES + ciphertext.length];
+        System.arraycopy(nonce.getBytes(), 0, result, 0, Constants.GCM_NONCE_BYTES);
+        System.arraycopy(ciphertext, 0, result, Constants.GCM_NONCE_BYTES, ciphertext.length);
+
+        return result;
     }
 
-    private static Cipher prepareCipher(final AbstractEDSKey<?> key, final int type) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException {
-        AlgorithmParameterSpec iv = null;
-        final String instanceName;
+    /**
+     * Reverses {@link #seal(SecretEDSKey, byte[], byte[])}.
+     *
+     * @param key    Symmetric Key
+     * @param aad    Additional authenticated data
+     * @param sealed Nonce followed by ciphertext and tag
+     * @return Plaintext
+     */
+    public static byte[] open(final SecretEDSKey key, final byte[] aad, final byte[] sealed) {
+        if ((sealed == null) || (sealed.length < Constants.GCM_NONCE_BYTES)) {
+            throw new CryptoException("The sealed value is too short.");
+        }
+        final Nonce nonce = Nonce.of(Arrays.copyOf(sealed, Constants.GCM_NONCE_BYTES));
+        final byte[] ciphertext = Arrays.copyOfRange(sealed, Constants.GCM_NONCE_BYTES, sealed.length);
 
-        if (key.getAlgorithm().getType() == KeyAlgorithm.Type.ASYMMETRIC) {
-            instanceName = key.getAlgorithm().getName();
-        } else if (key.getAlgorithm().getType() == KeyAlgorithm.Type.SYMMETRIC) {
-            final KeyAlgorithm algorithm = key.getAlgorithm();
-            instanceName = algorithm.getTransformationValue();
-            iv = switch (key.getAlgorithm().getTransformation()) {
-                case AES_CBC ->
-                    // SonarQube rule S3329 (http://localhost:9000/coding_rules?open=squid:S3329&rule_key=squid:S3329)
-                    // is marking this place as a vulnerability, as it cannot
-                    // tell that the salt is generated randomly using
-                    // SecureRandom, and also stored armored in the database.
-                    // As the same salt must be used for both encryption and
-                    // decryption - the rule is simply not good enough.
-                        new IvParameterSpec(((SecretEDSKey) key).getSalt().getBytes());
-                case AES_GCM_128, AES_GCM_192, AES_GCM_256 ->
-                        new GCMParameterSpec(Constants.GCM_IV_LENGTH, ((SecretEDSKey) key).getSalt().getBytes());
-                default ->
-                    // Unreachable Code by design, only 2 AES transformation
-                    // Algorithms exists, and they are both checked.
-                        throw new CryptoException("Cannot prepare Cipher for this Symmetric Algorithm " + key.getAlgorithm().getTransformation() + '.');
-            };
-        } else {
+        return open(key, nonce, aad, ciphertext);
+    }
+
+    private static Cipher prepareGcmCipher(final SecretEDSKey key, final Nonce nonce, final int mode)
+            throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException {
+        if (key.getAlgorithm().getType() != KeyAlgorithm.Type.SYMMETRIC) {
             throw new CryptoException("Cannot prepare Cipher for this Algorithm Type " + key.getAlgorithm().getType() + '.');
         }
 
-        final Cipher cipher;
-        cipher = Cipher.getInstance(instanceName);
-        cipher.init(type, key.getKey(), iv);
+        final Cipher cipher = Cipher.getInstance(key.getAlgorithm().getTransformationValue());
+        cipher.init(mode, key.getKey(), new GCMParameterSpec(Constants.GCM_TAG_BITS, nonce.getBytes()));
 
         return cipher;
     }
 
     // =========================================================================
-    // Key Protection, Encrypting & Armoring - De-armoring & Decrypting Keys
+    // Member Keys & Circle Keys
     // =========================================================================
 
     /**
-     * The Public RSA Key, stored in EDS, is simply saved in x.509 format, stored
-     * Base64 encoded.
+     * <p>Protects the Member's private keys with two layers (PLAN.md, Crypto §2):
+     * the inner layer with the given key (password key or session key), the
+     * outer layer with the MasterKey. Without the MasterKey, a copy of the
+     * database gives nothing to test password guesses against.</p>
      *
-     * @param key Public RSA key to armor (Base64 encoded x.509 Key)
-     * @return String representation of the Key
+     * @param innerKey Password or Session Key
+     * @param innerAad AAD of the inner layer
+     * @param outerAad AAD of the outer (MasterKey) layer
+     * @param keyPair  The Member's keys
+     * @return Armored, double wrapped private keys
      */
-    public static String armoringPublicKey(final Key key) {
-        final X509EncodedKeySpec keySpec = new X509EncodedKeySpec(key.getEncoded());
-        final byte[] rawKey = keySpec.getEncoded();
+    public String protectPrivateKeys(final SecretEDSKey innerKey, final byte[] innerAad, final String outerAad, final MemberKeyPair keyPair) {
+        final byte[] privateBytes = keyPair.privateBytes();
+        final byte[] inner = seal(innerKey, innerAad, privateBytes);
+        Arrays.fill(privateBytes, (byte) 0);
 
-        return Base64.getEncoder().encodeToString(rawKey);
+        return sealWithMasterKey(outerAad, inner);
     }
 
-    public PublicKey dearmoringPublicKey(final String armoredKey) {
-        try {
-            final KeyAlgorithm algorithm = settings.getAsymmetricAlgorithm();
-            final KeyFactory keyFactory = KeyFactory.getInstance(algorithm.getName());
-            final byte[] rawKey = Base64.getDecoder().decode(armoredKey);
-            final KeySpec x509KeySpec = new X509EncodedKeySpec(rawKey);
+    /**
+     * Reverses {@link #protectPrivateKeys(SecretEDSKey, byte[], String, MemberKeyPair)}.
+     *
+     * @param innerKey   Password or Session Key
+     * @param innerAad   AAD of the inner layer
+     * @param outerAad   AAD of the outer (MasterKey) layer
+     * @param publicKeys The Member's public keys
+     * @param protectedKeys Armored, double wrapped private keys
+     * @return The Member's keys
+     */
+    public MemberKeyPair openPrivateKeys(final SecretEDSKey innerKey, final byte[] innerAad, final String outerAad, final MemberKeyPair.Public publicKeys, final String protectedKeys) {
+        final byte[] inner = openWithMasterKey(outerAad, protectedKeys);
+        final byte[] privateBytes = open(innerKey, innerAad, inner);
+        final MemberKeyPair keyPair = MemberKeyPair.of(publicKeys, privateBytes);
+        Arrays.fill(privateBytes, (byte) 0);
 
-            return keyFactory.generatePublic(x509KeySpec);
-        } catch (InvalidKeySpecException | NoSuchAlgorithmException e) {
+        return keyPair;
+    }
+
+    /**
+     * Wraps a Circle key to a Member's public keys, using the hybrid KEM.
+     *
+     * @param recipient The Member's public keys
+     * @param aad       AAD, binding the Circle key to its use
+     * @param circleKey The Circle key
+     * @return Armored, wrapped Circle key
+     */
+    public static String wrapCircleKey(final MemberKeyPair.Public recipient, final byte[] aad, final SecretEDSKey circleKey) {
+        final byte[] encoded = circleKey.getEncoded();
+        final byte[] wrapped = HybridKem.wrap(recipient, aad, encoded);
+        Arrays.fill(encoded, (byte) 0);
+
+        return Base64.getEncoder().encodeToString(wrapped);
+    }
+
+    /**
+     * Unwraps a Circle key, wrapped to the Member's keys.
+     *
+     * @param algorithm        Algorithm of the Circle key
+     * @param own              The Member's keys
+     * @param aad              AAD, as used when wrapping
+     * @param armoredCircleKey Armored, wrapped Circle key
+     * @return The Circle key
+     */
+    public static SecretEDSKey unwrapCircleKey(final KeyAlgorithm algorithm, final MemberKeyPair own, final byte[] aad, final String armoredCircleKey) {
+        try {
+            final byte[] raw = HybridKem.unwrap(own, aad, Base64.getDecoder().decode(armoredCircleKey));
+            final SecretKey key = new SecretKeySpec(raw, algorithm.getName());
+            Arrays.fill(raw, (byte) 0);
+
+            return new SecretEDSKey(algorithm, key);
+        } catch (IllegalArgumentException e) {
             throw new CryptoException(e.getMessage(), e);
         }
     }
 
     /**
-     * The Private RSA Key stored in EDS, is stored encrypted, so it cannot be
-     * extracted without some effort. To do this, a Key is needed, together with
-     * a Salt which the Initial Vector is based on. The encrypted Key is then
-     * converted into PKCS8 and converted using Base64 encoding. The result of
-     * this will make the key safe for storage in the database.
+     * Derives a key from a high-entropy secret with HKDF-SHA512, e.g. the
+     * Session key from a Session token (PLAN.md, Crypto §2a). Unlike PBKDF2, this
+     * is cheap, so it may run on every request.
      *
-     * @param encryptionKey Symmetric Key to encrypt the Private RSA Key with
-     * @param privateKey    The Private RSA Key to encrypt and armor
-     * @return Armored (PKCS8 and Base64 encoded encrypted key)
+     * @param secret High-entropy secret, at least 256 bits
+     * @param salt   HKDF salt
+     * @param info   HKDF info, binding the key to its use
+     * @return AES-256-GCM key
      */
-    public static String encryptAndArmorPrivateKey(final SecretEDSKey encryptionKey, final Key privateKey) {
-        final PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(privateKey.getEncoded());
-        final byte[] rawKey = keySpec.getEncoded();
-        final byte[] encryptedKey = encrypt(encryptionKey, rawKey);
-
-        return Base64.getEncoder().encodeToString(encryptedKey);
-    }
-
-    public PrivateKey dearmoringPrivateKey(final SecretEDSKey decryptionKey, final String armoredKey) {
+    public static SecretEDSKey deriveKey(final byte[] secret, final byte[] salt, final byte[] info) {
         try {
-            // We only need the name of the Asymmetric Algorithm here, not the
-            // keySize. As all Asymmetric Algorithms share the same basic
-            // algorithm and thus name, we can use the Asymmetric Algorithm
-            // from the Settings.
-            final KeyAlgorithm algorithm = settings.getAsymmetricAlgorithm();
-            final KeyFactory keyFactory = KeyFactory.getInstance(algorithm.getName());
-            final byte[] dearmored = Base64.getDecoder().decode(armoredKey);
-            final byte[] rawKey = decrypt(decryptionKey, dearmored);
-            final KeySpec keySpec = new PKCS8EncodedKeySpec(rawKey);
+            final byte[] derived = KDF.getInstance(HKDF_ALGORITHM).deriveData(HKDFParameterSpec.ofExtract()
+                    .addIKM(secret)
+                    .addSalt(salt)
+                    .thenExpand(info, DERIVED_KEY_BYTES));
+            final KeyAlgorithm algorithm = KeyAlgorithm.AES_GCM_256;
+            final SecretEDSKey key = new SecretEDSKey(algorithm, new SecretKeySpec(derived, algorithm.getName()));
+            Arrays.fill(derived, (byte) 0);
 
-            return keyFactory.generatePrivate(keySpec);
-        } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+            return key;
+        } catch (NoSuchAlgorithmException | InvalidAlgorithmParameterException e) {
             throw new CryptoException(e.getMessage(), e);
         }
-    }
-
-    public static String encryptAndArmorCircleKey(final PublicEDSKey publicKey, final SecretEDSKey circleKey) {
-        final byte[] encryptedCircleKey = encrypt(publicKey, circleKey.getEncoded());
-
-        return Base64.getEncoder().encodeToString(encryptedCircleKey);
-    }
-
-    public static SecretEDSKey extractCircleKey(final KeyAlgorithm algorithm, final PrivateEDSKey privateKey, final String armoredCircleKey) {
-        final byte[] dearmoredCircleKey = Base64.getDecoder().decode(armoredCircleKey);
-        final byte[] decryptedCircleKey = decrypt(privateKey, dearmoredCircleKey);
-        final SecretKey key = new SecretKeySpec(decryptedCircleKey, algorithm.getName());
-
-        return new SecretEDSKey(algorithm, key);
-    }
-
-    /**
-     * <p>The RSA KeyPair for each Member Account is stored with an encrypted
-     * Private Key and armored and the Public Key armored. This way, it is easy
-     * to verify that the Key's are correctly stored as they are stored purely
-     * as text and nothing else.</p>
-     *
-     * <p>To recreate the Key Pair, the Private Key has to be decrypted, and then
-     * both the Public and Private Keys must be converted.</p>
-     *
-     * @param algorithm         EDS Key Algorithm
-     * @param key               Symmetric Key to decrypt the Private Key with
-     * @param salt              Base for the Initial Vector, used for decrypting
-     * @param armoredPublicKey  Armored unencrypted Public Key
-     * @param armoredPrivateKey Armored and encrypted Private Key
-     * @return RSA KeyPair with the Public and Private Keys
-     * @throws CryptoException if an error occurred
-     */
-    public EDSKeyPair extractAsymmetricKey(final KeyAlgorithm algorithm, final SecretEDSKey key, final String salt, final String armoredPublicKey, final String armoredPrivateKey) {
-        key.setSalt(new IVSalt(salt));
-
-        // Extracting the Public & Private Keys
-        final PublicKey publicKey = dearmoringPublicKey(armoredPublicKey);
-        final PrivateKey privateKey = dearmoringPrivateKey(key, armoredPrivateKey);
-
-        // Build the EDSKeyPair
-        final KeyPair keyPair = new KeyPair(publicKey, privateKey);
-        return new EDSKeyPair(algorithm, keyPair);
     }
 
     public byte[] stringToBytes(final String string) {

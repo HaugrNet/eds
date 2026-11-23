@@ -17,6 +17,8 @@
     <description>Quarkus runtime module, which selects PostgreSQL or the in-memory H2 database at startup</description>
 
     <properties>
+        <contract.dir>${project.build.directory}/contract</contract.dir>
+        <webui.dir>${project.basedir}/src/main/webui</webui.dir>
         <!-- The stone alone (-Dstone) is built in a folder of its own,
              target/stone, so its build doesn't remove the JAR of the EDS with
              Rune; its JAR is written beside that one, in target -->
@@ -232,6 +234,94 @@
                     <name>quarkus.profile</name>
                 </property>
             </activation>
+        </profile>
+        <!-- Rune, the PWA (RUNE.md): Quinoa builds it from src/main/webui and
+             serves it at the root (/). It is part of the EDS JAR unless the
+             stone alone is built (-Dstone), which then holds neither Rune
+             nor Quinoa. -->
+        <profile>
+            <id>rune</id>
+            <activation>
+                <property>
+                    <name>!stone</name>
+                </property>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>io.quarkiverse.quinoa</groupId>
+                    <artifactId>quarkus-quinoa</artifactId>
+                    <version>${version.quinoa}</version>
+                </dependency>
+            </dependencies>
+            <build>
+                <!-- The settings of Quinoa, beside the resources of the stone -->
+                <resources>
+                    <resource>
+                        <directory>src/main/resources</directory>
+                    </resource>
+                    <resource>
+                        <directory>src/main/rune</directory>
+                    </resource>
+                </resources>
+                <plugins>
+                    <!-- The TypeScript client of the PWA is generated from the contract
+                         in eds-api, before Quinoa builds the PWA -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <version>${version.maven-dependency-plugin}</version>
+                        <executions>
+                            <execution>
+                                <id>unpack-contract</id>
+                                <phase>initialize</phase>
+                                <goals>
+                                    <goal>unpack</goal>
+                                </goals>
+                                <configuration>
+                                    <artifactItems>
+                                        <artifactItem>
+                                            <groupId>${project.groupId}</groupId>
+                                            <artifactId>eds-api</artifactId>
+                                            <version>${project.version}</version>
+                                            <includes>openapi.json</includes>
+                                            <outputDirectory>${contract.dir}</outputDirectory>
+                                        </artifactItem>
+                                    </artifactItems>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.openapitools</groupId>
+                        <artifactId>openapi-generator-maven-plugin</artifactId>
+                        <version>${version.openapi-generator}</version>
+                        <executions>
+                            <execution>
+                                <id>generate-typescript-client</id>
+                                <phase>generate-sources</phase>
+                                <goals>
+                                    <goal>generate</goal>
+                                </goals>
+                                <configuration>
+                                    <inputSpec>${contract.dir}/openapi.json</inputSpec>
+                                    <generatorName>typescript-fetch</generatorName>
+                                    <output>${webui.dir}/src/api</output>
+                                    <generateApiTests>false</generateApiTests>
+                                    <generateModelTests>false</generateModelTests>
+                                    <generateApiDocumentation>false</generateApiDocumentation>
+                                    <generateModelDocumentation>false</generateModelDocumentation>
+                                    <openapiNormalizer>REF_AS_PARENT_IN_ALLOF=true</openapiNormalizer>
+                                    <configOptions>
+                                        <supportsES6>true</supportsES6>
+                                        <useSingleRequestParameter>true</useSingleRequestParameter>
+                                        <hideGenerationTimestamp>true</hideGenerationTimestamp>
+                                    </configOptions>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
         <!-- The stone alone: the REST API and the chat, without a web app.
              Built to target/eds-stone.jar with: mvn -Dstone -pl eds-quarkus package -->

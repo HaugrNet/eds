@@ -93,7 +93,7 @@ java -Dquarkus.config.locations=/path/to/application.properties \
 | `EDS_TLS_CERT`, `EDS_TLS_KEY` | (none) | The certificate and its key, as files; with them, EDS serves HTTPS |
 | `quarkus.http.ssl-port` | 8443 | HTTPS port |
 | `EDS_INSECURE_REQUESTS` | `enabled` | Plain HTTP beside HTTPS: `enabled`, `redirect` or `disabled` |
-| (fixed in the code) | `/api/v1` | The REST API and the WebSocket are below `/api/v1` (`Constants.REST_API`). There is no context path; put a reverse proxy in front for another layout |
+| (fixed in the code) | `/` and `/api/v1` | Rune is served at the root; the REST API and the WebSocket are below `/api/v1` (`Constants.REST_API`). There is no context path; put a reverse proxy in front for another layout |
 | `quarkus.management.port` | 9000 | Management port, with the health endpoints |
 
 ### Streaming of content
@@ -683,7 +683,9 @@ curl -X POST -H "Content-Type: application/json" -d '{}' http://localhost:8080/a
 
 The answer also tells what kind of system it is: `database` is the product
 name of the database, and `persistent` is `false` on a test system, i.e. an
-in-memory H2 database whose data is lost when the server stops.
+in-memory H2 database whose data is lost when the server stops. The web app
+shows "Test system" in its status line, in the about dialog and on the
+maintenance page.
 
 ## FitNesse Integration Testing
 
@@ -764,6 +766,19 @@ for the features of the rooms, the chat among them: the frames are described in 
 overview of the specification (section "Features and the socket") and by the schema
 `SocketFrame`. A reverse proxy in front of EDS must pass WebSocket upgrades on that
 path. What changes reaches the connections of the same EDS instance only.
+
+The web app, Rune (the PWA), is served at `http://localhost:8080/`. The build makes it
+with Quinoa, which downloads Node 24 and the npm packages into `eds-quarkus/.quinoa`
+and `src/main/webui/node_modules`. Behind an HTTP proxy, npm uses `HTTPS_PROXY`, but
+Quinoa's Node download doesn't. `eds.sh build` therefore puts the archive in Quinoa's
+cache itself when `HTTPS_PROXY` is set; for a build with Maven alone, do it by hand,
+e.g. `curl -o eds-quarkus/.quinoa/cache/node-v24.22.0-linux-x64.tar.gz
+https://nodejs.org/dist/v24.22.0/node-v24.22.0-linux-x64.tar.gz`. The build container
+(`eds.sh build --podman`) is Alpine and uses the musl build of Node
+(`node-v24.22.0-linux-x64-musl.tar.gz`) and of the npm packages, so a build on the
+host after one in the container, or the other way, installs both anew. For work on the app,
+`mvn quarkus:dev -pl eds-quarkus` runs the Vite dev server behind EDS with hot reload.
+Images and videos in the app use download tokens (`eds.download.token.lifetime.minutes`).
 
 ## Encrypting in the Client
 

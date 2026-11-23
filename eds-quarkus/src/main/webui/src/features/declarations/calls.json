@@ -1,0 +1,8 @@
+{
+  "feature": "calls",
+  "version": 1,
+  "signals": 0,
+  "kinds": {
+    "relay": {"add": "ADMIN", "change": ["administrators"], "remove": ["administrators"], "keep": "count:1", "size": 4096}
+  }
+}

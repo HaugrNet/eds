@@ -1,0 +1,21 @@
+{
+  "name": "eds-pwa",
+  "private": true,
+  "version": "2.0.0",
+  "description": "The EDS web app (RUNE.md): plain TypeScript and Web Components, with the client generated from the API contract.",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && node scripts/check-i18n.mjs && node scripts/test-e2e.ts && node scripts/test-features.ts && vite build",
+    "test": "node scripts/test-e2e.ts && node scripts/test-features.ts",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "typescript": "6.0.3",
+    "vite": "8.3.4"
+  },
+  "dependencies": {
+    "@fontsource/inter": "5.3.0",
+    "@fontsource/space-grotesk": "5.3.0"
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "feature": "location",
+  "version": 1,
+  "signals": 1000,
+  "kinds": {
+    "position": {"add": "READ", "change": ["author"], "remove": ["author"], "keep": "member", "size": 1024},
+    "track": {"add": "READ", "remove": ["author"], "keep": "age:86400", "size": 1024}
+  }
+}

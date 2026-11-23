@@ -1,0 +1,11 @@
+{
+  "feature": "plans",
+  "version": 1,
+  "kinds": {
+    "plan": {"add": "WRITE", "change": ["adders"], "remove": ["author"], "close": ["author", "administrators"], "keep": "all", "size": 16384},
+    "item": {"add": "WRITE", "change": ["adders"], "remove": ["adders"], "keep": "all", "about": "plan", "size": 4096},
+    "expense": {"add": "WRITE", "change": ["author"], "remove": ["author"], "keep": "all", "about": "plan", "size": 8192},
+    "payment": {"add": "WRITE", "change": ["author"], "remove": ["author"], "keep": "all", "about": "plan", "size": 2048},
+    "confirmation": {"add": "WRITE", "remove": ["author"], "keep": "member-about", "about": "payment", "size": 512}
+  }
+}

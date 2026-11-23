@@ -1,0 +1,10 @@
+{
+  "feature": "chat",
+  "version": 1,
+  "signals": 2000,
+  "kinds": {
+    "message": {"add": "WRITE", "change": ["author"], "remove": ["author"], "keep": "all", "size": 70000},
+    "reaction": {"add": "WRITE", "change": ["author"], "remove": ["author"], "keep": "member-about", "about": "message", "size": 1024},
+    "receipt": {"add": "READ", "change": ["author"], "keep": "member", "size": 1024}
+  }
+}

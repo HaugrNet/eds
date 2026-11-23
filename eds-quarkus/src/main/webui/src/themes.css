@@ -1,0 +1,59 @@
+/*
+ * Rune's other palettes, on the tokens of rune-theme.css: each light, and
+ * dark with the system or data-theme="dark". All text and accent colours
+ * have at least 4.5:1 contrast to the background and surface (WCAG AA).
+ */
+
+/* Fjord: blue */
+:root[data-palette="fjord"] {
+  --color-bg: #EEF2F5; --color-surface: #F9FBFC; --color-border: #CBD5DD;
+  --color-text: #1B2733; --color-text-muted: #4E5D6B; --color-accent: #1F5F8B; --color-on-accent: #FFFFFF;
+}
+:root[data-palette="fjord"][data-theme="dark"] {
+  --color-bg: #141B22; --color-surface: #1E2731; --color-border: #33414E;
+  --color-text: #E6EDF3; --color-text-muted: #A9B6C2; --color-accent: #6FB3E0; --color-on-accent: #0E1620;
+}
+@media (prefers-color-scheme: dark) {
+  :root[data-palette="fjord"]:not([data-theme="light"]) {
+    --color-bg: #141B22; --color-surface: #1E2731; --color-border: #33414E;
+    --color-text: #E6EDF3; --color-text-muted: #A9B6C2; --color-accent: #6FB3E0; --color-on-accent: #0E1620;
+  }
+}
+
+/* Moss: green */
+:root[data-palette="moss"] {
+  --color-bg: #F1F3EC; --color-surface: #FAFBF7; --color-border: #D0D6C4;
+  --color-text: #1F261C; --color-text-muted: #545E4E; --color-accent: #3F6B2E; --color-on-accent: #FFFFFF;
+}
+:root[data-palette="moss"][data-theme="dark"] {
+  --color-bg: #171C15; --color-surface: #222A1F; --color-border: #39432F;
+  --color-text: #E8EDE2; --color-text-muted: #B0BAA6; --color-accent: #8DBF6A; --color-on-accent: #142010;
+}
+@media (prefers-color-scheme: dark) {
+  :root[data-palette="moss"]:not([data-theme="light"]) {
+    --color-bg: #171C15; --color-surface: #222A1F; --color-border: #39432F;
+    --color-text: #E8EDE2; --color-text-muted: #B0BAA6; --color-accent: #8DBF6A; --color-on-accent: #142010;
+  }
+}
+
+/* High contrast: black and white, strong borders and focus */
+:root[data-palette="contrast"] {
+  --color-bg: #FFFFFF; --color-surface: #FFFFFF; --color-border: #000000;
+  --color-text: #000000; --color-text-muted: #333333; --color-accent: #0B3D91; --color-on-accent: #FFFFFF;
+}
+:root[data-palette="contrast"][data-theme="dark"] {
+  --color-bg: #000000; --color-surface: #0A0A0A; --color-border: #FFFFFF;
+  --color-text: #FFFFFF; --color-text-muted: #DDDDDD; --color-accent: #FFD400; --color-on-accent: #000000;
+}
+@media (prefers-color-scheme: dark) {
+  :root[data-palette="contrast"]:not([data-theme="light"]) {
+    --color-bg: #000000; --color-surface: #0A0A0A; --color-border: #FFFFFF;
+    --color-text: #FFFFFF; --color-text-muted: #DDDDDD; --color-accent: #FFD400; --color-on-accent: #000000;
+  }
+}
+:root[data-palette="contrast"] button.secondary,
+:root[data-palette="contrast"] input,
+:root[data-palette="contrast"] select,
+:root[data-palette="contrast"] textarea { border: 1px solid var(--color-border); }
+:root[data-palette="contrast"] :focus-visible { outline-width: 3px; }
+:root[data-palette="contrast"] .muted { color: var(--color-text-muted); }

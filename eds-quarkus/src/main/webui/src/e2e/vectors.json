@@ -1,0 +1,153 @@
+{
+  "about": "Test vectors of the convention of Rune and Tolk for end-to-end encryption, version 1, suite 1 (E2E.md). Made by vectors/e2e-v1.py, an independent implementation. Binary values are Base64 (URL-safe, no padding) unless named hex.",
+  "circleId": "d8838d7d-71e7-433d-8790-af7c080e9de9",
+  "memberId": "073dcc8f-ffa6-4cda-8d61-09ba9441e78e",
+  "keys": {
+    "privateKey": "AQIDBAUGBwgJCgsMDQ4PEBESExQVFhcYGRobHB0eHyAhIiMkJSYnKCkqKywtLi8w",
+    "publicPoint": "BMdvIoPdqVzUmw7Z5zPSkER043IW8SThPSyatM8BAhxJrZyrs9C5dJmu8vCrMT-gKCa8H4NFG1yJYqdcr_c1iNRACmKWQ2FU-zQ8OT6RBIpse8utyDzYpfJv6uiDFW-SoQ",
+    "publicKey": "eds-e2e:1:1:BMdvIoPdqVzUmw7Z5zPSkER043IW8SThPSyatM8BAhxJrZyrs9C5dJmu8vCrMT-gKCa8H4NFG1yJYqdcr_c1iNRACmKWQ2FU-zQ8OT6RBIpse8utyDzYpfJv6uiDFW-SoQ",
+    "fingerprint": "7575 876f 523d 8d12 2ddf 9551 4aef f235",
+    "accountKey": "ICEiIyQlJicoKSorLC0uLzAxMjM0NTY3ODk6Ozw9Pj8",
+    "recoveryKey": "EAQS-EIZE-EUTC-OKBJ-FIVS-YLJO-F4YD-CMRT-GQ2T-MNZY-HE5D-WPB5-HY7Q",
+    "deviceLink": "#device=ICEiIyQlJicoKSorLC0uLzAxMjM0NTY3ODk6Ozw9Pj8"
+  },
+  "vault": {
+    "salt": "wMHCw8TFxsfIycrLzM3Oz9DR0tPU1dbX2Nna29zd3t8",
+    "nonce": "AAECAwQFBgcICQoL",
+    "vault": "{\"e2e\":1,\"suite\":1,\"salt\":\"wMHCw8TFxsfIycrLzM3Oz9DR0tPU1dbX2Nna29zd3t8\",\"key\":\"AAECAwQFBgcICQoLdLICDuRDyb79NTySBzq8WGDPp_aDJEZJB5f1Gk-OMV7ifXrc9DwA0De18ABGNRARpWO3ziNOHlvYZ_86n-b-NQ\"}"
+  },
+  "secretByKey": {
+    "roomKey": "gIGCg4SFhoeIiYqLjI2Oj5CRkpOUlZaXmJmam5ydnp8",
+    "version": 3,
+    "ephemeralPrivateKey": "ZWZnaGlqa2xtbm9wcXJzdHV2d3h5ent8fX5_gIGCg4SFhoeIiYqLjI2Oj5CRkpOU",
+    "nonce": "EBESExQVFhcYGRob",
+    "secret": "{\"e2e\":1,\"suite\":1,\"by\":\"key\",\"version\":3,\"epk\":\"BGPvf9gKENmxYtLdvVo7ccf2uMPTOl-fGqUeerm5yelbZ7HWpqNSmghegBm5T3KePlAnxPWPs8piBOCoJmEeuUXiDKUsYO1g8ykF5b5vGChjTkZh68IlC_EkvW0P1ArNAw\",\"key\":\"EBESExQVFhcYGRobXAubCbnjsPVppipyu8j8S-YN2jB0E0IzPyCWu7Xg_xkCKiYaHT_Ht53rs9seN3k7\"}"
+  },
+  "secretByInvite": {
+    "roomKey": "gIGCg4SFhoeIiYqLjI2Oj5CRkpOUlZaXmJmam5ydnp8",
+    "version": 3,
+    "name": "Guest of the Chamber",
+    "inviteSecret": "oKGio6SlpqeoqaqrrK2ur7CxsrO0tba3uLm6u7y9vr8",
+    "nonce": "ICEiIyQlJicoKSor",
+    "secret": "{\"e2e\":1,\"suite\":1,\"by\":\"invite\",\"version\":3,\"key\":\"ICEiIyQlJicoKSorhntY-KPWX5mLzAaGzK2WH4eItT97tGxLz-NGm8Zz_jNDvz-XB121HOoIomjJbBbt\"}",
+    "token": "dG9rZW4tb2YtdGhlLXN0b25l",
+    "link": "#invite=eyJuIjoiR3Vlc3Qgb2YgdGhlIENoYW1iZXIiLCJ0IjoiZEc5clpXNHRiMll0ZEdobExYTjBiMjVsIiwiayI6Im9LR2lvNlNscHFlb3FhcXJySzJ1cjdDeHNyTzB0YmEzdUxtNnU3eTl2cjgifQ"
+  },
+  "sharedValue": {
+    "version": 3,
+    "roomKey": "gIGCg4SFhoeIiYqLjI2Oj5CRkpOUlZaXmJmam5ydnp8",
+    "earlier": {
+      "1": {
+        "roomKey": "QEFCQ0RFRkdISUpLTE1OT1BRUlNUVVZXWFlaW1xdXl8",
+        "nonce": "AAECAwQFBgcICQoL"
+      },
+      "2": {
+        "roomKey": "YGFiY2RlZmdoaWprbG1ub3BxcnN0dXZ3eHl6e3x9fn8",
+        "nonce": "EBESExQVFhcYGRob"
+      }
+    },
+    "value": "{\"e2e\":1,\"suite\":1,\"version\":3,\"earlier\":{\"1\":\"AAECAwQFBgcICQoL9opx6bkp2wN2l2dNrq1P13IjoDntgiA4yvcPd59XME3yrrt2vSJ7Lcte2L-SJnUF\",\"2\":\"EBESExQVFhcYGRobLjvpwPCKhY92GxK5EEYJfVwq1k7WXII5TGQ0T3dZNQkArYxO4WyJ0SUdO8gRig4J\"}}",
+    "first": "{\"e2e\":1,\"suite\":1,\"version\":1,\"earlier\":{}}"
+  },
+  "content": [
+    {
+      "name": "empty",
+      "context": "",
+      "version": 3,
+      "roomKey": "gIGCg4SFhoeIiYqLjI2Oj5CRkpOUlZaXmJmam5ydnp8",
+      "chunkSize": 16,
+      "salt": "wMHCw8TFxsfIycrLzM3Oz9DR0tPU1dbX2Nna29zd3t8",
+      "noncePrefix": "a0a1a2a3a4a5a6",
+      "plain": "",
+      "encrypted": "RURTRQEBAAAAAwEAAAAQwMHCw8TFxsfIycrLzM3Oz9DR0tPU1dbX2Nna29zd3t-goaKjpKWmkFIQwz5SGwLtA3UNlhpECA"
+    },
+    {
+      "name": "partial",
+      "context": "",
+      "version": 3,
+      "roomKey": "gIGCg4SFhoeIiYqLjI2Oj5CRkpOUlZaXmJmam5ydnp8",
+      "chunkSize": 16,
+      "salt": "wMHCw8TFxsfIycrLzM3Oz9DR0tPU1dbX2Nna29zd3t8",
+      "noncePrefix": "a0a1a2a3a4a5a6",
+      "plain": "aGVsbG8gY2hhbWJlcg",
+      "encrypted": "RURTRQEBAAAAAwEAAAAQwMHCw8TFxsfIycrLzM3Oz9DR0tPU1dbX2Nna29zd3t-goaKjpKWmJ9o3_U15gBoA_Efroseeb3H0or06lN4kA-esPyA"
+    },
+    {
+      "name": "exact multiple",
+      "context": "",
+      "version": 3,
+      "roomKey": "gIGCg4SFhoeIiYqLjI2Oj5CRkpOUlZaXmJmam5ydnp8",
+      "chunkSize": 16,
+      "salt": "wMHCw8TFxsfIycrLzM3Oz9DR0tPU1dbX2Nna29zd3t8",
+      "noncePrefix": "a0a1a2a3a4a5a6",
+      "plain": "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8",
+      "encrypted": "RURTRQEBAAAAAwEAAAAQwMHCw8TFxsfIycrLzM3Oz9DR0tPU1dbX2Nna29zd3t-goaKjpKWm004hQJNVTznJhHpW06iOyF5pJAVsrSiz6JyM5jCN0QcbcSueA-E7boeVWVmRlwHzX6vsZ6ZfQtawL3I9NpIv4g"
+    },
+    {
+      "name": "several chunks",
+      "context": "",
+      "version": 3,
+      "roomKey": "gIGCg4SFhoeIiYqLjI2Oj5CRkpOUlZaXmJmam5ydnp8",
+      "chunkSize": 16,
+      "salt": "wMHCw8TFxsfIycrLzM3Oz9DR0tPU1dbX2Nna29zd3t8",
+      "noncePrefix": "a0a1a2a3a4a5a6",
+      "plain": "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8gISIjJCUmJygpKissLS4vMDEyMzQ",
+      "encrypted": "RURTRQEBAAAAAwEAAAAQwMHCw8TFxsfIycrLzM3Oz9DR0tPU1dbX2Nna29zd3t-goaKjpKWm004hQJNVTznJhHpW06iOyF5pJAVsrSiz6JyM5jCN0QcytCkQHOfqy1XKuAh57CVnokVCfRRa0tbYA85cKyJhKRF1Bj2GayLOh26M_myIY86Eqd1HGCb-LxTOOrZxgFdN2J7R-q4vJAdyhkD-3LkqiN982p6u"
+    },
+    {
+      "name": "a thumbnail",
+      "context": "thumbnail",
+      "version": 3,
+      "roomKey": "gIGCg4SFhoeIiYqLjI2Oj5CRkpOUlZaXmJmam5ydnp8",
+      "chunkSize": 16,
+      "salt": "wMHCw8TFxsfIycrLzM3Oz9DR0tPU1dbX2Nna29zd3t8",
+      "noncePrefix": "a0a1a2a3a4a5a6",
+      "plain": "iVBORyBub3QgcmVhbGx5",
+      "encrypted": "RURTRQEBAAAAAwEAAAAQwMHCw8TFxsfIycrLzM3Oz9DR0tPU1dbX2Nna29zd3t-goaKjpKWmxu8V1gI3jAZB40DvvM36Qj1aEi_ejLSVvLcd71yCXg"
+    },
+    {
+      "name": "a file name",
+      "context": "name",
+      "version": 3,
+      "roomKey": "gIGCg4SFhoeIiYqLjI2Oj5CRkpOUlZaXmJmam5ydnp8",
+      "chunkSize": 65536,
+      "salt": "wMHCw8TFxsfIycrLzM3Oz9DR0tPU1dbX2Nna29zd3t8",
+      "noncePrefix": "a0a1a2a3a4a5a6",
+      "plain": "UXVhcnRlcmx5IHJlcG9ydCAoUTQpLnBkZg",
+      "encrypted": "RURTRQEBAAAAAwEAAQAAwMHCw8TFxsfIycrLzM3Oz9DR0tPU1dbX2Nna29zd3t-goaKjpKWmHso641Y8kR4YsVfroM7xOXR5_2jgkuSFx4NBhIjWUpBx8Enbperf-tQ"
+    },
+    {
+      "name": "an entry of a feature",
+      "context": "chat|message",
+      "version": 3,
+      "roomKey": "gIGCg4SFhoeIiYqLjI2Oj5CRkpOUlZaXmJmam5ydnp8",
+      "chunkSize": 65536,
+      "salt": "wMHCw8TFxsfIycrLzM3Oz9DR0tPU1dbX2Nna29zd3t8",
+      "noncePrefix": "a0a1a2a3a4a5a6",
+      "plain": "eyJ2IjoxLCJ0ZXh0IjoiSGVsbG8sIGNoYW1iZXIifQ",
+      "encrypted": "RURTRQEBAAAAAwEAAQAAwMHCw8TFxsfIycrLzM3Oz9DR0tPU1dbX2Nna29zd3t-goaKjpKWmNJ0tsxhoz1AV9F368puhBTE9wjPlnPeJwLyn7GU_3w3k7bidNOH6dL5Hdlpxicg"
+    },
+    {
+      "name": "an earlier key",
+      "context": "",
+      "version": 1,
+      "roomKey": "QEFCQ0RFRkdISUpLTE1OT1BRUlNUVVZXWFlaW1xdXl8",
+      "chunkSize": 16,
+      "salt": "wMHCw8TFxsfIycrLzM3Oz9DR0tPU1dbX2Nna29zd3t8",
+      "noncePrefix": "a0a1a2a3a4a5a6",
+      "plain": "d3JpdHRlbiB1bmRlciB0aGUgZmlyc3Qga2V5",
+      "encrypted": "RURTRQEBAAAAAQEAAAAQwMHCw8TFxsfIycrLzM3Oz9DR0tPU1dbX2Nna29zd3t-goaKjpKWm5wGEeIXLk-wLisosiW_SigEmvV3u0D02ZluZLv1RlmOsSwnVfH0K_465IAOq06GtCoCUMrNRLFSEm8Q"
+    }
+  ],
+  "large": {
+    "name": "two full chunks and a rest, of 64 KiB",
+    "length": 131172,
+    "pattern": "byte i is (i * 7 + 3) mod 256",
+    "version": 3,
+    "roomKey": "gIGCg4SFhoeIiYqLjI2Oj5CRkpOUlZaXmJmam5ydnp8",
+    "chunkSize": 65536,
+    "salt": "wMHCw8TFxsfIycrLzM3Oz9DR0tPU1dbX2Nna29zd3t8",
+    "noncePrefix": "a0a1a2a3a4a5a6",
+    "sha256": "6924e441db3a0a063d4e5c85e11c6c458c79febc2d43aa19e5ca0c3d3b8e0bd5"
+  }
+}

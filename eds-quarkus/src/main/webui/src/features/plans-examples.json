@@ -1,0 +1,391 @@
+{
+  "about": "Examples of the feature 'plans' (FEATURES.md): expenses and payments, the balances which follow, and the payments which settle them. Made by vectors/plans-v1.py, an independent implementation. A person is 'm:<memberId>' or 'g:<name>'; here names stand for IDs.",
+  "examples": [
+    {
+      "name": "three share a dinner evenly",
+      "expenses": [
+        {
+          "amount": "90.00",
+          "currency": "EUR",
+          "paidBy": "m:alice",
+          "split": [
+            {
+              "who": "m:alice",
+              "share": 1
+            },
+            {
+              "who": "m:bob",
+              "share": 1
+            },
+            {
+              "who": "m:carol",
+              "share": 1
+            }
+          ]
+        }
+      ],
+      "payments": [],
+      "balances": {
+        "EUR": {
+          "m:alice": "60.00",
+          "m:bob": "-30.00",
+          "m:carol": "-30.00"
+        }
+      },
+      "settle": {
+        "EUR": [
+          {
+            "from": "m:bob",
+            "to": "m:alice",
+            "amount": "30.00"
+          },
+          {
+            "from": "m:carol",
+            "to": "m:alice",
+            "amount": "30.00"
+          }
+        ]
+      }
+    },
+    {
+      "name": "a hundredth is left over",
+      "expenses": [
+        {
+          "amount": "100.00",
+          "currency": "EUR",
+          "paidBy": "m:bob",
+          "split": [
+            {
+              "who": "m:alice",
+              "share": 1
+            },
+            {
+              "who": "m:bob",
+              "share": 1
+            },
+            {
+              "who": "m:carol",
+              "share": 1
+            }
+          ]
+        }
+      ],
+      "payments": [],
+      "balances": {
+        "EUR": {
+          "m:alice": "-33.34",
+          "m:bob": "66.67",
+          "m:carol": "-33.33"
+        }
+      },
+      "settle": {
+        "EUR": [
+          {
+            "from": "m:alice",
+            "to": "m:bob",
+            "amount": "33.34"
+          },
+          {
+            "from": "m:carol",
+            "to": "m:bob",
+            "amount": "33.33"
+          }
+        ]
+      }
+    },
+    {
+      "name": "unequal shares, and a guest without an account",
+      "expenses": [
+        {
+          "amount": "120.00",
+          "currency": "EUR",
+          "paidBy": "m:alice",
+          "split": [
+            {
+              "who": "m:alice",
+              "share": 2
+            },
+            {
+              "who": "m:bob",
+              "share": 1
+            },
+            {
+              "who": "g:Dana (guest)",
+              "share": 1
+            }
+          ]
+        },
+        {
+          "amount": "30.50",
+          "currency": "EUR",
+          "paidBy": "g:Dana (guest)",
+          "split": [
+            {
+              "who": "m:bob",
+              "share": 1
+            },
+            {
+              "who": "g:Dana (guest)",
+              "share": 1
+            }
+          ]
+        }
+      ],
+      "payments": [],
+      "balances": {
+        "EUR": {
+          "g:Dana (guest)": "-14.75",
+          "m:alice": "60.00",
+          "m:bob": "-45.25"
+        }
+      },
+      "settle": {
+        "EUR": [
+          {
+            "from": "m:bob",
+            "to": "m:alice",
+            "amount": "45.25"
+          },
+          {
+            "from": "g:Dana (guest)",
+            "to": "m:alice",
+            "amount": "14.75"
+          }
+        ]
+      }
+    },
+    {
+      "name": "several expenses and a payment already made",
+      "expenses": [
+        {
+          "amount": "200.00",
+          "currency": "EUR",
+          "paidBy": "m:alice",
+          "split": [
+            {
+              "who": "m:alice",
+              "share": 1
+            },
+            {
+              "who": "m:bob",
+              "share": 1
+            },
+            {
+              "who": "m:carol",
+              "share": 1
+            },
+            {
+              "who": "g:Dana (guest)",
+              "share": 1
+            }
+          ]
+        },
+        {
+          "amount": "60.00",
+          "currency": "EUR",
+          "paidBy": "m:bob",
+          "split": [
+            {
+              "who": "m:alice",
+              "share": 1
+            },
+            {
+              "who": "m:bob",
+              "share": 1
+            },
+            {
+              "who": "m:carol",
+              "share": 1
+            }
+          ]
+        },
+        {
+          "amount": "45.99",
+          "currency": "EUR",
+          "paidBy": "m:carol",
+          "split": [
+            {
+              "who": "m:alice",
+              "share": 1
+            },
+            {
+              "who": "m:carol",
+              "share": 2
+            }
+          ]
+        }
+      ],
+      "payments": [
+        {
+          "amount": "50.00",
+          "currency": "EUR",
+          "from": "g:Dana (guest)",
+          "to": "m:alice"
+        }
+      ],
+      "balances": {
+        "EUR": {
+          "g:Dana (guest)": "0.00",
+          "m:alice": "64.67",
+          "m:bob": "-10.00",
+          "m:carol": "-54.67"
+        }
+      },
+      "settle": {
+        "EUR": [
+          {
+            "from": "m:carol",
+            "to": "m:alice",
+            "amount": "54.67"
+          },
+          {
+            "from": "m:bob",
+            "to": "m:alice",
+            "amount": "10.00"
+          }
+        ]
+      }
+    },
+    {
+      "name": "two currencies are kept apart",
+      "expenses": [
+        {
+          "amount": "80.00",
+          "currency": "EUR",
+          "paidBy": "m:alice",
+          "split": [
+            {
+              "who": "m:alice",
+              "share": 1
+            },
+            {
+              "who": "m:bob",
+              "share": 1
+            }
+          ]
+        },
+        {
+          "amount": "900.00",
+          "currency": "DKK",
+          "paidBy": "m:bob",
+          "split": [
+            {
+              "who": "m:alice",
+              "share": 1
+            },
+            {
+              "who": "m:bob",
+              "share": 2
+            }
+          ]
+        }
+      ],
+      "payments": [],
+      "balances": {
+        "DKK": {
+          "m:alice": "-300.00",
+          "m:bob": "300.00"
+        },
+        "EUR": {
+          "m:alice": "40.00",
+          "m:bob": "-40.00"
+        }
+      },
+      "settle": {
+        "DKK": [
+          {
+            "from": "m:alice",
+            "to": "m:bob",
+            "amount": "300.00"
+          }
+        ],
+        "EUR": [
+          {
+            "from": "m:bob",
+            "to": "m:alice",
+            "amount": "40.00"
+          }
+        ]
+      }
+    },
+    {
+      "name": "settled: nothing is left",
+      "expenses": [
+        {
+          "amount": "40.00",
+          "currency": "EUR",
+          "paidBy": "m:alice",
+          "split": [
+            {
+              "who": "m:alice",
+              "share": 1
+            },
+            {
+              "who": "m:bob",
+              "share": 1
+            }
+          ]
+        }
+      ],
+      "payments": [
+        {
+          "amount": "20.00",
+          "currency": "EUR",
+          "from": "m:bob",
+          "to": "m:alice"
+        }
+      ],
+      "balances": {
+        "EUR": {
+          "m:alice": "0.00",
+          "m:bob": "0.00"
+        }
+      },
+      "settle": {
+        "EUR": []
+      }
+    },
+    {
+      "name": "who paid isn't among those who share",
+      "expenses": [
+        {
+          "amount": "33.33",
+          "currency": "EUR",
+          "paidBy": "m:carol",
+          "split": [
+            {
+              "who": "m:alice",
+              "share": 1
+            },
+            {
+              "who": "m:bob",
+              "share": 1
+            }
+          ]
+        }
+      ],
+      "payments": [],
+      "balances": {
+        "EUR": {
+          "m:alice": "-16.67",
+          "m:bob": "-16.66",
+          "m:carol": "33.33"
+        }
+      },
+      "settle": {
+        "EUR": [
+          {
+            "from": "m:alice",
+            "to": "m:carol",
+            "amount": "16.67"
+          },
+          {
+            "from": "m:bob",
+            "to": "m:carol",
+            "amount": "16.66"
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#000" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 300 200">
+<!-- Peaks over a fjord, with pines: along the foot of the login, and of the page shown while EDS doesn't answer. Its ends meet, so it repeats. -->
+<path d="M0 176L34 132l20 22 48-84 38 62 20-24 46-70 50 92 22-18 22 50"/>
+<path d="M84 102l18-10 12 12 10-8M190 82l16-12 14 14 12-8"/>
+<path d="M24 176v-12M24 168l-9 0 9-20 9 20zM24 152l-7 0 7-14 7 14z"/>
+<path d="M132 176v-12M132 168l-9 0 9-20 9 20zM132 152l-7 0 7-14 7 14z"/>
+<path d="M154 176v-9M154 170l-7 0 7-15 7 15z"/>
+<path d="M252 176v-9M252 170l-7 0 7-15 7 15z"/>
+<path d="M0 176h300"/>
+<path d="M0 190c12-8 25-8 37.500 0s25 8 37.500 0 25-8 37.500 0 25 8 37.500 0 25-8 37.500 0 25 8 37.500 0 25-8 37.500 0 25 8 37.500 0" stroke-width="2"/>
+</svg>

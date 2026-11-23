@@ -1,0 +1,825 @@
+:root {
+  /* The app's variables, on top of the Rune theme tokens (rune-theme.css) */
+  --bg: var(--color-bg);
+  --surface: var(--color-surface);
+  --surface-2: color-mix(in srgb, var(--color-text) 6%, var(--color-surface));
+  --text: var(--color-text);
+  --muted: var(--color-text-muted);
+  --border: var(--color-border);
+  --accent: var(--color-accent);
+  --accent-text: var(--color-on-accent);
+  --own: color-mix(in srgb, var(--color-accent) 14%, var(--color-surface));
+  --error: #B3261E;
+  --read: #1479D0;
+  --ok: #2E7D32;
+  --radius: var(--radius-md);
+  --gap: var(--space-3);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.45;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --error: #FF8A80; --read: #53BDEB; --ok: #81C784; }
+}
+:root[data-theme="dark"] { --error: #FF8A80; --read: #53BDEB; --ok: #81C784; }
+
+h1, h2, .top strong { font-family: var(--font-display); font-weight: 600; }
+
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; }
+body { background: var(--bg); color: var(--text); }
+eds-root, eds-app { display: block; height: 100%; }
+[hidden] { display: none !important; }
+
+button, .button {
+  font: inherit; border: 0; border-radius: 8px; padding: 8px 14px; cursor: pointer;
+  background: var(--accent); color: var(--accent-text); text-decoration: none; display: inline-flex; align-items: center; gap: 6px;
+}
+button:disabled { opacity: .55; cursor: default; }
+button.secondary { background: var(--surface-2); color: var(--text); }
+button.icon { background: transparent; color: var(--text); padding: 6px 8px; font-size: 1.1rem; }
+button.link { background: none; color: var(--accent); padding: 0; }
+button.danger { background: transparent; color: var(--error); border: 1px solid currentColor; }
+button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+input, textarea {
+  font: inherit; color: var(--text); background: var(--surface); border: 1px solid var(--border);
+  border-radius: 8px; padding: 8px 10px; width: 100%;
+}
+/* A tick box or a choice is as wide as itself, not as its line: beside its words, at their start. */
+input[type="checkbox"], input[type="radio"] { width: auto; flex: none; padding: 0; margin: 0; accent-color: var(--accent); }
+.muted { color: var(--muted); }
+.error { color: var(--error); }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); }
+
+/*
+ * The login (design.zip, login.html) and the page shown while EDS doesn't
+ * answer (server-asleep.html): a 540 px stage with the plaited knot
+ * (components/knot.ts) as a ring and a 280 px form in it. Both are dark in
+ * every theme and palette, as the ring's gaps are painted in --rune-bg.
+ */
+eds-login, eds-unavailable {
+  --bg: var(--rune-bg); --surface: var(--rune-bg); --surface-2: color-mix(in srgb, var(--rune-text) 6%, var(--rune-bg));
+  --text: var(--rune-text); --muted: var(--rune-label); --border: var(--rune-field-border);
+  --accent: var(--rune-accent); --accent-text: #15120c; --error: #FF8A80; --ok: #81C784; --read: #53BDEB;
+  position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px;
+  min-height: 100%; padding: 48px 24px;
+  background: var(--bg); color: var(--text); font-family: Inter, system-ui, sans-serif; color-scheme: dark;
+}
+.rune-stage { position: relative; width: 540px; height: 540px; flex: none; display: flex; align-items: center; justify-content: center; }
+.rune-knot { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+/* A strand: a gap in the background colour around it, where it goes over another, and a groove along its middle. */
+.knot-gap { stroke: var(--rune-bg); stroke-width: 14; fill: none; }
+.knot-strand { stroke: var(--rune-accent); stroke-width: 8; fill: none; }
+.knot-groove { stroke: var(--rune-bg); stroke-width: 1.6; fill: none; }
+
+.rune-form { position: relative; width: 280px; display: flex; flex-direction: column; gap: 24px; }
+.rune-logo { align-self: center; width: 144px; height: 64px; fill: none; stroke: var(--rune-accent); stroke-width: 5; stroke-linecap: square; stroke-linejoin: miter; }  /* ᚱᚢᚾ — rún */
+.rune-fields { display: flex; flex-direction: column; gap: 16px; }
+.rune-field { display: flex; flex-direction: column; gap: 6px; }
+.rune-field label { font-size: 13px; font-weight: 500; color: var(--rune-label); }
+.rune-field input {
+  height: 44px; padding: 0 12px; background: var(--rune-bg);
+  border: 1px solid var(--rune-field-border); border-radius: 8px;
+  color: var(--rune-text); font: inherit; font-size: 15px;
+}
+.rune-field input:focus { outline: 2px solid var(--rune-accent); outline-offset: 1px; border-color: var(--rune-accent); }
+.rune-btn {
+  height: 46px; border: 0; border-radius: 8px; background: var(--rune-accent); color: #15120c;
+  font: inherit; font-size: 15px; font-weight: 600; letter-spacing: 0.02em; cursor: pointer;
+  justify-content: center;
+}
+.rune-btn:hover { filter: brightness(1.08); }
+/* The button of both screens: half as wide as the login's fields, so it stays clear of the ring. */
+.rune-form .rune-btn { align-self: center; width: 140px; padding: 0; }
+.rune-form .error { width: min(360px, 100%); text-align: center; }
+.rune-form .error > p { margin: 0; }
+.rune-form .error .notice { text-align: left; }
+.rune-form .error:empty { display: none; }
+/* Whether Rune is asking again, and which server it asks: small, at the foot of the page, so the stage stays centred. */
+.rune-foot {
+  position: absolute; left: 0; right: 0; bottom: max(12px, env(safe-area-inset-bottom)); padding: 0 24px;
+  display: grid; gap: 2px; text-align: center; font-size: 12px; color: #7b8089;
+}
+.rune-foot p { margin: 0; overflow-wrap: anywhere; }
+/* "Test system" is emphasised by weight and the accent colour, not by a warning block. */
+.rune-foot strong { color: var(--rune-accent); font-weight: 600; }
+.rune-foot .ua-status:empty { display: none; }
+/* No room for the knot: the form alone. */
+@media (max-width: 560px) {
+  .rune-knot { display: none; }
+  .rune-stage { width: 100%; height: auto; }
+  .rune-form { width: 100%; }
+}
+/* A low window: the foot follows the stage instead of lying over it. */
+@media (max-height: 700px) {
+  .rune-foot { position: static; padding: 0; }
+}
+/* Joining by an invitation: a card */
+.login { width: min(360px, 100%); padding: 28px; display: grid; gap: 12px; }
+.login h1 { margin: 0; font-size: 2rem; letter-spacing: -0.02em; }
+.login p { margin: 0; }
+.login label { display: grid; gap: 4px; font-weight: 500; }
+.login .logo { width: 64px; height: 64px; }
+.login .error:empty { display: none; }
+/*
+ * While EDS doesn't answer (design.zip, server-asleep.html): the same stage,
+ * with a notice in place of the form, and a button to ask right away.
+ */
+.rune-status { position: relative; width: 280px; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 12px; }
+.ua-picture { width: 236px; height: auto; display: block; margin-bottom: 8px; overflow: visible; }
+.ua-line { fill: none; stroke: #d9d3c7; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+.ua-mark { fill: none; stroke: var(--rune-accent); stroke-width: 6; stroke-linecap: square; }
+.ua-dot { fill: var(--rune-accent); }
+.ua-moon { fill: var(--rune-accent); fill-opacity: .6; }
+.ua-moon-cut { fill: var(--rune-bg); }
+.ua-zz { font-family: Inter, system-ui, sans-serif; fill: #7b8089; }
+.ua-plus { fill: none; stroke: #7b8089; stroke-width: 1.6; stroke-linecap: round; }
+.rune-status h1 { margin: 0; font-family: var(--font-body); font-size: 22px; font-weight: 600; color: var(--rune-text); }
+.rune-status p { margin: 0 0 8px; font-size: 15px; line-height: 1.5; color: #b9b2a4; text-wrap: pretty; }
+.rune-status .rune-btn { margin: 12px 0; }
+.rune-status .small { margin: 0; }
+/*
+ * Eye candy: the snoring z's float up and away, the stars twinkle. Each has
+ * its own rhythm, so nothing moves in step. A star rests dim, then flares up
+ * to a brighter colour and a little larger, so it reads as a blink on the
+ * dark page too. Off under prefers-reduced-motion, where they keep their
+ * resting look.
+ */
+.ua-zz { opacity: 0; animation: ua-snore 4s ease-out infinite; }
+.ua-zz:nth-of-type(1) { animation-delay: 0s; }
+.ua-zz:nth-of-type(2) { animation-delay: 1.3s; }
+.ua-plus { opacity: .25; transform-box: fill-box; transform-origin: center; animation: ua-twinkle 2.6s ease-in-out infinite; }
+.ua-plus:nth-of-type(1) { animation-delay: 0s; }
+.ua-plus:nth-of-type(2) { animation-duration: 3.4s; animation-delay: .7s; }
+.ua-plus:nth-of-type(3) { animation-duration: 2.1s; animation-delay: 1.2s; }
+.ua-plus:nth-of-type(4) { animation-duration: 3.9s; animation-delay: 1.9s; }
+@keyframes ua-snore {
+  0% { opacity: 0; transform: translate(0, 0); }
+  15% { opacity: 1; }
+  60% { opacity: .6; }
+  100% { opacity: 0; transform: translate(10px, -16px); }
+}
+@keyframes ua-twinkle {
+  0%, 60%, 100% { opacity: .25; stroke: #7b8089; transform: scale(1); }
+  80% { opacity: 1; stroke: #f1ece1; transform: scale(1.35); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ua-call circle, .ua-sleep { animation: none; opacity: .6; }
+  .ua-zz { animation: none; opacity: .7; }
+  .ua-plus { animation: none; opacity: .6; }
+}
+.notice {
+  border: 1px solid color-mix(in srgb, var(--error) 45%, var(--border)); border-left: 4px solid var(--error);
+  border-radius: 8px; padding: 10px 12px; background: color-mix(in srgb, var(--error) 8%, var(--surface)); color: var(--text);
+}
+.notice strong { color: var(--error); }
+.notice p { margin: 4px 0 0; }
+.small { font-size: .85rem; }
+
+/* App layout */
+eds-app { display: grid; grid-template-rows: auto 1fr auto; }
+/* The line at the bottom: about the server */
+.status-line {
+  display: flex; align-items: center; gap: 6px 18px; padding: 3px 16px; min-width: 0; overflow: hidden; white-space: nowrap;
+  background: var(--surface); border-top: 1px solid var(--border); color: var(--muted); font-size: .78rem;
+}
+.status-line > span { overflow: hidden; text-overflow: ellipsis; flex: 0 1 auto; min-width: 0; }
+.status-line .who { margin-left: auto; }
+.status-line .connection::before { content: ""; display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; background: var(--muted); }
+.status-line .connection[data-state="up"]::before { background: var(--ok); }
+.status-line .connection[data-state="down"]::before { background: var(--error); }
+.status-line .connection[data-state="down"] { color: var(--error); }
+.top {
+  display: flex; align-items: center; gap: 10px; padding: 8px 16px;
+  background: var(--surface); border-bottom: 1px solid var(--border); min-width: 0;
+}
+.top .brand { width: 30px; height: 30px; display: block; }
+.top strong { font-size: 1.15rem; letter-spacing: -0.01em; }
+.top .circle-name { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: inline-flex; align-items: center; gap: 6px; min-width: 0; }
+.tabs { display: flex; gap: 14px; align-self: stretch; align-items: stretch; margin: -8px 0; }
+/* On a desktop only the tabs of features show: they bring a hidden pane up. */
+.tab:not(.feature-tab) { display: none; }
+.tab[hidden] { display: none; }
+/*
+ * Tabs are not buttons like "Members" and "Features", which open a window:
+ * plain words, the ones whose pane shows with a line of the accent below,
+ * and a line between them and the buttons.
+ */
+.tab {
+  background: transparent; color: var(--muted); padding: 0 2px; border-radius: 0; font-weight: 500;
+  border-bottom: 3px solid transparent; border-top: 3px solid transparent;
+}
+.tab:hover { color: var(--text); }
+.tab[aria-pressed="true"] { color: var(--text); border-bottom-color: var(--accent); }
+.tabs:has(.feature-tab:not([hidden])) { margin-left: 4px; padding-left: 14px; border-left: 1px solid var(--border); }
+
+.panes { position: relative; min-height: 0; overflow: hidden; }
+/*
+ * Desktop: each pane is placed by the Workspace (absolute, from the layout).
+ * A pane has no border of its own: the dividers are the lines between them.
+ */
+.pane { position: absolute; min-height: 0; overflow: hidden; display: flex; flex-direction: column; background: var(--bg); }
+.pane.hidden-pane { display: none; }
+.pane > :not(.pane-bar) { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+.pane-bar {
+  flex: none; display: flex; align-items: center; gap: 6px; padding: 2px 8px; min-height: 30px;
+  border-bottom: 1px solid var(--border); background: var(--surface); color: var(--muted);
+  font-size: .8rem; text-transform: uppercase; letter-spacing: .06em; cursor: grab; user-select: none; touch-action: none;
+}
+.pane-bar .pane-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pane-bar .grip { opacity: .6; }
+.panes.moving-pane, .panes.moving-pane .pane-bar { cursor: grabbing; }
+/*
+ * The rooms pane is put away with the « on its bar. Away, it is a strip at
+ * the left edge with its name upright, and its » brings it back.
+ */
+.pane-minimize {
+  flex: none; width: 24px; height: 22px; padding: 0; border-radius: 5px; background: transparent; color: inherit;
+  display: grid; place-items: center; cursor: pointer; font-size: 1rem; line-height: 1;
+}
+.pane-minimize:hover:not(:disabled) { background: color-mix(in srgb, var(--text) 14%, transparent); color: var(--text); }
+.pane-minimize:disabled { opacity: .3; cursor: default; }
+.rooms-strip {
+  position: absolute; left: 0; top: 0; bottom: 0; width: 34px; padding: 8px 0; border-radius: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 10px;
+  background: color-mix(in srgb, var(--text) 11%, var(--bg)); color: var(--muted); border-right: 1px solid var(--border);
+  font-size: .8rem; text-transform: uppercase; letter-spacing: .06em; cursor: pointer;
+}
+.rooms-strip[hidden] { display: none; }
+.rooms-strip:hover, .rooms-strip:focus-visible { color: var(--text); background: color-mix(in srgb, var(--text) 16%, var(--bg)); }
+.rooms-strip .strip-open { font-size: 1rem; line-height: 1; }
+/* Upright, read from the bottom up, as on the spine of a book. */
+.rooms-strip .strip-name { writing-mode: vertical-rl; transform: rotate(180deg); white-space: nowrap; }
+.panes.moving-pane .pane > :not(.pane-bar) { pointer-events: none; }
+/*
+ * Two levels, and two kinds of room. The rooms pane is where one chooses
+ * rooms and people, so it is shaded; the other panes hold the content of the
+ * room chosen. The content of a chamber is tinted with the accent, its panes
+ * have a line of it on top and say "E2E": not by colour alone.
+ */
+.pane.rooms-pane { background: color-mix(in srgb, var(--text) 7%, var(--bg)); scrollbar-color: color-mix(in srgb, var(--text) 35%, transparent) transparent; }
+.pane.rooms-pane .pane-bar { background: color-mix(in srgb, var(--text) 11%, var(--bg)); }
+eds-app[data-room="chamber"] .pane:not(.rooms-pane) { background: color-mix(in srgb, var(--accent) 6%, var(--bg)); }
+eds-app[data-room="chamber"] .pane:not(.rooms-pane) .pane-bar {
+  background: color-mix(in srgb, var(--accent) 16%, var(--surface)); color: var(--text); box-shadow: inset 0 2px 0 var(--accent);
+}
+.pane-mark { display: none; }
+eds-app[data-room="chamber"] .pane-mark {
+  display: inline; padding: 0 7px; border: 1px solid var(--accent); border-radius: 999px;
+  font-size: .68rem; letter-spacing: .04em; line-height: 1.5; white-space: nowrap; cursor: help;
+}
+.drop-hint {
+  position: absolute; z-index: 5; pointer-events: none; border: 2px dashed var(--accent); border-radius: 6px;
+  background: color-mix(in srgb, var(--accent) 18%, transparent); display: grid; place-items: center; font-weight: 600;
+}
+.drop-hint[hidden] { display: none; }
+/* A divider: a thin line, with room around it to take hold of. */
+.splitter { position: absolute; z-index: 2; touch-action: none; background: var(--border); }
+.splitter.vertical { cursor: col-resize; }
+.splitter.horizontal { cursor: row-resize; }
+.splitter::after { content: ""; position: absolute; }
+.splitter.vertical::after { inset: 0 -4px; }
+.splitter.horizontal::after { inset: -4px 0; }
+.splitter:hover, .splitter.dragging, .splitter:focus-visible { background: var(--accent); outline: 1px solid var(--accent); }
+.room-picker { width: auto; max-width: 14rem; padding: 4px 8px; }
+.room-picker[hidden], .top .circle-name[hidden] { display: none; }
+.pane-choices { display: flex; flex-wrap: wrap; gap: 4px 14px; }
+.choice.inline { align-items: center; }
+.layout-settings { border: 1px solid var(--border); border-radius: 6px; padding: 10px 12px; margin: 0; }
+.layout-settings legend { padding: 0 4px; font-weight: 500; }
+.pane-title { font-size: .8rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 14px 16px 8px; }
+
+/* Circles */
+/* The rooms pane: rooms on top, users below, each scrolling by itself. */
+eds-circles { gap: 0; }
+.side-section { flex: 1 1 50%; min-height: 0; display: flex; flex-direction: column; }
+.side-section + .side-section { border-top: 1px solid var(--border); }
+.circles, .users { list-style: none; margin: 0; padding: 0 8px 8px; overflow: auto; flex: 1; min-height: 0; }
+.circles li.muted, .circles li.error, .users li.error { padding: 8px; }
+.circle, .user { width: 100%; background: transparent; color: var(--text); justify-content: flex-start; padding: 8px; }
+.circle[aria-current="true"] { background: var(--surface-2); font-weight: 600; }
+.room .row { display: flex; align-items: center; }
+.room .row .circle { flex: 1; min-width: 0; }
+.disclose { flex: none; color: var(--muted); }
+.side-section .details { margin: 4px 0 12px 12px; padding: 2px 0 2px 10px; border-left: 2px solid var(--border); font-weight: 400; display: grid; gap: 10px; grid-template-columns: minmax(0, 1fr); }
+.side-section .details[hidden] { display: none; }
+.side-section .room-members .members .avatar { width: 28px; height: 28px; font-size: .9rem; }
+.side-section .avatar, .avatar.small { width: 24px; height: 24px; font-size: .8rem; }
+.circle .avatar, .user .avatar { width: 30px; height: 30px; font-size: 1rem; }
+.user-room .link.name { text-align: left; justify-content: flex-start; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* Adding: who or where first; the access and the button show once chosen. */
+.add-member { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; padding-top: 10px; border-top: 1px solid var(--border); }
+.add-member:empty { display: none; }
+.add-member select { font-size: .85rem; padding: 6px 8px; min-width: 0; }
+.add-member select:first-child { grid-column: 1 / -1; }
+.add-member button { padding: 6px 14px; justify-content: center; }
+.side-section .details .error { margin: 0; }
+.side-section .details .error:empty { display: none; }
+.avatar {
+  width: 30px; height: 30px; border-radius: 50%; display: inline-grid; place-items: center; flex: none;
+  background: var(--accent); color: var(--accent-text); font-weight: 600;
+}
+/* A picture avatar: the line drawing on a tint of the accent; cut-outs in the tint. */
+.avatar.picture {
+  --avatar-bg: color-mix(in srgb, var(--accent) 16%, var(--surface));
+  background: var(--avatar-bg); color: var(--text);
+}
+.avatar svg { width: 74%; height: 74%; display: block; }
+.avatar .cut { fill: var(--avatar-bg); stroke: none; }
+.avatar .cut-line { stroke: var(--avatar-bg); }
+.avatar.large { width: 44px; height: 44px; font-size: 1.3rem; }
+.message .meta .avatar.author { vertical-align: middle; margin-right: 6px; }
+
+/* The own avatar in the header, and its menu */
+.account { position: relative; margin-left: auto; flex: none; }
+.account-button { background: transparent; padding: 3px; border-radius: 50%; }
+.account-button:hover, .account-button[aria-expanded="true"] { background: var(--surface-2); }
+.account-menu {
+  position: absolute; right: 0; top: calc(100% + 6px); z-index: 20; min-width: 240px; padding: 6px;
+  background: var(--surface); color: var(--text); border: 1px solid var(--border); border-radius: var(--radius);
+  box-shadow: 0 8px 24px rgb(0 0 0 / .18); display: grid; gap: 2px;
+}
+.account-menu[hidden] { display: none; }
+.account-menu .menu-head { display: flex; align-items: center; gap: 10px; padding: 6px 8px 8px; }
+.account-menu .menu-head > span { display: grid; min-width: 0; }
+.account-menu .menu-head strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.account-menu hr { border: 0; border-top: 1px solid var(--border); margin: 4px 0; width: 100%; }
+.menu-item {
+  background: transparent; color: var(--text); justify-content: space-between; width: 100%;
+  padding: 8px 10px; border-radius: 6px; text-align: left;
+}
+.menu-item:hover, .menu-item:focus-visible { background: var(--surface-2); outline-offset: -2px; }
+
+/* Choosing an avatar */
+dialog.modal.wide { width: min(640px, calc(100vw - 32px)); }
+.avatar-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 6px; max-height: 60vh; overflow: auto; }
+.avatar-choice {
+  background: transparent; color: var(--text); border: 1px solid var(--border); border-radius: var(--radius);
+  display: grid; grid-template-columns: 44px minmax(0, 1fr); grid-template-rows: auto auto; column-gap: 8px;
+  padding: 8px; text-align: left; align-items: center;
+}
+.avatar-choice .avatar { grid-row: span 2; }
+.avatar-choice .avatar-name { font-weight: 600; }
+.avatar-choice .small { line-height: 1.25; }
+.avatar-choice:hover { background: var(--surface-2); }
+.avatar-choice[aria-pressed="true"] { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+
+/* Chat */
+eds-chat .status { margin: 0 16px; min-height: 1.4em; display: flex; gap: 8px; align-items: center; flex: none; }
+eds-chat .scroller { flex: 1; overflow: auto; padding: 8px 16px; }
+.earlier { display: block; margin: 0 auto 8px; }
+.timeline { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.message { max-width: min(560px, 85%); background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 8px 12px; align-self: flex-start; }
+.message.own { background: var(--own); align-self: flex-end; }
+.message .meta { font-size: .8rem; }
+.message .text { margin: 2px 0 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+.message .editor { display: grid; gap: 6px; margin-top: 4px; }
+/* Dropping files onto the chat */
+eds-chat { position: relative; }
+/*
+ * Pictures behind the panes, to break the plain colours: the web of wyrd
+ * behind the chat, a triquetra behind the rooms and one behind the users,
+ * Yggdrasil behind the files and folders, an eight-lobed knot behind the
+ * plans. Rune's own line drawings (assets/scene-*.svg), used as
+ * masks, so they take the text colour of the theme, and faint: they must
+ * never get in the way of reading.
+ */
+eds-chat, eds-files, .side-section { position: relative; isolation: isolate; }
+/* The plans scroll as a whole, so their picture lies behind the pane around them, and stays. */
+.plans-pane { isolation: isolate; }
+/* Each in the middle of its place, three quarters of its width and height at most. */
+eds-chat::before, eds-files::before, .side-section::before, .plans-pane::before {
+  content: ""; position: absolute; z-index: -1; pointer-events: none; inset: 12.5%;
+  background: color-mix(in srgb, var(--text) 6%, transparent);
+  mask-repeat: no-repeat; mask-size: contain; mask-position: center;
+}
+eds-chat::before { mask-image: url('./assets/scene-wyrd.svg'); }
+eds-files::before { mask-image: url('./assets/scene-yggdrasil.svg'); }
+.plans-pane::before { mask-image: url('./assets/scene-rosette.svg'); }
+/* One triquetra behind the rooms, one behind the users. */
+.side-section::before { mask-image: url('./assets/scene-triquetra.svg'); }
+eds-chat.dropping::after {
+  content: attr(data-drop-hint); position: absolute; inset: 8px; border: 2px dashed var(--accent); border-radius: var(--radius);
+  display: grid; place-items: center; background: color-mix(in srgb, var(--bg) 85%, transparent); font-weight: 600; pointer-events: none;
+}
+/* Previews of pasted images */
+.paste-previews { display: flex; gap: 6px; flex-wrap: wrap; }
+.paste-previews img { max-width: 120px; max-height: 120px; border-radius: 6px; border: 1px solid var(--border); object-fit: cover; }
+/* Unread counts */
+.circle .circle-name-text { flex: 1; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.badge { min-width: 1.4em; padding: 0 6px; border-radius: 999px; background: var(--accent); color: var(--accent-text); font-size: .75rem; font-weight: 600; text-align: center; }
+/* Notification choices */
+.choice { display: flex !important; gap: 10px; align-items: flex-start; font-weight: 400 !important; }
+.choice input { width: auto; margin-top: 4px; }
+/* Typing indicator */
+.typing { min-height: 1.3em; padding: 0 16px; font-size: .8rem; font-style: italic; flex: none; }
+/* Receipts of the own messages: one tick sent, two received by everyone, two blue read by everyone. */
+.ticks { display: inline-block; vertical-align: -1px; margin-left: 6px; line-height: 0; cursor: default; }
+.ticks svg { fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.ticks[data-state="read"] { color: var(--read); }
+/* Reactions */
+.reactions { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
+.reaction { background: var(--surface-2); color: var(--text); border: 1px solid var(--border); border-radius: 999px; padding: 1px 8px; font-size: .85rem; }
+.reaction.mine { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 14%, var(--surface)); }
+.reaction-picker { display: inline-flex; gap: 2px; margin-left: 4px; padding: 2px 4px; border: 1px solid var(--border); border-radius: 999px; background: var(--surface); }
+.reaction-picker .icon { padding: 0 3px; font-size: 1rem; }
+/* Replies */
+.message .quote {
+  display: block; width: 100%; text-align: left; margin: 4px 0 2px; padding: 4px 8px; border-radius: 6px;
+  background: var(--surface-2); color: var(--muted); border-left: 3px solid var(--accent); font-size: .85rem;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.message.highlight { outline: 2px solid var(--accent); outline-offset: 2px; transition: outline-color .3s; }
+.reply-bar { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 6px 16px; border-top: 1px solid var(--border); background: var(--surface-2); font-size: .9rem; flex: none; }
+.reply-bar span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.message .editor textarea { resize: vertical; }
+/* Delete, on the own messages only; on hover with a mouse. */
+.message .delete { padding: 0 4px; font-size: .85rem; margin-left: 4px; opacity: 0; }
+.message:hover .delete, .message:focus-within .delete { opacity: 1; }
+@media (hover: none) { .message .delete { opacity: 1; } }
+.file-card {
+  margin-top: 8px; display: grid; grid-template-columns: 64px 1fr; grid-template-rows: auto auto; column-gap: 10px; text-align: left;
+  background: var(--surface-2); color: var(--text); padding: 6px; width: 100%; max-width: 360px;
+}
+.file-card .thumb { grid-row: span 2; width: 64px; height: 64px; }
+.file-card .name { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; align-self: end; }
+.composer { display: flex; gap: 8px; align-items: flex-end; padding: 10px 16px; border-top: 1px solid var(--border); background: var(--surface); flex: none; }
+.composer textarea { resize: none; max-height: 140px; }
+
+/* Files */
+eds-files { position: relative; }
+eds-files.dropping::after {
+  content: attr(data-drop-hint); position: absolute; inset: 8px; border: 2px dashed var(--accent); border-radius: var(--radius);
+  display: grid; place-items: center; background: color-mix(in srgb, var(--bg) 85%, transparent); font-weight: 600;
+}
+eds-files .toolbar { display: flex; flex-wrap: wrap; gap: 8px; padding: 12px 16px; flex: none; }
+eds-files .toolbar .icon { margin-left: auto; }
+eds-files > .muted { margin: 0 16px; flex: none; }
+.crumbs { padding: 0 16px 8px; flex: none; overflow-wrap: anywhere; }
+.transfers { list-style: none; margin: 0; padding: 0 16px; flex: none; }
+.transfers li { display: grid; grid-template-columns: 1fr 120px; gap: 8px; align-items: center; font-size: .9rem; }
+.transfers li.download { grid-template-columns: minmax(0, 1fr) 120px auto auto; }
+.transfers li.download.paused progress { opacity: .5; }
+.transfer-buttons { display: flex; gap: 2px; }
+.transfers li.download.error { grid-template-columns: 1fr; }
+.transfers li > span:first-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.transfers li.error { grid-template-columns: 1fr; }
+.files { overflow: auto; padding: 0 16px 16px; flex: 1; align-content: start; }
+.files.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 10px; }
+.files.list { display: flex; flex-direction: column; gap: 2px; }
+.entry { position: relative; }
+.entry-open { width: 100%; background: transparent; color: var(--text); padding: 6px; border-radius: 8px; text-align: left; }
+.entry-open:hover { background: var(--surface-2); }
+.files.grid .entry-open { flex-direction: column; align-items: stretch; }
+.files.grid .thumb { width: 100%; aspect-ratio: 1; }
+.files.list .entry-open { display: grid; grid-template-columns: 40px 1fr auto; }
+.files.list .thumb { width: 40px; height: 40px; }
+.entry .name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: .9rem; }
+.entry .meta { font-size: .75rem; }
+.files.grid .meta { display: none; }
+.entry-actions { position: absolute; top: 4px; right: 4px; display: flex; gap: 2px; opacity: 0; }
+.entry-actions .icon { background: var(--surface); border-radius: 50%; padding: 4px 7px; }
+.entry:hover .entry-actions, .entry:focus-within .entry-actions { opacity: 1; }
+.entry-actions .delete:hover { color: var(--error); }
+/* Touch screens have no hover: the actions stay visible. */
+@media (hover: none) { .entry-actions { opacity: 1; } }
+.files.list .entry-actions { top: 50%; transform: translateY(-50%); }
+.files.list .entry-open { padding-right: 44px; }
+/* The action sheet of a file: full-width buttons, at the bottom on phones. */
+dialog.sheet .stack button { justify-content: center; }
+@media (max-width: 760px) { dialog.sheet { margin: auto auto 0; width: 100%; max-width: 100%; border-radius: var(--radius) var(--radius) 0 0; } }
+.thumb {
+  position: relative; display: grid; place-items: center; background: var(--surface-2); border-radius: 8px;
+  overflow: hidden; font-size: 1.6rem; flex: none;
+}
+.thumb img { width: 100%; height: 100%; object-fit: cover; }
+.thumb .play { position: absolute; color: #fff; text-shadow: 0 1px 4px #000; font-size: 1.2rem; }
+
+/*
+ * The settings of EDS, for the System Administrator, in a window that floats
+ * over the panes: the knot (components/knot.ts) goes around it as a frame
+ * with round corners, on the background colour, which shows in its gaps.
+ */
+dialog.knot-window {
+  width: min(900px, calc(100vw - 32px)); height: min(780px, calc(100vh - 32px)); max-width: none; max-height: none;
+  padding: 44px; border: 0; border-radius: 52px; overflow: hidden;
+  background: var(--bg); color: var(--text); box-shadow: 0 18px 60px rgb(0 0 0 / .4);
+}
+dialog.knot-window::backdrop { background: rgb(0 0 0 / .35); }
+.window-knot { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; fill: none; }
+.window-body {
+  position: relative; height: 100%; display: flex; flex-direction: column; overflow: hidden;
+  background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+}
+.window-body header { flex: none; display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 14px 10px 16px; border-bottom: 1px solid var(--border); }
+.window-body h2 { font-size: 1.05rem; margin: 0; }
+.window-body eds-server { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+/* No room for the knot on a phone: the window fills the screen. */
+@media (max-width: 760px) {
+  dialog.knot-window { width: 100vw; height: 100dvh; padding: 0; border-radius: 0; }
+  .window-knot { display: none; }
+  .window-body { border: 0; border-radius: 0; }
+}
+eds-server { container-type: inline-size; }
+
+/* About Rune: what is encrypted, and how */
+dialog.about { display: flex; flex-direction: column; }
+dialog.about:not([open]) { display: none; }
+dialog.about .dialog-body { overflow: auto; padding: 16px 20px 20px; }
+dialog.about p { margin: 0 0 8px; }
+dialog.about h3 { font-size: .8rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 16px 0 4px; font-weight: 600; }
+dialog.about .about-connection { margin: 16px 0 0; padding-top: 12px; border-top: 1px solid var(--border); font-weight: 500; }
+dialog.about .about-connection:not(.error) { color: var(--ok); }
+.server-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 12px 16px; flex: none !important; border-bottom: 1px solid var(--border); }
+.server-bar .icon { margin-left: auto; }
+.server-bar p { margin: 0; flex: 1 1 100%; order: 1; }
+.server-bar p:empty { display: none; }
+.server-settings { overflow: auto; padding: 4px 16px 16px; flex: 1; min-height: 0; }
+.setting-group { max-width: 760px; }
+.setting-group h3 { font-size: .8rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 18px 0 2px; font-weight: 600; }
+.setting-group > p { margin: 0 0 6px; }
+.setting { display: grid; grid-template-columns: minmax(0, 1fr); gap: 6px; padding: 10px 0 10px 10px; border-top: 1px solid var(--border); border-left: 3px solid transparent; margin-left: -13px; }
+.setting.changed { border-left-color: var(--accent); }
+.setting-name { display: grid; gap: 1px; min-width: 0; }
+.setting-name label { font-weight: 500; }
+.setting-name code { font-size: .72rem; overflow-wrap: anywhere; }
+.setting-field { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; min-width: 0; }
+.setting-field input[type="text"], .setting-field select { flex: 1 1 10rem; min-width: 0; max-width: 22rem; padding: 6px 8px; }
+.setting-field input.number { flex: 0 1 9.5rem; font-variant-numeric: tabular-nums; }
+.setting-field input[type="checkbox"] { width: 18px; height: 18px; margin: 0; }
+.setting-field input:invalid { border-color: var(--error); }
+.setting-fixed { color: var(--muted); overflow-wrap: anywhere; }
+@container (min-width: 560px) {
+  .setting { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; align-items: center; }
+}
+
+/* Panes with a button in their head */
+/* A title and its button; in a narrow pane the button goes below the title, not over the pane's edge. */
+.pane-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0 8px; padding-right: 12px; flex: none !important; }
+.pane-head .pane-title { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pane-head button { padding: 5px 12px; font-size: .85rem; white-space: nowrap; margin: 6px 0 8px 16px; max-width: calc(100% - 16px); overflow: hidden; text-overflow: ellipsis; }
+.rooms-pane .error { margin: 0 16px; }
+.rooms-pane .error:empty { display: none; }
+
+/* Dialogs: invite, passphrase */
+dialog.modal {
+  width: min(460px, calc(100vw - 32px)); max-height: calc(100vh - 32px); padding: 0; border: 1px solid var(--border);
+  border-radius: var(--radius); background: var(--surface); color: var(--text);
+}
+dialog.modal::backdrop { background: rgb(0 0 0 / .5); }
+dialog.modal header { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 14px; border-bottom: 1px solid var(--border); }
+dialog.modal h2 { font-size: 1.05rem; margin: 0; }
+.dialog-body { padding: 14px; }
+.stack { display: grid; gap: 10px; }
+.stack label { display: grid; gap: 4px; font-weight: 500; }
+.stack p { margin: 0; }
+.stack .error:empty { display: none; }
+.actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+select {
+  font: inherit; color: var(--text); background: var(--surface); border: 1px solid var(--border);
+  border-radius: 8px; padding: 8px 10px; width: 100%;
+}
+/* The list of a select is painted by the browser: without colours of its own it is light where the field is transparent. */
+select option, select optgroup { background-color: var(--surface); color: var(--text); }
+.qr { justify-self: center; width: min(280px, 100%); padding: 8px; background: #fff; border-radius: 8px; }
+.qr svg { display: block; width: 100%; height: auto; }
+.login .link { justify-self: center; }
+
+/* Members */
+/*
+ * A row is the avatar, the name and the remove button. In a narrow place (the
+ * rooms pane) the access of a room's member goes below the name, as quiet
+ * text, so the name keeps the width; from 380px (the dialog, a wide pane) it
+ * is a field on the same line.
+ */
+.room-members { container-type: inline-size; }
+.members { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.members li { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; column-gap: 10px; align-items: center; padding: 5px 2px 5px 6px; border-radius: 8px; min-height: 40px; }
+.members li.muted { display: block; min-height: 0; padding: 4px 6px; }
+.members li:not(.muted):hover, .members li:focus-within { background: var(--surface-2); }
+.members .name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.members .link.name { text-align: left; justify-content: flex-start; display: block; border-radius: 4px; }
+.members .icon { color: var(--muted); font-size: .9rem; padding: 6px 9px; }
+.members .icon:hover { color: var(--error); }
+.room-members .members li > .avatar, .room-members .members li > .with-light { grid-row: 1 / span 2; }
+.room-members .members li > :last-child { grid-column: 3; grid-row: 1 / span 2; }
+.members .access { grid-column: 2; grid-row: 2; justify-self: start; font-size: .8rem; color: var(--muted); line-height: 1.3; }
+.members select.access {
+  width: auto; max-width: 100%; padding: 1px 2px; margin-left: -6px; border-color: transparent; background-color: transparent; cursor: pointer;
+}
+.members select.access:hover, .members select.access:focus-visible { color: var(--text); border-color: var(--border); }
+@container (min-width: 380px) {
+  .members li { grid-template-columns: auto minmax(0, 1fr) auto auto; }
+  .room-members .members li > .avatar, .room-members .members li > .with-light, .room-members .members li > :last-child, .members .access { grid-column: auto; grid-row: auto; }
+  .members .access { font-size: inherit; }
+  .members select.access { padding: 6px 8px; margin: 0; max-width: 12rem; color: var(--text); border-color: var(--border); background-color: var(--surface); }
+}
+
+/* Drag and drop onto folders */
+.entry.drop-here .entry-open, .crumbs .drop-here { outline: 2px dashed var(--accent); outline-offset: -2px; background: color-mix(in srgb, var(--accent) 10%, transparent); }
+.entry.dragging { opacity: .5; }
+.entry[draggable="true"] .entry-open { cursor: grab; }
+
+/* Preview */
+dialog.preview {
+  width: min(960px, calc(100vw - 32px)); max-height: calc(100vh - 32px); padding: 0; border: 1px solid var(--border);
+  border-radius: var(--radius); background: var(--surface); color: var(--text);
+}
+dialog.preview::backdrop { background: rgb(0 0 0 / .6); }
+dialog.preview header { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-bottom: 1px solid var(--border); }
+dialog.preview h2 { font-size: 1rem; margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; flex: 1; }
+.preview-body { padding: 14px; display: grid; place-items: center; }
+.preview-body img, .preview-body video { max-width: 100%; max-height: calc(100vh - 140px); border-radius: 6px; background: #000; }
+
+/* Phones: one pane at a time, chosen in the header */
+@media (max-width: 760px) {
+  .tab:not(.feature-tab):not([hidden]) { display: inline-flex; }
+  .tabs, .tabs:has(.feature-tab:not([hidden])) { flex-wrap: wrap; margin: 0; padding: 0; border-left: 0; align-self: auto; }
+  .tab { padding: 6px 2px; }
+  .top { flex-wrap: wrap; padding: 8px 16px; }
+  .top .circle-name { display: none; }
+  /* One pane at a time, chosen with the tabs; the layout is for desktops. */
+  .panes { display: grid; grid-template-columns: minmax(0, 1fr); }
+  .panes .pane, .panes .pane.hidden-pane { position: static; display: none; border: 0; border-radius: 0; }
+  .pane-bar, .room-picker, .rooms-strip { display: none !important; }
+  /* The picture behind the plans stays within its pane. */
+  .panes .plans-pane { position: relative; }
+  eds-app[data-view="rooms"] .panes .rooms-pane,
+  eds-app[data-view="chat"] .panes .chat-pane,
+  eds-app[data-view="files"] .panes .files-pane,
+  eds-app[data-view="calendar"] .panes .calendar-pane,
+  eds-app[data-view="plans"] .panes .plans-pane,
+  eds-app[data-view="location"] .panes .location-pane { display: flex; }
+  .status-line .who, .status-line .wide { display: none; }
+  .message { max-width: 92%; }
+}
+
+/* Read-only members: no composer, no reply, react or edit; reactions only shown. */
+eds-chat.read-only .write-only { display: none; }
+eds-chat.read-only .reaction { cursor: default; pointer-events: none; }
+.read-only-note { flex: none; margin: 0; padding: 12px 16px; border-top: 1px solid var(--border); background: var(--surface); text-align: center; }
+.toolbar button:disabled { opacity: .5; cursor: not-allowed; }
+.two-columns { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; }
+
+/* Chambers: the mark in the list of rooms, the recovery key and the fingerprints */
+.chamber-mark { margin-left: 6px; padding: 0 6px; border: 1px solid var(--border); border-radius: 999px; font-size: .7rem; color: var(--muted, inherit); white-space: nowrap; }
+.chamber-mark[hidden] { display: none; }
+textarea.recovery-key { width: 100%; font-family: ui-monospace, monospace; font-size: 1rem; letter-spacing: .04em; resize: none; }
+.fingerprint { font-family: ui-monospace, monospace; overflow-wrap: anywhere; }
+.feature-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.feature-row strong { min-width: 6em; }
+.room-members .members li > .key-line { grid-column: 2 / -1; grid-row: 3; font-size: .72rem; line-height: 1.3; }
+
+/* The panes of features: calendar, plans, location */
+.feature-pane { overflow: auto; padding: 12px 16px 16px; display: block !important; }
+.feature-status { margin: 0 0 8px; }
+.feature-status:empty { display: none; }
+.feature-pane .toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 0 0 12px; }
+.feature-pane .grow { flex: 1; min-width: 0; }
+.feature-pane h3 { margin: 4px 0; font-size: 1.15rem; }
+.feature-pane h4 { margin: 18px 0 6px; font-size: .8rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); font-weight: 600; }
+.feature-pane h4.today { color: var(--accent); }
+.feature-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.feature-list > li { display: flex; align-items: center; gap: 10px; padding: 6px 8px; border-radius: 8px; }
+.feature-list > li:hover { background: var(--surface-2); }
+.feature-list > li.done .check span { text-decoration: line-through; color: var(--muted); }
+.feature-list .check { flex: 1; min-width: 0; }
+.feature-row-open { flex: 1; display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; background: transparent; color: var(--text); text-align: left; padding: 4px 0; }
+.feature-add { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0 0; }
+.feature-add input { flex: 1; min-width: 12em; }
+.feature-head .toolbar { margin: 6px 0 0; }
+.amount { white-space: nowrap; font-variant-numeric: tabular-nums; }
+.amount.owed { color: var(--ok, inherit); }
+.amount.owes { color: var(--error); }
+.due { margin: 4px 8px; }
+.share-row { display: flex; align-items: center; gap: 8px; }
+.share-row .check { flex: 1; }
+input.share { width: 5em; }
+/* The box at the first line of its words, in the middle of that line; further lines go below the words. */
+label.check { display: flex; align-items: flex-start; gap: 8px; font-weight: 400; }
+label.check input[type="checkbox"], label.check input[type="radio"] { margin-top: .3em; }
+.calendar-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+.calendar-grid.week { grid-template-columns: minmax(0, 1fr); }
+.calendar-grid .weekday { background: var(--surface); padding: 4px 6px; font-size: .75rem; color: var(--muted); text-align: center; }
+.calendar-grid .day { background: var(--bg); min-height: 84px; padding: 4px; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.calendar-grid.week .day { min-height: 48px; }
+/*
+ * The month fills its pane, in width and in height: the weeks share the
+ * height, down to two lines of text (the day's number and one event); below
+ * that the pane scrolls. A day shows the events it has room for, and beside
+ * its number how many more there are (calendar-pane.ts, fit). The days of a
+ * week grow with their events.
+ */
+eds-calendar.fills { display: flex !important; flex-direction: column; }
+eds-calendar.fills .feature-status { flex: none; }
+eds-calendar.fills .feature-body { flex: 1 0 auto; display: flex; flex-direction: column; min-height: 0; }
+eds-calendar.fills .toolbar { flex: none; }
+/* As high as its place, and at least its weeks at two lines each below the names of the days: so the weeks don't take the height of the fullest. */
+.calendar-grid.month { flex: 1 1 0; min-height: calc(var(--weeks, 6) * 47px + 28px); grid-template-rows: auto; grid-auto-rows: minmax(46px, 1fr); }
+.calendar-grid.month .day { min-height: 0; overflow: hidden; }
+.calendar-grid.month .day > * { flex: none; }
+.calendar-grid.month button.event { line-height: 1.25; }
+.day-head { display: flex; align-items: baseline; justify-content: space-between; gap: 4px; min-width: 0; }
+.calendar-grid .more { flex: none; padding: 0; line-height: 1.25; font-size: .72rem; white-space: nowrap; }
+.calendar-grid .day.other-month { background: var(--surface); }
+.calendar-grid .day.other-month .day-number { color: var(--muted); }
+.calendar-grid .day.today .day-number { color: var(--accent); font-weight: 700; }
+.day-number { font-size: .8rem; }
+button.event { display: block; width: 100%; text-align: left; padding: 1px 5px; border-radius: 4px; font-size: .78rem; line-height: 1.4; background: var(--surface-2); color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+button.event.whole-day { background: var(--accent); color: var(--accent-text); }
+.event-time { color: var(--muted); font-variant-numeric: tabular-nums; }
+.agenda-row { display: flex; align-items: baseline; gap: 10px; padding: 2px 0; }
+.agenda-row button.event { width: auto; max-width: 60%; }
+.places .place { align-items: flex-start; }
+.track { margin: 4px 0 0; padding-left: 1.4em; }
+.report { margin: 0 0 14px; }
+.feature-pane .toolbar select { width: auto; }
+/* The month or the days shown: as wide as its words, so in a narrow pane what follows goes to the next line, not over it. */
+.feature-pane .toolbar .calendar-title { flex: 1 1 auto; min-width: min-content; }
+
+/* The stones a System Administrator looks after */
+.stones-body { flex: 1; min-height: 0; overflow: auto; padding: 14px 16px 18px; }
+.stones { display: grid; gap: 14px; }
+.stone-card { border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; background: var(--bg); }
+.stone-card header { display: flex; align-items: center; gap: 10px; border: 0; padding: 0; justify-content: flex-start; }
+.stone-card h3 { margin: 0; font-size: 1.05rem; flex: 0 1 auto; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.stone-card header .icon { margin-left: auto; }
+.stone-card > p { margin: 4px 0 8px; }
+.stone-state { font-size: .8rem; padding: 1px 8px; border-radius: 999px; border: 1px solid var(--border); white-space: nowrap; }
+.stone-state.fine { color: var(--ok, #2e7d32); border-color: currentColor; }
+.stone-state.watch { color: var(--warn, #b26a00); border-color: currentColor; }
+.stone-state.near { color: var(--error); border-color: currentColor; }
+.storage { display: grid; gap: 4px; margin: 0 0 10px; }
+.storage-text { display: flex; justify-content: space-between; gap: 10px; font-size: .9rem; }
+.storage progress { width: 100%; height: 8px; }
+.storage.watch strong { color: var(--warn, #b26a00); }
+.storage.near strong { color: var(--error); }
+.measures { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 8px; margin: 0 0 8px; }
+.measure { display: grid; gap: 1px; padding: 6px 8px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); min-width: 0; }
+.measure-name { font-size: .75rem; color: var(--muted); }
+.measure strong { font-variant-numeric: tabular-nums; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.measure.watch strong { color: var(--warn, #b26a00); }
+.measure.near strong { color: var(--error); }
+.spark { width: 100%; height: 28px; display: block; }
+.spark polyline { fill: none; stroke: var(--accent); stroke-width: 1.5; vector-effect: non-scaling-stroke; stroke-linejoin: round; }
+.measure.watch .spark polyline { stroke: var(--warn, #b26a00); }
+.measure.near .spark polyline { stroke: var(--error); }
+.pace { display: flex; align-items: center; gap: 6px; margin-left: auto; }
+.pace select { width: auto; padding: 3px 6px; }
+.stones-body .feature-add input { flex: 1; min-width: 10em; }
+
+/*
+ * Who is online, and calls (RUNE.md, "Presence and calls"). The light is a
+ * dot at the avatar of a person who is online; the telephone beside a person
+ * shows while they can be called.
+ */
+.with-light { position: relative; display: inline-flex; flex: none; }
+.presence-light {
+  position: absolute; right: -2px; bottom: -2px; width: 10px; height: 10px; border-radius: 50%;
+  background: var(--ok); border: 2px solid var(--surface); box-sizing: border-box;
+}
+.presence-light[hidden] { display: none; }
+.name-line { display: flex; align-items: center; gap: 2px; min-width: 0; }
+.name-line .name { flex: 0 1 auto; min-width: 0; }
+.user-item .row { display: flex; align-items: center; }
+.user-item .row .user { flex: 1; min-width: 0; }
+button.call-person { flex: none; color: var(--muted); padding: 6px 8px; line-height: 0; }
+button.call-person:hover, .members button.call-person:hover { color: var(--accent); }
+button.call-person[hidden] { display: none; }
+button.call-person:disabled { opacity: .5; cursor: not-allowed; }
+
+/* The call of a room, at the top of its chat. */
+.call-bar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding: 6px 12px; border-bottom: 1px solid var(--border); }
+.call-bar[hidden] { display: none; }
+.call-bar .call-going { flex: 1; min-width: 0; font-size: .9rem; }
+.call-bar .call-going::before { content: ""; display: inline-block; width: 8px; height: 8px; margin-right: 8px; border-radius: 50%; background: var(--ok); }
+
+/* Notes over the panes, and the calls ringing here. */
+.notices, eds-call-panel { position: fixed; right: 16px; z-index: 30; display: grid; gap: 8px; width: min(360px, calc(100vw - 32px)); }
+.notices { top: 64px; }
+eds-call-panel { bottom: 44px; }
+.notice-card { background: var(--surface); color: var(--text); border: 1px solid var(--border); border-radius: 10px; padding: 12px; box-shadow: 0 6px 24px rgba(0, 0, 0, .25); }
+.notice-card p { margin: 0 0 10px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.call-ringing { display: grid; gap: 8px; }
+.call-incoming { border-color: var(--accent); }
+
+/* The call this device is in: a tile per person. */
+.call-box { background: var(--surface); color: var(--text); border: 1px solid var(--border); border-radius: 10px; padding: 10px; box-shadow: 0 6px 24px rgba(0, 0, 0, .25); display: grid; gap: 8px; }
+.call-box[hidden] { display: none; }
+.call-box header { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.call-tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.call-tiles[data-count="1"] { grid-template-columns: 1fr; }
+.call-tile { position: relative; aspect-ratio: 4 / 3; background: #101010; border-radius: 8px; overflow: hidden; }
+.call-tile video { width: 100%; height: 100%; object-fit: cover; display: block; }
+.call-tile.own video { transform: scaleX(-1); }
+.call-tile.no-picture video { visibility: hidden; }
+.call-face { position: absolute; inset: 0; display: none; align-items: center; justify-content: center; }
+.call-tile.no-picture .call-face { display: flex; }
+.call-name { position: absolute; left: 0; right: 0; bottom: 0; padding: 3px 8px; font-size: .78rem; color: #fff; background: rgba(0, 0, 0, .55); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.call-controls { justify-content: center; }
+.call-controls button[aria-pressed="true"] { border-color: var(--accent); }
+@media (max-width: 760px) {
+  eds-call-panel.in-call { inset: 0; width: auto; background: var(--bg, var(--surface)); padding: 12px; align-content: start; overflow: auto; }
+  eds-call-panel.in-call .call-box { border: 0; box-shadow: none; padding: 0; }
+}

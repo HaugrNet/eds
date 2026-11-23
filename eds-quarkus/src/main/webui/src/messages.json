@@ -1,0 +1,31 @@
+{
+  "about": "EDS's messages in Rune's words, shared by Rune (messages.ts) and Tolk (eds-cli, internal/messages). EDS says Circle and Data Object, Rune says room and file. 'pattern' is a regular expression that both JavaScript and Go understand; 'text' is the English text, a key of the catalogs in i18n/; 'values' fills its {name} from a group of the pattern, formatted as a size where it says so. Messages without an entry stay in English, with 'words' replaced.",
+  "messages": [
+    { "pattern": "^The current Account is not allowed to perform the given action\\.?$", "text": "You don't have permission to do that in this room." },
+    { "pattern": "^The requesting Account is not permitted to Process Data\\.?$", "text": "You can only read in this room." },
+    { "pattern": "^The requesting Account is not permitted to Process a Trustee\\.?$", "text": "Only administrators of this room can change who has which access." },
+    { "pattern": "^The Member is already a trustee of the requested Circle\\.?$", "text": "This user is already in the room." },
+    { "pattern": "^Only its author may edit a message\\.?$", "text": "Only the author can edit a message." },
+    { "pattern": "^Only its author may delete a message\\.?$", "text": "Only the author can delete a message." },
+    { "pattern": "^Join the Circle before sending to it\\.?$", "text": "You have to be in the room to send messages to it." },
+    { "pattern": "^The access to the Circle has ended\\.?$", "text": "You are no longer in this room." },
+    { "pattern": "^The shared Data Object '.*' is not part of the Circle\\.?$", "text": "The shared file isn't in this room." },
+    { "pattern": "^A chat message can't share the chat\\.?$", "text": "Messages can't be shared as files." },
+    { "pattern": "^Another record with the same name already exists\\.?$", "text": "A file or folder with this name already exists here." },
+    { "pattern": "^The Data Object could not be found\\.?$", "text": "The file could not be found; it may have been deleted." },
+    { "pattern": "^The content cannot be stored, the storage limit of EDS is reached\\.?$", "text": "The stone is out of storage space, so the file wasn't stored." },
+    { "pattern": "^The content is larger than the allowed (\\d+) bytes\\.?$", "text": "The file is larger than the stone allows ({size}).", "values": { "size": { "group": 1, "format": "size" } } },
+    { "pattern": "^The Credential is too weak\\. (.*)$", "text": "The passphrase is too weak. {detail}", "values": { "detail": { "group": 1 } } },
+    { "pattern": "^The Folder cannot be removed as it is not empty\\.?$", "text": "Only empty folders can be deleted. Delete or move its files first." },
+    { "pattern": "^The name '.*' provided is already being used in the given folder\\.?$", "text": "A file or folder with this name already exists there." },
+    { "pattern": "^It is not permitted to move Folders\\.?$", "text": "Folders can't be moved, only files." },
+    { "pattern": "^Folders have no content\\.?$", "text": "Folders can't be opened as files." },
+    { "pattern": "The (new )?name of (the new )?(the )?Data Object is invalid", "text": "The name is empty or too long (at most 75 characters)." }
+  ],
+  "words": [
+    ["Data Objects", "files"],
+    ["Data Object", "file"],
+    ["Circles", "rooms"],
+    ["Circle", "room"]
+  ]
+}

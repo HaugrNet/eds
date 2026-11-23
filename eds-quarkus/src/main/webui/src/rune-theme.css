@@ -1,0 +1,63 @@
+/* Rune theme tokens: light by default, dark via OS setting or data-theme="dark" */
+:root {
+  --rune-granite: #1E2124;
+  --rune-slate:   #3A3F44;
+  --rune-stone:   #5C6166;
+  --rune-bone:    #F3F0E8;
+  --rune-ochre:   #A63F24;
+  --rune-ember:   #E3805C;
+  /* A lighter ember for the dark UI: 4.6:1 on Slate, where #E3805C has 3.8:1 */
+  --rune-ember-ui: #EC9473;
+
+  /* The login and the page for an EDS that doesn't answer: one dark stage in
+     every theme and palette. The knot's gaps are painted in --rune-bg, and its
+     strands in --rune-accent (components/knot.ts). */
+  --rune-bg: #12151a;
+  --rune-accent: #D9A24A;
+  --rune-text: #f2ede2;
+  --rune-label: #c9c2b4;
+  --rune-field-border: #3d4450;
+
+  --color-bg:          var(--rune-bone);
+  --color-surface:     #FBFAF6;
+  --color-border:      #D9D4C8;
+  --color-text:        var(--rune-granite);
+  --color-text-muted:  var(--rune-stone);   /* 5.6:1 on bg */
+  --color-accent:      var(--rune-ochre);   /* buttons, links, focus */
+  --color-on-accent:   var(--rune-bone);
+
+  --font-display: "Space Grotesk", Inter, system-ui, sans-serif;
+  --font-body:    Inter, system-ui, sans-serif;
+
+  --radius-sm: 8px;  --radius-md: 12px;  --radius-lg: 18px;
+  --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px; --space-6: 24px; --space-8: 32px;
+  --tap-min: 44px;
+
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --color-bg: var(--rune-granite);
+    --color-surface: var(--rune-slate);
+    --color-border: #4A5056;
+    --color-text: var(--rune-bone);
+    --color-text-muted: #B9BDC1;
+    --color-accent: var(--rune-ember-ui);
+    --color-on-accent: var(--rune-granite);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --color-bg: var(--rune-granite);
+  --color-surface: var(--rune-slate);
+  --color-border: #4A5056;
+  --color-text: var(--rune-bone);
+  --color-text-muted: #B9BDC1;
+  --color-accent: var(--rune-ember-ui);
+  --color-on-accent: var(--rune-granite);
+  color-scheme: dark;
+}
+
+body { background: var(--color-bg); color: var(--color-text); font-family: var(--font-body); }
+:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }

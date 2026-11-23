@@ -1,0 +1,7 @@
+{
+  "feature": "calendar",
+  "version": 1,
+  "kinds": {
+    "event": {"add": "WRITE", "change": ["adders"], "remove": ["adders"], "keep": "all", "size": 32768}
+  }
+}

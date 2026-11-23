@@ -882,3 +882,127 @@ load, the last 24 hours in steps of five minutes, and the last 720 samples of th
 inventory. A restart starts them anew. The load of the database itself isn't told;
 `databaseMillis`, the time a trivial query takes, rises with it. Stones on the same
 database server tell the same `databaseMark`.
+
+## Tolk, the Command Line
+
+Tolk (`tolk`) is the command line of Rune and EDS: the same rooms, users and files,
+for the terminal and for scripts. It is one program without dependencies at run
+time, for Linux, macOS and Windows. A server instance is a **stone** in Tolk's
+words, as in Rune.
+
+### Build
+
+Tolk is written in Go, so Go (1.26 or newer) must be installed. It is only built
+with the profile `cli`:
+
+```bash
+mvn -Pcli install            # the whole project, with Tolk
+mvn -Pcli install -pl eds-cli   # only Tolk
+```
+
+This runs `go generate`, `go vet` and `go test`, and writes the binaries to
+`eds-cli/target/dist/`: `tolk-<version>-linux-amd64`, `-linux-arm64`,
+`-darwin-amd64`, `-darwin-arm64` and `-windows-amd64.exe`, with `SHA256SUMS`.
+`./eds.sh install` copies the one for this system to `~/.local/bin/tolk`, with its
+bash completion and manual pages (and links `eds.sh` there too); otherwise copy it
+to a directory on your `PATH` as `tolk`. Without Maven:
+`sh eds-cli/build.sh <version>`, or `go build ./cmd/tolk` in `eds-cli/` for the
+system at hand.
+
+Tolk's commands use Go's standard library and two modules of the Go team,
+`golang.org/x/term` and `golang.org/x/sys`; its interactive mode is built on Bubble
+Tea and Lip Gloss, which need 14 further modules. All their sources are in
+`eds-cli/vendor/`,
+so the build needs no module cache and no access to a Go module proxy. After a
+change of `go.mod`, `go mod vendor` renews the directory; Go refuses to build when
+the two don't match.
+
+### First steps
+
+```bash
+tolk init                                   # creates the encrypted container
+tolk register stone work --url https://eds.example.com --account kim
+tolk login                                  # unlocks the container, starts the agent
+tolk rooms
+tolk send report.pdf Projects/2026/ -p      # upload into a folder, making it
+pg_dump mydb | tolk send - Backups/mydb.sql # from a pipe
+tolk get Projects/2026/report.pdf           # run again to continue a broken download
+tolk cp work:Projects/report.pdf home:Family   # between stones
+echo "Deploy done" | tolk chat --plain --room @ops
+tolk logout
+```
+
+`tolk help` shows the first steps and the topics of the help; `tolk help <topic>`
+or `tolk help <command>` (also `tolk <command> --help`) explains one of them, and
+`tolk help all` everything. `tolk man` opens the same as a manual page; the build
+also writes it to `eds-cli/target/dist/` as `tolk.1` (German: `tolk.de.1`).
+`tolk completion bash` writes the bash completion, for `source <(tolk completion
+bash)` in `~/.bashrc`: commands, subcommands, flags and their values, file names,
+and the stone names while the agent runs; the words come from the command lines of
+the help, so a new command completes without more work. An
+invitation link from Rune is accepted with `tolk accept <link>`, which also
+registers its stone.
+
+`tolk chat` (with `--stone <name>` for another than the default stone) opens Rune
+in the terminal: rooms and users, the chat and the
+files of one stone, in Rune's words and colours. F1 lists the keys, F2 is the
+account menu (language, theme, panes, the bell), Ctrl+Q leaves. Under 100 columns
+it shows one pane at a time.
+
+- **Chambers:** `tolk room new <room> --chamber` makes a room whose content Tolk
+  encrypts before the stone gets it (`E2E.md`); `send`, `get`, `cp`, `chat` and
+  the interactive mode then work as in a room. The account gets its keys with its
+  first chamber, and Tolk shows the recovery key (`tolk key recovery`, and
+  `tolk key link` for a further device); `tolk members` shows the fingerprints.
+  `tolk help chambers` tells the rest.
+- **Features:** `tolk features`, `tolk calendar`, `tolk plan` and `tolk location` are
+  what Rune shows in its panes (`FEATURES.md`); `tolk entry` reads and writes the
+  entries of any feature as JSON. `tolk help features`.
+- **Status:** `tolk status` is a table of the stones, `tolk status --watch` the
+  live view; a stone which is only looked after is registered with a status key
+  and no account (`tolk register stone <name> --url … --status-key`).
+  `tolk help status`.
+- **Addresses:** a room is `[stone:]room`, a file or folder `[stone:]room/path`;
+  without `stone:` the default stone is meant. Several addresses may be given,
+  `@group` names a list of them (`tolk group set <name> <room> …`), and `'stone:*'`
+  every room the account is in. A colon or slash inside a name is written `\:` or
+  `\/`, or the ID is used instead of the name.
+- **The container:** `config.json` in Tolk's config directory
+  (`~/.config/tolk/` on Linux; `TOLK_CONFIG_DIR` overrides it) holds each stone's
+  URL, account and passphrase, encrypted with AES-256-GCM under a key made from the
+  container's passphrase (PBKDF2-HMAC-SHA256, 600,000 iterations). Nothing in the
+  file tells which stones are used.
+- **The agent:** `tolk login` asks for the container's passphrase once and starts an
+  agent, like `ssh-agent`, which keeps the opened container and the sessions in
+  memory until `tolk logout` (or `--lifetime 8h`). Nothing decrypted is written to
+  disk. Its socket is in `$XDG_RUNTIME_DIR/tolk`, or a directory of the user's own
+  in the temp directory (`TOLK_AGENT_DIR` overrides it).
+- **Unattended scripts:** set `TOLK_PASSPHRASE_FILE` to a file only the script's
+  user can read, with the container's passphrase. Each call then logs in to the
+  stones it uses and out again. Passphrases are never taken from a flag or another
+  environment variable; where a script has to give one, it is read from standard
+  input (`--passphrase-stdin`).
+- **Scripts:** `--output json` gives stable English keys, sizes in bytes and times
+  as ISO-8601 UTC; data goes to standard output, messages and progress to standard
+  error. Exit codes: 0 ok, 1 other, 2 usage, 3 login failed, 4 not found, 5 no
+  connection, 6 not permitted. A command with several targets goes on after a
+  failure and reports each target.
+- **Language:** English and German (`--lang`, `tolk settings language de`, or the
+  environment's locale). Colours follow Rune's palettes; `NO_COLOR` turns them off.
+
+### Sessions
+
+A stone keeps a session per login, so the same account can be used in Rune and in
+Tolk, and on several devices, at the same time; a logout ends only its own session.
+An account has at most `eds.session.max.per.member` sessions (default 10), after
+which a new login ends the one that expires first. Scripts with
+`TOLK_PASSPHRASE_FILE` log in for every call, so many of them at once are better
+given an account of their own, or the agent's session through `tolk login`.
+
+### Behind a reverse proxy
+
+Tolk's stone URL is the API root, `https://<host>/api/v1` (a URL without a path
+gets `/api/v1`). Uploads from a pipe have no `Content-Length` and are sent chunked,
+which the proxy must pass on without buffering limits below the stone's largest
+file; `tolk chat` needs WebSocket upgrades on `/api/v1/socket`, as Rune does. A proxy
+from the environment (`HTTPS_PROXY`, `NO_PROXY`) is used for both.

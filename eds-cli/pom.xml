@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>net.haugr</groupId>
+        <artifactId>eds</artifactId>
+        <version>2.0-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+    <artifactId>eds-cli</artifactId>
+    <packaging>pom</packaging>
+    <name>EDS - Tolk</name>
+    <description>Tolk, the command line of Rune and EDS: a Go module, built with the Maven profile "cli"</description>
+
+    <!-- Tolk is written in Go (TOLK.md, L6), so Maven only runs the Go
+         tool chain: `go generate` renews the files shared with Rune, `go vet`
+         and `go test` check the module, and build.sh cross-compiles the
+         binaries into target/dist/. Go must be installed; the module is only
+         part of the build with -Pcli. -->
+    <properties>
+        <version.exec-maven-plugin>3.5.1</version.exec-maven-plugin>
+        <go.executable>go</go.executable>
+    </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>${version.exec-maven-plugin}</version>
+                <executions>
+                    <execution>
+                        <id>go-generate</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>${go.executable}</executable>
+                            <arguments>
+                                <argument>generate</argument>
+                                <argument>./...</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>go-vet</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <skip>${skipTests}</skip>
+                            <executable>${go.executable}</executable>
+                            <arguments>
+                                <argument>vet</argument>
+                                <argument>./...</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>go-test</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <skip>${skipTests}</skip>
+                            <executable>${go.executable}</executable>
+                            <arguments>
+                                <argument>test</argument>
+                                <argument>./...</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>build-binaries</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>sh</executable>
+                            <arguments>
+                                <argument>build.sh</argument>
+                                <argument>${project.version}</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                </executions>
+                <configuration>
+                    <workingDirectory>${project.basedir}</workingDirectory>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

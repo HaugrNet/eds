@@ -476,6 +476,16 @@
     </build>
 
     <profiles>
+        <!-- Builds Tolk, the command line (eds-cli), too: a Go module, so Go
+             must be installed. `mvn -Pcli install` tests it and writes its
+             binaries for five systems to eds-cli/target/dist/. -->
+        <profile>
+            <id>cli</id>
+            <modules>
+                <module>eds-cli</module>
+            </modules>
+        </profile>
+
         <!-- Generates CycloneDX Software Bill of Materials (SBOM) files, see
              README.md for details. Each module gets its own SBOM in
              <module>/target/<module>-<version>-cyclonedx.(json|xml), and the

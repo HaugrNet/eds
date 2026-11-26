@@ -2,8 +2,10 @@
 # ==============================================================================
 # EDS - Encrypted Data Share Control Script
 # ------------------------------------------------------------------------------
-# Builds EDS (the server) and the stone alone, and controls the EDS
-# container: start, stop, restart, status and logs. The container is built and run with rootless Podman. Run without
+# Builds EDS (the server), Rune (the web app, served by the EDS container),
+# the stone alone (the server without the web app) and Tolk (the command
+# line), and controls the EDS container: start, stop, restart, status and
+# logs. The container is built and run with rootless Podman. Run without
 # arguments for the help.
 # ==============================================================================
 
@@ -23,15 +25,21 @@ readonly builderImage="eds-builder:local"
 readonly containerImage="eds-quarkus:local"
 readonly containerName="eds-quarkus"
 readonly containerSbom="${targetDir}/container-eds-quarkus-cyclonedx.json"
-# The stone alone: the server built as a JAR and an image of its own (the
-# Maven property stone), which a host runs.
+# The stone alone: the server without the web app, with neither Rune nor
+# Quinoa in its JAR (the Maven property stone), and so in its image.
 readonly stoneJar="${scriptDir}/eds-quarkus/target/eds-stone.jar"
 readonly stoneImage="eds-stone:local"
 readonly stoneSbom="${targetDir}/container-eds-stone-cyclonedx.json"
+# The npm packages of Rune, from its lockfile: only those which are part of
+# the web app, not the tools which build it (devDependencies)
+readonly runeLock="${scriptDir}/eds-quarkus/src/main/webui/package-lock.json"
+readonly runeSbom="${targetDir}/rune-npm-cyclonedx.json"
 readonly fitnesseDir="${scriptDir}/eds-testing"
 readonly fitnesseJar="${fitnesseDir}/fitnesse-standalone.jar"
 readonly fitnesseFixtures="${fitnesseDir}/target/eds-testing.jar"
 readonly fitnesseLog="${fitnesseDir}/target/fitnesse.log"
+readonly tolkDir="${scriptDir}/eds-cli"
+readonly tolkDist="${tolkDir}/target/dist"
 readonly PORT=${EDS_PORT:-8080}
 readonly FITNESSE_PORT=${FITNESSE_PORT:-2080}
 
@@ -50,10 +58,13 @@ EDS - Encrypted Data Share Control Script
   Build:
     build [what...] [options]    Build everything, or only what is named;
                                  the tests are skipped
-      eds                        The server: all Maven modules, and the
-                                 container image that serves it
-      stone                      The stone alone: a JAR and a container
-                                 image of their own, which a host runs
+      eds                        The server: all Maven modules
+      rune                       The web app: the EDS JAR it is part of, and
+                                 the container image that serves it
+      stone                      The server without the web app: a JAR and
+                                 a container image of their own, which hold
+                                 neither Rune nor what serves it (Quinoa)
+      tolk                       The command line, for five systems (needs Go)
 
         --test                   Also run the tests of what is built; with
                                  eds, SonarQube then analyses the code and
@@ -66,21 +77,22 @@ EDS - Encrypted Data Share Control Script
         --podman                 Run the Maven build in the Podman build
                                  container (build.container), instead of
                                  with the local Java; the other steps run
-                                 on the host
+                                 on the host. It has no Go, so not for Tolk
 
-  Control the EDS container, which serves the API, or the stone alone:
+  Control the EDS container, which serves the API and Rune, or as the stone
+  alone only the API:
     start [stone] [--masterkey]  Start it, and wait until EDS is ready; the
                                  image is built first, if it is missing or
                                  not built from the present JAR
-                                 Optionally, start the stone alone ('eds'
-                                 names the other)
+                                 Optionally, start the stone alone, without
+                                 Rune ('rune' names the one with it)
                                  Optionally, start it with the MasterKey file
                                  as its source, so EDS is unlocked at startup
     stop [--remove]              Stop it, optionally also remove the container
                                  and both images
     restart                      Stop and start it, with the options of start;
-                                 it stays what it was, unless 'stone' or
-                                 'eds' is named
+                                 it stays what it was, with or without Rune,
+                                 unless 'stone' or 'rune' is named
     status                       Status of the build, the container, EDS
                                  and FitNesse
     logs                         Follow the logs of the container
@@ -103,8 +115,10 @@ EDS - Encrypted Data Share Control Script
     fitnesse stop                Stop it
 
   Install:
-    install [--remove]           Put eds.sh on the PATH, in ~/.local/bin,
-                                 with its bash completion.
+    install [--remove]           Put eds.sh and Tolk on the PATH, in
+                                 ~/.local/bin, with their bash completion
+                                 and the manual pages of Tolk; Tolk is built
+                                 first, if it is missing or not up to date.
                                  ~/.bashrc is only changed if ~/.local/bin
                                  isn't on the PATH or bash-completion is
                                  missing. Optionally, remove all of it again
@@ -114,8 +128,10 @@ EDS - Encrypted Data Share Control Script
   Examples:
     ${script} build --test            Everything, with the tests and
                                       SonarQube
+    ${script} build rune              Rune and its container image
     ${script} build stone             The stone alone and its container image
-    ${script} build eds && ${script} restart
+    ${script} build tolk --test       Only Tolk, with its tests
+    ${script} build rune && ${script} restart
     ${script} build stone && ${script} restart stone
 
   The EDS container uses the in-memory H2 database, unless EDS_DB_URL is set
@@ -220,8 +236,8 @@ function containerExists() {
     podman container exists "${containerName}" 2>/dev/null
 }
 
-# There are two images, each from its own JAR: "eds" is EDS, and "stone" the
-# stone alone. The functions below take one of the two words.
+# There are two images, each from its own JAR: "rune" is EDS with Rune, and
+# "stone" the stone alone. The functions below take one of the two words.
 function imageOf() {
     if [[ "${1}" == stone ]]; then echo "${stoneImage}"; else echo "${containerImage}"; fi
 }
@@ -231,14 +247,14 @@ function jarOf() {
 }
 
 function kindName() {
-    if [[ "${1}" == stone ]]; then echo "the stone alone"; else echo "EDS"; fi
+    if [[ "${1}" == stone ]]; then echo "the stone alone, without Rune"; else echo "EDS with Rune"; fi
 }
 
-# What the EDS container was created from: stone or eds
+# What the EDS container was created from: stone or rune
 function containerKind() {
     local image
     image=$(podman container inspect -f '{{.ImageName}}' "${containerName}" 2>/dev/null)
-    if [[ "${image}" == *"${stoneImage}" ]]; then echo stone; else echo eds; fi
+    if [[ "${image}" == *"${stoneImage}" ]]; then echo stone; else echo rune; fi
 }
 
 function imageExists() {
@@ -296,6 +312,19 @@ function imageOutdated() {
     [[ "${modified}" != "$(stat -c %Y "${jar}")" ]]
 }
 
+# The stone alone must hold neither Rune nor Quinoa, which serves it: what
+# isn't there can't be switched on. The names of the files in a JAR are
+# readable as they are, so it is searched without a tool for archives.
+function checkStoneJar() {
+    [[ -s "${stoneJar}" ]] || { echo "${stoneJar} is missing"; return 1; }
+    local found
+    found=$(grep -a -o -m 5 -e 'io/quarkiverse/quinoa[A-Za-z0-9/._-]*' -e 'META-INF/resources/[A-Za-z0-9/._-]*' "${stoneJar}" | sort -u)
+    [[ -z "${found}" ]] && return 0
+    echo "Found in ${stoneJar}:"
+    echo "${found}"
+    return 1
+}
+
 function fitnessePid() {
     pgrep -f "fitnesse-standalone.jar -p ${FITNESSE_PORT}"
 }
@@ -312,12 +341,14 @@ function edsVersion() {
 # ==============================================================================
 function doBuild() {
     local withTest=false withSbom=false withPodman=false withSonar=true
-    local buildEds=false buildStone=false named=false
+    local buildEds=false buildRune=false buildStone=false buildTolk=false named=false
     for option in "$@"; do
         case "${option}" in
             eds) buildEds=true; named=true ;;
+            rune) buildRune=true; named=true ;;
             stone) buildStone=true; named=true ;;
-            all) buildEds=true; buildStone=true; named=true ;;
+            tolk) buildTolk=true; named=true ;;
+            all) buildEds=true; buildRune=true; buildStone=true; buildTolk=true; named=true ;;
             --test) withTest=true ;;
             --sbom) withSbom=true ;;
             --no-sonar) withSonar=false ;;
@@ -326,9 +357,20 @@ function doBuild() {
         esac
     done
 
+    # The build container only holds the JDK, so Tolk can't be built in it.
+    local note=""
     if [[ "${named}" != true ]]; then
         buildEds=true
+        buildRune=true
         buildStone=true
+        if [[ "${withPodman}" == true ]]; then
+            note="Tolk is not built with --podman, as the build container has no Go."
+        else
+            buildTolk=true
+        fi
+    elif [[ "${withPodman}" == true && "${buildTolk}" == true ]]; then
+        usageError "Tolk can't be built with --podman, as the build container has no Go."
+        return 1
     fi
     # The SBOM of the project is aggregated over all Maven modules.
     if [[ "${withSbom}" == true && "${buildEds}" != true ]]; then
@@ -346,7 +388,9 @@ function doBuild() {
 
     local parts=()
     [[ "${buildEds}" == true ]] && parts+=(EDS)
+    [[ "${buildRune}" == true ]] && parts+=(Rune)
     [[ "${buildStone}" == true ]] && parts+=("the stone alone")
+    [[ "${buildTolk}" == true ]] && parts+=(Tolk)
     local what
     what=$(IFS=,; echo "${parts[*]}")
     what="${what//,/, }"
@@ -355,19 +399,21 @@ function doBuild() {
     logDir=$(mktemp -d -t eds-build-XXXXXX)
     local start=${SECONDS}
 
-    # The images which are built: of EDS, and of the stone alone
+    # The images which are built: of EDS with Rune, and of the stone alone
     local images=()
-    [[ "${buildEds}" == true ]] && images+=(eds)
+    [[ "${buildRune}" == true ]] && images+=(rune)
     [[ "${buildStone}" == true ]] && images+=(stone)
 
     local tools=(java)
     [[ "${withPodman}" == true ]] && tools=(podman)
     [[ ${#images[@]} -gt 0 && "${withPodman}" != true ]] && tools+=(podman)
+    [[ "${buildTolk}" == true ]] && tools+=(go)
     [[ "${withSbom}" == true ]] && tools+=(grype jq syft)
     # SonarQube runs with the local Java, also after a build with --podman
     [[ "${withSonar}" == true && "${withPodman}" == true ]] && tools+=(java)
 
     echo "EDS Build: ${what}"
+    [[ -n "${note}" ]] && echo "${note}"
     section "Build"
     requireTools "${tools[@]}" || { summary; return 1; }
 
@@ -377,6 +423,8 @@ function doBuild() {
     # The stone alone is a build of its own, after the others
     local others=()
     [[ "${buildEds}" == true ]] && others+=(EDS)
+    [[ "${buildRune}" == true ]] && others+=(Rune)
+    [[ "${buildTolk}" == true ]] && others+=(Tolk)
     local description
     description="Maven build of $(IFS=,; echo "${others[*]}")"
     description="${description//,/, }"
@@ -390,13 +438,23 @@ function doBuild() {
         description+=" in ${builderImage}"
     fi
 
-    # EDS is all the Maven modules. The stone alone is eds-quarkus built once
-    # more (-Dstone), in a folder of its own, so both JARs are kept. It is
-    # only packaged. The API and the core are built with it, unless the build
-    # before it did so.
+    # EDS is all the Maven modules. Rune is part of the EDS JAR (eds-quarkus),
+    # which needs the API and the core. Tolk (eds-cli) is a Go module, that
+    # Maven only builds with the profile cli.
+    [[ "${buildTolk}" == true ]] && mavenArgs+=(-Pcli)
+    if [[ "${buildEds}" != true ]]; then
+        local modules=()
+        [[ "${buildRune}" == true ]] && modules+=(eds-quarkus)
+        [[ "${buildTolk}" == true ]] && modules+=(eds-cli)
+        mavenArgs+=(-pl "$(IFS=,; echo "${modules[*]}")" -am)
+    fi
+    # The stone alone is eds-quarkus built once more, without Rune and Quinoa
+    # (-Dstone), in a folder of its own, so both JARs are kept. It is only
+    # packaged: what is installed is the build with Rune. The API and the
+    # core are built with it, unless the build before it did so.
     local stoneArgs=(-B -q -ntp -Dstone -pl eds-quarkus)
     local stoneDescription="Maven build of the stone alone"
-    [[ "${buildEds}" == true ]] || stoneArgs+=(-am)
+    [[ "${buildEds}" == true || "${buildRune}" == true ]] || stoneArgs+=(-am)
     if [[ "${withTest}" == true ]]; then
         description+=", with tests"
         stoneDescription+=", with tests"
@@ -413,6 +471,11 @@ function doBuild() {
         description+=" (-Psbom)"
     fi
 
+    # Only Rune needs Node, the stone alone is built without it
+    if [[ "${buildEds}" == true || "${buildRune}" == true ]]; then
+        cacheNode "${withPodman}"
+    fi
+
     if [[ ${#others[@]} -gt 0 ]]; then
         runStep "${description}" maven "${mvn[@]}" "${mavenArgs[@]}" clean install || { summary; return 1; }
     fi
@@ -423,9 +486,11 @@ function doBuild() {
     fi
     if [[ "${buildStone}" == true ]]; then
         runStep "${stoneDescription}" maven-stone "${mvn[@]}" "${stoneArgs[@]}" clean package || { summary; return 1; }
+        runStep "The stone alone holds neither Rune nor Quinoa" stone-jar checkStoneJar || { summary; return 1; }
     fi
 
-    # The images of EDS and of the stone alone
+    # Rune is served by the EDS container, so its image is always built too,
+    # and so is the image of the stone alone.
     local kind
     for kind in "${images[@]}"; do
         runStep "Container image $(imageOf "${kind}")" "container-${kind}" buildImage "${kind}" || { summary; return 1; }
@@ -439,13 +504,18 @@ function doBuild() {
     fi
 
     section "Artifacts"
-    if [[ "${buildEds}" == true ]]; then
-        echo "  EDS JAR:          ${appJar#"${scriptDir}"/}"
-        echo "  Container image:  ${containerImage}"
+    if [[ "${buildEds}" == true || "${buildRune}" == true ]]; then
+        echo "  EDS JAR, with Rune:      ${appJar#"${scriptDir}"/}"
+    fi
+    if [[ "${buildRune}" == true ]]; then
+        echo "  Container image:         ${containerImage}"
     fi
     if [[ "${buildStone}" == true ]]; then
-        echo "  Stone JAR:        ${stoneJar#"${scriptDir}"/}"
-        echo "  Container image:  ${stoneImage}"
+        echo "  Stone JAR, without Rune: ${stoneJar#"${scriptDir}"/}"
+        echo "  Container image:         ${stoneImage}"
+    fi
+    if [[ "${buildTolk}" == true ]]; then
+        echo "  Tolk:                    ${tolkDist#"${scriptDir}"/}/"
     fi
     if isContainerRunning && [[ " ${images[*]} " == *" $(containerKind) "* ]]; then
         echo
@@ -472,20 +542,70 @@ function prepareBuilder() {
 }
 
 # ==============================================================================
+# Node behind an HTTP proxy
+# ------------------------------------------------------------------------------
+# Quinoa installs the Node which builds Rune, and downloads it without the
+# proxy of the environment (HTTPS_PROXY), so behind one the build fails. Its
+# cache is looked in first: the archive is put there with curl, which uses
+# the proxy. The build container is Alpine and needs the musl build of Node,
+# the host its own, so both may be in the cache. Without a proxy, or if curl
+# fails, Quinoa is left to it.
+#   $1 = true for the build container
+# ==============================================================================
+function cacheNode() {
+    local inContainer="${1}"
+    [[ -n "${HTTPS_PROXY:-${https_proxy:-}}" ]] || return 0
+    command -v curl > /dev/null 2>&1 || return 0
+
+    local version
+    version=$(sed -n 's/^quarkus\.quinoa\.package-manager-install\.node-version=//p' \
+        "${scriptDir}/eds-quarkus/src/main/rune/META-INF/microprofile-config.properties")
+    local arch
+    case "$(uname -m)" in
+        x86_64) arch="x64" ;;
+        aarch64 | arm64) arch="arm64" ;;
+        *) return 0 ;;
+    esac
+    [[ -n "${version}" && "$(uname -s)" == "Linux" ]] || return 0
+    if [[ "${inContainer}" == true ]] || (ldd --version 2>&1 | grep -qi musl); then
+        arch+="-musl"
+    fi
+
+    local name="node-v${version}-linux-${arch}.tar.gz"
+    local cache="${scriptDir}/eds-quarkus/.quinoa/cache"
+    # A download which failed leaves an empty file, which would be taken
+    # for the archive.
+    [[ -s "${cache}/${name}" ]] && return 0
+    mkdir -p "${cache}"
+    rm -f "${cache}/${name}"
+    if curl -fsSL --max-time 300 -o "${cache}/${name}.part" "https://nodejs.org/dist/v${version}/${name}" 2> "${logDir}/node.log"; then
+        mv "${cache}/${name}.part" "${cache}/${name}"
+        ok "Node ${version} fetched through the proxy (${name})"
+    else
+        rm -f "${cache}/${name}.part"
+    fi
+}
+
+# ==============================================================================
 # SBOM checks
 # ------------------------------------------------------------------------------
-# Validates the Software Bill of Materials (SBOM) from the Maven build and for
-# the container images, and scans them for
+# Validates the Software Bill of Materials (SBOM) from the Maven build, of the
+# npm packages of Rune, and for the container images, and scans them for
 # vulnerabilities with Grype, the same way as the CI Build does. High or
 # Critical findings fail the check, reviewed findings can be suppressed in
 # .grype.yaml.
 # ==============================================================================
 function sbomChecks() {
-    # $@ = the images which were built: eds, stone, both or none
+    # $@ = the images which were built: rune, stone, both or none
     local kinds=("$@")
     local candidates=("${targetDir}"/eds-*-cyclonedx.json)
     local mavenSbom=""
     [[ -e "${candidates[0]}" ]] && mavenSbom="${candidates[0]}"
+
+    # Rune is in the EDS JAR, which --sbom always builds. Syft reads only
+    # the lockfile, so Node is not needed for it.
+    runStep "Syft SBOM for the npm packages of Rune" syft-npm \
+        syft scan "file:${runeLock}" -q -o "cyclonedx-json=${runeSbom}"
 
     local kind image sbom label
     for kind in "${kinds[@]}"; do
@@ -501,6 +621,7 @@ function sbomChecks() {
 
     section "SBOMs"
     sbomValidate "Maven" "${mavenSbom:-${targetDir}/eds-<version>-cyclonedx.json}" "1.6"
+    sbomValidate "Rune (npm)" "${runeSbom}" ""
     for kind in "${kinds[@]}"; do
         sbom=$(sbomOf "${kind}")
         label=$(sbomLabel "${kind}")
@@ -514,11 +635,12 @@ function sbomChecks() {
 
     section "Vulnerabilities (fails on High or Critical)"
     sbomScan "Maven" "${mavenSbom}" "grype-report.json"
+    sbomScan "Rune (npm)" "${runeSbom}" "grype-report-rune-npm.json"
     for kind in "${kinds[@]}"; do
         if [[ "${kind}" == stone ]]; then
             sbomScan "$(sbomLabel stone)" "${stoneSbom}" "grype-report-eds-stone-container.json"
         else
-            sbomScan "$(sbomLabel eds)" "${containerSbom}" "grype-report-eds-container.json"
+            sbomScan "$(sbomLabel rune)" "${containerSbom}" "grype-report-eds-container.json"
         fi
     done
 }
@@ -622,11 +744,11 @@ function sbomScan() {
 # EDS container
 # ==============================================================================
 function startContainer() {
-    local withMasterKey=false kind=eds
+    local withMasterKey=false kind=rune
     for option in "$@"; do
         case "${option}" in
             --masterkey) withMasterKey=true ;;
-            stone | eds) kind="${option}" ;;
+            stone | rune) kind="${option}" ;;
             *) usageError "Unknown option: ${option}"; return 1 ;;
         esac
     done
@@ -713,12 +835,12 @@ function startContainer() {
     waitForEds "${kind}"
 }
 
-# Where the container is reached
+# Where the container is reached: the stone alone has no Rune
 function servedAt() {
     if [[ "${1}" == stone ]]; then
-        echo "the API at http://localhost:${PORT}/api/v1 (the stone alone)"
+        echo "the API at http://localhost:${PORT}/api/v1 (the stone alone, without Rune)"
     else
-        echo "the API at http://localhost:${PORT}/api/v1"
+        echo "Rune at http://localhost:${PORT}/, the API at http://localhost:${PORT}/api/v1"
     fi
 }
 
@@ -732,7 +854,7 @@ function waitForEds() {
         version=$(edsVersion)
         if [[ -n "${version}" ]]; then
             echo
-            echo "EDS ${version} is ready: $(servedAt "${1:-eds}")"
+            echo "EDS ${version} is ready: $(servedAt "${1:-rune}")"
             return 0
         fi
         echo -n "."
@@ -770,10 +892,10 @@ function stopContainer() {
 
 # Stops and starts the container, with the options of start. The container
 # is replaced at the start, so a new image and configuration are used. It
-# stays what it was, the stone alone or EDS, unless one is named.
+# stays what it was, the stone alone or EDS with Rune, unless one is named.
 function restartContainer() {
     local options=("$@")
-    if containerExists && [[ " $* " != *" stone "* && " $* " != *" eds "* ]]; then
+    if containerExists && [[ " $* " != *" stone "* && " $* " != *" rune "* ]]; then
         options+=("$(containerKind)")
     fi
     stopContainer || return 1
@@ -925,19 +1047,19 @@ function showStatus() {
 
     section "Build"
     if [[ -f "${appJar}" ]]; then
-        ok "EDS JAR: ${appJar#"${scriptDir}"/}"
+        ok "EDS JAR, with Rune: ${appJar#"${scriptDir}"/}"
     else
         echo "  [--]   EDS JAR not found, run '${script} build'"
     fi
-    if ! imageExists eds; then
-        echo "  [--]   Container image not found, run '${script} build eds'"
-    elif imageOutdated eds; then
+    if ! imageExists rune; then
+        echo "  [--]   Container image not found, run '${script} build rune'"
+    elif imageOutdated rune; then
         echo "  [--]   Container image ${containerImage} was not built from the present EDS JAR, '${script} start' rebuilds it"
     else
         ok "Container image: ${containerImage}"
     fi
     if [[ -f "${stoneJar}" ]]; then
-        ok "Stone JAR: ${stoneJar#"${scriptDir}"/}"
+        ok "Stone JAR, without Rune: ${stoneJar#"${scriptDir}"/}"
     else
         echo "  [--]   Stone JAR not found, run '${script} build stone'"
     fi
@@ -947,6 +1069,12 @@ function showStatus() {
         echo "  [--]   Container image ${stoneImage} was not built from the present Stone JAR, '${script} start stone' rebuilds it"
     else
         ok "Container image: ${stoneImage}"
+    fi
+    local tolk=("${tolkDist}"/tolk-*)
+    if [[ -e "${tolk[0]}" ]]; then
+        ok "Tolk: ${#tolk[@]} binaries in ${tolkDist#"${scriptDir}"/}/"
+    else
+        echo "  [--]   Tolk not found, run '${script} build tolk'"
     fi
 
     section "EDS container"
@@ -996,9 +1124,28 @@ function showLogs() {
 # ==============================================================================
 readonly binDir="${HOME}/.local/bin"
 readonly completionDir="${XDG_DATA_HOME:-${HOME}/.local/share}/bash-completion/completions"
+readonly manDir="${XDG_DATA_HOME:-${HOME}/.local/share}/man"
 readonly bashrcFile="${HOME}/.bashrc"
 readonly bashrcBegin="# >>> eds.sh install >>>"
 readonly bashrcEnd="# <<< eds.sh install <<<"
+
+# The Tolk binary of this system, e.g. tolk-2.0-SNAPSHOT-linux-amd64
+function tolkBinary() {
+    local os arch
+    case "$(uname -s)" in
+        Linux) os=linux ;;
+        Darwin) os=darwin ;;
+        *) return 1 ;;
+    esac
+    case "$(uname -m)" in
+        x86_64 | amd64) arch=amd64 ;;
+        aarch64 | arm64) arch=arm64 ;;
+        *) return 1 ;;
+    esac
+    local found=("${tolkDist}"/tolk-*-"${os}-${arch}")
+    [[ -e "${found[0]}" ]] && echo "${found[0]}"
+    return 0
+}
 
 # Whether bash-completion is there, which loads the completion of a command
 # from the user's completion directory when the command is first completed
@@ -1017,8 +1164,10 @@ function removeBashrcBlock() {
     sed -i.eds-backup "/^${bashrcBegin}\$/,/^${bashrcEnd}\$/d" "${bashrcFile}" && rm -f "${bashrcFile}.eds-backup"
 }
 
-# Puts eds.sh on the PATH, in ~/.local/bin, with its bash completion. eds.sh
-# is linked, so it stays the script of this checkout. ~/.bashrc is only changed when ~/.local/bin isn't
+# Puts eds.sh and Tolk on the PATH, in ~/.local/bin, with their bash
+# completion and the manual pages of Tolk. eds.sh is linked, so it stays the
+# script of this checkout; Tolk is copied, built first if it is missing or
+# older than its sources. ~/.bashrc is only changed when ~/.local/bin isn't
 # on the PATH, or bash-completion isn't there to load the completions.
 function doInstall() {
     local remove=false
@@ -1034,21 +1183,40 @@ function doInstall() {
     fi
 
     section "eds.sh"
-    mkdir -p "${binDir}" "${completionDir}"
+    mkdir -p "${binDir}" "${completionDir}" "${manDir}/man1" "${manDir}/de/man1"
     ln -sfn "${scriptDir}/eds.sh" "${binDir}/eds.sh"
     ok "Linked as ${binDir}/eds.sh"
     showCompletion > "${completionDir}/eds.sh"
     ok "Bash completion: ${completionDir}/eds.sh"
+
+    section "Tolk"
+    local binary
+    if ! binary=$(tolkBinary); then
+        fail "Tolk is not built for $(uname -s) $(uname -m)"
+        return 1
+    fi
+    if [[ -z "${binary}" ]] || [[ -n "$(find "${tolkDir}/cmd" "${tolkDir}/internal" -newer "${binary}" -print -quit)" ]]; then
+        echo "  [..]   Tolk is $([[ -z "${binary}" ]] && echo "not built" || echo "older than its sources"), building it"
+        (doBuild tolk) > /dev/null || { fail "Building Tolk, see '${script} build tolk'"; return 1; }
+        binary=$(tolkBinary)
+    fi
+    install -m 755 "${binary}" "${binDir}/tolk.new" && mv -f "${binDir}/tolk.new" "${binDir}/tolk"
+    ok "Copied as ${binDir}/tolk ($("${binDir}/tolk" version 2>/dev/null))"
+    "${binDir}/tolk" completion bash > "${completionDir}/tolk"
+    ok "Bash completion: ${completionDir}/tolk"
+    cp "${tolkDist}/tolk.1" "${manDir}/man1/tolk.1"
+    cp "${tolkDist}/tolk.de.1" "${manDir}/de/man1/tolk.1"
+    ok "Manual pages: man tolk"
 
     section "Shell"
     local lines=()
     [[ ":${PATH}:" == *":${binDir}:"* ]] \
         || lines+=("case \":\${PATH}:\" in *\":${binDir}:\"*) ;; *) export PATH=\"${binDir}:\${PATH}\" ;; esac")
     hasBashCompletion \
-        || lines+=("[[ -r \"${completionDir}/eds.sh\" ]] && source \"${completionDir}/eds.sh\"")
+        || lines+=("for f in \"${completionDir}/eds.sh\" \"${completionDir}/tolk\"; do [[ -r \"\${f}\" ]] && source \"\${f}\"; done")
     removeBashrcBlock
     if [[ ${#lines[@]} -eq 0 ]]; then
-        ok "${binDir} is on the PATH, and bash-completion loads the completion"
+        ok "${binDir} is on the PATH, and bash-completion loads the completions"
     else
         {
             echo "${bashrcBegin}"
@@ -1058,17 +1226,18 @@ function doInstall() {
         } >> "${bashrcFile}"
         local added=()
         [[ ":${PATH}:" == *":${binDir}:"* ]] || added+=("${binDir} on the PATH")
-        hasBashCompletion || added+=("the completion")
+        hasBashCompletion || added+=("the completions")
         ok "Added to ${bashrcFile}: $(IFS=,; echo "${added[*]}" | sed 's/,/, /g')"
     fi
     echo
-    echo "Installed. In a new shell, or after 'source ~/.bashrc', 'eds.sh' completes with Tab."
+    echo "Installed. In a new shell, or after 'source ~/.bashrc', 'eds.sh' and 'tolk' complete with Tab."
 }
 
 function uninstall() {
     section "Removing what '${script} install' put in place"
-    rm -f "${binDir}/eds.sh" "${completionDir}/eds.sh"
-    ok "eds.sh and its completion"
+    rm -f "${binDir}/eds.sh" "${binDir}/tolk" "${completionDir}/eds.sh" "${completionDir}/tolk" \
+        "${manDir}/man1/tolk.1" "${manDir}/de/man1/tolk.1"
+    ok "eds.sh and Tolk, their completions and the manual pages of Tolk"
     removeBashrcBlock
     ok "The block in ${bashrcFile}, if there was one"
 }
@@ -1088,10 +1257,10 @@ _eds_sh() {
         words=(build start stop restart status logs masterkey fitnesse install completion)
     else
         case "${COMP_WORDS[1]}" in
-            build) words=(eds stone all --test --sbom --podman)
+            build) words=(eds rune stone tolk all --test --sbom --podman)
                    [[ " ${COMP_WORDS[*]} " == *" --test "* ]] && words+=(--no-sonar) ;;
-            start | restart) words=(stone eds --masterkey)
-                   [[ " ${COMP_WORDS[*]} " == *" stone "* || " ${COMP_WORDS[*]} " == *" eds "* ]] \
+            start | restart) words=(stone rune --masterkey)
+                   [[ " ${COMP_WORDS[*]} " == *" stone "* || " ${COMP_WORDS[*]} " == *" rune "* ]] \
                        && words=(--masterkey) ;;
             stop | install) words=(--remove) ;;
             masterkey)

@@ -294,8 +294,9 @@ relabelled for the container.
 The container is managed with `eds.sh` from the project root:
 
 ```bash
-./eds.sh build            # Build EDS and the stone alone, and their container images
-./eds.sh build stone      # Only the stone alone, and its container image
+./eds.sh build            # Build EDS, Rune and Tolk, and the container image
+./eds.sh build rune       # Only the EDS JAR with Rune, and the container image
+./eds.sh build stone      # Only the stone alone, without Rune, and its container image
 ./eds.sh start            # Start the container, wait until ready
 ./eds.sh start stone      # The same with the stone alone
 ./eds.sh stop             # Stop the container
@@ -305,7 +306,7 @@ The container is managed with `eds.sh` from the project root:
 ./eds.sh logs             # Follow the container logs
 ```
 
-`build` takes `eds` and `stone` to build only those, and `--test`
+`build` takes `eds`, `rune`, `stone` and `tolk` to build only those, and `--test`
 to also run the tests. With the tests of `eds`, SonarQube analyses the code too, and
 the build fails unless its quality gate passes, so anything new it finds is resolved
 before a commit. The scanner takes the server and the token from `SONAR_HOST_URL`
@@ -315,21 +316,33 @@ or was not built from the present JAR.
 
 ### The Stone Alone
 
-The stone alone is EDS built as the server alone, with a JAR and a container image
-of its own (the Maven property `stone`):
+EDS is built in two forms, each with its own JAR and container image:
 
 | | JAR | Image | Serves |
 |---|---|---|---|
-| The stone alone | `eds-quarkus/target/eds-stone.jar` | `eds-stone:local` | the API below `/api/v1` |
+| EDS with Rune | `eds-quarkus/target/eds-rune.jar` | `eds-quarkus:local` | Rune at `/`, the API below `/api/v1` |
+| The stone alone | `eds-quarkus/target/eds-stone.jar` | `eds-stone:local` | only the API below `/api/v1` |
+
+The stone alone holds neither the files of Rune nor Quinoa, the library which
+serves them. Which of the two a JAR is, is decided when it is built (the Maven
+property `stone`), not by a setting: nothing in a running stone can switch the web
+app on, as it isn't there. The build checks the JAR for it, and `EdsStoneTest`
+that every path of Rune is answered with 404.
 
 ```bash
 ./eds.sh build stone                       # The JAR and the image
-./eds.sh start stone                       # Run it
+./eds.sh start stone                       # Run it, in place of EDS with Rune
 mvn -Dstone -pl eds-quarkus package        # Or the JAR with Maven alone
 ```
 
-It is run and set up as EDS is, and takes the same settings; it is what a host
-runs (below).
+Both are run the same way and take the same settings. `restart` keeps the form
+the container has; `restart stone` or `restart rune` changes it. A build of Rune
+cleans `eds-quarkus/target`, and with it the Stone JAR, so `build stone` comes
+after it, as `eds.sh build` does; the image of the stone is kept.
+
+Tolk and any other client of the API work with the stone alone as with any
+stone. A Rune served from elsewhere does too, once its address is named in the
+setting `eds.cors.value` of the stone.
 
 The MasterKey (see MasterKey above) can be handled with it too:
 
@@ -378,8 +391,13 @@ configuration.
 ## Setting Up a Stone on a Host
 
 This is the whole way from an empty host to a stone which runs, keeps its data
-in PostgreSQL, is reached over HTTPS and starts with the host. It runs the image
-of the stone alone, `eds-stone:local`, saved as the archive `eds-stone.tar`.
+in PostgreSQL, is reached over HTTPS and starts with the host. It is the same
+for both forms; only the image differs:
+
+| Form | Image | Archive (below) | Serves |
+|---|---|---|---|
+| The stone alone | `eds-stone:local` | `eds-stone.tar` | only the API below `/api/v1` |
+| EDS with Rune | `eds-quarkus:local` | `eds-rune.tar` | Rune at `/`, the API below `/api/v1` |
 
 The host needs nothing of the EDS sources: one image and the script `stone`
 (`accessories/podman/stone`), which sets up and controls the container. The
@@ -397,8 +415,8 @@ topic with the details: `podman`, `images`, `settings`, `postgresql`, `masterkey
 ### 1. Where EDS is built: the image and the script
 
 ```bash
-$ ./eds.sh build stone
-$ podman save -o eds-stone.tar eds-stone:local
+$ ./eds.sh build stone                               # or: ./eds.sh build rune
+$ podman save -o eds-stone.tar eds-stone:local       # or: -o eds-rune.tar eds-quarkus:local
 $ scp eds-stone.tar accessories/podman/stone user@host:
 ```
 
@@ -422,7 +440,7 @@ give every new user. If `stone check` says they are missing:
 ```bash
 $ mkdir -p ~/.local/bin && install -m 755 stone ~/.local/bin/stone
 $ stone                                              # the help
-$ stone load eds-stone.tar
+$ stone load eds-stone.tar                           # or: eds-rune.tar
 ```
 
 If `~/.local/bin` is not in the PATH, add it in `~/.profile`:
@@ -464,13 +482,14 @@ already exists elsewhere only needs the role and the database.
 ### 5. The settings
 
 ```bash
-$ stone init
+$ stone init stone                                   # or: stone init rune
 ```
 
 This creates `~/.config/stone/stone.env`, readable only by that user, as it
 holds the password of the database. One setting per line, without quotes:
 
 ```bash
+STONE_KIND=stone
 STONE_BIND=127.0.0.1
 STONE_PORT=8080
 STONE_MASTERKEY=file
@@ -481,11 +500,12 @@ EDS_DB_PASSWORD=a long password
 
 | Setting | Default | |
 |---|---|---|
+| `STONE_KIND` | `stone` | What is run: `stone` (only the API) or `rune` (the API and the web app) |
 | `STONE_BIND` | `127.0.0.1` | The address of the host the stone listens on. `127.0.0.1` is only the host itself, which is right behind a reverse proxy; `0.0.0.0` is every address |
 | `STONE_PORT` | `8080` | The port of the host for HTTP |
 | `STONE_TLS_PORT` | `8443` | The port of the host for HTTPS by the stone itself, published when `EDS_TLS_CERT` is set |
 | `STONE_MASTERKEY` | `file` | `file` starts the stone with `~/.config/stone/masterkey`; `none` doesn't |
-| `STONE_IMAGE` | `eds-stone:local` | Another image, e.g. one from a registry |
+| `STONE_IMAGE` | (by `STONE_KIND`) | Another image, e.g. one from a registry |
 | `STONE_NAME` | `stone` | The name of the container; `stone-<name>` for a named instance |
 | `STONE_ADMIN_ACCOUNT` | (asked) | The account name of the System Administrator, for `masterkey load` |
 | `EDS_...` | | The settings of the stone itself, see [Properties](#properties) |
@@ -528,8 +548,8 @@ A new stone has no account, and sets no name for one (see
 [The System Administrator](#the-system-administrator)): whoever comes to it first
 becomes its System Administrator, under the account name and with the passphrase
 given. So choose the name and be the first, right after the first start, before
-the stone is reachable from outside: with `stone masterkey load`, which asks for
-the name, or with the MasterKey request.
+the stone is reachable from outside: in Rune, with Tolk, or with
+`stone masterkey load`, which asks for the name.
 
 ### 8. [ROOT] HTTPS, by a reverse proxy
 
@@ -601,13 +621,14 @@ $ stone status
 
 ### Several Stones on One Host
 
-A host may run several stones, e.g. one for each group of people. Each is an
-instance with a name, given before the command; without one it is the default
-instance, which is all a host with one stone needs:
+A host may run several stones, e.g. one for each group of people, or a stone
+alone beside an EDS with Rune. Each is an instance with a name, given before the
+command; without one it is the default instance, which is all a host with one
+stone needs:
 
 ```bash
-$ stone -i north init                                # proposes the next free port
-$ stone -i south init
+$ stone -i north init stone                          # proposes the next free port
+$ stone -i south init rune
 $ stone list                                         # the instances, and what each is doing
 ```
 
@@ -650,6 +671,14 @@ $ stone list
 
 Every command is for one instance. Only `list` and `load` are for all of them,
 and `cleanup` keeps an image the container of another instance runs from.
+
+### Using a Stone Alone from a Rune
+
+A stone alone has no web app, so a browser reaches it from a Rune served
+elsewhere. A browser only allows that if the stone names the address of that
+Rune in its setting `eds.cors.value` (see [The Status of a Stone](#the-status-of-a-stone)),
+which the System Administrator changes with the settings request. Tolk and other
+programs which are not web pages need nothing.
 
 ### A New Version
 
@@ -882,6 +911,116 @@ load, the last 24 hours in steps of five minutes, and the last 720 samples of th
 inventory. A restart starts them anew. The load of the database itself isn't told;
 `databaseMillis`, the time a trivial query takes, rises with it. Stones on the same
 database server tell the same `databaseMark`.
+
+## Rune and Tolk against a Stone
+
+Four tests: two need no stone and are part of every build of Rune; two run
+against a running stone, a test system with an empty in-memory database (`java -jar eds-quarkus/target/eds-rune.jar`). They need Node 24 or
+later, which runs TypeScript as it is; the build keeps one in
+`eds-quarkus/.quinoa/node/`.
+
+```sh
+cd eds-quarkus/src/main/webui
+node scripts/test-e2e.ts      # the convention against its vectors (no stone needed)
+node scripts/test-features.ts    # plans, calendar, location, status (no stone needed)
+node node_modules/vite/bin/vite.js build --config vite.flow.config.ts
+node scripts/flow/flow.ts http://localhost:8080            # Rune's modules as several people
+(cd ../../../../eds-cli && go build -o /tmp/tolk ./cmd/tolk)
+node scripts/flow/together.ts http://localhost:8080 /tmp/tolk   # Rune and Tolk in the same chambers
+```
+
+`flow.ts` and `together.ts` each want a stone without their accounts, so the stone
+is started anew between them. The first two are part of every build of Rune.
+
+## Chambers: Who Gets the Key, and How
+
+A chamber is only usable by a member who has **its key**. Being a member is not
+enough: someone who was added and has no key sees the chamber, and can read and
+write nothing in it. Nobody copies a key by hand, and there is no field to paste
+one into. The apps pass it on, in two steps which each have one actor:
+
+1. **The member has keys of their own** (a key pair, made once per account):
+   - made with their first chamber, or by accepting an invitation link;
+   - or made on purpose: in Rune under the name in the menu, "Keys for chambers",
+     "Make my keys"; in Tolk with `tolk key create`.
+   The recovery key shown then is the member's own, for further devices. It is
+   not given to anyone, the administrator included.
+2. **An administrator's app gives them the key of the chamber**, locked to the
+   member's public key:
+   - Rune does it by itself while an administrator has the chamber open. It looks
+     every few seconds as long as a member waits, so the administrator clicks
+     nothing.
+   - Tolk does it when an administrator lists the members: `tolk members <room>`.
+
+The member's Rune opens the chamber by itself when the key has come.
+
+| The member was… | Keys of their own | The key of the chamber |
+|---|---|---|
+| invited by link | made on accepting | carried by the link: at once, nobody else has to be online |
+| added, and has keys already | there | given by the app which adds them: at once |
+| added, and has no keys yet | **the member makes them first** | given once an administrator has the chamber open in Rune, or lists its members in Tolk |
+
+What each side sees meanwhile:
+
+- The member: "You have no keys for chambers yet…" (step 1 is theirs), then "You
+  have no key to this chamber yet…" (step 2 is the administrator's app).
+- The administrator, with the members of the chamber: "no keys yet" (the member
+  has to do step 1), "waits for the key" (step 2 is about to happen), "invited,
+  not joined yet", or nothing when the member has the key.
+
+So for a chamber to work for someone who was added, an administrator of it has to
+be signed in with the chamber open, or list its members, once after the member
+made their keys. Until then the member is locked out, by design: the stone
+can't hand the key over, as it never has it. An invitation link avoids the wait.
+
+A key which changed since the administrator's device last saw it is not given
+the key of the chamber by itself: the administrator compares the fingerprint
+with the member first ("The key changed", with the members).
+
+## Who Is Online, and Calls
+
+Rune shows a light beside a person who is online, and makes voice and video calls
+between the people of a room, or between two of them (`FEATURES.md`, "Presence and
+calls"). A call has at most four people.
+
+- **The light** needs nothing: the stone tells who is connected, to the people who
+  share a room with them. Everyone can switch their own off, in Rune under their
+  name ("Online status") and in Tolk with `tolk settings present false`.
+- **Calls** are the feature `calls`. The System Administrator offers it in the
+  stone settings, and an administrator of a room switches it on under "Features".
+  The buttons for the call of a room are at the top of its chat; a telephone
+  beside a person calls them directly. Tolk makes no calls.
+- **A call set for a time** is an event of the room's calendar, marked as a call.
+  Rune tells of it ten minutes before and when it starts, while it is open.
+- **A browser asks for the microphone**, and for the camera when it is switched
+  on. It only does over `https`, or on `localhost`.
+
+Sound and picture go from device to device, encrypted between them, and not
+through the stone. That works by itself where the devices reach each other
+directly: in one network, or with public addresses. Elsewhere a call needs a
+**relay**, which EDS doesn't bring along:
+
+- A STUN server tells a device its address as others see it, which is enough
+  behind most home routers. A TURN server passes the call on where that isn't
+  enough: company networks, some mobile networks. It can't read what it passes on.
+- [coturn](https://github.com/coturn/coturn) is both. A small `turnserver.conf`:
+
+  ```
+  listening-port=3478
+  realm=turn.example.org
+  lt-cred-mech
+  user=name:credential
+  fingerprint
+  ```
+
+  Its ports must be reachable from the devices: 3478 over UDP and TCP, and the
+  range it relays on. coturn's documentation has the rest, TLS among it.
+- An administrator of a room names the servers under "Features", "Relay…", one
+  per line: `stun:turn.example.org:3478`, and
+  `turn:turn.example.org:3478 name credential`. They are kept as an entry of the
+  room, so everyone in it can read them; in a chamber the stone can't.
+- Rune names no public server by itself, as that would tell a third party who
+  calls.
 
 ## Tolk, the Command Line
 

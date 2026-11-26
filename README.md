@@ -40,10 +40,10 @@ findings of that testing, to guarantee that the stability will remain high. The 
 Java 25, and [Maven](https://maven.apache.org/).
 
 In the root folder, there exists a small script, ```eds.sh```, which can be used to
-build EDS and the stone alone, and to control the EDS container:
+build EDS, Rune and Tolk, and to control the EDS container:
 
 ```bash
-./eds.sh build [eds] [stone] [--test [--no-sonar]] [--sbom] [--podman]
+./eds.sh build [eds] [rune] [stone] [tolk] [--test [--no-sonar]] [--sbom] [--podman]
 ./eds.sh start [stone] [--masterkey] | stop [--remove] | restart
 ./eds.sh status | logs
 ./eds.sh fitnesse start | fitnesse stop
@@ -51,30 +51,41 @@ build EDS and the stone alone, and to control the EDS container:
 ./eds.sh install [--remove] | completion
 ```
 
-Without a name, ```build``` builds both; the tests only run with ```--test```.
+Without a name, ```build``` builds all of them; the tests only run with ```--test```.
 With the tests of EDS, SonarQube analyses the code as well, and the build fails unless
 its quality gate passes (```SONAR_HOST_URL``` and ```SONAR_TOKEN``` name the server and
 the token; ```--no-sonar``` leaves it out).
-```install``` puts ```eds.sh``` on the PATH, in ```~/.local/bin```, with its bash
-completion. ```~/.bashrc``` is only changed when ```~/.local/bin``` isn't
+Rune, the web app, is part of the EDS JAR and served by the EDS container, so
+```build rune``` also builds the container image.
+```install``` puts ```eds.sh``` and Tolk on the PATH, in ```~/.local/bin```, with the bash
+completion of both and the manual pages of Tolk; Tolk is built first if it is missing
+or older than its sources. ```~/.bashrc``` is only changed when ```~/.local/bin``` isn't
 on the PATH or bash-completion is missing, and ```install --remove``` takes all of it out
 again. ```completion``` prints the bash completion of the script alone.
 
-The stone alone is the server built as a JAR and a container image of its own
-(```eds-quarkus/target/eds-stone.jar```, ```eds-stone:local```), which a host runs.
-```build stone``` builds it, ```start stone``` runs it. See [RUNNING.md](RUNNING.md),
-"The Stone Alone".
+The stone alone is the server without the web app, for where only the API is
+wanted. ```build stone``` builds it as a JAR and a container image of its own
+(```eds-quarkus/target/eds-stone.jar```, ```eds-stone:local```), which hold
+neither Rune nor Quinoa, the library which serves it: this is decided when it is
+built, so nothing in a running stone can switch the web app on.
+```start stone``` runs it. See [RUNNING.md](RUNNING.md), "The Stone Alone".
 
 ```eds.sh``` is for the machine EDS is built on. On a host which only runs a stone,
-the script ```accessories/podman/stone``` is all that is needed
+with or without Rune, the script ```accessories/podman/stone``` is all that is needed
 beside the image: it is put in the PATH, and sets up and controls the container as
 a normal user. ```stone help setup``` tells the steps, from the database to HTTPS,
 and which of them need root. See [RUNNING.md](RUNNING.md), "Setting Up a Stone on
 a Host".
 
+Tolk, the command line for the terminal and for scripts, is written in Go and
+built with ```./eds.sh build tolk```, or ```mvn -Pcli install``` (Go must be
+installed); its binaries for Linux, macOS and Windows are written to
+```eds-cli/target/dist/```. See [RUNNING.md](RUNNING.md), "Tolk, the Command Line".
+
 With ```--podman```, the Maven build runs in the Podman build container,
 ```build.container```, so only Podman is needed instead of a local Java. The
-container image and the SBOM scans are still built and run on the host.
+container image and the SBOM scans are still built and run on the host. The
+build container has no Go, so Tolk is not built with it.
 
 ### OpenAPI Specification
 The OpenAPI Specification of the REST API is ```eds-api/src/main/resources/openapi.json```.
@@ -141,13 +152,25 @@ syft scan oci-archive:target/eds-quarkus.tar -o cyclonedx-json=target/container-
 grype sbom:target/container-eds-quarkus-cyclonedx.json --fail-on high
 ```
 
+#### Rune SBOM
+The web app Rune is built with npm, so its packages are not in the Maven SBOM.
+Syft reads them from its lockfile, and only those which are part of the web
+app: the tools which build it (devDependencies) are not shipped, and are left
+out. The SBOM is written to ```target/rune-npm-cyclonedx.json```, and is
+scanned like the others:
+
+```bash
+syft scan file:eds-quarkus/src/main/webui/package-lock.json -o cyclonedx-json=target/rune-npm-cyclonedx.json
+grype sbom:target/rune-npm-cyclonedx.json --fail-on high
+```
+
 All of the above, the Maven build, the container images, the SBOMs and the
 scans, can also be run in one step, with the same pass/fail rules as the CI
 Build. It requires Syft, Grype and jq, and Podman for the images:
 
 ```bash
-./eds.sh build --sbom            # Maven & container SBOMs and scans
-./eds.sh build eds --sbom        # Without the image of the stone alone
+./eds.sh build --sbom            # Maven, Rune & container SBOMs and scans
+./eds.sh build eds --sbom        # Only the Maven and Rune SBOMs and scans
 ```
 
 ## Who is this for

@@ -62,7 +62,7 @@ jobs:
           podman build --format docker -f accessories/podman/Containerfile \
               -t eds-quarkus:ci eds-quarkus/target
 
-      # The stone alone: the server as a JAR of its own
+      # The stone alone: the server without the web app, a JAR of its own
       # (target/eds-stone.jar) built from the modules installed above, and an
       # image from the same Containerfile
       - name: Build the stone alone and its container image
@@ -91,6 +91,15 @@ jobs:
           podman save --format oci-archive -o "${RUNNER_TEMP}/eds-stone.tar" eds-stone:ci
           ${{ steps.syft.outputs.cmd }} scan "oci-archive:${RUNNER_TEMP}/eds-stone.tar" \
               -o cyclonedx-json=target/container-eds-stone-cyclonedx.json
+
+      # The npm packages of Rune are not in the Maven SBOM. Syft reads them
+      # from the lockfile, only those which are part of the web app, not the
+      # tools which build it (devDependencies)
+      - name: Generate Rune npm SBOM
+        id: rune-sbom
+        run: |
+          ${{ steps.syft.outputs.cmd }} scan file:eds-quarkus/src/main/webui/package-lock.json \
+              -o cyclonedx-json=target/rune-npm-cyclonedx.json
 
       - name: Install Grype
         id: grype
@@ -124,6 +133,14 @@ jobs:
               --fail-on high \
               -o table \
               -o json=grype-report-eds-stone-container.json
+
+      - name: Scan Rune npm SBOM for vulnerabilities
+        if: ${{ !cancelled() && steps.rune-sbom.outcome == 'success' }}
+        run: |
+          ${{ steps.grype.outputs.cmd }} sbom:target/rune-npm-cyclonedx.json \
+              --fail-on high \
+              -o table \
+              -o json=grype-report-rune-npm.json
 
       - name: Upload vulnerability report
         if: ${{ always() }}

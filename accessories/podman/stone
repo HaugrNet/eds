@@ -3,7 +3,7 @@
 # stone - runs an EDS stone on a host
 # ------------------------------------------------------------------------------
 # Sets up and controls one EDS container on the host it runs on: the stone
-# alone, which serves the API. It needs
+# alone (only the API), or EDS with Rune (the API and the web app). It needs
 # nothing of the EDS sources, only this file and a container image, so it can
 # be copied to a directory of the PATH, e.g. ~/.local/bin/stone.
 #
@@ -74,7 +74,8 @@ readonly masterKeyMount="/run/secrets/eds-masterkey"
 readonly unitDir="${XDG_CONFIG_HOME:-${HOME}/.config}/systemd/user"
 readonly unitFile="${unitDir}/${unitName}.service"
 
-# The image, as 'eds.sh build stone' names it, and the label it carries
+# The two images, as 'eds.sh build' names them, and the label both carry
+readonly runeImage="eds-quarkus:local"
 readonly stoneImage="eds-stone:local"
 readonly edsLabel="maintainer=EDS Project"
 
@@ -93,6 +94,12 @@ function setting() {
     fi
     [[ -f "${envFile}" ]] && value=$(sed -n "s/^${name}=//p" "${envFile}" | tail -n 1)
     echo "${value:-${2:-}}"
+}
+
+function kind() {
+    local value
+    value=$(setting STONE_KIND stone)
+    if [[ "${value}" == rune ]]; then echo rune; else echo stone; fi
 }
 
 # The name of this instance, for a person
@@ -125,8 +132,14 @@ function instances() {
     done
 }
 
+function kindName() {
+    if [[ "${1}" == rune ]]; then echo "EDS with Rune"; else echo "the stone alone, without Rune"; fi
+}
+
 function image() {
-    setting STONE_IMAGE "${stoneImage}"
+    local default="${stoneImage}"
+    [[ "$(kind)" == rune ]] && default="${runeImage}"
+    setting STONE_IMAGE "${default}"
 }
 
 function containerName() { setting STONE_NAME "${unitName}"; }
@@ -237,8 +250,10 @@ stone - runs an EDS stone on this host
                                    proxy       HTTPS by a reverse proxy [ROOT]
                                    boot        Start with the host [ROOT, once]
                                    instances   Several stones on one host
+                                   cors        A Rune from another address
                                    cleanup     Removing what is no longer used
-    init                         Create the settings file
+    init [stone|rune]            Create the settings file, for the stone alone
+                                 (only the API, the default) or EDS with Rune
     check                        What is in place, what is missing, and who
                                  can do it: you, or root
     load <archive>               Load a container image from an archive made
@@ -296,6 +311,7 @@ function helpTopic() {
         proxy | reverse-proxy) helpProxy ;;
         boot) helpBoot ;;
         instances | instance) helpInstances ;;
+        cors) helpCors ;;
         cleanup) helpCleanup ;;
         *) usageError "Unknown help topic: ${1}" ;;
     esac
@@ -314,9 +330,10 @@ Setting up a stone, step by step
             Without one, the stone keeps everything in memory and loses it
             when it stops: fine to try it, never for real use.
   3.        The image, brought to this host          @SCRIPT@ help images
-              $ @SCRIPT@ load eds-stone.tar
+              $ @SCRIPT@ load eds-stone.tar          (the stone alone)
+              $ @SCRIPT@ load eds-rune.tar           (EDS with Rune)
   4.        The settings
-              $ @SCRIPT@ init
+              $ @SCRIPT@ init stone                  or: @SCRIPT@ init rune
             Then put the database into @ENV@,
             see '@SCRIPT@ help settings'.
   5.        The MasterKey                            @SCRIPT@ help masterkey
@@ -334,11 +351,16 @@ Setting up a stone, step by step
   For more than one stone on this host, each is given a name, and the steps
   3 to 9 are done for each: see '@SCRIPT@ help instances'.
 
+  The stone alone and EDS with Rune are set up the same way; only step 3 and
+  the word given to 'init' differ. The stone alone serves the API below
+  /api/v1 and nothing else: it holds no web app which could be switched on.
+  EDS with Rune also serves the web app at /.
+
   A new stone has no account, and sets no name for one: whoever comes to
   it first becomes its System Administrator, under the account name and
   with the passphrase given. So choose the name, 'admin' or any other, and
   be the first: right after the first start, before the stone is reachable
-  from outside, with '@SCRIPT@ masterkey load' or the MasterKey request.
+  from outside, with '@SCRIPT@ masterkey load', in Rune, or with Tolk.
 EOF
 }
 
@@ -378,13 +400,15 @@ function helpImages() {
     topic <<'EOF'
 Getting the images to this host
 
-  The image is built from the EDS sources with './eds.sh build stone':
+  There are two images, built from the EDS sources with './eds.sh build':
 
-    eds-stone:local      The stone alone: the API
+    eds-stone:local      The stone alone: the API, and no web app
+    eds-quarkus:local    EDS with Rune: the API and the web app
 
-  Where it was built, it is written to an archive:
+  Where they were built, each is written to an archive:
 
       $ podman save -o eds-stone.tar eds-stone:local
+      $ podman save -o eds-rune.tar eds-quarkus:local
 
   The archive is copied to this host, e.g. with scp, and loaded:
 
@@ -396,7 +420,8 @@ Getting the images to this host
       $ @SCRIPT@ restart
       $ @SCRIPT@ cleanup            Removes the image it replaced
 
-  The setting STONE_IMAGE names another image, e.g. one from a registry:
+  The setting STONE_KIND tells which of the two is run (stone or rune), and
+  STONE_IMAGE names another image, e.g. one from a registry:
 
       STONE_IMAGE=registry.example.com/eds/eds-stone:2.0
 EOF
@@ -413,6 +438,8 @@ The settings file
 
   For this script:
 
+    STONE_KIND=stone         What is run: stone (only the API) or rune (the
+                             API and the web app)
     STONE_BIND=127.0.0.1     The address of the host the stone listens on.
                              127.0.0.1 is only this host, which is right
                              behind a reverse proxy; 0.0.0.0 is every address
@@ -420,7 +447,7 @@ The settings file
     STONE_TLS_PORT=8443      The port of the host for HTTPS, see 'help tls'
     STONE_MASTERKEY=file     Start with the MasterKey file: file or none,
                              see 'help masterkey'
-    STONE_IMAGE=...          Another image than eds-stone:local
+    STONE_IMAGE=...          Another image than the one of STONE_KIND
     STONE_ADMIN_ACCOUNT=...  The account name of the System Administrator,
                              for 'masterkey load'; it is asked for without
     STONE_NAME=stone         The name of the container
@@ -658,7 +685,9 @@ HTTPS by a reverse proxy                                                [ROOT]
 
       $ @SCRIPT@ status
 
-  The stone answers below https://stone.example.com/api/v1.
+  The stone alone answers only below https://stone.example.com/api/v1; with
+  Rune, the web app is at https://stone.example.com/. Tolk takes the first
+  as its stone URL.
 EOF
 }
 
@@ -716,11 +745,12 @@ function helpInstances() {
     topic <<'EOF'
 Several stones on one host
 
-  A host may run several stones, e.g. one for each group of people. Each is
-  an instance with a name, given before the command:
+  A host may run several stones, e.g. one for each group of people, or a
+  stone alone beside an EDS with Rune. Each is an instance with a name,
+  given before the command:
 
-      $ @PROGRAM@ -i north init
-      $ @PROGRAM@ -i south init
+      $ @PROGRAM@ -i north init stone
+      $ @PROGRAM@ -i south init rune
       $ @PROGRAM@ list
 
   Without -i it is the default instance, which is all a host with one
@@ -764,6 +794,28 @@ Several stones on one host
 EOF
 }
 
+function helpCors() {
+    topic <<'EOF'
+A Rune from another address
+
+  A browser only lets a web page call the stone it came from, unless the
+  stone allows other addresses. So a Rune which is served elsewhere, by
+  another stone or for the status of several stones, must be named by each
+  stone it is to reach. This is the case for every stone alone which is to
+  be used from a Rune, as it has no web app of its own.
+
+  The setting is eds.cors.value, a setting of the stone which the System
+  Administrator changes with the settings request, e.g. with Tolk; it is
+  not part of the settings file. It holds the addresses of the pages, with
+  their scheme and without a path, separated by commas:
+
+      https://rune.example.com,https://status.example.com
+
+  '*' allows every address. Tolk and other programs which are not web pages
+  are not affected, and need nothing.
+EOF
+}
+
 function helpCleanup() {
     topic <<'EOF'
 Removing what is no longer used
@@ -799,11 +851,16 @@ EOF
 # Set up
 # ==============================================================================
 function doInit() {
-    [[ $# -eq 0 ]] || { usageError "Unknown option: ${1}"; return 1; }
+    local what="${1:-stone}"
+    case "${what}" in
+        stone | rune) ;;
+        *) usageError "Unknown option: ${what}"; return 1 ;;
+    esac
 
     (umask 077 && mkdir -p "${stoneHome}" "${certsDir}" "${logsDir}") || return 1
     if [[ -e "${envFile}" ]]; then
         echo "The settings file ${envFile} already exists, it is kept."
+        echo "Change STONE_KIND in it to run another form; it is now: $(kindName "$(kind)")."
         return 0
     fi
 
@@ -819,6 +876,9 @@ function doInit() {
     (umask 077 && cat > "${envFile}" <<EOF
 # Settings of $(instanceName) on this host, see '${script} help settings'.
 # One setting per line, NAME=value, without quotes; comments on their own lines.
+
+# What is run: stone (only the API) or rune (the API and the web app)
+STONE_KIND=${what}
 
 # The address and the port of the host the stone listens on. 127.0.0.1 is
 # only this host, which is right behind a reverse proxy; 0.0.0.0 is every
@@ -842,7 +902,7 @@ STONE_MASTERKEY=file
 #EDS_INSECURE_REQUESTS=redirect
 EOF
     ) || return 1
-    echo "Created ${envFile}, on port ${free}."
+    echo "Created ${envFile} for $(kindName "${what}"), on port ${free}."
     echo "Next: the database in that file ('${script} help postgresql'), then '${script} check'."
 }
 
@@ -867,7 +927,7 @@ function doLoad() {
 
 # Tells what is in place and what is missing, and who can do what is missing
 function doCheck() {
-    echo "Stone check${instance:+ of '${instance}'}"
+    echo "Stone check${instance:+ of '${instance}'}: $(kindName "$(kind)")"
     echo
     echo "Podman"
     if ! command -v podman > /dev/null 2>&1; then
@@ -911,7 +971,7 @@ function doCheck() {
         fi
     else
         missing "No settings file, the defaults are used"
-        todoUser "${script} init"
+        todoUser "${script} init stone, or: ${script} init rune"
     fi
 
     local address number
@@ -1046,8 +1106,9 @@ function doStart() {
     done
     needPodman || return 1
 
-    local name wanted
+    local name what wanted
     name=$(containerName)
+    what=$(kind)
     wanted=$(image)
     if isRunning; then
         echo "$(instanceName Capital) is already running."
@@ -1103,7 +1164,7 @@ function doStart() {
         args+=(-v "${masterKeyFile}:${masterKeyMount}:ro,z" -e "EDS_MASTERKEY_URL=file://${masterKeyMount}")
     fi
 
-    echo "Starting $(instanceName)..."
+    echo "Starting $(instanceName): $(kindName "${what}")..."
     podman "${args[@]}" "${wanted}" > /dev/null || return 1
     [[ "${wait}" == true ]] || return 0
     waitForStone
@@ -1112,7 +1173,11 @@ function doStart() {
 function servedAt() {
     local base
     base="http://$(localAddress):$(port)"
-    echo "the API at ${base}/api/v1"
+    if [[ "$(kind)" == rune ]]; then
+        echo "Rune at ${base}/, the API at ${base}/api/v1"
+    else
+        echo "the API at ${base}/api/v1 (the stone alone, without Rune)"
+    fi
 }
 
 function waitForStone() {
@@ -1154,7 +1219,7 @@ function doStop() {
 
 function doStatus() {
     needPodman || return 1
-    echo "Stone status${instance:+ of '${instance}'}"
+    echo "Stone status${instance:+ of '${instance}'}: $(kindName "$(kind)")"
     echo
     local wanted
     wanted=$(image)
@@ -1277,7 +1342,7 @@ function doList() {
         echo "No stone is set up yet: '${program} init', or '${program} -i <name> init'."
         return 0
     fi
-    printf '  %-12s %-22s %-10s %s\n' "INSTANCE" "LISTENS ON" "STATE" "WITH THE HOST"
+    printf '  %-12s %-6s %-22s %-10s %s\n' "INSTANCE" "KIND" "LISTENS ON" "STATE" "WITH THE HOST"
     local file container state boot
     for name in "${names[@]}"; do
         file="${stoneBase}${name:+/${name}}/stone.env"
@@ -1292,7 +1357,7 @@ function doList() {
                 && systemctl --user is-enabled "stone${name:+-${name}}.service" > /dev/null 2>&1; then
             boot="yes"
         fi
-        printf '  %-12s %-22s %-10s %s\n' "${name:-(default)}" \
+        printf '  %-12s %-6s %-22s %-10s %s\n' "${name:-(default)}" "$(settingIn "${file}" STONE_KIND stone)" \
             "$(settingIn "${file}" STONE_BIND 127.0.0.1):$(settingIn "${file}" STONE_PORT 8080)" "${state}" "${boot}"
     done
 }

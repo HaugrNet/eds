@@ -266,6 +266,27 @@ final class StatusTest extends DatabaseSetup {
     }
 
     @Test
+    void testTheInventoryWaitsForTheDatabaseAndTheLoadDoesNot() {
+        final Settings mySettings = newSettings();
+        mySettings.set(StandardSetting.STATUS_LOAD_INTERVAL.getKey(), "1");
+        mySettings.set(StandardSetting.STATUS_INVENTORY_INTERVAL.getKey(), "1");
+        final StatusBean status = new StatusBean(entityManager, mySettings);
+        final byte[] key = key(status, "overview");
+
+        // While the startup prepares the database, only the load is sampled.
+        status.tick(SECOND, false);
+        status.tick(2 * SECOND, false);
+        StatusResponse response = status.status(key, null, true);
+        assertEquals(List.of(1L, 2L), response.getLoad().getSamples().stream().map(StatusSample::getSequence).toList());
+        assertTrue(response.getInventory().getSamples().isEmpty());
+
+        // Once it is ready, the inventory, which was due all along, is gathered.
+        status.tick(3 * SECOND, true);
+        response = status.status(key, null, true);
+        assertEquals(1, response.getInventory().getSamples().size());
+    }
+
+    @Test
     void testTheLoadCanBeSwitchedOff() {
         final Settings mySettings = newSettings();
         mySettings.set(StandardSetting.STATUS_LOAD_INTERVAL.getKey(), "0");

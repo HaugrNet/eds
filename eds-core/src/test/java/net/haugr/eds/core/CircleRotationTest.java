@@ -880,7 +880,13 @@ final class CircleRotationTest extends DatabaseSetup {
     }
 
     private boolean offered(final String circleId) {
-        return CircleRotations.pending(circle(circleId).getId()) != null;
+        final CircleRotations.Handoff handoff = CircleRotations.pending(circle(circleId).getId());
+        // The offers are kept by the internal ID, in the JVM: one of another
+        // test's database under the same ID isn't this Circle's (ticket 24).
+        if ((handoff != null) && !circleId.equals(handoff.externalId())) {
+            throw new IllegalStateException("The offer is of another Circle under the same ID.");
+        }
+        return handoff != null;
     }
 
     /** Runs the rotation the last read handed the secrets to. */

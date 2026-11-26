@@ -121,11 +121,10 @@ public final class RotationManager extends AbstractManager<RotationDao, EDSRespo
      * @return The rotation, or null if there is nothing to do with them
      */
     public Rotation begin(final CircleRotations.Handoff handoff) {
-        final CircleEntity circle = dao.find(CircleEntity.class, handoff.circleId());
+        final CircleEntity circle = dao.findAndLockCircle(handoff.circleId());
         if (circle == null) {
             return null;
         }
-        dao.lockCircle(circle);
         dao.refresh(circle);
         final KeyEntity active = dao.findKey(circle, Status.ACTIVE);
         if ((active == null) || !Objects.equals(active.getId(), handoff.keyId())) {
@@ -191,8 +190,12 @@ public final class RotationManager extends AbstractManager<RotationDao, EDSRespo
      * Re-encrypts one Data Object with the new secret, in its own content row:
      * the parts are replaced, and the row is switched to the new secret, in
      * the same transaction. Only the content row is locked, as everything
-     * else which changes or deletes the object comes to it last; so the job
-     * and the requests never wait for each other in a circle. A large
+     * else which changes or deletes the object takes the row before its parts
+     * (see {@code DataDao.deleteContent}), and the job holds no other row
+     * meanwhile; so the job and the requests never wait for each other in a
+     * circle. The stored bytes of the Circle only change if the stored length
+     * does, which the rotation keeps (the header keeps its chunk size); so
+     * the Circle's row of them isn't taken either. A large
      * object's old parts are read on a connection of their own, which sees
      * them as committed.
      *
@@ -213,7 +216,7 @@ public final class RotationManager extends AbstractManager<RotationDao, EDSRespo
         final ContentCopier.Target to = new ContentCopier.Target(dataId, rotation.current(),
                 new DataFormat.Context(rotation.externalId(), objectId, rotation.keyId()), true);
         final String algorithm = settings.getHashAlgorithm().getAlgorithm();
-        dao.withConnection(connection ->
+        dao.writeContent(rotation.circleId(), dataId, connection ->
                 ContentCopier.copy(connection, readers, from, to, settings.getStreamReadBatchSize(), algorithm, settings.getDataMaxInlineSize()));
         dao.updateContentKey(dataId, dao.getReference(KeyEntity.class, rotation.keyId()));
 
@@ -232,11 +235,10 @@ public final class RotationManager extends AbstractManager<RotationDao, EDSRespo
      * @return The last entry of this batch, or -1 if there were none
      */
     public long resealEntries(final Rotation rotation, final long afterId, final int limit) {
-        final CircleEntity circle = dao.find(CircleEntity.class, rotation.circleId());
+        final CircleEntity circle = dao.findAndLockCircle(rotation.circleId());
         if (circle == null) {
             return -1;
         }
-        dao.lockCircle(circle);
         long last = -1;
         for (final EntryEntity entry : dao.findEntries(circle, afterId, limit)) {
             dao.refresh(entry);
@@ -268,12 +270,11 @@ public final class RotationManager extends AbstractManager<RotationDao, EDSRespo
      * @return What was found
      */
     public Outcome end(final Rotation rotation) {
-        final CircleEntity circle = dao.find(CircleEntity.class, rotation.circleId());
-        final KeyEntity retiring = dao.find(KeyEntity.class, rotation.previousKeyId());
-        if ((circle == null) || (retiring == null)) {
+        final CircleEntity circle = dao.findAndLockCircle(rotation.circleId());
+        final KeyEntity retiring = (circle != null) ? dao.find(KeyEntity.class, rotation.previousKeyId()) : null;
+        if (retiring == null) {
             return Outcome.DONE;
         }
-        dao.lockCircle(circle);
         dao.refresh(circle);
         if (dao.countDataOnKey(retiring) > 0) {
             return Outcome.MORE;

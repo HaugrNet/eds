@@ -55,8 +55,13 @@ they describe is already built.
 
 - **`SECURITY.md` — can anyone break in?** The adversary's view: we tried to read a
   Circle's data as an outsider, as a thief with a copy of the whole database, and as
-  the server's own operator — and couldn't. It records what held, the one weak spot
-  we found (names were readable), and how it was fixed. *Assessed; the fix is built.*
+  the server's own operator — and couldn't. The first assessment (2026-11-21) found
+  one weak spot (names were readable), which is fixed; the second (2026-11-22, white
+  and black hat) found more, most of them fixed and recorded there.
+
+- **`FINDINGS.md` — the open tickets.** Bugs, improvements and checks still to do,
+  with the decisions taken on them. Temporary: an entry leaves when its work is
+  done, and its decision goes into the plan it belongs to.
 
 ## How to read the status language
 

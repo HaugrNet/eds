@@ -28,6 +28,7 @@ import net.haugr.eds.core.setup.DatabaseSetup;
 import net.haugr.eds.core.enums.HashAlgorithm;
 import net.haugr.eds.core.enums.KeyAlgorithm;
 import net.haugr.eds.core.enums.StandardSetting;
+import net.haugr.eds.core.model.Settings;
 import net.haugr.eds.core.model.entities.MemberEntity;
 
 import java.util.HashMap;
@@ -86,7 +87,8 @@ final class ManagementBeanSettingsTest extends DatabaseSetup {
         final ManagementBean bean = prepareManagementBean(newSettings());
         final SettingResponse response = bean.settings(prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT));
         assertEquals(ReturnCode.AUTHENTICATION_WARNING.getCode(), response.getReturnCode());
-        assertEquals("Could not uniquely identify an account for 'admin'.", response.getReturnMessage());
+        // An unknown name is answered as a wrong passphrase (ticket 21).
+        assertEquals("Cannot authenticate the Account from the given Credentials.", response.getReturnMessage());
     }
 
     @Test
@@ -205,12 +207,12 @@ final class ManagementBeanSettingsTest extends DatabaseSetup {
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
         assertEquals("Ok", response.getReturnMessage());
         assertEquals(StandardSetting.values().length, response.getSettings().size());
-        assertEquals("UTF-8", response.getSettings().get(StandardSetting.EDS_CHARSET.getKey()));
+        assertEquals("EN", response.getSettings().get(StandardSetting.EDS_LOCALE.getKey()));
 
         // The internal collection used is unmodifiable. So we simply copy the
         // list from the response and update one of the existing values
         final Map<String, String> mySettings = new HashMap<>(response.getSettings());
-        mySettings.put(StandardSetting.EDS_CHARSET.getKey(), "ISO-8859-15");
+        mySettings.put(StandardSetting.EDS_LOCALE.getKey(), "DA");
         request.setSettings(mySettings);
         request.setCredential(credentialOf(Constants.ADMIN_ACCOUNT));
 
@@ -218,7 +220,7 @@ final class ManagementBeanSettingsTest extends DatabaseSetup {
         assertEquals(ReturnCode.SUCCESS.getCode(), update.getReturnCode());
         assertEquals("Ok", update.getReturnMessage());
         assertEquals(StandardSetting.values().length, update.getSettings().size());
-        assertEquals("ISO-8859-15", update.getSettings().get(StandardSetting.EDS_CHARSET.getKey()));
+        assertEquals("DA", update.getSettings().get(StandardSetting.EDS_LOCALE.getKey()));
     }
 
     @Test
@@ -316,12 +318,12 @@ final class ManagementBeanSettingsTest extends DatabaseSetup {
         final ManagementBean bean = prepareManagementBean(newSettings());
         final SettingRequest request = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
         final Map<String, String> mySettings = new HashMap<>();
-        mySettings.put(StandardSetting.EDS_CHARSET.getKey(), null);
+        mySettings.put(StandardSetting.EDS_LOCALE.getKey(), null);
         request.setSettings(mySettings);
 
         final SettingResponse response = bean.settings(request);
         assertEquals(ReturnCode.SETTING_WARNING.getCode(), response.getReturnCode());
-        assertEquals("The value for the key 'eds.system.charset' is undefined.", response.getReturnMessage());
+        assertEquals("The value for the key 'eds.system.locale' is undefined.", response.getReturnMessage());
     }
 
     @Test
@@ -376,16 +378,47 @@ final class ManagementBeanSettingsTest extends DatabaseSetup {
     }
 
     @Test
-    void testInvalidCharset() {
-        final ManagementBean bean = prepareManagementBean(newSettings());
+    void testTheCharacterSetIsNoLongerASetting() {
+        // Ticket 14: another character set made every stored key unreadable.
+        // The old key is now a custom setting, which EDS doesn't read.
+        final Settings settings = newSettings();
+        final ManagementBean bean = prepareManagementBean(settings);
         final SettingRequest request = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
         final Map<String, String> newSettings = new HashMap<>();
-        newSettings.put(StandardSetting.EDS_CHARSET.getKey(), "UTF-9");
+        newSettings.put("eds.system.charset", "UTF-16");
+        request.setSettings(newSettings);
+
+        assertTrue(bean.settings(request).isOk());
+        assertEquals("UTF-8", settings.getCharset().name());
+        // The administrator still gets in, with the same passphrase.
+        assertTrue(bean.settings(prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT)).isOk());
+    }
+
+    @Test
+    void testReadinessIsNotChangedWithTheRequest() {
+        // Ticket 14: set to false, every request was refused until a restart.
+        final Settings settings = newSettings();
+        final ManagementBean bean = prepareManagementBean(settings);
+        final SettingRequest request = prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT);
+        final Map<String, String> newSettings = new HashMap<>();
+        newSettings.put(StandardSetting.IS_READY.getKey(), "false");
         request.setSettings(newSettings);
 
         final SettingResponse response = bean.settings(request);
         assertEquals(ReturnCode.SETTING_WARNING.getCode(), response.getReturnCode());
-        assertEquals("Invalid Character set value for 'eds.system.charset'.", response.getReturnMessage());
+        assertEquals("The setting eds.is.ready may not be changed with this request.", response.getReturnMessage());
+        assertTrue(settings.isReady());
+
+        // Nor with blanks around the key, which is stored trimmed (the review).
+        newSettings.clear();
+        newSettings.put(" " + StandardSetting.IS_READY.getKey() + " ", "false");
+        request.setSettings(newSettings);
+        request.setCredential(credentialOf(Constants.ADMIN_ACCOUNT));
+        final SettingResponse padded = bean.settings(request);
+        assertEquals(ReturnCode.SETTING_WARNING.getCode(), padded.getReturnCode());
+        assertEquals("The setting eds.is.ready may not be changed with this request.", padded.getReturnMessage());
+        assertTrue(settings.isReady());
+        assertTrue(bean.settings(prepareRequest(SettingRequest.class, Constants.ADMIN_ACCOUNT)).isOk());
     }
 
     @Test

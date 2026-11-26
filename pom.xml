@@ -40,7 +40,7 @@
         <module>eds-api</module>
         <module>eds-core</module>
         <module>eds-quarkus</module>
-        <module>eds-fitnesse</module>
+        <module>eds-testing</module>
     </modules>
 
     <scm>
@@ -100,7 +100,7 @@
         <!-- Quarkus versions, the Hibernate version must match the version
              used by the Quarkus Platform BOM, see the Quarkus modules. -->
         <version.quarkus>3.40.1.1</version.quarkus>
-        <!-- Client generation from the contract: Java in eds-fitnesse, TypeScript in eds-quarkus -->
+        <!-- Client generation from the contract: Java in eds-testing, TypeScript in eds-quarkus -->
         <version.openapi-generator>7.26.0</version.openapi-generator>
         <version.hibernate-core.quarkus>7.4.9.Final</version.hibernate-core.quarkus>
         <!-- JUnit version used by the Quarkus BOM, the Quarkus test framework
@@ -163,12 +163,6 @@
                 <artifactId>slf4j-api</artifactId>
                 <version>${version.slf4j}</version>
                 <scope>provided</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-nop</artifactId>
-                <version>${version.slf4j}</version>
-                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
@@ -505,10 +499,10 @@
                                 <configuration>
                                     <outputName>${project.artifactId}-${project.version}-cyclonedx</outputName>
                                     <!-- The SBOM lists what is shipped: the
-                                         FitNesse test module is not, so its
+                                         test module (eds-testing) is not, so its
                                          libraries are left out. -->
                                     <excludeArtifactId>
-                                        <artifactId>eds-fitnesse</artifactId>
+                                        <artifactId>eds-testing</artifactId>
                                     </excludeArtifactId>
                                 </configuration>
                             </execution>

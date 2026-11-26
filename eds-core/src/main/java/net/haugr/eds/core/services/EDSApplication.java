@@ -83,6 +83,7 @@ public class EDSApplication extends Application {
         // allowed origins may call the stone.
         set.add(StatusFilter.class);
         set.add(OriginFilter.class);
+        set.add(BodyCounter.class);
         set.add(CircleFeatureService.class);
         set.add(VersionService.class);
 

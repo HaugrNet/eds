@@ -838,6 +838,76 @@ final class ShareBeanDataTest extends DatabaseSetup {
     }
 
     @Test
+    void testAReadTrusteeCannotMoveOrCopyAnObjectWithoutContent() {
+        // Ticket 8: the WRITE check of the source ran only for content, so a
+        // READ Trustee could move an object without it out of the Circle.
+        final ShareBean bean = prepareShareBean();
+        final ProcessDataRequest addRequest = prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "metadataOnly", 0);
+        addRequest.setData(null);
+        final ProcessDataResponse addResponse = bean.processData(addRequest);
+        assertEquals(ReturnCode.SUCCESS.getCode(), addResponse.getReturnCode());
+
+        // member3 can READ in circle1, and WRITE in circle3.
+        final ProcessDataRequest moveRequest = prepareRequest(ProcessDataRequest.class, MEMBER_3);
+        moveRequest.setAction(Action.MOVE);
+        moveRequest.setDataId(addResponse.getDataId());
+        moveRequest.setTargetCircleId(CIRCLE_3_ID);
+        final ProcessDataResponse moveResponse = bean.processData(moveRequest);
+        assertEquals(ReturnCode.AUTHORIZATION_WARNING.getCode(), moveResponse.getReturnCode());
+        assertEquals("The current Account is not allowed to perform the given action.", moveResponse.getReturnMessage());
+
+        final ProcessDataResponse copyResponse = bean.processData(prepareCopyDataRequest(MEMBER_3, addResponse.getDataId(), CIRCLE_3_ID, null));
+        assertEquals(ReturnCode.AUTHORIZATION_WARNING.getCode(), copyResponse.getReturnCode());
+        assertEquals("The current Account is not allowed to perform the given action.", copyResponse.getReturnMessage());
+
+        final FetchDataResponse stillThere = bean.fetchData(prepareReadRequest(MEMBER_1, null, addResponse.getDataId()));
+        assertEquals(ReturnCode.SUCCESS.getCode(), stillThere.getReturnCode());
+        assertEquals(CIRCLE_1_ID, stillThere.getMetadata().getFirst().getCircleId());
+    }
+
+    @Test
+    void testAFolderOfAnotherCircleIsNeverAParent() {
+        // Ticket 9: ADD, COPY and MOVE took a folder of another Circle as the
+        // parent; UPDATE already refused one.
+        final ShareBean bean = prepareShareBean();
+        final ProcessDataRequest folderRequest = prepareAddDataRequest(MEMBER_1, CIRCLE_2_ID, "foreignFolder", 0);
+        folderRequest.setTypeName(Constants.FOLDER_TYPENAME);
+        final ProcessDataResponse folderResponse = bean.processData(folderRequest);
+        assertEquals(ReturnCode.SUCCESS.getCode(), folderResponse.getReturnCode());
+        final String foreignFolder = folderResponse.getDataId();
+
+        final ProcessDataRequest addRequest = prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "planted", 512);
+        addRequest.setFolderId(foreignFolder);
+        final ProcessDataResponse addResponse = bean.processData(addRequest);
+        assertEquals(ReturnCode.ILLEGAL_ACTION.getCode(), addResponse.getReturnCode());
+        assertEquals("The folder belongs to another Circle.", addResponse.getReturnMessage());
+
+        final ProcessDataRequest folderAddRequest = prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "plantedFolder", 0);
+        folderAddRequest.setTypeName(Constants.FOLDER_TYPENAME);
+        folderAddRequest.setFolderId(foreignFolder);
+        assertEquals(ReturnCode.ILLEGAL_ACTION.getCode(), bean.processData(folderAddRequest).getReturnCode());
+
+        final ProcessDataResponse sourceResponse = bean.processData(prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "source", 512));
+        assertEquals(ReturnCode.SUCCESS.getCode(), sourceResponse.getReturnCode());
+        final ProcessDataResponse copyResponse = bean.processData(prepareCopyDataRequest(MEMBER_1, sourceResponse.getDataId(), CIRCLE_1_ID, foreignFolder));
+        assertEquals(ReturnCode.ILLEGAL_ACTION.getCode(), copyResponse.getReturnCode());
+        assertEquals("The folder belongs to another Circle.", copyResponse.getReturnMessage());
+
+        final ProcessDataRequest moveRequest = prepareRequest(ProcessDataRequest.class, MEMBER_1);
+        moveRequest.setAction(Action.MOVE);
+        moveRequest.setDataId(sourceResponse.getDataId());
+        moveRequest.setTargetCircleId(CIRCLE_1_ID);
+        moveRequest.setTargetFolderId(foreignFolder);
+        final ProcessDataResponse moveResponse = bean.processData(moveRequest);
+        assertEquals(ReturnCode.ILLEGAL_ACTION.getCode(), moveResponse.getReturnCode());
+        assertEquals("The folder belongs to another Circle.", moveResponse.getReturnMessage());
+
+        // Nothing went into the folder, so it can still be deleted.
+        assertEquals(ReturnCode.SUCCESS.getCode(), bean.fetchData(prepareReadRequest(MEMBER_1, null, sourceResponse.getDataId())).getReturnCode());
+        assertEquals(ReturnCode.SUCCESS.getCode(), bean.processData(prepareDeleteRequest(MEMBER_1, foreignFolder)).getReturnCode());
+    }
+
+    @Test
     void testDeleteFolderWithData() {
         final ShareBean bean = prepareShareBean();
         final String folderName = "folder1";

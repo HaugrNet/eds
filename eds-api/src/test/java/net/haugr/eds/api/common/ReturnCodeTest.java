@@ -57,6 +57,7 @@ final class ReturnCodeTest {
 
         // Errors
         runAssertions(ReturnCode.ERROR, 500, 500, CLASS_ERROR, "General Error occurred while handling the request.");
+        runAssertions(ReturnCode.SERVICE_BUSY, 503, 503, CLASS_ERROR, "The stone is busy, try again shortly.");
         runAssertions(ReturnCode.INSUFFICIENT_STORAGE, 507, 507, CLASS_ERROR, "The storage limit for content is reached.");
         runAssertions(ReturnCode.CRYPTO_ERROR, 591, 500, CLASS_ERROR, "Cryptographic Error occurred during the handling of the request.");
         runAssertions(ReturnCode.INTEGRITY_ERROR, 592, 500, CLASS_ERROR, "The Encrypted Data is having integrity problems.");

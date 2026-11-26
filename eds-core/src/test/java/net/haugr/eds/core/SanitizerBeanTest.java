@@ -296,6 +296,7 @@ final class SanitizerBeanTest extends DatabaseSetup {
 
     private void prepareInvalidData() {
         final ProcessDataManager service = new ProcessDataManager(settings, entityManager);
+        service.limitAttempts(new AuthLimitBean(entityManager, settings));
         timeWarpChecksum(service.perform(prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "Valid Data1", LARGE_SIZE_BYTES)), Utilities.newDate(1L));
         falsifyChecksum(service.perform(prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "Invalidated Data1", LARGE_SIZE_BYTES)), Utilities.newDate(2L), SanityStatus.OK);
         falsifyChecksum(service.perform(prepareAddDataRequest(MEMBER_1, CIRCLE_1_ID, "Invalidated Data2", MEDIUM_SIZE_BYTES)), Utilities.newDate(), SanityStatus.OK);

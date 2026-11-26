@@ -18,7 +18,9 @@ package net.haugr.eds.core.managers;
 
 import java.security.MessageDigest;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
@@ -105,6 +107,7 @@ public final class ProcessMemberManager extends AbstractManager<MemberDao, Proce
     }
 
     private ProcessMemberResponse processActions(final ProcessMemberRequest request) {
+        requirePassphraseFor(request);
         return switch (request.getAction()) {
             case CREATE -> createMember(request);
             case INVITE -> inviteMember(request);
@@ -332,6 +335,49 @@ public final class ProcessMemberManager extends AbstractManager<MemberDao, Proce
         return invited.getExternalId() + '|' + circle.getExternalId();
     }
 
+    /**
+     * <p>A Session lets a client act for the Member without the passphrase,
+     * and can be stolen. So what would keep the account from its owner, or
+     * outlast the Session, needs the passphrase (ticket 7): a login, so a
+     * Session can't make another with a new expiry, and a change of the
+     * Account Name, invalidating or deleting the own account, and replacing
+     * or removing the public key or the vault (E2E.md).</p>
+     *
+     * <p>The first public key and vault may come with a Session: Rune and
+     * Tolk make them after a login, when the account has no vault, which is
+     * what they take for having no keys, and Rune no longer has the
+     * passphrase then. Once there is a vault, both need the passphrase. A new passphrase needs the old one, as
+     * before ({@link #updateOwnCredential(ProcessMemberRequest)}).</p>
+     *
+     * @param request The request, whose Credential Type is checked
+     */
+    private void requirePassphraseFor(final ProcessMemberRequest request) {
+        if (request.getCredentialType() != CredentialType.PASSPHRASE) {
+            final String what = switch (request.getAction()) {
+                case LOGIN -> "log in";
+                case INVALIDATE -> "invalidate the Account";
+                case DELETE -> (request.getMemberId() == null) ? "delete the own Account" : null;
+                case UPDATE -> whatUpdateNeedsThePassphrase(request);
+                default -> null;
+            };
+            if (what != null) {
+                throw new EDSException(ReturnCode.VERIFICATION_WARNING, "It is only permitted to " + what + " when authenticating with Passphrase.");
+            }
+        }
+    }
+
+    private String whatUpdateNeedsThePassphrase(final ProcessMemberRequest request) {
+        final String what;
+        if (!isEmpty(trim(request.getNewAccountName()))) {
+            what = "change the Account Name";
+        } else if (((request.getPublicKey() != null) || (request.getVault() != null)) && (member.getVault() != null)) {
+            what = "replace or remove the public key or the vault";
+        } else {
+            what = null;
+        }
+        return what;
+    }
+
     private static MemberRole whichRole(final ProcessMemberRequest request) {
         return (request.getMemberRole() != null) ? request.getMemberRole() : MemberRole.STANDARD;
     }
@@ -415,7 +461,7 @@ public final class ProcessMemberManager extends AbstractManager<MemberDao, Proce
 
     /** The Member's settings for clients must be a JSON object; EDS doesn't look into it. */
     private static String checkedSettings(final String settings) {
-        try (jakarta.json.JsonReader reader = jakarta.json.Json.createReader(new java.io.StringReader(settings))) {
+        try (jakarta.json.JsonReader reader = net.haugr.eds.core.JsonFactories.READERS.createReader(new java.io.StringReader(settings))) {
             reader.readObject();
             return settings;
         } catch (jakarta.json.JsonException | IllegalStateException e) {
@@ -549,7 +595,6 @@ public final class ProcessMemberManager extends AbstractManager<MemberDao, Proce
             }
             checkNotLastTrustee(member);
             rotateAfterLeaving(member);
-            dao.delete(member);
             response = new ProcessMemberResponse(ReturnCode.SUCCESS, theMember(member) + " has been successfully deleted.");
         }
 
@@ -557,19 +602,39 @@ public final class ProcessMemberManager extends AbstractManager<MemberDao, Proce
     }
 
     /**
-     * The Circles of a Member who is deleted rotate their Circle Secret now,
-     * as for a Trustee who leaves (PLAN.md, Crypto C6).
+     * Deletes a Member, whose Circles rotate their Circle Secret now, as for
+     * a Trustee who leaves (PLAN.md, Crypto C6).
      *
      * @param leaving The Member who is deleted
      */
     private void rotateAfterLeaving(final MemberEntity leaving) {
-        for (final TrusteeEntity trustee : dao.findTrusteesByMember(leaving, EnumSet.allOf(TrustLevel.class))) {
-            final CircleEntity circle = trustee.getCircle();
+        // The Member first, then its Circles in the order of their IDs, before
+        // anything changes: the order of the rotation of the MasterKey and of
+        // the Circle Secret (ticket 1). A Member or Circle deleted while this
+        // waited for it is told as gone, or passed over.
+        if (!dao.lockMemberIfThere(leaving.getId())) {
+            throw new IdentificationException("No such Account exist.");
+        }
+        final List<TrusteeEntity> trustees = dao.findTrusteesByMember(leaving, EnumSet.allOf(TrustLevel.class));
+        final List<CircleEntity> circles = new ArrayList<>();
+        trustees.stream().map(TrusteeEntity::getCircle).sorted(Comparator.comparing(CircleEntity::getId)).forEach(circle -> {
+            if (dao.lockCircleIfThere(circle.getId())) {
+                circles.add(circle);
+            }
+        });
+        // Under the locks, the Member is checked again: another Trustee may
+        // have left one of its Circles while this waited.
+        checkNotLastTrustee(leaving);
+        for (final CircleEntity circle : circles) {
+            // Read again once locked, so a change committed meanwhile isn't
+            // written back.
+            dao.refresh(circle);
             circle.setRotateCircleKeyDue(Utilities.newDate());
             dao.save(circle);
-            // The row goes with the account, by the database.
-            dao.detach(trustee);
         }
+        // The Trustee rows go with the account, by the database.
+        trustees.forEach(dao::detach);
+        dao.delete(leaving);
     }
 
     private ProcessMemberResponse processDeleteAsAdmin(final ProcessMemberRequest request) {
@@ -590,7 +655,6 @@ public final class ProcessMemberManager extends AbstractManager<MemberDao, Proce
         checkNotLastTrustee(found);
         rotateAfterLeaving(found);
 
-        dao.delete(found);
         return new ProcessMemberResponse(ReturnCode.SUCCESS, theMember(found) + " has successfully been deleted.");
     }
 

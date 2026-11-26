@@ -126,16 +126,6 @@ public interface Management {
      *     allowed values.</i>
      *   </li>
      *   <li>
-     *     <b>eds.system.charset</b> - default value: 'UTF-8'<br>
-     *     Allowed Values: Any Character Set supported by Java<br>
-     *     <i>When applying armoring to the raw keys, it means using a Base64
-     *     encoding and decoding. However, they have to be saved using a
-     *     character set. Any character set can be used, but if keys have been
-     *     stored using one, changing it will cause problems as they may not be
-     *     read out safely again. So, please only change this if you are really
-     *     sure.</i>
-     *   </li>
-     *   <li>
      *     <b>eds.show.all.circles</b> - default value: 'false'<br>
      *     Allowed Values: Boolean - 'true' or 'false'<br>
      *     <i>Exposing all Circles means that it is possible for a member,
@@ -147,15 +137,15 @@ public interface Management {
      *     with.</i>
      *   </li>
      *   <li>
-     *     <b>eds.show.trustees</b> - default value: true<br>
+     *     <b>eds.show.trustees</b> - default value: false<br>
      *     Allowed Values: Boolean - 'true' or 'false'<br>
-     *     <i>Privacy is important, however - there may be reasons to reduce the
-     *     privacy level and allow that a Member can view information about
-     *     other Members even if there is no direct relation between the two. If
-     *     two members share a Circle, then they will automatically be able to
-     *     view each other, but if not, then this setting applies. By default, it
-     *     is set to True - as EDS should be used by organizations or companies
-     *     where all members already share information.</i>
+     *     <i>Which Circles of another Member a Member sees. With false, only
+     *     the Circles both share. With true, every Circle of every Member: as
+     *     any Member can list all Members, every account can then see every
+     *     Circle of the stone, with its name and the Members in it, though not
+     *     its data. That suits a small group where everybody knows everybody,
+     *     a family, a shop or an organization, and is a choice to make on
+     *     purpose.</i>
      *   </li>
      *   <li>
      *     <b>eds.sanity.check.startup</b> - default value: 'true'<br>
@@ -197,10 +187,12 @@ public interface Management {
      *   </li>
      *   <li>
      *     <b>eds.masterkey.url</b> - default value: ''<br>
-     *     Allowed Values: Any valid URL<br>
-     *     <i>Reference to a series of bytes, which will be used as the secret
-     *     when generating the MasterKey. It must be reachable for the EDS
-     *     instance(s) at startup.</i>
+     *     Allowed Values: A {@code file:} URL without a host (a regular
+     *     file), or an {@code https:} URL (no redirects)<br>
+     *     <i>Reference to a series of bytes, at most 16 KiB, which will be
+     *     used as the secret when generating the MasterKey. It must be
+     *     reachable for the EDS instance(s) at startup, within 10 seconds.
+     *     It is changed with the MasterKey request, not here.</i>
      *   </li>
      *   <li>
      *     <b>eds.cors.value</b> - default value: '*'<br>
@@ -321,13 +313,17 @@ public interface Management {
      *
      * <p><b>Login / Logout</b> <i>Linking and unlinking a Session with an
      * Account. This is to help websites to use EDS without needing to store
-     * the Account credentials unsafely.</i></p>
+     * the Account credentials unsafely. A login needs the PassPhrase: a
+     * Session cannot make another Session.</i></p>
      *
      * <p><b>Update existing Member</b> <i>This action will only affect a
      * member's own Account. Whereby it is allowed to change the Account Name,
      * provided the name has not been taken. It is also possible to update the
      * credentials (PassPhrase) and to change the Public Key belonging to an
-     * account and which others may see.</i></p>
+     * account and which others may see. With a Session, the Account Name and
+     * the PassPhrase can't be changed, and the Public Key and the vault only
+     * be set while the account has no vault; the rest needs the
+     * PassPhrase.</i></p>
      *
      * <p><b>Update Credential</b> <i>It is possible for an active member to
      * update the credentials used for authentication, but it is not possible
@@ -337,15 +333,16 @@ public interface Management {
      * by anyone else than the current owner of an account.</i></p>
      *
      * <p><b>Remove Member</b> <i>Removing a Member from the system can be done
-     * either by the Member (to remove themselves) or by the System
-     * Administrator. A Circle Administrator cannot remove a Member from the
+     * either by the Member (to remove themselves, with the PassPhrase, not a
+     * Session) or by the System Administrator. A Circle Administrator cannot remove a Member from the
      * system. Removal of a Member will automatically remove all Data belonging
      * to the Member, i.e., the Circle relations and the Member details.</i></p>
      *
      * <p>It is also possible, via this request, to invalidate the account,
      * meaning that the account will appear correct, but it is not possible to
      * either read or write data in any Circles. The Account can be later
-     * corrected by replacing all existing Trustee records.</p>
+     * corrected by replacing all existing Trustee records. Invalidating needs
+     * the PassPhrase, not a Session.</p>
      *
      * @param request Request Object with details for the Processing
      * @return Response Object with the result of the Processing

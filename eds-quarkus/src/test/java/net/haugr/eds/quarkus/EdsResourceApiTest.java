@@ -89,7 +89,7 @@ final class EdsResourceApiTest {
         circles(owner, circleId);
         trustees(owner, circleId, otherId);
         data(owner, circleId, targetId);
-        dataTypes(owner);
+        dataTypes(admin, owner);
         refused(owner);
 
         // Clean up: the Circles and the Members.
@@ -182,14 +182,20 @@ final class EdsResourceApiTest {
         as(owner).when().get("/data/{dataId}", copyId).then().statusCode(404);
     }
 
-    private static void dataTypes(final String owner) {
-        // Data Types.
+    private static void dataTypes(final String admin, final String owner) {
+        // Data Types: of the whole stone, so changed by an administrator only
+        // (ticket 15); everyone with a Circle reads them.
         as(owner).body("""
+                        {"type": "Resource test type"}
+                        """).when().put("/dataTypes/{typeName}", "resource-type")
+                .then().statusCode(401).body("returnCode", equalTo(401));
+        as(admin).body("""
                         {"type": "Resource test type"}
                         """).when().put("/dataTypes/{typeName}", "resource-type")
                 .then().statusCode(200).body("dataType.typeName", equalTo("resource-type"));
         as(owner).when().get("/dataTypes").then().statusCode(200).body("dataTypes.typeName", hasItem("resource-type"));
-        as(owner).when().delete("/dataTypes/{typeName}", "resource-type").then().statusCode(200);
+        as(owner).when().delete("/dataTypes/{typeName}", "resource-type").then().statusCode(401);
+        as(admin).when().delete("/dataTypes/{typeName}", "resource-type").then().statusCode(200);
     }
 
     private static void refused(final String owner) {

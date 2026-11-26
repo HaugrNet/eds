@@ -19,17 +19,36 @@ package net.haugr.eds.core.socket;
 /**
  * <p>CDI event, fired when a change of Members, Circles, Trustees or the
  * MasterKey may end the access of open connections of the socket. The
- * {@link SocketHub} checks them again, after the change is committed.</p>
+ * {@link SocketHub} checks them again, after the change is committed: the
+ * connections which joined the Circle named, or all of them (ticket 18).</p>
  *
+ * @param circleId The Circle whose access changed, or null for a change
+ *                 which may touch every connection (a Member, a Session,
+ *                 the MasterKey)
  * @author Kim Jensen
  * @since EDS 2.0
  */
-public final class AccessChange {
+public record AccessChange(String circleId) {
 
-    /** The event; it carries no information. */
-    public static final AccessChange INSTANCE = new AccessChange();
+    /** A change which may touch every connection. */
+    public static final AccessChange EVERYONE = new AccessChange(null);
 
-    private AccessChange() {
-        // Single instance.
+    /**
+     * A change of the access to one Circle.
+     *
+     * @param circleId The Circle, by its ID; null means every connection
+     * @return The event
+     */
+    public static AccessChange of(final String circleId) {
+        return (circleId == null) ? EVERYONE : new AccessChange(circleId);
+    }
+
+    /**
+     * Whether the change may touch every connection.
+     *
+     * @return True for every connection
+     */
+    public boolean touchesEveryone() {
+        return circleId == null;
     }
 }

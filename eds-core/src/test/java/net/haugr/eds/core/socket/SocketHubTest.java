@@ -21,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import jakarta.json.Json;
@@ -46,6 +47,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import net.haugr.eds.api.common.Action;
@@ -57,6 +59,7 @@ import net.haugr.eds.api.requests.ProcessTrusteeRequest;
 import net.haugr.eds.api.responses.CircleFeatureResponse;
 import net.haugr.eds.api.responses.ProcessMemberResponse;
 import net.haugr.eds.core.FeatureBean;
+import net.haugr.eds.core.LogCapture;
 import net.haugr.eds.core.exceptions.EDSException;
 import net.haugr.eds.core.managers.FeatureManager;
 import net.haugr.eds.core.setup.DatabaseSetup;
@@ -89,6 +92,8 @@ final class SocketHubTest extends DatabaseSetup {
             }}""";
     private static final String FAST = """
             {"feature": "fast", "version": 1, "signals": 0, "kinds": {"note": {"add": "WRITE", "size": 100}}}""";
+    private static final String PACED = """
+            {"feature": "paced", "version": 1, "signals": 100, "kinds": {"note": {"add": "WRITE", "size": 100}}}""";
     private static final String QUIET = """
             {"feature": "quiet", "version": 1, "kinds": {"note": {"add": "WRITE", "size": 100}}}""";
 
@@ -150,13 +155,30 @@ final class SocketHubTest extends DatabaseSetup {
         assertTrue(first.closed.await(WAIT_SECONDS, TimeUnit.SECONDS));
         assertEquals(SocketConnection.POLICY_VIOLATION, first.code.get());
 
-        // A token which isn't a Session's is answered, and the connection may try again.
+        // A token which isn't a Session's is answered, and the connection
+        // closed: the first frame must be a valid AUTH (tickets 18 and 22).
         final Peer second = open();
         second.tell("{\"type\":\"AUTH\",\"token\":\"" + Base64.getEncoder().encodeToString(new byte[32]) + "\"}");
         assertEquals(ReturnCode.AUTHENTICATION_WARNING.getCode(), second.expect("ERROR").getInt("returnCode"));
-        second.tell("{\"type\":\"AUTH\",\"token\":\"\"}");
-        assertEquals(ReturnCode.AUTHENTICATION_WARNING.getCode(), second.expect("ERROR").getInt("returnCode"));
-        assertEquals(1, hub.connections());
+        // At once, not by the deadline for AUTH: the hub let go of it before it answered.
+        assertEquals(0, hub.connections());
+        assertTrue(second.closed.await(WAIT_SECONDS, TimeUnit.SECONDS));
+        assertEquals(SocketConnection.POLICY_VIOLATION, second.code.get());
+        // The answer names the frame, so a client learns why.
+        final Peer third = open();
+        third.tell("{\"type\":\"AUTH\",\"ref\":\"a\",\"token\":\"\"}");
+        final JsonObject noToken = third.expect("ERROR");
+        assertEquals(ReturnCode.AUTHENTICATION_WARNING.getCode(), noToken.getInt("returnCode"));
+        assertEquals("a", noToken.getString("ref"));
+        assertTrue(third.closed.await(WAIT_SECONDS, TimeUnit.SECONDS));
+        // A first frame which isn't even one closes it too (ticket 22).
+        final Peer fourth = open();
+        fourth.tell("not a frame");
+        assertEquals(ReturnCode.VERIFICATION_WARNING.getCode(), fourth.expect("ERROR").getInt("returnCode"));
+        assertEquals(0, hub.connections());
+        assertTrue(fourth.closed.await(WAIT_SECONDS, TimeUnit.SECONDS));
+        assertEquals(SocketConnection.POLICY_VIOLATION, fourth.code.get());
+        assertEquals(0, hub.connections());
     }
 
     @Test
@@ -262,11 +284,12 @@ final class SocketHubTest extends DatabaseSetup {
         assertEquals("The token is not Base64.", refused.getString("returnMessage"));
 
         // The URL safe alphabet is taken too; this one names no Session.
-        peer.tell("{\"type\":\"AUTH\",\"token\":\"____-___\"}");
-        final JsonObject unknown = peer.expect("ERROR");
+        final Peer other = open();
+        other.tell("{\"type\":\"AUTH\",\"token\":\"____-___\"}");
+        final JsonObject unknown = other.expect("ERROR");
         assertEquals(ReturnCode.AUTHENTICATION_WARNING.getCode(), unknown.getInt("returnCode"));
         assertNotEquals("The token is not Base64.", unknown.getString("returnMessage"));
-        assertEquals(1, hub.connections());
+        assertEquals(0, hub.connections());
     }
 
     @Test
@@ -563,7 +586,7 @@ final class SocketHubTest extends DatabaseSetup {
         remove.setMemberId(MEMBER_3_ID);
         assertTrue(prepareManagementBean(shared, settings).processTrustee(remove).isOk());
         shared.flush();
-        hub.accessChanged(AccessChange.INSTANCE);
+        hub.accessChanged(AccessChange.EVERYONE);
         assertEquals(MEMBER_3_ID, watcher.next("ABSENT").getString("memberId"));
         removed.expect("LEFT");
 
@@ -572,7 +595,7 @@ final class SocketHubTest extends DatabaseSetup {
         logout.setAction(Action.LOGOUT);
         assertTrue(prepareManagementBean(shared, settings).processMember(logout).isOk());
         shared.flush();
-        hub.accessChanged(AccessChange.INSTANCE);
+        hub.accessChanged(AccessChange.EVERYONE);
         assertEquals(MEMBER_5_ID, watcher.next("ABSENT").getString("memberId"));
         assertTrue(loggedOut.closed.await(WAIT_SECONDS, TimeUnit.SECONDS));
 
@@ -708,7 +731,7 @@ final class SocketHubTest extends DatabaseSetup {
         // In the stone the hub is told after the commit; here the change
         // is flushed, so the hub's thread reads it.
         shared.flush();
-        hub.accessChanged(AccessChange.INSTANCE);
+        hub.accessChanged(AccessChange.EVERYONE);
 
         final JsonObject left = reader.expect("LEFT");
         assertEquals(CIRCLE_1_ID, left.getString("circleId"));
@@ -721,7 +744,7 @@ final class SocketHubTest extends DatabaseSetup {
         logout.setAction(Action.LOGOUT);
         assertTrue(prepareManagementBean(shared, settings).processMember(logout).isOk());
         shared.flush();
-        hub.accessChanged(AccessChange.INSTANCE);
+        hub.accessChanged(AccessChange.EVERYONE);
         assertEquals(ReturnCode.AUTHENTICATION_WARNING.getCode(), gone.expect("ERROR").getInt("returnCode"));
         assertTrue(gone.closed.await(WAIT_SECONDS, TimeUnit.SECONDS));
         assertEquals(SocketConnection.POLICY_VIOLATION, gone.code.get());
@@ -735,8 +758,8 @@ final class SocketHubTest extends DatabaseSetup {
     void testAConnectionWhichDoesNotReadIsClosed() throws InterruptedException {
         final Peer deaf = new Peer(false);
         hub.open(deaf);
-        // The answer to the first frame blocks the connection.
-        hub.receive(deaf.id(), "not a frame");
+        // The answer to the AUTH frame blocks the connection.
+        hub.receive(deaf.id(), "{\"type\":\"AUTH\",\"token\":\"" + Base64.getEncoder().encodeToString(session(MEMBER_3)) + "\"}");
         assertTrue(deaf.sending.await(WAIT_SECONDS, TimeUnit.SECONDS));
         for (int i = 0; i <= SocketHub.MAX_PENDING_FRAMES; i++) {
             hub.receive(deaf.id(), "not a frame");
@@ -773,21 +796,20 @@ final class SocketHubTest extends DatabaseSetup {
     void testAFrameMustNameWhatItIsAbout() {
         final Peer peer = open();
 
-        // An AUTH frame without a token, which may be tried again.
+        // An AUTH frame without a token.
         peer.tell("{\"type\":\"AUTH\"}");
         final JsonObject refused = peer.expect("ERROR");
         assertEquals(ReturnCode.AUTHENTICATION_WARNING.getCode(), refused.getInt("returnCode"));
         assertEquals("The AUTH frame has no token.", refused.getString("returnMessage"));
         // The URL safe alphabet, known by an underscore alone.
-        peer.tell("{\"type\":\"AUTH\",\"token\":\"____\"}");
-        assertNotEquals("The token is not Base64.", peer.expect("ERROR").getString("returnMessage"));
+        final Peer urlSafe = open();
+        urlSafe.tell("{\"type\":\"AUTH\",\"token\":\"____\"}");
+        assertNotEquals("The token is not Base64.", urlSafe.expect("ERROR").getString("returnMessage"));
 
         // A JOIN without a Circle.
-        peer.token = session(MEMBER_3);
-        peer.tell("{\"type\":\"AUTH\",\"token\":\"" + Base64.getEncoder().encodeToString(peer.token) + "\"}");
-        peer.expect("READY");
-        peer.tell("{\"type\":\"JOIN\",\"ref\":\"j\"}");
-        final JsonObject noCircle = peer.expect("ERROR");
+        final Peer joining = authenticated(MEMBER_3);
+        joining.tell("{\"type\":\"JOIN\",\"ref\":\"j\"}");
+        final JsonObject noCircle = joining.expect("ERROR");
         assertEquals("j", noCircle.getString("ref"));
         assertEquals(ReturnCode.VERIFICATION_WARNING.getCode(), noCircle.getInt("returnCode"));
         assertEquals(1, hub.connections());
@@ -885,7 +907,7 @@ final class SocketHubTest extends DatabaseSetup {
         assertTrue(prepareManagementBean(shared, settings).processMember(logout).isOk());
         shared.flush();
 
-        hub.accessChanged(AccessChange.INSTANCE);
+        hub.accessChanged(AccessChange.EVERYONE);
         assertEquals(ReturnCode.AUTHENTICATION_WARNING.getCode(), gone.expect("ERROR").getInt("returnCode"));
         assertTrue(gone.closed.await(WAIT_SECONDS, TimeUnit.SECONDS));
 
@@ -916,7 +938,7 @@ final class SocketHubTest extends DatabaseSetup {
         for (final RuntimeException kept : new RuntimeException[] {
                 new EDSException(ReturnCode.DATABASE_ERROR, "The database is busy."), new IllegalStateException("Something broke.") }) {
             failure.set(kept);
-            hub.accessChanged(AccessChange.INSTANCE);
+            hub.accessChanged(AccessChange.EVERYONE);
             work.next().run();
             peer.tell(auth);
             work.drain();
@@ -925,13 +947,68 @@ final class SocketHubTest extends DatabaseSetup {
 
         // One which finds the access gone ends it.
         failure.set(new EDSException(ReturnCode.AUTHORIZATION_WARNING, "No more."));
-        hub.accessChanged(AccessChange.INSTANCE);
+        hub.accessChanged(AccessChange.EVERYONE);
         work.next().run();
         final JsonObject ended = peer.expect("ERROR");
         assertEquals(ReturnCode.AUTHENTICATION_WARNING.getCode(), ended.getInt("returnCode"));
         assertEquals("No more.", ended.getString("returnMessage"));
         assertTrue(peer.closed.await(WAIT_SECONDS, TimeUnit.SECONDS));
         assertEquals(0, hub.connections());
+    }
+
+    @Test
+    void testAFrameAnsweredWithAnErrorIsLoggedAsWarn() {
+        final ManualWork work = new ManualWork();
+        replace(new SocketHub(new FeatureBean(shared, settings) {
+            @Override
+            public CircleFeatureResponse circleFeatures(final byte[] token, final String circleId) {
+                throw new EDSException(ReturnCode.DATABASE_ERROR, "The database is busy.");
+            }
+        }, new Given<>(work)));
+        final Peer peer = open();
+        peer.tell("{\"type\":\"AUTH\",\"token\":\"" + Base64.getEncoder().encodeToString(session(MEMBER_3)) + "\"}");
+        work.drain();
+        peer.expect("READY");
+
+        try (LogCapture log = LogCapture.of(SocketHub.class)) {
+            peer.tell("{\"type\":\"JOIN\",\"circleId\":\"" + CIRCLE_1_ID + "\"}");
+            work.drain();
+            assertEquals(ReturnCode.DATABASE_ERROR.getCode(), peer.expect("ERROR").getInt("returnCode"));
+            assertEquals(List.of("Socket frame failed with DATABASE_ERROR: The database is busy."), log.warnings());
+
+            // A frame refused for what it asks is not the stone's error.
+            peer.tell("{\"type\":\"JOIN\",\"circleId\":\"no id\"}");
+            work.drain();
+            assertEquals(ReturnCode.VERIFICATION_WARNING.getCode(), peer.expect("ERROR").getInt("returnCode"));
+            assertEquals(1, log.warnings().size());
+        }
+    }
+
+    @Test
+    void testAnErrorBeforeAuthIsNotLoggedAsWarn() throws InterruptedException {
+        final ManualWork work = new ManualWork();
+        replace(new SocketHub(new FeatureBean(shared, settings) {
+            @Override
+            public FeatureManager.Identity identify(final byte[] token) {
+                throw new EDSException(ReturnCode.CRYPTO_ERROR, "EDS is locked, the MasterKey is not loaded.");
+            }
+        }, new Given<>(work)));
+        try (LogCapture log = LogCapture.of(SocketHub.class)) {
+            // A locked stone fails every AUTH; an unknown client can try many
+            // times, each with a connection of its own, which is closed.
+            for (int i = 0; i < 3; i++) {
+                final Peer peer = open();
+                peer.tell("{\"type\":\"AUTH\",\"token\":\"AAAA\"}");
+                work.drain();
+                assertEquals(ReturnCode.CRYPTO_ERROR.getCode(), peer.expect("ERROR").getInt("returnCode"));
+                // The stone failed, not the Session: the client may try again
+                // later, and doesn't take it for an ended Session (1008).
+                assertTrue(peer.closed.await(WAIT_SECONDS, TimeUnit.SECONDS));
+                assertEquals(SocketConnection.TRY_AGAIN_LATER, peer.code.get());
+            }
+            assertEquals(List.of(), log.warnings());
+            assertEquals(0, hub.connections());
+        }
     }
 
     @Test
@@ -974,7 +1051,7 @@ final class SocketHubTest extends DatabaseSetup {
         hub.closed(joining.id());
         join.run();
         // And so does a check of the access.
-        hub.accessChanged(AccessChange.INSTANCE);
+        hub.accessChanged(AccessChange.EVERYONE);
         final Runnable check = work.next();
         hub.closed(checked.id());
         check.run();
@@ -1022,7 +1099,7 @@ final class SocketHubTest extends DatabaseSetup {
     void testAHubOutsideCdiDoesNothing() {
         final SocketHub proxy = new SocketHub();
 
-        assertDoesNotThrow(() -> proxy.accessChanged(AccessChange.INSTANCE));
+        assertDoesNotThrow(() -> proxy.accessChanged(AccessChange.EVERYONE));
         assertDoesNotThrow(proxy::shutdown);
         assertEquals(0, proxy.connections());
     }
@@ -1032,8 +1109,8 @@ final class SocketHubTest extends DatabaseSetup {
         final Peer peer = authenticated(MEMBER_3);
         hub.shutdown();
 
-        assertDoesNotThrow(() -> hub.accessChanged(AccessChange.INSTANCE));
-        assertDoesNotThrow(() -> hub.accessChanged(AccessChange.INSTANCE));
+        assertDoesNotThrow(() -> hub.accessChanged(AccessChange.EVERYONE));
+        assertDoesNotThrow(() -> hub.accessChanged(AccessChange.EVERYONE));
         assertEquals(0, hub.connections());
         assertTrue(peer.frames.isEmpty());
     }
@@ -1060,6 +1137,266 @@ final class SocketHubTest extends DatabaseSetup {
         failing.tell(auth);
         assertEquals(ReturnCode.ILLEGAL_ACTION.getCode(), failing.expect("ERROR").getInt("returnCode"));
         assertEquals(1, hub.connections());
+    }
+
+
+    // =========================================================================
+    // Limits before AUTH, the access versions and the budgets (ticket 18)
+    // =========================================================================
+
+    @Test
+    void testOnlySoManyConnectionsWaitForTheirAuth() throws InterruptedException {
+        assertEquals(10, SocketHub.AUTH_TIMEOUT_SECONDS);
+        final List<Peer> waiting = new java.util.ArrayList<>();
+        for (int i = 0; i < SocketHub.MAX_WAITING_FOR_AUTH; i++) {
+            waiting.add(open());
+        }
+        assertEquals(SocketHub.MAX_WAITING_FOR_AUTH, hub.connections());
+
+        // One more is closed at once, and not kept.
+        final Peer refused = open();
+        assertTrue(refused.closed.await(WAIT_SECONDS, TimeUnit.SECONDS));
+        assertEquals(SocketConnection.TRY_AGAIN_LATER, refused.code.get());
+        assertEquals(SocketHub.MAX_WAITING_FOR_AUTH, hub.connections());
+
+        // One which authenticates no longer waits, so another may come; so
+        // may one when a waiting one goes.
+        final Peer first = waiting.getFirst();
+        first.tell("{\"type\":\"AUTH\",\"token\":\"" + Base64.getEncoder().encodeToString(session(MEMBER_3)) + "\"}");
+        first.expect("READY");
+        final Peer next = open();
+        hub.closed(waiting.get(1).id());
+        final Peer last = open();
+        assertEquals(1L, next.closed.getCount());
+        assertEquals(1L, last.closed.getCount());
+        assertEquals(SocketHub.MAX_WAITING_FOR_AUTH + 1, hub.connections());
+    }
+
+    @Test
+    void testBeforeAuthOnlyALittleMayWait() throws InterruptedException {
+        try (LogCapture log = LogCapture.of(SocketHub.class)) {
+            final Peer peer = open();
+            peer.tell("x".repeat((int) SocketHub.MAX_PENDING_RECEIVED_BEFORE_AUTH + 1));
+
+            assertTrue(peer.closed.await(WAIT_SECONDS, TimeUnit.SECONDS));
+            assertEquals(SocketConnection.TRY_AGAIN_LATER, peer.code.get());
+            assertEquals(0, hub.connections());
+            // Anyone could do it, so it isn't a WARN.
+            assertEquals(List.of(), log.warnings());
+        }
+    }
+
+    @Test
+    void testNothingOfACircleIsSentBeforeTheAccessIsCheckedAgain() throws InterruptedException {
+        final ManualWork work = manualWork();
+        final Peer reader = joinedBy(work, MEMBER_3);
+
+        // member3 is removed from the Circle, and the hub is told; the check
+        // of the connection waits for the work.
+        final ProcessTrusteeRequest remove = prepareRequest(ProcessTrusteeRequest.class, MEMBER_1);
+        remove.setAction(Action.REMOVE);
+        remove.setCircleId(CIRCLE_1_ID);
+        remove.setMemberId(MEMBER_3_ID);
+        assertTrue(prepareManagementBean(shared, settings).processTrustee(remove).isOk());
+        shared.flush();
+        hub.accessChanged(AccessChange.of(CIRCLE_1_ID));
+
+        // An entry added now isn't sent to it before it was checked.
+        final net.haugr.eds.api.requests.EntryRequest body = new net.haugr.eds.api.requests.EntryRequest();
+        body.setKind("note");
+        body.setContent(b64("not for member3"));
+        assertTrue(features.addEntry(session(MEMBER_2), CIRCLE_1_ID, BOARD, body).isOk());
+        assertNull(reader.frames.poll(300, TimeUnit.MILLISECONDS));
+
+        // Checked, it is told that it left, and never gets the entry.
+        work.drain();
+        assertEquals(CIRCLE_1_ID, reader.expect("LEFT").getString("circleId"));
+        assertNull(reader.frames.poll(300, TimeUnit.MILLISECONDS));
+    }
+
+    @Test
+    void testWhatIsHeldIsSentInOrder() {
+        final ManualWork work = manualWork();
+        final Peer reader = joinedBy(work, MEMBER_3);
+
+        // The access to the Circle changes, but member3 keeps it: what is
+        // told meanwhile waits behind the check. Once checked, what comes
+        // next still waits behind what was held, so the order is kept.
+        hub.accessChanged(AccessChange.of(CIRCLE_1_ID));
+        hub.dataChanged(new DataChange(CIRCLE_1_ID, "first"));
+        work.next().run();
+        hub.dataChanged(new DataChange(CIRCLE_1_ID, "second"));
+        work.drain();
+        assertEquals("first", reader.expect("FILES").getString("dataId"));
+        assertEquals("second", reader.expect("FILES").getString("dataId"));
+    }
+
+    @Test
+    void testAChangeOfOneCircleChecksOnlyItsConnections() throws InterruptedException {
+        final AtomicReference<byte[]> outside = new AtomicReference<>();
+        final CountDownLatch insideChecked = new CountDownLatch(1);
+        final CountDownLatch outsideChecked = new CountDownLatch(1);
+        final FeatureBean counting = new FeatureBean(shared, settings, event -> listening.get().featureChanged(event)) {
+            @Override
+            public Set<String> readableCircles(final byte[] token) {
+                (Arrays.equals(token, outside.get()) ? outsideChecked : insideChecked).countDown();
+                return super.readableCircles(token);
+            }
+        };
+        replace(new SocketHub(counting, 200, clock, SocketHub.AUTH_TIMEOUT_SECONDS * 1000));
+        joined(MEMBER_2);
+        outside.set(authenticated(MEMBER_3).token);
+
+        // The connection in the Circle is checked, the other one isn't.
+        hub.accessChanged(AccessChange.of(CIRCLE_1_ID));
+        assertTrue(insideChecked.await(WAIT_SECONDS, TimeUnit.SECONDS));
+        assertFalse(outsideChecked.await(1, TimeUnit.SECONDS));
+
+        // A change which may touch everyone checks it too.
+        hub.accessChanged(AccessChange.EVERYONE);
+        assertTrue(outsideChecked.await(WAIT_SECONDS, TimeUnit.SECONDS));
+    }
+
+    @Test
+    void testTheFramesAfterAFailedAuthAreNotHandled() {
+        final ManualWork work = new ManualWork();
+        final AtomicInteger identified = new AtomicInteger();
+        replace(new SocketHub(new FeatureBean(shared, settings) {
+            @Override
+            public FeatureManager.Identity identify(final byte[] token) {
+                identified.incrementAndGet();
+                return super.identify(token);
+            }
+        }, new Given<>(work)));
+        final Peer peer = open();
+        // A bad AUTH, and a good one right behind it, before either is handled.
+        peer.tell("{\"type\":\"AUTH\",\"token\":\"" + Base64.getEncoder().encodeToString(new byte[32]) + "\"}");
+        peer.tell("{\"type\":\"AUTH\",\"token\":\"" + Base64.getEncoder().encodeToString(session(MEMBER_3)) + "\"}");
+        work.drain();
+
+        assertEquals(ReturnCode.AUTHENTICATION_WARNING.getCode(), peer.expect("ERROR").getInt("returnCode"));
+        // The second AUTH, which came before the first was handled, isn't.
+        assertEquals(1, identified.get());
+        assertEquals(0, hub.connections());
+    }
+
+    @Test
+    void testJoiningUnknownCirclesKeepsNoVersions() {
+        final Peer peer = authenticated(MEMBER_3);
+        for (int i = 0; i < 3; i++) {
+            peer.tell(frame("JOIN", "\"ref\":\"x\"").replace(CIRCLE_1_ID, java.util.UUID.randomUUID().toString()));
+            peer.expect("ERROR");
+        }
+        assertEquals(0, hub.versionsKept());
+
+        hub.accessChanged(AccessChange.of(CIRCLE_1_ID));
+        assertEquals(1, hub.versionsKept());
+    }
+
+    @Test
+    void testNothingIsSentWhenTheCheckFails() throws InterruptedException {
+        final ManualWork work = new ManualWork();
+        final AtomicBoolean failing = new AtomicBoolean(false);
+        final FeatureBean flaky = new FeatureBean(shared, settings, event -> listening.get().featureChanged(event)) {
+            @Override
+            public Set<String> readableCircles(final byte[] token) {
+                if (failing.get()) {
+                    throw new EDSException(ReturnCode.DATABASE_ERROR, "The database can't be read.");
+                }
+                return super.readableCircles(token);
+            }
+        };
+        replace(new SocketHub(flaky, new Given<>(work)));
+        final Peer reader = joinedBy(work, MEMBER_3);
+
+        failing.set(true);
+        hub.accessChanged(AccessChange.of(CIRCLE_1_ID));
+        hub.dataChanged(new DataChange(CIRCLE_1_ID, "unchecked"));
+        try (LogCapture log = LogCapture.of(SocketHub.class)) {
+            work.drain();
+            // The failed check is the stone's, so it is a WARN.
+            assertFalse(log.warnings().isEmpty());
+        }
+        assertNull(reader.frames.poll(300, TimeUnit.MILLISECONDS));
+
+        // Once the database can be read, the next one is sent.
+        failing.set(false);
+        hub.dataChanged(new DataChange(CIRCLE_1_ID, "checked"));
+        work.drain();
+        assertEquals("checked", reader.expect("FILES").getString("dataId"));
+    }
+
+    @Test
+    void testASignalOverTheBudgetDoesNotUseUpTheInterval() {
+        assertTrue(features.putFeature(session(Constants.ADMIN_ACCOUNT), "paced", PACED).isOk());
+        assertTrue(features.setCircleFeature(session(MEMBER_1), CIRCLE_1_ID, "paced", FeatureState.ON).isOk());
+        final Peer writer = joined(MEMBER_2);
+        final Peer reader = joined(MEMBER_3);
+        final String large = "x".repeat(Constants.MAX_SIGNAL_LENGTH);
+        final int fit = (int) (SocketHub.SIGNAL_BURST / Constants.MAX_SIGNAL_LENGTH);
+
+        // One a tenth of a second, the interval of "paced": the budget runs out.
+        for (int i = 0; i <= fit; i++) {
+            if (i > 0) {
+                clock.advance(Duration.ofMillis(100));
+            }
+            writer.tell(frame("SIGNAL", "\"feature\":\"paced\",\"signal\":\"" + large + "\""));
+            writer.tell(frame("COUNT", "\"feature\":\"paced\""));
+            writer.expect("COUNTED");
+        }
+        for (int i = 0; i < fit; i++) {
+            assertEquals(large, reader.expect("SIGNAL").getString("signal"));
+        }
+        // The last one went over the budget and was dropped; a small one at
+        // the same moment is a tenth of a second after the last one which
+        // went, so the interval has passed.
+        writer.tell(frame("SIGNAL", "\"feature\":\"paced\",\"signal\":\"small\""));
+        assertEquals("small", reader.expect("SIGNAL").getString("signal"));
+    }
+
+    @Test
+    void testSignalsHaveABudget() {
+        final Peer writer = joined(MEMBER_2);
+        final Peer reader = joined(MEMBER_3);
+        final String large = "x".repeat(Constants.MAX_SIGNAL_LENGTH);
+        final int fit = (int) (SocketHub.SIGNAL_BURST / Constants.MAX_SIGNAL_LENGTH);
+
+        // The feature "fast" has no interval, so only the budget holds them.
+        for (int i = 0; i <= fit; i++) {
+            writer.tell(frame("SIGNAL", "\"feature\":\"fast\",\"signal\":\"" + large + "\""));
+        }
+        writer.tell(frame("SIGNAL", "\"feature\":\"fast\",\"signal\":\"marker\""));
+        // The frames of a connection are handled in order: once the count is
+        // answered, the signals before it went or were dropped.
+        writer.tell(frame("COUNT", "\"feature\":\"fast\""));
+        writer.expect("COUNTED");
+        for (int i = 0; i < fit; i++) {
+            assertEquals(large, reader.expect("SIGNAL").getString("signal"));
+        }
+        // The one over the budget was dropped, and so was the small one after
+        // it; a small one fits what came back after a second.
+        clock.advance(Duration.ofSeconds(1));
+        writer.tell(frame("SIGNAL", "\"feature\":\"fast\",\"signal\":\"after a second\""));
+        assertEquals("after a second", reader.expect("SIGNAL").getString("signal"));
+    }
+
+    @Test
+    void testChangesOfEntriesHaveABudget() {
+        final Peer writer = joined(MEMBER_2);
+        for (int i = 0; i < SocketHub.ENTRY_BURST; i++) {
+            writer.tell(frame("ADD", "\"feature\":\"fast\",\"kind\":\"note\",\"content\":\"" + b64("n" + i) + "\""));
+            writer.answer("ADDED");
+        }
+
+        writer.tell(frame("ADD", "\"ref\":\"over\",\"feature\":\"fast\",\"kind\":\"note\",\"content\":\"" + b64("over") + "\""));
+        final JsonObject busy = writer.expect("ERROR");
+        assertEquals("over", busy.getString("ref"));
+        assertEquals(ReturnCode.SERVICE_BUSY.getCode(), busy.getInt("returnCode"));
+
+        // The budget comes back over time.
+        clock.advance(Duration.ofSeconds(1));
+        writer.tell(frame("ADD", "\"feature\":\"fast\",\"kind\":\"note\",\"content\":\"" + b64("later") + "\""));
+        writer.answer("ADDED");
     }
 
     // =========================================================================
@@ -1102,6 +1439,19 @@ final class SocketHubTest extends DatabaseSetup {
         peer.token = session(account);
         peer.tell("{\"type\":\"AUTH\",\"token\":\"" + Base64.getEncoder().encodeToString(peer.token) + "\"}");
         peer.expect("READY");
+        return peer;
+    }
+
+    /** A connection which joined circle1, with its frames handled by the given work. */
+    private Peer joinedBy(final ManualWork work, final String account) {
+        final Peer peer = open();
+        peer.token = session(account);
+        peer.tell("{\"type\":\"AUTH\",\"token\":\"" + Base64.getEncoder().encodeToString(peer.token) + "\"}");
+        work.drain();
+        peer.expect("READY");
+        peer.tell("{\"type\":\"JOIN\",\"circleId\":\"" + CIRCLE_1_ID + "\"}");
+        work.drain();
+        peer.expect("JOINED");
         return peer;
     }
 

@@ -133,12 +133,6 @@ public final class RotationDao extends DataDao {
                 .getSingleResult();
     }
 
-    public long countData(final CircleEntity circle) {
-        return entityManager.createQuery("select count(d.id) from DataEntity d where d.metadata.circle = :circle", Long.class)
-                .setParameter(CIRCLE, circle)
-                .getSingleResult();
-    }
-
     /**
      * Deletes the row of a retired Circle Secret; with it go pending
      * invitations which were sealed with it (by the database). It fails if
@@ -150,22 +144,6 @@ public final class RotationDao extends DataDao {
         entityManager.createQuery("delete from KeyEntity k where k.id = :id")
                 .setParameter("id", keyId)
                 .executeUpdate();
-    }
-
-    /**
-     * Locks the content row until the end of the transaction, and tells the
-     * secret it is on. Only the row of {@code eds_data} is locked: a locking
-     * read of the entity would join its Data Object, key and Circle, and
-     * some databases (H2) lock the rows of all of them.
-     *
-     * @param id Internal ID of the content row
-     * @return Key row of its secret, or null if the row is gone
-     */
-    public Long lockData(final long id) {
-        final List<?> found = entityManager.createNativeQuery("SELECT key_id FROM eds_data WHERE id = ? FOR UPDATE")
-                .setParameter(1, id)
-                .getResultList();
-        return found.isEmpty() ? null : ((Number) found.getFirst()).longValue();
     }
 
     /**

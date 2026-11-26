@@ -116,9 +116,11 @@ public final class UploadDataManager extends AbstractManager<DataDao, ProcessDat
         FeatureFolder.refuseIf(FeatureFolder.isEntry(metadata));
         Thumbnails.refuseIf(Thumbnails.isThumbnail(metadata));
         final TrusteeEntity trustee = findTrustee(metadata.getCircle().getExternalId());
-        // The thumbnail no longer matches the new content; if the upload
-        // fails, the rollback restores it.
-        dao.deleteThumbnails(metadata);
+        // The thumbnail no longer matches the new content, and is deleted
+        // once it is written; if the upload fails, the rollback restores it.
+        // The rows of both are held first, in the order every request which
+        // replaces or deletes them takes them.
+        dao.lockContentWithThumbnails(metadata);
 
         // The existing content is never loaded, it may be large; only its
         // Id, and the Key is switched to the current Circle Secret.
@@ -148,6 +150,7 @@ public final class UploadDataManager extends AbstractManager<DataDao, ProcessDat
         }
 
         final SecretEDSKey circleSecret = unwrapCircleKey(trustee);
+        final long circleId = metadata.getCircle().getId();
         final DataFormat.Context context = new DataFormat.Context(metadata.getCircle().getExternalId(), metadata.getExternalId(), trustee.getKey().getId());
         final String algorithm = settings.getHashAlgorithm().getAlgorithm();
         // The stream reads the body of the request, which the HTTP layer
@@ -159,7 +162,7 @@ public final class UploadDataManager extends AbstractManager<DataDao, ProcessDat
             // The content is replaced, so its current length doesn't count.
             StorageCeiling.check(settings, dao, id, encrypting.storedLength());
             try {
-                dao.withConnection(connection -> EncryptedDataStore.write(connection, id, encrypting, encrypting.storedLength(), algorithm, settings.getStreamReadBatchSize()));
+                dao.writeContent(circleId, id, connection -> EncryptedDataStore.write(connection, id, encrypting, encrypting.storedLength(), algorithm, settings.getStreamReadBatchSize()));
             } catch (EDSException e) {
                 throw e;
             } catch (RuntimeException e) {
@@ -168,8 +171,12 @@ public final class UploadDataManager extends AbstractManager<DataDao, ProcessDat
                 throw rolledBack(e);
             }
         } else {
-            encrypting = writeToTheEnd(id, circleSecret, context, maxSize, algorithm);
+            encrypting = writeToTheEnd(circleId, id, circleSecret, context, maxSize, algorithm);
         }
+        // After the write, as the delete changes the stored bytes of the
+        // Circle, whose row (eds_circle_storage) is then held until the
+        // commit; the content is not streamed while it is held.
+        dao.deleteThumbnails(metadata);
 
         final ProcessDataResponse response = new ProcessDataResponse("The content of " + theDataObject(metadata) + " was successfully uploaded.");
         response.setDataId(metadata.getExternalId());
@@ -186,7 +193,8 @@ public final class UploadDataManager extends AbstractManager<DataDao, ProcessDat
      * rolled back, and the previous content stays. Nothing is spooled on
      * the way: each part is written as it has arrived.
      */
-    private DataStreams.EncryptingStream writeToTheEnd(final long id, final SecretEDSKey circleSecret, final DataFormat.Context context, final long maxSize, final String algorithm) {
+    private DataStreams.EncryptingStream writeToTheEnd(final long circleId, final long id, final SecretEDSKey circleSecret,
+                                                       final DataFormat.Context context, final long maxSize, final String algorithm) {
         final long room = StorageCeiling.remaining(settings, dao, id);
         if (room <= 0) {
             throw new EDSException(ReturnCode.INSUFFICIENT_STORAGE, StorageCeiling.REACHED);
@@ -200,7 +208,7 @@ public final class UploadDataManager extends AbstractManager<DataDao, ProcessDat
         final DataStreams.EncryptingStream encrypting = DataStreams.encrypt(circleSecret, context, bounded);
         final long stored;
         try {
-            stored = dao.withConnection(connection -> EncryptedDataStore.writeToTheEnd(connection, id, encrypting, algorithm, settings.getStreamReadBatchSize()));
+            stored = dao.writeContent(circleId, id, connection -> EncryptedDataStore.writeToTheEnd(connection, id, encrypting, algorithm, settings.getStreamReadBatchSize()));
         } catch (EDSException e) {
             throw e;
         } catch (RuntimeException e) {

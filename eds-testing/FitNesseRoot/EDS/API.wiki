@@ -1,0 +1,990 @@
+---
+Test
+---
+!*> Setup
+!include .EDS.Setup
+!define REST_ROOT {[ http(s)://HOST:PORT/ROOT ]}
+
+*!
+
+!anchor content
+!1 !-<img src="files/javadog.png"> API - Application Programming Interface -!
+The EDS API consists of 2 main parts, the first is the management part, which
+is used to control a EDS instance, and the second is the sharing part. The full
+documentation of the API is its contract, ''openapi.json'' (in the module eds-api), which a
+running EDS also serves as ${REST_ROOT}/openapi.json.
+
+There was both a SOAP & REST based !-WebService-! available, the default for
+the !-FitNesse-! tests is the REST, if the SOAP based !-WebServices-! are still
+required, please use version 1.2, as that is the final version with SOAP
+support, as of 2.0 SOAP support has been discontinued.
+
+Note; EDS is not a HTTP(S) Server, it is an Application, the JSON requests will
+therefore always return the standard HTTP code 200, whenever an incoming request
+has been answered by the EDS. A different !-ReturnCode-! & !-ReturnMessage-! is
+set in the response, which will provide more details if the request could not
+be processed correctly. The EDS !-ReturnCodes-! are similar to the HTTP codes,
+so understanding them should be easier, but the !-ReturnMessage-! is containing
+significantly more details regarding the problem. This was decided to ensure
+that a System using EDS can better deal with the problems without having to
+resort to EDS logs. The streaming of content, the Resource API, the Features and the
+Status are the exception: they answer with the return code as HTTP status.
+
+[[Management has the following elements: ][#management]]
+
+ * '''[[ Version ][#version]] '''
+ * '''[[ !-MasterKey-! ][#masterkey]] '''
+ * '''[[ Settings ][#settings]] '''
+ * '''[[ Sanitized ][#sanitized]] '''
+ * '''[[ Authenticated ][#authenticated]] '''
+ * '''[[ Members ][#members]] '''
+ * '''[[ Circles of Trust ][#circles]] '''
+ * '''[[ Trustees ][#trustees]] '''
+ * '''[[ Status ][#status]] '''
+
+[[ Sharing has the following elements: ][#sharing]]
+
+ * '''[[ Data Type ][#datatype]] '''
+ * '''[[ Data ][#data]] '''
+ * '''[[ Content Streaming ][#streaming]] '''
+ * '''[[ Resource API ][#resources]] '''
+ * '''[[ Features ][#features]] '''
+
+----
+[[ Top ][#content]]
+!anchor management
+!2 Management
+Management primarily contain the functionality which is used to control
+the system, including altering settings. Adding a system specific !-MasterKey-!
+as well as creating Members, Circles of Trust and assign Members as Trustees to
+the Circles.
+
+'''Important'''; ''A new EDS has no account at all, and so no default name or
+passphrase which someone could forget to change. The very first request claims it:
+its account name and passphrase become the System Administrator. The passphrase
+must be strong enough, like every passphrase in EDS. For this test, the setup claims
+the instance as '''admin''', with the passphrase ${ADMIN_PASSPHRASE}.''
+
+!* Version
+[[ Top ][#content]]
+!anchor version
+!4 '''Version'''
+Returns the current Version of the running EDS instance. This method serves
+mainly as a simply way to check if the system is operational. This request is
+the only EDS request not requiring any credentials to invoke.
+
+ * Version - Read version of running instance, act as ping
+   * REST (POST) request is: ${REST_ROOT}/version
+
+|version                                  |
+|return code?|return message?|eds version?|
+|${SUCCESS}  |Ok             |2.0-SNAPSHOT|
+*!
+
+!* !-MasterKey-!
+[[ Top ][#content]]
+!anchor masterkey
+!4 '''!-MasterKey-!'''
+The !-MasterKey-! is the kill-switch of !-EDS-!. It is not stored anywhere: it is
+derived (HKDF-SHA512) from an external high-entropy source when !-EDS-! starts,
+and lives only in memory. The database only holds its version and a key check
+value, so a wrong !-MasterKey-! is rejected without decrypting anything. There is
+no default !-MasterKey-!: without a source (the environment variable
+'''EDS_MASTERKEY_URL''' or the setting '''eds.masterkey.url'''), !-EDS-! stays
+locked, until it is unlocked with the !-MasterKey-! request. On a fresh instance,
+the first request sets the !-MasterKey-! up. The Setup page does this.
+
+To make sure the next test run also works, the !-MasterKey-! is reverted to the
+original at the end of the following table.
+
+ * !-MasterKey-! - Unlock & Set !-MasterKey-!
+   * Only '''System Administrators''' may perform this
+   * REST (POST) request is: ${REST_ROOT}/masterKey
+
+|master key                                                                                              |
+|account name|credential|url                                 |secret|return code?|return message?        |
+|admin       |${ADMIN_PASSPHRASE}|null                                |${MASTERKEY_DEFAULT}|${SUCCESS}  |!-MasterKey-! unlocked.|
+|admin       |${ADMIN_PASSPHRASE}|null                                |${MASTERKEY_SECRET}|${SUCCESS}  |!-MasterKey-! updated. |
+|admin       |${ADMIN_PASSPHRASE}|null                                |admin |${VERIFICATION_WARNING}|The !-MasterKey-! secret is too weak. Use at least 20 random characters (letters, digits and symbols), or a passphrase of several random words.|
+|admin       |${ADMIN_PASSPHRASE}|null                                |${MASTERKEY_DEFAULT}|${SUCCESS}  |!-MasterKey-! updated. |
+
+The secret may instead be read from a URL (the column url), a file or a web address; this isn't tested here, as the test
+must not depend on a source outside it.
+
+Changing the !-MasterKey-! rotates it: everything it protects (the Members' keys and the Trustees' Circle Secrets) is re-wrapped
+with the new !-MasterKey-! in one transaction, sessions end and pending invitations are deleted. Data Objects aren't touched. A new
+!-MasterKey-! secret must be strong enough.
+
+!*> Create Test accounts
+|process member                                                                                                                                                                           |
+|account name|credential|credential type|action|member id|public key|new account name|new credential|member role|member id?|return code?|return message?                                  |
+|admin       |${ADMIN_PASSPHRASE}|PASSPHRASE     |CREATE|null     |null      |user1           |${PASSPHRASE_1}|STANDARD   |user1_id  |${SUCCESS}  |The Member 'user1' was successfully added to EDS.|
+|admin       |${ADMIN_PASSPHRASE}|PASSPHRASE     |CREATE|null     |null      |user2           |${PASSPHRASE_2}|STANDARD   |user2_id  |${SUCCESS}  |The Member 'user2' was successfully added to EDS.|
+|admin       |${ADMIN_PASSPHRASE}|PASSPHRASE     |CREATE|null     |null      |user3           |${PASSPHRASE_3}|STANDARD   |user3_id  |${SUCCESS}  |The Member 'user3' was successfully added to EDS.|
+|admin       |${ADMIN_PASSPHRASE}|PASSPHRASE     |CREATE|null     |null      |user4           |password4     |STANDARD   |null      |${VERIFICATION_WARNING}|The Credential is too weak. Use at least 20 random characters (letters, digits and symbols), or a passphrase of several random words.|
+
+*!
+
+|master key                                                                                                                  |
+|account name|credential|url |secret    |return code?             |return message?                                           |
+|user1       |${PASSPHRASE_1}|null|new secret|${AUTHENTICATION_WARNING}|Given Account is not permitted to perform this request.   |
+|admin       |${ADMIN_PASSPHRASE}|null|${MASTERKEY_SECRET}|${SUCCESS}               |!-MasterKey-! updated.                                    |
+*!
+
+!* Settings
+[[ Top ][#content]]
+!anchor settings
+!4 '''Settings'''
+The !-EDS-! Settings request can only be performed by the System
+Administrator, i.e. the system super user. It is a way to both extract the
+current settings, and update existing values.
+
+ * Settings - Read & Update Settings
+   * Only '''System Administrators''' may perform this
+   * REST (POST) request is: ${REST_ROOT}/settings
+
+|script|Settings     |admin                          |${ADMIN_PASSPHRASE}|
+|show  |value for key|eds.crypto.symmetric.algorithm |
+|show  |value for key|eds.crypto.asymmetric.algorithm|
+|show  |value for key|eds.crypto.pbe.algorithm       |
+|show  |value for key|eds.crypto.hash.algorithm      |
+|show  |value for key|eds.system.locale              |
+|show  |value for key|eds.show.all.circles           |
+|show  |value for key|eds.show.trustees              |
+|show  |value for key|eds.sanity.check.startup       |
+|show  |value for key|eds.sanity.check.interval.days |
+|show  |value for key|eds.cors.value                 |
+|show  |value for key|eds.circle.secret.rotation.days|
+|show  |value for key|eds.circle.secret.rotation.threads|
+
+The values above are only shown, not checked: they depend on the defaults and on
+what is stored in the database, and are there for information.
+
+Note, that if a different user attempts to invoke this request, it is refused, and
+the list has only undefined values.
+
+|script|Settings     |user1                          |${PASSPHRASE_1}|
+|check |return code  |${AUTHORIZATION_WARNING}       |
+|check |value for key|eds.crypto.symmetric.algorithm |undefined|
+|check |value for key|eds.crypto.asymmetric.algorithm|undefined|
+|check |value for key|eds.crypto.pbe.algorithm       |undefined|
+|check |value for key|eds.crypto.hash.algorithm      |undefined|
+|check |value for key|eds.system.locale              |undefined|
+|check |value for key|eds.system.charset             |undefined|
+|check |value for key|eds.show.all.circles           |undefined|
+|check |value for key|eds.show.trustees              |undefined|
+|check |value for key|eds.sanity.check.startup       |undefined|
+|check |value for key|eds.sanity.check.interval.days |undefined|
+|check |value for key|eds.cors.value                 |undefined|
+|check |value for key|eds.circle.secret.rotation.days|undefined|
+
+!5 Symmetric Algorithm
+The primary part of all internal encryption is performed using Symmetric Keys. These are all based on the AES algorithms
+and only AES-256-GCM is supported (CNSA 2.0 / BSI TR-02102). The CBC variants and the 128 and 192 bit key sizes
+were removed in EDS 2.0.
+The allowed values are:
+ * '''AES_GCM_256'''
+
+|Settings                                                                                                                                                            |
+|account name|credential|key                           |value      |return code?      |return message?                                                   |defined?   |
+|admin       |${ADMIN_PASSPHRASE}|eds.crypto.symmetric.algorithm|AES_CBC_128|${SETTING_WARNING}|Unsupported Crypto Algorithm for 'eds.crypto.symmetric.algorithm'.|AES_GCM_256|
+|admin       |${ADMIN_PASSPHRASE}|eds.crypto.symmetric.algorithm|AES_CBC_192|${SETTING_WARNING}|Unsupported Crypto Algorithm for 'eds.crypto.symmetric.algorithm'.|AES_GCM_256|
+|admin       |${ADMIN_PASSPHRASE}|eds.crypto.symmetric.algorithm|AES_CBC_256|${SETTING_WARNING}|Unsupported Crypto Algorithm for 'eds.crypto.symmetric.algorithm'.|AES_GCM_256|
+|admin       |${ADMIN_PASSPHRASE}|eds.crypto.symmetric.algorithm|AES_GCM_128|${SETTING_WARNING}|Unsupported Crypto Algorithm for 'eds.crypto.symmetric.algorithm'.|AES_GCM_256|
+|admin       |${ADMIN_PASSPHRASE}|eds.crypto.symmetric.algorithm|AES_GCM_192|${SETTING_WARNING}|Unsupported Crypto Algorithm for 'eds.crypto.symmetric.algorithm'.|AES_GCM_256|
+|admin       |${ADMIN_PASSPHRASE}|eds.crypto.symmetric.algorithm|AES_GCM_256|${SUCCESS}        |Ok                                                                |AES_GCM_256|
+|admin       |${ADMIN_PASSPHRASE}|eds.crypto.symmetric.algorithm|AES_CBC_512|${SETTING_WARNING}|Unsupported Crypto Algorithm for 'eds.crypto.symmetric.algorithm'.|AES_GCM_256|
+
+!5 Asymmetric Algorithm
+Each Member Account has its own key pairs, which are used to wrap the Circle keys. Since !-EDS-! 2.0, these are a hybrid of
+ML-KEM-1024 (post-quantum) and ECDH P-384: both must be broken to recover a Circle key. RSA was removed.
+The allowed values are:
+ * '''MLKEM1024_P384'''
+
+|Settings                                                                                                                                                        |
+|account name|credential|key                            |value   |return code?      |return message?                                                    |defined?|
+|admin       |${ADMIN_PASSPHRASE}|eds.crypto.asymmetric.algorithm|MLKEM1024_P384|${SUCCESS}        |Ok                                                                 |MLKEM1024_P384|
+|admin       |${ADMIN_PASSPHRASE}|eds.crypto.asymmetric.algorithm|RSA_2048|${SETTING_WARNING}|Unsupported Crypto Algorithm for 'eds.crypto.asymmetric.algorithm'.|MLKEM1024_P384|
+
+!5 PBE Algorithm
+The PBE, Password Based Encryption, Algorithm, which is the Algorithm used to convert a given Passphrase to a Symmetric Key,
+is based on the PBKDF2 algorithm, which again is a special way to generated a Symmetric Key, just as normal Symmetric Keys.
+The allowed values are:
+ * '''PBE_GCM_256'''
+
+|Settings                                                                                                                                                 |
+|account name|credential|key                     |value      |defined?|return code?          |return message?                                             |
+|admin       |${ADMIN_PASSPHRASE}|eds.crypto.pbe.algorithm|PBE_CBC_128|PBE_GCM_256 |${SETTING_WARNING}|Unsupported Crypto Algorithm for 'eds.crypto.pbe.algorithm'.|
+|admin       |${ADMIN_PASSPHRASE}|eds.crypto.pbe.algorithm|PBE_CBC_192|PBE_GCM_256 |${SETTING_WARNING}|Unsupported Crypto Algorithm for 'eds.crypto.pbe.algorithm'.|
+|admin       |${ADMIN_PASSPHRASE}|eds.crypto.pbe.algorithm|PBE_CBC_256|PBE_GCM_256 |${SETTING_WARNING}|Unsupported Crypto Algorithm for 'eds.crypto.pbe.algorithm'.|
+|admin       |${ADMIN_PASSPHRASE}|eds.crypto.pbe.algorithm|PBE_GCM_128|PBE_GCM_256 |${SETTING_WARNING}|Unsupported Crypto Algorithm for 'eds.crypto.pbe.algorithm'.|
+|admin       |${ADMIN_PASSPHRASE}|eds.crypto.pbe.algorithm|PBE_GCM_192|PBE_GCM_256 |${SETTING_WARNING}|Unsupported Crypto Algorithm for 'eds.crypto.pbe.algorithm'.|
+|admin       |${ADMIN_PASSPHRASE}|eds.crypto.pbe.algorithm|PBE_GCM_256|PBE_GCM_256 |${SUCCESS}        |Ok                                                          |
+|admin       |${ADMIN_PASSPHRASE}|eds.crypto.pbe.algorithm|PBE_GCM_512|PBE_GCM_256 |${SETTING_WARNING}|Unsupported Crypto Algorithm for 'eds.crypto.pbe.algorithm'.|
+*!
+
+!* Sanitized
+[[ Top ][#content]]
+!anchor sanitized
+!4 '''Sanitized'''
+Any server relies on the storage for correctness. If the storage used has flaws and the stored data is being altered as a consequence of this, then
+it may have drastic consequences. Something which is encrypted may be rendered unreadable of just a single bit has been flipped. It is therefore
+essential that the storage is always correct. To help with this, EDS has a feature build-in, which runs sanitizing checks at frequent interval,
+so all data will be checked at least once every x days, where x is defined as a system property (eds.sanity.check.interval.days).
+
+The sanitizing request is an administrative request, and the result is a list of Data Id's, of the stored Objects where their checksums no longer
+match the encrypted data. The check can be made generally or for a Circle of Trust or simply as a check if new errors have occurred since a certain
+date.
+
+ * Sanitized - Read current status
+   * REST (POST) request is: ${REST_ROOT}/sanitized
+
+|sanitized                                                                          |
+|account name|credential|circle id|since     |failures?|return code?|return message?|
+|admin       |${ADMIN_PASSPHRASE}|null     |null      |[]       |${SUCCESS}  |Ok             |
+|admin       |${ADMIN_PASSPHRASE}|null     |2019-01-01|[]       |${SUCCESS}  |Ok             |
+*!
+
+!* Authenticated
+[[ Top ][#content]]
+!anchor authenticated
+!4 '''Authenticated'''
+EDS is designed as a backend system to be integrated into other systems, which opens
+the question of authentication checks, how to ensure that the standard authentication
+checks is aligned with EDS, so EDS can be used to store data securely.
+
+The use-cases for the authentication mechanism is check if an account may access the
+securely stored data or not. It is not designed nor intended to replace other
+security mechanisms, such as 2FA of existing mechanisms. The check is simply here
+to serve the purpose checking if accounts are aligned or not.
+
+This alignment check is required, since the user credentials are needed to unlock
+the keys internally. For this reason, the account should use a separate and different
+credential to unlock the EDS account, to prevent that poor passwords are passed on to
+also weaken the security of the EDS stored data.
+
+ * Authenticated - Check Member Authentication
+   * REST (POST) request is: ${REST_ROOT}/authenticated
+
+|authenticated                                                                    |
+|account name|credential|member id?|return code?|return message?                  |
+|admin       |${ADMIN_PASSPHRASE}|admin_id  |${SUCCESS}  |admin successfully authenticated.|
+*!
+
+!* Members
+[[ Top ][#content]]
+!anchor members
+!4 '''Members'''
+Managing Members is a core part of the Management. The following features can be
+performed with the current API:
+
+ * Create Member - Creates a new Account with a given password
+   * Only '''System Administrators''' may perform this
+   * REST (POST) request is: ${REST_ROOT}/members/createMember
+ * Invite Member - Creates an invitation, so a Member can update themselves
+   * Only '''System Administrators''' may perform this
+   * REST (POST) request is: ${REST_ROOT}/members/inviteMember
+ * Login - Simple way to temporarily assign a !-SessionKey-! to an account
+   * REST (POST) request is: ${REST_ROOT}/members/login
+ * Logout - Remove the temporary !-SessionKey-! from accessing the account
+   * REST (POST) request is: ${REST_ROOT}/members/logout
+ * Alter Member Roles - Allows an Administrator to change a Members permissions
+   * Only '''System Administrators''' may perform this
+   * REST (POST) request is: ${REST_ROOT}/members/alterMember
+ * Update Member - Allows a member to update their account & credentials
+   * REST (POST) request is: ${REST_ROOT}/members/updateMember
+ * Invalidate Member - Allows a member to invalidate their account, rendering it useless
+   * REST (POST) request is: ${REST_ROOT}/members/invalidate
+ * Delete Member - Removes a Member Account from the System permanently
+   * REST (POST) request is: ${REST_ROOT}/members/deleteMember
+ * Fetch Members - Retrieve a list of one or more Members
+   * REST (POST) request is: ${REST_ROOT}/members/fetchMembers
+
+Firstly, there are 2 ways to create accounts, both require system administrative
+permissions. The first way is to run the CREATE action the second is to use the
+INVITE action. The CREATE action requires that the new account is completely defined,
+i.e. that the account name and credentials. The INVITE will just require the account
+name and issue a one-time invitation token, which the new user uses to set their own
+credentials. EDS only stores a keyed hash (HMAC) of the token, and the invitation expires
+after the time set in '''eds.invitation.timeout.hours'''.
+
+Once accounts are in usage, it may not be feasible to constantly provide both the
+account name and credentials. Hence, it is possible to perform a LOGIN. This will
+take an Account and an existing Session and link them together for a brief period of
+time, how brief is defined via the settings. The session is then the only information
+required to identify and unlock the account. Since the Session is thus used as both
+an identification and authentication value, it must be guarded well. The Account should
+by the end of a session invoke the LOGOUT.
+
+It should be noted, that it is not possible to change the credentials for an Account
+using the Session! Nor can a Session log in to make another Session: a login needs
+the passphrase, so a stolen Session ends when it expires.
+
+|process member                                                                                                                                                                                                                                                        |
+|account name|credential       |credential type|action    |member id |public key|new account name|new credential|member role|member id?|invitation?       |return code?             |return message?                                                                    |
+|admin       |${ADMIN_PASSPHRASE}|PASSPHRASE     |CREATE    |null      |null      |admin2          |${PASSPHRASE_2}|ADMIN      |admin2_id |null             |${SUCCESS}               |The Member 'admin2' was successfully added to EDS.                                 |
+|admin       |${ADMIN_PASSPHRASE}|PASSPHRASE     |CREATE    |null      |null      |member1         |${PASSPHRASE_1}|STANDARD   |member1_id|null             |${SUCCESS}               |The Member 'member1' was successfully added to EDS.                                |
+|member1     |${PASSPHRASE_1}  |null           |UPDATE    |null      |null      |null            |null          |null       |null      |null             |${SUCCESS}               |The Member 'member1' was successfully updated.                                     |
+|member1     |${PASSPHRASE_1}  |null           |LOGIN     |null      |null      |null            |session_key   |null       |$login_member_id=|null             |${SUCCESS}               |The Member 'member1' has successfully logged in.                                   |
+|null        |session_key      |null           |UPDATE    |null      |null      |null            |new_session   |null       |null      |null             |${VERIFICATION_WARNING}  |It is only permitted to update the credentials when authenticating with Passphrase.|
+|null        |session_key      |SESSION        |LOGIN     |null      |null      |null            |new_session   |null       |null      |null             |${VERIFICATION_WARNING}  |It is only permitted to log in when authenticating with Passphrase.                |
+|null        |session_key      |SESSION        |CREATE    |null      |null      |user9           |${PASSPHRASE_9}|null       |null      |null             |${AUTHORIZATION_WARNING} |Members are not permitted to create new Accounts.                                  |
+|member1     |${PASSPHRASE_1}  |PASSPHRASE     |INVALIDATE|null      |null      |null            |null          |null       |null      |null             |${SUCCESS}               |The Member 'member1' has been Invalidated.                                         |
+|member1     |${PASSPHRASE_1}  |null           |UPDATE    |null      |null      |null            |null          |null       |null      |null             |${AUTHENTICATION_WARNING}|Cannot authenticate the Account from the given Credentials.                        |
+|null        |session_key      |SESSION        |UPDATE    |null      |null      |null            |null          |null       |null      |null             |${AUTHENTICATION_WARNING}|No Session could be found.                                                         |
+|admin       |${ADMIN_PASSPHRASE}|null           |DELETE    |member1_id|null      |null            |null          |null       |null      |null             |${SUCCESS}               |The Member 'member1' has successfully been deleted.                                |
+|admin       |${ADMIN_PASSPHRASE}|null           |INVITE    |null      |null      |invitee         |null          |null       |invitee_id|invitee_invitation|${SUCCESS}               |An invitation was successfully issued for 'invitee'.                               |
+|invitee     |invitee_invitation|INVITATION     |UPDATE    |null      |null      |invitee         |${INVITEE_PASSPHRASE}|null       |invitee_id|null             |${SUCCESS}               |The invitation was successfully processed for 'invitee'.                           |
+|invitee     |invitee_invitation|INVITATION     |UPDATE    |null      |null      |invitee         |${INVITEE_PASSPHRASE}|null       |null      |null             |${VERIFICATION_WARNING}  |Account does not have an invitation pending.                                       |
+|admin       |${ADMIN_PASSPHRASE}|PASSPHRASE     |DELETE    |invitee_id|null      |null            |null          |null       |null      |null             |${SUCCESS}               |The Member 'invitee' has successfully been deleted.                                |
+
+A LOGOUT ends the Session it comes with, and leaves the other Sessions of the Member alone.
+
+|process member                                                                                                           |
+|account name|credential     |credential type|action|new credential|return code?             |return message?                               |
+|user2       |${PASSPHRASE_2}|PASSPHRASE     |LOGIN |logout_a      |${SUCCESS}               |The Member 'user2' has successfully logged in.|
+|user2       |${PASSPHRASE_2}|PASSPHRASE     |LOGIN |logout_b      |${SUCCESS}               |The Member 'user2' has successfully logged in.|
+|null        |logout_a       |SESSION        |LOGOUT|null          |${SUCCESS}               |Ok                                            |
+|null        |logout_a       |SESSION        |LOGIN |logout_c      |${AUTHENTICATION_WARNING}|No Session could be found.                    |
+|null        |logout_b       |SESSION        |LOGIN |logout_d      |${VERIFICATION_WARNING}  |It is only permitted to log in when authenticating with Passphrase.|
+|null        |logout_b       |SESSION        |LOGOUT|null          |${SUCCESS}               |Ok                                            |
+
+|fetch members                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+|account name|credential|member id|members?                                                                                                                                                                                                                                                                                                                                                                                                                                                           |circles?|return code?|return message?|
+|admin       |${ADMIN_PASSPHRASE}|null     |[Member{memberId='admin_id', accountName='admin', memberRole='ADMIN', publicKey='null'}, Member{memberId='admin2_id', accountName='admin2', memberRole='ADMIN', publicKey='null'}, Member{memberId='user1_id', accountName='user1', memberRole='STANDARD', publicKey='null'}, Member{memberId='user2_id', accountName='user2', memberRole='STANDARD', publicKey='null'}, Member{memberId='user3_id', accountName='user3', memberRole='STANDARD', publicKey='null'}]|[]      |${SUCCESS}  |Ok             |
+|user2       |${PASSPHRASE_2}|user1_id |[Member{memberId='user1_id', accountName='user1', memberRole='STANDARD', publicKey='null'}]                                                                                                                                                                                                                                                                                                                                                                        |[]      |${SUCCESS}  |Ok             |
+*!
+
+!* Circles of Trust
+[[ Top ][#content]]
+!anchor circles
+!4 '''Circles of Trust'''
+Circles of Trust is a core part of EDS, as this is the grouping of Members or
+''Trustees'', to facilitate sharing of information. There are no limits as to
+who may create a Circle of Trust. Circles of Trust do not have an Owner, but
+rather one or more Circle Administrators. The first Member to create a Circle
+will automatically become the initial Circle Administrator - or if a Member Id
+is given, then this Member will be the initial Circle Administrator.
+
+Circles of Trust do not have much information initially - basically just their
+name, which must be unique. Circles of Trust may also have an external Circle
+Key, which means a shared Key that can be used by Trustees from a Client system.
+
+ * Create Circle - Creates a new Circle of Trust in EDS
+   * REST (POST) request is: ${REST_ROOT}/circles/createCircle
+ * Update Circle - Allows the Circle of Trust to be renamed
+   * REST (POST) request is: ${REST_ROOT}/circles/updateCircle
+ * Delete Circle - Removes a Circle with all Trustees & Data from the System
+   * REST (POST) request is: ${REST_ROOT}/circles/deleteCircle
+ * Fetch Circles - Retrieves a list of Circles in the current EDS instance
+   * REST (POST) request is: ${REST_ROOT}/circles/fetchCircles
+
+|process circle                                                                                                                                                                                |
+|account name|credential|action|circle id |circle name    |member id|circle key      |circle id?|return code?             |return message ?                                                    |
+|admin       |${ADMIN_PASSPHRASE}|CREATE|null      |circle1        |user1_id |null            |circle1_id|${SUCCESS}               |The Circle 'circle1' was successfully created.                      |
+|user1       |${PASSPHRASE_1}|CREATE|null      |circle1        |null     |null            |null      |${IDENTIFICATION_WARNING}|A Circle with the requested name already exists.                    |
+|user1       |${PASSPHRASE_1}|CREATE|null      |circle2        |null     |null            |circle2_id|${SUCCESS}               |The Circle 'circle2' was successfully created.                      |
+|user2       |${PASSPHRASE_2}|CREATE|null      |circle3        |null     |super secret key|circle3_id|${SUCCESS}               |The Circle 'circle3' was successfully created.                      |
+|user2       |${PASSPHRASE_2}|CREATE|null      |circle5        |null     |null            |circle5_id|${SUCCESS}               |The Circle 'circle5' was successfully created.                      |
+|user2       |${PASSPHRASE_2}|UPDATE|circle5_id|new Circle Name|null     |null            |null      |${SUCCESS}               |The Circle 'new Circle Name' was successfully updated.              |
+|user2       |${PASSPHRASE_2}|DELETE|circle5_id|null           |null     |null            |null      |${SUCCESS}               |The Circle 'new Circle Name' has successfully been removed from EDS.|
+
+
+The Fetch Circles request lists the Circles a Member is a Trustee of; the System Administrator gets all Circles. With the setting
+!-eds.show.all.circles-! (default false), every Member gets all Circles. Only a Trustee of a Circle can retrieve its Circle Key.
+
+|fetch circles                                                                                                                                                                                                                                                                         |
+|account name|credential|circles?                                                                                                                                                                                                                         |return code?|return message?|
+|user1       |${PASSPHRASE_1}|[Circle{circleId='circle1_id', circleName='circle1', circleKey='null'}, Circle{circleId='circle2_id', circleName='circle2', circleKey='null'}]            |${SUCCESS}  |Ok             |
+|user2       |${PASSPHRASE_2}|[Circle{circleId='circle3_id', circleName='circle3', circleKey='super secret key'}]|${SUCCESS}  |Ok             |
+*!
+
+!* Trustees
+[[ Top ][#content]]
+!anchor trustees
+!4 '''Trustees'''
+Trustees are the Members of a Circle of Trust, each with a trust level: READ, WRITE or ADMIN. The administrators of a
+Circle add, alter and remove its Trustees.
+
+ * Add Trustee
+   * REST (POST) request is: ${REST_ROOT}/trustees/addTrustee
+ * Alter Trustee
+   * REST (POST) request is: ${REST_ROOT}/trustees/alterTrustee
+ * Remove Trustee
+   * REST (POST) request is: ${REST_ROOT}/trustees/removeTrustee
+ * Fetch Trustees
+   * REST (POST) request is: ${REST_ROOT}/trustees/fetchTrustees
+
+|process trustee                                                                                                                                                              |
+|account name|credential|action|circle id |member id|trust level|return code?|return message ?                                                                                |
+|user1       |${PASSPHRASE_1}|ADD   |circle2_id|user2_id |WRITE      |${SUCCESS}  |The Member 'user2' was successfully added as trustee to 'circle2'.                              |
+|user1       |${PASSPHRASE_1}|ADD   |circle2_id|user3_id |READ       |${SUCCESS}  |The Member 'user3' was successfully added as trustee to 'circle2'.                              |
+|user2       |${PASSPHRASE_2}|ADD   |circle3_id|user1_id |WRITE      |${SUCCESS}  |The Member 'user1' was successfully added as trustee to 'circle3'.                              |
+|user1       |${PASSPHRASE_1}|ALTER |circle2_id|user3_id |ADMIN      |${SUCCESS}  |The Trustee 'user3' has successfully been given the trust level 'ADMIN' in the Circle 'circle2'.|
+|user1       |${PASSPHRASE_1}|ALTER |circle2_id|user3_id |READ       |${SUCCESS}  |The Trustee 'user3' has successfully been given the trust level 'READ' in the Circle 'circle2'. |
+
+If a Fetch Members for a given User is invoked now, then the list of Circles which the Member is entrusted with will also be returned.
+
+|fetch members                                                                                                                                                                                                                     |
+|account name|credential|member id|members?                                                                                   |circles?                                                               |return code?|return message?|
+|user2       |${PASSPHRASE_2}|user3_id |[Member{memberId='user3_id', accountName='user3', memberRole='STANDARD', publicKey='null'}]|[Circle{circleId='circle2_id', circleName='circle2', circleKey='null'}]|${SUCCESS}  |Ok             |
+
+However, the Fetch Members request with the Circle listing is limited, and instead the fetch Trustees should be used, as it will
+return a more accurate depiction of the relations. Note, that this request is more stringent in the results returned. System
+Administrators are allowed to retrieve most information but members are only allowed to retrieve information if a relation between
+the Member & Circle already exists.
+
+|fetch trustees                                                                                                                                                                                                                                                                                                                                                                                |
+|account name|credential|circle id |trustees?                                                                                                                                                                                                                                                       |return code?             |return message?                                                 |
+|admin       |${ADMIN_PASSPHRASE}|circle3_id|[Trustee{memberId='user1_id', accountName='user1', circleId='circle3_id', circleName='null', trustLevel='WRITE', publicKey='null'}, Trustee{memberId='user2_id', accountName='user2', circleId='circle3_id', circleName='null', trustLevel='ADMIN', publicKey='null'}]|${SUCCESS}               |Ok                                                              |
+|user1       |${PASSPHRASE_1}|circle3_id|[Trustee{memberId='user1_id', accountName='user1', circleId='circle3_id', circleName='null', trustLevel='WRITE', publicKey='null'}, Trustee{memberId='user2_id', accountName='user2', circleId='circle3_id', circleName='null', trustLevel='ADMIN', publicKey='null'}]|${SUCCESS}               |Ok                                                              |
+|user2       |${PASSPHRASE_2}|circle3_id|[Trustee{memberId='user1_id', accountName='user1', circleId='circle3_id', circleName='null', trustLevel='WRITE', publicKey='null'}, Trustee{memberId='user2_id', accountName='user2', circleId='circle3_id', circleName='null', trustLevel='ADMIN', publicKey='null'}]|${SUCCESS}               |Ok                                                              |
+|user3       |${PASSPHRASE_3}|circle3_id|[]                                                                                                                                                                                                                                                              |${IDENTIFICATION_WARNING}|=~/No Trustee information found for member 'user3' and circle.*/|
+
+A Trustee may have a secret in a Circle: text of a client, which !-EDS-! stores without looking inside, for clients
+which encrypt themselves (see E2E.md). Every Trustee sets their own with Alter Trustee, without a trust level; an administrator
+of the Circle may set that of any Trustee.
+
+|process trustee                                                                                                                                                         |
+|account name|credential     |action|circle id |member id|secret           |return code?            |return message?                                                               |
+|user1       |${PASSPHRASE_1}|ALTER |circle3_id|user1_id |wrapped-for-user1|${SUCCESS}              |The secret of the Trustee 'user1' in the Circle 'circle3' was successfully set.|
+|user1       |${PASSPHRASE_1}|ALTER |circle3_id|user2_id |not-mine-to-set  |${AUTHORIZATION_WARNING}|Only an administrator of the Circle may set the secret of another Trustee.    |
+|user2       |${PASSPHRASE_2}|ALTER |circle3_id|user2_id |wrapped-for-user2|${SUCCESS}              |The secret of the Trustee 'user2' in the Circle 'circle3' was successfully set.|
+
+A secret is returned to its Member and to the administrators of the Circle, and to nobody else, also not to the System Administrator.
+
+|fetch trustees                                                                                         |
+|account name|credential         |circle id |secrets?                                                   |return code?|
+|user1       |${PASSPHRASE_1}    |circle3_id|[user1='wrapped-for-user1', user2='null']                  |${SUCCESS}  |
+|user2       |${PASSPHRASE_2}    |circle3_id|[user1='wrapped-for-user1', user2='wrapped-for-user2']     |${SUCCESS}  |
+|admin       |${ADMIN_PASSPHRASE}|circle3_id|[user1='null', user2='null']                               |${SUCCESS}  |
+
+A client which keeps a key of its own in the secrets changes it for all Trustees at once, e.g. after a Trustee was removed:
+Set Secrets (${REST_ROOT}/trustees/setSecrets) sets the secrets of several Trustees, and the external key of the Circle if
+given, all or none. It needs the trust level ADMIN in the Circle; Trustees not named keep their secret.
+
+|process trustee                                                                                                                                                                       |
+|account name|credential         |action |circle id |secrets                              |circle key |return code?             |return message?                                                    |
+|user1       |${PASSPHRASE_1}    |SECRETS|circle3_id|user1_id=v2-user1, user2_id=v2-user2 |null       |${AUTHORIZATION_WARNING} |=~/not permitted/                                                  |
+|user2       |${PASSPHRASE_2}    |SECRETS|circle3_id|user1_id=v2-user1, admin_id=v2-admin |null       |${IDENTIFICATION_WARNING}|=~/is not a Trustee of the Circle; no secret was set./             |
+|admin       |${ADMIN_PASSPHRASE}|SECRETS|circle3_id|user1_id=v2-user1                    |null       |${ILLEGAL_ACTION}        |It is not possible to set secrets in a Circle, without membership. |
+
+Nothing was set by the refused requests.
+
+|fetch trustees                                                                                     |
+|account name|credential     |circle id |secrets?                                               |return code?|
+|user2       |${PASSPHRASE_2}|circle3_id|[user1='wrapped-for-user1', user2='wrapped-for-user2'] |${SUCCESS}  |
+
+|process trustee                                                                                                                                                             |
+|account name|credential     |action |circle id |secrets                              |circle key  |return code?|return message?                                                            |
+|user2       |${PASSPHRASE_2}|SECRETS|circle3_id|user1_id=v2-user1, user2_id=v2-user2 |key v2      |${SUCCESS}  |The secrets of 2 Trustee(s) of the Circle 'circle3' were successfully set.|
+
+|fetch trustees                                                                         |
+|account name|credential     |circle id |secrets?                                 |return code?|
+|user2       |${PASSPHRASE_2}|circle3_id|[user1='v2-user1', user2='v2-user2']     |${SUCCESS}  |
+
+|fetch circles                                                                                                                                                      |
+|account name|credential     |circles?                                                                                                                       |return code?|
+|user2       |${PASSPHRASE_2}|[Circle{circleId='circle2_id', circleName='circle2', circleKey='null'}, Circle{circleId='circle3_id', circleName='circle3', circleKey='key v2'}]|${SUCCESS}  |
+
+The administrators of a Circle remove its Trustees, and every Trustee may leave a Circle. The last Trustee can't leave it, as
+nobody could read its data again; the Circle is deleted instead.
+
+|process trustee                                                                                                                                                                                                  |
+|account name|credential     |action|circle id |member id|trust level|return code?            |return message?                                                                                                        |
+|user1       |${PASSPHRASE_1}|ADD   |circle1_id|user2_id |READ       |${SUCCESS}              |The Member 'user2' was successfully added as trustee to 'circle1'.                                                     |
+|user1       |${PASSPHRASE_1}|ADD   |circle1_id|user3_id |READ       |${SUCCESS}              |The Member 'user3' was successfully added as trustee to 'circle1'.                                                     |
+|user3       |${PASSPHRASE_3}|REMOVE|circle1_id|user2_id |null       |${AUTHORIZATION_WARNING}|=~/not permitted/                                                                                                      |
+|user1       |${PASSPHRASE_1}|REMOVE|circle1_id|user2_id |null       |${SUCCESS}              |The Trustee 'user2' was successfully removed from the Circle 'circle1'.                                                |
+|user3       |${PASSPHRASE_3}|REMOVE|circle1_id|user3_id |null       |${SUCCESS}              |The Trustee 'user3' was successfully removed from the Circle 'circle1'.                                                |
+|user1       |${PASSPHRASE_1}|REMOVE|circle1_id|user1_id |null       |${ILLEGAL_ACTION}       |The last Member of the Circle 'circle1' can't leave it, as nobody could read its data again. Delete the Circle instead.|
+
+'''Rotating the Circle Secret.''' A Member who leaves a Circle, or is removed, loses their copy of the Circle Secret, but may
+have kept what a client held of it. So the Circle Secret is rotated afterwards: the Circle gets a new secret, wrapped for every
+Trustee, and its Data Objects are re-encrypted with it in the background, while everything reads and writes as before. The
+stone can't read a Circle Secret by itself, so the rotation starts at the next request of a Trustee which reads it; above,
+user2 and user3 left circle1, and its rotation starts with the next Data Object user1 adds to it (below). A rotation is also
+due a period after the last one (''eds.circle.secret.rotation.days''), and a Circle administrator may ask for one: Rotate
+Circle, ${REST_ROOT}/circles/rotateCircle.
+
+|process circle                                                                                                                            |
+|account name|credential     |action|circle id |circle name|member id|circle key|circle id?|return code?            |return message ?                                     |
+|user3       |${PASSPHRASE_3}|ROTATE|circle2_id|null       |null     |null      |null      |${AUTHORIZATION_WARNING}|Only a Circle Administrator may perform this action.|
+*!
+
+!* Status
+[[ Top ][#content]]
+!anchor status
+!4 '''Status'''
+The Status tells those who look after a stone how it is doing: its load, how busy it is, and its inventory, what it holds,
+in general numbers only (see STATUS.md). Like the Resource API, it takes the ''Authorization: Bearer'' header and answers
+with the return code as HTTP status. The header carries either the Session of the System Administrator, or a status key:
+a key which reads the status and nothing else, also while the stone is locked. The System Administrator creates the
+status keys, each with a label; a key is returned once, as EDS keeps only its hash.
+
+ * Status - ${REST_ROOT}/status (GET)
+ * Status keys - ${REST_ROOT}/status/keys (GET, POST), ${REST_ROOT}/status/keys/{label} (DELETE)
+
+|process member                                                     |
+|account name|credential         |action|new credential|return code?|
+|admin       |${ADMIN_PASSPHRASE}|LOGIN |sadmin_session|${SUCCESS}  |
+|user1       |${PASSPHRASE_1}    |LOGIN |suser1_session|${SUCCESS}  |
+
+|resources                                                                                                                  |
+|credential    |operation      |name   |new key    |status?|return code?             |names?   |awake?|version?    |samples?|
+|sadmin_session|getStatus      |null   |null       |200    |${SUCCESS}               |null     |true  |2.0-SNAPSHOT|true    |
+|suser1_session|getStatus      |null   |null       |401    |${AUTHORIZATION_WARNING} |null     |null  |null        |null    |
+|null          |getStatus      |null   |null       |403    |${AUTHENTICATION_WARNING}|null     |null  |null        |null    |
+|suser1_session|postStatusKey  |monitor|null       |401    |${AUTHORIZATION_WARNING} |null     |null  |null        |null    |
+|sadmin_session|postStatusKey  |monitor|monitor_key|200    |${SUCCESS}               |[monitor]|null  |null        |null    |
+|sadmin_session|postStatusKey  |monitor|null       |404    |${IDENTIFICATION_WARNING}|null     |null  |null        |null    |
+|sadmin_session|postStatusKey  |null   |null       |406    |${VERIFICATION_WARNING}  |null     |null  |null        |null    |
+|sadmin_session|getStatusKeys  |null   |null       |200    |${SUCCESS}               |[monitor]|null  |null        |null    |
+|monitor_key   |getStatus      |null   |null       |200    |${SUCCESS}               |null     |true  |2.0-SNAPSHOT|true    |
+|monitor_key   |getStatusKeys  |null   |null       |403    |${AUTHENTICATION_WARNING}|null     |null  |null        |null    |
+
+A withdrawn key is refused from then on.
+
+|resources                                                                    |
+|credential    |operation      |name   |status?|return code?             |names?|
+|sadmin_session|deleteStatusKey|monitor|200    |${SUCCESS}               |[]    |
+|monitor_key   |getStatus      |null   |403    |${AUTHENTICATION_WARNING}|null  |
+|sadmin_session|deleteStatusKey|monitor|404    |${IDENTIFICATION_WARNING}|null  |
+*!
+
+----
+[[ Top ][#content]]
+!anchor sharing
+!2 Sharing
+
+!* !-DataType-!
+!anchor datatype
+!4 '''Data Type'''
+Since all data is stored in EDS encrypted, and EDS only cares that the bytes which
+came in, also goes out - it can be hard for an application or server using EDS to
+ascertain what is behind the bytes. For this reason, EDS supports storing data with
+a "data type".
+
+Data Types can be anything; by default 4 types exist: "folder", "data", "thumbnail",
+the small image of a Data Object, and "entry", the entries of a feature, such as the
+messages of a chat. If nothing is explicitly defined, the "data" will always be picked.
+The "folder" is simply there to provide the possibility to have structures of data, and it
+has the unique feature that Data Objects can have a folder as parent. All Circles of Trust will have a standard
+folder as their root, and it is used transparently within EDS.
+
+Working with data types requires administrative permissions, the request must be made
+as either system administrator or circle administrator. In the example below, admin is
+a system administrator, user1 is a circle administrator and user2 is neither.
+
+!-<img src="files/note.png" align="left">-! Contrary to all other entities in EDS, data types do not have any id's, they
+only have a name and a custom definition. The name is therefore unique, and is used to change or delete the Data Type.
+
+There are 3 kinds of actions / requests which can be made for data Types
+ * Process !-DataType-!
+   * REST (POST) request is: ${REST_ROOT}/dataTypes/processDataType
+ * Delete !-DataType-!
+   * REST (POST) request is: ${REST_ROOT}/dataTypes/deleteDataType
+ * Fetch !-DataTypes-!
+   * REST (POST) request is: ${REST_ROOT}/dataTypes/fetchDataTypes
+
+|process dataType                                                                                                                                                   |
+|account name|credential|action |name          |type                         |return code?            |return message?                                              |
+|admin       |${ADMIN_PASSPHRASE}|PROCESS|MIMEType PDF  |application/pdf              |${SUCCESS}              |The Data Type 'MIMEType PDF' was successfully processed.     |
+|admin       |${ADMIN_PASSPHRASE}|PROCESS|jsonObject    |{"a":"b","c":"d"}            |${SUCCESS}              |The Data Type 'jsonObject' was successfully processed.       |
+|user1       |${PASSPHRASE_1}|PROCESS|Circle Type   |{"a":"b"}                    |${AUTHORIZATION_WARNING}|Cannot complete this request, as it is only allowed for the System Administrator.|
+|admin       |${ADMIN_PASSPHRASE}|PROCESS|Object42      |com.company.object.ObjectName|${SUCCESS}              |The Data Type 'Object42' was successfully processed.         |
+|user3       |${PASSPHRASE_3}|PROCESS|Awesome Object|Cool                         |${AUTHORIZATION_WARNING}|Cannot complete this request, as it is only allowed for the System Administrator.|
+|user3       |${PASSPHRASE_3}|DELETE |MIMEType PDF  |                             |${AUTHORIZATION_WARNING}|Cannot complete this request, as it is only allowed for the System Administrator.|
+|admin       |${ADMIN_PASSPHRASE}|DELETE |data          |                             |${AUTHORIZATION_WARNING}|It is not permitted to delete the Data Type 'data'.          |
+|admin       |${ADMIN_PASSPHRASE}|DELETE |MIMEType PDF  |null                         |${SUCCESS}              |The Data Type 'MIMEType PDF' was successfully deleted.       |
+
+|fetch dataTypes                                                                                                                                                                                                                                                                     |
+|account name|credential|data types?                                                                                                                                                                                                                    |return code?|return message?|
+|admin       |${ADMIN_PASSPHRASE}|!-[DataType{typeName='folder', type='Folder'}, DataType{typeName='data', type='Data Object'}, DataType{typeName='thumbnail', type='Thumbnail'}, DataType{typeName='entry', type='Entry of a Feature'}, DataType{typeName='jsonObject', type='{"a":"b","c":"d"}'}, DataType{typeName='Object42', type='com.company.object.ObjectName'}]-!|${SUCCESS}  |Ok             |
+*!
+
+!* Data
+[[ Top ][#content]]
+!anchor data
+!4 '''Data'''
+
+ * Add Data to a Circle of Trust
+   * REST (POST) request is: ${REST_ROOT}/data/addData
+ * Copy Data from one Circle of Trust to another
+   * REST (POST) request is: ${REST_ROOT}/data/copyData
+ * Move Data from one Circle of Trust to another
+   * REST (POST) request is: ${REST_ROOT}/data/moveData
+ * Update Data record in a Circle of Trust
+   * REST (POST) request is: ${REST_ROOT}/data/updateData
+ * Delete Data record from a Circle of Trust
+   * REST (POST) request is: ${REST_ROOT}/data/deleteData
+ * Fetch Data from a Circle of Trust
+   * REST (POST) request is: ${REST_ROOT}/data/fetchData
+
+|process data                                                                                                                                                                                                                        |
+|account name|credential|action|circle id |data id  |data name|type name     |target folder id|target circle id|data               |return code?        |return message?                                                             |
+|user1       |${PASSPHRASE_1}|ADD   |circle1_id|null     |data1    |folder        |null            |null            |null               |${SUCCESS}          |The Folder 'data1' was successfully added to the Circle 'circle1'.          |
+|user1       |${PASSPHRASE_1}|ADD   |circle1_id|null     |data2    |data          |null            |null            |First Data Object  |${SUCCESS}          |The Data Object 'data2' was successfully added to the Circle 'circle1'.     |
+|user1       |${PASSPHRASE_1}|ADD   |circle2_id|null     |data3    |Awesome Object|null            |null            |Second Data Object |${INTEGRITY_WARNING}|Cannot find a matching !-DataType-! for the Object.                         |
+|user1       |${PASSPHRASE_1}|DELETE|null      |data1_id |null     |null          |null            |null            |null               |${SUCCESS}          |The Data Object 'data1' has been removed from the Circle 'circle1'.         |
+|user1       |${PASSPHRASE_1}|ADD   |circle1_id|null     |data4    |data          |null            |null            |Another Data Object|${SUCCESS}          |The Data Object 'data4' was successfully added to the Circle 'circle1'.     |
+|user1       |${PASSPHRASE_1}|ADD   |circle1_id|null     |data5    |data          |null            |null            |More Data          |${SUCCESS}          |The Data Object 'data5' was successfully added to the Circle 'circle1'.     |
+|user1       |${PASSPHRASE_1}|ADD   |circle2_id|null     |status   |null          |null            |null            |initial            |${SUCCESS}          |The Data Object 'status' was successfully added to the Circle 'circle2'.    |
+|user1       |${PASSPHRASE_1}|UPDATE|circle2_id|status_id|null     |null          |null            |null            |updated content    |${SUCCESS}          |The Data Object 'status' was successfully updated.                          |
+|user1       |${PASSPHRASE_1}|ADD   |circle2_id|null     |data6    |null          |null            |null            |some more data     |${SUCCESS}          |The Data Object 'data6' was successfully added to the Circle 'circle2'.     |
+|user1       |${PASSPHRASE_1}|COPY  |circle2_id|data6_id |copied   |null          |null            |circle1_id      |null               |${SUCCESS}          |The Data Object 'data6' was successfully copied from 'circle2' to 'circle1'.|
+|user1       |${PASSPHRASE_1}|MOVE  |circle2_id|data6_id |moved    |null          |null            |circle1_id      |null               |${SUCCESS}          |The Data Object 'data6' was successfully moved from 'circle2' to 'circle1'. |
+|user1       |${PASSPHRASE_1}|UPDATE|circle1_id|copied_id|copied   |null          |null            |null            |null               |${SUCCESS}          |The Data Object 'copied' was successfully updated.                          |
+|user1       |${PASSPHRASE_1}|UPDATE|circle1_id|moved_id |moved    |null          |null            |null            |null               |${SUCCESS}          |The Data Object 'moved' was successfully updated.                           |
+
+|fetch data                                                                                                                                                                                             |
+|account name|credential|circle id |data id  |data name|page number|page size|records?|folder id?     |data id?             |data name?     |type name?  |data?            |return code?|return message?|
+|user1       |${PASSPHRASE_1}|circle1_id|null     |null     |1          |2        |5       |circle1_root_id|[moved_id, copied_id]|[moved, copied]|[data, data]|null             |${SUCCESS}  |Ok             |
+|user1       |${PASSPHRASE_1}|circle1_id|null     |null     |2          |2        |5       |circle1_root_id|[data5_id, data4_id] |[data5, data4] |[data, data]|null             |${SUCCESS}  |Ok             |
+|user1       |${PASSPHRASE_1}|null      |data2_id |null     |null       |null     |1       |circle1_root_id|data2_id             |data2          |data        |First Data Object|${SUCCESS}  |Ok             |
+|user1       |${PASSPHRASE_1}|null      |null     |data2    |null       |null     |1       |circle1_root_id|data2_id             |data2          |data        |First Data Object|${SUCCESS}  |Ok             |
+|user1       |${PASSPHRASE_1}|circle2_id|status_id|null     |null       |null     |1       |circle2_root_id|status_id            |status         |data        |updated content  |${SUCCESS}  |Ok             |
+
+The !-MasterKey-! is rotated back to the original, with Members, Circles and Data in place. Data Objects aren't re-encrypted
+by a rotation, so the data reads as before.
+
+|master key                                                                                     |
+|account name|credential         |url |secret              |return code?|return message?        |
+|admin       |${ADMIN_PASSPHRASE}|null|${MASTERKEY_DEFAULT}|${SUCCESS}  |!-MasterKey-! updated. |
+
+|fetch data                                                                                                                                                                                             |
+|account name|credential|circle id |data id  |data name|page number|page size|records?|folder id?     |data id?             |data name?     |type name?  |data?            |return code?|return message?|
+|user1       |${PASSPHRASE_1}|null      |data2_id |null     |null       |null     |1       |circle1_root_id|data2_id             |data2          |data        |First Data Object|${SUCCESS}  |Ok             |
+|user1       |${PASSPHRASE_1}|circle2_id|status_id|null     |null       |null     |1       |circle2_root_id|status_id            |status         |data        |updated content  |${SUCCESS}  |Ok             |
+*!
+
+!* Content Streaming
+[[ Top ][#content]]
+!anchor streaming
+!4 '''Content Streaming'''
+
+Large content is sent and received as a raw stream, outside the JSON requests. The Data Object is registered first (without
+data), then its content is uploaded. A download can ask for a byte range, so media can be played and seeked without loading
+the whole object. Both authenticate with the Session token from a login (''Authorization: Bearer''), and answer with real
+HTTP status codes. The content is encrypted in chunks (PLAN.md, Crypto §4), and only the chunks of a range are read and decrypted.
+
+ * Upload Content - Replaces the content of a Data Object
+   * REST (PUT) request is: ${REST_ROOT}/data/{dataId}/content
+ * Download Content - The content, or a range of it
+   * REST (GET) request is: ${REST_ROOT}/data/{dataId}/content
+ * Content Headers - Size, ETag and type of the content
+   * REST (HEAD) request is: ${REST_ROOT}/data/{dataId}/content
+
+|process member                                                                                                    |
+|account name|credential     |action|new credential|return code?|return message?                                 |
+|user1       |${PASSPHRASE_1}|LOGIN |user1_session |${SUCCESS}  |The Member 'user1' has successfully logged in.   |
+
+|process data                                                                                                     |
+|account name|credential     |action|circle id |data name|type name|media type|return code?|
+|user1       |${PASSPHRASE_1}|ADD   |circle1_id|stream1  |data     |video/mp4 |${SUCCESS}  |
+|user1       |${PASSPHRASE_1}|ADD   |circle1_id|stream2  |data     |null      |${SUCCESS}  |
+
+|upload content                                                                                                                 |
+|credential   |data id   |content                                    |generated size|if match|return code?            |etag?|
+|user1_session|stream1_id|The quick brown fox jumps over the lazy dog|null          |null    |${SUCCESS}              |set  |
+|user1_session|stream2_id|null                                       |200000        |null    |${SUCCESS}              |set  |
+|user1_session|stream2_id|null                                       |10            |"stale" |${PRECONDITION_FAILED}  |null |
+|null         |stream1_id|small                                      |null          |null    |${AUTHENTICATION_WARNING}|null |
+
+The download of the text, in full and in ranges. The media type ''video/mp4'' may be shown inline; the content without a
+media type is served for download only.
+
+|download content                                                                                                                                                    |
+|credential   |data id   |range        |if range|head |status?|content?                                   |content length?|content range?|content type?           |disposition?|
+|user1_session|stream1_id|null         |null    |false|200    |The quick brown fox jumps over the lazy dog|43             |null          |video/mp4               |inline      |
+|user1_session|stream1_id|bytes=4-8    |null    |false|206    |quick                                      |5              |bytes 4-8/43  |video/mp4               |inline      |
+|user1_session|stream1_id|bytes=-3     |null    |false|206    |dog                                        |3              |bytes 40-42/43|video/mp4               |inline      |
+|user1_session|stream1_id|bytes=4-8    |"stale" |false|200    |The quick brown fox jumps over the lazy dog|43             |null          |video/mp4               |inline      |
+|user1_session|stream1_id|null         |null    |true |200    |null                                       |43             |null          |video/mp4               |inline      |
+
+The larger content is checked against the generated bytes: in full, across the boundary of the first two chunks (64 KiB), and
+the last byte. A range outside the content is not satisfiable (416).
+
+|download content                                                                                                                                     |
+|credential   |data id   |range            |status?|content length?|content range?            |matches generated?|content type?           |disposition?|return code?             |
+|user1_session|stream2_id|null             |200    |200000         |null                      |true              |application/octet-stream|attachment  |${SUCCESS}               |
+|user1_session|stream2_id|bytes=65530-65545|206    |16             |bytes 65530-65545/200000  |true              |application/octet-stream|attachment  |206                      |
+|user1_session|stream2_id|bytes=199999-    |206    |1              |bytes 199999-199999/200000|true              |application/octet-stream|attachment  |206                      |
+|user1_session|stream2_id|bytes=200000-    |416    |null           |bytes */200000            |null              |null                    |null        |${RANGE_NOT_SATISFIABLE} |
+|null         |stream2_id|null             |403    |null           |null                      |null              |null                    |null        |${AUTHENTICATION_WARNING}|
+
+'''Download tokens.''' The media elements of a browser (''img'', ''video'') can't send the ''Authorization'' header. A
+download token, created with the Session, reads the content of this one Data Object instead, as the query parameter
+''token''; ranges work as usual, so a player can seek. It reads no other Data Object, and ends at its expiry, at logout, or
+when the !-MasterKey-! changes.
+
+ * Create Download Token - ${REST_ROOT}/data/{dataId}/token (POST)
+ * Download Content with a token - ${REST_ROOT}/data/{dataId}/content?token=... (GET, HEAD)
+
+|resources                                                                       |
+|credential   |operation          |data id   |new key|status?|return code?             |
+|user1_session|createDownloadToken|stream1_id|token1 |200    |${SUCCESS}               |
+|null         |createDownloadToken|stream1_id|null   |403    |${AUTHENTICATION_WARNING}|
+
+|download content                                                                                                   |
+|credential|data id   |token |range    |status?|content?                                   |content type?|return code?|
+|null      |stream1_id|token1_id|bytes=4-8|206    |quick                                      |video/mp4    |206         |
+|null      |stream1_id|token1_id|null     |200    |The quick brown fox jumps over the lazy dog|video/mp4    |${SUCCESS}  |
+
+The token is bound to its Data Object, and an invalid token reads nothing.
+
+|download content                                                       |
+|credential|data id   |token      |status?|return code?             |
+|null      |stream2_id|token1_id  |403    |${AUTHENTICATION_WARNING}|
+|null      |stream1_id|not-a-token|403    |${AUTHENTICATION_WARNING}|
+
+'''Thumbnails.''' A client (Rune draws them in the browser) stores a small image of the content, encrypted like any
+content; EDS never reads it. The Metadata of the Data Object points to it (''thumbnailId''), it is downloaded like any
+content, and new content removes it, as it no longer matches. Only JPEG, PNG and WebP are accepted; other media types
+are refused by the HTTP layer (415, without a JSON body).
+
+ * Store Thumbnail - ${REST_ROOT}/data/{dataId}/thumbnail (PUT)
+
+|resources                                                                                                     |
+|credential   |operation   |data id   |content        |media type   |new key|status?|return code?|thumbnail id?|
+|user1_session|putThumbnail|stream1_id|thumbnail bytes|image/png    |thumb1 |200    |${SUCCESS}  |null         |
+|user1_session|getDataById |stream1_id|null           |null         |null   |200    |${SUCCESS}  |thumb1_id    |
+
+|download content                                                                             |
+|credential   |data id|status?|content?       |content type?|disposition?|return code?|
+|user1_session|thumb1_id|200    |thumbnail bytes|image/png    |inline      |${SUCCESS}  |
+
+|upload content                                                                     |
+|credential   |data id   |content    |generated size|if match|return code?|etag?|
+|user1_session|stream1_id|new content|null          |null    |${SUCCESS}  |set  |
+
+|resources                                                         |
+|credential   |operation  |data id   |status?|thumbnail id?|
+|user1_session|getDataById|stream1_id|200    |null         |
+
+|process data                                                                       |
+|account name|credential     |action|data id   |return code?|
+|user1       |${PASSPHRASE_1}|DELETE|stream1_id|${SUCCESS}  |
+|user1       |${PASSPHRASE_1}|DELETE|stream2_id|${SUCCESS}  |
+
+|download content                                                       |
+|credential   |data id   |status?|return code?             |
+|user1_session|stream1_id|404    |${IDENTIFICATION_WARNING}|
+*!
+
+!* Resource API
+[[ Top ][#content]]
+!anchor resources
+!4 '''Resource API'''
+
+Next to the JSON API, EDS has an ID-based resource API, where the IDs are part of the path, and the HTTP method says what to do.
+Each operation runs the same rules as its JSON twin, with the same request object as body; values from the path replace those
+of the body. It only accepts a Session, as ''Authorization: Bearer'', and answers with the return code as HTTP status. The
+operations are named by their operationId in the API contract (''openapi.json'').
+
+ * Members - ${REST_ROOT}/members (GET, POST), ${REST_ROOT}/members/{memberId} (GET, PUT, DELETE)
+ * Circles - ${REST_ROOT}/circles (GET, POST), ${REST_ROOT}/circles/{circleId} (GET, PUT, DELETE)
+ * Trustees - ${REST_ROOT}/circles/{circleId}/trustees (GET, POST), ${REST_ROOT}/circles/{circleId}/trustees/{memberId} (PUT, DELETE)
+ * Data - ${REST_ROOT}/data?circleId= (GET), ${REST_ROOT}/data (POST), ${REST_ROOT}/data/{dataId} (GET, PUT, DELETE), ${REST_ROOT}/data/{dataId}/copy and /move (POST)
+ * Data Types - ${REST_ROOT}/dataTypes (GET), ${REST_ROOT}/dataTypes/{typeName} (PUT, DELETE)
+
+|process member                                                                                                    |
+|account name|credential         |action|new credential|return code?|
+|admin       |${ADMIN_PASSPHRASE}|LOGIN |admin_session |${SUCCESS}  |
+
+The System Administrator creates a Member, and changes its role; a standard Member may not create Members.
+
+|resources                                                                                                                  |
+|credential   |operation       |member id  |name    |new credential |role |new key|status?|return code?             |names?|
+|admin_session|postMembers     |null       |rmember |${PASSPHRASE_9}|null |rmember|200    |${SUCCESS}               |null|
+|admin_session|getMemberById   |rmember_id |null    |null           |null |null   |200    |${SUCCESS}               |[rmember:STANDARD]|
+|admin_session|putMemberById   |rmember_id |null    |null           |ADMIN|null   |200    |${SUCCESS}               |null|
+|admin_session|getMemberById   |rmember_id |null    |null           |null |null   |200    |${SUCCESS}               |[rmember:ADMIN]|
+|admin_session|putMemberById   |rmember_id |null    |null           |STANDARD|null|200    |${SUCCESS}               |null|
+|user1_session|postMembers     |null       |rother  |${PASSPHRASE_9}|null |rother |401    |${AUTHORIZATION_WARNING} |null|
+
+A Member creates two Circles, renames one, and adds the new Member as Trustee. An unknown Circle is ''404''.
+
+|resources                                                                                                                         |
+|credential   |operation              |circle id                           |member id |name            |trust level|new key|status?|return code?             |names?|
+|user1_session|postCircles            |null                                |null      |rcircle         |null       |rcircle|200    |${SUCCESS}               |null|
+|user1_session|postCircles            |null                                |null      |rtarget         |null       |rtarget|200    |${SUCCESS}               |null|
+|user1_session|putCircleById          |rcircle_id                          |null      |rcircle renamed |null       |null   |200    |${SUCCESS}               |null|
+|user1_session|getCircleById          |rcircle_id                          |null      |null            |null       |null   |200    |${SUCCESS}               |[rcircle renamed]|
+|user1_session|getCircleById          |4c5bc2c6-0fa5-4c3a-9d1e-1a2b3c4d5e6f|null      |null            |null       |null   |404    |${IDENTIFICATION_WARNING}|[]    |
+|user1_session|postCircleTrustees     |rcircle_id                          |rmember_id|null            |READ       |null   |200    |${SUCCESS}               |null|
+|user1_session|getCircleTrustees      |rcircle_id                          |null      |null            |null       |null   |200    |${SUCCESS}               |[rmember:READ, user1:ADMIN]|
+|user1_session|putCircleTrusteeById   |rcircle_id                          |rmember_id|null            |WRITE      |null   |200    |${SUCCESS}               |null|
+|user1_session|getCircleTrustees      |rcircle_id                          |null      |null            |null       |null   |200    |${SUCCESS}               |[rmember:WRITE, user1:ADMIN]|
+
+The secrets of several Trustees are set at once, all or none, as with Set Secrets: ${REST_ROOT}/circles/{circleId}/secrets (PUT).
+
+|resources                                                                                                                       |
+|credential   |operation       |circle id |secrets                                   |external key|status?|return code?             |
+|user1_session|putCircleSecrets|rcircle_id|rmember_id=for-rmember, user2_id=for-user2|null        |404    |${IDENTIFICATION_WARNING}|
+|user1_session|putCircleSecrets|rcircle_id|rmember_id=for-rmember, user1_id=for-user1|shared key  |200    |${SUCCESS}               |
+
+|fetch trustees                                                                      |
+|account name|credential     |circle id |secrets?                                  |return code?|
+|user1       |${PASSPHRASE_1}|rcircle_id|[rmember='for-rmember', user1='for-user1']|${SUCCESS}  |
+
+|resources                                                                                                                                                    |
+|credential   |operation              |circle id |member id |name|trust level|new key|status?|return code?|names?       |
+|user1_session|deleteCircleTrusteeById|rcircle_id|rmember_id|null|null       |null   |200    |${SUCCESS}  |null         |
+|user1_session|getCircleTrustees      |rcircle_id|null      |null|null       |null   |200    |${SUCCESS}  |[user1:ADMIN]|
+
+The rotation of the Circle Secret of circle1, which user1 started in the Data section, runs in the background; the Circle tells it
+(''secretRotated'', ''rotationDue'' and ''rotation'' with its progress). When it has ended, the Data Objects read as before. A Circle
+administrator has the secret of circle2 rotated now: ${REST_ROOT}/circles/{circleId}/rotation (PUT). The System Administrator
+may ask too, but isn't a Trustee, so that rotation would start at the next request of a Trustee.
+
+|resources                                                                                        |
+|credential   |operation        |circle id |status?|return code?             |rotation due?|rotated?|
+|user1_session|waitForRotation  |circle1_id|200    |${SUCCESS}               |set          |true    |
+|user1_session|putCircleRotation|circle2_id|200    |${SUCCESS}               |null         |null    |
+|user1_session|waitForRotation  |circle2_id|200    |${SUCCESS}               |set          |true    |
+|null         |putCircleRotation|circle2_id|403    |${AUTHENTICATION_WARNING}|null         |null    |
+
+|fetch data                                                                                                                                                           |
+|account name|credential     |circle id |data id  |data name|page number|page size|records?|folder id?     |data id?|data name?|type name?|data?            |return code?|
+|user1       |${PASSPHRASE_1}|null      |data2_id |null     |null       |null     |1       |circle1_root_id|data2_id|data2     |data      |First Data Object|${SUCCESS}  |
+|user2       |${PASSPHRASE_2}|circle2_id|status_id|null     |null       |null     |1       |circle2_root_id|status_id|status   |data      |updated content  |${SUCCESS}  |
+
+Data Objects are added, listed with their size, fetched without their content, renamed, copied and moved to the other Circle,
+and deleted. A move gives the Data Object a new ID.
+
+|resources                                                                                                                                         |
+|credential   |operation     |circle id |data id |target circle id|name          |content     |new key|status?|return code?             |names?|size?|without content?|
+|user1_session|postData      |rcircle_id|null    |null            |rnote         |twelve bytes|rnote  |200    |${SUCCESS}               |null|null|null|
+|user1_session|getData       |rcircle_id|null    |null            |null          |null        |null   |200    |${SUCCESS}               |[rnote]|12   |true            |
+|user1_session|getDataById   |null      |rnote_id|null            |null          |null        |null   |200    |${SUCCESS}               |[rnote]|12  |true            |
+|user1_session|putDataById   |null      |rnote_id|null            |rnote renamed |null        |null   |200    |${SUCCESS}               |null|null|null|
+|user1_session|postDataCopy  |null      |rnote_id|rtarget_id      |null          |null        |rcopy  |200    |${SUCCESS}               |null|null|null|
+|user1_session|postDataMove  |null      |rnote_id|rtarget_id      |null          |null        |rmoved |200    |${SUCCESS}               |null|null|null|
+|user1_session|getData       |rtarget_id|null    |null            |null          |null        |null   |200    |${SUCCESS}               |[rnote renamed, rnote renamed]|12|true|
+|user1_session|getDataById   |null      |rcopy_id|null            |null          |null        |null   |200    |${SUCCESS}               |[rnote renamed]|12|true|
+|user1_session|deleteDataById|null      |rcopy_id|null            |null          |null        |null   |200    |${SUCCESS}               |null|null|null|
+|user1_session|deleteDataById|null      |rmoved_id|null           |null          |null        |null   |200    |${SUCCESS}               |null|null|null|
+|user1_session|getData       |rtarget_id|null    |null            |null          |null        |null   |200    |${SUCCESS}               |[]    |null|true            |
+
+Data Types are created or changed by their name, listed and deleted; only by an administrator, as they are of the whole stone.
+
+|resources                                                                                          |
+|credential   |operation           |name |type               |status?|return code?|names?|
+|user1_session|putDataTypeByName   |rtype|Resource test type |401    |${AUTHORIZATION_WARNING}|null|
+|admin_session|putDataTypeByName   |rtype|Resource test type |200    |${SUCCESS}  |null|
+|user1_session|getDataTypes        |null |null               |200    |${SUCCESS}  |[Object42, data, entry, folder, jsonObject, rtype, thumbnail]|
+|user1_session|deleteDataTypeByName|rtype|null               |401    |${AUTHORIZATION_WARNING}|null|
+|admin_session|deleteDataTypeByName|rtype|null               |200    |${SUCCESS}  |null|
+
+Invalid requests and missing or unknown Sessions are answered with their HTTP status. Credentials in the body don't replace the
+Session. At the end, the Circles and the Member are deleted.
+
+|resources                                                                                          |
+|credential     |operation       |circle id |member id |name|status?|return code?             |
+|user1_session  |postCircles     |null      |null      |null|406    |${VERIFICATION_WARNING}  |
+|null           |getCircles      |null      |null      |null|403    |${AUTHENTICATION_WARNING}|
+|no_such_session|getCircles      |null      |null      |null|403    |${AUTHENTICATION_WARNING}|
+|user1_session  |deleteCircleById|rcircle_id|null      |null|200    |${SUCCESS}               |
+|user1_session  |deleteCircleById|rtarget_id|null      |null|200    |${SUCCESS}               |
+|admin_session  |deleteMemberById|null      |rmember_id|null|200    |${SUCCESS}               |
+|admin_session  |getMemberById   |null      |4c5bc2c6-0fa5-4c3a-9d1e-1a2b3c4d5e6f|null|404|${IDENTIFICATION_WARNING}|
+
+The Member is gone from the listing of all Members.
+
+|resources                                                                                       |
+|credential   |operation |status?|names?                                                              |
+|admin_session|getMembers|200    |[admin2:ADMIN, admin:ADMIN, user1:STANDARD, user2:STANDARD, user3:STANDARD]|
+*!
+
+!* Features
+[[ Top ][#content]]
+!anchor features
+!4 '''Features'''
+
+A feature is something a Circle can have beside its files, such as a chat or a calendar (see FEATURES.md). !-EDS-! doesn't know what a
+feature is for: a feature is a declaration, which names the kinds of its entries and, for each kind, rules from a fixed set. !-EDS-!
+stores the entries and enforces the rules; what an entry holds is the clients' business. The operations are part of the
+Resource API, and are named by their operationId in the API contract.
+
+ * Features of the stone - ${REST_ROOT}/features (GET), ${REST_ROOT}/features/{feature} (PUT, DELETE)
+ * Features of a Circle - ${REST_ROOT}/circles/{circleId}/features (GET), ${REST_ROOT}/circles/{circleId}/features/{feature} (PUT, DELETE)
+ * Entries - ${REST_ROOT}/circles/{circleId}/features/{feature}/entries (GET, POST), .../entries/{entryId} (GET, PUT, DELETE), .../entries/{entryId}/closed (PUT), .../count (GET)
+
+|process member                                                     |
+|account name|credential         |action|new credential|return code?|
+|admin       |${ADMIN_PASSPHRASE}|LOGIN |tadmin_session|${SUCCESS}  |
+|user1       |${PASSPHRASE_1}    |LOGIN |t1_session    |${SUCCESS}  |
+|user2       |${PASSPHRASE_2}    |LOGIN |t2_session    |${SUCCESS}  |
+|user3       |${PASSPHRASE_3}    |LOGIN |t3_session    |${SUCCESS}  |
+
+The System Administrator decides which features the stone offers. This one keeps notes, which their author changes and the
+administrators of a Circle close, and votes about notes, of which every Member has one per note. Every Member may read
+what the stone offers.
+
+|features                                                                                           |
+|credential    |operation|feature |declaration|status?|return code?            |features?    |
+|t1_session    |putFeature  |notes|!-{"feature":"notes","version":1,"kinds":{"note":{"add":"WRITE","change":["author"],"remove":["author"],"close":["administrators"],"size":1000},"vote":{"add":"READ","change":["author"],"about":"note","keep":"member-about","size":10}}}-!|401    |${AUTHORIZATION_WARNING}|[]        |
+|tadmin_session|putFeature  |notes|!-{"feature":"notes"}-!|406|${VERIFICATION_WARNING}|[]    |
+|tadmin_session|putFeature  |notes|!-{"feature":"notes","version":1,"kinds":{"note":{"add":"WRITE","change":["author"],"remove":["author"],"close":["administrators"],"size":1000},"vote":{"add":"READ","change":["author"],"about":"note","keep":"member-about","size":10}}}-!|200    |${SUCCESS}              |[notes:v1]|
+|t3_session    |getFeatures |null |null       |200    |${SUCCESS}              |[notes:v1]|
+
+The Member user1 creates a Circle; user2 may write to it, user3 may only read it. As its administrator, user1 switches the
+feature on, which makes its hidden folder ''.notes''.
+
+|resources                                                                                               |
+|credential|operation         |circle id  |member id|name     |trust level|new key |status?|return code?|
+|t1_session|postCircles       |null       |null     |feature room|null       |featureroom|200    |${SUCCESS}  |
+|t1_session|postCircleTrustees|featureroom_id|user2_id |null     |WRITE      |null    |200    |${SUCCESS}  |
+|t1_session|postCircleTrustees|featureroom_id|user3_id |null     |READ       |null    |200    |${SUCCESS}  |
+
+|features                                                                                        |
+|credential|operation     |circle id  |feature |state|status?|return code?            |features?    |
+|t2_session|putCircleFeature |featureroom_id|notes|ON   |401    |${AUTHORIZATION_WARNING}|[]        |
+|t1_session|putCircleFeature |featureroom_id|notes|ON   |200    |${SUCCESS}              |[notes:ON]|
+|t3_session|getCircleFeatures|featureroom_id|null |null |200    |${SUCCESS}              |[notes:ON]|
+
+Entries are added by those the kind allows: a note needs the trust level WRITE, a vote only READ. !-EDS-! notes the author. A
+second vote of a Member about the same note replaces the first. Only its author changes a note, and what is about an entry
+is listed and counted.
+
+|features                                                                                                                                                                     |
+|credential|operation    |circle id  |feature |kind|about   |entry id|content       |new key|status?|return code?            |entries?                                                |count?|
+|t2_session|postEntry    |featureroom_id|notes|note|null    |null    |Buy bread     |bread  |200    |${SUCCESS}              |[note:user2:Buy bread]                                  |null  |
+|t3_session|postEntry    |featureroom_id|notes|note|null    |null    |Not for me    |null   |401    |${AUTHORIZATION_WARNING}|[]                                                      |null  |
+|t3_session|postEntry    |featureroom_id|notes|vote|null    |null    |yes           |null   |406    |${VERIFICATION_WARNING} |[]                                                      |null  |
+|t3_session|postEntry    |featureroom_id|notes|vote|bread_id|null    |yes           |null   |200    |${SUCCESS}              |[vote:user3:yes]                                        |null  |
+|t3_session|postEntry    |featureroom_id|notes|vote|bread_id|null    |no            |null   |200    |${SUCCESS}              |[vote:user3:no:changed]                                 |null  |
+|t1_session|putEntry     |featureroom_id|notes|null|null    |bread_id|Not by another|null   |401    |${AUTHORIZATION_WARNING}|[]                                                      |null  |
+|t2_session|putEntry     |featureroom_id|notes|null|null    |bread_id|Buy two breads|null   |200    |${SUCCESS}              |[note:user2:Buy two breads:changed]                     |null  |
+|t1_session|getEntries   |featureroom_id|notes|null|null    |null    |null          |null   |200    |${SUCCESS}              |[note:user2:Buy two breads:changed, vote:user3:no:changed]|null|
+|t1_session|getEntries   |featureroom_id|notes|null|bread_id|null    |null          |null   |200    |${SUCCESS}              |[vote:user3:no:changed]                                 |null  |
+|t1_session|getEntryCount|featureroom_id|notes|vote|null    |null    |null          |null   |200    |${SUCCESS}              |null                                                    |1     |
+
+A closed entry stays as it is, with what is about it, until it is opened again. Removing an entry removes what is about it.
+
+|features                                                                                                                                                    |
+|credential|operation     |circle id  |feature |about   |entry id|content |closed|status?|return code?            |entries?                                        |
+|t2_session|putEntryClosed|featureroom_id|notes|null    |bread_id|null    |true  |401    |${AUTHORIZATION_WARNING}|[]                                              |
+|t1_session|putEntryClosed|featureroom_id|notes|null    |bread_id|null    |true  |200    |${SUCCESS}              |[note:user2:Buy two breads:closed:changed]      |
+|t2_session|putEntry      |featureroom_id|notes|null    |bread_id|Too late|null  |405    |${ILLEGAL_ACTION}       |[]                                              |
+|t1_session|putEntryClosed|featureroom_id|notes|null    |bread_id|null    |false |200    |${SUCCESS}              |[note:user2:Buy two breads:changed]             |
+|t2_session|deleteEntry   |featureroom_id|notes|null    |bread_id|null    |null  |200    |${SUCCESS}              |[note:user2:-:changed, vote:user3:-:changed]    |
+|t1_session|getEntries    |featureroom_id|notes|null    |null    |null    |null  |200    |${SUCCESS}              |[]                                              |
+
+Switched off, a feature keeps its entries and hides them. Removing it from the Circle removes them; then the stone can stop
+offering it. At the end, the Circle is deleted.
+
+|features                                                                                              |
+|credential    |operation       |circle id  |feature |state|status?|return code?             |features?     |
+|t1_session    |putCircleFeature   |featureroom_id|notes|OFF  |200    |${SUCCESS}               |[notes:OFF]|
+|t2_session    |getEntries      |featureroom_id|notes|null |404    |${IDENTIFICATION_WARNING}|null       |
+|tadmin_session|deleteFeature      |null       |notes|null |405    |${ILLEGAL_ACTION}        |[]         |
+|t1_session    |deleteCircleFeature|featureroom_id|notes|null |200    |${SUCCESS}               |[]         |
+|tadmin_session|deleteFeature      |null       |notes|null |200    |${SUCCESS}               |[]         |
+|tadmin_session|getFeatures        |null       |null |null |200    |${SUCCESS}               |[]         |
+
+|resources                                                                 |
+|credential|operation       |circle id  |status?|return code?|
+|t1_session|deleteCircleById|featureroom_id|200    |${SUCCESS}  |
+*!

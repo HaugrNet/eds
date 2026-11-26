@@ -1,0 +1,1557 @@
+#!/bin/bash
+# ==============================================================================
+# stone - runs an EDS stone on a host
+# ------------------------------------------------------------------------------
+# Sets up and controls one EDS container on the host it runs on: the stone
+# alone, which serves the API. It needs
+# nothing of the EDS sources, only this file and a container image, so it can
+# be copied to a directory of the PATH, e.g. ~/.local/bin/stone.
+#
+# Everything it does is done as the user who runs it, with rootless Podman: it
+# never asks for root, and never calls sudo. What must be changed in the
+# system (installing Podman or PostgreSQL, a reverse proxy, start at boot) is
+# told by 'stone help <topic>' and 'stone check', marked with [ROOT], and is
+# left to whoever has the rights. Run without arguments for the help.
+#
+# A host may run several stones, each an instance with a name: 'stone -i north
+# start'. An instance has its own settings, MasterKey, logs, container and
+# service. Without a name it is the default instance, which is all a host
+# with one stone needs.
+# ==============================================================================
+
+program="$(basename "${0}")"
+readonly program
+
+# The instance: -i <name> before the command, or STONE_INSTANCE. None is the
+# default instance.
+instance="${STONE_INSTANCE:-}"
+while true; do
+    case "${1:-}" in
+        -i | --instance)
+            if [[ $# -lt 2 ]]; then
+                echo "${1} needs the name of an instance."
+                exit 1
+            fi
+            instance="${2}"
+            shift 2
+            ;;
+        --instance=*)
+            instance="${1#*=}"
+            shift
+            ;;
+        *) break ;;
+    esac
+done
+[[ "${instance}" == default ]] && instance=""
+if [[ -n "${instance}" ]]; then
+    # It becomes part of the names of a directory, a container and a service
+    if [[ ! "${instance}" =~ ^[a-z0-9][a-z0-9-]{0,30}$ || "${instance}" == certs || "${instance}" == logs ]]; then
+        echo "'${instance}' can't be the name of an instance: use small letters, digits and"
+        echo "'-', at most 31 characters; 'certs' and 'logs' are taken."
+        exit 1
+    fi
+fi
+readonly instance
+
+# How this instance is called, as the hints of this script tell it
+script="${program}"
+[[ -n "${instance}" ]] && script+=" -i ${instance}"
+readonly script
+
+# Where the settings and the logs are; both are only the user's own. A named
+# instance has a directory of its own below those of the default instance.
+readonly stoneBase="${STONE_HOME:-${XDG_CONFIG_HOME:-${HOME}/.config}/stone}"
+readonly stateBase="${STONE_STATE:-${XDG_STATE_HOME:-${HOME}/.local/state}/stone}"
+readonly stoneHome="${stoneBase}${instance:+/${instance}}"
+readonly stoneState="${stateBase}${instance:+/${instance}}"
+# The name of its container, unless STONE_NAME tells another, and of its service
+readonly unitName="stone${instance:+-${instance}}"
+readonly envFile="${stoneHome}/stone.env"
+readonly masterKeyFile="${stoneHome}/masterkey"
+readonly certsDir="${stoneHome}/certs"
+readonly logsDir="${stoneState}/logs"
+readonly masterKeyMount="/run/secrets/eds-masterkey"
+readonly unitDir="${XDG_CONFIG_HOME:-${HOME}/.config}/systemd/user"
+readonly unitFile="${unitDir}/${unitName}.service"
+
+# The image, as 'eds.sh build stone' names it, and the label it carries
+readonly stoneImage="eds-stone:local"
+readonly edsLabel="maintainer=EDS Project"
+
+# ==============================================================================
+# Settings
+# ------------------------------------------------------------------------------
+# The settings file is read, never executed, so a password may hold any
+# character. A variable of the environment takes precedence over the file.
+#   $1 = name, $2 = default
+# ==============================================================================
+function setting() {
+    local name="${1}" value=""
+    if [[ -n "${!name+set}" ]]; then
+        echo "${!name}"
+        return
+    fi
+    [[ -f "${envFile}" ]] && value=$(sed -n "s/^${name}=//p" "${envFile}" | tail -n 1)
+    echo "${value:-${2:-}}"
+}
+
+# The name of this instance, for a person
+#   $1 = anything, for the start of a sentence
+function instanceName() {
+    local the="the"
+    [[ -n "${1:-}" ]] && the="The"
+    echo "${the} stone${instance:+ '${instance}'}"
+}
+
+function isEnabled() {
+    command -v systemctl > /dev/null 2>&1 && systemctl --user is-enabled "${unitName}.service" > /dev/null 2>&1
+}
+
+# The value of a setting in the settings file of any instance
+#   $1 = settings file, $2 = name, $3 = default
+function settingIn() {
+    local value=""
+    [[ -f "${1}" ]] && value=$(sed -n "s/^${2}=//p" "${1}" | tail -n 1)
+    echo "${value:-${3:-}}"
+}
+
+# The instances of this user which have settings: an empty line for the
+# default instance, and the names of the others
+function instances() {
+    [[ -f "${stoneBase}/stone.env" ]] && echo ""
+    local file
+    for file in "${stoneBase}"/*/stone.env; do
+        [[ -f "${file}" ]] && basename "$(dirname "${file}")"
+    done
+}
+
+function image() {
+    setting STONE_IMAGE "${stoneImage}"
+}
+
+function containerName() { setting STONE_NAME "${unitName}"; }
+function bindAddress() { setting STONE_BIND 127.0.0.1; }
+function port() { setting STONE_PORT 8080; }
+function tlsPort() { setting STONE_TLS_PORT 8443; }
+
+# The address at which this host itself reaches the stone
+function localAddress() {
+    local address
+    address=$(bindAddress)
+    case "${address}" in
+        0.0.0.0 | "") echo "127.0.0.1" ;;
+        *) echo "${address}" ;;
+    esac
+}
+
+function apiUrl() { echo "http://$(localAddress):$(port)/api/v1"; }
+
+# ==============================================================================
+# Common helpers
+# ==============================================================================
+function usageError() {
+    echo "${1}"
+    echo "Run '${script}' without arguments for the help."
+    return 1
+}
+
+function ok() { echo "  [OK]   ${1}"; }
+function missing() { echo "  [--]   ${1}"; }
+
+# What is still to do, and who can do it: [USER] is you, [ROOT] needs root
+function todoUser() { echo "         [USER] ${1}"; }
+function todoRoot() { echo "         [ROOT] ${1}"; }
+
+function needPodman() {
+    command -v podman > /dev/null 2>&1 && return 0
+    echo "Podman is not installed. Installing it changes the system and needs root,"
+    echo "see '${script} help podman'."
+    return 1
+}
+
+function isRunning() {
+    [[ "$(podman container inspect -f '{{.State.Running}}' "$(containerName)" 2>/dev/null)" == "true" ]]
+}
+
+function containerExists() {
+    podman container exists "$(containerName)" 2>/dev/null
+}
+
+function imageExists() {
+    podman image exists "${1}" 2>/dev/null
+}
+
+# Runs wget in the container, which reaches the ports the host doesn't
+function inContainer() {
+    podman exec "$(containerName)" wget -q -T 4 -O - "$@" 2>/dev/null
+}
+
+function isReady() {
+    inContainer "http://localhost:9000/q/health/ready" | grep -qE '"status":\s*"UP"'
+}
+
+# Prints the version of the running EDS, or nothing if it doesn't answer
+function edsVersion() {
+    inContainer --header "Content-Type: application/json" --post-data '{}' \
+        "http://localhost:8080/api/v1/version" | grep -o '"version":"[^"]*"' | cut -d'"' -f4
+}
+
+# Asks before something is removed, unless --yes was given
+#   $1 = true if --yes was given, $2 = question
+function confirmed() {
+    [[ "${1}" == true ]] && return 0
+    local answer
+    read -r -p "${2} [y/N] " answer
+    [[ "${answer}" == y || "${answer}" == Y || "${answer}" == yes ]]
+}
+
+# ==============================================================================
+# Help
+# ==============================================================================
+function showHelp() {
+    cat <<EOF
+stone - runs an EDS stone on this host
+
+  Usage: ${program} [-i <instance>] <command> [options]
+
+  Everything here runs as you, with rootless Podman. Nothing asks for root.
+  What must be changed in the system is told by the help topics and by
+  'check', marked with [ROOT], for whoever has the rights.
+
+  Several stones on this host:
+    -i <instance>                Before the command: the stone of that name,
+                                 with its own settings, MasterKey, logs,
+                                 container and service. Without it, the
+                                 default instance. See 'help instances'
+    list                         The instances, and what each is doing
+
+  Set up:
+    help [topic]                 This help, or a step by step guide:
+                                   setup       The whole way, start here
+                                   podman      Podman for your user [ROOT]
+                                   images      Getting the images to this host
+                                   settings    The settings file
+                                   postgresql  The database [ROOT]
+                                   masterkey   The MasterKey, and its three sources
+                                   tls         HTTPS by the stone itself
+                                   proxy       HTTPS by a reverse proxy [ROOT]
+                                   boot        Start with the host [ROOT, once]
+                                   instances   Several stones on one host
+                                   cleanup     Removing what is no longer used
+    init                         Create the settings file
+    check                        What is in place, what is missing, and who
+                                 can do it: you, or root
+    load <archive>               Load a container image from an archive made
+                                 with 'podman save'
+
+  Run:
+    start                        Start the stone, and wait until it is ready
+    stop                         Stop it
+    restart                      Stop and start it, e.g. after a new image or
+                                 a change of the settings
+    status                       What runs, and how it is doing
+    logs                         Follow the log of the stone
+    enable | disable             Start the stone with the host, or no longer
+
+  MasterKey:
+    masterkey generate [--force] Create a random MasterKey in the MasterKey
+                                 file (only readable by you)
+    masterkey load               Send the MasterKey file to a running, locked
+                                 stone, as the System Administrator. On a new
+                                 stone, the account name given becomes it
+
+  Clean up:
+    cleanup [--yes]              Remove EDS images which are no longer used:
+                                 those a newer one replaced
+    cleanup --images [--yes]     Stop and remove the container, and remove
+                                 all EDS images
+    cleanup --all [--yes]        The same, and the logs and the start with
+                                 the host. The settings and the MasterKey
+                                 file are never removed
+
+  Settings: ${envFile}
+  Logs:     ${logsDir}
+
+EOF
+}
+
+# Prints a help topic, with the names of this host and user filled in
+function topic() {
+    sed -e "s|@SCRIPT@|${script}|g" -e "s|@PROGRAM@|${program}|g" -e "s|@UNIT@|${unitName}|g" \
+        -e "s|@USER@|${USER:-$(id -un)}|g" \
+        -e "s|@HOME@|${stoneHome}|g" -e "s|@ENV@|${envFile}|g" \
+        -e "s|@PORT@|$(port)|g" -e "s|@LOGS@|${logsDir}|g"
+}
+
+function helpTopic() {
+    case "${1:-}" in
+        "") showHelp ;;
+        setup) helpSetup ;;
+        podman) helpPodman ;;
+        images) helpImages ;;
+        settings) helpSettings ;;
+        postgresql | postgres | database) helpPostgresql ;;
+        masterkey) helpMasterKey ;;
+        tls) helpTls ;;
+        proxy | reverse-proxy) helpProxy ;;
+        boot) helpBoot ;;
+        instances | instance) helpInstances ;;
+        cleanup) helpCleanup ;;
+        *) usageError "Unknown help topic: ${1}" ;;
+    esac
+}
+
+function helpSetup() {
+    topic <<'EOF'
+Setting up a stone, step by step
+
+  A line with '#' is run as root and changes the system; a line with '$' is
+  run as you (@USER@). After the steps marked [ROOT], which are done once,
+  everything is done as you.
+
+  1. [ROOT] Podman, for your user                    @SCRIPT@ help podman
+  2. [ROOT] A PostgreSQL database for the stone      @SCRIPT@ help postgresql
+            Without one, the stone keeps everything in memory and loses it
+            when it stops: fine to try it, never for real use.
+  3.        The image, brought to this host          @SCRIPT@ help images
+              $ @SCRIPT@ load eds-stone.tar
+  4.        The settings
+              $ @SCRIPT@ init
+            Then put the database into @ENV@,
+            see '@SCRIPT@ help settings'.
+  5.        The MasterKey                            @SCRIPT@ help masterkey
+              $ @SCRIPT@ masterkey generate
+  6.        Look at what is in place
+              $ @SCRIPT@ check
+  7.        Start it
+              $ @SCRIPT@ start
+              $ @SCRIPT@ status
+  8. [ROOT] HTTPS for the world outside              @SCRIPT@ help proxy
+            (or by the stone itself, without root:   @SCRIPT@ help tls)
+  9. [ROOT, once] Start with the host                @SCRIPT@ help boot
+              $ @SCRIPT@ enable
+
+  For more than one stone on this host, each is given a name, and the steps
+  3 to 9 are done for each: see '@SCRIPT@ help instances'.
+
+  A new stone has no account, and sets no name for one: whoever comes to
+  it first becomes its System Administrator, under the account name and
+  with the passphrase given. So choose the name, 'admin' or any other, and
+  be the first: right after the first start, before the stone is reachable
+  from outside, with '@SCRIPT@ masterkey load' or the MasterKey request.
+EOF
+}
+
+function helpPodman() {
+    topic <<'EOF'
+Podman for your user                                                    [ROOT]
+
+  The stone runs in a rootless container: Podman is installed once, by
+  root, and from then on used by you without any rights.
+
+  AS ROOT - this changes the system:
+
+    Debian, Ubuntu:
+      # apt install podman
+    Fedora, RHEL, Rocky, Alma:
+      # dnf install podman
+
+    A rootless container needs a range of subordinate user and group ids for
+    your user. Most systems give one to every new user; if '@SCRIPT@ check'
+    says it is missing:
+      # usermod --add-subuids 100000-165535 --add-subgids 100000-165535 @USER@
+
+    Only if the stone is to listen on a port below 1024 itself, without a
+    reverse proxy in front of it (ports from 80 on, for all users):
+      # sysctl -w net.ipv4.ip_unprivileged_port_start=80
+      # echo 'net.ipv4.ip_unprivileged_port_start=80' > /etc/sysctl.d/50-stone.conf
+
+  AS YOU:
+
+      $ podman info                 It answers without an error
+      $ podman system migrate       After a change of the id ranges
+      $ @SCRIPT@ check
+EOF
+}
+
+function helpImages() {
+    topic <<'EOF'
+Getting the images to this host
+
+  The image is built from the EDS sources with './eds.sh build stone':
+
+    eds-stone:local      The stone alone: the API
+
+  Where it was built, it is written to an archive:
+
+      $ podman save -o eds-stone.tar eds-stone:local
+
+  The archive is copied to this host, e.g. with scp, and loaded:
+
+      $ @SCRIPT@ load eds-stone.tar
+
+  A newer image is brought the same way, and used from the next start:
+
+      $ @SCRIPT@ load eds-stone.tar
+      $ @SCRIPT@ restart
+      $ @SCRIPT@ cleanup            Removes the image it replaced
+
+  The setting STONE_IMAGE names another image, e.g. one from a registry:
+
+      STONE_IMAGE=registry.example.com/eds/eds-stone:2.0
+EOF
+}
+
+function helpSettings() {
+    topic <<'EOF'
+The settings file
+
+  '@SCRIPT@ init' creates @ENV@, readable
+  only by you, as it holds the password of the database. One setting per
+  line, NAME=value, without quotes; a comment is a line of its own. A change
+  is used from the next '@SCRIPT@ restart'.
+
+  For this script:
+
+    STONE_BIND=127.0.0.1     The address of the host the stone listens on.
+                             127.0.0.1 is only this host, which is right
+                             behind a reverse proxy; 0.0.0.0 is every address
+    STONE_PORT=8080          The port of the host for HTTP
+    STONE_TLS_PORT=8443      The port of the host for HTTPS, see 'help tls'
+    STONE_MASTERKEY=file     Start with the MasterKey file: file or none,
+                             see 'help masterkey'
+    STONE_IMAGE=...          Another image than eds-stone:local
+    STONE_ADMIN_ACCOUNT=...  The account name of the System Administrator,
+                             for 'masterkey load'; it is asked for without
+    STONE_NAME=stone         The name of the container
+
+  For the stone itself:
+
+    EDS_DB_URL=jdbc:postgresql://host.containers.internal:5432/eds
+    EDS_DB_USERNAME=eds_user
+    EDS_DB_PASSWORD=...      See 'help postgresql'. Without EDS_DB_URL the
+                             stone keeps everything in memory
+    EDS_DB_RETRY_INTERVAL=10s
+    EDS_MASTERKEY_URL=...    Another source of the MasterKey than the file
+    EDS_TLS_CERT, EDS_TLS_KEY, EDS_INSECURE_REQUESTS
+                             See 'help tls'
+
+  A variable of the environment takes precedence over the file, for one
+  call: STONE_PORT=8090 @SCRIPT@ start. The directory of the settings is
+  STONE_HOME, by default ~/.config/stone.
+EOF
+}
+
+function helpPostgresql() {
+    topic <<'EOF'
+The database: PostgreSQL                                                [ROOT]
+
+  The stone needs an empty database and a role which owns it; it creates its
+  tables itself at the first start. It neither needs nor should have the
+  right to create databases or roles. Whoever runs the database server sets
+  this up once; after that, the stone only needs the URL and the password.
+
+  A database server which already exists elsewhere needs only step 2 there,
+  and step 4 here.
+
+  1. AS ROOT - install the server on this host:
+
+    Debian, Ubuntu:
+      # apt install postgresql
+    Fedora, RHEL, Rocky, Alma:
+      # dnf install postgresql-server
+      # postgresql-setup --initdb
+      # systemctl enable --now postgresql
+
+  2. AS ROOT - the role and the database, with a password of your own:
+
+      # sudo -u postgres psql
+      postgres=# CREATE ROLE eds_user WITH LOGIN PASSWORD 'a long password';
+      postgres=# CREATE DATABASE eds WITH OWNER = eds_user;
+
+  3. AS ROOT - let the container reach a server on this host. In the
+     container, 'localhost' is the container itself; the host is
+     'host.containers.internal', and a connection to it doesn't reach a
+     server which only listens on the loopback address. So the server must
+     also listen on an address of the host, and accept the role from it.
+
+     In postgresql.conf (its place: SHOW config_file; in psql):
+       listen_addresses = 'localhost,<address of this host>'
+
+     In pg_hba.conf (SHOW hba_file;), one line for the stone:
+       host  eds  eds_user  <address of this host>/32  scram-sha-256
+
+      # systemctl restart postgresql
+
+     The port 5432 must not be reachable from other hosts unless that is
+     wanted: keep it closed in the firewall.
+
+  4. AS YOU - tell the stone, in @ENV@:
+
+       EDS_DB_URL=jdbc:postgresql://host.containers.internal:5432/eds
+       EDS_DB_USERNAME=eds_user
+       EDS_DB_PASSWORD=a long password
+
+      $ @SCRIPT@ restart
+      $ @SCRIPT@ status             Database: PostgreSQL
+
+  A stone which can't reach its database doesn't fall back to memory: it
+  stays not ready and tries again, by default every ten seconds, and says so
+  in its log ('@SCRIPT@ logs'). All that is stored is in the database, so the
+  backup of the stone is the backup of this database, with the MasterKey.
+EOF
+}
+
+function helpMasterKey() {
+    topic <<'EOF'
+The MasterKey
+
+  Everything a stone stores is protected by its MasterKey, which is never
+  stored itself: the stone reads it at the start, and without it stays
+  locked. Whoever loses it loses all that is stored. There are three ways to
+  give it, and the choice is who can start the stone:
+
+  1. The MasterKey file on this host. The stone starts by itself, also with
+     the host. Whoever can read your files can read it.
+
+      $ @SCRIPT@ masterkey generate
+       STONE_MASTERKEY=file          in @ENV@ (the default)
+
+  2. A source elsewhere, which the stone reads at each start. Taking the
+     source away keeps the stone from starting again: a kill-switch.
+
+       STONE_MASTERKEY=none
+       EDS_MASTERKEY_URL=https://keys.example.com/stone-north
+
+  3. By hand, after each start. The stone starts locked, and the System
+     Administrator unlocks it; nothing of the MasterKey stays on the host
+     when the file is kept elsewhere.
+
+       STONE_MASTERKEY=none
+      $ @SCRIPT@ start
+      $ @SCRIPT@ masterkey load     Asks for the name and the passphrase
+                                    of the System Administrator
+
+  The file is @HOME@/masterkey, readable only by you.
+  Keep a copy of it in a safe place, apart from the backup of the database:
+  one is of no use without the other. 'masterkey generate' never replaces a
+  file unless --force is given, as what the old MasterKey protected can then
+  no longer be opened.
+EOF
+}
+
+function helpTls() {
+    topic <<'EOF'
+HTTPS by the stone itself
+
+  The stone can serve HTTPS without anything in front of it, which needs no
+  root as long as the port is 1024 or above. For the ports 80 and 443, and
+  for certificates which renew themselves, a reverse proxy is the usual way:
+  see '@SCRIPT@ help proxy'.
+
+  1. Put the certificate, with its chain, and the key here, readable by you:
+
+       @HOME@/certs/tls.crt
+       @HOME@/certs/tls.key
+
+  2. In @ENV@:
+
+       STONE_BIND=0.0.0.0
+       STONE_TLS_PORT=8443
+       EDS_TLS_CERT=/app/certs/tls.crt
+       EDS_TLS_KEY=/app/certs/tls.key
+       EDS_INSECURE_REQUESTS=redirect
+
+     The two paths are those in the container, where the directory is
+     mounted read-only. EDS_INSECURE_REQUESTS tells what happens to plain
+     HTTP: enabled (answered), redirect (sent to HTTPS) or disabled.
+
+  3.  $ @SCRIPT@ restart
+
+  The stone is then at https://<host>:8443/. A renewed certificate is used
+  from the next restart.
+EOF
+}
+
+function helpProxy() {
+    topic <<'EOF'
+HTTPS by a reverse proxy                                                [ROOT]
+
+  The usual way to the world outside: the stone listens only on this host
+  (STONE_BIND=127.0.0.1, the default), and a reverse proxy in front of it
+  holds the ports 80 and 443 and the certificate. Installing and setting it
+  up changes the system and needs root; the stone itself stays as it is.
+
+  What the proxy must do, whichever it is:
+    - pass everything on to http://127.0.0.1:@PORT@, with the Host header
+    - pass on WebSocket upgrades, for /api/v1/socket (the chat and calls)
+    - allow bodies up to the largest file of the stone (1000 MiB by default)
+      and pass them on while they arrive, without storing them first
+    - allow a request to last as long as a large file takes
+    - never pass on the port 9000 (health), which the host doesn't publish
+
+  AS ROOT - with Caddy, which gets and renews the certificate itself:
+
+      # apt install caddy             or: dnf install caddy
+
+    /etc/caddy/Caddyfile:
+      stone.example.com {
+          request_body {
+              max_size 1100MB
+          }
+          reverse_proxy 127.0.0.1:@PORT@ {
+              flush_interval -1
+          }
+      }
+
+      # systemctl reload caddy
+
+  AS ROOT - with nginx, and a certificate from e.g. certbot:
+
+      # apt install nginx             or: dnf install nginx
+
+    /etc/nginx/conf.d/stone.conf:
+      map $http_upgrade $connection_upgrade {
+          default upgrade;
+          ''      close;
+      }
+      server {
+          listen 443 ssl;
+          server_name stone.example.com;
+          ssl_certificate     /etc/letsencrypt/live/stone.example.com/fullchain.pem;
+          ssl_certificate_key /etc/letsencrypt/live/stone.example.com/privkey.pem;
+
+          client_max_body_size 1100m;
+          proxy_request_buffering off;
+          proxy_buffering off;
+          proxy_read_timeout 3600s;
+          proxy_send_timeout 3600s;
+
+          location / {
+              proxy_pass http://127.0.0.1:@PORT@;
+              proxy_http_version 1.1;
+              proxy_set_header Host $host;
+              proxy_set_header Upgrade $http_upgrade;
+              proxy_set_header Connection $connection_upgrade;
+          }
+      }
+      server {
+          listen 80;
+          server_name stone.example.com;
+          return 301 https://$host$request_uri;
+      }
+
+      # nginx -t && systemctl reload nginx
+
+    On a system with SELinux (Fedora, RHEL), nginx may only connect to the
+    stone after:
+      # setsebool -P httpd_can_network_connect 1
+
+  AS ROOT - open the firewall for 80 and 443, and for nothing else:
+
+      # ufw allow 80,443/tcp                                     (Ubuntu)
+      # firewall-cmd --permanent --add-service=http --add-service=https
+      # firewall-cmd --reload                                    (Fedora, RHEL)
+
+  AS YOU - nothing changes; the stone keeps EDS_INSECURE_REQUESTS=enabled, as
+  the proxy speaks plain HTTP to it on this host only.
+
+      $ @SCRIPT@ status
+
+  The stone answers below https://stone.example.com/api/v1.
+EOF
+}
+
+function helpBoot() {
+    topic <<'EOF'
+Start with the host                                               [ROOT, once]
+
+  '@SCRIPT@ enable' makes a service of your own user which starts the stone,
+  with systemd: @UNIT@.service. That needs no root. But the services
+  of a user only run while that user is logged in, unless the user may
+  'linger', which root allows once for the user, however many stones:
+
+  AS ROOT - this changes the system:
+
+      # loginctl enable-linger @USER@
+
+  AS YOU:
+
+      $ @SCRIPT@ enable             Start with the host
+      $ @SCRIPT@ disable            No longer; the stone keeps running
+      $ systemctl --user status @UNIT@
+
+  What happens when the host starts again:
+
+    1. systemd starts the services of every user who may linger, without a
+       login. Each enabled instance has its own, so all of them start; one
+       which fails doesn't keep the others from starting.
+    2. The service waits for the network where Podman can tell, starts the
+       container and is done. If the container can't be started yet, it
+       tries again every ten seconds.
+    3. The stone itself waits for its database: one which isn't up yet is
+       tried again until it answers, so the order of the two doesn't
+       matter. PostgreSQL on this host starts with the host by itself, once
+       root has enabled it (systemctl enable postgresql).
+    4. The stone reads its MasterKey, from the file or another source (see
+       '@SCRIPT@ help masterkey'), and is unlocked. Without a source it
+       starts locked, and waits for '@SCRIPT@ masterkey load': with
+       STONE_MASTERKEY=none, a host which starts again needs you.
+
+  So for a stone to be back by itself after a start of the host, it needs:
+  linger for the user, '@SCRIPT@ enable', a database which starts by
+  itself, and a MasterKey source. '@SCRIPT@ check' tells which is missing.
+  Try it without starting the host again:
+
+      $ @SCRIPT@ stop
+      $ systemctl --user start @UNIT@
+      $ @SCRIPT@ status
+
+  The service calls this script where it is now. After moving the script,
+  run '@SCRIPT@ enable' again, for each instance.
+EOF
+}
+
+function helpInstances() {
+    topic <<'EOF'
+Several stones on one host
+
+  A host may run several stones, e.g. one for each group of people. Each is
+  an instance with a name, given before the command:
+
+      $ @PROGRAM@ -i north init
+      $ @PROGRAM@ -i south init
+      $ @PROGRAM@ list
+
+  Without -i it is the default instance, which is all a host with one
+  stone needs. STONE_INSTANCE=north names it for a whole shell.
+
+  An instance has, of its own:
+
+                     the default instance       the instance 'north'
+    Settings         ~/.config/stone/           ~/.config/stone/north/
+    MasterKey file   ~/.config/stone/masterkey  ~/.config/stone/north/masterkey
+    Logs             ~/.local/state/stone/logs  ~/.local/state/stone/north/logs
+    Container        stone                      stone-north
+    Service          stone.service              stone-north.service
+
+  What each instance must be given, as nothing can be shared:
+
+    - A port of its own on the host, STONE_PORT in its settings (and
+      STONE_TLS_PORT, if it serves HTTPS itself). 'init' proposes the next
+      one which is free, and 'check' tells if two instances have the same.
+    - A database of its own: another name in EDS_DB_URL, and best a role
+      of its own too. See '@PROGRAM@ help postgresql'; the steps 1 and 3
+      are done once for the host, step 2 for each stone:
+        postgres=# CREATE ROLE north_user WITH LOGIN PASSWORD '...';
+        postgres=# CREATE DATABASE north WITH OWNER = north_user;
+      and one more line in pg_hba.conf for it.
+    - A MasterKey of its own: '@PROGRAM@ -i north masterkey generate'.
+    - A name of its own in the reverse proxy: one site for each stone,
+      passing on to its port. See '@PROGRAM@ help proxy'.
+
+  What they share: Podman, the images (several instances run from the same
+  image), and the right to linger, which root gives once for the user.
+
+  Each instance is started with the host by itself:
+
+      $ @PROGRAM@ -i north enable
+      $ @PROGRAM@ -i south enable
+
+  Every command is for one instance: 'start', 'stop', 'status', 'logs',
+  'check', 'masterkey' and 'cleanup'. Only 'list' and 'load' are for all of
+  them, and 'cleanup' keeps an image another instance still runs from.
+EOF
+}
+
+function helpCleanup() {
+    topic <<'EOF'
+Removing what is no longer used
+
+  Loading a newer image leaves the one it replaced on the host, without a
+  name. Nothing uses it, and it takes its space until it is removed:
+
+      $ @SCRIPT@ cleanup            Removes EDS images which a newer one
+                                    replaced. The stone keeps running
+
+  To take the stone off the host:
+
+      $ @SCRIPT@ cleanup --images   Stops and removes the container, and
+                                    removes all EDS images
+      $ @SCRIPT@ cleanup --all      The same, and the logs in
+                                    @LOGS@,
+                                    and the start with the host
+
+  Each asks before it removes anything, unless --yes is given. Only images
+  of EDS are touched, never other images or containers of yours.
+
+  None of them removes the settings or the MasterKey file in
+  @HOME@: without the MasterKey, what the
+  database holds can never be read again, so that file is only ever removed
+  by hand. The database is not touched either; it is removed by whoever
+  runs it:
+
+      # sudo -u postgres dropdb eds                               [ROOT]
+EOF
+}
+
+# ==============================================================================
+# Set up
+# ==============================================================================
+function doInit() {
+    [[ $# -eq 0 ]] || { usageError "Unknown option: ${1}"; return 1; }
+
+    (umask 077 && mkdir -p "${stoneHome}" "${certsDir}" "${logsDir}") || return 1
+    if [[ -e "${envFile}" ]]; then
+        echo "The settings file ${envFile} already exists, it is kept."
+        return 0
+    fi
+
+    # The next port no other instance has in its settings, from 8080 on
+    local free=8080 other taken=" "
+    while IFS= read -r other; do
+        taken+="$(settingIn "${stoneBase}${other:+/${other}}/stone.env" STONE_PORT 8080) "
+    done < <(instances)
+    while [[ "${taken}" == *" ${free} "* ]]; do
+        free=$((free + 1))
+    done
+
+    (umask 077 && cat > "${envFile}" <<EOF
+# Settings of $(instanceName) on this host, see '${script} help settings'.
+# One setting per line, NAME=value, without quotes; comments on their own lines.
+
+# The address and the port of the host the stone listens on. 127.0.0.1 is
+# only this host, which is right behind a reverse proxy; 0.0.0.0 is every
+# address of the host.
+STONE_BIND=127.0.0.1
+STONE_PORT=${free}
+
+# Start with the MasterKey file (${script} masterkey generate): file or none
+STONE_MASTERKEY=file
+
+# The database, see '${script} help postgresql'. Without EDS_DB_URL the stone
+# keeps everything in memory, and loses it when it stops.
+#EDS_DB_URL=jdbc:postgresql://host.containers.internal:5432/eds
+#EDS_DB_USERNAME=eds_user
+#EDS_DB_PASSWORD=
+
+# HTTPS by the stone itself, see '${script} help tls'
+#STONE_TLS_PORT=8443
+#EDS_TLS_CERT=/app/certs/tls.crt
+#EDS_TLS_KEY=/app/certs/tls.key
+#EDS_INSECURE_REQUESTS=redirect
+EOF
+    ) || return 1
+    echo "Created ${envFile}, on port ${free}."
+    echo "Next: the database in that file ('${script} help postgresql'), then '${script} check'."
+}
+
+function doLoad() {
+    [[ $# -eq 1 ]] || { usageError "Usage: ${script} load <archive>"; return 1; }
+    needPodman || return 1
+    if [[ ! -f "${1}" ]]; then
+        echo "${1} not found."
+        return 1
+    fi
+    podman load -q -i "${1}" || return 1
+    # A running stone keeps the image it was started from
+    if isRunning; then
+        local used present
+        used=$(podman container inspect -f '{{.Image}}' "$(containerName)" 2>/dev/null)
+        present=$(podman image inspect -f '{{.Id}}' "$(image)" 2>/dev/null)
+        if [[ "${used}" != "${present}" ]]; then
+            echo "The running stone still uses its old image, '${script} restart' replaces it."
+        fi
+    fi
+}
+
+# Tells what is in place and what is missing, and who can do what is missing
+function doCheck() {
+    echo "Stone check${instance:+ of '${instance}'}"
+    echo
+    echo "Podman"
+    if ! command -v podman > /dev/null 2>&1; then
+        missing "Podman is not installed"
+        todoRoot "Install it, see '${script} help podman'"
+    else
+        ok "$(podman --version)"
+        local user="${USER:-$(id -un)}"
+        if grep -q "^${user}:" /etc/subuid 2>/dev/null && grep -q "^${user}:" /etc/subgid 2>/dev/null; then
+            ok "Subordinate ids for ${user}"
+        else
+            missing "No subordinate user or group ids for ${user}, rootless containers can't start"
+            todoRoot "usermod --add-subuids 100000-165535 --add-subgids 100000-165535 ${user}"
+        fi
+        if podman info > /dev/null 2>&1; then
+            ok "Podman runs as ${user}, without root"
+        else
+            missing "'podman info' fails for ${user}"
+            todoUser "See its message; after a change of the ids: podman system migrate"
+        fi
+    fi
+
+    echo
+    echo "Image"
+    local wanted
+    wanted=$(image)
+    if command -v podman > /dev/null 2>&1 && imageExists "${wanted}"; then
+        ok "${wanted}"
+    else
+        missing "${wanted} is not on this host"
+        todoUser "${script} load <archive>, see '${script} help images'"
+    fi
+
+    echo
+    echo "Settings"
+    if [[ -f "${envFile}" ]]; then
+        ok "${envFile}"
+        if [[ -n "$(find "${envFile}" -perm /077 2>/dev/null)" ]]; then
+            missing "The settings file can be read by others"
+            todoUser "chmod 600 ${envFile}"
+        fi
+    else
+        missing "No settings file, the defaults are used"
+        todoUser "${script} init"
+    fi
+
+    local address number
+    address=$(bindAddress)
+    number=$(port)
+    if [[ "${number}" -lt 1024 ]]; then
+        local first
+        first=$(cat /proc/sys/net/ipv4/ip_unprivileged_port_start 2>/dev/null)
+        if [[ -n "${first}" && "${number}" -lt "${first}" ]]; then
+            missing "Port ${number} is below ${first}, which only root may use"
+            todoUser "Use a port from 1024 on (STONE_PORT) behind a reverse proxy, see '${script} help proxy'"
+            todoRoot "Or: sysctl -w net.ipv4.ip_unprivileged_port_start=${number}"
+        else
+            ok "Listens on ${address}:${number}"
+        fi
+    elif [[ "${address}" == 127.0.0.1 ]]; then
+        ok "Listens on ${address}:${number}, only reachable from this host"
+        todoRoot "For the world outside: a reverse proxy, see '${script} help proxy'"
+    else
+        ok "Listens on ${address}:${number}"
+    fi
+
+    # Two instances can't listen on the same port of the host
+    local other otherFile
+    while IFS= read -r other; do
+        [[ "${other}" == "${instance}" ]] && continue
+        otherFile="${stoneBase}${other:+/${other}}/stone.env"
+        if [[ "$(settingIn "${otherFile}" STONE_PORT 8080)" == "${number}" ]]; then
+            missing "The instance '${other:-default}' has the same port ${number}; only one of the two can run"
+            todoUser "Another STONE_PORT in ${envFile}"
+        fi
+    done < <(instances)
+
+    echo
+    echo "Database"
+    local url
+    url=$(setting EDS_DB_URL)
+    if [[ -z "${url}" ]]; then
+        missing "No database (EDS_DB_URL): everything is kept in memory and lost when the stone stops"
+        todoRoot "A PostgreSQL database, see '${script} help postgresql'"
+        todoUser "Then EDS_DB_URL, EDS_DB_USERNAME and EDS_DB_PASSWORD in the settings file"
+    else
+        ok "${url}"
+        [[ -n "$(setting EDS_DB_PASSWORD)" ]] || missing "No password (EDS_DB_PASSWORD)"
+        checkDatabaseListens "${url}"
+    fi
+
+    echo
+    echo "MasterKey"
+    if [[ -n "$(setting EDS_MASTERKEY_URL)" ]]; then
+        ok "Read at the start from $(setting EDS_MASTERKEY_URL)"
+    elif [[ "$(setting STONE_MASTERKEY file)" == file ]]; then
+        if [[ -s "${masterKeyFile}" ]]; then
+            ok "Read at the start from ${masterKeyFile}"
+            if [[ -n "$(find "${masterKeyFile}" -perm /077 2>/dev/null)" ]]; then
+                missing "The MasterKey file can be read by others"
+                todoUser "chmod 600 ${masterKeyFile}"
+            fi
+        else
+            missing "No MasterKey file, the stone starts locked"
+            todoUser "${script} masterkey generate, see '${script} help masterkey'"
+        fi
+    else
+        ok "None at the start: the stone starts locked, until '${script} masterkey load'"
+    fi
+
+    echo
+    echo "Start with the host"
+    if ! command -v systemctl > /dev/null 2>&1; then
+        missing "No systemd on this host, start the stone your own way"
+    else
+        if isEnabled; then
+            ok "The service ${unitName}.service is enabled"
+        else
+            missing "The stone is not started with the host"
+            todoUser "${script} enable"
+        fi
+        if [[ "$(loginctl show-user "${USER:-$(id -un)}" -p Linger --value 2>/dev/null)" == yes ]]; then
+            ok "Your services run without you being logged in (linger)"
+        else
+            missing "Your services only run while you are logged in"
+            todoRoot "loginctl enable-linger ${USER:-$(id -un)}, see '${script} help boot'"
+        fi
+    fi
+    echo
+    echo "[USER] is done by you; [ROOT] changes the system and needs root."
+}
+
+# A PostgreSQL on this host must listen on more than the loopback address,
+# or the container can't reach it. Only a hint: it is checked where it can be.
+function checkDatabaseListens() {
+    local url="${1}" rest host number
+    rest="${url#jdbc:postgresql://}"
+    rest="${rest%%/*}"
+    host="${rest%%:*}"
+    number=5432
+    [[ "${rest}" == *:* ]] && number="${rest##*:}"
+    case "${host}" in
+        localhost | 127.0.0.1)
+            missing "In the container, ${host} is the container itself, not this host"
+            todoUser "Use host.containers.internal in EDS_DB_URL for a database on this host"
+            ;;
+        host.containers.internal)
+            command -v ss > /dev/null 2>&1 || return 0
+            local listeners
+            listeners=$(ss -ltnH 2>/dev/null | awk '{print $4}' | grep -E ":${number}\$")
+            if [[ -z "${listeners}" ]]; then
+                missing "Nothing listens on port ${number} of this host"
+                todoRoot "Install and start PostgreSQL, see '${script} help postgresql'"
+            elif ! echo "${listeners}" | grep -qvE '^(127\.|\[::1\])'; then
+                missing "Port ${number} only listens on the loopback address, which the container can't reach"
+                todoRoot "listen_addresses and pg_hba.conf, see '${script} help postgresql' (step 3)"
+            else
+                ok "Port ${number} of this host listens for the container"
+            fi
+            ;;
+    esac
+}
+
+# ==============================================================================
+# Run
+# ==============================================================================
+function doStart() {
+    # --no-wait is for the service: it starts the container and is done, as
+    # the stone itself waits for its database.
+    local wait=true
+    for option in "$@"; do
+        case "${option}" in
+            --no-wait) wait=false ;;
+            *) usageError "Unknown option: ${option}"; return 1 ;;
+        esac
+    done
+    needPodman || return 1
+
+    local name wanted
+    name=$(containerName)
+    wanted=$(image)
+    if isRunning; then
+        echo "$(instanceName Capital) is already running."
+        return 0
+    fi
+    if ! imageExists "${wanted}"; then
+        echo "The image ${wanted} is not on this host."
+        echo "Load it with '${script} load <archive>', see '${script} help images'."
+        return 1
+    fi
+
+    local withMasterKey=false
+    if [[ -z "$(setting EDS_MASTERKEY_URL)" && "$(setting STONE_MASTERKEY file)" == file && -s "${masterKeyFile}" ]]; then
+        withMasterKey=true
+    fi
+
+    # A stopped container is replaced, so the present image and settings are
+    # always used. Nothing is lost: all that is stored is in the database.
+    podman rm "${name}" > /dev/null 2>&1
+    (umask 077 && mkdir -p "${logsDir}") || return 1
+
+    # The "eds" user of the image (UID/GID 1001) is mapped to you, so the
+    # logs are yours. The proxy settings of the host are not passed on, as
+    # the stone only connects to its database and the MasterKey source. The
+    # :Z and :z options relabel the mounts for SELinux, and are ignored
+    # without it. The health port 9000 is not published.
+    local address
+    address=$(bindAddress)
+    local args=(run -d --name "${name}" --http-proxy=false
+        --userns=keep-id:uid=1001,gid=1001
+        -p "${address}:$(port):8080"
+        -v "${logsDir}:/app/logs:Z"
+        -e "TZ=$(setting TZ "$(cat /etc/timezone 2>/dev/null || echo UTC)")"
+        -e QUARKUS_LOG_FILE_ENABLED=true
+        -e QUARKUS_LOG_FILE_PATH=/app/logs/eds.log
+        -e QUARKUS_LOG_FILE_ROTATION_MAX_FILE_SIZE=10M
+        -e QUARKUS_LOG_FILE_ROTATION_MAX_BACKUP_INDEX=5)
+
+    # The settings file first, so the environment takes precedence. Passed
+    # by name, so the values, like the password, are not in the process list.
+    [[ -f "${envFile}" ]] && args+=(--env-file "${envFile}")
+    local variable
+    for variable in EDS_DB_URL EDS_DB_USERNAME EDS_DB_PASSWORD EDS_DB_RETRY_INTERVAL \
+                    EDS_MASTERKEY_URL EDS_TLS_CERT EDS_TLS_KEY EDS_INSECURE_REQUESTS; do
+        [[ -n "${!variable+set}" ]] && args+=(-e "${variable}")
+    done
+    if [[ -n "$(setting EDS_TLS_CERT)" ]]; then
+        args+=(-p "${address}:$(tlsPort):8443" -v "${certsDir}:/app/certs:ro,z")
+    fi
+    # The MasterKey file is mounted read-only and used as the MasterKey
+    # source; the secret itself is never part of the command line.
+    if [[ "${withMasterKey}" == true ]]; then
+        args+=(-v "${masterKeyFile}:${masterKeyMount}:ro,z" -e "EDS_MASTERKEY_URL=file://${masterKeyMount}")
+    fi
+
+    echo "Starting $(instanceName)..."
+    podman "${args[@]}" "${wanted}" > /dev/null || return 1
+    [[ "${wait}" == true ]] || return 0
+    waitForStone
+}
+
+function servedAt() {
+    local base
+    base="http://$(localAddress):$(port)"
+    echo "the API at ${base}/api/v1"
+}
+
+function waitForStone() {
+    echo -n "Waiting for the stone "
+    local retries=0
+    while [[ ${retries} -lt 60 ]]; do
+        if ! isRunning; then
+            echo
+            echo "Error: the stone stopped. Its last words:"
+            podman logs --tail 15 "$(containerName)" 2>&1 | sed 's/^/  | /'
+            return 1
+        fi
+        if isReady; then
+            echo
+            echo "EDS $(edsVersion) is ready: $(servedAt)"
+            return 0
+        fi
+        echo -n "."
+        sleep 1
+        retries=$((retries + 1))
+    done
+
+    echo
+    echo "The stone runs, but is not ready after 60 seconds. It keeps trying when"
+    echo "it can't reach its database; see '${script} logs' and '${script} check'."
+    return 1
+}
+
+function doStop() {
+    [[ $# -eq 0 ]] || { usageError "Unknown option: ${1}"; return 1; }
+    needPodman || return 1
+    if isRunning; then
+        echo "Stopping the stone..."
+        podman stop "$(containerName)" > /dev/null
+    else
+        echo "The stone is not running."
+    fi
+}
+
+function doStatus() {
+    needPodman || return 1
+    echo "Stone status${instance:+ of '${instance}'}"
+    echo
+    local wanted
+    wanted=$(image)
+    if imageExists "${wanted}"; then
+        ok "Image: ${wanted}, created $(podman image inspect -f '{{.Created.Format "2006-01-02 15:04"}}' "${wanted}" 2>/dev/null)"
+    else
+        missing "Image ${wanted} is not on this host, see '${script} help images'"
+    fi
+
+    if isRunning; then
+        local used
+        used=$(podman container inspect -f '{{.ImageName}}' "$(containerName)" 2>/dev/null)
+        ok "Container: running, from ${used#localhost/}"
+        if isReady; then
+            ok "Health: UP"
+        else
+            echo "  [FAIL] Health: not ready, see '${script} logs'"
+        fi
+        local answer
+        answer=$(inContainer --header "Content-Type: application/json" --post-data '{}' "http://localhost:8080/api/v1/version")
+        if [[ -n "${answer}" ]]; then
+            ok "EDS $(echo "${answer}" | grep -o '"version":"[^"]*"' | cut -d'"' -f4): $(servedAt)"
+            local database
+            database=$(echo "${answer}" | grep -o '"database":"[^"]*"' | cut -d'"' -f4)
+            if echo "${answer}" | grep -q '"persistent":true'; then
+                ok "Database: ${database}"
+            else
+                missing "Database: ${database}, in memory: everything is lost when the stone stops"
+            fi
+        else
+            echo "  [FAIL] The API doesn't answer"
+        fi
+    elif containerExists; then
+        missing "Container: stopped, start it with '${script} start'"
+    else
+        missing "Container: not created, start it with '${script} start'"
+    fi
+
+    if isEnabled; then
+        ok "Starts with the host (${unitName}.service)"
+    else
+        missing "Not started with the host, see '${script} help boot'"
+    fi
+    echo
+}
+
+function doLogs() {
+    needPodman || return 1
+    if ! containerExists; then
+        echo "The stone was not started yet, start it with '${script} start'."
+        return 1
+    fi
+    echo "Following the log of the stone (Ctrl+C to exit)..."
+    podman logs -f --tail 100 "$(containerName)"
+}
+
+# ==============================================================================
+# Start with the host: a systemd service of the user, which needs no root.
+# That it also runs without a login (linger) is allowed by root, once.
+# ==============================================================================
+function doEnable() {
+    command -v systemctl > /dev/null 2>&1 || { echo "This host has no systemd."; return 1; }
+    local self
+    self=$(readlink -f "${0}")
+    mkdir -p "${unitDir}" || return 1
+    # The network of the system is not known to the services of a user;
+    # Podman has a service which waits for it, where it is new enough. Where
+    # it isn't, or the container can't be started yet, the start is tried
+    # again. The stone itself waits for its database.
+    cat > "${unitFile}" <<EOF
+# Written by '${script} enable', removed by '${script} disable'
+[Unit]
+Description=EDS stone${instance:+ (${instance})}
+Wants=podman-user-wait-network-online.service
+After=podman-user-wait-network-online.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+Environment=STONE_HOME=${stoneBase}
+Environment=STONE_STATE=${stateBase}
+ExecStart=${self}${instance:+ -i ${instance}} start --no-wait
+ExecStop=${self}${instance:+ -i ${instance}} stop
+Restart=on-failure
+RestartSec=10
+TimeoutStartSec=180
+
+[Install]
+WantedBy=default.target
+EOF
+    systemctl --user daemon-reload || return 1
+    systemctl --user enable "${unitName}.service" > /dev/null 2>&1 || return 1
+    echo "$(instanceName Capital) is started with the host, by ${unitFile}."
+    if ! isRunning; then
+        echo "It is not running now: '${script} start', or 'systemctl --user start ${unitName}'."
+    fi
+    if [[ "$(loginctl show-user "${USER:-$(id -un)}" -p Linger --value 2>/dev/null)" != yes ]]; then
+        echo
+        echo "[ROOT] Your services only run while you are logged in. For the stone to"
+        echo "       start with the host, root allows it once (this changes the system):"
+        echo "         # loginctl enable-linger ${USER:-$(id -un)}"
+    fi
+}
+
+function doDisable() {
+    command -v systemctl > /dev/null 2>&1 || { echo "This host has no systemd."; return 1; }
+    systemctl --user disable "${unitName}.service" > /dev/null 2>&1
+    rm -f "${unitFile}"
+    systemctl --user daemon-reload
+    echo "$(instanceName Capital) is no longer started with the host."
+}
+
+# ==============================================================================
+# The instances of this user, and what each is doing
+# ==============================================================================
+function doList() {
+    local names=() name
+    mapfile -t names < <(instances)
+    if [[ ${#names[@]} -eq 0 ]]; then
+        echo "No stone is set up yet: '${program} init', or '${program} -i <name> init'."
+        return 0
+    fi
+    printf '  %-12s %-22s %-10s %s\n' "INSTANCE" "LISTENS ON" "STATE" "WITH THE HOST"
+    local file container state boot
+    for name in "${names[@]}"; do
+        file="${stoneBase}${name:+/${name}}/stone.env"
+        container=$(settingIn "${file}" STONE_NAME "stone${name:+-${name}}")
+        state="stopped"
+        if command -v podman > /dev/null 2>&1 \
+                && [[ "$(podman container inspect -f '{{.State.Running}}' "${container}" 2>/dev/null)" == "true" ]]; then
+            state="running"
+        fi
+        boot="no"
+        if command -v systemctl > /dev/null 2>&1 \
+                && systemctl --user is-enabled "stone${name:+-${name}}.service" > /dev/null 2>&1; then
+            boot="yes"
+        fi
+        printf '  %-12s %-22s %-10s %s\n' "${name:-(default)}" \
+            "$(settingIn "${file}" STONE_BIND 127.0.0.1):$(settingIn "${file}" STONE_PORT 8080)" "${state}" "${boot}"
+    done
+}
+
+# ==============================================================================
+# MasterKey
+# ==============================================================================
+
+# Creates a random MasterKey secret: 48 random bytes, Base64 encoded (64
+# characters, 384 bits), well above the entropy EDS requires. EDS uses the
+# bytes of the file as they are, so no newline is written.
+function generateMasterKey() {
+    local force=false
+    for option in "$@"; do
+        case "${option}" in
+            --force) force=true ;;
+            *) usageError "Unknown option: ${option}"; return 1 ;;
+        esac
+    done
+
+    if [[ -e "${masterKeyFile}" && "${force}" != true ]]; then
+        echo "The MasterKey file ${masterKeyFile} already exists, it is kept."
+        echo "Replacing it makes the data protected by it unreadable; use --force if that is intended."
+        return 1
+    fi
+
+    local secret
+    secret=$(head -c 48 /dev/urandom | base64 -w0) || return 1
+    (umask 077 && mkdir -p "${stoneHome}" && printf '%s' "${secret}" > "${masterKeyFile}") || return 1
+    chmod 600 "${masterKeyFile}"
+    echo "Created the MasterKey file ${masterKeyFile} (readable only by you)."
+    echo "Keep a copy of it in a safe place: without it, what is stored can't be read."
+    echo "The stone reads it at the next '${script} start' (STONE_MASTERKEY=file)."
+}
+
+# Sends the MasterKey file to a running stone with the MasterKey request. On
+# a new stone, it becomes the first MasterKey, and the admin account is
+# created with the given passphrase; later, it unlocks a stone which started
+# without a source. The secret and the passphrase are sent via stdin, so they
+# don't show in the process list.
+function loadMasterKey() {
+    command -v curl > /dev/null 2>&1 || { echo "This needs curl."; return 1; }
+    if [[ ! -s "${masterKeyFile}" ]]; then
+        echo "The MasterKey file ${masterKeyFile} doesn't exist."
+        echo "Create one with '${script} masterkey generate'."
+        return 1
+    fi
+    if ! isRunning; then
+        echo "The stone is not running, start it first."
+        return 1
+    fi
+
+    # A stone sets no name for its System Administrator: on a new stone the
+    # name given here becomes it, later it is the name it has.
+    local account="$(setting STONE_ADMIN_ACCOUNT "${EDS_ADMIN_ACCOUNT:-}")"
+    if [[ -z "${account}" ]]; then
+        read -r -p "Account name of the System Administrator (a new stone gives it this name) [admin]: " account
+        account="${account:-admin}"
+    fi
+    if [[ "${account}" == *'"'* || "${account}" == *'\'* ]]; then
+        echo "The account name can't hold a quote or a backslash here."
+        return 1
+    fi
+    local passphrase="${EDS_ADMIN_PASSPHRASE:-}"
+    if [[ -z "${passphrase}" ]]; then
+        read -r -s -p "Passphrase of ${account}: " passphrase
+        echo
+    fi
+    if [[ -z "${passphrase}" ]]; then
+        echo "No passphrase given."
+        return 1
+    fi
+
+    local response returnCode message
+    response=$(printf '{"accountName":"%s","credential":"%s","secret":"%s"}' "${account}" \
+            "$(printf '%s' "${passphrase}" | base64 -w0)" "$(base64 -w0 < "${masterKeyFile}")" \
+        | curl -s -X POST -H "Content-Type: application/json" --data-binary @- "$(apiUrl)/masterKey")
+    returnCode=$(echo "${response}" | grep -o '"returnCode":[0-9]*' | cut -d: -f2)
+    message=$(echo "${response}" | grep -o '"returnMessage":"[^"]*"' | cut -d'"' -f4)
+
+    if [[ "${returnCode}" == "200" ]]; then
+        echo "${message:-MasterKey loaded.}"
+        return 0
+    fi
+    echo "The MasterKey was not loaded: ${message:-no answer from the stone} (${returnCode:-?})"
+    return 1
+}
+
+# ==============================================================================
+# Clean up
+# ------------------------------------------------------------------------------
+# Only what is of EDS is touched: its images carry a label. The settings and
+# the MasterKey file are never removed.
+# ==============================================================================
+
+# The EDS images which no longer have a name, as a newer one replaced them
+function replacedImages() {
+    podman images -q --filter "dangling=true" --filter "label=${edsLabel}" 2>/dev/null | sort -u
+}
+
+# All EDS images, with or without a name
+function allImages() {
+    {
+        podman images -q --filter "label=${edsLabel}" 2>/dev/null
+        local custom
+        custom=$(setting STONE_IMAGE)
+        [[ -n "${custom}" ]] && podman images -q "${custom}" 2>/dev/null
+    } | sort -u
+}
+
+function listImages() {
+    local id line tags
+    for id in "$@"; do
+        line=$(podman image inspect -f '{{.RepoTags}}|{{.Created.Format "2006-01-02 15:04"}}' "${id}" 2>/dev/null) || continue
+        tags="${line%%|*}"
+        tags="${tags#[}"
+        tags="${tags%]}"
+        echo "    ${id:0:12}  ${line##*|}  ${tags:-(replaced by a newer one)}"
+    done
+}
+
+function doCleanup() {
+    local mode=unused yes=false
+    for option in "$@"; do
+        case "${option}" in
+            --images) mode=images ;;
+            --all) mode=all ;;
+            --yes) yes=true ;;
+            *) usageError "Unknown option: ${option}"; return 1 ;;
+        esac
+    done
+    needPodman || return 1
+
+    local ids=()
+    if [[ "${mode}" == unused ]]; then
+        mapfile -t ids < <(replacedImages)
+        if [[ ${#ids[@]} -eq 0 ]]; then
+            echo "No EDS images which are no longer used."
+            return 0
+        fi
+        echo "EDS images which a newer one replaced:"
+        listImages "${ids[@]}"
+        confirmed "${yes}" "Remove them?" || { echo "Nothing removed."; return 0; }
+        # An image which a container still uses is kept by Podman
+        podman rmi "${ids[@]}" > /dev/null 2>&1
+        mapfile -t ids < <(replacedImages)
+        if [[ ${#ids[@]} -gt 0 ]]; then
+            echo "Kept, as the stone still runs from it ('${script} restart' uses the new one):"
+            listImages "${ids[@]}"
+        else
+            echo "Removed."
+        fi
+        return 0
+    fi
+
+    mapfile -t ids < <(allImages)
+    echo "This takes $(instanceName) off this host:"
+    containerExists && echo "  the container '$(containerName)'$(isRunning && echo ", which is running")"
+    if [[ ${#ids[@]} -gt 0 ]]; then
+        echo "  the EDS images, unless another stone has a container from them:"
+        listImages "${ids[@]}"
+    fi
+    if [[ "${mode}" == all ]]; then
+        echo "  the logs in ${logsDir}"
+        [[ -e "${unitFile}" ]] && echo "  the start with the host (${unitFile})"
+    fi
+    echo "Kept: the settings and the MasterKey file in ${stoneHome}, and the database."
+    confirmed "${yes}" "Go on?" || { echo "Nothing removed."; return 0; }
+
+    if [[ "${mode}" == all && -e "${unitFile}" ]]; then
+        doDisable > /dev/null
+    fi
+    podman rm -f "$(containerName)" > /dev/null 2>&1
+    # Without force: an image the container of another instance runs from
+    # is kept by Podman.
+    local id
+    for id in "${ids[@]}"; do
+        podman rmi "${id}" > /dev/null 2>&1
+    done
+    if [[ "${mode}" == all ]]; then
+        rm -rf "${logsDir}"
+    fi
+    echo "Removed."
+    mapfile -t ids < <(allImages)
+    if [[ ${#ids[@]} -gt 0 ]]; then
+        echo "Kept, as another stone on this host has a container from it:"
+        listImages "${ids[@]}"
+    fi
+}
+
+# ==============================================================================
+# Main
+# ==============================================================================
+if [[ "$(id -u)" -eq 0 ]]; then
+    echo "Don't run '${script}' as root: the stone runs as a normal user, with rootless"
+    echo "Podman. Only the steps marked [ROOT] in '${script} help setup' need root."
+    exit 1
+fi
+
+command="${1:-}"
+[[ $# -gt 0 ]] && shift
+
+function noOptions() {
+    [[ $# -eq 0 ]] || usageError "Unknown option: ${1}"
+}
+
+case "${command}" in
+    "" | -h | --help)
+        showHelp
+        ;;
+    help)
+        helpTopic "$@"
+        ;;
+    init)
+        doInit "$@"
+        ;;
+    check)
+        noOptions "$@" && doCheck
+        ;;
+    list)
+        noOptions "$@" && doList
+        ;;
+    load)
+        doLoad "$@"
+        ;;
+    start)
+        doStart "$@"
+        ;;
+    stop)
+        doStop "$@"
+        ;;
+    restart)
+        doStop && doStart "$@"
+        ;;
+    status)
+        noOptions "$@" && doStatus
+        ;;
+    logs)
+        noOptions "$@" && doLogs
+        ;;
+    enable)
+        noOptions "$@" && doEnable
+        ;;
+    disable)
+        noOptions "$@" && doDisable
+        ;;
+    masterkey)
+        action="${1:-}"
+        [[ $# -gt 0 ]] && shift
+        case "${action}" in
+            generate) generateMasterKey "$@" ;;
+            load) noOptions "$@" && loadMasterKey ;;
+            *) usageError "Unknown command: masterkey ${action}" ;;
+        esac
+        ;;
+    cleanup)
+        doCleanup "$@"
+        ;;
+    *)
+        usageError "Unknown command: ${command}"
+        ;;
+esac

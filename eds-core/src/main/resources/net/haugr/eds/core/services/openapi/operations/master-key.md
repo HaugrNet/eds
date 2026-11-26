@@ -2,14 +2,14 @@
 permission: MASTER_KEY
 - AUTHENTICATION_WARNING: The account isn't `admin`, the System Administrator's credentials are wrong, or EDS is locked and the secret doesn't match the stored key check value.
 - VERIFICATION_WARNING: Neither or both of `secret` and `url` are given, the URL is invalid, or a new secret (first setup or change) is too weak.
-- NETWORK_ERROR: The secret can't be read from the URL.
+- NETWORK_ERROR: The secret can't be read from the URL (EDS unlocked; while it is locked, this is answered as AUTHENTICATION_WARNING, as a wrong secret), or two other sources are being read at the moment.
 
 **Fields:**
 
 | Field | Required | Notes |
 |---|---|---|
 | `secret` | one of the two | The MasterKey secret, Base64-encoded. |
-| `url` | one of the two | URL to read the secret from. |
+| `url` | one of the two | URL to read the secret from: `file:` without a host (a regular file) or `https:` (200, no redirects); at most 16 KiB, within 10 seconds. |
 
 Only the account `admin` may call this. The MasterKey is derived from the secret with
 HKDF-SHA512; EDS stores only its version and a key check value (KCV), never the key
@@ -30,6 +30,11 @@ or the secret. The request has these outcomes:
   ("MasterKey updated"): the Members' salts and private keys and the Trustees'
   Circle Secrets. Sessions end, and pending invitations are deleted. Data Objects
   aren't touched, so a rotation is fast even with a lot of data.
+
+While EDS is unlocked, the System Administrator's passphrase is checked before
+anything is read from `url`. While it is locked, the passphrase can't be checked
+first (the accounts' keys are wrapped with the MasterKey), so a source which can't
+be read is answered as a wrong secret, and the log tells why, without the URL.
 
 When `url` is given, it is stored as `eds.masterkey.url` and used at the next start;
 with `secret`, the stored URL is cleared. At startup, EDS reads the source from the

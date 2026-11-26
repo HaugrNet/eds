@@ -16,12 +16,14 @@
  */
 package net.haugr.eds.core;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
@@ -31,6 +33,9 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Arrays;
+import jakarta.transaction.Status;
+import jakarta.transaction.Synchronization;
+import jakarta.transaction.TransactionSynchronizationRegistry;
 import net.haugr.eds.api.common.Action;
 import net.haugr.eds.api.requests.FetchDataRequest;
 import net.haugr.eds.api.requests.ProcessDataRequest;
@@ -45,6 +50,7 @@ import net.haugr.eds.api.requests.MasterKeyRequest;
 import net.haugr.eds.api.responses.FetchMemberResponse;
 import net.haugr.eds.api.responses.MasterKeyResponse;
 import net.haugr.eds.core.enums.StandardSetting;
+import net.haugr.eds.core.exceptions.EDSException;
 import net.haugr.eds.core.jce.MasterKey;
 import net.haugr.eds.core.managers.MasterKeyManager;
 import net.haugr.eds.core.model.Settings;
@@ -160,6 +166,49 @@ final class ManagementBeanMasterKeyTest extends DatabaseSetup {
         assertTrue(fetched.isOk(), fetched.getReturnMessage());
     }
 
+    @Test
+    void testARotatedMasterKeyIsInstalledOnlyWhenCommitted() {
+        assertTrue(rotateWith(Status.STATUS_COMMITTED));
+    }
+
+    @Test
+    void testARotationRolledBackKeepsTheMasterKey() {
+        assertFalse(rotateWith(Status.STATUS_ROLLEDBACK));
+    }
+
+    /**
+     * Rotates the MasterKey in a transaction which ends with the given status
+     * (ticket 13): until it has ended, the old MasterKey is in use. Whether
+     * the new one was installed then.
+     */
+    private boolean rotateWith(final int status) {
+        deleteNonAdminMembers();
+        final String kcvBefore = MasterKey.getInstance().getKcv();
+        final List<Synchronization> registered = new java.util.ArrayList<>();
+        final ManagementBean bean = new ManagementBean(entityManager, settings, registry(registered));
+        final MasterKeyRequest request = prepareRequest(MasterKeyRequest.class, Constants.ADMIN_ACCOUNT);
+        request.setSecret(bytes(NEW_MASTERKEY_SECRET));
+
+        final MasterKeyResponse response = bean.masterKey(request);
+        assertTrue(response.isOk(), response.getReturnMessage());
+        assertEquals(kcvBefore, MasterKey.getInstance().getKcv(), "The new MasterKey was installed before the commit");
+        assertEquals(1, registered.size());
+
+        registered.getFirst().afterCompletion(status);
+        return !kcvBefore.equals(MasterKey.getInstance().getKcv());
+    }
+
+    /** A registry of a transaction which is active, and keeps what is registered. */
+    private static TransactionSynchronizationRegistry registry(final List<Synchronization> registered) {
+        return (TransactionSynchronizationRegistry) java.lang.reflect.Proxy.newProxyInstance(ManagementBeanMasterKeyTest.class.getClassLoader(),
+                new Class<?>[] { TransactionSynchronizationRegistry.class }, (proxy, method, args) -> switch (method.getName()) {
+                    case "getTransactionStatus" -> Status.STATUS_ACTIVE;
+                    case "registerInterposedSynchronization" -> registered.add((Synchronization) args[0]);
+                    case "setRollbackOnly" -> null;
+                    default -> throw new UnsupportedOperationException(method.getName());
+                });
+    }
+
     // The paths are the test's own resources and temporary files.
     @SuppressWarnings("findsecbugs:PATH_TRAVERSAL_IN")
     @Test
@@ -203,7 +252,101 @@ final class ManagementBeanMasterKeyTest extends DatabaseSetup {
 
         final MasterKeyResponse response = bean.masterKey(request);
         assertEquals(ReturnCode.NETWORK_ERROR.getCode(), response.getReturnCode());
-        assertEquals(path + " (No such file or directory)", response.getReturnMessage());
+        // A fixed message, without the URL (ticket 5).
+        assertEquals("The MasterKey source could not be read (not a regular file).", response.getReturnMessage());
+    }
+
+    /**
+     * Without the passphrase, nothing is fetched (ticket 6): before, the URL
+     * was read first, so anyone who knew the name of the System
+     * Administrator could make the stone fetch any URL.
+     */
+    @Test
+    void testNothingIsFetchedWithoutThePassphrase() throws IOException {
+        try (LocalListener listener = LocalListener.answering()) {
+            final ManagementBean bean = prepareManagementBean();
+            final MasterKeyRequest request = prepareRequest(MasterKeyRequest.class, Constants.ADMIN_ACCOUNT);
+            request.setCredential(bytes("root"));
+            request.setUrl("https://127.0.0.1:" + listener.port() + "/secret");
+
+            final MasterKeyResponse response = bean.masterKey(request);
+            assertEquals(ReturnCode.AUTHENTICATION_WARNING.getCode(), response.getReturnCode());
+            assertEquals("Invalid credentials.", response.getReturnMessage());
+            assertEquals(0, listener.accepted(), "The URL may not be fetched before the passphrase is checked.");
+        }
+    }
+
+    /**
+     * While EDS is locked, the secret must be read before the passphrase can
+     * be checked. A source which can't be read is answered as a wrong
+     * secret, so the answer tells nothing about files or hosts (ticket 6),
+     * and the log has the kind of failure, without the URL (ticket 5).
+     */
+    @Test
+    void testAnUnreadableSourceWhileLockedIsAnsweredAsAWrongSecret() throws IOException {
+        MasterKey.getInstance().lock();
+        final ManagementBean bean = prepareManagementBean();
+
+        try (LocalListener silent = LocalListener.silent()) {
+            // The first fails without the fix, before /dev/zero is tried,
+            // which was read until the memory ran out: a missing file, a
+            // query (which may hold a secret), a device, another scheme, and
+            // a server which never answers.
+            for (final String url : List.of("file://" + tempDir() + "no-such-file-x7", "file://" + tempDir() + "no-such-file-x7?key=s3cr3t",
+                    "file:///dev/zero", "http://127.0.0.1:1/secret", "https://127.0.0.1:" + silent.port() + "/secret")) {
+                assertAnsweredAsAWrongSecret(bean, url);
+            }
+        }
+    }
+
+    /**
+     * While others hold both slots for reading a source, the System
+     * Administrator is told so, not that the secret is wrong; the refusal
+     * depends on no URL, so it tells an attacker nothing.
+     */
+    @Test
+    void testBusySourcesWhileLockedAreSaidAsSuch() throws Exception {
+        MasterKey.getInstance().lock();
+        final ManagementBean bean = prepareManagementBean();
+
+        try (LocalListener silent = LocalListener.silent()) {
+            final String url = "https://127.0.0.1:" + silent.port() + "/secret";
+            final List<Thread> readers = new java.util.ArrayList<>();
+            for (int i = 0; i < MasterKey.MAX_FETCHES; i++) {
+                readers.add(Thread.ofVirtual().start(() -> assertThrows(EDSException.class, () -> MasterKey.readMasterKeySecretFromUrl(url))));
+            }
+            final long until = System.nanoTime() + java.util.concurrent.TimeUnit.SECONDS.toNanos(10);
+            while (silent.accepted() < MasterKey.MAX_FETCHES) {
+                assertTrue(System.nanoTime() < until, "The readers didn't connect.");
+                java.util.concurrent.locks.LockSupport.parkNanos(java.util.concurrent.TimeUnit.MILLISECONDS.toNanos(10));
+            }
+
+            final MasterKeyRequest request = prepareRequest(MasterKeyRequest.class, Constants.ADMIN_ACCOUNT);
+            request.setUrl(url);
+            final MasterKeyResponse response = bean.masterKey(request);
+            assertEquals(ReturnCode.NETWORK_ERROR.getCode(), response.getReturnCode());
+            assertEquals(MasterKey.SOURCES_BUSY, response.getReturnMessage());
+            assertFalse(MasterKey.getInstance().isUnlocked());
+
+            for (final Thread reader : readers) {
+                reader.join(java.time.Duration.ofSeconds(20));
+            }
+        }
+    }
+
+    private void assertAnsweredAsAWrongSecret(final ManagementBean bean, final String url) {
+        final MasterKeyRequest request = prepareRequest(MasterKeyRequest.class, Constants.ADMIN_ACCOUNT);
+        request.setUrl(url);
+
+        try (LogCapture log = LogCapture.of(MasterKeyManager.class)) {
+            final MasterKeyResponse response = bean.masterKey(request);
+            assertEquals(ReturnCode.AUTHENTICATION_WARNING.getCode(), response.getReturnCode(), url);
+            assertEquals("Invalid credentials.", response.getReturnMessage(), url);
+            assertThat(log.warnings()).singleElement().asString()
+                    .startsWith("The MasterKey request's source could not be read while EDS is locked: The MasterKey source ")
+                    .doesNotContain("no-such-file-x7").doesNotContain("s3cr3t").doesNotContain("127.0.0.1");
+        }
+        assertFalse(MasterKey.getInstance().isUnlocked(), url);
     }
 
     // The paths are the test's own resources and temporary files.
@@ -391,6 +534,28 @@ final class ManagementBeanMasterKeyTest extends DatabaseSetup {
         assertEquals(1, stored.getVersion());
         assertEquals(MasterKey.derive(bytes(NEW_MASTERKEY_SECRET)).kcv(), stored.getKcv());
         assertNotNull(dao.findMemberByName(Constants.ADMIN_ACCOUNT));
+    }
+
+    /**
+     * A stone without accounts: the first MasterKey comes with the first
+     * account's passphrase, and if that can't be the passphrase of an
+     * account, as it's too weak, EDS must stay locked, although the MasterKey
+     * itself was right.
+     */
+    @Test
+    void testFirstSetupWithWeakPassphraseStaysLocked() {
+        deleteAllMembers();
+        deleteMasterKeyRecords();
+        MasterKey.getInstance().lock();
+
+        final ManagementBean bean = prepareManagementBean();
+        final MasterKeyRequest request = prepareRequest(MasterKeyRequest.class, "sysop");
+        request.setCredential(bytes("weak"));
+        request.setSecret(bytes(NEW_MASTERKEY_SECRET));
+
+        final MasterKeyResponse response = bean.masterKey(request);
+        assertEquals(ReturnCode.VERIFICATION_WARNING.getCode(), response.getReturnCode(), response.getReturnMessage());
+        assertFalse(MasterKey.getInstance().isUnlocked());
     }
 
     /**

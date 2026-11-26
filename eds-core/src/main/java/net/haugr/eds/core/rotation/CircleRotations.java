@@ -154,6 +154,26 @@ public final class CircleRotations {
     }
 
     /**
+     * The rotation of a Circle no longer waits for a next try, as the Circle
+     * is deleted.
+     *
+     * @param circleId Internal ID of the Circle
+     */
+    public static void stopWaiting(final long circleId) {
+        WAITING.remove(circleId);
+    }
+
+    /**
+     * Whether the rotation of a Circle waits for its next try.
+     *
+     * @param circleId Internal ID of the Circle
+     * @return True while it waits
+     */
+    public static boolean isWaiting(final long circleId) {
+        return WAITING.containsKey(circleId);
+    }
+
+    /**
      * Forgets the offer of a Circle, and that it waits: as a stone which
      * stops forgets them.
      *

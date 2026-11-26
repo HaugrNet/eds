@@ -141,7 +141,9 @@ final class CommonService {
      * duration.</p>
      *
      * <p>If an error occurred, then an error log entry is added, with all
-     * the information available, to help track down the problem. All known
+     * the information available, to help track down the problem. A request
+     * which is answered with an error Return Code, e.g. after the bean
+     * caught the cause, is logged as WARN with the Return Code and message. All known
      * errors in EDS are properly converted to a ReturnCode plus Message and
      * returned to the recipient for proper error handling.</p>
      *
@@ -162,7 +164,14 @@ final class CommonService {
         try {
             response = action.get();
             final String duration = calculateDuration(settings.getLocale(), startTime);
-            LOGGER.info("{} completed in {} ms", endpoint, duration);
+            final ReturnCode returnCode = ReturnCode.findReturnCode(response.getReturnCode());
+            if (isError(returnCode)) {
+                // An error the request was answered with: the stone itself
+                // failed, so it is logged as more than a completed request.
+                LOGGER.warn("{} completed in {} ms with {}: {}", endpoint, duration, returnCode, response.getReturnMessage());
+            } else {
+                LOGGER.info("{} completed in {} ms", endpoint, duration);
+            }
         } catch (RuntimeException e) {
             final String duration = calculateDuration(settings.getLocale(), startTime);
             LOGGER.error("{} completed in {} ms with error: {}", endpoint, duration, e.getMessage(), e);
@@ -174,6 +183,21 @@ final class CommonService {
                 .type(PRODUCES)
                 .entity(response)
                 .build();
+    }
+
+    /**
+     * Tells if a Return Code is of the errors, which the endpoints with HTTP
+     * status codes answer with a status of 5xx; unlike the warnings, they are
+     * no fault of the request, and are logged as WARN. A busy stone isn't:
+     * whoever sends many passphrases at once controls how many are answered
+     * so, and their limit logs a summary instead (ticket 20).
+     *
+     * @param returnCode The Return Code, or null if unknown
+     * @return True for an error, or an unknown Return Code
+     */
+    public static boolean isError(final ReturnCode returnCode) {
+        return (returnCode == null)
+                || ((returnCode.getClassification() == ReturnCode.Classification.CLASS_ERROR) && (returnCode != ReturnCode.SERVICE_BUSY));
     }
 
     /**

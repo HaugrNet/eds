@@ -2,8 +2,9 @@
 
 Project: EDS (Encrypted Data Share), https://github.com/HaugrNet/eds
 
-Status: planned 2026-11-15, nothing built. Discussed and decided with the user the
-same day; what is still to decide is listed under "Open decisions".
+Status: planned and built 2026-11-15 (M1 here, M2 in `RUNE.md`, M3 in `TOLK.md`).
+Discussed and decided with the user the same day; what is still to decide is
+listed under "Open decisions".
 
 Like `E2E.md` and `FEATURES.md`, this plan crosses the backend, Rune and Tolk. It
 doesn't depend on either. Code comments cite it as `STATUS.md`. Phases are named
@@ -56,7 +57,7 @@ declaration, folder or entries. A stone answers one request about itself, its
   here; two stones may run on one host, or use one database server.
 - Moving a stone, or balancing between stones.
 
-## What exists today
+## What existed before M1 (2026-11-15)
 
 - The version request, without authentication: version, kind of database, whether
   it is persistent, and the storage ceiling.
@@ -98,10 +99,10 @@ to; two stones may share a host and differ in the port.
   a label, sees a key once, lists the labels and withdraws a key. A key is 256
   random bits; the stone keeps only its SHA-512 hash.
 
-Why a key and not a login: a stone keeps one session per account (`PLAN.md`,
-Clients API, "Open"), so an overview that logged in would end the administrator's
-own session on that stone, and the other way round. A key that leaks gives away
-numbers, nothing else.
+Why a key and not a login: a login would take one of the account's sessions
+(`eds.session.max.per.member`) and need the passphrase in the overview. (When this
+was planned, a stone kept one session per account, so a login would have ended the
+administrator's own.) A key that leaks gives away numbers, nothing else.
 
 Why a plain hash and not the MasterKey's, as for invitations: the status should
 answer while the stone is asleep, and say so, and a key should survive a change of
@@ -137,11 +138,15 @@ says how old the inventory is.
 
 | Number | From |
 |---|---|
-| Storage used, and the ceiling | the query the ceiling uses today |
-| Accounts, rooms, files | counts |
+| Storage used, and the ceiling | the sum of the Circles' totals (`eds_circle_storage`) |
+| Accounts, rooms, files, entries of features | counts |
 | Sessions that haven't ended | a count |
 | Circles whose Circle Secret is due to be rotated, those being rotated, and the objects they still have to re-encrypt (PLAN.md, Crypto C6; added 2026-11-21) | counts |
 | The database: its kind, and a mark for its server | the connection |
+
+Each inventory also compares the Circles' totals with their stored parts, and logs a
+WARN for each Circle that differs (`PLAN.md`, "The storage ceiling"; its cost is
+ticket 27 in `FINDINGS.md`).
 
 The mark is a hash of the database server's address: two stones on one database
 server show the same mark, and the address itself isn't given away.
@@ -246,7 +251,7 @@ Done 2026-11-15:
   "several allowed addresses" is settled: yes.
 - **The name** is told with the status only; the version request, which needs no
   authentication, doesn't tell it.
-- Tests: `StatusCollectorTest` (8), `StatusTest` (11: the keys, who reads, a
+- Tests, as of 2026-11-15: `StatusCollectorTest` (8), `StatusTest` (11: the keys, who reads, a
   withdrawn key, the sleeping stone, a key reads nothing else, load and inventory,
   switched off, only numbers, the database mark), `OriginFilterTest` (3), and
   `EdsStatusTest` (2, in the running stone: the scheduler gathers, the requests are
@@ -255,9 +260,8 @@ Done 2026-11-15:
 - Differs from the plan: the day and the inventory's history come only when asked
   for (`history`), and the inventory is gathered when the stone starts and then at
   its interval, so its first sample may be older than a change.
-- For M2: the Rune of a stone may only connect to its own stone (its Content
-  Security Policy), which has to open for the stones it watches; and the stone
-  settings of Rune don't name the new settings yet.
+- For M2, done there: Rune's Content Security Policy opened for the stones it
+  watches, and Rune's stone settings name the new settings.
 
 ### Phase M2: Rune
 
@@ -287,8 +291,9 @@ All 2026-11-15, the user:
 
 ## Open decisions
 
-- **Where Rune keeps status keys.** Planned: in the browser of the device, so a
-  second device needs them again. With chambers, the Member's vault (`E2E.md`)
-  could carry them.
-- **Limits for the colours:** fixed in the clients, or set by the administrator.
-- **The lengths of the histories,** and the range allowed for the two intervals.
+Built as planned, open for revision:
+- **Where Rune keeps status keys:** in the browser of the device, so a second device
+  needs them again. With chambers, the Member's vault (`E2E.md`) could carry them.
+- **Limits for the colours:** fixed in the clients (`stones-window.ts`).
+- **The lengths of the histories** (720, 288, 720 samples) and the ranges of the
+  two intervals (0–3600 s and 1–10080 minutes).

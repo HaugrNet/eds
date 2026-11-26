@@ -78,14 +78,23 @@ public final class Crypto {
     // Counts the PBKDF2 derivations, so tests can prove that requests with a
     // Session don't run PBKDF2 (PLAN.md, C3).
     private static final LongAdder PASSWORD_KEY_DERIVATIONS = new LongAdder();
+    // The same, for the calling thread, as the tests of one JVM run beside
+    // each other (ticket 21: an unknown name derives a key too).
+    private static final ThreadLocal<long[]> THREAD_DERIVATIONS = ThreadLocal.withInitial(() -> new long[1]);
     private static final byte LABEL_SEPARATOR = 0;
 
     private final MasterKey masterKey;
     private final Settings settings;
+    private final PassphraseLimit passphraseLimit;
 
     public Crypto(final Settings settings) {
+        this(settings, PassphraseLimit.SHARED);
+    }
+
+    Crypto(final Settings settings, final PassphraseLimit passphraseLimit) {
         masterKey = MasterKey.getInstance();
         this.settings = settings;
+        this.passphraseLimit = passphraseLimit;
     }
 
     // =========================================================================
@@ -108,12 +117,19 @@ public final class Crypto {
      * @return Symmetric Key
      * @throws CryptoException if an error occurred
      */
-    // Part of the instance API of Crypto, which every caller holds; made
-    // static, each call through an instance would be a finding instead.
-    @SuppressWarnings("java:S2325")
     public SecretEDSKey generatePasswordKey(final KeyAlgorithm algorithm, final byte[] secret, final byte[] salt, final int iterations) {
+        // Only so many at once, as each costs about a fifth of a CPU-second
+        // (ticket 20); beyond them, the request is answered as busy. A request
+        // which took its place already keeps it.
+        try (var _ = passphrasePlace()) {
+            return derivePasswordKey(algorithm, secret, salt, iterations);
+        }
+    }
+
+    private static SecretEDSKey derivePasswordKey(final KeyAlgorithm algorithm, final byte[] secret, final byte[] salt, final int iterations) {
         try {
             PASSWORD_KEY_DERIVATIONS.increment();
+            THREAD_DERIVATIONS.get()[0]++;
             final char[] extendedSecret = generateSecretChars(secret);
 
             final SecretKeyFactory factory = SecretKeyFactory.getInstance(algorithm.getTransformationValue());
@@ -126,6 +142,18 @@ public final class Crypto {
         } catch (IllegalArgumentException | NoSuchAlgorithmException | InvalidKeySpecException e) {
             throw new CryptoException(e.getMessage(), e);
         }
+    }
+
+    /**
+     * Takes a place to check a passphrase (ticket 20), for a request which
+     * looks the account up and checks the passphrase within it; the
+     * derivation then takes no second one.
+     *
+     * @return The place, to close when the passphrase is checked
+     * @throws net.haugr.eds.core.exceptions.EDSException with SERVICE_BUSY, if no place came free in time
+     */
+    public PassphraseLimit.Place passphrasePlace() {
+        return passphraseLimit.take(settings.getAuthConcurrentPassphrases(), settings.getAuthPassphraseWaitMillis());
     }
 
     /**
@@ -148,6 +176,18 @@ public final class Crypto {
      */
     public static long passwordKeyDerivations() {
         return PASSWORD_KEY_DERIVATIONS.sum();
+    }
+
+    /**
+     * Returns the number of PBKDF2 derivations made by the calling thread
+     * since the last call, and starts the count anew.
+     *
+     * @return Number of PBKDF2 derivations of this thread
+     */
+    public static long takePasswordKeyDerivationsOfThisThread() {
+        final long derived = THREAD_DERIVATIONS.get()[0];
+        THREAD_DERIVATIONS.remove();
+        return derived;
     }
 
     public static SecretEDSKey generateSymmetricKey(final KeyAlgorithm algorithm) {

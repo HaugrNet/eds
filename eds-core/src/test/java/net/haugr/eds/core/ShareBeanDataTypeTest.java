@@ -41,6 +41,8 @@ import org.junit.jupiter.api.Test;
  */
 final class ShareBeanDataTypeTest extends DatabaseSetup {
 
+    private static final String ONLY_ADMINISTRATORS = "Cannot complete this request, as it is only allowed for the System Administrator.";
+
     @Test
     void testEmptyFetchRequest() {
         final ShareBean bean = prepareShareBean();
@@ -106,20 +108,48 @@ final class ShareBeanDataTypeTest extends DatabaseSetup {
     }
 
     @Test
-    void testCircleAdminsAreAuthorized() {
+    void testOnlyAdministratorsChangeDataTypes() {
         final ShareBean bean = prepareShareBean();
         final String type = "MyDataType";
         final String name = "The Data Type";
 
-        final ProcessDataTypeRequest request = prepareRequest(ProcessDataTypeRequest.class, MEMBER_1);
+        // Data Types are of the whole stone: an administrator of a Circle
+        // may not change them, only an administrator of the stone (ticket 15).
+        final ProcessDataTypeRequest byCircleAdmin = prepareRequest(ProcessDataTypeRequest.class, MEMBER_1);
+        byCircleAdmin.setType(type);
+        byCircleAdmin.setTypeName(name);
+        final ProcessDataTypeResponse refused = bean.processDataType(byCircleAdmin);
+        assertEquals(ReturnCode.AUTHORIZATION_WARNING.getCode(), refused.getReturnCode());
+        assertEquals(ONLY_ADMINISTRATORS, refused.getReturnMessage());
+
+        final ProcessDataTypeRequest request = prepareRequest(ProcessDataTypeRequest.class, Constants.ADMIN_ACCOUNT);
         request.setType(type);
         request.setTypeName(name);
-        assertNotNull(request.getTypeName());
-        assertNotNull(request.getType());
-
         final ProcessDataTypeResponse response = bean.processDataType(request);
         assertEquals(ReturnCode.SUCCESS.getCode(), response.getReturnCode());
         assertEquals("The Data Type '" + name + "' was successfully processed.", response.getReturnMessage());
+
+        // Nor delete it.
+        final ProcessDataTypeRequest delete = prepareRequest(ProcessDataTypeRequest.class, MEMBER_1);
+        delete.setAction(Action.DELETE);
+        delete.setTypeName(name);
+        assertEquals(ReturnCode.AUTHORIZATION_WARNING.getCode(), bean.processDataType(delete).getReturnCode());
+    }
+
+    @Test
+    void testTheDefaultDataTypesAreNotDeleted() {
+        final ShareBean bean = prepareShareBean();
+
+        // Unused on a new stone, but a Data Object or folder added without a
+        // type takes them (ticket 15, and O4 finding 4).
+        for (final String name : new String[] { Constants.DATA_TYPENAME, Constants.FOLDER_TYPENAME }) {
+            final ProcessDataTypeRequest delete = prepareRequest(ProcessDataTypeRequest.class, Constants.ADMIN_ACCOUNT);
+            delete.setAction(Action.DELETE);
+            delete.setTypeName(name);
+            final ProcessDataTypeResponse response = bean.processDataType(delete);
+            assertEquals(ReturnCode.AUTHORIZATION_WARNING.getCode(), response.getReturnCode(), name);
+            assertEquals("It is not permitted to delete the Data Type '" + name + "'.", response.getReturnMessage());
+        }
     }
 
     @Test
@@ -134,7 +164,7 @@ final class ShareBeanDataTypeTest extends DatabaseSetup {
 
         final ProcessDataTypeResponse response = bean.processDataType(request);
         assertEquals(ReturnCode.AUTHORIZATION_WARNING.getCode(), response.getReturnCode());
-        assertEquals("The requesting Account is not permitted to Process Data Type.", response.getReturnMessage());
+        assertEquals(ONLY_ADMINISTRATORS, response.getReturnMessage());
     }
 
     @Test

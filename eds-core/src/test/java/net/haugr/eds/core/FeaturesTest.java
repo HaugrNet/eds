@@ -313,6 +313,84 @@ final class FeaturesTest extends DatabaseSetup {
     }
 
     @Test
+    void testAPageIsReadWithTheSameQueriesWhateverItsSize() {
+        // Ticket 28: what each entry is about, its author and its content were
+        // read with a query for each entry, and each query first checked all
+        // entities read so far for changes.
+        final FeatureBean features = features();
+        final Listed listed = listed(features);
+        entityManager.flush();
+        entityManager.clear();
+        final long[] few = statementsOfAPage(features, 5);
+
+        for (int i = 0; i < 6; i++) {
+            final Entry note = add(features, (i % 2 == 0) ? MEMBER_1 : MEMBER_2, "note", null, null, "more " + i).getEntries().getFirst();
+            add(features, MEMBER_3, "vote", note.getEntryId(), null, "vote " + i);
+        }
+        assertTrue(add(features, MEMBER_1, "vote", listed.n1().getEntryId(), null, "one more").isOk());
+        entityManager.flush();
+        entityManager.clear();
+        final long[] many = statementsOfAPage(features, 18);
+
+        assertEquals(few[0], many[0], "the statements of a page of 5 and of 18 entries");
+        // No flush before each of the page's queries: so the entities read
+        // for an entry (it, its Metadata, ...) are checked for changes once,
+        // not again before every later query. Without it, 11 checks more for
+        // each entry; with it, 3.
+        assertTrue(many[1] - few[1] <= 4L * (18 - 5),
+                "checks for changes of a page of 5 and of 18 entries: " + few[1] + " and " + many[1]);
+    }
+
+    @Test
+    void testAReadPageKeepsTheRestOfTheTransactionAsItWas() {
+        // The read runs without a flush before each query; afterwards the
+        // flush mode is the one before, and a change is written as usual.
+        final FeatureBean features = features();
+        final Listed listed = listed(features);
+        entityManager.flush();
+        entityManager.clear();
+        final jakarta.persistence.FlushModeType before = entityManager.getFlushMode();
+        assertEquals(5, features.entries(session(MEMBER_3), CIRCLE_1_ID, BOARD, EntryQuery.all().content(true)).getEntries().size());
+        assertEquals(before, entityManager.getFlushMode());
+        // The content read for the page isn't kept in the persistence context.
+        assertTrue(entityManager.unwrap(org.hibernate.Session.class).getStatistics().getEntityKeys().stream()
+                .noneMatch(key -> (key instanceof org.hibernate.engine.spi.EntityKey entity)
+                        && entity.getEntityName().endsWith(".DataEntity")), "content kept after the page was read");
+
+        assertTrue(features.changeEntry(session(MEMBER_2), CIRCLE_1_ID, BOARD, listed.n1().getEntryId(), body(null, null, null, "changed")).isOk());
+        entityManager.flush();
+        entityManager.clear();
+        final List<Entry> read = features.entries(session(MEMBER_3), CIRCLE_1_ID, BOARD, EntryQuery.all().kind("note").oldestFirst(true).content(true)).getEntries();
+        assertEquals("changed", text(read.getFirst()));
+    }
+
+    /** The statements and the checks for changes (dirty checks) of reading the page of all entries of the board with their content, which must have the given size. */
+    private long[] statementsOfAPage(final FeatureBean features, final int size) {
+        final byte[] token = session(MEMBER_3);
+        final org.hibernate.stat.Statistics statistics = entityManager.getEntityManagerFactory()
+                .unwrap(org.hibernate.SessionFactory.class).getStatistics();
+        statistics.clear();
+        statistics.setStatisticsEnabled(true);
+        final long[] dirtyChecks = new long[1];
+        entityManager.unwrap(org.hibernate.engine.spi.SharedSessionContractImplementor.class).getEventListenerManager()
+                .addListener(new org.hibernate.SessionEventListener() {
+                    @Override
+                    public void dirtyCalculationStart() {
+                        dirtyChecks[0]++;
+                    }
+                });
+        try {
+            final List<Entry> page = features.entries(token, CIRCLE_1_ID, BOARD, EntryQuery.all().content(true)).getEntries();
+            assertEquals(size, page.size());
+            assertTrue(page.stream().allMatch(entry -> (entry.getAccountName() != null) && (text(entry) != null)));
+            assertTrue(page.stream().filter(entry -> "vote".equals(entry.getKind())).allMatch(entry -> entry.getAbout() != null));
+            return new long[]{statistics.getPrepareStatementCount(), dirtyChecks[0]};
+        } finally {
+            statistics.setStatisticsEnabled(false);
+        }
+    }
+
+    @Test
     void testNamesAreUniqueInTheFeatureOfTheCircle() {
         final FeatureBean features = features();
         on(features);

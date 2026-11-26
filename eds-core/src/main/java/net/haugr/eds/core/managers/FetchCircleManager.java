@@ -115,10 +115,14 @@ public final class FetchCircleManager extends AbstractManager<RotationDao, Fetch
             final KeyEntity previous = retiring.get(entity.getId());
             if (previous != null) {
                 final CircleRotation rotation = new CircleRotation();
-                final long objects = dao.countData(entity);
+                // While the secret is rotated, all content of the Circle is on
+                // the previous or the current one; counted on the keys, by
+                // their index, not by a join through all Metadata of the
+                // Circle (the load run of 2026-11-23).
+                final long done = (current != null) ? dao.countDataOnKey(current) : 0;
                 rotation.setStarted(circle.getSecretRotated());
-                rotation.setObjects(objects);
-                rotation.setObjectsDone(objects - dao.countDataOnKey(previous));
+                rotation.setObjects(done + dao.countDataOnKey(previous));
+                rotation.setObjectsDone(done);
                 circle.setRotation(rotation);
             }
         }

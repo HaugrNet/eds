@@ -16,7 +16,6 @@
  */
 package net.haugr.eds.core.socket;
 
-import jakarta.json.Json;
 import jakarta.json.JsonArrayBuilder;
 import jakarta.json.JsonException;
 import jakarta.json.JsonNumber;
@@ -32,6 +31,7 @@ import net.haugr.eds.api.common.SocketFrameType;
 import net.haugr.eds.api.dtos.CircleFeature;
 import net.haugr.eds.api.dtos.Entry;
 import net.haugr.eds.api.dtos.SocketFrame;
+import net.haugr.eds.core.JsonFactories;
 import net.haugr.eds.core.exceptions.EDSException;
 
 /**
@@ -57,7 +57,7 @@ public final class SocketCodec {
      */
     public static SocketFrame parse(final String text) {
         final JsonObject json;
-        try (JsonReader reader = Json.createReader(new StringReader(text))) {
+        try (JsonReader reader = JsonFactories.READERS.createReader(new StringReader(text))) {
             json = reader.readObject();
         } catch (JsonException | IllegalStateException e) {
             throw invalid("The frame must be a JSON object.", e);
@@ -103,7 +103,7 @@ public final class SocketCodec {
      * @return The frame as JSON
      */
     public static String write(final SocketFrame frame) {
-        final JsonObjectBuilder builder = Json.createObjectBuilder();
+        final JsonObjectBuilder builder = JsonFactories.BUILDERS.createObjectBuilder();
         builder.add(Constants.FIELD_TYPE, frame.getType().name());
         add(builder, Constants.FIELD_REF, frame.getRef());
         add(builder, Constants.FIELD_MEMBER_ID, frame.getMemberId());
@@ -113,7 +113,7 @@ public final class SocketCodec {
         add(builder, Constants.FIELD_SIGNAL, frame.getSignal());
         add(builder, Constants.FIELD_TO, frame.getTo());
         if (frame.getPresent() != null) {
-            final JsonArrayBuilder present = Json.createArrayBuilder();
+            final JsonArrayBuilder present = JsonFactories.BUILDERS.createArrayBuilder();
             frame.getPresent().forEach(present::add);
             builder.add(Constants.FIELD_PRESENT, present);
         }
@@ -121,7 +121,7 @@ public final class SocketCodec {
             builder.add(Constants.FIELD_ENTRY, entry(frame.getEntry()));
         }
         if (frame.getEntries() != null) {
-            final JsonArrayBuilder entries = Json.createArrayBuilder();
+            final JsonArrayBuilder entries = JsonFactories.BUILDERS.createArrayBuilder();
             for (final Entry entry : frame.getEntries()) {
                 entries.add(entry(entry));
             }
@@ -131,7 +131,7 @@ public final class SocketCodec {
             builder.add(Constants.FIELD_COUNT, frame.getCount());
         }
         if (frame.getFeatures() != null) {
-            final JsonArrayBuilder features = Json.createArrayBuilder();
+            final JsonArrayBuilder features = JsonFactories.BUILDERS.createArrayBuilder();
             for (final CircleFeature feature : frame.getFeatures()) {
                 features.add(feature(feature));
             }
@@ -147,7 +147,7 @@ public final class SocketCodec {
     }
 
     private static JsonObjectBuilder feature(final CircleFeature feature) {
-        final JsonObjectBuilder object = Json.createObjectBuilder();
+        final JsonObjectBuilder object = JsonFactories.BUILDERS.createObjectBuilder();
         add(object, Constants.FIELD_NAME, feature.getName());
         if (feature.getVersion() != null) {
             object.add(Constants.FIELD_VERSION, feature.getVersion());
@@ -158,7 +158,7 @@ public final class SocketCodec {
     }
 
     private static JsonObjectBuilder entry(final Entry entry) {
-        final JsonObjectBuilder builder = Json.createObjectBuilder();
+        final JsonObjectBuilder builder = JsonFactories.BUILDERS.createObjectBuilder();
         add(builder, Constants.FIELD_ENTRY_ID, entry.getEntryId());
         add(builder, Constants.FIELD_CIRCLE_ID, entry.getCircleId());
         add(builder, Constants.FIELD_FEATURE, entry.getFeature());

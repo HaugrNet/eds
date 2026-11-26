@@ -230,10 +230,12 @@ public abstract class AbstractRequest implements Serializable {
 
     /**
      * <p>Checks if a URL is valid or not, it uses the URL methods to see if it
-     * is valid, and if not - the given error map is extended with the error
-     * information from the Exception thrown. The method is thus not logging ot
-     * re-throwing the exception, as the method is only intended as a
-     * pre-processing check.</p>
+     * is valid, and if not - the given error map is extended with a fixed
+     * message. The message of the Exception isn't used, as it repeats the
+     * URL, which may hold a secret (the MasterKey's source), and the answer
+     * is logged. The method is thus not logging or re-throwing the
+     * exception, as the method is only intended as a pre-processing
+     * check.</p>
      *
      * <p>The key for the error map, is the {@link Constants#FIELD_URL}, which
      * is the only EDS field holding a URL, and thus it is not a parameter to
@@ -251,11 +253,9 @@ public abstract class AbstractRequest implements Serializable {
             new URI(value).toURL();
         } catch (MalformedURLException | URISyntaxException | IllegalArgumentException e) {
             // SonarQube Warning java:S1166 - Ignored here
-            // The error information from the Exception is added to the
-            // error Object, which again is returned. Logging it here
-            // would be pointless, and thus the Sonar warning is ignored
-            // at this place.
-            errors.put(Constants.FIELD_URL, "The URL field is invalid - " + e.getMessage());
+            // Neither the Exception nor its message is passed on or
+            // logged: it repeats the URL, which may hold a secret.
+            errors.put(Constants.FIELD_URL, "The URL field is invalid.");
         }
     }
 

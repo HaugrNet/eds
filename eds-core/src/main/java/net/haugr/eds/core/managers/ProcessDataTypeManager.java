@@ -80,8 +80,7 @@ public final class ProcessDataTypeManager extends AbstractManager<CommonDao, Pro
             dao.save(entity);
         } else {
             entity = found;
-            throwConditionalException(Objects.equals(Constants.FOLDER_TYPENAME, entity.getName()) || Objects.equals(Constants.DATA_TYPENAME, entity.getName())
-                            || Objects.equals(Constants.THUMBNAIL_TYPENAME, entity.getName()) || Objects.equals(Constants.ENTRY_TYPENAME, entity.getName()),
+            throwConditionalException(isDefault(entity),
                     ReturnCode.AUTHORIZATION_WARNING, "It is not permitted to update the Data Type '" + entity.getName() + "'.");
 
             if (!Objects.equals(type, entity.getType())) {
@@ -100,15 +99,23 @@ public final class ProcessDataTypeManager extends AbstractManager<CommonDao, Pro
         return response;
     }
 
+    /** Whether the Data Type is one of the defaults, which are neither changed nor deleted. */
+    private static boolean isDefault(final DataTypeEntity entity) {
+        return Objects.equals(Constants.FOLDER_TYPENAME, entity.getName()) || Objects.equals(Constants.DATA_TYPENAME, entity.getName())
+                || Objects.equals(Constants.THUMBNAIL_TYPENAME, entity.getName()) || Objects.equals(Constants.ENTRY_TYPENAME, entity.getName());
+    }
+
     private ProcessDataTypeResponse doDelete(final ProcessDataTypeRequest request) {
         final String name = request.getTypeName().trim();
         final DataTypeEntity entity = dao.findDataTypeByName(name);
 
         throwConditionalNullException(entity,
                 ReturnCode.IDENTIFICATION_WARNING, "No records were found with the name '" + name + "'.");
-        // The features and the thumbnail endpoint create their objects when
-        // needed, so their types must stay.
-        throwConditionalException(Objects.equals(Constants.THUMBNAIL_TYPENAME, entity.getName()) || Objects.equals(Constants.ENTRY_TYPENAME, entity.getName()),
+        // The default types stay, as they can't be changed either: the
+        // features and the thumbnail endpoint create their objects when
+        // needed, and a Data Object or folder added without a type takes
+        // its default (ticket 15).
+        throwConditionalException(isDefault(entity),
                 ReturnCode.AUTHORIZATION_WARNING, "It is not permitted to delete the Data Type '" + entity.getName() + "'.");
 
         // We need to check that the Data Type is not being used. If so,

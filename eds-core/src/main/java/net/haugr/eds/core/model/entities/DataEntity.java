@@ -57,12 +57,6 @@ import jakarta.persistence.Table;
                 " d.sanityStatus = :status," +
                 " d.sanityChecked = :checked " +
                 "where d.id = :id")
-@NamedQuery(name = "data.deleteByCircle",
-        query = "delete from DataEntity d " +
-                "where d.metadata in (select m from MetadataEntity m where m.circle = :circle)")
-@NamedQuery(name = "data.deleteByMetadata",
-        query = "delete from DataEntity d " +
-                "where d.metadata = :metadata")
 @NamedQuery(name = "data.findChecksum",
         query = "select d.checksum " +
                 "from DataEntity d " +
@@ -181,6 +175,21 @@ public class DataEntity extends EDSEntity {
      */
     public byte[] getData() {
         return DataPart.join(parts);
+    }
+
+    /**
+     * The stored length of the encrypted data, from the parts in memory;
+     * for content given with {@link #setData(byte[])}, before it is saved.
+     *
+     * @return Length in bytes
+     */
+    public long storedLength() {
+        long length = 0;
+        for (final DataPart part : parts) {
+            length += part.getLength();
+        }
+
+        return length;
     }
 
     public void setChecksum(final String checksum) {

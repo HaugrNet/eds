@@ -16,7 +16,6 @@
  */
 package net.haugr.eds.core.features;
 
-import jakarta.json.Json;
 import jakarta.json.JsonArray;
 import jakarta.json.JsonException;
 import jakarta.json.JsonNumber;
@@ -34,6 +33,7 @@ import java.util.Set;
 import java.util.regex.Pattern;
 import net.haugr.eds.api.common.Constants;
 import net.haugr.eds.api.common.TrustLevel;
+import net.haugr.eds.core.JsonFactories;
 import net.haugr.eds.core.exceptions.VerificationException;
 
 /**
@@ -262,7 +262,7 @@ public final class FeatureDeclaration {
             throw new VerificationException("The declaration must be at most " + Constants.MAX_DECLARATION_LENGTH + " characters.");
         }
 
-        try (JsonReader reader = Json.createReader(new StringReader(text))) {
+        try (JsonReader reader = JsonFactories.READERS.createReader(new StringReader(text))) {
             return reader.readObject();
         } catch (JsonException | IllegalStateException e) {
             throw invalid("The declaration must be a JSON object.", e);

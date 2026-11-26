@@ -452,6 +452,14 @@ public enum ReturnCode {
     NETWORK_ERROR(Classification.CLASS_ERROR, 2, "Unable to communicate with the requested network service."),
 
     /**
+     * <b>HTTP Status Code 503 - Service Unavailable</b>.<br>
+     * <i>The stone is too busy to check a passphrase now: as many are checked
+     * at once as it allows ({@code eds.auth.concurrent.passphrases}), and no
+     * place came free in time. The request may be sent again shortly.</i>
+     */
+    SERVICE_BUSY(Classification.CLASS_ERROR, 3, "The stone is busy, try again shortly."),
+
+    /**
      * <b>HTTP Status Code 507 - Insufficient Storage</b>.<br>
      * <i>Storing the content would exceed the configured ceiling for all
      * stored content ({@code eds.data.max.total.size}).</i>

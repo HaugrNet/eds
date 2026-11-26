@@ -19,13 +19,15 @@ package net.haugr.eds.core.managers;
 import java.security.MessageDigest;
 import java.util.List;
 import jakarta.persistence.EntityManager;
+import jakarta.transaction.Status;
+import jakarta.transaction.Synchronization;
+import jakarta.transaction.TransactionSynchronizationRegistry;
 import net.haugr.eds.api.common.ReturnCode;
 import net.haugr.eds.api.requests.Authentication;
 import net.haugr.eds.api.requests.MasterKeyRequest;
 import net.haugr.eds.api.responses.MasterKeyResponse;
 import net.haugr.eds.core.enums.StandardSetting;
 import net.haugr.eds.core.exceptions.AuthenticationException;
-import net.haugr.eds.core.exceptions.CryptoException;
 import net.haugr.eds.core.exceptions.EDSException;
 import net.haugr.eds.core.jce.MasterKey;
 import net.haugr.eds.core.model.CommonDao;
@@ -58,6 +60,9 @@ public final class MasterKeyManager extends AbstractManager<CommonDao, MasterKey
     private static final String INVALID_CREDENTIALS = "Invalid credentials.";
 
     private final MasterKey masterKey = MasterKey.getInstance();
+    /** A rotated MasterKey, installed only once its transaction committed (ticket 13). */
+    private MasterKey.Material rotated = null;
+    private int rotatedVersion = 0;
 
     public MasterKeyManager(final Settings settings, final EntityManager entityManager) {
         super(settings, new CommonDao(entityManager));
@@ -136,8 +141,39 @@ public final class MasterKeyManager extends AbstractManager<CommonDao, MasterKey
 
         checkPermitted(request);
 
-        final byte[] rawSecret = readRawSecret(request);
-        return masterKey.isUnlocked() ? processUnlocked(request, rawSecret) : processLocked(request, rawSecret);
+        final MasterKeyResponse response;
+        if (masterKey.isUnlocked()) {
+            // The passphrase first: nothing is read from a URL for whoever
+            // doesn't know it (ticket 6).
+            checkPassphrase(findAdmin(request), request.getCredential(), INVALID_CREDENTIALS);
+            response = processUnlocked(request, readRawSecret(request));
+        } else {
+            response = processLocked(request, readSecretWhileLocked(request));
+        }
+
+        return response;
+    }
+
+    /**
+     * While EDS is locked, the passphrase can't be checked before the secret
+     * is read: the keys of the accounts are wrapped with the MasterKey. A
+     * source which can't be read is then answered as a wrong secret, so the
+     * answer tells nothing about files or hosts (ticket 6). The log tells
+     * the kind of the failure, without the URL (ticket 5). Only the refusal
+     * because other sources are being read is passed on as it is.
+     */
+    private static byte[] readSecretWhileLocked(final MasterKeyRequest request) {
+        try {
+            return readRawSecret(request);
+        } catch (EDSException e) {
+            if (MasterKey.SOURCES_BUSY.equals(e.getMessage())) {
+                // Depends on no URL, so it tells nothing; and the System
+                // Administrator must see why, not a wrong secret.
+                throw e;
+            }
+            LOGGER.warn("The MasterKey request's source could not be read while EDS is locked: {}", e.getMessage());
+            throw new AuthenticationException(INVALID_CREDENTIALS);
+        }
     }
 
     private MasterKeyResponse processLocked(final MasterKeyRequest request, final byte[] rawSecret) {
@@ -154,23 +190,27 @@ public final class MasterKeyManager extends AbstractManager<CommonDao, MasterKey
         }
 
         // The MasterKey is correct; the System Administrator must still
-        // authenticate, otherwise EDS stays locked.
-        final MemberEntity admin = findAdmin(request);
-        if (!canOpenKeys(admin, request.getCredential())) {
-            masterKey.lock();
-            throw new AuthenticationException(INVALID_CREDENTIALS);
+        // authenticate, otherwise EDS stays locked. It is locked again on any
+        // failure from here on, also one which isn't an EDS Exception (the
+        // count runs in transactions of its own), and also when the first
+        // account of a stone can't be made, so EDS is never left unlocked
+        // without the System Administrator's passphrase.
+        boolean authenticated = false;
+        try {
+            checkPassphrase(findAdmin(request), request.getCredential(), INVALID_CREDENTIALS);
+            authenticated = true;
+        } finally {
+            if (!authenticated) {
+                masterKey.lock();
+            }
         }
         updateMasterKeySetting(request);
 
         return new MasterKeyResponse(ReturnCode.SUCCESS, "MasterKey unlocked.");
     }
 
+    // The passphrase is checked before the secret is read, see perform.
     private MasterKeyResponse processUnlocked(final MasterKeyRequest request, final byte[] rawSecret) {
-        final MemberEntity admin = findAdmin(request);
-        if (!canOpenKeys(admin, request.getCredential())) {
-            throw new AuthenticationException(INVALID_CREDENTIALS);
-        }
-
         final MasterKey.Material material = MasterKey.derive(rawSecret);
         final MasterKeyResponse response;
 
@@ -212,7 +252,15 @@ public final class MasterKeyManager extends AbstractManager<CommonDao, MasterKey
         // Every Session ends: their outer layer is of the old MasterKey.
         dao.createNamedQuery("session.removeAll").executeUpdate();
 
-        for (final MemberEntity entity : dao.findAllAscending(MemberEntity.class, "id")) {
+        // The Members are locked, in the order of their IDs, before they are
+        // read: a new passphrase committed meanwhile would otherwise be
+        // overwritten by its old keys, wrapped anew (ticket 13). Then the
+        // Circles, before anything changes: a pending invitee goes with its
+        // invitations and Trustee rows, which the rotation of a Circle Secret
+        // changes under the lock of its Circle (ticket 1).
+        final List<MemberEntity> members = dao.lockMembers();
+        dao.lockCircles(dao.findAllAscending(CircleEntity.class, "id"));
+        for (final MemberEntity entity : members) {
             if (ProcessMemberManager.INVITATION_MARKER.equals(entity.getPrivateKey())) {
                 dao.delete(entity);
             } else {
@@ -224,8 +272,9 @@ public final class MasterKeyManager extends AbstractManager<CommonDao, MasterKey
 
         // No rotation of a Circle Secret may change a Trustee row meanwhile
         // (PLAN.md, Crypto C6), or one of the two would undo the other.
+        // The Trustees are read after the Circles are locked: one added while
+        // the rotation waited for its Circle is wrapped anew too.
         final List<TrusteeEntity> allTrustees = dao.findAllAscending(TrusteeEntity.class, "id");
-        dao.lockCircles(dao.findAllAscending(CircleEntity.class, "id"));
         allTrustees.forEach(dao::refresh);
         for (final TrusteeEntity trustee : allTrustees) {
             final String aad = TRUSTEE_OUTER_AAD + trusteeBinding(trustee.getCircle(), trustee.getMember(), trustee.getKey());
@@ -239,7 +288,46 @@ public final class MasterKeyManager extends AbstractManager<CommonDao, MasterKey
         }
 
         saveMasterKey(version, material.kcv());
-        masterKey.install(material, version);
+        // Installed when the transaction committed, not before: until then
+        // the rows are wrapped with the old MasterKey, for every other
+        // request, and a rollback leaves the old one in place (ticket 13).
+        rotated = material;
+        rotatedVersion = version;
+    }
+
+    /**
+     * Installs the MasterKey this request rotated to, once its transaction
+     * has committed: at once without a transaction of the container (the
+     * tests), not at all if the transaction is rolled back.
+     *
+     * @param transactions The registry of the transaction, or null
+     */
+    public void installAfterCommit(final TransactionSynchronizationRegistry transactions) {
+        final MasterKey.Material material = rotated;
+        if (material == null) {
+            return;
+        }
+        final int version = rotatedVersion;
+        rotated = null;
+        if (transactions == null) {
+            masterKey.install(material, version);
+        } else if (transactions.getTransactionStatus() == Status.STATUS_ACTIVE) {
+            transactions.registerInterposedSynchronization(new Synchronization() {
+                @Override
+                public void beforeCompletion() {
+                    // Nothing before.
+                }
+
+                @Override
+                public void afterCompletion(final int status) {
+                    if (status == Status.STATUS_COMMITTED) {
+                        masterKey.install(material, version);
+                    } else {
+                        LOGGER.warn("The MasterKey wasn't changed, as its transaction ended with the status {}.", status);
+                    }
+                }
+            });
+        }
     }
 
     private void setupMasterKey(final byte[] secret) {
@@ -290,21 +378,6 @@ public final class MasterKeyManager extends AbstractManager<CommonDao, MasterKey
 
         entity.setSetting(url);
         dao.save(entity);
-    }
-
-    private boolean canOpenKeys(final MemberEntity admin, final byte[] secret) {
-        boolean result = false;
-
-        try {
-            // If the Password Key can't unlock the Private Key, then a
-            // CryptoException is thrown, which we'll ignore here.
-            openMemberKeys(admin, secret);
-            result = true;
-        } catch (CryptoException e) {
-            LOGGER.debug("Decrypting the System Administrator Account failed: {}", e.getMessage(), e);
-        }
-
-        return result;
     }
 
     /**

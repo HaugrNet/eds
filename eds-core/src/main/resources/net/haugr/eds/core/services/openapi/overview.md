@@ -104,9 +104,13 @@ the `type` from `SocketFrameType`), with entries as the schema `Entry`. Each fra
 a JSON object in a text frame of at most 256 KiB; fields which don't apply are
 omitted, and `ref`, chosen by the client, is returned in the answer to the frame.
 
-1. The first frame must be `AUTH`, with the session as `token` (Base64), within 30
+1. The first frame must be `AUTH`, with the session as `token` (Base64), within 10
    seconds; EDS answers `READY` with the Member. Browsers can't send an
-   `Authorization` header on a WebSocket, hence the frame.
+   `Authorization` header on a WebSocket, hence the frame. Any other first frame, or
+   an AUTH which fails, is answered with `ERROR` (with its `ref`) and the connection
+   is closed: 1008 when the session or the frame is wrong, 1013 when EDS can't
+   check it now (e.g. it is locked). At most 256 connections may wait for their
+   AUTH at once; one more is closed at once (1013).
 2. `JOIN` with a `circleId` subscribes to the Circle (trust level `READ`); `JOINED`
    brings the `features` of the Circle with their state, and in `present` the IDs of
    the Members who are present in it. `LEAVE` ends it. A client may join all its
@@ -119,6 +123,8 @@ omitted, and `ref`, chosen by the client, is returned in the answer to the frame
    `kind`, `about`, `name`, `after`, `before`, `oldestFirst`, `limit` and `bare`) with
    `ENTRIES`; `COUNT` (optionally with `kind` and `after`) with `COUNTED`. A request
    which fails is answered with `ERROR`, the `returnCode` and the `returnMessage`.
+   A connection may change 100 entries at once, and 20 more each second; one more
+   is answered with `SERVICE_BUSY` (503).
    An entry whose content doesn't fit a frame is written with the Features operations.
 4. What changes in a joined Circle is told to every connection which joined it, once
    it is stored: `ADDED`, `CHANGED` and `REMOVED` with the `entry`, whichever
@@ -133,7 +139,8 @@ omitted, and `ref`, chosen by the client, is returned in the answer to the frame
    connections of that Member which joined the Circle; the sender may name themselves,
    to reach their other connections. It is neither stored nor answered. A feature must
    declare signals, with the least time between two of a connection (which may be 0);
-   one which comes sooner is dropped.
+   one which comes sooner is dropped. A connection may send 256 KiB of signals at
+   once, and 32 KiB more each second; a signal over that is dropped too.
 6. `FILES` with a `circleId` and a `dataId` is sent to the connections which joined
    the Circle, after its files changed: a Data Object was added, uploaded, updated,
    moved, copied or deleted, or got a thumbnail. Clients reload the files through the

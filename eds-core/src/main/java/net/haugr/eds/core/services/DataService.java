@@ -251,6 +251,10 @@ public class DataService {
 
         if (!download.isOk()) {
             final ReturnCode returnCode = ReturnCode.findReturnCode(download.error().getReturnCode());
+            if (CommonService.isError(returnCode)) {
+                LOGGER.warn("{} {} of the Data Object {} answered with {}: {}", withBody ? "GET" : "HEAD",
+                        Constants.REST_DATA_BASE + Constants.REST_DATA_CONTENT, dataId, returnCode, download.error().getReturnMessage());
+            }
             final Response.ResponseBuilder builder = Response.status((returnCode != null) ? returnCode.getHttpCode() : 500)
                     .type(CommonService.PRODUCES)
                     .entity(download.error());

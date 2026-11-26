@@ -23,6 +23,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.transaction.TransactionSynchronizationRegistry;
 import jakarta.transaction.Transactional;
 import net.haugr.eds.core.socket.AccessChange;
+import net.haugr.eds.api.common.Action;
 import net.haugr.eds.api.common.Constants;
 import net.haugr.eds.api.common.ReturnCode;
 import net.haugr.eds.api.requests.Authentication;
@@ -47,7 +48,10 @@ import net.haugr.eds.api.responses.ProcessTrusteeResponse;
 import net.haugr.eds.api.responses.SanityResponse;
 import net.haugr.eds.api.responses.SettingResponse;
 import net.haugr.eds.api.responses.VersionResponse;
+import java.util.function.BiFunction;
+import java.util.function.Supplier;
 import net.haugr.eds.core.exceptions.EDSException;
+import net.haugr.eds.core.managers.AbstractManager;
 import net.haugr.eds.core.managers.AuthenticatedManager;
 import net.haugr.eds.core.managers.FetchCircleManager;
 import net.haugr.eds.core.managers.FetchMemberManager;
@@ -84,14 +88,16 @@ public class ManagementBean {
     private final SchemaManager schemaManager;
     private final TransactionSynchronizationRegistry transactions;
     private final Event<AccessChange> accessChanges;
+    private final AuthLimitBean authLimit;
 
     public ManagementBean() {
         this(null, null, Settings.getInstance(), null, null);
     }
 
     @Inject
-    public ManagementBean(final EntityManager entityManager, final SchemaManager schemaManager, final TransactionSynchronizationRegistry transactions, final Event<AccessChange> accessChanges) {
-        this(entityManager, schemaManager, Settings.getInstance(), transactions, accessChanges);
+    public ManagementBean(final EntityManager entityManager, final SchemaManager schemaManager, final TransactionSynchronizationRegistry transactions,
+                          final Event<AccessChange> accessChanges, final AuthLimitBean authLimit) {
+        this(entityManager, schemaManager, Settings.getInstance(), transactions, accessChanges, authLimit);
     }
 
     public ManagementBean(final EntityManager entityManager, final Settings settings) {
@@ -108,24 +114,71 @@ public class ManagementBean {
 
     public ManagementBean(final EntityManager entityManager, final SchemaManager schemaManager, final Settings settings,
                           final TransactionSynchronizationRegistry transactions, final Event<AccessChange> accessChanges) {
+        this(entityManager, schemaManager, settings, transactions, accessChanges, new AuthLimitBean(entityManager, settings));
+    }
+
+    public ManagementBean(final EntityManager entityManager, final SchemaManager schemaManager, final Settings settings,
+                          final TransactionSynchronizationRegistry transactions, final Event<AccessChange> accessChanges, final AuthLimitBean authLimit) {
         this.entityManager = entityManager;
         this.schemaManager = schemaManager;
         this.settings = settings;
         this.transactions = transactions;
         this.accessChanges = accessChanges;
+        this.authLimit = authLimit;
     }
 
     /**
      * Lets the socket check its connections again, once the change is
      * committed (PLAN.md, L4): a change of Members, Circles, Trustees or
-     * the MasterKey may end a Session or the access to a Circle.
+     * the MasterKey may end a Session or the access to a Circle. A change
+     * of one Circle names it, so only the connections which joined it are
+     * checked (ticket 18).
      *
      * @param response The response of the change
+     * @param change   What changed, or null when nothing can end an access
      */
-    private void accessChange(final EDSResponse response) {
-        if ((accessChanges != null) && response.isOk()) {
-            accessChanges.fire(AccessChange.INSTANCE);
+    private void accessChange(final EDSResponse response, final AccessChange change) {
+        if ((accessChanges != null) && (change != null) && response.isOk()) {
+            accessChanges.fire(change);
         }
+    }
+
+    /**
+     * <p>Runs a Management request: invokes the business logic, and converts an
+     * EDS Exception into the typed error response. As the Exception never
+     * reaches the transaction interceptor, the transaction is marked
+     * rollback-only here, so partial writes are not committed.</p>
+     *
+     * <p>The manager counts the attempts at a passphrase (#68) with the
+     * {@link AuthLimitBean}, in transactions of their own, so the rollback of
+     * the request doesn't undo them.</p>
+     *
+     * @param request The request
+     * @param manager Makes the manager with the business logic to run
+     * @param onError Builds the typed error response from code and message
+     * @param <Q>     Request type
+     * @param <R>     Response type
+     * @return The response, successful or converted from an Exception
+     */
+    private <Q extends Authentication, R extends EDSResponse> R execute(final Q request, final Supplier<? extends AbstractManager<?, R, Q>> manager,
+                                                                        final BiFunction<ReturnCode, String, R> onError) {
+        R response;
+
+        try {
+            final AbstractManager<?, R, Q> logic = manager.get();
+            logic.limitAttempts(authLimit);
+            response = logic.perform(request);
+        } catch (EDSException e) {
+            // The Exception doesn't reach the transaction interceptor, so
+            // anything written before the failure must be rolled back here.
+            Transactions.markRollbackOnly(transactions);
+            // Any Warning or Error thrown by the EDS contain enough
+            // information, so it can be dealt with by the requesting System.
+            LOGGER.debug("The request failed.", e);
+            response = onError.apply(e.getReturnCode(), e.getMessage());
+        }
+
+        return response;
     }
 
     public VersionResponse version() {
@@ -155,31 +208,16 @@ public class ManagementBean {
     }
 
     public SettingResponse settings(final SettingRequest request) {
-        SettingResponse response;
-
-        try {
-            final SettingManager manager = new SettingManager(settings, entityManager);
-            response = manager.perform(request);
-        } catch (EDSException e) {
-            // The Exception doesn't reach the transaction interceptor, so
-            // anything written before the failure must be rolled back here.
-            Transactions.markRollbackOnly(transactions);
-            // Any Warning or Error thrown by the EDS contain enough
-            // information, so it can be dealt with by the requesting
-            // System. Logging the error is thus not needed, as all
-            // information is provided in the response.
-            LOGGER.debug(e.getMessage(), e);
-            response = new SettingResponse(e.getReturnCode(), e.getMessage());
-
+        return execute(request, () -> new SettingManager(settings, entityManager), (code, message) -> {
+            final SettingResponse response = new SettingResponse(code, message);
             // For the case that we have a settings warning, the current
             // settings should be returned, so it can be shown what they
             // currently are.
-            if (e.getReturnCode() == ReturnCode.SETTING_WARNING) {
+            if (code == ReturnCode.SETTING_WARNING) {
                 response.setSettings(SettingManager.convert(settings));
             }
-        }
-
-        return response;
+            return response;
+        });
     }
 
     /**
@@ -203,195 +241,55 @@ public class ManagementBean {
     }
 
     public MasterKeyResponse masterKey(final MasterKeyRequest request) {
-        MasterKeyResponse response;
-
-        try {
-            final MasterKeyManager manager = new MasterKeyManager(settings, entityManager);
-            response = manager.perform(request);
-        } catch (EDSException e) {
-            // The Exception doesn't reach the transaction interceptor, so
-            // anything written before the failure must be rolled back here.
-            Transactions.markRollbackOnly(transactions);
-            // Any Warning or Error thrown by the EDS contain enough
-            // information, so it can be dealt with by the requesting
-            // System. Logging the error is thus not needed, as all
-            // information is provided in the response.
-            LOGGER.debug(e.getMessage(), e);
-            response = new MasterKeyResponse(e.getReturnCode(), e.getMessage());
+        final MasterKeyManager manager = new MasterKeyManager(settings, entityManager);
+        final MasterKeyResponse response = execute(request, () -> manager, MasterKeyResponse::new);
+        if (response.isOk()) {
+            // A new MasterKey only once it is committed (ticket 13).
+            manager.installAfterCommit(transactions);
         }
-
-        accessChange(response);
+        accessChange(response, AccessChange.EVERYONE);
         return response;
     }
 
     public SanityResponse sanity(final SanityRequest request) {
-        SanityResponse response;
-
-        try {
-            final SanityManager manager = new SanityManager(settings, entityManager);
-            response = manager.perform(request);
-        } catch (EDSException e) {
-            // The Exception doesn't reach the transaction interceptor, so
-            // anything written before the failure must be rolled back here.
-            Transactions.markRollbackOnly(transactions);
-            // Any Warning or Error thrown by the EDS contain enough
-            // information, so it can be dealt with by the requesting
-            // System. Logging the error is thus not needed, as all
-            // information is provided in the response.
-            LOGGER.debug(e.getMessage(), e);
-            response = new SanityResponse(e.getReturnCode(), e.getMessage());
-        }
-
-        return response;
+        return execute(request, () -> new SanityManager(settings, entityManager), SanityResponse::new);
     }
 
     public AuthenticateResponse authenticated(final Authentication request) {
-        AuthenticateResponse response;
-
-        try {
-            final AuthenticatedManager manager = new AuthenticatedManager(settings, entityManager);
-            response = manager.perform(request);
-        } catch (EDSException e) {
-            // The Exception doesn't reach the transaction interceptor, so
-            // anything written before the failure must be rolled back here.
-            Transactions.markRollbackOnly(transactions);
-            // Any Warning or Error thrown by the EDS contain enough
-            // information, so it can be dealt with by the requesting
-            // System. Logging the error is thus not needed, as all
-            // information is provided in the response.
-            LOGGER.debug(e.getMessage(), e);
-            response = new AuthenticateResponse(e.getReturnCode(), e.getMessage());
-        }
-
-        return response;
+        return execute(request, () -> new AuthenticatedManager(settings, entityManager), AuthenticateResponse::new);
     }
 
     public FetchMemberResponse fetchMembers(final FetchMemberRequest request) {
-        FetchMemberResponse response;
-
-        try {
-            final FetchMemberManager manager = new FetchMemberManager(settings, entityManager);
-            response = manager.perform(request);
-        } catch (EDSException e) {
-            // The Exception doesn't reach the transaction interceptor, so
-            // anything written before the failure must be rolled back here.
-            Transactions.markRollbackOnly(transactions);
-            // Any Warning or Error thrown by the EDS contain enough
-            // information, so it can be dealt with by the requesting
-            // System. Logging the error is thus not needed, as all
-            // information is provided in the response.
-            LOGGER.debug(e.getMessage(), e);
-            response = new FetchMemberResponse(e.getReturnCode(), e.getMessage());
-        }
-
-        return response;
+        return execute(request, () -> new FetchMemberManager(settings, entityManager), FetchMemberResponse::new);
     }
 
     public ProcessMemberResponse processMember(final ProcessMemberRequest request) {
-        ProcessMemberResponse response;
-
-        try {
-            final ProcessMemberManager manager = new ProcessMemberManager(settings, entityManager);
-            response = manager.perform(request);
-        } catch (EDSException e) {
-            // The Exception doesn't reach the transaction interceptor, so
-            // anything written before the failure must be rolled back here.
-            Transactions.markRollbackOnly(transactions);
-            // Any Warning or Error thrown by the EDS contain enough
-            // information, so it can be dealt with by the requesting
-            // System. Logging the error is thus not needed, as all
-            // information is provided in the response.
-            LOGGER.debug(e.getMessage(), e);
-            response = new ProcessMemberResponse(e.getReturnCode(), e.getMessage());
-        }
-
-        accessChange(response);
+        final ProcessMemberResponse response = execute(request, () -> new ProcessMemberManager(settings, entityManager), ProcessMemberResponse::new);
+        // Creating and inviting an account end no access; a login may end
+        // the oldest Session of the account (eds.session.max.per.member).
+        final Action action = (request != null) ? request.getAction() : null;
+        accessChange(response, ((action == Action.CREATE) || (action == Action.INVITE)) ? null : AccessChange.EVERYONE);
         return response;
     }
 
     public FetchCircleResponse fetchCircles(final FetchCircleRequest request) {
-        FetchCircleResponse response;
-
-        try {
-            final FetchCircleManager manager = new FetchCircleManager(settings, entityManager);
-            response = manager.perform(request);
-        } catch (EDSException e) {
-            // The Exception doesn't reach the transaction interceptor, so
-            // anything written before the failure must be rolled back here.
-            Transactions.markRollbackOnly(transactions);
-            // Any Warning or Error thrown by the EDS contain enough
-            // information, so it can be dealt with by the requesting
-            // System. Logging the error is thus not needed, as all
-            // information is provided in the response.
-            LOGGER.debug(e.getMessage(), e);
-            response = new FetchCircleResponse(e.getReturnCode(), e.getMessage());
-        }
-
-        return response;
+        return execute(request, () -> new FetchCircleManager(settings, entityManager), FetchCircleResponse::new);
     }
 
     public ProcessCircleResponse processCircle(final ProcessCircleRequest request) {
-        ProcessCircleResponse response;
-
-        try {
-            final ProcessCircleManager manager = new ProcessCircleManager(settings, entityManager);
-            response = manager.perform(request);
-        } catch (EDSException e) {
-            // The Exception doesn't reach the transaction interceptor, so
-            // anything written before the failure must be rolled back here.
-            Transactions.markRollbackOnly(transactions);
-            // Any Warning or Error thrown by the EDS contain enough
-            // information, so it can be dealt with by the requesting
-            // System. Logging the error is thus not needed, as all
-            // information is provided in the response.
-            LOGGER.debug(e.getMessage(), e);
-            response = new ProcessCircleResponse(e.getReturnCode(), e.getMessage());
-        }
-
-        accessChange(response);
+        final ProcessCircleResponse response = execute(request, () -> new ProcessCircleManager(settings, entityManager), ProcessCircleResponse::new);
+        // A new Circle ends no access; the others name their Circle.
+        accessChange(response, ((request == null) || (request.getAction() == Action.CREATE)) ? null : AccessChange.of(request.getCircleId()));
         return response;
     }
 
     public FetchTrusteeResponse fetchTrustees(final FetchTrusteeRequest request) {
-        FetchTrusteeResponse response;
-
-        try {
-            final FetchTrusteeManager manager = new FetchTrusteeManager(settings, entityManager);
-            response = manager.perform(request);
-        } catch (EDSException e) {
-            // The Exception doesn't reach the transaction interceptor, so
-            // anything written before the failure must be rolled back here.
-            Transactions.markRollbackOnly(transactions);
-            // Any Warning or Error thrown by the EDS contain enough
-            // information, so it can be dealt with by the requesting
-            // System. Logging the error is thus not needed, as all
-            // information is provided in the response.
-            LOGGER.debug(e.getMessage(), e);
-            response = new FetchTrusteeResponse(e.getReturnCode(), e.getMessage());
-        }
-
-        return response;
+        return execute(request, () -> new FetchTrusteeManager(settings, entityManager), FetchTrusteeResponse::new);
     }
 
     public ProcessTrusteeResponse processTrustee(final ProcessTrusteeRequest request) {
-        ProcessTrusteeResponse response;
-
-        try {
-            final ProcessTrusteeManager manager = new ProcessTrusteeManager(settings, entityManager);
-            response = manager.perform(request);
-        } catch (EDSException e) {
-            // The Exception doesn't reach the transaction interceptor, so
-            // anything written before the failure must be rolled back here.
-            Transactions.markRollbackOnly(transactions);
-            // Any Warning or Error thrown by the EDS contain enough
-            // information, so it can be dealt with by the requesting
-            // System. Logging the error is thus not needed, as all
-            // information is provided in the response.
-            LOGGER.debug(e.getMessage(), e);
-            response = new ProcessTrusteeResponse(e.getReturnCode(), e.getMessage());
-        }
-
-        accessChange(response);
+        final ProcessTrusteeResponse response = execute(request, () -> new ProcessTrusteeManager(settings, entityManager), ProcessTrusteeResponse::new);
+        accessChange(response, (request != null) ? AccessChange.of(request.getCircleId()) : null);
         return response;
     }
 }

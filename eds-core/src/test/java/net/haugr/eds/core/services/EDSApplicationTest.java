@@ -29,6 +29,6 @@ final class EDSApplicationTest {
     @Test
     void testApplication() {
         final EDSApplication application = new EDSApplication();
-        assertEquals(16, application.getClasses().size());
+        assertEquals(17, application.getClasses().size());
     }
 }

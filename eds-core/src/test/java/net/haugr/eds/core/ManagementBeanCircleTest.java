@@ -45,6 +45,8 @@ import net.haugr.eds.api.responses.ProcessTrusteeResponse;
 import net.haugr.eds.core.setup.DatabaseSetup;
 import net.haugr.eds.core.enums.StandardSetting;
 import net.haugr.eds.core.model.Settings;
+import net.haugr.eds.core.model.entities.CircleEntity;
+import net.haugr.eds.core.rotation.CircleRotations;
 import net.haugr.eds.core.socket.AccessChange;
 import java.util.UUID;
 
@@ -68,14 +70,77 @@ final class ManagementBeanCircleTest extends DatabaseSetup {
         create.setCircleName("announced");
         final ProcessCircleResponse created = bean.processCircle(create);
         assertTrue(created.isOk(), created.getReturnMessage());
-        assertEquals(List.of(AccessChange.INSTANCE), announced);
+        // A new Circle ends no access, so the socket isn't told (ticket 18).
+        assertEquals(List.of(), announced);
 
-        // The same name again fails, and isn't announced.
+        // A change of it names it, so only its connections are checked.
+        final ProcessCircleRequest update = prepareRequest(ProcessCircleRequest.class, MEMBER_1);
+        update.setAction(Action.UPDATE);
+        update.setCircleId(created.getCircleId());
+        update.setCircleName("announced again");
+        final ProcessCircleResponse updated = bean.processCircle(update);
+        assertTrue(updated.isOk(), updated.getReturnMessage());
+        assertEquals(List.of(AccessChange.of(created.getCircleId())), announced);
+
+        // The name of another Circle fails, and isn't announced.
         final ProcessCircleRequest again = prepareRequest(ProcessCircleRequest.class, MEMBER_1);
-        again.setAction(Action.CREATE);
-        again.setCircleName("announced");
+        again.setAction(Action.UPDATE);
+        again.setCircleId(created.getCircleId());
+        again.setCircleName(CIRCLE_2);
         assertFalse(bean.processCircle(again).isOk());
         assertEquals(1, announced.size());
+    }
+
+    @Test
+    void testEachChangeNamesWhatItMayEnd() {
+        final List<Object> announced = new ArrayList<>();
+        final ManagementBean bean = new ManagementBean(entityManager, settings, null, announcer(announced));
+
+        // A new account ends no access.
+        final ProcessMemberRequest create = prepareRequest(ProcessMemberRequest.class, Constants.ADMIN_ACCOUNT);
+        create.setAction(Action.CREATE);
+        create.setNewAccountName("announced member");
+        create.setNewCredential(credentialOf("announced member"));
+        assertTrue(bean.processMember(create).isOk());
+        assertEquals(List.of(), announced);
+
+        // A login may end another Session of the account: everyone.
+        final ProcessMemberRequest login = prepareRequest(ProcessMemberRequest.class, MEMBER_2);
+        login.setAction(Action.LOGIN);
+        assertTrue(bean.processMember(login).isOk());
+        assertEquals(List.of(AccessChange.EVERYONE), announced);
+
+        // A change of a Trustee names its Circle.
+        final ProcessTrusteeRequest alter = prepareRequest(ProcessTrusteeRequest.class, MEMBER_1);
+        alter.setAction(Action.ALTER);
+        alter.setCircleId(CIRCLE_1_ID);
+        alter.setMemberId(MEMBER_2_ID);
+        alter.setTrustLevel(TrustLevel.READ);
+        assertTrue(bean.processTrustee(alter).isOk());
+        assertEquals(List.of(AccessChange.EVERYONE, AccessChange.of(CIRCLE_1_ID)), announced);
+    }
+
+    @Test
+    void testADeletedCircleIsNoLongerWaitedFor() {
+        // Ticket 2: a rotation put off for a Circle is forgotten with it.
+        final ManagementBean bean = prepareManagementBean();
+        final ProcessCircleRequest create = prepareRequest(ProcessCircleRequest.class, MEMBER_1);
+        create.setAction(Action.CREATE);
+        create.setCircleName("put off");
+        final ProcessCircleResponse created = bean.processCircle(create);
+        assertTrue(created.isOk(), created.getReturnMessage());
+        final long circle = dao.find(CircleEntity.class, created.getCircleId()).getId();
+        CircleRotations.retryLater(circle);
+        try {
+            assertTrue(CircleRotations.isWaiting(circle));
+            final ProcessCircleRequest delete = prepareRequest(ProcessCircleRequest.class, MEMBER_1);
+            delete.setAction(Action.DELETE);
+            delete.setCircleId(created.getCircleId());
+            assertTrue(bean.processCircle(delete).isOk());
+            assertFalse(CircleRotations.isWaiting(circle));
+        } finally {
+            CircleRotations.forget(circle);
+        }
     }
 
     @Test

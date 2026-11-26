@@ -2,8 +2,9 @@
 
 Project: EDS (Encrypted Data Share), https://github.com/HaugrNet/eds
 
-Status: planned 2026-11-15, nothing built. Discussed and decided with the user the
-same day; what is still to decide is listed under "Open decisions".
+Status: planned 2026-11-15 and built from then (E1 and E2 here; E3–E6 in `RUNE.md`
+and `TOLK.md`); names hidden since 2026-11-21. Discussed and decided with the user;
+what is still to decide is listed under "Open decisions".
 
 This plan crosses the three parts of EDS. `PLAN.md` (the backend), `RUNE.md` and
 `TOLK.md` stay the plans of their parts; for end-to-end encryption they refer to
@@ -135,7 +136,7 @@ What the clients may want later, and where it would live:
 | A key per device instead of per Member | nothing: `publicKey` and `secret` can hold several |
 | A passphrase for the vault | nothing: the vault is the client's |
 | Signed lists of Members | nothing: they fit in the Circle's shared value |
-| Hidden file and folder names | done 2026-11-21 (see "Names"): the client encrypts the name in its place; the stone's name column was widened to hold the ciphertext, and still only stores it. Since 2026-11-22 the stone keeps names unique by a Name Key the client sends (see "Names") |
+| Hidden file and folder names | done 2026-11-21 (see "Names"): the client encrypts the name in its place; the stone's name column was widened to hold the ciphertext, and still only stores it. Since 2026-11-22 the stone can keep names unique by a Name Key the client sends (see "Names"); Rune and Tolk don't send it yet |
 | Content bound to its Data Object | nothing: a matter of the content format |
 | Playing video while it is fetched | nothing: ranges of ciphertext are served today |
 
@@ -320,7 +321,7 @@ padding. `HKDF` is HKDF-SHA-512 to 32 bytes; without a salt it uses its default.
 (16)`, the nonce random. Labels start with `eds-e2e/v1/`. JSON is written without
 blanks; readers take any order of fields and pass over fields they don't know.
 The independent implementation is `eds-quarkus/src/main/webui/vectors/e2e-v1.py`,
-its vectors are `src/e2e/vectors.json` beside it.
+its vectors are `eds-quarkus/src/main/webui/src/e2e/vectors.json`.
 
 **The Member's keys**
 
@@ -510,7 +511,7 @@ Done 2026-11-15, after N1 (several sessions, `PLAN.md`):
 - Differs from the plan: the old chat is left alone (it becomes a feature, `FEATURES.md`),
   so "the chat passes a text through unchanged" wasn't checked. The pointers to this
   file are in `PLAN.md`, `RUNE.md` and `TOLK.md`.
-- Left for the clients: Rune and Tolk don't use the new fields yet.
+- Left for the clients then: Rune and Tolk use the new fields since E3–E6.
 
 ### Phase E2: the convention
 
@@ -588,19 +589,17 @@ All 2026-11-15, the user:
 
 ## Open decisions
 
-- **Playing while fetching** in a chamber, through the service worker, so a video
-  starts at once: later, in Rune only.
-- **Names.** Hiding file and folder names, with a list kept by the clients; not in
-  version 1.
+- **Room names:** whether to hide them (`SECURITY.md`, "Open"). File and folder
+  names are hidden since 2026-11-21 (see "Names").
 - **A passphrase for the vault** instead of the recovery key, for people who would
   rather remember than keep something: weaker against a copy of the database, so
   not offered in version 1.
 - **Signed lists of Members,** so a client needn't trust the stone's directory at
   all: later, if fingerprints prove too little.
-- **Certificate pinning** for a stone on an unusual host: the link could carry the
-  certificate's fingerprint for Tolk and a phone app. A topic of its own.
 - **Whether the stone should refuse** its own copy between Circles when one has a
   shared value: decided no for now, as EDS doesn't interpret.
+- Improvements (playing a video while it is fetched, certificate pinning) are
+  tickets in `FINDINGS.md`.
 
 ## Follow-up: features
 

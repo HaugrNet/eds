@@ -43,10 +43,11 @@ import net.haugr.eds.core.enums.Status;
 import net.haugr.eds.core.exceptions.AuthorizationException;
 import net.haugr.eds.core.exceptions.EDSException;
 import net.haugr.eds.core.model.DataDao;
-import net.haugr.eds.core.model.EncryptedDataStore;
 import net.haugr.eds.core.model.SchemaManager;
 import net.haugr.eds.core.model.Settings;
 import net.haugr.eds.core.model.entities.StatusKeyEntity;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <p>Business logic of the status of a stone (STATUS.md): the status keys,
@@ -61,6 +62,20 @@ import net.haugr.eds.core.model.entities.StatusKeyEntity;
  * @since EDS 2.0
  */
 public final class StatusManager extends AbstractManager<DataDao, EDSResponse, Authentication> {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(StatusManager.class);
+
+    // The Circles whose stored bytes differ from the sum of their parts, or
+    // which have no row of them (-1); in one statement, so both are read from
+    // the same state of the database.
+    private static final String DIFFERING_TOTALS = "SELECT c.id, COALESCE(s.stored_bytes, -1), COALESCE(SUM(p.part_length), 0) FROM eds_circles c "
+            + "LEFT JOIN eds_circle_storage s ON s.circle_id = c.id "
+            + "LEFT JOIN eds_metadata m ON m.circle_id = c.id "
+            + "LEFT JOIN eds_data d ON d.metadata_id = m.id "
+            + "LEFT JOIN eds_data_parts p ON p.data_id = d.id "
+            + "GROUP BY c.id, s.stored_bytes "
+            + "HAVING COALESCE(s.stored_bytes, -1) <> COALESCE(SUM(p.part_length), 0) "
+            + "ORDER BY c.id";
 
     /** The parameter of the queries of the rotations of Circle Secrets. */
     private static final String RETIRING = "retiring";
@@ -231,10 +246,11 @@ public final class StatusManager extends AbstractManager<DataDao, EDSResponse, A
      */
     public Map<String, Double> inventory() {
         final Map<String, Double> values = new LinkedHashMap<>();
-        final long[] storage = dao.withConnection(connection ->
-                new long[] { EncryptedDataStore.totalLength(connection, -1), SchemaManager.ceiling(settings, connection) });
-        values.put("storageUsed", (double) storage[0]);
-        values.put("storageCeiling", (double) storage[1]);
+        // The storage in use is the sum of the Circles' totals, as the
+        // ceiling has it (PLAN.md, Streaming, "The storage ceiling").
+        values.put("storageUsed", (double) dao.storedBytes());
+        values.put("storageCeiling", (double) dao.withConnection(connection -> SchemaManager.ceiling(settings, connection)));
+        checkStoredBytes();
         values.put("accounts", count("select count(m.id) from MemberEntity m where m.invitationExpire is null"));
         values.put("circles", count("select count(c.id) from CircleEntity c"));
         values.put("files", count("select count(m.id) from MetadataEntity m where m.type.name not in ('folder', 'thumbnail', 'entry')"));
@@ -261,6 +277,28 @@ public final class StatusManager extends AbstractManager<DataDao, EDSResponse, A
                 .getSingleResult());
 
         return values;
+    }
+
+    /**
+     * Compares the stored bytes of each Circle with the sum of the parts of
+     * its objects, and warns of each which differs. A difference is a path
+     * which adds or removes parts without changing the total. Nothing is
+     * corrected: a correction here would race the writers.
+     *
+     * @return Number of Circles whose total differs
+     */
+    public int checkStoredBytes() {
+        return dao.withConnection(connection -> {
+            int differing = 0;
+            try (Statement statement = connection.createStatement(); ResultSet result = statement.executeQuery(DIFFERING_TOTALS)) {
+                while (result.next()) {
+                    differing++;
+                    LOGGER.warn("The stored bytes of the Circle with the internal id {} are {}, but the parts of its objects have {} bytes.",
+                            result.getLong(1), result.getLong(2), result.getLong(3));
+                }
+            }
+            return differing;
+        });
     }
 
     private double count(final String jpql) {

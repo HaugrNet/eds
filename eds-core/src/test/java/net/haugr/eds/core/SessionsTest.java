@@ -115,7 +115,8 @@ final class SessionsTest extends DatabaseSetup {
         final byte[] first = login(bean, MEMBER_1);
         final byte[] second = login(bean, MEMBER_1);
 
-        final ProcessMemberRequest invalidate = prepareSessionRequest(ProcessMemberRequest.class, first);
+        // Invalidating needs the passphrase (ticket 7).
+        final ProcessMemberRequest invalidate = prepareRequest(ProcessMemberRequest.class, MEMBER_1);
         invalidate.setAction(Action.INVALIDATE);
         assertTrue(bean.processMember(invalidate).isOk());
 

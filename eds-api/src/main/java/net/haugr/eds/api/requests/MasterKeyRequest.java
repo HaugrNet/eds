@@ -71,7 +71,9 @@ public final class MasterKeyRequest extends Authentication {
     private byte[] secret = null;
 
     /** The Secret as URL. */
-    @Schema(description = "URL to read the MasterKey secret from, instead of sending the secret.", examples = { "https://keys.example.com/eds-masterkey" })
+    @Schema(description = "URL to read the MasterKey secret from, instead of sending the secret: a file: URL without a host "
+            + "(a regular file) or an https: URL (200, no redirects); at most 16 KiB, read within 10 seconds.",
+            examples = { "https://keys.example.com/eds-masterkey" })
     @JsonbProperty(value = Constants.FIELD_URL)
     @JsonbNillable
     private String url = null;

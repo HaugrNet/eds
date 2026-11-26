@@ -21,6 +21,9 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import net.haugr.eds.core.model.entities.CircleEntity;
 import net.haugr.eds.core.model.entities.CircleFeatureEntity;
 import net.haugr.eds.core.model.entities.EntryEntity;
@@ -110,6 +113,25 @@ public final class FeatureDao extends DataDao {
         return (id != null) ? entityManager.find(EntryEntity.class, id) : null;
     }
 
+    /**
+     * The external IDs of the entries of the given internal IDs, in one
+     * query.
+     *
+     * @param ids Internal IDs of entries
+     * @return The external ID of each entry found, by its internal ID
+     */
+    public Map<Long, String> findEntryExternalIds(final Collection<Long> ids) {
+        final Map<Long, String> found = HashMap.newHashMap(ids.size());
+        if (!ids.isEmpty()) {
+            for (final Object[] row : entityManager.createQuery("select e.id, e.metadata.externalId from EntryEntity e where e.id in :ids", Object[].class)
+                    .setParameter("ids", ids)
+                    .getResultList()) {
+                found.put((Long) row[0], (String) row[1]);
+            }
+        }
+        return found;
+    }
+
     public EntryEntity findEntryByMetadata(final MetadataEntity metadata) {
         return first(entityManager.createQuery(ENTRIES + " where e.metadata = :metadata", EntryEntity.class)
                 .setParameter("metadata", metadata));
@@ -126,7 +148,7 @@ public final class FeatureDao extends DataDao {
      * @param aboutId    Internal ID of the entry it is about, or null for any
      * @return The entry, or null if the Member has none
      */
-    public EntryEntity findOwnEntry(final CircleFeatureEntity circleFeature, final String kind, final java.util.Collection<String> ownerTags, final Long aboutId) {
+    public EntryEntity findOwnEntry(final CircleFeatureEntity circleFeature, final String kind, final Collection<String> ownerTags, final Long aboutId) {
         final TypedQuery<EntryEntity> query = entityManager.createQuery((aboutId != null) ? FIND_OWN_ENTRY_ABOUT : FIND_OWN_ENTRY, EntryEntity.class)
                 .setParameter(FEATURE, circleFeature)
                 .setParameter("kind", kind)

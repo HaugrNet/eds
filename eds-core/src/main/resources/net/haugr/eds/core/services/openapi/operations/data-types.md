@@ -1,6 +1,6 @@
 ## POST /dataTypes/processDataType
 permission: PROCESS_DATA_TYPE
-- AUTHORIZATION_WARNING: The type is `data` or `folder`, which can't be changed.
+- AUTHORIZATION_WARNING: The Member isn't an administrator, or the type is one of the defaults (`data`, `folder`, `thumbnail`, `entry`), which can't be changed.
 
 **Fields:**
 
@@ -9,11 +9,12 @@ permission: PROCESS_DATA_TYPE
 | `typeName` | yes | Up to 75 characters. An existing name updates that type, a new one creates it. |
 | `type` | yes | The definition, up to 256 characters. |
 
-Requires the trust level `WRITE` in at least one Circle. Data Types are shared by
-all Circles. Returns the stored type in `dataType`.
+Only administrators may change Data Types, as they are shared by all Circles.
+Returns the stored type in `dataType`.
 
 ## POST /dataTypes/deleteDataType
 permission: PROCESS_DATA_TYPE
+- AUTHORIZATION_WARNING: The Member isn't an administrator, or the type is one of the defaults (`data`, `folder`, `thumbnail`, `entry`), which can't be deleted.
 - IDENTIFICATION_WARNING: No Data Type with the name exists.
 - ILLEGAL_ACTION: The type is still used by Data Objects.
 
@@ -23,8 +24,8 @@ permission: PROCESS_DATA_TYPE
 |---|---|---|
 | `typeName` | yes | The Data Type to delete. |
 
-Requires the trust level `WRITE` in at least one Circle. Only unused types can be
-deleted; `folder` is always in use (every Circle has a root folder).
+Only administrators may delete Data Types. Only unused types can be deleted, and
+never the defaults.
 
 ## POST /dataTypes/fetchDataTypes
 permission: FETCH_DATA_TYPE

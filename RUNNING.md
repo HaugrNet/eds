@@ -88,8 +88,11 @@ java -Dquarkus.config.locations=/path/to/application.properties \
 | `EDS_DB_USERNAME` | eds_user | PostgreSQL user |
 | `EDS_DB_PASSWORD` | (empty) | PostgreSQL password |
 | `EDS_DB_RETRY_INTERVAL` | 10s | How often to retry, while PostgreSQL cannot be reached |
-| `EDS_MASTERKEY_URL` / `eds.masterkey.url` | (none, locked) | URL of the MasterKey source (e.g. `file:///run/secrets/eds-masterkey`), read at startup. Without it, EDS stays locked until it is unlocked with the MasterKey request; see below |
+| `EDS_MASTERKEY_URL` / `eds.masterkey.url` | (none, locked) | URL of the MasterKey source (e.g. `file:///run/secrets/eds-masterkey`), read at startup: a `file:` URL without a host, or `https:` (no redirects), of at most 16 KiB, read within 10 s. Without it, EDS stays locked until it is unlocked with the MasterKey request; see below |
 | `quarkus.http.port` | 8080 | HTTP port |
+| `EDS_TLS_CERT`, `EDS_TLS_KEY` | (none) | The certificate and its key, as files; with them, EDS serves HTTPS |
+| `quarkus.http.ssl-port` | 8443 | HTTPS port |
+| `EDS_INSECURE_REQUESTS` | `enabled` | Plain HTTP beside HTTPS: `enabled`, `redirect` or `disabled` |
 | (fixed in the code) | `/api/v1` | The REST API and the WebSocket are below `/api/v1` (`Constants.REST_API`). There is no context path; put a reverse proxy in front for another layout |
 | `quarkus.management.port` | 9000 | Management port, with the health endpoints |
 
@@ -98,8 +101,20 @@ java -Dquarkus.config.locations=/path/to/application.properties \
 Large Data Objects are uploaded and downloaded as raw streams
 (`PUT`/`GET /data/{dataId}/content`, up to `eds.stream.max.object.size`, default
 1000 MiB). The JSON `data` field is limited to `eds.data.max.inline.size` (default
-10 MiB). `quarkus.http.limits.max-body-size` (1100M) must allow the maximum object
-size. The streaming settings are EDS settings, changed with the settings request:
+10 MiB).
+
+The size of a request body:
+- The uploads of content and thumbnails (`PUT /data/{dataId}/content`,
+  `PUT /data/{dataId}/thumbnail`) are limited by their endpoints and by
+  `quarkus.http.limits.max-body-size` (1100M), which must allow
+  `eds.stream.max.object.size`.
+- Every other request has a body of at most 16 MiB, or the Base64 of
+  `eds.data.max.inline.size` plus 1 MiB if that is more. `Content-Length` is
+  checked before anything is read: over the limit is answered with 413, a chunked
+  body (HTTP/1.1) with 411. An HTTP/2 body without a length is counted while it is
+  read, and answered with 413 once it passes the limit.
+
+The streaming settings are EDS settings, changed with the settings request:
 
 | Setting | Default | Description |
 |---------|---------|-------------|
@@ -137,7 +152,12 @@ The MasterKey is the kill-switch of EDS: everything stored is protected by it,
 and it is never stored. EDS derives it at startup from the content of
 `EDS_MASTERKEY_URL` (environment), the system property `eds.masterkey.url`, or the
 `eds.masterkey.url` setting, in that order. The content must be a high-entropy
-secret (at least 15 characters, an estimated 128 bits or more). The database only
+secret (at least 15 characters, an estimated 128 bits or more). The source is a
+`file:` URL without a host (a regular file, not a device or a pipe; symbolic links
+are followed), or an `https:` URL, whose answer must be 200 without a redirect. It
+may hold at most 16 KiB and must be read within 10 seconds, the TLS handshake
+included; at most two sources are read at the same time. A source which doesn't
+meet this leaves EDS locked, and the log says why, without the URL. The database only
 holds a key check value, so a wrong source is detected at startup. There is no
 default MasterKey: without a valid source, EDS stays locked, and requests fail with
 CRYPTO_ERROR (591) until the System Administrator unlocks it with the MasterKey
@@ -159,13 +179,29 @@ invitations into a Circle are deleted when its secret is rotated.
 
 | Setting | Default | Description |
 |---------|---------|-------------|
-| `eds.circle.secret.rotation.days` | 365 | Days from a new Circle, or the end of a rotation, until the next; `0` rotates only after a removal or when asked. A change applies from a Circle's next rotation on |
+| `eds.circle.secret.rotation.days` | 365 | Days from a new Circle, or the end of a rotation, until the next, 0 to 36500; `0` rotates only after a removal or when asked. A change applies from a Circle's next rotation on |
 | `eds.circle.secret.rotation.threads` | 2 | Data Objects re-encrypted at a time by the rotation of a Circle, 1 to 64 |
 
 A rotation re-encrypts every Data Object of the Circle, so it costs about as much as
 reading and writing all of it once. Each object is re-encrypted in its own row, so
 the database needs room for the objects re-encrypted at a time once more (on
 PostgreSQL until VACUUM gives back the old rows), not for the Circle twice.
+
+### Checking Passphrases
+
+A passphrase is checked with PBKDF2, which costs about a fifth of a CPU-second.
+The stone checks only so many at once; a request which finds no place in time is
+answered `SERVICE_BUSY` (503) and may be sent again. With
+`eds.auth.max.failed.attempts` above 0, too many failed attempts lock an account
+for a while; the lock heals itself, and a new passphrase clears it.
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `eds.auth.concurrent.passphrases` | 0 | Passphrases checked at once, 0 to 1024; `0` is half the processors, at least one |
+| `eds.auth.passphrase.wait.millis` | 2000 | How long a request waits for a place, 0 to 60000 ms |
+| `eds.auth.max.failed.attempts` | 0 | Failed attempts within the window before the account is locked, 0 to 1000; `0` switches the lock off |
+| `eds.auth.failed.window.minutes` | 15 | The window in which failed attempts are counted, 1 to 1440 |
+| `eds.auth.lockout.minutes` | 15 | How long the lock lasts, 1 to 1440 |
 
 ### The System Administrator
 
@@ -195,7 +231,9 @@ stone's users, rooms and settings: they create and delete users, but can't creat
 an administrator, change anyone's role, or delete an administrator.
 
 - **Making one.** The first System Administrator creates the account with a
-  passphrase and the role of an administrator, or makes an existing user one. The same
+  passphrase and the role of an administrator (Rune: "New user", Tolk:
+  `tolk user new <name> --admin`), or makes an existing user one (Rune: "Make
+  administrator" under the user, Tolk: `tolk user role <name> admin`). The same
   takes the role back.
 - **Invitations make users, always.** An invitation link can fall into the wrong
   hands, so the stone refuses one which asks for an administrator. A person who is
@@ -238,6 +276,9 @@ EDS_TLS_KEY=/app/certs/tls.key
 EDS_INSECURE_REQUESTS=enabled
 ```
 
+The same variables can also be set in the environment of `eds.sh`, which then
+take precedence over the file.
+
 Inside the container, `localhost` is the container itself. For a PostgreSQL
 running on the host, use `host.containers.internal`, which Podman maps to the
 host. Connections to it don't reach services that only listen on the loopback
@@ -247,6 +288,67 @@ matching entry in `pg_hba.conf`).
 
 On systems with SELinux, like RHEL, the log and certificate mounts are
 relabelled for the container.
+
+### Control Script
+
+The container is managed with `eds.sh` from the project root:
+
+```bash
+./eds.sh build            # Build EDS and the stone alone, and their container images
+./eds.sh build stone      # Only the stone alone, and its container image
+./eds.sh start            # Start the container, wait until ready
+./eds.sh start stone      # The same with the stone alone
+./eds.sh stop             # Stop the container
+./eds.sh stop --remove    # Remove the container and both images
+./eds.sh restart          # Stop and start, e.g. after a new build
+./eds.sh status           # Build, health and version of the container
+./eds.sh logs             # Follow the container logs
+```
+
+`build` takes `eds` and `stone` to build only those, and `--test`
+to also run the tests. With the tests of `eds`, SonarQube analyses the code too, and
+the build fails unless its quality gate passes, so anything new it finds is resolved
+before a commit. The scanner takes the server and the token from `SONAR_HOST_URL`
+and `SONAR_TOKEN`, and the proxy from `HTTPS_PROXY`; `--no-sonar` leaves it out.
+`start` builds the container image first, if it is missing
+or was not built from the present JAR.
+
+### The Stone Alone
+
+The stone alone is EDS built as the server alone, with a JAR and a container image
+of its own (the Maven property `stone`):
+
+| | JAR | Image | Serves |
+|---|---|---|---|
+| The stone alone | `eds-quarkus/target/eds-stone.jar` | `eds-stone:local` | the API below `/api/v1` |
+
+```bash
+./eds.sh build stone                       # The JAR and the image
+./eds.sh start stone                       # Run it
+mvn -Dstone -pl eds-quarkus package        # Or the JAR with Maven alone
+```
+
+It is run and set up as EDS is, and takes the same settings; it is what a host
+runs (below).
+
+The MasterKey (see MasterKey above) can be handled with it too:
+
+```bash
+./eds.sh masterkey generate     # Random secret in accessories/podman/masterkey
+./eds.sh start --masterkey      # Start EDS with that file as its MasterKey source
+./eds.sh masterkey load         # Or: send it to a running, locked EDS as admin
+```
+
+`masterkey generate` writes 48 random bytes, Base64-encoded, to the file (mode 600,
+ignored by Git), and never replaces an existing file without `--force`, as data
+protected by the old MasterKey can't be opened any more. Keep a safe copy of it.
+`EDS_MASTERKEY_FILE` names another file. `start --masterkey` mounts the file
+read-only into the container and sets `EDS_MASTERKEY_URL` to it. `masterkey load`
+asks for the System Administrator's account name and passphrase (or takes
+`EDS_ADMIN_ACCOUNT` and `EDS_ADMIN_PASSPHRASE`); on a new EDS, the name and the
+passphrase given become those of the System Administrator (see below), and the
+passphrase must meet the strength rules (e.g. 20 random characters). The secret and the
+passphrase are sent through stdin, so they don't show in the process list.
 
 ### Health Checks
 
@@ -273,6 +375,304 @@ mount, `accessories/podman/logs/` (`eds.log`). The `eds` user of the image
 `start` always creates a new container, from the current image and
 configuration.
 
+## Setting Up a Stone on a Host
+
+This is the whole way from an empty host to a stone which runs, keeps its data
+in PostgreSQL, is reached over HTTPS and starts with the host. It runs the image
+of the stone alone, `eds-stone:local`, saved as the archive `eds-stone.tar`.
+
+The host needs nothing of the EDS sources: one image and the script `stone`
+(`accessories/podman/stone`), which sets up and controls the container. The
+script runs as a normal user, with rootless Podman. It never asks for root and
+never calls `sudo`, and refuses to run as root. Some steps change the system and
+so need root; they are marked **[ROOT]** here, in `stone help <topic>` and in
+`stone check`, and are done once, by whoever has the rights. Lines starting with
+`#` are run as root, lines starting with `$` as the user of the stone. Once they
+are done, everything is done as that user.
+
+`stone help setup` tells the same steps on the host itself, and every step has a
+topic with the details: `podman`, `images`, `settings`, `postgresql`, `masterkey`,
+`tls`, `proxy`, `boot`, `instances`, `cors` and `cleanup`.
+
+### 1. Where EDS is built: the image and the script
+
+```bash
+$ ./eds.sh build stone
+$ podman save -o eds-stone.tar eds-stone:local
+$ scp eds-stone.tar accessories/podman/stone user@host:
+```
+
+### 2. [ROOT] Podman, and a user for the stone
+
+```bash
+# apt install podman                                 # Debian, Ubuntu
+# dnf install podman                                 # Fedora, RHEL, Rocky, Alma
+# useradd --create-home stone                        # a user of its own is a good habit
+```
+
+A rootless container needs subordinate user and group ids, which most systems
+give every new user. If `stone check` says they are missing:
+
+```bash
+# usermod --add-subuids 100000-165535 --add-subgids 100000-165535 stone
+```
+
+### 3. The script, in the PATH of that user
+
+```bash
+$ mkdir -p ~/.local/bin && install -m 755 stone ~/.local/bin/stone
+$ stone                                              # the help
+$ stone load eds-stone.tar
+```
+
+If `~/.local/bin` is not in the PATH, add it in `~/.profile`:
+`export PATH="$HOME/.local/bin:$PATH"`.
+
+### 4. [ROOT] The database
+
+The stone needs an empty PostgreSQL database and a role which owns it, and
+creates its tables itself; see [PostgreSQL Database Setup](#postgresql-database-setup).
+Without a database it keeps everything in memory and loses it when it stops,
+which is only for trying it out.
+
+```bash
+# apt install postgresql                             # Debian, Ubuntu
+# dnf install postgresql-server && postgresql-setup --initdb && systemctl enable --now postgresql
+# sudo -u postgres psql
+postgres=# CREATE ROLE eds_user WITH LOGIN PASSWORD 'a long password';
+postgres=# CREATE DATABASE eds WITH OWNER = eds_user;
+```
+
+For a server on the same host, the container must be able to reach it. In the
+container, `localhost` is the container itself; the host is
+`host.containers.internal`, and a connection to it doesn't reach a server which
+only listens on the loopback address. So in `postgresql.conf` (`SHOW config_file;`)
+and `pg_hba.conf` (`SHOW hba_file;`):
+
+```
+listen_addresses = 'localhost,<address of this host>'
+host  eds  eds_user  <address of this host>/32  scram-sha-256
+```
+
+```bash
+# systemctl restart postgresql
+```
+
+Keep the port 5432 closed to other hosts in the firewall. A database server which
+already exists elsewhere only needs the role and the database.
+
+### 5. The settings
+
+```bash
+$ stone init
+```
+
+This creates `~/.config/stone/stone.env`, readable only by that user, as it
+holds the password of the database. One setting per line, without quotes:
+
+```bash
+STONE_BIND=127.0.0.1
+STONE_PORT=8080
+STONE_MASTERKEY=file
+EDS_DB_URL=jdbc:postgresql://host.containers.internal:5432/eds
+EDS_DB_USERNAME=eds_user
+EDS_DB_PASSWORD=a long password
+```
+
+| Setting | Default | |
+|---|---|---|
+| `STONE_BIND` | `127.0.0.1` | The address of the host the stone listens on. `127.0.0.1` is only the host itself, which is right behind a reverse proxy; `0.0.0.0` is every address |
+| `STONE_PORT` | `8080` | The port of the host for HTTP |
+| `STONE_TLS_PORT` | `8443` | The port of the host for HTTPS by the stone itself, published when `EDS_TLS_CERT` is set |
+| `STONE_MASTERKEY` | `file` | `file` starts the stone with `~/.config/stone/masterkey`; `none` doesn't |
+| `STONE_IMAGE` | `eds-stone:local` | Another image, e.g. one from a registry |
+| `STONE_NAME` | `stone` | The name of the container; `stone-<name>` for a named instance |
+| `STONE_ADMIN_ACCOUNT` | (asked) | The account name of the System Administrator, for `masterkey load` |
+| `EDS_...` | | The settings of the stone itself, see [Properties](#properties) |
+
+A variable of the environment takes precedence over the file, for one call.
+`STONE_HOME` names another directory than `~/.config/stone`; the logs are in
+`~/.local/state/stone/logs` (`STONE_STATE`). The file is read, never executed.
+
+### 6. The MasterKey
+
+Everything a stone stores is protected by its MasterKey (see [MasterKey](#masterkey)),
+and whoever loses it loses all that is stored. There are three ways to give it:
+
+| Way | Settings | The stone starts |
+|---|---|---|
+| The MasterKey file on the host | `STONE_MASTERKEY=file`, after `stone masterkey generate` | by itself, also with the host |
+| A source elsewhere, read at each start | `STONE_MASTERKEY=none`, `EDS_MASTERKEY_URL=https://...` | by itself, as long as the source is there: taking it away is the kill-switch |
+| By hand | `STONE_MASTERKEY=none`, then `stone masterkey load` after each start | locked, until the System Administrator unlocks it |
+
+```bash
+$ stone masterkey generate
+```
+
+Keep a copy of the file in a safe place, apart from the backup of the database.
+
+### 7. Check and start
+
+```bash
+$ stone check                                        # what is in place, what is missing, and who can do it
+$ stone start
+$ stone status
+```
+
+`check` goes through Podman, the image, the settings, the database, the MasterKey
+and the start with the host, and tells for each thing which is missing whether it
+is done by the user (`[USER]`) or needs root (`[ROOT]`), with the command.
+`status` tells the database the stone uses; `H2, in memory` means it has none.
+
+A new stone has no account, and sets no name for one (see
+[The System Administrator](#the-system-administrator)): whoever comes to it first
+becomes its System Administrator, under the account name and with the passphrase
+given. So choose the name and be the first, right after the first start, before
+the stone is reachable from outside: with `stone masterkey load`, which asks for
+the name, or with the MasterKey request.
+
+### 8. [ROOT] HTTPS, by a reverse proxy
+
+The stone listens only on the host itself (`STONE_BIND=127.0.0.1`), and a
+reverse proxy in front of it holds the ports 80 and 443 and the certificate.
+Whichever proxy it is, it must:
+
+- pass everything on to `http://127.0.0.1:8080`, with the `Host` header
+- pass on WebSocket upgrades, for `/api/v1/socket` (the chat and calls)
+- allow bodies up to the largest file of the stone (1000 MiB by default) and pass
+  them on while they arrive, without storing them first
+- allow a request to last as long as a large file takes
+- never pass on the port 9000 (health), which the host doesn't publish
+
+With Caddy, which gets and renews the certificate itself (`/etc/caddy/Caddyfile`):
+
+```
+stone.example.com {
+    request_body {
+        max_size 1100MB
+    }
+    reverse_proxy 127.0.0.1:8080 {
+        flush_interval -1
+    }
+}
+```
+
+`stone help proxy` has the same for nginx, and the firewall. Without a proxy and
+without root, the stone can serve HTTPS itself on a port from 1024 on, with a
+certificate in `~/.config/stone/certs`; see `stone help tls`.
+
+### 9. [ROOT, once] Start with the host
+
+```bash
+# loginctl enable-linger stone                       # the services of the user run without a login
+$ stone enable                                       # a systemd service of the user starts the stone
+```
+
+`stone disable` takes the service away again; the stone keeps running.
+
+`enable` writes a service of the user, `~/.config/systemd/user/stone.service`,
+which needs no root. The services of a user only run while that user is logged
+in, unless the user may linger, which root allows once. When the host starts
+again:
+
+1. systemd starts the services of every user who may linger, without a login.
+2. The service waits for the network (where Podman has
+   `podman-user-wait-network-online.service`), starts the container and is done.
+   If the container can't be started yet, it tries again every ten seconds.
+3. The stone itself waits for its database: one which isn't up yet is tried
+   again until it answers, so the order of the two doesn't matter. PostgreSQL on
+   the same host starts by itself once root has enabled it
+   (`# systemctl enable postgresql`).
+4. The stone reads its MasterKey from the file or another source, and is
+   unlocked. With `STONE_MASTERKEY=none` and no `EDS_MASTERKEY_URL` it starts
+   locked and waits for `stone masterkey load`: such a host needs a person after
+   each start.
+
+So a stone is back by itself after a start of the host if it has: linger for its
+user, `stone enable`, a database which starts by itself, and a MasterKey source.
+`stone check` tells which of them is missing. It can be tried without starting
+the host again:
+
+```bash
+$ stone stop
+$ systemctl --user start stone
+$ stone status
+```
+
+### Several Stones on One Host
+
+A host may run several stones, e.g. one for each group of people. Each is an
+instance with a name, given before the command; without one it is the default
+instance, which is all a host with one stone needs:
+
+```bash
+$ stone -i north init                                # proposes the next free port
+$ stone -i south init
+$ stone list                                         # the instances, and what each is doing
+```
+
+`STONE_INSTANCE=north` names it for a whole shell. A name is of small letters,
+digits and `-`. An instance has, of its own:
+
+| | The default instance | The instance `north` |
+|---|---|---|
+| Settings | `~/.config/stone/stone.env` | `~/.config/stone/north/stone.env` |
+| MasterKey file | `~/.config/stone/masterkey` | `~/.config/stone/north/masterkey` |
+| Logs | `~/.local/state/stone/logs` | `~/.local/state/stone/north/logs` |
+| Container | `stone` | `stone-north` |
+| Service | `stone.service` | `stone-north.service` |
+
+Every step above from the settings on is done for each instance, with `-i`. What
+each must be given, as nothing of it can be shared:
+
+- **A port** of the host, `STONE_PORT` in its settings (and `STONE_TLS_PORT`, if
+  it serves HTTPS itself). `init` proposes the next one no instance has, and
+  `check` tells if two have the same.
+- **A database**: another name in `EDS_DB_URL`, and best a role of its own. The
+  server, `listen_addresses` and the restart are done once for the host; the role,
+  the database and its line in `pg_hba.conf` for each stone:
+  `CREATE ROLE north_user ...; CREATE DATABASE north WITH OWNER = north_user;`
+- **A MasterKey**: `stone -i north masterkey generate`.
+- **A name in the reverse proxy**: one site for each stone, passing on to its port.
+
+They share Podman, the images (several instances run from the same image) and
+the right to linger, which root gives once for the user.
+
+Each instance is started with the host by its own service, so after a start of
+the host all of them come back, and one which fails doesn't keep the others:
+
+```bash
+# loginctl enable-linger stone                       # once, for the user
+$ stone -i north enable
+$ stone -i south enable
+$ stone list
+```
+
+Every command is for one instance. Only `list` and `load` are for all of them,
+and `cleanup` keeps an image the container of another instance runs from.
+
+### A New Version
+
+```bash
+$ stone load eds-stone.tar
+$ stone restart
+$ stone cleanup                                      # removes the image it replaced
+```
+
+### Cleaning Up
+
+| Command | Removes |
+|---|---|
+| `stone cleanup` | EDS images which a newer one replaced. The stone keeps running |
+| `stone cleanup --images` | The container, and all EDS images |
+| `stone cleanup --all` | The same, and the logs and the start with the host |
+
+Each lists what it removes and asks first, unless `--yes` is given. Only images of
+EDS are touched, never other images or containers of the user. None of them
+removes the settings or the MasterKey file, as what the database holds can never
+be read again without the MasterKey: that file is only ever removed by hand. The
+database is removed by whoever runs it (`# sudo -u postgres dropdb eds`).
+
 ## Verifying the Installation
 
 After starting, verify EDS is running:
@@ -288,7 +688,7 @@ in-memory H2 database whose data is lost when the server stops.
 ## FitNesse Integration Testing
 
 EDS includes FitNesse-based acceptance tests, which are both tests and documentation.
-The fixtures in `eds-fitnesse` use a Java client generated from the API contract
+The fixtures in `eds-testing` use a Java client generated from the API contract
 (openapi-generator, `java` with the `native` library), so the suites also check that
 a generated client works against the server.
 
@@ -300,13 +700,13 @@ mvn -Pfitnesse install
 
 The profile `fitnesse` builds everything, then starts the runner JAR
 (`eds-quarkus/target/eds-rune.jar`) on the ports 18080 and 19000, runs the `EDS`
-suite against it, and stops it. The results are in `eds-fitnesse/target/`:
+suite against it, and stops it. The results are in `eds-testing/target/`:
 `fitnesse-results.txt`, and the log of EDS in `eds-server.log`; FitNesse keeps the
 detailed results in `FitNesseRoot/files/testResults`. Without `EDS_DB_URL`, EDS uses
 the in-memory H2 database; with it, the given PostgreSQL database, whose Circles,
 Members and DataTypes the suite removes first.
 
-When the runner JAR is already built, `mvn -Pfitnesse verify -pl eds-fitnesse` is
+When the runner JAR is already built, `mvn -Pfitnesse verify -pl eds-testing` is
 enough. Options, as system properties: `eds.runner` (another runner JAR),
 `eds.it.http.port` and `eds.it.management.port`, and `eds.it.suite` (e.g.
 `EDS.API`).
@@ -314,16 +714,16 @@ enough. Options, as system properties: `eds.runner` (another runner JAR),
 ### Running FitNesse Interactively
 
 Download the FitNesse standalone JAR from https://fitnesse.org/ and place it in the
-`eds-fitnesse` directory (or create a symlink) as `fitnesse-standalone.jar`. Build the
+`eds-testing` directory (or create a symlink) as `fitnesse-standalone.jar`. Build the
 fixtures, and start FitNesse from that directory:
 
 ```bash
-mvn clean package -pl eds-fitnesse -am -DskipTests
-cd eds-fitnesse
+mvn clean package -pl eds-testing -am -DskipTests
+cd eds-testing
 java -jar fitnesse-standalone.jar -p 2080
 ```
 
-Access the test suite at http://localhost:2080/EDS.
+Or use `./eds.sh fitnesse start`. Access the test suite at http://localhost:2080/EDS.
 Tests can be run as a complete suite or individually; each test is independent and
 self-contained.
 
@@ -337,7 +737,18 @@ of the suite. The environment variable `EDS_URL` replaces it, e.g.
 curl http://localhost:2080/?shutdown
 ```
 
-Or visit http://localhost:2080/?shutdown in a browser.
+Or visit http://localhost:2080/?shutdown in a browser, or use `./eds.sh fitnesse stop`.
+
+### Load and Rotation Tests
+
+`eds-testing` also holds the load test (`./mvnw -Pload verify -pl eds-testing`,
+optionally watching a PostgreSQL in a container) and the big-data test of the
+rotation of a Circle Secret (`./mvnw -Protation verify -pl eds-testing`). Both start
+the stone alone, `eds-quarkus/target/eds-stone.jar`, which is built with
+`./mvnw -Dstone -pl eds-quarkus package`. With Podman on the PATH, they run it in a
+rootless container built from that JAR (`accessories/podman/Containerfile`), which a
+later run removes if a killed run left it. Their properties and reports are in
+`eds-testing/README.txt`.
 
 ## API Documentation
 
@@ -372,8 +783,8 @@ A secret given with an invitation waits with it and becomes the invited Member's
 when they accept. `POST /trustees/setSecrets` sets the secrets of several Trustees,
 and the shared value, in one step: all or nothing.
 
-A client may follow the convention in `E2E.md`, or its own, in its own
-Circles. The walk-through below uses nothing but
+Rune and Tolk follow one convention for these values (`E2E.md`). Any other client
+may follow its own, in its own Circles. The walk-through below uses nothing but
 `curl`, `jq` and OpenSSL: two people share a file which the stone can't read. It is
 an example of the fields, not a recommendation for the cryptography (the file has
 no integrity protection, for one). It was run against a stone as it stands here.
@@ -446,8 +857,8 @@ curl -s -H "Authorization: Bearer $KEY" "http://localhost:8080/api/v1/status?his
 |---|---|---|
 | `eds.stone.name` | (none) | The name of the stone, which may be a technical one. Told with the status only. |
 | `eds.status.load.interval.seconds` | 5 | Seconds between two samples of the load, 0 to 3600; 0 switches the gathering off. One second is affordable: a sample takes well below a millisecond. |
-| `eds.status.inventory.interval.minutes` | 60 | Minutes between two samples of the inventory, which are queries. |
-| `eds.cors.value` | `http://localhost` | The origins of pages which may call the stone from a browser, separated by commas; `*` for all. |
+| `eds.status.inventory.interval.minutes` | 60 | Minutes between two samples of the inventory, which are queries, 1 to 10080. |
+| `eds.cors.value` | `http://localhost` | The origins of pages which may call the stone from a browser, separated by commas; `*` for all. A Rune which shows several stones is named here on each of them. |
 
 A status key also works while the stone is locked and waits for its MasterKey, and
 stays valid when the MasterKey changes; `DELETE /api/v1/status/keys/{label}`

@@ -57,7 +57,7 @@ final class SchemaManagerTest {
 
         assertEquals(Outcome.READY, manager.prepare());
         assertNull(manager.getLastConnectionError());
-        assertEquals(17, count(dataSource, "SELECT count(*) FROM information_schema.tables WHERE table_schema = 'PUBLIC'"));
+        assertEquals(18, count(dataSource, "SELECT count(*) FROM information_schema.tables WHERE table_schema = 'PUBLIC'"));
         assertEquals(1, count(dataSource, "SELECT count(*) FROM eds_versions"));
         assertEquals(4, count(dataSource, "SELECT count(*) FROM eds_datatypes"));
     }

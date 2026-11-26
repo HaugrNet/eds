@@ -1,6 +1,6 @@
 ## POST /settings
 permission: SETTING
-- SETTING_WARNING: A key is empty, a standard setting has an empty or invalid value, a locked setting is changed after Members exist, or `eds.masterkey.url` is changed (use the MasterKey operation).
+- SETTING_WARNING: A key is empty, a standard setting has an empty or invalid value, a locked setting is changed after Members exist, `eds.masterkey.url` is changed (use the MasterKey operation), or `eds.is.ready` is changed (EDS sets it itself).
 
 **Fields:**
 

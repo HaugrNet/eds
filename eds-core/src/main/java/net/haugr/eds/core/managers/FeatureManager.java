@@ -21,7 +21,9 @@ import jakarta.persistence.EntityManager;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
+import java.util.Map;
 import java.util.Collections;
+import java.util.stream.Collectors;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.HexFormat;
@@ -56,7 +58,6 @@ import net.haugr.eds.core.model.entities.CircleEntity;
 import net.haugr.eds.core.model.entities.CircleFeatureEntity;
 import net.haugr.eds.core.model.entities.DataEntity;
 import net.haugr.eds.core.model.entities.EntryEntity;
-import net.haugr.eds.core.model.entities.MemberEntity;
 import net.haugr.eds.core.model.entities.MetadataEntity;
 import net.haugr.eds.core.model.entities.FeatureEntity;
 import net.haugr.eds.core.model.entities.TrusteeEntity;
@@ -396,10 +397,13 @@ public final class FeatureManager extends AbstractManager<FeatureDao, EDSRespons
         // entries of the Circle to stand still. The feature was read before
         // the lock, so its next position may be stale: another request may
         // have taken it meanwhile. It is read again under the lock.
+        // Unwrapped before the lock, so the other writers of the Circle
+        // don't wait for it (ticket 28); checked again under the lock.
+        final Early early = unwrapEarly(trustee);
         dao.lockCircle(trustee.getCircle());
         dao.entityManager().refresh(circleFeature);
         final EntryEntity about = about(circleFeature, kind, body.getAbout());
-        final SecretEDSKey circleSecret = circleSecret(trustee);
+        final SecretEDSKey circleSecret = circleSecret(trustee, early);
 
         if ((kind.keep() == FeatureDeclaration.Keep.MEMBER) || (kind.keep() == FeatureDeclaration.Keep.MEMBER_ABOUT)) {
             final EntryEntity own = dao.findOwnEntry(circleFeature, kind.name(), ownerTags(circleSecret, circleId), (kind.keep() == FeatureDeclaration.Keep.MEMBER_ABOUT) ? about.getId() : null);
@@ -456,10 +460,13 @@ public final class FeatureManager extends AbstractManager<FeatureDao, EDSRespons
         throwConditionalException((body == null) || ((body.getContent() == null) && (body.getName() == null)),
                 ReturnCode.VERIFICATION_WARNING, "Neither a new content nor a new name was given.");
 
+        // Unwrapped before the lock, so the other writers of the Circle
+        // don't wait for it (ticket 28); checked again under the lock.
+        final Early early = unwrapEarly(trustee);
         dao.lockCircle(trustee.getCircle());
         final EntryEntity entry = entry(circleFeature, entryId);
         final FeatureDeclaration.Kind kind = kind(circleFeature, entry.getKind());
-        final SecretEDSKey circleSecret = circleSecret(trustee);
+        final SecretEDSKey circleSecret = circleSecret(trustee, early);
         allowed(kind.change(), kind, trustee, entry, circleSecret, circleId, "change");
         refuseClosed(entry);
 
@@ -499,10 +506,13 @@ public final class FeatureManager extends AbstractManager<FeatureDao, EDSRespons
         final TrusteeEntity trustee = findTrustee(circleId);
         final CircleFeatureEntity circleFeature = writable(trustee, feature);
 
+        // Unwrapped before the lock, so the other writers of the Circle
+        // don't wait for it (ticket 28); checked again under the lock.
+        final Early early = unwrapEarly(trustee);
         dao.lockCircle(trustee.getCircle());
         final EntryEntity entry = entry(circleFeature, entryId);
         final FeatureDeclaration.Kind kind = kind(circleFeature, entry.getKind());
-        final SecretEDSKey circleSecret = circleSecret(trustee);
+        final SecretEDSKey circleSecret = circleSecret(trustee, early);
         allowed(kind.remove(), kind, trustee, entry, circleSecret, circleId, "remove");
         refuseClosed(entry);
 
@@ -534,10 +544,13 @@ public final class FeatureManager extends AbstractManager<FeatureDao, EDSRespons
                 ReturnCode.VERIFICATION_WARNING, "Whether to close the entry or to open it again is missing.");
         final boolean close = closed;
 
+        // Unwrapped before the lock, so the other writers of the Circle
+        // don't wait for it (ticket 28); checked again under the lock.
+        final Early early = unwrapEarly(trustee);
         dao.lockCircle(trustee.getCircle());
         final EntryEntity entry = entry(circleFeature, entryId);
         final FeatureDeclaration.Kind kind = kind(circleFeature, entry.getKind());
-        final SecretEDSKey circleSecret = circleSecret(trustee);
+        final SecretEDSKey circleSecret = circleSecret(trustee, early);
         allowed(kind.close(), kind, trustee, entry, circleSecret, circleId, close ? "close" : "open");
         // An entry which is about a closed one stays as it is.
         final EntryEntity above = dao.findEntryById(entry.getAboutId());
@@ -606,11 +619,13 @@ public final class FeatureManager extends AbstractManager<FeatureDao, EDSRespons
             }
         }
 
+        // The page is read without a flush before each query, and with one
+        // query for what all its entries are about, one for their authors and
+        // one for their content (ticket 28).
         final boolean withContent = query.content();
         final EntryResponse response = new EntryResponse();
-        for (final EntryEntity entry : dao.findEntries(circleFeature, query, aboutId, size)) {
-            response.addEntry(convert(entry, circleId, circleSecret, withContent));
-        }
+        dao.reading(() -> convert(dao.findEntries(circleFeature, query, aboutId, size), circleId, circleSecret, withContent, true))
+                .forEach(response::addEntry);
 
         return response;
     }
@@ -919,6 +934,39 @@ public final class FeatureManager extends AbstractManager<FeatureDao, EDSRespons
         return unwrapCircleKey(trustee);
     }
 
+    /** The Circle Secret unwrapped before the Circle is locked, and the key row it is of. */
+    private record Early(long keyId, SecretEDSKey secret) {
+    }
+
+    /**
+     * Unwraps the Circle Secret before the Circle is locked (ticket 28): the
+     * unwrap (ECDH and ML-KEM) takes the longest of a write, and every other
+     * writer of the Circle would wait for it under the lock.
+     *
+     * @param trustee The requesting Member's Trustee row, as read before the lock
+     * @return The secret, with the key row it is of
+     */
+    private Early unwrapEarly(final TrusteeEntity trustee) {
+        return new Early(trustee.getKey().getId(), unwrapCircleKey(trustee));
+    }
+
+    /**
+     * The current Circle Secret under the lock. The Trustee row is read
+     * again, as a rotation may have installed a new key before the lock was
+     * had; the secret unwrapped before the lock is used while it is still
+     * the current one, else the new one is unwrapped.
+     *
+     * @param trustee The requesting Member's Trustee row
+     * @param early   The secret unwrapped before the lock
+     * @return The current Circle Secret
+     */
+    private SecretEDSKey circleSecret(final TrusteeEntity trustee, final Early early) {
+        dao.refresh(trustee);
+        reader = trustee;
+        retiring = null;
+        return (trustee.getKey().getId() == early.keyId()) ? early.secret() : unwrapCircleKey(trustee);
+    }
+
     /** The retiring Circle Secret while it is rotated, else null. */
     private SecretEDSKey retiringSecret() {
         if ((retiring == null) && (reader != null) && (reader.getPreviousKey() != null)) {
@@ -950,41 +998,80 @@ public final class FeatureManager extends AbstractManager<FeatureDao, EDSRespons
     }
 
     private Entry convert(final EntryEntity entity, final String circleId, final SecretEDSKey circleSecret, final boolean withContent) {
-        final MetadataEntity metadata = entity.getMetadata();
-        final Entry entry = new Entry();
-        entry.setEntryId(metadata.getExternalId());
-        entry.setCircleId(circleId);
-        entry.setFeature(entity.getCircleFeature().getFeature().getName());
-        entry.setKind(entity.getKind());
-        entry.setPosition(entity.getPosition());
-        final EntryEntity about = dao.findEntryById(entity.getAboutId());
-        entry.setAbout((about != null) ? about.getMetadata().getExternalId() : null);
-        entry.setName(metadata.getName());
-        entry.setAdded(metadata.getAdded());
-        entry.setChanged(entity.getChanged());
-        entry.setClosed(Boolean.TRUE.equals(entity.getClosed()));
+        return convert(List.of(entity), circleId, circleSecret, withContent, false).getFirst();
+    }
 
-        final String memberId = seals.openAuthor(circleSecret, this::retiringSecret, circleId, entity);
-        entry.setMemberId(memberId);
-        final MemberEntity author = (memberId != null) ? dao.find(MemberEntity.class, memberId) : null;
-        entry.setAccountName((author != null) ? author.getName() : null);
+    /**
+     * The entries as the API gives them. What they are about, their authors'
+     * names and their content are each read with one query for all of them,
+     * not one for each entry (ticket 28).
+     *
+     * @param entities      The entries
+     * @param circleId      ID of the Circle
+     * @param circleSecret  The current Circle Secret
+     * @param withContent   Whether the content is given
+     * @param onlyRead      Whether the content is only read here: it leaves
+     *                      the persistence context afterwards, so it isn't
+     *                      checked for changes at the commit
+     * @return The entries, in the same order
+     */
+    private List<Entry> convert(final List<EntryEntity> entities, final String circleId, final SecretEDSKey circleSecret,
+                                final boolean withContent, final boolean onlyRead) {
+        final Map<Long, String> abouts = dao.findEntryExternalIds(entities.stream()
+                .map(EntryEntity::getAboutId).filter(Objects::nonNull).collect(Collectors.toSet()));
+        final List<String> authors = new ArrayList<>(entities.size());
+        for (final EntryEntity entity : entities) {
+            authors.add(seals.openAuthor(circleSecret, this::retiringSecret, circleId, entity));
+        }
+        final Map<String, String> names = dao.findMemberNames(authors.stream().filter(Objects::nonNull).collect(Collectors.toSet()));
+        final Map<Long, DataEntity> contents = withContent
+                ? dao.findDataByMetadata(entities.stream().map(EntryEntity::getMetadata).toList(), onlyRead)
+                : Map.of();
 
-        if (withContent) {
-            final DataEntity data = dao.findDataByMetadata(metadata);
+        final List<Entry> entries = new ArrayList<>(entities.size());
+        for (int i = 0; i < entities.size(); i++) {
+            final EntryEntity entity = entities.get(i);
+            final MetadataEntity metadata = entity.getMetadata();
+            final Entry entry = new Entry();
+            entry.setEntryId(metadata.getExternalId());
+            entry.setCircleId(circleId);
+            entry.setFeature(entity.getCircleFeature().getFeature().getName());
+            entry.setKind(entity.getKind());
+            entry.setPosition(entity.getPosition());
+            entry.setAbout((entity.getAboutId() != null) ? abouts.get(entity.getAboutId()) : null);
+            entry.setName(metadata.getName());
+            entry.setAdded(metadata.getAdded());
+            entry.setChanged(entity.getChanged());
+            entry.setClosed(Boolean.TRUE.equals(entity.getClosed()));
+            final String memberId = authors.get(i);
+            entry.setMemberId(memberId);
+            entry.setAccountName((memberId != null) ? names.get(memberId) : null);
+            final DataEntity data = contents.get(metadata.getId());
             if (data != null) {
-                try {
-                    final byte[] content = DataFormat.decrypt(contentSecret(circleSecret, data), dataContext(data), data.getData());
-                    entry.setContent(Base64.getEncoder().encodeToString(content));
-                    Arrays.fill(content, (byte) 0);
-                } catch (RuntimeException e) {
-                    // A damaged entry mustn't hide the others; the sanity
-                    // check reports the damage.
-                    LOGGER.warn("The entry {} can't be read: {}", metadata.getExternalId(), e.getMessage());
-                }
+                entry.setContent(content(circleSecret, data, metadata));
             }
+            entries.add(entry);
+        }
+        if (onlyRead) {
+            dao.detach(contents.values());
         }
 
-        return entry;
+        return entries;
+    }
+
+    /** The decrypted content, Base64; null if it can't be read. */
+    private String content(final SecretEDSKey circleSecret, final DataEntity data, final MetadataEntity metadata) {
+        try {
+            final byte[] content = DataFormat.decrypt(contentSecret(circleSecret, data), dataContext(data), data.getData());
+            final String encoded = Base64.getEncoder().encodeToString(content);
+            Arrays.fill(content, (byte) 0);
+            return encoded;
+        } catch (RuntimeException e) {
+            // A damaged entry mustn't hide the others; the sanity check
+            // reports the damage.
+            LOGGER.warn("The entry {} can't be read: {}", metadata.getExternalId(), e.getMessage());
+            return null;
+        }
     }
 
     private static String describe(final FeatureState state) {

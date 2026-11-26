@@ -24,17 +24,17 @@ dependency-reduced-pom.xml
 # FitNesse settings
 *.zip
 fitnesse-standalone.jar
-eds-fitnesse/FitNesseRoot/FitNesse/
-eds-fitnesse/FitNesseRoot/FrontPage/
-eds-fitnesse/FitNesseRoot/PageFooter/
-eds-fitnesse/FitNesseRoot/PageHeader/
-eds-fitnesse/FitNesseRoot/PlugIns/
-eds-fitnesse/FitNesseRoot/RecentChanges.wiki
-eds-fitnesse/FitNesseRoot/TemplateLibrary/
-eds-fitnesse/FitNesseRoot/content.txt
-eds-fitnesse/FitNesseRoot/files/
-eds-fitnesse/FitNesseRoot/properties
-eds-fitnesse/FitNesseRoot/properties.xml
+eds-testing/FitNesseRoot/FitNesse/
+eds-testing/FitNesseRoot/FrontPage/
+eds-testing/FitNesseRoot/PageFooter/
+eds-testing/FitNesseRoot/PageHeader/
+eds-testing/FitNesseRoot/PlugIns/
+eds-testing/FitNesseRoot/RecentChanges.wiki
+eds-testing/FitNesseRoot/TemplateLibrary/
+eds-testing/FitNesseRoot/content.txt
+eds-testing/FitNesseRoot/files/
+eds-testing/FitNesseRoot/properties
+eds-testing/FitNesseRoot/properties.xml
 
 # PWA (eds-quarkus/src/main/webui): generated client, Node, build output
 eds-quarkus/src/main/webui/src/api/

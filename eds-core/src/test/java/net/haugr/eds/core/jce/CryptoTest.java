@@ -24,6 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.Base64;
@@ -328,31 +329,17 @@ final class CryptoTest extends DatabaseSetup {
     }
 
     @Test
-    void testStringToBytesConversion() {
+    void testTextIsAlwaysUtf8() {
+        // Ticket 14: the character set was a setting, and another one made
+        // every stored key unreadable.
         final Settings mySettings = newSettings();
         final Crypto myCrypto = new Crypto(mySettings);
         final String str = "Alpha Beta æøåßöäÿ";
+        mySettings.set("eds.system.charset", "UTF-16");
 
-        final String garbage = "INVALID_ENCODING";
-        mySettings.set(StandardSetting.EDS_CHARSET.getKey(), garbage);
-
-        final EDSException cause = assertThrows(EDSException.class, () -> myCrypto.stringToBytes(str));
-        assertTrue(cause.getMessage().contains("java.nio.charset.UnsupportedCharsetException: " + garbage));
-        assertEquals(ReturnCode.SETTING_ERROR, cause.getReturnCode());
-    }
-
-    @Test
-    void testBytesToStringConversion() {
-        final Settings mySettings = newSettings();
-        final Crypto myCrypto = new Crypto(mySettings);
-        final String str = "Alpha Beta æøåßöäÿ";
-        final byte[] bytes = str.getBytes(mySettings.getCharset());
-        final String garbage = "INVALID_ENCODING";
-        mySettings.set(StandardSetting.EDS_CHARSET.getKey(), garbage);
-
-        final EDSException cause = assertThrows(EDSException.class, () -> myCrypto.bytesToString(bytes));
-        assertEquals(ReturnCode.SETTING_ERROR, cause.getReturnCode());
-        assertTrue(cause.getMessage().contains("UnsupportedCharsetException: " + garbage));
+        final byte[] bytes = myCrypto.stringToBytes(str);
+        assertArrayEquals(str.getBytes(StandardCharsets.UTF_8), bytes);
+        assertEquals(str, myCrypto.bytesToString(bytes));
     }
 
     @Test

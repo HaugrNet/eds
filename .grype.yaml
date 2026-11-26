@@ -10,4 +10,13 @@
 #     package:
 #       name: some-library
 #       version: 1.2.3
-ignore: []
+ignore:
+  # Quadratic CPU use when parsing the W3C tracestate header. The API comes
+  # only through quarkus-scheduler (opentelemetry-instrumentation-api); EDS
+  # has no OpenTelemetry extension, so no propagator ever parses an incoming
+  # tracestate header. Fixed in 1.67.0: remove this entry once the Quarkus
+  # BOM manages that version or later (3.40.1.2 still has 1.62.0).
+  - vulnerability: GHSA-ccrj-gw8r-854m
+    package:
+      name: opentelemetry-api
+      version: 1.62.0

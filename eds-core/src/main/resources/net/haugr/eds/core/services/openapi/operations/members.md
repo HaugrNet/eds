@@ -58,8 +58,11 @@ To accept, the invited person sends a request to `updateMember` with
 
 ## POST /members/login
 permission: PROCESS_MEMBER
+- VERIFICATION_WARNING: The request is invalid (required fields are missing, values are too long or IDs are invalid), or it comes with a session; a login needs the passphrase.
 
-Starts a session for the Member. **Fields:** only the authentication fields.
+Starts a session for the Member. **Fields:** only the authentication fields. A
+login needs the passphrase: a session can't make another session, so one that is
+stolen ends when it expires.
 
 EDS generates a random 256-bit session token and returns it once in `session`;
 it stores only a keyed hash of it (HMAC with a MasterKey-derived key) and a copy of
@@ -96,7 +99,7 @@ System Administrator only.
 permission: PROCESS_MEMBER
 - ILLEGAL_ACTION: The System Administrator account is renamed, or the new name is `admin`.
 - CONSTRAINT_ERROR: The new account name already exists.
-- VERIFICATION_WARNING: The new name is too long, the new credential is too weak, or the credential is changed while authenticated with a session. When accepting an invitation: the account has no invitation pending, or `newCredential` is missing.
+- VERIFICATION_WARNING: The new name is too long, or the new credential is too weak. With a session: the credential or the account name is changed, or a public key or vault is replaced or removed, which need the passphrase. When accepting an invitation: the account has no invitation pending, or `newCredential` is missing.
 - IDENTIFICATION_WARNING: When accepting an invitation: the account doesn't exist.
 - AUTHENTICATION_WARNING: When accepting an invitation: the token is wrong, or the invitation has expired.
 
@@ -104,12 +107,12 @@ permission: PROCESS_MEMBER
 
 | Field | Notes |
 |---|---|
-| `newAccountName` | New account name, up to 75 characters. |
+| `newAccountName` | New account name, up to 75 characters. Only allowed when authenticated with the passphrase. |
 | `newCredential` | New passphrase, Base64-encoded; must meet the entropy rules. Only allowed when authenticated with the passphrase. |
-| `publicKey` | New external public key. |
+| `publicKey` | New external public key. With a session, only while the account has no `vault`; after that, it needs the passphrase. |
 | `avatar` | New avatar, the ID of a picture the clients know. An empty value removes it. |
 | `settings` | The Member's settings for clients, a JSON object as text of at most 4096 characters; EDS stores it as it is. An empty value removes them. |
-| `vault` | The Member's vault: text of at most 65536 characters, which EDS stores as it is and returns to the Member only, e.g. their own private key, wrapped by a client, so their other devices can fetch it. An empty value removes it. |
+| `vault` | The Member's vault: text of at most 65536 characters, which EDS stores as it is and returns to the Member only, e.g. their own private key, wrapped by a client, so their other devices can fetch it. An empty value removes it. With a session, only the first one; replacing or removing it needs the passphrase. |
 
 Updates the requesting Member's own account. Changing the passphrase also
 re-protects the Member's access to all their Circles. This endpoint is also used to
@@ -118,6 +121,7 @@ accept an invitation, see `inviteMember`.
 ## POST /members/invalidate
 permission: PROCESS_MEMBER
 - ILLEGAL_ACTION: The requesting Member is the System Administrator.
+- VERIFICATION_WARNING: The request is invalid (required fields are missing, values are too long or IDs are invalid), or it comes with a session; invalidating needs the passphrase.
 
 Invalidates the **requesting** Member's own credentials: the passphrase is replaced
 by a random one and the session ends, so the account can no longer be used.
@@ -128,12 +132,13 @@ since the Circle keys can no longer be unlocked.
 permission: PROCESS_MEMBER
 - ILLEGAL_ACTION: A Member other than the System Administrator deletes another account, the System Administrator deletes their own account, the System Administrator account is to be deleted, or the account is the last Trustee of a Circle.
 - IDENTIFICATION_WARNING: No Member with the given `memberId` exists.
+- VERIFICATION_WARNING: The request is invalid (required fields are missing, values are too long or IDs are invalid), or the requester's own account is deleted with a session, which needs the passphrase.
 
 **Fields:**
 
 | Field | Required | Notes |
 |---|---|---|
-| `memberId` | no | The account to delete (System Administrator only). Omit to delete the requester's own account. |
+| `memberId` | no | The account to delete (System Administrator only). Omit to delete the requester's own account, which needs the passphrase. |
 
 Deletes the account and its Trustee records. Data stored in Circles stays with the
 Circles. This can't be undone.
@@ -154,8 +159,9 @@ permission: FETCH_MEMBER
 Without `memberId`, returns all Members sorted by name (no paging). With
 `memberId`, returns that Member and Circles: for the requester themselves, their
 own Circles; for the System Administrator, all Circles of the Member; for others,
-all Circles of the Member if `eds.show.trustees` is true, otherwise only the
-Circles both share. The requester's own record carries their `settings` and their
+all Circles of the Member if `eds.show.trustees` is true, otherwise (the default)
+only the Circles both share. With it true, any Member can learn every Circle of the
+stone and who is in it, though not its data. The requester's own record carries their `settings` and their
 `vault`; nobody else gets them.
 
 ## GET /members

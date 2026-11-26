@@ -695,6 +695,91 @@ final class ManagementBeanProcessMemberTest extends DatabaseSetup {
     }
 
     @Test
+    void testASessionCannotMakeAnotherSession() {
+        // Ticket 7: a stolen Session could renew itself for ever.
+        final ManagementBean bean = prepareManagementBean();
+        final ProcessMemberResponse loginResponse = bean.processMember(prepareLoginRequest(MEMBER_1));
+        assertTrue(loginResponse.isOk());
+
+        final ProcessMemberRequest renew = prepareSessionRequest(ProcessMemberRequest.class, loginResponse.getSession());
+        renew.setAction(Action.LOGIN);
+        final ProcessMemberResponse response = bean.processMember(renew);
+        assertEquals(ReturnCode.VERIFICATION_WARNING.getCode(), response.getReturnCode());
+        assertEquals("It is only permitted to log in when authenticating with Passphrase.", response.getReturnMessage());
+        assertNull(response.getSession());
+        assertEquals(1L, sessionsOf(MEMBER_1));
+    }
+
+    @Test
+    void testASessionCannotTakeTheAccountFromItsOwner() {
+        // Ticket 7: a Session alone could rename, invalidate or delete the account.
+        final ManagementBean bean = prepareManagementBean();
+        final byte[] session = bean.processMember(prepareLoginRequest(MEMBER_1)).getSession();
+
+        final ProcessMemberRequest rename = prepareSessionRequest(ProcessMemberRequest.class, session);
+        rename.setAction(Action.UPDATE);
+        rename.setNewAccountName("taken over");
+        assertRefusedWithoutPassphrase(bean.processMember(rename), "change the Account Name");
+
+        final ProcessMemberRequest invalidate = prepareSessionRequest(ProcessMemberRequest.class, session);
+        invalidate.setAction(Action.INVALIDATE);
+        assertRefusedWithoutPassphrase(bean.processMember(invalidate), "invalidate the Account");
+
+        final ProcessMemberRequest delete = prepareSessionRequest(ProcessMemberRequest.class, session);
+        delete.setAction(Action.DELETE);
+        assertRefusedWithoutPassphrase(bean.processMember(delete), "delete the own Account");
+
+        // The account is as it was: the same name, and the passphrase opens it.
+        assertTrue(bean.processMember(prepareLoginRequest(MEMBER_1)).isOk());
+    }
+
+    @Test
+    void testASessionSetsTheFirstKeysButDoesNotReplaceThem() {
+        // Rune and Tolk make the keys of E2E.md after a login with a Session,
+        // when the account has none; replacing or removing them needs the
+        // passphrase (ticket 7).
+        final ManagementBean bean = prepareManagementBean();
+        final byte[] session = bean.processMember(prepareLoginRequest(MEMBER_1)).getSession();
+
+        assertTrue(bean.processMember(keysRequest(session, "first public key", "first vault")).isOk());
+        assertRefusedWithoutPassphrase(bean.processMember(keysRequest(session, "planted public key", null)), "replace or remove the public key or the vault");
+        assertRefusedWithoutPassphrase(bean.processMember(keysRequest(session, null, "")), "replace or remove the public key or the vault");
+        assertEquals("first public key", memberEntity(MEMBER_1).getMemberKey());
+        assertEquals("first vault", memberEntity(MEMBER_1).getVault());
+
+        // Other changes still go with the Session.
+        final ProcessMemberRequest avatar = prepareSessionRequest(ProcessMemberRequest.class, session);
+        avatar.setAction(Action.UPDATE);
+        avatar.setAvatar("raven");
+        assertTrue(bean.processMember(avatar).isOk());
+
+        // With the passphrase, they are replaced.
+        final ProcessMemberRequest replace = prepareRequest(ProcessMemberRequest.class, MEMBER_1);
+        replace.setAction(Action.UPDATE);
+        replace.setPublicKey("new public key");
+        replace.setVault("new vault");
+        assertTrue(bean.processMember(replace).isOk());
+        assertEquals("new public key", memberEntity(MEMBER_1).getMemberKey());
+        assertEquals("new vault", memberEntity(MEMBER_1).getVault());
+    }
+
+    @Test
+    void testAPublicKeyWithoutAVaultIsNoKeys() {
+        // Rune and Tolk take an account without a vault for one without keys,
+        // and make them with a Session; a public key alone doesn't stop that.
+        final ManagementBean bean = prepareManagementBean();
+        final ProcessMemberRequest publicKeyOnly = prepareRequest(ProcessMemberRequest.class, MEMBER_1);
+        publicKeyOnly.setAction(Action.UPDATE);
+        publicKeyOnly.setPublicKey("an older public key");
+        assertTrue(bean.processMember(publicKeyOnly).isOk());
+
+        final byte[] session = bean.processMember(prepareLoginRequest(MEMBER_1)).getSession();
+        assertTrue(bean.processMember(keysRequest(session, "public key", "vault")).isOk());
+        assertEquals("public key", memberEntity(MEMBER_1).getMemberKey());
+        assertRefusedWithoutPassphrase(bean.processMember(keysRequest(session, "another public key", null)), "replace or remove the public key or the vault");
+    }
+
+    @Test
     void testUnknownSessionIsRejected() {
         final ManagementBean bean = prepareManagementBean();
         final FetchMemberResponse response = bean.fetchMembers(prepareSessionRequest(FetchMemberRequest.class, generateData(32)));
@@ -1125,6 +1210,29 @@ final class ManagementBeanProcessMemberTest extends DatabaseSetup {
         request.setAction(Action.LOGIN);
 
         return request;
+    }
+
+    private static ProcessMemberRequest keysRequest(final byte[] session, final String publicKey, final String vault) {
+        final ProcessMemberRequest request = prepareSessionRequest(ProcessMemberRequest.class, session);
+        request.setAction(Action.UPDATE);
+        request.setPublicKey(publicKey);
+        request.setVault(vault);
+        return request;
+    }
+
+    private static void assertRefusedWithoutPassphrase(final ProcessMemberResponse response, final String what) {
+        assertEquals(ReturnCode.VERIFICATION_WARNING.getCode(), response.getReturnCode());
+        assertEquals("It is only permitted to " + what + " when authenticating with Passphrase.", response.getReturnMessage());
+    }
+
+    private MemberEntity memberEntity(final String name) {
+        return entityManager.createQuery("select m from MemberEntity m where m.name = :name", MemberEntity.class)
+                .setParameter("name", name).getSingleResult();
+    }
+
+    private long sessionsOf(final String name) {
+        return entityManager.createQuery("select count(s) from SessionEntity s where s.member.name = :name", Long.class)
+                .setParameter("name", name).getSingleResult();
     }
 
     private static ProcessMemberRequest prepareLogoutRequest(final byte[] session) {

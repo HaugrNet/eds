@@ -7,13 +7,15 @@ Status: done. OpenAPI 2026-11-01, Crypto and Streaming 2026-11-02, Clients API
 2026-11-04 to 2026-11-08, the server changes made while the clients were built until
 2026-11-11, and the fixes of the review of 2026-11-13. What is still open is listed
 at the end of each chapter. *Crypto* C6, rotating a Circle Secret, was added and
-built on 2026-11-21.
+built on 2026-11-21; the corrections after the load and security tests followed
+2026-11-22 to 2026-11-24 (*Streaming*, "The storage ceiling: a total for each
+Circle"; `SECURITY.md`). The findings still open are in `FINDINGS.md`.
 
 EDS 2.0 has three plans, one per part:
 
 | File      | Part                                                                      |
 |-----------|---------------------------------------------------------------------------|
-| `PLAN.md` | The backend: `eds-api`, `eds-core`, `eds-quarkus` (the server), `eds-fitnesse` |
+| `PLAN.md` | The backend: `eds-api`, `eds-core`, `eds-quarkus` (the server), `eds-testing` |
 | `RUNE.md` | Rune, the PWA in `eds-quarkus/src/main/webui`                              |
 | `TOLK.md` | Tolk, the CLI in `eds-cli`                                                 |
 
@@ -48,8 +50,10 @@ phases L5 (Rune) and L6 (Tolk) continue in `RUNE.md` and `TOLK.md`.
 
 The work was built phase by phase, as the chapters tell it, over 160 commits in which
 backend, Rune and Tolk often changed together. For the review it is handed over
-anew, as fourteen commits on `master`: thirteen slices of the finished work by
-layer, and one change of its own (#68) between the backend and the clients:
+anew, as fourteen commits on the branch `feature/refactor`, on top of `master`
+(rearranged on 2026-11-26, at the user's request): eight slices of the backend by
+layer, one commit of everything that changed the backend after them, and then Rune
+and Tolk, each as its plan and what was built from it, and what operates all three:
 
 | # | Commit | Holds |
 |---|--------|-------|
@@ -61,35 +65,36 @@ layer, and one change of its own (#68) between the backend and the clients:
 | 6 | API: REST | `eds-core`: the services, the managers behind them, streaming (`stream`), the status, the declarations of features |
 | 7 | API: the socket | `eds-core`: the package `socket`, and its frames in `eds-api` |
 | 8 | Tests | the tests of `eds-api`, `eds-core` and `eds-quarkus`, and `eds-fitnesse`; `eds-client`, the Java client FitNesse used, goes |
-| 9 | #68 | the lock of an account after too many failed passphrase attempts, as a change on top of commits 1 to 8: `AuthLimitBean`, its columns and settings, its tests |
+| 9 | The backend after the slices | #68 (the lock of an account after too many failed passphrase attempts); the corrections after the load and security tests of 2026-11-22/23 (tickets 5–11, 14, 20, 21, 23–25); `eds-fitnesse` renamed `eds-testing`, with the load test's PostgreSQL observer and its stone in a container (ticket 29); the throughput under load (tickets 28, 35–37); the load test as the clients ask (38); the socket's limits before AUTH and its checks of access (18, 22), Data Types by administrators only (15), a new MasterKey installed after its commit (13), and one lock order for the whole stone (1–3); the stone alone in operation (`eds.sh`, `accessories/podman/stone`, CI); the documents checked against the code, and `FINDINGS.md` |
 | 10 | The plan of Rune | `RUNE.md`, with Rune's parts of the three crossing plans |
 | 11 | Rune | `eds-quarkus/src/main/webui`, its build (Quinoa) and headers, its test, the brand; and `EdsStoneTest`, which checks that the stone alone (`-Dstone`) leaves it out |
 | 12 | The plan of Tolk | `TOLK.md`, with Tolk's parts of the three crossing plans and the runs of both together |
 | 13 | Tolk | `eds-cli`, the Maven profile `cli` |
-| 14 | Operating | `eds.sh` and `README.md`, which build and describe all three and the stone alone; `accessories/podman/stone`, which sets up and runs stones on a host; and the parts of `RUNNING.md` about the clients and about such a host |
+| 14 | Operating Rune and Tolk | what `eds.sh`, `README.md`, `RUNNING.md`, `accessories/podman/stone` and CI need for Rune and Tolk: building and installing them, EDS with Rune beside the stone alone, the clients against a stone |
 
 - **The commits are slices, not steps.** A file is in one commit, whole, by the
   layer it belongs to; the state after a commit never existed as such. They are
-  meant to be read one layer at a time, not to be run. Two states do build and pass
-  their tests: the backend by itself after commit 8, and again after commit 9,
-  and everything after the last.
+  meant to be read one layer at a time, not to be run. These states build and pass
+  their tests: the backend by itself after commit 8 and again after commit 9, and
+  everything after the last.
 - **A change of the database is in commit 3 whichever chapter asked for it**: the
   columns for the keys (*Crypto*), the stored content (*Streaming*), the entries of
   features, the invitations, the status. The chapters say why; the schema version
-  and what each version added are in *Clients API*, "After L5". The one exception is
-  #68: commit 9 holds its columns with the rest of that change, so it can be
-  reviewed, and taken or left, as one.
-- **Rune and Tolk are the last parts**, each as its plan and then what was built
+  and what each version added are in *Clients API*, "After L5". The exceptions are
+  in commit 9: the columns of #68, and the table `eds_circle_storage` and three
+  indexes (*Streaming*, "The storage ceiling: a total for each Circle").
+- **Rune and Tolk follow the backend**, each as its plan and then what was built
   from it, so each can be taken to a branch of its own with both.
   Rune needs commits 1 to 9; Tolk needs those and Rune's, as it keeps copies of
   files Rune owns (`RUNE.md`, "Shared with Tolk").
-- **Four files have parts of several commits** and grow with them: the root
+- **Some files have parts of several commits** and grow with them: the root
   `pom.xml` (Quinoa's version with Rune, the profile `cli` with Tolk),
   `eds-quarkus/pom.xml` and `application.properties` (Quinoa, the TypeScript
-  client and the headers of the web app with Rune, and with them the profile
-  for EDS with Rune), and `RUNNING.md` (the web app
-  with Rune, the command line with Tolk, the clients and a stone on a host
-  together with commit 14).
+  client and the headers of the web app with Rune), `RUNNING.md` (the web app with
+  Rune, the command line with Tolk, the clients with commit 14), and `eds.sh`,
+  `README.md`, `accessories/podman/stone` and the CI build (the stone alone with
+  commit 9, Rune and Tolk with commit 14). Commit 9 changes files of commits 1 to 8
+  where its changes need it.
 - The names of the phases (O1 to O5, C1 to C6, S1 to S5, L1 to L6, N1, E1 to E6, T1
   to T6, M1 to M3) are those of the plans and of comments in the code. They say when
   and why something was built, not which commit holds it.
@@ -117,7 +122,7 @@ isn't committed as done, and isn't described as done.
 
 1. **The build is green.** `mvn clean install` of every module passes from a clean
    tree (`./eds.sh build --test` for all three parts). Nothing is left for later
-   with a failing step.
+   with a failing step. Tolk's tests are part of it (`./eds.sh build tolk --test`).
 2. **All tests pass.** No failure and no error. A skipped test is skipped for a
    stated reason only: the tests of PostgreSQL without a PostgreSQL database, and
    those which read Rune's sources in a tree without Rune.
@@ -164,7 +169,7 @@ isn't committed as done, and isn't described as done.
 ### Step 0: Baseline
 
 Before O1:
-- Run the existing unit tests and FitNesse suites (`eds-fitnesse` on `eds-client`)
+- Run the existing unit tests and FitNesse suites (`eds-fitnesse`, now `eds-testing`, on `eds-client`)
   and record the result. They're the regression safety net during the crypto and
   streaming work. (The first version of the plan for the clients put acceptance tests before
   the crypto upgrade for this reason; the existing suites fill that role now.)
@@ -277,14 +282,16 @@ chapter named first.
 - **Server-side spool for uploads without `Content-Length`**: *Streaming*; decided
   2026-11-10, done 2026-11-11 for the CLI (`TOLK.md`, L6b) so true pipes work
   with `tolk send -`; `LENGTH_REQUIRED` (411) is gone from the contract.
-- **Maximum object size** (PostgreSQL's 1 GB field limit, H2 behaviour):
-  *Streaming*; affects PWA and CLI limits.
+- **Maximum object size** (`eds.stream.max.object.size`, within the HTTP body limit;
+  content is stored in parts, so no field limit applies): *Streaming*; affects PWA
+  and CLI limits.
 - **Chat and thumbnail storage**: *Clients API*, but must use the *Crypto* §4
-  format. Chat decided in L4: a Data Object per message, in the hidden `.chat`
-  folder of the Circle. Thumbnails decided in L5: made by the browser, stored
+  format. Chat decided in L4, rebuilt as a feature since 2026-11-15 (`FEATURES.md`):
+  an entry per message (`eds_entries`, with a Data Object of Data Type `entry`) in the
+  hidden `.chat` folder of the Circle. Thumbnails decided in L5: made by the browser, stored
   encrypted as a child of their Data Object.
-- **Path layout**: *Clients API* (2026-11-10). Rune at `/`, the REST API and the chat
-  below `/api/v1`, health at `/q/health` on the management port.
+- **Path layout**: *Clients API* (2026-11-10). Rune at `/`, the REST API and the socket
+  (`/api/v1/socket`, the chat and the other features) below `/api/v1`, health at `/q/health` on the management port.
 - **The System Administrator has no set name** (2026-11-18, asked for by the
   user: a default name is left as it is as a default passphrase is). The account
   `admin` was made by whoever first used that name, and was known by the name: it
@@ -651,22 +658,23 @@ Done 2026-11-01 (0 gaps):
   documented.
 
 Findings that change behaviour, left for later (most touch code that
-*Crypto* rewrites anyway). Two are fixed since, as marked; the others are still
-open:
+*Crypto* rewrites anyway). Two are fixed since, as marked, and 10 is gone; the open
+bugs among them are tickets in `FINDINGS.md`, and 7 and 11 are decisions recorded
+here:
 
 | # | Finding | Where |
 |---|---|---|
 | 1 | `alterMember` with an unknown `memberId` throws a `NullPointerException`, returned as `ERROR` instead of `IDENTIFICATION_WARNING`. **Fixed 2026-11-13.** | `ProcessMemberManager.alterMember` |
-| 2 | Suspected: updating or deleting a Circle as a Member without a Trustee record in it (or as the System Administrator setting a `circleKey`) calls `trustees.getFirst()` on an empty list, returned as `ERROR`. | `ProcessCircleManager.hasAdminRights`, `updateExternalCircleKey` |
+| 2 | An administrator who isn't a Trustee of the Circle and sets a `circleKey` calls `trustees.getFirst()` on an empty list, returned as `ERROR`. (A Member without a Trustee record is refused before.) | `ProcessCircleManager.updateExternalCircleKey` |
 | 3 | `updateCircle` removes the stored external key whenever `circleKey` is omitted. Documented, but surprising; renaming a Circle shouldn't drop its key. **Fixed 2026-11-10**: an omitted `circleKey` keeps the stored key. | `ProcessCircleManager.updateCircle` |
-| 4 | The default Data Types `data` and `folder` can be deleted when unused, although they can't be updated. (`chat`, `chat-receipt` and `thumbnail` can't.) | `ProcessDataTypeManager.doDelete` |
+| 4 | The default Data Types `data` and `folder` could be deleted when unused, although they can't be updated. **Fixed 2026-11-26** with ticket 15 (`SECURITY.md`, "Data Types, and the rotation of the MasterKey"). | `ProcessDataTypeManager.doDelete` |
 | 5 | Inconsistent codes for duplicates: duplicate Circle, Member or Data Object names give `IDENTIFICATION_WARNING`; duplicate names on invite or rename give `CONSTRAINT_ERROR`. | several managers |
-| 6 | Changing a default Data Type gives `AUTHORIZATION_WARNING` (should be `ILLEGAL_ACTION`); a non-admin calling the MasterKey operation gets `AUTHENTICATION_WARNING` (should be `AUTHORIZATION_WARNING`); inviting as a non-admin gives `ILLEGAL_ACTION` while creating gives `AUTHORIZATION_WARNING`. | `ProcessDataTypeManager`, `MasterKeyManager`, `ProcessMemberManager` |
+| 6 | Changing a default Data Type gives `AUTHORIZATION_WARNING` (should be `ILLEGAL_ACTION`); a non-admin calling the MasterKey operation gets `AUTHENTICATION_WARNING` (should be `AUTHORIZATION_WARNING`); inviting as a non-admin without a Circle gives `ILLEGAL_ACTION`, into a Circle not administered `AUTHORIZATION_WARNING`, while creating gives `AUTHORIZATION_WARNING`. | `ProcessDataTypeManager`, `MasterKeyManager`, `ProcessMemberManager` |
 | 7 | `ReturnCode` uses 401 for `AUTHORIZATION_WARNING` and 403 for `AUTHENTICATION_WARNING`, the reverse of the HTTP meaning of those numbers. Changing it changes the wire values; decide with the HTTP-status question in *Clients API* L1. | `ReturnCode` |
 | 8 | `WARNING` and `ILLEGAL_SERVICE` are never raised. | `ReturnCode` |
 | 9 | `invalidate` acts on the requester and ignores `memberId`; the endpoint name suggests otherwise. | `ProcessMemberManager.invalidate` |
-| 10 | The inventory returns `folderId` `-` for every entry, which doesn't match the documented ID format. | `InventoryManager` |
-| 11 | `EntropyVerifier` rates word-based passphrases per character, so long passphrases like "correct horse battery staple…" are rejected (known gap, *Crypto* §5). | `EntropyVerifier` |
+| 10 | The inventory returned `folderId` `-` for every entry. **Gone**: the operation was removed (`STATUS.md`). | `InventoryManager` |
+| 11 | `EntropyVerifier` rates word-based passphrases per character, so long passphrases like "correct horse battery staple…" are rated by their characters, not their words (known gap, accepted with *Crypto* §5 and PBKDF2). | `EntropyVerifier` |
 
 #### Phase O5: Enforce and publish
 
@@ -724,7 +732,9 @@ All decided since:
 
 ### Open
 
-- The O4 findings 2 and 4 to 11 in the table above.
+- Finding 7 (401 and 403 swapped in `ReturnCode`): to decide with the HTTP-status
+  question of *Clients API* L1, as it changes the wire values. The other open
+  findings (2, 5, 6, 8, 9) are tickets in `FINDINGS.md`.
 
 ## Crypto
 
@@ -940,8 +950,9 @@ storage format to maintain.
     scrub.
   - Not a security control: someone with DB write access can recompute the hash.
     Tampering is covered by the GCM tags.
-  - Make failures visible: report scrub status and failed objects through the
-    readiness/health endpoint and a metric, so monitoring raises an alarm. Marking
+  - Make failures visible: report scrub status and failed objects through a health
+    group of its own (`/q/health/group/sanity`, DOWN while an object is failed; not
+    readiness, and no metric, see *Streaming* S4), so monitoring raises an alarm. Marking
     a row as failed isn't enough on its own.
   - Configurable interval, including "off" for installations whose storage already
     scrubs; large installations can spread the reads over time.
@@ -976,7 +987,7 @@ storage format to maintain.
     `FetchSignatureManager`, `SignatureDao`, `SignatureEntity`, signature handling in
     `ShareBean`, `Crypto`, `PublicEDSKey`, `Permission`, settings.
   - Schema: `eds_signatures` table.
-  - `eds-fitnesse`: `Sign`, `Verify`, `FetchSignatures` fixtures and suites.
+  - `eds-testing`: `Sign`, `Verify`, `FetchSignatures` fixtures and suites.
 - **AES-CBC and PBE-CBC** variants, **AES-GCM-128/192**, **SHA-256** transformations.
 - **X25519 / X448** placeholder entries.
 
@@ -1001,8 +1012,9 @@ storage format to maintain.
   Secret is wrapped to the new Member's keys (a normal Trustee) and the row deleted;
   it goes with the invited Member (expiry, MasterKey rotation) or the Circle.
   `inviteMember` takes the access as `trustLevel` (READ, WRITE as the default, or
-  ADMIN). An inviter who isn't the System Administrator must name a Circle they
-  administer (`ILLEGAL_ACTION` otherwise), and the invited Member always gets the
+  ADMIN). An inviter who isn't an administrator must name a Circle they administer
+  (`ILLEGAL_ACTION` without a Circle, `AUTHORIZATION_WARNING` for a Circle they don't
+  administer), and the invited Member always gets the
   role STANDARD. A name that exists already is added to the Circle at once, without
   an invitation.
 
@@ -1346,9 +1358,9 @@ gone at the end; a MasterKey rotation during a Circle rotation; swapped trustee 
 refused (the new AAD).
 
 **The big-data test** (2026-11-21, the user: "a big-data test using PG, and set the
-data amount as a parameter"). `CircleRotationIT` in `eds-fitnesse`, under its own
+data amount as a parameter"). `CircleRotationIT` in `eds-testing`, under its own
 Maven profile `rotation`, like the load test: `./mvnw -Protation verify -pl
-eds-fitnesse`. It needs PostgreSQL: it refuses to start without `EDS_DB_URL`
+eds-testing`. It needs PostgreSQL: it refuses to start without `EDS_DB_URL`
 (with `EDS_DB_USERNAME`, `EDS_DB_PASSWORD`), an empty database, and starts the stone
 alone on it.
 - It fills a Circle with content of the given amount through the API (streamed
@@ -1371,6 +1383,7 @@ alone on it.
 | `eds.rotation.object.max`    | Largest object, at most the stone's maximum (1000 MiB)| `256MiB`|
 | `eds.rotation.object.min`    | Smallest object                                       | `1KiB`  |
 | `eds.rotation.threads`       | `eds.circle.secret.rotation.threads` of the stone     | `2`     |
+| `eds.rotation.uploads`       | Uploads at a time while the Circle is filled          | `4`     |
 | `eds.rotation.concurrent`    | Users at work during the rotation                     | `true`  |
 | `eds.rotation.seed`          | Repeat a run's sizes and content                      | random  |
 | `eds.rotation.jvm`           | Options for the stone's JVM, e.g. `-Xmx512m`          |         |
@@ -1413,8 +1426,90 @@ Done 2026-11-21. What differs from the plan above, and details:
   A first version wrote a new row and deleted the old; with it, the job needed the
   Data Object's row while holding the content's, and requests take the two in either
   order (a delete takes the content first, an upload deletes thumbnails, so their
-  Data Objects, first): the load test found deadlocks both ways. A large object's old
+  Data Objects, first; see also the delete below): the load test found deadlocks both ways. A large object's old
   parts are read on a connection of their own, which sees them as committed.
+- **A delete takes the content row before its parts** (2026-11-22): the 2-hour load
+  test on PostgreSQL 18 (128 users, 32 rooms, no pauses, 15.5 million operations
+  without a failure) ended with a deadlock when a room was deleted while its rotation
+  ran. `DataEntity.parts` is an element collection, so Hibernate's bulk delete of the
+  entity deletes the rows of `eds_data_parts` first, without the content row, which
+  the job holds while it replaces those parts. The content is now deleted with a
+  native `DELETE FROM eds_data`, and the database takes the parts with each row; a
+  Circle's rows are locked first, in the order of their IDs. Deleting a Circle locks
+  the Circle first, as the end of a rotation does before it changes the Trustees; and
+  a step of the rotation whose Circle went while it waited for its lock leaves it
+  alone (`CommonDao.findAndLockCircle`) instead of failing with an ERROR.
+  A copy or move (to another Circle) now holds the source's content row while it reads
+  it, and reads its secret from that row: the second load run (30 minutes) had a move
+  fail with "Tag mismatch", as the rotation replaced the content and its secret
+  between the two reads. **One order for the rows of a Data Object**: the content row
+  and the thumbnails' rows are taken together, in the order of their IDs, as the
+  delete of the Circle takes them, before anything else changes (`DataDao.
+  lockContentWithThumbnails`), by the move, the update with data, the upload and the
+  delete. Before, the update took the content first and the others the thumbnails
+  first, and a move which held its rows for the whole copy made that a deadlock with
+  the delete of the Circle (found by the review). `RotationLockOrderTest` holds the
+  rows as the job and the delete of the Circle do, with the thumbnail's row before
+  and after the content's, and fails without each part (the move with the same "Tag
+  mismatch").
+  The review found lock orders which were there before, and consequences of holding
+  the source row (tickets 1, 2 and 3; decided 2026-11-22: legit, but not worked on
+  then). Done 2026-11-26, see "One lock order for the whole stone" below; what is
+  left of ticket 3 is in `FINDINGS.md`. Seen in the load
+  runs: the stone logged nothing for a request it answered with 500 (the failed
+  move), and on a new database a query met `eds_data_parts` before the schema was
+  there (one WARN at the start). Decided and done 2026-11-22: a request answered with
+  an error Return Code (5xx; on the endpoints without status codes, the same codes
+  in a 200) is logged as WARN with the Return Code and message (`CommonService.
+  runRequest`, the download in `DataService` with the Data Object's ID, and a socket
+  frame in `SocketHub`, there only after AUTH: a locked stone fails every AUTH, and
+  an unknown client could fill the log). A warning (4xx) is not. `CONSTRAINT_ERROR`
+  (a name which is taken) answers 500 and is logged so, though it is the request's
+  fault (ticket 4 in `FINDINGS.md`). The inventory of the stone's status (`StatusBean.tick(boolean)`)
+  waits until `DatabaseStartup` has started, and logs the wait once as INFO; it was
+  the inventory which queried the tables while the startup created them. The load is
+  sampled meanwhile. `DatabaseStartup.getState` no longer waits for an attempt in
+  progress. The tests of eds-core can now see what is logged (`LogCapture`):
+  logback, still off by `logback-test.xml`, is the provider of SLF4J, named by the
+  tests' `META-INF/services`, as its jar names none for the class path, and
+  `slf4j-nop` goes. Reviewed by a reviewer which didn't write it.
+- **One lock order for the whole stone** (2026-11-26, tickets 1–3, the user asked
+  for the five worst findings to be fixed). Members before Circles, each in the
+  order of their IDs, and Circles before the rows in them:
+  - **The deletion of a Member** (`ProcessMemberManager.rotateAfterLeaving`) locks
+    the Member, then its Circles, then reads each Circle again and marks its
+    rotation due, before anything changes. It changed the Circles unlocked, in the
+    order of its Trustees, and then deleted the Member: the opposite order of the
+    rotation of the MasterKey, which locks all Members, then all Circles (ticket 13),
+    so the two could deadlock. Under the locks it checks again that the Member isn't
+    the last Trustee of a Circle: before, another Trustee could leave meanwhile, or
+    two deletions run at once, and leave a Circle nobody could read again. A Member
+    deleted meanwhile is answered as gone, and a Circle deleted meanwhile is passed
+    over, instead of an error.
+  - **The rotation of the MasterKey** locks the Circles before it deletes pending
+    invitees, whose invitations go with them. The old code didn't hit it, as
+    Hibernate deferred the delete until after the lock; the order is now explicit.
+  - **A second delete of a Circle** which waited for the first one is answered as a
+    Circle which isn't there (`IDENTIFICATION_WARNING`), not with an error
+    (`CommonDao.lockCircleIfThere`). A rotation put off for a deleted Circle is
+    forgotten with it (`CircleRotations.forget`).
+  - **A copy whose source was replaced** by an update while it waited for the source
+    row copies the new content, instead of failing with "deleted meanwhile", and
+    reads its Trustee again once it holds the row, so the secret of a rotation which
+    began meanwhile is there.
+  - **A put-off rotation of a deleted Circle** is forgotten with it; a job which
+    runs isn't touched, as it finds the Circle gone itself.
+  - Tested in `RotationLockOrderTest`, `MasterKeyRotationLockTest` and
+    `ManagementBeanCircleTest`; each fails without its part, but for the order of
+    the invitees, which the old code didn't hit, and the Trustee read again by a
+    copy, for which no test can make the rotation win the row. Reviewed by a
+    reviewer which didn't write it; its findings are fixed, or listed below.
+  - What stays:
+    - of ticket 3 (`FINDINGS.md`): copies of one object run one after the other (H2
+      has no `FOR SHARE`); a delete of the Circle waits for a large copy;
+    - a Trustee added to a Circle while the deletion of its Member waits for another
+      Circle goes with the Member, and its Circle isn't marked for a rotation;
+    - the MasterKey's part: ticket 53.
 - **The ETag stays**: a rotation keeps the header of the stored content (chunk size,
   salt, nonce prefix; `DataStreams.rotate`), as the content doesn't change. The key
   still does, as it comes from the new secret and its version. Without it, a client's
@@ -1457,8 +1552,9 @@ Done 2026-11-21. What differs from the plan above, and details:
   `started`, `objects`, `objectsDone`); the socket frames `ROTATING` and `ROTATED`; the
   inventory's `rotationsDue`, `rotationsRunning` and `rotationObjects`; the settings
   `eds.circle.secret.rotation.days` (0 to 36500) and `.threads` (1 to 64). Rune and
-  Tolk don't show a rotation yet; they ignore the two frames.
-- **Tests**: `CircleRotationTest` (20, eds-core, H2, each in a room of its own and with
+  Tolk don't show a rotation yet; they ignore the two frames (a ticket in
+  `FINDINGS.md`).
+- **Tests**: `CircleRotationTest` (29, eds-core, H2, each in a room of its own and with
   settings of its own, as the other tests of the module share the test data and the
   settings): due after creation, removal and
   the period, and when the account is deleted; started by a Trustee's read and not by
@@ -1496,10 +1592,10 @@ Done 2026-11-21. What differs from the plan above, and details:
 - ~~Default PBKDF2 iteration count for SHA-512~~: decided in C3, 210000 (OWASP).
 - Whether to offer pure ML-KEM-1024 as an opt-in, and how it is selected per circle.
 - ~~Chunk size for the §4 format~~: decided in C4, 64 KiB.
-- Maximum object size: PostgreSQL caps a single field at 1 GB. Going beyond that
-  needs PostgreSQL large objects, which the shared PostgreSQL/H2 schema doesn't
-  support. Also check H2's size limit and whether `substring` on its
-  `BYTEA`/`BINARY VARYING` avoids loading the whole value.
+- Maximum object size: see *Streaming*, "Open points". Since content is stored in
+  parts (*Streaming*, "Content in parts", 2026-11-18), no field holds more than a
+  part and `substring` is no longer used, so PostgreSQL's 1 GB field limit and H2's
+  handling of large values are no longer the bound.
 - ~~Per-object download tokens (§2a)~~: done in L5.
 - ~~`ManagementBean`/`ShareBean` should call `setRollbackOnly()` when catching
   `EDSException`~~: done in Step 0.
@@ -1509,11 +1605,14 @@ Done 2026-11-21. What differs from the plan above, and details:
   by default, which is what this plan names, or SHA-384. The sanity job checks
   content with the algorithm its checksum was stored with, told by the checksum's
   length (2026-11-13), so the setting can change while content exists.
+- Bugs and improvements found along the way are tickets in `FINDINGS.md`.
 ## Streaming
 
 Status: done (S1–S5, 2026-11-02); see the "Done" notes under each phase. Changed
 since: a streamed copy and the storage ceiling (2026-11-04), download tokens (L5),
-uploads without `Content-Length` (2026-11-11).
+uploads without `Content-Length` (2026-11-11), content in parts (2026-11-18), the
+storage ceiling per Circle (2026-11-23), and connections and locks held for less
+(2026-11-25).
 Scope: streaming upload and download of Data Objects, including byte ranges.
 The endpoints are documented to the *OpenAPI* standard in the phase they're added.
 Related:
@@ -1523,9 +1622,8 @@ Related:
   code.
 - *Clients API* later turns the endpoints defined here into the OpenAPI contract;
   Rune and Tolk are built on them (`RUNE.md`, `TOLK.md`).
-- Parked prototype: branch `feature/streaming-data` (commit a0a27173). It streams
-  uploads with bounded memory, but downloads still load the whole value
-  (pgjdbc reads a `bytea` value fully).
+- A parked prototype (a branch since deleted) streamed uploads with bounded memory,
+  but downloads still loaded the whole value (pgjdbc reads a `bytea` value fully).
 
 ### Goals
 
@@ -1589,7 +1687,7 @@ the OpenAPI contract unchanged.
   time.
 - Media elements in the PWA (`<video src>`, `<img src>`) can't send custom headers.
   This needs either a short-lived download token for one object (*Crypto* §2a) or
-  a same-origin session cookie. Decide before the PWA work starts (Open points).
+  a same-origin session cookie. Decided in L5: a download token per object.
 
 #### Upload: `PUT /data/{dataId}/content`
 
@@ -1597,17 +1695,13 @@ the OpenAPI contract unchanged.
   metadata, not taken from this header.
 - `Content-Length` is the normal case, and given whenever the client knows it. With
   it, content above the configured maximum is refused with `413 Content Too Large`
-  before the body is read, the storage ceiling is checked up front, and the
-  encrypted stream goes to the database with its exact length (the PostgreSQL
-  protocol needs a parameter's length up front; the encrypted length follows from
-  the plaintext length and the format).
+  before the body is read, and the storage ceiling is checked up front.
 - Without `Content-Length` (changed 2026-11-11; `411 Length Required` and the return
   code `LENGTH_REQUIRED` are gone): the body is read to its end, for true pipes
   (`… | tolk send -`). The same format is written; which chunk is the last is found
-  by reading one byte ahead. pgjdbc spools the encrypted stream to a temp file
-  before sending it, so the server needs temp space up to the maximum object size
-  per such upload, and that file only ever holds ciphertext; H2 holds the value in
-  memory, as always. The limits are enforced while reading: the plaintext is cut off
+  by reading one byte ahead. (In S1, pgjdbc spooled such a stream to a temp file.
+  Since "Content in parts" each part is read into a buffer, from 64 KiB up to the
+  part size, and inserted; there is no temp file.) The limits are enforced while reading: the plaintext is cut off
   where it passes the maximum object size (`413`) or what is left below the storage
   ceiling (`507`), and the stored length is checked against the ceiling again after
   the write; either way the transaction is rolled back and the previous content
@@ -1712,7 +1806,7 @@ This is how it was built in S1, with the data of an object as one value. Since
   object size; the EDS limit is checked against `Content-Length` first.
 - **Managers** (reuse and adapt from the prototype):
   - Upload: `UploadDataManager` (checks: object exists, not a folder, member has write
-    access), now with the chunked format, required length and ETag.
+    access), now with the chunked format, an optional length and the ETag.
   - Download: `DownloadDataManager` + `DataStream`, now with range calculation
     (requested bytes → chunk indexes → blob offsets), batch reads, per-chunk
     decryption and trimming of the first and last chunk.
@@ -1726,13 +1820,14 @@ This is how it was built in S1, with the data of an object as one value. Since
 
 ### Configuration
 
-| Setting                          | Proposed default | Purpose                               |
-|----------------------------------|------------------|---------------------------------------|
-| `eds.stream.max-object-size`     | `1000M`          | Upload limit (below the 1 GB PG cap)  |
-| `eds.stream.transaction-timeout` | `3600` (s)       | Upload/download transaction timeout   |
-| `eds.stream.read-batch-size`     | `4M`             | Bytes per `substring` query           |
-| `eds.data.max-inline-size`       | `10M`            | Limit for the JSON `byte[] data` path |
-| `quarkus.http.limits.max-body-size` | ≥ max object size | HTTP layer limit                   |
+| Setting | Default | Purpose |
+|---|---|---|
+| `eds.stream.max.object.size` | `1048576000` (1000 MiB) | Upload limit |
+| `eds.stream.transaction.timeout.seconds` | `3600` | Upload/download transaction timeout |
+| `eds.stream.read.batch.size` | `4194304` (4 MiB, 64 KiB–16 MiB) | The size of a stored part |
+| `eds.data.max.inline.size` | `10485760` (10 MiB) | Limit for the JSON `byte[] data` path |
+| `eds.data.max.total.size` | `0` (none) | The storage ceiling |
+| `quarkus.http.limits.max-body-size` | `1100M`, ≥ max object size | HTTP layer limit |
 
 The chunk size is part of the format and stored in each object's header; it isn't a
 runtime setting (see *Crypto* Open points).
@@ -1744,7 +1839,8 @@ runtime setting (see *Crypto* Open points).
   session auth.
 - **FitNesse**: fixtures for upload, full download, range download and the error
   cases.
-- **Go CLI / PWA**: built afterwards on the generated clients (*Clients API*); the
+- **Tolk and Rune**: built afterwards (*Clients API*): Rune on a generated client,
+  Tolk on a hand-written one checked against the contract; the
   existing `eds-client` gets the streaming methods now and is retired in *Clients API*
   L3.
 
@@ -1772,7 +1868,8 @@ Done 2026-11-02. Results and deviations:
   EntityManager's transaction via Hibernate's `Session.doReturningWork`; so
   `hibernate-core` is now `provided` in `eds-core`, as in the prototype.
 - `eds_metadata.media_type VARCHAR(255)`; on PostgreSQL the
-  `SchemaManager` also sets `encrypted_data` to `STORAGE EXTERNAL`.
+  `SchemaManager` also sets `encrypted_data` to `STORAGE EXTERNAL` (gone since
+  "Content in parts").
 - Tests: `EncryptedDataStoreTest` writes 20 MB and reads it back whole, in ranges and
   across batch boundaries, and checks short streams, reads past the end and unknown
   rows. It always runs on H2. It runs on PostgreSQL when `EDS_TEST_POSTGRESQL_URL` (or
@@ -1905,7 +2002,8 @@ Done 2026-11-02. Results and deviations:
   without `data` and `CONTENT_TOO_LARGE`, pointing to the content endpoint.
 - Copy and cross-circle move re-encrypt chunk by chunk (`stream/ContentCopier`, on
   `DataStreams.reencrypt`). One connection can't run the source's batch queries while
-  it receives the target's streamed statement, so above the inline limit the source
+  it receives the target's streamed statement (the reason before "Content in
+  parts"), so above the inline limit the source
   is read on a second connection (`ConnectionSource`, a reader thread in a
   `REPEATABLE READ` read-only transaction) and handed over in 64 KiB chunks through a
   bounded queue: source → decrypt → encrypt → target, nothing buffered. Up to the
@@ -2030,28 +2128,216 @@ are plain JPA and go with any of them, but the stored content did not.
   rollback, on H2 and PostgreSQL (2026-11-18, PostgreSQL 18: also the snapshot,
   and 512 MiB written, read and copied with a heap of 128 MiB).
 
+### The storage ceiling: a total for each Circle (2026-11-23)
+
+Status: done 2026-11-24 (ticket 23, which has left `FINDINGS.md`).
+
+- **Why.** Before every write, also of every chat message, the ceiling check summed
+  `part_length` over all of `eds_data_parts` (`EncryptedDataStore.totalLength`). The
+  cost of a write grew with everything the stone holds: in the 5-hour load run on
+  PostgreSQL the requests went from 736 to 309 per 5 s while the CPU went idle, and
+  the table was read in full 1.7 million times.
+- **The total, in a table of its own** (decided by the user, 2026-11-24):
+  `eds_circle_storage` (`circle_id`, the key and a foreign key to the Circle with
+  `ON DELETE CASCADE`; `stored_bytes BIGINT DEFAULT 0 NOT NULL`), a row for each
+  Circle: the sum of `part_length` of the parts of its objects. It changes in the
+  same transaction as the parts, so it is exact, and every stone on the same
+  database sees the same number. Not a column of `eds_circles`, as first planned: a
+  write would then lock the Circle's row while it holds content rows, the reverse
+  of the order in which deleting a Circle takes them (Circle first,
+  `ProcessCircleManager.deleteCircle`), and the two could deadlock. A write never
+  waits for the Circle's row. The total isn't part of `CircleEntity`, so a save of
+  a Circle can't write an old value back.
+- **One statement, never read and write.**
+  `UPDATE eds_circle_storage SET stored_bytes = stored_bytes + ? WHERE circle_id = ?`
+  (`CommonDao.changeStoredBytes`). Reading, adding and saving through JPA would lose
+  updates without notice, as the entities have no `@Version`. The statement locks
+  the row until the commit, so writes to one Circle wait for each other and writes
+  to other Circles don't; it comes after the parts are written, to keep that wait
+  short.
+- **Where the total changes**, all in `CommonDao` and `DataDao`:
+  - `CommonDao.save` of a new `CircleEntity` makes its row.
+  - `CommonDao.save` of a new `DataEntity` adds its content (content given with
+    `setData` is only ever given to a new entity): the inline data of
+    `ProcessDataManager` (add, update) and `AbstractManager.encryptAndSave`
+    (entries, thumbnails). The empty placeholders of an upload and a copy add 0.
+  - `DataDao.writeContent` measures the stored length of the row before and after
+    the write and adds the difference: an upload with and without a length
+    (`UploadDataManager`), a copy (`ProcessDataManager`, to the target Circle), and
+    the rotation (`RotationManager.reencrypt`). The rotation keeps the length (the
+    header keeps its chunk size), so it changes nothing and doesn't take the row.
+  - `DataDao.deleteContent` locks the content row, takes its parts from the total,
+    then deletes it. Through it go the delete of an object and its thumbnails
+    (`deleteThumbnails`), replaced inline content, a move's source, entries
+    changed, replaced, removed or pruned, and those of a feature removed from a
+    Circle.
+  - `CommonDao.delete` of a `MetadataEntity` or `DataEntity` takes what is still
+    stored, for parts `ON DELETE CASCADE` would remove unseen (no caller leaves
+    any today; it costs one indexed query).
+  - The delete of a Circle changes nothing: its row goes with it. A folder has no
+    content; its children are deleted one by one (a feature's folder), or it must
+    be empty.
+
+  A change is written at once, unless held (`holdStoredBytes`/`writeStoredBytes`):
+  a move holds the changes of both Circles and writes them at its end, in the order
+  of the Circles' IDs, so two moves can't deadlock. An upload deletes the old
+  thumbnails after the content is written, not before, so the row isn't held while
+  it streams (the ceiling check then still counts the old thumbnail, a few KB).
+- **The check** (`StorageCeiling`): `CommonDao.storedBytes()`, i.e.
+  `SUM(stored_bytes)` (a row for each Circle, not each part) plus the changes held,
+  less `EncryptedDataStore.length` of the content being replaced.
+  `EncryptedDataStore.totalLength` is gone. As before there is no lock on the
+  whole: writes in different Circles can together pass the ceiling by what they add
+  ("Storage ceiling", S4).
+- **Kept honest.** The inventory reads `storedBytes()` as `storageUsed`, and
+  `StatusManager.checkStoredBytes` compares in one statement each Circle's total
+  with the sum of its parts, logging a WARN with the internal id and both numbers
+  (-1 for a Circle without its row). It corrects nothing, as that would race the
+  writers; a difference is a path above that was missed. Its cost: ticket 27.
+- **Schema.** The version stays 4 (see "Schema version"); a database of an earlier
+  2.0 build is created anew. Found by the same load runs and changed with it:
+  indexes `data_key_idx` on `eds_data (key_id, id)` (the rotation takes the next
+  content of a key in ID order from the index), `entry_about_idx` on
+  `eds_entries (about_id)` and `entry_kind_idx` on
+  `eds_entries (circle_feature_id, kind, position)`; and
+  `DataDao.lockContentWithThumbnails` finds the rows first and locks them one by
+  one in ID order, as the `OR` of one statement kept the index out.
+- **Not chosen.** A total in memory, loaded at startup: faster, but with two stones
+  on one database each sees only its own writes, and a rollback or a cascade
+  missed on one path leaves it wrong until a restart. A total refreshed at most
+  every 30 seconds, exact near the ceiling: no schema change, but every refresh
+  still reads every part.
+- **Done when**, and met: a test shows that the check reads no part of another
+  object, a test of each path compares the totals with the sum of the parts, a test
+  of concurrent writes to one Circle shows that no update is lost (all in
+  `StoredBytesTest`), and a long load run on PostgreSQL keeps its throughput
+  (below). `RotationLockOrderTest` shows that a write finishes while another
+  transaction holds the Circle's row, as its delete does.
+- **Measured (2026-11-24).** The same 5-hour load on PostgreSQL as before (160
+  users in 40 rooms, `auto_explain` at 250 ms): 34.1 million operations instead of
+  26.6, none failed, no WARN or ERROR in the stone's log, no busy answers. Requests
+  a second, hour by hour: 2,435, 2,120, 1,742, 1,693, 1,677 (before: 2,302, 1,750,
+  1,296, 1,088, 991), so flat from the third hour on. `eds_data_parts` and
+  `eds_entries` are no longer read by sequential scans (before: 1.6 million and
+  104,000 full scans). Statements over 250 ms: 22,442 instead of 628,531, of which
+  22,222 wait for the lock of a Circle's row (each a few hundred ms) and 105 for
+  the row of totals. The inventory's comparison took 0.5 s in the first hour and
+  2.1 s in the fifth (ticket 27). Why the first hours are slower: see "Connections
+  and locks held for less" below.
+
+### Connections and locks held for less (2026-11-25)
+
+Status: done 2026-11-26 (tickets 28, steps 1, 2 and 4; 35; 36; 37), commit
+"Throughput under load". What is left of 28, and ticket 38, are in
+`FINDINGS.md`.
+
+- **Why.** In the 4-hour load run of 2026-11-25 (160 users in 40 rooms, a pool of
+  60), the requests a second fell from 2,458 to 1,682 in four hours. All 60
+  connections were open and 54 of them were idle in transaction: the stone held
+  them while it worked in Java. That work was:
+  - Hibernate checking every entity for changes before every query of a page of
+    entries, with up to three queries more for each entry;
+  - the unwrap of the Circle key (ECDH on P-384 and ML-KEM) under the lock of the
+    Circle's row;
+  - PBKDF2 at login, after the account was read.
+- **Decided by the user (2026-11-25), in this order, each measured by a load run:**
+  - **Step 1, reads without flushes.** `CommonDao.reading` runs a read with
+    Hibernate's flush mode at COMMIT, after one flush, and sets the mode back.
+    `FeatureManager.entries` reads a page that way, with its authors, entries
+    and content each in one query (`findMemberNames`, `findEntryExternalIds`,
+    `findDataByMetadata`). The content of a read is loaded read-only and
+    detached after it.
+  - **Step 2, the Circle key before the lock.** Add, change, remove and close
+    unwrap the Circle key before `lockCircle`. Under the lock the Trustee is
+    refreshed, and the key is unwrapped again only if its key ID changed. An
+    offer to the rotation from the early unwrap is checked again under the
+    Circle's lock by `RotationManager.begin`.
+  - **Step 4, the passphrase before the request's connection.** The account is
+    read in a transaction of its own (`AuthAttempts.findAccount`, `REQUIRES_NEW`
+    in `AuthLimitBean`) and the passphrase checked before the request's
+    transaction reads anything. Then the account is read again in it, and the
+    passphrase checked again if its keys changed meanwhile (`sameKeys`).
+    - An unknown name still costs the same work and gets the same answer as a
+      wrong passphrase.
+    - A stone's first account is still claimed in the request's transaction.
+  - **Option 3, a cache of Circle keys:** the last option. The user isn't fond
+    of caching secrets.
+- **The JSON provider (ticket 35, option 2).** `JsonFactories` holds one
+  `JsonBuilderFactory` and one `JsonReaderFactory`. Before, each
+  `Json.create*` call ran a `ServiceLoader` lookup that read the stone's JAR.
+- **The buffer of a stored content (ticket 36).**
+  - The decision: stream the parts when the length is known, and use a buffer
+    from 64 KiB that grows when it isn't.
+  - Done otherwise for a known length, accepted by the user (2026-11-26). If the
+    client's stream fails partway through a part, pgjdbc has already sent part
+    of it, can't recover and drops the connection, and the error would be the
+    driver's. So the stream is still read into a buffer first, and the buffer is
+    the size of the content's largest part, no longer 4 MiB for every write.
+  - Without a length, the buffer starts at 64 KiB and doubles up to the part
+    size (`PartBuffer`).
+- **The load test's Flight Recording (ticket 37):** `maxsize=8g` and no
+  `maxage`, so it keeps the whole run (`TestStone`). `maxage=0` kept only the
+  last chunk.
+- **Tests, each failing without its part:**
+  - `FeaturesTest`: the statements of a page and its checks for changes, 5
+    against 18 entries; nothing read for the page kept.
+  - `RotationLockOrderTest`: the Circle key unwrapped while a write waits for
+    the Circle's lock.
+  - `PassphraseBeforeReadTest`: no account in the request's session while
+    PBKDF2 runs; an account changed meanwhile checked again.
+  - `SocketCodecTest`: one JSON provider made.
+  - `EncryptedDataStoreTest`: under 1 MiB allocated for a write of 100 bytes.
+  - `TestStoneTest`: the recording option.
+- **Measured (2026-11-25):** the same load as before, each step for 30 minutes,
+  then all of them for 4 hours. Runs vary by about 7 %.
+
+  | Run (30 min) | requests/s | effect |
+  |---|---|---|
+  | baseline | 2,665 | `chat.history.rest` p50 786 ms |
+  | + step 1 | 3,289 | `chat.history.rest` p50 254 ms; a page of entries from 28.5 % to 4.6 % of the CPU |
+  | + step 2 | 3,078 | lock waits over 200 ms down by a third |
+  | + step 4 | 3,287 | idle in transaction over 100 ms after a member select: 3.8 → 0.75 |
+
+  The 4-hour run, requests a second hour by hour:
+
+  | | hour 1 | hour 2 | hour 3 | hour 4 |
+  |---|---|---|---|---|
+  | before | 2,458 | 2,081 | 1,869 | 1,682 |
+  | after | 4,481 | 4,034 | 3,667 | 3,396 |
+
+  - **The run:** 55.9 million operations, none failed.
+  - **Idle in transaction:** 18 ms at the median and 82–99 ms at the 90th
+    percentile, before 48–69 and 419–566 ms.
+  - **GC:** about 285 s an hour, before about 690.
+  - **Still a fall of 24 %:** that is the database's own work, which grows with
+    the history. Two counts are ticket 38, and the buffer cache is ticket 32.
+    ECDH is now the largest CPU cost (23 %). The runs' files are in
+    `/home/kim/projects/eds-runs/results/`.
+
 ### Open points
 
-- ~~pgjdbc buffering~~: verified in S1. It streams with a length; without one it
-  spools ciphertext to a temp file, not memory. `Content-Length` stays the normal
-  case (it allows `413` before reading the body and avoids the temp file); uploads
-  without it use this behaviour (see below).
-- ~~H2 limits~~: verified in S1. 1,000,000,000 bytes, not memory-bounded.
-- Objects above ~1 GB: PostgreSQL large objects (`lo_*`) would lift the limit, but
-  don't fit the shared PostgreSQL/H2 schema. Not planned unless a use case appears.
+- ~~pgjdbc buffering~~: verified in S1. Since "Content in parts" there is no temp
+  file: a part at a time in a buffer. `Content-Length` stays the normal case (it
+  allows `413` before reading the body).
+- ~~H2 limits~~: verified in S1; since "Content in parts" bounded by a part on H2 as
+  well.
+- Objects above 1000 MiB: not planned unless a use case appears. Since "Content in
+  parts" (2026-11-18) no field holds more than a part, so PostgreSQL's 1 GB field
+  limit is no longer the bound, and large objects (`lo_*`) aren't needed. The
+  limits are `eds.stream.max.object.size` (1000 MiB; the settings request checks
+  no upper bound, ticket 34) and `quarkus.http.limits.max-body-size` (1100M).
 - PWA media access: decided in *Clients API* L5, a download token per object
   (`POST /data/{dataId}/token`, then `?token=` on the content URL); no cookie.
 - ~~Server-side spool for uploads without `Content-Length`~~: decided 2026-11-10
   (the user), done 2026-11-11 for the CLI (`TOLK.md`, L6b); see "Upload" above.
   `DataStreams.encrypt` without a length, `EncryptedDataStore.writeToTheEnd`
-  (`setBinaryStream` without a length), and `UploadDataManager.writeToTheEnd` with
+  (parts read to the end of the stream), and `UploadDataManager.writeToTheEnd` with
   the limits. H2 accepts a stream without a length as well. Tests:
   `DataStreamsTest` (the same bytes as with a length, for every boundary case),
   `ShareBeanUploadTest` (round trips, too large, a failing source),
   `ShareBeanLargeDataTest` (the ceiling, while reading and after), and
   `EdsStreamingTest` with a real chunked request over HTTP.
-- Chunk size (format decision in *Crypto* C4); 64 KiB is a common choice
-  (0.02 % tag overhead, small range reads stay cheap).
+- ~~Chunk size~~: 64 KiB, decided in *Crypto* C4.
 - ~~Defaults for the inline limit, read batch size and maximum object size~~: 10 MiB,
   4 MiB and 1000 MiB (S2, S4).
 
@@ -2094,7 +2380,7 @@ topics, it refers to them and doesn't redefine them.
 Where the plan started; parts of the original restructuring were already done, in
 some cases differently from the first version of this plan:
 
-- Modules: `eds-api`, `eds-core`, `eds-quarkus`, `eds-client`, `eds-fitnesse`.
+- Modules: `eds-api`, `eds-core`, `eds-quarkus`, `eds-client`, `eds-fitnesse` (now `eds-testing`).
   The pg/h2 Quarkus variants and WildFly are gone.
 - Java 25 (`pom.xml`), Quarkus 3.x; `eds-quarkus` is the only runnable module and
   builds an uber-jar (`quarkus.package.jar.type=uber-jar`).
@@ -2117,16 +2403,16 @@ eds/
 ├── eds-core/                business logic, crypto, persistence, REST and WebSocket implementations
 ├── eds-quarkus/             Quarkus application → runnable uber-jar
 │   └── src/main/webui/      Rune (RUNE.md)
-├── eds-fitnesse/            generated Java client, fixtures, FitNesse suites
+├── eds-testing/             generated Java client, FitNesse fixtures and suites, load and rotation tests
 └── eds-cli/                 Tolk (TOLK.md; profile: cli)
 ```
 
-`eds-client` was retired in Phase L3; the generated client in `eds-fitnesse` covers
+`eds-client` was retired in Phase L3; the generated client in `eds-testing` covers
 what it did.
 
-Reactor order: `eds-api` → `eds-core` → `eds-quarkus` → `eds-fitnesse`.
-`eds-fitnesse` is always a module of the build; its profile `fitnesse` only adds the
-run of the suites against the runner JAR.
+Reactor order: `eds-api` → `eds-core` → `eds-quarkus` → `eds-testing`.
+`eds-testing` is always a module of the build; its profiles `fitnesse`, `load` and
+`rotation` only add the runs against a stone (`eds-testing/README.txt`).
 
 Baseline: Java 25, Quarkus 3.x (current LTS).
 
@@ -2151,40 +2437,57 @@ Baseline: Java 25, Quarkus 3.x (current LTS).
 
 - Everything server-side: crypto layer, persistence (Jakarta Persistence / Hibernate ORM),
   business services, the REST resources (code-first, annotated; they use the
-  hand-written `eds-api` types), and the Jakarta WebSocket endpoint of the chat (the
-  runner brings `quarkus-websockets`).
+  hand-written `eds-api` types), and the Jakarta WebSocket endpoint of the socket
+  (`SocketEndpoint`; the runner brings `quarkus-websockets`).
 - Written against Jakarta APIs (CDI, REST, Persistence, Transactions); no Quarkus
   bootstrapping here, so it stays unit-testable without a container.
 - CDI beans and resources of `eds-core` are indexed by the runner
   (`quarkus.index-dependency.eds-core.*` in `application.properties`); there is no
   Jandex plugin.
-- Add `org.slf4j:slf4j-nop` (or `slf4j-simple`) in `test` scope, version matching the
-  resolved `slf4j-api`, if the "No SLF4J providers were found" warning still appears.
+- In the tests, logback is the provider of SLF4J (off by `logback-test.xml`, named
+  by the tests' `META-INF/services`), so a test can see what is logged
+  (`LogCapture`); `slf4j-nop` went on 2026-11-22.
 
 #### eds-quarkus
 
 - Thin module: depends on `eds-core`; contains `application.properties`, the database
   selection/startup classes and the PWA.
 - REST and PWA on the same origin (no CORS). Path layout (2026-11-10): Rune at `/`,
-  the REST API and the chat WebSocket below `/api/v1`. The API root is defined once
+  the REST API and the socket (`/api/v1/socket`) below `/api/v1`. The API root is defined once
   in the code (`Constants.REST_API`, the `@ApplicationPath` of `EDSApplication`);
   there is no `quarkus.http.root-path`.
 - Rune is built into the same JAR by Quinoa; that wiring is described in `RUNE.md`.
 - Published spec: serve the contract itself at runtime (L2), not a version
   re-derived at runtime.
 
-#### eds-fitnesse
+#### eds-testing
 
 - Test module, not production code: third-party libraries are allowed here (decided
   2026-11-05).
 - Unpacks `openapi.json` from `eds-api`, generates a Java client with generator `java`,
-  `library=native` (java.net.http + Jackson), package `net.haugr.eds.client`.
+  `library=native` (java.net.http + Jackson), package `net.haugr.eds.testing.client`.
   No Quarkus or MicroProfile runtime in this module, and no other EDS code.
 - FitNesse fixtures wrap the generated client; wiki pages live in the module.
 - Lifecycle (profile `fitnesse`): `FitNesseSuiteIT` (Failsafe) starts the
   `eds-quarkus` runner JAR on its own ports, waits for `/q/health/ready`, runs the
   `EDS` suite with FitNesse (a test dependency) in a separate process, and stops the
   runner. H2 by default; PostgreSQL when `EDS_DB_URL` is set in the environment.
+- Packages under `net.haugr.eds.testing`: `.fitnesse` (the fixtures), `.client`
+  (the generated client), `.load` (in `src/test/java`: the load test `StoneLoadIT`,
+  profile `load`; the rotation test `CircleRotationIT`, profile `rotation`; the
+  PostgreSQL observer `PostgresObserver`). The module was `eds-fitnesse` until
+  2026-11-25, renamed as it holds more than FitNesse.
+- The load and rotation tests start their stone with `TestStone`. With Podman on
+  the PATH, it runs in a rootless container, `eds-<name>-stone` (chosen by the
+  user, 2026-11-25), built from `eds-stone.jar` with
+  `accessories/podman/Containerfile`. The container uses the host's network, the
+  user's ID and `target/` as a mount, and gets the set `EDS_*` and `QUARKUS_*`
+  variables by name. A container left by a killed run is removed by name at the
+  next start, and a shutdown hook stops it when the JVM is stopped. Without
+  Podman, or with `-Deds.stone.container=false`, it runs `java -jar`. This was
+  ticket 29 in `FINDINGS.md`: a killed test left its stone holding the ports.
+- `TestStone` records the stone with JFR (`-Deds.load.jfr`) with `maxsize=8g` and
+  no `maxage`, so the recording keeps a whole run (ticket 37, 2026-11-25).
 
 ### Cross-cutting requirements
 
@@ -2200,7 +2503,7 @@ Baseline: Java 25, Quarkus 3.x (current LTS).
   metadata, see *Streaming*; the size is computed from the stored object).
 - WebSocket frame types defined as JSON schemas in `components/schemas`, so all
   clients get generated frame models; only socket handling is hand-written. Added in
-  L4 with the chat.
+  L4 with the chat; `SocketFrame` and `SocketFrameType` since `FEATURES.md`.
 - Consistent error model across all endpoints: every response body is the JSON
   response with `returnCode` and `returnMessage`. The JSON API answers HTTP 200
   (decided 2026-11-04: kept); the content endpoints and the resource API answer with
@@ -2320,7 +2623,7 @@ contract is served at `/api/v1/openapi.json` (see "After L5"):
 #### Phase L3: Acceptance tests on the generated client
 
 Tasks:
-- Generate the Java client in `eds-fitnesse`; port the fixtures from `eds-client`.
+- Generate the Java client in `eds-testing`; port the fixtures from `eds-client`.
 - Suites for the ID-based API and anything not yet covered.
 - Integration-test lifecycle (start DB + server, run suites, stop).
 - Retire `eds-client`.
@@ -2328,11 +2631,11 @@ Tasks:
 Done when: `mvn -Pfitnesse verify` runs the suites green against the runner JAR and
 no module depends on `eds-client`.
 
-Decision (2026-11-05, by the user): `eds-fitnesse` is a test module, so the rule
+Decision (2026-11-05, by the user): `eds-testing` is a test module, so the rule
 against third-party libraries doesn't apply to it.
 
 Done 2026-11-05:
-- `eds-fitnesse` generates the client from the contract, unpacked from the `eds-api`
+- `eds-testing` generates the client from the contract, unpacked from the `eds-api`
   jar (`openapi-generator-maven-plugin` 7.26.0, `java`/`native`, Jackson 2.22.1).
   The normalizer rule `REF_AS_PARENT_IN_ALLOF` keeps the inheritance of eds-api
   (requests extend `Authentication`, responses `EDSResponse`), so the fixtures stayed
@@ -2359,6 +2662,11 @@ Done 2026-11-05:
 - `eds-client` (hand-written Gson client) removed, with Gson.
 - Result: `EDS.API` 548 right, 0 wrong (was 416; the 132 new are the resource API).
 #### Phase L4: Live chat
+
+> Replaced since `FEATURES.md` T4 (2026-11-15): the chat is a feature on the
+> socket `/api/v1/socket` (`SocketFrame`, `SocketFrameType`). The Data Types `chat`
+> and `chat-receipt`, the chat frames and the `chat` fixture are gone. Kept as the
+> record of how it was built.
 
 Tasks:
 - Chat storage design (Open decisions), encrypted per *Crypto* §4.
@@ -2407,8 +2715,9 @@ Done 2026-11-06:
   backlog thrown away. Frames are handled and sent by two threads per connection, so
   a blocked send holds nothing else up; a dropped connection which doesn't read is
   closed after 10 s all the same.
-- Not done: rate limits per connection, and delivery across several EDS instances
-  (messages reach the connections of the same instance). Editing and deleting
+- Not done: rate limits per connection (since 2026-11-26 the socket's budgets,
+  `SECURITY.md`), and delivery across several EDS instances (messages reach the
+  connections of the same instance); see `FEATURES.md`. Editing and deleting
   messages came later, see "After L5".
 - Tests: `ChatTest` and `ChatCodecTest` (core, including the check that the stored
   bytes contain neither text nor sender), `EdsChatTest` (Quarkus, real WebSockets),
@@ -2477,7 +2786,8 @@ came in small steps; this is what they add up to.
   `metadata_not_before_parent_id` is dropped. Folders can't be moved, so loops still
   can't occur.
 
-**Chat (2026-11-08 to 2026-11-10)**, on the L4 WebSocket; the frames and schemas are
+**Chat (2026-11-08 to 2026-11-10)**, replaced since `FEATURES.md` T4 (see L4), on the
+L4 WebSocket; the frames and schemas were
 in the contract (`ChatFrameType`, `ChatFrame`, `ChatMessage`, `ChatReceipt`), the
 protocol in its overview:
 - `CHANGED`: the files of a joined Circle changed (added, uploaded, updated, moved,
@@ -2538,7 +2848,8 @@ protocol in its overview:
 
 **Schema**
 - The schema changed with these steps. Since S1:
-  - the standard Data Types `chat`, `thumbnail` and `chat-receipt`;
+  - the standard Data Types `chat`, `thumbnail` and `chat-receipt` (since
+    `FEATURES.md`: `entry` instead of `chat` and `chat-receipt`);
   - the table `eds_invitations`;
   - `eds_members.avatar`, `eds_circles.avatar`;
   - `eds_members.pbe_iterations` (not null) and `eds_members.settings`;
@@ -2559,30 +2870,27 @@ protocol in its overview:
 **Tests**
 - The full build ran with 796 tests and no failures on 2026-11-10, and with 806 on
   2026-11-13 (154 in `eds-api`, 626 in `eds-core`, 24 in `eds-quarkus`, 2 in
-  `eds-fitnesse`).
-- The FitNesse suite last ran on 2026-11-08 (`EDS.API` 702 right, 0 wrong). It was
-  not run after the changes of 2026-11-10 and later, including the move to
-  `/api/v1`; that run is open.
+  `eds-testing`).
+- The FitNesse suite runs in every verification since; see the latest commit.
 
 ### Tools
 
 - `eds.sh` in the project root builds and runs the parts (`RUNNING.md` describes its
-  use): `build [eds|rune|tolk]`, `start [--masterkey]`, `stop [--remove]`, `restart`,
+  use): `build [eds|rune|stone|tolk|all] [--test] [--no-sonar] [--sbom] [--podman]`,
+  `start [--masterkey]`, `stop [--remove]`, `restart`,
   `status`, `logs` for the one Podman container; `masterkey generate [--force]` and
   `masterkey load` for a MasterKey file in `accessories/podman/` (git-ignored);
-  `fitnesse start|stop`. The parts for Rune and Tolk come with their plans.
-- `.github/workflows/build.yml` is unchanged by this work; whether CI builds Rune
-  (which needs Node through Quinoa) and Tolk (`-Pcli`, which needs Go) is open.
+  `fitnesse start|stop`, `completion`, `install`. The parts for Rune and Tolk come
+  with their plans.
+- `.github/workflows/build.yml` builds EDS with Rune and the stone, with the tests
+  skipped; Tolk (`-Pcli`) isn't built in CI (a ticket in `FINDINGS.md`).
 
 ### Open
 
 - **One session per account**: solved 2026-11-15, see "Several sessions" below.
-- Chat: retention and deletion rules, which come with an extended Circle
-  configuration; rate limits per connection; delivery across several EDS instances.
+- The socket and the features (retention, delivery across several EDS instances):
+  see `FEATURES.md`, "Open decisions".
 - Objects above about 1 GB (*Streaming*, "Open points").
-- A copy within a stone for Tolk's `cp` uses a download and an upload, not the
-  server's copy operation (`TOLK.md`).
-- The FitNesse run after 2026-11-10, and CI for Rune and Tolk (above).
 
 ## Several sessions
 
@@ -2639,7 +2947,4 @@ Done 2026-11-15:
   untouched, new passphrase, invalidate, the limit, expiry). The contract changed
   only in the texts of login, logout and the new setting.
 - Not done: a list of a Member's sessions and "log out everywhere" as requests of
-  their own. Rune's stone settings don't name the new setting yet; it comes with
-  the Rune phases.
-- Found: `ChatHubTest` fails now and then in a full build (its 10 s waits run out
-  under load); it passes alone.
+  their own (a ticket in `FINDINGS.md`).

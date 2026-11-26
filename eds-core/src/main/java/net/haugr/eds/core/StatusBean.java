@@ -67,6 +67,7 @@ public class StatusBean {
     private final Map<String, Long> validKeys = new ConcurrentHashMap<>();
     private final AtomicReference<StatusManager.Database> database = new AtomicReference<>();
     private volatile long lastProbe = 0;
+    private volatile boolean inventoryWaitLogged = false;
 
     public StatusBean() {
         this(null, null, (TransactionSynchronizationRegistry) null);
@@ -103,11 +104,32 @@ public class StatusBean {
     }
 
     /**
+     * As {@link #tick()}, but the inventory only when the database is ready:
+     * before the startup has prepared it, the inventory would query tables
+     * which the startup may still be creating. The load is sampled anyway.
+     *
+     * @param databaseReady True when the startup has prepared the database
+     */
+    public void tick(final boolean databaseReady) {
+        tick(System.nanoTime(), databaseReady);
+    }
+
+    /**
      * As {@link #tick()}, at the given time, for the tests.
      *
      * @param nanos The time, as of {@link System#nanoTime()}
      */
     public void tick(final long nanos) {
+        tick(nanos, true);
+    }
+
+    /**
+     * As {@link #tick(boolean)}, at the given time, for the tests.
+     *
+     * @param nanos         The time, as of {@link System#nanoTime()}
+     * @param databaseReady True when the startup has prepared the database
+     */
+    public void tick(final long nanos, final boolean databaseReady) {
         final StatusCollector collector = StatusCollector.getInstance();
 
         if (collector.loadDue(nanos, settings.getStatusLoadInterval())) {
@@ -125,6 +147,13 @@ public class StatusBean {
         }
 
         if (collector.inventoryDue(nanos, settings.getStatusInventoryInterval() * 60)) {
+            if (!databaseReady) {
+                if (!inventoryWaitLogged) {
+                    inventoryWaitLogged = true;
+                    LOGGER.info("The inventory of the stone is gathered once the database is ready.");
+                }
+                return;
+            }
             try {
                 final StatusManager manager = new StatusManager(settings, entityManager);
                 collector.sampleInventory(nanos, manager.inventory());

@@ -62,6 +62,15 @@ jobs:
           podman build --format docker -f accessories/podman/Containerfile \
               -t eds-quarkus:ci eds-quarkus/target
 
+      # The stone alone: the server as a JAR of its own
+      # (target/eds-stone.jar) built from the modules installed above, and an
+      # image from the same Containerfile
+      - name: Build the stone alone and its container image
+        run: |
+          mvn -B -ntp -DskipTests -Dstone -pl eds-quarkus package
+          podman build --format docker -f accessories/podman/Containerfile \
+              --build-arg JAR=eds-stone.jar -t eds-stone:ci eds-quarkus/target
+
       - name: Install Syft
         id: syft
         uses: anchore/sbom-action/download-syft@v0
@@ -75,6 +84,13 @@ jobs:
           podman save --format oci-archive -o "${RUNNER_TEMP}/eds-quarkus.tar" eds-quarkus:ci
           ${{ steps.syft.outputs.cmd }} scan "oci-archive:${RUNNER_TEMP}/eds-quarkus.tar" \
               -o cyclonedx-json=target/container-eds-quarkus-cyclonedx.json
+
+      - name: Generate stone container SBOM
+        id: stone-sbom
+        run: |
+          podman save --format oci-archive -o "${RUNNER_TEMP}/eds-stone.tar" eds-stone:ci
+          ${{ steps.syft.outputs.cmd }} scan "oci-archive:${RUNNER_TEMP}/eds-stone.tar" \
+              -o cyclonedx-json=target/container-eds-stone-cyclonedx.json
 
       - name: Install Grype
         id: grype
@@ -100,6 +116,14 @@ jobs:
               --fail-on high \
               -o table \
               -o json=grype-report-eds-container.json
+
+      - name: Scan stone container SBOM for vulnerabilities
+        if: ${{ !cancelled() && steps.stone-sbom.outcome == 'success' }}
+        run: |
+          ${{ steps.grype.outputs.cmd }} sbom:target/container-eds-stone-cyclonedx.json \
+              --fail-on high \
+              -o table \
+              -o json=grype-report-eds-stone-container.json
 
       - name: Upload vulnerability report
         if: ${{ always() }}

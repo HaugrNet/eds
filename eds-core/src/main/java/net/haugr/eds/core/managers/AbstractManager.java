@@ -25,7 +25,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
-import net.haugr.eds.api.common.Constants;
 import net.haugr.eds.api.common.CredentialType;
 import net.haugr.eds.api.common.MemberRole;
 import net.haugr.eds.api.common.ReturnCode;
@@ -78,6 +77,8 @@ public abstract class AbstractManager<D extends CommonDao, R extends EDSResponse
     protected static final SecureRandom RANDOM = new SecureRandom();
     /** Length of the random PBKDF2 salt per Member. */
     private static final int PASSWORD_SALT_BYTES = 16;
+    /** The salt of the derivation for an unknown name, which only costs the time. */
+    private static final byte[] UNKNOWN_ACCOUNT_SALT = new byte[PASSWORD_SALT_BYTES];
 
     // Labels and AAD values, which bind each protected value to its purpose
     // (PLAN.md, Crypto). Changing any of them makes existing data unreadable.
@@ -112,6 +113,13 @@ public abstract class AbstractManager<D extends CommonDao, R extends EDSResponse
     protected MemberKeyPair keyPair = null;
     /** The Session of this request, if it came with one. */
     protected SessionEntity session = null;
+    /** The count of the attempts at a passphrase (#68), given by the Bean. */
+    private AuthAttempts attempts = null;
+    /** The account was made by this request (claimStone), and isn't committed yet. */
+    private boolean claimed = false;
+
+    /** The answer to wrong credentials, and to a locked account, so a lock tells nothing more. */
+    public static final String WRONG_CREDENTIALS = "Cannot authenticate the Account from the given Credentials.";
 
     /**
      * General Constructor.
@@ -197,12 +205,16 @@ public abstract class AbstractManager<D extends CommonDao, R extends EDSResponse
             //     searched and also allow the checks to end earlier.
             //     However, equally important, this check is a premature
             //     check and will *not* count in the final Business Logic!
-            verifyAccount(authentication, circleId);
-
-            //     Check if the Member is valid, i.e. if the given
-            //     Credentials can correctly decrypt the Private Key for
-            //     the Account. If not, then an Exception is thrown.
-            checkCredentials(member, authentication.getCredential());
+            //       The place to check a passphrase is taken first (ticket
+            //     20), so a request which waits for one holds no connection
+            //     of the database yet.
+            //       The given Credentials must decrypt the Private Key of
+            //     the Account, else an Exception is thrown. The account is
+            //     read in a transaction of its own, so this request holds no
+            //     connection while the passphrase is checked (ticket 28).
+            try (var _ = crypto.passphrasePlace()) {
+                verifyAccount(authentication, circleId);
+            }
         }
 
         // Step 3; Final check, ensure that the Member is having the correct
@@ -311,13 +323,65 @@ public abstract class AbstractManager<D extends CommonDao, R extends EDSResponse
      */
     private void verifyAccount(final A authentication, final String circleId) {
         final String account = trim(authentication.getAccountName());
-        MemberEntity memberEntity = dao.findMemberByName(account);
-
-        if (memberEntity == null) {
-            memberEntity = claimStone(account, authentication.getCredential());
+        final byte[] credential = authentication.getCredential();
+        if (attempts == null) {
+            // Without the Bean's transactions of their own, as before;
+            // checkPassphrase refuses it.
+            verifyAccountHere(account, credential, circleId);
+            return;
         }
 
+        // The account is read in a transaction of its own, and the
+        // passphrase checked (PBKDF2) before this request's transaction reads
+        // anything: so it holds no connection of the database meanwhile
+        // (ticket 28). The answers stay as they were.
+        final AuthAttempts.Account found = attempts.findAccount(account, circleId);
+        if (found.byName() == null) {
+            if (found.stoneHasAccounts()) {
+                throw unknownAccount(credential);
+            }
+            // A stone's first account, claimed in this transaction.
+            verifyAccountHere(account, credential, circleId);
+            return;
+        }
+        StatusCollector.getInstance().active(found.byName().getId());
+        final MemberKeyPair opened = checkPassphrase(found.member(), credential, WRONG_CREDENTIALS);
+        keyPair = keysNow(found.member(), opened, credential);
+    }
+
+    /**
+     * Reads the account again, now in this request's transaction, as its
+     * member. A new passphrase meanwhile gives the account new keys: then the
+     * passphrase is checked again.
+     */
+    private MemberKeyPair keysNow(final MemberEntity checked, final MemberKeyPair opened, final byte[] credential) {
+        final MemberEntity current = dao.find(MemberEntity.class, checked.getId());
+        if (current == null) {
+            throw new AuthenticationException(WRONG_CREDENTIALS);
+        }
+        member = current;
+        return sameKeys(checked, current) ? opened : checkPassphrase(current, credential, WRONG_CREDENTIALS);
+    }
+
+    /** The account read and its passphrase checked in this request's transaction, as before ticket 28. */
+    private void verifyAccountHere(final String account, final byte[] credential, final String circleId) {
+        MemberEntity memberEntity = dao.findMemberByName(account);
+        if (memberEntity == null) {
+            memberEntity = claimStone(account, credential);
+        }
         checkMemberAccount(memberEntity, circleId);
+        checkCredentials(member, credential);
+    }
+
+    /** Whether the account read before still has the keys its passphrase was checked against. */
+    private static boolean sameKeys(final MemberEntity read, final MemberEntity current) {
+        return Objects.equals(read.getSalt(), current.getSalt())
+                && (read.getPbeAlgorithm() == current.getPbeAlgorithm())
+                && Objects.equals(read.getPbeIterations(), current.getPbeIterations())
+                && (read.getKeyAlgorithm() == current.getKeyAlgorithm())
+                && Objects.equals(read.getMemberKey(), current.getMemberKey())
+                && Objects.equals(read.getPublicKey(), current.getPublicKey())
+                && Objects.equals(read.getPrivateKey(), current.getPrivateKey());
     }
 
     /**
@@ -337,12 +401,34 @@ public abstract class AbstractManager<D extends CommonDao, R extends EDSResponse
      * @throws AuthenticationException if the stone has an account already
      */
     protected final MemberEntity claimStone(final String accountName, final byte[] credential) {
+        // Once the stone has an account, it keeps one (its System
+        // Administrator can't be deleted): an unknown name then takes no
+        // lock, so many of them aren't checked one at a time.
+        if (dao.countMembers() != 0) {
+            throw unknownAccount(credential);
+        }
         dao.lockForTheFirstAccount();
         if (dao.countMembers() != 0) {
-            throw new AuthenticationException("Could not uniquely identify an account for '" + accountName + "'.");
+            throw unknownAccount(credential);
         }
 
+        claimed = true;
         return createNewAccount(accountName, MemberRole.ADMIN, credential);
+    }
+
+    /**
+     * An unknown name is answered as a wrong passphrase, and after the same
+     * work: the passphrase's key is derived as for a new account, with a
+     * fixed salt, and thrown away (ticket 21). So neither the answer nor the
+     * time tells whether an account of the name exists. The derivation takes
+     * a place of the {@code PassphraseLimit} as any other (ticket 20).
+     *
+     * @param credential The passphrase given
+     * @return The refusal
+     */
+    private AuthenticationException unknownAccount(final byte[] credential) {
+        crypto.generatePasswordKey(settings.getPasswordAlgorithm(), credential, UNKNOWN_ACCOUNT_SALT, settings.getPasswordIterations());
+        return new AuthenticationException(WRONG_CREDENTIALS);
     }
 
     /**
@@ -452,7 +538,14 @@ public abstract class AbstractManager<D extends CommonDao, R extends EDSResponse
         // New keys end every Session of the Member.
         dao.removeSessions(member);
         session = null;
+        final boolean existing = member.getId() != null;
         dao.save(member);
+        if (existing) {
+            // A new passphrase ends a lock (#68): the attempts were at the
+            // old one, e.g. at the name of an invitation before it was
+            // accepted.
+            dao.clearFailedLogins(member.getId());
+        }
 
         return pair;
     }
@@ -650,16 +743,78 @@ public abstract class AbstractManager<D extends CommonDao, R extends EDSResponse
     }
 
     private void checkCredentials(final MemberEntity entity, final byte[] credential) {
+        keyPair = checkPassphrase(entity, credential, WRONG_CREDENTIALS);
+    }
+
+    /**
+     * Gives the manager the count of the attempts at a passphrase (#68),
+     * which the Bean keeps in transactions of their own.
+     *
+     * @param attempts The count, see {@link AuthAttempts}
+     */
+    public final void limitAttempts(final AuthAttempts attempts) {
+        this.attempts = attempts;
+    }
+
+    /**
+     * <p>Opens the keys of an account with its passphrase: the one place
+     * where a passphrase is checked, for every request and the MasterKey
+     * request, and so where the lock of an account (#68) applies.</p>
+     *
+     * <p>Each attempt is counted before the passphrase is checked, so no
+     * more are tried than the limit allows, however many come at the same
+     * moment. A locked account is refused with the same answer as a wrong
+     * passphrase, after the same work, so neither the answer nor its time
+     * tells the lock. An accepted passphrase clears the count. An account
+     * this request made itself (a stone's first) has nothing to count.</p>
+     *
+     * @param entity     The account
+     * @param credential The passphrase given
+     * @param message    The answer to a locked account or a wrong passphrase
+     * @return The opened keys of the account
+     * @throws AuthenticationException if the account is locked, or the
+     *                                 passphrase is wrong
+     * @throws IllegalStateException   if the Bean didn't give the count, see
+     *                                 {@link #limitAttempts(AuthAttempts)}
+     */
+    protected final MemberKeyPair checkPassphrase(final MemberEntity entity, final byte[] credential, final String message) {
+        if (attempts == null) {
+            // A Bean which forgot it would count in the request's transaction,
+            // which the rollback of a failed request undoes: nothing would lock.
+            throw new IllegalStateException("A passphrase is checked without the count of its attempts, see limitAttempts.");
+        }
+        final boolean limited = !claimed && (settings.getAuthMaxFailedAttempts() > 0);
+
+        // The attempt is counted first, so no more are tried than the limit
+        // allows; after the place to check it is taken, so a busy answer is
+        // no attempt (ticket 20).
+        try (var _ = crypto.passphrasePlace()) {
+            return tryPassphrase(entity, credential, message, limited, !limited || attempts.begin(entity.getId()));
+        }
+    }
+
+    private MemberKeyPair tryPassphrase(final MemberEntity entity, final byte[] credential, final String message, final boolean limited, final boolean permitted) {
+        final MemberKeyPair opened;
         try {
-            keyPair = openMemberKeys(entity, credential);
+            opened = openMemberKeys(entity, credential);
         } catch (CryptoException e) {
             // If an incorrect Passphrase was used to generate the PBE key, then
             // a Bad Padding Exception should've been thrown, which is converted
             // into an EDS Crypto Exception. If that is the case, the Member has
             // provided invalid credentials - with which it is not possible to
             // extract the KeyPair for the Account.
-            throw new AuthenticationException("Cannot authenticate the Account from the given Credentials.", e);
+            throw new AuthenticationException(message, e);
         }
+        if (!permitted) {
+            // Locked: the passphrase was checked only so the answer takes
+            // as long as to a wrong one; even a right one is refused.
+            throw new AuthenticationException(message);
+        }
+        if (limited) {
+            attempts.succeeded(entity.getId());
+        }
+
+        return opened;
     }
 
     /**

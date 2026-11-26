@@ -84,8 +84,9 @@ final class SettingsTest extends DatabaseSetup {
         mySettings.set(StandardSetting.EDS_LOCALE, Locale.GERMAN.toString());
         assertEquals(Locale.GERMAN, mySettings.getLocale());
 
-        mySettings.set(StandardSetting.EDS_CHARSET, "ISO-8859-15");
-        assertEquals("ISO-8859-15", mySettings.getCharset().name());
+        // Text is UTF-8, whatever is stored under the old key (ticket 14).
+        mySettings.set("eds.system.charset", "UTF-16");
+        assertEquals("UTF-8", mySettings.getCharset().name());
 
         mySettings.set(StandardSetting.SANITY_STARTUP, "false");
         assertFalse(mySettings.hasSanityStartup());
@@ -103,7 +104,8 @@ final class SettingsTest extends DatabaseSetup {
     @Test
     void testShowOtherMemberInformation() {
         final Settings mySettings = newSettings();
-        assertTrue(mySettings.hasShareTrustees());
+        // Off by default (ticket 10).
+        assertFalse(mySettings.hasShareTrustees());
         mySettings.set(StandardSetting.SHOW_TRUSTEES, "false");
         assertFalse(mySettings.hasShareTrustees());
         mySettings.set(StandardSetting.SHOW_TRUSTEES, "true");

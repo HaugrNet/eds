@@ -346,6 +346,21 @@ final class ManagementBeanFetchMemberTest extends DatabaseSetup {
     }
 
     @Test
+    void testByDefaultOnlySharedCirclesAreShown() {
+        // Ticket 10: the default showed every Circle of any Member, and so,
+        // with the list of all Members, every Circle of the stone.
+        final ManagementBean bean = prepareManagementBean(newSettings());
+        final FetchMemberRequest request = prepareRequest(FetchMemberRequest.class, MEMBER_4);
+        request.setMemberId(findFirstMember().getExternalId());
+        final FetchMemberResponse response = bean.fetchMembers(request);
+
+        assertTrue(response.isOk());
+        // Member 1 is in Circle1 and Circle2, Member 4 in Circle2 and Circle3.
+        assertEquals(1, response.getCircles().size());
+        assertEquals(CIRCLE_2_ID, response.getCircles().getFirst().getCircleId());
+    }
+
+    @Test
     void testFindMember1WithShowOtherFalseAsMember4() {
         // Ensure that we have the correct settings for the Service
         final Settings mySettings = newSettings();

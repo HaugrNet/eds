@@ -38,6 +38,7 @@ import net.haugr.eds.core.model.TrusteeDao;
 import net.haugr.eds.core.model.entities.CircleEntity;
 import net.haugr.eds.core.model.entities.DataTypeEntity;
 import net.haugr.eds.core.model.entities.KeyEntity;
+import net.haugr.eds.core.rotation.CircleRotations;
 import net.haugr.eds.core.model.entities.MemberEntity;
 import net.haugr.eds.core.model.entities.MetadataEntity;
 import net.haugr.eds.core.model.entities.TrusteeEntity;
@@ -303,6 +304,16 @@ public final class ProcessCircleManager extends AbstractManager<TrusteeDao, Proc
         final CircleEntity entity = dao.find(CircleEntity.class, externalId);
         throwConditionalException(entity == null,
                 ReturnCode.IDENTIFICATION_WARNING, NO_SUCH_CIRCLE);
+        // The Circle is locked first, as the rotation of its Circle Secret
+        // does before it changes the Trustees at its end. On PostgreSQL this
+        // lock still lets a request add rows to the Circle, as a move or a
+        // thumbnail does while it holds rows of its Data Object. A stronger
+        // lock would make such a request wait for this delete, while the
+        // delete waits for the rows the request holds.
+        // A Circle deleted by another request while this one waited for it
+        // is answered as one which isn't there (ticket 2).
+        throwConditionalException(!dao.lockCircleIfThere(entity.getId()),
+                ReturnCode.IDENTIFICATION_WARNING, NO_SUCH_CIRCLE);
 
         // Before deleting the Circle, all associated Trustees must be deleted.
         // This is to avoid having orphaned Trustees.
@@ -313,6 +324,9 @@ public final class ProcessCircleManager extends AbstractManager<TrusteeDao, Proc
         // which go with the Circle.
         dao.deleteContentOfCircle(entity);
         dao.deleteCircle(entity);
+        // A rotation put off for the Circle is forgotten with it (ticket 2);
+        // a job which runs finds the Circle gone, and ends.
+        CircleRotations.stopWaiting(entity.getId());
 
         return new ProcessCircleResponse(theCircle(entity) + " has successfully been removed from EDS.");
     }

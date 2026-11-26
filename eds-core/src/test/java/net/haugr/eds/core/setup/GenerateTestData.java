@@ -88,6 +88,9 @@ public final class GenerateTestData {
         append(builder, "    ('" + DatabaseSetup.CIRCLE_2_ID + "', '" + DatabaseSetup.CIRCLE_2 + "'),");
         append(builder, "    ('" + DatabaseSetup.CIRCLE_3_ID + "', '" + DatabaseSetup.CIRCLE_3 + "');");
         append(builder, "");
+        append(builder, "-- Each Circle has its row of stored bytes.");
+        append(builder, "INSERT INTO eds_circle_storage (circle_id) VALUES (1), (2), (3);");
+        append(builder, "");
         append(builder, "-- For each Circle, we need to have a unique Key, but with the same settings.");
         append(builder, "INSERT INTO eds_keys (circle_id, algorithm, status) VALUES");
         append(builder, "    (1, '" + settings.getSymmetricAlgorithm() + "', '" + Status.ACTIVE + "'),");

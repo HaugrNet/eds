@@ -29,6 +29,7 @@ import net.haugr.eds.api.responses.AuthenticateResponse;
 import net.haugr.eds.api.responses.FetchCircleResponse;
 import net.haugr.eds.api.responses.SettingResponse;
 import net.haugr.eds.core.enums.StandardSetting;
+import net.haugr.eds.core.jce.Crypto;
 import net.haugr.eds.core.model.Settings;
 import net.haugr.eds.core.setup.DatabaseSetup;
 import org.junit.jupiter.api.Test;
@@ -83,7 +84,7 @@ final class ManagementBeanAuthenticatedTest extends DatabaseSetup {
         for (final String name : new String[] { Constants.ADMIN_ACCOUNT, "sysop" }) {
             final AuthenticateResponse later = bean.authenticated(prepareRequest(Authentication.class, name));
             assertEquals(ReturnCode.AUTHENTICATION_WARNING.getCode(), later.getReturnCode());
-            assertEquals("Could not uniquely identify an account for '" + name + "'.", later.getReturnMessage());
+            assertEquals("Cannot authenticate the Account from the given Credentials.", later.getReturnMessage());
         }
         assertEquals(1L, dao.countMembers());
 
@@ -170,6 +171,26 @@ final class ManagementBeanAuthenticatedTest extends DatabaseSetup {
 
         final FetchCircleResponse response = bean.fetchCircles(request);
         assertEquals(ReturnCode.AUTHENTICATION_WARNING.getCode(), response.getReturnCode());
-        assertEquals("Could not uniquely identify an account for 'member6'.", response.getReturnMessage());
+        assertEquals("Cannot authenticate the Account from the given Credentials.", response.getReturnMessage());
+    }
+
+    @Test
+    void testAnUnknownNameIsAnsweredAsAWrongPassphraseAfterTheSameWork() {
+        // Ticket 21: neither the answer nor the time may tell whether a name
+        // exists; an unknown name derives a key as a known one does.
+        final ManagementBean bean = prepareManagementBean();
+        final Authentication wrong = prepareRequest(Authentication.class, MEMBER_1);
+        wrong.setCredential(credentialOf("not the passphrase of member1"));
+        Crypto.takePasswordKeyDerivationsOfThisThread();
+        final AuthenticateResponse refused = bean.authenticated(wrong);
+        final long derivedForWrong = Crypto.takePasswordKeyDerivationsOfThisThread();
+
+        final AuthenticateResponse unknown = bean.authenticated(prepareRequest(Authentication.class, "nobody by this name"));
+        final long derivedForUnknown = Crypto.takePasswordKeyDerivationsOfThisThread();
+
+        assertEquals(refused.getReturnCode(), unknown.getReturnCode());
+        assertEquals(refused.getReturnMessage(), unknown.getReturnMessage());
+        assertEquals(1L, derivedForWrong);
+        assertEquals(derivedForWrong, derivedForUnknown);
     }
 }

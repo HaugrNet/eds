@@ -55,6 +55,8 @@ final class ReturnCodeCauses {
         CAUSES.put(ReturnCode.PRECONDITION_FAILED, "If-Match doesn't match the ETag of the stored content.");
         CAUSES.put(ReturnCode.CONTENT_TOO_LARGE, "A content upload larger than eds.stream.max.object.size.");
         CAUSES.put(ReturnCode.RANGE_NOT_SATISFIABLE, "A content download with a Range outside the content.");
+        CAUSES.put(ReturnCode.SERVICE_BUSY, "As many passphrases are being checked as eds.auth.concurrent.passphrases allows, "
+                + "and no place came free within eds.auth.passphrase.wait.millis; the request may be sent again shortly.");
         CAUSES.put(ReturnCode.INSUFFICIENT_STORAGE, "Storing the content would exceed eds.data.max.total.size, the ceiling for all stored content.");
         CAUSES.put(ReturnCode.CRYPTO_ERROR, "A cryptographic operation failed, e.g. a key could not be unlocked, or EDS is locked because the MasterKey is not loaded.");
         CAUSES.put(ReturnCode.INTEGRITY_ERROR, "Stored data failed its integrity check (corrupted), or the Circle's " +

@@ -113,12 +113,14 @@ public final class StoreTestDatabases {
     public static long createDataRow(final Connection connection) throws SQLException {
         final String unique = UUID.randomUUID().toString();
         try (PreparedStatement circle = connection.prepareStatement("INSERT INTO eds_circles (external_id, name) VALUES (?, ?)");
+             PreparedStatement storage = connection.prepareStatement("INSERT INTO eds_circle_storage (circle_id) VALUES ((SELECT max(id) FROM eds_circles))");
              PreparedStatement key = connection.prepareStatement("INSERT INTO eds_keys (circle_id, algorithm, status) VALUES ((SELECT max(id) FROM eds_circles), 'AES_GCM_256', 'ACTIVE')");
              PreparedStatement metadata = connection.prepareStatement("INSERT INTO eds_metadata (external_id, parent_id, circle_id, datatype_id, name) " +
                      "VALUES (?, 0, (SELECT max(id) FROM eds_circles), 2, 'stream object')")) {
             circle.setString(1, unique);
             circle.setString(2, "circle " + unique);
             circle.executeUpdate();
+            storage.executeUpdate();
             key.executeUpdate();
             metadata.setString(1, unique);
             metadata.executeUpdate();

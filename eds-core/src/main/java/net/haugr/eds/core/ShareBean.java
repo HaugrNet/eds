@@ -23,6 +23,7 @@ import java.io.InputStream;
 import jakarta.transaction.TransactionSynchronizationRegistry;
 import jakarta.transaction.Transactional;
 import jakarta.transaction.UserTransaction;
+import net.haugr.eds.api.common.ReturnCode;
 import net.haugr.eds.api.requests.FetchDataRequest;
 import net.haugr.eds.api.requests.FetchDataTypeRequest;
 import net.haugr.eds.api.requests.ProcessDataRequest;
@@ -41,6 +42,7 @@ import net.haugr.eds.core.model.Settings;
 import jakarta.enterprise.event.Event;
 import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.function.BiFunction;
 import net.haugr.eds.core.socket.DataChange;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -79,17 +81,18 @@ public class ShareBean {
     private final TransactionSynchronizationRegistry transactions;
     private final UserTransaction userTransaction;
     private final ConnectionSource readers;
+    private final AuthLimitBean authLimit;
     // Committed changes of a Circle's files, for the socket; null outside CDI.
     private Event<DataChange> dataChanges = null;
 
     public ShareBean() {
-        this(null, (TransactionSynchronizationRegistry) null, null, null, null);
+        this(null, (TransactionSynchronizationRegistry) null, null, null, null, null);
     }
 
     @Inject
     public ShareBean(final EntityManager entityManager, final TransactionSynchronizationRegistry transactions, final UserTransaction userTransaction,
-                     final ConnectionSource readers, final Event<DataChange> dataChanges) {
-        this(entityManager, Settings.getInstance(), transactions, userTransaction, readers);
+                     final ConnectionSource readers, final Event<DataChange> dataChanges, final AuthLimitBean authLimit) {
+        this(entityManager, Settings.getInstance(), transactions, userTransaction, readers, authLimit);
         this.dataChanges = dataChanges;
     }
 
@@ -111,11 +114,39 @@ public class ShareBean {
 
     public ShareBean(final EntityManager entityManager, final Settings settings, final TransactionSynchronizationRegistry transactions,
                      final UserTransaction userTransaction, final ConnectionSource readers) {
+        this(entityManager, settings, transactions, userTransaction, readers, new AuthLimitBean(entityManager, settings));
+    }
+
+    public ShareBean(final EntityManager entityManager, final Settings settings, final TransactionSynchronizationRegistry transactions,
+                     final UserTransaction userTransaction, final ConnectionSource readers, final AuthLimitBean authLimit) {
         this.entityManager = entityManager;
         this.settings = settings;
         this.transactions = transactions;
         this.userTransaction = userTransaction;
         this.readers = readers;
+        this.authLimit = authLimit;
+    }
+
+    /**
+     * Converts the failure of a request into its response, and rolls the
+     * transaction back. The attempts at a passphrase (#68) are counted by the
+     * manager, with the {@link AuthLimitBean}, in transactions of their own,
+     * so the rollback doesn't undo them.
+     *
+     * @param e       The failure
+     * @param onError Builds the typed error response from code and message
+     * @param <R>     Response type
+     * @return The error response
+     */
+    private <R extends EDSResponse> R failed(final EDSException e, final BiFunction<ReturnCode, String, R> onError) {
+        // The Exception doesn't reach the transaction interceptor, so
+        // anything written before the failure must be rolled back here.
+        Transactions.markRollbackOnly(transactions);
+        // Any Warning or Error thrown by the EDS contain enough information,
+        // so it can be dealt with by the requesting System.
+        LOGGER.debug("The request failed.", e);
+
+        return onError.apply(e.getReturnCode(), e.getMessage());
     }
 
     /**
@@ -287,17 +318,10 @@ public class ShareBean {
 
         try {
             final ProcessDataTypeManager manager = new ProcessDataTypeManager(settings, entityManager);
+            manager.limitAttempts(authLimit);
             response = manager.perform(request);
         } catch (EDSException e) {
-            // The Exception doesn't reach the transaction interceptor, so
-            // anything written before the failure must be rolled back here.
-            Transactions.markRollbackOnly(transactions);
-            // Any Warning or Error thrown by the EDS contain enough
-            // information, so it can be dealt with by the requesting
-            // System. Logging the error is thus not needed, as all
-            // information is provided in the response.
-            LOGGER.debug(e.getMessage(), e);
-            response = new ProcessDataTypeResponse(e.getReturnCode(), e.getMessage());
+            response = failed(e, ProcessDataTypeResponse::new);
         }
 
         return response;
@@ -308,17 +332,10 @@ public class ShareBean {
 
         try {
             final FetchDataTypeManager manager = new FetchDataTypeManager(settings, entityManager);
+            manager.limitAttempts(authLimit);
             response = manager.perform(request);
         } catch (EDSException e) {
-            // The Exception doesn't reach the transaction interceptor, so
-            // anything written before the failure must be rolled back here.
-            Transactions.markRollbackOnly(transactions);
-            // Any Warning or Error thrown by the EDS contain enough
-            // information, so it can be dealt with by the requesting
-            // System. Logging the error is thus not needed, as all
-            // information is provided in the response.
-            LOGGER.debug(e.getMessage(), e);
-            response = new FetchDataTypeResponse(e.getReturnCode(), e.getMessage());
+            response = failed(e, FetchDataTypeResponse::new);
         }
 
         return response;
@@ -343,17 +360,10 @@ public class ShareBean {
                 // Data Object is gone afterwards.
                 circles.addAll(circlesOf(request));
                 final ProcessDataManager manager = new ProcessDataManager(settings, entityManager, readers);
+                manager.limitAttempts(authLimit);
                 response = manager.perform(request);
             } catch (EDSException e) {
-                // The Exception doesn't reach the transaction interceptor, so
-                // anything written before the failure must be rolled back here.
-                Transactions.markRollbackOnly(transactions);
-                // Any Warning or Error thrown by the EDS contain enough
-                // information, so it can be dealt with by the requesting
-                // System. Logging the error is thus not needed, as all
-                // information is provided in the response.
-                LOGGER.debug(e.getMessage(), e);
-                response = new ProcessDataResponse(e.getReturnCode(), e.getMessage());
+                response = failed(e, ProcessDataResponse::new);
             }
 
             return response;
@@ -381,17 +391,10 @@ public class ShareBean {
 
         try {
             final FetchDataManager manager = new FetchDataManager(settings, entityManager, metadataOnly);
+            manager.limitAttempts(authLimit);
             response = manager.perform(request);
         } catch (EDSException e) {
-            // The Exception doesn't reach the transaction interceptor, so
-            // anything written before the failure must be rolled back here.
-            Transactions.markRollbackOnly(transactions);
-            // Any Warning or Error thrown by the EDS contain enough
-            // information, so it can be dealt with by the requesting
-            // System. Logging the error is thus not needed, as all
-            // information is provided in the response.
-            LOGGER.debug(e.getMessage(), e);
-            response = new FetchDataResponse(e.getReturnCode(), e.getMessage());
+            response = failed(e, FetchDataResponse::new);
         }
 
         return response;

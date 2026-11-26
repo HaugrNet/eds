@@ -17,7 +17,12 @@
 package net.haugr.eds.core.model;
 
 import java.util.EnumSet;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import org.hibernate.jpa.HibernateHints;
 import jakarta.persistence.EntityManager;
 import net.haugr.eds.core.model.entities.KeyEntity;
 import net.haugr.eds.core.enums.SanityStatus;
@@ -121,7 +126,62 @@ public class DataDao extends CommonDao {
     }
 
     /**
-     * Deletes the content of a Data Object, without loading it.
+     * Locks the content row until the end of the transaction, and tells the
+     * secret it is on. Only the row of {@code eds_data} is locked: a locking
+     * read of the entity would join its Data Object, key and Circle, and
+     * some databases (H2) lock the rows of all of them. The rotation of the
+     * Circle Secret holds it while it replaces the content and its secret,
+     * so a copy which holds it reads the content with the secret it is on.
+     *
+     * @param id Internal ID of the content row
+     * @return Key row of its secret, or null if the row is gone
+     */
+    public Long lockData(final long id) {
+        final List<?> found = entityManager.createNativeQuery("SELECT key_id FROM eds_data WHERE id = ? FOR UPDATE")
+                .setParameter(1, id)
+                .getResultList();
+        return found.isEmpty() ? null : ((Number) found.getFirst()).longValue();
+    }
+
+    /**
+     * Locks the content rows of a Data Object and of its thumbnails, in the
+     * order of their IDs, as the delete of its Circle takes them; a request
+     * which replaces, moves or deletes the Data Object does so before it
+     * changes anything, so two of them, or one and the delete of the Circle,
+     * never hold one of the rows each while they wait for the other.
+     *
+     * @param metadata The Data Object
+     */
+    public void lockContentWithThumbnails(final MetadataEntity metadata) {
+        // The rows are found first, and then locked one by one in the order
+        // of their IDs. In one statement, with "OR metadata_id IN (subquery)",
+        // the index of metadata_id couldn't be used, and PostgreSQL read all
+        // content rows each time (the load run of 2026-11-23); and with
+        // "metadata_id IN (...) ORDER BY id FOR UPDATE", H2 locks the rows in
+        // the order of that index, not of their IDs. A row added between the
+        // two steps is a new thumbnail, which no other request holds yet.
+        final List<Long> ids = new ArrayList<>();
+        for (final Object id : entityManager.createNativeQuery("SELECT d.id FROM eds_data d WHERE d.metadata_id = ? "
+                        + "UNION ALL SELECT d.id FROM eds_data d JOIN eds_metadata m ON m.id = d.metadata_id "
+                        + "JOIN eds_datatypes t ON t.id = m.datatype_id WHERE m.parent_id = ? AND t.datatype_name = 'thumbnail'")
+                .setParameter(1, metadata.getId())
+                .setParameter(2, metadata.getId())
+                .getResultList()) {
+            ids.add(((Number) id).longValue());
+        }
+        ids.sort(null);
+        for (final Long id : ids) {
+            entityManager.createNativeQuery("SELECT id FROM eds_data WHERE id = ? FOR UPDATE")
+                    .setParameter(1, id)
+                    .getResultList();
+        }
+    }
+
+    /**
+     * Deletes the content of a Data Object, without loading it. The content
+     * row goes before its parts, which the database deletes with it (a bulk
+     * delete of the entity would take the parts first), as the rotation of
+     * the Circle Secret holds the row while it replaces the parts.
      *
      * @param metadata The Data Object
      */
@@ -133,10 +193,65 @@ public class DataDao extends CommonDao {
         final Object[] info = findContentInfo(metadata);
         if (info != null) {
             entityManager.detach(entityManager.getReference(DataEntity.class, info[0]));
+            // The parts go with the row, so their length is taken from the
+            // Circle's total before. The row is held first, so a rotation
+            // can't replace the parts between the two.
+            entityManager.createNativeQuery("SELECT id FROM eds_data WHERE metadata_id = ? ORDER BY id FOR UPDATE")
+                    .setParameter(1, metadata.getId())
+                    .getResultList();
+            changeStoredBytes(metadata.getCircle().getId(), -storedLengthOfObject(metadata.getId()));
         }
-        entityManager.createNamedQuery("data.deleteByMetadata")
-                .setParameter(METADATA, metadata)
+        entityManager.createNativeQuery("DELETE FROM eds_data WHERE metadata_id = ?")
+                .setParameter(1, metadata.getId())
                 .executeUpdate();
+    }
+
+    /**
+     * Writes the content of an existing row with the {@link EncryptedDataStore}
+     * (an upload, a copy, a rotation), and changes the stored bytes of its
+     * Circle by the difference of its stored length, measured before and
+     * after: content which is replaced counts as removed.
+     *
+     * @param circleId Internal ID of the Circle of the content
+     * @param dataId   Internal ID of the content row
+     * @param write    The write, on the transaction's Connection
+     * @param <T>      Result type
+     * @return Result of the write
+     */
+    public <T> T writeContent(final long circleId, final long dataId, final ConnectionWork<T> write) {
+        final long[] difference = new long[1];
+        final T result = withConnection(connection -> {
+            final long before = Math.max(0, EncryptedDataStore.length(connection, dataId));
+            final T written = write.execute(connection);
+            difference[0] = Math.max(0, EncryptedDataStore.length(connection, dataId)) - before;
+            return written;
+        });
+        changeStoredBytes(circleId, difference[0]);
+
+        return result;
+    }
+
+    /**
+     * The content of each of the given Metadata, with its parts, in one
+     * query. For a read only, what isn't in the persistence context yet is
+     * loaded read-only: no copy is kept to compare at the flush.
+     *
+     * @param metadata The Metadata
+     * @param onlyRead Whether the content is only read in this transaction
+     * @return The content found, by the internal ID of its Metadata
+     */
+    public Map<Long, DataEntity> findDataByMetadata(final Collection<MetadataEntity> metadata, final boolean onlyRead) {
+        final Map<Long, DataEntity> found = HashMap.newHashMap(metadata.size());
+        if (!metadata.isEmpty()) {
+            for (final DataEntity data : entityManager.createQuery(
+                            "select distinct d from DataEntity d left join fetch d.parts where d.metadata in :metadata", DataEntity.class)
+                    .setParameter(METADATA, metadata)
+                    .setHint(HibernateHints.HINT_READ_ONLY, onlyRead)
+                    .getResultList()) {
+                found.put(data.getMetadata().getId(), data);
+            }
+        }
+        return found;
     }
 
     public DataEntity findDataByMetadata(final MetadataEntity metadata) {
@@ -237,7 +352,7 @@ public class DataDao extends CommonDao {
      * @param parentIds Internal IDs of the Data Objects
      * @return The thumbnails
      */
-    public List<MetadataEntity> findThumbnails(final java.util.Collection<Long> parentIds) {
+    public List<MetadataEntity> findThumbnails(final Collection<Long> parentIds) {
         if (parentIds.isEmpty()) {
             return List.of();
         }

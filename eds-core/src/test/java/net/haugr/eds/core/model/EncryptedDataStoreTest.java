@@ -61,6 +61,51 @@ final class EncryptedDataStoreTest {
     private static final int MB = 1024 * 1024;
 
     @Test
+    void testASmallContentNeedsNoBufferOfAWholePart() throws Exception {
+        // Ticket 36: each write allocated a buffer of a whole part (4 MiB),
+        // whatever the size of the content.
+        final com.sun.management.ThreadMXBean threads = (com.sun.management.ThreadMXBean) java.lang.management.ManagementFactory.getThreadMXBean();
+        assumeTrue(threads.isThreadAllocatedMemorySupported());
+        final DataSource dataSource = StoreTestDatabases.h2("store-buffer");
+        StoreTestDatabases.freshSchema(dataSource);
+        try (Connection connection = dataSource.getConnection()) {
+            connection.setAutoCommit(false);
+            final long id = StoreTestDatabases.createDataRow(connection);
+            final byte[] small = new byte[100];
+            // The first write loads the classes and prepares the statements.
+            EncryptedDataStore.write(connection, id, new ByteArrayInputStream(small), small.length, "SHA-512");
+
+            final long known = allocatedBy(threads, () ->
+                    EncryptedDataStore.write(connection, id, new ByteArrayInputStream(small), small.length, "SHA-512"));
+            final long unknown = allocatedBy(threads, () ->
+                    EncryptedDataStore.writeToTheEnd(connection, id, new ByteArrayInputStream(small), "SHA-512"));
+            assertTrue(known < MB, "A write of 100 bytes with their length allocated " + known + " bytes");
+            assertTrue(unknown < MB, "A write of 100 bytes without their length allocated " + unknown + " bytes");
+
+            // Without a length, the buffer grows past its first size as the
+            // stream gives more.
+            final byte[] large = new byte[DataPart.DEFAULT_SIZE + 3 * DataPart.MIN_SIZE + 7];
+            for (int i = 0; i < large.length; i++) {
+                large[i] = (byte) (i * 31 + i / 251);
+            }
+            assertEquals(large.length, EncryptedDataStore.writeToTheEnd(connection, id, new ByteArrayInputStream(large), "SHA-512"));
+            assertArrayEquals(large, EncryptedDataStore.read(connection, id, 0, large.length));
+            connection.rollback();
+        }
+    }
+
+    private interface Write {
+        void run() throws SQLException;
+    }
+
+    private static long allocatedBy(final com.sun.management.ThreadMXBean threads, final Write write) throws SQLException {
+        final long thread = Thread.currentThread().threadId();
+        final long before = threads.getThreadAllocatedBytes(thread);
+        write.run();
+        return threads.getThreadAllocatedBytes(thread) - before;
+    }
+
+    @Test
     void testH2() throws Exception {
         final DataSource dataSource = StoreTestDatabases.h2("store");
         runStoreChecks(dataSource);
@@ -269,8 +314,7 @@ final class EncryptedDataStoreTest {
             }
             connection.commit();
             assertEquals(size, EncryptedDataStore.length(connection, other));
-            assertEquals(2L * size, EncryptedDataStore.totalLength(connection, -1));
-            assertEquals(size, EncryptedDataStore.totalLength(connection, id));
+            assertEquals(size, EncryptedDataStore.length(connection, id));
             final MessageDigest otherRead = MessageDigest.getInstance("SHA-512");
             try (InputStream stream = EncryptedDataStore.open(connection, other, 0, size, 4 * MB)) {
                 otherRead.update(stream.readAllBytes());

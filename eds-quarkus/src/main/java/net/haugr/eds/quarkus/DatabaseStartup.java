@@ -76,7 +76,8 @@ public class DatabaseStartup {
     private final ManagementBean managementBean;
     private final Settings settings;
     private final Database database;
-    private State state = State.PENDING;
+    // Volatile, as other threads read it without waiting for an attempt.
+    private volatile State state = State.PENDING;
     private int attempts = 0;
 
     /**
@@ -181,11 +182,11 @@ public class DatabaseStartup {
     }
 
     /**
-     * Returns the current state.
+     * Returns the current state, without waiting for an attempt in progress.
      *
      * @return The state
      */
-    public synchronized State getState() {
+    public State getState() {
         return state;
     }
 

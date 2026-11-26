@@ -36,13 +36,17 @@ INSERT INTO eds_settings (name, setting) VALUES
     ('eds.crypto.pbe.iterations', '1024'),
     ('eds.crypto.hash.algorithm', 'SHA_512'),
     ('eds.system.locale', 'EN'),
-    ('eds.system.charset', 'UTF-8'),
     ('eds.show.all.circles', 'false'),
     ('eds.show.trustees', 'true'),
     ('eds.sanity.check.startup', 'true'),
     ('eds.sanity.check.interval.days', '180'),
     ('eds.session.timeout.minutes', '480'),
     ('eds.session.max.per.member', '10'),
+    ('eds.auth.max.failed.attempts', '0'),
+    ('eds.auth.failed.window.minutes', '15'),
+    ('eds.auth.lockout.minutes', '15'),
+    ('eds.auth.concurrent.passphrases', '0'),
+    ('eds.auth.passphrase.wait.millis', '2000'),
     ('eds.download.token.lifetime.minutes', '60'),
     ('eds.invitation.timeout.hours', '168'),
     ('eds.circle.secret.rotation.days', '365'),
@@ -82,6 +86,9 @@ INSERT INTO eds_circles (external_id, name) VALUES
     ('d8838d7d-71e7-433d-8790-af7c080e9de9', 'circle1'),
     ('8ba34e12-8830-4a1f-9681-b689cad52009', 'circle2'),
     ('a2797176-a5b9-4dc9-867b-8c5c1bb3a9f9', 'circle3');
+
+-- Each Circle has its row of stored bytes.
+INSERT INTO eds_circle_storage (circle_id) VALUES (1), (2), (3);
 
 -- For each Circle, we need to have a unique Key but with the same settings.
 INSERT INTO eds_keys (circle_id, algorithm, status) VALUES

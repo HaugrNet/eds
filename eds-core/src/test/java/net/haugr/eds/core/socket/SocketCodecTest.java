@@ -42,6 +42,30 @@ import org.junit.jupiter.api.Test;
 final class SocketCodecTest {
 
     @Test
+    void testTheJsonProviderIsLookedUpOnce() {
+        // Ticket 35: each frame looked the provider up again, reading the JAR.
+        final String property = jakarta.json.spi.JsonProvider.JSONP_PROVIDER_FACTORY;
+        final String before = System.getProperty(property);
+        System.setProperty(property, CountingJsonProvider.class.getName());
+        try {
+            CountingJsonProvider.MADE.set(0);
+            for (int i = 0; i < 50; i++) {
+                final SocketFrame frame = new SocketFrame(SocketFrameType.LEFT);
+                frame.setCircleId("circle " + i);
+                assertTrue(SocketCodec.write(frame).contains("circle " + i));
+            }
+            // Once, if the factories weren't made before in this JVM.
+            assertTrue(CountingJsonProvider.MADE.get() <= 1, "The provider was made " + CountingJsonProvider.MADE.get() + " times");
+        } finally {
+            if (before == null) {
+                System.clearProperty(property);
+            } else {
+                System.setProperty(property, before);
+            }
+        }
+    }
+
+    @Test
     void testATextFieldIsText() {
         assertRefused("{\"type\":\"JOIN\",\"circleId\":5}", "The field 'circleId' must be text.");
     }

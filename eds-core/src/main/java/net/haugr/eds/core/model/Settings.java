@@ -17,18 +17,17 @@
 package net.haugr.eds.core.model;
 
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import net.haugr.eds.api.common.ReturnCode;
 import net.haugr.eds.api.common.Utilities;
 import net.haugr.eds.core.enums.HashAlgorithm;
 import net.haugr.eds.core.enums.KeyAlgorithm;
 import net.haugr.eds.core.enums.StandardSetting;
-import net.haugr.eds.core.exceptions.EDSException;
 
 /**
  * <p>This Class holds the general settings for the EDS. All settings used by
@@ -50,6 +49,16 @@ import net.haugr.eds.core.exceptions.EDSException;
  * @since EDS 1.0
  */
 public final class Settings {
+
+    /** The most failed passphrase attempts which may be allowed before a lock (#68). */
+    public static final int MAX_AUTH_FAILED_ATTEMPTS = 1000;
+
+    /** The longest window and lock of the authentication attempt limits (#68), a day. */
+    public static final int MAX_AUTH_MINUTES = 1440;
+    /** The most passphrases checked at once which may be set (ticket 20). */
+    public static final int MAX_CONCURRENT_PASSPHRASES = 1024;
+    /** The longest wait for a place to check a passphrase which may be set. */
+    public static final int MAX_PASSPHRASE_WAIT_MILLIS = 60_000;
 
     private static Settings instance = null;
     private static final Object LOCK = new Object();
@@ -137,12 +146,16 @@ public final class Settings {
         return Locale.forLanguageTag(get(StandardSetting.EDS_LOCALE.getKey()));
     }
 
+    /**
+     * Text becomes bytes as UTF-8, always: passphrases, and the associated
+     * data of every key and object. It was a setting, but another character
+     * set made every stored key unreadable, so nobody could log in to set it
+     * back (ticket 14).
+     *
+     * @return UTF-8
+     */
     public Charset getCharset() {
-        try {
-            return Charset.forName(get(StandardSetting.EDS_CHARSET.getKey()));
-        } catch (IllegalArgumentException e) {
-            throw new EDSException(ReturnCode.SETTING_ERROR, e);
-        }
+        return StandardCharsets.UTF_8;
     }
 
     public boolean hasShowAllCircles() {
@@ -219,6 +232,80 @@ public final class Settings {
 
     public int getSessionMaxPerMember() {
         return Math.max(1, Integer.parseInt(get(StandardSetting.SESSION_MAX_PER_MEMBER.getKey()).trim()));
+    }
+
+    /**
+     * The number of failed passphrase attempts allowed within the window
+     * before an account is locked (#68), 0 to {@link #MAX_AUTH_FAILED_ATTEMPTS};
+     * 0 turns the lock off.
+     *
+     * @return Maximum failed attempts, or 0 when the lock is off
+     */
+    public int getAuthMaxFailedAttempts() {
+        return authSetting(StandardSetting.AUTH_MAX_FAILED_ATTEMPTS, 0, MAX_AUTH_FAILED_ATTEMPTS);
+    }
+
+    /**
+     * The window, in minutes, in which the failed attempts are counted (#68),
+     * 1 to {@link #MAX_AUTH_MINUTES}.
+     *
+     * @return Failed-attempt window in minutes
+     */
+    public int getAuthFailedWindowMinutes() {
+        return authSetting(StandardSetting.AUTH_FAILED_WINDOW_MINUTES, 1, MAX_AUTH_MINUTES);
+    }
+
+    /**
+     * How long, in minutes, an account stays locked after too many failed
+     * attempts (#68), 1 to {@link #MAX_AUTH_MINUTES}; the lock heals itself
+     * when the time passes.
+     *
+     * @return Lockout time in minutes
+     */
+    public int getAuthLockoutMinutes() {
+        return authSetting(StandardSetting.AUTH_LOCKOUT_MINUTES, 1, MAX_AUTH_MINUTES);
+    }
+
+    /**
+     * Reads a setting of the lock (#68), which every check of a passphrase
+     * reads: a stored value which isn't a number gives the default, and one
+     * out of range the nearest limit, so no stored value can stop the
+     * logins with a passphrase, or lock an account for good. A new value is
+     * checked when it is set (SettingManager).
+     */
+    private int authSetting(final StandardSetting setting, final int min, final int max) {
+        final String value = get(setting.getKey());
+        int number;
+        try {
+            number = Integer.parseInt((value != null) ? value.trim() : setting.getValue());
+        } catch (NumberFormatException _) {
+            number = Integer.parseInt(setting.getValue());
+        }
+
+        return Math.clamp(number, min, max);
+    }
+
+    /**
+     * How many passphrases are checked at once (ticket 20), 1 to
+     * {@link #MAX_CONCURRENT_PASSPHRASES}; 0, the default, gives half the
+     * processors, at least one.
+     *
+     * @return Passphrases checked at once
+     */
+    public int getAuthConcurrentPassphrases() {
+        final int configured = authSetting(StandardSetting.AUTH_CONCURRENT_PASSPHRASES, 0, MAX_CONCURRENT_PASSPHRASES);
+        return (configured > 0) ? configured : Math.max(1, Runtime.getRuntime().availableProcessors() / 2);
+    }
+
+    /**
+     * How long, in milliseconds, a request waits for a place to check its
+     * passphrase, before it is answered as busy (ticket 20), 0 to
+     * {@link #MAX_PASSPHRASE_WAIT_MILLIS}.
+     *
+     * @return Milliseconds
+     */
+    public int getAuthPassphraseWaitMillis() {
+        return authSetting(StandardSetting.AUTH_PASSPHRASE_WAIT_MILLIS, 0, MAX_PASSPHRASE_WAIT_MILLIS);
     }
 
     public String getStoneName() {

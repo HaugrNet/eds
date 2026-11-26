@@ -190,6 +190,9 @@ CREATE TABLE eds_members (
   settings         VARCHAR(4096),  -- The Member's own settings for clients, a JSON object
   external_vault   TEXT,           -- The Member's vault, text of a client (E2E.md), as given
   invitation_expire TIMESTAMP,     -- Time, when a pending Invitation expires
+  failed_logins    INTEGER DEFAULT 0 NOT NULL, -- Failed passphrase attempts in the current window (#68)
+  first_failed_at  TIMESTAMP,      -- Start of the current failed-attempt window (#68)
+  locked_until     TIMESTAMP,      -- The account is locked until this time, after too many failures (#68)
   altered          TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
   added            TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
 
@@ -258,6 +261,25 @@ CREATE TABLE eds_circles (
   CONSTRAINT circle_unique_name             UNIQUE (name)
 );
 CREATE INDEX circle_rotate_due_idx ON eds_circles (rotate_circle_key_due);
+
+-- =============================================================================
+-- The stored bytes of a Circle: the sum of part_length of the parts of its
+-- objects, so the storage ceiling is checked against a row for each Circle
+-- instead of every part (PLAN.md, Streaming, "The storage ceiling"). They
+-- change in the same transaction as the parts, by one statement which adds to
+-- them. They have a table of their own, not a column of eds_circles: a write
+-- holds this row until it commits, while the delete of a Circle locks the
+-- Circle's row before the rows of its content, so the two never wait for each
+-- other in a circle. The row is made with the Circle, and goes with it.
+-- =============================================================================
+CREATE TABLE eds_circle_storage (
+  circle_id        INTEGER NOT NULL,
+  stored_bytes     BIGINT DEFAULT 0 NOT NULL,
+
+  /* Primary & Foreign Keys */
+  CONSTRAINT circle_storage_pk              PRIMARY KEY (circle_id),
+  CONSTRAINT circle_storage_circle_fk       FOREIGN KEY (circle_id) REFERENCES eds_circles (id) ON DELETE CASCADE
+);
 
 -- =============================================================================
 -- A central part of the EDS is encryption. All data is encrypted using a series
@@ -488,7 +510,10 @@ CREATE TABLE eds_data (
   CONSTRAINT data_key_fk                    FOREIGN KEY (key_id) REFERENCES eds_keys (id)
 );
 CREATE INDEX data_metadata_idx ON eds_data (metadata_id);
-CREATE INDEX data_key_idx ON eds_data (key_id);
+-- With the ID, the rotation takes the next content of a key in the order of
+-- the IDs from the index alone; on the key only, PostgreSQL read the content
+-- in ID order and left out the other keys (the load run of 2026-11-23).
+CREATE INDEX data_key_idx ON eds_data (key_id, id);
 -- =============================================================================
 -- The encrypted data of a Data Object, as a row for each part of it. A part is
 -- a range of the bytes, nothing more: where one part ends and the next starts
@@ -589,6 +614,11 @@ CREATE TABLE eds_entries (
   CONSTRAINT entry_unique_metadata          UNIQUE (metadata_id),
   CONSTRAINT entry_unique_position          UNIQUE (circle_feature_id, position)
 );
+-- The entries about an entry (reactions, replies), and the entries of a kind
+-- in a feature: without them, PostgreSQL read the whole table, or every entry
+-- of the feature (the load run of 2026-11-23).
+CREATE INDEX entry_about_idx ON eds_entries (about_id);
+CREATE INDEX entry_kind_idx ON eds_entries (circle_feature_id, kind, position);
 
 -- =============================================================================
 -- Status keys (STATUS.md). A key reads the status of the stone, its load and

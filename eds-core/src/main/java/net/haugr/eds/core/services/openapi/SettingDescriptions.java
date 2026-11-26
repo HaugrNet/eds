@@ -40,13 +40,21 @@ final class SettingDescriptions {
         DESCRIPTIONS.put(StandardSetting.PBE_ITERATIONS, "Iterations for deriving keys from new passphrases, at least 1000. Each account keeps the iterations of its passphrase.");
         DESCRIPTIONS.put(StandardSetting.HASH_ALGORITHM, "Algorithm for checksums.");
         DESCRIPTIONS.put(StandardSetting.EDS_LOCALE, "Locale for formatting.");
-        DESCRIPTIONS.put(StandardSetting.EDS_CHARSET, "Character set for converting between text and bytes. Must be a valid character set.");
         DESCRIPTIONS.put(StandardSetting.SHOW_CIRCLES, "If true, every Member can list all Circles, not only their own.");
-        DESCRIPTIONS.put(StandardSetting.SHOW_TRUSTEES, "If true, Members can see all Circles of another Member, not only the shared ones.");
+        DESCRIPTIONS.put(StandardSetting.SHOW_TRUSTEES, "If true, Members can see all Circles of another Member, not only the shared ones. "
+                + "As any Member can list all Members, every account then sees every Circle of the stone and who is in it, "
+                + "though not its data; for small groups where everybody knows everybody.");
         DESCRIPTIONS.put(StandardSetting.SANITY_STARTUP, "If true, the sanity check runs when EDS starts.");
         DESCRIPTIONS.put(StandardSetting.SANITY_INTERVAL, "Days between sanity checks of a Data Object; 0 switches the checks off. A number.");
         DESCRIPTIONS.put(StandardSetting.SESSION_TIMEOUT, "Lifetime of a session, in minutes.");
         DESCRIPTIONS.put(StandardSetting.SESSION_MAX_PER_MEMBER, "Sessions a Member may have at a time, one per login; a further login ends the one that expires first.");
+        DESCRIPTIONS.put(StandardSetting.AUTH_MAX_FAILED_ATTEMPTS, "Failed passphrase attempts allowed within the window before an account is locked, 0 to 1000; 0 disables the limit.");
+        DESCRIPTIONS.put(StandardSetting.AUTH_FAILED_WINDOW_MINUTES, "The window, in minutes, in which the failed passphrase attempts are counted, 1 to 1440.");
+        DESCRIPTIONS.put(StandardSetting.AUTH_CONCURRENT_PASSPHRASES, "How many passphrases are checked at once, 1 to 1024; 0 (the default) for half the processors. "
+                + "A passphrase check (PBKDF2) costs about a fifth of a CPU-second, so this keeps CPU for everything else when many arrive at once.");
+        DESCRIPTIONS.put(StandardSetting.AUTH_PASSPHRASE_WAIT_MILLIS, "How long, in milliseconds, a request waits for a place to check its passphrase "
+                + "before it is answered as busy (503), 0 to 60000.");
+        DESCRIPTIONS.put(StandardSetting.AUTH_LOCKOUT_MINUTES, "How long, in minutes, an account stays locked after too many failed attempts, 1 to 1440; the lock then heals itself.");
         DESCRIPTIONS.put(StandardSetting.DOWNLOAD_TOKEN_LIFETIME, "Lifetime of a download token for the content of one Data Object, in minutes; at most the rest of the Session. A number.");
         DESCRIPTIONS.put(StandardSetting.INVITATION_TIMEOUT, "Lifetime of an invitation, in hours. A number.");
         DESCRIPTIONS.put(StandardSetting.CIRCLE_SECRET_ROTATION_DAYS, "Days from a new Circle, or the end of a rotation, until the Circle Secret is rotated again, 0 to 36500; "
@@ -66,7 +74,7 @@ final class SettingDescriptions {
         DESCRIPTIONS.put(StandardSetting.STATUS_LOAD_INTERVAL, "Seconds between two samples of the load for the status, 0 to 3600; 0 switches the gathering off.");
         DESCRIPTIONS.put(StandardSetting.STATUS_INVENTORY_INTERVAL, "Minutes between two samples of the inventory for the status, 1 to 10080.");
         DESCRIPTIONS.put(StandardSetting.CORS, "Allowed origin for CORS (cross-origin requests).");
-        DESCRIPTIONS.put(StandardSetting.IS_READY, "Internal: false while EDS isn't ready, e.g. while the database is unavailable.");
+        DESCRIPTIONS.put(StandardSetting.IS_READY, "Internal: false while EDS isn't ready, e.g. while the database is unavailable. Set by EDS only; can't be changed with this request.");
     }
 
     private SettingDescriptions() {

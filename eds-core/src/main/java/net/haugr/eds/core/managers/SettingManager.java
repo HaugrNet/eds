@@ -16,7 +16,6 @@
  */
 package net.haugr.eds.core.managers;
 
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -93,7 +92,7 @@ public final class SettingManager extends AbstractManager<CommonDao, SettingResp
 
         // All issues should've been covered, meaning that we can now safely
         // update the settings in the DB & the Settings Object.
-        processCheckedSettings(request, changedEntries);
+        processCheckedSettings(changedEntries);
 
         // All corrections have been made, now we can destroy the credentials
         Arrays.fill(request.getCredential(), (byte) 0);
@@ -116,7 +115,9 @@ public final class SettingManager extends AbstractManager<CommonDao, SettingResp
 
             final String value = trim(entry.getValue());
             if (!Objects.equals(settings.get(key), value)) {
-                checkStandardSetting(entry);
+                // The key and value as they are stored; before, a blank around
+                // the key passed every check of a standard setting.
+                checkStandardSetting(key, value);
                 map.put(key, value);
             }
         }
@@ -124,14 +125,14 @@ public final class SettingManager extends AbstractManager<CommonDao, SettingResp
         return map;
     }
 
-    private void processCheckedSettings(final SettingRequest request, final Map<String, String> changedEntries) {
+    private void processCheckedSettings(final Map<String, String> changedEntries) {
         final Map<String, SettingEntity> existing = convertSettings(dao.findAllAscending(SettingEntity.class, "id"));
         for (final Map.Entry<String, String> entry : changedEntries.entrySet()) {
-            processSettingRecord(request, existing, entry);
+            processSettingRecord(existing, entry);
         }
     }
 
-    private void processSettingRecord(final SettingRequest request, final Map<String, SettingEntity> existing, final Map.Entry<String, String> entry) {
+    private void processSettingRecord(final Map<String, SettingEntity> existing, final Map.Entry<String, String> entry) {
         final String key = trim(entry.getKey());
         final SettingEntity existingSetting = existing.get(key);
         final String value = trim(entry.getValue());
@@ -140,30 +141,30 @@ public final class SettingManager extends AbstractManager<CommonDao, SettingResp
             if (isEmpty(value)) {
                 deleteSetting(existingSetting);
             } else {
-                persistAndUpdateSetting(request, existingSetting, key, value);
+                persistAndUpdateSetting(existingSetting, key, value);
             }
         } else {
             final SettingEntity entity = new SettingEntity();
-            persistAndUpdateSetting(request, entity, key, value);
+            persistAndUpdateSetting(entity, key, value);
         }
     }
 
-    private void checkStandardSetting(final Map.Entry<String, String> entry) {
-        final StandardSetting standardSetting = StandardSetting.find(entry.getKey());
+    private static void checkStandardSetting(final String key, final String value) {
+        final StandardSetting standardSetting = StandardSetting.find(key);
         if (standardSetting != null) {
-            if (isEmpty(entry.getValue())) {
+            if (isEmpty(value)) {
                 // A stone needn't have a name.
                 if (standardSetting == StandardSetting.STONE_NAME) {
                     return;
                 }
-                throw new EDSException(ReturnCode.SETTING_WARNING, "The value for the key '" + entry.getKey() + "' is undefined.");
+                throw new EDSException(ReturnCode.SETTING_WARNING, "The value for the key '" + key + "' is undefined.");
             } else {
-                checkAllowedValues(standardSetting, entry.getValue());
+                checkAllowedValues(standardSetting, value);
             }
         }
     }
 
-    private void checkAllowedValues(final StandardSetting setting, final String value) {
+    private static void checkAllowedValues(final StandardSetting setting, final String value) {
         switch (setting) {
             case SYMMETRIC_ALGORITHM:
                 checkAlgorithm(KeyAlgorithm.Type.SYMMETRIC, setting, value);
@@ -181,9 +182,6 @@ public final class SettingManager extends AbstractManager<CommonDao, SettingResp
                 // Each account keeps the iterations of its passphrase, so
                 // the setting only counts for new passphrases.
                 checkIterations(setting, value);
-                break;
-            case EDS_CHARSET:
-                checkCharset(setting, value);
                 break;
             case SANITY_INTERVAL, INVITATION_TIMEOUT, SESSION_MAX_PER_MEMBER, DOWNLOAD_TOKEN_LIFETIME, STREAM_MAX_OBJECT_SIZE,
                  STREAM_TRANSACTION_TIMEOUT, STREAM_READ_BATCH_SIZE, DATA_MAX_INLINE_SIZE, DATA_MAX_TOTAL_SIZE, SANITY_MAX_OBJECTS:
@@ -205,6 +203,18 @@ public final class SettingManager extends AbstractManager<CommonDao, SettingResp
                 break;
             case CIRCLE_SECRET_ROTATION_THREADS:
                 checkRange(setting, value, 1, 64);
+                break;
+            case AUTH_MAX_FAILED_ATTEMPTS:
+                checkRange(setting, value, 0, Settings.MAX_AUTH_FAILED_ATTEMPTS);
+                break;
+            case AUTH_FAILED_WINDOW_MINUTES, AUTH_LOCKOUT_MINUTES:
+                checkRange(setting, value, 1, Settings.MAX_AUTH_MINUTES);
+                break;
+            case AUTH_CONCURRENT_PASSPHRASES:
+                checkRange(setting, value, 0, Settings.MAX_CONCURRENT_PASSPHRASES);
+                break;
+            case AUTH_PASSPHRASE_WAIT_MILLIS:
+                checkRange(setting, value, 0, Settings.MAX_PASSPHRASE_WAIT_MILLIS);
                 break;
             default:
                 checkOtherSettings(setting);
@@ -256,14 +266,6 @@ public final class SettingManager extends AbstractManager<CommonDao, SettingResp
         return set;
     }
 
-    private static void checkCharset(final StandardSetting setting, final String value) {
-        try {
-            Charset.forName(value);
-        } catch (IllegalArgumentException e) {
-            throw new EDSException(ReturnCode.SETTING_WARNING, "Invalid Character set value for '" + setting.getKey() + "'.", e);
-        }
-    }
-
     private static void checkNumber(final StandardSetting setting, final String value) {
         if (!PATTERN_NUMBER.matcher(value).matches()) {
             throw new EDSException(ReturnCode.SETTING_WARNING, "Invalid Integer value for '" + setting + "'.");
@@ -279,12 +281,12 @@ public final class SettingManager extends AbstractManager<CommonDao, SettingResp
     }
 
     private static void checkOtherSettings(final StandardSetting setting) {
-        // Currently, the only setting that has not been checked otherwise,
-        // and which is not allowed to be updated - is the MasterKey URL, since
-        // doing so may have harmful consequences. The setting may only be
-        // updated by the MasterKey request.
-        if (setting == StandardSetting.MASTERKEY_URL) {
-            throw new EDSException(ReturnCode.SETTING_WARNING, "The setting " + StandardSetting.MASTERKEY_URL.getKey() + " may not be changed with this request.");
+        // Two settings may not be changed with this request: the MasterKey
+        // URL, which only the MasterKey request changes, and whether EDS is
+        // ready, which EDS sets itself; set to false, every request was
+        // refused until a restart (ticket 14).
+        if ((setting == StandardSetting.MASTERKEY_URL) || (setting == StandardSetting.IS_READY)) {
+            throw new EDSException(ReturnCode.SETTING_WARNING, "The setting " + setting.getKey() + " may not be changed with this request.");
         }
     }
 
@@ -293,7 +295,7 @@ public final class SettingManager extends AbstractManager<CommonDao, SettingResp
         dao.delete(entity);
     }
 
-    private void persistAndUpdateSetting(final SettingRequest request, final SettingEntity entity, final String key, final String value) {
+    private void persistAndUpdateSetting(final SettingEntity entity, final String key, final String value) {
         // First, just update the setting.
         entity.setName(key);
         entity.setSetting(value);

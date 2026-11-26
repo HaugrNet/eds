@@ -60,17 +60,11 @@ final class StorageCeiling {
      * @throws EDSException with INSUFFICIENT_STORAGE, if it would exceed the ceiling
      */
     static void check(final Settings settings, final DataDao dao, final long replacedId, final long adding) {
-        dao.withConnection(connection -> {
-            final long ceiling = SchemaManager.ceiling(settings, connection);
-            if (ceiling > 0) {
-                final long used = EncryptedDataStore.totalLength(connection, replacedId);
-                if (used + adding > ceiling) {
-                    // The usage of the whole EDS isn't given to the Member.
-                    throw new EDSException(ReturnCode.INSUFFICIENT_STORAGE, REACHED);
-                }
-            }
-            return null;
-        });
+        final long ceiling = dao.withConnection(connection -> SchemaManager.ceiling(settings, connection));
+        if ((ceiling > 0) && (used(dao, replacedId) + adding > ceiling)) {
+            // The usage of the whole EDS isn't given to the Member.
+            throw new EDSException(ReturnCode.INSUFFICIENT_STORAGE, REACHED);
+        }
     }
 
     /**
@@ -83,13 +77,23 @@ final class StorageCeiling {
      * @return Stored bytes below the ceiling, never negative
      */
     static long remaining(final Settings settings, final DataDao dao, final long replacedId) {
-        return dao.withConnection(connection -> {
-            final long ceiling = SchemaManager.ceiling(settings, connection);
-            if (ceiling <= 0) {
-                return Long.MAX_VALUE;
-            }
+        final long ceiling = dao.withConnection(connection -> SchemaManager.ceiling(settings, connection));
+        if (ceiling <= 0) {
+            return Long.MAX_VALUE;
+        }
 
-            return Math.max(0, ceiling - EncryptedDataStore.totalLength(connection, replacedId));
-        });
+        return Math.max(0, ceiling - used(dao, replacedId));
+    }
+
+    /**
+     * The stored bytes in use: the totals of the Circles, a row for each
+     * (PLAN.md, Streaming, "The storage ceiling"), less the content which is
+     * replaced, whose own parts are found by its Id. Before, every part of
+     * every object was summed on each write.
+     */
+    private static long used(final DataDao dao, final long replacedId) {
+        final long replaced = (replacedId < 0) ? 0 : Math.max(0L, dao.withConnection(connection -> EncryptedDataStore.length(connection, replacedId)));
+
+        return dao.storedBytes() - replaced;
     }
 }

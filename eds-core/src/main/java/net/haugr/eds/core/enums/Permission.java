@@ -81,10 +81,11 @@ public enum Permission {
     /**
      * DataTypes is used, if the Clients wishes to have more control over what
      * an Object represents, which may be needed if multiple clients are
-     * accessing the same instance without sharing other information. However,
-     * only Circle Administrators may add new DataTypes for Circles.
+     * accessing the same instance without sharing other information. Data
+     * Types are of the whole stone, so only administrators may add, change
+     * or delete them, as with the settings (ticket 15).
      */
-    PROCESS_DATA_TYPE(TrustLevel.WRITE, "Process Data Type."),
+    PROCESS_DATA_TYPE(TrustLevel.SYSOP, "Process Data Type."),
 
     /**
      * Altering the settings is only allowed to be performed by a System

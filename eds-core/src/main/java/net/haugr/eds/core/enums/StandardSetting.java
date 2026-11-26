@@ -33,16 +33,30 @@ public enum StandardSetting {
     PBE_ITERATIONS("eds.crypto.pbe.iterations", "210000"),
     HASH_ALGORITHM("eds.crypto.hash.algorithm", "SHA_512"),
     EDS_LOCALE("eds.system.locale", "EN"),
-    EDS_CHARSET("eds.system.charset", "UTF-8"),
     // Members only see the Circles they are in, unless set to true.
     SHOW_CIRCLES("eds.show.all.circles", "false"),
-    SHOW_TRUSTEES("eds.show.trustees", "true"),
+    // Members only see the Circles they share with another Member, unless
+    // set to true, which shows every Circle of every Member (ticket 10).
+    SHOW_TRUSTEES("eds.show.trustees", "false"),
     SANITY_STARTUP("eds.sanity.check.startup", "true"),
     SANITY_INTERVAL("eds.sanity.check.interval.days", "180"),
     SESSION_TIMEOUT("eds.session.timeout.minutes", "480"),
     // Sessions a Member may have at a time (PLAN.md, "Several sessions"); a
     // further login ends the one that expires first.
     SESSION_MAX_PER_MEMBER("eds.session.max.per.member", "10"),
+    // Authentication attempt limits (#68). After this many failed passphrase
+    // attempts within the window, an account is locked for the lockout time.
+    // 0 (the default) disables the feature, so nothing is ever locked.
+    AUTH_MAX_FAILED_ATTEMPTS("eds.auth.max.failed.attempts", "0"),
+    // The window in which failed attempts are counted, and how long a lock
+    // then lasts; the lock heals itself, so no account is ever locked for good.
+    AUTH_FAILED_WINDOW_MINUTES("eds.auth.failed.window.minutes", "15"),
+    AUTH_LOCKOUT_MINUTES("eds.auth.lockout.minutes", "15"),
+    // How many passphrases are checked at once (PBKDF2, which costs about a
+    // fifth of a CPU-second each), 0 for half the processors; and how long a
+    // request waits for a place before it is answered as busy (ticket 20).
+    AUTH_CONCURRENT_PASSPHRASES("eds.auth.concurrent.passphrases", "0"),
+    AUTH_PASSPHRASE_WAIT_MILLIS("eds.auth.passphrase.wait.millis", "2000"),
     // Lifetime of a download token for one Data Object (PLAN.md, L5), at
     // most the rest of the Session.
     DOWNLOAD_TOKEN_LIFETIME("eds.download.token.lifetime.minutes", "60"),

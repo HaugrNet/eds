@@ -2,8 +2,9 @@
 
 Project: EDS (Encrypted Data Share), https://github.com/HaugrNet/eds
 
-Status: planned 2026-11-15, nothing built. Discussed and decided with the user the
-same day; what is still to decide is listed under "Open decisions".
+Status: done, 2026-11-15 to 2026-11-17 (T1–T3 and T7 here; T4 and T8 in
+`RUNE.md`; T5, T6 and T9 in `TOLK.md`). Discussed and decided with the user; what is
+still to decide is listed under "Open decisions".
 
 Like `E2E.md`, this plan crosses the backend, Rune and Tolk. It builds on `E2E.md`
 and shares its order of work (see "Order of work"). Code comments cite it as
@@ -28,7 +29,7 @@ and can be switched on and off. Planned beside the chat:
   and calls".
 
 Each feature keeps what it stores in a folder of its own in the Circle: `.chat`,
-`.calendar`, `.location`, `.plans`.
+`.calendar`, `.location`, `.plans`, `.calls`.
 
 A view of the stones themselves for System Administrators (storage, load, people
 active) was discussed as a feature too and is kept apart: it belongs to a stone, not
@@ -78,12 +79,12 @@ Decided about how:
 - Moving a stone's existing chat history: EDS 2.0 has no upgrade in place
   (`PLAN.md`, Rules).
 
-## The chat today
+## The chat before this plan
 
-It already has the parts of a feature, built by hand (`PLAN.md`, Clients API, L4 and
+Before T4 it had the parts of a feature, built by hand (`PLAN.md`, Clients API, L4 and
 "After L5"):
 
-| Part | Today |
+| Part | Before T4 |
 |---|---|
 | Reserved folder | `.chat` in the root of the Circle; hidden, and the data requests may read but not change it |
 | Kinds of entries | messages (Data Type `chat`) and a marker per Member for received and read (`chat-receipt`) |
@@ -164,7 +165,10 @@ One socket for everything, in place of the chat's:
   a feature switched on or off, and the files of the Circle changed (`CHANGED`, as
   today).
 - Access ends promptly when it is taken away, and the limits on what may wait for
-  a slow connection stay (`PLAN.md`, L4).
+  a slow connection stay (`PLAN.md`, L4). Since 2026-11-26 nothing more of a Circle
+  is sent before the access is checked again, and a connection has limits before
+  its AUTH and budgets for signals and changes of entries after it (`SECURITY.md`,
+  "The socket before and after AUTH").
 
 ### Presence, and signals to one Member
 
@@ -205,11 +209,10 @@ the OpenAPI documentation.
 The chat's own operations and frames, `ChatManager` and its helpers, the form of a
 stored message, and the Data Types `chat` and `chat-receipt`.
 
-The old chat and the chat as a feature both want the folder `.chat`, so a stone can't
-serve both. Until Rune has moved (T4) the stone serves the old chat, and the tests
-of T1 and T2 use a declaration of another name. With T4 the old chat leaves the
-stone. Tolk follows in T5; between the two, Tolk's chat works against its fake
-stone only.
+The old chat and the chat as a feature both wanted the folder `.chat`, so a stone
+couldn't serve both. Until T4 the stone served the old chat, and the tests of T1
+and T2 used a declaration of another name. With T4 the old chat left the stone;
+Tolk followed in T5.
 
 ### Why the backend needs no later change
 
@@ -588,7 +591,8 @@ Done 2026-11-15:
     asks for hidden names; nothing in it is read.
   - The name `chat` is refused for a feature until the old chat has left the stone
     (T4).
-  - No limit on how often entries are added.
+  - No limit on how often entries are added (over the socket since 2026-11-26, see
+    "The socket").
 
 ### Phase T2: the socket
 
@@ -648,7 +652,8 @@ Done when: the forms and declarations are in the repository and the examples
 cover every kind.
 
 Done 2026-11-15:
-- The four declarations are in `eds-quarkus/src/main/webui/src/features/declarations/`,
+- The four declarations are in `eds-quarkus/src/main/webui/src/features/declarations/`
+  (`calls.json` followed with T7, 2026-11-17),
   and the forms in "The forms of the entries" above.
 - `FeatureConventionsTest` (core; skipped without Rune's sources): the stone accepts
   all four, and the chat's declaration does what the chat of the stone did:
@@ -767,11 +772,13 @@ All 2026-11-15, the user:
 
 ## Open decisions
 
-- **Delivery across several instances** of EDS and rate limits per connection,
-  open for the chat today (`PLAN.md`, Clients API, "Open"), now for the socket.
-- **Whether a declaration may be changed** in ways that make stored entries break
-  a rule (a smaller size, a shorter age). Planned: the new rule counts for what is
-  written afterwards, and ages are applied to everything.
+- **Delivery across several instances** of EDS (the socket and presence reach the
+  connections of one instance). Rate limits per connection: since 2026-11-26 the
+  socket has budgets for signals and changes of entries (`SECURITY.md`, "The socket
+  before and after AUTH"); the resource API has none.
+- ~~Whether a declaration may be changed~~ in ways that make stored entries break
+  a rule: decided and built in T1. The new rule counts for what is written
+  afterwards, and ages are applied to everything.
 - **A phone app,** which the location feature needs to be of real use, and a map.
 - **Files as a feature**, later.
 - **A relay for a whole stone.** Today an administrator names the servers per

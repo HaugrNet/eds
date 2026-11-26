@@ -74,7 +74,6 @@ public final class EncryptedDataStore {
     // A row for every eds_data row, also for one without parts; none if
     // there is no such eds_data row.
     private static final String READ_LENGTH = "SELECT COALESCE(SUM(p.part_length), 0) FROM eds_data d LEFT JOIN eds_data_parts p ON p.data_id = d.id WHERE d.id = ? GROUP BY d.id";
-    private static final String TOTAL_LENGTH = "SELECT COALESCE(SUM(part_length), 0) FROM eds_data_parts WHERE data_id <> ?";
     private static final String READ_HEADS = "SELECT d.metadata_id, (SELECT COALESCE(SUM(a.part_length), 0) FROM eds_data_parts a WHERE a.data_id = d.id), h.part " +
             "FROM eds_data d LEFT JOIN eds_data_parts h ON h.data_id = d.id AND h.part_offset = 0 WHERE d.metadata_id IN (";
     // The part which holds the byte at an offset
@@ -192,24 +191,6 @@ public final class EncryptedDataStore {
             statement.setLong(1, dataId);
             try (ResultSet result = statement.executeQuery()) {
                 return result.next() ? result.getLong(1) : -1;
-            }
-        }
-    }
-
-    /**
-     * Returns the stored length of all encrypted data together, without
-     * reading it, leaving out one row (e.g. the one which is replaced).
-     *
-     * @param connection JDBC Connection
-     * @param excludedId Internal Id of the eds_data row to leave out, or -1
-     * @return Length in bytes
-     * @throws SQLException if the query fails
-     */
-    public static long totalLength(final Connection connection, final long excludedId) throws SQLException {
-        try (PreparedStatement statement = connection.prepareStatement(TOTAL_LENGTH)) {
-            statement.setLong(1, excludedId);
-            try (ResultSet result = statement.executeQuery()) {
-                return result.next() ? result.getLong(1) : 0;
             }
         }
     }
@@ -427,7 +408,12 @@ public final class EncryptedDataStore {
         }
 
         final int partSize = DataPart.size(wantedSize);
-        final byte[] buffer = new byte[partSize];
+        // No more room than the content needs (ticket 36): with a length, as
+        // much as the largest of its parts; without, that of a smallest part,
+        // which grows as the stream gives more.
+        final PartBuffer buffer = new PartBuffer((length == TO_THE_END)
+                ? Math.min(DataPart.MIN_SIZE, partSize)
+                : (int) Math.min(partSize, length));
         long offset = 0;
         try (PreparedStatement statement = connection.prepareStatement(INSERT_PART)) {
             // A parameter stays set for each execution, until it is set again.
@@ -437,12 +423,12 @@ public final class EncryptedDataStore {
                 if (length != TO_THE_END) {
                     wanted = (int) Math.min(wanted, length - offset);
                 }
-                final int read = fill(stream, buffer, wanted);
+                final int read = buffer.fill(stream, wanted);
                 if (read > 0) {
-                    digest.update(buffer, 0, read);
+                    digest.update(buffer.bytes(), 0, read);
                     statement.setLong(2, offset);
                     statement.setInt(3, read);
-                    statement.setBinaryStream(4, new ByteArrayInputStream(buffer, 0, read), read);
+                    statement.setBinaryStream(4, new ByteArrayInputStream(buffer.bytes(), 0, read), read);
                     statement.executeUpdate();
                     offset += read;
                 }
@@ -459,26 +445,48 @@ public final class EncryptedDataStore {
     }
 
     /**
-     * Reads from the stream until the wanted number of bytes is there, or it
-     * ends. A failure of the stream, whatever the stream was, is given on as
-     * a failure of the write, as the database driver did when it read the
-     * stream itself.
+     * The bytes of one part, read from the stream. It starts as large as the
+     * caller expects a part to need, and grows, up to the size of a part,
+     * only if the stream gives more (ticket 36): a buffer of a whole part
+     * (4 MiB) for each write was most of what the stone allocated.
      */
-    private static int fill(final InputStream stream, final byte[] buffer, final int wanted) throws SQLException {
-        int filled = 0;
-        try {
-            while (filled < wanted) {
-                final int read = stream.read(buffer, filled, wanted - filled);
-                if (read < 0) {
-                    break;
-                }
-                filled += read;
-            }
-        } catch (IOException | RuntimeException e) {
-            throw new SQLException("The stream of the data failed: " + e.getMessage(), e);
+    private static final class PartBuffer {
+
+        private byte[] bytes;
+
+        private PartBuffer(final int size) {
+            bytes = new byte[size];
         }
 
-        return filled;
+        private byte[] bytes() {
+            return bytes;
+        }
+
+        /**
+         * Reads from the stream until the wanted number of bytes is there, or
+         * it ends. A failure of the stream, whatever the stream was, is given
+         * on as a failure of the write, as the database driver did when it
+         * read the stream itself.
+         */
+        private int fill(final InputStream stream, final int wanted) throws SQLException {
+            int filled = 0;
+            try {
+                while (filled < wanted) {
+                    if (filled == bytes.length) {
+                        bytes = Arrays.copyOf(bytes, Math.clamp(2L * bytes.length, Math.min(DataPart.HEAD_SIZE, wanted), wanted));
+                    }
+                    final int read = stream.read(bytes, filled, Math.min(wanted, bytes.length) - filled);
+                    if (read < 0) {
+                        break;
+                    }
+                    filled += read;
+                }
+            } catch (IOException | RuntimeException e) {
+                throw new SQLException("The stream of the data failed: " + e.getMessage(), e);
+            }
+
+            return filled;
+        }
     }
 
     private static void writeChecksum(final Connection connection, final long dataId, final String checksum) throws SQLException {

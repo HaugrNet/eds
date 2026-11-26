@@ -29,6 +29,7 @@ import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Base64;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
@@ -85,10 +86,20 @@ import org.slf4j.LoggerFactory;
  * the transaction succeeded.</p>
  *
  * <p>Access ends promptly: when a change of Members, Circles, Trustees or
- * the MasterKey is committed ({@link AccessChange}), the connections are
- * checked again, and when a Session has expired its connections are closed.
+ * the MasterKey is committed ({@link AccessChange}), the connections it may
+ * touch are checked again, and when a Session has expired its connections
+ * are closed. Until a connection is checked, nothing of the Circle is sent
+ * to it: each Circle has an access version, raised right after the commit,
+ * and a connection checked before it is checked again first (ticket 18).
  * What waits for a connection is limited, both ways; a connection over a
  * limit, whose client doesn't read or floods, is closed.</p>
+ *
+ * <p>Before AUTH a connection may do little: at most
+ * {@link #MAX_WAITING_FOR_AUTH} wait for it at once, its first frame must
+ * be a valid AUTH within {@link #AUTH_TIMEOUT_SECONDS} seconds, or it is
+ * closed, and less may wait to be handled. After AUTH, its signals have a
+ * budget of characters, and its changes of entries a budget of frames
+ * (tickets 18 and 22).</p>
  *
  * @author Kim Jensen
  * @since EDS 2.0
@@ -114,9 +125,20 @@ public class SocketHub {
      */
     public static final String WORK = "eds-socket-work";
     /** The first frame, AUTH, must come within this time. */
-    static final long AUTH_TIMEOUT_SECONDS = 30;
+    static final long AUTH_TIMEOUT_SECONDS = 10;
+    /** The most connections which may wait for their AUTH at once; one more is closed at once. */
+    static final int MAX_WAITING_FOR_AUTH = 256;
+    /** The most characters which may wait to be handled before AUTH: the AUTH frame is small. */
+    static final long MAX_PENDING_RECEIVED_BEFORE_AUTH = 64L * 1024;
+    /** The characters of signals a connection may send at once, and how many come back a second. */
+    static final long SIGNAL_BURST = 256L * 1024;
+    static final long SIGNAL_RATE = 32L * 1024;
+    /** The changes of entries a connection may make at once, and how many come back a second. */
+    static final long ENTRY_BURST = 100;
+    static final long ENTRY_RATE = 20;
 
     private static final String NOT_AUTHENTICATED = "Not authenticated";
+    private static final String TOO_MANY_WAITING = "Too many connections wait for AUTH";
     private static final String SESSION_EXPIRED = "The Session has expired.";
 
     private final FeatureBean features;
@@ -126,6 +148,12 @@ public class SocketHub {
     private final ScheduledExecutorService timer;
     private final ExecutorService checker;
     private final AtomicBoolean checkPending = new AtomicBoolean(false);
+    /** The connections which wait for their AUTH. */
+    private final AtomicInteger waiting = new AtomicInteger(0);
+    /** The access version of everyone: raised by a change which may touch every connection. */
+    private final AtomicLong everyoneVersion = new AtomicLong(0);
+    /** The access version of each Circle: raised by a change of the access to it. */
+    private final Map<String, AtomicLong> circleVersions = new ConcurrentHashMap<>();
     private final long closeTimeoutMillis;
     private final Clock clock;
     private final long authTimeoutMillis;
@@ -198,12 +226,30 @@ public class SocketHub {
         return clients.size();
     }
 
+    /**
+     * The Circles whose access version is kept, for the tests: only a change
+     * of the access makes one.
+     *
+     * @return Circles with a version
+     */
+    int versionsKept() {
+        return circleVersions.size();
+    }
+
     // =========================================================================
     // Connections
     // =========================================================================
 
     public void open(final SocketConnection connection) {
-        final Client client = new Client(connection, this::overloaded, frameWork);
+        if (waiting.incrementAndGet() > MAX_WAITING_FOR_AUTH) {
+            waiting.decrementAndGet();
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Socket connection {} refused: {}.", connection.id(), TOO_MANY_WAITING);
+            }
+            Thread.ofVirtual().name("eds-socket-refuse-" + connection.id()).start(() -> connection.close(SocketConnection.TRY_AGAIN_LATER, TOO_MANY_WAITING));
+            return;
+        }
+        final Client client = new Client(connection, this::overloaded, frameWork, clock);
         clients.put(connection.id(), client);
         timer.schedule(() -> {
             if ((client.identity() == null) && clients.containsKey(connection.id())) {
@@ -222,6 +268,7 @@ public class SocketHub {
     public void closed(final String connectionId) {
         final Client client = clients.remove(connectionId);
         if (client != null) {
+            stopWaiting(client);
             gone(client);
             client.dispose();
         }
@@ -278,13 +325,26 @@ public class SocketHub {
     }
 
     /**
-     * Members, Circles, Trustees or the MasterKey changed: every connection
-     * is checked again, off the thread of the request. A check which is
-     * waiting already covers the later changes too.
+     * Members, Circles, Trustees or the MasterKey changed. The access version
+     * is raised at once, on the thread of the request, so nothing more of
+     * the Circle is sent to a connection before it was checked again. The
+     * checks themselves run off that thread: of the connections which joined
+     * the Circle, or of every connection; a check of every connection which
+     * is waiting already covers the later changes too.
      *
-     * @param change The marker of a committed change
+     * @param change What changed, committed
      */
     void accessChanged(@Observes(during = TransactionPhase.AFTER_SUCCESS) final AccessChange change) {
+        if (!change.touchesEveryone()) {
+            circleVersions.computeIfAbsent(change.circleId(), id -> new AtomicLong(0)).incrementAndGet();
+            for (final Client client : clients.values()) {
+                if ((client.identity() != null) && client.circles.contains(change.circleId())) {
+                    client.run(() -> check(client));
+                }
+            }
+            return;
+        }
+        everyoneVersion.incrementAndGet();
         if ((checker != null) && checkPending.compareAndSet(false, true)) {
             try {
                 checker.execute(() -> {
@@ -303,17 +363,77 @@ public class SocketHub {
         announce(circleId, json, except, null);
     }
 
-    /** Tells the connections which joined a Circle; only those of one Member, if one is named. */
+    /**
+     * Tells the connections which joined a Circle; only those of one Member,
+     * if one is named. A connection whose access to the Circle may have
+     * changed since it was last checked is checked first, in the order of
+     * its frames: what it is told then waits behind the check, and so does
+     * what comes after, until all of it is sent.
+     */
     private void announce(final String circleId, final String json, final Client except, final String memberId) {
         for (final Client client : clients.values()) {
             if (!client.equals(except) && client.circles.contains(circleId) && ((memberId == null) || isOf(client, memberId))) {
                 if (expired(client)) {
                     drop(client, ReturnCode.AUTHENTICATION_WARNING, SESSION_EXPIRED);
+                } else if ((client.held.get() > 0) || stale(client, circleId)) {
+                    sendChecked(client, circleId, json);
                 } else {
                     client.sendText(json);
                 }
             }
         }
+    }
+
+    /**
+     * Sends behind a check of the access, in the order of the connection's
+     * frames. If the check fails (the database can't be read), what was to
+     * be sent is dropped, and the next announcement checks again.
+     */
+    private void sendChecked(final Client client, final String circleId, final String json) {
+        client.held.incrementAndGet();
+        client.run(() -> {
+            try {
+                if (stale(client, circleId)) {
+                    check(client);
+                }
+                // Not if the check failed, so it is still stale: nothing is
+                // sent which wasn't checked.
+                if (client.circles.contains(circleId) && !stale(client, circleId)) {
+                    client.sendText(json);
+                }
+            } finally {
+                client.held.decrementAndGet();
+            }
+        });
+    }
+
+    // =========================================================================
+    // Access versions
+    // =========================================================================
+
+    /**
+     * The access version of a Circle; 0 for a Circle whose access never
+     * changed, which has no entry: only a change of the access makes one, so
+     * a client can't grow the map with the IDs it joins.
+     */
+    private long circleVersion(final String circleId) {
+        final AtomicLong version = circleVersions.get(circleId);
+        return (version != null) ? version.get() : 0;
+    }
+
+    /** The access versions now, of everyone and of a Circle; read before a check of the access. */
+    private Checked versions(final String circleId) {
+        return new Checked(everyoneVersion.get(), circleVersion(circleId));
+    }
+
+    /** Whether the access of a connection to a Circle may have changed since it was checked. */
+    private boolean stale(final Client client, final String circleId) {
+        final Checked checked = client.checked.get(circleId);
+        return (checked == null) || (checked.everyone() < everyoneVersion.get()) || (checked.circle() < circleVersion(circleId));
+    }
+
+    /** The access versions a connection was checked against, for one Circle. */
+    private record Checked(long everyone, long circle) {
     }
 
     /** An entry as it is announced: without a long content, which is fetched. */
@@ -329,22 +449,34 @@ public class SocketHub {
     // =========================================================================
 
     private void handle(final Client client, final String text) {
+        if (!client.equals(clients.get(client.connection.id()))) {
+            // Dropped meanwhile: the frames which still wait are not handled.
+            return;
+        }
+        if (client.identity() == null) {
+            handleFirst(client, text);
+            return;
+        }
         String ref = null;
         try {
             final SocketFrame frame = SocketCodec.parse(text);
             ref = frame.getRef();
             if (frame.getType() == SocketFrameType.AUTH) {
                 authenticate(client, frame);
-            } else if (client.identity() == null) {
-                drop(client, ReturnCode.AUTHENTICATION_WARNING, "The first frame must be AUTH.");
             } else if (expired(client)) {
                 drop(client, ReturnCode.AUTHENTICATION_WARNING, SESSION_EXPIRED);
             } else {
                 dispatch(client, frame);
             }
         } catch (EDSException e) {
-            LOGGER.debug("Socket frame failed: {}", e.getMessage());
-            if ((e.getReturnCode() == ReturnCode.AUTHENTICATION_WARNING) && (client.identity() != null)) {
+            if ((e.getReturnCode().getClassification() == ReturnCode.Classification.CLASS_ERROR) && (e.getReturnCode() != ReturnCode.SERVICE_BUSY)) {
+                // An error of the stone, not of the frame (as the REST endpoints
+                // log it; a busy stone isn't one).
+                LOGGER.warn("Socket frame failed with {}: {}", e.getReturnCode(), e.getMessage());
+            } else {
+                LOGGER.debug("Socket frame failed: {}", e.getMessage());
+            }
+            if (e.getReturnCode() == ReturnCode.AUTHENTICATION_WARNING) {
                 drop(client, e.getReturnCode(), e.getMessage());
             } else {
                 client.send(error(ref, e.getReturnCode(), e.getMessage()));
@@ -353,6 +485,43 @@ public class SocketHub {
             LOGGER.error("Socket frame failed: {}", e.getMessage(), e);
             client.send(error(ref, ReturnCode.ERROR, e.getMessage()));
         }
+    }
+
+    /**
+     * The first frame of a connection must be a valid AUTH: anything else,
+     * or an AUTH which fails, closes the connection (tickets 18 and 22).
+     * Nothing of it is logged above DEBUG: a locked stone fails every AUTH,
+     * and an unknown client could fill the log.
+     */
+    private void handleFirst(final Client client, final String text) {
+        // The answer names the frame it answers, so a client learns why
+        // before the connection is closed.
+        String ref = null;
+        try {
+            final SocketFrame frame = SocketCodec.parse(text);
+            ref = frame.getRef();
+            if (frame.getType() != SocketFrameType.AUTH) {
+                drop(client, ref, ReturnCode.AUTHENTICATION_WARNING, "The first frame must be AUTH.");
+                return;
+            }
+            authenticate(client, frame);
+        } catch (EDSException e) {
+            LOGGER.debug("The first socket frame failed: {}", e.getMessage());
+            drop(client, ref, e.getReturnCode(), e.getMessage());
+        } catch (RuntimeException e) {
+            LOGGER.debug("The first socket frame failed: {}", e.getMessage(), e);
+            drop(client, ref, ReturnCode.ERROR, e.getMessage());
+        }
+    }
+
+    /**
+     * How a connection is closed for a failure: as a broken rule (1008), which
+     * clients take for an ended Session, unless the stone failed (a locked
+     * stone, the database), which a client may try again later (1013).
+     */
+    private static int closeCode(final ReturnCode returnCode) {
+        return (returnCode.getClassification() == ReturnCode.Classification.CLASS_ERROR)
+                ? SocketConnection.TRY_AGAIN_LATER : SocketConnection.POLICY_VIOLATION;
     }
 
     /** Runs a frame of an authenticated connection; a failure is answered by {@link #handle(Client, String)}. */
@@ -380,6 +549,7 @@ public class SocketHub {
         final FeatureManager.Identity identity = features.identify(token);
         client.token.set(token);
         client.identity.set(identity);
+        stopWaiting(client);
 
         final SocketFrame ready = reply(SocketFrameType.READY, frame);
         ready.setMemberId(identity.memberId());
@@ -389,6 +559,9 @@ public class SocketHub {
 
     private void join(final Client client, final SocketFrame frame) {
         final String circleId = checkId(frame.getCircleId(), Constants.FIELD_CIRCLE_ID);
+        // The versions before the check: a change committed meanwhile is
+        // checked again.
+        final Checked versions = versions(circleId);
         // Reading the features of the Circle needs READ in it, which is what
         // joining it needs.
         final CircleFeatureResponse found = checked(features.circleFeatures(client.token(), circleId));
@@ -403,6 +576,7 @@ public class SocketHub {
             if (!client.equals(clients.get(client.connection.id()))) {
                 return;
             }
+            client.checked.put(circleId, versions);
             client.circles.add(circleId);
             show(client, circleId, !Boolean.TRUE.equals(frame.getUnseen()));
             joined.setPresent(present(circleId));
@@ -415,6 +589,7 @@ public class SocketHub {
         synchronized (presence) {
             show(client, circleId, false);
             client.circles.remove(circleId);
+            client.checked.remove(circleId);
         }
 
         final SocketFrame left = reply(SocketFrameType.LEFT, frame);
@@ -424,6 +599,7 @@ public class SocketHub {
 
     private void add(final Client client, final SocketFrame frame) {
         final String circleId = joined(client, frame);
+        spend(client);
         final EntryRequest body = new EntryRequest();
         body.setKind(frame.getKind());
         body.setAbout((frame.getAbout() != null) ? checkId(frame.getAbout(), Constants.FIELD_ABOUT) : null);
@@ -434,6 +610,7 @@ public class SocketHub {
 
     private void change(final Client client, final SocketFrame frame) {
         final String circleId = joined(client, frame);
+        spend(client);
         final EntryRequest body = new EntryRequest();
         body.setName(frame.getName());
         body.setContent(frame.getContent());
@@ -442,11 +619,13 @@ public class SocketHub {
 
     private void remove(final Client client, final SocketFrame frame) {
         final String circleId = joined(client, frame);
+        spend(client);
         done(client, frame, circleId, features.removeEntry(client.token(), circleId, feature(frame), checkId(frame.getEntryId(), Constants.FIELD_ENTRY_ID)));
     }
 
     private void close(final Client client, final SocketFrame frame) {
         final String circleId = joined(client, frame);
+        spend(client);
         done(client, frame, circleId, features.closeEntry(client.token(), circleId, feature(frame), checkId(frame.getEntryId(), Constants.FIELD_ENTRY_ID), frame.getClosed()));
     }
 
@@ -485,7 +664,8 @@ public class SocketHub {
      * A signal is passed on to the others which joined the Circle, or to
      * the connections of the one Member it names, and neither stored nor
      * answered. One which comes too soon after the connection's last one
-     * for the feature and Circle is dropped silently.
+     * for the feature and Circle is dropped silently, and so is one over the
+     * connection's budget for signals.
      */
     private void signal(final Client client, final SocketFrame frame) {
         // The checks run in this order: joined, feature, to, the signal, and
@@ -495,7 +675,9 @@ public class SocketHub {
         final String to = (frame.getTo() != null) ? checkId(frame.getTo(), Constants.FIELD_TO) : null;
         final String signal = signalOf(frame);
         final long interval = features.signal(client.token(), circleId, feature);
-        if (due(client, circleId + '|' + feature, interval)) {
+        final String key = circleId + '|' + feature;
+        if (due(client, key, interval) && client.signals.take(signal.length())) {
+            client.signalled.put(key, clock.millis());
             final SocketFrame passed = new SocketFrame(SocketFrameType.SIGNAL);
             passed.setCircleId(circleId);
             passed.setFeature(feature);
@@ -517,20 +699,22 @@ public class SocketHub {
         return signal;
     }
 
+    /** A change of an entry takes one of the connection's budget; without one left, the stone is busy for it. */
+    private static void spend(final Client client) {
+        if (!client.entries.take(1)) {
+            throw new EDSException(ReturnCode.SERVICE_BUSY, "Too many changes of entries at once; try again shortly.");
+        }
+    }
+
     /**
      * Whether a signal of the connection for the feature and Circle (the
-     * key) may go now, as the interval has passed since its last one; if
-     * so, now is noted as the time of its last one.
+     * key) may go now, as the interval has passed since its last one. The
+     * time of the last one is noted when it goes, so a signal over the
+     * budget doesn't use up the interval.
      */
     private boolean due(final Client client, final String key, final long interval) {
-        final long now = clock.millis();
         final Long last = client.signalled.get(key);
-        if ((last != null) && ((now - last) < interval)) {
-            return false;
-        }
-        client.signalled.put(key, now);
-
-        return true;
+        return (last == null) || ((clock.millis() - last) >= interval);
     }
 
     // =========================================================================
@@ -626,12 +810,24 @@ public class SocketHub {
             return;
         }
         try {
+            // The versions before the check: a change committed meanwhile is
+            // checked again.
+            final Map<String, Checked> versions = new HashMap<>();
+            for (final String circleId : client.circles) {
+                versions.put(circleId, versions(circleId));
+            }
             final Set<String> readable = features.readableCircles(token.clone());
             for (final String circleId : client.circles) {
-                if (!readable.contains(circleId)) {
+                if (readable.contains(circleId)) {
+                    final Checked checked = versions.get(circleId);
+                    if (checked != null) {
+                        client.checked.put(circleId, checked);
+                    }
+                } else {
                     synchronized (presence) {
                         show(client, circleId, false);
                         client.circles.remove(circleId);
+                        client.checked.remove(circleId);
                     }
                     final SocketFrame left = new SocketFrame(SocketFrameType.LEFT);
                     left.setCircleId(circleId);
@@ -666,20 +862,41 @@ public class SocketHub {
     }
 
     private void drop(final Client client, final ReturnCode returnCode, final String message) {
+        drop(client, null, returnCode, message);
+    }
+
+    /** Closes a connection, after telling it why; the answer names a frame, if one is given. */
+    private void drop(final Client client, final String ref, final ReturnCode returnCode, final String message) {
         if (clients.remove(client.connection.id()) != null) {
+            stopWaiting(client);
             gone(client);
-            client.send(error(null, returnCode, message));
-            client.closeAfterSends(SocketConnection.POLICY_VIOLATION, NOT_AUTHENTICATED);
-            timer.schedule(() -> client.closeNow(SocketConnection.POLICY_VIOLATION, NOT_AUTHENTICATED), closeTimeoutMillis, TimeUnit.MILLISECONDS);
+            client.send(error(ref, returnCode, message));
+            final int code = closeCode(returnCode);
+            final String reason = (code == SocketConnection.POLICY_VIOLATION) ? NOT_AUTHENTICATED : "The stone failed, try again later";
+            client.closeAfterSends(code, reason);
+            timer.schedule(() -> client.closeNow(code, reason), closeTimeoutMillis, TimeUnit.MILLISECONDS);
         }
     }
 
     private void overloaded(final Client client) {
         if (clients.remove(client.connection.id()) != null) {
+            stopWaiting(client);
             gone(client);
             final String id = client.connection.id();
-            LOGGER.warn("Too much waits for the socket connection {}, it is closed.", id);
+            if (client.identity() == null) {
+                // Before AUTH anyone could fill the log with it.
+                LOGGER.debug("Too much waits for the socket connection {} before its AUTH, it is closed.", id);
+            } else {
+                LOGGER.warn("Too much waits for the socket connection {}, it is closed.", id);
+            }
             client.closeNow(SocketConnection.TRY_AGAIN_LATER, "Too much is waiting");
+        }
+    }
+
+    /** The connection no longer waits for its AUTH: it has it, or it is gone. */
+    private void stopWaiting(final Client client) {
+        if (client.waiting.compareAndSet(true, false)) {
+            waiting.decrementAndGet();
         }
     }
 
@@ -762,20 +979,30 @@ public class SocketHub {
         private final Consumer<Client> overloaded;
         private final SerialExecutor handler;
         private final ExecutorService sender;
-        private final Backlog received = new Backlog(MAX_PENDING_RECEIVED);
-        private final Backlog sent = new Backlog(MAX_PENDING_SENT);
+        private final Backlog received = new Backlog();
+        private final Backlog sent = new Backlog();
         private final AtomicBoolean reported = new AtomicBoolean(false);
         private final AtomicBoolean closed = new AtomicBoolean(false);
         private final Set<String> circles = ConcurrentHashMap.newKeySet();
         /** The Circles in which the connection is shown: joined, and not unseen. */
         private final Set<String> shown = ConcurrentHashMap.newKeySet();
         private final Map<String, Long> signalled = new ConcurrentHashMap<>();
+        /** The access versions each joined Circle was last checked against. */
+        private final Map<String, Checked> checked = new ConcurrentHashMap<>();
+        /** What is told to the connection behind a check of its access, not yet sent. */
+        private final AtomicInteger held = new AtomicInteger(0);
+        /** Whether the connection still waits for its AUTH. */
+        private final AtomicBoolean waiting = new AtomicBoolean(true);
+        private final Budget signals;
+        private final Budget entries;
         private final AtomicReference<byte[]> token = new AtomicReference<>();
         private final AtomicReference<FeatureManager.Identity> identity = new AtomicReference<>();
 
-        private Client(final SocketConnection connection, final Consumer<Client> overloaded, final Executor work) {
+        private Client(final SocketConnection connection, final Consumer<Client> overloaded, final Executor work, final Clock clock) {
             this.connection = connection;
             this.overloaded = overloaded;
+            this.signals = new Budget(SIGNAL_BURST, SIGNAL_RATE, clock);
+            this.entries = new Budget(ENTRY_BURST, ENTRY_RATE, clock);
             this.handler = new SerialExecutor(work);
             this.sender = Executors.newSingleThreadExecutor(Thread.ofVirtual().name("eds-socket-send-" + connection.id()).factory());
         }
@@ -796,7 +1023,9 @@ public class SocketHub {
 
         private void receive(final String text, final Runnable task) {
             final int length = text.length();
-            if (!received.add(length)) {
+            // Before AUTH only a little may wait: the AUTH frame is small.
+            final long limit = (identity() == null) ? MAX_PENDING_RECEIVED_BEFORE_AUTH : MAX_PENDING_RECEIVED;
+            if (!received.add(length, limit)) {
                 overflow();
             } else if (!execute(handler, received.counted(length, task))) {
                 received.remove(length);
@@ -813,7 +1042,7 @@ public class SocketHub {
 
         private void sendText(final String text) {
             final int length = text.length();
-            if (!sent.add(length)) {
+            if (!sent.add(length, MAX_PENDING_SENT)) {
                 overflow();
             } else if (!execute(sender, sent.counted(length, () -> transmit(text)))) {
                 sent.remove(length);
@@ -869,6 +1098,7 @@ public class SocketHub {
             }
             circles.clear();
             shown.clear();
+            checked.clear();
             handler.shutdown();
             sender.shutdownNow();
         }
@@ -877,15 +1107,11 @@ public class SocketHub {
     /** What waits for a connection in one direction, counted in frames and characters. */
     private static final class Backlog {
 
-        private final long maxCharacters;
         private final AtomicInteger frames = new AtomicInteger(0);
         private final AtomicLong characters = new AtomicLong(0);
 
-        private Backlog(final long maxCharacters) {
-            this.maxCharacters = maxCharacters;
-        }
-
-        private boolean add(final int length) {
+        /** Adds a frame, unless the frames or the characters would pass their limit. */
+        private boolean add(final int length, final long maxCharacters) {
             if (frames.incrementAndGet() > MAX_PENDING_FRAMES) {
                 frames.decrementAndGet();
                 return false;
@@ -910,6 +1136,39 @@ public class SocketHub {
                     remove(length);
                 }
             };
+        }
+    }
+
+    /**
+     * A budget which is spent and comes back over time: at most its burst
+     * at once, refilled at its rate a second (a token bucket).
+     */
+    private static final class Budget {
+
+        private final long burst;
+        private final long rate;
+        private final Clock clock;
+        private double left;
+        private long last;
+
+        private Budget(final long burst, final long rate, final Clock clock) {
+            this.burst = burst;
+            this.rate = rate;
+            this.clock = clock;
+            this.left = (double) burst;
+            this.last = clock.millis();
+        }
+
+        /** Takes the amount, if that much is left. */
+        private synchronized boolean take(final long amount) {
+            final long now = clock.millis();
+            left = Math.min((double) burst, left + ((double) Math.max(0, now - last) * rate / 1000.0));
+            last = now;
+            if ((double) amount > left) {
+                return false;
+            }
+            left -= (double) amount;
+            return true;
         }
     }
 

@@ -135,6 +135,7 @@ final class MasterKeyRequestTest {
 
         final Map<String, String> errors = request.validate();
         assertEquals(1, errors.size());
-        assertTrue(errors.get(Constants.FIELD_URL).startsWith("The URL field is invalid"));
+        // A fixed message: the URL may hold a secret, and the answer is logged.
+        assertEquals("The URL field is invalid.", errors.get(Constants.FIELD_URL));
     }
 }
